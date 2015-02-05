@@ -56,7 +56,12 @@ module Skylab::TanMan
       new = proto.__dupe except: [:id, [:equals, :id]]
       new[:id] = _parse_id key_s
       new[:equals][:id] = _parse_id val.to_s
-      _insert_item_before_item new, new_before_this_asst # nil ok for 2nd param
+
+      if new_before_this_asst
+        _insert_item_before_item new, new_before_this_asst
+      else
+        _append! new
+      end
     end
   end
 end

@@ -8,6 +8,9 @@ module Skylab::TanMan::TestSupport::Models::Node
 
   extend TestSupport_::Quickie
 
+  EMPTY_S_ = TestLib_::EMPTY_S_
+  NEWLINE_ = TestLib_::NEWLINE_
+
   module InstanceMethods
 
     Constants::Within_silo[ :node, self ]

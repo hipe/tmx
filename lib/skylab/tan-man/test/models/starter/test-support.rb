@@ -8,6 +8,6 @@ module Skylab::TanMan::TestSupport::Models::Starter
 
   extend TestSupport_::Quickie
 
-  NEWLINE_ = NEWLINE_
+  NEWLINE_ = TestLib_::NEWLINE_
 
 end

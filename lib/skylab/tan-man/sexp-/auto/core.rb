@@ -2,17 +2,18 @@ module Skylab::TanMan
 
   module Sexp_::Auto
 
-    # This module is an experiment in the automatic generation of abstract
-    # syntax trees (their classes and then objects) dynamically
-    # from the syntax nodes of a parse from a Treetop grammar.
+    # an experiment in the automatic generation of abstract syntax trees
+    # (classes perchance to have objects) dynamically from the syntax nodes
+    # of a parse from a Treetop grammar.
 
     class << self
-      attr_accessor :debug_stream
-      attr_accessor :do_debug
-      alias_method :debug?, :do_debug
-    end
 
-    @debug_stream = TanMan_.lib_.some_stderr
+      attr_accessor :do_debug
+
+      def debug_stream
+        TanMan_.lib_.some_stderr
+      end
+    end
 
     @do_debug = true  # true until you know enough to find this line
 
@@ -95,16 +96,19 @@ module Skylab::TanMan
       # There might be issues with hacks with more broad patterns intercepting
       # all potential matches with hacks with more narrow patterns so
       # order might be important here.
+
       i.tree_class and fail('sanity') ; i.tree_class = tree_class # sorry
-      hack =   Sexp_::Auto::Hacks::HeadTail.match i # run hacks
-      hack ||= Sexp_::Auto::Hacks::RecursiveRule.match i
+
+      hack =   Auto_::Hacks__::HeadTail.match i  # run hacks
+      hack ||= Auto_::Hacks__::RecursiveRule.match i
       hack and hack.commit!
+
       tree_class
     end
 
     def inference2tree o # extent: solo def, 2 calls
-      if o.member and Sexp_::Auto::Hacks::MemberName.matches? o.member
-        Sexp_::Auto::Hacks::MemberName.tree o
+      if o.member and Auto_::Hacks__::MemberName.matches? o.member
+        Auto_::Hacks__::MemberName.tree o
       elsif o.element_names_are_inferrable
         tree_class = if o.sexps_module.const_defined?( o.sexp_const, false )
           o.sexps_module.const_get o.sexp_const, false
@@ -118,7 +122,7 @@ module Skylab::TanMan
         # Note that we have *no* parent tree class per above, and no elem name.
         a = if o._node.elements
           o._node.elements.map do |n|
-            Sexp_::Auto::Inference.get(n, nil, nil)
+            Auto_::Inference.get(n, nil, nil)
           end
         end
         if a and a.any? { |x| x.the_expression_name_is_inferrable or x.element_names_are_inferrable }
@@ -126,17 +130,17 @@ module Skylab::TanMan
           a.each_with_index { |_inf, idx| list[idx] = inference2tree(_inf) }
           list
         else
-          Sexp_::Auto::Factories::TextValue.tree o
+          Auto_::Factories::TextValue.tree o
         end
       end
     end
 
     def instance_methods_module
-      Sexp_::Auto::InstanceMethods
+      Auto_::InstanceMethods
     end
 
     def list_class
-      Sexp_::Auto::List
+      Auto_::List
     end
 
     def module_methods_module
@@ -145,11 +149,11 @@ module Skylab::TanMan
 
     def node2tree node, parent_class, member_i # extent: solo def, 2 calls
       # don't call node.tree because that can call this
-      inference2tree Sexp_::Auto::Inference.get(node, parent_class, member_i)
+      inference2tree Auto_::Inference.get(node, parent_class, member_i)
     end
 
     def sexp_builder_anchor_module # experimental
-      Sexp_::Auto
+      Auto_
     end
 
     self
@@ -160,7 +164,7 @@ module Skylab::TanMan
     # This module or descendant modules will be included by generated
     # Sexp_ ("tree") classes.
 
-    include Sexp_::Auto::BuildMethods # node2tree et. al
+    include BuildMethods # node2tree et. al
 
     # extent: solo def, 2 calls
 
@@ -189,9 +193,13 @@ module Skylab::TanMan
       elsif err_p
         err_p[ parser ]
       else
-        Stderr_[].puts "#{ self } parse failed - #{ parser.failure_reason }"
+        raise Parse_Failure.new( __say_parse_failed parser )
         UNABLE_
       end
+    end
+
+    def __say_parse_failed parser
+      "#{ name } parse failed - #{ parser.failure_reason || '(no reason?)' }"
     end
 
     attr_accessor :rule
@@ -203,6 +211,8 @@ module Skylab::TanMan
       new( * child_a )
     end
   end
+
+  Parse_Failure = ::Class.new ::RuntimeError
 
   module InstanceMethods
 
@@ -302,9 +312,7 @@ module Skylab::TanMan
 
   # --*--
 
-  My_Struct_ = TanMan_.lib_.basic_struct
-
-  ContentTextValue = My_Struct_[ :content_text_value ]
+  # ContentTextValue = TanMan_.lib_.basic_struct :content_text_value  # #todo
 
   class ContentTextValue
 
@@ -324,8 +332,31 @@ module Skylab::TanMan
       def [] syntax_node
         new syntax_node.text_value
       end
-      alias_method :_members, :members
+      # alias_method :_members, :members
     end
+
+    def initialize x
+      @content_text_value = x
+    end
+
+    def __dupe _=nil
+      dup
+    end
+
+    def initialize_copy _
+      @content_text_value = @content_text_value.dup
+      nil
+    end
+
+    def [] sym
+      if :content_text_value == sym
+        @content_text_value
+      else
+        raise ::NameError, "no member '#{ x }' in struct"
+      end
+    end
+
+    attr_reader :content_text_value
 
     def normalized_string
       @content_text_value
@@ -348,12 +379,8 @@ module Skylab::TanMan
 
   class Inference
 
-    def initialize extension_module_meta_a, member_i, _node, _parent_class,
-        tree_class=nil # only used for hacks for now (experimental!!)
-
-      @extension_module_metas, @member, @_node, @_parent_class,
-        @tree_class = extension_module_meta_a, member_i, _node, _parent_class,
-          tree_class
+    def initialize * a
+      @extension_module_metas, @member, @_node, @_parent_class, @tree_lass = a
     end
 
     def members
@@ -369,7 +396,7 @@ module Skylab::TanMan
     # for a given node from its extension modules.  We crawl up backwards from
     # the first extension module to infer things like the sexp wrapper module.
 
-    cache = { } # for some algorithms we might try look-ahead to infer names
+    cache = {}  # for some algorithms we might try look-ahead to infer names
 
     factory = nil
 
@@ -408,12 +435,12 @@ module Skylab::TanMan
             found = i ; break
           end
         end
-        metas = a.map { |mod| Sexp_::Auto::ExtensionModuleMeta[mod] }
+        metas = a.map { |mod| Auto_::ExtensionModuleMeta[mod] }
         if found
-          Sexp_::Auto::Inference_WithElements.new(
+          Auto_::Inference_WithElements.new(
             metas, member_i, node, parent_class, found)
         else
-          Sexp_::Auto::Inference_WithConst.new(
+          Auto_::Inference_WithConst.new(
             metas, member_i, node, parent_class)
         end
       end
@@ -491,22 +518,21 @@ module Skylab::TanMan
     # (In such a series, the "outermost" node gets the highest number.)
     #
     # So in this example, (using a notation where:
+    #
     #   <first em name> => <sexp const name>
+    #
     # ) we get:
+    #
     #   Foo0 => Foo0, Foo1 => Foo1, BUT : Foo2 => Foo
 
-    STEM = { } # grammar_mod => :Foo => [:Foo0, :Foo1, :Foo2]
-
-    SEXP = { } # grammar_mod => { :Foo3 => :Foo, :Foo2 => :Foo2, ... }
-
     def sexp_const
-      ( SEXP.fetch grammar_module do |grammar_module|
-        SEXP[ grammar_module ] = (
+      ( SEXP__.fetch grammar_module do |grammar_module|
+        SEXP__[ grammar_module ] = (
          ::Hash.new do |hsh, const|
             stem = chomp_digits const
             arr = (
-              STEM.fetch grammar_module do |gram_mod|
-                STEM[gram_mod] = (
+              STEM__.fetch grammar_module do |gram_mod|
+                STEM__[gram_mod] = (
                   ::Hash.new do |h, stm|
                     i = 0 ; a = [ ] ; gm = gram_mod
                     loop do
@@ -523,6 +549,10 @@ module Skylab::TanMan
         )
       end )[ expression_extension_module_meta.tail_const ]
     end
+
+    STEM__ = {}  # grammar_mod => :Foo => [:Foo0, :Foo1, :Foo2]
+
+    SEXP__ = {}  # grammar_mod => { :Foo3 => :Foo, :Foo2 => :Foo2, ... }
 
     def sexps_module
       # auto-vivify a module to hold generated sexps
@@ -557,7 +587,6 @@ module Skylab::TanMan
     def members
       [ * super, :methods_of_interest ]
     end
-
 
     def methods_of_interest
       extension_module_metas[ @methods_idx ].module.instance_methods
@@ -641,9 +670,11 @@ module Skylab::TanMan
     end
   end
 
+  Auto_ = self
+
   # --*--
 
-module Lossless
+  module Lossless
 
     # "lossless" means the sexp can recreate faithfully (losslessly) the
     # entirety of the source input string.
@@ -651,7 +682,7 @@ module Lossless
 
   module BuildMethods
 
-    include Sexp_::Auto::BuildMethods
+    include Auto_::BuildMethods
 
     def build_element_names i # extent: * defs, 1 call
 
@@ -690,23 +721,23 @@ module Lossless
     end
 
     def instance_methods_module
-      Sexp_::Auto::Lossless::InstanceMethods
+      Auto_::Lossless::InstanceMethods
     end
 
     def list_class
-      Sexp_::Auto::Lossless::List
+      Auto_::Lossless::List
     end
   end
 
   extend BuildMethods
 
   module ModuleMethods
-    include Sexp_::Auto::ModuleMethods
+    include Auto_::ModuleMethods
   end
 
   module InstanceMethods
 
-    include Sexp_::Auto::InstanceMethods
+    include Auto_::InstanceMethods
 
     def description
       unparse
@@ -735,8 +766,8 @@ module Lossless
     end
   end
 
-  class List < Sexp_::Auto::List
-    include Sexp_::Auto::Lossless::InstanceMethods
+  class List < Auto_::List
+    include Auto_::Lossless::InstanceMethods
   end
 
   # --*--
@@ -778,6 +809,6 @@ module Lossless
       new(* _children)
     end
   end
-end
+  end
   end
 end

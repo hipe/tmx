@@ -4,7 +4,7 @@
 
 ## introduction
 
-remember that constants in ruby hold references to any arbitrary value.
+remember that a constant in ruby can refer to any arbitrary value.
 remember too that ruby itself dictates that the const name must be
 something like:
 
@@ -117,19 +117,19 @@ a const name indicates how private the value is:
 mean by "node" see [#094].)
 
 this means that the characters that make up this const's name and the
-sematics of what this this const references must not change during this
+semantics of what this const references must not change during this
 "version" [1][1] of the surrounding node.
 
 as such, during development of a new-ish library we will often find that
-we largely avoid naming constants as such, because of how quickly things
-change.
+we largely avoid naming constants using this classification because of
+how quickly things are changing.
 
 also we avoid deep names with many such consts for the same reason
 [#xxx].
 
 
 
-#### a const with one trailing underscore is..
+#### a const with *one* trailing underscore is..
 
 .."visible" to the surrounding node and any nodes below it.
 
@@ -140,7 +140,7 @@ subsystem.
 
 
 
-#### a const with two or more trailing underscores is..
+#### a const with *two* trailing underscores is..
 
 .."visible" only to the surrounding node and/or file that the const is
 defined in. this is both the ugliest variant and perhaps most commonly
@@ -148,6 +148,31 @@ used.
 
 the reason we see this convention employed so often is that it reflects
 and encourages "good" design: [#xxx]
+
+
+
+#### a const with *three* trailing underscores..
+
+..has the same characteristis as the criteria for "two" above, but also
+that constant is only accessed from one code location.
+
+
+
+### why use these scope-related name conventions for consts?
+
+we certainly don't use them because they are pretty. we use them because
+it optimizes our code for refactorability: how large the scope is for a
+given const directly expressses the cost of changing it. on the one
+end, a const with three trailing underscores can be presumed to have a
+relatively low cost of change because the instances of it being coupled
+to is relatively low (it is only used in one place). on the other end, a
+const with zero trailing underscores can be presumed to have a much
+greater scope and consequently probably has a much higher cost of
+change.
+
+this added dimension to const names can help inform decisions quickly
+about how important a node is when we are considering changing its
+interface or removing it altogether.
 
 
 

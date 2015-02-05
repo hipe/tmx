@@ -1,8 +1,16 @@
 digraph{
 
+  am [ label="associate\nmagnetic" ]
+  cv [ label="basic CLI\nvisaul re-integration" style=filled ]
+  cn [ label="cleanup\nnames" ]
+  si [ label="silo\nsquash" ]
   ss [ label="get [tm] to\nbe self-supporting" ]
-  xx [ label="basic CLI\nvisaul re-integration" fillcolor="#b5d5fb" style=filled ]
-  ss->xx
+  st [ label="sg\ntags" ]
+  tu [ label="ttt\nunify" ]
+  the_rest [ label="[the rest]" ]
+
+  ss->the_rest
+  the_rest->cv
 
   # that one color of blue: fillcolor="#b5d5fb" style=filled
 

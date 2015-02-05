@@ -6,7 +6,9 @@ module Skylab::TanMan::TestSupport::Sexp
 
   include Constants
 
-  TanMan_ = TanMan_ ; TestLib_ = TestLib_
+  TanMan_ = TanMan_
+  TestLib_ = TestLib_
+  EMPTY_S_ = TestLib_::EMPTY_S_
 
   module InstanceMethods
 

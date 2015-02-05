@@ -99,7 +99,7 @@ module Skylab::TanMan
           @fuzzy_matches_found = nil
           @has_neighbors = true
           @num_nodes_seen = 0
-          @scan = @stmt_list.to_stream
+          @scan = @stmt_list.to_node_stream_
           @still_looking_for_lexically_greater = @can_create  # || @can_create.nil?
           init_matchers
         end
@@ -363,14 +363,21 @@ module Skylab::TanMan
         end
 
         def insert_when_touch_and_no_matches
+
           _least_greater_neighbor = @first_lexically_greater_node_stmt ||
             @first_non_node_stmt || @first_edge_stmt
+
           nd = @created_existing_or_destroyed_node
-          new_stmt_list = @datastore.insert_stmt_before_stmt(
+
+          _new_stmt_list = @datastore.insert_stmt_before_stmt(
             nd, _least_greater_neighbor )
-          node_stmt = new_stmt_list[ :stmt ]
+
+          node_stmt = _new_stmt_list[ :stmt ]
+
           nd.object_id == node_stmt.object_id or self._SANITY
+
           send_created_event_for_node node_stmt
+
           ACHIEVED_
         end
 

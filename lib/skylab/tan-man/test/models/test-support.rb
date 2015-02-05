@@ -8,15 +8,17 @@ module Skylab::TanMan::TestSupport::Models
 
   extend TestSupport_::Quickie
 
-  EMPTY_S_ = EMPTY_S_
-
-  NEWLINE_ = NEWLINE_
-
-  TanMan_ = TanMan_ ; TestLib_ = TestLib_
-
   Brazen_ = TanMan_::Brazen_
 
   Callback_ = TanMan_::Callback_
+
+  TanMan_ = TanMan_
+
+  TestLib_ = TestLib_
+
+  EMPTY_S_ = TestLib_::EMPTY_S_
+
+  NEWLINE_ = TestLib_::NEWLINE_
 
   module Constants
 
@@ -119,7 +121,7 @@ module Skylab::TanMan::TestSupport::Models
         d += 1
       end
       @__seen_id_h[ s_a_ ] = true
-      s_a_ * TanMan_::Brazen_::UNDERSCORE_
+      s_a_ * TestLib_::UNDERSCORE_
     end
 
     # ~
@@ -251,7 +253,7 @@ module Skylab::TanMan::TestSupport::Models
 
     def dir sym
       ::File.join( dirs,
-        sym.id2name.gsub( Callback_::UNDERSCORE_, Callback_::DASH_ ) )
+        sym.id2name.gsub( TestLib_::UNDERSCORE_, TestLib_::DASH_ ) )
     end
 
     def dirs

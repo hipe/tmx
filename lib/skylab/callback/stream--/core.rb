@@ -137,6 +137,21 @@ module Skylab::Callback
 
         end  # >>
 
+        def length_exceeds d
+          does_exceed = false
+          known_length = 0
+          begin
+            if known_length > d
+              does_exceed = true
+              break
+            end
+            gets or break
+            known_length += 1
+            redo
+          end while nil
+          does_exceed
+        end
+
         def count
           d = 0
           d +=1 while gets
@@ -181,6 +196,16 @@ module Skylab::Callback
 
         def expand_by & p
           self.class.expand self, p
+        end
+
+        def last
+          begin
+            x = gets
+            x or break
+            y = x
+            redo
+          end while nil
+          y
         end
 
         def map & p

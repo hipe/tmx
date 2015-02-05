@@ -40,7 +40,7 @@ module Skylab::TanMan::TestSupport::Models::Association
       expect_OK_event :deleted_association do |ev|
         ev.to_event.association.unparse.should eql "foo -> bar"
       end
-      @output_s.should eql "digraph {\n foo\nbar\n }\n"
+      @output_s.should eql "digraph {\n foo\nbar\n}\n"
       expect_succeeded
     end
 

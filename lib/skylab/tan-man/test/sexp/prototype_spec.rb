@@ -4,7 +4,7 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
 
   describe "[tm] sexp prototype" do
 
-    extend TS_  # #borrow:one
+    extend TS_
 
   using_grammar '70-38-simplo' do
 
@@ -35,36 +35,44 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
       it 'raises a runmun error at parse time' do
         -> do
           result
-        end.should raise_error %r(\bwhen parsing .+prototype)
+        end.should raise_error subject::Invalid_Prototype
       end
     end
 
     using_input 'two-element-prototype' do
+
       it 'appends and inserts valid string items - PARTIALLY PENDING' do
+
         o = result.node_list
-        r = o._append! 'faeioup'
-        o.object_id.should eql( r.object_id )
-        o.unparse.should eql( 'faeioup' ) # no seaprator here
+
+        x = o._append! 'faeioup'
+        x.object_id.should eql o.object_id
+        o.unparse.should eql 'faeioup'  # no separator here
         lines = result.unparse.split NEWLINE_
-        lines.length.should eql( 2 )
-        lines.last.should eql( 'faeioup' )
-        r = o._append! 'fooooop'
-        ( r.object_id == o.object_id ).should eql( false )
-        o.unparse.should eql( 'faeioup ;  fooooop' ) # exactly what u asked for
-        r2 = o._append! 'fuuup'
-        ( r2.object_id == r.object_id ).should eql( false )
+        lines.length.should eql 2
+        lines.last.should eql 'faeioup'
+
+        x = o._append! 'fooooop'
+        ( x.object_id == o.object_id ).should eql false
+        o.unparse.should eql 'faeioup ;  fooooop'  # exactly what u asked for
+
+        x = o._append! 'fuuup'
+        ( x.object_id == o.object_id ).should eql false
+
         exp = 'faeioup ;  fooooop ;  fuuup'
-        o.unparse.should eql( exp )
-        result.unparse.split( "\n" ).last.should eql( exp )
-        if false
+        o.unparse.should eql exp
+        @result.unparse.split( TanMan_::NEWLINE_ ).last.should eql exp
+
+        if false  # #todo - necessary stuff not yet implemented
         o._insert_item_before_item 'faeup', 'fooooop'
         o.unparse.should eql( 'faeioup ;  faeup ;  fooooop ;  fuuup' )
         end
       end
 
-      it 'appends an invalid string as an item' do
-        result.node_list._append!('fzzzp')
-        result.node_list.unparse.should eql('fzzzp')
+      it "append an invalid node - raises" do
+        -> do
+          result.node_list._append! 'fzzzp'
+        end.should raise_error TanMan_::Sexp_::Auto::Parse_Failure
       end
     end
   end
@@ -80,37 +88,51 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
 
     using_input_string 'beginning feep ending', 'one' do
 
-      it('enumerates') { unparses.should eql(['feep']) }
+      it 'enumerates' do
+        unparses.should eql [ 'feep' ]
+      end
     end
 
     using_input_string 'beginning fap;fep;fip ending', 'three' do
 
-      it('enumerates') { unparses.should eql(['fap', 'fep', 'fip']) }
+      it 'enumerates' do
+        unparses.should eql [ 'fap', 'fep', 'fip' ]
+      end
     end
 
     using_input 'primordial' do
 
-      it 'appends a valid string as an item - BORKED - where are semis?' do
+      it "append valid strings - separator semantics because prototype" do
+
         o = result.node_list
-        o.nil?.should eql( false )
-        o.nodes.should eql( [] )
-        r = o._append! 'fiiiiip'
-        r.object_id.should eql(o.object_id)
-        o.unparse.should eql( "fiiiiip;\n" )
-        o._append! 'fap'
-        o.unparse.should eql( "fiiiiip;\nfap\n" ) # look what it did!
+        o.nodes.should eql TanMan_::EMPTY_A_
+
+        x = o._append! 'fiiiiip;'
+        x.object_id.should eql o.object_id
+        o.unparse.should eql "fiiiiip\n"
+
+        o._append! 'fap;'
+        o.unparse.should eql "fiiiiip;\nfap\n"
       end
 
       it 'raises an exception if you try to append an invalid string' do
-        ->{ result.node_list._append!('fzzzp') }.should raise_error(
-          /failed to parse item to insert/)
+
+        -> do
+          result.node_list._append! 'fzzzp'
+        end.should raise_error TanMan_::Sexp_::Auto::Parse_Failure
       end
     end
 
     # --*--
+
     def unparses
       result.node_list.nodes.map(&:unparse)
     end
   end
+
+  def subject
+    TanMan_::Sexp_::Prototype
+  end
+
 end
-end # a hiccup in indentation for Quickie
+end

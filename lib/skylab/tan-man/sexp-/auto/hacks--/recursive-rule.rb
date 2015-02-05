@@ -1,527 +1,885 @@
 module Skylab::TanMan
 
-  module Sexp_::Auto::Hacks::RecursiveRule
+  module Sexp_::Auto
 
-    # This hack matches a node that matches the first of a series of patterns:
-    # 1) if a rule has an element that itself has the same name as the rule
-    # 2) if the rule is named "foo_list" and has a "foo" as an element
-    #     (a member called "tail" is then assumed that itself must have
-    #      a member called "foo_list")
-    # A large portion of the hack is dedicated to an experimental mutation API
+  module Hacks__::RecursiveRule
 
-    extend Sexp_::Auto::Hack::ModuleMethods
+    # Synopsis: this hack exists primarily to deliver the list mutation API,
+    # a sub-library that is both essential to the host application and (in its
+    # implementation) highly experimental in effort to DRY itself.
+    #
+    #
+    # Behavior added by this hack:
+    #
+    # for any structure class that matches any first of the below criteria,
+    # it will be given (directly) a set of methods which whenever appropriate
+    # will have a name and behavior that is an adaption of a particular
+    # function from the W3C's XML DOM API: `insertBefore`, `appendChild`,
+    # `removeChild`.
+    #
+    # in this documentation and code we will refer to these added methods
+    # generally as "operations".
+    #
+    # these operations should behave generally in the expected way, with
+    # (open [#092]) either some magic or some specialization to be added
+    # to allow for strings to be passed in instead of nodes when relevant.
+    #
+    # when relevant the W3C names will be adapted in some regular way,
+    # probably to substitue our idiomatic "node" in place of "child", and to
+    # give the methods more self-documenting names with respect to their
+    # parameters.
+    #
+    #
+    # Criteria to match the hack:
+    #
+    # remember that our parses produce structures that follow the name and
+    # structure of the rules of the grammar. this hack matches those structure
+    # classes that match any first of this series of patterns:
+    #
+    # 1) if the structure class has a member that is the same name as the
+    #    structure class's corresponding rule (e.g if structure class `FooBar`
+    #    (made for rule `foo_bar`) has a member `foo_bar`), then this
+    #    structure class falls into the classification we call "simple
+    #    recursion". in instances of this structure, this member "slot" (when
+    #    occupied) is assumed to be another instance of this same class of
+    #    structure.
+    #
+    # 2) if the structure class's corresponding rule is named something like
+    #    `foo_list` *and* has a `foo` as an element (where `foo` is any
+    #    nonzero length span of characters), then we assume there is also a
+    #    member called `tail` which in turn (when occupied) is assumed to be
+    #    occupied by an intermediate structure that itself has a member called
+    #    `foo_list` which (when occupied) is again an instance of the topic
+    #    structure class and so on. we call this classification "compound
+    #    recursion".
+    #
+    #
+    # Implementaion
+    #
+    # we implement all this with two categories of component: method
+    # builders and "operation sessions". within each category of component
+    # there is one base class and then one sub-class for each classification
+    # of grammar, amounting to around 6 classes.
 
-    def self.match o
+    extend Hack_::ModuleMethods
 
-      if o.has_members_of_interest
+    class << self
 
-        cls = o.tree_class
-        md = LIST_RX__.match o.rule.to_s
-        if md
-          stem_i = md[ :stem ].intern
+      def match o
+
+        builder_cls = if o.has_members_of_interest
+
+          md = LIST_RX__.match o.rule.to_s
+          if md
+            stem_i = md[ :stem ].intern
+          end
+
+          moi = o.members_of_interest
+          rule_i = o.rule
+
+          if moi.include? rule_i  # a "foo" rule with a "foo" element
+            Simple_Recursion_Methods_Builder___
+
+          elsif stem_i and moi.include? stem_i
+            Compound_Recursion_Methods_Builder___
+          end
         end
-        moi = o.members_of_interest
 
-        if moi.include? o.rule  # "foo" rule with "foo" element
+        if builder_cls
+          builder_cls.new( stem_i, moi, o.tree_class, rule_i ).__produce_hack
+        end
+      end
+    end  # >>
 
-          Sexp_::Auto::Hack.new do
-            _enhance cls,
-              ( md ? stem_i : o.rule ),  # stem
-              :content,  # item
-              o.rule  # tail
+    LIST_RX__ = Hack_.list_rx  # any name that ends in "_list"
+
+    class Methods_Builder__
+
+      def initialize stem_i, moi, cls, rule_i
+        @cls = cls
+        @rule_i = rule_i
+        @stem_i = stem_i
+        @some_stem_i = stem_i || rule_i
+        init_session_prototype_
+      end
+
+      def __produce_hack
+        Hack_.new do
+          me = self
+          @cls.class_exec do
+
+            include Common_Static_Methods___
+
+            # ~ mutators
+
+            define_method :_append!, me.build_append_item_method
+            define_method :_insert_item_before_item, me.build_insert_item_before_item_method
+            define_method :_remove_item, me.build_remove_item_method
+
+            # ~ readers
+
+            define_method me.pluralized_method_name, ITEMS_SOFT_ALIAS_METHOD___
+            define_method :_items, me.build_to_items_array_method  # #todo: rename this to `to_items_array_`
+            define_method :to_node_stream_, me.build_to_node_stream_method
+
+            nil
           end
+        end
+      end
 
+      # ~ mutators
 
-        elsif md  # "foo_list" rule with "foo" elem
+      def build_insert_item_before_item_method
 
-          if moi.include? stem_i
+        sess = @session
+        -> new_x, before_this_x do
+          before_this_x or self._WHERE
+          o = sess.dup
+          o.init_insertion to_node_stream_, new_x, self
+          o.receive_reference_x before_this_x
+          o.insert_new_item_before_item
+        end
+      end
 
-            Sexp_::Auto::Hack.new do
-              _enhance cls,
-                stem_i,  # stem
-                stem_i,  # item
-                :tail,  # tail
-                o.rule  # list
-            end
-          end
+      def build_append_item_method
+
+        sess = @session
+        -> new_s do
+          o = sess.dup
+          o.init_insertion to_node_stream_, new_s, self
+          o.via_new_string_append
+        end
+      end
+
+      def build_remove_item_method
+
+        sess = @session
+        -> s do
+          o = sess.dup
+          o.remove to_node_stream_, s, self
+        end
+      end
+
+      # ~ for readers
+
+      def pluralized_method_name
+        :"#{ @some_stem_i }s"
+      end
+
+      def build_to_items_array_method
+        item_k = @session.item_k
+        -> do
+          to_node_stream_.map_by do | x |
+            x[ item_k ]
+          end.to_a
         end
       end
     end
 
-    LIST_RX__ = Sexp_::Auto::Hack.list_rx  # any name that ends in "_list"
+    ITEMS_SOFT_ALIAS_METHOD___ = -> do
+      _items
+    end
 
-    METHOD_I_A__ = [ :_append!, :_insert_item_before_item, :_items, :_remove_item ]
+    class Simple_Recursion_Methods_Builder___ < Methods_Builder__
 
-    METHOD_I_A__.push :_named_prototypes # this is *so* sketchy here #experimental
-                                  # but still we want in the check below
-                                  # to make sure we aren't overriding the
-                                  # good methods
+      def init_session_prototype_
 
-    def self._enhance tree_class, stem, item, tail, list=nil
+        @session = Simple_Recursion_Operation_Session___.new(
 
-                                  # *NOTE* the above 3 parameters `item`,
-                                  # `tail`, `list` are *all* symbols that
-                                  # represent struct member names (rule names)
-                                  # from the grammar!
-
-      # #experimental'y functional - everything is here
-
-      ( METHOD_I_A__ & tree_class.instance_methods ).length.nonzero? and fail 'sanity'
-
-                                               # be sure we're not overwriting
-      tree_class._hacks.push :RecursiveRule    # #debugging-feature-only
-      tree_class.include Sexp_::Auto::Hacks::RecursiveRule::SexpInstanceMethods
-
-      match_p = -> search_item do              # a function to make matcher
-        if ::String === search_item            # functions for matching nodes
-          -> node { search_item == node[item] }  # that new nodes are
-        else                                   # supposed to come before / after
-          -> node { search_item.object_id == node[item].object_id }
-        end
+          @some_stem_i,  # stem
+          :content,  # item
+          @rule_i ) # tail
+        nil
       end
 
-      # determining what is the node that follows a node is different
-      # based on whether or not there is a list member
+      def build_to_node_stream_method
 
-      next_node = if list then
-        -> node do
-          x = node[ tail ]
-          if x
-            if tree_class == x.class
-              # #todo - this is an edge case that happens in nature. not covered
-              x
-            else
-              x[ list ]
-            end
-          end
-        end
-      else
-        -> node do
-          node[ tail ]
-        end
-      end
+        tail_k = @session.tail_k
+        item_k = @session.item_k
 
-      # -- Item insertion lambdas
-
-      normalize_item = -> item_elem, proto do  # normalize the item for insert
-        res = nil                              # (parsing string if necessary)
-        begin
-          if ! (::String === item_elem)        # then item is presumably a sexp
-            break( res = item_elem )           # and validating it would be
-          end                                  # prohibitively annoying
-          o = proto[ item ]
-          if ::String === o                    # the elem in the proto is also
-            break( res = item_elem )           # a string, they both are, so
-          end                                  # again validating is meh
-
-          # item is string and proto elem is not string, assume we are to parse
-          res = o.class.parse o.class.rule, item_elem, -> failed_parser do
-            fail "failed to parse item to insert - #{
-              }#{ ( failed_parser.failure_reason || item_elem ).inspect }"
-          end
-
-        end while nil
-        res
-      end
-                                               # what is the index, the left
-                                               # and right node of the new node
-                                               # to be inserted?
-      idx_left_right = -> new_before_this, existing_a do        # #single-call
-        if new_before_this
-          match = match_p[ new_before_this ]
-          right, idx = existing_a.each.with_index.detect { |x, _| match[ x ] }
-          right or fail "node to insert before not found."
-          left = 0 == idx ? nil : existing_a[ idx - 1 ]
-        else
-          left = existing_a.last               # nil IFF adding to empty list
-          idx = existing_a.length
-          right = nil
-        end
-        [ idx, left, right ]
-      end
-
-
-      normalize_proto_a = -> me, existing_a, idx do             # #single-call
-        proto_a = nil
-        if me._prototype
-          proto_a = me._prototype._nodes.to_a
-        else
-          proto_a = existing_a
-        end
-        if proto_a.length < 2
-          fail "cannot insert into a list with less than 2 items -- #{
-            }for hack to work, need a prototype list, node & item."
-        end
-
-        res = [ proto_a.first, nil ] # always hold on to first, it can be spec.
-        res[0] = proto_a[0]
-        use_idx = [1, [idx, proto_a.length - 2].min ].max # explain this #todo
-        res[1] = proto_a[ use_idx ]
-        res
-      end
-
-
-      tail_p = -> right, proto do                               # #multi-call
-        # nasty : we ned to do this before we reassign any members of "left"
-        # because left itself may be the prototype node!
-        #
-        o = nil
-        if list
-          if next_node[ proto ]
-            fail "can't use non-ultimate node in prototype for this #{
-              }hack to work." # w/o heavy hacking
-          end
-          o = proto.__dupe_member tail
-          o[list] = right if right
-        elsif right
-          o = right
-        else
-          o = nil
-        end
-        -> _ { o }
-      end
-
-
-
-      # -- List item insertion lambdas (in ascending order of complexity)
-
-                                  # #experimental for hacks .. what is the list
-                                  # of separator or whitespace-like elements
-                                  # that is true-ish in both the head and tail
-                                  # prototypes?
-      inner_p = -> me, proto_0, proto_n do # experimental for hacks!
-        ( me.class._members - [ item, tail ] ).reduce( [] ) do |memo, m|
-          if proto_0[m] && proto_n[m]
-            memo << m
-          end
-          memo
-        end # e.g. `e0`, `e2`, `sep`
-      end
-
-      initial = -> me, proto_a do                               # #single-call
-        # This is for the case of initial insertion of an item into an empty
-        # list node -- something that is not normally possibly with recursive
-        # rules of the form  foo_list ::= (foo (sep foo_list)? sep?)?
-        # (whenever a list node is created it has something in it),
-        # so this only used for the kind of weird hacks this library
-        # is for..
-        #
-        # Regardless, the strategy for the insertion of an item into an empty
-        # list (which we might call a "list controller") is as follows:
-        #
-        # Take for example a prototype "a=b, c=d":
-        # In this case, we want the newly inserted item to look like "e=f",
-        # so note neither the "," (which is `e2` of proto_0 in one grammar)
-        # nor the " " (which is `e0` of proto_n in the same), make in into
-        # the final item (er, list node). So we have bit of a problem inferring
-        # how the first element inserted into a list should look given
-        # that the the prototype is necessarily (and reasonably) at least
-        # two elements long.
-        #
-        # What we do for now is say, "we will take from proto_0 the element
-
-
-        proto_0, proto_n = [ proto_a.first, proto_a.last ]
-
-        inner = inner_p[ me, proto_0, proto_n ] # see
-
-        xfer = ::Hash.new -> m do
-          if me[m]                # if there was already *anything* there, just
-            me[m]                 # use that, don't clobber it.
-          elsif inner.include? m
-            rs = proto_0.__dupe_member m
-          end
-          rs
-        end
-        [ me, me, xfer ]          # `me` is the final result, and receiver
-                                  # (below line left intact for that project.)
-      end # (there was stark tranformation above for [#bs-010])
-
-
-
-
-      insert = if list
-        # For inserting an item under an existing parent (left) node ..
-        -> me, proto_a, left, right do
-          proto_0, proto_n = [proto_a.first, proto_a.last]
-
-          new = proto_n.__dupe except:[item, [tail, list]]
-
-          if ! left[tail]
-            left[tail] = proto_0[tail].__dupe except: [list]
-          end
-          left[tail][list] = new
-
-                                               # (ick) b/c everything is done
-          selfsame = -> k { new[k] }           # above we just xfer in the same
-          xfer = ::Hash.new selfsame           # values here..
-          xfer[tail] = selfsame                # and here.
-
-          if right
-            new[tail][list] = right
-          end
-          [new, new, xfer]
-        end
-      else
-        -> me, proto_a, left, right do
-          proto_0, proto_n = [proto_a.first, proto_a.last]
-
-          ancillary = me.class._members - [item, tail]   # `e0`, `e2`
-          if ! right
-            ancillary.each do |m|
-              if ! left[m] and proto_0[m]
-                left[m] = proto_0.__dupe_member m        # e.g. ','
-              end
-            end
-          end
-
-          if right
-            new = proto_n.class.new
-            ancillary.each do |m|                        # leading ' ' and
-              if proto_0[m]                              # trailing ','
-                new[m] = proto_0.__dupe_member m
-              elsif proto_n[m]
-                new[m] = proto_n.__dupe_member m
-              end
-            end
-          else
-            new = proto_n.__dupe except:[item, tail]     # e.g. ' '
-          end
-
-          selfsame = -> k { new[k] }
-          xfer = ::Hash.new selfsame
-          xfer[tail] = selfsame
-
-          if right
-            new[tail] = right
-          end
-
-          left[tail] = new
-
-          [new, new, xfer]
-        end
-      end
-
-
-
-      swap = -> root, proto_a, new_item, existing_length do
-
-        # Having no `left` node means inserting at root -- b/c of the
-        # structure of recursive rules this works out to be an *intense*
-        # hack, see _remove_item
-        #
-        # Specifically, (and remembering: a "node" *has* an "item"
-        # (e.g. AList has AList1), the `new_list` we create actually
-        # goes to live in the second slot, getting for its members
-        # a lot of the members root used to have (like its item and tail)..
-        # hold on tight..
-
-
-        proto_0, proto_n = [proto_a.first, proto_a.last]
-        new_list = root.class.new
-
-                                               # When transferring each member
-                                               # to the new node we created,
-                                               # the default behavior is to
-                                               # snatch the element from the
-                                               # root and give it to the new
-                                               # node, and in its stead give
-                                               # root a shiny new element from
-        xfer = ::Hash.new -> m do              # the prototye.
-          give_to_root = proto_0.__dupe_member m
-          take_from_root = root[m]
-          root[m] = give_to_root
-                                               # If root didn't have anything
-          if ! take_from_root                  # in a spot (e.g. e0, e2), expect
-            take_from_root = proto_n.__dupe_member m # that there is white-
-          end                                  # -space formatting we need that
-          take_from_root                       # the proto_a had but that root
-        end                                    # didnt.
-
-        orig_root_tail = root[tail]            # about to get clobbered
-        if list && ! next_node[ proto_n ]
-          tail_shell = proto_0[tail].__dupe except: [list]
-          tail_shell[list] = new_list
-          root[tail] = tail_shell              # clobbered is in orig_root_tail
-        else
-          root[tail] = new_list                # clobbered is in orig_root_tail
-        end
-        xfer[tail] = -> _ { orig_root_tail }
-
-        original_root_item = root[item]
-        xfer[item] = -> _ { original_root_item }
-
-        root[item] = normalize_item[ new_item, proto_n ]
-
-        [ root, new_list, xfer ]               # [0] - result of insert call
-                                               # [1] - target of transfer hash
-
-      end
-
-
-
-      tree_class.send :define_method, :_insert_item_before_item do |new, new_before_this|
-        existing_a = _nodes.to_a
-                                               # (the `#`-marked calls below are
-                                               # all #single-call, that is, they
-                                               # are all only used here)
-
-        idx, left, right = idx_left_right[ new_before_this, existing_a ]     #
-
-        proto_a = normalize_proto_a[ self, existing_a, idx ]                 #
-
-        if left
-          res, target, xfer = insert[ self, proto_a, left, right ]           #
-        elsif right
-          res, target, xfer = swap[ self, proto_a, new, existing_a.length ]  #
-        else
-          res, target, xfer = initial[ self, proto_a ]                       #
-        end
-
-        if ! xfer.key? item                    # the default strategy for
-          use_item = normalize_item[ new, proto_a.last ] # populating the
-          xfer[item] = -> _ { use_item }       # `item` (content) part of the
-        end                                    # new node
-
-        if ! xfer.key? tail                    # the default strategy for
-          xfer[tail] = tail_p[ right, proto_a.last ] # populating the
-        end                                    # "next self" part        #
-
-        self.class._members.each do |m|
-          target[m] = xfer[m][ m ]
-        end
-
-        res
-      end
-
-
-      tree_class.send :define_method, :_items do
-        _nodes.map do |node|
-          node[item]
-        end
-      end
-
-
-      tree_class.send :define_method, :_items_count_exceeds do |count|
-        !! _nodes.each_with_index.detect { |_, idx| idx == count }
-      end
-
-
-      tree_class.send :define_method, :_nodes do  # #open [#085]
-        ::Enumerator.new do |y|
-          if self[item] # else zero-width tree stub
-            curr_node = self
-            begin
-              y << curr_node
-              curr_node = next_node[ curr_node ]
-            end while curr_node
-          end
-          nil
-        end
-      end
-
-
-      tree_class.send :define_method, :to_stream do
-        subsequent_p = nil
-        p = -> do
-          if self[ item ]  # else zero-width tree stub
+        -> do
+          p = nil
+          main_p = -> do
             x = self
-            p = subsequent_p[ x ]
-          else
-            p = EMPTY_P_
-          end
-          x
-        end
-        subsequent_p = -> x do
-          -> do
-            x = next_node[ x ]
-            x or p = EMPTY_P_
+            p = -> do
+              x = x[ tail_k ]
+              if ! x
+                p = EMPTY_P_
+              end
+              x
+            end
             x
           end
-        end
-        Callback_.stream do
-          p[]
+          p = -> do
+            # because #artificial-stub
+            if self[ item_k ]
+              p = main_p
+              p[]
+            else
+              p = EMPTY_P_
+              nil
+            end
+          end
+          Callback_.stream do
+            p[]
+          end
         end
       end
+    end
 
+    class Compound_Recursion_Methods_Builder___ < Methods_Builder__
 
+      def init_session_prototype_
 
-      tree_class.send :define_method, :_remove_item do |search_item|
+        @session = Compound_Recursion_Operation_Session__.new(
 
-        parent = res = nil
+          @stem_i,  # stem
+          @stem_i,  # item
+          :tail,  # tail
+          @rule_i )  # list
 
-        match = match_p[ search_item ]
-        target = _nodes.detect do |node|
-          rs = match[ node ] || nil
-          if ! rs
-            parent = node
+        nil
+      end
+
+      def build_to_node_stream_method
+
+        item_k = @session.item_k
+        list_k = @session.list_k
+        tail_k = @session.tail_k
+
+        -> do
+          p = nil
+          main_p = -> do
+            x = self
+            p = -> do
+              tail_x = x[ tail_k ]
+              x_ = if tail_x
+                tail_x[ list_k ]
+              end
+              if x_
+                x = x_
+                x_
+              else
+                p = EMPTY_P_
+                nil
+              end
+            end
+            self
           end
-          rs
+          p = -> do
+            if self[ item_k ]
+              p = main_p
+              p[]
+            else
+              p = EMPTY_P_
+              nil
+            end
+          end
+          Callback_.stream do
+            p[]
+          end
         end
+      end
+    end
 
-        fail "node to remove not found." if ! target
+    class Operation_Session__
 
-        if parent
-          parent[tail] = target[tail]
-          target[tail] = nil
-          res = target
+      # for those operations that mutate the list (append, insert, remove)
+      # we implement each operation in its particular call with one session
+      # instance. the session is used as a "scratch space" to hold operation-
+      # specific data as needed which is then discarded when the operation is
+      # complete; preserving the ivar namespace of the participating
+      # structure itself. we achieve this by duping a "prototype" session
+      # that starts with having nothing but the particular member names.
+
+      def initialize stem, item, tail
+        @item_k = item
+        @stem_k = stem
+        @tail_k = tail
+      end
+
+      attr_reader :item_k, :stem_k, :tail_k
+
+      # ~ appendation & insertion
+
+      def init_insertion node_st, new_x, front_node
+        @front_node = front_node
+        if new_x.respond_to? :ascii_only?
+          @argument_is_string = true
+          @new_s = new_x
         else
-          # When "removing" the first (root) node of a list (tree), we can't
-          # actually remove the node itself because it is a handle to the whole
-          # list.  The really hacky part is this: given that we want to result
-          # in a node that represents what was removed, and we can't actually
-          # remove the first node, we swap all the properties of the first and
-          # second node (except their "next node" properties) and result in
-          # what was once the second node!! ack!
-          # This mess is kept logically separate because as the idea
-          # of zero-width list stubs evolves this might become unnecessary.
-
-          fail 'sanity' if object_id != target.object_id
-          source = next_node[ target ] || target.class.new
-          fail 'sanity' if source.class != target.class
-          xfer = ::Hash.new -> m { target[m] }
-          xfer[tail] = -> _ { nil }
-          target.class._members.each do |m|
-            swap_me = source[m]
-            source[m] = xfer[m][ m ]
-            target[m] = swap_me
-          end
-          res = source # this is the sketchy thing! it is a "surrogate angel"
+          @argument_is_string = false
+          @new_x = new_x
         end
-        res
+        @node_st = node_st
+        nil
       end
 
+      def via_new_string_append
 
+        # exhaust the stream until you are left with any last two items:
+        #   [ [ node_Y ] node_Z ]
 
-      define_items_method tree_class, stem
+        node_Y, node_Z = any_last_two_via_stream @node_st
 
+        @new_item_x = _via_argument_produce_new_mixed_item
 
-      nil
+        if node_Z
+
+          if node_Y
+            __via_new_item_node_append_to_nodes_Y_and_Z node_Y, node_Z
+          else
+            __via_new_item_node_append_to_only_node node_Z
+          end
+        else
+          via_new_item_node_append_into_starter_stub_
+        end
+      end
+
+      def __via_new_item_node_append_to_nodes_Y_and_Z node_Y, node
+        via_new_item_node_append_to_only_node_using_prototype_list_ node, node_Y
+      end
+
+      def __via_new_item_node_append_to_only_node node
+        via_new_item_node_append_to_only_node_using_prototype_list_ node, _prototype_list
+      end
+
+      def insert_new_item_before_item  # assume the reference node exists
+
+        # we care about whether or not the new node is being added at the
+        # front and if so whether the existing list is only one item long
+
+        p = _build_equality_comparator_proc
+        st = @node_st
+        x = st.gets
+
+        if x
+
+          if p[ x ]
+            before_first_node = true
+            any_second_node = st.gets
+          else
+
+            begin
+              greatest_lesser = x
+              x = st.gets
+              x or break
+              if p[ x ]
+                before_non_first_node = true
+                break
+              end
+              redo
+            end while nil
+          end
+        end
+
+        if before_non_first_node
+
+          __build_and_insert_node_between_nodes_L_and_N greatest_lesser, x
+
+        elsif any_second_node
+
+          __build_and_insert_node_in_front_of_plural_list
+
+        elsif before_first_node
+
+          __build_and_insert_node_in_front_of_only_node
+
+        else
+          self._NOT_FOUND
+        end
+      end
+
+      def __build_and_insert_node_between_nodes_L_and_N node_L, node_N
+
+        # the styling of node M must express that it is both non-first and
+        # non-last. node L is non-last and node N is non-first. so for now
+        # we start with a dup of node L and then passively merge on top of
+        # it node N before finally transfering the content member.
+
+        _new_item_x = _via_argument_produce_new_mixed_item
+
+        node_M = node_L.dup
+
+        node_L.members.each do | k |
+          if ! node_M[ k ]
+            x = node_N[ k ]
+            if x
+              node_M[ k ] = x
+            end
+          end
+        end
+
+        node_M[ @tail_k ] = node_M[ @tail_k ].dup  # make it its own copy
+        node_M[ @item_k ] = _new_item_x
+        set_nodes_next_node_ node_L, node_M
+        set_nodes_next_node_ node_M, node_N
+
+        node_M
+      end
+
+      # the root node is the only node that cannot change identity. as such
+      # to accomplish this operation we will: 1) make a "created node" that
+      # is a shallow dup of the root node and 2) transfer the argument data
+      # into the root node as appropriate and 3) point the root node to the
+      # created node. any second node that was here when we got here (which
+      # is now the third node) should automatically be OK during the above.
+
+      def __build_and_insert_node_in_front_of_only_node
+
+        # use :+#prototype-styling
+
+        pl = _prototype_list
+        if pl
+          _via_root_node_insert_at_front do | created_node |
+            _resolve_styling_for_front_insertion created_node, pl
+          end
+        else
+          raise Prototype_Required.new( 1, :insert_into )
+        end
+      end
+
+      def __build_and_insert_node_in_front_of_plural_list
+
+        # use :+#proximity-styling
+
+        _via_root_node_insert_at_front do | created_node |
+          _resolve_styling_for_front_insertion created_node, @front_node
+        end
+      end
+
+      def _via_root_node_insert_at_front
+
+        root_node = @front_node
+
+        _new_item_x = _via_argument_produce_new_mixed_item
+
+        created_node = root_node.dup  # (1)
+
+        root_node[ @item_k ] = _new_item_x  # (2)
+
+        yield created_node  # resovle styling
+
+        affix_to_prepared_node_P_node_Q_ root_node, created_node  # (3)
+
+        root_node
+      end
+
+      def _resolve_styling_for_front_insertion created_node, proto_list
+
+        # if the root node has a tail member, then it is the tail member that
+        # the original root had. the `proto_list` may be the root node and it
+        # may not. in the case that the root node had a tail member and there
+        # is no true prototype, dup the member so we don't mutate that of the
+        # created node. if the prototype is a true prototype, then we dup the
+        # member from *there* assuming that is what we should be using anyway
+
+        root_node = @front_node
+
+        had_tail = root_node[ @tail_k ]
+
+        root_node[ @tail_k ] = proto_list[ @tail_k ].dup  # must exist
+
+        if ! had_tail
+
+          # any members that aren't already set in the root node should be
+          # "styled" to express a non-final node (for e.g we might need to
+          # pick up a separator expression).
+
+          proto_list.members.each do | k |
+            if ! root_node[ k ]
+              x = proto_list[ k ]
+              if x
+                root_node[ k ] = x.dup  # assmue string
+              end
+            end
+          end
+        end
+
+        nil
+      end
+
+      def any_last_two_via_stream st
+        node_Z = nil
+        begin
+          x = st.gets
+          x or break
+          node_Y = node_Z
+          node_Z = x
+          redo
+        end while nil
+        [ node_Y, node_Z ]
+      end
+
+      # ~ removal
+
+      def remove st, reference_x, front_node
+
+        @front_node = front_node
+
+        receive_reference_x reference_x
+        p = _build_equality_comparator_proc
+
+        begin
+          x = st.gets
+          x or break
+          if p[ x ]
+            did_find = true
+            break
+          end
+          prev = x
+          redo
+        end while nil
+
+        if did_find
+          x_ = st.gets
+          if prev
+            if x_
+              remove_nonfinal_node_B_ prev, x, x_
+            else
+              remove_final_node_B_ prev, x
+            end
+          elsif x_
+            remove_node_A_ x, x_
+          else
+            __remove_the_only_node
+          end
+        else
+          self._DO_ME
+        end
+      end
+
+      def __remove_the_only_node
+
+        # amazingly this works for both grammar categories for now
+
+        node = @front_node
+        x = node[ @item_k ]
+        node.members.each do | k |
+          node[ k ] = nil
+        end
+        x
+      end
+
+      # ~ support
+
+      # ~~ support for reference
+
+      def receive_reference_x reference_x
+        if reference_x.respond_to? :ascii_only?
+          @reference_is_string = true
+          @reference_s = reference_x
+        else
+          @reference_is_string = false
+          @reference_item_x = reference_x
+        end ; nil
+      end
+
+      def _build_equality_comparator_proc
+
+        if @reference_is_string  # clean up in #open [#092]
+          build_string_comparator_proc___
+        else
+          __build_normal_equality_comparator_proc
+        end
+      end
+
+      def __build_normal_equality_comparator_proc
+        oid = @reference_item_x.object_id
+        -> x do
+          oid == x[ @item_k ].object_id
+        end
+      end
+
+      # ~~ support for node production
+
+      def _via_argument_produce_new_mixed_item  # while #open [#092]
+
+        if @argument_is_string
+          produce_new_mixed_item_via_string_argument_
+        else
+          @new_x
+        end
+      end
+
+      def _prototype_list
+        @front_node._prototype
+      end
     end
+
+    class Simple_Recursion_Operation_Session___ < Operation_Session__
+
+      # ~ appendation (the two #hook-out's)
+
+      def via_new_item_node_append_into_starter_stub_
+        front_node = @front_node
+        front_node[ @item_k ] = @new_item_x
+        front_node
+      end
+
+      def via_new_item_node_append_to_only_node_using_prototype_list_ node, pl
+
+        # 1) style the new final node that we are creating to look like the
+        # final node of the acting protoype (the easiest way is to dup it &
+        # copy over the one content member). 2) point the old final node to
+        # the new final node. 3) style the old final node appropriately now
+        # that it is non-final.
+
+        _last = pl.to_node_stream_.last  # (1)
+        new_item_node = _last.dup
+        new_item_node[ @item_k ] = @new_item_x
+
+        node[ @tail_k ] = new_item_node  # (2)
+
+        pl.members.each do | k |  # (3)
+
+          if node[ k ]
+            @item_k == k and next  # don't overwrite its content member
+            @tail_k == k and next  # don't overwrite its next member
+              # but separators, delimiters & whitespace re-style based
+              # on the proto
+          end
+
+          x = pl[ k ]
+          x or next  # we allow any existing member to stay as-is
+          node[ k ] = x.dup
+        end
+
+        new_item_node
+      end
+
+      # ~ insertation (the two #hook-out's)
+
+      def affix_to_prepared_node_P_node_Q_ node_P, node_Q
+
+        node = node_P[ @tail_k ]  # node_P's tail struct is a shallow dup of
+          # that of the prototype. (it has surface expression of e.g a space)
+
+        node[ @item_k ] = nil  # no matter what, we do not want the content
+          # member of the prototype
+
+        node_Q.members.each do | k |  # now let every *trueish* member
+          # of the new node clobber on top of that prepared node.
+
+          x = node_Q[ k ]
+          x or next
+          node[ k ] = x
+        end
+
+        # the concert of the above gives us spacing from the prototype but
+        # also trumping spacing from the existing node, as well as any of
+        # its subsequent nodes.
+
+        nil
+      end
+
+      def set_nodes_next_node_ node_P, node_Q
+
+        node_P[ @tail_k ] = node_Q
+
+        nil
+      end
+
+      # ~ mixed item production (the one #hook-out)
+
+      def produce_new_mixed_item_via_string_argument_
+        @front_node.class.parse( @tail_k, @new_s )[ @item_k ]
+      end
+
+      # ~ removal (three #hook-outs's)
+
+      def remove_node_A_ node_A, node_B
+        x = node_A.dup
+        x[ @stem_k ] = nil
+        node_B.members.each do | k |
+          node_A[ k ] = node_B[ k ]
+        end
+        x[ @item_k ]
+      end
+
+      def remove_final_node_B_ node_A, node_B
+        node_A[ @stem_k ] = nil
+        node_B[ @item_k ]
+      end
+
+      def remove_nonfinal_node_B_ node_A, node_B, node_C
+        node_A[ @stem_k ] = node_C
+        node_B[ @stem_k ] = nil
+        node_B[ @item_k ]
+      end
+
+      # ~ support
+
+      def build_string_comparator_proc___
+        s = @reference_s
+        -> x do
+          _ = x[ @item_k ]
+          _.respond_to? :ascii_only? or self._SANITY  # while #open [#092]
+          s == _
+        end
+      end
+    end
+
+    class Compound_Recursion_Operation_Session__ < Operation_Session__
+
+      def initialize _, __, ___, list=nil
+        super _, __, ___
+        @list_k = list
+      end
+
+      attr_reader :list_k
+
+      # ~ appendation (the two #hook-out's)
+
+      def via_new_item_node_append_into_starter_stub_
+
+        front_node = @front_node
+
+        final_proto_node = _prototype_list.to_node_stream_.last
+
+        final_proto_node.members.each do | k |
+          front_node[ k ] = final_proto_node[ k ]
+        end
+
+        front_node[ @item_k ] = @new_item_x
+        front_node
+      end
+
+      def via_new_item_node_append_to_only_node_using_prototype_list_ node, pl
+
+        # create the new node before you mutate the existing node because
+        # the prototype may actually be the parent node of the final node
+
+        proto_Y, proto_Z = any_last_two_via_stream pl.to_node_stream_
+
+        node_ = __produce_new_final_node_from_prototype_list proto_Z
+
+        tail = __produce_tail_of_final_node node, proto_Y
+
+        tail[ @list_k ] = node_
+
+        # the previous final node still has "final node" "styling". it must
+        # adopt the styling of the prototype's penultimate (which might also
+        # be first) node.
+
+        proto_Y.members.each do | sym |
+          @item_k == sym and next
+          @tail_k == sym and next
+          x = proto_Y[ sym ]
+          if x
+            x = x.dup
+          end
+          node[ sym ] = x
+        end
+
+        node_
+      end
+
+      def __produce_new_final_node_from_prototype_list proto
+
+        node = proto.dup
+        node[ @item_k ] = nil  # safety
+
+        tail = node[ @tail_k ]
+        if tail
+          tail = tail.dup
+          tail[ @list_k ] = nil
+          node[ @tail_k ] = tail
+        end
+        node[ @item_k ] = @new_item_x
+        node
+      end
+
+      def __produce_tail_of_final_node node, proto
+
+        tail = node[ @tail_k ]
+        if ! tail
+          tail = proto[ @tail_k ].dup
+          tail[ @list_k ] = nil  # safety
+          node[ @tail_k ] = tail
+        end
+
+        tail
+      end
+
+      # ~ insertation (the two #hook-out's)
+
+      def affix_to_prepared_node_P_node_Q_ node_P, node_Q
+        set_nodes_next_node_ node_P, node_Q
+        nil
+      end
+
+      def set_nodes_next_node_ node_P, node_Q
+        node_P[ @tail_k ][ @list_k ] = node_Q
+        nil
+      end
+
+      # ~ mixed item production (the one #hook-out)
+
+      def produce_new_mixed_item_via_string_argument_
+        @front_node.class.parse( @list_k, @new_s )[ @item_k ]
+      end
+
+      # ~ removal (three #hook-out's)
+
+      def remove_node_A_ node_A, node_B  # for now, differs only by k
+        x = node_A.dup
+        x[ @tail_k ] = nil
+        node_B.members.each do | k |
+          node_A[ k ] = node_B[ k ]
+        end
+        x
+      end
+
+      def remove_final_node_B_ node_A, _node_B
+
+        # somewhat arbitrarily, we will preserve the tail structure
+
+        tail = node_A[ @tail_k ]
+        list = tail[ @list_k ]
+        tail[ @list_k ] = nil
+        list[ @item_k ]
+      end
+    end
+
+    module Common_Static_Methods___
+
+      attr_accessor :_prototype  # so that we can add to lists with zero or one items
+
+      def list?  # #todo
+        true
+      end
+
+      def _named_prototypes  # collude in a hack implemented elsewhere meh
+      end
+
+      def _nodes  # #open [#085]
+        ::Enumerator.new do | y |
+          st = to_node_stream_
+          begin
+            x = st.gets
+            x or break
+            y << x
+            redo
+          end while nil
+        end
+      end
+    end
+
+    class Prototype_Required < ::RuntimeError
+
+      def initialize d, verb_phrase_symbol
+        @items_count = d
+        super "prototype required to #{
+          }#{ verb_phrase_symbol.id2name.gsub( UNDERSCORE_, SPACE_ ) } #{
+           }a list with#{ " only" if d.nonzero? } #{
+            }item#{ 's' if 1 != d }"
+      end
+
+      attr_reader :items_count
+    end
+
+    UNDERSCORE_ = '_'.freeze
   end
-
-
-  module Sexp_::Auto::Hacks::RecursiveRule::SexpInstanceMethods
-
-    def _append! new
-      _insert_item_before_item new, nil
-    end
-
-    def list?
-      true
-    end
-
-    def _named_prototypes         # this is an aggregious bit of cross-hack
-                                  # dependency - assume that this sexp class
-                                  # wants to take part in the prototype romp and
-                                  # assume furthermore that we will end up
-                                  # further down in the ancestor chain than the
-    end                           # module that has the correct definition
-                                  # for this, should actual prototypes exist!
-                                  # the falseish-ness of this is then used to
-                                  # emit `No_Prototypes` events.
-
-    attr_accessor :_prototype     # used in eponymous file, see above comment.
-
   end
 end

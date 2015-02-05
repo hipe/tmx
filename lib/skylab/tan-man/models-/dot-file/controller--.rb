@@ -50,25 +50,43 @@ module Skylab::TanMan
       end
 
       def insert_stmt new, new_before_this=nil  # #note-20
+
         g = @graph_sexp
-        prototype = -> do
-          p = -> do
-            x = g.class.parse :stmt_list, "xyzzy_1\nxyzzy_2"
-            p = -> { x } ; x
-          end
-          -> { p[] }
-        end.call
-        empty_stmt_list = -> do
-          prototype[].__dupe except: [ :stmt, :tail ]
-        end
+
         if ! g.stmt_list
-          g.stmt_list = empty_stmt_list[]
+          g.stmt_list = __empty_stmt_list
         end
-        if ! g.stmt_list._prototype && ! g.stmt_list._items_count_exceeds( 1 )
-          g.stmt_list._prototype = prototype[]
+
+        if ! g.stmt_list._prototype && ! g.stmt_list.to_node_stream_.length_exceeds( 1 )
+          g.stmt_list._prototype = _sl_proto
         end
-        g.stmt_list._insert_item_before_item new, new_before_this
+
+        if new_before_this
+          g.stmt_list._insert_item_before_item new, new_before_this
+        else
+          g.stmt_list._append! new
+        end
       end
+
+      def __empty_stmt_list
+        _sl_proto.__dupe except: [ :stmt, :tail ]
+      end
+
+      def _sl_proto  # assumes static grammar
+        Memoized_SL_proto___[] || Memoize_SL_proto___[ @graph_sexp.class ]
+      end
+
+      -> do
+        x = nil
+        Memoized_SL_proto___ = -> do
+          x
+        end
+        Memoize_SL_proto___ = -> parser do
+          x = parser.parse :stmt_list, "xyzzy_1\nxyzzy_2"
+          x.freeze
+          x
+        end
+      end.call
 
       def destroy_stmt stmt
         if @graph_sexp.stmt_list

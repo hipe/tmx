@@ -26,7 +26,7 @@ module Skylab::TanMan
       def rslv_stmt_list_and_stream
         @stmt_list = @datastore.graph_sexp.stmt_list
         if @stmt_list
-          @st = @stmt_list.to_stream
+          @st = @stmt_list.to_node_stream_
           ACHIEVED_
         elsif :delete == @verb
           when_no_stmt_list
@@ -296,11 +296,18 @@ module Skylab::TanMan
       end
 
       def via_edge_stmt_make_association
-        @stmt_list._insert_item_before_item @edge_stmt, @least_greater_edge_stmt  # #todo - do we need the other
-        # (result is stmt_list whose stmt is the argument)
+
+        ref_x = @least_greater_edge_stmt
+        if ref_x
+          @stmt_list._insert_item_before_item @edge_stmt, ref_x
+        else
+          @stmt_list._append! @edge_stmt
+        end
+
         maybe_send_event :info, :created_association do
           bld_created_association_event
         end
+
         @result = ACHIEVED_  # is result
       end
 

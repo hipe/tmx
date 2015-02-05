@@ -175,8 +175,7 @@ module Skylab::TanMan
         end while nil
         if ! res
           # we raise to stay on spec but this could (should?) change to an info
-          raise "when parsing your \"#{ @name_tokens.join ' ' }\" prototype #{
-            }embedded in a comment: #{ reason }"
+          raise Sexp_::Prototype::Invalid_Prototype.new( @name_tokens, reason )
           break
         end
         result = process_parse_result res      # probably true or false
@@ -411,6 +410,17 @@ module Skylab::TanMan
         fail "name collision: #{ name }"
       else
         _named_prototypes[name] = prototype
+      end
+    end
+  end
+
+  module Sexp_::Prototype
+
+    class Invalid_Prototype < ::RuntimeError
+
+      def initialize token_s_a, reason_s
+        super "when parsing your \"#{ token_s_a * SPACE_ }\" prototype #{
+          }embedded in a comment: #{ reason_s }"
       end
     end
   end

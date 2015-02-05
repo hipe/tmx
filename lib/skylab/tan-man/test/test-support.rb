@@ -105,14 +105,24 @@ module Skylab::TanMan::TestSupport
     Volatile_tmpdir = memoize[ -> do
       Base_tmpdir__[].tmpdir_via_join 'volatile-tmpdir', :max_mkdirs, 2
     end ]
+
+    # ~
+
+    EMPTY_S_ = TanMan_::EMPTY_S_
+
+    DASH_ = '-'.freeze
+
+    NEWLINE_ = TanMan_::NEWLINE_
+
+    SPACE_ = TanMan_::SPACE_
+
+    UNDERSCORE_ = '_'.freeze
+
   end
 
   module Constants
     Callback_ = TanMan_::Callback_
     TanMan_ = TanMan_
-    EMPTY_S_ = TanMan_::EMPTY_S_
-    NEWLINE_ = TanMan_::NEWLINE_
-    SPACE_ = TanMan_::SPACE_
     TestLib_ = TestLib_
     TestSupport_  = ::Skylab::TestSupport
   end
@@ -149,13 +159,13 @@ module Skylab::TanMan::TestSupport
 
     def using_input_string _STR_, *tags, & p
 
-      desc = if tags.first.respond_to? :ascii_only?
+      _desc = if tags.first.respond_to? :ascii_only?
         tags.shift
       else
         "using input string #{ _STR_.inspect }"
       end
 
-      context desc, * tags do
+      context _desc, * tags do
 
         against_string _STR_
 
@@ -263,13 +273,11 @@ module Skylab::TanMan::TestSupport
     def bld_grammar_const granule_s
       md = GRANULE_TO_CONST_RX__.match granule_s
       _underscore_separated_zero_padded_integer_segment_sequence =
-        md[ :num ].gsub DASH_, UNDERSCORE_
+        md[ :num ].gsub TestLib_::DASH_, TestLib_::UNDERSCORE_
       rest_s = md[ :rest ] and rest_s = "_#{ TestLib_::Constantize[ rest_s ] }"
       :"Grammar#{
         _underscore_separated_zero_padded_integer_segment_sequence }#{ rest_s }"
     end
-
-    DASH_ = '-'.freeze ; UNDERSCORE_ = '_'.freeze
 
     GRANULE_TO_CONST_RX__ = /\A(?<num>\d+(?:-\d+)*)(?:-(?<rest>.+))?\z/
 

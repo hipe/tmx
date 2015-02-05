@@ -8,6 +8,8 @@ module Skylab::TanMan::TestSupport::Models::Association
 
   extend TestSupport_::Quickie
 
+  EMPTY_S_ = TestLib_::EMPTY_S_
+
   module InstanceMethods
 
     def collection_class

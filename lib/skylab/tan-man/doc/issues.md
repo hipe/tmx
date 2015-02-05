@@ -1,3 +1,6 @@
+[#093] #open get rid of __dupe
+[#092] #open #list-API unmunge `_insert_item_before_item` et. a.
+[#091] #open #list-API improve the implementation of \`unparse\`
 [#090] #open association add is not magnetic
 [#089] #open [br] datastore / file-based [ file etc ] <= [ttt]
 [#088] #open same issue as below with graph use
@@ -5,7 +8,7 @@
 [#086]       #done on first test run with an empty "[tmx root]/tmp/", the
                event of creating the tmpdir breaks the comprehensive test run
              this is now #wishlist because the fix is so ugly.
-[#085] #open refactor `_nodes` to use `to_scan` (now `to_stream`)
+[#085] #open #list-API refactor `_nodes` to use `to_scan` (now `to_stream`)
 [#084]       #parent-node: [#model] the node model narrative ..
 [#083]       #doc-node kernel
 [#082]       #parent-node: [#083] the kernel properties narrative ..

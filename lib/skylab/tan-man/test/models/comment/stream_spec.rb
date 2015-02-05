@@ -1,6 +1,6 @@
 require_relative '../test-support'
 
-module Skylab::TanMan::TestSupport::Models::Scan__
+module Skylab::TanMan::TestSupport::Models::Comment
 
   ::Skylab::TanMan::TestSupport::Models[ TS__ = self ]
 
@@ -9,6 +9,9 @@ module Skylab::TanMan::TestSupport::Models::Scan__
   extend TestSupport_::Quickie
 
   TanMan_ = TanMan_
+
+  EMPTY_S_ = TanMan_::EMPTY_S_
+  NEWLINE_ = TanMan_::NEWLINE_
 
   module ModuleMethods
     def use _METH_I_

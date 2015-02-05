@@ -51,8 +51,12 @@ module Skylab::TanMan
       end
       equals_stmt.rhs = str
       if created
-        _first_node_statement = node_statements.gets
-        stmt_list._insert_item_before_item equals_stmt, _first_node_statement
+        first_node_statement = node_statements.gets
+        if first_node_statement
+          stmt_list._insert_item_before_item equals_stmt, first_node_statement
+        else
+          stmt_list._append! equals_stmt
+        end
       else
         equals_stmt
       end
@@ -79,7 +83,7 @@ module Skylab::TanMan
     def get_stmt_scan
       sl = stmt_list
       if sl
-        sl.to_stream
+        sl.to_node_stream_
       else
         Callback_.stream.the_empty_stream
       end

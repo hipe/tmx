@@ -1,84 +1,121 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
+module Skylab::TanMan::TestSupport::Sexp::Auto::Hacks
 
-  describe "[tm] sexp auto hacks recursive rule - THE GAUNTLET", g: true do
+  describe "[tm] sexp - auto - hacks - recursive rule (with production grammar)", g: true do
 
     extend TS_
 
-    context "with stmt_list" do
-      include Stmt_List_I_M
-      context "on zero" do
-        it "1.1 - one on zero - no separators, goes after comment" do
-          go 'alpha'
-          graph_sexp.unparse.should eql( "digraph{\n#one comment\nalpha}" )
-          expect 'alpha'
+    context "against a `stmt_list`" do
+
+      include Stmt_List_I_M___
+
+      context "against zero items, prototype with separator semantics" do
+
+        against_string "\n#one comment\n"
+        add_separating_prototype_to_stmt_list
+
+        it "any append - result has separator semantics, goes after comment" do
+          insrt 'alpha'
+          @graph_sexp.unparse.should eql "digraph{\n#one comment\nalpha}"
+          @stmt_list_s.should eql "alpha"
         end
-        with "\n#one comment\n"
-        give_stmt_list_a_prototype
       end
-      context "on one" do
-        it "2.1 - one after one - adds no space or addtnl sep" do
-          go 'parmalade'
-          expect 'marmalade;   parmalade'
+
+      context "against one item, prototype with separator semantics" do
+
+        against_string 'marmalade;   '  # three spaces
+        add_separating_prototype_to_stmt_list
+
+        it "position 1 - uses the prototype for the separator" do
+          insrt 'barmalade'
+          @stmt_list_s.should eql "barmalade\nmarmalade;   "
         end
-        it "2.2 - one before one - uses prototype spacing" do
-          go 'barmalade'
-          expect "barmalade\nmarmalade;   "
+
+        it "position 2 - adds no space or addtnl sep (i.e does not use proto)" do
+          insrt 'parmalade'
+          @stmt_list_s.should eql 'marmalade;   parmalade'
         end
-        with 'marmalade;   ' # three spaces
-        give_stmt_list_a_prototype
       end
-      context "on two" do
-        it "3.1 - one after two - last post ws is used" do
-          go 'moo'
-          expect "boo\n\nloo\n\n\nmoo\n\n\n"
+
+      context "againt two items, no prototype - existing has delimiter semantics" do
+
+        against_string "boo\n\nloo\n\n\n"
+
+        it "position 1 - use proximity styling (use first node)" do
+          insrt 'aoo'
+          @stmt_list_s.should eql "aoo\n\nboo\n\nloo\n\n\n"
         end
-        it "3.2 - one between two - lpwis" do
-          go 'coo'
-          expect "boo\n\ncoo\n\n\nloo\n\n\n"
+
+        it "position 2 - use proximity styling (first node trumps second)" do
+          insrt 'coo'
+          @stmt_list_s.should eql "boo\n\ncoo\n\nloo\n\n\n"
         end
-        it "3.3 - one before two - first post ws is used" do
-          go 'aoo'
-          expect "aoo\n\nboo\n\nloo\n\n\n"
+
+        it "position 3 - per proximity styling use styling of item 2" do
+          insrt 'moo'
+          @stmt_list_s.should eql "boo\n\nloo\n\n\nmoo\n\n\n"
         end
-        with "boo\n\nloo\n\n\n"
+      end
+
+      context "against two items, no prototype - existing has separator semantics" do
+
+        against_string "abo\n\nbeebo"
+
+        it "position 3 - delimiter from item 1 is used, styled like item 2" do
+          insrt 'ceebo'
+          @stmt_list_s.should eql "abo\n\nbeebo\n\nceebo"
+        end
       end
     end
-    context "with attr_list" do
-      include Attr_List_I_M
-      context "on zero" do
-        it "1.1 - one on zero (hacked) - no separators, good!" do
-          go 'nazir=zenith'
-          expect 'nazir=zenith'
+
+    context "against an `attr_list`" do
+
+      include Attr_List_I_M___
+
+      context "against zero items" do
+
+        against_string EMPTY_S_
+
+        it "any append (hacked) - surface expressions use separator semantics (i.e nothing)" do
+          insrt 'nazir=zenith'
+          @a_list_s.should eql 'nazir=zenith'
         end
-        with EMPTY_S_
       end
-      context "on one" do
-        it "2.1 - one after one - uses comma and space" do
-          go 'moo=m'
-          expect 'koo=k, moo=m'
+
+      context "against one item (with prototype)" do
+
+        against_string 'koo=k'
+
+        it "position 1 - uses (necessarily) prototype for styling" do
+          insrt 'boo=b'
+          @a_list_s.should eql 'boo=b, koo=k'
         end
-        it "2.2 - one before one - uses comma and space" do
-          go 'boo=b'
-          expect 'boo=b, koo=k'
+
+        it "position 2 - uses (necessarily) prototype for styling" do
+          insrt 'moo=m'
+          @a_list_s.should eql 'koo=k, moo=m'
         end
-        with 'koo=k'
       end
-      context "on two" do
-        it "3.1 - one after two - uses comma and *one* space per proto" do
-          go 'liffo=l'
-          expect 'biffo=x,  kiffo=y, liffo=l'
+
+      context "against two items (with prototype)" do
+
+        against_string 'biffo=x,  kiffo=y'
+
+        it "position 1 - use proximity styling" do
+          insrt 'aiffo=a'
+          @a_list_s.should eql 'aiffo=a,  biffo=x,  kiffo=y'
         end
-        it "3.2 - one between two - uses command and one leading space" do
-          go 'giffo=g'
-          expect 'biffo=x, giffo=g,  kiffo=y'
+
+        it "position 2 - use proximity styling" do
+          insrt 'giffo=g'
+          @a_list_s.should eql 'biffo=x,  giffo=g,  kiffo=y'
         end
-        it "3.3 - one before two - commas OK" do
-          go 'aiffo=a'
-          expect 'aiffo=a, biffo=x,  kiffo=y'
+
+        it "position 3 - use proximity styling" do
+          insrt 'liffo=l'
+          @a_list_s.should eql 'biffo=x,  kiffo=y,  liffo=l'
         end
-        with 'biffo=x,  kiffo=y'
       end
     end
   end
