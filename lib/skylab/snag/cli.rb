@@ -279,6 +279,11 @@ module Skylab::Snag
         @param_h[:max_count] = n
       end
 
+      o.on '-t', '--tag TAG', 'reduce output list against tag name (list only)' do | s |
+        ( param_h[ :tag ] ||= [] ).push s
+        nil
+      end
+
       o.regexp_replace_tokens %r{\A-(?<num>\d+)\z} do |md|  # [#030]
         [ '--max-count', md[:num] ]
       end
@@ -327,7 +332,7 @@ module Skylab::Snag
           receive_error_line msg_p[ true ]
         end
       else
-        bx = pbox.algorithms.new_box_and_mutate_by_partition_at :max_count, :be_verbose
+        bx = pbox.algorithms.new_box_and_mutate_by_partition_at :max_count, :be_verbose, :tag
         if pbox.length.zero?
           rdc_nodes bx
         else
@@ -370,7 +375,16 @@ module Skylab::Snag
 
       end
 
-      bx.add :query_sexp, [ :and, [ :has_tag, :open ] ]
+      and_sexp = [ :and, [ :has_tag, :open ] ]
+      bx.add :query_sexp, and_sexp
+
+      s_a = bx.remove :tag
+      if s_a
+        s_a.each do | tag_s |
+          and_sexp.push [ :has_tag, tag_s.intern ]
+        end
+      end
+
       call_API [ :nodes, :reduce ], bx.algorithms.to_hash, -> o do
         o.on_error_event handle_inside_error_event
         o.on_error_string handle_error_string

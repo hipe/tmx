@@ -8,7 +8,7 @@
 [#086]       #done on first test run with an empty "[tmx root]/tmp/", the
                event of creating the tmpdir breaks the comprehensive test run
              this is now #wishlist because the fix is so ugly.
-[#085] #open #list-API refactor `_nodes` to use `to_scan` (now `to_stream`)
+[#085] #open #list-API give a better name to `_nodes` et al
 [#084]       #parent-node: [#model] the node model narrative ..
 [#083]       #doc-node kernel
 [#082]       #parent-node: [#083] the kernel properties narrative ..

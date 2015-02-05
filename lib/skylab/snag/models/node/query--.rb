@@ -123,7 +123,12 @@ module Skylab::Snag
       end
 
       def match? node
-        ! detect { |x| ! x.match?( node ) }
+
+        _elem_that_does_not_match = @elements.detect do | x |
+          ! x.match? node
+        end
+
+        ! _elem_that_does_not_match
       end
     end
 
