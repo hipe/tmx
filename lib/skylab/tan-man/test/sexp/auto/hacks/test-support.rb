@@ -60,7 +60,7 @@ module Skylab::TanMan::TestSupport::Sexp::Auto::Hacks
       new_before_this_item = Find_new_before_this_item__[ a_list, asst_to_insert_s, :content ]
 
       if new_before_this_item
-        a_list.insert_item_before_item_string_ asst_to_insert_s, new_before_this_item
+        a_list.insert_item_before_item_ asst_to_insert_s, new_before_this_item
       else
         a_list.append_item_via_string_ asst_to_insert_s
       end

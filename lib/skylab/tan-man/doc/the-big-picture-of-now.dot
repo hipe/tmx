@@ -8,7 +8,7 @@ digraph{
   ss [ label="get [tm] to\nbe self-supporting" ]
   st [ label="sg\ntags" style=filled ]
   tu [ label="ttt\nunify" ]
-  um [ label="unmunge\nmethods" ]
+  um [ label="unmunge\nmethods" style=filled ]
   up [ label="cleanup unparse" ]
 
   am -> cd

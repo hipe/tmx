@@ -43,14 +43,14 @@ describe "[tm] sexp - auto - hacks - mutation", g: true do
       context 'add to' do
 
         it 'position 1 - use first as prototype' do
-          inserted = result.insert_item_before_item_string_ 'faap;', 'feep'
+          inserted = result.insert_item_before_item_string_ 'faap', 'feep'
           node_s_a.should eql [ 'faap', 'feep', 'forp' ]
           @result.unparse.should eql "faap ; feep ; forp ; \n"
           inserted.object_id.should eql @result.object_id  # yikes
         end
 
         it 'position 2 - use ??? as prototype' do
-          inserted = result.insert_item_before_item_string_ 'faap;', 'forp'
+          inserted = result.insert_item_before_item_string_ 'faap', 'forp'
           node_s_a.should eql ['feep', 'faap', 'forp' ]
           @result.unparse.should eql "feep ; faap ; forp ; \n"
           inserted.content.should eql 'faap'
@@ -87,22 +87,22 @@ describe "[tm] sexp - auto - hacks - mutation", g: true do
       context 'add to' do
 
         it 'position 1 - uses item 1 as prototype' do
-          result.insert_item_before_item_string_ 'faap  ;  ', 'fap'
+          result.insert_item_before_item_string_ 'faap', 'fap'
           @result.unparse.should eql "faap;fap;fep ; fip ;\n "
         end
 
         it 'position 2 - uses item 1 as prototype' do
-          result.insert_item_before_item_string_ 'faap  ;  ', 'fep'
+          result.insert_item_before_item_string_ 'faap', 'fep'
           @result.unparse.should eql "fap;faap;fep ; fip ;\n "
         end
 
         it 'position 3 - use item 2 as prototype' do
-          result.insert_item_before_item_string_ 'faap;', 'fip'
+          result.insert_item_before_item_string_ 'faap', 'fip'
           @result.unparse.should eql "fap;fep ; faap ; fip ;\n "
         end
 
         it 'position 4 (append) - mutate the final two appropriately' do
-          result.append_item_via_string_ 'faap;'
+          result.append_item_via_string_ 'faap  ;  '
           @result.unparse.should eql "fap;fep ; fip ; faap ;\n "
         end
       end

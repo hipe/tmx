@@ -1,5 +1,5 @@
 [#093] #open get rid of __dupe
-[#092] #open #list-API unmunge `_insert_item_before_item` et. a.
+[#092]       #done #list-API unmunge `_insert_item_before_item` et. a.
 [#091] #open #list-API improve the implementation of \`unparse\`
 [#090] #open association add is not magnetic
 [#089] #open [br] datastore / file-based [ file etc ] <= [ttt]

@@ -17,17 +17,25 @@ module Skylab::TanMan
     # function from the W3C's XML DOM API: `insertBefore`, `appendChild`,
     # `removeChild`.
     #
-    # in this documentation and code we will refer to these added methods
-    # generally as "operations".
+    # in this documentation and code we refer to these added methods generally
+    # as "operations". for those operations that have a W3C counterpart as
+    # described above (and except where exceptions are noted):
     #
-    # these operations should behave generally in the expected way, with
-    # (open [#092]) either some magic or some specialization to be added
-    # to allow for strings to be passed in instead of nodes when relevant.
+    # a) they behave in the "expected" way pursuant to their counterpart with
+    # regards to the semantics of their arguments, whether/how they mutate
+    # their receiver, and the semantics of their result value.
     #
-    # when relevant the W3C names will be adapted in some regular way,
-    # probably to substitue our idiomatic "node" in place of "child", and to
-    # give the methods more self-documenting names with respect to their
-    # parameters.
+    # b) the W3C method names will be adapted for this library in a regular
+    # way: 1) we say our more idiomatic "item" instead of "child" (because
+    # this library is a list mutation library, and in this universe it is
+    # "items" that compose lists). 2) we give these method names more detail
+    # to self-document their arguments, especially near (c) below.
+    #
+    # c) a "specialization bifurcation" is exposed for certain operations:
+    # they expose an additional method version that takes a string argument
+    # for (exclusively) either the item to be added or the "reference item",
+    # a string argument that will be parsed against the appropriate
+    # grammatical rule to produce the appropriate item.
     #
     #
     # Criteria to match the hack:
@@ -104,89 +112,107 @@ module Skylab::TanMan
       end
 
       def __produce_hack
+
         Hack_.new do
+
+          @cls.include Common_Static_Methods___
+          session = @session
           me = self
+
+
           @cls.class_exec do
 
-            include Common_Static_Methods___
-
-            # ~ mutators
-
-            # (while #open [#092])
-            x = me.build_append_item_method
-            define_method :append_item_via_string_, x
-            define_method :append_item_, x
-
-            x = me.build_insert_item_before_item_method
-            define_method :insert_item_before_item_string_, x
-            define_method :insert_item_before_item_, x
-
-            x = me.build_remove_item_method
-            define_method :remove_item_via_string_, x
-            define_method :remove_item_, x
-
-            # ~ readers
+            define_method :to_node_stream_, me.build_to_node_stream_method
 
             define_method me.pluralized_method_name, ITEMS_SOFT_ALIAS_METHOD___
-            define_method :to_item_array_, me.build_to_item_array_method
-            define_method :to_node_stream_, me.build_to_node_stream_method
+
+            define_method :session_prototype_ do
+              session
+            end
 
             nil
           end
         end
       end
 
-      # ~ mutators
-
-      def build_insert_item_before_item_method
-
-        sess = @session
-        -> new_x, before_this_x do
-          before_this_x or self._WHERE
-          o = sess.dup
-          o.init_insertion to_node_stream_, new_x, self
-          o.receive_reference_x before_this_x
-          o.insert_new_item_before_item
-        end
-      end
-
-      def build_append_item_method
-
-        sess = @session
-        -> new_s do
-          o = sess.dup
-          o.init_insertion to_node_stream_, new_s, self
-          o.via_new_string_append
-        end
-      end
-
-      def build_remove_item_method
-
-        sess = @session
-        -> s do
-          o = sess.dup
-          o.remove to_node_stream_, s, self
-        end
-      end
-
-      # ~ for readers
-
       def pluralized_method_name
         :"#{ @some_stem_i }s"
-      end
-
-      def build_to_item_array_method
-        item_k = @session.item_k
-        -> do
-          to_node_stream_.map_by do | x |
-            x[ item_k ]
-          end.to_a
-        end
       end
     end
 
     ITEMS_SOFT_ALIAS_METHOD___ = -> do
       to_item_array_
+    end
+
+    module Common_Static_Methods___
+
+      attr_accessor :prototype_  # so that we can add to lists with zero or one items
+
+      def is_list
+        true
+      end
+
+      def named_prototypes_  # collude in a hack implemented elsewhere meh
+      end
+
+      # ~ mutators
+
+      def append_item_via_string_ item_s
+        o = _start_session
+        o.receive_new_item_via_string item_s
+        o.via_new_item_append
+      end
+
+      def append_item_ item
+        o = _start_session
+        o.receive_new_item item
+        o.via_new_item_append
+      end
+
+      def insert_item_before_item_string_ item, reference_s
+        o = _start_session
+        o.receive_reference_item_via_string reference_s
+        o.receive_new_item item
+        o.insert_new_item_before_item
+      end
+
+      def insert_item_before_item_ item, before_this_item
+        o = _start_session
+        o.receive_reference_item before_this_item
+        o.receive_new_item item
+        o.insert_new_item_before_item
+      end
+
+      def remove_item_via_string_ item_as_string
+        o = _start_session
+        o.receive_reference_item_via_string item_as_string
+        o.via_reference_item_remove
+      end
+
+      def remove_item_ item
+        o = _start_session
+        o.receive_reference_item item
+        o.via_reference_item_remove
+      end
+
+      # ~ readers
+
+      def to_item_array_
+        k = session_prototype_.item_k
+        to_node_stream_.map_by do | x |
+          x[ k ]
+        end.to_a
+      end
+
+      def nodes_
+        to_node_stream_.to_enum
+      end
+
+      # ~ support
+
+      def _start_session
+        session_prototype_.dup.__init_session to_node_stream_, self
+      end
     end
 
     class Simple_Recursion_Methods_Builder___ < Methods_Builder__
@@ -309,29 +335,46 @@ module Skylab::TanMan
 
       attr_reader :item_k, :stem_k, :tail_k
 
-      # ~ appendation & insertion
-
-      def init_insertion node_st, new_x, front_node
+      def __init_session node_st, front_node
         @front_node = front_node
-        if new_x.respond_to? :ascii_only?
-          @argument_is_string = true
-          @new_s = new_x
-        else
-          @argument_is_string = false
-          @new_x = new_x
-        end
         @node_st = node_st
+        self
+      end
+
+      def receive_reference_item_via_string s
+        @reference_item_is_string = true
+        @reference_item_as_string = s
         nil
       end
 
-      def via_new_string_append
+      def receive_reference_item x
+        @reference_item_is_string = false
+        @reference_item = x
+        nil
+      end
+
+      # ~ appendation & insertion
+
+      def receive_new_item_via_string s
+        @new_item_is_string = true
+        @new_item_as_string = s
+        nil
+      end
+
+      def receive_new_item x
+        @new_item_is_string = false
+        @new_item = x
+        nil
+      end
+
+      def via_new_item_append
 
         # exhaust the stream until you are left with any last two items:
         #   [ [ node_Y ] node_Z ]
 
-        node_Y, node_Z = any_last_two_via_stream @node_st
-
         @new_item_x = _via_argument_produce_new_mixed_item
+
+        node_Y, node_Z = any_last_two_via_stream @node_st
 
         if node_Z
 
@@ -459,9 +502,9 @@ module Skylab::TanMan
 
       def _via_root_node_insert_at_front
 
-        root_node = @front_node
-
         _new_item_x = _via_argument_produce_new_mixed_item
+
+        root_node = @front_node
 
         created_node = root_node.dup  # (1)
 
@@ -522,12 +565,10 @@ module Skylab::TanMan
 
       # ~ removal
 
-      def remove st, reference_x, front_node
+      def via_reference_item_remove
 
-        @front_node = front_node
-
-        receive_reference_x reference_x
         p = _build_equality_comparator_proc
+        st = @node_st
 
         begin
           x = st.gets
@@ -572,21 +613,11 @@ module Skylab::TanMan
 
       # ~ support
 
-      # ~~ support for reference
-
-      def receive_reference_x reference_x
-        if reference_x.respond_to? :ascii_only?
-          @reference_is_string = true
-          @reference_s = reference_x
-        else
-          @reference_is_string = false
-          @reference_item_x = reference_x
-        end ; nil
-      end
+      # ~~ support for reference item
 
       def _build_equality_comparator_proc
 
-        if @reference_is_string  # clean up in #open [#092]
+        if @reference_item_is_string
           build_string_comparator_proc___
         else
           __build_normal_equality_comparator_proc
@@ -594,7 +625,7 @@ module Skylab::TanMan
       end
 
       def __build_normal_equality_comparator_proc
-        oid = @reference_item_x.object_id
+        oid = @reference_item.object_id
         -> x do
           oid == x[ @item_k ].object_id
         end
@@ -602,12 +633,12 @@ module Skylab::TanMan
 
       # ~~ support for node production
 
-      def _via_argument_produce_new_mixed_item  # while #open [#092]
+      def _via_argument_produce_new_mixed_item
 
-        if @argument_is_string
+        if @new_item_is_string
           produce_new_mixed_item_via_string_argument_
         else
-          @new_x
+          @new_item
         end
       end
 
@@ -692,7 +723,7 @@ module Skylab::TanMan
       # ~ mixed item production (the one #hook-out)
 
       def produce_new_mixed_item_via_string_argument_
-        @front_node.class.parse( @tail_k, @new_s )[ @item_k ]
+        @front_node.class.parse( @tail_k, @new_item_as_string )[ @item_k ]
       end
 
       # ~ removal (three #hook-outs's)
@@ -720,11 +751,9 @@ module Skylab::TanMan
       # ~ support
 
       def build_string_comparator_proc___
-        s = @reference_s
+        s = @reference_item_as_string
         -> x do
-          _ = x[ @item_k ]
-          _.respond_to? :ascii_only? or self._SANITY  # while #open [#092]
-          s == _
+          s == x[ @item_k ]
         end
       end
     end
@@ -826,7 +855,7 @@ module Skylab::TanMan
       # ~ mixed item production (the one #hook-out)
 
       def produce_new_mixed_item_via_string_argument_
-        @front_node.class.parse( @list_k, @new_s )[ @item_k ]
+        @front_node.class.parse( @list_k, @new_item_as_string )[ @item_k ]
       end
 
       # ~ removal (three #hook-out's)
@@ -848,22 +877,6 @@ module Skylab::TanMan
         list = tail[ @list_k ]
         tail[ @list_k ] = nil
         list[ @item_k ]
-      end
-    end
-
-    module Common_Static_Methods___
-
-      attr_accessor :prototype_  # so that we can add to lists with zero or one items
-
-      def is_list
-        true
-      end
-
-      def named_prototypes_  # collude in a hack implemented elsewhere meh
-      end
-
-      def nodes_
-        to_node_stream_.to_enum
       end
     end
 
