@@ -744,13 +744,7 @@ module Skylab::TanMan
     end
 
     def unparse
-      map do |child|
-        case child
-        when ::NilClass ; child.to_s
-        when ::String   ; child
-        else            ; child.unparse
-        end
-      end.join EMPTY_S_
+      unparse_into( [] ).join EMPTY_S_
     end
 
     def unparse_into y

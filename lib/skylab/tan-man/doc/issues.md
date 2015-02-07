@@ -1,6 +1,6 @@
 [#093] #open get rid of __dupe
 [#092]       #done #list-API unmunge `_insert_item_before_item` et. a.
-[#091] #open #list-API improve the implementation of \`unparse\`
+[#091]       #done #list-API improve the implementation of \`unparse\`
 [#090] #open association add is not magnetic
 [#089] #open [br] datastore / file-based [ file etc ] <= [ttt]
 [#088] #open same issue as below with graph use

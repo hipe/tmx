@@ -9,7 +9,7 @@ digraph{
   st [ label="sg\ntags" style=filled ]
   tu [ label="ttt\nunify" ]
   um [ label="unmunge\nmethods" style=filled ]
-  up [ label="cleanup unparse" ]
+  up [ label="cleanup unparse" style=filled ]
 
   am -> cd
   cd -> up
