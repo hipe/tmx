@@ -239,7 +239,7 @@ module Skylab::TanMan
             curr_tree.class == sexp.class or fail 'test me'
             curr_tree.prototype_ and fail 'sanity - prototype_ already set!'
             hub = curr_tree
-          elsif sexp.is_list
+          elsif sexp.is_list_
             hub = sexp.class.new
           else
             fail "implement me - prototypes for non-list rules"

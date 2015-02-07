@@ -216,82 +216,18 @@ module Skylab::TanMan
 
   module InstanceMethods
 
-    # For now, methods defined here must have names that do *not* match
-    # /\A[_a-z][a-z0-9][a-z0-9_]*\z/  (i.e. all the methods you define here
-    # must have either a '__' at the beginning, or a '!', '?' in them (for now))
-    #
-    # The above regex represents a "method namespace" that it reserved for names
-    # derived from rule and expression names in the client grammar,
-    # and method names in any client extension modules (that aren't intending
-    # to override these).
+    # all methods defined here must end in a '_' per [#hl-116] - methods that
+    # look "normal" is a namespace left open entirely for business (i.e rules
+    # in the grammar).
 
-    def __dupe opts=nil
-      o = Dupe_Opts_.new
-      opts.each { |k, v| o[k] = v } and opts = nil if opts
-      new = self.class.new
-      op = ::Hash[ self.class._members.map { |m| [m, :normal] } ]
-      if o.except
-        except_h = { }
-        o.except.each do |mixed|
-          case mixed
-          when ::Symbol
-            op[mixed] = :except
-            except_h[mixed] = :all
-          when ::Array
-            op[mixed.first] = :except
-            if 1 == mixed.length
-              except_h[mixed.first] = :all
-            else
-              v = 2 < mixed.length ? mixed[1..-1] : mixed[1]
-              (except_h[mixed.first] ||= []).push v
-            end
-          else
-            fail "invalid \"except\" element: #{ mixed.class }"
-          end
-        end
-      end
-      op.each do |k, v|
-        case v
-        when :normal
-          new[k] = __dupe_member k
-        when :except
-          if :all != except_h[k]
-            new[k] = __dupe_member k, except_h[k]
-          end
-        else
-          fail 'sanity - bad opcode'
-        end
-      end
-      new
-    end
-    Dupe_Opts_ = ::Struct.new :except
-
-    def __dupe_member member_i, except_a=nil
-      o = self[member_i]
-      if o.respond_to? :__dupe
-        if except_a
-          raise ::TypeError.new( 'nope' ) unless ::Array === except_a
-          opt_h = { except: except_a }
-        end
-        res = o.__dupe(* [opt_h].compact ) # #here
-      else
-        if except_a and o
-          fail "sanity - had an `except_a` list for a nerk that does #{
-            }not respond to __dupe: #{ o.class }"
-        end
-        res =
-        case o
-        when ::NilClass ; nil
-        when ::String   ; o.dup
-        else            ; fail "implement me -- #{ o.class }"
-        # see #doc-point [#074] - representing numeric values in sexps
-        end
-      end
-      res
-    end
-
-    def is_list  # is this sexp node a list-like node?
+    def is_list_  # is this sexp node a list-like node?
       false
+    end
+
+    def duplicate_except_ * except
+
+      Auto_::Actors__::Duplicate[ self.class.new, self, members, except ]
+
     end
   end
 
@@ -299,13 +235,14 @@ module Skylab::TanMan
 
     include InstanceMethods
 
-    def __dupe # #here
-      other = self.class.new length
-      length.times.each { |i| other[i] = __dupe_member i }
-      other
+    def duplicate_except_
+
+      d = length
+      Auto_::Actors__::Duplicate[ self.class.new( d ), self, d.times.to_a ]
+
     end
 
-    def is_list
+    def is_list_
       true
     end
   end
@@ -339,7 +276,7 @@ module Skylab::TanMan
       @content_text_value = x
     end
 
-    def __dupe _=nil
+    def duplicate_except_
       dup
     end
 

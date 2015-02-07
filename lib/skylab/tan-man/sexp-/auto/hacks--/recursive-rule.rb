@@ -148,7 +148,7 @@ module Skylab::TanMan
 
       attr_accessor :prototype_  # so that we can add to lists with zero or one items
 
-      def is_list
+      def is_list_
         true
       end
 

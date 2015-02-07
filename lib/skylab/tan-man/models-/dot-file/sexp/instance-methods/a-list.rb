@@ -53,7 +53,7 @@ module Skylab::TanMan
       end
       fail "sanity - this algo not built for zero-length lists" if ! proto
 
-      new = proto.__dupe except: [:id, [:equals, :id]]
+      new = proto.duplicate_except_ :id, [ :equals, :id ]
       new[:id] = _parse_id key_s
       new[:equals][:id] = _parse_id val.to_s
 

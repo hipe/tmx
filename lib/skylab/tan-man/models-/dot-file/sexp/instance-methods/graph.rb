@@ -47,7 +47,7 @@ module Skylab::TanMan
         proto = stmt_list.named_prototypes_[ :label ]
         proto or fail 'no label prototype'
         created = true
-        proto.__dupe except: [:rhs]
+        proto.duplicate_except_ :rhs
       end
       equals_stmt.rhs = str
       if created

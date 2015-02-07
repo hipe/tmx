@@ -146,7 +146,7 @@ module Skylab::TanMan
       head and y << head
       if ! tail
         # nothing
-      elsif tail.is_list
+      elsif tail.is_list_
         tail.each do |tree|
           y << tree.content
         end

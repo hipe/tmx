@@ -260,8 +260,8 @@ module Skylab::TanMan
       end
 
       def resolve_edge_statement
-        edge_stmt = @prototype.__dupe(
-          except: [ [ :agent, :id ], [ :edge_rhs, :recipient, :id ] ] )
+        edge_stmt = @prototype.duplicate_except_(
+          [ :agent, :id ], [ :edge_rhs, :recipient, :id ] )
         edge_stmt.set_source_node_id @from_node.node_id
         edge_stmt.set_target_node_id @to_node.node_id
         @edge_stmt = edge_stmt

@@ -69,7 +69,7 @@ module Skylab::TanMan
       end
 
       def __empty_stmt_list
-        _sl_proto.__dupe except: [ :stmt, :tail ]
+        _sl_proto.duplicate_except_ :stmt, :tail
       end
 
       def _sl_proto  # assumes static grammar

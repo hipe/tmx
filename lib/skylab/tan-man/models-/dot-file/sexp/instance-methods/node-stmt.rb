@@ -25,7 +25,7 @@ module Skylab::TanMan
     LABEL__ = 'label'.freeze
 
     def _create_node_with_label label, & oes_p
-      node_stmt = __dupe
+      node_stmt = duplicate_except_
       ok = Set_label_of_new_node_made_from_prototype__[ label, node_stmt, oes_p ]
       ok && node_stmt
     end

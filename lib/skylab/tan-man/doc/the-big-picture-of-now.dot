@@ -1,7 +1,7 @@
 digraph{
 
   am [ label="associate\nmagnetic" ]
-  cd [ label="cleanup\ndupe" ]
+  cd [ label="cleanup\ndupe" style=filled ]
   cv [ label="basic CLI\nvisaul re-integration" style=filled ]
   cn [ label="cleanup\nnames" style=filled ]
   si [ label="silo\nsquash" ]
