@@ -56,13 +56,13 @@ module Skylab::TestSupport
 
         _RX = TestSupport_.lib_.basic::String.regex_for_line_scanning
 
-        scnr = TestSupport_::Library_::StringScanner.new s
+        scn = TestSupport_::Library_::StringScanner.new s
 
         y = []
         current_line_index = 0
         while current_line_index < beg_d
-          current_index += 1
-          if ! scnr.skip _RX
+          current_line_index += 1
+          if ! scn.skip _RX
             y = false
             break
           end
@@ -70,7 +70,7 @@ module Skylab::TestSupport
         if y
           while current_line_index <= end_d
             current_line_index += 1
-            s = scnr.scan _RX
+            s = scn.scan _RX
             if s
               y.push s
             else

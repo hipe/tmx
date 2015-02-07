@@ -49,13 +49,25 @@ module Skylab::TanMan
       end
     end
 
+    class << self
+
+      def build_sexp_fuzzy_matcher_via_natural_key_fragment s
+
+        rx = /\A#{ ::Regexp.escape s }/i  # :+[#069] case insensitive?. :~+[#ba-015]
+
+        -> stmt do
+          rx =~ stmt.label_or_node_id_normalized_string
+        end
+      end
+    end  # >>
+
     Silo__ = ::Class.new Model_::Document_Entity::Silo
 
     class Collection_Controller__ < Model_::Document_Entity::Collection_Controller
 
       def entity_stream_via_model model
         if model_class == model
-          to_node_stream.map_by do | node |
+          to_node_sexp_stream.map_by do | node |
             _entity_via_node node
           end
         end
@@ -65,7 +77,7 @@ module Skylab::TanMan
 
         label_s = node_identifier.entity_name_s
 
-        node = to_node_stream.detect do | node_ |
+        node = to_node_sexp_stream.detect do | node_ |
           label_s == node_.label
         end
 
@@ -81,13 +93,43 @@ module Skylab::TanMan
         end
       end
 
+      def entity_via_natural_key_fuzzily s
+
+        p = Node_.build_sexp_fuzzy_matcher_via_natural_key_fragment s
+
+        st = to_node_sexp_stream
+
+        found_a = []
+        begin
+          x = st.gets
+          x or break
+          _does_match = p[ x ]
+          if _does_match
+            if s == x.label  # case sensitive
+              found_a.clear.push x
+              break
+            else
+              found_a.push x
+            end
+          end
+          redo
+        end while nil
+
+        case 1 <=> found_a.length
+        when  0
+          _entity_via_node found_a.fetch 0
+        when -1
+          self._BEHAVIOR_IS_NOT_YET_DESIGNED  # #todo
+        end
+      end
+
       def retrieve_any_node_with_id i
-        to_node_stream.detect do |node|
+        to_node_sexp_stream.detect do |node|
           i == node.node_id
         end
       end
 
-      def to_node_stream
+      def to_node_sexp_stream
         datastore_controller.at_graph_sexp :nodes
       end
 
@@ -124,7 +166,7 @@ module Skylab::TanMan
         _ok = Node_::Actors__::Mutate::Via_entity.call(
           :delete,
           ent,
-          @dsc,
+          datastore_controller,
           @kernel, & ( oes_p || @on_event_selectively ) )
 
         _ok and _commit_changes action

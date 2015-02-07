@@ -110,18 +110,11 @@ module Skylab::TanMan
             s == stmt.label_or_node_id_normalized_string
           end
           if @do_fuzzy
-            @fuzzy_match_p = build_fuzzy_match_p
+            @fuzzy_match_p = Node_.build_sexp_fuzzy_matcher_via_natural_key_fragment_ @name_s
             @match_p = @fuzzy_match_p
           else
             @match_p = @exact_match_p
           end ; nil
-        end
-
-        def build_fuzzy_match_p
-          rx = /\A#{ ::Regexp.escape @name_s }/i  # :+[#069] case insensitive?. :~+[#ba-015]
-          -> stmt do
-            rx !~ stmt.label_or_node_id_normalized_string
-          end
         end
 
         def process_node_for_neighbors node

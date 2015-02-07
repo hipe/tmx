@@ -79,7 +79,9 @@ module Skylab::TanMan
 
           otr = Brazen_::Models_::Workspace.common_properties
 
-          o :for_document_input_only, :property, :input_string,
+          o :property, :output_stream,  # hidden for now, for #feature [#037]
+
+            :for_document_input_only, :property, :input_string,
             :for_document_input_only, :property, :input_path,
 
             :for_document_output_only, :property, :output_string,
@@ -359,15 +361,19 @@ module Skylab::TanMan
 
           args = @action.output_arguments
 
-          if 1 == args.length && :output_path == args.first.name_symbol && DASH___ == args.first.value_x
-            args = [ args.first.class.new( @action.stdout, :output_stream ) ]
+
+          trio = args.fetch 0
+
+          if :output_path == trio.name_symbol && DASH_ == trio.value_x  # :+#magic-value for feature [#037]
+
+            args = [ trio.class.new(
+              @action.stdout, true, IO_PROPERTIES__.fetch( :output_stream ) ) ]
+
           end
 
           datastore_controller.persist_via_args(
             @action.argument_box[ :dry_run ], * args )
         end
-
-        DASH___ = '-'.freeze
 
         def datastore_controller
           @preconditions.fetch :dot_file  # yes

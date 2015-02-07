@@ -285,13 +285,27 @@ module Skylab::Brazen
         puts ">> >> >> >> MADE #{ name.as_slug } CTRL"
     end
 
-    def initialize_copy _otr_  # when entity is flyweight
-      @property_box = @property_box.dup
-    end
-
     def accept_parent_node_ x
       # for non-top model nodes
       @parent_node = x ; nil
+    end
+
+    # ~ dup-like and dup-related
+
+    def new_via_iambic x_a
+      dup.__init_duplication_via_iambic x_a
+    end
+
+    protected def __init_duplication_via_iambic x_a
+      # (for now we don't go thru normalization - but we might one day)
+      x_a.each_slice 2 do  | k, x |
+        @property_box.set k, x
+      end
+      self
+    end
+
+    def initialize_copy _otr_  # when entity is flyweight
+      @property_box = @property_box.dup
     end
 
     # ~ multipurpose, simple readers

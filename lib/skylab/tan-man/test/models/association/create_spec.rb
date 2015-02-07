@@ -145,6 +145,27 @@ module Skylab::TanMan::TestSupport::Models::Association
       end
     end
 
+    it "against a digraph with two nodes, will first match existing nodes fuzzily before creating" do
+
+      s = <<-HERE.unindent
+        digraph {
+          bar [label=bar]
+          foo [label=foo]}
+      HERE
+
+      call_API :association, :add,
+        :from_node_label, 'fo',
+        :to_node_label, 'ba',
+        :input_string, s,
+        :output_string, s
+
+      expect_OK_event :found_existing_node
+      expect_OK_event :found_existing_node
+      expect_OK_event :created_association
+      @output_s = s
+      excerpt( 3 .. 3 ).should eql "  foo -> bar}\n"
+    end
+
     def associate src_s, tgt_s, * x_a_
       x_a = [ :association, :add ]
       add_input_arguments_to_iambic x_a

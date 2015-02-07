@@ -68,13 +68,11 @@ module Skylab::TanMan
 
       def receive_persist_entity action, ent, & oes_p
 
-        @dsc ||= datastore_controller
-
         _bytes = Graph_::Actors__::Touch.call(
 
           action.argument_box[ :dry_run ],
 
-          action, ent, @dsc, @kernel, & oes_p )
+          action, ent, datastore_controller, @kernel, & oes_p )
 
         _bytes and super
       end

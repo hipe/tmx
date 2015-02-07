@@ -246,7 +246,7 @@ module Skylab::TanMan
       end
 
       def bld_ping_event
-        an = @kernel.app_name.gsub Callback_::DASH_, TanMan_::SPACE_
+        an = @kernel.app_name.gsub DASH_, SPACE_
         build_neutral_event_with :ping do |y, o|
           y << "hello from #{ an }."
         end

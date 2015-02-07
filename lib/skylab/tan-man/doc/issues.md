@@ -1,7 +1,7 @@
 [#093]       #done cleanup `__dupe` interface and implementation
 [#092]       #done #list-API unmunge `_insert_item_before_item` et. a.
 [#091]       #done #list-API improve the implementation of \`unparse\`
-[#090] #open association add is not magnetic
+[#090]       #done make association magnetic
 [#089] #open [br] datastore / file-based [ file etc ] <= [ttt]
 [#088] #open same issue as below with graph use
 [#087] #open setting a starter doesn't remove the last one
@@ -67,8 +67,9 @@
 [#040]       #done make your own SubClient::InstanceMethods to DRY CLI & API
 [#039]       #done API::Whatever becomes MetaHell::Generic
 [#038]       #done `text_styler` away!
-[#037]       #done reconceive stdout, stderr -> infostream, paystream, errstream
-               .. (i.e. ("PIE" [#sl-113])
+[#037]       #feature stdout as an `output_stream`
+             (was: #done reconceive stdout, stderr -> infostream, paystream, errstream
+               .. (i.e. "PIE" [#sl-113]))
 [#036]       #done `format_error` -> `inflect_failure_reason` (and tests!)
 [#035]       #wont `delegates_to` go away as a smell (meh)
 [#034]       #done sort out `root_runtime`, client, `parent_runtime`, etc

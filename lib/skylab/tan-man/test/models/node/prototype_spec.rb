@@ -13,8 +13,8 @@ module Skylab::TanMan::TestSupport::Models::Node
         o = touch_node_via_label 'cyan'
         o.unparse.should eql "cyan [label=cyan]"  # :node_stmt
         number_of_nodes.should eql 1
-        to_node_stream.map do |n|
-          n.node_id
+        node_sexp_stream.map do | x |
+          x.node_id
         end.should eql [ :cyan ]
         unparsed[ -24 .. -1 ].should eql "*/\n\ncyan [label=cyan]\n}\n"
       end
@@ -36,8 +36,8 @@ module Skylab::TanMan::TestSupport::Models::Node
         number_of_nodes.should eql 1
         o = touch_node_via_label 'cyan'
         number_of_nodes.should eql 2
-        _i_a = to_node_stream.map do |n|
-          n.node_id
+        _i_a = node_sexp_stream.map do | x |
+          x.node_id
         end
         _i_a.should eql [ :blue, :cyan ]
         o.unparse.should eql "cyan [label=cyan]"
@@ -54,8 +54,8 @@ module Skylab::TanMan::TestSupport::Models::Node
         number_of_nodes.should eql 1
         o = touch_node_via_label 'cyan'
         number_of_nodes.should eql 2
-        _i_a = to_node_stream.map do |n|
-          n.node_id
+        _i_a = node_sexp_stream.map do | x |
+          x.node_id
         end
         _i_a.should eql [ :cyan, :red ]
         o.unparse.should eql "cyan [label=cyan]"
@@ -94,8 +94,8 @@ module Skylab::TanMan::TestSupport::Models::Node
         end
 
         def expect * i_a
-          _i_a = to_node_stream.map do |n|
-            n.node_id
+          _i_a = node_sexp_stream.map do | x |
+            x.node_id
           end
           _i_a.should eql i_a
         end

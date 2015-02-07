@@ -1,6 +1,6 @@
 digraph{
 
-  am [ label="associate\nmagnetic" ]
+  am [ label="associate\nmagnetic" style=filled ]
   cd [ label="cleanup\ndupe" style=filled ]
   cv [ label="basic CLI\nvisaul re-integration" style=filled ]
   cn [ label="cleanup\nnames" style=filled ]

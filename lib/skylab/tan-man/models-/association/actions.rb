@@ -6,7 +6,7 @@ module Skylab::TanMan
 
         :persist_to, :association,
 
-        :preconditions, [ :dot_file ],
+        :preconditions, [ :dot_file, :node ],
 
         :required,
         :property,
@@ -38,6 +38,14 @@ module Skylab::TanMan
           else
             super
           end
+        end
+
+        def via_edited_entity_produce_result
+          asc = datastore.__fuzzy_match_nodes_of_association @edited_entity
+          if asc
+            @edited_entity = asc
+          end
+          super
         end
       end
 
@@ -84,6 +92,30 @@ module Skylab::TanMan
         end
       end
 
+      def __fuzzy_match_nodes_of_association asc
+
+        cc = @preconditions.fetch :node
+
+        f_o = cc.entity_via_natural_key_fuzzily asc.property_value_via_symbol :from_node_label
+
+        t_o = cc.entity_via_natural_key_fuzzily asc.property_value_via_symbol :to_node_label
+
+        a = nil
+        if f_o
+          a = []
+          a.push :from_node_label, f_o.property_value_via_symbol( :name )
+        end
+
+        if t_o
+          a ||= []
+          a.push :to_node_label, t_o.property_value_via_symbol( :name )
+        end
+
+        if a
+          asc.new_via_iambic a
+        end
+      end
+
       def receive_persist_entity action, entity, & oes_p
 
         bx = action.argument_box
@@ -109,8 +141,6 @@ module Skylab::TanMan
 
       def _info_via_into_datastore_marshal_entity any_attrs_x, any_proto_sym, entity, & oes_p  # _DOG_EAR
 
-        @dsc ||= datastore_controller  # ick
-
         did_mutate = nil
 
         _oes_p_ = -> * i_a, & ev_p do
@@ -129,7 +159,7 @@ module Skylab::TanMan
           :prototype_i, any_proto_sym,
           :from_node_label, entity.property_value_via_symbol( :from_node_label ),
           :to_node_label, entity.property_value_via_symbol( :to_node_label ),
-          :datastore, @dsc,
+          :datastore, datastore_controller,
           :kernel, @kernel, & _oes_p_ )
 
         _ok and Info___[ did_mutate ]
@@ -145,7 +175,7 @@ module Skylab::TanMan
           :verb, :delete,
           :from_node_label, bx.fetch( :from_node_label ),
           :to_node_label, bx.fetch( :to_node_label ),
-          :datastore, @dsc,
+          :datastore, datastore_controller,
           :kernel, @kernel,
           & oes_p )
 

@@ -172,11 +172,13 @@ module Skylab::Brazen
             end
           end
 
-          @edited_entity and begin
-            _ok = @edited_entity.any_native_create_before_create_in_datastore
-            _ok and begin
-              @edited_entity.result_for_persist self
-            end
+          @edited_entity and via_edited_entity_produce_result
+        end
+
+        def via_edited_entity_produce_result  # :+#public-API
+          _ok = @edited_entity.any_native_create_before_create_in_datastore
+          _ok and begin
+            @edited_entity.result_for_persist self
           end
         end
       end

@@ -32,11 +32,11 @@ module Skylab::TanMan::TestSupport::Models::Node
     end
 
     def get_node_array
-      to_node_stream.to_a
+      node_sexp_stream.to_a
     end
 
-    def to_node_stream
-      collection_controller.to_node_stream
+    def node_sexp_stream
+      collection_controller.to_node_sexp_stream
     end
 
     def touch_node_via_label s

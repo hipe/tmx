@@ -102,9 +102,9 @@ module Skylab::TanMan::TestSupport::Models::Node
         touch_node_via_label 'milk the cow'
         touch_node_via_label 'milk the cat'
         touch_node_via_label 'MiLk the catfish'
-        to_node_stream.map( & :node_id ).
+        node_sexp_stream.map( & :node_id ).
           should eql [ :milk_3, :milk_2, :milk ]
-        a = to_node_stream.map( & :label )
+        a = node_sexp_stream.map( & :label )
         a.shift.should eql 'MiLk the catfish'
         a.shift.should eql 'milk the cat'
         a.shift.should eql 'milk the cow'
