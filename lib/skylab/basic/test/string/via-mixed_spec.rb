@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport
+module Skylab::Basic::TestSupport::String
 
   describe "[mh] \"strange\" (the summarization-aware `inspect`-ish)" do
 
@@ -20,12 +20,20 @@ module Skylab::MetaHell::TestSupport
       subject( 'eleven_chrs' ).should eql '"eleven[..]"'
     end
 
+    it "a typical symbol gets single quotes" do
+      subject( :"foo_Bar baz 123" ).should eql "'foo_Bar baz 123'"
+    end
+
+    it "a crazy symbol gets escaped" do
+      subject( :"\thi" ).should eql "'\\thi'"
+    end
+
     def expect_quotes s
       subject( s ).should eql "\"#{ s }\""
     end
 
     def subject s
-      MetaHell_.strange s
+      Basic_::String.via_mixed s
     end
   end
 end

@@ -105,6 +105,10 @@ module Skylab::Basic
         end
       end
 
+      def via_mixed * a
+        String_::Via_Mixed__.call_via_arglist a
+      end
+
       def word_wrappers
         Word_Wrappers__
       end

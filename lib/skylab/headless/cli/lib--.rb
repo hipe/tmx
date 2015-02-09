@@ -85,28 +85,6 @@ module Skylab::Headless
       end
     end
 
-    # (below might be :+[#101] name conventions for etc.)
-
-    Ellipsify__ = -> glyph, limit, string do
-      if string.length <= limit
-        string
-      elsif glyph.length <= limit
-        "#{ string[ 0, ( limit - glyph.length ) ] }#{ glyph }"
-      else
-        case limit  # this is what you get. [#it-001] is much more ambitious
-        when 0 ;  # and much less existant.
-        when 1 ; '.'
-        when 2 ; '[]'
-        when 3 ; '[.]'
-        else glyph[ 0, limit ]
-        end
-      end
-    end
-
-    Ellipsify_ = Ellipsify__.curry[ '[..]'.freeze ]
-
-    Ellipsify = Ellipsify_.curry[ Headless_.lib_.reasonably_short ]
-
     Cols = -> do
       cols_p = -> else_p do
         begin require 'ncurses' ; rescue ::LoadError => e ; end

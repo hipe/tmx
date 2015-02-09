@@ -203,10 +203,6 @@ module Skylab::Brazen
 
     Basic = sidesys[ :Basic ]
 
-    Ellipsify = -> * x_a do
-      Snag_[]::CLI.ellipsify.call_via_arglist x_a
-    end
-
     NLP_EN_methods = -> do
       HL__[].expression_agent.NLP_EN_methods
     end

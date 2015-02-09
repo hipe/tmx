@@ -1,3 +1,5 @@
+self._WELCOME_BACK
+
 module Skylab::TreetopTools
 
   class Parser::InputAdapters::Stream

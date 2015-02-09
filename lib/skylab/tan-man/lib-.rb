@@ -24,12 +24,16 @@ module Skylab::TanMan
       HL__[]::IO.dry_stub_instance
     end
 
-    Ellipsify = -> do
-      Sg__[]::CLI.ellipsify
+    Ellipsify = -> s do
+      Basic[]::String.ellipsify s
     end
 
     Entity = -> do
       Brazen_::Entity
+    end
+
+    File_utils = memoize.call do
+      require 'fileutils' ; ::FileUtils
     end
 
     Home_directory_pathname = -> do
@@ -37,6 +41,10 @@ module Skylab::TanMan
     end
 
     HL__ = sidesys[ :Headless ]
+
+    List_scanner = -> x do
+      Callback_::Scn.try_convert x
+    end
 
     Module_lib = -> do
       Basic[]::Module
@@ -46,6 +54,10 @@ module Skylab::TanMan
 
     NLP_EN_methods = -> do
       HL__[].expression_agent.NLP_EN_methods
+    end
+
+    Parameter = -> do
+      HL__[]::Parameter
     end
 
     Parse_lib = -> do
@@ -89,8 +101,6 @@ module Skylab::TanMan
     TT = memoize[ -> do
       require 'treetop' ; ::Treetop
     end ]
-
-    TTT = sidesys[ :TreetopTools ]
 
     INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(
       self, TanMan_ )

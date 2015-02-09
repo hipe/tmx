@@ -1,6 +1,8 @@
-module Skylab::TreetopTools
+module Skylab::TanMan
 
-  class Parser::Load
+  module Input_Adapters_::Treetop
+
+  class Load
 
     class Normalize_and_validate_paths__  # this looks like :+[#hl-022] but may not be
 
@@ -146,5 +148,6 @@ module Skylab::TreetopTools
         @event_receiver.receive_error_event ev
       end
     end
+  end
   end
 end

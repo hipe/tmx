@@ -56,7 +56,7 @@ module Skylab::TanMan::TestSupport
 
       def produce_parser_class  # override the parent's version of this :#hook-out for [ttt]
 
-        TanMan_.lib_.TTT::Parser::Load.new( :_xxx_,
+        TanMan_::Input_Adapters_::Treetop::Load.new( :_xxx_,
           -> o do
             o.generated_grammar_dir @_h.fetch :generated_grammar_dir_path
             o.root_for_relative_paths @_h.fetch :root_for_relative_paths_for_load

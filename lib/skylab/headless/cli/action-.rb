@@ -32,15 +32,6 @@ module Skylab::Headless
         end
       end
 
-      def ellipsify * a  # #todo: will merge into [#ba-032]
-        case a.length
-        when  0 ; CLI::Lib__::Ellipsify__
-        when  1 ; CLI::Lib__::Ellipsify[ * a ]
-        when  2 ; CLI::Lib__::Ellipsify_[ * a ]
-        else    ; CLI::Lib__::Ellipsify__[ * a ]
-        end
-      end
-
       def occurrence_stream * a
         if a.length.zero?
           CLI::Lib__::Occurrence_scanner

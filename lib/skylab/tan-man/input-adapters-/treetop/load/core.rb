@@ -1,13 +1,29 @@
-module Skylab::TreetopTools
+module Skylab::TanMan
 
-  Parser::Load = ::Class.new DSL::Client::Minimal
+  module Input_Adapters_::Treetop
 
-  class Parser::Load::Shell__ < DSL::Shell
+  class Load < Treetop_::DSL_::Client
+
+  class Shell__ < Treetop_::DSL_::Shell
 
     # Define the DSL that will be used to load grammars.
 
     def self.formal_parameter_class            # [#sl-119] one day DSL
-      Parameter # has extra nonsense for dirs [#hl-009] HL::P strain?
+      Parameter___ # has extra nonsense for dirs [#hl-009] HL::P strain?
+    end
+
+    class Parameter___ < LIB_.parameter
+
+      param :dir, boolean: true
+      param :exist, enum: [:must], accessor: true
+
+      public :[]                    # the Definer::I_M of this is private
+      public :known?                # the Definer::I_M of this is private
+
+      def pathname= x
+        super x
+        :dir == x and dir!
+      end
     end
 
     param :enhance_parser_with, dsl: :list
@@ -24,7 +40,6 @@ module Skylab::TreetopTools
 
   end
 
-  class Parser::Load
 
     include LIB_.parameter::Bound::InstanceMethods  # bound_parameters
 
@@ -52,7 +67,7 @@ module Skylab::TreetopTools
 
     def normalize_and_validate_paths
       _relpath_root = bound_parameters[ :root_for_relative_paths ]
-      Parser::Load::Normalize_and_validate_paths__[ _relpath_root, self ]
+      Load_::Normalize_and_validate_paths__[ _relpath_root, self ]
     end
 
     def start_loads
@@ -72,7 +87,7 @@ module Skylab::TreetopTools
         @generated_grammar_dir.join tail_pn
       end
       g.out_path = "#{ _base_pn }#{ Autoloader_::EXTNAME }"  # [..]/g1.treetop.rb
-      g.module_name_i_a = TreetopTools_::Hack_peek_module_name__[ g.in_pn.to_path ]
+      g.module_name_i_a = Load_::Hack_peek_module_name__[ g.in_pn.to_path ]
       g
     end
 
@@ -110,7 +125,7 @@ module Skylab::TreetopTools
     def load_or_generate_grammar_files
       via_grammars_summarize
       if @grammar_a.length.nonzero?
-        LIB_.treetop
+        LIB_.TT
       end
       ok = PROCEDE_
       @grammar_a.each do |g|
@@ -183,7 +198,7 @@ module Skylab::TreetopTools
         parent = parent.dirname
       end
       if parent.directory?
-        file_utils.mkdir_p g.out_pn.dirname.to_s, verbose: true
+        LIB_.file_utils.mkdir_p g.out_pn.dirname.to_s, verbose: true
         PROCEDE_
       else
         send_directory_must_exist_error parent
@@ -369,12 +384,7 @@ module Skylab::TreetopTools
       call_digraph_listeners :error, ev
     end
 
-    def file_utils
-      LIB_.file_utils
-    end
-
-
-
-    EMPTY_S_ = ''.freeze
+    Load_ = self
+  end
   end
 end

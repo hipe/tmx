@@ -5,7 +5,7 @@
 [#035]       #doc-node the range narrative ..
 [#034]       #doc-node the module narrative .. #tracking-tag module math
 [#033] #open make digraph a box
-[#032]       ellipsify
+[#032]       [ ellipsify ]
 [#031] #open domain partitioning of scanners
 [#030]       #code-node the basic struct
 [#029]       #doc-node the string node
@@ -18,7 +18,8 @@
 [#022]       #doc-node the scanners narrative ..
 [#021]       #digraph #redundancy-point
 [#020]       #doc-node the core narrative ..
-[#019]       #done move semantic into here #after:cu-001
+[#019]       [ strange ]
+             ( was: #done move semantic into here #after:cu-001 )
 [#018]       #doc-point #parent:006 #body-is-inline-in-parent
                a module and a switch statement hve `semantic intersect`
 [#017]       #doc-point #parent:006 #body-is-inline-in-parent

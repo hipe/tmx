@@ -107,8 +107,7 @@ module Skylab::BeautySalon
 
     A_RATHER_SHORT_LEN__ = 8
 
-    Ellipsulate__ = BS_.lib_.CLI_lib.ellipsify.
-      curry[ A_RATHER_SHORT_LEN__ ]
+    Ellipsulate__ = BS_.lib_.basic::String.ellipsify.curry[ A_RATHER_SHORT_LEN__ ]
 
     def resolve_line_stream
       res = nil

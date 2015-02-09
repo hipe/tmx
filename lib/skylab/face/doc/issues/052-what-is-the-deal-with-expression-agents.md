@@ -63,7 +63,7 @@ for your business concerns.
           basically use quotes IFF necessary (né smart_quotes).
 
 + `ick` - render an invalid value (for your business definition of invalid).
-          `x` is any value. distant ancestor of [#mh-050] the `strange`
+          `x` is any value. distant ancestor of [#ba-019] the `strange`
           family of renderers, which is a a sane choice of implementation
           for this semantic tag in a black & white string-ish modality.
           compare to `val`, in depicting `x` we frequently like to see

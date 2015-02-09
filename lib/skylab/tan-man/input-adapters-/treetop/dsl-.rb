@@ -1,10 +1,18 @@
 # encoding: UTF-8
 
-module Skylab::TreetopTools
+module Skylab::TanMan
 
-  DSL = ::Module.new
+  module Input_Adapters_::Treetop
 
-  class DSL::Shell  # #the-shell-narrative
+    LIB_ = TanMan_.lib_
+
+    PROCEDE_ = true
+
+    Treetop_ = self  # ~ stowaway
+
+  module DSL_
+
+  class Shell  # #the-shell-narrative
 
     extend LIB_.parameter::Definer::ModuleMethods
 
@@ -43,18 +51,21 @@ module Skylab::TreetopTools
     end
   end
 
-  DSL::Client = ::Module.new
-
-  class DSL::Client::Minimal  # #the-minimal-DSL-client-narrative
+  class Client  # #the-minimal-DSL-client-narrative
 
     LIB_.parameter[ self, :parameter_controller,
       :oldschool_parameter_error_structure_handler ]
 
     include LIB_.parameter::Definer::InstanceMethods::IvarsAdapter
 
-    def initialize client_x, dsl_body_p, event_p
-      @dsl_body_p, @event_p = dsl_body_p, event_p
-      super client_x
+    def initialize client_x, dsl_body_p, * a, & p
+
+      @dsl_body_p = dsl_body_p
+
+      p and a.push p
+      @event_p = a.fetch a.length - 1 << 2
+
+      super client_x, & nil
     end
 
   private
@@ -119,7 +130,7 @@ module Skylab::TreetopTools
     end
 
     def some_infostream
-      LIB_.CLI::IO.some_errstream_IO
+      LIB_.system.IO.some_stderr_IO
     end
 
     def formal_parameters
@@ -139,5 +150,7 @@ module Skylab::TreetopTools
       VERB__
     end
     VERB__ = "load".freeze
+  end
+  end
   end
 end

@@ -75,7 +75,7 @@ module Skylab::Headless::TestSupport::CLI::Client
     end
 
     def say_output t
-      _s = Headless_::CLI.ellipsify t.outstream.string
+      _s = Headless_.lib_.basic::String.ellipsify t.outstream.string
       "there was output to stderr? \"#{ _s }\")"
     end
   end

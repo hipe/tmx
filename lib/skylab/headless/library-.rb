@@ -16,7 +16,6 @@ module Skylab::Headless
     o[ :Shellwords ] = o[ :StringIO ] = stdlib
     o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
     o[ :Tmpdir ] = -> _ { require 'tmpdir' ; ::Dir }
-    o[ :TreetopTools ] = sidesys
 
     # ~ just do it live and implement small things here potentially redundantly
 

@@ -23,7 +23,7 @@ module Skylab::TanMan
       end
     private
       def description_under_expag_when_input_string expag
-        s = TanMan_.lib_.ellipsify[ @input_arg.value_x ]
+        s = TanMan_.lib_.ellipsify @input_arg.value_x
         expag.calculate do
           val s
         end

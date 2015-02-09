@@ -25,6 +25,12 @@ module Skylab::CSS_Convert
     Path_tools = -> do
       HL__[].system.filesystem.path_tools
     end
+
+    Treetop_tools = -> do
+      TM__[]::Input_Adapters_::Treetop
+    end
+
+    TM__ = sidesys[ :TanMan ]
   end
 
   LIB_ = lib_

@@ -30,7 +30,7 @@ module Skylab::TanMan
       DotFile_::SyntaxNodes.class
       DotFile_::Sexp::InstanceMethods.class
 
-      include TanMan_.lib_.TTT::Parser::InstanceMethods
+      include TanMan_::Input_Adapters_::Treetop::Parser_Instance_Methods
 
       def initialize bx, & oes_p
         @bx = bx
@@ -54,7 +54,7 @@ module Skylab::TanMan
 
       def __build_parser_class
 
-        TanMan_.lib_.TTT::Parser::Load.new( self,
+        TanMan_::Input_Adapters_::Treetop::Load.new( self,
 
           -> o do
 

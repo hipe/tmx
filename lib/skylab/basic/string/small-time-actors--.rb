@@ -35,7 +35,7 @@ module Skylab::Basic
         d
       end
 
-      class Ellipsify
+      class Ellipsify  # :[#032].
 
         Callback_::Actor.call self, :properties,
           :input_string,
@@ -51,27 +51,48 @@ module Skylab::Basic
               super
             end
           end
-        end
+
+          def curry  # meh
+            -> d do
+              -> s do
+                self[ s, d ]
+              end
+            end
+          end
+        end  # >>
 
         def execute
+
+          @glyph ||= DEFAULT_GLYPH___
           @max_width ||= String.a_reasonably_short_length_for_a_string
-          @glyph ||= DEFAULT_GLYPH__
-          d = @input_string.length
-          if d > @max_width
-            if @glyph.length > @max_width
-              have_fun
-            else
-              work
-            end
-          else
+
+          if @max_width >= @input_string.length
             @input_string
+          elsif @glyph.length > @max_width
+            silly
+          else
+            work
           end
         end
-        DEFAULT_GLYPH__ = '[..]'.freeze
+
+        DEFAULT_GLYPH___ = '[..]'.freeze
 
         def work
-          _d = @max_width - @glyph.length
-          "#{ @input_string[ 0, _d ] }#{ @glyph }"
+          "#{ @input_string[ 0, @max_width - @glyph.length ] }#{ @glyph }"
+        end
+
+        def silly
+
+          # arbitrary ASCII aesthetics for making the default glyph degrade
+          # "gracefully" for small widths. :+[#it-001]
+
+          case @max_width
+          when 0 ;
+          when 1 ; '.'
+          when 2 ; '[]'
+          when 3 ; '[.]'
+          else @glyph[ 0, @max_width ]
+          end
         end
       end
 

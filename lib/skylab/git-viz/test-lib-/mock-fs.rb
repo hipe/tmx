@@ -282,7 +282,7 @@ module Skylab::GitViz
         ::TypeError.new "no implicit conversion of #{ Typeish__[ x ]} into String"
       end
 
-      Typeish__ = -> x do  # :+[#mh-050]-like but for types not value
+      Typeish__ = -> x do  # :+[ba-019]-like but for types not value
         case x
         when ::NilClass, ::FalseClass, ::TrueClass ; x.inspect
         else x.class.name

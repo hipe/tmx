@@ -18,7 +18,8 @@
 [#053]       #in-situ
 [#052] #hole (was: #formal-box #doc-point #in-situ `to_struct` caveat.)
 [#051]       #doc-point #experimental-pattern :#method-cherry-picker..
-[#050]       #family "strange" (as used in "ick", formerly "inspect")
+[#050] #hole #moved-to: [#ba-019]
+             ( was:  #family "strange" (as used in "ick", formerly "inspect") )
 [#049]       #tracking-tag :#fuzzy
 [#048]       #doc-point what are touchers and when should you use them ..
 [#047]       #doc-point this class of grammars, and this parser..

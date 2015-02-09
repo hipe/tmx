@@ -49,7 +49,7 @@ module Skylab
       end
 
       def strange * a
-        MetaHell_::Strange__.call_via_arglist a
+        lib_.basic::String.via_mixed.call_via_arglist a
       end
 
       def struct_via_hash h  # :#deprecated

@@ -9,10 +9,6 @@ module Skylab::MetaHell
 
     Bzn__ = sidesys[ :Brazen ]
 
-    CLI_lib = -> do
-      HL__[]::CLI
-    end
-
     Entity_lib = -> do
       Bzn__[]::Entity
     end

@@ -1,6 +1,8 @@
-module Skylab::TreetopTools
+module Skylab::TanMan
 
-  module Parser::InstanceMethods  # you must implement the #hook-out's below
+  module Input_Adapters_::Treetop
+
+  module Parser_Instance_Methods  # you must implement the #hook-out's below
 
     Callback_::Event.selective_builder_sender_receiver self
 
@@ -9,13 +11,11 @@ module Skylab::TreetopTools
       parse _ia, EMPTY_A_, & oes_p
     end
 
-    TreetopTools_::EMPTY_A_ = [].freeze
-
   private
 
     def build_file_input_adapter path, & oes_p
 
-      TreetopTools_.lib_.system.filesystem.class::Byte_Upstream_Identifier.
+      TanMan_.lib_.system.filesystem.class::Byte_Upstream_Identifier.
         new( path, & oes_p )
 
     end
@@ -26,15 +26,6 @@ module Skylab::TreetopTools
 
   public
 
-    def parse_stream io, * a, & oes_p
-      _ia = build_stream_input_adapter io, & oes_p
-      parse _ia, a, & oes_p
-    end
-
-    private def build_stream_input_adapter *a, & oes_p
-      Parser::InputAdapters::Stream.new self, *a, & oes_p
-    end
-
     def parse_string whole_string, *a, & oes_p
       _ia = build_string_input_adapter whole_string, & oes_p
       parse _ia, a, & oes_p
@@ -43,7 +34,7 @@ module Skylab::TreetopTools
   private
 
     def build_string_input_adapter s, & x_p
-      TreetopTools_.lib_.basic::String::Byte_Upstream_Identifier.new s, & x_p
+      TanMan_.lib_.basic::String::Byte_Upstream_Identifier.new s, & x_p
     end
 
     def parse input_adapter, a, & oes_p
@@ -97,7 +88,6 @@ module Skylab::TreetopTools
     end
 
     def when_parse_failure & oes_p
-      require 'byebug' ; byebug ; $stderr.puts "ZAP DANG" and false
       if oes_p
         oes_p.call :error, :parse_failed do
           build_parse_failure_event
@@ -127,5 +117,6 @@ module Skylab::TreetopTools
     def parse_time_elapsed_seconds
       @parse_time_elapsed_seconds
     end
+  end
   end
 end

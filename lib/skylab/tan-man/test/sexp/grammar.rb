@@ -170,7 +170,7 @@ module Skylab::TanMan::TestSupport::Sexp
         receive_info_string "      (loading parser ^_^ #{ s })"  # was gsub_path_hack
       end
 
-      TanMan_.lib_.TTT::Parser::Load.new( self,
+      TanMan_::Input_Adapters_::Treetop::Load.new( self,
         -> o do
           do_force_overwrite and o.force_overwrite!
           o.generated_grammar_dir tmpdir_prepared

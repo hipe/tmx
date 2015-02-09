@@ -19,6 +19,10 @@ module Skylab::TanMan
 
   Autoloader_[ self ]
 
+  module Input_Adapters_
+    Autoloader_[ self ]
+  end
+
   Brazen_ = ::Skylab::Brazen
   ACHIEVED_ = true
   DASH_ = '-'.freeze

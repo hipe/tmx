@@ -105,9 +105,11 @@
               1. unify & modernify autoloading
               2. fix api vis-a-vis actions to integrate with autoloading
 [#012]       #done 2012-11-01 refactor UI / NLP to use sexp auto
-[#011]       make sure complex prototypes can be used with nonzero length lists
-[#010]       #done 2012-10-27 associate two nodes
-               1. sic, 2. redudantly, 3. agent not exist 4. target not exist
+[#011]       #parent-node: [#010] the peek module name hack narrative ..
+             ( was: make sure complex prototypes can be used with nonzero length lists )
+[#010]       [ the treetop input adapter ]
+             ( was: #done 2012-10-27 associate two nodes
+               1. sic, 2. redudantly, 3. agent not exist 4. target not exist )
 [#009] #open square word wrap (target an aspect ratio)
              #doc-node: the node controller narrative ..
              ( was: #done 2012-10-27 create a node

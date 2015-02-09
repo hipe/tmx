@@ -33,7 +33,7 @@ module Skylab::CodeMolester
       # the grammar changes. clearing a cache would thus never be necessary.
 
       # These kind of things are candidates to be pushed up into
-      # ::Skylab::TreetopTools, but should not be abstracted out of this
+      #  but should not be abstracted out of this
       # here until it feels stable.
 
       parent_module = Config_

@@ -1,5 +1,3 @@
-require 'skylab/treetop-tools/core'
-
 module Skylab::CSS_Convert
 
   Parser_ = ::Module.new
@@ -40,7 +38,7 @@ module Skylab::CSS_Convert
 
   module Parser_::InstanceMethods
 
-    include ::Skylab::TreetopTools::Parser::InstanceMethods
+    include LIB_.treetop_tools::Parser_Instance_Methods
 
     def initialize mode_client
       @actuals = mode_client.actual_parameters
@@ -49,11 +47,10 @@ module Skylab::CSS_Convert
     end
 
     def load_parser_class_with & _DSL
-      p = ::Skylab::TreetopTools::Parser::Load.new self, _DSL, -> o do
+      ( LIB_.treetop_tools::Load.new self, _DSL do | o |
         o.on_info handle_info_event
         o.on_error handle_error
-      end
-      p.invoke
+      end ).invoke
     end
 
   private

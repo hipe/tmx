@@ -1,6 +1,10 @@
-module Skylab::TreetopTools
+module Skylab::TanMan
 
-  class Hack_peek_module_name__  # READ [#006] the const-pryer hack
+  module Input_Adapters_::Treetop
+
+  class Load
+
+  class Hack_peek_module_name__  # READ [#011]
 
     Callback_::Actor[ self, :properties, :path ]
 
@@ -73,11 +77,9 @@ module Skylab::TreetopTools
 
     SPACE_RX_ = /[ \t]*(#.*)?\n?/
 
-    CTX_LEN_ = 40  # heuristic
-
-    Strange_ = LIB_.strange_proc.curry[ CTX_LEN_ ]
-
     T_MODULE_ = 'module'.freeze
 
+  end
+  end
   end
 end
