@@ -1006,7 +1006,8 @@ module Skylab::Brazen
 
       def parse_options
         @op ||= option_parser
-        @op.parse! argv ; nil
+        @op.parse! argv
+        nil
       rescue ::OptionParser::ParseError => e
         resolve_bound_call_when_parse_error e ; nil
       end
@@ -1329,11 +1330,11 @@ module Skylab::Brazen
       end
 
       def argument_is_required
-        :one == @argument_arity or :one_to_many == @argument_arity
+        :one == @argument_arity or :one_or_more == @argument_arity
       end
 
       def takes_many_arguments
-        :zero_to_many == @argument_arity or :one_to_many == @argument_arity
+        :zero_or_more == @argument_arity or :one_or_more == @argument_arity
       end
 
       def has_default
@@ -1348,7 +1349,7 @@ module Skylab::Brazen
           y << "this screen"
         end )
       box.add :ellipsis, Property__.new( :ellipsis,
-        # :argument_arity, :zero_to_many,
+        # :argument_arity, :zero_or_more,
         :argument_arity, :zero_or_one,
         :custom_moniker, '..' )
 

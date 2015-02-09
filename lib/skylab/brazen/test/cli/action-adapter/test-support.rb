@@ -77,6 +77,11 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
             :one == @parameter_arity
           end
 
+          def takes_many_arguments
+            :zero_or_more == @argument_arity ||
+              :one_or_more == @argument_arity
+          end
+
           def takes_argument
             :one == @argument_arity
           end

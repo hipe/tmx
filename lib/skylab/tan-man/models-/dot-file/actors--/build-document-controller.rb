@@ -15,30 +15,46 @@ module Skylab::TanMan
             @kernel, @on_event_selectively = @action.controller_nucleus.to_a
             receive_input_arguments @action.input_arguments and super
           end
+
+          def _produce_trio_box
+            @action.to_trio_box
+          end
+
+          def _output_trio_array
+            @action.output_arguments
+          end
         end
 
-        class Via_argument_box < self
+        class Via_trio_box < self
 
           # some concerns (like hear-maps) don't have an action, but have
           # arguments and want a document controller.
 
           Actor_.call self, :properties,
-            :bx, :kernel
+            :trio_box, :kernel
 
           def execute
 
-            in_a, out_a = TanMan_::Model_::Document_Entity::Partition_IO_Args.new(
-              @bx.to_pair_stream,
+            in_a, @out_a = TanMan_::Model_::Document_Entity::Partition_IO_Args.new(
+              @trio_box.to_value_stream,
               & @on_event_selectively ).partition_and_sort
 
             in_a and begin
               @in_arg_a = in_a
               dc = super
               dc and begin
-                dc.caddied_output_args = out_a
+                dc.caddied_output_args = @out_a
                 dc
               end
             end
+          end
+
+          def _produce_trio_box
+            @trio_box
+          end
+
+          def _output_trio_array
+            @out_a
           end
         end
 
@@ -73,7 +89,7 @@ module Skylab::TanMan
         def via_workspace_path_resolve_graph_sexp
 
           ws = @kernel.silo( :workspace ).workspace_via_trio_box(
-              @action.to_trio_box, & @on_event_selectively )
+            _produce_trio_box, & @on_event_selectively )
 
           ws and __resolve_graph_sexp_via_workspace ws
         end
@@ -112,13 +128,13 @@ module Skylab::TanMan
 
           ok = via_input_path_resolve_graph_sexp
 
-          a = @action.output_arguments
+          a = _output_trio_array
 
           if ok && a && :workspace_path == a.first.name_symbol
 
             # it's not very useful to have the workspace path as the output arg
 
-            a[ 0 ] = Callback_.pair.new( path, :output_path )
+            a[ 0 ] = Callback_.pair.new( path, :output_path )  # structure violation
 
           end
 

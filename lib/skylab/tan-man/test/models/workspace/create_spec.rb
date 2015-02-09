@@ -8,8 +8,6 @@ module Skylab::TanMan::TestSupport::Models::Workspace
 
     it "holy god" do
 
-      debug!
-
       config_filename = 'xyz'
 
       call_API :init,

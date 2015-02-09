@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   class Models_::Meaning
 
-    class Collection_Controller__ < Brazen_.model.collection_controller_class
+    class Collection_Controller__ <  Model_::Document_Entity::Collection_Controller
 
       class << self
 
@@ -17,19 +17,14 @@ module Skylab::TanMan
 
       def receive_persist_entity action, ent, & oes_p
 
-        bx = action.argument_box
-
         _ok = Meaning_::Actors__::Persist.call(
           _build_session,
-          bx[ :force ],
+          action.argument_box[ :force ],
           ent,
           & oes_p )
 
         _ok and begin
-
-          _dot_file.persist_via_args(
-            bx[ :dry_run ],
-            * @action.output_arguments )  # :+[#041] should this happen here?
+          flush_changed_document_to_ouptut_adapter  # no guarantee it did change but meh. :+[#001] where does saving happen?
         end
       end
 

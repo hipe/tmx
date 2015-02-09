@@ -14,10 +14,15 @@ module Skylab::TanMan
           INPUT_PROPERTIES___.array
         end
 
+        def output_stream_property
+          IO_PROPERTIES__.output_stream
+        end
+
         def action_class
           Action___
         end
       end  # >>
+
 
       Action___ = ::Class.new Action_  # before below
 
@@ -79,9 +84,7 @@ module Skylab::TanMan
 
           otr = Brazen_::Models_::Workspace.common_properties
 
-          o :property, :output_stream,  # hidden for now, for #feature [#037]
-
-            :for_document_input_only, :property, :input_string,
+          o :for_document_input_only, :property, :input_string,
             :for_document_input_only, :property, :input_path,
 
             :for_document_output_only, :property, :output_string,
@@ -115,6 +118,16 @@ module Skylab::TanMan
         end
       end
 
+      module IO_PROPERTIES__
+
+        define_singleton_method :output_stream, ( Callback_.memoize do  # hidden for now, for #feature [#037]
+
+          self::Entity_Property.new do
+            @name = Callback_::Name.via_variegated_symbol :output_stream
+          end
+        end )
+      end
+
       KEEP_PARSING_ = true
 
       INPUT_PROPERTIES___ = common_properties_class.new( nil ).set_properties_proc do
@@ -126,34 +139,28 @@ module Skylab::TanMan
 
       class Partition_IO_Args
 
-        def initialize pair_st, properties=nil, & oes_p
-          @pair_st = pair_st
+        def initialize trio_st, formals=nil, & oes_p
+          @trio_st = trio_st
           @on_event_selectively = oes_p
-          if properties
-            @formals_were_provided = true
-            @properties = properties
-          else
-            @formals_were_provided = false
-            @properties = IO_PROPERTIES__.box
-          end
+          @formals = formals
         end
 
         def partition_and_sort
-          __determine_what_we_are_normalizing_for
 
           input_specific_a = nil
           input_non_specific_a = nil
           output_specific_a = nil
           output_non_specific_a = nil
 
-          _Trio = TanMan_.lib_.basic.trio
-          st = @pair_st
-          while pair = st.gets
-            prp = @properties[ pair.name_symbol ]
+          st = @trio_st
+          while trio = st.gets
+
+            prp = trio.property
             prp or next
             prp.respond_to? :is_for_document_IO or next
-            pair.value_x or next
-            trio = _Trio.new pair.value_x, true, prp
+
+            trio.value_x or next
+
             if prp.is_document_direction_specific
               if prp.is_document_input_specific
                 ( input_specific_a ||= [] ).push trio
@@ -172,22 +179,24 @@ module Skylab::TanMan
 
           @result_array_pair = []
 
+          __partition_any_formals
+
           _ok = _money( input_specific_a, input_non_specific_a, @normalize_for_input, 0 ) and
             _money( output_specific_a, output_non_specific_a, @normalize_for_output, 1 )
 
           _ok and @result_array_pair
         end
 
-        def __determine_what_we_are_normalizing_for
-          if @formals_were_provided
-            __determine_normalization_directions_set
+        def __partition_any_formals
+          if @formals
+            __partition_formals
           else
-            @normalize_for_input = false
-            @normalize_for_output = false
+            @normalize_for_output = @normalize_for_input = false
           end
+          nil
         end
 
-        def __determine_normalization_directions_set
+        def __partition_formals
 
           # whether (variously) any output or input *specific* formals are
           # expressed in the box determines whether we are normalizing for
@@ -203,8 +212,12 @@ module Skylab::TanMan
               prp.is_document_output_specific and saw_output = true
             end ]
 
-          @properties.each do | prp |
-            prp.respond_to? :is_for_document_IO or next
+          @formals.each do | prp |
+
+            # here we do not use just the name to match.
+
+            prp.respond_to?( :is_for_document_IO ) or next
+
             p_a.each_with_index do | p, idx |
               p[ prp ] and seen.push idx
             end
@@ -273,7 +286,7 @@ module Skylab::TanMan
           Callback_::Event.inline_not_OK_with :non_one_IO,
               :direction_i, direction_sym,
               :arg_a, arg_a,
-              :properties, @properties do | y, o |
+              :properties, @formals do | y, o |
 
             if o.arg_a.length.zero?
 
@@ -288,7 +301,7 @@ module Skylab::TanMan
                   prp.send( meth_sym ) &&  # :+[#br-046]
                   ( prp.is_document_IO_essential || prp.is_document_direction_specific )
 
-              end.map_by do | prp |
+              end.map do | prp |
                 par prp
               end.to_a
 
@@ -307,20 +320,6 @@ module Skylab::TanMan
       end
 
       class Silo < Brazen_.model.silo_class
-
-        def collection_controller_via_document_controller dc, & oes_p
-
-          pc = Callback_::Box.new
-          pc.add :dot_file, dc
-
-          mc = model_class
-
-          mc.collection_controller_class.new_with(
-            :action, :__no_action__,
-            :preconditions, pc,
-            :model_class, mc,
-            :kernel, @kernel, & oes_p )
-        end
 
         def model_class
           self.class.__model_class
@@ -358,22 +357,21 @@ module Skylab::TanMan
         end
 
         def flush_changed_document_to_ouptut_adapter
-
-          args = @action.output_arguments
-
-
-          trio = args.fetch 0
-
-          if :output_path == trio.name_symbol && DASH_ == trio.value_x  # :+#magic-value for feature [#037]
-
-            args = [ trio.class.new(
-              @action.stdout, true, IO_PROPERTIES__.fetch( :output_stream ) ) ]
-
-          end
-
-          datastore_controller.persist_via_args(
-            @action.argument_box[ :dry_run ], * args )
+          flush_changed_document_to_output_adapter_per_action @action
         end
+
+      public
+
+        def flush_changed_document_to_output_adapter_per_action action
+
+          datastore_controller.persist_via_three(
+            action.argument_box[ :dry_run ],
+            action.output_arguments,
+            action.stdout )
+
+        end
+
+      private
 
         def datastore_controller
           @preconditions.fetch :dot_file  # yes
@@ -402,8 +400,8 @@ module Skylab::TanMan
         def __document_entity_normalize
 
           in_a, out_a = Partition_IO_Args.new(
-            @argument_box.to_pair_stream,
-            @formal_properties,
+            to_trio_stream,
+            formal_properties,
             & handle_event_selectively ).partition_and_sort
 
           in_a and begin

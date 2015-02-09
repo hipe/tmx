@@ -1,11 +1,14 @@
 digraph{
 
+  # blue: fillcolor="#b5d5fb" style=filled
+  # done: style=filled
+
   am [ label="associate\nmagnetic" style=filled ]
   cd [ label="cleanup\ndupe" style=filled ]
   cv [ label="basic CLI\nvisaul re-integration" style=filled ]
   cn [ label="cleanup\nnames" style=filled ]
   si [ label="silo\nsquash" ]
-  ss [ label="get [tm] to\nbe self-supporting" ]
+  ss [ label="get [tm] to\nbe self-supporting", style=filled]
   st [ label="sg\ntags" style=filled ]
   tu [ label="ttt\nunify" ]
   um [ label="unmunge\nmethods" style=filled ]
@@ -20,7 +23,4 @@ digraph{
   tu -> ss
   um -> cn
   up -> um
-
-  # that one color of blue: fillcolor="#b5d5fb" style=filled
-
 }

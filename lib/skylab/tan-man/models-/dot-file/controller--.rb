@@ -103,6 +103,19 @@ module Skylab::TanMan
 
       attr_accessor :caddied_output_args  # topic doesn't do anything with this, just carries it
 
+      def persist_via_three dry_run, a, output_stream
+
+        trio = a.fetch 0
+
+        if :output_path == trio.name_symbol && DASH_ == trio.value_x  # :+#magic-value for feature [#037]
+          a = [ trio.class.new(
+            output_stream, true,
+            TanMan_::Model_::Document_Entity.output_stream_property ) ]
+        end
+
+        persist_via_args dry_run, * a
+      end
+
       def persist_via_args is_dry, arg, *_
         adapter = Persist_Adapters__.produce_via_argument arg
         adapter.init @kernel, & @on_event_selectively

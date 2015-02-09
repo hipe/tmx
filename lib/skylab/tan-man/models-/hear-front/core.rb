@@ -16,29 +16,25 @@ module Skylab::TanMan
           y << 'experimental natural language-ISH interface'
         end,
 
-        :required, :argument_arity, :one_or_more, :property, :word,
+        :reuse, Model_::Document_Entity.IO_properties,
 
-        :reuse, Model_::Document_Entity.IO_properties
+        :flag, :property, :dry_run,
+
+        :required, :argument_arity, :one_or_more, :property, :word
 
       def produce_result
 
-        word_s_a = @argument_box.fetch :word
+        bx = to_trio_box
+        bx.add :stdout, TanMan_.lib_.basic.trio( stdout, true, nil )
 
-        if word_s_a.length.zero?
-          self._DO_ME
+        bc = @kernel.silo( :hear_front ).__bound_call_via_trio_box(
+          bx,
+          & handle_event_selectively )
 
+        if bc
+          bc.receiver.send bc.method_name, * bc.args
         else
-
-          bc = @kernel.silo( :hear_front ).__bound_call_via_etc(
-            word_s_a,
-            @argument_box,
-             & handle_event_selectively )
-
-          if bc
-            bc.receiver.send bc.method_name, * bc.args
-          else
-            bc
-          end
+          bc
         end
       end
     end
@@ -57,9 +53,11 @@ module Skylab::TanMan
           :name_value_for_order )
       end
 
-      def __bound_call_via_etc words, arg_box, & oes_p
+      def __bound_call_via_trio_box bx, & oes_p
 
-        upstream = TanMan_.lib_.parse_lib.input_stream.via_array words
+        word_s_a = bx.fetch( :word ).value_x
+
+        upstream = TanMan_.lib_.parse_lib.input_stream.via_array word_s_a
 
         st = @definition_collection.to_stream
         dfn = st.gets
@@ -72,9 +70,9 @@ module Skylab::TanMan
 
         if on
           dfn.external_definition.bound_call_via_heard(
-            Heard__[ on.value_x, arg_box, @k ], & oes_p )
+            Heard__[ on.value_x, bx, @k ], & oes_p )
         else
-          __when_no_matching_definition words, & oes_p
+          __when_no_matching_definition word_s_a, & oes_p
         end
       end
 
@@ -95,7 +93,7 @@ module Skylab::TanMan
         end
       end
 
-      Heard__ = ::Struct.new :parse_tree, :argument_box, :kernel
+      Heard__ = ::Struct.new :parse_tree, :trio_box, :kernel
 
       def __to_name_of_module_that_has_hear_map_stream
 

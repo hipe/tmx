@@ -61,9 +61,7 @@
 [#044]       #branch-down cli tests (but issue wip)
 [#043]       #tracking-tag other guys that could benefit from svc
 [#042]       #done FileUtils as a service (JSON)
-[#041] #open resolve one layer where all datastore persists happen (i.e
-             should collection controllers write files or should actions?)
-             (was: #watch i don't like how status is implemented with the arrays)
+[#041] #open workspace status is furloughed
 [#040]       #done make your own SubClient::InstanceMethods to DRY CLI & API
 [#039]       #done API::Whatever becomes MetaHell::Generic
 [#038]       #done `text_styler` away!
@@ -110,11 +108,12 @@
 [#011]       make sure complex prototypes can be used with nonzero length lists
 [#010]       #done 2012-10-27 associate two nodes
                1. sic, 2. redudantly, 3. agent not exist 4. target not exist
-[#009]       #doc-node: the node controller narrative ..
+[#009] #open square word wrap (target an aspect ratio)
+             #doc-node: the node controller narrative ..
              ( was: #done 2012-10-27 create a node
                1. with one template (3 permutations) 2. with another template (3 permutes) )
 [#008]       #done 2012-10-10 #rename rename "nt" to "expression" / "rule"
-[#007] #open tracking all non-primitive values still used in our trans-modality API
+[#007]     #watch tracking all non-primitive values still used in our trans-modality API
              (was: #done #small #critical models/ dir generated during specs 2012-09-29)
 [#006]       meta property reference (.rb!)
              (was: #one-day look into reflection via metagrammer instead 2012-09-27)
@@ -124,5 +123,7 @@
 [#002] #open implement ambiguity expressor for 'st[atus]' and 'st[arter]'
              (was: #done 2012-08-30 rename `remote*` to fit a pattern (e.g. controller)
                examples-controller -> example-collection)
-[#001] #open refactor out the repetition among document entity actions
+[#001] #open refactor out the repetition among document entity actions:
+             resolve one layer where all datastore persists happen (i.e
+             should collection controllers write files or should actions?)
              (was: #done tan -w ok, #depends-on:(#sl-unwip))

@@ -41,7 +41,7 @@ module Skylab::TanMan
         end
 
         def via_edited_entity_produce_result
-          asc = datastore.__fuzzy_match_nodes_of_association @edited_entity
+          asc = datastore._fuzzy_match_nodes_of_association @edited_entity
           if asc
             @edited_entity = asc
           end
@@ -72,7 +72,18 @@ module Skylab::TanMan
       end
     end
 
-    Silo__ = ::Class.new Model_::Document_Entity::Silo
+    class Silo__ < Model_::Document_Entity::Silo
+
+      def association_collection_controller_via_preconditions bx, & oes_p
+
+        mc = model_class
+        mc.collection_controller_class.new_with(
+          :action, :__no_action__,
+          :preconditions, bx,
+          :model_class, mc,
+          :kernel, @kernel, & oes_p )
+      end
+    end
 
     class Collection_Controller__ < Model_::Document_Entity::Collection_Controller
 
@@ -86,13 +97,19 @@ module Skylab::TanMan
         end
 
         asc and begin
+
+          asc_ = _fuzzy_match_nodes_of_association asc
+          if asc_
+            asc = asc_
+          end
+
           info = _info_via_into_datastore_marshal_entity(
             nil, nil, asc, & oes_p )
           info and asc
         end
       end
 
-      def __fuzzy_match_nodes_of_association asc
+      def _fuzzy_match_nodes_of_association asc
 
         cc = @preconditions.fetch :node
 
@@ -139,7 +156,7 @@ module Skylab::TanMan
         info and flush_maybe_changed_document_to_output_adapter__ info.did_mutate
       end
 
-      def _info_via_into_datastore_marshal_entity any_attrs_x, any_proto_sym, entity, & oes_p  # _DOG_EAR
+      def _info_via_into_datastore_marshal_entity any_attrs_x, any_proto_sym, entity, & oes_p
 
         did_mutate = nil
 

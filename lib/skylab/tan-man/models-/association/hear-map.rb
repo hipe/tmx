@@ -27,7 +27,7 @@ module Skylab::TanMan
             Touch_Node_and_Create_Association__.new(
               pt.fetch( 0 ).join( SPACE_ ),
               pt.fetch( 3 ).join( SPACE_ ),
-              hrd.argument_box,
+              hrd.trio_box,
               hrd.kernel, & oes_p ).bound_call
           end
         end
@@ -57,7 +57,7 @@ module Skylab::TanMan
       class Touch_Node_and_Create_Association__
 
         def initialize * a, & oes_p
-          @src_lbl_s, @dst_lbl_s, @argument_box, @kernel = a
+          @src_lbl_s, @dst_lbl_s, @trio_box, @kernel = a
           @did_mutate = false
           @did_mutate_filter = -> * i_a, & ev_p do
             ev = ev_p[]
@@ -72,6 +72,7 @@ module Skylab::TanMan
         end
 
         def bound_call
+
           ok = __resolve_document_controller
           ok &&= __via_document_controller_maybe_touch_nodes
           ok &&= __via_document_controller_and_nodes_touch_association
@@ -84,13 +85,18 @@ module Skylab::TanMan
         end
 
         def __resolve_document_controller
-          @dc = @kernel.silo( :dot_file ).document_controller_via_argument_box(
-            @argument_box, & @on_event_selectively )
+
+          @dc = @kernel.silo( :dot_file ).document_controller_via_trio_box(
+            @trio_box, & @on_event_selectively )
 
           @dc && ACHIEVED_
         end
 
         def __via_document_controller_maybe_touch_nodes
+
+          @nodes_controller = @kernel.silo( :node ).  # used 2x later
+            node_collection_controller_via_document_controller(
+              @dc, & @did_mutate_filter )
 
           # because the association silo alone won't do the hacky magic for this
 
@@ -103,10 +109,7 @@ module Skylab::TanMan
 
         def __via_document_controller_DO_touch_nodes
 
-          nc = @kernel.silo( :node ).
-            collection_controller_via_document_controller(
-              @dc, & @did_mutate_filter )
-
+          nc = @nodes_controller
           sn = nc.touch_node_via_label @src_lbl_s
           sn and dn = nc.touch_node_via_label( @dst_lbl_s )
           sn and dn and begin
@@ -118,9 +121,12 @@ module Skylab::TanMan
 
         def __via_document_controller_and_nodes_touch_association
 
+          bx = @nodes_controller.to_preconditions_plus_self
+
           ac = @kernel.silo( :association ).
-            collection_controller_via_document_controller(
-              @dc, & @on_event_selectively )
+            association_collection_controller_via_preconditions(
+              bx,
+              & @on_event_selectively )
 
           _asc = ac.touch_association_via_node_labels(
             @src_lbl_s, # @src_node_stmt.label,
@@ -134,9 +140,10 @@ module Skylab::TanMan
 
           if @did_mutate
 
-            @dc.persist_via_args(
-              @argument_box[ :dry_run ],  # probably never set, b.c hear
-              * @dc.caddied_output_args )
+            @dc.persist_via_three(
+              ( _ = @trio_box[ :dry_run ] and _.value_x ),
+              @dc.caddied_output_args,
+              @trio_box.fetch( :stdout ).value_x )
 
           else
             ACHIEVED_  # assume that 3 events were emitted

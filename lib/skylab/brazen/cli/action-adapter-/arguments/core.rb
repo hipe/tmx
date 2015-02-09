@@ -172,7 +172,17 @@ module Skylab::Brazen
           def accept_monadic_actual_property_value i
             a = instance_variable_get i
             a ||= instance_variable_set i, []
-            a.push( @arg_a_scan.gets_one.name_symbol, @argv_scan.gets_one ) ; nil
+            formal = @arg_a_scan.gets_one
+            if formal.takes_many_arguments
+              if @arg_a_scan.unparsed_exists
+                self._DO_ME
+              end
+              # naive implementation:
+              a.push formal.name_symbol, @argv_scan.flush_remaining_to_array
+            else
+              a.push formal.name_symbol, @argv_scan.gets_one
+            end
+            nil
           end
 
           def complain_about_any_extra_arguments

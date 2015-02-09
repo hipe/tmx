@@ -4,6 +4,10 @@ module Skylab::Brazen
 
     class << self
 
+      def bound_call_session
+        API::Produce_bound_call__
+      end
+
       def exit_statii
         Exit_statii__[]
       end

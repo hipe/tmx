@@ -527,6 +527,26 @@ module Skylab::Callback
 
     # ~ hax (for "collaborators")
 
+    # ~~ experimental "from end" parsing for [#cb-047]
+
+    def random_access_ d  # negative only for now
+      if d < 0
+        d_ = @x_a_length + d
+        if 0 <= d_
+          @x_a.fetch d_
+        end
+      end
+    end
+
+    def pop_
+      @x_a.fetch( @x_a_length -= 1 )
+    end
+
+    def reverse_advance_one_
+      @x_a_length -= 1
+      nil
+    end
+
     def array_for_read
       @x_a
     end

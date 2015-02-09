@@ -61,7 +61,24 @@ module Skylab::TanMan
       end
     end  # >>
 
-    Silo__ = ::Class.new Model_::Document_Entity::Silo
+    class Silo__ < Model_::Document_Entity::Silo
+
+      def node_collection_controller_via_document_controller dc, & oes_p
+
+        # experiment with action-free silos starts here
+
+        pc = Callback_::Box.new
+        pc.add :dot_file, dc
+
+        mc = model_class
+
+        mc.collection_controller_class.new_with(
+          :action, :__no_action__,
+          :preconditions, pc,
+          :model_class, mc,
+          :kernel, @kernel, & oes_p )
+      end
+    end
 
     class Collection_Controller__ < Model_::Document_Entity::Collection_Controller
 

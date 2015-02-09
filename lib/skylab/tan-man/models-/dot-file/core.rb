@@ -74,15 +74,15 @@ module Skylab::TanMan
     class Silo__ < Brazen_.model.silo_class
 
       def members
-        [ :document_controller_via_argument_box, * super ]
+        [ :document_controller_via_trio_box, * super ]
       end
 
       def model_class
         DotFile_
       end
 
-      def document_controller_via_argument_box bx, & oes_p
-        DotFile_::Actors__::Build_Document_Controller::Via_argument_box[ bx, @kernel, & oes_p ]
+      def document_controller_via_trio_box bx, & oes_p
+        DotFile_::Actors__::Build_Document_Controller::Via_trio_box[ bx, @kernel, & oes_p ]
       end
     end
 

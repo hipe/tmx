@@ -136,7 +136,7 @@ module Skylab::Brazen
         class self::Entity_Property
 
           def argument_is_required  # *not the same as* parameter is required
-            :one == @argument_arity or :one_to_many == @argument_arity
+            :one == @argument_arity or :one_or_more == @argument_arity
           end
 
           def takes_argument
@@ -144,7 +144,7 @@ module Skylab::Brazen
           end
 
           def takes_many_arguments
-            :zero_to_many == @argument_arity or :one_to_many == @argument_arity
+            :zero_or_more == @argument_arity or :one_or_more == @argument_arity
           end
 
         private
@@ -159,17 +159,17 @@ module Skylab::Brazen
           receive_value_of_entity_property a, prp
         end
 
-        def receive_value_of_entity_property x, prop  # #hook-in
+        def receive_value_of_entity_property x, prp  # #hook-in
 
           # overwrite this hook-in called by our produced iambic writer methods
           # (determiend by topic) so that we write not to ivars but to this box.
 
-          actual_property_box_for_write.add prop.name_symbol, x
+          actual_property_box_for_write.set prp.name_symbol, x  # (changed from `add`)
           KEEP_PARSING_
         end
 
         def actual_property_box_for_write
-          actual_property_box  # :++#hook-out
+          actual_property_box  # :+#hook-out
         end
 
         def any_property_value_via_property prop

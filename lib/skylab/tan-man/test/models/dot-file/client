@@ -24,10 +24,17 @@ module Skylab::TanMan::TestSupport::Models::DotFile
     end
 
     def _doc_controller_via_name_value_pair sym, x
+
       bx = TanMan_::Callback_::Box.new
-      bx.add sym, x
+
+      TanMan_::Models_.class
+
+      bx.add sym, TanMan_.lib_.basic.trio( x, true,
+
+        TanMan_::Model_::Document_Entity::IO_PROPERTIES__.fetch( sym ) )
+
       TanMan_::API.application_kernel.silo( :dot_file ).
-        document_controller_via_argument_box bx, & @on_event_selectively
+        document_controller_via_trio_box bx, & @on_event_selectively
     end
   end
 end

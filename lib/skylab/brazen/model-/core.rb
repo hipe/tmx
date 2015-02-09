@@ -940,6 +940,13 @@ module Skylab::Brazen
           puts ">> >> >>    MADE #{ model_class.name_function.as_slug } CCTL"
       end
 
+      def to_preconditions_plus_self
+        bx = @preconditions.dup
+        bx.add( model_class.name_function.as_lowercase_with_underscores_symbol,
+          self )
+        bx
+      end
+
       def provide_action_precondition id, _g, & oes_p
         if id.entity_name_s
           ent = datastore.entity_via_identifier id, & ( oes_p || handle_event_selectively )
@@ -1170,6 +1177,23 @@ module Skylab::Brazen
         model_class.name_function.as_lowercase_with_underscores_symbol
       end
 
+      def bound_call * x_a, & oes_p
+
+        sess = Brazen_::API.bound_call_session.start_via_iambic x_a, @kernel, & oes_p
+        sess.receive_top_bound_node model_class.new( @kernel, & oes_p )
+
+        if sess.via_current_branch_resolve_action
+          st = sess.iambic_stream
+          act = sess.bound
+          act.first_edit
+          ok = act.process_pair_box_passively st.gets_one
+          ok &&= act.process_iambic_stream_fully_ st
+          ok and act.via_arguments_produce_bound_call
+        else
+          sess.bound_call
+        end
+      end
+
       def provide_Action_preconditioN id, g, & oes_p  # :+#public-API
         cc = g.touch :collection_controller_prcn, id, self
         cc and begin
@@ -1284,6 +1308,10 @@ module Skylab::Brazen
           end
           nil
         end
+      end
+
+      def has_name sym
+        @box[].has_name sym
       end
 
       def [] sym

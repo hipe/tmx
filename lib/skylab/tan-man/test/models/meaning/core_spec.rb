@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::Models::Meaning
 
-  describe "[tm] Models::Meaning core" do
+  describe "[tm] models - meaning" do
 
     extend TS_
 

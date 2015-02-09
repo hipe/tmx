@@ -4,62 +4,90 @@ module Skylab::Brazen
 
     class Produce_bound_call__
 
+      # called as an actor in one place and used as a session in another
+
       Callback_::Actor.call self, :properties,
         :x_a,
         :kernel,
         :mod
 
-      def execute
-
-        @bound = nil  # there is no parent bound action to start
-
-        @st = Callback_::Iambic_Stream.via_array @x_a
-
-        if :on_event_selectively == @x_a[ -2 ]  # :+[#049] case study: ordering hacks
-          @on_event_selectively = @x_a.last
-          @st.x_a_length -= 2
-        else
-          @on_event_selectively = __prdc_some_handle_event_selectively
+      class << self
+        def start_via_iambic x_a, k, & oes_p
+          new do
+            @on_event_selectively = oes_p
+            @kernel = k
+            @x_a = x_a
+            _init
+          end
         end
+      end  # >>
 
-        _ok = resolve_bound_action
-        _ok && via_bound_action_resolve_bound_call
-
+      def execute
+        _init
+        _ok = __resolve_bound_action
+        _ok && __via_bound_action_resolve_bound_call
         @bound_call
       end
 
-    private
+      def receive_top_bound_node x
+        @bound = x
+        @current_unbound_action_stream = @bound.to_unbound_action_stream
+        nil
+      end
 
-      def resolve_bound_action
+      attr_reader :bound, :bound_call
+
+      def iambic_stream
+        @st
+      end
+
+      def _init
+
+        @bound = nil  # there is no parent bound action to start
+
+        st = Callback_::Iambic_Stream.via_array @x_a
+
+        @on_event_selectively ||= begin
+          if :on_event_selectively == st.random_access_( -2 )  # :+[#049] case study: ordering hacks
+            x = st.pop_
+            st.reverse_advance_one_
+            x
+          else
+            __prdc_some_handle_event_selectively
+          end
+        end
+
+        @st = st
+        nil
+      end
+
+      def __resolve_bound_action
         if @st.unparsed_exists
-          via_current_tokens_resolve_action
+          __via_current_tokens_resolve_action
         else
-          whine_about_how_there_is_an_empty_iambic_arglist
+          __whine_about_how_there_is_an_empty_iambic_arglist
         end
       end
 
-      def whine_about_how_there_is_an_empty_iambic_arglist
-        end_in_error_with :no_such_action, :action_name, nil
+      def __whine_about_how_there_is_an_empty_iambic_arglist
+        _end_in_error_with :no_such_action, :action_name, nil
       end
 
-      def via_current_tokens_resolve_action
+      def __via_current_tokens_resolve_action
 
         @current_unbound_action_stream = @kernel.to_unbound_action_stream
 
         begin
 
           ok = via_current_branch_resolve_action
-
           ok or break
-
-          @st.advance_one
 
           if ! @bound.class.is_branch  # ick / meh
             break
           end
 
           if @st.no_unparsed_exists
-            when_name_is_too_short
+            __when_name_is_too_short
             ok = false
             break
           end
@@ -82,6 +110,7 @@ module Skylab::Brazen
           unb or break
 
           if sym == unb.name_function.as_lowercase_with_underscores_symbol
+            @st.advance_one
             break
           end
 
@@ -96,20 +125,20 @@ module Skylab::Brazen
           end
           OK_
         else
-          when_no_action_at_this_step
+          __when_no_action_at_this_step
         end
       end
 
-      def when_no_action_at_this_step
-        end_in_error_with :no_such_action, :action_name, @st.current_token
+      def __when_no_action_at_this_step
+        _end_in_error_with :no_such_action, :action_name, @st.current_token
       end
 
-      def when_name_is_too_short
-        end_in_error_with :action_name_ends_on_branch_node,
+      def __when_name_is_too_short
+        _end_in_error_with :action_name_ends_on_branch_node,
           :local_node_name, @bound.name.as_lowercase_with_underscores_symbol
       end
 
-      def via_bound_action_resolve_bound_call
+      def __via_bound_action_resolve_bound_call
 
         x = @bound.bound_call_against_iambic_stream @st
         if x
@@ -120,7 +149,7 @@ module Skylab::Brazen
         end
       end
 
-      def end_in_error_with * x_a
+      def _end_in_error_with * x_a
 
         _result = @on_event_selectively.call :error, * x_a
 

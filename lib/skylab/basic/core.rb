@@ -193,8 +193,10 @@ module Skylab::Basic  # introduction at [#020]
 
     end
 
-    def initialize * a
-      @value_x, @actuals_has_name, @property = a
+    def initialize x, b, prp=nil
+      @actuals_has_name = b
+      @property = prp
+      @value_x = x
       freeze
     end
 

@@ -139,20 +139,51 @@ module Skylab::Brazen
 
     def __edit_and_call & edit_p  # in the spirit of `<model class>.edit`
 
-      @argument_box = Callback_::Box.new
-      edit_p[ es = Edit_Session__.new ]
-      mf, @preconditions = es.to_a  # nil ok on both.
-
-      if mf
-        formal_properties
-        @formal_properties = @formal_properties.to_mutable_box_like_proxy  # might be same object
-        mf[ @formal_properties ]
-      end
+      first_edit( & edit_p )
 
       bc = via_arguments_produce_bound_call
       bc and begin
         bc.receiver.send bc.method_name, * bc.args
       end
+    end
+
+    def first_edit & edit_p  # :+#public-API [tm]. cannot fail
+
+      @argument_box = Callback_::Box.new
+
+      if edit_p
+        edit_p[ es = Edit_Session__.new ]
+        mf, @preconditions = es.to_a  # nil ok on both.
+
+        if mf
+          formal_properties
+          @formal_properties = @formal_properties.to_mutable_box_like_proxy  # might be same object
+          mf[ @formal_properties ]
+        end
+      end
+      nil
+    end
+
+    def process_pair_box_passively bx  # wants to go up. #magnetic
+
+      method_name_p = iambic_writer_method_name_passive_lookup_proc
+      keep_parsing = true
+
+      bx.each_pair do | k, single |
+        m_i = method_name_p[ k ]
+        m_i or next
+        @__methodic_actor_iambic_stream__ = Gets_One_Value_Proxy___.new single.value_x
+        keep_parsing = send m_i
+        keep_parsing or break
+      end
+
+      keep_parsing
+    end
+
+    Gets_One_Value_Proxy___ = ::Struct.new :gets_one
+
+    def process_iambic_stream_fully_ x
+      process_iambic_stream_fully x
     end
 
     class Edit_Session__
@@ -203,8 +234,6 @@ module Skylab::Brazen
       KEEP_PARSING_
     end
 
-  private
-
     def via_arguments_produce_bound_call  # :+#public-API [ts]
 
       # expose the moment between `process_iambic_stream_fully` and `normalize`
@@ -217,6 +246,8 @@ module Skylab::Brazen
         Brazen_.bound_call.via_value ok
       end
     end
+
+  private
 
     def __resolve_preconditions
 
@@ -306,6 +337,20 @@ module Skylab::Brazen
         h_[ k ] = _Trio.new h.fetch( k ), true, fo.fetch( k )
       end
       Callback_::Box.allocate.init a_, h_
+    end
+
+    def to_trio_stream
+      _Trio = LIB_.basic.trio
+      fp = formal_properties
+      a = @argument_box.a_ ; h = @argument_box.h_
+      d = 0 ; len = a.length
+      Callback_.stream do
+        if d < len
+          k = a.fetch d
+          d += 1
+          _Trio.new h.fetch( k ), true, fp.fetch( k )
+        end
+      end
     end
 
     def trio sym  # #hook-near model. may soften if needed.

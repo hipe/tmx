@@ -79,9 +79,9 @@ module Skylab::TanMan
         end
 
         def __persist
-          @preconditions.fetch( :dot_file ).persist_via_args(
-            @argument_box[ :dry_run ],
-            * @output_arguments )
+
+          @preconditions.fetch( :meaning ).
+            flush_changed_document_to_output_adapter_per_action( self )
         end
       end
     end

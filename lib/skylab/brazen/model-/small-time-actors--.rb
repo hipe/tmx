@@ -6,8 +6,8 @@ module Skylab::Brazen
 
       class When_datastore_not_indicated  # :+[#035] should probably not be UI-level
 
-        Actor_[ self, :properties,
-          :controller ]
+        Actor_.call self, :properties,
+          :controller
 
         def execute
           @label_s = caller_locations( 5, 1 ).first.label

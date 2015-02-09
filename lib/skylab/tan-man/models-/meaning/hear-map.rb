@@ -21,14 +21,13 @@ module Skylab::TanMan
 
           def bound_call_via_heard hrd, & oes_p
 
-            pt, bx, k = hrd.to_a
+            pt = hrd.parse_tree
 
-            k.bound_API_call_with :meaning, :add,
+            hrd.kernel.silo( :meaning ).bound_call :add,
+              hrd.trio_box,
               :name, pt.fetch( 0 ).join( SPACE_ ),
               :value, pt.fetch( 2 ).join( SPACE_ ),
               :force,  # because this is "set" not "create"
-              :workspace_path, bx[ :workspace_path ],
-              :config_filename, bx[ :config_filename ],
               & oes_p
           end
         end
@@ -45,7 +44,7 @@ module Skylab::TanMan
                 :one_or_more, :any_token ]
           end
 
-          def bound_call_via_heard pt
+          def bound_call_via_heard pt, & oes_p
             self._DO_ME
           end
         end
@@ -64,8 +63,15 @@ module Skylab::TanMan
 
           end
 
-          def bound_call_via_heard hrd
-            self._DO_ME
+          def bound_call_via_heard hrd, & oes_p
+
+            pt = hrd.parse_tree
+
+            hrd.kernel.silo( :meaning ).bound_call :associate,
+              hrd.trio_box,
+              :node_label, pt.first.join( SPACE_ ),
+              :meaning_name, pt.last.join( SPACE_ ),
+              & oes_p
           end
         end
 
@@ -83,7 +89,7 @@ module Skylab::TanMan
                 :one_or_more, :any_token ]
           end
 
-          def bound_call_via_heard hrd
+          def bound_call_via_heard hrd, & oes_p
             self._DO_ME
           end
         end
