@@ -1,20 +1,16 @@
-module Skylab::TreetopTools
+module Skylab::Basic
 
-  class Parser::InputAdapters::String
+  module String
 
-    include Parser::InputAdapter::InstanceMethods
+    class Byte_Upstream_Identifier
 
-    def default_entity_noun_stem
-      'input string'
-    end
+      def initialize s
+        @s = s
+      end
 
-    def whole_string
-      upstream.kind_of?( ::String ) ? upstream :
-        error( "expecting String, had: #{ upstream.inspect }" )
-    end
-
-    def type
-      Parser::InputAdapter::Types::STRING
+      def whole_string
+        @s
+      end
     end
   end
 end

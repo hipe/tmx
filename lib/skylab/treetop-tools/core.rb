@@ -20,7 +20,7 @@ module Skylab::TreetopTools
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
-    Bsc__ = sidesys[ :Basic ]
+    Basic = sidesys[ :Basic ]
 
     Basic_fields = -> * x_a do
       MH__[]::Basic_Fields.call_via_iambic x_a
@@ -35,7 +35,7 @@ module Skylab::TreetopTools
     CodeMolester__ = sidesys[ :CodeMolester ]
 
     Digraph = -> do
-      Bsc__[]::Digraph
+      Basic[]::Digraph
     end
 
     File_utils = memoize[ -> { require 'fileutils' ; ::FileUtils } ]

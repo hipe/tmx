@@ -4,23 +4,20 @@ module Skylab::TreetopTools
 
     Callback_::Event.selective_builder_sender_receiver self
 
-    def parse_file pn, * a, & oes_p
-      _ia = build_file_input_adapter pn, & oes_p
-      parse _ia, a, & oes_p
+    def parse_file path, & oes_p
+      _ia = build_file_input_adapter path, & oes_p
+      parse _ia, EMPTY_A_, & oes_p
     end
+
+    TreetopTools_::EMPTY_A_ = [].freeze
 
   private
 
-    def build_file_input_adapter *a, & oes_p
-      opts = if a.last.respond_to? :each_pair
-        a.last.dup  # don't modify original
-      else
-        a << (( _ = {} )) ; _  # NOT 'EMPTY_H_' (it will get mutated)
-      end
-      opts.key? :entity_noun_stem or
-        opts[ :entity_noun_stem ] = entity_noun_stem
+    def build_file_input_adapter path, & oes_p
 
-      Parser::InputAdapters::File.new self, *a, & oes_p
+      TreetopTools_.lib_.system.filesystem.class::Byte_Upstream_Identifier.
+        new( path, & oes_p )
+
     end
 
     def entity_noun_stem  # :+#public-API #hook-in
@@ -45,8 +42,8 @@ module Skylab::TreetopTools
 
   private
 
-    def build_string_input_adapter *a
-      Parser::InputAdapters::String.new self, *a
+    def build_string_input_adapter s, & x_p
+      TreetopTools_.lib_.basic::String::Byte_Upstream_Identifier.new s, & x_p
     end
 
     def parse input_adapter, a, & oes_p
