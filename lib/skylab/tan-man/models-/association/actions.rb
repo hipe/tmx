@@ -72,7 +72,7 @@ module Skylab::TanMan
       end
     end
 
-    class Silo__ < Model_::Document_Entity::Silo
+    class Silo_Daemon < Silo_Daemon
 
       def association_collection_controller_via_preconditions bx, & oes_p
 

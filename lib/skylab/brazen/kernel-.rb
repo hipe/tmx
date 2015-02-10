@@ -275,15 +275,26 @@ module Skylab::Brazen
       -> id do
         cache_h.fetch id.silo_name_i do
           id.value.const_get :Actions, false  # :+[#043] a loading hack
-          silo = some_silo_via_mod id.value
+          silo = ___start_silo_daemon_via_mod id.value
           cache_h[ id.silo_name_i ] = silo
           silo
         end
       end
     end
 
-    def some_silo_via_mod mod
-      mod.silo_class.new self
+    def ___start_silo_daemon_via_mod mod
+
+      # we load a file if there is any file to load "manually" because a) the
+      # alternatives are uglier and noiser and b) starting the silo daemon is
+      # something special that only happens once per application kernel.
+
+      if mod.respond_to? :entry_tree
+        if mod.entry_tree.has_entry SILO_DAEMON_FILE___
+          mod.const_get :Silo_Daemon, false  # kick any autoloading
+        end
+      end
+
+      mod::Silo_Daemon.new self, mod
     end
 
     def bld_model_not_found_event id, s
@@ -291,6 +302,8 @@ module Skylab::Brazen
         :token, s, :identifier, id
     end
   end
+
+  SILO_DAEMON_FILE___ = "silo-daemon#{ Autoloader_::EXTNAME }"
 
   Kernel_::Node_Identifier__ = class Node_Identifier_
 

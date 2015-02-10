@@ -319,19 +319,6 @@ module Skylab::TanMan
         end
       end
 
-      class Silo < Brazen_.model.silo_class
-
-        def model_class
-          self.class.__model_class
-        end
-
-        class << self
-          def __model_class
-            @__model_class ||= TanMan_.lib_.basic::Module.value_via_relative_path( self, '..' )
-          end
-        end
-      end
-
       class Collection_Controller < Brazen_.model.collection_controller_class
 
         def unparse_into y

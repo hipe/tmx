@@ -177,11 +177,7 @@ module Skylab::Brazen
       self
     end
 
-    class Silo__ < Brazen_.model.silo_class
-
-      def model_class
-        Data_Stores_::Couch
-      end
+    class Silo_Daemon < Brazen_.model.silo_daemon_class
 
       def provide_Action_preconditioN id, g, & oes_p  # :+#public-API
         super id, g do | * i_a, & ev_p |

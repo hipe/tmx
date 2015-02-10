@@ -39,14 +39,14 @@ module Skylab::TanMan
       end
     end
 
-    class Silo__
+    class Silo_Daemon < ::Object
 
       # every top-level model node has zero or more parse functions. these are
       # instantiated lazily, only as many as are needed to find one that
       # parses the input. but each that is created is cached, so that we only
       # ever create one parse function for the lifetime of the process.
 
-      def initialize k
+      def initialize k, _model_class
         @k = k
         @definition_collection = Callback_.stream.immutable_with_random_access.new(
           Callback_.stream.ordered( __to_definition_stream ),

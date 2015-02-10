@@ -902,6 +902,10 @@ module Skylab::Callback
 
     class Entry_Tree_ < Normpath_  # read [#024]:introduction-to-the-entry-tree
 
+      def has_entry s
+        @h.key? s
+      end
+
       def to_stream  # :+#public-API, #the-fuzzily-unique-entry-scanner, #fuzzy-sibling-pairs
         @did_index_all ||= index_all
         a = @stem_i_a ; d = -1 ; last = a.length - 1

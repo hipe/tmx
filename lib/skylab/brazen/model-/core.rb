@@ -48,8 +48,8 @@ module Skylab::Brazen
           Model_::Silo_Controller_
         end
 
-        def silo_class
-          Model_::Silo_
+        def silo_daemon_class
+          Model_::Silo_Daemon
         end
       end
     end
@@ -125,17 +125,6 @@ module Skylab::Brazen
           end
         end
         const_get :Silo_Controller__, false
-      end
-
-      def silo_class
-        if ! const_defined? :Silo__, false
-          if const_defined? :Silo__
-            const_set :Silo__, const_get( :Silo__ ).make( self )
-          else
-            const_set :Silo__, Silo_.make( self )
-          end
-        end
-        const_get :Silo__, false
       end
 
       def unmarshalled kernel, oes_p, & edit_p
@@ -1150,37 +1139,33 @@ module Skylab::Brazen
       end
     end
 
-    class Silo_
+    class Silo_Daemon
 
-      class << self
+      def initialize kernel, model_class
 
-        def make _MODEL_CLASS_, & p
-          ::Class.new( self ).class_exec do
-            define_method :model_class do _MODEL_CLASS_ end
-            p and class_exec( & p )
-            self
-          end
+        @kernel = kernel
+        @model_class = model_class
+
+        if @kernel.do_debug
+          @kernel.debug_IO.puts(
+            ">>          MADE #{ Callback_::Name.via_module( @model_class ).as_slug } SILO" )
         end
       end
 
-      def initialize kernel
-        @kernel = kernel
-        @kernel.do_debug and @kernel.debug_IO.
-          puts ">>          MADE #{ Callback_::Name.via_module( model_class ).as_slug } SILO"
+      def members
+        [ :build_silo_controller, :model_class, :name_symbol ]
       end
 
-      def members
-        [ :build_silo_controller, :name_symbol ]
-      end
+      attr_reader :model_class
 
       def name_symbol
-        model_class.name_function.as_lowercase_with_underscores_symbol
+        @model_class.name_function.as_lowercase_with_underscores_symbol
       end
 
       def bound_call * x_a, & oes_p
 
         sess = Brazen_::API.bound_call_session.start_via_iambic x_a, @kernel, & oes_p
-        sess.receive_top_bound_node model_class.new( @kernel, & oes_p )
+        sess.receive_top_bound_node @model_class.new( @kernel, & oes_p )
 
         if sess.via_current_branch_resolve_action
           st = sess.iambic_stream
@@ -1210,7 +1195,7 @@ module Skylab::Brazen
 
       def provide_silo_controller_prcn id, g, & oes_p
 
-        a = model_class.preconditions
+        a = @model_class.preconditions
 
         if a && a.length.nonzero?
 
@@ -1223,9 +1208,9 @@ module Skylab::Brazen
             & oes_p )
 
           bx and begin
-            model_class.silo_controller_class.new_with(
+            @model_class.silo_controller_class.new_with(
               :preconditions, bx,
-              :model_class, model_class,
+              :model_class, @model_class,
               :kernel, @kernel,
               & oes_p )
           end
@@ -1243,8 +1228,8 @@ module Skylab::Brazen
       end
 
       def build_silo_controller & oes_p
-        model_class.silo_controller_class.new_with(
-          :model_class, model_class,
+        @model_class.silo_controller_class.new_with(
+          :model_class, @model_class,
           :kernel, @kernel, :on_event_selectively, oes_p )
       end
 
@@ -1255,9 +1240,9 @@ module Skylab::Brazen
         # override this IFF your silo wants to add to (or otherwise mutate)
         # the formal properties of every client action that depends on you.
 
-        my_name_sym = model_class.node_identifier.full_name_i
+        my_name_sym = @model_class.node_identifier.full_name_i
 
-        a = model_class.preconditions
+        a = @model_class.preconditions
         if a and a.length.nonzero?
           x_ = x
           a.each do | silo_id |

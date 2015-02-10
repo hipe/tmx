@@ -162,7 +162,7 @@ module Skylab::Brazen
 
     # ~ the custom stack
 
-    class Silo__ < Brazen_.model.silo_class
+    class Silo_Daemon < Brazen_.model.silo_daemon_class
 
       # ~ custom exposures
 

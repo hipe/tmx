@@ -71,7 +71,7 @@ module Skylab::TanMan
       @pn ||= Starter_.dir_pn_instance.join property_value_via_symbol :name
     end
 
-    class Silo__ < Brazen_.model.silo_class
+    class Silo_Daemon < Silo_Daemon
 
       # ~ custom exposures
 

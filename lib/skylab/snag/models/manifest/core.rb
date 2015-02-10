@@ -4,10 +4,6 @@ module Skylab::Snag
 
     class << self
 
-      def build_silo _API_client
-        Silo__.new _API_client
-      end
-
       def build_file pathname
         self::File__.new pathname
       end
@@ -150,9 +146,9 @@ module Skylab::Snag
       end
     end
 
-    class Silo__
+    class Silo_Daemon < ::Object
 
-      def initialize _API_client
+      def initialize _API_client, _model_class
         @API_client = _API_client
         @cache_h = {}
       end

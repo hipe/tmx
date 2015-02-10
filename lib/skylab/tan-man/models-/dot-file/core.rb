@@ -41,10 +41,6 @@ module Skylab::TanMan
         Silo_Controller__
       end
 
-      def silo_class
-        Silo__
-      end
-
       # ~ support
 
       def node_identifier
@@ -71,7 +67,7 @@ module Skylab::TanMan
       end
     end
 
-    class Silo__ < Brazen_.model.silo_class
+    class Silo_Daemon < Model_::Silo_Daemon
 
       def members
         [ :document_controller_via_trio_box, * super ]

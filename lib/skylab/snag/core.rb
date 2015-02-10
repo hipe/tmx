@@ -83,7 +83,7 @@ module Skylab::Snag
 
       _cls = Autoloader_.const_reduce [ name_symbol ], _models_module
 
-      _cls.build_silo @invo_ctx
+      _cls::Silo_Daemon.new @invo_ctx, :_one_day_etc_
     end
   end
 

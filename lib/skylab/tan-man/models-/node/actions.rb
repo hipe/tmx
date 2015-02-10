@@ -61,7 +61,8 @@ module Skylab::TanMan
       end
     end  # >>
 
-    class Silo__ < Model_::Document_Entity::Silo
+
+    class Silo_Daemon < Silo_Daemon
 
       def node_collection_controller_via_document_controller dc, & oes_p
 
