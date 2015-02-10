@@ -167,7 +167,7 @@ module Skylab::Brazen
 
       def initialize a
         input_method_i, input_x, event_receiver_method_i, event_receiver_x = a
-        @input_id = Input_Identifier_.send input_method_i, input_x
+        @input_id = Brazen_::Data_Store_::Byte_Upstream_Identifier.send input_method_i, input_x
         @on_event_selectively = send event_receiver_method_i, event_receiver_x
       end
 
@@ -197,7 +197,7 @@ module Skylab::Brazen
         @column_number = nil
         @line_number = 0
         @state_i = initial_state_i
-        @lines = @input_id.to_line_stream_
+        @lines = @input_id.to_simple_line_stream
         resolve_document
       end
 
@@ -315,110 +315,6 @@ module Skylab::Brazen
         @sect.assignments.accept_asmt(
           Assignment_.new( * @md.captures, & @on_event_selectively ) )
         PROCEDE_
-      end
-    end
-
-    module Input_Identifier_
-
-      class << self
-
-        def via_stream io
-          Stream_Input_Identifier__.new io
-        end
-
-        def via_string s
-          String_Input_Identifier__.new s
-        end
-
-        def via_path s
-          Path_Input_Identifier__.new s
-        end
-      end
-    end
-
-    class Stream_Input_Identifier__
-
-      def initialize io
-        @io = io
-      end
-
-      def description_under expag
-        if @io.respond_to? :path
-          path = @io.path
-          expag.calculate do
-            pth path
-          end
-        else
-         "«input stream»"  # :+#guillemets
-        end
-      end
-
-      def to_line_stream_
-        @io
-      end
-    end
-
-    class String_Input_Identifier__
-
-      def initialize s
-        @s = s
-      end
-
-      def description_under _expr_
-        LIB_.ellispsify( @s ).inspect
-      end
-
-      def to_line_stream_
-        String_Input_Adapter_.new @s
-      end
-    end
-
-    class Path_Input_Identifier__
-
-      def initialize s
-        @path_s = s
-      end
-
-      def members
-        [ :to_path, :to_pathname, :description_under, :to_line_stream_ ]
-      end
-
-      def to_path
-        @path_s
-      end
-
-      def to_pathname
-        @path_s and ::Pathname.new @path_s
-      end
-
-      def description_under expr
-        Brazen_.lib_.basic::Pathname.description_under_of_path expr, @path_s
-      end
-
-      def to_line_stream_
-        Path_Input_Adapter_.new @path_s
-      end
-    end
-
-    class String_Input_Adapter_
-      def initialize str
-        @scn = LIB_.string_scanner.new str
-      end
-
-      def gets
-        @scn.scan RX__
-      end
-
-      RX__ = /[^\r\n]*\r?\n|[^\r\n]+/
-    end
-
-    class Path_Input_Adapter_
-      def initialize path_s
-        @IO = ::File.open path_s, 'r'
-      end
-
-      def gets
-        @IO.gets
       end
     end
 

@@ -10,7 +10,7 @@ digraph{
   si [ label="silo\nsquash" ]
   ss [ label="get [tm] to\nbe self-supporting", style=filled]
   st [ label="sg\ntags" style=filled ]
-  tu [ label="ttt\nunify" ]
+  tu [ label="ttt\nunify" , style=filled]
   um [ label="unmunge\nmethods" style=filled ]
   up [ label="cleanup unparse" style=filled ]
 

@@ -2,7 +2,7 @@
 [#092]       #done #list-API unmunge `_insert_item_before_item` et. a.
 [#091]       #done #list-API improve the implementation of \`unparse\`
 [#090]       #done make association magnetic
-[#089] #open [br] datastore / file-based [ file etc ] <= [ttt]
+[#089]       #done [br] datastore / file-based [ file etc ] <= [ttt]
 [#088] #open same issue as below with graph use
 [#087] #open setting a starter doesn't remove the last one
 [#086]       #done on first test run with an empty "[tmx root]/tmp/", the

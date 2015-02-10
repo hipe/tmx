@@ -78,7 +78,8 @@
              entrypoint is better. rely on `ok` : false
 [#021]       the API magic result shape narrative .. (was "scope kernel")
 [#020] #open  --help and --host
-[#019]       #done turn `is_positive` into `ok` to match HTTP responses
+[#019]       [ byte upstream identifiers ]
+             ( was: #done turn `is_positive` into `ok` to match HTTP responses )
 [#018]       #parent-node: [#013] "the model property ordering rationale.."
              (was: #parent-node: [#013] "model ivars..")
 [#017] #open environment variables need a general solution, probably one
