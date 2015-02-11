@@ -4,16 +4,16 @@ module Skylab::Brazen
 
     class << self
 
-      def parse_path path_s, & oes_p
-        Parse_[ :via_path, path_s, :on_event_selectively, oes_p ]
+      def parse_path path, & oes_p
+        Parse_[ :via_path, path, & oes_p ]
       end
 
       def parse_string str, & oes_p
-        Parse_[ :via_string, str, :on_event_selectively, oes_p ]
+        Parse_[ :via_string, str, & oes_p ]
       end
 
       def read io, & oes_p
-        Parse_[ :via_stream, io, :on_event_selectively, oes_p ]
+        Parse_[ :via_stream, io, & oes_p ]
       end
 
       def write * a
@@ -37,7 +37,7 @@ module Skylab::Brazen
 
     def members
       [ :receive_delete_entity, :entity_stream_via_model,
-          :entity_via_identifier, :receive_persist_entity,
+          :entity_via_key, :receive_persist_entity,
             :property_value_via_symbol ]
     end
 
@@ -55,13 +55,14 @@ module Skylab::Brazen
 
     def receive_persist_entity action, entity, & oes_p
       ok = resolve_mutable_document( & oes_p )
+      ok &&= entity.intrinsic_create_before_create_in_datastore action, & oes_p
       ok &&= Git_Config_::Mutable::Actors::Mutate[ entity, @mutable_document, & oes_p ]
       ok and _via_mutated_mutable_document_write_file_via_persist( action, & oes_p )
     end
 
     # ~ retrieve (one)
 
-    def entity_via_identifier id, & oes_p
+    def entity_via_intrinsic_key id, & oes_p
       Git_Config_::Actors__::Retrieve[ id, @document, @kernel, & oes_p ]
     end
 
@@ -79,6 +80,7 @@ module Skylab::Brazen
 
     def receive_delete_entity action, entity, & oes_p
       ok = resolve_mutable_document
+      ok &&= entity.intrinsic_delete_before_delete_in_datastore( action, & oes_p )
       ok &&= Git_Config_::Mutable::Actors::Delete[ entity, @mutable_document, & oes_p ]
       ok and _via_mutated_mutable_document_write_file_via_persist( action, & oes_p )  # _DOG_EAR
     end
@@ -136,21 +138,12 @@ module Skylab::Brazen
         & oes_p )
     end
 
-    class Silo_Controller__ < Brazen_.model.silo_controller_class
+    class Silo_Daemon < Silo_Daemon
 
-      def provide_action_precondition _id, _g
-        self
-      end
-
-      def provide_collection_controller_precon _id, _g
-        self
-      end
-
-      def datastore_controller_via_entity x
-        document = Parse_[ :via_path, x.existent_config_path,
-                           :on_event_selectively, @on_event_selectively ]
-        document and begin
-          Git_Config_.new document, @kernel, & @on_event_selectively
+      def via_path path, & oes_p
+        doc = Parse_[ :via_path, path, & oes_p ]
+        doc and begin
+          Git_Config_.new doc, @kernel, & oes_p
         end
       end
     end
@@ -158,31 +151,17 @@ module Skylab::Brazen
     class Parse_  # the [#cb-046] "any result" pattern is employed.
 
       class << self
-        def [] *a
-          new( a ).execute
+        def [] *a, & oes_p
+          new( a, & oes_p ).execute
         end
-      end
+      end  # >>
 
       Brazen_.event.selective_builder_sender_receiver self
 
-      def initialize a
-        input_method_i, input_x, event_receiver_method_i, event_receiver_x = a
+      def initialize a, & oes_p
+        input_method_i, input_x = a
         @input_id = Brazen_::Data_Store_::Byte_Upstream_Identifier.send input_method_i, input_x
-        @on_event_selectively = send event_receiver_method_i, event_receiver_x
-      end
-
-      def on_event_selectively oes_p
-        if oes_p
-          oes_p
-        else
-          -> i, *, & ev_p do
-            if :info != i
-              _ev = ev_p[]
-              _s = ev.render_first_line_under Brazen_::API.expression_agent_instance
-              raise ParseError, _s
-            end
-          end
-        end
+        @on_event_selectively = oes_p
       end
 
     public

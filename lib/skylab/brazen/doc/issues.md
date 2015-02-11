@@ -74,8 +74,9 @@
 [#025]       #doc-node: the brazen four layer model model ..
 [#024]       #parent-node: [#025] the model action narrative ..
 [#023] #hole ( was: #parent-node: [#011] event prototype )
-[#022]       #done obliterate `receive_negative_event` and the rest - single
-             entrypoint is better. rely on `ok` : false
+[#022]       [ entity identifier ]
+             ( was: #done obliterate `receive_negative_event` and the rest - single
+             entrypoint is better. rely on `ok` : false )
 [#021]       the API magic result shape narrative .. (was "scope kernel")
 [#020] #open  --help and --host
 [#019]       [ byte upstream identifiers ]

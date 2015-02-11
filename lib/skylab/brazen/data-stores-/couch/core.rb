@@ -8,7 +8,8 @@ module Skylab::Brazen
         y << "manage couch datastores."
       end
 
-      o :persist_to, :workspace
+      o :persist_to, :workspace,
+        :preconditions, [ :datastore_couch ]
 
       o :description, -> y do
         y << "the name of the database"
@@ -90,28 +91,22 @@ module Skylab::Brazen
       "#{ o[ :name ] } on #{ o[ :host ] }:#{ o[ :port ] }"
     end
 
-    def datastore_controller_via_entity _ent
-      self
+    # ~ c r u d
+
+    def receive_persist_entity act, entity, & oes_p
+      _ok = entity.intrinsic_create_before_create_in_datastore act, & oes_p
+      _ok && Couch_::Actors__::Persist[ act.argument_box[ :dry_run ], entity, self ]
     end
 
-    # ~ for create
-
-    def receive_persist_entity action, entity
-      Couch_::Actors__::Persist[ action.argument_box[ :dry_run ], entity, self ]
-    end
-
-    def any_native_create_before_create_in_datastore
-      Couch_::Actors__::Touch_datastore[ self, & handle_event_selectively ]
+    def intrinsic_create_before_create_in_datastore _action, & oes_p
+      oes_p ||= handle_event_selectively
+      Couch_::Actors__::Touch_datastore[ self, & oes_p ]
       PROCEDE_  # #note-085
     end
 
-    # ~ for retrieve (one)
-
-    def entity_via_identifier id, & oes_p
+    def entity_via_intrinsic_key id, & oes_p
       Couch_::Actors__::Retrieve_datastore_entity[ id, self, @kernel, & oes_p ]
     end
-
-    # ~ for retrieve (list)
 
     def entity_stream_via_model cls, & oes_p
       Couch_::Actors__::Build_stream.with :model_class, cls,
@@ -120,16 +115,12 @@ module Skylab::Brazen
         & oes_p
     end
 
-    # ~ for delete entity
-
     def receive_delete_entity action, ent, & oes_p
-      _ok = ent.intrinsic_delete action, & oes_p
+      _ok = ent.intrinsic_delete_before_delete_in_datastore action, & oes_p
       _ok && Couch_::Actors__::Delete[ action, ent, self, & oes_p ]
     end
 
-    # ~ for delete self
-
-    def intrinsic_delete action, & oes_p
+    def intrinsic_delete_before_delete_in_datastore action, & oes_p
 
       Couch_::Actors__::Delete_datastore.call(
         action.trio( :dry_run ),
@@ -171,40 +162,26 @@ module Skylab::Brazen
 
   public  # ~ hook out's & hook in's
 
-    def as_precondition_via_preconditions precons
-      @preconditions = precons
-      # (we used to touch the database here)
-      self
-    end
+    class Silo_Daemon < Silo_Daemon
 
-    class Silo_Daemon < Brazen_.model.silo_daemon_class
+      def precondition_for_self _action, _id, box, & oes_p
+        :"???"  # we might want to use this for write-datastore operations
+      end
 
-      def provide_Action_preconditioN id, g, & oes_p  # :+#public-API
-        super id, g do | * i_a, & ev_p |
-          oes_p.call( * i_a ) do
-            ev = ev_p[]
-            x_a = ev.to_iambic
-            x_a.push :invite_to_action, [ :datastore, :couch, :add ]
-            ev.class.inline_via_iambic x_a, & ev.message_proc
+      def precondition_for act, id, box, & oes_p
+        box.fetch( :workspace ).entity_via_intrinsic_key id do | * i_a, & ev_p |
+          oes_p.call( * i_a  ) do
+            ev_p[].new_inline_with :invite_to_action, [ :datastore, :couch, :add ]
           end
         end
       end
     end
 
-    class Silo_Controller__ < Brazen_.model.silo_controller_class
-
-    end
-
-    class Collection_Controller__ < Brazen_.model.collection_controller_class
-
-    end
-
     class << self
-
       def HTTP_remote
         Couch_::HTTP_Remote__
       end
-    end
+    end  # >>
 
     Couch_ = self
     Data_Store_ = Brazen_::Data_Store_

@@ -266,28 +266,18 @@ module Skylab::Brazen
 
       oes_p = handle_event_selectively
 
-      g = Model_::Preconditions_::Graph.new self, @kernel, & oes_p
-
-      if @preconditions
-        g.receive_starting_actual_preconditions @preconditions
-      end
-
-      bx = Model_::Preconditions_.establish_box_with(
-        :self_identifier, model_class.node_identifier,
-        :identifier_a, a,
-        :on_self_reliance, method( :self_as_precondition ),
-        :graph, g,
-        :level_i, :Action_preconditioN,
-        & oes_p )
+      bx = Model_::Preconditions_::Produce_Box.new(
+        a,  # the identifiers for silos i depend on
+        @preconditions,  # any starting box
+        model_class.node_identifier,  # my identifier
+        self,  # the action
+        @kernel,
+        & oes_p ).produce_box
 
       bx and begin
         @preconditions = bx
         ACHIEVED_
       end
-    end
-
-    def self_as_precondition id, g, silo
-      g.touch :collection_controller_prcn, id, silo
     end
 
   public
@@ -296,7 +286,7 @@ module Skylab::Brazen
 
     def to_full_trio_box
       bx = Callback_::Box.new
-      _Trio = LIB_.basic.trio
+      _Trio = Trio__[]
       h = @argument_box.h_
       st = formal_properties.to_stream
       prp = st.gets
@@ -313,22 +303,53 @@ module Skylab::Brazen
       bx
     end
 
-    def to_trio_box
-      _Trio = LIB_.basic.trio
-      fo = formal_properties
-      a = @argument_box.a_ ; h = @argument_box.h_
-      h_ = {}
-      d = -1 ; last = a.length - 1
-      while d < last
-        d += 1
-        k = a.fetch d
-        h_[ k ] = _Trio.new h.fetch( k ), true, fo.fetch( k )
+    def to_trio_box_proxy
+      Trio_Box_Proxy___.new @argument_box, formal_properties
+    end
+
+    class Trio_Box_Proxy___
+
+      def initialize argument_box, formals
+        @argument_box = argument_box
+        @fo = formals
+        @h = {}
       end
-      Callback_::Box.allocate.init a.dup, h_
+
+      def members ; [ :fo, :argument_box ] end ; attr_reader :fo, :argument_box
+
+      def [] k
+        fetch k do end
+      end
+
+      def fetch k, & p
+
+        @h.fetch k do
+
+          had_x = true
+          x = @argument_box.fetch k do
+            had_x = false
+            nil
+          end
+
+          had_f = true
+          f = @fo.fetch k do
+            had_f = false
+            nil
+          end
+
+          if had_f || had_x
+            Trio__[].new x, had_x, f
+          elsif p
+            p[]
+          else
+            raise ::KeyError, "no formal or actual argument '#{ k }'"
+          end
+        end
+      end
     end
 
     def to_trio_box_except__ * i_a  # [cu]
-      _Trio = LIB_.basic.trio
+      _Trio = Trio__[]
       fo = formal_properties
       h = @argument_box.h_
       a_ = @argument_box.a_ - i_a
@@ -340,7 +361,7 @@ module Skylab::Brazen
     end
 
     def to_trio_stream
-      _Trio = LIB_.basic.trio
+      _Trio = Trio__[]
       fp = formal_properties
       a = @argument_box.a_ ; h = @argument_box.h_
       d = 0 ; len = a.length
@@ -354,8 +375,12 @@ module Skylab::Brazen
     end
 
     def trio sym  # #hook-near model. may soften if needed.
-      LIB_.basic.trio(
-        @argument_box.fetch( sym ), true, formal_properties.fetch( sym ) )
+      Trio__[].new(
+        @argument_box[ sym ], true, formal_properties.fetch( sym ) )
+    end
+
+    Trio__ = Callback_.memoize do
+      LIB_.basic.trio
     end
 
     def argument_value sym

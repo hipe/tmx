@@ -68,17 +68,13 @@ the possible events we expect to emit from such a query are things like
 
 and so, given all of the above, we have:
 
+    entity_via_intrinsic_key <x>, & <on event selectively>
 
-    entity_via_identifier <identifier>, & <on event selectively>
-
-
-`identifier` is a interface that is currently evolving, but will
-probably be something like a symbol name of the model class and a string
-name for the entity's (natural key) `name` field value.
-
-not all collection-like silos are multi-model. a collection may be designed
-(or produced) to hold only one kind of entity, in which case the identifier
-will only be used for its pertitnent part.
+the meaning and shape of `x` is totally up to the collection - for simple
+collection that hold one kind of entity, this might be a natural key or
+a primary key. for collections that can hold a disparate collection of
+entities of different model classes (silos), consider using an [#022]
+"entity identifier".
 
 
 

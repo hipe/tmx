@@ -296,10 +296,6 @@ module Skylab::Brazen
           @delegate = delegate
         end
 
-        def with * x_a
-          self._NO_EASY_use_new_with
-        end
-
         def new_with * x_a
           dup.init_dup x_a
         end

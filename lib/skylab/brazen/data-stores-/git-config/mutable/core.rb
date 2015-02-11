@@ -7,37 +7,35 @@ module Skylab::Brazen
       class << self
 
         def new & oes_p
-          Document__.new Parse__.new_with( :on_event_selectively, oes_p )
+          Document__.new Parse__.new_with( & oes_p )
         end
 
         def parse_string str, & oes_p
-          Parse__[ :via_string, str, :on_event_selectively, oes_p ]
+          Parse__[ :via_string, str, & oes_p ]
         end
 
         def parse_path path_s, & oes_p
-          Parse__[ :via_path, path_s, :on_event_selectively, oes_p ]
+          Parse__[ :via_path, path, & oes_p ]
         end
 
         def parse_input_id input_id, & oes_p
-          Parse__[ :via_input_adapter, input_id,
-                   :on_event_selectively, oes_p ]
+          Parse__[ :via_input_adapter, input_id, & oes_p ]
         end
       end
 
       class Parse__ < Parse_
 
         class << self
-          def with * x_a
-            self._NO_EASY_USE_new_with
-          end
-          def new_with * x_a
-            new x_a
+          def new_with * x_a, & oes_p
+            new x_a, & oes_p
           end
         end
 
-        def initialize a
-          a.last.nil? and self._WHERE
-          absorb_even_iambic_fully a
+        def initialize a, & oes_p
+          @on_event_selectively = oes_p
+          if a.length.nonzero?
+            absorb_even_iambic_fully a
+          end
         end
 
       private
@@ -164,12 +162,9 @@ module Skylab::Brazen
       class Pass_Thru_Parse__ < Parse__
         undef_method :execute
         class << self
-          def with * x_a
-            self._NO_easy_use_new_with
-          end
 
-          def new_with * x_a
-            new x_a
+          def new_with * x_a, & oes_p
+            new x_a, & oes_p
           end
         end
 
@@ -1056,8 +1051,7 @@ module Skylab::Brazen
 
           _parse = Parse__.new_with :via_string_for_immediate_parse,
             y * EMPTY_S_,
-            :on_event_selectively,
-            @parse.handle_event_selectively
+            & @parse.handle_event_selectively
 
           otr = Section_or_Subsection_Parse__.new _parse
           otr.parse or self._SYNTAX_MISMATCH

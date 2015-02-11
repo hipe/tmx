@@ -10,8 +10,6 @@ module Skylab::Brazen
 
       :after, :status,
 
-      :persist_to, :datastore_git_config,
-
       :preconditions, EMPTY_A_,
 
       :required, :property, :config_filename,
@@ -19,7 +17,7 @@ module Skylab::Brazen
       :required, :property, :surrounding_path )
 
     def members
-      [ :datastore, :existent_surrounding_path ]
+      [ :existent_surrounding_path ]
     end
 
     # ~ custom exposures
@@ -92,28 +90,61 @@ module Skylab::Brazen
     # ~ #hook-outs and #hook-ins
 
     def description_under expag
-      if @datastore_resolved_OK
-        @datastore.description_under expag
-      elsif @pn
-        pn = @pn
-        expag.calculate do
-          pth pn
-        end
+
+      if cfg_
+        @cfg_.description_under expag
       else
-        self.class.name_function.as_human
+        path = @property_box[ :surrounding_path ]
+        if path
+          expag.calculate do
+            pth path
+          end
+        else
+          self.class.name_function.as_human
+        end
       end
     end
 
-    def datastore_controller_via_entity _ent
-      self
+    # ~~ c r u d
+
+    def receive_persist_entity act, ent, & oes_p
+      doc = _datastore( & oes_p )
+      doc and begin
+        doc.receive_persist_entity act, ent, & oes_p
+      end
     end
 
-    def provide_action_precondition _id, graph
-      self
+    def entity_via_intrinsic_key id, & oes_p
+      doc = _datastore( & oes_p )
+      doc and begin
+        doc.entity_via_intrinsic_key id, & oes_p
+      end
     end
 
-    def __NO__receive_missing_required_properties ev  # covered by [tm], #ugly
-      receive_missing_required_properties_softly ev
+    def receive_delete_entity act, ent, & oes_p
+      doc = _datastore( & oes_p )
+      doc and begin
+        doc.receive_delete_entity act, ent, & oes_p
+      end
+    end
+
+    # ~ for actions
+
+    def resolve_datastore_ & oes_p
+      _datastore( & oes_p ) ? ACHIEVED_ : UNABLE_
+    end
+
+    attr_reader :cfg_
+
+    # ~ support
+
+    def _datastore & oes_p
+      @___did_attempt_to_resolve_document ||= begin
+        @cfg_ = @kernel.silo( :datastore_git_config ).via_path(
+          existent_config_path, & oes_p )
+        true
+      end
+      @cfg_
     end
 
     # ~ for actions
@@ -162,58 +193,60 @@ module Skylab::Brazen
 
     # ~ the custom stack
 
-    class Silo_Daemon < Brazen_.model.silo_daemon_class
+    class Silo_Daemon < Silo_Daemon
 
       # ~ custom exposures
 
       def workspace_via_trio_box box, & oes_p
-        build_silo_controller( & oes_p )._workspace_via_trio_box box
+        WS_via_trio_box___.new( box, @model_class, @kernel, & oes_p ).execute
       end
 
       # ~ hook-outs / hook-ins
 
-      def model_class
-        Workspace_
+      def precondition_for action, id, box, & oes_p
+        WS_via_trio_box___.
+          new( action.to_trio_box_proxy, @model_class, @kernel, & oes_p ).execute
       end
 
       def any_mutated_formals_for_depender_action_formals x
         bx = x.to_mutable_box_like_proxy
         st = COMMON_PROPERTIES_.to_stream
-        prp = st.gets
         begin
-          bx.add prp.name_symbol, prp
           prp = st.gets
-        end while prp
+          prp or break
+          k = prp.name_symbol
+          bx.has_name k and redo
+          bx.add k, prp
+          redo
+        end while nil
         bx
       end
     end
 
-    class Silo_Controller__ < Brazen_.model.silo_controller_class
+    class WS_via_trio_box___
 
-      def provide_collection_controller_precon _id, graph
-        _workspace_via_trio_box graph.action.to_trio_box
-      end
+      def initialize bx, mc, k, & oes_p
+        @bx = bx
+        @kernel = k
+        @model_class = mc
+        @on_event_selectively = oes_p
 
-      def _workspace_via_trio_box bx
-
-        @preconditions ||= nil
-
-        @oes_p = event_lib.
+        @oes_p = Callback_::Event.
           produce_handle_event_selectively_through_methods.
             bookends self, :Workspace_via_trio_boX do | * i_a, & ev_p |
           maybe_send_event_via_channel i_a, & ev_p
         end
+      end
+
+      def execute
 
         @ws = @model_class.edit_entity @kernel, @oes_p do |o|
-          if @preconditions
-            o.preconditions @preconditions
-          end
           o.edit_with(
-            :config_filename, bx.fetch( :config_filename ).value_x,
-            :surrounding_path, bx.fetch( :workspace_path ).value_x )
+            :config_filename, @bx.fetch( :config_filename ).value_x,
+            :surrounding_path, @bx.fetch( :workspace_path ).value_x )
         end
 
-        @ws and __via_workspace_produce_existent_workspace_via_trio_box bx
+        @ws and __via_workspace_produce_existent_workspace_via_trio_box @bx
       end
 
       def __via_workspace_produce_existent_workspace_via_trio_box bx
@@ -249,6 +282,8 @@ module Skylab::Brazen
         x_a.push :invite_to_action, [ :init ]
         build_event_via_iambic_and_message_proc x_a, ev.message_proc
       end
+
+      Callback_::Event.selective_builder_sender_receiver self
     end
 
     Workspace_ = self

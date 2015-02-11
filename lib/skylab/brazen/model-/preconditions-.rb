@@ -4,181 +4,81 @@ module Skylab::Brazen
 
     module Preconditions_
 
-      class << self
+      class Produce_Box
 
-        def establish_box_with * x_a, & oes_p
-          Resolution__.call_via_iambic x_a, & oes_p
-        end
-      end
+        # assume nonzero length precondition id's
 
-      class Graph
+        def initialize id_a, bx, id, action, kernel, & oes_p
 
-        def initialize action, kernel, & oes_p
           @action = action
-          @matrix_h = ::Hash.new do |h, k|
-            h[ k ] = ::Hash.new { |h_, k_| h_[ k_ ] = Node__.new }
-          end
-          @on_event_selectively = oes_p
+          @identifier_a = id_a
           @kernel = kernel
-        end
+          @on_event_selectively = oes_p
+          @self_id = id
 
-        attr_reader :action
-
-        def receive_starting_actual_preconditions box
-          box.each_pair do | k, x |
-            node = Node__.new :OK
-            node.value_x = x
-            node.self_value_x = x  # or not
-            @matrix_h[ k ][ :collection_controller_prcn ] = node  # and cetera
+          @box = if bx
+            bx
+          else
+            Callback_::Box.new
           end
-          nil
         end
 
-        def touch lvl_i, id, silo
-          node = @matrix_h[ id.full_name_i ][ lvl_i ]
-          case node.state_i
-          when :OK
-            node.value_x
-          when :none
-            # touches do not change state, work does..
-            x = silo.send :"provide_#{ lvl_i }", id, self, & @on_event_selectively
-            if x
-              if :none == node.state_i  # just kidding
-                node.state_i = :OK
-                node.value_x = x
+        def produce_box
+
+          seen = {} ; done_h = @box.h_
+
+          resolve_silo = -> me_id, id_a do
+
+            # in the normal case, first resolve the preconditions, then the self
+
+            me_k = me_id.full_name_i
+            ok = true
+
+            _seen_ = seen.fetch me_k do seen[ me_k ] = true ; false end
+            _seen_ and self._DO_ME
+
+            relies_on_self = false
+
+            if id_a && id_a.length.nonzero?
+
+              id_a.each do | id |
+
+                k = id.full_name_i
+                done_h.key? k and next
+
+                if me_k == k
+                  relies_on_self = true
+                  next
+                end
+                _sub_silo = @kernel.silo_via_identifier id
+                _id_a_ = _sub_silo.model_class.preconditions
+                ok = resolve_silo[ id, _id_a_ ]
+                ok or break
               end
             end
-            x
-          else
-            self._STATE_FAIL
-          end
-        end
-
-        def work is_self_p, lvl_i, id  # assumes state 'none'
-          silo = @kernel.silo_via_identifier id, & @on_event_selectively
-          silo and begin
-            node = @matrix_h[ id.full_name_i ][ lvl_i ]
-            if is_self_p
-              x = is_self_p[ id, self, silo ]
-              if x
-                # what is returned when self is relied upon,
-                # do not cache for others to use
-                node.self_value_x = x
-                PROCEDE_
+            if ok
+              x = if relies_on_self
+                # resolve a self-reliance only after the other deps are done
+                _me_silo = @kernel.silo_via_identifier me_id
+                _me_silo.precondition_for_self @action, me_id, @box, & @on_event_selectively
               else
-                node.state_i = :NG
-                x
+                _silo = @kernel.silo_via_identifier me_id
+                _silo.precondition_for @action, me_id, @box, & @on_event_selectively
               end
-            else
-              node.state_i = :processing
-              x = silo.send :"provide_#{ lvl_i }", id, self, & @on_event_selectively
               if x
-                node.state_i = :OK
-                node.value_x = x
-                PROCEDE_
+                @box.add me_k, x
               else
-                node.state_i = :NG
-                x
+                ok = x
               end
             end
+            ok
           end
-        end
 
-        def read_state lvl_i, id
-          @matrix_h[ id.full_name_i ][ lvl_i ].state_i
-        end
-
-        def fetch_value lvl_i, id
-          node = @matrix_h.fetch( id.full_name_i ).fetch( lvl_i )
-          node.value_x || node.self_value_x
-        end
-
-        class Node__
-          def initialize state_sym=:none
-            @state_i = state_sym
-          end
-          attr_accessor :state_i
-          attr_accessor :value_x, :self_value_x
-        end
-      end
-
-      class Resolution__
-
-        Actor_.call self, :properties,
-          :self_identifier,
-          :identifier_a,
-          :on_self_reliance,
-          :graph,
-          :level_i
-
-        def execute
-
-          if @identifier_a.length.nonzero?
-            @self_full_name_i = @self_identifier.full_name_i
-            step_on_each_identifier
-          end
-        end
-
-      private
-
-        def step_on_each_identifier
-          ok = true
-          @identifier_a.each do |id|
-            @id = id
-            ok = step
-            ok or break
-          end
-          ok && flush
-        end
-
-        def step
-          state_i = @graph.read_state @level_i, @id
-          case state_i
-
-          when :none
-            work
-
-          when :processing
-            raise "cyclic: #{ @level_i } #{ @id.full_name_i }"
-            when_processing
-
-          when :OK
-            PROCEDE_
-
-          else
-            self._NEVER
-
-          end
-        end
-
-        def when_processing
-          @on_event_selectively.call :error, :cyclic_dependency_in_precondition_graph do
-            bld_cyclic_dependency_in_precondition_graph_event
-          end
-          UNABLE_
-        end
-
-        def bld_cyclic_dependency_in_precondition_graph_event
-          build_not_OK_event_with :cyclic_dependency_in_precondition_graph,
-            :model_name, @id.full_name_i
-        end
-
-        def work
-          if @self_full_name_i == @id.full_name_i
-            @graph.work @on_self_reliance, @level_i, @id
-          else
-            @graph.work nil, @level_i, @id
-          end
-        end
-
-        def flush
-          bx = Box_.new
-          @identifier_a.each do |id|
-            bx.add id.full_name_i, @graph.fetch_value( @level_i, id )
-          end
-          bx
+          x = resolve_silo[ @self_id, @identifier_a ]
+          x and @box
         end
       end
     end
   end
 end
+# :+#tombstone: cyclic dependency event

@@ -14,10 +14,6 @@ module Skylab::Brazen
           Pair_
         end
 
-        def collection_controller_class
-          Collection_Controller_
-        end
-
         def entity * a, & p
           if a.length.nonzero?
             Model_::Entity.via_nonzero_length_arglist a, & p
@@ -42,14 +38,6 @@ module Skylab::Brazen
 
         def retrieve_methods
           Model_::Action_Factory__.retrieve_methods
-        end
-
-        def silo_controller_class
-          Model_::Silo_Controller_
-        end
-
-        def silo_daemon_class
-          Model_::Silo_Daemon
         end
       end
     end
@@ -97,34 +85,6 @@ module Skylab::Brazen
         edit_entity_directly kernel, oes_p do
           @property_box = Flyweight_Property_Box__.new me
         end
-      end
-
-      def collection_controller_class
-        if ! const_defined? :Collection_Controller__, false
-          if const_defined? :Collection_Controller__
-            self._DO_ME
-          else
-            cls = ::Class.new LIB.collection_controller_class
-            const_set :Generated_Collection_Controller___, cls
-            const_set :Collection_Controller__, cls
-          end
-        end
-        const_get :Collection_Controller__, false
-      end
-
-      def silo_controller_class
-        if ! const_defined? :Silo_Controller__, false
-          if const_defined? :Silo_Controller__
-            cls = ::Class.new const_get( :Silo_Controller__ )
-            const_set :Generated_Silo_Controller_Subclass___, cls
-            const_set :Silo_Controller__, cls
-          else
-            cls = ::Class.new LIB.silo_controller_class
-            const_set :Generated_Silo_Controller__, cls
-            const_set :Silo_Controller__, cls
-          end
-        end
-        const_get :Silo_Controller__, false
       end
 
       def unmarshalled kernel, oes_p, & edit_p
@@ -674,90 +634,25 @@ module Skylab::Brazen
 
   public
 
-    # ~ create
+    # ~ c r u d
 
-    def result_for_persist action
-      datastore_resolved_OK and
-        @datastore.receive_persist_entity action, self, & handle_event_selectively
-    end
-
-    def receive_persist_entity action, ent, & oes_p
-      datastore_resolved_OK and
-        @datastore.receive_persist_entity action, ent, & oes_p
-    end
-
-    def any_native_create_before_create_in_datastore
-      PROCEDE_
-    end
-
-    # ~ retrive one
-
-    def entity_via_identifier id_o, & oes_p
-      datastore_resolved_OK and @datastore.entity_via_identifier id_o, & oes_p
-    end
-
-    # ~ retrieve (many)
-
-    def entity_stream_via_model cls, & oes_p
-      datastore_resolved_OK and @datastore.entity_stream_via_model cls, & oes_p
-    end
-
-    # ~ delete (anemic out-of-box implementation: pass the buck)
-
-    def receive_delete_entity action, entity, & oes_p
-      datastore_resolved_OK and @datastore.receive_delete_entity action, entity, & oes_p
-    end
-
-    def intrinsic_delete _action  # :+#public-API #hook-in
-
-      # override this if your entity requires special delete behavior beyond
-      # what is performed by the datastore (i.e deleting the entity's record)
-
-      PROCEDE_
-    end
-
-  private
-
-    def datastore_resolved_OK
-      @did_attempt_to_resolve_datastore ||= rslv_datastore
-      @datastore_resolved_OK
-    end
-
-    def rslv_datastore
-      @did_attempt_to_resolve_datastore = true
-      @persist_to ||= self.class.persist_to
-      if @persist_to
-        via_persist_to_rslv_datastore
-      else
-        when_no_persist_to_for_rslv_datastore
-      end
+    def intrinsic_create_before_create_in_datastore _action, & oes_p
       ACHIEVED_
     end
 
-    def when_no_persist_to_for_rslv_datastore
-      @datastore_is_OK = false
-      Model_::Small_Time_Actors__::When_datastore_not_indicated[ self ]
+    def result_for_persist action, & oes_p
+      _datastore.receive_persist_entity action, self, & oes_p
     end
 
-    def via_persist_to_rslv_datastore
-      if preconditions
-        _intermediary = @preconditions.fetch @persist_to.full_name_i
-        @datastore = _intermediary.datastore_controller_via_entity self
-        @datastore_resolved_OK = @datastore ? true : false
-      else
-        via_kernel_rslv_datastore
-      end ; nil
+    def intrinsic_delete_before_delete_in_datastore _action, & oes_p
+      ACHIEVED_
     end
 
-    def via_kernel_rslv_datastore
-      silo = @kernel.silo_via_identifier @persist_to, & @on_event_selectively
-      if silo
-        @datastore = silo.dsc_via_entity self, & @on_event_selectively
-        @datastore_resolved_OK = @datastore ? true : false
-      else
-        @datastore_resolved_OK = false
-      end ; nil
+    def _datastore
+      @preconditions.fetch self.class.persist_to.full_name_i
     end
+
+  private
 
     # ~ multipurpose internal producers
 
@@ -787,11 +682,6 @@ module Skylab::Brazen
 
     def properties
       @property_box or fail "no prop box for #{ self.class }"
-    end
-
-    def datastore  # for low-level actors
-      _ok = datastore_resolved_OK
-      _ok and @datastore
     end
 
     # ~ adjunct & experiments
@@ -905,240 +795,6 @@ module Skylab::Brazen
 
     # ~ the stack
 
-    class Collection_Controller_
-
-      Actor_.call self, :properties,
-        :action,
-        :preconditions,
-        :model_class,
-        :kernel
-
-      class << self
-
-        def new_with * x_a, & oes_p
-          new do
-            oes_p and @on_event_selectively = oes_p
-            process_iambic_fully x_a
-          end
-        end
-      end
-
-      def initialize & p
-        instance_exec( & p )
-        @kernel.do_debug and @kernel.debug_IO.
-          puts ">> >> >>    MADE #{ model_class.name_function.as_slug } CCTL"
-      end
-
-      def to_preconditions_plus_self
-        bx = @preconditions.dup
-        bx.add( model_class.name_function.as_lowercase_with_underscores_symbol,
-          self )
-        bx
-      end
-
-      def provide_action_precondition id, _g, & oes_p
-        if id.entity_name_s
-          ent = datastore.entity_via_identifier id, & ( oes_p || handle_event_selectively )
-          ent and ent.as_precondition_via_preconditions @preconditions  # :+#public-API #hook-out
-        else
-          self
-        end
-      end
-
-      def datastore_controller_via_entity _
-        self
-      end
-
-      def receive_persist_entity action, ent, & oes_p
-        @dsc ||= datastore_controller
-        @dsc and @dsc.receive_persist_entity action, ent, & oes_p
-      end
-
-      private def normalize_entity_name_via_fuzzy_lookup ent, & oes_p  # (covered by [tm] for now)
-
-        ent_ = one_entity_against_natural_key_fuzzily(
-          ent.natural_key_string, & oes_p )
-
-        ent_ and begin
-          ent.normalize_property_value_via_normal_entity(
-            ent.class.natural_key_string, ent_, & oes_p )
-          ACHIEVED_
-        end
-      end
-
-      def one_entity_against_natural_key_fuzzily name_s, & oes_p
-        __one_entity_via_entity_array(
-          __reduce_to_array_against_natural_key_fuzzily( name_s, & oes_p ),
-          name_s,
-          & oes_p )
-      end
-
-      def __one_entity_via_entity_array ent_a, name_s, & oes_p
-        case 1 <=> ent_a.length
-        when  0
-          ent_a.fetch 0
-        when -1
-          __one_entity_when_via_fuzzy_lookup_ambiguous ent_a, name_s, & oes_p  # #todo - model ambiguity method not implemented
-        when  1
-          __when_zero_entities_found_against_natural_key name_s, & oes_p
-        end
-      end
-
-    private
-
-      def __reduce_to_array_against_natural_key_fuzzily name_s, & oes_p
-
-        Brazen_.lib_.basic::Fuzzy.reduce_to_array_stream_against_string(
-
-          entity_stream_via_model( model_class, & oes_p ),
-
-          name_s,
-
-          -> ent do
-            ent.natural_key_string
-          end,
-
-          -> ent do
-            ent.dup
-          end )
-      end
-
-      def __when_zero_entities_found_against_natural_key name_s, & oes_p
-
-        oes_p ||= handle_event_selectively
-
-        oes_p.call :error, :entity_not_found do
-          __build_zero_entities_found_against_natural_key_event name_s
-        end
-
-        UNABLE_
-      end
-
-      def __build_zero_entities_found_against_natural_key_event name_s
-
-        _scn = entity_stream_via_model model_class do
-        end
-
-        _a_few_ent_a = _scn.take A_FEW__ do |x|
-          x.dup
-        end
-
-        build_not_OK_event_with :entity_not_found,
-            :name_string, name_s,
-            :a_few_ent_a, _a_few_ent_a,
-            :model_class, model_class do | y, o |
-
-          human_s = o.model_class.name_function.as_human
-
-          s_a = o.a_few_ent_a.map do |x|
-            val x.natural_key_string
-          end
-
-          _some_known_nodes = case 1 <=> s_a.length
-          when -1
-            "(some known #{ human_s }#{ s s_a }: #{ s_a * ', ' })"
-          when  0
-            "(the only known #{ human_s } is #{ s_a.first })"
-          when  1
-            "(there are no #{ human_s }s)"
-          end
-
-          y << "#{ human_s } not found: #{
-           }#{ ick o.name_string } #{
-            }#{ _some_known_nodes }"
-
-        end
-      end
-
-      A_FEW__ = 3
-
-    public
-
-      def receive_delete_entity action, entity, & oes_p
-        @dsc ||= datastore_controller
-        @dsc and via_datastore_controller_receive_delete_entity action, entity, & oes_p
-      end
-
-    private
-
-      def datastore
-        @preconditions.fetch model_class.persist_to.full_name_i
-      end
-
-      def model_class
-        @model_class
-      end
-    end
-
-    class Silo_Controller_
-
-      class << self
-        def new_with * x_a, & oes_p  # :+#[#cb-063] used to be free
-          new do
-            if oes_p
-              @on_event_selectively = oes_p
-            end
-            process_iambic_fully x_a
-          end
-        end
-      end
-
-      Actor_[ self, :properties,
-        :preconditions,
-        :model_class,
-        :kernel, :on_event_selectively ]
-
-      def initialize
-        super
-        @kernel.do_debug and @kernel.debug_IO.
-          puts ">> >>       MADE #{ Callback_::Name.via_module( model_class ).as_slug } SCTL"
-      end
-
-      def members
-        EMPTY_A_
-      end
-
-      def provide_collection_controller_precon id, graph
-
-        a = model_class.preconditions
-
-        if a
-          bx = Model_::Preconditions_.establish_box_with(
-            :self_identifier, id,
-            :identifier_a, a,
-            :on_self_reliance, method( :when_cc_relies_on_self ),
-            :graph, graph,
-            :level_i, :collection_controller_prcn,
-            & @on_event_selectively )
-
-          bx and begin
-            model_class.collection_controller_class.curry_with(
-              :action, graph.action,
-              :preconditions, bx,
-              :model_class, model_class,
-              :kernel, @kernel,
-              & @on_event_selectively )
-          end
-        else
-
-          model_class.collection_controller_class.new_with(
-            :model_class, model_class,
-            :kernel, @kernel,
-            & @on_event_selectively )
-        end
-      end
-
-      def when_cc_relies_on_self id, graph, silo
-        graph.touch :silo_controller_prcn, id, silo
-      end
-
-    private
-
-      def model_class
-        @model_class
-      end
-    end
-
     class Silo_Daemon
 
       def initialize kernel, model_class
@@ -1153,7 +809,7 @@ module Skylab::Brazen
       end
 
       def members
-        [ :build_silo_controller, :model_class, :name_symbol ]
+        [ :model_class, :name_symbol ]
       end
 
       attr_reader :model_class
@@ -1177,60 +833,6 @@ module Skylab::Brazen
         else
           sess.bound_call
         end
-      end
-
-      def provide_Action_preconditioN id, g, & oes_p  # :+#public-API
-        cc = g.touch :collection_controller_prcn, id, self
-        cc and begin
-          cc.provide_action_precondition id, g, & oes_p
-        end
-      end
-
-      def provide_collection_controller_prcn id, g, & oes_p
-        sc = g.touch :silo_controller_prcn, id, self
-        sc and begin
-          sc.provide_collection_controller_precon id, g, & oes_p
-        end
-      end
-
-      def provide_silo_controller_prcn id, g, & oes_p
-
-        a = @model_class.preconditions
-
-        if a && a.length.nonzero?
-
-          bx = Model_::Preconditions_.establish_box_with(
-            :self_identifier, id,
-            :identifier_a, a,
-            :on_self_reliance, method( :when_silo_controller_relies_on_self ),
-            :graph, g,
-            :level_i, :silo_controller_prcn,
-            & oes_p )
-
-          bx and begin
-            @model_class.silo_controller_class.new_with(
-              :preconditions, bx,
-              :model_class, @model_class,
-              :kernel, @kernel,
-              & oes_p )
-          end
-        else
-          build_silo_controller( & oes_p )
-        end
-      end
-
-      def when_silo_controller_relies_on_self id, graph, silo
-        silo
-      end
-
-      def dsc_via_entity entity, & oes_p
-        build_silo_controller( & oes_p ).datastore_controller_via_entity entity
-      end
-
-      def build_silo_controller & oes_p
-        @model_class.silo_controller_class.new_with(
-          :model_class, @model_class,
-          :kernel, @kernel, :on_event_selectively, oes_p )
       end
 
       # ~
@@ -1257,6 +859,29 @@ module Skylab::Brazen
           end
         end
         x_  # nothing by default
+      end
+
+      def precondition_for action, id, box, & oes_p
+        id = @model_class.persist_to
+        if id
+
+          # assume this is an "ordinary" business silo with datastore and so
+          # its precondition *is* the datastore. we could also place a dummy
+          # value here and let the entity fetch the d.s from the box itself.
+
+          box.fetch id.full_name_i
+        else
+          _implement_me
+        end
+      end
+
+      def precondition_for_self( * )
+        _implement_me
+      end
+
+      def _implement_me
+        _loc = caller_locations( 1 ..1 ).first
+        raise "implement me - `#{ @model_class }::Silo_Daemon##{ _loc.label }`"
       end
     end
 

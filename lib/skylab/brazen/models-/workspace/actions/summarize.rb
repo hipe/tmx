@@ -10,7 +10,7 @@ module Skylab::Brazen
 
       def produce_result
         ok = resolve_existent_workspace
-        ok &&= resolve_datastore
+        ok &&= @ws.resolve_datastore_( & handle_event_selectively )
         ok && work
       end
 
@@ -33,16 +33,11 @@ module Skylab::Brazen
 
       ONLY_LOOK_IN_THE_FIRST_DIRECTORY___ = 1  # for now, searching upwards is not an option
 
-      def resolve_datastore
-        @ds = @ws.datastore
-        @ds and ACHIEVED_
-      end
-
       def work
         bx = Box_.new
         one = -> { 1 }
         increment = -> d { d + 1 }
-        st = @ds.to_section_stream( & handle_event_selectively )
+        st = @ws.cfg_.to_section_stream( & handle_event_selectively )
         sect = st.gets
 
         while sect

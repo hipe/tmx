@@ -51,6 +51,11 @@ module Skylab::Brazen::TestSupport::Model::Entity
 
         class E__Integer
 
+          def initialize
+            @on_event_selectively = nil  # avoid a warning
+            super
+          end
+
           include Test_Instance_Methods_
 
           Subject_.call self do

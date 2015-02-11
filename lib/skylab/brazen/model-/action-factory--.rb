@@ -176,10 +176,7 @@ module Skylab::Brazen
         end
 
         def via_edited_entity_produce_result  # :+#public-API
-          _ok = @edited_entity.any_native_create_before_create_in_datastore
-          _ok and begin
-            @edited_entity.result_for_persist self
-          end
+          @edited_entity.result_for_persist self, & handle_event_selectively
         end
       end
 
@@ -302,10 +299,17 @@ module Skylab::Brazen
         include Semi_Generated_Instance_Methods__
 
         def produce_result
+
           __init_selective_listener_proc_for_delete
+
+          oes_p = handle_event_selectively
+
           ok = __via_args_resolve_subject_entity
-          ok &&= @subject_entity.intrinsic_delete self
-          ok and @datastore.receive_delete_entity self, @subject_entity, & handle_event_selectively
+
+          ok &&= @subject_entity.intrinsic_delete_before_delete_in_datastore(
+            self, & oes_p )
+
+          ok and @datastore.receive_delete_entity self, @subject_entity, & oes_p
         end
 
         def __init_selective_listener_proc_for_delete
@@ -330,7 +334,7 @@ module Skylab::Brazen
 
         def __via_identifier_resolve_subject_entity
           datastore
-          @subject_entity = @datastore.entity_via_identifier @identifier, & handle_event_selectively
+          @subject_entity = @datastore.entity_via_intrinsic_key @identifier, & handle_event_selectively
           @subject_entity ? PROCEDE_ : UNABLE_
         end
       end

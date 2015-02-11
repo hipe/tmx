@@ -181,15 +181,13 @@ module Skylab::Brazen
 
     def silo_via_identifier id, & oes_p
       if id.is_resolved
-        prdc_silo id
+        _produce_silo id
       else
-        cols_via_unresolved_id id, & oes_p
+        __cols_via_unresolved_id id, & oes_p
       end
     end
 
-  private
-
-    def cols_via_unresolved_id id, & oes_p
+    def __cols_via_unresolved_id id, & oes_p
       id = id.as_mutable_for_resolving
       node = self ; mod_a = nil
       full_raw_s_a = id.raw_name_parts
@@ -198,15 +196,15 @@ module Skylab::Brazen
         index += 1
         target_s = full_raw_s_a.fetch index
         if ! mod_a
-          mod_a = some_modules_array_via_mod node
+          mod_a = __some_modules_array_via_mod node
           local_index = -1
         end
         local_index += 1
-        reduce_search_space mod_a, local_index, target_s
+        __reduce_search_space mod_a, local_index, target_s
         case 1 <=> mod_a.length
         when  0
           node = mod_a.fetch 0
-          _num_parts = some_name_function_via_mod( node ).as_parts.length
+          _num_parts = _some_name_function_via_mod( node ).as_parts.length
           _start_of_next_part = index - local_index + _num_parts
           id.add_demarcation_index _start_of_next_part
           _is_silo =
@@ -217,15 +215,13 @@ module Skylab::Brazen
           end
           if _is_silo
             id.bake node
-            result = prdc_silo id
+            result = _produce_silo id
             break
           else
             mod_a = nil
           end
         when  1
-          result = oes_p.call :not_found do
-            bld_model_not_found_event id, target_a
-          end
+          result = __when_not_found id, target_s, & oes_p
           break
         when -1
           self._NEATO
@@ -234,9 +230,25 @@ module Skylab::Brazen
       result
     end
 
-    def reduce_search_space mod_a, local_index, target_s
+    def __when_not_found id, target_s, & oes_p
+      if oes_p
+        oes_p.call :not_found do
+          _build_model_not_found_event id, target_s
+        end
+      else
+        raise _build_model_not_found_event( id, target_s ).to_exception
+      end
+    end
+
+    def _build_model_not_found_event id, s
+      Brazen_.event.inline_with :node_not_found,
+        :token, s, :identifier, id,
+        :error_category, :name_error
+    end
+
+    def __reduce_search_space mod_a, local_index, target_s
       mod_a.each_with_index do |mod, d|
-        s = some_name_function_via_mod( mod ).as_parts[ local_index ]
+        s = _some_name_function_via_mod( mod ).as_parts[ local_index ]
         if ! ( s and target_s == s )
           mod_a[ d ] = nil
         end
@@ -244,7 +256,7 @@ module Skylab::Brazen
       mod_a.compact! ; nil
     end
 
-    def some_name_function_via_mod mod
+    def _some_name_function_via_mod mod
       if mod.respond_to? :name_function
         mod.name_function
       else
@@ -255,7 +267,7 @@ module Skylab::Brazen
       end
     end
 
-    def some_modules_array_via_mod mod
+    def __some_modules_array_via_mod mod
       if mod.respond_to? :to_node_stream
         mod.to_node_stream.to_a
       else
@@ -266,7 +278,7 @@ module Skylab::Brazen
       end
     end
 
-    def prdc_silo id
+    def _produce_silo id
       ( @touch_silo_p ||= bld_touch_silo_p )[ id ]
     end
 
@@ -296,16 +308,11 @@ module Skylab::Brazen
 
       mod::Silo_Daemon.new self, mod
     end
-
-    def bld_model_not_found_event id, s
-      Brazen_.event.inline_with :node_not_found,
-        :token, s, :identifier, id
-    end
   end
 
   SILO_DAEMON_FILE___ = "silo-daemon#{ Autoloader_::EXTNAME }"
 
-  Kernel_::Node_Identifier__ = class Node_Identifier_
+  Kernel_::Node_Identifier__ = class Node_Identifier_  # :[#022].
 
     class << self
 
@@ -423,6 +430,7 @@ module Skylab::Brazen
     class Mutable_For_Resolving__ < Identifier_Kernel__
 
       def initialize i, s=nil
+        @silo_name_i = nil
         @entity_name_s = s
         @full_name_i = i
       end
@@ -439,6 +447,14 @@ module Skylab::Brazen
 
       def add_demarcation_index d
         ( @d_a ||= [] ).push d ; nil
+      end
+
+      def silo_name_i
+        if @silo_name_i
+          @silo_name_i
+        else
+          @full_name_i
+        end
       end
 
       def silo_name_parts
