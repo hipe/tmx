@@ -33,7 +33,7 @@ module Skylab::Brazen
         end
 
         def to_upper_unbound_action_stream
-          Callback_.stream.via_item ActionClassLike__.new( @p, @name_s, @mod )
+          Callback_::Stream.via_item ActionClassLike__.new( @p, @name_s, @mod )
         end
       end
 
@@ -166,7 +166,7 @@ module Skylab::Brazen
 
           params.pop  # because #here
 
-          bx = Callback_.stream::Mutable_Box_Like_Proxy.new [], {}
+          bx = Callback_::Stream::Mutable_Box_Like_Proxy.new [], {}
           params.each do | opt_req_rest, name_symbol |
 
             case opt_req_rest

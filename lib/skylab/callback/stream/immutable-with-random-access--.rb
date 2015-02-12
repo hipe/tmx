@@ -1,6 +1,6 @@
 module Skylab::Callback
 
-  class Stream__
+  class Stream
 
     class Immutable_with_Random_Access__
 

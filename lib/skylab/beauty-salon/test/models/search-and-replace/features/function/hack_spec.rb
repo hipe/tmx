@@ -26,7 +26,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
           end ]
         end
 
-        o = Callback_.stream.via_nonsparse_array s_a
+        o = Callback_::Stream.via_nonsparse_array s_a
 
         o.gets.should eql "Jazzmatazz"
         o.gets.should eql "Jazzmatazz::Bizzo"

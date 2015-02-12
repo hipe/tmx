@@ -33,7 +33,7 @@ module Skylab::TestSupport
         end
 
         def to_child_stream
-          Callback_.stream.via_nonsparse_array @expression_a
+          Callback_::Stream.via_nonsparse_array @expression_a
         end
 
         class Matchdata

@@ -281,14 +281,14 @@ module Skylab::Brazen
     end
 
     def to_full_pair_stream
-      Callback_.stream.via_nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
+      Callback_::Stream.via_nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
         Pair_.new any_property_value( i ), i
       end
     end
 
     def to_normalized_bound_property_scan
       props = formal_properties
-      Callback_.stream.via_nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
+      Callback_::Stream.via_nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
         trio_via_property props.fetch i
       end
     end
@@ -407,17 +407,17 @@ module Skylab::Brazen
 
       def to_upper_action_cls_strm
         @did ||= work
-        Callback_.stream.via_nonsparse_array @up_a
+        Callback_::Stream.via_nonsparse_array @up_a
       end
 
       def to_lower_action_cls_strm
         @did ||= work
-        Callback_.stream.via_nonsparse_array @down_a
+        Callback_::Stream.via_nonsparse_array @down_a
       end
 
       def to_node_stream
         @did ||= work
-        Callback_.stream.via_nonsparse_array @all_a
+        Callback_::Stream.via_nonsparse_array @all_a
       end
 
       def all_a

@@ -58,8 +58,8 @@ module Skylab::TanMan
 
       def initialize k, _model_class
         @k = k
-        @definition_collection = Callback_.stream.immutable_with_random_access.new(
-          Callback_.stream.ordered( __to_definition_stream ),
+        @definition_collection = Callback_::Stream.immutable_with_random_access.new(
+          Callback_::Stream.ordered( __to_definition_stream ),
           :name_value_for_order )
       end
 
@@ -92,7 +92,7 @@ module Skylab::TanMan
 
           bx = TanMan_::Models_.const_get( nm.as_const, false ).const_get( :Hear_Map, false )::Definitions
 
-          Callback_.stream.via_nonsparse_array bx.constants do | const |
+          Callback_::Stream.via_nonsparse_array bx.constants do | const |
 
             Definition__.new(
               bx.const_get( const, false ),
@@ -107,7 +107,7 @@ module Skylab::TanMan
 
       def __to_name_of_module_that_has_hear_map_stream
 
-        Callback_.stream.via_nonsparse_array(
+        Callback_::Stream.via_nonsparse_array(
 
           ::Dir[ "#{ Models_.dir_pathname }/*/hear-map#{ Autoloader_::EXTNAME }" ]
 

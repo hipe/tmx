@@ -355,7 +355,7 @@ module Skylab::Brazen
         h = @argument_box.h_
         _Trio = Trio__[]
 
-        Callback_.stream.via_times a.length do | d |
+        Callback_::Stream.via_times a.length do | d |
           k = a.fetch d
           _Trio.new h.fetch( k ), true, fo.fetch( k )
         end

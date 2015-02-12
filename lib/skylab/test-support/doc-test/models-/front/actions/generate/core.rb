@@ -401,7 +401,7 @@ module Skylab::TestSupport
 
           @__generate_action_formal_props_box__ = bx
 
-          Callback_.stream.immutable_with_random_access.new_with(
+          Callback_::Stream.immutable_with_random_access.new_with(
             :key_method_name, :name_symbol,
             :upstream, bx.to_value_stream )
 

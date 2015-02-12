@@ -91,7 +91,7 @@ module Skylab::Brazen
         if @down_IO.size.nonzero?
           @down_IO.truncate 0
         end
-        _scan = Callback_.stream.via_nonsparse_array @pair_a
+        _scan = Callback_::Stream.via_nonsparse_array @pair_a
         ok = Brazen_.cfg.write @down_IO,
           _scan, 'current', 'curried-search-and-replace-agent'
         if ok

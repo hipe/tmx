@@ -89,7 +89,7 @@ module Skylab::Cull
           final_a.concat a
         end
 
-        Callback_.stream.via_nonsparse_array final_a
+        Callback_::Stream.via_nonsparse_array final_a
       end
     end
   end

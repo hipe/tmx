@@ -193,7 +193,7 @@ module Skylab::TanMan
 
           _pn_a = base_pn.children false
 
-          scan = Callback_.stream.via_nonsparse_array( _pn_a ).map_reduce_by do |pn|
+          scan = Callback_::Stream.via_nonsparse_array( _pn_a ).map_reduce_by do |pn|
             props.replace_hash 'name' => pn.to_path
             fly
           end

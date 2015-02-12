@@ -59,7 +59,7 @@ module Skylab::Basic  # introduction at [#020]
       def reduce_array_against_string a, s, * p_a, & p
         p and p_a.push p
         _reduce_to_array_stream_against_regex(
-          Callback_.stream.via_nonsparse_array( a.select{ |x| x }.to_a ),
+          Callback_::Stream.via_nonsparse_array( a.select{ |x| x }.to_a ),
           case_insensitive_regex_via_string( s ),
           s,
           p_a )

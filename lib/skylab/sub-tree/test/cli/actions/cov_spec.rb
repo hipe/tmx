@@ -58,7 +58,7 @@ describe "[st] CLI actions cov" do
       argv CMD_, '-l', "./#{ PN_ }/test"
     end
 
-    scn = Callback_.stream.via_nonsparse_array emission_a
+    scn = Callback_::Stream.via_nonsparse_array emission_a
     em = scn.gets
     em.stream_symbol.should eql :payload
 
@@ -93,7 +93,7 @@ describe "[st] CLI actions cov" do
 
   it "show a shallow tree of matched test files only." do
     argv CMD_, '-s', Abs_testdir_[]
-    scn = Callback_.stream.via_nonsparse_array emission_a
+    scn = Callback_::Stream.via_nonsparse_array emission_a
     em = scn.gets
     em.stream_symbol.should eql :payload
     text[ em ].should match %r(\A/.+/test\z)  # first line is test dir abspath

@@ -90,7 +90,7 @@ module Skylab::Cull
     end
 
     def to_actual_property_stream
-      Callback_.stream.via_nonsparse_array @actual_properties
+      Callback_::Stream.via_nonsparse_array @actual_properties
     end
 
     def actual_property_via_name_symbol sym

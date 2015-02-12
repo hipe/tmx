@@ -1,6 +1,6 @@
 module Skylab::Callback
 
-  class Stream__
+  class Stream
 
     class Mutable_Box_Like_Proxy
 
@@ -76,7 +76,7 @@ module Skylab::Callback
       end
 
       def to_stream
-        Callback_.stream.via_times @a.length do | d |  # we could make this accomodate growable boxes during iteration if we needed to
+        Callback_::Stream.via_times @a.length do | d |  # we could make this accomodate growable boxes during iteration if we needed to
           @h.fetch @a.fetch d
         end
       end

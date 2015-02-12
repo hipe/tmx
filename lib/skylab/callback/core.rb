@@ -22,9 +22,9 @@ module Skylab::Callback
 
     def stream( & p )
       if block_given?
-        Callback_::Stream__.new( & p )
+        Callback_::Stream.new( & p )
       else
-        Callback_::Stream__
+        Callback_::Stream
       end
     end
 
@@ -293,7 +293,7 @@ module Skylab::Callback
     end
 
     def to_name_stream
-      Callback_::Stream__.via_nonsparse_array @a
+      Callback_::Stream.via_nonsparse_array @a
     end
 
     def to_value_minimal_stream

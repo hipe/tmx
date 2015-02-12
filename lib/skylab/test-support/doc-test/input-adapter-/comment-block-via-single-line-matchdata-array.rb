@@ -6,7 +6,7 @@ module Skylab::TestSupport
 
       define_singleton_method :[] do |md_a|
 
-        Callback_.stream.via_nonsparse_array md_a do |md|
+        Callback_::Stream.via_nonsparse_array md_a do |md|
           md
         end
       end

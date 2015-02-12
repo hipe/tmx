@@ -70,10 +70,10 @@ module Skylab::Headless
         p_a and build_producer_from_p_a p_a
       end
       def build_producer_from_p_a p_a
-        Callback_.stream.via_nonsparse_array( p_a ).expand_by do |p|
+        Callback_::Stream.via_nonsparse_array( p_a ).expand_by do |p|
           y = []
           @client.instance_exec y, & p
-          Callback_.stream.via_nonsparse_array y
+          Callback_::Stream.via_nonsparse_array y
         end
       end
       def absorb_desc_lines_and_sections_from_raw_lines_producer producer

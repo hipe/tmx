@@ -213,7 +213,7 @@ module Skylab::Brazen
         end
 
         def to_node_stream
-          Callback_.stream.via_nonsparse_array @a
+          Callback_::Stream.via_nonsparse_array @a
         end
 
         def count_number_of_nodes i
@@ -254,7 +254,7 @@ module Skylab::Brazen
         end
 
         def _to_node_stream_via_symbol sym
-          _to_node_streamish Callback_.stream.stream_class, sym
+          _to_node_streamish Callback_::Stream.stream_class, sym
 
         end
 
@@ -1042,7 +1042,7 @@ module Skylab::Brazen
         end
 
         def to_node_stream
-          Callback_.stream.the_empty_stream
+          Callback_::Stream.the_empty_stream
         end
 
         def for_edit

@@ -117,14 +117,14 @@ module Skylab::MetaHell
           end
 
           o.set_reflective_function_stream(
-            Callback_.stream.via_nonsparse_array @function_a )
+            Callback_::Stream.via_nonsparse_array @function_a )
 
           o.set_downstream y
         end
       end
 
       def to_reflective_function_stream_  # for above
-        Callback_.stream.via_nonsparse_array @function_a
+        Callback_::Stream.via_nonsparse_array @function_a
       end
 
       def to_parse_array_fully_proc

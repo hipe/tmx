@@ -142,7 +142,7 @@ module Skylab::TanMan
         class << self
 
           def to_upper_unbound_action_stream
-            Callback_.stream.via_item self
+            Callback_::Stream.via_item self
           end
 
           def to_lower_unbound_action_stream  # #hook-in [br]

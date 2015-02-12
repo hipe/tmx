@@ -85,7 +85,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
         _text_span = Omni_Mock_.new [ desc_line ]
 
-        _lines = Callback_.stream.via_nonsparse_array code_line_a
+        _lines = Callback_::Stream.via_nonsparse_array code_line_a
 
         _matchdata = DocTest_::
           Intermediate_Streams_::Models_::Example_Node::Matchdata.new(
@@ -94,7 +94,7 @@ module Skylab::TestSupport::TestSupport::DocTest
         _x = Subject_[]::Intermediate_Streams_::Models_::Example_Node.new(
           _text_span, _matchdata )
 
-        Callback_.stream.via_item _x
+        Callback_::Stream.via_item _x
       end
     end
 

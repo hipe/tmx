@@ -66,7 +66,7 @@ module Skylab::CodeMolester
         def to_content_item_scan
           _scan = nosecs_sexp.to_content_item_scan
           _scan_ = sections_sexp.to_content_item_scan
-          Callback_.stream.concat _scan, _scan_
+          Callback_::Stream.concat _scan, _scan_
         end
 
         def nosecs_sexp
@@ -306,7 +306,7 @@ module Skylab::CodeMolester
 
       Content_items__ = Callback_.memoize do
 
-        class Content_Items__ < Callback_.stream.mutable_with_random_access
+        class Content_Items__ < Callback_::Stream.mutable_with_random_access
 
           def initialize sexp
             super sexp.method( :to_content_item_scan ), :item_name

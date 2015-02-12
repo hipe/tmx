@@ -86,7 +86,7 @@ module Skylab::Face
       end
 
       Aggregate = new do |a|
-        _scn = Callback_.stream.via_nonsparse_array a
+        _scn = Callback_::Stream.via_nonsparse_array a
         scn = Callback_::Scn.articulators.eventing(
           :gets_under, _scn,
           :iff_zero_items, -> y do

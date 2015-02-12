@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module String
 
-    class Line_Scanner__ < Callback_.stream.stream_class
+    class Line_Scanner__ < Callback_::Stream.stream_class
 
       # read [#024] (in [#022]) the string scanner narrative
 

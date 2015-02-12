@@ -346,7 +346,7 @@ module Skylab::Brazen
         idx && @a.fetch( idx )
       end
       def to_stream
-        Callback_.stream.via_nonsparse_array @a
+        Callback_::Stream.via_nonsparse_array @a
       end
       def each_pair
         @a.each do | ast |

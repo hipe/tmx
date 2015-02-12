@@ -254,7 +254,7 @@ module Skylab::CodeMolester
 
       lbl = field.local_normal_name.id2name  # #todo
 
-      _upstream_scan = Callback_.stream.via_nonsparse_array predicate_s_a
+      _upstream_scan = Callback_::Stream.via_nonsparse_array predicate_s_a
 
       scn = Callback_::Scn.articulators.eventing(
 

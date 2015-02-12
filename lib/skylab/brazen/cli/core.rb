@@ -347,7 +347,7 @@ module Skylab::Brazen
       end
 
       def wrap_adapter_stream_with_ordering_buffer_ st
-        Callback_.stream.ordered st
+        Callback_::Stream.ordered st
       end
 
     private
@@ -428,7 +428,7 @@ module Skylab::Brazen
         if @front_properties
           @front_properties.to_stream
         else
-          Callback_.stream.via_nonsparse_array EMPTY_A_
+          Callback_::Stream.via_nonsparse_array EMPTY_A_
         end.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :help
       end
 
@@ -1419,7 +1419,7 @@ module Skylab::Brazen
         @a = a
       end
       def produce_result
-        scn = Callback_.stream.via_nonsparse_array @a
+        scn = Callback_::Stream.via_nonsparse_array @a
         while exe = scn.gets
           value = exe.receiver.send exe.method_name, * exe.args
           value.nonzero? and break

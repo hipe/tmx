@@ -34,27 +34,44 @@ problem.
 
 
 
-### on the visibility of the node (extreme detail)
+### on building streams and the visibility of the node
 
-the reason we rename this to be a private node (`[cb]::Stream__` not
-`[cb]::Stream`) is for implementation hiding: the thing we do with
-sub-classing Proc is (although “elegant”) perhaps kinda weird and not very
-future-proofy.
+it is called `[cb]::Stream` and not (e.g) `[cb]::Stream__` in part
+because that is the naming guideline for all nodes at the topmost
+level of a sidesystem [#citation-needed]: such nodes are solidly part
+of the subsystem so the code reads (and executes) more directly when
+using these, rather than "rounded" singleton methods [#citation-needed].
 
-but wait, that’s not why. the reason is that when we build streams
-themselves it is either functionally or through using one of the macros
-(a "macro" begin a method like `build_a_stream_from_a_nonsparse_array` or
+in practice we most frequently build streams either functionally
+or with one of the convenience macros (singleton methods with names
+like `build_a_stream_from_a_nonsparse_array` or
 `build_a_stream_with_this_one_trueish_item_as_its_only_item (names are
 made up but equivalent methods exist)).
 
-for the latter (building via macros), we should be using a “library shell”
-anyway (an object whose only job is to have methods that correspond to
-public singleton methods of that node (i.e its “library methods”)).
+(at the time of this writing occurrences of the former had a count
+of 46 and the latter 91, for a ratio of about 1:2 hand-written
+functions-to-macros.)
 
-for the former (building a stream functionally) since the argument here to
-build such a thing is only proc, the current favored way to do that is by
-using a block, and we like `[cb].stream do ..` better than
-`[cb]::Stream.new do ..` probably just because its shorter.
+for the case where we are building your stream functionally (e.g
+often with proc that calls another proc that changes during the
+traversal of your stream), it is best to use the `[cb].stream` rounded
+singleton method rather than accessing `Stream` directly, because we
+would like some implementation hiding: the fact that we subclass
+::Proc is "elegant" as an implementation but should not be assumed,
+hence the below former is prefered to the below latter:
+
+    my_stream = [cb].stream do
+      # ..
+    end
+
+the above is better than the below:
+
+    my_stream = [cb]::Stream.new do
+      # ..
+    end
+
+the former is preferred because we don't want to publicize the fact
+that we are subclassing Proc -- this implementation may change.
 
 
 

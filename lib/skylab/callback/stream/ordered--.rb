@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   module Callback_
 
-    class Stream__::Ordered__
+    class Stream::Ordered__
 
       Actor_.call self, :properties,
         :upstream
@@ -89,7 +89,7 @@ module Skylab::Brazen
         @went_h[ my_name_x ] = true
         items_waiting_for_me = @waiting_h.delete my_name_x
         if items_waiting_for_me
-          @ready_buffer_queue.push Callback_.stream.via_nonsparse_array items_waiting_for_me
+          @ready_buffer_queue.push Callback_::Stream.via_nonsparse_array items_waiting_for_me
           @p = @gets_from_buffer
         end
         nil

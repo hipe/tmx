@@ -4,7 +4,7 @@ module Skylab::Headless
 
     module Parser__
 
-      class Scanner__ < Callback_.stream.immutable_with_random_access  # :+[#053]
+      class Scanner__ < Callback_::Stream.immutable_with_random_access  # :+[#053]
 
         # a custom scanner class (has random access with caching) made just
         # for option parsers, specifically for querying for a specific option

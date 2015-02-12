@@ -68,7 +68,7 @@ module Skylab::Brazen::TestSupport::Models::Workspace
 
       ev = expect_event :summary
       ev.render_all_lines_into_under y=[], black_and_white_expression_agent_for_expect_event
-      scn = Brazen_::Callback_.stream.via_nonsparse_array y
+      scn = Brazen_::Callback_::Stream.via_nonsparse_array y
       scn.gets.should match %r(\Asummary of «.+#{ ::Regexp.escape cfg_filename }»:\z)
       scn.gets.should match %r(\A[^[:alnum:]]*2 poet or authors\z)
       scn.gets.should match %r(\A[^[:alnum:]]*2 vocabularies\z)

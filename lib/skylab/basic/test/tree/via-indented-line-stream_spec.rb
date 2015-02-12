@@ -139,7 +139,7 @@ module Skylab::Basic::TestSupport::Tree
       else
         Basic_::EMPTY_A_
       end
-      @lines = Basic_::Callback_.stream.via_nonsparse_array _line_a
+      @lines = Basic_::Callback_::Stream.via_nonsparse_array _line_a
       build_tree
       nil
     end

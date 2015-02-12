@@ -15,7 +15,7 @@ module Skylab::TanMan::TestSupport::Models::Meaning::Graph
     def graph_from * s_pair_a
 
       TanMan_::Models_::Meaning::Graph__.new(
-        TanMan_::Callback_.stream.via_nonsparse_array( s_pair_a ) do | s, s_ |
+        TanMan_::Callback_::Stream.via_nonsparse_array( s_pair_a ) do | s, s_ |
           TanMan_::Models_::Meaning.new s, s_
         end )
     end

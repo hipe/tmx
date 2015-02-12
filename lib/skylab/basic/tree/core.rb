@@ -180,9 +180,9 @@ module Skylab::Basic
 
       def to_child_stream
         if has_children
-          Callback_.stream.via_nonsparse_array @children
+          Callback_::Stream.via_nonsparse_array @children
         else
-          Callback_.stream.the_empty_stream
+          Callback_::Stream.the_empty_stream
         end
       end
     end

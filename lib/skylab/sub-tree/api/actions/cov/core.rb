@@ -94,7 +94,7 @@ module Skylab::SubTree
         end,
         :local_test_pathname_scan_proc, -> do
           entry_a = ::Dir[ glob ]
-          Callback_.stream.via_nonsparse_array entry_a do | entry_s |
+          Callback_::Stream.via_nonsparse_array entry_a do | entry_s |
             _spec_pn = ::Pathname.new entry_s
             _spec_pn.relative_path_from sub_dir
           end

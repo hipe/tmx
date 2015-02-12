@@ -269,7 +269,7 @@ module Skylab::CodeMolester
         hot_entity_scan_via_resource resource
       else
         send_event event
-        Callback_.stream.the_empty_stream
+        Callback_::Stream.the_empty_stream
       end
     end
 
@@ -278,7 +278,7 @@ module Skylab::CodeMolester
       if sects
         hot_entity_scan_via_sections sects
       else
-        Callback_.stream.the_empty_stream
+        Callback_::Stream.the_empty_stream
       end
     end
 

@@ -132,7 +132,7 @@ module Skylab::BeautySalon
                 end
               end while nil
               lines.reverse!
-              Callback_.stream.via_nonsparse_array lines
+              Callback_::Stream.via_nonsparse_array lines
             end
 
             def segment_stream_from match

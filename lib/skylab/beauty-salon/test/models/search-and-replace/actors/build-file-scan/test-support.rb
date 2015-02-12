@@ -20,7 +20,7 @@ module Skylab::BeautySalon::TestSupport::Models::S_and_R::Actors_BFS
 
     def build_stream_for_single_path_to_file_with_three_lines
 
-      Callback_.stream.via_item( TestSupport_::Data::Universal_Fixtures.
+      Callback_::Stream.via_item( TestSupport_::Data::Universal_Fixtures.
         dir_pathname.join( 'three-lines.txt' ).to_path )
 
     end

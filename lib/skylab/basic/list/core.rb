@@ -28,7 +28,7 @@ module Skylab::Basic
     end
 
     Build_pairs_scan_via_even_iambic__ = -> a do
-      Callback_.stream.via_times( a.length / 2 ).map_by do |d|
+      Callback_::Stream.via_times( a.length / 2 ).map_by do |d|
         d = d << 1
         [ a.fetch( d ), a.fetch( d + 1 ) ]
       end

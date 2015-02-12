@@ -1,6 +1,6 @@
 module Skylab::Callback
 
-      class Stream__ < ::Proc  # see [#044]
+      class Stream < ::Proc  # see [#044]
 
         alias_method :gets, :call
 

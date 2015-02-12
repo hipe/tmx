@@ -57,7 +57,7 @@ module Skylab::Callback::TestSupport
     end
 
     def subject
-      Callback_::Stream__
+      Callback_::Stream
     end
   end
 end

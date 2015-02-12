@@ -11,7 +11,7 @@ module Skylab::MetaHell
         end
 
         def to_reflective_function_stream
-          Callback_.stream.via_nonsparse_array @_function_a
+          Callback_::Stream.via_nonsparse_array @_function_a
         end
       end
     end

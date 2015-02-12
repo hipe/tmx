@@ -1,6 +1,6 @@
 module Skylab::Callback
 
-  class Stream__
+  class Stream
 
     class Mutable_with_Random_Access__  # abstract base class
 
