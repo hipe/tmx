@@ -641,14 +641,16 @@ module Skylab::Brazen
     end
 
     def result_for_persist action, & oes_p
-      _datastore.receive_persist_entity action, self, & oes_p
+      entity_collection.receive_persist_entity action, self, & oes_p
     end
 
     def intrinsic_delete_before_delete_in_datastore _action, & oes_p
       ACHIEVED_
     end
 
-    def _datastore
+  private
+
+    def entity_collection  # :+#public-API
       @preconditions.fetch self.class.persist_to.full_name_i
     end
 

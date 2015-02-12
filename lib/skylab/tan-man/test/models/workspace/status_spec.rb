@@ -11,7 +11,7 @@ module Skylab::TanMan::TestSupport::Models::Workspace
       ev = expect_OK_event :resource_not_found
       black_and_white( ev ).should eql '"tanman-workspace/config" not found in dirs'
       expect_no_more_events
-      # expect_succeeded  # result is nil - #todo maybe?
+      expect_succeeded
     end
 
     it "partay" do

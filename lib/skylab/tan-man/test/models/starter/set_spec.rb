@@ -13,8 +13,9 @@ module Skylab::TanMan::TestSupport::Models::Starter
       prepare_ws_tmpdir <<-HERE.unindent
         --- /dev/null
         +++ b/#{ cfn }
-        @@ -0,0 +1 @@
-        +using_starter=holy-foly.dot
+        @@ -0,0 +1,2 @@
+        +[ xy ]
+        +using-starter=holy-foly.dot
       HERE
 
       call_API :starter, :set,
@@ -27,6 +28,7 @@ module Skylab::TanMan::TestSupport::Models::Starter
         s_a.should eql [ "digraph.dot", "holy-smack.dot", "minimal.dot" ]
         ev.name_string.should eql 'wiz'
       end
+
       expect_failed
     end
 
@@ -68,6 +70,7 @@ module Skylab::TanMan::TestSupport::Models::Starter
         +using-starter = fizzibble.dot
       HERE
 
+
       @pn = @ws_pn.join cfn
 
       call_API :starter, :set, :name, 'digr',
@@ -85,6 +88,7 @@ module Skylab::TanMan::TestSupport::Models::Starter
       line_a = excerpt( -2 .. -1 ).split( NEWLINE_ )
       line_a[ 0 ].should eql 'using-starter = fizzibble.dot'
       line_a[ 1 ].should eql '[starter "digraph.dot"]'
+
     end
   end
 end

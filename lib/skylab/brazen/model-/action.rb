@@ -315,7 +315,9 @@ module Skylab::Brazen
         @h = {}
       end
 
-      def members ; [ :fo, :argument_box ] end ; attr_reader :fo, :argument_box
+      def members ; [ :fo, :argument_box ] end
+
+      attr_reader :fo, :argument_box
 
       def [] k
         fetch k do end
@@ -344,6 +346,18 @@ module Skylab::Brazen
           else
             raise ::KeyError, "no formal or actual argument '#{ k }'"
           end
+        end
+      end
+
+      def to_value_stream
+        a = @argument_box.a_
+        fo = @fo
+        h = @argument_box.h_
+        _Trio = Trio__[]
+
+        Callback_.stream.via_times a.length do | d |
+          k = a.fetch d
+          _Trio.new h.fetch( k ), true, fo.fetch( k )
         end
       end
     end

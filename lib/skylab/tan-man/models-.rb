@@ -65,7 +65,7 @@ module Skylab::TanMan
     end
 
     def name
-      self._ONLY_TO_LOOK_LIKE_A_MODULE  # #todo
+      fail  # this is only here to exist as a method, to make it look like a module
     end
   end
 
@@ -161,19 +161,119 @@ module Skylab::TanMan
     end
   end
 
-  class Collection_Controller_ < Brazen_.model.collection_controller_class
-
-  end
-
   class Kernel_ < Brazen_::Kernel_  # :[#083].
     # :+#archive-tombstone: this used to be bottom properties frame
+  end
+
+  module Common_Collection_Controller_Methods_
+
+    # ~ :++#CC-abstraction-candidate(s)
+
+    def one_entity_against_natural_key_fuzzily_ name_s, & oes_p
+
+      a = __reduce_to_array_against_natural_key_fuzzily name_s, & oes_p
+
+      a and begin
+        __one_entity_via_entity_array(
+          a,
+          name_s,
+          & oes_p )
+      end
+    end
+
+    def __reduce_to_array_against_natural_key_fuzzily name_s, & oes_p
+
+      st = entity_stream_via_model _model_class, & oes_p
+
+      st and __fuzzy_reduce_to_array_stream_against_natkey st, name_s, & oes_p
+    end
+
+    def __fuzzy_reduce_to_array_stream_against_natkey st, name_s, & oes_p
+
+      TanMan_.lib_.basic::Fuzzy.reduce_to_array_stream_against_string(
+
+        st,
+
+        name_s,
+
+        -> ent do
+          ent.natural_key_string
+        end,
+
+        -> ent do
+          ent.dup
+        end )
+    end
+
+    def __one_entity_via_entity_array ent_a, name_s, & oes_p
+
+      case 1 <=> ent_a.length
+      when  0
+        ent_a.fetch 0
+      when -1
+        __one_entity_when_via_fuzzy_lookup_ambiguous ent_a, name_s, & oes_p  # #open [#012] not implemented
+      when  1
+        __when_zero_entities_found_against_natural_key name_s, & oes_p
+      end
+    end
+
+    def __when_zero_entities_found_against_natural_key name_s, & oes_p
+
+      oes_p ||= handle_event_selectively
+
+      oes_p.call :error, :entity_not_found do
+        __build_zero_entities_found_against_natural_key_event name_s
+      end
+
+      UNABLE_
+    end
+
+    def __build_zero_entities_found_against_natural_key_event name_s
+
+      _scn = entity_stream_via_model _model_class do  # :+#hook-in
+      end
+
+      _a_few_ent_a = _scn.take A_FEW__ do |x|
+        x.dup
+      end
+
+      build_not_OK_event_with :entity_not_found,
+          :name_string, name_s,
+          :a_few_ent_a, _a_few_ent_a,
+          :model_class, _model_class do | y, o |
+
+        human_s = o.model_class.name_function.as_human
+
+        s_a = o.a_few_ent_a.map do |x|
+          val x.natural_key_string
+        end
+
+        _some_known_nodes = case 1 <=> s_a.length
+        when -1
+          "(some known #{ human_s }#{ s s_a }: #{ s_a * ', ' })"
+        when  0
+          "(the only known #{ human_s } is #{ s_a.first })"
+        when  1
+          "(there are no #{ human_s }s)"
+        end
+
+        y << "#{ human_s } not found: #{
+         }#{ ick o.name_string } #{
+          }#{ _some_known_nodes }"
+
+      end
+    end
+
+    A_FEW__ = 3
+
+    def _model_class
+      @model_class or self._SET_THIS_IVAR
+    end
   end
 
   Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
 
   class Models_::Workspace < Brazen_::Models_::Workspace
-
-    self.persist_to = :datastores_git_config
 
     set_workspace_config_filename 'tanman-workspace/config'
 
@@ -346,7 +446,7 @@ module Skylab::TanMan
       @property_box[ :value ]
     end
 
-    Stub_ = Stubber_[ self ]
+    Stub_ = Stubber_[ self ]  # :+[#br-043] magic name
 
     module Actions
       Add = Stub_[ :Add ]

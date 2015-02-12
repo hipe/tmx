@@ -83,7 +83,7 @@ module Skylab::TanMan
     #   - If the rule name is of the form "foo_list" we infer the stem "foo"
     #   - else if an inference can be made of the syntax node that is under the
     #     "head' label, we infer the stem from that
-    #     (#todo the above sucks and must be removed.  such lists should be
+    #     (#wont-fix the above sucks and must be removed.  such lists should be
     #     possibly zero-length and as such this is a non-deterministic hack.
     #     *unless* of course the only time (and hence first time)
     #     this hack is triggered is when it is with a list that is nonzero

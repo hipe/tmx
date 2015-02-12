@@ -24,7 +24,7 @@ module Skylab::TanMan
 
       def produce_result
 
-        bx = to_trio_box
+        bx = __to_trio_box
         bx.add :stdout, TanMan_.lib_.basic.trio( stdout, true, nil )
 
         bc = @kernel.silo( :hear_front ).__bound_call_via_trio_box(
@@ -36,6 +36,16 @@ module Skylab::TanMan
         else
           bc
         end
+      end
+
+      def __to_trio_box
+        bx = Callback_::Box.new
+        fo = formal_properties
+        _Trio = TanMan_.lib_.basic.trio
+        @argument_box.each_pair do | k, x |
+          bx.add k, _Trio.new( x, true, fo.fetch( k ) )
+        end
+        bx
       end
     end
 

@@ -66,50 +66,35 @@ module Skylab::TanMan
 
       def node_collection_controller_via_document_controller dc, & oes_p
 
-        # experiment with action-free silos starts here
+        # :+#actionless-collection-controler-experiment
 
-        pc = Callback_::Box.new
-        pc.add :dot_file, dc
+        bx = Callback_::Box.new
+        bx.add :dot_file, dc
 
-        mc = model_class
+        precondition_for_self :_no_action_,
+          @model_class.node_identifier,
+          bx,
+          & oes_p
+      end
 
-        mc.collection_controller_class.new_with(
-          :action, :__no_action__,
-          :preconditions, pc,
-          :model_class, mc,
-          :kernel, @kernel, & oes_p )
+      def precondition_for_self act, id, box, & oes_p
+        Collection_Controller__.new act, box, @model_class, @kernel, & oes_p
       end
     end
 
     class Collection_Controller__ < Model_::Document_Entity::Collection_Controller
 
-      def entity_stream_via_model model
-        if model_class == model
-          to_node_sexp_stream.map_by do | node |
-            _entity_via_node node
-          end
-        end
+      include Common_Collection_Controller_Methods_
+
+      def to_preconditions_plus_self__
+        bx = @precons_box_.dup
+        bx.add(
+          @model_class.name_function.as_lowercase_with_underscores_symbol,
+          self )
+        bx
       end
 
-      def entity_via_identifier node_identifier, & oes_p
-
-        label_s = node_identifier.entity_name_s
-
-        node = to_node_sexp_stream.detect do | node_ |
-          label_s == node_.label
-        end
-
-        if node
-
-          _entity_via_node node
-
-        elsif oes_p
-          oes_p.call :info, :entity_not_found do
-            Callback_::Event.inline_neutral_with :entity_not_found,
-              :entity_name_string, node_identifier.entity_name_s
-          end
-        end
-      end
+      # ~ c r u d
 
       def entity_via_natural_key_fuzzily s
 
@@ -137,31 +122,59 @@ module Skylab::TanMan
         when  0
           _entity_via_node found_a.fetch 0
         when -1
-          self._BEHAVIOR_IS_NOT_YET_DESIGNED  # #todo
+          self._BEHAVIOR_IS_NOT_YET_DESIGNED  # #open similar to [#012]
         end
       end
 
-      def retrieve_any_node_with_id i
-        to_node_sexp_stream.detect do |node|
-          i == node.node_id
+      def entity_via_intrinsic_key node_identifier, & oes_p
+
+        label_s = node_identifier.entity_name_s
+
+        node = to_node_sexp_stream.detect do | node_ |
+          label_s == node_.label
+        end
+
+        if node
+
+          _entity_via_node node
+
+        elsif oes_p
+          oes_p.call :info, :entity_not_found do
+            Callback_::Event.inline_neutral_with :entity_not_found,
+              :entity_name_string, node_identifier.entity_name_s
+          end
+        end
+      end
+
+      def entity_stream_via_model model
+        if @model_class == model
+          to_node_sexp_stream.map_by do | node |
+            _entity_via_node node
+          end
+        end
+      end
+
+      def retrieve_any_node_with_id sym
+        to_node_sexp_stream.detect do | node |
+          sym == node.node_id
         end
       end
 
       def to_node_sexp_stream
-        datastore_controller.at_graph_sexp :nodes
+        document_.at_graph_sexp :nodes
       end
 
       def get_node_statement_scan
-        datastore_controller.at_graph_sexp :node_statements
+        document_.at_graph_sexp :node_statements
       end
 
       def at_graph_sexp i
-        datastore_controller.at_graph_sexp i
+        document_.at_graph_sexp i
       end
 
       def touch_node_via_label s
 
-        node = Node_.edit_entity @kernel, handle_event_selectively do |o|
+        node = Node_.edit_entity @kernel, @on_event_selectively do |o|
           o.edit_with :name, s
         end
 
@@ -179,34 +192,34 @@ module Skylab::TanMan
         mutate_via_verb_and_entity :touch, entity
       end
 
-      def via_datastore_controller_receive_delete_entity action, ent, & oes_p
+      def receive_delete_entity action, ent, & oes_p
 
         _ok = Node_::Actors__::Mutate::Via_entity.call(
           :delete,
           ent,
-          datastore_controller,
+          document_,
           @kernel, & ( oes_p || @on_event_selectively ) )
 
         _ok and _commit_changes action
       end
 
       def mutate_via_verb_and_entity verb_i, entity
-        _dsc = datastore_controller
         Node_::Actors__::Mutate::Via_entity.call(
           verb_i,
           entity,
-          _dsc,
+          document_,
           @kernel, & @on_event_selectively )
       end
 
       def _entity_via_node node
-        model_class.new( @kernel, & @on_event_selectively ).
-          __init_via_node_stmt_and_immutable_preconditions node, @preconditions
+
+        @model_class.new( @kernel, & @on_event_selectively ).
+          __init_via_node_stmt_and_immutable_preconditions node, @precons_box_
       end
 
       def _commit_changes action
-        datastore_controller.persist_via_args(
-          @action.argument_box[ :dry_run ], * @action.output_arguments )
+        document_.persist_via_args(
+          action.argument_box[ :dry_run ], * action.output_arguments )
       end
     end
 

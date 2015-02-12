@@ -1,6 +1,8 @@
 module Skylab::TanMan
 
-  module Models_::DotFile  # cannot be a model subclass because treetop
+  module Models_::DotFile  # cannot be a model subclass because a) treetop
+    # allows grmamar to be nested within ruby modules but not classes and b)
+    # we want to nest our treetop grammars under the relevant model node.
 
     class << self
 
@@ -31,16 +33,6 @@ module Skylab::TanMan
         true
       end
 
-      # ~ the stack (we have to write them explicitly because treetop)
-
-      def collection_controller_class
-        Collection_Controller__
-      end
-
-      def silo_controller_class
-        Silo_Controller__
-      end
-
       # ~ support
 
       def node_identifier
@@ -58,23 +50,14 @@ module Skylab::TanMan
 
     Actions = ::Module.new
 
-    Collection_Controller__ = :_NONE_
-
-    class Silo_Controller__ < Brazen_.model.silo_controller_class
-
-      def provide_collection_controller_precon _id, graph
-        DotFile_::Actors__::Build_Document_Controller::Via_action[ graph.action ]
-      end
-    end
-
     class Silo_Daemon < Model_::Silo_Daemon
 
       def members
         [ :document_controller_via_trio_box, * super ]
       end
 
-      def model_class
-        DotFile_
+      def precondition_for action, id, box, & oes_p
+        DotFile_::Actors__::Build_Document_Controller::Via_action[ action ]
       end
 
       def document_controller_via_trio_box bx, & oes_p

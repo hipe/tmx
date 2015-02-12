@@ -2,7 +2,7 @@ module Skylab::TanMan::TestSupport::Sexp::Grammars::Namespace60
   grammar NerpZerp60
     rule document
       # interestingly the below custom methods won't take if we have
-      # comment_list as the first rule. #todo find out what it is about
+      # comment_list as the first rule. #meh find out what it is about
       # the rule that makes it so.
       comment_list
       {

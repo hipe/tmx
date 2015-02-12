@@ -10,6 +10,8 @@ module Skylab::TanMan
 
         edit_entity_class(
 
+          :preconditions, EMPTY_A_,
+
           :flag, :property, :use_default,
 
           # reading from the workspace is an option, but the workspace is not a precondition
@@ -20,7 +22,7 @@ module Skylab::TanMan
 
         def produce_result
           Session.new @kernel, handle_event_selectively do | o |
-            o.trio_box = to_trio_box
+            o.trio_box = to_trio_box_proxy
           end.via_trio_box
         end
 

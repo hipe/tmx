@@ -103,7 +103,7 @@ module Skylab::TanMan::TestSupport::Models::Graph
             --- /dev/null
             +++ b/#{ cfn }
             @@ -0,0 +1 @@
-            +[ "whatever" ]
+            +[ whatever ]
             --- /dev/null
             +++ b/#{ cdn }/not-a-dotfile.dot/empty-file.txt
             @@ -0,0 +1 @@
@@ -128,10 +128,9 @@ module Skylab::TanMan::TestSupport::Models::Graph
           shared_setup_via_config_line '["whtvr"]'
           expect_not_OK_event :config_parse_error
           expect_failed
-
         end
 
-        it "and digraph path is file" do
+        it "and digraph path is file - OK" do
 
           shared_setup_via_config_line '[whtvr]'
 

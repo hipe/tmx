@@ -7,7 +7,7 @@ digraph{
   cd [ label="cleanup\ndupe" style=filled ]
   cv [ label="basic CLI\nvisaul re-integration" style=filled ]
   cn [ label="cleanup\nnames" style=filled ]
-  si [ label="silo\nsquash" ]
+  si [ label="silo\nsquash" , style=filled]
   ss [ label="get [tm] to\nbe self-supporting", style=filled]
   st [ label="sg\ntags" style=filled ]
   tu [ label="ttt\nunify" , style=filled]

@@ -20,16 +20,6 @@ module Skylab::TanMan::TestSupport::Models
 
   NEWLINE_ = TestLib_::NEWLINE_
 
-  module Constants
-
-    Within_silo = -> silo_name_i, instance_methods_module do
-      _NODE_ID_ = Brazen_.node_identifier.via_symbol silo_name_i
-      instance_methods_module.send :define_method, :silo_node_identifier do
-        _NODE_ID_
-      end  ; nil
-    end
-  end
-
   module InstanceMethods
 
     # ~ adjunct facet : hearing ( & abstract graphs )
@@ -134,41 +124,8 @@ module Skylab::TanMan::TestSupport::Models
       evr
     end
 
-    def collection_controller
-      @collection_controller ||= b_c_c
-    end
-
-    def b_c_c
-      silo
-      _id = @silo.model_class.node_identifier
-
-      oes_p = handle_event_selectively
-
-      k = kernel
-
-      _inp_a = send :"bld_input_args_when_#{ input_mechanism_i }"
-
-      @action = Mock_Action__.new _inp_a, k, & oes_p
-
-      _g = Brazen_::Model_::Preconditions_::Graph.new @action, k, & oes_p
-
-      @silo.provide_collection_controller_prcn _id, _g, & oes_p
-    end
-
     def bld_input_args_when_input_file_granule
       [ Brazen_.model.actual_property.new( input_file_pathname.to_path, :input_path ) ]
-    end
-
-    def silo_controller
-      @silo_controller ||= b_s_c
-    end
-
-    def silo
-      @silo ||= b_s
-    end
-
-    def b_s
-      kernel.silo_via_identifier silo_node_identifier
     end
 
     def kernel
@@ -269,21 +226,6 @@ module Skylab::TanMan::TestSupport::Models
       CONFIG_FILENAME_SHALLOW___
     end
     CONFIG_FILENAME_SHALLOW___ = 'tern-mern.conf'
-  end
-
-  class Mock_Action__
-
-    def initialize inp_a, k, & oes_p
-      @input_arguments = inp_a
-      @kernel = k
-      @oes_p = oes_p
-    end
-
-    def controller_nucleus  # #experiment in [br]
-      [ @kernel, @oes_p ]
-    end
-
-    attr_reader :input_arguments
   end
 
   THE_DOTFILE__ = 'the.dot'

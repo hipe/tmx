@@ -332,8 +332,15 @@ module Skylab::TanMan
         include mod
         mod.override.each { |meth| alias_method meth, "my_#{meth}" }
       end
-      parent_mod = (cls_modname.nil?) ? ::Object :
-        cls_modname.split('::').inject(::Object){ |m,n| m.const_get(n) }
+
+      parent_mod = if cls_modname
+        cls_modname.split( CONST_SEP_ ).reduce( ::Object ) do | m, s |
+          m.const_get s
+        end
+      else
+        ::Object
+      end
+
       nonum, num = cls_basename.match(/\A(.*[^0-9])([0-9]+)?\Z/).captures
       i = num ? (num.to_i + 1) : 2
       i += 1 while(parent_mod.const_defined?(usename = "#{nonum}#{i}"))

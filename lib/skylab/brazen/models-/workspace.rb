@@ -91,8 +91,8 @@ module Skylab::Brazen
 
     def description_under expag
 
-      if cfg_
-        @cfg_.description_under expag
+      if document_
+        @document_.description_under expag
       else
         path = @property_box[ :surrounding_path ]
         if path
@@ -108,21 +108,28 @@ module Skylab::Brazen
     # ~~ c r u d
 
     def receive_persist_entity act, ent, & oes_p
-      doc = _datastore( & oes_p )
+      doc = _document( & oes_p )
       doc and begin
         doc.receive_persist_entity act, ent, & oes_p
       end
     end
 
     def entity_via_intrinsic_key id, & oes_p
-      doc = _datastore( & oes_p )
+      doc = _document( & oes_p )
       doc and begin
         doc.entity_via_intrinsic_key id, & oes_p
       end
     end
 
+    def entity_stream_via_model cls, & oes_p
+      doc = _document( & oes_p )
+      doc and begin
+        doc.entity_stream_via_model cls, & oes_p
+      end
+    end
+
     def receive_delete_entity act, ent, & oes_p
-      doc = _datastore( & oes_p )
+      doc = _document( & oes_p )
       doc and begin
         doc.receive_delete_entity act, ent, & oes_p
       end
@@ -130,21 +137,23 @@ module Skylab::Brazen
 
     # ~ for actions
 
-    def resolve_datastore_ & oes_p
-      _datastore( & oes_p ) ? ACHIEVED_ : UNABLE_
+    def resolve_document_ & oes_p
+      _document( & oes_p ) ? ACHIEVED_ : UNABLE_
     end
 
-    attr_reader :cfg_
+    attr_reader :document_
 
     # ~ support
 
-    def _datastore & oes_p
+    def _document & oes_p
       @___did_attempt_to_resolve_document ||= begin
-        @cfg_ = @kernel.silo( :datastore_git_config ).via_path(
-          existent_config_path, & oes_p )
+
+        @document_ = Brazen_::Data_Stores_::Git_Config.via_path_and_kernel(
+          existent_config_path, @kernel, & oes_p )
+
         true
       end
-      @cfg_
+      @document_
     end
 
     # ~ for actions

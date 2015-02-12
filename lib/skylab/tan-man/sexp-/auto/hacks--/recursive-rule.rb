@@ -618,9 +618,16 @@ module Skylab::TanMan
       def _build_equality_comparator_proc
 
         if @reference_item_is_string
-          build_string_comparator_proc___
+          __build_string_comparator_proc
         else
           __build_normal_equality_comparator_proc
+        end
+      end
+
+      def __build_string_comparator_proc
+        s = @reference_item_as_string
+        -> x do
+          s == x[ @item_k ]
         end
       end
 
@@ -746,15 +753,6 @@ module Skylab::TanMan
         node_A[ @stem_k ] = node_C
         node_B[ @stem_k ] = nil
         node_B[ @item_k ]
-      end
-
-      # ~ support
-
-      def build_string_comparator_proc___
-        s = @reference_item_as_string
-        -> x do
-          s == x[ @item_k ]
-        end
       end
     end
 

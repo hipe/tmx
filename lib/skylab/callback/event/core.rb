@@ -105,7 +105,7 @@ module Skylab::Callback
         end
 
         def selective_builder_sender_receiver x
-          x.include Selective_Builder_Receiver_Sender_Methods__ ; nil
+          x.include Selective_Builder_Receiver_Sender_Methods ; nil
         end
 
         def wrap
@@ -420,7 +420,7 @@ module Skylab::Callback
         PN_RX__ = /(?:_|\A)path(?:name)?\z/
       end
 
-      module Selective_Builder_Receiver_Sender_Methods__
+      module Selective_Builder_Receiver_Sender_Methods
 
       private
 

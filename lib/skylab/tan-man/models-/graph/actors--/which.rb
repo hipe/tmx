@@ -1,3 +1,4 @@
+self._NOT_USED   # open [#013]
 module Skylab::TanMan
   class API::Actions::Graph::Which < API::Action
     extend API::Action::Parameter_Adapter

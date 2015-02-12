@@ -1,8 +1,10 @@
 digraph {
 
+  # that one color of blue: fillcolor="#b5d5fb" style=filled
+  # done: style=filled
 
-  hear [label="hear"]
-  lists [label="lists in [br]"]
+  hear [label="hear", style=filled]
+  lists [label="lists in [br]", style=filled]
   parse [label="parse" style=filled]
   x1 [label="(parsing is\nspecialized n18n)" style=filled]
   x2 [label="(rename \"token scanners\")" style=filled]
@@ -21,5 +23,4 @@ digraph {
   x2->x4
 
 
-  # that one color of blue: fillcolor="#b5d5fb" style=filled
 }

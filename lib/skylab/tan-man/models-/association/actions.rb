@@ -41,7 +41,7 @@ module Skylab::TanMan
         end
 
         def via_edited_entity_produce_result
-          asc = datastore._fuzzy_match_nodes_of_association @edited_entity
+          asc = entity_collection._fuzzy_match_nodes_of_association @edited_entity
           if asc
             @edited_entity = asc
           end
@@ -64,10 +64,8 @@ module Skylab::TanMan
           remove Brazen_::NAME_  # ouch/meh
 
        def produce_result
-         cc = datastore
-         cc and begin
-           cc.receive_delete_entity self, nil, & handle_event_selectively
-         end
+         entity_collection.receive_delete_entity(
+           self, nil, & handle_event_selectively )
        end
       end
     end
@@ -76,20 +74,24 @@ module Skylab::TanMan
 
       def association_collection_controller_via_preconditions bx, & oes_p
 
-        mc = model_class
-        mc.collection_controller_class.new_with(
-          :action, :__no_action__,
-          :preconditions, bx,
-          :model_class, mc,
-          :kernel, @kernel, & oes_p )
+        # :+#actionless-collection-controler-experiment
+
+        precondition_for_self :_no_action_2_,
+          @model_class.node_identifier,
+          bx,
+          & oes_p
+      end
+
+      def precondition_for_self action, id, bx, & oes_p
+        Collection_Controller___.new action, bx, @model_class, @kernel, & oes_p
       end
     end
 
-    class Collection_Controller__ < Model_::Document_Entity::Collection_Controller
+    class Collection_Controller___ < Model_::Document_Entity::Collection_Controller
 
       def touch_association_via_node_labels src_lbl_s, dst_lbl_s, & oes_p
 
-        oes_p ||= handle_event_selectively
+        oes_p ||= @on_event_selectively
 
         asc = Association_.edit_entity @kernel, oes_p do | o |
           o.edit_with :from_node_label, src_lbl_s,
@@ -111,7 +113,7 @@ module Skylab::TanMan
 
       def _fuzzy_match_nodes_of_association asc
 
-        cc = @preconditions.fetch :node
+        cc = @precons_box_.fetch :node
 
         f_o = cc.entity_via_natural_key_fuzzily asc.property_value_via_symbol :from_node_label
 
@@ -176,7 +178,7 @@ module Skylab::TanMan
           :prototype_i, any_proto_sym,
           :from_node_label, entity.property_value_via_symbol( :from_node_label ),
           :to_node_label, entity.property_value_via_symbol( :to_node_label ),
-          :datastore, datastore_controller,
+          :document, document_,
           :kernel, @kernel, & _oes_p_ )
 
         _ok and Info___[ did_mutate ]
@@ -184,7 +186,7 @@ module Skylab::TanMan
 
       Info___ = ::Struct.new :did_mutate
 
-      def via_datastore_controller_receive_delete_entity action, _, & oes_p
+      def receive_delete_entity action, _, & oes_p
 
         bx = action.argument_box
 
@@ -192,7 +194,7 @@ module Skylab::TanMan
           :verb, :delete,
           :from_node_label, bx.fetch( :from_node_label ),
           :to_node_label, bx.fetch( :to_node_label ),
-          :datastore, datastore_controller,
+          :document, document_,
           :kernel, @kernel,
           & oes_p )
 

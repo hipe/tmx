@@ -10,7 +10,7 @@ module Skylab::Brazen
 
       def produce_result
         ok = resolve_existent_workspace
-        ok &&= @ws.resolve_datastore_( & handle_event_selectively )
+        ok &&= @ws.resolve_document_( & handle_event_selectively )
         ok && work
       end
 
@@ -37,7 +37,7 @@ module Skylab::Brazen
         bx = Box_.new
         one = -> { 1 }
         increment = -> d { d + 1 }
-        st = @ws.cfg_.to_section_stream( & handle_event_selectively )
+        st = @ws.document_.to_section_stream( & handle_event_selectively )
         sect = st.gets
 
         while sect

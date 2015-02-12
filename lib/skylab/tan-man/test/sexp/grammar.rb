@@ -66,9 +66,6 @@ module Skylab::TanMan::TestSupport::Sexp
 
     attr_accessor :do_force_overwrite
 
-    attr_accessor :receive_parser_loading_info_p
-
-
     def invoke argv               # enhance headless with invite at the end
       res = super
       if false == res
@@ -157,94 +154,6 @@ module Skylab::TanMan::TestSupport::Sexp
           true
         end
       end
-    end
-
-    def grammars o
-      o.treetop_grammar 'g1.treetop'
-    end
-
-    def produce_parser_class
-
-      info_p = receive_parser_loading_info_p
-      info_p ||= -> s do
-        receive_info_string "      (loading parser ^_^ #{ s })"  # was gsub_path_hack
-      end
-
-      TanMan_::Input_Adapters_::Treetop::Load.new( self,
-        -> o do
-          do_force_overwrite and o.force_overwrite!
-          o.generated_grammar_dir tmpdir_prepared
-          o.root_for_relative_paths anchor_dir_pathname
-          grammars o
-        end,
-        ->(o) do
-          o.on_info info_p
-          o.on_error method :fail
-        end
-      ).invoke
-    end
-
-    def receive_info_string s
-      @IO_adapter.errstream.puts s ; nil
-    end
-
-    define_method :resovle_upstream do
-      fail 'YES'  #  :+[#hl-022]:read:#todo IFF this is ever used
-      ok = false                  # [#hl-023] exit-code aware, [#019] invite
-      begin
-        if upstream
-          if argv.empty?
-            ok = true
-          else
-            send_error_string "Upstream already resolved. #{
-              }Expecting zero args, had #{ argv.length }: #{argv.first.inspect}"
-          end
-        elsif 1 == argv.length
-          path = argv.shift
-          if '-' == path
-            if @stdin.tty?
-              send_error_string "expecting STDIN to be a readable stream, was tty."
-            else
-              self.upstream = build_stream_input_adapter @stdin
-              @stdin = nil
-              ok = true
-            end
-          elsif @stdin.tty?
-            @pathname = ::Pathname.new path
-            if @pathname.exist?
-              self.upstream = build_file_input_adapter @pathname
-              ok = true
-            else
-              send_error_string "file not found: #{ pth @pathname }"
-            end
-          else
-            send_error_string "can't have both STDIN and <pathspec>: #{ path }"
-          end
-        else
-          send_error_string "expecting #{ pathspec_syntax }, had #{ argv.length } args."
-        end
-      end while nil
-      ok
-    end
-
-    let :stem_path do
-      _stem_const_rx = /\A  #{ anchor_module_head }  (.+)  \z/x
-      _md = _stem_const_rx.match self.class.name
-      _s = _md[ 1 ]
-      TanMan_::Callback_::Name.lib.pathify[ _s ]
-    end
-
-    def tmpdir_prepared
-      @tmpdir_prepared ||= bld_tmpdir_prepared
-    end
-
-    def bld_tmpdir_prepared
-      pn = prepared_tanman_tmpdir.join stem_path
-      td = prepared_tanman_tmpdir.class.new pn
-      if ! td.exist?
-        td.prepare  # because parent gets rewritten once per runtime
-      end
-      td
     end
 
     def upstream

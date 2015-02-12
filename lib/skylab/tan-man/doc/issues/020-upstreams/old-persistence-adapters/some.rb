@@ -65,7 +65,7 @@ module Skylab::TanMan
     define_method :remove do |remote_name, resource_name, &b|
       e = on_remove.new b
       if resource_name
-        resource = services.config.send resource_name # #todo
+        resource = services.config.send resource_name
         remotes = resource.remotes
         resources_count = 1
       else

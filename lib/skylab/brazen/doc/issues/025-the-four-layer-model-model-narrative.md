@@ -1,5 +1,11 @@
 # the four layer model model narrative :[#025]
 
+EDIT: we are keeping this because we love it, but [br] no longer has
+these four specific tiers built into it. now, [br] knows only that
+there is a model class and a silo daemon.
+
+
+
 ## introduction
 
 let's get right to it:

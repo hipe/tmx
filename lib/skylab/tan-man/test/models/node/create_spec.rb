@@ -99,6 +99,7 @@ module Skylab::TanMan::TestSupport::Models::Node
       end
 
       it "creates unique but natural node_ids" do
+
         touch_node_via_label 'milk the cow'
         touch_node_via_label 'milk the cat'
         touch_node_via_label 'MiLk the catfish'

@@ -1,3 +1,4 @@
+[#094] #open become insensitive to newlines when referencing nodes
 [#093]       #done cleanup `__dupe` interface and implementation
 [#092]       #done #list-API unmunge `_insert_item_before_item` et. a.
 [#091]       #done #list-API improve the implementation of \`unparse\`
@@ -16,7 +17,7 @@
 [#078]       #tracking-tag this spot with `const_set`
 [#077]       #done services.rb wat
 [#076]       [ meaning graph ]  (comments inline)
-             (was: events need to be modernized)
+             ( #was: events need to be modernized )
 [#075]       #tracking-tag of hiccup skip Actions module `ANCHOR_BOX_MODULE`
 [#074]       #doc-point numerics in sexps #sexp-auto
 [#073]       #done rename 'examples' to 'starters'
@@ -43,7 +44,7 @@
              3. applying them
 [#056]       #tracking-tag: can we use tan-man to guide refactorings yet?
                #waiting-on:(#014, #015)
-[#055] #open meaning delete
+[#055] #open #feature meaning delete
 [#054]       #watching it seems like it will probably be dangerous to
              reuse the same parser for multiple parses?, also #tracking-tag
 [#053]       #postponed normalizing string here
@@ -51,23 +52,22 @@
 [#051]       #postponed support for 'port' in dot-lang grammar
 [#050]       #done just for fun, eliminate all return statements
 [#049]       #watch #pattern - four permutations for file creation (dirname etc)
-[#048]       #done failing on tan init should do porcelain too
-[#048]       upstreams.
-             (was: #watch what is the deal with the non-orthogonal-ass
-              event interface for remote list)
-[#047] #hole (was: #watch where to specify local/global, or merge?)
+[#048]       ( #was: #done failing on tan init should do porcelain too )
+             ( #was: #watch what is the deal with the non-orthogonal-ass
+              event interface for remote list )
+[#047]       #done #watch where to specify local/global, or merge?
 [#046]       #trend away from Parameter::Definer etc. and towards lamba args
 [#045]       #postponed Parameter::Definer (up?), vs Attribute::Definer
 [#044]       #branch-down cli tests (but issue wip)
 [#043]       #tracking-tag other guys that could benefit from svc
 [#042]       #done FileUtils as a service (JSON)
-[#041] #open workspace status is furloughed
+[#041] #open #feature workspace status is furloughed
 [#040]       #done make your own SubClient::InstanceMethods to DRY CLI & API
 [#039]       #done API::Whatever becomes MetaHell::Generic
 [#038]       #done `text_styler` away!
 [#037]       #feature stdout as an `output_stream`
-             (was: #done reconceive stdout, stderr -> infostream, paystream, errstream
-               .. (i.e. "PIE" [#sl-113]))
+             ( #was: #done reconceive stdout, stderr -> infostream, paystream, errstream
+               .. (i.e. "PIE" [#sl-113]) )
 [#036]       #done `format_error` -> `inflect_failure_reason` (and tests!)
 [#035]       #wont `delegates_to` go away as a smell (meh)
 [#034]       #done sort out `root_runtime`, client, `parent_runtime`, etc
@@ -84,14 +84,15 @@
 [#023]       #deferred combine all Boxxy, consider Boxxy-like solutions
                #depends-on:#018
 [#022]       #done end client defaulting patterns (workspace etc)
-             (was: workspace directories)
-             (was: refactor-in headless, and sub-client)
-[#021]       merge singletons into service
-[#020]       #done #low-priority nounify cli commands
+             ( #was: workspace directories )
+             ( #was: refactor-in headless, and sub-client )
+[#021]       #done merge singletons into service
+[#020] #open #feature-collection upstream
+             ( #was: #done #low-priority nounify cli commands
                x. check -> graph check
                x. push -> graph push
                x. use -> graph use
-               x. tell -> graph tell
+               x. tell -> graph tell )
 [#019]       #done "magic" for DRYING up tests (Regret) #done
 [#018]       #deferred #depends-on:#sl-100 refactor out porcelain ["bleeding"]
                we are gonna hinge this on to treemap for no real reason
@@ -99,33 +100,36 @@
 [#017]       #pattern: for to maybe push up to headless
 [#016]       #done #pattern: action instance spawns instance of model controller
                .. so make `controllers` knob for clarity
-[#015]       #done UI for dissociate (and prune nodes? - no, out of scope)
+[#015] #open #feature remove association between nodes (see)
+             ( #was: #done UI for dissociate (and prune nodes? - no, out of scope) )
 [#014]       #done UI for associate (labeled "depends on")
-[#013]       #DONE UI for chose example, then use example
+[#013] #open unused files
+             ( #was: #DONE UI for chose example, then use example
               1. unify & modernify autoloading
-              2. fix api vis-a-vis actions to integrate with autoloading
-[#012]       #done 2012-11-01 refactor UI / NLP to use sexp auto
+              2. fix api vis-a-vis actions to integrate with autoloading )
+[#012] #open #feature common collection controller - ambiguity method not implemented
+             ( #was: #done 2012-11-01 refactor UI / NLP to use sexp auto
 [#011]       #parent-node: [#010] the peek module name hack narrative ..
-             ( was: make sure complex prototypes can be used with nonzero length lists )
+             ( #was: make sure complex prototypes can be used with nonzero length lists )
 [#010]       [ the treetop input adapter ]
-             ( was: #done 2012-10-27 associate two nodes
+             ( #was: #done 2012-10-27 associate two nodes
                1. sic, 2. redudantly, 3. agent not exist 4. target not exist )
-[#009] #open square word wrap (target an aspect ratio)
+[#009] #open #feature square word wrap (target an aspect ratio)
              #doc-node: the node controller narrative ..
-             ( was: #done 2012-10-27 create a node
+             ( #was: #done 2012-10-27 create a node
                1. with one template (3 permutations) 2. with another template (3 permutes) )
 [#008]       #done 2012-10-10 #rename rename "nt" to "expression" / "rule"
 [#007]     #watch tracking all non-primitive values still used in our trans-modality API
-             (was: #done #small #critical models/ dir generated during specs 2012-09-29)
+             ( #was: #done #small #critical models/ dir generated during specs 2012-09-29 )
 [#006]       meta property reference (.rb!)
-             (was: #one-day look into reflection via metagrammer instead 2012-09-27)
+             ( #was: #one-day look into reflection via metagrammer instead 2012-09-27 )
 [#005]       #open #one-day look into "statement oriented" processing 2012-09-02
 [#004]       #open #one-day look into multibyte regexp 2012-09-02
 [#003]       #open #one-day unshield your eyes : google "dotfile grammar" 2012-09-01
 [#002] #open implement ambiguity expressor for 'st[atus]' and 'st[arter]'
-             (was: #done 2012-08-30 rename `remote*` to fit a pattern (e.g. controller)
+             ( #was: #done 2012-08-30 rename `remote*` to fit a pattern (e.g. controller )
                examples-controller -> example-collection)
 [#001] #open refactor out the repetition among document entity actions:
              resolve one layer where all datastore persists happen (i.e
              should collection controllers write files or should actions?)
-             (was: #done tan -w ok, #depends-on:(#sl-unwip))
+             ( #was: #done tan -w ok, #depends-on:(#sl-unwip) )

@@ -23,7 +23,6 @@ module Skylab::TanMan
         end
       end  # >>
 
-
       Action___ = ::Class.new Action_  # before below
 
       # every document entity action (by default) must resolve at least an
@@ -319,23 +318,40 @@ module Skylab::TanMan
         end
       end
 
-      class Collection_Controller < Brazen_.model.collection_controller_class
+      class Collection_Controller
 
-        def unparse_into y
-          datastore_controller.unparse_into y
+        # frontier. this *is* a controller because it is coupled to the action.
+
+        include Callback_::Event::Selective_Builder_Receiver_Sender_Methods
+
+        def initialize act, bx, mc, k, & oes_p
+
+          oes_p or self._EVENT_HANDLER_MANDATORY
+
+          @action = act
+          @df = bx.fetch :dot_file
+          @kernel = k
+          @model_class = mc
+          @precons_box_ = bx
+          @on_event_selectively = oes_p
+
         end
 
-      private
+        # c r u d
+
+        def unparse_into y
+          @df.unparse_into y
+        end
 
         def flush_maybe_changed_document_to_output_adapter__ did_mutate
           if did_mutate
             flush_changed_document_to_ouptut_adapter
           else
-            when_document_did_not_change
+            __when_document_did_not_change
           end
         end
 
-        def when_document_did_not_change
+        def __when_document_did_not_change
           maybe_send_event :info, :document_did_not_change do
             build_neutral_event_with :document_did_not_change do |y, o|
               y << "document did not change."
@@ -347,23 +363,25 @@ module Skylab::TanMan
           flush_changed_document_to_output_adapter_per_action @action
         end
 
-      public
-
         def flush_changed_document_to_output_adapter_per_action action
 
-          datastore_controller.persist_via_three(
+          @df.persist_via_three(
             action.argument_box[ :dry_run ],
             action.output_arguments,
             action.stdout )
-
         end
 
-      private
+        def document_
 
-        def datastore_controller
-          @preconditions.fetch :dot_file  # yes
+          # we wanted this to be referred to as "digraph" and not "dot file"
+          # but the clients need to manipulate the document at the sexp level
+          # so it is pointless to try to abstract our implementation away..
+
+          @df
         end
       end
+
+      DOT_DOT_ = '..'.freeze
 
       class Action___  # re-open
 

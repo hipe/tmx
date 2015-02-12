@@ -249,8 +249,6 @@ module Skylab::TanMan
 
   # --*--
 
-  # ContentTextValue = TanMan_.lib_.basic_struct :content_text_value  # #todo
-
   class ContentTextValue
 
     # Exeperimental: Use this as a sexp builder in your grammars (with []) where
@@ -587,8 +585,6 @@ module Skylab::TanMan
       @prts ||= @module.name.split CONST_SEP_
     end
   end
-
-  CONST_SEP_ = '::'.freeze
 
   # --*--
 

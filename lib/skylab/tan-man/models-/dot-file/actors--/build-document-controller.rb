@@ -16,8 +16,8 @@ module Skylab::TanMan
             receive_input_arguments @action.input_arguments and super
           end
 
-          def _produce_trio_box
-            @action.to_trio_box
+          def _produce_trio_box_proxy
+            @action.to_trio_box_proxy
           end
 
           def _output_trio_array
@@ -49,7 +49,7 @@ module Skylab::TanMan
             end
           end
 
-          def _produce_trio_box
+          def _produce_trio_box_proxy
             @trio_box
           end
 
@@ -88,15 +88,33 @@ module Skylab::TanMan
 
         def via_workspace_path_resolve_graph_sexp
 
-          ws = @kernel.silo( :workspace ).workspace_via_trio_box(
-            _produce_trio_box, & @on_event_selectively )
+          ok = __resolve_workspace_via_trio_box _produce_trio_box_proxy
+          ok &&= __via_workspace_resolve_document
+          ok &&= __via_document_resolve_graph_path
+          ok &&= __via_graph_path_and_workspace_resolve_graph_sexp
 
-          ws and __resolve_graph_sexp_via_workspace ws
         end
 
-        def __resolve_graph_sexp_via_workspace ws
+        def __resolve_workspace_via_trio_box bx
 
-          x = ws.datastore.property_value_via_symbol GRPH___ do | i, i_, & ev_p |
+          @ws = @kernel.silo( :workspace ).workspace_via_trio_box bx,
+            & @on_event_selectively
+
+          @ws && ACHIEVED_
+        end
+
+        def __via_workspace_resolve_document
+
+          ok = @ws.resolve_document_( & @on_event_selectively )
+          if ok
+            @doc = @ws.document_
+          end
+          ok
+        end
+
+        def __via_document_resolve_graph_path
+
+          @graph_path = @doc.property_value_via_symbol GRPH___ do | i, i_, & ev_p |
 
             if :property_not_found == i_
 
@@ -113,15 +131,17 @@ module Skylab::TanMan
             end
           end
 
-          x and __resolve_graph_sexp_via_graph_path x, ws.asset_directory_
+          @graph_path && ACHIEVED_
         end
 
         GRPH___ = :graph
 
-        def __resolve_graph_sexp_via_graph_path path, surrounding_path
+        def __via_graph_path_and_workspace_resolve_graph_sexp
+
+          path = @graph_path ;  _surrounding_path = @ws.asset_directory_
 
           if path.length.nonzero? && ::File::SEPARATOR != path[ 0 ]
-            path = ::File.expand_path path, surrounding_path
+            path = ::File.expand_path path, _surrounding_path
           end
 
           @input_path = path

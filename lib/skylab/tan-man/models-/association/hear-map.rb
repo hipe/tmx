@@ -121,7 +121,7 @@ module Skylab::TanMan
 
         def __via_document_controller_and_nodes_touch_association
 
-          bx = @nodes_controller.to_preconditions_plus_self
+          bx = @nodes_controller.to_preconditions_plus_self__
 
           ac = @kernel.silo( :association ).
             association_collection_controller_via_preconditions(

@@ -63,10 +63,8 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
         o.unparse.should eql exp
         @result.unparse.split( TanMan_::NEWLINE_ ).last.should eql exp
 
-        if false  # #todo - necessary stuff not yet implemented
         o.insert_item_before_item_string_ 'faeup', 'fooooop'
-        o.unparse.should eql( 'faeioup ;  faeup ;  fooooop ;  fuuup' )
-        end
+        o.unparse.should eql 'faeioup ;  faeup ;  fooooop ;  fuuup'
       end
 
       it "append an invalid node - raises" do

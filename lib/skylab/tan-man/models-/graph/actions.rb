@@ -2,17 +2,17 @@ module Skylab::TanMan
 
   class Models_::Graph
 
-    Entity_.call self,
+    edit_entity_class(
 
-        :persist_to, :graph,
+      :persist_to, :graph,  # go thru our own custom c.c for now
 
-        :required, :property, :digraph_path
+      :required, :property, :digraph_path )
 
     class << self
       def action_class  # luckily we want all our (one) action(s) to be this way
         TanMan_::Model_::Document_Entity.action_class
       end
-    end
+    end  # >>
 
     Actions = make_action_making_actions_module
 
@@ -21,7 +21,9 @@ module Skylab::TanMan
       Use = make_action_class :Create do
 
         edit_entity_class(
-          :preconditions, [ :workspace, :graph ],
+
+          :preconditions, [ :graph, :workspace ],
+
           :properties,
             :starter,
             :created_on )
@@ -38,17 +40,21 @@ module Skylab::TanMan
             ::Time.now.utc.to_s
           end
         end
-
-        def _ws
-          if instance_variable_defined? :@preconditions  # #experimental
-            @preconditions.fetch :workspace
-          end
-        end
       end
     end
 
-    def natural_key_string
-      @property_box.fetch :digraph_path
+    # c r u d
+
+    def intrinsic_create_before_create_in_datastore action, & oes_p
+
+       Graph_::Actors__::Touch.call(
+
+          action.argument_box[ :dry_run ],
+
+          action, self, @preconditions.fetch( :workspace ), @kernel, & oes_p )
+
+        # (result on success is bytes)
+
     end
 
     def to_pair_stream_for_persist
@@ -58,27 +64,34 @@ module Skylab::TanMan
       bx.add Brazen_::NAME_, ::Pathname.new(
         @property_box.fetch :digraph_path
       ).relative_path_from(
-        ::Pathname.new( @datastore.datastore_controller.asset_directory_ )
+        ::Pathname.new( @preconditions.fetch( :workspace ).asset_directory_ )
       ).to_path
 
       bx.to_pair_stream
     end
 
-    class Collection_Controller__ < Collection_Controller_
+    def natural_key_string
+      @property_box.fetch :digraph_path
+    end
 
-      def receive_persist_entity action, ent, & oes_p
+    class Silo_Daemon < Silo_Daemon
 
-        _bytes = Graph_::Actors__::Touch.call(
+      def precondition_for_self action, id, bx, & oes_p
+        Use___.new action, bx, @kernel, & oes_p
+      end
+    end
 
-          action.argument_box[ :dry_run ],
+    class Use___
 
-          action, ent, datastore_controller, @kernel, & oes_p )
+      # this is just a completely dumb limiting wrapper to prove that
+      # this silo is only using this one operation of the workspace.
 
-        _bytes and super
+      def initialize _action, bx, _k, & _oes_p
+        @ws = bx.fetch :workspace
       end
 
-      def datastore_controller
-        @action.preconditions.fetch :workspace
+      def receive_persist_entity action, ent, & oes_p
+        @ws.receive_persist_entity action, ent, & oes_p
       end
     end
 

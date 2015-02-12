@@ -9,11 +9,11 @@ module Skylab::TanMan
        :attrs,
        :prototype_i,
        :from_node_label, :to_node_label,
-       :datastore,
+       :document,
        :kernel
 
       def execute
-        @parser = @datastore.graph_sexp.class
+        @parser = @document.graph_sexp.class
         ok = rslv_stmt_list_and_stream
         ok &&= find_nodes
         ok &&= find_neighbor_associations
@@ -24,7 +24,7 @@ module Skylab::TanMan
     private
 
       def rslv_stmt_list_and_stream
-        @stmt_list = @datastore.graph_sexp.stmt_list
+        @stmt_list = @document.graph_sexp.stmt_list
         if @stmt_list
           @st = @stmt_list.to_node_stream_
           ACHIEVED_
@@ -43,9 +43,9 @@ module Skylab::TanMan
         # life is easier if we hack an empty statement list into existence.
         # these do not occur in nature. we need one because touch.
 
-        sx = @datastore.graph_sexp.class.parse :stmt_list, 'a->b'  # the NT classes are not guaranteed to be generated yet
+        sx = @document.graph_sexp.class.parse :stmt_list, 'a->b'  # the NT classes are not guaranteed to be generated yet
         sx.stmt = nil  # then throw the above away. we just want the empty NT parse tree, which does not occur naturaly
-        @datastore.graph_sexp.stmt_list = sx
+        @document.graph_sexp.stmt_list = sx
         @stmt_list = sx
         @st = @stmt_list.to_stream
         ACHIEVED_
@@ -53,7 +53,7 @@ module Skylab::TanMan
 
       def when_no_stmt_list
         @result = maybe_send_event :error, :no_stmt_list do
-          build_not_OK_event_with :no_stmt_list, :datastore, @datastore
+          build_not_OK_event_with :no_stmt_list, :document, @document
         end
         UNABLE_
       end
@@ -62,7 +62,7 @@ module Skylab::TanMan
 
         @touch_node_p = Models_::Node.touch.curry_with(
           :verb,  send( :"node_verb_when_#{ @verb }" ),
-          :datastore, @datastore,
+          :document, @document,
           :kernel, @kernel,
           & @on_event_selectively )
 
@@ -358,7 +358,7 @@ module Skylab::TanMan
         end
       end
 
-    if false  # #todo
+    if false  # #open [#015] remove association
     def destroy_all_associations node_id, _, success # i cannot fail
       res_a = each_associated_list_node( node_id ).to_a.reverse.map do |list|
         x = list._remove! list.stmt             # (reverse b/c deletes up

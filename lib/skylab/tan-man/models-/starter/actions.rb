@@ -24,12 +24,23 @@ module Skylab::TanMan
 
         edit_entity_class :preconditions, [ :workspace, :starter ]
 
-        def bound_call_against_iambic_stream st
+        def produce_result
           super
+        end
+
+        def entity_collection
+          # sanity
         end
       end
 
-      Ls = make_action_class :List
+      Ls = make_action_class :List do
+
+        edit_entity_class :preconditions, EMPTY_A_
+
+        def entity_collection
+          @___col ||= Collection_in_Filesystem_Controller__.new @kernel
+        end
+      end
 
       class Get < Action_
 
@@ -71,6 +82,10 @@ module Skylab::TanMan
       @pn ||= Starter_.dir_pn_instance.join property_value_via_symbol :name
     end
 
+    def entity_collection
+      @__col ||= Hybrid_Collection_Controller___.new @preconditions, self.class, @kernel
+    end
+
     class Silo_Daemon < Silo_Daemon
 
       # ~ custom exposures
@@ -90,7 +105,10 @@ module Skylab::TanMan
           # we already have and mutate its formals not to know about workspace
           # related arguments. all this ick bc we want to reuse action factory
 
-          o.preconditions workspace: ws
+          bx = Callback_::Box.new
+          bx.add :workspace, ws
+
+          o.preconditions bx
 
           o.mutate_formal_properties do | fo |
             Models_::Workspace.common_properties.box.each_name do | sym |
@@ -102,21 +120,69 @@ module Skylab::TanMan
 
       # ~ hook-outs / hook-ins
 
-      def model_class
-        Models_::Starter
+      def precondition_for_self _act, _id, box, & oes_p
+
+        # the datastore for starters is the config file
+
+        box.fetch :workspace
       end
     end
 
-    class Collection_Controller__ < Collection_Controller_
+    class Hybrid_Collection_Controller___
 
-      def receive_persist_entity action, ent, & oes_p
-        _ok = normalize_entity_name_via_fuzzy_lookup ent, & oes_p
-        _ok and super action, ent, & oes_p
+      # use the filesystem when reading the available collection,
+      # use the workspace when writing the currently selected entity.
+
+      def initialize bx, mc, k
+        @kernel = k
+        @model_class = mc
+        @ws = bx.fetch :workspace
       end
 
-      def entity_stream_via_model _cls_, & oes_p
+      def receive_persist_entity act, ent, & oes_p
+        _ok = __normalize_entity_name_via_fuzzy_lookup ent, & oes_p
+        _ok and begin
+          @ws.receive_persist_entity act, ent, & oes_p
+        end
+      end
 
-        oes_p or self._WHERE
+      def __normalize_entity_name_via_fuzzy_lookup ent, & oes_p
+
+        # :+#CC-abstraction-candidate
+
+        ent_ = one_entity_against_natural_key_fuzzily_(
+          ent.natural_key_string, & oes_p )
+
+        ent_ and begin
+          ent.normalize_property_value_via_normal_entity(
+            ent.class.natural_key_string, ent_, & oes_p )
+          ACHIEVED_
+        end
+      end
+
+      def entity_stream_via_model cls, & oes_p
+        _fs.entity_stream_via_model cls, & oes_p
+      end
+
+      # ~
+
+      include Callback_::Event::Selective_Builder_Receiver_Sender_Methods
+      include Common_Collection_Controller_Methods_
+
+      def _fs
+        @fs ||= Collection_in_Filesystem_Controller__.new @kernel
+      end
+    end
+
+    class Collection_in_Filesystem_Controller__
+
+      def initialize k
+        @kernel = k
+      end
+
+      # ~ #hook-out's
+
+      def entity_stream_via_model _cls_, & oes_p
 
         p = -> do
 
@@ -124,6 +190,7 @@ module Skylab::TanMan
           props = fly.properties
 
           base_pn = Starter_.dir_pn_instance
+
           _pn_a = base_pn.children false
 
           scan = Callback_.stream.via_nonsparse_array( _pn_a ).map_reduce_by do |pn|
@@ -135,13 +202,10 @@ module Skylab::TanMan
           end
           scan.gets
         end
+
         Callback_.stream do
           p[]
         end
-      end
-
-      def datastore_controller
-        @action.preconditions.fetch :workspace
       end
     end
 

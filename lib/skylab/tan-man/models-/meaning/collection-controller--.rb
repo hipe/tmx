@@ -11,7 +11,9 @@ module Skylab::TanMan
             init_via_iambic x_a
           end
         end
-      end
+      end  # >>
+
+      include Common_Collection_Controller_Methods_
 
       # ~ create
 
@@ -32,7 +34,7 @@ module Skylab::TanMan
 
       def entity_stream_via_model cls, & oes_p
 
-        if model_class == cls  # just to punish those who dare defy us
+        if @model_class == cls  # just to punish those who dare defy us
           _build_session.to_stream_of_meanings_with_mutable_string_metadata
         end
       end
@@ -44,18 +46,14 @@ module Skylab::TanMan
           meaning,
           node,
           _build_session.to_stream_of_meanings_with_mutable_string_metadata,
-          _dot_file,
-          & handle_event_selectively )
+          document_,
+          & @on_event_selectively )
       end
 
       # ~ support
 
       def _build_session
-        Session__.new _dot_file.graph_sexp
-      end
-
-      def _dot_file
-        @preconditions.fetch :dot_file
+        Session__.new document_.graph_sexp
       end
 
       class Session__

@@ -11,7 +11,7 @@ module Skylab::TanMan
           Callback_::Actor.call self, :properties,
             :name,
             :verb,  # 'create' | 'retrieve' | 'touch'
-            :datastore,
+            :document,
             :kernel
 
           def resolve_name_string
@@ -24,7 +24,7 @@ module Skylab::TanMan
           Callback_::Actor.call self, :properties,
             :verb,
             :entity,
-            :datastore,
+            :document,
             :kernel
 
           def resolve_name_string
@@ -42,7 +42,7 @@ module Skylab::TanMan
 
         def init_ivars
           resolve_name_string
-          @graph_sexp = @datastore.graph_sexp
+          @graph_sexp = @document.graph_sexp
           @stmt_list = @graph_sexp.stmt_list
           send :"init_ivars_for_#{ @verb }"
         end
@@ -362,7 +362,7 @@ module Skylab::TanMan
 
           nd = @created_existing_or_destroyed_node
 
-          _new_stmt_list = @datastore.insert_stmt_before_stmt(
+          _new_stmt_list = @document.insert_stmt_before_stmt(
             nd, _least_greater_neighbor )
 
           node_stmt = _new_stmt_list[ :stmt ]
@@ -376,7 +376,7 @@ module Skylab::TanMan
 
         def insert_new_node_into_empty_list
           nd = @created_existing_or_destroyed_node
-          stmt_list = @datastore.insert_stmt nd
+          stmt_list = @document.insert_stmt nd
           node = stmt_list[ :stmt ]
           nd.object_id == node.object_id or self._SANITY
           send_created_event_for_node node
@@ -384,7 +384,7 @@ module Skylab::TanMan
         end
 
         def __del
-          @datastore.destroy_stmt @exact_match_found
+          @document.destroy_stmt @exact_match_found
         end
 
         def send_created_event_for_node node_stmt

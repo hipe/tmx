@@ -22,7 +22,7 @@ module Skylab::TanMan
 
           def bound_call_via_heard hrd, & oes_p
 
-            self._TODO_fix_grammar  # #todo
+            self._DO_ME_fun_fix_grammar
 
             hrd.kernel.bound_API_call_with :init,
               :path, ::Dir.pwd, & oes_p

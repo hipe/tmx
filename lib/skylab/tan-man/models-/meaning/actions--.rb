@@ -65,12 +65,12 @@ module Skylab::TanMan
         end
 
         def __resolve_meaning
-          @meaning = @meanings_controller.one_entity_against_natural_key_fuzzily @argument_box[ :meaning_name ]
+          @meaning = @meanings_controller.one_entity_against_natural_key_fuzzily_ @argument_box[ :meaning_name ]
           @meaning and ACHIEVED_
         end
 
         def __resolve_node
-          @node = @nodes_controller.one_entity_against_natural_key_fuzzily @argument_box[ :node_label ]
+          @node = @nodes_controller.one_entity_against_natural_key_fuzzily_ @argument_box[ :node_label ]
           @node and ACHIEVED_
         end
 
@@ -86,10 +86,10 @@ module Skylab::TanMan
       end
     end
 
-    class << self
+    class Silo_Daemon < Silo_Daemon
 
-      def collection_controller_class
-        Meaning_::Collection_Controller__
+      def precondition_for_self action, id, box, & oes_p
+        Meaning_::Collection_Controller__.new action, box, @model_class, @kernel, & oes_p
       end
     end
 

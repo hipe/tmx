@@ -24,7 +24,7 @@ module Skylab::Brazen
     private
 
       def init_via_model_action_entity m_cls, a_cls, e_cls
-        @model_class = m_cls ; @cls1 = a_cls ; @ent = e_cls
+        @mc = m_cls ; @cls1 = a_cls ; @ent = e_cls
         resolve_cls2
       end
 
@@ -32,7 +32,7 @@ module Skylab::Brazen
 
         @cls2 = const_set :Semi_Generated_Action, ::Class.new( @cls1 )
 
-        _MODEL_CLASS_ = @model_class
+        _MODEL_CLASS_ = @mc
 
         @cls2.class_exec do
 
@@ -136,7 +136,7 @@ module Skylab::Brazen
           # formals (continued at #note-135..)
 
           super x  # any preconditions will add their properties here. maybe [#018] order sensitive
-          st = model_class.properties.to_stream
+          st = _model_class.properties.to_stream
           prp = st.gets
           if prp
             bx = @formal_properties.to_mutable_box_like_proxy
@@ -165,7 +165,7 @@ module Skylab::Brazen
             @parent_node = nil
           else
 
-            @edited_entity = self.class.model_class.
+            @edited_entity = _model_class.
                   edited @kernel, handle_event_selectively do |o|
               o.preconditions @preconditions
               o.edit_magnetically_from_box @argument_box
@@ -185,8 +185,8 @@ module Skylab::Brazen
         include Semi_Generated_Instance_Methods__
 
         def produce_result
-          datastore.entity_stream_via_model(
-            self.class.model_class, & handle_event_selectively )
+          entity_collection.entity_stream_via_model(
+            _model_class, & handle_event_selectively )
         end
       end
 
@@ -203,13 +203,8 @@ module Skylab::Brazen
 
         def produce_one_entity & oes_p
           oes_p ||= handle_event_selectively
-          @datastore_controller = datastore.datastore_controller
-          @datastore_controller && __via_dsc_for_one_produce_entity( & oes_p )
-        end
-
-        def __via_dsc_for_one_produce_entity & oes_p
-          @__entity_stream = @datastore_controller.entity_stream_via_model(
-            model_class, & oes_p )
+          @__entity_stream = entity_collection.entity_stream_via_model(
+            _model_class, & oes_p )
           __via_entity_stream_and_dsc_for_one_produce_entity( & oes_p )
         end
 
@@ -248,8 +243,8 @@ module Skylab::Brazen
 
         def bld_single_entity_resolved_with_ambiguity
           build_neutral_event_with :single_entity_resolved_with_ambiguity,
-              :model, model_class,
-              :describable_source, @datastore_controller do |y, o|
+              :model, _model_class,
+              :describable_source, entity_collection do |y, o|
 
             _lemma = o.model.name_function.as_human
             _source = o.describable_source.description_under self
@@ -268,8 +263,8 @@ module Skylab::Brazen
 
         def bld_entity_not_found_event
           build_not_OK_event_with :entity_not_found,
-              :model, model_class,
-              :describable_source, @datastore_controller do |y, o|
+              :model, _model_class,
+              :describable_source, entity_collection do |y, o|
 
             _lemma = o.model.name_function.as_human
             _source = o.describable_source.description_under self
@@ -309,7 +304,7 @@ module Skylab::Brazen
           ok &&= @subject_entity.intrinsic_delete_before_delete_in_datastore(
             self, & oes_p )
 
-          ok and @datastore.receive_delete_entity self, @subject_entity, & oes_p
+          ok and entity_collection.receive_delete_entity self, @subject_entity, & oes_p
         end
 
         def __init_selective_listener_proc_for_delete
@@ -327,14 +322,13 @@ module Skylab::Brazen
 
         def __via_args_resolve_identifier
           _name_s = @argument_box.fetch NAME_
-          id = model_class.node_identifier.with_local_entity_identifier_string _name_s
+          id = _model_class.node_identifier.with_local_entity_identifier_string _name_s
           @identifier = id
           PROCEDE_
         end
 
         def __via_identifier_resolve_subject_entity
-          datastore
-          @subject_entity = @datastore.entity_via_intrinsic_key @identifier, & handle_event_selectively
+          @subject_entity = entity_collection.entity_via_intrinsic_key @identifier, & handle_event_selectively
           @subject_entity ? PROCEDE_ : UNABLE_
         end
       end
@@ -342,11 +336,11 @@ module Skylab::Brazen
       module Semi_Generated_Instance_Methods__
       private
 
-        def datastore
-          @datastore ||= @preconditions.fetch self.class.model_class.persist_to.full_name_i
+        def entity_collection  # :+#public-API #hook-in
+          @preconditions.fetch _model_class.persist_to.full_name_i
         end
 
-        def model_class
+        def _model_class
           self.class.model_class
         end
       end

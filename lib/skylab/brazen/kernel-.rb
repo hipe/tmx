@@ -303,7 +303,12 @@ module Skylab::Brazen
       if mod.respond_to? :entry_tree
         if mod.entry_tree.has_entry SILO_DAEMON_FILE___
           mod.const_get :Silo_Daemon, false  # kick any autoloading
+          did = true
         end
+      end
+
+      if ! did and mod.const_defined? :Stub_, false  # :+[#043]
+        mod.const_get :Actions__, false
       end
 
       mod::Silo_Daemon.new self, mod

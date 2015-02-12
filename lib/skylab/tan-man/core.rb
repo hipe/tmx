@@ -25,6 +25,7 @@ module Skylab::TanMan
 
   Brazen_ = ::Skylab::Brazen
   ACHIEVED_ = true
+  CONST_SEP_ = '::'.freeze
   DASH_ = '-'.freeze
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> {}

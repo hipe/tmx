@@ -16,6 +16,13 @@ module Skylab::Brazen
         Parse_[ :via_stream, io, & oes_p ]
       end
 
+      def via_path_and_kernel path, k, & oes_p
+        doc = Parse_[ :via_path, path, & oes_p ]
+        doc and begin
+          Git_Config_.new doc, k, & oes_p
+        end
+      end
+
       def write * a
         Git_Config_::Actors__::Write.call_via_arglist a
       end
@@ -24,6 +31,7 @@ module Skylab::Brazen
     Actions = ::Module.new
 
     def initialize * a, & oes_p
+      @did_resolve_mutable_document = false
       case a.length
       when 1
         kernel = a.first
@@ -42,10 +50,9 @@ module Skylab::Brazen
     end
 
     def description_under expag
-      if @document
-        @document.description_under expag
-      elsif @mutable_document
-        @mutable_document.description_under expag
+      doc = _document
+      if doc
+        doc.description_under expag
       else
         "«git config»"  # :+#guillemets
       end
@@ -63,17 +70,17 @@ module Skylab::Brazen
     # ~ retrieve (one)
 
     def entity_via_intrinsic_key id, & oes_p
-      Git_Config_::Actors__::Retrieve[ id, @document, @kernel, & oes_p ]
+      Git_Config_::Actors__::Retrieve[ id, _document, @kernel, & oes_p ]
     end
 
     # ~ retrieve (many)
 
     def entity_stream_via_model cls, & oes_p
-      Git_Config_::Actors__::Build_stream[ cls, @document, @kernel, & oes_p ]
+      Git_Config_::Actors__::Build_stream[ cls, _document, @kernel, & oes_p ]
     end
 
     def to_section_stream & oes_p
-      Git_Config_::Actors__::Build_stream[ nil, @document, @kernel, & oes_p ]
+      Git_Config_::Actors__::Build_stream[ nil, _document, @kernel, & oes_p ]
     end
 
     # ~ delete
@@ -88,7 +95,7 @@ module Skylab::Brazen
     # ~ atomic property values
 
     def property_value_via_symbol sym, & oes_p
-      x = @document.sections[ sym ]
+      x = _document.sections[ sym ]
       if x
 
         x.subsect_name_s
@@ -98,7 +105,7 @@ module Skylab::Brazen
 
           Callback_::Event.inline_neutral_with :property_not_found,
               :property_symbol, sym,
-              :input_identifier, @document.input_id do |y, o|
+              :input_identifier, _document.input_id do |y, o|
 
             y << "no #{ nm Callback_::Name.via_variegated_symbol o.property_symbol } #{
               }property in #{ o.input_identifier.description_under self }"
@@ -109,12 +116,20 @@ module Skylab::Brazen
 
   private  # ~ verb support
 
+    def _document
+      if @did_resolve_mutable_document
+        @mutable_document
+      else
+        @document
+      end
+    end
+
     def resolve_mutable_document & oes_p
-      @did_resolve_mutable_document ||= rslv_mutable_document( & oes_p )
+      @did_resolve_mutable_document ||= __resolve_mutable_document( & oes_p )
       @mutable_document_is_resolved
     end
 
-    def rslv_mutable_document & oes_p
+    def __resolve_mutable_document & oes_p
       if @document.is_mutable
         @mutable_document = @document
         @mutable_document_is_resolved = true
@@ -136,16 +151,6 @@ module Skylab::Brazen
         :path, @mutable_document.input_id.to_path,
         :document, @mutable_document,
         & oes_p )
-    end
-
-    class Silo_Daemon < Silo_Daemon
-
-      def via_path path, & oes_p
-        doc = Parse_[ :via_path, path, & oes_p ]
-        doc and begin
-          Git_Config_.new doc, @kernel, & oes_p
-        end
-      end
     end
 
     class Parse_  # the [#cb-046] "any result" pattern is employed.
