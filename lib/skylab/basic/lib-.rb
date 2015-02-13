@@ -5,7 +5,7 @@ module Skylab::Basic
     memo, sidesys, stdlib = Autoloader_.at :memoize,
       :build_require_sidesystem_proc, :build_require_stdlib_proc
 
-    Bzn_ = sidesys[ :Brazen ]
+    Brazen = sidesys[ :Brazen ]
 
     Bundle_Directory = -> mod do
       MH__[]::Bundle::Directory[ mod ]
@@ -29,14 +29,10 @@ module Skylab::Basic
 
     Entity = -> * a, & edit_p do
       if a.length.nonzero? || edit_p
-        Bzn_[]::Entity.call_via_arglist a, & edit_p
+        Brazen[]::Entity.call_via_arglist a, & edit_p
       else
-        Bzn_[]::Entity
+        Brazen[]::Entity
       end
-    end
-
-    Event = -> do
-      Bzn_[].event
     end
 
     Funcy_globful = -> x do

@@ -24,6 +24,14 @@ module Skylab::Headless
         Filesystem_::Find__.mixed_via_iambic x_a
       end
 
+      def flock_first_available_path * x_a
+        if x_a.length.zero?
+          Filesystem_::Flock_first_available_path__
+        else
+          Filesystem_::Flock_first_available_path__.call_via_iambic x_a
+        end
+      end
+
       def grep * x_a
         Filesystem_::Grep__.mixed_via_iambic x_a
       end

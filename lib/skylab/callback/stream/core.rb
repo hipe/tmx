@@ -179,6 +179,17 @@ module Skylab::Callback
           x
         end
 
+        def flush_to_box_keyed_to_method sym
+          bx = Callback_::Box.new
+          begin
+            x = gets
+            x or break
+            bx.add x.send( sym ), x
+            redo
+          end while nil
+          bx
+        end
+
         def flush_to_immutable_with_random_access_keyed_to_method i, * x_a
           Stream_::Immutable_with_Random_Access__.new self, i, x_a
         end

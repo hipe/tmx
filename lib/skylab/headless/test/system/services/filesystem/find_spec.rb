@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::System::Services::Filesystem
 
-  describe "[hl] system services - filesystem find" do
+  describe "[hl] system - services - filesystem - find" do
 
     it "minimal working example - find one file" do
 

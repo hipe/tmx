@@ -31,7 +31,7 @@ module Skylab::Basic
       RX_RX__ = %r(\A/(?<source>.*)/(?<modifiers>[imx]+)?\z)m
 
       def when_no_md
-        _ev = Basic_.lib_.event.inline_not_OK_with :not_parsable_as_regex,
+        _ev = Callback_::Event.inline_not_OK_with :not_parsable_as_regex,
           :string, @string
         @on_error[ _ev ]
       end
@@ -61,7 +61,7 @@ module Skylab::Basic
       end
 
       def when_rx_e
-        @on_error[ Basic_.lib_.event.wrap.exception @e ]
+        @on_error[ Callback_::Event.wrap.exception @e ]
       end
 
       def value_is_known

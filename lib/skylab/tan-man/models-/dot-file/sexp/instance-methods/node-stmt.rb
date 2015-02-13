@@ -58,7 +58,7 @@ module Skylab::TanMan
       def execute
         @equals = @node._label_sexp[ :content ][ :equals ]
         @str = @equals[ :id ].normalized_string
-        if TanMan_.lib_.string_lib.template.string_has_parameter @str, :label
+        if TanMan_.lib_.string_lib.template.string_has_variable @str, :label
           when_template_parameters
         else
           when_no_template_parameters

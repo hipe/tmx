@@ -14,6 +14,10 @@ module Skylab::Brazen
       end
     end
 
+    def byte_upstream_identifier
+      Brazen_::Data_Store_::Byte_Upstream_Identifier
+    end
+
     def cfg
       Brazen_::Data_Stores_::Git_Config
     end

@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::System::Services::Filesystem
 
-  describe "[hl] system services - filesystem - grep (a HACK)" do
+  describe "[hl] system - services - FS - grep (a HACK)" do
 
     it "minimal case - " do
       parent_subject.grep( :ruby_regexp, /foo/ ).string.should eql "grep -E foo"

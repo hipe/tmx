@@ -46,7 +46,7 @@ module Skylab::Basic
 
       def build_dot_dot_event real_parts, rel_parts, sep
 
-        Basic_.lib_.event.inline_not_OK_with :cannot_go_higher_than_top,
+        Callback_::Event.inline_not_OK_with :cannot_go_higher_than_top,
             :real_parts, real_parts, :rel_parts, rel_parts, :sep, sep do | y, o |
 
           _s = o.real_parts.join o.sep

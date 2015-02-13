@@ -109,12 +109,10 @@ module Skylab::Face::TestSupport::CLI::Client::API_Integration::Service
       end
 
       it "service in API/CLI : no/no - .." do
+        _rx = /has not declared the required services.+biffle.+baffle/
         -> do
           invoke 'winkle-tankle'
-        end.should raise_error(
-          Face_::Plugin::DeclarationError,
-            /has not declared the required services.+biffle.+baffle/
-        )
+        end.should raise_error Face_::Plugin::DeclarationError, _rx
       end
     end
   end

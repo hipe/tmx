@@ -177,7 +177,7 @@ module Skylab::Basic  # introduction at [#020]
     end
 
     def build_not_OK_event_via_mutable_iambic_and_message_proc x_a, msg_p
-      Basic_.lib_.event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, msg_p
+      Callback_::Event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, msg_p
     end
   end
 

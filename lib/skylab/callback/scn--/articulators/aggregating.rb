@@ -59,8 +59,8 @@ module Skylab::Callback
 
       def via_template_parse_remainder_of_iambic_stream st
         bx = Box.new
-        @nucleus.template.get_formal_parameters.each do |param|
-          bx.add param.name_i, Field__.new( param )
+        @nucleus.template.to_formal_variable_stream.each do | param |
+          bx.add param.name_symbol, Field__.new( param )
         end
         @nucleus.field_box = bx
         @nucleus.name_i_a = bx.get_names.freeze
@@ -190,8 +190,8 @@ module Skylab::Callback
           :when_field_value_count_is_one_p,
           :when_field_value_count_is_two_or_more_p
 
-        def name_i
-          @tparam.name_i
+        def name_symbol
+          @tparam.name_symbol
         end
 
         def cleanup_after_scan
@@ -351,7 +351,7 @@ module Skylab::Callback
           scn = @nucleus.field_box.to_value_minimal_stream
           agg_fld_a = []
           while fld = scn.gets
-            @is_repeated_h[ fld.name_i ] and next
+            @is_repeated_h[ fld.name_symbol ] and next
             if fld.does_field_aggregation
               agg_fld_a.push fld
             else
@@ -524,9 +524,9 @@ module Skylab::Callback
           @oframe = @frame_a.fetch 0
           @subs_h = {} ; @derivative_p_a = false  # #experiment 1 of 2
           scn = @nucleus.field_box.to_value_minimal_stream
-          agg_i = @afield.name_i
+          agg_i = @afield.name_symbol
           while @fld = scn.gets
-            if agg_i == @fld.name_i
+            if agg_i == @fld.name_symbol
               @p = @afield.aggregate_p
               @x = @frame_a.map { |frame| frame[ agg_i ] }
               via_proc_and_value_substitute_value
@@ -613,7 +613,7 @@ module Skylab::Callback
         end
 
         def via_proc_substitute_value
-          @x = @oframe[ @fld.name_i ]
+          @x = @oframe[ @fld.name_symbol ]
           via_proc_and_value_substitute_value ; nil
         end
 
@@ -626,13 +626,13 @@ module Skylab::Callback
           if @y.length.zero?
             via_nil_sustitute_value
           else
-            @subs_h[ @fld.name_i ] = @y * EMPTY_S_
+            @subs_h[ @fld.name_symbol ] = @y * EMPTY_S_
           end ; nil
         end
 
         def via_passthru_increment_and_substitute_value
           via_field_increment_value_count
-          @subs_h[ @fld.name_i ] = @oframe[ @fld.name_i ]
+          @subs_h[ @fld.name_symbol ] = @oframe[ @fld.name_symbol ]
           nil
         end
 
@@ -645,13 +645,13 @@ module Skylab::Callback
         end
 
         def via_field_produce_incremented_value_count
-          fld_i = @fld.name_i
+          fld_i = @fld.name_symbol
           _x = @oframe[ fld_i ]
           @field_value_count_h[ fld_i ][ _x ] += 1
         end
 
         def via_nil_sustitute_value  # if we don't add the key, the template will
-          @subs_h[ @fld.name_i ] = nil   # substitute the mustache variable name
+          @subs_h[ @fld.name_symbol ] = nil   # substitute the mustache variable name
         end
       end
 

@@ -44,7 +44,7 @@ module Skylab::Basic
       end
 
       def black_and_white_expression_agent_for_expect_event
-        Basic_::Lib_::Bzn_[]::API.expression_agent_instance
+        Basic_.lib_.brazen::API.expression_agent_instance
       end
     end
   end
