@@ -51,5 +51,23 @@ module Skylab::Brazen
         end
       end  # >>
     end
+
+    module Byte_Downstream_Identifier
+
+      class << self
+
+        def via_stream io
+          Brazen_.lib_.IO::Byte_Downstream_Identifier.new io
+        end
+
+        def via_string s
+          Brazen_.lib_.basic::String::Byte_Downstream_Identifier.new s
+        end
+
+        def via_path s
+          Brazen_.lib_.system.filesystem.class::Byte_Downstream_Identifier.new s
+        end
+      end  # >>
+    end
   end
 end

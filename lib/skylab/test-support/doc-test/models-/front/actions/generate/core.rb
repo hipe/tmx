@@ -531,7 +531,7 @@ module Skylab::TestSupport
             :path, @output_path,
             :is_dry_run, @dry_run,
             :force_arg, _force_arg,
-            :on_event_selectively, handle_event_selectively )
+            & handle_event_selectively )
 
           if io
             io.truncate 0
@@ -565,12 +565,15 @@ module Skylab::TestSupport
         end
 
         def via_upstream_path_rslv_line_upstream
+
           io = TestSupport_.lib_.system.filesystem.normalization.upstream_IO(
-            :path, @upstream_path,
-            :on_event_selectively, -> * i_a, & ev_p do
-              @result = maybe_send_event_via_channel i_a, & ev_p
-              :error != i_a.first
-            end )
+
+              :path, @upstream_path ) do | * i_a, & ev_p |
+
+            @result = maybe_send_event_via_channel i_a, & ev_p
+            :error != i_a.first
+          end
+
           if io
             @line_upstream = io ; ACHIEVED_
           else

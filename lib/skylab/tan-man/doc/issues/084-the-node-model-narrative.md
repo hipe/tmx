@@ -2,13 +2,11 @@
 
 ## :#lexical-esque-node-insertion
 
-this algorithm is a specialized form of :+[#067] the lexical-esque
+this algorithm is a specialized form of :+[#br-011] the lexical-esque
 insertion strategy:
-
 
 When creating new nodes this is how we determine where they go:
 (this is likely not implemented fully as you read this)
-(#doc-point [#067] is a big part of this, see more there.)
 
   + if you find any existing node statements,
     + if you encounter any first one that is lexically greater than you,

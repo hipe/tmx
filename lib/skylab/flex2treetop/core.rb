@@ -510,10 +510,12 @@ module Skylab::Flex2Treetop
     private
 
       def rslv_upstream_IO
-        x_a = []
-        x_a.push :path_arg, Lib_::Bsc_[].trio.via_x_and_i( @flexfile, :flexfile )
-        x_a.push :on_event, flattener_event_receiver_proc_for( :rslv_up_IO )
-        io = LIB_.system.filesystem.normalization.upstream_IO.mixed_via_iambic x_a
+
+        _ = Lib_::Bsc_[].trio.via_x_and_i @flexfile, :flexfile
+
+        io = LIB_.system.filesystem.normalization.upstream_IO.
+          mixed_with :path_arg, _, & _handle_event_thru( :rslv_up_IO )
+
         if io
           @upstream_IO = io
           PROCEDE_
@@ -531,12 +533,16 @@ module Skylab::Flex2Treetop
       end
 
       def rslv_payload_IO
+
         x_a = []
         send :"when_payload_shape_is_#{ @pay_i }", x_a
-        x_a.push :on_event, flattener_event_receiver_proc_for( :rslv_pay_IO )
+
         x_a.push :force_arg, bld_force_arg
         x_a.push :last_looks, method( :last_looks )
-        io = LIB_.system.filesystem.normalization.downstream_IO.mixed_via_iambic x_a
+
+        io = LIB_.system.filesystem.normalization.downstream_IO.
+          mixed_via_iambic x_a, & _handle_event_thru( :rslv_pay_IO )
+
         if io
           @payload_IO = io
           PROCEDE_
@@ -626,12 +632,17 @@ module Skylab::Flex2Treetop
         UNABLE_
       end
 
-      def flattener_event_receiver_proc_for i
-        -> ev do
+      def _handle_event_thru sym
+
+        -> * i_a, & ev_p do
+
+          ev = ev_p[]
+
           if ! ev.ok.nil?
-            i_ = ev.ok ? :OK : :not_OK
+            ok_i = ev.ok ? :OK : :not_OK
           end
-          @sl.maybe_receive_event i, * i_, ev.terminal_channel_i, ev
+
+          @sl.maybe_receive_event sym, * ok_i, ev.terminal_channel_i, ev
         end
       end
 

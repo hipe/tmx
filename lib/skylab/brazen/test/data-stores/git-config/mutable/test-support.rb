@@ -76,8 +76,8 @@ module Skylab::Brazen::TestSupport::Data_Stores::Git_Config::Mutable
       end
     end
 
-    def touch_section subsect_s=nil, sect_s
-      document.sections.touch_section subsect_s, sect_s
+    def touch_section subsect_s=nil, sect_s, & x_p
+      document.sections.touch_section subsect_s, sect_s, & x_p
     end
 
     # ~ expectations

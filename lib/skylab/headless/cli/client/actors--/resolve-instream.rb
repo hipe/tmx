@@ -39,14 +39,16 @@ module Skylab::Headless
       end
 
       def work
+
         _path_arg = build_path_arg
+
         io = Headless_.system.filesystem.normalization.upstream_IO(
           :instream, @IO_adapter.instream,
-          :path_arg, _path_arg,
-          :on_event, -> ev do
-            @evr.receive_event ev
+          :path_arg, _path_arg ) do | *, & ev_p |
+            @evr.receive_event ev_p[]
             UNABLE_
-          end )
+          end
+
         io and begin
           @IO_adapter.instream = io  # may be the same one -- stdin
           ACHIEVED_

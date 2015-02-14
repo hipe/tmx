@@ -234,6 +234,10 @@ module Skylab::Brazen
           @escaped_subsection_s = ss.dup )
       end
 
+      def members
+        [ :section_s, :subsection_s, :escaped_subsection_s ]
+      end
+
       attr_reader :section_s, :subsection_s, :escaped_subsection_s
 
       def to_a

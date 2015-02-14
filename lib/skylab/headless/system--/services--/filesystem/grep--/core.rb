@@ -8,12 +8,11 @@ module Skylab::Headless
 
         class << self
 
-          def mixed_via_iambic x_a
+          def mixed_via_iambic x_a, & oes_p
 
             new do
-              process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+              process_iambic_stream_fully iambic_stream_via_iambic_array( x_a ), & oes_p
             end.mixed_result
-
           end
         end
 

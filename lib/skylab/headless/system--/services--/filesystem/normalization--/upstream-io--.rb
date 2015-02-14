@@ -34,15 +34,10 @@ module Skylab::Headless
               ACHIEVED_
             end
 
-            def on_event=
-              oe_p = iambic_property
-              @on_event_selectively = -> *, & ev_p do
-                oe_p[ ev_p[] ]
-              end
-              ACHIEVED_
-            end
-
-            o :properties, :instream, :as_normal_value, :on_event_selectively
+            o :properties,
+                :as_normal_value,
+                :instream,
+                :stat
           end
 
           def initialize & edit_p
@@ -61,8 +56,6 @@ module Skylab::Headless
               freeze  # is a curried normalization (not implemented yet)
             end
           end
-
-        private
 
           def execute
             if @instream
@@ -149,7 +142,7 @@ module Skylab::Headless
             @path = @path_arg.value_x
             path_exists_and_set_stat_and_stat_error @path
             if @stat
-              when_stat
+              via_stat_execute
             else
               when_no_stat
             end
@@ -161,14 +154,14 @@ module Skylab::Headless
             end
           end
 
-          def when_stat
+          def via_stat_execute
             if @only_apply_ftype_expectation
               via_stat_and_expected_ftype_exert_expectation
             elsif FILE_FTYPE_ == @stat.ftype
               via_path_open_file
             else
               maybe_send_event :error, :wrong_ftype do
-                via_stat_and_path_build_wrong_ftype_event FILE_FTYPE_
+                build_wrong_ftype_event_ @path_arg.value_x, @stat, FILE_FTYPE_
               end
             end
           end
@@ -178,7 +171,7 @@ module Skylab::Headless
               @as_normal_value[ ACHIEVED_ ]
             else
               maybe_send_event :error, :wron_ftype do
-                via_stat_and_path_build_wrong_ftype_event @expected_ftype
+                build_wrong_ftype_event_ @path_arg.value_x, @stat, @expected_ftype
               end
             end
           end

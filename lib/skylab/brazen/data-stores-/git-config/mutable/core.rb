@@ -194,7 +194,7 @@ module Skylab::Brazen
           end ; nil
         end
 
-        def get_body_line_stream
+        def to_body_line_stream
           nscn = to_node_stream
           lscn = nil
           Callback_::Scn.new do
@@ -375,7 +375,7 @@ module Skylab::Brazen
         end
 
         def to_line_stream
-          get_body_line_stream
+          to_body_line_stream
         end
 
         def add_comment str
@@ -458,19 +458,31 @@ module Skylab::Brazen
 
         # ~ the mutators
 
-        def touch_comparable_item item, compare_p
-          scn = to_stream
-          while x = scn.gets
+        def touch_comparable_item item, compare_p, & x_p  # :+[#011]
+
+          st = to_stream
+
+          begin
+            x = st.gets
+            x or break
             d = compare_p[ x ]
             case d
             when -1 ; last_above_neighbor = x
             when  0 ; exact_match = x ; break
             when  1 ; first_below_neighbor = x ; break
             end
-          end
+            redo
+          end while nil
+
           if exact_match
+            if x_p
+              x_p.call :info, :found_existing
+            end
             exact_match
           else
+            if x_p
+              x_p.call :info, :inserting_item
+            end
             @collection_kernel.insert_item_y_between_x_and_z(
               last_above_neighbor, item, first_below_neighbor )
           end
@@ -533,21 +545,32 @@ module Skylab::Brazen
           [ :touch_section, :delete_these_ones, * super ]
         end
 
-        def touch_section subsect_s=nil, sect_s
-          section = bld_section subsect_s, sect_s
+        def touch_section subsect_s=nil, sect_s, & x_p
+          section = _build_section subsect_s, sect_s
           section and begin
-            _compare_p = bld_compare section
-            touch_comparable_item section, _compare_p
+            _compare_p = __build_compare section
+            touch_comparable_item section, _compare_p, & x_p
           end
         end
 
-      private
+        def touch_section_magnetic sect_s, & x_p
 
-        def bld_section subsect_s, sect_s
+          # "magnetic" in this case means to match any existing section
+          # based soley on the section name, insensitive to any
+          # subsection name.
+
+          section = _build_section nil, sect_s
+          section and begin
+            _compare_p = __build_compare_magnetic section
+            touch_comparable_item section, _compare_p, & x_p
+          end
+        end
+
+        def _build_section subsect_s, sect_s
           Section_or_Subsection__.via_literals subsect_s, sect_s, @parse
         end
 
-        def bld_compare section
+        def __build_compare section
           normalized_name_s = section.internal_normal_name_string
           subsection_name_s = section.subsect_name_s
           if subsection_name_s
@@ -574,6 +597,13 @@ module Skylab::Brazen
             if d.zero?
               x.subsect_name_s ? 1 : 0
             else d end
+          end
+        end
+
+        def __build_compare_magnetic section
+          s = section.internal_normal_name_string
+          -> x do
+            x.internal_normal_name_string <=> s
           end
         end
 
@@ -727,6 +757,7 @@ module Skylab::Brazen
         end
 
         def set_subsection_name s
+          @is_editable or _make_editable
           @kernel.set_subsect_name_ s
         end
 
@@ -920,14 +951,21 @@ module Skylab::Brazen
           s__ = s_.dup
           Section_.mutate_subsection_name_for_marshal s__
 
-          line_ = @line.dup
-          line_[ @name_start_index + @name_width + @subsection_leader_width,
-                 @subsection_name_width ] = s__
+          line = @line.dup
+
+          base_d = @name_start_index + @name_width
+
+          if @subsection_leader_width
+            line[ base_d + @subsection_leader_width, @subsection_name_width ] = s__
+          else
+            line[ base_d, 0 ] = " \"#{ s__ }\" "
+            # the absence of existing trailing spacing is for now assumed
+          end
 
           @subsect_s = s_.freeze
           @subsection_name_width = s__.length
 
-          @line = line_
+          @line = line
 
           ACHIEVED_
         end
@@ -951,7 +989,7 @@ module Skylab::Brazen
           p = -> do
             x = @line
             p = -> do
-              scn = get_body_line_stream
+              scn = to_body_line_stream
               p = -> do
                 scn.gets
               end
@@ -959,7 +997,7 @@ module Skylab::Brazen
             end
             x
           end
-          Callback_::Scn.new do
+          Callback_.stream do
             p[]
           end
         end
@@ -981,7 +1019,7 @@ module Skylab::Brazen
       private
 
         def aref_set_via_assignment ast
-          _compare_p = bld_compare ast
+          _compare_p = __build_compare ast
           otr = @assignments_shell.touch_comparable_item ast, _compare_p
           if ast.object_id == otr.object_id
             maybe_send_added_value_event ast
@@ -996,7 +1034,7 @@ module Skylab::Brazen
           end
         end
 
-        def bld_compare ast
+        def __build_compare ast
           norm_s = ast.internal_normal_name_string
           -> x do
             x.internal_normal_name_string <=> norm_s
@@ -1071,7 +1109,7 @@ module Skylab::Brazen
             p = EMPTY_P_
             line
           end
-          Callback_::Scn.new do
+          Callback_.stream do
             p[]
           end
         end
@@ -1472,7 +1510,7 @@ module Skylab::Brazen
       public
 
         def to_line_stream
-          Single_line_scanner__[ @line ]
+          Line_stream_via_single_line__[ @line ]
         end
 
         def unparse_into_yielder y
@@ -1605,8 +1643,7 @@ module Skylab::Brazen
       class Assignment_Kernel__
 
         def to_line_stream
-          _line = rndr_line
-          Single_line_scanner__[ _line ]
+          Line_stream_via_single_line__[ rndr_line ]
         end
 
         def set_value x
@@ -1683,7 +1720,7 @@ module Skylab::Brazen
         end
 
         def to_line_stream
-          Single_line_scanner__[ @line ]
+          Line_stream_via_single_line__[ @line ]
         end
 
         def to_line
@@ -1691,12 +1728,8 @@ module Skylab::Brazen
         end
       end
 
-      Single_line_scanner__ = -> line do
-        Callback_::Scn.new do
-          if line
-            r = line ; line = nil ; r
-          end
-        end
+      Line_stream_via_single_line__ = -> line do
+        Callback_::Stream.via_item line
       end
 
       SPACE_RX_ = /[ ]*/

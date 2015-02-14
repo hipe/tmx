@@ -102,18 +102,23 @@ module Skylab::TestSupport
           DIRECTORY_FTYPE__ = 'directory'.freeze
 
           def via_manifest_pathname_resolve_open_upstream_IO
+
             pn = @manifest_dir_pn.join @doc_test_files_file
             pth = pn.to_path
+
             io = @filesystem.normalization.upstream_IO(
-              :path, pth,
-              :on_event, -> ev do
-                if @not_found_ev_a.nil?
-                  @not_found_ev_a = [ ev ]
-                else
-                  @not_found_ev_a.push ev
-                end
-                UNABLE_
-              end )
+
+                :path, pth ) do | *, & ev_p |
+
+              ev = ev_p[]
+              if @not_found_ev_a.nil?
+                @not_found_ev_a = [ ev ]
+              else
+                @not_found_ev_a.push ev
+              end
+              UNABLE_
+            end
+
             io and begin
               _len = @doc_test_dir.length + 2 + @doc_test_files_file.length  # three parts, 2 separator slashes ick
               @top_path = pth[ 0 .. - ( 1 + _len ) ]

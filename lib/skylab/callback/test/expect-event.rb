@@ -110,6 +110,12 @@ module Skylab::Callback::TestSupport
           end
         end
 
+        def flush_to_event_stream
+          st = Callback_::Stream.via_nonsparse_array @ev_a
+          @ev_a = TestSupport_::EMPTY_A_
+          st
+        end
+
         # ~ expectations along the different qualities of events
 
         def via_ev_expect_terminal_channel_of i

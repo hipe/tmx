@@ -16,6 +16,14 @@ module Skylab::Callback
 
         attr_reader :ev
 
+        def new_with_event ev
+          dup.__init_otr( ev )
+        end
+
+        protected def __init_otr ev
+          @ev = ev ; self
+        end
+
         def inflected_verb
           if @nf.respond_to? :inflected_verb
             @nf.inflected_verb

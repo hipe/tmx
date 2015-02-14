@@ -49,7 +49,11 @@ module Skylab::Brazen
         :surrounding_path, bx.fetch( :surrounding_path ),
         :config_filename, bx.fetch( :config_filename ) )
 
-      Workspace_::Actors__::Init.call_via_iambic x_a, & oes_p
+      ok = Workspace_::Actors__::Init.call_via_iambic x_a, & oes_p
+      if ok
+        @_surrounding_path_exists = true
+      end
+      ok
     end
 
     # ~~ find nearest
@@ -249,6 +253,19 @@ module Skylab::Brazen
 
       def execute
 
+        ws_path = @bx.fetch( :workspace_path ).value_x
+        if ws_path
+          __execute_via_workspace_path ws_path
+        else
+          @on_event_selectively.call :error, :missing_required_properties do
+            Brazen_.properties_stack.build_missing_required_properties_event [ :workspace_path ]
+          end
+          UNABLE_
+        end
+      end
+
+      def __execute_via_workspace_path ws_path
+
         @ws = @model_class.edit_entity @kernel, @oes_p do |o|
           o.edit_with(
             :config_filename, @bx.fetch( :config_filename ).value_x,
@@ -280,9 +297,29 @@ module Skylab::Brazen
       end
 
       def on_Workspace_via_trio_boX_resource_not_found_via_channel i_a, & ev_p
-        maybe_send_event_via_channel i_a do
-          bld_workspace_not_found_event ev_p[]
+
+        pair = @bx[ :just_looking ]
+
+        if pair && pair.value_x
+          __when_just_looking i_a, & ev_p
+        else
+          maybe_send_event_via_channel i_a do
+            bld_workspace_not_found_event ev_p[]
+          end
         end
+      end
+
+      def __when_just_looking i_a, & ev_p
+        maybe_send_event :info, * i_a[ 1 .. -1 ] do
+          ev = ev_p[]
+          x_a = ev.to_iambic
+          x_a[ 0 ] = :workspace_not_found
+          if :ok == x_a[ -2 ]
+            x_a[ -1 ] = true
+          end
+          build_event_via_iambic_and_message_proc x_a, ev.message_proc
+        end
+        nil
       end
 
       def bld_workspace_not_found_event ev

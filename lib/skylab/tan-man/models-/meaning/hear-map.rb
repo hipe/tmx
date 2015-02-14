@@ -24,7 +24,8 @@ module Skylab::TanMan
             pt = hrd.parse_tree
 
             hrd.kernel.silo( :meaning ).bound_call :add,
-              hrd.trio_box,
+              :trio_box, hrd.trio_box,
+              :with,
               :name, pt.fetch( 0 ).join( SPACE_ ),
               :value, pt.fetch( 2 ).join( SPACE_ ),
               :force,  # because this is "set" not "create"
@@ -68,7 +69,8 @@ module Skylab::TanMan
             pt = hrd.parse_tree
 
             hrd.kernel.silo( :meaning ).bound_call :associate,
-              hrd.trio_box,
+              :trio_box, hrd.trio_box,
+              :with,
               :node_label, pt.first.join( SPACE_ ),
               :meaning_name, pt.last.join( SPACE_ ),
               & oes_p

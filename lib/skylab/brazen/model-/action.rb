@@ -164,6 +164,11 @@ module Skylab::Brazen
       nil
     end
 
+    def receive_starting_preconditions bx
+      @preconditions = bx
+      nil
+    end
+
     def process_pair_box_passively bx  # wants to go up. #magnetic
 
       method_name_p = iambic_writer_method_name_passive_lookup_proc

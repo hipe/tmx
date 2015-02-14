@@ -21,11 +21,7 @@ module Skylab::Callback
     end
 
     def stream( & p )
-      if block_given?
-        Callback_::Stream.new( & p )
-      else
-        Callback_::Stream
-      end
+      Callback_::Stream.new( & p )
     end
 
     def test_support

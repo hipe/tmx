@@ -69,7 +69,6 @@ module Skylab::TanMan::TestSupport::Models::Graph
         end
 
         expect_failed
-
       end
 
       it "and digraph is abspath whose dirname is noent - no" do
@@ -82,15 +81,18 @@ module Skylab::TanMan::TestSupport::Models::Graph
           :digraph_path, full_path,
           :workspace_path, @ws_pn.to_path, :config_filename, cfn
 
-        expect_event :adding_extension
+        ev = _expect_events_order_insensitive(
 
-        ev = expect_not_OK_event :resource_not_found
+          adding_extension: nil,
+          entity_not_found: nil,
+          using_default: nil,
+          parent_directory_must_exist: IDENTITY_ )
 
         full_path_ = ::File.dirname full_path
 
         ev.to_event.path.should eql full_path_
 
-        black_and_white( ev ).should eql "No such file or directory - some-deep"
+        black_and_white( ev ).should eql "parent directory must exist - some-deep"
 
         expect_failed
       end
@@ -116,9 +118,9 @@ module Skylab::TanMan::TestSupport::Models::Graph
             :digraph_path, dgpn.to_path,
             :workspace_path, @ws_pn.to_path, :config_filename, cfn
 
-          expect_not_OK_event :resource_is_wrong_shape,
-            /\Aexpected \(val "file"\) had \(ick "directory"\) - #{
-              }\(pth #<Pathname:[^>]+not-a-dotfile\.dot>\)\z/
+          expect_not_OK_event :wrong_ftype,
+            /\A\(pth "[^"]+"\) exists but is not \(indefinite_noun #{
+             }"file"\), it is \(indefinite_noun "directory"\)\z/
 
           expect_failed
         end
@@ -132,20 +134,56 @@ module Skylab::TanMan::TestSupport::Models::Graph
 
         it "and digraph path is file - OK" do
 
-          shared_setup_via_config_line '[whtvr]'
+          shared_setup_via_config_line '[wiw]'
 
           expect_OK_event :datastore_resource_committed_changes
 
-          cpn = @ws_pn.join cfn
+          _read_config_file
 
-          @output_s = cpn.read
-
-          excerpt( -2 .. -2 ).should eql "[graph \"i-exist/like-a-boss.dog\"]\n"
+          excerpt( -2 .. -1 ).should eql "[graph \"i-exist/like-a-boss.dog\" ]\n[wiw]\n"
 
           expect_succeeded
         end
 
+        it "and diraph path is File object (A HACK)" do
+
+          prepare_ws_tmpdir <<-O.unindent
+            --- /dev/null
+            +++ b/#{ cfn }
+            @@ -0,0 +1 @@
+            +[ graph "dingo-dango" ]
+            --- /dev/null
+            +++ b/#{ cdn }/open-this-yourself
+            @@ -0,0 +1 @@
+            + this will get overwritten
+          O
+
+          _file = @ws_pn.join( 'open-this-yourself' ).open( WRITE_MODE_ )
+
+          call_API :graph, :use,
+            :digraph_path, _file,
+            :workspace_path, @ws_pn.to_path, :config_filename, cfn
+
+          @ev_a[ 0 .. -3 ] = TanMan_::EMPTY_A_
+
+          expect_OK_event :wrote_file
+          expect_OK_event :datastore_resource_committed_changes
+          expect_succeeded
+
+          _read_config_file
+          excerpt( 0 .. 0 ).should eql "[ graph \"../open-this-yourself\" ]\n"
+        end
+
         def shared_setup_via_config_line config_line
+
+          __like_a_boss config_line
+
+          call_API :graph, :use,
+            :digraph_path, @digraph_path,
+            :workspace_path, @ws_pn.to_path, :config_filename, cfn
+        end
+
+        def __like_a_boss config_line
 
           prepare_ws_tmpdir <<-O.unindent
             --- /dev/null
@@ -158,11 +196,14 @@ module Skylab::TanMan::TestSupport::Models::Graph
             + but this is not a dotfile
           O
 
-          dgpn = @ws_pn.join "#{ cdn }/i-exist/like-a-boss.dog"
+          @digraph_path = @ws_pn.join( "#{ cdn }/i-exist/like-a-boss.dog" ).to_path
 
-          call_API :graph, :use,
-            :digraph_path, dgpn.to_path,
-            :workspace_path, @ws_pn.to_path, :config_filename, cfn
+          nil
+        end
+
+        def _read_config_file
+          @output_s = @ws_pn.join( cfn ).read
+          nil
         end
 
         context "and digraph does *not* exist" do
@@ -180,23 +221,24 @@ module Skylab::TanMan::TestSupport::Models::Graph
               :digraph_path, dg_pn.to_path,
               :workspace_path, @ws_pn.to_path, :config_filename, cfn
 
-            ev = expect_neutral_event :adding_extension
-            black_and_white( ev ).should eql "adding .dot extension to make-me"
+            _expect_events_order_insensitive(
 
-            ev = expect_not_OK_event :entity_not_found
-            black_and_white( ev ).should eql "in config there are no starters"
+              adding_extension: [ nil,
+                "adding .dot extension to make-me" ],
 
-            ev = expect_neutral_event :using_default
-            black_and_white( ev ).should match(
-              /\Ausing default starter "minimal\.dot" \(the last of [23] starters\)/ )
+              entity_not_found: [ nil,
+                "in config there are no starters" ],
 
-            ev = expect_OK_event :wrote_file
-            black_and_white( ev ).should match(
-              /\Awrote make-me\.dot \([456]\d bytes\)/ )
+              using_default: [ nil,
+                /\Ausing default starter "minimal\.dot" \(the last of [23] starters\)/ ],
 
-            ev = expect_OK_event :datastore_resource_committed_changes
-            black_and_white( ev ).should match(
-              %r(\Aupdated config \(\d{2} bytes\)) )
+              before_probably_creating_new_file: nil,
+
+              wrote_file: [ true,
+                /\Awrote make-me\.dot \([456]\d bytes\)/ ],
+
+              datastore_resource_committed_changes: [ true,
+                %r(\Aupdated config \(\d{2} bytes\)) ] )
 
             io = dg_pn.sub_ext( '.dot' ).open( READ_MODE_ )
             o = TestSupport_::Expect_Line::Scanner.via_line_stream io
@@ -220,9 +262,13 @@ module Skylab::TanMan::TestSupport::Models::Graph
               :workspace_path, @ws_pn.to_path,
               :config_filename, cfn
 
-            expect_not_OK_event :entity_not_found
-            expect_event :using_default
-            ev = expect_event :wrote_file
+            ev = _expect_events_order_insensitive(
+              entity_not_found: nil,
+              using_default: nil,
+              before_probably_creating_new_file: nil,
+              wrote_file: IDENTITY_,
+              datastore_resource_committed_changes: nil )
+
             ::File.basename( ev.to_event.path ).should eql 'make-this.wtvr'
 
             expect_succeeded_result
@@ -238,6 +284,50 @@ module Skylab::TanMan::TestSupport::Models::Graph
         @@ -0,0 +1 @@
         +[ whatever ]
       O
+    end
+
+    def _expect_events_order_insensitive mutable_h
+
+      # :+#abstraction-candidate
+
+      h = mutable_h
+      last_user_result = nil
+      st = flush_to_event_stream
+
+      begin
+        ev = st.gets
+        ev or break
+        k = ev.terminal_channel_i
+        x = h.fetch k
+        h.delete k
+        x or redo
+
+        if x.respond_to? :call
+          last_user_result = x[ ev ]
+          redo
+        end
+
+        ok, msg_x = x
+
+        ok_ = ev.to_event.ok
+        ok == ok_ or fail "`#{ k }.ok` was #{ ok_.inspect }, expected #{ ok.inspect }"
+
+        msg_x or redo
+        msg = black_and_white ev
+        if msg_x.respond_to? :named_captures
+          msg.should match msg_x
+        else
+          msg.should eql msg_x
+        end
+
+        redo
+      end while nil
+
+      if h.length.nonzero?
+        fail "these expected events were not emitted: (#{ h.keys * ', ' })"
+      end
+
+      last_user_result
     end
   end
 end

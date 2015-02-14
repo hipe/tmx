@@ -198,15 +198,19 @@ module Skylab::CodeMolester
     end
 
     public def read & p
+
       read = Read__.new
       p and p[ read ]
       error_x = nil
-      io = CM_.lib_.system.filesystem.normalization.upstream_IO(
-        :path, @pathname.to_path,
-        :on_event, -> ev do
-          error_x = read.receive_event ev
-          false
-        end )
+
+      io = ( CM_.lib_.system.filesystem.normalization.upstream_IO(
+
+          :path, @pathname.to_path ) do | *, & ev_p |
+
+        error_x = read.receive_event ev_p[]
+        false
+      end )
+
       if io
         read_via_open_IO_and_read io, read
       else

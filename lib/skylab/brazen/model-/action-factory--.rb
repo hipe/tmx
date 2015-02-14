@@ -142,6 +142,9 @@ module Skylab::Brazen
             bx = @formal_properties.to_mutable_box_like_proxy
             @formal_properties = bx  # may be same object
             begin
+              if bx.has_name prp.name_symbol
+                self._NEEDS_POLICY  # #todo
+              end
               bx.add prp.name_symbol, prp
               prp = st.gets
             end while prp

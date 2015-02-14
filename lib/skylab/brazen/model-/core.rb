@@ -365,6 +365,11 @@ module Skylab::Brazen
         acr and acr.to_lower_action_cls_strm
       end
 
+      def to_intrinsic_unbound_action_stream
+        acr = actn_class_reflection
+        acr and acr.to_node_stream
+      end
+
       def is_actionable
         @did_reslolve_acr ||= init_action_class_reflection
         @is_actionable
@@ -820,16 +825,48 @@ module Skylab::Brazen
         @model_class.name_function.as_lowercase_with_underscores_symbol
       end
 
+      def call * x_a, & oes_p
+        bc = _bound_call_via x_a, & oes_p
+        bc and bc.receiver.send( bc.method_name, * bc.args )
+      end
+
       def bound_call * x_a, & oes_p
+        _bound_call_via x_a, & oes_p
+      end
+
+      def _bound_call_via x_a, & oes_p
 
         sess = Brazen_::API.bound_call_session.start_via_iambic x_a, @kernel, & oes_p
         sess.receive_top_bound_node @model_class.new( @kernel, & oes_p )
 
-        if sess.via_current_branch_resolve_action
+        if sess.via_current_branch_resolve_action_promotion_insensitive
           st = sess.iambic_stream
+          h = { trio_box: nil, preconditions: nil }
+          while st.unparsed_exists
+            if :with == st.current_token
+              st.advance_one
+              break
+            end
+            k = st.gets_one
+            h.fetch k  # validate
+            h[ k ] = st.gets_one
+          end
+          preconds = h[ :preconditions ]
+          trio_box = h[ :trio_box ]
+          h = nil
+
           act = sess.bound
           act.first_edit
-          ok = act.process_pair_box_passively st.gets_one
+
+          if preconds
+            act.receive_starting_preconditions preconds
+          end
+
+          ok = true
+          if trio_box
+            ok = act.process_pair_box_passively trio_box
+          end
+
           ok &&= act.process_iambic_stream_fully_ st
           ok and act.via_arguments_produce_bound_call
         else

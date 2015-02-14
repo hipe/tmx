@@ -10,10 +10,14 @@ module Skylab::Brazen::TestSupport::CLI::Actions
     with_max_num_dirs '1'
 
     context "from within empty directory ( NOTE misspelling in preterite :P )" do
+
       from_new_directory_one_deep
+
       it "ok, inits." do
         invoke
         expect %r(\Ainited workspace: created \./brazen\.conf .+bytes)
+        expect " config filename: brazen.conf"
+        expect "surrounding path: ."
         expect_succeeded
       end
     end

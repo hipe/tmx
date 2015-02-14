@@ -8,8 +8,8 @@ module Skylab::Headless
 
         class << self
 
-          def downstream_IO * x_a
-            Normalization__::Downstream_IO__.mixed_via_iambic x_a
+          def downstream_IO * x_a, & oes_p
+            Normalization__::Downstream_IO__.mixed_via_iambic x_a, & oes_p
           end
 
           def existent_directory * x_a, & oes_p
@@ -20,17 +20,20 @@ module Skylab::Headless
             singleton_class.instance_methods( false ) - [ :members ]
           end
 
-          def upstream_IO * x_a, & p
-            p and x_a.push :on_event_selectively, p
-            Normalization__::Upstream_IO__.mixed_via_iambic x_a
+          def upstream_IO * x_a, & oes_p
+            Normalization__::Upstream_IO__.mixed_via_iambic x_a, & oes_p
           end
 
-          def unlink_file * x_a
-            Normalization__::Unlink_File__.mixed_via_iambic x_a
+          def unlink_file * x_a, & oes_p
+            Normalization__::Unlink_File__.mixed_via_iambic x_a, & oes_p
           end
         end  # >>
 
         module Common_Module_Methods_
+
+          def mixed_with * x_a, & oes_p
+            mixed_via_iambic x_a, & oes_p
+          end
 
           def mixed_via_iambic x_a, & oes_p
             if x_a.length.nonzero?
@@ -57,11 +60,12 @@ module Skylab::Headless
           UNABLE_
         end
 
-        def via_stat_and_path_build_wrong_ftype_event expected_ftype_s
+        def build_wrong_ftype_event_ path, stat, expected_ftype_s
+
           build_not_OK_event_with :wrong_ftype,
-              :actual_ftype, @stat.ftype,
+              :actual_ftype, stat.ftype,
               :expected_ftype, expected_ftype_s,
-              :path, @path do |y, o|
+              :path, path do |y, o|
 
             y << "#{ pth o.path } exists but is not #{
              }#{ indefinite_noun o.expected_ftype }, #{
@@ -75,7 +79,7 @@ module Skylab::Headless
 
         Event_.selective_builder_sender_receiver self
 
-        FILE_FTYPE_ = 'file'.freeze
+        FILE_FTYPE_ = FILE_FTYPE
 
       end
     end

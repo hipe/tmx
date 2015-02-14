@@ -4,7 +4,7 @@ module Skylab::Headless
 
     class Services__::Filesystem
 
-      class Flock_first_available_path__
+      class Flock_first_available_path__  # :[#002].
 
         class << self
 

@@ -109,7 +109,7 @@ module Skylab::Callback
 
       def to_new_mutable_box_like_proxy
         @done or flush
-        Callback_.stream::Mutable_Box_Like_Proxy.new @a.dup, @h.dup
+        Callback_::Stream::Mutable_Box_Like_Proxy.new @a.dup, @h.dup
       end
 
       def length

@@ -79,7 +79,7 @@ module Skylab::TanMan::TestSupport::Models::Starter
 
       expect_OK_event :normalized_value
       expect_OK_event :datastore_resource_committed_changes do |ev|
-        ev.to_event.bytes.should eql 63
+        ev.to_event.bytes.should eql 64
       end
       expect_succeeded
 
@@ -87,7 +87,7 @@ module Skylab::TanMan::TestSupport::Models::Starter
 
       line_a = excerpt( -2 .. -1 ).split( NEWLINE_ )
       line_a[ 0 ].should eql 'using-starter = fizzibble.dot'
-      line_a[ 1 ].should eql '[starter "digraph.dot"]'
+      line_a[ 1 ].should eql '[starter "digraph.dot" ]'
 
     end
   end

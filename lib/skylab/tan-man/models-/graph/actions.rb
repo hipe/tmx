@@ -25,6 +25,7 @@ module Skylab::TanMan
           :preconditions, [ :graph, :workspace ],
 
           :properties,
+            :workspace_path,  # make this non-required, before w.s silo gets to it
             :starter,
             :created_on )
             # :reuse, Models_::Workspace.common_properties.array
@@ -47,13 +48,13 @@ module Skylab::TanMan
 
     def intrinsic_create_before_create_in_datastore action, & oes_p
 
-       Graph_::Actors__::Touch.call(
+      Graph_::Actors__::Touch.call(
 
-          action.argument_box[ :dry_run ],
+        action.argument_box[ :dry_run ],
 
-          action, self, @preconditions.fetch( :workspace ), @kernel, & oes_p )
+        action, self, @preconditions.fetch( :workspace ), @kernel, & oes_p )
 
-        # (result on success is bytes)
+      # (result on success is bytes)
 
     end
 
@@ -61,11 +62,10 @@ module Skylab::TanMan
 
       bx = Callback_::Box.new
 
-      bx.add Brazen_::NAME_, ::Pathname.new(
-        @property_box.fetch :digraph_path
-      ).relative_path_from(
-        ::Pathname.new( @preconditions.fetch( :workspace ).asset_directory_ )
-      ).to_path
+      bx.add Brazen_::NAME_,
+        @preconditions.fetch( :workspace ).
+          from_asset_directory_relativize_path__(
+            @property_box.fetch :digraph_path )
 
       bx.to_pair_stream
     end

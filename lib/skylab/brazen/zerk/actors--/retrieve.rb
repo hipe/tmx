@@ -10,16 +10,21 @@ module Skylab::Brazen
         :on_event_selectively
 
       def execute
+
         @up_IO = LIB_.system.filesystem.normalization.upstream_IO(
-          :path, @path,
-          :on_event, -> ev do
-            if :errno_enoent == ev.terminal_channel_i
-              NOTHING_TO_DO_
-            else
-              maybe_send_persistence_error ev
-              ev.ok
-            end
-          end )
+
+            :path, @path ) do | *, & ev_p |
+
+          ev = ev_p[]
+
+          if :errno_enoent == ev.terminal_channel_i
+            NOTHING_TO_DO_
+          else
+            maybe_send_persistence_error ev
+            ev.ok
+          end
+        end
+
         if @up_IO
           via_IO
         else

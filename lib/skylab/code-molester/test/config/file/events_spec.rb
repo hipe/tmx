@@ -218,8 +218,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
                 end
               end
               x.should eql false
-              # _rx = /parent directory does not exist, will not write.+co-mo/
-              s.should match %r(\ANo such file or directory - «[^»]+»\z)
+              s.should match %r(\Aparent directory must exist - «[^»]+»\z)
             end
           end
 

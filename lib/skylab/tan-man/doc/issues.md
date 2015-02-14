@@ -4,8 +4,8 @@
 [#091]       #done #list-API improve the implementation of \`unparse\`
 [#090]       #done make association magnetic
 [#089]       #done [br] datastore / file-based [ file etc ] <= [ttt]
-[#088] #open same issue as below with graph use
-[#087] #open setting a starter doesn't remove the last one
+[#088]       #done same issue as below with graph use
+[#087]       #done setting a starter doesn't remove the last one
 [#086]       #done on first test run with an empty "[tmx root]/tmp/", the
                event of creating the tmpdir breaks the comprehensive test run
              this is now #wishlist because the fix is so ugly.
@@ -28,7 +28,7 @@
 [#068]       #done dot file controller is becoming a god object, also redesign
              the way it executes "tell"s, so it's not as much an action
              obj
-[#067]       #tracking-tag lexical ordering stuff ..
+[#067] #hole ( was: #tracking-tag lexical ordering stuff )
 [#066]       #done issue with adding a new node on an empty graph,
              new nodes should always come after `node` node
 [#065]       #done fuzzy manage dependency
@@ -93,13 +93,15 @@
                x. push -> graph push
                x. use -> graph use
                x. tell -> graph tell )
-[#019]       #done "magic" for DRYING up tests (Regret) #done
+[#019] #open where is my optional term going?
+             ( was: #done "magic" for DRYING up tests (Regret) #done )
 [#018]       #deferred #depends-on:#sl-100 refactor out porcelain ["bleeding"]
                we are gonna hinge this on to treemap for no real reason
                except the *huge* tangent stack we are under
 [#017]       #pattern: for to maybe push up to headless
-[#016]       #done #pattern: action instance spawns instance of model controller
-               .. so make `controllers` knob for clarity
+[#016]       [ nascent - see commit ]
+             ( was: #done #pattern: action instance spawns instance of model controller
+               .. so make `controllers` knob for clarity )
 [#015] #open #feature remove association between nodes (see)
              ( #was: #done UI for dissociate (and prune nodes? - no, out of scope) )
 [#014]       #done UI for associate (labeled "depends on")

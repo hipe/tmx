@@ -8,6 +8,10 @@ module Skylab::TanMan::TestSupport::Models::Graph
 
   extend TestSupport_::Quickie
 
+  IDENTITY_ = -> x { x }
+
   READ_MODE_ = 'r'.freeze
+
+  WRITE_MODE_ = 'w'.freeze
 
 end

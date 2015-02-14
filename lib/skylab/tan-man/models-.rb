@@ -353,6 +353,13 @@ module Skylab::TanMan
       end
     end
 
+    def from_asset_directory_relativize_path__ path
+      ad = asset_directory_
+      ad and begin
+        ::Pathname.new( path ).relative_path_from( ::Pathname.new ad ).to_path
+      end
+    end
+
     def asset_directory_
       @___did_calculate_asset_dir ||= begin
         if @_surrounding_path_exists

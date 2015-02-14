@@ -13,15 +13,35 @@ module Skylab::Brazen
           :mutable_document
 
         def execute
-          ok = resolve_properties
+          ok = __look_at_entity
           ok &&= via_entity_resolve_subsection_id_via_entity_name @name_x
-          ok && edit_file
+          ok && __produce_and_edit_section
           @result
         end
 
-      private
+        def __look_at_entity
 
-        def resolve_properties
+          # if there is only one formal property and the number of
+          # actual properties is greater than one, ..
+
+          __look_at_formals
+          __resolve_pair_array
+        end
+
+        def __look_at_formals
+
+          fo = @entity.formal_properties
+
+          if 1 == fo.length
+            @use_short_identity = true
+          else
+            @use_short_identity = false
+          end
+          nil
+        end
+
+        def __resolve_pair_array
+
           body_pair_a = []
           did_see_name = false
           st = @entity.to_pair_stream_for_persist
@@ -62,58 +82,99 @@ module Skylab::Brazen
           end
         end
 
-        def edit_file
+        def __produce_and_edit_section
+          if @use_short_identity && @body_pair_a.length.zero?
+            __go_short
+          else
+            __go_long
+          end
+        end
+
+        def __go_short
+
+          h = {
+            found_existing: :__go_short_when_existed,
+            inserting_item: :__go_short_when_created }
+
+          method = nil
+          @section = @mutable_document.sections.touch_section_magnetic(
+              @subsection_id.section_s ) do | * i_a |
+
+            method = h.fetch i_a.fetch 1
+            nil
+          end
+
+          @actual_s = "#{ @name_x }"
+
+          send method
+          __go_short_common_finish
+        end
+
+        def __go_short_when_created
+          # @verb_symbol = :created
+        end
+
+        def __go_short_when_existed
+          # @verb_symbol = :changed  # LOOK
+        end
+
+        def __go_short_common_finish
+          @section.set_subsection_name @actual_s
+          @result = ACHIEVED_
+          nil
+        end
+
+        def __go_long
           if @entity.came_from_persistence
-            edit_file_via_update_section
+            __go_long_whereafter(
+              inserting_item: :__go_long_update_when_created,
+              found_existing: :__go_long_update_when_updated )
           else
-            edit_file_via_create_section
+            __go_long_whereafter(
+              inserting_item: :__go_long_create_when_created,
+              found_existing: :__go_long_create_when_updated )
           end
         end
 
-        def edit_file_via_create_section
-          _a = @subsection_id.to_a
-          @section = @mutable_document.sections.touch_section( * _a )
-          if @section.is_empty
-            edit_file_via_create_section_when_section_empty
-          else
-            edit_file_via_create_section_when_section_not_empty
+        def __go_long_whereafter h
+
+          method = nil
+
+          @section = @mutable_document.sections.touch_section(
+              * @subsection_id.to_a ) do | * i_a |
+
+            method = h.fetch i_a.fetch 1
+            nil
           end
+
+          send method
         end
 
-        def edit_file_via_create_section_when_section_empty
-          @verb_symbol = :created
-          write_section
+        def __go_long_create_when_created
+          # @verb_symbol = :created
+          _into_section_write
+          ACHIEVED_
         end
 
-        def edit_file_via_create_section_when_section_not_empty
-          maybe_send_event :error, :will_not_clobber_existing_entity do
-            bld_will_not_clobber_existing_entity_event
-          end
-          @result = UNABLE_
-        end
+        def __go_long_create_when_updated
 
-        def bld_will_not_clobber_existing_entity_event
-          _s = @subsection_id.description
-          build_not_OK_event_with :will_not_clobber_existing_entity,
-            :entity_description, _s, :entity, @entity
-        end
+          self._RIDE_ME
 
-        def edit_file_via_update_section
-          @verb_symbol = :updated
-          y = get_section_body_lines
+          s_a = _section_to_line_array
           @section.clear_section
-          write_section
-          y_ = get_section_body_lines
-          if y == y_
+          _into_section_write
+          s_a_ = _section_to_line_array
+
+          if s_a == s_a_
             when_no_change_in_section
           else
-            write_section
+            # @verb_symbol = :updated
+            ACHIEVED_
           end
         end
 
-        def get_section_body_lines
-          scn = @section.get_body_line_stream
-          y = [] ; x = nil ; y.push x while x = scn.gets ; y
+        def _section_to_line_array
+          @section.to_line_stream.to_a
         end
 
         def when_no_change_in_section
@@ -129,7 +190,7 @@ module Skylab::Brazen
             :entity_description, _s, :entity, @entity
         end
 
-        def write_section
+        def _into_section_write
           @body_pair_a.each do |pair|
             s = pair.name_symbol.to_s
             if s.include? UNDERSCORE_

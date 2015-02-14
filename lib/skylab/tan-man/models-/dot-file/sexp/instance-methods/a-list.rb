@@ -34,7 +34,7 @@ module Skylab::TanMan
       key_s = sym.to_s            # id of new assignment as string for comp.
       new_before_this_asst = nil  # before which asst will we insert ourselves?
 
-      items.each do |asst|        # always iterate over the whole list [#067]
+      items.each do |asst|        # :+[#br-011] always iterate over the whole list
         cmp = key_s <=> asst[:id].normalized_string
         case cmp
         when -1                   # new should come before current one..

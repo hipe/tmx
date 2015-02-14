@@ -36,8 +36,7 @@ module Skylab::TestSupport
           :filename, test_support_file,
           :max_num_dirs_to_look, -1,
           :property_symbol, :directory,
-          * rest,
-          :on_event_selectively, ( oes_p || @oes_p ) )
+          * rest, & ( oes_p || @oes_p ) )
 
         path and begin
           ::Pathname.new ::File.join( path, test_support_file )
@@ -54,7 +53,7 @@ module Skylab::TestSupport
         TestSupport_.lib_.system.filesystem.normalization.upstream_IO(
           :path, x,
           :only_apply_expectation_that_path_is_ftype_of, FILE_FTYPE_,
-          :on_event_selectively, ( oes_p || @oes_p ) )
+          & ( oes_p || @oes_p ) )
 
       end
 

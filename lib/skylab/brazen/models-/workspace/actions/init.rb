@@ -41,12 +41,14 @@ module Skylab::Brazen
 
     def __via_workspace
 
-      @ws.init_workspace(
+      _ok = @ws.init_workspace(
         :is_dry, @argument_box[ :dry_run ],
         :app_name, @kernel.app_name,
         :prop, formal_property_via_symbol( :path ),
         & event_lib.produce_handle_event_selectively_through_methods.
           bookends( self, :init ) )
+
+      _ok and @ws  # experiment
     end
 
     def on_init_resource_not_found_via_channel i_a, & ev_p

@@ -28,7 +28,7 @@ module Skylab::TanMan::TestSupport::Models::Workspace
 
       io.close
 
-      expect_succeeded
+      @result.existent_surrounding_path  # should respond
 
     end
 

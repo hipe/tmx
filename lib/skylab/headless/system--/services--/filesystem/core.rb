@@ -84,6 +84,8 @@ module Skylab::Headless
         end
       end
 
+      FILE_FTYPE = 'file'
+
       Filesystem_ = self
 
       DIRECTORY_FTYPE = 'directory'.freeze

@@ -16,6 +16,8 @@ module Skylab::TanMan
           y << 'experimental natural language-ISH interface'
         end,
 
+        :inflect, :noun, nil, :verb, 'understand',
+
         :reuse, Model_::Document_Entity.IO_properties,
 
         :flag, :property, :dry_run,

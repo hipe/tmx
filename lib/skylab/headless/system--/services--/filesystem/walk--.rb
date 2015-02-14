@@ -121,14 +121,15 @@ module Skylab::Headless
         def whn_found found_path, surrounding_path
 
           _ok = Headless_.system.filesystem.normalization.upstream_IO(
-            :only_apply_expectation_that_path_is_ftype_of, ( @ftype || FILE_FTYPE___ ),
-            :path, found_path,
-            :on_event, -> ev do
-              maybe_send_event normal_top_channel_via_OK_value ev.ok do
-                ev
-              end
-              UNABLE_
-            end )
+              :only_apply_expectation_that_path_is_ftype_of, ( @ftype || FILE_FTYPE___ ),
+              :path, found_path ) do | * i_a, & ev_p |
+
+            ev = ev_p[]
+            maybe_send_event normal_top_channel_via_OK_value ev.ok do
+              ev
+            end
+            UNABLE_
+          end
 
           _ok && surrounding_path
         end

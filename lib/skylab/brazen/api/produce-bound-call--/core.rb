@@ -16,6 +16,7 @@ module Skylab::Brazen
           new do
             @on_event_selectively = oes_p
             @kernel = k
+            @mod = k.module
             @x_a = x_a
             _init
           end
@@ -100,8 +101,15 @@ module Skylab::Brazen
       end
 
       def via_current_branch_resolve_action
+        _resolve_action_via_unbound_stream @current_unbound_action_stream
+      end
 
-        st = @current_unbound_action_stream
+      def via_current_branch_resolve_action_promotion_insensitive
+        _resolve_action_via_unbound_stream @bound.class.to_intrinsic_unbound_action_stream
+      end
+
+      def _resolve_action_via_unbound_stream st
+
         sym = @st.current_token
 
         begin
@@ -151,7 +159,9 @@ module Skylab::Brazen
 
       def _end_in_error_with * x_a
 
-        _result = @on_event_selectively.call :error, * x_a
+        _result = @on_event_selectively.call :error, x_a.first do
+          Callback_::Event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, nil
+        end
 
         @bound_call = Brazen_.bound_call.via_value _result
 

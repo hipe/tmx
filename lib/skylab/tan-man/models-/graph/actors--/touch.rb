@@ -12,194 +12,232 @@ module Skylab::TanMan
         :kernel
 
       def execute
-
-        arg = @entity.trio :digraph_path
-
-        ok_arg = NORMALIZE_DIGRAPH_PATH_.normalize_argument arg, & @on_event_selectively
-
-        ok_arg and begin
-          @digraph_path = ok_arg.value_x
-          via_digraph_path
-        end
+        __init_downstream_identifier
+        send :"__execute_for_#{ @down_ID.Category_symboL }"
       end
 
-      o = TanMan_.lib_.basic::Pathname.normalization
+      def __init_downstream_identifier
+        @arg = @entity.trio :digraph_path
+        x = @arg.value_x
+        if x.respond_to? :write
+          @down_ID = Brazen_.byte_downstream_identifier.via_stream x
+        else
+          @down_ID = Brazen_.byte_downstream_identifier.via_path x
+        end
+        nil
+      end
 
-      NORMALIZE_DIGRAPH_PATH_ = o.new_with :absolute
+      def __execute_for_PatH
+        Touch_path___.new( @arg, self, & @on_event_selectively ).execute
+      end
 
-      NORMALIZE_STARTER_FILE_ = o.new_with :relative, :downward_only
+      def __execute_for_Input_streaM
+        _ok = resolve_upstream_lines_
+        _ok and flush_upstream_lines_to_file_ @arg.value_x
+      end
 
-      def via_digraph_path
-        @pn = ::Pathname.new @digraph_path
-        via_pn_any_stat
-        if @stat
-          when_stat
-        elsif @pn.extname.length.zero?
-          add_extension_to_everything
-          via_pn_any_stat
-          if @stat
-            when_stat
+      class Touch_path___
+
+        def initialize arg, parent, & oes_p
+          @arg = arg
+          @parent = parent
+          @on_event_selectively = oes_p
+        end
+
+        def execute
+          if __path_is_absolute
+            __via_absolute_path_touch_path
           else
-            when_stat_e
+            UNABLE_
           end
-        else
-          when_stat_e
         end
-      end
 
-      def via_pn_any_stat
-        @stat_e, @stat = stat_e_and_stat_via_pn @pn ; nil
-      end
-
-      def when_stat
-        if FILE__ == @stat.ftype
-          when_pn_is_file
-        else
-          when_pn_is_not_file
+        def __path_is_absolute
+          ok_arg = TanMan_.lib_.basic::Pathname.
+            normalization.new_with( :absolute ).normalize_argument(
+              @arg, & @on_event_selectively )
+          ok_arg and begin
+            @arg = ok_arg
+            ACHIEVED_
+          end
         end
-      end
 
-      def when_pn_is_not_file
-        maybe_send_event :error, :resource_is_wrong_shape do
-          bld_resource_is_wrong_shape_event
+        def __via_absolute_path_touch_path
+
+          begin
+
+            if __path_exists
+              ok = __path_is_file
+              ok or break
+              ok = _write_path_to_entity
+              break
+            end
+
+            if __path_has_extension
+              ok = __write_upstream_content
+              ok &&= _write_path_to_entity
+              break
+            end
+
+            __add_extension_to_path
+            redo
+          end while nil
+          ok
         end
-        UNABLE_
-      end
 
-      def bld_resource_is_wrong_shape_event
-        build_not_OK_event_with :resource_is_wrong_shape,
-            :pathname, @pn, :shape, @stat.ftype do | y, o |
-
-          y << "expected #{ val FILE__ } had #{ ick o.shape } #{
-            }- #{ pth o.pathname }"
+        def __path_exists
+          e, @stat = __noent_exception_and_stat_via_path @arg.value_x
+          e ? false : true
         end
-      end
 
-      FILE__ = 'file'.freeze
-
-      def add_extension_to_everything
-        @ext = EXT__
-        maybe_send_adding_ext
-        @digraph_path = "#{ @digraph_path }#{ EXT__ }"
-        @entity.properties.replace :digraph_path, @digraph_path
-        @pn = @pn.sub_ext @ext ; nil
-      end
-
-      EXT__ = '.dot'.freeze
-
-      def maybe_send_adding_ext
-        maybe_send_event :info, :adding_extensio do
-          bld_adding_extension_event
+        def __noent_exception_and_stat_via_path path
+          [ nil, ::File.stat( path ) ]
+        rescue ::Errno::ENOENT => e
+          [ e, false ]
         end
-      end
 
-      def bld_adding_extension_event
+        def __path_is_file
 
-        build_neutral_event_with :adding_extension,
-            :extension, @ext, :from_pn, @pn do |y, o|
+          _fs.normalization.upstream_IO.new_with(
+            :stat, @stat,
+            :path_arg, @arg,
+            :only_apply_expectation_that_path_is_ftype_of, @fs.class::FILE_FTYPE,
+            & @on_event_selectively ).via_stat_execute
 
-          y << "adding #{ o.extension } extension to #{ pth o.from_pn }"
         end
-      end
 
-      def when_stat_e  # pn not exist
-        @dpn = @pn.dirname
-        @dpn_stat_e, @dpn_stat = stat_e_and_stat_via_pn @dpn
-        if @dpn_stat
-          when_dpn_stat
-        else
-          when_dpn_stat_e
+        def __path_has_extension
+          ::File.extname( @arg.value_x ).length.nonzero?
         end
-      end
 
-      def stat_e_and_stat_via_pn pn
-        [ nil, pn.stat ]
-      rescue ::Errno::ENOENT => e
-        [ e, false ]
-      end
+        def __add_extension_to_path
 
-      def when_dpn_stat_e
-        maybe_send_event :error, :resource_not_found do
-          bld_resource_not_found_event
+          @ext = TanMan_::Models_::DotFile::DEFAULT_EXTENSION
+
+          maybe_send_event :info, :adding_extension do
+            __build_adding_extension_event
+          end
+
+          @arg = @arg.new_with_value(
+            ::Pathname.new( @arg.value_x ).sub_ext( @ext ).to_path )
+
+          nil
         end
-        UNABLE_
+
+        def __build_adding_extension_event
+          build_neutral_event_with :adding_extension,
+              :extension, @ext, :path, @arg.value_x do | y, o |
+            y << "adding #{ o.extension } extension to #{ pth o.path }"
+          end
+        end
+
+        def _write_path_to_entity
+          @parent.into_entity_write_digraph_path__ @arg.value_x
+        end
+
+        def __write_upstream_content
+
+          ok = @parent.resolve_upstream_lines_
+          ok &&= __resolve_downstream_file
+          ok and @parent.flush_upstream_lines_to_file_ @f
+        end
+
+        def __resolve_downstream_file
+
+          @f = _fs.normalization.downstream_IO.with(
+            :path_arg, @arg, & @on_event_selectively )
+
+          @f && ACHIEVED_
+        end
+
+        def _fs
+          @fs ||= TanMan_.lib_.system.filesystem
+        end
+
+        include Callback_::Event::Selective_Builder_Receiver_Sender_Methods
       end
 
-      def bld_resource_not_found_event
+      def into_entity_write_digraph_path__ path
 
-        Callback_::Event.wrap.exception @dpn_stat_e,
-          :path_hack,
-          :terminal_channel_i, :resource_not_found
-      end
+        # the path is not relativized here. the path might not have changed.
 
-      def when_pn_is_file
+        @entity.properties.replace :digraph_path, path
+
         ACHIEVED_
       end
 
-      def when_dpn_stat
-        if DIRECTORY_FTYPE__ == @dpn_stat.ftype
-          when_dpn_is_dir
-        else
-          self._TO_DO_when_dpn_is_not_dir
-        end
-      end
-      DIRECTORY_FTYPE__ = 'directory'.freeze
-
-      def when_dpn_is_dir
-        @ws = @action.preconditions.fetch :workspace
-        @value_fetcher = Value_Fetcher_Shell___.new Value_Fetcher_Kernel___.new @action
-        @lines = via_ws_expect_lines
-        @lines ||= any_lines
-        @lines and via_lines
+      def resolve_upstream_lines_
+        otr = dup
+        otr.extend Produce_upstream_lines___
+        @up_lines = otr.execute
+        @up_lines && ACHIEVED_
       end
 
-      def via_ws_expect_lines
+      def flush_upstream_lines_to_file_ f  # assume @up_lines
 
-        # first, use any starter indicated in the workspace
+        # flush upstream lines into file
 
-        @kernel.silo( :starter ).lines_via__(
-          @value_fetcher, @workspace, & @on_event_selectively )
-      end
-
-      def any_lines
-
-        # if no starter is indicated in the workspace, use default
-
-        Models_::Starter::Actions::Lines.session @kernel, @on_event_selectively do | o |
-          o.value_fetcher = @value_fetcher
-        end.via_default
-      end
-
-      def via_lines
-
-        is_dry = @is_dry_run
-        _opener = if is_dry
-          TanMan_.lib_.dry_stub
-        else
-          @pn
-        end
         bytes = 0
-        _opener.open WRITEMODE_ do |io|
-          while line = @lines.gets
-            bytes += io.write line
-          end
-        end
+        begin
+          line = @up_lines.gets
+          line or break
+          bytes += f.write line
+          redo
+        end while nil
+
+        f.close
+
         maybe_send_event :info, :wrote_file do
-          bld_wrote_file_event bytes, is_dry
+          __build_wrote_file_event bytes, f
         end
+
         bytes
       end
 
-      WRITEMODE_ = 'w'.freeze
-
-      def bld_wrote_file_event bytes, is_dry
+      def __build_wrote_file_event bytes, f
 
         build_OK_event_with :wrote_file,
-            :is_dry, is_dry,
-            :path, @pn.to_path, :bytes, bytes do |y, o|
+            :is_dry, @is_dry_run,
+            :path, f.path, :bytes, bytes do | y, o |
 
           o.is_dry and _dry = " dry"
           y << "wrote #{ pth o.path } (#{ o.bytes }#{ _dry } bytes)"
+        end
+      end
+
+      module Produce_upstream_lines___
+
+        def execute
+          @value_fetcher = Value_Fetcher_Shell___.new Value_Fetcher_Kernel___.new @action
+          _x = __via_workspace_expect_lines
+          _x or __any_lines
+        end
+
+        def __via_workspace_expect_lines
+
+          # first, use any starter indicated in the workspace
+
+          @kernel.silo( :starter ).lines_via__(
+              @value_fetcher, @workspace ) do | * i_a, & ev_p |
+
+            if :entity_not_found == i_a.last
+              @on_event_selectively.call :info, :entity_not_found do
+                wrap = ev_p[]
+                wrap.new_with_event wrap.to_event.new_inline_with( :ok, nil )
+              end
+            else
+              @on_event_selectively[ * i_a, & ev_p ]
+            end
+          end
+        end
+
+        def __any_lines
+
+          # if no starter is indicated in the workspace, use default
+
+          Models_::Starter::Actions::Lines.session @kernel, @on_event_selectively do | o |
+            o.value_fetcher = @value_fetcher
+          end.via_default
         end
       end
 
@@ -229,6 +267,8 @@ module Skylab::TanMan
           @provider.template_value :created_on_timestamp_string
         end
       end
+
+      include Callback_::Event::Selective_Builder_Receiver_Sender_Methods
     end
   end
 end

@@ -4,6 +4,8 @@ module Skylab::TanMan
     # allows grmamar to be nested within ruby modules but not classes and b)
     # we want to nest our treetop grammars under the relevant model node.
 
+    DEFAULT_EXTENSION = '.dot'.freeze
+
     class << self
 
       def produce_parse_tree_via oes_p

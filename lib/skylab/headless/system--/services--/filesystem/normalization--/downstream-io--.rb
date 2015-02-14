@@ -126,6 +126,22 @@ module Skylab::Headless
           end
 
           def when_no_stat_for_file
+            dir = ::File.dirname @path
+            if ::File.directory? dir
+              __go
+            else
+              __when_no_dirname dir
+            end
+          end
+
+          def __when_no_dirname dir
+            maybe_send_event :resource_not_found, :parent_directory_must_exist  do
+              build_not_OK_event_with :parent_directory_must_exist, :path, dir
+            end
+            UNABLE_
+          end
+
+          def __go
             snd_creating_event_for_file
             if @is_dry_run
               @as_normal_value[ Headless_::IO.dry_stub_instance ]
