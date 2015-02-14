@@ -381,7 +381,12 @@ module Skylab::Snag
       s_a = bx.remove :tag
       if s_a
         s_a.each do | tag_s |
-          and_sexp.push [ :has_tag, tag_s.intern ]
+          if NEGATION_CHARACTER_BYTE___ == tag_s.getbyte( 0 )
+            tag_s = tag_s[ 1 .. -1 ]
+            and_sexp.push [ :does_not_have_tag, tag_s.intern ]
+          else
+            and_sexp.push [ :has_tag, tag_s.intern ]
+          end
         end
       end
 
@@ -394,6 +399,8 @@ module Skylab::Snag
         o.on_output_line handle_payload_line
       end
     end
+
+    NEGATION_CHARACTER_BYTE___ = '~'.getbyte 0
 
   public
 
