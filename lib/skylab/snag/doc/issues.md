@@ -1,7 +1,8 @@
 [#069]       #tracking-tag advanced event signing by our actors
 [#068]       #parent-node: [#003] "melt is a hack.."
 [#067]       #parent-node: [#057] model support
-[#066] #hole (was: the actor dream, moved to [cb])
+[#066] #open modernify events (we have a native implementation)
+             ( was: the actor dream, moved to [cb] )
 [#065] #open tall stacks swallow error results (most of these tests)
 [#064] #open hide `ping` action
 [#063]       #parent-node: [#057] the melt narrative ..
@@ -73,6 +74,7 @@
 [#004]       #done light fast solo CLI client 2012-11-12
 [#003]       #parent-node: [#057] was: tree report of todos 2012-10-13
 [#002]       #done 2012-08-19 basic CLI integration specs - essential coverage
-[#001]       #done 2012-08-20 integrate the 'issue-all' one-off #deferred
+[#001] #open tag negation in queries
+             ( was: #done 2012-08-20 integrate the 'issue-all' one-off #deferred )
 [#sl-048]    #done show should list (for now) 2012-02-10
 [#sl-046]    #done #feature add verbose/debug mode, put such output there 2012-02-07

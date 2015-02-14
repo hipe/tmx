@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module Range
 
-    class Normalization__  # :+[#037]
+    class Normalization__  # :+[#027]
 
       Callback_::Actor.methodic self, :properties,
         :on_event,

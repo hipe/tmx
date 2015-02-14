@@ -1,7 +1,7 @@
 (we cram two different doc-nodes in here for now with the intention of
 one day assimilating the older one into the newer one.)
 
-# the new normal :[#ba-037]
+# the new normal :[#027]
 
 ## introduction
 
@@ -24,7 +24,7 @@ as it would turn out, this conception of normalization is so broad that
 it arguably encompases all of computing in our universe. this is an
 isomorphicism we play with here and there to put this normalization
 API to perhaps surprising use in some places, for example the possible
-transformation and resoultion of resources on the filesystem or even on
+transformation and resolution of resources on the filesystem or even on
 the network.
 
 for what is a "URL" but a formal definition of some resource that you
@@ -72,19 +72,19 @@ one new method replaces.
 
 (the were: `normalize`, `normalize_argument`,
 `any_error_event_via_validate_x`, `normalize_via_two`,
-`normalize_via_three` #tombstone (their documentation too).)
+`normalize_via_three` :+#tombstone (their documentation too).)
 
 for a single, unified solution that is universally applicable,
 recognizable, and poka-yoke; we have adopted this one method name,
 signature and semantics:
 
-`normalize_argument` - argument ("arg") is a [#ba-038] argument
-structure. optional block is a [#ca-017] selective listener.
+`normalize_argument` - argument ("arg") is a [#ba-038]  ("trio")
+argument structure. optional block is a [#ca-017] selective listener.
 
-"arg" contains the knowledge of whether or not a value was passed,
-and in the case that it is known to have been passed, "arg" also
-contains this value. (as well "arg" contains a name function that
-may be useful when building events.)
+the "arg" structure can indicate whether or not an actual value was
+"passed", and in the case that it was the "arg" value can provide
+the actual value. as well the field's `name_symbol` can be accessed,
+as well as a formal property structure (if any).
 
 if it is known to have been passed, note that depending on your
 interface the incoming value may be `false`, `nil`, or any other
@@ -97,17 +97,18 @@ a native integer `1`). if it is already valid and normal as it is
 you may leave it as it is.
 
 if based on your definition of normal this normalization was
-successful, your result must be a [#ba-038]-shaped argument
-structure containing the new (or same) value for the argument value.
+successful, your result must be another or the same [#ba-038]-shaped
+argument structure containing the new (or same) value for the argument
+value.
 
 any true-ish result that you return will be assumed to be an object
 of this shape. if the incoming result was itself already valid and
 normal as-is, you may result in this same object as your result.
 
-in the case where you tranformed the value in some way, it may
+(in the case where you tranformed the value in some way, it may
 be useful to use the `new_with_value` method of [#ba-038] to create
 a modified frozen dup of the incoming argument structure, but with
-the new desired value.
+the new desired value.)
 
 any false-ish result that you return will be assumed to signify that
 the incoming argument value (or absence of value) was invalid.
@@ -115,7 +116,7 @@ the incoming argument value (or absence of value) was invalid.
 in the cases where the value was invalid or the value was changed for
 normalization -AND- and event listener was passed (the optional block
 argument), you can emit possible events. it is recommended that you do
-so for all such cases when the value is invalid, but not you should
+so for all such cases when the value is invalid, but you should
 always check whether the listener was passed at all first.
 
 
@@ -158,7 +159,7 @@ of normalization.
 
 
 
-# the field-level custom normalization API :[#019]
+# the field-level custom normalization API :[#fa-019]
 
 This is the field-level normalization API.
 

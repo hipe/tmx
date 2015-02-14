@@ -3,98 +3,83 @@ module Skylab::Snag
   class Models::Tag
 
     class Stem_Normalization_
-      # [#043] employs case sensitivity, [#017] results in callback's result
 
-      def initialize delegate=Snag_::Model_::THROWING_INFO_ERROR_delegate
-        @delegate = delegate
+      # :+[#ba-027] is a universally conventional normalizer (subset)
+      # [#017] result is callback's result
+      # [#043] employs case sensitivity
+
+      class << self
+
+        def normalize_argument_value x, & oes_p
+          new( x, & oes_p ).__execute
+        end
+
+        private :new
+      end  # >>
+
+      def initialize x, & oes_p
+        @x = x
+        @on_event_selectively = oes_p
       end
 
-      attr_reader :result_of_last_callback_called, :stem_i
+      def __execute
 
-      def stem_i= x
-        with_tag_s "##{ x }"
-        @stem_i = x  # be careful
-      end
+        s = @x.to_s  # sometimes symbol
 
-      def with_tag_s tag_s
-        will_change
-        @tag_s = tag_s
-        self
-      end
+        if HASH_CHARACTER_BYTE___ != s.getbyte( 0 )
 
-      def valid
-        if is_valid
-          self
+          # add this IFF necessary. this *is* a normalization, so we
+          # accept the input in either way
+
+          s = "#{ HASH_CHARACTER___ }#{ s }"
+
+          @x = s  # error messages are easier to read if we include
+            # this change in them (covered)
+        end
+
+        st = Models::Hashtag.scanner s
+
+        sym_o = st.gets
+
+        if sym_o
+          if :hashtag == sym_o.symbol_i
+            @symbol = sym_o
+            _rest = st.gets
+            if _rest
+              _when_invalid
+            else
+              Snag_.lib_.basic.trio @symbol.get_stem_s.intern, true, nil
+            end
+          else
+            _when_invalid
+          end
         else
-          false
+          _when_invalid
         end
       end
 
-      def is_valid
-        @is_validated or validate
-        @is_valid
-      end
-
-    private
-      def will_change
-        @is_validated = @is_valid = false ; nil
-      end
-
-      def validate
-        @is_validated = true
-        @scn = Models::Hashtag.scanner @tag_s
-        @symbol = @scn.gets
-        if @symbol && :hashtag == @symbol.symbol_i
-          check_the_rest
+      def _when_invalid
+        if @on_event_selectively
+          @on_event_selectively.call :error, :invalid_tag_stem do
+            Invalid__.new @x
+          end
         else
-          result_in_invalid_error
-        end ; nil
-      end
-
-      def check_the_rest
-        @xtra = @scn.gets
-        if @xtra
-          when_unexpected_trailing_content
-        else
-          accept_validity
+          _ = Invalid__.new @x
+          self._UNCOVERED_CODE_IS_BROKEN_CODE
+          raise Invalid__.new( @x ).to_exception
         end
       end
 
-      def when_unexpected_trailing_content
-        result_in_invalid_error
-      end
+      HASH_CHARACTER___ = '#'
+      HASH_CHARACTER_BYTE___ = HASH_CHARACTER___.getbyte( 0 )
 
-      def accept_validity
-        @stem_i = @symbol.get_stem_s.intern
-        @is_valid = true ; nil
-      end
-
-      def value_changed
-        if @delegate.info_event_p
-          _ev = Changed__.new @unsanitized_stem_i, out_s.intern
-          @result_of_last_callback_called = @delegate.receive_info_event _ev
-        end ; nil
-      end
-      Changed__ = Event_[].new :from_i, :to_i do
-        message_proc do |y, o|
-          y << "changed #{ ick o.from_i } to #{ ick o.to_i }"
-        end
-      end
-
-      def result_in_invalid_error
-        result_in_error Invalid__.new @tag_s
-      end
       Invalid__ = Event_[].new :tag_s do
         message_proc do |y, o|
           y << "tag must be alphanumeric separated with dashes - #{
            }invalid tag name: #{ ick o.tag_s }"
         end
       end
-
-      def result_in_error ev
-        @result_of_last_callback_called = @delegate.receive_error_event ev
-        nil
-      end
     end
   end
 end
+# :+#tombstone changed event

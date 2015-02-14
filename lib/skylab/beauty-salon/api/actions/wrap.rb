@@ -50,7 +50,7 @@ module Skylab::BeautySalon
 
   private
 
-    # [#fa-019]
+    # :+[#ba-027] with [#fa-019] shape
 
     -> do
       rx = /\A\d+\z/
@@ -71,7 +71,7 @@ module Skylab::BeautySalon
       end
     end.call
 
-    # [#fa-019] assume that x is nil or an array.
+    # :+[#fa-019] assume that x is nil or an array.
 
     def normalize_lines y, x, z
       ok = y.count

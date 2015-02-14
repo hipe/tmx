@@ -103,7 +103,7 @@ module Skylab::Brazen
           attr_reader :has_ad_hoc_normalizers, :norm_p_a
         end
 
-        def _apply_ad_hoc_normalizers pr  # this evolved from [#fa-019]
+        def _apply_ad_hoc_normalizers pr  # this evolved from [#ba-027]
           ok = true
           bx = actual_property_box_for_write
           pr.norm_p_a.each do | arg_and_oes_block_p |

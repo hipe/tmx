@@ -1,7 +1,7 @@
 [#039] #open one day unify & simplify all box classes
 [#038]       [ trio ]
-[#037]       #doc-node the new normal ( #IN: [#fa-019] woah! )
-[#036]       #parent-node: [#037] #tracking-tag the idea of a curried normalizer
+[#037] #hole ( was: #doc-node the new normal ( #IN: [#fa-019] woah! ) )
+[#036]       #parent-node: [#027] #tracking-tag the idea of a curried normalizer
 [#035]       #doc-node the range narrative ..
 [#034]       #doc-node the module narrative .. #tracking-tag module math
 [#033] #open make digraph a box
@@ -10,7 +10,8 @@
 [#030]       #code-node the basic struct
 [#029]       #doc-node the string node
 [#028]       #parent-node: [#029] the string template narrative ..
-[#027] #hole (was: aggregated articulation refactor)
+[#027]       the normalization narrative ..
+             ( was: aggregated articulation refactor )
 [#026]       #doc-node the hash narrative ..
 [#025]       #doc-node #digraph the digraph narrative ..
 [#024]       #parent-node: [#022] "the string scanner narrative.."

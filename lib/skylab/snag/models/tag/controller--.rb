@@ -31,16 +31,28 @@ module Skylab::Snag
     private
 
       def validate
+
         @is_validated = true
-        o = Tag_::Stem_Normalization_.new @delegate
-        o.stem_i = @stem_i
-        if o.is_valid
+        x = nil
+
+        ok_arg = Tag_::Stem_Normalization_.
+            normalize_argument_value @stem_i do | * i_a, & ev_p |
+
+          x = if :error == i_a.first
+            @delegate.receive_error_event ev_p[]
+          else
+            @delegate.receive_info_event ev_p[]
+          end
+          nil
+        end
+        @last_callback_result = x
+
+        if ok_arg
           @is_valid = true
-          @stem_i = o.stem_i
+          @stem_i = ok_arg.value_x
         else
           @is_valid = false
         end
-        @last_callback_result = o.result_of_last_callback_called
         nil
       end
 

@@ -158,10 +158,12 @@ module Skylab::Snag
 
       def self.normal sexp, delegate
         tag_i = sexp.fetch 1
-        tag_i_ = Models::Tag.normalize_stem_i tag_i,
-          -> ev do
-            delegate.receive_error_event ev
+        tag_i_ = Models::Tag.normalize_stem_symbol__ tag_i do | * i_a, & ev_p |
+
+          if :error == i_a.first
+            delegate.receive_error_event ev_p[]
           end
+        end
         tag_i_ and new tag_i_
       end
 

@@ -94,7 +94,7 @@ sending it `normalization_failure_line_notify` with the selfsame arg that
 `y#<<` received). this allows for evented handling of the message, e.g adding
 meta-information about the action to the message.
 
-(with the above said, please see [#019] for information about possible
+(with the above said, please see [#ba-027] for information about possible
 future/possible current features of field-level normalization.)
 
 

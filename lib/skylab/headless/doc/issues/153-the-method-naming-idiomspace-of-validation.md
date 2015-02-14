@@ -32,9 +32,9 @@ potentially mutate either the particular business field or the whole object
 as appropriate. it is very likely that we will stipulate that the result of
 such a call be a boolean-ish indicating whether the field or object is valid
 or not, that is, whether or not the data could be normalized (similar to
-[#fa-019]).
+[#ba-027]).
 
-(there exists [#fa-019] one particular normalization API documented
+(there exists [#ba-027] one particular normalization API documented
 voluminously in all of ~3000 words. when the topic document reaches draft we
 should cycle-back there and confirm that the language accords with this
 convention.)
@@ -62,7 +62,7 @@ is not a good general solution for several reasons:
   topic does not self-document what the event substrate is, if one even
   exists.
 
-the [#fa-019] generalized normalization solution has resolutions for all of
+the [#ba-027] generalized normalization solution has resolutions for all of
 these issues.
 
 

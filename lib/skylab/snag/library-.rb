@@ -30,10 +30,10 @@ module Skylab::Snag
     sidesys = Autoloader_.build_require_sidesystem_proc
 
     A_short_length = -> do
-      Bsc__[]::String.a_reasonably_short_length_for_a_string
+      Basic[]::String.a_reasonably_short_length_for_a_string
     end
 
-    Bsc__ = sidesys[ :Basic ]
+    Basic = sidesys[ :Basic ]
 
     Basic_fields = -> * x_a do
       if x_a.length.zero?
@@ -44,10 +44,10 @@ module Skylab::Snag
     end
 
     Bound_call = -> * a do
-      Bzn__[].bound_call.build_via_arglist a
+      Brazen[].bound_call.build_via_arglist a
     end
 
-    Bzn__ = sidesys[ :Brazen ]
+    Brazen = sidesys[ :Brazen ]
 
     CLI_legacy_DSL = -> mod do
       Porcelain__[]::Legacy::DSL[ mod ]
@@ -70,11 +70,11 @@ module Skylab::Snag
     end
 
     Entity = -> do
-      Bzn__[]::Entity
+      Brazen[]::Entity
     end
 
     Event = -> do
-      Bzn__[].event
+      Brazen[].event
     end
 
     FUC = -> do
@@ -111,7 +111,7 @@ module Skylab::Snag
     Porcelain__ = sidesys[ :Porcelain ]
 
     Pretty_path = -> x do
-      Bzn__[]::CLI.pretty_path x
+      Brazen[]::CLI.pretty_path x
     end
 
     Strange = -> * x_a do
@@ -119,7 +119,7 @@ module Skylab::Snag
     end
 
     String_lib = -> do
-      Bsc__[]::String
+      Basic[]::String
     end
 
     SubTree__ = sidesys[ :SubTree ]

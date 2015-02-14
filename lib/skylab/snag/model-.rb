@@ -118,6 +118,12 @@ module Skylab::Snag
 
         attr_reader :message_proc
 
+        def to_exception  # ick this inspired #open [#066]
+          _expag = Snag_.lib_.brazen::API.expression_agent_instance
+          _a = render_all_lines_into_under [], _expag
+          ::RuntimeError.new _a * SPACE_
+        end
+
         def render_all_lines_into_under y, expression_agent
           expression_agent.calculate y, self, & message_proc
         end

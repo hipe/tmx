@@ -54,7 +54,7 @@ module Skylab::Face
           field_value_notify fld, valid_x
           x = valid_x
           nil
-        end, & normalizer_p )  # tome at [#019]
+        end, & normalizer_p )  # tome at [#ba-027]
         is_invalid = befor != y.count
       end
       [ is_invalid, is_absent, x ]
@@ -90,7 +90,7 @@ module Skylab::Face
 
     class Normalization_ ; include Sayer_
 
-      # mutates param_h [#019] [#bl-013] [#sl-116]
+      # mutates param_h :+[#ba-027] [#bl-013] [#sl-116]
 
       LIB_.basic_fields :client, self,
         :globbing, :absorber, :initialize, :field_i_a,

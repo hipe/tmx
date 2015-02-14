@@ -58,6 +58,7 @@
                API action lifecycle point: `execute`
 [#019]       #doc-point #parent:021 #body-is-inline-in-parent
                API action lifecycle point: `normalize`
+             #see-also: [#ba-027]
 [#018]       #doc-point #parent:021 #body-is-inline-in-parent
                API action lifecycle point: `resolve_services`
 [#017]       #doc-point #parent:021 #body-is-inline-in-parent

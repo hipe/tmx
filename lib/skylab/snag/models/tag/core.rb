@@ -15,14 +15,12 @@ module Skylab::Snag
         new Immutable_Kernel__.new.via_tag_s tag_s
       end
 
-      def normalize_stem_i stem_i, delegate=Snag_::Model_::THROWING_INFO_ERROR_delegate
-        o = Tag_::Stem_Normalization_.new delegate
-        o.stem_i = stem_i
-        if o.is_valid
-          o.stem_i
-        else
-          o.result_of_last_callback_called
-        end
+      def normalize_stem_symbol__ stem_i, & oes_p
+
+        ok_arg = Tag_::Stem_Normalization_.
+          normalize_argument_value( stem_i, & oes_p )
+
+        ok_arg && ok_arg.value_x
       end
     end
 
@@ -75,10 +73,16 @@ module Skylab::Snag
 
     class Immutable_Kernel__
 
-      def via_tag_s tag_s
-        @stem_i = Tag_::Stem_Normalization_.
-          new.with_tag_s( tag_s ).valid.stem_i.freeze
-        freeze
+      def via_tag_s tag_s, & oes_p
+
+        ok_arg = Tag_::Stem_Normalization_.normalize_argument_value( tag_s, & oes_p )
+
+        if ok_arg
+          @stem_i = ok_arg.value_x
+          freeze
+        else
+          ok_arg
+        end
       end
 
       def to_string
