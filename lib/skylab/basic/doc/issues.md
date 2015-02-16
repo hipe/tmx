@@ -1,10 +1,11 @@
 [#039] #open one day unify & simplify all box classes
 [#038]       [ trio ]
-[#037] #hole ( was: #doc-node the new normal ( #IN: [#fa-019] woah! ) )
+[#037] #open make digraph a box
+             ( was: #doc-node the new normal ( #IN: [#fa-019] woah! ) )
 [#036]       #parent-node: [#027] #tracking-tag the idea of a curried normalizer
 [#035]       #doc-node the range narrative ..
 [#034]       #doc-node the module narrative .. #tracking-tag module math
-[#033] #open make digraph a box
+[#033]       [ word wrap ]
 [#032]       [ ellipsify ]
 [#031] #open domain partitioning of scanners
 [#030]       #code-node the basic struct

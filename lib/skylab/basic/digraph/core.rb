@@ -81,7 +81,7 @@ module Skylab::Basic
     end
 
     def initialize
-      @a = [] ; @h = {}  # #open [#033]
+      @a = [] ; @h = {}  # #open [#037]
       @node_class ||= Basic_::Digraph.node_class
     end
 

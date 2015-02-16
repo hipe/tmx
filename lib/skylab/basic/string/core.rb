@@ -126,7 +126,7 @@ module Skylab::Basic
       end
     end  # >>
 
-    module Word_Wrappers__
+    module Word_Wrappers__  # notes in [#033]
 
       class << self
 
