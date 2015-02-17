@@ -12,6 +12,7 @@ module Skylab::Basic
 
       def initialize & edit_p
 
+        @do_add_newlines = false
         @margin = nil
         @pieces = []
         @scn = Basic_.lib_.string_scanner EMPTY_S_
@@ -21,8 +22,24 @@ module Skylab::Basic
 
     private
 
+      def add_newlines=
+        @do_add_newlines = true
+        KEEP_PARSING_
+      end
+
+      def aspect_ratio=
+        extend Basic_::String::Fit_to_Aspect_Ratio_::Methods
+        @ratio_a = iambic_property
+        KEEP_PARSING_
+      end
+
       def input_string=
         _receive_input_string iambic_property
+        KEEP_PARSING_
+      end
+
+      def input_words=
+        __receive_input_words iambic_property
         KEEP_PARSING_
       end
 
@@ -54,16 +71,23 @@ module Skylab::Basic
         end
 
         flush_via_fit_ ftw.fit_to_width _width
-
-        @pieces.clear
-        @downstream_yielder
       end
 
       def flush_via_fit_ fit
 
-        p = if @margin
+        p = if @margin  # easier to follow this way, but not "elegant"
+          if @do_add_newlines
+            -> s do
+              "#{ @margin }#{ s }\n"
+            end
+          else
+            -> s do
+              "#{ @margin }#{ s }"
+            end
+          end
+        elsif @do_add_newlines
           -> s do
-            "#{ @margin }#{ s }"
+            "#{ s }\n"
           end
         else
           IDENTITY_
@@ -73,39 +97,60 @@ module Skylab::Basic
         fit.line_pairs.each_slice 2 do | d, d_ |
 
           _s_a = ( d .. d_ ).map do | d__ |
-            p[ @pieces.fetch( d__ ).s ]
+            @pieces.fetch( d__ ).s
           end
 
-          y << ( _s_a * EMPTY_S_ )
+          y << p[ _s_a * EMPTY_S_ ]
         end
 
+        @pieces.clear
+        @downstream_yielder
+      end
+
+      def __receive_input_words s_a
+
+        _receive_piece_stream __build_inbound_piece_scanner_via_array s_a
         nil
       end
 
       def _receive_input_string s
 
-        st = __build_inbound_piece_scanner s
+        _receive_piece_stream _build_inbound_piece_scanner_via_string s
+        self
+      end
+
+      def _receive_piece_stream st
+
         pc = st.gets
         if pc
-
-          if @pieces.length.nonzero? && :non_space == @pieces.last.category_symbol
-
-            # insert an "artificial" space between this first incoming
-            # word and any last word from any last input chunk
-
-            _accept_piece Piece__.new( SPACE_, :space )
-          end
+          __add_artificial_space_if_necessary
           _accept_piece pc
+          begin
+            pc = st.gets
+            pc or break
+            _accept_piece pc
+            redo
+          end while nil
         end
 
-        begin
-          pc = st.gets
-          pc or break
-          _accept_piece pc
-          redo
-        end while nil
+        nil
+      end
 
-        self
+      def __add_artificial_space_if_necessary
+
+        # insert an "artificial" space between this first incoming
+        # word and any last word from any last input chunk
+
+        if @pieces.length.nonzero? && :non_space == @pieces.last.category_symbol
+          _add_artificial_space
+        end
+
+        nil
+      end
+
+      def _add_artificial_space
+        _accept_piece Piece__.new( SPACE_, :space )
+        nil
       end
 
       def _accept_piece pc
@@ -114,7 +159,81 @@ module Skylab::Basic
         nil
       end
 
-      def __build_inbound_piece_scanner s
+      def __build_inbound_piece_scanner_via_array s_a
+
+        ary_st = Callback_::Stream.via_nonsparse_array s_a
+
+        non_initial_p = nil
+        p = nil
+        p_for_special = nil
+
+        initial_p = -> do
+          s = ary_st.gets
+          if s
+            if SPECIAL_RX___ =~ s
+              p = p_for_special[ s, initial_p ]
+              p[]
+            else
+              p = non_initial_p
+              Piece__.new s, :non_space
+            end
+          else
+            p = EMPTY_P_
+            nil
+          end
+        end
+
+        p_for_special = -> s, then_p do
+          st = _build_inbound_piece_scanner_via_string s
+          -> do
+            x = st.gets
+            if x
+              p = -> do
+                x_ = st.gets
+                if x_
+                  x_
+                else
+                  p = non_initial_p
+                  p[]
+                end
+              end
+              x
+            else
+              p = then_p
+              p[]
+            end
+          end
+        end
+
+        non_initial_p = -> do
+          s = ary_st.gets
+          if s
+            if SPECIAL_RX___ =~ s
+              p = p_for_special[ s, non_initial_p ]
+              Piece__.new SPACE_, :space
+            else
+              p = -> do
+                p = non_initial_p
+                Piece__.new s, :non_space
+              end
+              Piece__.new SPACE_, :space
+            end
+          else
+            p = EMPTY_P_
+            nil
+          end
+        end
+
+        p = initial_p
+
+        Callback_.stream do
+          p[]
+        end
+      end
+
+      SPECIAL_RX___ = /[[:space:]-]/
+
+      def _build_inbound_piece_scanner_via_string s
 
         @scn.string = s
 
@@ -151,7 +270,7 @@ module Skylab::Basic
           end
         end
 
-        Callback_::stream do
+        Callback_.stream do
           p[]
         end
       end
@@ -181,7 +300,7 @@ module Skylab::Basic
           @narrowest_line_width = nil
         end
 
-        attr_reader :line_pairs
+        attr_reader :actual_width, :line_pairs, :narrowest_line_width
 
         def fit_to_width w
           dup.fit_to_width__ w
@@ -285,7 +404,6 @@ module Skylab::Basic
 
           @_piece = @_pieces = @_piece_stream = nil
 
-          @line_count = @line_pairs.length / 2
 
           freeze
         end

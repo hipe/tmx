@@ -63,6 +63,67 @@ module Skylab::Basic::TestSupport::String::WW
           [ 'fe', 'fi', 'fo' ] )
     end
 
+    it "target aspect ratio of 3:2 against 4 pairs" do
+
+      ww = subject.new_with(
+        :aspect_ratio, [ 3, 2 ],
+        :downstream_yielder, [] )
+
+      ww << 'ab cd'
+      ww << 'ef gh'
+
+      ww.flush.should eql [ 'ab cd', 'ef gh' ]
+    end
+
+    it "target aspect ratio of 2:3 against 4 pairs" do
+
+      ww = subject.new_with(
+        :aspect_ratio, [ 2, 3 ],
+        :downstream_yielder, [] )
+
+      ww << 'ab'
+      ww << 'cd ef'
+      ww << 'gh'
+
+      ww.flush.should eql %w( ab cd ef gh )
+    end
+
+    context "(hyphens and cetera)" do
+
+      it "a more attractive fit wins over a closer aspect ratio (widen)" do
+
+        _a = subject.with(
+          :aspect_ratio, [ 8, 3 ],
+          :downstream_yielder, [],
+          :input_string, 'never re-think it' )
+
+        #     'never',
+        #     're-think',
+        #     'it'
+        #
+        # the above delineation fits perfectly into a rectangle of 8:3,
+        # yet the below more attractive delineation is chosen:
+
+        _a.should eql [ 'never re-', 'think it' ]
+      end
+
+      it "a more attractive fit wins over a closer aspect ratio (shrinken)" do
+
+        _a = subject.with(
+          :aspect_ratio, [ 11, 2 ],
+          :downstream_yielder, [],
+          :input_string, 'i love this city' )
+
+        #     'i love this'
+        #     'city'
+        #
+        # the above delineation fits perfectly into an 11:2 rectangle,
+        # yet the below more attractive delineation is chosen:
+
+        _a.should eql [ 'i love', 'this city' ]
+      end
+    end
+
     def left_subject
       Basic_::String.word_wrappers.calm
     end
