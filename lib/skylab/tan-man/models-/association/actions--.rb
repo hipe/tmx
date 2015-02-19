@@ -1,24 +1,24 @@
 module Skylab::TanMan
 
-  class Models_::Association
+  class Models_::Association  # re-opening
 
-    TanMan_::Entity_.call self,
+    edit_entity_class(
 
-        :persist_to, :association,
+      :persist_to, :association,
 
-        :preconditions, [ :dot_file, :node ],
+      :preconditions, [ :dot_file, :node ],
 
-        :required,
-        :property,
-        :from_node_label,
+      :required,
+      :property,
+      :from_node_label,
 
-        :required,
-        :property,
-        :to_node_label
+      :required,
+      :property,
+      :to_node_label )
 
-    Actions = make_action_making_actions_module
+    Actions__ = make_action_making_actions_module
 
-    module Actions
+    module Actions__
 
       Add = make_action_class :Create
 

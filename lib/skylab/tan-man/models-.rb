@@ -1,74 +1,5 @@
 module Skylab::TanMan
 
-  # ~ the stack
-
-  Entity_ = Brazen_.model.entity do
-
-    # create an entity extension module whose foundation is another entity
-    # extension module. effectively we inherit its metaproperties & ad-hoc
-    # processors, etc. we may add to them but not (easily) take them away.
-
-  end
-
-  module Entity_
-  public
-
-    def property_value_via_symbol sym  # abstraction candidate
-      property_value_via_property self.class.property_via_symbol sym
-    end
-
-    def receive_missing_required_properties ev  # #hook-in [br]
-      receive_missing_required_properties_softly ev  # #experimental
-    end
-  end
-
-  Actor_ = -> cls, * a do
-    Callback_::Actor.via_client_and_iambic cls, a
-    Callback_::Event.selective_builder_sender_receiver cls ; nil
-  end
-
-  Stubber_ = -> model do
-
-    -> action_const do
-
-      Stub_.new action_const do | boundish, & oes_p |
-
-        model::Actions__.const_get( action_const, false ).new boundish, & oes_p
-      end
-    end
-  end
-
-  class Stub_
-
-    def initialize action_const, & build_bound_p
-
-      @build_bound_p = build_bound_p
-      @name_function = Callback_::Name.via_const action_const
-    end
-
-    attr_reader :name_function
-
-    def is_actionable
-      true
-    end
-
-    def is_promoted
-      false
-    end
-
-    def is_branch
-      false
-    end
-
-    def new boundish, & oes_p
-      @build_bound_p.call boundish, & oes_p
-    end
-
-    def name
-      fail  # this is only here to exist as a method, to make it look like a module
-    end
-  end
-
   DESC_METHOD_ = -> s = nil, & p do
     if s && ! p
       self.description_block = -> y { y << s }
@@ -76,6 +7,71 @@ module Skylab::TanMan
       self.description_block = p
     end ; nil
   end
+
+  class Model_ < Brazen_::Model_
+
+    define_singleton_method :desc, DESC_METHOD_
+
+    class << self
+
+      def action_class
+        Action_
+      end
+
+      def stubber
+        Stub_Making_Action_Box_Module__.new self
+      end
+
+      def entity_module
+        Entity_
+      end
+
+      public :make_common_properties, :common_properties_class  # b.c doc.ent
+    end
+  end
+
+  # ~ see [#024]:stubbing
+
+  class Stub_Making_Action_Box_Module__ < ::Module
+
+    def initialize model_class
+      model_class.const_set :Stub_, :__legacy_requirement__  # :+[#br-043] magic name
+      @_mc = model_class
+    end
+
+    def stub
+      Action_Stub___.new @_mc
+    end
+  end
+
+  class Action_Stub___ < ::Module
+
+    def initialize mc
+      @model_class = mc
+    end
+
+    def name_function
+      @nf ||= begin
+        Callback_::Name.via_module self
+      end
+    end
+
+    def is_actionable
+      true
+    end
+
+    def is_branch
+      false
+    end
+
+    attr_accessor :is_promoted
+
+    def new boundish, & oes_p
+      @model_class::Actions__.const_get( @nf.as_const ).new boundish, & oes_p
+    end
+  end
+
+  # ~
 
   class Action_ < Brazen_::Model_::Action
 
@@ -123,46 +119,44 @@ module Skylab::TanMan
 
       attr_reader :stdout
 
+      def to_trio_box_
+        bx = Callback_::Box.new
+        fo = formal_properties
+        _Trio = TanMan_.lib_.basic.trio
+        ( @argument_box.each_pair do | k, x |
+          bx.add k, _Trio.new( x, true, fo.fetch( k ) )
+        end )
+        bx
+      end
+
       self
     end
   end
 
-  class Model_ < Brazen_::Model_
 
-    define_singleton_method :desc, DESC_METHOD_
+  Entity_ = Brazen_.model.entity do
 
-    class << self
+    # create an entity extension module whose foundation is another entity
+    # extension module. effectively we inherit its metaproperties & ad-hoc
+    # processors, etc. we may add to them but not (easily) take them away.
 
-      def action_class
-        Action_
-      end
+  end
 
-      def autoload_actions
+  module Entity_
+  public
 
-        class << self
+    def property_value_via_symbol sym  # abstraction candidate
+      property_value_via_property self.class.property_via_symbol sym
+    end
 
-          def to_upper_unbound_action_stream
-            Callback_::Stream.via_item self
-          end
-
-          def to_lower_unbound_action_stream  # #hook-in [br]
-            @did_load_actions ||= begin
-              self.const_get :Actions, false
-              true
-            end
-            super
-          end
-        end
-      end
-
-      def entity_module
-        Entity_
-      end
+    def receive_missing_required_properties ev  # #hook-in [br]
+      receive_missing_required_properties_softly ev  # #experimental
     end
   end
 
-  class Kernel_ < Brazen_::Kernel_  # :[#083].
-    # :+#archive-tombstone: this used to be bottom properties frame
+  Actor_ = -> cls, * a do
+    Callback_::Actor.via_client_and_iambic cls, a
+    Callback_::Event.selective_builder_sender_receiver cls ; nil
   end
 
   module Common_Collection_Controller_Methods_
@@ -271,6 +265,12 @@ module Skylab::TanMan
     end
   end
 
+  class Kernel_ < Brazen_::Kernel_  # :[#083].
+    # :+#archive-tombstone: this used to be bottom properties frame
+  end
+
+  # ~
+
   Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
 
   class Models_::Workspace < Brazen_::Models_::Workspace
@@ -285,7 +285,7 @@ module Skylab::TanMan
       def entity_module  # for below
         Entity_
       end
-    end
+    end  # >>
 
     COMMON_PROPERTIES___ = make_common_properties do | sess |
 
@@ -297,65 +297,24 @@ module Skylab::TanMan
 
     end
 
-    Actions = ::Module.new
+    Actions = Stub_Making_Action_Box_Module__.new self
 
-    class Actions::Status < Brazen_::Models_::Workspace::Actions::Status
-
-      extend Action_::MM
-
-      @is_promoted = true
-
-      @after_name_symbol = :init
-
-    desc "show the status of the config director{y|ies} active at the path"
-
-      def receive_stdout_ _
-      end
+    module Actions
+      Status = stub
+      Status.is_promoted = true
+      Init = stub
+      Init.is_promoted = true
+      Ping = stub
+      Ping.is_promoted = true
     end
 
-    class Actions::Init < Brazen_::Models_::Workspace::Actions::Init
-
-      extend Action_::MM
-
-      @is_promoted = true
-
-      desc do |y|
-        _ = @kernel.silo( :workspace ).model_class.default_config_filename
-        y << "create the #{ val _ } directory"
-      end
-
-      def receive_stdout_ _
-      end
-    end
-
-    class Actions::Ping < Action_
-
-      Entity_.call self,
-
-          :promote_action,
-
-          :desc, -> y do
-            y << "pings tanman (lowlevel)"
-          end
-
-      def produce_result
-        maybe_send_event :info, :ping do
-          bld_ping_event
-        end
-        :hello_from_tan_man
-      end
-
-      def bld_ping_event
-        an = @kernel.app_name.gsub DASH_, SPACE_
-        build_neutral_event_with :ping do |y, o|
-          y << "hello from #{ an }."
-        end
-      end
-    end
+    # ~ all abstraction candidates:
 
     def from_asset_directory_relativize_path__ path
+
       ad = asset_directory_
-      ad and begin
+
+      ad && path && path.length.nonzero? && begin
         ::Pathname.new( path ).relative_path_from( ::Pathname.new ad ).to_path
       end
     end
@@ -371,15 +330,7 @@ module Skylab::TanMan
     end
   end
 
-  class Models_::Remote < Model_
-
-    desc "manage remotes."
-
-    @after_name_symbol = :graph
-
-    Actions = ::Module.new
-
-  end
+  # :+#tombstone:remote model (3 lines)
 
   class Models_::Graph < Model_
 
@@ -387,12 +338,31 @@ module Skylab::TanMan
 
     desc "with the current graph.."
 
-    autoload_actions
+    Actions = stubber
+
+    module Actions
+      Use = stub
+      Sync = stub
+    end
 
     # desc "there's a lot you can tell about a man from his choice of words"
   end
 
-  class Models_::Node < Model_::Document_Entity
+  class Graph_Document_Entity__ < Model_
+
+    class << self
+
+      def action_class  # #hook-in to [br]'s action factory
+        TanMan_::Model_::Document_Entity::Action
+      end
+
+      def document_in_workspace_identifier_symbol  # #hook-out to doc.ent
+        :graph
+      end
+    end  # >>
+  end
+
+  class Models_::Node < Graph_Document_Entity__
 
     @after_name_symbol = :hear
 
@@ -400,13 +370,11 @@ module Skylab::TanMan
       y << "view and edit nodes"
     end
 
-    autoload_actions
-
     class << self
       def touch
         self::Actors__::Mutate::Touch
       end
-    end
+    end # >>
 
     def to_controller  # experiment
       Models_::Node::Controller__.new self, @preconditions.fetch( :dot_file )
@@ -414,10 +382,18 @@ module Skylab::TanMan
 
     attr_reader :node_stmt
 
+    Actions = stubber
+
+    module Actions
+      Add = stub
+      Ls = stub
+      Rm = stub
+    end
+
     Node_ = self
   end
 
-  class Models_::Association < Model_::Document_Entity
+  class Models_::Association < Graph_Document_Entity__
 
     @after_name_symbol = :node
 
@@ -425,10 +401,15 @@ module Skylab::TanMan
       y << "view and edit associations"
     end
 
-    autoload_actions
+    Actions = stubber
+
+    module Actions
+      Add = stub
+      Rm = stub
+    end
   end
 
-  class Models_::Meaning < Model_::Document_Entity
+  class Models_::Meaning < Graph_Document_Entity__
 
     @after_name_symbol = :association
 
@@ -453,13 +434,13 @@ module Skylab::TanMan
       @property_box[ :value ]
     end
 
-    Stub_ = Stubber_[ self ]  # :+[#br-043] magic name
+    Actions = stubber
 
     module Actions
-      Add = Stub_[ :Add ]
-      Ls  = Stub_[ :Ls ]
-      Rm = Stub_[ :Rm ]
-      Associate = Stub_[ :Associate ]
+      Add = stub
+      Ls = stub
+      Rm = stub
+      Associate = stub
     end
   end
 
@@ -471,17 +452,17 @@ module Skylab::TanMan
       y << "get or set the starter file used to create digraphs"
     end
 
-    autoload_actions
-  end
+    Actions = stubber
 
-  module Models_::Datastores
+    module Actions
+      Set = stub
+      Ls = stub
+      Get = stub
+      Lines = stub
 
-    Actions = ::Module.new
-
-    module Nodes
-
-      Git_Config = Brazen_::Data_Stores_::Git_Config
-
+      def Lines.session * a, & p
+        Models_::Starter::Actions__::Lines.session( * a, & p )
+      end
     end
   end
 

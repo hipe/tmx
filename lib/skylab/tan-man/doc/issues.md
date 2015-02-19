@@ -10,7 +10,7 @@
                event of creating the tmpdir breaks the comprehensive test run
              this is now #wishlist because the fix is so ugly.
 [#085]       #done #list-API make methods conform to [#hl-116]
-[#084]       #parent-node: [#model] the node model narrative ..
+[#084]       #parent-node: [#024] of node ..
 [#083]       #doc-node kernel
 [#082]       #parent-node: [#083] the kernel properties narrative ..
 [#081]       config shell (lost). part of [#mh-053]
@@ -80,13 +80,15 @@
 [#027]       overhaul to cli actions base class
 [#026]       #done API::InvocationMethods away!
 [#025]       API::RuntimeExtensions away! #done
-[#024]       #done use -h -- we had to etc use bleeding
+[#024]       [ model ] and #doc-node: the model experiments narrative ..
+             ( #was: #done use -h -- we had to etc use bleeding )
 [#023]       #deferred combine all Boxxy, consider Boxxy-like solutions
                #depends-on:#018
 [#022]       #done end client defaulting patterns (workspace etc)
              ( #was: workspace directories )
              ( #was: refactor-in headless, and sub-client )
-[#021]       #done merge singletons into service
+[#021]       the document entity narrative ..
+             ( #was: #done merge singletons into service )
 [#020] #open #feature-collection upstream
              ( #was: #done #low-priority nounify cli commands
                x. check -> graph check
@@ -100,7 +102,7 @@
                except the *huge* tangent stack we are under
 [#017]       #pattern: for to maybe push up to headless
 [#016]       [ nascent - see commit ]
-             ( was: #done #pattern: action instance spawns instance of model controller
+             ( #was: #done #pattern: action instance spawns instance of model controller
                .. so make `controllers` knob for clarity )
 [#015] #open #feature remove association between nodes (see)
              ( #was: #done UI for dissociate (and prune nodes? - no, out of scope) )
@@ -120,7 +122,8 @@
              #doc-node: the node controller narrative ..
              ( #was: #done 2012-10-27 create a node
                1. with one template (3 permutations) 2. with another template (3 permutes) )
-[#008]       #done 2012-10-10 #rename rename "nt" to "expression" / "rule"
+[#008]       the treetop load DSL narrative ..
+             ( #was: #done 2012-10-10 #rename rename "nt" to "expression" / "rule" )
 [#007]     #watch tracking all non-primitive values still used in our trans-modality API
              ( #was: #done #small #critical models/ dir generated during specs 2012-09-29 )
 [#006]       meta property reference (.rb!)

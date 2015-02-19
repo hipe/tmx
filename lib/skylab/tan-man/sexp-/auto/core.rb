@@ -306,7 +306,9 @@ module Skylab::TanMan
     end
 
     def unparse_into y
-      y << @content_text_value
+      s = @content_text_value.to_s
+      y << s
+      s.length
     end
   end
 
@@ -677,19 +679,24 @@ module Skylab::TanMan
     end
 
     def unparse
-      unparse_into( [] ).join EMPTY_S_
+      y = []
+      unparse_into y
+      y.join EMPTY_S_
     end
 
     def unparse_into y
+      d = 0
       each do | child |
         child or next
         if child.respond_to? :unparse_into
-          child.unparse_into y
+          d += child.unparse_into y
         else
-          y << child
+          s = child.to_s
+          y << s
+          d += s.length
         end
       end
-      y
+      d
     end
   end
 

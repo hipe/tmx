@@ -2,9 +2,11 @@ module Skylab::TanMan
 
   module Models_::DotFile
 
-    module Actors__
+    module Small_Time_
 
-      class Build_Document_Controller
+      Actors = ::Module.new
+
+      class Actors::Build_Document_Controller
 
         class Via_action < self
 

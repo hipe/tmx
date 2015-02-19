@@ -59,11 +59,11 @@ module Skylab::TanMan
       end
 
       def precondition_for action, id, box, & oes_p
-        DotFile_::Actors__::Build_Document_Controller::Via_action[ action ]
+        DotFile_::Small_Time_::Actors::Build_Document_Controller::Via_action[ action ]
       end
 
       def document_controller_via_trio_box bx, & oes_p
-        DotFile_::Actors__::Build_Document_Controller::Via_trio_box[ bx, @kernel, & oes_p ]
+        DotFile_::Small_Time_::Actors::Build_Document_Controller::Via_trio_box[ bx, @kernel, & oes_p ]
       end
     end
 

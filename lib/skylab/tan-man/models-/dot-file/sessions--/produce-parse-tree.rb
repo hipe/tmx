@@ -30,7 +30,7 @@ module Skylab::TanMan
       DotFile_::SyntaxNodes.class
       DotFile_::Sexp::InstanceMethods.class
 
-      include TanMan_::Input_Adapters_::Treetop::Parser_Instance_Methods
+      include TanMan_::Input_Adapters_::Treetop::Parser__  # :+#for-one-commit-only
 
       def initialize bx, & oes_p
         @bx = bx

@@ -158,7 +158,7 @@ module Skylab::TanMan::TestSupport::Models::Graph
             + this will get overwritten
           O
 
-          _file = @ws_pn.join( 'open-this-yourself' ).open( WRITE_MODE_ )
+          _file = @ws_pn.join( 'open-this-yourself' ).open( ::File::CREAT | ::File::EXCL | ::File::WRONLY )
 
           call_API :graph, :use,
             :digraph_path, _file,

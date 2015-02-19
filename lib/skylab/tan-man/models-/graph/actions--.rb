@@ -14,9 +14,9 @@ module Skylab::TanMan
       end
     end  # >>
 
-    Actions = make_action_making_actions_module
+    Actions__ = make_action_making_actions_module
 
-    module Actions
+    module Actions__
 
       Use = make_action_class :Create do
 
@@ -62,10 +62,13 @@ module Skylab::TanMan
 
       bx = Callback_::Box.new
 
+      path = @property_box.fetch :digraph_path
+      if path.respond_to? :path  # because of a :+[#br-021] hack
+        path = path.path
+      end
+
       bx.add Brazen_::NAME_,
-        @preconditions.fetch( :workspace ).
-          from_asset_directory_relativize_path__(
-            @property_box.fetch :digraph_path )
+        @preconditions.fetch( :workspace ).from_asset_directory_relativize_path__( path )
 
       bx.to_pair_stream
     end

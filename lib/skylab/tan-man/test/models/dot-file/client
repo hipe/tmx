@@ -25,9 +25,9 @@ module Skylab::TanMan::TestSupport::Models::DotFile
 
     def _doc_controller_via_name_value_pair sym, x
 
-      bx = TanMan_::Callback_::Box.new
-
       TanMan_::Models_.class
+
+      bx = TanMan_::Callback_::Box.new
 
       bx.add sym, TanMan_.lib_.basic.trio( x, true,
 

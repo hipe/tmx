@@ -38,7 +38,7 @@ module Skylab::CSS_Convert
 
   module Parser_::InstanceMethods
 
-    include LIB_.treetop_tools::Parser_Instance_Methods
+    include LIB_.treetop_tools::Parser__  # :+#for-one-commit-only
 
     def initialize mode_client
       @actuals = mode_client.actual_parameters

@@ -1,3 +1,6 @@
+
+self._NOT_USED  # open :+[#013]
+
 module Skylab::TanMan
 
   class API::Actions::Status < API::Action   # due for a refactor [#041]

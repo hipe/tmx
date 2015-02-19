@@ -1,23 +1,22 @@
 module Skylab::TanMan
 
-  class Models_::Node  # is document entity
+  class Models_::Node  # re-opening
 
-    Entity_.call self,
+    edit_entity_class(
 
-        :persist_to, :node,
+      :persist_to, :node,
 
-        :preconditions, [ :dot_file ],
+      :preconditions, [ :dot_file ],
 
-        :required,
-        :ad_hoc_normalizer, -> arg, & oes_p do
-          Node_::Controller__::Normalize_name[ self, arg, & oes_p ]
-        end,
-        :property, :name
+      :required,
+      :ad_hoc_normalizer, -> arg, & oes_p do
+        Node_::Controller__::Normalize_name[ self, arg, & oes_p ]
+      end,
+      :property, :name )
 
+    Actions__ = make_action_making_actions_module
 
-    Actions = make_action_making_actions_module
-
-    module Actions
+    module Actions__
 
       Add = make_action_class :Create do
 

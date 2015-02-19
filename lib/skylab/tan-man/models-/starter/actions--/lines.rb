@@ -28,13 +28,17 @@ module Skylab::TanMan
 
         class << self
 
+          def session k, oes_p, & edit_p
+            Starter_::Actions__::Lines::Session.new k, oes_p, & edit_p
+          end
+
           def via__ value_fetcher, starter, k, & oes_p
             Session.new k, oes_p do | o |
               o.starter = starter
               o.value_fetcher = value_fetcher
             end.via_starter
           end
-        end
+        end  # >>
 
         # we cleaved an API action into an internal API
 

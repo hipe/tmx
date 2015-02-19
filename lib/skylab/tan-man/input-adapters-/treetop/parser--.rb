@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   module Input_Adapters_::Treetop
 
-  module Parser_Instance_Methods  # you must implement the #hook-out's below
+  module Parser__  # :+#for-one-commit-only # you must implement the #hook-out's below
 
     Callback_::Event.selective_builder_sender_receiver self
 

@@ -1,6 +1,6 @@
 module Skylab::TanMan
 
-  class Models_::Starter
+  class Models_::Starter  # re-opening
 
     edit_entity_class(
       :persist_to, :starter,
@@ -8,17 +8,16 @@ module Skylab::TanMan
 
     class << self
 
-      def dir_pn_instance
+      def __dir_pn_instance
         @dpn ||= TanMan_.dir_pathname.join RELPATH___
       end
-
     end  # >>
 
     RELPATH___ = 'data-documents/starters'.freeze
 
-    Actions = make_action_making_actions_module
+    Actions__ = make_action_making_actions_module
 
-    module Actions
+    module Actions__
 
       Set = make_action_class :Create do
 
@@ -56,17 +55,6 @@ module Skylab::TanMan
           end
         end
       end
-
-      Lines = Stub_.new :Lines do | boundish, & oes_p |
-
-        Starter_::Actions__::Lines.new boundish, & oes_p
-
-      end
-      class << Lines
-        def session k, oes_p, & edit_p
-          Starter_::Actions__::Lines::Session.new k, oes_p, & edit_p
-        end
-      end
     end
 
     def line_stream_against_value_fetcher vfetch
@@ -79,7 +67,7 @@ module Skylab::TanMan
     end
 
     def to_pathname
-      @pn ||= Starter_.dir_pn_instance.join property_value_via_symbol :name
+      @pn ||= Starter_.__dir_pn_instance.join property_value_via_symbol :name
     end
 
     def entity_collection
@@ -99,7 +87,7 @@ module Skylab::TanMan
 
       def starter_in_workspace ws, & oes_p
 
-        Actions::Get.edit_and_call @kernel, oes_p do | o |
+        Actions__::Get.edit_and_call @kernel, oes_p do | o |
 
           # experimentally hack the enternal API action: give it the workspace
           # we already have and mutate its formals not to know about workspace
@@ -189,7 +177,7 @@ module Skylab::TanMan
           fly = Starter_.new_flyweight @kernel, & oes_p
           props = fly.properties
 
-          base_pn = Starter_.dir_pn_instance
+          base_pn = Starter_.__dir_pn_instance
 
           _pn_a = base_pn.children false
 
