@@ -87,7 +87,7 @@ module Skylab::Brazen
         end
       end
 
-      def name_i
+      def name_symbol
         @group_name.as_variegated_symbol
       end
 
@@ -96,7 +96,7 @@ module Skylab::Brazen
 
       def to_marshal_pair
         if @has_active_boolean
-          Callback_.pair.new @active_boolean.name_i, @group_name.as_slug.intern
+          Callback_::Pair[ @active_boolean.name_symbol, @group_name.as_slug.intern ]
         end
       end
 

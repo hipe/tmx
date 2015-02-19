@@ -36,7 +36,7 @@ module Skylab::Callback
         end
 
         def bld_event_class
-          x_a = [ name_i ]
+          x_a = [ name_symbol ]
           members.each do |i|
             x_a.push i, nil
           end
@@ -46,7 +46,7 @@ module Skylab::Callback
           ecls
         end
 
-        def name_i
+        def name_symbol
           Callback_::Name.via_module( self ).as_trimmed_variegated_symbol
         end
       end
@@ -88,7 +88,7 @@ module Skylab::Callback
         private
 
           def bld_event_class
-            x_a = [ name_i ]
+            x_a = [ name_symbol ]
             msg_p = self::P___
             _NAME_I_A = []
             msg_p.parameters.each do |(_, i)|
@@ -116,7 +116,7 @@ module Skylab::Callback
             cls
           end
 
-          def name_i
+          def name_symbol
             Callback_::Name.via_module( self ).as_trimmed_variegated_symbol
           end
         end  # >>

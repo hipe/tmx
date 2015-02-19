@@ -98,7 +98,7 @@ module Skylab::TanMan
 
       def bound_call_for_ping
         _x = maybe_send_event :payload, :ping_for_action do
-          build_OK_event_with :ping_from_action, :name_i,
+          build_OK_event_with :ping_from_action, :name_symbol,
             name.as_lowercase_with_underscores_symbol
         end
         Brazen_.bound_call.via_value _x

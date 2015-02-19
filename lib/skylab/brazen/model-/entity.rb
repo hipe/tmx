@@ -173,7 +173,7 @@ module Skylab::Brazen
         end
 
         def any_property_value_via_property prop
-          actual_property_box[ prop.name_i ]  # :++#hook-out
+          actual_property_box[ prop.name_symbol ]  # :++#hook-out
         end
 
 
@@ -482,7 +482,7 @@ module Skylab::Brazen
       stack.push_frame_via_box primary_box
 
       while prop = scn.gets
-        i = prop.name_i
+        i = prop.name_symbol
         pptr = stack.any_proprietor_of i
         if pptr
           had_value = true

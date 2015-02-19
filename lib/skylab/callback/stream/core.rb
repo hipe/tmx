@@ -76,10 +76,6 @@ module Skylab::Callback
             Stream_::Ordered__[ st ]
           end
 
-          def pair
-            Pair_
-          end
-
           def reduce scn, p
             new do
               begin

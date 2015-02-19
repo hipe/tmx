@@ -32,7 +32,7 @@ module Skylab::Basic
         # ~ for a particular act of normalization:
 
         def x=
-          set_arg Trio_.new iambic_property, true, Basic_.default_property
+          set_arg Callback_::Trio.new iambic_property, true, Basic_.default_property
         end
 
         def arg=

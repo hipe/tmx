@@ -33,10 +33,10 @@ module Skylab::SubTree::TestSupport::Tree_Print
 
     class Node
       def initialize name_i, a=nil
-        @a = a ; @name_i = name_i ; nil
+        @a = a ; @name_symbol = name_i ; nil
       end
       def tree_print q
-        q.node_label @name_i
+        q.node_label @name_symbol
         if @a
           q.branch do
             @a.each do |node|

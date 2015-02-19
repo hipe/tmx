@@ -31,7 +31,7 @@ module Skylab::Basic  # introduction at [#020]
     end
 
     def minimal_property name
-      Minimal_Property__.new name
+      Minimal_Property.new name
     end
 
     def normalizers
@@ -40,9 +40,9 @@ module Skylab::Basic  # introduction at [#020]
 
     def trio * x_a
       if x_a.length.zero?
-        Trio_
+        Callback_::Trio
       else
-        Trio_.new( * x_a )
+        Callback_::Trio.new( * x_a )
       end
     end
   end
@@ -50,7 +50,7 @@ module Skylab::Basic  # introduction at [#020]
   Callback_ = ::Skylab::Callback
 
   Default_property_instance__ = Callback_.memoize do
-    Minimal_Property__.via_variegated_symbol :argument
+    Minimal_Property.via_variegated_symbol :argument
   end
 
   module Fuzzy  # :[#015].
@@ -101,7 +101,7 @@ module Skylab::Basic  # introduction at [#020]
     end  # >>
   end
 
-  class Minimal_Property__
+  class Minimal_Property
 
     class << self
 
@@ -120,8 +120,6 @@ module Skylab::Basic  # introduction at [#020]
     def name_symbol
       @name.as_variegated_symbol
     end
-
-    alias_method :name_i, :name_symbol  # until etc
 
     def description
       "« #{ @name.as_slug } »"  # :+#guillemets
@@ -178,48 +176,6 @@ module Skylab::Basic  # introduction at [#020]
 
     def build_not_OK_event_via_mutable_iambic_and_message_proc x_a, msg_p
       Callback_::Event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, msg_p
-    end
-  end
-
-  class Trio_  # :[#038].
-
-    class << self
-
-      def via_value_and_variegated_symbol x, i
-        new x, true, Minimal_Property__.via_variegated_symbol( i )
-      end
-
-      alias_method :via_x_and_i, :via_value_and_variegated_symbol
-
-    end
-
-    def initialize x, b, prp=nil
-      @actuals_has_name = b
-      @property = prp
-      @value_x = x
-      freeze
-    end
-
-    def members
-      [ :actuals_has_name, :property, :name, :name_symbol, :value_x ]
-    end
-
-    attr_reader :value_x, :actuals_has_name, :property
-
-    attr_writer :value_x
-
-    def name_symbol
-      @property.name_symbol
-    end
-
-    def name
-      @property.name
-    end
-
-    def new_with_value x
-      otr = dup
-      otr.value_x = x
-      otr.freeze
     end
   end
 

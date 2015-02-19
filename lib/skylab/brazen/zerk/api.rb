@@ -98,14 +98,14 @@ module Skylab::Brazen
       def build_child_not_found_event
 
         build_not_OK_event_with :child_not_found,
-            :name_i, @token,
-            :did_you_mean_i_a, childs.map( & :name_i ) do |y, o|
+            :name_symbol, @token,
+            :did_you_mean_i_a, childs.map( & :name_symbol ) do |y, o|
 
           _s_a = o.did_you_mean_i_a.map do |i|
             val i
           end
 
-          y << "child not found: #{ ick o.name_i } - did you mean #{
+          y << "child not found: #{ ick o.name_symbol } - did you mean #{
             }#{ or_ _s_a }?"
         end
       end
@@ -120,14 +120,14 @@ module Skylab::Brazen
       def build_request_ended_prematurely_event
 
         build_not_OK_event_with :request_ended_prematurely,
-          :name_i, @node.name_i,
-          :did_you_mean_i_a, childs.map( & :name_i ) do |y, o|
+          :name_symbol, @node.name_symbol,
+          :did_you_mean_i_a, childs.map( & :name_symbol ) do |y, o|
 
           _s_a = o.did_you_mean_i_a.map do |i|
             val i
           end
 
-          y << "premature end of '#{ o.name_i }' request - #{
+          y << "premature end of '#{ o.name_symbol }' request - #{
             }did you mean #{ or_ _s_a }?"
         end
       end

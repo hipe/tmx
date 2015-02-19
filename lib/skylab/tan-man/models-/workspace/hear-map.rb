@@ -54,7 +54,7 @@ module Skylab::TanMan
 
             def touch_workspace & path_p
 
-              @bx.add :just_looking, Callback_.pair.new( true, :just_looking )
+              @bx.add :just_looking, Callback_::Pair[ true, :just_looking ]
 
               @ws = @kernel.silo( :workspace ).workspace_via_trio_box(
                 @bx, & @on_event_selectively )

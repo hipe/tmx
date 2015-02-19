@@ -55,7 +55,7 @@ module Skylab::Snag
       end
 
       def say_missing_required a
-        "missing required API propert{y|ies} (#{ a.map( & :name_i ) * ', ' })"
+        "missing required API propert{y|ies} (#{ a.map( & :name_symbol ) * ', ' })"
       end
 
       def receive_info_string ev_s
@@ -144,7 +144,7 @@ module Skylab::Snag
 
         def bld_delegating_property_for_slot _SLOT
 
-          stem_symbol = :"on_#{ _SLOT.name_i }"
+          stem_symbol = :"on_#{ _SLOT.name_symbol }"
 
           @property_class.new do
 
@@ -184,9 +184,9 @@ module Skylab::Snag
 
           mod.const_get( :Delegate, false ).ordered_dictionary.each_value do |slot|
 
-            _RECEIVE_METHOD_NAME = :"receive_#{ slot.name_i }"
+            _RECEIVE_METHOD_NAME = :"receive_#{ slot.name_symbol }"
 
-            mod.send :define_method, :"send_#{ slot.name_i }" do |ev|
+            mod.send :define_method, :"send_#{ slot.name_symbol }" do |ev|
 
               @delegate.send _RECEIVE_METHOD_NAME, ev
             end

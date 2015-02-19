@@ -33,7 +33,7 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
       if @result
         @result.terminal_channel_i.should eql event_channel_i
         if :missing == event_channel_i
-          @result.property.name_i.should eql x_i
+          @result.property.name_symbol.should eql x_i
         else
           @result.x.should eql x_i
         end

@@ -3,7 +3,7 @@
 
 ## synopsis
 
-given one [#ba-038] "arg" for a path (whose actual value is possibly
+given one [#ca-004] "arg" for a path (whose actual value is possibly
 false-ish), and zero or one actual value for an "instream", resolve one
 stream open for reading.
 
@@ -16,7 +16,7 @@ there is what the user passes to your action and then there is what
 your action passes to this actor, which is [#mh-024] different:
 
 your action passes to this actor zero or one instream (the IO object,
-typically STDIN); and one [#ba-038] argument "trio" modeling both
+typically STDIN); and one [#ca-004] argument "trio" modeling both
 the user's actual argument value for the `path` (if any was provided)
 as well as modeling the formal value of the `path` (that is, metadata
 about the field (like its name function) for use in event emission).

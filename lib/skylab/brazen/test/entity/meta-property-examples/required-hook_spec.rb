@@ -14,7 +14,10 @@ module Skylab::Brazen::TestSupport::Entity
 
           during_entity_normalize do |ent|
             miss_a = ent.class.requored_prop_a.reduce nil do | m, prop |
-              ent.any_property_value_via_property( prop ).nil? and ( m ||= [] ).push prop.name_i
+              if ent.any_property_value_via_property( prop ).nil?
+                m ||= []
+                m.push prop.name_symbol
+              end
               m
             end
             if miss_a

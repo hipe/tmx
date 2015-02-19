@@ -424,7 +424,7 @@ module Skylab::Brazen
           st = to_pair_stream
           pair = st.gets
           while pair
-            yield pair.name_i, pair.value_x
+            yield pair.name_symbol, pair.value_x
             pair = st.gets
           end
         else

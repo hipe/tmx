@@ -395,7 +395,7 @@ module Skylab::TestSupport
           if @output_adapter_o
             bx = bx.dup
             @output_adapter_o.formal_properties_array.each do | prp |
-              bx.add_or_replace prp.name_i, -> { prp }, -> _ { prp }
+              bx.add_or_replace prp.name_symbol, -> { prp }, -> _ { prp }
             end
           end
 
@@ -416,11 +416,11 @@ module Skylab::TestSupport
           prp = st.gets
           while prp
 
-            if :upstream_path == prp.name_i  # hack for aesthetics, may change when [#br-078]
+            if :upstream_path == prp.name_symbol  # hack for aesthetics, may change when [#br-078]
               break
             end
 
-            bx.add prp.name_i, prp
+            bx.add prp.name_symbol, prp
 
             prp = st.gets
           end
@@ -435,7 +435,7 @@ module Skylab::TestSupport
               _x,
               sym )
 
-            bx.add_or_replace prop.name_i, -> do
+            bx.add_or_replace prop.name_symbol, -> do
               prop
             end, -> _ do
               prop
@@ -443,7 +443,7 @@ module Skylab::TestSupport
           end
 
           while prp
-            bx.add prp.name_i, prp
+            bx.add prp.name_symbol, prp
             prp = st.gets
           end
 

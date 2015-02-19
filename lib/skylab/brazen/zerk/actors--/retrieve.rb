@@ -79,14 +79,14 @@ module Skylab::Brazen
         # of nodes here may not be persistable (buttons etc)
         h = {}
         @children.each do |cx|
-          h[ cx.name_i ] = cx
+          h[ cx.name_symbol ] = cx
         end
         @child_via_normal_name_h = h ; nil
       end
 
       def via_ast
-        @name_i = @ast.external_normal_name_symbol
-        @child = @child_via_normal_name_h[ @name_i ]
+        @name_symbol = @ast.external_normal_name_symbol
+        @child = @child_via_normal_name_h[ @name_symbol ]
         if @child
           via_child
         else
@@ -96,7 +96,7 @@ module Skylab::Brazen
 
       def when_no_such_node
         @on_event_selectively.call :error do
-          Brazen_.event.inline_not_OK_with :no_such_node, :name_symbol, @name_i
+          Brazen_.event.inline_not_OK_with :no_such_node, :name_symbol, @name_symbol
         end
         UNABLE_
       end

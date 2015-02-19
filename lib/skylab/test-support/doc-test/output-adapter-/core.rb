@@ -219,7 +219,7 @@ module Skylab::TestSupport
       end
       ea = ::Enumerator.new do |y|
         frml_options.values.each do |opt|
-          opt.summarize_p[ build_section_yielder[ y, opt.name_i ] ]
+          opt.summarize_p[ build_section_yielder[ y, opt.name_symbol ] ]
         end
       end
       TestSupport_.lib_.CLI_table(

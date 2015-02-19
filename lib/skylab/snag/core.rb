@@ -47,7 +47,7 @@ module Skylab::Snag
 
         normpath = st.gets
         while normpath
-          sym = normpath.name_i
+          sym = normpath.name_symbol
           define_method :"#{ sym }s", bld_module_reader( sym )
           normpath = st.gets
         end

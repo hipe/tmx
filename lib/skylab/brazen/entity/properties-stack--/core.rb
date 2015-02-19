@@ -105,7 +105,7 @@ module Skylab::Brazen
     Bound_properties = -> bp_p, properties do
       properties.to_stream.map_by do |prop|
         bp_p[ prop ]
-      end.flush_to_immutable_with_random_access_keyed_to_method :name_i
+      end.flush_to_immutable_with_random_access_keyed_to_method :name_symbol
     end
 
     Build_extra_properties_event__ = -> name_i_a, did_you_mean_i_a=nil, lemma=nil, adj=nil do

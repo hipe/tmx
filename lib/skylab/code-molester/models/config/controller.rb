@@ -22,7 +22,7 @@ module Skylab::CodeMolester
         if st.pathname
           new( * st.values ).normalize_via_yes_or_no _OK_p, not_OK_p
         else
-          not_OK_p[ Missing_Argument__[ :name_i, :pathname ] ]
+          not_OK_p[ Missing_Argument__[ :name_symbol, :pathname ] ]
         end
       end
 

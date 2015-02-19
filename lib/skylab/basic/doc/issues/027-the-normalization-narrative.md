@@ -78,7 +78,7 @@ for a single, unified solution that is universally applicable,
 recognizable, and poka-yoke; we have adopted this one method name,
 signature and semantics:
 
-`normalize_argument` - argument ("arg") is a [#ba-038]  ("trio")
+`normalize_argument` - argument ("arg") is a [#ca-004]  ("trio")
 argument structure. optional block is a [#ca-017] selective listener.
 
 the "arg" structure can indicate whether or not an actual value was
@@ -97,7 +97,7 @@ a native integer `1`). if it is already valid and normal as it is
 you may leave it as it is.
 
 if based on your definition of normal this normalization was
-successful, your result must be another or the same [#ba-038]-shaped
+successful, your result must be another or the same [#ca-004]-shaped
 argument structure containing the new (or same) value for the argument
 value.
 
@@ -106,7 +106,7 @@ of this shape. if the incoming result was itself already valid and
 normal as-is, you may result in this same object as your result.
 
 (in the case where you tranformed the value in some way, it may
-be useful to use the `new_with_value` method of [#ba-038] to create
+be useful to use the `new_with_value` method of [#ca-004] to create
 a modified frozen dup of the incoming argument structure, but with
 the new desired value.)
 

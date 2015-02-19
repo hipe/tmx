@@ -68,17 +68,17 @@ module Skylab::Callback
 
       class Callback_Slot__
         def initialize i
-          @name_i = i
+          @name_symbol = i
         end
-        attr_reader :name_i
+        attr_reader :name_symbol
         def attr_reader_method_name
-          @attr_reader_method_name ||= :"#{ @name_i }_p"
+          @attr_reader_method_name ||= :"#{ @name_symbol }_p"
         end
         def attr_writer_method_name
-          @attr_writer_method_name ||= :"#{ @name_i }_p="
+          @attr_writer_method_name ||= :"#{ @name_symbol }_p="
         end
         def ivar
-          @ivar ||= :"@#{ @name_i }_p"
+          @ivar ||= :"@#{ @name_symbol }_p"
         end
       end
 

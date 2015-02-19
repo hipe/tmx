@@ -20,7 +20,7 @@ module Skylab::Brazen::TestSupport::Entity
 
         _a.length.should eql 1
         prop = _a.first
-        prop.name_i.should eql :wazoozle
+        prop.name_symbol.should eql :wazoozle
     end
 
     context "create arbitrary meta-properties and use them in the properties" do

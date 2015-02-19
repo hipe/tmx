@@ -151,9 +151,9 @@ module Skylab::Face
           else
             absrb_passive
           end
-          @field.name_i ||= :"#{ bx.length }"
+          @field.name_symbol ||= :"#{ bx.length }"
         end
-        bx.add @field.name_i, @field ; nil
+        bx.add @field.name_symbol, @field ; nil
       end
       attr_reader :d
       LIB_.fields_from_methods(
@@ -174,11 +174,11 @@ module Skylab::Face
           @d = shell.d ; @field.fill = shell.fill
         end
         def id  # typically for fields w/o labels, i.e non-displayed headers
-          @field.name_i = iambic_property
+          @field.name_symbol = iambic_property
         end
         def label
           @field.label_s = iambic_property
-          @field.name_i.nil? and @field.name_i = @field.label_s.intern
+          @field.name_symbol.nil? and @field.name_symbol = @field.label_s.intern
         end
         def left
           @field.align_i = :left
@@ -209,7 +209,7 @@ module Skylab::Face
         yield self
         freeze  # ensure that we can dupe with shallow copies
       end
-      attr_accessor :align_i, :label_s, :name_i, :cel_renderer_p_p
+      attr_accessor :align_i, :label_s, :name_symbol, :cel_renderer_p_p
     end
 
   public

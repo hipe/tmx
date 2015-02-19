@@ -381,7 +381,7 @@ module Skylab::Brazen
         end
 
         box = @writable_formal_propery_method_names_box
-        name_i = prop.name_i
+        name_i = prop.name_symbol
         do_add = false
         meth_i = box.fetch name_i do
           do_add = true
@@ -469,7 +469,7 @@ module Skylab::Brazen
       def build_immutable_properties_stream_with_random_access_
         entity_formal_property_method_names_box_for_read.to_value_stream.map_by do |i|
           send i
-        end.flush_to_immutable_with_random_access_keyed_to_method :name_i
+        end.flush_to_immutable_with_random_access_keyed_to_method :name_symbol
       end
 
       def any_property_via_symbol i
@@ -694,7 +694,7 @@ module Skylab::Brazen
 
       def trio_via_property prop
         had = true
-        x = actual_property_box.fetch prop.name_i do
+        x = actual_property_box.fetch prop.name_symbol do
           had = false ; nil
         end
         LIB_.trio.new x, had, prop
@@ -977,7 +977,7 @@ module Skylab::Brazen
 
       def dflt_apply
         -> mprop do
-          name_i = mprop.name_i
+          name_i = mprop.name_symbol
           meth_i = :"#{ name_i }="
           _meth_p = mprop.iambic_writer_method_proc
           attr_reader name_i
@@ -1049,7 +1049,7 @@ module Skylab::Brazen
       end
 
       def any_value_of_metaprop mprop
-        send mprop.name_i
+        send mprop.name_symbol
       end
 
       def set_value_of_metaprop x, mprop

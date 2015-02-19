@@ -49,7 +49,7 @@ module Skylab::Brazen::TestSupport::Entity
       end
 
       it "reflects" do
-        AHP_Child.properties.each_value.map( & :name_i ).
+        AHP_Child.properties.each_value.map( & :name_symbol ).
           should eql [ :foo, :bar, :baz, :biff ]
       end
 

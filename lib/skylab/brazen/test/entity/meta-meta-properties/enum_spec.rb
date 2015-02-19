@@ -54,9 +54,9 @@ module Skylab::Brazen::TestSupport::Entity
         a = h.keys
         a.length.should eql 3
         ( a - [ :red, :blue, nil ] ).length.should be_zero
-        h[ :red ].map( & :name_i ).should eql [ :red_thing ]
-        h[ :blue ].map( & :name_i ).should eql [ :blue_thing, :other_blue_thing ]
-        h[ nil ].map( & :name_i ).should eql [ :no_color ]
+        h[ :red ].map( & :name_symbol ).should eql [ :red_thing ]
+        h[ :blue ].map( & :name_symbol ).should eql [ :blue_thing, :other_blue_thing ]
+        h[ nil ].map( & :name_symbol ).should eql [ :no_color ]
       end
     end
 

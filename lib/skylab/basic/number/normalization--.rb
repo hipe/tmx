@@ -68,7 +68,7 @@ module Skylab::Basic
             ok = via_number_and_minimum_validate
           end
           if ok
-            Trio_.new @number, true
+            Callback_::Trio.new @number, true
           else
             @result
           end

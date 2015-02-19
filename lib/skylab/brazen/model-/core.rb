@@ -42,7 +42,7 @@ module Skylab::Brazen
       end
     end
 
-    Pair_ = Callback_::Box.pair
+    Pair_ = Callback_::Pair
 
     class << self
     private

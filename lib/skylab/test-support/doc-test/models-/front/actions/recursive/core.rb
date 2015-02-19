@@ -33,7 +33,7 @@ module Skylab::TestSupport
                   if _ENUM_BOX_P[][ x ]
                     receive_value_of_entity_property x, _PROP
                   else
-                    receive_bad_enum_value x, _PROP.name_i, _ENUM_BOX_P[]
+                    receive_bad_enum_value x, _PROP.name_symbol, _ENUM_BOX_P[]
                   end
                 end
               end

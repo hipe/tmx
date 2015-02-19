@@ -11,8 +11,8 @@ module Skylab::Brazen::TestSupport::Data_Stores::Git_Config
       pn = td.join 'some-file.cfg'
       io = ::File.open pn.to_path, 'w+'
       a = []
-      a.push Callback_.pair.new 'x x', :Foo
-      a.push Callback_.pair.new true, :zappo
+      a.push Callback_::Pair[ 'x x', :Foo ]
+      a.push Callback_::Pair[ true, :zappo ]
       _scan = Callback_::Stream.via_nonsparse_array a
       x = subject.write io, _scan, 'sub sec.to', 'se-cto'
       x.should eql true
@@ -27,7 +27,7 @@ module Skylab::Brazen::TestSupport::Data_Stores::Git_Config
     end
 
     it "don't fall over on backslashes" do
-      _a = [ Callback_.pair.new( '\b', :'two-characters' ) ]
+      _a = [ Callback_::Pair[ '\b', :'two-characters' ] ]
       _scan = Callback_::Stream.via_nonsparse_array _a
       io = Brazen_::LIB_.string_IO.new
       x = subject.write io, _scan, 'sub.sect', 'se-ct'

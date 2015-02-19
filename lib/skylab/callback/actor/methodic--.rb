@@ -301,7 +301,7 @@ module Skylab::Callback
         attr_reader :argument_arity, :ivar, :name, :parameter_arity
 
         def members
-          [ :argument_arity, :ivar, :name, :name_i, :parameter_arity ]
+          [ :argument_arity, :ivar, :name, :name_symbol, :parameter_arity ]
         end
 
       private
@@ -318,11 +318,9 @@ module Skylab::Callback
 
       public
 
-        def name_i
+        def name_symbol
           @name.as_variegated_symbol
         end
-
-        alias_method :name_symbol, :name_i  # #open [#004]
 
         def as_ivar
           ivar || @name.as_ivar
@@ -458,7 +456,7 @@ module Skylab::Callback
         end
 
         def accept_prop prop
-          name_i = prop.name_i
+          name_i = prop.name_symbol
           m_i = :"produce_#{ name_i }_property"
           @box.add name_i, m_i
           @cls.send :define_singleton_method, m_i do
@@ -485,7 +483,7 @@ module Skylab::Callback
             _BX = const_get BX_
             Callback_::Stream.via_nonsparse_array _BX.a_ do |i|
               send _BX.fetch i
-            end.flush_to_immutable_with_random_access_keyed_to_method :name_i
+            end.flush_to_immutable_with_random_access_keyed_to_method :name_symbol
           end
         end
       end

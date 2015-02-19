@@ -29,12 +29,12 @@ module Skylab::Callback::TestSupport::Actor::Methodic::PR
 
       it "`<actor>.properties.fetch` with a symbol name, against a good name" do
         prop = A.properties.fetch :two
-        prop.name_i.should eql :two
+        prop.name_symbol.should eql :two
       end
 
       it "with an else block has no effect, same result as above" do
         prop = A.properties.fetch :one do :_no_see_ end
-        prop.name_i.should eql :one
+        prop.name_symbol.should eql :one
       end
 
       it "fetch nonexistent term without an else block - key error" do

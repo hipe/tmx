@@ -56,10 +56,10 @@ module Skylab::Callback
 
     class Channel__
       def initialize i
-        @name_i = i
+        @name_symbol = i
         freeze
       end
-      attr_reader :name_i
+      attr_reader :name_symbol
     end
 
     def initialize
@@ -87,14 +87,14 @@ module Skylab::Callback
     def subscribe_all
       scan = chan_scan
       while chan = scan.gets
-        @is_h[ chan.name_i ] = true
+        @is_h[ chan.name_symbol ] = true
       end ; nil
     end
 
     def unsubscribe_all
       scan = chan_scan
       while chan = scan.gets
-        @is_h.delete chan.name_i
+        @is_h.delete chan.name_symbol
       end ; nil
     end
 
@@ -105,20 +105,20 @@ module Skylab::Callback
   private
 
     def add_subscription chan
-      @is_h[ chan.name_i ] = true
+      @is_h[ chan.name_symbol ] = true
     end
 
     def add_callback_proc p, chan
-      @is_h[ chan.name_i ] = true
-      @p_h[ chan.name_i ] = p ; nil
+      @is_h[ chan.name_symbol ] = true
+      @p_h[ chan.name_symbol ] = p ; nil
     end
 
     def remove_subscription chan
-      @is_h.delete chan.name_i
+      @is_h.delete chan.name_symbol
     end
 
     def is_subscribed chan
-      @is_h.key? chan.name_i
+      @is_h.key? chan.name_symbol
     end
 
     def produce_proc chan
@@ -128,7 +128,7 @@ module Skylab::Callback
     end
 
     def send_event_on_chan ev, chan
-      if p = @p_h[ chan.name_i ]
+      if p = @p_h[ chan.name_symbol ]
         p[ ev ]
       else
         a = [ :receive ]
@@ -136,7 +136,7 @@ module Skylab::Callback
           a.push @channel_i
         end
         if @do_use_subscription_channel_name
-          a.push chan.name_i
+          a.push chan.name_symbol
         else
           a.push :event
         end

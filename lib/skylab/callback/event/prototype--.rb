@@ -45,9 +45,9 @@ module Skylab::Callback
               define_method :message_proc do _MESSAGE_PROC_ end
               _BOX_ = Callback_::Box.new
               while scn.unparsed_exists
-                prop = Prop__.new scn.gets_one, scn.gets_one
-                _BOX_.add prop.name_i, prop
-                attr_reader prop.name_i
+                prp = Prop__.new scn.gets_one, scn.gets_one
+                _BOX_.add prp.name_symbol, prp
+                attr_reader prp.name_symbol
               end
               _BOX_.freeze
               define_singleton_method :prop_bx do _BOX_ end
@@ -59,12 +59,12 @@ module Skylab::Callback
 
         class Prop__
           def initialize i, x
-            @name_i = i
+            @name_symbol = i
             @name_as_ivar = :"@#{ i }"
             @default_value = x
             freeze
           end
-          attr_reader :name_i, :name_as_ivar, :default_value
+          attr_reader :name_symbol, :name_as_ivar, :default_value
         end
 
         module Module_Methods__
@@ -129,7 +129,7 @@ module Skylab::Callback
             instance_variable_set prop.name_as_ivar, x
           end
           bx.each_value do |prop|
-            seen_h[ prop.name_i ] and next
+            seen_h[ prop.name_symbol ] and next
             instance_variable_set prop.name_as_ivar, prop.default_value
           end ; nil  # caller should freeze
         end

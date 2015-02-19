@@ -154,7 +154,7 @@ module Skylab::TanMan
 
             # it's not very useful to have the workspace path as the output arg
 
-            a[ 0 ] = Callback_.pair.new( path, :output_path )  # structure violation
+            a[ 0 ] = Callback_::Pair[ path, :output_path ]  # structure violation
 
           end
 

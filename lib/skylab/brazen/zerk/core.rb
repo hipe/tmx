@@ -62,7 +62,7 @@ module Skylab::Brazen
 
       # ~~ getters of symbols & strings (little to big)
 
-      def name_i
+      def name_symbol
         @name.as_variegated_symbol
       end
 
@@ -341,13 +341,13 @@ module Skylab::Brazen
 
       def [] name_i  # :+#courtesy
         @children.detect do |cx|
-          name_i == cx.name_i
+          name_i == cx.name_symbol
         end
       end
 
       def has_name name_i  # :+#courtesy
         @children.index do |cx|
-          name_i == cx.name_i
+          name_i == cx.name_symbol
         end
       end
 
@@ -548,7 +548,7 @@ module Skylab::Brazen
 
       def receive_focus
         if @group
-          @group.activate name_i
+          @group.activate name_symbol
         elsif @is_activated
           receive_activation
         else
@@ -558,7 +558,7 @@ module Skylab::Brazen
 
       def receive_iambic_stream _
         if @group
-          @group.activate name_i
+          @group.activate name_symbol
         elsif @is_activated
           ACHIEVED_
         else
@@ -580,7 +580,7 @@ module Skylab::Brazen
         if @group
           nil  # the group controller does this
         elsif @is_activated
-          Callback_.pair.new :yes, name_i
+          Callback_::Pair[ :yes, name_symbol ]
         end
       end
     end

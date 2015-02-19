@@ -59,7 +59,7 @@ module Skylab::Brazen
           if _ENUM_BOX[ x ]
             KEEP_PARSING_
           else
-            prop.receive_bad_enum_value x, mprop.name_i, _ENUM_BOX
+            prop.receive_bad_enum_value x, mprop.name_symbol, _ENUM_BOX
           end
         end
 

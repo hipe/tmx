@@ -702,7 +702,7 @@ module Skylab::Flex2Treetop
 
   Assert_open_stream__ = -> prop do
     ivar = prop.as_ivar
-    name_i = prop.name_i
+    name_i = prop.name_symbol
     -> do
       x = iambic_property
       if x && ! x.closed?
@@ -786,7 +786,7 @@ Translate__ = Class_as_function__[ -> do class Translate____
           KEEP_PARSING_
         else
           raise ::ArgumentError,
-            "pass no #{ prop.name_i } when nonconventional endpoint (#{ x })"
+            "pass no #{ prop.name_symbol } when nonconventional endpoint (#{ x })"
         end
       end
     end

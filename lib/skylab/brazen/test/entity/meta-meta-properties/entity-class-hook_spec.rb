@@ -16,7 +16,7 @@ module Skylab::Brazen::TestSupport::Entity
               @clandestine = t_or_f
               -> prop do
                 if t_or_f
-                  ( @clandestine_i_a ||= [] ).push prop.name_i
+                  ( @clandestine_i_a ||= [] ).push prop.name_symbol
                 end
                 true
               end

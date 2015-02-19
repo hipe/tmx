@@ -350,7 +350,7 @@ module Skylab::BeautySalon
 
       def to_marshal_pair
         if @s
-          Callback_.pair.new @s, name_i
+          Callback_::Pair[ @s, name_symbol ]
         end
       end
 
@@ -408,7 +408,7 @@ module Skylab::BeautySalon
 
       def to_marshal_pair
         if @rx
-          Callback_.pair.new @rx.inspect, name_i
+          Callback_::Pair[ @rx.inspect, name_symbol ]
         end
       end
 
@@ -480,7 +480,7 @@ module Skylab::BeautySalon
 
       def to_marshal_pair
         if @o
-          Callback_.pair.new @o.marshal_dump, name_i
+          Callback_::Pair[ @o.marshal_dump, name_symbol ]
         end
       end
 
@@ -573,7 +573,7 @@ module Skylab::BeautySalon
 
       def to_marshal_pair
         if @a
-          Callback_.pair.new @a.join( SPACE_ ), name_i
+          Callback_::Pair[ @a.join( SPACE_ ), name_symbol ]
         end
       end
 

@@ -304,7 +304,7 @@ module Skylab::Brazen
               Read_via_Method_.write_external_read_proc prop
               prop.during_apply do | prop_ |
                 @active_entity_edit_session.while_ignoring_method_added do
-                  define_method prop_.name_i, prop_.literal_proc ; nil
+                  define_method prop_.name_symbol, prop_.literal_proc ; nil
                 end
                 ACHIEVED_
               end
@@ -312,7 +312,7 @@ module Skylab::Brazen
             end
 
             def when_memoized prop  # (was: [#062] "i just blue myself")
-              _METH_I_ = prop.name_i
+              _METH_I_ = prop.name_symbol
               _METHOD_NAME = :"__NON_MEMOIZED_#{ _METH_I_ }"
               _IVAR = :"@use_memoized_#{ _METH_I_  }"
               _IVAR_ = prop.as_ivar
@@ -361,7 +361,7 @@ module Skylab::Brazen
             end
 
             def write_external_read_proc prop
-              _READ_METHOD_NAME = prop.name_i
+              _READ_METHOD_NAME = prop.name_symbol
               prop.external_read do | entity |
                 entity.__send__ _READ_METHOD_NAME
               end
@@ -384,7 +384,7 @@ module Skylab::Brazen
 
           _PROP.during_apply do
             @active_entity_edit_session.while_ignoring_method_added do
-              define_method _PROP.name_i, _MONADIC_P_
+              define_method _PROP.name_symbol, _MONADIC_P_
             end
             ACHIEVED_
           end
@@ -404,7 +404,7 @@ module Skylab::Brazen
 
             @active_entity_edit_session.while_ignoring_method_added do
 
-              define_method prop_.name_i do
+              define_method prop_.name_symbol do
                 any_property_value_via_property prop_
               end
 

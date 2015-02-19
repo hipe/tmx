@@ -155,7 +155,7 @@ module Skylab::Callback::TestSupport::Actor::Methodic::MP
         a = _scan.reduce_by do |prop|
           o.instance_variable_get( prop.as_ivar ).nil?
         end.to_a
-        a.map( & :name_i ).should eql [ :foo, :baz ]
+        a.map( & :name_symbol ).should eql [ :foo, :baz ]
       end
     end
   end

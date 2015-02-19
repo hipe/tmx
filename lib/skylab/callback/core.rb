@@ -12,10 +12,6 @@ module Skylab::Callback
       @__lib ||= produce_library_shell_via_library_and_app_modules self::Lib_, self
     end
 
-    def pair
-      Pair_
-    end
-
     def produce_library_shell_via_library_and_app_modules lib_mod, app_mod
       Callback_::Librication__[ lib_mod, app_mod ]
     end
@@ -452,10 +448,6 @@ module Skylab::Callback
       def the_empty_box
         @teb ||= new.freeze
       end
-
-      def pair
-        Pair_
-      end
     end
   end
 
@@ -562,12 +554,53 @@ module Skylab::Callback
     self
   end
 
-  Pair_ = ::Struct.new :value_x, :name_symbol do  # :[#055].
+  Pair_ = Pair = ::Struct.new :value_x, :name_symbol do  # :[#055].
     def with_name_symbol i
       self.class.new value_x, i
     end
   end
 
+  class Trio  # :[#004].
+
+    class << self
+
+      def via_value_and_variegated_symbol x, i
+        new x, true,
+          Callback_.lib_.basic::Minimal_Property.via_variegated_symbol( i )
+      end
+
+      alias_method :via_x_and_i, :via_value_and_variegated_symbol
+    end
+
+    def initialize x, b, prp=nil
+      @actuals_has_name = b
+      @property = prp
+      @value_x = x
+      freeze
+    end
+
+    def members
+      [ :actuals_has_name, :property, :name, :name_symbol, :value_x ]
+    end
+
+    attr_reader :value_x, :actuals_has_name, :property
+
+    attr_writer :value_x
+
+    def name_symbol
+      @property.name_symbol
+    end
+
+    def name
+      @property.name
+    end
+
+    def new_with_value x
+      otr = dup
+      otr.value_x = x
+      otr.freeze
+    end
+  end
 
   # ~ the #employment story
 
@@ -1231,7 +1264,7 @@ module Skylab::Callback
 
       attr_reader :norm_pathname
 
-      def name_i  # :+#public-API
+      def name_symbol  # :+#public-API
         name_for_lookup.as_variegated_symbol
       end
 
