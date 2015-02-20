@@ -6,43 +6,41 @@ module Skylab::TanMan
 
     class Sessions__::Produce_Parse_Tree
 
-      class Shell < ::BasicObject
+      Callback_::Actor.methodic self, :properties,
 
-        def initialize bx
-          @bx = bx
-        end
+        :generated_grammar_dir_path,
 
-        def generated_grammar_dir_path path
-          @bx.add :generated_grammar_dir_path, path
-        end
+        :byte_upstream_identifier
 
-        def input_path path
-          @bx.add :parse_method, :parse_file
-          @bx.add :parse_argument, path
-        end
-
-        def input_string s
-          @bx.add :parse_method, :parse_string
-          @bx.add :parse_argument, s
-        end
+      def initialize & edit_p
+        @on_event_selectively = nil
+        instance_exec( & edit_p )
       end
 
       DotFile_::SyntaxNodes.class
       DotFile_::Sexp::InstanceMethods.class
 
-      include TanMan_::Input_Adapters_::Treetop::Parser__  # :+#for-one-commit-only
-
-      def initialize bx, & oes_p
-        @bx = bx
-        @on_event_selectively = oes_p
+      def accept_selective_listener_proc oes_p
+        @on_event_selectively = oes_p ; nil
       end
 
-      def produce_parse_tree
-        h = @bx.h_
-        send h.fetch( :parse_method ), h.fetch( :parse_argument ), & @on_event_selectively
+      def execute
+
+        o = TanMan_::Input_Adapters_::Treetop.new_parse
+
+        o.receive_byte_upstream_identifier @byte_upstream_identifier
+
+        o.receive_parser_class produce_parser_class_
+
+        x = o.flush_to_parse_tree
+        if x
+          x
+        else
+          self._FUN
+        end
       end
 
-      def produce_parser_class  # :#hook-out for [ttt]
+      def produce_parser_class_
         Memoized_parser_class__[] || Memoize_parser_class__[ __build_parser_class ]
       end
 
@@ -60,7 +58,7 @@ module Skylab::TanMan
 
             # o.force_overwrite!  will re-write generated parser files
 
-            o.generated_grammar_dir @bx.fetch :generated_grammar_dir_path
+            o.generated_grammar_dir @generated_grammar_dir_path
 
             o.root_for_relative_paths Models_::DotFile.dir_pathname.to_path
 
@@ -71,7 +69,7 @@ module Skylab::TanMan
 
           -> o do
 
-            # one day ..
+            # #open [#025] one day ..
 
             o.on_info do | ev |
               @on_event_selectively.call :info, ev.terminal_channel_i do

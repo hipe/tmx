@@ -168,12 +168,15 @@ module Skylab::TanMan::TestSupport::Sexp::Auto::Hacks
 
     def _resolve_graph_sexp
 
-      @graph_sexp = TanMan_::Models_::DotFile.produce_parse_tree_via(
-        handle_event_selectively
-      )  do | o |
-        o.input_string produce_digraph_input_string_
-        o.generated_grammar_dir_path existent_testing_GGD_path
-      end
+      @graph_sexp = TanMan_::Models_::DotFile.produce_parse_tree_with(
+
+        :byte_upstream_identifier,
+          TanMan_::Brazen_.byte_upstream_identifier.via_string(
+            produce_digraph_input_string_ ),
+
+        :generated_grammar_dir_path, existent_testing_GGD_path,
+
+        & handle_event_selectively )
 
       nil
     end

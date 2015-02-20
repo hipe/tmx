@@ -8,15 +8,13 @@ module Skylab::CSS_Convert
   end
 
 
-  class Directive__::Parser
-
-    include CSSC_::Parser_::InstanceMethods
+  class Directive__::Parser < CSSC_::Parser_::Common_Base
 
   private
 
     def produce_parser_class
 
-      valid_arg = DIR_N11N__.normalize_value actual_parameters.tmpdir_absolute do | *, & ev_p |
+      valid_arg = DIR_N11N__.normalize_value @actuals.tmpdir_absolute do | *, & ev_p |
         @delegate.receive_event ev_p[]
         UNABLE_
       end
@@ -28,9 +26,9 @@ module Skylab::CSS_Convert
 
     def produce_parser_class_via_generate_grammar_dir ggd
       _relpath_root = Directive__::Parser.dir_pathname
-      load_parser_class_with do |o|
+      load_parser_class_with__ do |o|
         o.enhance_parser_with CSSC_::Parser_::Extlib::InstanceMethods
-        actual_parameters.force_overwrite? and o.force_overwrite!
+        @actuals.force_overwrite? and o.force_overwrite!
         o.treetop_grammar 'common.treetop'
         o.treetop_grammar 'directive.treetop'
         o.root_for_relative_paths _relpath_root

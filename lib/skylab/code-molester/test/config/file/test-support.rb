@@ -83,7 +83,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
     end
 
     def join_with_newlines_under ev, expag
-      scan = ev.scan_for_render_lines_under expag
+      scan = ev.to_stream_of_lines_rendered_under expag
       scan.to_a.join CM_::NEWLINE_
     end
   end

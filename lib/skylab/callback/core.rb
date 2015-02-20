@@ -573,17 +573,17 @@ module Skylab::Callback
     end
 
     def initialize x, b, prp=nil
-      @actuals_has_name = b
+      @is_known_known = b
       @property = prp
       @value_x = x
       freeze
     end
 
     def members
-      [ :actuals_has_name, :property, :name, :name_symbol, :value_x ]
+      [ :property, :is_known_known, :name, :name_symbol, :value_x ]
     end
 
-    attr_reader :value_x, :actuals_has_name, :property
+    attr_reader :is_known_known, :property, :value_x
 
     attr_writer :value_x
 

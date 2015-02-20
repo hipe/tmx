@@ -34,6 +34,8 @@ module Skylab::Brazen
       end
     end
 
+    Byte_Stream_Singleton_Methods__ = ::Module.new
+
     module Byte_Upstream_Identifier  # :[#018].
 
       class << self
@@ -49,12 +51,24 @@ module Skylab::Brazen
         def via_path s
           Brazen_.lib_.system.filesystem.class::Byte_Upstream_Identifier.new s
         end
+
+        def via_trios trio_a, & oes_p
+          o = __method_call_via_shape trio_a, & oes_p
+          o and send o.method_name, * o.args
+        end
       end  # >>
+
+      extend Byte_Stream_Singleton_Methods__
     end
 
     module Byte_Downstream_Identifier
 
       class << self
+
+        def the_dry_identifier
+          self._WHY
+          LIB_.IO.dry_stub.the_dry_byte_downstream_identifier
+        end
 
         def via_stream io
           Brazen_.lib_.IO::Byte_Downstream_Identifier.new io
@@ -67,7 +81,57 @@ module Skylab::Brazen
         def via_path s
           Brazen_.lib_.system.filesystem.class::Byte_Downstream_Identifier.new s
         end
+
+        def via_trios trio_a, & oes_p
+          o = __method_call_via_shape trio_a, & oes_p
+          o and send o.method_name, * o.args
+        end
       end  # >>
+
+      extend Byte_Stream_Singleton_Methods__
     end
+
+    module Byte_Stream_Singleton_Methods__
+
+      def __method_call_via_shape trio_a, & oes_p
+        Byte_stream_method_call_via_shape___.new( trio_a, & oes_p ).execute
+      end
+    end
+
+    class Byte_stream_method_call_via_shape___
+
+      def initialize trio_a, & oes_p
+        @arg = trio_a.fetch 0
+        @on_event_selectively = oes_p
+      end
+
+      def execute
+        @x = @arg.value_x
+        send DIRECTION_SHAPE_RX.match( @arg.name_symbol )[ :shape ]
+      end
+
+      def path
+
+        # :+[#021] shape magic: it is convenient for lazy smart clients
+        # to be able to pass stream-like mixed values in for a path
+
+        if @x.respond_to? :ascii_only?
+          Brazen_.bound_call @x, nil, :via_path
+        else
+          stream
+        end
+      end
+
+      def stream
+        Brazen_.bound_call [ @x ], nil, :via_stream
+          # argument value might be an array impersonating a stream
+      end
+
+      def string
+        Brazen_.bound_call @x, nil, :via_string
+      end
+    end
+
+    DIRECTION_SHAPE_RX = /\A(?<direction>.+)_(?<shape> path | stream | string )\z/x
   end
 end

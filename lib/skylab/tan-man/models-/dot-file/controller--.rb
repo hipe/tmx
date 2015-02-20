@@ -2,40 +2,38 @@ module Skylab::TanMan
 
   module Models_::DotFile
 
-    class Controller__  # see [#009]
+    class Controller__  # see [#009] (historical)
 
-      def initialize gsp, input_arg, k, & oes_p
+      def initialize gsp, bu_id, k, & oes_p
+
+        # we encapsulate the byte upstream ID into the controller because
+        # every document has exactly one BUID. however the same relationship
+        # does not hold with byte downstream ID's so they are passed as args.
+
+        @byte_upstream_identifier = bu_id
         @graph_sexp = gsp
-        @input_arg = input_arg
         @on_event_selectively = oes_p
         @kernel = k
       end
 
       def members
-        [ :caddied_output_args, :graph_sexp,
+        [ :graph_sexp,
           :persist_via_args, :unparse_into ]
       end
 
       attr_reader :graph_sexp
 
-      def description_under expag
-        send :"description_under_expag_when_#{ @input_arg.name_symbol }", expag
-      end
-    private
-      def description_under_expag_when_input_string expag
-        s = TanMan_.lib_.ellipsify @input_arg.value_x
-        expag.calculate do
-          val s
-        end
+      # ~ readers
+
+      def persist_into_byte_downstream id, * x_a, & oes_p
+
+        DotFile_::Small_Time_::Actors::Persist.new(
+          id, @graph_sexp, x_a, & oes_p ).execute
       end
 
-      def description_under_expag_when_input_pathname expag
-        pn = @input_arg.value_x
-        expag.calculate do
-          pth pn
-        end
+      def description_under expag
+        @byte_upstream_identifier.description_under expag
       end
-    public
 
       def at_graph_sexp i
         @graph_sexp.send i
@@ -44,6 +42,8 @@ module Skylab::TanMan
       def unparse_into y
         @graph_sexp.unparse_into y
       end
+
+      # ~ mutators
 
       def insert_stmt_before_stmt new, least_greater_neighbor
         insert_stmt new, least_greater_neighbor
@@ -99,118 +99,6 @@ module Skylab::TanMan
 
       def provide_action_precondition _id, _g
         self
-      end
-
-      attr_accessor :caddied_output_args  # topic doesn't do anything with this, just carries it
-
-      def persist_via_three dry_run, a, output_stream
-
-        trio = a.fetch 0
-
-        if :output_path == trio.name_symbol && DASH_ == trio.value_x  # :+#magic-value for feature [#037]
-          a = [ trio.class.new(
-            output_stream, true,
-            TanMan_::Model_::Document_Entity.output_stream_property ) ]
-        end
-
-        persist_via_args dry_run, * a
-      end
-
-      def persist_via_args is_dry, arg, *_
-        adapter = Persist_Adapters__.produce_via_argument arg
-        adapter.init @kernel, & @on_event_selectively
-        adapter.receive_rewritten_datastore_controller is_dry, self
-      end
-
-      class Common_Persist_Adapter__
-        class << self
-          alias_method :build, :new
-        end
-
-        def init k, & oes_p
-          @on_event_selectively = oes_p
-          @kernel = k
-          nil
-        end
-      end
-
-      module Persist_Adapters__
-
-        class << self
-
-          def produce_via_argument arg
-            ftch_class_via_argument_name( arg.name_symbol ).build arg.value_x
-          end
-
-          define_method :ftch_class_via_argument_name, ( -> do
-            p = -> name_symbol do
-              mod = Persist_Adapters__
-              h = {}
-              mod.constants.each do |i|
-                h[ i.downcase ] = mod.const_get i, false
-              end
-              ( p = h.method :fetch )[ name_symbol ]
-            end
-            -> i { p[ i ] }
-          end ).call
-        end
-
-        class Output_String < Common_Persist_Adapter__
-
-          def initialize output_string
-            @output_string = output_string
-          end
-
-          def receive_rewritten_datastore_controller _is_dry, o  # #hook-out (local)
-            @output_string.replace o.graph_sexp.unparse
-            ACHIEVED_
-          end
-        end
-
-        class Output_Stream < Common_Persist_Adapter__
-
-          def initialize io
-            @io = io
-          end
-
-          def receive_rewritten_datastore_controller _is_dry, o
-            o.graph_sexp.unparse_into @io
-            ACHIEVED_
-          end
-        end
-
-        class Output_Path < Common_Persist_Adapter__
-
-          def initialize path
-            @output_path = path
-          end
-
-          def receive_rewritten_datastore_controller is_dry, x
-
-            if is_dry
-              bytes = x.graph_sexp.unparse.length
-            else
-              bytes =
-              ::File.open @output_path, WRITE_MODE_ do | fh |
-                fh.write x.graph_sexp.unparse
-              end
-            end
-            @on_event_selectively.call :info, :wrote_resource do
-              Callback_::Event.inline_OK_with :wrote_resource,
-                  :path, @output_path,
-                  :bytes, bytes,
-                  :is_dry, is_dry,
-                  :is_completion, true do  |y, o|
-
-                y << "wrote #{ pth o.path } #{
-                  }(#{ o.bytes }#{ ' dry' if o.is_dry } bytes)"
-              end
-            end
-            ACHIEVED_  # not bytes, it's confusing to the API
-          end
-
-          WRITE_MODE_ = 'w'
-        end
       end
     end
   end

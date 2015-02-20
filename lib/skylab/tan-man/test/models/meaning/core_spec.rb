@@ -141,5 +141,8 @@ module Skylab::TanMan::TestSupport::Models::Meaning
       scn.advance_N_lines 2
       scn.next_line.should eql "fizzle [fillcolor=\"#79f234\", label=fizzle, style=filled]\n"
     end
+
+    ignore_these_events :wrote_resource
+
   end
 end

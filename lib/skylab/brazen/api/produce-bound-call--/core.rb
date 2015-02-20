@@ -179,13 +179,13 @@ module Skylab::Brazen
 
         -> * i_a, & ev_p do
 
-          _ev = if ev_p
-            ev_p[]
-          else
-            Brazen_.event.inline_via_normal_extended_mutable_channel i_a
+          event_expresser.maybe_receive_on_channel_event i_a do
+            if ev_p
+              ev_p[]
+            else
+              Brazen_.event.inline_via_normal_extended_mutable_channel i_a
+            end
           end
-
-          event_expresser.receive_ev _ev
         end
       end
     end

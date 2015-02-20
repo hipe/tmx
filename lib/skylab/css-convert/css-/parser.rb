@@ -2,9 +2,7 @@ module Skylab::CSS_Convert
 
   CSS_ = ::Module.new
 
-  class CSS_::Parser_
-
-    include CSSC_::Parser_::InstanceMethods
+  class CSS_::Parser_ < CSSC_::Parser_::Common_Base
 
                                   # maybe [#sl-115] clean up below
 

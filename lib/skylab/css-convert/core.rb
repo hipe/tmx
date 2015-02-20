@@ -85,7 +85,7 @@ module Skylab::CSS_Convert
     Headless_::Parameter[ self, :parameter_controller, :oldschool_parameter_error_structure_handler ]
 
     def receive_event ev
-      scn = ev.scan_for_render_lines_under expression_agent
+      scn = ev.to_stream_of_lines_rendered_under expression_agent
       ok = ev.ok || ev.ok.nil?
       while line = scn.gets  # usually one line
         if ok
@@ -255,9 +255,12 @@ module Skylab::CSS_Convert
 
   public
 
-    def receive_string_on_channel s, i
-      s.respond_to?( :ascii_only? ) or fail "not string: #{ s.class }"
-      call_digraph_listeners i, s
+    def receive_event_on_channel__ ev, i
+      x = nil
+      ev.render_each_line_under expression_agent do | s |
+        x = call_digraph_listeners i, s
+      end
+      x
     end
   end
 

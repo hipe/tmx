@@ -122,7 +122,7 @@ module Skylab::Cull
     def _edit_via_mutable_trio_box bx
 
       arg_a = bx.to_value_stream.reduce_by do | arg |
-        arg.actuals_has_name && :path != arg.name_symbol
+        arg.is_known_known && :path != arg.name_symbol
       end.to_a
 
       if arg_a.length.zero?

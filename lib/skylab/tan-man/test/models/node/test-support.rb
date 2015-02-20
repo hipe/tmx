@@ -69,7 +69,7 @@ module Skylab::TanMan::TestSupport::Models::Node
       # from the functional layer. but this c.c uses preconditions that come
       # from formal preconds and formal preconds come from the action. so we
       # need to know the action anyway to build the c.c. (the fact that this
-      # component has "controller" in the name is a hint that it shoudl only
+      # component has "controller" in the name is a hint that it should only
       # be tested functionally. food for the thoughts of the future.)
 
       # because we don't want any of the above knowledge to be built deeply
@@ -84,9 +84,9 @@ module Skylab::TanMan::TestSupport::Models::Node
 
       oes_p = handle_event_selectively
 
-      _inp_a = send :"bld_input_args_when_#{ input_mechanism_i }"
-
-      action = Mock_Action___.new _inp_a, kr, & oes_p
+      action = Mock_Action___.new(
+        send( :"__via__#{ input_mechanism_i }__build_byte_upstream_identifier" ),
+        kr, & oes_p )
 
       bx = TanMan_::Callback_::Box.new
       bx.add :dot_file,
@@ -94,20 +94,30 @@ module Skylab::TanMan::TestSupport::Models::Node
 
       silo.precondition_for_self action, id, bx, & oes_p
     end
+
+    def __via__input_file_granule__build_byte_upstream_identifier
+
+      TanMan_::Brazen_.byte_upstream_identifier.via_path input_file_path
+
+    end
   end
+
+  H__ = {
+    input_path: :path
+  }
 
   class Mock_Action___
 
-    def initialize inp_a, k, & oes_p
-      @input_arguments = inp_a
+    def initialize up_id, k, & oes_p
+      @document_entity_byte_upstream_identifier = up_id
       @kernel = k
       @oes_p = oes_p
     end
 
+    attr_reader :document_entity_byte_upstream_identifier
+
     def controller_nucleus  # #experiment in [br]
       [ @kernel, @oes_p ]
     end
-
-    attr_reader :input_arguments
   end
 end

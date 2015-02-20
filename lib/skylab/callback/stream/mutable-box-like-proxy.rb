@@ -65,15 +65,29 @@ module Skylab::Callback
         @a.map( & @h.method( :fetch ) )
       end
 
-      def each
+      def each_value
         @a.each do | sym |
           yield @h.fetch sym
         end ; nil
       end
 
+      def each_pair
+        @a.each do | sym |
+          yield sym, @h.fetch( sym )
+        end ; nil
+      end
+
+      # ~ (
+
+      def map_reduce_by & x_p
+        to_stream.map_reduce_by( & x_p )
+      end
+
       def reduce_by & x_p
         to_stream.reduce_by( & x_p )
       end
+
+      # ~ )
 
       def to_stream
         Callback_::Stream.via_times @a.length do | d |  # we could make this accomodate growable boxes during iteration if we needed to

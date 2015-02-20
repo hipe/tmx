@@ -36,9 +36,7 @@ module Skylab::CSS_Convert
     end
   end
 
-  module Parser_::InstanceMethods
-
-    include LIB_.treetop_tools::Parser__  # :+#for-one-commit-only
+  class Parser_::Common_Base
 
     def initialize mode_client
       @actuals = mode_client.actual_parameters
@@ -46,51 +44,32 @@ module Skylab::CSS_Convert
       @expag = mode_client.expression_agent
     end
 
-    def load_parser_class_with & _DSL
+    def parse_path path
+
+      o = LIB_.treetop_tools.new_parse
+      o.receive_upstream_path path
+      o.receive_parser_class produce_parser_class
+      o.flush_to_parse_tree
+    end
+
+    def load_parser_class_with__ & _DSL
       ( LIB_.treetop_tools::Load.new self, _DSL do | o |
-        o.on_info handle_info_event
-        o.on_error handle_error
+        o.on_info __handle_info
+        o.on_error __handle_error
       end ).invoke
     end
 
-  private
-
-    def actual_parameters
-      @actuals
-    end
-
-    def handle_info_event
+    def __handle_info
       -> ev do
-        _msg = @expag.calculate do
-          ev.render_all_lines_into_under y=[], self
-          "#{ em '*' } #{ y * SPACE_ }"
-        end
-        send_info_message _msg
+        @delegate.receive_event_on_channel__ ev, :info
       end
     end
 
-    def handle_error
-      -> ev do
-        _e = if ev.respond_to? :to_exception
-          ev.to_exception
-        else
-          ::RuntimeError.new "failed to load grammarz: #{ ev }"
-        end
-        raise _e
+    def __handle_error
+      -> * do
+        self._DO_ME
       end
     end
-
-    def parameter_label param, d=nil  # while subclient
-      d and _tail = "[#{ d }]"
-      "«#{ param.name.as_lowercase_with_underscores_symbol }#{ _tail }»"  # :+#guillemets
-    end
-
-    include Event_Sender_Methods_
-
-    def send_string_on_channel s, i
-      @delegate.receive_string_on_channel s, i
-    end
-
   end
 
   class Parser_::Sexpesque < ::Array

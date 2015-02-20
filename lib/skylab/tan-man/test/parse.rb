@@ -32,29 +32,29 @@ module Skylab::TanMan::TestSupport
     # ~ work phase
 
     def parse_file path
-      @bx.set :parse_method, :parse_file
-      @bx.set :parse_argument, path
+      @bx.set :buid, TanMan_::Brazen_.byte_upstream_identifier.via_path( path )
       _work
     end
 
     def parse_string s
-      @bx.set :parse_method, :parse_string
-      @bx.set :parse_argument, s
+      @bx.set :buid, TanMan_::Brazen_.byte_upstream_identifier.via_string( s )
       _work
     end
 
     def _work
-      Customized_Session__.new( @bx, & @on_event_selectively ).produce_parse_tree
+      Produce_parse_tree_custom___.new( @bx, & @on_event_selectively ).execute
     end
 
-    class Customized_Session__ < TanMan_::Models_::DotFile::Sessions__::Produce_Parse_Tree
+    class Produce_parse_tree_custom___ < TanMan_::Models_::DotFile::Sessions__::Produce_Parse_Tree
 
       def initialize bx, & oes_p
         @_h = bx.h_
-        super
+        @on_event_selectively = oes_p
+        @byte_upstream_identifier = @_h.fetch :buid
+        nil
       end
 
-      def produce_parser_class  # override the parent's version of this :#hook-out for [ttt]
+      def produce_parser_class_  # override the parent's version of this :#hook-out for [ttt]
 
         TanMan_::Input_Adapters_::Treetop::Load.new( :_xxx_,
           -> o do

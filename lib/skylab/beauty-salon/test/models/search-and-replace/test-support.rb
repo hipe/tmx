@@ -53,10 +53,8 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
 
     def call_API * x_a
       evr = event_receiver_for_expect_event
-      x_a.push :on_event_selectively, -> * , & ev_p do
-        ev = ev_p[]
-        evr.receive_ev ev
-        ev.ok
+      x_a.push :on_event_selectively, -> * i_a , & ev_p do
+        evr.maybe_receive_on_channel_event i_a, & ev_p
       end
       @result = _API.call( * x_a )
       nil

@@ -28,6 +28,12 @@ module Skylab::Headless
         Headless_.lib_.basic::Pathname.description_under_of_path expr, @path
       end
 
+      def shape_symbol
+        :file
+      end
+
+      # ~~ off-grid reflection
+
       def to_pathname
         @path and ::Pathname.new @path_s
       end
@@ -44,6 +50,12 @@ module Skylab::Headless
 
       def to_simple_line_stream
         ::File.open @path, READ_MODE_
+      end
+
+      # ~ fun etc.
+
+      def to_byte_downstream_adapter
+        Filesystem_::Byte_Downstream_Identifier.new @path, & @on_event_selectively
       end
     end
   end

@@ -60,5 +60,8 @@ module Skylab::TanMan::TestSupport::Models::Association
       scn.next_line.should eql "zip_2 -> zip_3}\n"
       scn.next_line.should be_nil
     end
+
+    ignore_these_events :wrote_resource
+
   end
 end

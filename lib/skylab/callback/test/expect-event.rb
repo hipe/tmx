@@ -7,7 +7,9 @@ module Skylab::Callback::TestSupport
       def [] test_context_cls
         test_context_cls.include Test_Context_Instance_Methods ; nil
       end
-    end
+    end  # >>
+
+    # ->
 
       module Test_Context_Instance_Methods
 
@@ -21,22 +23,10 @@ module Skylab::Callback::TestSupport
         end
 
         def handle_event_selectively
-          @__HES_p__ ||= bld_on_event_selectively
+          event_receiver_for_expect_event.handle_event_selectively
         end
 
-        def bld_on_event_selectively
-          evr = event_receiver_for_expect_event
-          -> * x_a, & ev_p do
-            _ev = if ev_p
-              ev_p[]
-            else
-              Callback_::Event.inline_via_normal_extended_mutable_channel x_a
-            end
-            evr.receive_ev _ev
-          end
-        end
-
-        def event_receiver_for_expect_event
+        def event_receiver_for_expect_event  # :+#public-API
           @evr ||= begin
             @ev_a = nil
             build_event_receiver_for_expect_event
@@ -44,6 +34,9 @@ module Skylab::Callback::TestSupport
         end
 
         def build_event_receiver_for_expect_event  # :+#public-API :#hook-in
+
+          # (this is frequently hooked-in to to implement ignoring certain events)
+
           Event_Receiver__.new -> ev do
             ( @ev_a ||= [] ).push ev
           end, self
@@ -93,7 +86,7 @@ module Skylab::Callback::TestSupport
           if @ev_a
             if @ev_a.length.nonzero?
               _ev = @ev_a.first.to_event
-              raise "expected no more events, has #{ _ev.description }"
+              raise "expected no more events, had #{ @evr.first_line_description _ev }"
             end
           end
         end
@@ -236,39 +229,50 @@ module Skylab::Callback::TestSupport
 
       class Event_Receiver__
 
-        def initialize ev_p, test_context
-          @ev_p = ev_p
-          @test_context = test_context
+        def initialize recv_ev_p, test_context
+
+          @chan_p = -> i_a, & ev_p do
+            __receive_passed_event(
+              if ev_p
+                ev_p[]
+              else
+                Callback_::Event.inline_via_normal_extended_mutable_channel i_a
+              end )
+          end
+
           if test_context.do_debug
             @do_debug = true
             @debug_IO = test_context.debug_IO
           else
             @do_debug = false
           end
-          @p_a = nil
+
+          @recv_ev_p = recv_ev_p
+
+          @test_context = test_context
         end
 
-        def add_event_pass_filter &p
-          ( @p_a ||= [] ).push p ; nil
-        end
-
-        def receive_ev ev
-          if @p_a
-            d = @p_a.index do |p|
-              ! p[ ev ]
-            end
-          end
-          if d
-            prcss_supressed_event ev
-          else
-            prcss_passed_ev ev
+        def handle_event_selectively
+          @__HES_p ||= -> * i_a, & ev_p do
+            @chan_p[ i_a, & ev_p ]
           end
         end
 
-      private
+        def maybe_receive_on_channel_event i_a, & ev_p
+          @chan_p[ i_a, & ev_p ]
+        end
 
-        def prcss_passed_ev ev
-          @do_debug and express_event ev
+        def add_map_reducer & map_reducer_p
+
+          next_p = @chan_p
+
+          @chan_p = -> i_a, & ev_p do
+            map_reducer_p[ ev_p, i_a, next_p ]
+          end ; nil
+        end
+
+        def __receive_passed_event ev
+          @do_debug and __express_event_into ev, @debug_IO
           ev_ = ev.to_event
           if ev_.has_tag :flyweighted_entity
             was_wrapped = ev.object_id != ev_.object_id
@@ -276,68 +280,44 @@ module Skylab::Callback::TestSupport
             ev_ = ev_.with :flyweighted_entity, _ent
             ev = ev_
             if was_wrapped
-              ev = Fake_Wrapper__.new ev
+              ev = Fake_Wrapper___.new ev
             end
           end
-          @ev_p[ ev ]
+          @recv_ev_p[ ev ]
           if ev_.has_tag :ok
             ev_.ok
           end
         end
 
-        def prcss_supressed_event ev
-          if @do_debug
-            express_event ev, "(suppressed by filter:) " ; nil
-          end
+        def __express_event_into ev, io
+          st = _description_line_stream_for ev
+          begin
+            line = st.gets
+            line or break
+            io.puts line
+            redo
+          end while nil
         end
 
-      public
-
-        def app_name
-          @test_context.app_name
+        def first_line_description comment=nil, ev
+          _description_line_stream_for( comment, ev ).gets
         end
 
-        def express_event ev, comment=nil
-          @ev = ev ; @ev_ = ev.to_event
-          @ok_s = ok_s ; @tci = ev.terminal_channel_i
-          @mems = "(#{ @ev_.tag_names * ', ' })"
-          io = @debug_IO
-          p = -> s do
-            header_s = "#{ comment }#{ @ok_s } #{ @tci } #{ @mems } - "
-            io.puts "#{ header_s }#{ s.inspect }"
-            p = -> s_ do
-              blank_s = Callback_::SPACE_ * header_s.length
-              io.puts "#{ blank_s }#{ s_.inspect }"
-              p = -> s__ do
-                io.puts "#{ blank_s }#{ s__.inspect }"
-              end
-            end ; nil
-          end
-          _y = ::Enumerator::Yielder.new do |s|
-            p[ s ]
-          end
-          ev.render_all_lines_into_under _y, @test_context.expression_agent_for_expect_event
-          nil
-        end
+        def _description_line_stream_for comment=nil, ev
 
-      private
+          desc = Describer___.new ev,
+            comment,
+            @test_context.expression_agent_for_expect_event
 
-        def ok_s
-          ev_ = @ev.to_event
-          if ev_.has_tag :ok
-            x = ev_.ok
-            if x.nil?
-              '(neutral)'
-            else
-              x ? '(ok)' : '(not ok)'
-            end
-          else
-            '(ok? not ok?)'
+          Callback_.stream do
+            desc.gets
           end
         end
       end
 
-      Fake_Wrapper__ = ::Struct.new :to_event
+      Fake_Wrapper___ = ::Struct.new :to_event
+
+    # <-
 
     Expectation__ = self
 
@@ -380,6 +360,89 @@ module Skylab::Callback::TestSupport
         if scn.unparsed_exists
           raise ::ArgumentError, "unreasonable expectation: #{ scn.current_token }"
         end ; nil
+      end
+    end
+
+    class Describer___
+
+      # we build "Good Design" into our deugging "UI" only because we
+      # know empirically (and state tautologically) that it stands to improve
+      # development productivity by way of improving debugging usability.
+
+      def initialize ev, comment, expag
+        @comment = comment
+        @ev = ev.to_event  # we ignore wrappers completely
+        @expag = expag
+        @is_active = true
+        @meth = :__gets_when_line_zero
+      end
+
+      def gets
+        if @is_active
+          send @meth
+        end
+      end
+
+      def __gets_when_line_zero
+        @st = @ev.to_stream_of_lines_rendered_under @expag
+        @line = @st.gets
+        if @line
+          __render_first_line
+        else
+          @is_active = nil
+        end
+      end
+
+      def __render_first_line
+
+        # if the event itself renders out multiple lines, render it with the
+        # event "metadata" creating the first and only line of a left column
+        # with each content line from the event in a right column, an effect
+        # only noticable for the few events that render into multiple lines.
+
+        @first_line_header = "#{ @comment }#{ __OK_s }#{
+         } #{ @ev.terminal_channel_i }#{
+          } (#{ @ev.tag_names * ', ' }) - "
+
+        s = "#{ @first_line_header }#{ @line.inspect }"
+        @line = @st.gets
+        if @line
+          @meth = :__gets_via_second_line
+        else
+          @is_active = false
+        end
+        s
+      end
+
+      def __OK_s
+        ev = @ev.to_event
+        if ev.has_tag :ok
+          x = ev.ok
+          if x.nil?
+            '(neutral)'
+          else
+            x ? '(ok)' : '(not ok)'
+          end
+        else
+          '(ok? not ok?)'
+        end
+      end
+
+      def __gets_via_second_line
+
+        @blank_s = Callback_::SPACE_ * @first_line_header.length
+        @meth = :_via_line_flush_subsequent_line
+        _via_line_flush_subsequent_line
+      end
+
+      def _via_line_flush_subsequent_line
+
+        s = "#{ @blank_s }#{ @line.inspect }"
+        @line = @st.gets
+        if ! @line
+          @is_active = false
+        end
+        s
       end
     end
   end

@@ -8,12 +8,6 @@ module Skylab::TanMan
 
       :required, :property, :digraph_path )
 
-    class << self
-      def action_class  # luckily we want all our (one) action(s) to be this way
-        TanMan_::Model_::Document_Entity.action_class
-      end
-    end  # >>
-
     Actions__ = make_action_making_actions_module
 
     module Actions__
@@ -28,7 +22,6 @@ module Skylab::TanMan
             :workspace_path,  # make this non-required, before w.s silo gets to it
             :starter,
             :created_on )
-            # :reuse, Models_::Workspace.common_properties.array
 
         def template_value i
           send :"#{ i }_template_value"
@@ -79,6 +72,10 @@ module Skylab::TanMan
 
     class Silo_Daemon < Silo_Daemon
 
+      def produce_byte_stream_identifiers_at_in i_a, ws, & oes_p
+        Produce_byte_stream_identifiers_at_in___.new( i_a, ws, & oes_p ).go
+      end
+
       def precondition_for_self action, id, bx, & oes_p
         Use___.new action, bx, @kernel, & oes_p
       end
@@ -98,8 +95,62 @@ module Skylab::TanMan
       end
     end
 
+    class Produce_byte_stream_identifiers_at_in___
+
+      # mostly this encapsulates the invitation. one day we might push up
+      # the logic related to building the stream identifiers into the w.s
+
+      def initialize i_a, ws, & oes_p
+        @i_a = i_a
+        @workspace = ws
+        @on_event_selectively = oes_p
+      end
+
+      def go
+
+        @graph_path = @workspace.business_property_value(
+            Graph_.persist_to.full_name_i ) do | * i_a, & ev_p |
+
+          if :property_not_found == i_a[ 1 ]
+            __invite( i_a, & ev_p )
+          else
+            @on_event_selectively[ * i_a, & ev_p ]
+          end
+        end
+
+        @graph_path and __via_graph_path
+      end
+
+      def __invite i_a, & ev_p
+
+        @on_event_selectively.call( * i_a ) do
+
+          ev_p[].new_inline_with :invite_to_action, [ :graph, :use ],
+            :ok, false  # change the not found from neutral to not OK
+              # otherwise clients will not look for this invitation
+
+        end
+
+        UNABLE_
+      end
+
+      def __via_graph_path
+
+        path = @workspace.from_asset_directory_absolutize_path__ @graph_path
+
+        @i_a.map do | direction_symbol |
+
+          Brazen_.data_store.const_get(
+
+            Model_::Document_Entity::CONST_VIA_DIRECTION.fetch direction_symbol
+          ).via_path path
+        end
+      end
+    end
+
     Autoloader_[ Actors__ = ::Module.new ]
 
     Graph_ = self
+
   end
 end

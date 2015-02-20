@@ -310,11 +310,29 @@ module Skylab::TanMan
 
     # ~ all abstraction candidates:
 
+
+    def business_property_value sym, & oes_p
+
+      ok = resolve_document_( & oes_p )
+      ok and begin
+        @document_.property_value_via_symbol sym, & oes_p
+      end
+    end
+
+    def from_asset_directory_absolutize_path__ path
+
+      ad = asset_directory_
+
+      ad && path.length.nonzero? && ::File::SEPARATOR != path[ 0 ] and begin  # etc
+        ::File.expand_path path, ad
+      end
+    end
+
     def from_asset_directory_relativize_path__ path
 
       ad = asset_directory_
 
-      ad && path && path.length.nonzero? && begin
+      ad && path && path.length.nonzero? and begin
         ::Pathname.new( path ).relative_path_from( ::Pathname.new ad ).to_path
       end
     end

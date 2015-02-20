@@ -22,7 +22,6 @@ module Skylab::TanMan::TestSupport::Models::Meaning
         ent.value_string.should eql 'faffle */'  # <- LOOK
 
       st.gets.should be_nil
-
     end
 
     it "shell-style" do
@@ -49,5 +48,7 @@ module Skylab::TanMan::TestSupport::Models::Meaning
     end
 
     it "when input does not parse as a graph-viz dotfile (it borks)"
+
+    ignore_these_events :using_parser_files
   end
 end

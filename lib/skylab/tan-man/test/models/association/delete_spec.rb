@@ -41,6 +41,7 @@ module Skylab::TanMan::TestSupport::Models::Association
         ev.to_event.association.unparse.should eql "foo -> bar"
       end
       @output_s.should eql "digraph {\n foo\nbar\n}\n"
+      expect_event :wrote_resource
       expect_succeeded
     end
 

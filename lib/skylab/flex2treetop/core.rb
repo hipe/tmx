@@ -683,7 +683,7 @@ module Skylab::Flex2Treetop
       PAYSTREAM__ = "«paystream»".freeze  # :+#guillemets
 
       def receive_event ev
-        scan = ev.scan_for_render_lines_under expression_agent
+        scan = ev.to_stream_of_lines_rendered_under expression_agent
         while line = scan.gets
           if ev.ok
             x = emit_info_string line

@@ -33,6 +33,33 @@ module Skylab::Headless
 
       APPEND_MODE_ = 'a'.freeze
 
+      # ~
+
+      class << self
+
+        def the_dry_byte_downstream_identifier
+          THE_DRY_BYTE_DOWNSTREAM_IDENTIFIER___
+        end
+      end
+
+      module THE_DRY_BYTE_DOWNSTREAM_IDENTIFIER___
+
+        class << self
+          def to_minimal_yielder
+            LT_LT___
+          end
+        end  # >>
+
+        class Less_Than_Less_Than___
+          def << _
+            self
+          end
+        end
+
+        LT_LT___ = Less_Than_Less_Than___.new
+
+      end
+
       self
     end.new.freeze  # :+#[#sl-126] class for singleton
   end

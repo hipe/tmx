@@ -2,9 +2,9 @@ module Skylab::Basic
 
   module String
 
-    class Byte_Upstream_Identifier
+    class Byte_Downstream_Identifier
 
-      #  :+[#br-019] unified interface for accessing the bytes in a string.
+      #  near :+[#br-019]: unified interface for writing bytes to a string
 
       def initialize s
         @s = s
@@ -23,14 +23,10 @@ module Skylab::Basic
         :string
       end
 
-      # ~ data delivery
+      # ~ data acceptance exposures
 
-      def whole_string
-        @s
-      end
-
-      def to_simple_line_stream
-        String_.line_stream @s
+      def to_minimal_yielder
+        @s.clear  # this is what you want..
       end
     end
   end

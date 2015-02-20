@@ -4,13 +4,20 @@ module Skylab::TanMan
 
   module Input_Adapters_::Treetop
 
+    class << self
+
+      def new_parse
+        Treetop_::Parser__.new
+      end
+    end
+
     LIB_ = TanMan_.lib_
 
     PROCEDE_ = true
 
     Treetop_ = self  # ~ stowaway
 
-  module DSL_
+  module DSL_  # see [#008]
 
   class Shell  # #the-shell-narrative
 

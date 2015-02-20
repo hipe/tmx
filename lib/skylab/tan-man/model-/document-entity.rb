@@ -2,9 +2,13 @@ module Skylab::TanMan
 
   class Model_
 
-    class Document_Entity < self
+    module Document_Entity
 
       class << self
+
+        def downstream_identifier_via_trios trio_a, & oes_p
+          Brazen_.byte_downstream_identifier.via_trios trio_a, & oes_p
+        end
 
         def IO_properties
           IO_PROPERTIES__.array
@@ -18,94 +22,153 @@ module Skylab::TanMan
           IO_PROPERTIES__.output_stream
         end
 
-        def action_class
-          Action___
+        def upstream_identifier_via_trios trio_a, & oes_p
+          Brazen_.byte_upstream_identifier.via_trios trio_a, & oes_p
         end
       end  # >>
 
-      Action___ = ::Class.new Action_  # before below
+      class Action < Action_
+
+        def document_entity_byte_upstream_identifier
+          @_DEBUID
+        end
+
+        def document_entity_byte_downstream_identifier
+          @_DEBDID
+        end
+
+      private
+
+        def normalize
+
+          # first call ordinary normalize to let any user-provided defaulting
+          # logic play out. then with the result arguments, resolve from them
+          # one input and (when applicable) one output means.
+
+          super && __document_entity_normalize
+        end
+
+        def __document_entity_normalize
+
+          o = Byte_Stream_Identifier_Resolver.new formal_properties, @kernel,
+            & handle_event_selectively
+
+          o.for_model model_class
+
+          o.against_argument_box @argument_box
+
+          st = o.to_resolution_pair_stream
+
+          st and begin
+            ok = true
+            begin
+              pair = st.gets
+              pair or break
+              ok = send :"receive_byte__#{ pair.name_symbol }__identifier", pair.value_x
+              ok or break
+              redo
+            end while nil
+            ok
+          end
+        end
+
+        def receive_byte__input__identifier id
+
+          if :path == id.shape_symbol && DASH_ == id.path
+            self._SUPPORT_FOR_STDIN_NEEDS_TO_be_implemented_which_should_be_easy
+          end
+          @_DEBUID = id
+          ACHIEVED_
+        end
+
+        def receive_byte__output__identifier id
+
+          if :path == id.shape_symbol && DASH_ == id.path
+            id = Brazen.data_store::Byte_Upstream_Identifier.via_stream stdout
+          end
+          @_DEBDID = id
+          ACHIEVED_
+        end
+      end
 
       # every document entity action (by default) must resolve at least an
       # input means (add, ls, rm). those that mutate must also resolve one
       # output means (add, rm). back clients don't have a concept of "PWD"
       # but the front client may re-write the `workspace_path` property to
       # default to an arbitrary path that it provides at run-time (for e.g
-      # its own `pwd`). however this effort is wasted if the input and any
+      # its own `pwd`); however this effort is wasted if the input and any
       # output means are expressed explicitly for eg path, string or stream
 
-      IO_PROPERTIES__ = make_common_properties do | sess |
+      IO_PROPERTIES__ = Model_.make_common_properties do | sess |
 
         sess.edit_entity_class do
 
           entity_property_class_for_write  # (was until #wishlist [#br-084] a flag meta meta property)
           class self::Entity_Property
 
-            attr_reader(
-              :can_be_for_document_input,
-              :can_be_for_document_output,
-              :is_document_direction_specific,
-              :is_document_input_specific,
-              :is_document_output_specific,
-              :is_document_IO_essential,
-              :is_for_document_IO
-            )
+            def initialize
+              @direction_symbols = []
+              @is_essential_to_direction = false
+              super
+            end
+
+            def expresses_direction
+              true  # or etc
+            end
+
+            attr_reader :direction_symbols
+
+            def direction_specific_symbol
+              if 1 == @direction_symbols.length
+                @direction_symbols.first
+              end
+            end
+
+            def is_essential_to_direction
+              1 == @direction_symbols.length || @is_essential_to_direction
+            end
 
           private
 
-            def document_IO_essential=
-              @is_document_IO_essential = true
+            def direction_essential=
+              @is_essential_to_direction = true
               KEEP_PARSING_
             end
 
-            def for_document_input_only=
-              @can_be_for_document_input = true
-              @is_document_direction_specific = true
-              @is_for_document_IO = true
-              @is_document_input_specific = true
-              KEEP_PARSING_
-            end
-
-            def for_document_IO=
-              @can_be_for_document_input = true
-              @can_be_for_document_output = true
-              @is_for_document_IO = true
-              KEEP_PARSING_
-            end
-
-            def for_document_output_only=
-              @can_be_for_document_output = true
-              @is_document_direction_specific = true
-              @is_for_document_IO = true
-              @is_document_output_specific = true
+            def for_direction=
+              @direction_symbols.push iambic_property
               KEEP_PARSING_
             end
           end
 
           otr = Brazen_::Models_::Workspace.common_properties
 
-          o :for_document_input_only, :property, :input_string,
-            :for_document_input_only, :property, :input_path,
+          o :for_direction, :input, :property, :input_string,
+            :for_direction, :input, :property, :input_path,
 
-            :for_document_output_only, :property, :output_string,
-            :for_document_output_only, :property, :output_path,
+            :for_direction, :output, :property, :output_string,
+            :for_direction, :output, :property, :output_path,
 
-            :for_document_IO,
+            :for_direction, :input,
+            :for_direction, :output,
               :default_proc, otr[ :config_filename ].default_proc,
               :property, :config_filename,
 
-            :for_document_IO,
+            :for_direction, :input,
+            :for_direction, :output,
               :non_negative_integer,
               :default, 1,
               :description, otr[ :max_num_dirs ].description_proc,
               :property, :max_num_dirs,
 
-            :for_document_IO,
-              :document_IO_essential,
+            :for_direction, :input,
+            :for_direction, :output,
+              :direction_essential,
               :property, :workspace_path  # at end
 
           # during the input and output resolution, if there is more than one
           # relevant argument it's a (perhaps resolvable) ambiguity. if among
-          # these arguments one is a workspace-related argument it is trumped
+          # these arguments one is a workspace-related argument it's #trump'ed
           # by any and all non-workspace-related arguments with the following
           # rationale: a workspace-related argument (unlike an argument under
           # opposing classifications) is potentially dual-purpose, expressing
@@ -127,181 +190,261 @@ module Skylab::TanMan
         end )
       end
 
-      KEEP_PARSING_ = true
+      INPUT_PROPERTIES___ = Model_.common_properties_class.new( nil ).set_properties_proc do
 
-      INPUT_PROPERTIES___ = common_properties_class.new( nil ).set_properties_proc do
+        IO_PROPERTIES__.to_stream.reduce_by do | prp |
 
-        IO_PROPERTIES__.to_stream.reduce_by( & :can_be_for_document_input ).
+          prp.direction_symbols.include? :input
 
-          flush_to_mutable_box_like_proxy_keyed_to_method( :name_symbol )
+        end.flush_to_mutable_box_like_proxy_keyed_to_method :name_symbol
       end
 
-      class Partition_IO_Args
+      # ~
 
-        def initialize trio_st, formals=nil, & oes_p
-          @trio_st = trio_st
-          @on_event_selectively = oes_p
+      class Byte_Stream_Identifier_Resolver  # [#021]:#args-partitioning explains it all
+
+        def initialize formals=nil, kr, & oes_p
           @formals = formals
+          @kernel = kr
+          @model_cls = nil
+          @oneness_h = nil
+          @on_event_selectively = oes_p
         end
 
-        def partition_and_sort
+        def against_trio_box bx
+          @trio_box = bx ; nil
+        end
 
-          input_specific_a = nil
-          input_non_specific_a = nil
-          output_specific_a = nil
-          output_non_specific_a = nil
+        def for_model x
+          @model_cls = x ; nil
+        end
 
-          st = @trio_st
-          while trio = st.gets
+        def against_argument_box bx
+          @arg_bx = bx ; nil
+        end
 
-            prp = trio.property
-            prp or next
-            prp.respond_to? :is_for_document_IO or next
+        def to_resolution_pair_stream  # assume formals
 
-            trio.value_x or next
+          __via_formals_init_direction_symbol_list_and_oneness_hash
 
-            if prp.is_document_direction_specific
-              if prp.is_document_input_specific
-                ( input_specific_a ||= [] ).push trio
-              else
-                ( output_specific_a ||= [] ).push trio
-              end
-            else
-              if prp.can_be_for_document_input
-                ( input_non_specific_a ||= [] ).push trio
-              end
-              if prp.can_be_for_document_output
-                ( output_non_specific_a ||= [] ).push trio
-              end
+          ok, * rest = _produce_any_IDs_at @direction_symbol_list
+
+          ok and begin
+
+            Callback_::Stream.via_times @direction_symbol_list.length do | d |
+
+              Callback_::Pair[
+                rest.fetch( d ),
+                @direction_symbol_list.fetch( d ) ]
+            end
+          end
+        end
+
+        def __via_formals_init_direction_symbol_list_and_oneness_hash
+
+          dir_sym_a = []
+          dir_sym_seen_h = {}
+          dir_sym_required_h = {}
+
+          @formals.each_value do | prp |
+
+            if ! prp.respond_to? :expresses_direction
+              next
+            end
+
+            sym = prp.direction_specific_symbol
+            sym or next
+
+            dir_sym_seen_h.fetch sym do
+
+                # #one-day a test of optional-ness
+                dir_sym_required_h[ sym ] = true
+
+              dir_sym_a.push sym
+              dir_sym_seen_h[ sym ] = true
             end
           end
 
-          @result_array_pair = []
-
-          __partition_any_formals
-
-          _ok = _money( input_specific_a, input_non_specific_a, @normalize_for_input, 0 ) and
-            _money( output_specific_a, output_non_specific_a, @normalize_for_output, 1 )
-
-          _ok and @result_array_pair
+          @direction_symbol_list = dir_sym_a
+          @oneness_h = dir_sym_required_h
+          nil
         end
 
-        def __partition_any_formals
+        def solve_for direction_symbol
+          ok, id = _produce_any_IDs_at [ direction_symbol ]
+          ok && id
+        end
+
+        def each_resolution_pair
+          self._THIS
+        end
+
+        def _produce_any_IDs_at direction_sym_a
+
+          # 1) partition every relevant argument into one or more buckets,
+          # one placement for each direction that the argument solves 2) sort
+          # each bucket, short-circuit complaining if it is ambiguous. 3)
+          # index each such list by the object id of its "leader" argument.
+          # this grouping is called a "waypoint", a waypoint being a data
+          # source and/or destination that knows the one or more directions
+          # it solves for. 4) after the full pass of the previous step, ask
+          # each waypoint to solve each of its ID's, short-circuiting on any
+          # failure. with each such waypoint index each of its IDs by the
+          # direction (symbols) it produces, a mapping of which is our result.
+
+          ok = true
+          bucket_h = __produce_bucket_hash direction_sym_a
+
+          wp_o_a = [] ; wp_via_leader = {}
+
+          direction_sym_a.each do | sym |
+
+            arglist = bucket_h.fetch sym
+            ok = __normalize_bucket_list arglist, sym
+            ok or break
+
+            if arglist.length.zero?
+              next
+            end
+
+            k = arglist.first.object_id
+            _idx = wp_via_leader.fetch k do
+              wp = Waypoint__.new arglist, @model_cls, @kernel, & @on_event_selectively
+              d = wp_o_a.length
+              wp_o_a[ d ] = wp
+              wp_via_leader[ k ] = d
+            end
+            wp = wp_o_a.fetch _idx
+            wp.receive_additional_direction sym
+          end
+
+          if ok
+            identifier_via_direction = {}
+            wp_o_a.each do | waypoint |
+
+              ok = waypoint.solve
+              ok or break
+              waypoint.each_solution_pair do | sym, id |
+                identifier_via_direction[ sym ] = id
+              end
+            end
+
+            [ ok, * ( direction_sym_a.map( &
+              identifier_via_direction.method( :[] ) ) ) ]
+          else
+            ok
+          end
+        end
+
+        def __produce_bucket_hash direction_sym_a
+
+          bucket_h = ::Hash[ direction_sym_a.map { | sym | [ sym, [] ] } ]
+
+          __each_relevant_trio do | trio |
+
+            trio.property.direction_symbols.each do | sym |
+
+              a = bucket_h[ sym ]
+              a or next
+              a.push trio
+            end
+          end
+
+          bucket_h
+        end
+
+        def __each_relevant_trio
+
+          # if we were given formals we assume we have the arguments as a
+          # box and so we must buil our own trios. if we weren't we don't
+
           if @formals
-            __partition_formals
+
+            @arg_bx.each_pair do | k, x |
+
+              prp = @formals.fetch k
+
+              if ! prp.respond_to? :expresses_direction
+                next
+              end
+
+              yield Callback_::Trio.new( x, true, prp )
+            end
           else
-            @normalize_for_output = @normalize_for_input = false
+
+            @trio_box.each_value do | trio |
+
+              if ! trio.property.respond_to? :expresses_direction
+                next
+              end
+
+              yield trio
+            end
           end
           nil
         end
 
-        def __partition_formals
+        def __normalize_bucket_list sort_me, direction_sym
 
-          # whether (variously) any output or input *specific* formals are
-          # expressed in the box determines whether we are normalizing for
-          # a one-ness of that particular category against the arguments.
+          # for this particular direction the number of actuals whose formal
+          # is "essential" must match either the arity `0..1` or `1`
+          # depending on etc
 
-          seen = []
-          saw_input = saw_output = false
-          p_a = [  # diminishing pool
-            -> prp do
-              prp.is_document_input_specific and saw_input = true
-            end,
-            -> prp do
-              prp.is_document_output_specific and saw_output = true
-            end ]
-
-          @formals.each do | prp |
-
-            # here we do not use just the name to match.
-
-            prp.respond_to?( :is_for_document_IO ) or next
-
-            p_a.each_with_index do | p, idx |
-              p[ prp ] and seen.push idx
-            end
-            seen.length.zero? and next
-            seen.each do | d |
-              p_a[ d ] = nil
-            end
-            p_a.compact!
-            if p_a.length.zero?
-              break
-            end
-            seen.clear
-          end
-          @normalize_for_input = saw_input
-          @normalize_for_output = saw_output
-          nil
-        end
-
-        def _money spec_a, non_spec_a, do_normalize, idx
-
-          if non_spec_a
-            essential_a, non_essential_a = non_spec_a.partition do | arg |
-              arg.property.is_document_IO_essential
-            end
+          essential, non_essential = sort_me.partition do | arg |
+            arg.property.is_essential_to_direction
           end
 
-          if spec_a  # assume nonzero length
-            winners_a = spec_a
-          elsif essential_a && essential_a.length.nonzero?
-            winners_a = essential_a
-          end
+          case 1 <=> essential.length
 
-          if winners_a
+          when 0  # exactly one - success
 
-            if 1 < winners_a.length  # more than one essential argument
-              # of the same ranking is an unresolvable ambiguity always
-
-              _non_one winners_a, idx
-
-            else  # every non-nil input or output value provided is put
-              # into the result array sorted by significance descending
-
-              @result_array_pair[ idx ] = [ * spec_a, * essential_a, * non_essential_a ]
-              ACHIEVED_
-            end
-          elsif do_normalize  # because this was in the provided formal
-            # array and none was resolved, it's an error
-            _non_one EMPTY_A_, idx
-          else
-            @result_array_pair[ idx ] = EMPTY_A_
+            sort_me.replace [ * essential, * non_essential ]
             ACHIEVED_
+
+          when 1  # zero
+
+            if @oneness_h && @oneness_h[ direction_sym ]  # missing required meta-property
+              _non_one direction_sym, essential
+
+            else
+
+              sort_me.clear  # if you don't have essentials, you get NONE
+
+              ACHIEVED_  # not present but not "missing"
+            end
+
+          when -1  # more than one - ambiguous
+
+            _non_one direction_sym, essential
+
           end
         end
 
-        def _non_one arg_a, d
+        def _non_one sym, essential
           @on_event_selectively.call :error, :non_one_IO do
-            _build_non_one_IO_event DIRECTIONS__[ d ], arg_a
+            __build_non_one_IO_event sym, essential
           end
           UNABLE_
         end
 
-        DIRECTIONS__ = [ :input, :output ]
-
-        def _build_non_one_IO_event direction_sym, arg_a
+        def __build_non_one_IO_event direction_sym, arg_a
 
           Callback_::Event.inline_not_OK_with :non_one_IO,
               :direction_i, direction_sym,
               :arg_a, arg_a,
-              :properties, @formals do | y, o |
+              :formals, @formals do | y, o |
 
             if o.arg_a.length.zero?
 
-              meth_sym = {
-                input: :can_be_for_document_input,
-                output: :can_be_for_document_output
-              }.fetch o.direction_i
+              i = o.direction_i
 
-              _s_a = o.properties.reduce_by do | prp |
+              _s_a = o.formals.map_reduce_by do | prp |
+                if prp.respond_to?( :expresses_direction ) &&
+                    prp.direction_symbols.include?( i ) &&
+                      prp.is_essential_to_direction
 
-                prp.respond_to?( meth_sym ) &&
-                  prp.send( meth_sym ) &&  # :+[#br-046]
-                  ( prp.is_document_IO_essential || prp.is_document_direction_specific )
-
-              end.map do | prp |
-                par prp
+                  par prp
+                end
               end.to_a
 
               _xtra = " (provide #{ or_ _s_a })"
@@ -317,6 +460,77 @@ module Skylab::TanMan
           end
         end
       end
+
+      class Waypoint__
+
+        def initialize arglist, model_cls, kr, & oes_p
+          @arglist = arglist
+          @arg = @arglist.first
+          @direction_symbols = []
+          @kernel = kr
+          @model_cls = model_cls
+          @name_symbol = @arg.name_symbol
+          @on_event_selectively = oes_p
+        end
+
+        def receive_additional_direction sym
+          @direction_symbols.push sym ; nil
+        end
+
+        def solve
+
+          # our only special case in this app is w.s. otherwise use [br]
+
+          if :workspace_path == @name_symbol
+            __solve_for_workspace
+          else
+            __solve_for_normal
+          end
+        end
+
+        def __solve_for_normal
+
+          _ = CONST_VIA_DIRECTION.fetch(
+            @arg.property.direction_specific_symbol )
+
+          id = Brazen_.data_store.const_get( _ ).via_trios(
+            @arglist, & @on_event_selectively )
+
+          id and begin
+            @id_a = [ id ]
+            ACHIEVED_
+          end
+        end
+
+        def __solve_for_workspace  # (limit w.s logic to this method only)
+
+          ws = @kernel.silo( :workspace ).workspace_via_trio_box(
+            Callback_::Stream.via_nonsparse_array( @arglist ).
+              flush_to_box_keyed_to_method( :name_symbol ),
+            & @on_event_selectively )
+
+          ws and begin
+            @id_a = @kernel.silo(
+              @model_cls.document_in_workspace_identifier_symbol ).
+                produce_byte_stream_identifiers_at_in(
+                  @direction_symbols, ws, & @on_event_selectively )
+
+            @id_a && ACHIEVED_
+          end
+        end
+
+        def each_solution_pair
+          @direction_symbols.length.times.each do | d |
+            yield @direction_symbols.fetch( d ),
+              @id_a.fetch( d )
+          end ; nil
+        end
+      end
+
+      CONST_VIA_DIRECTION = {
+        input: :Byte_Upstream_Identifier,
+        output: :Byte_Downstream_Identifier
+      }.freeze
 
       class Collection_Controller
 
@@ -365,10 +579,14 @@ module Skylab::TanMan
 
         def flush_changed_document_to_output_adapter_per_action action
 
-          @df.persist_via_three(
-            action.argument_box[ :dry_run ],
-            action.output_arguments,
-            action.stdout )
+          @df.persist_into_byte_downstream(
+
+            action.document_entity_byte_downstream_identifier,
+
+            :is_dry, action.argument_box[ :dry_run ],
+
+            & action.handle_event_selectively )
+
         end
 
         def document_
@@ -381,42 +599,7 @@ module Skylab::TanMan
         end
       end
 
-      DOT_DOT_ = '..'.freeze
-
-      class Action___  # re-open
-
-        def input_arguments
-          @input_argument_a
-        end
-
-        attr_reader :output_arguments  # not guaranteed to exist for some actions
-
-      private
-
-        def normalize
-
-          # first call ordinary normalize to let any user-provided defaulting
-          # logic play out. then with the result arguments, resolve from them
-          # one input and (as appropriate) one output means.
-
-          super && __document_entity_normalize
-        end
-
-        def __document_entity_normalize
-
-          in_a, out_a = Partition_IO_Args.new(
-            to_trio_stream,
-            formal_properties,
-            & handle_event_selectively ).partition_and_sort
-
-          in_a and begin
-            @input_argument_a = in_a
-            @output_arguments = out_a
-            ACHIEVED_
-          end
-        end
-      end
-      Action = Action___  # until next commit
+      KEEP_PARSING_ = true
     end
   end
 end

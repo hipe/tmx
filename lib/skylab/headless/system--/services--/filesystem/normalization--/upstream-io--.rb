@@ -66,7 +66,7 @@ module Skylab::Headless
           end
 
           def when_formal_both
-            if @path_arg.actuals_has_name
+            if @path_arg.is_known_known
               if instream_is_noninteractive_and_open
                 when_actual_both
               else
@@ -84,7 +84,7 @@ module Skylab::Headless
           end
 
           def when_formal_path
-            if @path_arg.actuals_has_name
+            if @path_arg.is_known_known
               when_actual_path
             else
               when_path_not_provided

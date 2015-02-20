@@ -26,6 +26,10 @@ module Skylab::Brazen
       Brazen_::Data_Stores_::Git_Config
     end
 
+    def data_store
+      Brazen_::Data_Store_
+    end
+
     def data_stores
       Brazen_::Data_Stores_
     end

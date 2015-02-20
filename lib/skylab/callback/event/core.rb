@@ -277,7 +277,7 @@ module Skylab::Callback
         N_Lines.new( y, d, [ message_proc ], expag ).execute self
       end
 
-      def scan_for_render_lines_under expag
+      def to_stream_of_lines_rendered_under expag
         # with threads we could do this one line at a time but meh
         s_a = []
         y = ::Enumerator::Yielder.new do |s|

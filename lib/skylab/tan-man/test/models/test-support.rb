@@ -116,18 +116,6 @@ module Skylab::TanMan::TestSupport::Models
 
     # ~
 
-    def build_event_receiver_for_expect_event
-      evr = super
-      evr.add_event_pass_filter do |ev|
-        :using != ev.terminal_channel_i
-      end
-      evr
-    end
-
-    def bld_input_args_when_input_file_granule
-      [ Brazen_.model.actual_property.new( input_file_pathname.to_path, :input_path ) ]
-    end
-
     def kernel
       subject_API.application_kernel
     end

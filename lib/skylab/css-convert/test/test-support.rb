@@ -49,11 +49,11 @@ module Skylab::CSS_Convert::TestSupport
     end
 
     def parse_css_in_file pathname
-      build_parser(CSSC_::CSS_::Parser).parse_string pathname.read
+      build_parser(CSSC_::CSS_::Parser).parse_path pathname.to_path
     end
 
     def parse_directives_in_file pathname
-      build_parser(CSSC_::Directive__::Parser).parse_string pathname.read
+      build_parser(CSSC_::Directive__::Parser).parse_path pathname.to_path
     end
 
     define_method :unstyle, CSSC_.lib_.CLI_lib.pen.unstyle

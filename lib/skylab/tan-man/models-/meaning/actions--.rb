@@ -1,24 +1,24 @@
 module Skylab::TanMan
 
-  class Models_::Meaning
+  class Models_::Meaning  # re-opening
 
-    TanMan_::Entity_.call self,
+    edit_entity_class(
 
-        :persist_to, :meaning,
+      :persist_to, :meaning,
 
-        :preconditions, [ :dot_file ],
+      :preconditions, [ :dot_file ],
 
-        :required,
-        :ad_hoc_normalizer, -> arg, & oes_p do
-          Meaning_::Actors__::Edit::Normalize_name[ arg, & oes_p ]
-        end,
-        :property, :name,
+      :required,
+      :ad_hoc_normalizer, -> arg, & oes_p do
+        Meaning_::Actors__::Edit::Normalize_name[ arg, & oes_p ]
+      end,
+      :property, :name,
 
-        :required,
-        :ad_hoc_normalizer, -> arg, & oes_p do
-          Meaning_::Actors__::Edit::Normalize_value[ arg, & oes_p ]
-        end,
-        :property, :value
+      :required,
+      :ad_hoc_normalizer, -> arg, & oes_p do
+        Meaning_::Actors__::Edit::Normalize_value[ arg, & oes_p ]
+      end,
+      :property, :value )
 
     Actions__ = make_action_making_actions_module
 
@@ -40,7 +40,7 @@ module Skylab::TanMan
 
       Rm = make_action_class :Delete
 
-      class Associate < TanMan_::Model_::Document_Entity.action_class
+      class Associate < TanMan_::Model_::Document_Entity::Action
 
         Entity_.call self,
 
@@ -81,7 +81,7 @@ module Skylab::TanMan
         def __persist
 
           @preconditions.fetch( :meaning ).
-            flush_changed_document_to_output_adapter_per_action( self )
+            flush_changed_document_to_output_adapter_per_action self
         end
       end
     end

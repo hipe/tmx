@@ -217,8 +217,11 @@ module Skylab::TanMan
       end
 
       def _commit_changes action
-        document_.persist_via_args(
-          action.argument_box[ :dry_run ], * action.output_arguments )
+
+        document_.persist_into_byte_downstream(
+          action.document_entity_byte_downstream_identifier,
+          :is_dry, action.argument_box[ :dry_run ],
+          & action.handle_event_selectively )
       end
     end
 

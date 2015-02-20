@@ -4,6 +4,10 @@ module Skylab::Headless
 
     class << self
 
+      def dry_stub
+        IO::Dry_Stub__
+      end
+
       def dry_stub_instance
         IO::DRY_STUB__
       end

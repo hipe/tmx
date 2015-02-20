@@ -10,12 +10,27 @@ module Skylab::Headless
         @io = io
       end
 
-      def members
-        [ :Category_symboL ]
+      # ~ reflection
+
+      def description_under expag
+        if @io.respond_to? :path
+          path = @io.path
+          expag.calculate do
+            pth path
+          end
+        else
+         "«output stream»"  # :+#guillemets
+        end
       end
 
-      def Category_symboL
-        :Input_streaM
+      def shape_symbol
+        :stream
+      end
+
+      # ~ data acceptance exposures
+
+      def to_minimal_yielder
+        @io
       end
     end
   end

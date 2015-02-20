@@ -107,7 +107,7 @@ module Skylab::Headless
 
         def receive_event ev  # experimenal bridge to the future
           # in practice most events have only one line so..
-          scan = ev.scan_for_render_lines_under expression_agent
+          scan = ev.to_stream_of_lines_rendered_under expression_agent
           while line = scan.gets
             if ev.ok
               emit_info_line line

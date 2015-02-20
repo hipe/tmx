@@ -145,5 +145,7 @@ module Skylab::TanMan::TestSupport::Models::Node
         end
       end.call
     end
+
+    ignore_these_events :using_parser_files, :wrote_resource
   end
 end

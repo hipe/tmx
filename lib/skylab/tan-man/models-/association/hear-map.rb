@@ -139,15 +139,46 @@ module Skylab::TanMan
         def __maybe_persist
 
           if @did_mutate
-
-            @dc.persist_via_three(
-              ( _ = @trio_box[ :dry_run ] and _.value_x ),
-              @dc.caddied_output_args,
-              @trio_box.fetch( :stdout ).value_x )
-
+            __do_persist
           else
             ACHIEVED_  # assume that 3 events were emitted
           end
+        end
+
+        def __do_persist
+
+          o = TanMan_::Model_::Document_Entity::
+            Byte_Stream_Identifier_Resolver.new(
+              @kernel, & @on_event_selectively )
+
+          o.for_model Association_
+
+          o.against_trio_box @trio_box
+
+          id = o.solve_for :output
+
+          id and begin
+
+            if :path == id.shape_symbol && DASH_ == id.path
+
+              id = Brazen_.data_store::Byte_Downstream_Identifier.via_stream(
+                @trio_box.fetch( :stdout ).value_x )
+            end
+
+            __persist_into_byte_downstream id
+          end
+        end
+
+        def __persist_into_byte_downstream id
+
+          arg = @trio_box[ :dry_run ]
+          if arg
+            is_dry = arg.value_x
+          end
+
+          @dc.persist_into_byte_downstream id,
+            :is_dry, is_dry,
+            & @on_event_selectively
         end
       end
     end

@@ -345,6 +345,14 @@ module Skylab::Callback
         end
       end
 
+      # ~ (
+
+      def map_reduce_by & p
+        to_stream.map_reduce_by( & p )
+      end
+
+      # ~ )
+
       def to_stream
         if @done
           to_stream_when_done Stream_

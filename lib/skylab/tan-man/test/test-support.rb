@@ -198,7 +198,35 @@ module Skylab::TanMan::TestSupport
 
       nil
     end
+
+    def ignore_these_events * top_chan_i_a
+
+      _YOU_SHALL_NOT_PASS = ::Hash[ top_chan_i_a.map { | i | [ i, true ] } ]
+
+      define_method :build_event_receiver_for_expect_event do
+
+        er = super()
+        er.add_map_reducer do | ev_p, i_a, chan_p |
+
+          if _YOU_SHALL_NOT_PASS[ i_a.last ]
+
+            if do_debug
+              debug_IO.puts event_receiver_for_expect_event.
+                first_line_description(
+                  "ignoring: ", ev_p[] )
+            end
+
+            TanMan_::UNABLE_  # err on the side of us having swallowed a failure
+          else
+
+            chan_p[ i_a, & ev_p ]
+          end
+        end
+        er
+      end ; nil
+    end
   end
+
 
   module InstanceMethods
 
@@ -208,7 +236,7 @@ module Skylab::TanMan::TestSupport
       @do_debug = true
     end
 
-    attr_accessor :do_debug
+    attr_reader :do_debug
 
     def debug_IO
       Some_debug_IO[]
@@ -259,7 +287,7 @@ module Skylab::TanMan::TestSupport
       desired_module_const_i = bld_grammar_const granule_s
       if ! mod.const_defined? desired_module_const_i
         _BASE_PN_ = mod.dir_pathname.join granule_s
-        load _BASE_PN_.join( "client" ).to_path
+        load _BASE_PN_.join( CLIENT___ ).to_path
         was_not_defined = true
       end
       @grammar_class = mod.const_get desired_module_const_i, false
@@ -269,6 +297,8 @@ module Skylab::TanMan::TestSupport
         end
       end ; nil
     end
+
+    CLIENT___ = 'client'
 
     def bld_grammar_const granule_s
       md = GRANULE_TO_CONST_RX__.match granule_s
@@ -283,19 +313,18 @@ module Skylab::TanMan::TestSupport
 
     def __resolve_parse_session
 
+      # life is easier if we don't have to ignore 'manually' the below event
+
       _oes_p = -> * i_a, & ev_p do
 
-        if :info == i_a.first && :using == i_a[ 1 ]  # always ignore these, too noisy
-          if do_debug
-            ev = ev_p[]
-            debug_IO.puts "(ignoring #{ i_a.inspect } event: #{ black_and_white( ev ).inspect })" ; nil
-          end
-        else
-          ev = ev_p[]
-          event_receiver_for_expect_event.receive_ev ev
-          ev.ok
+        if :using_parser_files != i_a.last
+          self._DO_ME
         end
+        nil
       end
+
+      # but if you wanted to test for specific events here:
+      # _oes_p = event_receiver_for_expect_event.handle_event_selectively
 
       @parse = TS_::Parse.new _oes_p do | o |
         o.generated_grammar_dir_path existent_testing_GGD_path
@@ -353,16 +382,12 @@ module Skylab::TanMan::TestSupport
     end
 
     def input_file_path
-      input_file_pathname.to_path
+      @input_file_path ||= build_input_file_path
     end
 
-    def input_file_pathname
-      @input_file_pathname ||= build_input_file_pathname
-    end
-
-    def build_input_file_pathname
+    def build_input_file_path
       module_with_subject_fixtures_node.dir_pathname.
-        join "fixtures/#{ input_file_granule }"
+        join( "fixtures/#{ input_file_granule }" ).to_path
     end
 
     def module_with_subject_fixtures_node
@@ -378,7 +403,7 @@ module Skylab::TanMan::TestSupport
     end
 
     def add_input_arguments_to_iambic_when_input_file_granule x_a
-      x_a.push :input_path, input_file_pathname.to_path ; nil
+      x_a.push :input_path, input_file_path; nil
     end
 
     def add_input_arguments_to_iambic_when_input_string x_a
@@ -390,7 +415,7 @@ module Skylab::TanMan::TestSupport
     end
 
     def some_input_string_when_input_file_granule
-      @input_file_pathname.read
+      ::File.read @input_file_path
     end
 
     def some_input_string_when_input_string

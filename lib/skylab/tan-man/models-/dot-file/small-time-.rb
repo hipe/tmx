@@ -2,190 +2,122 @@ module Skylab::TanMan
 
   module Models_::DotFile
 
-    module Small_Time_
+    Small_Time_ = ::Module.new
 
-      Actors = ::Module.new
+    Small_Time_::Actors = ::Module.new
 
-      class Actors::Build_Document_Controller
+    Small_Time_::Sessions = ::Module.new
 
-        class Via_action < self
+    class Small_Time_::Actors::Persist
 
-          Actor_.call self, :properties,
-            :action
+      Callback_::Actor.methodic self, :properties, :is_dry
 
-          def execute
-            @kernel, @on_event_selectively = @action.controller_nucleus.to_a
-            receive_input_arguments @action.input_arguments and super
-          end
+      def initialize id, gsp, x_a, & oes_p
+        @byte_downstream_identifier = id
+        @graph_sexp = gsp
+        @is_dry = false
+        @on_event_selectively = oes_p
+        if x_a.length.nonzero?
+          process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+        end
+      end
 
-          def _produce_trio_box_proxy
-            @action.to_trio_box_proxy
-          end
+      def execute
 
-          def _output_trio_array
-            @action.output_arguments
-          end
+        y = if @is_dry
+          Brazen_.data_store::Byte_Downstream_Identifier.the_dry_identifier.to_minimal_yielder
+        else
+          @byte_downstream_identifier.to_minimal_yielder
         end
 
-        class Via_trio_box < self
+        bytes = @graph_sexp.unparse_into y
 
-          # some concerns (like hear-maps) don't have an action, but have
-          # arguments and want a document controller.
-
-          Actor_.call self, :properties,
-            :trio_box, :kernel
-
-          def execute
-
-            in_a, @out_a = TanMan_::Model_::Document_Entity::Partition_IO_Args.new(
-              @trio_box.to_value_stream,
-              & @on_event_selectively ).partition_and_sort
-
-            in_a and begin
-              @in_arg_a = in_a
-              dc = super
-              dc and begin
-                dc.caddied_output_args = @out_a
-                dc
-              end
-            end
-          end
-
-          def _produce_trio_box_proxy
-            @trio_box
-          end
-
-          def _output_trio_array
-            @out_a
-          end
+        if y.respond_to? :close
+          y.close
         end
 
-        def receive_input_arguments a
-          if a and a.length.nonzero?
-            @in_arg_a = a
-            ACHIEVED_
-          else
-            when_no_IO :input
-          end
+        @on_event_selectively.call :info, :wrote_resource do
+          __build_event bytes
         end
 
-        def when_no_IO i
-          maybe_send_event :error, :cannot_resolve_IO do
-            build_not_OK_event_with :cannot_resolve_IO, :direction, i
-          end
-          UNABLE_
-        end
+        ACHIEVED_  # not bytes, it's confusing to the API
+      end
 
-        def execute
-          ok = via_input_resolve_graph_sexp
-          ok and via_graph_sexp_produce_document_controller
-        end
+      def __build_event bytes
 
-        def via_input_resolve_graph_sexp
-          arg = @in_arg_a.fetch 0
-          sym = arg.name_symbol
-          instance_variable_set :"@#{ sym }", arg.value_x
-          send :"via_#{ sym }_resolve_graph_sexp"
-        end
+        Callback_::Event.inline_OK_with :wrote_resource,
 
-        def via_workspace_path_resolve_graph_sexp
+            :byte_downstream_identifier, @byte_downstream_identifier,
+            :bytes, bytes,
+            :is_dry, @is_dry,
+            :is_completion, true do  | y, o |
 
-          ok = __resolve_workspace_via_trio_box _produce_trio_box_proxy
-          ok &&= __via_workspace_resolve_document
-          ok &&= __via_document_resolve_graph_path
-          ok &&= __via_graph_path_and_workspace_resolve_graph_sexp
+          _s = o.byte_downstream_identifier.description_under self
+
+          y << "wrote #{ _s } #{
+
+            }(#{ o.bytes }#{ ' dry' if o.is_dry } bytes)"
 
         end
+      end
+    end
 
-        def __resolve_workspace_via_trio_box bx
+    class Small_Time_::Sessions::Build_Document_Controller
 
-          @ws = @kernel.silo( :workspace ).workspace_via_trio_box bx,
-            & @on_event_selectively
+      def initialize kr=nil, & oes_p
+        @kernel = kr
+        @on_event_selectively = oes_p
+      end
 
-          @ws && ACHIEVED_
+      def receive_document_action action
+        @kernel, @on_event_selectively = action.controller_nucleus.to_a
+        receive_byte_upstream_identifier action.document_entity_byte_upstream_identifier
+        produce_document_controller
+      end
+
+      def receive_trio_box bx
+
+        o = TanMan_::Model_::Document_Entity::
+          Byte_Stream_Identifier_Resolver.new(
+            @kernel, & @on_event_selectively )
+
+        o.against_trio_box bx
+
+        @_BUID = o.solve_for :input
+
+        nil
+      end
+
+      def receive_byte_upstream_identifier id
+        @_BUID = id ; nil
+      end
+
+      def produce_document_controller
+        @_BUID and begin
+          ok = __via_BUID_resolve_graph_sexp
+          ok && __via_graph_sexp_produce_doc_controller
         end
+      end
 
-        def __via_workspace_resolve_document
+      def __via_BUID_resolve_graph_sexp
 
-          ok = @ws.resolve_document_( & @on_event_selectively )
-          if ok
-            @doc = @ws.document_
-          end
-          ok
-        end
+        @graph_sexp = DotFile_.produce_parse_tree_with(
 
-        def __via_document_resolve_graph_path
+          :byte_upstream_identifier, @_BUID,
+          :generated_grammar_dir_path, __GGD_path,
 
-          @graph_path = @doc.property_value_via_symbol GRPH___ do | i, i_, & ev_p |
+          & @on_event_selectively )
 
-            if :property_not_found == i_
+        @graph_sexp && ACHIEVED_
+      end
 
-              @on_event_selectively.call i, i_ do
+      def __GGD_path
+        @kernel.call :paths, :path, :generated_grammar_dir, :verb, :retrieve
+      end
 
-                ev_p[].new_inline_with(
-                  :invite_to_action, [ :graph, :use ],
-                  :ok, false )  # client's won't look for invite otherwise..
-              end
+      def __via_graph_sexp_produce_doc_controller
 
-              UNABLE_
-            else
-              @on_event_selectively[ i, i_, & ev_p ]
-            end
-          end
-
-          @graph_path && ACHIEVED_
-        end
-
-        GRPH___ = :graph
-
-        def __via_graph_path_and_workspace_resolve_graph_sexp
-
-          path = @graph_path ;  _surrounding_path = @ws.asset_directory_
-
-          if path.length.nonzero? && ::File::SEPARATOR != path[ 0 ]
-            path = ::File.expand_path path, _surrounding_path
-          end
-
-          @input_path = path
-
-          ok = via_input_path_resolve_graph_sexp
-
-          a = _output_trio_array
-
-          if ok && a && :workspace_path == a.first.name_symbol
-
-            # it's not very useful to have the workspace path as the output arg
-
-            a[ 0 ] = Callback_::Pair[ path, :output_path ]  # structure violation
-
-          end
-
-          ok
-        end
-
-        def via_input_path_resolve_graph_sexp
-          @graph_sexp = DotFile_.produce_parse_tree_via @on_event_selectively do | o |
-            o.generated_grammar_dir_path _GGD_path
-            o.input_path @input_path
-          end
-          @graph_sexp && ACHIEVED_
-        end
-
-        def via_input_string_resolve_graph_sexp
-          @graph_sexp = DotFile_.produce_parse_tree_via @on_event_selectively do | o |
-            o.generated_grammar_dir_path _GGD_path
-            o.input_string @input_string
-          end
-          @graph_sexp && ACHIEVED_
-        end
-
-        def _GGD_path
-          @kernel.call :paths, :path, :generated_grammar_dir, :verb, :retrieve
-        end
-
-        def via_graph_sexp_produce_document_controller
-          DotFile_::Controller__.new @graph_sexp, @in_arg_a.fetch( 0 ), @kernel, & @on_event_selectively
-        end
+        DotFile_::Controller__.new @graph_sexp, @_BUID, @kernel, & @on_event_selectively
       end
     end
   end

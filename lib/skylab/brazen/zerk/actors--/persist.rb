@@ -84,7 +84,7 @@ module Skylab::Brazen
       end
 
       def line_scan_for_event ev
-        ev.scan_for_render_lines_under Brazen_::API.expression_agent_instance
+        ev.to_stream_of_lines_rendered_under Brazen_::API.expression_agent_instance
       end
 
       def via_down_IO_write

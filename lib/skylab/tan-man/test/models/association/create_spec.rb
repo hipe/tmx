@@ -184,5 +184,7 @@ module Skylab::TanMan::TestSupport::Models::Association
       x_a_.length.nonzero? and x_a.concat x_a_
       call_API_via_iambic x_a ; nil
     end
+
+    ignore_these_events :using_parser_files, :wrote_resource
   end
 end

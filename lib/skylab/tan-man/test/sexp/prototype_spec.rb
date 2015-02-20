@@ -6,6 +6,8 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
 
     extend TS_
 
+  # <-
+
   using_grammar '70-38-simplo' do
 
     using_input_string EMPTY_S_, 'totally empty input string' do
@@ -120,17 +122,18 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
         end.should raise_error TanMan_::Sexp_::Auto::Parse_Failure
       end
     end
+  end
 
-    # --*--
+  # ->
 
     def unparses
-      result.node_list.nodes.map(&:unparse)
+      result.node_list.nodes.map( & :unparse )
+    end
+
+    ignore_these_events :using_parser_files
+
+    def subject
+      TanMan_::Sexp_::Prototype
     end
   end
-
-  def subject
-    TanMan_::Sexp_::Prototype
-  end
-
-end
 end

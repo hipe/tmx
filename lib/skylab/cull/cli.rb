@@ -128,7 +128,7 @@ module Skylab::Cull
     def on_before e
       _native_ev = e.payload_a.first
       _ev = _native_ev.renderable
-      scan = _ev.scan_for_render_lines_under expression_agent
+      scan = _ev.to_stream_of_lines_rendered_under expression_agent
       while s = scan.gets
         @err.write "#{ s } .."
       end

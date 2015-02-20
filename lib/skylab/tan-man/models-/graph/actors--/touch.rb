@@ -13,7 +13,7 @@ module Skylab::TanMan
 
       def execute
         __init_downstream_identifier
-        send :"__execute_for_#{ @down_ID.Category_symboL }"
+        send :"__execute_for__#{ @down_ID.shape_symbol }__"
       end
 
       def __init_downstream_identifier
@@ -27,11 +27,11 @@ module Skylab::TanMan
         nil
       end
 
-      def __execute_for_PatH
+      def __execute_for__path__
         Touch_path___.new( @arg, self, & @on_event_selectively ).execute
       end
 
-      def __execute_for_Input_streaM
+      def __execute_for__stream__
         _ok = resolve_upstream_lines_
         _ok and flush_upstream_lines_to_file_ @arg.value_x
       end

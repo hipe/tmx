@@ -349,7 +349,7 @@ module Skylab::TanMan
     end
 
     def send_overwriting_event exist_g_a
-      i = @force_overwrite ? :overwriting : :using
+      i = @force_overwrite ? :rewriting_parser_files : :using_parser_files
       _ev = build_neutral_event_with i, :exist_g_a, exist_g_a do |y, o|
         _s_a = o.exist_g_a.map do |g|
           pth g.out_pn

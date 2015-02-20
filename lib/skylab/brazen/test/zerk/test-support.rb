@@ -28,8 +28,8 @@ module Skylab::Brazen::TestSupport::Zerk
 
     def build_mock_parent
       evr = event_receiver_for_expect_event
-      Mock_Parent__.new -> *, & ev_p do
-        evr.receive_ev ev_p[]
+      Mock_Parent__.new -> i_a, & ev_p do
+        evr.maybe_receive_on_channel_event i_a, & ev_p
       end
     end
   end
