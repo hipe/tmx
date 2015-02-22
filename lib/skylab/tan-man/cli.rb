@@ -19,8 +19,10 @@ module Skylab::TanMan
     class Action_Adapter < Action_Adapter
 
       def receive_frame adapter
-        if @bound.respond_to? :receive_stdout_
-          @bound.receive_stdout_ adapter.resources.sout
+        if @bound.respond_to? :receive_stdin_
+          o = adapter.resources
+          @bound.receive_stdin_ o.sin
+          @bound.receive_stdout_ o.sout
         end
         super
       end

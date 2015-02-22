@@ -9,6 +9,8 @@ module Skylab::Treemap
 
   Kernel_ = ::Class.new Brazen_::Kernel_  # for now
 
+  if false
+
   def self.lib_
     @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
   end
@@ -17,6 +19,7 @@ module Skylab::Treemap
 
     # sidesys = Autoloader_.build_require_sidesystem_proc
 
+  end
   end
 
   IDENTITY_ = -> { x }

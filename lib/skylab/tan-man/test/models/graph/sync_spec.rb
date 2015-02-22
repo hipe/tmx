@@ -82,6 +82,19 @@ module Skylab::TanMan::TestSupport::Models::Graph
       expect_succeeded
     end
 
+    it "case 4 - corner case 1 - this. (covers immaculate conception)" do
+
+      out_a = []
+      call_API :graph, :sync,
+        :input_string, "digraph{\n hi->mother\n }",
+        :output_path, out_a
+
+      expect_OK_event :created_association
+      expect_OK_event :wrote_resource
+
+      out_a.join( EMPTY_S_ ).should eql "digraph{\nhi -> mother\n}\n"  # note spacing
+    end
+
     it "case 2 (\"import\") - simple venn case with edges only, no labels" do
 
       i_am_this =

@@ -60,7 +60,7 @@ module Skylab::Headless
 
       # ~ fun etc.
 
-      def to_byte_downstream_adapter
+      def to_byte_downstream_identifier
         Filesystem_::Byte_Downstream_Identifier.new @path, & @on_event_selectively
       end
     end

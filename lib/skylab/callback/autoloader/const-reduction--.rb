@@ -265,6 +265,7 @@ module Skylab::Callback
           prdc_result_when_const_not_defined
         end
       end
+
       def rslv_any_tree
         if @mod.respond_to? :entry_tree
           tree = @mod.entry_tree
@@ -283,6 +284,7 @@ module Skylab::Callback
           prdc_result_when_const_not_defined
         end
       end
+
       def rslv_some_result_by_loading_file_for_normpath file_normpath
         file_normpath.change_state_to :loaded
         @did_require = true
@@ -291,16 +293,21 @@ module Skylab::Callback
         require _path
         rslv_some_result_via_fuzzy_lookup
       end
+
       def rslv_some_result_when_ambiguous a
         idx = a.index @name.as_const
-        idx or self._NEVER_BEEN_TESTED
-        const = a.fetch idx
-        r = @mod.const_get const, false
-        if @do_result_in_n_and_v_for_step
-          r = [ const, r ]
+        if ! idx
+          idx = 0  # MEH
         end
-        r
+        const = a.fetch idx
+        x = @mod.const_get const, false
+        if @do_result_in_n_and_v_for_step
+          [ const, x ]
+        else
+          x
+        end
       end
+
       def rslv_result_when_const_not_defined
         @result = prdc_result_when_const_not_defined
         CEASE_

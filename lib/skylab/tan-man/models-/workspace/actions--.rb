@@ -14,8 +14,6 @@ module Skylab::TanMan
 
       desc "show the status of the config director{y|ies} active at the path"
 
-      def receive_stdout_ _
-      end
     end
 
     class Actions__::Init < Brazen_::Models_::Workspace::Actions::Init
@@ -27,9 +25,6 @@ module Skylab::TanMan
       desc do |y|
         _ = @kernel.silo( :workspace ).model_class.default_config_filename
         y << "create the #{ val _ } directory"
-      end
-
-      def receive_stdout_ _
       end
     end
 

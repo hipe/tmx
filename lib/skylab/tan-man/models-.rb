@@ -127,12 +127,17 @@ module Skylab::TanMan
         @kernel
       end
 
-      def receive_stdout_ x
-        @stdout = x
+      def receive_stdin_ x
+        @stdin_ = x
         nil
       end
 
-      attr_reader :stdout
+      def receive_stdout_ x
+        @stdout_ = x
+        nil
+      end
+
+      attr_reader :stdin_, :stdout_
 
       def to_trio_box_
         bx = Callback_::Box.new

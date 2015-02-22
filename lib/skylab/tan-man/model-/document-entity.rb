@@ -78,15 +78,25 @@ module Skylab::TanMan
         end
 
         def receive_byte__input__identifier_ id
-
-          @_DEBUID = maybe_convert_to_stdin_stream_ id
-          ACHIEVED_
+          if id
+            @_DEBUID = maybe_convert_to_stdin_stream_ id
+            @_DEBUID && ACHIEVED_
+          else
+            @_DEBUID = id
+            ACHIEVED_
+          end
         end
 
         def maybe_convert_to_stdin_stream_ id
 
           if id && :path == id.shape_symbol && DASH_ == id.path
-            self._SUPPORT_FOR_STDIN_NEEDS_TO_be_implemented_which_should_be_easy
+            sin = stdin_
+            if sin.tty?
+              maybe_send_event :error, :stdin_should_probably_not_be_interactive
+              UNABLE_
+            else
+              Brazen_.data_store::Byte_Upstream_Identifier.via_stream sin
+            end
           else
             id
           end
@@ -101,7 +111,7 @@ module Skylab::TanMan
         def __maybe_convert_to_stdout_stream id
 
           if id && :path == id.shape_symbol && DASH_ == id.path
-            Brazen.data_store::Byte_Upstream_Identifier.via_stream stdout
+            Brazen_.data_store::Byte_Downstream_Identifier.via_stream stdout_
           else
             id
           end
@@ -412,25 +422,39 @@ module Skylab::TanMan
 
         def __normalize_bucket_list sort_me, direction_sym
 
-          # for this particular direction the number of actuals whose formal
-          # is "essential" must match either the arity `0..1` or `1`
-          # depending on etc
+          # here is the center of this fun complication: specifics trump
+          # non-specific essentials. any in the first category means we
+          # don't count the second category at all. but within the category
+          # that is relevant, you must have exactly one (or zero) winner.
 
-          essential, non_essential = sort_me.partition do | arg |
-            arg.property.is_essential_to_direction
+          specifics = nil
+          non_specific_essentials = nil
+          others = nil
+
+          sort_me.each do | arg |
+            prp = arg.property
+            if 1 == prp.direction_symbols.length
+              ( specifics ||= [] ).push arg
+            elsif prp.is_essential_to_direction
+              ( non_specific_essentials ||= [] ).push arg
+            else
+              ( others ||= [] ).push arg
+            end
           end
 
-          case 1 <=> essential.length
+          count_this = specifics || non_specific_essentials || EMPTY_A_
+
+          case 1 <=> count_this.length
 
           when 0  # exactly one - success
 
-            sort_me.replace [ * essential, * non_essential ]
+            sort_me.replace [ * count_this, * others ]
             ACHIEVED_
 
           when 1  # zero
 
             if @oneness_h && @oneness_h[ direction_sym ]  # missing required meta-property
-              when_count_is_not_one direction_sym, essential
+              when_count_is_not_one direction_sym
 
             else
 
@@ -441,7 +465,7 @@ module Skylab::TanMan
 
           when -1  # more than one - ambiguous
 
-            when_count_is_not_one direction_sym, essential
+            when_count_is_not_one direction_sym, count_this
 
           end
         end

@@ -9,6 +9,9 @@ module Skylab::Tolerance
       "\e[#{ a.map( & map.method( :[] ) ).compact * ';' }m#{ s }\e[0m"  # [#hl-029]
     end
   end.call
+
+  My_TiteColor = ::Module.new  # wtf ever - yours days are numbered friend
+
   module Styles
     include My_TiteColor
     o = Stylize_.curry

@@ -17,6 +17,8 @@ module Skylab::TanMan
 
           :preconditions, EMPTY_A_,
 
+          :inflect, :verb, 'sync', :noun, 'graph',
+
           :flag, :property, :dry_run,
 
           :reuse, TanMan_::Model_::Document_Entity.IO_properties,
@@ -40,15 +42,26 @@ module Skylab::TanMan
 
           o.set_custom_direction_mapping :hereput, :input
 
+          # some front clients will always throw in a workspace path
+          # (guess) to default in for a missing input or output path, and
+          # then when the workspace is not found an error happens. in our
+          # case, if a "hereput" is provided, we *never* want to employ the
+          # above mechanics, because it gets in the way of what we do below.
+
+          h = @argument_box.h_
+          if h[ :hereput_path ] || h[ :hereput_string ] and h[ :workspace_path ]
+            @argument_box.remove :workspace_path
+          end
+
           ok, inp, herep, outp = o.solve_at :input, :hereput, :output
 
+          ok &&= receive_byte__input__identifier_ inp
+
+          ok and @byte_herestream_ID = maybe_convert_to_stdin_stream_( herep )
+
+          ok &&= receive_byte__output__identifier_ outp
+
           ok and begin
-
-            receive_byte__input__identifier_ inp
-
-            @byte_herestream_ID = maybe_convert_to_stdin_stream_ herep
-
-            receive_byte__output__identifier_ outp
 
             @resolver = o
 

@@ -1,5 +1,12 @@
 # created by tan-man on 2013-02-07 02:15:19 UTC
 
+/* this file was (re) created with:
+
+  ./slicer/script/sidesystem-dependencies | tan-man graph sync --input-path - ./slicer/doc/sidesystem-dependencies/01-use-this-one.dot
+
+*/
+
+
 digraph {
 
 /*
@@ -15,17 +22,120 @@ digraph {
 #                 blue : fillcolor="#b5d5fb"
 #                green : fillcolor="#79f233"
 
-node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
+# node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
 
-label="Core Dependencies (hand written (for now ..))"
-
-
-headless [label=headless]
-meta [label="meta-hell"]
-pub [label="[cb] digraph"]
-semantic [label=semantic]
-headless -> meta
-pub -> meta
-pub -> semantic
-semantic -> meta
+ba [label=Basic]
+bs [label=BeautySalon]
+b2 [label=Bnf2Treetop]
+br [label=Brazen]
+cs [label=CSS_Convert]
+ca [label=Callback]
+cm [label=CodeMolester]
+cu [label=Cull]
+de [label=Dependency]
+fa [label=Face]
+fm [label=FileMetrics]
+f2 [label=Flex2Treetop]
+gi [label=Git]
+gv [label=GitViz]
+he [label=Headless]
+it [label=InformationTactics]
+mh [label=MetaHell]
+pe [label=Permute]
+po [label=Porcelain]
+sla [label=Slake]
+sli [label=Slicer]
+sn [label=Snag]
+st [label=SubTree]
+tmx [label=TMX]
+tan [label=TanMan]
+ts [label=TestSupport]
+to [label=Tolerance]
+tr [label=Treemap]
+y2 [label=Yacc2Treetop]
+ba -> br
+ba -> he
+ba -> mh
+br -> ba
+br -> he
+br -> sn
+bs -> ba
+bs -> br
+bs -> fa
+bs -> he
+bs -> mh
+bs -> st
+ca -> ba
+ca -> br
+ca -> he
+ca -> it
+ca -> mh
+cm -> ba
+cm -> br
+cm -> fa
+cm -> he
+cm -> mh
+cs -> he
+cs -> tan
+cu -> ba
+cu -> he
+de -> cm
+de -> fa
+de -> he
+de -> mh
+de -> sla
+f2 -> ba
+f2 -> br
+f2 -> he
+f2 -> mh
+fa -> ba
+fa -> he
+fa -> mh
+fm -> ba
+fm -> fa
+fm -> he
+fm -> mh
+gi -> ba
+gi -> fa
+gi -> he
+gi -> mh
+gv -> he
+gv -> st
+he -> ba
+he -> br
+he -> mh
+mh -> ba
+mh -> br
+mh -> he
+mh -> it
+pe -> he
+po -> ba
+po -> he
+sla -> mh
+sli -> fa
+sn -> ba
+sn -> br
+sn -> he
+sn -> mh
+sn -> po
+sn -> st
+st -> ba
+st -> br
+st -> fa
+st -> he
+st -> it
+st -> mh
+st -> po
+st -> ts
+tan -> ba
+tan -> he
+tan -> mh
+tan -> sn
+ts -> ba
+ts -> br
+ts -> fa
+ts -> he
+ts -> it
+ts -> mh
+ts -> sn
 }

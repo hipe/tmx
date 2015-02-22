@@ -56,11 +56,21 @@ module Skylab::TanMan
         # life is easier if we hack an empty statement list into existence.
         # these do not occur in nature. we need one because touch.
 
-        sx = @document.graph_sexp.class.parse :stmt_list, 'a->b'  # the NT classes are not guaranteed to be generated yet
-        sx.stmt = nil  # then throw the above away. we just want the empty NT parse tree, which does not occur naturaly
+        _prs = @document.graph_sexp.class
+        proto = _prs.parse :stmt_list, "a->b\nc->d\n"  # that last one..
+          # the NT classes are not guaranteed to be generated yet
+
+        sx = proto.dup
+        sx.stmt = nil
+        sx.tail = nil
+          # we just want the empty NT parse tree, which does not occur naturaly
+
+        sx.prototype_ = proto
+
         @document.graph_sexp.stmt_list = sx
         @stmt_list = sx
-        @st = @stmt_list.to_stream
+        @st = sx.to_node_stream_
+
         ACHIEVED_
       end
 

@@ -1,0 +1,205 @@
+#!/usr/bin/env ruby -w
+
+require_relative '../core'
+
+module Skylab::Slicer
+
+  class SS_Dep__
+
+    def initialize _, o, e, a
+
+      @stdout = o
+      @stderr = e
+      @argv = a
+
+      @a = []
+      @h = {}
+    end
+
+    def execute
+      if @argv.length.zero?
+        __go
+      else
+        @stderr.puts "usage: #{ ::File.basename $PROGRAM_NAME }"
+        nil
+      end
+    end
+
+    def __go
+
+      @stdout.puts "digraph {"
+
+      ::Dir[ "#{ ::Skylab.dir_pathname.to_path }/*/core.rb" ].each do | path |
+
+        ss = __begin_sidesystem_via_path path
+
+        if ! ss.mod
+          next
+        end
+
+        ss.find_library
+
+        __add_sidesystem ss
+
+      end
+
+      __determine_and_distribute_medallions
+      __walk_each_sidesystem
+      @stdout.puts "}"
+
+      nil
+    end
+
+    def __begin_sidesystem_via_path path
+
+      ss = Sidesystem___.new
+      ss.norm = ::File.dirname path
+      ss.stem = ::File.basename ss.norm
+      ss.receive_any_module( Autoloader_.const_reduce( [ ss.stem ], ::Skylab ) do end )  # any h
+      ss
+    end
+
+    class Sidesystem___
+
+      attr_accessor :mod, :const, :deps, :medo, :norm, :stem
+
+      attr_reader :lib_path
+
+      def receive_any_module mod
+        @mod = mod
+        if @mod
+          s = @mod.name
+          d = s.rindex COLON__
+          @const = s[ d + 1 .. -1 ].intern
+        end
+        nil
+      end
+
+      COLON__ = ':'
+
+      def find_library
+        @lib_path = nil
+        if @mod.respond_to? :lib_
+          @mod.lib_
+
+          lib_path = "#{ @norm }/lib-#{ Autoloader_::EXTNAME }"
+
+          if ::File.exist? lib_path
+            @lib_path = lib_path
+          else
+            lib_path = "#{ @norm }/library-#{ Autoloader_::EXTNAME }"
+            if ::File.exist? lib_path
+              @lib_path = lib_path
+            else
+              @lib_path = "#{ @norm }/core#{ Autoloader_::EXTNAME }"
+            end
+          end
+        end
+        @lib_path && true
+      end
+    end
+
+    def __add_sidesystem ss
+
+      @h[ ss.const ] = ss
+      @a.push ss
+      nil
+    end
+
+    def __determine_and_distribute_medallions
+
+      rx = /\A([A-Z])(?:[a-z_]*)([A-Z0-9])/
+
+      first_try = -> const_s do
+        md = rx.match const_s
+        if md
+          "#{ md[ 1 ] }#{ md[ 2 ] }".downcase
+        else
+          const_s[ 0, 2 ].downcase
+        end
+      end
+
+      h = ::Hash.new { |h_, k| h_[ k ] = [] }
+
+      @a.each do | ss |
+        _medo = first_try[ ss.const.id2name ]
+        h[ _medo ].push ss
+      end
+
+      resolve_conflict = -> ss_a do
+        d = 3
+        ss_a.each do |ss|
+          ss.medo = ss.const.id2name[ 0, d ].downcase
+          _output_for_label ss
+        end
+        nil
+      end
+
+      h.each_pair do | medo, ss_a |
+        if 1 == ss_a.length
+          ss = ss_a.first
+          ss.medo = medo
+          _output_for_label ss
+        else
+          resolve_conflict[ ss_a ]
+        end
+      end
+
+      nil
+    end
+
+    def _output_for_label ss
+      @stdout.puts "  #{ ss.medo } [ label=\"#{ ss.const }\" ]"
+      nil
+    end
+
+    def __walk_each_sidesystem
+      @a.each do | ss |
+        __do_sidesystem ss
+      end ; nil
+    end
+
+    def __do_sidesystem ss
+      if ss.lib_path
+        __do_library_file ss
+      end
+      nil
+    end
+
+    def __do_library_file ss
+
+      sym_a = []
+      ::File.open ss.lib_path, ::File::RDONLY do | fh |
+        begin
+          line = fh.gets
+          line or break
+          md = RX__.match line
+          md and sym_a.push md[ 1 ].intern
+          redo
+        end while nil
+      end
+
+      if sym_a.length.zero?
+        fail "wtf: #{ ss.lib_path }"
+      else
+        ss.deps = sym_a
+        __go_deps ss
+      end
+      nil
+    end
+
+    RX__ = / = sidesys\[ :([A-Za-z0-9_]+) \]/
+
+    def __go_deps ss
+
+      lhs = "  #{ ss.medo } -> "
+
+      ss.deps.each do | sym |
+        @stdout.puts "#{ lhs }#{ @h.fetch( sym ).medo }"
+      end
+      nil
+    end
+  end
+end
+
+Skylab::Slicer::SS_Dep__.new( nil, $stdout, $stderr, ::ARGV ).execute
