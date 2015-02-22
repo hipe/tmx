@@ -2,25 +2,13 @@ module Skylab::Basic
 
   module String
 
-    class Byte_Downstream_Identifier
+    class Byte_Downstream_Identifier < String::Byte_Upstream_Identifier::Superclass
 
       #  near :+[#br-019]: unified interface for writing bytes to a string
 
-      def initialize s
-        @s = s
-      end
-
       # ~ reflection
 
-      def description_under expag
-        s = String_.ellipsify( @s ).inspect
-        expag.calculate do
-          val s
-        end
-      end
-
-      def shape_symbol
-        :string
+      def EN_preposition_lexeme
       end
 
       # ~ data acceptance exposures

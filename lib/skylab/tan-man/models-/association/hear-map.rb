@@ -176,7 +176,7 @@ module Skylab::TanMan
             is_dry = arg.value_x
           end
 
-          @dc.persist_into_byte_downstream id,
+          @dc.persist_into_byte_downstream_identifier id,
             :is_dry, is_dry,
             & @on_event_selectively
         end

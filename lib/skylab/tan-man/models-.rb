@@ -40,14 +40,14 @@ module Skylab::TanMan
     end
 
     def stub
-      Action_Stub___.new @_mc
+      Common_Action_Stub___.new @_mc
     end
   end
 
-  class Action_Stub___ < ::Module
+  class Action_Stub_ < ::Module
 
-    def initialize mc
-      @model_class = mc
+    def initialize & real_action_class_p
+      @real_action_class_p = real_action_class_p
     end
 
     def name_function
@@ -67,7 +67,22 @@ module Skylab::TanMan
     attr_accessor :is_promoted
 
     def new boundish, & oes_p
-      @model_class::Actions__.const_get( @nf.as_const ).new boundish, & oes_p
+      produce_real_action_class_.new boundish, & oes_p
+    end
+
+    def produce_real_action_class_
+      @real_action_class_p.call
+    end
+  end
+
+  class Common_Action_Stub___ < Action_Stub_
+
+    def initialize mc
+      @model_class = mc
+    end
+
+    def produce_real_action_class_
+      @model_class::Actions__.const_get @nf.as_const
     end
   end
 

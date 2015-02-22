@@ -78,7 +78,8 @@
 [#029]       #done no more api knob (api.invoke -> `api_invoke`)
 [#028]       #bad-ticket any and all changes to CLI core client
 [#027]       overhaul to cli actions base class
-[#026]       #done API::InvocationMethods away!
+[#026]       #doc-node: the syncing narrative ..
+             ( #was: #done API::InvocationMethods away! )
 [#025] #open ancient legacy [ttt] mess-lette
              ( #was: API::RuntimeExtensions away! #done )
 [#024]       [ model ] and #doc-node: the model experiments narrative ..

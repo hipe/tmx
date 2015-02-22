@@ -116,7 +116,7 @@ module Skylab::TanMan::TestSupport
 
     SPACE_ = TanMan_::SPACE_
 
-    UNDERSCORE_ = '_'.freeze
+    UNDERSCORE_ = TanMan_::UNDERSCORE_
 
   end
 
@@ -454,6 +454,17 @@ module Skylab::TanMan::TestSupport
     Callback_::Autoloader[ self ]
 
     module Dirs
+      Callback_::Autoloader[ self ]
+    end
+
+    module Graphs
+      class << self
+        def [] sym
+          dir_pathname.join(
+            "#{ sym.id2name.gsub( TanMan_::UNDERSCORE_, TanMan_::DASH_ ) }.dot"
+          ).to_path
+        end
+      end
       Callback_::Autoloader[ self ]
     end
   end

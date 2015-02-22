@@ -52,9 +52,16 @@ module Skylab::TanMan
             :is_dry, @is_dry,
             :is_completion, true do  | y, o |
 
-          _s = o.byte_downstream_identifier.description_under self
+          id = o.byte_downstream_identifier
 
-          y << "wrote #{ _s } #{
+          _s = id.description_under self
+
+          s = id.EN_preposition_lexeme
+          if s
+            _to = " #{ s }"
+          end
+
+          y << "wrote#{ _to  } #{ _s } #{
 
             }(#{ o.bytes }#{ ' dry' if o.is_dry } bytes)"
 

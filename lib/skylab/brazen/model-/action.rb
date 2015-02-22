@@ -113,7 +113,12 @@ module Skylab::Brazen
 
       accept_selective_listener_via_channel_proc( -> i_a, & ev_p do  # #note-100
         oes_p.call( * i_a ) do
-          Brazen_.event.wrap.signature name, ev_p[]
+          _ev = if ev_p
+            ev_p[]
+          else
+            Callback_::Event.inline_via_normal_extended_mutable_channel i_a
+          end
+          Callback_::Event.wrap.signature name, _ev
         end
       end )
     end
@@ -398,8 +403,8 @@ module Skylab::Brazen
         @argument_box[ sym ], true, formal_properties.fetch( sym ) )
     end
 
-    Trio__ = Callback_.memoize do
-      LIB_.basic.trio
+    Trio__ = -> do
+      Callback_::Trio
     end
 
     def argument_value sym

@@ -554,6 +554,10 @@ module Skylab::Brazen
       end
 
       def edit_with * x_a  # e.g by hand
+        edit_via_iambic x_a
+      end
+
+      def edit_via_iambic x_a
         bx = @tree.delta_box_
         fo = @formals
         st = Callback_::Iambic_Stream.via_array x_a
@@ -981,6 +985,13 @@ module Skylab::Brazen
 
       def box
         @box[]
+      end
+
+      def entity_property_class
+        if ! @did_flush
+          @flush[]
+        end
+        self::Entity_Property
       end
 
       def set_properties_proc & p  # if you are making a derivative collection

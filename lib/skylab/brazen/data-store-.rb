@@ -40,16 +40,20 @@ module Skylab::Brazen
 
       class << self
 
+        def via_path s
+          Brazen_.lib_.system.filesystem.class::Byte_Upstream_Identifier.new s
+        end
+
         def via_stream io
           Brazen_.lib_.IO::Byte_Upstream_Identifier.new io
         end
 
-        def via_string s
-          Brazen_.lib_.basic::String::Byte_Upstream_Identifier.new s
+        def via_line_array s_a
+          Brazen_.lib_.basic::List::Byte_Upstream_Identifier.new s_a
         end
 
-        def via_path s
-          Brazen_.lib_.system.filesystem.class::Byte_Upstream_Identifier.new s
+        def via_string s
+          Brazen_.lib_.basic::String::Byte_Upstream_Identifier.new s
         end
 
         def via_trios trio_a, & oes_p
@@ -70,16 +74,20 @@ module Skylab::Brazen
           LIB_.IO.dry_stub.the_dry_byte_downstream_identifier
         end
 
+        def via_path s
+          Brazen_.lib_.system.filesystem.class::Byte_Downstream_Identifier.new s
+        end
+
         def via_stream io
           Brazen_.lib_.IO::Byte_Downstream_Identifier.new io
         end
 
-        def via_string s
-          Brazen_.lib_.basic::String::Byte_Downstream_Identifier.new s
+        def via_line_array s_a
+          Brazen_.lib_.basic::List::Byte_Downstream_Identifier.new s_a
         end
 
-        def via_path s
-          Brazen_.lib_.system.filesystem.class::Byte_Downstream_Identifier.new s
+        def via_string s
+          Brazen_.lib_.basic::String::Byte_Downstream_Identifier.new s
         end
 
         def via_trios trio_a, & oes_p
@@ -113,18 +121,19 @@ module Skylab::Brazen
       def path
 
         # :+[#021] shape magic: it is convenient for lazy smart clients
-        # to be able to pass stream-like mixed values in for a path
+        # to be able to pass stream-like mixed values in for a path.
 
         if @x.respond_to? :ascii_only?
           Brazen_.bound_call @x, nil, :via_path
+        elsif @x.respond_to? :each_with_index
+          Brazen_.bound_call [ @x ], nil, :via_line_array
         else
           stream
         end
       end
 
       def stream
-        Brazen_.bound_call [ @x ], nil, :via_stream
-          # argument value might be an array impersonating a stream
+        Brazen_.bound_call @x, nil, :via_stream
       end
 
       def string

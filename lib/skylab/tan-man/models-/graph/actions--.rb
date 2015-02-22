@@ -8,6 +8,8 @@ module Skylab::TanMan
 
       :required, :property, :digraph_path )
 
+    DocEnt_ = TanMan_::Model_::Document_Entity
+
     Actions__ = make_action_making_actions_module
 
     module Actions__
@@ -34,6 +36,10 @@ module Skylab::TanMan
             ::Time.now.utc.to_s
           end
         end
+      end
+
+      Sync = Action_Stub_.new do
+        Graph_::Sync_::Action
       end
     end
 

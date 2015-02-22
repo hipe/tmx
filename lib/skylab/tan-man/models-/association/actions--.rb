@@ -8,13 +8,17 @@ module Skylab::TanMan
 
       :preconditions, [ :dot_file, :node ],
 
-      :required,
       :property,
       :from_node_label,
 
-      :required,
       :property,
-      :to_node_label )
+      :from_node_ID,
+
+      :property,
+      :to_node_label,
+
+      :property,
+      :to_node_ID )
 
     Actions__ = make_action_making_actions_module
 
@@ -63,18 +67,49 @@ module Skylab::TanMan
         entity_formal_property_method_names_box_for_write.
           remove Brazen_::NAME_  # ouch/meh
 
-       def produce_result
-         entity_collection.receive_delete_entity(
-           self, nil, & handle_event_selectively )
-       end
+        def produce_result
+          entity_collection.receive_delete_entity(
+            self, nil, & handle_event_selectively )
+        end
       end
     end
+
+    def normalize
+      _ok = super
+      _ok and __custom_normalize
+    end
+
+    def __custom_normalize
+
+      # our true normalization at this level is imperative not declarative
+      # (although it could be made to be so) however if it fails we act as
+      # if it's simply labels that are required b.c ID's are corroborative
+
+      h = @property_box.h_
+      @has_both_labels_ = h[ :from_node_label ] && h[ :to_node_label ] && true
+      @has_both_IDs_ = h[ :from_node_ID ] && h[ :to_node_ID ] && true
+
+      if @has_both_labels_ || @has_both_IDs_
+        ACHIEVED_
+      else
+        _miss_prp_a = [ :from_node_label, :to_node_label ].reduce [] do | m, i |
+          if ! h[ i ]
+            m.push formal_properties.fetch i
+          end
+          m
+        end
+        receive_missing_required_props _miss_prp_a
+        UNABLE_
+      end
+    end
+
+    attr_reader :has_both_labels_, :has_both_IDs_
 
     class Silo_Daemon < Silo_Daemon
 
       def association_collection_controller_via_preconditions bx, & oes_p
 
-        # :+#actionless-collection-controler-experiment
+        # :+#actionless-collection-controller-experiment
 
         precondition_for_self :_no_action_2_,
           @model_class.node_identifier,
@@ -93,10 +128,8 @@ module Skylab::TanMan
 
         oes_p ||= @on_event_selectively
 
-        asc = Association_.edit_entity @kernel, oes_p do | o |
-          o.edit_with :from_node_label, src_lbl_s,
-            :to_node_label, dst_lbl_s
-        end
+        asc = _begin_association :from_node_label, src_lbl_s,
+          :to_node_label, dst_lbl_s, & oes_p
 
         asc and begin
 
@@ -108,6 +141,27 @@ module Skylab::TanMan
           info = _info_via_into_datastore_marshal_entity(
             nil, nil, asc, & oes_p )
           info and asc
+        end
+      end
+
+      def touch_association_via_IDs src_id_sym, dst_id_sym, & oes_p
+
+        asc = _begin_association :from_node_ID, src_id_sym,
+          :to_node_ID, dst_id_sym
+
+        asc and begin
+
+          info = _info_via_into_datastore_marshal_entity(
+            nil, nil, asc, & oes_p )
+
+          info and asc
+        end
+      end
+
+      def _begin_association * x_a, & oes_p
+
+        Association_.edit_entity @kernel, ( oes_p || @on_event_selectively ) do | o |
+          o.edit_via_iambic x_a
         end
       end
 
@@ -160,6 +214,8 @@ module Skylab::TanMan
 
       def _info_via_into_datastore_marshal_entity any_attrs_x, any_proto_sym, entity, & oes_p
 
+        oes_p ||= @on_event_selectively
+
         did_mutate = nil
 
         _oes_p_ = -> * i_a, & ev_p do
@@ -172,15 +228,24 @@ module Skylab::TanMan
           end
         end
 
-        _ok = Association_::Actors__::Mutate.with(
+        x_a = [
           :verb, :touch,
           :attrs, any_attrs_x,
           :prototype_i, any_proto_sym,
-          :from_node_label, entity.property_value_via_symbol( :from_node_label ),
-          :to_node_label, entity.property_value_via_symbol( :to_node_label ),
           :document, document_,
-          :kernel, @kernel, & _oes_p_ )
+          :kernel, @kernel ]
 
+        h = entity.properties.h_
+
+        if entity.has_both_labels_
+          x_a.push :from_node_label, h.fetch( :from_node_label ),
+                   :to_node_label, h.fetch( :to_node_label )
+        else
+          x_a.push :from_node_ID, h.fetch( :from_node_ID ),
+                   :to_node_ID, h.fetch( :to_node_ID )
+        end
+
+        _ok = Association_::Actors__::Mutate.call_via_iambic x_a, & _oes_p_
         _ok and Info___[ did_mutate ]
       end
 

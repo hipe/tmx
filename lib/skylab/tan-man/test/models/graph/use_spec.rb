@@ -240,7 +240,7 @@ module Skylab::TanMan::TestSupport::Models::Graph
               datastore_resource_committed_changes: [ true,
                 %r(\Aupdated config \(\d{2} bytes\)) ] )
 
-            io = dg_pn.sub_ext( '.dot' ).open( READ_MODE_ )
+            io = dg_pn.sub_ext( '.dot' ).open( ::File::RDONLY )
             o = TestSupport_::Expect_Line::Scanner.via_line_stream io
 
             o.next_line.should eql "# created by tan-man on XYZ\n"

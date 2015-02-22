@@ -8,6 +8,8 @@ module Skylab::TanMan
 
       :preconditions, [ :dot_file ],
 
+      :property, :id,
+
       :required,
       :ad_hoc_normalizer, -> arg, & oes_p do
         Node_::Controller__::Normalize_name[ self, arg, & oes_p ]
@@ -65,7 +67,7 @@ module Skylab::TanMan
 
       def node_collection_controller_via_document_controller dc, & oes_p
 
-        # :+#actionless-collection-controler-experiment
+        # :+#actionless-collection-controller-experiment
 
         bx = Callback_::Box.new
         bx.add :dot_file, dc
@@ -171,14 +173,27 @@ module Skylab::TanMan
         document_.at_graph_sexp i
       end
 
-      def touch_node_via_label s
+      def add_node_via_id_and_label id_s, label_s
 
-        node = Node_.edit_entity @kernel, @on_event_selectively do |o|
-          o.edit_with :name, s
-        end
+        node = _begin_node :name, label_s, :id, id_s
 
         node and begin
           produce_relevant_sexp_via_touch_entity node
+        end
+      end
+
+      def touch_node_via_label s
+
+        node = _begin_node :name, s
+
+        node and begin
+          produce_relevant_sexp_via_touch_entity node
+        end
+      end
+
+      def _begin_node * x_a, & oes_p
+        Node_.edit_entity @kernel, ( oes_p || @on_event_selectively ) do | o |
+          o.edit_via_iambic x_a
         end
       end
 
@@ -218,7 +233,7 @@ module Skylab::TanMan
 
       def _commit_changes action
 
-        document_.persist_into_byte_downstream(
+        document_.persist_into_byte_downstream_identifier(
           action.document_entity_byte_downstream_identifier,
           :is_dry, action.argument_box[ :dry_run ],
           & action.handle_event_selectively )

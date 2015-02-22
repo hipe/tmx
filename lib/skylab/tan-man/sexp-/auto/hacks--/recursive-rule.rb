@@ -890,8 +890,6 @@ module Skylab::TanMan
 
       attr_reader :items_count
     end
-
-    UNDERSCORE_ = '_'.freeze
   end
   end
 end

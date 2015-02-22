@@ -14,8 +14,17 @@ module Skylab::TanMan
             :document,
             :kernel
 
-          def resolve_name_string
+          def init_name_string_
             @name_s = @name ; @name = nil ; nil
+          end
+
+          def init_ivars
+            @node_ID_is_provided = false
+            super
+          end
+
+          def resolve_new_node_id_
+            resolve_new_node_id_programmatically
           end
         end
 
@@ -27,8 +36,31 @@ module Skylab::TanMan
             :document,
             :kernel
 
-          def resolve_name_string
+          def init_name_string_
             @name_s = @entity.property_value_via_symbol :name ; nil
+          end
+
+          def init_ivars
+
+            provided_ID = @entity.properties[ :id ]
+            if provided_ID
+              @provided_ID = provided_ID
+              @provided_ID_sym = provided_ID.intern
+              @node_ID_is_provided = true
+            else
+              @node_ID_is_provided = false
+            end
+            super
+          end
+
+          def resolve_new_node_id_
+
+            if @node_ID_is_provided
+              @new_node_ID_sym = @provided_ID.intern
+              ACHIEVED_
+            else
+              resolve_new_node_id_programmatically
+            end
           end
         end
 
@@ -41,34 +73,34 @@ module Skylab::TanMan
       private
 
         def init_ivars
-          resolve_name_string
           @graph_sexp = @document.graph_sexp
+          init_name_string_
           @stmt_list = @graph_sexp.stmt_list
-          send :"init_ivars_for_#{ @verb }"
+          send :"init_ivars_for__#{ @verb }__"
         end
 
-        def init_ivars_for_create
+        def init_ivars_for__create__
           @can_create = true
           @do_fuzzy = false
-          @inner_verb = :tuch
+          @internal_verb = :touch
         end
 
-        def init_ivars_for_touch
+        def init_ivars_for__touch__
           @can_create = true
           @do_fuzzy = false
-          @inner_verb = :tuch
+          @internal_verb = :touch
         end
 
-        def init_ivars_for_retrieve
+        def init_ivars_for__retrieve__
           @can_create = false
           @do_fuzzy = false
-          @inner_verb = @verb
+          @internal_verb = @verb
         end
 
-        def init_ivars_for_delete
+        def init_ivars_for__delete__
           @can_create = false
           @do_fuzzy = false
-          @inner_verb = :del
+          @internal_verb = @verb
         end
 
         def find_neighbors
@@ -84,10 +116,16 @@ module Skylab::TanMan
         end
 
         def find_neighbors_when_stmt_list
+
           init_ivars_for_find_neighbors
-          while @scan and node = @scan.gets
+
+          begin
+            @still_looking or break
+            node = @node_stream.gets
+            node or break
             process_node_for_neighbors node
-          end ; nil
+            redo
+          end while nil
         end
 
         def init_ivars_for_find_neighbors
@@ -99,12 +137,29 @@ module Skylab::TanMan
           @fuzzy_matches_found = nil
           @has_neighbors = true
           @num_nodes_seen = 0
-          @scan = @stmt_list.to_node_stream_
+          @node_stream = @stmt_list.to_node_stream_
+          @still_looking = @node_stream && true
           @still_looking_for_lexically_greater = @can_create  # || @can_create.nil?
           init_matchers
         end
 
         def init_matchers
+
+          if @node_ID_is_provided
+            __init_matcher_using_node_IDs
+          else
+            __init_matcher_using_labels
+          end
+        end
+
+        def __init_matcher_using_node_IDs
+          sym = @provided_ID_sym
+          @match_p = -> stmt do
+            sym == stmt.node_id
+          end ; nil
+        end
+
+        def __init_matcher_using_labels
           s = @name_s
           @exact_match_p = -> stmt do
             s == stmt.label_or_node_id_normalized_string
@@ -145,7 +200,8 @@ module Skylab::TanMan
             when_fuzzy_and_match stmt
           else
             @exact_match_found = stmt
-            @scan = nil
+            @still_looking = false
+            @node_stream = nil
           end
         end
 
@@ -153,7 +209,8 @@ module Skylab::TanMan
           _b = @exact_match_p[ stmt ]
           if _b
             @exact_match_found = stmt
-            @scan = nil
+            @still_looking = false
+            @node_stream = nil
           else
             @still_looking_for_lexically_greater = nil
             @catch_the_first_non_node_stmt = nil  # 2 of 3
@@ -177,15 +234,15 @@ module Skylab::TanMan
         end
 
         def via_verb_produce_relevant_sexp
-          send :"produce_relevant_sexp_when_#{ @inner_verb }"
+          send :"produce_relevant_sexp_when__#{ @internal_verb }__"
         end
 
-        def produce_relevant_sexp_when_tuch
-          ok = resolve_relevant_sexp_when_tuch
+        def produce_relevant_sexp_when__touch__
+          ok = resolve_relevant_sexp_when_touch
           ok && @created_existing_or_destroyed_node
         end
 
-        def produce_relevant_sexp_when_retrieve
+        def produce_relevant_sexp_when__retrieve__
           if @do_fuzzy
             self._HOLE
           elsif @exact_match_found
@@ -195,7 +252,7 @@ module Skylab::TanMan
           end
         end
 
-        def produce_relevant_sexp_when_del
+        def produce_relevant_sexp_when__delete__
           if @do_fuzzy
             self._HOLE
           elsif @exact_match_found
@@ -205,7 +262,7 @@ module Skylab::TanMan
           end
         end
 
-        def resolve_relevant_sexp_when_tuch
+        def resolve_relevant_sexp_when_touch
           ok = resolve_new_node_without_id
           ok &&= to_new_node_apply_id
           ok && via_neighbors_and_new_node_insert_if_necessary
@@ -221,11 +278,9 @@ module Skylab::TanMan
         def resolve_new_node_without_id
           proto = produce_prototype_node
           new = proto._create_node_with_label @name_s, & handle_event_selectively
-          if new
+          new and begin
             @created_existing_or_destroyed_node = new
             ACHIEVED_
-          else
-            new
           end
         end
 
@@ -258,13 +313,13 @@ module Skylab::TanMan
         end.call
 
         def to_new_node_apply_id
-          ok = resolve_new_node_id
+          ok = resolve_new_node_id_
           if ok
-            @created_existing_or_destroyed_node.set_node_id @new_node_id
+            @created_existing_or_destroyed_node.set_node_id @new_node_ID_sym
           end
         end
 
-        def resolve_new_node_id
+        def resolve_new_node_id_programmatically
           stem_s = @graph_sexp._label2id_stem @name_s
           stem_i = stem_s.intern
           h = ::Hash[ @graph_sexp.nodes.map do |node|
@@ -274,7 +329,7 @@ module Skylab::TanMan
           while h.key? stem_i
             stem_i = :"#{ stem_s }_#{ d += 1 }"
           end
-          @new_node_id = stem_i ; ACHIEVED_
+          @new_node_ID_sym = stem_i ; ACHIEVED_
         end
 
         def via_neighbors_and_new_node_insert_if_necessary
@@ -298,19 +353,19 @@ module Skylab::TanMan
         def when_matches_exist
           one = @exact_match_found || @fuzzy_matches_found.first  # CAREFUL
           if @can_create
-            send :"when_#{ @inner_verb }_when_one_exists_already", one
+            send :"when__#{ @internal_verb }__when_one_exists_already", one
           elsif @exact_match_found || 1 == @fuzzy_matches_found.length
-            send :"when_#{ @inner_verb }_when_one_exists_already", one
+            send :"when__#{ @internal_verb }__when_one_exists_already", one
           else
             when_ambiguous
           end
         end
 
-        def when_tuch_when_one_exists_already one
+        def when__touch__when_one_exists_already one
 
           @created_existing_or_destroyed_node = one  # OVERWRITE
 
-          is_ok = send :"when_#{ @verb }_and_you_found_one_it_is_OK"
+          is_ok = send :"when__#{ @verb }__and_you_found_one_it_is_OK"
 
           maybe_send_event normal_top_channel_via_OK_value( is_ok ), :found_existing_node do
             Node_::Events__::Found_Existing_Node.
@@ -324,15 +379,15 @@ module Skylab::TanMan
           end
         end
 
-        def when_create_and_you_found_one_it_is_OK
+        def when__create__and_you_found_one_it_is_OK
           false
         end
 
-        def when_touch_and_you_found_one_it_is_OK
+        def when__touch__and_you_found_one_it_is_OK
           true
         end
 
-        def when_destroy_when_one_exists_already one
+        def when__delete__when_one_exists_already one
           self._DO_ME
           # node_controller( one ).destroy @error_p, @success_p
         end

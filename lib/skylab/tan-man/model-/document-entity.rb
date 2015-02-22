@@ -10,6 +10,10 @@ module Skylab::TanMan
           Brazen_.byte_downstream_identifier.via_trios trio_a, & oes_p
         end
 
+        def entity_property_class
+          IO_PROPERTIES__.entity_property_class
+        end
+
         def IO_properties
           IO_PROPERTIES__.array
         end
@@ -45,13 +49,14 @@ module Skylab::TanMan
           # logic play out. then with the result arguments, resolve from them
           # one input and (when applicable) one output means.
 
-          super && __document_entity_normalize
+          super && document_entity_normalize_
         end
 
-        def __document_entity_normalize
+        def document_entity_normalize_
 
-          o = Byte_Stream_Identifier_Resolver.new formal_properties, @kernel,
-            & handle_event_selectively
+          o = Byte_Stream_Identifier_Resolver.new( @kernel, & handle_event_selectively )
+
+          o.formals formal_properties
 
           o.for_model model_class
 
@@ -64,7 +69,7 @@ module Skylab::TanMan
             begin
               pair = st.gets
               pair or break
-              ok = send :"receive_byte__#{ pair.name_symbol }__identifier", pair.value_x
+              ok = send :"receive_byte__#{ pair.name_symbol }__identifier_", pair.value_x
               ok or break
               redo
             end while nil
@@ -72,22 +77,34 @@ module Skylab::TanMan
           end
         end
 
-        def receive_byte__input__identifier id
+        def receive_byte__input__identifier_ id
 
-          if :path == id.shape_symbol && DASH_ == id.path
-            self._SUPPORT_FOR_STDIN_NEEDS_TO_be_implemented_which_should_be_easy
-          end
-          @_DEBUID = id
+          @_DEBUID = maybe_convert_to_stdin_stream_ id
           ACHIEVED_
         end
 
-        def receive_byte__output__identifier id
+        def maybe_convert_to_stdin_stream_ id
 
-          if :path == id.shape_symbol && DASH_ == id.path
-            id = Brazen.data_store::Byte_Upstream_Identifier.via_stream stdout
+          if id && :path == id.shape_symbol && DASH_ == id.path
+            self._SUPPORT_FOR_STDIN_NEEDS_TO_be_implemented_which_should_be_easy
+          else
+            id
           end
-          @_DEBDID = id
+        end
+
+        def receive_byte__output__identifier_ id
+
+          @_DEBDID = __maybe_convert_to_stdout_stream id
           ACHIEVED_
+        end
+
+        def __maybe_convert_to_stdout_stream id
+
+          if id && :path == id.shape_symbol && DASH_ == id.path
+            Brazen.data_store::Byte_Upstream_Identifier.via_stream stdout
+          else
+            id
+          end
         end
       end
 
@@ -203,24 +220,33 @@ module Skylab::TanMan
 
       class Byte_Stream_Identifier_Resolver  # [#021]:#args-partitioning explains it all
 
-        def initialize formals=nil, kr, & oes_p
-          @formals = formals
+        def initialize kr, & oes_p
+          @formals = nil
           @kernel = kr
           @model_cls = nil
           @oneness_h = nil
           @on_event_selectively = oes_p
         end
 
+        def set_custom_direction_mapping i, i_
+          @custom_direction_mappings_h ||= {}
+          @custom_direction_mappings_h[ i ] = i_
+        end
+
         def against_trio_box bx
           @trio_box = bx ; nil
+        end
+
+        def against_argument_box bx
+          @arg_bx = bx ; nil
         end
 
         def for_model x
           @model_cls = x ; nil
         end
 
-        def against_argument_box bx
-          @arg_bx = bx ; nil
+        def formals x
+          @formals = x ; nil
         end
 
         def to_resolution_pair_stream  # assume formals
@@ -275,8 +301,8 @@ module Skylab::TanMan
           ok && id
         end
 
-        def each_resolution_pair
-          self._THIS
+        def solve_at * direction_symbol_a
+          _produce_any_IDs_at direction_symbol_a
         end
 
         def _produce_any_IDs_at direction_sym_a
@@ -309,7 +335,7 @@ module Skylab::TanMan
 
             k = arglist.first.object_id
             _idx = wp_via_leader.fetch k do
-              wp = Waypoint__.new arglist, @model_cls, @kernel, & @on_event_selectively
+              wp = Waypoint__.new arglist, self
               d = wp_o_a.length
               wp_o_a[ d ] = wp
               wp_via_leader[ k ] = d
@@ -356,7 +382,7 @@ module Skylab::TanMan
         def __each_relevant_trio
 
           # if we were given formals we assume we have the arguments as a
-          # box and so we must buil our own trios. if we weren't we don't
+          # box and so we can build our own trios. if we weren't we don't
 
           if @formals
 
@@ -404,7 +430,7 @@ module Skylab::TanMan
           when 1  # zero
 
             if @oneness_h && @oneness_h[ direction_sym ]  # missing required meta-property
-              _non_one direction_sym, essential
+              when_count_is_not_one direction_sym, essential
 
             else
 
@@ -415,12 +441,12 @@ module Skylab::TanMan
 
           when -1  # more than one - ambiguous
 
-            _non_one direction_sym, essential
+            when_count_is_not_one direction_sym, essential
 
           end
         end
 
-        def _non_one sym, essential
+        def when_count_is_not_one sym, essential=EMPTY_A_
           @on_event_selectively.call :error, :non_one_IO do
             __build_non_one_IO_event sym, essential
           end
@@ -459,18 +485,37 @@ module Skylab::TanMan
              }had #{ o.arg_a.length }#{ _xtra }"
           end
         end
+
+        # ~ for waypoint:
+
+        def kr_
+          @kernel
+        end
+
+        def model_cls_
+          @model_cls
+        end
+
+        def oes_p_
+          @on_event_selectively
+        end
+
+        def const_via_direction_ sym
+
+          CONST_VIA_DIRECTION.fetch sym do
+            CONST_VIA_DIRECTION.fetch( @custom_direction_mappings_h.fetch( sym ) )
+          end
+        end
       end
 
       class Waypoint__
 
-        def initialize arglist, model_cls, kr, & oes_p
+        def initialize arglist, parent
           @arglist = arglist
           @arg = @arglist.first
           @direction_symbols = []
-          @kernel = kr
-          @model_cls = model_cls
           @name_symbol = @arg.name_symbol
-          @on_event_selectively = oes_p
+          @parent = parent
         end
 
         def receive_additional_direction sym
@@ -490,11 +535,12 @@ module Skylab::TanMan
 
         def __solve_for_normal
 
-          _ = CONST_VIA_DIRECTION.fetch(
-            @arg.property.direction_specific_symbol )
+          id = Brazen_.data_store.const_get(
 
-          id = Brazen_.data_store.const_get( _ ).via_trios(
-            @arglist, & @on_event_selectively )
+            @parent.const_via_direction_ @arg.property.direction_specific_symbol
+
+          ).via_trios(
+            @arglist, & @parent.oes_p_ )
 
           id and begin
             @id_a = [ id ]
@@ -504,16 +550,19 @@ module Skylab::TanMan
 
         def __solve_for_workspace  # (limit w.s logic to this method only)
 
-          ws = @kernel.silo( :workspace ).workspace_via_trio_box(
+          kr = @parent.kr_
+          oes_p = @parent.oes_p_
+
+          ws = kr.silo( :workspace ).workspace_via_trio_box(
             Callback_::Stream.via_nonsparse_array( @arglist ).
               flush_to_box_keyed_to_method( :name_symbol ),
-            & @on_event_selectively )
+              & oes_p )
 
           ws and begin
-            @id_a = @kernel.silo(
-              @model_cls.document_in_workspace_identifier_symbol ).
+            @id_a = kr.silo(
+              @parent.model_cls_.document_in_workspace_identifier_symbol ).
                 produce_byte_stream_identifiers_at_in(
-                  @direction_symbols, ws, & @on_event_selectively )
+                  @direction_symbols, ws, & oes_p )
 
             @id_a && ACHIEVED_
           end
@@ -579,7 +628,7 @@ module Skylab::TanMan
 
         def flush_changed_document_to_output_adapter_per_action action
 
-          @df.persist_into_byte_downstream(
+          @df.persist_into_byte_downstream_identifier(
 
             action.document_entity_byte_downstream_identifier,
 

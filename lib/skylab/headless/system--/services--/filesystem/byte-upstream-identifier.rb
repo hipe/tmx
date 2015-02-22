@@ -24,13 +24,19 @@ module Skylab::Headless
         [ :description_under,  :to_path, :to_pathname, :to_simple_line_stream ]
       end
 
+      def is_same_waypoint_as x
+        :path == x.shape_symbol && @path == x.path  # can fail because etc.
+      end
+
       def description_under expr
         Headless_.lib_.basic::Pathname.description_under_of_path expr, @path
       end
 
       def shape_symbol
-        :file
+        :path
       end
+
+      attr_reader :path
 
       # ~~ off-grid reflection
 

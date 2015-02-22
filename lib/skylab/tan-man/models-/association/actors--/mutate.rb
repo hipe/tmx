@@ -9,15 +9,28 @@ module Skylab::TanMan
        :attrs,
        :prototype_i,
        :from_node_label, :to_node_label,
+       :from_node_ID, :to_node_ID,
        :document,
        :kernel
 
+      def initialize
+        @from_node_label = nil  # used as a canary
+        super
+      end
+
       def execute
+
         @parser = @document.graph_sexp.class
+
         ok = rslv_stmt_list_and_stream
-        ok &&= find_nodes
+
+        if ok && @from_node_label
+          ok = find_nodes
+        end
+
         ok &&= find_neighbor_associations
         ok && work
+
         @result
       end
 
@@ -99,8 +112,12 @@ module Skylab::TanMan
         @greatest_lesser_edge_stmt = nil
         @matched_stmt = nil
         ok = ACHIEVED_
-        snid_s = @from_node.node_id.id2name
-        tnid_s = @to_node.node_id.id2name
+
+        __init_node_ID_symbols_and_strings
+
+        snid_s = @source_node_ID_s
+        tnid_s = @target_node_ID_s
+
 
         stmt_list = @st.gets
         while stmt_list
@@ -127,6 +144,22 @@ module Skylab::TanMan
         end
 
         ok
+      end
+
+      def __init_node_ID_symbols_and_strings
+
+        if @from_node_label
+          @source_node_ID_sym = @from_node.node_id
+          @target_node_ID_sym = @to_node.node_id
+        else
+          @source_node_ID_sym = @from_node_ID
+          @target_node_ID_sym = @to_node_ID  # (yeah, just an ivar name change)
+        end
+
+        @source_node_ID_s = @source_node_ID_sym.id2name
+        @target_node_ID_s = @target_node_ID_sym.id2name
+
+        nil
       end
 
       def when_same stmt
@@ -260,11 +293,15 @@ module Skylab::TanMan
       end
 
       def resolve_edge_statement
-        edge_stmt = @prototype.duplicate_except_(
-          [ :agent, :id ], [ :edge_rhs, :recipient, :id ] )
-        edge_stmt.set_source_node_id @from_node.node_id
-        edge_stmt.set_target_node_id @to_node.node_id
+
+        edge_stmt = @prototype.duplicate_except_ [ :agent, :id ],
+          [ :edge_rhs, :recipient, :id ]
+
+        edge_stmt.set_source_node_id @source_node_ID_sym
+        edge_stmt.set_target_node_id @target_node_ID_sym
+
         @edge_stmt = edge_stmt
+
         if @attrs
           add_attrs_to_edge_stmt
         else

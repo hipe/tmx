@@ -17,15 +17,14 @@ module Skylab::TanMan
       end
 
       def members
-        [ :graph_sexp,
-          :persist_via_args, :unparse_into ]
+        [ :graph_sexp, :persist_into_byte_downstream_identifier, :unparse_into ]
       end
 
       attr_reader :graph_sexp
 
       # ~ readers
 
-      def persist_into_byte_downstream id, * x_a, & oes_p
+      def persist_into_byte_downstream_identifier id, * x_a, & oes_p  # [ :is_try, true ]
 
         DotFile_::Small_Time_::Actors::Persist.new(
           id, @graph_sexp, x_a, & oes_p ).execute

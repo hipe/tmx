@@ -2,28 +2,17 @@ module Skylab::Headless
 
   module IO
 
-    class Byte_Upstream_Identifier
+    class Byte_Upstream_Identifier < Byte_Identifer_
 
       # a :+[#br-019] unified interface for accessing the bytes in a stream.
       #
       # unlike the other (current) implementations, this one is itself
       # stateful: there is only ever one input stream to read from.
 
-      def initialize io
-        @io = io
-      end
-
       # ~ reflection
 
-      def description_under expag
-        if @io.respond_to? :path
-          path = @io.path
-          expag.calculate do
-            pth path
-          end
-        else
-         "«input stream»"  # :+#guillemets
-        end
+      def fallback_description_
+        "«input stream»"  # :+#guillemets
       end
 
       # ~ data delivery

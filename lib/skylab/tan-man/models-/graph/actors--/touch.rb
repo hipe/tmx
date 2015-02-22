@@ -31,7 +31,7 @@ module Skylab::TanMan
         Touch_path___.new( @arg, self, & @on_event_selectively ).execute
       end
 
-      def __execute_for__stream__
+      def __execute_for__IO__
         _ok = resolve_upstream_lines_
         _ok and flush_upstream_lines_to_file_ @arg.value_x
       end

@@ -37,5 +37,6 @@ module Skylab::TanMan
   SPACE_ = ' '.freeze
   TanMan_ = self
   UNABLE_ = false
+  UNDERSCORE_ = '_'.freeze
 
 end

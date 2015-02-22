@@ -13,8 +13,15 @@ module Skylab::Headless
 
       # ~ reflection
 
+      def is_same_waypoint_as x
+        :path == x.shape_symbol && @path == x.path  # can fail because etc.
+      end
+
       def description_under expag
         Headless_.lib_.basic::Pathname.description_under_of_path expag, @path
+      end
+
+      def EN_preposition_lexeme
       end
 
       def shape_symbol
