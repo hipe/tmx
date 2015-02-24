@@ -5,8 +5,11 @@
 [#036]       make lexical scope deeper in quickie main document.
 [#035]       #parent-node:[#021] the system narrative ..
 [#034] #open #parent-node: [015] "re-architect.."
-[#033]       #done if you un-orphanize core.rb it presents an issue with autoloader)
-[#032]       #done #parent-node: [#015] change syntax to work with contiguous nonblank lines
+[#033]       #historical #done fix test globbing .. [#xx-009]
+             ( #was: #done if you un-orphanize core.rb it presents an issue with autoloader) )
+[#032] #open white plugin whines weirdly when strange files are in lib/skylab ([#xx-007])
+             ( #was: #done folderize plugins ([#xx-008]) )
+             ( #was: #done #parent-node: [#015] change syntax to work with contiguous nonblank lines )
 [#031] #open #universal while regret no longer wires test nodes for autoloading
 [#030] #open #parent-node:[#015] the doc-test recursive spec needs mock fs
 [#029]       #tracking-tag the 'expect' omnibus and narrative ..
@@ -25,8 +28,10 @@
 [#016]       #parent-node:[#017] why we do not include parent anchor module..
 [#015]       #doc-node the doc-test narrative ..
 [#014]       #parent-node: [#015] how nodes are generated ..
-[#013]       #done 351 extra tests (but this issue 2 states ago .. oh boy)
-[#012]       #done #parent-node: [#015] setup vs example?
+[#013]       #historical #done #inquiry-point choke point etc (#relates-to [#ts-013]) ([#xx-004]))
+             #done 351 extra tests (but this issue 2 states ago .. oh boy)
+[#012]       #doc-point #in-situ (the particular importance of result values) ([#xx-006])
+             ( #was: #done #parent-node: [#015] setup vs example? )
 [#011]       #tracking-tag fix 'test/' - 'TestSupport' for autoloading?
 [#010]       #tracking-tag "dark hack" this one weird old trick makes ..
 [#009]       #subscription - will Quickie ever short-circuit (throw
@@ -36,6 +41,11 @@
 [#006] #open test/all: redundancy points, maybe waits for [#tm-056]
 [#005] #open #quickie #redundant s-tylize
 [#004] #open quickie: module names into fashion (and now narrative)
-[#003]       #done rename `all_specs.rb` -> all
-[#002]       #done Constants too
-[#001]       #done regret
+[#005]       #doc-point confessions of an ambiguous grammar .. (was [#xx-005]
+             ( #was: #done test/all should (whitelist) run the tests in the proivded order,
+             and not the lexical order? )
+             ( #was: #done rename `all_specs.rb` -> all )
+[#002]       coverage is a no fun zone ..
+             ( #was: #done Constants too )
+[#001]       [ tree runner ]
+             ( #was: #done regret )

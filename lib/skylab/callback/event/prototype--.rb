@@ -8,7 +8,7 @@ module Skylab::Callback
           def via_deflist_and_message_proc i_a, p
             Build__[ i_a, p ]
           end
-        end
+        end  # >>
 
         class Build__
 

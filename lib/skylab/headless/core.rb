@@ -24,7 +24,7 @@ module Skylab::Headless  # ([#013] is reserved for a core node narrative - no st
     def system
       @system ||= Headless_::System__::Front.new
     end
-  end
+  end  # >>
 
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader

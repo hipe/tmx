@@ -1023,13 +1023,13 @@ module Skylab::Headless
       end
 
       def preterite_verb
-        NLP::EN::Part_Of_Speech::Preterite_verb__
+        NLP::EN::Part_Of_Speech::Preterite_verb___
       end
 
       def progressive_verb
-        NLP::EN::Part_Of_Speech::Progreessive_verb__
+        NLP::EN::Part_Of_Speech::Progressive_verb___
       end
-    end
+    end  # >>
 
     @abbrev_box = {}
 
@@ -1305,12 +1305,12 @@ module Skylab::Headless
         end
       end
 
-      Preterite_verb__ = -> lemma_i do
-        POS::Verb[ lemma_i ].preterite
+      Preterite_verb___ = -> lemma_s do
+        POS::Verb[ lemma_s ].preterite
       end
 
-      Progreessive_verb__ = -> lemma_i do
-        POS::Verb[ lemma_i ].progressive
+      Progressive_verb___ = -> lemma_s do
+        POS::Verb[ lemma_s ].progressive
       end
     end
   end

@@ -39,12 +39,29 @@ is outside the scope of this document ^_^ #yolo ¯\_(ツ)_/¯
 
 ## a one-line summary of each item
 
+ 7. [ts] digraph-powered simplification of belowFeb.,  2015
  6. [hl] import [gv]'s custom facility (best)   Jan.,  2014
  5. [ts] quickie rolls a custom solution        June,  2013
  4. [fa] the forgettable 'Services_'            June,  2013
  3. [fa] Plugin abstracted out of test/all      April, 2013
  2. [tr] "adapter" (plugin) facility            June,  2012
  1. [as] an "assesss" take on plugins           March, 2010
+
+
+
+## library 7 of N: digraph-powered simplification of predecessor
+
+this is a synopsis of what is at [#hl-077]:
+
+  • no more shell/kernel pattern. there is just one plugin dispatcher
+    class, one plugin base class, and tons of little ancillary classes.
+
+  • plain-old-programming with small classes as much as possible over
+    overwrought interfaces.
+
+  • the most advanced, expressive yet implementation of a digraph-driven
+    plugin architecture.
+
 
 
 

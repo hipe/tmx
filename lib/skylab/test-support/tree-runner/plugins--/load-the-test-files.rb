@@ -1,10 +1,29 @@
-module Skylab::Test
+module Skylab::TestSupport
 
-  module Plugins::Req
+  class Tree_Runner
 
-    # `Req` plugin. 'req' is short for 'require', and this ugly name will
-    # stick until [#hl-070-002] we design something better.
+    class Plugins__::Load_The_Test_Files < Plugin_
 
+      # ( was: [#hl-070-002] something about names )
+
+      can :flush_the_test_files do | tr |
+
+        tr.if_transition_is_effected do | o |
+
+          o.on '--require-only',
+              "require() each file (but do not require 'r#{}spec/autorun')" do
+
+            @require_only = true
+          end
+        end
+      end
+
+      def do__flush_the_test_files__
+        @resources.serr.puts "(pretending to flush the test files)"
+        ACHIEVED_
+      end
+
+    if false
     Plugin_.enhance self do
 
       eventpoints_subscribed_to( * %i|
@@ -23,9 +42,6 @@ module Skylab::Test
       )
 
     end
-  end
-
-  class Plugins::Req::Client
 
     def initialize
       @be_verbose = nil
@@ -37,7 +53,7 @@ module Skylab::Test
     ]
 
     action_summaries(
-      req: "require() each file (but do not require 'r#{}spec/autorun')",
+      req: :x,
       run: "(the default action - specifying its name is not necessary)"
     )
 
@@ -72,8 +88,6 @@ module Skylab::Test
       end
     end
 
-  private
-
     def _req before
       cache_a = [ ] ; info = infostream
       res = hot_spec_paths.each do |p|
@@ -104,6 +118,8 @@ module Skylab::Test
 
     def full_name
       "#{ @plugin_parent_services.full_name } #{ local_plugin_moniker }"
+    end
+    end
     end
   end
 end

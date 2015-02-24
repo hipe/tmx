@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby -w
+
+path = ::File.expand_path '../../lib/skylab', __FILE__
+
+require "#{ path }/test-support/tree-runner/core"
+
+o = ::Skylab::TestSupport::Tree_Runner.new nil, $stdout, $stderr, ::ARGV
+
+o.root_directory_path = path
+
+o.execute

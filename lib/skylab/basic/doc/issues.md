@@ -1,5 +1,6 @@
 [#039] #open one day unify & simplify all box classes
-[#038] #hole ( #was: [ trio ] )
+[#038]       [ the visual testing CLI client ]
+             ( #was: [ trio ] )
 [#037] #open make digraph a box
              ( was: #doc-node the new normal ( #IN: [#fa-019] woah! ) )
 [#036]       #parent-node: [#027] #tracking-tag the idea of a curried normalizer

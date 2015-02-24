@@ -203,7 +203,8 @@
 [#006]       #parent-node: [#sl-116], #facility-tracker `error_count`
 [#005]       unify concepts let sub-client trump rename `parent_runtime` `par_client`
 [#004]       #doc-point the deprecation and rebirth of the sub-client pattern ..
-[#003]       #done #refactor: use en.rb in sub-client fo
+[#003]       [ CLI option ]
+             ( #was; #done #refactor: use en.rb in sub-client )
 [#002]       [ flock etc ]
              ( was: #done 2012-08-29 #refactor : interceptors under one roof )
 [#001] #open 2012-08-18 #feature : term2html (and architecture)

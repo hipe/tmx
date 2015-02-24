@@ -1,7 +1,39 @@
-module Skylab::Test
+module Skylab::TestSupport
 
-  module Plugins::Counts
+  class Tree_Runner
 
+    class Plugins__::Count_The_Test_Files < Plugin_
+
+      does :flush_the_test_files do | st |
+
+        st.transition_is_effected_by do | o |
+
+          o.on '--counts', 'show a report of the number of tests per subproduct'
+
+        end
+
+        st.if_transition_is_effected do | o |
+
+          o.on '-v', '--verbose', 'show max share meter (experimental)' do
+            @verbosity_level += 1
+          end
+
+          o.on '-V', 'reduce verbosity level' do
+            @verbosity_level -= 1
+          end
+
+          o.on '-z', '--zero', 'display the zero values' do
+            @do_zero = true
+          end
+        end
+      end
+
+      def do__flush_the_test_files__
+        @resources.serr.puts "(pretending to count the test files)"
+        ACHIEVED_
+      end
+
+    if false
     Plugin_.enhance self do
 
       eventpoints_subscribed_to( * %i|
@@ -15,25 +47,9 @@ module Skylab::Test
         :hot_subtree,
         :paystream
       )
-
     end
-  end
-
-  class Plugins::Counts::Client
 
     available_options do |o, _|
-
-      o.on '-v', '--verbose', 'show max share meter (experimental)' do
-        @verbosity_level += 1
-      end
-
-      o.on '-V', 'reduce verbosity level' do
-        @verbosity_level -= 1
-      end
-
-      o.on '-z', '--zero', 'display the zero values (when counting)' do
-        @do_zero = true
-      end
 
       true
     end
@@ -43,7 +59,7 @@ module Skylab::Test
     ]
 
     action_summaries(
-      counts: "show a report of the number of tests per subproduct"
+      counts: :x
     )
 
     def initialize
@@ -84,11 +100,14 @@ module Skylab::Test
       end
       nil
     end
-  private
+
     def bld_max_share_meter_args
       _width = Test_::Lib_::CLI_table[].some_screen_width
       [ :target_width, _width, :field, :fill,
         :cel_renderer_builder, :max_share_meter ]
+    end
+    end
+
     end
   end
 end

@@ -1,7 +1,40 @@
-module Skylab::Test
+module Skylab::TestSupport
 
-  module Plugins::Files
+  class Tree_Runner
 
+    class Plugins__::List_The_Test_Files < Plugin_
+
+      does :flush_the_test_files do | st |
+
+        st.transition_is_effected_by do | o |
+
+          o.on '--list-files', 'write to stdout the path to each test file'
+
+        end
+
+        st.if_transition_is_effected do | o |
+
+          o.on '-p', '--pretty', '..filenames. (files)' do
+            @do_pretty = true
+          end
+
+          o.on '-v', '--verbose', 'this way you can have everything' do
+            @be_verbose = true
+          end
+        end
+      end
+
+      def initialize( * )
+        super
+        @do_pretty = @be_verbose = false
+      end
+
+      def do__flush_the_test_files__
+        @resources.serr.puts "(pretending to list the test files. pretty: #{ @do_pretty ? 'yes' : 'no' })"
+        ACHIEVED_
+      end
+
+    if false
     Plugin_.enhance self do
 
       eventpoints_subscribed_to( * %i|
@@ -14,9 +47,6 @@ module Skylab::Test
       services_used [ :paystream, :proxy ], [ :hot_spec_paths, :proxy ],
         [ :pretty_path, :ivar ]
     end
-  end
-
-  class Plugins::Files::Client
 
     def initialize
       @do_pretty = @be_verbose = @did_run = nil
@@ -29,20 +59,6 @@ module Skylab::Test
     action_summaries(
       files: "write to stdout the pretty name of each test file"
     )
-
-    available_options do |o, _|
-
-      o.on '-p', '--pretty', '..filenames. (files)' do
-        @do_pretty = true
-      end
-
-      o.on '-v', '--verbose', 'this way you can have everything' do
-        @be_verbose = true
-      end
-
-      true  # when you took action, non-nil
-    end
-
     def files
       paystream, hot_spec_paths =
         @plugin_parent_services[ :paystream, :hot_spec_paths ]  # grease
@@ -73,6 +89,8 @@ module Skylab::Test
         y << "listed #{ @last_count } spec file(s)"
         true
       end
+    end
+    end
     end
   end
 end

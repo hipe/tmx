@@ -1,4 +1,6 @@
-module Skylab::Test
+module Skylab::TestSupport
+
+  class Tree_Runner
 
   # `Subtree` plugin - experimentally, this is more like an "extension"
   # (as it might be called in mozilla culture.) this whole app is basically
@@ -11,7 +13,24 @@ module Skylab::Test
   # plugin modules that themselves provide different such options! plugins
   # for plugins omg two levels! (relax it's just a tree))
 
-  module Plugins::Subtree
+    class Plugins__::Produce_The_Sidesystems < Plugin_
+
+      can :build_sidesystem_tree
+
+      can :build_the_test_files
+
+
+      def do__build_sidesystem_tree__
+        @resources.serr.puts "(sub-tree pretending to build the SS tree)"
+        ACHIEVED_
+      end
+
+      def do__build_the_test_files__
+        @resources.serr.puts "(sub-tree pretending to build the test files)"
+        ACHIEVED_
+      end
+
+    if false
 
     Plugin_.enhance self do  # LOOK - see below
 
@@ -27,9 +46,8 @@ module Skylab::Test
         :info_y,
         [ :pretty_path, :ivar ]
     end
-  end
 
-  class Plugins::Subtree::Services__
+  class Plugins__::Subtree::Services__
 
     def initialize p
       @p = p
@@ -40,8 +58,6 @@ module Skylab::Test
     end
   end
 
-  class Plugins::Subtree::Client
-
     Plugin_::Host.enhance self do
 
       # LOOK - experimentally we are a plugin *and* a plugin host ("app")
@@ -49,7 +65,7 @@ module Skylab::Test
       # the parent (e.g `argument_list` up, `arg_list` here), to mitigate
       # only slightly a potentially confusing situation.
 
-      plugin_box_module -> { Plugins::Subtree::Agents }
+      plugin_box_module -> { Plugins__::Subtree::Agents }
 
       eventpoints( * %i|
         arg_list
@@ -73,7 +89,7 @@ module Skylab::Test
     end
 
     def services
-      @services ||= Plugins::Subtree::Services__.new any_test_pn_a_for_subproject_i_p
+      @services ||= Plugins__::Subtree::Services__.new any_test_pn_a_for_subproject_i_p
     end
 
     include Merge_Options_
@@ -181,7 +197,7 @@ module Skylab::Test
       emit_eventpoint :is_active_boolean_agent do |pi, bool|
         bool and y << pi
       end
-      Plugins::Subtree::And_.new y, * func_tuple
+      Plugins__::Subtree::And_.new y, * func_tuple
     end
 
     def report_conflicts conflict_a
@@ -254,11 +270,6 @@ module Skylab::Test
       ok or iy << "won't procede further because of the above."
       ok
     end
-
-    Subtree = Plugins::Subtree
-  end
-
-  module Plugins::Subtree
 
     class Subproject_Cache_  # wrap this up: we get the full tree via two
       # filesystem hits exposed by two respective surface members neither
@@ -344,6 +355,8 @@ module Skylab::Test
       def some_test_paths
         any_test_pn_a || EMPTY_A_
       end
+    end
+    end
     end
   end
 end

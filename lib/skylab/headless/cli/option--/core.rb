@@ -1,6 +1,6 @@
 module Skylab::Headless
 
-  module CLI::Option__
+  module CLI::Option__  # :[#003].
 
     class << self
 
@@ -78,7 +78,7 @@ module Skylab::Headless
           o[ i ]
         end
       end
-    end
+    end  # >>
 
     Local_normal_name_as_long__ = -> i do
       "--#{ i.id2name.gsub UNDERSCORE_, DASH_ }"

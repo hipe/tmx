@@ -2,7 +2,7 @@ module Skylab::Headless
 
   module CLI::Option__
 
-    class Model__
+    class Model__  # tracked with [#003] (parent node)
 
       # for reflection of options, not for parsing.
 
@@ -28,16 +28,17 @@ module Skylab::Headless
           m
         end
 
-        def on *a, &b
+        def on * a, & p
           new do
             @norm_short_str = @long_sexp = @sexp = nil
             @args = a
-            @block = b
+            @block = p
           end
         end
 
         private :new
-      end
+
+      end  # >>
 
       Local_normal_name_as_short__ = -> i do
         "-#{ i[ 0 ] }"
@@ -87,12 +88,12 @@ module Skylab::Headless
       attr_reader :block
 
       def normal_short_string
-        @norm_short_str.nil? && @args and touch
+        @norm_short_str.nil? && @args and _classify_args
         @norm_short_str
       end
 
       def normal_long_string
-        @long_sexp.nil? && @args and touch
+        @long_sexp.nil? && @args and _classify_args
         if @long_sexp
           ( @long_sexp.at :__, :no, :stem, :arg ) * EMPTY_SEP__
         else
@@ -111,7 +112,7 @@ module Skylab::Headless
       def long_sexp
         if @long_sexp.nil?
           if @args
-            touch
+            _classify_args
           else
             @long_sexp = if @norm_long_str
               Option_::Long_.lease_from_matchdata(
@@ -159,12 +160,12 @@ module Skylab::Headless
       end
 
       def sexp
-        @sexp.nil? and touch
+        @sexp.nil? and _classify_args
         @sexp
       end
 
       def short_fulls
-        @sexp.nil? and touch
+        @sexp.nil? and _classify_args
         if @sexp
           ::Enumerator.new do |y|
             @sexp.children( :short_full ).each do |sx|
@@ -176,7 +177,7 @@ module Skylab::Headless
       end
 
       def long_fulls
-        @sexp.nil? and touch
+        @sexp.nil? and _classify_args
         if @sexp
           ::Enumerator.new do |y|
             @sexp.children( :long_sexp ).each do |sx|
@@ -187,16 +188,16 @@ module Skylab::Headless
         end
       end
 
-    private
+      def _classify_args  # @args => @norm_short_str @long_sexp @sexp
 
-      def touch  # @args -> @norm_short_str @long_sexp @sexp
         o = Headless_::Library_::CodeMolester::Sexp
         sexp = o[ :opt ]
-        h = { }
+        h = {}
         add = -> k, v do
           ( h[ k ] ||= [ ] ) << sexp.length
           sexp << o[ k, v ]
         end
+
         @args.each do |x|
           if x.respond_to? :ascii_only?
             if SIMPLE_SHORT_RX__ =~ x
@@ -210,12 +211,14 @@ module Skylab::Headless
             add[ :other, x ]
           end
         end
+
         @norm_short_str, @long_sexp = [ :short_full, :long_sexp ].map do |i|
           if h[ i ] && 1 == h.fetch( i ).length
           then sexp.fetch( h.fetch( i ).fetch( 0 ) ).fetch( 1 )
           else false
           end
         end
+
         @sexp = sexp
         nil
       end

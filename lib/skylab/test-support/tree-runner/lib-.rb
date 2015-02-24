@@ -1,14 +1,35 @@
-module Skylab::Test
+module Skylab::TestSupport
 
-  require_relative '../lib/skylab/callback/core'
+  class Tree_Runner
 
-  Callback_ = ::Skylab::Callback
-  Autoloader_ = Callback_::Autoloader
+    sl_lib = ::File.expand_path '../..', HERE_ # [#002] #at-this-exact-point
 
-  module Lib_  # :+[#ss-001]
+    require "#{ sl_lib }/test-support/core"
 
-    sidesys, stdlib = Autoloader_.at :build_require_sidesystem_proc,
-      :build_require_stdlib_proc
+    Autoloader_[ self ]
+
+    Autoloader_[ Plugins__, :boxxy ]
+
+    module Lib_  # :+[#ss-001]
+
+      sidesys = Autoloader_.build_require_sidesystem_proc
+
+      HL__ = sidesys[ :Headless ]
+
+      NLP = -> do
+        HL__[]::NLP
+      end
+
+      Oxford_and = -> a do
+        Callback_::Oxford_and[ a ]
+      end
+
+      Option_parser = -> do
+        require 'optparse'
+        ::OptionParser
+      end
+
+      if false
 
     Bsc__ = sidesys[ :Basic ]
 
@@ -34,7 +55,6 @@ module Skylab::Test
 
     Face__ = sidesys[ :Face ]
 
-    HL__ = sidesys[ :Headless ]
 
     Heavy_plugin = -> do
       Face__[]::Plugin
@@ -42,9 +62,6 @@ module Skylab::Test
 
     MH__ = sidesys[ :MetaHell ]
 
-    Oxford_and = -> a do
-      Callback_::Oxford_and[ a ]
-    end
 
     Parse_lib = -> do
       MH__[]::Parse
@@ -69,18 +86,15 @@ module Skylab::Test
     Touch_const = -> do
       MH__[].touch_const
     end
+
+      end
+    end  # Lib_
+
+    # ~
+
+    Plugin_ = Lib_::HL__[]::Plugin
+
+    Plugins__::Express_Help = Plugin_::Express_Help
+
   end
-
-  EMPTY_A_ = [].freeze
-
-  Stderr_ = -> { $stderr }  # resources should not be accessed as contants
-                            # or globals from within application code
-  Test_ = self
-
-  UNIVERSAL_TEST_DIR_RELPATH_ = 'test'.freeze
-
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
-
-  stowaway :Benchmark, -> { TestSupport::Benchmark }
-
 end
