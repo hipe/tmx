@@ -1029,6 +1029,10 @@ module Skylab::Headless
       def progressive_verb
         NLP::EN::Part_Of_Speech::Progressive_verb___
       end
+
+      def third_person
+        NLP::EN::Part_Of_Speech::Third_person___
+      end
     end  # >>
 
     @abbrev_box = {}
@@ -1060,10 +1064,8 @@ module Skylab::Headless
     # exponent (might change!). no block is provided here, assuming
     # that always the lemma is set as an ivar.
 
-    ends_with_e_rx = /e\z/i  # 2x
-
     as :preterite do
-      if ends_with_e_rx =~ @lemma
+      if ENDS_IN_E_RX__ =~ @lemma
         "#{ $~.pre_match }ed"
       else
         "#{ @lemma }ed"
@@ -1072,16 +1074,17 @@ module Skylab::Headless
 
     as :progressive do
       case @lemma
-      when ends_with_e_rx ; "#{ $~.pre_match }ing"  # "mate" -> "mating"
-      when TEE_TEE_RX__   ; "#{ @lemma }ting"       # "set" -> "setting"
-      else                ; "#{ @lemma }ing"
+      when ENDS_IN_E_RX__   ; "#{ $~.pre_match }ing"  # "mate" -> "mating"
+      when DOUBLE_T__RX__   ; "#{ @lemma }ting"       # "set" -> "setting"
+      else                  ; "#{ @lemma }ing"
       end
     end
-    #
-    TEE_TEE_RX__ = /[aeiou]t\z/  # #todo - bring the others up to convention
+
+    DOUBLE_T__RX__ = /[aeiou]t\z/  # #todo - bring the others up to convention
+    ENDS_IN_E_RX__ = /e\z/i
 
     as :singular_third_present do
-      "#{ @lemma }s"
+      NLP::EN::POS::Noun[ @lemma ].plural  # wow
     end
 
     # `Verb::Phrase`
@@ -1120,12 +1123,14 @@ module Skylab::Headless
     end
 
     as :plural do
-      if ENDS_IN_Y__ =~ @lemma
-        @lemma.sub ENDS_IN_Y__, 'ies'
-      else
-        "#{ @lemma }s"
+      case @lemma
+      when ENDS_IN_Y__      ; @lemma.sub ENDS_IN_Y__, 'ies'
+      when ENDS_IN_ETC__    ; "#{ @lemma }es"
+      else                  ; "#{ @lemma }s"
       end
     end
+
+    ENDS_IN_ETC__ = /sh?\z/i  # ick
     ENDS_IN_Y__ = /y\z/i
 
     lexicon do |lexicn|
@@ -1311,6 +1316,10 @@ module Skylab::Headless
 
       Progressive_verb___ = -> lemma_s do
         POS::Verb[ lemma_s ].progressive
+      end
+
+      Third_person___ = -> lemma_s do
+        POS::Verb[ lemma_s ].singular__third__present
       end
     end
   end

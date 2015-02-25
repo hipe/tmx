@@ -58,6 +58,8 @@ module Skylab::Headless
       Basic[]::Enumerator
     end
 
+    Face___ = sidesys[ :Face ]
+
     Funcy_globful = -> cls do
       MH__[].funcy_globful cls
     end
@@ -78,6 +80,10 @@ module Skylab::Headless
 
     Module_lib = -> do
       Basic[]::Module
+    end
+
+    Other_CLI_table = -> * x_a do
+      Face___[]::CLI::Table.call_via_iambic x_a
     end
 
     Parse_lib = -> do

@@ -201,7 +201,8 @@
 [#008]       `P::C::I_M` --> `SC::I_M` THIS WAS BAD see [#004], [#027]
 [#007]       #done use of Parameter::Set#list, unify with B-oxxy interface
 [#006]       #parent-node: [#sl-116], #facility-tracker `error_count`
-[#005]       unify concepts let sub-client trump rename `parent_runtime` `par_client`
+[#005]       #parent-node: [#126]  [ CLI table ]
+             ( #was: unify concepts let sub-client trump rename `parent_runtime` `par_client` )
 [#004]       #doc-point the deprecation and rebirth of the sub-client pattern ..
 [#003]       [ CLI option ]
              ( #was; #done #refactor: use en.rb in sub-client )

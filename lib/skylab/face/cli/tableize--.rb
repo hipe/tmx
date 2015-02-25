@@ -1,6 +1,6 @@
 module Skylab::Face
 
-  CLI::Tableize__ = -> opts, line_p, rows do  # :+#deprecation:until-cull
+  CLI::Tableize__ = -> opts, line_p, rows do  # :[#048]. :+#deprecation:until-cull
 
     # `tableize` has been deprecated (use [#036]). but here's a demo:
     #

@@ -14,11 +14,11 @@ module Skylab::TestSupport
 
         st.if_transition_is_effected do | o |
 
-          o.on '-p', '--pretty', '..filenames. (files)' do
+          o.on '-p', '--pretty', 'make the filenames \"pretty\" somehow' do
             @do_pretty = true
           end
 
-          o.on '-v', '--verbose', 'this way you can have everything' do
+          o.on '-v', '--verbose', 'add additional information' do
             @be_verbose = true
           end
         end

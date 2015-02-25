@@ -14,6 +14,10 @@ module Skylab::TestSupport
 
       sidesys = Autoloader_.build_require_sidesystem_proc
 
+      CLI_lib = -> do
+        HL__[]::CLI
+      end
+
       HL__ = sidesys[ :Headless ]
 
       NLP = -> do
@@ -41,13 +45,6 @@ module Skylab::TestSupport
       Bsc__[]::Tree
     end
 
-    CLI_lib = -> do
-      HL__[]::CLI
-    end
-
-    CLI_table = -> * x_a do
-      Face__[]::CLI::Table.via_iambic x_a
-    end
 
     EN_calculate = -> & p do
       HL__[].expression_agent.NLP_EN_agent.calculate( & p )

@@ -91,6 +91,16 @@ module Skylab
           nil
         end
 
+        # ~ dispatcher adjunct methods
+
+        def plugins
+          @pu_a
+        end
+
+        def digraph
+          @sm.digraph
+        end
+
         # ~ dispatcher ancillaries
 
         class State_Machine___
@@ -129,10 +139,24 @@ module Skylab
           def target_state_of_transition tr_sym
             @h.fetch( tr_sym ).to_symbol
           end
+
+          def transition tr_sym
+            @h.fetch tr_sym
+          end
         end
 
-        Transition___ = ::Struct.new(
-          :transition_index, :from_symbol, :name_symbol, :to_symbol )
+        class Transition___
+
+          def initialize * a
+            @transition_index, @from_symbol, @name_symbol, @to_symbol = a
+          end
+
+          attr_reader :transition_index, :from_symbol, :name_symbol, :to_symbol
+
+          def name
+            @__name__ ||= Callback_::Name.via_variegated_symbol( @name_symbol )
+          end
+        end
 
         class Canary_Parser___  # #storypoint-21
 
@@ -248,39 +272,29 @@ module Skylab
           def __each_occurrence  # side effects too
 
             @pu_a.each_with_index do | pu, d |
-              reac_a = pu.reactions
-              if reac_a
-                reac_a.each do | tr |
-                  op_a = tr.catalyzing_formal_options
-                  if op_a
-                    op_a.each do | op |
-                      yield( Occurrence__.new op, d, tr.transition_symbol, true )
-                    end
-                  end
-                  op_a = tr.ancillary_formal_options
-                  if op_a
-                    op_a.each do | op |
-                      yield( Occurrence__.new op, d, tr.transition_symbol )
-                    end
-                  end
+
+              pu.each_reaction do | tr |
+
+                tr.each_catalyzing_formal do | op |
+                  yield( Occurrence__.new op, d, tr.transition_symbol, true )
+                end
+
+                tr.each_ancillary_formal_option do | op |
+                  yield( Occurrence__.new op, d, tr.transition_symbol )
                 end
               end
-              cap_a = pu.capabilities
-              if cap_a
-                cap_a.each do | tr |
 
-                  sym = tr.transition_symbol
-                  h = @caps
-                  h.fetch( @sm.digraph.source_state_of_transition sym ) do |k|
-                    h[ k ] = []
-                  end.push Step__.new( sym, d )
+              pu.each_capability do | tr |
 
-                  op_a = tr.ancillary_formal_options
-                  if op_a
-                    op_a.each do | op |
-                      yield( Occurrence__.new op, d, sym )
-                    end
-                  end
+                sym = tr.transition_symbol
+                h = @caps
+
+                h.fetch( @sm.digraph.source_state_of_transition sym ) do |k|
+                  h[ k ] = []
+                end.push Step__.new( sym, d )
+
+                tr.each_ancillary_formal_option do | op |
+                  yield( Occurrence__.new op, d, sym )
                 end
               end
             end
@@ -613,21 +627,29 @@ module Skylab
       class Capability__
 
         def initialize sym
+          @ancillary_formals = nil
           @transition_symbol = sym
         end
 
-        attr_reader :ancillary_formal_options, :transition_symbol
+        attr_reader :ancillary_formals, :transition_symbol
+
+        def each_ancillary_formal_option & yld_p
+          a = @ancillary_formals
+          if a
+            a.each( & yld_p ) ; nil
+          end
+        end
 
         def if_transition_is_effected & op_p
 
           each_option_in_as_(
-            :ancillary_formal_options,
+            :ancillary_formals,
             @transition_symbol,
             my_symbol_,
             op_p
           ) do | op |
 
-            ( @ancillary_formal_options ||= [] ).push op ; nil
+            ( @ancillary_formals ||= [] ).push op ; nil
           end
 
           nil
@@ -638,25 +660,37 @@ module Skylab
         end
 
         def each_option_in_as_ * id_a, op_p, & op_o_p
-          op_p[ Formal_Option_Recorder___.new( id_a, & op_o_p ) ]
+          op_p[ Formal_Recorder___.new( id_a, & op_o_p ) ]
           nil
         end
       end
 
       class Reaction__ < Capability__
 
-        attr_reader :catalyzing_formal_options
+        def initialize( * )
+          @catalyzing_formals = nil
+          super
+        end
+
+        attr_reader :catalyzing_formals
+
+        def each_catalyzing_formal & yld_p
+          a = @catalyzing_formals
+          if a
+            a.each( & yld_p ) ; nil
+          end
+        end
 
         def transition_is_effected_by & op_p
 
           each_option_in_as_(
-            :catalyzing_formal_options,
+            :catalyzing_formals,
             @transition_symbol,
             my_symbol_,
             op_p
           )do | op |
 
-            ( @catalyzing_formal_options ||= [] ).push op ; nil
+            ( @catalyzing_formals ||= [] ).push op ; nil
           end
           nil
         end
@@ -668,7 +702,7 @@ module Skylab
 
       # ~~ a specialization of :+[#003] rewritten for insulation
 
-      class Formal_Option_Recorder___
+      class Formal_Recorder___
 
         def initialize id_prefix_x, & p
           @id_prefix_x = id_prefix_x
@@ -678,7 +712,7 @@ module Skylab
 
         def on * a, & any_p
           x = [ ( @d += 1 ), * @id_prefix_x ]
-          @op_o_p[ Formal_Option___.new do
+          @op_o_p[ Formal___.new do
             @formal_path_x = x
             @args = a
             @block = any_p
@@ -688,7 +722,7 @@ module Skylab
         end
       end
 
-      class Formal_Option___
+      class Formal___
 
         def initialize & edit_p
           @_short_d_a = nil
@@ -702,6 +736,21 @@ module Skylab
         attr_reader :short_id_s_a, :long_id_s, :arg_category_string, :block
 
         attr_reader :args, :formal_path_x
+
+        def full_pedagogic_moniker_rendered_under _expag
+          barebones_arguments * ', '
+        end
+
+        def to_description_line_stream_rendered_under _expag
+
+          _d = if @_long_d
+            @_long_d + 1
+          else
+            @_short_d_a.last + 1  # etc
+          end
+
+          Callback_::Stream.via_nonsparse_array @args[ _d .. -1 ]  # empty OK
+        end
 
         def barebones_arguments
 
@@ -883,8 +932,24 @@ module Skylab
         end.send( which ).fetch opt_id  # #sorry
       end
 
+      def each_reaction & yld_p
+        a = reactions
+        if a
+          a.each( & yld_p )
+        end
+        nil
+      end
+
       def reactions
         self.class._reac_a
+      end
+
+      def each_capability & yld_p
+        a = capabilities
+        if a
+          a.each( & yld_p )
+        end
+        nil
       end
 
       def capabilities
@@ -899,9 +964,14 @@ module Skylab
 
           st.transition_is_effected_by do | op |
 
-            op.on '--help', 'this screen'
+            op.on '--help', 'show this screen'
 
           end
+        end
+
+        def do__finish__
+          Plugin_::When_::Express_Help.new(
+            @resources, & @on_event_selectively ).execute
         end
       end
 

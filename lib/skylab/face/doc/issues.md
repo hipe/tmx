@@ -12,7 +12,8 @@
 [#051]       #tracking-tag the idea of the #snitch is tracked by this tag
 [#050]       #doc-point when mono mono and we get an array..
 [#049]       #in-situ
-[#048]       #done `t-ablify` - cleanup signature (#rip)
+[#048]       #parent-node: [#002]  [ this other tiny deprecated CLI table lib ]
+             ( #was #done `t-ablify` - cleanup signature (#rip) )
 [#047]       #doc-point visibility of the node is *not* in the domain ..
 [#046]       #feature-point `Magic_Touch_`
 [#045]       #doc-point Face::TestSupport::CLI and below is part of face's
@@ -81,7 +82,8 @@
 [#005]       #parent-node:[#011] introducing the entity library #initials:`el` ..
 [#004]       argument error hack
 [#003] #open Face::Open2 is superseded by [hl] IO select
-[#002]       #done path-tools to e.g. headless
+[#002]       the CLI tables narrative ..
+             ( #was: #done path-tools to e.g. headless )
 [#001]       #postponed shorten wide lines #open #depends-on:sl-104
 [#sl-100.100.500] 2012-06-08 #open index all features
 [#sl-100.100.400] 2012-06-08 #open rename stuff, unify names

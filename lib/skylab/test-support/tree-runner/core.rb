@@ -22,7 +22,8 @@ module Skylab
       def execute
         ok = __load_and_start_coverage_plugin_if_necessary
         ok and begin
-          ok = __build_dispatcher.process_input_against_plugins_in_module @argv, Plugins__
+          @dsp = __build_dispatcher
+          ok = @dsp.process_input_against_plugins_in_module @argv, Plugins__
           ok or __when_not_OK ok
         end
       end
@@ -48,7 +49,6 @@ module Skylab
 
       end
 
-
       def __build_dispatcher
 
         require "#{ HERE_ }/lib-"
@@ -61,8 +61,7 @@ module Skylab
 
           i_a.concat first_two  # `__receive__user_authentication_failure_error_string__`
 
-          send :"__receive__#{ i_a * UNDERSCORE_ }__", & ev_p
-          nil
+          send :"__receive__#{ i_a * UNDERSCORE_ }__", & ev_p  # result is result
         end
 
         disp.state_machine(
@@ -84,6 +83,17 @@ module Skylab
         disp
       end
 
+      def __receive__dispatcher_request_by_plugin__
+        @dsp
+      end
+
+      def __receive__help_event__ & ev_p
+
+        ev_p[].render_all_lines_into_under @resources.serr, expression_agent_
+
+        nil
+      end
+
       def __receive__optparse_parse_error_exception__ & ev_p
         @resources.serr.puts ev_p[].message
         @was_unable = true
@@ -97,8 +107,7 @@ module Skylab
       end
 
       def __write_event_to_stderr ev
-        @__expag__ ||= Expression_Agent___.new
-        ev.render_each_line_under @__expag__ do | line |
+        ev.render_each_line_under expression_agent_ do | line |
           @resources.serr.puts line
         end
         nil
@@ -120,6 +129,11 @@ module Skylab
         ::File.basename $PROGRAM_NAME
       end
 
+      def expression_agent_
+        @__expag__ ||= Expression_Agent___.new
+      end
+
+
     class Expression_Agent___  # #todo after :+#dev cull this
       alias_method :calculate, :instance_exec
       def ick msg
@@ -132,14 +146,10 @@ module Skylab
         ( @kbd ||= curry :green )[ msg ]
       end
       def hdr msg
-        ( @hdr ||= curry :green )[ msg ]
+        ( @hdr ||= _curry :green )[ msg ]
       end
 
-      def progressive_verb s
-        s_a = s.split SPACE_
-        s_a[ 0 ] = _NLP_agent.progressive_verb[ s_a[ 0 ] ]
-        s_a * SPACE_
-      end
+
 
       def multiline a
         1 == a.length ? " #{ a[0] }" : "\n#{ a * "\n" }"
@@ -152,8 +162,24 @@ module Skylab
       def par i
         "<#{ i.to_s.gsub '_', '-' }>"
       end
-    private
-      def curry x
+
+      # ~
+
+      def progressive_verb s
+        _with_split_and_join :progressive_verb, s
+      end
+
+      def third_person s
+        _with_split_and_join :third_person, s
+      end
+
+      def _with_split_and_join meth, s
+        s_a = s.split SPACE_
+        s_a[ 0 ] = _NLP_agent.send( meth )[ s_a[ 0 ] ]
+        s_a * SPACE_
+      end
+
+      def _curry x
         Tree_Runner_::Lib_::CLI_lib[].pen.stylify.curry[ [ * x ] ]
       end
 

@@ -1,4 +1,4 @@
-module Skylab::Headless::CLI::Table
+module Skylab::Headless::CLI::Table  # :[#005].
 
   # (emigrated from porcelain, one of its last remaining useful nerks)
   # a rewrite of a table renderer that, as an excercise:
