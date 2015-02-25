@@ -8,57 +8,102 @@ module Skylab::TestSupport
 
         st.transition_is_effected_by do | o |
 
-          o.on '--divide N', "output the sidesystems into N smaller systems"
+          o.on '--divide N', "output the sidesystems into N smaller systems" do | s |
+            @N = s
+          end
 
         end
       end
 
+      def initialize( * )
+        super
+        @N = nil
+      end
+
       def do__flush_the_sidesystem_tree__
-        @resources.serr.puts "(this is the divide plugin pretending to work)"
+        ok = __normalize_number
+        ok &&= __resolve_SS_box
+        ok && __via_SS_box
+      end
+
+      def __normalize_number
+
+        _arg = Callback_::Trio.via_value_and_variegated_symbol @N, :number
+
+        ok_arg = Lib_::Basic[]::Number.normalization.with(
+          :argument, _arg,
+          :minimum, 1,
+          & @on_event_selectively )
+
+        ok_arg and begin
+          @d = ok_arg.value_x
+          ACHIEVED_
+        end
+      end
+
+      def __resolve_SS_box
+        @bx = @on_event_selectively.call :for_plugin, :sidesystem_box
+        @bx && ACHIEVED_
+      end
+
+      def __via_SS_box
+
+        _s = @on_event_selectively.call :for_plugin, :program_name
+        @head_s = "#{ _s } "
+
+        @num_pieces = @bx.length
+
+        if @d > @num_pieces
+          __when_too_big
+        else
+          _via_OK_count
+        end
+      end
+
+      def __when_too_big
+
+        d = @d ; num_pieces = @num_pieces
+
+        @on_event_selectively.call :info, :expression do | y |
+
+          y << "#{ ick d } is larger than the number of pieces #{
+            }(#{ num_pieces }) - reducing the count to that number"
+
+        end
+
+        @d = @num_pieces
+        _via_OK_count
+      end
+
+      def _via_OK_count
+
+        lesser_chunk_size = @num_pieces / @d
+        num_chunks_with_the_greater_chunk_size = @num_pieces % @d
+        num_chunks_with_the_lesser_chunk_size = @d - num_chunks_with_the_greater_chunk_size
+
+        num_chunks_with_the_lesser_chunk_size.times do | d |
+          _express_chunk d * lesser_chunk_size, lesser_chunk_size
+        end
+
+        greater_chunk_size = lesser_chunk_size + 1
+        offset = num_chunks_with_the_lesser_chunk_size * lesser_chunk_size
+
+        num_chunks_with_the_greater_chunk_size.times do | d |
+          _express_chunk offset + ( d * greater_chunk_size ), greater_chunk_size
+        end
+
         ACHIEVED_
       end
 
-      if false
+      def _express_chunk d, d_
 
-    Plugin_.enhance self do
+        _ = ( d ... ( d + d_ ) ).map do | d__ |
+          @bx.at_position( d__ ).basename
+        end * SPACE_
 
-      eventpoints_subscribed_to( * %i|
-        available_actions
-        action_summaries
-        argv_hijinx
-      | )
-
-      services_used(
-        [ :infostream, :proxy ],
-        [ :paystream, :proxy ],
-        [ :hot_subtree, :proxy ],
-        [ :full_program_name, :proxy ]
-      )
-
-    end
-
-    available_actions [ [ :divide, 0.1700 ] ]
-
-    action_summaries( divide: :x )
-
-    def initialize
-      @argv = nil
-    end
-
-    argv_hijinx do |cmd_i, argv|
-      if :divide == cmd_i
-        @argv = argv.dup
-        argv.clear
+        @resources.serr.puts "#{ @head_s }#{ _ }"
       end
-      nil
-    end
 
-    def divide
-      self.class.const_get( :Back__, false )[ @plugin_parent_services, @argv ]
-      false  # do not continue
-    end
-
-      end
     end
   end
 end

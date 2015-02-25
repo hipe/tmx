@@ -59,7 +59,7 @@ module Skylab::Slicer
       ss
     end
 
-    class Sidesystem___
+    class Sidesystem___  # :+[#ts-041]
 
       attr_accessor :mod, :const, :deps, :medo, :norm, :stem
 

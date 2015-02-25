@@ -77,37 +77,44 @@ module Skylab
         end
 
         def message_proc
+          oes_p = @on_event_selectively
           -> y, o do
-            Render___.new( y, o.__dsp, o.rsc, self ).execute
+            Render___.new( y, o.__dsp, o.rsc, self, & oes_p ).execute
           end
         end
 
         attr_reader :rsc
 
         def __dsp
-           @on_event_selectively.call(  # strange use of event model - meh
-            :request, :by_plugin, :dispatcher )
+          @on_event_selectively.call :for_plugin, :dispatcher  # experimental
         end
 
         class Render___
 
-          def initialize into_y, dsp, rsc, expag
+          def initialize into_y, dsp, rsc, expag, & oes_p
+            @content_has_been_displayed = false
             @dg = dsp.digraph
             @expag = expag
-            @plugins = dsp.plugins
+            @on_event_selectively = oes_p
+            @plugins = dsp.plugin_a
             @y = into_y
           end
 
           def execute
-            @bx = __group_formals_by_local_identifier
+            __init_args_list_and_options_box
             __render
           end
 
-          def __group_formals_by_local_identifier
+          def __init_args_list_and_options_box
 
+            a = nil
             bx = Callback_::Box.new
 
             @plugins.each do | pu |
+
+              if pu.respond_to? :process_ARGV
+                ( a ||= [] ).push pu
+              end
 
               pu.each_reaction do | tr |
 
@@ -133,17 +140,54 @@ module Skylab
                 end
               end
             end
-            bx
+
+            @takes_ARGV_pu_a = a
+            @bx = bx ; nil
           end
 
           def __render
 
+            if @takes_ARGV_pu_a
+              __render_usage_and_arguments
+            end
+
+            __render_options
+          end
+
+          def __render_usage_and_arguments
+
+            _pn = @on_event_selectively.call :for_plugin, :program_name
+
+            s_a = @takes_ARGV_pu_a.reduce [] do | m, pu |
+              s = pu.description_for_ARGV_syntax_under @expag
+              s and m.push s
+              m
+            end
+
+            if s_a.length.nonzero?
+              _args = " #{ s_a * SPACE_ }"
+            end
+
             y = @y
-            y << "(skipping args)\n\n"
+            @expag.calculate do
+              y << "#{ hdr( 'usage:' ) } #{ _pn } [opts]#{ _args }\n"
+            end
+
+            @content_has_been_displayed = true
+
+            nil
+          end
+
+          def __render_options
+
+            y = @y
+
+            @content_has_been_displayed and y << "\n"
 
             @expag.calculate do
               y <<  "#{ hdr( 'options:' ) }\n"
             end
+
             @mat_a = []
 
             @bx.each_value do | fo_a |

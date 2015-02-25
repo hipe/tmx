@@ -8,9 +8,9 @@ module Skylab::Brazen
 
     def bound_call *a
       if a.length.zero?
-        Bound_Call__
+        Callback_::Bound_Call
       else
-        Bound_Call__.new( *a )
+        Callback_::Bound_Call.new( * a )
       end
     end
 
@@ -83,28 +83,6 @@ module Skylab::Brazen
   Actor_ = -> cls, * x_a do
     Lib_::Snag_[]::Model_::Actor.via_client_and_iambic cls, x_a
     Brazen_.event.selective_builder_sender_receiver cls ; nil
-  end
-
-  Bound_Call__ = ::Struct.new :args, :receiver, :method_name do  # volatility order (subjective)
-
-    class << self
-
-      def build_via_arglist a
-        if a.length.zero?
-          self
-        else
-          new( * a )
-        end
-      end
-
-      def the_empty_call
-        @tec ||= new EMPTY_P_, :call
-      end
-
-      def via_value x
-        new nil, -> { x }, :call
-      end
-    end
   end
 
   Callback_ = ::Skylab::Callback

@@ -602,6 +602,28 @@ module Skylab::Callback
     end
   end
 
+  Bound_Call = ::Struct.new :args, :receiver, :method_name do  # volatility order (subjective)
+
+    class << self
+
+      def build_via_arglist a
+        if a.length.zero?
+          self
+        else
+          new( * a )
+        end
+      end
+
+      def the_empty_call
+        @tec ||= new EMPTY_P_, :call
+      end
+
+      def via_value x
+        new nil, -> { x }, :call
+      end
+    end  # >>
+  end
+
   # ~ the #employment story
 
   module Autoloader  # read [#024] the new autoloader narrative

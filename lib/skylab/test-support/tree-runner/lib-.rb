@@ -2,7 +2,7 @@ module Skylab::TestSupport
 
   class Tree_Runner
 
-    sl_lib = ::File.expand_path '../..', HERE_ # [#002] #at-this-exact-point
+    sl_lib = ::File.expand_path '../..', HERE_  # [#002] #at-this-exact-point
 
     require "#{ sl_lib }/test-support/core"
 
@@ -14,6 +14,8 @@ module Skylab::TestSupport
 
       sidesys = Autoloader_.build_require_sidesystem_proc
 
+      Basic = sidesys[ :Basic ]
+
       CLI_lib = -> do
         HL__[]::CLI
       end
@@ -24,8 +26,9 @@ module Skylab::TestSupport
         HL__[]::NLP
       end
 
-      Oxford_and = -> a do
-        Callback_::Oxford_and[ a ]
+      Open3 = -> do
+        require 'open3'
+        ::Open3
       end
 
       Option_parser = -> do
@@ -33,9 +36,12 @@ module Skylab::TestSupport
         ::OptionParser
       end
 
+      System = -> do
+        HL__[].system
+      end
+
       if false
 
-    Bsc__ = sidesys[ :Basic ]
 
     Basic_Mutex = -> do
       Bsc__[]::Mutex
@@ -91,7 +97,20 @@ module Skylab::TestSupport
 
     Plugin_ = Lib_::HL__[]::Plugin
 
-    Plugins__::Express_Help = Plugin_::Express_Help
+    class Plugins__::Express_Help < Plugin_
 
+      does :finish do | st |
+
+        st.transition_is_effected_by do | o |
+
+          o.on '--help', 'show this screen'
+
+        end
+      end
+
+      def do__finish__
+        Plugin_.express_help_into @resources, & @on_event_selectively
+      end
+    end
   end
 end
