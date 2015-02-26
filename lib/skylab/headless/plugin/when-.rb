@@ -6,7 +6,25 @@ module Skylab
 
       When_ = ::Module.new
 
-      When_::Unused_Actuals = Callback_::Event.prototype_with :unused_actuals,
+      _Ev = Callback_::Event
+
+      When_::Ambiguous_Next_Step = _Ev.prototype_with :ambiguous_next_step,
+
+          :steps, nil, :plugin_a, nil, :digraph, nil do | y, o |
+
+        a = o.steps.map do | step |
+          o.plugin_a.fetch( step.plugin_idx ).name.as_human
+        end
+
+        _v = o.digraph.
+          transition( o.steps.first.transition_symbol ).name.as_human
+
+        y << "input has ambiguity - #{ both a }#{ and_ a } #{
+          }want to #{ _v }"
+
+      end
+
+      When_::Unused_Actuals = _Ev.prototype_with :unused_actuals,
 
           :box, nil, :steps, nil, :plugins, nil do | y, o |
 

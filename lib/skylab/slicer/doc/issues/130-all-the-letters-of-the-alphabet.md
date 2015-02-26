@@ -51,7 +51,8 @@ x - very often used as standalone or as a suffix to emphasize that the variable
 y - used often as a standalone name for something (almost always an argument)
     that is interacted with in an ::Enumerator::Yielder-exact way, i.e the
     -ONLY- thing we do with it is send `yield` (alias `<<`) on it.
-    (this evolved to apply to an array being built as some kind of result.)
+    (this evolved to apply to an array being built as some kind of result,
+     because the semantics are the same and visually it can be the same too.)
 z - nope. (has very rarely been used to hold the index of the last item in
     an array, that is, length - 1).
 

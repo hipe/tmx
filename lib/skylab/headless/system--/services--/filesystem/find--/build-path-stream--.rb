@@ -6,20 +6,22 @@ module Skylab::Headless
 
   class Find__
 
-    class Build_scan__
+    class Build_path_stream__
 
-      Callback_::Actor.call self, :properties,
-
-        :on_event_selectively, :valid_command_s
+      Callback_::Actor.call self, :properties, :args
 
       # try to read from the process's STDOUT *first* before seeing if
-      # there's # STDERR to read. if you read from STDERR it might block
+      # there's STDERR to read. if you read from STDERR it might block
       # if it hasn't yet closed the other stream.
 
       def execute
+
         thread = nil
+
         p = -> do
-          _, o, e, thread = Headless_::Library_::Open3.popen3 @valid_command_s
+
+          _, o, e, thread = Headless_::Library_::Open3.popen3( * @args )
+
           p = -> do
             s = o.gets
             if s  # then no error on first try
@@ -54,8 +56,7 @@ module Skylab::Headless
 
         @on_event_selectively.call :error, :find_error do
 
-          Callback_::Event.inline_with :find_error,
-            :message, error_s, :ok, false
+          Callback_::Event.inline_not_OK_with :find_error, :message, error_s
         end
         nil
       end

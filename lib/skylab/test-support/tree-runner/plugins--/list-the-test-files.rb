@@ -4,15 +4,15 @@ module Skylab::TestSupport
 
     class Plugins__::List_The_Test_Files < Plugin_
 
-      does :flush_the_test_files do | st |
+      does :flush_the_test_files do | tr |
 
-        st.transition_is_effected_by do | o |
+        tr.transition_is_effected_by do | o |
 
           o.on '--list-files', 'write to stdout the path to each test file'
 
         end
 
-        st.if_transition_is_effected do | o |
+        tr.if_transition_is_effected do | o |
 
           o.on '-p', '--pretty', 'make the filenames \"pretty\" somehow' do
             @do_pretty = true
@@ -30,67 +30,66 @@ module Skylab::TestSupport
       end
 
       def do__flush_the_test_files__
-        @resources.serr.puts "(pretending to list the test files. pretty: #{ @do_pretty ? 'yes' : 'no' })"
+
+        # ~ the base callbacks
+
+        @receive_path = @resources.sout.method( :puts )
+
+        @at_end = EMPTY_P_
+
+        # ~ mutate the callbacks
+
+        if @be_verbose
+          __mutate_callbacks_for_be_verbose
+        end
+
+        if @do_pretty
+          __mutate_callbacks_for_do_pretty
+        end
+
+        # ~ flush output:
+
+        p = @receive_path
+        st = @on_event_selectively.call :for_plugin, :test_file_stream
+        begin
+          path = st.gets
+          path or break
+          p[ path ]
+          redo
+        end while nil
+
+        @at_end[]
+
         ACHIEVED_
       end
 
-    if false
-    Plugin_.enhance self do
+      def __mutate_callbacks_for_do_pretty
 
-      eventpoints_subscribed_to( * %i|
-        available_actions
-        action_summaries
-        available_options
-        conclude
-      | )
+        @receive_path = -> p do
+          -> path do
+            path = "(pretty: #{ path })"
+            p[ path ]
+          end
+        end.call @receive_path
+        nil
+      end
 
-      services_used [ :paystream, :proxy ], [ :hot_spec_paths, :proxy ],
-        [ :pretty_path, :ivar ]
-    end
+      def __mutate_callbacks_for_be_verbose
 
-    def initialize
-      @do_pretty = @be_verbose = @did_run = nil
-    end
+        count = 0
+        @receive_path = -> p do
+          -> path do
+            count += 1
+            p[ path ]
+          end
+        end.call @receive_path
 
-    available_actions [
-      [ :files, 0.50 ]
-    ]
-
-    action_summaries(
-      files: "write to stdout the pretty name of each test file"
-    )
-    def files
-      paystream, hot_spec_paths =
-        @plugin_parent_services[ :paystream, :hot_spec_paths ]  # grease
-
-      block = if @do_pretty
-        -> spec_path do
-          paystream.puts @pretty_path[ spec_path ]
+        @at_end = -> do
+          @resources.serr.puts "(listed #{ count } spec file(s))"
+          nil
         end
-      else
-        -> spec_path do
-          paystream.puts "#{ spec_path }"
-        end
+        nil
       end
-      count = 0
-      ok = hot_spec_paths.each do |pn|
-        count += 1
-        block[ pn ]
-      end
-      if ok
-        @did_run = true
-        @last_count = count if @be_verbose
-      end
-      ok
-    end
-
-    conclude do |y|
-      if @be_verbose && @did_run
-        y << "listed #{ @last_count } spec file(s)"
-        true
-      end
-    end
-    end
     end
   end
 end

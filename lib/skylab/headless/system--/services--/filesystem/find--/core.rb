@@ -4,75 +4,103 @@ module Skylab::Headless
 
     class Services__::Filesystem
 
-      class Find__  # see [#171]. this particular node models the command itself
+      class Find__  # see [#171].
+
+        # synopsis:
+        #
+        #   • this is a :+[#ba-027]:#normal-normalizer: once built this entity
+        #     is :+[#bs-018] immutable, effecting :+[#sl-016] spawn-and-mutate
+        #
+        #   • when successful the entity holds a tokenized array of strings
+        #     (the "command args") obviating the need to shellescape here
+        #     (but know what you're doing!! major :+#security concern)
+        #
+        #   • this node itself is concerned with modeling the entity not
+        #     finding the files, however producing an array of paths for
+        #     the latter is the default behavior for some forms of call.
 
         class << self
 
           def mixed_via_iambic x_a
             new do
               process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+              self._THIS_WILL_be_fun_to_clean_this_up
               @x_a = @d = @x_a_length = nil  # #todo
-            end.mixed_result
+            end.__mixed_result
           end
 
           private :new
-        end
+        end  # >>
 
-        Callback_::Actor.methodic self, :simple, :properties,
+        Callback_::Actor.methodic self, :properties, :as_normal_value
+          # (and see many iambic writers below)
 
-          :iambic_writer_method_to_be_provided, :property, :filename,
+        def initialize & edit_p
 
-          :iambic_writer_method_to_be_provided, :property, :filenames,
-
-          :iambic_writer_method_to_be_provided, :property, :freeform_query_infix,
-
-          :iambic_writer_method_to_be_provided, :property, :ignore_dirs,
-
-          :iambic_writer_method_to_be_provided, :property, :path,
-          :iambic_writer_method_to_be_provided, :property, :paths,
-
-          :properties, :as_normal_value, :on_event_selectively
-
-
-        def initialize & p
-          @as_normal_value = DEFAULT_AS_NORMAL_VALUE_PROC__
-          @on_event_selectively = DEFAULT_ON_EVENT_SELECTIVELY__
-          # ~ ivars related to fields, alphabeticized by field's name
+          @as_normal_value = DEFAULT_AS_NORMAL_VALUE_PROC___
+          @freeform_query_infix_words = nil
+          @on_event_selectively = DEFAULT_ON_EVENT_SELECTIVELY___
           @unescaped_filename_a = []
-          @freeform_query_infix = nil
           @unescaped_ignore_dir_a = []
           @unescaped_path_a = []
-          instance_exec( & p )
+
+          instance_exec( & edit_p )
+          _decide_if_curry_and_resolve_command_args
+          freeze
+        end
+
+        DEFAULT_AS_NORMAL_VALUE_PROC___ = -> cmd do
+          cmd.to_path_stream.to_a
+        end
+
+        DEFAULT_ON_EVENT_SELECTIVELY___ = -> i, * _, & ev_p do
+          if :info != i
+            raise ev_p[].to_exception
+          end
+        end
+
+        def new_with * x_a, & oes_p
+          dup.__init_new x_a, & oes_p
+        end
+
+        def initialize_copy _otr_
+
+          # do not freeze here or make ivar dups here, this dup is for
+          # internal copies whose existing ivars are read-only but who
+          # must themselves reamain mutable, see #note-130
+
+        end
+
+      protected def __init_new x_a, & oes_p
+
+          # for now this is hand-written to allow only the paths to change:
+
+          @unescaped_path_a = @unescaped_path_a.dup
+
+          oes_p and accept_selective_listener_proc oes_p
+
+          ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+
+          ok and begin
+            _decide_if_curry_and_resolve_command_args
+            freeze
+          end
+        end
+
+
+        private def accept_selective_listener_proc p  # #hook-out for [ca]
+          @on_event_selectively = p ; nil
+        end
+
+        def _decide_if_curry_and_resolve_command_args
           if @unescaped_path_a.length.zero?
             @is_curry = true
           else
             @is_curry = false
-            resolve_any_valid_command_string
+            __resolve_valid_command_args
           end
-          freeze
+          nil
         end
-
-        DEFAULT_AS_NORMAL_VALUE_PROC__ = -> cmd do
-          cmd.to_stream.to_a  # #todo - not yet implemented, part of the grand unification
-        end
-
-        DEFAULT_ON_EVENT_SELECTIVELY__ = -> i, * _, & ev_p do
-          if :info != i
-            raise ev.to_exception
-          end
-        end
-
-        def mixed_result
-          if @is_curry
-            self
-          elsif @any_valid_command_string
-            @as_normal_value[ self ]
-          else
-            @last_error_result  # #todo
-          end
-        end
-
-      private
 
         def freeze
           @unescaped_filename_a.freeze
@@ -81,33 +109,7 @@ module Skylab::Headless
           super
         end
 
-        def initialize_copy _otr_
-          # do not freeze here, this dup is for internal copies whose
-          # existing ivars are read-only but who must themselves reamain
-          # mutable, see #note-130
-        end
-
-      protected
-
-        def init_copy
-          @unescaped_filename_a = @unescaped_filename_a.dup
-          # assume '@freeform_query_infix' if set is frozen
-          @unescaped_ignore_dir_a = @unescaped_ignore_dir_a.freeze
-          @unescaped_path_a = @unescaped_path_a.dup
-          nil
-        end
-
-      public
-
-        def string
-          @any_valid_command_string
-        end
-
-        def to_stream
-          @any_valid_command_string and begin
-            Find__::Build_scan__[ @on_event_selectively, @any_valid_command_string ]
-          end
-        end
+        attr_reader :args
 
       private
 
@@ -122,25 +124,28 @@ module Skylab::Headless
           KEEP_PARSING_
         end
 
-        def freeform_query_infix=
-          s = iambic_property
-          if s
-            if FREEFORM_QUERY_VALIDATION_HACK_RX__ =~ s
-              s.frozen? or s.freeze  # or change how you dup, or require
-              @freeform_query_infix = s
-            else
-              raise ::ArgumentError, "looks strange: #{ s.inspect }"  # just sanity
+        def freeform_query_infix_words=
+
+          # for now a hack to effect "-type d" etc. if we find ourselves
+          # leveraging this more than once in the same "way", abstract.
+
+          s_a = iambic_property
+          if s_a
+            s_a.each do | s |
+              if FREEFORM_WORD_SANITY_RX___ =~ s
+                s.frozen? or s.freeze  # or change how you dup, or require
+              else
+                raise ::ArgumentError, "looks strange: #{ s.inspect }"  # for now, sanity
+              end
             end
+            @freeform_query_infix_words = s_a.freeze
           else
-            @freeform_query_infix = s
+            @freeform_query_infix_words = nil
           end
           KEEP_PARSING_
         end
 
-        FREEFORM_QUERY_VALIDATION_HACK_RX__ = -> do
-          part = '-?[a-z0-9]+'
-          %r(\A#{ part }(?:[ ]#{ part })*\z)
-        end.call
+        FREEFORM_WORD_SANITY_RX___ = /\A-?[a-z0-9]+\z/
 
         def ignore_dirs=
           @unescaped_ignore_dir_a.replace iambic_property
@@ -157,86 +162,134 @@ module Skylab::Headless
           KEEP_PARSING_
         end
 
-        # ~ done with iambic writers
+      public
 
-        def resolve_any_valid_command_string  # amazing hax #note-130
-          otr = dup
-          otr.singleton_class.send :prepend, Command_String_Building_Methods__
-          s = otr.execute
-          if s
-            @any_valid_command_string = s.freeze
-            @on_event_selectively.call :info, :command_string do
-              Command_String_Event__[ s ]
-            end
+        def __mixed_result
+          if @is_curry
+            self
+          elsif @valid_args
+            @as_normal_value[ self ]
           else
-            @any_valid_command_string = UNABLE_
+            @last_error_result  # #todo
+          end
+        end
+
+        def to_path_stream
+          @args and begin
+            Find__::Build_path_stream__[ @args, & @on_event_selectively ]
+          end
+        end
+
+        def __resolve_valid_command_args  # amazing hax #note-130
+          otr = dup
+          otr.extend Command_Building_Methods__
+          @args = otr.__args_via_flush
+          if @args
+            @on_event_selectively.call :info, :event, :find_command_args do
+              Command_Args_Event__[ @args ]
+            end
           end
           nil
         end
 
-        Command_String_Event__ = Callback_::Event.prototype_with(
+        Command_Args_Event__ = Callback_::Event.prototype_with(
 
-            :command_string, :command_string, nil, :ok, nil ) do |y, o|
+           :find_command_args, :find_command_args, nil, :ok, nil ) do | y, o |
 
-          y << "generated `find` command: #{ o.command_string }"
+          sw = Headless_.lib_.shellwords
+
+          _ = o.find_command_args.map do | s |
+            sw.shellescape s
+          end.join SPACE_
+
+          y << "generated `find` command: \"#{ _ }\""
         end
 
-        module Command_String_Building_Methods__
+        module Command_Building_Methods__
 
-          # assume nonzero paths
+          def __args_via_flush
 
-          def execute
-            @y = [ 'find' ]
-            append_nonzero_paths
-            if @unescaped_ignore_dir_a.length.nonzero?
-              append_ignore_dir_phrase
+            if @unescaped_path_a.length.nonzero?
+              __args_via_nonzero_length_list_of_paths
+            else
+              UNABLE_
             end
-            if @freeform_query_infix
-              @y.push @freeform_query_infix
-            end
-            if @unescaped_filename_a.length.nonzero?
-              append_name_phrase
-            end
-            @y * SPACE_
           end
 
-        private
+          def __args_via_nonzero_length_list_of_paths
 
-          def append_nonzero_paths
-            @unescaped_path_a.each do |s|
-              @y.push Headless_.lib_.shellwords.escape s
+            # given any nonzero-length list of paths (and barring any
+            # invalid additions to the freeform words array), we *think*
+            # this is guaranteed always to build a valid find command..
+
+            @y = [ FIND__ ]
+
+            __add_paths
+
+            @y.push DOUBLE_DASH___
+
+            if @unescaped_ignore_dir_a.length.nonzero?
+              __add_ignore_dir_phrase
+            end
+
+            if @freeform_query_infix_words
+              @y.concat @freeform_query_infix_words
+            end
+
+            if @unescaped_filename_a.length.nonzero?
+              __add_name_phrase
+            end
+
+            @y.freeze
+          end
+
+          DOUBLE_DASH___ = '--'.freeze
+          FIND__ = 'find'.freeze
+
+          def __add_paths
+            @unescaped_path_a.each do | path |
+              @y.push F__, path.freeze  # ( we used to :+#escape here )
             end ; nil
           end
 
-          def append_ignore_dir_phrase
-            @y.push '-not \( -type d \( -mindepth 1 -a'
-            @y.push ignore_dir_orlist
-            @y.push '\) -prune \)'
+          F__ = '-f'.freeze
+
+          def __add_ignore_dir_phrase
+            @y.concat %w'-not ( -type d ( -mindepth 1 -a'
+            _add_OR_list_via_unescaped_value_array @unescaped_ignore_dir_a
+            @y.concat %w') -prune )'
           end
 
-          def ignore_dir_orlist
-            orlist_via_unescaped_value_array @unescaped_ignore_dir_a
+          def __add_name_phrase
+            @y.push '('
+            _add_OR_list_via_unescaped_value_array @unescaped_filename_a
+            @y.push ')'
           end
 
-          def append_name_phrase
-            @y.push '\('
-            @y.push name_orlist
-            @y.push '\)'
+          def _add_OR_list_via_unescaped_value_array s_a
+
+            st = Callback_::Stream.via_times s_a.length do | d |
+              [ NAME_OPERATOR__, s_a.fetch( d ) ]  # ( we used to :+#escape here )
+            end
+
+            s_a = st.gets
+            if s_a
+              @y.concat s_a
+            end
+
+            begin
+              s_a = st.gets
+              s_a or break
+              @y.push OR_OPERATOR__
+              @y.concat s_a
+              redo
+            end while nil
+            nil
           end
 
-          def name_orlist
-            orlist_via_unescaped_value_array @unescaped_filename_a
-          end
+          NAME_OPERATOR__ = '-name'.freeze
+          OR_OPERATOR__ = '-o'.freeze
 
-          def orlist_via_unescaped_value_array a
-            a.map do |s|
-              "-name #{ Dangerous_conditional_shellescape_path__[ s ] }"
-            end.join ' -o '
-          end
-
-          Dangerous_conditional_shellescape_path__ = -> s do
-            Headless_.lib_.shellwords.escape s  # placeholder for hax
-          end
         end
       end
     end

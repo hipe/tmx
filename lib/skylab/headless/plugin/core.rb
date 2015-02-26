@@ -345,7 +345,9 @@ module Skylab::Headless
             when 1
               self.__TODO_when_no_step
             when -1
-              self.__TODO_when_ambiguous
+              __when_ambiguous a
+              ok = UNABLE_
+              break
             end
 
             redo
@@ -354,6 +356,15 @@ module Skylab::Headless
         end
 
         FINISHED___ = :finished
+
+        def __when_ambiguous a
+
+          @on_event_selectively.call :error, :event, :ambiguous_next_step do
+            Plugin_::When_::Ambiguous_Next_Step.new_with(
+              :steps, a, :plugin_a, @plugin_a, :digraph, @state_machine.digraph )
+          end
+          nil
+        end
 
         def __into_plan_add_step step
 

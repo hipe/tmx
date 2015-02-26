@@ -221,6 +221,10 @@ module Skylab
         Callback_::Oxford_and[ s_a ]
       end
 
+      def both x
+        Tree_Runner_::Lib_::NLP[]::EN.both x
+      end
+
       def ick msg
         "\"#{ msg }\""
       end

@@ -122,7 +122,7 @@ always check whether the listener was passed at all first.
 
 
 
-## normal normalizers
+## :#normal-normalizers
 
 in the normal case a normalizer will be implemented something like a
 specialized actor. the full lifecycle of normalization can be broken up

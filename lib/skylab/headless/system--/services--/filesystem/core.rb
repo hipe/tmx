@@ -20,8 +20,12 @@ module Skylab::Headless
         end
       end
 
-      def find * x_a
-        Filesystem_::Find__.mixed_via_iambic x_a
+      def find * x_a, & oes_p
+        if x_a.length.zero?
+          Filesystem_::Find__
+        else
+          Filesystem_::Find__.mixed_via_iambic x_a, & oes_p
+        end
       end
 
       def flock_first_available_path * x_a

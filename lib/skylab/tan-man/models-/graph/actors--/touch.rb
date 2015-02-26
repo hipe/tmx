@@ -168,7 +168,7 @@ module Skylab::TanMan
 
       def resolve_upstream_lines_
         otr = dup
-        otr.extend Produce_upstream_lines___  # :+[#sk-106]
+        otr.extend Produce_upstream_lines___  # :+[#sl-106]
         @up_lines = otr.execute
         @up_lines && ACHIEVED_
       end

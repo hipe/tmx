@@ -280,11 +280,11 @@ module Skylab::TestSupport
 
           @on_event_selectively.call :error, :expression, :didnt_match_anything do | y |
 
-            _s_a = no_matches.map do | mtch |
+            a = no_matches.map do | mtch |
               ick mtch.s
             end
 
-            y << "#{ or_ _s_a } #{ s _s_a, :does } match any subsystems."
+            y << "#{ and_ a } #{ s a, :does } not match any subsystem#{ s a }."
           end
         end
 

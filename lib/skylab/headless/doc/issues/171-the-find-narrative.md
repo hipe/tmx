@@ -7,7 +7,8 @@ back 3.5 years before the birth of this document.
 
 in its current incarnation it is (or will soon) represent a unification
 of three separate nodes that were ground-up rewrites of this same kind
-of thing. as we write this we are undertaking yet another rewrite.
+of thing. as we write this we are undertaking yet another rewrite (and
+then another renovation).
 
 
 
@@ -30,21 +31,30 @@ of thing. as we write this we are undertaking yet another rewrite.
 
 ### implementation requirements
 
-• immutability - in keeping with the tradition we now often see in
-    the implementations for normalizations, the agent will be immutable.
-    "edits" to it will be implemented as (presumably duped) copies of
-    whatever original you started with. (one day [#bs-018] will explain.)
+• immutability - in keeping with our pattern for normalizations, the
+    agent will be immutable. "edits" to it will be implemented as
+    (presumably duped) copies of whatever original you started with.
+    (one day [#bs-018] will explain why we like immutability,
+     and below will explain more specifically).
 
 • separation of representation from execution - because today we like
     scanners but we expect that perhaps that might change, we should
     compartmentalize how we respresent the find command from how it
     is (within the system) executed.
 
+• we used to and no longer represent or deliver the command as a string.
+    we now represent and deliver it as an array of tokens. this frees us
+    from the burden of escaping (e.g through `Shellwords.shellescape`),
+    ** provided that the user passes the array of tokens as a list of
+    args to e.g `Open3.popen3` **.
+    this is a major point of concern for :+#security. this was tested
+    only by finding a file whose filename had a space in it.
 
 
 
 
-## "amazing hax" (:#note-130)
+
+## "amazing hax" (:#note-130) (now :+[#sl-106])
 
 so this is a fun weird experimental pattern: we don't want the command
 object itself to have to worry about the logical mechanics of building
@@ -73,7 +83,7 @@ for all these reasons stated above we do it this way: we make a dup of the
 command that is left as mutable i.e not frozen. with this dup we *prepend*
 onto its singleton class a module with all the methods we want to use to
 build the command string. it is as if we have changed the class of the
-object, just to do this one ad-hoc task.
+object, just to do this one ad-hoc task. (EDIT: just extend)
 
 when this would-be actor is finished it produces its result. that result
 in internalized into an ivar in the command object and it is frozen.

@@ -39,7 +39,7 @@
 [#109]       this whacky #pattern of using a class as a namespace
 [#108]       #low-low-priority #pattern normalization
 [#107]       #low-priority 2012-11-02 this lexical scoping issue
-[#106]       :+#pattern: the spawn pattern
+[#106]       :+#pattern: the spawn pattern (currently described in [#hl-171])
              ( was: #done 2012-10-28 autoloading vis-a-vis const awareness )
 [#105] #open 2012-08-18 play with test/all_specs.rb -w
 [#102.901.3.2.2] #doc-point #open 2012-06-12 towards an event wiring pattern ..
