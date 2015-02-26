@@ -31,7 +31,7 @@
 [#014]       #parent-node: [#015] how nodes are generated ..
 [#013]       #historical #done #inquiry-point choke point etc (#relates-to [#ts-013]) ([#xx-004]))
              #done 351 extra tests (but this issue 2 states ago .. oh boy)
-[#012]       #doc-point #in-situ (the particular importance of result values) ([#xx-006])
+[#012]       #doc-point #in-situ (the particular importance of result values) (was: [#xx-006])
              ( #was: #done #parent-node: [#015] setup vs example? )
 [#011]       #tracking-tag fix 'test/' - 'TestSupport' for autoloading?
 [#010]       #tracking-tag "dark hack" this one weird old trick makes ..

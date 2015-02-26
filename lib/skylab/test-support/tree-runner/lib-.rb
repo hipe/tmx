@@ -121,5 +121,17 @@ module Skylab::TestSupport
         Plugin_.express_help_into @resources, & @on_event_selectively
       end
     end
+
+    module Adapters_
+      Autoloader_[ self ]
+    end
+
+    class Adapter_
+
+      def initialize rsc, & oes_p
+        @resources = rsc
+        @on_event_selectively = oes_p
+      end
+    end
   end
 end

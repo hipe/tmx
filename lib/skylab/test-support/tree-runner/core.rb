@@ -6,13 +6,9 @@ module Skylab
 
       def initialize _, o, e, a
 
+        @argv = a
         @resources = Resources___.new o, e
         @was_unable = false
-        if a.frozen?
-          @argv = a
-        else
-          @argv = a.dup.freeze  # #todo remove after :+#dev
-        end
       end
 
       Resources___ = ::Struct.new :sout, :serr
@@ -71,22 +67,26 @@ module Skylab
 
         require "#{ HERE_ }/lib-"
 
-        disp = Plugin_::Dispatcher.new @resources do | * i_a, & ev_p |
+        @on_event_selectively = -> * i_a, & ev_p do
 
-          first_two = i_a.shift 2  # `error`, `string`
+          first_two = i_a[ 0, 2 ]  # `error`, `string`
 
-          i_a.reverse!  # `authentication_failure`, `user` ..
+          rest = i_a[ 2 .. -1 ]  # `authentication_failure`, `user`
 
-          i_a.concat first_two  # `__receive__user_authentication_failure_error_string__`
+          long_a = rest.reverse
+          long_a.concat first_two  # `__receive__user_authentication_failure_error_string__`
 
-          meth = :"__receive__#{ i_a * UNDERSCORE_ }__"
+          meth = :"__receive__#{ long_a * UNDERSCORE_ }__"
 
           if ! respond_to? meth
             meth = :"__receive__#{ first_two * UNDERSCORE_ }__"
+            args = rest
           end
 
-          send meth, & ev_p  # result is result
+          send meth, * args, & ev_p  # result is result
         end
+
+        disp = Plugin_::Dispatcher.new @resources, & @on_event_selectively
 
         disp.state_machine(
 
@@ -122,6 +122,13 @@ module Skylab
       end
 
       # ~ callbacks where we give data:
+
+      def __receive__for_plugin_adapter__ sym
+        h = ( @__vendor_adapters__ ||= {} )
+        h.fetch sym do
+          h[ sym ] = __build_adapter sym  # memoizing any failure
+        end
+      end
 
       def __receive__for_plugin_dispatcher__
         @dsp
@@ -210,6 +217,16 @@ module Skylab
         ::Enumerator::Yielder.new do | line |
           @resources.serr.puts line
         end
+      end
+
+      # ~ support for above (ad-hoc business)
+
+      def __build_adapter sym
+
+        _cls = Tree_Runner_::Adapters_.const_get(
+          Callback_::Name.via_variegated_symbol( sym ).as_const, false )
+
+        _cls.new @resources, & @on_event_selectively
       end
 
     class Expression_Agent___  # #todo after :+#dev cull this

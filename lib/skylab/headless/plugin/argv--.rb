@@ -344,7 +344,9 @@ module Skylab::Headless
 
           Callback_::Bound_Call.new( nil,
 
-            Plan___.new( @argv_2, @prcs_argv_meth_name, @step_a, @indexes,
+            Plan___.new(
+              @argv_2, @input_x, @prcs_argv_meth_name,
+              @step_a, @indexes,
               & @on_event_selectively ),
 
             :execute_the_plan )
@@ -353,19 +355,28 @@ module Skylab::Headless
 
       class Plan___
 
-        def initialize input_x, input_method_name, step_a, idxs, & oes_p
+        def initialize working_argv, real_argv, input_method_name, step_a, idxs, & oes_p
           @input_method_name = input_method_name
-          @input_x = input_x
           @on_event_selectively = oes_p
           @plugin_a = idxs.plugin_a
+          @real_ARGV = real_argv
           @step_a = step_a
+          @working_ARGV = working_argv
         end
 
         def execute_the_plan
 
+          # arbitrary plugins may rely on arbitrary outside services to parse
+          # additional ARGV at any point (or conversely, the outside services
+          # may rely on ARGV being empty) so we must transfer it over now.
+
+          @real_ARGV.replace @working_ARGV
+          @working_ARGV = nil
+          input_x = @real_ARGV
+
           ok = true
 
-          if @input_x.length.nonzero? && ! @input_method_name
+          if input_x.length.nonzero? && ! @input_method_name
             _when_unprocessed_input
             ok = UNABLE_
           else
@@ -377,10 +388,10 @@ module Skylab::Headless
               step.write_actuals_into_plugin pu
 
               if step.does_process_input
-                ok = pu.send @input_method_name, @input_x
+                ok = pu.send @input_method_name, input_x
                 ok or break
 
-                if step.is_last_to_process_input && @input_x.length.nonzero?
+                if step.is_last_to_process_input && input_x.length.nonzero?
                   _when_unprocessed_input
                   ok = UNABLE_
                   break

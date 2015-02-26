@@ -1,15 +1,14 @@
-module Skylab::Test
+module Skylab::TestSupport
 
-  module Adapters_::Relish
+  class Tree_Runner
 
-    # we use a strange name as an exercise in modularity, and so we don't
-    # get false-positives when searching for the real ::R-Spec/r-spec
+    class Adapters_::Relish < Tree_Runner_::Adapter_
 
-    Test_::Adapter_.anchor_module self  # do all the common things
-
-    class << self
+  # we use a strange name as an exercise in modularity, and so we don't
+  # get false-positives when searching for the real ::R-Spec/r-spec
 
       def load_core_if_necessary
+
         if ! defined? ::Rspec
           Autoloader_.require_stdlib :RSpec
         end ; nil
