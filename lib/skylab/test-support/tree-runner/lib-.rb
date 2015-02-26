@@ -20,6 +20,16 @@ module Skylab::TestSupport
         HL__[]::CLI
       end
 
+      CLI_table = -> * x_a do
+        if x_a.length.zero?
+          Face__[]::CLI::Table
+        else
+          Face__[]::CLI::Table[ * x_a ]
+        end
+      end
+
+      Face__ = sidesys[ :Face ]
+
       HL__ = sidesys[ :Headless ]
 
       NLP = -> do
@@ -56,7 +66,6 @@ module Skylab::TestSupport
       HL__[].expression_agent.NLP_EN_agent.calculate( & p )
     end
 
-    Face__ = sidesys[ :Face ]
 
 
     Heavy_plugin = -> do

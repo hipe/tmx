@@ -220,9 +220,7 @@ module Skylab
               :header, :none,
 
               :read_rows_from, @mat_a,
-              :write_lines_to, -> s do
-                y << "#{ s }\n"
-              end )
+              :write_lines_to, y )
 
             ACHIEVED_
           end

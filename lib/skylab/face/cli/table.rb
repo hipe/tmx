@@ -44,9 +44,11 @@ module Skylab::Face
     #     act  # => exp
 
     class << self
+
       def [] * x_a
         new( x_a ).execute
       end
+
       def call_via_iambic x_a
         if x_a.length.zero?
           self
@@ -54,77 +56,120 @@ module Skylab::Face
           new( x_a ).execute
         end
       end
-    end
+    end  # >>
 
     def initialize x_a
-      @do_show_header = @field_box = @left_x =
-        @right_x = @read_rows_from =
-        @sep_x = @target_width_d = @write_lines_to = nil
+
+      @do_show_header = @field_box = @left_x = @right_x =
+        @sep_x = @target_width_d = nil
+
+      @row_upstream = @line_downstream_yielder = nil
+
       Table_Shell__.new 0, x_a, self
     end
 
-    attr_writer :do_show_header, :field_box, :left_x, :read_rows_from,
-      :right_x, :sep_x, :write_lines_to
+    attr_writer :do_show_header, :field_box, :left_x, :right_x, :sep_x
+
+    attr_accessor :row_upstream, :line_downstream_yielder
 
     alias_method :dupe, :dup  # :+[#mh-021] (ok)
 
     def initialize_copy _otr_
       # @do_show_header, @left_x @right_x, @sep_x copy-by-reference
 
-      # ALSO @read_rows_from, @write_lines_to copy-by-reference (for now)
+      # ALSO @row_upstream, @line_downstream_yielder  copy-by-reference (for now)
 
       @field_box and @field_box = @field_box.dupe  # deep copy #storypoint-80
       nil
     end
 
     class Table_Shell__
+
       def initialize d, x_a, kernel
+
         @d = d ; @kernel = kernel ; @x_a = x_a
+
         @field_box = nil
-        1 == @x_a.length and when_one
+
+        if 1 == @x_a.length
+          # hack - whenever exactly 1 element is passed
+          # assume it is a rows enumerator.
+          @x_a.unshift :read_rows_from
+        end
+
         absrb
+
         if @field_box
           @kernel.do_show_header.nil? and @kernel.do_show_header = true
           @kernel.field_box and raise "field merge not implemented"
           @kernel.field_box = @field_box
         end
       end
-    private
-      def when_one  # hack - whenever exactly 1 element is passed
-        # assume it is a rows enumerator.
-        @x_a.unshift :read_rows_from ; nil
-      end
+
     LIB_.fields_from_methods :niladic, :absorber, :absrb, -> do
+
       def field
         bx = (( @field_box ||= LIB_.box.new ))
         shell = Field_Shell__.new @d, @x_a, bx
         @d = shell.d
       end
+
       def header
         x = iambic_property
         :none == x or raise ::ArgumentError, "only 'none' is allowed (#{ x })"
         @kernel.do_show_header = false
+        KEEP_PARSING_
       end
+
       def left
         @kernel.left_x = iambic_property
+        KEEP_PARSING_
       end
+
       def read_rows_from
-        @kernel.read_rows_from = iambic_property  # empty ary must be OK here
+
+        x = iambic_property
+
+        if ! x.respond_to? :gets
+
+          if x.respond_to? :each_with_index and x.respond_to? :[]
+            x = Callback_::Stream.via_nonsparse_array x
+          elsif x.respond_to? :call
+            x = Callback_.stream( & x )
+          end
+        end
+
+        @kernel.row_upstream = x
+        KEEP_PARSING_
       end
+
       def right
         @kernel.right_x = iambic_property
+        KEEP_PARSING_
       end
+
       def sep
         @kernel.sep_x = iambic_property
+        KEEP_PARSING_
       end
+
       def show_header
         @kernel.do_show_header = iambic_property
+        KEEP_PARSING_
       end
+
       def target_width
         @kernel.accept_target_width_from_stream @iambic_scan
+        KEEP_PARSING_
       end
+
       def write_lines_to
-        @kernel.write_lines_to = iambic_property
+
+        _x = iambic_property
+
+        @kernel.line_downstream_yielder = _x
+
+        KEEP_PARSING_
       end
     end
     end
@@ -215,16 +260,14 @@ module Skylab::Face
   public
 
     def execute
-      ok = @read_rows_from  # nothing to do when no data producers
-      ok &&= string_pass
-      ok && render_pass
+      ok = ( @row_upstream || @line_downstream_yielder )  # else don't bother
+      ok &&= __string_pass
+      ok && __render_pass
     end
-
-  private
 
     # ~ the string pass
 
-    def string_pass
+    def __string_pass
       The_String_Pass__.new( self ).field_stats_and_cel_matrix do |fs, cm|
         @cel_matrix = cm
         @field_stats = fs
@@ -232,62 +275,82 @@ module Skylab::Face
     end
 
     class The_String_Pass__
+
       def initialize kernel
         @kernel = kernel
       end
+
       def field_stats_and_cel_matrix
-        if (( @scn = bld_row_stream ))
-          yield( * rslv_two_from_scan )
+
+        @up_st = __build_row_stream
+        if @up_st
+
+          yield( * __via_upstream_produce_two )
+
         else
-          yield @scn
+          yield @up_st
         end
       end
-    private
-      def bld_row_stream
-        p = nil
-        initialize_normal_p = -> do
-          ea = @kernel.read_rows_from.to_enum
-          p = -> do
-            begin
-              ea.next
-            rescue ::StopIteration
-            end
-          end ; nil
-        end
-        if @kernel.do_show_header
-          p = -> do
-            initialize_normal_p[]
+
+      def __build_row_stream
+
+        st = @kernel.row_upstream
+
+        p = if @kernel.do_show_header
+
+          -> do
+            p = st.method :gets
             @kernel.field_box.map( & :label_s )
           end
         else
-          initialize_normal_p[]
+          st.method :gets
         end
-        Callback_::Scn.new { p[] }
+
+        Callback_::Scn.new do
+          p[]
+        end
       end
-      def rslv_two_from_scan
+
+      def __via_upstream_produce_two
+
         h = ::Hash.new do |h_, d|
           h_[ d ] = Field_Statistics__.new d
         end
+
         cel_matrix = []
-        while (( row = @scn.gets ))
-          cel_matrix.push( cel_row = [] )
+
+        begin
+
+          row = @up_st.gets
+          row or break
+
+          cel_row = []
+          cel_matrix.push cel_row
+
           row.each_with_index do |cel_x, d|
             cel_row.push h[ d ].see_value_and_build_cel( cel_x )
           end
-        end
+
+          redo
+        end while nil
+
         [ h.length.times.map do |d|
             h.fetch( d ).finish_string_pass
           end, cel_matrix ]
       end
     end
+
   public
-    attr_reader :do_show_header, :field_box, :read_rows_from
+
+    attr_reader :do_show_header, :field_box
 
     class Field_Statistics__
+
       attr_reader :d, :min_numeric_x, :max_numeric_x,
         :min_strlen, :max_strlen,
         :max_whole_places, :max_rational_places,
         :typecount_h
+
       def initialize d
         @d = d
         @min_numeric_x = @max_numeric_x = nil
@@ -392,46 +455,48 @@ module Skylab::Face
 
     # ~ the render pass
 
-    def render_pass
-      cel_renderers = prdc_cel_renderers
-      if @write_lines_to
-        puts_p = @write_lines_to
-      else
+    def __render_pass
+
+      cel_renderers = __produce_cel_renderers
+
+      y = @line_downstream_yielder
+
+      if ! y
         io = Library_::StringIO.new
-        puts_p = io.method :puts
+        y = io
       end
 
       left = @left_x || DEFAULT_LEFT_MARGIN__
       sep = @sep_x || DEFAULT_SEPARATOR__
       right = @right_x || DEFAULT_RIGHT_MARGIN__
 
-      scn = get_cel_row_iterator
-      while (( row = scn.gets ))
-        puts_p[ "#{ left }#{
+      st = __cel_row_stream
+      begin
+        row = st.gets
+        row or break
+        y << "#{ left }#{
           ( row.map.with_index do |cel, d|
             cel_renderers.fetch( d ).call cel
           end ) * ( sep ) }#{
-          }#{ right }" ]
-      end
+          }#{ right }"
+        redo
+      end while nil
+
       io && io.string
     end
 
     DEFAULT_LEFT_MARGIN__ = '| '.freeze
     DEFAULT_SEPARATOR__ = ' | '.freeze
-    DEFAULT_RIGHT_MARGIN__ = ' |'.freeze
+    DEFAULT_RIGHT_MARGIN__ = " |\n".freeze
 
-    def get_cel_row_iterator
-      d = -1 ; last = @cel_matrix.length - 1
-      Callback_::Scn.new do
-        if d < last
-          @cel_matrix.fetch d += 1
-        end
-      end
+    def __cel_row_stream
+
+      Callback_::Stream.via_nonsparse_array @cel_matrix
     end
 
-    def prdc_cel_renderers
+    def __produce_cel_renderers
       @widest_row_cels_count = @field_stats.length
-      @field_fetcher = prdc_field_fetcher
+      @field_fetcher = __produce_field_fetcher
       early_pass_only = true
       a = @widest_row_cels_count.times.map do |d|
         x = @field_fetcher[ d ].
@@ -446,7 +511,7 @@ module Skylab::Face
       a
     end
 
-    def prdc_field_fetcher
+    def __produce_field_fetcher
       if @field_box
         field_a = @field_box.values
         fields_count = field_a.length
@@ -608,17 +673,23 @@ module Skylab::Face
     def self.some_screen_width
       Table_::Fill_.some_screen_w
     end
+
     def self.any_calculated_screen_width
       Table_::Fill_.any_calculated_screen_w
     end
+
   public
+
     def accept_target_width_from_stream scan
       @target_width_d = scan.gets_one ; nil
     end
+
   private
+
     class Field__
       attr_accessor :fill
     end
+
     def prdc_late_pass_renderers a
       Table_::Fill_.produce_late_pass_renderers a do |o|
         o.field_fetcher = @field_fetcher
@@ -629,6 +700,7 @@ module Skylab::Face
       end ; nil
     end
 
+    KEEP_PARSING_ = true
     MINUS_ = '-'.freeze
     Table_ = self
   end

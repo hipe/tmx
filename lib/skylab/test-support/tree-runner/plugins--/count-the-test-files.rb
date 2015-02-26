@@ -4,15 +4,15 @@ module Skylab::TestSupport
 
     class Plugins__::Count_The_Test_Files < Plugin_
 
-      does :flush_the_test_files do | st |
+      does :flush_the_test_files do | tr |
 
-        st.transition_is_effected_by do | o |
+        tr.transition_is_effected_by do | o |
 
           o.on '--counts', 'show a report of the number of tests per subproduct'
 
         end
 
-        st.if_transition_is_effected do | o |
+        tr.if_transition_is_effected do | o |
 
           o.on '-v', '--verbose', 'show max share meter (experimental)' do
             @verbosity_level += 1
@@ -28,86 +28,145 @@ module Skylab::TestSupport
         end
       end
 
+      def initialize( * )
+        @verbosity_level = 1
+        @do_zero = nil
+        super
+      end
+
       def do__flush_the_test_files__
-        @resources.serr.puts "(pretending to count the test files)"
-        ACHIEVED_
-      end
 
-    if false
-    Plugin_.enhance self do
+        tall = Tallier____.new(
+          @on_event_selectively.call( :for_plugin, :test_file_stream ),
+          @on_event_selectively.call( :for_plugin, :sidesystem_box ),
+          @do_zero )
 
-      eventpoints_subscribed_to( * %i|
-        available_options
-        available_actions
-        action_summaries
-      | )
+        if 1 < @verbosity_level
 
-      services_used(
-        :info_y,
-        :hot_subtree,
-        :paystream
-      )
-    end
+          field_extra = __build_max_share_meter_args
 
-    available_options do |o, _|
-
-      true
-    end
-
-    available_actions [
-      [ :counts, 0.1666 ]
-    ]
-
-    action_summaries(
-      counts: :x
-    )
-
-    def initialize
-      @verbosity_level = 1
-      @do_zero ||= nil
-    end
-
-    def counts
-      if 1 < @verbosity_level
-        field_extra = bld_max_share_meter_args
-        total_line_extra = [ nil ]
-        do_meter = true
-      end
-      Test_::Lib_::CLI_table[
-        :field, 'subproduct',
-        :field, 'num test files',
-        * field_extra,
-        :write_lines_to, paystream.method( :puts ),
-        :read_rows_from, ::Enumerator.new do |y|
-          total = 0 ; hs = hot_subtree
-          ok = hs.children.each do |tre|
-            sp = tre.data
-            num = tre.children.count
-            if num.nonzero? or @do_zero
-              total += num
-              if do_meter
-                y << [ sp.slug, num, num ]
-              else
-                y << [ sp.slug, num ]
-              end
+          p = -> do
+            rec = tall.gets_record
+            if rec
+              [ rec.moniker, rec.count, rec.count ]
+            else
+              p = EMPTY_P_
+              [ '(total)', tall.upstream_item_count, nil ]
             end
           end
-          y << [ '(total)', total, * total_line_extra ]
-          ok
-        end  ]
-      if 1 == @verbosity_level
-        info_y << '("-v" for visualization, "-V" hides this message)'
+
+        else
+
+          p = -> do
+            rec = tall.gets_record
+            if rec
+              [ rec.moniker, rec.count ]
+            else
+              p = EMPTY_P_
+              [ '(total)', tall.upstream_item_count ]
+            end
+          end
+        end
+
+        Tree_Runner_::Lib_::CLI_table[
+          :field, 'subproduct',
+          :field, 'num test files',
+          * field_extra,
+          :write_lines_to, @resources.sout,
+          :read_rows_from, -> { p[] } ]
+
+        if 1 == @verbosity_level
+          @resources.serr.puts '("-v" for visualization, "-V" hides this message)'
+        end
+
+        nil
       end
-      nil
-    end
 
-    def bld_max_share_meter_args
-      _width = Test_::Lib_::CLI_table[].some_screen_width
-      [ :target_width, _width, :field, :fill,
-        :cel_renderer_builder, :max_share_meter ]
-    end
-    end
+      def __build_max_share_meter_args
 
+        _width = Tree_Runner_::Lib_::CLI_table[].some_screen_width
+
+        [ :target_width, _width, :field, :fill,
+          :cel_renderer_builder, :max_share_meter ]
+      end
+
+      class Tallier____
+
+        def initialize st, bx, do_zero
+
+          box_d = 0
+
+          path = nil
+          p2 = nil
+          p = -> do
+            path = st.gets
+            if path
+              p = p2
+              p2[]
+            else
+              p = EMPTY_P_
+              nil
+            end
+          end
+
+          p2 = -> do
+            # makes at least two big assumptions
+
+            count = nil
+            begin
+              ss = bx.at_position box_d
+              box_d += 1
+              s = "#{ ss.path }#{ ::File::SEPARATOR }"
+              len = s.length
+              if s == path[ 0, len ]
+                break
+              elsif do_zero
+                count = 0
+                break
+              else
+                redo
+              end
+            end while nil
+
+            if ! count
+              count = 1
+              begin
+                path = st.gets
+                if path
+                  if s == path[ 0, len ]
+                    count += 1
+                    redo
+                  else
+                    break
+                  end
+                else
+                  p = EMPTY_P_
+                  break
+                end
+              end while nil
+            end
+
+            if count
+              @upstream_item_count += count
+              Record___.new( ss.basename, count )
+            else
+              p2[]  # recurse
+            end
+          end
+
+          @upstream_item_count = 0
+
+          @gets_record = -> { p[] }
+        end
+
+        attr_reader :upstream_item_count
+
+        def gets_record
+          @gets_record[]
+        end
+
+        Record___ = ::Struct.new :moniker, :count
+      end
     end
   end
 end
