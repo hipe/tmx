@@ -46,17 +46,16 @@ module Skylab::BeautySalon
           @path_list && @path_list.length.nonzero?
       end
 
-      def via_fresh_values_build_command & maybe_p
+      def via_fresh_values_build_command & oes_p
         BS_.lib_.system.filesystem.find(
           :filenames, @glob_list,
           :paths, @path_list,
-          :freeform_query_infix, '-type f',
-          :on_event_selectively, maybe_p,
-          :as_normal_value, IDENTITY_ )
+          :freeform_query_infix_words, %w'-type f',
+          :as_normal_value, IDENTITY_, & oes_p )
       end
 
       def via_command_execute
-        @stream = @cmd.to_stream
+        @stream = @cmd.to_path_stream
         if @is_interactive
           @stream and via_stream
         else
@@ -180,7 +179,7 @@ module Skylab::BeautySalon
 
         def refresh_upstream_path_stream
           cmd = @parent.parent[ :files ].build_command do end
-          @upstream_path_stream = cmd && cmd.to_stream
+          @upstream_path_stream = cmd && cmd.to_path_stream
           @upstream_path_stream ? ACHIEVED_ : UNABLE_
         end
 

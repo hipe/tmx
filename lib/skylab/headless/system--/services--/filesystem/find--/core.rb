@@ -21,11 +21,10 @@ module Skylab::Headless
 
         class << self
 
-          def mixed_via_iambic x_a
+          def mixed_via_iambic x_a, & oes_p
             new do
+              @on_event_selectively = oes_p
               process_iambic_stream_fully iambic_stream_via_iambic_array x_a
-              self._THIS_WILL_be_fun_to_clean_this_up
-              @x_a = @d = @x_a_length = nil  # #todo
             end.__mixed_result
           end
 
@@ -167,7 +166,7 @@ module Skylab::Headless
         def __mixed_result
           if @is_curry
             self
-          elsif @valid_args
+          elsif @args
             @as_normal_value[ self ]
           else
             @last_error_result  # #todo
@@ -184,7 +183,7 @@ module Skylab::Headless
           otr = dup
           otr.extend Command_Building_Methods__
           @args = otr.__args_via_flush
-          if @args
+          if @args && @on_event_selectively
             @on_event_selectively.call :info, :event, :find_command_args do
               Command_Args_Event__[ @args ]
             end
@@ -266,10 +265,10 @@ module Skylab::Headless
             @y.push ')'
           end
 
-          def _add_OR_list_via_unescaped_value_array s_a
+          def _add_OR_list_via_unescaped_value_array string_ary
 
-            st = Callback_::Stream.via_times s_a.length do | d |
-              [ NAME_OPERATOR__, s_a.fetch( d ) ]  # ( we used to :+#escape here )
+            st = Callback_::Stream.via_times string_ary.length do | d |
+              [ NAME_OPERATOR__, string_ary.fetch( d ) ]  # ( we used to :+#escape here )
             end
 
             s_a = st.gets

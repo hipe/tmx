@@ -14,7 +14,7 @@ module Skylab::Face
     #
     # call it with one thing, must respond to each (in two dimensions)
     #
-    #     Table[ :a ]  # => NoMethodError: undefined method `each' for :a..
+    #     Table[ :a ]  # => NoMethodError: "private method .."
     #
     #
     # that is, an array of atoms won't fly either
@@ -180,7 +180,7 @@ module Skylab::Face
     #     x = Face_::CLI::Table[ :field, 'Food', :field, 'Drink',
     #       :left, '(', :sep, ',', :right, ')',
     #       :read_rows_from, [[ 'nut', 'pomegranate' ]],
-    #       :write_lines_to, a.method( :<< ) ]
+    #       :write_lines_to, a ]
     #
     #     x  # => nil
     #     ( a * 'X' )  # => "(Food,Drink      )X(nut ,pomegranate)"
@@ -299,11 +299,15 @@ module Skylab::Face
         p = if @kernel.do_show_header
 
           -> do
-            p = st.method :gets
+            p = -> do
+              st.gets
+            end
             @kernel.field_box.map( & :label_s )
           end
         else
-          st.method :gets
+          -> do
+            st.gets
+          end
         end
 
         Callback_::Scn.new do
@@ -625,7 +629,7 @@ module Skylab::Face
     # but the real fun begins with currying
     # you can curry properties and behavior for table in one place ..
     #
-    #     P = Face_::CLI::Table.curry :left, '<', :sep, ',', :right, '>'
+    #     P = Face_::CLI::Table.curry :left, '<', :sep, ',', :right, ">\n"
     #
     #
     # and then use it in another place:

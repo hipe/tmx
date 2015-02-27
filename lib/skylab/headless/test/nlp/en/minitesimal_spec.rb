@@ -42,7 +42,7 @@ describe "[hl] NLP EN minitesimal" do
 
     o = -> a, n, so, *t do
       it "#{ so }", *t do
-        x = "#{ s a, :no }known person#{ s a } #{ s a, :exis}#{ _and a }#{
+        x = "#{ s a, :no }known person#{ s a } #{ s a, :exist }#{ _and a }#{
           } in #{ s n, :this }#{ " #{ n }" if 1 != n } location#{ s n }."
         x.should eql( so )
       end

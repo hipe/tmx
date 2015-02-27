@@ -7,19 +7,27 @@ module Skylab::FileMetrics
     include API::Common::InstanceMethods
 
     def run
+
       c = FM_::Models::Count.new("folders summary")
-      _find_cmd_s = build_find_dirs_command_string
-      dirs = %x{#{ _find_cmd_s }}.split "\n"  # :NEWLINE_.
+
+      dirs = build_find_dirs_command.to_path_stream.to_a
+
       if @req[:show_files_list] || @req.fetch( :debug_volume )
         @ui.err.puts( dirs )
       end
       dirs.each do |dir|
         cmd = build_find_files_command( [ dir ] ) or break
-        stdout_lines cmd.string, ( _files = [] ) or break
+        st = stdout_line_stream_via_args cmd.args
+        st or break
+
         # (for fun, leaving below antique lines intact as long as possible!)
         _dir_count = Models::Count.new(dir, nil)
         _ok_files = []; _errs = []
-        _files.each do |f|
+
+        begin
+          f = st.gets
+          f or break
+          f.chomp!
           if File.exist?(f)
             if File.readable?(f)
               _ok_files.push(f)
@@ -29,7 +37,8 @@ module Skylab::FileMetrics
           else
             _dir_count.add_child(Models::Count.new(f, nil, :notice => "bad link"))
           end
-        end
+          redo
+        end while nil
         _folder_count = count_lines(_ok_files, File.basename(dir))
         _folder_count.count ||= 0
         c.add_child _folder_count
@@ -49,33 +58,30 @@ module Skylab::FileMetrics
     # (we are trying to keep some ancient code for posterity for now ..)
     module Models
       Count = FM_::Models::Count.subclass :num_files,
-        :num_lines, :total_share, :max_share, :lipstick_float, :lipstick
+        :num_lines, :total_share, :max_share, :lipstick_float
     end
 
     LineCount = Models::Count
 
   private
 
-    def build_find_dirs_command_string
-
+    def build_find_dirs_command
       FM_.lib_.system.filesystem.find(
         :path, @req[ :path ],
         :ignore_dirs, @req[ :exclude_dirs ],
         :filenames, @req[ :include_names ],
-        :freeform_query_infix, '-a -maxdepth 1 -type d',
-        :on_event_selectively, -> i, * _, & p do
-          if :info == i
-            if @req[ :show_commands ]
-              _ev = p[]
-              @ui.err.puts _ev.command_string
-            end
-          else
-            raise ev.to_exception
+        :freeform_query_infix_words, %w'-a -maxdepth 1 -type d',
+        :as_normal_value, IDENTITY_
+      ) do | i, *_, & ev_p |
+        if :info == i
+          if @req[ :show_commands ]
+            _ev = p[]
+            @ui.err.puts _ev.command_string
           end
-        end,
-        :as_normal_value, -> command do
-          command.string
-        end )
+        else
+          raise ev.to_exception
+        end
+      end
     end
 
     -> do  # `render_table`

@@ -45,7 +45,7 @@ module Skylab::TestSupport
 
     Basic = sidesys[ :Basic ]
 
-    Bzn_ = sidesys[ :Brazen ]
+    Brazen = sidesys[ :Brazen ]
 
     Box = -> do
       Basic[]::Box.new
@@ -69,14 +69,14 @@ module Skylab::TestSupport
 
     Entity = -> * a, & p do
       if a.length.nonzero? || p
-        Bzn_[]::Entity.call_via_arglist a, & p
+        Brazen[]::Entity.call_via_arglist a, & p
       else
-        Bzn_[]::Entity
+        Brazen[]::Entity
       end
     end
 
     Properties_stack_frame = -> * a do
-      Bzn_[].properties_stack.common_frame.call_via_arglist a
+      Brazen[].properties_stack.common_frame.call_via_arglist a
     end
 
     Funcy_globful = -> mod do

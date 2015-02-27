@@ -172,11 +172,17 @@ module Skylab::Callback
     end
 
     def process_iambic_fully x_a
+
       bx = formal_fields_ivar_box_for_read_
+
       x_a.each_slice 2 do |i, x|
         instance_variable_set bx.fetch( i ), x
-      end ; nil
+      end
+
+      NIL___
     end
+
+    NIL___ = nil
 
     def process_iambic_stream_fully st
       bx = formal_fields_ivar_box_for_read_

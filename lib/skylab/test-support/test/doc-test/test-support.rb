@@ -102,7 +102,7 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
 
     def black_and_white_expression_agent_for_expect_event
-      TestSupport_::Lib_::Bzn_[]::API.expression_agent_instance
+      TestSupport_.lib_.brazen::API.expression_agent_instance
     end
 
     define_method :next_interesting_line_dedented, -> do

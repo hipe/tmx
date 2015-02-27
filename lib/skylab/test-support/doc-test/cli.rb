@@ -4,7 +4,7 @@ module Skylab::TestSupport
 
     # this new guy, it's gotta be light and generated
 
-    class CLI < TestSupport_::Lib_::Bzn_[]::CLI
+    class CLI < Brazen_::CLI
 
       class << self
 

@@ -1,6 +1,6 @@
 require 'open3'
 
-module Skylab::Face
+module Skylab::Face  # :[#003]
 
   # read both stdout and stderr of a system command without blocking
   # (this is superseded by [#hl-048] [hl] IO select,

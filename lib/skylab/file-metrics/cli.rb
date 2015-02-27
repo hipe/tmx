@@ -83,7 +83,7 @@ module Skylab::FileMetrics
         op.banner = "#{ hi 'description:' }#{
           } Shows the linecount of each file, longest first. Show percentages
           of max for each file. Will go recursively into directories.
-        ".gsub(/^ +/, '')
+        ".gsub(/^ +/, EMPTY_S_)
 
         req = op_common_head
         req[:count_comment_lines] = true
@@ -118,7 +118,7 @@ module Skylab::FileMetrics
       end.call
 
       option_parser do |op|
-        op.banner = <<-DESC.gsub(/^ +/, '')
+        op.banner = <<-DESC.gsub(/^ +/, EMPTY_S_)
           #{ hi 'description:' }#{
           } Experimental report. With all folders one level under <path>,
           for each of them report number of files and total sloc,
@@ -136,7 +136,7 @@ module Skylab::FileMetrics
 
       option_parser do |op|
 
-        op.banner = <<-O.gsub( /^ +/, '' )  # #todo
+        op.banner = <<-O.gsub( /^ +/, EMPTY_S_ )  # #todo
           #{ hi 'description:' }#{
           } just report on the number of files with different extensions,
           ordered by frequency of extension
@@ -172,7 +172,7 @@ module Skylab::FileMetrics
         # massive but semi-elegant hack, #goof-on wheel greasing.
         s = command.op.banner
         y = LIB_.reverse_string_scanner s
-        y << ''
+        y << EMPTY_S_
         command.usage y
         y << "\n#{ hi 'options:' }\n" ; nil
       end
@@ -184,7 +184,7 @@ module Skylab::FileMetrics
 
       def field_h
         @field_h ||= {
-          header: '',
+          header: EMPTY_S_,
           is_autonomous: true,
           cook: -> col_width_a, seplen do
             # (our rendering function takes a proxy, and the upstream rendering

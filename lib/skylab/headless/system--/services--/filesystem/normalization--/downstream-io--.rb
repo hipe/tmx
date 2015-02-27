@@ -54,7 +54,7 @@ module Skylab::Headless
           def initialize & p
             @do_execute = false
             @force_arg = nil
-            @ftype = FILE_FTYPE_
+            @ftype = FILE_FTYPE
             @is_dir_mode = false
             @is_dry_run = false
             @last_looks = nil

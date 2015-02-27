@@ -157,11 +157,11 @@ module Skylab::Headless
           def via_stat_execute
             if @only_apply_ftype_expectation
               via_stat_and_expected_ftype_exert_expectation
-            elsif FILE_FTYPE_ == @stat.ftype
+            elsif FILE_FTYPE == @stat.ftype
               via_path_open_file
             else
               maybe_send_event :error, :wrong_ftype do
-                build_wrong_ftype_event_ @path_arg.value_x, @stat, FILE_FTYPE_
+                build_wrong_ftype_event_ @path_arg.value_x, @stat, FILE_FTYPE
               end
             end
           end
@@ -170,7 +170,7 @@ module Skylab::Headless
             if @expected_ftype == @stat.ftype
               @as_normal_value[ ACHIEVED_ ]
             else
-              maybe_send_event :error, :wron_ftype do
+              maybe_send_event :error, :wrong_ftype do
                 build_wrong_ftype_event_ @path_arg.value_x, @stat, @expected_ftype
               end
             end

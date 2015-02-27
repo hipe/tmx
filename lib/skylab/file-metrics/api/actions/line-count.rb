@@ -27,8 +27,7 @@ module Skylab::FileMetrics
       res
     end
 
-    LineCount = FM_::Models::Count.subclass :total_share, :max_share,
-      :lipstick, :lipstick_float
+    LineCount = FM_::Models::Count.subclass :total_share, :max_share, :lipstick_float
 
   private
 
@@ -54,11 +53,11 @@ module Skylab::FileMetrics
     def files_in_dir path, line_y
       cmd = build_find_files_command @path_a
       if cmd
-        cmd_string = cmd.string
         if @req[:show_commands] || @req.fetch( :debug_volume )
-          @ui.err.puts cmd_string
+          _ = cmd.args.map( & FM_::Libary_::Shellwords.method( :shellescape ) )
+          @ui.err.puts ( _ * SPACE_ )
         end
-        stdout_lines cmd_string, line_y
+        stdout_lines_into_from_command_args line_y, cmd.args
       end
     end
 

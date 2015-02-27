@@ -8,16 +8,18 @@ module Skylab::Cull
 
         result = nil
 
-        surrounding_path = Cull_.lib_.filesystem.walk(
+        fs = Cull_.lib_.filesystem
+
+        surrounding_path = fs.walk(
           :start_path, arg.value_x,
           :filename, FILENAME_,
-          :ftype, DIR_FTYPE_,
+          :ftype, fs.constants::DIRECTORY_FTYPE,
           :max_num_dirs_to_look, -1,
-          :prop, arg.property,
-          :on_event_selectively, -> * i_a, & ev_p do
-            result = oes_p[ * i_a, & ev_p ]
-            UNABLE_
-          end )
+          :prop, arg.property
+        ) do | * i_a, & ev_p |
+          result = oes_p[ * i_a, & ev_p ]
+          UNABLE_
+        end
 
         if surrounding_path
           ::File.join surrounding_path, FILENAME_
@@ -448,7 +450,6 @@ module Skylab::Cull
 
     COMMON_PROPERTIES_ = Survey_Action_Methods_.properties.to_a
     CONFIG_FILENAME_ = 'config'.freeze
-    DIR_FTYPE_ = 'directory'.freeze
     FILENAME_ = 'cull-survey'.freeze
     Survey_ = self
   end

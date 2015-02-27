@@ -54,7 +54,7 @@ module Skylab::Headless::TestSupport::SubClient
       def self.expect arr, str, *tags
         it str, *tags do
           x = sc.instance_exec do
-            "#{ s arr, :no }known person#{ s } #{ s :exis }#{ _and arr }#{
+            "#{ s arr, :no }known person#{ s } #{ s :exist }#{ _and arr }#{
               } in #{ s :this }#{ _non_one } location#{ s }."
           end
           x.should eql( str )

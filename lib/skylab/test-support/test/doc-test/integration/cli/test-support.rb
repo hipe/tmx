@@ -69,7 +69,7 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
   FAKE_PROGNAME_ = 'ts-dt'
 
   Generic_error__ = TestSupport_::Callback_.memoize do
-    TestSupport_::Lib_::Bzn_[]::API.exit_statii.fetch :generic_error
+    TestSupport_.lib_.brazen::API.exit_statii.fetch :generic_error
   end
 
   Subject_ = Parent_::Subject_

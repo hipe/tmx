@@ -165,7 +165,7 @@ module Skylab::Face::TestSupport::CLI::Table
     end
 
     def write_lines_to
-      ( @y ||= [] ).method :push
+      @y ||= []
     end
 
     def release_lines

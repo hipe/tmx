@@ -111,15 +111,16 @@ module Skylab::SubTree
         end
 
         def find_with_find
+
           @result = SubTree_.lib_.system.filesystem.find(
+
             :path, @path,
-            :freeform_query_infix, '-type dir',
+            :freeform_query_infix_words, %w'-type dir',
             :filenames, TEST_DIR_NAME_A_,
-            :on_event_selectively,
-              selective_listener_for_find.handle_event_selectively,
+
             :as_normal_value, -> command do
-              command.to_stream
-            end )
+              command.to_path_stream
+            end, & selective_listener_for_find.handle_event_selectively )
           nil
         end
 

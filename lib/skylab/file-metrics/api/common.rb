@@ -1,58 +1,90 @@
 module Skylab::FileMetrics
 
   module API::Common
-  end
 
-  class API::Common::RuntimeError < ::RuntimeError
-  end
+    RuntimeError = ::Class.new ::RuntimeError
 
-  class API::Common::SystemError < ::SystemCallError
-  end
+    SystemError = ::Class.new ::SystemCallError
 
-  module API::Common::ModuleMethods
+    module ModuleMethods
 
-    def run *a
-      new(* a ).run
-    end
-  end
-
-  module API::Common::InstanceMethods
-
-  private
-
-    def initialize ui, req
-      @ui, @req = ui, req
+      def run * x_a
+        new( * x_a ).run
+      end
     end
 
-    def error msg
-      @ui.err.puts msg
-      false
-    end
+    module InstanceMethods
+    private
 
-    def build_find_files_command path_a
+      def initialize ui, req
+        @ui = ui ; @req = req
+      end
 
-      FM_.lib_.system.filesystem.find(
-        :paths, path_a,
-        :ignore_dirs, @req[ :exclude_dirs ],
-        :filenames, @req[ :include_names ],
-        :freeform_query_infix, '-not -type d',
-        :as_normal_value, -> x { x }, # :IDENTITY_.
-        :on_event_selectively, -> i, *_, & p do
+      def error msg
+        @ui.err.puts msg
+        UNABLE_
+      end
+
+      def build_find_files_command path_a
+
+        FM_.lib_.system.filesystem.find(
+          :paths, path_a,
+          :ignore_dirs, @req[ :exclude_dirs ],
+          :filenames, @req[ :include_names ],
+          :freeform_query_infix_words, %w'-not -type d',
+          :as_normal_value, IDENTITY_
+        ) do | i, *_, & ev_p |
           if :info != i
-            _ev = p.call
-            error _ev  # #todo
+            error ev_p.call
           end
-        end )
-    end
+        end
+      end
 
-    # `stdout_lines` - write each (chomped) line of stdout that results from
-    # executing `command_string` on the system to `y` using `<<`.
-    # any stdout data is written to our own selfsame stream, decorated.
-    # result is true if no stderr data was written, false if it was.
+      def stdout_lines_via_command_args a
+        y = []
+        x = _synchronously_write_into_via_four y, * _four_via_command_args( a )
+        x && y
+      end
 
-    def stdout_lines command_string, y
-      tsa_limit = ( @tsa_limit ||= 0.33 )  # tsa = time since activity
-      FM_::Library_::Open3.popen3 command_string do |_, sout, serr|
+      def stdout_lines_via_command_string s
+        y = []
+        x = _synchronously_write_into_via_four y, * _four_via_command_string( s )
+        x && y
+      end
+
+      def stdout_lines_into_from_command_args y, a
+        _synchronously_write_into_via_four y, * _four_via_command_args( a )
+      end
+
+      def stdout_line_stream_via_args a
+        _asynchronous_stdout_stream_via_four( * _four_via_command_args( a ) )
+      end
+
+      def _four_via_command_args a
+        FM_::Library_::Open3.popen3( * a )
+      end
+
+      def _four_via_command_string s
+        FM_::Library_::Open3.popen3 s
+      end
+
+      def _asynchronous_stdout_stream_via_four _, o, __, ___
+
+        # a placeholder for the idea of it
+
+        p = -> do
+          o.gets
+        end
+
+        Callback_.stream do
+          p[]
+        end
+      end
+
+      def _synchronously_write_into_via_four y, _, sout, serr, _
+
+        tsa_limit = ( @tsa_limit ||= 0.33 )  # tsa = time since activity
+
         er = nil
         select = LIB_.select
         select.timeout_seconds = 5.0  # exaggerated amount for fun
@@ -60,18 +92,16 @@ module Skylab::FileMetrics
         num_souts = 0
         did_filler_activity = false
 
-        -> do
-          # (this block is all just a UI nicety - 'TSA' - time since activity)
-          select.heartbeat tsa_limit do
-            if num_souts.zero?
-              @ui.err.write '.'
-            else
-              @ui.err.write( '*' * num_souts )
-              num_souts = 0
-            end
-            did_filler_activity ||= true
+        # (this block is all just a UI nicety - 'TSA' - time since activity)
+        select.heartbeat tsa_limit do
+          if num_souts.zero?
+            @ui.err.write '.'
+          else
+            @ui.err.write( '*' * num_souts )
+            num_souts = 0
           end
-        end.call
+          did_filler_activity ||= true
+        end
 
         select.on sout do |line|
           num_souts += 1
@@ -86,12 +116,15 @@ module Skylab::FileMetrics
         end
 
         select.select
+
         if did_filler_activity
           @ui.err.write " done.\n"
         end
+
         ! er
       end
-    end
+
+      # <-
 
     -> do  # `count_lines`
 
@@ -172,15 +205,20 @@ module Skylab::FileMetrics
     end.call
 
     def linecount_using_grep_chain file_a, filter_a, label
+
       cmd_tail = "#{ filter_a * ' | ' } | wc -l"
+
       file_a.reduce( linecount_class.new label ) do |coun, file|
+
         cmd = "cat #{ shellescape_path file } | #{ cmd_tail }"
+
         if @req[:show_commands] || @req.fetch( :trace_volume )
           @ui.err.puts cmd
         end
         rs = -> do
-          stdout_lines cmd, ( lines = [] ) or break
-          lines * ''
+          lines = stdout_lines_via_command_string cmd
+          lines or break
+          lines * EMPTY_S_
         end.call
         rs or break
         cnt = linecount_class.new file
@@ -200,6 +238,16 @@ module Skylab::FileMetrics
 
     def linecount_using_wc file_a, label
 
+      count = linecount_class.new label
+      if file_a.length.zero?
+        count
+      else
+        __linecount_using_wc_of_nonzero_length_file_list count, file_a
+      end
+    end
+
+    def __linecount_using_wc_of_nonzero_length_file_list count, file_a
+
       # (this hackery deserves explanation: we assume the following: there
       # is one corresponding output line from `wc` for each argument (treated
       # as input file) (the stream to which that line was written will be
@@ -216,15 +264,20 @@ module Skylab::FileMetrics
       # hence always ends up at the end (where it started) after sorting!)
       #
 
-      count = linecount_class.new label
-      file_a.length.zero? and return count  # we usu. avoid return, 2 easy here
-      cmd = "wc -l #{ file_a.map(& method(:shellescape_path )) * ' '} | sort -g"
-      if @req[:show_commands] || @req.fetch( :debug_volume )
+      cmd = "wc -l #{
+        file_a.map( & method( :shellescape_path ) ) * SPACE_
+      } | sort -g"
+
+        # we would build this as a tokenized array but for the pipe
+
+      if @req[ :show_commands ] || @req.fetch( :debug_volume )
         @ui.err.puts cmd
       end
-      stdout_lines cmd, ( line_a = [] )  # (was #004)
-      if line_a.length.zero?
-        raise SystemError, 'never'
+
+      line_a = stdout_lines_via_command_string cmd  # (was [#004])
+
+      if ! line_a || line_a.length.zero?
+        raise ::SystemError, 'never'
       else
         one = 1 == file_a.length
         range = if one then 0..0 else 0..-2 end
@@ -262,6 +315,9 @@ module Skylab::FileMetrics
           end
         ] ]
       end
+    end
+
+    # ->
     end
   end
 end

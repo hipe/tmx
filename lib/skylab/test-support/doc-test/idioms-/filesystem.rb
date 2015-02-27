@@ -50,14 +50,14 @@ module Skylab::TestSupport
 
       def file_must_exist x, & oes_p
 
-        TestSupport_.lib_.system.filesystem.normalization.upstream_IO(
+        fs = TestSupport_.lib_.system.filesystem
+        fs.normalization.upstream_IO(
           :path, x,
-          :only_apply_expectation_that_path_is_ftype_of, FILE_FTYPE_,
+          :only_apply_expectation_that_path_is_ftype_of,
+            fs.constants::FILE_FTYPE,
           & ( oes_p || @oes_p ) )
 
       end
-
-      FILE_FTYPE_ = 'file'.freeze
     end
   end
 end

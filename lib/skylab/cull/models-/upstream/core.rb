@@ -99,8 +99,6 @@ module Skylab::Cull
       @_adapter.event_for_fell_short_of_count needed_number, had_number
     end
 
-    FILE_FTYPE_ = 'file'
-
     Upstream_ = self
 
   end

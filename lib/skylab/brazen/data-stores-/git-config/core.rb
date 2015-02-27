@@ -89,7 +89,7 @@ module Skylab::Brazen
       ok = resolve_mutable_document
       ok &&= entity.intrinsic_delete_before_delete_in_datastore( action, & oes_p )
       ok &&= Git_Config_::Mutable::Actors::Delete[ entity, @mutable_document, & oes_p ]
-      ok and _via_mutated_mutable_document_write_file_via_persist( action, & oes_p )  # _DOG_EAR
+      ok and _via_mutated_mutable_document_write_file_via_persist( action, & oes_p )
     end
 
     # ~ atomic property values

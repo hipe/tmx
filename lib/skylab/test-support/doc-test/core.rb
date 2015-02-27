@@ -38,7 +38,7 @@ module Skylab::TestSupport
     #     THIS_FILE_.contains( 'from these description lines"' ) # => true
 
 
-    Bzn_ = TestSupport_::Lib_::Bzn_[]
+    Brazen_ = TestSupport_.lib_.brazen
 
     class << self
 
@@ -57,7 +57,7 @@ module Skylab::TestSupport
 
     module API
 
-      extend Bzn_::API.module_methods
+      extend Brazen_::API.module_methods
 
       class << self
 
@@ -78,12 +78,12 @@ module Skylab::TestSupport
         end
 
         def expression_agent_class
-          Bzn_::API.expression_agent_class
+          Brazen_::API.expression_agent_class
         end
       end
     end
 
-    class Kernel_ < Bzn_::Kernel_  # #todo
+    class Kernel_ < Brazen_::Kernel_  # #todo
 
     end
 

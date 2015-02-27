@@ -53,7 +53,7 @@ module Skylab::FileMetrics
   private
 
     Count = FM_::Models::Count.subclass :total_share, :max_share,
-      :lipstick_float, :lipstick
+      :lipstick_float
 
     Count_ = ::Struct.new :extension, :count
 
@@ -75,7 +75,7 @@ module Skylab::FileMetrics
             pn = ::Pathname.new file
             use_ext = pn.extname.to_s
             # (please leave this line intact, below was *perfect* [#bs-010])
-            if '' == use_ext  # (yes, '.foo' has an extname of '' thankfully)
+            if EMPTY_S_ == use_ext  # (yes, '.foo' has an extname of '' thankfully)
               pat = pat_a.detect { |p| p.rx =~ file }
               use_ext = if pat then pat.label else pn.basename.to_s end
             end
@@ -97,39 +97,46 @@ module Skylab::FileMetrics
 
     end.call
 
-    # this does things wierdly as an experiment for massively progressive output
     def get_file_a
-      res = false
+
+      cmd = build_find_files_command @req[ :paths ]
+
+      if @req[ :show_commands ] || @req.fetch( :debug_volume )
+        @ui.err.puts cmd.string
+      end
+
+      _, o, e = FM_::Library_::Open3.popen3( * cmd.args )  # :+[#004]
+
+        # used to use [#fa-003], redundant with  [#hl-048] but can't
+        # because it takes command strings and must be annnihilated
+
+      s = e.gets
+      if s
+        s.chomp!
+        fail "not exptecting stderr output from find cmd - #{ s.inspect }"
+      end
+
+      y = []
+      out = if @req.fetch( :debug_volume )
+        -> line do
+          y.push line
+          @ui.err.write line
+        end
+      else
+        -> line do
+          y.push line
+        end
+      end
+
       begin
-        cmd = build_find_files_command( @req[:paths] ) or break
-        if @req[:show_commands] || @req.fetch( :debug_volume )
-          @ui.err.puts cmd.string
-        end
-        buff = Library_::StringIO.new
-        stay = true
-        open2 cmd.string do |o|  # [#004]
-          o.err do |s|
-            fail "not exptecting stderr output from find cmd - #{ s.strip }."
-            stay = false
-          end
-          o.out( & ( if @req.fetch( :debug_volume )
-            -> s do
-              buff.write s
-              @ui.err.write s
-            end
-          else -> s { buff.write s } end ) )
-        end
-        stay or break
-        scn = Library_::StringScanner.new buff.string  # not good just fun
-        file_a = [ ]
-        loop do
-          scn.skip( /\n+/ )
-          line = scn.scan( /[^\n]+/ ) or break
-          file_a << line
-        end
-        res = file_a
+        s = o.gets
+        s or break
+        s.chomp!
+        out[ s ]
+        redo
       end while nil
-      res
+
+      y
     end
 
     -> do  # `render_table`

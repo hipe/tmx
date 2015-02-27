@@ -2,9 +2,9 @@ module Skylab::TestSupport
 
   module DocTest
 
-    class Action_ < Bzn_.model.action_class
+    class Action_ < Brazen_.model.action_class
 
-      Bzn_.model.entity self do
+      Brazen_.model.entity self do
 
       end
     end

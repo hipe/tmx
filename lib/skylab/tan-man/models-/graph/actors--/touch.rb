@@ -98,10 +98,12 @@ module Skylab::TanMan
 
         def __path_is_file
 
-          _fs.normalization.upstream_IO.new_with(
+          fs = _fs
+
+          fs.normalization.upstream_IO.new_with(
             :stat, @stat,
             :path_arg, @arg,
-            :only_apply_expectation_that_path_is_ftype_of, @fs.class::FILE_FTYPE,
+            :only_apply_expectation_that_path_is_ftype_of, @fs.constants::FILE_FTYPE,
             & @on_event_selectively ).via_stat_execute
 
         end

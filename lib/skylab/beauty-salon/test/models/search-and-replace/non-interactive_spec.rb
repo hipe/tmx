@@ -21,7 +21,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
         :preview,
         :files
 
-      expect_neutral_event :command_string
+      expect_neutral_event :find_command_args
       expect_no_more_events
       basename( @result.gets ).should eql 'one-line.txt'
       basename( @result.gets ).should eql THREE_LINES_FILE_

@@ -22,9 +22,9 @@ module Skylab::SubTree
           :field, :id, :glyphs_and_slug, :left,
           :field, :id, :xtra, :left,
           :show_header, false,
-          :left, EMPTY_S_, :sep, EMPTY_S_, :right, EMPTY_S_,
+          :left, EMPTY_S_, :sep, EMPTY_S_, :right, "\n",
           :read_rows_from, row_a,
-          :write_lines_to, @paystream.method( :puts ) ]
+          :write_lines_to, @paystream ]
         nil
       end
     end

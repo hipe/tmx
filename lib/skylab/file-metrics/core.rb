@@ -114,13 +114,14 @@ module Skylab::FileMetrics
     end
   end
 
+  EMPTY_S_ = ''.freeze
   FM_ = self
-
+  IDENTITY_ = -> x { x }
   LIB_ = FM_.lib_
-
   Face_ = LIB_.face_top
-
   MONADIC_TRUTH_ = -> _ { true }
+  SPACE_ = ' '.freeze
+  UNABLE_ = false
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 

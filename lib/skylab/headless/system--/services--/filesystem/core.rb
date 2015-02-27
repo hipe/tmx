@@ -12,6 +12,10 @@ module Skylab::Headless
         Filesystem_::Cache__
       end
 
+      def constants
+        Filesystem_
+      end
+
       def file_utils_controller & p
         if p
           Filesystem_::File_Utils_Controller__.new p
@@ -88,11 +92,13 @@ module Skylab::Headless
         end
       end
 
+      DIRECTORY_FTYPE = 'directory'.freeze
+
       FILE_FTYPE = 'file'
 
-      Filesystem_ = self
+      FILE_SEPARATOR_BYTE = ::File::SEPARATOR.getbyte 0
 
-      DIRECTORY_FTYPE = 'directory'.freeze
+      Filesystem_ = self
 
     end
   end

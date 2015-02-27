@@ -34,17 +34,8 @@ module Skylab::Headless
 
         # ~ doc-test related paths (for dev & hax)
 
-        :memoized, :inline_method, :doc_test_manifest_path, -> do
-          top_of_the_universe_pathname.join(
-            "#{ doc_test_dir }/#{ doc_test_files_file }" ).to_path.freeze
-        end,
-
-        :memoized, :proc, :doc_test_dir, -> do
-          'test/doc-test'.freeze
-        end,
-
-        :memoized, :proc, :doc_test_files_file, -> do
-          'data-documents/files'.freeze
+        :memoized, :proc, :doc_test_manifest_file, -> do
+          'doc-test.manifest'.freeze
         end,
 
 

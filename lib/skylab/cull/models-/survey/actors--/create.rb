@@ -16,10 +16,12 @@ module Skylab::Cull
         # using dry run, check to see that we could create the directory
         # if we wanted to -- that is, that it does not already exist.
 
-        Cull_.lib_.filesystem.normalization.downstream_IO(
+        fs = Cull_.lib_.filesystem
+
+        fs.normalization.downstream_IO(
           :path, @survey.workspace_path_,
           :is_dry_run, true,  # always true, we are checking only
-          :ftype, DIR_FTYPE_,
+          :ftype, fs.constants::DIRECTORY_FTYPE,
           :on_event_selectively, @on_event_selectively ) and
 
         when_dir

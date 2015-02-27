@@ -75,23 +75,16 @@ module Skylab::FileMetrics::TestSupport::Models
       it "internally, nils are set for all fields" do
         me = klass.new :A, fum: :D
         ( a = me.instance_variables ).sort_by! { |x| x.to_s }
-        a.should eql( [ :@fee, :@fi, :@fo, :@fum ] )
+        a.should eql( [ :@child_a, :@fee, :@fi, :@fo, :@fum ] )
         a.map { |ivar| me.instance_variable_get ivar }.should eql(
-          [ :A, nil, nil, :D ]
+          [ nil, :A, nil, nil, :D ]
         )
       end
 
       it "it complains about strange fields in the hash" do
         -> do
           klass.new fizzle: :F
-        end.should raise_error( ::KeyError, /key not found: :fizzle/ )
-      end
-
-      it "it complains if there is a conflict btwn hash and positional" do
-        -> do
-          klass.new :A, :B, :C, fi: :B, fo: :C, fum: :D
-        end.should raise_error( ::ArgumentError,
-          /hash argument in conflict with positional argument - index 1, "fi"/ )
+        end.should raise_error( ::KeyError, /\Akey not found: :fizzle/ )
       end
     end
 

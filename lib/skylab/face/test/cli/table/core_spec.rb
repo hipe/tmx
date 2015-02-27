@@ -16,7 +16,7 @@ module Skylab::Face::TestSupport::CLI::Table
         -> do
           Table[ :a ]
         end.should raise_error( NoMethodError,
-                     ::Regexp.new( "\\Aundefined\\ method\\ `each'\\ for\\ :a" ) )
+                     ::Regexp.new( "\\Aprivate\\ method" ) )
       end
       it "that is, an array of atoms won't fly either" do
         -> do
@@ -39,16 +39,18 @@ module Skylab::Face::TestSupport::CLI::Table
         act.should eql exp
       end
     end
+
     it "specify custom headers, separators, and output functions" do
       a = []
       x = Face_::CLI::Table[ :field, 'Food', :field, 'Drink',
         :left, '(', :sep, ',', :right, ')',
         :read_rows_from, [[ 'nut', 'pomegranate' ]],
-        :write_lines_to, a.method( :<< ) ]
+        :write_lines_to, a ]
 
       x.should eql nil
       ( a * 'X' ).should eql "(Food,Drink      )X(nut ,pomegranate)"
     end
+
     it "add field modifiers between the `field` keyword and its label (left/right)" do
       str = Face_::CLI::Table[
         :field, :right, :label, "Subproduct",
@@ -62,10 +64,11 @@ module Skylab::Face::TestSupport::CLI::Table
       HERE
       str.should eql exp
     end
+
     context "you can curry properties and behavior for table in one place .." do
 
       before :all do
-        P = Face_::CLI::Table.curry :left, '<', :sep, ',', :right, '>'
+        P = Face_::CLI::Table.curry :left, '<', :sep, ',', :right, ">\n"
       end
       it "and then use it in another place" do
         P[ [ %w(a b), %w(c d) ] ].should eql "<a,b>\n<c,d>\n"
@@ -76,7 +79,7 @@ module Skylab::Face::TestSupport::CLI::Table
       it "you can even curry the curried \"function\", curry the data, and so on -" do
         q = P.curry( :read_rows_from, [ %w( a b ) ], :sep, 'X' )
         q[ :sep, '_' ].should eql "<a_b>\n"
-        q[].should eql "<aXb>\n"
+        q[ :read_rows_from, [ %w'c d' ]].should eql "<cXd>\n"
       end
     end
   end

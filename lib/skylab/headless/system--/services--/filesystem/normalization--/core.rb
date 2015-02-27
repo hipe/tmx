@@ -9,6 +9,11 @@ module Skylab::Headless
         class << self
 
           def downstream_IO * x_a, & oes_p
+
+            if 1 == x_a.length
+              x_a.unshift :path
+            end
+
             Normalization__::Downstream_IO__.mixed_via_iambic x_a, & oes_p
           end
 
@@ -21,6 +26,11 @@ module Skylab::Headless
           end
 
           def upstream_IO * x_a, & oes_p
+
+            if 1 == x_a.length
+              x_a.unshift :path
+            end
+
             Normalization__::Upstream_IO__.mixed_via_iambic x_a, & oes_p
           end
 
@@ -78,8 +88,6 @@ module Skylab::Headless
         Event_ = Entity_.event
 
         Event_.selective_builder_sender_receiver self
-
-        FILE_FTYPE_ = FILE_FTYPE
 
       end
     end

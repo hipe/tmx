@@ -72,7 +72,7 @@ module Skylab::FileMetrics::TestSupport::CLI
         arr.length.should eql( 5 )
         lbl, num, pc1, pc2, lip = arr
         lbl.should eql( '*.rb' )
-        expect_integer num, 14..14  # greetings from the past
+        expect_integer num, 15..15  # greetings from the past
         expect_percent pc1
         expect_percent pc2, 100.0
         expect_pluses lip, floor..MAX_NUM_PLUSES__
@@ -106,7 +106,7 @@ module Skylab::FileMetrics::TestSupport::CLI
         dr, nf, nl, ts, ms, lp = output_lines[1].strip.split( /(?!< ) +(?! )/ )
         dr.should eql( 'api' )
         expect_integer nf, 3..10
-        expect_integer nl, 520..540  # hello from the past
+        expect_integer nl, 550..575  # hello from the past
         expect_percent ts
         expect_percent ms, 100.0
         expect_pluses lp, floor..MAX_NUM_PLUSES__

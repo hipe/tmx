@@ -167,11 +167,11 @@ module Skylab::Headless
       last_pathname = last_was_dir = true
       touch_file = -> path_tail do
 
-        SLASH__ == path_tail.to_s.getbyte( 0 ) and
+        FILE_SEPARATOR_BYTE == path_tail.to_s.getbyte( 0 ) and
           Raise__[ ::ArgumentError, say_not_relative( path_tail ) ]
 
         dest_path = join path_tail
-        if SLASH__ == dest_path.to_s.getbyte( -1 )
+        if FILE_SEPARATOR_BYTE == dest_path.to_s.getbyte( -1 )
           last_pathname = dest_dir = dest_path
           last_was_dir = true
         else
@@ -197,8 +197,6 @@ module Skylab::Headless
         end
       end
     end
-
-    SLASH__ = '/'.getbyte 0
 
     def say_not_relative file
       "must be relative - #{ file }"

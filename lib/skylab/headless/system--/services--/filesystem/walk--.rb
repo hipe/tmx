@@ -9,8 +9,8 @@ module Skylab::Headless
         class << self
           def new_with * x_a, & oes_p  # :+[#cb-063]
             new do
+              oes_p and @on_event_selectively = oes_p
               process_iambic_fully x_a
-              @on_event_selectively ||= oes_p
             end
           end
         end
@@ -22,8 +22,7 @@ module Skylab::Headless
             :ftype,
             :max_num_dirs_to_look,
             :prop,
-            :property_symbol,
-            :on_event_selectively
+            :property_symbol
 
         Callback_::Event.selective_builder_sender_receiver self
 
@@ -31,8 +30,6 @@ module Skylab::Headless
           @ftype = @prop = @property_symbol = nil
           super( & edit_p )
         end
-
-        FILE__ = 'file'.freeze
 
         def find_any_nearest_file_pathname  # :+#public-API
           execute
@@ -46,13 +43,11 @@ module Skylab::Headless
       private
 
         def normalize_ivars
-          if SLASH_ != @start_path.getbyte( 0 )
+          if FILE_SEPARATOR_BYTE != @start_path.getbyte( 0 )
             @start_path = ::File.expand_path @start_path
           end
           @start_pathname = ::Pathname.new @start_path
         end
-
-        SLASH_ = '/'.getbyte 0
 
         def work
           st, e = stat_and_stat_error
@@ -106,7 +101,6 @@ module Skylab::Headless
               surrounding_path = pn.to_path
               break
             end
-            try.exist? and break( found_path = try )
             pn_ = pn.dirname
             pn_ == pn and break  # we've reached the top - the root path
             pn = pn_
@@ -121,20 +115,11 @@ module Skylab::Headless
         def whn_found found_path, surrounding_path
 
           _ok = Headless_.system.filesystem.normalization.upstream_IO(
-              :only_apply_expectation_that_path_is_ftype_of, ( @ftype || FILE_FTYPE___ ),
-              :path, found_path ) do | * i_a, & ev_p |
-
-            ev = ev_p[]
-            maybe_send_event normal_top_channel_via_OK_value ev.ok do
-              ev
-            end
-            UNABLE_
-          end
+              :only_apply_expectation_that_path_is_ftype_of, ( @ftype || FILE_FTYPE ),
+              :path, found_path, & @on_event_selectively )
 
           _ok && surrounding_path
         end
-
-        FILE_FTYPE___ = 'file'.freeze
 
         def whn_resource_not_found count
           maybe_send_event :error, :resource_not_found do

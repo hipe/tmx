@@ -9,14 +9,9 @@ module Skylab::TestSupport
         class Models__::Manifest_Entry
 
           def initialize top_path, & oes_p
-            @on_event_selectively = oes_p
+
             @top_path = top_path
-          end
-
-          attr_reader :path, :tagging_a, :top_path
-
-          def members
-            [ :get_absolute_path, :path, :tagging_a, :top_path ]
+            @on_event_selectively = oes_p
           end
 
           def render_all_lines_into_under y, expag
@@ -115,6 +110,8 @@ module Skylab::TestSupport
             nil
           end
 
+          attr_reader :path, :tagging_a
+
           class Tagging__
 
             def initialize i, x
@@ -137,6 +134,7 @@ module Skylab::TestSupport
               y << s
               ACHIEVED_
             end
+
           end
         end
       end

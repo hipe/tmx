@@ -677,9 +677,10 @@ module Skylab::BeautySalon
       def display_any_find_command
         @my_files_agent.build_command do | * i_a, & ev_p|
           ev = ev_p[]
-          if :info == i_a.first && :command_string == i_a[ 1 ]
+          if :info == i_a.first && :find_command_args == i_a[ 1 ]
+            _s_a = ev.find_command_args.map( & BS_.lib_.shellwords.method( :shellescape ) )
             @serr.puts
-            @serr.puts "current find command: #{ ev.command_string }"
+            @serr.puts "current find command: #{ _s_a * SPACE_ }"
           else
             maybe_send_event_via_channel i_a do
               ev

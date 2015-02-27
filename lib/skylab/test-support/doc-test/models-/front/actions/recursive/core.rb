@@ -60,7 +60,7 @@ module Skylab::TestSupport
         end
 
         define_method :bld_bad_enum_value_event,
-          Lib_::Bzn_[]::Entity.build_bad_enum_value_event_method_proc
+          Brazen_::Entity.build_bad_enum_value_event_method_proc
 
         # ~ end experiments
 
@@ -127,8 +127,7 @@ module Skylab::TestSupport
           via_properties_init_ivars
 
           o = TestSupport_.lib_.system.defaults
-          @doc_test_dir = o.doc_test_dir
-          @doc_test_files_file = o.doc_test_files_file
+          @doc_test_files_file = o.doc_test_manifest_file
 
           pn = ::Pathname.new @path
           if pn.relative?
@@ -150,21 +149,26 @@ module Skylab::TestSupport
         end
 
         def produce_result
+
           struct = Recursive_::Actors__::Produce_manifest_entry_stream[
             @path,
-            @doc_test_dir,
             @doc_test_files_file,
             self.class.property_via_symbol( :path ),
-            handle_event_selectively ]
+            & handle_event_selectively ]
 
           struct and begin
-            @lines, @top_path = struct.to_a
-            via_lines_and_top_path
+
+            @lines = struct.open_file_IO
+            @manifest_patch = struct.manifest_path
+            @top_path = struct.surrounding_path
+
+            __via_lines_and_manifest_path
           end
         end
 
-        def via_lines_and_top_path
-          @st = via_lines_and_top_path_build_matching_entry_stream
+        def __via_lines_and_manifest_path
+
+          @st = __via_lines_and_manifest_path_build_matching_entry_stream
           case @sub_action
           when :list
             @st
@@ -225,14 +229,14 @@ module Skylab::TestSupport
           end
         end
 
-        def via_lines_and_top_path_build_matching_entry_stream
+        def __via_lines_and_manifest_path_build_matching_entry_stream
 
           # this is a hand-written reduce-map-reduce: skipping irrelevant
           # lines in the manifest, with each relevant line (as an "entry"
           # instance) produce only those entries whose paths are equal to
           # or under the argument path. if we stop early, close the file.
 
-          st = via_lines_and_top_path_bld_entry_stream
+          st = __via_lines_and_manifest_path_build_entry_stream
 
           target_path_length = @path.length
 
@@ -298,10 +302,13 @@ module Skylab::TestSupport
           end
         end
 
-        def via_lines_and_top_path_bld_entry_stream
+        def __via_lines_and_manifest_path_build_entry_stream
 
           proto = Recursive_::Models__::Manifest_Entry.new(
-            @top_path, & handle_event_selectively )
+
+            @top_path,
+
+            & handle_event_selectively )
 
           Callback_.stream do
             begin

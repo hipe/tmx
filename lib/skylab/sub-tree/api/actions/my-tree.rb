@@ -131,11 +131,19 @@ module Skylab::SubTree
     end
 
     def resolve_upstream_from_i_and_OK
-      i = Upstream_resolver_[ @upstream, @path_a, @file, @pattern,
+      i = Upstream_resolver___[ @upstream, @path_a, @file, @pattern,
         method( :mention ),
         -> io { @upstream = io },
-        -> find_cmd_str do
-          @verbose.find_command and mention find_cmd_str
+        -> find_cmd_o do
+
+          if @verbose.find_command
+
+            _ = find_cmd_o.args.map( &
+              SubTree_::Library_::Shellwords.method( :shellescape ) )
+
+            mention _ * SPACE_
+          end
+
         end, -> p do
           @exit_status_p = p
         end
@@ -280,8 +288,8 @@ module Skylab::SubTree
 
     alias_method :any_expression_agent, :expression_agent
 
-    class Upstream_resolver_ < LIB_.struct( :upstream, :path_a, :file,
-      :pattern, :say_p_p, :change_upstream_p, :cmd_s_p, :exit_status_p_p )
+    class Upstream_resolver___ < LIB_.struct( :upstream, :path_a, :file,
+      :pattern, :say_p_p, :change_upstream_p, :cmd_o_p, :exit_status_p_p )
 
       LIB_.funcy_globful self
 
@@ -338,22 +346,22 @@ module Skylab::SubTree
           pattern_part = [ :filename, @pattern ]
         end
 
-        cmd_s = SubTree_.lib_.system.filesystem.find(
+        cmd_o = SubTree_.lib_.system.filesystem.find(
+
           :paths, @path_a,
           * pattern_part,
-          :freeform_query_infix, '-type file',
-          :as_normal_value, -> cmd do
-            cmd.string
-          end,
-          :on_event_selectively, -> i, * _, & ev_p do
-            if :info != i
-              raise ev_p[].to_exception
-            end
-          end )
+          :freeform_query_infix_words, %w'-type file',
+          :as_normal_value, IDENTITY_
 
-        if cmd_s
-          @cmd_s_p[ cmd_s ]
-          i, o, e, t = SubTree_::Library_::Open3.popen3 cmd_s
+        ) do | i, * _, & ev_p |
+          if :info != i
+            raise ev_p[].to_exception
+          end
+        end
+
+        if cmd_o
+          @cmd_o_p[ cmd_o ]
+          i, o, e, t = SubTree_::Library_::Open3.popen3( * cmd_o.args )
           i.close
           s = e.read
           if s && s.length.nonzero?
