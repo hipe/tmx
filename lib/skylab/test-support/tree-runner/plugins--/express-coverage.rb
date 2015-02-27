@@ -1,218 +1,225 @@
-module Skylab::Test
+module Skylab::TestSupport
 
-  class Plugins::Coverage::Manager
+  class Tree_Runner
 
-    # this is a bootstrap zone! no fun allowed [#te-002]. if you are familiar
-    # with the skylab universe and how perfect, clean and consistent it always
-    # is (i'm lookin' at you, me!) then everything here will look wierd to you.
+    class Plugins__::Express_Coverage
 
-    SWITCH_ = Plugins::Coverage::SWITCH_
+      class Back  # assume coverage has been requested
 
-    -> do
-      the_one_place_where_singleton_should_be_ok = nil
-      define_singleton_method :instance do
-        the_one_place_where_singleton_should_be_ok ||= begin
-          x = new
-          ::Kernel.at_exit( & x.method( :final_conclusions ) )
-          x
+        def initialize resources, & oes_p
+
+          _pn = oes_p.call :for_plugin, :program_name
+
+          @command_name = "(XX #{ _pn } XX)"
+          @serr = resources.serr
+          @stateful_matcher = Stateful_Matcher___.new resources, & oes_p
+
         end
-      end
-      nil
-    end.call
 
-    def initialize
-      @final_conclusions = nil
-      @state = nil
-      state! :initialized
-      nil
-    end
-
-    # `start` - result is tuple. `argv` is argv of caller and must not
-    # be mutated. idx is the index of the e.g `--c-overage` switch.
-
-    def start y, argv, idx
-      require LIB_SKYLAB_PN_[].join( 'test-support/init' ).to_path
-        # the above is the last require before we (_we_) are started.
-      begin
-        state! :starting
-        sn = ::Struct.new( :medium, :murmur ).new( true, false )  # try it
-        ok, res = resolve_white_matcher y, argv, idx, sn
-        ok or break
-        @white_x = res
-        ok, res = start_simplecov y, sn
-        ok or break
-        @black_x = -> do  # do this after starting above just as grease
-          fun = ::Skylab::TestSupport::Init
-          rx = ::Regexp.method :escape
-          Black_Rx_Matcher_.new(  # could stand to be more extensible
-            %r{ (?:
-              #{ rx[ fun.spec.rb ] }
-                |
-              (?: \A | / )
-              (?: #{  fun::Test_support_filenames[].map( & rx ) * '|' } )
-            )\z }x )
-        end.call
-        state! :started
-        ok = true ; res = nil
-      end while false
-      [ ok, res ]
-    end
-
-    def final_conclusions
-      @final_conclusions and @final_conclusions[]
-    end
-
-    def add_path y, path
-      :started == @state or raise "can't add path unless started - #{ @state }"
-      @white_x.add_path y, path
-    end
-
-  private
-
-    -> do  # `state!` - cutie little baby state machine
-      h = {
-        initialized: {
-          starting: -> { },
-        },
-        starting: {
-          started: -> { @is_started = true }
-        }
-      }
-      h[ nil ] = {
-        initialized: -> {  @is_started = false }
-      }
-      define_method :state! do |i|
-        instance_exec( & h.fetch( @state ).fetch( i ) )
-        @state = i
-        nil
-      end
-      private :state!
-    end.call
-
-    def resolve_white_matcher y, argv, idx, sn  # result is tuple
-      argv = argv.dup
-      argv[ idx, 1 ] = [ ]
-      if argv.length.zero?
-        [ DO_STAY_, OMNI_PASS_MATCHER_ ]
-      else
-        build_union_matcher y, argv, idx, sn
-      end
-    end
-
-    DO_STAY_ = true ; DO_NOT_STAY_ = false ; GENERIC_ERROR_CODE_ = 1
-
-    def build_union_matcher y, argv, idx, sn
-      # Dir.glob avoids dotfiles unlike Pathname#children
-      h = ::Dir[ LIB_SKYLAB_PN_[].join '*' ].reduce( { } ) do |m, p|
-        pn = ::Pathname.new p
-        m[ pn.basename.to_s ] = pn
-        m
-      end
-      a = [ ] ; miss_a = nil ; argv.each do |x|
-        if h.key? x
-          a << "#{ h.fetch x }/"
-        else
-          ( miss_a ||= [ ] ) << x
+        def ARGV= x
+          @stateful_matcher.ARGV = x
         end
-      end
-      if miss_a
-        y << "when using, #{ SWITCH_ } we can only have subproduct #{
-          }names here (for now), not (#{ miss_a * ', ' })"
-        [ DO_NOT_STAY_, GENERIC_ERROR_CODE_ ]
-      else
-        [ DO_STAY_, Pathname_Union_Matcher_.new( a ) ]
-      end
-    end
 
-    def start_simplecov y, sn
-      yes = n = yc = nc = 0
-      p = $VERBOSE ; $VERBOSE = nil ; require 'simplecov' ; $VERBOSE = p
-      sc = ::SimpleCov ; cache_h = { }
-      sc.command_name "#{ FULL_NAME_[] } [various]"
-      sc.add_filter do |x|
-        @is_started or ::Kernel.raise "sanity - had state #{
-          }#{ @state.inspect } when tried to load - #{ x.filename }"
-        did = nil
-        res = cache_h.fetch x.filename do |k|
-          did = true ; r =
-          if @white_x.match( x.filename ) && ! @black_x.match( x.filename )
-            sn.murmur and y << "Y    #{ x.filename }"
-            yes += 1
-            false
+        def ARGV_coverage_switch_index= x
+          @stateful_matcher.ARGV_coverage_switch_index = x
+        end
+
+        def execute
+          _ok = @stateful_matcher.normalize
+          _ok && __start_simplecov
+        end
+
+        def __start_simplecov
+
+          require 'simplecov'  # $VERBOSE
+          sc = ::SimpleCov
+          sc.command_name @command_name
+          sc.add_filter( & @stateful_matcher.handle_yes_or_no_via_vendor_file )
+          special_x = sc.start
+          if special_x.nil?
+            @serr.puts "(coverage appears to have started successfully)"
+            ::Kernel.at_exit( & method( :__at_exit ) )
+            ACHIEVED_
           else
-            sn.murmur and y << "N    #{ x.filename }"
-            n += 1
-            true
-          end
-          cache_h[ k ] = r
-        end
-        if ! did
-          sn.murmur and y << "#{ res ? 'N' : 'Y' }(c) #{ x.filename }"
-          res ? ( nc += 1 ) : ( yc += 1 )
-        end
-        res
-      end
-      begin
-        ok = sc.start
-        if ! ok
-          y << "simplecov was not usable. it may be that the #{ SWITCH_ } #{
-            }option is unavailable to you where you live in your #{
-            }neigbhorhood."
-          break( res = GENERIC_ERROR_CODE_ )
-        end
-        @final_conclusions = -> do
-          if sn.medium
-            y << "(cov mgr said yes to #{ yes } files, no to #{ n }, was #{
-              }asked again about any same file #{ yc + nc } times)"
+            __TODO_when_never_before_seen_result_of_starting_coverage special_x
           end
         end
-      end while false
-      [ ok, res ]
-    end
 
-    class Omni_Pass_Matcher_
-      def pass _ ; true end
-    end
-
-    OMNI_PASS_MATCHER_ = Omni_Pass_Matcher_.new
-
-    class Black_Rx_Matcher_
-
-      def initialize rx
-        @match = -> x do
-          rx =~ x
+        def __at_exit
+          @serr.puts '(coverage plugin has seen the exit)'
+          nil
         end
-      end
 
-      def match x ; @match[ x ] end
-    end
+        def __resolve_stateful_matcher
 
-    class Pathname_Union_Matcher_
+          sm.root_directory_path = @root_directory_path
+          sm.serr = @serr
+          @stateful_matcher = sm.normalize
+          @stateful_matcher && ACHIEVED_
+        end
 
-      def initialize a
-        @match = -> path do
-          a.detect do |dir|
-            idx = path.index dir
-            idx && idx.zero?
+        class Stateful_Matcher___
+
+          # decide whether or not you want each file (whose paths are each
+          # passed sometimes many times) based on the sidesystem it appears
+          # in. cache this decision.
+
+          def initialize resources, & oes_p
+            @on_event_selectively = oes_p
+            @serr = resources.serr
           end
-        end
-        @add_path = -> y, x do
-          '/' == x[ -1 ] and raise "abnormal - #{ x }"
-          x = "#{ x }/"
-          shorter = @match[ x ]
-          if shorter
-            if shorter != x
-              fail "sanity - #{ x }"
+
+          attr_writer :ARGV, :ARGV_coverage_switch_index
+
+          def normalize
+
+            @root_path = @on_event_selectively.call :for_plugin, :root_directory_path
+            d_a = ( 0 ... @ARGV_coverage_switch_index ).to_a
+            d_a.concat ( @ARGV_coverage_switch_index + 1 ... @ARGV.length ).to_a
+
+            h = {}
+            ::Dir[ "#{ @root_path }/*" ].each do | path |  # :+[#sl-118] (3 of N)
+              h[ ::File.basename path ] = path
             end
-          else
-            a << x
-            true
+
+            cover_these = []
+            extra_a = nil
+
+            d_a.each do | d |
+              token = @ARGV.fetch d
+              if h.key? token
+                cover_these.push token
+              else
+                ( extra_a ||= [] ).push token
+              end
+            end
+
+            @simple_sidesystem_index = h
+
+            if extra_a
+              __when_extra extra_a
+            else
+
+              # mutate ARGV now before generated "canary" parser sees switch
+
+              @ARGV[ @ARGV_coverage_switch_index, 1 ] = EMPTY_A_
+
+              __when_normal cover_these
+            end
           end
-        end
+
+          def __when_extra extra_a
+
+            coverage_moniker = @ARGV.fetch @ARGV_coverage_switch_index
+
+            h = @simple_sidesystem_index
+
+            @on_event_selectively.call :error, :expression do | y |
+
+              _middle_two = if 3 > h.length
+                h.keys
+              else
+                d = h.length / 2
+                ks = h.keys
+                [ ks[ d - 1 ], ks[ d ] ]
+              end
+
+              _s_a = _middle_two.map do | s |
+                s.inspect
+              end
+
+              _s_a_ = extra_a.map do | s |
+                s.inspect
+              end
+
+              y << "`#{ coverage_moniker }` can only work with a limited #{
+                }set of arguments."
+
+              y << "you can only use *full* names of sidesystems (#{
+                }#{ _s_a * ', ' } etc)."
+
+              y << "this/these argument(s)/options(s) cannot be used: #{
+                }#{ _s_a_ * ', ' }"
+
+            end
+            UNABLE_
+          end
+
+          def __when_normal cover_these
+
+            cache_h = {}
+
+            do_want = __decide_if_want cover_these
+
+            @etc_p = -> vendor_source_file do
+
+              cache_h.fetch vendor_source_file.filename do | path |
+                cache_h[ path ] = do_want[ path ]
+              end
+            end
+            ACHIEVED_
+          end
+
+          def handle_yes_or_no_via_vendor_file
+            @etc_p
+          end
+
+          def __decide_if_want cover_these
+
+            yes = ::Hash[ cover_these.map { | s | [ s, true ] } ]
+
+            common_head = "#{ @root_path }#{ SEP__ }"
+            common_head_d = common_head.length
+
+            -> path do
+
+              if common_head == path[ 0, common_head_d ]
+
+                d_ = path.index SEP__, common_head_d
+                if d_
+
+                  ss_name = path[ common_head_d .. d_ - 1 ]
+
+                  if yes[ ss_name ]
+                    DO_WANT__
+                  else
+                    @serr.puts "(skipping per sidesystem: #{ path })"
+                    DO_NOT_WANT__
+                  end
+                else
+                  @serr.puts "(STRANGER: #{ path })"
+                  DO_NOT_WANT__
+                end
+              else
+                @serr.puts "(stranger: #{ path })"
+                DO_NOT_WANT__
+              end
+            end
+          end
+        end  # stateful matcher
+      end  # back
+
+      # ~ as plugin (we have to re-write looking like a plugin because [#002])
+
+      def initialize _plugin_idx, _resources, & oes_p
       end
 
-      def match x ; @match[ x ] end
-      def add_path y, x ; @add_path[ y, x ] end
+      def each_reaction
+      end
+
+      def each_capability
+      end
+
+      # ~ lots of these are duplicated because [#002]
+
+      ACHIEVED_ = true
+      DO_NOT_WANT__ = true  # sic
+      DO_WANT__ = false  # sic
+      EMPTY_A_ = []
+      SEP__ = ::File::SEPARATOR
+      SPACE_ = ' '
+      UNABLE_ = false
+
     end
   end
 end

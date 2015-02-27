@@ -29,7 +29,7 @@ module Skylab::Slicer
 
       @stdout.puts "digraph {"
 
-      ::Dir[ "#{ ::Skylab.dir_pathname.to_path }/*/core.rb" ].each do | path |
+      ::Dir[ "#{ ::Skylab.dir_pathname.to_path }/*/core.rb" ].each do | path |  # :+[#118]
 
         ss = __begin_sidesystem_via_path path
 

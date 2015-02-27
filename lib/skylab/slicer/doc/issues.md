@@ -26,7 +26,8 @@
 [#121]       #pattern of CLI.new, API.invoke as facades hehe inv. of [#109]
 [#120]       #tracking-tag backticks that could be robustified
 [#119] #open #tracking-tag #pattern of def.self some_thing instead of DSL
-[#118] #hole (moved to [#hl-171]) (was unify find command in multiple places)
+[#118]       #track everywhere that you determine sidesystem composition
+             ( #was: unify find command in multiple places (moved to [#hl-171]))
 [#117]       #pattern of defaults (if not nil, etc)
 [#116]       #pattern of set!, update_attributes! etc (w/ error_count)
                #normalization #algorithm

@@ -4,17 +4,26 @@ digraph g {
 
 list of things we want to cull :[#003]
 
-  + there are at leaast 3 ways to do API
-  + there are at least 3 box libs
+most difficult-ish is at top
+
   + there are numerous CLI libs
-  + there are numerous CLI table libs (hubbed at [#fa-002])
-  + there are numerous event base classes
-  + there are two name libs
-  + there are numerous param base classes
+
+  + there are at least 3 ways to do API
+
   + there are quite numerous param libs
+    + there are numerous param base classes
+
+  + there are numerous event base classes
+
   + plugin libs?
+
+  + there are numerous CLI table libs (hubbed at [#fa-002])
+
   + IO select: [#fa-003] and [#hl-048]
 
+
+  + there WERE two name libs
+  + there WERE at least 3 box libs
 */
 
   Name [style=filled]

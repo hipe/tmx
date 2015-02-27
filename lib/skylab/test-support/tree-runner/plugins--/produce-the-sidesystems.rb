@@ -41,7 +41,7 @@ module Skylab::TestSupport
 
           bx = Callback_::Box.new
 
-          ::Dir[ "#{ @root_path }/*" ].each do | path |
+          ::Dir[ "#{ @root_path }/*" ].each do | path |  # :+[#sl-118] ( 2 of N )
 
             bn = ::File.basename path
             bx.add bn, Sidesystem___.new( bn, path )

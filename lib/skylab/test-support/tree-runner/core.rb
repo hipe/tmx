@@ -16,56 +16,18 @@ module Skylab
       attr_accessor :root_directory_path
 
       def execute
+        __init_callback_handler
         ok = __load_and_start_coverage_plugin_if_necessary
         ok &&= __resolve_bound_call
         ok and begin
           ok = @bc.receiver.send @bc.method_name, * @bc.args
-          ok or __when_not_OK ok
+          ok or _when_not_OK ok
         end
       end
 
-      def __resolve_bound_call
+      def __init_callback_handler
 
-        @dsp = __build_dispatcher
-        @bc = @dsp.bound_call_via_ARGV @argv
-        if @bc
-          ACHIEVED_
-        else
-          __when_not_OK @bc
-        end
-      end
-
-      def __when_not_OK x
-        if @was_unable
-          __invite
-        end
-        x
-      end
-
-      def __load_and_start_coverage_plugin_if_necessary  # [#002] ..
-
-        if @argv.index COVERAGE_SWITCH_
-          __load_and_start_the_coverage_plugin
-        else
-          true
-        end
-      end
-
-      COVERAGE_SWITCH_ = '--coverage'
-
-      def __load_and_start_the_coverage_plugin
-
-        require "#{ HERE_ }/plugins-/coverage/back"
-
-        o = Plugins__::Coverage::Back.new @resources
-        o.root_directory_path = @root_directory_path
-        o.execute
-
-      end
-
-      def __build_dispatcher
-
-        require "#{ HERE_ }/lib-"
+        # a custom event callback handler similar to [#ca-006]
 
         @on_event_selectively = -> * i_a, & ev_p do
 
@@ -85,6 +47,30 @@ module Skylab
 
           send meth, * args, & ev_p  # result is result
         end
+        nil
+      end
+
+      def __resolve_bound_call
+
+        @dsp = __build_dispatcher
+        @bc = @dsp.bound_call_via_ARGV @argv
+        if @bc
+          ACHIEVED_
+        else
+          _when_not_OK @bc
+        end
+      end
+
+      def _when_not_OK x
+        if @was_unable
+          __invite
+        end
+        x
+      end
+
+      def __build_dispatcher
+
+        require "#{ HERE_ }/lib-"
 
         disp = Plugin_::Dispatcher.new @resources, & @on_event_selectively
 
@@ -159,14 +145,14 @@ module Skylab
 
       # ~ general event callbacks:
 
-      def __receive__error_expression__ & y_p
+      def __receive__error_expression__ *, & y_p
 
         _expression_agent.calculate _serr_yielder, & y_p
         @was_unable = true
         nil
       end
 
-      def __receive__error_event__ & ev_p
+      def __receive__error_event__ *, & ev_p
 
         _receive_error_event ev_p[]
       end
@@ -183,13 +169,19 @@ module Skylab
       end
 
       def __receive__optparse_parse_error_exception__ & ev_p
-        _receive_error_event ev_p[]
+        __receive_error_exception ev_p[]
       end
 
       # ~ support for above
 
       def _receive_error_event ev
         _render_into_stderr_event ev
+        @was_unable = true
+        UNABLE_
+      end
+
+      def __receive_error_exception e
+        @resources.serr.puts e.message
         @was_unable = true
         UNABLE_
       end
@@ -229,40 +221,52 @@ module Skylab
         _cls.new @resources, & @on_event_selectively
       end
 
+      # ~ outside the main flow: coverage specifics
+
+      def __load_and_start_coverage_plugin_if_necessary  # [#002] ..
+
+        d = @argv.index COVERAGE_SWITCH___
+        if d
+          ok = __load_and_start_the_coverage_plugin d
+          ok or _when_not_OK ok
+        else
+          true
+        end
+      end
+
+      def __load_and_start_the_coverage_plugin d
+
+        require "#{ HERE_ }/plugins--/express-coverage"
+
+        pu = Plugins__::Express_Coverage::Back.
+          new( @resources, & @on_event_selectively )
+
+        pu.ARGV = @argv
+        pu.ARGV_coverage_switch_index = d
+
+        pu.execute
+      end
+
+      COVERAGE_SWITCH___ = '--coverage'
+
+      # ~
+
+
     class Expression_Agent___  # #todo after :+#dev cull this
 
       alias_method :calculate, :instance_exec
 
+      # ~ style-related classifications
 
-      def and_ s_a
-        Callback_::Oxford_and[ s_a ]
-      end
-
-      def both x
-        Tree_Runner_::Lib_::NLP[]::EN.both x
-      end
-
-      def ick msg
+      def ick msg  # e.g divide
         "\"#{ msg }\""
       end
-      def kb msg
-        "`#{ msg }`"
-      end
-      def kbd msg
-        ( @kbd ||= curry :green )[ msg ]
-      end
-      def hdr msg
+
+      def hdr msg  # e.g help
         ( @hdr ||= _curry :green )[ msg ]
       end
-      def multiline a
-        1 == a.length ? " #{ a[0] }" : "\n#{ a * "\n" }"
-      end
 
-      def or_ s_a
-        Callback_::Oxford_or[ s_a ]
-      end
-
-      def par x
+      def par x  # e.g divide
 
         _nm = if x.respond_to?( :ascii_only? ) || x.respond_to?( :id2name )
           Callback_::Name.via_slug x
@@ -273,22 +277,30 @@ module Skylab
         "<#{ _nm.as_slug }>"
       end
 
-      def s * x_a
-        Tree_Runner_::Lib_::NLP[]::EN::s( * x_a )
+      # ~ linguistic- (and EN-) related classifications of string
+
+      def and_ s_a
+        Callback_::Oxford_and[ s_a ]
       end
 
-      def val x
-        x.inspect
+      def both x
+        Tree_Runner_::Lib_::NLP[]::EN.both x
       end
-
-      # ~
 
       def indefinite_noun s
         _NLP_agent.indefinite_noun[ s ]
       end
 
+      def or_ s_a
+        Callback_::Oxford_or[ s_a ]
+      end
+
       def progressive_verb s
         _with_split_and_join :progressive_verb, s
+      end
+
+      def s * x_a
+        Tree_Runner_::Lib_::NLP[]::EN::s( * x_a )
       end
 
       def third_person s
@@ -317,6 +329,8 @@ module Skylab
       SPACE_ = ' '.freeze
 
       Tree_Runner_ = self
+
+      UNDERSCORE_ = '_'.freeze  # we need our own because [#002]
     end
   end
 end

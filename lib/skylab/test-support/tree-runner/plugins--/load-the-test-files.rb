@@ -11,7 +11,7 @@ module Skylab::TestSupport
         tr.if_transition_is_effected do | o |
 
           o.on '--require-only',
-              "require() each file (but do not require 'r#{}spec/autorun')" do
+              "require() each file, but do not require 'r#{}spec/autorun'" do
 
             @require_only = true
           end
