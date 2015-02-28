@@ -36,6 +36,11 @@ module Skylab::Brazen
         bc and bc.receiver.send bc.method_name, * bc.args
       end
 
+      def call_via_mutable_box * i_a, bx, & x_p
+        bc = _API_daemon.produce_bound_call_via_mutable_box i_a, bx, & x_p
+        bc and bc.receiver.send bc.method_name, * bc.args
+      end
+
       def application_kernel
         _API_daemon.application_kernel
       end
@@ -77,6 +82,15 @@ module Skylab::Brazen
         end
 
         API::Produce_bound_call__[ x_a, @app_kernel, @mod ]
+      end
+
+      def produce_bound_call_via_mutable_box i_a, bx, & x_p
+
+        API::Produce_bound_call__.start_via_iambic_and_mutable_box(
+          i_a,
+          bx,
+          @app_kernel,
+          & x_p ).resolve_bound_call
       end
 
       def application_kernel

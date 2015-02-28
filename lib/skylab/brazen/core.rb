@@ -110,9 +110,11 @@ module Skylab::Brazen
       end
 
       def surrounding_module mod
-        LIB_.module_lib.value_via_relative_path mod, '..'
+        LIB_.module_lib.value_via_relative_path mod, DOT_DOT_
       end
-    end
+    end  # >>
+
+    DOT_DOT_ = '..'
 
     module Name_Function_Proprietor_Methods__  # infects upwards
 

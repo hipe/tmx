@@ -4,9 +4,13 @@
 
 typeset me=$0; typeset -a rest; rest=($*)
 
-source "$me/../../zsh-lib/init-component-node.zsh"
+# meh:
+typeset x=$(dirname $me)
+typeset testdir=$(dirname $x)
 
-typeset child_nodes_dir=$component_node_local_top_dir/vcs-adapters-
+source "$testdir/zsh-lib/init-component-node.zsh"
+
+typeset child_nodes_dir=$component_node_local_top_dir/vcs-adapters
 
 -print-component-node-description () {
   serr

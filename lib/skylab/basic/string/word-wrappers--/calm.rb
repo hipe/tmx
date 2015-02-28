@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module String
 
-    class Word_Wrappers__::Calm
+    class Word_Wrappers__::Calm  # :+[#033].
 
       Callback_::Actor.methodic self, :properties,
 

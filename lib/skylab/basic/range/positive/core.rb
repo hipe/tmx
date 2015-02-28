@@ -17,7 +17,11 @@ module Skylab::Basic
 
     attr_reader :begin, :end
 
-    def describe
+    def description_under _expag
+      description
+    end
+
+    def description
       "#{ @begin }-#{ INFINITY == @end ? 'INFINITY' : @end }"
     end
 

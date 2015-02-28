@@ -56,7 +56,7 @@ module Skylab::BeautySalon
 
           def when_multiline_OK d, path
             es = Self_::String_Edit_Session_.new(
-              ::File.open( path, READ_MODE_ ).read,  # noent meh
+              ::File.open( path, ::File::CREAT | ::File::RDONLY ).read,  # noent meh
               @ruby_regexp,
               @on_event_selectively )
 

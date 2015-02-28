@@ -20,13 +20,13 @@ module Skylab::Headless
             false
           end
         end
-      end
+      end  # >>
 
       def clear_for_pool
         self.no = self.stem = self.arg = nil
       end
 
-      include Callback_::Box::Struct_proxy::InstanceMethods
+      include Callback_::Box::Proxies::Struct::For::InstanceMethods
     end
   end
 end

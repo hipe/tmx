@@ -1216,7 +1216,7 @@ module Skylab::Brazen
 
     public
 
-      def rendering_method_name_for prop  # for expag
+      def rendering_method_name_for_property prop  # for expag
         category_i, = lookup_property prop
         :"render_prop_as_#{ category_i }"
       end

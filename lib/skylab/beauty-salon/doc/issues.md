@@ -1,3 +1,4 @@
+[#033]       [ word wrap (here) ]
 [#026]       #parent-node: [#010] procedurally find the smaller methods
 [#025] #open have the multiple forms save to one file
 [#024] #open explicit choice of single line v. multiline

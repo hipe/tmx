@@ -142,7 +142,7 @@ module Skylab::Basic::TestSupport::Range
     end
 
     def expect str
-      @unio.describe.should eql( str )
+      @unio.description.should eql( str )
     end
   end
 end

@@ -2,6 +2,8 @@ module Skylab::BeautySalon
 
   class Models_::Search_and_Replace  # see [#016]
 
+    Actions = THE_EMPTY_MODULE_
+
     class << self
 
       def client_for_three * a

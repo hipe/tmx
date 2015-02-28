@@ -2,6 +2,8 @@ module Skylab::BeautySalon
 
   class Models_::Deliterate < BS_.lib_.brazen.model.action_class
 
+    Actions = THE_EMPTY_MODULE_
+
     Brazen_ = BS_.lib_.brazen
 
     def write_options o
@@ -116,7 +118,7 @@ module Skylab::BeautySalon
     end
 
     def via_input_path_resolve_input_stream
-      @input_stream = ::File.open @input_path, READ_MODE_
+      @input_stream = ::File.open @input_path, ::File::CREAT | ::File::RDONLY
       @input_stream && ACHIEVED_
     rescue ::Errno::ENOENT => e
       maybe_send_event :error, :IO_error do

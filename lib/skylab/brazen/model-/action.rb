@@ -111,16 +111,30 @@ module Skylab::Brazen
       @preconditions = nil
       @kernel = boundish.to_kernel
 
-      accept_selective_listener_via_channel_proc( -> i_a, & ev_p do  # #note-100
-        oes_p.call( * i_a ) do
-          _ev = if ev_p
-            ev_p[]
-          else
-            Callback_::Event.inline_via_normal_extended_mutable_channel i_a
-          end
-          Callback_::Event.wrap.signature name, _ev
-        end
+      accept_selective_listener_proc oes_p
+    end
+
+    def accept_selective_listener_proc oes_p  # name might change to expose [ca]
+
+      accept_selective_listener_via_channel_proc( -> i_a, & ev_p do
+
+        maybe_emit_wrapped_or_autovivified_event oes_p, i_a, & ev_p
+
       end )
+    end
+
+    def maybe_emit_wrapped_or_autovivified_event oes_p, i_a, & ev_p  # #note-100
+
+      oes_p.call( * i_a ) do
+
+        _ev = if ev_p
+          ev_p[]
+        else
+          Callback_::Event.inline_via_normal_extended_mutable_channel i_a
+        end
+
+        Callback_::Event.wrap.signature name, _ev
+      end
     end
 
   public
@@ -131,14 +145,98 @@ module Skylab::Brazen
       # to meet preconditions we have to parse the iambic stream. to parse
       # the iambic stream we have to call `normalize`.
 
+      _bound_call_against do
+        process_iambic_stream_fully st
+      end
+    end
+
+    def bound_call_against_box box
+
+      # exactly as above
+
+      _bound_call_against do
+        __process_box_as_iambic_stream_fully box
+      end
+    end
+
+    def __process_box_as_iambic_stream_fully bx  # experimental
+
+      keep_parsing = true
+      formals = formal_properties
+      pxy = Value_As_Stream_Like_Proxy___.new
+      @__methodic_actor_iambic_stream__ = pxy
+      bx.each_pair do | k, x |
+
+        prp = formals[ k ]
+        if ! prp
+          pxy.accept_current_token_ k
+          when_after_process_iambic_fully_stream_has_content pxy
+          keep_parsing = false
+          break
+        end
+
+        if prp.takes_argument
+
+          pxy.accept_current_token_ x
+          keep_parsing = send prp.iambic_writer_method_name
+
+        elsif x
+
+          # the formal is a flag and the actual is true-ish. disregard what
+          # the actual value is, in the interest of iambic isomorphism.
+
+          pxy.clear
+          keep_parsing = send prp.iambic_writer_method_name
+
+        else
+
+          # the formal is a flag and the actual is known but false-ish..
+          # it's tempting to add the [ nil or false ] to the argument box,
+          # but this is in violation of the iambic isomorphism
+
+        end
+
+        keep_parsing or break
+
+      end
+      @__methodic_actor_iambic_stream__ = nil
+      keep_parsing
+    end
+
+    class Value_As_Stream_Like_Proxy___
+
+      def current_token
+        @p[]
+      end
+
+      def gets_one
+        x = @p[]
+        @p = nil
+        x
+      end
+
+      def accept_current_token_ x
+        @p = -> do
+          x
+        end ; nil
+      end
+
+      def clear
+        @p = nil
+      end
+    end
+
+    def _bound_call_against
+
       @argument_box = Box_.new
-      ok = process_iambic_stream_fully st
+      ok = yield
       if ok
         via_arguments_produce_bound_call
       else
         Brazen_.bound_call.via_value ok
       end
     end
+
 
     # ~ experiment: is it worth it hacking external API actions for internal calls? [tm]
 

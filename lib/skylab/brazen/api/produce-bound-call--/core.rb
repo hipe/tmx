@@ -9,22 +9,42 @@ module Skylab::Brazen
       Callback_::Actor.call self, :properties,
         :x_a,
         :kernel,
-        :mod
+        :mod,
+        :box
 
       class << self
+
         def start_via_iambic x_a, k, & oes_p
           new do
-            @on_event_selectively = oes_p
-            @kernel = k
-            @mod = k.module
-            @x_a = x_a
-            _init
+            _common_pre_init x_a, k, & oes_p
+            @box = nil
+            _common_post_init
           end
         end
+
+        def start_via_iambic_and_mutable_box x_a, bx, k, & oes_p
+          new do
+            _common_pre_init x_a, k, & oes_p
+            @box = bx
+            _common_post_init
+          end
+        end
+
       end  # >>
 
+      def _common_pre_init x_a, k, & oes_p
+        @on_event_selectively = oes_p
+        @kernel = k
+        @mod = k.module
+        @x_a = x_a
+      end
+
       def execute
-        _init
+        _common_post_init
+        resolve_bound_call
+      end
+
+      def resolve_bound_call
         _ok = __resolve_bound_action
         _ok && __via_bound_action_resolve_bound_call
         @bound_call
@@ -42,9 +62,30 @@ module Skylab::Brazen
         @st
       end
 
-      def _init
+      def _common_post_init
 
         @bound = nil  # there is no parent bound action to start
+
+        if @box
+          __init_when_iambic_and_box
+        else
+          __init_when_iambic
+        end
+      end
+
+      def __init_when_iambic_and_box
+
+        @on_event_selectively ||= begin
+          _oes_p = @box.remove :on_event_selectively do end
+          _oes_p || _produce_some_handle_event_selectively
+        end
+
+        @st = Callback_::Iambic_Stream.via_array @x_a
+
+        ACHIEVED_
+      end
+
+      def __init_when_iambic
 
         st = Callback_::Iambic_Stream.via_array @x_a
 
@@ -54,7 +95,7 @@ module Skylab::Brazen
             st.reverse_advance_one_
             x
           else
-            __prdc_some_handle_event_selectively
+            _produce_some_handle_event_selectively
           end
         end
 
@@ -148,12 +189,21 @@ module Skylab::Brazen
 
       def __via_bound_action_resolve_bound_call
 
-        x = @bound.bound_call_against_iambic_stream @st
-        if x
-          @bound_call = x
-          OK_
+        ok = true
+        if @box
+          if @st.unparsed_exists
+            _end_in_error_with :no_such_action, :action_name, @st.current_token
+            ok = false
+          else
+            bc = @bound.bound_call_against_box @box
+          end
         else
-          @bound_call = x
+          bc = @bound.bound_call_against_iambic_stream @st
+        end
+
+        ok and begin
+          @bound_call = bc
+          bc and OK_
         end
       end
 
@@ -168,7 +218,7 @@ module Skylab::Brazen
         UNABLE_
       end
 
-      def __prdc_some_handle_event_selectively
+      def _produce_some_handle_event_selectively
 
         _two_streams = LIB_.two_streams
 

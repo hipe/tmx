@@ -423,10 +423,16 @@ module Skylab::Callback
       @h[ i ] = p[ x ]
     end
 
-    def remove i
-      d = @a.index( i ) or raise ::KeyError, say_not_found( i )
-      @a[ d, 1 ] = EMPTY_A_
-      @h.delete i
+    def remove i, & else_p
+      d = @a.index i
+      if d
+        @a[ d, 1 ] = EMPTY_A_
+        @h.delete i
+      elsif else_p
+        else_p[]
+      else
+        raise ::KeyError, say_not_found( i )
+      end
     end
 
     def algorithms  # ~ experimental bridge to the past
@@ -434,7 +440,7 @@ module Skylab::Callback
     end
 
     def to_struct  # ~ ditto
-      Box::Struct_proxy[ @a, @h, self ]
+      Box::Proxies::Struct::For[ @a, @h, self ]
     end
 
     private def say_not_found i

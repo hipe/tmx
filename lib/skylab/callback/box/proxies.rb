@@ -2,7 +2,32 @@ module Skylab::Callback
 
   class Box
 
-    class Struct_proxy  # see [#062]
+    Proxies = ::Module.new
+
+    Proxies::Hash = ::Module.new
+
+    class Proxies::Hash::Like
+
+      def initialize
+        @bx = Box.new
+      end
+
+      def [] k
+        @bx[ k ]
+      end
+
+      def []= k, x
+        @bx.set k, x
+      end
+
+      def box_
+        @bx
+      end
+    end
+
+    Proxies::Struct = ::Module.new
+
+    class Proxies::Struct::For  # see [#062]
 
       # note this is just the actor that builds the proxy, not the proxy iteslf
 

@@ -9,11 +9,25 @@ module Skylab::Basic
 
     attr_writer :unexpected_proc
 
-    def describe
+    def description_under expag
+
       if @a.length.nonzero?
-        @a.map( & :describe ) * ','
+        @a.map do | x |
+          x.description_under expag
+        end * LOOK_LIKE_MANPAGE__
       end
     end
+
+    def description
+
+      if @a.length.nonzero?
+        @a.map do | x |
+          x.description
+        end * LOOK_LIKE_MANPAGE__
+      end
+    end
+
+    LOOK_LIKE_MANPAGE__ = ','.freeze
 
     # `add` - result t|f
 
@@ -22,11 +36,11 @@ module Skylab::Basic
       begin
 
         break( res = @unexpected_proc[
-          "can't understand non-positive range - #{ cur.describe }" ] ) if
+          "can't understand non-positive range - #{ cur.description }" ] ) if
             cur.begin < 1
 
         break( res = @unexpected_proc[
-          "can't understand range with negative width - #{ cur.describe }"] ) if
+          "can't understand range with negative width - #{ cur.description  }"] ) if
             cur.end < cur.begin and cur.end != Range::Positive::INFINITY
 
         break( @a << Range::Positive::Mutable_.new( cur.begin, cur.end ) ) if

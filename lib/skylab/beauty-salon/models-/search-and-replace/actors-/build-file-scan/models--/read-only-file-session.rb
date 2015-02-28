@@ -126,7 +126,7 @@ module Skylab::BeautySalon
         NEWLINE_CHAR__ = NEWLINE_.getbyte 0
 
         def __to_read_only_match_stream_when_single_line__  # when [#024] explicit choice
-          io = ::File.open @path, READ_MODE_
+          io = ::File.open @path, ::File::CREAT | ::File::RDONLY
           line_number = 0
           rx = @ruby_regexp
           Callback_.stream do

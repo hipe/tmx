@@ -6,6 +6,10 @@ list of things we want to cull :[#003]
 
 most difficult-ish is at top
 
+  + API
+
+  + plugin libs?
+
   + there are numerous CLI libs
 
   + there are at least 3 ways to do API
@@ -14,8 +18,6 @@ most difficult-ish is at top
     + there are numerous param base classes
 
   + there are numerous event base classes
-
-  + plugin libs?
 
   + there are numerous CLI table libs (hubbed at [#fa-002])
 
@@ -26,14 +28,24 @@ most difficult-ish is at top
   + there WERE at least 3 box libs
 */
 
-  Name [style=filled]
-  Box [style=filled]
-  Event
-  CLI
+
   API
+  Box [style=filled]
+  CLI
+  Event
+  Name [style=filled]
+  Param [ label="param\nbase class" ]
+  Plugin
   Property
-  Param [ label="param\nlib" ]
-  Param -> Property
+
+
+  API -> Event
+  API -> Plugin
+  API -> Property
+  CLI -> API
+  CLI -> Event
+  CLI -> Property
+  Property-> Param
 
   /* that one color of blue: fillcolor="#b5d5fb" */
 

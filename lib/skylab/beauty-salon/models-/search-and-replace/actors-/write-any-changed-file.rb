@@ -34,7 +34,7 @@ module Skylab::BeautySalon
       def via_stream_write_lines line
         tmpfile_pn = build_tmpfile_pathname
         @tmpfile = tmpfile_pn.to_path
-        io = tmpfile_pn.open WRITE_MODE_
+        io = tmpfile_pn.open ::File::CREAT | ::File::WRONLY
         bytes = 0
         begin
           bytes += io.write line

@@ -10,17 +10,33 @@ module Skylab::BeautySalon
     @lib ||= Callback_.produce_library_shell_via_library_and_app_modules( Lib_, self )
   end
 
+  Brazen_ = Autoloader_.require_sidesystem :Brazen
+
+  module API
+
+    extend Brazen_::API.module_methods
+
+  end
+
+  class Kernel_ < Brazen_::Kernel_  # :+[#br-015]
+
+  end
+
+  THE_EMPTY_MODULE_ = ::Module.new.freeze
+
+  module Models_
+    Autoloader_[ self, :boxxy ]  # ask for it
+  end
+
   module Lib_
 
     sidesys, = Autoloader_.at :build_require_sidesystem_proc
 
-    API_Action = -> do
-      Face__[]::API::Action
-    end
-
     Basic = sidesys[ :Basic ]
 
-    Brazen = sidesys[ :Brazen ]
+    Brazen = -> do  # not until we're sure
+      Brazen_
+    end
 
     CLI_lib = -> do
       HL__[]::CLI
@@ -47,10 +63,6 @@ module Skylab::BeautySalon
 
     Old_CLI_lib = -> do
       Face__[]::CLI
-    end
-
-    Plugin = -> do
-      Face__[]::Plugin
     end
 
     Proxy_lib = -> do
@@ -93,10 +105,11 @@ module Skylab::BeautySalon
   EMPTY_S_ = ''.freeze
   IDENTITY_ = -> x { x }          # for fun we track this
   NEWLINE_ = "\n"
-  READ_MODE_ = 'r'.freeze
+  NIL_ = nil  # to emphasize its use
   PROCEDE_ = true
   SPACE_ = ' '.freeze
+  STOP_PARSING_ = false
   UNABLE_ = false
-  WRITE_MODE_ = 'w'.freeze
+  UNDERSCORE_ = '_'.freeze
 
 end

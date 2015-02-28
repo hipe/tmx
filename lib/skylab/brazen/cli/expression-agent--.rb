@@ -69,7 +69,7 @@ module Skylab::Brazen
       end
 
       def par prop
-        _unstyled = send @partitions.rendering_method_name_for( prop ), prop
+        _unstyled = send @partitions.rendering_method_name_for_property( prop ), prop
         highlight _unstyled
       end
 
@@ -137,7 +137,7 @@ module Skylab::Brazen
 
       Singleton_instance__ = Callback_.memoize do
         _partitions = LIB_.proxy_lib.
-          inline :rendering_method_name_for, -> prp do
+          inline :rendering_method_name_for_property, -> prp do
             :render_prop_as_unknown
           end
 
