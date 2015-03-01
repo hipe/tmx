@@ -1,6 +1,6 @@
 module Skylab::TestSupport
 
-  class Coverage::Coverer
+  class Coverage_::Coverer
 
     def initialize y, path_prefix_p
       @path_prefix_p = path_prefix_p

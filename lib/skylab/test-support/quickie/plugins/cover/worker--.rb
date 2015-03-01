@@ -122,7 +122,7 @@ module Skylab::TestSupport
 
       def start_service_with_path_prefix path_prefix
         _io = resolve_stderr_IO
-        TestSupport_::Coverage::Service.start _io, -> { path_prefix }
+        TestSupport_::Coverage_::Service.start _io, -> { path_prefix }
       end
 
       def resolve_stderr_IO

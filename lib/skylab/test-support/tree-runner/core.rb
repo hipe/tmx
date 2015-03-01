@@ -27,7 +27,8 @@ module Skylab
 
       def __init_callback_handler
 
-        # a custom event callback handler similar to [#ca-006]
+        # a custom event callback handler similar to [#ca-006].
+        # as part of what is here a broader pattern we implement :+[#br-023]
 
         @on_event_selectively = -> * i_a, & ev_p do
 
@@ -325,8 +326,6 @@ module Skylab
       HERE_ = ::File.expand_path '..', __FILE__
 
       Plugins__= ::Module.new
-
-      SPACE_ = ' '.freeze
 
       Tree_Runner_ = self
 

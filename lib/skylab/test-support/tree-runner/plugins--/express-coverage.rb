@@ -217,7 +217,6 @@ module Skylab::TestSupport
       DO_WANT__ = false  # sic
       EMPTY_A_ = []
       SEP__ = ::File::SEPARATOR
-      SPACE_ = ' '
       UNABLE_ = false
 
     end

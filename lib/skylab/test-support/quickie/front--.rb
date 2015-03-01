@@ -121,7 +121,7 @@ module Skylab::TestSupport
       def argument_error argv
         @y << "#{ moniker_ }aborting because none of the plugins or #{
           }loaded spec files processed the argument(s) - #{
-          }#{ argv.map( & :inspect ) * ' ' }"
+          }#{ argv.map( & :inspect ) * SPACE_ }"
         @y << invite_string
         nil
       end

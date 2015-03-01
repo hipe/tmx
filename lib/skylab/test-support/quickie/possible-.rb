@@ -259,7 +259,7 @@ module Skylab::TestSupport
           word_a = [ ]
           (( s = @any_conj && @any_conj.articulate_self )) and word_a << s
           (( s = ( @agent | @predicate ).inflect )) and word_a << s
-          word_a * ' ' if word_a.length.nonzero?
+          word_a * SPACE_ if word_a.length.nonzero?
         end
 
         Internen__ = -> mod_x do

@@ -14,10 +14,6 @@ module Skylab::TestSupport
       mod.extend Anchor_ModuleMethods
       mod.initialize_for_regret_with_parent_anchor_mod nil
       end
-
-      def infer_const * x_a
-        Regret_::Infer_const__[ * x_a ]
-      end
     end
 
     module Anchor_ModuleMethods

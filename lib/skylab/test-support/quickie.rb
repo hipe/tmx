@@ -940,7 +940,7 @@ module Skylab::TestSupport
 
     msgs = -> be_what, takes_args do
       pos, neg = omfg_h.fetch be_what.intern do |k|
-        stem = be_what.gsub '_', ' '
+        stem = be_what.gsub UNDERSCORE_, SPACE_
         [ "is #{ stem }", "to be #{ stem }" ]
       end
       if takes_args

@@ -71,10 +71,6 @@ module Skylab::TMX::TestSupport::CLI::L2P
       go :'quickie', FLAG_
     end
 
-    it "regret" do
-      go :regret
-    end
-
     it "slicer" do
       go :slicer
     end
@@ -85,6 +81,10 @@ module Skylab::TMX::TestSupport::CLI::L2P
 
     it "sub tree" do
       go :sub_tree
+    end
+
+    it "test support" do
+      go :"test-support"
     end
 
     it "tan man" do

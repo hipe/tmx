@@ -54,7 +54,7 @@ module Skylab::FileMetrics
       cmd = build_find_files_command @path_a
       if cmd
         if @req[:show_commands] || @req.fetch( :debug_volume )
-          _ = cmd.args.map( & FM_::Libary_::Shellwords.method( :shellescape ) )
+          _ = cmd.args.map( & FM_::Library_::Shellwords.method( :shellescape ) )
           @ui.err.puts ( _ * SPACE_ )
         end
         stdout_lines_into_from_command_args line_y, cmd.args

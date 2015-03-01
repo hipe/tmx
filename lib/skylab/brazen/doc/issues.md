@@ -73,7 +73,10 @@
 [#026]       #parent-node: [#025] the collection controller narrative ..
 [#025]       #doc-node: the brazen four layer model model ..
 [#024]       #parent-node: [#025] the model action narrative ..
-[#023] #hole ( was: #parent-node: [#011] event prototype )
+[#023]       #experimental-feature-tracker: `expression` as a level-2
+               channel that works not in event objects but expresssions
+               directly
+             ( was: #parent-node: [#011] event prototype )
 [#022]       [ entity identifier ]
              ( was: #done obliterate `receive_negative_event` and the rest - single
              entrypoint is better. rely on `ok` : false )

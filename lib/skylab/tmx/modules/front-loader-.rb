@@ -103,9 +103,5 @@ module Skylab::TMX
       ::Skylab::TestSupport::Quickie::Recursive_Runner
     end, :skip, false
 
-    namespace :regret, -> do  # because names are not isomorphic with f.s
-      require 'skylab/test-support/core'
-      ::Skylab::TestSupport::Regret::CLI::Client
-    end, :skip, false
   end
 end

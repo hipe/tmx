@@ -6,7 +6,7 @@ module Skylab::TanMan
       def new * a
         new_top_invocation a, TanMan_
       end
-    end
+    end  # >>
 
     def resolve_app_kernel
       @app_kernel = TanMan_::API.application_kernel ; nil
@@ -172,7 +172,7 @@ module Skylab::TanMan
       end
     end
 
-    module Client  # ~ #comport:face (just to fit in 'tmx')
+    module Client  # ~ #hook-out for [tmx] integration
       module Adapter
         module For
           module Face

@@ -31,7 +31,7 @@ module Skylab::TestSupport
         end
         r and a << r
         a.length.zero? and a << plugin_i.to_s
-        a * ' '
+        a * SPACE_
       end
 
       def some_desc_a

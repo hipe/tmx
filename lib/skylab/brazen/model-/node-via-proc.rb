@@ -94,17 +94,47 @@ module Skylab::Brazen
 
         def search_for_name_stop_index
 
-          # assume convention: insist that some nearest module has the
-          # 'Action_' const (probably the application node), and insist
-          # that the Action_ node has the name stop index const.
+          # assume the convention that somewhere there is an `Action_`
+          # node "reference class" (probably base class) that has the
+          # name stop index const.
 
-          chain = LIB_.module_lib.chain_via_module @parent_module
-          _mod = ( chain.length - 1 ).downto( 0 ).reduce nil do |_, d|
-            if chain.fetch( d ).value_x.const_defined? :Action_
-              break chain[ d ].value_x
+          scn = LIB_.basic::List.line_stream(
+            LIB_.module_lib.chain_via_module @parent_module )
+
+          # assume the convention that the current leaf of the chain is some
+          # box module (either 'Actions' or 'Models_`), and the one above
+          # that is either a model node or the application node.
+
+          begin
+
+            box_node = scn.rgets
+            focus_node = scn.rgets
+
+            focus_mod = focus_node.value_x
+
+            if focus_mod.const_defined? :Action_
+              reference_class = focus_mod::Action_
+              break
             end
+
+            if :Models_ == box_node.name_symbol
+              break  # we always stop at this (perhaps local) top
+            end
+
+            redo
+          end while nil
+
+          if ! reference_class
+
+            # if it wasn't found by there being an 'Action_' base class
+            # defined somewhere, assume we are at the top and the focus
+            # mod is the application class. to use procs in this way you
+            # must define the following method.
+
+            reference_class = focus_mod.action_class
           end
-          @name_stop_index = _mod::Action_::NAME_STOP_INDEX
+
+          @name_stop_index = reference_class::NAME_STOP_INDEX
           true
         end
       end
@@ -171,7 +201,11 @@ module Skylab::Brazen
 
             case opt_req_rest
             when :req
+              argument_arity = :one
               parameter_arity = :one
+            when :rest
+              argument_arity = :zero_or_more
+              parameter_arity = :zero_or_one # or not ..
             else
               raise ::NoMethodError, opt_req_rest
             end
@@ -180,6 +214,7 @@ module Skylab::Brazen
 
             Brazen_.model.entity::Entity_Property.new do
 
+              @argument_arity = argument_arity
               @name = Callback_::Name.via_variegated_symbol name_symbol
               @parameter_arity = parameter_arity
 
@@ -192,7 +227,7 @@ module Skylab::Brazen
           case 0 <=> @action_class_like.p.arity
           when -1 ; bc_when_nonzero_arity_via_stream st
           when  0 ; bc_when_zero_arity
-          when  1 ; bc_when_glob st
+          when  1 ; __bound_call_when_glob st
           end
         end
 
@@ -200,9 +235,21 @@ module Skylab::Brazen
           Brazen_.bound_call nil, @action_class_like.p, :call
         end
 
-        def __REDO_bc_when_glob st
-          x_a.push self
-          Brazen_.bound_call x_a, @action_class_like.p, :call
+        def __bound_call_when_glob st
+
+          # currently this gets its coverage by pinging [ts] under [tmx]
+
+          if st.unparsed_exists
+            _sym = st.gets_one  # whatever name symbol was used by the action for the argument
+            mutable_args = st.gets_one
+            st.unparsed_exists and self._WRITE_ME_newly_encountered_argument_signature
+          else
+            mutable_args = []
+          end
+
+          mutable_args.push self # :+#here again
+
+          Callback_::Bound_Call.new mutable_args, @action_class_like.p, :call
         end
 
         def bc_when_nonzero_arity_via_stream st
@@ -269,7 +316,7 @@ module Skylab::Brazen
 
         def bc_when_OK mutable_arglist
 
-          mutable_arglist.push self  # :#here is where we use the 1 extra arg
+          mutable_arglist.push self  # :+#here is one place where we add the xtra arg
 
           Brazen_.bound_call mutable_arglist, @action_class_like.p, :call
         end

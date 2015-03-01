@@ -1,6 +1,6 @@
 module Skylab::TestSupport
 
-  module Coverage::Muncher
+  module Coverage_::Muncher
 
     def self.munch *a
       a.reduce MUNCH.curry do |f, x|
@@ -12,7 +12,7 @@ module Skylab::TestSupport
       idx = argv.index switch
       if idx
         argv[ idx, 1 ] = []
-        Coverage::Service.start infostream, path_prefix_proc
+        Coverage_::Service.start infostream, path_prefix_proc
       end
       nil
     end

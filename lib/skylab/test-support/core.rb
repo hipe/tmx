@@ -53,6 +53,7 @@ module Skylab::TestSupport  # :[#021].
   stowaway :Lib_, 'library-'
   MONADIC_TRUTH_ = -> _ { true }
   NEWLINE_ = "\n".freeze
+  SPACE_ = ' '.freeze
   TEST_DIR_FILENAME_ = 'test'.freeze
   TestSupport_ = self  # there is another module called ::SL::TS::TS
   UNABLE_ = false

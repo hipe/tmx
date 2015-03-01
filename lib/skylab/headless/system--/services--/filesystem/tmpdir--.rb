@@ -38,7 +38,6 @@ module Skylab::Headless
       end
     end
 
-
     def initialize * x_a, & p
       @is_noop = false
       @be_verbose = false
@@ -60,6 +59,10 @@ module Skylab::Headless
     end
 
     attr_reader :be_verbose, :to_pathname
+
+    def path
+      @path_s
+    end
 
     def tmpdir_via_join path_tail, * x_a
       otr = dup
@@ -221,7 +224,7 @@ module Skylab::Headless
       end
     end
 
-    def _OMG_
+    def UNLINK_FILES_RECURSIVELY_
       if_verbose_say { say_rm_minus_rf }
       if SAFETY_RX__ =~ @path_s
         remove_entry_secure @path_s  # TERRIFYING (result is nil)
@@ -245,13 +248,11 @@ module Skylab::Headless
 
       if Sanity_check_pathname__[ self ]
 
-        path_a = ::Dir[ "#{ join '{*,.?*}' }" ]  # include dotfiles and '..'
+        _path_ = Headless_::Library_::Shellwords.shellescape @path_s
 
-        d = path_a.length
+        path_a = ::Dir[ "#{ _path_ }/{*,.?*}" ]  # include dotfiles and '..'
 
-        d.zero? and Raise__[ say_no_elements ]
-
-        case 1 <=> d
+        case 1 <=> path_a.length
         when -1 ; prepare_when_directory_has_entries
         when  0 ; prepare_when_directory_appears_empty path_a
         when  1 ; Raise__[ say_no_elements ]
@@ -283,7 +284,7 @@ module Skylab::Headless
     end
 
     def prepare_when_directory_has_entries
-      ok = _OMG_
+      ok = self.UNLINK_FILES_RECURSIVELY_
       ok and begin
         ::FileUtils.mkdir @path_s, noop: @is_noop, verbose: @be_verbose  # result is array of selfsame path
       end

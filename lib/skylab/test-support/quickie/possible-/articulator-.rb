@@ -174,7 +174,7 @@ module Skylab::TestSupport
           @a.reduce( [] ) do |m, art|
             (( s = art.articulate_self )) and m << s
             m
-          end * ' '
+          end * SPACE_
         end
 
       private

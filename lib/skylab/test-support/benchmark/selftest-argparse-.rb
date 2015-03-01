@@ -18,7 +18,7 @@ module Skylab::TestSupport
           call[ test_proc ]
         else
           if ! [ '-h', '--help' ].include? arg
-            y << "unrecognized argument(s) - #{ argv * ' ' }"
+            y << "unrecognized argument(s) - #{ argv * SPACE_ }"
           end
           usg[]
         end

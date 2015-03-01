@@ -1,164 +1,89 @@
 module Skylab::TestSupport
 
-  module Regret::CLI
+  class CLI < TestSupport_.lib_.brazen::CLI
 
-    def self.new * x_a
-      Client.new( * x_a )
-    end
+    # ~ we want this to go away eventually
 
-    Client = ::Class.new TestSupport_.lib_.CLI_client_base_class  # loads 'LIB_'
-    RegretLib_ = Regret::API::RegretLib_
-  end
+    class << self
 
-  class Regret::CLI::Client
+      def new * a
+        new_top_invocation a, TestSupport_
+      end
+    end  # >>
 
-    API = Regret::API
-    CLI = Regret::CLI
-    RegretLib_ = API::RegretLib_
+    # ~ because there is perhaps no standard location
 
-    API::Conf::Verbosity[ self ]
-
-    def initialize( * )
-      super
-      @param_h = { }
-      @pth = RegretLib_::Pretty_path_proc[]
+    def resolve_app_kernel
+      @app_kernel = TestSupport_::API::Kernel.new @mod
       nil
     end
 
-    use :hi, [ :last_hot, :as, :command ]
+    # ~ experimental extension of action adapter base class, exactly :+[#br-023]
 
-    # ~ hack an adapter for doc-test for this ancient [fa] legacy API
+    class Action_Adapter < CLI::Action_Adapter
 
-    namespace :doc_test, -> do
-      Doc_Test_____
-    end
+      def handle_event_selectively
 
-    module Doc_Test_____
-      module Adapter
-        module For
-          class Face
+        common_OES_p = super
 
-            module Of
-              Hot = -> _NS_sheet, _doc_test_adpter_module do
-                -> k, slug do
-                  Adapter_____.new k, slug, _NS_sheet
-                end
-              end
-            end
+        -> * i_a, & x_p do
 
-            def initialize kernel, slug, ns_sheet
+          if :expression == i_a[ 1 ]
 
-              svcs = kernel.instance_variable_get :@parent_services  # meh
-              a = svcs.three_streams
-              a.push [ svcs.program_name, slug ]
+            expression_agent.calculate @resources.serr, & x_p
 
-              @ns_sheet = ns_sheet
-              @native_client = TestSupport_::DocTest::CLI.new( * a )
-
-            end
-
-            def is_visible
-              true
-            end
-
-            def name
-              @ns_sheet.name
-            end
-
-            def get_summary_a_from_sheet ns_sheet
-              @native_client.get_styled_description_string_array_via_name ns_sheet.name
-            end
-
-            def pre_execute
-              true
-            end
-
-            def invokee
-              @native_client
-            end
-
-            Adapter_____ = self
+            RESULT_VALUE_FOR_TOP_CHANNEL___.fetch i_a.first
+          else
+            common_OES_p[ * i_a, & x_p ]
           end
         end
       end
     end
 
-    # ~
+    RESULT_VALUE_FOR_TOP_CHANNEL___ = {
+      info: nil,
+      error: UNABLE_ }
 
-  public
+    # ~ the currently cludgy way we get resources directly to the model action
 
-    set :node, :simplecov, :autonomous
+    module Actions
 
-    def simplecov * arg
-      kls = CLI::Actions::Simplecov
-      cli = kls.new @sin, @out, @err
-      s_a = @mechanics.get_normal_invocation_string_parts << 'simplecov'
-      cli.program_name = s_a * ' '
-      # the client uses `load` to load the target file, hence it expects to
-      # be passed the global `argv` so that it can parse it destructively
-      # so that the target file gets only the arguments intended for it.
-      # this is why we don't pass it `arg` above - `arg` is a deep copy
-      # of argv (but it is decorative - it generates the syntax).
-      argv = @mechanics.last_hot.release_argv
-      argv == arg or fail "sanity"
-      cli.invoke argv
-    end
+      class Cover < Action_Adapter
 
-    set :node, :ping, :invisible
+        def receive_frame x
+          super
+          @bound.sout = @resources.sout
+          @bound.serr = @resources.serr
+          @bound.invocation_s_a = @resources.invocation_s_a
+          nil
+        end
 
-    def ping
-      api
-    end
-
-  private
-  dsl_off
-
-    # implement services:
-
-    def pth ; @pth end  # avoid `private attribute?` warning
-
-    def invite x=nil, msg=nil
-      msg and @y << msg
-      @mechanics.invite_for @y, ( x || @mechanics.last_hot_recursive )
-      nil
-    end
-
-    def api * method_param_a
-      e = get_exe_with :param_x, method_param_a
-      execute e
-    end
-
-    def execute_with * a
-      e = get_exe_with( *a )
-      execute e
-    end
-
-    def get_exe_with * a
-      a.unshift( method( :get_expression_agent ) ).unshift :expression_agent_p
-      @mechanics.get_api_executable_with( * a )
-    end
-
-    def get_expression_agent hot_api_action
-      CLI::Expression_Agent_.new :hot_API_action, hot_api_action,
-        :procs, [ :hi, method( :hi ) ]
-    end
-
-    def execute ex
-      r = if ex
-        ex.execute
-      else ex end
-      if false == r
-        invite
-        r = nil
+        def parse_options
+          # don't let the option parser swallow the '--' "early"
+          nil
+        end
       end
-      r
     end
 
-    LIB_.heavy_plugin_lib::Host::Proxy.enhance self do  # at end
-      services [ :out, :ivar ],
-               [ :err, :ivar ],
-               [ :pth, :ivar ],
-               [ :invitation ]
+    # ~ for tmx integration
+
+    Client = self
+
+    module Adapter  # #hook-out for [tmx] integration
+      module For
+        module Face
+          module Of
+            module Hot
+
+              def self.[] kernel, token
+
+                TestSupport_.lib_.brazen::CLI::Client::Adapter::For::Face::Of::Hot::Maker.
+                  new( TestSupport_ ).make_adapter( kernel, token )
+              end
+            end
+          end
+        end
+      end
     end
   end
 end

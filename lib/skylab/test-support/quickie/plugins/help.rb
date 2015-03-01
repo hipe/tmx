@@ -77,7 +77,7 @@ module Skylab::TestSupport
         [
           ( "[#{ s_a * '] [' }]" if s_a.length.nonzero? ),
           ( "[#{ a_a * '] [' }]" if a_a.length.nonzero? )
-        ].compact.join ' '
+        ].compact.join SPACE_
       end
     end
   end

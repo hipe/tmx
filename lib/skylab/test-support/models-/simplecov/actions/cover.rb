@@ -1,8 +1,32 @@
 #!/usr/bin/env ruby -w
 
-module Skylab
+if __FILE__ == $PROGRAM_NAME
 
-  class SimpleCov
+  # for fun and regressability we allow this to be run as a standalone script
+  # as well as from within our [br]-powered API. below hacks accomodate this.
+
+  is_standalone = true
+
+  module Skylab
+    module TestSupport
+      Models_ = ::Module.new
+      TestSupport_ = self
+      module API
+        Brazen_ = ::Object.new
+        def Brazen_.model
+          o = ::Object.new
+          def o.entity( * )
+          end
+          o
+        end
+      end
+    end
+  end
+end
+
+module Skylab::TestSupport
+
+  module API
 
     # a fun one-off for using simplecov in ad-hoc scenarios. if you have
     # some ruby that can be run by loading one file and processing some
@@ -14,187 +38,237 @@ module Skylab
     # for typical coverage measurement of a test or test suite. for such
     # standard use, please see the simplecov gem's README.md
 
-    # EDIT: the quickie test runner now has simplecov integration.
-    # see 'tmx-quickie'.
+    class TestSupport_::Models_::Simplecov
 
-    def initialize sin, sout, serr
-      @program_name = nil
-      @y = ::Enumerator::Yielder.new { |msg| serr.puts msg ; nil }
-      @invoke = -> argv do
-        argv.length.zero? and break usage
-        1 == argv.length and /\A-(?:h|-help)\z/ =~ argv[0] and break usage
-        ok, res = resolve_matcher argv
-        if ok
-          res = execute argv
-        end
-        res
-      end
-      nil
-    end
+      Actions = ::Module.new
 
-    def invoke argv
-      @invoke[ argv ]
-    end
+      class Actions::Cover
 
-    attr_writer :program_name
+        class << self
 
-  private
-
-    def resolve_matcher argv  # result is tuple
-      idx = argv.index '--'
-      if ! idx then
-        @matcher = MOCK_
-        true
-      else
-        # special circumstances here: we might be bootstrapping.
-        require_relative calculate_lib_skylab_absolute_path
-        require 'skylab/basic/core'
-        @matcher = -> a do
-          a.map! { |x| ::File.expand_path x }
-          u = ::Skylab::Basic::Pathname::Union[ a ]
-          u.normalize do | *, & ev_p |
-            ev_p[].render_each_line_under nil do | line |
-              @y << "(#{ program_name } #{ line })"
-            end
+          def after_name_symbol
             nil
           end
-          u
-        end.call argv[ 0, idx ]
-        argv[ 0 .. idx ] = []
-        true
-      end
-    end
 
-    class Mock_
-      def match x ; true end
-    end
+          def is_branch
+            false
+          end
 
-    MOCK_ = Mock_.new
+          def is_promoted
+            true
+          end
 
-    def calculate_lib_skylab_absolute_path
-      ::File.expand_path(
-        ::Array.new( HOST_C_A_.length, DOT_DOT_ ) * '/', __FILE__ )
-    end
+          def name_function
+            @__nf__ ||= Callback_::Name.via_module self
+          end
 
-    def execute argv
-      SimpleCov_.without_warning -> { require 'simplecov' }
-      # we assume that the first arg element is a loadable path. we shift it
-      # off so that the remaining argv attempts to mimic the argv that the
-      # script would have seen if it were invoked with ruby or as an exeuctable.
-      pth = argv.shift or fail "sanity - empty argv?"
-      @y << "(#{ program_name } about to run: #{ ( [ pth ] + argv ) * ' ' })"
-      ::SimpleCov.command_name "#{ ::File.basename pth } (skylab simplecov)"
-      ::SimpleCov.add_filter do |x|
-        ! @matcher.match( x.filename )
-      end
-      ::SimpleCov.start
-      load_path_somehow pth
-      # $VERBOSE = false  # let simplecov go quietly on exit ([#sc-002])
-    end
+        end  # >>
 
-    def load_path_somehow pth
-      # this kind of sucks : apparently the simplecov hooks into `require`
-      # and not `load` (from the looks of it), so if a standalone file itself
-      # is what you're covering, we cannot use load, hence it must end
-      # with an `.rb`. in other words for now it appears impossible to
-      # cover a standalone executable ruby script.
-      xp = ::File.expand_path pth
-      require xp  # we used to use `load`
-    end
+        Brazen_.model.entity self,
 
-    o = -> i, p do
-      if p.arity.zero?
-        define_singleton_method i do
-          p.call  # call it with its original context, not ours
+          :required, :argument_arity, :one_or_more, :property, :arg
+
+        def initialize _boundish, & oes_p
+
+          @on_event_selectively = oes_p
         end
-      else
-        define_singleton_method i do | * x_a |
-          if x_a.length.zero?
-            p
+
+        def is_visible
+          true
+        end
+
+        def name
+          self.class.name_function
+        end
+
+        def has_description
+          true
+        end
+
+        def under_expression_agent_get_N_desc_lines expag, d=nil
+          [ 'ya sure whatever' ]
+        end
+
+        def accept_parent_node_ x
+          @__NOT_USED_the_kernel_again__ = x
+          nil
+        end
+
+        def bound_call_against_iambic_stream st, & oes_p
+
+          :arg == st.gets_one or raise ::ArgumentError
+          a = st.gets_one
+          st.unparsed_exists and raise ::ArgumentError
+
+          # begin hacky fix
+
+          a == ::ARGV or self._SANITY
+          a.object_id == ::ARGV.object_id and self._THIS_IS_FIXED
+          a = ::ARGV
+
+          # end hacky fix
+
+          @argv = a
+
+          Callback_::Bound_Call.new nil, self, :execute
+        end
+
+        attr_accessor :invocation_s_a, :serr, :sout
+
+        attr_writer :argv  # for standalone mode only
+
+        def execute
+          if @argv.length.zero?
+            _usage
+          elsif 1 == @argv.length && /\A-(?:h|-help)\z/ =~ @argv.first
+            __help
           else
-            p[ * x_a ]
+            __nonzero_argv
           end
         end
-      end ; nil
-    end
 
-    class << o
-      alias_method :[]=, :call
-    end
+        def __help
+          _usage
+        end
 
-    o[:without_warning] = -> f do  # as seen in [#mh-028]
-      x = $VERBOSE ; $VERBOSE = false
-      begin
-        r = f.call
-      ensure
-        $VERBOSE = x
+        def _usage
+
+          @serr.puts "usage: #{ _program_name } #{
+            }[ <white-path-fragment> [ <white-path-fragment> [..] ] -- ] <a-ruby-file>"
+
+          ACHIEVED_
+        end
+
+        def __nonzero_argv
+          ok = __resolve_matcher
+          ok &&= __validate_remaining_ARGV
+          ok && __via_matcher_execute
+        end
+
+        def __resolve_matcher
+          idx = @argv.index DOUBLE_DASH___
+          if idx
+            __resolve_matcher_via_parse_argv idx
+          else
+            @matcher = Mock_Matcher___.new
+            ACHIEVED_
+          end
+        end
+
+        DOUBLE_DASH___ = '--'
+
+        class Mock_Matcher___
+          def filter x
+            false
+          end
+        end
+
+        def __resolve_matcher_via_parse_argv idx
+          white_file_frags = @argv[ 0, idx ]
+          if white_file_frags.length.zero?
+            @serr.puts "(empty whitelist, aborting)"
+            _invite
+          else
+            @argv[ 0 .. idx ] = EMPTY_A_
+            @matcher = Caching_Matcher___.new white_file_frags
+            ACHIEVED_
+          end
+        end
+
+        class Caching_Matcher___
+
+          def initialize white_frag_list
+
+            cache_h = {}
+
+            @p = -> vendor_file do
+
+              cache_h.fetch vendor_file.filename do | path |
+
+                skip_this = true
+
+                white_frag_list.each do | frag |
+                  if path.include? frag
+                    skip_this = false
+                    break
+                  end
+                end
+
+                cache_h[ path ] = skip_this
+              end
+            end
+          end
+
+          def filter x
+            @p[ x ]
+          end
+        end
+
+        def __validate_remaining_ARGV
+          if @argv.length.zero?
+            @serr.puts "need some args after `--`"
+            _invite
+          else
+            ACHIEVED_
+          end
+        end
+
+        def __via_matcher_execute  # assume nonzero length argv
+
+          require 'simplecov'
+
+          # we assume that the first arg element is a loadable path. we shift
+          # it off so that the remaining argv attempts to mimic the argv that
+          # the script would have seen if it were invoked with ruby or as an
+          # exeuctable.
+
+          @serr.puts "(#{ _program_name } about to run: #{ @argv * SPACE_ })"
+
+          path = @argv.shift
+
+          ::SimpleCov.command_name "#{ ::File.basename path } (skylab simplecov)"
+
+          ::SimpleCov.add_filter( & @matcher.method( :filter ) )
+
+          ::SimpleCov.start
+
+          # this kind of sucks: apparently the simplecov hooks into `require`
+          # and not `load` (from the looks of it), so if a standalone file
+          # itself is what you're covering, we cannot use load, hence it must
+          # end with an `.rb`. in other words for now it appears impossible
+          # to cover a standalone executable ruby script.
+
+          require ::File.expand_path path
+        end
+
+        def _invite
+          @serr.puts "try `#{ _program_name } -h` for help."
+          UNABLE_
+        end
+
+        def _program_name
+          @__pn__ ||= "#{ @invocation_s_a * SPACE_ } cover".freeze
+        end
       end
-      r
+
+      # ( we need our own because we might be standalone: )
+
+      ACHIEVED_ = true
+      SPACE_ = ' '.freeze
+      UNABLE_ = false
     end
-
-    # `run_with_rspec` - this was what this script used to do, here for
-    # possible future use
-
-    o[:run_with_rspec] = -> argv, serr, sout do
-      o[:load_bundler].call
-      o[:without_warning][ -> do
-        require 'rspec/core'
-        require 'simplecov'
-      end ]
-      $VERBOSE = false # simplecov barfs at exit otherwise
-      ::RSpec::Core::Runner.run argv, serr, sout
-    end
-
-    o[:load_bundler] = -> do
-      ::ENV['BUNDLE_GEMFILE'] ||= "#{ o[:root][] }/Gemfile"
-      nil
-    end
-
-    -> do
-      root = nil
-      o[:root] = -> do
-        root ||= ::File.expand_pth '../..', __FILE__
-      end
-    end.call
-
-    def usage
-      usage_string = -> do
-        "#{ program_name } [ <white-path> [ <white-path> [..] ] -- ] <a-ruby-file>"
-      end
-      usage = -> do
-        @y << "usage: #{ usage_string[] }"
-        nil
-      end
-      usage[]
-    end
-
-    def program_name
-      @program_name || $PROGRAM_NAME
-    end
-
-    def self.load_into_host
-      # assume we have just been autoloaded by the parent node
-      # place ourselves in the appropriate location in that graph
-      mod = HOST_C_A_.reduce( ::Object ) do |m, c|  # rewrite :+[#ba-034]
-        m.const_get c, false
-      end
-      mod.const_set :Simplecov, self
-      # the casing changes only because our filename has no '-' or '_'
-      nil
-    end
-
-    HOST_C_A_ = %i| Skylab TestSupport Regret CLI Actions |
-
-    SimpleCov_ = self
-
   end
 end
 
-# this hybridization allows us to run this file directly if any parent
-# nodes are in a broken state.
+if is_standalone
 
-if __FILE__ == $PROGRAM_NAME
-  Skylab::SimpleCov.new( STDIN, STDOUT, STDERR ).invoke ::ARGV
-else
-  Skylab::SimpleCov.load_into_host
+  o = Skylab::TestSupport::Models_::Simplecov::Actions::Cover.new nil
+  o.invocation_s_a = [ $PROGRAM_NAME ]
+  o.sout = $stdout
+  o.serr = $stderr
+  o.argv = ::ARGV
+  o.execute
+
 end
+
+# :+#tombstone: rspec integration (ancient)

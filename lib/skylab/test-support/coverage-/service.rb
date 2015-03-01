@@ -1,6 +1,6 @@
 module Skylab::TestSupport
 
-  class Coverage::Service
+  class Coverage_::Service
 
     def self.start infostream, path_prefix_p
       new( infostream ).start path_prefix_p
@@ -12,7 +12,7 @@ module Skylab::TestSupport
     end
 
     def start path_prefix_p
-      Coverage::Coverer.new( @y, path_prefix_p ).cover
+      Coverage_::Coverer.new( @y, path_prefix_p ).cover
       nil
     end
   end

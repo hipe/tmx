@@ -32,6 +32,11 @@ module Skylab::Brazen
 
       end  # >>
 
+      def initialize
+        @box = nil
+        super
+      end
+
       def _common_pre_init x_a, k, & oes_p
         @on_event_selectively = oes_p
         @kernel = k

@@ -68,11 +68,16 @@ module Skylab::Headless
         Filesystem_::Path_Tools__
       end
 
-      def tmpdir * x_a
-        if x_a.length.zero?
+      def tmpdir * x_a, & x_p
+
+        case 1 <=> x_a.length
+        when -1
+          Filesystem_::Tmpdir__.new_via_iambic x_a, & x_p
+        when  0
+          x_a.unshift :path
+          Filesystem_::Tmpdir__.new_via_iambic x_a, & x_p
+        when  1
           Filesystem_::Tmpdir__
-        else
-          Filesystem_::Tmpdir__.new_via_iambic x_a
         end
       end
 

@@ -78,7 +78,7 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem::Cache
       it "if parent directory not exist - raises #fragile: before next test" do
         pn = tmpdir_pn
         if pn.exist?
-          pn._OMG_
+          pn.UNLINK_FILES_RECURSIVELY_
         end
         _rx = %r(No such file or directory .+/woo-wee\z)
         -> do
