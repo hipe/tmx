@@ -1,55 +1,30 @@
 require_relative '../core'
 
-::Skylab::SubTree::Autoloader_.require_sidesystem :TestSupport
-
-Skylab::TestSupport::Quickie.enable_kernel_describe
-  # then we don't need to extend quick explicitly per test module ..
-  # but this is just for easy legacy bridge-refactoring
-
 module Skylab::SubTree::TestSupport
 
-  module Constants
-    Callback_ = ::Skylab::Callback
-    SubTree_ = ::Skylab::SubTree
-    TestSupport_ = ::Skylab::TestSupport
-  end
+  SubTree_ = ::Skylab::SubTree
+  Autoloader_ = SubTree_::Autoloader_
 
-  include Constants
-
-  TestSupport_ = TestSupport_
+  TestSupport_ = Autoloader_.require_sidesystem :TestSupport
 
   TestSupport_::Regret[ self ]
 
-  module TestLib_
+  TS_ = self
 
-    sidesys = ::Skylab::SubTree::Autoloader_.
-      method :build_require_sidesystem_proc
-
-    HL__ = sidesys[ :Headless ]
-
-    CLI_lib = -> do
-      HL__[]::CLI
-    end
-
-    Face_ = sidesys[ :Face ]
-
-    Stderr = -> do
-      TestSupport_.debug_IO
-    end
-  end
-
-  Constants::TestLib_ = TestLib_
+  extend TestSupport_::Quickie
 
   module InstanceMethods
-
-    def debug_stream
-      TestSupport_.debug_IO
-    end
 
     attr_reader :do_debug
 
     def debug!
       @do_debug = true
     end
+
+    def debug_IO
+      TestSupport_.debug_IO
+    end
   end
+
+  NIL_ = nil
 end

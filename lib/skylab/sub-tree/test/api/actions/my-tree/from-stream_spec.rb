@@ -1,3 +1,4 @@
+if false  # #todo:next-commit
 require_relative 'test-support'
 
 module Skylab::SubTree::TestSupport::API::Actions::My_Tree
@@ -97,4 +98,5 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
     end
     MOCK_IO_ = Mock_IO_.new
   end
+end
 end

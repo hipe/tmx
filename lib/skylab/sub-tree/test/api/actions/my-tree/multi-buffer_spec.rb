@@ -1,3 +1,4 @@
+if false  # #todo:next-commit
 require_relative 'test-support'
 
 module Skylab::SubTree::TestSupport::API::Actions::My_Tree::MB_
@@ -69,4 +70,5 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree::MB_
       r.should eql true
     end
   end
+end
 end

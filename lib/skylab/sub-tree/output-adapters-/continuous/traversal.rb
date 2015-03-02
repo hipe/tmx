@@ -1,70 +1,85 @@
 module Skylab::SubTree
 
-  class API::Actions::My_Tree::Traversal_
+  class Output_Adapters_::Continuous
 
-    Lib_::Properties_stack_frame.call self,
-      :field, :sep,
-      :field, :do_verbose_lines,
-      :field, :info_p
+    class Traversal
 
-    Lib_::Entity.call self do
+      Callback_::Actor.methodic self, :properties,
+        :sep,
+        :do_verbose_lines
 
-      def out_p
-        set_output_proc iambic_property
+      def initialize & edit_p
+        @curr_a = []
+        @do_verbose_lines = false
+        @matrix_a = []
+
+        instance_exec( & edit_p )
+
+        @glyph_set ||= SubTree_.lib_.CLI_lib.tree.glyph_sets_module::WIDE
+        @sep ||= SEP_
       end
-    end
 
-    def set_output_proc p
-      @out_p = case p.arity
-      when 3     ; out_proc_when_arity_is_three p
-      when 2     ; out_proc_when_arity_is_two p
-      when 1, -1 ; out_proc_when_arity_is_one_or_glob p
-      else       ; when_out_proc_arity_is_strange p
+      def accept_selective_listener_proc oes_p
+        @on_event_selectively = oes_p ; nil
       end
-      true  # KEEP_PARSING_
-    end
 
-  private
+    private
 
-    def out_proc_when_arity_is_three p  # glyphs, slug, extra
-      -> row_a do
-        node = row_a.pop
-        p[ row_a, * node.to_a ] ; nil
+      def output_proc=
+
+        p = iambic_property
+
+        case p.arity
+        when 3     ; __resolve_downstream_proc_via_arity_of_three p
+        when 2     ; __resolve_downstream_proc_via_arity_of_two p
+        when 1, -1 ; __resolve_downstream_proc_via_arity_of_one_or_glob p
+        else       ; __when_strange_arity
+        end
       end
-    end
 
-    def out_proc_when_arity_is_two  # glyphs-slug, extra
-      -> row_a do
-        node = row_a.pop
-        slug, extra_a = node.to_a
-        _x = "#{ "#{ row_a * SPACE_ } " if row_a.length.nonzero? }"
-        p[ "#{ _x }#{ slug }", extra_a ] ; nil
+      def __resolve_downstream_proc_via_arity_of_three p  # glyphs, slug, extra
+
+        @down_p = -> row_a do
+          node = row_a.pop
+          p[ row_a, * node.to_a ] ; nil
+        end
+
+        KEEP_PARSING_
       end
-    end
 
-    def out_proc_when_arity_is_one_or_glob p  # glyphs-slug-extra
-      -> row_a do
-        node = row_a.pop
-        _x = "#{ "#{ row_a * SPACE_ } " if row_a.length.nonzero? }"
-        p[ "#{ _x }#{ node.to_a.compact * SPACE_ }" ] ; nil
+      def __resolve_downstream_proc_via_arity_of_two  # glyphs-slug, extra
+
+        @down_p = -> row_a do
+          node = row_a.pop
+          slug, extra_a = node.to_a
+          _x = "#{ "#{ row_a * SPACE_ } " if row_a.length.nonzero? }"
+          p[ "#{ _x }#{ slug }", extra_a ] ; nil
+        end
+
+        KEEP_PARSING_
       end
-    end
 
-    def when_out_proc_arity_is_strange p
-      raise ::ArgumentError, "unsupported `out_p` arity - #{ p.arity }"
-    end
+      def __resolve_downstream_proc_via_arity_of_one_or_glob p  # glyphs-slug-extra
 
-    def initialize * x_a
-      @curr_a = [] ; @matrix_a = [] ; @sep ||= SEP_
-      @glyph_set = SubTree_.lib_.CLI_lib.tree.glyph_sets_module::WIDE
-      process_iambic_stream_fully iambic_stream_via_iambic_array x_a
-    end
+        @down_p = -> row_a do
+          node = row_a.pop
+          _x = "#{ "#{ row_a * SPACE_ } " if row_a.length.nonzero? }"
+          p[ "#{ _x }#{ node.to_a.compact * SPACE_ }" ] ; nil
+        end
 
-  public
+        KEEP_PARSING_
+      end
+
+      def __when_strange_arity p
+        raise ::ArgumentError, "unsupported `down_p` arity - #{ p.arity }"
+      end
+
+    public
+
+      # <-
 
     def puts line, extra_x=nil
-      a = line.split @sep
-      self.<<( a, extra_x )
+      self.<<( line.split( @sep ), extra_a )
     end
 
     def << a, extra_x=nil
@@ -118,7 +133,7 @@ module Skylab::SubTree
       sub_flush d, pipe_d
       if @matrix_a.length.nonzero? and @matrix_a.first.first  # if flushable
         loop do                                # flush each contiguous row
-          @out_p[ @matrix_a.shift ]            # starting from the first one
+          @down_p[ @matrix_a.shift ]            # starting from the first one
           @matrix_a.first && @matrix_a.first.first or break
         end
       end
@@ -150,12 +165,17 @@ module Skylab::SubTree
       @info_p[ "(adding row: #{ seen_a.inspect }#{ '..' if extra_x })" ]
     end
 
+  private
+
     SubTree_.lib_.CLI_lib.tree.glyphs.each_const_value do |glyph|
       m = glyph.normalized_glyph_name
       define_method m do
         @glyph_set[ m ]
       end
-      private m
     end  # blank crook pipe separator tee
+
+    # ->
+
+    end
   end
 end

@@ -40,7 +40,7 @@ module Skylab::TestSupport
         TestSupport_.lib_.CLI_table(
           :field, :field, :left, :show_header, false,
           :left, '  ', :sep, '     ', :right, EMPTY_S_,
-          :write_lines_to, @y.method( :<< ),
+          :write_lines_to, @y,
           :read_rows_from, @svc.plugins._a.reduce( [] ) do |row_a, p|
             Multiline_column_B__[ row_a, p.syntax_moniker, p.some_desc_a ]
             row_a

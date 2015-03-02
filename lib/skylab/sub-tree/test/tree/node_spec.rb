@@ -2,6 +2,8 @@ require_relative 'test-support'
 
 module Skylab::SubTree::TestSupport::Tree
 
+  if false  # #todo: next-commit
+
   describe "[st] tree node" do
 
     let(:paths) { [
@@ -69,5 +71,6 @@ module Skylab::SubTree::TestSupport::Tree
         it("some")  { subject.should eql(%w(a b)) }
       end
     end
+  end
   end
 end

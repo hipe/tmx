@@ -1,4 +1,4 @@
-[#014] #open - don't use this any more, use pn
+[#014]       #done don't use this any more, use pn
 [#013] #open was SubTree::CLI.expression_agent  but it sucks so hard
 [#012] #open change this to reduce when it works
 [#011] #open - cover this

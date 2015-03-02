@@ -1,3 +1,4 @@
+if false  # #todo:next-commit
 require_relative 'my-tree/test-support'
 
 module Skylab::SubTree::TestSupport::CLI::Actions::My_Tree
@@ -54,4 +55,5 @@ module Skylab::SubTree::TestSupport::CLI::Actions::My_Tree
       no_more_lines
     end
   end
+end
 end

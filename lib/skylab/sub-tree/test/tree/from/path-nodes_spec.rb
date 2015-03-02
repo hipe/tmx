@@ -2,6 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SubTree::TestSupport::Tree::From_PN__
 
+  if false  # #todo:next-commit
   ::Skylab::SubTree::TestSupport::Tree[ TS__ = self ]
 
   include Constants
@@ -46,5 +47,6 @@ module Skylab::SubTree::TestSupport::Tree::From_PN__
         "#{ [ * @x ] * ' ' }".upcase
       end
     end
+  end
   end
 end

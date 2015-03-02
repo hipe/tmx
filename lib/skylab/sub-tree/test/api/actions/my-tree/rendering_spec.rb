@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+if false  # #todo:next-commit
 require_relative 'rendering/test-support'
 
 module Skylab::SubTree::TestSupport::API::Actions::My_Tree::Rendering
@@ -94,4 +95,5 @@ describe "[st] API actions my-tree" do  # historic hiccup #borrow-one-indent
 
   end
 end  # #pay-one-back
+end
 end

@@ -2,63 +2,32 @@ require_relative '../callback/core'
 
 module Skylab::SubTree
 
-  const_defined?( :Callback_, false ) and fail 'whre?'
+  class << self
+
+    def lib_
+      @lib ||= SubTree_::Lib_::INSTANCE
+    end
+  end  # >>
 
   Callback_ = ::Skylab::Callback
-  Autoloader_ = Callback_::Autoloader
-
-  module API
-    module Actions
-      Autoloader_[ self ]
-    end
-    Autoloader_[ self ]
-  end
-
-  module Core
-    Autoloader_[ self ]
-  end
-
-  module Test_Fixtures
-    Autoloader_[ self ]
-  end
-
-  def self.lib_
-    @lib ||= SubTree_::Lib_::INSTANCE
-  end
+    Autoloader_ = Callback_::Autoloader
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
-  DOT_ = '.'.freeze
-
-  Entity_ = -> * x_a do
-    SubTree_.lib_.entity_via_iambic x_a
-  end
-
-  EMPTY_P_ = -> { }
-
   EMPTY_S_ = ''.freeze
 
-  IDENTITY_ = -> x { x }
+  KEEP_PARSING_ = true
 
-  stowaway :Lib_, 'library-'
+  stowaway :Library_, 'lib-'
 
-  Name_ = Callback_::Name
+  NEWLINE_ = "\n"
 
-  PROCEDE_ = true
+  NIL_ = nil
 
-  SEP_ = '/'.freeze
-
-  SPACE_ = ' '.freeze
-
-  Stop_at_pathname_ = -> do  #  # #open [#014] - - don't use this any more, ..
-    rx = %r{\A[./]\z}  # hackishly - for all pn, parent eventually is this
-    -> pn do
-      rx =~ pn.instance_variable_get( :@path )
-    end
-  end.call
+  SEP_ = ::File::SEPARATOR
 
   SubTree_ = self
 
-  UNABLE_ = false
+  SPACE_ = ' '.freeze
 
 end

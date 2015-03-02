@@ -4,6 +4,7 @@ require_relative 'test-support'
 
 module Skylab::SubTree::TestSupport::Tree
 
+  if false  # #todo:next-commit
   describe "[st] tree" do
     it "renders a pretty tree" do
       node = Subject_[].from :hash,
@@ -53,6 +54,7 @@ module Skylab::SubTree::TestSupport::Tree
       act = node.to_text
       act.should eql( exp ) # use this form with --diff option
     end
+  end
   end
 end
 # #tombstone artifact

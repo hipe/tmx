@@ -1,46 +1,85 @@
 module Skylab::SubTree
 
-  module Tree_Print
+  Output_Adapters_ = ::Module.new
 
-    def self.tree_print obj, out, * x_a  # 'do_verbose_lines', 'info_p'
-      _puts_p = out.respond_to?( :puts ) ? out.method( :puts ) : out
-      ctx = Kernel__.new _puts_p, x_a
-      obj.tree_print ctx
-      ctx.flush ; nil
+  class Output_Adapters_::Continuous
+
+    Callback_::Actor.call self, :properties,
+
+      :upstream_tree,
+      :output_line_downstream_yielder,
+      :info_line_downstream_yielder,
+      :do_verbose_lines
+
+    def initialize
+      @do_verbose_lines = false
+      super
     end
 
-    class Kernel__
+    def execute
 
-      def initialize out_line_p, x_a
+      es = Expression_State___.new(
+        @do_verbose_lines,
+        @info_line_downstream_yielder,
+        @output_line_downstream_yielder )
+
+      @upstream_tree.express_tree_against es
+
+      es.flush__
+
+      NIL_
+    end
+
+    class Expression_State___
+
+      def initialize do_verbose_lines, info_y, down_y
+
+        @down_y = down_y
+
         @stack_label_x_a = []
-        @out_line_p = out_line_p
-        @traversal = SubTree_::API::Actions::My_Tree::Traversal_.
-          new :out_p, method( :three_from_traversal ), * x_a
+
+        @traversal = Continuous_::Traversal.new_with(
+          :do_verbose_lines, do_verbose_lines,
+          :output_proc, method( :__three_from_traversal )
+
+        ) do | * i_a, & ev_p |
+          self._WAHOO
+        end
+      end
+
+      def __three_from_traversal glyph_s_a, slug_s, xtra_s
+
+        if glyph_s_a.length.nonzero?
+          sp = SPACE_
+        end
+
+        @down_y <<
+          "#{ glyph_s_a * EMPTY_S_ }#{ sp }#{ slug_s }#{ xtra_s }#{ NEWLINE_ }"
+
+        NIL_
       end
 
       def node_label s
+
         @last_label = s
-        a = [ * @stack_label_x_a, s ]
-        @traversal << a  ; nil
+        @traversal << [ * @stack_label_x_a, s ]
+        NIL_
       end
 
       def branch
+
         @stack_label_x_a << @last_label
         yield
-        @stack_label_x_a.pop ; nil
+        @stack_label_x_a.pop
+        NIL_
       end
 
-      def flush
-        @traversal.flush ; nil
-      end
-
-    private
-
-      def three_from_traversal glyphs_s_a, slug_s, xtra_s
-        glyphs_s_a.length.nonzero? and sp = SPACE_
-        @out_line_p[ "#{ glyphs_s_a * EMPTY_S_ }#{ sp }#{ slug_s }#{ xtra_s }" ]
-        nil
+      def flush__
+        @traversal.flush
+        NIL_
       end
     end
+
+    Continuous_ = self
   end
 end

@@ -1,0 +1,153 @@
+#!/usr/bin/env ruby -w
+
+# class Skylab::Git
+#   model Models_::Whatever
+#     class Unrename < Action_
+#       class Some_Actor
+
+
+class Skylab_Git_Models_Whatever_Unrename
+
+        def initialize i, o, e, a, pn
+
+          @argv = a
+          @do_forward = true
+          @pairs = []
+          @program_name = ::File.basename pn
+          @serr = e
+          @sin = i
+          @sout = o
+        end
+
+        def execute
+
+          ok = __parse_args
+          ok &&= __memoize_all_upstream_lines_of_interest
+          ok &&= __check_for_nonzero_lines_of_interest
+          ok && __work
+        end
+
+        def __parse_args
+          if @argv.length.zero?
+            ACHIEVED_
+          else
+            __parse_opts
+          end
+        end
+
+        def __parse_opts
+
+          require 'optparse'
+
+          op = ::OptionParser.new
+
+          op.on '-R', '--reverse',
+              'reproduce the original `mv` statements' do
+
+            @do_forward = false
+          end
+
+
+          x = ACHIEVED_
+          op.on '--help', 'this screen' do
+
+            @serr.puts "synopsis: a placeholder hack for turning a commit with\n#{
+              }          renames into data that can be mutated\n\n"
+
+            @serr.puts "usage: ( rename-related comments of git commit msg ) | #{
+              }#{ @program_name } [ -R ]"
+
+            @serr.puts
+
+            @serr.puts 'options:'
+
+            op.summarize @serr
+
+            x = CEASE_
+          end
+
+          begin
+            op.parse! @argv
+          rescue ::OptionParser::ParseError => e
+            @serr.puts e.message
+            __invite
+            x = UNABLE_
+          end
+
+          x
+        end
+
+        def __invite
+          @serr.puts "see '#{ @program_name } --help'"
+          nil
+        end
+
+        def __memoize_all_upstream_lines_of_interest
+
+          ok = ACHIEVED_
+          rx = RX___
+          begin
+            line = @sin.gets
+            line or break
+            md = rx.match line
+            md or redo
+            ok = __receive_match md
+            ok or break
+            redo
+          end while nil
+
+          ok
+        end
+
+        RX___ = /\A#[[:space:]]+renamed:[[:space:]]+(?<rest>.+)/
+
+        def __receive_match md
+
+          # because we are parsing a "porcelain" and not "plumbing", there
+          # is a chance that a file that contains " -> " in its name will
+          # break this. we at least check for that below; but there is no
+          # workaround for that case.
+
+          s_a = md[ :rest ].split SEP__
+          case 2 <=> s_a.length
+          when  0 ; @pairs.push s_a ; ACHIEVED_
+          when -1 ; __when_too_many
+          when  1 ; __when_less_than_two
+          end
+        end
+
+        SEP__ = ' -> '
+
+        def __check_for_nonzero_lines_of_interest
+          if @pairs.length.zero?
+            __when_no_pairs
+          else
+            ACHIEVED_
+          end
+        end
+
+        def __when_no_pairs
+          @serr.puts "no renames. nothing to do."
+          UNABLE_
+        end
+
+        def __work
+          if @do_forward
+            @pairs.each do | src, dst |
+              @sout.puts "git mv #{ dst } #{ src }"
+            end
+          else
+            @pairs.each do | src, dst |
+              @sout.puts "git mv #{ src } #{ dst }"
+            end
+          end
+          @serr.puts "done."
+          ACHIEVED_
+        end
+
+        ACHIEVED_ = true
+        CEASE_ = nil
+        UNABLE_ = false
+
+  self
+end.new( $stdin, $stdout, $stderr, ::ARGV, $PROGRAM_NAME ).execute
