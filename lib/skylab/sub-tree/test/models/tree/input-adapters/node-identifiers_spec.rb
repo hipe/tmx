@@ -1,18 +1,18 @@
 require_relative '../test-support'
 
-module Skylab::SubTree::TestSupport::Tree::From_PN__
+module Skylab::SubTree::TestSupport::Models_Tree::IA_PNP
 
-  if false  # #todo:next-commit
-  ::Skylab::SubTree::TestSupport::Tree[ TS__ = self ]
+  ::Skylab::SubTree::TestSupport::Models_Tree[ self ]
 
   include Constants
 
   extend TestSupport_::Quickie
 
-  describe "[st] tree from path nodes" do
+  describe "[st] models - tree - input adapters - node identifiers" do
 
-    it "so what" do
-      hi = Subject_[].from :path_nodes, [ path_node_one, path_node_two ]
+    it "works" do
+
+      hi = Subject_[].from :node_identifiers, [ path_node_one, path_node_two ]
       hi.children_count.should eql 2
       one, two = hi.children.to_a
       one.slug.should eql "hi_there"
@@ -26,14 +26,14 @@ module Skylab::SubTree::TestSupport::Tree::From_PN__
     end
 
     def path_node_one
-      Example_Path_Node.new :hi_there
+      Example_Identifier_Node.new :hi_there
     end
 
     def path_node_two
-      Example_Path_Node.new %i( hey there )
+      Example_Identifier_Node.new %i( hey there )
     end
 
-    class Example_Path_Node
+    class Example_Identifier_Node
 
       def initialize x
         @x = x
@@ -47,6 +47,5 @@ module Skylab::SubTree::TestSupport::Tree::From_PN__
         "#{ [ * @x ] * ' ' }".upcase
       end
     end
-  end
   end
 end

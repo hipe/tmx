@@ -2,13 +2,13 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport::CLI::Actions
 
-  describe "[br] CLI actions - level-2 - cannon" do
+  describe "[br] CLI actions - level-2 - canon" do
 
     extend TS_
 
     with_invocation 'workspace'
 
-    context "(cannon numbers are relativized)" do
+    context "(canon numbers are relativized)" do
 
       it "  0) (no args) - error / usage / invite" do
         invoke

@@ -1,13 +1,8 @@
-if false  # #todo:next-commit
-require_relative 'test-support'
+require_relative '../../../test-support'  # #todo:change-this-at-step:8
 
-module Skylab::SubTree::TestSupport::API::Actions::My_Tree
+module Skylab::SubTree::TestSupport
 
-  describe "[st] API actions my-tree from stream" do
-
-    extend TS_
-
-    NIL_A_ = NIL_A_
+  describe "[st] API actions my-tree from stream", wip: true do
 
     it "expag loads" do
       SubTree_::API::Actions::My_Tree::EXPRESSION_AGENT_
@@ -22,7 +17,7 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
     end
 
     it "reads from an open filehandle" do
-      io = fixtures_dir_pn.join( OFO_ ).open 'r'
+      io = fixtures_dir_pn.join( _OFO ).open 'r'
       f = start_front_with_upstream io
       f.with_parameters :path_a, NIL_A_, :verbose, ( 3 if do_debug )
       r = f.flush
@@ -31,18 +26,18 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
       io.should be_closed
     end
 
-    OFO_ = 'one-find.output'.freeze
+    _OFO = 'one-find.output'.freeze
 
     it "reads from a file" do
       f = start_front
-      f.with_parameters :path_a, NIL_A_, :file, fixtures_dir_pn.join( OFO_ )
+      f.with_parameters :path_a, NIL_A_, :file, fixtures_dir_pn.join( _OFO )
       r = f.flush
       r.should eql true
       @o.string.should eql PRETTY_
     end
 
     it "fake stdin and file - can't read from both stdin and file" do
-      f = start_front_with_upstream MOCK_IO_
+      f = start_front_with_upstream _MOCK_IO
       f.with_parameters :path_a, NIL_A_, :file, :fake_file
       r = f.flush
       r.should eql false
@@ -59,7 +54,7 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
     end
 
     it "all three - can't read from a, b, and c" do
-      r = start_front_with_upstream( MOCK_IO_ ).with_parameters(
+      r = start_front_with_upstream( _MOCK_IO ).with_parameters(
         :path_a, [ :fake_path ], :file, :Fake_file
       ).flush
       r.should eql false
@@ -86,7 +81,7 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
       r.should eql true
     end
 
-    class Mock_IO_
+    class Mock_IO_  # #change-this-at=step:8  etc. move up, w/e
       def closed?
         false
       end
@@ -96,7 +91,6 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
         false
       end
     end
-    MOCK_IO_ = Mock_IO_.new
+    _MOCK_IO = Mock_IO_.new
   end
-end
 end

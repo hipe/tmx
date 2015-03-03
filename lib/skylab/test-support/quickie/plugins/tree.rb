@@ -41,13 +41,13 @@ module Skylab::TestSupport
           io.puts path_s
           tree = tree_
         end
-        scn = tree.get_traversal_stream
-        x = scn.gets
+        st = tree.to_classified_stream_for( :text )
+        x = st.gets
         if ! path_s
           x.node.any_slug and fail "what: #{ x.node.any_slug }"
         end
-        while (( card = scn.gets ))
-          io.puts "#{ card.prefix[] }#{ card.node.any_slug }"
+        while (( card = st.gets ))
+          io.puts "#{ card.prefix_string }#{ card.node.any_slug }"
         end
         nil
       end

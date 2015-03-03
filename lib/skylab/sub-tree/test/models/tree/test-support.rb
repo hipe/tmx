@@ -1,15 +1,48 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::SubTree::TestSupport::Tree
+module Skylab::SubTree::TestSupport::Models_Tree
 
-  ::Skylab::SubTree::TestSupport[ self ]
+  # ~ begin hopping over a would-be test node for "models"
+
+  parent = ::Skylab::SubTree::TestSupport
+
+  parent.autoloaderize_with_filename_child_node 'models/tree', self
+
+  parent[ TS_ = self ]
+
+  # ~ end
 
   include Constants
 
-  module Constants
-    Subject_ = -> do
-      SubTree_::Tree
+  extend TestSupport_::Quickie
+
+  module InstanceMethods
+
+    def fp * x_a
+      Subject_[].from :paths, x_a
     end
+
+    define_method :deindent, -> do
+      _RX = /^[ ]{8}/
+      -> s do
+        s.gsub! _RX, EMPTY_S_
+        s
+      end
+    end.call
+  end
+
+  Callback_ = SubTree_::Callback_
+
+  EMPTY_A_ = SubTree_::EMPTY_A_
+  EMPTY_P_ = SubTree_::EMPTY_P_
+  EMPTY_S_ = SubTree_::EMPTY_S_
+
+  Subject_ = -> do
+    SubTree_::Models::Tree
+  end
+
+  module Constants
+    Subject_ = Subject_
   end
 end
 

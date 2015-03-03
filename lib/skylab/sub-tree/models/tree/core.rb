@@ -1,64 +1,109 @@
 module Skylab::SubTree
 
-  module Tree
+  # Models = ::Module.new  # #change-this-at-step:8 (or 10)
 
-    def self.enhance_with_module_methods_and_instance_methods mod
-      mod.extend Module_Methods__
-      mod.include Instance_Methods__ ; nil
-    end
+  module Models::Tree
 
-    Entity_ = -> client, _props_, * i_a do
-      :properties == _props_ or raise ::ArgumentError, "'properties' not '#{ _fields_ }'"
-      SubTree_.lib_.funcy_globless client
-      def client.call_via_iambic x_a
-        new( x_a ).execute
+    class << self
+
+      def enhance_with_module_methods_and_instance_methods mod
+
+        mod.extend Module_Methods__
+        mod.include Instance_Methods__ ; nil
       end
-      SubTree_.lib_.basic_fields.with :client, client,
-        :absorber, :initialize,
-        :field_i_a, i_a ; nil
-    end
 
-    DEFAULT_PATH_SEPARATOR_ = '/'.freeze
+      def from shape_symbol, x
+        Node__.from shape_symbol, x
+      end
 
-    def self.new *a
-      Node_.new( *a )
-    end
-
-    def self.from *a
-      Node_.from_mutable_args a
-    end
+    end  # >>
 
     module Module_Methods__
 
-      def from * a
-        from_mutable_args a
-      end
+      def from sym, x
 
-      def from_mutable_args a
-        a.unshift :client, self
-        Tree::From_[ a ]
+        s = sym.id2name
+
+        ia = Tree_::Input_Adapters__.const_get(
+          :"#{ s[ 0 ].upcase }#{ s[ 1 .. -1 ] }"  # :+#actor-case
+        ).new
+
+        ia.mixed_upstream = x
+        ia.node_class = self
+        ia.produce_tree
       end
 
       def path_separator
-        Tree::DEFAULT_PATH_SEPARATOR_
+        DEFAULT_PATH_SEPARATOR___
       end
+    end
+
+    DEFAULT_PATH_SEPARATOR___ = ::File::SEPARATOR
+
+    class Node_Construction___
+
+      Callback_::Actor.call self, :properties,
+        :name_services, :slug
+
+      attr_reader :name_services, :slug
+
+      class << self
+        def new_via_iambic x_a, & oes_p  # :+[#ca-063]
+          new do
+            oes_p and accept_selective_listener_proc oes_p
+            process_iambic_fully x_a
+          end
+        end
+      end  # >>
     end
 
     module Instance_Methods__
 
-      class Construction_
-        Entity_[ self, :properties, :slug, :name_services ]
-        attr_reader :slug, :name_services
+      def initialize * x_a  # yes globbed, we construct these by hand
+
+        @box_multi = nil  # often re-written when below
+
+        if x_a.length.nonzero?
+          nc = Node_Construction___.new_via_iambic x_a
+
+          ns = nc.name_services
+          if ns
+            @node_id = ns.attach_notify self
+            @name_services = ns
+          end
+
+          sl = nc.slug
+          if sl
+            append_isomorphic_key sl
+          end
+        end
+
+        NIL_
       end
 
-      def initialize * x_a  # yes globbed, we construct these by hand
-        o = Construction_.new x_a
-        if (( ns = o.name_services ))
-          @node_id = ns.attach_notify self
-          @name_services = ns
-        end
-        s = o.slug and append_isomorphic_key s
-        @box_multi = nil
+      def members
+        [ :any_slug, :children, :children_count, :fetch, :has_children,
+          :has_slug, :is_branch, :node_payload, :slug, :to_child_stream ]
+      end
+
+      # ~ exposures to high-level expression adapters & related (experimental)
+
+      def to_classified_stream_for modality_symbol, * x_a
+
+        x_a.push :node, self
+
+        s = modality_symbol.id2name  # :+#actor-case
+
+        Tree_::Expression_Adapters__.const_get(
+
+          :"#{ s[ 0 ].upcase }#{ s[ 1 .. -1 ] }", false
+
+        )::Actors::Build_classified_stream.call_via_iambic x_a
+      end
+
+      def to_classified_stream
+
+        Tree_::Actors__::Build_classified_stream.new( self ).execute
       end
 
       #  ~ as parent and/or child ~
@@ -75,6 +120,8 @@ module Skylab::SubTree
         children_count.nonzero?
       end
 
+
+
       #  ~ as child, simple readers ~
 
       def isomorphic_key_count
@@ -82,7 +129,9 @@ module Skylab::SubTree
       end
 
       def any_slug
-        slug if has_slug
+        if has_slug
+          slug
+        end
       end
 
       def first_isomorphic_key
@@ -151,20 +200,30 @@ module Skylab::SubTree
       end
 
       def fetch path, & else_p
-        Tree::Fetch_or_create_[ :client, self, :do_create, false,
-          :else_p, else_p, :path, path ]
+
+        Tree_::Small_Time_Actors__::Fetch_or_create.with(
+
+          :path, path,
+          :else_p, else_p,
+          :do_not_create,
+          :node, self )
       end
 
-      def fetch_or_create *a  # ( may mutate )
-        Tree::Fetch_or_create_[ :client, self, :do_create, true, *a ]
+      def fetch_or_create * x_a, & x_p  # `x_p` currently not used
+
+        Tree_::Small_Time_Actors__::Fetch_or_create.with(
+
+          :create_if_necessary,
+          :node, self,
+          * x_a, & x_p )
       end
 
       def fetch_first_child
         @box_multi.fetch_first_item
       end
 
-      def fetch_child_at_index idx
-        @box_multi.fetch_item_at_index idx
+      def child_at_position idx
+        @box_multi.item_at_position idx
       end
 
       def [] k_x
@@ -175,34 +234,33 @@ module Skylab::SubTree
         @box_multi.get_enumerator
       end
 
-      def get_child_stream_p
-        @box_multi.get_stream_p
+      def to_child_stream
+        Callback_.stream( & get_some_child_stream_p )
       end
 
       def get_some_child_stream_p
         has_children ? get_child_stream_p : EMPTY_P_
       end
 
-      def to_text
-        Tree::To_text_[ :client, self ]
+      def get_child_stream_p
+        @box_multi.get_stream_p
       end
-
-      def to_paths
-        Tree::To_paths_[ :client, self ]
-      end
-
-      def get_traversal_stream *a
-        Tree::Traversal::Scanner_[ self, *a ]
-      end
-
-      alias_method :get_traversal_stream, :get_traversal_stream
 
       def longest_common_base_path
-        if (( child = any_only_child ))
-          res = [ child.slug ]
-          ( r = child.longest_common_base_path ) and res.concat r
+        child = any_only_child
+        if child
+          y = [ child.slug ]
+          child.__longest_common_base_path_into y
+          y
         end
-        res
+      end
+
+      def __longest_common_base_path_into y
+        child = any_only_child
+        if child
+          y.push child.slug
+          child.__longest_common_base_path_into y
+        end
       end
 
       def any_only_child
@@ -216,7 +274,8 @@ module Skylab::SubTree
       #  ~ as parent, name services ~
 
       def attach_notify node
-        ( @box_multi ||= Tree::Box_Multi_.new ).add node
+        @box_multi ||= Tree_::Models__::Box_Multi.new
+        @box_multi.add node
       end
 
       def detach_and_release_keyset_notify node_id
@@ -274,7 +333,7 @@ module Skylab::SubTree
       #  ~ facet specific: merging (post-order, covered) ~
 
       def destructive_merge otr, *a
-        Tree::Merge_[
+        Tree_::Merge_[
           :client, self,
           :key_proc, -> node do
              node.last_isomorphic_key
@@ -289,7 +348,7 @@ module Skylab::SubTree
       MERGE_ATTR_A_ = [ :children, :keys ].freeze
 
       def destructive_merge_children_notify other, algo
-        Tree::Merge_::Destructive_merge_children_[ self, other, algo ]
+        Tree_::Merge_::Destructive_merge_children_[ self, other, algo ]
         nil
       end
 
@@ -319,8 +378,15 @@ module Skylab::SubTree
       end
     end
 
-    class Node_
-      Tree.enhance_with_module_methods_and_instance_methods self
+    # (immediately after instance methods close we do the below)
+
+    Tree_ = self
+
+    class Node__
+
+      Tree_.enhance_with_module_methods_and_instance_methods self
     end
+
+    Autoloader_[ Sessions_ = ::Module.new ]
   end
 end

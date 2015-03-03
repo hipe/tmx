@@ -1,76 +1,93 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::SubTree::TestSupport::Tree
+module Skylab::SubTree::TestSupport::Models_Tree
 
-  if false  # #todo: next-commit
+  # ->
 
-  describe "[st] tree node" do
+    describe "[st] models - tree - actors - `longest_common_base_path`" do
 
-    let(:paths) { [
-      'a',
-      'bb/cc/dd',
-      'bb/cc',
-      'bb/cc/dd/ee'
-    ] }
+      it "(does paths to tree and vice-versa)" do
 
-    it "does paths to tree and vice-versa" do
-      node = Subject_[].from :paths, paths
-      paths_ = node.to_paths
-      want = <<-HERE.unindent
-       a
-       bb/
-       bb/cc/
-       bb/cc/dd/
-       bb/cc/dd/ee
-      HERE
-      have = "#{paths_.join("\n")}\n"
-      have.should eql(want)
+        _from_paths = [
+          'a',
+          'bb/cc/dd',
+          'bb/cc',
+          'bb/cc/dd/ee'
+        ].freeze
+
+        paths_via_tree(
+          Subject_[].from :paths, _from_paths
+        ).should eql %w(
+          a
+          bb/
+          bb/cc/
+          bb/cc/dd/
+          bb/cc/dd/ee )
+      end
+
+      it "when empty" do
+        against EMPTY_A_
+        expect nil
+      end
+
+      it "when 1x1" do
+        against %w(one)
+        expect %w(one)
+      end
+
+      it "when 1x2" do
+        against %w(one/two)
+        expect %w(one two)
+      end
+
+      it "when 1x3" do
+        against %w(one/two/three)
+        expect %w(one two three)
+      end
+
+      it "when 2x1 (different)" do
+        against %w(one two)
+        expect nil
+      end
+
+      it "when 2x1 (same)" do
+        against %w(yup yup)
+        expect %w(yup)
+      end
+
+      it "when 2x2 (some)" do
+        against %w(a/b a/c)
+        expect %w(a)
+      end
+
+      it "when 2x2 (none)" do
+        against %w(x/a y/a)
+        expect nil
+      end
+
+      it "when 2x2 (all)" do # actually should become 1x2
+        against %w(p/q p/q)
+        expect %w(p q)
+      end
+
+      it "when 3x3 (some)" do
+        against %w(a/b/c a/b/f/g a/b/f/h a/b/l/m/n)
+        expect %w(a b)
+      end
+
+      def against s_a
+        @s_a = s_a
+      end
+
+      def expect s_a
+        Subject_[].from( :paths, @s_a ).
+          longest_common_base_path.should eql s_a
+      end
+
+      define_method :paths_via_tree, TS_::Paths_via_tree.to_proc
+
     end
 
-    context "with regards to longest common base path" do
-      let(:tree) { Subject_[].from :paths, paths }
-      let :subject do tree.longest_common_base_path end
-      context "when empty" do
-        let(:paths) { %w() }
-        it("nil")   { subject.should be_nil }
-      end
-      context "when 1x1" do
-        let(:paths) { %w(one) }
-        it("one")   { subject.should eql(['one']) }
-      end
-      context "when 1x2" do
-        let(:paths) { %w(one/two) }
-        it("two")   { subject.should eql(['one', 'two']) }
-      end
-      context "when 1x3" do
-        let(:paths) { %w(one/two/three) }
-        it("three") { subject.should eql(%w(one two three)) }
-      end
-      context "when 2x1 (different)" do
-        let(:paths) { %w(one two) }
-        it("nope")  { subject.should be_nil }
-      end
-      context "when 2x1 (same)" do
-        let(:paths) { %w(yup yup) }
-        it("yup")   { subject.should eql(['yup']) }
-      end
-      context "when 2x2 (some)" do
-        let(:paths) { %w(a/b a/c) }
-        it("some")  { subject.should eql(['a']) }
-      end
-      context "when 2x2 (none)" do
-        let(:paths) { %w(x/a y/a) }
-        it("none")  { subject.should be_nil }
-      end
-      context "when 2x2 (all)" do # actually should become 1x2
-        let(:paths) { %w(p/q p/q) }
-        it("all")   { subject.should eql(%w(p q)) }
-      end
-      context "when 3x3 (some)" do
-        let(:paths) { %w(a/b/c a/b/f/g a/b/f/h a/b/l/m/n) }
-        it("some")  { subject.should eql(%w(a b)) }
-      end
-    end
-  end
-  end
+    # <-
+
 end

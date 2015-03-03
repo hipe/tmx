@@ -1,6 +1,16 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::SubTree::TestSupport::CLI::Actions::My_Tree
+module Skylab::SubTree::TestSupport::The_CLI_Modality
+
+  ::Skylab::SubTree::TestSupport[ TS_ = self ]
+
+  include Constants
+
+  extend TestSupport_::Quickie
+
+  PN_ = 'xyzzy'
+
+  if false
 
   _Face_TS = ::Skylab::SubTree::TestSupport::TestLib_::Face_[]::TestSupport
   _Face_TS::CLI::Client[ MY_Tree_TS_ = self ]  # do this first
@@ -40,5 +50,7 @@ module Skylab::SubTree::TestSupport::CLI::Actions::My_Tree
     def invoke *argv
       super( * get_sut_command_a.concat( argv ) )
     end
+  end
+
   end
 end

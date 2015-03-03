@@ -1,10 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::SubTree::TestSupport::Tree
+module Skylab::SubTree::TestSupport::Models_Tree
 
-  if false  # #todo:next-commit
-
-  describe "[st] tree merge actors" do
+  describe "[st] tree merge actors", wip: true do
 
     it "loads" do
       fun
@@ -56,6 +54,5 @@ module Skylab::SubTree::TestSupport::Tree
     def fun
       Subject_[]::Merge_
     end
-  end
   end
 end

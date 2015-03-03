@@ -118,12 +118,27 @@ module Skylab::Brazen
 
       accept_selective_listener_via_channel_proc( -> i_a, & ev_p do
 
-        maybe_emit_wrapped_or_autovivified_event oes_p, i_a, & ev_p
+        receive_uncategorized_emission oes_p, i_a, & ev_p
 
       end )
     end
 
-    def maybe_emit_wrapped_or_autovivified_event oes_p, i_a, & ev_p  # #note-100
+    def receive_uncategorized_emission oes_p, i_a, & x_p  # #note-100
+
+      # this is :[#023]: (still experimental) `expression` as a level-2
+      # channel name has the following magic treatment
+
+      if :expression == i_a[ 1 ]
+
+        __maybe_emit_expression oes_p, i_a, & x_p
+
+      else
+
+        maybe_emit_wrapped_or_autovivified_event oes_p, i_a, & x_p
+      end
+    end
+
+    def maybe_emit_wrapped_or_autovivified_event oes_p, i_a, & ev_p
 
       oes_p.call( * i_a ) do
 
@@ -136,6 +151,40 @@ module Skylab::Brazen
         Callback_::Event.wrap.signature name, _ev
       end
     end
+
+    # ~ begin experimental [#023] feature
+
+    def __maybe_emit_expression oes_p, i_a, & msg_p
+
+      first = i_a.first
+      rest = i_a[ 2 .. -1 ]
+
+      oes_p.call first, * rest do
+
+        # (because we have changed the signature of the potential event from
+        #  being an expression to an event object we must modify the channel)
+
+        send :"__build__#{ first }__event_via_expression", rest, & msg_p
+      end
+    end
+
+    def __build__info__event_via_expression rest, & msg_p  # mutates `rest`
+
+      # `rest` is a channel - don't encourage abuse by acccepting iambic
+      # name-value pairs there. don't use simple expressions if you want
+      # to include metadata in your event.
+
+      _terminal_channel = rest.length.zero? ? :generic_info : rest.fetch( 0 )
+
+      build_neutral_event_with _terminal_channel do | y, _o |
+
+        # (remember, this context right here is the expression agent)
+
+        calculate y, & msg_p
+      end
+    end
+
+    # ~ end
 
   public
 

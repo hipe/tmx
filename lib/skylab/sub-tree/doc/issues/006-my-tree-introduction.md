@@ -2,7 +2,7 @@
 
 Some reasons for this:
 
-  + We wanted to see if we can make a full cannonical CLI with H-eadless (1.1)
+  + We wanted to see if we can make a full canonical CLI with H-eadless (1.1)
   + We want trees with linecounts etc like we were doing before manually
 
 

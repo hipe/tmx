@@ -47,22 +47,35 @@ module Skylab::GitViz
       end
 
       def rndr_first_pass
-        scn = @tree.get_traversal_stream :glyphset_x, :narrow  # wide or narrow
-        prcss_root scn.gets
+
+        st = @tree.to_classified_stream_for :text,
+          :glyphset_identifier_x, :narrow  # wide or narrow
+
+        prcss_root st.gets
         row_a = [] ; max = 0
-        while (( card = scn.gets ))
+
+        begin
+          card = st.gets
+          card or break
+
           n = card.node
           _line_node_slug = if n.is_branch
             n.slug  # e.g maybe colorize this one
           else
             n.slug
           end
-          row = Row__.new card.prefix[], n.is_leaf,
+
+          row = Row__.new card.prefix_string, n.is_leaf,
             _line_node_slug, n.repo_trail
+
           d = row.file_column_string_length
+
           max < d and max = d
-          row_a << row
-        end
+
+          row_a.push row
+          redo
+        end while nil
+
         @row_a = row_a ; @file_column_string_width = max ; nil
       end
 

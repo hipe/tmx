@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::GitViz::TestSupport::CLI
 
-  describe "[gv] CLI - core and cannon and periphery" do
+  describe "[gv] CLI - core and canon and periphery" do
 
     extend TS__ ; use :expect
 

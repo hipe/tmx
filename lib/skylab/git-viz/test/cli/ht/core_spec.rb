@@ -37,10 +37,10 @@ module Skylab::GitViz::TestSupport::CLI
 
     def expect_dots
       expect_emissions_on_channel :o
-      expect "   ├everybody in the room is floating  │ •• "
-      expect "   ├it's just                          │"
-      expect "   │ └funky like that                  │• • "
-      expect "   └move-after                         │   •"
+      expect " ├everybody in the room is floating  │ •• "
+      expect " ├it's just                          │"
+      expect " │ └funky like that                  │• • "
+      expect " └move-after                         │   •"
     end
   end
 end

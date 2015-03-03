@@ -1,13 +1,16 @@
 # encoding: utf-8
 
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::SubTree::TestSupport::Tree
+module Skylab::SubTree::TestSupport::Models_Tree
 
-  if false  # #todo:next-commit
-  describe "[st] tree" do
+  describe "[st] models - tree - expad - text = classified stream from hash" do
+
+    extend TS_
+
     it "renders a pretty tree" do
-      node = Subject_[].from :hash,
+
+      _node = Subject_[].from :hash,
         { :name => "document",
           :children => [
             { :name => "head" },
@@ -36,7 +39,7 @@ module Skylab::SubTree::TestSupport::Tree
           ]
         }
 
-      exp = <<-HERE.gsub %r|^        |, ''
+      _exp = deindent( <<-HERE )
         document
          ├head
          ├body
@@ -51,10 +54,20 @@ module Skylab::SubTree::TestSupport::Tree
          │   └sub4
          └foot
       HERE
-      act = node.to_text
-      act.should eql( exp ) # use this form with --diff option
+
+      y = []
+      st = _node.to_classified_stream_for :text
+      begin
+        cx = st.gets
+        cx or break
+        y.push "#{ cx.prefix_string }#{ cx.node.slug }\n"
+        redo
+      end while nil
+
+      _act = y.join EMPTY_S_
+
+      _act.should eql _exp  # use this form with --diff option
     end
-  end
   end
 end
 # #tombstone artifact

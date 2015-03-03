@@ -6,7 +6,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
     extend CLI::ModuleMethods ; include CLI::InstanceMethods
 
-    context "the cannon" do
+    context "the canon" do
 
       it "0    with no args - explain what's expected" do
         invoke

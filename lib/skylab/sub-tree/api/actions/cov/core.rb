@@ -1,5 +1,15 @@
 module Skylab::SubTree
 
+  module Models_::File_Coverage
+
+    Actions = ::Module.new
+
+    class Actions::File_Coverage < Action_
+
+      @is_promoted = true
+
+  if false
+
   class API::Actions::Cov < API::Action
 
     Local_Actor_.call self, :simple, :properties,
@@ -164,5 +174,9 @@ module Skylab::SubTree
     Data_Event_ = Data_Event_
 
     TEST_DIR_NAME_A_ = SubTree_::Lib_::Test_dir_name_a[]
+  end
+  end
+
+    end
   end
 end

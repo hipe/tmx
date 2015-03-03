@@ -12,7 +12,17 @@ module Skylab::SubTree
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
+  Autoloader_[ Models = ::Module.new ]  # #change-this-at-step:8 (or 10)
+
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+
+  ACHIEVED_ = true
+
+  DEFAULT_GLYPHSET_IDENTIFIER_ = :narrow
+
+  EMPTY_A_ = [].freeze
+
+  EMPTY_P_ = -> {}
 
   EMPTY_S_ = ''.freeze
 

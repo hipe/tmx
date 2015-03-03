@@ -1,20 +1,17 @@
-if false  # #todo:next-commit
 require_relative 'test-support'
 
-describe "[st] CLI core" do
+module Skylab::SubTree::TestSupport::The_CLI_Modality
 
-  ts = ::Skylab::SubTree::TestSupport
+  # <-
 
-  extend ts::CLI
-
-  _PN = ts::CLI::Constants::PN_
+describe "[st] CLI core", wip: true do
 
   acts_rx = /\{.+rerun\|ping\}/
   actions = acts_rx.source
   expecting_rx_ = /\AExpecting #{ actions }\.\z/i # look!
   expecting_rx  = /\AExpecting #{ actions }\z/i
-  usage_rx = /\AUsage: #{ _PN } #{ actions } \[opts\] \[args\]\z/i
-  invite_rx = /\ATry #{ _PN } -h for help\.\z/
+  usage_rx = /\AUsage: #{ PN_ } #{ actions } \[opts\] \[args\]\z/i
+  invite_rx = /\ATry #{ PN_ } -h for help\.\z/
 
   it "0   : no args        : expecting / invite" do
     argv
@@ -51,7 +48,7 @@ describe "[st] CLI core" do
     line.should match( usage_rx )
     line.should match( /^$/ )
     line.should match(
-    /\AFor help on a particular subcommand, try #{ _PN } <subcommand> -h\.\z/i
+    /\AFor help on a particular subcommand, try #{ PN_ } <subcommand> -h\.\z/i
     )
     emission_a.should be_empty
     names.detect{ |x| :help != x }.should be_nil
@@ -72,7 +69,7 @@ describe "[st] CLI core" do
 
   it "2.2 : `-h rec`       : 1) usage 2) desc 3) opts" do
     argv '-h', _CMD
-    line.should match(/\Ausage: #{ _PN } #{ _CMD }/i)
+    line.should match(/\Ausage: #{ PN_ } #{ _CMD }/i)
     line.should match( /^$/ )
     line.should match(/\Adescription:?\z/i)
     line.should match(/\A *see crude/i)
@@ -92,10 +89,13 @@ describe "[st] CLI core" do
   it "2.3 : `-h rec more`  : msg / usage / invite" do
     argv '-h', _CMD, 'wat'
     line.should match( /\bignoring: "wat"/ )
-    line.should match( /\Ausage: #{ _PN } / )
+    line.should match( /\Ausage: #{ PN_ } / )
     # ..meh
     names.uniq.should eql( [ :info, :help ] )
     result.should eql( 0 )
   end
 end
+
+# ->
+
 end

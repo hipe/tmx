@@ -40,7 +40,7 @@
 [#137]       #parent-node: [#126] the CLI box narrative ..
 [#136]       #test-node #in-situ
 [#135]       #parent-node: [#126] the CLI argument node narrative (#syntax) ..
-[#134]       #parent-node: [#133]  (#cannon) "the canonical numbers for.."
+[#134]       #parent-node: [#133]  (#canon) "the canonical numbers for.."
 [#133]       #parent-node: [#125] headless testing conventions ..
 [#132]       #in-situ the magical, multipurpose Event base class and variants
 [#131]       #parent-node: [#125] the notificate narrative ..

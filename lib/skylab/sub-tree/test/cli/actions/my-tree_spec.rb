@@ -1,24 +1,25 @@
-if false  # #todo:next-commit
-require_relative 'my-tree/test-support'
+require_relative '../../test-support'  # change-this-at-step:10 and below
 
-module Skylab::SubTree::TestSupport::CLI::Actions::My_Tree
+module Skylab::SubTree::TestSupport
 
-  describe "[st] CLI actions my-tree" do
+  describe "[st] CLI actions my-tree", wip: true do
 
     extend TS_
 
-    FULL_PN_ = ( [ PN_, * TS_::SUT_CMD_SETTING_.value ] * ' ' ).freeze
+    _PN = 'xyzzy2'
 
-    INVITE_RX_ = /\ATry #{ FULL_PN_ } -h for help\.\z/i
+    _FULL_PN = 'meh' # = ( [ _PN, * TS_::SUT_CMD_SETTING_.value ] * ' ' ).freeze
 
-    USAGE_RX_ = /\Ausage: #{ FULL_PN_ }.* \[-f <file\>\] .*#{
+    _INVITE_RX = /\ATry #{ _FULL_PN } -h for help\.\z/i
+
+    _USAGE_RX = /\Ausage: #{ _FULL_PN }.* \[-f <file\>\] .*#{
       }\[<path> \[<path>\[\.\.\.\]\]\]\z/
 
     it "1.2 : one unrec opt : msg / usage / invite" do
       result = invoke '-x'
       nonstyled.should match(/\Ainvalid option: -x\z/)
-      styled.should match USAGE_RX_
-      styled.should match INVITE_RX_
+      styled.should match _USAGE_RX
+      styled.should match _INVITE_RX
       no_more_lines
       result.should eql 1
     end
@@ -36,18 +37,18 @@ module Skylab::SubTree::TestSupport::CLI::Actions::My_Tree
       r.should be_zero
     end
 
-    OPT_SUMMARY_FIRST_LINE_RX_ =
+    _OPT_SUMMARY_FIRST_LINE_RX =
       /\A[ ]{3,}-[a-zA-Z], --(?:(?!>  ).)+[^ ][ ]{2,}[^ ]/  # ensure some desc
 
     def expect_beautiful_help
-      styled.should match USAGE_RX_
+      styled.should match _USAGE_RX
       any_blanks
       header 'description'
       nonstyled.should match( /\A[ ].+\binspired\b.+\btree\b/i )
       nonstyled.should match( /\A[ ]+[a-z ]{10,}\z/ )
       any_blanks
       header 'options'
-      one_or_more_styled OPT_SUMMARY_FIRST_LINE_RX_
+      one_or_more_styled _OPT_SUMMARY_FIRST_LINE_RX
       any_blanks
       styled.should match( /add.+volume/ )
       styled.should match( /it can also read paths from STDIN/ )
@@ -55,5 +56,4 @@ module Skylab::SubTree::TestSupport::CLI::Actions::My_Tree
       no_more_lines
     end
   end
-end
 end

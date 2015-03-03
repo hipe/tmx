@@ -1,122 +1,86 @@
 module Skylab::SubTree
 
-  class Tree::Traversal
+  module Models::Tree
 
-    class Scanner_
+    Expression_Adapters__ = ::Module.new
 
-      SubTree_.lib_.funcy_globful self
+    module Expression_Adapters__::Text
 
-      SubTree_.lib_.basic_fields :client, self,
-        :absorber, :absrb_iambic_fully,
-        :field_i_a, [ :glyphset_x ]
+      Actors = ::Module.new
 
-      class Scn__ < ::Proc
-        alias_method :gets, :call
-      end
-      class Scn_ < Scn__
+      class Actors::Build_classified_stream
+
+        Callback_::Actor.call self, :properties,
+
+          :node,
+          :glyphset_identifier_x
+
         def initialize
-          @count = 0
+          @glyphset_identifier_x = DEFAULT_GLYPHSET_IDENTIFIER___
           super
         end
-        alias_method :gets, :call
-        def gets
-          @count += 1
-          super
+
+        DEFAULT_GLYPHSET_IDENTIFIER___ = :narrow
+
+        def execute
+          _ok = __resolve_glypshet
+          _ok && __via_glyphset_produce_stream
         end
-        attr_reader :count
-      end
 
-      def initialize tree, * x_a
-        @tree = tree
-        @initial_spaces ||= '  '
-        absrb_iambic_fully x_a ; nil
-      end
+        def __resolve_glypshet
 
-      def execute
-        @glyphset_x ||= :narrow  # DEFAULT_GLYPHSET_
-        Normalize_and_absorb_glyphset_x[ self ]
-        @gets = -> do
-          first
-        end
-        Scn_.new do
-          @gets.call
-        end
-      end
+          @glyphset = Autoloader_.const_reduce(
+            [ @glyphset_identifier_x ],
+            SubTree_.lib_.CLI_lib.tree.glyph_sets_module )
 
-    private
-
-      def first
-        card = MutableCard_.new( @tree, 0 )
-        card.prefix = -> { @initial_spaces }
-        if @tree.has_children
-          @longevity_a = [ true ]
-          @stack_a = [ Frame_.new( @tree, card ) ]
-          @gets = -> { work }
-        else
-          @gets = DONE_
-        end
-        card
-      end
-
-      DONE_ = EMPTY_ = EMPTY_P_
-
-      def push node, card
-        node.has_children or fail "sanity"
-        @stack_a.push Frame_.new( node, card )
-        @longevity_a[ card.level ] = card.is_last
-        nil
-      end
-
-      def work
-        child, is_first, is_last = @stack_a.last.advance
-        card = MutableCard_.new( child, @stack_a.length, is_first, is_last )
-        card.prefix = -> { render_prefix card }
-        if child.has_children
-          push child, card
-        elsif is_last
-          @stack_a.pop
-          while @stack_a.length.nonzero? and @stack_a.last.is_exhausted
-            @stack_a.pop
-          end
-          if @stack_a.length.zero?
-            @gets = DONE_
+          @glyphset && begin
+            __via_glyphset_init
+            ACHIEVED_
           end
         end
-        card
-      end
 
-      def render_prefix card
-        a = card.level.times.map do |x|
-          @longevity_a[ x ] ? @blank : @pipe
+        def __via_glyphset_init
+
+          h = @glyphset
+          @blank = h.fetch :blank
+          @crook = h.fetch :crook
+          @pipe = h.fetch :pipe
+          @separator = h.fetch :separator
+          @tee = h.fetch :tee
+            # (yes, we used to, but viva readability & simplicity)
+          NIL_
         end
-        tail = card.is_last ? @crook : @tee
-        "#{ a * EMPTY_S_ }#{ tail }"
-      end
-    end
 
-    class Scanner_::Frame_
+        def __via_glyphset_produce_stream
 
-      def initialize node, card  # assume children
-        @node = node
-        @last = node.children_count - 1
-        @current = 0
+          prefix_a = []
 
-      end
+          @node.to_classified_stream.map_by do | cx |
 
-      def advance
-        child = @node.fetch_child_at_index @current
-        is_first = @current.zero?
-        if @last == @current
-          @node = @current = nil
-          is_last = true
-        else
-          @current += 1
+            d = cx.depth
+
+            if d.nonzero?
+
+              shorter_d = d - 1
+
+              if shorter_d < prefix_a.length
+                prefix_a[ shorter_d .. -1 ] = EMPTY_A_
+              end
+
+              my_prefix = "#{ prefix_a * EMPTY_S_ }#{ cx.is_last ? @crook : @tee }"
+
+              _future_prefix = cx.is_last ? @blank : @pipe
+
+              prefix_a[ shorter_d ] = _future_prefix
+
+            end
+
+            Classifications___.new cx.node, my_prefix
+
+          end
         end
-        [ child, is_first, is_last ]
-      end
 
-      def is_exhausted
-        @current.nil?
+        Classifications___ = ::Struct.new :node, :prefix_string
       end
     end
   end

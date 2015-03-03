@@ -69,7 +69,12 @@
 [#030]       #parent-node: [#026] the creating narrative ..
 [#029]       #parent-node: [#028] "a universal normal name convention.."
 [#028]       #parent-node: [#010] the datastore actor narrative ...
-[#027]       #done do not throw exceptions for parse errors
+[#027] #open #tracking the zero-configuration dream - one day, [br]-powered
+               API's should need not define a 'Kernel' / 'Kernel_' nor have
+               a dedicated 'API' file - just limit it to a singleton
+               method defined on the toplevel sidesysetm that produces
+               the daemon or kernel by calling [br])
+             ( #was: #done do not throw exceptions for parse errors )
 [#026]       #parent-node: [#025] the collection controller narrative ..
 [#025]       #doc-node: the brazen four layer model model ..
 [#024]       #parent-node: [#025] the model action narrative ..

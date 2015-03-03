@@ -14,7 +14,7 @@ module Skylab::Snag::TestSupport::CLI
       }sn0g <subcommand> -h\.$}i
     blank_line_rx = /\A\z/  # expects chomp to be used
 
-    context "the CLI cannon (with the same memoized client!) - lvls 0 & 1 ui" do
+    context "the CLI canon (with the same memoized client!) - lvls 0 & 1 ui" do
 
       use_memoized_client
 

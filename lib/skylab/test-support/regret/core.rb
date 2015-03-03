@@ -20,10 +20,10 @@ module Skylab::TestSupport
 
       def [] mod, * x_a
         if ! mod.respond_to? :dir_pathname
-          n = mod.name
-          _const = n[ n.rindex( ':' ) + 1 .. -1 ]
-          _filename = Callback_::Name.via_const( _const ).as_slug
-          autoloaderize_with_filename_child_node _filename, mod
+          s = mod.name
+          autoloaderize_with_filename_child_node(
+            Callback_::Name.via_const( s[ s.rindex( CONST_SEP_ ) + 2 .. -1 ] ).as_slug,
+            mod )
         end
         mod.extend Anchor_ModuleMethods
         mod.initialize_for_regret_with_parent_anchor_mod self

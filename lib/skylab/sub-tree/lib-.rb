@@ -16,6 +16,8 @@ module Skylab::SubTree
 
     _memo, sidesys = Autoloader_.at :memoize, :build_require_sidesystem_proc
 
+    Brazen = sidesys[ :Brazen ]
+
     CLI_lib = -> do
       HL__[]::CLI
     end

@@ -122,7 +122,7 @@ module Skylab::Snag
       Basic[]::String
     end
 
-    SubTree__ = sidesys[ :SubTree ]
+    ST__ = sidesys[ :SubTree ]
 
     System = -> do
       HL__[].system
@@ -133,7 +133,7 @@ module Skylab::Snag
     end
 
     Tree = -> do
-      SubTree__[]::Tree
+      ST__[]::Models::Tree
     end
 
     Writemode = -> do

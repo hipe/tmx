@@ -1,8 +1,10 @@
 module Skylab::SubTree
 
-  module Tree
+  module Models::Tree
 
     class Merge_  # ( part of the [#mh-014] diaspora )
+
+      if false
 
       Entity_[ self, :properties, :client, :other, :key_proc, :attr_a ]
 
@@ -121,6 +123,8 @@ module Skylab::SubTree
         ks.key_a.object_id == rka.object_id or fail "sanity"
         bm.merge_keyset_to_item ks, new_remote_id
         nil
+      end
+
       end
     end
   end

@@ -1,5 +1,15 @@
 module Skylab::SubTree
 
+  module Models_::Files
+
+    Actions = ::Module.new
+
+    class Actions::Files < Action_
+
+      @is_promoted = true
+
+      if false
+
   class API::Actions::My_Tree
 
     SubTree_.lib_.enhance_as_API_normalizer self, :all
@@ -382,6 +392,9 @@ module Skylab::SubTree
         p = s_or_p.respond_to?( :ascii_only? ) ? -> { s_or_p } : s_or_p
         @say_p_p[ p ]
         false
+      end
+    end
+  end
       end
     end
   end

@@ -1,6 +1,6 @@
 module Skylab::SubTree
 
-  module Tree
+  module Models::Tree
 
     class Merge_
 

@@ -1,56 +1,108 @@
 module Skylab::SubTree
 
-  module Tree
+  module Models::Tree
 
-    class Fetch_or_create_
+    Small_Time_Actors__ = ::Module.new
 
-      Entity_[ self, :properties,
-        :client,
-        :do_create,
-        :else_p,
-        :init_node,
+    class Small_Time_Actors__::Fetch_or_create
+
+      Callback_::Actor.methodic self, :properties,
+
+        :path,
         :node_payload,
-        :path ]
-
-      def execute
-        _path_a = some_normalized_path_a
-        node = work _path_a, @client
-        @node_payload and node.set_node_payload @node_payload
-        node
-      end
+        :init_node,
+        :else_p,
+        :node
 
     private
 
-      def some_normalized_path_a
+      def create_if_necessary=
+        @OK_to_create = true
+        KEEP_PARSING_
+      end
+
+      def do_not_create=
+        @OK_to_create = false
+        KEEP_PARSING_
+      end
+
+      def initialize & edit_p
+        @node_payload = nil
+        @else_p = nil
+        @init_node = nil
+        instance_exec( & edit_p )
+      end
+
+    public
+
+      def execute
+
+        path_a = __some_normalized_path_a
+
+        node = if path_a.length.zero?
+          @node
+        else
+          _touch_via_nonzero_length_path path_a, @node
+        end
+
+        if @node_payload
+          node.set_node_payload @node_payload
+        end
+
+        node
+      end
+
+      def __some_normalized_path_a
+
         path_a = ::Array.try_convert @path
-        path_a or some_normd_path_a_when_not_array
+        if path_a
+          path_a
+        else
+          __some_normd_path_a_when_not_array
+        end
       end
 
-      def some_normd_path_a_when_not_array
-        @path or raise ::ArgumentError, "'path' is a required iambic param."
-        "#{ @path }".split @client.path_separator
+      def __some_normd_path_a_when_not_array
+
+        if @path
+          "#{ @path }".split @node.path_separator
+        else
+          raise ::ArgumentError, "missing required property `path`"  # or use simple properties
+        end
       end
 
-      def work mutable_path_a, node
-        begin
-          mutable_path_a.length.zero? and break( r = node )
-          slug = mutable_path_a.shift
-          if node.has_children
-            child = node[ slug ]
-          end
-          if ! child
-            @else_p and break r = @else_p[]
-            @do_create or break
-            child = node.class.new :slug, slug, :name_services, node
-            @init_node and @init_node[ child ]
-          end
-          r = if mutable_path_a.length.zero?
+      def _touch_via_nonzero_length_path mutable_path_a, node
+
+        slug = mutable_path_a.shift
+
+        if node.has_children
+          child = node[ slug ]
+        end
+
+        if child
+          if mutable_path_a.length.zero?
             child
           else
-            work mutable_path_a, child
+            _touch_via_nonzero_length_path mutable_path_a, child
           end
-        end while nil
-        r
+
+        elsif @else_p
+          @else_p[]
+
+        elsif @OK_to_create
+
+          child = node.class.new :slug, slug, :name_services, node
+
+          if @init_node
+            @init_node[ child ]
+          end
+
+          if mutable_path_a.length.zero?  # again..
+            child
+          else
+            _touch_via_nonzero_length_path mutable_path_a, child
+          end
+        end
       end
     end
   end

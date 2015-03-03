@@ -1,33 +1,14 @@
 # encoding: utf-8
 
-if false  # #todo:next-commit
+require_relative '../../test-support'  # #change-this-at-step:10
 
-require_relative 'test-support'
+module Skylab::SubTree::TestSupport
 
-module Skylab::SubTree::TestSupport::CLI::Actions::Cov
+  # <-
 
-  ::Skylab::SubTree::TestSupport::CLI::Actions[ self ]
+describe "[st] CLI actions cov", wip: true do
 
-  include Constants
-
-  Callback_ = Callback_
-
-  CMD_ = 'cov'.freeze
-
-  RELATIVE_TESTDIR_NO_DOT_ = "#{ PN_ }/test"
-
-  TestSupport_ = TestSupport_
-
-  Abs_testdir_ = -> do
-    SubTree_.dir_pathname.join( 'test' ).to_s
-  end
-
-  # (this used to be home to "dark hack" [#ts-010] but we modernized it)
-
-# lose indent 1x
-describe "[st] CLI actions cov" do
-
-  extend SubTree_::TestSupport::CLI
+  _PN = 'xyzzy3'
 
   text = -> x do
     txt = x.payload_x
@@ -37,7 +18,7 @@ describe "[st] CLI actions cov" do
 
   srbrx, srbrx2 = -> do
     rx = ::Regexp.escape TestSupport_.spec_rb
-    [ /#{ rx }\z/, %r{\A\./#{ PN_ }/.+#{ rx }\z} ]
+    [ /#{ rx }\z/, %r{\A\./#{ _PN }/.+#{ rx }\z} ]
   end.call
 
   test_files_in_hub_rx = %r(\b\d+ test files in hub\b)
@@ -148,9 +129,6 @@ describe "[st] CLI actions cov" do
     end
   end
 
-  TestLib_::Stderr[].puts TestLib_::CLI_lib[].pen.stylize(
-    "    <<< SKIPPING COV TREE INTEGRATION >>>", :red )
-
   false and it "LOOK AT THAT BEAUTIFUL COV TREE" do
     debug!
     cd SubTree_.dir_pathname.dirname.to_s do
@@ -170,7 +148,11 @@ describe "[st] CLI actions cov" do
   def build_client
     build_client_for_both
   end
+
 end
-# gain indent 1x
+
+# ->
+
 end
-end
+
+# :+#tombstone: this used to be home to [#ts-010] "dark hack"

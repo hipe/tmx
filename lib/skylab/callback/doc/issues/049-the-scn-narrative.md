@@ -44,7 +44,7 @@ metaphor is such a precise fit, but bear in mind a scanner is not limited to
 producing strings (the 's' in "gets"), however:
 
 a corollary of the second point above forms one of the scanner's most
-defining limitations: a scanner cannont be used to produce elements whose
+defining limitations: a scanner cannot be used to produce elements whose
 valid state may include `nil` or `false`.
 
 

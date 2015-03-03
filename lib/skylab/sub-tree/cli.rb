@@ -4,6 +4,55 @@ module Skylab::SubTree
 
   class CLI
 
+    # hack thru #hook-in for [fa] (tmx integration)
+
+    module Adapter
+      module For
+        module Face
+          module Of
+            Hot = -> ns_sheet, _me do
+              -> strange_kernel, my_slug do
+
+                # transitional blood, #change-this-at-step:8 (or 10)
+
+                fml = strange_kernel.instance_variable_get :@parent_services
+
+                _invocation_name = "#{ fml.program_name } #{ my_slug }"
+
+                CLI_.new( fml.istream, fml.ostream, fml.estream, _invocation_name )
+              end
+            end
+          end
+        end
+      end
+    end
+
+    # ~ begin hax for superficial, stubby pinging #change-this-at-step:8 (or 10)
+
+    def initialize _sin, sout, serr, invo_s
+      @serr = serr
+      @sout = sout
+      @invo_s = invo_s
+    end
+
+    def pre_execute
+      ACHIEVED_
+    end
+
+    def invokee
+      self
+    end
+
+    def invoke argv
+      [ "ping" ] == argv or self._HELFF
+      @serr.puts "hello from sub tree."
+      :hello_from_sub_tree
+    end
+
+    # ~ end
+
+    if false  # #change-at-step-8 (or 10)
+
     Callback_[ self, :employ_DSL_for_digraph_emitter ]  # do this before you extend
       # legacy, it gives you a graph
 
@@ -267,6 +316,10 @@ module Skylab::SubTree
     module Actions
       Autoloader_[ self ]
     end
+
+    end
+
+    CLI_ = self
 
     Client = self  # #comport:tmx
   end

@@ -98,16 +98,24 @@ module Skylab::Snag
         super
         @glyphset_i ||= :wide  # wide or narrow
       end
+
       def execute
-        scn = @tree.get_traversal_stream :glyphset_x, @glyphset_i
+
+        st = @tree.to_classified_stream_for :text,
+          :glyphset_identifier_x, @glyphset_i
+
         Callback_::Scn.new do
-          card = scn.gets
-          card and line_via_card card
+          card = st.gets
+          if card
+            line_via_card card
+          end
         end
       end
+
     private
+
       def line_via_card card
-        prefix_s = card.prefix[]
+        prefix_s = card.prefix_string
         node = card.node
         s = "#{ prefix_s } #{ node.slug }"
         if node.is_leaf
@@ -149,23 +157,36 @@ module Skylab::Snag
     private
 
       def build_cache
-        scn = @tree.get_traversal_stream :glyphset_x, @glyphset_i ; y = []
-        card = scn.gets
+
+        y = []
+
+        st = @tree.to_classified_stream_for :text,
+          :glyphset_identifier_x, @glyphset_i
+
+        card = st.gets
         if card.node.children_count.zero?
           card = nil
         end
+
         while card
+
           node = card.node
+
           _line_node_slug = stylize node.slug,
             node.is_branch ? @path_style_a : @line_num_style_a
-          s = "#{ card.prefix[] } #{ _line_node_slug }"
+
+          s = "#{ card.prefix_string } #{ _line_node_slug }"
           item = Item__.new s, unstyle( s ).length
+
           y.push item
+
           if node.is_leaf && node.todo
             item.todo = node.todo
           end
-          card = scn.gets
+
+          card = st.gets
         end
+
         @cache_a = y ; nil
       end
 

@@ -1,8 +1,10 @@
 module Skylab::SubTree
 
-  module Tree
+  module Models::Tree
 
-    class Box_Multi_
+    Models__ = ::Module.new
+
+    class Models__::Box_Multi
 
       # ( about the name: it's an associative collection whose both keys and
       # values are ordered. when the values are ordered, in skylab parlance
@@ -29,10 +31,10 @@ module Skylab::SubTree
       #  ~ items retrievers ~
 
       def fetch_first_item
-        fetch_item_at_index 0
+        item_at_position 0
       end
 
-      def fetch_item_at_index idx
+      def item_at_position idx
         @item_h.fetch @order_a.fetch( idx )
       end
 
@@ -116,7 +118,7 @@ module Skylab::SubTree
       def add item_x
         item_id = @count += 1
         @item_h[ item_id ] = item_x
-        @order_a << item_id
+        @order_a.push item_id
         item_id
       end
 
@@ -127,8 +129,8 @@ module Skylab::SubTree
       end
 
       def append_key_to_item key_x, item_id
-        a = _add_key_to_item_and_get_list key_x, item_id
-        a << key_x
+        _a = _add_key_to_item_and_get_list key_x, item_id
+        _a.push key_x
         nil
       end
 
@@ -220,7 +222,7 @@ module Skylab::SubTree
               rev_h = ::Hash.new { |h, k| h[ k ] = [ ] }
               mks.each do |k|
                 kx = @mkey_h[ k ]
-                rev_h[ kx ] << k
+                rev_h[ kx ].push k
               end
               rev_h
             end

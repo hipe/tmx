@@ -1,25 +1,31 @@
 module Skylab::SubTree
 
-  module Tree
+  module Models::Tree
 
-    class From_hash_
+    Input_Adapters__ = ::Module.new
 
-      Entity_[ self, :properties, :client, :hash ]
+    class Input_Adapters__::Hash
 
-      def execute
-        work @client.new, @hash
+      attr_writer :mixed_upstream, :node_class
+
+      def produce_tree
+        _work @node_class.new, @mixed_upstream
       end
 
-    private
+      def _work parent_node, h
 
-      def work parent_node, child_h
-        child_node = @client.new :name_services, parent_node,
-          :slug, child_h.fetch( :name )
-        if (( a = child_h[:children] ))
-          a.each do |h|
-            work child_node, h
+        child_node = @node_class.new(
+
+          :slug, h.fetch( :name ),
+          :name_services, parent_node )
+
+        a = h[ :children ]
+        if a
+          a.each do | h_ |
+            _work child_node, h_
           end
         end
+
         child_node
       end
     end

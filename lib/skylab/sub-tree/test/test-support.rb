@@ -11,6 +11,11 @@ module Skylab::SubTree::TestSupport
 
   TS_ = self
 
+  module Constants
+    SubTree_ = SubTree_
+    TestSupport_ = TestSupport_
+  end
+
   extend TestSupport_::Quickie
 
   module InstanceMethods
@@ -24,7 +29,13 @@ module Skylab::SubTree::TestSupport
     def debug_IO
       TestSupport_.debug_IO
     end
+
+    def subject_API
+      SubTree_::API
+    end
   end
+
+  Callback_ = SubTree_::Callback_
 
   NIL_ = nil
 end

@@ -1,16 +1,24 @@
 module Skylab::SubTree
 
-  module Tree
+  module Models::Tree
 
-    class From_path_nodes__
+    class Input_Adapters__::Node_identifiers
 
-      Entity_[ self, :properties, :client, :path_nodes ]
+      attr_writer :mixed_upstream, :node_class
 
-      def execute
-        root = @client.new :name_services, @client.new
-        @path_nodes.each do |node|
-          root.fetch_or_create :path, node.to_tree_path, :node_payload, node
+      def produce_tree
+
+        cls = @node_class
+
+        root = cls.new :name_services, cls.new
+
+        @mixed_upstream.each do | identifier |
+
+          root.fetch_or_create(
+            :path, identifier.to_tree_path,
+            :node_payload, identifier )
         end
+
         root
       end
     end

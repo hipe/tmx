@@ -87,7 +87,7 @@ module Skylab::SubTree
       else
         slug_s = n.slug
       end
-      [ "#{ card.prefix }#{ slug_s }", glyphage ]
+      [ "#{ card.prefix_string }#{ slug_s }", glyphage ]
     end
     #
     BRANCH_A_ = [ :branch ].freeze

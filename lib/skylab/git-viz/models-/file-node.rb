@@ -6,7 +6,7 @@ module Skylab::GitViz
 
     def self.[] * x_a
       Build_Tree_Node__.build_tree_node x_a do |bld|
-        file_node = from :path_nodes, bld.get_trail_a
+        file_node = from :node_identifiers, bld.get_trail_a
         file_node.commitpoint_manifest = bld.commitpoint_mani
         file_node
       end

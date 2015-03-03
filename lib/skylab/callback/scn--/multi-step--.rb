@@ -10,7 +10,7 @@ module Skylab::Callback
             process_iambic_fully x_a
           end
         end
-      end
+      end  # >>
 
       Callback_::Actor.call self, :properties,
         :init,

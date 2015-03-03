@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Face::TestSupport::CLI::Client
 
-  describe "[fa] CLI client cannon" do
+  describe "[fa] CLI client canon" do
 
     extend CLI_Client_TS_
 

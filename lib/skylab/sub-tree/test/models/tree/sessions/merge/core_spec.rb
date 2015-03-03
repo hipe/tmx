@@ -1,9 +1,8 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::SubTree::TestSupport::Tree
+module Skylab::SubTree::TestSupport::Models_Tree
 
-  if false  # #todo:next-commit
-  describe "[st] tree merge" do
+  describe "[st] tree merge", wip: true do
 
     def tree_from_paths a
       Subject_[].from :paths, a
@@ -36,6 +35,5 @@ module Skylab::SubTree::TestSupport::Tree
       t1.destructive_merge t2
       t1.to_paths.should eql( %w| sky/ sky/hl sky/face | )
     end
-  end
   end
 end

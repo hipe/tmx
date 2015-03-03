@@ -1,18 +1,42 @@
 module Skylab::SubTree
 
-  class API::Actions::Dirstat
+  module Models_::Directories
 
-    def self.get_desc
+    Actions = ::Module.new
+
+    class Actions::Ping < Action_
+
+      @is_promoted = true
+
+      def produce_result
+
+        kr = @kernel
+
+        maybe_send_event :info, :expression, :ping do | y |
+          y << "hello from #{ em kr.app_name }."
+        end
+
+        :_hello_from_sub_tree_
+      end
+    end
+
+    class Actions::Dirstat < Action_
+
+      @is_promoted = true
+
+      self.description_block = -> y do
+
+        y <<
 
       "the point of this one-off-ish is to show for a given changeset\n#{
         }how much changes are in which subproducts. but it has #{
         }generalized out from that.."
 
-    end
+      end
 
-    Money_ = -> sin, sout, serr, program_name, prefix, mode_a do
+      Invoke___ = -> sin, sout, serr, program_name, prefix, mode_a do
 
-    # lose 2
+      # <-
 
   no = 1 ; yes = 0  # exit statii
 
@@ -146,16 +170,9 @@ module Skylab::SubTree
 
   yes
 
-    # gain 2
-    end
+  # ->
 
-    SubTree_::Lib_::Basic_fields[ :client, self,
-      :field_i_a, Money_.parameters.map( & :last ) ]
-
-    def execute
-
-      Money_[ @sin, @sout, @serr, @program_name, @prefix, @mode_a ]
-
+      end
     end
   end
 end

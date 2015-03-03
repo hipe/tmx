@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Brazen::TestSupport::CLI
 
-  describe "[br] CLI cannon level 1" do
+  describe "[br] CLI canon level 1" do
 
     extend TS_
 
