@@ -26,7 +26,7 @@ module Skylab::SubTree::TestSupport::Models_Files
       scn.next_line.should eql ".\n"
       scn.next_line.should match %r(\A├── foo.rb #{ _MTIME }$)
       scn.next_line.should match %r(\A└── test$)
-      scn.next_line.should match %r(\A    └── foo_spec\.rb #{ _MTIME }$)
+      scn.next_line.should match %r(\A    └── foo_speg\.rb #{ _MTIME }$)
       scn.next_line.should be_nil
 
       expect_succeeded
@@ -51,12 +51,12 @@ module Skylab::SubTree::TestSupport::Models_Files
       st.gets.should eql ".                          \n"
       st.gets.should eql "├── foo.rb           1 line\n"
       st.gets.should eql "└── test                   \n"
-      st.gets.should eql "    └── foo_spec.rb  1 line\n"
+      st.gets.should eql "    └── foo_speg\.rb  1 line\n"
 
       expect_succeeded
     end
 
-    it "a in-notify extension and a mutli-buffer extension" do
+    it "a in-notify extension and a multi-buffer extension" do
 
       io = build_string_IO
 
@@ -73,11 +73,11 @@ module Skylab::SubTree::TestSupport::Models_Files
 
       st.gets.should match %r(\A\.[ ]+\n\z)
 
-      st.gets.should match %r(\A├── foo\.rb[ ]+#{ _MTIME } 1 line\n\z)
+      st.gets.should match %r(\A├── foo\.rb[ ]+#{ _MTIME } 1 line[ ]*\n\z)
 
       st.gets.should match %r(\A└── test[ ]+\n\z)
 
-      st.gets.should match %r(\A    └── foo_spec\.rb  #{ _MTIME } 1 line\n\z)
+      st.gets.should match %r(\A    └── foo_speg\.rb  #{ _MTIME } 1 line[ ]*\n\z)
 
       st.gets.should be_nil
 

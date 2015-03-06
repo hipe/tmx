@@ -2,11 +2,11 @@ require_relative '../../test-support'
 
 module Skylab::SubTree::TestSupport::Models_Files
 
-  parent = ::Skylab::SubTree::TestSupport
+  ts = ::Skylab::SubTree::TestSupport
 
-  parent.autoloaderize_with_filename_child_node 'models/files', self
+  ts.autoloaderize_with_filename_child_node 'models/files', self
 
-  parent[ TS_ = self ]
+  ts[ TS_ = self ]
 
   include Constants
 

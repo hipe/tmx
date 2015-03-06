@@ -1,8 +1,8 @@
 # encoding: utf-8
 
-require_relative '../../test-support'  # #change-this-at-step:10
+require_relative '../test-support'
 
-module Skylab::SubTree::TestSupport
+module Skylab::SubTree::TestSupport::Models_File_Coverage
 
   # <-
 

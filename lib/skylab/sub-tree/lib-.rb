@@ -54,6 +54,12 @@ module Skylab::SubTree
       HL__[].system
     end
 
+    Test_dir_name_a = -> do
+      TS___[].constant :TEST_DIR_NAME_A
+    end
+
+    TS___ = sidesys[ :TestSupport ]
+
     INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(
       self, SubTree_ )  # at the end
 

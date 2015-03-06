@@ -12,8 +12,6 @@ module Skylab::SubTree
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
-  Autoloader_[ Models = ::Module.new, :boxxy ]  # #change-this-at-step:10
-
   Autoloader_[ Models_ = ::Module.new, :boxxy ]
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]

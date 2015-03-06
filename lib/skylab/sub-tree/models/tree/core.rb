@@ -1,6 +1,6 @@
 module Skylab::SubTree
 
-  # Models = ::Module.new  # #change-this-at-step:10
+  Models = ::Module.new
 
   module Models::Tree
 

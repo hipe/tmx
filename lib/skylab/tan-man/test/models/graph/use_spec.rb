@@ -47,8 +47,8 @@ module Skylab::TanMan::TestSupport::Models::Graph
         expect_not_OK_event :workspace_not_found do |ev|
           ev = ev.to_event
           ev.num_dirs_looked.should eql 1
-          ev.filename.should eql cfn
-          ev.start_pathname.should eql @ws_pn
+          ev.file_pattern_x.should eql cfn
+          ev.start_path.should eql @ws_pn.to_path
         end
 
         expect_failed

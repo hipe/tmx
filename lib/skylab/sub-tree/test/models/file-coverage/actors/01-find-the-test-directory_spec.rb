@@ -1,0 +1,128 @@
+require_relative '../test-support'
+
+module Skylab::SubTree::TestSupport::Models_File_Coverage
+
+  describe "[st] models - file-coverage - 01: find the test directory" do
+
+    extend TS_
+
+    it "against an asset file when the root dir is not found" do
+
+      where do
+        the_asset_file
+        max_num_dirs 0
+      end
+
+      expect_not_OK_event :resource_not_found do | ev |
+        ev_ = ev.to_event
+        ev_.start_path.should eql the_asset_file_path
+        ev_.num_dirs_looked.should be_zero
+        ev_.file_pattern_x.should be_respond_to :each_with_index
+        ev_.ok.should eql false
+      end
+
+      expect_failed
+    end
+
+    it "against a test file when the root dir is not found" do
+
+      where do
+        the_test_file
+        max_num_dirs 0
+      end
+
+      expect_not_OK_event :resource_not_found
+      expect_failed
+    end
+
+    it "against an asset file when the root dir is found" do
+
+      where do
+        the_asset_file
+        max_num_dirs 2
+      end
+
+      expect_that_the_root_is_found
+    end
+
+    it "against a test file when the root dir is found" do
+
+      where do
+        the_test_file
+        max_num_dirs 2
+      end
+
+      expect_that_the_root_is_found
+    end
+
+    it "on the root dir itself - root is found" do
+
+      where do
+        path fixture_tree( :one )
+        max_num_dirs 1
+      end
+
+      expect_that_the_root_is_found
+    end
+
+    it "on the test dir itself - root is found" do
+
+      where do
+        path "#{ fixture_tree :one }/test"
+        max_num_dirs 1
+      end
+
+      expect_that_the_root_is_found
+    end
+
+    # ~ test setup & asset execution
+
+    def the_asset_file
+      path the_asset_file_path
+    end
+
+    let :the_asset_file_path do
+      "#{ fixture_tree :one }/foo.rb"
+    end
+
+    def the_test_file
+      path the_test_file_path
+    end
+
+    let :the_test_file_path do
+      "#{ fixture_tree :one }/test/foo_speg.rb"
+    end
+
+    def where
+
+      bnd = SubTree_::API.application_kernel.
+        silo( :file_coverage ).model_class::Actions::File_Coverage.
+          new MOCK_BOUNDISH_, & handle_event_selectively
+
+      bnd.instance_variable_set :@test_file_patterns, TEST_FILE_PATTERNS_
+      @__bound__ = bnd
+      yield
+      @result = bnd.__find_the_test_directory
+      NIL_
+    end
+
+    def path path
+      @__bound__.instance_variable_set :@path, path
+      NIL_
+    end
+
+    def max_num_dirs d
+      @__bound__.instance_variable_set :@max_num_dirs, d
+      NIL_
+    end
+
+    # ~ test assertion
+
+    def expect_that_the_root_is_found
+
+      _s = @__bound__.instance_variable_get( :@test_dir )
+      TEST__ == _s[ - TEST__.length .. -1 ] or fail
+      expect_succeeded
+    end
+  end
+end

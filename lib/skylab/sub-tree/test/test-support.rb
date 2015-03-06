@@ -31,7 +31,8 @@ module Skylab::SubTree::TestSupport
     end
 
     def fixture_tree sym
-      TS_.dir_pathname.join( "fixture-trees/#{ sym.id2name.gsub UNDERSCORE_, DASH_ }" ).to_path
+      TS_.dir_pathname.join(
+        "fixture-trees/#{ sym.id2name.gsub UNDERSCORE_, DASH_ }" ).to_path
     end
 
     def subject_API

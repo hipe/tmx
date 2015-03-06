@@ -170,7 +170,7 @@ module Skylab::Snag
         def lookup
           @config = @API_client
           @did_fail = false
-          surrounding_path = bld_walk.find_any_nearest_file_pathname
+          surrounding_path = bld_walk.find_any_nearest_surrounding_path
           if @did_fail
             @no_p[ @ev ]
           else

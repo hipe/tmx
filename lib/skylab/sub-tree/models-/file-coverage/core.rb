@@ -4,9 +4,41 @@ module Skylab::SubTree
 
     Actions = ::Module.new
 
+    class << self
+      def is_silo
+        true
+      end
+    end  # >>
+
+    class Silo_Daemon
+      def initialize kr, mc
+        @kernel = kr
+        @model_class = mc
+      end
+      attr_reader :model_class
+    end
+
     class Actions::File_Coverage < Action_
 
       @is_promoted = true
+
+      def initialize( * )
+        @be_verbose = false  # placeholder
+        super
+      end
+
+      def __find_the_test_directory  # assume @max_num_dirs and @path
+
+        @test_dir = File_Coverage_::Actors_::Find_the_test_directory.with(
+
+          :filenames, FILENAMES___,
+          :start_path, @path,
+          :be_verbose, @be_verbose,
+          :max_num_dirs_to_look, @max_num_dirs,
+          & handle_event_selectively )
+
+        @test_dir && ACHIEVED_
+      end
 
   if false
 
@@ -178,5 +210,12 @@ module Skylab::SubTree
   end
 
     end
+
+    Autoloader_[ Actors_ = ::Module.new ]
+
+    File_Coverage_ = self
+
+    FILENAMES___ = SubTree_::Lib_::Test_dir_name_a[]
+
   end
 end

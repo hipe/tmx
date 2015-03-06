@@ -118,7 +118,7 @@ module Skylab::SubTree::TestSupport::Models_Files
         └── one
             ├── foo.rb
             └── test
-                └── foo_spec.rb
+                └── foo_speg.rb
       HERE
 
       _act.should eql _exp

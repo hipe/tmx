@@ -44,7 +44,10 @@ module Skylab::Snag
       end
 
       def pth x
-        Snag_.lib_.pretty_path x.to_path
+        if x.respond_to? :to_path
+          x = x.to_path
+        end
+        Snag_.lib_.pretty_path x
       end
 
       def val x

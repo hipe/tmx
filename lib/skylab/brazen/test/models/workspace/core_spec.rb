@@ -20,7 +20,7 @@ module Skylab::Brazen::TestSupport::Models::Workspace
       expect_OK_event :resource_not_found do |ev|
         ev_ = ev.to_event
         ev_.num_dirs_looked.should eql 1
-        ev_.start_pathname.should eql @ws_tmpdir
+        ev_.start_path.should eql @ws_tmpdir.to_path
       end
       expect_succeeded
     end

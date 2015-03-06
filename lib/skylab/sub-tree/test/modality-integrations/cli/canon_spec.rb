@@ -1,6 +1,12 @@
-require_relative 'core'
+require_relative 'test-support'
 
 module Skylab::SubTree::TestSupport::Modality_Integrations::CLI
+
+  if ! const_defined?( :Expect_expression )
+    require_relative 'core'  # this must be conditional because our own
+    # autoloader doesn't require files it loads them. sometimes the subject
+    # node is already loaded (but not yet required) when we get to this point
+  end
 
   describe "[st] modality integration - CLI - canon" do
 
