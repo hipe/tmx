@@ -27,7 +27,7 @@ module Skylab::TestSupport
 
         @__sout_serr_expectation__ = bld_sout_serr_expectation_via_iambic x_a, & p
 
-        __sout_serr_actual_stream_is_resolved__.nil? and rslv_sout_serr_actual_stream
+        @__sout_serr_is_baked__ ||= _bake_sout_serr
 
         __send__ @__sout_serr_expectation__.method_name
       end
@@ -42,11 +42,11 @@ module Skylab::TestSupport
         Expectation__
       end
 
-      def rslv_sout_serr_actual_stream
-        @__sout_serr_actual_stream_is_resolved__ = true
+      def _bake_sout_serr
         @__sout_serr_actual_stream__ = Callback_::Iambic_Stream.via_array(
           build_baked_em_a )
-        nil
+
+        true
       end
 
       def build_baked_em_a  # :+#hook-near #universal
@@ -57,7 +57,7 @@ module Skylab::TestSupport
 
       def expect_maybe_a_blank_line
 
-        __sout_serr_actual_stream_is_resolved__.nil? and rslv_sout_serr_actual_stream
+        @__sout_serr_is_baked__ ||= _bake_sout_serr
 
         st = @__sout_serr_actual_stream__
         if st.unparsed_exists and NEWLINE_ == st.current_token.string
@@ -68,7 +68,7 @@ module Skylab::TestSupport
 
       def expect_no_more_lines
 
-        __sout_serr_actual_stream_is_resolved__.nil? and rslv_sout_serr_actual_stream
+        @__sout_serr_is_baked__ ||= _bake_sout_serr
 
         if @__sout_serr_actual_stream__.unparsed_exists
           _x = @__sout_serr_actual_stream__.current_token
@@ -86,6 +86,9 @@ module Skylab::TestSupport
       end
 
       def get_string_for_contiguous_lines_on_stream sym
+
+        @__sout_serr_is_baked__ ||= _bake_sout_serr
+
         io = TestSupport_::Library_::StringIO.new
         st = _sout_serr_stream_for_contiguous_lines_on_stream sym
         em = st.gets
@@ -184,7 +187,6 @@ module Skylab::TestSupport
       end
     public
 
-      attr_reader :__sout_serr_actual_stream_is_resolved__
 
       attr_reader :__sout_serr_default_stream_symbol__
     end

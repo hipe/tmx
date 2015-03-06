@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class CLI
 
-    class Expression_Agent__
+    class Expression_Agent
 
       class << self
 
@@ -101,15 +101,15 @@ module Skylab::Brazen
       end
       DIR_SEP___ = ::File::SEPARATOR.getbyte 0
 
-      def render_prop_as_option prop
+      def render_property_as__option__ prop
         "--#{ prop.name.as_slug }"
       end
 
-      def render_prop_as_argument prop
+      def render_property_as__argument__ prop
         "<#{ prop.name.as_slug }>"
       end
 
-      def render_prop_as_environment_variable prp
+      def render_property_as__environment_variable__ prp
         @partitions.adapter.environment_variable_name_string_via_property prp
       end
 
@@ -138,7 +138,7 @@ module Skylab::Brazen
       Singleton_instance__ = Callback_.memoize do
         _partitions = LIB_.proxy_lib.
           inline :rendering_method_name_for_property, -> prp do
-            :render_prop_as_unknown
+            :render_property_as_unknown
           end
 
         new _partitions

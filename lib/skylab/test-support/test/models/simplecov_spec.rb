@@ -13,7 +13,7 @@ module Skylab::TestSupport::TestSupport::Models
       }/bin/tmx-test-support"
 
       _exe_ = TestSupport_.dir_pathname.join(
-        'test/executable-fixtures/for-simplecov.rb'
+        'test/fixture-executables/for-simplecov.rb'
       ).to_path
 
       sys = TestSupport_.lib_.system

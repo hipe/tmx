@@ -1,6 +1,5 @@
 # what is the deal with expression agents? :[#052]
 
-
 in simplest terms the expression agent is the context in which your UI
 strings are evaluated to be rendered for your particular modality.
 
@@ -77,6 +76,12 @@ for your business concerns.
 + `lbl` - render a label for the property field of a business entity.
           this tag will probably be subsumed by `par`.
 
++ `omg` - very legacy. "style an error with excessive & exuberant emphasis"
+          like `ick` but more emphatic, e.g renderd in red in CLI. eew.
+
++ `or_` - described at `and_`
+
+
 + `par` - render a parameter name given a symbol. allows you to
           reference it by symbolic name without needing to know what its
           surface manifestation is in the particular modality.  for e.g.,
@@ -85,11 +90,6 @@ for your business concerns.
           arguments (or as environment variables!) appropriately.
           this tag will probably subsume `lbl`.
           the (somewhat demanding) logic for this is tracked by [#hl-036].
-
-+ `omg` - very legacy. "style an error with excessive & exuberant emphasis"
-          like `ick` but more emphatic, e.g renderd in red in CLI. eew.
-
-+ `or_` - described at `and_`
 
 + `pth` - for security-ish reasons as well as aesthetics: when rendering
           to many more porcelain-y contexts it looks too detailed to
@@ -220,7 +220,9 @@ made public (this can be done in only a few lines of dark hackery).
 
 the above said, we so far have only developed expression agents for two
 classes of application: those variously of the API and CLI variety. (of
-course, there exist on the big board hopes to target other modalities.)
+course, there exist on the big board hopes to target other modalities,
+an effort that require a fundamental reworking of some of the above
+assumptions, but will hopefully allow us to retain its same spirit.)
 
 [..]
 
@@ -284,9 +286,9 @@ at the end of there name - as a reminder that they are deprecated.
 
 
 
-## notes
+## case studies & notes
 
-### :#note-br-10
+### :#note-br-10, :#point-10
 
 using the expression agent singleton is for hacks and one-offs. the
 expression agent has a long-running NLP agent holds state of the speech
@@ -298,3 +300,38 @@ to fail flickeringly and in a manner hard to track down.
 we intentionally do not offer any cache clearing facilities: this would
 be a step in the wrong direction. in a mature application each action will
 create its own expression agent instance.
+
+
+
+
+### :#case-study-st-2: when to subclass expression agents
+
+the more important questions is "when *not* to?" and the answer is
+"usually.": the expression agent is the one component that we have no
+qualms about "duplication" efforts over across applications: the kinds
+of styles the application will need to express stem from the semantic
+categories it expresses itself through, and these semantics categories
+stem from the business concerns of the particular application.
+
+the subject expag is a :+#frontier node pushing forward the expag as a
+gateway into the broader possibilites of per-model modality adapters,
+which itself should be thought of as a gateway to not doing this..
+
+we want our business actions written for The Common Modality to be able
+to express its events as data divorced from presentation.
+
+the semi-generated target modality application adapter should be able to
+render this data (received as "line-items") in a form appropriate for
+the modality, for example a table.
+
+although we (for now) encourage the duplication of efforts of writing
+expags *across* applications, we don't want to duplicate efforts within
+them. however, it is a smell in the other direction to make monolithic
+spaghetti expags that serve all purposes for all actions of all models
+within the application. for this reason we have made this per-model
+expag subclass.
+
+disjoint thoughts:
+
+  + the procedurally generated action modality adapter should ultimately
+    query the constant graph for customized expags.

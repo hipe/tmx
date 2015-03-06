@@ -1,68 +1,155 @@
 module Skylab::SubTree
 
-  class API::Actions::My_Tree::Extensions_
+  module API
 
-    SubTree_::Library_.touch :Shellwords
+    module SubTree_::Models_::Files
 
-    class Line_Count_
+      class Extensions_::Line_Count
 
-      Entity_[ self, :properties, :local_normal_name, :infostream, :verbose ]
-
-      attr_reader :local_normal_name
-
-      def is_post_notifiee
-        true
-      end
-
-      def post_notify row_a
-        leaves = row_a.reduce [] do |m, row|
-          (( lf = row.any_leaf )) or next m
-          m << lf
+        def initialize trio, & oes_p
+          @on_event_selectively = oes_p
+          @trio = trio
         end
-        cmd = "wc -l #{ leaves.map { |lf| lf.input_line.shellescape } * SPACE_ }"
-        @verbose.volume.nonzero? and @infostream.puts cmd
-        _, o, e, w = SubTree_::Library_::Open3.popen3 cmd
-        if (( err = e.read )) && EMPTY_S_ != err
-          o.read  # toss
-          es = w.value.exitstatus
-          @infostream.puts "(find (existatus #{ es }) wrote to #{
-            }errstream - #{ err })"
-        else
-          mutate_leaves_with_find_results leaves, o, w
+
+        def is_collection_operation
+          true  # see [#006]:#collection-operations. execute this extension
+          # post-pass, processing all the items at once which a) lets us take
+          # only one trip to the system instead of N and b) may allow us to
+          # line up our results nicely into columns for some modalities.
         end
-        nil
-      end
 
-    private
-
-      def mutate_leaves_with_find_results leaves, o, w
-        h = prepare_find_results leaves, o, w
-        leaves.each do |lf|
-          d = h.fetch lf.input_line
-          lf.add_attribute :line_count, d
-          lf.add_subcel "#{ d } line#{ 's' if 1 != d }"
+        def local_normal_name
+          @trio.name_symbol
         end
-        nil
-      end
 
-      def prepare_find_results leaves, o, w
-        h = { } ; prev_line = o.gets  # edge cases - there might be a file
-        while true  # called `total`, there might be only 1 file
-          if ! (( line = o.gets ))
-            h.length.nonzero? and break
-            stop = true
+        def receive_collection_of_mutable_items row_a
+
+          _ok = __resolve_command_string_array row_a
+          _ok && __execute_command
+        end
+
+        def __resolve_command_string_array row_a
+
+          @leaf_a = row_a.reduce [] do | m, row |
+            lf = row.any_leaf
+            lf or next m
+            lf.input_line or next  # safeguard
+            m.push lf
+            m
           end
-          md = RX_.match prev_line
-          h[ md[ :file ] ] = md[ :num_lines ].to_i
-          stop and break
-          prev_line = line
+
+          if @leaf_a.length.zero?
+            __TODO_when_no_leafs
+          else
+
+            cmd_s_a = [ 'wc', '-l', * ( @leaf_a.map do | lf |
+              lf.input_line  # you must not shellescape: no shell used
+            end ) ]
+
+            @on_event_selectively.call :info, :wordcount_command do
+              __build_wordcount_command_event cmd_s_a
+            end
+
+            @cmd_s_a = cmd_s_a
+            ACHIEVED_
+          end
         end
-        es = w.value.exitstatus
-        @verbose.volume.nonzero? and @infostream.puts "(find exitstatus #{es})"
-        h
+
+        def __build_wordcount_command_event s_a
+
+          Callback_::Event.inline_neutral_with :wordcount_command,
+
+              :s_a, s_a do | y, o |
+
+            _s_a = o.s_a.map( &
+              SubTree_::Library_::Shellwords.method( :shellescape ) )
+
+            y << "wordcount command: #{ _s_a * SPACE_ }"
+          end
+        end
+
+        def __execute_command
+
+          _, o, e, t = SubTree_::Library_::Open3.popen3( * @cmd_s_a )
+
+          s = e.read
+          if s && s.length.nonzero?
+            __when_command_in_system_error s, o, e, t
+          else
+            __mutate_leaves_with_find_results o, t
+          end
+        end
+
+        def __when_command_in_system_error s, o, e, t
+
+          o.read  # toss
+          d = t.value.exitstatus
+
+          @on_event_selectively.call :error, :expression, :find do | y |
+            y << "(find (exitstatus #{ d }) wrote to errstream - #{ s })"
+          end
+          UNABLE_
+        end
+
+      private
+
+        def __mutate_leaves_with_find_results  o, t
+
+          h = __build_find_results o, t
+
+          @leaf_a.each do | lf |
+
+            d = h.fetch lf.input_line
+
+            lf.add_attribute :line_count, d
+
+            lf.add_subcel "#{ d } line#{ 's' if 1 != d }"  # etc
+          end
+
+          ACHIEVED_
+        end
+
+        def __build_find_results o, t
+
+          h = {}
+          prev_line = o.gets  # edge cases: there might be
+            # a file caled `total`, there might be only one file
+
+          begin
+
+            line = o.gets
+            if ! line
+              h.length.zero? or break
+              stop = true
+            end
+
+            md = RX___.match prev_line
+
+            h[ md[ :file ] ] = md[ :num_lines ].to_i
+
+            stop and break
+            prev_line = line
+            redo
+          end while nil
+
+          d = t.value.exitstatus
+          if d.zero?
+
+            @on_event_selectively.call :info, :expression, :find_exitstatus do | y |
+              y << "(find exitstatus #{ d })"
+            end
+          else
+            @on_event_selectively.call :error, :expression, :find_exitstatus do | y |
+              y << "(find exitstatus #{ d })"
+            end
+          end
+
+          h
+        end
+
+        RX___ = /\A[ ]*(?<num_lines>\d+)[ ]+(?<file>[^ \n].*[^\n])\n?\z/
+
       end
-      #
-      RX_ = /\A[ ]*(?<num_lines>\d+)[ ]+(?<file>[^ \n].*[^\n])\n?\z/
     end
   end
 end

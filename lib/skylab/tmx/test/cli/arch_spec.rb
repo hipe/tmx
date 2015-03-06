@@ -111,7 +111,7 @@ module Skylab::TMX::TestSupport::CLI::Arch
     def expect_hello
       a = lines[ :err ]
       line = a.fetch( 0 )
-      expect = "hello from #{ self.class.with_value.to_s.gsub( '_', ' ' ) }."
+      expect = "hello from #{ self.class.with_value.to_s.gsub( UNDERSCORE_, SPACE_ ) }."
       line.should eql( expect )
       a.length.should eql( 1 )
     end

@@ -1,12 +1,12 @@
 # encoding: utf-8
 
-require_relative '../../../test-support'  # #change-this-at-step:8
+require_relative 'test-support'
 
-module Skylab::SubTree::TestSupport
+module Skylab::SubTree::TestSupport::Models_Files::The_CLI_Modality
 
   # <-
 
-describe "[st] API actions my-tree", wip: true do
+describe "[st] models - files - modalities - CLI - expression" do
 
   extend TS_
 
@@ -18,7 +18,7 @@ describe "[st] API actions my-tree", wip: true do
       a/f
     HERE
 
-    makes <<-HERE
+    make <<-HERE
       a
       ├── b
       │   ├── c
@@ -38,7 +38,7 @@ describe "[st] API actions my-tree", wip: true do
       x/y/z
     HERE
 
-    makes <<-HERE
+    make <<-HERE
       a
       └── b
           ├── c
@@ -60,7 +60,7 @@ describe "[st] API actions my-tree", wip: true do
       a
     HERE
 
-    makes <<-HERE
+    make <<-HERE
       a
     HERE
 
@@ -78,7 +78,7 @@ describe "[st] API actions my-tree", wip: true do
       document/foot
     HERE
 
-    makes <<-HERE
+    make <<-HERE
       document
       ├── head
       ├── body

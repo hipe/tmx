@@ -29,6 +29,36 @@ describe "[st] CLI actions cov", wip: true do
     @emit_spy.emission_a.length.zero? or fail "expected no more lines"
   end
 
+  # (the following two are moved in here from a higher node. unintegrated)
+
+  it "2.2 : `-h rec`       : 1) usage 2) desc 3) opts" do
+    argv '-h', _CMD
+    line.should match(/\Ausage: #{ PN_ } #{ _CMD }/i)
+    line.should match( /^$/ )
+    line.should match(/\Adescription:?\z/i)
+    line.should match(/\A *see crude/i)
+    line.should match(/\A +\*/)
+    line.should match(/\A +\*/)
+    line.should match( /^$/ )
+    line.should match(/\Aoptions:?\z/i)
+    l = line
+    loop do
+      l.should match(/\A  /)
+      l = line or break
+    end
+    names.uniq.should eql( [ :help ] )
+    result.should eql( 0 )
+  end
+
+  it "2.3 : `-h rec more`  : msg / usage / invite" do
+    argv '-h', _CMD, 'wat'
+    line.should match( /\bignoring: "wat"/ )
+    line.should match( /\Ausage: #{ PN_ } / )
+    # ..meh
+    names.uniq.should eql( [ :info, :help ] )
+    result.should eql( 0 )
+  end
+
   it "show a list of matched test files only." do
 
     # cd into lib/skylab and ask about this subproduct itself. (yes this is
@@ -130,7 +160,6 @@ describe "[st] CLI actions cov", wip: true do
   end
 
   false and it "LOOK AT THAT BEAUTIFUL COV TREE" do
-    debug!
     cd SubTree_.dir_pathname.dirname.to_s do
       argv CMD_, RELATIVE_TESTDIR_NO_DOT_
     end

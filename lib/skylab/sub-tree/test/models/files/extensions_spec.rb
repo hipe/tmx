@@ -1,66 +1,98 @@
-require_relative '../../../test-support'  # #change-this-at-step:8
+require_relative 'test-support'
 
-module Skylab::SubTree::TestSupport
+module Skylab::SubTree::TestSupport::Models_Files
 
-  _CROOK = '└──'
-  _TEE = '├──'
-  _UNIT = '[acdehikmnorswy]{1,3}'
+  describe "[st] models - files - extensions" do
 
-    _MTIME = "\\d+ #{ _UNIT }"
-
-  describe "[st] API actions my-tree multi-buffer", wip: true do
+    Callback_.test_support::Expect_event[ self ]
 
     extend TS_
 
-    it "an in-notify extension - `mtime`" do
-      f = start_front.with_parameters :path_a, [ 'one' ], :mtime, true
-      r = nil ; SubTree_::Library_::FileUtils.cd fixtures_dir_pn do
-        r = f.flush
-      end
-      @e.string.should be_empty
-      @a = @o.string.split "\n"
-      line.should eql 'one'
-      glyph_and_rest _TEE, /\Afoo\.rb #{ _MTIME }\z/
-      glyph_and_rest _CROOK, /\Atest\z/
-      glyph_and_rest _CROOK, /\Afoo_spec\.rb #{ _MTIME }\z/
-      expect_no_more_lines
-      r.should eql true
-    end
+    _MTIME = "\\d+ [acdehikmnorswy]{1,3}"
 
-    def glyph_and_rest exp_glyph, rx
-      glyph, rest = line.split SPACE_, 2
-      glyph.should eql exp_glyph
-      rest.should match rx
+    it "an in-notify extension - `mtime`" do
+
+      io = build_string_IO
+      _path = fixture_tree :one
+
+      SubTree_::Library_::FileUtils.cd _path do  # not necessary, just prettier
+
+        call_API :files, :mtime,
+          :path, [ '.' ],
+          :output_stream, io
+      end
+
+      scn = TestSupport_::Expect_Line::Scanner.via_string io.string
+      scn.next_line.should eql ".\n"
+      scn.next_line.should match %r(\A├── foo.rb #{ _MTIME }$)
+      scn.next_line.should match %r(\A└── test$)
+      scn.next_line.should match %r(\A    └── foo_spec\.rb #{ _MTIME }$)
+      scn.next_line.should be_nil
+
+      expect_succeeded
+
     end
 
     it "a multi-buffer extension - `line count`" do
-      f = start_front.with_parameters :path_a, [ 'one' ], :line_count, true
-      r = nil ; SubTree_::Library_::FileUtils.cd fixtures_dir_pn do
-        r = f.flush
+
+      io = build_string_IO
+
+      SubTree_::Library_::FileUtils.cd fixture_tree :one do
+
+        call_API :files, :line_count,
+          :path, [ '.' ],
+          :output_stream, io
       end
-      @e.string.should be_empty
-      a = @o.string.split "\n"
-      a.shift.should eql "one                        "
-      a.shift.should eql "├── foo.rb           1 line"
-      a.shift.should eql "└── test                   "
-      a.shift.should eql "    └── foo_spec.rb  1 line"
-      r.should eql true
+
+      st = _skip_informational_events_and_get_to_table_line_stream
+
+      io.string.should eql EMPTY_S_
+
+      st.gets.should eql ".                          \n"
+      st.gets.should eql "├── foo.rb           1 line\n"
+      st.gets.should eql "└── test                   \n"
+      st.gets.should eql "    └── foo_spec.rb  1 line\n"
+
+      expect_succeeded
     end
 
     it "a in-notify extension and a mutli-buffer extension" do
-      f = start_front.with_parameters :path_a, [ 'one' ], :line_count, true,
-        :mtime, true
-      r = nil ; SubTree_::Library_::FileUtils.cd fixtures_dir_pn do
-        r = f.flush
+
+      io = build_string_IO
+
+      SubTree_::Library_::FileUtils.cd fixture_tree :one do
+
+        call_API :files, :mtime, :line_count,
+          :path, [ '.' ],
+          :output_stream, io
       end
-      @e.string.should be_empty
-      @a = @o.string.split "\n"
-      line.strip.should eql 'one'
-      glyph_and_rest _TEE, /\Afoo\.rb[ ]{2,}#{ _MTIME } 1 line\z/
-      glyph_and_rest _CROOK, /\Atest[ ]{10,}\z/
-      glyph_and_rest _CROOK, /\Afoo_spec\.rb[ ]{2,}#{ _MTIME } 1 line\z/
-      expect_no_more_lines
-      r.should eql true
+
+      io.string.should eql EMPTY_S_
+
+      st = _skip_informational_events_and_get_to_table_line_stream
+
+      st.gets.should match %r(\A\.[ ]+\n\z)
+
+      st.gets.should match %r(\A├── foo\.rb[ ]+#{ _MTIME } 1 line\n\z)
+
+      st.gets.should match %r(\A└── test[ ]+\n\z)
+
+      st.gets.should match %r(\A    └── foo_spec\.rb  #{ _MTIME } 1 line\n\z)
+
+      st.gets.should be_nil
+
+      expect_succeeded
+    end
+
+    def _skip_informational_events_and_get_to_table_line_stream
+
+      @ev_a[ 0 .. -2 ] = EMPTY_A_  # HACK: skip any informationals here
+
+      ev = expect_neutral_event :result_table
+
+      ev and begin
+        Callback_::Stream.via_nonsparse_array black_and_white_lines ev
+      end
     end
   end
 end

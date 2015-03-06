@@ -16,7 +16,7 @@ module Skylab::SubTree
           y << "hello from #{ em kr.app_name }."
         end
 
-        :_hello_from_sub_tree_
+        :hello_from_sub_tree
       end
     end
 

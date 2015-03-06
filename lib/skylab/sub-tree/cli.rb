@@ -2,237 +2,160 @@ require_relative 'core'
 
 module Skylab::SubTree
 
-  class CLI
+  class CLI < SubTree_.lib_.brazen::CLI
 
-    # hack thru #hook-in for [fa] (tmx integration)
+    Brazen_ = SubTree_.lib_.brazen
 
+    # ~ begin #hook-out for [tmx] integration
+
+    Client = self
     module Adapter
       module For
         module Face
           module Of
-            Hot = -> ns_sheet, _me do
-              -> strange_kernel, my_slug do
+            Hot = -> x, x_ do
 
-                # transitional blood, #change-this-at-step:8 (or 10)
-
-                fml = strange_kernel.instance_variable_get :@parent_services
-
-                _invocation_name = "#{ fml.program_name } #{ my_slug }"
-
-                CLI_.new( fml.istream, fml.ostream, fml.estream, _invocation_name )
-              end
+              Brazen_::CLI::Client.fml SubTree_, x, x_
             end
           end
         end
       end
     end
 
-    # ~ begin hax for superficial, stubby pinging #change-this-at-step:8 (or 10)
-
-    def initialize _sin, sout, serr, invo_s
-      @serr = serr
-      @sout = sout
-      @invo_s = invo_s
-    end
-
-    def pre_execute
-      ACHIEVED_
-    end
-
-    def invokee
-      self
-    end
-
-    def invoke argv
-      [ "ping" ] == argv or self._HELFF
-      @serr.puts "hello from sub tree."
-      :hello_from_sub_tree
-    end
-
     # ~ end
 
-    if false  # #change-at-step-8 (or 10)
+    class << self
 
-    Callback_[ self, :employ_DSL_for_digraph_emitter ]  # do this before you extend
-      # legacy, it gives you a graph
+      def new * a
+        new_top_invocation a, SubTree_
+      end
+    end  # >>
 
-    listeners_digraph event: :all
-
-    def initialize( * )
-      @local_iambic = []
-      super
+    def produce_app_kernel
+      SubTree_::API::Kernel.new SubTree_
     end
 
-  private
+    module Actions
 
-    def get_services
-      Client_Services_.new self
+      class Files < CLI::Action_Adapter
+
+        def resolve_properties
+
+          # :+[#br-021]:#the-first-case-study, #note-st-1 #BUMF
+
+          bbx = @bound.formal_properties.to_mutable_box_like_proxy
+
+          fbx = bbx.dup
+
+          prp = fbx.remove :input_stream
+
+          bbx.replace :input_stream, prp.new_with_default { @resources.sin }
+
+          prp = fbx.remove :output_stream
+
+          bbx.replace :output_stream, prp.new_with_default { @resources.sout }
+
+          @bound.change_formal_properties bbx
+
+          @back_properties = bbx
+          @front_properties = fbx
+
+          # do not super. it's not what you want
+
+          nil
+        end
+      end
     end
 
-    Client_Services_ = SubTree_.lib_.iambic :emit_proc, -> { method :call_digraph_listeners },
-          :instream, -> { some_upstream },
-          :errstream, -> { some_infostream },
-          :outstream, -> { some_paystream }
+    class Expression_Agent
 
-  public
+      def initialize parti
+        @partitions = parti
+      end
 
-    def pen
-      SubTree_.lib_.CLI_pen
-    end
+      alias_method :calculate, :instance_exec
 
-  private
+      attr_writer :current_property
 
-    def expression_agent
-      self.class.expression_agent
-    end
+    private
 
-    -> do
-      p = -> do
-        class Expression_Agent__
-          def initialize _ ; end
-          alias_method :calculate, :instance_exec
-        private
-          SubTree_.lib_.EN_add_methods self, :private, %i( s )
-          o = LIB_.CLI_lib.pen.stylify.curry
-          define_method :em, o[ %i( green ) ]
-          define_method :escape_path, LIB_.pretty_path_proc
-          define_method :ick, LIB_.strange_proc.curry[ 60 ]
-        public
-          def stylize * a
-            SubTree_.lib_.CLI_lib.pen.stylify a, a.pop
+      lib = SubTree_.lib_
+
+      # ~ classifications for visual styling
+
+      sty = lib.CLI_lib.pen.stylify.curry
+
+      def code s
+        "'#{ s }'"
+      end
+
+      def em s
+        _strong s
+      end
+
+      def escape_path s
+        # define_method :escape_path, lib.pretty_path_proc
+        s
+      end
+
+      def hdr s
+        _strong s
+      end
+
+      define_method :ick, lib.strange_proc.curry[ 60 ]
+
+      def par_via_sym sym
+
+        if @partitions
+          cat_sym, prp = @partitions.category_symbol_and_property_via_name_symbol sym
+        end
+
+        _par prp, cat_sym, sym
+      end
+
+      def par prp
+
+        if @partitions
+          cat_sym, = @partitions.category_symbol_and_property_via_name_symbol( prp.name_symbol )
+        end
+
+        _par prp, cat_sym, prp.name_symbol
+      end
+
+      def _par prp, cat_sym, sym
+
+        if cat_sym
+
+          send @partitions.rendering_method_name_for_property_category_name_symbol( cat_sym ), prp
+
+        else
+          _ = if prp
+            prp.name.as_slug
+          else
+            sym.id2name.gsub UNDERSCORE_, DASH_
           end
-        end
-        r = Expression_Agent__.method :new ; p = -> { r } ; r
-      end
-      define_singleton_method :expression_agent,
-        Lib_::Touch_const_reader[
-          true, p[], :EXPRESSION_AGENT__, self, :_no_arg_ ]
-    end.call
-
-  public
-
-    # --*--                         DSL ZONE                              --*--
-
-
-    LIB_.CLI_DSL self
-
-    desc "inspired by unix builtin `tree`"
-    desc "but adds custom features geared towards development"
-
-    option_parser do |o|
-      front = my_tree_front
-      front.with_properties( :param_h, @param_h, :expression_agent,
-        SubTree_.lib_.field_front_expression_agent(
-          front.field_box, LIB_.stock_API_expression_agent ) )
-      front.write_option_parser_to o ; nil
-    end
-
-    argument_syntax '[<path> [..]]'
-
-    def my_tree *path, _
-      i, o, e = @three_streams_p[]
-      f = my_tree_front
-      if path.length.zero?
-        path << ( ::Dir.pwd if i.tty? && ! @param_h[ :file ] )  # yes nil
-      end
-      @param_h[ :path_a ] = path
-      f.with_properties :upstream, i, :paystream, o, :infostream, e,
-        :program_name, @legacy_last_hot.normalized_invocation_string
-      r = f.flush
-      if false == r
-        @legacy_last_hot.invite
-        exitstatus_for_error
-      else
-        exitstatus_for_normal
-      end
-    end
-
-  private
-
-    def my_tree_front
-      @my_tree_front ||= SubTree_::API::Actions::My_Tree.new
-    end
-
-  public
-
-    desc "(\"sub-tree\") from <in-dir> copy the files in <list> to <out-dir>. always safe."
-
-    option_parser do |o|
-      o.on '-F', '--force', 'to confirm clobbering existing files' do
-        @param_h[:do_force] = true
-      end
-    end
-    argument_syntax '<in-dir> <out-dir> <list>'
-
-    def st in_dir, out_dir, list, param_h
-      SubTree_::API::Actions::Sub_Tree.new( :err, some_infostream,
-        :is_dry_run, false, :do_force, param_h[:do_force],
-        :in_dir, in_dir, :out_dir, out_dir, :list, list ).execute
-    end
-
-    option_parser do |o|
-      pn = -> { @program_name }
-      clr = -> x { hdr x }
-
-      o.separator "#{ hdr 'stdin usage:' }"
-      o.separator "   or: <git-command> | #{ pn[] } <prefix>"
-      o.separator EMPTY_S_
-      o.separator "#{ hdr 'typical usage:' }"
-      o.separator "    #{ clr[ "git diff --numstat HEAD~1 | #{ pn[] } lib/skylab" ] }"
-      o.separator EMPTY_S_
-      o.separator "#{ hdr 'options:' }"
-
-      o.on '-- HEAD[~N]', 'will become `git diff HEAD~<n> --numstat' do |x|
-        old = @param_h[ :mode_a ]
-        @param_h[ :mode_a ] = [ :git_diff, x ]
-        if old
-          call_digraph_listeners :error_string, "(clobbering \"#{ old.last }\")"
+          "«#{ _ }»"  # :+#guillemets
         end
       end
 
-    end
-
-    desc( -> do
-      p = -> do
-        SubTree_::API::Actions::Dirstat.get_desc
+      def render_property_as__option__ prp
+          "'--#{ prp.name.as_slug }'"
       end
-      p.singleton_class.send :alias_method, :to_s, :call
-      p
-    end.call )
 
-    argument_syntax '<prefix> [<file>]'
-
-    def dirstat prefix, file=nil, _par_h
-      a = parse_dirstat( prefix, file ) and execute_dirstat a
-    end
-
-  private
-
-    def parse_dirstat prefix, file
-      @param_h[ :prefix ] = prefix
-      if file && (( x = @param_h[ :mode_a ] ))
-        bork "can't have both <file> and \"#{ x.last }\""
-      else
-        file and @param_h[ :mode_a ] = [ :file, file ]
-        @param_h.reduce( [] ) { |m, (k, v)| m << k << v }
+      def render_property_as__argument__ prp
+        "<#{ prp.name.as_slug }>"
       end
+
+      define_method :_strong, sty[ %i( green ) ]
+
+      # ~ EN NLP
+
+      lib.EN_add_methods self, :private, %i( s )
+
     end
 
-    def execute_dirstat a
-      SubTree_::API::Actions::Dirstat.new(
-        :sin, @instream, :sout, @paystream, :serr, @errstream,
-        :program_name, @legacy_last_hot.send( :normalized_invocation_string ),
-        * a
-      ).execute
-    end
 
-    def bork msg
-      call_digraph_listeners :error_string, msg
-      invite
-      nil
-    end
-
-  public
+    if false  # #change-this-at-step:10
 
     desc "see crude unit test coverage with a left-right-middle filetree diff"
     desc "  * test files with corresponding application files appear as green."
@@ -303,24 +226,7 @@ module Skylab::SubTree
       end
       res
     end
-
-    desc "performs a ping."
-
-    def ping
-      call_digraph_listeners :info, "hello from sub tree."
-      :hello_from_sub_tree
     end
-
-    dsl_off
-
-    module Actions
-      Autoloader_[ self ]
-    end
-
-    end
-
-    CLI_ = self
-
-    Client = self  # #comport:tmx
   end
 end
+# :+#tombstone: 'sub-tree' is explained

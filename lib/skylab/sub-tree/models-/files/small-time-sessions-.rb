@@ -1,31 +1,78 @@
 module Skylab::SubTree
 
-  class API::Actions::My_Tree
+  module API
 
-    class Render_table_ < LIB_.struct( :paystream, :row_a )
+    module SubTree_::Models_::Files
 
-      LIB_.funcy_globful self
+      Small_Time_Sessions_ = ::Module.new
 
-      def execute
-        row_a = [ ]
-        @row_a.each do |row|
-          g_a, slug, any_leaf = row.to_a
-          cel_a = [ ]
-          cel_a << "#{ "#{ g_a * SPACE_ } " if g_a.length.nonzero? }#{
-            }#{ slug }"
-          cel_a << ( if any_leaf
-            (( fs = any_leaf.any_free_cel )) ? "  #{ fs }" : EMPTY_S_
-          else EMPTY_S_ end )
-          row_a << cel_a
+      class Small_Time_Sessions_::Perform_aggregate_find
+
+        Callback_::Actor.call self, :properties,
+          :paths, :pattern
+
+        class << self
+          def new_with * x_a, & oes_p  # :+[#ca-063]
+            new do
+              @on_event_selectively = oes_p
+              process_iambic_fully x_a
+            end
+          end
+        end  # >>
+
+        def produce_upstream
+          _ok = __resolve_command
+          _ok && __via_command_produce_upstream
         end
-        SubTree_::Lib_::CLI_table[
-          :field, :id, :glyphs_and_slug, :left,
-          :field, :id, :xtra, :left,
-          :show_header, false,
-          :left, EMPTY_S_, :sep, EMPTY_S_, :right, "\n",
-          :read_rows_from, row_a,
-          :write_lines_to, @paystream ]
-        nil
+
+        def __resolve_command
+
+          if @pattern
+            _pattern_part = [ :filename, @pattern ]
+          end
+
+          @cmd_o = SubTree_.lib_.system.filesystem.find(
+            :paths, @paths,
+            * _pattern_part,
+            :freeform_query_infix_words, %w'-type file',
+            :as_normal_value, IDENTITY_, & @on_event_selectively )
+
+          @cmd_o && ACHIEVED_
+        end
+
+        def __via_command_produce_upstream
+
+          i, o, e, @thread = SubTree_::Library_::Open3.popen3( * @cmd_o.args )
+          i.close
+          s = e.read
+          if s && s.length.nonzero?
+            o.close
+            __when_errput s
+          else
+            e.close
+            o
+          end
+        end
+
+        attr_reader :thread
+
+        def __when_errput s
+
+          s.chomp!
+
+          @on_event_selectively.call :error, :find_error do
+
+            Callback_::Event.inline_not_OK_with :find_error,
+
+                :msg, s,
+                :exitstatus, @thread.value.exitstatus do | y, o |
+
+              y << "#{ o.msg } (exitstatus: #{ o.exitstatus })"
+            end
+          end
+
+          UNABLE_
+        end
       end
     end
   end

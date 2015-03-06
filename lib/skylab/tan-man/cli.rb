@@ -8,8 +8,8 @@ module Skylab::TanMan
       end
     end  # >>
 
-    def resolve_app_kernel
-      @app_kernel = TanMan_::API.application_kernel ; nil
+    def produce_app_kernel
+      TanMan_::API.application_kernel
     end
 
     # ~ experimental front client customizations:
@@ -69,7 +69,7 @@ module Skylab::TanMan
 
     # ~ could go away:
 
-    class Expression_Agent__
+    class Expression_Agent
 
       def initialize partitions
         @kernel = partitions.adapter.application_kernel
@@ -172,21 +172,23 @@ module Skylab::TanMan
       end
     end
 
-    module Client  # ~ #hook-out for [tmx] integration
-      module Adapter
-        module For
-          module Face
-            module Of
-              module Hot
-                def self.[] kernel, token
-                  Brazen_::CLI::Client::Adapter::For::Face::Of::Hot::Maker.
-                    new( TanMan_ ).make_adapter( kernel, token )
-                end
-              end
+    # ~ begin #hook-out for [tmx] integration
+
+    Client = self
+    module Adapter
+      module For
+        module Face
+          module Of
+            Hot = -> x, x_ do
+
+              Brazen_::CLI::Client.fml TanMan_, x, x_
             end
           end
         end
       end
     end
+
+    # ~ end
+
   end
 end

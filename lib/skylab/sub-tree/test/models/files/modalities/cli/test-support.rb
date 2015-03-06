@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::SubTree::TestSupport::API::Actions::My_Tree::Rendering
+module Skylab::SubTree::TestSupport::Models_Files::The_CLI_Modality
 
-  ::Skylab::SubTree::TestSupport::API::Actions::My_Tree[ TS_ = self ]
+  ::Skylab::SubTree::TestSupport::Models_Files[ TS_ = self ]
 
   include Constants
 
@@ -12,27 +12,52 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree::Rendering
 
   module InstanceMethods
 
-    include Constants
+    include SubTree_::TestSupport::Modality_Integrations::CLI::Expect_expression::Instance_Methods
+
+    define_method :expect, instance_method( :expect )  # because rspec
+
+    # ~ ad-hoc DSL (for one file currently)
 
     def with str
-      @with = str.unindent.chomp
+      _unindent str
+      @paths_string = str
       nil
     end
 
-    def makes str
-      o = TestSupport_::IO.spy(
-        :do_debug_proc, -> { do_debug },
-        :debug_IO, debug_stream )
-      do_debug and o.debug! "s-tdout: "
-      t = SubTree_::API::Actions::My_Tree::Traversal_.new(
-        :out_p, o.method( :puts ),
-        :do_verbose_lines, do_debug,
-        :info_p, ( do_debug and e.method( :puts ) ) )
-      @with.split( "\n" ).each do |s|
-        t.puts s
-      end
-      t.flush
+    def make expect_str
+
+      io = SubTree_::Library_::StringIO.new @paths_string
+      io.rewind
+      @use_this_as_stdin = io
+      local_invoke
+
+      _unindent expect_str
+      get_string_for_contiguous_lines_on_stream( :o ).should eql expect_str
+
+      expect_succeeded
+    end
+
+    def _unindent str
+      str.unindent
       nil
     end
+
+    def local_invoke * argv
+      argv.unshift 'files'
+      invoke_via_argv argv
+    end
+
+    # ~ #hook-outs
+
+    def subject_CLI
+      SubTree_::CLI
+    end
+
+    define_method :invocation_strings_for_expect_expression, -> do
+      a = [ 'stflz' ].freeze
+      -> do
+        a
+      end
+    end.call
   end
 end

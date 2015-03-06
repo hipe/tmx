@@ -2,15 +2,11 @@ require_relative '../../test-support'
 
 module Skylab::SubTree::TestSupport::Models_Tree
 
-  # ~ begin hopping over a would-be test node for "models"
-
   parent = ::Skylab::SubTree::TestSupport
 
   parent.autoloaderize_with_filename_child_node 'models/tree', self
 
   parent[ TS_ = self ]
-
-  # ~ end
 
   include Constants
 

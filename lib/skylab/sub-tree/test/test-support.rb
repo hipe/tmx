@@ -30,12 +30,31 @@ module Skylab::SubTree::TestSupport
       TestSupport_.debug_IO
     end
 
+    def fixture_tree sym
+      TS_.dir_pathname.join( "fixture-trees/#{ sym.id2name.gsub UNDERSCORE_, DASH_ }" ).to_path
+    end
+
     def subject_API
       SubTree_::API
     end
   end
 
   Callback_ = SubTree_::Callback_
+
+  DASH_ = SubTree_::DASH_
+
+  EMPTY_S_ = SubTree_::EMPTY_S_
+
+  UNDERSCORE_ = SubTree_::UNDERSCORE_
+
+  module Constants
+    Callback_ = Callback_
+    DASH_ = DASH_
+    EMPTY_A_ = SubTree_::EMPTY_A_
+    EMPTY_S_ = EMPTY_S_
+    NIL_ = SubTree_::NIL_
+    UNDERSCORE_ = UNDERSCORE_
+  end
 
   NIL_ = nil
 end

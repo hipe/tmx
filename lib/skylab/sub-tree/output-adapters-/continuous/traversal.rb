@@ -76,32 +76,75 @@ module Skylab::SubTree
 
     public
 
+
+      def puts line, extra_x=nil
+
+        # the same as `line.chomp.split( @sep )` but less memory. meh
+
+        a = [] ; d = 0 ; len = line.length ; last = len - 1 ; sep = @sep
+
+        begin
+          d_ = line.index sep, d
+          if d_
+            a.push line[ d ... d_ ]
+            d = d_ + 1
+            redo
+          elsif len.zero?
+            break
+          else
+
+            if NEWLINE_BYTE_ == line.getbyte( last )
+              if last.zero?
+                break
+              end
+              last -= 1
+            end
+
+            a.push line[ d .. last ]
+            break
+          end
+        end while nil
+
+        self.<<( a, extra_x )  # eew
+      end
+
+      NEWLINE_BYTE_ = NEWLINE_.getbyte 0
+
       # <-
 
-    def puts line, extra_x=nil
-      self.<<( line.split( @sep ), extra_a )
-    end
-
     def << a, extra_x=nil
+
       xtra_x = nil
+
       a.reduce [] do |seen_a, s|  # note this effectively skips blank lines!
-        seen_a << s
-        idx = ( 0 ... @curr_a.length ).detect { |i| @curr_a[i] != seen_a[i] }
+
+        seen_a.push s
+
+        idx = ( 0 ... @curr_a.length ).detect do | d |
+          @curr_a[ d ] != seen_a[ d ]
+        end
+
         if idx
           if idx < seen_a.length
             ( @curr_a.length - idx ).times { @curr_a.pop } # pop the curr_a
+
             do_push = true        # stack down to a place where it matches
           end                     # else seen_a is already covered by curr_a
         elsif @curr_a.length != seen_a.length
           do_push = true          # seen_a is one level deeper than curr_a
         end                       # else they are identical
-        extra_x and xtra_x = a.length == seen_a.length ? extra_x : nil
+
+        if extra_x
+          xtra_x = a.length == seen_a.length ? extra_x : nil
+        end
+
         if do_push                # then seen_a is one level under curr_a
-          @curr_a << seen_a.last
+          @curr_a.push seen_a.last
           row seen_a, xtra_x
         else
           xtra_x and fail "sanity - extra info on a redundant row?"
         end
+
         seen_a
       end
       nil
@@ -112,26 +155,38 @@ module Skylab::SubTree
     end
 
     def flush  # to say you are done adding lines
-      row nil ; nil
+      row nil
+      ACHIEVED_
     end
 
   private
 
     def row seen_a, extra_x=nil
+
       if seen_a
+
         @do_verbose_lines and say_row( seen_a, extra_x )
+
         len = seen_a.length
         min_a = ::Array.new len
-        len.zero? or min_a[ -1 ] = Node_.new( seen_a.last, extra_x )
-        @matrix_a << min_a
+
+        if len.nonzero?
+          min_a[ -1 ] = Branch_or_Leaf___.new( seen_a.last, extra_x )
+        end
+
+        @matrix_a.push min_a
         pipe_d = len - 2                       # the imaginary pipe is last nil
         d = @matrix_a.length - 1
+
       else                                     # a flush run
         pipe_d = -1                            # the imaginary pipe would go
         d = @matrix_a.length                   # off the chart
       end
+
       sub_flush d, pipe_d
+
       if @matrix_a.length.nonzero? and @matrix_a.first.first  # if flushable
+
         loop do                                # flush each contiguous row
           @down_p[ @matrix_a.shift ]            # starting from the first one
           @matrix_a.first && @matrix_a.first.first or break
@@ -139,10 +194,11 @@ module Skylab::SubTree
       end
       nil
     end
-    #
-    Node_ = ::Struct.new :slug, :extra_x
+
+    Branch_or_Leaf___ = ::Struct.new :slug, :extra_x
 
     def sub_flush d, pipe_d
+
       while (( d -= 1 )) >= 0                  # from bottom row to top
         cel_a = @matrix_a[ d ]
         crook_d = cel_a.length - 2             # this is where the 'L' would go

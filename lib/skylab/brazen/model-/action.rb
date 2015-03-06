@@ -476,6 +476,13 @@ module Skylab::Brazen
 
       attr_reader :fo, :argument_box
 
+      def any_trueish k
+        x = @argument_box[ k ]
+        x and begin
+          Trio__[].new x, true, @fo.fetch( k )
+        end
+      end
+
       def [] k
         fetch k do end
       end

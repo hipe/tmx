@@ -204,7 +204,10 @@ module Skylab::Brazen
 
         def ad_hoc_section label_s, & p
           section_boundary
-          @y << @expression_agent.hdr( label_s )
+          y = @y
+          @expression_agent.calculate do
+            y << hdr( label_s )
+          end
           p[ self ] ; nil
         end
 
@@ -333,11 +336,19 @@ module Skylab::Brazen
         end
 
         def output_single_line_section hdr_s, line
-          @y << "#{ @expression_agent.hdr hdr_s } #{ line }"
+          y = @y
+          @expression_agent.calculate do
+            y << "#{ hdr hdr_s } #{ line }"
+          end
+          nil
         end
 
         def output_header hdr_s
-          @y << @expression_agent.hdr( hdr_s ) ; nil
+          y = @y
+          @expression_agent.calculate do
+            y << hdr( hdr_s )
+          end
+          nil
         end
 
         # ~ courtesy

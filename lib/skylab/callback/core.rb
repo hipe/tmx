@@ -612,6 +612,10 @@ module Skylab::Callback
       otr.value_x = x
       otr.freeze
     end
+
+    def description  # look good for [#010]
+      "«trio#{ ":#{ @property.name.as_slug }" if @property }»"  # :+#guillemets
+    end
   end
 
   Bound_Call = ::Struct.new :args, :receiver, :method_name do  # volatility order (subjective)
@@ -1934,6 +1938,8 @@ module Skylab::Callback
       mod.const_get x, false
     end
   end
+
+  NIL_ = nil
 
   NILADIC_TRUTH_ = -> { true }
 

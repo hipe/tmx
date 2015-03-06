@@ -72,6 +72,10 @@ module Skylab::TMX
     end
   end
 
+  DASH_ = '-'.freeze
+
+  EMPTY_S_ = ''.freeze
+
   TMX = self  # not 'TMX_', just for aesthetics
 
   # (:+[#su-001]:none)

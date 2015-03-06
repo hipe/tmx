@@ -9,11 +9,11 @@ module Skylab::Brazen
       end
 
       def expression_agent_class
-        CLI_::Expression_Agent__
+        CLI_::Expression_Agent
       end
 
       def expression_agent_instance
-        CLI_::Expression_Agent__.instance
+        CLI_::Expression_Agent.instance
       end
 
       alias_method :new_top_invocation, :new
@@ -49,7 +49,7 @@ module Skylab::Brazen
 
       def invoke argv
         @resources.complete @env || ::ENV, argv
-        resolve_app_kernel
+        __resolve_app_kernel
         resolve_properties
         resolve_partitions
         resolve_bound_call
@@ -61,9 +61,16 @@ module Skylab::Brazen
           @exit_status
         end
       end
+
     private
-      def resolve_app_kernel
-        @app_kernel = @mod.const_get( :Kernel_, false ).new @mod ; nil
+
+      def __resolve_app_kernel
+        @app_kernel = produce_app_kernel
+        nil
+      end
+
+      def produce_app_kernel  # :+#public-API #hook-in
+        @mod.const_get( :Kernel_, false ).new @mod
       end
 
     public
@@ -128,7 +135,7 @@ module Skylab::Brazen
       end
 
       def expression_agent_class
-        self.class.const_get :Expression_Agent__, false
+        self.class.const_get :Expression_Agent, false
       end
 
     private
@@ -295,9 +302,7 @@ module Skylab::Brazen
         # a model instance just querying its child consts, or maybe it is an
         # arbitrary kernel doing something else, you neither know nor care.
 
-        _st = bound_action.to_unbound_action_stream
-
-        _st.map_by do | unbound |
+        bound_action.to_unbound_action_stream.map_by do | unbound |
 
           _adapter_via_unbound unbound
 
@@ -1216,23 +1221,44 @@ module Skylab::Brazen
 
     public
 
-      def rendering_method_name_for_property prop  # for expag
-        category_i, = lookup_property prop
-        :"render_prop_as_#{ category_i }"
+      def rendering_method_name_for_property prp  # for expag
+
+        __any_rendering_method_name_for_property( prp ) ||
+          :render_property_as_unknown
       end
 
-    private
+      def __any_rendering_method_name_for_property prp
 
-      def lookup_property prop
-        sym = prop.name_symbol
-        if opt = __option_via_name_symbol( sym )
-          [ :option, opt ]
-        elsif arg = __argument_via_name_symbol( sym )
-          [ :argument, arg ]
-        elsif env = __environment_variable_via_name_symbol( sym )
-          [ :environment_variable, env ]
+        sym, = category_symbol_and_property_via_name_symbol prp.name_symbol
+
+        if sym
+          rendering_method_name_for_property_category_name_symbol sym
+        end
+      end
+
+      def rendering_method_name_for_property_category_name_symbol sym
+        :"render_property_as__#{ sym }__"
+      end
+
+      def category_symbol_and_property_via_name_symbol sym
+
+        prp = __option_via_name_symbol sym
+
+        if prp
+          [ :option, prp ]
         else
-          [ :unknown, prop ]
+
+          prp = __argument_via_name_symbol sym
+          if prp
+            [ :argument, prp ]
+
+          else
+
+            prp = __environment_variable_via_name_symbol sym
+            if prp
+              [ :environment_variable, prp ]
+            end
+          end
         end
       end
 

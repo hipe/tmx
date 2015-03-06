@@ -5,70 +5,74 @@ module Skylab::Brazen
     # ~ #comport:face this whole file. (just to fit in 'tmx')
 
     module Client
+
       module Adapter
         module For
           module Face
             module Of
-              class Hot
-                def self.[] kernel, token
-                  Adapter___.make_adapter kernel, token
-                end
-
-                class Maker
-                  def initialize mod
-                    @mod = mod
-                  end
-
-                  def make_adapter kernel, token
-                    Adapter__.new @mod, kernel, token
-                  end
-                end
-
-                class Adapter__
-
-                  def initialize *a
-                    @mod, @given_NS_sheet, @parent_top_client = a
-                  end
-
-                  def call * a
-                    @parent_top_client_kernel, @given_slug = a
-                    self
-                  end
-
-                  def get_summary_a_from_sheet sht
-                  end
-
-                  def get_autonomous_quad argv
-                    s_a = @parent_top_client_kernel.
-                      get_normal_invocation_string_parts
-                    [ @mod::CLI.new( *
-                        @parent_top_client_kernel.three_streams, s_a ),
-                      :invoke,
-                      [ argv ],
-                      nil ]
-                  end
-
-                  def is_autonomous
-                    true
-                  end
-
-                  def is_visible
-                    true
-                  end
-
-                  def name
-                    @given_NS_sheet.name
-                  end
-
-                  def pre_execute
-                    self
-                  end
-                end
-
-                Adapter___ = Maker.new Brazen_
+              Hot = -> x, x_ do
+                Client.fml Brazen_, x, x_
               end
             end
           end
+        end
+      end
+
+      class << self
+
+        def fml ss_mod, ns_sheet, my_CLI_class
+
+          -> strange_kernel, any_invo_s do
+
+            FML___.
+              new ss_mod, ns_sheet, my_CLI_class, strange_kernel, any_invo_s
+
+          end
+        end
+      end  # >>
+
+      class FML___
+
+        def initialize *a
+
+          @my_SS_mod, @NS_sheet, _my_CLI_class,
+            @strange_kernel, _given_slug = a
+
+        end
+
+        def get_summary_a_from_sheet sht
+        end
+
+        def get_autonomous_quad argv
+
+          # the below isn't always the same as `_my_CLI_class` above
+
+          [ @my_SS_mod::CLI.new( *
+
+              @strange_kernel.three_streams,
+              @strange_kernel.get_normal_invocation_string_parts ) ,
+
+            :invoke,
+
+            [ argv ],
+
+            nil ]
+        end
+
+        def is_autonomous
+          true
+        end
+
+        def is_visible
+          true
+        end
+
+        def name
+          @NS_sheet.name
+        end
+
+        def pre_execute
+          self
         end
       end
     end

@@ -8,7 +8,9 @@ module Skylab::SubTree
 
     extend Brazen_::API.module_methods
 
-    SubTree_::Kernel_ = ::Class.new Brazen_::Kernel_  # not settled yet
+    Kernel = ::Class.new Brazen_::Kernel_  # not settled yet
+
+    SubTree_::Kernel_ = Kernel
 
   end
 end

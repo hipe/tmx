@@ -17,7 +17,7 @@ module Skylab::BeautySalon
       @param_h = Callback_::Box::Proxies::Hash::Like.new
 
       _ = Render_property_as___.new do | _ |
-        :render_prop_as_argument
+        :render_property_as__argument__
       end
 
       @expag = Expression_Agent___.new _

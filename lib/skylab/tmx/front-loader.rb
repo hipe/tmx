@@ -192,7 +192,7 @@ module Skylab::TMX
       end
 
       def get_summary_a_from_sheet ns_sht
-        [ get_anchored_program_name_separated_by( '-' ) ]
+        [ get_anchored_program_name_separated_by( DASH_ ) ]
       end
 
       def invoke argv

@@ -111,14 +111,16 @@ module Skylab::TMX::TestSupport::CLI::L2P
       go :'yacc2treetop', FLAG_
     end
 
-    def go i, *a
-      _hack_write i if a.length.zero?
-      _go i, *a
+    def go sym, *a
+      if a.length.zero?
+        _hack_write sym
+      end
+      _go sym, *a
     end
 
-    def _go i, *a
-      x = _confirm_out_and_err_streams i, *a
-      x.should eql( :"hello_from_#{ i }" )
+    def _go sym, *a
+      _x = _confirm_out_and_err_streams sym, *a
+      _x.should eql :"hello_from_#{ sym }"
       nil
     end
 
@@ -129,37 +131,42 @@ module Skylab::TMX::TestSupport::CLI::L2P
         i.id2name, ping_arg ]
 
       o, e, st = TestSupport::Library_::Open3.capture3( * argv )
-      o.should eql ''
-      e.should eql( "#{ hellomsg i }\n" )
-      st.exitstatus.should eql( exitstatus )
+      o.should eql EMPTY_S_
+      e.should eql "#{ hellomsg i }\n"
+
+      st.exitstatus.should eql exitstatus
       nil
     end
 
     def _confirm_out_and_err_streams i, arg=PING_ARG_
-      x = invoke "#{ i.to_s.gsub '_', '-' }", arg
+      x = invoke "#{ i.to_s.gsub UNDERSCORE_, DASH_ }", arg
       iog = @__memoized.fetch :io_spy_triad  # dear future - i am sorry:
       # calling `lines` does hackery that won't work with our hackery, maybe.
 
       oa, ea = [ :outstream, :errstream ].map do |ii|
         io = iog[ ii ]
         str = io.string
-        a = str.split "\n"  # then:
+        a = str.split NEWLINE_  # then:
         io.rewind
         io.truncate 0
         a
       end
-      ea.fetch( 0 ).should eql( hellomsg i )
+
+      s = ea.fetch 0
+      s.gsub! SIMPLER_STYLE_RX_, EMPTY_S_
+      s.should eql hellomsg( i )
+
       ea.length.should eql( 1 )
       oa.length.should eql( 0 )
       x
     end
 
     def hellomsg i
-      "hello from #{ i.to_s.gsub( '_', ' ' ) }."
+      "hello from #{ i.to_s.gsub( UNDERSCORE_, SPACE_ ) }."
     end
 
     -> do  # hacklund..
-      a = [ ]
+      a = []
       define_method :_hack_write do |i|
         a << i
         nil

@@ -5,7 +5,11 @@ module Skylab::SubTree
     stdlib = Autoloader_.method :require_stdlib
 
     o = {}
+    o[ :FileUtils ] = stdlib
+    o[ :Open3 ] = stdlib
+    o[ :Shellwords ] = stdlib
     o[ :StringIO ] = stdlib
+    o[ :Time ] = stdlib
 
     define_singleton_method :const_missing do | sym |
       const_set sym, o.fetch( sym )[ sym ]
@@ -22,7 +26,33 @@ module Skylab::SubTree
       HL__[]::CLI
     end
 
+    CLI_table = -> * x_a do
+      FA___[]::CLI::Table.call_via_iambic x_a
+    end
+
+    EN_add_methods = -> * i_a do
+      HL__[].expression_agent.NLP_EN_methods.call_via_arglist i_a
+    end
+
+    FA___ = sidesys[ :Face ]
+
     HL__ = sidesys[ :Headless ]
+
+    IT___ = sidesys[ :InformationTactics ]
+
+    MH___ = sidesys[ :MetaHell ]
+
+    Strange_proc = -> do
+      MH___[].strange.to_proc
+    end
+
+    Summarize_time = -> x do
+      IT___[]::Summarize::Time[ x ]
+    end
+
+    System = -> do
+      HL__[].system
+    end
 
     INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(
       self, SubTree_ )  # at the end

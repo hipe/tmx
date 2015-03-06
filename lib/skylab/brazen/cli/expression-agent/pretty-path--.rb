@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class CLI
 
-    class Expression_Agent__
+    class Expression_Agent
 
       class Pretty_Path__  # re-write [#hl-031]
 

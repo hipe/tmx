@@ -3,7 +3,7 @@ module Skylab::TestSupport
   class CLI
 
 
-    class Expression_Agent__
+    class Expression_Agent
 
       # a reconception of the pen. imagine accessibility and text to speech.
       # we have hopes for this to flourish upwards and outwards.
@@ -59,7 +59,7 @@ module Skylab::TestSupport
 
       # ~ (from above)
 
-      def render_prop_as_argument prp
+      def render_property_as__argument__ prp
         "<#{ prp.name.as_slug }>"
       end
 

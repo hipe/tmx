@@ -1,67 +1,86 @@
-require_relative '../../../test-support'  # keep this as nearest
+require_relative '../../test-support'
 
-module Skylab::SubTree::TestSupport
-  module API
-    module Actions
-      # remove these as possible
-    end
-  end
-end
+module Skylab::SubTree::TestSupport::Models_Files
 
-module Skylab::SubTree::TestSupport::API::Actions::My_Tree
+  parent = ::Skylab::SubTree::TestSupport
 
-  ::Skylab::SubTree::TestSupport[ TS_ = self ]
+  parent.autoloaderize_with_filename_child_node 'models/files', self
+
+  parent[ TS_ = self ]
 
   include Constants
 
-  module Constants
-
-    NIL_A_ = [ nil ].freeze
-
-    PRETTY_ = <<-HERE.unindent
-      one
-      ├── foo.rb
-      └── test
-          └── foo_spec.rb
-    HERE
-
-  end
-
   extend TestSupport_::Quickie
-
-  SubTree_ = SubTree_
-  TestSupport_ = TestSupport_
 
   module InstanceMethods
 
-    def start_front_with_upstream io
-      start_front io
+    def build_string_IO
+      SubTree_::Library_::StringIO.new
     end
 
-    def start_front up=nil
-      f = SubTree_::API::Actions::My_Tree.new
-      @o = TestSupport_::IO.spy.new
-      @e = TestSupport_::IO.spy.new
-      if do_debug
-        @o.debug! 's-tdout; '
-        @e.debug! 's-tderr: '
+    def fixture_file sym
+      Fixture_Files[ sym ]
+    end
+
+    def black_and_white_expression_agent_for_expect_event
+      produce_action_specific_expag_safely_
+    end
+
+    def produce_action_specific_expag_safely_
+
+      # don't autoload yourself just to get the expag - ..
+
+      if SubTree_.const_defined? :API
+        SubTree_::Models_::Files::Modalities::CLI::EXPRESSION_AGENT
+      else
+        fail
       end
-      f.with_properties :param_h, {}, :upstream, up, :paystream, @o, :infostream, @e
-    end
-
-    def fixtures_dir_pn
-      Fixtures_dir_pn_.call
-    end
-    Fixtures_dir_pn_ = -> do
-      SubTree_::Test_Fixtures.dir_pathname
-    end
-
-    def line
-      @a.shift or fail "expected more lines, had none"
-    end
-
-    def expect_no_more_lines
-      @a.length.zero? or fail "expected no more lines - #{ @a[ 0 ] }"
     end
   end
+
+  # ~ longer consts
+
+  module Fixture_Files
+    class << self
+      def [] sym
+
+        TS_.dir_pathname.join(
+          "fixture-files/#{ sym.id2name.gsub UNDERSCORE_, DASH_ }.output"
+        ).to_path
+
+      end
+    end  # >>
+  end
+
+  MOCK_NONINTERACTIVE_IO_ = class Mock_Noninteractive_IO___
+
+    def closed?
+      false
+    end
+
+    def close
+    end
+
+    def tty?
+      false
+    end
+    self
+  end.new
+
+  PRETTY_ = <<-HERE.unindent
+    one
+    ├── foo.rb
+    └── test
+        └── foo_spec.rb
+  HERE
+
+  # ~ short consts
+
+  Callback_ = Callback_
+  DASH_ = DASH_
+  EMPTY_A_ = EMPTY_A_
+  EMPTY_S_ = EMPTY_S_
+  SubTree_ = SubTree_
+  UNDERSCORE_ = UNDERSCORE_
+
 end

@@ -26,7 +26,7 @@ module Skylab::TMX
           redo if :hop == SKIP_H_[ stem_i ]
           opt_h = { skip: false }
           if 1 < (( initials_a = stem.scan INITIALS_RX_ )).length
-            opt_h[ :aliases ] = [ initials_a * '' ]
+            opt_h[ :aliases ] = [ initials_a * EMPTY_S_ ]
           end
           client_mod_p = Client_module_resolver_p_[ stem ]
           r = [ stem_i, client_mod_p, opt_h ]

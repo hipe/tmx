@@ -2,18 +2,16 @@ module Skylab::Treemap
 
   class CLI
 
-    # ~ #comport:face this whole file. (just to fit in 'tmx')
+    # ~ #hook-out for [tmx] integration (this whole file)
 
     module Client
       module Adapter
         module For
           module Face
             module Of
-              module Hot
-                def self.[] kernel, token
-                  Brazen_::CLI::Client::Adapter::For::Face::Of::Hot::Maker.
-                    new( Treemap_ ).make_adapter kernel, token
-                end
+              Hot = -> x, x_ do
+
+                Brazen_::CLI::Client.fml Treemap_, x, x_
               end
             end
           end

@@ -13,9 +13,8 @@ module Skylab::TestSupport
 
     # ~ because there is perhaps no standard location
 
-    def resolve_app_kernel
-      @app_kernel = TestSupport_::API::Kernel.new @mod
-      nil
+    def produce_app_kernel
+      TestSupport_::API::Kernel.new @mod
     end
 
     # ~ experimental extension of action adapter base class, exactly :+[#br-023]
@@ -75,10 +74,9 @@ module Skylab::TestSupport
           module Of
             module Hot
 
-              def self.[] kernel, token
+              def self.[] kr, tok
 
-                TestSupport_.lib_.brazen::CLI::Client::Adapter::For::Face::Of::Hot::Maker.
-                  new( TestSupport_ ).make_adapter( kernel, token )
+                TestSupport_.lib_.brazen::CLI::Client.fml TestSupport_, kr, tok
               end
             end
           end

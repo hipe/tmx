@@ -12,11 +12,15 @@ module Skylab::SubTree
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
-  Autoloader_[ Models = ::Module.new ]  # #change-this-at-step:8 (or 10)
+  Autoloader_[ Models = ::Module.new, :boxxy ]  # #change-this-at-step:10
+
+  Autoloader_[ Models_ = ::Module.new, :boxxy ]
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
   ACHIEVED_ = true
+
+  DASH_ = '-'.freeze
 
   DEFAULT_GLYPHSET_IDENTIFIER_ = :narrow
 
@@ -27,6 +31,8 @@ module Skylab::SubTree
   EMPTY_S_ = ''.freeze
 
   KEEP_PARSING_ = true
+
+  IDENTITY_ = -> x { x }
 
   stowaway :Library_, 'lib-'
 
@@ -40,4 +46,7 @@ module Skylab::SubTree
 
   SPACE_ = ' '.freeze
 
+  UNABLE_ = false
+
+  UNDERSCORE_ = '_'.freeze
 end

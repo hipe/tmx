@@ -1,101 +1,103 @@
-require_relative 'test-support'
+require_relative 'core'
 
-module Skylab::SubTree::TestSupport::The_CLI_Modality
+module Skylab::SubTree::TestSupport::Modality_Integrations::CLI
 
-  # <-
+  describe "[st] modality integration - CLI - canon" do
 
-describe "[st] CLI core", wip: true do
+    extend TS_
 
-  acts_rx = /\{.+rerun\|ping\}/
-  actions = acts_rx.source
-  expecting_rx_ = /\AExpecting #{ actions }\.\z/i # look!
-  expecting_rx  = /\AExpecting #{ actions }\z/i
-  usage_rx = /\AUsage: #{ PN_ } #{ actions } \[opts\] \[args\]\z/i
-  invite_rx = /\ATry #{ PN_ } -h for help\.\z/
+    Expect_expression[ self ]
 
-  it "0   : no args        : expecting / invite" do
-    argv
-    line.should match( expecting_rx_ )
-    line.should match( usage_rx )
-    line.should match( invite_rx )
-    emission_a.should be_empty
-    names.should eql( [ :usage_issue, :usage, :ui ] )
-    result.should eql( 1 )  # old-school exit code
-  end
+    define_method :expect, instance_method( :expect )  # #because-rspec
 
-  it "1.1 : one unrec arg  : msg / expecting / invite" do
-    argv 'borf'
-    line.should match( /\Ainvalid action: borf\z/i )
-    line.should match( expecting_rx )
-    line.should match( invite_rx )
-    emission_a.should be_empty
-    names.should eql( [ :usage_issue, :usage_issue, :ui ] )
-    result.should eql( 1 )  # old-school exit code
-  end
-
-  it "1.2 : one unrec opt  : expecting / invite" do
-    argv '-z'
-    line.should match( /\Ainvalid action: -z\z/i )
-    line.should match( expecting_rx )
-    line.should match( invite_rx )
-    emission_a.should be_empty
-    names.should eql( [ :usage_issue, :usage_issue, :ui ] )
-    result.should eql( 1 )
-  end
-
-  it "1.3 : one opt : `-h` : usage / invite" do
-    argv '-h'
-    line.should match( usage_rx )
-    line.should match( /^$/ )
-    line.should match(
-    /\AFor help on a particular subcommand, try #{ PN_ } <subcommand> -h\.\z/i
-    )
-    emission_a.should be_empty
-    names.detect{ |x| :help != x }.should be_nil
-    result.should eql( 0 )
-  end
-
-  it "2.1 : `-h unrec`     : msg invite" do
-    argv '-h', 'wat'
-    line.should match( /\Ainvalid action: wat\z/i )
-    line.should match( expecting_rx )
-    line.should match( invite_rx )
-    emission_a.should be_empty
-    names.should eql( [:usage_issue, :usage_issue, :ui] )
-    result.should eql( 1 )
-  end
-
-  _CMD = 'cov'
-
-  it "2.2 : `-h rec`       : 1) usage 2) desc 3) opts" do
-    argv '-h', _CMD
-    line.should match(/\Ausage: #{ PN_ } #{ _CMD }/i)
-    line.should match( /^$/ )
-    line.should match(/\Adescription:?\z/i)
-    line.should match(/\A *see crude/i)
-    line.should match(/\A +\*/)
-    line.should match(/\A +\*/)
-    line.should match( /^$/ )
-    line.should match(/\Aoptions:?\z/i)
-    l = line
-    loop do
-      l.should match(/\A  /)
-      l = line or break
+    it "invoke the ping of the API, adapted to this modality" do
+      invoke 'ping'
+      expect :styled, 'hello from sub tree.'
+      expect_no_more_lines
+      @exitstatus.should eql :hello_from_sub_tree
     end
-    names.uniq.should eql( [ :help ] )
-    result.should eql( 0 )
+
+    it "0   : no args        : expecting / usage / invite" do
+      invoke
+      expect "expecting <action>"
+      expect :styled, _usage_rx
+      _expect_generic_invite
+    end
+
+    it "1.1 : one unrec arg  : msg / expecting / invite" do
+      invoke 'borf'
+      expect "unrecognized action \"borf\""
+      _expect_known_actions
+      _expect_generic_invite
+    end
+
+    it "1.2 : one unrec opt  : expecting / invite" do
+      invoke '-z'
+      expect 'invalid option: -z'
+      _expect_generic_invite
+    end
+
+    it "1.3 : one opt : `-h` : usage / invite" do
+
+      invoke '-h'
+
+      big = @IO_spy_group_for_expect_stdout_stderr.lines.map do | ln |
+        ln.string
+      end.join EMPTY_S_
+
+      big.should match %r(--help \[cmd\][ ]+this screen \(or help for action\))
+
+      big.should match %r(\bthe point of this\b)
+
+      big.should match %r(\binspired by unix\b)
+
+      expect_success_result
+    end
+
+    it "2.1 : `-h unrec`     : msg invite" do
+
+      invoke '-h', 'wat'
+      expect "unrecognized action \"wat\""
+      _expect_known_actions
+      _expect_generic_invite
+    end
+
+    -> do
+
+      all_possible_actions = %w( dirstat files ping )
+      cmd_name = 'stcli'
+
+      # ~
+
+      usage_rx = /\Ausage #{ cmd_name } <action> \[\.\.\]$/
+
+      define_method :_usage_rx do
+        usage_rx
+      end
+
+
+      generic_help_string = "use '#{ cmd_name } -h' for help"
+
+      define_method :_expect_generic_invite do
+        expect generic_help_string
+        expect_errored_generically
+      end
+
+
+      define_method :_expect_known_actions do
+
+        _emmi = @__sout_serr_actual_stream__.gets_one
+
+        _md = %r(\Aknown actions are \((.+)\)$).match _emmi.string
+
+        _s_a = _md[ 1 ].split(', ').map { |s| s[ 1 ... -1 ] }  # unquote. eew
+
+        miss_a = all_possible_actions - _s_a
+
+        if miss_a.length.nonzero?
+          fail "missing: #{ miss_a.inspect }"
+        end
+      end
+    end.call
   end
-
-  it "2.3 : `-h rec more`  : msg / usage / invite" do
-    argv '-h', _CMD, 'wat'
-    line.should match( /\bignoring: "wat"/ )
-    line.should match( /\Ausage: #{ PN_ } / )
-    # ..meh
-    names.uniq.should eql( [ :info, :help ] )
-    result.should eql( 0 )
-  end
-end
-
-# ->
-
 end

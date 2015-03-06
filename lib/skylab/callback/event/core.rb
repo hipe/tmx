@@ -126,7 +126,7 @@ module Skylab::Callback
         st = Callback_::Iambic_Stream.via_array x_a
         @terminal_channel_i = st.gets_one
         _process_pairs st.flush_to_each_pairer, & msg_p
-        nil
+        NIL_
       end
 
       def __init_via_box_and_terminal_channel_symbol bx, sym, & msg_p
@@ -147,7 +147,8 @@ module Skylab::Callback
 
         @__ivar_box__ = bx
         @message_proc = msg_p
-        nil
+
+        NIL_
       end
 
     public

@@ -1,200 +1,83 @@
-require_relative '../test-support'
-require 'skylab/callback/test/test-support'
+require_relative 'test-support'
 
-module Skylab::SubTree::TestSupport::CLI
+module Skylab::SubTree::TestSupport::Modality_Integrations::CLI
 
-  ::Skylab::SubTree::TestSupport[ self ]  # #regret
+  module Expect_expression
 
-  module Constants
-    PN_ = 'sub-tree'.freeze
-  end
+    class << self
 
-  TestLib_ = Constants::TestLib_
+      def [] test_context_module
 
-  module InstanceMethods
-
-    include Constants # access SubTree_ from within i.m's in the specs
-
-    # (in pre-order from the first test.)
-
-    def argv *argv
-      if do_debug
-        dputs "argv : #{ argv.inspect }"
+        test_context_module.include Instance_Methods
+        NIL_
       end
-      @result = client.invoke argv
-      if do_debug
-        dputs "RESULT: #{ @result.inspect }"
+    end  # >>
+
+    module Instance_Methods
+
+      include TestSupport_::Expect_Stdout_Stderr::InstanceMethods
+
+      # (adpated from [br])
+
+      def invoke * argv
+        invoke_via_argv argv
       end
-      nil
-    end
-    #
-    attr_reader :result
 
-    -> do
-      stderr = TestSupport_.debug_IO
+      def invoke_via_argv argv
 
-      define_method :dputs do |x|
-        stderr.puts x
+        @exitstatus = __produce_CLI_client.invoke argv
+
+        NIL_
       end
-    end.call
 
-    def client  # (avoiding `let` just for ease of step-debugging)
-      @client ||= build_client
-    end
+      def __produce_CLI_client
 
-    def build_client
-      build_client_for_events
-    end
+        g = TestSupport_::IO.spy.group.new
 
-    def build_client_for_events
-      @io_mode = :event ; @names = [ ]
-      es = emit_spy
-      client = client_class.new do |clnt|
-        clnt.on_all do |e|
-          es.call_digraph_listeners e.stream_symbol, e.text
+        g.do_debug_proc = -> do
+          do_debug
         end
-      end
-      client.instance_variable_set :@program_name, PN_
-      client
-    end
 
-    attr_reader :names
+        g.debug_IO = debug_IO
 
-    def build_client_for_both  # adapted from [fa] (the lib)
-      # sadly this has to wire the thing both ways to catch op parse error e's
-      @io_mode = :both ; @names = [ ]
-      t = @triad_spy = TestSupport_::IO.spy.triad nil  # no fake stin
-      do_debug and t.debug!
-      es = emit_spy
-      client_class.new sin: t.instream, out: t.outstream, err: t.errstream,
-        program_name: PN_, wire_p:( -> emtr do
-          emtr.on_all do |e|
-            es.call_digraph_listeners e.stream_symbol, e.text
-          end
-        end )
-    end
-
-    def client_class
-      SubTree_::CLI::Client
-    end
-
-    def emit_spy
-      @emit_spy ||= bld_emit_spy
-    end
-
-    def bld_emit_spy
-      Callback_.test_support.call_digraph_listeners_spy(
-        :do_debug_proc, -> { do_debug },
-        :debug_IO, debug_stream )
-    end
-
-    def line
-      line_thru TestLib_::CLI_lib[].pen.unstyle
-    end
-
-    def styled
-      line_thru TestLib_::CLI_lib[].pen.unstyle_styled
-    end
-
-    def nonstyled
-      line_thru Assert_nonstyled_
-    end
-
-    Assert_nonstyled_ = -> s do
-      x = TestLib_::CLI_lib[].parse_styles s
-      x and fail "line was styled, should not have been - #{ x }"
-      s
-    end
-
-    def line_thru p
-      e = emission_a.shift
-      if e
-        @names.push e.stream_symbol
-        ev = e.payload_x
-        _s = if ev.respond_to? :ascii_only? then ev else
-          _exag = SubTree_::CLI.expression_agent
-          _exag.calculate( * ev.a, & ev.p )
+        io = use_this_as_stdin
+        if io
+          g.add_stream :i, io
+        else
+          g.add_stream :i, :__instream_not_used_yet__
         end
-        p[ _s ]
+
+        g.add_stream :o
+        g.add_stream :e
+
+        @IO_spy_group_for_expect_stdout_stderr = g
+
+        subject_CLI.new( * g.values_at( :i, :o, :e ),
+          invocation_strings_for_expect_expression )
+
       end
-    end
 
-    def no_more_lines
-      @emission_a.length.zero? or fail "expected no more lined, had - #{
-        }#{ @emission_a.fetch( 0 ).inspect }"
-    end
+      attr_reader :use_this_as_stdin
 
-    def any_blanks
-      while @emission_a.length.nonzero?
-        e = @emission_a.fetch 0
-        EMPTY_S_ == e.payload_x or break
-        @emission_a.shift
-      end
-      nil
-    end
-    #
-    EMPTY_S_ = ''.freeze
+      -> do
 
-    def header str
-      styled.should eql( str )
-      nil
-    end
+        generic_exitstatus = 5  # meh
 
-    def one_or_more_styled rx
-      styled.should match( rx )
-      while @emission_a.length.nonzero?
-        e = @emission_a.fetch 0
-        s = TestLib_::CLI_lib[].pen.unstyle_styled e.payload_x
-        if s  # if it's styled
-          if rx =~ s
-            @emission_a.shift
-            next
-          end
+        define_method :expect_errored_generically do
+          expect_no_more_lines
+          @exitstatus.should eql generic_exitstatus
         end
-        break
+
+      end.call  # etc
+
+      def expect_succeeded
+        expect_no_more_lines
+        expect_success_result
       end
-      nil
-    end
 
-    def emission_a
-      @emission_a ||= begin
-        case @io_mode
-        when :three_streams
-          digest_triad_into_emission_a
-        when :event
-          @emit_spy.emission_a
-        when :both
-          digest_both_into_emission_a
-        else ; fail "io_mode? - #{ @io_mode }"
-        end
+      def expect_success_result
+        @exitstatus.should be_zero
       end
-    end
-
-    def digest_both_into_emission_a
-      a = @emit_spy.emission_a
-      digest_triad_into a
-      a
-    end
-
-    def digest_triad_into_emission_a
-      digest_triad_into(( y = [ ] ))
-      y
-    end
-
-    def digest_triad_into y
-      t = @triad_spy ; @triad_spy = :digested
-      o = t.outstream ; e = t.errstream ; t[ :outstream ] = t[ :errstream ] = nil
-      [ [ :out, o ], [ :err, e ] ].each do |(i, io)|
-        y.concat io.string.split( "\n" ).map { |s| Emission_[ i, s ] }
-      end
-      nil
-    end
-
-    Emission_ = ::Struct.new :stream_symbol, :payload_x
-
-    def cd path, &block
-      SubTree_.lib_.clear_pwd_cache
-      SubTree_::Library_::FileUtils.cd path, verbose: do_debug, &block
     end
   end
 end
