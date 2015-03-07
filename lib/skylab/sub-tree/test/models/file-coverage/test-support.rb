@@ -26,6 +26,10 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
   NIL_ = nil
 
+  Subject_ = -> do
+    SubTree_::Models_::File_Coverage
+  end
+
   TEST__ = 'test'.freeze
 
   TEST_FILE_PATTERNS_ = [ '*_speg.rb', '*_spek.rb' ]  # :+#ersatz-names, #change-this-in-step:10 this is not yet used but will be

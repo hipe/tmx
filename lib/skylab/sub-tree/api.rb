@@ -4,7 +4,7 @@ module Skylab::SubTree
 
     Brazen_ = SubTree_.lib_.brazen
 
-    SubTree_::Action_ = Brazen_.model.action_class
+    Action = SubTree_::Action_ = Brazen_.model.action_class  # hm..
 
     extend Brazen_::API.module_methods
 

@@ -18,7 +18,7 @@ module Skylab::SubTree
       attr_reader :model_class
     end
 
-    class Actions::File_Coverage < Action_
+    class Actions::File_Coverage < SubTree_::API::Action
 
       @is_promoted = true
 
