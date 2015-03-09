@@ -2,39 +2,37 @@ require_relative '../core'
 
 module Skylab::GitViz::TestSupport
 
-  module Constants
-    GitViz_ = ::Skylab::GitViz
-    o = GitViz_::Lib_
-    TestSupport_ = o::Test_support[]
-    TS_ = GitViz_::TestSupport
-  end
+  GitViz_ = ::Skylab::GitViz
 
-  include Constants
+  TestSupport_ = GitViz_.lib_.test_support
+
+  TestSupport_::Regret[ TS_ = self ]
 
   extend TestSupport_::Quickie
 
-  TestSupport_::Regret[ self ]
-
-  GitViz_ = GitViz_ ; TS__ = self
-
   module ModuleMethods
-    def use i
-      const_i = GitViz_::Name_.via_variegated_symbol( i ).as_const
+
+    def use sym
+
+      const_i = GitViz_::Name_.via_variegated_symbol( sym ).as_const
       mod = nearest_test_node
-      while true
+
+      begin
         if mod.const_defined? const_i, false
-          found_mod = mod.const_get const_i
+          found_callable = mod.const_get const_i
           break
         end
         mod_ = mod.parent_anchor_module
-        if mod_
-          mod = mod_
-        else
-          found_mod = GitViz_::Test_Lib_.const_get const_i, false
+        if ! mod_
+          found_callable = GitViz_::Test_Lib_.const_get const_i, false
           break
         end
-      end
-      found_mod[ self ] ; nil
+        mod = mod_
+        redo
+      end while nil
+
+      found_callable[ self ]
+      NIL_
     end
   end
 
@@ -43,32 +41,33 @@ module Skylab::GitViz::TestSupport
     def debug!
       @do_debug = true ; nil
     end
+
     attr_reader :do_debug
+
     def debug_IO
       GitViz_.lib_.some_stderr_IO
     end
 
-    def listener
-      @listener ||= build_listener
-    end
+    def listener_x  # assume "expect event" ..
 
-    def build_listener
-      GitViz_::Callback_::Selective_listener.spy_proxy do |spy|
-        spy.emission_a = @baked_em_a = []
-        spy.inspect_emission_proc =
-          method :inspect_emission_channel_and_payload
-        spy.do_debug_proc = -> { do_debug }
-        spy.debug_IO = debug_IO
-      end
-    end
+      # the event receiver in whatever form is current
 
-    def inspect_emission_channel_and_payload i_a, x
-      "#{ i_a.inspect }: #{ GitViz_::Test_Lib_::Strange[ x ] }"
+      handle_event_selectively
     end
+  end
 
-    def baked_em_a  # #hook-out: 'expect'
-      @baked_em_a ||= build_baked_em_a
-    end
+  # ~ longer short constants (the longest of which we might call "stowaways")
+
+  Expect_Event = -> test_mod do  # generated from `expect_event`
+
+    test_mod.include(
+      GitViz_::Callback_.test_support::Expect_event::Test_Context_Instance_Methods )
+
+    nil
+  end
+
+  module Messages
+    PATH_IS_FILE = "path is file, must have directory".freeze
   end
 
   module Testable_Client  # read [#015] the testable client narrative intro.
@@ -94,13 +93,7 @@ module Skylab::GitViz::TestSupport
 
   Autoloader_ = GitViz_::Autoloader_
 
-  Autoloader_[ self, :boxxy,  GitViz_.dir_pathname.join( 'test' ) ]
-
-  module Messages
-    PATH_IS_FILE = "path is file, must have directory".freeze
-  end
-
-  module VCS_Adapters  # ~ stowaway
+  module VCS_Adapters
     module Git
       Autoloader_[ Fixtures = ::Module.new ]
 
@@ -108,4 +101,22 @@ module Skylab::GitViz::TestSupport
     end
     Autoloader_[ self ]
   end
+
+  # ~ short constants
+
+  NIL_ = nil
+
+  # ~ any re-assignments of above to propagate to child test nodes
+
+  module Constants
+    GitViz_ = GitViz_
+    NIL_ = NIL_
+    TestSupport_ = TestSupport_
+    Top_TS_ = TS_
+  end
+
+  # ~ set it up so we peek into the FS to autoload usees
+
+  Autoloader_[ self, :boxxy, GitViz_.dir_pathname.join( 'test' ) ]
+
 end

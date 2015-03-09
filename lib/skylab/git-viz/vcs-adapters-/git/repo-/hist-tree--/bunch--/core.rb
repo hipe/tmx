@@ -6,41 +6,45 @@ module Skylab::GitViz
 
       class Bunch__
 
-        def self.build_bunch hist_tree, listener
-          Build_Bunch__[ hist_tree, self, listener ]
-        end
+        class << self
 
-        Build_Bunch__ = Simple_Agent_.new :hist_tree, :bunch_cls, :listener do
+          def build_bunch hist_tree, & oes_p
+            Build___[ hist_tree, self, & oes_p ]
+          end
+        end  # >>
+
+        class Build___
+
+          Callback_::Actor.call self, :properties, :hist_tree, :bunch_cls
 
           def execute
             @repo = @hist_tree.repo
-            @trail_a = @bunch_cls::Begin__[ self, @listener ]
-            @trail_a && finish
+            @trail_a = @bunch_cls::Begin__[ self, & @on_event_selectively ]
+            @trail_a && __finish
           end
 
           # ~ for children
 
-          def begin_trail line, listener
-            @bunch_cls::Trail__.begin self, line, listener
+          def begin_trail line, & oes_p
+            @bunch_cls::Trail__.begin self, line, & oes_p
           end
 
           attr_reader :repo
 
-        private  # ~
-
-          def finish
+          def __finish
             ok = @repo.close_the_pool
-            ok &&= @bunch_cls::Finish__[ self, @trail_a, @listener ]
-            ok && when_OK
+            ok &&= @bunch_cls::Finish__[ self, @trail_a, & @on_event_selectively ]
+            ok && __flush
           end
 
-          def when_OK
+          def __flush
             Bunch__.new @trail_a
           end
         end
 
         def initialize trail_a
-          @trail_a = trail_a ; freeze
+          @trail_a = trail_a
+          freeze
         end
 
         def get_trail_stream

@@ -1,33 +1,36 @@
 require_relative 'test-support'
 
-module Skylab::GitViz::TestSupport::API
+module Skylab::GitViz::TestSupport::Models
 
-  describe "[gv] API" do
+  describe "[gv] models" do
 
-    extend TS__ ; use :expect
+    extend TS_
+    use :expect_event
 
     it "loads" do
       GitViz_::API
     end
 
-    it "ping with strange parameters - X" do
-      _rx = %r(\Aunrecognized property 'not_an_arg')
-      -> do
-        invoke_API :ping, :not_an_arg, :_no_see_
-      end.should raise_error ::ArgumentError, _rx
+    it "ping with strange parameters - emits expression of failure" do
+
+      call_API :ping, :not_an_arg, :_no_see_
+      expect_not_OK_event :extra_properties
+      expect_failed
     end
 
     it "simple ping" do
-      invoke_API :ping
-      expect :on_channel_i, :info, "hello from git viz."
-      expect_no_more_emissions
+
+      call_API :ping
+      expect_neutral_event :ping
       @result.should eql :hello_from_git_viz
     end
 
-    it "ping with parameters, defaults" do
-      invoke_API :ping, :go_the_distance, :how_wide, "20 feet"
-      expect :on_channel_i, :info, '(20 feet x 80 feet)'
-      @result.should eql :_the_distance_
+    it "ping with parameters - the action receives the actual parameters" do
+
+      call_API :ping, :secret_x, :k
+
+      @result.should eql "hi: k"
+      expect_no_more_events
     end
   end
 end

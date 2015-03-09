@@ -6,7 +6,10 @@ module Skylab::GitViz
 
       class Bunch__::Trail__
 
-        Finish__ = Simple_Agent_.new :bunch, :trail, :listener do
+        class Finish__
+
+          Callback_::Actor.call self, :properties,
+            :bunch, :trail
 
           def execute
             @repo = @bunch.repo
@@ -32,7 +35,7 @@ module Skylab::GitViz
           end
           def finish_each_filediff filediff
             begin
-              filediff.finish_filediff @trail, @listener
+              filediff.finish_filediff__ @trail, & @on_event_selectively
               filediff = @scn.gets
             end while filediff
             PROCEDE_

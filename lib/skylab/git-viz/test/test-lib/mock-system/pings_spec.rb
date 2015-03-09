@@ -1,10 +1,10 @@
 require_relative 'test-support'
 
-module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System
+module Skylab::GitViz::TestSupport::Test_Lib::Mock_System
 
-  describe "[gv] mock system pings" do
+  describe "[gv] test lib - mock system - pings" do
 
-    extend TS__
+    extend TS_
 
     it 'loads' do
       GitViz_::Test_Lib_::Mock_System
@@ -37,7 +37,7 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System
           def initialize fm
             @fixtures_module = fm ; nil
           end
-          attr_reader :fixtures_module
+          attr_reader :fixtures_module  # #hook-in to mock system, mock FS
         end
       end
 

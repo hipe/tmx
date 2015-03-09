@@ -65,7 +65,7 @@ use-case for cellular..
 
 ## :#storypoint-45
 
-although CONTINUE_ is the same value as `nil`, which one we use indicates
+although `CONTINUE_` is the same value as `nil`, which one we use indicates
 idiomatically (that is, to the human, not the machine) whether or not our
 result value matters. and when it matters it really matters! depending on
 how the parent component handles it, (and typicially it is the case that)

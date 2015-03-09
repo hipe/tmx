@@ -65,7 +65,7 @@ normalized representation for them. easy, right? either as the arrays we send
 to the `spawn` command, or their strings, having been carefully shell-escaped.
 
 we briefly considered having the system commands isomorph into long method
-names so we could easily hand-write aribtrary responses in ruby, but this
+names so we could easily hand-write arbitrary responses in ruby, but this
 quickly fell off the table as being too gangly, hard to read and leaky:
 
     define_method :"git show --numstat --pretty:format:%ai head -- ./foo" do
@@ -109,7 +109,7 @@ things like ::File#stat (oh by the way we were doing that), and furthermore
 given that we have stashed away a plan for "live automated tests" anyway,
 how hard would it really be to mock the filesystem for our purposes?
 
-as we looked at it, we realized that a significant manjority of our filesystem
+as we looked at it, we realized that a significant majority of our filesystem
 interaction happened through ::Pathname. things like `exist?`, `expand_path`,
 even `open` were our typical conduit to the filesystem. so it is from this
 point that the experiment begins.

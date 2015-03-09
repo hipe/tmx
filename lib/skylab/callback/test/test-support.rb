@@ -10,25 +10,16 @@ module Skylab::Callback::TestSupport
         TS_::Call_Digraph_Listeners_Spy__.new( * a )
       end
     end
-  end
+  end  # >>
 
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
-  module Constants
-    Callback_ = Callback_
-    TestSupport_ = Callback_::Autoloader.require_sidesystem :TestSupport
-  end
-
-  Autoloader_[ self, Callback_.dir_pathname.join( 'test' ) ]
-
-  include Constants
+  TestSupport_ = Autoloader_.require_sidesystem :TestSupport
 
   extend TestSupport_::Quickie
 
   TestSupport_::Regret[ TS_ = self ]
-
-  TestSupport_ = TestSupport_
 
   module InstanceMethods
 
@@ -54,7 +45,19 @@ module Skylab::Callback::TestSupport
     end
   end
 
+  # ~ singles
+
+  EMPTY_A_ = Callback_::EMPTY_A_
   KEEP_PARSING_ = true
   NEWLINE_ = "\n".freeze
 
+  # ~ give these to the children
+
+  module Constants
+    Callback_ = Callback_
+    EMPTY_A_ = EMPTY_A_
+    TestSupport_ = TestSupport_
+  end
+
+  Autoloader_[ self, Callback_.dir_pathname.join( 'test' ) ]
 end

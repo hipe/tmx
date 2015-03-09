@@ -8,7 +8,7 @@ end
 
 module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
-  ::Skylab::GitViz::TestSupport::VCS_Adapters[ TS__ = self ]
+  ::Skylab::GitViz::TestSupport::VCS_Adapters[ TS_ = self ]
 
   include Constants
 
@@ -23,7 +23,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
     end
 
     def build_front
-      front_class.new GitViz_::VCS_Adapters_::Git, listener do |f|
+      front_class.new GitViz_::VCS_Adapters_::Git, listener_x do |f|
         f.set_system_conduit system_conduit
       end
     end
@@ -50,6 +50,10 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
     def _VCS_adapter_module
       GitViz_::VCS_Adapters_::Git
+    end
+
+    def black_and_white_expression_agent_for_expect_event
+      GitViz_.lib_.brazen::API.expression_agent_instance
     end
   end
 end

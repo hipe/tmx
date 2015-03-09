@@ -635,9 +635,8 @@ module Skylab::GitViz
           end
         end
         def gt_scn_from_prototype_a a
-          a = a.dup
-          Scn_.new do
-            a.shift
+          Callback_::Stream.via_times a.length do | d |
+            a.fetch d
           end
         end
       end

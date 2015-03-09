@@ -1,37 +1,31 @@
 module Skylab::GitViz::TestSupport
 
-  module Mock_1  # a "business" "test bundle" (employed via 'use :mock_1')
-    # that is used in junction with using the mock repository of the same name.
+  module Mock_1
 
-    def self.[] test_node
-      test_node.include Instance_Methods__
-    end
+    # a "business" "test bundle" (employed via 'use :mock_1') that is used
+    # in conjunction with using the mock repository of the same name.
 
-    module Instance_Methods__
+    class << self
+      def [] ctx
+        ctx.include Instance_Methods___
+      end
+    end  # >>
+
+    module Instance_Methods___
 
       def expect_informational_emissions_for_mock_1
-        expect_this_many_system_commands 8
+
+        __expect_this_many_system_commands 8
         expect_this_many_statements_about_omissions 2
-        expect_no_more_emissions
+        expect_no_more_events
       end
 
-      def expect_this_many_system_commands d
-        expect_this_many_of_this d, NEXT_SYSTEM_COMMAND__
+      def __expect_this_many_system_commands d
+        expect_N_events d, :next_system_command
       end
-
-      NEXT_SYSTEM_COMMAND__ = %i( next_system command ).freeze
 
       def expect_this_many_statements_about_omissions d
-        expect_this_many_of_this d, STATEMENTS_OF_OMISSION__
-      end
-
-      STATEMENTS_OF_OMISSION__ =
-        %i( info string omitting_informational_commitpoint ).freeze
-
-      def expect_this_many_of_this d, a
-        d.times do
-          expect a
-        end
+        expect_N_events d, :omitting_informational_commitpoint
       end
     end
   end

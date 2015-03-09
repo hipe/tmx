@@ -1,12 +1,14 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::GitViz::TestSupport::CLI
+module Skylab::GitViz::TestSupport::Models
 
-  describe "[gv] CLI \"hist-tree\" command" do
+  describe "[gv] models - hist-tree - modalities - CLI", wip: true do
 
-    extend TS__ ; use :expect
+    extend TS_
+    use :expect_event
 
     it "help screen shows with 'ht' alias" do
+      self._USE_expect_stdout_stderr
       invoke 'ht', '-h'
       expect :styled, %r(\Ausage: #{ PROGNAME_ } #{
         }\{hist-tree\|ht\} .*\[<path>\]\z)

@@ -4,11 +4,15 @@ module Skylab::GitViz
 
     class Repo_::Commit_::Build__ < Git::System_Agent_
 
-      def initialize repo, sha, listener, & sa_p
-        @repo = repo ; @SHA = sha
+      def initialize repo, sha, listener_x, & sa_p
+
+        @repo = repo
+        @SHA = sha
+
         _cmd_s_a = [ GIT_EXE_,
           'show', '--numstat', '--pretty=tformat:%ai', @SHA.to_string, '--' ]
-        super listener do |sa|
+
+        super listener_x do | sa |
           sa.set_chdir_pathname @repo.absolute_pathname
           sa.set_cmd_s_a _cmd_s_a
           sa_p && sa_p[ sa ]

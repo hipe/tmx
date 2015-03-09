@@ -1,10 +1,11 @@
 require_relative 'test-support'
 
-module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System
+module Skylab::GitViz::TestSupport::Test_Lib::Mock_System
 
-  describe "[gv] mock system periphery (different kinds of strange behavior)", zmq: true do
+  describe "[gv] test lib - mock system - periphery (different kinds of strange behavior)", zmq: true do
 
-    extend TS__ ; use :server_expect
+    extend TS_
+    use :server_expect
 
     context "strange parameter" do
 
@@ -102,7 +103,7 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System
     end
 
     def manifest_prefix_pathname
-      TS__::Fixtures.dir_pathname
+      TS_::Fixtures.dir_pathname
     end
 
     def other_args

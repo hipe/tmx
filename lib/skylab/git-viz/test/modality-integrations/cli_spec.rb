@@ -1,12 +1,14 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::GitViz::TestSupport::CLI
+module Skylab::GitViz::TestSupport
 
-  describe "[gv] CLI - core and canon and periphery" do
+  describe "[gv] modality integrations - CLI", wip: true do
 
-    extend TS__ ; use :expect
+    extend TS_
+    use :expect_event
 
     it "loads" do
+      self._USE_expect_stdout_stderr
       GitViz_::CLI
     end
 

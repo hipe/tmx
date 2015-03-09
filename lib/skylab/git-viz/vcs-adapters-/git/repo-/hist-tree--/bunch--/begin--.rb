@@ -4,22 +4,30 @@ module Skylab::GitViz
 
     class Repo_::Hist_Tree__
 
-      Bunch__::Begin__ = Simple_Agent_.new :bunch, :listener do
+      class Bunch__::Begin__
+
+        Callback_::Actor.call self, :properties, :bunch
 
         def execute
-          @scn = self.class::Get_ls_files_scanner__[ @bunch, @listener ]
-          @scn && exec_with_each_file_line
+          @st = self.class::Get_ls_files_scanner__[ @bunch, & @on_event_selectively ]
+          @st && __via_upstream_lines_etc
         end
 
-      private
+        def __via_upstream_lines_etc
 
-        def exec_with_each_file_line
-          trail_a = nil ; line = @scn.gets or self.sanity
+          line = @st.gets or self._SANITY
+          trail_a = nil
+
           begin
-            trail = @bunch.begin_trail line, @listener
-            trail and (( trail_a ||= [] )) << trail
-            line = @scn.gets
-          end while line
+            trail = @bunch.begin_trail line, & @on_event_selectively
+            if trail
+              trail_a ||= []
+              trail_a.push trail
+            end
+            line = @st.gets
+            line ? redo : break
+          end while nil
+
           trail_a
         end
       end
@@ -28,19 +36,21 @@ module Skylab::GitViz
 
         class Get_ls_files_scanner__ < Git::System_Agent_
 
-          def self.[] bunch, listener
-            new( bunch, listener ).execute
-          end
+          class << self
+            def [] bunch, & oes_p
+              new( bunch, & oes_p ).execute
+            end
+          end  # >>
 
-          def initialize bunch, listener
+          def initialize bunch, & oes_p
             repo = bunch.repo
-            super listener do |sa|
+            super oes_p do | sa |
               sa.set_cmd_s_a [ GIT_EXE_, 'ls-files', '--', '.' ]
               sa.set_chdir_pathname repo.get_focus_dir_absolute_pn
               sa.set_system_conduit repo.system_conduit
             end
           end
-        public
+
           def execute
             get_any_nonzero_count_output_line_stream_from_cmd
           end

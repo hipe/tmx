@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::GitViz::TestSupport::Test_Lib_::Mock_FS
+module Skylab::GitViz::TestSupport::Test_Lib::Mock_FS
 
-  ::Skylab::GitViz::TestSupport::Test_Lib_[ TS__ = self ]
+  ::Skylab::GitViz::TestSupport::Test_Lib[ TS_ = self ]
 
   include Constants
 

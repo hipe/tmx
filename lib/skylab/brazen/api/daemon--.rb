@@ -23,7 +23,7 @@ module Skylab::Brazen
       def two_stream_event_expresser
         API::Produce_bound_call__::Two_Stream_Event_Expresser
       end
-    end
+    end  # >>
 
     extend module MM__
 

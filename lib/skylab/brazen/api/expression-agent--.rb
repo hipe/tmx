@@ -73,6 +73,9 @@ module Skylab::Brazen
       end
 
       def pth x
+        if x.respond_to? :to_path
+          x = x.to_path
+        end
         "«#{ x }»"  # :+#guillemets
       end
 

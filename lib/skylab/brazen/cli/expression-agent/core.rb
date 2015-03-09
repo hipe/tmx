@@ -13,7 +13,7 @@ module Skylab::Brazen
         def pretty_path x
           self::Pretty_Path__[ x ]
         end
-      end
+      end  # >>
 
       def initialize partitions
         @partitions = partitions

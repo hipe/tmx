@@ -8,10 +8,10 @@ module Skylab::GitViz
 
         class Begin__ < Git::System_Agent_
 
-          def initialize trail, listener
+          def initialize trail, & oes_p
             @file_relpath = trail.file_relpath
             @repo = trail.repo ; @trail = trail
-            super listener do |sa|
+            super oes_p do |sa|
               sa.set_chdir_pathname @repo.get_focus_dir_absolute_pn
               sa.set_cmd_s_a [ GIT_EXE_, * INNER_CMD_S_A__, trail.file_relpath ]
               sa.set_system_conduit @repo.system_conduit

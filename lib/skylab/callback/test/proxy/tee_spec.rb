@@ -58,7 +58,7 @@ module Skylab::Callback::TestSupport::Proxy::Tee
         x = tee.shift
         x.should eql :one
 
-        a.should eql Callback_::EMPTY_A_
+        a.should eql EMPTY_A_
         a_.should eql [ :one ]
 
       end

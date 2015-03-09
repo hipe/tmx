@@ -318,6 +318,10 @@ module Skylab::Callback
 
       public
 
+        def description  # play nice with :+[#cb-110]
+          "«property#{ ":#{ @name.as_slug }" if @name }»"  # :+#guillemets
+        end
+
         def name_symbol
           @name.as_variegated_symbol
         end

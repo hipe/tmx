@@ -23,6 +23,8 @@ module Skylab::GitViz
 
     # ~ universe modules, sidesystem facilities and short procs all as procs
 
+    Brazen = sidesys[ :Brazen ]
+
     Bsc__ = wall[ :Basic ]
 
     Basic_Set = -> * a do

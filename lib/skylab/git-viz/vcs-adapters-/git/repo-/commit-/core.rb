@@ -13,7 +13,7 @@ module Skylab::GitViz
           def new_writable sha
             self::Writable__.new self, sha
           end
-        end
+        end  # >>
 
         class Writable__ < self
           def initialize ci_cls, sha
@@ -72,29 +72,30 @@ module Skylab::GitViz
         end
 
         class Pool
-          def initialize repo, sys_cond, listener
+          def initialize repo, sys_cond, & oes_p
             @cache_h = {} ; @commit_class = repo.class::Commit_
-            @listener = listener ; @repo = repo ; @system_conduit = sys_cond
+            @on_event_selectively = oes_p
+            @repo = repo ; @system_conduit = sys_cond
           end
           def SHA_notify sha
-            r = true
+            x = true
             @cache_h.fetch sha do |hash_key|
-              ci = rslv_any_ci sha
+              ci = __produce_any_ci sha
               if ci
                 @cache_h[ hash_key ] = ci
               else
-                r = ci
+                x = ci
               end
             end
-            r
+            x
           end
-        private
-          def rslv_any_ci sha
-            @commit_class.build_ci @repo, sha, @listener do |ci|
+
+          def __produce_any_ci sha
+            @commit_class.build_ci @repo, sha, @on_event_selectively do | ci |
               ci.set_system_conduit @system_conduit
             end
           end
-        public
+
           def close_pool
             a = @cache_h.values.freeze ; @cache_h = :_closed_
             @commit_class::Rink_.build_rink a

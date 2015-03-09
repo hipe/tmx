@@ -1,6 +1,6 @@
 require_relative '../test-support'
 
-module Skylab::GitViz::TestSupport::Test_Lib_
+module Skylab::GitViz::TestSupport::Test_Lib
 
   ::Skylab::GitViz::TestSupport[ self ]
 

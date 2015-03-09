@@ -4,17 +4,28 @@ module Skylab::GitViz
 
     class Repo_  # read [#016] the git repo narrative for storypoints
 
-      def self.build_repo pathname, listener, & repo_option_p
-        pn = self::Resolve__.new( self, pathname, listener ).execute
-        pn and new( pn, pathname, listener, & repo_option_p )
-      end
+      class << self
 
-      def initialize absolute_pn, focus_dir_absoulte_pn, listener
-        @listener = listener
+        def build_repo pathname, oes_p, & repo_option_p
+
+          pn = Produce_pathname___[ self, pathname, & oes_p ]
+          pn and begin
+            new( pn, pathname, oes_p, & repo_option_p )
+          end
+        end
+      end  # >>
+
+      def initialize absolute_pn, focus_dir_absoulte_pn, oes_p
+
         @absolute_pn = absolute_pn
-        @ci_pool_p = -> { init_ci_pool }
+
+        @ci_pool_p = -> { __init_ci_pool }
+
         @focus_dir_relpath_pn = focus_dir_absoulte_pn.
           relative_path_from( absolute_pn )
+
+        @on_event_selectively = oes_p
+
         yield self
         # M-etaHell::F-UN.without_warning { GitViz_.lib_.grit }  # see [#016]:#as-for-grit
         # @inner = ::Grit::Repo.new absolute_pn.to_path ; nil
@@ -23,7 +34,7 @@ module Skylab::GitViz
       attr_accessor :system_conduit
 
       def build_hist_tree_bunch  # this is a good starting point for :[#012]
-        _hist_tree = self.class::Hist_Tree__.new self, @listener
+        _hist_tree = self.class::Hist_Tree__.new self, & @on_event_selectively
         _hist_tree.build_bunch
       end
 
@@ -52,62 +63,72 @@ module Skylab::GitViz
       # ~ the commit pool
 
       def SHA_notify sha
-        commit_pool.SHA_notify sha
+        _commit_pool.SHA_notify sha
       end
-    private
-      def commit_pool
-        @ci_pool_p[]
-      end
-      def init_ci_pool
-        ci_pool = bld_ci_pool ; @ci_pool_p = -> { ci_pool } ; ci_pool
-      end
-      def bld_ci_pool
-        self.class::Commit_::Pool.new self, @system_conduit, @listener
-      end
-    public
+
       def close_the_pool
-        @sparse_matrix = commit_pool.close_pool
+        @sparse_matrix = _commit_pool.close_pool
         @ci_pool_p = -> { raise "the pool's closed" }
         @sparse_matrix && PROCEDE_
       end
+
       attr_reader :sparse_matrix
 
-      # ~ private helper classes
+      def _commit_pool
+        @ci_pool_p[]
+      end
 
-      class Resolve__  # this looks like a :+[#hl-176] tree walk
+      def __init_ci_pool
+        ci_pool = __build_ci_pool
+        @ci_pool_p = -> { ci_pool }
+        ci_pool
+      end
 
-        def initialize repo_cls, pn, listener
-          @listener = listener ; @pn = pn
-          @pn.absolute? or raise ::ArgumentError,
-            "relative paths are not honored here - #{ pn }"
-          @repo_cls = repo_cls ; nil
+      def __build_ci_pool
+        self.class::Commit_::Pool.new self, @system_conduit, & @on_event_selectively
+      end
+
+
+      Produce_pathname___ = -> repo_cls, pathname, & oes_p do
+
+        # we gotta use this and not :+[#hl-176] (tree walk) while #open [#004]
+
+        if SEP_BYTE___ != pathname.instance_variable_get( :@path ).getbyte( 0 )
+          # use of pathname is "temporary"
+
+          raise ::ArgumentError, "relative paths are not honored here - #{ pathname.to_path }"
         end
 
-        def execute
-          pn = @pn ; count = 0
-          begin
-            pn.join( IMPLEMENTATION_DIR_ ).exist? and break
-            count += 1
-            TOP__ == pn.instance_variable_get( :@path ) and
-              break( did_fail = true )
-            pn = pn.dirname
-          end while true
-          @count = count
-          did_fail ? when_did_fail : pn
-        end
-        TOP__ = '/'.freeze
-      private
-        def when_did_fail
-          @listener.maybe_receive_event :repo_root_not_found, :error, :string do
-            say_didnt_find_repo_implementation_dir
+        filename = IMPLEMENTATION_DIR_
+        num_times_looked = 1
+        pn = pathname
+        begin
+          if pn.join( filename ).exist?
+            found = pn
+            break
           end
-          DESIST_
-        end
-        def say_didnt_find_repo_implementation_dir
-          "Didn't find #{ IMPLEMENTATION_DIR_ } in this or any parent #{
-            }directory (looked in #{ @count } dirs): #{ @pn }"
+          pn_ = pn.dirname
+          if pn_ == pn
+            break
+          end
+          num_times_looked += 1
+          pn = pn_
+          redo
+        end while nil
+
+        found or begin
+
+          oes_p.call :error, :expression, :repo_root_not_found do | y |
+
+            y << "Didn't find '#{ filename }' entry in this or any parent #{
+              }directory (looked in #{ num_times_looked } dirs): #{ pth pathname }"
+
+          end
+          UNABLE_
         end
       end
+
+      SEP_BYTE___ = ::File::SEPARATOR.getbyte 0
 
       class SHA_  # [#016]:#what-is-the-deal-with-SHA's?
 

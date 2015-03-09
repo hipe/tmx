@@ -3,7 +3,7 @@ require_relative '../test-support'
 module Skylab::GitViz::TestSupport::VCS_Adapters::Git::System_Agent
 
   Parent_TS__ = ::Skylab::GitViz::TestSupport::VCS_Adapters::Git
-  Parent_TS__[ TS__ = self ]
+  Parent_TS__[ TS_ = self ]
 
   include Constants
 
@@ -16,7 +16,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git::System_Agent
   module InstanceMethods
 
     def with_system_agent & p
-      @sa = testable_system_agent_class.new listener do |sa|
+      @sa = testable_system_agent_class.new listener_x do |sa|
         sa.set_system_conduit mock_system_conduit
         p[ sa ]
       end ; nil

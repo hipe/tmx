@@ -1,13 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::GitViz::TestSupport
+module Skylab::Callback::TestSupport::Name
 
-  describe "[gv] name" do
-
-    def self.memoize i, & p
-      p_ = -> do x = p[] ; p_ = -> { x } ; x end
-      define_method i do p_[] end
-    end
+  describe "[ca] name" do
 
     context "from const" do
 
@@ -32,21 +27,20 @@ module Skylab::GitViz::TestSupport
         end
       end
 
-      def expect i, s
-        _name = GitViz_::Name_.via_const i
-        _name.as_doc_slug.should eql s
+      def expect sym, s
+        subject.via_const( sym ).as_doc_slug.should eql s
       end
     end
 
     context "from variegated symbol" do
 
-      memoize :name do
-        GitViz_::Name_.via_variegated_symbol :merk_FS
-      end
-
       it "as_const" do
-        name.as_const.should eql :Merk_FS
+        subject.via_variegated_symbol( :merk_FS ).as_const.should eql :Merk_FS
       end
+    end
+
+    def subject
+      Callback_::Name
     end
   end
 end

@@ -224,8 +224,9 @@ module Skylab::Brazen
         end
 
         def bound_call_against_iambic_stream st  # #hook-out
+
           case 0 <=> @action_class_like.p.arity
-          when -1 ; bc_when_nonzero_arity_via_stream st
+          when -1 ; _bound_call_when_nonzero_arity_via_stream st
           when  0 ; bc_when_zero_arity
           when  1 ; __bound_call_when_glob st
           end
@@ -237,40 +238,26 @@ module Skylab::Brazen
 
         def __bound_call_when_glob st
 
-          # currently this gets its coverage by pinging [ts] under [tmx]
+          # currently this gets its coverage by ( [ts], [gv] ) ping
 
-          if st.unparsed_exists
-            _sym = st.gets_one  # whatever name symbol was used by the action for the argument
-            mutable_args = st.gets_one
-            st.unparsed_exists and self._WRITE_ME_newly_encountered_argument_signature
-          else
-            mutable_args = []
-          end
-
-          mutable_args.push self # :+#here again
-
-          Callback_::Bound_Call.new mutable_args, @action_class_like.p, :call
+          _bound_call_when_nonzero_arity_via_stream st
         end
 
-        def bc_when_nonzero_arity_via_stream st
+        def _bound_call_when_nonzero_arity_via_stream st
 
           param_a = @action_class_like.p.parameters
           param_a[ -1, 1 ] = EMPTY_A_  # always 1 arg for the call used #here
 
-          h = {}
-          while st.unparsed_exists
-            _sym = st.gets_one
-            _x = if st.unparsed_exists
-              st.gets_one
-            end
-            h[ _sym ] = _x
-          end
+          h = __hash_via_flushing_probably_iambic_stream st
 
           arglist = []
           miss_sym_a = nil
           param_a.each do | orr, name_sym |
-            if h.key? name_sym
-              arglist.push h.delete name_sym
+
+            x = h.delete name_sym
+            if x
+              arglist.push x
+
             elsif :req == orr
               miss_sym_a ||= []
               miss_sym_a.push name_sym
@@ -288,6 +275,17 @@ module Skylab::Brazen
           else
             bc_when_OK arglist
           end
+        end
+
+        def __hash_via_flushing_probably_iambic_stream st
+
+          h = {}
+          while st.unparsed_exists
+            h[ st.gets_one ] = if st.unparsed_exists
+              st.gets_one
+            end
+          end
+          h
         end
 
         def __bc_when_extra extra_sym_a

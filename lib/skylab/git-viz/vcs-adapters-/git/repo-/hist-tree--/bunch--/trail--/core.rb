@@ -6,23 +6,26 @@ module Skylab::GitViz
 
       class Bunch__::Trail__
 
-        def self.begin bunch, line, listener
-          new( bunch, line, listener ).begin
-        end
+        class << self
 
-        def self.finish bunch, trail, listener
-          self::Finish__[ bunch, trail, listener ]
-        end
+          def begin bunch, line, & oes_p
+            new( bunch, line, & oes_p ).begin
+          end
 
-        def initialize bunch, line, listener
+          def finish bunch, trail, & oes_p
+            self::Finish__[ bunch, trail, & oes_p ]
+          end
+        end  # >>
+
+        def initialize bunch, line, & oes_p
           @file_relpath = line  # relative to anywhere
           @filediff_a = nil
-          @listener_p = -> { listener }
+          @on_event_selectively = oes_p
           @repo_p = -> { bunch.repo }
         end
 
         def begin
-          Begin__.new( self, @listener_p[] ).execute
+          Begin__.new( self, & @on_event_selectively ).execute
         end
 
         def to_tree_path
@@ -55,7 +58,7 @@ module Skylab::GitViz
         end
 
         def finish
-          @listener_p = @repo_p = nil
+          @repo_p = nil
           freeze  # or not, whatever
           PROCEDE_
         end

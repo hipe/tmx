@@ -8,8 +8,8 @@ module Skylab::GitViz
         new( * a, & p ).execute
       end
 
-      def initialize listener
-        @listener = listener
+      def initialize listener_x
+        @on_event_selectively = listener_x
         if block_given?
           yield args = Args__.new
           @cmd_s_a, @chdir_pathname, @system_conduit = args.to_a
@@ -57,9 +57,9 @@ module Skylab::GitViz
       def gt_any_output_line_stream_when_no_first_output_line
         peek_s = @e.gets
         if peek_s
-          r = unexpected_errput peek_s
+          x = unexpected_errput peek_s
           expect_zero_exitstatus
-          r
+          x
         else
           expect_zero_exitstatus
         end
@@ -73,7 +73,7 @@ module Skylab::GitViz
               line_s.chomp!  # #storypoint-45
               line_s
             else
-              gets_p = fnsh_the_stream_with_a_proc
+              gets_p = __finish_the_stream_with_a_proc
               line_s
             end
           end
@@ -86,26 +86,42 @@ module Skylab::GitViz
         end
       end
 
-      def fnsh_the_stream_with_a_proc
+      def __finish_the_stream_with_a_proc
         line_s = @e.gets
-        line_s and unexpected_errput line_s
+        if line_s
+          unexpected_errput line_s
+        end
         expect_zero_exitstatus
         EMPTY_P_
       end
 
       def unexpected_errput line_s
+
         begin
-          line_s.chomp!
-          @listener.maybe_receive_event :unexpected_stderr, :line, line_s
+
+          -> line_s_ do
+            @on_event_selectively.call :error, :expression, :unexpected_stderr do | y |
+              y << line_s_
+            end
+          end[ line_s ]  # this event is built around line as it is now
+
           line_s = @e.gets
-        end while line_s
+          if line_s
+            redo
+          else
+            break
+          end
+        end while nil
+
         INTERRUPT__
       end
 
       def expect_zero_exitstatus
         d = @w.value.exitstatus
         if d.nonzero?
-          @listener.maybe_receive_event :unexpected, :exitstatus, d
+          @on_event_selectively.call :error, :expression, :unexpected_exitstatus do | y |
+            y << d
+          end
         end
       end
 
@@ -149,30 +165,46 @@ module Skylab::GitViz
       end
 
       def prepare_exec_when_enonent e
+
         emit_command_and_command_options
-        @listener.maybe_receive_event :cannot_execute_command, :string do
-          e.message
+
+        @on_event_selectively.call :error, :expression, :cannot_execute_command do | y |
+          y << e.message
         end
+
         INTERRUPT__
       end
 
       def prepare_exec_when_path_exists
+
         if FTYPE_WHITE_S_A.include? @stat.ftype
           @cmd_opt_a = [ @cmd_opt_h ]
           PROCEDE__
+
         else
+
           emit_command_and_command_options
-          @listener.maybe_receive_event :cannot_execute_command, :string do
-            say_wrong_ftype
+
+          me = self
+          @on_event_selectively.call :error, :expression, :cannot_execute_command do |y|
+            me.__express_wrong_ftype_into_under y, self
           end
+
           INTERRUPT__
         end
       end
       FTYPE_WHITE_S_A = %w( directory ).freeze
 
-      def say_wrong_ftype
-        "path is #{ @stat.ftype }, must have #{ FTYPE_WHITE_S_A * ' or ' }"
-      end
+      public( def __express_wrong_ftype_into_under y, expag
+
+        act = @stat.ftype
+
+        expag.calculate do
+          y << "path is #{ act }, must have #{ or_ FTYPE_WHITE_S_A }"
+        end
+
+        NIL_
+      end )
 
       def exec_cmd
         emit_command_and_command_options
@@ -181,19 +213,16 @@ module Skylab::GitViz
       end
 
       def emit_command_and_command_options
-        @listener.maybe_receive_event :next_system, :command do
-          Command__.new @cmd_s_a, @cmd_opt_h
-        end ; nil
+
+        @on_event_selectively.call :next_system, :command do
+          Next_System_Command___[ @cmd_s_a, @cmd_opt_h ]
+        end
+
+        NIL_
       end
 
-      class Command__  # just a wrapper used in reporting, currently
-        def initialize cmd_s_a, any_nonzero_length_option_h
-          @any_nonzero_length_option_h = any_nonzero_length_option_h
-          @command_s_a = cmd_s_a
-          nil
-        end
-        attr_reader :command_s_a, :any_nonzero_length_option_h
-      end
+      Next_System_Command___ = Callback_::Event.data_event_class_factory.new(
+        :command_s_a, :any_nonzero_length_option_h )
 
       INTERRUPT__ = false
       PROCEDE__ = true

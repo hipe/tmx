@@ -65,6 +65,20 @@ module Skylab::Callback::TestSupport
           expect_event_via_iambic_and_proc [ :is_ok, true, :shorthand, x_a ], p
         end
 
+        def expect_N_events d, term_chn_sym
+          block_given? and raise ::ArgumentError
+          idx = ( 0 ... d ).detect do | d_ |
+            term_chn_sym != @ev_a.fetch( d_ ).terminal_channel_i
+          end
+          if idx
+            fail "expected '#{ term_chn_sym }', #{
+              }had '#{ @ev_a.fetch( idx ).terminal_channel_i }' (event at index #{ idx })"
+          else
+            @ev_a[ 0, d ] = EMPTY_A_
+            nil
+          end
+        end
+
         def expect_event * x_a, & p
           expect_event_via_iambic_and_proc [ :shorthand, x_a ], p
         end
@@ -105,7 +119,7 @@ module Skylab::Callback::TestSupport
 
         def flush_to_event_stream
           st = Callback_::Stream.via_nonsparse_array @ev_a
-          @ev_a = TestSupport_::EMPTY_A_
+          @ev_a = EMPTY_A_
           st
         end
 
@@ -231,14 +245,7 @@ module Skylab::Callback::TestSupport
 
         def initialize recv_ev_p, test_context
 
-          @chan_p = -> i_a, & ev_p do
-            __receive_passed_event(
-              if ev_p
-                ev_p[]
-              else
-                Callback_::Event.inline_via_normal_extended_mutable_channel i_a
-              end )
-          end
+          @chan_p = method :__receive_on_channel_unclassified
 
           if test_context.do_debug
             @do_debug = true
@@ -250,6 +257,38 @@ module Skylab::Callback::TestSupport
           @recv_ev_p = recv_ev_p
 
           @test_context = test_context
+        end
+
+        def __receive_on_channel_unclassified i_a, & x_p
+
+          if i_a && :expression == i_a[ 1 ]  # buy-in to :+[#br-023]
+            __receive_expression i_a, & x_p
+          else
+            __receive_passed_event(
+              if x_p
+                x_p[]
+              else
+                Callback_::Event.inline_via_normal_extended_mutable_channel i_a
+              end )
+          end
+        end
+
+        def __receive_expression i_a, & msg_p
+
+          _ok = case i_a.first
+          when :info    ; nil
+          when :payload ; true
+          else          ; false  # meh
+          end
+
+          _ev = Callback_::Event.inline_with(
+
+              i_a.fetch( 2 ), :ok, _ok ) do | y, _ |
+
+            instance_exec y, & msg_p
+          end
+
+          __receive_passed_event _ev
         end
 
         def handle_event_selectively
@@ -384,6 +423,19 @@ module Skylab::Callback::TestSupport
       end
 
       def __gets_when_line_zero
+        if @ev.message_proc
+          __gets_when_line_zero_and_event_is_expressive
+        else
+          __gets_when_line_zero_and_event_is_not_expressive
+        end
+      end
+
+      def __gets_when_line_zero_and_event_is_not_expressive
+        @is_active = false
+        "« #{ _render_data_head } »"  # :+#guillemets
+      end
+
+      def __gets_when_line_zero_and_event_is_expressive
         @st = @ev.to_stream_of_lines_rendered_under @expag
         @line = @st.gets
         if @line
@@ -400,9 +452,7 @@ module Skylab::Callback::TestSupport
         # with each content line from the event in a right column, an effect
         # only noticable for the few events that render into multiple lines.
 
-        @first_line_header = "#{ @comment }#{ __OK_s }#{
-         } #{ @ev.terminal_channel_i }#{
-          } (#{ @ev.tag_names * ', ' }) - "
+        @first_line_header = "#{ _render_data_head } - "
 
         s = "#{ @first_line_header }#{ @line.inspect }"
         @line = @st.gets
@@ -412,6 +462,12 @@ module Skylab::Callback::TestSupport
           @is_active = false
         end
         s
+      end
+
+      def _render_data_head
+        "#{ @comment }#{ __OK_s }#{
+         } #{ @ev.terminal_channel_i }#{
+          } (#{ @ev.tag_names * ', ' })"
       end
 
       def __OK_s

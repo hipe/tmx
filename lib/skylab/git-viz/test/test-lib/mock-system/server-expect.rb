@@ -1,6 +1,6 @@
 module Skylab::GitViz
 
-  module TestSupport::Test_Lib_::Mock_System
+  module TestSupport::Test_Lib::Mock_System
 
     class Server_Expect
       def self.[] ctx

@@ -21,35 +21,49 @@ module Skylab::GitViz
           freeze ; nil
         end
 
-        def finish_filediff trail, listener
-          Finish_Filediff__.new( trail, self, listener ).finish_filediff
+        def finish_filediff__ trail, & oes_p
+          Finish_Filediff___.new( trail, self, & oes_p ).__finish_filediff
         end
 
-        class Finish_Filediff__
-          def initialize trail, filediff, listener
-            @filediff = filediff ; @listener = listener
-            @repo = trail.repo ; @trail = trail
+        class Finish_Filediff___
+
+          def initialize trail, filediff, & oes_p
+
+            @filediff = filediff
+            @on_event_selectively = oes_p
+            @repo = trail.repo
+            @trail = trail
           end
-          def finish_filediff
+
+          def __finish_filediff
             @ci = @repo.lookup_commit_with_SHA @filediff.SHA
             @norm_path = @repo.normal_path_of_file_relpath @trail.file_relpath
             @counts = @ci.lookup_any_filediff_counts_for_normpath @norm_path
             @counts ? when_yes : when_no
           end
+
         private
+
           def when_yes
             _cpi = @repo.lookup_commitpoint_index_of_commit @ci
             @filediff.set_commitpoint_index _cpi
             @filediff.set_counts_and_finish @counts
             PROCEDE_
           end
+
           def when_no  # this is here to catch [#035] this issue
-            @listener.maybe_receive_event :info, :string,
-              :omitting_informational_commitpoint do
-                "'#{ @filediff.SHA.to_string }' appears only to be #{
-                  }informational in regards to #{ @norm_path }"
+
+            fd = @filediff ; norm_path = @norm_path
+
+            @on_event_selectively.call(
+                :info, :expression, :omitting_informational_commitpoint ) do | y |
+
+              y << "'#{ fd.SHA.to_string }' appears only to be #{
+                }informational in regards to #{ norm_path }"
             end
+
             @trail.remove_filediff @filediff
+
             PROCEDE_
           end
         end

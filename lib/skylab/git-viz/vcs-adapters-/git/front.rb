@@ -4,9 +4,9 @@ module Skylab::GitViz
 
     class Front
 
-      def initialize context_mod, listener, & extra_p
+      def initialize context_mod, oes_p, & extra_p
         @context_mod = context_mod
-        @listener = listener
+        @on_event_selectively = oes_p
         yield self
         freeze
       end
@@ -16,14 +16,16 @@ module Skylab::GitViz
       end
 
       def procure_repo_from_pathname pn
-        @context_mod::Repo_.build_repo pn, @listener do |repo|
+        @context_mod::Repo_.build_repo pn, @on_event_selectively do | repo |
           repo.system_conduit = @system_conduit
         end
       end
 
       def ping
-        @listener.maybe_receive_event :ping, :hello_from_front
-        nil
+        @on_event_selectively.call :payload, :expression, :ping do | y |
+          y << "hello from front."
+        end
+        :hello_from_front
       end
     end
 

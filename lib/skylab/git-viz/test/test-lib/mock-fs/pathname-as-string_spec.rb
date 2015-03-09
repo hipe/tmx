@@ -1,10 +1,10 @@
 require_relative 'test-support'
 
-module Skylab::GitViz::TestSupport::Test_Lib_::Mock_FS
+module Skylab::GitViz::TestSupport::Test_Lib::Mock_FS
 
-  describe "[gv] mock FS - pathname as string" do
+  describe "[gv] test lib - mock FS - pathname as string" do
 
-    extend TS__
+    extend TS_
 
     it 'loads' do
       Mock_FS_Parent_Module__::Mock_FS
@@ -44,7 +44,7 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_FS
         class Eg_Test_Eg_Context_STR
           Mock_FS_Parent_Module__::Mock_FS[ self ]
           def self.nearest_test_node
-            TS__
+            TS_
           end
         end
       end
