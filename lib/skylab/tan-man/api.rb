@@ -6,12 +6,15 @@ module Skylab::TanMan
 
     class << self
 
-      def expression_agent_instance  # :+[#051]
-        @expag ||= expression_agent_class.new application_kernel
+      def call * x_a, & oes_p
+        bc = TanMan_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
+        bc and bc.receiver.send bc.method_name, * bc.args
       end
-    end
 
-    extend Brazen_::API.module_methods
+      def expression_agent_instance  # :+[#051]
+        @expag ||= Expression_Agent__.new TanMan_.application_kernel_
+      end
+    end  # >>
 
     # ~
 

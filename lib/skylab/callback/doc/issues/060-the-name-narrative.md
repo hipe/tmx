@@ -1,5 +1,9 @@
 # the Name narrative :[#060]
 
+EDIT: below is for old name that used to be in [hl]. subject node
+was rewritten from scratch for [gv] and distilled up to here, but has
+the same intent.
+
 
 ## upgrade path and obviation roadmap for old / new name
 
@@ -54,7 +58,7 @@ of the old.
 a name "function" may be a bit of a misnomer, it is really several functions
 in one, bound around (or curried to) an inner "normalized" name. abstracted
 from existing application here, it comes in handy for doing name "inflection"
-for the [#146] isomorphicisms, if it happes to work out that the name
+for the [#hl-146] isomorphicisms, if it happens to work out that the name
 function(s) you want are here.
 
 

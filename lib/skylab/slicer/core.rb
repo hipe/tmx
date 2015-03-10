@@ -3,14 +3,18 @@ require 'skylab/callback/core'
 
 module Skylab::Slicer
 
+  class << self
+
+    def lib_
+      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+    end
+  end  # >>
+
   Callback_ = ::Skylab::Callback
-    Autoloader_ = Callback_::Autoloader
 
-  def self.lib_
-    @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
-  end
+  Autoloader_ = Callback_::Autoloader
 
-  module Lib_  # :+[#su-001]
+  module Lib_
 
     sidesys, = Autoloader_.at :build_require_sidesystem_proc
 
@@ -27,5 +31,5 @@ module Skylab::Slicer
 
   Slicer_ = self
 
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 end

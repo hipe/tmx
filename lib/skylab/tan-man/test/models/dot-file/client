@@ -33,7 +33,7 @@ module Skylab::TanMan::TestSupport::Models::DotFile
 
         TanMan_::Model_::Document_Entity::IO_PROPERTIES__.fetch( sym ) )
 
-      TanMan_::API.application_kernel.silo( :dot_file ).
+      TanMan_.application_kernel_.silo( :dot_file ).
         document_controller_via_trio_box bx, & @on_event_selectively
     end
   end

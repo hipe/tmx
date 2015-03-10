@@ -16,19 +16,17 @@ module Skylab::Git
       @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
         self::Lib_, self )
     end
-  end
+  end  # >>
 
   Callback_ = ::Skylab::Callback
-    Autoloader_ = Callback_::Autoloader
 
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+  Autoloader_ = Callback_::Autoloader
+
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   DASH_ = '-'.freeze
-
   Git_ = self
-
   stowaway :Lib_, 'library-'
-
   UNDERSCORE_ = '_'.freeze
 
 end

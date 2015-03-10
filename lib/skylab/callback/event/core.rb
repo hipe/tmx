@@ -402,10 +402,11 @@ module Skylab::Callback
         def maybe_pathify_item_x
           if PN_RX__ =~ @first_tag_i.to_s
             x = @item_x
-            s = @expression_agent.calculate do
-              pth x
+            @item_x = if x
+              @expression_agent.calculate do
+                pth x
+              end
             end
-            @item_x = s
             ACHIEVED_
           end
         end

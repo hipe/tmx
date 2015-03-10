@@ -44,7 +44,7 @@ module Skylab::Headless::TestSupport
     end
   end
 
-  module TestLib_  # :+[#su-001]:just-for-tests
+  module TestLib_
 
     Callback_test_support = -> do
       Headless_::Callback_.test_support

@@ -2,6 +2,27 @@ require_relative '../callback/core'
 
 module Skylab::SubTree
 
+  Callback_ = ::Skylab::Callback
+
+  module API
+
+    class << self
+
+      def call * x_a, & oes_p
+        bc = application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
+        bc and bc.receiver.send bc.method_name, * bc.args
+      end
+
+      define_method :application_kernel_, ( Callback_.memoize do
+        SubTree_.lib_.brazen::Kernel.new SubTree_
+      end )
+
+      def action_class_
+        SubTree_.lib_.brazen.model.action_class
+      end
+    end  # >>
+  end
+
   class << self
 
     def lib_
@@ -9,12 +30,11 @@ module Skylab::SubTree
     end
   end  # >>
 
-  Callback_ = ::Skylab::Callback
-    Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Callback_::Autoloader
+
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   Autoloader_[ Models_ = ::Module.new, :boxxy ]
-
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
   ACHIEVED_ = true
 
@@ -48,3 +68,5 @@ module Skylab::SubTree
 
   UNDERSCORE_ = '_'.freeze
 end
+
+# :+#tombstone: dedicated API node

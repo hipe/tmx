@@ -117,6 +117,6 @@ module Skylab::GitViz::TestSupport
 
   # ~ set it up so we peek into the FS to autoload usees
 
-  Autoloader_[ self, :boxxy, GitViz_.dir_pathname.join( 'test' ) ]
+  Autoloader_[ self, :boxxy, GitViz_.dir_pathname.join( 'test' ).to_path ]
 
 end

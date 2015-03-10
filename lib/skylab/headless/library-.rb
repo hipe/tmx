@@ -1,6 +1,6 @@
 module Skylab::Headless
 
-  module Library_  # :+[#su-001]
+  module Library_
 
     stdlib, sidesys = Autoloader_.at :require_stdlib, :require_sidesystem
 

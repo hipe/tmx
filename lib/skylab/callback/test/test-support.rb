@@ -60,5 +60,5 @@ module Skylab::Callback::TestSupport
     TestSupport_ = TestSupport_
   end
 
-  Autoloader_[ self, Callback_.dir_pathname.join( 'test' ) ]
+  Autoloader_[ self, Callback_.dir_pathname.join( 'test' ).to_path ]
 end

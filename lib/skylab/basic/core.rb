@@ -45,7 +45,7 @@ module Skylab::Basic  # introduction at [#020]
         Callback_::Trio.new( * x_a )
       end
     end
-  end
+  end  # >>
 
   Callback_ = ::Skylab::Callback
 
@@ -179,10 +179,8 @@ module Skylab::Basic  # introduction at [#020]
     end
   end
 
-  Autoloader_ = Callback_::Autoloader
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
-
   ACHIEVED_ = true
+  Autoloader_ = Callback_::Autoloader
   Basic_ = self
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> {}
@@ -195,4 +193,5 @@ module Skylab::Basic  # introduction at [#020]
   PROCEDE_ = true
   UNABLE_ = false
 
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 end

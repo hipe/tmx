@@ -286,7 +286,7 @@ module Skylab::BeautySalon
         bx.add sym, x_a.fetch( d )
       end
 
-      BS_::API.call_via_mutable_box method.name, bx, & @on_event_selectively
+      BS_::API.call_via_mutable_box__ method.name, bx, & @on_event_selectively
     end
 
     def on_info_string e  # meh

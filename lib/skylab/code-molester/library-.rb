@@ -1,6 +1,6 @@
 module Skylab::CodeMolester
 
-  module Library_  # :+[#su-001]
+  module Library_
 
     quietly, stdlib = Autoloader_.at :require_quietly,  :require_stdlib
 

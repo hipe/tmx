@@ -8,95 +8,27 @@ module Skylab::Brazen
         API::Produce_bound_call__
       end
 
+      def call * x_a, & oes_p
+        bc = Brazen_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
+        bc and bc.receiver.send bc.method_name, * bc.args
+      end
+
       def exit_statii
         Exit_statii__[]
       end
 
-      def module_methods
-        MM__
+      def expression_agent_class
+        API::Expression_Agent__
       end
 
       def expression_agent_instance  # #note-015
-        @expag ||= expression_agent_class.new application_kernel
+        @expag ||= expression_agent_class.new :_no_kernel_
       end
 
       def two_stream_event_expresser
         API::Produce_bound_call__::Two_Stream_Event_Expresser
       end
     end  # >>
-
-    extend module MM__
-
-      def members
-        [ :application_kernel, :call ]
-      end
-
-      def call * x_a, & x_p
-        bc = _API_daemon.produce_bound_call_via_mutable_iambic x_a, & x_p
-        bc and bc.receiver.send bc.method_name, * bc.args
-      end
-
-      def call_via_mutable_box * i_a, bx, & x_p
-        bc = _API_daemon.produce_bound_call_via_mutable_box i_a, bx, & x_p
-        bc and bc.receiver.send bc.method_name, * bc.args
-      end
-
-      def application_kernel
-        _API_daemon.application_kernel
-      end
-
-      def _API_daemon
-        @API_daemon ||= bld_API_daemon
-      end
-
-    private
-
-      def bld_API_daemon
-        Daemon__.new Brazen_.name_library.surrounding_module self
-      end
-
-    public
-
-      def debug_IO
-        @debug_IO ||= LIB_.system.IO.some_stderr_IO
-      end
-
-      def expression_agent_class
-        const_get :Expression_Agent__, false
-      end
-
-      self
-    end
-
-    class Daemon__
-
-      def initialize mod
-        @mod = mod
-        @app_kernel = @mod.const_get( :Kernel_, false ).new @mod ; nil
-      end
-
-      def produce_bound_call_via_mutable_iambic x_a, & x_p
-
-        if x_p
-          x_a.push :on_event_selectively, x_p
-        end
-
-        API::Produce_bound_call__[ x_a, @app_kernel, @mod ]
-      end
-
-      def produce_bound_call_via_mutable_box i_a, bx, & x_p
-
-        API::Produce_bound_call__.start_via_iambic_and_mutable_box(
-          i_a,
-          bx,
-          @app_kernel,
-          & x_p ).resolve_bound_call
-      end
-
-      def application_kernel
-        @app_kernel
-      end
-    end
 
     Exit_statii__ = Callback_.memoize do
 

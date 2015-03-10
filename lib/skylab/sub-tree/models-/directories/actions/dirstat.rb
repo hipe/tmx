@@ -4,7 +4,7 @@ module Skylab::SubTree
 
     Actions = ::Module.new
 
-    class Actions::Ping < Action_
+    class Actions::Ping < API.action_class_
 
       @is_promoted = true
 
@@ -20,7 +20,7 @@ module Skylab::SubTree
       end
     end
 
-    class Actions::Dirstat < Action_
+    class Actions::Dirstat < API.action_class_
 
       @is_promoted = true
 

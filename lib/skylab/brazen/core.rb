@@ -4,7 +4,13 @@ require_relative '../callback/core'
 
 module Skylab::Brazen
 
+  Callback_ = ::Skylab::Callback
+
   class << self
+
+    define_method :application_kernel_, ( Callback_.memoize do
+      Brazen_::Kernel.new Brazen_
+    end )
 
     def bound_call *a
       if a.length.zero?
@@ -42,10 +48,6 @@ module Skylab::Brazen
       Callback_::Event
     end
 
-    def kernel_class
-      Brazen_::Kernel_
-    end
-
     def lib_
       LIB_
     end
@@ -78,15 +80,14 @@ module Skylab::Brazen
       require_relative 'test/test-support'
       Brazen_::TestSupport
     end
-  end
+  end  # >>
 
   Actor_ = -> cls, * x_a do
     Lib_::Snag_[]::Model_::Actor.via_client_and_iambic cls, x_a
     Brazen_.event.selective_builder_sender_receiver cls ; nil
   end
 
-  Callback_ = ::Skylab::Callback
-    Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Callback_::Autoloader
 
   module Data_Stores_
     class << self
@@ -267,7 +268,7 @@ module Skylab::Brazen
     end
   end
 
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   ACHIEVED_ = true
   Brazen_ = self
@@ -288,9 +289,7 @@ module Skylab::Brazen
   PROCEDE_ = true
   SPACE_ = ' '.freeze
   STOP_PARSING_ = false
-
   stowaway :TestSupport, 'test/test-support'
-
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
 

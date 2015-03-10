@@ -3,30 +3,36 @@ require 'skylab/callback/core'
 
 module Skylab::BeautySalon
 
-  Callback_ = ::Skylab::Callback
-    Autoloader_ = Callback_::Autoloader
-
-  def self.lib_
-    @lib ||= Callback_.produce_library_shell_via_library_and_app_modules( Lib_, self )
-  end
-
-  Brazen_ = Autoloader_.require_sidesystem :Brazen
-
   module API
 
-    extend Brazen_::API.module_methods
+    class << self
 
+      def call * x_a, & oes_p
+        bc = BS_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
+        bc and bc.receiver.send bc.method_name, * bc.args
+      end
+
+      def call_via_mutable_box__ * i_a, bx, & x_p
+        bc = BS_.application_kernel_.bound_call_via_mutable_box i_a, bx, & x_p
+        bc and bc.receiver.send bc.method_name, * bc.args
+      end
+    end  # >>
   end
 
-  class Kernel_ < Brazen_::Kernel_  # :+[#br-015]
+  Callback_ = ::Skylab::Callback
 
-  end
+  class << self
 
-  THE_EMPTY_MODULE_ = ::Module.new.freeze
+    define_method :application_kernel_, ( Callback_.memoize do
+      Brazen_::Kernel.new BS_
+    end )
 
-  module Models_
-    Autoloader_[ self, :boxxy ]  # ask for it
-  end
+    def lib_
+      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules( Lib_, self )
+    end
+  end  # >>
+
+  Autoloader_ = Callback_::Autoloader
 
   module Lib_
 
@@ -94,22 +100,23 @@ module Skylab::BeautySalon
     end
   end
 
-  # (:+[#su-001]:none)
-
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
-
   ACHIEVED_ = true
+  Brazen_ = Autoloader_.require_sidesystem :Brazen
   BS_ = self
   CONST_SEP_ = '::'.freeze
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
   IDENTITY_ = -> x { x }          # for fun we track this
+  Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]  # ask for it
   NEWLINE_ = "\n"
   NIL_ = nil  # to emphasize its use
   PROCEDE_ = true
   SPACE_ = ' '.freeze
   STOP_PARSING_ = false
+  THE_EMPTY_MODULE_ = ::Module.new.freeze
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
+
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
 end

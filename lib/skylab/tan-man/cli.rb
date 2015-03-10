@@ -4,13 +4,9 @@ module Skylab::TanMan
 
     class << self
       def new * a
-        new_top_invocation a, TanMan_
+        new_top_invocation a, TanMan_.application_kernel_
       end
     end  # >>
-
-    def produce_app_kernel
-      TanMan_::API.application_kernel
-    end
 
     # ~ experimental front client customizations:
 

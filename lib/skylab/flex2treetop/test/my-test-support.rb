@@ -8,7 +8,7 @@ module Skylab::Flex2Treetop::MyTestSupport
   MyTestSupport = self
   TestSupport = ::Skylab::TestSupport
 
-  Callback_::Autoloader[ self, F2TT_.dir_pathname.join( 'test' ) ]
+  Callback_::Autoloader[ self, F2TT_.dir_pathname.join( 'test' ).to_path ]
 
   extend TestSupport::Quickie
 

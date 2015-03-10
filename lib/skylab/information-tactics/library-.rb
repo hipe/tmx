@@ -1,6 +1,6 @@
 module Skylab::InformationTactics
 
-  module Library_  # :+[#su-001]
+  module Library_
 
     class << self
 
@@ -9,7 +9,7 @@ module Skylab::InformationTactics
           const_get i, false
         end ; nil
       end
-    end
+    end  # >>
 
     -> o do
 

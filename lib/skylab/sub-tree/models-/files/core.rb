@@ -6,11 +6,11 @@ module Skylab::SubTree
 
       Actions = ::Module.new
 
-      class Actions::Files < Action_
+      class Actions::Files < API.action_class_
 
         @is_promoted = true
 
-        Brazen_.model.entity self,
+        SubTree_.lib_.brazen.model.entity self,
 
           :desc, -> y do
             y << "inspired by unix builtin `tree`"

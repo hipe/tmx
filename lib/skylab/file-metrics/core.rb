@@ -3,10 +3,18 @@ require 'skylab/callback/core'
 
 module Skylab::FileMetrics
 
+  class << self
+
+    def lib_
+      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+    end
+  end  # >>
+
   Callback_ = ::Skylab::Callback
+
   Autoloader_ = Callback_::Autoloader
 
-  module Library_  # :+[#su-001]
+  module Library_
 
     stdlib = Autoloader_.method :require_stdlib
 
@@ -28,10 +36,6 @@ module Skylab::FileMetrics
     end
 
     Autoloader_[ self ]
-  end
-
-  def self.lib_
-    @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
   end
 
   module Lib_
@@ -123,6 +127,6 @@ module Skylab::FileMetrics
   SPACE_ = ' '.freeze
   UNABLE_ = false
 
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
 end

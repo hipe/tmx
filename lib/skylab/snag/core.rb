@@ -4,13 +4,6 @@ require 'skylab/callback/core'
 module Skylab::Snag
 
   Callback_ = ::Skylab::Callback
-    Autoloader_ = Callback_::Autoloader
-
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
-
-  module Core
-    Autoloader_[ self ]
-  end
 
   class << self
 
@@ -18,26 +11,16 @@ module Skylab::Snag
       @lib ||= Snag_::Lib_::INSTANCE
     end
 
-    define_method :models_cls, -> do
+    define_method :models_cls, ( Callback_.memoize do
 
-      p = -> do
+      # go deep into [cb] API
 
-        # go deep into [cb] API
+      Models_Hub__.define_reader_methods_via_entry_tree_stream_(
+        Models.entry_tree.to_stream )
 
-        _st = Models.entry_tree.to_stream
-
-        Models_Hub__.define_reader_methods_via_entry_tree_stream_ _st
-        p = -> do
-          Models_Hub__
-        end
-        Models_Hub__
-      end
-
-      -> do
-        p[]
-      end
-    end.call
-  end
+      Models_Hub__
+    end )
+  end  # >>
 
   class Models_Hub__
 
@@ -87,42 +70,35 @@ module Skylab::Snag
     end
   end
 
+  Autoloader_ = Callback_::Autoloader
+
+  module Core
+    Autoloader_[ self ]
+  end
+
   module Models
     Autoloader_[ self, :boxxy ]
   end
-
-  ACHIEVED_= true
-
-  Bsc__ = Autoloader_.build_require_sidesystem_proc :Basic
-
-  Bzn__ = Autoloader_.build_require_sidesystem_proc :Brazen
-
-  EMPTY_A_ = [].freeze
-
-  EMPTY_P_ = -> { }
-
-  EMPTY_S_ = ''.freeze
-
-  Event_ = -> { Snag_::Model_::Event }
-
-  IDENTITY_ = -> x { x }
-
-  stowaway :Lib_, 'library-'
-
-  LINE_SEP_ = "\n".freeze
-
-  KEEP_PARSING_ = true
-
-  NEUTRAL_ = nil
 
   NF_ = -> do
     Bzn__[].name_library
   end
 
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
+  ACHIEVED_= true
+  Bsc__ = Autoloader_.build_require_sidesystem_proc :Basic
+  Bzn__ = Autoloader_.build_require_sidesystem_proc :Brazen
+  EMPTY_A_ = [].freeze
+  EMPTY_P_ = -> { }
+  EMPTY_S_ = ''.freeze
+  Event_ = -> { Snag_::Model_::Event }
+  IDENTITY_ = -> x { x }
+  stowaway :Lib_, 'library-'
+  LINE_SEP_ = "\n".freeze
+  KEEP_PARSING_ = true
+  NEUTRAL_ = nil
   Snag_ = self
-
   SPACE_ = ' '.freeze
-
   UNABLE_ = false
-
 end

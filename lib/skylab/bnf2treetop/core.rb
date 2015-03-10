@@ -22,5 +22,4 @@ module Skylab::BNF_2_Treetop
         end ]
     end
   end
-  # (:+[#su-001]:none)
 end

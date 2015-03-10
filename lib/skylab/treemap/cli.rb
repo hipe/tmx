@@ -6,7 +6,7 @@ module Skylab::Treemap
 
     class << self
       def new * a
-        new_top_invocation a, Treemap_
+        new_top_invocation a, Treemap_.application_kernel_
       end
     end
 

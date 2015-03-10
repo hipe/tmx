@@ -11,7 +11,7 @@ module Skylab::Headless::TestSupport::Plugin
         class Mandango
 
           Headless_::Plugin::Host[ self ]
-          Callback::Autoloader[ self, TS__.dir_pathname.join( 'mandango' ) ]
+          Callback::Autoloader[ self, TS__.dir_pathname.join( 'mandango' ).to_path ]
 
           def initialize
             m = method :raise

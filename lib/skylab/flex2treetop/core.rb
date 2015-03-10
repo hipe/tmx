@@ -2,18 +2,18 @@ require_relative '../callback/core'
 
 module Skylab::Flex2Treetop
 
+  class << self
+
+    def lib_
+      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+    end
+  end  # >>
+
   Callback_ = ::Skylab::Callback
-    Autoloader_ = Callback_::Autoloader
 
-  VERSION = '0.0.2'
+  Autoloader_ = Callback_::Autoloader
 
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
-
-  def self.lib_
-    @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
-  end
-
-  module Lib_  # :+[#su-001]
+  module Lib_
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
@@ -177,7 +177,7 @@ module Skylab::Flex2Treetop
 
     def show_flex2tt_tt_grammar
       @IO_adapter.outstream.write TREETOP_GRAMMAR__
-      PROCEDE_
+      ACHIEVED_
     end
 
     def show_tests
@@ -192,7 +192,7 @@ module Skylab::Flex2Treetop
           emit_error_line "( missing example - fix this - #{ rel_pn })"
         end
       end
-      PROCEDE_
+      ACHIEVED_
     end
 
     def version
@@ -335,9 +335,11 @@ module Skylab::Flex2Treetop
 
   KEEP_PARSING_ = true  # must be defined before local actor is used below
 
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]  # before #here
+
   module API
 
-    LIB_.API_lib self, :with_service, :with_session, :with_actions
+    LIB_.API_lib self, :with_service, :with_session, :with_actions  # :#here
 
     action_class
     class Action
@@ -518,7 +520,7 @@ module Skylab::Flex2Treetop
 
         if io
           @upstream_IO = io
-          PROCEDE_
+          ACHIEVED_
         end
       end
 
@@ -526,7 +528,7 @@ module Skylab::Flex2Treetop
         if @do_show_sexp_only || @do_use_FS_parser
           @verb_s = :_no_verb_
           @payload_IO = :_no_outstream_
-          PROCEDE_
+          ACHIEVED_
         else
           rslv_payload_IO
         end
@@ -545,7 +547,7 @@ module Skylab::Flex2Treetop
 
         if io
           @payload_IO = io
-          PROCEDE_
+          ACHIEVED_
         end
       end
 
@@ -1663,16 +1665,12 @@ Translate__ = Class_as_function__[ -> do class Translate____
     fixthix:  'flex2treetop/test/fixtures/fixthis.flex'
   }.freeze
 
+  ACHIEVED_ = true
   F2TT_ = self
-
-  PROCEDE_ = true
-
   SPACE_ = ' '.freeze
-
   READ_MODE_ = 'r'.freeze
-
   UNABLE_ = false
-
+  VERSION = '0.0.2'
   WRITE_MODE_ = 'w'.freeze
 
   TREETOP_GRAMMAR__ = <<'GRAMMAR'

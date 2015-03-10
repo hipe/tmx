@@ -1,16 +1,47 @@
 module Skylab::Brazen
 
-  class Kernel_  # [#015]
+  class Kernel  # [#015]
 
     def initialize mod
-      @module = mod
       @models_mod = mod.const_get :Models_, false
+      @module = mod
       @nm = nil
     end
 
     def members
-      [ :app_name, :debug_IO, :module, :silo ]
+      [ :app_name, :bound_call_via_mutable_iambic, :debug_IO, :module, :silo ]
     end
+
+    attr_reader :module
+
+    # ~ call exposures
+
+    def call * x_a, & x_p  # #note-25
+
+      bc = bound_call_via_mutable_iambic x_a, & x_p
+
+      bc and bc.receiver.send bc.method_name, * bc.args
+    end
+
+    def bound_call_via_mutable_iambic x_a, & oes_p
+
+      if oes_p
+        x_a.push :on_event_selectively, oes_p
+      end
+
+      Brazen_::API::Produce_bound_call__[ x_a, self, @module ]
+    end
+
+    def bound_call_via_mutable_box i_a, bx, & x_p  # [bs] only so far
+
+      Brazen_::API::Produce_bound_call__.start_via_iambic_and_mutable_box(
+        i_a,
+        bx,
+        self,
+        & x_p ).resolve_bound_call
+    end
+
+    # ~ client exposures
 
     def to_kernel
       self  # the top
@@ -31,26 +62,7 @@ module Skylab::Brazen
     end
 
     def debug_IO
-      @module::API.debug_IO
-    end
-
-    attr_reader :module
-
-    def call * x_a, & x_p  # #note-25
-
-      bc = _bound_API_call_via_iambic x_a, & x_p
-
-      bc and bc.receiver.send bc.method_name, * bc.args
-    end
-
-    def bound_API_call_with * x_a, & x_p
-      _bound_API_call_via_iambic x_a, & x_p
-    end
-
-    def _bound_API_call_via_iambic x_a, & x_p
-
-      @module.const_get( :API, false )._API_daemon.
-        produce_bound_call_via_mutable_iambic x_a, & x_p
+      LIB_.system.IO.some_stderr_IO  # etc
     end
 
     def to_unbound_action_stream
@@ -187,7 +199,7 @@ module Skylab::Brazen
       end
     end
 
-    def __cols_via_unresolved_id id, & oes_p
+    def __cols_via_unresolved_id id, & oes_p  # #note-40
       id = id.as_mutable_for_resolving
       node = self ; mod_a = nil
       full_raw_s_a = id.raw_name_parts
@@ -317,7 +329,7 @@ module Skylab::Brazen
 
   SILO_DAEMON_FILE___ = "silo-daemon#{ Autoloader_::EXTNAME }"
 
-  Kernel_::Node_Identifier__ = class Node_Identifier_  # :[#022].
+  Kernel::Node_Identifier__ = class Node_Identifier_  # :[#022].
 
     class << self
 

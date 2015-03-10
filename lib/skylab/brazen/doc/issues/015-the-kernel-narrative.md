@@ -1,25 +1,35 @@
 # the kernel narrative :[#015]
 
+## synopsis
+
+  • brazen-powered applications are "model-trees" (or "silo-fields"), with a
+    "kernel" being the root of this tree
+
+  • brazen-powered applications have to date never needed to subclass
+    the kernel. it is a lowlevel mechanism that has no business logic.
+
+  • the kernel is always one instance per application
+
+  • the kernel is typically lazy-loaded and long-running
+
+  • the kernel was merged with another component called "daemon"
+
+  • the kernel cannot fail
+
+  • the kernel never emits events directly
+
+
+
+
 ## introduction
 
-the kernel exists to make the topnost node look like any other interface
+the kernel exists to make the topmost node look like any other interface
 branch node as necessary. it is pre-modality. it exists for modality-
 specific clients to attach to and query for the data that makes up the
 application.
 
 as well it can be used by controllers to read "silo" shells for
 other parts of the model.
-
-
-
-
-## :#note-25
-
-this is questionable: the API is supposed to rely on the kernel but not
-the other way around. however the kernel is everywhere and we want to
-give the actions a way to make API calls without using the singleton
-directly (which has no guarantee of sticking around) so we use this
-means for now.
 
 
 

@@ -3,7 +3,7 @@ module Skylab::Callback::TestSupport
     module TerstSerppert
       # we "simuate" what these test nodes
       _dpn = Autoloader::Fixtures::Elvn_Ferce.dir_pathname.join 'terst'
-      Autoloader_[ self, _dpn ]
+      Autoloader_[ self, _dpn.to_path ]
 
       stowaway :CIL, 'cil/terst-serppert'
     end

@@ -1136,7 +1136,7 @@ module Skylab::Git
       end
     end
 
-    Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+    Autoloader_[ self, ::File.dirname( __FILE__ ) ]
     Autoloader_[ Plugins__ = ::Module.new ]
 
     # ~ plugins

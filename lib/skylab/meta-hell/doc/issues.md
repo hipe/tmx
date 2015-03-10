@@ -74,7 +74,7 @@
 [#013]       #done move porcelain attribtues to here, then clean up
 [#012]       #done foo/ and foo.rb should be automagic, no declaration of module
 [#011]       #doc-node the parse narrative ..
-             (#re-purposed:once, became [#su-001])
+             (#re-purposed:once, became [#su-001] (which dissolved to `Lib_`))
 [#010]       #done pull in D-elegatesTo from porcelain!
 [#009]       #done when you made plastic you didn't know about `define_singleton_method`
 [#008]       #done after etc, consider pulling in Let

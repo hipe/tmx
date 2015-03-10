@@ -27,13 +27,9 @@ module Skylab::SubTree
     class << self
 
       def new * a
-        new_top_invocation a, SubTree_
+        new_top_invocation a, API.application_kernel_
       end
     end  # >>
-
-    def produce_app_kernel
-      SubTree_::API::Kernel.new SubTree_
-    end
 
     module Actions
 

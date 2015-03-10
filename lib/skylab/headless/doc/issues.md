@@ -48,7 +48,8 @@
              ( #re-purposed:thrice. moved to [#cb-058]
                was: #parent-node: [#017] our own hand-rolled parameter library
                #parent-in-universe: [#mh-053] )
-             (#re-purposed: once. before above, was what became [#su-001])
+             (#re-purposed: once. before above, became [#su-001] then
+               dissolved to `Lib_`)
 [#129]       #parent-node: [#126] headless CLI client DSL narrative
 [#128]       #in-situ (?) hard-coded in-project tmpdir path!
 [#126]       #parent-node: [#125] headless CLI component & theory narratives ..

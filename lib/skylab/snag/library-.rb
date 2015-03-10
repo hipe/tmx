@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  module Library_  # :+[#su-001]
+  module Library_
 
     stdlib, subsystem = Autoloader_.at :require_stdlib, :require_sidesystem
 

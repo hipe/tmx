@@ -16,6 +16,10 @@ module Skylab::TestSupport
 
     class << self
 
+      define_method :krnl, ( Callback_.memoize do
+        TestSupport_.lib_.brazen::Kernel.new TestSupport_
+      end )
+
       def lib_
         @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib___, self
       end
@@ -41,10 +45,6 @@ module Skylab::TestSupport
       end
 
       Autoloader_[ self, :boxxy ]
-    end
-
-
-    class Kernel < Brazen_::Kernel_
     end
 
     module Lib___

@@ -10,8 +10,6 @@ module Skylab::Slake::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
-  Autoloader_[ self, Slake_.dir_pathname.join( 'test' ) ]  # #while:[#ts-031]
-
   TestSupport_::Regret[ Slake_TestSupport = self ]
 
   module Constants

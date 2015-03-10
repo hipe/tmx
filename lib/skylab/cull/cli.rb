@@ -4,7 +4,7 @@ module Skylab::Cull
 
     class << self
       def new * a
-        new_top_invocation a, Cull_
+        new_top_invocation a, Cull_.application_kernel_
       end
     end  # >>
 

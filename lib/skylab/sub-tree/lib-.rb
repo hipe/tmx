@@ -1,6 +1,6 @@
 module Skylab::SubTree
 
-  module Library_  # :+[#su-001]
+  module Library_
 
     stdlib = Autoloader_.method :require_stdlib
 

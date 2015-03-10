@@ -27,9 +27,10 @@ module Skylab::Headless  # ([#013] is reserved for a core node narrative - no st
   end  # >>
 
   Callback_ = ::Skylab::Callback
-    Autoloader_ = Callback_::Autoloader
 
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+  Autoloader_ = Callback_::Autoloader
+
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   ACHIEVED_ = true
   COLON_ = ':'.freeze

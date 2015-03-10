@@ -4,15 +4,18 @@ require 'skylab/headless/core'
 
 module Skylab::CSS_Convert
 
+  class << self
+
+    def lib_
+      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+    end
+  end  # >>
+
   Callback_ = ::Skylab::Callback
 
-    Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Callback_::Autoloader
 
-  def self.lib_
-    @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
-  end
-
-  module Lib_  # (:+[#su-001]:none)
+  module Lib_
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
@@ -35,8 +38,6 @@ module Skylab::CSS_Convert
 
   LIB_ = lib_
 
-  Headless_ = ::Skylab::Headless
-
   Event_Sender_Methods_ = ::Module.new
 
   module Core
@@ -45,6 +46,8 @@ module Skylab::CSS_Convert
       include Event_Sender_Methods_
     end
   end
+
+  Headless_ = ::Skylab::Headless
 
   module Core::SubClient::InstanceMethods
 
@@ -375,16 +378,6 @@ module Skylab::CSS_Convert
     end
   end
 
-  Autoloader_[ CSSC_ = self, ::Pathname.new( ::File.dirname __FILE__ ) ]
-
-  FIXTURES_DIR = CSSC_.dir_pathname.join('test/fixtures')
-
-  SPACE_ = ' '.freeze
-
-  SUCCEEDED_ = true
-
-  UNABLE_ = false
-
   VISUAL_TESTS_ = Callback_.memoize do
     o = []
     o.push test.new( 'color test', 'see what the CLI colors look like.', :color_test )
@@ -392,4 +385,13 @@ module Skylab::CSS_Convert
     o.push tst.new( '002', 'minitessimal.txt', :fixture )
     o
   end
+
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
+  CSSC_ = self
+  FIXTURES_DIR = CSSC_.dir_pathname.join 'test/fixtures'
+  SPACE_ = ' '.freeze
+  SUCCEEDED_ = true
+  UNABLE_ = false
+
 end

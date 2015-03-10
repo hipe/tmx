@@ -2,7 +2,7 @@ module Skylab::TestSupport
 
   # (was [#035]:the-system-node)
 
-  module Library_  #  :+[#su-001]
+  module Library_
 
     gemlib = stdlib = Autoloader_.method :require_stdlib
 

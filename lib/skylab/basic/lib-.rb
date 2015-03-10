@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  module Lib_  # :+[#su-001]
+  module Lib_
 
     memo, sidesys, stdlib = Autoloader_.at :memoize,
       :build_require_sidesystem_proc, :build_require_stdlib_proc

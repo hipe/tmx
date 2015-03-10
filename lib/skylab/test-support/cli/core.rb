@@ -7,15 +7,9 @@ module Skylab::TestSupport
     class << self
 
       def new * a
-        new_top_invocation a, TestSupport_
+        new_top_invocation a, TestSupport_::API.krnl
       end
     end  # >>
-
-    # ~ because there is perhaps no standard location
-
-    def produce_app_kernel
-      TestSupport_::API::Kernel.new @mod
-    end
 
     # ~ experimental extension of action adapter base class, exactly :+[#br-023]
 

@@ -34,12 +34,13 @@ module Skylab::TestSupport  # :[#021].
     def tmpdir
       self::Lib_::Tmpdir[]
     end
-  end
+  end  # >>
 
   Callback_ = ::Skylab::Callback
-    Autoloader_ = Callback_::Autoloader
 
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+  Autoloader_ = Callback_::Autoloader
+
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   ACHIEVED_ = true
   CONST_SEP_ = '::'.freeze

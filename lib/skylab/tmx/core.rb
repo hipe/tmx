@@ -39,9 +39,7 @@ module Skylab::TMX
     end
   end
 
-    Autoloader_ = Callback_::Autoloader
-
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+  Autoloader_ = Callback_::Autoloader
 
   module CLI  # #stowaway
     def self.new *a
@@ -73,10 +71,8 @@ module Skylab::TMX
   end
 
   DASH_ = '-'.freeze
-
   EMPTY_S_ = ''.freeze
-
   TMX = self  # not 'TMX_', just for aesthetics
 
-  # (:+[#su-001]:none)
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 end

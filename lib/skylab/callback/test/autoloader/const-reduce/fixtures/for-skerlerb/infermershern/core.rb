@@ -6,7 +6,7 @@ module Skylab::Callback::TestSupport::Autoloader
 
       module Infermershern
 
-        Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+        Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
       end
     end

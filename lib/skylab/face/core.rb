@@ -10,7 +10,8 @@ module Skylab::Face  # read [#011] the top node narrative
   end
 
   Callback_ = ::Skylab::Callback
-    Autoloader_ = Callback_::Autoloader
+
+  Autoloader_ = Callback_::Autoloader
 
   module API
     def self.[] mod
@@ -21,7 +22,7 @@ module Skylab::Face  # read [#011] the top node narrative
     Autoloader_[ self ]
   end
 
-  module Library_  # :+[#su-001]
+  module Library_
 
     stdlib = Autoloader_.method :require_stdlib
     o = { }
@@ -484,7 +485,7 @@ module Skylab::Face  # read [#011] the top node narrative
       end
     end
 
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   DASH_ = '-'.freeze
 

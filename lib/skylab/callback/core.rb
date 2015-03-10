@@ -8,8 +8,32 @@ module Skylab::Callback
       self::Bundles.apply_iambic_on_client x_a, mod
     end
 
+    def const_sep
+      CONST_SEP_
+    end
+
+    def distill * a
+      if a.length.zero?
+        Distill_
+      else
+        Distill_[ * a ]
+      end
+    end
+
     def lib_
       @__lib ||= produce_library_shell_via_library_and_app_modules self::Lib_, self
+    end
+
+    def memoize * a, & p
+      if a.length.zero?
+        if block_given?
+          Memoize_.call_( & p )
+        else
+          Memoize_
+        end
+      else
+        Memoize_.call_( & a.fetch( a.length - 1 << 1 ) )
+      end
     end
 
     def produce_library_shell_via_library_and_app_modules lib_mod, app_mod
@@ -23,7 +47,7 @@ module Skylab::Callback
     def test_support
       Callback_::Test
     end
-  end
+  end  # >>
 
   module Actor  # see [#042] the actor narrative
 
@@ -179,10 +203,8 @@ module Skylab::Callback
         instance_variable_set bx.fetch( i ), x
       end
 
-      NIL___
+      NIL_
     end
-
-    NIL___ = nil
 
     def process_iambic_stream_fully st
       bx = formal_fields_ivar_box_for_read_
@@ -721,11 +743,11 @@ module Skylab::Callback
 
     class << self  # methods that implement the different employment features
 
-      def dir_pathname_argument x
-        if x.respond_to? :relative_path_from
+      def dir_path_argument x
+        if x.respond_to? :ascii_only?
           -> mod do
             mod.module_exec do
-              @dir_pathname = x
+              @dir_pathname = ::Pathname.new( x )
               extend Methods__
             end
           end
@@ -754,7 +776,7 @@ module Skylab::Callback
     end
 
     POSSIBLE_P_A_ = [
-      method( :dir_pathname_argument ),
+      method( :dir_path_argument ),
       method( :methods_keyword ),
       method( :boxxy_keyword )
     ].freeze
@@ -1003,7 +1025,7 @@ module Skylab::Callback
         np.set_value x
         _is_module_esque = x.respond_to? :module_exec  # not all x are modules.
         if _is_module_esque && ! x.respond_to?( :dir_pathname )
-          Autoloader[ x, np.get_some_dir_pathname ]  # some x wire themselves.
+          Autoloader[ x, np.some_dir_path ]  # some x wire themselves.
         end
         # all x with a corresponding dir must take this now to avoid redundant
         # filesystem hits. in the case of of nodes that first resolve their
@@ -1029,8 +1051,8 @@ module Skylab::Callback
       def has_directory
         false
       end
-      def get_some_dir_pathname
-        @dir_pn ||= bld_dpn
+      def some_dir_path
+        some_dir_pathname.to_path
       end
       def some_dir_pathname
         @dir_pn ||= bld_dpn
@@ -1046,8 +1068,8 @@ module Skylab::Callback
       def has_directory
         true
       end
-      def get_some_dir_pathname
-        @dir_pn
+      def some_dir_path
+        @dir_pn.to_path
       end
     end
 
@@ -1522,7 +1544,7 @@ module Skylab::Callback
   module Autoloader  # ~ service methods outside the immediate scope of a.l
     module Methods__
       def autoloaderize_with_filename_child_node fn, cn
-        Autoloader[ cn, dir_pathname.join( fn ) ] ; nil
+        Autoloader[ cn, dir_pathname.join( fn ).to_path ] ; nil
       end
     end
   end
@@ -1627,8 +1649,8 @@ module Skylab::Callback
     end
   end
 
-  class Name  # will freeze any string it is constructed with
-    # this only supports the simplified inflection necessary for this app.
+  class Name  # :[#060]
+
     class << self
 
       def is_valid_const const_i
@@ -1838,16 +1860,6 @@ module Skylab::Callback
     VALID_CONST_RX__ = /\A[A-Z][A-Z_a-z0-9]*\z/
   end
 
-  # ~ public and protected consts and any related public accessor methods
-
-  ACHIEVED_ = true
-
-  def self.const_sep
-    CONST_SEP_
-  end
-
-  CONST_SEP_ = '::'.freeze
-
   Constify_if_possible_ = -> do
     white_rx = %r(\A[a-z][-_a-z0-9]*\z)i
     gsub_rx = /([-_]+)([a-z])?/
@@ -1862,17 +1874,8 @@ module Skylab::Callback
     end
   end.call
 
-  DASH_ = '-'.freeze
-
-  def self.distill * a
-    if a.length.zero?
-      Distill_
-    else
-      Distill_[ * a ]
-    end
-  end
-
-  UNDERSCORE_ = '_'.freeze
+    DASH_ = '-'.freeze
+    UNDERSCORE_ = '_'.freeze
 
   Distill_ = -> do  # [#026]:#the-distill-function  :+[#bm-002]
     black_rx = /[-_ ]+(?=[^-_])/  # preserve final trailing underscores & dashes
@@ -1885,26 +1888,6 @@ module Skylab::Callback
       s.downcase.intern
     end
   end.call
-
-  EMPTY_A_ = [].freeze
-
-  EMPTY_P_ = -> {}
-
-  EMPTY_S_ = ''.freeze  # think of all the memory you'll save
-
-  KEEP_PARSING_ = true
-
-  def self.memoize * a, & p
-    if a.length.zero?
-      if block_given?
-        Memoize_.call_( & p )
-      else
-        Memoize_
-      end
-    else
-      Memoize_.call_( & a.fetch( a.length - 1 << 1 ) )
-    end
-  end
 
   module Memoize_
     class << self
@@ -1939,10 +1922,6 @@ module Skylab::Callback
     end
   end
 
-  NIL_ = nil
-
-  NILADIC_TRUTH_ = -> { true }
-
   Oxford = -> separator, none, final_sep, a do
     if a.length.zero?
       none
@@ -1958,11 +1937,6 @@ module Skylab::Callback
       end * EMPTY_S_
     end
   end
-
-  Oxford_or = Oxford.curry[ ', ', '[none]', ' or ' ]
-  Oxford_and = Oxford.curry[ ', ', '[none]', ' and ' ]
-
-  PATH_SEP_ = '/'.freeze
 
   class Scn < ::Proc  # see [#049]
 
@@ -2002,11 +1976,21 @@ module Skylab::Callback
     alias_method :gets, :call
   end
 
+  ACHIEVED_ = true
+  CONST_SEP_ = '::'.freeze
+  EMPTY_A_ = [].freeze
+  EMPTY_P_ = -> {}
+  EMPTY_S_ = ''.freeze  # think of all the memory you'll save
+  KEEP_PARSING_ = true
+  NIL_ = nil
+  NILADIC_TRUTH_ = -> { true }
+  Oxford_or = Oxford.curry[ ', ', '[none]', ' or ' ]
+  Oxford_and = Oxford.curry[ ', ', '[none]', ' and ' ]
+  PATH_SEP_ = ::File::SEPARATOR
   SPACE_ = ' '.freeze
-
   UNABLE_ = false
 
-  require 'pathname'  # ~ eat our own dogfood, necessarily at the end
+  require 'pathname'  # eat our own dogfood. necessary before below.
 
-  Autoloader[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+  Autoloader[ self, ::File.dirname( __FILE__ ) ]
 end

@@ -37,27 +37,7 @@ module Skylab::TestSupport
     #
     #     THIS_FILE_.contains( 'from these description lines"' ) # => true
 
-
-    Brazen_ = TestSupport_.lib_.brazen
-
-    class << self
-
-      def comment_block_stream_via_line_stream_using_single_line_comment_hack x
-        DocTest_::Input_Adapters__::
-          Comment_block_stream_via_line_stream_using_single_line_comment_hack[ x ]
-      end
-
-      def get_output_adapter_slug_array
-        self::Output_Adapters_.entry_tree.to_stream.map_by do | et |
-          et.name.as_slug
-        end.to_a
-      end
-
-    end  # >>
-
     module API
-
-      extend Brazen_::API.module_methods
 
       class << self
 
@@ -74,18 +54,34 @@ module Skylab::TestSupport
               end
             end
           end
-          super( * x_a, & nil )
+
+          bc = DocTest_.application_kernel_.bound_call_via_mutable_iambic x_a
+          bc and bc.receiver.send bc.method_name, * bc.args
         end
 
         def expression_agent_class
           Brazen_::API.expression_agent_class
         end
+      end  # >>
+    end
+
+    class << self
+
+      define_method :application_kernel_, ( Callback_.memoize do
+        Brazen_::Kernel.new DocTest_
+      end )
+
+      def comment_block_stream_via_line_stream_using_single_line_comment_hack x
+        DocTest_::Input_Adapters__::
+          Comment_block_stream_via_line_stream_using_single_line_comment_hack[ x ]
       end
-    end
 
-    class Kernel_ < Brazen_::Kernel_  # #todo
-
-    end
+      def get_output_adapter_slug_array
+        self::Output_Adapters_.entry_tree.to_stream.map_by do | et |
+          et.name.as_slug
+        end.to_a
+      end
+    end  # >>
 
     # ~ support for parsing
 
@@ -316,10 +312,9 @@ module Skylab::TestSupport
       end
     end
 
+    Brazen_ = TestSupport_.lib_.brazen
     BLANK_RX_ = /\A[[:space:]]*\z/
-
     DocTest_ = self
-
     IDENTITY_ = -> x { x }
   end
 end

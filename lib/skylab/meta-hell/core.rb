@@ -74,9 +74,8 @@ module Skylab
     end
 
     Callback_ = ::Skylab::Callback
-      Autoloader_ = ::Skylab::Callback::Autoloader
 
-    Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+    Autoloader_ = ::Skylab::Callback::Autoloader
 
     DASH_ = '-'.getbyte 0
 
@@ -94,6 +93,7 @@ module Skylab
 
     MONADIC_TRUTH_ = -> _ { true }
 
+    Autoloader_[ self, ::File.dirname( __FILE__ ) ]
   end
 end
 

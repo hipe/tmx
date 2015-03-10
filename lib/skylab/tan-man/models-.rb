@@ -285,9 +285,6 @@ module Skylab::TanMan
     end
   end
 
-  class Kernel_ < Brazen_::Kernel_  # :[#083].
-    # :+#archive-tombstone: this used to be bottom properties frame
-  end
 
   # ~
 
@@ -368,7 +365,6 @@ module Skylab::TanMan
     end
   end
 
-  # :+#tombstone:remote model (3 lines)
 
   class Models_::Graph < Model_
 
@@ -508,3 +504,5 @@ module Skylab::TanMan
     Models_::Internal_::Paths[ path, verb, call ]
   end
 end
+# :+#tombstone: this used to be bottom properties frame
+# :+#tombstone: remote model (3 lines)

@@ -141,7 +141,7 @@ module Skylab::Callback
         else
           x = @const_missing.lookup_x_after_loaded
           if @do_add_core_file
-            Autoloader[ x, np.some_dir_pathname ]
+            Autoloader[ x, np.some_dir_path ]
             x.module_exec do
               @did_resolve_entry_tree = true
               @any_built_entry_tree = np

@@ -1,6 +1,6 @@
 module Skylab::Porcelain
 
-  module Library_  # :+[#su-001]
+  module Library_
 
     o = { }
     o[ :Basic ] = -> _ { require 'skylab/basic/core' ; ::Skylab::Basic }

@@ -18,7 +18,7 @@ module Skylab::Brazen
 
       alias_method :new_top_invocation, :new
       def new * a
-        new_top_invocation a, Brazen_
+        new_top_invocation a, Brazen_.application_kernel_
       end
 
       def pretty_path x
@@ -34,10 +34,11 @@ module Skylab::Brazen
 
     class Top_Invocation__
 
-      def initialize a, mod
+      def initialize a, ak
+        @app_kernel = ak
         @env = nil
-        @mod = mod
-        @resources = Resources__.new a, mod
+        @mod = ak.module
+        @resources = Resources__.new a, @mod
         # (abstract base class "invocation" has no initialize method)
       end
 
@@ -49,7 +50,6 @@ module Skylab::Brazen
 
       def invoke argv
         @resources.complete @env || ::ENV, argv
-        __resolve_app_kernel
         resolve_properties
         resolve_partitions
         resolve_bound_call
@@ -60,17 +60,6 @@ module Skylab::Brazen
         else
           @exit_status
         end
-      end
-
-    private
-
-      def __resolve_app_kernel
-        @app_kernel = produce_app_kernel
-        nil
-      end
-
-      def produce_app_kernel  # :+#public-API #hook-in
-        @mod.const_get( :Kernel_, false ).new @mod
       end
 
     public

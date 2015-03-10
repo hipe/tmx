@@ -76,7 +76,7 @@ module Skylab::TanMan::TestSupport::Models::Node
       # into out tests, we just hack-build an actual preconditions box here
       # manually until the four or so tests that need this can be improved.
 
-      kr = kernel
+      kr = TanMan_.application_kernel_
 
       silo = kr.silo :node
 

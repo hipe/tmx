@@ -227,7 +227,7 @@ module Skylab::Brazen
 
         _two_streams = LIB_.two_streams
 
-        _expag = @mod::API.expression_agent_class.new @kernel
+        _expag = @mod::API.expression_agent_instance
 
         event_expresser = Produce_bound_call__::Two_Stream_Event_Expresser.
           new( * _two_streams, _expag )

@@ -2,33 +2,33 @@ require_relative '../callback/core'
 
 module Skylab::Cull
 
+  module API
+
+    class << self
+
+      def call * x_a, & oes_p
+        bc = Cull_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
+        bc and bc.receiver.send bc.method_name, * bc.args
+      end
+
+      def expression_agent_class
+        Brazen_::API.expression_agent_class
+      end
+    end  # >>
+  end
+
   Callback_ = ::Skylab::Callback
-    Autoloader_ = Callback_::Autoloader
 
   class << self
+
+    define_method :application_kernel_, ( Callback_.memoize do
+      Brazen_::Kernel.new Cull_
+    end )
 
     def lib_
       @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
     end
   end  # >>
-
-  Brazen_ = Autoloader_.require_sidesystem :Brazen
-
-  module API
-
-    class << self
-
-      include Brazen_::API.module_methods
-
-      def expression_agent_class
-        Brazen_::API.expression_agent_class
-      end
-    end
-  end
-
-  module Models_
-    Autoloader_[ self, :boxxy ]
-  end
 
   HARD_CALL_METHOD_ = -> * values, arg_box, & oes_p do
 
@@ -100,7 +100,9 @@ module Skylab::Cull
     end
   end
 
-  module Lib_  # :+[#su-001]
+  Autoloader_ = Callback_::Autoloader
+
+  module Lib_
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
@@ -127,17 +129,19 @@ module Skylab::Cull
     end
   end
 
+  Brazen_ = Autoloader_.require_sidesystem :Brazen
+
   ACHIEVED_ = true
   Action_ = Brazen_.model.action_class  # for name stop index we need this const
   Cull_ = self
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
   KEEP_PARSING_ = true
-  Kernel_ = Brazen_.kernel_class
   Model_ = Brazen_.model.model_class
+  Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
   NIL_ = nil
   UNABLE_ = false
 
-  Autoloader_[ self, ::Pathname.new( ::File.dirname( __FILE__ ) ) ]
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
 end

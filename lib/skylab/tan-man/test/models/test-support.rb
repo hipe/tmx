@@ -114,12 +114,6 @@ module Skylab::TanMan::TestSupport::Models
       s_a_ * TestLib_::UNDERSCORE_
     end
 
-    # ~
-
-    def kernel
-      subject_API.application_kernel
-    end
-
     # ~ fixture and prepared dir and file paths
 
     def using_dotfile content_s

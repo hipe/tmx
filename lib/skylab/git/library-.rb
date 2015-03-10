@@ -1,6 +1,6 @@
 module Skylab::Git
 
-  module Library_  # :+[#su-001]
+  module Library_
 
     stdlib, = Autoloader_.at :require_stdlib
 

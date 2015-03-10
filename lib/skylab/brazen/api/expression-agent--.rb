@@ -8,9 +8,9 @@ module Skylab::Brazen
       # in "black & white" when we are rendering their messages
       # to be used in exception messages.
 
-      def initialize k
+      def initialize kr
         @app_name_p = -> do
-          k.app_name
+          kr.app_name
         end
       end
 

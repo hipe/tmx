@@ -9,7 +9,7 @@ module Skylab::TestSupport
       class << self
 
         def new * a
-          new_top_invocation a, DocTest_
+          new_top_invocation a, DocTest_.application_kernel_
         end
       end
 

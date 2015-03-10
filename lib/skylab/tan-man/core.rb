@@ -3,28 +3,33 @@ require 'skylab/brazen/core'
 
 module Skylab::TanMan
 
+  Callback_ = ::Skylab::Callback
+
   class << self
 
-    def name_function
-      @nf ||= Callback_::Name.via_module self
-    end
+    define_method :application_kernel_, ( Callback_.memoize do
+      Brazen_::Kernel.new TanMan_
+    end )
 
     def lib_
       @lib ||= TanMan_::Lib_::INSTANCE
     end
-  end
 
-  Callback_ = ::Skylab::Callback
-    Autoloader_ = Callback_::Autoloader
+    def name_function
+      @nf ||= Callback_::Name.via_module self
+    end
+  end  # >>
 
-  Autoloader_[ self ]
+  Autoloader_ = Callback_::Autoloader
 
   module Input_Adapters_
     Autoloader_[ self ]
   end
 
-  Brazen_ = ::Skylab::Brazen
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
   ACHIEVED_ = true
+  Brazen_ = ::Skylab::Brazen
   CONST_SEP_ = '::'.freeze
   DASH_ = '-'.freeze
   EMPTY_A_ = [].freeze
