@@ -71,9 +71,9 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git::Repo::Hist_Tree
       end
 
       def __expect_constituency
-        @trail_a = @bunch.get_trail_stream.to_a
+        @trail_a = @bunch.immutable_trail_array
         @trail_a.length.should eql 3
-        @trail = @trail_a.shift
+        @trail = @trail_a.fetch 0
         __expect_trail
       end
 

@@ -74,6 +74,8 @@ module Skylab::GitViz
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
+  ACHIEVED_ = true
+
   Callback_Tree_ = Callback_::Tree
 
   CONTINUE_ = nil
@@ -89,8 +91,6 @@ module Skylab::GitViz
   Name_ = Callback_::Name
 
   NIL_ = nil
-
-  PROCEDE_ = true
 
   Scn_ = Callback_::Scn
 

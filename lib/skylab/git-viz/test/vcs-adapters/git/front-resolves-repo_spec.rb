@@ -38,9 +38,10 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
     def __expect_totally_doesnt_exist
 
       expect_not_OK_event :repo_root_not_found do | ev |
-        black_and_white( ev ).should eql(
-          "Didn't find '.git' entry in this or any parent directory #{
-           }(looked in 3 dirs): «/totally/doesn-t-exist»" )
+
+        ev.filename.should eql '.git'
+        ev.num_times_looked.should eql 3
+        ev.path.should eql "/totally/doesn-t-exist"
       end
 
       expect_failed

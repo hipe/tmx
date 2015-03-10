@@ -39,7 +39,7 @@ module Skylab::GitViz
         s_ or fail "test me - ISO compliant string? - #{ s }"
         _dt = GitViz_.lib_.date_time.iso8601 s_  # throes a.e, fine for now
         @writable_ci.set_author_datetime _dt
-        PROCEDE_
+        ACHIEVED_
       end
 
       def normalize_ISO_8601_string s  # [#009] #storypoint-10
@@ -71,7 +71,7 @@ module Skylab::GitViz
           @writable_ci.add_numstat_entry( * md.captures )
           line_s = @scn.gets
         end while line_s
-        PROCEDE_
+        ACHIEVED_
       end
       NUMSTAT_LINE_RX__ = /\A(\d+)\t(\d+)\t(.+)\z/
 

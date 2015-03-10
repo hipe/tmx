@@ -16,7 +16,6 @@ module Skylab::GitViz
       def prepare_VCS_resources  # continuation of [#006]:#storypoint-40
         @do_use_mocks = :do_use_mocks == @x_a.first && @x_a.shift && true
         @pathname = :pathname == @x_a.first && begin @x_a.shift ; @x_a.shift end
-        @x_a.unshift :VCS_adapters_module, GitViz_::VCS_Adapters_
         if @do_use_mocks
           prepare_VCS_resouces_for_mocks
         else

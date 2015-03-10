@@ -50,6 +50,7 @@ module Skylab::Callback::TestSupport
   EMPTY_A_ = Callback_::EMPTY_A_
   KEEP_PARSING_ = true
   NEWLINE_ = "\n".freeze
+  NIL_ = nil
 
   # ~ give these to the children
 

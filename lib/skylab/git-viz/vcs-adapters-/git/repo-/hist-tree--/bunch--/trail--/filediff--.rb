@@ -48,7 +48,7 @@ module Skylab::GitViz
             _cpi = @repo.lookup_commitpoint_index_of_commit @ci
             @filediff.set_commitpoint_index _cpi
             @filediff.set_counts_and_finish @counts
-            PROCEDE_
+            ACHIEVED_
           end
 
           def when_no  # this is here to catch [#035] this issue
@@ -64,7 +64,7 @@ module Skylab::GitViz
 
             @trail.remove_filediff @filediff
 
-            PROCEDE_
+            ACHIEVED_
           end
         end
       end

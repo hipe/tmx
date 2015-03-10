@@ -19,7 +19,8 @@ module Skylab::Callback::TestSupport
 
         def call_API_via_iambic x_a
           x_a.push :on_event_selectively, handle_event_selectively
-          @result = subject_API.call( * x_a ) ; nil
+          @result = subject_API.call( * x_a )
+          NIL_
         end
 
         def handle_event_selectively

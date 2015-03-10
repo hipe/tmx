@@ -18,16 +18,19 @@ module Skylab::GitViz
       DEFAULT_RELPATH_ = 'pathnames.manifest'.freeze
 
       module Instance_Methods__
+
         def mock_pathname path_s
-          _fm = mock_FS
-          _fm.touch_pn path_s
+          mock_FS.touch_pn path_s
         end
+
         def mock_FS
           @mock_FS ||= FS_[ fixtures_module, pathnames_manifest_relpath ]
         end
+
         def fixtures_module
           self.class.fixtures_mod
         end
+
         def pathnames_manifest_relpath
           DEFAULT_RELPATH_
         end
@@ -69,7 +72,7 @@ module Skylab::GitViz
         end
         def init_tree pn
           fs_p = -> { self }
-          fh = pn.open 'r'
+          fh = pn.open ::File::RDONLY
           _ea = Each__.new do |&p|
             line = fh.gets
             while line

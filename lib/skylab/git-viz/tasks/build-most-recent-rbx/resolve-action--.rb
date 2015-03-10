@@ -48,13 +48,13 @@ module Skylab::GitViz::Tasks
           }#{ @installed_ruby }, which is higher"
         @y << "than the highest known stable-esque version in The Cloud #{
           }(#{ @cloud_version }). neato, can i see!?"
-        PROCEDE_
+        ACHIEVED_
       end
 
       def when_same
         @y << "#{ @installed_ruby.to_s } is in your rbenv and is #{
           }most recent according to The Cloud."
-        PROCEDE_
+        ACHIEVED_
       end
 
       def when_upgrade

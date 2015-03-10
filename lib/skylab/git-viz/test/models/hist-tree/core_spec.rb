@@ -2,23 +2,26 @@ require_relative '../test-support'
 
 module Skylab::GitViz::TestSupport::Models
 
-  describe "[gv] models - hist-tree", wip: true do
+  describe "[gv] models - hist-tree" do
 
     extend TS_
+    use :expect_event
     use :mock_FS
     use :mock_system
     use :mock_1
 
     it "absolute path no ent (mocked) - x" do
       _call_API_against_path '/this-path-is-not-even-mocked/zang'
-      _expect_no_repo
+      __expect_no_repo
     end
 
-    def expect_no_repo
-      self._FUN
-      expect %i( repo_root_not_found error string ), %r(\ADidn't find \.git #{
-        }in this or any parent directory \(looked in 3 dirs\): #{
-         }/[-a-z/]+/zang\z)
+    def __expect_no_repo
+
+      ev = expect_not_OK_event( :repo_root_not_found ).to_event
+
+      ev.num_times_looked.should eql 3
+      ev.path.should eql '/this-path-is-not-even-mocked/zang'
+
       expect_failed
     end
 
@@ -31,14 +34,18 @@ module Skylab::GitViz::TestSupport::Models
 
       call_API( * _common_x_a,
         :system_conduit, :_s_c_,
-        :path, path )
+        :path, mock_pathname( path ) )
     end
 
     def _expect_no_ent
-      self._REDO
-      expect %i( next_system command )
-      expect %i( cannot_execute_command string ), %r(\ANo such file #{
+
+      expect_event :next_system_command
+
+      _ev = expect_not_OK_event( :cannot_execute_command ).to_event
+
+      black_and_white( _ev ).should match %r(\ANo such file #{
         }or directory - /[-a-z/]+/nazoozle/fazoozle\z)
+
       expect_failed
     end
 
@@ -48,10 +55,13 @@ module Skylab::GitViz::TestSupport::Models
     end
 
     def __expect_path_is_file
-      self._REDO
+
       __expect_command_with_chdir_matching %r(/move-after\z)
-      expect %i( cannot_execute_command string),
-        /\Apath is file, must have directory\z/
+
+      expect_not_OK_event :cannot_execute_command,
+        'path is file, must have (or_ ["directory"])'
+
+      expect_failed
     end
 
     it "path is valid (mock) - o" do
@@ -77,24 +87,22 @@ module Skylab::GitViz::TestSupport::Models
 
       call_API(
         * _common_x_a,
-        :path, path,
-        :system_conduit, mock_system_conduit,
-        :filesysetm, mock_filesystem )
+        :path, mock_pathname( path ),
+        :system_conduit, mock_system_conduit )
     end
 
-    def _common_x_a
-      self._CLEANUP
-      [ :hist_tree,
-        :VCS_adapters_module, GitViz_::VCS_Adapters_,
-        :VCS_adapter_name, :git,
-        :VCS_listener, @listener ]
-    end
+    define_method :_common_x_a, -> do
+      a = [ :hist_tree, :VCS_adapter_name, :git ].freeze
+      -> do
+        a
+      end
+    end.call
 
     def __expect_command_with_chdir_matching rx
-      expect %i( next_system command ) do |em|
-        em.payload_x.any_nonzero_length_option_h.fetch( :chdir ).
-          should match rx
-      end
+
+      _ev = expect_event( :next_system_command ).to_event
+      _ev.any_nonzero_length_option_h.fetch( :chdir ).should match rx
+      nil
     end
 
     def fixtures_module  # hook-in to mock system, mock FS

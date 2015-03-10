@@ -35,7 +35,7 @@ module Skylab::GitViz
       def is_silo
         true
       end
-    end
+    end  # >>
 
     Actions = ::Module.new
 
@@ -43,90 +43,76 @@ module Skylab::GitViz
 
       @is_promoted = true
 
+      GitViz_.lib_.brazen.model.entity self,
 
-      # attribute :pathname, pathname: true, default: '.'
+        :required, :property, :VCS_adapter_name,
 
-      # def execute
-      #   _VCS_front
-      #   GitViz_::Models_::File_Node[
-      #     :pathname, @pathname, :VCS_front, @VCS_front ]
-    end
+        :required, :property, :system_conduit,
 
-    Models_ = ::Module.new  # again
+        :required, :property, :path
 
-    class Models_::File_Node
-
-      if false
-      GitViz_.lib_.tree.enhance_with_module_methods_and_instance_methods self
+      def produce_result
+        _ok = __resolve_VCS_adapter
+        _ok && __via_VCS_adapter
       end
 
-      def self.[] * x_a
-        self._LOOK
-        Actors_::Build_tree_node x_a do |bld|
-          file_node = from :node_identifiers, bld.get_trail_a
-          file_node.commitpoint_manifest = bld.commitpoint_mani
-          file_node
+      def __resolve_VCS_adapter
+
+        _VCS_mod = GitViz_::VCS_Adapters_.const_get(
+          Callback_::Name.via_slug(
+            @argument_box.fetch( :VCS_adapter_name ).to_s
+          ).as_const, false )
+
+        fro = _VCS_mod::Front.new _VCS_mod, handle_event_selectively do | fr |
+          fr.set_system_conduit @argument_box.fetch :system_conduit
+        end
+
+        fro and begin
+          @VCS_adapter = fro
+          ACHIEVED_
         end
       end
 
-      def set_node_payload x
-        @repo_trail = x ; nil
-      end
+      def __via_VCS_adapter
 
-      attr_reader :repo_trail
+        pn = @argument_box.fetch :path
 
-      attr_accessor :commitpoint_manifest
+        if ! pn.respond_to? :to_path and pn  # while [#004], let the magic happen
+          pn = ::Pathname.new pn
+        end
 
-      def some_commitpoint_manifest
-        @commitpoint_manifest or fail 'sanity'
+        Actors__::Build_tree[ pn, @VCS_adapter, & handle_event_selectively ]
       end
     end
 
-    Actors_ = ::Module.new
+    Actors__ = ::Module.new
 
-    class Actors_::Build_tree_node
+    class Actors__::Build_tree
 
-      if false
-      GitViz_.lib_.basic_Set self,
-        :with_members, %i( pathname VCS_front ).freeze,
-        :initialize_basic_set_with_iambic
+      Callback_::Actor.call self, :properties,
+
+        :pathname, :VCS_adapter
+
+      def execute
+        ok = __resolve_repo
+        ok &&= __via_repo_resolve_bunch
+        ok && __flush
       end
 
-      def self.build_tree_node x_a, & p
-        new( x_a, p ).build_tree_node
+      def __resolve_repo
+        @repo = @VCS_adapter.procure_repo_from_pathname @pathname  # #todo:name
+        @repo && ACHIEVED_
       end
 
-      def initialize x_a, p
-        initialize_basic_set_with_iambic x_a
-        @client_p = p
-      end
-
-      def build_tree_node
-        pre_execute && @client_p[ self ]
-      end
-
-    private
-
-      def pre_execute
-        procure_repo && procure_bunch
-      end
-      def procure_repo
-        @repo = @VCS_front.procure_repo_from_pathname @pathname
-        @repo && true
-      end
-      def procure_bunch
+      def __via_repo_resolve_bunch
         @bunch = @repo.build_hist_tree_bunch
-        @bunch && true
+        @bunch && ACHIEVED_
       end
 
-    public
+      def __flush
 
-      def get_trail_a
-        @bunch.get_trail_stream.to_a
-      end
-
-      def commitpoint_mani
-        @repo.sparse_matrix
+        GitViz_.lib_.tree.from(
+          :node_identifiers, @bunch.immutable_trail_array )
       end
     end
   end

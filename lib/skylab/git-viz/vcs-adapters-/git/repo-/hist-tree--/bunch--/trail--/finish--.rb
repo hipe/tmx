@@ -22,7 +22,7 @@ module Skylab::GitViz
             if @scn
               finish_every_filediff
             else
-              PROCEDE_
+              ACHIEVED_
             end
           end
           def finish_every_filediff
@@ -30,7 +30,7 @@ module Skylab::GitViz
             if first_filediff
               finish_each_filediff first_filediff
             else
-              PROCEDE_
+              ACHIEVED_
             end
           end
           def finish_each_filediff filediff
@@ -38,7 +38,7 @@ module Skylab::GitViz
               filediff.finish_filediff__ @trail, & @on_event_selectively
               filediff = @scn.gets
             end while filediff
-            PROCEDE_
+            ACHIEVED_
           end
         end
       end

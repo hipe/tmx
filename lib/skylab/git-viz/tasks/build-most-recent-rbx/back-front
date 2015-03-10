@@ -60,12 +60,13 @@ module Skylab::GitViz::Tasks
     end
 
     def mock_resolve_most_recent_cloud_version
-      r = Build_RBX::Curl_version__::Result__.new
-      r.did_change = true
-      r.version = ::Gem::Version.new '2.2.1'
+      x = Build_RBX::Curl_version__::Result__.new
+      x.did_change = true
+      x.version = ::Gem::Version.new '2.2.1'
       a, b = URL_HEAD_AND_TAIL_
-      r.url = "#{ a }#{ r.version }#{ b }"
-      @cloud_result = r ; PROCEDE_
+      x.url = "#{ a }#{ x.version }#{ b }"
+      @cloud_result = x
+      ACHIEVED_
     end
 
     def resolve_action

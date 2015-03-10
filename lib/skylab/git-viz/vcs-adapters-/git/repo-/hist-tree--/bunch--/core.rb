@@ -47,13 +47,8 @@ module Skylab::GitViz
           freeze
         end
 
-        def get_trail_stream
-          d = last = nil
-          GitViz_.lib_.power_scanner :init, -> do
-            d = -1 ; last = @trail_a.length - 1
-          end, :gets, -> do
-            d < last and @trail_a.fetch d += 1
-          end
+        def immutable_trail_array
+          @trail_a
         end
       end
     end

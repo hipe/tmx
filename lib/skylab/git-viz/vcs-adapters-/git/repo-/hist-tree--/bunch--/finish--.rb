@@ -11,7 +11,7 @@ module Skylab::GitViz
 
         def execute
           @trail_class = @bunch.repo.class::Hist_Tree__::Bunch__::Trail__
-          ok = PROCEDE_
+          ok = ACHIEVED_
           @trail_a.each do |trail|
             ok = __finish_trail trail
             ok or break

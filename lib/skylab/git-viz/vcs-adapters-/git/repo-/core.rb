@@ -69,7 +69,7 @@ module Skylab::GitViz
       def close_the_pool
         @sparse_matrix = _commit_pool.close_pool
         @ci_pool_p = -> { raise "the pool's closed" }
-        @sparse_matrix && PROCEDE_
+        @sparse_matrix && ACHIEVED_
       end
 
       attr_reader :sparse_matrix
@@ -118,11 +118,16 @@ module Skylab::GitViz
 
         found or begin
 
-          oes_p.call :error, :expression, :repo_root_not_found do | y |
+          oes_p.call :error, :repo_root_not_found do
 
-            y << "Didn't find '#{ filename }' entry in this or any parent #{
-              }directory (looked in #{ num_times_looked } dirs): #{ pth pathname }"
+            Callback_::Event.inline_not_OK_with :repo_root_not_found,
+                :filename, filename, :num_times_looked, num_times_looked,
+                :path, pathname.to_path do | y, o |
 
+              y << "Didn't find '#{ o.filename }' #{
+               }entry in this or any parent directory #{
+                }(looked in #{ o.num_times_looked } dirs): #{ pth o.path }"
+            end
           end
           UNABLE_
         end

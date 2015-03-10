@@ -60,7 +60,7 @@ module Skylab::GitViz
         def finish
           @repo_p = nil
           freeze  # or not, whatever
-          PROCEDE_
+          ACHIEVED_
         end
 
         def get_any_nonzero_count_filediff_stream

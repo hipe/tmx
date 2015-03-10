@@ -22,7 +22,7 @@ module Skylab::GitViz::Tasks
         @y << "rake install"
         @y << "#{ '-' * 80 }"
         @y << "good luck!"
-        PROCEDE_
+        ACHIEVED_
       end
     end
   end

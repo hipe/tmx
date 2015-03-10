@@ -15,5 +15,9 @@ module Skylab::GitViz::TestSupport::Models
     def subject_API  # #hook-out for "expect event"
       GitViz_::API
     end
+
+    def black_and_white_expression_agent_for_expect_event
+      GitViz_.lib_.brazen::API.expression_agent_instance
+    end
   end
 end

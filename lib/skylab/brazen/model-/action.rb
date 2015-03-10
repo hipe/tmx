@@ -168,19 +168,37 @@ module Skylab::Brazen
       end
     end
 
-    def __build__info__event_via_expression rest, & msg_p  # mutates `rest`
+    def __build__error__event_via_expression rest, & msg_p  # mutates `rest`
 
       # `rest` is a channel - don't encourage abuse by acccepting iambic
       # name-value pairs there. don't use simple expressions if you want
       # to include metadata in your event.
 
-      _terminal_channel = rest.length.zero? ? :generic_info : rest.fetch( 0 )
+      _term_chan = _any_expr_chan( rest ) || :generic_error
 
-      build_neutral_event_with _terminal_channel do | y, _o |
+      build_not_OK_event_with _term_chan do | y, _o |
 
         # (remember, this context right here is the expression agent)
 
         calculate y, & msg_p
+      end
+    end
+
+    def __build__info__event_via_expression rest, & msg_p  # ditto
+
+      _term_chan = _any_expr_chan( rest ) || :generic_info
+
+      build_neutral_event_with _term_chan do | y, _o |
+
+        calculate y, & msg_p
+      end
+    end
+
+    def _any_expr_chan i_a
+
+      case i_a.length
+      when 1..2  ; i_a.fetch 0
+      when 3     ; i_a.fetch 2
       end
     end
 
