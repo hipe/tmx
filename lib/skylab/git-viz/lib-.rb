@@ -15,7 +15,7 @@ module Skylab::GitViz
         memo[ -> do
           /\Arbx\b/i =~ ::RUBY_ENGINE and raise "cannot load '#{ i }' in rbx!"
           skylab_top[]
-          require "skylab/#{ Name_.via_const( i ).as_slug }/core"
+          require "skylab/#{ Callback_::Name.via_const( i ).as_slug }/core"
           ::Skylab.const_get i, false
         end ]
       end

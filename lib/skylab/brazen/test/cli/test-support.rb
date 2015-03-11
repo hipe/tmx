@@ -4,16 +4,7 @@ module Skylab::Brazen::TestSupport::CLI
 
   ::Skylab::Brazen::TestSupport[ TS_ = self ]
 
-  Brazen_ = ::Skylab::Brazen
-  Callback_ = Brazen_::Callback_
   TestSupport_ = ::Skylab::TestSupport
-
-  SPACE_ = Brazen_::SPACE_
-
-  module Constants
-    Brazen_ = Brazen_
-    TestSupport_ = TestSupport_
-  end
 
   extend TestSupport_::Quickie
 
@@ -22,12 +13,11 @@ module Skylab::Brazen::TestSupport::CLI
     def fake_app_name
       FAKE_APP_NAME__
     end
-    FAKE_APP_NAME__ = 'bzn'.freeze
 
     def with_invocation * _S_A_
 
       _S_A_.freeze
-      define_method :sub_action_s_a do _S_A_ end
+      define_method :argv_prefix_for_expect_stdout_stderr do _S_A_ end
 
       _RX_ = /\Ause '?bzn #{ _S_A_ * SPACE_ } -h'? for help\z/
       define_method :localized_invite_line_rx do _RX_ end
@@ -46,41 +36,15 @@ module Skylab::Brazen::TestSupport::CLI
     # ~ invoke phase ("action under test")
 
     def invoke * argv
-      a = sub_action_s_a and argv[ 0, 0 ] = a
-      invoke_via_argv argv
+      using_expect_stdout_stderr_invoke_via_argv argv
     end
 
-    def sub_action_s_a  # :+#hook-over
+    def subject_CLI  # for above
+      Brazen_::CLI
     end
 
-    def invoke_with_no_prefix * argv
-      invoke_via_argv argv
-    end
-
-    def invoke_via_argv argv
-
-      g = TestSupport_::IO.spy.group.new
-
-      g.do_debug_proc = -> do
-        do_debug
-      end
-
-      g.debug_IO = debug_IO
-
-      g.add_stream :i, :_no_instream_
-      g.add_stream :o
-      g.add_stream :e
-
-      @IO_spy_group_for_expect_stdout_stderr = g
-
-      @invocation = Brazen_::CLI.new nil, * g.values_at( :o, :e ), [ 'bzn' ]
-
-      prepare_invocation
-
-      @exitstatus = @invocation.invoke argv ; nil
-    end
-
-    def prepare_invocation  # :+#hook-over
+    def invocation_strings_for_expect_stdout_stderr
+      FAKE_INVO_STRING_ARY___
     end
 
     # ~ common business assertions
@@ -273,5 +237,18 @@ module Skylab::Brazen::TestSupport::CLI
         expect( * a )
       end
     end
+  end
+
+  FAKE_APP_NAME__ = 'bzn'.freeze
+
+  FAKE_INVO_STRING_ARY___ = [ FAKE_APP_NAME__ ].freeze
+
+  Brazen_ = ::Skylab::Brazen
+  Callback_ = Brazen_::Callback_
+  SPACE_ = Brazen_::SPACE_
+
+  module Constants
+    Brazen_ = Brazen_
+    TestSupport_ = TestSupport_
   end
 end

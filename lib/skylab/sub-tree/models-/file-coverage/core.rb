@@ -1,6 +1,6 @@
 module Skylab::SubTree
 
-  module Models_::File_Coverage
+  class Models_::File_Coverage
 
     Actions = ::Module.new
 

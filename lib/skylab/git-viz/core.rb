@@ -5,6 +5,37 @@ require_relative '../callback/core'
 
 module Skylab::GitViz
 
+  module CLI  # :+#stowaway
+
+    class << self
+
+      def new * a
+
+        client = GitViz_.lib_.brazen::CLI.new_top_invocation(
+          a, GitViz_.application_kernel_ )
+
+        client.receive_environment MONADIC_EMPTINESS_
+
+        client
+      end
+    end  # >>
+
+    # ~ begin :+#hook-out for tmx
+    Client = self
+    module Adapter
+      module For
+        module Face
+          module Of
+            Hot = -> x, x_ do
+              GitViz_.lib_.brazen::CLI::Client.fml GitViz_, x, x_
+            end
+          end
+        end
+      end
+    end
+    # ~ end
+  end
+
   module API
 
     class << self
@@ -15,6 +46,8 @@ module Skylab::GitViz
       end
     end  # >>
   end
+
+  Callback_ = ::Skylab::Callback
 
   class << self
 
@@ -32,36 +65,6 @@ module Skylab::GitViz
     end
   end  # >>
 
-  # ~ begin #change-this-at-step:7
-
-  class CLI
-    Client = self
-    module Adapter
-      module For
-        module Face
-          module Of
-            Hot = -> x, x_ do
-              GitViz_.lib_.brazen::CLI::Client.fml GitViz_, x, x_
-            end
-          end
-        end
-      end
-    end
-    def initialize * a
-      @sin, @sout, @serr, @invo_s_a = a
-    end
-    def invoke argv
-      if %w( ping ) == argv
-        @serr.puts "hello from git viz."
-        :hello_from_git_viz
-      end
-    end
-  end
-
-  # ~ end
-
-  Callback_ = ::Skylab::Callback
-
   Autoloader_ = ::Skylab::Callback::Autoloader
   ACHIEVED_ = true
   Callback_Tree_ = Callback_::Tree
@@ -72,6 +75,7 @@ module Skylab::GitViz
   GitViz_ = self
   Name_ = Callback_::Name
   NIL_ = nil
+  MONADIC_EMPTINESS_ = -> _ {}
   Scn_ = Callback_::Scn
   SPACE_ = ' '.freeze
   UNABLE_ = false

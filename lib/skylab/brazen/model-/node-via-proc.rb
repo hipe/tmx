@@ -8,21 +8,23 @@ module Skylab::Brazen
 
       class << self
 
-        def produce_action_class_like p, const_sym, parent_mod
+        def produce_action_class_like p, const_sym, box_mod, parent_mod
+
           ActionClassLike__.new( p,
-            "#{ parent_mod.name }#{ CONST_SEP_ }#{ const_sym }",
-            parent_mod )
+            "#{ box_mod.name }#{ CONST_SEP_ }#{ const_sym }",
+            box_mod, parent_mod )
         end
 
-        def produce_nodelike p, i, mod
-          NodeLike__.new p, i, mod
+        def produce_nodelike p, i, box_mod, model_class
+          NodeLike__.new p, i, box_mod, model_class
         end
-      end
+      end  # >>
 
       class NodeLike__
 
-        def initialize p, i, mod
+        def initialize p, i, mod, mc
           @name_s = "#{ mod.name }#{ CONST_SEP_ }#{ i }"
+          @mc = mc
           @mod = mod
           @i = i
           @p = p
@@ -33,7 +35,7 @@ module Skylab::Brazen
         end
 
         def to_upper_unbound_action_stream
-          Callback_::Stream.via_item ActionClassLike__.new( @p, @name_s, @mod )
+          Callback_::Stream.via_item ActionClassLike__.new( @p, @name_s, @mod, @mc )
         end
       end
 
@@ -41,8 +43,9 @@ module Skylab::Brazen
 
         include NAME.name_function_proprietor_methods
 
-        def initialize p, name_s, mod
-          @parent_module = mod
+        def initialize p, name_s, box_mod, model_class
+          @box_module = box_mod
+          @model_class = model_class
           @name_s = name_s
           @p = p
         end
@@ -59,10 +62,10 @@ module Skylab::Brazen
           true  # meh
         end
 
-        attr_reader :p, :parent_module
+        attr_reader :p, :box_module, :model_class
 
         def members
-          [ :name_function, :parent_module ]
+          [ :box_module, :model_class, :name_function ]
         end
 
         def name_function
@@ -99,7 +102,7 @@ module Skylab::Brazen
           # name stop index const.
 
           scn = LIB_.basic::List.line_stream(
-            LIB_.module_lib.chain_via_module @parent_module )
+            LIB_.module_lib.chain_via_module @box_module )
 
           # assume the convention that the current leaf of the chain is some
           # box module (either 'Actions' or 'Models_`), and the one above
@@ -203,6 +206,9 @@ module Skylab::Brazen
             when :req
               argument_arity = :one
               parameter_arity = :one
+            when :opt
+              argument_arity = :one
+              parameter_arity = :zero_or_one
             when :rest
               argument_arity = :zero_or_more
               parameter_arity = :zero_or_one # or not ..
@@ -255,12 +261,12 @@ module Skylab::Brazen
           param_a.each do | orr, name_sym |
 
             x = h.delete name_sym
-            if x
-              arglist.push x
 
-            elsif :req == orr
+            if :req == orr && x.nil?
               miss_sym_a ||= []
               miss_sym_a.push name_sym
+            else
+              arglist.push x
             end
           end
 

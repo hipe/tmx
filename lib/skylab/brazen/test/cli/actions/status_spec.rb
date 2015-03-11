@@ -86,8 +86,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
     # ~ ad-hoc business for this file
 
     def invoke * argv
-      argv[ 0, 0 ] = sub_action_s_a
-      invoke_via_argv argv
+      using_expect_stdout_stderr_invoke_via_argv argv
     end
 
     def expect_negative_exitstatus

@@ -25,6 +25,10 @@ module Skylab::Brazen
         @expag ||= expression_agent_class.new :_no_kernel_
       end
 
+      def members
+        singleton_class.instance_methods( false ) - [ :members ]
+      end
+
       def two_stream_event_expresser
         API::Produce_bound_call__::Two_Stream_Event_Expresser
       end

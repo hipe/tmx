@@ -28,7 +28,7 @@ module Skylab::SubTree::TestSupport::Models_Files::The_CLI_Modality
 
       io = SubTree_::Library_::StringIO.new @paths_string
       io.rewind
-      @use_this_as_stdin = io
+      @for_expect_stdout_stderr_use_this_as_stdin = io
       local_invoke
 
       _unindent expect_str
@@ -44,7 +44,7 @@ module Skylab::SubTree::TestSupport::Models_Files::The_CLI_Modality
 
     def local_invoke * argv
       argv.unshift 'files'
-      invoke_via_argv argv
+      using_expect_stdout_stderr_invoke_via_argv argv
     end
 
     # ~ #hook-outs
@@ -53,7 +53,7 @@ module Skylab::SubTree::TestSupport::Models_Files::The_CLI_Modality
       SubTree_::CLI
     end
 
-    define_method :invocation_strings_for_expect_expression, -> do
+    define_method :invocation_strings_for_expect_stdout_stderr, -> do
       a = [ 'stflz' ].freeze
       -> do
         a

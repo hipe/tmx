@@ -4,10 +4,16 @@ require 'skylab/test-support/core'
 module Skylab::Brazen::TestSupport
 
   class << self
+
+    def CLI
+      require_relative 'cli/test-support'
+      CLI
+    end
+
     def expect_interactive x
       self::Zerk::Expect_Interactive[ x ]
     end
-  end
+  end  # >>
 
   TestSupport_ = ::Skylab::TestSupport
 

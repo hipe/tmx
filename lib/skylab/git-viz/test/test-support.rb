@@ -14,7 +14,7 @@ module Skylab::GitViz::TestSupport
 
     def use sym
 
-      const_i = GitViz_::Name_.via_variegated_symbol( sym ).as_const
+      const_i = Callback_::Name.via_variegated_symbol( sym ).as_const
       mod = nearest_test_node
 
       begin
@@ -54,6 +54,14 @@ module Skylab::GitViz::TestSupport
 
       handle_event_selectively
     end
+
+    def fixtures_module_for_mock_FS
+      fixtures_module_
+    end
+
+    def fixtures_module_for_mock_system
+      fixtures_module_
+    end
   end
 
   # ~ longer short constants (the longest of which we might call "stowaways")
@@ -65,6 +73,7 @@ module Skylab::GitViz::TestSupport
 
     nil
   end
+
 
   module Messages
     PATH_IS_FILE = "path is file, must have directory".freeze
@@ -104,6 +113,7 @@ module Skylab::GitViz::TestSupport
 
   # ~ short constants
 
+  Callback_ = GitViz_::Callback_
   NIL_ = nil
 
   # ~ any re-assignments of above to propagate to child test nodes

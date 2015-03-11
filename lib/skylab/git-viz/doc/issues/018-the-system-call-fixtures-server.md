@@ -13,7 +13,7 @@ ports and so on. when it gets requests, it dispatches them out to the backend.
 
 the backend is concerned with nothing about zero MQ and everything about our
 business logix. the "business responder" of the backend is documented at
-[#034] (currently in this document).
+[#034]  (currently in this document).
 
 
 ## :#introduction-to-the-middle-end

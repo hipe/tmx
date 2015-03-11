@@ -69,7 +69,7 @@ module Skylab::GitViz
       private
         def bld_fd_stream
           d = -1 ; last = @filediff_a.length - 1
-          Scn_.new do
+          Callback_::Scn.new do
             d < last and @filediff_a.fetch d += 1
           end
         end

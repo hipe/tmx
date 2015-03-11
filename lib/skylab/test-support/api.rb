@@ -29,6 +29,10 @@ module Skylab::TestSupport
 
       Ping = -> * rest, mock_bound_action do
 
+        if 1 == rest.length && rest.first.nil?
+          rest.clear  # meh
+        end
+
         kr = mock_bound_action.kernel
 
         _x = if rest.length.nonzero?
@@ -37,7 +41,7 @@ module Skylab::TestSupport
           '.'
         end
 
-        mock_bound_action.maybe_receive_event :info, :expression do | y |
+        mock_bound_action.maybe_receive_event :info, :expression, :ping do | y |
           y << "hello from #{ kr.app_name.gsub SPACE_, DASH_ }#{ _x }\n"
         end
 

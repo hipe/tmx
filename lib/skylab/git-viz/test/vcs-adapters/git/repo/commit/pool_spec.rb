@@ -85,9 +85,5 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git::Repo
       expect_no_more_events
       mani
     end
-
-    def fixtures_module  # #hook-in to mock system, mock FS
-      my_fixtures_module
-    end
   end
 end

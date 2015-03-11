@@ -9,6 +9,82 @@ module Skylab::TestSupport
     module InstanceMethods
     private
 
+      # ~ begin optional support for "full stack" CLI (assuming conventions)
+
+      def using_expect_stdout_stderr_invoke_via_argv a  # might mutate arg
+
+        _init_invocation_and_invoke_against_mutable_argv_and_prefix(
+          a, argv_prefix_for_expect_stdout_stderr )
+      end
+
+      def argv_prefix_for_expect_stdout_stderr  # :+#hook-in
+      end
+
+      def using_expect_stdout_stderr_invoke_with_no_prefix * argv
+
+        _init_invocation_and_invoke_against_mutable_argv_and_prefix argv, nil
+      end
+
+      def _init_invocation_and_invoke_against_mutable_argv_and_prefix a, a_
+
+        __init_invocation
+
+        if a_
+          a[ 0, 0 ] = a_
+        end
+
+        @exitstatus = @invocation.invoke a
+
+        NIL_
+      end
+
+      def __init_invocation
+
+        g = TestSupport_::IO.spy.group.new
+
+        g.do_debug_proc = -> do
+          do_debug  # :+#hook-out
+        end
+
+        g.debug_IO = debug_IO  # :+#hook-out
+
+        io = for_expect_stdout_stderr_use_this_as_stdin
+        if io
+          g.add_stream :i, io
+        else
+          g.add_stream :i, :__instream_not_used_yet__
+        end
+
+        g.add_stream :o
+        g.add_stream :e
+
+        @IO_spy_group_for_expect_stdout_stderr = g
+
+        invo = subject_CLI.new( * g.values_at( :i, :o, :e ),
+          invocation_strings_for_expect_stdout_stderr )  # :+#hook-out
+
+        if instance_variable_defined? :@for_expect_stdout_stderr_prepare_invocation
+          @for_expect_stdout_stderr_prepare_invocation[ invo ]
+        else
+          for_expect_stdout_stderr_prepare_invocation invo
+        end
+
+        @invocation = invo
+
+        NIL_
+      end
+
+    public
+
+      attr_reader :for_expect_stdout_stderr_use_this_as_stdin  # :+#hook-in
+
+    private
+
+      def for_expect_stdout_stderr_prepare_invocation _  # :+#hook-in
+      end
+
+      # ~ end
+
       # ~ before the expectation, set default behavior
 
       def on_stream stream_symbol
@@ -29,7 +105,20 @@ module Skylab::TestSupport
 
         @__sout_serr_is_baked__ ||= _bake_sout_serr
 
-        __send__ @__sout_serr_expectation__.method_name
+        exp = @__sout_serr_expectation__
+        p = exp.receive_unstyled_string
+
+        ok = __send__ exp.method_name
+
+        if ok && p
+          s =  @__sout_serr_line__
+          if ! s
+            s = @__sout_serr_emission__.string.gsub SIMPLE_STYLE_RX__, EMPTY_S_
+            s.chomp!
+          end
+          ok = p[ s ]
+        end
+        ok
       end
 
       def bld_sout_serr_expectation_via_iambic x_a, & p
@@ -77,6 +166,9 @@ module Skylab::TestSupport
       end
 
       def count_contiguous_lines_on_stream sym
+
+        @__sout_serr_is_baked__ ||= _bake_sout_serr
+
         count = 0
         st = _sout_serr_stream_for_contiguous_lines_on_stream sym
         while st.gets
@@ -97,6 +189,14 @@ module Skylab::TestSupport
           em = st.gets
         end
         io.string
+      end
+
+      def sout_serr_line_stream_for_contiguous_lines_on_stream sym
+
+        @__sout_serr_is_baked__ ||= _bake_sout_serr
+        _sout_serr_stream_for_contiguous_lines_on_stream( sym ).map_by do | em |
+          em.string
+        end
       end
 
       def _sout_serr_stream_for_contiguous_lines_on_stream sym
@@ -141,14 +241,14 @@ module Skylab::TestSupport
           line = @__sout_serr_emission__.string  # WE MUTATE IT for now
           s = line.chomp!
           if s
-            _sout_serr_receive_chomped_emission_line s
+            __sout_serr_receive_chomped_emission_line s
           else
             fail "for now expecting all lines to be newine terminated: #{ line.inspect }"
           end
         end
       end
 
-      def _sout_serr_receive_chomped_emission_line line
+      def __sout_serr_receive_chomped_emission_line line
         if @__sout_serr_expectation__.expect_is_styled
           s = line.dup.gsub! SIMPLE_STYLE_RX__, EMPTY_S_
           if s
@@ -169,6 +269,7 @@ module Skylab::TestSupport
         if st.unparsed_exists
           em = st.gets_one
           @__sout_serr_emission__ = em
+          @__sout_serr_line__ = nil
           stream_sym = exp.stream_symbol
           stream_sym ||= __sout_serr_default_stream_symbol__
           if stream_sym
@@ -208,11 +309,11 @@ module Skylab::TestSupport
         while st.unparsed_exists
           process_the_rest_using_shape_hack st
         end
-        p and self._DO_ME_receive_proc p
+        @receive_unstyled_string = p
       end
 
       attr_reader :stream_symbol, :expect_is_styled,
-        :method_name, :pattern_x
+        :method_name, :pattern_x, :receive_unstyled_string
 
     private
 

@@ -2,8 +2,7 @@ require_relative '../test-support'
 
 module Skylab::GitViz::TestSupport::VCS_Adapters::Git::Repo
 
-  Parent_TS__ = ::Skylab::GitViz::TestSupport::VCS_Adapters::Git
-  Parent_TS__[ TS_ = self ]
+  ::Skylab::GitViz::TestSupport::VCS_Adapters::Git[ TS_ = self ]
 
   include Constants
 
@@ -28,10 +27,6 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git::Repo
 
     def mock_repo_argument_pathname  # local #hook-out
       mock_pathname '/derp/berp'
-    end
-
-    def my_fixtures_module
-      Parent_TS__::Fixtures
     end
 
     def system_conduit

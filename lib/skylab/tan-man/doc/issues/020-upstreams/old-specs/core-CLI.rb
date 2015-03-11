@@ -25,6 +25,9 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph::Remote::Core
     end
 
     def expect_help_screen
+
+      self._NOTE_FROM_THE_PAST_PRESENT  # this overhauled into [#br-044]
+
       expect_section 'usage'
       expect_section 'description', :one_line, %r{\Aadd/remove/list}
       expect_section 'options' do

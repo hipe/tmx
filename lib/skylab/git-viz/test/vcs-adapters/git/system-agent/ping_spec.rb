@@ -73,9 +73,5 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git::System_Agent
     def _expect_no_output_stream
       @scn.should eql false
     end
-
-    def fixtures_module  # #hook-in, reach up: we don't maintain our own
-      Parent_TS__::Fixtures  # fixturs dir, we use that of parent test dir
-    end
   end
 end

@@ -81,6 +81,8 @@ module Skylab::TanMan
       @model_class = mc
     end
 
+    attr_reader :model_class
+
     def produce_real_action_class_
       @model_class::Actions__.const_get @nf.as_const
     end

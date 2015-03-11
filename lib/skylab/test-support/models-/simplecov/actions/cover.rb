@@ -58,6 +58,10 @@ module Skylab::TestSupport
             true
           end
 
+          def model_class
+            TestSupport_::Models_::Simplecov
+          end
+
           def name_function
             @__nf__ ||= Callback_::Name.via_module self
           end

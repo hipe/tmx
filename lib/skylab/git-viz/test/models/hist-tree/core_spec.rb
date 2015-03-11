@@ -104,9 +104,5 @@ module Skylab::GitViz::TestSupport::Models
       _ev.any_nonzero_length_option_h.fetch( :chdir ).should match rx
       nil
     end
-
-    def fixtures_module  # hook-in to mock system, mock FS
-      GitViz_::TestSupport::VCS_Adapters::Git::Fixtures
-    end
   end
 end

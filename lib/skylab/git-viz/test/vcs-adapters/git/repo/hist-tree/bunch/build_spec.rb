@@ -89,9 +89,5 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git::Repo::Hist_Tree
         @filediff.commitpoint_index.should eql 2
       end
     end
-
-    def fixtures_module  # #hook-out
-      my_fixtures_module
-    end
   end
 end

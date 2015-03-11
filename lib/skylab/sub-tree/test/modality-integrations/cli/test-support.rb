@@ -16,7 +16,7 @@ module Skylab::SubTree::TestSupport::Modality_Integrations::CLI
       SubTree_::CLI
     end
 
-    define_method :invocation_strings_for_expect_expression, -> do
+    define_method :invocation_strings_for_expect_stdout_stderr, -> do
       a = [ 'stcli' ].freeze
       -> do
         a

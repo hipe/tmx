@@ -1,86 +1,65 @@
 module Skylab::GitViz
 
-  class CLI::Client  # read [#006] the CLI client narrative
+  # [#006] is the CLI client narrative
 
-    def initialize( * )
-      @param_x_a = []
-      super
-      init_info_yielder
-    end
-  private
-    def init_info_yielder
-      if @infostream
-        @y = ::Enumerator::Yielder.new( & @infostream.method( :puts ) )
-      end ; nil
-    end
-  public
+  class Models_::HistTree
 
-    GitViz_.lib_.CLI_legacy_DSL self
+    Modalities = ::Module.new
 
-    desc 'ping'  # #storypoint-20
+    module Modalities::CLI
 
-    option_parser do |o|
-      o.on '--on-channel <i>' do |s|
-        @param_x_a.push :on_channel, s
+      module Actions
+
+        class Hist_Tree < GitViz_.lib_.brazen::CLI::Action_Adapter
+
+          def resolve_properties  # #nascent-operation :+[#br-042]
+
+            bp = @bound.formal_properties.to_mutable_box_like_proxy
+            fp = bp.dup
+
+            # ~
+
+            fp.remove :VCS_adapter_name
+
+            bp.replace_by :VCS_adapter_name do | prp |
+              prp.new_with_default do
+                :git
+              end
+            end
+
+            # ~
+
+            fp.remove :system_conduit
+
+            sys_cond = @parent.env_[ :__system_conduit__ ]  # let hacks in
+            sys_cond ||= GitViz_.lib_.open3
+
+            bp.replace_by :system_conduit do | prp |
+              prp.new_with_default do
+                sys_cond
+              end
+            end
+
+            # ~
+
+            @back_properties = bp
+            @front_properties = fp
+            NIL_
+          end
+
+          def via_output_iambic_resolve_bound_call
+            Callback_::Bound_Call.new nil, self, :__call_and_render
+          end
+
+          def __call_and_render
+            self._FUN
+          end
+        end
       end
-    end
-
-    def ping _  # #storypoint-30
-      disptch_to_CLI_action
-    end
-
-    desc "fun ASCII-powered data vizualization on a git-versioned filetree"
-
-    option_parser do |o|
-      o.base.long[ 'use-mocks' ] = ::OptionParser::Switch::NoArgument.new do  # :+#hidden-option
-        @param_x_a.push :do_use_mocks  # #storypoint-40
-      end
-    end
-
-    argument_syntax '[<path>]'
-
-    aliases 'ht'
-
-    def hist_tree path=nil, _
-      path and @param_x_a.push :pathname, ::Pathname.new( path )
-      disptch_to_CLI_action
-    end
-
-  dsl_off
-
-  private
-
-    def disptch_to_CLI_action
-      _i = @legacy_last_hot._sheet._name.as_variegated_symbol
-      _const_i = Name_.via_variegated_symbol( _i ).as_const
-      _unbnd = CLI::Actions__.const_get _const_i, false
-      _bound = _unbnd.new( svcs_for_CLI_action )
-      _bound.invoke_with_iambic @param_x_a
-    end
-
-    GitViz_.lib_.CLI_lib::Client[ self,
-      :client_services,
-        :named, :svcs_for_CLI_action ]
-
-    svcs_for_CLI_action_class
-    class Svcs_For_CLI_Action
-      def emit_on_channel_line i, s
-        @up_p[].send :"#{ i }_line_from_CLI_action", s ; nil
-      end
-    end
-
-    def info_line_from_CLI_action s
-      @infostream.puts s ; nil
-    end
-
-    def error_line_from_CLI_action s
-      @infostream.puts s ; nil
-    end
-
-    def payload_line_from_CLI_action s
-      @paystream.puts s ; nil
     end
   end
 end
+
+# :+#tombstone:  o.base.long[ 'use-mocks' ] = ::OptionParser::Switch::NoArgument.new do  # :+#hidden-option
 # (keep this line for posterity - there was some AMAZING foolishness going
 # on circa early '12 that is a good use case for why autoloader #todo)

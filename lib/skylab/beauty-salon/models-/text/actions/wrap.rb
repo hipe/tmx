@@ -46,7 +46,7 @@ module Skylab::BeautySalon
           if :for_action == i_a.first  # then there is probably no ev_p
             oes_p[ * i_a, & ev_p ]
 
-          elsif :expression == i_a[ 1 ]  # same idea, different thing
+          elsif :expression == i_a[ 1 ]  # same idea, different thing  (:+[#br-023])
             oes_p[ * i_a, & ev_p ]
 
           else

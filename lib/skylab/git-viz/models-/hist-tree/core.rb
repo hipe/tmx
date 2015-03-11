@@ -12,13 +12,20 @@ module Skylab::GitViz
 
     Actions = ::Module.new
 
-    Actions::Ping = -> secret_x=nil, bnd do
+    Actions::Ping = -> on_channel=nil, secret_x=nil, bnd do
 
       if secret_x
         "hi: #{ secret_x }"
+
       else
 
-        bnd.maybe_receive_event :info, :expression, :ping do | y |
+        _chn = if on_channel
+          on_channel.intern
+        else
+          :info
+        end
+
+        bnd.maybe_receive_event _chn, :expression, :ping do | y |
 
           y << "hello from #{ bnd.kernel.app_name }."
         end
@@ -28,7 +35,7 @@ module Skylab::GitViz
     end
   end
 
-  module Models_::HistTree
+  class Models_::HistTree  # (not used as class YET)
 
     class << self
 

@@ -50,9 +50,11 @@
 [#047]       #parent-node: [#013] the model entity narrative
 [#046]       #parent-ndoe: [#024] the action factory narrative ..
 [#045]       #parent-node: [#001] "the meta-properties narrative.."
-[#044]       #done graph has an action so maybe we don't need to pass it everywhere
+[#044]       [ expect section ]
+             ( #was: #done graph has an action so maybe we don't need to pass it everywhere )
 [#043]      #tracking-tag loading hacks
-[#042]       #done make persit entity interface symmetrical with delete entity
+[#042]      #tracking-tag mutate formal properties by front client etc ..
+             ( #was: #done make persit entity interface symmetrical with delete entity )
 [#041]       #sibling: [#021] magic property names case studies ..
              ( #was: #done rename "collections controller" to "silo controller" )
 [#040] #open in git-config, for set value, nil as literal value is undefined

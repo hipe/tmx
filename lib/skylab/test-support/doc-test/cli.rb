@@ -119,7 +119,7 @@ module Skylab::TestSupport
           include Experimental_Hax__
 
           def current_output_path ev, i_a
-            receive_event_on_channel ev, * i_a
+            receive_event_on_channel ev, i_a
           end
 
           def before_editing_existing_file ev
@@ -135,7 +135,7 @@ module Skylab::TestSupport
           def wrote ev, i_a
 
             if _saw_first_part
-              receive_event_on_channel ev, * i_a
+              receive_event_on_channel ev, i_a
               true  # don't stop the batch
             else
               s_a = render_event_lines ev

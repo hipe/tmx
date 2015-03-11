@@ -6,6 +6,8 @@ module Skylab::SubTree
 
     module Modalities::CLI
 
+      Actions = ::Module.new  # THE_EMPTY_MODULE_
+
       EXPRESSION_AGENT = class Expression_Agent___ < SubTree_::CLI::Expression_Agent
 
         # see [#hl-052]:#case-study-st-2 ("when to subclass expression agents")

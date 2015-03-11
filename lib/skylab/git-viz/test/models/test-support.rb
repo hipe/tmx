@@ -19,5 +19,9 @@ module Skylab::GitViz::TestSupport::Models
     def black_and_white_expression_agent_for_expect_event
       GitViz_.lib_.brazen::API.expression_agent_instance
     end
+
+    def fixtures_module_
+      GitViz_::TestSupport::VCS_Adapters::Git::Fixtures
+    end
   end
 end

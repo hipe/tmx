@@ -33,9 +33,5 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git::Repo
       counts.num_insertions.should eql 3
       counts.num_deletions.should eql 2
     end
-
-    def fixtures_module  # #hook-in to mock system, mock FS
-      my_fixtures_module
-    end
   end
 end

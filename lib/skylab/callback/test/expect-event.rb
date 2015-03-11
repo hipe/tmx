@@ -265,7 +265,7 @@ module Skylab::Callback::TestSupport
           if i_a && :expression == i_a[ 1 ]  # buy-in to :+[#br-023]
             __receive_expression i_a, & x_p
           else
-            __receive_passed_event(
+            _receive_passed_event(
               if x_p
                 x_p[]
               else
@@ -289,7 +289,7 @@ module Skylab::Callback::TestSupport
             instance_exec y, & msg_p
           end
 
-          __receive_passed_event _ev
+          _receive_passed_event _ev
         end
 
         def handle_event_selectively
@@ -311,7 +311,7 @@ module Skylab::Callback::TestSupport
           end ; nil
         end
 
-        def __receive_passed_event ev
+        def _receive_passed_event ev
           @do_debug and __express_event_into ev, @debug_IO
           ev_ = ev.to_event
           if ev_.has_tag :flyweighted_entity

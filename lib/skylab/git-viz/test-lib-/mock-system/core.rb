@@ -22,14 +22,27 @@ module Skylab::GitViz
       DEFAULT_RELPATH_ = 'system-commands.manifest'.freeze
 
       module Instance_Methods__
+
       private
+
         def mock_system_conduit
-          @mock_system_conduit ||=
-            In_module[ fixtures_module, system_commands_manifest_relpath ]
+          @mock_system_conduit ||= __build_mock_system_conduit
         end
-        def fixtures_module
-          self.class.fixtures_mod
+
+        def __build_mock_system_conduit
+
+          # allow clients to specify the below higher up in their chain
+          # than the subject would be if it were included
+
+          _mod = if respond_to? :fixtures_module_for_mock_system
+            fixtures_module_for_mock_system
+          else
+            self.class.fixtures_mod
+          end
+
+          In_module[ _mod, system_commands_manifest_relpath ]
         end
+
         def system_commands_manifest_relpath
           DEFAULT_RELPATH_
         end
@@ -42,6 +55,8 @@ module Skylab::GitViz
       end
 
       # #storypoint-45 #what-do-you-mean-by-IO
+
+      Callback_Tree_ = Callback_::Tree
 
       class Mock_Command_IO_Cache_
         def initialize
@@ -631,7 +646,7 @@ module Skylab::GitViz
           if @has_out_dumpfile
             gt_scn_from_prototype_a @o_a
           else
-            Scn_.the_empty_stream
+            Callback_::Scn.the_empty_stream
           end
         end
         def gt_scn_from_prototype_a a

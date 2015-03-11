@@ -286,6 +286,7 @@ module Skylab::Brazen
   LIB_ = Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
   NAME_ = :name
   NEWLINE_ = "\n".freeze
+  NIL_ = nil
   PROCEDE_ = true
   SPACE_ = ' '.freeze
   STOP_PARSING_ = false

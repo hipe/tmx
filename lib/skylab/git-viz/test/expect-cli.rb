@@ -1,131 +1,128 @@
-require_relative '../test-support'
+module Skylab::GitViz::TestSupport
 
-module Skylab::GitViz::TestSupport::CLI
+  module Expect_CLI
 
-  ::Skylab::GitViz::TestSupport[ TS__ = self ]
+    class << self
+      def [] test_mod
+        test_mod.include TestSupport_::Expect_Stdout_Stderr::InstanceMethods
+        test_mod.include self
+      end
+    end  # >>
 
-  module Constants
-    PROGNAME_ = 'gv'.freeze
-  end
-
-  include Constants
-
-  GitViz_ = GitViz_
-  PROGNAME_ = PROGNAME_
-  TestSupport_ = TestSupport_
-
-  extend TestSupport_::Quickie
-
-  module InstanceMethods
-
-    # ~ action-under-test phase
-
-    def invoke * s_a
-      @result = client.invoke s_a ; nil
+    def invoke * argv
+      using_expect_stdout_stderr_invoke_via_argv argv
     end
 
-    def client
-      @client ||= build_client
+    def subject_CLI
+      GitViz_::CLI
     end
 
-    def build_client
-      grp = _IO_spy_group
-      cli = GitViz_::CLI::Client.new( * grp.values_at( :i, :o, :e ) )
-      cli.program_name = PROGNAME__
-      cli
+    define_method :invocation_strings_for_expect_stdout_stderr, -> do
+      x = [ 'gvz'.freeze ].freeze
+      -> { x }
+    end.call
+
+    # ~ assertion phase (ad-hocs)
+
+    def expect_whine_about_unrecognized_action x
+      expect :styled,
+        %r(\Aunrecognized action:? ['"]?#{ ::Regexp.escape x }['"]?\z)i
     end
 
-    PROGNAME__ = PROGNAME_
-
-    def _IO_spy_group
-      @IO_spy_group ||= bld_IO_spy_group
+    def expect_whine_about_unrecognized_option x
+      expect "invalid option: #{ x }"
     end
 
-    def bld_IO_spy_group
-      grp = TestSupport_::IO.spy.group.new
-      grp.debug_IO = debug_IO
-      grp.do_debug_proc = -> { do_debug }
-      grp.add_stream :i, :_no_instream_
-      grp.add_stream :o
-      grp.add_stream :e
-      grp
-    end
+    def expect_express_all_known_actions
 
-    # ~ assertion phase
-    def expect_expecting_line_with_action_subset * i_a
-      _s_a = i_a.map { |i| i.id2name.gsub( GitViz_::UNDERSCORE_, GitViz_::DASH_ ) }
-      subset = GitViz_.lib_.set.new _s_a
-      expect_expecting_line do
-        _s_a_ = @md[ :altrntn ].split( / *\| */ )
-        superset = ::Set.new _s_a_
-        outside = subset - superset
-        outside.count.zero? or fail say_outside( outside )
+      _s = expect( :styled ) { |x| x }  # IDENTITY_
+      _a = /\Aknown actions are \('([^\)]+)'\)\z/.match( _s )[ 1 ].split( "', '" )
+
+      h = ::Hash[ the_list_of_all_visible_actions.map { |s| [ s, true ] } ]
+
+      _a.each do | s |
+        h.delete( s ) or fail self.__TODO_say_extra_action( s )
+      end
+
+      if h.length.nonzero?
+        fail self.__TODO_say_missing_actions( h.keys )
       end
     end
 
-    def expect_expecting_line &p
-      expect :styled, EXPECTING_RX__, &p
-    end
-    RXS__ = '[-a-z]+'
-    ALT_INNER_RXS__ = " *#{ RXS__ }(?: *\\| *#{ RXS__ })* *"
-    EXPECTING_RX__ = /\Aexpecting \{(?<altrntn>#{ ALT_INNER_RXS__ })\}\.?\z/
-
-    def say_outside outside
-      "these action name(s) were outside of the alternation term: #{
-        }(#{ outside.to_a * ', ' })"
+    def expect_generic_expecting_line
+      expect :styled, "expecting <action>"
     end
 
     def expect_usaged_and_invited
       expect_usage_line
-    end
-
-    def expect_invited
-      expect_invite_line
-      expect_failed
+      expect_generically_invited
     end
 
     def expect_usage_line
-      expect :styled, USAGE_LINE_RX__
+      expect :styled, "usage: gvz <action> [..]"
     end
 
-    ALTERNATION_RXS__ = "\\{#{ ALT_INNER_RXS__ }\\}"
-    USAGE_LINE_RX__ = /\Ausage: #{ PROGNAME__ } #{
-      }#{ ALTERNATION_RXS__ } \[opts\] \[args\]\z/
-
-    def expect_invite_line
-      expect :styled, INVITE_LINE_RX__
+    def expect_generically_invited
+      expect_generic_invite_line
+      expect_failed
     end
-    INVITE_LINE_RX__ = /\ATry #{ PROGNAME__ } -h for help\.?\z/
+
+    def expect_generic_invite_line
+      expect :styled, "use 'gvz -h' for help"
+    end
 
     def expect_failed
-      expect_result_for_failure
       expect_no_more_lines
+      expect_result_for_failure
     end
 
     def expect_succeeded
-      expect_result_for_success
       expect_no_more_lines
-    end
-
-    def expect_result_for_success
-      @result.should eql 0
+      expect_result_for_success
     end
 
     def expect_result_for_failure
-      @result.should eql 1
+      @exitstatus.should eql _memo.generic_error
     end
 
-    def expect_blank_line
-      expect BLANK_LINE__
-    end
-    BLANK_LINE__ = ''.freeze
-
-    def expect_no_more_lines
-      expect_no_more_emissions
+    def expect_result_for_success
+      @exitstatus.should be_zero
     end
 
-    def build_baked_em_a
-      _IO_spy_group.release_lines
+    # ~ more ad-hoc
+
+    def the_list_of_all_visible_actions
+      %w( ping hist-tree )
     end
+
+
+    # ~ BLUNK
+
+    def expect_expecting_and_invited
+      expect_expecting_line
+      expect_invited ; nil
+    end
+
+    # ~ END
+
+    define_method :_memo, -> do
+      p = -> do
+
+        a = [] ; a_ = []
+
+        es = GitViz_.lib_.brazen::API.exit_statii
+        a.push :generic_error ; a_.push es.fetch( :generic_error )
+
+        Memo___ = ::Struct.new( * a ).new( * a_ )
+        p = -> do
+          Memo___
+        end
+        Memo___
+      end
+      -> do
+        p[]
+      end
+    end.call
+
   end
 end

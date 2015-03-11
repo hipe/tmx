@@ -35,9 +35,9 @@ module Skylab::GitViz::TestSupport::Test_Lib::Mock_System
         class Eg_Context
           GitViz_::Test_Lib_::Mock_System[ self ]
           def initialize fm
-            @fixtures_module = fm ; nil
+            @fixtures_module_for_mock_system = fm ; nil
           end
-          attr_reader :fixtures_module  # #hook-in to mock system, mock FS
+          attr_reader :fixtures_module_for_mock_system  # #hook-in to mock system, mock FS
         end
       end
 

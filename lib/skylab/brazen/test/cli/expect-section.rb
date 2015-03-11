@@ -1,133 +1,270 @@
-module Skylab::TanMan::TestSupport::CLI
+module Skylab::Brazen::TestSupport::CLI
 
-  module InstanceMethods
+  module Expect_Section  # :[#044].
 
-    remove_method :expect_section
-    def expect_section *a, &p
-      Expect_Section__.new( self, a, p ).flush
-    end
-  end
+    # in one go, parse a whole "screen" with indentation-sensitive syntax
+    # reminiscent of a super simplified python or OGDL. the result data
+    # structure it geared towards assertion.
 
-  class Expect_Section__
+    class << self
 
-    def initialize ctx, a, p
-      @a = a ; @p = p
-      @one_line_regex = nil
-      @test_context = ctx
-    end
-
-    def flush
-      parse
-      begin
-        @section_label_string_stem and ( expect_section_label or break )
-        @one_line_regex and ( expect_one_line_with_regex or break )
-        @p and instance_exec( & @p )
-        (( s = peek )) and BLANK_RX__ =~ s and skip_line
-          # always skip any blank line at the end of a section
-      end while nil
-      nil
-    end
-    #
-    BLANK_RX__ = /\A\z/
-
-  private
-
-    def parse
-      (( s = @a.shift )).respond_to?( :ascii_only? ) or
-        raise ::TypeError, "need string had #{ s.class } for section label"
-      @section_label_string_stem = s
-      if @a.length.nonzero?
-        @p and raise ::ArgumentError, "can't have iambic and block"
-        send OP_H__.fetch( @a.shift )
+      def tree_via_string s
+        tree_via_line_stream Brazen_.lib_.basic::String.line_stream s
       end
-      nil
-    end
-    #
-    OP_H__ = { one_line: :parse_one_line }.freeze
-    #
-    def parse_one_line
-      @one_line_regex = @a.shift
-      @a.length.zero? or raise ::ArgumentError, "unexpected iambic - #{ @a[0].class }"
-      nil
+
+      def tree_via_line_stream st
+        Build___.new( st ).execute
+      end
+    end  # >>
+
+    class Build___
+
+      def initialize st
+        @st = st
+      end
+
+      def execute
+
+        st = @st
+
+        stack = [ frame = Frame__.new( 0, [] ) ]
+        @stack = stack
+
+        begin
+          s = st.gets
+          s or break
+          line = Line___.new s
+
+          if line.has_no_content
+            frame.a.push Amorphous__.new line
+            redo
+          end
+
+          case frame.margin_length <=> line.margin_length
+          when  0
+            frame.a.push Amorphous__.new line
+
+          when -1
+
+            frame = Frame__.new line.margin_length, [ Amorphous__.new( line ) ]
+            stack.push frame
+
+          when  1
+
+            frame = __pop line
+
+          end
+
+          redo
+        end while nil
+
+        frame = @stack.pop
+
+        while @stack.length.nonzero?
+
+          frame_ = @stack.pop
+          frame_.a.last.accept_children frame.a
+          frame = frame_
+        end
+
+        Flush___[ frame.a ]
+      end
+
+      def __pop line
+
+        begin
+
+          finished_frame = @stack.pop
+          possible_parent = @stack.last
+
+          case possible_parent.margin_length <=> line.margin_length
+          when 0
+
+            possible_parent.a.last.accept_children finished_frame.a
+            possible_parent.a.push Amorphous__.new line
+
+            stop = true
+            frame = possible_parent
+
+          when -1
+            self._DO_ME
+
+          when 1
+
+            possible_parent.a.last.accept_children finished_frame.a
+          end
+
+          stop && break
+          redo
+        end while nil
+
+        frame
+      end
     end
 
-    def expect_section_label
-      line = styled_line
-      len = (( str = "#{ @section_label_string_stem }:" )).length
-      left = line[ 0, len ] ; r = nil
-      in_test_context do
-        left.should eql( str )
-        if line.length > len
-          line[ len, 1 ].should eql( ' ' )
-          r = line[ len + 1 .. -1 ]
+    Frame__ = ::Struct.new :margin_length, :a
+
+    class Line___
+
+      def initialize s
+
+        md = LINE_RX___.match s
+
+        o = md.offset 1
+        @margin_offset = o
+        @margin_length = o.last - o.first
+
+        o = md.offset 2
+        @has_no_content = o.last == o.first
+
+        @content_range = ::Range.new( * o, true )
+
+        @line = s
+      end
+
+      attr_reader :children, :has_no_content, :line, :margin_length
+
+      def unstyled_header_content
+        @__UHC__ ||= __unstyle_header_content
+      end
+
+      def __unstyle_header_content
+        s = unstyled_content
+        d = s.index COLON___
+        if d
+          s[ 0, d ]
+        else
+          s
         end
       end
-      @any_first_line_remainder_string = r
-      left == str
-    end
 
-    def expect_one_line_with_regex
-      rx = @one_line_regex ; s = @any_first_line_remainder_string
-      in_test_context do
-        s.should match( rx )
+      def unstyled_content
+        @__UC__ ||= __unstyle_content
       end
-      rx =~ s
-    end
 
-    def peek
-      @test_context.peek_any_next_info_line
-    end
-    #
-    def styled_line
-      @test_context.styled_info_line
-    end
-    #
-    def skip_line
-      @test_context.some_info_line
-      nil
-    end
+      define_method :__unstyle_content, ( -> do
 
-    def in_test_context &p
-      @test_context.instance_exec( & p )
-    end
+        pp = Callback_.memoize do
+          Brazen_.lib_.old_CLI_lib.pen.unstyle
+        end
 
-    #  ~ these happen within the blocks - note the change in result meaning ~
+        -> do
+          pp[][ line_content ]
+        end
+      end.call )
 
-    def expect_exactly_one_line
-      in_test_context do
-        line = some_info_line
-        ( line !~ BLANK_RX__ ).should eql( true )
+      def line_content
+        @line_content ||= @line[ @content_range ]
       end
-      expect_no_more_lines_in_section
-      nil
     end
-    #
-    def expect_no_more_lines_in_section
-      in_test_context do
-        if (( s = peek_any_next_info_line ))
-          s.should match( BLANK_RX__ )
-          some_info_line
+
+    COLON___ = ':'.freeze
+
+    LINE_RX___ = /\A([ \t]*)([^\n\r]*)\r?\n?\z/
+
+    class Amorphous__
+
+      def initialize x
+        @a = nil ; @x = x
+      end
+
+      attr_reader :a, :x
+
+      def accept_children a
+        @a = a
+      end
+
+      def children_count
+        if @a
+          @a.length
+        else
+          0
         end
       end
-      nil
     end
 
-    def expect_item item_label, content_rx
-      in_test_context do
-        line = styled_info_line
-        md = ITEM_RX__.match( line ) or fail "sanity - item line? - #{ line }"
-        lbl, desc_line_1 = md.captures
-        lbl.should eql( item_label )
-        desc_line_1.should match( content_rx )
+    Flush___ = -> amorph_a do
+
+      nd = if 1 == amorph_a.length
+        Monadic_Root_Node__.new
+      else
+        Root_Node__.new
       end
-      nil
-    end
-    #
-    ITEM_RX__ =
-      /\A[ ]{2,}(?<item_name>(?:(?![ ]{2}).)+)(?:[ ]{2,}(?<rest>.+))?\z/
 
-    def expect_no_more_items
-      expect_no_more_lines_in_section
+      nd.children = Recurse__[ amorph_a, nd ]
+      nd.freeze
+    end
+
+    Recurse__ = -> amorph_a, parent do
+
+      amorph_a.map do | amorph |
+
+        if amorph.children_count.zero?
+
+          Leaf_Node__.new( amorph.x, parent ).freeze
+
+        else
+
+          nd = if 1 == amorph.children_count
+            Monadic_Branch_Node__
+          else
+            Branch_Node__
+          end.new amorph.x, parent
+
+          nd.children = Recurse__[ amorph.a, nd ]
+          nd.freeze
+        end
+      end.freeze
+    end
+
+    Parent_Methods__ = ::Module.new
+
+    ONLY_CHILD__ = -> do
+      @children.first
+    end
+
+    class Root_Node__  # has zero or more than one child
+
+      include Parent_Methods__
+    end
+
+    class Monadic_Root_Node__ < Root_Node__  # has one child
+
+      define_method :only_child, ONLY_CHILD__
+
+    end
+
+    class Leaf_Node__  # has one parent, no children
+
+      def initialize x, parent
+        @parent = parent
+        @x = x
+      end
+      attr_reader :parent, :x
+
+      def children_count
+        0
+      end
+    end
+
+    class Branch_Node__ < Leaf_Node__  # has one parent, 2 or more children
+
+      include Parent_Methods__
+
+    end
+
+    class Monadic_Branch_Node__ < Branch_Node__  # has one parent, one child
+
+      define_method :only_child, ONLY_CHILD__
+    end
+
+    module Parent_Methods__
+
+      attr_accessor :children
+
+      def children_count
+        @children.length
+      end
     end
   end
 end

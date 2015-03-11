@@ -34,7 +34,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
     context "-" do
 
       it "1.4) (help screen) (goofy style)" do
-        invoke_with_no_prefix '-h', 'workspace'
+        using_expect_stdout_stderr_invoke_with_no_prefix '-h', 'workspace'
         expect_helpscreen_for_workspace_node
       end
     end

@@ -109,7 +109,8 @@ module Skylab::Brazen
             x = Brazen_::Model_::Node_via_Proc.produce_action_class_like(
               unb,
               const_i_a.fetch( d ),
-              box_mod )
+              box_mod,
+              item )
 
             break
           end
@@ -172,7 +173,7 @@ module Skylab::Brazen
 
     def try_convert_to_node_like_via_mixed x, i, mod
       if x.respond_to? :call
-        Brazen_::Model_::Node_via_Proc.produce_nodelike x, i, mod
+        Brazen_::Model_::Node_via_Proc.produce_nodelike x, i, mod, @module
       end
     end
 

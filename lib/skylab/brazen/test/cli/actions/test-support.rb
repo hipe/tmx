@@ -77,14 +77,14 @@ module Skylab::Brazen::TestSupport::CLI::Actions
 
   module InstanceMethods
 
-    def sub_action_s_a
+    def argv_prefix_for_expect_stdout_stderr
       self.class.sub_action_s_a
     end
 
-    def prepare_invocation
+    def for_expect_stdout_stderr_prepare_invocation invo
       env = {}
       prepare_env env
-      @invocation.env = env  # never use real life ::ENV !
+      invo.receive_environment env  # never use real life ::ENV !
       path = from_directory
       if path
         file_utils.cd path

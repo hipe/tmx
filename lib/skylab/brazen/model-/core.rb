@@ -458,7 +458,7 @@ module Skylab::Brazen
 
       def try_convert_to_node_like_via_mixed x, i
         if x.respond_to? :call
-          Model_::Node_via_Proc.produce_action_class_like x, i, @mod
+          Model_::Node_via_Proc.produce_action_class_like x, i, @mod, @cls
         end
       end
     end

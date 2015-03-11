@@ -2,8 +2,7 @@ require_relative '../test-support'
 
 module Skylab::GitViz::TestSupport::VCS_Adapters::Git::System_Agent
 
-  Parent_TS__ = ::Skylab::GitViz::TestSupport::VCS_Adapters::Git
-  Parent_TS__[ TS_ = self ]
+  ::Skylab::GitViz::TestSupport::VCS_Adapters::Git[ TS_ = self ]
 
   include Constants
 

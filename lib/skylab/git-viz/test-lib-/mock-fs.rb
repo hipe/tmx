@@ -24,11 +24,21 @@ module Skylab::GitViz
         end
 
         def mock_FS
-          @mock_FS ||= FS_[ fixtures_module, pathnames_manifest_relpath ]
+          @mock_FS ||= __build_mock_FS
         end
 
-        def fixtures_module
-          self.class.fixtures_mod
+        def __build_mock_FS
+
+          # allow node hierarchies to specify the below even though
+          # they haven't pulled the subject into their chain yet
+
+          _mod = if respond_to? :fixtures_module_for_mock_FS
+            fixtures_module_for_mock_FS
+          else
+            self.class.fixtures_mod
+          end
+
+          FS_[ _mod, pathnames_manifest_relpath ]
         end
 
         def pathnames_manifest_relpath

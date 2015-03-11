@@ -24,7 +24,7 @@ module Skylab::Brazen
       def pretty_path x
         expression_agent_class.pretty_path x
       end
-    end
+    end  # >>
 
     Top_Invocation__ = self
 
@@ -46,7 +46,13 @@ module Skylab::Brazen
         [ :application_kernel, :bound_action, * super ]
       end
 
-      attr_writer :env
+      def receive_environment x  # experiment
+        @env = x ; nil
+      end
+
+      def env_
+        @env
+      end
 
       def invoke argv
         @resources.complete @env || ::ENV, argv
@@ -318,14 +324,51 @@ module Skylab::Brazen
       # this is CLI. you need not cache these.
 
       def __branch_class_for_unbound_action unbound
-        _any_branch_or_leaf_class_for_unbound( unbound ) || branch_class
+
+        _any_specialized_adapter_in_self_for( unbound ) || branch_class
       end
 
       def __leaf_class_for_unbound_action unbound
-        _any_branch_or_leaf_class_for_unbound( unbound ) || leaf_class
+
+        __any_specialized_adapter_under_model_node_for( unbound ) ||
+
+          _any_specialized_adapter_in_self_for( unbound ) || leaf_class
       end
 
-      def _any_branch_or_leaf_class_for_unbound unbound
+      # ~ begin modalities (per model)
+
+      def __any_specialized_adapter_under_model_node_for unbound  # leaf
+
+        mc = unbound.model_class
+        if mc.respond_to?( :entry_tree ) && mc.entry_tree.has_entry( MODA___ )
+
+          # hacking a peek into the filesystem (for free) here is not as ugly
+          # as a) needing to opt-in to boxxy everywhere or b) requiring stubs
+
+          mc.const_get :Modalities, false
+        end
+        if mc.const_defined? :Modalities
+          __any_branch_or_leaf_class_for_unoubnd_when_modalities unbound
+        end
+      end
+
+      def __any_branch_or_leaf_class_for_unoubnd_when_modalities unb
+
+        sym = unb.name_function.as_const
+        _box = unb.model_class::Modalities::CLI::Actions
+        if _box.const_defined? sym, false
+          _box.const_get sym
+        end
+      end
+
+      MODA___ = 'modalities'
+
+      # ~ end
+
+      def _any_specialized_adapter_in_self_for unbound  # branch or leaf
+
+        # the "classical" way to override - all special actions in one file
+
         sym = unbound.name_function.as_const
         if self.class::Actions.const_defined? sym, false
           self.class::Actions.const_get sym
@@ -607,7 +650,8 @@ module Skylab::Brazen
         @parent = otr
         @resources = otr.resources
         resolve_properties
-        resolve_partitions ; nil
+        resolve_partitions
+        NIL_
       end
 
       def via_argv_resolve_some_bound_call
@@ -651,12 +695,47 @@ module Skylab::Brazen
         # will for example first check if a special method is defined which
         # corresponds to the channel name in some way and instead use that.
 
-        -> * i_a, & ev_p do
-          receive_event_on_channel ev_p[], * i_a
+        -> * i_a, & x_p do
+          __receive_unclassified_emission i_a, & x_p
         end
       end
 
-      def receive_event_on_channel ev, * i_a  # :+#public-API
+      def __receive_unclassified_emission i_a, & x_p
+
+        if i_a && :expression == i_a[ 1 ]
+          send :"receive__#{ i_a[ 0 ] }__expression", * i_a[ 2 .. -1 ], & x_p
+        else
+          receive_event_on_channel x_p[], i_a
+        end
+      end
+
+      # ~ begin implement :+[#br-023]:
+
+      def receive__error__expression sym, & msg_p
+
+        receive_negative_event _event_via_expression( false, sym, & msg_p )
+      end
+
+      def receive__info__expression sym, & msg_p
+
+        receive_neutral_event _event_via_expression( nil, sym, & msg_p )
+      end
+
+      def receive__payload__expression sym, & msg_p
+
+        receive_payload_event _event_via_expression( true, sym, & msg_p )
+      end
+
+      def _event_via_expression ok, sym, & msg_p
+
+        Callback_::Event.inline_with sym, :ok, ok do | y, _ |
+          instance_exec y, & msg_p
+        end
+      end
+
+      # ~ end
+
+      def receive_event_on_channel ev, i_a  # :+#public-API
         ev_ = ev.to_event
         has_OK_tag = if ev_.has_tag :ok
           ok_x = ev_.ok
@@ -1457,7 +1536,7 @@ module Skylab::Brazen
 
     class Action_Adapter  # re-open
 
-      def resolve_properties
+      def resolve_properties  # :+[#042] #nascent-operation
 
         @mutable_back_properties = nil
         @mutable_front_properties = nil

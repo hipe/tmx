@@ -31,7 +31,8 @@ module Skylab::BeautySalon
         elsif :expression == i_a[ 1 ]
 
           # currently for "expression" callbacks we never care what the
-          # remaining terms are - it's just info or error to us.
+          # remaining terms are - it's just info or error to us. (this is
+          # a hand-rolled :+[#br-023] because we aren't using [br] yet)
 
           send :"__receive__#{ i_a.first }_#{ i_a[ 1 ] }__", & x_p
 

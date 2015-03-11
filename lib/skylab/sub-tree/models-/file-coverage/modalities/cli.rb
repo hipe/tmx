@@ -2,6 +2,16 @@
 
 module Skylab::SubTree
 
+  class Models_::File_Coverage
+
+    Modalities = ::Module.new
+
+    module Modalities::CLI
+
+      Actions = ::Module.new  # THE_EMPTY_MODULE_
+
+      if false
+
   SubTree_::Library_.touch :Set
 
   class CLI::Actions::Cov < CLI::Action
@@ -153,6 +163,10 @@ module Skylab::SubTree
         $stderr.puts "  #{ _full }"
       end
       nil
+    end
+  end
+
+      end
     end
   end
 end

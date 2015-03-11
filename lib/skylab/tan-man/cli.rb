@@ -29,7 +29,7 @@ module Skylab::TanMan
       include Previous_Actions___
 
       class Status < Action_Adapter
-        def resolve_properties
+        def resolve_properties  # :+[#br-042] #nascent-operation
           super
           mutable_back_properties.replace_by :path do | prp |
             prp.dup.set_default_proc do
@@ -44,7 +44,7 @@ module Skylab::TanMan
       class Graph < Branch_Adapter
         module Actions
           class Use < Action_Adapter
-            def resolve_properties  # e.g
+            def resolve_properties  # :+[#br-042] #nascent-operation
               super
               mutable_back_properties.replace_by :digraph_path do | prp |
                 prp.dup.add_ad_hoc_normalizer do | arg |
