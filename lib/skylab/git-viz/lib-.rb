@@ -25,10 +25,10 @@ module Skylab::GitViz
 
     Brazen = sidesys[ :Brazen ]
 
-    Bsc__ = wall[ :Basic ]
+    Basic = wall[ :Basic ]
 
     Basic_Set = -> * a do
-      Bsc__[]::Set[ * a ]
+      Basic[]::Set[ * a ]
     end
 
     CLI_legacy_DSL = -> mod do
