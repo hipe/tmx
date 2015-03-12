@@ -2,7 +2,7 @@ module Skylab::GitViz
 
   module Test_Lib_
 
-    module Mock_Sys
+    module Mock_Sys  # see [#007]
 
       Models_ = ::Module.new
 
@@ -115,6 +115,110 @@ module Skylab::GitViz
           end
         end
       end
+
+      class Conduit
+
+        def initialize path
+          @is_opened = false
+          @is_fully_loaded = false
+          @lookup = method :__first_lookup
+          @path = path
+        end
+
+        def popen3 * argv
+          block_given? and raise ::ArgumentError
+          cmd = @lookup[ argv ]
+          if cmd
+            cmd.to_four
+          else
+            raise ::KeyError, "no such command: #{ argv.inspect }"
+          end
+        end
+
+        def __first_lookup argv
+
+          @cache = {}
+
+          _lines = ::File.open @path, ::File::RDONLY
+          @st = Models_::Command.unmarshalling_stream _lines, :OGDL  # etc
+
+          @lookup = method :__lookup_while_reading
+          @lookup[ argv ]
+        end
+
+        def __lookup_while_reading argv
+
+          begin
+            cmd = @st.gets
+            if cmd
+
+              @cache[ cmd.argv ] = cmd  # etc
+
+              if argv == cmd.argv
+                x = cmd
+                break
+              else
+                redo
+              end
+            else
+              @lookup = method :__lookup_when_fully_loaded
+              x = @lookup[ argv ]  # meh
+              break
+            end
+          end while nil
+          x
+        end
+
+        def __lookup_when_fully_loaded argv
+
+          cmd = @cache[ argv ]  # etc
+          if cmd
+            cmd
+          else
+            self._DO_ME
+          end
+        end
+      end
+
+      # ~ begin re-open for subject
+
+      class Models_::Command
+
+        def to_four
+          [ nil, __to_mock_stdout, __to_mock_stderr, __to_mock_thread ]
+        end
+
+        def __to_mock_stdout
+          if @stdout_string
+            GitViz_.lib_.basic::String.line_stream @stdout_string
+          end
+        end
+
+        def __to_mock_stderr
+          if @stderr_string
+            GitViz_.lib_.basic::String.line_stream @stderr_string
+          end
+        end
+
+        def __to_mock_thread
+          if @exitstatus
+            Mock_Thread___.new @exitstatus
+          end
+        end
+      end
+
+      class Mock_Thread___
+
+        def initialize es
+          @value = Mock_Thread_Value___.new es
+        end
+
+        attr_reader :value
+      end
+
+      Mock_Thread_Value___ = ::Struct.new :exitstatus
+
+      # ~ end
 
       Mock_Sys_ = self
     end

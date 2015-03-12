@@ -119,6 +119,7 @@ module Skylab::GitViz::TestSupport
   # ~ any re-assignments of above to propagate to child test nodes
 
   module Constants
+    Callback_ = Callback_
     GitViz_ = GitViz_
     NIL_ = NIL_
     TestSupport_ = TestSupport_

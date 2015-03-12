@@ -1,0 +1,17 @@
+
+  # this is a dummy command, just to get in the way:
+
+command
+  argv
+    echo, hi
+
+
+  # we use this command in a test for step 3:
+
+command
+  argv
+    echo, "it's", "\"fun\""
+  stdout_string
+    "it's \"fun\"
+    "
+  exitstatus 0

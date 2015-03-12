@@ -33,7 +33,8 @@
 [#010]       #parent-node:[#011] the git commit poool narrative ..
 [#009]       #parent-node:[#011] the git commit narrative ..
 [#008]       #parent-node:[#005] the VCS adapter agent narrative ..
-[#007] #hole ( #was: #parent-node:[#005] the CLI action narrative .. )
+[#007]       the mock-sys narrative ..
+             ( #was: #parent-node:[#005] the CLI action narrative .. )
 [#006]       #parent-node:[#005] the CLI client narrative ..
 [#005]       #doc-node the application narrative ..
 [#004] #open mock-FS with paths not pathnames

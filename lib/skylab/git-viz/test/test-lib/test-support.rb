@@ -3,7 +3,7 @@ require 'stringio'
 
 module Skylab::GitViz::TestSupport::Test_Lib
 
-  ::Skylab::GitViz::TestSupport[ self ]
+  ::Skylab::GitViz::TestSupport[ TS_ = self ]
 
   include Constants
 
@@ -17,5 +17,6 @@ module Skylab::GitViz::TestSupport::Test_Lib
       # we are not sure why, but it's probably for the better.
   end
 
+  Callback_ = Callback_
   GitViz_ = GitViz_
 end
