@@ -19,9 +19,8 @@ module Skylab::GitViz
 
         def initialize lines
           @lines = lines
-          @line = nil
           @scn = GitViz_.lib_.string_scanner.new EMPTY_S_
-          @stack = []
+          @stack = [ Frame__.new( 0, Root_Node___.new ) ]
         end
 
         def execute
@@ -32,21 +31,18 @@ module Skylab::GitViz
 
         def __gets
 
-          s = @lines.gets
-          if s
-            __gets_when_at_least_one_line s
+          if _resolve_next_nonblank_noncomment_line
+            __gets_when_at_least_one_line
           end
         end
 
-        def __gets_when_at_least_one_line line
+        def __gets_when_at_least_one_line
 
-          @stack.length.zero? or self._SANITY
+          1 == @stack.length or self._SANITY
 
-          frame = Frame__.new 0, Root_Node___.new
-          @stack.push frame
+          frame = @stack.last
 
           begin
-            @scn.string = line
             d = @scn.skip INDENT__
             case frame.margin_count <=> d
             when 0
@@ -59,25 +55,41 @@ module Skylab::GitViz
               frame = __pop d
 
               if 1 == @stack.length
+
                 # this is the part that makes us streaming: break as soon
-                # as you have completed a level-one objecthh
+                # as you have completed a level-one object
+
+                stopped_early = true
+
                 break
               end
             else
               self._SANITY
             end
 
-            line = @lines.gets
-            line or break
+            _yes = _resolve_next_nonblank_noncomment_line
+            _yes or break
             redo
           end while nil
 
           frame and begin
 
-            root_node = @stack.fetch( 0 ).node
-            @stack.clear
-            1 == root_node.children.length or self._SANITY
-            root_node.children.fetch( -1 )
+            a = @stack.first.node.children
+
+            # the number of children that the root node has should always
+            # be either one or two based on whether there is more than one
+            # object in the stream. when two, keep the stack where it is:
+            # we have just started parsing the next object
+
+            if stopped_early
+              2 == a.length or self._SANITY
+              x = a.shift
+            else
+              1 == a.length or self._SANITY
+              x = a.shift
+              @stack[ 1 .. -1 ] = EMPTY_A_
+            end
+            x
           end
         end
 
@@ -215,9 +227,10 @@ module Skylab::GitViz
           fr = @stack.last
 
           begin
-            line = @lines.gets
-            line or raise "end of quote not found"
-            @scn.string = line
+
+            _yes = _resolve_next_nonblank_noncomment_line
+            _yes or raise "end of quote not found"
+
             s = @scn.scan INDENT__
             if s.length < fr.margin_count
               fr.margin_count = s.length
@@ -246,13 +259,53 @@ module Skylab::GitViz
         end
 
         def _mutate_content_by_unescaping s
+
           s.gsub! ESC_RX___ do
-            $~[ 1 ]
+
+            d = $~[ 1 ].getbyte 0
+
+            x = SUPPORTED_ESCAPE_SEQUENCES__[ d ]
+
+            if x
+              x
+            else
+              raise "unsupported escape sequence: \"\\#{ d.chr }"
+              # or just: "\\#{ d.chr }"
+            end
           end
           NIL_
         end
 
         ESC_RX___ = /\\(.)/
+
+        SUPPORTED_ESCAPE_SEQUENCES__ = {
+          '"'.getbyte( 0 ) => '"',
+          'n'.getbyte( 0 ) => "\n",
+          "\\".getbyte( 0 ) => "\\"
+        }  # etc
+
+        def _resolve_next_nonblank_noncomment_line
+
+          begin
+            line = @lines.gets
+            if line
+              @scn.string = line
+
+              _d = @scn.skip COMMENT_LINE_BEGINNING_OR_BLANK_LINE___
+              if _d
+                redo
+              else
+                x = ACHIEVED_
+              end
+            else
+              @scn = nil
+            end
+            break
+          end while nil
+          x
+        end
+
+        COMMENT_LINE_BEGINNING_OR_BLANK_LINE___ = /[ \t]*(?:#|$)/
 
         Frame__ = ::Struct.new :margin_count, :node
 
