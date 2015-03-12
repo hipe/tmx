@@ -41,17 +41,21 @@ module Skylab::Basic
             Reverse__[ s ]
           end
         end
-      end
+      end  # >>
 
       def initialize count_p
         @count_p = count_p
+      end
+
+      def members
+        [ :gets, :line_number ]
       end
 
       def line_number
         @count_p.call.nonzero?
       end
 
-      Reverse__ = -> mutable_string do
+      Reverse__ = -> mutable_string do  # see #the-reverse-scanner
         is_first = true
         ::Enumerator::Yielder.new do |line|
           if is_first
