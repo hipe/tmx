@@ -74,6 +74,10 @@ module Skylab::GitViz::TestSupport
     nil
   end
 
+  Expect_Line = -> test_mod do
+
+    TestSupport_::Expect_line[ test_mod ]
+  end
 
   module Messages
     PATH_IS_FILE = "path is file, must have directory".freeze

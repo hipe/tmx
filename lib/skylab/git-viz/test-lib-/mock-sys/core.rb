@@ -4,6 +4,13 @@ module Skylab::GitViz
 
     module Mock_Sys  # see [#007]
 
+      class << self
+
+        def recording_session byte_downstream, & edit_p
+          Mock_Sys_::Recording_Session__.new( byte_downstream, & edit_p ).execute
+        end
+      end  # >>
+
       Models_ = ::Module.new
 
       class Models_::Command
@@ -221,6 +228,8 @@ module Skylab::GitViz
       # ~ end
 
       Mock_Sys_ = self
+      NEWLINE_ = "\n"
+
     end
   end
 end

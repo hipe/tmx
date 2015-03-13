@@ -13,7 +13,7 @@ module Skylab::TestSupport
       def shell output_s
         Shell__.new output_s
       end
-    end
+    end  # >>
 
     Test_Context_Instance_Methods__ = ::Module.new
 

@@ -47,34 +47,63 @@ module Skylab::GitViz
 
         def _write_string_stream st, name_sym, margin
 
-          @io.write "#{ margin }#{ name_sym }\n"
+          @io.write "#{ margin }#{ name_sym }"  # no newline yet
 
           s = st.gets
           if s
+
             margin_ = "#{ INDENT__ }#{ margin }"
-            __write_first_string s, margin_
-            begin
-              s = st.gets
-              s or break
-              __write_additional_string s, margin_
-              redo
-            end while nil
+
+            s_ = st.gets
+
+            if s_
+
+              @io.write NEWLINE_
+
+              __write_first_string s, margin_
+
+              s = s_
+              begin
+                __write_additional_string s, margin
+                s = st.gets
+                s or break
+                redo
+              end while nil
+            else
+              __write_only_string s, margin_
+            end
+
             @io.write NEWLINE_
           end
         end
 
         def __write_first_string s, margin
-          __write_string false, s, margin
+          _write_string false, s, margin
         end
 
         def __write_additional_string s, margin
-          __write_string true, s, margin
+          _write_string true, s, margin
         end
 
-        def __write_string is_addtnl, s, margin
+        def __write_only_string s, margin
+
+          # for aesthetics, when there is only one string render it on the
+          # same line as its parent node unless it contains a real newline
+
+          if s.include? NEWLINE_
+
+            @io.write NEWLINE_
+            _write_string false, s, margin
+
+          else
+            _write_string false, s, SPACE_
+          end
+        end
+
+        def _write_string is_addtnl, s, margin
 
           if s.length.zero? || COMPLEX_RX___ =~ s
-            __write_complex_string is_addtnl, s, margin
+            __write_quoted_string is_addtnl, s, margin
           else
             _write_simple_string is_addtnl, s, margin
           end
@@ -82,7 +111,7 @@ module Skylab::GitViz
 
         COMPLEX_RX___ = /['" \t\r\n()]/
 
-        def __write_complex_string is_addtnl, s, margin
+        def __write_quoted_string is_addtnl, s, margin
           s = s.dup
           s.gsub! ESC_RX___ do
             "\\#{ $~[ 0 ] }"
@@ -131,7 +160,6 @@ module Skylab::GitViz
         end
 
         INDENT__ = '  '.freeze
-        NEWLINE_ = "\n"
 
       public
 
