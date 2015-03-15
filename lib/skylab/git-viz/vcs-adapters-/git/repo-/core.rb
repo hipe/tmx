@@ -169,3 +169,4 @@ module Skylab::GitViz
     end
   end
 end
+# :+#tombstone: [#008] `Simple_Agent_` was replaced by [cb] actor
