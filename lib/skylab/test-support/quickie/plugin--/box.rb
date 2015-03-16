@@ -51,6 +51,7 @@ module Skylab::TestSupport
         get_test_path_a
         paystream
         program_moniker
+        to_test_path_stream
         y )
 
       SERVICES_THAT_PLUGINS_WANT__.each do |i|

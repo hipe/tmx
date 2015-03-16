@@ -97,6 +97,10 @@ module Skylab::TestSupport
         @plugins[ :run_recursive ].client.get_any_test_path_a
       end
 
+      def to_test_path_stream
+        @plugins[ :run_recursive ].client.to_test_path_stream
+      end
+
       def replace_test_path_s_a path_s_a
         @plugins[ :run_recursive ].client.replace_test_path_s_a path_s_a
       end

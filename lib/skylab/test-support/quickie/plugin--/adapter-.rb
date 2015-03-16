@@ -70,6 +70,7 @@ module Skylab::TestSupport
         paystream
         plugins
         program_moniker
+        to_test_path_stream
         y ).freeze
 
       SERVICES_THAT_PLUGINS_WANT__.each do |i|

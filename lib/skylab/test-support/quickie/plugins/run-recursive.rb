@@ -80,6 +80,10 @@ module Skylab::TestSupport
         (( a = @test_path_a )) ? a.dup : a
       end
 
+      def to_test_path_stream
+        Callback_::Stream.via_nonsparse_array @test_path_a
+      end
+
       def replace_test_path_s_a path_s_a
         @test_path_a = path_s_a
         CONTINUE_

@@ -80,6 +80,11 @@ module Skylab::BeautySalon
 
     class Preview_Agent_Children__::Matches_Node < Branch_
 
+      def initialize( * )
+        @has_path = false
+        super
+      end
+
       def orient_self
         @fa = @parent.lower_files_agent
         @rf = @parent.regexp_field
@@ -94,29 +99,68 @@ module Skylab::BeautySalon
         @rf.value_is_known
       end
 
+      def receive_path___ x
+
+        if x
+          @gbf = @rbf = @pag = nil
+          @has_path = true
+          @paths_agent_group = Explicit_Path___.new x
+          ACHIEVED_
+        else
+          @has_path = @paths_agent_group = x
+        end
+      end
+
+      attr_reader :has_path
+
+      class Explicit_Path___
+        def initialize s
+          @path = s
+        end
+        def has_active_boolean
+          true
+        end
+        def active_boolean
+          self
+        end
+        def build_path_stream
+          Callback_::Stream.via_item @path
+        end
+      end
+
       def prepare_for_focus
-        grp = Zerk_::Enumeration_Group.new [ :grep, :ruby ], :grep_via, self
-        @paths_agent_group = grp
-        gbf = Grep_Boolean__.new grp, self
-        @grep_boolean_field = gbf
-        _rbf = Ruby_Boolean__.new grp, self
+
+        if ! @has_path
+          __init_paths_agent_group
+        end
 
         @children = [
           Up_Button_.new( self ),
-          gbf,
-          _rbf,
+          * @gbf,
+          * @rbf,
           Files_Node__.new( self ),
           Counts_Node__.new( self ),
           Matches_Node__.new( self ),
           Replace_Node__.new( self ),
           Quit_Button_.new( self ),
-          grp ]
+          * @pag ]
 
         if @is_interactive
           retrieve_values_from_FS_if_exist
         end
 
         ACHIEVED_
+      end
+
+      def __init_paths_agent_group
+
+        grp = Zerk_::Enumeration_Group.new [ :grep, :ruby ], :grep_via, self
+        @paths_agent_group = grp
+        @gbf = Grep_Boolean__.new grp, self
+        @grep_boolean_field = @gbf
+        @rbf = Ruby_Boolean__.new grp, self
+        @pag = grp
+        NIL_
       end
 
       attr_reader :paths_agent_group, :grep_boolean_field

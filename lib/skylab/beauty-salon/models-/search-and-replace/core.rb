@@ -106,7 +106,8 @@ module Skylab::BeautySalon
 
       class << self
 
-        def call * x_a
+        def call * x_a, & oes_p
+          oes_p and x_a.push :on_event_selectively, oes_p
           bc = new( x_a ).resolve_bound_call
           bc and begin
             bc.receiver.send bc.method_name, * bc.args
@@ -244,10 +245,10 @@ module Skylab::BeautySalon
           @replace_field = Replace_Field__.new( self ),
           @dirs_field = Dirs_Field__.new( self ),
           @files_field = Files_Field__.new( self ),
-          pn = Preview_Node__.new( self ),
+          @preview_node = Preview_Node__.new( self ),
           Quit_Button_.new( self ) ]
 
-        pn.orient_self
+        @preview_node.orient_self
 
         @is_first_display = true
 
@@ -277,6 +278,9 @@ module Skylab::BeautySalon
       attr_reader :dirs_field, :files_field, :grep_rx_field, :regexp_field,
         :replace_field, :work_dir
 
+      def receive__path__ x  # exeriment for API
+        @preview_node.receive_path__ x
+      end
     end
 
     class Grep_RX_Field__ < Field_
@@ -469,8 +473,17 @@ module Skylab::BeautySalon
         @o ? ACHIEVED_ : UNABLE_
       end
 
-      def against_nonempty_iambic_stream stream
-        against_nonempty_iambic_stream_assume_string stream
+      def against_nonempty_iambic_stream st
+
+        if st.current_token.respond_to? :call
+          receive_matchdata_values = st.gets_one
+          @o = -> md do
+            receive_matchdata_values[ * md.captures ]
+          end
+          ACHIEVED_
+        else
+          against_nonempty_iambic_stream_assume_string st
+        end
       end
 
       def marshal_load s, & ep
@@ -632,9 +645,15 @@ module Skylab::BeautySalon
       end
 
       def orient_self
+
+        @mod = S_and_R_::Preview_Agent_Children__
+
         @parent_files_field = @parent.files_field
         @parent_dirs_field = @parent.dirs_field
+
+        @matches_agent = @mod::Matches_Node.new self
         @regexp_field = @parent.regexp_field
+
         nil
       end
 
@@ -642,14 +661,12 @@ module Skylab::BeautySalon
       end
 
       def prepare_for_focus
-        mod = S_and_R_::Preview_Agent_Children__
-        @my_files_agent = mod::Files_Node.new self
-        matches_agent = mod::Matches_Node.new self
-        matches_agent.orient_self
+        @my_files_agent = @mod::Files_Node.new self
+        @matches_agent.orient_self
         @children = [
           Up_Button_.new( self ),
           @my_files_agent,
-          matches_agent,
+          @matches_agent,
           Quit_Button_.new( self ) ]
 
         @my_files_agent.orient_self
@@ -661,7 +678,12 @@ module Skylab::BeautySalon
         @serr.puts
       end
 
+      def receive_path__ x
+        @matches_agent.receive_path___ x
+      end
+
       def can_receive_focus
+        @matches_agent.has_path or
         @parent_files_field.value_is_known &&
           @parent_dirs_field.value_is_known
       end

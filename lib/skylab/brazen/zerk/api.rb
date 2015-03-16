@@ -51,7 +51,13 @@ module Skylab::Brazen
           @node_ = node
           via_second_node_step
         else
-          when_child_not_found
+          m = :"receive__#{ @token }__"
+          if @node.respond_to? m
+            @scan.advance_one
+            @node.send m, @scan.gets_one
+          else
+            __when_child_not_found
+          end
         end
       end
 
@@ -88,7 +94,7 @@ module Skylab::Brazen
         end
       end
 
-      def when_child_not_found
+      def __when_child_not_found
         @result = maybe_send_event :error do
           build_child_not_found_event
         end
