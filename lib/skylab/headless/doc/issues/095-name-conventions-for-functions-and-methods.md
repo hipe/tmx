@@ -46,6 +46,13 @@ better this time.
   of the base-classes called something like "action" in many of our
   frameworks :+[#020]
 
++ `[..]_for_[..]` - this is becoming a convention for "#hook-out"
+  methods (defined somewhere): e.g `foo_bar_for_biff_baz` is a method that
+  produces a "foo bar" for the "biff baz" library. if you see a method
+  defined like this, you might be able to infer that it is called
+  somewhere outside of the scope you are looking at; that it is a
+  "#hook-out" method that a different library calls of your objects.
+
 + `[_]from[_]` - this meaning is explicitly not defined conventionally.
   use "from" how you like, but do not use it if you can use `via`.
 

@@ -20,8 +20,9 @@
 [#022]       #done heartbeat and shutdown timer
 [#021]       #DONE #experimental is it practical to "#rainbow-kick" the server?
 [#020]       #done just for the lols different rubies talk on the same system
-[#019]       #done fixture server is a long running process, doesn't need to
-             re-parse the whole manifest file for each request (read [#018])
+[#019] #open filenames with special characters in them
+             ( #was: #done fixture server is a long running process, doesn't need to
+             re-parse the whole manifest file for each request (read [#018]) )
 [#018]       #parent-node:[#023] the manifest server ..
 [#017]       #parent-node:[#023] the fixtures building narrative ..
 [#016]       #parent-node:[#011] the git repo narrative ..

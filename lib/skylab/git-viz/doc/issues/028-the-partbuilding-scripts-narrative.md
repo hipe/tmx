@@ -1,5 +1,7 @@
 # the partbuilding scripts narrative :[#028]
 
+(EDIT: this document is all +#archival. the simplified [#007] replaces this.)
+
 
 ## #storypoint-1
 

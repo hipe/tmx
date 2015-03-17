@@ -1,5 +1,7 @@
 # the fixtures building narrative :[#017]
 
+(EDIT: this document is all +#archival. the simplified [#007] replaces this.)
+
 ## introduction
 
 (EDIT: this pertains to the "build scripts" written largely in zsh, and not

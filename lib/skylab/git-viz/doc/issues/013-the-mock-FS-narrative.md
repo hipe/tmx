@@ -1,5 +1,25 @@
 # the mock FS narrative :[#013]
 
+
+## the new introduction
+
+a mock filesystem is defined by an absolute (real filesystem) path to a
+manifest file. the manifest file is simply a list of absolute paths that
+constitute the imaginary files and directories of the mock fileystem.
+(directories are the paths that end in "/".)
+
+the function of the mock filesystem is to act like a real filesystem
+that has these nodes and these nodes only (unless otherwise noted); but
+only with respect to the operations that we perform on paths: we may
+only report whether or not given path exists on this imaginary system, and
+if so whether it is a file or a directory.
+
+(we could also perform imaginary directory listings, but we don't need
+that yet.)
+
+
+
+
 ## :#storypoint-5 introduction
 
 years and years ago we knew that chris wanstrath et. al. had a gem like this.
@@ -158,7 +178,7 @@ consistent name conventions.)
 
 ## :#storypoint-90
 
-as ::Pathname does we allow any aribtrary string to constitute our
+as ::Pathname does we allow any arbitrary string to constitute our
 "deep structure" inner value, which is after all just a frozen string.
 however when looking things up in the tree we will want a more normalized
 representation to acount for a few behaviors we are after. there is more

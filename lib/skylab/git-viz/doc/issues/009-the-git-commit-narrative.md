@@ -1,7 +1,19 @@
 # the git commit narrative :[#009]
 
+## :#storypoint-15
 
-## :#storypoint-10
+the trailing double dash is necessary to make the command non-
+ambiguous: the variable represents a commit and not a tree. its
+utility isn't always evident unless the commit is not found.
+
+large commits (in terms of the number of files affected) that go
+over the buffer threshold will bork against this naive
+implementation, but this is enough to get us off the ground.
+
+
+
+
+## :#storypoint-36
 
 either git, ruby, or my OS has some confusion about what ISO-8601 means.
 according to wikipedia it appears that ruby is off the hook and either git
@@ -24,14 +36,4 @@ then with ruby try to parse that exact string:
     DateTime.iso8601 "2014-01-05T04:03:24-0500"  # => #<DateTime: 2014-0..>
 
 
-
-## :#storypoint-20
-
-in my environment there is an incongruence between what "man git-diff-tree"
-reports and the observed behavior, of the '--numstat' flag with regards
-to file moves. in the magpage in the sizeable section on --numstat it
-describes how it will show file rename information in one line. the behavior
-(of 1.7.4.4) appears always to be to give one file rename two separate lines.
-the behavior may actually be better from a machine readability standpiont, but
-then we miss out on all the crazy fun of the '-z' option described in the
-manpage.
+:#tombstone: ramblings about the '-z' option, before we knew about '-M'

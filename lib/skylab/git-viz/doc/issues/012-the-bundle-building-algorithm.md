@@ -1,3 +1,146 @@
+# the bundle building algorithm :[#012]
+
+(EDIT: this document has much older content that is not yet assimilated,
+halfway down, demarcated by many dashes. what follows immediate is "current")
+
+
+## introduction
+
+a "bundle" contains all the information needed to build a "hist-tree".
+we can think of it as a matrix of "filediffs", with time one one axis and
+files on another; where a "filediff" is the changes to one file in one
+commit.
+
+below is a pseudocode description of the algorithm we use to build a
+bundle, along with descriptions of the datastructures it is built
+around.
+
+
+
+
+## in pseudocode
+
+below, a specialized structure or concept will appear as a hashtag the
+first time it is used, and then will *not* appear as a hashtag each
+subseqent time it is used. the hashtagged terms are defined in the
+next section.
+
+(note the hashtags are also used inline in the code so don't change the
+constituency here without renaming there. in the code they will always
+appear with the form "[#012]:#hashtag-name" (without the quotes).)
+
+  • determine the list of #path's in our #path-of-interest with
+    #the-git-ls-files-command.
+
+  • for each above path,
+
+    • start a #trail with this path as its #current-path
+
+    • perform a #git-log-follow-command.
+      with each resultant #SHA of this command
+      *in order from most recent to oldest*,
+
+      • if a #commit with this SHA already exists in #the-commit-cache,
+        we will use this commit in the bullet after next at this level.
+
+      • otherwise, we will create the commit (reflection) object:
+        perform a #git-show-command. with the resultant output of this,
+
+        • for each #line-item of the output
+          • create a #filechange with which:
+            • populate its 4 fields
+            • add it to #the-filechange-dictionary, keyed to its
+              #current-path
+
+      • with the commit object produced by one of the above two bullets,
+
+        fetch the filechange by using the current-path of the trail.
+
+          • add this filechange to the trail.
+          • if the filechange is a rename, change the current-path of
+            the trail
+
+    • with this complete trail, add it to the #list-of-trails.
+
+  • sort the-commit-cache by datetime (MAYBE), putting the results
+    into #the-commit-box. the-commit-box plus the list-of-trails is
+    #the-bundle.
+
+
+
+## definition of terms (in order of first appearance in the algorithm)
+
+when a term uses another term in its definition, that other term will
+appear with a hashtag IFF it hasn't been defined yet.
+
+• a #path is a fileystem path relative to the root directory of the
+  repository. this the internal, univerally normal way we represent
+  filesystem locations, which themselves are transient data,
+  as opposed to existing one-to-one with a #trail.
+
+• the #path-of-interest is a path given as an argument that indicates
+  an existant filesystem tree that has one or more tracked files.
+
+• the #git-ls-files-command will show the paths of all the files under
+  the path-of-interest at the HEAD of the repository.
+
+• a #trail is a list of #filechanges AND a #current-path
+
+• the #current-path of above is a path that gets mutated the further we
+  go back in time, corresponding to the file in its current location at
+  that state.
+
+• the #git-log-follow-command will give us the #SHA of every commit in
+  which the file was changed, including renames.
+
+• a #SHA is as per git. we would like to represent it with a large
+  number if we figure out the right way to do this, else we will use
+  strings.
+
+• a #commit is a structure with a SHA, a platform
+  datetime, and PEHAPS [..]
+
+• #the-commit-cache is a simple hash of commits, keyed by SHA. we used
+  to call it "the commit dictionary" but we want to emphasize that
+  because the repo itself is volatile, cacheing commits should be the
+  exception and not the rule.
+
+• the #git-show-command..
+
+• #line-item's are the constituent itmes of the output of a
+  #git-show-command. each one will transform into a #filechange.
+
+• a #filechange has any one, two or all of:
+    • a #rename
+    • a number of lines removed
+    • a number of line added
+
+• #the-filechange-dictionary is a simple hash of filechanges, keyed to
+  the current path.. REALLY
+
+• the #list-of-trails is a simple array of trails.
+
+• #the-commit-box, #the-bundle are described by the algortihm.
+
+
+
+
+## impotant notes
+
+during the first major rewrite of [gv], we tried a simplified algorithm
+that used only `git log` on the path of interest, and a special `git
+show` on each resultant SHA. this did not have the necessary effect of
+tracking changes to files when they were outside of the path of
+interest, as can be seeing by trying the first command manually on the
+real repo created by building story-03.
+
+if the above algortihm seems more convoluted than it need be, keep this
+in mind.
+
+
+
+--------------------------- much older: -------------------------------
+
 # datamodel and algorithm narratives :[#012]
 
 

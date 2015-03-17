@@ -1,5 +1,9 @@
 # wtf is a rainbow kick :[#021]
 
+(EDIT: this document is +#archival, related as it did to the archived
+ [#017]. however, in itself it is a :+#cool-server-plugin.)
+
+
 we didn't know what to call this idea so we looked up that one soccer move
 where the player kicks the ball with her heel and it goes over her head from
 back to the front, landing in front of here whence she can kick it again.

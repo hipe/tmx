@@ -1,5 +1,10 @@
 # the shutdown timer narrative :[#022]
 
+
+(EDIT: this document is +#archival, related as it did to the archived
+ [#017]. however, in itself it is a :+#cool-server-plugin.)
+
+
 # introduction: scope, purpose and vision
 
 this goofy experimental feature is saddled with the hopes of one day

@@ -1,11 +1,4 @@
-# the git repo narrative :[#011]
-
-## introduction
-
-because the repo is the frontmost object after the front, we will see a lot
-of general higher-level notes here.
-
-
+# the git repo narrative :[#016]
 
 ## :#as-for-grit
 
@@ -40,17 +33,43 @@ now, and then explore other alternatives in the future.
 
 
 
+
 ## #what-is-the-deal-with-SHA's?
 
-we suspect there will always be a better way to work with these unique
-identifiers for commits. in the first prototype of this, passed SHA's around
-as strings, because this was little more than a text processing hack. then
-we starting to feel silly "wasting" that storage, so we started passing them
-around as symbols, knowing the whole time that they are (seemingly) 40-byte
-values, so passing them around as symbols seemed dumb to.
+there is hypotheticaly "wasted" memory in storing a SHA as a string as
+opposed to its number: a 40-character long SHA string takes up 40 "bytes",
+but has a valuespace of only 20 bytes:
 
-whatever the "ideal" way is to throw these things around, we will come up with
-eventually but not today. as a perfect solution for such a perfect solution,
-we simply make a wrapper class that manages a (possibly large!) field of
-immutable singletons, one for each SHA. and then we just sit back and wait for
-the future to tell us what is better.
+each character of a SHA string has 16 possible values (0-9, a-f).
+two characters of a SHA string then have 16 x 16 possible values, or
+256. a byte also has 256 possible values (2^8). so every two
+characters in a SHA can be represented by (or represent) a byte.
+
+so "2" is the exchange rate: 2 characters in a SHA can represent (or
+be represented by) 1 byte. so a typical SHA that is 40 characters wide
+can represent the valuespace in 20 bytes, or ~1.15E18 different
+values (that is, about a trillion trillion).
+
+so when we use a string that is 40 bytes long to represent a 20-byte
+long value, we are taking of twice as much memory as we need to..
+
+if our current typical usage of SHA's involves taking trips back to
+the system with the same SHA to get different information about it (and
+when we talk to the system we pass SHA's a strings); and we consider the
+perspective that a 40-byte SHA is still only about as much storage as half
+a typical "line" of text, it may be not worth the processing and code
+overhead to bother converting SHA's back and forth to numbers.
+
+here's a summary of the PRO's of keeping SHA's as strings:
+
+  + keeping SHA's as strings is easier for the human to debug
+
+  + keeping SHA's as strings means a smaller code footprint:
+
+    + keeping SHA's as strings means we don't have to convert when
+      feeding SHA's back to the system
+
+
+this is an implementation detail anyway! if we force ourselves to stick
+with workin with SHA's only thru the class, we should be somewhat
+protected if we change our mind on this.

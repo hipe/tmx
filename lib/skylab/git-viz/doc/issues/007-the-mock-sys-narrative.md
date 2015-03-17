@@ -23,7 +23,7 @@ scope and immediate interests.)
 
 ## immediate history
 
-"mock-sys" is a ground-up rewrite of "mock system" without
+"mock-sys" is a ground-up rewrite of [#023] "mock system" without
 the #issues-that-mock-system-has, and with
 a #justification-for-why-we-didnt-just-improve-the-existing-library.
 given this, we thinking about #what-we-plan-to-do-with-mock-system.
@@ -37,9 +37,25 @@ what happened was, we approached "mock-system" intending to use it for
 new developement. we were floored and aghast at how byzantine it was: to
 create new system call fixtures we had to build rbx *and* install zmq.
 
-we vaguely remember why we built it that way those couple of years back,
-and we are still glad we did for the experience; however these
-requirements are a showstopper now:
+for a sense of the byzantine scope of this stack, you may want to skim:
+
+  • [#017] the fixture building narrative
+  • [#018] the system call fixtures narrative
+  • [#021] wtf is a rainbow kick (this is still cool)
+  • [#022] the shutodown timer narrative
+  • [#023] the mock system narrative
+  • [#024] the manifest client narrative
+  • [#027] the freetags feature
+  • [#028] the artbuilding scripts narrative
+
+what it amounted to was an exercize in overdoing the architecture for
+what we told ourselves at the time was a "good" reason, but really we
+were just looking for an excuse to play with concurrency and server
+architectures.
+
+that's all fine and good for the massively false requirements it had
+created for itself, but today we just want a mock system. this now
+legacy system is a showstopper for our requirements today:
 
 the fact that the runtime of "mock-system" was not the runtime of tmx
 meant that it had gone stale and was broken against current tmx.
