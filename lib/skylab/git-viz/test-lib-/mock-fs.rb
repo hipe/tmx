@@ -4,18 +4,13 @@ module Skylab::GitViz
 
     module Mock_FS  # read [#013] the mock FS narrative #storypoint-5 (or not)
 
-      def self.[] user_mod
-        user_mod.module_exec do
-          extend Module_Methods__
-          include Instance_Methods__ ; nil
+      class << self
+
+        def [] mod
+          mod.include Instance_Methods__
+          nil
         end
-      end
-
-      In_module = -> mod, relpath=DEFAULT_RELPATH_ do
-        FS_[ mod, relpath ]
-      end
-
-      DEFAULT_RELPATH_ = 'pathnames.manifest'.freeze
+      end  # >>
 
       module Instance_Methods__
 
@@ -24,85 +19,71 @@ module Skylab::GitViz
         end
 
         def mock_FS
-          @mock_FS ||= __build_mock_FS
+          @__mock_FS__ ||= __produce_mock_FS
         end
 
-        def __build_mock_FS
+        def __produce_mock_FS
 
-          # allow node hierarchies to specify the below even though
-          # they haven't pulled the subject into their chain yet
+          path = send :manifest_path_for_mock_FS  # #:+#hook-out
 
-          _mod = if respond_to? :fixtures_module_for_mock_FS
-            fixtures_module_for_mock_FS
-          else
-            self.class.fixtures_mod
+          cache = send :cache_hash_for_mock_FS  # #:+#hook-out
+
+          mock_FS = cache[ path ]
+
+          if ! mock_FS
+            mock_FS = Mock_FS___.new path
+            cache[ path ] = mock_FS
           end
 
-          FS_[ _mod, pathnames_manifest_relpath ]
-        end
-
-        def pathnames_manifest_relpath
-          DEFAULT_RELPATH_
+          mock_FS
         end
       end
 
-      module Module_Methods__
-        def fixtures_mod
-          self.nearest_test_node::Fixtures  # covered
-        end
-      end
+      class Mock_FS___
 
-      class Cache_
-        def initialize
-          @h = {}
-        end
-        def [] pathname
-          @h.fetch pathname.instance_variable_get( :@path ) do |path|
-            @h[ path ] = FS_.new pathname
-          end
-        end
-      end
+        def initialize path
 
-      class FS_
-
-        def self.[] mod, relpath=DEFAULT_RELPATH_
-          mod.module_exec do
-            ( @mock_FS_cache ||= Cache_.new )[ dir_pathname.join( relpath ) ]
-          end
-        end
-
-        def initialize pn
-          @self_reference = -> { self }
-          init_tree pn
-          init_pathname_pool ; nil
-        end
-      private
-        def init_pathname_pool
-          @pathname_pool_h = {} ; nil
-        end
-        def init_tree pn
           fs_p = -> { self }
-          fh = pn.open ::File::RDONLY
-          _ea = Each__.new do |&p|
-            line = fh.gets
-            while line
-              path_x =
-                mutate_manifest_line_into_normd_path_and_get_tree_path line
-              p[ Pathname_.new line, fs_p, path_x ]
+
+          fh = ::File.open path, ::File::RDONLY
+
+          _ea = Each_Proxy___.new do | & yield_p |
+
+            begin
               line = fh.gets
-            end
-            fh.close ; nil
+              line or break
+              line.chop!
+              line.freeze
+
+              yield_p[ Pathname__.new( line, fs_p, __produce_tree_path( line ) ) ]
+
+              redo
+            end while nil
+
           end
-          @tree = GitViz_.lib_.tree.from :node_identifiers, _ea ; nil
+
+          @tree = GitViz_.lib_.tree.from :node_identifiers, _ea
+
+          fh.close
+
+          @pathname_pool_h = {}
+
+          @FS_p = -> { self }
         end
 
-        def mutate_manifest_line_into_normd_path_and_get_tree_path line
-          # #storypoint-90
-          line.chomp! ; line.freeze  # tiny optimization
-          do_dir_hack = SEP_ == line.getbyte( -1 )
-          norm_s = line.gsub WANKY_SEPARATOR_RX__, ''
-          path_i_a = norm_s.split( SEPARATOR_STRING_, -1 ).map( & :intern )
-          do_dir_hack and path_i_a << :'.'
+        class Each_Proxy___ < ::Proc
+          alias_method :each, :call
+        end
+
+        def __produce_tree_path line  # #storypoint-90
+
+          is_dir = SEPARATOR_BYTE__ == line.getbyte( -1 )
+
+          path_i_a = line.gsub( ABNORMAL_SEPARATOR_RX__, EMPTY_S_ ).
+            split( ::File::SEPARATOR, -1 ).map( & :intern )
+
+          is_dir and path_i_a.push :'.'
+
           path_i_a
         end
 
@@ -110,7 +91,7 @@ module Skylab::GitViz
 
         def touch_pn path_x  # #storypoint #80
           path_x.respond_to? :to_str or
-            raise Exception_for_not_string_[ path_x ]
+            raise Exception_for_not_string__[ path_x ]
           path_s = path_x.to_str
           pn = lookup_any_FS_pathname path_s
           pn or tch_cached_pn path_s
@@ -120,7 +101,7 @@ module Skylab::GitViz
           path_s = path_s.to_str
           tn = any_tree_node_with_path_s path_s
           if tn
-            Mock_Stat_.new tn.is_branch ? :directory_ftype : :file_ftype
+            Mock_Stat___.new tn.is_branch ? :directory_ftype : :file_ftype
           else
             raise ::Errno::ENOENT, path_s
           end
@@ -155,8 +136,8 @@ module Skylab::GitViz
           @tree.fetch _path_x do end
         end
         def nrmlz_path_for_tree_lookup path_s
-          path_s.gsub( WANKY_SEPARATOR_RX__, '' ).
-            split( SEPARATOR_STRING_ ).map( & :intern )
+          path_s.gsub( ABNORMAL_SEPARATOR_RX__, EMPTY_S_ ).
+            split( ::File::SEPARATOR ).map( & :intern )
         end
 
         def hack_add_dir_pathname tree_node, path_s
@@ -167,18 +148,14 @@ module Skylab::GitViz
         def tch_cached_pn path_s
           @pathname_pool_h.fetch path_s do
             path_s.frozen? or path_s = path_s.dup.freeze
-            @pathname_pool_h[ path_s ] = Pathname_.new path_s, @self_reference
+            @pathname_pool_h[ path_s ] = Pathname__.new path_s, @FS_p
           end
         end
 
-        class Each__ < ::Proc
-          alias_method :each, :call
-        end
-
-        WANKY_SEPARATOR_RX__ = %r((?<=/)/+|/+\z)
+        ABNORMAL_SEPARATOR_RX__ = %r((?<=/)/+|/+\z)
       end
 
-      class Pathname_
+      class Pathname__
 
         def initialize path_x, fs_p, tree_path_x=nil
           path_x.respond_to? :to_str or
@@ -187,8 +164,8 @@ module Skylab::GitViz
           path_s = unsanitized_s.frozen? ? unsanitized_s :
             unsanitized_s.dup.freeze  # memory "optimization", may change
           @FS_p = fs_p
-          @is_absolute = path_s.getbyte( 0 ) == SEP_  # str may be empty
-          @has_trailing_slash = path_s.getbyte( -1 ) == SEP_
+          @is_absolute = path_s.getbyte( 0 ) == SEPARATOR_BYTE__  # str may be empty
+          @has_trailing_slash = path_s.getbyte( -1 ) == SEPARATOR_BYTE__
           @path = path_s
           @tree_path_x = tree_path_x || @path
           freeze
@@ -266,7 +243,7 @@ module Skylab::GitViz
 
         def inst_from_unsanitized x
           x.respond_to? :to_str or
-            raise Exception_for_not_string_[ x ]
+            raise Exception_for_not_string__[ x ]
           _FS.touch_pn x.to_str
         end
 
@@ -275,34 +252,39 @@ module Skylab::GitViz
         end
       end
 
-      class Mock_Stat_
+      class Mock_Stat___
+
         def initialize ftype_i
-          send :"set_ftype_to_#{ ftype_i }" ; nil
+          send :"__receive_ftype_of__#{ ftype_i }__" ; nil
         end
+
         attr_reader :ftype
-      private
-        def set_ftype_to_directory_ftype
-          @ftype = DIRECTORY_FTYPE__ ; nil
+
+        def __receive_ftype_of__directory_ftype__
+          @ftype = DIRECTORY_FTYPE___ ; nil
         end
-        def set_ftype_to_file_ftype
-          @ftype = FILE_FTYPE__
+
+        DIRECTORY_FTYPE___ = 'directory'.freeze
+
+        def __receive_ftype_of__file_ftype__
+          @ftype = FILE_FTYPE___
         end
-        DIRECTORY_FTYPE__ = 'directory'.freeze
-        FILE_FTYPE__= 'file'.freeze
+
+        FILE_FTYPE___ = 'file'.freeze
       end
 
-      Exception_for_not_string_ = -> x do
-        ::TypeError.new "no implicit conversion of #{ Typeish__[ x ]} into String"
+      Exception_for_not_string__ = -> x do
+        ::TypeError.new "no implicit conversion of #{ Typeish___[ x ]} into String"
       end
 
-      Typeish__ = -> x do  # :+[ba-019]-like but for types not value
+      Typeish___ = -> x do  # :+[ba-019]-like but for types not value
         case x
         when ::NilClass, ::FalseClass, ::TrueClass ; x.inspect
         else x.class.name
         end
       end
 
-      SEP_ = (( SEPARATOR_STRING_ = '/'.freeze )).getbyte 0
+      SEPARATOR_BYTE__ = ::File::SEPARATOR.getbyte 0
 
     end
   end

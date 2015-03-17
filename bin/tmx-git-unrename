@@ -8,31 +8,26 @@
 
 class Skylab_Git_Models_Whatever_Unrename
 
-        def initialize i, o, e, a, pn
+        def initialize _, o, e, a, pn
 
           @argv = a
           @do_forward = true
           @pairs = []
           @program_name = ::File.basename pn
           @serr = e
-          @sin = i
           @sout = o
         end
 
         def execute
 
-          ok = __parse_args
-          ok &&= __memoize_all_upstream_lines_of_interest
-          ok &&= __check_for_nonzero_lines_of_interest
-          ok && __work
+          ok = __parse_argv
+          ok &&= __resolve_commit
+          ok && __via_commit
         end
 
-        def __parse_args
-          if @argv.length.zero?
-            ACHIEVED_
-          else
-            __parse_opts
-          end
+        def __parse_argv
+          _ok = __parse_opts
+          _ok && __parse_args
         end
 
         def __parse_opts
@@ -51,17 +46,20 @@ class Skylab_Git_Models_Whatever_Unrename
           x = ACHIEVED_
           op.on '--help', 'this screen' do
 
-            @serr.puts "synopsis: a placeholder hack for turning a commit with\n#{
-              }          renames into data that can be mutated\n\n"
+            @serr.puts "synopsis: output the text for the git commands that\n#{
+              }          unrename (or rename) files per the renames in the commit\n\n"
 
-            @serr.puts "usage: ( rename-related comments of git commit msg ) | #{
-              }#{ @program_name } [ -R ]"
+            @serr.puts "usage: #{ @program_name } [ -R ] <commit>"
 
             @serr.puts
 
             @serr.puts 'options:'
 
             op.summarize @serr
+
+            @serr.puts "example:"
+            @serr.puts "    #{ @program_name } HEAD#{ SPACE_ * 12 }#{
+              }# produces unrenames for renames in HEAD commit"
 
             x = CEASE_
           end
@@ -77,76 +75,75 @@ class Skylab_Git_Models_Whatever_Unrename
           x
         end
 
+        def __parse_args
+          case 1 <=> @argv.length
+          when 0
+            @commit_reference_s = @argv.fetch 0
+            ACHIEVED_
+          when -1
+            @serr.puts "unpexpected argument: #{ @argv[ 1 ].inspect }"
+            __invite
+            UNABLE_
+          when  1
+            @serr.puts "expectin <commit>"
+            __invite
+            UNABLE_
+          end
+        end
+
         def __invite
           @serr.puts "see '#{ @program_name } --help'"
           nil
         end
 
-        def __memoize_all_upstream_lines_of_interest
+        def __resolve_commit
 
-          ok = ACHIEVED_
-          rx = RX___
-          begin
-            line = @sin.gets
-            line or break
-            md = rx.match line
-            md or redo
-            ok = __receive_match md
-            ok or break
-            redo
-          end while nil
+          require_relative '../lib/skylab'
+          require 'skylab/git-viz/core'
 
-          ok
+          @repo = ::Skylab::GitViz.repository.new_via_path( ::Dir.pwd )
+
+          @ci = @repo.fetch_commit_via_identifier @commit_reference_s  # etc
+          @ci && ACHIEVED_
         end
 
-        RX___ = /\A#[[:space:]]+renamed:[[:space:]]+(?<rest>.+)/
+        def __via_commit
 
-        def __receive_match md
+          exe = @repo.vendor_program_name
 
-          # because we are parsing a "porcelain" and not "plumbing", there
-          # is a chance that a file that contains " -> " in its name will
-          # break this. we at least check for that below; but there is no
-          # workaround for that case.
-
-          s_a = md[ :rest ].split SEP__
-          case 2 <=> s_a.length
-          when  0 ; @pairs.push s_a ; ACHIEVED_
-          when -1 ; __when_too_many
-          when  1 ; __when_less_than_two
-          end
-        end
-
-        SEP__ = ' -> '
-
-        def __check_for_nonzero_lines_of_interest
-          if @pairs.length.zero?
-            __when_no_pairs
+          p = if @do_forward
+            -> fc do
+              @sout.puts "#{ exe } mv #{ fc.destination_path } #{ fc.source_path }"
+            end
           else
+            -> fc do
+              @sout.puts "#{ exe } mv #{ fc.source_path } #{ fc.destination_path }"
+            end
+          end
+
+          st = @ci.to_filechange_stream.reduce_by do | fc |
+            fc.is_rename
+          end
+
+          fc = st.gets
+          if fc
+            begin
+              p[ fc ]
+              fc = st.gets
+              fc or break
+              redo
+            end while nil
+            @serr.puts 'done.'
             ACHIEVED_
-          end
-        end
-
-        def __when_no_pairs
-          @serr.puts "no renames. nothing to do."
-          UNABLE_
-        end
-
-        def __work
-          if @do_forward
-            @pairs.each do | src, dst |
-              @sout.puts "git mv #{ dst } #{ src }"
-            end
           else
-            @pairs.each do | src, dst |
-              @sout.puts "git mv #{ src } #{ dst }"
-            end
+            @serr.puts "no renames in #{ @commit_reference_s.inspect }?"
+            UNABLE_
           end
-          @serr.puts "done."
-          ACHIEVED_
         end
 
         ACHIEVED_ = true
         CEASE_ = nil
+        SPACE_ = ' '
         UNABLE_ = false
 
   self

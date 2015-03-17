@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::GitViz::TestSupport::Test_Lib
 
-  describe "[gv] test-lib - mock-sys - input-adapters" do
+  describe "[gv] test-lib - mock-sys - 02: input-adapters" do
 
     it "reads one command" do
 
@@ -59,7 +59,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
     end
 
     def subject
-      GitViz_::Test_Lib_::Mock_Sys
+      GitViz_::Test_Lib_::Mock_System
     end
   end
 end

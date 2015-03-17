@@ -1,77 +1,78 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::GitViz::TestSupport::VCS_Adapters::Git::System_Agent
+module Skylab::GitViz::TestSupport::Test_Lib
 
-  describe "[gv] VCS adapters - git - system agent - ping" do
+  describe "[gv] test-lib - mock-sys - 05: full integration example" do
 
     extend TS_
-    use :expect_event
-    use :mock_FS
-    use :mock_system
 
-    it "ping when chdiring to a directory - output lines are in scanner" do
-      _ping_from_path 'wa-da-da-dir'
-      __expect_pinged
-    end
+    before :all do
 
-    it "ping when chdiring to a file - x" do
-      _ping_from_path 'wa-da-da-file'
-      _expect_ping_command_with_chdir_value 'wa-da-da-file'
-      _expect_cannot_execute_command_saying Top_TS_::Messages::PATH_IS_FILE
-      _expect_no_output_stream
-    end
+      class MS_05_Fake_Test_Context
 
-    it "ping when chdiring to a noent - x" do
-      _ping_from_path 'wa-da-da-not-exist'
-      _expect_ping_command_with_chdir_value 'wa-da-da-not-exist'
-      _expect_cannot_execute_command_saying(
-        "No such file or directory - wa-da-da-not-exist" )
-      _expect_no_output_stream
-    end
+        GitViz_::Test_Lib_::Mock_System[ self ]
 
-    def _ping_from_path x
-      with_system_agent do |sa|
-        sa.set_cmd_s_a %w( print -l winz WINZ )
-        sa.set_chdir_pathname mock_pathname x
-      end
-      @scn = @sa.get_any_nonzero_count_output_line_stream_from_cmd
-      nil
-    end
+        define_method :cache_hash_for_mock_system, ( Callback_.memoize do
+          {}
+        end )
 
-    def __expect_pinged
-      __expect_next_system_command_for_pinged
-      expect_no_more_events
-      __expect_output_lines_for_pinged
-    end
-
-    def __expect_next_system_command_for_pinged
-      _expect_ping_command_with_chdir_value 'wa-da-da-dir'
-      expect_no_more_events
-    end
-
-    def _expect_ping_command_with_chdir_value x
-
-      expect_OK_event :next_system_command do | cmd |
-
-        cmd.command_s_a.should eql %w( print -l winz WINZ )
-        cmd.any_nonzero_length_option_h[ :chdir ].should eql x
+        define_method :manifest_path_for_mock_system, ( Callback_.memoize do
+          TS_.dir_pathname.join(
+            'mock-system/05-full-integration-example/fixtures/commands.ogdl'
+          ).to_path
+        end )
       end
     end
 
-    def _expect_cannot_execute_command_saying exp_s
-      expect_not_OK_event :cannot_execute_command do | ev |
-        black_and_white( ev ).should eql exp_s
+    it "enhance your test context module in the common way" do
+      # if this doesn't fail it succeeds
+    end
+
+    it "look a ping" do
+
+      tc = _test_context_instance
+      _, o, e, t = tc.mock_system_conduit.popen3 'echo', 'hello'
+      t.value.exitstatus.should be_zero
+      e.should be_nil  # you get none because you had none
+      o.gets.should eql "hello\n"
+      o.gets.should be_nil
+    end
+
+    it "if you submit a command that isn't in manifest, key error is raised" do
+
+      begin
+        _mock_system_conduit.popen3( 'not', 'there' )
+      rescue ::KeyError => e
       end
+      e.message.should match(
+        /\Ano such mock command \["not", "there"\] in [^ ]+\.ogdl"\z/ )
     end
 
-    def __expect_output_lines_for_pinged
-      @scn.gets.should eql 'winz'
-      @scn.gets.should eql 'WINZ'
-      @scn.gets.should be_nil
+    it "you can't reach a command that doesn't have a pwd with a pwd" do
+
+      _hack_lookup( 'echo', 'hello', chdir: 'xx' ).should be_nil
     end
 
-    def _expect_no_output_stream
-      @scn.should eql false
+    it "you can't reach a command that has a pwd without the same pwd" do
+
+      _hack_lookup( 'echo', 'hi' ).should be_nil
     end
+
+    it "with a command with a pwd, you must use the pwd" do
+
+      _hack_lookup( 'echo', 'hi', chdir: 'x/y' ).exitstatus.should eql 777
+    end
+
+    def _hack_lookup * args
+      _mock_system_conduit.instance_variable_get( :@lookup )[ args ]
+    end
+
+    def _mock_system_conduit
+      _test_context_instance.mock_system_conduit
+    end
+
+    define_method :_test_context_instance, ( Callback_.memoize do
+      MS_05_Fake_Test_Context.new
+    end )
   end
 end

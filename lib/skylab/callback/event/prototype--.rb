@@ -89,10 +89,6 @@ module Skylab::Callback
             end
           end
 
-          def with * x_a
-            self._NO_EASY_use_new_with
-          end
-
           def new_with * x_a
             construct do
               init_via_even_iambic x_a

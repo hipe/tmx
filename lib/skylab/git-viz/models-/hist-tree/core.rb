@@ -70,9 +70,9 @@ module Skylab::GitViz
             @argument_box.fetch( :VCS_adapter_name ).to_s
           ).as_const, false )
 
-        fro = _VCS_mod::Front.new _VCS_mod, handle_event_selectively do | fr |
-          fr.set_system_conduit @argument_box.fetch :system_conduit
-        end
+        fro = _VCS_mod::Front.new_via_system_conduit(
+          @argument_box.fetch( :system_conduit ),
+          & handle_event_selectively )
 
         fro and begin
           @VCS_adapter = fro
@@ -107,7 +107,7 @@ module Skylab::GitViz
       end
 
       def __resolve_repo
-        @repo = @VCS_adapter.procure_repo_from_pathname @pathname  # #todo:name
+        @repo = @VCS_adapter.new_repository_via_pathname @pathname
         @repo && ACHIEVED_
       end
 

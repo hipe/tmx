@@ -9,7 +9,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
 
     it "works" do
 
-      io = ::StringIO.new
+      io = new_string_IO_
 
       x = subject.recording_session io do | sess |
 
@@ -51,7 +51,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
     end
 
     def subject
-      GitViz_::Test_Lib_::Mock_Sys
+      GitViz_::Test_Lib_::Mock_System
     end
   end
 end

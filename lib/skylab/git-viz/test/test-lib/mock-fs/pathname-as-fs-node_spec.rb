@@ -2,16 +2,23 @@ require_relative 'test-support'
 
 module Skylab::GitViz::TestSupport::Test_Lib::Mock_FS
 
-  class Eg_Test_Eg_Context_FS
-    Mock_FS_Parent_Module__::Mock_FS[ self ]
-    def fixtures_module_for_mock_FS
-      TS_::Fixtures
-    end
-  end
-
   describe "[gv] test lib -mock FS - pathname as fs node" do
 
     extend TS_
+
+    before :all do
+
+      class Eg_Test_Eg_Context_FS
+
+        Mock_FS_Parent_Module__::Mock_FS[ self ]
+
+        define_method :cache_hash_for_mock_FS, BUILD_CACHE_METHOD_[]
+
+        def manifest_path_for_mock_FS
+          COMMON_MOCK_FS_MANIFEST_PATH_
+        end
+      end
+    end
 
     it "that who exists in the manifest exists" do
       tc = test_context

@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::GitViz::TestSupport::Test_Lib
 
-  describe "[gv] test-lib - mock-sys - playback" do
+  describe "[gv] test-lib - mock-sys - 03: playback" do
 
     it "a mock system conduit is built with a pathname (any string)" do
 
@@ -41,11 +41,11 @@ module Skylab::GitViz::TestSupport::Test_Lib
     end )
 
     define_method :_manifest_A, ( Callback_.memoize do
-      TS_.dir_pathname.join( 'mock-sys/03-playback/fixtures/story-A.ogdl' ).to_path
+      TS_.dir_pathname.join( 'mock-system/03-playback/fixtures/story-A.ogdl' ).to_path
     end )
 
     def subject
-      GitViz_::Test_Lib_::Mock_Sys
+      GitViz_::Test_Lib_::Mock_System
     end
   end
 end

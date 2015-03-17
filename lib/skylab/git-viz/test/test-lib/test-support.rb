@@ -1,5 +1,4 @@
 require_relative '../test-support'
-require 'stringio'
 
 module Skylab::GitViz::TestSupport::Test_Lib
 
@@ -9,14 +8,15 @@ module Skylab::GitViz::TestSupport::Test_Lib
 
   extend TestSupport_::Quickie
 
-  module Mock_System
+  module InstanceMethods
 
-    ::Skylab::Callback::Autoloader[ self, :boxxy ]  # we need the
-      # "test node extensions" implementation to see e.g the 'server_expect'
-      # extension. this became necessary with the new autoloader rewrite and
-      # we are not sure why, but it's probably for the better.
+    def new_string_IO_
+      Top_TS_.lib_.string_IO.new
+    end
   end
 
   Callback_ = Callback_
   GitViz_ = GitViz_
+  Top_TS_ = Top_TS_
+
 end

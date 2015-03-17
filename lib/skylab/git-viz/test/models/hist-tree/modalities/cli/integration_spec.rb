@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../../../test-support'
 
 module Skylab::GitViz::TestSupport::Models
 
-  describe "[gv] models - hist-tree - modalities - CLI" do
+  describe "[gv] models - hist-tree - modalities - CLI", wip: true do
 
     extend TS_
     use :mock_system

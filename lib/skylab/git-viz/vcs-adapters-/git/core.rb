@@ -2,23 +2,33 @@ module Skylab::GitViz
 
   module VCS_Adapters_::Git  # read [#011] the git VCS adapter narrative
 
+    class << self
+
+      def repository
+        Git_::Models_::Repository
+      end
+    end  # >>
+
     class Front
 
-      def initialize context_mod, oes_p, & extra_p
-        @context_mod = context_mod
-        @on_event_selectively = oes_p
-        yield self
-        freeze
-      end
+      class << self
 
-      def set_system_conduit x
-        @system_conduit = x ; nil
-      end
-
-      def procure_repo_from_pathname pn
-        @context_mod::Repo_.build_repo pn, @on_event_selectively do | repo |
-          repo.system_conduit = @system_conduit
+        def new_via_system_conduit sc, & oes_p
+          new sc, & oes_p
         end
+
+        private :new
+      end  # >>
+
+      def initialize sc, & oes_p
+        @on_event_selectively = oes_p
+        @system_conduit = sc
+      end
+
+      def new_repository_via_pathname pn
+
+        Git_::Models_::Repository.new_via_pathname(
+          pn, @system_conduit, & @on_event_selectively )
       end
 
       def ping
@@ -29,11 +39,17 @@ module Skylab::GitViz
       end
     end
 
+    Autoloader_[ Actors_ = ::Module.new ]
+
+    Autoloader_[ Models_ = ::Module.new ]
+
     DESIST_ = false
 
-    Git = self
+    Git_ = self
 
     GIT_EXE_ = 'git'.freeze
+
+    GIT_GENERAL_ERROR_ = 128
 
     IMPLEMENTATION_DIR_ = '.git'.freeze
 

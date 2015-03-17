@@ -12,7 +12,7 @@ module Skylab::GitViz::TestSupport::Test_Lib::IA_OGDL
 
     def against s
 
-      @st = GitViz_::Test_Lib_::Mock_Sys::Input_Adapters_::
+      @st = GitViz_::Test_Lib_::Mock_System::Input_Adapters_::
         OGDL.tree_stream_from_lines( GitViz_.lib_.basic::String.line_stream s )
 
       NIL_

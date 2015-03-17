@@ -2,7 +2,7 @@ module Skylab::GitViz
 
   module Test_Lib_
 
-    module Mock_Sys
+    module Mock_System
 
       Input_Adapters_ = ::Module.new
 
@@ -92,8 +92,6 @@ module Skylab::GitViz
             x
           end
         end
-
-        EMPTY_S_ = ''.freeze
 
         def __push d
 
@@ -226,11 +224,10 @@ module Skylab::GitViz
           a = [ content ]
           fr = @stack.last
 
+          _yes = _resolve_next_nonblank_noncomment_line
+          _yes or raise _say_end_of_quote_not_found
+
           begin
-
-            _yes = _resolve_next_nonblank_noncomment_line
-            _yes or raise "end of quote not found"
-
             s = @scn.scan INDENT__
             if s.length < fr.margin_count
               fr.margin_count = s.length
@@ -241,21 +238,33 @@ module Skylab::GitViz
 
             content = @scn.scan QUOT_CONTENT__
             _mutate_content_by_unescaping content
-            _line = "#{ use }#{ content }"
+            a.push "#{ use }#{ content }"
 
-            a.push _line
-            if @scn.skip QUOT__
+            if @scn.eos?
+
+              s_ = @lines.gets
+              s_ or raise _say_end_of_quote_not_found
+
+              @scn.string = s_
+              redo
+
+            elsif @scn.skip QUOT__
               @scn.skip INDENT__
               @scn.skip EOL__
               x = a.join EMPTY_S_
               break
+
             else
-              self._MULTILINE_QUOTE_IS_EASY
+              self._DO_ME
             end
 
           end while nil
 
           x
+        end
+
+        def _say_end_of_quote_not_found
+          "end of quote not found"
         end
 
         def _mutate_content_by_unescaping s

@@ -45,7 +45,7 @@ module Skylab::GitViz::TestSupport::Test_Lib::Mock_FS
       "#{ r }".should eql "#{ r_ }"
     end
     def build_pathname_from_string path_s
-      Mock_FS_Parent_Module__::Mock_FS::Pathname_.
+      Mock_FS_Parent_Module__::Mock_FS::Pathname__.
         new path_s, Mock_mock_FS__
     end
   end
@@ -56,7 +56,7 @@ module Skylab::GitViz::TestSupport::Test_Lib::Mock_FS
         def initialize
           @self_ref = -> { self }
           @h = ::Hash.new do |h, k|
-            h[ k ] = Mock_FS_Parent_Module__::Mock_FS::Pathname_.
+            h[ k ] = Mock_FS_Parent_Module__::Mock_FS::Pathname__.
               new k, @self_ref
           end ; nil
         end
@@ -67,4 +67,14 @@ module Skylab::GitViz::TestSupport::Test_Lib::Mock_FS
       end.new ; p = -> { r } ; r
     end ; -> { p[] }
   end.call
+
+  BUILD_CACHE_METHOD_ = -> do
+    h = {}
+    -> do
+      h
+    end
+  end
+
+  COMMON_MOCK_FS_MANIFEST_PATH_ =
+    TS_.dir_pathname.join( 'fixtures/paths.manifest' ).to_path
 end

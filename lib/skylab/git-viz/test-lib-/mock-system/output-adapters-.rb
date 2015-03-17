@@ -2,7 +2,7 @@ module Skylab::GitViz
 
   module Test_Lib_
 
-    module Mock_Sys
+    module Mock_System
 
       Output_Adapters_ = ::Module.new
 
@@ -151,7 +151,7 @@ module Skylab::GitViz
             begin
               s = st.gets
               s or break
-              self._FUN
+              @io.write "#{ margin }#{ s }"
               redo
             end while nil
             @io.write "    \""

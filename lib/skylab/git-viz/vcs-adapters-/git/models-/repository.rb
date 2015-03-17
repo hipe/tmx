@@ -2,94 +2,54 @@ module Skylab::GitViz
 
   module VCS_Adapters_::Git
 
-    class Repo_  # read [#016] the git repo narrative for storypoints
+    class Models_::Repository  # [#016]..
 
       class << self
 
-        def build_repo pathname, oes_p, & repo_option_p
+        def new_via_path path, sys_cond=GitViz_.lib_.open3, & oes_p
+          new_via_pathname ::Pathname.new( path ), sys_cond, & oes_p
+        end
 
-          pn = Produce_pathname___[ self, pathname, & oes_p ]
-          pn and begin
-            new( pn, pathname, oes_p, & repo_option_p )
+        def new_via_pathname interest_pn, sys_cond, & oes_p  # while #open [#004]
+
+          repo_pn = Find_repository_pathname___[ self, interest_pn, & oes_p ]
+          repo_pn and begin
+            new interest_pn, repo_pn, sys_cond, & oes_p
           end
         end
       end  # >>
 
-      def initialize absolute_pn, focus_dir_absoulte_pn, oes_p
-
-        @absolute_pn = absolute_pn
-
-        @ci_pool_p = -> { __init_ci_pool }
-
-        @focus_dir_relpath_pn = focus_dir_absoulte_pn.
-          relative_path_from( absolute_pn )
+      def initialize interest_pn, repo_pn, sys_cond, & oes_p
 
         @on_event_selectively = oes_p
+        @path = repo_pn.to_path
+        @system_conduit = sys_cond
 
-        yield self
         # M-etaHell::F-UN.without_warning { GitViz_.lib_.grit }  # see [#016]:#as-for-grit
         # @inner = ::Grit::Repo.new absolute_pn.to_path ; nil
       end
 
-      attr_accessor :system_conduit
+      attr_reader :path
 
-      def build_hist_tree_bunch  # this is a good starting point for :[#012]
-        _hist_tree = self.class::Hist_Tree__.new self, & @on_event_selectively
-        _hist_tree.build_bunch
+      def fetch_commit_via_identifier id_s, & oes_p
+
+        oes_p ||= @on_event_selectively
+
+        Models_::Commit.fetch_via_identifier__ id_s, self, & oes_p
       end
 
-      def get_focus_dir_absolute_pn
-        @absolute_pn.join @focus_dir_relpath_pn
+      def repo_popen_3_ * s_a
+        ::Hash.try_convert( s_a.last ) and raise ::ArgumentError
+        s_a.unshift GIT_EXE_
+        s_a.push chdir: @path
+        @system_conduit.popen3( * s_a )
       end
 
-      def absolute_pathname
-        @absolute_pn
+      def vendor_program_name  # :+#public-API
+        GIT_EXE_
       end
 
-      # ~ for the children - filediffs
-
-      def normal_path_of_file_relpath relpath
-        @focus_dir_relpath_pn.join( relpath ).to_s
-      end
-
-      def lookup_commit_with_SHA x
-        @sparse_matrix.lookup_commit_with_SHA x
-      end
-
-      def lookup_commitpoint_index_of_commit ci
-        @sparse_matrix.lookup_commitpoint_index_of_ci ci
-      end
-
-      # ~ the commit pool
-
-      def SHA_notify sha
-        _commit_pool.SHA_notify sha
-      end
-
-      def close_the_pool
-        @sparse_matrix = _commit_pool.close_pool
-        @ci_pool_p = -> { raise "the pool's closed" }
-        @sparse_matrix && ACHIEVED_
-      end
-
-      attr_reader :sparse_matrix
-
-      def _commit_pool
-        @ci_pool_p[]
-      end
-
-      def __init_ci_pool
-        ci_pool = __build_ci_pool
-        @ci_pool_p = -> { ci_pool }
-        ci_pool
-      end
-
-      def __build_ci_pool
-        self.class::Commit_::Pool.new self, @system_conduit, & @on_event_selectively
-      end
-
-
-      Produce_pathname___ = -> repo_cls, pathname, & oes_p do
+      Find_repository_pathname___ = -> repo_cls, pathname, & oes_p do
 
         # we gotta use this and not :+[#hl-176] (tree walk) while #open [#004]
 
@@ -135,37 +95,6 @@ module Skylab::GitViz
 
       SEP_BYTE___ = ::File::SEPARATOR.getbyte 0
 
-      class SHA_  # [#016]:#what-is-the-deal-with-SHA's?
-
-        def self.some_instance_from_string sha_s
-          MOCK_FRIENDLY_SHA_WHITE_RX__ =~ sha_s or fail "SHA?: #{ sha_s }"
-          touch_from_SHA_i sha_s.intern
-        end
-        MOCK_FRIENDLY_SHA_WHITE_RX__ = /\A[a-z0-9]+\z/
-        @cache_h = {}
-        class << self
-        private
-          def touch_from_SHA_i sha_i
-            @cache_h.fetch sha_i do
-              @cache_h[ sha_i ] = new sha_i
-            end
-          end
-          private :new
-        end
-
-        def initialize sha_i
-          @SHA_i = sha_i ; freeze
-        end
-        def as_symbol
-          @SHA_i
-        end
-        def hash
-          @SHA_i.hash
-        end
-        def to_string
-          @SHA_i.id2name
-        end
-      end
     end
   end
 end

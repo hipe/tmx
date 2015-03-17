@@ -240,7 +240,7 @@ module Skylab::Callback
 
   Callback_ = self
 
-  class Box
+  class Box  # :[#061]
 
     def initialize
       @a = [] ; @h = {}

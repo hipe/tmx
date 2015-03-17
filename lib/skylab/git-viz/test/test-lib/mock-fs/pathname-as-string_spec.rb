@@ -21,33 +21,60 @@ module Skylab::GitViz::TestSupport::Test_Lib::Mock_FS
       it "employ it on (e.g a test context class) with `Mock_FS[cls]`" do
         m_i = :mock_pathname ; mod = Employer_STR
         mod.private_method_defined? m_i or mod.method_defined? m_i or fail
-        Employer_STR.should be_respond_to :fixtures_mod
       end
     end
 
-    it "usage - your jobulous must have a class method `nearest_test_node`" do
+    it "usage - you must define the path method" do
 
-      cls = ::Class.new.class_exec do
+      test_context = _one_such_instance
+
+      begin
+        test_context.mock_pathname :x
+      rescue ::NoMethodError => e
+      end
+
+      e.name.should eql :manifest_path_for_mock_FS
+    end
+
+    it "usage - you must define the cache method" do
+
+      test_context = _one_such_instance
+
+      def test_context.manifest_path_for_mock_FS
+      end
+
+      begin
+        test_context.mock_pathname :x
+      rescue ::NoMethodError => e
+      end
+
+      e.name.should eql :cache_hash_for_mock_FS
+    end
+
+    def _one_such_instance
+
+      ::Class.new.class_exec do
         Mock_FS_Parent_Module__::Mock_FS[ self ]
         self
-      end
-      test_context = cls.new
-      -> do
-        test_context.mock_pathname :x
-      end.should raise_error ::NoMethodError,
-        /\Aundefined method `nearest_test_node'/
+      end.new
     end
 
     context "usage - working with pathnames - absolute/relative" do
 
       before :all do
+
         class Eg_Test_Eg_Context_STR
+
           Mock_FS_Parent_Module__::Mock_FS[ self ]
-          def self.nearest_test_node
-            TS_
+
+          define_method :cache_hash_for_mock_FS, BUILD_CACHE_METHOD_[]
+
+          def manifest_path_for_mock_FS
+            COMMON_MOCK_FS_MANIFEST_PATH_
           end
         end
       end
+
       def test_context_class
         Eg_Test_Eg_Context_STR
       end

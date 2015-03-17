@@ -2,72 +2,115 @@ module Skylab::GitViz
 
   module VCS_Adapters_::Git
 
-    class Repo_::Hist_Tree__
+    class Models_::Filechange
 
-      class Bunch__::Trail__::Filediff__
+      class << self
 
-        def initialize sha
-          @SHA = sha ; nil
-        end
+        def via_normal_string s
 
-        attr_reader :commitpoint_index, :counts, :SHA
+          md = NUMSTAT_LINE_RX___.match s
 
-        def set_commitpoint_index idx
-          @commitpoint_index = idx ; nil
-        end
+          s_ = md[ :the_rest ]
 
-        def set_counts_and_finish counts
-          @counts = counts
-          freeze ; nil
-        end
+          d = s_.index ROCKET_SHIP__
 
-        def finish_filediff__ trail, & oes_p
-          Finish_Filediff___.new( trail, self, & oes_p ).__finish_filediff
-        end
-
-        class Finish_Filediff___
-
-          def initialize trail, filediff, & oes_p
-
-            @filediff = filediff
-            @on_event_selectively = oes_p
-            @repo = trail.repo
-            @trail = trail
+          if d
+            is_rename = true
+            source_path, destination_path = Parse_rename___[ d, s_ ]
           end
 
-          def __finish_filediff
-            @ci = @repo.lookup_commit_with_SHA @filediff.SHA
-            @norm_path = @repo.normal_path_of_file_relpath @trail.file_relpath
-            @counts = @ci.lookup_any_filediff_counts_for_normpath @norm_path
-            @counts ? when_yes : when_no
-          end
+          new do
 
-        private
-
-          def when_yes
-            _cpi = @repo.lookup_commitpoint_index_of_commit @ci
-            @filediff.set_commitpoint_index _cpi
-            @filediff.set_counts_and_finish @counts
-            ACHIEVED_
-          end
-
-          def when_no  # this is here to catch [#035] this issue
-
-            fd = @filediff ; norm_path = @norm_path
-
-            @on_event_selectively.call(
-                :info, :expression, :omitting_informational_commitpoint ) do | y |
-
-              y << "'#{ fd.SHA.to_string }' appears only to be #{
-                }informational in regards to #{ norm_path }"
+            @insertion_count = md[ :insertion_count ].to_i
+            @deletion_count = md[ :deletion_count ].to_i
+            if is_rename
+              @is_rename =  true
+              @source_path = source_path
+              @destination_path = destination_path
+            else
+              @path = s_
             end
-
-            @trail.remove_filediff @filediff
-
-            ACHIEVED_
+            freeze
           end
+        end
+
+        private :new
+      end  # >>
+
+      NUMSTAT_LINE_RX___ = /\A
+
+        (?<insertion_count> \d+ ) \t
+
+        (?<deletion_count> \d+ ) \t
+
+        (?<the_rest>.+) \z/x
+
+      ROCKET_SHIP__ = ' => '.freeze
+
+      def initialize & edit_p
+        @is_rename = false
+        instance_exec( & edit_p )
+      end
+
+      attr_reader :insertion_count, :deletion_count,
+
+        :is_rename,
+        :source_path,
+        :destination_path
+
+      def end_path
+        if @is_rename
+          @destination_path
+        else
+          @path
         end
       end
+
+      Parse_rename___ = -> rocket_d, s do
+
+        # git does no escaping of filenames in their rendering here, so if
+        # they contain any of the special characters used below, there is
+        # a chance that our string math will save us (or at least bork
+        # louder instead of failing silently )where regex would not but
+        # this is unverified :[#019]
+
+        close_d = s.index CLOSE_CURLY___
+        if close_d
+
+          open_d = s.rindex OPEN_CURLY___, rocket_d - 1
+
+          head_s = s[ 0, open_d ]  # zero length OK
+
+          tail_s = s[ close_d + 1 .. -1 ]  # zero length OK
+
+          src_s = s[ open_d + 1 ... rocket_d ]  # zero length OK
+
+          dst_s = s[ rocket_d + ROCKETSHIP_LENGTH__ ... close_d ]  # zero length OK
+
+          source_path = if src_s.length.zero?
+            ::File.join head_s, tail_s
+          else
+            "#{ head_s }#{ src_s }#{ tail_s }"
+          end
+
+          destination_path = if dst_s.length.zero?
+            ::File.join head_s, tail_s
+          else
+            "#{ head_s }#{ dst_s }#{ tail_s }"
+          end
+
+          [ source_path, destination_path ]
+
+        else
+
+          [ s[ 0, rocket_d ], s[ rocket_d + ROCKETSHIP_LENGTH__ .. -1 ] ]
+        end
+      end
+
+      CLOSE_CURLY___ = '}'
+      OPEN_CURLY___ = '{'
+      ROCKETSHIP_LENGTH__ = ROCKET_SHIP__.length
+
     end
   end
 end

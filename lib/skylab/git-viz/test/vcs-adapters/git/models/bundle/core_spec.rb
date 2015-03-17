@@ -1,14 +1,14 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::GitViz::TestSupport::VCS_Adapters::Git::Repo::Hist_Tree
+module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
-  describe "[gv] VCS adapters - git - repo - hist-tree - bunch - build" do
+  describe "[gv] VCS adapters - git - models - bundle - story 01", wip: true do
 
     extend TS_
     use :expect_event
     use :mock_FS
     use :mock_system
-    use :mock_1
+    use :story_01
 
     context "for no-ent path under repo" do
 
@@ -62,7 +62,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git::Repo::Hist_Tree
 
       it "oh nelly furtado watch out" do
         @bunch = repo.build_hist_tree_bunch
-        expect_informational_emissions_for_mock_1
+        expect_informational_emissions_for_story_01
         __expect_constituency
       end
 
@@ -84,8 +84,8 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git::Repo::Hist_Tree
       end
 
       def __expect_filediff
-        @filediff.counts.num_insertions.should eql 3
-        @filediff.counts.num_deletions.should eql 2
+        @filediff.counts.insertion_count.should eql 3
+        @filediff.counts.deletion_count.should eql 2
         @filediff.commitpoint_index.should eql 2
       end
     end

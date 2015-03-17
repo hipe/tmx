@@ -2,106 +2,62 @@ module Skylab::GitViz
 
   module VCS_Adapters_::Git
 
-    class Repo_
+    class Models_::Commit  # see [#009]
 
-      class Commit_
+      class << self
 
-        class << self
-          def build_ci repo, sha, lstnr, & p
-            self::Build__.call repo, sha, lstnr, & p
-          end
-          def new_writable sha
-            self::Writable__.new self, sha
-          end
-        end  # >>
+        def fetch_via_identifier__ id_s, repo, & x_p
 
-        class Writable__ < self
-          def initialize ci_cls, sha
-            @ci_cls = ci_cls ; @file_numstat_h = { } ; @SHA = sha ; nil
-          end
-          def set_author_datetime dt
-            @author_datetime = dt ; nil
-          end
-          def add_numstat_entry inserts_d_s, deletes_d_s, norm_path
-            @file_numstat_h[ norm_path ] =
-              File_Numstat__[ inserts_d_s.to_i, deletes_d_s.to_i ].freeze
-            nil
-          end
-          def finish_write
-            @file_numstat_h.freeze
-            r = @ci_cls.new @SHA, @author_datetime, @file_numstat_h
-            @author_datetime = @file_numstat_h = nil ; r
-          end
+          Actors_::Fetch[ id_s, repo, & x_p ]
         end
 
-        File_Numstat__ = ::Struct.new :num_insertions, :num_deletions
+        def get_base_command_
 
-        def initialize sha, author_dt, file_numstat_h
-          @author_datetime = author_dt
-          @file_numstat_h = file_numstat_h
-          @SHA = sha
-          freeze
+          [ GIT_EXE_, * BASE_CMD_ ]
+        end
+      end  # >>
+
+      def initialize & edit_p
+        instance_exec( & edit_p )
+      end
+
+      def members
+        [ :author_datetime, :filechanges, :SHA, :to_filechange_stream ]
+      end
+
+      attr_accessor :author_datetime, :filechanges, :SHA
+
+      def fetch_filechange_via_end_path path
+
+        filec = @filechanges.detect do | fc |
+
+          path == fc.end_path
         end
 
-        attr_reader :author_datetime, :SHA
-
-        def lookup_any_filediff_counts_for_normpath normpath
-          fetch_filediff_counts_for_normpath normpath do end
-        end
-
-        def fetch_filediff_counts_for_normpath normpath, &p
-          found = true
-          r = @file_numstat_h.fetch normpath do found = false end
-          found ? r : when_filediff_counts_for_relpath_not_found( normpath, p )
-        end
-      private
-        def when_filediff_counts_for_relpath_not_found normpath, p
-          p ||= -> do
-            raise ::KeyError, "(corrupt model?) #{
-              } #{ normpath } is not a part of commit #{
-               }'#{ @SHA.to_string }'#{ say_known_files }"
-          end
-          p[]
-        end
-        def say_known_files  # :+[#it-001] summarization
-          if ( 1..5 ).include? @file_numstat_h.length
-            ". known files:(#{ @file_numstat_h.keys * ', ' })"
-          else
-            " (of #{ @file_numstat_h.length } files affected by that commit)"
-          end
-        end
-
-        class Pool
-          def initialize repo, sys_cond, & oes_p
-            @cache_h = {} ; @commit_class = repo.class::Commit_
-            @on_event_selectively = oes_p
-            @repo = repo ; @system_conduit = sys_cond
-          end
-          def SHA_notify sha
-            x = true
-            @cache_h.fetch sha do |hash_key|
-              ci = __produce_any_ci sha
-              if ci
-                @cache_h[ hash_key ] = ci
-              else
-                x = ci
-              end
-            end
-            x
-          end
-
-          def __produce_any_ci sha
-            @commit_class.build_ci @repo, sha, @on_event_selectively do | ci |
-              ci.set_system_conduit @system_conduit
-            end
-          end
-
-          def close_pool
-            a = @cache_h.values.freeze ; @cache_h = :_closed_
-            @commit_class::Rink_.build_rink a
-          end
+        if filec
+          filec
+        elsif block_given?
+          yield
+        else
+          raise ::KeyError, __say_no_such_FC( path )
         end
       end
+
+      def __say_no_such_FC path
+        "no such filechange whose end path is #{ path.inspect }"
+      end
+
+      def to_filechange_stream
+        Callback_::Stream.via_nonsparse_array @filechanges
+      end
+
+      Autoloader_[ Actors_ = ::Module.new ]
+
+      BASE_CMD_ = %w( show --find-renames --numstat --pretty=tformat:%H%n%ai )
+        # :[#012]:#the-git-show-command
+
+      Commit_ = self
+
     end
   end
 end

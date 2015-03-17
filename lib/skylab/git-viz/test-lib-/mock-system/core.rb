@@ -2,14 +2,92 @@ module Skylab::GitViz
 
   module Test_Lib_
 
-    module Mock_Sys  # see [#007]
+    module Mock_System  # see [#007]
 
       class << self
 
+        def [] test_context
+          test_context.include Instance_Methods___
+          NIL_
+        end
+
         def recording_session byte_downstream, & edit_p
-          Mock_Sys_::Recording_Session__.new( byte_downstream, & edit_p ).execute
+          Mock_System_::Recording_Session__.new( byte_downstream, & edit_p ).execute
         end
       end  # >>
+
+      module Instance_Methods___
+
+        def mock_system_conduit
+
+          h = cache_hash_for_mock_system
+          h.fetch manifest_path_for_mock_system do | path |
+            h[ path ] = Conduit.new path
+          end
+        end
+      end
+
+      class Conduit
+
+        def initialize path
+          @is_opened = false
+          @is_fully_loaded = false
+          @lookup = method :__first_lookup
+          @path = path
+          @st = nil
+        end
+
+        def popen3 * args
+          block_given? and raise ::ArgumentError
+          cmd = @lookup[ args ]
+          if cmd
+            cmd.to_four
+          else
+            raise ::KeyError, "no such mock command #{ args.inspect } in #{ @path.inspect }"
+          end
+        end
+
+        def __first_lookup args
+
+          @st = to_command_stream
+          @cache = {}
+          @lookup = method :__lookup_while_reading
+          @lookup[ args ]
+        end
+
+        def to_command_stream
+          _lines = ::File.open @path, ::File::RDONLY
+          Models_::Command.unmarshalling_stream _lines, :OGDL  # etc
+        end
+
+        def __lookup_while_reading args
+
+          begin
+            cmd = @st.gets
+            if cmd
+
+              @cache[ cmd.args_ ] = cmd
+
+              if cmd.args_ == args
+                x = cmd
+                break
+              else
+                redo
+              end
+            else
+              @lookup = method :__lookup_when_fully_loaded
+              x = @lookup[ args ]  # meh
+              break
+            end
+          end while nil
+          x
+        end
+
+        def __lookup_when_fully_loaded args
+
+          @cache[ args ]
+        end
+      end
 
       Models_ = ::Module.new
 
@@ -24,20 +102,50 @@ module Skylab::GitViz
         end  # >>
 
         def initialize
+          @chdir = nil
           @exitstatus = nil
           @stdout_string = nil
           @stderr_string = nil
           @argv = nil
         end
 
-        attr_accessor :exitstatus, :stdout_string, :stderr_string, :argv
+        attr_accessor :exitstatus, :stdout_string, :stderr_string
+
+        attr_reader :argv, :chdir
+
+        def args_
+          @__args__ ||= if @chdir
+            [ * @argv, chdir: @chdir ]
+          else
+            @argv
+          end
+        end
+
+        def receive_args a
+          @args = a
+          h = ::Hash.try_convert a.last
+          if h
+            KEYS___ == h.keys or raise ::ArgumentError
+            @chdir = h.fetch :chdir
+            @argv = a[ 0 .. -2 ]
+          else
+            @argv = a
+          end
+          a
+        end
+
+        KEYS___ = [ :chdir ]
 
         def write_to io
 
-          oa = Mock_Sys_::Output_Adapters_::OGDL_esque.new io, :command
+          oa = Mock_System_::Output_Adapters_::OGDL_esque.new io, :command
 
           if @argv
             oa.write @argv, :argv, :string_array
+          end
+
+          if @chdir
+            oa.write @chdir, :chdir, :string
           end
 
           if @stdout_string
@@ -76,6 +184,11 @@ module Skylab::GitViz
           ACHIEVED_
         end
 
+        def __unmarshal__chdir__from_node nd
+
+          @chdir = _insist_on_one_string nd
+        end
+
         def __unmarshal__exitstatus__from_node nd
 
           s = _insist_on_one_string nd
@@ -111,7 +224,7 @@ module Skylab::GitViz
 
       Build_unmarshalling_stream___ = -> x, sym, model_class do
 
-        st = Mock_Sys_::Input_Adapters_.const_get( sym ).tree_stream_from_lines( x )
+        st = Mock_System_::Input_Adapters_.const_get( sym ).tree_stream_from_lines( x )
 
         Callback_.stream do
 
@@ -119,70 +232,6 @@ module Skylab::GitViz
           tree and begin
 
             model_class.new.read_from_tree tree
-          end
-        end
-      end
-
-      class Conduit
-
-        def initialize path
-          @is_opened = false
-          @is_fully_loaded = false
-          @lookup = method :__first_lookup
-          @path = path
-        end
-
-        def popen3 * argv
-          block_given? and raise ::ArgumentError
-          cmd = @lookup[ argv ]
-          if cmd
-            cmd.to_four
-          else
-            raise ::KeyError, "no such command: #{ argv.inspect }"
-          end
-        end
-
-        def __first_lookup argv
-
-          @cache = {}
-
-          _lines = ::File.open @path, ::File::RDONLY
-          @st = Models_::Command.unmarshalling_stream _lines, :OGDL  # etc
-
-          @lookup = method :__lookup_while_reading
-          @lookup[ argv ]
-        end
-
-        def __lookup_while_reading argv
-
-          begin
-            cmd = @st.gets
-            if cmd
-
-              @cache[ cmd.argv ] = cmd  # etc
-
-              if argv == cmd.argv
-                x = cmd
-                break
-              else
-                redo
-              end
-            else
-              @lookup = method :__lookup_when_fully_loaded
-              x = @lookup[ argv ]  # meh
-              break
-            end
-          end while nil
-          x
-        end
-
-        def __lookup_when_fully_loaded argv
-
-          cmd = @cache[ argv ]  # etc
-          if cmd
-            cmd
-          else
-            self._DO_ME
           end
         end
       end
@@ -227,8 +276,7 @@ module Skylab::GitViz
 
       # ~ end
 
-      Mock_Sys_ = self
-      NEWLINE_ = "\n"
+      Mock_System_ = self
 
     end
   end

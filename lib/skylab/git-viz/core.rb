@@ -63,6 +63,10 @@ module Skylab::GitViz
     def mock_FS
       GitViz_::Test_Lib_::Mock_FS
     end
+
+    def repository
+      GitViz_::VCS_Adapters_::Git.repository
+    end
   end  # >>
 
   Autoloader_ = ::Skylab::Callback::Autoloader
@@ -72,8 +76,10 @@ module Skylab::GitViz
   DASH_ = '-'.freeze
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> {}
+  EMPTY_S_ = ''.freeze
   GitViz_ = self
   Name_ = Callback_::Name
+  NEWLINE_ = "\n"
   NIL_ = nil
   MONADIC_EMPTINESS_ = -> _ {}
   Scn_ = Callback_::Scn

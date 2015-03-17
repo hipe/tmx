@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../../test-support'
 
-module Skylab::GitViz::TestSupport::VCS_Adapters::Git::Repo
+module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
-  describe "[gv] VCS adapters - git - repo - commit - pool" do
+  describe "[gv] VCS adapters - git - models - [THIS]", wip: true do
 
     extend TS_
     use :expect_event
@@ -21,7 +21,9 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git::Repo
 
     it "with a repo touch a noent SHA - x" do
       @result = repo.SHA_notify _SHA '456456'
-      expect_event_sequence_and_result_for_noent_SHA_ '456456'
+      expect_event_sequence_for_noent_SHA_ '456456'
+      expect_result_for_whatever
+      expect_no_more_events
     end
 
     it "touch 2 commits then close the pool, emits only system call events" do

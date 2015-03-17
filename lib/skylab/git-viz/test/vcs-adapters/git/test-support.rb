@@ -18,46 +18,45 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
   module InstanceMethods
 
-    def front
-      @front ||= build_front
+    def front_
+      @front ||= __build_front
     end
 
-    def build_front
-      front_class.new GitViz_::VCS_Adapters_::Git, listener_x do |f|
-        f.set_system_conduit system_conduit
-      end
-    end
-
-    def system_conduit
-    end
-
-    def front_class
-      _VCS_adapter_module::Front
-    end
-
-    def _VCS_const i
-      _VCS_adapter_module::Front.class  # always ensure this is loaded first
-      _VCS_adapter_module.const_get i, false
+    def __build_front
+      GitViz_::VCS_Adapters_::Git::Front.new_via_system_conduit(
+        mock_system_conduit, & listener_x )
     end
 
     def expect_result_for_failure  # #hook-out
       @result.should eql false
     end
 
-    def execute_this_cmd( *a )
-      system_agent.execute_this_cmd_a a
-    end
-
-    def _VCS_adapter_module
-      GitViz_::VCS_Adapters_::Git
-    end
-
     def black_and_white_expression_agent_for_expect_event
       GitViz_.lib_.brazen::API.expression_agent_instance
     end
-
-    def fixtures_module_
-      TS_::Fixtures
-    end
   end
+
+  # ~
+
+  Commit_Support = -> test_context_mod do
+
+    TS_::Model_Support::Commit_support[ test_context_mod ]
+  end
+
+  # ~
+
+  Autoloader_ = Callback_::Autoloader
+  ACHIEVED_ = true
+  Callback_ = Callback_
+  GENERAL_ERROR_ = 128
+  NIL_ = nil
+
+  fixture_stories = ::File.join( TS_.dir_pathname.to_path, 'fixture-stories' )
+
+  STORY_02_PATHS_ = ::File.join fixture_stories, '02-path-of-interest/paths.list'
+  STORY_02_COMMANDS_ = ::File.join fixture_stories, '02-path-of-interest/commands.ogdl'
+
+  STORY_03_PATHS_ = ::File.join fixture_stories, '03-funky/paths.list'
+  STORY_03_COMMANDS_ = ::File.join fixture_stories, '03-funky/commands.ogdl'
+
 end

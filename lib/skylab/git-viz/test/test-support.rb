@@ -4,6 +4,20 @@ module Skylab::GitViz::TestSupport
 
   GitViz_ = ::Skylab::GitViz
 
+  Callback_ = GitViz_::Callback_
+
+  class << self
+
+    def lib_
+      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+        Lib_module___[], TS_ )
+    end
+
+    define_method :universal_cache_hash_, ( Callback_.memoize do
+      {}
+    end )
+  end  # >>
+
   TestSupport_ = GitViz_.lib_.test_support
 
   TestSupport_::Regret[ TS_ = self ]
@@ -48,23 +62,37 @@ module Skylab::GitViz::TestSupport
       GitViz_.lib_.some_stderr_IO
     end
 
+    def cache_hash_for_mock_FS
+      TS_.universal_cache_hash_
+    end
+
+    def cache_hash_for_mock_system
+      TS_.universal_cache_hash_
+    end
+
     def listener_x  # assume "expect event" ..
 
       # the event receiver in whatever form is current
 
       handle_event_selectively
     end
-
-    def fixtures_module_for_mock_FS
-      fixtures_module_
-    end
-
-    def fixtures_module_for_mock_system
-      fixtures_module_
-    end
   end
 
   # ~ longer short constants (the longest of which we might call "stowaways")
+
+  # ~ lib
+
+  Lib_module___ = Callback_.memoize do
+
+    module Lib____
+
+      stdlib = Callback_::Autoloader.build_require_stdlib_proc
+
+      String_IO = stdlib[ :StringIO ]
+
+      self
+    end
+  end
 
   Expect_Event = -> test_mod do  # generated from `expect_event`
 
@@ -117,7 +145,6 @@ module Skylab::GitViz::TestSupport
 
   # ~ short constants
 
-  Callback_ = GitViz_::Callback_
   NIL_ = nil
 
   # ~ any re-assignments of above to propagate to child test nodes

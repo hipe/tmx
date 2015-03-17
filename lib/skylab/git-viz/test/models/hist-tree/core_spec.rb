@@ -2,13 +2,12 @@ require_relative '../test-support'
 
 module Skylab::GitViz::TestSupport::Models
 
-  describe "[gv] models - hist-tree" do
+  describe "[gv] models - hist-tree", wip: true do
 
     extend TS_
     use :expect_event
     use :mock_FS
     use :mock_system
-    use :mock_1
 
     it "absolute path no ent (mocked) - x" do
       _call_API_against_path '/this-path-is-not-even-mocked/zang'
@@ -70,7 +69,7 @@ module Skylab::GitViz::TestSupport::Models
     end
 
     def __expect_bunch
-      expect_informational_emissions_for_mock_1
+      expect_informational_emissions_for_story_01
       __expect_result_structure
     end
 

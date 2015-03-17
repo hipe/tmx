@@ -1,32 +1,30 @@
 module Skylab::GitViz::TestSupport
 
-  module Mock_1
-
-    # a "business" "test bundle" (employed via 'use :mock_1') that is used
-    # in conjunction with using the mock repository of the same name.
+  module Story_01
 
     class << self
+
       def [] ctx
+
+        GitViz_::Test_Lib_::Mock_FS[ ctx ]
+        GitViz_::Test_Lib_::Mock_System[ ctx ]
+
         ctx.include Instance_Methods___
       end
     end  # >>
 
     module Instance_Methods___
 
-      def expect_informational_emissions_for_mock_1
+      define_method :manifest_path_for_mock_FS, ( Callback_.memoize do
+        ::File.join STORY__, 'paths.list'
+      end )
 
-        __expect_this_many_system_commands 8
-        expect_this_many_statements_about_omissions 2
-        expect_no_more_events
-      end
-
-      def __expect_this_many_system_commands d
-        expect_N_events d, :next_system_command
-      end
-
-      def expect_this_many_statements_about_omissions d
-        expect_N_events d, :omitting_informational_commitpoint
-      end
+      define_method :manifest_path_for_mock_system, ( Callback_.memoize do
+        ::File.join STORY__, 'commands.ogdl'
+      end )
     end
+
+    STORY__ = ::File.join TS_.dir_pathname.to_path,
+      'vcs-adapters/git/fixture-stories/01-representative-renames'
   end
 end
