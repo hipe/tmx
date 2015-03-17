@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+# the significance of this story is in the readme at 00.
+
+# ~ begin boilerplate
+
+dir=$( dirname $0 )
+
+if [[ ! -e "$dir/00-readme.md" ]] ; then
+  echo "something went wrong - was unable to find self"
+  exit 5
+fi
+
+cd "$dir"
+
+if [[ -d tmp ]] ; then
+
+  rm -rf tmp
+
+fi
+
+mkdir tmp
+
+cd tmp
+
+git init .
+
+# ~ end
+
+
+echo '01' > simple-before.txt
+git add simple-before.txt
+
+mkdir from-here
+echo '02' > from-here/same-name.txt
+git add from-here/same-name.txt
+
+mkdir -p lvl-1/lvl-2
+echo '03' >  lvl-1/lvl-2/same-name-again.txt
+git add lvl-1/lvl-2/same-name-again.txt
+
+mkdir some-dir
+echo '04' > some-dir/before-at-tail-of-path.txt
+git add some-dir/before-at-tail-of-path.txt
+
+git ci -m 'this is the first commit' > out.log
+
+
+
+
+git mv simple-before.txt simple-after.txt
+
+mkdir to-here
+git mv from-here/same-name.txt to-here/
+
+mkdir lvl-1/lvl-2-B
+git mv lvl-1/lvl-2/same-name-again.txt lvl-1/lvl-2-B
+
+git mv some-dir/before-at-tail-of-path.txt some-dir/after-at-tail-of-path.txt
+
+git ci -m 'this is the second commit' >> out.log
+echo 'done.'

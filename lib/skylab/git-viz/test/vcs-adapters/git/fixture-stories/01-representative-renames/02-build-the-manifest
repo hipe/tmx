@@ -1,0 +1,119 @@
+#!/usr/bin/env ruby -w
+
+require_relative '../../test-support'
+
+module Skylab::GitViz::TestSupport::VCS_Adapters::Git
+
+  module Story_01
+
+    class Build_the_manifest
+
+      class << self
+
+        def [] * a
+
+          new( * a ).execute
+
+        end
+      end  # >>
+
+      def initialize _, o, e, _, _, file
+        @sout = o
+        @serr = e
+        init_path_ivars_via_build_file_path file
+      end
+
+      def init_path_ivars_via_build_file_path file
+
+        @here = ::File.dirname file
+
+        @tmpdir = ::File.join @here, 'tmp'
+
+        @repo_path = @tmpdir
+
+        @path = ::File.join @tmpdir, 'raw-manifest.ogdl'
+
+        NIL_
+      end
+
+      def execute
+        session do
+          work
+        end
+      end
+
+      def init_name_mappings
+
+        @name_mappings = Actors_::Build_name_mappings[ @tmpdir ]
+
+        NIL_
+      end
+
+      def work
+        execute_show_command
+        NIL_
+      end
+
+      def execute_show_command
+
+        _, @o, _, t = popen3_show 'head'
+
+        t.value.exitstatus.zero? or fail
+        NIL_
+      end
+
+      def popen3_show_via_story_moniker s
+
+        popen3_show @name_mappings.SHA_head_via_commit_moniker_h.fetch s
+      end
+
+      def popen3_show ci_id
+
+        a = models::Commit.get_base_command_
+        a.push ci_id, '--'
+
+        @sess.popen3( * a, chdir: @repo_path )
+      end
+
+      def models
+
+        GitViz_::VCS_Adapters_::Git::Models_
+      end
+
+      def session
+        start_session
+        yield self
+        end_session
+      end
+
+      def start_session
+
+        @fh = ::File.open @path, ::File::CREAT | ::File::TRUNC | ::File::WRONLY
+        @sess = GitViz_::Test_Lib_::Mock_System.recording_session @fh
+        NIL_
+      end
+
+      def end_session
+
+        @fh.close
+        @serr.puts "wrote #{ @path }"
+        ACHIEVED_
+      end
+    end
+
+    Story_01_ = self
+
+    module Actors_
+
+      Autoloader_[ self, ::File.join( ::File.dirname( __FILE__ ), 'actors-' ) ]
+    end
+  end
+end
+
+if $PROGRAM_NAME == __FILE__
+
+  _ok = Skylab::GitViz::TestSupport::VCS_Adapters::Git::Story_01::Build_the_manifest[
+    $stdin, $stdout, $stderr, $PROGRAM_NAME, ARGV, __FILE__ ]
+
+  exit( _ok ? 0 : 5 )
+end

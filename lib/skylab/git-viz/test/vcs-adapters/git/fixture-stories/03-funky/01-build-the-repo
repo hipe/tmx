@@ -1,0 +1,92 @@
+#!/usr/bin/env zsh
+
+# ~ begin boilerplate
+
+dir=$( dirname $0 )
+
+if [[ ! -e "$dir/00-readme.md" ]] ; then
+  echo "something went wrong - was unable to find self"
+  exit 5
+fi
+
+cd "$dir"
+
+if [[ -d tmp ]] ; then
+
+  rm -rf tmp
+
+fi
+
+mkdir tmp
+
+cd tmp
+
+git init .
+
+# ~ end
+
+
+# for contrast, see:
+#   doc/issues/017-mock-system-archive/test/vcs-adapters/git/asset-script/for-mock-repo-1/zsh-lib/functions/part-repo
+
+mkdir -p "dirzo/it's just"
+
+file1="dirzo/it's just/funky like that"
+
+cat > "$file1" <<HERE
+a
+b
+c
+d
+e
+HERE
+
+git add "$file1"
+git commit -m "this is the first commit" > out.log
+
+
+
+
+file2="dirzo/everybody in the room is floating"
+
+echo "a
+b
+c" > "$file2"
+
+git add "$file2"
+git commit -m "this is the second commit" >> out.log
+
+
+
+
+cat > "$file1" <<HERE
+0
+1
+2
+3
+4
+HERE
+
+cat > "$file2" <<HERE
+A
+b
+C
+D
+HERE
+
+file3A=dirzo/move-before
+file3B=dirzo/move-after
+
+echo "one-line" > "$file3A"
+
+git add "$file3A"
+git add -u
+git commit -m "this is the third commit" >> out.log
+
+
+
+
+git mv "$file3A" "$file3B"
+git commit -m "this is the fourth commit" >> out.log
+
+echo 'done.'

@@ -1,0 +1,23 @@
+command
+  argv
+    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, no-such-commit, --
+  chdir /m03/repo
+  stdout_string ""
+  stderr_string
+    "fatal: bad revision 'no-such-commit'
+    "
+  exitstatus 128
+command
+  argv
+    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa0303, --
+  chdir /m03/repo
+  stdout_string
+    "fafa030300000000000000000000000000000000
+    1999-01-03 13:09:11 +0000
+    
+    3	2	dirzo/everybody in the room is floating
+    5	5	dirzo/it's just/funky like that
+    1	0	dirzo/move-before
+    "
+  stderr_string ""
+  exitstatus 0

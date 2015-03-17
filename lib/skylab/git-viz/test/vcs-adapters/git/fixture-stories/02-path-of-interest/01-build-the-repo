@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+# ~ begin boilerplate
+
+dir=$( dirname $0 )
+
+if [[ ! -e "$dir/00-readme.md" ]] ; then
+  echo "something went wrong - was unable to find self"
+  exit 5
+fi
+
+cd "$dir"
+
+if [[ -d tmp ]] ; then
+
+  rm -rf tmp
+
+fi
+
+mkdir tmp
+
+cd tmp
+
+git init .
+
+# ~ end
+
+
+# state 1:
+
+echo 'foo line 1' > foo.txt
+
+mkdir some-dir
+
+echo 'bar line 1' > some-dir/bar.txt
+
+echo 'baz line 1' > some-dir/baz.txt
+
+git add .
+
+git ci -m 'this is the first commit' > out.log
+
+
+# state 2:
+
+sed -i '' '1,1s/^.*$/BAR line 1/' some-dir/bar.txt
+
+git add some-dir/bar.txt
+
+git ci -m 'this is the second commit' >> out.log
+
+
+# state 3:
+
+sed -i '' '1,1s/^.*$/FOO line 1/' foo.txt
+
+git add foo.txt
+
+git ci -m 'this is the third commit' >> out.log
+
+
+# state 4:
+
+sed -i '' '1,1s/^.*$/BAZ line 1/' some-dir/baz.txt
+
+git add some-dir/baz.txt
+
+git ci -m 'this is the fourth commit' >> out.log
+
+echo 'done.'

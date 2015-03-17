@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# ~ begin boilerplate
+
+dir=$( dirname $0 )
+
+if [[ ! -e "$dir/00-readme.md" ]] ; then
+  echo "something went wrong - was unable to find self"
+  exit 5
+fi
+
+cd "$dir"
+
+if [[ -d tmp ]] ; then
+
+  rm -rf tmp
+  echo "removed temporary directory. cleanup done."
+
+else
+
+  echo "no temporary directory found, nothing to do for cleanup."
+fi
+
+# ~ end

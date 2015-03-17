@@ -1,0 +1,11 @@
+command
+  argv
+    echo, hello
+  stdout_string "hello\n"
+  exitstatus 0
+
+command
+  argv
+    echo, hi
+  chdir x/y
+  exitstatus 777

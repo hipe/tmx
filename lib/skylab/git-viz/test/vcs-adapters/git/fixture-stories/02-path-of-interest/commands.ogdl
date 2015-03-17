@@ -1,0 +1,9 @@
+command
+  argv
+    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, no-such-commit, --
+  chdir /m02/repo
+  stdout_string ""
+  stderr_string
+    "fatal: bad revision 'no-such-commit'
+    "
+  exitstatus 128

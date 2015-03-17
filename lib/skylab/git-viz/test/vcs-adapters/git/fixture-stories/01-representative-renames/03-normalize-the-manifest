@@ -1,0 +1,58 @@
+#!/usr/bin/env ruby -w
+
+load File.join File.dirname( __FILE__ ), '02-build-the-manifest'
+
+module Skylab::GitViz::TestSupport::VCS_Adapters::Git
+
+  module Story_01
+
+    class Normalize_the_manifest < Build_the_manifest
+
+      def init_path_ivars_via_build_file_path file
+        super
+        @raw_manifest_path = @path
+        @path = ::File.join @here, 'commands.ogdl'
+        NIL_
+      end
+
+      def execute
+        @main_mock_repo_path ||= '/the/repo'
+        init_name_mappings
+        super
+      end
+
+      attr_writer :main_mock_repo_path
+
+      def work
+
+        st = GitViz_::Test_Lib_::Mock_System::Conduit.new(
+          @raw_manifest_path ).to_command_stream
+
+        norm = Actors_::Normalize_command.new(
+          @name_mappings,
+          @main_mock_repo_path,
+          @serr )
+
+        begin
+
+          cmd = st.gets
+          cmd or break
+          _cmd_ = norm.against cmd
+          @sess.receive_command _cmd_
+
+          redo
+        end while nil
+
+        NIL_
+      end
+    end
+  end
+end
+
+if $PROGRAM_NAME == __FILE__
+
+  _ok = Skylab::GitViz::TestSupport::VCS_Adapters::Git::Story_01::Normalize_the_manifest[
+    $stdin, $stdout, $stderr, $PROGRAM_NAME, ARGV, __FILE__ ]
+
+  exit _ok ? 0 : 5
+end

@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby -w
+
+load File.join( File.dirname( File.dirname( __FILE__ ) ),
+  '01-representative-renames/03-normalize-the-manifest' )
+
+o = Skylab::GitViz::TestSupport::VCS_Adapters::Git::Story_01::Normalize_the_manifest.new(
+  $stdin, $stdout, $stderr, $PROGRAM_NAME, ARGV, __FILE__ )
+
+o.main_mock_repo_path = '/m03/repo'
+
+_ok = o.execute
+
+exit _ok ? 0 : 5
