@@ -1,3 +1,5 @@
+# somewhere: GitViz_.lib_.tree.from( :node_identifiers, @bunch.immutable_trail_array )
+
 module Skylab::GitViz
 
   module CLI

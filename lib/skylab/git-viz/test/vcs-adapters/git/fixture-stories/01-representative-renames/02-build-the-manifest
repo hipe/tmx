@@ -75,6 +75,18 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
         @sess.popen3( * a, chdir: @repo_path )
       end
 
+      def popen3_ls_files_of relpath
+
+        _abs = ::File.join @tmpdir, relpath
+
+        @sess.popen3( * models::Bundle.ls_files_command_, chdir: _abs )
+      end
+
+      def popen3_log_of relpath
+
+        @sess.popen3( * models::Bundle.log_command_, relpath, chdir: @repo_path )
+      end
+
       def models
 
         GitViz_::VCS_Adapters_::Git::Models_

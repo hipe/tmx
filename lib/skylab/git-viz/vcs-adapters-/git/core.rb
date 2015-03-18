@@ -27,8 +27,12 @@ module Skylab::GitViz
 
       def new_repository_via_pathname pn
 
-        Git_::Models_::Repository.new_via_pathname(
+        models::Repository.new_via_pathname(
           pn, @system_conduit, & @on_event_selectively )
+      end
+
+      def models
+        Git_::Models_
       end
 
       def ping

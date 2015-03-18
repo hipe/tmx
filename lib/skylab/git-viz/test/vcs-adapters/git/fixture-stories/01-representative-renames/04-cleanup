@@ -15,10 +15,13 @@ if [[ -d tmp ]] ; then
 
   rm -rf tmp
   echo "removed temporary directory. cleanup done."
+  exit 0
 
 else
 
   echo "no temporary directory found, nothing to do for cleanup."
+  exit 72  # /usr/include/sysexits.h
+
 fi
 
 # ~ end

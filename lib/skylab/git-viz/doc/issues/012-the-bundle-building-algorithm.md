@@ -7,8 +7,8 @@ halfway down, demarcated by many dashes. what follows immediate is "current")
 ## introduction
 
 a "bundle" contains all the information needed to build a "hist-tree".
-we can think of it as a matrix of "filediffs", with time one one axis and
-files on another; where a "filediff" is the changes to one file in one
+we can think of it as a matrix of "filechanges", with time one one axis and
+files on another; where a "filechange" is the changes to one file in one
 commit.
 
 below is a pseudocode description of the algorithm we use to build a

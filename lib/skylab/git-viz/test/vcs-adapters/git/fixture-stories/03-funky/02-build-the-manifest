@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby -w
 
-load File.join( File.dirname( File.dirname( __FILE__ ) ),
+dir = File.expand_path( '..', __FILE__ )
+
+load File.join( File.dirname( dir ),
   '01-representative-renames/02-build-the-manifest' )
 
 _ok = Skylab::GitViz::TestSupport::VCS_Adapters::Git::Story_01::Build_the_manifest.new(
@@ -11,12 +13,44 @@ _ok = Skylab::GitViz::TestSupport::VCS_Adapters::Git::Story_01::Build_the_manife
 
   128 == t.value.exitstatus or fail
 
+
   sto.init_name_mappings
 
   _, _o, _e, t = sto.popen3_show_via_story_moniker 'third'
 
   t.value.exitstatus.zero? or fail
 
+
+  _, _o, _e, t = sto.popen3_ls_files_of 'these-dirs/not-tracked'
+
+  t.value.exitstatus.zero? or fail
+
+
+  _, o, _e, t = sto.popen3_ls_files_of 'dirzo'
+
+  t.value.exitstatus.zero? or fail
+
+  begin
+    line = o.gets
+    line or break
+    line.chomp!
+
+    _, o_, _e, t = sto.popen3_log_of "dirzo/#{ line }"
+
+    t.value.exitstatus.zero? or fail
+
+    begin
+      line = o_.gets
+      line or break
+      line.strip!
+
+      _, _o, _e, t = sto.popen3_show line
+
+      t.value.exitstatus.zero? or fail
+      redo
+    end while nil
+    redo
+  end while nil
 end
 
 exit( _ok ? 0 : 5 )

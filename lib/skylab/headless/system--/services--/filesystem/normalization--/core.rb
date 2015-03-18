@@ -61,9 +61,20 @@ module Skylab::Headless
 
       private
 
+        def pathname_exists_and_set_stat_and_stat_error pn
+
+          _set_stat_and_stat_error_by { pn.stat }
+        end
+
         def path_exists_and_set_stat_and_stat_error path
-          @stat = ::File.stat path
+
+          _set_stat_and_stat_error_by { ::File.stat path }
+        end
+
+        def _set_stat_and_stat_error_by
+
           @stat_e = nil
+          @stat = yield
           ACHIEVED_
         rescue ::Errno::ENOENT, Errno::ENOTDIR => @stat_e  # #todo assimilate the others
           @stat = nil

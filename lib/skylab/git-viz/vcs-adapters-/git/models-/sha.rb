@@ -14,16 +14,14 @@ module Skylab::GitViz
       end  # >>
 
       def initialize s
-        if s.frozen?
-          @s = s
+        @string = if s.frozen?
+          s
         else
-          @s = s.dup.freeze
+          s.dup.freeze
         end
       end
 
-      def as_normal_string
-        @s
-      end
+      attr_reader :string
     end
   end
 end

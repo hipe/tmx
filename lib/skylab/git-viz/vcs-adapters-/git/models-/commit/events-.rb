@@ -29,9 +29,9 @@ module Skylab::GitViz
 
         Bad_Revision___ = Callback_::Event.prototype_with :bad_revision,
 
-            :ok, false,
             :revision_identifier, nil,
-            :exitstatus, nil do | y, o |
+            :exitstatus, nil,
+            :ok, false do | y, o |
 
           y << "unrecognized revision #{ ick o.revision_identifier }"
         end

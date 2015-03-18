@@ -111,6 +111,15 @@ module Skylab::GitViz::TestSupport
     PATH_IS_FILE = "path is file, must have directory".freeze
   end
 
+  GIT_FIXTURE_STORIES_ = ::File.join TS_.dir_pathname.to_path,
+    'vcs-adapters/git/fixture-stories'
+
+  GIT_STORY_03_PATHS_ = ::File.join GIT_FIXTURE_STORIES_,
+    '03-funky/paths.list'
+
+  GIT_STORY_03_COMMANDS_ = ::File.join GIT_FIXTURE_STORIES_,
+    '03-funky/commands.ogdl'
+
   module Testable_Client  # read [#015] the testable client narrative intro.
 
     DSL = -> mod do
@@ -152,6 +161,9 @@ module Skylab::GitViz::TestSupport
   module Constants
     Callback_ = Callback_
     GitViz_ = GitViz_
+    GIT_FIXTURE_STORIES_ = GIT_FIXTURE_STORIES_
+    GIT_STORY_03_COMMANDS_ = GIT_STORY_03_COMMANDS_
+    GIT_STORY_03_PATHS_ = GIT_STORY_03_PATHS_
     NIL_ = NIL_
     TestSupport_ = TestSupport_
     Top_TS_ = TS_

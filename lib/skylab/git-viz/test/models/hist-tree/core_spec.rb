@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::GitViz::TestSupport::Models
 
-  describe "[gv] models - hist-tree", wip: true do
+  describe "[gv] models - hist-tree" do
 
     extend TS_
     use :expect_event
@@ -10,7 +10,9 @@ module Skylab::GitViz::TestSupport::Models
     use :mock_system
 
     it "absolute path no ent (mocked) - x" do
+
       _call_API_against_path '/this-path-is-not-even-mocked/zang'
+
       __expect_no_repo
     end
 
@@ -25,61 +27,23 @@ module Skylab::GitViz::TestSupport::Models
     end
 
     it "abspath no ent, but inside a repo (mocked) - x" do
-      _call_API_against_path '/derp/berp/nazoozle/fazoozle'
-      _expect_no_ent
-    end
 
-    def _call_API_against_path path
+      _call_API_against_path '/m03/repo/nazoozle/fazoozle'
 
-      call_API( * _common_x_a,
-        :system_conduit, :_s_c_,
-        :path, mock_pathname( path ) )
-    end
-
-    def _expect_no_ent
-
-      expect_event :next_system_command
-
-      _ev = expect_not_OK_event( :cannot_execute_command ).to_event
-
-      black_and_white( _ev ).should match %r(\ANo such file #{
-        }or directory - /[-a-z/]+/nazoozle/fazoozle\z)
-
-      expect_failed
+      expect_failed_by :errno_enoent
     end
 
     it "path is file (mocked) - x" do
-      _call_API_against_path '/derp/berp/dirzo/move-after'
-      __expect_path_is_file
-    end
 
-    def __expect_path_is_file
+      _call_API_against_path "/m03/repo/dirzo/it's just/funky like that"
 
-      __expect_command_with_chdir_matching %r(/move-after\z)
-
-      expect_not_OK_event :cannot_execute_command,
-        'path is file, must have (or_ ["directory"])'
-
-      expect_failed
+      expect_failed_by :wrong_ftype
     end
 
     it "path is valid (mock) - o" do
-      __using_mock_sys_conduit_call_API_against_path '/derp/berp/dirzo'
-      __expect_bunch
-    end
 
-    def __expect_bunch
-      expect_informational_emissions_for_story_01
-      __expect_result_structure
-    end
-
-    def __expect_result_structure
-      @result.has_slug.should be_nil
-      @result.children_count.should eql 3
-      one, two, three = @result.children.to_a
-      one.slug.should eql "everybody in the room is floating"
-      two.slug.should eql "it's just"
-      three.slug.should eql "move-after"
+      __using_mock_sys_conduit_call_API_against_path '/m03/repo/dirzo'
+      __expect_bundle
     end
 
     def __using_mock_sys_conduit_call_API_against_path path
@@ -97,11 +61,28 @@ module Skylab::GitViz::TestSupport::Models
       end
     end.call
 
-    def __expect_command_with_chdir_matching rx
+    def __expect_bundle
 
-      _ev = expect_event( :next_system_command ).to_event
-      _ev.any_nonzero_length_option_h.fetch( :chdir ).should match rx
-      nil
+      bndl = @result
+
+      bndl.trails.length.should eql 3
+      # see tombstone below
+    end
+
+    def _call_API_against_path path
+
+      call_API( * _common_x_a,
+        :system_conduit, :_s_c_,
+        :path, mock_pathname( path ) )
+    end
+
+    def manifest_path_for_mock_FS
+      GIT_STORY_03_PATHS_
+    end
+
+    def manifest_path_for_mock_system
+      GIT_STORY_03_COMMANDS_
     end
   end
 end
+# :+#tombstone: testing the tree model

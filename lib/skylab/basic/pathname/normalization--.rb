@@ -78,6 +78,13 @@ module Skylab::Basic
 
       public
 
+        def normalize_value x, & oes_p
+
+          normalize_argument(
+            Callback_::Trio.via_value_and_variegated_symbol( x, :path ),
+            & oes_p )
+        end
+
         def normalize_argument arg, & oes_p
           otr = dup
           otr.init_copy arg, & oes_p

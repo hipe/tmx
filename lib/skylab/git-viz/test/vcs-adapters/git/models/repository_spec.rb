@@ -5,8 +5,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
   describe "[gv] VCS adapters - git - models - repository" do
 
     extend TS_
-    use :mock_FS
-    use :expect_event
+    use :repository_support
 
     it "builds" do
       front_
@@ -21,7 +20,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
     it "just go ahead and TRY to give this low-level nerk a relpath" do
       __expect_relative_paths_are_not_honored_here do
-        _against_pathname 'anything'
+        init_respository_via_pathname_ 'anything'
       end
     end
 
@@ -34,7 +33,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
     end
 
     it "resolve when provide a path that totally doesn't exist - x" do
-      _against_pathname '/totally/doesn-t-exist'
+      init_respository_via_pathname_ '/totally/doesn-t-exist'
       __expect_totally_doesnt_exist
     end
 
@@ -51,14 +50,10 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
     end
 
     it "give it a FILE in a dir that is a repo - WORKS" do
-      _against_pathname '/m02/repo/core.py'
-      expect_no_more_events
-      @result.should be_respond_to :fetch_commit_via_identifier
-    end
 
-    def _against_pathname s
-      @result = front_.new_repository_via_pathname mock_pathname s
-      NIL_
+      init_respository_via_pathname_ '/m02/repo/core.py'
+      expect_no_more_events
+      @repository.should be_respond_to :fetch_commit_via_identifier
     end
 
     def manifest_path_for_mock_FS

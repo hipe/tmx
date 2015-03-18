@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w
 
-load File.join File.dirname( __FILE__ ), '02-build-the-manifest'
+load File.expand_path( '../02-build-the-manifest', __FILE__ )
 
 module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
@@ -30,6 +30,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
         norm = Actors_::Normalize_command.new(
           @name_mappings,
+          @tmpdir,
           @main_mock_repo_path,
           @serr )
 

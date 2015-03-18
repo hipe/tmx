@@ -2,87 +2,95 @@ module Skylab::GitViz
 
   module VCS_Adapters_::Git
 
-    class Repo_::Hist_Tree__
+    class Models_::Bundle
 
-      class Bunch__::Trail__
+      class Actors_::Build_trail
 
-        class << self
-
-          def begin bunch, line, & oes_p
-            new( bunch, line, & oes_p ).begin
-          end
-
-          def finish bunch, trail, & oes_p
-            self::Finish__[ bunch, trail, & oes_p ]
-          end
-        end  # >>
-
-        def initialize bunch, line, & oes_p
-          @file_relpath = line  # relative to anywhere
-          @filediff_a = nil
+        def initialize repo, & oes_p
+          @ci_sha_a = []
+          @ci_cache = {}
           @on_event_selectively = oes_p
-          @repo_p = -> { bunch.repo }
+          @repo = repo
+          s = @repo.relative_path_of_interest
+          @normalize_path = if s && s.length.nonzero?
+            -> x { ::File.join s, x }
+          else
+            -> x { x }  # IDENTITY_
+          end
+          freeze
         end
 
-        def begin
-          Begin__.new( self, & @on_event_selectively ).execute
+        attr_reader :ci_cache, :ci_sha_a
+
+        def [] path
+          dup.__execute path
         end
 
-        def to_tree_path
-          @file_relpath
+        protected def __execute path
+
+          path_ = @normalize_path[ path ]
+
+          @trail = []
+          _, o, e, t = @repo.repo_popen_3_( * LOG_BASE_CMD_, path_ )
+          line = o.gets
+          if line
+
+            @normal_received_path = path_
+            @o = o
+
+            ok = __via_output line
+            ok && @trail
+          else
+            i_a, ev_p = Bundle_::Events_.potential_event_for_log(
+              e, t, ::File.join( @repo.path, @normal_received_path ) )
+
+            @on_event_selectively.call( * i_a,  ev_p )
+          end
         end
 
-        # ~ for the children
+        def __via_output line
 
-        attr_reader :file_relpath
-
-        def repo
-          @repo_p[]
+          @curr_path = @normal_received_path
+          ok = true
+          begin
+            line.chomp!
+            ok = __process_SHA line
+            ok or break
+            line = @o.gets
+          end while nil
+          ok
         end
 
-        def build_filediff sha
-          self.class::Filediff__.new sha
-        end
+        def __process_SHA sha
 
-        def add_filediff fd
-          (( @filediff_a ||= [] )) << fd ; nil
-        end
+          ci = __produce_ci sha
+          fc = ci.fetch_filechange_via_end_path @curr_path
 
-        def remove_filediff filediff
-          p = filediff.SHA.hash.method :==
-          idx = @filediff_a.index do |fd|
-            p[ fd.SHA.hash ]
-          end or self._SANITY
-          @filediff_a[ idx, 1 ] = EMPTY_A_
-          SILENT_
-        end
+          if fc.is_rename
+            @curr_path = fc.source_path
+          end
 
-        def finish
-          @repo_p = nil
-          freeze  # or not, whatever
+          @trail.push Bundle_Filechange___.new( fc, ci.SHA )
+
           ACHIEVED_
         end
 
-        def get_any_nonzero_count_filediff_stream
-          @filediff_a and bld_fd_stream
-        end
-      private
-        def bld_fd_stream
-          d = -1 ; last = @filediff_a.length - 1
-          Callback_::Scn.new do
-            d < last and @filediff_a.fetch d += 1
+        def __produce_ci sha
+          @ci_cache.fetch sha do
+            ci = @repo.fetch_commit_via_identifier sha
+            @ci_sha_a.push sha
+            @ci_cache[ sha ] = ci
+            ci
           end
         end
-      public
+      end
 
-        def get_filediff_stream
-          d = last = nil
-          GitViz_.lib_.power_scanner :init, -> do
-            d = -1 ; last = ( @filediff_a ? ( @filediff_a.length - 1 ) : -1 )
-          end, :gets, -> do
-            d < last and @filediff_a.fetch d += 1
-          end
+      class Bundle_Filechange___  # :+#stowaway
+        def initialize fc, _SHA
+          @fc = fc
+          @SHA = _SHA
         end
+        attr_reader :fc, :SHA
       end
     end
   end

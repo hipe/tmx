@@ -22,14 +22,21 @@ module Skylab::GitViz
       def initialize interest_pn, repo_pn, sys_cond, & oes_p
 
         @on_event_selectively = oes_p
+
         @path = repo_pn.to_path
+
+        @pn_ = repo_pn
+
+        @relative_path_of_interest =
+          interest_pn.relative_path_from( repo_pn ).to_path
+
         @system_conduit = sys_cond
 
         # M-etaHell::F-UN.without_warning { GitViz_.lib_.grit }  # see [#016]:#as-for-grit
         # @inner = ::Grit::Repo.new absolute_pn.to_path ; nil
       end
 
-      attr_reader :path
+      attr_reader :pn_, :path, :relative_path_of_interest
 
       def fetch_commit_via_identifier id_s, & oes_p
 
@@ -39,9 +46,13 @@ module Skylab::GitViz
       end
 
       def repo_popen_3_ * s_a
-        ::Hash.try_convert( s_a.last ) and raise ::ArgumentError
+
         s_a.unshift GIT_EXE_
-        s_a.push chdir: @path
+
+        if ! ::Hash.try_convert( s_a.last )
+          s_a.push chdir: @path
+        end
+
         @system_conduit.popen3( * s_a )
       end
 

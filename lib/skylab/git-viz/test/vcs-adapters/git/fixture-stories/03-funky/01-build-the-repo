@@ -89,4 +89,14 @@ git commit -m "this is the third commit" >> out.log
 git mv "$file3A" "$file3B"
 git commit -m "this is the fourth commit" >> out.log
 
+
+
+
+mkdir -p "these-dirs/not-tracked"
+
+
+
+
 echo 'done.'
+
+exit 0

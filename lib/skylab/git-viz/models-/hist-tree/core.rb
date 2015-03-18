@@ -59,8 +59,9 @@ module Skylab::GitViz
         :required, :property, :path
 
       def produce_result
-        _ok = __resolve_VCS_adapter
-        _ok && __via_VCS_adapter
+        ok = __resolve_VCS_adapter
+        ok &&= __via_VCS_adapter_resolve_repo
+        ok && __via_repo_produce_mutable_bundle
       end
 
       def __resolve_VCS_adapter
@@ -80,7 +81,7 @@ module Skylab::GitViz
         end
       end
 
-      def __via_VCS_adapter
+      def __via_VCS_adapter_resolve_repo
 
         pn = @argument_box.fetch :path
 
@@ -88,38 +89,18 @@ module Skylab::GitViz
           pn = ::Pathname.new pn
         end
 
-        Actors__::Build_tree[ pn, @VCS_adapter, & handle_event_selectively ]
-      end
-    end
+        @pathname = pn
 
-    Actors__ = ::Module.new
-
-    class Actors__::Build_tree
-
-      Callback_::Actor.call self, :properties,
-
-        :pathname, :VCS_adapter
-
-      def execute
-        ok = __resolve_repo
-        ok &&= __via_repo_resolve_bunch
-        ok && __flush
-      end
-
-      def __resolve_repo
-        @repo = @VCS_adapter.new_repository_via_pathname @pathname
+        @repo = @VCS_adapter.new_repository_via_pathname pn
         @repo && ACHIEVED_
       end
 
-      def __via_repo_resolve_bunch
-        @bunch = @repo.build_hist_tree_bunch
-        @bunch && ACHIEVED_
-      end
+      def __via_repo_produce_mutable_bundle
 
-      def __flush
+        _short_path = @pathname.relative_path_from( @repo.pn_ ).to_path
 
-        GitViz_.lib_.tree.from(
-          :node_identifiers, @bunch.immutable_trail_array )
+        @VCS_adapter.models::Bundle.build_via_path_and_repo(
+          _short_path, @repo, & @on_event_selectively )
       end
     end
   end

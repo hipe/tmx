@@ -16,8 +16,14 @@ module Skylab::Headless
 
             def path=
               @do_execute = true
-              @path_arg = Headless_.lib_.basic.
-                trio.via_x_and_i iambic_property, :path
+              @path_arg = Callback_::Trio.via_x_and_i iambic_property, :path
+              ACHIEVED_
+            end
+
+            def pathname=
+              @do_execute = true
+              @path_arg = Callback_::Trio.via_x_and_i iambic_property, :path
+              @value_is_pathname = true
               ACHIEVED_
             end
 
@@ -45,6 +51,7 @@ module Skylab::Headless
             @instream = nil
             @only_apply_ftype_expectation = false
             @path_arg_was_explicit = false
+            @value_is_pathname = false
             instance_exec( & edit_p )
             @as_normal_value ||= IDENTITY_
           end
@@ -139,8 +146,16 @@ module Skylab::Headless
           end
 
           def when_actual_path
-            @path = @path_arg.value_x
-            path_exists_and_set_stat_and_stat_error @path
+
+            if @value_is_pathname
+              pn = @path_arg.value_x
+              pathname_exists_and_set_stat_and_stat_error pn
+              @path = pn.to_path
+            else
+              @path = @path_arg.value_x
+              path_exists_and_set_stat_and_stat_error @path
+            end
+
             if @stat
               via_stat_execute
             else

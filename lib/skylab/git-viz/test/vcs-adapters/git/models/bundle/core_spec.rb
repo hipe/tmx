@@ -2,92 +2,81 @@ require_relative '../../test-support'
 
 module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
-  describe "[gv] VCS adapters - git - models - bundle - story 01", wip: true do
+  describe "[gv] VCS adapters - git - models - bundle" do
 
     extend TS_
-    use :expect_event
-    use :mock_FS
-    use :mock_system
-    use :story_01
+    use :repository_support
 
-    context "for no-ent path under repo" do
 
-      it "repo builds with this no-ent path" do
-        repo
-      end
+    it "noent - soft error" do
 
-      it "but if you try to get the hist tree node array - x" do
-
-        @result = repo.build_hist_tree_bunch
-        expect_next_system_command_emission_
-        __expect_no_such_file_or_directory_from_system_agent(
-          '/derp/berp/wazoozle/canoodle' )
-        expect_failed
-      end
-
-      def mock_repo_argument_pathname  # local #hook-out
-        mock_pathname '/derp/berp/wazoozle/canoodle'
-      end
-
-      def __expect_no_such_file_or_directory_from_system_agent s
-
-        expect_not_OK_event :cannot_execute_command do | ev |
-          black_and_white( ev ).should eql "No such file or directory - #{ s }"
-        end
-      end
+      _against '/m03/repo/xx/not-there'
+      expect_failed_by :errno_enoent
     end
 
-    context "for path that is file under repo" do
+    it "file - soft error" do
 
-      it "it complains about how the path is a file - x" do
-        @result = repo.build_hist_tree_bunch
-        expect_next_system_command_emission_
-        expect_path_is_file_emission
-        expect_failed
-      end
-
-      def mock_repo_argument_pathname  # local #hook-out
-        mock_pathname '/derp/berp/dirzo/move-after'
-      end
-
-      def expect_path_is_file_emission
-
-        expect_not_OK_event :cannot_execute_command do | ev |
-          black_and_white( ev ).should eql Top_TS_::Messages::PATH_IS_FILE
-        end
-      end
+      _against "/m03/repo/dirzo/it's just/funky like that"
+      expect_failed_by :wrong_ftype
     end
 
-    context "but if that path is a directory under the repo" do
+    it "dir that is not tracked - soft error" do
 
-      it "oh nelly furtado watch out" do
-        @bunch = repo.build_hist_tree_bunch
-        expect_informational_emissions_for_story_01
-        __expect_constituency
+      _against "/m03/repo/these-dirs/not-tracked"
+      expect_failed_by :directory_is_not_tracked
+    end
+
+    it "boogie boogie boogie boogie boogie" do
+
+      _against "/m03/repo/dirzo"
+
+      bnch = @bunch
+      bnch.should be_respond_to :ci_box
+      bnch.trails.length.should eql 3
+      @trail = bnch.trails.fetch 0
+      __expect_trail
+    end
+
+    def __expect_trail
+
+      trl = @trail
+      trl.length.should eql 1  # currently there is no trail that is not 1 in length :(
+
+      bfc = trl.fetch 0
+
+      bfc.SHA.string.should eql 'fafa030300000000000000000000000000000000'
+      bfc.fc.insertion_count.should eql 3
+      bfc.fc.deletion_count.should eql 2
+
+      # we used to check `commitpoint_index`, we do no longer
+
+    end
+
+    def _against abs
+
+      init_respository_via_pathname_ mock_pathname abs
+
+      x = subject_VCS::Models_::Bundle.build_via_path_and_repo(
+
+        @repository.relative_path_of_interest,
+        @repository,
+        & handle_event_selectively )
+
+      if x
+        @bunch = x
+      else
+        @result = x
       end
 
-      def mock_repo_argument_pathname  # local #hook-out
-        mock_pathname '/derp/berp/dirzo'
-      end
+      NIL_
+    end
 
-      def __expect_constituency
-        @trail_a = @bunch.immutable_trail_array
-        @trail_a.length.should eql 3
-        @trail = @trail_a.fetch 0
-        __expect_trail
-      end
+    def manifest_path_for_mock_FS
+      STORY_03_PATHS_
+    end
 
-      def __expect_trail
-        @filediff_a = @trail.get_filediff_stream.to_a
-        @filediff = @filediff_a.shift
-        __expect_filediff
-      end
-
-      def __expect_filediff
-        @filediff.counts.insertion_count.should eql 3
-        @filediff.counts.deletion_count.should eql 2
-        @filediff.commitpoint_index.should eql 2
-      end
+    def manifest_path_for_mock_system
+      STORY_03_COMMANDS_
     end
   end
 end

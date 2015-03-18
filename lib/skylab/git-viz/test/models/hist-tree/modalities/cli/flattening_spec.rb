@@ -1,6 +1,6 @@
 require_relative '../../../test-support'
 
-module Skylab::GitViz::TestSupport::VCS_Adapters::Git
+module Skylab::GitViz::TestSupport::Models
 
   describe "[gv] VCS adapters - git - models - [THIS]", wip: true do
 

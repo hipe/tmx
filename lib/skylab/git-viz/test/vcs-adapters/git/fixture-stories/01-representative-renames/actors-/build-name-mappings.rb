@@ -47,7 +47,8 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
           @SHA_head_via_commit_moniker_h = h_
         end
 
-        attr_reader :commit_moniker_via_SHA_head_h, :SHA_head_via_commit_moniker_h
+        attr_reader :commit_moniker_via_SHA_head_h,
+          :SHA_head_via_commit_moniker_h
 
         def long_mock_SHA_via_normal_ordinal moniker
 

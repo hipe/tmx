@@ -27,8 +27,10 @@ module Skylab::GitViz
 
         def __process_ISO_8601_datetime_line
 
-          _date, _time, _zone =
-            GIT_STYLE_ISO8601_RX___.match( @upstream.gets.chomp! ).captures
+          s = @upstream.gets
+          s.chomp!
+
+          _date, _time, _zone = GIT_STYLE_ISO8601_RX___.match( s ).captures
 
           _s = "#{ _date }T#{ _time }#{ _zone }"  # [#009]:#storypoint-36 git might have an issue
 

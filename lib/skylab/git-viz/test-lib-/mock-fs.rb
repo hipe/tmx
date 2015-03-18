@@ -239,6 +239,12 @@ module Skylab::GitViz
           _FS.is_path_s_directory @path
         end
 
+        # ~ in-universe #hook-in's
+
+        def description  # for :+[#cb-010]
+          "«mock pathname: #{ @path }»"  # :+#guillemets
+        end
+
       private  # ~ :#ultra-private implementation methods used in > 1 place
 
         def inst_from_unsanitized x

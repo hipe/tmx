@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+# ~ begin boilerplate (variation 2)
+
+dir=$( dirname $0 )
+
+if [[ ! -e "$dir/00-readme.md" ]] ; then
+  echo "something went wrong - was unable to find self"
+  exit 5
+fi
+
+cd "$dir"
+
+# ~ end
+
+for s in 01-build-the-repo 02-build-the-manifest 03-normalize-the-manifest 04-cleanup  ; do
+
+  "./$s"
+
+  d=$?
+
+  if [ $d -ne 0 ] ; then
+    echo "failed (exitstatus $d)"
+    exit $d
+  else
+    echo "$s OK"
+  fi
+done
+
+exit 0

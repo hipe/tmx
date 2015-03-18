@@ -2,60 +2,45 @@ module Skylab::GitViz
 
   module VCS_Adapters_::Git
 
-    class Repo_::Hist_Tree__
+    class Models_::Bundle
 
-      class Bunch__::Begin__
+      class << self
 
-        Callback_::Actor.call self, :properties, :bunch
+        def build_via_path_and_repo path, repo, & oes_p
 
-        def execute
-          @st = self.class::Get_ls_files_scanner__[ @bunch, & @on_event_selectively ]
-          @st && __via_upstream_lines_etc
+          Actors_::Build[ path, repo, & ( oes_p || repo.handle_event_selectively ) ]
         end
 
-        def __via_upstream_lines_etc
+        def log_command_
 
-          line = @st.gets or self._SANITY
-          trail_a = nil
-
-          begin
-            trail = @bunch.begin_trail line, & @on_event_selectively
-            if trail
-              trail_a ||= []
-              trail_a.push trail
-            end
-            line = @st.gets
-            line ? redo : break
-          end while nil
-
-          trail_a
+          LOG_CMD___
         end
+
+        def ls_files_command_
+
+          LS_FILES_CMD___
+        end
+      end  # >>
+
+      def initialize list_of_trails, ci_box
+        @ci_box = ci_box
+        @trails = list_of_trails
       end
 
-      class Bunch__::Begin__
+      attr_reader :ci_box, :trails
 
-        class Get_ls_files_scanner__ < Git::System_Agent_
+      Autoloader_[ Actors_ = ::Module.new ]
 
-          class << self
-            def [] bunch, & oes_p
-              new( bunch, & oes_p ).execute
-            end
-          end  # >>
+      Bundle_ = self
 
-          def initialize bunch, & oes_p
-            repo = bunch.repo
-            super oes_p do | sa |
-              sa.set_cmd_s_a [ GIT_EXE_, 'ls-files', '--', '.' ]
-              sa.set_chdir_pathname repo.get_focus_dir_absolute_pn
-              sa.set_system_conduit repo.system_conduit
-            end
-          end
+      LOG_BASE_CMD_ = %w( log --find-renames --follow --pretty=format:%H -- ).freeze
 
-          def execute
-            get_any_nonzero_count_output_line_stream_from_cmd
-          end
-        end
-      end
+      LOG_CMD___ = [ GIT_EXE_, * LOG_BASE_CMD_ ].freeze
+
+      LS_FILES_BASE_CMD_ = %w( ls-files -- . ).freeze
+
+      LS_FILES_CMD___ = [ GIT_EXE_, * LS_FILES_BASE_CMD_ ].freeze
+
     end
   end
 end
