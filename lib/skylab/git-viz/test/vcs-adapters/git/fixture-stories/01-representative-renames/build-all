@@ -3,9 +3,10 @@
 # ~ begin boilerplate 2
 
 dir=$( dirname $0 )
+me="$dir/00-readme.md"
 
-if [[ ! -e "$dir/00-readme.md" ]] ; then
-  echo "something went wrong - was unable to find self"
+if [[ ! -e "$me" ]] ; then
+  echo "something went wrong - was unable to find: $me"
   exit 5
 fi
 

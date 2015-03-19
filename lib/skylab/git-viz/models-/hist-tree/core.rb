@@ -35,7 +35,7 @@ module Skylab::GitViz
     end
   end
 
-  class Models_::HistTree  # (not used as class YET)
+  class Models_::HistTree
 
     class << self
 
@@ -43,6 +43,16 @@ module Skylab::GitViz
         true
       end
     end  # >>
+
+    def initialize x, repo
+
+      # note this can be pure business IFF every action is promoted
+
+      @repo = repo
+      @VCS_bundle = x
+    end
+
+    attr_reader :VCS_bundle
 
     Actions = ::Module.new
 
@@ -61,7 +71,8 @@ module Skylab::GitViz
       def produce_result
         ok = __resolve_VCS_adapter
         ok &&= __via_VCS_adapter_resolve_repo
-        ok && __via_repo_produce_mutable_bundle
+        ok &&= __via_repo_resolve_mutable_VCS_bundle
+        ok and Hist_Tree_.new @mutable_VCS_bundle, @repo
       end
 
       def __resolve_VCS_adapter
@@ -95,13 +106,17 @@ module Skylab::GitViz
         @repo && ACHIEVED_
       end
 
-      def __via_repo_produce_mutable_bundle
+      def __via_repo_resolve_mutable_VCS_bundle
 
         _short_path = @pathname.relative_path_from( @repo.pn_ ).to_path
 
-        @VCS_adapter.models::Bundle.build_via_path_and_repo(
+        @mutable_VCS_bundle = @VCS_adapter.models::Bundle.build_via_path_and_repo(
           _short_path, @repo, & @on_event_selectively )
+
+        @mutable_VCS_bundle && ACHIEVED_
       end
     end
+
+    Hist_Tree_ = self
   end
 end

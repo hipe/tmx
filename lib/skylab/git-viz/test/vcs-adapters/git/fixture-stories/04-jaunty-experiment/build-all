@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# ~ begin boilerplate 2
+# ~ begin boilerplate (variation 2)
 
 dir=$( dirname $0 )
 
@@ -11,6 +11,8 @@ fi
 
 cd "$dir"
 
+# ~ end
+
 for s in 01-build-the-repo 02-build-the-manifest 03-normalize-the-manifest 04-cleanup  ; do
 
   "./$s"
@@ -18,7 +20,7 @@ for s in 01-build-the-repo 02-build-the-manifest 03-normalize-the-manifest 04-cl
   d=$?
 
   if [ $d -ne 0 ] ; then
-    echo "$s failed (exitstatus $d)"
+    echo "failed (exitstatus $d)"
     exit $d
   else
     echo "$s OK"
@@ -26,5 +28,3 @@ for s in 01-build-the-repo 02-build-the-manifest 03-normalize-the-manifest 04-cl
 done
 
 exit 0
-
-# ~ end

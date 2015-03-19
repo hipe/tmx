@@ -19,7 +19,7 @@
 [#023]       #parent-node:[#014] the mock system narrative ..
 [#022]       #done heartbeat and shutdown timer
 [#021]       #DONE #experimental is it practical to "#rainbow-kick" the server?
-[#020]       #done just for the lols different rubies talk on the same system
+             #done just for the lols different rubies talk on the same system
 [#019] #open filenames with special characters in them
              ( #was: #done fixture server is a long running process, doesn't need to
              re-parse the whole manifest file for each request (read [#018]) )
@@ -36,7 +36,8 @@
 [#008]       #parent-node:[#005] the VCS adapter agent narrative ..
 [#007]       the mock-sys narrative ..
              ( #was: #parent-node:[#005] the CLI action narrative .. )
-[#006]       #parent-node:[#005] the CLI client narrative ..
+[#006]       the flattening experiment ..
+             ( #was: #parent-node:[#005] the CLI client narrative .. )
 [#005]       #doc-node the application narrative ..
 [#004] #open mock-FS with paths not pathnames
              ( #was: #parent-node:[#005] the infrastructure narrative .. )

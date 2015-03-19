@@ -1,0 +1,168 @@
+command
+  argv
+    git, ls-files, --, .
+  chdir /m04/repo
+  stdout_string
+    "file1
+    file2
+    file3
+    "
+  stderr_string ""
+  exitstatus 0
+command
+  argv
+    git, log, --find-renames, --follow, --pretty=format:%H, --, file1
+  chdir /m04/repo
+  stdout_string
+    "fafa005000000000000000000000000000000000
+    fafa003000000000000000000000000000000000
+    fafa002000000000000000000000000000000000    "
+  stderr_string ""
+  exitstatus 0
+command
+  argv
+    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa005000000000000000000000000000000000, --
+  chdir /m04/repo
+  stdout_string
+    "fafa005000000000000000000000000000000000
+    1999-01-05 13:11:13 +0000
+    
+    1	1	file1
+    1	1	file2
+    "
+  stderr_string ""
+  exitstatus 0
+command
+  argv
+    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa003000000000000000000000000000000000, --
+  chdir /m04/repo
+  stdout_string
+    "fafa003000000000000000000000000000000000
+    1999-01-03 13:09:11 +0000
+    
+    1	1	file1
+    "
+  stderr_string ""
+  exitstatus 0
+command
+  argv
+    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa002000000000000000000000000000000000, --
+  chdir /m04/repo
+  stdout_string
+    "fafa002000000000000000000000000000000000
+    1999-01-02 13:08:10 +0000
+    
+    1	0	file1
+    1	0	file2
+    "
+  stderr_string ""
+  exitstatus 0
+command
+  argv
+    git, log, --find-renames, --follow, --pretty=format:%H, --, file2
+  chdir /m04/repo
+  stdout_string
+    "fafa005000000000000000000000000000000000
+    fafa004000000000000000000000000000000000
+    fafa002000000000000000000000000000000000    "
+  stderr_string ""
+  exitstatus 0
+command
+  argv
+    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa005000000000000000000000000000000000, --
+  chdir /m04/repo
+  stdout_string
+    "fafa005000000000000000000000000000000000
+    1999-01-05 13:11:13 +0000
+    
+    1	1	file1
+    1	1	file2
+    "
+  stderr_string ""
+  exitstatus 0
+command
+  argv
+    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa004000000000000000000000000000000000, --
+  chdir /m04/repo
+  stdout_string
+    "fafa004000000000000000000000000000000000
+    1999-01-04 13:10:12 +0000
+    
+    1	1	file2
+    1	1	file3
+    "
+  stderr_string ""
+  exitstatus 0
+command
+  argv
+    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa002000000000000000000000000000000000, --
+  chdir /m04/repo
+  stdout_string
+    "fafa002000000000000000000000000000000000
+    1999-01-02 13:08:10 +0000
+    
+    1	0	file1
+    1	0	file2
+    "
+  stderr_string ""
+  exitstatus 0
+command
+  argv
+    git, log, --find-renames, --follow, --pretty=format:%H, --, file3
+  chdir /m04/repo
+  stdout_string
+    "fafa004000000000000000000000000000000000
+    fafa001000000000000000000000000000000000    "
+  stderr_string ""
+  exitstatus 0
+command
+  argv
+    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa004000000000000000000000000000000000, --
+  chdir /m04/repo
+  stdout_string
+    "fafa004000000000000000000000000000000000
+    1999-01-04 13:10:12 +0000
+    
+    1	1	file2
+    1	1	file3
+    "
+  stderr_string ""
+  exitstatus 0
+command
+  argv
+    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa001000000000000000000000000000000000, --
+  chdir /m04/repo
+  stdout_string
+    "fafa001000000000000000000000000000000000
+    1999-01-01 13:07:09 +0000
+    
+    1	0	file3
+    "
+  stderr_string ""
+  exitstatus 0
+command
+  argv
+    git, cherry, fafa005, fafa004
+  chdir /m04/repo
+  stdout_string ""
+  stderr_string ""
+  exitstatus 0
+command
+  argv
+    git, cherry, fafa002, fafa001
+  chdir /m04/repo
+  stdout_string ""
+  stderr_string ""
+  exitstatus 0
+command
+  argv
+    git, log, --pretty=tformat:%H, fafa001..fafa005, --
+  chdir /m04/repo
+  stdout_string
+    "fafa005000000000000000000000000000000000
+    fafa004000000000000000000000000000000000
+    fafa003000000000000000000000000000000000
+    fafa002000000000000000000000000000000000
+    "
+  stderr_string ""
+  exitstatus 0

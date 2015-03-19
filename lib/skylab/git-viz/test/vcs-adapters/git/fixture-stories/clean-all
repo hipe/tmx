@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+dir=$( dirname $0 )
+me="$dir/clean-all"
+
+if [[ ! -e "$me" ]] ; then
+  echo "something went wrong - unable to find: $me"
+  exit 5
+fi
+
+cd "$dir"
+
+for entry in $( ls ) ; do
+
+  if [[ ! -d "$entry" ]] ; then
+    continue
+  fi
+
+  file="$entry/04-cleanup"
+
+  if [[ ! -x "$file" ]] ;  then
+    continue
+  fi
+
+  echo "(executing: $file)"
+
+  "$file"
+
+  d=$?
+
+  if [[ $d -ne 0 ]] ; then
+    echo "$file failed (exitstatus $d)"
+    exit $d
+  fi
+
+done

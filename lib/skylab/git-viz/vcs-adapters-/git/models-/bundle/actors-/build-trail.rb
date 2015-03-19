@@ -12,11 +12,13 @@ module Skylab::GitViz
           @on_event_selectively = oes_p
           @repo = repo
           s = @repo.relative_path_of_interest
-          @normalize_path = if s && s.length.nonzero?
+
+          @normalize_path = if s && s.length.nonzero? && DOT_ != s
             -> x { ::File.join s, x }
           else
             -> x { x }  # IDENTITY_
           end
+
           freeze
         end
 
@@ -53,17 +55,23 @@ module Skylab::GitViz
           @curr_path = @normal_received_path
           ok = true
           begin
-            line.chomp!
+            line.strip!
             ok = __process_SHA line
             ok or break
             line = @o.gets
+            line or break
+            redo
           end while nil
+          if ok
+            @trail.reverse!  # the commits came to use most recent to oldest
+          end
           ok
         end
 
         def __process_SHA sha
 
           ci = __produce_ci sha
+
           fc = ci.fetch_filechange_via_end_path @curr_path
 
           if fc.is_rename

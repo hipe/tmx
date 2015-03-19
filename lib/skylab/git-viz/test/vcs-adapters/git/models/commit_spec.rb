@@ -27,7 +27,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
       debug!
 
-      _against_string 'fafa0303'
+      _against_string 'fafa003'
 
       expect_next_system_command_emission_
       expect_no_more_events

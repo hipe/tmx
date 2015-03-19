@@ -5,9 +5,7 @@ module Skylab::GitViz::TestSupport::Models
   describe "[gv] models - hist-tree" do
 
     extend TS_
-    use :expect_event
-    use :mock_FS
-    use :mock_system
+    use :hist_tree_model_support
 
     it "absolute path no ent (mocked) - x" do
 
@@ -42,36 +40,21 @@ module Skylab::GitViz::TestSupport::Models
 
     it "path is valid (mock) - o" do
 
-      __using_mock_sys_conduit_call_API_against_path '/m03/repo/dirzo'
+      call_API_for_hist_tree_against_path_ '/m03/repo/dirzo'
       __expect_bundle
     end
 
-    def __using_mock_sys_conduit_call_API_against_path path
-
-      call_API(
-        * _common_x_a,
-        :path, mock_pathname( path ),
-        :system_conduit, mock_system_conduit )
-    end
-
-    define_method :_common_x_a, -> do
-      a = [ :hist_tree, :VCS_adapter_name, :git ].freeze
-      -> do
-        a
-      end
-    end.call
-
     def __expect_bundle
 
-      bndl = @result
+      _mbndl = @result
 
-      bndl.trails.length.should eql 3
+      _mbndl.VCS_bundle.trails.length.should eql 3
       # see tombstone below
     end
 
     def _call_API_against_path path
 
-      call_API( * _common_x_a,
+      call_API( * hist_tree_head_iambic_,
         :system_conduit, :_s_c_,
         :path, mock_pathname( path ) )
     end

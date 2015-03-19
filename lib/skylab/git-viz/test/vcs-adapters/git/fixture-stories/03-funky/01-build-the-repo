@@ -49,9 +49,9 @@ git commit -m "this is the first commit" > out.log
 
 file2="dirzo/everybody in the room is floating"
 
-echo "a
-b
-c" > "$file2"
+echo "m
+n
+o" > "$file2"
 
 git add "$file2"
 git commit -m "this is the second commit" >> out.log
@@ -68,10 +68,10 @@ cat > "$file1" <<HERE
 HERE
 
 cat > "$file2" <<HERE
-A
-b
-C
-D
+M
+n
+O
+p
 HERE
 
 file3A=dirzo/move-before

@@ -29,9 +29,15 @@ module Skylab::GitViz
 
       attr_reader :ci_box, :trails
 
+      def build_matrix_via_repository repo
+        Actors_::Build_matrix.new( self, repo ).execute
+      end
+
       Autoloader_[ Actors_ = ::Module.new ]
 
       Bundle_ = self
+
+      GIT_EXE = GIT_EXE_
 
       LOG_BASE_CMD_ = %w( log --find-renames --follow --pretty=format:%H -- ).freeze
 

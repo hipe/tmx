@@ -74,6 +74,7 @@ module Skylab::GitViz
   Callback_Tree_ = Callback_::Tree
   CONTINUE_ = nil
   DASH_ = '-'.freeze
+  DOT_ = '.'.freeze
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze

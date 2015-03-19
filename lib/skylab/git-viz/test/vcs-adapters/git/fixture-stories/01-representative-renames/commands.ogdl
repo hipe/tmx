@@ -3,7 +3,7 @@ command
     git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, head, --
   chdir /the/repo
   stdout_string
-    "fafa020200000000000000000000000000000000
+    "fafa002000000000000000000000000000000000
     1999-01-02 13:08:10 +0000
     
     0	0	lvl-1/{lvl-2 => lvl-2-B}/same-name-again.txt

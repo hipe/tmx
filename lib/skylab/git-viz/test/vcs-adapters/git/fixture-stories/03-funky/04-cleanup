@@ -19,8 +19,8 @@ if [[ -d tmp ]] ; then
 
 else
 
-  echo "no temporary directory found, nothing to do for cleanup."
-  exit 72  # /usr/include/sysexits.h
+  echo "(no temporary directory found, nothing to do for cleanup.)"
+  exit 0
 
 fi
 

@@ -31,33 +31,52 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
       def __normalize__log__command
 
-        a = []
-        nm = @name_mappings
-        st = GitViz_.lib_.basic::String.line_stream @cmd.stdout_string
-        begin
+        send "__normalize_git_log_command_for_argv_length__#{ @cmd.argv.length }__"
+      end
 
-          line = st.gets
-          line or break
+      def __normalize_git_log_command_for_argv_length__5__  # ICK
 
-          sha, rest = SHA_AND_REST_RX___.match( line ).captures
+        a = @cmd.argv
+        src, dst = RANGE_RX___.match( a.fetch 3 ).captures
+        a[ 3 ] = "#{ _convert_short src }..#{ _convert_short dst }"
 
-          _moni = nm.commit_moniker_via_SHA_head_h.fetch(
-            sha[ 0, SHORT_SHA_LENGTH__ ] )
-
-          _sha_ = nm.long_mock_SHA_via_normal_ordinal _moni
-          a.push "#{ _sha_ }#{ rest }"
-          redo
-        end while nil
-
-        @cmd.stdout_string.replace a.join EMPTY_S_
+        _mutate_string_by_converting_each_line_content @cmd.stdout_string do | line |
+          _convert_long line
+        end
 
         _do_the_chdir_line
         NIL_
       end
 
+      short_sha = '[0-9a-z]{7}'
+
       sha = '[0-9a-z]{38,42}'  #todo
 
-      SHA_AND_REST_RX___ = /(\A#{ sha })(.+)?\z/m
+      RANGE_RX___ = /\A(#{ short_sha })\.\.(#{ short_sha })\z/
+
+      def __normalize_git_log_command_for_argv_length__7__  # ICK
+
+        _mutate_string_by_converting_each_line_content @cmd.stdout_string do | line |
+          _convert_long line
+        end
+
+        _do_the_chdir_line
+        NIL_
+      end
+
+      def __normalize__cherry__command
+
+        a = @cmd.argv
+        a[ -1 ] = _convert_short a[ -1 ]
+        a[ -2 ] = _convert_short a[ -2 ]
+
+        if @cmd.stdout_string.length.nonzero?
+          require 'byebug' ; byebug ; $stderr.puts( "FML" ) && nil
+        end
+
+        _do_the_chdir_line
+        NIL_
+      end
 
       def __normalize__show__command
 
@@ -78,7 +97,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
           if 37 < sha_x.length
 
-            _moniker = nm.commit_moniker_via_SHA_head_h.fetch sha_x[ 0, SHORT_SHA_LENGTH__ ]
+            _moniker = nm.commit_moniker_via_SHA_head_h.fetch sha_x[ 0, SHORT_SHA_LENGTH_ ]
             use_SHA = nm.long_mock_SHA_via_normal_ordinal _moniker
           else
 
@@ -92,7 +111,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
         NIL_
       end
 
-      SHA_LIKE_RX___ = /\A[0-9a-z]+\z/
+      SHA_LIKE_RX___ = /\A[0-9a-f]+\z/
 
       def __do_the_SHA_line
 
@@ -102,7 +121,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
         @cmd.stdout_string.sub! SHA_LIKE_FIRST_LINE_RX__ do
 
           @moniker = nm.commit_moniker_via_SHA_head_h.fetch(
-            $~[ 0 ][ 0, SHORT_SHA_LENGTH__ ] )
+            $~[ 0 ][ 0, SHORT_SHA_LENGTH_ ] )
 
           "#{ nm.long_mock_SHA_via_normal_ordinal @moniker }\n"
         end
@@ -110,8 +129,6 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
       end
 
       SHA_LIKE_FIRST_LINE_RX__ = /\A#{ sha }\n(#{ sha }[[:space:]]$)?/  # #todo
-
-      SHORT_SHA_LENGTH__ = 7
 
       def __do_the_datetime_line
 
@@ -149,6 +166,46 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
           s.replace ::File.join @main_mock_repo_path, s[ s_.length .. -1 ]
         end
         NIL_
+      end
+
+      def _mutate_string_by_converting_each_line_content screen
+
+        st = GitViz_.lib_.basic::String.line_stream screen
+
+        a = []
+        begin
+          line = st.gets
+          line or break
+          content, terminator = CONTENT_AND_TERMINATOR_RX___.match( line ).captures
+
+          content.replace yield content
+
+          a.push "#{ content }#{ terminator }"
+          redo
+        end while nil
+
+        screen.replace a.join EMPTY_S_
+
+        NIL_
+      end
+
+      CONTENT_AND_TERMINATOR_RX___ = /\A(|.*[^\r\n])(\r?\n)?\z/
+
+      def _convert_long long_SHA
+
+        @name_mappings.long_mock_SHA_via_normal_ordinal(
+          _moniker_via_short long_SHA[ 0, SHORT_SHA_LENGTH_ ] )
+      end
+
+      def _convert_short short_SHA
+
+        @name_mappings.short_mock_SHA_via_normal_ordinal(
+          _moniker_via_short short_SHA )
+      end
+
+      def _moniker_via_short short_SHA
+
+        @name_mappings.commit_moniker_via_SHA_head_h.fetch short_SHA
       end
     end
   end

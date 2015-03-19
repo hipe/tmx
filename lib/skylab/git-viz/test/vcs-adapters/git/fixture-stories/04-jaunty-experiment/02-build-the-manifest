@@ -1,0 +1,56 @@
+#!/usr/bin/env ruby -w
+
+dir = File.expand_path( '..', __FILE__ )
+
+load File.join( File.dirname( dir ),
+  '01-representative-renames/02-build-the-manifest' )
+
+_ok = Skylab::GitViz::TestSupport::VCS_Adapters::Git::Story_01::Build_the_manifest.new(
+
+  $stdin, $stdout, $stderr, $PROGRAM_NAME, ARGV, __FILE__ ).session do | sto |
+
+  _, o, _e, t = sto.popen3_ls_files_of '.'
+
+  t.value.exitstatus.zero? or fail
+
+  begin
+    line = o.gets
+    line or break
+    line.chomp!
+
+    _, o_, _e, t = sto.popen3_log_of line
+
+    t.value.exitstatus.zero? or fail
+
+    begin
+      line = o_.gets
+      line or break
+      line.strip!
+
+      _, _o, _e, t = sto.popen3_show line
+
+      t.value.exitstatus.zero? or fail
+      redo
+    end while nil
+    redo
+  end while nil
+
+  sto.init_name_mappings
+  a = sto.name_mappings.SHA_head_order
+
+  _, _o, _e, t = sto.popen3_cherry a.fetch( 4 ), a.fetch( 3 )
+
+  t.value.exitstatus.zero? or fail
+
+  _, _o, _e, t = sto.popen3_cherry a.fetch( 1 ), a.fetch( 0 )
+
+  t.value.exitstatus.zero? or fail
+
+  _, _, _, t = sto.repo_popen_3_ 'log', '--pretty=tformat:%H',
+    "#{ a[ 0 ] }..#{ a[ 4 ] }", '--'
+
+  t.value.exitstatus.zero? or fail
+
+end
+
+exit( _ok ? 0 : 5 )

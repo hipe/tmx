@@ -10,6 +10,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
         fh = ::File.open ::File.join( @tmpdir, 'out.log' ), ::File::RDONLY
         normal_moniker_via_SHA_head = {}
+        order = []
         begin
           line = fh.gets
           line or break
@@ -18,12 +19,13 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
           _normal = THIS_IS_ETC_RX___.match( commit_msg )[ 1 ]
 
+          order.push sha_head
           normal_moniker_via_SHA_head[ sha_head ] = _normal
 
           redo
         end while nil
 
-        Name_Mappings___.new normal_moniker_via_SHA_head
+        Name_Mappings___.new order, normal_moniker_via_SHA_head
       end
 
       OPEN_SQUARE_BRACKET_BYTE___ = '['.getbyte 0
@@ -39,15 +41,18 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
       class Name_Mappings___
 
-        def initialize h
+        def initialize a, h
 
           @commit_moniker_via_SHA_head_h = h
           h_ = h.invert
           h_.length < h.length and self._HASH_COLLISION  # improbable
           @SHA_head_via_commit_moniker_h = h_
+
+          @SHA_head_order = a
         end
 
         attr_reader :commit_moniker_via_SHA_head_h,
+          :SHA_head_order,
           :SHA_head_via_commit_moniker_h
 
         def long_mock_SHA_via_normal_ordinal moniker
@@ -55,16 +60,16 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
           "#{ short_mock_SHA_via_normal_ordinal moniker }#{ ZEROS___ }"
         end
 
-        ZEROS___ = '0' * 32
+        ZEROS___ = '0' * 33  # 40 - SHORT_SHA_LENGTH_
 
         def short_mock_SHA_via_normal_ordinal moniker
 
           d = integer_via_normal_ordinal moniker
 
-          "fafa#{ FMT__ % [ d, d ] }"
+          "fafa#{ FMT___ % d }"
         end
 
-        FMT__ = "%02d%02d"
+        FMT___ = "%03d"
 
         def integer_via_normal_ordinal moniker
           ORD___.fetch moniker
@@ -74,7 +79,8 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
           'first' => 1,
           'second' => 2,
           'third' => 3,
-          'fourth' => 4
+          'fourth' => 4,
+          'fifth' => 5
         }
       end
     end

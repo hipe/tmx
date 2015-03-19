@@ -49,6 +49,8 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
         NIL_
       end
 
+      attr_reader :name_mappings
+
       def work
         execute_show_command
         NIL_
@@ -77,7 +79,11 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
       def popen3_ls_files_of relpath
 
-        _abs = ::File.join @tmpdir, relpath
+        _abs = if DOT_ == relpath
+          @tmpdir
+        else
+          ::File.join @tmpdir, relpath
+        end
 
         @sess.popen3( * models::Bundle.ls_files_command_, chdir: _abs )
       end
@@ -85,6 +91,21 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
       def popen3_log_of relpath
 
         @sess.popen3( * models::Bundle.log_command_, relpath, chdir: @repo_path )
+      end
+
+      def popen3_cherry short_SHA, short_SHA_
+
+        @sess.popen3 models::Bundle::GIT_EXE, 'cherry',
+          short_SHA, short_SHA_, chdir: @repo_path
+      end
+
+      def repo_popen_3_ * a
+
+        if ! ::Hash.try_convert a.last
+          a.push chdir: @repo_path
+        end
+
+        @sess.popen3 models::Bundle::GIT_EXE, * a
       end
 
       def models

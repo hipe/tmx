@@ -1,0 +1,69 @@
+#!/usr/bin/env zsh
+
+# ~ begin boilerplate
+
+dir=$( dirname $0 )
+
+if [[ ! -e "$dir/00-readme.md" ]] ; then
+  echo "something went wrong - was unable to find self"
+  exit 5
+fi
+
+cd "$dir"
+
+if [[ -d tmp ]] ; then
+
+  rm -rf tmp
+
+fi
+
+mkdir tmp
+
+cd tmp
+
+git init .
+
+# ~ end
+
+
+echo 'a' > file3
+
+git add file3
+
+git ci -m 'this is the first commit' > out.log
+
+
+
+echo 'b' > file1
+echo 'c' > file2
+
+git add file1 file2
+
+git ci -m 'this is the second commit' >> out.log
+
+
+
+echo 'd' > file1
+
+git ci -am 'this is the third commit' >> out.log
+
+
+
+
+echo 'e' > file2
+echo 'f' > file3
+
+git ci -am 'this is the fourth commit' >> out.log
+
+
+
+echo 'g' > file1
+echo 'h' > file2
+
+git ci -am 'this is the fifth commit' >> out.log
+
+
+
+echo 'done.'
+
+exit 0

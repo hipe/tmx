@@ -9,10 +9,10 @@ command
   exitstatus 128
 command
   argv
-    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa0303, --
+    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa003, --
   chdir /m03/repo
   stdout_string
-    "fafa030300000000000000000000000000000000
+    "fafa003000000000000000000000000000000000
     1999-01-03 13:09:11 +0000
     
     3	2	dirzo/everybody in the room is floating
@@ -44,17 +44,16 @@ command
     git, log, --find-renames, --follow, --pretty=format:%H, --, "dirzo/everybody in the room is floating"
   chdir /m03/repo
   stdout_string
-    "fafa030300000000000000000000000000000000
-    fafa020200000000000000000000000000000000
-    fafa010100000000000000000000000000000000        "
+    "fafa003000000000000000000000000000000000
+    fafa002000000000000000000000000000000000    "
   stderr_string ""
   exitstatus 0
 command
   argv
-    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa030300000000000000000000000000000000, --
+    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa003000000000000000000000000000000000, --
   chdir /m03/repo
   stdout_string
-    "fafa030300000000000000000000000000000000
+    "fafa003000000000000000000000000000000000
     1999-01-03 13:09:11 +0000
     
     3	2	dirzo/everybody in the room is floating
@@ -65,10 +64,10 @@ command
   exitstatus 0
 command
   argv
-    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa020200000000000000000000000000000000, --
+    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa002000000000000000000000000000000000, --
   chdir /m03/repo
   stdout_string
-    "fafa020200000000000000000000000000000000
+    "fafa002000000000000000000000000000000000
     1999-01-02 13:08:10 +0000
     
     3	0	dirzo/everybody in the room is floating
@@ -77,31 +76,19 @@ command
   exitstatus 0
 command
   argv
-    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa010100000000000000000000000000000000, --
-  chdir /m03/repo
-  stdout_string
-    "fafa010100000000000000000000000000000000
-    1999-01-01 13:07:09 +0000
-    
-    5	0	dirzo/it's just/funky like that
-    "
-  stderr_string ""
-  exitstatus 0
-command
-  argv
     git, log, --find-renames, --follow, --pretty=format:%H, --, "dirzo/it's just/funky like that"
   chdir /m03/repo
   stdout_string
-    "fafa030300000000000000000000000000000000
-    fafa010100000000000000000000000000000000        "
+    "fafa003000000000000000000000000000000000
+    fafa001000000000000000000000000000000000    "
   stderr_string ""
   exitstatus 0
 command
   argv
-    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa030300000000000000000000000000000000, --
+    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa003000000000000000000000000000000000, --
   chdir /m03/repo
   stdout_string
-    "fafa030300000000000000000000000000000000
+    "fafa003000000000000000000000000000000000
     1999-01-03 13:09:11 +0000
     
     3	2	dirzo/everybody in the room is floating
@@ -112,10 +99,10 @@ command
   exitstatus 0
 command
   argv
-    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa010100000000000000000000000000000000, --
+    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa001000000000000000000000000000000000, --
   chdir /m03/repo
   stdout_string
-    "fafa010100000000000000000000000000000000
+    "fafa001000000000000000000000000000000000
     1999-01-01 13:07:09 +0000
     
     5	0	dirzo/it's just/funky like that
@@ -127,16 +114,16 @@ command
     git, log, --find-renames, --follow, --pretty=format:%H, --, dirzo/move-after
   chdir /m03/repo
   stdout_string
-    "fafa040400000000000000000000000000000000
-    fafa030300000000000000000000000000000000        "
+    "fafa004000000000000000000000000000000000
+    fafa003000000000000000000000000000000000    "
   stderr_string ""
   exitstatus 0
 command
   argv
-    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa040400000000000000000000000000000000, --
+    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa004000000000000000000000000000000000, --
   chdir /m03/repo
   stdout_string
-    "fafa040400000000000000000000000000000000
+    "fafa004000000000000000000000000000000000
     1999-01-04 13:10:12 +0000
     
     0	0	dirzo/{move-before => move-after}
@@ -145,10 +132,10 @@ command
   exitstatus 0
 command
   argv
-    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa030300000000000000000000000000000000, --
+    git, show, --find-renames, --numstat, --pretty=tformat:%H%n%ai, fafa003000000000000000000000000000000000, --
   chdir /m03/repo
   stdout_string
-    "fafa030300000000000000000000000000000000
+    "fafa003000000000000000000000000000000000
     1999-01-03 13:09:11 +0000
     
     3	2	dirzo/everybody in the room is floating

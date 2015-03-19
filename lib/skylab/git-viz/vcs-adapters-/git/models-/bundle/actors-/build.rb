@@ -25,7 +25,7 @@ module Skylab::GitViz
 
           _n11n = GitViz_.lib_.basic::Pathname.normalization
 
-          _ = _n11n.new_with :relative, :downward_only, :no_single_dots
+          _ = _n11n.new_with :relative, :downward_only  #, :no_single_dots
 
           arg = _.normalize_value @path, & @on_event_selectively
 
@@ -54,7 +54,11 @@ module Skylab::GitViz
           # assume that last time we check, path is a relpath of interest
           # that is a directory and is or is not tracked
 
-          full_POI = ::File.join @repo.path, @path
+          full_POI = if DOT_ == @path  # special case?
+            @repo.path
+          else
+            ::File.join @repo.path, @path
+          end
 
           _i, @upstream_lines, e, t = @repo.repo_popen_3_(
             * LS_FILES_BASE_CMD_, chdir: full_POI )  # :[#012]:#the-git-ls-files-command

@@ -99,7 +99,7 @@ end
 
 module Skylab::MetaHell
 
-  module Bundle
+  module Bundle  # :[#001].
 
     module Multiset
 
