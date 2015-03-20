@@ -2,157 +2,169 @@
 
 module Skylab::GitViz
 
-  module CLI
+  class Models_::HistTree
 
-    class Actions__::Hist_Tree < Action_
+    module Modalities::CLI
 
-      def invoke_with_iambic x_a
-        @x_a = x_a
-        prepare_VCS_resources
-        @tree = invoke_API_with_iambic @x_a
-        @tree and render_tree
-      end
+      Models_ = ::Module.new
 
-    private
+      class Models_::Table
 
-      def prepare_VCS_resources  # continuation of [#006]:#storypoint-40
-        @do_use_mocks = :do_use_mocks == @x_a.first && @x_a.shift && true
-        @pathname = :pathname == @x_a.first && begin @x_a.shift ; @x_a.shift end
-        if @do_use_mocks
-          prepare_VCS_resouces_for_mocks
-        else
-          self._DO_IT_LIVE_
+        class << self
+
+          def new_via_bundle_and_repository bundle, repository
+
+            Build___.new( bundle, repository ).execute
+          end
+        end  # >>
+
+        def initialize rows, glyphs
+          @glyphs = glyphs
+          @rows = rows
         end
-      end
 
-      def prepare_VCS_resouces_for_mocks
-        fixtures_mod = GitViz_::TestSupport::VCS_Adapters::Git::Fixtures
-        _mock_FS = GitViz_::Test_Lib_::Mock_FS::In_module[ fixtures_mod ]
-        _mock_pn = _mock_FS.touch_pn @pathname.to_path
-        @x_a.push :pathname, _mock_pn
-        _mock_sc = GitViz_::Test_Lib_::Mock_System::In_module[ fixtures_mod ]
-        @x_a.unshift :system_conduit, _mock_sc
-      end
+        attr_reader :glyphs, :rows
 
-      def repo_root_not_found_error_string_from_VCS str
-        emit_error_line "(info: #{ str })"
-      end
+        class Build___
 
-      def info_string_omitting_informational_commitpoint_from_VCS str
-        emit_info_line str
-      end
+          def initialize bundle, repository
 
-      def render_tree
-        es = rndr_first_pass
-        es or rndr_second_pass
-      end
+            @matrix = bundle.build_matrix_via_repository repository
+            order_box = @matrix.order_box
+            @number_of_columns = order_box.length
+            @order_box_length = order_box.length
+            @order_box_h = order_box.h_
 
-      def rndr_first_pass
+            glyphs = Glyphs___.new bundle.statistics,
+              # "\u2058",  # Four Dot Punctuation - ⁘
+              "\u29bf",  # Circled Bullet - ⦿
+              # "\u25c9",  # Fisheye - ◉
+              "\u25cf",  # Blank Circle - ●
+              "\u2022",  # Bullet - ●
+              "\u2b24"   # Blank Large Circle - ⬤
 
-        st = @tree.to_classified_stream_for :text,
-          :glyphset_identifier_x, :narrow  # wide or narrow
+            @glyphs = glyphs
+            @ranges = glyphs.ranges
+            @indexes = 0 ... @ranges.length
 
-        prcss_root st.gets
-        row_a = [] ; max = 0
-
-        begin
-          card = st.gets
-          card or break
-
-          n = card.node
-          _line_node_slug = if n.is_branch
-            n.slug  # e.g maybe colorize this one
-          else
-            n.slug
           end
 
-          row = Row__.new card.prefix_string, n.is_leaf,
-            _line_node_slug, n.repo_trail
+          def execute
 
-          d = row.file_column_string_length
+            _row_a = @matrix.bundle.trails.map do | trail |
+              __row_via_trail trail
+            end
 
-          max < d and max = d
-
-          row_a.push row
-          redo
-        end while nil
-
-        @row_a = row_a ; @file_column_string_width = max ; nil
-      end
-
-      def prcss_root root_card
-        _cpm = root_card.node.some_commitpoint_manifest
-        @heatmap_renderer = Heatmap_Renderer__.new _cpm ; nil
-      end
-
-      def rndr_second_pass
-        fmt = "%-#{ @file_column_string_width }s  #{ TALL_PIPE__ }"
-        @row_a.each do |row|
-          _heatmap = if row.is_leaf
-            render_heatmap_string row
+            Table_.new _row_a, @glyphs
           end
-          _s = "#{ fmt % "#{ row.glyph_s }#{ row.slug_s }" }#{ _heatmap }"
-          emit_payload_line _s
-        end
-        SUCCESS_EXIT_STATUS__
-      end
 
-      def render_heatmap_string row
-        @heatmap_renderer.render_string_for_row row
-      end
+          def __row_via_trail trail
 
-      class Heatmap_Renderer__
+            row = ::Array.new @order_box_length
 
-        def initialize commitpoint_manifest
-          p = Heatmap_Render__.new
-          p.string = ' ' * commitpoint_manifest.commitpoint_count
-          @render_prototype = p ; nil
-        end
+            st = Callback_::Stream.via_nonsparse_array trail
 
-        def render_string_for_row row
-          @render_prototype.dupe_for_row( row ).render_heatmap_row
-        end
-      end
+            bf = st.gets
 
-      class Heatmap_Render__
+            cel = _cel_via_bundle_filechange bf
 
-        attr_accessor :row, :string
+            cel.is_first = true
 
-        def initialize_copy otr
-          @string = otr.string.dup ; nil
-        end
+            row[ @order_box_h.fetch bf.SHA.string ] = cel
 
-        def dupe_for_row row
-          otr = dup
-          otr.row = row
-          otr
-        end
+            begin
 
-        def render_heatmap_row
-          @scn = @row.repo_trail.get_filediff_stream
-          while (( fd = @scn.gets ))
-            _index = fd.commitpoint_index
-            @string[ _index ] = BULLET__
+              bf = st.gets
+              bf or break
+              row[  @order_box_h.fetch bf.SHA.string ] =
+                _cel_via_bundle_filechange( bf )
+
+              redo
+            end while nil
+
+            row
           end
-          @string
+
+          def _cel_via_bundle_filechange bundle_filechange
+
+            d = bundle_filechange.fc.change_count
+
+            idx = @indexes.detect do | d_ |
+
+              @ranges.fetch( d_ ).include? d
+
+            end
+
+            idx or self._SANITY
+
+            Modality_Filechange___.new false, idx, bundle_filechange
+          end
         end
 
-        BULLET__ = '•'.freeze
+        Modality_Filechange___ = ::Struct.new :is_first, :amount_classification, :bundle_filechange
+
+        class Glyphs___
+
+          attr_reader :create_glyph, :glyphs, :ranges
+
+          def initialize statistics, create_glyph, * glyphs
+
+            @create_glyph = create_glyph
+
+            s_length = statistics.length
+            g_length = glyphs.length
+
+            chunk_length = s_length / g_length
+
+            d = 0
+
+            range_a = []
+
+            d_ = d + chunk_length
+
+            begin_ = statistics.fetch d
+            end_ = statistics.fetch d_
+
+            end_value = statistics.fetch( -1 )
+
+            begin
+
+              range_a.push ::Range.new( begin_, end_ )
+
+              if end_value == end_
+                break
+              end
+
+              d = d_ + 1
+              if s_length == d
+                break
+              end
+
+              begin_ = statistics.fetch d
+              d_ = d + chunk_length
+
+              if s_length <= d_
+                self._LOOK
+              end
+
+              end__ = statistics.fetch d_
+
+              if end_ == begin_
+                begin_ = end__
+              end
+
+              end_ = end__
+
+              redo
+            end while nil
+
+            @glyphs = glyphs
+            @ranges = range_a
+          end
+        end
+
+        Table_ = self
       end
-
-      class Row__
-        def initialize glyph_s, is_leaf, slug_s, repo_trail
-          @glyph_s = glyph_s ; @is_leaf = is_leaf
-          @repo_trail = repo_trail ; @slug_s = slug_s
-        end
-        attr_reader :glyph_s, :is_leaf, :repo_trail, :slug_s
-        def file_column_string_length
-          @glyph_s.length + @slug_s.length
-        end
-      end
-
-      SUCCESS_EXIT_STATUS__ = 0
-      TALL_PIPE__ = '│'.freeze
     end
   end
 end

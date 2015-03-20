@@ -63,18 +63,12 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
       @bundle.build_matrix_via_repository @repository
     end
 
-    _GIT_STORY_04_COMMANDS = ::File.join GIT_FIXTURE_STORIES_,
-      '04-jaunty-experiment/commands.ogdl'
-
-    _GIT_STORY_04_PATHS = ::File.join GIT_FIXTURE_STORIES_,
-      '04-jaunty-experiment/paths.list'
-
-    define_method :manifest_path_for_mock_FS do
-      _GIT_STORY_04_PATHS
+    def manifest_path_for_mock_FS
+      GIT_STORY_04_PATHS_
     end
 
-    define_method :manifest_path_for_mock_system do
-      _GIT_STORY_04_COMMANDS
+    def manifest_path_for_mock_system
+      GIT_STORY_04_COMMANDS_
     end
   end
 end

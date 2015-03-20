@@ -2,90 +2,56 @@ require_relative '../../../test-support'
 
 module Skylab::GitViz::TestSupport::Models
 
-  describe "[gv] VCS adapters - git - models - [THIS]", wip: true do
+  describe "[gv] VCS adapters - git - models - hist-tree - CLI - flattening" do
 
     extend TS_
-    use :expect_event
-    use :mock_FS
-    use :mock_system
 
-    it "the commit pool builds" do
-      repo._commit_pool.should be_respond_to :close_pool
+    require Top_TS_::VCS_Adapters::Git.dir_pathname.join( 'test-support' ).to_path
+
+    _o = Top_TS_::VCS_Adapters::Git
+    _o::Bundle_Support[ self ]
+
+    it "loads" do
+      _subject
     end
 
-    it "with a repo touch an existant SHA once" do
-      @result = repo.SHA_notify _SHA( '234234' )
-      expect_next_system_command_emission_
-      expect_succeeded
+    it "sparse row, each cel knows if it is first, and its amount classification" do
+
+      bundle_against_ '/m04/repo'
+
+      _table = _subject.new_via_bundle_and_repository @bundle, @repository
+
+      _table.rows.length.should eql 3
+
+      row = _table.rows.fetch 0
+
+      row.length.should eql 5
+
+      row[ 0 ].should be_nil
+
+      row[ 1 ].is_first.should eql true
+      row[ 1 ].amount_classification.should be_zero
+
+      row[ 2 ].is_first.should eql false
+      row[ 2 ].amount_classification.should eql 1
+
+      row[ 3 ].should be_nil
+
+      row[ 4 ].is_first.should eql false
+      row[ 4 ].amount_classification.should eql 1
+
     end
 
-    it "with a repo touch a noent SHA - x" do
-      @result = repo.SHA_notify _SHA '456456'
-      expect_event_sequence_for_noent_SHA_ '456456'
-      expect_result_for_whatever
-      expect_no_more_events
+    def _subject
+      GitViz_::Models_::Hist_Tree::Modalities::CLI::Models_::Table
     end
 
-    it "touch 2 commits then close the pool, emits only system call events" do
-      memoized_manifest  # AWFUL sorry - see last method in this file
+    def manifest_path_for_mock_FS
+      GIT_STORY_04_PATHS_
     end
 
-    _SUBJ = 'commitpoint manifest'
-
-    it "#{ _SUBJ } can 'commitpoint_count' (2)" do
-      memoized_manifest.commitpoint_count.should eql 2
-    end
-
-    it "#{ _SUBJ } can 'lookup_commit_with_SHA' (SHA is in manifest)" do
-      mani = memoized_manifest
-      ci = mani.lookup_commit_with_SHA _SHA '123123'
-      ci_ = mani.lookup_commit_with_SHA _SHA '345345'
-      ci.SHA.as_symbol.should eql :'123123'
-      ci_.SHA.as_symbol.should eql :'345345'
-    end
-
-    it "#{ _SUBJ } 'lookup_commit_with_SHA' on outside SHA - X" do
-      mani = memoized_manifest
-      _sha = _SHA '234234'
-      -> do
-        mani.lookup_commit_with_SHA _sha
-      end.should raise_error ::KeyError, /\Akey not found: -?\d+$/
-    end
-
-    it "#{ _SUBJ } can 'lookup_commitpoint_index_of_ci' (chronologiezes)" do
-      mani = memoized_manifest
-      ci = mani.lookup_commit_with_SHA _SHA '123123'
-      ci_ = mani.lookup_commit_with_SHA _SHA '345345'
-      idx = mani.lookup_commitpoint_index_of_ci ci
-      idx_ = mani.lookup_commitpoint_index_of_ci ci_
-      idx.should eql 1
-      idx_.should eql 0
-      ci.author_datetime.iso8601.should eql "2014-01-05T04:03:24-05:00"
-      ci_.author_datetime.iso8601.should eql "2014-01-04T18:33:24-05:00"
-    end
-
-    -> do
-      p = nil
-      q = -> ctx do
-        x = ctx.__build_commit_manifest  # meh - yes this is DANGEROUS
-        p = -> { x }
-        x
-      end
-      define_method :memoized_manifest do
-        p ? p[] : q[ self ]
-      end
-    end.call
-
-    def __build_commit_manifest
-      repo.SHA_notify _SHA '123123'
-      @repo.SHA_notify _SHA '345345'
-      _x = @repo.close_the_pool
-      _x.should eql true
-      mani = @repo.sparse_matrix or fail "expected ci manifest"
-      expect_next_system_command_emission_
-      expect_next_system_command_emission_
-      expect_no_more_events
-      mani
+    def manifest_path_for_mock_system
+      GIT_STORY_04_COMMANDS_
     end
   end
 end

@@ -120,6 +120,13 @@ module Skylab::GitViz::TestSupport
   GIT_STORY_03_COMMANDS_ = ::File.join GIT_FIXTURE_STORIES_,
     '03-funky/commands.ogdl'
 
+  GIT_STORY_04_PATHS_ = ::File.join GIT_FIXTURE_STORIES_,
+    '04-jaunty-experiment/paths.list'
+
+  GIT_STORY_04_COMMANDS_ = ::File.join GIT_FIXTURE_STORIES_,
+    '04-jaunty-experiment/commands.ogdl'
+
+
   module Testable_Client  # read [#015] the testable client narrative intro.
 
     DSL = -> mod do
@@ -164,6 +171,8 @@ module Skylab::GitViz::TestSupport
     GIT_FIXTURE_STORIES_ = GIT_FIXTURE_STORIES_
     GIT_STORY_03_COMMANDS_ = GIT_STORY_03_COMMANDS_
     GIT_STORY_03_PATHS_ = GIT_STORY_03_PATHS_
+    GIT_STORY_04_COMMANDS_ = GIT_STORY_04_COMMANDS_
+    GIT_STORY_04_PATHS_ = GIT_STORY_04_PATHS_
     NIL_ = NIL_
     TestSupport_ = TestSupport_
     Top_TS_ = TS_

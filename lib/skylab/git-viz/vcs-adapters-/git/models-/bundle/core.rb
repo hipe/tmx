@@ -22,12 +22,13 @@ module Skylab::GitViz
         end
       end  # >>
 
-      def initialize list_of_trails, ci_box
+      def initialize stats, list_of_trails, ci_box
         @ci_box = ci_box
+        @statistics = stats
         @trails = list_of_trails
       end
 
-      attr_reader :ci_box, :trails
+      attr_reader :ci_box, :statistics, :trails
 
       def build_matrix_via_repository repo
         Actors_::Build_matrix.new( self, repo ).execute

@@ -23,6 +23,7 @@ module Skylab::GitViz
 
             @insertion_count = md[ :insertion_count ].to_i
             @deletion_count = md[ :deletion_count ].to_i
+            @change_count = @insertion_count + @deletion_count
             if is_rename
               @is_rename =  true
               @source_path = source_path
@@ -52,11 +53,18 @@ module Skylab::GitViz
         instance_exec( & edit_p )
       end
 
-      attr_reader :insertion_count, :deletion_count,
+      attr_reader :insertion_count, :deletion_count, :change_count,
 
         :is_rename,
         :source_path,
         :destination_path
+
+      def write_statistics x
+
+        x.push @change_count
+
+        NIL_
+      end
 
       def end_path
         if @is_rename

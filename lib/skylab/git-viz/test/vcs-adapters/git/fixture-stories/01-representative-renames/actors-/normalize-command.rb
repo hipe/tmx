@@ -71,7 +71,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
         a[ -2 ] = _convert_short a[ -2 ]
 
         if @cmd.stdout_string.length.nonzero?
-          require 'byebug' ; byebug ; $stderr.puts( "FML" ) && nil
+          self._DO_ME_FUN
         end
 
         _do_the_chdir_line

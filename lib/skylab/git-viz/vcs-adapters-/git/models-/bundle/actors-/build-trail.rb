@@ -6,18 +6,22 @@ module Skylab::GitViz
 
       class Actors_::Build_trail
 
-        def initialize repo, & oes_p
+        def initialize stats, repo, & oes_p
+
           @ci_sha_a = []
           @ci_cache = {}
-          @on_event_selectively = oes_p
-          @repo = repo
-          s = @repo.relative_path_of_interest
+
+          s = repo.relative_path_of_interest
 
           @normalize_path = if s && s.length.nonzero? && DOT_ != s
             -> x { ::File.join s, x }
           else
             -> x { x }  # IDENTITY_
           end
+
+          @on_event_selectively = oes_p
+          @repo = repo
+          @statistics = stats
 
           freeze
         end
@@ -73,6 +77,8 @@ module Skylab::GitViz
           ci = __produce_ci sha
 
           fc = ci.fetch_filechange_via_end_path @curr_path
+
+          fc.write_statistics @statistics
 
           if fc.is_rename
             @curr_path = fc.source_path

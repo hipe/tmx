@@ -44,6 +44,8 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
   Bundle_Support = -> tcm do
 
+    tcm.include InstanceMethods  # for when nodes from outside our graph come in
+
     Repository_Support[ tcm ]
 
     tcm.send :define_method, :bundle_against_ do | abs |

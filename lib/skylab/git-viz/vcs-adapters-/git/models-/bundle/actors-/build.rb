@@ -10,9 +10,13 @@ module Skylab::GitViz
 
         def execute
 
-          @build_trail = Actors_::Build_trail.new( @repo, & @on_event_selectively )
+          statistics = []
+
+          @build_trail = Actors_::Build_trail.new( statistics, @repo, & @on_event_selectively )
 
           @list_of_trails = []
+
+          @statistics = statistics
 
           ok = __normalize_path_appearance
           ok &&= __normalize_path_on_filesystem
@@ -77,6 +81,7 @@ module Skylab::GitViz
         end
 
         def __for_each_path_etc
+
           ok = true
           line = @line
           begin
@@ -102,13 +107,17 @@ module Skylab::GitViz
         end
 
         def __flush
+
           o = @build_trail
           bx = Callback_::Box.allocate
           bx.instance_exec do
             @a = o.ci_sha_a
             @h = o.ci_cache
           end
-          Bundle_.new( @list_of_trails, bx )
+
+          @statistics.sort!.freeze
+
+          Bundle_.new( @statistics, @list_of_trails, bx )
         end
       end
     end

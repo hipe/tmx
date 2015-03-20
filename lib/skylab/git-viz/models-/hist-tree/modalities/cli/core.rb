@@ -56,6 +56,9 @@ module Skylab::GitViz
           end
         end
       end
+
+      Autoloader_[ self ]  # because it is parent module, not this one, that punches the load
+
     end
   end
 end
