@@ -36,7 +36,7 @@ module Skylab::GitViz
 
           path_ = @normalize_path[ path ]
 
-          @trail = []
+          @fc_a = []
           _, o, e, t = @repo.repo_popen_3_( * LOG_BASE_CMD_, path_ )
           line = o.gets
           if line
@@ -44,8 +44,8 @@ module Skylab::GitViz
             @normal_received_path = path_
             @o = o
 
-            ok = __via_output line
-            ok && @trail
+            _ok = __via_output line
+            _ok and __flush path
           else
             i_a, ev_p = Bundle_::Events_.potential_event_for_log(
               e, t, ::File.join( @repo.path, @normal_received_path ) )
@@ -67,7 +67,7 @@ module Skylab::GitViz
             redo
           end while nil
           if ok
-            @trail.reverse!  # the commits came to use most recent to oldest
+            @fc_a.reverse!  # the commits came to use most recent to oldest
           end
           ok
         end
@@ -84,7 +84,7 @@ module Skylab::GitViz
             @curr_path = fc.source_path
           end
 
-          @trail.push Bundle_Filechange___.new( fc, ci.SHA )
+          @fc_a.push Bundle_Filechange___.new( fc, ci.SHA )
 
           ACHIEVED_
         end
@@ -96,6 +96,26 @@ module Skylab::GitViz
             @ci_cache[ sha ] = ci
             ci
           end
+        end
+
+        def __flush path
+
+          Trail__.new @fc_a, path
+        end
+      end
+
+      class Trail__
+
+        def initialize fca, path
+
+          @filechanges = fca
+          @path = path
+        end
+
+        attr_reader :filechanges, :path
+
+        def to_tree_path  # #hook-out for [st]
+          @path
         end
       end
 

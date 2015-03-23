@@ -48,11 +48,11 @@ module Skylab::GitViz
 
       # note this can be pure business IFF every action is promoted
 
+      @bundle = x
       @repo = repo
-      @VCS_bundle = x
     end
 
-    attr_reader :VCS_bundle
+    attr_reader :repo, :bundle
 
     Actions = ::Module.new
 

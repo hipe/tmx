@@ -48,7 +48,7 @@ module Skylab::GitViz::TestSupport::Models
 
       _mbndl = @result
 
-      _mbndl.VCS_bundle.trails.length.should eql 3
+      _mbndl.bundle.trails.length.should eql 3
       # see tombstone below
     end
 

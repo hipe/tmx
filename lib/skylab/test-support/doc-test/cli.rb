@@ -27,11 +27,11 @@ module Skylab::TestSupport
 
         class Generate < CLI_LIB_::Action_Adapter
 
-          # here is one way to hack modality-specific defaults
+          # here is one way to hack modality-specific defaults ( WILL DEPERECATE see :+[#br-042]
 
           def prepare_to_parse_parameters  # #hook-in to [br]
             super
-            @output_iambic.push(
+            @mutable_backbound_iambic.push(
               :output_adapter, :quickie,
               :line_downstream, @resources.sout )
                 # hidden property, can't be overwritten except
@@ -63,7 +63,7 @@ module Skylab::TestSupport
             if @seen_h[ :output_adapter ]
 
               _ok = @bound.receive_iambic_stream_(
-                Callback_::Iambic_Stream_via_Array_.new 0, @output_iambic )
+                Callback_::Iambic_Stream_via_Array_.new 0, @mutable_backbound_iambic )
 
               # if the above changes our output adapter
               # it may change our formal properties
@@ -97,15 +97,16 @@ module Skylab::TestSupport
             ACHIEVED_  # don't stop the batch job
           end
 
-          def via_output_iambic_resolve_bound_call
+          def via_bound_action_mutate_mutable_backbound_iambic x_a  # EEEW :+[#br-078]
 
-            if :path == @output_iambic[ -2 ]  # EEEW tracked by [#br-078]
-              path = @output_iambic.last
+            if :path == x_a[ -2 ]
+              path = x_a.last
               if FILE_SEP_ != path[ 0 ]
                 path = ::File.expand_path path
-                @output_iambic[ -1 ] = path
+                x_a[ -1 ] = path
               end
             end
+
             super
           end
         end

@@ -33,7 +33,8 @@
                [fa] near [#fa-006], [#gv-030] sets the stage nicely)
 [#062]       #doc-node the zerk narrative ..
 [#061]       #tracking-tag `members` as a universal thing
-[#060]       #done issue with parsing properties
+[#060]       #tracking ways we customize CLI action adapter rendering customization
+             ( #was: #done issue with parsing properties )
 [#059]       #doc-node names
 [#058]       #parent-node: [#057] the default frame
 [#057]       #parent-node: [#001] the properties stack

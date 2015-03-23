@@ -51,6 +51,20 @@ _ok = Skylab::GitViz::TestSupport::VCS_Adapters::Git::Story_01::Build_the_manife
     end while nil
     redo
   end while nil
+
+  a = sto.name_mappings.SHA_head_order
+
+  [ 1, 0,  0, 2,  2, 3 ].each_slice 2 do | d, d_ |
+
+    _, _o, _e, t = sto.popen3_cherry a.fetch( d ), a.fetch( d_ )
+    t.value.exitstatus.zero? or fail
+  end
+
+  _, _, _, t = sto.repo_popen_3_ 'log', '--pretty=tformat:%H',
+    "#{ a[ 0 ] }..#{ a.fetch 3 }", '--'
+
+  t.value.exitstatus.zero? or fail
+
 end
 
 exit( _ok ? 0 : 5 )

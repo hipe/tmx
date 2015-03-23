@@ -39,15 +39,16 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
     def __expect_trail
 
       trl = @trail
-      trl.length.should eql 2
+      a = trl.filechanges
+      a.length.should eql 2
 
-      bfc = trl.fetch 0
+      bfc = a.fetch 0
 
       bfc.SHA.string.should eql 'fafa002000000000000000000000000000000000'
       bfc.fc.insertion_count.should eql 3
       bfc.fc.deletion_count.should be_zero
 
-      bfc = trl.fetch 1
+      bfc = a.fetch 1
       bfc.SHA.string.should eql 'fafa003000000000000000000000000000000000'
       bfc.fc.insertion_count.should eql 3
       bfc.fc.deletion_count.should eql 2

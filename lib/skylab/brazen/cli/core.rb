@@ -400,7 +400,7 @@ module Skylab::Brazen
       end
 
       def resolve_bound_call_when_parsed_options
-        if @output_iambic.length.zero?
+        if @mutable_backbound_iambic.length.zero?
           if argv.length.zero?
             resolve_bound_call_when_no_arguments
           else
@@ -423,7 +423,7 @@ module Skylab::Brazen
       end
 
       def to_actual_parameters_stream
-        Actual_Parameter_Scanner__.new @output_iambic, @front_properties
+        Actual_Parameter_Scanner__.new @mutable_backbound_iambic, @front_properties
       end
 
       def resolve_bound_call_when_multiple_matching_adapters
@@ -529,9 +529,9 @@ module Skylab::Brazen
       end
 
       def resolve_bound_call_when_ARGV_parsed
-        @output_iambic.concat @arg_parse.release_result_iambic
+        @mutable_backbound_iambic.concat @arg_parse.release_result_iambic
         @partitions.env_a and process_environment
-        @bound_call or via_output_iambic_resolve_bound_call
+        @bound_call or __via_mutable_backbound_iambic_resolve_some_bound_call
       end
 
       def process_environment
@@ -543,7 +543,7 @@ module Skylab::Brazen
           s or next
           cased_i = prp.name_symbol.downcase  # [#039] casing
           @seen_h[ cased_i ] and next
-          @output_iambic.push cased_i, s
+          @mutable_backbound_iambic.push cased_i, s
         end
         nil
       end
@@ -556,21 +556,55 @@ module Skylab::Brazen
         @__APPNAME ||= application_kernel.app_name.gsub( /[^[:alnum:]]+/, EMPTY_S_ ).upcase
       end
 
-      def via_output_iambic_resolve_bound_call
+      def __via_mutable_backbound_iambic_resolve_some_bound_call
 
-        # begin experiment
+        ok = via_bound_action_mutate_mutable_backbound_iambic @mutable_backbound_iambic
+
+        ok &&= __via_bound_action_and_mutated_backbound_iambic_resolve_bound_call
+
+        if ! ok
+
+          @bound_call = Callback_::Bound_Call.via_value ok
+        end
+
+        NIL_  # failure is not an option
+      end
+
+      def __via_bound_action_and_mutated_backbound_iambic_resolve_bound_call
+
+        bc = @bound.bound_call_against_iambic_stream(
+
+          Callback_::Iambic_Stream.via_array @mutable_backbound_iambic )
+
+        bc &&= bound_call_via_bound_call_from_back bc
+
+        bc and begin
+          @bound_call = bc
+          ACHIEVED_
+        end
+      end
+
+      def via_bound_action_mutate_mutable_backbound_iambic x_a  # :+#public-API :+#hook-in but..
+
+        # .. we don't love this so use it sparingly. it might go away
+
+        # ~ begin experiment: one way to give stdout to the action
+
         prp = @bound.any_formal_property_via_symbol :downstream
         if prp && prp.is_hidden
-          @output_iambic.push :downstream, @resources.sout
+          x_a.push :downstream, @resources.sout
         end
-        # end experiment
 
-        @bound_call = @bound.bound_call_against_iambic_stream(
-          Callback_::Iambic_Stream.via_array @output_iambic )
+        # ~ end
 
-        @bound_call ||= Brazen_.bound_call.via_value @bound_call
+        ACHIEVED_
+      end
 
-        nil
+      def bound_call_via_bound_call_from_back bc  # :+#public-API :+#hook-in
+
+        # experiment for [#060] the ability to customize rendering (beyond expag)
+
+        bc
       end
 
       Autoloader_[ self ]
@@ -1022,12 +1056,12 @@ module Skylab::Brazen
         if prop.takes_argument
           -> x do
             @seen_h[ prop.name_symbol ] = true
-            @output_iambic.push prop.name_symbol, x
+            @mutable_backbound_iambic.push prop.name_symbol, x
           end
         else
           -> _ do
             @seen_h[ prop.name_symbol ] = true
-            @output_iambic.push prop.name_symbol
+            @mutable_backbound_iambic.push prop.name_symbol
           end
         end
       end
@@ -1072,7 +1106,7 @@ module Skylab::Brazen
       end
 
       def prepare_to_parse_parameters  # :+#public-API :+#hook-in
-        @output_iambic = []  # :+#public-API (name)
+        @mutable_backbound_iambic = []  # :+#public-API (name)
         @seen_h = {}
         @bound_call = nil
       end
@@ -1463,8 +1497,10 @@ module Skylab::Brazen
     end.call
 
     class Actual_Parameter_Scanner__
-      def initialize output_iambic, props
-        scn = Callback_::Iambic_Stream.via_array output_iambic
+
+      def initialize mutable_backbound_iambic, props
+
+        scn = Callback_::Iambic_Stream.via_array mutable_backbound_iambic
         prop = i = x = nil
         @prop_p = -> { prop }
         @pair_p = -> { [ i, x ] }

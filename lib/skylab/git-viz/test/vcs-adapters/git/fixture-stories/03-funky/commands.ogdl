@@ -144,3 +144,40 @@ command
     "
   stderr_string ""
   exitstatus 0
+command
+  argv
+    git, cherry, fafa002, fafa001
+  chdir /m03/repo
+  stdout_string ""
+  stderr_string ""
+  exitstatus 0
+command
+  argv
+    git, cherry, fafa001, fafa003
+  chdir /m03/repo
+  stdout_string
+    "+ fafa002000000000000000000000000000000000
+    + fafa003000000000000000000000000000000000
+    "
+  stderr_string ""
+  exitstatus 0
+command
+  argv
+    git, cherry, fafa003, fafa004
+  chdir /m03/repo
+  stdout_string
+    "+ fafa004000000000000000000000000000000000
+    "
+  stderr_string ""
+  exitstatus 0
+command
+  argv
+    git, log, --pretty=tformat:%H, fafa001..fafa004, --
+  chdir /m03/repo
+  stdout_string
+    "fafa004000000000000000000000000000000000
+    fafa003000000000000000000000000000000000
+    fafa002000000000000000000000000000000000
+    "
+  stderr_string ""
+  exitstatus 0

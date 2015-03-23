@@ -19,6 +19,15 @@ module Skylab::GitViz::TestSupport::Models
     end
   end
 
+  # ~
+
+  Bundle_Support = -> tcm do
+
+    require Top_TS_::VCS_Adapters::Git.dir_pathname.join( 'test-support' ).to_path  # reach down meh
+
+    Top_TS_::VCS_Adapters::Git::Bundle_Support[ tcm ]
+  end
+
   module Hist_Tree_Model_Support
 
     class << self

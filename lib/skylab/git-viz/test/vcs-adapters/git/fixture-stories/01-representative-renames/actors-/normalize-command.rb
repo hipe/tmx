@@ -70,13 +70,22 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
         a[ -1 ] = _convert_short a[ -1 ]
         a[ -2 ] = _convert_short a[ -2 ]
 
-        if @cmd.stdout_string.length.nonzero?
-          self._DO_ME_FUN
+        s = @cmd.stdout_string
+
+        if s.length.nonzero?
+
+          _mutate_string_by_converting_each_line_content s do | line |
+
+            plus, long_SHA = ETC_RX__.match( line ).captures
+            "#{ plus }#{ _convert_long long_SHA }"
+          end
         end
 
         _do_the_chdir_line
         NIL_
       end
+
+      ETC_RX__ = /\A  ( \+[ ] )  ( #{ sha }  )  \z/x
 
       def __normalize__show__command
 

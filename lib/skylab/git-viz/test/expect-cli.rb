@@ -3,9 +3,12 @@ module Skylab::GitViz::TestSupport
   module Expect_CLI
 
     class << self
-      def [] test_mod
-        test_mod.include TestSupport_::Expect_Stdout_Stderr::InstanceMethods
-        test_mod.include self
+
+      def [] tcm
+
+        tcm.include TestSupport_::Expect_Stdout_Stderr::InstanceMethods
+        tcm.send :define_method, :expect, tcm.instance_method( :expect )  # because rspec
+        tcm.include self
       end
     end  # >>
 

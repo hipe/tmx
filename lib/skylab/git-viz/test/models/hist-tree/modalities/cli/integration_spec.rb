@@ -2,11 +2,11 @@ require_relative '../../../test-support'
 
 module Skylab::GitViz::TestSupport::Models
 
-  describe "[gv] models - hist-tree - modalities - CLI", wip: true do
+  describe "[gv] VCS adapters - git - models - hist-tree - CLI - integration" do
 
     extend TS_
-    use :mock_system
-    use :expect_CLI
+    use :bundle_support
+    use :expect_CLI  # order matters
 
     it "help screen - expect [#br-042] back-to-front property mutation" do
 
@@ -24,12 +24,11 @@ module Skylab::GitViz::TestSupport::Models
       expect_result_for_success
     end
 
-    it "see dots (mocked)", wip: true do
+    it "see dots (mocked) (note tree cosmetics appear broken)" do
 
       @for_expect_stdout_stderr_prepare_invocation = method :__prepare_invo
 
-      invoke 'hi', '/derp/berp/dirzo'
-      __expect_information_about_moves
+      invoke 'hi', mock_pathname( '/m03/repo/dirzo' )
       __expect_dots
       expect_succeeded
     end
@@ -39,22 +38,24 @@ module Skylab::GitViz::TestSupport::Models
       NIL_
     end
 
-    def __expect_information_about_moves
+    def __expect_dots
 
-      on_stream :e
-      2.times do
-        expect %r(\bappears\b.+informational\b)
-      end
+      on_stream :o
 
-      NIL_
+      expect " ├everybody in the room is floating |   ⦿ •  "
+      expect " ├it's just                         |"
+      expect " │ └funky like that                 | ⦿   •  "
+      expect " └move-after                        |     ⦿ ●"
+
+      expect_succeeded
     end
 
-    def __expect_dots
-      expect_emissions_on_channel :o
-      expect " ├everybody in the room is floating  │ •• "
-      expect " ├it's just                          │"
-      expect " │ └funky like that                  │• • "
-      expect " └move-after                         │   •"
+    def manifest_path_for_mock_FS
+      GIT_STORY_03_PATHS_
+    end
+
+    def manifest_path_for_mock_system
+      GIT_STORY_03_COMMANDS_
     end
   end
 end

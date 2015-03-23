@@ -1,5 +1,3 @@
-# somewhere: GitViz_.lib_.tree.from( :node_identifiers, @bunch.immutable_trail_array )
-
 module Skylab::GitViz
 
   class Models_::HistTree
@@ -52,17 +50,19 @@ module Skylab::GitViz
           def execute
 
             _row_a = @matrix.bundle.trails.map do | trail |
-              __row_via_trail trail
+              Row___.new( __row_via_trail( trail ), trail.path )
             end
 
             Table_.new _row_a, @glyphs
           end
 
+          Row___ = ::Struct.new :a, :to_tree_path
+
           def __row_via_trail trail
 
             row = ::Array.new @order_box_length
 
-            st = Callback_::Stream.via_nonsparse_array trail
+            st = Callback_::Stream.via_nonsparse_array trail.filechanges
 
             bf = st.gets
 

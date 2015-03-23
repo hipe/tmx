@@ -31,8 +31,10 @@ module Skylab::GitViz
 
           @bundle.trails.each do | tr |
 
-            _first_fc = tr.first
-            _last_fc = tr.last
+            fc_a = tr.filechanges
+
+            _first_fc = fc_a.first
+            _last_fc = fc_a.last
 
             firsts.touch _first_fc.SHA.string do end
             lasts.touch _last_fc.SHA.string do end
@@ -54,7 +56,8 @@ module Skylab::GitViz
 
             line = o.gets
             if line
-              self._PROBABLY_OK
+
+              PLUS_BYTE___ == line.getbyte( 0 ) or fail
               m
             else
               # the right one (head) has no commits yet to be appied to upstream
@@ -82,7 +85,7 @@ module Skylab::GitViz
             line = o.gets
 
             if line
-              self._PROBABLY_OK
+
               PLUS_BYTE___ == line.getbyte( 0 ) or fail
               sha
             else

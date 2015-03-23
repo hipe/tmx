@@ -5,11 +5,7 @@ module Skylab::GitViz::TestSupport::Models
   describe "[gv] VCS adapters - git - models - hist-tree - CLI - flattening" do
 
     extend TS_
-
-    require Top_TS_::VCS_Adapters::Git.dir_pathname.join( 'test-support' ).to_path
-
-    _o = Top_TS_::VCS_Adapters::Git
-    _o::Bundle_Support[ self ]
+    use :bundle_support
 
     it "loads" do
       _subject
@@ -25,20 +21,22 @@ module Skylab::GitViz::TestSupport::Models
 
       row = _table.rows.fetch 0
 
-      row.length.should eql 5
+      a = row.a
 
-      row[ 0 ].should be_nil
+      a.length.should eql 5
 
-      row[ 1 ].is_first.should eql true
-      row[ 1 ].amount_classification.should be_zero
+      a[ 0 ].should be_nil
 
-      row[ 2 ].is_first.should eql false
-      row[ 2 ].amount_classification.should eql 1
+      a[ 1 ].is_first.should eql true
+      a[ 1 ].amount_classification.should be_zero
 
-      row[ 3 ].should be_nil
+      a[ 2 ].is_first.should eql false
+      a[ 2 ].amount_classification.should eql 1
 
-      row[ 4 ].is_first.should eql false
-      row[ 4 ].amount_classification.should eql 1
+      a[ 3 ].should be_nil
+
+      a[ 4 ].is_first.should eql false
+      a[ 4 ].amount_classification.should eql 1
 
     end
 
