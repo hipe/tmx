@@ -1,5 +1,8 @@
 # the git commit pool narrative :[#010]
 
+(EDIT: this is archival. we may re-promote it to ordinary relevance in
+the future, since all of its content is concerned with semantics.)
+
 
 ## #storypoint-30 what is the deal with commitpoint indexes?
 

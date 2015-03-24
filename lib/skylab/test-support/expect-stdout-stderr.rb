@@ -56,7 +56,13 @@ module Skylab::TestSupport
         end
 
         g.add_stream :o
-        g.add_stream :e
+
+        io = for_expect_stdout_stderr_use_this_as_stderr
+        if io
+          g.add_stream :e, io
+        else
+          g.add_stream :e
+        end
 
         @IO_spy_group_for_expect_stdout_stderr = g
 
@@ -76,7 +82,8 @@ module Skylab::TestSupport
 
     public
 
-      attr_reader :for_expect_stdout_stderr_use_this_as_stdin  # :+#hook-in
+      attr_reader :for_expect_stdout_stderr_use_this_as_stdin,  # :+#hook-in
+        :for_expect_stdout_stderr_use_this_as_stderr
 
     private
 

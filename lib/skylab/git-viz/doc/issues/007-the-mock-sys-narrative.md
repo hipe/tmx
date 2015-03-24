@@ -97,5 +97,5 @@ it is used.
 ### :#what-we-plan-to-do-with-mock-system
 
 can we put it in a museum? the rainbow kicking, the plugin architure,
-it's all kind cool. but actually this is an open issue, is what to do
+it's all kind of cool. but actually this is an open issue, is what to do
 with all the old code.

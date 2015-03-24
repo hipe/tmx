@@ -6,9 +6,10 @@ module Skylab::GitViz
 
       class Actors_::Build_matrix  # algorithm in [#006]
 
-        def initialize bundle, repo  # no events. all failure is exceptional
+        def initialize bundle, repo, rsx  # no events. all failure is exceptional
 
           @repo = repo
+          @stderr = rsx.stderr
           @bundle = bundle
         end
 
@@ -48,23 +49,29 @@ module Skylab::GitViz
 
         def __init_earliest
 
-          _ = @firsts.a_.reduce do | m, sha |
+          _ = @firsts.a_.reduce do | upstream, head |
 
-            _i, o, _e, t = _cherry m, sha
+            @stderr.write A___
 
-            t.value.exitstatus.zero? or fail
+            _i, o, _e, t = _cherry upstream, head  # :+[#021]
+
 
             line = o.gets
+
             if line
 
               PLUS_BYTE___ == line.getbyte( 0 ) or fail
-              m
+
+              # there is one or more commit in <limit>..<head> that has no
+              # equivalent in <head>..<upstream>. this means the upstream
+              # is the "older" of the two.
+
+              t.exit  # no need to look at the rest. result is receiver
+              upstream
             else
-              # the right one (head) has no commits yet to be appied to upstream
-              # (left). since they are on the same timeline, this can only mean
-              # that the right one is the same or "older" than the left (yeah?)
-              #
-              sha
+
+              t.value.exitstatus.zero? or fail
+              head
             end
           end
 
@@ -72,26 +79,29 @@ module Skylab::GitViz
           NIL_
         end
 
+        A___ = 'a'
+
         def __init_latest
 
-          _ = @lasts.a_.reduce do | m, sha |
+          _ = @lasts.a_.reduce do | upstream, head |
 
-            _i, o, _e, t = _cherry m, sha
+            @stderr.write Z___
 
-            # if it's empty, flip it, else don't
-
-            t.value.exitstatus.zero? or fail
+            _i, o, _e, t = _cherry upstream, head
 
             line = o.gets
 
             if line
 
+              # see converse note above
+
               PLUS_BYTE___ == line.getbyte( 0 ) or fail
-              sha
+              t.exit
+              head
             else
-              # the right has no commits that the left doesn't have. right is
-              # same or older, ergo left is same or newer.
-              m
+
+              t.value.exitstatus.zero? or fail
+              upstream
             end
           end
 
@@ -100,6 +110,7 @@ module Skylab::GitViz
         end
 
         PLUS_BYTE___ = '+'.getbyte 0
+        Z___ = 'z'
 
         def _cherry long_SHA, long_SHA_
 
@@ -108,10 +119,10 @@ module Skylab::GitViz
 
         def __init_order_box  # (read #step-three)
 
-          _, o, e, t = @repo.repo_popen_3_ 'log', '--pretty=tformat:%H',
-            "#{ _short @earliest_SHA }..#{ _short @latest_SHA }", "--"
+          @stderr.write O___
 
-          t.value.exitstatus.zero? or fail
+          _, o, e, t = @repo.repo_popen_3_ 'log', '--pretty=tformat:%H',
+            "#{ _short @earliest_SHA }..#{ _short @latest_SHA }", "--"  # :+[#021]
 
           # as does the output of most such vendor commands, the output of
           # this one starts from the most recent (graph-wise) SHA and at each
@@ -128,7 +139,6 @@ module Skylab::GitViz
           order_box = Callback_::Box.new
           pool = ::Hash[ @bundle.ci_box.a_.map { | sha_s | [ sha_s, true ] } ]
 
-
           # because of the way the vendor command works, the first (oldest)
           # SHA will not appear in the list of SHA's; yet for the sake of
           # our algorithm we will add it such that it looks like it was:
@@ -138,11 +148,18 @@ module Skylab::GitViz
 
           begin
             line = o.gets
-            line or break
+
+            if ! line
+              t.value.exitstatus.zero? or fail
+              break
+            end
+
+            @stderr.write DOT_
+
             line.chop!
 
             _had = pool.delete line
-            _had or next
+            _had or redo
 
             column_index -= 1
 
@@ -150,14 +167,12 @@ module Skylab::GitViz
 
             if pool.length.zero?
 
-              if o.respond_to? :closed?  # hack to allow for minimal mocks for now
-                if ! o.closed?
-                  o.close
-                end
-                if ! e.closed
-                  e.close
-                end
+              t.exit
+              if o.respond_to? :close
+                o.close
+                e.close
               end
+              @stderr.write NEWLINE_
 
               break
             end
@@ -172,6 +187,8 @@ module Skylab::GitViz
           @order_box = order_box
           NIL_
         end
+
+        O___ = 'o'
 
         def _short long_SHA
           long_SHA[ 0, SHORT_SHA_LENGTH__ ]

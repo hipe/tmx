@@ -1,0 +1,16 @@
+ ├commit-             |
+ │ ├build--.rb        |         ⦿   ●             ● ● ●   ● ● ●  
+ │ ├core.rb           |         ⦿ ●       ●                 ●    
+ │ └rink-.rb          |           ⦿ ●     ●       ● ●     ●      
+ ├core.rb             | ⦿ ● ● • • • ● ● ● ● ● ● ● ● ●   ● ● ⬤ ●  
+ └hist-tree--         |
+   ├bunch--           |
+   │ ├begin--.rb      |                   ⦿           ●     •    
+   │ ├core.rb         |                   ⦿         ● ●   ● ● ●  
+   │ ├finish--.rb     |                   ⦿                 ● ●  
+   │ └trail--         |
+   │   ├begin--.rb    |                   ⦿           ●     ●    
+   │   ├core.rb       |                   ⦿ ●       ● ●   ● ● ● ●
+   │   ├filediff--.rb |                   ⦿     ●           ● ●  
+   │   └finish--.rb   |                   ⦿           ●     ● ●  
+   └core.rb           |                   ⦿                 ●    

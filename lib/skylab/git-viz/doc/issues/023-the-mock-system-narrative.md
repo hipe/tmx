@@ -1,5 +1,7 @@
 # the mock system narrative :[#023]
 
+(EDIT: this is mostly archival, documenting the first mock system. see [#007].)
+
 ## introduction
 
 from the highest level this whole mock system thing can be broken into two

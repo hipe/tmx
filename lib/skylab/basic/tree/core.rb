@@ -18,7 +18,7 @@ module Skylab::Basic
       def via * i_a
         Via__.call_via_iambic i_a
       end
-    end
+    end  # >>
 
     class Via__
 
@@ -49,6 +49,68 @@ module Skylab::Basic
         Tree_::Via_Indented_Line_Stream__.new( @build_using, @stream,
           @glyph, @on_event_selectively ).execute
       end
+    end
+
+    class Binary
+
+      class << self
+
+        def via_sorted_range_list a
+
+          d = a.length
+          if 1 == d
+            Leaf__[ a.first ]
+          else
+
+            d_ = d / 2
+            if 1 == d_
+              left = Leaf__[ a.first ]
+              right = if ( d % 2 ).zero?
+                Leaf__[ a.last ]
+              else
+                via_sorted_range_list a[ 1, 2 ]
+              end
+            else
+              left = via_sorted_range_list a[ 0, d_ ]
+              right = if ( d % 2 ).zero?
+                via_sorted_range_list a[ d_, d_ ]
+              else
+                via_sorted_range_list a[ d_, d + 1 ]
+              end
+            end
+
+            Branch___.new left, right
+          end
+        end
+      end  # >>
+
+      class Branch___
+
+        def initialize left, right
+
+          @begin = left.begin
+          @determiner = right.begin
+          @left = left
+          @right = right
+        end
+
+        attr_reader :begin
+
+        def is_leaf
+          false
+        end
+
+        def category_for d
+
+          if @determiner > d
+            @left.category_for d
+          else
+            @right.category_for d
+          end
+        end
+      end
+
+      Leaf__ = IDENTITY_  # etc
     end
 
   class Lazy_via_Enumeresque__

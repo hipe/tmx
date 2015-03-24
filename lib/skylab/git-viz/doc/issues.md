@@ -13,13 +13,16 @@
 [#029]       shutdown/fail more gracefully when manifest parse errors
 [#028]       #parent-node:[#017] fixtures scripts in detail ..
 [#027]       #done #parent-node:[#018] the idea for the "free-tags" feature
-[#026]       #done use 'listen' gem to listen to filesystem for manifest changes
+[#026]       the glyph assignment algorithm ..
+             ( #was: #done use 'listen' gem to listen to filesystem for manifest changes )
 [#025] #open omg concurrency
 [#024]       #parent-node:[#023] the manifest client narrative ..
 [#023]       #parent-node:[#014] the mock system narrative ..
-[#022]       #done heartbeat and shutdown timer
-[#021]       #DONE #experimental is it practical to "#rainbow-kick" the server?
-             #done just for the lols different rubies talk on the same system
+[#022]       the shutdown timer and heartbeat narrative ..
+[#021]       #tracking places where we hit the page limit
+             ( #was:
+               #DONE #experimental is it practical to "#rainbow-kick" the server?
+               #done just for the lols different rubies talk on the same system )
 [#019] #open filenames with special characters in them
              ( #was: #done fixture server is a long running process, doesn't need to
              re-parse the whole manifest file for each request (read [#018]) )

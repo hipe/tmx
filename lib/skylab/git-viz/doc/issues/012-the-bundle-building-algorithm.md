@@ -48,7 +48,7 @@ appear with the form "[#012]:#hashtag-name" (without the quotes).)
 
         • for each #line-item of the output
           • create a #filechange with which:
-            • populate its 4 fields
+            • populate all of its fields
             • add it to #the-filechange-dictionary, keyed to its
               #current-path
 

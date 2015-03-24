@@ -1,5 +1,11 @@
 # this git gotcha :[#035]
 
+(EDIT: this whoe thing may have stemmed from a pre-understanding of the
+  `-m` option etc.)
+
+
+
+
 (the TL;DR: is 2nd to last paragraph.)
 
 the two scripts that are sibling to this file are minimal pairs that present

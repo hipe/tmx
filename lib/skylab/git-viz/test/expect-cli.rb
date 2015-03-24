@@ -10,7 +10,17 @@ module Skylab::GitViz::TestSupport
         tcm.send :define_method, :expect, tcm.instance_method( :expect )  # because rspec
         tcm.include self
       end
+
+      def mock_stderr_instance
+
+        MOCK_STDERR__
+      end
     end  # >>
+
+    def mock_stderr_instance
+
+      MOCK_STDERR__
+    end
 
     def invoke * argv
       using_expect_stdout_stderr_invoke_via_argv argv
@@ -98,15 +108,14 @@ module Skylab::GitViz::TestSupport
       %w( ping hist-tree )
     end
 
+    # ~
 
-    # ~ BLUNK
-
-    def expect_expecting_and_invited
-      expect_expecting_line
-      expect_invited ; nil
-    end
-
-    # ~ END
+    MOCK_STDERR__ = class Mock_Stderr___
+      def write s
+        NIL_
+      end
+      self
+    end.new
 
     define_method :_memo, -> do
       p = -> do

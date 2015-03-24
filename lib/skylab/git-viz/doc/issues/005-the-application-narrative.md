@@ -1,5 +1,7 @@
 # the application narrative :[#005]
 
+(EDIT: this no longer belongs in [gv])
+
 ## :#this-node-looks-funny-because-it-is-multi-domain
 
 this application-top file looks a lot different than its cousin files

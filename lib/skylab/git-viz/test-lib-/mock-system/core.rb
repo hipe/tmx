@@ -270,6 +270,10 @@ module Skylab::GitViz
         end
 
         attr_reader :value
+
+        def exit
+          self
+        end
       end
 
       Mock_Thread_Value___ = ::Struct.new :exitstatus

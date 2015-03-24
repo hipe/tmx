@@ -1,5 +1,7 @@
 # :#what-is-meant-by-isomorphic-interface? :[#030]
 
+(TODO: this doesn't belong in [gv])
+
 this node here intends for itself to be a small but powerful re-imagining
 of a now ancient effort started at [#fa-006] (currently undocumented) that
 was never fully realized.

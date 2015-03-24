@@ -68,7 +68,21 @@ module Skylab::GitViz
 
         :required, :property, :path
 
+
+      def initialize( * )
+
+        @_stderr_as_received = nil
+        super
+      end
+
+      def receive_stderr_ x
+
+        @_stderr_as_received = x
+        NIL_
+      end
+
       def produce_result
+
         ok = __resolve_VCS_adapter
         ok &&= __via_VCS_adapter_resolve_repo
         ok &&= __via_repo_resolve_mutable_VCS_bundle
@@ -108,13 +122,24 @@ module Skylab::GitViz
 
       def __via_repo_resolve_mutable_VCS_bundle
 
+        _rsx = Resources___.new @_stderr_as_received || NULL_STDERR___
+
         _short_path = @pathname.relative_path_from( @repo.pn_ ).to_path
 
         @mutable_VCS_bundle = @VCS_adapter.models::Bundle.build_via_path_and_repo(
-          _short_path, @repo, & @on_event_selectively )
+          _short_path, @repo, _rsx, & @on_event_selectively )
 
         @mutable_VCS_bundle && ACHIEVED_
       end
+
+      NULL_STDERR___ = class Null_Stderr___
+        def write _
+          NIL_
+        end
+        self
+      end.new
+
+      Resources___ = ::Struct.new :stderr  # for now
     end
 
     Hist_Tree_ = self

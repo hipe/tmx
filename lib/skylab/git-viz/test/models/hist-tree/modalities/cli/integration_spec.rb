@@ -27,6 +27,7 @@ module Skylab::GitViz::TestSupport::Models
     it "see dots (mocked) (note tree cosmetics appear broken)" do
 
       @for_expect_stdout_stderr_prepare_invocation = method :__prepare_invo
+      @for_expect_stdout_stderr_use_this_as_stderr = mock_stderr_instance
 
       invoke 'hi', mock_pathname( '/m03/repo/dirzo' )
       __expect_dots
@@ -44,7 +45,7 @@ module Skylab::GitViz::TestSupport::Models
 
       expect " ├everybody in the room is floating |   ⦿ •  "
       expect " ├it's just                         |"
-      expect " │ └funky like that                 | ⦿   •  "
+      expect " │ └funky like that                 | ⦿   ⬤  "
       expect " └move-after                        |     ⦿ ●"
 
       expect_succeeded

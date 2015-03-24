@@ -6,9 +6,9 @@ module Skylab::GitViz
 
       class << self
 
-        def build_via_path_and_repo path, repo, & oes_p
+        def build_via_path_and_repo path, repo, rsx, & oes_p
 
-          Actors_::Build[ path, repo, & ( oes_p || repo.handle_event_selectively ) ]
+          Actors_::Build[ path, repo, rsx, & ( oes_p || repo.handle_event_selectively ) ]
         end
 
         def log_command_
@@ -22,8 +22,9 @@ module Skylab::GitViz
         end
       end  # >>
 
-      def initialize stats, list_of_trails, ci_box
+      def initialize stats, list_of_trails, ci_box, rsx
         @ci_box = ci_box
+        @resources = rsx
         @statistics = stats
         @trails = list_of_trails
       end
@@ -31,7 +32,7 @@ module Skylab::GitViz
       attr_reader :ci_box, :statistics, :trails
 
       def build_matrix_via_repository repo
-        Actors_::Build_matrix.new( self, repo ).execute
+        Actors_::Build_matrix.new( self, repo, @resources ).execute
       end
 
       Autoloader_[ Actors_ = ::Module.new ]

@@ -8,6 +8,19 @@ module Skylab::GitViz::TestSupport::Models
 
   extend TestSupport_::Quickie
 
+  module ModuleMethods
+
+    def memoize sym, & p
+
+      define_singleton_method sym, & Callback_.memoize( & p )
+
+      define_method sym do
+
+        self.class.send sym
+      end
+    end
+  end
+
   module InstanceMethods
 
     def subject_API  # #hook-out for "expect event"
@@ -63,8 +76,9 @@ module Skylab::GitViz::TestSupport::Models
 
   # ~
 
-  NIL_ = NIL_
+  Callback_ = Callback_
   GitViz_ = GitViz_
+  NIL_ = NIL_
   Top_TS_ = Top_TS_
 
 end

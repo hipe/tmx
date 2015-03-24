@@ -6,7 +6,7 @@ module Skylab::GitViz
 
       class Actors_::Build_trail
 
-        def initialize stats, repo, & oes_p
+        def initialize stats, repo, rsx, & oes_p
 
           @ci_sha_a = []
           @ci_cache = {}
@@ -23,6 +23,8 @@ module Skylab::GitViz
           @repo = repo
           @statistics = stats
 
+          @stderr = rsx.stderr
+
           freeze
         end
 
@@ -33,6 +35,8 @@ module Skylab::GitViz
         end
 
         protected def __execute path
+
+          @stderr.write C___
 
           path_ = @normalize_path[ path ]
 
@@ -54,7 +58,11 @@ module Skylab::GitViz
           end
         end
 
+        C___ = 'C'
+
         def __via_output line
+
+          @stderr.write DOT_
 
           @curr_path = @normal_received_path
           ok = true

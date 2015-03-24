@@ -127,6 +127,30 @@ module Skylab::Callback
             scan
           end
 
+          def via_range r, & p
+
+            if r.begin < r.end
+              amount_to_add = 1
+              d = r.begin - amount_to_add
+              last = if r.exclude_end?
+                r.end - amount_to_add
+              else
+                r.end
+              end
+            end  # etc
+
+            if last
+
+              st = new do
+                if last != d
+                  d += amount_to_add
+                end
+              end
+              p and st = st.map_reduce_by( & p )
+              st
+            end
+          end
+
           def with_random_access
             Stream_::With_Random_Access__
           end

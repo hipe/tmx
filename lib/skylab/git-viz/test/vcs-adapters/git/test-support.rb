@@ -56,6 +56,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
         @repository.relative_path_of_interest,
         @repository,
+        MOCK_RSX___,
         & handle_event_selectively )
 
       if x
@@ -69,6 +70,15 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
     NIL_
   end
+
+  MOCK_RSX___ = class Mock_Resources___
+
+    def stderr
+      Top_TS_::Expect_CLI.mock_stderr_instance
+    end
+
+    self
+  end.new
 
   Commit_Support = -> test_context_mod do
 

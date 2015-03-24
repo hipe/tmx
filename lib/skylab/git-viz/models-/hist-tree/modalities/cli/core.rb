@@ -46,6 +46,10 @@ module Skylab::GitViz
             @back_properties = bp
             @front_properties = fp
 
+            # ~
+
+            @bound.receive_stderr_ @resources.serr
+
             NIL_
           end
 
@@ -82,7 +86,7 @@ module Skylab::GitViz
               @bundle, @repo )
 
             table and begin
-              @glyphs = table.glyphs
+              @glyph_mapper = table.glyph_mapper
               @rows = table.rows
               ACHIEVED_
             end
@@ -134,11 +138,12 @@ module Skylab::GitViz
             fmt = "%-#{ @column_A_max_width }s |"
             io = @resources.sout
 
+            cg_s = @glyph_mapper.create_glyph
+            s_a = @glyph_mapper.glyphs
+
             @column_A.each_with_index do | s, d |
 
               io << fmt % s
-              s = @glyphs.create_glyph
-              s_a = @glyphs.glyphs
 
               row = a[ d ]
               if row
@@ -146,7 +151,7 @@ module Skylab::GitViz
                   io << SPACE_
                   if x
                     if x.is_first
-                      io << s
+                      io << cg_s
                     else
                       io << s_a.fetch( x.amount_classification )
                     end

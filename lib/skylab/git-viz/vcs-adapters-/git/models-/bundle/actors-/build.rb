@@ -6,13 +6,14 @@ module Skylab::GitViz
 
       class Actors_::Build
 
-        Callback_::Actor.call self, :properties, :path, :repo
+        Callback_::Actor.call self, :properties, :path, :repo, :rsx
 
         def execute
 
           statistics = []
 
-          @build_trail = Actors_::Build_trail.new( statistics, @repo, & @on_event_selectively )
+          @build_trail = Actors_::Build_trail.new(
+            statistics, @repo, @rsx, & @on_event_selectively )
 
           @list_of_trails = []
 
@@ -117,7 +118,7 @@ module Skylab::GitViz
 
           @statistics.sort!.freeze
 
-          Bundle_.new( @statistics, @list_of_trails, bx )
+          Bundle_.new( @statistics, @list_of_trails, bx, @rsx )
         end
       end
     end

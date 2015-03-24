@@ -16,12 +16,12 @@ module Skylab::GitViz
           end
         end  # >>
 
-        def initialize rows, glyphs
-          @glyphs = glyphs
+        def initialize rows, x
+          @glyph_mapper = x
           @rows = rows
         end
 
-        attr_reader :glyphs, :rows
+        attr_reader :glyph_mapper, :rows
 
         class Build___
 
@@ -33,18 +33,19 @@ module Skylab::GitViz
             @order_box_length = order_box.length
             @order_box_h = order_box.h_
 
-            glyphs = Glyphs___.new bundle.statistics,
+            gm = Build_glyph_mapper___.new( bundle.statistics,
               # "\u2058",  # Four Dot Punctuation - ⁘
               "\u29bf",  # Circled Bullet - ⦿
               # "\u25c9",  # Fisheye - ◉
               "\u25cf",  # Blank Circle - ●
               "\u2022",  # Bullet - ●
               "\u2b24"   # Blank Large Circle - ⬤
+            ).execute
 
-            @glyphs = glyphs
-            @ranges = glyphs.ranges
-            @indexes = 0 ... @ranges.length
 
+            @__gm = gm
+
+            @B_tree = gm.B_tree
           end
 
           def execute
@@ -53,7 +54,7 @@ module Skylab::GitViz
               Row___.new( __row_via_trail( trail ), trail.path )
             end
 
-            Table_.new _row_a, @glyphs
+            Table_.new _row_a, @__gm
           end
 
           Row___ = ::Struct.new :a, :to_tree_path
@@ -87,80 +88,138 @@ module Skylab::GitViz
 
           def _cel_via_bundle_filechange bundle_filechange
 
-            d = bundle_filechange.fc.change_count
+            _cc_d = bundle_filechange.fc.change_count
 
-            idx = @indexes.detect do | d_ |
+            _cat_d = @B_tree.category_for _cc_d
 
-              @ranges.fetch( d_ ).include? d
+            _cat_d or self._SANITY
 
-            end
-
-            idx or self._SANITY
-
-            Modality_Filechange___.new false, idx, bundle_filechange
+            Modality_Filechange___.new false, _cat_d, bundle_filechange
           end
         end
 
         Modality_Filechange___ = ::Struct.new :is_first, :amount_classification, :bundle_filechange
 
-        class Glyphs___
-
-          attr_reader :create_glyph, :glyphs, :ranges
+        class Build_glyph_mapper___  # algorithm in [#026]
 
           def initialize statistics, create_glyph, * glyphs
 
-            @create_glyph = create_glyph
+            @__create_glyph = create_glyph
+            @__glyphs = glyphs
 
-            s_length = statistics.length
-            g_length = glyphs.length
+            @number_of_categories = glyphs.length
+            @stats = statistics
+          end
 
-            chunk_length = s_length / g_length
+          def execute
 
-            d = 0
+            __init_B_tree
 
-            range_a = []
+            Glyph_Mapper___.new do | o |
+              o.B_tree = @B_tree
+              o.create_glyph = @__create_glyph
+              o.glyphs = @__glyphs
+            end
+          end
 
-            d_ = d + chunk_length
+          def __init_B_tree
 
-            begin_ = statistics.fetch d
-            end_ = statistics.fetch d_
+            __init_category_list
 
-            end_value = statistics.fetch( -1 )
+            @B_tree = GitViz_.lib_.basic::Tree::Binary.
+              via_sorted_range_list @category_list
+
+            NIL_
+          end
+
+          def __init_category_list
+
+            @first = @stats.first
+            @last = @stats.last
+
+            if @last == @first
+
+              self._WHEN_EXPANSE_OF_ONE
+            else
+
+              @expanse = @last - @first + 1
+              @units_per_category = 1.0 * @expanse / @number_of_categories
+
+              if 1.0 > @units_per_category
+
+                __init_category_list_simply
+              else
+
+                __init_category_list_normally
+              end
+            end
+            NIL_
+          end
+
+          def __init_category_list_simply
+
+            # you have more categories than you have expanse. chop off the
+            # latter catergories because meh. procede as if etc b.c meh
+
+            @category_list = @expanse.times.map do | d |
+              x = @first + d
+              Category__.new x, x, d
+            end
+            NIL_
+          end
+
+          def __init_category_list_normally
+
+            a = []
+            begin_d = @first
+            st = Callback_::Stream.via_range( 1 .. @number_of_categories )
+            start_d = @first
 
             begin
 
-              range_a.push ::Range.new( begin_, end_ )
+              d = st.gets
+              d or break
 
-              if end_value == end_
-                break
-              end
+              begin_d_ = start_d + ( d * @units_per_category ).to_i
 
-              d = d_ + 1
-              if s_length == d
-                break
-              end
+              a.push Category__.new( begin_d, begin_d_ - 1, d - 1 )
 
-              begin_ = statistics.fetch d
-              d_ = d + chunk_length
-
-              if s_length <= d_
-                self._LOOK
-              end
-
-              end__ = statistics.fetch d_
-
-              if end_ == begin_
-                begin_ = end__
-              end
-
-              end_ = end__
+              begin_d = begin_d_
 
               redo
             end while nil
 
-            @glyphs = glyphs
-            @ranges = range_a
+            @category_list = a
+            NIL_
           end
+        end
+
+        class Category__
+
+          def initialize begin_, end_, d
+            @begin = begin_
+            @category_d = d
+            @end = end_
+          end
+
+          attr_reader :begin, :category_d, :end
+
+          def category_for d
+
+            if @begin <= d && @end >= d
+              @category_d
+            end
+          end
+        end
+
+        class Glyph_Mapper___
+
+          def initialize
+            yield self
+            freeze
+          end
+
+          attr_accessor :B_tree, :create_glyph, :glyphs
         end
 
         Table_ = self
