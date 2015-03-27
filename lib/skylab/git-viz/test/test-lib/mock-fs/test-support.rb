@@ -13,7 +13,7 @@ module Skylab::GitViz::TestSupport::Test_Lib::Mock_FS
   GitViz_::Autoloader_[ Fixtures = ::Module.new ]
 
   module ModuleMethods
-    def memoize i, &p  # this is used for OCD reasons, but can be problematic
+    def memoize_ i, &p  # this is used for OCD reasons, but can be problematic
       p_ = -> ctx do
         r = ctx.instance_exec( & p ) ; p_ = -> _ { r } ; r
       end

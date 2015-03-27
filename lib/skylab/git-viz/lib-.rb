@@ -65,6 +65,10 @@ module Skylab::GitViz
 
     MD5 = memo[ -> do require 'digest/md5' ; ::Digest::MD5 end ]
 
+    NLP = -> do
+      HL__[]::NLP
+    end
+
     Open3 = stdlib[ :Open3 ]
 
     Option_parser = memo[ -> do require 'optparse' ; ::OptionParser end ]

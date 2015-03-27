@@ -92,7 +92,7 @@ module Skylab::GitViz
             @curr_path = fc.source_path
           end
 
-          @fc_a.push Bundle_Filechange___.new( fc, ci.SHA )
+          @fc_a.push Bundle_Filechange___.new( fc, ci )
 
           ACHIEVED_
         end
@@ -128,11 +128,14 @@ module Skylab::GitViz
       end
 
       class Bundle_Filechange___  # :+#stowaway
-        def initialize fc, _SHA
+        def initialize fc, ci
+          @ci = ci
           @fc = fc
-          @SHA = _SHA
         end
-        attr_reader :fc, :SHA
+        attr_reader :ci, :fc
+        def SHA
+          @ci.SHA
+        end
       end
     end
   end

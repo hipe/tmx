@@ -396,10 +396,10 @@ module Skylab::Brazen
       def resolve_bound_call_when_looks_like_option_for_first_argument
         prepare_to_parse_parameters
         parse_options
-        @bound_call or resolve_bound_call_when_parsed_options
+        @bound_call or resolve_bound_call_when_options_parsed
       end
 
-      def resolve_bound_call_when_parsed_options
+      def resolve_bound_call_when_options_parsed
         if @mutable_backbound_iambic.length.zero?
           if argv.length.zero?
             resolve_bound_call_when_no_arguments
@@ -407,11 +407,11 @@ module Skylab::Brazen
             resolve_bound_call_when_looks_like_action_for_first_argument
           end
         else
-          resolve_bound_call_when_successfully_parsed_options
+          __resolve_bound_call_when_options_parsed_successfully
         end
       end
 
-      def resolve_bound_call_when_successfully_parsed_options
+      def __resolve_bound_call_when_options_parsed_successfully
         a = [] ; scn = to_actual_parameters_stream
         scn.next
         begin
@@ -478,10 +478,10 @@ module Skylab::Brazen
       def resolve_bound_call
         prepare_to_parse_parameters
         parse_options
-        @bound_call or resolve_bound_call_after_parsed_options
+        @bound_call or resolve_bound_call_when_options_parsed
       end
 
-      def resolve_bound_call_after_parsed_options
+      def resolve_bound_call_when_options_parsed
         if @seen_h[ :help ]
           resolve_bound_call_when_help_request
         else

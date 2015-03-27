@@ -49,6 +49,10 @@ module Skylab::Callback
         @h[ k ]
       end
 
+      def at_position d
+        @h.fetch @a.fetch d
+      end
+
       def to_fetch_proc
         @h.method :fetch
       end
@@ -97,10 +101,18 @@ module Skylab::Callback
 
       # ~ mutators
 
+      def add_to_front sym, x
+        _add_at_position 0, sym, x
+      end
+
       def add sym, x
+        _add_at_position @a.length, sym, x
+      end
+
+      def _add_at_position d, sym, x
         had = true
         @h.fetch sym do
-          @a.push sym
+          @a[ d, 0 ] = [ sym ]
           @h[ sym ] = x
           had = nil
         end
@@ -121,6 +133,10 @@ module Skylab::Callback
       def remove sym
         @a[ @a.index( sym ), 1 ] = EMPTY_A_
         @h.delete sym
+      end
+
+      def a_
+        @a
       end
     end
   end

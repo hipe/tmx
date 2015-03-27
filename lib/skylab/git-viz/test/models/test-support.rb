@@ -10,7 +10,7 @@ module Skylab::GitViz::TestSupport::Models
 
   module ModuleMethods
 
-    def memoize sym, & p
+    def memoize_ sym, & p
 
       define_singleton_method sym, & Callback_.memoize( & p )
 
@@ -78,6 +78,8 @@ module Skylab::GitViz::TestSupport::Models
 
   Callback_ = Callback_
   GitViz_ = GitViz_
+  Mock_Filechange_ = ::Struct.new :author_datetime, :change_count
+  Mock_Row_ = ::Struct.new :to_a
   NIL_ = NIL_
   Top_TS_ = Top_TS_
 

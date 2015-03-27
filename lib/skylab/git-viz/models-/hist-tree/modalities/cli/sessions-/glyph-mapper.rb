@@ -4,132 +4,58 @@ module Skylab::GitViz
 
     module Modalities::CLI
 
-      Models_ = ::Module.new
+      Sessions_ = ::Module.new
 
-      class Models_::Table
+      class Sessions_::Glyph_Mapper  # algorithm in [#026]
 
         class << self
 
-          def new_via_bundle_and_repository bundle, repository
+          def start create_glyph, * glyphs
 
-            Build___.new( bundle, repository ).execute
+            new  glyphs, create_glyph
           end
         end  # >>
 
-        def initialize rows, x
-          @glyph_mapper = x
-          @rows = rows
+        def initialize glyphs, create_glyph
+
+          @create_glyph = create_glyph
+          @glyphs = glyphs
         end
 
-        attr_reader :glyph_mapper, :rows
+        attr_reader :create_glyph, :glyphs
 
-        class Build___
+        def bake_for statistics
+          Bake___.new( statistics, @glyphs, @create_glyph ).execute
+        end
 
-          def initialize bundle, repository
+        class Baked___ < self
 
-            @matrix = bundle.build_matrix_via_repository repository
-            order_box = @matrix.order_box
-            @number_of_columns = order_box.length
-            @order_box_length = order_box.length
-            @order_box_h = order_box.h_
+          def initialize _B_tree, x, x_
+            super( x, x_ )
+            @B_tree = _B_tree
+          end
 
-            gm = Build_glyph_mapper___.new( bundle.statistics,
-              # "\u2058",  # Four Dot Punctuation - ⁘
-              "\u29bf",  # Circled Bullet - ⦿
-              # "\u25c9",  # Fisheye - ◉
-              "\u25cf",  # Blank Circle - ●
-              "\u2022",  # Bullet - ●
-              "\u2b24"   # Blank Large Circle - ⬤
-            ).execute
+          attr_reader :B_tree
 
+        end
 
-            @__gm = gm
+        class Bake___
 
-            @B_tree = gm.B_tree
+          def initialize * a
+
+            @stats, @glyphs, @create_glyph = a
+
+            @number_of_categories = @glyphs.length
           end
 
           def execute
-
-            _row_a = @matrix.bundle.trails.map do | trail |
-              Row___.new( __row_via_trail( trail ), trail.path )
-            end
-
-            Table_.new _row_a, @__gm
-          end
-
-          Row___ = ::Struct.new :a, :to_tree_path
-
-          def __row_via_trail trail
-
-            row = ::Array.new @order_box_length
-
-            st = Callback_::Stream.via_nonsparse_array trail.filechanges
-
-            bf = st.gets
-
-            cel = _cel_via_bundle_filechange bf
-
-            cel.is_first = true
-
-            row[ @order_box_h.fetch bf.SHA.string ] = cel
-
-            begin
-
-              bf = st.gets
-              bf or break
-              row[  @order_box_h.fetch bf.SHA.string ] =
-                _cel_via_bundle_filechange( bf )
-
-              redo
-            end while nil
-
-            row
-          end
-
-          def _cel_via_bundle_filechange bundle_filechange
-
-            _cc_d = bundle_filechange.fc.change_count
-
-            _cat_d = @B_tree.category_for _cc_d
-
-            _cat_d or self._SANITY
-
-            Modality_Filechange___.new false, _cat_d, bundle_filechange
-          end
-        end
-
-        Modality_Filechange___ = ::Struct.new :is_first, :amount_classification, :bundle_filechange
-
-        class Build_glyph_mapper___  # algorithm in [#026]
-
-          def initialize statistics, create_glyph, * glyphs
-
-            @__create_glyph = create_glyph
-            @__glyphs = glyphs
-
-            @number_of_categories = glyphs.length
-            @stats = statistics
-          end
-
-          def execute
-
-            __init_B_tree
-
-            Glyph_Mapper___.new do | o |
-              o.B_tree = @B_tree
-              o.create_glyph = @__create_glyph
-              o.glyphs = @__glyphs
-            end
-          end
-
-          def __init_B_tree
 
             __init_category_list
 
-            @B_tree = GitViz_.lib_.basic::Tree::Binary.
+            _B_tree = GitViz_.lib_.basic::Tree::Binary.
               via_sorted_range_list @category_list
 
-            NIL_
+            Baked___.new( _B_tree, @glyphs, @create_glyph )
           end
 
           def __init_category_list
@@ -137,22 +63,18 @@ module Skylab::GitViz
             @first = @stats.first
             @last = @stats.last
 
-            if @last == @first
+            @expanse = @last - @first + 1  # last == first OK
 
-              self._WHEN_EXPANSE_OF_ONE
+            @units_per_category = Rational @expanse, @number_of_categories
+
+            if 1.0 > @units_per_category
+
+              __init_category_list_simply
             else
 
-              @expanse = @last - @first + 1
-              @units_per_category = 1.0 * @expanse / @number_of_categories
-
-              if 1.0 > @units_per_category
-
-                __init_category_list_simply
-              else
-
-                __init_category_list_normally
-              end
+              __init_category_list_normally
             end
+
             NIL_
           end
 
@@ -211,18 +133,6 @@ module Skylab::GitViz
             end
           end
         end
-
-        class Glyph_Mapper___
-
-          def initialize
-            yield self
-            freeze
-          end
-
-          attr_accessor :B_tree, :create_glyph, :glyphs
-        end
-
-        Table_ = self
       end
     end
   end

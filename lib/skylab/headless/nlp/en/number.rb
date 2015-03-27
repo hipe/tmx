@@ -61,6 +61,25 @@ module Skylab::Headless
       end
     end
 
+    _ST = 'st' ; _ND = 'nd' ; _RD = 'rd' ; _TH = 'th'
+
+    o[ :ord ] = -> d do  # ( redux of part of above )
+
+      d = d.abs % 100
+
+      case d
+      when 11, 12, 13 ; _TH
+      else
+        d %= 10
+        case d
+        when 1 ; _ST
+        when 2 ; _ND
+        when 3 ; _RD
+        else   ; _TH
+        end
+      end
+    end
+
   end.call -> do
     o = -> i, p do
       define_singleton_method i do | * a |

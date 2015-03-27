@@ -83,24 +83,29 @@ module Skylab::Brazen
         private
 
           def ad_hoc_normalizer=
-            _add_ad_hoc_normalizer( & iambic_property )
+
+            accept_ad_hoc_normalizer( & iambic_property )
             KEEP_PARSING_
           end
 
         public
 
           def add_ad_hoc_normalizer & arg_and_oes_block_p
-            _add_ad_hoc_normalizer( & arg_and_oes_block_p )
+
+            accept_ad_hoc_normalizer(  & arg_and_oes_block_p )
             self
           end
 
-          def _add_ad_hoc_normalizer & arg_and_oes_block_p
+          attr_reader :has_ad_hoc_normalizers, :norm_p_a
+
+        private
+
+          def accept_ad_hoc_normalizer & arg_and_oes_block_p
+
             @has_ad_hoc_normalizers = true
             ( @norm_p_a ||= [] ).push arg_and_oes_block_p
-            nil
+            NIL_
           end
-
-          attr_reader :has_ad_hoc_normalizers, :norm_p_a
         end
 
         def _apply_ad_hoc_normalizers pr  # this evolved from [#ba-027]
@@ -324,13 +329,18 @@ module Skylab::Brazen
 
         class self::Entity_Property
         private
+
           def integer_greater_than_or_equal_to=
+            add_normalizer_for_greater_than_or_equal_to_integer iambic_property
+          end
+
+          def add_normalizer_for_greater_than_or_equal_to_integer d
 
             _NORMER = Model_::Entity.normalizers.number(
               :number_set, :integer,
-              :minimum, iambic_property )
+              :minimum, d )
 
-            _add_ad_hoc_normalizer do | arg, & oes_p |
+            accept_ad_hoc_normalizer do | arg, & oes_p |
               if arg.value_x.nil?
                 arg
               else
@@ -346,7 +356,7 @@ module Skylab::Brazen
               :number_set, :integer,
               :minimum, 0 )
 
-            _add_ad_hoc_normalizer do | arg, & oes_p |
+            accept_ad_hoc_normalizer do | arg, & oes_p |
 
               if arg.value_x.nil?
                 arg

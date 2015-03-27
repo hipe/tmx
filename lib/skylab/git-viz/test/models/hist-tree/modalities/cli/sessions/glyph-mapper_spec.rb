@@ -2,7 +2,7 @@ require_relative '../../../../test-support'
 
 module Skylab::GitViz::TestSupport::Models
 
-  describe "[gv] VCS adapters - git - models - hist-tree - CLI - models - table :[#026]" do
+  describe "[gv] VCS adapters - git - models - hist-tree - CLI - sessions - glyph mapper:[#026]" do
 
     extend TS_
 
@@ -48,17 +48,21 @@ module Skylab::GitViz::TestSupport::Models
 
     def _against d
 
-      _mapper.B_tree.category_for d
+      _baked.B_tree.category_for d
     end
 
-    memoize :_mapper do
+    memoize_ :_baked do
 
-      GitViz_::Models_::Hist_Tree::Modalities::CLI::Models_::Table::
-        Build_glyph_mapper___.new(
-          _statistics, 'Cr', 'A', 'B', 'C' ).execute
+      _mapper.bake_for _statistics
     end
 
-    memoize :_statistics do
+    memoize_ :_mapper do
+
+      GitViz_::Models_::Hist_Tree::Modalities::CLI::Sessions_::Glyph_Mapper.
+        start 'Cr', 'A', 'B', 'C'
+    end
+
+    memoize_ :_statistics do
 
       [0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,4,4,4,4,4,
        5,6,6,6,7,8,9,10,13,13,16,23,23,25,30,31,31,34,36,40,42,44,44,45,45,

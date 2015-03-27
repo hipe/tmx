@@ -12,6 +12,15 @@ module Skylab::GitViz
 
         class Hist_Tree < GitViz_.lib_.brazen::CLI::Action_Adapter
 
+          GLYPHS___ =
+            # "\u2058",  # Four Dot Punctuation - ⁘
+            "\u29bf",  # Circled Bullet - ⦿
+            # ~
+            # "\u25c9",  # Fisheye - ◉
+            "\u25cf",  # Blank Circle - ●
+            "\u2022",  # Bullet - ●
+            "\u2b24"   # Blank Large Circle - ⬤
+
           def resolve_properties  # #nascent-operation :+[#br-042]
 
             bp = @bound.formal_properties.to_mutable_box_like_proxy
@@ -43,6 +52,16 @@ module Skylab::GitViz
 
             # ~
 
+            fp.add_to_front :width, ( fp.at_position( 0 ).class.new do
+
+              @name = Callback_::Name.via_variegated_symbol( :width )
+              @parameter_arity = :one
+
+              add_normalizer_for_greater_than_or_equal_to_integer 1
+            end )
+
+            # ~
+
             @back_properties = bp
             @front_properties = fp
 
@@ -51,6 +70,30 @@ module Skylab::GitViz
             @bound.receive_stderr_ @resources.serr
 
             NIL_
+          end
+
+          def via_bound_action_mutate_mutable_backbound_iambic x_a
+
+            # :+[#br-049] hacks like these are temporary.
+            # this is a :+#frontier for a front-only prop with validation
+
+            sym = x_a.fetch 0
+
+            _arg = Callback_::Trio.via_value_and_variegated_symbol(
+              x_a.fetch( 1 ), sym )
+
+            arg = @front_properties.fetch( sym ).
+              norm_p_a.first.call _arg do | * i_a, & ev_p |
+
+              receive_event_on_channel ev_p[], i_a
+            end
+
+            x_a[ 0, 2 ] = EMPTY_A_
+
+            arg and begin
+              @width = arg.value_x
+              ACHIEVED_
+            end
           end
 
           def bound_call_via_bound_call_from_back bc  # frontier experiment of :+[#br-060]
@@ -63,8 +106,8 @@ module Skylab::GitViz
           def __render
 
             ok = __via_bound_call_from_back_resolve_bundle
-            ok &&= __via_bundle_resolve_rows
-            ok &&= __via_rows_resolve_column_A
+            ok &&= __via_bundle_resolve_sparse_matrix_of_content
+            ok &&= __via_sparse_matrix_of_content_resolve_column_A
             ok && __via_column_A_render
           end
 
@@ -79,30 +122,28 @@ module Skylab::GitViz
             end
           end
 
+          def __via_bundle_resolve_sparse_matrix_of_content
 
-          def __via_bundle_resolve_rows
-
-            table = CLI_::Models_::Table.new_via_bundle_and_repository(
-              @bundle, @repo )
+            table = CLI_::Models_::Sparse_Matrix_of_Content.
+              new_via_bundle_and_repository @bundle, @repo
 
             table and begin
-              @glyph_mapper = table.glyph_mapper
-              @rows = table.rows
+              @matrix = table
               ACHIEVED_
             end
           end
 
-          def __via_rows_resolve_column_A
+          def __via_sparse_matrix_of_content_resolve_column_A
 
             st = GitViz_.lib_.tree.from( :node_identifiers,
-              @rows ).to_classified_stream_for :text
+              @matrix.rows ).to_classified_stream_for :text
 
             st.gets  # the first node is always the root node,
               # which never has any visual representation
 
             max = 0
             column_A_content = []
-            column_B_row = []
+            column_B_rows = []
             begin
               o = st.gets
               o or break
@@ -112,57 +153,34 @@ module Skylab::GitViz
 
               if node.is_leaf
 
-                column_B_row.push node.node_payload
+                column_B_rows.push node.node_payload
 
                 d = s.length  # or include the branch nodes. it's a design choice
                 if max < d
                   max = d
                 end
               else
-                column_B_row.push nil
+                column_B_rows.push nil
               end
               redo
             end while nil
 
             @column_A = column_A_content
             @column_A_max_width = max
-            @column_B_row = column_B_row
+            @column_B_rows = column_B_rows
+
             ACHIEVED_
           end
 
           def __via_column_A_render
 
-            # (this may get more interesting in the next commit)
-
-            a = @column_B_row
-            fmt = "%-#{ @column_A_max_width }s |"
-            io = @resources.sout
-
-            cg_s = @glyph_mapper.create_glyph
-            s_a = @glyph_mapper.glyphs
-
-            @column_A.each_with_index do | s, d |
-
-              io << fmt % s
-
-              row = a[ d ]
-              if row
-                row.a.each do | x |
-                  io << SPACE_
-                  if x
-                    if x.is_first
-                      io << cg_s
-                    else
-                      io << s_a.fetch( x.amount_classification )
-                    end
-                  else
-                    io << SPACE_
-                  end
-                end
-              end
-              io << NEWLINE_
-            end
-            ACHIEVED_
+            CLI_::Actors_::Scale_time[
+              @column_B_rows,
+              @column_A_max_width,
+              @column_A,
+              @width,
+              CLI_::Sessions_::Glyph_Mapper.start( * GLYPHS___ ),
+              @resources.sout ]
           end
         end
       end

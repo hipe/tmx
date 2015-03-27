@@ -30,6 +30,39 @@ only.
 
 
 
+## example
+
+let's say that people in a room are the following heights:
+
+  5'2", 5'10", 5'11", 6'4"
+
+if we want to break this series up into contiguous categories of "short",
+"medium", "tall"; the subject algorithm achieves this with absolutely no
+consideration for the distribution of datapoints except the lowest and
+highest value:
+
+  1. between the lowest (5'2") and the highest (6'4") covers a "distance"
+     of 14 inches (but note that in a world where everybody is a discrete
+     number of inches, there are 16 possible height values in this range).
+
+  2. divide that distance by the number of categories you want:
+     14 / 3 = ~ 4.6 inches per category.
+
+  3. use this rational number to make your categories:
+
+     short:  5'2" -  ~ 5'6.6
+     medium: ~5'6.6" - ~5'11"
+     tall: 5'11" - ~6'3.6"
+
+     these ranges exclude the value of each "end" component itself.
+
+     note that we lost some distance due to a rounding error - we want
+     that last term to a) include its end component and b) be 6'4", not
+     ~ 6'3.6". in the code we will address issues like these.
+
+
+
+
 ## the pseudocode
 
   • determine the "expanse": determine the smallest value and largest

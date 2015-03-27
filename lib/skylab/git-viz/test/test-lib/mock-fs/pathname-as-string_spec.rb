@@ -104,7 +104,7 @@ module Skylab::GitViz::TestSupport::Test_Lib::Mock_FS
         expect_absolute
       end
 
-      memoize :simple_absolute do
+      memoize_ :simple_absolute do
         build_pathname_from_string '/foo'
       end
 
@@ -113,7 +113,7 @@ module Skylab::GitViz::TestSupport::Test_Lib::Mock_FS
         expect_absolute
       end
 
-      memoize :compound_absolute do
+      memoize_ :compound_absolute do
         build_pathname_from_string '/foo/bar'
       end
 
@@ -122,7 +122,7 @@ module Skylab::GitViz::TestSupport::Test_Lib::Mock_FS
         expect_relative
       end
 
-      memoize :simple_relative do
+      memoize_ :simple_relative do
         build_pathname_from_string 'biz'
       end
 
@@ -131,7 +131,7 @@ module Skylab::GitViz::TestSupport::Test_Lib::Mock_FS
         expect_relative
       end
 
-      memoize :compound_relative do
+      memoize_ :compound_relative do
         build_pathname_from_string 'biz/baz'
       end
 
@@ -140,7 +140,7 @@ module Skylab::GitViz::TestSupport::Test_Lib::Mock_FS
         expect_relative
       end
 
-      memoize :empty_string_pathname do
+      memoize_ :empty_string_pathname do
         build_pathname_from_string ''
       end
 

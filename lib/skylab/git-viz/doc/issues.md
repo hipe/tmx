@@ -10,9 +10,10 @@
 [#031] #open detect renames
                (was: the plugin narrative, moved to [hl])
 [#030]       #parent-node:[#018] what is meant by isomorphic interface? ..
-[#029]       shutdown/fail more gracefully when manifest parse errors
+[#029]       the scale time algorithm ..
+             ( #was: shutdown/fail more gracefully when manifest parse errors )
 [#028]       #parent-node:[#017] fixtures scripts in detail ..
-[#027]       #done #parent-node:[#018] the idea for the "free-tags" feature
+[#027]       #to-archive #parent-node:[#018] the idea for the "free-tags" feature
 [#026]       the glyph assignment algorithm ..
              ( #was: #done use 'listen' gem to listen to filesystem for manifest changes )
 [#025] #open omg concurrency

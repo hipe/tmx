@@ -17,21 +17,54 @@ module Skylab::GitViz::TestSupport::Models
           sout_serr_line_stream_for_contiguous_lines_on_stream :e )
 
       screen.children.map { |cx| cx.x.unstyled_header_content }.should eql(
-        [ 'usage', 'options', 'argument' ] )
+        [ 'usage', 'options', 'arguments' ] )
 
-      screen.children.last.only_child.x.line_content.should eql 'path'
+      args = screen.children.last
+      args.children.map { |cx| cx.x.unstyled_header_content }.should eql(
+        %w( width path ) )
 
       expect_result_for_success
     end
 
-    it "see dots (mocked) (note tree cosmetics appear broken)" do
+    it "when width is not present" do
+
+      invoke 'hi', 'x'
+
+      on_stream :e
+      expect :styled, 'expecting <path>'
+      expect_result_for_failure
+    end
+
+    it "when width is not valid" do
+
+      invoke 'hi', '--', '-1', 'x'
+
+      expect :styled, '<width> must be greater than or equal to 1, had \'-1\''
+      expect_result_for_failure
+    end
+
+    it "DAY VIEW!" do
+
+      _common_prepare
+
+      invoke 'hi', '--', '46', _the_pathname
+
+       __expect_day_view_dots
+    end
+
+    it "SHIFT VIEW!" do
+
+      _common_prepare
+
+      invoke 'hi', '--', '47', _the_pathname
+
+      __expect_shift_view_dots
+    end
+
+    def _common_prepare
 
       @for_expect_stdout_stderr_prepare_invocation = method :__prepare_invo
       @for_expect_stdout_stderr_use_this_as_stderr = mock_stderr_instance
-
-      invoke 'hi', mock_pathname( '/m03/repo/dirzo' )
-      __expect_dots
-      expect_succeeded
     end
 
     def __prepare_invo invo
@@ -39,7 +72,45 @@ module Skylab::GitViz::TestSupport::Models
       NIL_
     end
 
-    def __expect_dots
+    def _the_pathname
+      mock_pathname '/m03/repo/dirzo'
+    end
+
+    # ~ expects
+
+    def __expect_day_view_dots
+
+      on_stream :o
+
+      expect "                                     1J  "
+      expect "                                     9a3M"
+      expect "                                     9nro"
+      expect "                                     9 dn"
+      expect " ├everybody in the room is floating | •• "
+      expect " ├it's just                         |"
+      expect " │ └funky like that                 |• ⬤ "
+      expect " └move-after                        |  ●●"
+
+      expect_succeeded
+    end
+
+    def __expect_shift_view_dots
+
+      on_stream :o
+
+      expect "                                     1         "
+      expect "                                     9J28 38 M8"
+      expect "                                     9anA rA oA"
+      expect "                                     9ndM dM nM"
+      expect " ├everybody in the room is floating |   •  •   "
+      expect " ├it's just                         |"
+      expect " │ └funky like that                 |•     ⬤   "
+      expect " └move-after                        |      ●  ●"
+
+      expect_succeeded
+    end
+
+    def __FOR_THE_FUTURE_expect_solid_dots
 
       on_stream :o
 

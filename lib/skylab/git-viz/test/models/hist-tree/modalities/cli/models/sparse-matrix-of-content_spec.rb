@@ -1,8 +1,8 @@
-require_relative '../../../test-support'
+require_relative '../../../../test-support'
 
 module Skylab::GitViz::TestSupport::Models
 
-  describe "[gv] VCS adapters - git - models - hist-tree - CLI - flattening" do
+  describe "[gv] VCS adapters - git - models - hist-tree - CLI - models - sparse matrix of content" do
 
     extend TS_
     use :bundle_support
@@ -21,27 +21,30 @@ module Skylab::GitViz::TestSupport::Models
 
       row = _table.rows.fetch 0
 
-      a = row.a
+      a = row.to_a
 
       a.length.should eql 5
 
       a[ 0 ].should be_nil
 
-      a[ 1 ].is_first.should eql true
-      a[ 1 ].amount_classification.should be_zero
+      mfc = a.fetch 1
+      mfc.is_first.should eql true
+      mfc.change_count.should eql 1
 
-      a[ 2 ].is_first.should eql false
-      a[ 2 ].amount_classification.should eql 1
+      mfc = a.fetch 2
+      mfc.is_first.should eql false
+      mfc.change_count.should eql 2
 
       a[ 3 ].should be_nil
 
-      a[ 4 ].is_first.should eql false
-      a[ 4 ].amount_classification.should eql 1
+      mfc = a.fetch 4
+      mfc.is_first.should eql false
+      mfc.change_count.should eql 2
 
     end
 
     def _subject
-      GitViz_::Models_::Hist_Tree::Modalities::CLI::Models_::Table
+      GitViz_::Models_::Hist_Tree::Modalities::CLI::Models_::Sparse_Matrix_of_Content
     end
 
     def manifest_path_for_mock_FS
