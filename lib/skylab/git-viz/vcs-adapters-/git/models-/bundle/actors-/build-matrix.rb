@@ -146,6 +146,9 @@ module Skylab::GitViz
           pool.fetch @earliest_SHA  # sanity
           pool.delete @earliest_SHA  # wlll pay it back #here
 
+          @stderr.write "(building order box with .."
+
+          count = 0
           begin
             line = o.gets
 
@@ -154,7 +157,7 @@ module Skylab::GitViz
               break
             end
 
-            @stderr.write DOT_
+            count += 1
 
             line.chop!
 
@@ -179,6 +182,8 @@ module Skylab::GitViz
 
             redo
           end while nil
+
+          @stderr.write "#{ count } commits)#{ NEWLINE_ }"
 
           order_box.add @earliest_SHA, 0  # payed it back from :#here
 

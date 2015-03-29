@@ -1,12 +1,14 @@
-[#037]       :#todo:when-ba-is-purified
+[#037] #open speedup..
 [#036] #open #parent-node:[#017]
                redudnancy with mapping real SHA's to commitpoint SHA's
 [#035]       #parent-node:[#005] git gotchas ..
 [#034]       #parent-node:[#023] the first business responder ("server backend")
 [#033]       #parent-node:[#021] the different kinds of callback trees
-[#032]       #done re-arch auto shutdown to use messages, currently it's creating
-             assertion failures, perhaps b.c we are passing sockets across
-             memory barriers?
+[#032] #open yet another mis-understanding of how --follow works:
+             it appears to catch both past and present files with this name
+             ( #was: #done re-arch auto shutdown to use messages, currently
+               it's creating assertion failures, perhaps b.c we are passing
+               sockets across memory barriers? )
 [#031] #open detect renames
                (was: the plugin narrative, moved to [hl])
 [#030]       #parent-node:[#018] what is meant by isomorphic interface? ..

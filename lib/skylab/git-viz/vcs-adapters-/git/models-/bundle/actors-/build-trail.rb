@@ -41,6 +41,7 @@ module Skylab::GitViz
           path_ = @normalize_path[ path ]
 
           @fc_a = []
+          # $stderr.puts "git #{ [ * LOG_BASE_CMD_ , path_ ].join ' ' }"
           _, o, e, t = @repo.repo_popen_3_( * LOG_BASE_CMD_, path_ )
           line = o.gets
           if line
@@ -62,10 +63,9 @@ module Skylab::GitViz
 
         def __via_output line
 
-          @stderr.write DOT_
-
           @curr_path = @normal_received_path
           ok = true
+          @found_false_match = false
           begin
             line.strip!
             ok = __process_SHA line
@@ -84,7 +84,29 @@ module Skylab::GitViz
 
           ci = __produce_ci sha
 
-          fc = ci.fetch_filechange_via_end_path @curr_path
+          fc = ci.fetch_filechange_via_end_path @curr_path do end
+
+          if fc
+            if @found_false_match
+              @found_false_match = false
+              @stderr.write 'r)'
+            end
+            __process_filechange fc, ci
+          else
+
+            # case studies for when/why this happens are in [#032] a "false matches"
+
+            if @found_false_match
+              @stderr.write 'f'
+            else
+              @stderr.write '(F'
+              @found_false_match = true
+            end
+            ACHIEVED_
+          end
+        end
+
+        def __process_filechange fc, ci
 
           fc.write_statistics @statistics
 

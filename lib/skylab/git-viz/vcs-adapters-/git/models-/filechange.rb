@@ -10,6 +10,20 @@ module Skylab::GitViz
 
           md = NUMSTAT_LINE_RX___.match s
 
+          if md
+            insertion_count = md[ :insertion_count ].to_i
+            deletion_count = md[ :deletion_count ].to_i
+          else
+
+            md = /\-\t-\t(?<the_rest>.+)/.match s
+
+            if md
+              $stderr.write"([#032]-esque)"
+              insertion_count = 0
+              deletion_count = 0
+            end
+          end
+
           s_ = md[ :the_rest ]
 
           d = s_.index ROCKET_SHIP__
@@ -21,8 +35,8 @@ module Skylab::GitViz
 
           new do
 
-            @insertion_count = md[ :insertion_count ].to_i
-            @deletion_count = md[ :deletion_count ].to_i
+            @insertion_count = insertion_count
+            @deletion_count = deletion_count
             @change_count = @insertion_count + @deletion_count
             if is_rename
               @is_rename =  true

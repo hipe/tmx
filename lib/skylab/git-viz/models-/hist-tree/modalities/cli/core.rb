@@ -24,6 +24,24 @@ module Skylab::GitViz
           def resolve_properties  # #nascent-operation :+[#br-042]
 
             bp = @bound.formal_properties.to_mutable_box_like_proxy
+
+            bp.replace_by :path do | prp |
+
+              prp.dup.add_ad_hoc_normalizer do | arg, & oes_p |
+
+                # hackd for now
+
+                path = arg.value_x
+
+                if ! path.respond_to?( :relative_path_from ) && ::File::SEPARATOR != path[ 0 ]
+                  arg = arg.new_with_value ::File.expand_path path
+                end
+                arg
+              end
+            end
+
+            # ~
+
             fp = bp.dup
             @bound.change_formal_properties bp
 

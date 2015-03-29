@@ -62,7 +62,7 @@ appear with the form "[#012]:#hashtag-name" (without the quotes).)
 
     • with this complete trail, add it to the #list-of-trails.
 
-  • sort the-commit-cache by datetime (MAYBE), putting the results
+  • sort the-commit-cache by datetime (MAYBE (see [#037[)), putting the results
     into #the-commit-box. the-commit-box plus the list-of-trails is
     #the-bundle.
 

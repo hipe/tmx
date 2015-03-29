@@ -92,7 +92,7 @@ module Skylab::Brazen
 
           def add_ad_hoc_normalizer & arg_and_oes_block_p
 
-            accept_ad_hoc_normalizer(  & arg_and_oes_block_p )
+            accept_ad_hoc_normalizer( & arg_and_oes_block_p )
             self
           end
 
