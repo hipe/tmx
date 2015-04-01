@@ -225,7 +225,7 @@ module Skylab::Brazen
             end
           end
 
-          class Crazy_Scanner__ < Callback_::Iambic_Stream_via_Array_
+          class Crazy_Scanner__ < Callback_::Polymorphic_Stream_via_Array_
             attr_writer :d, :x_a_length
             attr_reader :d
           end

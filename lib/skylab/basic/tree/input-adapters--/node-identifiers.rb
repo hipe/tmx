@@ -1,26 +1,24 @@
-module Skylab::SubTree
+module Skylab::Basic
 
-  module Models::Tree
+  module Tree
 
-    class Input_Adapters__::Node_identifiers
+    # ->
 
-      attr_writer :mixed_upstream, :node_class
+      Input_Adapters__::Node_identifiers = -> upstream_x do
 
-      def produce_tree
+        root = Tree_::Mutable_.new
 
-        cls = @node_class
+        upstream_x.each do | identifier |
 
-        root = cls.new :name_services, cls.new
-
-        @mixed_upstream.each do | identifier |
-
-          root.fetch_or_create(
-            :path, identifier.to_tree_path,
-            :node_payload, identifier )
+          root.touch identifier.to_tree_path,
+            :leaf_node_payload_proc, -> do
+              identifier
+            end
         end
 
         root
       end
-    end
+
+      # <-
   end
 end

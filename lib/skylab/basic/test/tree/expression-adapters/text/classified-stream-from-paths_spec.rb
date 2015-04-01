@@ -1,14 +1,14 @@
 require_relative '../../test-support'
 
-module Skylab::SubTree::TestSupport::Models_Tree
+module Skylab::Basic::TestSupport::Tree_TS
 
-  describe "[st] models - tree - expad - text - classified stream from paths" do
+  describe "[ba] tree - expad - text - classified stream from paths" do
 
     extend TS_
 
     it "3 node triangle" do
 
-      tree = fp 'a/b', 'a/c'
+      tree = via_paths_ 'a/b', 'a/c'
       tree = tree.fetch_only_child
 
       st = tree.to_classified_stream_for :text
@@ -18,11 +18,11 @@ module Skylab::SubTree::TestSupport::Models_Tree
       begin
         card = st.gets
         card or break
-        y.push "#{ card.prefix_string }#{ card.node.any_slug }\n"
+        y.push "#{ card.prefix_string }#{ card.node.slug }\n"
         redo
       end while nil
 
-      _exp = deindent <<-HERE
+      _exp = deindent_ <<-HERE
         a
          ├b
          └c
@@ -33,7 +33,7 @@ module Skylab::SubTree::TestSupport::Models_Tree
 
     it "3 point beanstalk" do
 
-      tree = fp 'a/b/c'
+      tree = via_paths_ 'a/b/c'
       tree = tree.fetch_only_child
       st = tree.to_classified_stream_for :text
       y = []
@@ -41,11 +41,11 @@ module Skylab::SubTree::TestSupport::Models_Tree
       begin
         card = st.gets
         card or break
-        y.push "#{ card.prefix_string }#{ card.node.any_slug }\n"
+        y.push "#{ card.prefix_string }#{ card.node.slug }\n"
         redo
       end while nil
 
-      _exp = deindent <<-HERE
+      _exp = deindent_ <<-HERE
         a
          └b
            └c
@@ -56,7 +56,7 @@ module Skylab::SubTree::TestSupport::Models_Tree
 
     it "vertical runs" do
 
-      tree = fp 'z/hufflbuff/ravendoor',
+      tree = via_paths_ 'z/hufflbuff/ravendoor',
         'z/hufflbuff/ravendoor/sabblewood',
         'z/snaggoletoogh/liverwords',
         'z/snaggoletoogh/liverwords/beef',
@@ -75,7 +75,7 @@ module Skylab::SubTree::TestSupport::Models_Tree
         redo
       end while nil
 
-      _exp = deindent( <<-HERE )
+      _exp = deindent_ <<-HERE
         z
          ├hufflbuff
          │ └ravendoor

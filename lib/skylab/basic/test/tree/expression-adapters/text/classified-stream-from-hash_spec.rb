@@ -2,15 +2,15 @@
 
 require_relative '../../test-support'
 
-module Skylab::SubTree::TestSupport::Models_Tree
+module Skylab::Basic::TestSupport::Tree_TS
 
-  describe "[st] models - tree - expad - text = classified stream from hash" do
+  describe "[ba] tree - expad - text = classified stream from hash" do
 
     extend TS_
 
     it "renders a pretty tree" do
 
-      _node = Subject_[].from :hash,
+      _node = Subject_[].via :hash,
         { :name => "document",
           :children => [
             { :name => "head" },
@@ -39,7 +39,7 @@ module Skylab::SubTree::TestSupport::Models_Tree
           ]
         }
 
-      _exp = deindent( <<-HERE )
+      _exp = deindent_ <<-HERE
         document
          ├head
          ├body

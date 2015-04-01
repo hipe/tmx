@@ -1,8 +1,8 @@
-module Skylab::SubTree
+module Skylab::Basic
 
-  module Models::Tree
+  module Tree
 
-    class Merge_
+    class Sessions_::Merge
 
       module Actors__
 
@@ -11,13 +11,15 @@ module Skylab::SubTree
           # get concatted, an int onto a list gets pushed, a list onto an
           # int is not supported, etc.
 
-          Callback_::Actor[ self, :properties,
-            :merge_which_i, :x, :x_ ]
+          Callback_::Actor.call self, :properties,
+            :x,
+            :x_,
+            :merge_category_symbol
 
           def execute
             @mo = produce_modus_for_mixed @x
             @mo_ = produce_modus_for_mixed @x_
-            p = @mo.send @merge_which_i
+            p = @mo.send @merge_category_symbol
             if p
               p[ @x, @mo_, @x_ ]
             else
@@ -28,7 +30,7 @@ module Skylab::SubTree
         private
 
           def say_does_not_merge
-            "#{ PREFIX__ }'#{ @mo.shape_i }' doesn't `#{ @merge_which_i }`"
+            "#{ PREFIX__ }'#{ @mo.shape_i }' doesn't `#{ @merge_category_symbol }`"
           end
 
           def produce_modus_for_mixed x
@@ -49,7 +51,7 @@ module Skylab::SubTree
         MODI_OPERANDI_A__ = -> do
 
           an = -> x do
-            "#{ SubTree_.lib_.NLP_EN_lib.an x }#{ x }"
+            "#{ Basic_.lib_.NLP_EN.an x }#{ x }"
           end
 
           say_merge_conflict = -> xx, yx do
@@ -70,22 +72,25 @@ module Skylab::SubTree
           result_a = []
 
           o = -> * x_a do
-            result_a.push Modus_Operandus__.new x_a ; nil
+            result_a.push Modus_Operandus___.new x_a ; nil
           end
 
-          class Modus_Operandus__
+          class Modus_Operandus___
 
-            Entity_[ self, :properties,
+            Callback_::Actor.call self, :properties,
               :shape_i,
               :match,
               :dupe,
               :merge_atomic,
               :merge_one_dimensional,
-              :merge_union ]
+              :merge_union
 
             attr_reader :shape_i, :match, :dupe, :merge_atomic,
               :merge_one_dimensional, :merge_union
 
+            def initialize x_a
+              process_iambic_fully x_a
+            end
           end
 
           o[ :shape_i, :nil,

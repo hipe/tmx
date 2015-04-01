@@ -1,25 +1,25 @@
 require_relative '../test-support'
 
-module Skylab::SubTree::TestSupport::Models_Tree::IA_PNP
+module Skylab::Basic::TestSupport::Tree_TS::IA_PNP
 
-  ::Skylab::SubTree::TestSupport::Models_Tree[ self ]
+  ::Skylab::Basic::TestSupport::Tree_TS[ self ]
 
   include Constants
 
   extend TestSupport_::Quickie
 
-  describe "[st] models - tree - input adapters - node identifiers" do
+  describe "[ba] tree - input adapters - node identifiers" do
 
     it "works" do
 
-      hi = Subject_[].from :node_identifiers, [ path_node_one, path_node_two ]
+      hi = Subject_[].via :node_identifiers, [ path_node_one, path_node_two ]
       hi.children_count.should eql 2
-      one, two = hi.children.to_a
+      one, two = hi.to_child_stream.to_a
       one.slug.should eql "hi_there"
       one.node_payload.wazoozle.should eql 'HI_THERE'
 
       two.slug.should eql :hey
-      x = two.children.first
+      x = two.fetch_first_child
       x.slug.should eql :there
       two.node_payload.should be_nil
       x.node_payload.wazoozle.should eql 'HEY THERE'

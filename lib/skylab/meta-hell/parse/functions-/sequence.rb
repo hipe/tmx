@@ -10,7 +10,7 @@ module Skylab::MetaHell
 
         __prepare
 
-        f_st = Callback_::Iambic_Stream.via_array @function_a
+        f_st = Callback_::Polymorphic_Stream.via_array @function_a
 
         if f_st.unparsed_exists
           f = f_st.current_token

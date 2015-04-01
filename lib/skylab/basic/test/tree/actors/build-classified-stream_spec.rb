@@ -1,14 +1,14 @@
 require_relative '../test-support'
 
-module Skylab::SubTree::TestSupport::Models_Tree
+module Skylab::Basic::TestSupport::Tree_TS
 
-  describe "[st] models - tree - actors - build traversal stream" do
+  describe "[ba] tree - actors - build traversal stream" do
 
     extend TS_
 
     it "3 node triangle" do
 
-      tree = fp 'a/b', 'a/c'
+      tree = via_paths_ 'a/b', 'a/c'
       tree = tree.fetch_only_child  # only because 'a' is only child above
 
       st = tree.to_classified_stream
@@ -37,7 +37,7 @@ module Skylab::SubTree::TestSupport::Models_Tree
 
     it "3 node beanstalk" do
 
-      tree = fp 'a/b/c'
+      tree = via_paths_ 'a/b/c'
       tree = tree.fetch_only_child  # ditto
 
       st = tree.to_classified_stream
@@ -65,11 +65,11 @@ module Skylab::SubTree::TestSupport::Models_Tree
 
     it "5 point valley" do
 
-      tree = fp 'a/b', 'c', 'd/e'
+      tree = via_paths_ 'a/b', 'c', 'd/e'
       st = tree.to_classified_stream
 
       cx = st.gets
-      cx.node.has_slug.should be_nil
+      cx.node.slug.should be_nil
       cx.depth.should eql 0
       cx.is_first.should eql true
       cx.is_last.should eql true
@@ -110,11 +110,11 @@ module Skylab::SubTree::TestSupport::Models_Tree
 
     it "4 point mountain" do
 
-      tree = fp 'a', 'b/c', 'd'
+      tree = via_paths_ 'a', 'b/c', 'd'
       st = tree.to_classified_stream
 
       cx = st.gets
-      cx.node.has_slug.should be_nil
+      cx.node.slug.should be_nil
       cx.depth.should eql 0
 
       cx = st.gets

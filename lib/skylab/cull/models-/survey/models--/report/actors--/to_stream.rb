@@ -20,7 +20,7 @@ module Skylab::Cull
 
         def normal
 
-          rfstream = Callback_::Iambic_Stream.via_array @call_a.reverse
+          rfstream = Callback_::Polymorphic_Stream.via_array @call_a.reverse
           jogs = []
 
           begin

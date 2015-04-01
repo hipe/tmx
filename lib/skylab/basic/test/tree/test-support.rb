@@ -1,24 +1,36 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-module Skylab::SubTree::TestSupport::Models_Tree
+module Skylab::Basic::TestSupport::Tree_TS
 
-  ts = ::Skylab::SubTree::TestSupport
-
-  ts.autoloaderize_with_filename_child_node 'models/tree', self
-
-  ts[ TS_ = self ]
+  ::Skylab::Basic::TestSupport[ TS_ = self, :filename, 'tree' ]
 
   include Constants
 
   extend TestSupport_::Quickie
 
-  module InstanceMethods
+  module ModuleMethods
 
-    def fp * x_a
-      Subject_[].from :paths, x_a
+    def use sym
+
+      TS_.const_get(
+        Callback_::Name.via_variegated_symbol( sym ).as_const, false
+      )[ self ]
     end
 
-    define_method :deindent, -> do
+    def memoize_ i, & p
+      define_method i, ( Callback_.memoize do
+        p[]
+      end )
+    end
+  end
+
+  module InstanceMethods
+
+    def via_paths_ * x_a
+      Subject_[].via :paths, x_a
+    end
+
+    define_method :deindent_, -> do
       _RX = /^[ ]{8}/
       -> s do
         s.gsub! _RX, EMPTY_S_
@@ -27,19 +39,28 @@ module Skylab::SubTree::TestSupport::Models_Tree
     end.call
   end
 
-  Callback_ = SubTree_::Callback_
+  Expect_Event = -> tcm do
 
-  EMPTY_A_ = SubTree_::EMPTY_A_
-  EMPTY_P_ = SubTree_::EMPTY_P_
-  EMPTY_S_ = SubTree_::EMPTY_S_
+    Basic_::TestSupport::TestLib_::Expect_event[ tcm ]
+  end
 
   Subject_ = -> do
-    SubTree_::Models::Tree
+    Basic_::Tree
   end
+
+  o = Basic_
+
+  Callback_ = o::Callback_
+  EMPTY_A_ = o::EMPTY_A_
+  EMPTY_P_ = o::EMPTY_P_
+  EMPTY_S_ = o::EMPTY_S_
+  NIL_ = o::Tree::NIL_
 
   module Constants
     Subject_ = Subject_
   end
+
+  Basic_ = Basic_
 end
 
 # #tombstone legacy artifacts of early early test setup

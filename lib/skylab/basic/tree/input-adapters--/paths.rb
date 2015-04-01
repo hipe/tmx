@@ -1,26 +1,21 @@
-module Skylab::SubTree
+module Skylab::Basic
 
-  module Models::Tree
+  module Tree
 
-    class Input_Adapters__::Paths
+    # ->
 
-      attr_writer :mixed_upstream, :node_class
+      Input_Adapters__::Paths = -> upstream_x do
 
-      def produce_tree
+        root = Tree_::Mutable_.new
 
-        cls = @node_class
-        init_node = nil  # future-proofing
-        paths = @mixed_upstream
+        upstream_x.each do | path |
 
-        root = cls.new :name_services, cls.new
-
-        paths.each do | path |
-
-          root.fetch_or_create :path, path, :init_node, init_node
+          root.touch path
         end
 
         root
       end
-    end
+
+      # <-
   end
 end

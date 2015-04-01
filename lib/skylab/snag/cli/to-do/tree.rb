@@ -1,18 +1,8 @@
 module Skylab::Snag
 
-  class CLI::ToDo::Tree
-    # [#sl-109] class as namespace
-  end
+  class CLI::ToDo::Tree  # :+[#sl-109] class as namespace
 
-  class CLI::ToDo::Tree::Node
-
-    Snag_.lib_.tree.enhance_with_module_methods_and_instance_methods self
-
-    attr_accessor :todo
-
-  end
-
-  class CLI::ToDo::Tree
+    # <-
 
     def initialize *a
       @do_pretty, @delegate = a
@@ -50,7 +40,8 @@ module Skylab::Snag
       attr_writer :glyphset_i
 
       def render
-        @tree = CLI::ToDo::Tree::Node.new
+
+        @tree = Snag_.lib_.basic::Tree.mutable_node.new
         populate_and_crop_tree
         resolve_producer
         @producer and flush
@@ -59,37 +50,50 @@ module Skylab::Snag
     private
 
       def populate_and_crop_tree
-        @todo_a.each do |todo|
-          _a = todo.path.split( SEP__ ).push todo.line_number_string
-          @tree.fetch_or_create( :path, _a,
-            :init_node, -> nod do
-              nod.is_leaf and nod.todo = todo
-            end )
+
+        tree = @tree
+
+        @todo_a.each do | todo |
+
+          _path_a = todo.path.split( SEP___ ).push todo.line_number_string
+
+          tree.touch _path_a, :leaf_node_payload_proc, -> do
+            todo
+          end
         end
-        if 1 == @tree.children_count
-          @tree = @tree.children.first # comment out and see
-        end ; nil
+
+        tree = @tree.any_only_child
+        if tree
+          @tree = tree  # comment out and see
+        end
+
+        NIL_
       end
+
+      SEP___ = ::File::SEPARATOR
 
       def resolve_producer
         @producer = if @do_pretty
-          Build_pretty_tree_lines_producer__[ @tree, @glyphset_i ]
+          Build_pretty_tree_lines_producer___[ @tree, @glyphset_i ]
         else
-          Build_basic_tree_lines_producer__[ @tree, @glyphset_i ]
+          Build_basic_tree_lines_producer___[ @tree, @glyphset_i ]
         end
       end
 
       def flush
-        while (( line = @producer.gets ))
+
+        begin
+          line = @producer.gets
+          line or break
           @delegate.receive_payload_line line
-        end
+          redo
+        end while nil
+
         NEUTRAL_
       end
-
-      SEP__ = '/'.freeze
     end
 
-    class Build_basic_tree_lines_producer__
+    class Build_basic_tree_lines_producer___
 
       Snag_::Model_::Actor[ self,
         :properties, :tree, :glyphset ]
@@ -120,8 +124,10 @@ module Skylab::Snag
         s = "#{ prefix_s } #{ node.slug }"
         if node.is_leaf
           a = [ s ]
-          if node.todo
-            a.push node.todo.full_source_line
+
+          todo = node.node_payload
+          if todo
+            a.push todo.full_source_line
           end
           a * SPACE_
         else
@@ -130,7 +136,7 @@ module Skylab::Snag
       end
     end
 
-    class Build_pretty_tree_lines_producer__
+    class Build_pretty_tree_lines_producer___
 
       Snag_::Model_::Actor[ self,
         :properties, :tree, :glyphset ]
@@ -180,8 +186,9 @@ module Skylab::Snag
 
           y.push item
 
-          if node.is_leaf && node.todo
-            item.todo = node.todo
+          todo = node.node_payload
+          if todo
+            item.todo = todo
           end
 
           card = st.gets

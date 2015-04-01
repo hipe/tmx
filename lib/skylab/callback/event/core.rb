@@ -123,7 +123,7 @@ module Skylab::Callback
     private
 
       def __init_via_iambic x_a, & msg_p
-        st = Callback_::Iambic_Stream.via_array x_a
+        st = Callback_::Polymorphic_Stream.via_array x_a
         @terminal_channel_i = st.gets_one
         _process_pairs st.flush_to_each_pairer, & msg_p
         NIL_

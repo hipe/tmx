@@ -22,15 +22,20 @@ module Skylab::TestSupport
 
         if ! mod.respond_to? :dir_pathname
 
-          s = mod.name
-          autoloaderize_with_filename_child_node(
-
+          _filename = if x_a.length.nonzero? && :filename == x_a.first
+            x = x_a.fetch 1  # :+[#br-049]
+            x_a[ 0, 2 ] = EMPTY_A_
+            x
+          else
+            s = mod.name
             Callback_::Name.via_const(
               s[ s.rindex( CONST_SEP_ ) + 2 .. -1 ]
-            ).as_slug,
+            ).as_slug
+          end
 
-            mod )
+          autoloaderize_with_filename_child_node _filename, mod
         end
+
         mod.extend Anchor_ModuleMethods
         mod.initialize_for_regret_with_parent_anchor_mod self
         x_a.length.nonzero? and

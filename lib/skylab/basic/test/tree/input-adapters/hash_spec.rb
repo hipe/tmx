@@ -1,12 +1,12 @@
 require_relative '../test-support'
 
-module Skylab::SubTree::TestSupport::Models_Tree
+module Skylab::Basic::TestSupport::Tree_TS
 
-  describe "[st] models - tree - input adapters - hash" do
+  describe "[ba] tree - input adapters - hash" do
 
     it 'works' do
 
-      tree = Subject_[].from :hash,
+      tree = Subject_[].via :hash,
 
         { name: 'foo',
           children: [
@@ -24,13 +24,13 @@ module Skylab::SubTree::TestSupport::Models_Tree
       node.to_child_stream.gets.should be_nil
 
       node = st.gets
-      node.any_slug.should eql 'baz'
+      node.slug.should eql 'baz'
 
-      node_a = node.children.to_a
+      node_a = node.to_child_stream.to_a
       node_a.length.should eql 1
 
       node = node_a.first
-      node.last_isomorphic_key.should eql 'bizzo'
+      node.slug.should eql 'bizzo'
     end
   end
 end

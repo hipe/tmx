@@ -85,14 +85,14 @@ module Skylab::Brazen
           _oes_p || _produce_some_handle_event_selectively
         end
 
-        @st = Callback_::Iambic_Stream.via_array @x_a
+        @st = Callback_::Polymorphic_Stream.via_array @x_a
 
         ACHIEVED_
       end
 
       def __init_when_iambic
 
-        st = Callback_::Iambic_Stream.via_array @x_a
+        st = Callback_::Polymorphic_Stream.via_array @x_a
 
         @on_event_selectively ||= begin
           if :on_event_selectively == st.random_access_( -2 )  # :+[#049] case study: ordering hacks

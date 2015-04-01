@@ -218,6 +218,11 @@ module Skylab::Callback
           Stream_::Mutable_Box_Like_Proxy.via_flushable_stream__ self, sym
         end
 
+        def flush_to_polymorphic_stream
+
+          Stream_::Polymorphic___.new self
+        end
+
         def map_detect & p
           while x = gets
             x_ = p[ x ] and break

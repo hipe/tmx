@@ -1,21 +1,21 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Basic::TestSupport::Tree
+module Skylab::Basic::TestSupport::Tree_TS
 
   describe "[ba] tree - via indented line stream" do
 
     extend TS_
 
-    Basic_::TestSupport::TestLib_::Expect_event[ self ]
+    use :expect_event
 
     it "none" do
-      with_lines nil
+      _against_lines nil
       expect_no_events
       @tree.should be_nil
     end
 
     it "one" do
-      with_lines dedent <<-HERE
+      _against_lines _dedent <<-HERE
         + beeble
       HERE
       @tree.value_x.should be_nil
@@ -30,7 +30,7 @@ module Skylab::Basic::TestSupport::Tree
     end
 
     it "when a line does not have the glyph" do
-      with_lines dedent <<-HERE
+      _against_lines _dedent <<-HERE
         hi + no
       HERE
       @tree.should eql false
@@ -39,7 +39,7 @@ module Skylab::Basic::TestSupport::Tree
     end
 
     it "two in a row at the same level" do
-      with_lines dedent <<-HERE
+      _against_lines _dedent <<-HERE
          + foo
          + bar
       HERE
@@ -57,7 +57,7 @@ module Skylab::Basic::TestSupport::Tree
     end
 
     it "strange de-indent" do
-      with_lines dedent <<-HERE
+      _against_lines _dedent <<-HERE
           + foo
          + bar
       HERE
@@ -67,7 +67,7 @@ module Skylab::Basic::TestSupport::Tree
     end
 
     it "one child" do
-      with_lines dedent <<-HERE
+      _against_lines _dedent <<-HERE
           + foo
               + bar
       HERE
@@ -80,13 +80,13 @@ module Skylab::Basic::TestSupport::Tree
     end
 
     it "step back two" do
-      with_lines dedent <<-HERE
+      _against_lines _dedent <<-HERE
           + foo
             + bar
               + baz
           + boffo
       HERE
-      to_normal_string.should eql dedent <<-O
+      _to_normal_string.should eql _dedent <<-O
         + foo
           + bar
             + baz
@@ -95,7 +95,7 @@ module Skylab::Basic::TestSupport::Tree
     end
 
     it "canonical complex case" do
-      omg = dedent <<-HERE
+      omg = _dedent <<-HERE
         + document
           + head
           + body
@@ -110,8 +110,8 @@ module Skylab::Basic::TestSupport::Tree
               + sub4
           + foot
       HERE
-      with_lines omg
-      to_normal_string.should eql omg
+      _against_lines omg
+      _to_normal_string.should eql omg
       expect_no_events
     end
 
@@ -123,7 +123,7 @@ module Skylab::Basic::TestSupport::Tree
           :"top_#{ line.chop! }"
         end
       end
-      with_lines dedent <<-O
+      _against_lines _dedent <<-O
         + foo
           + bar
         + baz
@@ -133,15 +133,17 @@ module Skylab::Basic::TestSupport::Tree
       @tree.children.last.value_x.should eql :top_baz
     end
 
-    def with_lines heredoc_string
+    def _against_lines heredoc_string
+
       _line_a = if heredoc_string
         heredoc_string.split line_split_regex
       else
         Basic_::EMPTY_A_
       end
       @lines = Basic_::Callback_::Stream.via_nonsparse_array _line_a
+
       build_tree
-      nil
+      NIL_
     end
 
     def build_tree
@@ -152,14 +154,14 @@ module Skylab::Basic::TestSupport::Tree
         :indented_line_stream, @lines,
         :build_using, handle_build,
         :glyph, '+ ',
-        :on_event_selectively, _oes_p )
+        & _oes_p )
 
-      nil
+      NIL_
     end
 
     attr_reader :handle_build
 
-    def to_normal_string
+    def _to_normal_string
 
       io = Basic_.lib_.string_IO
       @tree.children_depth_first_via_args_hook io, nil do |node, io_, indent, p|
@@ -171,27 +173,16 @@ module Skylab::Basic::TestSupport::Tree
       io.string
     end
 
-    def dedent s
+    def _dedent s
       s.gsub! dedent_regex, Basic_::EMPTY_S_
       s
     end
 
-    def self.memoize i, & p  # #todo
-      p_ = -> do
-        x = p[]
-        p_ = -> { x }
-        x
-      end
-      define_method i do
-        p_[]
-      end
-    end
-
-    memoize :dedent_regex do
+    memoize_ :dedent_regex do
       /^[ ]{8}/
     end
 
-    memoize :line_split_regex do
+    memoize_ :line_split_regex do
       /(?<=\n)/
     end
   end

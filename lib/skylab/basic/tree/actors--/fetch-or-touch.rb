@@ -1,107 +1,87 @@
-module Skylab::SubTree
+module Skylab::Basic
 
-  module Models::Tree
+  module Tree
 
-    Small_Time_Actors__ = ::Module.new
-
-    class Small_Time_Actors__::Fetch_or_create
+    class Actors__::Fetch_or_touch
 
       Callback_::Actor.methodic self, :properties,
 
-        :path,
-        :node_payload,
-        :init_node,
-        :else_p,
-        :node
-
-    private
-
-      def create_if_necessary=
-        @OK_to_create = true
-        KEEP_PARSING_
-      end
-
-      def do_not_create=
-        @OK_to_create = false
-        KEEP_PARSING_
-      end
+        :path_x,
+        :x_p,
+        :node,
+        :fetch_or_touch,
+        :leaf_node_payload_proc
 
       def initialize & edit_p
-        @node_payload = nil
-        @else_p = nil
-        @init_node = nil
+
+        @leaf_node_payload_proc = nil
         instance_exec( & edit_p )
       end
-
-    public
 
       def execute
 
         path_a = __some_normalized_path_a
-
-        node = if path_a.length.zero?
+        if path_a.length.zero?
           @node
         else
-          _touch_via_nonzero_length_path path_a, @node
+          __execute_when_some_path(
+            Callback_::Polymorphic_Stream.via_array( path_a ),
+            @node )
         end
+      end
 
-        if @node_payload
-          node.set_node_payload @node_payload
-        end
+      def __execute_when_some_path scn, node
 
-        node
+        begin
+
+          slug = scn.gets_one
+
+          node_ = node[ slug ]
+
+          if ! node_ && :touch == @fetch_or_touch
+
+            node_ = node.class.new slug
+            node.add slug, node_
+
+            p = if @leaf_node_payload_proc
+              if scn.no_unparsed_exists
+                @leaf_node_payload_proc
+              end
+            else
+              @x_p
+            end
+
+            if p
+              node_.set_node_payload p[]
+            end
+          end
+
+          if node_
+            if scn.unparsed_exists
+              node = node_
+              redo
+            end
+            x = node_
+            break
+          end
+
+          if @x_p
+            x = @x_p[]
+            break
+          end
+
+          raise ::KeyError, "no such node: '#{ slug }'"
+        end while nil
+        x
       end
 
       def __some_normalized_path_a
 
-        path_a = ::Array.try_convert @path
+        path_a = ::Array.try_convert @path_x
         if path_a
           path_a
         else
-          __some_normd_path_a_when_not_array
-        end
-      end
-
-      def __some_normd_path_a_when_not_array
-
-        if @path
-          "#{ @path }".split @node.path_separator
-        else
-          raise ::ArgumentError, "missing required property `path`"  # or use simple properties
-        end
-      end
-
-      def _touch_via_nonzero_length_path mutable_path_a, node
-
-        slug = mutable_path_a.shift
-
-        if node.has_children
-          child = node[ slug ]
-        end
-
-        if child
-          if mutable_path_a.length.zero?
-            child
-          else
-            _touch_via_nonzero_length_path mutable_path_a, child
-          end
-
-        elsif @else_p
-          @else_p[]
-
-        elsif @OK_to_create
-
-          child = node.class.new :slug, slug, :name_services, node
-
-          if @init_node
-            @init_node[ child ]
-          end
-
-          if mutable_path_a.length.zero?  # again..
-            child
-          else
-            _touch_via_nonzero_length_path mutable_path_a, child
-          end
+          "#{ @path_x }".split @node.path_separator  #  :+#gigo
         end
       end
     end

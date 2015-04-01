@@ -41,7 +41,7 @@ module Skylab::Callback
               when :simple
                 Apply_simple_enhancement__.new(
                   cls,
-                  Iambic_Stream_via_Array_.new( 1, i_a )
+                  Polymorphic_Stream_via_Array_.new( 1, i_a )
                 ).execute
               when :properties
                 __apply_seed_treatment start_index, cls, i_a
@@ -59,21 +59,33 @@ module Skylab::Callback
           end
 
           def __apply_seed_treatment start_index, mod, i_a
+
             mod.module_exec do
+
               private
+
+              sym_a = []
+
               start_index.upto( i_a.length - 1 ) do |d|
+
                 sym = i_a.fetch d
+                sym_a.push sym
                 _IVAR = :"@#{ sym }"
+
                 define_method :"#{ sym }=" do
                   instance_variable_set _IVAR, iambic_property
                   KEEP_PARSING_
                 end
               end
+
+              const_set BX_, Mock_Box___.new( sym_a )  # :+#experiment
             end
             nil
           end
         end  # >>
       end
+
+      Mock_Box___ = ::Struct.new :a_
 
       module Module_Methods__
 
@@ -84,8 +96,17 @@ module Skylab::Callback
         end
 
         def call_via_arglist a, & oes_p
-          curried = build_via_arglist a, & oes_p  # :+#hook-out
+          curried = build_via_arglist a, & oes_p
           curried && curried.execute
+        end
+
+        def build_via_arglist a, & oes_p
+          ok = nil
+          o = new do
+            @on_event_selectively ||= oes_p
+            ok = process_arglist_fully a
+          end
+          ok && o
         end
 
         def call_via_iambic x_a, & oes_p
@@ -126,7 +147,7 @@ module Skylab::Callback
         end
 
         def iambic_stream_via_iambic_array x_a
-          Iambic_Stream_via_Array_.new 0, x_a
+          Polymorphic_Stream_via_Array_.new 0, x_a
         end
 
         # ~ experiment (looks like [br] `edit_entity_class`)
@@ -142,8 +163,18 @@ module Skylab::Callback
 
       private
 
+        def process_arglist_fully a  # :+#experiment, seed properties only
+
+          process_iambic_stream_fully Polymorphic_Stream_via_Arglist___.new(
+            a, self.class.const_get( BX_ ).a_ )
+        end
+
+        def process_iambic_fully x_a
+          process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+        end
+
         def iambic_stream_via_iambic_array x_a
-          Iambic_Stream_via_Array_.new 0, x_a
+          Polymorphic_Stream_via_Array_.new 0, x_a
         end
 
         def process_iambic_stream_fully stream  # :+#public-API :+#hook-in
@@ -238,6 +269,67 @@ module Skylab::Callback
 
         def receive_extra_iambic ev  # :+#public-API (name) :+#hook-in
           raise ev.to_exception
+        end
+      end
+
+      class Polymorphic_Stream_via_Arglist___  # :+[#046]
+
+        def initialize a, sym_a
+
+          @d = 0
+          @len = sym_a.length
+
+          p = key_p = -> do
+            sym_a.fetch @d
+          end
+
+          val_p = -> do
+            a.fetch @d
+          end
+
+          advance_whey_val = nil
+          advance = advance_when_key = -> do
+            p = val_p
+            advance = advance_whey_val
+            NIL_
+          end
+
+          advance_whey_val = -> do
+            p = key_p
+            advance = advance_when_key
+            @d += 1
+            NIL_
+          end
+
+          @advance = -> do
+            advance[]
+          end
+
+          @current = -> do
+            p[]
+          end
+        end
+
+        def no_unparsed_exists
+          @d >= @len
+        end
+
+        def unparsed_exists
+          @d < @len
+        end
+
+        def gets_one
+          x = @current[]
+          @advance[]
+          x
+        end
+
+        def current_token
+          @current[]
+        end
+
+        def advance_one
+          @advance[]
         end
       end
 

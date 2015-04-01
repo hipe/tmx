@@ -102,7 +102,7 @@ module Skylab::TestSupport
     Heavy_plugin = Heavy_plugin_lib
 
     Iambic_scanner = -> do
-      Callback_::Iambic_Stream
+      Callback_::Polymorphic_Stream
     end
 
     Ivars_with_procs_as_methods = -> * a do

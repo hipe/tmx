@@ -13,7 +13,7 @@ module Skylab::Brazen
       Brazen_.event.selective_builder_sender_receiver self
 
       def initialize x_a, branch
-        @scan = Callback_::Iambic_Stream.via_array x_a
+        @scan = Callback_::Polymorphic_Stream.via_array x_a
         @node = branch
         @node.before_focus
         nil

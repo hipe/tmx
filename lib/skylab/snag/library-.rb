@@ -122,22 +122,12 @@ module Skylab::Snag
       Basic[]::String
     end
 
-    ST__ = sidesys[ :SubTree ]
-
     System = -> do
       HL__[].system
     end
 
     Tmpdir_pathname = -> do
       System[].filesystem.tmpdir_pathname
-    end
-
-    Tree = -> do
-      ST__[]::Models::Tree
-    end
-
-    Writemode = -> do
-      HL__[]::WRITE_MODE_
     end
 
     INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(

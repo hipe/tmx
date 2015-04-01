@@ -1,5 +1,8 @@
 # developing a pattern language for abstract structures
 
+(EDIT: this should be edited against [#041], for which the topic
+document should be considered supplemental background.)
+
 ## style and purpose
 
 we are going to cherry-pick a subset of all human knowledge (specifically

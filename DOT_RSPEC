@@ -1,2 +1,4 @@
+--color
+--fail-fast
+--format documentation
 --tag ~wip
---tag ~zmq

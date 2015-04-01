@@ -1,10 +1,10 @@
 require_relative '../test-support'
 
-module Skylab::SubTree::TestSupport::Models_Tree
+module Skylab::Basic::TestSupport::Tree_TS
 
   # ->
 
-    describe "[st] models - tree - actors - `longest_common_base_path`" do
+    describe "[ba] tree - actors - `longest_common_base_path`" do
 
       it "(does paths to tree and vice-versa)" do
 
@@ -15,8 +15,8 @@ module Skylab::SubTree::TestSupport::Models_Tree
           'bb/cc/dd/ee'
         ].freeze
 
-        paths_via_tree(
-          Subject_[].from :paths, _from_paths
+        __paths_via_tree(
+          Subject_[].via :paths, _from_paths
         ).should eql %w(
           a
           bb/
@@ -80,11 +80,11 @@ module Skylab::SubTree::TestSupport::Models_Tree
       end
 
       def expect s_a
-        Subject_[].from( :paths, @s_a ).
+        Subject_[].via( :paths, @s_a ).
           longest_common_base_path.should eql s_a
       end
 
-      define_method :paths_via_tree, TS_::Paths_via_tree.to_proc
+      define_method :__paths_via_tree, TS_::Paths_via_tree.to_proc
 
     end
 

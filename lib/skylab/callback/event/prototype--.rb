@@ -35,7 +35,7 @@ module Skylab::Callback
           end
 
           def work
-            scn = Callback_::Iambic_Stream.via_array @deflist_a
+            scn = Callback_::Polymorphic_Stream.via_array @deflist_a
             cls = ::Class.new Prototype__
             _MESSAGE_PROC_ = @message_proc
             cls.class_exec do

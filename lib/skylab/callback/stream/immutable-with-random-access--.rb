@@ -18,7 +18,7 @@ module Skylab::Callback
             freeze
           end
         end
-      end
+      end  # >>
 
       def build_with * x_a
         otr = dup

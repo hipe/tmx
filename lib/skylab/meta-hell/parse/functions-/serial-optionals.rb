@@ -93,7 +93,7 @@ module Skylab::MetaHell
           # args are matchers (constituency of the grammar). if unparsed
           # exists raise argument error. otherwise result is output tuple.
 
-          arg_st = Callback_::Iambic_Stream.via_array a
+          arg_st = Callback_::Polymorphic_Stream.via_array a
           input_array = arg_st.gets_one
 
           new_with(

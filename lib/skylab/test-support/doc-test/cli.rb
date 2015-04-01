@@ -63,7 +63,7 @@ module Skylab::TestSupport
             if @seen_h[ :output_adapter ]
 
               _ok = @bound.receive_iambic_stream_(
-                Callback_::Iambic_Stream_via_Array_.new 0, @mutable_backbound_iambic )
+                Callback_::Polymorphic_Stream_via_Array_.new 0, @mutable_backbound_iambic )
 
               # if the above changes our output adapter
               # it may change our formal properties

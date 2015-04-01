@@ -62,7 +62,7 @@ module Skylab::GitViz
 
           end
 
-          @tree = GitViz_.lib_.tree.from :node_identifiers, _ea
+          @tree = GitViz_.lib_.tree.via :node_identifiers, _ea
 
           fh.close
 
@@ -131,13 +131,13 @@ module Skylab::GitViz
             _pn or hack_add_dir_pathname tree_node, path_s
           end
         end
+
         def any_tree_node_with_path_s path_s
-          _path_x = nrmlz_path_for_tree_lookup path_s
-          @tree.fetch _path_x do end
-        end
-        def nrmlz_path_for_tree_lookup path_s
-          path_s.gsub( ABNORMAL_SEPARATOR_RX__, EMPTY_S_ ).
+
+          _path_i_a = path_s.gsub( ABNORMAL_SEPARATOR_RX__, EMPTY_S_ ).
             split( ::File::SEPARATOR ).map( & :intern )
+
+          @tree.fetch_via_path _path_i_a do end
         end
 
         def hack_add_dir_pathname tree_node, path_s

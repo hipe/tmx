@@ -1,32 +1,33 @@
-module Skylab::SubTree
+module Skylab::Basic
 
-  module Models::Tree
-
-    Input_Adapters__ = ::Module.new
+  module Tree
 
     class Input_Adapters__::Hash
 
-      attr_writer :mixed_upstream, :node_class
+      Callback_::Actor.call self, :properties,
 
-      def produce_tree
-        _work @node_class.new, @mixed_upstream
+        :upstream_x
+
+      def execute
+
+        @node_class = Tree_::Mutable_
+        _work @node_class.new, @upstream_x
       end
 
-      def _work parent_node, h
+      def _work node, h
 
-        child_node = @node_class.new(
-
-          :slug, h.fetch( :name ),
-          :name_services, parent_node )
+        slug = h.fetch :name
+        node_ = @node_class.new slug
+        node.add slug, node_
 
         a = h[ :children ]
         if a
           a.each do | h_ |
-            _work child_node, h_
+            _work node_, h_
           end
         end
 
-        child_node
+        node_
       end
     end
   end

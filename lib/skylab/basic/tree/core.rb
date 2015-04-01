@@ -2,9 +2,6 @@ module Skylab::Basic
 
   module Tree
 
-    # ordinary trees are well-trodden and boring. we will find a way
-    # to goof this one up somehow..
-
     class << self
 
       def immutable_node
@@ -15,41 +12,23 @@ module Skylab::Basic
         Lazy_via_Enumeresque__.new internal_properties, children_yielder_p
       end
 
-      def via * i_a
-        Via__.call_via_iambic i_a
+      def mutable_node
+        Tree_::Mutable_
+      end
+
+      def via sym, x, * x_a, & x_p
+
+        p_x = Tree_::Input_Adapters__.const_get(
+          Callback_::Name.via_variegated_symbol( sym ).as_const, false )
+
+        if x_a.length.nonzero? || block_given?
+          x_a.push :upstream_x, x
+          p_x.call_via_iambic x_a, & x_p
+        else
+          p_x[ x ]
+        end
       end
     end  # >>
-
-    class Via__
-
-      Callback_::Actor.methodic self, :simple, :properties,
-        :property, :build_using,
-        :property, :glyph,
-        :iambic_writer_method_to_be_provided, :property, :indented_line_stream,
-        :property, :on_event_selectively
-
-      def initialize
-        @build_using = nil
-        super
-      end
-
-      def execute
-        send @execute_method_name
-      end
-
-    private
-
-      def indented_line_stream=
-        @execute_method_name = :execute_via_indented_line_stream
-        @stream = iambic_property
-        ACHIEVED_
-      end
-
-      def execute_via_indented_line_stream
-        Tree_::Via_Indented_Line_Stream__.new( @build_using, @stream,
-          @glyph, @on_event_selectively ).execute
-      end
-    end
 
     class Binary
 
@@ -316,7 +295,7 @@ module Skylab::Basic
       end
     end
 
-
+    NIL_ = nil
     Tree_ = self
   end
 end

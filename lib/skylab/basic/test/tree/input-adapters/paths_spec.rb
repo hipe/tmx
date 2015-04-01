@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::SubTree::TestSupport::Models_Tree
+module Skylab::Basic::TestSupport::Tree_TS
 
-  describe "[st] models - tree - input adapters - hash" do
+  describe "[ba] tree - input adapters - hash" do
 
     it 'works' do
 
@@ -13,9 +13,9 @@ module Skylab::SubTree::TestSupport::Models_Tree
         'bb/cc/dd/ee'
       ].freeze
 
-      node = Subject_[].from :paths, paths
+      node = Subject_[].via :paths, paths
 
-      node.has_slug.should be_nil
+      node.slug.should be_nil
 
       node.children_count.should eql 2
 

@@ -33,7 +33,7 @@ module Skylab::MetaHell::TestSupport::Parse
     memoize_subject do
       Subject_[].function_( :non_negative_integer ).
         new_via_iambic_stream_passively(
-          Callback_::Iambic_Stream.the_empty_iambic_stream )
+          Callback_::Polymorphic_Stream.the_empty_iambic_stream )
     end
   end
 end

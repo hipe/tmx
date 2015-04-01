@@ -86,7 +86,6 @@ module Skylab::Headless
           end
         end
 
-
         private def accept_selective_listener_proc p  # #hook-out for [ca]
           @on_event_selectively = p ; nil
         end

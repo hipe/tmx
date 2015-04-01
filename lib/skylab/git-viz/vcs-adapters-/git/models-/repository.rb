@@ -70,7 +70,7 @@ module Skylab::GitViz
           raise ::ArgumentError, "relative paths are not honored here - #{ pathname.to_path }"
         end
 
-        filename = IMPLEMENTATION_DIR_
+        filename = VENDOR_DIR_
         num_times_looked = 1
         pn = pathname
         begin

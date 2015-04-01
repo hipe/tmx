@@ -5,8 +5,26 @@ module Skylab::Headless
     DRY_STUB__ = class Dry_Stub__  # getting a good dry run
 
       def open mode
-        WRITE_MODE_ == mode || APPEND_MODE_ == mode or fail say_fail mode
+
+        if mode.respond_to? :ascii_only?
+          WRITE_MODE_ == mode || APPEND_MODE_ == mode or fail __say_s mode
+        else
+          ( ::File::CREAT | ::File::WRONLY ) == mode or fail __say_d mode
+        end
+
         yield self
+      end
+
+      def __say_s mode_s
+
+        "sanity - expected #{ WRITE_MODE_ } or #{ APPEND_MODE_ } had #{ mode_s }"
+      end
+
+      APPEND_MODE_ = 'a'
+
+      def __say_d mode_d
+
+        "sanity - expected ( CREATE | WRONLY ) had #{ mode_d }"
       end
 
       def puts *a
@@ -24,16 +42,6 @@ module Skylab::Headless
         # there is risk of this silently succeeding when it should have
         # failed per state, but meh we would have to remove the singleton  #open [#170]
       end
-
-    private
-
-      def say_fail mode_s
-        "sanity - expected #{ WRITE_MODE_ } or #{ APPEND_MODE_ } had #{ mode_s }"
-      end
-
-      APPEND_MODE_ = 'a'.freeze
-
-      # ~
 
       class << self
 

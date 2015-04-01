@@ -253,7 +253,7 @@ module Skylab::BeautySalon
       x_a.push :from_line, from_line, :to_line, to_line
 
       bc = @action.bound_call_against_iambic_stream(
-        Callback_::Iambic_Stream.via_array( x_a ) )
+        Callback_::Polymorphic_Stream.via_array( x_a ) )
 
       @x_a = nil
 

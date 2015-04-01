@@ -2,12 +2,19 @@ module Skylab::Basic
 
   module Tree
 
-    class Via_Indented_Line_Stream__
+    class Input_Adapters__::Indented_Line_Stream
+
+      Callback_::Actor.call self, :properties,
+
+        :upstream_x,
+        :build_using,
+        :glyph
 
       include Simple_Selective_Sender_Methods_
 
-      def initialize * a
-        @build_using, @stream, @glyph, @on_event_selectively = a
+      def initialize
+
+        super
         @build_using ||= -> _, * do _ end
         @glyph_regex = /\A([[:space:]]*)#{ ::Regexp.escape @glyph }/
       end
@@ -175,7 +182,7 @@ module Skylab::Basic
       end
 
       def re_init_next_line
-        @line = @stream.gets
+        @line = @upstream_x.gets
         @line ? true : false
       end
 

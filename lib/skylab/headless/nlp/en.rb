@@ -34,7 +34,7 @@ module Skylab::Headless
             S__[ * a ]
           end
         end
-      end
+      end  # >>
 
       An__ = -> do
 

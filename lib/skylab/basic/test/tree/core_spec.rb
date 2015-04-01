@@ -1,8 +1,8 @@
-require_relative 'tree/test-support'
+require_relative 'test-support'
 
-module Skylab::Basic::TestSupport::Tree
+module Skylab::Basic::TestSupport::Tree_TS
 
-  describe "[ba] trees - experiments with different build techniques" do
+  describe "[ba] tree" do
 
     it "lazy via enumeresque" do
 

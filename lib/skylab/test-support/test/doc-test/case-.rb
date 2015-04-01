@@ -145,8 +145,7 @@ module Skylab::TestSupport
         TestSupport_::Lib_::Basic[]::Tree.via(
           :indented_line_stream, @predicate_ff.fake_open,
           :glyph, '+ ',
-          :build_using, method( :bld_node ),
-          :on_event_selectively, nil )
+          :build_using, method( :bld_node ) )
 
       end
 

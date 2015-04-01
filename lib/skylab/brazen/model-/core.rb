@@ -560,7 +560,7 @@ module Skylab::Brazen
       def edit_via_iambic x_a
         bx = @tree.delta_box_
         fo = @formals
-        st = Callback_::Iambic_Stream.via_array x_a
+        st = Callback_::Polymorphic_Stream.via_array x_a
         while st.unparsed_exists
           prp = fo.fetch st.gets_one
           if prp.takes_argument

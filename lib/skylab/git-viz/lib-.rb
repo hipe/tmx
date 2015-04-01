@@ -101,8 +101,6 @@ module Skylab::GitViz
 
     String_scanner = memo[ -> do require 'strscan' ; ::StringScanner end ]
 
-    ST__ = sidesys[ :SubTree ]
-
     System = -> do
       HL__[].system
     end
@@ -110,9 +108,9 @@ module Skylab::GitViz
     Test_support = wall[ :TestSupport ]
 
     Tree = -> do
-      ST__[]::Models::Tree
+      Basic[]::Tree
     end
 
-    ZMQ = memo[ -> do require 'ffi-rzmq' ; ::ZMQ end ]
+    # ZMQ = memo[ -> do require 'ffi-rzmq' ; ::ZMQ end ]
   end
 end

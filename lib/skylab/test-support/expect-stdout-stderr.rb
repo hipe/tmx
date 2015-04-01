@@ -130,7 +130,7 @@ module Skylab::TestSupport
 
       def bld_sout_serr_expectation_via_iambic x_a, & p
         _sout_serr_expectation_class.new(
-          Callback_::Iambic_Stream.via_array( x_a ),
+          Callback_::Polymorphic_Stream.via_array( x_a ),
             & p )
       end
 
@@ -139,7 +139,7 @@ module Skylab::TestSupport
       end
 
       def _bake_sout_serr
-        @__sout_serr_actual_stream__ = Callback_::Iambic_Stream.via_array(
+        @__sout_serr_actual_stream__ = Callback_::Polymorphic_Stream.via_array(
           build_baked_em_a )
 
         true

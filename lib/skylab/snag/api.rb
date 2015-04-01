@@ -8,7 +8,7 @@ module Skylab::Snag
 
       def bound_call_via_legacy_arglist arglist, & wire_p
         Produce_bound_call__.new(
-          Callback_::Iambic_Stream.via_array( arglist ), & wire_p ).execute
+          Callback_::Polymorphic_Stream.via_array( arglist ), & wire_p ).execute
       end
 
       # ~ convenience accessors for common property stack values

@@ -1,4 +1,4 @@
-module Skylab::SubTree::TestSupport::Models_Tree
+module Skylab::Basic::TestSupport::Tree_TS
 
   # ->
 
@@ -47,16 +47,18 @@ module Skylab::SubTree::TestSupport::Models_Tree
 
             has = node.has_children
 
-            x = if node.has_slug
+            slug = node.slug
+
+            x = if slug
 
               if has
                 s = sep
               end
 
               if prefix_path
-                "#{ prefix_path }#{ node.slug }#{ s }"
+                "#{ prefix_path }#{ slug }#{ s }"
               else
-                "#{ node.slug }#{ s }"
+                "#{ slug }#{ s }"
               end
             else
               prefix_path  # any

@@ -138,12 +138,12 @@ module Skylab::Snag
     # ~ tags
 
     def add_tag tag_identifier, * x_a
-      _st = Callback_::Iambic_Stream.via_array x_a
+      _st = Callback_::Polymorphic_Stream.via_array x_a
       tags_controller.using_iambic_stream_add_tag _st, tag_identifier
     end
 
     def remove_tag tag_identifier, * x_a
-      _st = Callback_::Iambic_Stream.via_array x_a
+      _st = Callback_::Polymorphic_Stream.via_array x_a
       tags_controller.using_iambic_stream_remove_tag _st, tag_identifier
     end
 

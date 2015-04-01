@@ -1,8 +1,6 @@
-module Skylab::SubTree
+module Skylab::Basic
 
-  module Models::Tree
-
-    Actors__ = ::Module.new
+  module Tree
 
     class Actors__::Build_classified_stream
 

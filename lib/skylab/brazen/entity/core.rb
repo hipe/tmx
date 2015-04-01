@@ -53,7 +53,7 @@ module Skylab::Brazen
           o.execute
         else
           # ~ #duped-here
-          st = Callback_::Iambic_Stream.via_array x_a
+          st = Callback_::Polymorphic_Stream.via_array x_a
           cls = st.gets_one
           Callback_::Actor.methodic cls
           cls.extend Module_Methods__
@@ -266,7 +266,7 @@ module Skylab::Brazen
       attr_reader :property_related_nonterminal  # hax only (covered)
 
       def edit_entity_class * x_a, & edit_p
-        receive_edit Callback_::Iambic_Stream.via_array( x_a ), & edit_p
+        receive_edit Callback_::Polymorphic_Stream.via_array( x_a ), & edit_p
         nil
       end
 
@@ -524,7 +524,7 @@ module Skylab::Brazen
 
       def o * x_a, & edit_p
         @active_entity_edit_session.receive_edit(
-          Callback_::Iambic_Stream.via_array( x_a ), & edit_p )
+          Callback_::Polymorphic_Stream.via_array( x_a ), & edit_p )
       end
 
       def during_entity_normalize & p
@@ -551,7 +551,7 @@ module Skylab::Brazen
       end
 
       def via_nonzero_length_arglist a, & edit_p
-        st = Callback_::Iambic_Stream.via_array a
+        st = Callback_::Polymorphic_Stream.via_array a
         _enhance_to_and_edit_entity_class_via_any_nonempty_stream(
           st.gets_one, st, & edit_p )
       end
@@ -564,7 +564,7 @@ module Skylab::Brazen
 
       def call_via_client_class_and_iambic cls, x_a, & edit_p
         if x_a.length.nonzero?
-          st = Callback_::Iambic_Stream.via_array x_a
+          st = Callback_::Polymorphic_Stream.via_array x_a
         end
         _enhance_to_and_edit_entity_class_via_any_nonempty_stream cls, st, & edit_p
       end
@@ -622,7 +622,7 @@ module Skylab::Brazen
         @active_entity_edit_session = sess
 
         if x_a.length.nonzero?
-          x = sess.receive_edit Callback_::Iambic_Stream.via_array x_a
+          x = sess.receive_edit Callback_::Polymorphic_Stream.via_array x_a
         end
 
         if block_given?

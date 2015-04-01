@@ -373,7 +373,7 @@ module Skylab::Callback::TestSupport
 
       def initialize x_a, p
         @call_a = [ [ :resolve_ev_by_expect_one_event ] ]
-        @scn = Callback_::Iambic_Stream.via_array x_a
+        @scn = Callback_::Polymorphic_Stream.via_array x_a
         while @scn.unparsed_exists
           send @scn.gets_one
         end
@@ -387,7 +387,7 @@ module Skylab::Callback::TestSupport
       end
 
       def shorthand
-        scn = Callback_::Iambic_Stream.via_array @scn.gets_one
+        scn = Callback_::Polymorphic_Stream.via_array @scn.gets_one
         scn.unparsed_exists and parse_shorthand scn
       end
 

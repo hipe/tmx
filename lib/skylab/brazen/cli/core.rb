@@ -250,7 +250,7 @@ module Skylab::Brazen
 
       def retrieve_bound_action_via_nrml_nm i_a
         retrv_bound_action_via_normal_name_symbol_stream(
-          Callback_::Iambic_Stream.via_array i_a )
+          Callback_::Polymorphic_Stream.via_array i_a )
       end
 
       def retrv_bound_action_via_normal_name_symbol_stream sym_st
@@ -574,7 +574,7 @@ module Skylab::Brazen
 
         bc = @bound.bound_call_against_iambic_stream(
 
-          Callback_::Iambic_Stream.via_array @mutable_backbound_iambic )
+          Callback_::Polymorphic_Stream.via_array @mutable_backbound_iambic )
 
         bc &&= bound_call_via_bound_call_from_back bc
 
@@ -1500,7 +1500,7 @@ module Skylab::Brazen
 
       def initialize mutable_backbound_iambic, props
 
-        scn = Callback_::Iambic_Stream.via_array mutable_backbound_iambic
+        scn = Callback_::Polymorphic_Stream.via_array mutable_backbound_iambic
         prop = i = x = nil
         @prop_p = -> { prop }
         @pair_p = -> { [ i, x ] }

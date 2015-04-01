@@ -153,7 +153,7 @@ module Skylab::GitViz
 
           def __via_sparse_matrix_of_content_resolve_column_A
 
-            st = GitViz_.lib_.tree.from( :node_identifiers,
+            st = GitViz_.lib_.tree.via( :node_identifiers,
               @matrix.rows ).to_classified_stream_for :text
 
             st.gets  # the first node is always the root node,

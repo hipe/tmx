@@ -2,11 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::SubTree::TestSupport::Models_File_Coverage
 
-  ts = ::Skylab::SubTree::TestSupport
-
-  ts.autoloaderize_with_filename_child_node 'models/file-coverage', self
-
-  ts[ TS_ = self ]
+  ::Skylab::SubTree::TestSupport[ TS_ = self, :filename, 'models/file-coverage' ]
 
   include Constants
 

@@ -1,6 +1,6 @@
-module Skylab::SubTree
+module Skylab::Basic
 
-  module Models::Tree
+  module Tree
 
     Expression_Adapters__ = ::Module.new
 
@@ -31,7 +31,7 @@ module Skylab::SubTree
 
           @glyphset = Autoloader_.const_reduce(
             [ @glyphset_identifier_x ],
-            SubTree_.lib_.CLI_lib.tree.glyph_sets_module )
+            Basic_.lib_.CLI_lib.tree.glyph_sets_module )
 
           @glyphset && begin
             __via_glyphset_init

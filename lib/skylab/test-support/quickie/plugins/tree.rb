@@ -44,10 +44,10 @@ module Skylab::TestSupport
         st = tree.to_classified_stream_for( :text )
         x = st.gets
         if ! path_s
-          x.node.any_slug and fail "what: #{ x.node.any_slug }"
+          x.node.slug and fail "what: #{ x.node.slug }"
         end
         while (( card = st.gets ))
-          io.puts "#{ card.prefix_string }#{ card.node.any_slug }"
+          io.puts "#{ card.prefix_string }#{ card.node.slug }"
         end
         nil
       end

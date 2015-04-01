@@ -55,6 +55,10 @@ module Skylab::Basic
 
     MH__ = sidesys[ :MetaHell ]
 
+    NLP_EN = -> do
+      HL__[]::NLP::EN
+    end
+
     NLP_EN_agent = -> do
       HL__[].expression_agent.NLP_EN_agent
     end

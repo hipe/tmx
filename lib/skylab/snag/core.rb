@@ -96,6 +96,7 @@ module Skylab::Snag
   IDENTITY_ = -> x { x }
   stowaway :Lib_, 'library-'
   LINE_SEP_ = "\n".freeze
+  NIL_ = nil
   KEEP_PARSING_ = true
   NEUTRAL_ = nil
   Snag_ = self

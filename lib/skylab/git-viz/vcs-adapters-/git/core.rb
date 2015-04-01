@@ -55,7 +55,7 @@ module Skylab::GitViz
 
     GIT_GENERAL_ERROR_ = 128
 
-    IMPLEMENTATION_DIR_ = '.git'.freeze
+    VENDOR_DIR_ = '.git'.freeze
 
   end
 end
