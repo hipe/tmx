@@ -42,6 +42,8 @@ module Skylab::SubTree
 
   DEFAULT_GLYPHSET_IDENTIFIER_ = :narrow
 
+  DOT_ = '.'.freeze
+
   EMPTY_A_ = [].freeze
 
   EMPTY_P_ = -> {}

@@ -10,7 +10,7 @@ module Skylab::Basic
 
         upstream_x.each do | path |
 
-          root.touch path
+          root.touch_node path
         end
 
         root

@@ -12,6 +12,10 @@ module Skylab::Basic
         Lazy_via_Enumeresque__.new internal_properties, children_yielder_p
       end
 
+      def merge_destructively
+        Tree_::Sessions_::Merge
+      end
+
       def mutable_node
         Tree_::Mutable_
       end

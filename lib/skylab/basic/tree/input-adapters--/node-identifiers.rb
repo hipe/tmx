@@ -10,7 +10,7 @@ module Skylab::Basic
 
         upstream_x.each do | identifier |
 
-          root.touch identifier.to_tree_path,
+          root.touch_node identifier.to_tree_path,
             :leaf_node_payload_proc, -> do
               identifier
             end

@@ -1814,7 +1814,7 @@ module Skylab::Callback
     end
     def build_human
       s = as_slug.dup
-      s.gsub! TRAILING_DASHES_RX__, EMPTY_S_
+      s.gsub! TRAILING_DASHES_RX, EMPTY_S_
       s.gsub! DASH_, SPACE__
       s.freeze
     end
@@ -1834,7 +1834,7 @@ module Skylab::Callback
     end
     def build_trimmed_variegated_symbol
       s = as_slug.dup
-      s.gsub! TRAILING_DASHES_RX__, EMPTY_S_
+      s.gsub! TRAILING_DASHES_RX, EMPTY_S_
       s.gsub! DASH_, UNDERSCORE_
       s.intern
     end
@@ -1855,7 +1855,7 @@ module Skylab::Callback
     NORMALIZE_CONST_RX__ = /(?<=[a-z])(?=[A-Z])/
     SLUGIFY_CONST_RX__ = /[A-Z](?=[a-z])/
     SPACE__ = ' '.freeze
-    TRAILING_DASHES_RX__ = /-+\z/
+    TRAILING_DASHES_RX = /-+\z/
     THE_EMPTY_STRING__ = ''.freeze
     VALID_CONST_RX__ = /\A[A-Z][A-Z_a-z0-9]*\z/
   end

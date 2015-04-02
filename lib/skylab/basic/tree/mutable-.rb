@@ -52,7 +52,7 @@ module Skylab::Basic
         NIL_
       end
 
-      def fetch_via_path path_x, & else_p  # #todo covered only by [gv]
+      def fetch_node path_x, & else_p  # #todo covered only by [gv]
 
         me = self
 
@@ -116,15 +116,18 @@ module Skylab::Basic
 
       def to_constituents  # #hook-out for above
 
-        Tree_::Sessions_::Merge::Constituents.new self, :@node_payload
+        Tree_::Sessions_::Merge::Constituents.via_ivars self, :@node_payload
       end
 
-      def to_polymorphic_key_stream  # ditto
+      def to_destructee_polymorphic_key_stream  # ditto
 
-        Callback_::Polymorphic_Stream.via_array @a
+        # because this object *will* be modified mid-scan,
+        # we *must* use a duplicate array below.
+
+        Callback_::Polymorphic_Stream.via_array @a.dup
       end
 
-      def touch path_x, * x_a, & node_payload_p
+      def touch_node path_x, * x_a, & node_payload_p
 
         me = self
         ok = nil

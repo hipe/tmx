@@ -269,7 +269,7 @@ module Skylab::TestSupport
     end
 
     Mutate_string_by_removing_trailing_dashes_ = -> s do
-      s.gsub! Callback_::Name::TRAILING_DASHES_RX__, EMPTY_S_  # ick/meh
+      s.gsub! Callback_::Name::TRAILING_DASHES_RX, EMPTY_S_  # ick/meh
       nil
     end
 

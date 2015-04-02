@@ -20,6 +20,8 @@ module Skylab::SubTree
 
     _memo, sidesys = Autoloader_.at :memoize, :build_require_sidesystem_proc
 
+    Basic = sidesys[ :Basic ]
+
     Brazen = sidesys[ :Brazen ]
 
     CLI_lib = -> do
@@ -54,8 +56,17 @@ module Skylab::SubTree
       HL__[].system
     end
 
+    Test_file_suffix_a = -> do
+      self._TODO  # #todo-during:15
+      [ TS___[].spec_rb ]
+    end
+
     Test_dir_name_a = -> do
       TS___[].constant :TEST_DIR_NAME_A
+    end
+
+    Tree = -> do
+      Basic[]::Tree
     end
 
     TS___ = sidesys[ :TestSupport ]

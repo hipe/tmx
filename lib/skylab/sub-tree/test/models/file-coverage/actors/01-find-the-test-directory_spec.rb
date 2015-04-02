@@ -99,7 +99,7 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
         silo( :file_coverage ).model_class::Actions::File_Coverage.
           new MOCK_BOUNDISH_, & handle_event_selectively
 
-      bnd.instance_variable_set :@test_file_patterns, TEST_FILE_PATTERNS_
+      bnd.instance_variable_set :@nc, Name_conventions_[]
       @__bound__ = bnd
       yield
       @result = bnd.__find_the_test_directory

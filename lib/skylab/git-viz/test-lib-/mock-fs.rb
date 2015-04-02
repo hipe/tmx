@@ -137,7 +137,7 @@ module Skylab::GitViz
           _path_i_a = path_s.gsub( ABNORMAL_SEPARATOR_RX__, EMPTY_S_ ).
             split( ::File::SEPARATOR ).map( & :intern )
 
-          @tree.fetch_via_path _path_i_a do end
+          @tree.fetch_node _path_i_a do end
         end
 
         def hack_add_dir_pathname tree_node, path_s

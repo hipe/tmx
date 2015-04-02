@@ -17,6 +17,15 @@ module Skylab::Basic
         def merge_union x, x_
           Merge_::Actors__::Merge[ x, x_, :merge_union ]
         end
+
+        def via_ivars destructee, mutatee, * ivars
+
+          consts = Constituents.new ivars
+
+          P__[ consts.of( destructee ), consts.of( mutatee ) ]
+
+          NIL_
+        end
       end  # >>
 
       def initialize destructee, mutatee
@@ -27,16 +36,17 @@ module Skylab::Basic
 
       def execute
 
-        P__[ @mutatee.to_constituents, @destructee.to_constituents ]
+        P__[ @destructee.to_constituents, @mutatee.to_constituents ]
 
-        P__[ @mutatee, @destructee ]
+        P__[ @destructee, @mutatee ]
       end
 
-      P__ = -> mutatee, destructee do
+      P__ = -> destructee, mutatee do
 
-        st = destructee.to_polymorphic_key_stream
+        st = destructee.to_destructee_polymorphic_key_stream
 
         while st.unparsed_exists
+
           key = st.gets_one
           item_ = destructee.remove key
           if item_.nil?
@@ -60,12 +70,27 @@ module Skylab::Basic
 
       class Constituents
 
-        def initialize o, * ivars
+        class << self
+
+          def via_ivars o, * ivars
+            new o, ivars
+          end
+        end  # >>
+
+        def initialize o=nil, ivars
           @o = o
           @ivars = ivars
         end
 
-        def to_polymorphic_key_stream
+        def of o
+          dup.__of o
+        end
+
+        protected def __of o
+          @o = o ; self
+        end
+
+        def to_destructee_polymorphic_key_stream
 
           Callback_::Stream.via_nonsparse_array( @ivars ).reduce_by do | k |
 

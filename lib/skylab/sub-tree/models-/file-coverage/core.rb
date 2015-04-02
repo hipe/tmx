@@ -217,5 +217,9 @@ module Skylab::SubTree
 
     FILENAMES___ = SubTree_::Lib_::Test_dir_name_a[]
 
+    Autoloader_[ Models_ = ::Module.new ]
+
+    Models_::Entry = IDENTITY_
+
   end
 end

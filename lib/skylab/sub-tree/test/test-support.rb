@@ -18,6 +18,30 @@ module Skylab::SubTree::TestSupport
 
   extend TestSupport_::Quickie
 
+  module ModuleMethods
+
+    def use sym
+
+      const_i = Callback_::Name.via_variegated_symbol( sym ).as_const
+      mod = nearest_test_node
+
+      begin
+
+        if mod.const_defined? const_i, false
+          found = mod.const_get const_i
+          break
+        end
+
+        mod = mod.parent_anchor_module
+
+        redo
+      end while nil
+
+      found[ self ]
+      NIL_
+    end
+  end
+
   module InstanceMethods
 
     attr_reader :do_debug
@@ -30,10 +54,16 @@ module Skylab::SubTree::TestSupport
       TestSupport_.debug_IO
     end
 
-    def fixture_tree sym
-      TS_.dir_pathname.join(
-        "fixture-trees/#{ sym.id2name.gsub UNDERSCORE_, DASH_ }" ).to_path
-    end
+    define_method :fixture_tree, -> do
+      h = {}
+      -> sym do
+        h.fetch sym do
+          h[ sym ] = TS_.dir_pathname.join(
+            "fixture-trees/#{ sym.id2name.gsub UNDERSCORE_, DASH_ }" ).
+              to_path.freeze
+        end
+      end
+    end.call
 
     def subject_API
       SubTree_::API
@@ -54,6 +84,7 @@ module Skylab::SubTree::TestSupport
     EMPTY_A_ = SubTree_::EMPTY_A_
     EMPTY_S_ = EMPTY_S_
     NIL_ = SubTree_::NIL_
+    Top_TS_ = TS_
     UNDERSCORE_ = UNDERSCORE_
   end
 

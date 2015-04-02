@@ -57,7 +57,7 @@ module Skylab::Snag
 
           _path_a = todo.path.split( SEP___ ).push todo.line_number_string
 
-          tree.touch _path_a, :leaf_node_payload_proc, -> do
+          tree.touch_node _path_a, :leaf_node_payload_proc, -> do
             todo
           end
         end

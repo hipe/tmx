@@ -16,6 +16,39 @@ module Skylab::Headless
         Filesystem_
       end
 
+      def directory? s  # :+#core-service
+        ::File.directory? s
+      end
+
+      def entry_stream abs_path  # :+#core-service
+
+        a = ::Dir.entries abs_path
+        d = 0
+        len = a.length
+
+        if DOT_ == a[ d ]
+
+          d += 1
+
+          if DOT_DOT__ == a[ d ]
+            d += 1
+          end
+        end
+
+        Callback_.stream do
+
+          if d < len
+            x = a.fetch d
+            d += 1
+            x
+          end
+        end
+      end
+
+      def file? s  # :+#core-service
+        ::File.file? s
+      end
+
       def file_utils_controller & p
         if p
           Filesystem_::File_Utils_Controller__.new p
@@ -98,6 +131,10 @@ module Skylab::Headless
       end
 
       DIRECTORY_FTYPE = 'directory'.freeze
+
+      DOT_ = '.'.freeze
+
+      DOT_DOT__ = '..'
 
       FILE_FTYPE = 'file'
 

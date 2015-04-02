@@ -304,7 +304,7 @@ module Skylab::Headless
       stack_a = [] ; pop_p = -> do
         curr_pn = self
         -> do
-          if ! ( curr_pn.root? || DOT__ == curr_pn.instance_variable_get( :@path ) )
+          if ! ( curr_pn.root? || DOT_ == curr_pn.instance_variable_get( :@path ) )
             stack_a.push curr_pn.basename.to_s
             curr_pn = curr_pn.dirname
           end
@@ -326,8 +326,6 @@ module Skylab::Headless
 
       Sanity_check_pathname__[ curr_pn ]
     end
-
-    DOT__ = '.'.freeze
 
     def say_must_be_at_least
       "max_mkdirs must be at least 1."
