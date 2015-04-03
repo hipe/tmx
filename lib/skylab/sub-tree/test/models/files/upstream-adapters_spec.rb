@@ -4,9 +4,8 @@ module Skylab::SubTree::TestSupport::Models_Files
 
   describe "[st] models - files - upstream adapters" do
 
-    Callback_.test_support::Expect_event[ self ]
-
     extend TS_
+    use :expect_event
 
     it "stdin and file - can't read from both stdin and file" do
 

@@ -30,8 +30,13 @@ module Skylab::SubTree
 
             if compare == @nc.normal_string_for_test_file_entry( ent )
 
-              _filename_via_path ::File.join(
-                test_dir[ @test_local_range ], ent.to_s )
+              _path = if a.length.zero?
+                ent.to_s
+              else
+                ::File.join( test_dir[ @test_local_range ], ent.to_s )
+              end
+
+              _filename_via_path _path
             end
           end
 

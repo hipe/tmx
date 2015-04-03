@@ -8,14 +8,6 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
   extend TestSupport_::Quickie
 
-  Callback_ = Callback_
-
-  module InstanceMethods
-
-    include Callback_.test_support::Expect_event::Test_Context_Instance_Methods
-
-  end
-
   module Build_Compound_Tree
 
     class << self
@@ -47,19 +39,86 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
     end
   end
 
+  module Expect_Node_Characteristics
+
+    class << self
+      def [] tcm
+        tcm.include self
+      end
+    end  # >>
+
+
+    def expect_tests_but_no_assets_ node
+
+      _expect_tests node
+      _expect_NO_assets node
+    end
+
+    def expect_assets_but_no_tests_ node
+
+      _expect_assets node
+      _expect_NO_tests node
+    end
+
+    def expect_assets_and_tests_ node
+
+      _expect_assets node
+      _expect_tests node
+    end
+
+    def _expect_assets node
+
+      node.node_payload.has_assets or fail _say_expected( :assets, node )
+    end
+
+    def _expect_tests node
+
+      node.node_payload.has_tests or fail _say_expected( :tests, node )
+    end
+
+    def _expect_NO_assets node
+
+      node.node_payload.has_assets and fail _say_expected( :no, :assets, node )
+    end
+
+    def _expect_NO_tests node
+
+      node.node_payload.has_tests and fail _say_expected( :no, :tests, node )
+    end
+
+    def _say_expected no=nil, which, node
+
+      s = node.slug.inspect
+
+      if no
+        "expected no #{ which }, had some: #{ s }"
+      else
+        "expected #{ which }, had none: #{ s }"
+      end
+    end
+  end
+
+  Fixture_tree_ = -> do
+    h = {}
+    -> sym do
+      h.fetch sym do
+        h[ sym ] = Top_TS_.dir_pathname.
+          join( "fixture-trees/#{ sym }" ).to_path.freeze
+      end
+    end
+  end.call
+
   Fixture_tree_test_dir_for_ = -> do
     h = {}
     -> sym do
       h.fetch sym do
-
-        h[ sym ] = Top_TS_.dir_pathname.join(
-          "fixture-trees/#{ sym }/test"
-        ).to_path.freeze
-
+        h[ sym ] = ::File.join( Fixture_tree_[ sym ], 'test' ).freeze
       end
     end
 
   end.call
+
+  Callback_ = Callback_
 
   Name_conventions_ = Callback_.memoize do
 

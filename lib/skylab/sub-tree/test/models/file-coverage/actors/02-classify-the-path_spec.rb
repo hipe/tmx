@@ -5,6 +5,7 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
   describe "[st] models - file-coverage - 02: classify the path" do
 
     extend TS_
+    use :expect_event
 
     it "path does not exist" do
 

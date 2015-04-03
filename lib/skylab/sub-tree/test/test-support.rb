@@ -70,6 +70,12 @@ module Skylab::SubTree::TestSupport
     end
   end
 
+  Expect_Event = -> tcm do
+
+    tcm.include Callback_.test_support::Expect_event::Test_Context_Instance_Methods
+
+  end
+
   Callback_ = SubTree_::Callback_
 
   DASH_ = SubTree_::DASH_

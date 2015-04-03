@@ -429,7 +429,7 @@ module Skylab::Callback
         def iambic_writer_method_proc
           if @iambic_writer_method_proc_is_generated
             if @parameter_arity
-              send :"iambic_writer_method_proc_when_arity_is_#{ @argument_arity }"
+              send :"iambic_writer_method_proc_when_arity_is__#{ @argument_arity }__"
             else
               IAMBIC_WRITER_METHOD_BODY_WHEN_IGNORE_H__.fetch @argument_arity
             end
@@ -440,7 +440,7 @@ module Skylab::Callback
 
       private
 
-        def iambic_writer_method_proc_when_arity_is_one
+        def iambic_writer_method_proc_when_arity_is__one__
           _IVAR = as_ivar
           -> do
             instance_variable_set _IVAR, iambic_property
@@ -448,7 +448,7 @@ module Skylab::Callback
           end
         end
 
-        def iambic_writer_method_proc_when_arity_is_zero
+        def iambic_writer_method_proc_when_arity_is__zero__
           _IVAR = as_ivar
           -> do
             instance_variable_set _IVAR, true

@@ -7,17 +7,15 @@ module Skylab::SubTree
       module For_directory___
 
         def execute
-          init
-          send :"__from__#{ @cx.testiness }__"
-        end
 
-        def __from__test__
+          init
 
           ok = __resolve_the_big_tree
           ok &&= __break_the_big_tree_up_into_big_asset_tree_and_big_test_tree
-          ok &&= __maybe_prune_the_big_trees
+          ok &&= __maybe_prune_one_big_tree
           ok &&= __prepare_the_asset_tree
           ok &&= __prepare_the_test_tree
+          ok &&= __maybe_prune_the_other_tree
           ok && __via_prepared_trees_produce_the_combined_tree
         end
 
@@ -25,7 +23,7 @@ module Skylab::SubTree
 
           _st = SubTree_.lib_.system.filesystem.find( :path, @business_hub_dir_,
               :filename, "*#{ Autoloader_::EXTNAME }",  # here we :+[#008] assume all relevant files have one same extension
-              :freeform_query_infix_words, %w( -type file ),
+              :freeform_query_infix_words, TYPE_FILE___,
               :as_normal_value, -> cmd do
                 cmd.to_path_stream
               end )
@@ -39,69 +37,122 @@ module Skylab::SubTree
           @big_tree = SubTree_::lib_.tree.via :paths, _st
           ACHIEVED_
         end
+        TYPE_FILE___ = %w( -type file )
 
         def __break_the_big_tree_up_into_big_asset_tree_and_big_test_tree
 
-          td_fn = File_Coverage_::Models_::Filename.new @test_dir[ @asset_local_range_ ]
+          @test_dir_localized = @test_dir[ @asset_local_range_ ]
+
+          td_fn = File_Coverage_::Models_::Filename.new @test_dir_localized
 
           _will_lose_child = @big_tree.fetch_node td_fn.to_dir_entry_stream.map( & :string )
 
-          @big_asset_tree = @big_tree
+          @big_trees = Trees__.new
+          @big_trees[ :asset ] = @big_tree
           @big_tree = nil
-          @big_test_tree = _will_lose_child.remove td_fn.file_entry.to_s
+
+          @big_trees[ :test ] = _will_lose_child.remove td_fn.file_entry.to_s
 
           ACHIEVED_
         end
 
-        def __maybe_prune_the_big_trees
+        def __maybe_prune_one_big_tree
+
+          @pre_pruned_trees = Trees__.new
 
           if @business_hub_dir_ == @path || @test_dir == @path
 
-            @pruned_asset_tree = @big_asset_tree
-            @pruned_test_tree = @big_test_tree
-            @big_asset_tree = @big_test_tree = nil
+            @prune_the_other_tree = nil
+
+            @pre_pruned_trees[ :asset ] = @big_trees[ :asset ]
+            @pre_pruned_trees[ :test ] = @big_trees[ :test ]
+            @big_trees[ :asset ] = @big_trees[ :test ] = nil
 
             ACHIEVED_
 
           else
-
-            __prune_the_big_trees
+            __prune_one_big_tree
           end
         end
 
-        def __prune_the_big_trees
+        def __prune_one_big_tree  # assume path is not test dir
 
-          _sub_path = @path[ @asset_local_range_ ]
+          sub_path = @path[ @asset_local_range_ ]
+          test_head = "#{ @test_dir_localized }#{ ::File::SEPARATOR }"
 
-          self._FUN
+          if test_head == sub_path[ 0, test_head.length ]
+
+            _path = sub_path[ test_head.length .. -1 ]
+
+            _prune_this_big_tree _path, :test, :asset
+
+          else
+
+            # :+[#014] - test dir is *within* asset dir, hence the asymmetry
+
+            _prune_this_big_tree sub_path, :asset, :test
+          end
+        end
+
+        def _prune_this_big_tree real_path, left, right
+
+          path_a = real_path.split ::File::SEPARATOR
+
+          @real_prune_path_a_for = Trees__.new
+
+          @real_prune_path_a_for[ left ] = path_a
+
+          _x = @big_trees[ left ].fetch_node path_a do end
+
+          @pre_pruned_trees[ left ] = _x
+          @big_trees[ left ] = nil
+
+          @pre_pruned_trees[ right ] = @big_trees[ right ]
+          @big_trees[ right ] = nil
+
+          @prune_the_other_tree = [ left, right ]
+
+          ACHIEVED_
+        end
+
+        def __normalize_test_subdir_path path_s
+
+          path_s.split( ::File::SEPARATOR ).map do | s |
+
+            @nc.normal_string_for_test_dir_entry s
+          end
         end
 
         def __prepare_the_asset_tree
 
-          tr = _build_prepared_tree @pruned_asset_tree,
+          @prepared_trees = Trees__.new
+
+          tr = _build_prepared_tree @pre_pruned_trees[ :asset ],
             :normal_string_for_asset_dir_entry,
             :normal_string_for_asset_file_entry,
             :receive_asset_dir_entry_string_,
             :receive_asset_file_entry_string_
 
           tr and begin
-            @pruned_asset_tree = nil
-            @prepared_asset_tree = tr
+            @pre_pruned_trees[ :asset ] = nil
+            @prepared_trees[ :asset ] = tr
             ACHIEVED_
           end
         end
 
+        Trees__ = ::Struct.new :asset, :test
+
         def __prepare_the_test_tree
 
-          tr = _build_prepared_tree @pruned_test_tree,
+          tr = _build_prepared_tree @pre_pruned_trees[ :test ],
             :normal_string_for_test_dir_entry,
             :normal_string_for_test_file_entry,
             :receive_test_dir_entry_string_,
             :receive_test_file_entry_string_
 
           tr and begin
-            @pruned_test_tree = nil
-            @prepared_test_tree = tr
+            @pre_pruned_trees[ :test ] = nil
+            @prepared_trees[ :test ] = tr
             ACHIEVED_
           end
         end
@@ -179,10 +230,39 @@ module Skylab::SubTree
           tree_
         end
 
+        def __maybe_prune_the_other_tree
+
+          a = @prune_the_other_tree
+          if a
+            __prune_the_other_tree( * a )
+          else
+            ACHIEVED_
+          end
+        end
+
+        def __prune_the_other_tree left, right
+
+          m = :"normal_string_for_#{ left }_dir_entry"  # ick/meh
+
+          _normal_path = @real_prune_path_a_for[ left ].map do | s |
+            @nc.send m, s
+          end
+
+          x = @prepared_trees[ right ].fetch_node _normal_path do end
+          if x
+            @prepared_trees[ right ] = x
+          else
+            @prepared_trees[ right ] = @prepared_trees[ right ].class.new
+              # make a new mutable empty box. it will be the mutatee or destructee
+          end
+
+          ACHIEVED_
+        end
+
         def __via_prepared_trees_produce_the_combined_tree
 
-          @prepared_test_tree.merge_destructively @prepared_asset_tree
-          @prepared_test_tree
+          @prepared_trees[ :test ].merge_destructively @prepared_trees[ :asset ]
+          @prepared_trees[ :test ]
         end
       end
     end

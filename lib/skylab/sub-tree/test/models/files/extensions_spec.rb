@@ -4,9 +4,8 @@ module Skylab::SubTree::TestSupport::Models_Files
 
   describe "[st] models - files - extensions" do
 
-    Callback_.test_support::Expect_event[ self ]
-
     extend TS_
+    use :expect_event
 
     _MTIME = "\\d+ [acdehikmnorswy]{1,3}"
 

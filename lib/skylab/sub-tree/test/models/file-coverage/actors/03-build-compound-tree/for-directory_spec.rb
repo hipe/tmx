@@ -6,7 +6,9 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
     extend TS_
 
+    use :expect_event
     use :build_compound_tree
+    use :expect_node_characteristics
 
     it "minimal positive case" do
 
@@ -77,15 +79,13 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
       _path 'aa-bb'
 
-      _expect_has_both @node[ 'from-one' ].node_payload
-      _expect_has_both @node[ 'from-another' ].node_payload
-
+      expect_assets_and_tests_ @node[ 'from-one' ]
+      expect_assets_and_tests_ @node[ 'from-another' ]
     end
 
     def _path s
 
       @node = _memoized_tree.fetch_node s
-      @npl = @node.node_payload
       NIL_
     end
 
@@ -111,26 +111,20 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
     def _expect_asset_without_test file_entry_s
 
-      @npl.has_assets.should eql true
-      @npl.has_tests.should be_nil
-      a = @npl.asset_file_entry_s_a
+      expect_assets_but_no_tests_ @node
+
+      a = @node.node_payload.asset_file_entry_s_a
       a.length.should eql 1
       a.first.should eql file_entry_s
     end
 
     def _expect_test_without_asset file_entry_s
 
-      @npl.has_tests.should eql true
-      @npl.has_assets.should be_nil
-      a = @npl.test_file_entry_s_a
+      expect_tests_but_no_assets_ @node
+
+      a = @node.node_payload.test_file_entry_s_a
       a.length.should eql 1
       a.first.should eql file_entry_s
-    end
-
-    def _expect_has_both npl
-
-      npl.has_assets.should eql true
-      npl.has_tests.should eql true
     end
   end
 end

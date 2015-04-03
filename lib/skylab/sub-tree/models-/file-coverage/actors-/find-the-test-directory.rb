@@ -74,18 +74,24 @@ module Skylab::SubTree
 
       def __init_find
 
+        @find_was_OK = true
+
         _fs = SubTree_.lib_.system.filesystem
 
         @find = _fs.find.new_with(
           :filenames, @filenames,  # "always safe"
           :freeform_query_infix_words, %w( -type dir -maxdepth 1 )
         ) do | * i_a, & ev_p |
-          case i_a.last
-          when :find_command_args
-            if @be_verbose
-              @on_event_selectively[ * i_a, & ev_p ]
+
+          yes = true
+          if :error == i_a.first
+            @find_was_OK = false
+          elsif :find_command_args == i_a.last
+            if ! @be_verbose
+              yes = false
             end
-          else
+          end
+          if yes
             @on_event_selectively[ * i_a, & ev_p ]
           end
         end
@@ -112,7 +118,7 @@ module Skylab::SubTree
             end
           else
             # assume @did_find is false
-            ACHIEVED_
+            @find_was_OK
           end
         else
           st

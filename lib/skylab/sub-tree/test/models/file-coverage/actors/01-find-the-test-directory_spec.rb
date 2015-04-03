@@ -5,6 +5,7 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
   describe "[st] models - file-coverage - 01: find the test directory" do
 
     extend TS_
+    use :expect_event
 
     it "against an asset file when the root dir is not found" do
 
@@ -100,6 +101,7 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
           new MOCK_BOUNDISH_, & handle_event_selectively
 
       bnd.instance_variable_set :@nc, Name_conventions_[]
+      bnd.instance_variable_set :@be_verbose, false
       @__bound__ = bnd
       yield
       @result = bnd.__find_the_test_directory

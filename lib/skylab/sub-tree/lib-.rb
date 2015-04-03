@@ -57,7 +57,6 @@ module Skylab::SubTree
     end
 
     Test_file_suffix_a = -> do
-      self._TODO  # #todo-during:15
       [ TS___[].spec_rb ]
     end
 

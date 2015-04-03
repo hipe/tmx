@@ -6,6 +6,7 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
     extend TS_
 
+    use :expect_event
     use :build_compound_tree
 
     it "of single test with counterpart" do
@@ -99,7 +100,7 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
       x.children_count.should be_zero
     end
 
-    # (we skip the complement test because boring)
+    # complement test :+#skipped-because-boring
 
     def test_dir_for_build_compound_tree
 

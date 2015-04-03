@@ -28,7 +28,9 @@
 [#067] #open smooth different interfacings with API actions taxonomy
 [#066]       #done cool new build-less events
 [#065]       #done implement unmarshaling for strings with newlines (git-config)
-[#064]       #done marshal issue near regexps with escape-looking sequences
+[#064] #open either rename `desc` to `entity_description` or make
+             the syntax smarter without bloating it.
+             ( #was: #done marshal issue near regexps with escape-looking sequences )
 [#063]       [ isomorphicisms and emergent interfaces ]
                [fa] near [#fa-006], [#gv-030] sets the stage nicely)
 [#062]       #doc-node the zerk narrative ..
@@ -87,14 +89,14 @@
                directly
              ( was: #parent-node: [#011] event prototype )
 [#022]       [ entity identifier ]
-             ( was: #done obliterate `receive_negative_event` and the rest - single
+             ( #was: #done obliterate `receive_negative_event` and the rest - single
              entrypoint is better. rely on `ok` : false )
 [#021]       the API magic result shape narrative .. (was "scope kernel")
 [#020] #open  --help and --host
 [#019]       [ byte upstream identifiers ]
              ( was: #done turn `is_positive` into `ok` to match HTTP responses )
 [#018]       #parent-node: [#013] "the model property ordering rationale.."
-             (was: #parent-node: [#013] "model ivars..")
+             ( #was: #parent-node: [#013] "model ivars..")
 [#017] #open environment variables need a general solution, probably one
                where the front client handles this alone.
 [#016]       #parent-node: [#013] the inferred inflection narrative ..
@@ -110,7 +112,7 @@
 [#007] #open anticpating the issue with losing hooks accross inheritance bounds
 [#006]       #doc-node the defaults vs required narrative ..
 [#005]       [name]  (compound names derived from model nodes)
-             (was: #done re-arch expressions agents to work correctly with 'par')k
+             ( #was: #done re-arch expressions agents to work correctly with 'par')k
 [#004]       #parent-node: [#002] the help renderer narrative ..
 [#003]       #parent-node: [#002] the CLI state processors narrative ..
 [#002]       #doc-node brazen CLI

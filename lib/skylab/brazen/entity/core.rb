@@ -952,7 +952,7 @@ module Skylab::Brazen
         before_p_p = if @iambic_writer_method_proc_is_generated
           @iambic_writer_method_proc_is_generated = false
           -> mprop do
-            mprop.iambic_writer_method_proc_when_arity_is_one
+            mprop.iambic_writer_method_proc_when_arity_is__one__
           end
         else
           @iambic_writer_method_proc_proc
@@ -973,7 +973,7 @@ module Skylab::Brazen
         end
         after_write_hook_p_a
       end
-      public :iambic_writer_method_proc_when_arity_is_one
+      public :iambic_writer_method_proc_when_arity_is__one__
 
       def dflt_apply
         -> mprop do
@@ -1068,7 +1068,7 @@ module Skylab::Brazen
         x
       end
 
-      def iambic_writer_method_proc_when_arity_is_one
+      def iambic_writer_method_proc_when_arity_is__one__
         _SYM = name_symbol
         -> do
           receive_value_of_entity_property iambic_property, (
@@ -1079,7 +1079,7 @@ module Skylab::Brazen
         end
       end
 
-      def iambic_writer_method_proc_when_arity_is_zero
+      def iambic_writer_method_proc_when_arity_is__zero__
         _SYM = name_symbol
         -> do
           receive_value_of_entity_property true,
@@ -1090,7 +1090,7 @@ module Skylab::Brazen
         end
       end
 
-      def iambic_writer_method_proc_when_arity_is_one_or_more
+      def iambic_writer_method_proc_when_arity_is__one_or_more__
         _SYM = name_symbol
         -> do
           receive_list_of_entity_property iambic_property,
