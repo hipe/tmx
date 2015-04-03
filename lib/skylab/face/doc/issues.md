@@ -2,9 +2,9 @@
 [#060] #hole (was: correct namespace and indentation for CLI)
 [#059]       #parent-node:[#todo] the model manager narrative ..
 [#058]       #parent-node:[#007] the API action narrative ..
-[#057]       #parent-node:[#055] the API client model narrative ..
+[#057]       #SUNSETTED #parent-node:[#055] the API client model narrative ..
 [#056]       #parent-node:[#todo] the CLI client narrative ..
-[#055]       #parent-node:[#007] the API client narrative ..
+[#055]       #SUNSETTED #parent-node:[#007] the API client narrative ..
 [#054]       #parent-node: [#hl-070] the first plugin library (#broadened-from:
                [#hl-077] #API-point track how `initialize` looks in #plugins)
 [#053]       #tracking-tag #the-caculate-pattern
@@ -42,7 +42,7 @@
                the `desc` meta-field
 [#029]       #doc-point #parent:024 #body-is-inline-in-parent
                the "useful five" argument arities
-[#028]       #doc-point #parent:025 #body-is-inline-in-parent
+[#028]       #SUNSETTED #doc-point #parent:025 #body-is-inline-in-parent
                facets are hard-coded
 [#027]       #doc-point #parent:025 #body-is-inline-in-parent
                binary facet reflection
