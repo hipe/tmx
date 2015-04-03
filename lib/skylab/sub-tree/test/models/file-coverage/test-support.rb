@@ -98,6 +98,12 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
     end
   end
 
+  Expect_Stdin_Stdout = -> tcm do
+
+    tcm.include TestSupport_::Expect_Stdout_Stderr::InstanceMethods
+    tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
+  end
+
   Fixture_tree_ = -> do
     h = {}
     -> sym do

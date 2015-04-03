@@ -8,7 +8,6 @@ module Skylab::SubTree
 
       def initialize test_file_name_pattern_a
 
-        @f = For_now___
         @N = 1
 
         @test_file_patterns = SubTree_.lib_.basic::Pathname::Patterns[
@@ -17,65 +16,73 @@ module Skylab::SubTree
 
       def normal_string_for_asset_dir_entry entry
 
-        @f::String_without_trailing_dashes[ entry.to_s ]
+        _without_trailing_dashes entry.to_s
       end
 
       def normal_string_for_asset_file_entry entry
 
-        @f::Base_string_without_trailing_dashes[ entry.to_s ]
+        s = _without_extension entry.to_s
+        _mutate_by_removing_trailing_dashes s
+        s
       end
 
       def normal_string_for_test_dir_entry entry
 
-        entry.to_s  # :+[#001] test sub-directory names are already normal
+        _without_number_prefix entry.to_s
       end
 
       def normal_string_for_test_file_entry entry
 
         s = entry.to_s
 
-        _is = @test_file_patterns.match s
+        _yes = @test_file_patterns.match s
 
-        if _is
+        if _yes
 
-          @f::Base_string_without_N_suffix_parts[ s, @N ]
+          s = _without_extension s
+          _mutate_by_removing_number_prefix s
+          _without_N_suffix_parts s, @N
         end
       end
 
-      module For_now___
+      # ~ the would-be support
 
-        Base_string_without_N_suffix_parts = -> s, d do
+      def _without_trailing_dashes s
 
-          s = Base_string_of__[ s ]
-          a = s.split UNDERSCORE_
-          a[ 0 .. - ( 1 + d ) ].join UNDERSCORE_
-        end
+        s.gsub Callback_::Name::TRAILING_DASHES_RX, EMPTY_S_
+      end
 
-        Base_string_without_trailing_dashes = -> s do
+      def _without_extension s
 
-          s = Base_string_of__[ s ]
-          Mutate_string_by_removing_trailing_dashes__[ s ]
-          s
-        end
+        ext = ::File.extname s
+        s[ 0 .. - ( 1 + ext.length ) ]
+      end
 
-        Base_string_of__ = -> s do
+      def _without_N_suffix_parts s, d
 
-          ext = ::File.extname s
-          s[ 0 .. - ( 1 + ext.length ) ]
-        end
+        a = s.split UNDERSCORE_
+        a[ 0 .. - ( 1 + d ) ].join UNDERSCORE_
+      end
 
-        Mutate_string_by_removing_trailing_dashes__ = -> s do
+      def _without_number_prefix s
 
-          s.gsub! Callback_::Name::TRAILING_DASHES_RX, EMPTY_S_
-          NIL_
-        end
+        s.gsub NUMBER_PREFIX_RX__, EMPTY_S_
+      end
 
-        String_without_trailing_dashes = -> s do
+      # ~
 
-          s = s.dup
-          Mutate_string_by_removing_trailing_dashes__[ s ]
-          s
-        end
+      def _mutate_by_removing_number_prefix s
+
+        s.gsub! NUMBER_PREFIX_RX__, EMPTY_S_
+        NIL_
+      end
+
+      NUMBER_PREFIX_RX__ = /\A\d+-/
+
+      def _mutate_by_removing_trailing_dashes s
+
+        s.gsub! Callback_::Name::TRAILING_DASHES_RX, EMPTY_S_
+        NIL_
       end
     end
   end

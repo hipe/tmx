@@ -66,7 +66,7 @@ module Skylab::TestSupport
 
         @IO_spy_group_for_expect_stdout_stderr = g
 
-        invo = subject_CLI.new( * g.values_at( :i, :o, :e ),
+        invo = subject_CLI.new( * g.values_at( :i, :o, :e ),  # :+#hook-out
           invocation_strings_for_expect_stdout_stderr )  # :+#hook-out
 
         if instance_variable_defined? :@for_expect_stdout_stderr_prepare_invocation
@@ -149,7 +149,27 @@ module Skylab::TestSupport
         @IO_spy_group_for_expect_stdout_stderr.release_lines
       end
 
-      # ~ other expectations
+      # ~ for the end
+
+      def expect_failed
+        expect_no_more_lines
+        expect_result_for_failure
+      end
+
+      def expect_succeeded
+        expect_no_more_lines
+        expect_result_for_success
+      end
+
+      def expect_result_for_failure
+        @exitstatus.should eql result_for_failure_for_expect_stdout_stderr  # :+#hook-out
+      end
+
+      def expect_result_for_success
+        @exitstatus.should be_zero
+      end
+
+      # ~ support & other expectations
 
       def expect_maybe_a_blank_line
 

@@ -84,23 +84,28 @@ module Skylab::Brazen
 
           def ad_hoc_normalizer=
 
-            accept_ad_hoc_normalizer( & iambic_property )
+            _append_ad_hoc_normalizer( & iambic_property )
             KEEP_PARSING_
           end
 
         public
 
-          def add_ad_hoc_normalizer & arg_and_oes_block_p
+          attr_reader :has_ad_hoc_normalizers, :norm_p_a
 
-            accept_ad_hoc_normalizer( & arg_and_oes_block_p )
+          def prepend_ad_hoc_normalizer & arg_and_oes_block_p
+
+            @has_ad_hoc_normalizers = true
+            ( @norm_p_a ||= [] ).unshift arg_and_oes_block_p
             self
           end
 
-          attr_reader :has_ad_hoc_normalizers, :norm_p_a
+          def append_ad_hoc_normalizer & x_p
 
-        private
+            _append_ad_hoc_normalizer( & x_p )
+            self
+          end
 
-          def accept_ad_hoc_normalizer & arg_and_oes_block_p
+          def _append_ad_hoc_normalizer & arg_and_oes_block_p
 
             @has_ad_hoc_normalizers = true
             ( @norm_p_a ||= [] ).push arg_and_oes_block_p
@@ -340,7 +345,7 @@ module Skylab::Brazen
               :number_set, :integer,
               :minimum, d )
 
-            accept_ad_hoc_normalizer do | arg, & oes_p |
+            _append_ad_hoc_normalizer do | arg, & oes_p |
               if arg.value_x.nil?
                 arg
               else
@@ -356,7 +361,7 @@ module Skylab::Brazen
               :number_set, :integer,
               :minimum, 0 )
 
-            accept_ad_hoc_normalizer do | arg, & oes_p |
+            _append_ad_hoc_normalizer do | arg, & oes_p |
 
               if arg.value_x.nil?
                 arg

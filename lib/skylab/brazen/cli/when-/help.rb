@@ -21,12 +21,19 @@ module Skylab::Brazen
     private
 
       def whn_command_string
+
         aa = @aa
         a = aa.find_matching_action_adapters_against_tok @any_cmd_string
+
         case 1 <=> a.length
-        when  0 ; a.first.receive_show_help @help_renderer.invocation
-        when  1 ; aa.receive_no_matching_action @any_cmd_string
-        when -1 ; aa.receive_multiple_matching_adapters a  # #todo - unimplemented ambiguity case
+        when  0
+          a.first.receive_show_help_ @help_renderer.invocation
+
+        when  1
+          aa.receive_no_matching_via_token__ @any_cmd_string
+
+        when -1
+          aa.receive_multiple_matching_via_adapters_and_token__ a, @any_cmd_string
         end
       end
 

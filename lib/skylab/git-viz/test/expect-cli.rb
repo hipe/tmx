@@ -7,7 +7,7 @@ module Skylab::GitViz::TestSupport
       def [] tcm
 
         tcm.include TestSupport_::Expect_Stdout_Stderr::InstanceMethods
-        tcm.send :define_method, :expect, tcm.instance_method( :expect )  # because rspec
+        tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
         tcm.include self
       end
 
@@ -84,22 +84,8 @@ module Skylab::GitViz::TestSupport
       expect :styled, "use 'gvz -h' for help"
     end
 
-    def expect_failed
-      expect_no_more_lines
-      expect_result_for_failure
-    end
-
-    def expect_succeeded
-      expect_no_more_lines
-      expect_result_for_success
-    end
-
-    def expect_result_for_failure
-      @exitstatus.should eql _memo.generic_error
-    end
-
-    def expect_result_for_success
-      @exitstatus.should be_zero
+    def result_for_failure_for_expect_stdout_stderr
+      _memo.generic_error
     end
 
     # ~ more ad-hoc

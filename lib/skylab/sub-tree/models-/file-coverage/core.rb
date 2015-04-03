@@ -25,18 +25,40 @@ module Skylab::SubTree
       SubTree_.lib_.brazen.model.entity self,
 
         :argument_arity, :one_or_more,
-        :description, -> y do
-          y << "the test file suffixes to use (default: etc)"  # #todo
-        end,
+
+        :description, ( -> y do
+
+          _s = @current_property.default_proc.call.map do | s |
+            ick s
+          end.join ', '
+
+          y << "the test file suffixes to use (default: #{ _s })"
+        end ),
+
         :default_proc, -> do
           SubTree_.lib_.test_file_suffix_a
         end,
+
         :property, :test_file_suffix,
 
+        # ~
+
         :required,
+
         :description, -> y do
           y << "the path to any file or folder in a project"
         end,
+
+        :ad_hoc_normalizer, -> arg, & oes_p do
+
+          if arg.value_x
+            SubTree_.lib_.basic::Pathname.normalization.new_with( :absolute ).
+              normalize_argument( arg, & oes_p )
+          else
+            arg
+          end
+        end,
+
         :property, :path
 
       def produce_result
@@ -111,10 +133,22 @@ module Skylab::SubTree
     end
 
     class Agnostic_Tree_Wrapper___
+
       def initialize tree
         @tree = tree
       end
+
       attr_reader :tree
+
+      def name
+        @nm ||= Callback_::Name.via_variegated_symbol :file_coverage_tree
+      end
+
+      def render_all_lines_into_under y, expag
+
+        File_Coverage_::Modalities::CLI::Agnostic_Text_Based_Expression.
+          new( y, expag, @tree ).execute
+      end
     end
 
     Autoloader_[ Actors_ = ::Module.new ]

@@ -160,6 +160,7 @@ module Skylab::Brazen
       end
 
       def whn_result_is_trueish x
+
         if ACHIEVED_ == x  # covered
           SUCCESS_
         elsif x.respond_to? :bit_length  # covered
@@ -206,10 +207,16 @@ module Skylab::Brazen
 
     public
 
-      def receive_no_matching_action tok
-        @token = tok
-        resolve_bound_call_when_no_matching_action
-        call_bound_call @bound_call
+      def receive_no_matching_via_token__ token
+
+        _bc = _bound_call_for_unrecognized_via token
+        call_bound_call _bc
+      end
+
+      def receive_multiple_matching_via_adapters_and_token__ a, token
+
+        _bc = _bound_call_for_ambiguous_via a, token
+        call_bound_call _bc
       end
 
     private
@@ -237,13 +244,24 @@ module Skylab::Brazen
       end
 
       def resolve_bound_call_when_looks_like_action_for_first_argument
-        @token = @resources.argv.shift
-        @adapter_a = find_matching_action_adapters_against_tok @token
-        case 1 <=> @adapter_a.length
-        when  0 ; resolve_bound_call_when_one_matching_adapter
-        when  1 ; resolve_bound_call_when_no_matching_action
-        when -1 ; resolve_bound_call_when_multiple_matching_adapters
-        end     ; nil
+
+        token = @resources.argv.shift
+        @adapter_a = find_matching_action_adapters_against_tok token
+
+        @bound_call = case 1 <=> @adapter_a.length
+
+        when  0
+          __via_one_adapter_produce_bound_call
+
+        when  1
+          _bound_call_for_unrecognized_via token
+
+        when -1
+          _bound_call_for_ambiguous_via @adapter_a, token
+
+        end
+
+        NIL_
       end
 
     public
@@ -389,8 +407,9 @@ module Skylab::Brazen
 
     private
 
-      def resolve_bound_call_when_no_matching_action
-        @bound_call = CLI_::When_::No_Matching_Action.new @token, help_renderer, self
+      def _bound_call_for_unrecognized_via token
+
+        CLI_::When_::No_Matching_Action.new token, help_renderer, self
       end
 
       def resolve_bound_call_when_looks_like_option_for_first_argument
@@ -426,15 +445,18 @@ module Skylab::Brazen
         Actual_Parameter_Scanner__.new @mutable_backbound_iambic, @front_properties
       end
 
-      def resolve_bound_call_when_multiple_matching_adapters
-        @bound_call = CLI_::When_::Ambiguous_Matching_Actions.new self._TODO
+      def _bound_call_for_ambiguous_via adapter_a, token
+
+        CLI_::When_::Multiple_Matching_Actions.
+          new adapter_a, token, help_renderer
       end
 
-      def resolve_bound_call_when_one_matching_adapter
+      def __via_one_adapter_produce_bound_call
+
         @adapter = @adapter_a.first
         @adapter_a = nil
         @adapter.receive_frame self
-        @bound_call = @adapter.via_argv_resolve_some_bound_call
+        @adapter.via_argv_resolve_some_bound_call
       end
     end
 
@@ -469,7 +491,7 @@ module Skylab::Brazen
         end.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :help
       end
 
-    public def receive_show_help otr
+    public def receive_show_help_ otr
         receive_frame otr
         help_renderer.output_help_screen
         SUCCESS_
@@ -642,7 +664,7 @@ module Skylab::Brazen
 
       include Adapter_Methods__
 
-      def receive_show_help otr
+      def receive_show_help_ otr
         receive_frame otr
         CLI_::When_::Help.new( nil, help_renderer, self ).produce_result
       end

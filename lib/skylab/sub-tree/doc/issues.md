@@ -20,5 +20,5 @@
              ( #was: #done haha look at borked bin )
 [#002]       [ file coverage ]
              ( #was: #done refactor! )
-[#001]       #+[#003] test sub-directory entry names are normal
+[#001] #hole ( #was: #+[#003] test sub-directory entry names are normal )
              ( #was: #done specs! )

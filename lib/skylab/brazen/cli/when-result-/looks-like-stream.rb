@@ -42,23 +42,13 @@ module Skylab::Brazen
 
       def when_at_least_one_item
 
-        @name = if @item.respond_to? :name
-          @item.name
-        else
-          Callback_::Name.via_module @item.class
-        end
+        __resolve_name
 
-        @via_item = if @item.respond_to? :execute or
-          @item.respond_to? :render_all_lines_into_under or
-            ! @item.class.respond_to? :properties
-          method :per_item
-        else
-          __build_listing_expresser
-        end
+        p = __per_item_proc
 
         @count = 1
         begin
-          @via_item[]
+          p[]
           @ok or break
           @item = @upstream.gets
           @item or break
@@ -73,7 +63,31 @@ module Skylab::Brazen
         end
       end
 
+      def __resolve_name
+
+        @name = if @item.respond_to? :name
+          @item.name
+        else
+          Callback_::Name.via_module @item.class
+        end
+        NIL_
+      end
+
+      def __per_item_proc
+
+        if @item.respond_to? :execute or
+          @item.respond_to? :render_all_lines_into_under or
+            ! @item.class.respond_to? :properties
+
+          method :per_item
+
+        else
+          __build_listing_expresser
+        end
+      end
+
       def __build_listing_expresser
+
         p = When_Result_::Looks_like_stream__::Build_listing_expresser[ @expag, @item ]
         -> do
           @ok = p[ @item, @y ]
@@ -82,18 +96,24 @@ module Skylab::Brazen
       end
 
       def per_item
+
         if @item.respond_to? :execute
           via_item_execute
+
         elsif @item.respond_to? :render_all_lines_into_under
           @ok = @item.render_all_lines_into_under @y, @expag
+
         else
           @y << @item
           @ok = true
+
         end
+
         if ! @ok
           @count -= 1  # since it will short circuit ..
         end
-        nil
+
+        NIL_
       end
 
       def via_item_execute

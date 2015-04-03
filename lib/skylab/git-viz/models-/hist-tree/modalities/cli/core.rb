@@ -27,7 +27,7 @@ module Skylab::GitViz
 
             bp.replace_by :path do | prp |
 
-              prp.dup.add_ad_hoc_normalizer do | arg, & oes_p |
+              prp.dup.append_ad_hoc_normalizer do | arg, & oes_p |
 
                 # hackd for now
 

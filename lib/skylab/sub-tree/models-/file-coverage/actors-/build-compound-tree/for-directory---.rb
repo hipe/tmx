@@ -8,6 +8,8 @@ module Skylab::SubTree
 
         def execute
 
+          ::File::SEPARATOR == @path[ 0, 1 ] or raise ::ArgumentError  # sanity
+
           init
 
           ok = __resolve_the_big_tree

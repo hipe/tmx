@@ -25,7 +25,7 @@ module Skylab::TestSupport::TestSupport
       me = self
       before :all do
         me.include _Subject[]::InstanceMethods
-        me.send :define_method, :expect, me.instance_method( :expect )  # because rspec
+        me.send :define_method, :expect, me.instance_method( :expect )  # :+#this-rspec-annoyance
       end
 
       it "build a styled expectation" do
@@ -60,7 +60,7 @@ module Skylab::TestSupport::TestSupport
       me = self
       before :all do
         me.include _Subject[]::InstanceMethods
-        me.send :define_method, :expect, me.instance_method( :expect )  # because rspec
+        me.send :define_method, :expect, me.instance_method( :expect )  # :+#this-rspec-annoyance
       end
 
       it "when baked emission a is empty - X" do

@@ -73,13 +73,25 @@ module Skylab::SubTree
 
       attr_writer :current_property
 
-    private
+      # ~
 
       lib = SubTree_.lib_
 
+      pen = lib.CLI_lib.pen
+
+      define_method :stylify_, pen.stylify
+
+      # ~ experimental model-specific customization
+
+      def file_coverage_glyphset_identifier__
+        :wide  # narrow | wide
+      end
+
+    private
+
+
       # ~ classifications for visual styling
 
-      sty = lib.CLI_lib.pen.stylify.curry
 
       def code s
         "'#{ s }'"
@@ -142,11 +154,11 @@ module Skylab::SubTree
         "<#{ prp.name.as_slug }>"
       end
 
-      define_method :_strong, sty[ %i( green ) ]
+      define_method :_strong, pen.stylify.curry[ %i( green ) ]
 
       # ~ EN NLP
 
-      lib.EN_add_methods self, :private, %i( s )
+      lib.EN_add_methods self, :private, %i( or_ s )
 
     end
 

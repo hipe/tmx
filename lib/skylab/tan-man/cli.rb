@@ -47,7 +47,7 @@ module Skylab::TanMan
             def resolve_properties  # :+[#br-042] #nascent-operation
               super
               mutable_back_properties.replace_by :digraph_path do | prp |
-                prp.dup.add_ad_hoc_normalizer do | arg |
+                prp.dup.append_ad_hoc_normalizer do | arg |
                   if arg.value_x and SLASH_BYTE___ != arg.value_x.getbyte( 0 )
                     arg = arg.new_with_value ::File.expand_path arg.value_x
                   end
