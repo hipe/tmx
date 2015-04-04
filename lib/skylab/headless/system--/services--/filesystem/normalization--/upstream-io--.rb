@@ -8,6 +8,14 @@ module Skylab::Headless
 
         class Upstream_IO__ < self  # see [#022]
 
+          class << self
+
+            def call path_arg, & oes_p
+
+              mixed_with :path_arg, path_arg, & oes_p
+            end
+          end  # >>
+
           extend Common_Module_Methods_
 
           Entity_.call self do

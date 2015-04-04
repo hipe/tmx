@@ -1,53 +1,23 @@
 module Skylab::Brazen
 
-  class Model_
+    module Proxies_::Proc_As
 
-    module Node_via_Proc
+      # #todo - covered only by: [tm], [cu]
 
-      # #todo - node via proc is covered elsewhere: [tm], [cu]
-
-      class << self
-
-        def produce_action_class_like p, const_sym, box_mod, parent_mod
-
-          ActionClassLike__.new( p,
-            "#{ box_mod.name }#{ CONST_SEP_ }#{ const_sym }",
-            box_mod, parent_mod )
-        end
-
-        def produce_nodelike p, i, box_mod, model_class
-          NodeLike__.new p, i, box_mod, model_class
-        end
-      end  # >>
-
-      class NodeLike__
-
-        def initialize p, i, mod, mc
-          @name_s = "#{ mod.name }#{ CONST_SEP_ }#{ i }"
-          @mc = mc
-          @mod = mod
-          @i = i
-          @p = p
-        end
-
-        def name  # result is string only because we are emulating ::Module#name
-          @name_s
-        end
-
-        def to_upper_unbound_action_stream
-          Callback_::Stream.via_item ActionClassLike__.new( @p, @name_s, @mod, @mc )
-        end
-      end
-
-      class ActionClassLike__
+      class Unbound_Action
 
         include NAME.name_function_proprietor_methods
 
-        def initialize p, name_s, box_mod, model_class
+        def initialize p, const_sym, box_mod, model_cls
+
           @box_module = box_mod
-          @model_class = model_class
-          @name_s = name_s
+          @model_class = model_cls
+          @name_s = "#{ box_mod.name }#{ CONST_SEP_ }#{ const_sym }"
           @p = p
+        end
+
+        def members
+          [ :box_module, :model_class, :name_function ]
         end
 
         def is_branch
@@ -59,17 +29,17 @@ module Skylab::Brazen
         end
 
         def is_promoted
-          true  # meh
+          false  # :+[#065] procs are always not promoted
         end
 
         attr_reader :p, :box_module, :model_class
 
-        def members
-          [ :box_module, :model_class, :name_function ]
+        def name
+          @name_s
         end
 
         def name_function
-          super
+          super  # hello
         end
 
         def name_function_class  # #hook-in
@@ -80,12 +50,14 @@ module Skylab::Brazen
           nil
         end
 
-        def name
-          @name_s
+        def to_upper_unbound_action_stream
+
+          Callback_::Stream.via_item self
         end
 
         def new k , & oes_p
-          Bound_Action_Like___.new k, self, & oes_p
+
+          As_Bound_Action___.new k, self, & oes_p
         end
 
       private
@@ -142,22 +114,22 @@ module Skylab::Brazen
         end
       end
 
-      class Bound_Action_Like___
+      class As_Bound_Action___
 
         class << self
           def after_name_symbol
             # for now
           end
-
-          def is_branch
-            false
-          end
-        end
+        end  # >>
 
         def initialize k, action_class_like, & oes_p
           @action_class_like = action_class_like
           @kernel = k
           @on_event_selectively = oes_p
+        end
+
+        def is_branch
+          false  # :+ procs are never branches
         end
 
         attr_reader :action_class_like, :kernel
@@ -330,11 +302,6 @@ module Skylab::Brazen
           send :"bc_when_#{ err.terminal_channel_i }_arguments"
         end
 
-
-
-
-
-
         private def maybe_send_event * i_a, & ev_p
           @on_event_selectively[ * i_a, & ev_p ]
         end
@@ -343,13 +310,11 @@ module Skylab::Brazen
           @on_event_selectively[ * i_a, & ev_p ]
         end
 
-
-
         def _sign_event ev
           _nf = @action_class_like.name_function
           Brazen_.event.wrap.signature _nf, ev
         end
       end
     end
-  end
+
 end

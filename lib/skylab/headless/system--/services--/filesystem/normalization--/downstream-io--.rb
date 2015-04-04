@@ -174,11 +174,11 @@ module Skylab::Headless
 
           def via_force_arg_not_OK_to_overwrite
             maybe_send_event :error, :missing_required_properties do
-              bld_missing_force_event
+              __build_missing_force_event
             end
           end
 
-          def bld_missing_force_event
+          def __build_missing_force_event
             build_not_OK_event_with :missing_required_permission,
                 :force_arg, @force_arg, :path_arg, @path_arg do |y, o|
 
@@ -203,11 +203,11 @@ module Skylab::Headless
 
           def snd_creating_event_for_file
             maybe_send_event :info, :before_probably_creating_new_file do
-              bld_BPCNF_event_for_file
+              __build_BPCNF_event_for_file
             end
           end
 
-          def bld_BPCNF_event_for_file
+          def __build_BPCNF_event_for_file
             build_neutral_event_with :before_probably_creating_new_file,
                 :path_arg, @path_arg do |y, o|
 

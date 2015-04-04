@@ -45,8 +45,8 @@ module Skylab::Brazen
         true
       end
 
-      def is_branch
-        false  # for now, every action node is always a terminal (leaf) node
+      def is_branch  # see commment at same instance method
+        false
       end
 
       def preconditions
@@ -112,6 +112,10 @@ module Skylab::Brazen
       @kernel = boundish.to_kernel
 
       accept_selective_listener_proc oes_p
+    end
+
+    def is_branch  # see comment above
+      false  # for now, every action node is always a terminal (leaf) node
     end
 
     def accept_selective_listener_proc oes_p  # name might change to expose [ca]
@@ -189,6 +193,16 @@ module Skylab::Brazen
       _term_chan = _any_expr_chan( rest ) || :generic_info
 
       build_neutral_event_with _term_chan do | y, _o |
+
+        calculate y, & msg_p
+      end
+    end
+
+    def __build__payload__event_via_expression rest, & msg_p  # ditto
+
+      _term_chan = _any_expr_chan( rest ) || :generic_payload
+
+      build_OK_event_with _term_chan do | y, _o |
 
         calculate y, & msg_p
       end
@@ -382,8 +396,18 @@ module Skylab::Brazen
 
       # bend [cb] methodic to accomodate [#046] mutable formal properties
 
-      cls = self.class
       formals = formal_properties
+
+      if formals
+        __iambic_writer_method_name_passive_lookup_proc_via_formals formals
+      else
+        -> _ { }  # MONADIC_EMPTINESS_
+      end
+    end
+
+    def __iambic_writer_method_name_passive_lookup_proc_via_formals formals
+
+      cls = self.class
 
       -> sym do
         prp = formals[ sym ]

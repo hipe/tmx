@@ -64,7 +64,7 @@ module Skylab::Basic
         if a.length.zero?
           Identifier__
         else
-          Identifier__.new( a.fetch( a.length - 1 << 1 ).to_path )
+          Identifier__.new( * a )
         end
       end
 
@@ -91,12 +91,31 @@ module Skylab::Basic
 
     class Identifier__
 
-      def initialize path
-        @path = path
+      def initialize io=nil, path_x
+
+        @_IO = io
+
+        @path = if path_x.respond_to? :to_path
+          path_x.to_path
+        else
+          path_x
+        end
+      end
+
+      def members
+        [ :memers ] - self.class.instance_methods( false )
       end
 
       def description_under expag
         Pathname_.description_under_of_path expag, @path
+      end
+
+      def to_simple_line_stream
+        @_IO
+      end
+
+      def to_minimal_yielder
+        @_IO
       end
     end
 

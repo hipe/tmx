@@ -3,36 +3,13 @@ require 'skylab/test-support/core'
 
 module Skylab::Flex2Treetop::MyTestSupport
 
-  Callback_ = ::Skylab::Callback
-  F2TT_ = ::Skylab::Flex2Treetop
-  MyTestSupport = self
-  TestSupport = ::Skylab::TestSupport
+  TestSupport_ = ::Skylab::TestSupport
 
-  Callback_::Autoloader[ self, F2TT_.dir_pathname.join( 'test' ).to_path ]
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
-
-  module TestLib_
-
-    sidesys = Callback_::Autoloader.build_require_sidesystem_proc
-
-    Bsc__ = sidesys[ :Basic ]
-
-    HL__ = sidesys[ :Headless ]
-
-    MH__ = sidesys[ :MetaHell ]
-
-    Rotating_buffer = -> d do
-      Bsc__[]::Rotating_Buffer[ d ]
-    end
-
-    Strange = -> x do
-      MH__[].strange x
-    end
-
-    System = -> do
-      HL__[].system
-    end
+  def self.extended tcm
+    tcm.extend Headless::ModuleMethods
+    tcm.include Headless::InstanceMethods
   end
 
   # for #posterity we are keeping the below name which is mythically
@@ -42,22 +19,35 @@ module Skylab::Flex2Treetop::MyTestSupport
 
     # ~ test phase.
 
+    module ModuleMethods
+
+      def use sym
+
+        Top_TS_.const_get(
+          Callback_::Name.via_variegated_symbol( sym ).as_const, false
+        )[ self ]
+      end
+    end
+
     module InstanceMethods
 
-      def debug!
-        @do_debug = true
+      def fixture_flex_ sym
+        Fixture_file__[ sym, :flex ]
       end
-      attr_reader :do_debug
-      def debug_IO
-        TestLib_::System[].IO.some_stderr_IO
+
+      def fixture_file_ sym, cat_sym
+        Fixture_file__[ sym, cat_sym ]
       end
+
+      # ~
 
       def _IO_spy_group
-        @IO_spy_group ||= build_IO_spy_group
+        @IO_spy_group ||= __build_IO_spy_group
       end
 
-      def build_IO_spy_group
-        grp = TestSupport::IO.spy.group.new
+      def __build_IO_spy_group
+
+        grp = TestSupport_::IO.spy.group.new
         grp.debug_IO = debug_IO
         grp.do_debug_proc = -> { do_debug }
         grp.add_stream :stdin do |io|
@@ -68,24 +58,43 @@ module Skylab::Flex2Treetop::MyTestSupport
         grp
       end
 
-      def fixture name_i
-        self.class.fixture name_i
-      end
-    end
+      # ~
 
-    module ModuleMethods
-      def fixture name_i
-        _path_s = F2TT_::FIXTURE_H__.fetch name_i
-        ::Skylab.dir_pathname.join( _path_s ).to_s
-      end
-    end
-
-    module InstanceMethods
       def tmpdir
-        Tmpdir__[ -> { do_debug && debug_IO } ]
+        Tmpdir___[ -> { do_debug && debug_IO } ]
+      end
+
+      # ~ support
+
+      attr_reader :do_debug
+
+      def debug!
+        @do_debug = true
+      end
+
+      def debug_IO
+        TestLib_::System[].IO.some_stderr_IO
       end
     end
-    Tmpdir__ = -> do
+
+    Fixture_file__ = -> do
+
+      h = {}
+
+      -> sym, cat_sym do
+
+        h_ = h.fetch cat_sym do
+          h[ cat_sym ] = {}
+        end
+
+        h_.fetch sym do
+
+          h_[ sym ] = ::File.join( FIXTURE_FILES_DIR_, "#{ sym }.#{ cat_sym }" ).freeze
+        end
+      end
+    end.call
+
+    Tmpdir___ = -> do
       p = -> dbg_IO_p do
         _pn = TestLib_::System[].filesystem.tmpdir_pathname.join 'f2tt'
         x_a = [ :path, _pn ]
@@ -93,7 +102,7 @@ module Skylab::Flex2Treetop::MyTestSupport
         if dbg_IO
           x_a.push :be_verbose, true, :debug_IO, dbg_IO
         end
-        td = TestSupport.tmpdir.new_via_iambic x_a
+        td = TestSupport_.tmpdir.new_via_iambic x_a
         p = -> _ { td }
         td
       end
@@ -123,7 +132,7 @@ module Skylab::Flex2Treetop::MyTestSupport
       end
 
       def expct_styled line
-        F2TT_.lib_.CLI_lib.pen.unstyle_styled( line ) or
+        F2TT_.lib_.CLI_pen.unstyle_styled( line ) or
           fail "expected styled, was not: #{ line }"
       end
 
@@ -164,6 +173,7 @@ module Skylab::Flex2Treetop::MyTestSupport
       COMMENT_RX__ = /\A[ \t]*#/
 
       def expect_no_more_lines
+        self._NO
         line_source.assert_no_more_lines
       end
 
@@ -179,16 +189,22 @@ module Skylab::Flex2Treetop::MyTestSupport
       attr_reader :ln_source
 
       def bld_line_source
+
+        self._WAHT
+
         _grp = _IO_spy_group
         @IO_spy_group = :_IO_spy_group_was_baked_
         _a = _grp.release_lines
-        MyTestSupport::Line_Source__.new dbg_IO do |ls|
+        Top_TS_::Line_Source__.new dbg_IO do |ls|
           ls.init_upstream_line_source_with_emissions :stderr, _a
         end
       end
 
       def build_line_source_from_open_file_IO io
-        MyTestSupport::Line_Source__.new dbg_IO do |ls|
+
+        self._WHAT
+
+        Top_TS_::Line_Source__.new dbg_IO do |ls|
           ls.init_upstream_line_source_with_open_file_IO io
         end
       end
@@ -209,8 +225,58 @@ module Skylab::Flex2Treetop::MyTestSupport
         @result.should eql true
       end
 
-      define_method :_EM, F2TT_.lib_.CLI_lib.pen.stylify.curry[ %i( yellow ) ]
+      # define_method :_EM, F2TT_.lib_.CLI_pen.stylify.curry[ %i( yellow ) ]
     end
   end
-  XX = '@ rb_file_s_stat '.freeze  # 2.1.0 added this
+
+  module Expect_Event
+
+    class << self
+
+      def [] tcm
+
+        tcm.include Callback_.test_support::Expect_Event::Test_Context_Instance_Methods
+        tcm.include self
+      end
+    end  # >>
+
+    def black_and_white_expression_agent_for_expect_event
+
+      F2TT_::Brazen_::API.expression_agent_instance
+    end
+  end
+
+  Expect_Line = -> tcm do
+
+    TestSupport_::Expect_line[ tcm ]
+  end
+
+  Callback_ = ::Skylab::Callback
+
+  module TestLib_
+
+    sidesys = Callback_::Autoloader.build_require_sidesystem_proc
+
+    Bsc__ = sidesys[ :Basic ]
+
+    HL__ = sidesys[ :Headless ]
+
+    MH__ = sidesys[ :MetaHell ]
+
+    Strange = -> x do
+      MH__[].strange x
+    end
+
+    System = -> do
+      HL__[].system
+    end
+  end
+
+  F2TT_ = ::Skylab::Flex2Treetop
+  FIXTURE_FILES_DIR_ = F2TT_.dir_pathname.join( 'test/fixture-files' ).to_path
+  ICK_ = '@ rb_file_s_stat '.freeze  # 2.1.0 added this
+  NIL_ = nil
+  REAL_PROGNAME_ = 'flex2treetop'.freeze  # no easy way to mutate this?
+  Stderr_Resources_ = ::Struct.new :stderr
+  Top_TS_ = self
 end

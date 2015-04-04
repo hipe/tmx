@@ -195,6 +195,10 @@ module Skylab::Brazen
         ! is_invisible
       end
 
+      def is_branch
+        true  # see comments at same method above
+      end
+
       def to_kernel
         @kernel
       end
@@ -344,6 +348,10 @@ module Skylab::Brazen
       self.class.to_lower_unbound_action_stream
     end
 
+    def to_lower_unbound_action_stream
+      self.class.to_lower_unbound_action_stream
+    end
+
     class << self
 
       def to_unbound_action_stream
@@ -351,22 +359,22 @@ module Skylab::Brazen
       end
 
       def to_upper_unbound_action_stream  # :+#public-API
-        acr = actn_class_reflection
+        acr = _action_class_reflection
         acr and acr.to_upper_action_cls_strm
       end
 
       def to_node_stream
-        acr = actn_class_reflection
+        acr = _action_class_reflection
         acr and acr.to_node_stream
       end
 
       def to_lower_unbound_action_stream  # :+#public-API
-        acr = actn_class_reflection
-        acr and acr.to_lower_action_cls_strm
+        acr = _action_class_reflection
+        acr and acr.to_lower_action_class_stream_
       end
 
       def to_intrinsic_unbound_action_stream
-        acr = actn_class_reflection
+        acr = _action_class_reflection
         acr and acr.to_node_stream
       end
 
@@ -375,7 +383,7 @@ module Skylab::Brazen
         @is_actionable
       end
 
-      def actn_class_reflection
+      def _action_class_reflection
         @did_reslolve_acr ||= init_action_class_reflection
         @acr
       end
@@ -383,7 +391,7 @@ module Skylab::Brazen
     private
 
       def init_action_class_reflection
-        has = const_defined? ACTIONS__, false  # #one
+        has = const_defined? ACTIONS_CONST_, false  # #one
         if ! has
           h = entry_tree.instance_variable_get :@h
           if h.key? ACTIONS_DIR__ or h.key? ACTIONS_FILE__
@@ -396,10 +404,9 @@ module Skylab::Brazen
       end
 
       def bld_action_class_reflection
-        Lazy_Action_Class_Reflection.new self, const_get( ACTIONS__, false )
+        Lazy_Action_Class_Reflection.new self, const_get( ACTIONS_CONST_, false )
       end
 
-      ACTIONS__ = :Actions
       ACTIONS_DIR__ = 'actions'.freeze
       ACTIONS_FILE__ = "#{ ACTIONS_DIR__ }#{ Autoloader_::EXTNAME }"
     end
@@ -415,7 +422,7 @@ module Skylab::Brazen
         Callback_::Stream.via_nonsparse_array @up_a
       end
 
-      def to_lower_action_cls_strm
+      def to_lower_action_class_stream_
         @did ||= work
         Callback_::Stream.via_nonsparse_array @down_a
       end
@@ -438,7 +445,7 @@ module Skylab::Brazen
         i_a.each do |i|
           cls = @mod.const_get i, false
           if ! cls.respond_to? :name
-            cls = try_convert_to_node_like_via_mixed cls, i
+            cls = __try_convert_to_unbound_action_via_mixed cls, i
             cls or next
           end
           @all_a.push cls
@@ -456,9 +463,11 @@ module Skylab::Brazen
         DONE_
       end
 
-      def try_convert_to_node_like_via_mixed x, i
+      def __try_convert_to_unbound_action_via_mixed x, i
+
         if x.respond_to? :call
-          Model_::Node_via_Proc.produce_action_class_like x, i, @mod, @cls
+
+          Proxies_::Proc_As::Unbound_Action.new x, i, @mod, @cls
         end
       end
     end

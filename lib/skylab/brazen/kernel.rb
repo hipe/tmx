@@ -66,11 +66,12 @@ module Skylab::Brazen
     end
 
     def to_unbound_action_stream
+
       _to_model_stream.expand_by do | item |
         if item.respond_to? :to_upper_unbound_action_stream
           item.to_upper_unbound_action_stream
         else
-          dflt_upper_unbound_action_stream_via_item item
+          __default_upper_unbound_action_stream_via_item item
         end
       end
     end
@@ -86,12 +87,38 @@ module Skylab::Brazen
       end
     end
 
-    private def dflt_upper_unbound_action_stream_via_item item  # experiment #open [#067]
-      box_mod = const_i_a = d = p = nil
+    def __default_upper_unbound_action_stream_via_item item  # experiment #open [#067]
+
+      box_mod = const_i_a = d = p = main = nil
+
+      p = -> do
+
+        box_mod = item::Actions
+        const_i_a = box_mod.constants
+        const_i_a.sort!
+        d = const_i_a.length
+        p = main
+        p[]
+      end
+
+      has_non_promoted_children = false
       main = -> do
         begin
+
           if d.zero?
-            p = EMPTY_P_[]
+
+            if has_non_promoted_children
+
+              x = if item.respond_to? :name_function
+                item
+
+              else
+                Proxies_::Module_As::Unbound_Model.new item
+
+              end
+            end
+
+            p = EMPTY_P_
             break
           end
           d -= 1
@@ -101,35 +128,24 @@ module Skylab::Brazen
             if unb.is_promoted
               x = unb
               break
+            else
+              has_non_promoted_children = true
             end
           else
 
-            # assume proc and for now all procs are treated as promoted (here)
+            # assume proc which is [#065] never treated as promoted
+            has_non_promoted_children = true
 
-            x = Brazen_::Model_::Node_via_Proc.produce_action_class_like(
-              unb,
-              const_i_a.fetch( d ),
-              box_mod,
-              item )
-
-            break
           end
 
           redo
         end while nil
         x
       end
-      p = -> do
-        box_mod = item::Actions
-        const_i_a = box_mod.constants
-        const_i_a.sort!
-        d = const_i_a.length
-        p = main
+
+      Callback_.stream do
         p[]
       end
-      ( Callback_.stream do
-        p[]
-      end )
     end
 
     def bound_action_via_unbound_action_bound_to cls, & oes_p
@@ -158,7 +174,8 @@ module Skylab::Brazen
             modish = x
             break
           end
-          modish = try_convert_to_node_like_via_mixed x, i, @models_mod
+
+          modish = __try_convert_to_unbound_node_via_mixed x, i, @models_mod
           modish and break
         end
         modish
@@ -171,9 +188,11 @@ module Skylab::Brazen
       i_a
     end
 
-    def try_convert_to_node_like_via_mixed x, i, mod
+    def __try_convert_to_unbound_node_via_mixed x, i, mod
+
       if x.respond_to? :call
-        Brazen_::Model_::Node_via_Proc.produce_nodelike x, i, mod, @module
+
+        Proxies_::Proc_As::Unbound_Action.new x, i, mod, @module
       end
     end
 

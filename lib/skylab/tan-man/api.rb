@@ -11,6 +11,10 @@ module Skylab::TanMan
         bc and bc.receiver.send bc.method_name, * bc.args
       end
 
+      def expression_agent_class
+        Expression_Agent__
+      end
+
       def expression_agent_instance  # :+[#051]
         @expag ||= Expression_Agent__.new TanMan_.application_kernel_
       end

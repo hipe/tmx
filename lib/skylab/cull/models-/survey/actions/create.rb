@@ -2,28 +2,11 @@ module Skylab::Cull
 
   class Models_::Survey
 
+    Autoloader_[ Actions = ::Module.new, :boxxy ]
+
     # ~ begin stowaways
 
-    Autoloader_[ ( Actions = ::Module.new ), :boxxy ]
-
-    Actions::Ping = -> call do
-
-      call.maybe_receive_event :info, :ping do
-
-        Callback_::Event.wrap.signature(
-          call.action_class_like.name_function,
-          ( Callback_::Event.inline_neutral_with :ping do | y, o |
-            y << "hello from #{ call.kernel.app_name }."
-          end ) )
-      end
-
-      :hello_from_cull
-    end
-
-    class Actions::Ping2 < Action_
-
-      # we have the odd situation of wanting to use the same name
-      # twice: one for the promoted action and once for this one.
+    class Actions::Ping < Action_
 
       @name_function = Brazen_.model.action_class.name_function_class.new(
         self, Actions, :Ping )

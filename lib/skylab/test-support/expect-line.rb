@@ -165,8 +165,20 @@ module Skylab::TestSupport
       end
 
       def expect_line_scanner
-        @expect_line_scanner ||= Expect_Line::Scanner.via_string( @output_s )
+        @expect_line_scanner ||= __build_expect_line_scanner
       end
+
+      def __build_expect_line_scanner
+
+        st = line_stream_for_expect_line
+        if st
+          Expect_Line_::Scanner.via_stream st
+        else
+          Expect_Line_::Scanner.via_string @output_s
+        end
+      end
+
+      attr_reader :line_stream_for_expect_line
     end
 
     NONBLANK_RX__ = /[^[:space:]]/
@@ -186,8 +198,12 @@ module Skylab::TestSupport
           new TestSupport_.lib_.basic::String.line_stream string
         end
 
+        def via_stream st
+          new st
+        end
+
         private :new
-      end
+      end  # >>
 
       def initialize up
         @up = up
@@ -198,8 +214,36 @@ module Skylab::TestSupport
           :advance_to_rx, :next_line, :skip_blank_lines ]
       end
 
-
       attr_reader :line
+
+      # ~ advancing by a counting number of lines from current or end
+
+      def advance_to_before_Nth_last_line d
+
+        skip_until_before_Nth_last_line d
+        @line
+      end
+
+      def skip_until_before_Nth_last_line d
+
+        buff = TestSupport_.lib_.basic::Rotating_Buffer[ d + 1 ]
+
+        count = -1  # because our buffer runs for one more than the amt requested
+        begin
+          line = @up.gets
+          line or break
+          count += 1
+          buff << line
+          redo
+        end while nil
+
+        st = Callback_::Stream.via_nonsparse_array buff.to_a
+
+        @line = st.gets
+        @up = st
+
+        count
+      end
 
       def advance_N_lines d
         line = nil
@@ -214,12 +258,56 @@ module Skylab::TestSupport
         @line = @up.gets
       end
 
+      # ~ advancing by searching for a regexp (positively or negatively)
+
+      def skip_blank_lines
+
+        advance_past_lines_that_match BLANK_RX___
+      end
+
+      BLANK_RX___ = /\A[[:space:]]*\z/
+
+      def advance_past_lines_that_match rx
+
+        @line = @up.gets
+        advance_to_not_rx rx
+      end
+
       def advance_to_next_rx rx
+
         @line = @up.gets
         advance_to_rx rx
       end
 
+      def advance_to_not_rx rx
+
+        _count_from_advance_to_not_rx rx
+        @line
+      end
+
+      def skip_lines_that_match rx
+
+        @line = @up.gets
+        _count_from_advance_to_not_rx rx
+      end
+
+      def _count_from_advance_to_not_rx rx
+
+        count = 0
+        begin
+          @line or fail "never found a line that didn't match #{ rx.inspect }"
+          if rx =~ @line
+            count += 1
+            @line = @up.gets
+            redo
+          end
+          break
+        end while nil
+        count
+      end
+
       def advance_to_rx rx
+
         begin
           @line or fail "never found before end of file: #{ rx.inspect }"
           md = rx.match @line
@@ -230,18 +318,7 @@ module Skylab::TestSupport
         md
       end
 
-      def skip_blank_lines
-        begin
-          @line = @up.gets
-          if BLANK_RX__ =~ @line
-            redo
-          else
-            break
-          end
-        end while nil
-      end
-
-      BLANK_RX__ = /\A[[:space:]]*\z/
+      # ~ building fake files
 
       def build_fake_file_from_line_and_every_line_while_rx rx
         fake_lines = []
@@ -283,5 +360,7 @@ module Skylab::TestSupport
         @content.include? str
       end
     end
+
+    Expect_line::Expect_Line_ = self
   end
 end

@@ -19,6 +19,24 @@ module Skylab::Cull
 
   Callback_ = ::Skylab::Callback
 
+  Autoloader_ = Callback_::Autoloader
+
+  Autoloader_[ Models_ = ::Module.new, :boxxy ]
+
+  Models_::Ping = -> call do
+
+    call.maybe_receive_event :info, :ping do
+
+      Callback_::Event.wrap.signature(
+        call.action_class_like.name_function,
+        ( Callback_::Event.inline_neutral_with :ping do | y, o |
+          y << "hello from #{ call.kernel.app_name }."
+        end ) )
+    end
+
+    :hello_from_cull
+  end
+
   class << self
 
     define_method :application_kernel_, ( Callback_.memoize do
@@ -100,8 +118,6 @@ module Skylab::Cull
     end
   end
 
-  Autoloader_ = Callback_::Autoloader
-
   module Lib_
 
     sidesys = Autoloader_.build_require_sidesystem_proc
@@ -138,7 +154,6 @@ module Skylab::Cull
   EMPTY_S_ = ''.freeze
   KEEP_PARSING_ = true
   Model_ = Brazen_.model.model_class
-  Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
   NIL_ = nil
   UNABLE_ = false
 

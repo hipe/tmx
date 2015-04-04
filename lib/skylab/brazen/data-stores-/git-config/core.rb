@@ -564,7 +564,7 @@ module Skylab::Brazen
               _otr
             else
               oes.call :error, :invalid_escape_sequence do
-                build_invalid_escape_sequence_event $~[ 0 ]  # #todo - unimplemented error cse
+                self.__TODO_build_invalid_escape_sequence_event $~[ 0 ]
               end
               ok = false
               s  # put the string "back in" as-is

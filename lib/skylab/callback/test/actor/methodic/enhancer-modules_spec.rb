@@ -119,9 +119,11 @@ module Skylab::Callback::TestSupport::Actor::Methodic::MP
               @parameter_arity = :one
             end
           end
+
           module_methods_module_for_write
+
           module ModuleMethods
-            def required_properties_scan
+            def to_required_properties_stream
               properties.to_stream.reduce_by do |prop|
                 prop.is_required
               end
@@ -147,14 +149,18 @@ module Skylab::Callback::TestSupport::Actor::Methodic::MP
       end
 
       it "works" do
+
         o = D_2.new do
           process_fully :bar, :hi
           nilify_uninitialized_ivars
         end
-        _scan = o.class.required_properties_scan
-        a = _scan.reduce_by do |prop|
-          o.instance_variable_get( prop.as_ivar ).nil?
+
+        _st = o.class.to_required_properties_stream
+
+        a = _st.reduce_by do | prp |
+          o.instance_variable_get( prp.as_ivar ).nil?
         end.to_a
+
         a.map( & :name_symbol ).should eql [ :foo, :baz ]
       end
     end

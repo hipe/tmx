@@ -1,109 +1,16 @@
-require_relative '../callback/core'
+require_relative '..'
+require 'skylab/callback/core'
+require 'skylab/brazen/core'
 
-module Skylab::Flex2Treetop
-
-  class << self
-
-    def lib_
-      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
-    end
-  end  # >>
-
-  Callback_ = ::Skylab::Callback
-
-  Autoloader_ = Callback_::Autoloader
-
-  module Lib_
-
-    sidesys = Autoloader_.build_require_sidesystem_proc
-
-    API_lib = -> * a do
-      if a.length.zero?
-        HL__[]::API
-      else
-        HL__[]::API.call_via_arglist a
-      end
-    end
-
-    Bsc_  = sidesys[ :Basic ]
-
-    Bzn_ = sidesys[ :Brazen ]
-
-    CLI_lib = -> do
-      HL__[]::CLI
-    end
-
-    Funcy_globful = -> x do
-      MH__[].funcy_globful x
-    end
-
-    HL__ = sidesys[ :Headless ]
-
-    MH__ = sidesys[ :MetaHell ]
-
-    Option_parser = -> { require 'optparse' ; ::OptionParser }
-
-    Pathname_lib = -> do
-      Bsc_[]::Pathname
-    end
-
-    Strange = -> x do
-      MH__[].strange x
-    end
-
-    String_lib = -> do
-      Bsc_[]::String
-    end
-
-    String_scanner = -> { require 'strscan' ; ::StringScanner }
-
-    Stdib_tmpdir = -> { require 'tmpdir' ; ::Dir }
-
-    System = -> do
-      HL__[].system
-    end
-  end
-
-  LIB_ = lib_
+module Skylab::Flex2Treetop  # see [#008] the narrative
 
   module CLI
+
     def self.new i, o, e  # #hook-out[tmx]
-      CLI::Client.new i, o, e
-    end
-  end
-
-  class CLI::Client
-
-    LIB_.CLI_lib.action self, :DSL
-
-    LIB_.CLI_lib.client self, :client_instance_methods, :three_streams_notify
-
-    def initialize i, o, e
-      @do_ping_API = false
-      @param_x_a = []
-      three_streams_notify i, o, e
-      super()
+      self._THIS
     end
 
-  private
-
-    def default_action_i
-      :translate
-    end
-
-    def build_option_parser
-
-      o = LIB_.option_parser.new
-
-      o.base.long[ 'ping' ] = ::OptionParser::Switch::OptionalArgument.
-          new do |x|
-        touch_queue_without_initial_queue
-        enqueue_with_args :ping, x
-      end
-
-      o.base.long[ 'API' ] = ::OptionParser::Switch::NoArgument.new do
-        @do_ping_API = true
-      end
+    if false  # for phase 5
 
       o.on('-g=<grammar>', '--grammar=<grammar>',
         "nest treetop output in this grammar declaration",
@@ -157,118 +64,321 @@ module Skylab::Flex2Treetop
       o.on('--test', '(shows some visual tests that can be run)') do
         enqueue_without_initial_queue :show_tests
       end
-      o
-    end
-
-    def ping arg=nil
-      if @do_ping_API
-        invoke_API :ping, :arg_1, arg
-      elsif arg
-        "(#{ arg })"
-      else
-        ping_simple
-      end
-    end
-
-    def ping_simple
-      @IO_adapter.errstream.puts "hello from flex2treetop."
-      :hello_from_flex2treetop
-    end
-
-    def show_flex2tt_tt_grammar
-      @IO_adapter.outstream.write TREETOP_GRAMMAR__
-      ACHIEVED_
-    end
-
-    def show_tests
-      pwd = ::Pathname.pwd
-      emit_info_line say { "#{ kbd 'some nerks to try:' }" }
-      FIXTURE_H__.each_pair do |k, path|
-        pn = ::Skylab.dir_pathname.join path
-        rel_pn = pn.relative_path_from pwd
-        if pn.exist?
-          emit_payload_line "  #{ program_name } #{ rel_pn }"
-        else
-          emit_error_line "( missing example - fix this - #{ rel_pn })"
-        end
-      end
-      ACHIEVED_
-    end
-
-    def version
-      s = invoke_API :version
-      s and emit_payload_line s
-      nil
-    end
-
-    def translate flexfile
-      @param_x_a.unshift :translate,
-        :emit_info_string_p, method( :emit_info_line ),
-        :emit_info_line_p, method( :emit_info_line ),
-        :flexfile, flexfile,
-        :paystream_via, :IO, @IO_adapter.outstream,
-        :pp_IO_for_show_sexp, @IO_adapter.errstream
-      _endpoint_symbol = API.invoke_with_iambic @param_x_a
-      resolve_some_exit_behavior_and_value_for_endpoint_symbol _endpoint_symbol
-    end
-
-    def resolve_some_exit_behavior_and_value_for_endpoint_symbol i
-      case i
-      when :showed_sexp, :translated ; 0
-      when :parser_dir_not_exist ; rslv_exit_when_parser_dir_not_exist
-      when :parse_failure ; rslv_exit_when_parse_failure
-      when :translate_failure ; rslv_exit_when_translate_failure
-      else rslv_exit_for_unexpected_endpoint_symbol( i ) end
-    end
-
-    def rslv_exit_when_parser_dir_not_exist
-      help_yielder << invite_line
-      GENERIC_ERROR_EXITSTATUS__
-    end
-
-    def rslv_exit_when_parse_failure
-      help_yielder << say_try_again
-      GENERIC_ERROR_EXITSTATUS__
-    end
-
-    def say_try_again
-      "try fixing the issues in the flexfile grammar (or our grammar grammar)?"
-    end
-
-    def rslv_exit_when_translate_failure
-      help_yielder << say_translate_failure
-      GENERIC_ERROR_EXITSTATUS__
-    end
-
-    def say_translate_failure
-      "had to stop mid-translation because of the above issue."
-    end
-
-    def rslv_exit_for_unexpected_endpoint_symbol i
-      help_yielder << say_unexp_endpoint_symbol( i )
-      GENERIC_ERROR_EXITSTATUS__
-    end
-
-    def say_unexp_endpoint_symbol i
-      "encountered unexpected endpoint symbol '#{ i }'. not sure if OK."
-    end
-    GENERIC_ERROR_EXITSTATUS__ = 1
-
-    # ~ support for multiple "action-like" methods
-
-    def invoke_API * x_a
-      x_a[ 1, 0 ] = :errstream, @IO_adapter.errstream
-      API.invoke_with_iambic x_a
-    end
-
-    def resolve_IO_adapter_instream  # #hook-in to [hl]
-      ok = common_resolve_IO_adapter_instream
-      ok or help_yielder << invite_line
-      ok
     end
   end
 
-  module Local_Actor_  # #storypoint-210
+  module API
+
+    class << self
+
+      def call * x_a, & oes_p
+        bc = F2TT_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
+        bc and bc.receiver.send bc.method_name, * bc.args
+      end
+    end  # >>
+  end
+
+  Callback_ = ::Skylab::Callback
+
+  class << self
+
+    def action_class  # #hook-out for [br] for using procs as actions (if ever)
+      Action__
+    end
+
+    define_method :application_kernel_, ( Callback_.memoize do
+      Brazen_::Kernel.new F2TT_
+    end )
+
+    def lib_
+      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+    end
+  end  # >>
+
+  Brazen_ = ::Skylab::Brazen
+
+  class Action__ < Brazen_.model.action_class
+
+    Brazen_.model.entity self
+
+  end
+
+  module Models_
+
+    module Application
+
+      Actions = ::Module.new
+
+      class Actions::Ping < Action__
+
+        @is_promoted = true
+
+        edit_entity_class :property, :arg_1
+
+        def produce_result
+
+          arg_1 = @argument_box[ :arg_1 ]
+
+          maybe_send_event :payload, :expression, :ping do | y |
+
+            if arg_1
+              y << "helo:(#{ arg_1 })"
+            else
+              y << "hello from #{ app_name }."
+            end
+            :_xyzzy_
+          end
+          :_hello_from_API_
+        end
+      end
+
+      class Actions::Version < Action__
+
+        @is_promoted = true
+
+        edit_entity_class(
+          :flag, :property, :bare )
+
+        def produce_result
+
+          if @argument_box[ :bare ]
+            "#{ VERSION }"
+          else
+            "#{ @kernel.app_name }: #{ VERSION }"
+          end
+        end
+      end
+    end
+
+    class Test  # :+#frontier a parent-less model class
+
+      Actions = ::Module.new
+
+      Actions::List = -> act_pxy do
+
+        _path = F2TT_.dir_pathname.join( 'test/fixture-files' ).to_path
+
+        path_a = ::Dir.glob( "#{ _path }/*.flex", ::File::FNM_PATHNAME )
+
+        path = ::Skylab.dir_pathname.to_path
+
+        ADDITIONAL_RECOMMENDED_VISUAL_TEST_FILES___.each do | universe_file |
+          path_a.push ::File.join( path, universe_file )
+        end
+
+        Callback_::Stream.via_nonsparse_array path_a do | path_ |
+
+          Test_.new path_
+        end
+      end
+
+      def initialize path
+        @path = path
+      end
+
+      def basename_string
+        ::File.basename @path
+      end
+
+      Test_ = self
+    end
+
+    module Translation
+
+      Actions = ::Module.new
+
+      class Actions::Translate < Action__
+
+        @is_promoted = true
+
+        edit_entity_class(
+
+          :flag, :property, :case_sensitive,
+
+          :flag, :property, :clear_generated_files,
+
+          :flag, :property, :endpoint_is_FS_parser,
+
+          :flag, :property, :force,
+
+          :property, :FS_parser_dir,
+
+          :flag, :property, :show_sexp_only,
+
+          :flag,  :property, :use_FS_parser,
+
+          :flag, :property, :verbose,
+
+          :property, :wrap_in_grammar_s,
+
+          :required, :property, :resources,
+
+          :required, :property, :flexfile,
+
+          :required, :property, :output_path
+        )
+
+        def produce_result
+
+          ok = __resolve_resources
+          ok &&= __resolve_upstream
+          ok &&= __resolve_downstream
+          ok && __result_via_upstream_and_downstream
+        end
+
+        def __resolve_resources
+
+          @resources = @argument_box.fetch :resources
+          @resources && ACHIEVED_
+        end
+
+        def __resolve_upstream
+
+          trio = self.trio :flexfile
+          path = trio.value_x
+
+          id = if DASH_ == path
+
+            self._THIS
+          else
+
+            io = LIB_.system.filesystem.normalization.upstream_IO.call(
+              trio, & handle_event_selectively )
+
+            io and begin
+              F2TT_.lib_.basic::Pathname.identifier io, path
+            end
+          end
+
+          id and begin
+
+            @upstream_ID = id
+            ACHIEVED_
+          end
+        end
+
+        def __resolve_downstream
+
+          h = @argument_box.h_
+          if h[ :show_sexp_only ] || h[ :endpoint_is_FS_parser ]
+
+            @downstream_ID = :__DOWNSTREAM_NOT_USED__
+            @verb_s = 'skipping'
+            ACHIEVED_
+          else
+            __resolve_normal_downstream
+          end
+        end
+
+        def __resolve_normal_downstream
+
+          trio = self.trio :output_path
+          path = trio.value_x
+          id = if DASH_ == path
+
+            self._THIS
+          else
+
+            io = LIB_.system.filesystem.normalization.downstream_IO.with(
+                :path_arg, trio,
+                :force_arg, self.trio( :force ) ) do | * i_a, & ev_p |
+
+              if :info == i_a.first
+                @verb_s = send :"__verb_given__#{ i_a.last }__"
+              end
+
+              handle_event_selectively_via_channel[ i_a, & ev_p ]
+            end
+
+            io and begin
+              F2TT_.lib_.basic::Pathname.identifier io, path
+            end
+          end
+
+          id and begin
+
+            @downstream_ID = id
+            ACHIEVED_
+          end
+        end
+
+        def __verb_given__before_probably_creating_new_file__
+          CREATE___
+        end
+        def __verb_given__before_editing_existing_file__
+          OVERWRITE__
+        end
+        CREATE___ = 'create'.freeze
+        OVERWRITE__ = 'overwrite'.freeze
+
+        def __result_via_upstream_and_downstream
+
+          h = @argument_box.h_
+
+          Translate___.call(
+              :be_verbose, ( h[ :verbose ] || false ),
+              :do_clear_files, h[ :clear_generated_files ],
+              :do_show_sexp_only, h[ :show_sexp_only ],
+              :do_use_FS_parser, h[ :use_FS_parser ],
+              :endpoint_is_FS_parser, h[ :endpoint_is_FS_parser ],
+              :FS_parser_dir, h[ :FS_parser_dir ],
+              :downstream_ID, @downstream_ID,
+              :filesystem, ::File,  # the real one is used, no mocking yet
+              :resources, @resources,
+              :upstream_ID, @upstream_ID,
+              :verb_s, @verb_s,
+              :wrap_in_grammar_s, h[ :wrap_in_grammar_s ],
+              & handle_event_selectively )
+
+        end
+      end
+    end
+  end
+
+  Autoloader_ = Callback_::Autoloader
+
+  module Lib_
+
+    sidesys = Autoloader_.build_require_sidesystem_proc
+    vendor = Autoloader_.build_require_stdlib_proc
+
+    Basic = sidesys[ :Basic ]
+
+    HL___ = sidesys[ :Headless ]
+
+    Option_parser = -> { require 'optparse' ; ::OptionParser }
+
+    PP = -> do
+      require 'pp' ; ::PP
+    end
+
+    Stdlib_tmpdir = Callback_.memoize do
+      require 'tmpdir'
+      ::Dir
+    end
+
+    Strange = -> x do
+      MH__[].strange x
+    end
+
+    String_lib = -> do
+      Basic[]::String
+    end
+
+    String_scanner = -> { require 'strscan' ; ::StringScanner }
+
+    System = -> do
+      HL___[].system
+    end
+
+    Treetop = vendor[ :Treetop ]
+  end
+
+  LIB_ = lib_
+
+  module Local_actor__
+
+    # an experiment with whether it is worth it to support custom syntax syntax
 
     Callback_::Actor.methodic self, :simple, :properties
 
@@ -276,797 +386,464 @@ module Skylab::Flex2Treetop
 
     class Property
 
-      def initialize( * )
-        @argument_arity = :one
-        @parameter_arity = :one
-        super
-      end
-
-      attr_reader :default_proc
+      attr_reader :default_proc  # #hook-out for [cb] methodic
 
     private
 
-      def default=
-        _X = iambic_property
-        @default_proc = -> do
-          _X
-        end
-        KEEP_PARSING_
-      end
-
-      def flag=
-        @argument_arity = :zero
-        send :optional=
-      end
-
-      def optional=
-        @parameter_arity = :zero_or_one
+      def required=
+        @parameter_arity = :one
         KEEP_PARSING_
       end
     end
 
-  private
+    def initialize x_a, & oes_p
 
-    def init_via_iambic x_a
+      if oes_p
+        @on_event_selectively = oes_p
+      end
+
       process_iambic_stream_fully iambic_stream_via_iambic_array x_a
       via_default_proc_and_is_required_normalize
+
+      super( & nil )
     end
 
     def build_missing_required_properties_event miss_a  # #hook-in->[cb]
-      Lib_::Bzn_[]::Entity.properties_stack.
+
+      Brazen_::Entity.properties_stack.
         build_missing_required_properties_event(
-          miss_a, 'iambic parameter', "'#{ moniker_for_errmsg }' is" )
+          miss_a, 'iambic parameter', "'#{ __moniker_for_errmsg }' is" )
     end
 
-    def moniker_for_errmsg
+    def __moniker_for_errmsg
+
       Callback_::Name.via_module( self.class ).as_human
     end
+  end
 
-    module_methods_module_for_write
+  Deferred_actor__ = -> p do  # #storypoint-415
 
-    module ModuleMethods
-      def required_properties_scan
-        properties.to_stream.reduce_by do |prop|
-          prop.is_required
-        end
-      end
+    cls_p = Callback_.memoize p
+
+    -> * x_a, & oes_p do
+
+      cls_p[].new( x_a, & oes_p ).procede_until_endpoint_
     end
   end
 
-  KEEP_PARSING_ = true  # must be defined before local actor is used below
+Translate___ = Deferred_actor__[ -> do class Translate____
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]  # before #here
+    Local_actor__.call self, :simple, :properties,
 
-  module API
+      :required, :property, :be_verbose,
 
-    LIB_.API_lib self, :with_service, :with_session, :with_actions  # :#here
+      :property, :do_clear_files,
 
-    action_class
-    class Action
+      :property, :do_show_sexp_only,
 
-      Local_Actor_[ self, :simple, :properties ]
+      :property, :do_use_FS_parser,
 
-      # parameter_members
+      :required, :property, :downstream_ID,
 
-      def initialize seed
-        # we implement our own hacking of program name and
-        # errstream thru the ick argument iambic for now
+      :property, :endpoint_is_FS_parser,
 
-        @client = Services_for_API_Action__.new seed.session, seed.service
-        # #storypoint-250 - don't access session directly
+      :required, :property, :filesystem,
 
-        @errstream = seed.session.errstream  # #open [#011]
+      :property, :FS_parser_dir,
 
-        init_via_iambic seed.iambic
+      :required, :property, :resources,
 
-        super()
+      :required, :property, :upstream_ID,
+
+      :required, :property, :verb_s,
+
+      :property, :wrap_in_grammar_s
+
+    def procede_until_endpoint_
+
+      if @be_verbose && __is_conventional_endpoint
+        __express_doing
       end
 
-    private
-
-      def emit_error_string s
-        @errstream.puts s ; nil
+      if @do_use_FS_parser
+        x = __use_FS_parser
       end
 
-      def emit_info_line s
-        @errstream.puts s ; nil
-      end
+      x || __translate_stream
     end
 
-    class Services_for_API_Action__
-
-      def initialize session, service
-        @service = service ; @session = session ; nil
-      end
-
-      def program_name
-        @session.program_name
-      end
-    end
-
-    class Actions::Ping < Action
-
-      o :simple, :properties,
-          :ivar, :@arg_x, :property, :arg_1
-
-      def execute
-        @errstream.puts "helo:(#{ @arg_x })"
-        :_hello_from_API_
-      end
-    end
-
-    class Actions::Version < Action
-
-      o :simple, :properties,
-          :flag, :property, :bare
-
-      def execute
-        if @bare
-          "#{ VERSION }"
-        else
-          "#{ @client.program_name }: #{ VERSION }"
-        end
-      end
-    end
-
-    session_class
-    class Session
-      attr_reader :errstream
-    private
-      def program_name=
-        @service._CHANGE_PROGRAM_NAME! iambic_property
-      end
-    public
-      def program_name
-        @service.program_name
-      end
-    end
-
-    service_class
-    class Service
-      def initialize *_
-        @program_name = nil
-        super
-      end
-      def _CHANGE_PROGRAM_NAME! x
-        @program_name = x
-        KEEP_PARSING_
-      end
-      def program_name
-        @program_name || ::File.basename( $PROGRAM_NAME )
-      end
-    end
-
-    Pathname_writer__ = -> prop do
-      ivar = prop.as_ivar
-      -> do
-        x = LIB_.pathname_lib.try_convert iambic_property
-        instance_variable_set ivar, x
-      end
-    end
-
-    class Actions::Translate < Action
-
-      o :simple, :properties,
-        # * parameter_members,  # #storypoint-315
-
-        :flag, :ivar, :@is_case_sensitive, :property, :case_sensitive,
-
-        :flag, :ivar, :@do_clear_files, :property, :clear_generated_files,
-
-        :flag, :property, :endpoint_is_FS_parser,
-
-        :property, :flexfile,
-
-        :flag, :ivar, :@force_is_present, :property, :force,
-
-        :optional,
-          :iambic_writer_method_proc_proc, Pathname_writer__,
-          :property, :FS_parser_dir,
-
-        :property, :emit_info_line_p,
-
-        :property, :emit_info_string_p,
-
-        :iambic_writer_method_to_be_provided, :property, :paystream_via,
-
-        :property, :pp_IO_for_show_sexp,
-
-        :flag, :ivar, :@do_show_sexp_only, :property, :show_sexp_only,
-
-        :flag, :ivar, :@do_use_FS_parser, :property, :use_FS_parser,
-
-        :flag, :default, true, :ivar, :@be_verbose, :property, :verbose,
-
-        :optional, :property, :wrap_in_grammar_s
-
-      private
-
-        def paystream_via=  # a diadic term
-          @paystream_via = :_provided_
-          type_i = iambic_property
-          case type_i
-          when :IO
-            @pay_i = :IO
-            @pay_x = iambic_property
-            KEEP_PARSING_
-          when :path
-            @pay_i = :path
-            @pay_x = iambic_property
-            KEEP_PARSING_
-          else
-            raise ::ArgumentError, "no: '#{ type_i }'"
-          end
-        end
-
-    public
-
-      def execute
-        @sl = Callback_::Selective_Listener.flattening self
-        ok = rslv_upstream_IO
-        ok &&= maybe_rslv_payload_IO
-        ok && when_upstream_and_downstrem
-        @result_i
-      end
-
-    private
-
-      def rslv_upstream_IO
-
-        _ = Lib_::Bsc_[].trio.via_x_and_i @flexfile, :flexfile
-
-        io = LIB_.system.filesystem.normalization.upstream_IO.
-          mixed_with :path_arg, _, & _handle_event_thru( :rslv_up_IO )
-
-        if io
-          @upstream_IO = io
-          ACHIEVED_
-        end
-      end
-
-      def maybe_rslv_payload_IO
-        if @do_show_sexp_only || @do_use_FS_parser
-          @verb_s = :_no_verb_
-          @payload_IO = :_no_outstream_
-          ACHIEVED_
-        else
-          rslv_payload_IO
-        end
-      end
-
-      def rslv_payload_IO
-
-        x_a = []
-        send :"when_payload_shape_is_#{ @pay_i }", x_a
-
-        x_a.push :force_arg, bld_force_arg
-        x_a.push :last_looks, method( :last_looks )
-
-        io = LIB_.system.filesystem.normalization.downstream_IO.
-          mixed_via_iambic x_a, & _handle_event_thru( :rslv_pay_IO )
-
-        if io
-          @payload_IO = io
-          ACHIEVED_
-        end
-      end
-
-      def when_payload_shape_is_path x_a
-        x_a.push :path, @pay_x
-      end
-
-      def when_payload_shape_is_IO x_a
-        @verb_s = 'outputting'
-        x_a.push :outstream, @pay_x
-      end
-
-      def bld_force_arg
-        Lib_::Bsc_[].trio.via_value_and_variegated_symbol @force_is_present, :force
-      end
-
-      def last_looks ev, ok_p, ev_p
-        if AUTOGENERATED_RX =~ first_line
-          ev.stat.size.zero? and snd_zero_overwrite_event( ev )
-          ok_p[]
-        else
-          bld_looks_handmade_event ev
-          ev_p[ _ev ]
-        end
-      end
-
-      def snd_zero_overwrite_event ev
-        _ev = Lib_::Bzn_[].event.inline_with :zero_length,
-            :path, ev.path do |y, o|
-          y << "(overwriting empty file: #{ pth o.path })"
-        end
-        receive_event _ev ; nil
-      end
-
-      def bld_looks_handmade_event ev
-        Lib_::Bzn_[].event.inline_with :looks_handmade,
-            :path, ev.path, :ok, false do |y, o|
-          y << "won't overwrite, does not appear generated - #{
-           }#{ pth o.path }"
-        end
-      end
-
-      def rslv_up_IO_not_OK_errno_enoent ev
-        receive_event ev
-        @result_i = :not_found
-        UNABLE_
-      end
-
-      def rslv_up_IO_not_OK_wrong_ftype ev
-        receive_event ev
-        @result_i = :not_file
-        UNABLE_
-      end
-
-      def rslv_pay_IO_before_probably_creating_new_file ev
-        @verb_s = 'creating'
-      end
-
-      def rslv_pay_IO_before_editing_existing_file ev
-        @verb_s = 'overwriting'
-      end
-
-      def rslv_pay_IO_not_OK_missing_required_permission ev
-        receive_event ev
-        @result_i = :exists
-        UNABLE_
-      end
-
-      def rslv_pay_IO_not_OK_errno_eisdir ev
-        receive_event ev
-        @result_i = :not_file
-        UNABLE_
-      end
-
-      def rslv_pay_IO_not_OK_errno_enoent ev
-        receive_event ev
-        @result_i = :not_found
-        UNABLE_
-      end
-
-      def rslv_pay_IO_not_OK_looks_handmade ev
-        receive_event ev
-        @result_i = :will_not_clobber_existing_ostensibly_handmade_outfile
-        UNABLE_
-      end
-
-      def _handle_event_thru sym
-
-        -> * i_a, & ev_p do
-
-          ev = ev_p[]
-
-          if ! ev.ok.nil?
-            ok_i = ev.ok ? :OK : :not_OK
-          end
-
-          @sl.maybe_receive_event sym, * ok_i, ev.terminal_channel_i, ev
-        end
-      end
-
-      def when_upstream_and_downstrem
-        _outstream_moniker = resolve_some_outstream_moniker
-        i = Translate__[
-          :be_verbose, @be_verbose,
-          :do_clear_files, @do_clear_files,
-          :do_show_sexp_only, @do_show_sexp_only,
-          :do_use_FS_parser, @do_use_FS_parser,
-          :emit_info_line_p, @emit_info_line_p,
-          :emit_info_string_p, @emit_info_string_p,
-          :endpoint_is_FS_parser, @endpoint_is_FS_parser,
-          :FS_parser_dir, @FS_parser_dir,
-          :instream, @upstream_IO,
-          :instream_moniker, @flexfile,
-          :outstream, @payload_IO,
-          :outstream_moniker, _outstream_moniker,
-          :pp_IO_for_show_sexp, @pp_IO_for_show_sexp,
-          :verb_s, @verb_s,
-          :wrap_in_grammar_s, @wrap_in_grammar_s ]
-        if i
-          @result_i = i ; nil
-        end
-      end
-
-      def resolve_some_outstream_moniker
-        send :"rslv_some_outstream_moniker_when_#{ @pay_i }"
-      end
-
-      def rslv_some_outstream_moniker_when_path
-        @pay_x
-      end
-
-      def rslv_some_outstream_moniker_when_IO
-        PAYSTREAM__
-      end
-      PAYSTREAM__ = "«paystream»".freeze  # :+#guillemets
-
-      def receive_event ev
-        scan = ev.to_stream_of_lines_rendered_under expression_agent
-        while line = scan.gets
-          if ev.ok
-            x = emit_info_string line
-          else
-            x = emit_error_string line
-          end
-        end
-        x
-      end
-
-      def expression_agent
-        Lib_::Bzn_[]::API.expression_agent_instance
-      end
-    end
-  end
-
-  Assert_open_stream__ = -> prop do
-    ivar = prop.as_ivar
-    name_i = prop.name_symbol
-    -> do
-      x = iambic_property
-      if x && ! x.closed?
-        instance_variable_set ivar, x
-        KEEP_PARSING_
-      else
-        raise ::ArgumentError, "for '#{ name_i }' #{
-          }need open stream, had #{ LIB_.strange x }"
-      end
-    end
-  end
-
-  Class_as_function__ = -> p do  # #storypoint-415
-    the_class = Callback_.memoize p
-    -> * x_a do
-      the_class[].new( x_a ).endpoint_symbol
-    end
-  end
-
-Translate__ = Class_as_function__[ -> do class Translate____
-
-    Local_Actor_.call self, :simple, :properties,
-
-      :property, :be_verbose,
-
-      :optional, :property, :do_clear_files,
-
-      :optional, :property, :do_show_sexp_only,
-
-      :optional, :property, :do_use_FS_parser,
-
-      :property, :emit_info_line_p,
-
-      :property, :emit_info_string_p,
-
-      :optional, :property, :endpoint_is_FS_parser,
-
-      :optional, :property, :FS_parser_dir,
-
-      :iambic_writer_method_proc_proc, Assert_open_stream__,
-        :property, :instream,
-
-      :property, :instream_moniker,
-
-      :iambic_writer_method_to_be_provided, :property, :outstream,
-
-      :property, :outstream_moniker,
-
-      :property, :pp_IO_for_show_sexp,
-
-      :property, :verb_s,
-
-      :optional, :property, :wrap_in_grammar_s
-
-    def initialize x_a
-      init_via_iambic x_a
-      super()
-    end
-
-    def endpoint_symbol
-      @be_verbose and is_conventional_endpoint and emit_info_string say_v_phrase
-      @do_use_FS_parser and es = any_endpoint_with_FS_parser
-      es || endpoint_symbol_from_read_and_translate_file
-    end
-
-  private
-
-    def is_conventional_endpoint
+    def __is_conventional_endpoint
       ! ( @do_show_sexp_only || @endpoint_is_FS_parser )
     end
 
-    def outstream=
-      prop = self.class.properties.fetch :outstream
-      if is_conventional_endpoint
-        _p = Assert_open_stream__[ prop ]
-        instance_exec( & _p )
-      else
-        x = iambic_property
-        if :_no_outstream_ == x
-          @outstream = x  # still it must pass arity check
-          KEEP_PARSING_
-        else
-          raise ::ArgumentError,
-            "pass no #{ prop.name_symbol } when nonconventional endpoint (#{ x })"
-        end
+    def __express_doing
+
+      dn_ID = @downstream_ID ; up_ID = @upstream_ID ; verb_s = @verb_s
+
+      @on_event_selectively.call :info, :express, :doing do | y |
+
+        _dn_s = dn_ID.description_under self
+        _up_s = up_ID.description_under self
+
+        y << "#{ verb_s } #{ _dn_s } against #{ _up_s }"
       end
+      NIL_
+    end
+
+    def __translate_stream
+
+      _load_grammar_subclasses_if_necessary
+
+      _byte_downstream = if @do_show_sexp_only
+        :__BYTE_DOWNSTREAM_NOT_USED__
+      else
+        @downstream_ID.to_minimal_yielder
+      end
+
+      Translate_stream___.call(
+        :byte_upstream, @upstream_ID.to_simple_line_stream,
+        :byte_downstream, _byte_downstream,
+        :do_show_sexp_only, @do_show_sexp_only,
+        :resources, @resources,
+        :wrap_in_grammar_s, @wrap_in_grammar_s,
+        & @on_event_selectively )
     end
 
     # ~ we comport with [#hl-154] control-flow method-naming idioms
 
-    def say_v_phrase
-      "#{ @verb_s } #{ @outstream_moniker } with #{ @instream_moniker }"
+    def __use_FS_parser
+
+      @FS_parser_dir ||= LIB_.stdlib_tmpdir.tmpdir
+
+      x = __resolve_parser_dir_stat
+      x ||= __via_parser_dir_stat
+      x || __resolve_and_use_generated_files
     end
 
-    def any_endpoint_with_FS_parser
-      @FS_parser_dir ||= resolve_some_FS_parser_dir
-      es = any_endpoint_with_FS_parser_dir
-      es || any_endpoint_from_resolve_and_use_generated_files
-    end
+    def __resolve_parser_dir_stat
 
-    def resolve_some_FS_parser_dir
-      ::Pathname.new LIB_.stdlib_tmpdir.tmpdir
-    end
+      @stat = @filesystem.stat @FS_parser_dir
+      NIL_
 
-    def any_endpoint_with_FS_parser_dir
-      es = any_endpoint_from_get_FS_parser_dir_stat
-      es || any_endpoint_with_FS_parser_dir_stat
-    end
-
-    def any_endpoint_from_get_FS_parser_dir_stat
-      @stat = @FS_parser_dir.stat ; nil
     rescue ::Errno::ENOENT => e
-      endpoint_when_parser_dir_not_exist e
+
+      __when_enoent e
     end
 
-    def endpoint_when_parser_dir_not_exist e
-      emit_error_string e.message
+    def __when_enoent e
+
+      @on_event_selectively.call :error, :expression, :enoent do | y |
+        y << e.message
+      end
+
       :parser_dir_not_exist
     end
 
-    def any_endpoint_with_FS_parser_dir_stat
-      DIR_FTYPE___ != @stat.ftype and
-        endpoint_when_parser_dir_not_dir
+    def __via_parser_dir_stat
+
+      if DIR_FTYPE___ != @stat.ftype
+
+        __when_parser_dir_is_not_dir
+      end
+    end
+
+    def __when_parser_dir_is_not_dir
+
+      path = @FS_parser_dir ; stat = @stat
+
+      @on_event_selectively.call :error, :expression, :not_dir do | y |
+        y << "parser dir was #{ stat.ftype } - #{ pth path }"
+      end
+
+      :parser_dir_is_not_dir
     end
 
     DIR_FTYPE___ = LIB_.system.filesystem.constants::DIRECTORY_FTYPE
 
-    def endpoint_when_parser_dir_not_dir
-      emit_error_string say_parser_dir_is_not_dir
-      :parser_dir_is_not_dir
+    def __resolve_and_use_generated_files
+
+      @grammar_path = ::File.join @FS_parser_dir, 'flex-to-treetop.treetop'
+      @compiled_grammar_path = ::File.join @FS_parser_dir, 'flex-to-treetop.rb'
+
+      if @do_clear_files
+        __clear_generated_files
+      end
+
+      _x = __resolve_compiled_grammar_file
+      _x || __attempt_to_use_generated_files
     end
 
-    def say_parser_dir_is_not_dir
-      "parser dir was #{ @stat.ftype } - #{ @FS_parser_dir }"
+    def __clear_generated_files
+
+      fu = __build_file_utils
+      [ @grammar_path, @compiled_grammar_path ].each do | path |
+
+        @filesystem.exist?( path ) or next
+        fu.rm path
+      end
+
+      NIL_
     end
 
-    def any_endpoint_from_resolve_and_use_generated_files
-      @grammar_pathname = @FS_parser_dir.join 'flex-to-treetop.treetop'
-      @compiled_grammar_pathname = @FS_parser_dir.join 'flex-to-treetop.rb'
-      @do_clear_files and clear_generated_files
-      es = any_endpoint_from_resolve_compiled_grammar_file
-      es || any_endpoint_from_attempt_to_use_generated_files
-    end
+    def __build_file_utils
 
-    def clear_generated_files
-      fu = bld_file_utils
-      [ @grammar_pathname, @compiled_grammar_pathname ].each do |pn|
-        pn.exist? or next
-        fu.rm pn.to_path
-      end ; nil
-    end
-
-    def bld_file_utils
-      LIB_.system.filesystem.file_utils_controller.new do |msg|
-        emit_info_line "(futils:) #{ msg }" ; nil
+      LIB_.system.filesystem.file_utils_controller.new do | msg |
+        receive_info_line_ "(futils:) #{ msg }" ; nil
       end
     end
 
-    def any_endpoint_from_resolve_compiled_grammar_file
-      if @compiled_grammar_pathname.exist?
-        emit_info_string say_using_compiled_grammar_pathname ; nil
+    def __resolve_compiled_grammar_file  # _DOG_EAR
+
+      if @filesystem.exist? @compiled_grammar_path
+
+        path = @compiled_grammar_path
+
+        @on_event_selectively.call :info, :expression, :using do | y |
+          y << "using: #{ path }"
+        end
+
+        NIL_
       else
-        any_endpoint_from_recompile
+
+        __recompile
       end
     end
 
-    def say_using_compiled_grammar_pathname
-      "using: #{ @compiled_grammar_pathname.to_path }"
+    def __recompile
+
+      _x = __resolve_grammar_file
+      _x or __finish_recompile
     end
 
-    def any_endpoint_from_recompile
-      es = any_endpoint_from_resolve_grammar_file( y = [] )
-      es or any_endpoint_from_finish_recompile( y )
-    end
+    def __resolve_grammar_file
 
-    def any_endpoint_from_resolve_grammar_file y
-      ! @grammar_pathname.exist? and any_endpoint_from_write_grammar_file y
-    end
+      if not @filesystem.exist? @grammar_path
 
-    def any_endpoint_from_write_grammar_file  y
-      bytes = nil
-      @grammar_pathname.open WRITE_MODE_ do |fh|
-        bytes = fh.write TREETOP_GRAMMAR__
+        __write_grammar_file
       end
-      y << "wrote #{ @grammar_pathname } (#{ bytes } bytes)." ; nil
     end
 
-    def any_endpoint_from_finish_recompile y
-      y << "writing #{ @compiled_grammar_pathname }."
-      emit_info_string y * SPACE_
-      bytes = Svcs__::Treetop[]::Compiler::GrammarCompiler.
-        new.compile @grammar_pathname.to_path,
-          @compiled_grammar_pathname.to_path
-      emit_info_string "(treetop wrote #{ bytes } bytes)" ; nil
+    def __write_grammar_file
+
+      bytes = @filesystem.open @grammar_path, WRITE_MODE_ do | fh |
+
+        fh.write TREETOP_GRAMMAR__
+      end
+
+      path = @grammar_path
+
+      @on_event_selectively.call :info, :expression, :wrote_grammar do | y |
+        y << "wrote #{ path } (#{ bytes } bytes)."
+      end
+
+      NIL_
     end
 
-    def any_endpoint_from_attempt_to_use_generated_files
-      load_grammar_subclasses_if_necessary
+    def __finish_recompile
+
+      path = @compiled_grammar_path
+
+      @on_event_selectively.call :info, :expression, :writing_compiled do | y |
+        y << "writing #{ path } .."
+      end
+
+      bytes = LIB_.treetop::Compiler::GrammarCompiler.
+        new.compile @grammar_path, @compiled_grammar_path
+
+      @on_event_selectively.call :info, :expression, :wrote_compiled do | y |
+        y << " done (treetop wrote #{ bytes } bytes)."
+      end
+
+      NIL_
+    end
+
+    def __attempt_to_use_generated_files
+
+      _load_grammar_subclasses_if_necessary
+
       if defined? FlexFileParser
-        emit_error_string say_cannot_use_FS_because_ff_parser_already_loaded
-        :cannot_use_FS_flex_file_parser_already_loaded
+
+        __when_flexfile_parser_already_loaded
       else
-        any_endpoint_from_load_and_use_generated_files
+
+        __load_and_use_generated_files
       end
     end
 
-    def say_cannot_use_FS_because_ff_parser_already_loaded
-      "cannot use FS parser, a parser class is already loaded #{
-        }(maybe because you are running all the tests at once?)"
+    def __when_flexfile_parser_already_loaded
+
+      @on_event_selectively.call :error, :expression, :ff_parser_already do | y |
+        y << "cannot use FS parser, a parser class is already loaded #{
+          }(maybe because you are running all the tests at once?)"
+      end
+
+      :cannot_use_FS_flex_file_parser_already_loaded
     end
 
-    def any_endpoint_from_load_and_use_generated_files
-      require get_normalized_requireable_compiled_grammar_path
-      @endpoint_is_FS_parser && endpoint_when_reached_FS_parser
+    def __load_and_use_generated_files
+
+      require __get_normalized_requireable_compiled_grammar_path
+
+      if @endpoint_is_FS_parser
+        __when_reached_FS_parser
+      end
     end
 
-    def load_grammar_subclasses_if_necessary
-      Svcs__::CommonNode[] ; nil
+    def _load_grammar_subclasses_if_necessary
+
+      Common_node___[]
+      NIL_
     end
 
-    def get_normalized_requireable_compiled_grammar_path
-      pn_ = @compiled_grammar_pathname.absolute? ?
-        @compiled_grammar_pathname : @compiled_grammar_pathname.expand_path
-      pn_.sub_ext( '' ).to_path
+    def __get_normalized_requireable_compiled_grammar_path
+
+      path = @compiled_grammar_path
+
+      if ::File::SEPARATOR != path[ 0 ]
+        path = @filesystem.expand_path path
+      end
+
+      s = ::File.extname path
+      if s.length.nonzero?
+        path = path[ 0 ... - s.length ]
+      end
+
+      path
     end
 
-    def endpoint_when_reached_FS_parser
-      emit_info_string say_reached_FS_parser_as_endpoint
+    def __when_reached_FS_parser
+
+      @on_event_selectively.call :info, :expression, :touched do | y |
+        y << "touched files. nothing more to do."
+      end
+
       :filesystem_touched
-    end
-
-    def say_reached_FS_parser_as_endpoint
-      "touched files. nothing more to do."
-    end
-
-    def endpoint_symbol_from_read_and_translate_file
-      load_grammar_subclasses_if_necessary
-      Translate_stream__[
-        :do_show_sexp_only, @do_show_sexp_only,
-        :emit_info_line_p, @emit_info_line_p,
-        :emit_info_string_p, @emit_info_string_p,
-        :instream, @instream,
-        :outstream, @outstream,
-        :pp_IO_for_show_sexp, @pp_IO_for_show_sexp,
-        :wrap_in_grammar_s, @wrap_in_grammar_s ]
-    end
-
-    def emit_info_line s
-      @emit_info_line_p[ s ] ; nil
-    end
-
-    def emit_info_string s
-      @emit_info_string_p[ s ] ; nil
-    end
-
-    def emit_error_string s
-      @emit_info_string_p[ s ] ; nil
     end
 
     self
   end end ]
 
-  Translate_stream__ = Class_as_function__[ -> do
+  Translate_stream___ = Deferred_actor__[ -> do
 
-  class Translate_Stream__
+  class Translate_Stream____
 
-    Local_Actor_.call self, :simple, :properties,
+    Local_actor__.call self, :simple, :properties,
 
-      :optional, :property, :do_show_sexp_only,
+      :property, :do_show_sexp_only,
 
-      :property, :emit_info_line_p,
+      :required, :property, :byte_upstream,
 
-      :property, :emit_info_string_p,
+      :required, :property, :byte_downstream,
 
-      :property, :instream,
+      :required, :property, :resources,
 
-      :property, :outstream,
+      :property, :wrap_in_grammar_s
 
-      :property, :pp_IO_for_show_sexp,
+    def procede_until_endpoint_
 
-      :optional, :property, :wrap_in_grammar_s
+      x = __procede_to_endpoint
 
-    def initialize x_a
-      init_via_iambic x_a
-      super()
-    end
-
-    def endpoint_symbol
-      i = endpoint_i
     ensure
-      @do_show_sexp_only or @outstream.close
-      @instream.closed? or fail 'sanity - instream still open?'
-      i
+
+      if ! @do_show_sexp_only
+        @byte_downstream.close
+      end
+
+      x
     end
 
-  private
+    def __procede_to_endpoint
 
-    def endpoint_i
-      @parser = parser_class.new
-      @whole_file = @instream.read
-      @instream.close
+      @parser = __parser_class.new
+
+      @whole_file = @byte_upstream.read
+      @byte_upstream.close
+
       @parser_result_x = @parser.parse @whole_file
+
       if @parser_result_x
-        endpoint_symbol_when_parse_result
+
+        __via_parser_result
       else
-        endpoint_symbol_when_no_parse_result
+
+        __when_NO_parser_result
       end
     end
 
-    def parser_class
+    def __parser_class
+
       if F2TT_.const_defined? :Parser___
         F2TT_::Parser___
       else
-        bld_and_set_parser_class
+        __build_and_set_parser_class
       end
     end
 
-    def bld_and_set_parser_class
-      defined? FlexFileParser or load_treetop_grammar  # #storypoint-510
+    def __build_and_set_parser_class
+
+      if ! defined? FlexFileParser
+        __load_treetop_grammar  # #storypoint-515
+      end
+
       cls = F2TT_.const_set :Parser___, ::Class.new( FlexFileParser )
       cls.class_exec( & Enhance_parser_class__ )
       cls
     end
 
-    def load_treetop_grammar
-      Svcs__::Treetop[].load_from_string TREETOP_GRAMMAR__
+    def __load_treetop_grammar
+
+      LIB_.treetop.load_from_string TREETOP_GRAMMAR__
     end
 
-    def endpoint_symbol_when_no_parse_result
-      emit_error_string say_no_parse_result
+    def __when_NO_parser_result
+
+      s = parser.failure_reason
+
+      @on_event_selectively.call :error, :expression, :no_parser_result do | y |
+        y << ( s || "Got nil from parse without reason" )
+      end
+
       :parse_failure
     end
 
-    def say_no_parse_result
-      @parser.failure_reason || "Got nil from parse without reason"
-    end
+    def __via_parser_result
 
-    def endpoint_symbol_when_parse_result
       if @do_show_sexp_only
-        endpoint_symbol_when_show_sexp
+
+        __show_sexp
       else
-        endpoint_symbol_when_execute_translation
+
+        __translate
       end
     end
 
-    def endpoint_symbol_when_show_sexp
-      Svcs__::PP[].pp @parser_result_x.sexp, @pp_IO_for_show_sexp
+    def __show_sexp
+
+      LIB_.PP.pp @parser_result_x.sexp, @resources.stderr
+
       :showed_sexp
     end
 
-    def endpoint_symbol_when_execute_translation
-      @outstream.puts autogenerated_line
-      _i = @parser_result_x.sexp.translate build_translation_client
-      _i || :translate_failure
+    def __translate
+
+      @byte_downstream.puts __autogenerated_line
+
+      _sess = __start_translation_session
+
+      _x = @parser_result_x.sexp.translate _sess
+
+      _x || :translate_failure
     end
 
-    def autogenerated_line
-      _rx = LIB_.string_lib.mustache_regexp
+    def __autogenerated_line
+
+      _rx = LIB_.basic::String.mustache_regexp
+
       AUTOGENNED_TEMPLATE__.gsub _rx do
         send :"resolve_any_template_value_for_#{ $1 }"
       end
     end
+
     AUTOGENNED_TEMPLATE__ =
       "# Autogenerated by flex2treetop on {{now}}. Edits may be lost.".freeze
 
@@ -1076,39 +853,46 @@ Translate__ = Class_as_function__[ -> do class Translate____
 
     TIME_FORMAT__ = '%Y-%m-%d %I:%M:%S%P %Z'.freeze
 
-    def emit_error_string s
-      @emit_info_string_p[ s ] ; nil
+    def __start_translation_session
+
+      sess = Translation_Session___.new
+
+      sess.on_event_selectively =  @on_event_selectively
+
+      sess.wrap_in_grammar_s = @wrap_in_grammar_s
+
+      sess.builder = Sessions__::Treetop_builder[].new @byte_downstream
+
+      sess.grammar_s = TREETOP_GRAMMAR__
+
+      sess
     end
 
-    def build_translation_client
-      cli = Services_for_Tranlsation_Agent__.
-        new @emit_info_line_p, @wrap_in_grammar_s
-      cli.builder = Svcs__::Treetop_Builder[].new @outstream
-      cli.grammar_s = TREETOP_GRAMMAR__
-      cli
-    end
-    class Services_for_Tranlsation_Agent__
-      def initialize emit_info_line_p, wrap_in_g_s
-        @emit_info_line_p = emit_info_line_p
-        @is_case_sensitive = true
-        @wrap_in_g_s = wrap_in_g_s ;
-      end
+    class Translation_Session___
+
+      # this is the "client" that myriad syntactic structures translate into
+
+      attr_accessor(
+        :builder,
+        :grammar_s,
+        :on_event_selectively,
+        :wrap_in_grammar_s )
+
+
       attr_reader :is_case_sensitive
-      attr_accessor :builder, :grammar_s
-      def case_insensitive_notify
-        @is_case_sensitive = false ; nil
+      def receive_case_insensitive
+        @is_case_sensitive = true
+        NIL_
       end
 
       def translate_name x
         x  # could be used to add prefixes etc
       end
 
-      def emit_info_line s
-        @emit_info_line_p[ s ] ; nil
-      end
+      def maybe_receive_event * i_a, & x_p
 
-      def wrap_in_grammar_s
-        @wrap_in_g_s
+        @on_event_selectively.call( * i_a, & x_p )
+        NIL_
       end
     end
     self
@@ -1157,7 +941,7 @@ Translate__ = Class_as_function__[ -> do class Translate____
       def terminal!
         add_hook(:post_init){ |me| me.stringify_terminal_syntax_node! }
       end
-    end
+    end  # >>
 
     # all around here has been marked for confusion [#002]
 
@@ -1292,25 +1076,26 @@ Translate__ = Class_as_function__[ -> do class Translate____
     end
   end
 
-  Svcs__ = ::Module.new
-
-  Svcs__::CommonNode = Callback_.memoize do
+  Common_node___ = Callback_.memoize do
 
     # all of the below "public"-looking constants must be
     # visible to the grammar when it loads
 
-    class CommonNode < Svcs__::Treetop[]::Runtime::SyntaxNode
+    class CommonNode < LIB_.treetop::Runtime::SyntaxNode
       include Node_Module_Methods__
     end
+
     module AutoNodey
       include Node_Module_Methods__
       def sexp
         auto_sexp
       end
     end
+
     class AutoNode < CommonNode
       include AutoNodey
     end
+
     CommonNode
   end
 
@@ -1365,16 +1150,24 @@ Translate__ = Class_as_function__[ -> do class Translate____
     end
 
     def validate_grammar_s
+
       const_rxs = '[A-Z][_A-Za-z0-9]*'
-      /\A#{ const_rxs }(?:::#{ const_rxs })*\z/ =~ @grammar_s or begin
-        @client.emit_info_line say_invalid_grammar_namespace
+
+      if /\A#{ const_rxs }(?:::#{ const_rxs })*\z/ =~ @grammar_s
+
+        ACHIEVED_
+      else
+
+        g_s = @grammar_s
+
+        @client.maybe_receive_event :error, :expression, :invalid_NS do | y |
+
+          y << "grammar namespaces look like \"Foo::BarBaz\". #{
+            }this is not a valid grammar namespace: #{ g_s.inspect }"
+        end
+
         UNABLE_
       end
-    end
-
-    def say_invalid_grammar_namespace
-      "grammar namespaces look like \"Foo::BarBaz\". #{
-        }this is not a valid grammar namespace: #{ @grammar_s.inspect }"
     end
 
     def translate_when_valid
@@ -1422,17 +1215,26 @@ Translate__ = Class_as_function__[ -> do class Translate____
       end
     end
   end
+
   class StartDeclarationSexp < Sexpesque # :start_declaration
-    def translate client
-      case children[:declaration_value]
+
+    def translate sess
+
+      x = children[ :declaration_value ]
+
+      case x
+
       when 'case-insensitive'
-        client.case_insensitive_notify
+        sess.receive_case_insensitive
+
       else
-        client.builder <<
-          "# declaration ignored: #{ children[:declaration_value].inspect }"
+        sess.builder << "# declaration ignored: #{ x.inspect }"
       end
+
+      NIL_
     end
   end
+
   class ExplicitRangeSexp < Sexpesque # :explicit_range
     class << self
       def bounded min, max
@@ -1471,18 +1273,26 @@ Translate__ = Class_as_function__[ -> do class Translate____
     # this is pure hacksville to deduce meaning from actions as they are
     # usually expressed in the w3c specs with flex files -- which is always
     # just to return the constant corresponding to the token
+
     def translate client
+
       action_string = children[:action].my_text_value
       /\A\{(.+)\}\Z/ =~ action_string and action_string = $1
+
       if /\Areturn ([a-zA-Z_]+);\Z/ =~ action_string
         from_constant client, $1
+
       elsif %r{\A/\*([a-zA-Z0-9 ]+)\*/\Z} =~ action_string
         from_constant client, $1.gsub(' ','_') # extreme hack!
+
       else
-        client.emit_info_line(
-          "notice: Can't deduce a treetop rule name from: #{
-            }#{ action_string.inspect } Skipping." )
-        nil
+
+        client.maybe_receive_event :info, :expression, :cant_deduce_rule do |y|
+          y << "notice: Can't deduce a treetop rule name from: #{
+            }#{ action_string.inspect } Skipping."
+        end
+
+        NIL_
       end
     end
 
@@ -1595,41 +1405,38 @@ Translate__ = Class_as_function__[ -> do class Translate____
     end
   end
 
-  Svcs__::Treetop_Builder = Callback_.memoize do
+  Sessions__ = ::Module.new
 
-  class Treetop_Builder__ < Svcs__::Treetop[]::Compiler::RubyBuilder
-    def initialize outstream
+  Sessions__::Treetop_builder = Callback_.memoize do
+
+  class Treetop_Builder____ < LIB_.treetop::Compiler::RubyBuilder
+
+    def initialize byte_downstream
       super() # nathan sobo reasonably sets @ruby to a ::String here
-      @ruby = Progressive_Output_Adapter__.new outstream
+      @ruby = Progressive_Output_Adapter__.new byte_downstream
       # but then we hack it to this
     end
+
     def rule_declaration name, &block
       self << "rule #{name}"
       indented(&block)
       self << "end"
     end
+
     def grammar_declaration(name, &block)
       self << "grammar #{name}"
       indented(&block)
       self << "end"
       :translated
     end
+
     def write *a
       @ruby.<<(*a)
     end
+
     self
   end
   end
-
-  module Svcs__
-    o = Callback_.memoize
-    PP = o[ -> do require 'pp' ; ::PP end ]
-    Treetop = o[ -> do require 'treetop' ; ::Treetop end ]
-  end
-
-  # ~ constants
-
-  AUTOGENERATED_RX = /autogenerated by flex2treetop/i  # (was [#008])
 
   Enhance_parser_class__ = -> do  # (if you edit this heavily, move it up)
     # CompiledParser#failure_reason overridden for less context
@@ -1659,19 +1466,25 @@ Translate__ = Class_as_function__[ -> do class Translate____
     end
   end
 
-  FIXTURE_H__ = {
-    mini:     'flex2treetop/test/fixtures/mini.flex',
-    tokens:   'css-convert/css/parser/tokens.flex',
-    fixthix:  'flex2treetop/test/fixtures/fixthis.flex'
-  }.freeze
+  # ~ constants
 
+  ADDITIONAL_RECOMMENDED_VISUAL_TEST_FILES___ = %w(
+    css-convert/css/parser/tokens.flex',
+  )
+
+  AUTOGENERATED_RX = /autogenerated by flex2treetop/i  # (was [#008])
   ACHIEVED_ = true
+  DASH_ = '-'
   F2TT_ = self
+  KEEP_PARSING_ = true
+  NIL_ = nil
+  READ_MODE_ = ::File::RDONLY | ::File::CREAT
   SPACE_ = ' '.freeze
-  READ_MODE_ = 'r'.freeze
   UNABLE_ = false
   VERSION = '0.0.2'
-  WRITE_MODE_ = 'w'.freeze
+  WRITE_MODE_ = ::File::WRONLY | ::File::CREAT
+
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   TREETOP_GRAMMAR__ = <<'GRAMMAR'
 # The 'pattern' rule below is a subset of the grammar grammar described at
@@ -1851,3 +1664,4 @@ end
 end
 GRAMMAR
 end
+# :+#tombstone: #!storypoint-210 explained how methodic actor may have been born here

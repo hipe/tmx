@@ -1,48 +1,5 @@
 # the flex2treetop narrative
 
-## :#storypoint-210
-
-this is headless's experimental new spin on [#fa-013] "meta-fields" (or
-"meta-parameters") (and not to be confused with its old spin on this, dating
-from late 2012). as this works and takes shape we will document it over there.
-for now it is a #frontier-hack.
-
-and then a year later it moved to [cb] and became a clean ground-up
-re-write of a middleground between very simple actors and very complex
-entites.
-
-
-
-
-## :#storypoint-250
-
-in this application the sole way that an action may access any method of
-the service or session is through the "client" façade. this is to future-proof
-the whole thing, so we have a clear, "pure-interface" layer that shows us what
-the action needs from the surrounding system so that changes that must occur
-in the future from the outside-in need with regards to these structures be
-limited only to this node; because we are not sure what the future holds for
-these structures of "service" and "session".
-
-
-
-
-
-## :#storypoint-315
-
-this is a "frontier hack": we subclassed the parameter class and customized
-it, but when we comprehend over our parameters, the parameters we inherit
-from the headless API library are still the old kind and are not aware of
-the new metaparameter we added, hence when we check for the meta-parameter
-value the old parameters will not respond to that method. what we are doing
-here is rewriting those (~threee) parameters but this time with the new
-parameter class. note we are not passing meta-parameter values to those
-parameters, hence they get the defaults. this "should" work provided our
-default metaparameter values line up with the parameters we int
-
-
-
-
 ## :#storypoint-415
 
 this class-as-function facade does two things: one, it acts as it sounds, it

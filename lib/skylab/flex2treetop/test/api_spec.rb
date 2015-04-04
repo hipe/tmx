@@ -1,268 +1,364 @@
-require_relative 'api/test-support'
+require_relative 'my-test-support'
 
 module Skylab::Flex2Treetop::MyTestSupport
 
   describe "[f2tt] API" do
 
-    extend API::ModuleMethods ; include API::InstanceMethods  # #posterity
+    extend Top_TS_
 
-    context "basics" do
+    use :expect_event
+    use :expect_line
 
-      it "loads" do
+      it "load" do
+
         F2TT_::API
       end
 
-      it "ping - everybody gets an errstream" do
-        _API_invoke :ping, :arg_1, :_x_
-        expect 'helo:(_x_)'
-        expect_no_more_lines
+      it "ping" do
+
+        call_API :ping, :arg_1, :_x_
+
+        expect_OK_event :ping, 'helo:(_x_)'
+        expect_no_more_events
         @result.should eql :_hello_from_API_
       end
-    end
 
-    context "action extent mechanics" do
+      it "unrecognized action" do
 
-      it "request a nonexistent action - X (name error)" do
-        -> do
-          _API_invoke :wiggle, :you_never, :see_these, :args
-        end.should raise_error ::NameError, /\bcannot \"wiggle\"/
-      end
-    end
+        call_API :wiggle, :you_never, :see_these, :args
 
-    context "basic business and parameters" do
+        expect_not_OK_event :no_such_action do  | ev |
 
-      it "request the 'version' action - result is a version string" do
-        x = _API_invoke :version
-        x.should match %r(\A#{ ::Regexp.escape API::PROGNAME }: #{
-          }\d+(?:\.\d+)*\z)
+          ev.action_name.should eql :wiggle
+        end
+        expect_failed
       end
 
-      it "request the 'version' action and pass a flag" do
-        x = _API_invoke :version, :bare
-        x.should match %r(\A\d+(?:\.\d+)*\z)
-      end
-    end
+      it "version" do
 
-    context "core business" do
+        call_API :version
+
+        @result.should match(
+          %r(\A#{ ::Regexp.escape REAL_PROGNAME_ }: \d+(?:\.\d+)*\z) )
+      end
+
+      it "bare version" do
+
+        call_API :version, :bare
+
+        @result.should match %r(\A\d+(?:\.\d+)*\z)
+      end
+
+      it "reflect tests" do
+
+        call_API :test, :list
+        st = @result
+        test = st.gets
+        test.basename_string.should eql 'fixthis.flex'
+      end
 
       it "infile not exist" do
-        _API_invoke :translate,
-          * emitters,
-          :flexfile, tmpdir.join( 'not-there.flex' ).to_path,
-          * outpath( '_no_see_' )
 
-        expect %r(\bNo such 'flexfile' - «[^»]+not-there\.flex»\z)
-        expect_no_more_lines
-        @result.should eql :not_found
+        call_API :translate,
+          :flexfile, tmpdir.join( 'not-there.flex' ).to_path,
+          :resources, true,
+          * _outpath_arg( '_no_see_' )
+
+        expect_not_OK_event :errno_enoent,
+          %r(\bNo such \(par flexfile\) - \(pth ".+not-there\.flex"\)\z)
+
+        expect_failed
       end
 
       it "infile not file" do
-        td_ = tmpdir.clear.touch_r 'some-dir/'
-        _API_invoke :translate,
-          * emitters,
-          * outpath( '_meh_' ),
-          :flexfile, td_.to_path
-        expect %r(\A«[^»]+some-dir/» exists but is not a file, it is a directory\b)
-        @result.should eql :not_file
+
+        call_API :translate,
+          :flexfile, FIXTURE_FILES_DIR_,
+          :resources, true,
+          * _outpath_arg( '_meh_' )
+
+        ev = expect_not_OK_event :wrong_ftype
+
+        black_and_white( ev ).should match(
+          %r(\A«[^»]+/fixture-files» exists but is not a file, it is a directory\b) )
+
+        expect_failed
       end
 
       it "infile exist, outfile exist and force not present" do
-        _out_pn = tmpdir.clear.write 'outie.rb', 'some content'
-        _API_invoke :translate,
-          :flexfile, mini,
-          * emitters,
-          * outpath( _out_pn )
-        expect %r(\A'path' exists, won't overwrite without 'force': .+\boutie\b)
-        @result.should eql :exists
+
+        call_API :translate, * _etc( _file_with_some_content )
+
+        ev = expect_not_OK_event :missing_required_permission
+
+        black_and_white( ev ).should match(
+          %r(\A'output-path' exists, won't overwrite without 'force': #{
+            }«[^»]+file-with-some-content) )
+
+        expect_failed
       end
 
       it "infile exist, outfile not file" do
-        _in_pn = tmpdir.clear.write 'innie', 'xx'
-        _out_pn = tmpdir.touch_r 'some-dir/'
-        _API_invoke :translate,
-          :flexfile, _in_pn.to_path,
-          * emitters,
-          * outpath( _out_pn ),
-          :force
-        expect %r(\AIs a directory -.+\bsome-dir\b)
-        @result.should eql :not_file
-      end
-    end
 
-    context "verify treetop output - normal case" do
+        _in_path = _file_with_some_content
 
-      it "o" do
-        tmpdir.prepare
-        outfile = tmpdir.join 'oter.rb'
-        _API_invoke :translate,
-          :flexfile, mini,
-          * outpath( outfile ),
-          * emitters
-        expect_info_lines
-        @ln_source.change_upstream_stream_to_open_filehandle outfile.open 'r'
-        verify_first_few_lines_of_mini_flex
-        verify_last_few_lines_of_mini_flex
-        @result.should eql :translated
+        _out_path = FIXTURE_FILES_DIR_
+
+        call_API :translate, :force, :flexfile, _in_path, * _etc( _out_path )
+
+        expect_neutral_event :before_editing_existing_file
+
+        ev = expect_not_OK_event :errno_eisdir
+
+        black_and_white( ev ).should match %r(\AIs a directory - «.+/fixture-files)
+
+        expect_failed
       end
 
-      def expect_info_lines
-        expect %r(\bcreating .*\boter\.rb with .*\bmini\.flex\b)i
-        expect %r(\bCan't deduce a treetop rule name from: #{
-          }"return \*yytext;" Skipping\.\z)i
-        expect_no_more_lines
+      it "minimal case" do
+
+        _init_outpath
+
+        call_API :translate, * _etc
+
+        _prepare_to_verify_content
+
+        __expect_first_few_lines
+
+        __expect_last_few_lines
       end
 
-      def verify_first_few_lines_of_mini_flex
-        expect %r(\A# Autogenerated by flex2tree)
-        _line = gets_some_first_chopped_line_that_does_not_match %r(\A(?:#|$))
-        _line.should eql "rule escape"
+      def __expect_first_few_lines
+
+        next_line.should match %r(\A# Autogenerated by flex2tree)
+
+        _skip_blanks_and_comments
+
+        line.should eql "rule escape\n"
       end
 
-      def verify_last_few_lines_of_mini_flex
+      def __expect_last_few_lines
+
+        scn = @expect_line_scanner
+
         exp_a = <<-'HERE'.unindent.split %r((?<=\n))
           rule _ignore_comments_
             "\/" "\*" [^*]* "\*"+ ([^/*] [^*]* "\*"+)* "\/"
           end
         HERE
-        skip_until_last_N_lines exp_a.length
-        while (( line = exp_a.shift ))
-          expect line.chop!
-        end ; nil
-      end
-    end
 
-    context "verify treetop output - wrap in grammar name mono" do
+        scn.advance_to_before_Nth_last_line exp_a.length
 
-      _NUM_BODY_LINES = 14
+        exp_a.each do | expect_line |
 
-      it "o" do
-        o = tmpdir.clear.join 'outie.rb'
-        _API_invoke :translate,
-          :wrap_in_grammar_s, "Danbury",
-          * outpath( o ),
-          * emitters,
-          :flexfile, mini
-        skip_all_contiguous_emissions_on_channel :stderr
-        @ln_source.change_upstream_stream_to_open_filehandle o.open 'r'
-        skip_any_comment_lines
-        expect 'grammar Danbury'
-        count = skip_contiguous_chopped_lines_that_match(
-          /\A[ ]{2,}[^[:space:]]/ )
-        ( _NUM_BODY_LINES .. _NUM_BODY_LINES ).should be_include count
-        expect 'end'
-        expect_no_more_lines
-        @result.should eql :translated
-      end
-    end
-
-    context "verify treetop output - wrap in grammar name poly" do
-
-      it "o" do
-        o = tmpdir.clear.join 'outie.rb'
-        _API_invoke :translate,
-          :wrap_in_grammar_s, "Fibble::Toppel",
-          * outpath( o ),
-          :flexfile, mini,
-          * emitters
-        @result.should eql :translated
-        fh = o.open 'r'
-        init_line_source_as build_line_source_from_open_file_IO fh
-        skip_any_comment_lines
-        expect 'module Fibble'
-        expect '  grammar Toppel'
-        expect '    # from flex name definitions'
-        fh.close
-      end
-    end
-
-    context "wrap in bad grammar name" do
-
-      it "(note it still begins the file :/) x" do
-        o = tmpdir.clear.join 'never-make-this.rb'
-        _API_invoke :translate,
-          :wrap_in_grammar_s, 'Doonesbury Cartoon',
-          * emitters,
-          :flexfile, mini,
-          * outpath( o )
-        expect %r(\Acreating [^ ]+never-make-this)  # too bad
-        expect "grammar namespaces look like \"Foo::BarBaz\". #{
-          }this is not a valid grammar namespace: \"Doonesbury Cartoon\""
-        expect_no_more_lines
-        io = o.open 'r'
-        @ln_source.change_upstream_stream_to_open_filehandle io
-        expect %r(\A# Autogenerated)
-        io.close
-        @result.should eql :translate_failure
-      end
-    end
-
-    context "option - show sexp" do
-
-      it "o" do
-        o = tmpdir.clear.join 'no-really-never-make-this.rb'
-        _API_invoke :translate,
-          :show_sexp_only,
-          * emitters,
-          * outpath( o ),
-          :flexfile, mini
-        expect '[:file,'
-        count = skip_until_last_N_lines 1
-        count.should eql 59
-        expect %r(\A {2,} :action=>\[:action, "return \*yytext;)
-        expect_no_more_lines
-        @result.should eql :showed_sexp
-      end
-    end
-
-    context "options - read parser from filesystem" do
-
-      it "nosaj thing - x" do
-        foo = tmpdir.clear.join 'not-a-dir'
-        _API_invoke_with_parser_dir foo
-        expect %r(\ANo such file or directory #{ XX }- [^ ]+/not-a-dir\z)
-        expect_no_more_lines
-        @result.should eql :parser_dir_not_exist
-      end
-
-      it "saj thing - o", alone: true do
-        foo = tmpdir.clear.touch_r 'a-dir/'
-        _API_invoke_with_parser_dir foo
-        expect %r(\Awrote [^ ]+/a-dir/flex-to-treetop\.treetop #{
-          }.+ writing [^ ]+/a-dir/flex-to-treetop\.rb\.\z)
-        expect %r(\A\(treetop wrote \d{5} bytes\)\z)
-        peek = line_source.peek_any_chopped_line
-        if 'touched ' == peek[ 0, 8 ]
-          expect_loaded_from_filesystem_successfully
-        else
-          expect_the_thing_about_how_the_constant_is_already_loaded
+          scn.next_line.should eql expect_line
         end
       end
 
-      def expect_loaded_from_filesystem_successfully
-        debug_IO.puts "  (#{ _EM "THE FOLLOWING TEST" } is happy it ran alone.)"
-        expect 'touched files. nothing more to do.'
-        expect_no_more_lines
-        @result.should eql :filesystem_touched
+      it "wrap in one grammar module" do
+
+        _init_outpath
+
+        call_API :translate, :wrap_in_grammar_s, "Danbury", * _etc
+
+        _prepare_to_verify_content
+
+        _skip_blanks_and_comments
+
+        line.should eql "grammar Danbury\n"
+
+        _count = @expect_line_scanner.skip_lines_that_match(
+
+          /\A[ ]{2,}[^[:space:]]/ )
+
+        _count.should eql 14
+
+        line.should eql "end\n"
       end
 
-      def expect_the_thing_about_how_the_constant_is_already_loaded
-        debug_IO.puts "  (run #{ _EM "THE FOLLOWING TEST" } '-t alone' too!)"
-        expect %r(\Acannot use FS parser, a parser class is already loaded)
-        expect_no_more_lines
-        @result.should eql :cannot_use_FS_flex_file_parser_already_loaded
+      it "wrap in two grammar modules" do
+
+        _init_outpath
+
+        call_API :translate, :wrap_in_grammar_s, "Fibble::Toppel", * _etc
+
+        _prepare_to_verify_content
+
+        _skip_blanks_and_comments
+
+        line.should eql "module Fibble\n"
+        next_line.should eql "  grammar Toppel\n"
+        next_line.should eql "    # from flex name definitions\n"
       end
 
-      def _API_invoke_with_parser_dir foo
-        _API_invoke :translate,
-          :use_FS_parser, :FS_parser_dir, foo, :endpoint_is_FS_parser,
-          :flexfile, mini,
-          * emitters,
-          * outpath( 's' )
+      def _prepare_to_verify_content
+
+        :translated == @result or fail
+
+        expect_neutral_event :before_probably_creating_new_file
+        expect_neutral_event :cant_deduce_rule
+        expect_no_more_events
+
+        @output_s = ::File.read @outpath
+        NIL_
       end
 
-      def expect_beginning_cruft
-        expect %r(\boverwriting empty file: s\b)
+      it "bad grammar name" do
+
+        _init_outpath
+
+        call_API :translate, :wrap_in_grammar_s, 'Doonesbury Cartoon', * _etc
+
+        :translate_failure == @result or fail
+
+        expect_neutral_event :before_probably_creating_new_file
+
+        ev = expect_not_OK_event :invalid_NS
+
+        black_and_white( ev ).should eql(
+
+          "grammar namespaces look like \"Foo::BarBaz\". #{
+            }this is not a valid grammar namespace: \"Doonesbury Cartoon\"" )
+
+        expect_no_more_events
+
+        ::File.read( @outpath ).should match( /\A# Auto[^\n]+\n\z/ )
       end
-    end
+
+      it "option - show sexp (it's a big dump)" do
+
+        g = TestSupport_::IO.spy.group.new
+
+        g.do_debug_proc = -> do
+          do_debug
+        end
+
+        g.debug_IO = debug_IO
+        io = g.add_stream :A
+
+        @resources = Stderr_Resources_.new io
+
+        _init_outpath  # we will assert that it is not created
+
+        call_API :translate, :show_sexp_only, * _etc
+
+        :showed_sexp == @result or fail
+
+        ::File.exist?( @outpath ) and fail
+
+        @line_stream_for_expect_line = g.flush_to_line_stream_on :A
+
+        next_line.should eql "[:file,\n"
+
+        scn = @expect_line_scanner
+
+        _count = scn.skip_until_before_Nth_last_line 1
+        _count.should eql 59
+
+        scn.next_line.should match(
+
+          %r(\A {2,} :action=>\[:action, "return \*yytext;) )
+
+        scn.next_line.should be_nil
+      end
+
+      it "parser from FS - nosaj thing - x" do
+
+        _init_outpath  # we will assert that it is not created
+
+        _path = ::File.join FIXTURE_FILES_DIR_, 'not-a-dir'
+
+        _API_invoke_with_parser_dir _path
+
+        :parser_dir_not_exist == @result or fail
+
+        ::File.exist?( @outpath ) and fail
+
+        expect_not_OK_event :enoent,
+          %r(\ANo such file or directory #{ ICK_ }- [^ ]+/not-a-dir\z)
+
+        expect_no_more_events
+      end
+
+      it "parser from FS - saj thing - OK", alone: true do
+
+        # NOTE - sadly this is not a test-friendly scenario: the designed
+        # behavior is different based on whether or not grammars have been
+        # loaded already. as such, the below conditionally covers whether
+        # this test is run alone (or perhaps first), and whether it is run
+        # after cases that will have loaded the gramars already.
+
+        _init_outpath  # we will assert that it is not created
+
+        _path = tmpdir.touch_r( 'a-dir/' ).to_path
+
+        _API_invoke_with_parser_dir _path
+
+        expect_neutral_event :wrote_grammar
+        expect_neutral_event :writing_compiled
+        expect_neutral_event :wrote_compiled
+
+        if :filesystem_touched == @result
+          __single_case
+        else
+          __group_case
+        end
+
+        expect_no_more_events
+      end
+
+      def __single_case
+
+        expect_neutral_event :touched
+      end
+
+      def __group_case
+
+        :cannot_use_FS_flex_file_parser_already_loaded == @result or fail
+        expect_not_OK_event :ff_parser_already
+      end
+
+      def _API_invoke_with_parser_dir x
+
+        call_API :translate,
+
+          :use_FS_parser, :FS_parser_dir, x, :endpoint_is_FS_parser, * _etc
+      end
+
+      def _etc x=@outpath
+        [ :resources, ( resources || true ),
+          :flexfile, fixture_flex_( :mini ),
+          :output_path, x ]
+      end
+
+      attr_reader :resources
+
+      def _outpath_arg s
+        [ :output_path, s ]
+      end
+
+      def _file_with_some_content
+
+        fixture_file_ 'file-with-some-content', :txt
+      end
+
+      def _init_outpath
+
+        tmpdir = self.tmpdir
+        tmpdir.prepare  # nuke any old files from before
+        @outpath = tmpdir.join( 'o.rb' ).to_path
+        NIL_
+      end
+
+      def _skip_blanks_and_comments
+
+        expect_line_scanner.advance_past_lines_that_match %r(\A(?:#|$))
+
+        NIL_
+      end
+
+      def subject_API
+        F2TT_::API
+      end
   end
 end

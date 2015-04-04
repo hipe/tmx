@@ -129,7 +129,7 @@ module Skylab::Brazen
           ok = via_current_branch_resolve_action
           ok or break
 
-          if ! @bound.class.is_branch  # ick / meh
+          if ! @bound.is_branch
             break
           end
 
@@ -139,7 +139,7 @@ module Skylab::Brazen
             break
           end
 
-          @current_unbound_action_stream = @bound.class.to_lower_unbound_action_stream
+          @current_unbound_action_stream = @bound.to_lower_unbound_action_stream
 
           redo
         end while nil

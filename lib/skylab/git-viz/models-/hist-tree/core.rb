@@ -4,15 +4,9 @@ module Skylab::GitViz
 
   Action_ = GitViz_.lib_.brazen.model.action_class
 
-  module Models_::Ping
+  # ->
 
-    def self.is_silo
-      true
-    end
-
-    Actions = ::Module.new
-
-    Actions::Ping = -> on_channel=nil, secret_x=nil, bnd do
+    Models_::Ping = -> on_channel=nil, secret_x=nil, bnd do
 
       if secret_x
         "hi: #{ secret_x }"
@@ -33,7 +27,8 @@ module Skylab::GitViz
         :hello_from_git_viz
       end
     end
-  end
+
+    # <-
 
   class Models_::HistTree
 

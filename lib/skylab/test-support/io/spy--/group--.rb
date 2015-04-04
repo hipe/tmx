@@ -11,6 +11,18 @@ module Skylab::TestSupport
     attr_reader :debug
     attr_writer :debug_IO
 
+    def flush_to_line_stream_on sym  # lines as strings, not as objects
+
+      a = @line_a
+      @line_a = nil
+      Callback_::Stream.via_nonsparse_array( a ).map_reduce_by do | line_o |
+
+        if sym == line_o.stream_symbol
+          line_o.string
+        end
+      end
+    end
+
     def lines
       @line_a
     end
@@ -63,7 +75,8 @@ module Skylab::TestSupport
         @k_a << name_x
         @stream_h[ name_x ] = value_x
       end
-      did or raise "constituent is write-once: '#{ name_x }'" ; nil
+      did or raise "constituent is write-once: '#{ name_x }'"
+      value_x
     end
 
   private

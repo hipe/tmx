@@ -27,7 +27,8 @@
                in a stream instead of emitting one event for each item *maybe*
 [#067] #open smooth different interfacings with API actions taxonomy
 [#066]       #done cool new build-less events
-[#065]       #done implement unmarshaling for strings with newlines (git-config)
+[#065]       #track procs are always not-promoted
+             ( #was: #done implement unmarshaling for strings with newlines (git-config) )
 [#064] #open either rename `desc` to `entity_description` or make
              the syntax smarter without bloating it.
              ( #was: #done marshal issue near regexps with escape-looking sequences )

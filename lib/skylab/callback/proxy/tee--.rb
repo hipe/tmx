@@ -91,6 +91,10 @@ module Skylab::Callback
         @muxer.description
       end
 
+      def muxer_
+        @muxer
+      end
+
       alias_method :inspect, :to_s  # (makes errors more traceable)
 
       def method i

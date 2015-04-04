@@ -570,12 +570,10 @@ module Skylab::Callback
         module Proprietor_Module_Methods__
 
           def properties
-            @properties ||= bld_properties
+            @properties ||= __build_properties
           end
 
-        private
-
-          def bld_properties
+          def __build_properties
             _BX = const_get BX_
             Callback_::Stream.via_nonsparse_array _BX.a_ do |i|
               send _BX.fetch i
@@ -750,27 +748,39 @@ module Skylab::Callback
         private
 
           def via_default_proc_and_is_required_normalize  # #note-515, :+#courtesy
-            scn = self.class.properties.to_stream
+
             miss_a = nil
-            while prop = scn.gets
-              ivar = prop.as_ivar
+            st = self.class.properties.to_stream
+
+            begin
+              prp = st.gets
+              prp or break
+
+              ivar = prp.as_ivar
+
               x = if instance_variable_defined? ivar
                 instance_variable_get ivar
               else
                 instance_variable_set ivar, nil
               end
-              if x.nil? && prop.default_proc
-                x = prop.default_proc[]
+
+              if x.nil? && prp.default_proc
+                x = prp.default_proc[]
                 instance_variable_set ivar, x
               end
-              if prop.is_required && x.nil?
-                ( miss_a ||= [] ).push prop
+
+              if prp.is_required && x.nil?
+                ( miss_a ||= [] ).push prp
               end
-            end
+
+              redo
+            end while nil
+
             if miss_a
               _ev = build_missing_required_properties_event miss_a
               receive_missing_required_properties _ev
               UNABLE_
+
             else
               ACHIEVED_
             end
