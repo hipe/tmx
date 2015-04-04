@@ -61,7 +61,7 @@ module Skylab::Brazen
         end
 
         def get_full_syntax_strings
-          subject.write_full_syntax_strings a=[]
+          subject.write_full_syntax_strings__ a=[]
           a
         end
 
@@ -82,14 +82,22 @@ module Skylab::Brazen
         end
 
         def any_option_glyphs
+
           sw_s_a = []
+
           @op.top.list.each do |opt|
+
             sw = opt.short.first
+            sw or next
+
             SHORT_HELP__ == sw and next
+
             sw_s_a.push "[#{ render_native_opt_switch_with_arg opt }]"
           end
+
           sw_s_a.length.nonzero? and sw_s_a
         end
+
         SHORT_HELP__ = '-h'.freeze
 
         def render_native_opt_switch_with_arg opt
@@ -160,7 +168,9 @@ module Skylab::Brazen
         end
 
         def arg_glyphs
+
           a = @arg_a.reduce [] do |m, prop|
+
             s = if prop.has_custom_moniker
               prop.custom_moniker
             else
@@ -176,8 +186,10 @@ module Skylab::Brazen
             if prop.takes_many_arguments
               addendum = " [#{ s } [..]]"
             end
+
             m << "#{ open }#{ s }#{ addendum }#{ close }"
           end
+
           a.length.nonzero? and a
         end
 

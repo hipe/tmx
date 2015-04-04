@@ -255,18 +255,18 @@ module Skylab::Callback
         _y = ::Enumerator::Yielder.new do |s|
           s_a.push "(#{ s })"
         end
-        render_all_lines_into_under _y, Event_::EXPRESSION_AGENT__
+        express_into_under _y, Event_::EXPRESSION_AGENT__
         "(#{ s_a * ', ' })"
       end
 
       def render_each_line_under expag
-        render_all_lines_into_under(
+        express_into_under(
           ::Enumerator::Yielder.new do | s |
             yield s
           end, expag )
       end
 
-      def render_all_lines_into_under y, expression_agent
+      def express_into_under y, expression_agent
         render_into_yielder_N_lines_under y, nil, expression_agent
       end
 

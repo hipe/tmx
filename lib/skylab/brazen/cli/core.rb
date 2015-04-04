@@ -70,6 +70,10 @@ module Skylab::Brazen
 
     public
 
+      def bound_
+        @app_kernel
+      end
+
       def bound_action
         @app_kernel
       end
@@ -961,7 +965,7 @@ module Skylab::Brazen
       UCASE__ = 'A'.getbyte( 0 ) .. 'Z'.getbyte( 0 )
 
       def render_event_lines ev
-        ev.render_all_lines_into_under y=[], expression_agent
+        ev.express_into_under y=[], expression_agent
         y
       end
 
@@ -1097,7 +1101,7 @@ module Skylab::Brazen
       def populate_option_parser_with_universal_options op
       end
 
-      def write_full_syntax_strings y
+      def write_full_syntax_strings__ y
         write_any_primary_syntax_string y
         write_any_auxiliary_syntax_string y
       end

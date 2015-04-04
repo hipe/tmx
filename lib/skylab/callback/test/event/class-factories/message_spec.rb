@@ -28,7 +28,7 @@ module Skylab::Callback::TestSupport::Event::Class_Factories::MSG
 
       _ev = msg.to_event
 
-      _ev.render_all_lines_into_under y=[],
+      _ev.express_into_under y=[],
         Callback_.lib_.brazen::API.expression_agent_instance
 
       y.should eql ["ermegerd '_Foo_' (:_Bar_)"]

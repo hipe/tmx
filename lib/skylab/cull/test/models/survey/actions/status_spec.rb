@@ -41,7 +41,7 @@ module Skylab::Cull::TestSupport
       x = scn.gets
       while x
         count += 1
-        x.render_all_lines_into_under y, expression_agent_for_expect_event
+        x.express_into_under y, expression_agent_for_expect_event
         x = scn.gets
       end
       count.should eql 1

@@ -22,7 +22,7 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem
       end )
       _x.should eql :_nerp_
       a.last.should eql [ :error, :regexp_option_not_supported ]
-      a.first.render_all_lines_into_under y=[],
+      a.first.express_into_under y=[],
         Headless_::Lib_::Bzn_[]::API.expression_agent_instance
       y.should eql [ "non convertible regexp options - '[:MULTILINE, :EXTENDED]'" ]
     end

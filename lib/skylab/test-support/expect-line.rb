@@ -7,7 +7,7 @@ module Skylab::TestSupport
     class << self
 
       def [] test_context_class
-        test_context_class.include Test_Context_Instance_Methods__ ; nil
+        test_context_class.include Test_Context_Instance_Methods ; nil
       end
 
       def shell output_s
@@ -15,18 +15,18 @@ module Skylab::TestSupport
       end
     end  # >>
 
-    Test_Context_Instance_Methods__ = ::Module.new
+    Test_Context_Instance_Methods = ::Module.new
 
     class Shell__
 
-      include Test_Context_Instance_Methods__
+      include Test_Context_Instance_Methods
 
       def initialize s
         @output_s = s
       end
     end
 
-    module Test_Context_Instance_Methods__
+    module Test_Context_Instance_Methods
 
       def excerpt range
         excerpt_lines( range ) * EMPTY_S_
@@ -258,7 +258,49 @@ module Skylab::TestSupport
         @line = @up.gets
       end
 
+      # ~ convenience macros for paraphernalia
+
+      def expect_header sym
+
+        s = expect_styled_line
+        if s
+          exp = "#{ sym }:\n"
+          exp == s or fail "had: #{ s.inspect }, expected: #{ exp.inspect }"
+          NIL_
+        end
+      end
+
+      def expect_styled_line
+
+        @line = @up.gets
+        if @line
+          line = TestSupport_.lib_.CLI_pen.unstyle_styled @line
+          if line
+            @line = line
+            line
+          else
+            fail "not styled: #{ line.inspect }"
+          end
+        else
+          fail "expected line, had none"
+        end
+      end
+
       # ~ advancing by searching for a regexp (positively or negatively)
+
+      def expect_nonblank_line
+
+        @line = @up.gets
+        BLANK_RX___ =~ @line and fail "expected nonblank, had #{ @line.inspect }"
+        NIL_
+      end
+
+      def expect_blank_line
+
+        @line = @up.gets
+        BLANK_RX___ =~ @line or fail "not blank: #{ @line.inspect }"
+        NIL_
+      end
 
       def skip_blank_lines
 

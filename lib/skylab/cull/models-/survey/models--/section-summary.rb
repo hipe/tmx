@@ -20,7 +20,7 @@ module Skylab::Cull
         @sect = sect
       end
 
-      def render_all_lines_into_under y, expag
+      def express_into_under y, expag
 
         lhs_s = @sect.internal_normal_name_string
         rhs_x = @sect.subsect_name_s

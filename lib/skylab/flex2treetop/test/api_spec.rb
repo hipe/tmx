@@ -18,9 +18,9 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         call_API :ping, :arg_1, :_x_
 
-        expect_OK_event :ping, 'helo:(_x_)'
+        expect_neutral_event :ping, 'helo:(_x_)'
         expect_no_more_events
-        @result.should eql :_hello_from_API_
+        @result.should eql :_cheeky_monkey_
       end
 
       it "unrecognized action" do
@@ -61,7 +61,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         call_API :translate,
           :flexfile, tmpdir.join( 'not-there.flex' ).to_path,
-          :resources, true,
+          :resources, Mock_resources_[],
           * _outpath_arg( '_no_see_' )
 
         expect_not_OK_event :errno_enoent,
@@ -74,7 +74,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         call_API :translate,
           :flexfile, FIXTURE_FILES_DIR_,
-          :resources, true,
+          :resources, Mock_resources_[],
           * _outpath_arg( '_meh_' )
 
         ev = expect_not_OK_event :wrong_ftype
@@ -159,7 +159,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         _init_outpath
 
-        call_API :translate, :wrap_in_grammar_s, "Danbury", * _etc
+        call_API :translate, :wrap_in_grammar, "Danbury", * _etc
 
         _prepare_to_verify_content
 
@@ -180,7 +180,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         _init_outpath
 
-        call_API :translate, :wrap_in_grammar_s, "Fibble::Toppel", * _etc
+        call_API :translate, :wrap_in_grammar, "Fibble::Toppel", * _etc
 
         _prepare_to_verify_content
 
@@ -207,7 +207,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         _init_outpath
 
-        call_API :translate, :wrap_in_grammar_s, 'Doonesbury Cartoon', * _etc
+        call_API :translate, :wrap_in_grammar, 'Doonesbury Cartoon', * _etc
 
         :translate_failure == @result or fail
 
@@ -236,7 +236,7 @@ module Skylab::Flex2Treetop::MyTestSupport
         g.debug_IO = debug_IO
         io = g.add_stream :A
 
-        @resources = Stderr_Resources_.new io
+        @resources = Mock_Resources_.new nil, nil, io
 
         _init_outpath  # we will assert that it is not created
 
@@ -326,7 +326,7 @@ module Skylab::Flex2Treetop::MyTestSupport
       end
 
       def _etc x=@outpath
-        [ :resources, ( resources || true ),
+        [ :resources, ( resources || Mock_resources_[] ),
           :flexfile, fixture_flex_( :mini ),
           :output_path, x ]
       end

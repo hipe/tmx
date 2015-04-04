@@ -36,7 +36,7 @@ module Skylab::Brazen
         y = ::Enumerator::Yielder.new do |s|
           @out.puts "OK: #{ s }"
         end
-        ev.render_all_lines_into_under y, @expag
+        ev.express_into_under y, @expag
         OK_
       end
 
@@ -55,7 +55,7 @@ module Skylab::Brazen
         y = ::Enumerator::Yielder.new do |s|
           @err.puts "API call#{ _to } failed: #{ s }"
         end
-        ev.render_all_lines_into_under y, @expag
+        ev.express_into_under y, @expag
 
         UNABLE_
       end
@@ -68,7 +68,7 @@ module Skylab::Brazen
         y = ::Enumerator::Yielder.new do |s|
           @err.puts s
         end
-        ev.render_all_lines_into_under y, @expag
+        ev.express_into_under y, @expag
         nil
       end
 

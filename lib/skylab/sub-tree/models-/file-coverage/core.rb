@@ -144,7 +144,7 @@ module Skylab::SubTree
         @nm ||= Callback_::Name.via_variegated_symbol :file_coverage_tree
       end
 
-      def render_all_lines_into_under y, expag
+      def express_into_under y, expag
 
         File_Coverage_::Modalities::CLI::Agnostic_Text_Based_Expression.
           new( y, expag, @tree ).execute

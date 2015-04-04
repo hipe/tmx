@@ -10,7 +10,7 @@ module Skylab::TestSupport
 
           ev.with do | y, o |
 
-            ev.render_all_lines_into_under y, self
+            ev.express_into_under y, self
 
             _item_s_a = mod.constants.map do | const_i |
 

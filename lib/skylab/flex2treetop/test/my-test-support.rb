@@ -73,7 +73,7 @@ module Skylab::Flex2Treetop::MyTestSupport
       end
 
       def debug_IO
-        TestLib_::System[].IO.some_stderr_IO
+        TestSupport_.debug_IO
       end
     end
 
@@ -96,7 +96,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
     Tmpdir___ = -> do
       p = -> dbg_IO_p do
-        _pn = TestLib_::System[].filesystem.tmpdir_pathname.join 'f2tt'
+        _pn = F2TT_::LIB_.system.filesystem.tmpdir_pathname.join 'f2tt'
         x_a = [ :path, _pn ]
         dbg_IO = dbg_IO_p[]
         if dbg_IO
@@ -108,125 +108,6 @@ module Skylab::Flex2Treetop::MyTestSupport
       end
       -> dbg_IO_p { p[ dbg_IO_p ] }
     end.call
-
-    # ~ assertion phase.
-
-    module InstanceMethods
-
-      def expect * x_a, string_matcher_x
-        if x_a.length.nonzero? && :styled == x_a.first
-          x_a.shift ; do_expect_styled = true
-        end
-        x_a.length.zero? or fail say_unexpected( x_a.first )
-        line = gets_some_chopped_line  # #storypoint-050
-        do_expect_styled and line = expct_styled( line )
-        if string_matcher_x.respond_to? :named_captures
-          line.should match string_matcher_x
-        else
-          line.should eql string_matcher_x
-        end ; nil
-      end
-
-      def say_unexpected x
-        "unexpected #{ TestLib_::Strange[ x ] }"
-      end
-
-      def expct_styled line
-        F2TT_.lib_.CLI_pen.unstyle_styled( line ) or
-          fail "expected styled, was not: #{ line }"
-      end
-
-      def expect_failed
-        expect_no_more_lines
-        expect_result_for_failure
-      end
-
-      def expect_succeeded
-        expect_no_more_lines
-        expect_result_for_success
-      end
-
-      def gets_some_chopped_line
-        line_source.gets_some_chopped_line
-      end
-
-      def skip_until_last_N_lines d
-        line_source.skip_until_last_N_lines d
-      end
-
-      def skip_contiguous_chopped_lines_that_match rx
-        line_source.skip_contiguous_chopped_lines_that_match rx
-      end
-
-      def gets_some_first_chopped_line_that_does_not_match rx
-        line_source.gets_some_first_chopped_line_that_does_not_match rx
-      end
-
-      def skip_all_contiguous_emissions_on_channel chan_i
-        line_source.skip_all_contiguous_emissions_on_channel chan_i
-      end
-
-      def skip_any_comment_lines
-        skip_contiguous_chopped_lines_that_match COMMENT_RX__
-      end
-
-      COMMENT_RX__ = /\A[ \t]*#/
-
-      def expect_no_more_lines
-        self._NO
-        line_source.assert_no_more_lines
-      end
-
-      def init_line_source_as x
-        ln_source and fail "line source is already set"
-        @ln_source = x ; nil
-      end
-
-      def line_source
-        @ln_source ||= bld_line_source
-      end
-
-      attr_reader :ln_source
-
-      def bld_line_source
-
-        self._WAHT
-
-        _grp = _IO_spy_group
-        @IO_spy_group = :_IO_spy_group_was_baked_
-        _a = _grp.release_lines
-        Top_TS_::Line_Source__.new dbg_IO do |ls|
-          ls.init_upstream_line_source_with_emissions :stderr, _a
-        end
-      end
-
-      def build_line_source_from_open_file_IO io
-
-        self._WHAT
-
-        Top_TS_::Line_Source__.new dbg_IO do |ls|
-          ls.init_upstream_line_source_with_open_file_IO io
-        end
-      end
-
-      def change_line_source_channel_to chan_i
-        @ln_source.change_upstream_stream_to_channel chan_i ; nil
-      end
-
-      def dbg_IO
-        do_debug && debug_IO
-      end
-
-      def expect_result_for_failure
-        @result.should eql false
-      end
-
-      def expect_result_for_success
-        @result.should eql true
-      end
-
-      # define_method :_EM, F2TT_.lib_.CLI_pen.stylify.curry[ %i( yellow ) ]
-    end
   end
 
   module Expect_Event
@@ -251,32 +132,36 @@ module Skylab::Flex2Treetop::MyTestSupport
     TestSupport_::Expect_line[ tcm ]
   end
 
+  Expect_Stdout_Stderr = -> tcm do
+
+    tcm.include TestSupport_::Expect_Stdout_Stderr::InstanceMethods
+    tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
+  end
+
   Callback_ = ::Skylab::Callback
 
-  module TestLib_
+  Mock_resources_ = Callback_.memoize do
+    Mock_Resources_.new Mock_interactive_stdin_[]
+  end
 
-    sidesys = Callback_::Autoloader.build_require_sidesystem_proc
+  Mock_Resources_ = ::Struct.new :sin, :sout, :serr
 
-    Bsc__ = sidesys[ :Basic ]
+  Mock_interactive_stdin_ = Callback_.memoize do
+    Mock_Interactive_Stderr___.new
+  end
 
-    HL__ = sidesys[ :Headless ]
-
-    MH__ = sidesys[ :MetaHell ]
-
-    Strange = -> x do
-      MH__[].strange x
-    end
-
-    System = -> do
-      HL__[].system
+  class Mock_Interactive_Stderr___
+    def tty?
+      true
     end
   end
+
 
   F2TT_ = ::Skylab::Flex2Treetop
   FIXTURE_FILES_DIR_ = F2TT_.dir_pathname.join( 'test/fixture-files' ).to_path
   ICK_ = '@ rb_file_s_stat '.freeze  # 2.1.0 added this
   NIL_ = nil
   REAL_PROGNAME_ = 'flex2treetop'.freeze  # no easy way to mutate this?
-  Stderr_Resources_ = ::Struct.new :stderr
+  Stderr_Resources_ = ::Struct.new :serr
   Top_TS_ = self
 end

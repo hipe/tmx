@@ -14,12 +14,12 @@ module Skylab::TestSupport
             @on_event_selectively = oes_p
           end
 
-          def render_all_lines_into_under y, expag
+          def express_into_under y, expag
             s = get_absolute_path
             if @tagging_a
               s_a = []
               @tagging_a.each do | tg |
-                tg.render_all_lines_into_under s_a, expag
+                tg.express_into_under s_a, expag
               end
               if s_a.length.nonzero?
                 s.concat "  #{ s_a * '  ' }"
@@ -126,7 +126,7 @@ module Skylab::TestSupport
               [ :normal_name_symbol, :value_x ]
             end
 
-            def render_all_lines_into_under y, _expag
+            def express_into_under y, _expag
               s = "##{ @normal_name_symbol.id2name.gsub UNDERSCORE_, DASH_ }"
               if @value_x
                 s.concat ":#{ @value_x }"

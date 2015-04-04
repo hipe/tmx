@@ -97,7 +97,7 @@ module Skylab::TestSupport
             :replace
         ) do | sym, & ev_p |
 
-          ev_p[].render_all_lines_into_under @y, expag
+          ev_p[].express_into_under @y, expag
           if :error == sym
             ok = false
           end

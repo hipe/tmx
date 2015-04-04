@@ -23,6 +23,10 @@ module Skylab::Brazen
         As_Bound_Model___.new self, kr, & oes_p
       end
 
+      def const_defined? * a
+        @mod.const_defined?( * a )
+      end
+
       def __mod
         @mod
       end
@@ -52,6 +56,14 @@ module Skylab::Brazen
 
       def name
         @cls_pxy.name_function
+      end
+
+      def has_description
+        false
+      end
+
+      def to_unbound_action_stream
+        to_lower_unbound_action_stream
       end
 
       def to_lower_unbound_action_stream

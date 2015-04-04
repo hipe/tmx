@@ -47,6 +47,10 @@ module Skylab::Brazen
       self  # the top
     end
 
+    def kernel_
+      self
+    end
+
     def app_name
       ( if @nm
         @nm

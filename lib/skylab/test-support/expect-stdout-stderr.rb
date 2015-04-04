@@ -218,6 +218,14 @@ module Skylab::TestSupport
         io.string
       end
 
+      def flush_to_content_scanner
+
+        _st = sout_serr_line_stream_for_contiguous_lines_on_stream(
+          @__sout_serr_default_stream_symbol__ )
+
+        TestSupport_::Expect_Line::Scanner.via_line_stream _st
+      end
+
       def sout_serr_line_stream_for_contiguous_lines_on_stream sym
 
         @__sout_serr_is_baked__ ||= _bake_sout_serr

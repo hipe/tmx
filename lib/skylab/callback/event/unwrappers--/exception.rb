@@ -35,7 +35,7 @@ module Skylab::Callback
         end
 
         def resolve_message_lines
-          @event.render_all_lines_into_under @message_s_a=[], expression_agent
+          @event.express_into_under @message_s_a=[], expression_agent
           nil
         end
 

@@ -51,8 +51,8 @@ module Skylab::Callback
           @ev.terminal_channel_i
         end
 
-        def render_all_lines_into_under y, expag
-          @ev.render_all_lines_into_under y, expag
+        def express_into_under y, expag
+          @ev.express_into_under y, expag
         end
 
         def verb_lexeme

@@ -55,8 +55,8 @@ module Skylab::TMX::TestSupport::CLI::L2P
       go :file_metrics
     end
 
-    it "flex2treetop", wip: true do
-      go :flex2treetop, FLAG_
+    it "flex2treetop" do
+      go :flex2treetop
     end
 
     it "git" do

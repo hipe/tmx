@@ -43,7 +43,7 @@ module Skylab::Snag::TestSupport::Models::TD__
         @err_ev_a.length.should eql 1
         ev = @err_ev_a.shift
         ev.terminal_channel_i.should eql :directory_must_exist
-        ev.render_all_lines_into_under y=[], Snag_::API::EXPRESSION_AGENT
+        ev.express_into_under y=[], Snag_::API::EXPRESSION_AGENT
         y.first.should match %r(\Awon't create more than one directory\. #{
          }Parent directory of our tmpdir \(crunk-nizzle\) must exist: #{
           }fip-zazzle\z)

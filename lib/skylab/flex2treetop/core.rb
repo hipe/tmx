@@ -6,65 +6,27 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
   module CLI
 
-    def self.new i, o, e  # #hook-out[tmx]
-      self._THIS
-    end
+    class << self
 
-    if false  # for phase 5
-
-      o.on('-g=<grammar>', '--grammar=<grammar>',
-        "nest treetop output in this grammar declaration",
-        "(e.g. \"Mod1::Mod2::Grammar\")."
-      ) do |s|
-        @param_x_a.push :wrap_in_grammar_s, s
+      def new * a
+        Brazen_::CLI.new_top_invocation a, F2TT_.application_kernel_
       end
+    end  # >>
 
-      o.on('-s', '--sexp',
-        "show sexp of parsed flex file.",
-        "circumvent normal output. (devel)"
-      ) do
-        @param_x_a << :show_sexp_only
-      end
-
-      o.on('--flex-tt',
-       'write the flex treetop grammar to stdout.',
-       "circumvent normal output. (devel)"
-      ) do
-        enqueue_without_initial_queue :show_flex2tt_tt_grammar
-      end
-
-      o.on( '-t', '--tempdir[=<dir>]',
-        '[write, ]read flex treetop grammar',
-        '[from ,] to the filesystem as opposed to in memory. (devel)',
-        'multiple times will supress normal output.',
-        'use --clear (below) to force a rewrite of the file(s).'
-      ) do |s|
-        s and @param_x_a.push :FS_parser_dir, s
-        @did_tmpdir_option_once ||= begin ; first_time = true end
-        if first_time
-          @param_x_a << :use_FS_parser
-        else
-          @param_x_a << :endpoint_is_FS_parser
+    # ~ begin
+    Client = self
+    module Adapter
+      module For
+        module Face
+          module Of
+            Hot = -> x, x_ do
+              Brazen_::CLI::Client.fml F2TT_, x, x_
+            end
+          end
         end
       end
-
-      o.on('-c', '--clear',
-        'if used in conjuction with --tmpdir,',
-        'clear any existing parser files first (devel).'
-      ) do
-        @param_x_a << :clear_generated_files
-      end
-
-      o.on '-h', '--help', 'this' do
-        enqueue_without_initial_queue :help
-      end
-      o.on('-v', '--version', 'show version') do
-        enqueue_without_initial_queue :version
-      end
-      o.on('--test', '(shows some visual tests that can be run)') do
-        enqueue_without_initial_queue :show_tests
-      end
     end
+    # ~ end
   end
 
   module API
@@ -119,7 +81,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
           arg_1 = @argument_box[ :arg_1 ]
 
-          maybe_send_event :payload, :expression, :ping do | y |
+          maybe_send_event :info, :expression, :ping do | y |
 
             if arg_1
               y << "helo:(#{ arg_1 })"
@@ -128,7 +90,12 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
             end
             :_xyzzy_
           end
-          :_hello_from_API_
+
+          if arg_1
+            :_cheeky_monkey_
+          else
+            :hello_from_flex2treetop
+          end
         end
       end
 
@@ -137,6 +104,9 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
         @is_promoted = true
 
         edit_entity_class(
+          :desc, -> y do
+            y << "output the #{ app_name } version"
+          end,
           :flag, :property, :bare )
 
         def produce_result
@@ -166,14 +136,28 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
           path_a.push ::File.join( path, universe_file )
         end
 
+        test = Test_.new nil
+
         Callback_::Stream.via_nonsparse_array path_a do | path_ |
 
-          Test_.new path_
+          test.new path_
         end
       end
 
       def initialize path
         @path = path
+      end
+
+      def new x
+        dup.__init x
+      end
+
+      def __init x
+        @path = x ; self
+      end
+
+      def express_into_under y, expag
+        y << @path
       end
 
       def basename_string
@@ -185,6 +169,33 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
     module Translation
 
+      Modalities = ::Module.new
+      module Modalities::CLI
+        Actions = ::Module.new
+        class Actions::Translate < Brazen_::CLI::Action_Adapter
+
+          def resolve_properties  # :+[#br-042] will change
+
+            bp = @bound.formal_properties
+            fp = bp.to_mutable_box_like_proxy
+
+            fp.remove :resources
+
+            @back_properties = bp
+            @front_properties = fp
+
+            NIL_
+          end
+
+          def via_bound_action_mutate_mutable_backbound_iambic x_a
+
+            x_a.push :resources, @resources
+
+            ACHIEVED_
+          end
+        end
+      end
+
       Actions = ::Module.new
 
       class Actions::Translate < Action__
@@ -195,21 +206,53 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
           :flag, :property, :case_sensitive,
 
-          :flag, :property, :clear_generated_files,
-
-          :flag, :property, :endpoint_is_FS_parser,
-
-          :flag, :property, :force,
-
-          :property, :FS_parser_dir,
-
+          :description, -> y do
+            y << "show sexp of parsed flex file."
+            y << "circumvent normal output. (devel)"
+          end,
           :flag, :property, :show_sexp_only,
 
-          :flag,  :property, :use_FS_parser,
+
+          :description, -> y do
+            y << "nest treetop output in this grammar declaration"
+            y << "(e.g. \"Mod1::Mod2::Grammar\")."
+          end,
+          :property, :wrap_in_grammar,
+
+
+          :description, -> y do
+            y << '[write, ]read flex treetop grammar'
+            y << '[from ,] to the filesystem as opposed to in memory. (devel)'
+          end,
+          :flag, :property, :use_FS_parser,
+
+
+          :description, -> y do
+             y << 'force a rewrite of the parser file (when FS)'
+           end,
+          :flag, :property, :clear_generated_files,
+
+
+          :description, -> y do
+            y << "will use this dir else system tmpdir (when FS)"
+          end,
+          :property, :FS_parser_dir,
+
+
+          :description, -> y do
+            y << "do nothing else after writing the syntax (when FS)"
+          end,
+          :flag, :property, :endpoint_is_FS_parser,
+
+
+          :description, -> y do
+            y << "necessary for overwriting some files"
+          end,
+          :flag, :property, :force,
+
 
           :flag, :property, :verbose,
 
-          :property, :wrap_in_grammar_s,
 
           :required, :property, :resources,
 
@@ -234,25 +277,20 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
         def __resolve_upstream
 
-          trio = self.trio :flexfile
-          path = trio.value_x
+          path_arg = trio :flexfile
+          path = path_arg.value_x
 
-          id = if DASH_ == path
-
-            self._THIS
-          else
-
-            io = LIB_.system.filesystem.normalization.upstream_IO.call(
-              trio, & handle_event_selectively )
-
-            io and begin
-              F2TT_.lib_.basic::Pathname.identifier io, path
-            end
+          if DASH_ == path
+            path_arg = path_arg.to_unknown
           end
 
-          id and begin
+          io = LIB_.system.filesystem.normalization.upstream_IO.with(
+            :path_arg, path_arg,
+            :instream, @resources.sin,
+            & handle_event_selectively )
 
-            @upstream_ID = id
+          io and begin
+            @upstream_ID = F2TT_.lib_.basic::Pathname.identifier io, path
             ACHIEVED_
           end
         end
@@ -272,32 +310,31 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
         def __resolve_normal_downstream
 
-          trio = self.trio :output_path
-          path = trio.value_x
-          id = if DASH_ == path
+          path_arg = trio :output_path
+          path = path_arg.value_x
 
-            self._THIS
-          else
-
-            io = LIB_.system.filesystem.normalization.downstream_IO.with(
-                :path_arg, trio,
-                :force_arg, self.trio( :force ) ) do | * i_a, & ev_p |
-
-              if :info == i_a.first
-                @verb_s = send :"__verb_given__#{ i_a.last }__"
-              end
-
-              handle_event_selectively_via_channel[ i_a, & ev_p ]
-            end
-
-            io and begin
-              F2TT_.lib_.basic::Pathname.identifier io, path
-            end
+          if DASH_ == path
+            path_arg = path_arg.to_unknown
           end
 
-          id and begin
+          io = LIB_.system.filesystem.normalization.downstream_IO.with(
 
-            @downstream_ID = id
+            :path_arg, path_arg,
+            :outstream, @resources.sout,
+            :force_arg, trio( :force )
+
+          ) do | * i_a, & ev_p |
+
+            if :info == i_a.first
+              @verb_s = send :"__verb_given__#{ i_a.last }__"
+            end
+
+            handle_event_selectively_via_channel[ i_a, & ev_p ]
+          end
+
+          io and begin
+            @verb_s ||= 'output'
+            @downstream_ID = F2TT_.lib_.basic::Pathname.identifier io, path
             ACHIEVED_
           end
         end
@@ -327,7 +364,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
               :resources, @resources,
               :upstream_ID, @upstream_ID,
               :verb_s, @verb_s,
-              :wrap_in_grammar_s, h[ :wrap_in_grammar_s ],
+              :wrap_in_grammar_s, h[ :wrap_in_grammar ],
               & handle_event_selectively )
 
         end
@@ -344,7 +381,11 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
     Basic = sidesys[ :Basic ]
 
-    HL___ = sidesys[ :Headless ]
+    HL__ = sidesys[ :Headless ]
+
+    IO = -> do
+      HL__[]::IO
+    end
 
     Option_parser = -> { require 'optparse' ; ::OptionParser }
 
@@ -368,7 +409,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
     String_scanner = -> { require 'strscan' ; ::StringScanner }
 
     System = -> do
-      HL___[].system
+      HL__[].system
     end
 
     Treetop = vendor[ :Treetop ]
@@ -819,7 +860,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
 
     def __show_sexp
 
-      LIB_.PP.pp @parser_result_x.sexp, @resources.stderr
+      LIB_.PP.pp @parser_result_x.sexp, @resources.serr
 
       :showed_sexp
     end
@@ -1469,7 +1510,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
   # ~ constants
 
   ADDITIONAL_RECOMMENDED_VISUAL_TEST_FILES___ = %w(
-    css-convert/css/parser/tokens.flex',
+    css-convert/css/parser/tokens.flex
   )
 
   AUTOGENERATED_RX = /autogenerated by flex2treetop/i  # (was [#008])
@@ -1481,7 +1522,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
   READ_MODE_ = ::File::RDONLY | ::File::CREAT
   SPACE_ = ' '.freeze
   UNABLE_ = false
-  VERSION = '0.0.2'
+  VERSION = '0.0.3'
   WRITE_MODE_ = ::File::WRONLY | ::File::CREAT
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]

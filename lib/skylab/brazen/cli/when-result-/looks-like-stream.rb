@@ -76,7 +76,7 @@ module Skylab::Brazen
       def __per_item_proc
 
         if @item.respond_to? :execute or
-          @item.respond_to? :render_all_lines_into_under or
+          @item.respond_to? :express_into_under or
             ! @item.class.respond_to? :properties
 
           method :per_item
@@ -100,8 +100,8 @@ module Skylab::Brazen
         if @item.respond_to? :execute
           via_item_execute
 
-        elsif @item.respond_to? :render_all_lines_into_under
-          @ok = @item.render_all_lines_into_under @y, @expag
+        elsif @item.respond_to? :express_into_under
+          @ok = @item.express_into_under @y, @expag
 
         else
           @y << @item

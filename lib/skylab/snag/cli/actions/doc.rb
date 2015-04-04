@@ -84,7 +84,7 @@ module Skylab::Snag
       end
 
       def draw_arc
-        @ev.render_all_lines_into_under @oy, expression_agent ; nil
+        @ev.express_into_under @oy, expression_agent ; nil
       end
 
       def draw_node

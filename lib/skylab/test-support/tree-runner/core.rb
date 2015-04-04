@@ -198,7 +198,7 @@ module Skylab
 
       def _render_into_stderr_event ev
 
-        ev.render_all_lines_into_under _serr_yielder, _expression_agent
+        ev.express_into_under _serr_yielder, _expression_agent
         nil
       end
 

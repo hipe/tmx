@@ -617,9 +617,9 @@ module Skylab::Callback
       [ :property, :is_known_known, :name, :name_symbol, :value_x ]
     end
 
-    attr_reader :is_known_known, :property, :value_x
+    attr_reader :property
 
-    attr_writer :value_x
+    attr_accessor :is_known_known, :value_x
 
     def name_symbol
       @property.name_symbol
@@ -627,6 +627,13 @@ module Skylab::Callback
 
     def name
       @property.name
+    end
+
+    def to_unknown
+      otr = dup
+      otr.value_x = nil
+      otr.is_known_known = false
+      otr.freeze
     end
 
     def new_with_value x
@@ -1758,7 +1765,7 @@ module Skylab::Callback
     end
   public
 
-    def render_all_lines_into_under y, expag  # #hook-out [#br-023]
+    def express_into_under y, expag  # #hook-out [#br-023]
       name = self
       expag.calculate do
         y << nm( name )

@@ -67,7 +67,7 @@ module Skylab::Snag
         }, -> o do
           o.on_error_event handle_error_event
           o.on_tags do |tags|
-            tags.render_all_lines_into_under y=[], expression_agent
+            tags.express_into_under y=[], expression_agent
             send_payload_line y * SPACE_ ; nil
           end
 

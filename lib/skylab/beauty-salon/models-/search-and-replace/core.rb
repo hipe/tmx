@@ -17,7 +17,7 @@ module Skylab::BeautySalon
 
         @handle_event_selectively_via_channel = -> _, & ev_p do
           ev = ev_p[]
-          ev.render_all_lines_into_under @primary_UI_yielder, expression_agent
+          ev.express_into_under @primary_UI_yielder, expression_agent
           ev.ok  # always propagate this - some logic relies on the false-ish-ness
         end
 

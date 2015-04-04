@@ -36,7 +36,7 @@ module Skylab::Cull
       nil
     end
 
-    def render_all_lines_into_under y, expag  # #todo: #not-covered (done visually only)
+    def express_into_under y, expag  # #todo: #not-covered (done visually only)
       st = to_actual_property_stream
       expag.calculate do
         prp = st.gets

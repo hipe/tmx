@@ -2,8 +2,8 @@ module Skylab::TestSupport
 
   class IO::Spy__::Triad__ < ::Struct.new :instream, :outstream, :errstream
 
+    # [#031] WILL SUNSET. use "io spy group" for all new work
     # see [#020] a comparison of different IO spy aggregations
-    # the TL;DR is that this class may be deprecated.
 
     class << self
 
@@ -49,12 +49,13 @@ module Skylab::TestSupport
 
     Prefixed_debugging_IO__ = -> do
       p = -> i, io do
-        Prefixed_Debugging_IO__ = TestSupport_.lib_.proxy_lib.nice :puts, :write, :<<
+        Prefixed_Debugging_IO__ = TestSupport_.lib_.proxy_lib.nice :puts, :write, :<<, :rewind, :truncate
         p = -> i_, io_ do
           fmt = -> x do
             "(#{ i_ }: #{ x.inspect })"
           end
-          me = Prefixed_Debugging_IO__.new :<<, -> x do
+          me = Prefixed_Debugging_IO__.new(
+            :<<, -> x do
               io_ << fmt[ x ] ; me
             end,
             :puts, -> x do
@@ -63,7 +64,18 @@ module Skylab::TestSupport
             :write, -> x do
               io_.write fmt[ x ]
               x.length
+            end,
+            :rewind, -> do
+              io_.rewind
+            end,
+            :truncate, -> x do
+              if io_.respond_to? :truncate
+                io_.truncate x
+              else
+                0  # meh
+              end
             end
+          )
         end
         p[ i, io ]
       end

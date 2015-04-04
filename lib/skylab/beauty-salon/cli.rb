@@ -214,7 +214,7 @@ module Skylab::BeautySalon
 
       @action = BS_::Models_::Deliterate.new NO_KERNEL__ do | *, & ev_p |
 
-        ev_p[].render_all_lines_into_under @y,
+        ev_p[].express_into_under @y,
 
           BS_.lib_.brazen::CLI.expression_agent_instance
 

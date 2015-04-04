@@ -8,7 +8,7 @@ module Skylab::Snag
 
     THROWING_INFO_ERROR_delegate = Info_Error_Delegate.new nil, -> ev do
       y = []
-      ev.render_all_lines_into_under y, Snag_::API::EXPRESSION_AGENT
+      ev.express_into_under y, Snag_::API::EXPRESSION_AGENT
       raise y * SPACE_
     end
 
@@ -120,11 +120,11 @@ module Skylab::Snag
 
         def to_exception  # ick this inspired #open [#066]
           _expag = Snag_.lib_.brazen::API.expression_agent_instance
-          _a = render_all_lines_into_under [], _expag
+          _a = express_into_under [], _expag
           ::RuntimeError.new _a * SPACE_
         end
 
-        def render_all_lines_into_under y, expression_agent
+        def express_into_under y, expression_agent
           expression_agent.calculate y, self, & message_proc
         end
 

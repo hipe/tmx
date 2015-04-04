@@ -183,7 +183,7 @@ module Skylab::Callback::TestSupport
         end
 
         def expct_that_event_renders_as_one_string
-          @ev.render_all_lines_into_under s_a=[], expression_agent_for_expect_event
+          @ev.express_into_under s_a=[], expression_agent_for_expect_event
           if 1 == s_a.length
             s_a.fetch 0
           else
@@ -200,7 +200,7 @@ module Skylab::Callback::TestSupport
         end
 
         def black_and_white_lines ev
-          ev.render_all_lines_into_under y=[], black_and_white_expression_agent_for_expect_event
+          ev.express_into_under y=[], black_and_white_expression_agent_for_expect_event
           y
         end
 
