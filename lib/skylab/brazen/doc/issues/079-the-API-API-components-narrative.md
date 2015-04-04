@@ -1,11 +1,21 @@
-# the API node narrative  :[#017]
+# the API API components narrative :[#079]
 
-(EDIT: [#br-049] takes what we learned from this and repalces it)
 
-broadly this is an experimental reconception of the [fa] API API, one that
+# introduction
+
+the [br] API API is a third ground-up rewrite of an API API. taking what
+we learned from the now sunsetted [#hl-017]. that in turn was an
+experimental reconception of the [fa] API API, one that
 takes what we learned from there and tries to pare it down to have fewer
-moving parts. however this one was only distilled out of one small-sized
-application (f2tt) and so is not yet poised to replace [fa] whole hog.
+moving parts. ( however this one was only distilled out of one small-sized
+application (f2tt) and so was never intended to fully replace [fa] whole hog.i
+
+
+the below are (EDIT) not yet fully integrated descriptions from the old
+[hl] solution, that were kept because they may act as useful
+supplementat descriptions still for some of our current components and
+design choices.
+
 
 
 
@@ -29,6 +39,7 @@ this is via creating a "session" object and letting it take things from there.
 
 
 
+
 ## :#storypoint-15
 
 the "session" (we almost called it something like "request" or "fulfillment"
@@ -37,20 +48,6 @@ particular request. its job is to resolve an unbound action (think class),
 then build a bound action (think object) having passed it any parameters in
 the #storypoint-30 iambic array.
 
-
-
-## :#storypoint-20
-
-by default and for now, when you employ this bundle it creates both an
-'Actions' module for finding unbound actions, and an 'Action' sub-class
-that will presumably be used by you to model your actions.
-
-
-
-## :#storypoint-25
-
-if this module has a parent and that parent has a dirname, base your own
-off of that, otherwise base it off of where the enhancement came from.
 
 
 

@@ -5,7 +5,6 @@ yacc2treetop        q [ ]
 bnf2treetop         q [ ]
 css-convert         q [ ]
 
-treetop-tools       q [ ]
 code-molester       Q [ ]
 
 dependency          Q [ ]

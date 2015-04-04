@@ -29,6 +29,10 @@ for each request a dedicated "invocation" instance has a short-ish lifespan.
 [#cb-046] "iambics" were quite formalized by then too, and used then as
 they are now as the lingua franca for API actions.
 
+in fact, we re-purposed descriptions from the now sunsetted [#hl-017]
+to here as supplemental [#079] the API API components narrative.
+
+
 
 
 ## #note-015 :[#051]

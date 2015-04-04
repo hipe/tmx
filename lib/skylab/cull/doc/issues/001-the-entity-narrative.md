@@ -8,7 +8,7 @@ concept whose meaning when compared to those from other scopes is in
 some ways similar and in others distinct.
 
 in [cu]  (as elsewhere) an entity encapsulates a collection of actual
-properties. but let's set aside any preconceptions of what we thinkx
+properties. but let's set aside any preconceptions of what we think
 this term "entity" means means and reapproach it anew for [cu]:
 
 the shortest reasonable synopsis of this whole document is:

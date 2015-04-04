@@ -190,7 +190,8 @@
 [#019]       #pattern #convention iff CLI action invoke is false, invite
                (referred to now as the "common triad" #doc-point) ..
 [#018]       #doc-node the API action inflection hack narrative ..
-[#017]       #doc-point the API node narrative ..
+[#017] #hole #re-purposed into [#br-070]
+             ( #was: #doc-point the API node narrative .. )
 [#016] #open #low-priority dynamic uncolorize payload stream when ! tty?
 [#015]       #doc-node the CLI IO narrative #retrofitted
 [#014]       yacc2treetop
