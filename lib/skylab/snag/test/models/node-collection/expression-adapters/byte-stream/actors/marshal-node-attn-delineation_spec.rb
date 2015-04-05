@@ -1,8 +1,8 @@
-require_relative 'test-support'
+require_relative '../../../../../test-support'
 
-module Skylab::Snag::TestSupport::Models::Node
+module Skylab::Snag::TestSupport
 
-  describe "[sg] models node controller" do
+  describe "[sg] models - node collection - persistence adapters - m.n2", wip: true do
 
     extend TS_
 
@@ -43,18 +43,6 @@ module Skylab::Snag::TestSupport::Models::Node
         node.extra_line_a[1].should eql( '-two-line-' )
         node.extra_line_a[2].should eql( '_tre_line_' )
         node.extra_line_a.length.should eql(3)
-      end
-    end
-
-    class Delegate_Mock
-      def receive_error_string pay
-        Stderr_[].puts "WOW: #{ [ pay ].inspect }"
-      end
-      def receive_info_string pay
-        Stderr_[].puts "OK: #{ pay }"
-      end
-      def send_to_delegate name, pay
-        Stderr_[].puts "WAT: #{ [ pay].inspect }"
       end
     end
 

@@ -20,7 +20,7 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
       @exitstatus.should eql :_hello_from_doc_test_
     end
 
-    it "list" do
+    it "list", wip: true do
       invoke 'recursive', '--sub-act', 'list', common_path
       on_stream :output
       expect %r(\A/.+/doc-test/core\.rb[ ]{2}#output-filename:inte)
@@ -34,7 +34,7 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
 
     _NOUN_STEM = 'test document generation'
 
-    it "does the dry run that generates fake bytes omg" do
+    it "does the dry run that generates fake bytes omg", wip: true do
 
       invoke 'recursive', '--sub-act', 'preview', common_path
 
@@ -59,7 +59,7 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
       @exitstatus.should be_zero
     end
 
-    it "requires force to overwrite" do
+    it "requires force to overwrite", wip: true do
 
       invoke 'recursive', '--dry-run', common_path
 
@@ -71,7 +71,7 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
 
     end
 
-    it "money" do
+    it "money", wip: true do
 
       invoke 'recursive', '--forc', '--dry-run', common_path
 

@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../../test-support'
 
-module Skylab::Snag::TestSupport::CLI::Actions
+module Skylab::Snag::TestSupport
 
-  describe "[sg] CLI actions todo melt" do
+  describe "[sg] models - to-do - actions - melt", wip: true do
 
     extend TS_
 

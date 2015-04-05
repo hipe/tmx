@@ -1,8 +1,8 @@
-require_relative 'test-support'
+require_relative '../../../test-support'
 
-module Skylab::Snag::TestSupport::CLI::Actions
+module Skylab::Snag::TestSupport
 
-  describe "[sg] CLI actions open" do
+  describe "[sg] models - node - actions - open", wip: true do
 
     extend TS_
 

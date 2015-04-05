@@ -1,14 +1,8 @@
-require_relative '../test-support'
+require_relative '../../../../../test-support'
 
-module Skylab::Snag::TestSupport::Actors
+module Skylab::Snag::TestSupport
 
-  ::Skylab::Snag::TestSupport[ TS_ = self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  describe "[cb] actors - delineation" do
+  describe "[sg] [..] marshal", wip: true do
 
     extend TS_
 

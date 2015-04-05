@@ -1,8 +1,8 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Snag::TestSupport::Models
+module Skylab::Snag::TestSupport
 
-  describe "[cb] models" do
+  describe "[sg] models - date", wip: true do
 
     extend TS_
 

@@ -1,16 +1,8 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Snag::TestSupport::Models::Hashtag__
+module Skylab::Snag::TestSupport
 
-  ::Skylab::Snag::TestSupport::Models[ self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  SPACE_ = Snag_::SPACE_
-
-  describe "[sg] models hashtag" do
+  describe "[sg] models - hashtag", wip: true do
 
     context "parses" do
 
@@ -86,8 +78,8 @@ module Skylab::Snag::TestSupport::Models::Hashtag__
       @part_a = Subject_[].parse s
     end
 
-    Subject_ = -> do
-      Snag_::Models::Hashtag
+    def _subject
+      Snag_::Models_::Hashtag
     end
   end
 end

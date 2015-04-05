@@ -23,7 +23,7 @@ module Skylab::TestSupport::TestSupport::DocTest
       expect_failed
     end
 
-    it "'list' only those files relevant to the path. emits no events, result is stream" do
+    it "'list' only those files relevant to the path. emits no events, result is stream", wip: true do
 
       call_API :recursive, :sub_action, :list, :path, Subject_[].dir_pathname.to_path
 
@@ -50,7 +50,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
     end
 
-    it "'preview' results in a stream of \"generation\"s" do
+    it "'preview' results in a stream of \"generation\"s", wip: true do
 
       downstream = build_IO_spy_downstream_for_doctest
 

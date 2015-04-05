@@ -1,14 +1,10 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Snag::TestSupport::Models::ToDo__
+module Skylab::Snag::TestSupport
 
-  ::Skylab::Snag::TestSupport::Models[ TS__ = self ]
+  describe "[sg] models - to-do", wip: true do
 
-  include Constants ; extend TestSupport_::Quickie
-
-  describe "[sg] models to-do" do
-
-    extend TS__
+    extend TS_
 
     context 'this is a hack [#068]' do
 

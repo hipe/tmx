@@ -28,18 +28,6 @@ module Skylab::Snag
 
     module Actor
 
-      class << self
-        def [] cls, * i_a
-          via_client_and_iambic cls, i_a
-        end
-
-        def via_client_and_iambic cls, i_a
-          Callback_::Actor.via_client_and_iambic cls, i_a
-          cls.extend NF_[].name_function_proprietor_methods
-          cls.include self ; nil
-        end
-      end
-
     private
 
       def send_info_event * x_a, & p

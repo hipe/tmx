@@ -39,10 +39,14 @@ module Skylab::TestSupport
     private
 
       def tag=
-        tag_shell
+
+        ts = tag_shell
+
         1.upto( @x_a.length - 1 ).each do |d|
-          @tag_shell.receive_tag_argument @x_a.fetch d
-        end ; nil
+          ts.receive_tag_argument @x_a.fetch d
+        end
+
+        NIL_
       end
 
       def tag_shell

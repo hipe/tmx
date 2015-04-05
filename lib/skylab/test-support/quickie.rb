@@ -370,11 +370,18 @@ module Skylab::TestSupport
     end
 
     def bld_tag_shell
-      Tag_Shell_.new :on_error, -> _ do
-        raise ::OptionParser::InvalidArgument
-      end,
-      :on_info_trio, method( :add_tag_description ),
-      :on_filter_proc, method( :add_or_p )
+
+      Tag_Shell_.new(
+
+        :on_error, -> s do
+          e = ::OptionParser::InvalidArgument.new
+          e.reason = s
+          raise e
+        end,
+
+        :on_info_trio, method( :add_tag_description ),
+
+        :on_filter_proc, method( :add_or_p ) )
     end
 
     def add_tag_description include_or_exclude_i, tag_i, val_x
@@ -1087,16 +1094,29 @@ module Skylab::TestSupport
     RX__ = /(?<=\A on_ )[_a-z]+\z/x
 
     def receive_tag_argument s
-      md = TAG_RX__.match s
+
+      md = TAG_RX___.match s
+
       if md
         no, tag_s, val_s = md.captures
-        yes = ! no ; tag_i = tag_s.intern ; val_x = val_s ? val_s.intern : true
-        build_and_send_tag_byproducts_via_three_parts yes, tag_i, val_x
+
+        _yes = ! no
+        _tag_i = tag_s.intern
+        _val_x = val_s ? val_s.intern : true
+
+        build_and_send_tag_byproducts_via_three_parts _yes, _tag_i, _val_x
       else
+
         @send_error_p[ "invalid tag expression: \"#{ s }\"" ]
       end
     end
-    TAG_RX__ = /\A(?<not>~)?(?<tag>[^:]+)(?::(?<val>.+))?\z/
+
+    TAG_RX___ = /\A
+      (?<not> ~ )?
+      (?<tag> [-a-zA-Z_0-9]+ )  # or whatever
+      (?: : (?<val> .+) )?
+    \z/x
+
   private
     def build_and_send_tag_byproducts_via_three_parts yes, tag_i, val_x
       if @send_info_trio_p

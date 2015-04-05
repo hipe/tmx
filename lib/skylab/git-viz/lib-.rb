@@ -31,10 +31,6 @@ module Skylab::GitViz
       Basic[]::Set[ * a ]
     end
 
-    CLI_legacy_DSL = -> mod do
-      Porcelain__[]::Legacy::DSL[ mod ]
-    end
-
     CLI_lib = -> do
       HL__[]::CLI
     end
@@ -80,8 +76,6 @@ module Skylab::GitViz
     Oxford_and = oxford.curry[ ', ', '[none]', ' and ' ]
 
     Plugin = -> { HL__[]::Plugin }
-
-    Porcelain__ = wall[ :Porcelain ]
 
     Power_scanner = -> * x_a do
       Callback_::Scn.multi_step.new_via_iambic x_a

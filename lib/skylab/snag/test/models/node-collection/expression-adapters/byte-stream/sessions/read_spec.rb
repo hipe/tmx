@@ -1,8 +1,8 @@
-require_relative 'file/test-support'
+require_relative '../../../../../test-support'
 
-module Skylab::Snag::TestSupport::Models::Manifest::File
+module Skylab::Snag::TestSupport
 
-  describe "[sg] models manifest file" do
+  describe "[sg] models - [ .. ] file", wip: true do
 
     extend TS_
 

@@ -1,8 +1,8 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Snag::TestSupport::CLI
+module Skylab::Snag::TestSupport
 
-  describe "[sg] CLI core" do
+  describe "[sg] CLI core", wip: true do
 
     extend TS_
 
@@ -16,7 +16,7 @@ module Skylab::Snag::TestSupport::CLI
 
     context "the CLI canon (with the same memoized client!) - lvls 0 & 1 ui" do
 
-      use_memoized_client
+      # use_memoized_client #see
 
       it "0.0  (no args) - expecting / usage / invite" do
         invoke
@@ -63,7 +63,7 @@ module Skylab::Snag::TestSupport::CLI
 
       with_invocation 'numbers'
 
-      with_default_expected_stream_name :pay
+      # with_default_expected_stream_name :pay #see
 
       context "a manifest with two good lines" do
 

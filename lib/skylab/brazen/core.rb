@@ -82,9 +82,17 @@ module Skylab::Brazen
     end
   end  # >>
 
-  Actor_ = -> cls, * x_a do
-    Lib_::Snag_[]::Model_::Actor.via_client_and_iambic cls, x_a
-    Brazen_.event.selective_builder_sender_receiver cls ; nil
+  module Actor_
+    class << self
+      def [] cls, * x_a
+        Callback_::Actor.via_client_and_iambic cls, x_a
+        cls.extend Brazen_.name_library.name_function_proprietor_methods
+        # cls.include self
+        Brazen_.event.selective_builder_sender_receiver cls
+        NIL_
+      end
+      alias_method :call, :[]
+    end  # >>
   end
 
   Autoloader_ = Callback_::Autoloader

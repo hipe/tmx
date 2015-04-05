@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../../../test-support'
 
-module Skylab::Snag::TestSupport::CLI::Actions
+module Skylab::Snag::TestSupport
 
-  describe "[sg] CLI actions node tags" do
+  describe "[sg] models - tag - actions - add", wip: true do
 
     extend TS_  # the numbers used below are [#hl-134] canonical CLI test id's
 

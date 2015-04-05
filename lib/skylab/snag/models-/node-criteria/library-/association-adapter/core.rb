@@ -1,6 +1,8 @@
 module Skylab::Snag
 
-  class Models::Node::Query__
+  module Models_::Node_Criteria
+
+    Actions = THE_EMPTY_MODULE_
 
     class << self
 
@@ -9,8 +11,8 @@ module Skylab::Snag
         o.valid
       end
 
-      private :new
-    end
+      # private :new
+    end # >>
 
     def initialize query_sexp, max_count, delegate
       @counter = nil
@@ -112,7 +114,9 @@ module Skylab::Snag
       end
     end
 
-    module Query_Nodes_  # #borrow-indent
+    # <-
+
+    module Query_Nodes_
 
     def self.normal query_sexp, delegate
       _cls = Autoloader_.const_reduce [ query_sexp.first ], self
@@ -251,6 +255,9 @@ module Skylab::Snag
         node.is_valid
       end
     end
-    end # payback-indent
+
+    # ->
+
+    end
   end
 end

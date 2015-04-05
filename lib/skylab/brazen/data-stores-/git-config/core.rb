@@ -26,7 +26,7 @@ module Skylab::Brazen
       def write * a
         Git_Config_::Actors__::Write.call_via_arglist a
       end
-    end
+    end  # >>
 
     Actions = ::Module.new
 

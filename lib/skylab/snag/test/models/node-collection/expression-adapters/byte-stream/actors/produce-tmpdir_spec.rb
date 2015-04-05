@@ -1,14 +1,10 @@
-require_relative 'test-support'
+require_relative '../../../../../test-support'
 
-module Skylab::Snag::TestSupport::Models::TD__
+module Skylab::Snag::TestSupport
 
-  ::Skylab::Snag::TestSupport::Models[ TS__ = self ]
+  describe "[sg] models [..] tmpdir", wip: true do
 
-  include Constants ; extend TestSupport_::Quickie
-
-  describe "[sg] models tmpdir" do  # location of this file is intentional
-
-    extend TS__
+    extend TS_
 
     with_tmpdir do |o|
       o.clear.mkdir 'an-emtpy-dir'
@@ -83,15 +79,6 @@ module Skylab::Snag::TestSupport::Models::TD__
           debug_IO.puts "got FU msg: #{ msg }"
         end
         @FU_msg_s_a.push msg
-      end
-    end
-
-    class EE_L__
-      def initialize & p
-        @p = p
-      end
-      def receive_error_event ev
-        @p[ ev ]
       end
     end
   end

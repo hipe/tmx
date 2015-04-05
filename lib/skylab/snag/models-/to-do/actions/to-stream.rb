@@ -1,9 +1,5 @@
 module Skylab::Snag
 
-  # (below line kept for #posterity, it is the twinkle in the eye of the
-  # [#sl-123] convention)
-  # Todo = Api::Todo # yeah, this sad problem. or is it a pattern!?
-
   class API::Actions::ToDo::Report < API::Action
 
     attribute  :be_verbose
@@ -57,3 +53,4 @@ module Skylab::Snag
     make_sender_methods
   end
 end
+# :+#tombstone: beginnings of [#sl-123] convention: Todo = Api::Todo
