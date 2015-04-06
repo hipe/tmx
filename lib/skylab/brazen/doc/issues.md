@@ -1,5 +1,7 @@
+[#085]       [ module as model ]
 [#084]       :+#wishlist a `flag` meta-meta prperty
-[#083]       #done workspace `init` action should not default to '.' in API
+[#083]       use blocks as selective event receiver (optionally) for proc as action
+             ( #was: #done workspace `init` action should not default to '.' in API )
 [#082]       #tracking `list` implementations
 [#081]       #track experimental extensions to Actor
 [#080]       #parent-node:[#013] actors, agents and models ..

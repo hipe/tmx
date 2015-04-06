@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class CLI
 
-    class When_::Help < Simple_Bound_Call_
+    class When_::Help < As_Bound_Call_
 
       def initialize cmd_s, help_renderer, action_adapter
         @aa = action_adapter

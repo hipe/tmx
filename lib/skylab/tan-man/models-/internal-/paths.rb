@@ -38,13 +38,15 @@ module Skylab::TanMan
       end
 
       def when_bad_verb
-        @call.maybe_receive_event :error, :unrecognized_verb do
+
+        @on_event_selectively.call :error, :unrecognized_verb do
           _build_common_event :unrecognized_verb, :verb, @verb_x, /\Aexecute_(.+)_verb\z/
         end
       end
 
       def when_bad_noun
-        @call.maybe_receive_event :error, :unknown_path do
+
+        @on_event_selectively.call :error, :unknown_path do
           _build_common_event :unknown_path, :path, @path_x, /\Aretrieve_(.+)_path\z/
         end
       end

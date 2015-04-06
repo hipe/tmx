@@ -61,6 +61,10 @@ module Skylab::Snag::TestSupport
     def debug_IO
       TestSupport_.debug_IO
     end
+
+    def subject_API  # #hook-out for expect event
+      Snag_::API
+    end
   end
 
   Expect_Event = -> tcm do

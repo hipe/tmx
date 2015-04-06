@@ -647,15 +647,16 @@ module Skylab::Callback
     end
   end
 
-  Bound_Call = ::Struct.new :args, :receiver, :method_name do  # volatility order (subjective)
+  class Bound_Call
 
     class << self
 
-      def build_via_arglist a
-        if a.length.zero?
-          self
+      def build_via_arglist a, & p
+
+        if a.length.nonzero? || p
+          new( * a, & p )
         else
-          new( * a )
+          self
         end
       end
 
@@ -663,10 +664,22 @@ module Skylab::Callback
         @tec ||= new EMPTY_P_, :call
       end
 
-      def via_value x
-        new nil, -> { x }, :call
+      def via_value x, & p
+        new nil, -> { x }, :call, & p
       end
     end  # >>
+
+    def initialize * a, & p  # volatility order (subjective)
+      @args, @receiver, @method_name = a
+      @block = p
+    end
+
+    def members
+      [ :args, :receiver, :method_name, :block ]
+    end
+
+    attr_reader :args, :receiver, :method_name, :block
+
   end
 
   # ~ the #employment story

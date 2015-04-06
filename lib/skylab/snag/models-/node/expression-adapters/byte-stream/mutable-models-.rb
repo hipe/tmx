@@ -1,10 +1,13 @@
 module Skylab::Snag
 
-  class Models::Tag
+  class Models_::Tag_Collection
 
-    class Collection__
+    Actions = THE_EMPTY_MODULE_
+
+    # ->
 
       def initialize body_s, identifer
+        self._REDO
         @body_s = body_s ; @identifier = identifer ; nil
       end
 
@@ -103,6 +106,7 @@ module Skylab::Snag
           x and x.to_s
         end
       end
-    end
+
+      # <-
   end
 end

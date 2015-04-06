@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  module Models::Node
+  module Models_::Node
 
     class << self
 
@@ -32,7 +32,9 @@ module Skylab::Snag
         MAX_LINES_PER_NODE__
       end
       MAX_LINES_PER_NODE__ = 2
-    end
+    end  # >>
+
+    Actions = THE_EMPTY_MODULE_
 
     class Silo_Daemon < ::Object
 

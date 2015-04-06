@@ -8,7 +8,7 @@ module Skylab::Cull
 
       def call * x_a, & oes_p
         bc = Cull_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
-        bc and bc.receiver.send bc.method_name, * bc.args
+        bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
       end
 
       def expression_agent_class
@@ -23,14 +23,14 @@ module Skylab::Cull
 
   Autoloader_[ Models_ = ::Module.new, :boxxy ]
 
-  Models_::Ping = -> call do
+  Models_::Ping = -> act_pxy, & oes_p do
 
-    call.maybe_receive_event :info, :ping do
+    oes_p.call :info, :ping do
 
       Callback_::Event.wrap.signature(
-        call.action_class_like.name_function,
+        act_pxy.action_class_like.name_function,
         ( Callback_::Event.inline_neutral_with :ping do | y, o |
-          y << "hello from #{ call.kernel.app_name }."
+          y << "hello from #{ act_pxy.kernel.app_name }."
         end ) )
     end
 

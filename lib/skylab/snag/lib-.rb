@@ -12,17 +12,15 @@ module Skylab::Snag
     o[ :Shellwords ] = stdlib
     o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
 
-    def self.const_missing c
-      if (( p = self::H_[ c ] ))
-        const_set c, p[ c ]
+    define_singleton_method :const_missing do | sym |
+
+      p = o[ sym ]
+      if p
+        const_set sym, p[ sym ]
       else
         super
       end
     end
-
-    H_ = o.freeze
-
-    def self.kick ; end
   end
 
   module Lib_
@@ -133,6 +131,7 @@ module Skylab::Snag
     class << self
       attr_reader :instance
     end  # >>
+
     @instance = Callback_.produce_library_shell_via_library_and_app_modules(
       self, Snag_ )
   end

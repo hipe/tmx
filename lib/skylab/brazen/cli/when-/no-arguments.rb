@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class CLI
 
-    class When_::No_Arguments < Simple_Bound_Call_
+    class When_::No_Arguments < As_Bound_Call_
 
       def initialize prop, help_renderer
         @prop = prop

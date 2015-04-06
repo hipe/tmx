@@ -502,8 +502,8 @@ module Skylab::TanMan
     end
   end
 
-  Models_::Paths = -> path, verb, call do
-    Models_::Internal_::Paths[ path, verb, call ]
+  Models_::Paths = -> path, verb, call, & oes_p do
+    Models_::Internal_::Paths[ path, verb, call, & oes_p ]
   end
 end
 # :+#tombstone: this used to be bottom properties frame

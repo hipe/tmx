@@ -42,7 +42,7 @@ module Skylab::GitViz
 
       def call * x_a, & oes_p
         bc = GitViz_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
-        bc and bc.receiver.send bc.method_name, * bc.args
+        bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
       end
     end  # >>
   end
@@ -51,7 +51,7 @@ module Skylab::GitViz
 
   class << self
 
-    define_method :application_kernel_, ( ::Skylab::Callback.memoize do
+    define_method :application_kernel_, ( Callback_.memoize do
       GitViz_.lib_.brazen::Kernel.new GitViz_
     end )
 

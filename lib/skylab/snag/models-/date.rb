@@ -1,30 +1,38 @@
 module Skylab::Snag
 
-  class Models::Date
+  class Models_::Date
 
     class << self
 
-      def normal x, delegate
+      def normalize_argument arg, & oes_p  # :+[#ba-027]
 
-        if RX__ =~ x
-          x
-        else
-          delegate.receive_error_event new( x ).build_error_event
-          UNABLE_  # (used to be a :+[#017], no longer)
+        if arg.is_known_known
+
+          if RX__ =~ arg.value_x
+            arg
+          else
+            oes_p.call :error, :invalid_date do
+              __build_invalid_date_event arg.value_x
+            end
+          end
         end
       end
 
-      RX__ = %r{ \A \d{4} - \d{2} - \d{2} \z }x
-    end
+      def __build_invalid_date_event x
+
+        Callback_::Event.inline_not_OK_with :invalid_date, :x, x do | y, o |
+          y << "invalid date: #{ ick o.x }"
+        end
+      end
+    end  # >>
+
+    RX___ = %r{ \A \d{4} - \d{2} - \d{2} \z }x
+
+    Actions = THE_EMPTY_MODULE_
 
     def initialize x
+      self._CHECK_THIS
       @x = x
-    end
-
-    def build_error_event
-      Snag_::Model_::Event.inline :invalid_date, :x, @x do |y, o|
-        y << "invalid date: #{ ick o.x }"
-      end
     end
   end
 end

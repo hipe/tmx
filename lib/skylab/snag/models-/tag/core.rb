@@ -1,8 +1,9 @@
 module Skylab::Snag
 
-  class Models::Tag  # shell / kernel. this is the shell
+  class Models_::Tag  # shell / kernel. this is the shell
 
     class << self
+
       def canonical_tags
         CANONICAL_TAGS__[]
       end
@@ -22,9 +23,12 @@ module Skylab::Snag
 
         ok_arg && ok_arg.value_x
       end
-    end
+    end  # >>
+
+    Actions = THE_EMPTY_MODULE_
 
     def initialize kernel
+      self._CHECK_THIS
       @kernel = kernel
       freeze
     end

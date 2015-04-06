@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  module Models::Message
+  module Models_::Message
 
     blank_rx = /\A[[:space:]]*\z/
     nl_rx = /\n/
@@ -33,5 +33,7 @@ module Skylab::Snag
         res = msg
       end
     end
+
+    Actions = THE_EMPTY_MODULE_
   end
 end

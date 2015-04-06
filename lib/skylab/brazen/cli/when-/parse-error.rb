@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class CLI
 
-    class When_::Parse_Error < Simple_Bound_Call_
+    class When_::Parse_Error < As_Bound_Call_
 
       def initialize e, help_renderer
         @exception = e

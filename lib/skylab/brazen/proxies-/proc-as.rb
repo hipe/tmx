@@ -1,8 +1,8 @@
 module Skylab::Brazen
 
-    module Proxies_::Proc_As
+    module Proxies_::Proc_As  # see [#083]
 
-      # #todo - covered only by: [tm], [cu]
+      # #todo - covered only by: [tm], [cu], [sg]
 
       class Unbound_Action
 
@@ -47,7 +47,7 @@ module Skylab::Brazen
         end
 
         def custom_action_inflection
-          nil
+          NIL_
         end
 
         def to_upper_unbound_action_stream
@@ -55,9 +55,11 @@ module Skylab::Brazen
           Callback_::Stream.via_item self
         end
 
-        def new k , & oes_p
+        def new k, & oes_p
 
-          As_Bound_Action___.new k, self, & oes_p
+          @cx ||= Signature_Classifications___.new( @p )
+
+          As_Bound_Action___.new @cx, k, self, & oes_p
         end
 
       private
@@ -114,6 +116,44 @@ module Skylab::Brazen
         end
       end
 
+      class Signature_Classifications___
+
+        def initialize p
+
+          a_a = p.parameters
+
+          @accepts_block = false
+          @accepts_support_argument = false
+
+          if a_a.length.nonzero?
+
+            if :block == a_a.last.first
+              @accepts_block = true
+              a_a.pop
+            end
+
+            if a_a.length.nonzero?
+              send :"__#{ a_a.last.first }__", a_a
+            end
+          end
+
+          @business_parameters = a_a.freeze
+        end
+
+        attr_reader :accepts_block, :accepts_support_argument,
+          :business_parameters
+
+        def members
+          self.class.instance_methods false
+        end
+
+        def __req__ a_a
+          a_a.pop
+          @accepts_support_argument = true
+          NIL_
+        end
+      end
+
       class As_Bound_Action___
 
         class << self
@@ -122,10 +162,12 @@ module Skylab::Brazen
           end
         end  # >>
 
-        def initialize k, action_class_like, & oes_p
+        def initialize cx, k, action_class_like, & oes_p
+
           @action_class_like = action_class_like
           @kernel = k
           @on_event_selectively = oes_p
+          @signature_classifications = cx
         end
 
         def is_branch
@@ -162,17 +204,15 @@ module Skylab::Brazen
         end
 
         def _parameter_box
-          @pbx ||= bld_parameter_box
+          @pbx ||= __build_parameter_box
         end
 
-        def bld_parameter_box
-
-          params = @action_class_like.p.parameters
-
-          params.pop  # because #here
+        def __build_parameter_box
 
           bx = Callback_::Stream::Mutable_Box_Like_Proxy.new [], {}
-          params.each do | opt_req_rest, name_symbol |
+
+          @signature_classifications.
+              business_parameters.each do | opt_req_rest, name_symbol |
 
             case opt_req_rest
             when :req
@@ -198,39 +238,19 @@ module Skylab::Brazen
 
             end )
           end
+
           bx
         end
 
         def bound_call_against_iambic_stream st  # #hook-out
 
-          case 0 <=> @action_class_like.p.arity
-          when -1 ; _bound_call_when_nonzero_arity_via_stream st
-          when  0 ; bc_when_zero_arity
-          when  1 ; __bound_call_when_glob st
-          end
-        end
-
-        def __REDO_bc_when_zero_arity
-          Brazen_.bound_call nil, @action_class_like.p, :call
-        end
-
-        def __bound_call_when_glob st
-
-          # currently this gets its coverage by ( [ts], [gv] ) ping
-
-          _bound_call_when_nonzero_arity_via_stream st
-        end
-
-        def _bound_call_when_nonzero_arity_via_stream st
-
-          param_a = @action_class_like.p.parameters
-          param_a[ -1, 1 ] = EMPTY_A_  # always 1 arg for the call used #here
+          arglist = []
 
           h = __hash_via_flushing_probably_iambic_stream st
 
-          arglist = []
           miss_sym_a = nil
-          param_a.each do | orr, name_sym |
+
+          @signature_classifications.business_parameters.each do | orr, name_sym |
 
             x = h.delete name_sym
 
@@ -247,11 +267,15 @@ module Skylab::Brazen
           end
 
           if extra_sym_a
+
             __bc_when_extra extra_sym_a
+
           elsif miss_sym_a
+
             __bc_when_miss miss_sym_a
           else
-            bc_when_OK arglist
+
+            __bc_via_arglist arglist
           end
         end
 
@@ -267,46 +291,54 @@ module Skylab::Brazen
         end
 
         def __bc_when_extra extra_sym_a
-          _x = maybe_send_event :error do
+
+          _x = _maybe_send_event :error do
             __build_when_extra_arguments_event extra_sym_a
           end
+
           Brazen_.bound_call.via_value _x
         end
 
         def __build_when_extra_arguments_event extra_sym_a
+
           _sign_event Brazen_::Entity.properties_stack.
             build_extra_properties_event extra_sym_a, nil, 'argument', 'unexpected'
         end
 
         def __bc_when_miss miss_sym_a
-          _x = maybe_send_event :error do
+
+          _x = _maybe_send_event :error do
             __build_missing_arguments_event miss_sym_a
           end
+
           Brazen_.bound_call.via_value _x
         end
 
         def __build_missing_arguments_event miss_sym_a
+
           _sign_event Brazen_::Entity.properties_stack.
             build_missing_required_properties_event miss_sym_a, 'argument'
         end
 
-        def bc_when_OK mutable_arglist
+        def __bc_via_arglist arglist
 
-          mutable_arglist.push self  # :+#here is one place where we add the xtra arg
+          cx = @signature_classifications
 
-          Brazen_.bound_call mutable_arglist, @action_class_like.p, :call
+          if cx.accepts_support_argument
+
+            arglist.push self  # #mechanic-1
+          end
+
+          if cx.accepts_block
+
+            p = @on_event_selectively
+          end
+
+          Brazen_.bound_call arglist, @action_class_like.p, :call, & p
         end
 
-        def bc_when_custom_error err
-          @custom_error = err
-          send :"bc_when_#{ err.terminal_channel_i }_arguments"
-        end
+        def _maybe_send_event * i_a, & ev_p
 
-        private def maybe_send_event * i_a, & ev_p
-          @on_event_selectively[ * i_a, & ev_p ]
-        end
-
-        def maybe_receive_event * i_a, & ev_p
           @on_event_selectively[ * i_a, & ev_p ]
         end
 

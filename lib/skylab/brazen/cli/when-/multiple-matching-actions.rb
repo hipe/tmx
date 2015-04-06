@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class CLI
 
-    class When_::Multiple_Matching_Actions < Simple_Bound_Call_
+    class When_::Multiple_Matching_Actions < As_Bound_Call_
 
       def initialize adapter_a, token, help_renderer
 

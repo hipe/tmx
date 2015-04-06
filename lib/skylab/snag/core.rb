@@ -3,7 +3,27 @@ require 'skylab/callback/core'
 
 module Skylab::Snag
 
+  module API
+    class << self
+      def call * x_a, & oes_p
+        bc = Snag_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
+        bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
+      end
+    end  # >>
+  end
+
+  Callback_ = ::Skylab::Callback
+
   class << self
+
+    def action_class  # #hook-out for procs as actions (for name stop index)
+
+      lib_.brazen.model.action_class
+    end
+
+    define_method :application_kernel_, ( Callback_.memoize do
+      Snag_.lib_.brazen::Kernel.new Snag_
+    end )
 
     def lib_
       @lib ||= Snag_::Lib_.instance
@@ -11,11 +31,19 @@ module Skylab::Snag
 
   end  # >>
 
-  Callback_ = ::Skylab::Callback
-
   Autoloader_ = Callback_::Autoloader
 
   module Models_
+
+    Ping = -> act_pxy, & oes_p do
+
+      oes_p.call :info, :expression, :ping do | y |
+        y << "hello from #{ act_pxy.kernel.app_name }."
+      end
+
+      :hello_from_snag
+    end
+
     Autoloader_[ self, :boxxy ]
   end
 
@@ -35,5 +63,6 @@ module Skylab::Snag
   NEUTRAL_ = nil
   Snag_ = self
   SPACE_ = ' '.freeze
+  THE_EMPTY_MODULE_ = ::Module.new.freeze
   UNABLE_ = false
 end

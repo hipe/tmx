@@ -8,7 +8,7 @@ module Skylab::TanMan
 
       def call * x_a, & oes_p
         bc = TanMan_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
-        bc and bc.receiver.send bc.method_name, * bc.args
+        bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
       end
 
       def expression_agent_class

@@ -1,8 +1,11 @@
 module Skylab::Snag
 
-  class Models::Node::Collection__
+  class Models_::Node_Collection
+
+    Actions = THE_EMPTY_MODULE_
 
     def initialize manifest, _API_client
+      self._THIS
       @API_client = _API_client
       @manifest = manifest
     end
@@ -52,7 +55,8 @@ module Skylab::Snag
   public
 
     def build_query query_sexp, max_count, delegate
-      Node_.build_valid_query query_sexp, max_count, delegate
+
+      _node_class.build_valid_query query_sexp, max_count, delegate
     end
 
     def reduce_all_nodes_via_query q
@@ -68,9 +72,13 @@ module Skylab::Snag
     end
 
     def all
-      Node_.build_scan_from_lines @manifest.manifest_file.normalized_line_producer
+
+      _node_class.build_scan_from_lines @manifest.manifest_file.normalized_line_producer
     end
 
-    Node_ = Models::Node
+    def _node_class
+
+      Snag_::Models_::Node
+    end
   end
 end

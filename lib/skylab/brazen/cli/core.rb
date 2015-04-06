@@ -59,7 +59,8 @@ module Skylab::Brazen
         resolve_properties
         resolve_partitions
         resolve_bound_call
-        x = @bound_call.receiver.send @bound_call.method_name, * @bound_call.args
+        bc = @bound_call
+        x = bc.receiver.send @bound_call.method_name, * @bound_call.args, & bc.block
         flush_any_invitations
         if x
           whn_result_is_trueish x
@@ -638,7 +639,8 @@ module Skylab::Brazen
       self
     end
 
-    class Simple_Bound_Call_
+    class As_Bound_Call_
+
       def receiver
         self
       end
@@ -649,9 +651,12 @@ module Skylab::Brazen
 
       def args
       end
+
+      def block
+      end
     end
 
-    class When_Action_Help__ < Simple_Bound_Call_
+    class When_Action_Help__ < As_Bound_Call_
 
       def initialize _, help_renderer, _action_adapter
         @help_renderer = help_renderer
@@ -1570,10 +1575,12 @@ module Skylab::Brazen
       end
     end
 
-    class Aggregate_Bound_Call__ < Simple_Bound_Call_
+    class Aggregate_Bound_Call__ < As_Bound_Call_
+
       def initialize a
         @a = a
       end
+
       def produce_result
         scn = Callback_::Stream.via_nonsparse_array @a
         while exe = scn.gets

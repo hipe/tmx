@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Models::ToDo  # see [#003]
+  class Models_::To_Do  # see [#003]
 
     class << self
 
@@ -18,11 +18,14 @@ module Skylab::Snag
       DEFAULT_PATTERN_S__ = '[@#]todo\>'.freeze
 
       private :new
-    end
+    end  # >>
 
-    Snag_::Model_::Actor[ self ]
+    Actions = THE_EMPTY_MODULE_
 
     def initialize a
+
+      self._CHECK_THIS
+
       @line, @line_number_string, @path, @pattern_s, @delegate = a
       @line_number = @line_number_string.to_i
       @pathname = ::Pathname.new @path
@@ -160,8 +163,10 @@ module Skylab::Snag
 
     class Build_regex__  # #note-155
 
+      if false  # #todo:near-step:6
       Snag_::Model_::Actor[ self,
         :properties, :pattern_s, :delegate ]
+      end
 
       def execute
         @scn = Snag_::Library_::StringScanner.new @pattern_s
@@ -212,6 +217,8 @@ module Skylab::Snag
       ENDING_WORD_BOUNDARY_RX_S__ = '(?![a-zA-Z0-9.])'
     end
 
+    if false  # #todo:near-step:6
     Event_ = Snag_::Model_::Event
+    end
   end
 end

@@ -12,11 +12,14 @@ module Skylab::Brazen
       Brazen_::Kernel.new Brazen_
     end )
 
-    def bound_call *a
-      if a.length.zero?
-        Callback_::Bound_Call
+    def bound_call * a, & x_p
+
+      if a.length.nonzero? || x_p
+
+        Callback_::Bound_Call.new( * a, & x_p )
       else
-        Callback_::Bound_Call.new( * a )
+
+        Callback_::Bound_Call
       end
     end
 

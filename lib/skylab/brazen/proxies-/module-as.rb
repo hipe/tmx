@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  module Proxies_::Module_As
+  module Proxies_::Module_As  # :[#085].
 
     class Unbound_Model
 

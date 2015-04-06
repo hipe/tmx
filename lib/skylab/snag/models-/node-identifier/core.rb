@@ -1,6 +1,8 @@
 module Skylab::Snag
 
-  class Models::Identifier
+  class Models_::Node_Identifier  # #todo:near-step:N: all the others too
+
+    Actions = THE_EMPTY_MODULE_
 
     def initialize any_prefix_s, integer_s, any_suffix_s
       @prefix_s = any_prefix_s
@@ -41,7 +43,7 @@ module Skylab::Snag
           _x_ and UNABLE_  # +:[#017]
         end
       end
-    end
+    end  # >>
 
     NORMALIZING_RX__ = / \A (?:
       #{ FORMAL_RX.source } |
@@ -58,6 +60,7 @@ module Skylab::Snag
 
     module Events
 
+      if false  # #todo:near-step:N
       Invalid = Snag_::Model_::Event.new :mixed do
         message_proc do |y, o|
           y << "invalid identifier name #{ ick o.mixed } - #{
@@ -71,6 +74,7 @@ module Skylab::Snag
         message_proc do |y, o|
           y << "prefixes are ignored currently - #{ ick o.identifier.prefix_s }"
         end
+      end
       end
     end
   end

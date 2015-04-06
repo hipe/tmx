@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class CLI
 
-    class When_::Extra_Arguments < Simple_Bound_Call_
+    class When_::Extra_Arguments < As_Bound_Call_
 
       def initialize ev, help_renderer
         @render = help_renderer

@@ -6,7 +6,7 @@ module Skylab::GitViz
 
   # ->
 
-    Models_::Ping = -> on_channel=nil, secret_x=nil, bnd do
+    Models_::Ping = -> on_channel=nil, secret_x=nil, bnd, & oes_p do
 
       if secret_x
         "hi: #{ secret_x }"
@@ -19,7 +19,7 @@ module Skylab::GitViz
           :info
         end
 
-        bnd.maybe_receive_event _chn, :expression, :ping do | y |
+        oes_p.call _chn, :expression, :ping do | y |
 
           y << "hello from #{ bnd.kernel.app_name }."
         end

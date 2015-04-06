@@ -67,24 +67,41 @@ perhaps even when the input value is valid but gets normalized.
 
 ## the normal value normalization method
 
-there were once 5 (five) variants (each documented) that this following
-one new method replaces.
-
-(the were: `normalize`, `normalize_argument`,
-`any_error_event_via_validate_x`, `normalize_via_two`,
-`normalize_via_three` :+#tombstone (their documentation too).)
-
 for a single, unified solution that is universally applicable,
 recognizable, and poka-yoke; we have adopted this one method name,
-signature and semantics:
+signature and semantics: `normalize_argument`. we will present
+its signature below; but first, a historical aside to give us some
+context to the scope of this:
 
-`normalize_argument` - argument ("arg") is a [#ca-004]  ("trio")
-argument structure. optional block is a [#ca-017] selective listener.
+(this one subject method replaces all of what were once 5 (five)
+ variants of it (each documented at the time (tombstone at end)):
 
-the "arg" structure can indicate whether or not an actual value was
-"passed", and in the case that it was the "arg" value can provide
-the actual value. as well the field's `name_symbol` can be accessed,
-as well as a formal property structure (if any).
+    any_error_event_via_validate_x
+    normalize
+    normalize_argument
+    normalize_via_two
+    normalize_via_three
+
+ perhaps we should conceptualize it as one of our :+[#ba-041] universal
+ abstract operations.
+)
+
+the signature:
+
+  `normalize_argument` - argument ("arg") is a [#ca-004]  ("trio")
+     argument structure. optional block is a [#ca-017] selective listener.
+
+this arg structure has at least the below fields (see subject for more):
+
+  • the `name_symbol` of the field
+
+  • `is_known_known` a boolean-ish indicating whether or not we know
+       what the actual value is of this field
+
+  • the `value_x` actual value, when the above is trueo
+
+  • the (formal) `property` of the field (if any)
+
 
 if it is known to have been passed, note that depending on your
 interface the incoming value may be `false`, `nil`, or any other
@@ -97,7 +114,7 @@ a native integer `1`). if it is already valid and normal as it is
 you may leave it as it is.
 
 if based on your definition of normal this normalization was
-successful, your result must be another or the same [#ca-004]-shaped
+successful, your result *must* be another or the same [#ca-004]-shaped
 argument structure containing the new (or same) value for the argument
 value.
 
@@ -155,7 +172,7 @@ of normalization.
 
 
 
-#
+(EDIT: the below is close to sunsetting..)
 
 
 
@@ -523,3 +540,5 @@ by anything else, for the above described reasons.
 all of this will likely have changed by the time you finish reading it, but
 thank you anyway for doing so ^_^
 _
+
+:+#tombstone the documentation of the five sunsetted normalization methods
