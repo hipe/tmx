@@ -62,7 +62,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
       it "2.1  with one giberrsh arg - explain that file is not found" do
 
-        @for_expect_stdout_stderr_use_this_as_stdin = _mock_stdin
+        @stdin_for_expect_stdout_stderr = _mock_stdin
 
         invoke 'trans', 'not-there.txt', '-'
         expect :styled, %r(\bno such <flexfile> - not-there\.txt\z)
@@ -71,7 +71,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
       it "1.4  read flexfile, write treetop grammar to stdout" do
 
-        @for_expect_stdout_stderr_use_this_as_stdin = _mock_stdin
+        @stdin_for_expect_stdout_stderr = _mock_stdin
 
         invoke 'trans', fixture_flex_( :mini ), '-'
         __expect_all_this

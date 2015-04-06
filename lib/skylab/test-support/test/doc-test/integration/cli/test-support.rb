@@ -14,7 +14,7 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
 
   module InstanceMethods
 
-    include TestSupport_::Expect_Stdout_Stderr::InstanceMethods
+    include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
 
     define_method :expect, instance_method( :expect )  # because rspec
 

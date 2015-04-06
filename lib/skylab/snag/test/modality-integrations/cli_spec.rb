@@ -2,23 +2,29 @@ require_relative '../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] CLI core", wip: true do
+  describe "[sg] CLI core" do
 
     extend TS_
 
-    acts = '\{node.*nodes.*numbers.*open.*todo.*\}'
-    expecting_rx = %r{\AExpecting #{ acts }}i
-    invite_rx = %r{\ATry sn0g -h for help\.$}i
-    usage_rx = %r{\Ausage: sn0g #{ acts } \[opts\] \[args\]$}
-    deeper_invite_rx = %r{\AFor help on a particular subcommand, try #{
-      }sn0g <subcommand> -h\.$}i
-    blank_line_rx = /\A\z/  # expects chomp to be used
+    use :expect_CLI,
+      :subject_CLI, -> { Snag_::CLI },
+      :program_name, 'sn0g',
+      :generic_error_exitstatus, -> { Snag_.lib_.brazen::CLI::GENERIC_ERROR_ }
+
+    expecting_rx = %r{\Aexpecting <action>\z}i
+
+    usage_rx = %r{\Ausage: sn0g <action> \[\.\.\]\n?\z}
+
+    invite_rx = %r{\Ause 'sn0g -h' for help$}i
+
+    deeper_invite_rx = %r{\Ause 'sn0g -h <action>' for help on that action.\n\z}
 
     context "the CLI canon (with the same memoized client!) - lvls 0 & 1 ui" do
 
-      # use_memoized_client #see
+      use_memoized_client
 
       it "0.0  (no args) - expecting / usage / invite" do
+
         invoke
         o expecting_rx
         o usage_rx
@@ -26,29 +32,41 @@ module Skylab::Snag::TestSupport
         o
       end
 
-      it "1.2  (strange opt) - reason / expecting / invite" do
+      it "1.2  (strange opt) - reason / invite" do
+
         invoke '-x'
-        o( /\Ainvalid action.+-x/i )
-        o expecting_rx
+        expect "invalid option: -x"
         o invite_rx
         o
       end
 
-      it "1.3 (good arg) (ping)" do
+      it "1.3  (good arg) (ping)" do
+
         invoke 'ping'
-        o 'hello from snag.'
-        @result.should eql :hello_from_snag
+        expect 'hello from snag.'
+        expect_no_more_lines
+        @exitstatus.should eql :hello_from_snag
       end
 
-      it "1.4 (good opt) - usage / invite" do
+      it "1.4  (good opt) - usage / invite" do
+
         invoke '-h'
-        o usage_rx
-        o blank_line_rx
-        o deeper_invite_rx
-        o
+
+        on_stream :e
+        o = flush_to_content_scanner
+
+        o.expect_styled_line.should match usage_rx
+        o.expect_nonblank_line
+        o.expect_blank_line
+        o.expect_header :actions
+
+        o.advance_to_before_Nth_last_line 1
+        o.expect_styled_line.should match deeper_invite_rx
+
+        expect_succeeded
       end
 
-      it "2.3x4H (good arg/good opt) (help postfix) (param API)" do
+      it "2.3x4H (good arg/good opt) (help postfix) (param API)", wip: true do
         invoke 'todo', '-h'
         c = output.class::Composite.of output.lines
         c.unique_stream_name_order_i_a.should eql %i( info )
@@ -59,7 +77,7 @@ module Skylab::Snag::TestSupport
       end
     end
 
-    context "'numbers' with" do
+    context "'numbers' with", wip: true do
 
       with_invocation 'numbers'
 

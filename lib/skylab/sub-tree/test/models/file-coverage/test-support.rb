@@ -100,7 +100,7 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
   Expect_Stdin_Stdout = -> tcm do
 
-    tcm.include TestSupport_::Expect_Stdout_Stderr::InstanceMethods
+    tcm.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
     tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
   end
 

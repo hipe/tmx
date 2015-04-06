@@ -55,7 +55,15 @@ module Skylab::Brazen
       end
 
       def invoke argv
-        @resources.complete @env || ::ENV, argv
+
+        if @resources.frozen?  # :+#experimental: subsequent invocation
+
+          @resources = @resources.new argv
+        else
+
+          @resources.complete @env || ::ENV, argv
+        end
+
         resolve_properties
         resolve_partitions
         resolve_bound_call
@@ -1552,6 +1560,7 @@ module Skylab::Brazen
     end
 
     class Resources__
+
       def initialize a, mod
         @mod = mod
         @sin, @sout, @serr, @s_a = a
@@ -1567,11 +1576,23 @@ module Skylab::Brazen
       end
 
       attr_reader :argv, :env, :sin, :sout, :serr, :mod
+
+      def invocation_s_a
+        @s_a
+      end
+
       def complete env, argv
         @argv = argv ; @env = env ; freeze ; nil
       end
-      def invocation_s_a
-        @s_a
+
+      def new argv
+        dup.__new argv
+      end
+
+      protected def __new  argv
+
+        @argv = argv
+        freeze
       end
     end
 

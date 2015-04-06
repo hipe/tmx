@@ -134,7 +134,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
   Expect_Stdout_Stderr = -> tcm do
 
-    tcm.include TestSupport_::Expect_Stdout_Stderr::InstanceMethods
+    tcm.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
     tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
   end
 

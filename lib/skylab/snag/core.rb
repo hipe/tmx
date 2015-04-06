@@ -3,9 +3,38 @@ require 'skylab/callback/core'
 
 module Skylab::Snag
 
-  module API
+  module CLI
+
     class << self
+
+      def new * a
+
+        Snag_.lib_.brazen::CLI.new_top_invocation a, Snag_.application_kernel_
+      end
+    end  # >>
+
+    # ~ begin :+#hook-out for tmx
+    Client = self
+    module Adapter
+      module For
+        module Face
+          module Of
+            Hot = -> x, x_ do
+              Snag_.lib_.brazen::CLI::Client.fml Snag_, x, x_
+            end
+          end
+        end
+      end
+    end
+    # ~ end
+  end
+
+  module API
+
+    class << self
+
       def call * x_a, & oes_p
+
         bc = Snag_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
         bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
       end

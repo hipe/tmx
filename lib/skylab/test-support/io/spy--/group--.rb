@@ -9,7 +9,7 @@ module Skylab::TestSupport
     end
 
     attr_reader :debug
-    attr_writer :debug_IO
+    attr_writer :debug_IO, :line_a  # hax
 
     def flush_to_line_stream_on sym  # lines as strings, not as objects
 

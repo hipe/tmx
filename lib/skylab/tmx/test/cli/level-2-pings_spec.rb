@@ -75,7 +75,7 @@ module Skylab::TMX::TestSupport::CLI::L2P
       go :slicer
     end
 
-    it "snag", wip: true do
+    it "snag" do
       go :snag
     end
 

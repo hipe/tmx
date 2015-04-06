@@ -6,7 +6,7 @@ module Skylab::GitViz::TestSupport
 
       def [] tcm
 
-        tcm.include TestSupport_::Expect_Stdout_Stderr::InstanceMethods
+        tcm.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
         tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
         tcm.include self
       end

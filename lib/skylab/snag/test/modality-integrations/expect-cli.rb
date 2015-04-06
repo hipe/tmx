@@ -1,192 +1,106 @@
-require_relative '../test-support'
+module Skylab::Snag::TestSupport
 
-module Skylab::Snag::TestSupport::CLI
+  module Expect_CLI
 
-  ::Skylab::Snag::TestSupport[ TS_ = self ]
+    class << self
 
-  include Constants
+      remove_method :[]  # until etc
 
-  extend TestSupport_::Quickie
+      def [] tcm, x_a
 
-  Callback_ = Callback_
+        tcm.extend Module_Methods___
 
-  TestLib_ = TestLib_
+        tcm.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
+        tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
+        tcm.include self
 
-
-  # ~ invocation
-
-  module InstanceMethods
-
-    def invoke * argv_tail_s_a
-      argv = [ * invocation_prefix_s_a, * argv_tail_s_a ]
-      output.lines.clear
-      clnt = client
-      p = -> _ do
-        @result = clnt.invoke argv
-      end
-      if has_tmpdir
-        setup_tmpdir_if_necessary
-        from_tmpdir( & p )
-      else
-        p[ nil ]
-      end
-      nil
-    end
-
-    attr_reader :result
-
-    def invocation_prefix_s_a
-    end
-
-    def has_tmpdir
-    end
-  end
-
-
-  # ~ invocation prefix write & read
-
-  module ModuleMethods
-
-    def with_invocation * s_a
-      s_a.freeze
-      define_method :invocation_prefix_s_a do
-        s_a
-      end ; nil
-    end
-  end
-
-
-  # ~ ordinary client & output
-
-  module InstanceMethods
-
-    let :client do
-      Client__[ output ]
-    end
-
-    let :output do
-      output = Output__[]
-      output.do_debug_proc = -> { do_debug }
-      output
-    end
-  end
-
-
-  # ~ sketchy memoized client & output
-
-  module ModuleMethods
-
-    def use_memoized_client
-      method_defined? :memo_frame or dfn_memoized_readers
-    end
-
-    def dfn_memoized_readers
-
-      def client
-        o = memo_frame
-        if do_debug
-          o.output.debug or o.output.do_debug_proc = -> { do_debug }
+        x_a.each_slice 2 do | sym, x |
+          send :"__#{ sym }__", x
         end
-        o.client
+
+        NIL_
       end
 
-      def output
-        memo_frame.output
+      def __generic_error_exitstatus__ p
+
+        p_ = -> do
+          x = p[]
+          p_ = -> do
+            x
+          end
+          x
+        end
+
+        define_method :result_for_failure_for_expect_stdout_stderr do
+          p_[]
+        end
       end
 
-      define_method :memo_frame, ( Callback_.memoize do
-        Memo_Frame__.new _ = Output__[], Client__[ _ ]
-      end )
+      def __program_name__ x
+
+        a = [ x ].freeze
+
+        define_method :invocation_strings_for_expect_stdout_stderr do
+          a
+        end
+        NIL_
+      end
+
+      def __subject_CLI__ p
+
+        define_method :subject_CLI do
+          p[]
+        end
+      end
+    end  # >>
+
+    module Module_Methods___
+
+      def use_memoized_client  # a crime
+
+        p = -> tc do
+
+          # the first time:
+
+          tc.init_invocation_for_expect_stdout_stderr_  # call the original
+
+          g = tc.IO_spy_group_for_expect_stdout_stderr
+          invo = tc.invocation
+
+          p = -> tc_ do  # subsequent times
+
+            g.lines and fail
+            g.line_a = []
+
+            tc_.invocation = invo
+            tc_.IO_spy_group_for_expect_stdout_stderr = g
+
+            NIL_
+          end
+          NIL_
+        end
+
+        define_method :init_invocation_for_expect_stdout_stderr do
+          p[ self ]
+          NIL_
+        end
+      end
     end
-  end
 
-  Memo_Frame__ = ::Struct.new :output, :client
-
-
-  # ~ expectations
-
-  module ModuleMethods
-    def with_default_expected_stream_name i
-      define_method :default_expected_stream_name do i end ; nil
+    def invoke * argv
+      using_expect_stdout_stderr_invoke_via_argv argv
     end
-  end
 
-  module InstanceMethods
+    def o * x_a, & p  # legacy
 
-    def expect * x_a
-      if x_a.length.zero?
-        output.lines.length.should be_zero
+      if x_a.length.nonzero? || p
+
+        x_a.unshift :styled
+        expect_stdout_stderr_via_arglist x_a, & p
       else
-        expct_via_nonzero_length_x_a x_a
+
+        expect_failed
       end
     end
-
-    alias_method :o, :expect  # legacy
-
-    def expct_via_nonzero_length_x_a x_a
-      case x_a.length
-      when 1 ; chan_i = default_expected_stream_name ; x = x_a.first
-      when 2 ; chan_i, x = x_a
-      else   ; raise ::ArgumentError, "[channel] { rx | string }"
-      end
-      emission = output.lines.shift
-      emission or fail "had no more events in queue, expecting #{
-        }#{ [ chan_i, x ].inspect }"
-      emission.stream_symbol.should eql chan_i
-      emission.string.chomp!  # meh
-      if x.respond_to? :ascii_only?
-        emission.string.should eql x
-      else
-        emission.string.should match x
-      end ; nil
-    end
-
-    def default_expected_stream_name
-      :info
-    end
-
-    def expect_failed
-      expect_no_more_output_lines
-      expect_failure_result
-    end
-
-    def expect_succeeded
-      expect_no_more_output_lines
-      expect_success_result
-    end
-
-    def expect_no_more_output_lines
-      output.lines.length.should be_zero
-    end
-
-    def expect_failure_result
-      @result.should eql LEGACY_ERROR_CODE__
-    end
-
-    def expect_success_result
-      @result.should eql SUCCESS_EXITSTATUS__
-    end
-
-    def weirdly_expect_success_result
-      @result.should eql LEGACY_SUCCESS_CODE__
-    end
   end
-
-  Client__ = -> output do
-    client = Snag_::CLI.new nil, output.for( :pay ), output.for( :info )
-    client.send :program_name=, 'sn0g'
-    client
-  end
-
-  LEGACY_ERROR_CODE__ = 1
-
-  LEGACY_SUCCESS_CODE__ = 0
-
-  Output__ = -> do
-    output = TestSupport_::IO.spy.group.new
-    output.add_line_map_proc Snag_.lib_.CLI_lib.pen.unstyle
-    output
-  end
-
-  SUCCESS_EXITSTATUS__ = 0
 end

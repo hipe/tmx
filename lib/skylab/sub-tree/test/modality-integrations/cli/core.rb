@@ -15,7 +15,7 @@ module Skylab::SubTree::TestSupport::Modality_Integrations::CLI
 
     module Instance_Methods
 
-      include TestSupport_::Expect_Stdout_Stderr::InstanceMethods
+      include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
 
       # (adpated from [br])
 

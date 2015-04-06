@@ -17,14 +17,14 @@ module Skylab::TestSupport::TestSupport
     define_method :subject, _Subject
 
     it "the module has instance methods as part of its public API" do
-      subject::InstanceMethods
+      subject::Test_Context_Instance_Methods
     end
 
     context "build some expectation (internal)" do
 
       me = self
       before :all do
-        me.include _Subject[]::InstanceMethods
+        me.include _Subject[]::Test_Context_Instance_Methods
         me.send :define_method, :expect, me.instance_method( :expect )  # :+#this-rspec-annoyance
       end
 
@@ -59,7 +59,7 @@ module Skylab::TestSupport::TestSupport
 
       me = self
       before :all do
-        me.include _Subject[]::InstanceMethods
+        me.include _Subject[]::Test_Context_Instance_Methods
         me.send :define_method, :expect, me.instance_method( :expect )  # :+#this-rspec-annoyance
       end
 
@@ -193,7 +193,7 @@ module Skylab::TestSupport::TestSupport
 
           attr_reader :_baked_em_a
 
-          include TestSupport_::Expect_Stdout_Stderr::InstanceMethods
+          include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
 
           public :expect, :expect_no_more_lines
 

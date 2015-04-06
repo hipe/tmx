@@ -6,8 +6,7 @@ module Skylab::TestSupport
 
     # NOTE currently this mutates emission strings!
 
-    module InstanceMethods
-    private
+    module Test_Context_Instance_Methods
 
       # ~ begin optional support for "full stack" CLI (assuming conventions)
 
@@ -18,6 +17,7 @@ module Skylab::TestSupport
       end
 
       def argv_prefix_for_expect_stdout_stderr  # :+#hook-in
+        NIL_
       end
 
       def using_expect_stdout_stderr_invoke_with_no_prefix * argv
@@ -27,7 +27,7 @@ module Skylab::TestSupport
 
       def _init_invocation_and_invoke_against_mutable_argv_and_prefix a, a_
 
-        __init_invocation
+        init_invocation_for_expect_stdout_stderr
 
         if a_
           a[ 0, 0 ] = a_
@@ -38,7 +38,7 @@ module Skylab::TestSupport
         NIL_
       end
 
-      def __init_invocation
+      def init_invocation_for_expect_stdout_stderr
 
         g = TestSupport_::IO.spy.group.new
 
@@ -48,7 +48,7 @@ module Skylab::TestSupport
 
         g.debug_IO = debug_IO  # :+#hook-out
 
-        io = for_expect_stdout_stderr_use_this_as_stdin
+        io = stdin_for_expect_stdout_stderr
         if io
           g.add_stream :i, io
         else
@@ -57,7 +57,7 @@ module Skylab::TestSupport
 
         g.add_stream :o
 
-        io = for_expect_stdout_stderr_use_this_as_stderr
+        io = stderr_for_expect_stdout_stderr
         if io
           g.add_stream :e, io
         else
@@ -80,10 +80,13 @@ module Skylab::TestSupport
         NIL_
       end
 
-    public
+      attr_accessor :IO_spy_group_for_expect_stdout_stderr, :invocation  # for hax
 
-      attr_reader :for_expect_stdout_stderr_use_this_as_stdin,  # :+#hook-in
-        :for_expect_stdout_stderr_use_this_as_stderr
+      alias_method :init_invocation_for_expect_stdout_stderr_,
+        :init_invocation_for_expect_stdout_stderr  # for hax
+
+      attr_reader :stdin_for_expect_stdout_stderr,  # :+#hook-in
+        :stderr_for_expect_stdout_stderr
 
     private
 
@@ -107,6 +110,11 @@ module Skylab::TestSupport
       # ~ expect
 
       def expect * x_a, & p
+
+        expect_stdout_stderr_via_arglist x_a, & p
+      end
+
+      def expect_stdout_stderr_via_arglist x_a, & p
 
         @__sout_serr_expectation__ = bld_sout_serr_expectation_via_iambic x_a, & p
 

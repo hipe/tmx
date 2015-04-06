@@ -11,11 +11,15 @@ module Skylab::Snag::TestSupport
 
   module ModuleMethods
 
-    def use sym
+    def use sym, * x_a
+
+      if x_a.length.nonzero?
+        rest = [ x_a ]
+      end
 
       TS_.const_get(
         Callback_::Name.via_variegated_symbol( sym ).as_const, false
-      )[ self ]
+      )[ self, * rest ]
 
       NIL_
     end
@@ -67,8 +71,26 @@ module Skylab::Snag::TestSupport
     end
   end
 
+  module Expect_CLI
+
+    class << self
+      def [] tcm, x_a
+
+        require TS_.dir_pathname.join( 'modality-integrations/expect-cli' ).to_path
+        self[ tcm, x_a ]
+      end
+    end  # >>
+  end
+
   Expect_Event = -> tcm do
     Callback_.test_support::Expect_Event[ tcm ]
+  end
+
+  Expect_Stdout_Stderr = -> tcm do
+
+    tcm.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
+    tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
+    NIL_
   end
 
   Snag_ = ::Skylab::Snag

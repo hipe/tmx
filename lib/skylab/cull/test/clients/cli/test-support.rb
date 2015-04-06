@@ -14,7 +14,7 @@ module Skylab::Cull::TestSupport::Clients_CLI
 
   module InstanceMethods
 
-    include TestSupport_::Expect_Stdout_Stderr::InstanceMethods
+    include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
 
     def invoke * argv
 

@@ -28,7 +28,7 @@ module Skylab::SubTree::TestSupport::Models_Files::The_CLI_Modality
 
       io = SubTree_::Library_::StringIO.new @paths_string
       io.rewind
-      @for_expect_stdout_stderr_use_this_as_stdin = io
+      @stdin_for_expect_stdout_stderr = io
       local_invoke
 
       _unindent expect_str
