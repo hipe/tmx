@@ -809,33 +809,44 @@ module Skylab::Callback
     # ~ the dir_pathname feature & related (e.g child class)
 
     module Methods__
+
       def dir_pathname
-        @_did_resolve_dir_pathname ||= rslv_dir_pathname
+        @_did_resolve_dir_pathname ||= __resolve_dir_pathname
         @dir_pathname
       end
+
       def autoloader_name
         @did_orient_for_autoloader ||= orient_for_autoloader
         @autoloader_name
       end
+
     private
-      def rslv_dir_pathname
-        @dir_pathname ||= rslv_any_dir_pathname
+
+      def __resolve_dir_pathname
+        @dir_pathname ||= __produce_any_dir_pathname
         true
       end
-      def rslv_any_dir_pathname
+
+      def __produce_any_dir_pathname
+
         mod = autoloader_parent_module
         mod.respond_to? :dir_pathname or raise ::NoMethodError,
           autoloader_say_no_dirpathname( mod )
         dpn = mod.dir_pathname
-        dpn and dpn.join @autoloader_name.as_slug
+        if dpn
+          dpn.join @autoloader_name.as_slug
+        end
       end
+
       def autoloader_say_no_dirpathname mod
         "needs 'dir_pathname': #{ mod }"
       end
+
       def autoloader_parent_module
         @did_orient_for_autoloader ||= orient_for_autoloader
         @autoloader_parent_module
       end
+
       def orient_for_autoloader
         s_a = name.split CONST_SEP_
         @autoloader_name = Name.via_const s_a.pop
@@ -853,14 +864,16 @@ module Skylab::Callback
     end
 
     class Const_Missing_
+
       def initialize mod, i
         @name = Name.any_valid_via_const( i ) || Name.via_variegated_symbol( i )
         @mod = mod ; nil
       end
+
       def resolve_some_x
         stow_h = @mod.stowaway_h
         if stow_h && stow_h[ @name.as_const ]
-          rslv_some_x_when_stowaway
+          __result_when_stowaway
         else
           ( et = @mod.entry_tree ) and et.has_directory and
             np = et.normpath_from_distilled( @name.as_distilled_stem )
@@ -868,79 +881,123 @@ module Skylab::Callback
             @normpath = np
             send @normpath.method_name_for_state
           else
-            raise_uninitialized_constant_name_error
+            __raise_uninitialized_constant_name_error
           end
         end
       end
-    private
-      def raise_uninitialized_constant_name_error
+
+      def __raise_uninitialized_constant_name_error
         _say = "uninitialized constant #{
           }#{ @mod.name }::#{ @name.as_const } #{
            }and no directory[file] #{
             }#{ @mod.dir_pathname }/#{ @name.as_slug }[#{ EXTNAME_ }]"
         raise ::NameError, _say
       end
-      def rslv_some_x_when_not_loaded
+
+      def __result_when_not_loaded
+
         if @normpath.can_produce_load_file_path
-          rslv_some_x_via_normpath
+          __result_via_normpath
         else
-          rslv_some_x_when_directory
+          __result_when_directory
         end
       end
-      def rslv_some_x_via_normpath
-        load_normpath
-        rslv_some_x_after_loaded
+
+      def __result_via_normpath
+        _load_normpath
+        __result_after_loaded
       end
-      def load_normpath
+
+      def _load_normpath
+
         @normpath.value_is_known and self._HOLE  # probably just do it, yeah?
         @normpath.change_state_to :loaded  # no autoviv. for this last one
         @load_file_path = @normpath.get_load_file_path
         load @load_file_path
       end
-      def rslv_some_x_after_loaded
+
+      def __result_after_loaded
+
         x = lookup_x_after_loaded
         @mod.autoloaderize_with_normpath_value @normpath, x
         x
       end
-    public def lookup_x_after_loaded
+
+      def lookup_x_after_loaded
         const_i = name_as_const
         if @mod.const_defined? const_i, false
           @mod.const_get const_i, false
         else
-          fzzy_lookup method :rslv_some_x_via_different_casing_or_scheme
+          _fuzzy_lookup method :_result_via_different_casing_or_scheme
         end
       end
+
       def name_as_const
         @name.as_const
-      end ; public :name_as_const
-      def rslv_some_x_via_different_casing_or_scheme correct_i
+      end
+
+      def _result_via_different_casing_or_scheme correct_i
         # we don't cache it here (anymore), but we might cache this x elsewhere
         @mod.const_get correct_i, false
       end
-      def fzzy_lookup one_p, zero_p=nil, many_p=nil  # assume no exact match
-        fzzy_lookup_name_in_mod @name, @mod, one_p, zero_p, many_p
+
+      def _fuzzy_lookup one_p, zero_p=nil, many_p=nil  # assume no exact match
+        fuzzy_lookup_name_in_module_ @name, @mod, one_p, zero_p, many_p
       end
-    public( def fzzy_lookup_name_in_mod name, mod, one_p=nil, zero_p=nil, many_p=nil
-        a = [] ; stem = name.as_distilled_stem
-        mod.constants.each do |i|
-          stem == Distill_[ i ] and a << i
+
+      def fuzzy_lookup_name_in_module_ name, mod, one_p=nil, zero_p=nil, many_p=nil
+
+        a = []
+        stem = name.as_distilled_stem
+
+        mod.constants.each do | sym |
+          if stem == Distill_[ sym ]
+            a.push sym
+          end
         end
+
         case a.length <=> 1
-        when -1 ; zero_p or raise ::NameError, say_zero( name, mod ) ; zero_p[]
-        when  0 ; one_p ? one_p[ a.first ] : mod.const_get( a.first, false )
-        when  1 ; many_p[ a ]
+        when -1
+          if zero_p
+            zero_p[]
+          else
+            raise ::NameError, __say_zero( name, mod )
+          end
+
+        when  0
+          if one_p
+            one_p[ a.first ]
+          else
+            mod.const_get a.first, false
+          end
+
+        when  1
+          if many_p
+            many_p[ a ]
+          else
+            raise ::NameError, __say_ambiguous( a, name, mod )
+          end
         end
-      end )
-      def say_zero name, mod
+      end
+
+      def __say_zero name, mod
+
         "#{ mod.name }::( ~ #{ name.as_slug } ) #{
           }must be but does not appear to be defined in #{
            }#{ @load_file_path }"
+      end
+
+      def __say_ambiguous const_a, name, mod
+
+        "unhandled ambiguity - #{ name.as_slug.inspect } resolves to #{
+         }#{ mod.name }::( #{ const_a * ' AND ' } )"
       end
     end
 
     EXTNAME = EXTNAME_ = '.rb'.freeze
 
     class Normpath_
+
       def initialize parent_pn, file_entry, dir_entry
         @dir_entry = dir_entry ; @file_entry = file_entry
         block_given? and yield self
@@ -956,9 +1013,11 @@ module Skylab::Callback
         @state_i = :not_loaded
         @value_is_known = false
       end
+
       def to_path  # #todo:during-development
         @norm_pathname.to_path
       end
+
       SANITY_CHECK__ = -> do
         h = {}
         -> pn do
@@ -968,9 +1027,11 @@ module Skylab::Callback
             }entry tree redundantly created for #{ pn }"
         end
       end.call
+
       def can_produce_load_file_path
         @file_entry || has_corefile
       end
+
       def get_load_file_path
         @file_entry or self._NO_LOAD_FILE_PATH_BECAUSE_NO_FILE_ENTRY
         @norm_pathname.to_path
@@ -979,17 +1040,19 @@ module Skylab::Callback
       # ~~ experimental association of normpath with node value
 
       attr_reader :value_is_known
+
       def set_value x
-        @value_is_known and raise say_value_already_known( x )
+        @value_is_known and raise __say_value_already_known( x )
         @value_is_known = true
         @value_x = x ; nil
       end
+
       def known_value
         @value_is_known or self._VALUE_NOT_KNOWN
         @value_x
       end
-    private
-      def say_value_already_known x
+
+      def __say_value_already_known x
         ick = -> x_ { ::Module === x_ ? x_ : "a #{ x_.class }" }
         "can't associate normpath with #{ ick[ x ] }. it is already #{
           }associated with #{ ick[ @value_x ] } (for #{ @norm_pathname })."
@@ -1041,6 +1104,7 @@ module Skylab::Callback
     end
 
     module Methods__
+
       def autoloaderize_with_normpath_value np, x
         np.set_value x
         _is_module_esque = x.respond_to? :module_exec  # not all x are modules.
@@ -1055,12 +1119,12 @@ module Skylab::Callback
             # [#032] document why & when this gets here (e.g via the [sg] client)
           else
             # when dir exists but no file, WTF
-            x.set_entry_tree np
+            x.__set_entry_tree np
           end
         end ; nil
       end
-    protected
-      def set_entry_tree x
+
+    protected def __set_entry_tree x
         did_resolve_entry_tree and self._SANITY
         @did_resolve_entry_tree = true
         @any_built_entry_tree = x ; nil
@@ -1075,10 +1139,9 @@ module Skylab::Callback
         some_dir_pathname.to_path
       end
       def some_dir_pathname
-        @dir_pn ||= bld_dpn
+        @dir_pn ||= __build_dir_pathname
       end
-    private
-      def bld_dpn
+      def __build_dir_pathname
         @parent_pn.join @file_entry.corename
       end
       SNGL_LTR = 'F'.freeze
@@ -1096,13 +1159,14 @@ module Skylab::Callback
     # ~ the entry tree sub-story
 
     module Methods__
+
       def entry_tree
-        @did_resolve_entry_tree ||= rslv_entry_tree_by_looking_upwards
+        @did_resolve_entry_tree ||= __resolve_entry_tree_by_looking_upwards
         @any_built_entry_tree
       end
       attr_reader :did_resolve_entry_tree
-    private
-      def rslv_entry_tree_by_looking_upwards
+
+      def __resolve_entry_tree_by_looking_upwards
         any_dpn = dir_pathname
         apm = autoloader_parent_module or self._HOLE
         apm.respond_to? :entry_tree and pet = apm.entry_tree
@@ -1272,30 +1336,36 @@ module Skylab::Callback
     # ~ the state sub-story
 
     class Normpath_
+
       attr_reader :state_i
+
       def method_name_for_state
         METHODS__.fetch @state_i
       end
+
       METHODS__ = {
-        not_loaded: :rslv_some_x_when_not_loaded,
-        loading: :rslv_some_x_when_loading,
-        loaded: :rslv_some_x_when_loaded
+        not_loaded: :__result_when_not_loaded,
+        loading: :__result_when_loading,
+        loaded: :__result_when_loaded
       }
+
       STATES__ = {
         not_loaded: { loading: true, loaded: true },
         loading: { loaded: true },
         loaded: { }  # EMPTY_H_
       }
+
       def assert_state i
         @state_i == i or fail "expected state '#{ i }' had '#{ @state_i }' #{
           }for node #{ @norm_pathname }"
       end
+
       def change_state_to i
-        STATES__.fetch( @state_i )[ i ] or raise say_bad_state_transition( i )
+        STATES__.fetch( @state_i )[ i ] or raise __say_bad_state_transition( i )
         @state_i = i ; nil
       end
-    private
-      def say_bad_state_transition i
+
+      def __say_bad_state_transition i
         a = STATES__[ @state_i ].keys
         _s = if a.length.zero?
           "'#{ i }' is a final state and does not transition to any others"
@@ -1310,9 +1380,8 @@ module Skylab::Callback
     # ~ the loaded story
 
     class Const_Missing_
-    private
-      def rslv_some_x_when_loaded
-        fzzy_lookup method :rslv_some_x_via_different_casing_or_scheme
+      def __result_when_loaded
+        _fuzzy_lookup method :_result_via_different_casing_or_scheme
       end
     end
 
@@ -1328,7 +1397,8 @@ module Skylab::Callback
 
     class Const_Missing_
 
-      def rslv_some_x_when_stowaway  # [cu] relies on this heavily
+      def __result_when_stowaway  # [cu] relies on this heavily
+
         x = @mod.stowaway_h.fetch @name.as_const
         if x.respond_to? :split
           Autoloader::Stowaway_Actors__::Produce_x[ self, x ]
@@ -1381,16 +1451,18 @@ module Skylab::Callback
     # ~ the loading story (bolsters two others)
 
     class Const_Missing_
-      def rslv_some_x_when_loading  # :#spot-1
-        @mod.produce_autoloderized_module_for_const_missing self
+
+      def __result_when_loading  # :#spot-1
+        @mod.__produce_autoloderized_module_for_const_missing self
       end
+
       def some_normpath
         @normpath or self._NO_NORMPATH
       end
     end
 
     module Methods__
-      def produce_autoloderized_module_for_const_missing cm
+      def __produce_autoloderized_module_for_const_missing cm
         # assume this is coming from code in a written file and so
         # the received name is the correct casing / scheme
         np = cm.some_normpath
@@ -1404,10 +1476,13 @@ module Skylab::Callback
     # :#the-directory-story
 
     class Const_Missing_
+
     private
-      def rslv_some_x_when_directory  # [#024]:find-some-file
+
+      def __result_when_directory  # [#024]:find-some-file
+
         make_adjunct_chain
-        rslv_adjunct_value
+        __resolve_adjunct_value
         @adjunct_chain.length > 1 and cleanup_adjuct_chain
         @adjunct_value
       end
@@ -1438,10 +1513,11 @@ module Skylab::Callback
         @norm_pathname.to_path
       end
 
-      def rslv_adjunct_value
+      def __resolve_adjunct_value
+
         the_target_normpath = @normpath
         @normpath = @adjunct_chain.last  # eew/meh
-        load_normpath  # #spot-1
+        _load_normpath  # #spot-1
         @normpath = the_target_normpath
         @adjunct_value = lookup_x_after_loaded
         @normpath = the_target_normpath
@@ -1450,7 +1526,8 @@ module Skylab::Callback
           @mod.autoloaderize_with_normpath_value @normpath, @adjunct_value
           @normpath.change_state_to :loaded
         end
-        @adjunct_value.did_resolve_entry_tree or self._SANITY ; nil
+        @adjunct_value.did_resolve_entry_tree or self._SANITY
+        NIL_
       end
 
       def cleanup_adjuct_chain  # [#024]:created-modules
@@ -1464,7 +1541,7 @@ module Skylab::Callback
             if :loading == np.state_i
               np.change_state_to :loaded
             end
-            mod = fzzy_lookup_name_in_mod np.name_for_lookup, from_mod
+            mod = fuzzy_lookup_name_in_module_ np.name_for_lookup, from_mod
             from_mod.autoloaderize_with_normpath_value np, mod
           end
           if np.has_directory and d < last ||

@@ -2,31 +2,41 @@ require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - to-do", wip: true do
+  describe "[sg] models - to-do" do
 
     extend TS_
+    use :expect_event
 
     context 'this is a hack [#068]' do
 
       it "but will try to skip false matches" do
+
         @result = subject
-        expect :info_event, :did_not_match do |ev|
-          str = render_terminal_event ev
-          str.should match %r(\Askipping a line that matched via `grep`)
-          ev = ev.ev
-          ev.pn.to_path.should eql '(poth)'
+        __expect_this
+      end
+
+      def __expect_this
+
+        expect_neutral_event :did_not_match do | ev |
+
+          black_and_white( ev ).should match(
+            %r(\Askipping a line that matched via `grep`) )
+
+          ev.path.should eql '(poth)'
           ev.line.should match %r(\A@#{}todo\.blah )
           ev.line_number.should eql 33
         end
+
+        expect_no_more_events
       end
     end
 
     def subject
-      Snag_::Models::ToDo.build( * args )
+      Snag_::Models_::To_Do.build( * args, & handle_event_selectively )
     end
 
     def args
-      [ line_s, line_number_string, path, pattern_s, listener_spy ]
+      [ line_s, line_number_string, path, pattern_s ]
     end
 
     def line_s
@@ -42,7 +52,7 @@ module Skylab::Snag::TestSupport
     end
 
     def pattern_s
-      Snag_::Models::ToDo.default_pattern_s
+      Snag_::Models_::To_Do.default_pattern_s
     end
   end
 end

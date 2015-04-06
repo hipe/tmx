@@ -69,6 +69,10 @@ module Skylab::Snag::TestSupport
     def subject_API  # #hook-out for expect event
       Snag_::API
     end
+
+    def black_and_white_expression_agent_for_expect_event  # ditto
+      Snag_.lib_.brazen::API.expression_agent_instance
+    end
   end
 
   module Expect_CLI

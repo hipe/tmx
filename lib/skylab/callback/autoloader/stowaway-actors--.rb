@@ -114,24 +114,67 @@ module Skylab::Callback
       end
 
       def finish_np_a
-        d = -1 ; mod = @mod
+
+        d = -1
+        mod = @mod
+
         begin
+
           np = @np_a.fetch d += 1
+
           if np.value_is_known
-            x_ = np.known_value
+            x = np.known_value
+
           else
             np.change_state_to :loaded
-            is_broken = false ; const_i = nil
-            @const_missing.fzzy_lookup_name_in_mod np.name_for_lookup, mod,
-              -> c { const_i = c }, -> { is_broken = true }
-            is_broken and break
-            x_ = mod.const_get const_i, false
-            # as soon as one of these nodes it not defined, the chain of
-            # isomorphicisms is broken and we need not look any further
-            mod.autoloaderize_with_normpath_value np, x_
+
+            is_broken = false
+            many = nil
+
+            const_i = @const_missing.fuzzy_lookup_name_in_module_(
+
+              np.name_for_lookup, mod,
+
+              -> x_ { x_ },  # IDENTITY_ when exactly one is found, result is const
+
+              -> { is_broken = true ; false },  # when none
+
+              -> const_a { many = const_a ; false } )  # when many
+
+            if is_broken
+
+              # as soon as one of these nodes is not defined, the chain of
+              # isomorphicisms is broken and we need not look any further
+
+              break
+            end
+
+            if many
+              x = nil
+            else
+              x = mod.const_get const_i, false
+              mod.autoloaderize_with_normpath_value np, x
+            end
+
           end
-          mod = x_
-        end while d < @last_d ; nil
+          mod = x
+
+          if d < @last_d
+
+            if many
+              fail __say_this_failure( many, mod )
+            end
+            redo
+          end
+          break
+        end while nil
+
+        NIL_
+      end
+
+      def __say_this_failure const_a, mod
+
+        "ambiguous: #{ mod.name }::( #{ const_a * ' AND ' } )"
       end
 
       def produce_some_value

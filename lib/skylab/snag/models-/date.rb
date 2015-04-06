@@ -2,15 +2,19 @@ module Skylab::Snag
 
   class Models_::Date
 
+    Actions = THE_EMPTY_MODULE_
+
     class << self
 
       def normalize_argument arg, & oes_p  # :+[#ba-027]
 
         if arg.is_known_known
 
-          if RX__ =~ arg.value_x
-            arg
+          if RX___ =~ arg.value_x
+
+            arg.new_with_value new arg.value_x
           else
+
             oes_p.call :error, :invalid_date do
               __build_invalid_date_event arg.value_x
             end
@@ -28,11 +32,11 @@ module Skylab::Snag
 
     RX___ = %r{ \A \d{4} - \d{2} - \d{2} \z }x
 
-    Actions = THE_EMPTY_MODULE_
+    def initialize valid_s
 
-    def initialize x
-      self._CHECK_THIS
-      @x = x
+      @string = valid_s.frozen? ? valid_s : valid_s.freeze
     end
+
+    attr_reader :string
   end
 end
