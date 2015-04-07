@@ -65,8 +65,8 @@ module Skylab::SubTree
 
     class Expression_Agent
 
-      def initialize parti
-        @partitions = parti
+      def initialize cp
+        @categorized_properties = cp
       end
 
       alias_method :calculate, :instance_exec
@@ -114,8 +114,8 @@ module Skylab::SubTree
 
       def par_via_sym sym
 
-        if @partitions
-          cat_sym, prp = @partitions.category_symbol_and_property_via_name_symbol sym
+        if @categorized_properties
+          cat_sym, prp = @categorized_properties.category_symbol_and_property_via_name_symbol sym
         end
 
         _par prp, cat_sym, sym
@@ -123,8 +123,8 @@ module Skylab::SubTree
 
       def par prp
 
-        if @partitions
-          cat_sym, = @partitions.category_symbol_and_property_via_name_symbol( prp.name_symbol )
+        if @categorized_properties
+          cat_sym, = @categorized_properties.category_symbol_and_property_via_name_symbol( prp.name_symbol )
         end
 
         _par prp, cat_sym, prp.name_symbol
@@ -134,7 +134,7 @@ module Skylab::SubTree
 
         if cat_sym
 
-          send @partitions.rendering_method_name_for_property_category_name_symbol( cat_sym ), prp
+          send @categorized_properties.rendering_method_name_for_property_category_name_symbol( cat_sym ), prp
 
         else
           _ = if prp

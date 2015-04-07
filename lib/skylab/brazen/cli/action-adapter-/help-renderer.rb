@@ -16,7 +16,7 @@ module Skylab::Brazen
           @section_a = []
           @section_separator_p = -> { @y << nil }
           @y = ::Enumerator::Yielder.new( & ad.stderr.method( :puts ) )
-          ad.partitions.receive_help_renderer self
+          ad.categorized_properties.receive_help_renderer self
           screen_boundary
         end
 

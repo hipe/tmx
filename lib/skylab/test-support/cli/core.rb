@@ -25,7 +25,7 @@ module Skylab::TestSupport
           nil
         end
 
-        def parse_options
+        def bound_call_from_parse_options
           # don't let the option parser swallow the '--' "early"
           nil
         end

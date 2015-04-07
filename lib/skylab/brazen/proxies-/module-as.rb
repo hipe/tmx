@@ -74,6 +74,10 @@ module Skylab::Brazen
 
         _acr.to_lower_action_class_stream_
       end
+
+      def to_kernel
+        @kernel
+      end
     end
   end
 end

@@ -46,10 +46,10 @@ module Skylab::Brazen
 
       def execute
         _common_post_init
-        resolve_bound_call
+        produce_bound_call
       end
 
-      def resolve_bound_call
+      def produce_bound_call
         _ok = __resolve_bound_action
         _ok && __via_bound_action_resolve_bound_call
         @bound_call

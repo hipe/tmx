@@ -15,15 +15,20 @@ module Skylab::Brazen::TestSupport::Datastores__Couch__Actions__Add
     extend TS_
 
     it "with no name: missing required property: argument error" do
-      -> do
+      begin
         call_API :datastore, :couch, :add
-      end.should raise_error ::ArgumentError, /\bmissing required properties 'workspace-path' and 'name'/
+      rescue ::ArgumentError => e
+      end
+      e.message.should match(
+        /\bmissing required properties 'workspace-path' and 'name'/ )
     end
 
     it "with no workspace path: missing required property: argument error" do
-      -> do
+      begin
         call_API :datastore, :couch, :add, :name, 'zeep'
-      end.should raise_error ::ArgumentError, /\bmissing required property 'workspace-path'/
+      rescue ::ArgumentError => e
+      end
+      e.message.should match( /\bmissing required property 'workspace-path'/ )
     end
 
     it "with a noent workspace path" do

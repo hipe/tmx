@@ -15,8 +15,8 @@ module Skylab::Brazen
         end
       end  # >>
 
-      def initialize partitions
-        @partitions = partitions
+      def initialize cp
+        @categorized_properties = cp
       end
 
       attr_writer :current_property
@@ -28,7 +28,7 @@ module Skylab::Brazen
       end
 
       def app_name
-        @partitions.adapter.bound_.kernel_.app_name  # ick/meh
+        @categorized_properties.adapter.bound_.kernel_.app_name  # ick/meh
       end
 
       def s * x_a
@@ -69,7 +69,7 @@ module Skylab::Brazen
       end
 
       def par prop
-        _unstyled = send @partitions.rendering_method_name_for_property( prop ), prop
+        _unstyled = send @categorized_properties.rendering_method_name_for_property( prop ), prop
         highlight _unstyled
       end
 
@@ -110,7 +110,7 @@ module Skylab::Brazen
       end
 
       def render_property_as__environment_variable__ prp
-        @partitions.adapter.environment_variable_name_string_via_property prp
+        @categorized_properties.adapter.environment_variable_name_string_via_property prp
       end
 
       def render_prop_as_unknown prop
@@ -136,12 +136,14 @@ module Skylab::Brazen
       end
 
       Singleton_instance__ = Callback_.memoize do
-        _partitions = LIB_.proxy_lib.
+
+        _categorized_properties = LIB_.proxy_lib.
+
           inline :rendering_method_name_for_property, -> prp do
             :render_property_as_unknown
           end
 
-        new _partitions
+        new _categorized_properties
       end
     end
   end

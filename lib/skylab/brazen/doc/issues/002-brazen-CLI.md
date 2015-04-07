@@ -25,13 +25,13 @@ resolved.
 the top node and the non-top branch nodes are similar but not the same.
 the top node is like a non-top branch node with some added
 responsibility and public API methods. likewise the non-top branch node
-will have behavior that is differnt than the top node, namely that the
+will have behavior that is different than the top node, namely that the
 former has a parent and the latter does not.
 
 leaf nodes always have parents and never have children hence they are
 different from the other two kinds of nodes discussed so far. however
 all three have behavior in common, namely that they all parse options
-and output help screens, to naame a few.
+and output help screens.
 
 hence, 'invocation' is the abstract base class to rule them all. 'branch
 invocation' is yet another abstract base class childing off the first,
@@ -141,7 +141,47 @@ trailing optional.
 
 
 
-## :#note-600
+## property categorization :#note-600
+
+a central feature of [br] CLI, property categorization is a concrete
+manifestion of the whole underlying [br] experiment, one that traces its
+lineage years back to [hl]: the model models its action's properties
+with metadata that is processed by the modality to make design
+decisions about how to express the various properties using appropriate
+modality-specific mechanics.
+
+in an imaginary simple implementation that still exhibits our main
+objective, each property would either be optional or required. each
+former would be expressed as a CLI option, and each latter as a CLI
+argument.
+
+while this would work for some actions, it has some aesthetic and some
+functional shortcomings:
+
+  • under some circumstances, the (any) final would-be option can be
+    expressed as an optional positional argument (more on this below),
+    which is more usable.
+
+  • properties with polyadic argument arities (i.e those that take
+    more than one value) are most usable when they are expressed
+    (when possible) as globbed positional arguments (more on this
+    below).
+
+some specific (and experimental) "rules" for this modality, see in the
+couterpart code (roughly in code order):
+
+  • if a property is tagged as `hidden`, it can be read in from the
+    environment but otherwise gets no direct expression in the UI.
+    the design of this needs to change - the model probably shouldn't
+    know what the environment is.
+
+
+
+
+
+
+
+## :#note-610
 
 sadly we still have some cases to filter out. in the cases where
 properties are actually "officious" options (things like --version and

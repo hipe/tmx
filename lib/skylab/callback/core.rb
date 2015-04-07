@@ -665,6 +665,10 @@ module Skylab::Callback
         @tec ||= new EMPTY_P_, :call
       end
 
+      def via_this & p
+        new nil, p, :call
+      end
+
       def via_value x, & p
         new nil, -> { x }, :call, & p
       end

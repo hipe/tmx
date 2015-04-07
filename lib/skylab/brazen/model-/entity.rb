@@ -146,15 +146,15 @@ module Skylab::Brazen
         class self::Entity_Property
 
           def argument_is_required  # *not the same as* parameter is required
-            :one == @argument_arity or :one_or_more == @argument_arity
+            :one == @argument_arity || :one_or_more == @argument_arity
           end
 
           def takes_argument
-            :one == @argument_arity
+            :zero != @argument_arity
           end
 
           def takes_many_arguments
-            :zero_or_more == @argument_arity or :one_or_more == @argument_arity
+            :zero_or_more == @argument_arity || :one_or_more == @argument_arity
           end
 
         private
@@ -451,6 +451,14 @@ module Skylab::Brazen
       # • misc for nomenclature, description, etc.
 
         class self::Entity_Property
+        private
+
+          def name_symbol=
+            @name = Callback_::Name.via_variegated_symbol iambic_property
+            KEEP_PARSING_
+          end
+
+        public
 
           def has_custom_moniker  # [#014] maybe a smell, maybe not
             false

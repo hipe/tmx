@@ -2,124 +2,268 @@ module Skylab::Snag
 
   class Models_::To_Do
 
-    module Actions::Tree
+    Modalities = ::Module.new
 
-    # <-
+    module Modalities::CLI
 
-    if false  # :#here
-    def initialize *a
-      @do_pretty, @delegate = a
-      @is_valid = true
-      @glyphset_i = :wide  # narrow or wide
-      @todo_a = []
-    end
+      Actions = ::Module.new
 
-    attr_reader :is_valid
+      class Actions::To_Stream < Brazen_::CLI::Action_Adapter
 
-    attr_writer :glyphset_i
+        # we hack properties, do custom event handling, and hack expression
 
-    def if_valid_add_todo_to_tree todo
-      collapsed = todo.collapse @delegate
-      if collapsed
-        @todo_a.push collapsed
-      else
-        @is_valid = false
-      end ; nil
-    end
+        # ~ override parrent to create a custom dispatcher off of bound
 
-    def render
-      rndr = Render__.new @do_pretty, @todo_a, @delegate
-      rndr.glyphset_i = @glyphset_i
-      rndr.render
-    end
+        def initialize unbound, boundish
 
-    class Render__
+          @be_verbose = false
+          @bound = unbound.new boundish do | * i_a, & ev_p |
 
-      def initialize *a
-        @do_pretty, @todo_a, @delegate = a
-        @glyphset_i = nil
-      end
+            if :error == i_a.first
+              receive_uncategorized_emission i_a, & ev_p
+            else
+              i_a_ = i_a[ 2 .. -1 ].reverse
+              :info == i_a.first or i_a_.push i_a.first
+              i_a_.push i_a.fetch 1
+              _m = :"__receive__#{ i_a_ * UNDERSCORE_ }__"
+              send _m, i_a, & ev_p
+            end
+          end
 
-      attr_writer :glyphset_i
+          __init_counts
+        end
+        def __init_counts
+          d = 0
+          @skip_match_count_proc = -> { d }
+          @inc  = -> do
+            d += 1
+          end
+        end
 
-      def render
+        def _increment_count _
+          @inc[]
+          NIL_
+        end
+
+        # ~ we divide and mutate the formal properties, adding our own
+
+        def resolve_properties
+
+          bp = @bound.formal_properties
+          fp = bp.to_mutable_box_like_proxy
+
+          cls = @bound.class::Entity_Property
+
+          prp = cls.new_with :name_symbol, :verbose, :flag
+          fp.add prp.name_symbol, prp
+
+          prp = cls.new_with :name_symbol, :tree,
+            :parameter_arity, :zero_or_more,
+            :argument_arity, :zero,
+            :description, -> y do
+              y << "`-t` for black & white, `-tt` for color"
+            end
+          fp.add prp.name_symbol, prp
+
+          # @bound.change_formal_properties bp
+
+          @back_properties = bp
+          @front_properties = fp
+
+          NIL_
+        end
+
+        def receive__tree__option _, prp
+          increment_seen_count prp.name_symbol
+          NIL_
+        end
+
+        def receive__verbose__option _, _
+          @be_verbose = true
+          NIL_
+        end
+
+        # ~ the mandatory (per our custom event dispatcher) event handlers
+
+        def __receive__did_not_match__ i_a, & ev_p
+
+          if @be_verbose
+            receive_uncategorized_emission i_a, & ev_p
+          else
+
+            _increment_count :skip_match
+            NIL_
+          end
+        end
+
+        def __receive__find_command_args_event__ i_a, & ev_p
+
+          if @be_verbose
+            receive_uncategorized_emission i_a, & ev_p
+          end
+
+          NIL_
+        end
+
+        # ~ the conditionally custom expression behavior
+
+        def bound_call_via_bound_call_from_back bc  # :+[#br-060]
+
+          d = @seen_h[ :tree ]
+          if d
+
+            Callback_::Bound_Call.via_this do
+              __express_as_tree d, bc
+            end
+          else
+            bc
+          end
+        end
+
+        def __express_as_tree prettiness_d, bc
+
+          st = bc.receiver.send bc.method_name, * bc.args, & handle_event_selectively
+
+          st and begin
+            Actors_::Express_tree.with(
+              :item_stream, st,
+              :glyphset_category_symbol, :wide,  # narrow | wide
+              :do_pretty, ( 1 < prettiness_d ),
+              :skip_match_count_proc, @skip_match_count_proc,
+              :info_byte_downstream, @resources.serr,
+              :payload_byte_downstream, @resources.sout,
+              & handle_event_selectively )
+
+          end
+        end
+
+        Actors_ = ::Module.new
+
+        # <- 2
+
+    class Actors_::Express_tree
+
+      Callback_::Actor.call self, :properties,
+        :item_stream,
+        :glyphset_category_symbol,
+        :do_pretty,
+        :skip_match_count_proc,
+        :info_byte_downstream,
+        :payload_byte_downstream
+
+
+      def execute
 
         @tree = Snag_.lib_.basic::Tree.mutable_node.new
-        populate_and_crop_tree
-        resolve_producer
-        @producer and flush
+        populate_tree
+        prune_tree
+        resolve_line_stream
+        @line_stream and flush
       end
 
-    private
+      def populate_tree
 
-      def populate_and_crop_tree
-
+        st = @item_stream
         tree = @tree
+        count = 0
 
-        @todo_a.each do | todo |
+        st.each do | todo |  # it's a stream but we want the scope
+          count += 1
 
-          _path_a = todo.path.split( SEP___ ).push todo.line_number.to_s
+          _path_a = todo.path.split( SEP__ ).push todo.line_number.to_s
 
           tree.touch_node _path_a, :leaf_node_payload_proc, -> do
             todo
           end
         end
+        @item_count = count
+        NIL_
+      end
 
-        tree = @tree.any_only_child
-        if tree
-          @tree = tree  # comment out and see
+      def prune_tree
+
+        node = @tree
+        slug_s_a = nil
+
+        begin
+
+          node_ = node.any_only_child
+          node_ or break
+          s = node.slug
+          if slug_s_a
+            slug_s_a.push s
+          else
+            slug_s_a = []
+            if s
+              slug_s_a.push s  # only at root, allow root to have no slug
+            end
+          end
+          node = node_
+          redo
+        end while nil
+
+        if slug_s_a
+          slug_s_a.push node.slug
+          node.change_slug slug_s_a * SEP__
+          @tree = node
         end
 
         NIL_
       end
 
-      SEP___ = ::File::SEPARATOR
+      SEP__ = ::File::SEPARATOR
 
-      def resolve_producer
-        @producer = if @do_pretty
-          Build_pretty_tree_lines_producer___[ @tree, @glyphset_i ]
+      def resolve_line_stream
+        @line_stream = if @do_pretty
+          Build_pretty_tree_lines_stream___[ @tree, @glyphset_category_symbol ]
         else
-          Build_basic_tree_lines_producer___[ @tree, @glyphset_i ]
+          Build_basic_tree_lines_stream___[ @tree, @glyphset_category_symbol ]
         end
       end
 
       def flush
 
+        bd = @payload_byte_downstream
+        st = @line_stream
         begin
-          line = @producer.gets
+          line = st.gets
           line or break
-          @delegate.receive_payload_line line
+          bd.puts line
           redo
         end while nil
 
-        NEUTRAL_
+        d = @skip_match_count_proc[]
+        _s = if d.nonzero?
+          ", skipped #{ d } from grep"
+        else
+          ' total'
+        end
+
+        @info_byte_downstream.puts "(found #{ @item_count } to do's#{ _s })"
+
+        ACHIEVED_
       end
     end
 
-    class Build_basic_tree_lines_producer___
+    class Build_basic_tree_lines_stream___
 
-      Snag_::Model_::Actor[ self,
-        :properties, :tree, :glyphset ]
+      Callback_::Actor.call self, :properties,
+        :tree, :glyphset
 
       def initialize( * )
         super
-        @glyphset_i ||= :wide  # wide or narrow
+        @glyphset_category_symbol ||= :wide  # wide or narrow
       end
 
       def execute
 
-        st = @tree.to_classified_stream_for :text,
-          :glyphset_identifier_x, @glyphset_i
+        _st = @tree.to_classified_stream_for :text,
+          :glyphset_identifier_x, @glyphset_category_symbol
 
-        Callback_::Scn.new do
-          card = st.gets
-          if card
-            line_via_card card
-          end
+        _st.map_by do | card |
+          line_via_card card
         end
       end
-
-    private
 
       def line_via_card card
         prefix_s = card.prefix_string
@@ -139,14 +283,14 @@ module Skylab::Snag
       end
     end
 
-    class Build_pretty_tree_lines_producer___
+    class Build_pretty_tree_lines_stream___
 
-      Snag_::Model_::Actor[ self,
-        :properties, :tree, :glyphset ]
+      Callback_::Actor.call self, :properties,
+        :tree, :glyphset
 
       def initialize( * )
         super
-        @glyphset_i ||= :wide  # wide or narrow
+        @glyphset_category_symbol ||= :wide  # wide or narrow
         @line_num_style_a = [ :strong, :yellow ].freeze
         @path_style_a = [ :strong, :green ].freeze
         @tag_style_a = [ :reverse, :yellow ].freeze  # #etc
@@ -163,14 +307,12 @@ module Skylab::Snag
         via_cache_build_stream
       end
 
-    private
-
       def build_cache
 
         y = []
 
         st = @tree.to_classified_stream_for :text,
-          :glyphset_identifier_x, @glyphset_i
+          :glyphset_identifier_x, @glyphset_category_symbol
 
         card = st.gets
         if card.node.children_count.zero?
@@ -235,6 +377,13 @@ module Skylab::Snag
       end
 
       Item__ = ::Struct.new :s, :d, :todo
+    end
+
+    # -> 2
+
+      end
+
+      UNDERSCORE_ = '_'
     end
   end
 end

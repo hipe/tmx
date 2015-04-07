@@ -12,6 +12,11 @@ module Skylab::Basic
         @slug = slug
       end
 
+      def change_slug s
+        @slug = s
+        NIL_
+      end
+
       # ~ readers as parent
 
       def to_classified_stream_for modality_symbol, * x_a

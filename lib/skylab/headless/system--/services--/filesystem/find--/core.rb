@@ -239,6 +239,16 @@ module Skylab::Headless
           end
         end
 
+        def express_into_under y, expag
+
+          if @args
+            Command_Args_Event__[ @args ].express_into_under y, expag
+            ACHIEVED_
+          else
+            UNABLE_
+          end
+        end
+
         def __resolve_valid_command_args  # amazing hax #note-130
           otr = dup
           otr.extend Command_Building_Methods__  # pattern :+[#sl-144]

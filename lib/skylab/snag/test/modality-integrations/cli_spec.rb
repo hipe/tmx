@@ -6,10 +6,7 @@ module Skylab::Snag::TestSupport
 
     extend TS_
 
-    use :expect_CLI,
-      :subject_CLI, -> { Snag_::CLI },
-      :program_name, 'sn0g',
-      :generic_error_exitstatus, -> { Snag_.lib_.brazen::CLI::GENERIC_ERROR_ }
+    use :expect_my_CLI
 
     expecting_rx = %r{\Aexpecting <action>\z}i
 

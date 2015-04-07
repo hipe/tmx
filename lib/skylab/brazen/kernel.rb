@@ -38,7 +38,7 @@ module Skylab::Brazen
         i_a,
         bx,
         self,
-        & x_p ).resolve_bound_call
+        & x_p ).produce_bound_call
     end
 
     # ~ client exposures

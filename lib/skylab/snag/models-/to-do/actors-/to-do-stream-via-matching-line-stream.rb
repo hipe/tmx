@@ -58,7 +58,7 @@ module Skylab::Snag
 
       def __when_no_matches line_o
 
-        @on_event_selectively.call :error, :did_not_match do
+        @on_event_selectively.call :info, :did_not_match do
           __build_did_not_match_event line_o
         end
       end

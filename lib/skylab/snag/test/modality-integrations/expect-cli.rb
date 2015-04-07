@@ -4,20 +4,30 @@ module Skylab::Snag::TestSupport
 
     class << self
 
-      remove_method :[]  # until etc
+      def new_with * x_a
+        Modifiers___.new x_a
+      end
+    end  # >>
 
-      def [] tcm, x_a
+    class Modifiers___
+
+      def initialize x_a
+        @p_a = []
+        x_a.each_slice 2 do | sym, x |
+          send :"__#{ sym }__", x
+        end
+      end
+
+      def [] tcm
 
         tcm.extend Module_Methods___
 
         tcm.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
         tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
-        tcm.include self
-
-        x_a.each_slice 2 do | sym, x |
-          send :"__#{ sym }__", x
+        tcm.include Expect_CLI_
+        @p_a.each do | p |
+          p[ tcm ]
         end
-
         NIL_
       end
 
@@ -30,26 +40,36 @@ module Skylab::Snag::TestSupport
           end
           x
         end
+        @p_a.push -> tcm do
 
-        define_method :result_for_failure_for_expect_stdout_stderr do
-          p_[]
+          tcm.send :define_method, :result_for_failure_for_expect_stdout_stderr do
+            p_[]
+          end
         end
+        NIL_
       end
 
       def __program_name__ x
 
         a = [ x ].freeze
 
-        define_method :invocation_strings_for_expect_stdout_stderr do
-          a
+        @p_a.push -> tcm do
+
+          tcm.send :define_method, :invocation_strings_for_expect_stdout_stderr do
+            a
+          end
         end
         NIL_
       end
 
       def __subject_CLI__ p
 
-        define_method :subject_CLI do
-          p[]
+        @p_a.push -> tcm do
+
+          tcm.send :define_method, :subject_CLI do
+            p[]
+          end
+          NIL_
         end
       end
     end  # >>
@@ -102,5 +122,7 @@ module Skylab::Snag::TestSupport
         expect_failed
       end
     end
+
+    Expect_CLI_ = self
   end
 end

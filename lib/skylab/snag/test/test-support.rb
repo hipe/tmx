@@ -75,16 +75,25 @@ module Skylab::Snag::TestSupport
     end
   end
 
-  module Expect_CLI
+  Expect_My_CLI = -> do
 
-    class << self
-      def [] tcm, x_a
+    p = -> tcm do
 
-        require TS_.dir_pathname.join( 'modality-integrations/expect-cli' ).to_path
-        self[ tcm, x_a ]
-      end
-    end  # >>
-  end
+      require TS_.dir_pathname.join( 'modality-integrations/expect-cli' ).to_path
+
+      p = TS_::Expect_CLI.new_with(
+        :subject_CLI, -> { Snag_::CLI },
+        :program_name, 'sn0g',
+        :generic_error_exitstatus,
+          -> { Snag_.lib_.brazen::CLI::GENERIC_ERROR_ } )
+
+      p[ tcm ]
+    end
+
+    -> tcm do
+      p[ tcm ]
+    end
+  end.call
 
   Expect_Event = -> tcm, x_a=nil do
     Callback_.test_support::Expect_Event[ tcm, x_a ]

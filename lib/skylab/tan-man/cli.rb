@@ -67,8 +67,8 @@ module Skylab::TanMan
 
     class Expression_Agent
 
-      def initialize partitions
-        @kernel = partitions.adapter.application_kernel
+      def initialize cp
+        @kernel = cp.adapter.application_kernel
       end
 
       attr_writer :current_property

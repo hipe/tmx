@@ -11,9 +11,10 @@ module Skylab::Snag
       end
     end  # >>
 
-    DEFAULT_PATTERN_STRINGS___ = [ '[@#]todo\>'.freeze ]
+    DEFAULT_PATTERN_STRINGS___ = [ '#todo\>'.freeze ]
 
     def initialize
+      @ending_of_message = nil
       yield self
       freeze
     end
@@ -38,8 +39,45 @@ module Skylab::Snag
       NIL_
     end
 
-    def beginning_of_header
-      @header_r.begin
+    def express_into_under y, expag
+
+      o = @_matching_line
+      y << "#{ o.path }:#{ o.line_number }:#{ o.full_source_line }"
+      ACHIEVED_
+    end
+
+    # ~ begin
+
+    def any_pre_tag_string
+
+      if @header_r.begin.nonzero?
+
+        full_source_line[ 0 ... @header_r.begin ]
+      end
+    end
+
+    def tag_string
+
+      full_source_line[ @body_r ]
+    end
+
+    def any_post_tag_string  # almost always exists b.c newline
+
+      s = full_source_line
+      d = @body_r.end
+      d_ = @ending_of_message
+      if d_
+        self._FUN  # #todo cover this
+      else
+        d_ = s.length
+      end
+      s[ d ... d_ ]
+    end
+
+    # ~ end
+
+    def full_source_line
+      @_matching_line.full_source_line
     end
 
     def line_number
@@ -49,6 +87,12 @@ module Skylab::Snag
     def path
       @_matching_line.path
     end
+
+    def beginning_of_header
+      @header_r.begin
+    end
+
+
 
     Autoloader_[ Actions = ::Module.new, :boxxy ]
     Autoloader_[ Actors_ = ::Module.new ]

@@ -23,7 +23,7 @@ module Skylab::Snag
 
       def __resolve_pattern_string_for_grep
 
-        @pattern_string_for_grep = @pattern_s_a * PIPE_FOR_GREP___
+        @pattern_string_for_grep = @pattern_s_a * PIPE_FOR_GREP___  # :+#security - this is a hole
         ACHIEVED_
       end
 
@@ -44,8 +44,13 @@ module Skylab::Snag
             [ '-exec', 'grep', '--line-number',
               '--with-filename', @pattern_string_for_grep, '{}', '+' ],
 
+          :freeform_query_infix_words,
+            COMMON___,
+
           & @on_event_selectively )
       end
+
+      COMMON___ = %w( -type f ).freeze
     end
   end
 end

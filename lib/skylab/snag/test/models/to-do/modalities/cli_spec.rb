@@ -2,65 +2,87 @@ require_relative '../../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - to-do - actions - to stream", wip: true do
+  describe "[sg] models - to-do - actions - to stream" do
 
     extend TS_
+    use :expect_my_CLI
 
-    with_invocation 'todo', 'find'
+    it "regular style - works, is hard to read and boring" do
 
-    with_tmpdir do |o|
-      o.write 'ferbis.rb', <<-O.unindent
-        alpha
-        beta ##{}todo
-        gamma
-      O
-      o.write 'jerbis/one.rb', <<-O.unindent
-        line one ##{}todo
-        line two
-        line three ##{}todo
-      O
+      invoke( * _action, '-p', _common_pattern, _some_todos )
+
+      __expect_regular_style
     end
 
-    it "regular style - works, is hard to read" do
-      setup_tmpdir_read_only
-      invoke '-p', "##{}todo\\>", '.'
-      expect :pay, %r{^\./ferbis\.rb:2:beta ##{}todo$}
-      expect :pay, %r{jerbis/one.rb.*\b1\b}
-      expect :pay, %r{jerbis/one\.rb.*\b3\b}
-      expect :info, /found 3 items/
+    def __expect_regular_style
+
+      expect :o, %r{/ferbis\.code:2:beta %to-dew\z}
+      expect :o, %r{jerbis/one\.code:1:line one\b}
+      expect :o, %r{jerbis/one\.code:3:line three\b}
+      expect :e, /\A\(3 to dos total\)\z/
+
+      expect_succeeded
     end
 
-    it "tree style - works" do
-      setup_tmpdir_read_only
-      invoke '-t', '-p', "##{}todo\\>", '.'
-      expect :info, /found 3 items/
-      expect :pay, /\.$/
-      expect :pay, /\bferbis\.rb\b/
-      expect :pay, /2.*beta ##{}todo/
-      expect :pay, /\bjerbis\b/
-      expect :pay, /\bone\.rb\b/
+    it "black and white tree" do
+
+      invoke( * _action, '-t', '-p', _common_pattern, _some_todos )
+
+      __expect_black_and_white_tree
     end
 
-    it "show command - works" do
-      setup_tmpdir_read_only
-      invoke '--cmd', '.'
-      expect :pay, /\Afind .+ grep\b/
+    def __expect_black_and_white_tree
+
+      on_stream :o
+      o = flush_to_content_scanner
+      ::File.basename( o.next_line.chop! ).should eql 'some-todos'
+      o.next_line.should eql "├── ferbis.code\n"
+      o.finish.should eql 5
+
+      _expect_common_finish
     end
 
-    context "pretty tree style" do
+    it "the `show_command` modifier short-circuits" do
 
-      with_tmpdir do |o|
-        o.clear
-        o.write 'meeple.rb', <<-O.unindent
-          one # %delegates %todo:#100.200.1
-        O
-        nil
+      invoke( * _action, '--show-command', '-p', 'zipperly', _some_todos )
+
+      expect :o, /\Agenerated `find` command: "find -f\b/
+      expect_result_for_success
+    end
+
+    it "colorized tree" do
+
+      invoke( * _action, '-t', '-t', '-p', _common_pattern, _some_todos )
+
+      on_stream :o
+      o = flush_to_content_scanner
+      o.advance_N_lines 2
+      o.next_line[ 0, 15 ].should eql "│  └── \e[1;33m2"
+      o.finish.should eql 4
+
+      _expect_common_finish
+    end
+
+    define_method :_action, -> do
+      a = [ 'to-do', 'to-stream' ]
+      -> do
+        a
       end
+    end.call
 
-      it "colorizes pretty -tt style even if ##{}todo is not at beginning" do
-        invoke '-p', '%todo\>', '-tt', '.'
-        output.lines.first.string.should match( /found 1 /)
-      end
+    define_method :_common_pattern, -> do
+      s = '%to-dew\>'
+      -> { s }
+    end.call
+
+    def _some_todos
+      Fixture_trees_[ :some_todos ]
+    end
+
+    def _expect_common_finish
+      on_stream :e
+      expect "(found 3 to do's total)"
+      expect_succeeded
     end
   end
 end

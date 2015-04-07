@@ -8,7 +8,7 @@ module Skylab::Basic
 
       # only by [sg]: seems like [bs] should use this too but where?
 
-      # a hack/placeholder for this idea: try to covert a grep pattern
+      # a hack/placeholder for this idea: try to convert a grep pattern
       # string ** for some unspecified set of distributions of grep **
       # to a platform regex string
       #
@@ -16,8 +16,8 @@ module Skylab::Basic
       # build the platform regex is b.c we may be building a composite
       # regex from a list of grep strings.
       #
-      # CAVEAT: this may not yet be cleaned out of all business
-      # specifics it gained in its point of origin ([sg]), and should
+      # CAVEAT: this is not yet be cleaned out of all business
+      # specifics it gained in its point of origin [sg]. it should
       # be as needed.
       #
       # currently this detect-transforms only these features:

@@ -65,10 +65,9 @@ module Skylab::Brazen
         end
 
         resolve_properties
-        resolve_partitions
-        resolve_bound_call
-        bc = @bound_call
-        x = bc.receiver.send @bound_call.method_name, * @bound_call.args, & bc.block
+        resolve_categorized_properties
+        bc = _some_bound_call
+        x = bc.receiver.send bc.method_name, * bc.args, & bc.block
         flush_any_invitations
         if x
           whn_result_is_trueish x
@@ -209,11 +208,7 @@ module Skylab::Brazen
         @front_properties = Properties__.new
       end
 
-      def resolve_partitions
-        @partitions = Build_partitions__[ to_full_inferred_prop_strm, self ]
-      end
-
-      def to_full_inferred_prop_strm
+      def _to_full_inferred_property_stream
         st = @front_properties.to_stream
         st.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :ellipsis
       end
@@ -238,33 +233,39 @@ module Skylab::Brazen
         exe.receiver.send exe.method_name, * exe.args
       end
 
-      def resolve_bound_call
+      def _some_bound_call
+
         if argv.length.zero?
-          resolve_bound_call_when_no_arguments
+
+          _bound_call_when_no_arguments
+
         elsif DASH_BYTE_ == argv.first.getbyte( 0 )
-          resolve_bound_call_when_looks_like_option_for_first_argument
+
+          __bound_call_via_option_looking_first_arg
         else
-          resolve_bound_call_when_looks_like_action_for_first_argument
+          _bound_call_via_action_looking_first_argument
         end
       end
 
-      def resolve_bound_call_when_no_arguments
-        @bound_call = CLI_::When_::No_Arguments.new action_prop, help_renderer
+      def _bound_call_when_no_arguments
+        CLI_::When_::No_Arguments.new action_prop, help_renderer
       end
 
       def action_prop
         @front_properties.fetch :action
       end
 
-      def resolve_bound_call_when_looks_like_action_for_first_argument
+      def _bound_call_via_action_looking_first_argument
 
         token = @resources.argv.shift
         @adapter_a = find_matching_action_adapters_against_tok token
 
-        @bound_call = case 1 <=> @adapter_a.length
+        case 1 <=> @adapter_a.length
 
         when  0
-          __via_one_adapter_produce_bound_call
+          @adapter = @adapter_a.fetch 0
+          @adapter_a = nil
+          __bound_call_via_adapter
 
         when  1
           _bound_call_for_unrecognized_via token
@@ -273,8 +274,6 @@ module Skylab::Brazen
           _bound_call_for_ambiguous_via @adapter_a, token
 
         end
-
-        NIL_
       end
 
     public
@@ -425,33 +424,34 @@ module Skylab::Brazen
         CLI_::When_::No_Matching_Action.new token, help_renderer, self
       end
 
-      def resolve_bound_call_when_looks_like_option_for_first_argument
+      def __bound_call_via_option_looking_first_arg
+
         prepare_to_parse_parameters
-        parse_options
-        @bound_call or resolve_bound_call_when_options_parsed
+        bc = bound_call_from_parse_options
+        bc or _bound_call_via_parsed_options
       end
 
-      def resolve_bound_call_when_options_parsed
+      def _bound_call_via_parsed_options
         if @mutable_backbound_iambic.length.zero?
           if argv.length.zero?
-            resolve_bound_call_when_no_arguments
+            _bound_call_when_no_arguments
           else
-            resolve_bound_call_when_looks_like_action_for_first_argument
+            _bound_call_via_action_looking_first_argument
           end
         else
-          __resolve_bound_call_when_options_parsed_successfully
+          __bound_call_via_successfully_parsed_options
         end
       end
 
-      def __resolve_bound_call_when_options_parsed_successfully
+      def __bound_call_via_successfully_parsed_options
         a = [] ; scn = to_actual_parameters_stream
         scn.next
         begin
           i, x = scn.pair
           cls = bound_call_class_via_option_property_name_i i
           a.push cls.new( x, help_renderer, self )
-        end  while scn.next
-        @bound_call = Aggregate_Bound_Call__.new a
+        end while scn.next
+        Aggregate_Bound_Call__.new a
       end
 
       def to_actual_parameters_stream
@@ -464,12 +464,9 @@ module Skylab::Brazen
           new adapter_a, token, help_renderer
       end
 
-      def __via_one_adapter_produce_bound_call
+      def __bound_call_via_adapter
 
-        @adapter = @adapter_a.first
-        @adapter_a = nil
-        @adapter.receive_frame self
-        @adapter.via_argv_resolve_some_bound_call
+        @adapter.__bound_call_via_receive_frame self
       end
     end
 
@@ -490,13 +487,7 @@ module Skylab::Brazen
         [ * super ]
       end
 
-    private
-
-      def resolve_partitions
-        @partitions = Build_partitions__[ to_full_inferred_prop_strm, self ]
-      end
-
-      def to_full_inferred_prop_strm
+      def _to_full_inferred_property_stream
         if @front_properties
           @front_properties.to_stream
         else
@@ -504,27 +495,28 @@ module Skylab::Brazen
         end.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :help
       end
 
-    public def receive_show_help_ otr
+      def receive_show_help_ otr
         receive_frame otr
         help_renderer.output_help_screen
         SUCCESS_
       end
 
-      def resolve_bound_call
+      def _some_bound_call
+
         prepare_to_parse_parameters
-        parse_options
-        @bound_call or resolve_bound_call_when_options_parsed
+        bc = bound_call_from_parse_options
+        bc or _bound_call_via_parsed_options
       end
 
-      def resolve_bound_call_when_options_parsed
+      def _bound_call_via_parsed_options
         if @seen_h[ :help ]
-          resolve_bound_call_when_help_request
+          bound_call_for_help_request
         else
-          resolve_bound_call_when_any_args
+          __bound_call_via_ARGV
         end
       end
 
-      def resolve_bound_call_when_help_request
+      def bound_call_for_help_request  # :+#public-API
         a = []
         a.push bound_call_class_via_option_property_name_i( :help ).
            new( nil, help_renderer, self )
@@ -532,58 +524,68 @@ module Skylab::Brazen
           a.push CLI_::When_::Unhandled_Arguments.
             new argv, help_renderer
         end
-        @bound_call = Aggregate_Bound_Call__.new a
+        Aggregate_Bound_Call__.new a
       end
 
-    public def bound_call_class_for_help_option
+      def __bound_call_class_for__help__option
         When_Action_Help__
       end
 
-      def resolve_bound_call_when_any_args
+      def __bound_call_via_ARGV
+
         _n11n = Action_Adapter_::Arguments.normalization(
-          @partitions.arg_a || EMPTY_A_ )
+          @categorized_properties.arg_a || EMPTY_A_ )
+
         @arg_parse = _n11n.new_via_argv argv
+
         ev = @arg_parse.execute
         if ev
-          resolve_bound_call_when_ARGV_parsing_error_event ev
+          __bound_call_when_ARGV_parsing_error_event ev
         else
-          resolve_bound_call_when_ARGV_parsed
+          __bound_call_via_parsed_ARGV
         end
       end
 
-      def resolve_bound_call_when_ARGV_parsing_error_event ev
-        send :"resolve_bound_call_when_#{ ev.terminal_channel_i }_arguments", ev
+      def __bound_call_when_ARGV_parsing_error_event ev
+        send :"__bound_call_when__#{ ev.terminal_channel_i }__arguments", ev
       end
 
-      def resolve_bound_call_when_missing_arguments ev
-        @bound_call = CLI_::When_::Missing_Arguments.new ev, help_renderer
+      def __bound_call_when__missing__arguments ev
+        CLI_::When_::Missing_Arguments.new ev, help_renderer
       end
 
-      def resolve_bound_call_when_extra_arguments ev
-        @bound_call = CLI_::When_::Extra_Arguments.new ev, help_renderer
+      def __bound_call_when__extra__arguments ev
+        CLI_::When_::Extra_Arguments.new ev, help_renderer
       end
 
-      def resolve_bound_call_when_ARGV_parsed
+      def __bound_call_via_parsed_ARGV
+
         @mutable_backbound_iambic.concat @arg_parse.release_result_iambic
-        @partitions.env_a and process_environment
-        @bound_call or __via_mutable_backbound_iambic_resolve_some_bound_call
+
+        if @categorized_properties.env_a
+          bc = __process_environment
+        end
+
+        bc or begin
+          __bound_call_via_mutable_backbound_iambic
+        end
       end
 
-      def process_environment
+      def __process_environment
 
         env = @resources.env
 
-        @partitions.env_a.each do | prp |
+        @categorized_properties.env_a.each do | prp |
           s = env[ environment_variable_name_string_via_property prp ]
           s or next
           cased_i = prp.name_symbol.downcase  # [#039] casing
           @seen_h[ cased_i ] and next
           @mutable_backbound_iambic.push cased_i, s
         end
-        nil
+        NIL_
       end
 
-      public def environment_variable_name_string_via_property prp
+      def environment_variable_name_string_via_property prp
         "#{ __APPNAME }_#{ prp.name.as_lowercase_with_underscores_symbol.id2name.upcase }"
       end
 
@@ -591,31 +593,14 @@ module Skylab::Brazen
         @__APPNAME ||= application_kernel.app_name.gsub( /[^[:alnum:]]+/, EMPTY_S_ ).upcase
       end
 
-      def __via_mutable_backbound_iambic_resolve_some_bound_call
+      def __bound_call_via_mutable_backbound_iambic
 
         ok = via_bound_action_mutate_mutable_backbound_iambic @mutable_backbound_iambic
 
-        ok &&= __via_bound_action_and_mutated_backbound_iambic_resolve_bound_call
-
-        if ! ok
-
-          @bound_call = Callback_::Bound_Call.via_value ok
-        end
-
-        NIL_  # failure is not an option
-      end
-
-      def __via_bound_action_and_mutated_backbound_iambic_resolve_bound_call
-
-        bc = @bound.bound_call_against_iambic_stream(
-
-          Callback_::Polymorphic_Stream.via_array @mutable_backbound_iambic )
-
-        bc &&= bound_call_via_bound_call_from_back bc
-
-        bc and begin
-          @bound_call = bc
-          ACHIEVED_
+        if ok
+          __bound_call_via_bound_action_and_mutated_backbound_iambic
+        else
+          Callback_::Bound_Call.via_value ok  # failure is not an option
         end
       end
 
@@ -633,6 +618,15 @@ module Skylab::Brazen
         # ~ end
 
         ACHIEVED_
+      end
+
+      def __bound_call_via_bound_action_and_mutated_backbound_iambic
+
+        bc = @bound.bound_call_against_iambic_stream(
+
+          Callback_::Polymorphic_Stream.via_array @mutable_backbound_iambic )
+
+        bc and bound_call_via_bound_call_from_back bc
       end
 
       def bound_call_via_bound_call_from_back bc  # :+#public-API :+#hook-in
@@ -689,7 +683,7 @@ module Skylab::Brazen
 
     module Adapter_Methods__
 
-      def initialize unbound, boundish
+      def initialize unbound, boundish  # :+#public-API
         @bound = unbound.new boundish, & handle_event_selectively
       end
 
@@ -719,17 +713,17 @@ module Skylab::Brazen
         @bound.under_expression_agent_get_N_desc_lines exp, d
       end
 
+      def __bound_call_via_receive_frame otr
+        receive_frame otr
+        _some_bound_call
+      end
+
       def receive_frame otr
         @parent = otr
         @resources = otr.resources
         resolve_properties
-        resolve_partitions
+        resolve_categorized_properties
         NIL_
-      end
-
-      def via_argv_resolve_some_bound_call
-        resolve_bound_call
-        @bound_call
       end
 
       def bound_action
@@ -769,11 +763,11 @@ module Skylab::Brazen
         # corresponds to the channel name in some way and instead use that.
 
         -> * i_a, & x_p do
-          __receive_unclassified_emission i_a, & x_p
+          receive_uncategorized_emission i_a, & x_p
         end
       end
 
-      def __receive_unclassified_emission i_a, & x_p
+      def receive_uncategorized_emission i_a, & x_p
 
         if i_a && :expression == i_a[ 1 ]
           send :"receive__#{ i_a[ 0 ] }__expression", * i_a[ 2 .. -1 ], & x_p
@@ -1055,8 +1049,9 @@ module Skylab::Brazen
         Option_parser__[]
       end
 
-      def receive_partitions partitions
-        @partitions = partitions ; nil
+      def __receive_categorized_properties cp
+        @categorized_properties = cp
+        NIL_
       end
 
       def invocation_string
@@ -1069,49 +1064,117 @@ module Skylab::Brazen
         y << name.as_slug ; nil
       end
 
-      def populate_option_parser_with_generated_opts op, opt_a
+      def __populate_option_parser_with_generated_opts op, opt_a
+
         h = Build_unique_letter_hash__[ opt_a ]
-        opt_a.each do |prop|
+
+        opt_a.each do |prp|
+
           args = []
-          letter = h[ prop.name_symbol ]
+          letter = h[ prp.name_symbol ]
           letter and args.push "-#{ letter }"
-          base = "--#{ prop.name.as_slug }"
-          if prop.takes_argument
-            if prop.argument_is_required
-              args.push "#{ base } #{ argument_label_for prop }"
+          base = "--#{ prp.name.as_slug }"
+
+          if prp.takes_argument
+            if prp.argument_is_required
+              args.push "#{ base } #{ argument_label_for prp }"
             else
-              args.push "#{ base } [#{ argument_label_for prop }]"
+              args.push "#{ base } [#{ argument_label_for prp }]"
             end
           else
             args.push base
           end
-          _p = optparse_behavior_for_property prop
-          prop.has_description and render_property_description args, prop
+
+          _p = optparse_behavior_for_property prp
+          prp.has_description and __render_property_description args, prp
           op.on( * args, & _p )
-        end ; nil
+        end
+        NIL_
       end
 
-      def optparse_behavior_for_property prop  # :+#public-API #hook-in
-        if prop.takes_argument
-          -> x do
-            @seen_h[ prop.name_symbol ] = true
-            @mutable_backbound_iambic.push prop.name_symbol, x
+      # ~ begin
+
+      def optparse_behavior_for_property prp  # :+#public-API #hook-in
+
+        -> x do
+          m = :"receive__#{ prp.name_symbol }__option"
+          if respond_to? m
+            send m, x, prp
+          else
+            __receive_uncategorized_option x, prp
           end
-        else
-          -> _ do
-            @seen_h[ prop.name_symbol ] = true
-            @mutable_backbound_iambic.push prop.name_symbol
-          end
+          NIL_
         end
       end
 
-      def render_property_description a, prop
+      def __receive_uncategorized_option x, prp
+
+        if prp.takes_argument
+
+          if prp.takes_many_arguments
+
+            __receive_list_option x, prp
+          else
+            __receive_common_argumented_option x, prp
+          end
+        elsif :zero_or_more == prp.parameter_arity
+
+          __receive_incrementing_option prp
+        else
+
+          __receive_flag_option prp
+        end
+        NIL_
+      end
+
+      def __receive_list_option x, prp
+
+        @seen_h[ prp.name_symbol ] = true
+        @mutable_backbound_iambic.push prp.name_symbol, [ x ]  # hm..
+        NIL_
+      end
+
+      def __receive_common_argumented_option x, prp
+
+        @seen_h[ prp.name_symbol ] = true
+        @mutable_backbound_iambic.push prp.name_symbol, x
+        NIL_
+      end
+
+      def __receive_incrementing_option prp
+
+        k = prp.name_symbol
+        increment_seen_count k
+        @mutable_backbound_iambic.push k
+        NIL_
+      end
+
+      def increment_seen_count k
+
+        yes = true
+        @seen_h.fetch k do
+          yes = false
+          @seen_h[ k ] = 1
+        end
+        if yes
+          @seen_h[ k ] += 1
+        end
+        NIL_
+      end
+
+      def __receive_flag_option prp
+
+        @seen_h[ prp.name_symbol ] = true
+        @mutable_backbound_iambic.push prp.name_symbol
+        NIL_
+      end
+
+      # ~ end
+
+      def __render_property_description a, prop
         expag = expression_agent
         expag.current_property = prop
         a.concat prop.under_expression_agent_get_N_desc_lines expag ; nil
-      end
-
-      def populate_option_parser_with_universal_options op
       end
 
       def write_full_syntax_strings__ y
@@ -1129,7 +1192,7 @@ module Skylab::Brazen
       end
 
       def write_any_auxiliary_syntax_string y
-        help = to_full_inferred_prop_strm.each.detect do |prop|
+        help = _to_full_inferred_property_stream.each.detect do |prop|
           :help == prop.name_symbol
         end
         if help
@@ -1147,15 +1210,15 @@ module Skylab::Brazen
       def prepare_to_parse_parameters  # :+#public-API :+#hook-in
         @mutable_backbound_iambic = []  # :+#public-API (name)
         @seen_h = {}
-        @bound_call = nil
+        NIL_
       end
 
-      def parse_options
+      def bound_call_from_parse_options  # :+#public-API
         @op ||= option_parser
         @op.parse! argv
-        nil
+        NIL_
       rescue ::OptionParser::ParseError => e
-        resolve_bound_call_when_parse_error e ; nil
+        __bound_call_when_parse_error e
       end
 
       def option_parser
@@ -1163,7 +1226,7 @@ module Skylab::Brazen
       end
 
       def bound_call_class_via_option_property_name_i i
-        m_i = :"bound_call_class_for_#{ i }_option"
+        m_i = :"__bound_call_class_for__#{ i }__option"
         if respond_to? m_i
           send m_i
         else
@@ -1172,16 +1235,16 @@ module Skylab::Brazen
         end
       end
 
-      def resolve_bound_call_when_parse_error e
-        @bound_call = CLI_::When_::Parse_Error.new e, help_renderer
+      def __bound_call_when_parse_error e
+        CLI_::When_::Parse_Error.new e, help_renderer
       end
 
       def expression_agent
-        @partitions.expression_agent
+        @categorized_properties.expression_agent
       end
 
-      def partitions
-        @partitions
+      def categorized_properties
+        @categorized_properties
       end
 
       def properties
@@ -1193,13 +1256,19 @@ module Skylab::Brazen
       end
 
       def help_renderer
-        @partitions.help_renderer
+        @categorized_properties.help_renderer
       end
 
     private
 
       def argv
         @resources.argv
+      end
+
+      def resolve_categorized_properties
+        @categorized_properties = Categorize_properties___[
+          _to_full_inferred_property_stream, self ]
+        NIL_
       end
     end
 
@@ -1210,37 +1279,47 @@ module Skylab::Brazen
 
     # ~
 
-    class Build_partitions__
+    class Categorize_properties___  # #note-600
 
       Actor_.call self, :properties, :scn, :adapter
 
       def execute
-        Partitions__.new do |p|
-          @adapter.receive_partitions p
-          @partitions = p
-          work
+        Categorized_Properties___.new do | cp |
+          @adapter.__receive_categorized_properties cp
+          @categorized_properties = cp
+          __work
         end
-        @partitions
+        @categorized_properties
       end
 
-      def work
+      def __work
 
         @arg_a = @env_a = @opt_a = @many_a = nil
 
         d = 0 ; @original_index = {}
 
-        while prop = @scn.gets
+        begin
+          prp = @scn.gets
+          prp or break
 
-          @original_index[ prop.name_symbol ] = ( d += 1 )
+          @original_index[ prp.name_symbol ] = ( d += 1 )
 
-          if prop.can_be_from_environment
-            ( @env_a ||= [] ).push prop
+          if prp.can_be_from_environment  # probably goes away
+            ( @env_a ||= [] ).push prp
+            redo
           end
 
-          prop.is_hidden and next
+          if prp.is_hidden
+            redo
+          end
 
-          _is_effectively_required = if prop.is_required
-            if prop.has_default
+          if prp.takes_many_arguments
+            ( @many_a ||= [] ).push prp
+            redo
+          end
+
+          _is_effectively_required = if prp.is_required
+            if prp.has_default
               false  # explained fully at [#006]
             else
               true
@@ -1248,30 +1327,39 @@ module Skylab::Brazen
           end
 
           if _is_effectively_required
-            ( @arg_a ||= [] ).push prop
-          elsif prop.takes_many_arguments
-            ( @many_a ||= [] ).push prop
+
+            ( @arg_a ||= [] ).push prp
           else
-            ( @opt_a ||= [] ).push prop
+
+            ( @opt_a ||= [] ).push prp
           end
-        end
+
+          redo
+        end while nil
+
         if @many_a
-          determine_placement_for_many
+          __determine_placement_for_many
         end
-        maybe_make_experimental_aesthetic_readjustment
-        @partitions.adapter = @adapter
-        @partitions.arg_a = @arg_a.freeze
-        @partitions.env_a = @env_a.freeze
-        @partitions.opt_a = @opt_a.freeze ; nil
+
+        __maybe_make_experimental_aesthetic_readjustment
+
+        o = @categorized_properties
+        o.adapter = @adapter
+        o.arg_a = @arg_a.freeze
+        o.env_a = @env_a.freeze
+        o.opt_a = @opt_a.freeze
+        NIL_
       end
-    private
-      def maybe_make_experimental_aesthetic_readjustment  # #note-575
+
+      def __maybe_make_experimental_aesthetic_readjustment  # #note-575
+
         if ! @many_a && @opt_a && ( ! @arg_a || @opt_a.last.takes_argument  ) # (a), (b) and (c)
-          make_experimental_aestethic_adjustment
+          __make_experimental_aestethic_adjustment
         end
       end
 
-      def make_experimental_aestethic_adjustment  # #note-600
+      def __make_experimental_aestethic_adjustment  # #note-610
+
         d = @opt_a.length
         while d.nonzero?
           prop = @opt_a.fetch d -= 1
@@ -1287,80 +1375,81 @@ module Skylab::Brazen
         end ; nil
       end
 
-      def determine_placement_for_many  # #note-600
+      def __determine_placement_for_many
+
         if @arg_a
           @arg_a.push @many_a.pop
-          re_order @arg_a
+          _re_order @arg_a
         else
           @arg_a = [ @many_a.pop ]
         end
         if @many_a.length.nonzero?
           @opt_a.concat @many_a
-          re_order @opt_a
+          _re_order @opt_a
         end
         @many_a = true
       end
 
-      def re_order a
+      def _re_order a
         a.sort_by! do |prop|
           @original_index.fetch prop.name_symbol
         end ; nil
       end
     end
 
-    class Partitions__
+    class Categorized_Properties___
+
       def initialize
-        @expression_agent = @op = @help_renderer = nil
+
+        @expression_agent = @help_renderer = @op = nil
         yield self
-        @expression_agent or resolve_expression_agent
-        @op or resolve_option_parser
-        @help_renderer or resolve_help_renderer
+        @expression_agent || __resolve_expression_agent
+        @op || __resolve_option_parser
+        @help_renderer || __resolve_help_renderer
       end
+
       attr_accessor :opt_a, :arg_a, :env_a
       attr_accessor :adapter
-      attr_reader :expression_agent, :help_renderer, :partitions
-    private
+      attr_reader :expression_agent, :help_renderer, :categorized_properties
 
-      def resolve_expression_agent
+      def __resolve_expression_agent
         @expression_agent = @adapter.expression_agent_class.new self ; nil
       end
 
-      def resolve_option_parser
+      def __resolve_option_parser
         op = @adapter.option_parser_class.new
-        @opt_a and @adapter.populate_option_parser_with_generated_opts op, @opt_a
-        @adapter.populate_option_parser_with_universal_options op
-        @op = op ; nil
+        @opt_a and @adapter.__populate_option_parser_with_generated_opts op, @opt_a
+        @op = op
+        NIL_
       end
 
-      def resolve_help_renderer
+      def __resolve_help_renderer
         CLI_::Action_Adapter_::Help_Renderer.new @op, @adapter; nil
       end
 
-    public def receive_help_renderer o
+      def receive_help_renderer o
         @help_renderer = o
-        @opt_a and add_option_section o
-        @arg_a and add_arg_section o
-        @env_a and add_env_section o
+        @opt_a and __add_option_section o
+        @arg_a and __add_arg_section o
+        @env_a and __add_env_section o
       end
 
-      def add_option_section o
+      def __add_option_section o
         o.add_section :ad_hoc_section, 'options' do |help|
           help.output_option_parser_summary
         end
       end
 
-      def add_arg_section o
+      def __add_arg_section o
         o.arg_a = @arg_a
         o.add_section :item_section, 'argument', @arg_a ; nil
       end
 
-      def add_env_section o
+      def __add_env_section o
         o.add_section :item_section, 'environment variable', @env_a do | prp |
           adapter.environment_variable_name_string_via_property prp
         end
       end
-
-    public
 
       def rendering_method_name_for_property prp  # for expag
 
@@ -1470,7 +1559,8 @@ module Skylab::Brazen
         :argument_moniker,
         :can_be_from_environment,
         :custom_moniker,
-        :is_required
+        :is_required,
+        :parameter_arity
 
       def is_hidden
         false

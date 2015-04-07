@@ -53,7 +53,7 @@ module Skylab::TestSupport
             end
           end
 
-          def resolve_bound_call_when_help_request
+          def bound_call_for_help_request
 
             # hack an experiment where we re-build the option parser before
             # we use it to render a help screen, only in those cases where
@@ -70,7 +70,7 @@ module Skylab::TestSupport
 
               if _ok
                 @properties = @bound.formal_properties
-                resolve_partitions  # just does it all again!
+                resolve_categorized_properties  # just does it all again!
                 super
               else
 

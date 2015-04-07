@@ -55,7 +55,8 @@ something like what's going on:
 
 ### some rough definitions
 
-the "partitions" is the thing that represents the decisions we made
+the "partitions" (may be renamed to "categorized properties")
+is the thing that represents the decisions we made
 about whether each property is variously an environment variable, an
 option or an argument. it is useful in both directions: with it you can
 render help screens, but also given property you can look it up to

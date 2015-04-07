@@ -360,6 +360,20 @@ module Skylab::TestSupport
         md
       end
 
+      # ~ finish
+
+      def finish
+        count = 0
+        begin
+          if @up.gets
+            count += 1
+            redo
+          end
+          break
+        end while nil
+        count
+      end
+
       # ~ building fake files
 
       def build_fake_file_from_line_and_every_line_while_rx rx
