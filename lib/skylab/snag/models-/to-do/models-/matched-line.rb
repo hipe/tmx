@@ -1,56 +1,34 @@
 module Skylab::Snag
 
-  class Models::ToDo::Collection__::Flyweight__
+  class Models_::To_Do
 
-    def initialize pattern_s
-      @md = nil
-      @pattern_s = pattern_s  # just passed around. not used here.
-      @upstream_output_line = nil  # e.g ffrom find, e.g "path:line:source"
+    Models_ = ::Module.new
+
+    class Models_::Matched_Line
+
+      def reinitialize line
+
+        md = RX__.match line
+        if md
+          @full_source_line = md[ :full_source_line ]
+          @is_valid = true
+          @line_number = md[ :line ].to_i
+          @path = md[ :path ]
+        else
+          @full_source_line = false
+          @is_valid = false
+          @line_number = false
+          @path = false
+        end
+        NIL_
+      end
+
+      alias_method :initialize, :reinitialize
+
+      RX__ = /\A (?<path>[^:]+) : (?<line>\d+) : (?<full_source_line>.*) \z/mx
+
+      attr_reader :full_source_line, :is_valid, :line_number, :path
+
     end
-
-    attr_reader :upstream_output_line
-
-    def collapse delegate
-      @md or parse
-      Models::ToDo.build( @md[ :full_source_line ], @md[ :line ], @md[ :path ],
-        @pattern_s, delegate )
-    end
-
-    def is_valid
-      @md or parse
-      @md[ :line ] && @md[ :path ]
-    end
-
-    def full_source_line
-      @md or parse
-      @md[:full_source_line]
-    end
-
-    def line_number_string
-      @md or parse
-      @md[:line]
-    end
-
-    def path
-      @md or parse
-      @md[:path]
-    end
-
-    # replace the *entire* defining contents of the flyweight
-
-    def replace string
-      @md = nil
-      @upstream_output_line = string
-      self
-    end
-
-  private
-
-    def parse
-      @upstream_output_line or self._SANITY
-      @md = RX__.match( @upstream_output_line ) or self._SANITY
-    end
-
-    RX__ = /\A (?<path>[^:]+) : (?<line>\d+) : (?<full_source_line>.*) $/x
   end
 end

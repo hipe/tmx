@@ -37,8 +37,11 @@ module Skylab::Headless
         def initialize & edit_p
 
           @as_normal_value = DEFAULT_AS_NORMAL_VALUE_PROC___
-          @freeform_query_infix_words = nil
           @on_event_selectively = DEFAULT_ON_EVENT_SELECTIVELY___
+
+          @sanitized_freeform_query_infix_words = nil
+          @sanitized_freeform_query_postfix_words = nil
+
           @unescaped_filename_a = []
           @unescaped_ignore_dir_a = []
           @unescaped_path_a = []
@@ -97,7 +100,7 @@ module Skylab::Headless
             @is_curry = false
             __resolve_valid_command_args
           end
-          nil
+          NIL_
         end
 
         def freeze
@@ -118,7 +121,12 @@ module Skylab::Headless
 
         def filenames=
           # an "or" list
-          @unescaped_filename_a.replace iambic_property
+          x = iambic_property
+          if x
+            @unescaped_filename_a.replace x
+          else
+            @unescaped_filename_a.clear
+          end
           KEEP_PARSING_
         end
 
@@ -127,23 +135,21 @@ module Skylab::Headless
           # for now a hack to effect "-type d" etc. if we find ourselves
           # leveraging this more than once in the same "way", abstract.
 
-          s_a = iambic_property
-          if s_a
-            s_a.each do | s |
-              if FREEFORM_WORD_SANITY_RX___ =~ s
-                s.frozen? or s.freeze  # or change how you dup, or require
-              else
-                raise ::ArgumentError, "looks strange: #{ s.inspect }"  # for now, sanity
-              end
-            end
-            @freeform_query_infix_words = s_a.freeze
-          else
-            @freeform_query_infix_words = nil
+          arg = _normalize_unsanititized_freeform_string_array iambic_property
+          arg and begin
+            @sanitized_freeform_query_infix_words = arg.value_x   # nil OK
+            KEEP_PARSING_
           end
-          KEEP_PARSING_
         end
 
-        FREEFORM_WORD_SANITY_RX___ = /\A-?[a-z0-9]+\z/
+        def freeform_query_postfix_words=
+
+          arg = _normalize_unsanititized_freeform_string_array iambic_property
+          arg and begin
+            @sanitized_freeform_query_postfix_words = arg.value_x  # nil OK
+            KEEP_PARSING_
+          end
+        end
 
         def ignore_dirs=
           @unescaped_ignore_dir_a.replace iambic_property
@@ -159,6 +165,61 @@ module Skylab::Headless
           @unescaped_path_a.clear.replace iambic_property
           KEEP_PARSING_
         end
+
+        def trusted_strings=  # WARNING the hash is not currently dup-aware
+          h = ( @trusted_string_h ||= {} )
+          iambic_property.each do | s |
+            h[ s ] = true
+          end
+          KEEP_PARSING_
+        end
+
+        def _normalize_unsanititized_freeform_string_array s_a
+
+          if s_a
+            __normalze_trueish_unsanitized_freeform_string_array s_a
+          else
+            Callback_::Trio.new s_a, true  # a false-ish value is valid
+          end
+        end
+
+        def __normalze_trueish_unsanitized_freeform_string_array s_a
+
+          extra_a = nil
+          p = __i_am_not_to_be_trusted
+          s_a.each do | s |
+            if p[ s ]
+              ( extra_a ||= [] ).push s
+            else
+              s.frozen? or s.freeze  # or change how you dup, or require
+            end
+          end
+          if extra_a
+            raise ::ArgumentError, "looks strange: #{ s_a.map( & :inspect ) } * ', ' }"
+          else
+            Callback_::Trio.new s_a, true
+          end
+        end
+
+        def __i_am_not_to_be_trusted
+
+          _TRUSTED = false ; _NOT_TRUSTED = true
+          -> s do
+
+            if FREEFORM_WORD_SANITY_RX___ =~ s
+              _TRUSTED
+            else
+              h = @trusted_string_h
+              if h && h[ s ]
+                _TRUSTED
+              else
+                _NOT_TRUSTED
+              end
+            end
+          end
+        end
+
+        FREEFORM_WORD_SANITY_RX___ = /\A-{0,2}[a-z0-9]+(?:-[a-z0-9]+)*\z/
 
       public
 
@@ -180,14 +241,14 @@ module Skylab::Headless
 
         def __resolve_valid_command_args  # amazing hax #note-130
           otr = dup
-          otr.extend Command_Building_Methods__
+          otr.extend Command_Building_Methods__  # pattern :+[#sl-144]
           @args = otr.__args_via_flush
           if @args && @on_event_selectively
             @on_event_selectively.call :info, :event, :find_command_args do
               Command_Args_Event__[ @args ]
             end
           end
-          nil
+          NIL_
         end
 
         Command_Args_Event__ = Callback_::Event.prototype_with(
@@ -230,12 +291,18 @@ module Skylab::Headless
               __add_ignore_dir_phrase
             end
 
-            if @freeform_query_infix_words
-              @y.concat @freeform_query_infix_words
+            s_a = @sanitized_freeform_query_infix_words
+            if s_a
+              @y.concat s_a
             end
 
             if @unescaped_filename_a.length.nonzero?
               __add_name_phrase
+            end
+
+            s_a = @sanitized_freeform_query_postfix_words
+            if s_a
+              @y.concat s_a
             end
 
             @y.freeze
@@ -245,9 +312,11 @@ module Skylab::Headless
           FIND__ = 'find'.freeze
 
           def __add_paths
+
             @unescaped_path_a.each do | path |
               @y.push F__, path.freeze  # ( we used to :+#escape here )
-            end ; nil
+            end
+            NIL_
           end
 
           F__ = '-f'.freeze
@@ -282,13 +351,21 @@ module Skylab::Headless
               @y.concat s_a
               redo
             end while nil
-            nil
+            NIL_
           end
 
           NAME_OPERATOR__ = '-name'.freeze
           OR_OPERATOR__ = '-o'.freeze
 
         end
+
+        if false  # (was [#sg-029]) a structured EN description builder `to_phrasal_noun_modifier_event`
+          my.paths -> p { y << "in #{ and_ p.map(& val ) }" }, e[ :paths ]
+          my.names -> n { y << "named #{ or_ n.map(& val ) }" }, e[ :names ]
+          my.patrn -> p { y << "with the pattern #{ val[ p ] }" }, e[ :pattern ]
+        end
+
+        NIL_ = nil
       end
     end
   end

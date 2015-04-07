@@ -27,8 +27,9 @@ from it all.
 ([sg]   /N API ping spec
 ([sg]   /N CLI integration (top)
 ([sg]   /N date spec
-([sg]   /N todo spec
-([sg]   /N todo's find (todo stream spec)
+([sg]  7/N todo spec
+([sg]  8/N todo's stream (back)
+([sg]  9/N todo's stream (front)
 ([sg]   /N file spec
 ([sg]   /N digraph spec (make one)
 ([sg]   /N universal stream visual test

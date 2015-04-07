@@ -299,7 +299,6 @@ module Skylab::Basic
       end
     end
 
-    NIL_ = nil
     Tree_ = self
   end
 end

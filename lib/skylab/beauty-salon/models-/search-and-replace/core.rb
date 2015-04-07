@@ -408,9 +408,13 @@ module Skylab::BeautySalon
       end
 
       def marshal_load s, & p
-        @rx = BS_.lib_.basic::Regexp.marshal_load s do |ev|
-          p[ wrap_marshal_load_event ev ]
-          UNABLE_
+
+        @rx = BS_.lib_.basic::Regexp.marshal_load s do | * i_a, & ev_p |
+
+          if :error == i_a.first
+            p[ wrap_marshal_load_event ev_p[] ]
+            UNABLE_
+          end
         end
         @rx and ACHIEVED_
       end

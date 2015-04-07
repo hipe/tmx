@@ -6,7 +6,9 @@ module Skylab::Snag
 
     o = { }
     o[ :Basic ] = subsystem
-    o[ :DateTime ] = o[ :FileUtils ] = o[ :Open3 ] = stdlib
+    o[ :DateTime ] = stdlib
+    o[ :FileUtils ] = stdlib
+    o[ :Open3 ] = stdlib
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
     o[ :Porcelain__ ] = -> _ { subsystem[ :Porcelain ] }
     o[ :Shellwords ] = stdlib

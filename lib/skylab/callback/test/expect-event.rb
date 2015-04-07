@@ -4,10 +4,77 @@ module Skylab::Callback::TestSupport
 
     class << self
 
-      def [] test_context_cls
-        test_context_cls.include Test_Context_Instance_Methods ; nil
+      def [] test_context_cls, x_a=nil
+
+        test_context_cls.include Test_Context_Instance_Methods
+        if x_a && x_a.length.nonzero?
+          Modifiers___.new( x_a, test_context_cls ).execute
+        end
+        NIL_
       end
     end  # >>
+
+    class Modifiers___
+
+      def initialize x_a, tcm
+        @tcm = tcm
+        @x_a = x_a
+      end
+
+      def execute
+
+        @ignore_these = []
+
+        @x_a.each_slice 2 do | sym, x |
+          send :"__#{ sym }__", x
+        end
+
+        __finish
+      end
+
+      def __ignore__ x
+        @ignore_these.push x
+        NIL_
+      end
+
+      def __finish
+        Define_module_method_for_ignoring__[ @tcm, @ignore_these ]
+      end
+    end
+
+    IGNORE_THESE_EVENTS_METHOD = -> * top_chan_i_a do
+
+      Define_module_method_for_ignoring__[ self, top_chan_i_a ]
+    end
+
+    Define_module_method_for_ignoring__ = -> tcm, chan_i_a do
+
+      _YOU_SHALL_NOT_PASS = ::Hash[ chan_i_a.map { | i | [ i, true ] } ]
+
+      tcm.send :define_method, :_build_event_receiver_for_expect_event do
+
+        er = super()
+        er.add_map_reducer do | ev_p, i_a, chan_p |
+
+          if _YOU_SHALL_NOT_PASS[ i_a.last ]
+
+            if do_debug
+              debug_IO.puts event_receiver_for_expect_event.
+                first_line_description(
+                  "ignoring: ", ev_p[] )
+            end
+
+            Callback_::UNABLE_  # err on the side of us having swallowed
+              # a failure, if anybody's asking
+          else
+
+            chan_p[ i_a, & ev_p ]
+          end
+        end
+        er
+      end
+      NIL_
+    end
 
     # ->
 
@@ -30,11 +97,11 @@ module Skylab::Callback::TestSupport
         def event_receiver_for_expect_event  # :+#public-API
           @evr ||= begin
             @ev_a = nil
-            build_event_receiver_for_expect_event
+            _build_event_receiver_for_expect_event
           end
         end
 
-        def build_event_receiver_for_expect_event  # :+#public-API :#hook-in
+        def _build_event_receiver_for_expect_event  # :+#public-API :#hook-in
 
           # (this is frequently hooked-in to to implement ignoring certain events)
 

@@ -113,7 +113,7 @@ module Skylab::Brazen
 
             if has_non_promoted_children
 
-              x = if item.respond_to? :name_function
+              x = if item.respond_to? :is_branch
                 item
 
               else

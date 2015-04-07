@@ -1,123 +1,42 @@
 module Skylab::Snag
 
-  class Models::ToDo
+  class Models_::To_Do
 
-    module Collection__
+    Sessions_ = ::Module.new
 
-      class << self
+    class Sessions_::Collection
 
-        def build_scan_via_a a
-          Scan__.new a
-        end
+      def initialize & oes_p
+        @on_event_selectively = oes_p
       end
 
-  class Scan__  # #borrow:2
+      attr_writer :filename_pattern_s_a, :path_s_a, :pattern_s_a,
 
-    Delegate = Snag_::Model_::Delegate.new :command_string, :error_event
+        :system_conduit
 
-    Snag_::Model_::Actor[ self ]
+      def to_stream
 
-    def initialize a  # paths patterns names
-      @command = Snag_::Models::Find.new( * a.shift( 3 ) )
-      @delegate = Delegate.call_via_iambic a
-    end
+        cmd = build_system_command
+        cmd and begin
 
-    attr_reader :command, :exitstatus, :result, :seen_count
+          p = @on_event_selectively
 
-    def each
-      if block_given?
-        scn = to_stream ; x = nil
-        yield x while x = scn.gets
-        @result
-      else
-        to_enum
-      end
-    end
+          st = Actors_::Matching_line_stream_via_find_command[ cmd, @system_conduit, & p ]
 
-    def to_stream
-      @seen_count = 0 ; @result = nil
-      @p = bld_initial_gets_proc
-      Callback_::Scn.new do
-        @p[]
-      end
-    end
-  private
-    def bld_initial_gets_proc
-      -> do
-        @result = talk_to_command
-        @result and procede_with_normal_scan
-      end
-    end
-    def procede_with_normal_scan
-      @p = bld_money_gets_proc
-      @p[]
-    end
-    def talk_to_command
-      ok = resolve_command_pattern
-      ok && resolve_command_string
-    end
-    def resolve_command_pattern
-      @command.pattern -> ok_x do
-        @pattern_s = ok_x ; ACHIEVED_
-      end, -> ev do
-        send_error_event ev
-      end
-    end
-    def resolve_command_string
-      @command.command -> cmd_s do
-        @command_s = cmd_s
-        @delegate.receive_command_string cmd_s
-        ACHIEVED_
-      end, -> ev do
-        send_error_event ev
-      end
-    end
-    def bld_money_gets_proc
-      -> do
-        fly = Collection__::Flyweight__.new @pattern_s
-        _i, o, e, wait = Snag_::Library_::Open3.popen3 @command_s
-        @p = -> do
-          if o
-            o_line = o.gets
-            o_line or o = nil
-          end
-          if e
-            e_line = e.gets
-            e_line or e = nil
-          end
-          if e
-            send_unexpected_output_error_event e_line
-          end
-          if o
-            o_line.chomp!
-            fly.replace o_line
-            if e
-              flush_more_e e
-            end
-            @seen_count += 1
-            fly
-          elsif e
-            flush_more_e e
-            @exitstatus = wait.value.exitstatus
-            @result = UNABLE_
-          else
-            @exitstatus = wait.value.exitstatus
-            @result = ACHIEVED_
-            @p = EMPTY_P_ ; nil
+          st and begin
+
+            Actors_::To_do_stream_via_matching_line_stream[
+              st, @pattern_s_a, & p ]
           end
         end
-        @p[]
+      end
+
+      def build_system_command
+
+        otr = dup
+        otr.extend To_Do_::Actors_::Build_the_find_command  # pattern :+[#sl-144]
+        otr.execute
       end
     end
-    def send_unexpected_output_error_event line
-      send_error_event :unexpected_output, :line, line do |y, o|
-        y << "(unexpected output: #{ line.chomp })"
-      end
-    end
-    def flush_more_e io
-      self._DO_ME  # #todo
-    end
-  end
-    end  # #pay-back:2
   end
 end

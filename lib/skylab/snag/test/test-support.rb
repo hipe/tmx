@@ -86,8 +86,8 @@ module Skylab::Snag::TestSupport
     end  # >>
   end
 
-  Expect_Event = -> tcm do
-    Callback_.test_support::Expect_Event[ tcm ]
+  Expect_Event = -> tcm, x_a=nil do
+    Callback_.test_support::Expect_Event[ tcm, x_a ]
   end
 
   Expect_Stdout_Stderr = -> tcm do
@@ -97,10 +97,44 @@ module Skylab::Snag::TestSupport
     NIL_
   end
 
+  Fixture_files_ = -> do
+    p = -> sym do
+      h = {}
+
+      _path = TS_.dir_pathname.join( 'fixture-files' ).to_path
+
+      rx = /[-\.]/
+
+      ::Dir.glob( "#{ _path }/[^.]*" ).each do | path |
+        h[ ::File.basename( path ).gsub( rx, UNDERSCORE_ ).intern ] = path
+      end
+
+      p = h.method :fetch
+      p[ sym ]
+    end
+    -> sym do
+      p[ sym ]
+    end
+  end.call
+
+  Fixture_trees_ = -> do
+    h = {}
+    -> sym do
+      h.fetch sym do
+        h[ sym ] = TS_.dir_pathname.join(
+          'fixture-trees',
+          Callback_::Name.via_variegated_symbol( sym ).as_slug
+        ).to_path
+      end
+    end
+  end.call
+
   Snag_ = ::Skylab::Snag
 
   Callback_ = Snag_::Callback_
 
   NIL_ = nil
+
+  UNDERSCORE_ = '_'
 
 end

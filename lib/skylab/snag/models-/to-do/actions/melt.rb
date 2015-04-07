@@ -1,18 +1,24 @@
 module Skylab::Snag
 
-  module Models::Melt  # see [#063]
+  class Models_::To_Do
 
-    class << self
-      def build_controller * a
-        self::Controller__.new a
-      end
+    module Actions::Melt  # see [#063]
 
-      def replacement_non_content_width
-        REPLACEMENT_NON_CONTENT_WIDTH__
-      end
-    end
+      class << self
 
-    class Controller__ < Snag_::Model_::Controller
+        def is_actionable
+          false  # #todo:near-step:21
+        end
+
+        def replacement_non_content_width
+          REPLACEMENT_NON_CONTENT_WIDTH__
+        end
+      end  # >>
+
+      # <-2
+
+  if false  # :#here
+  class Controller__ < Snag_::Model_::Controller
 
     def initialize a
       @dry_run, @be_verbose, @paths, @pattern, @names, @working_dir,
@@ -114,7 +120,7 @@ module Skylab::Snag
     end
 
     def render_todo_location todo
-      "#{ todo.path }:#{ todo.line_number_string }"
+      "#{ todo.path }:#{ todo.line_number }"
     end
 
     # #note-110
@@ -298,6 +304,9 @@ module Skylab::Snag
     def send_info_event ev
       @delegate.receive_info_event ev ; NEUTRAL_
     end
+  end
+  end  # :+#here
+  # 2 ->
     end
   end
 end

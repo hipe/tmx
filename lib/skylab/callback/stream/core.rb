@@ -25,22 +25,50 @@ module Skylab::Callback
             @tes ||= new do end
           end
 
-          def expand scn, p
-            scn_ = nil
-            new do
+          def expand st, lower_st_p
+
+            proc_via_lower_stream = nil
+
+            p = upper_p = -> do
               begin
-                if ! scn_
-                  x = scn.gets
-                  x or break( scn = nil )
-                  scn_ = p[ x ]
-                  scn_ or redo  # can reduce too
+                upper_x = st.gets
+                if upper_x
+                  lower_st = lower_st_p[ upper_x ]
+                  if lower_st
+                    x = lower_st.gets
+                    if x
+                      p = proc_via_lower_stream[ lower_st ]
+                      break
+                    else
+                      redo
+                    end
+                  else
+                    # you can reduce as well as expand
+                    redo
+                  end
+                else
+                  p = EMPTY_P_
+                  x = upper_x
+                  break
                 end
-                x_ = scn_.gets
-                x_ and break
-                scn_ = nil
-                redo
               end while nil
-              x_
+              x
+            end
+
+            proc_via_lower_stream = -> lower_st do
+              -> do
+                x = lower_st.gets
+                if x
+                  x
+                else
+                  p = upper_p
+                  p[]
+                end
+              end
+            end
+
+            new do
+              p[]
             end
           end
 
@@ -137,18 +165,23 @@ module Skylab::Callback
               else
                 r.end
               end
-            end  # etc
-
-            if last
-
-              st = new do
-                if last != d
-                  d += amount_to_add
-                end
+            else
+              amount_to_add = -1
+              d = r.begin - amount_to_add
+              last = if r.exclude_end?
+                r.end - amount_to_add
+              else
+                r.end
               end
-              p and st = st.map_reduce_by( & p )
-              st
             end
+
+            st = new do
+              if last != d
+                d += amount_to_add
+              end
+            end
+            p and st = st.map_reduce_by( & p )
+            st
           end
 
           def with_random_access

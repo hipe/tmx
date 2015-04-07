@@ -54,7 +54,7 @@ module Skylab::Basic::TestSupport::Tree_TS
   EMPTY_A_ = o::EMPTY_A_
   EMPTY_P_ = o::EMPTY_P_
   EMPTY_S_ = o::EMPTY_S_
-  NIL_ = o::Tree::NIL_
+  NIL_ = o::NIL_
 
   module Constants
     Subject_ = Subject_

@@ -189,6 +189,7 @@ module Skylab::Basic  # introduction at [#020]
   KEEP_PARSING_ = true
   MONADIC_EMPTINESS_ = -> _ {}
   MONADIC_TRUTH_ = -> _ { true }
+  NIL_ = nil
   NILADIC_FALSEHOOD_ = -> { false }
   PROCEDE_ = true
   UNABLE_ = false

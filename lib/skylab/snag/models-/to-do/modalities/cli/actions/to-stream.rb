@@ -1,9 +1,12 @@
 module Skylab::Snag
 
-  class CLI::ToDo::Tree  # :+[#sl-109] class as namespace
+  class Models_::To_Do
+
+    module Actions::Tree
 
     # <-
 
+    if false  # :#here
     def initialize *a
       @do_pretty, @delegate = a
       @is_valid = true
@@ -55,7 +58,7 @@ module Skylab::Snag
 
         @todo_a.each do | todo |
 
-          _path_a = todo.path.split( SEP___ ).push todo.line_number_string
+          _path_a = todo.path.split( SEP___ ).push todo.line_number.to_s
 
           tree.touch_node _path_a, :leaf_node_payload_proc, -> do
             todo

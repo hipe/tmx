@@ -131,6 +131,8 @@ module Skylab::TanMan::TestSupport
 
   Callback_ = Callback_
 
+  Expect_Event__ = TanMan_::Callback_.test_support::Expect_Event
+
   TestSupport_ = TestSupport_
 
   module ModuleMethods
@@ -199,38 +201,13 @@ module Skylab::TanMan::TestSupport
       nil
     end
 
-    def ignore_these_events * top_chan_i_a
+    define_method :ignore_these_events, Expect_Event__::IGNORE_THESE_EVENTS_METHOD
 
-      _YOU_SHALL_NOT_PASS = ::Hash[ top_chan_i_a.map { | i | [ i, true ] } ]
-
-      define_method :build_event_receiver_for_expect_event do
-
-        er = super()
-        er.add_map_reducer do | ev_p, i_a, chan_p |
-
-          if _YOU_SHALL_NOT_PASS[ i_a.last ]
-
-            if do_debug
-              debug_IO.puts event_receiver_for_expect_event.
-                first_line_description(
-                  "ignoring: ", ev_p[] )
-            end
-
-            TanMan_::UNABLE_  # err on the side of us having swallowed a failure
-          else
-
-            chan_p[ i_a, & ev_p ]
-          end
-        end
-        er
-      end ; nil
-    end
   end
-
 
   module InstanceMethods
 
-    include TanMan_::Callback_.test_support::Expect_Event::Test_Context_Instance_Methods
+    include Expect_Event__::Test_Context_Instance_Methods
 
     def debug!
       @do_debug = true

@@ -192,7 +192,8 @@ module Skylab::Callback
       bx = formal_fields_ivar_box_for_read_
       a.length.times do |d|
         instance_variable_set bx.fetch_at_position( d ), a.fetch( d )
-      end ; nil
+      end
+      NIL_
     end
 
     def process_iambic_fully x_a
