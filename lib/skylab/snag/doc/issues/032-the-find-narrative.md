@@ -1,5 +1,7 @@
 # the find narrative :[#032]
 
+(EDIT: historical! some ideas here assimilated up into [hl]'s find)
+
 ## introduction
 
 wrap the unix system utility of the same name

@@ -35,6 +35,10 @@ module Skylab::Snag::TestSupport
 
     def with_tmpdir
     end
+
+    def memoize_ sym, & p
+      define_method sym, Callback_.memoize( & p )
+    end
   end
 
   module InstanceMethods

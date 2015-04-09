@@ -1,66 +1,72 @@
 module Skylab::Snag
 
-  class Models_::Node_Identifier  # #todo:near-step:N: all the others too
+  class Models_::Node_Identifier
 
     Actions = THE_EMPTY_MODULE_
 
-    def initialize any_prefix_s, integer_s, any_suffix_s
-      @prefix_s = any_prefix_s
-      @integer_s = integer_s  # leading 0's maybe meaningful dep'ing on client
-      @suffix_s = any_suffix_s
-      freeze
-    end
-
-    attr_reader :prefix_s
-
-    _CONTENT_RX = /
-      (?: (?<prefix> [a-z]+ ) - )?
-      (?<identifier_body>
-        (?<integer> \d+ )
-        (?:  \.  (?<suffix>  \d+  (?: \. \d+ )* ) )?
-      )
-    /x
-
-    FORMAL_RX = / \[ \# #{ _CONTENT_RX.source } \] /x
-    CONTENT_START_INDEX = 2  # '[#'.length
-    ENDCAP_WIDTH = 1  # ']'.length
-    PREFIX_SEPARATOR_WIDTH = 1  # '-'.length
-
     class << self
 
-      def normal x, delegate
-
-        md = NORMALIZING_RX__.match x.to_s
-
-        if md
-          o = new md[ :prefix ], md[ :integer ], md[ :suffix ]
-          if o.prefix_s && delegate.info_event_p
-            delegate.receive_info_event Events::Prefix_Ignored.new o
-          end
-          o
-        else
-          _x_ = delegate.receive_error_event Events::Invalid.new x
-          _x_ and UNABLE_  # +:[#017]
-        end
+      def new_via_integer d
+        new d
       end
+
+      def new_via_integer_and_suffix_string d, s
+        new d, Node_Identifier_::Models_::Suffix.parse( s )
+      end
+
+      private :new
     end  # >>
 
-    NORMALIZING_RX__ = / \A (?:
-      #{ FORMAL_RX.source } |
-      \# ? #{ _CONTENT_RX.source }
-    )\z/x
-
-    def render
-      "[##{ "#{ @prefix_s }-" if @prefix_s }#{ body_s }]"
+    def initialize d, suffix_o=nil
+      @suffix = suffix_o
+      @to_i = d
     end
 
-    def body_s
-      "#{ @integer_s }#{ ".#{ @suffix_s }" if @suffix_s }"
+    attr_reader :to_i, :suffix
+
+    include ::Comparable
+
+    def <=> otr
+      if otr.kind_of? Node_Identifier_
+        d = @to_i <=> otr.to_i
+        if d.zero?
+          o = @suffix
+          o_ = otr.suffix
+          if o
+            if o_
+              o <=> o_
+            else
+              1
+            end
+          elsif o_
+            -1
+          else
+            d
+          end
+        else
+          d
+        end
+      end
     end
 
-    module Events
+    # ~ begin suffixes
 
-      if false  # #todo:near-step:N
+    def suffix_separator_at_index d
+      if @suffix
+        @suffix.separator_at_index d
+      end
+    end
+
+    def suffix_value_at_index d
+      if @suffix
+        @suffix.value_at_index d
+      end
+    end
+
+    # ~ end suffixes
+
+    if false  # #todo
+
       Invalid = Snag_::Model_::Event.new :mixed do
         message_proc do |y, o|
           y << "invalid identifier name #{ ick o.mixed } - #{
@@ -75,7 +81,9 @@ module Skylab::Snag
           y << "prefixes are ignored currently - #{ ick o.identifier.prefix_s }"
         end
       end
-      end
+
     end
+
+    Node_Identifier_ = self
   end
 end

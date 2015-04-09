@@ -2,6 +2,8 @@ module Skylab::Snag
 
   class Models::Manifest::File__  # see [#038], intro at #note-12
 
+    # + use a byte upstream identifier (path, OS stream or string)
+
     def initialize pathname
       @file_mutex = false
       @fh = nil

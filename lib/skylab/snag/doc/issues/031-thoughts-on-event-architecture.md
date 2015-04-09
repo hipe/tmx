@@ -1,5 +1,7 @@
 # thoughts on event architecture :[#031]
 
+(EDIT: this is wayyyy old .. needs to be read yet)
+
 ## thoughts on API action event stream graphs
 
 at first analysis the P.I.E standard is a good rubric, b.c if for no

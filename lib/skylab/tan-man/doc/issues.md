@@ -28,7 +28,7 @@
 [#068]       #done dot file controller is becoming a god object, also redesign
              the way it executes "tell"s, so it's not as much an action
              obj
-[#067] #hole ( was: #tracking-tag lexical ordering stuff )
+[#067] #hole ( #was: #tracking-tag lexical ordering stuff, #moved-to [#br-011] )
 [#066]       #done issue with adding a new node on an empty graph,
              new nodes should always come after `node` node
 [#065]       #done fuzzy manage dependency

@@ -2,7 +2,7 @@ module Skylab::Snag
 
   module Models::Node
 
-    class Scan__  # the embodiment of [#059]
+    class Scan__  # the embodiment of [#059] scanners
 
       class << self
         def produce_scan_from_lines lines

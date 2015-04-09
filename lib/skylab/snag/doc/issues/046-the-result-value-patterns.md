@@ -1,5 +1,7 @@
 # the result value patterns :[#046]
 
+(EDIT: ancient!)
+
 
 ## introduction
 

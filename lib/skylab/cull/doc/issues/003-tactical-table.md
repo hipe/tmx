@@ -19,35 +19,6 @@ from it all.
 
 
 
-## this plan here
-
-([sg] G.U CLI 1/3 [po] 1/2 [sg] 1/N deletes)
-([sg]   /N renames)
-([sg]   /N wippify all tests except "loads"
-([sg]   /N API ping spec
-([sg]   /N CLI integration (top)
-([sg]   /N date spec
-([sg]  7/N todo spec
-([sg]  8/N todo's stream (back)
-([sg]  9/N todo's stream (front)
-([sg]   /N file spec
-([sg]   /N digraph spec (make one)
-([sg]   /N universal stream visual test
-([sg]   /N produce tmpdir spec
-([sg]   /N marshal node pt. 1 spec
-([sg]   /N marshal node pt. 2 spec
-([sg]   /N node add
-([sg]   /N hashtag spec
-([sg]   /N tag collection spec
-([sg]   /N node open
-([sg]   /N node list (to node stream spec)
-([sg]   /N node close
-([sg]   /N todo melt
-([sg]   /N find all
-
-
-
-
 ## the table
 
 

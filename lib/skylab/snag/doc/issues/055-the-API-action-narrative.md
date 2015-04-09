@@ -1,5 +1,7 @@
 # the API action narrative :[055]
 
+(EDIT: this is closer to the present, but still historical)
+
 ## introduction
 
 we hate the old API action. it coupled tightly to the old pub-sub (now

@@ -2,13 +2,17 @@
 
 ## introduction
 
+(EDIT: all of the below is made historical by the advent of [br])
+
 at the time of this writing the API "client" is conceived of as a
 would-be long-running (daemon-like) process that would possibly serve
 serveral clients in tandem.
 
 its two main functions are 1) in a config stack it may serve as the
 lowest frame, that is the last-line-of-defense defaults for business
-constants or configuration values.
+constants or configuration values. (EDIT: it is no longer recommended
+that any business defaults be kept in any top-level node within the
+application. such concerns belong at the model level at the highest.)
 
 2) it provides the "models" shell, which in turn provides shells with
 which the clients may produce silos, silo controllers, collection
