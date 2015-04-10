@@ -6,6 +6,14 @@ module Skylab::Snag
 
     class << self
 
+      def try_convert x
+        if x.respond_to? :suffix
+          x
+        elsif x.respond_to? :bit_length
+          new_via_integer x
+        end
+      end
+
       def new_via_integer d
         new d
       end
@@ -22,7 +30,12 @@ module Skylab::Snag
       @to_i = d
     end
 
-    attr_reader :to_i, :suffix
+    attr_reader :suffix, :to_i
+
+    def express_into_under y, expag
+      Node_Identifier_::Expression_Adapters.
+        const_get( expag.modality_const, false )[ y, expag, self ]
+    end
 
     include ::Comparable
 
@@ -65,23 +78,16 @@ module Skylab::Snag
 
     # ~ end suffixes
 
-    if false  # #todo
+    Expression_Adapters = ::Module.new
+    Expression_Adapters::Byte_Stream = -> y, expag, id do
 
-      Invalid = Snag_::Model_::Event.new :mixed do
-        message_proc do |y, o|
-          y << "invalid identifier name #{ ick o.mixed } - #{
-           }rendered full identifer: #{
-            }\"[#foo-001.2.3]\", equivalent to: \"001.2.3\" #{
-             }(prefixes ignored), \"001\" matches the superset"
-        end
+      sfx = id.suffix
+      if sfx
+        self._DO_ME
       end
 
-      Prefix_Ignored = Snag_::Model_::Event.new :identifier do
-        message_proc do |y, o|
-          y << "prefixes are ignored currently - #{ ick o.identifier.prefix_s }"
-        end
-      end
-
+      y << "[##{ "%0#{ expag.identifier_integer_width }d" % id.to_i }]"
+      NIL_
     end
 
     Node_Identifier_ = self

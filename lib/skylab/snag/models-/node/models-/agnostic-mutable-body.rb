@@ -1,66 +1,53 @@
 module Skylab::Snag
 
-  class Models::Tag
+  class Models_::Node
 
-    class Collection__
+    class Models_::Agnostic_Mutable_Body
 
-      class Controller__
+      def initialize
+        @_o_a = []
+      end
 
-        def initialize collection, delegate
-          @collection = collection ; @delegate = delegate
-        end
+      def is_mutable
+        true
+      end
 
-        def using_iambic_stream_add_tag st, stem_i
-          self.class::Add__.new( @collection, @delegate ).
-            using_iambic_stream_add_symbol st, stem_i
-        end
+      def modality_const
+        NIL_
+      end
 
-        def using_iambic_stream_remove_tag st, stem_i
-          self.class::Rm__.new( @collection, @delegate ).
-            using_iambic_stream_remove_symbol st, stem_i
-        end
+      def r_
+        0 ... 1
+      end
 
-        def set_body_s s
-          @collection.set_body_s s ; nil
-        end
+      def entity_stream_via_model cls
 
-        class Edit___
+        sym = cls.business_category_symbol
 
-          include Callback_::Actor.methodic_lib.iambic_processing_instance_methods
+        to_object_stream_.map_reduce_by do | o |
 
-          def initialize coll, lstn
-            @collection = coll ; @delegate = lstn
-          end
-
-        private
-
-          def build_tag stem_i
-            tag = Tag_.controller @delegate
-            tag.stem_i = stem_i
-            tag
-          end
-
-          def find_existing_tag tag
-            @collection.find_any_existing_tag_via_tag tag
-          end
-
-          def identifier
-            @collection.identifier
-          end
-
-          def get_body_s
-            @collection.get_body_s
-          end
-
-          def set_body_s s
-            @delegate.receive_change_body_string s ; nil
-          end
-
-          def merge_delegate x
-            @delegate.merge_in_other_listener_intersect x
-            KEEP_PARSING_
+          if sym == o.business_category_symbol
+            o
           end
         end
+      end
+
+      def to_object_stream_
+        Callback_::Stream.via_nonsparse_array @_o_a
+      end
+
+      def append_object o, & oes_p
+        @_o_a.push o
+        ACHIEVED_
+      end
+
+      def prepend_object o, & oes_p
+        @_o_a.unshift o
+        ACHIEVED_
+      end
+
+      def remove_equivalent_object o, & oes_p
+        self._FUN
       end
     end
   end

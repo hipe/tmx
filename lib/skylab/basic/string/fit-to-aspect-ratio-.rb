@@ -327,7 +327,7 @@ module Skylab::Basic
 
         def initialize pieces, ratio_width, ratio_height
 
-          @implementation = String_::Word_Wrappers__::Calm::Fit_to_Width_.new pieces
+          @implementation = String_::Word_Wrappers__::Calm::Fit_to_Width.new pieces
 
           @target_calculation = Target_Calculation___.new ratio_width, ratio_height
 

@@ -73,6 +73,8 @@ module Skylab::Snag
       :hello_from_snag
     end
 
+    Tag_Collection = :NO  # #todo:near-step:11
+
     Autoloader_[ self, :boxxy ]
   end
 

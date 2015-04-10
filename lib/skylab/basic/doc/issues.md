@@ -1,3 +1,5 @@
+[#042]       #parent-node: [#033] calm wordwrap "continuous" mode is
+               a partially implemented feature
 [#041]       a concept network towards universal abstract operations ..
 [#040]       the common destructive merge algorithm ..
 [#039] #open one day unify & simplify all box classes

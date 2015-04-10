@@ -53,7 +53,7 @@
              2012-06-04   (formerly [#sl-097])
 [#021]       #parent-node:[#011] #tracking-tag - this conv. of indenting per `#open`
 [#020]       #parent-node:[#038] "newlines as terminators vs. separators.."
-             (#was: #tracking-tag newlines - places where they might bite)
+             ( #was: #tracking-tag newlines - places where they might bite )
 [#019]       #tracking-tag prefixes - places where they might bite
 [#018]       #done functionality, interface for closing an issue
 [#017]       #parent-node: [#046] a cb error result may be translated
@@ -63,17 +63,21 @@
 [#013]       #done shortcut to open issue
 [#012]       #done rename to snag
 [#011]       #workflow #parent-node: [#037] the tags narrative ..
-[#010]       #done either do or don't do something about horrible all.rb d
-             ep now
+[#010]       the delineate narrative ..
+             ( #was: #done either do or don't do something about horrible
+             all.rb dep now )
 [#009] #open awesome semantic open tag search - ("smart twitter")
 [#008]       #done -n on all destructive actions
-[#007]       #done autoloadify
+[#007]       track places where we add (or "subtract") hashtag prefix
+             ( #was: #done autoloadify )
 [#006]       #doc-node structures for our API implementation ..
              (was: reanme Api -> API, P-orcelain -> CLI)
 [#005]       #done get cli working again
 [#004]       #done light fast solo CLI client 2012-11-12
-[#003]       #parent-node: [#057] was: tree report of todos 2012-10-13
-[#002]       #done 2012-08-19 basic CLI integration specs - essential coverage
+[#003]       #parent-node: [#057] the todo narrative ..
+             ( #was: tree report of todos 2012-10-13 )
+[#002]       #used-in-tests
+             ( #was: #done 2012-08-19 basic CLI integration specs - essential coverage  )
 [#001]       #done tag negation in queries
              ( was: #done 2012-08-20 integrate the 'issue-all' one-off #deferred )
 [#sl-048]    #done show should list (for now) 2012-02-10

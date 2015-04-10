@@ -116,7 +116,7 @@ module Skylab::Snag
           @y = []
           @o = @scn.gets
           while @o
-            send H__.fetch @o.symbol_i
+            send H__.fetch @o.nonterminal_symbol
             @o = @scn.gets
           end
           @y * EMPTY_S_
@@ -126,7 +126,7 @@ module Skylab::Snag
           @y << @o.to_s ; nil
         end
         def process_hashtag
-          _stem = @o.get_stem_s
+          _stem = @o.get_stem_string
           case _stem
           when PARENT_NODE__ ; skip_any_hashtag_value
           when DOC_NODE__ ; passthru_any_hashtag_value
@@ -145,9 +145,9 @@ module Skylab::Snag
           with_any_value -> { @scn.advance_one }
         end
         def with_any_value p
-          if o = @scn.peek and :hashtag_name_value_separator == o.symbol_i
+          if o = @scn.peek and :hashtag_name_value_separator == o.nonterminal_symbol
             p[]
-            if o = @scn.peek and :hashtag_value == o.symbol_i
+            if o = @scn.peek and :hashtag_value == o.nonterminal_symbol
               p[]
             end
           end ; nil

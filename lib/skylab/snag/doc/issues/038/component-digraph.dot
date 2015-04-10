@@ -2,15 +2,15 @@ digraph {
 
   add_node_actor [label="add node\nactor"]
   criteria_model [label="node criteria\nmodel"]
-  line_upstream [label="13. line\nupstream"]
+  line_upstream [label="11. line\nupstream"]
   marshal_node_actor [label="marshal\nnode actor"]
   mutate_node_actor [label="mutate\nnode actor"]
   node_collection_model [label="node collection\nmodel"]
   node_identifier_model [label="9. node identifier\nmodel" style=filled]
-  node_model [label="11. node model"]
+  node_model [label="10. node model" style=filled]
   node_upstream [label="node upstream"]
   reappropriation_session [label="reappropriation\nsession"]
-  tag_model [label="10. tag model"]
+  tag_model [label="10. tag model" style=filled]
   tempfile_model [label="tempfile\nmodel"]
 
 

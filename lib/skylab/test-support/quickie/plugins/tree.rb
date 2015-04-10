@@ -35,7 +35,7 @@ module Skylab::TestSupport
       def culled_test_files_eventpoint_notify
         io = @svc.paystream
         _a = @svc.get_test_path_a
-        tree = QuicLib_::Tree[].from :paths, _a
+        tree = QuicLib_::Tree[].via :paths, _a
         path_s, tree_ = condense_stem tree
         if path_s
           io.puts path_s

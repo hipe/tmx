@@ -1,112 +1,114 @@
 module Skylab::Snag
 
-  class Models_::Tag_Collection
+  class Models_::Node
 
-    Actions = THE_EMPTY_MODULE_
+    module Expression_Adapters::Byte_Stream
 
-    # ->
+      Mutable_Models_ = ::Module.new
 
-      def initialize body_s, identifer
-        self._REDO
-        @body_s = body_s ; @identifier = identifer ; nil
-      end
+      class Mutable_Models_::Body
 
-      attr_reader :identifier
+        class << self
 
-      def find_any_existing_tag_via_tag tag
-        s = tag.render
-        detect do |tag_|
-          s == tag_.render
+          def via_range_and_substring_array__ r, row_a
+            new r, row_a
+          end
+        end  # >>
+
+        def initialize r, row_a
+          @r = r
+          @row_a = row_a
         end
-      end
 
-      def detect & p
-        to_enum.detect( & p )
-      end
-
-      def to_a
-        to_enum.map do |shell_with_flyweight_as_kernel|
-          shell_with_flyweight_as_kernel.duplicate
+        def is_mutable
+          true
         end
-      end
 
-      def each & p
-        to_enum( & p )  # we keep it explicitly separate for now
-      end
-
-      def to_enum
-        if block_given?
-          scn = to_stream ; x = nil
-          yield x while x = scn.gets ; nil
-        else
-          enum_for :to_enum
+        def modality_const  # #experimental mechanic
+          :Byte_Stream
         end
-      end
 
-      def to_stream
-        scanner = Models::Hashtag.value_peeking_stream @body_s
-        flyweight = Flyweight__.new -> { scanner.peek_for_value }
-        tag = Tag_.new flyweight
-        Callback_::Scn.new do
-          begin
-            symbol = scanner.gets
-            symbol or break
-            if :hashtag == symbol.symbol_i
-              flyweight.replace symbol
-              result = tag
-              break
+        def r_
+          @r
+        end
+
+        def row_a_
+          @row_a
+        end
+
+        def prepend_object obj, & oes_p
+
+          o_a = _mutable_row_at_index( @r.begin ).o_a_
+          if o_a.length.nonzero?
+            o = o_a.first
+            if :space == o.business_category_symbol
+              if WS__ !~ o.to_s[ 0 ]
+                o.to_s[ 0, 0 ] = SPACE_  # you can just
+              end
+            else
+              o_a.unshift Snag_::Models::Hashtag::String_Piece.new SPACE_
             end
-          end while true
-          result
+          end
+          o_a.unshift obj
+          ACHIEVED_
+        end
+
+        def append_object obj, & oes_p
+
+          o_a = _mutable_row_at_index( @r.end - 1 ).o_a_
+          if o_a.length.nonzero?
+            o = o_a.last
+            if :space == o.business_category_symbol
+              if WS__ !~ o.to_s[ -1 ]
+                o.to_s.concat SPACE_  # you can just
+              end
+            else
+              o_a.push Snag_::Models::Hashtag::String_Piece.new SPACE_
+            end
+          end
+          o_a.push obj
+          ACHIEVED_
+        end
+
+        def _mutable_row_at_index d
+
+          x = @row_a.fetch d
+          if x.is_mutable
+            x
+          else
+            __convert_to_mutable_row d, x
+          end
+        end
+
+        def __convert_to_mutable_row d, ss
+
+          _a = ss.to_object_stream_.map_by do | o |  # because :+#flyweight
+            o.dup
+          end.to_a
+
+          mutable = Row___.new _a
+
+          @row_a[ d ] = mutable
+          mutable
+        end
+
+        class Row___
+
+          def initialize o_a
+            @o_a_ = o_a
+          end
+
+          attr_reader :o_a_
+
+          def is_mutable
+            true
+          end
+
+          def to_object_stream_
+            Callback_::Stream.via_nonsparse_array @o_a_
+          end
         end
       end
-
-      # ~ for mutation & mutating agents
-
-      def build_controller delegate
-        self.class::Controller__.new self, delegate
-      end
-
-      def get_body_s
-        @body_s.dup
-      end
-
-      def set_body_s s
-        @body_s = s ; nil
-      end
-
-      class Flyweight__
-
-        def initialize p
-          @peek_for_value_p = p
-        end
-
-        def replace symbol
-          @symbol = symbol
-        end
-
-        def duplicate_kernel
-          dup
-        end
-
-        def stem_i
-          @symbol.local_normal_name
-        end
-
-        def to_string
-          @symbol.to_s
-        end
-
-        def tag_start_offset_in_node_body_string
-          @symbol.pos
-        end
-
-        def tag_value_x
-          x = @peek_for_value_p[]
-          x and x.to_s
-        end
-      end
-
-      # <-
+    end
   end
 end

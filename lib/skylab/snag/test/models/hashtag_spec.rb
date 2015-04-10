@@ -52,21 +52,21 @@ module Skylab::Snag::TestSupport
 
     context "the symbol classes are reflective" do
 
-      it "you can 'get_stem_s' from a hash object" do
+      it "you can 'get_stem_string' from a hash object" do
         hashtag = build_hashtag '#foo-bar'
-        hashtag.get_stem_s.should eql 'foo-bar'
+        hashtag.get_stem_string.should eql 'foo-bar'
       end
     end
 
     def build_hashtag str
       a = Subject_[].parse str
-      1 == a.length and :hashtag == a.first.symbol_i or self._SANITY
+      1 == a.length and :hashtag == a.first.nonterminal_symbol or self._SANITY
       a.first
     end
 
     def expect_part i, x
       part = @part_a.shift or fail "expected more parts, had none"
-      part.symbol_i.should eql i
+      part.nonterminal_symbol.should eql i
       part.to_s.should eql x
     end
 

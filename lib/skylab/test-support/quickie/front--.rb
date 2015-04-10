@@ -273,10 +273,8 @@ module Skylab::TestSupport
 
       Stream = Lib_::Stream
 
-      ST___ = Autoloader_.build_require_sidesystem_proc :SubTree
-
       Tree = -> do
-        ST___[]::Models::Tree
+        Basic[]::Tree
       end
     end
 
