@@ -102,8 +102,14 @@ module Skylab::Basic
         end
       end
 
+      attr_reader :path
+
       def members
         [ :memers ] - self.class.instance_methods( false )
+      end
+
+      def modality_const  # :+#experimental
+        :Byte_Stream
       end
 
       def description_under expag

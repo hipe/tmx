@@ -1,16 +1,10 @@
 module Skylab::Snag
 
-  class Models_::Node_Collection
+  module Models_::Node_Collection
 
     Actions = THE_EMPTY_MODULE_
 
-    def initialize manifest, _API_client
-      self._THIS
-      @API_client = _API_client
-      @manifest = manifest
-    end
-
-    attr_reader :manifest  # used in actions for now
+    if false
 
     def add message, do_prepend_open_tag, dry_run, verbose_x, delegate
 
@@ -70,15 +64,34 @@ module Skylab::Snag
       end
       scan
     end
-
-    def all
-
-      _node_class.build_scan_from_lines @manifest.manifest_file.normalized_line_producer
     end
 
-    def _node_class
+    class << self
 
-      Snag_::Models_::Node
+      def is_silo
+        true
+      end
+    end  # >>
+
+    class Silo_Daemon
+
+      def initialize kr, mc
+        @kernel = kr
+        @model_class = mc
+        freeze
+      end
+
+      def node_collection_via_upstream_identifier x, & oes_p
+
+        # for now all upstreams are byte-stream based (and etc..)
+
+        id = Snag_.lib_.basic::Pathname.identifier x
+
+        NC_::Expression_Adapters.const_get( id.modality_const, false ).
+          node_collection_via_upstream_identifier( id, & oes_p )
+      end
     end
+
+    NC_ = self
   end
 end

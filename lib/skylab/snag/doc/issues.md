@@ -2,7 +2,7 @@
 [#068]       #parent-node: [#003] "melt is a hack.."
 [#067]       #parent-node: [#057] model support
 [#066] #open modernify events (we have a native implementation)
-             ( was: the actor dream, moved to [cb] )
+             ( #was: the actor dream, moved to [cb] )
 [#065] #open tall stacks swallow error results (most of these tests)
 [#064] #open hide `ping` action
 [#063]       #parent-node: [#057] the melt narrative ..
@@ -71,14 +71,15 @@
 [#007]       track places where we add (or "subtract") hashtag prefix
              ( #was: #done autoloadify )
 [#006]       #doc-node structures for our API implementation ..
-             (was: reanme Api -> API, P-orcelain -> CLI)
+             ( #was: reanme Api -> API, P-orcelain -> CLI)
 [#005]       #done get cli working again
-[#004]       #done light fast solo CLI client 2012-11-12
+[#004]       thoughts on interpretation and expression ..
+             ( #was: #done light fast solo CLI client 2012-11-12 )
 [#003]       #parent-node: [#057] the todo narrative ..
              ( #was: tree report of todos 2012-10-13 )
 [#002]       #used-in-tests
              ( #was: #done 2012-08-19 basic CLI integration specs - essential coverage  )
 [#001]       #done tag negation in queries
-             ( was: #done 2012-08-20 integrate the 'issue-all' one-off #deferred )
+             ( #was: #done 2012-08-20 integrate the 'issue-all' one-off #deferred )
 [#sl-048]    #done show should list (for now) 2012-02-10
 [#sl-046]    #done #feature add verbose/debug mode, put such output there 2012-02-07

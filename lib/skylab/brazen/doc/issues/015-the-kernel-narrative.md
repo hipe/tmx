@@ -74,3 +74,14 @@ if we were crazy we would cache this sorted const list.
 
 (what we end up doing is creating a linked-list style directed graph to
 represent the desired order).
+
+
+
+
+## :#note-265
+
+although it is a class of use cases by which this whole algorithm was
+inspired, currently this ambiguous state here only gets covered by
+[sg]  (at this moment) by for e.g requesting the silo `node_collection`
+(and there there are e.g 4 `node*` models). whew! that it works as
+intended almost a year later.

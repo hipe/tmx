@@ -1,41 +1,34 @@
 module Skylab::Snag
 
-  class Models::Manifest
+  module Models_::Node_Collection
 
-    class Agent_Adapter__
+    Expression_Adapters = ::Module.new
 
-      # so we can keep track of what "services" the agents need
+    module Expression_Adapters::Byte_Stream
 
-      Callback_::Actor.call self, :properties,
-        :all_nodes,
-        :file_utils,
-        :manifest_file,
-        :render_line_a,
-        :produce_tmpdir
+      class << self
+        def node_collection_via_upstream_identifier id, & oes_p
 
-      def initialize * x_a
-        process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+          Native_Collection___.new id
+        end
+      end  # >>
+
+      class Native_Collection___  # or whatever
+
+        def initialize id
+
+          @path_identifier = id
+        end
+
+        def to_node_stream & oes_p
+
+          BS_::Actors_::Produce_node_upstream[ @path_identifier, & oes_p ]
+        end
       end
 
-      def all_nodes
-        @all_nodes.call
-      end
+      Autoloader_[ Actors_ = ::Module.new ]
 
-      def build_file_utils_with * x_a
-        @file_utils[ iambic_stream_via_iambic_array x_a ]
-      end
-
-      def manifest_file
-        @manifest_file.call
-      end
-
-      def render_line_a identifier_d, node
-        @render_line_a[ identifier_d, node ]
-      end
-
-      def produce_tmpdir * x_a
-        @produce_tmpdir[ x_a ]
-      end
+      BS_ = self
     end
   end
 end

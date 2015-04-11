@@ -13,7 +13,7 @@ module Skylab::Brazen
         def trio
           LIB_.trio
         end
-      end
+      end  # >>
 
       # ~ ad-hoc processors
 

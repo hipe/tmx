@@ -242,7 +242,7 @@ module Skylab::Basic
 
         def nope terminal_channel_symbol
           @result = maybe_send_event :error, :invalid_property_value do
-            build_argument_error_event_with terminal_channel_symbol,
+            build_argument_error_event_with_ terminal_channel_symbol,
                 :path, @value_x,
                 :prop, @arg.property do | y, o |
 

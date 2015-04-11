@@ -1,36 +1,101 @@
 module Skylab::Snag
 
-  class API::Actions::Nodes::Numbers::List < API::Action_
+  class Models_::Node
 
-    Delegate = Snag_::Model_::Delegate.
-      new :error_event, :error_string,
-        :info_event, :info_string,
-        :output_line
+    Actions = ::Module.new
 
-    Entity_.call self,
+    class Actions::To_Stream < Brazen_.model.action_class
 
-      :make_delegate_properties,
-      :make_sender_methods,
+      Brazen_.model.entity self,
 
-      :required, :property, :working_dir
+        :ad_hoc_normalizer, -> arg, & oes_p do
 
-    def if_nodes_execute
-      all_count = valid_count = 0
-      all = @nodes.all.reduce_by { |_| all_count += 1 ; true }
-      valid = all.reduce_by do |node|
-        if node.is_valid
-          true
-        else
-          receive_info_event node.invalid_reason_event
-          false
+          Snag_::Models_::Node_Identifier.
+            interpret_out_of_under( arg, :User_Argument, & oes_p )
+
+        end, :property, :identifier,
+
+        :integer_greater_than_or_equal_to, 1,
+        :description, -> y do
+          y << 'limit output to N nodes'
+        end,
+        :property, :number_limit,
+
+        :required, :property, :upstream_identifier
+
+      def produce_result
+
+        nc = @kernel.silo( :node_collection ).
+          node_collection_via_upstream_identifier(
+            @argument_box.fetch( :upstream_identifier ),
+            & handle_event_selectively )
+
+        nc and begin
+          __via_node_collection nc
         end
       end
-      valid = valid.reduce_by { |_| valid_count += 1 ; true }
-      valid.each do |node|
-        send_output_line node.render_identifier
+
+      def __via_node_collection nc
+
+        h = @argument_box.h_
+
+        st = nc.to_node_stream( & handle_event_selectively )
+        st and begin
+
+          id_o = h[ :identifier ]
+          if id_o
+
+            __first_by st do | node |
+
+              id_o == node.ID
+            end
+          else
+            d = h[ :number_limit ]
+            if d
+              __limit_by_count d, st
+            else
+              st
+            end
+          end
+        end
       end
-      send_info_string "found #{ valid_count } valid of #{ all_count } total nodes."
-      ACHIEVED_
+
+      def __limit_by_count end_, st
+
+        count = 0
+
+        Callback_::Stream.new st.upstream do
+
+          if count < end_
+            x = st.gets
+            if x
+              count += 1
+            end
+            x
+          end
+        end
+      end
+
+      def __first_by st, & p
+
+        # #todo:during:node-critera
+
+        begin
+          node = st.gets
+          node or break
+
+          _yes = p[ node ]
+          if _yes
+            st.upstream.release_resource
+            break
+          end
+          redo
+        end while nil
+        node
+      end
+
+      # send_info_string "found #{ valid_count } valid of #{ all_count } total nodes."
+
     end
   end
 end

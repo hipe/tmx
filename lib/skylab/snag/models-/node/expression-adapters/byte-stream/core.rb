@@ -8,11 +8,11 @@ module Skylab::Snag
 
       class << self
 
-        def express_into_under_of y, expag, node
-          express_N_units_into_under_of nil, y, expag, node
+        def express_into_under_of_ y, expag, node
+          express_N_units_into_under_of_ nil, y, expag, node
         end
 
-        def express_N_units_into_under_of d, y, expag, node
+        def express_N_units_into_under_of_ d, y, expag, node
 
           body = node.body
 

@@ -11,7 +11,7 @@ module Skylab::Snag::TestSupport
 
     it "minimal positive case" do
 
-      o = _subject.new
+      o = _subject.send :new
 
       o.append_tag :A, & handle_event_selectively
 
@@ -24,7 +24,7 @@ module Skylab::Snag::TestSupport
 
     it "don't use the hash character here" do
 
-      o = _subject.new
+      o = _subject.send :new
 
       ok = o.prepend_tag :"#A", & handle_event_selectively
 
@@ -35,7 +35,8 @@ module Skylab::Snag::TestSupport
 
     it "create then express as byte stream" do
 
-      o = _subject.new 3  # the node identifier is '3'
+      o = _subject.new_via_identifier _id 3  # the node identifier is '3'
+
       o.append_tag :love
       o.append_string 'this'
       o.prepend_string 'we really '
@@ -48,7 +49,7 @@ module Skylab::Snag::TestSupport
 
     it "read from byte-stream" do
 
-      o = _subject.new nil, _body
+      o = _subject.new_via_body _body
       st = o.to_tag_stream
 
       tag = st.gets
@@ -66,7 +67,7 @@ module Skylab::Snag::TestSupport
 
     it "read from byte-strem then prepend" do
 
-      o = _subject.new _id( 4 ), _body
+      o = _subject.new_via_identifier_and_body _id( 4 ), _body
 
       _ok = o.prepend_tag :boo, & handle_event_selectively
       expect_no_events
@@ -91,7 +92,7 @@ module Skylab::Snag::TestSupport
 
     it "read from byte-stream then append (it only re-writes the necessary lines)" do
 
-      o = _subject.new _id( 3 ), _body
+      o = _subject.new_via_identifier_and_body _id( 3 ), _body
 
       _ok = o.append_tag :zoo, & handle_event_selectively
       expect_no_events

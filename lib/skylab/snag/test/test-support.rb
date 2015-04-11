@@ -110,7 +110,7 @@ module Skylab::Snag::TestSupport
     NIL_
   end
 
-  Fixture_files_ = -> do
+  Fixture_file_ = -> do
     p = -> sym do
       h = {}
 
@@ -122,6 +122,8 @@ module Skylab::Snag::TestSupport
         h[ ::File.basename( path ).gsub( rx, UNDERSCORE_ ).intern ] = path
       end
 
+      h[ :not_there ] = 'not-there.file'
+
       p = h.method :fetch
       p[ sym ]
     end
@@ -130,7 +132,7 @@ module Skylab::Snag::TestSupport
     end
   end.call
 
-  Fixture_trees_ = -> do
+  Fixture_tree_ = -> do
     h = {}
     -> sym do
       h.fetch sym do

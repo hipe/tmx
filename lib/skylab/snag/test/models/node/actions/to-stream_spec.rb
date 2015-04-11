@@ -2,69 +2,116 @@ require_relative '../../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - node-collection - actions - to-node-stream", wip: true do
+  describe "[sg] models - node - actions - to-stream" do
 
     extend TS_
 
-    with_invocation 'nodes', 'list'
+    use :expect_event
 
-    with_tmpdir_patch do
+    it "upstream identifer not resolved - you won't see it till you gets" do
 
-      <<-O.unindent
-        diff --git a/#{ manifest_file } b/#{ manifest_file }
-        --- /dev/null
-        +++ b/#{ manifest_file }
-        @@ -0,0 +1,4 @@
-        +[#003] #open feep my deep
-        +[#002]       #done wizzle bizzle 2013-11-11
-        +               one more line
-        +[#001]       #done
-      O
+      call_API :node, :to_stream,
+        :upstream_identifier, Fixture_file_[ :not_there ]
+
+      st = @result
+      _x = st.gets
+      _x.should  eql false
+
+      expect_not_OK_event :errno_enoent
     end
 
-    it "with `list -n 1` - shows only the first one it finds" do
-      setup_tmpdir_read_only
-      invoke '-n', '1'
+    it "uses flyweighting" do
 
-      infos = []
-      pays = []
-      output.lines.each do |line|
-        case line.stream_symbol
-        when :info ; infos.push line.string
-        when :pay  ; pays.push line.string.chomp
-        else       ; fail "wat? - #{ line.stream_symbol }"
-        end
-      end
-      infos.length.should eql 2
-      infos.first.should match( %r{ doc/issues\.md }x ) # has this in it
-      pays.length.should eql(3)
-      o = -> { pays.shift }
-      o[].should eql('---')
-      o[].should match( /\Aidentifier_body +: +003\z/ )
-      o[].should match( /\Afirst_line_body +: #open feep my deep\z/ )
-      o[].should eql(nil)
+      call_API :node, :to_stream,
+        :upstream_identifier, Fixture_file_[ :the_first_manifest ]
+
+      st = @result
+
+      x = st.gets
+      oid = x.object_id
+      x = x.dup
+
+      x_ = st.gets
+      x_.object_id.should eql oid
+      x_ = x_.dup
+
+      st.gets.should be_nil
+      st.upstream.release_resource  # not necessary
+
+      x.ID.to_i.should eql 1
+      x_.ID.to_i.should eql 2
+
+      st = x.body.__to_business_row_stream
+      st.gets.s.should eql "[#01]  this line is in\n"
+      st.gets.s.should eql " part of the above\n"
+      st.gets.should be_nil
+
+      st = x_.body.__to_business_row_stream
+      st.gets.s.should eql "[#02] hi\n"
+      st.gets.should be_nil
     end
 
-    it "with `list -2` - also works (-<n> option yay)" do
+    it "`number_limit`" do
+
+      call_API :node, :to_stream,
+        :number_limit, 1,
+        :upstream_identifier, _alpha_path
+
+      st = @result
+      st.gets.ID.to_i.should eql 5
+      st.gets.should be_nil
+
+    end
+
+    it "with `list -2` - also works (-<n> option yay)", wip: true do
       setup_tmpdir_read_only
       invoke '-2'
       output.lines.last.string.should match( /found 2 nodes with validity/ )
     end
 
-    context "if you ask to see a particular one" do
+    it "`identifier` where number is too low" do
 
-      it "with `show 002 --no-verbose` - it shows it tersely" do
-        setup_tmpdir_read_only
-        invoke '002', '--no-verbose'
-        names, = output.unzip
-        names.count{ |x| x == :pay }.should eql( 2 ) # i don't care about info
-        act = output.lines.select{ |x| :pay == x.stream_symbol }.map(&:string).join ''
-        exp = <<-O.unindent
-          [#002]       #done wizzle bizzle 2013-11-11
-                         one more line
-        O
-        act.should eql( exp )
-      end
+      call_API :node, :to_stream,
+        :identifier, '-12'
+
+      _ev = expect_not_OK_event( :number_too_small ).to_event
+
+      black_and_white( _ev ).should eql(
+        "'node-identifier-number-component' must be non-negative integer, had '-12'" )
+
+      expect_failed
+    end
+
+    it "`identifier` (RESULT SHAPE IS EXPERIMENTAL)" do
+
+      call_API :node, :to_stream,
+        :identifier, '0002',
+        :upstream_identifier, _alpha_path
+
+      expect_no_events
+      st = @result.body.__to_business_row_stream
+
+      st.gets.s.should eql "[#002]       #done wizzle bizzle 2013-11-11\n"
+      st.gets.s.should eql "               one more line\n"
+    end
+
+    it "`identifier` with suffix" do
+
+      call_API :node, :to_stream,
+        :identifier, '98.6',
+        :upstream_identifier, _second_manifest
+
+      st = @result.body.__to_business_row_stream
+      st.gets.s.should eql "[#98.6]  don't use these\n"
+      st.gets.should be_nil
+    end
+
+    memoize_ :_second_manifest do
+      Fixture_file_[ :the_second_manifest ]
+    end
+
+    memoize_ :_alpha_path do
+      ::File.join( Fixture_tree_[ :mock_project_alpha ], 'doc/issues.md' )
     end
   end
 end

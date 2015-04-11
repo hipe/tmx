@@ -76,7 +76,7 @@ module Skylab::Snag::TestSupport
     end.call
 
     def _some_todos
-      Fixture_trees_[ :some_todos ]
+      Fixture_tree_[ :some_todos ]
     end
 
     def _expect_common_finish

@@ -6,12 +6,36 @@ module Skylab::Snag
 
     class Models_::Suffix  # described in the node identifier spec
 
-      class << self
+      define_singleton_method :interpret_out_of_under_,
+        INTERPRET_OUT_OF_UNDER_METHOD_
 
-        def parse s
-          Parse___[ s ]
-        end
-      end # >>
+      Expression_Adapters = ::Module.new
+
+      module Expression_Adapters::Byte_Stream
+
+        class << self
+
+          def interpret_out_of_under_ scn, _, & oes_p
+            Interpret_out_of_string_scanner___[ scn, & oes_p ]
+          end
+        end  # >>
+      end
+
+      module Expression_Adapters::String
+
+        class << self
+
+          def interpret_out_of_under_ s, _, & oes_p
+
+            _scn = Snag_::Library_::StringScanner.new s
+
+            Interpret_out_of_string_scanner___.call _scn do | *, & ev_p |
+
+              raise ev_p[].to_exception
+            end
+          end
+        end  # >>
+      end
 
       def initialize a
         @to_a = a
@@ -68,39 +92,48 @@ module Skylab::Snag
         end
       end
 
-      Parse___ = -> do
-
-        separator = /[-.\/]/
-
-        string_value  = / [^-.\/0-9]  [^-.\/]*  /x
-
-          # one not separator or digit character followed by
-          # zero or more not separator characters
+      Interpret_out_of_string_scanner___ = -> do
 
         integer_value = / -? \d+ /x
 
+        multi_suffix_as_string = / -{2,} | \.{2,} | \/{2,} /x
 
-        -> s do
+        separator = /[-.\/]/
 
-          a = []
-          scn = Snag_::Library_::StringScanner.new s
+        string_value  = /[a-zA-Z_] [a-zA-Z0-9_']* /x  # Bill's_Barbecue_2015 or whatever meh
+
+        -> scn, & oes_p do
+
+          a = nil
+
           begin
             separator_string = scn.scan separator
             string = scn.scan string_value
+
             if string
               value_category_symbol = :string
               value_x = string
+
             else
               integer_s = scn.scan integer_value
+
               if integer_s
                 value_category_symbol = :integer
                 value_x = integer_s.to_i
+
               else
-                value_category_symbol = :string
-                value_x = scn.rest
-                scn.pos = scn.string.length
+                string = scn.scan multi_suffix_as_string
+                if string
+                  value_category_symbol = :string
+                  value_x = string
+                else
+
+                  break
+                end
               end
             end
+
+            a ||= []
 
             a.push Component___.new(
               separator_string,
@@ -111,7 +144,13 @@ module Skylab::Snag
             redo
           end while nil
 
-          Suffix_.new a.freeze
+          if a
+            Suffix_.new a.freeze
+          elsif oes_p
+            oes_p.call :error, :parse_error, :suffix_expected do
+              Expecting___[ scn, :suffix ]
+            end
+          end
         end
       end.call
 
@@ -164,6 +203,18 @@ module Skylab::Snag
           end
         end
         SHAPE_RANK___ = { integer: 0, string: 1 }
+      end
+
+      Expecting___ = -> scn, sym do
+
+        Callback_::Event.inline_not_OK_with(
+            :suffix_parse_error,
+            :x, scn.rest,
+            :expecting_symbol, sym,
+            :error_category, :argument_error ) do | y, o |
+
+          y << "invalid #{ o.expecting_symbol }: #{ ick o.x }"
+        end
       end
 
       Suffix_ = self

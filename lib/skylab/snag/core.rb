@@ -78,6 +78,36 @@ module Skylab::Snag
     Autoloader_[ self, :boxxy ]
   end
 
+  EXPRESS_INTO_UNDER_ = -> y, expag do
+
+    self.class::Expression_Adapters.const_get( expag.modality_const, false ).
+      express_into_under_of_ y, expag, self
+  end
+
+  module Expression_Methods_
+
+    def express_into_under y, expag
+
+      _expad_for( expag ).express_into_under_of_ y, expag, self
+    end
+
+    def express_N_units_into_under d, y, expag
+
+      _expad_for( expag ).express_N_units_into_under_of_ d, y, expag, self
+    end
+
+    def _expad_for expag
+      self.class::Expression_Adapters.const_get expag.modality_const, false
+    end
+  end
+
+  INTERPRET_OUT_OF_UNDER_METHOD_ = -> x, moda, & oes_p do
+
+    self::Expression_Adapters.const_get( moda.intern, false ).
+
+      interpret_out_of_under_ x, moda, & oes_p
+  end
+
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   ACHIEVED_= true

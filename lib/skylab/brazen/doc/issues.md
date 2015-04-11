@@ -19,7 +19,8 @@
 [#075]    #tracking :+#wishlist optionally generate ivar-based iambic writers
 [#074] #hole ( was: #parent-node: [#011] the codifying expression agents)
 [#073] #hole ( was: #parent-node: [#011] selective event listening via methods )
-[#072]       #done (was: modernize this interface)
+[#072] #open `is_silo` can probably go away in exchange for const_get( `Silo_Daemon` )
+             ( #was: modernize this interface )
 [#071]       #tracking-tag wrap
 [#070]       #tracking-tag when we intentionally expose a mechanical
                ivar as a property

@@ -2,36 +2,53 @@ module Skylab::Snag
 
   class Models_::Node
 
-    Actions = THE_EMPTY_MODULE_
+    class << self
 
-    def initialize node_ID_object=nil, body=nil
+      def new_via_body body
+        new nil, body
+      end
+
+      def new_via_identifier id_o
+        new id_o
+      end
+
+      def new_via_identifier_and_body id_o, body
+        new id_o, body
+      end
+
+      private :new
+    end
+
+    def initialize id_o=nil, body=nil
 
       @body = body
       @changed = false
-      @ID = if node_ID_object
-        Snag_::Models_::Node_Identifier.try_convert node_ID_object
-      else
-        node_ID_object
+      if id_o
+        id_o.respond_to?( :suffix ) or raise ::ArgumentError, "where? #{ id_o.class }"
+        @ID = id_o
       end
+    end
+
+    def reinitialize id_o
+
+      if id_o
+        id_o.respond_to?( :suffix ) or raise ::ArgumentError, "where? #{ id_o.class }"
+      end
+
+      @ID = id_o
+      NIL_
+    end
+
+    def initialize_copy _
+      @body = @body.dup
+      NIL_
     end
 
     attr_reader :body, :changed, :ID
 
     # ~
 
-    def express_into_under y, expag
-
-      _expad_for( expag ).express_into_under_of y, expag, self
-    end
-
-    def express_N_units_into_under d, y, expag
-
-      _expad_for( expag ).express_N_units_into_under_of d, y, expag, self
-    end
-
-    def _expad_for expag
-      Node_::Expression_Adapters.const_get expag.modality_const, false
-    end
+    include Expression_Methods_
 
     # ~
 
@@ -108,6 +125,8 @@ module Skylab::Snag
     end
 
     Autoloader_[ Models_ = ::Module.new ]
+
+    Brazen_ = Snag_.lib_.brazen
 
     Node_ = self
   end

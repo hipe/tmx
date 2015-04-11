@@ -79,7 +79,7 @@ module Skylab::Snag::TestSupport
 
       it "suffix components cannot be the empty string, so" do
 
-        o = _parent_subject.new_via_integer_and_suffix_string 0, '...'
+        o = _new_via_integer_and_suffix_string 0, '...'
         o.suffix_separator_at_index( 0 ).should eql '.'
         o.suffix_value_at_index( 0 ).should eql '..'
         o.suffix_separator_at_index( 1 ).should be_nil
@@ -88,7 +88,7 @@ module Skylab::Snag::TestSupport
 
       it "ditto" do
 
-        o = _parent_subject.new_via_integer_and_suffix_string 0, 'A'
+        o = _new_via_integer_and_suffix_string 0, 'A'
         o.suffix_separator_at_index( 0 ).should be_nil
         o.suffix_value_at_index( 0 ).should eql 'A'
       end
@@ -110,15 +110,24 @@ module Skylab::Snag::TestSupport
 
       it "the string used for the separator is used in the comparison!" do
 
-        ( _( 3, '.A-B/C' ) <=> _( 3, '.A-B-C' ) ).should eql 1
+        _a = _ 3, '.A-B/C'
+        _b = _ 3, '.A-B-C'
+        ( _a <=> _b ).should eql 1
       end
 
       def _ d, s
-        _parent_subject.new_via_integer_and_suffix_string d, s
+        _new_via_integer_and_suffix_string d, s
       end
 
+      _New_via_integer_and_suffix_string = -> d, ss do
+        _Subject[].new_via_integer_and_suffix_string d, ss
+      end
+
+      define_method :_new_via_integer_and_suffix_string,
+        _New_via_integer_and_suffix_string
+
       memoize_ :_subject do
-        _Subject[].new_via_integer_and_suffix_string 3, '.xyz--23/A'
+        _New_via_integer_and_suffix_string[ 3, '.xyz--23/A' ]
       end
     end
 

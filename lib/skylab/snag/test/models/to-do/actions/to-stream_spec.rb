@@ -10,7 +10,7 @@ module Skylab::Snag::TestSupport
     it "one fine | multiple matches on one line | multiple patterns " do
 
       call_API :to_do, :to_stream,
-        :path, [ Fixture_files_[ :foo_txt ] ],
+        :path, [ Fixture_file_[ :foo_txt ] ],
         :pattern, [ '\<deta\>', '\<geta', 'jeta\>' ]
 
       st = @result
@@ -31,7 +31,7 @@ module Skylab::Snag::TestSupport
     it "the name option" do
 
       call_API :to_do, :to_stream,
-        :path, [ Fixture_trees_[ :some_todos ] ],
+        :path, [ Fixture_tree_[ :some_todos ] ],
         :pattern, [ '[%]to-dew\>' ],
         :name, [ '*.code' ]
 
@@ -55,7 +55,7 @@ module Skylab::Snag::TestSupport
     it "tries to avoid false matches" do  # but this is not language aware [#068]
 
       call_API :to_do, :to_stream,
-        :path, [ Fixture_files_[ :matched_by_first_but_not_second_phase ] ],
+        :path, [ Fixture_file_[ :matched_by_first_but_not_second_phase ] ],
         :pattern, [ '@todo\>' ]
 
       _st = @result

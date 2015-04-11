@@ -165,7 +165,7 @@ module Skylab::Basic  # introduction at [#020]
       end
     end
 
-    def build_argument_error_event_with * x_a, & msg_p
+    def build_argument_error_event_with_ * x_a, & msg_p
       x_a.push :error_category, :argument_error
       build_not_OK_event_via_mutable_iambic_and_message_proc x_a, msg_p
     end

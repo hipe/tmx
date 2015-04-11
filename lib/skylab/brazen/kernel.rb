@@ -219,11 +219,12 @@ module Skylab::Brazen
       if id.is_resolved
         _produce_silo id
       else
-        __cols_via_unresolved_id id, & oes_p
+        __silo_via_unresolved_id id, & oes_p
       end
     end
 
-    def __cols_via_unresolved_id id, & oes_p  # #note-40
+    def __silo_via_unresolved_id id, & oes_p  # #note-40
+
       id = id.as_mutable_for_resolving
       node = self ; mod_a = nil
       full_raw_s_a = id.raw_name_parts
@@ -243,12 +244,11 @@ module Skylab::Brazen
           _num_parts = _some_name_function_via_mod( node ).as_parts.length
           _start_of_next_part = index - local_index + _num_parts
           id.add_demarcation_index _start_of_next_part
-          _is_silo =
-          if node.respond_to? :is_silo
+
+          _is_silo = if node.respond_to? :is_silo
             node.is_silo
-          else
-            false
           end
+
           if _is_silo
             id.bake node
             result = _produce_silo id
@@ -256,14 +256,21 @@ module Skylab::Brazen
           else
             mod_a = nil
           end
+
         when  1
           result = __when_not_found id, target_s, & oes_p
           break
         when -1
-          self._NEATO
+          # #note-265 - although it is a class of use cases for which this..
+          NIL_
         end
       end
       result
+    end
+
+    def __say_node_is_not_silo node
+
+      "is not silo (currently, must respond to `is_silo` with true-ish): #{ node.name }"
     end
 
     def __when_not_found id, target_s, & oes_p

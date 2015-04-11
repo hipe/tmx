@@ -47,6 +47,16 @@ module Skylab::Snag
           @sstr_a = sstr_a
         end
 
+        def reinitialize r
+          @r = r
+          NIL_
+        end
+
+        def initialize_copy _
+          @sstr_a = @sstr_a.dup
+          NIL_
+        end
+
         def is_mutable
           false
         end
@@ -67,12 +77,12 @@ module Skylab::Snag
 
         def __to_object_stream
 
-          __to_significant_row_stream.expand_by do | row |
+          __to_business_row_stream.expand_by do | row |
             row.to_object_stream_
           end
         end
 
-        def __to_significant_row_stream
+        def __to_business_row_stream
 
           a = @sstr_a
 

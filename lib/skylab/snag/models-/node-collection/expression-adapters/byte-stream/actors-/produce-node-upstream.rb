@@ -1,164 +1,220 @@
 module Skylab::Snag
 
-  module Models::Node
+  module Models_::Node_Collection
 
-    class Scan__  # the embodiment of [#059] scanners
+    module Expression_Adapters::Byte_Stream
 
-      class << self
-        def produce_scan_from_lines lines
-          Scanner_From_Lines__.new lines
-        end
-      end
+      class Actors_::Produce_node_upstream
 
-      def initialize p, upstream
-        @p = p ; @upstream = upstream ; nil
-      end
+        # parse the manifest file syntax: identifiers that start at column 1
 
-      def reduce_by & p
-        Scan__.new p, self
-      end
+        Callback_::Actor.call self, :properties,
+          :path_identifier
 
-      def stop_when & p
-        Stopper__.new p, self
-      end
+        def execute
 
-      def each
-        if block_given?
-          x = nil
-          yield x while x = gets
-          nil
-        else
-          to_enum
-        end
-      end
+          @p = -> do
+            __produce_the_first_node
+          end
 
-      def gets
-        x = @upstream.gets
-        while x
-          _pass = @p[ x ]
-          _pass and break
-          x = @upstream.gets
-        end
-        x
-      end
-
-      def stop
-        @upstream.stop ; nil
-      end
-
-      class Stopper__ < self
-        def initialize( * )
-          p = -> do
-            x = @upstream.gets
-            if x
-              _do_stop = @p[ x ]
-              if _do_stop
-                @upstream.stop
-                p = EMPTY_P_
-              end
+          o = Callback_::Stream
+          o.new(
+            o::Release_Resource_Proxy.new do
+              @line_upstream.close
             end
-            x
+          ) do
+            @p[]
           end
-          @gets_p = -> do
-            p[]
-          end
-          super
-        end
-        def gets
-          @gets_p.call
-        end
-      end
-
-      class Scanner_From_Lines__ < self
-
-        def initialize normalized_line_producer
-          @fly = Node_.build_flyweight
-          @line_producer = normalized_line_producer
-          @scn = Snag_::Library_::StringScanner.new EMPTY_S_
         end
 
-        def gets
-          @line ||= @line_producer.gets
-          @line and gets_when_line_and_expecting_node
+        def __produce_the_first_node
+
+          _ok = __resolve_line_upstream
+          _ok && __via_line_upstream_produce_first_node
         end
 
-        def stop
-          @line_producer.stop ; nil
+        def __resolve_line_upstream
+
+          @line_upstream =
+            Snag_.lib_.system.filesystem.normalization.upstream_IO(
+              @path_identifier.path, & @on_event_selectively )
+
+          @line_upstream && ACHIEVED_
         end
 
-      private
+        def __via_line_upstream_produce_first_node
 
-        def gets_when_line_and_expecting_node
-          @fly.clear
-          @scn.string = @line
-          d = @scn.skip ID_RX__
-          if d
-            gets_when_line_starts_with_identifier d
+          s = @line_upstream.gets
+          if s
+            __produce_first_node_via_first_line s
           else
-            gets_when_line_failed_to_start_with_identifier
+            @p = EMPTY_P_
+            s
           end
         end
 
-        def gets_when_line_failed_to_start_with_identifier
-          @fly.set_parse_failure 'identifier',
-            @line[ 0, 9 ],  # arbitrary amount
-            @line,
-            @line_producer.line_number,
-            @line_producer.pathname
-          @line = nil
-          @fly
-        end
+        def __produce_first_node_via_first_line s
 
-        def gets_when_line_starts_with_identifier width_d
-          id_s = @line[ 0, width_d ]
-          @md = ID_RX__.match id_s  # eew do it again
-          @indexes = @fly.indexes
-          @d = CONTENT_START_INDEX__
-          @md[ :prefix ] and prcs_prefix
-          @fly.first_line = @line
-          prcs_integer_and_identifier_body
-          prcs_first_line_body
-          @fly.is_valid = true
-          @line = nil
-          prcs_any_extra_lines
-          @fly
-        end
+          a = []
+          models = Snag_::Models_
+          o = models::Node::Expression_Adapters::Byte_Stream::Models_
+          scn = Snag_::Library_::StringScanner.new s
 
-        def prcs_prefix
-          @indexes.identifier_prefix.begin = @d
-          @d += @md[ :prefix ].length + Models::Identifier::PREFIX_SEPARATOR_WIDTH
-          @indexes.identifier_prefix.end = @d - 1
-        end
+          @body = o::Body.via_range_and_substring_array nil, a
 
-        def prcs_integer_and_identifier_body
-          @indexes.identifier_body.begin = @d
-          @indexes.integer.begin = @d
-          @indexes.integer.end = @d + @md[ :integer ].length - 1
-          @d += @md[ :identifier_body ].length
-          @indexes.identifier_body.end = @d - 1
-        end
+          @ID = models::Node_Identifier.new
+          @ID_ = models::Node_Identifier.new
 
-        def prcs_first_line_body
-          @scn.skip WHITE_RX__
-          @indexes.body.begin = @scn.pos
-          @indexes.body.end = @line.length - 1
-        end
+          @node = models::Node.new_via_body @body
 
-        def prcs_any_extra_lines
-          @line = @line_producer.gets
-          while @line
-            WHITE_AT_BEGINNING_RX__ =~ @line or break
-            @fly.extra_line_a.push @line
-            @line = @line_producer.gets
+          @reinterpret_ID = models::Node_Identifier::Expression_Adapters::
+            Byte_Stream.build_reinterpreter scn
+
+          @scn = scn
+          @sstr_a = a
+          @Substring = o::Substring
+
+          _ok = __gather_up_leading_non_identifier_lines
+          _ok && begin
+
+            @start_new_node = -> do
+
+              @business_line_range_begin = @sstr_a.length
+
+              @start_new_node = -> do
+                @business_line_range_begin = 0
+                @sstr_a.clear
+
+                @start_new_node = -> do
+                  @sstr_a.clear
+                  NIL_
+                end
+
+                NIL_
+              end
+              NIL_
+            end
+
+            @p = method :_node_via_just_after_node_identifier
+            _node_via_just_after_node_identifier
           end
-          nil
         end
 
-        CONTENT_START_INDEX__ = Models::Identifier::CONTENT_START_INDEX
-        ID_RX__ = Models::Identifier::FORMAL_RX
-        WHITE_RX__ = /[ \t]+/
-        WHITE_AT_BEGINNING_RX__ = /\A#{ WHITE_RX__.source }/
+        def __gather_up_leading_non_identifier_lines
+
+          begin
+
+            if @reinterpret_ID[ @ID ]
+              x = ACHIEVED_
+              break
+            end
+
+            s = @line_upstream.gets
+            if s
+              @sstr_a.push @Substring.new nil, nil, @scn.string
+              @scn.string = s
+              redo
+            end
+            break
+          end while nil
+          x
+        end
+
+        def _node_via_just_after_node_identifier
+
+          @business_line_range_end = nil
+          @start_new_node[]
+          __accept_first_node_line
+          begin
+            s = @line_upstream.gets
+            if ! s
+              x = _EOF
+              break
+            end
+            @scn.string = s
+            if @reinterpret_ID[ @ID_ ]
+              x = _node
+              break
+            end
+            d = @scn.skip WHITE__
+            if d
+              _accept_business_line_with_assumptions
+              redo
+            end
+            x = __skip_all_lines_till_next_ID
+            break
+          end while nil
+          x
+        end
+
+        def __skip_all_lines_till_next_ID
+
+          # current line is non-business. skip *all* lines till next ID
+
+          @business_line_range_end = @sstr_a.length
+          begin
+            @sstr_a.push @Substring.new( nil, nil, @scn.string )
+            s = @line_upstream.gets
+            if ! s
+              x = _EOF
+              break
+            end
+            @scn.string = s
+            if @reinterpret_ID[ @ID_ ]
+              x = _node
+              break
+            end
+            redo
+          end while nil
+          x
+        end
+
+        def _node
+
+          _reinitialize_node
+          id = @ID
+          @ID = @ID_
+          @ID_ = id
+          @node
+        end
+
+        def _EOF
+
+          _reinitialize_node
+          @p = EMPTY_P_
+          @node
+        end
+
+        def _reinitialize_node
+
+          @body.reinitialize(
+            @business_line_range_begin ...
+              ( @business_line_range_end || @sstr_a.length ) )
+
+          @node.reinitialize @ID
+
+          NIL_
+        end
+
+        def __accept_first_node_line
+
+          @scn.skip WHITE__
+          _accept_business_line_with_assumptions
+          NIL_
+        end
+
+        def _accept_business_line_with_assumptions
+
+          @sstr_a.push @Substring.new(
+            @scn.pos,
+            @scn.string.length - 1,  # dodgy, but meh for now
+            @scn.string )
+          NIL_
+        end
+
+        WHITE__ = /[ \t]+/
       end
     end
   end
 end
+# :+#tombstone: "the embodiment of [#059] scanners"

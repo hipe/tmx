@@ -84,6 +84,7 @@ module Skylab::Basic
       end
 
       o[ :unpack_equal ] = Unpack_equal__
+      o[ :unpack_subset ] = Unpack_subset__
 
     end.call
 

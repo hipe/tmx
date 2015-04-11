@@ -4,6 +4,13 @@ module Skylab::Snag
 
     # off the chain [#030] custom parsing of e.g -1, -2 just because
 
+    # example:
+    if false
+      o.regexp_replace_tokens %r(^-(?<num>\d+)$) do |md|   # replace -1, -2 etc
+        [ '--max-count', md[:num] ]                        # with this, before
+      end                                                  # o.p gets it [#030]
+    end
+                                                           # (AMAZING HACK)
     def initialize( * )
       @regexp_filters = nil
       super
