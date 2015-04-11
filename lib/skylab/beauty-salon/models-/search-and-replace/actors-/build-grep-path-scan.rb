@@ -74,27 +74,32 @@ module Skylab::BeautySalon
       Count_Item__ = ::Struct.new :path, :count
 
       def via_command_head_when_paths
-        scn = nil
+
+        st = nil
         p = -> do
-          scn = produce_next_stream
+          st = produce_next_stream
           p = -> do
-            while scn
-              x = scn.gets
+            while st
+              x = st.gets
               x and break
-              scn = produce_next_stream
+              st = produce_next_stream
             end
             x
           end
           p[]
         end
-        Callback_.stream do
-          p[]
-        end.with_signal_handlers :release_resource, -> do
-          if scn
-            scn.receive_signal :release_resource
-          else
-            ACHIEVED_
+
+        o = Callback_::Stream
+        o.new(
+          o::Release_Resource_Proxy.new do
+            if st
+              st.x.release_resource
+            else
+              ACHIEVED_
+            end
           end
+        ) do
+          p[]
         end
       end
 

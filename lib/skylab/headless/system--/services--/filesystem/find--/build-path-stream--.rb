@@ -42,13 +42,16 @@ module Skylab::Headless
           p[]
         end
 
-        Callback_.stream do
-          p[]
-        end.with_signal_handlers :release_resource, -> do
-          if thread && thread.alive?
-            thread.exit
+        o = Callback_::Stream
+        o.new(
+          o::Release_Resource_Proxy.new do
+            if thread && thread.alive?
+              thread.exit
+            end
+            ACHIEVED_
           end
-          ACHIEVED_
+        ) do
+          p[]
         end
       end
 

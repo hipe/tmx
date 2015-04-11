@@ -247,7 +247,8 @@ module Skylab::BeautySalon
         end
 
         def release_resources
-          @upstream_path_stream.receive_signal :release_resource
+
+          @upstream_path_stream.upstream.release_resource
         end
       end
 
@@ -662,8 +663,9 @@ module Skylab::BeautySalon
         end
 
         def release_resources
+
           ok = @paths_agent_group.active_boolean.release_resources
-          ok_ = @path_stream.receive_signal :release_resource
+          ok_ = @path_stream.upstream.release_resource
           ok && ok_ and begin
             if @is_interactive
               @y << "(released any `find` or `grep` resources.)"

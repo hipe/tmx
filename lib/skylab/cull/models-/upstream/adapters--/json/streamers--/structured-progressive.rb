@@ -16,12 +16,16 @@ module Skylab::Cull
         end
 
         def execute
-          Callback_.stream do
+
+          o = Callback_::Stream
+          o.new(
+            o::Release_Resource_Proxy.new do
+              @fh.close
+              ACHIEVED_
+            end
+          ) do
             @p[]
-          end.with_signal_handlers(
-            :close_if_necessary, -> do
-              self._THIS_IS_EASY
-            end )
+          end
         end
 
         def initialize fh, & oes_p

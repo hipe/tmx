@@ -64,9 +64,24 @@ module Skylab::CodeMolester
         end
 
         def to_content_item_scan
-          _scan = nosecs_sexp.to_content_item_scan
-          _scan_ = sections_sexp.to_content_item_scan
-          Callback_::Stream.concat _scan, _scan_
+
+          scan = nosecs_sexp.to_content_item_scan
+
+          scan_ = sections_sexp.to_content_item_scan
+
+          p = -> do  # re-write `concat_by`
+            x = scan.gets
+            x or begin
+              p = -> do
+                scan_.gets
+              end
+              p[]
+            end
+          end
+
+          Callback_.stream do
+            p[]
+          end
         end
 
         def nosecs_sexp

@@ -2,61 +2,39 @@ require_relative '../test-support'
 
 module Skylab::Callback::TestSupport
 
-  describe "[cb] scan - signals" do
+  describe "[cb] stream - signals" do
 
-    it "signals are an experimental hack halfway btwn a method and an event" do
+    it "has it" do
 
-      a = [ :A, :B, :c ]
-
-      p = -> do
-        a.shift
-      end
-
-      scan = subject.new do
-        p[]
-      end.with_signal_handlers :foo_bar, -> do
-        p = -> { :gone }
-        :_hi_
-      end, :baz, -> do
-        p = -> { :done }
-        :_hey_
-      end
-
-      scan.gets.should eql :A
-      scan.gets.should eql :B
-      scan.receive_signal( :foo_bar ).should eql :_hi_
-      scan.gets.should eql :gone
-      scan.gets.should eql :gone
-      scan.receive_signal( :baz ).should eql :_hey_
-      scan.gets.should eql :done
-
+      st = _build_subject
+      st.gets.should eql 3
+      st.gets.should eql 2
+      st.upstream.should eql :x
     end
 
-    it "name error when bad signal name" do
-      _ = subject.new() { }.with_signal_handlers :x, nil
-      -> do
-        _.receive_signal :z
-      end.should raise_error ::NameError, "no member 'z' in struct"
-    end
+    it "endures by a map" do
 
-    it "the signal handlers persist with the new scans" do
+      _st_ = _build_subject
 
-      a = [ :A, :B, :C ]
-
-      canary = nil
-      scan = subject.via_nonsparse_array( a ).with_signal_handlers(
-        :foo, -> { canary = :yes } )
-
-      scan_ = scan.map_by do |x|
-        "-> #{ x } <-"
+      st = _st_.map_by do | d |
+        "(#{ d })"
       end
 
-      scan_.receive_signal :foo
-
-      canary.should eql :yes
+      st.gets.should eql "(3)"
+      st.upstream.should eql :x
     end
 
-    def subject
+    def _build_subject
+      d = 4
+      _subject.new :x do
+        if d > 1
+          d -= 1
+        end
+      end
+    end
+
+    def _subject
+
       Callback_::Stream
     end
   end

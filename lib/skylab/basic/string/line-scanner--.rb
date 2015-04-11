@@ -9,6 +9,7 @@ module Skylab::Basic
       class << self
 
         def new * x_a, & p
+
           case x_a.length
           when 1
             s = x_a.first  # meh
@@ -43,8 +44,10 @@ module Skylab::Basic
         end
       end  # >>
 
-      def initialize count_p
+      def initialize count_p, & p
+
         @count_p = count_p
+        super( & p )
       end
 
       def members
@@ -53,6 +56,10 @@ module Skylab::Basic
 
       def line_number
         @count_p.call.nonzero?
+      end
+
+      private def new & p  # re-write parent, because we re-wrote `cls.new`
+        self.class.new( & p )
       end
 
       Reverse__ = -> mutable_string do  # see #the-reverse-scanner
