@@ -4,12 +4,6 @@ module Skylab::SubTree
 
     Actions = ::Module.new
 
-    class << self
-      def is_silo
-        true
-      end
-    end  # >>
-
     class Silo_Daemon
       def initialize kr, mc
         @kernel = kr

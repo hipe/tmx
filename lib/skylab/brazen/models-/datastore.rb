@@ -12,10 +12,6 @@ module Skylab::Brazen
 
     class << self
 
-      def is_silo
-        false
-      end
-
       def to_upper_unbound_action_stream
         Callback_::Stream.via_item self
       end
@@ -24,6 +20,8 @@ module Skylab::Brazen
         @acr = Model_::Lazy_Action_Class_Reflection.new self, Brazen_::Data_Stores_
         true
       end
-    end
+    end  # >>
+
+    Silo_Daemon = nil
   end
 end

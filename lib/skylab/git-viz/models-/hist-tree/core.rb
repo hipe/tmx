@@ -32,13 +32,6 @@ module Skylab::GitViz
 
   class Models_::HistTree
 
-    class << self
-
-      def is_silo
-        true
-      end
-    end  # >>
-
     def initialize x, repo
 
       # note this can be pure business IFF every action is promoted

@@ -27,6 +27,15 @@ module Skylab::TanMan
       end
 
       public :make_common_properties, :common_properties_class  # b.c doc.ent
+
+      def const_get _, __=nil  # local loading hack :(
+        if :Silo_Daemon == _ && ! const_defined?( :Silo_Daemon, false )
+          if const_defined? :Stub_, false
+            const_get :Actions__, false
+          end
+        end
+        super
+      end
     end
   end
 
@@ -35,7 +44,7 @@ module Skylab::TanMan
   class Stub_Making_Action_Box_Module__ < ::Module
 
     def initialize model_class
-      model_class.const_set :Stub_, :__legacy_requirement__  # :+[#br-043] magic name
+      model_class.const_set :Stub_, :__legacy_requirement__
       @_mc = model_class
     end
 
@@ -315,6 +324,8 @@ module Skylab::TanMan
         :property_object, otr.fetch( :workspace_path ) )
 
     end
+
+    Silo_Daemon = self::Silo_Daemon
 
     Actions = Stub_Making_Action_Box_Module__.new self
 

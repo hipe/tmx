@@ -30,10 +30,6 @@ module Skylab::TanMan
       def to_upper_unbound_action_stream
       end
 
-      def is_silo
-        true
-      end
-
       # ~ support
 
       def node_identifier

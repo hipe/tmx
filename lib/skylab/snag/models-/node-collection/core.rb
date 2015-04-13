@@ -66,13 +66,6 @@ module Skylab::Snag
     end
     end
 
-    class << self
-
-      def is_silo
-        true
-      end
-    end  # >>
-
     class Silo_Daemon
 
       def initialize kr, mc

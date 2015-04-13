@@ -69,10 +69,6 @@ module Skylab::Brazen
       def is_promoted
       end
 
-      def is_silo
-        true  # for now
-      end
-
       attr_accessor :after_name_symbol, :description_block,
         :precondition_controller_i_a
 

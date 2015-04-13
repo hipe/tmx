@@ -216,8 +216,10 @@ module Skylab::Brazen
     end
 
     def silo_via_identifier id, & oes_p
+
       if id.is_resolved
-        _produce_silo id
+
+        __silo_via_ID id
       else
         __silo_via_unresolved_id id, & oes_p
       end
@@ -226,54 +228,59 @@ module Skylab::Brazen
     def __silo_via_unresolved_id id, & oes_p  # #note-40
 
       id = id.as_mutable_for_resolving
-      node = self ; mod_a = nil
+
       full_raw_s_a = id.raw_name_parts
-      index = -1 ; last = full_raw_s_a.length - 1
+
+      index = -1
+      last = full_raw_s_a.length - 1
+      mod_a = nil
+      node = self
+
       while index != last
+
         index += 1
         target_s = full_raw_s_a.fetch index
+
         if ! mod_a
           mod_a = __some_modules_array_via_mod node
           local_index = -1
         end
+
         local_index += 1
         __reduce_search_space mod_a, local_index, target_s
+
         case 1 <=> mod_a.length
+
         when  0
           node = mod_a.fetch 0
           _num_parts = _some_name_function_via_mod( node ).as_parts.length
           _start_of_next_part = index - local_index + _num_parts
           id.add_demarcation_index _start_of_next_part
 
-          _is_silo = if node.respond_to? :is_silo
-            node.is_silo
-          end
+          cls = node.const_get :Silo_Daemon, false
 
-          if _is_silo
+          if cls
             id.bake node
-            result = _produce_silo id
+
+            x = __silo_via_cls_and_ID cls, id
             break
-          else
-            mod_a = nil
           end
+          mod_a = nil
 
         when  1
-          result = __when_not_found id, target_s, & oes_p
+          x = __when_not_found id, target_s, & oes_p
           break
+
         when -1
           # #note-265 - although it is a class of use cases for which this..
           NIL_
         end
       end
-      result
-    end
-
-    def __say_node_is_not_silo node
-
-      "is not silo (currently, must respond to `is_silo` with true-ish): #{ node.name }"
+      x
     end
 
     def __when_not_found id, target_s, & oes_p
+
       if oes_p
         oes_p.call :not_found do
           _build_model_not_found_event id, target_s
@@ -284,12 +291,14 @@ module Skylab::Brazen
     end
 
     def _build_model_not_found_event id, s
+
       Brazen_.event.inline_with :node_not_found,
         :token, s, :identifier, id,
         :error_category, :name_error
     end
 
     def __reduce_search_space mod_a, local_index, target_s
+
       mod_a.each_with_index do |mod, d|
         s = _some_name_function_via_mod( mod ).as_parts[ local_index ]
         if ! ( s and target_s == s )
@@ -300,6 +309,7 @@ module Skylab::Brazen
     end
 
     def _some_name_function_via_mod mod
+
       if mod.respond_to? :name_function
         mod.name_function
       else
@@ -311,6 +321,7 @@ module Skylab::Brazen
     end
 
     def __some_modules_array_via_mod mod
+
       if mod.respond_to? :to_node_stream
         mod.to_node_stream.to_a
       else
@@ -321,40 +332,26 @@ module Skylab::Brazen
       end
     end
 
-    def _produce_silo id
-      ( @touch_silo_p ||= bld_touch_silo_p )[ id ]
+    def __silo_via_ID id
+      ( @touch_silo_p ||= _build_touch_silo_p )[ nil, id ]
     end
 
-    def bld_touch_silo_p
+    def __silo_via_cls_and_ID cls, id
+      ( @touch_silo_p ||= _build_touch_silo_p )[ cls, id ]
+    end
+
+    def _build_touch_silo_p
+
       cache_h = {}
-      -> id do
+
+      -> cls, id do
+
         cache_h.fetch id.silo_name_i do
-          id.value.const_get :Actions, false  # :+[#043] a loading hack
-          silo = ___start_silo_daemon_via_mod id.value
-          cache_h[ id.silo_name_i ] = silo
-          silo
+          x = cls.new self, id.value
+          cache_h[ id.silo_name_i ] = x
+          x
         end
       end
-    end
-
-    def ___start_silo_daemon_via_mod mod
-
-      # we load a file if there is any file to load "manually" because a) the
-      # alternatives are uglier and noiser and b) starting the silo daemon is
-      # something special that only happens once per application kernel.
-
-      if mod.respond_to? :entry_tree
-        if mod.entry_tree.has_entry SILO_DAEMON_FILE___
-          mod.const_get :Silo_Daemon, false  # kick any autoloading
-          did = true
-        end
-      end
-
-      if ! did and mod.const_defined? :Stub_, false  # :+[#043]
-        mod.const_get :Actions__, false
-      end
-
-      mod::Silo_Daemon.new self, mod
     end
   end
 
