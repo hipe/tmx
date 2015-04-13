@@ -118,7 +118,7 @@ so, for 1) (add a node by re-appropriating if possible)
     lock the file
 
     find any existing re-appropriable node given
-      the criteria that that node has tag "#done" or tag "#hole"
+      the criteria that the node has tag "#done" or tag "#hole"
       and that the node has no extended content
 
     if a re-appropriable node was found

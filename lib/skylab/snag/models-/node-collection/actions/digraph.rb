@@ -110,7 +110,9 @@ module Skylab::Snag
 
         def initialize a
           super
-          @scn = Snag_::Models::Hashtag.puts_stream @s
+          @scn = Snag_::Models::Hashtag.
+            interpret_simple_stream_from_string( @s ).
+             flush_to_puts_stream
         end
         def execute
           @y = []

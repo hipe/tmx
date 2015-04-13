@@ -147,9 +147,8 @@ module Skylab::Snag::TestSupport
   Snag_ = ::Skylab::Snag
 
   Callback_ = Snag_::Callback_
-
   NIL_ = nil
-
+  SPACE_ = Snag_::SPACE_
   UNDERSCORE_ = '_'
 
 end

@@ -1,7 +1,7 @@
 digraph {
 
   add_node_actor [label="add node\nactor"]
-  criteria_model [label="12. node\ncriteria model"]
+  criteria_model [label="13. node\ncriteria model"]
   line_upstream [label="11. line\nupstream" style=filled]
   marshal_node_actor [label="marshal\nnode actor"]
   mutate_node_actor [label="mutate\nnode actor"]

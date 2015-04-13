@@ -4,22 +4,28 @@ module Skylab::Snag
 
     class << self
 
-      def puts_stream s
+      define_method :interpret_out_of_under, INTERPRET_OUT_OF_UNDER_METHOD_
 
-        Callback_::Scanner::Puts_Wrapper.new(
-          Hashtag_Simple_Stream__.new s )
-      end
-
-      def simple_stream_via_string__ s
+      def interpret_simple_stream_from_string s
         Hashtag_Simple_Stream__.new s
       end
 
-      def value_peeking_simple_stream__ begin_d, end_d, s, fly
-
-        Value_Peeking_Simple_Stream___.new(
-          Hashtag_Simple_Stream__.new( begin_d, end_d, fly, s ) )
+      def interpret_simple_stream_from__ begin_d, end_d, s, fly
+        Hashtag_Simple_Stream__.new begin_d, end_d, fly, s
       end
     end  # >>
+
+    TO_A_METHOD__ = -> do  # etc. redundant with etc
+
+      a = []
+      begin
+        x = gets
+        x or break
+        a.push x
+        redo
+      end while nil
+      a
+    end
 
     class Value_Peeking_Simple_Stream___  # #note-25
 
@@ -36,16 +42,7 @@ module Skylab::Snag
 
       attr_reader :st  # hax
 
-      def to_a  # etc
-        y = []
-        begin
-          x = gets
-          x or break
-          y.push x
-          redo
-        end while nil
-        y
-      end
+      define_method :to_a, TO_A_METHOD__
 
       def gets
 
@@ -105,6 +102,18 @@ module Skylab::Snag
       end
 
       attr_reader :scn  # hax
+
+      def flush_to_puts_stream
+
+        Callback_::Scanner::Puts_Wrapper.new self
+      end
+
+      def flush_to_value_peeking_stream
+
+        Value_Peeking_Simple_Stream___.new self
+      end
+
+      define_method :to_a, TO_A_METHOD__
 
       def gets
         if @queue.length.nonzero?

@@ -66,9 +66,10 @@ module Skylab::Snag
 
         convential_stream = -> sstr do
 
-          simple_st = Snag_::Models::Hashtag.value_peeking_simple_stream__(
+          simple_st = Snag_::Models::Hashtag.interpret_simple_stream_from__(
             sstr.begin, sstr.end, sstr.s,
-            Snag_::Models_::Tag.new( nil ) )  # one #flyweight to rule them all
+            Snag_::Models_::Tag.new( nil )  # one #flyweight to rule them all
+          ).flush_to_value_peeking_stream
 
           convential_stream = -> sstr_ do
             simple_st.reinitialize sstr_.begin, sstr_.end, sstr_.s

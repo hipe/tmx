@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - hashtag", wip: true do
+  describe "[sg] models - hashtag" do
 
     context "parses" do
 
@@ -59,9 +59,12 @@ module Skylab::Snag::TestSupport
     end
 
     def build_hashtag str
-      a = Subject_[].parse str
-      1 == a.length and :hashtag == a.first.nonterminal_symbol or self._SANITY
-      a.first
+
+      st = _subject.interpret_simple_stream_from_string str
+      o = st.gets
+      st.gets and self._SANITY
+      :hashtag == o.nonterminal_symbol or self._SANITY
+      o
     end
 
     def expect_part i, x
@@ -75,11 +78,11 @@ module Skylab::Snag::TestSupport
     end
 
     def scan s
-      @part_a = Subject_[].parse s
+      @part_a = _subject.interpret_simple_stream_from_string( s ).to_a
     end
 
     def _subject
-      Snag_::Models_::Hashtag
+      Snag_::Models::Hashtag
     end
   end
 end
