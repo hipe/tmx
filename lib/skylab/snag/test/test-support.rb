@@ -79,6 +79,36 @@ module Skylab::Snag::TestSupport
     end
   end
 
+  module Criteria_Library_Support  # (draws from [mh] parse t.s)
+
+    def self.[] mod
+      mod.include self
+      def mod.subject_module_
+        Snag_::Models_::Node_Criteria::Library_
+      end
+    end
+
+    def parse_against * s_a
+      against_ input_stream_via_array s_a
+    end
+
+    def input_stream_containing * s_a
+      input_stream_via_array s_a
+    end
+
+    def input_stream_via_array s_a
+      Snag_.lib_.parse_lib::Input_Streams_::Array.new s_a
+    end
+
+    def against_ st, & x_p
+      subject_object_.output_node_via_input_stream st, & x_p
+    end
+
+    def subject_module_
+      self.class.subject_module_
+    end
+  end
+
   Expect_My_CLI = -> do
 
     p = -> tcm do

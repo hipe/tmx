@@ -40,8 +40,8 @@
 [#031]       #done NO. BAD. (horrible event wiring in todo tree) ..
                and some comments on UI vs. API and so on
 [#030]       #done we would love to have -1, -2 etc
-[#029]       (PROTO EXPRESSION AGENTS was:
-             #tracking-tag #pattern of `instance_eval` for rendering)
+[#029]       [ THIS DOCUMENT NLP domain formal entity set ] ..
+             (#tracking-tag #pattern of `instance_eval` for rendering)
 [#028]       melt makes patch for whole codebase #deferred
 [#027]       #done move and maybe refactor todo -> todo find
 [#026]       #done refactor porcelain tree

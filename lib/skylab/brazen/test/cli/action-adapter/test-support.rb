@@ -67,12 +67,6 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
 
         class self::Entity_Property
 
-        private
-          def required=
-            @parameter_arity = :one
-            true
-          end
-        public
           def is_required
             :one == @parameter_arity
           end

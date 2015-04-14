@@ -162,6 +162,19 @@ module Skylab::Basic
     end
   end
 
+  class Immutable_Leaf  # :+#experimental
+
+    def initialize slug
+      @slug = slug
+    end
+
+    def has_children
+      false
+    end
+
+    attr_reader :slug
+  end
+
   class Pooled_Leaf__
 
     Basic_.lib_.pool( self ).with_with_instance

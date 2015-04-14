@@ -383,11 +383,6 @@ module Skylab::Brazen
             @parameter_arity = :zero_or_one
             self
           end
-        private
-          def required=
-            @parameter_arity = :one
-            KEEP_PARSING_
-          end
         end
 
         def receive_missing_required_props miss_prop_a

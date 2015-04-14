@@ -24,7 +24,7 @@ module Skylab::MetaHell
 
       def initialize
 
-        @minimum_number_of_characters = 1
+        @minimum_number_of_characters = nil
 
         super
 
@@ -63,6 +63,7 @@ module Skylab::MetaHell
 
         if @does_need_hotstring
           if @ss
+            @minimum_number_of_characters ||= 1
             Resolve_hotstrings__[ @ss ]
           else
             __resolve_hotstring_via_ivars

@@ -425,18 +425,6 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
     property_class_for_write
 
-    class Property
-
-      attr_reader :default_proc  # #hook-out for [cb] methodic
-
-    private
-
-      def required=
-        @parameter_arity = :one
-        KEEP_PARSING_
-      end
-    end
-
     def initialize x_a, & oes_p
 
       if oes_p

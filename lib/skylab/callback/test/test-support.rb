@@ -57,6 +57,7 @@ module Skylab::Callback::TestSupport
   module Constants
     Callback_ = Callback_
     EMPTY_A_ = EMPTY_A_
+    KEEP_PARSING_ = KEEP_PARSING_
     TestSupport_ = TestSupport_
   end
 

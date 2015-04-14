@@ -14,6 +14,8 @@ module Skylab::MetaHell
           false )
       end
 
+      alias_method :function, :function_
+
       def function_via_definition_array x_a
         st = Callback_::Polymorphic_Stream.via_array x_a
         function_( st.gets_one ).new_via_iambic_stream st

@@ -13,7 +13,7 @@ module Skylab::MetaHell
     # (0 thru N-1 inclusive), expressed in the special output node field
     # `constituent_index`.
     #
-    # so when a winner is found you have an ouput node with the index of
+    # so when a winner is found you have an output node with the index of
     # the constituent and its (any) output value. if no winner was found
     # the result of the `output_node_[..]` call is `nil`.
     #

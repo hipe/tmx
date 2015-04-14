@@ -13,30 +13,39 @@ module Skylab::Basic
         Callback_::Actor.call self, :properties,
 
           :node,
-          :glyphset_identifier_x
+          :glyphset_identifier_x,
+          :glyphset
 
         def initialize
-          @glyphset_identifier_x = DEFAULT_GLYPHSET_IDENTIFIER___
+          @glyphset = @glyphset_identifier_x = nil
           super
         end
 
         DEFAULT_GLYPHSET_IDENTIFIER___ = :narrow
 
         def execute
-          _ok = __resolve_glypshet
-          _ok && __via_glyphset_produce_stream
+
+          ok = __resolve_glypshet
+          ok && __via_glyphset_init
+          ok && __via_glyphset_produce_stream
         end
 
         def __resolve_glypshet
 
-          @glyphset = Autoloader_.const_reduce(
-            [ @glyphset_identifier_x ],
+          if @glyphset
+            ACHIEVED_
+          else
+            __resolve_glyphset_via_ID(
+              @glyphset_identifier_x || DEFAULT_GLYPHSET_IDENTIFIER___ )
+          end
+        end
+
+        def __resolve_glyphset_via_ID id_x
+
+          @glyphset = Autoloader_.const_reduce( [ id_x ],
             Basic_.lib_.CLI_lib.tree.glyph_sets_module )
 
-          @glyphset && begin
-            __via_glyphset_init
-            ACHIEVED_
-          end
+          @glyphset && ACHIEVED_
         end
 
         def __via_glyphset_init
@@ -45,7 +54,6 @@ module Skylab::Basic
           @blank = h.fetch :blank
           @crook = h.fetch :crook
           @pipe = h.fetch :pipe
-          @separator = h.fetch :separator
           @tee = h.fetch :tee
             # (yes, we used to, but viva readability & simplicity)
           NIL_

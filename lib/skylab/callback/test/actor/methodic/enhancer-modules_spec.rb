@@ -14,6 +14,8 @@ module Skylab::Callback::TestSupport::Actor::Methodic::MP
 
   Grandparent_Subject_ = Parent_TS_::Parent_subject_
 
+  KEEP_PARSING_ = KEEP_PARSING_
+
   describe "[cb] actor - methodic - enhancer modules" do
 
     context "a 'simple properties' enhancer module can access its properties class" do
@@ -115,8 +117,9 @@ module Skylab::Callback::TestSupport::Actor::Methodic::MP
           property_class_for_write
           class Property
           private
-            def required=
+            def requored=
               @parameter_arity = :one
+              KEEP_PARSING_
             end
           end
 
@@ -134,9 +137,9 @@ module Skylab::Callback::TestSupport::Actor::Methodic::MP
         class D_2
 
           D.call self, :simple, :properties,
-            :required, :property, :foo,
+            :requored, :property, :foo,
             :property, :bar,
-            :required, :property, :baz
+            :requored, :property, :baz
 
           alias_method :initialize, :instance_exec
 

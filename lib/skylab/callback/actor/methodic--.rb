@@ -18,6 +18,10 @@ module Skylab::Callback
           Simple_Property__
         end
 
+        def call cls, * i_a
+          via_client_and_iambic cls, i_a
+        end
+
         def via_client_and_iambic cls, i_a
           cls.extend Module_Methods__
           cls.include Iambic_Processing_Instance_Methods__
@@ -408,6 +412,11 @@ module Skylab::Callback
           STOP_PARSING_
         end
 
+        def required=
+          @parameter_arity = :one
+          KEEP_PARSING_
+        end
+
       public
 
         def description  # play nice with :+[#cb-110]
@@ -424,6 +433,10 @@ module Skylab::Callback
 
         def is_required
           :one == @parameter_arity
+        end
+
+        def default_proc  # :+#hook-in
+          NIL_
         end
 
         def iambic_writer_method_proc

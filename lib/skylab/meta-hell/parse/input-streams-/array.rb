@@ -4,6 +4,10 @@ module Skylab::MetaHell
 
     class Input_Streams_::Array
 
+      # largely redundant with [#ca-046] but some important differences.
+      # it is less confusing and less room for error if we just rewrite
+      # the commonalities and keep the graphs separate (for now).
+
       def initialize x_a
         @d = 0
         @token_cache_a = []
@@ -17,8 +21,16 @@ module Skylab::MetaHell
         x
       end
 
+      def no_unparsed_exists
+        @x_a_length == @d
+      end
+
       def unparsed_exists
         @x_a_length != @d
+      end
+
+      def _
+        current_token_object.value_x
       end
 
       def current_token_object

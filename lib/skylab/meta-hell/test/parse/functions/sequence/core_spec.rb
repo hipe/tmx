@@ -52,7 +52,7 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Sequence
       end
 
       it "against two right tokens and a wrong token" do
-        st = input_stream_containing 'fo', 'ba', 'bozzo'
+        st = input_stream_containing 'foo', 'bar', 'bozzo'
         against_input_stream( st ).value_x.should eql [ :foo, :bar ]
         st.current_index.should eql 2
       end
@@ -174,19 +174,19 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Sequence
       end
 
       it "against minimal good" do
-        st = input_stream_containing 'z'
+        st = input_stream_containing 'zo'
         against_input_stream( st ).value_x.should eql [ MetaHell_::EMPTY_A_, :zo ]
         st.current_index.should eql 1
       end
 
       it "with one optional" do
-        st = input_stream_containing 'z', 'z'
+        st = input_stream_containing 'zo', 'zo'
         against_input_stream( st ).value_x.should eql [ [ :zo ], :zo ]
         st.current_index.should eql 2
       end
 
       it "with two optionals" do
-        st = input_stream_containing 'z', 'z', 'z'
+        st = input_stream_containing 'zo', 'zo', 'zo'
         against_input_stream( st ).value_x.should eql [ [ :zo, :zo ], :zo ]
         st.current_index.should eql 3
       end
@@ -197,7 +197,7 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Sequence
       memoize_subject do
         Subject_[].new_with :functions,
           :one_or_more, :any_token,
-          :keyword, 'zoink'
+          :keyword, 'zoink', :minimum_number_of_characters, 1
 
       end
 
@@ -218,7 +218,7 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Sequence
       end
 
       it "two keywords" do
-        st = input_stream_containing 'zoink', 'zoink'
+        st = input_stream_containing 'zoink', 'zoi'
         against_input_stream( st ).value_x.should eql [ [ 'zoink' ], :zoink ]
         st.current_index.should eql 2
       end
@@ -256,7 +256,7 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Sequence
       memoize_subject do
         Subject_[].new_with :functions,
           :one_or_more, :any_token,
-          :keyword, 'has',
+          :keyword, 'has', :minimum_number_of_characters, 1,
           :one_or_more, :any_token
       end
 

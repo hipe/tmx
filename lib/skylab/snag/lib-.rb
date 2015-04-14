@@ -96,8 +96,13 @@ module Skylab::Snag
     end
 
     MH__ = sidesys[ :MetaHell ]
+
     Model_event = -> mod do
       HL__[]::Model::Event.apply_on_client mod
+    end
+
+    Parse_lib = -> do
+      MH__[]::Parse
     end
 
     Patch_lib = -> do
