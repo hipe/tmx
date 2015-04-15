@@ -16,6 +16,10 @@ module Skylab::MetaHell::TestSupport::Parse
       define_method :subject, Callback_.memoize( & build_p )
       nil
     end
+
+    def memoize_ sym, & p
+      define_method sym, Callback_.memoize( & p )
+    end
   end
 
   module InstanceMethods

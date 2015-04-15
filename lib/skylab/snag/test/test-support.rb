@@ -104,6 +104,11 @@ module Skylab::Snag::TestSupport
       subject_object_.output_node_via_input_stream st, & x_p
     end
 
+    def visual_tree_against_ st
+      _x = against_ st
+      _x.to_ascii_visualization_string_
+    end
+
     def subject_module_
       self.class.subject_module_
     end

@@ -62,6 +62,31 @@ module Skylab::Basic
           end
         end
 
+        def to_parser_proc
+
+          -> in_st, & x_p do
+
+            if in_st.unparsed_exists
+
+              x_p and self._NICE
+
+              _x = in_st.current_token_object.value_x
+              _trio = Callback_::Trio.new _x, true
+
+              arg = normalize_argument _trio do | * i_a, & ev_p |
+
+                self._HAVE_FUN
+              end
+
+              arg and begin
+                in_st.advance_one
+                # Basic_.lib_.parse_lib::Output_Node_.new arg.value_x  # if needed
+                arg
+              end
+            end
+          end
+        end
+
         def normalize_argument arg, & oes_p
           otr = dup
           otr.init_copy_with :argument, arg, & oes_p

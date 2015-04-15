@@ -33,9 +33,9 @@ module Skylab::MetaHell
 
         in_st = @input_stream
 
-        @function_a.each_with_index.reduce nil do | _, ( g, d ) |
+        @function_a.each_with_index.reduce nil do | _, ( f, d ) |
 
-          on = g.output_node_via_input_stream in_st
+          on = f.output_node_via_input_stream in_st
 
           if on
 

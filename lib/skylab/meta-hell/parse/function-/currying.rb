@@ -22,8 +22,27 @@ module Skylab::MetaHell
         :property, :input_stream
 
       def initialize
+
         @input_stream = nil
         super
+      end
+
+      def process_iambic_stream_passively st
+
+        # :+#experimental custom syntax - enclosing a flat list of
+        # constituents in an array: nicer than a `end_functions` token?
+
+        a = ::Array.try_convert st.current_token
+        if a
+
+          st.advance_one
+
+          _st = Callback_::Polymorphic_Stream.new 0, a
+
+          _process_functions_via_polymorphic_stream _st
+        else
+          super
+        end
       end
 
     private
@@ -44,20 +63,28 @@ module Skylab::MetaHell
       end
 
       def functions=
-        @function_a = []
-        st = __via_iambic_stream_produce_parse_function_stream
-        f = st.gets
-        while f
-          accept_function_ f
-          f = st.gets
-        end
-        UNABLE_ == f ? UNABLE_ : KEEP_PARSING_
+
+        _process_functions_via_polymorphic_stream @__methodic_actor_iambic_stream__
       end
 
-      UNABLE_ = false
+      def _process_functions_via_polymorphic_stream st
 
-      def __via_iambic_stream_produce_parse_function_stream
-        st = @__methodic_actor_iambic_stream__
+        @function_a = []
+
+        st_ = __produce_parse_function_stream_via_polymorphic_stream st
+
+        begin
+          f = st_.gets
+          f or break
+          accept_function_ f
+          redo
+        end while nil
+
+        UNABLE_ != f
+      end
+
+      def __produce_parse_function_stream_via_polymorphic_stream st
+
         Callback_.stream do
           if st.unparsed_exists
             sym = st.gets_one
@@ -190,6 +217,9 @@ module Skylab::MetaHell
       def _input_stream_via_array a
         Parse_::Input_Streams_::Array.new a
       end
+
+      UNABLE_ = false
+
     end
   end
 end

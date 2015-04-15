@@ -27,7 +27,7 @@ module Skylab::Snag::TestSupport
     it "experimentally, ambiguity can be resolved by a context pop" do
 
       st = input_stream_via_array %w( is blue and pink or is green )
-      _s = _visual_tree_against st
+      _s = visual_tree_against_ st
       _s.should eql __tree_viz_for_context_pop
     end
 
@@ -59,7 +59,7 @@ module Skylab::Snag::TestSupport
 
       st = input_stream_via_array %w( is blue and pink or is green or lavender )
 
-      _s = _visual_tree_against st
+      _s = visual_tree_against_ st
 
       _expect_parsed_everything st
 
@@ -106,7 +106,7 @@ module Skylab::Snag::TestSupport
       st = input_stream_via_array %w( is pink or blue or
         is green or is lavender and pink or is blue )
 
-      _s = _visual_tree_against st
+      _s = visual_tree_against_ st
       _s.should eql __tree_viz_for_down_up_down_up
     end
 
@@ -132,12 +132,6 @@ module Skylab::Snag::TestSupport
         fail "did not parse token #{ st.current_index }: #{
           }#{ st.current_token_object.value_x.inspect }"
       end
-    end
-
-    def _visual_tree_against st
-
-      _x = against_ st
-      _x.to_ascii_visualization_string_
     end
 
     # ~ hook-outs & support
