@@ -29,7 +29,7 @@ module Skylab::MetaHell
         @x_a_length != @d
       end
 
-      def _
+      def current_token
         current_token_object.value_x
       end
 
@@ -51,6 +51,22 @@ module Skylab::MetaHell
       def advance_one
         @d += 1 ; nil
       end
+
+      define_singleton_method :the_empty_stream, -> do
+        p = -> do
+          x = new EMPTY_A_
+          def x.current_index= d
+            if @d != d
+              super
+            end
+          end
+          p = -> { x }
+          x.freeze
+        end
+        -> do
+          p[]
+        end
+      end.call
     end
   end
 end

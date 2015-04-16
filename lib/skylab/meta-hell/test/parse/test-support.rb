@@ -16,10 +16,6 @@ module Skylab::MetaHell::TestSupport::Parse
       define_method :subject, Callback_.memoize( & build_p )
       nil
     end
-
-    def memoize_ sym, & p
-      define_method sym, Callback_.memoize( & p )
-    end
   end
 
   module InstanceMethods
@@ -34,6 +30,10 @@ module Skylab::MetaHell::TestSupport::Parse
 
     def against_input_stream st
       subject.output_node_via_input_stream st
+    end
+
+    def the_empty_input_stream
+      Subject_[]::Input_Streams_::Array.the_empty_stream
     end
 
     def input_stream_containing * x_a
@@ -57,9 +57,10 @@ module Skylab::MetaHell::TestSupport::Parse
     MetaHell_::Parse
   end
 
+  Callback_ = Constants::Callback_
   Constants::LIB_ = LIB_
-
   Constants::Subject_ = Subject_
+  UNDERSCORE_ = '_'
 
 end
 

@@ -7,10 +7,10 @@ module Skylab::MetaHell
 
     Basic = sidesys[ :Basic ]
 
-    Bzn__ = sidesys[ :Brazen ]
+    Brazen = sidesys[ :Brazen ]
 
     Entity_lib = -> do
-      Bzn__[]::Entity
+      Brazen[]::Entity
     end
 
     Levenshtein = -> do

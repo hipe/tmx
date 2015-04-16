@@ -83,6 +83,7 @@
 [#005]       #done second rewrite
 [#004]       #done #refactor look for opportunities to rid of `meta_hell` prefix
 [#003]       #done consider scrapping `_p` name convention for..
-[#002]       #done instance method klass creator tests
+[#002]       this one parse function with list against matrix
+             ( #was: #done instance method klass creator tests )
 [#001]       [ bundle ]
              ( #was: #done metahell tests and resolve #kick issue maybe )

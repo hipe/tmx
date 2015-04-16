@@ -3,29 +3,29 @@ require 'skylab/test-support/core'
 
 module Skylab::MetaHell::TestSupport
 
-  ::Skylab::TestSupport::Regret[ self ]
-  ::Skylab::TestSupport::Quickie.enable_kernel_describe
+  TestSupport_ = ::Skylab::TestSupport
 
-  module Constants
-    MetaHell_ = ::Skylab::MetaHell
-      Callback_ =  MetaHell_::Callback_
-    TestSupport_ = ::Skylab::TestSupport
-  end
-
-  include Constants
-
-  Callback_ = Callback_
-  MetaHell_ = MetaHell_
+  TestSupport_::Regret[ self ]
+  TestSupport_::Quickie.enable_kernel_describe
 
   module ModuleMethods
-    include Constants
-    def memoize name_i, p
-      define_method name_i, MetaHell_::Callback_.memoize( p ) ; nil
+
+    def use sym
+
+      _const = Callback_::Name.via_variegated_symbol( sym ).as_const
+      MetaHell_::TestSupport.const_get( _const, false )[ self ]
+    end
+
+    def memoize_ sym, & p
+      define_method sym, Callback_.memoize( & p )
     end
   end
 
+  Callback_ = ::Skylab::Callback
+  MetaHell_ = ::Skylab::MetaHell
+
   module InstanceMethods
-    include Constants
+
     extend MetaHell_::Let
 
     def debug!
@@ -43,6 +43,19 @@ module Skylab::MetaHell::TestSupport
     end
   end
 
+  Expect_Event = -> tcm do
+
+    Callback_.test_support::Expect_Event[ tcm ]
+
+    tcm.send :define_method, :black_and_white_expression_agent_for_expect_event do
+      MetaHell_.lib_.brazen::API.expression_agent_instance
+    end
+
+    NIL_
+  end
+
+  NIL_ = nil
+
   module Ivars_with_Procs_as_Methods
 
     # #tracking [#ts-039] frontier for a possible new argument function for `Subject_`
@@ -54,5 +67,12 @@ module Skylab::MetaHell::TestSupport
       MetaHell_::Ivars_with_Procs_as_Methods[ * x_a, & p ]
 
     end
+  end
+
+  module Constants
+
+    Callback_ = Callback_
+    MetaHell_ = MetaHell_
+    TestSupport_ = TestSupport_
   end
 end

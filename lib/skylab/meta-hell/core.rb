@@ -74,25 +74,15 @@ module Skylab
     end
 
     Callback_ = ::Skylab::Callback
-
     Autoloader_ = ::Skylab::Callback::Autoloader
-
     DASH_ = '-'.getbyte 0
-
     EMPTY_A_ = [].freeze  #storypoint-015 explains this OCD
-
     EMPTY_P_ = -> { }
-
     IDENTITY_ = -> x { x }
-
     KEEP_PARSING_ = true
-
     MetaHell_ = self
-
     MONADIC_EMPTINESS_ = -> _ { }
-
     MONADIC_TRUTH_ = -> _ { true }
-
     Autoloader_[ self, ::File.dirname( __FILE__ ) ]
   end
 end

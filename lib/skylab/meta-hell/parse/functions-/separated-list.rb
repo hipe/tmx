@@ -148,8 +148,6 @@ module Skylab::MetaHell
       def output_node_via_input_stream in_st
         @p[ in_st ]
       end
-
-      NIL_ = nil
     end
   end
 end

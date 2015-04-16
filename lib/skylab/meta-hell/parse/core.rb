@@ -70,6 +70,7 @@ module Skylab::MetaHell
       Autoloader_[ self ]
     end
 
+    NIL_ = nil
     Parse_ = self
   end
 end

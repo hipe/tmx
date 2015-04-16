@@ -27,7 +27,7 @@ module Skylab::MetaHell::TestSupport::Formal
   module ModuleMethods
     include Constants
     def subject func
-      memoize :subject, func
+      memoize_ :subject, & func
       nil
     end
   end

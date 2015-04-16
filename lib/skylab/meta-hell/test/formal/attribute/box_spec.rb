@@ -42,7 +42,7 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute::Box
 
     context "`select` - " do
 
-      memoize :box, -> do
+      memoize_ :box do
 
         st = ::Struct.new :name, :ready, :flavor
 

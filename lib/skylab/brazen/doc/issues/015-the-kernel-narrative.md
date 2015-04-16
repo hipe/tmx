@@ -43,10 +43,12 @@ inline with the word-parts that a would-be model name might have (e.g
 "git-config" as a datastore name has the two parts, "git" and "config").
 
 because these two concerns are munged into one name we need to do some
-parsing to determine where the one ends and the other begins. since the
-way the cards have fallen we don't actually need this logic yet, but we
-ceratainly will if we keep this up.
+parsing to determine where the one ends and the other begins.
 
+a year later we would try to abtract a general algorithm from this
+as [#mh-002] for use elswhere. but currently its native implementation
+is too entrenched, so for now thy exist separately but with the same
+idea behind them.
 
 
 
