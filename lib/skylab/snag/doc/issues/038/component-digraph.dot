@@ -5,7 +5,7 @@ digraph {
   line_upstream [label="11. line\nupstream" style=filled]
   marshal_node_actor [label="marshal\nnode actor"]
   mutate_node_actor [label="mutate\nnode actor"]
-  NLP_experiment [label="12. NLP expression\nadapter facility" ]
+  NLP_experiment [label="12. NLP expression\nadapter facility" style=filled]
   node_collection_model [label="node collection\nmodel"]
   node_identifier_model [label="9. node identifier\nmodel" style=filled]
   node_model [label="10. node model" style=filled]

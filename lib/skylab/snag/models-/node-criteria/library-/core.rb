@@ -88,36 +88,23 @@ module Skylab::Snag
 
       # ~~ parse functions for syntactic structures
 
-      Parse_a_conjunction_ = -> in_st do
+      Parse_a_conjunction_ = -> do
+        p = -> x do
 
-        # iff there is content after. #todo:shrink
+          p_ = Build_simple_word_parser_[ :or, :keyword, 'or',
+                                         :and, :keyword, 'and' ]
 
-        if in_st.unparsed_exists
-
-          s = in_st.current_token_object.value_x
-
-          sym = if OR___ == s
-            :or
-          elsif AND___ == s
-            :and
+          p = -> in_st do
+            o = p_[ in_st ]
+            o and o.name_symbol
           end
 
-          if sym
-            d = in_st.current_index
-            in_st.advance_one
-
-            if in_st.unparsed_exists
-              sym
-
-            else
-              in_st.current_index = d
-              DID_NOT_PARSE__
-            end
-          end
+          p[ x ]
         end
-      end
-
-      AND___ = 'and' ; OR___ = 'or'
+        -> x do
+          p[ x ]
+        end
+      end.call
 
       # ~~ parse functions - mechanisms
 
@@ -167,7 +154,7 @@ module Skylab::Snag
           in_st.current_index = cand.distance
           cand
         when 1
-          # errors were emitted by calle
+          # errors were emitted by callee
           UNABLE_
         when -1
           self._YAY_AMBIGUITY
@@ -210,9 +197,13 @@ module Skylab::Snag
         end while nil
 
         if cand_a.length.zero?
-          e_a.each do | i_a_, ev_p_ |
-            oes_p.call( * i_a_, & ev_p_ )
+
+          if e_a  # near [#012]
+            e_a.each do | i_a_, ev_p_ |
+              oes_p.call( * i_a_, & ev_p_ )
+            end
           end
+
         else
           cand_a.sort_by!( & :distance )
           d = ( cand_a.length - 1 ).downto( 0 ).detect do | d_ |
@@ -281,6 +272,53 @@ module Skylab::Snag
         end
 
         did_match
+      end
+
+      Build_simple_word_parser_ = -> * x_a do
+
+        last = x_a.length - 3
+
+        -> in_st, & oes_p do
+
+          if in_st.unparsed_exists
+
+            d = 0
+            s = in_st.current_token
+
+            begin
+
+              case x_a.fetch( d + 1 )
+              when :keyword
+                if x_a.fetch( d + 2 ) == s
+                  did_match = true
+                  x = Callback_::Pair.new true, x_a.fetch( d )
+                  break
+                end
+
+              when :regex
+                md = x_a.fetch( d + 2 ).match s
+                if md
+                  did_match = true
+                  x = Callback_::Pair.new md, x_a.fetch( d )
+                  break
+                end
+              end
+
+              if last == d
+                break
+              end
+              d += 3
+              redo
+            end while nil
+
+            if did_match
+              in_st.advance_one
+              x
+            elsif oes_p
+              self._FUN_AND_EASY  # near [#012]
+            end
+          end
+        end
       end
 
       # ~

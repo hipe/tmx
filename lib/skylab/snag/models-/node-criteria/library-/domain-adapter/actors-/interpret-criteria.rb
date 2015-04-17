@@ -21,17 +21,52 @@ module Skylab::Snag
 
           def execute
 
-            ok = _interpret :model_reflection,
-              :plural_model_name, :singular_model_name
-
-            ok &&= Parse_static_sequence_[
-              @in_st, THAT___, & @on_event_selectively ]
-
+            ok = __resolve_any_article_and_subject_and_any_conjunction
             ok &&= __resolve_tree_of_predicates
             ok && @tree_of_predicates
           end
 
-          THAT___ = %w( that )
+          def __resolve_any_article_and_subject_and_any_conjunction
+
+            art = Any_article__[ @in_st ]
+            if art
+              send :"__resolve_subj_and_conj_for__#{ art.name_symbol }__"
+            else
+              __resolve_subj_and_conj_for_indefinite_plural
+            end
+          end
+
+          Any_article__ = Build_simple_word_parser_.call(
+            :indefinite_article, :regex, /\Aan?\z/,
+            :definite_article, :keyword, 'the' )
+
+          # "a thing that.." (one day we might use this for etc)
+
+          def __resolve_subj_and_conj_for__indefinite_article__
+
+            _ok = _interpret :model_reflection, :singular_model_name
+
+            _ok && Keyword_that__[ @in_st, & @on_event_selectively ]
+          end
+
+          # "the thing [is].."  (conditional expressions look best in this form)
+
+          def __resolve_subj_and_conj_for__definite_article__
+
+            _interpret :model_reflection, :singular_model_name
+          end
+
+          # "things that .."  ("queries" look best in this form)
+
+          def __resolve_subj_and_conj_for_indefinite_plural
+
+            _ok = _interpret :model_reflection, :plural_model_name
+
+            _ok && Keyword_that__[ @in_st, & @on_event_selectively ]
+          end
+
+          Keyword_that__ = Build_simple_word_parser_[
+            :_modifier_conjunction_, :keyword, 'that' ]
 
           def __resolve_tree_of_predicates  # this is an attempt at [#005] a model solution for this
 
@@ -40,7 +75,7 @@ module Skylab::Snag
 
               ok_ = __interpret_first_AND_or_OR_verb_phrase
               while ok_
-                ok_ = self.__interpret_subsequent_particular_AND_or_OR_verb_phase
+                ok_ = __interpret_subsequent_particular_AND_or_OR_verb_phase
               end
               ok && __synthesize_tree_of_predicates
             end
@@ -155,6 +190,16 @@ module Skylab::Snag
             ok
           end
 
+          def __interpret_subsequent_particular_AND_or_OR_verb_phase
+
+            if @in_st.unparsed_exists
+              self._ABSTRACT_from_the_other_one  # which is [#005]
+            else
+
+              DID_NOT_PARSE_
+            end
+          end
+
           def _interpret_one_predicate_tail
 
             winner = _parse_one_predicate_tail
@@ -187,13 +232,18 @@ module Skylab::Snag
 
           def __synthesize_predicate_tail_tree
 
-            _cls = Library_::Models_.class_via_symbol @pred_tail_conjunction
-
-            @pred_tail_trees ||= []
-
-            @pred_tail_trees.push _cls.new @pred_tail_a
+            _x = if 1 == @pred_tail_a.length
+              @pred_tail_a.fetch 0
+            else
+              _cls = Library_::Models_.class_via_symbol @pred_tail_conjunction
+              _cls.new @pred_tail_a
+            end
 
             @pred_tail_a = nil
+
+            @pred_tail_trees ||= []
+            @pred_tail_trees.push _x
+
             ACHIEVED_
           end
 
@@ -203,7 +253,6 @@ module Skylab::Snag
               @pred_tail_trees.fetch 0
             else
               _cls = Library_::Models_.class_via_symbol @verbs_conjunction
-              self._ETC
               _cls.new @pred_tail_trees
             end
 

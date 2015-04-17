@@ -168,6 +168,10 @@ module Skylab::Basic
       @slug = slug
     end
 
+    def new_with_slug x
+      self.class.new x
+    end
+
     def has_children
       false
     end

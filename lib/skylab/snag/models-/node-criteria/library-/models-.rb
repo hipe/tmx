@@ -68,10 +68,28 @@ module Skylab::Snag
           def to_tree_
 
             me = LIB_.basic::Tree.mutable_node.new symbol
-            @a.each do | x |
-              tree = x.to_tree_
-              me.add tree.slug, tree
+
+            h = {}
+            counter = -> k do
+              if h.key? k
+                h[ k ] += 1
+              else
+                h[ k ] = 0
+              end
             end
+
+            @a.each do | x |
+
+              tree = x.to_tree_
+              k = tree.slug
+              d = counter[ k ]
+              if d.nonzero?
+                k = :"#{ k }[#{ d }]"
+                tree = tree.new_with_slug k
+              end
+              me.add k, tree
+            end
+
             me
           end
 

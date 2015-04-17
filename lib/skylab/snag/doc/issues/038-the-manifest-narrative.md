@@ -117,9 +117,7 @@ so, for 1) (add a node by re-appropriating if possible)
 
     lock the file
 
-    find any existing re-appropriable node given
-      the criteria that the node has tag "#done" or tag "#hole"
-      and that the node has no extended content
+    find any existing re-appropriable node
 
     if a re-appropriable node was found
 
@@ -136,25 +134,33 @@ so, for 1) (add a node by re-appropriating if possible)
     # etc w/ tempfile
     unlock the file
 
-
     here is how we find any existing re-appropriable node
+
+      the criteria is that
+      the node is tagged with "#done" or "#hole" and has
+      no extended content
 
       for each of the zero or more nodes in the file
 
         if the current node matches the criteria
 
-          if this is the first such node
+          memoize this node's identifer in a dictionary
+
+          if there is no memoized node
             memoize this node
           otherwise
-            if this node has an identifer that is lower than the existing
-            memoized node's identifier
-              memoize this node
+            with the number of deep "#was" tags that this node has compared
+            to the memoized node
+              if this node has less
+                memoize this node
+              otherwise if this node has the same amount
+                if this node has an identifier that is lower than
+                that of the memoized node
+                  memoize this node
 
-        while we are at it, memoize this node's identifer in a dictionary
 
     the above has given you zero or one memoized node.
     this node (if any) has the lowest re-appropriable identifier
-
 
     here is how we find the first available node identifier
 
