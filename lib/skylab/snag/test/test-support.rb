@@ -88,9 +88,25 @@ module Skylab::Snag::TestSupport
       end
     end
 
-    def parse_against * s_a
-      against_ input_stream_via_array s_a
+    def parse_against_ * s_a, & x_p
+      against_ input_stream_via_array( s_a ), & x_p
     end
+
+    def against_ in_st, & x_p
+
+      _interpreter = subject_object_
+      _context = grammatical_context_
+
+      _interpreter.interpret_out_of_under_ in_st, _context, & x_p
+    end
+
+    define_method :grammatical_context_for_singular_subject_number_, -> do
+
+      x = nil
+      -> do
+        x ||= subject_module_::Grammatical_Context_.new_with :subject_number, :singular
+      end
+    end.call
 
     def input_stream_containing * s_a
       input_stream_via_array s_a
@@ -98,10 +114,6 @@ module Skylab::Snag::TestSupport
 
     def input_stream_via_array s_a
       Snag_.lib_.parse_lib::Input_Streams_::Array.new s_a
-    end
-
-    def against_ st, & x_p
-      subject_object_.output_node_via_input_stream st, & x_p
     end
 
     def visual_tree_against_ st

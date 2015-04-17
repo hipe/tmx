@@ -17,13 +17,14 @@ module Skylab::Snag::TestSupport
         subject_module_::Association_Adapter.new_with
       rescue ::ArgumentError => e
       end
-      e.message.should match %r(\Amissing required property 'verb-lemma')
+      e.message.should match %r(\Amissing required property 'verb-lemma-and-phrase-head-s-a')
     end
 
     it "make a minimal association adapter" do
 
       _o = _min_assoc_adptr
-      _o.instance_variable_get( :@verb_lemma ).should eql 'is'
+      _o.instance_variable_get( :@verb_lemma_and_phrase_head_s_a ).should(
+        eql %w( is ) )
     end
 
     it "the named functions gets parsed" do
@@ -40,14 +41,14 @@ module Skylab::Snag::TestSupport
 
     it "parse the first case" do
 
-      on = parse_against 'is', 'on'
+      on = parse_against_ 'is', 'on'
       on.symbol.should eql :the_ON_form
       on.value_x.should eql :on
     end
 
     it "parse the second case" do
 
-      on = parse_against 'is', 'off'
+      on = parse_against_ 'is', 'off'
       on.symbol.should eql :the_OFF_form
       on.value_x.should eql :off
     end
@@ -163,6 +164,10 @@ module Skylab::Snag::TestSupport
 
     def subject_object_
       _min_assoc_adptr
+    end
+
+    def grammatical_context_
+      grammatical_context_for_singular_subject_number_
     end
 
     memoize_ :_min_assoc_adptr do

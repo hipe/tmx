@@ -9,10 +9,10 @@ module Skylab::Snag
         def initialize * a, & oes_p
 
           @on_event_selectively = oes_p
-          @state, vmp, sym, vmp_, @st, ada = a
+          @state, vmp, sym, vmp_, @in_st, @grammatical_context, @ada = a
 
-          @named_functions_ = ada.named_functions_
-          @verb_lemma = ada.verb_lemma
+          @named_functions_ = @ada.named_functions_
+          @verb_s_a = @ada.verb_lemma_and_phrase_head_s_a
 
           @did_reach_back = false
 
@@ -25,16 +25,16 @@ module Skylab::Snag
 
         def execute
 
-          if @st.unparsed_exists
+          if @in_st.unparsed_exists
 
-            @d = @st.current_index
+            @d = @in_st.current_index
 
             begin
 
               _stay = send :"__#{ @state }__"
               _stay or break
 
-              if @st.unparsed_exists
+              if @in_st.unparsed_exists
                 redo
               end
               break
@@ -48,7 +48,7 @@ module Skylab::Snag
 
           if _parse_conjunctive_token  # and / or
 
-            if _parse_verb  # ..is
+            if _parse_verb  # ..is  :+#one
 
               if _parse_verb_modifier_phrase
 
@@ -72,11 +72,13 @@ module Skylab::Snag
           end
         end
 
+        # the below is begging for [#005] cleanup
+
         def __after_verb_phrase__  # is pink or is green
 
           if _parse_conjunctive_token  # .. and
 
-            if _parse_verb  # .. is
+            if _parse_verb  # .. is  :+#one
 
               if _parse_verb_modifier_phrase  # .. red
 
@@ -102,7 +104,7 @@ module Skylab::Snag
 
           if _parse_conjunctive_token  # .. and
 
-            if _parse_verb  # .. is
+            if _parse_verb  # .. is  # :+#one
 
               if _parse_verb_modifier_phrase  # .. red
 
@@ -132,7 +134,7 @@ module Skylab::Snag
 
         def _write_verb_modifier_phrase_to a
 
-          @d = @st.current_index
+          @d = @in_st.current_index
           a.push @vmp
           KEEP_PARSING_
         end
@@ -143,7 +145,7 @@ module Skylab::Snag
           new.push @top_x
           new.push @vmp
 
-          @d = @st.current_index
+          @d = @in_st.current_index
           @state = :new_context
           @top_x = new
           @x = @vmp
@@ -161,7 +163,7 @@ module Skylab::Snag
           new.push guy
           new.push @vmp
 
-          @d = @st.current_index
+          @d = @in_st.current_index
           @state = :in_verb_modifier_phrase
           @x = new
 
@@ -174,7 +176,7 @@ module Skylab::Snag
           new.push @x
           new.push @vmp
 
-          @d = @st.current_index
+          @d = @in_st.current_index
           @state = :in_verb_modifier_phrase
           @top_x.replace_last_with_ new
           @x = new
@@ -184,24 +186,28 @@ module Skylab::Snag
 
         def _parse_conjunctive_token
 
-          sym = parse_a_conjunctive_token_ @st
+          sym = Parse_a_conjunction_[ @in_st ]
           if sym
             @sym = sym
             KEEP_PARSING_
           end
         end
 
-        def _parse_verb
+        def _parse_verb & x_p
 
-          d = scan_the_verb_token_ @st
-          if d
+          _did = @ada.scan_the_verb_phrase_head_out_of_under_(
+            @in_st, @grammatical_context, & x_p )
+
+          if _did
             KEEP_PARSING_
           end
         end
 
         def _parse_verb_modifier_phrase
 
-          on = parse_a_verb_modifier_phrase_ @st
+          on = @ada.verb_modifier_phrase_via_input_stream_(
+            @in_st, & @on_event_selectively )
+
           if on
             @vmp = on
             KEEP_PARSING_
@@ -210,13 +216,13 @@ module Skylab::Snag
 
         def _none_and_done
 
-          @st.current_index = @d
+          @in_st.current_index = @d
           DID_NOT_PARSE_
         end
 
         def _cls_for and_or_or_sym
 
-          Library_::Models_.const_get( AND_OR_OR_CONST_[ and_or_or_sym ], false )
+          Library_::Models_.class_via_symbol and_or_or_sym
         end
 
         def _ambiguous sym
@@ -237,10 +243,6 @@ module Skylab::Snag
           @top_x = UNABLE_
           _none_and_done
         end
-
-        include Association_Parse_Functions_
-
-        AND_OR_OR_CONST_ = { and: :And, or: :Or }
       end
     end
   end

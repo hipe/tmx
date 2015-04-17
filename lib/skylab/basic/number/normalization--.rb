@@ -80,8 +80,7 @@ module Skylab::Basic
 
               arg and begin
                 in_st.advance_one
-                # Basic_.lib_.parse_lib::Output_Node_.new arg.value_x  # if needed
-                arg
+                Basic_.lib_.parse_lib::output_node.new arg.value_x
               end
             end
           end

@@ -101,9 +101,7 @@ module Skylab::Callback::TestSupport
           end
         end
 
-        def _build_event_receiver_for_expect_event  # :+#public-API :#hook-in
-
-          # (this is frequently hooked-in to to implement ignoring certain events)
+        def _build_event_receiver_for_expect_event
 
           Event_Receiver__.new -> ev do
             ( @ev_a ||= [] ).push ev

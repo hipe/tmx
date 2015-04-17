@@ -78,5 +78,9 @@ module Skylab::Snag::TestSupport
 
             :keyword, 'wide' ] )
     end
+
+    def grammatical_context_
+      grammatical_context_for_singular_subject_number_
+    end
   end
 end

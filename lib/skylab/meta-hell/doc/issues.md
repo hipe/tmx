@@ -81,8 +81,11 @@
 [#007] #open push up logic for autoviv. of superklassen maybe? (at least test)
 [#006]       #note core dumps happen here with super
 [#005]       #done second rewrite
-[#004]       #done #refactor look for opportunities to rid of `meta_hell` prefix
-[#003]       #done consider scrapping `_p` name convention for..
+[#004]       this function too (in [sg])
+             ( #was: #done #refactor look for opportunities to rid of
+               `meta_hell` prefix )
+[#003]       there is a possible new parse function we might subsume in [sg]
+             ( #was: #done consider scrapping `_p` name convention for.. )
 [#002]       this one parse function with list against matrix
              ( #was: #done instance method klass creator tests )
 [#001]       [ bundle ]

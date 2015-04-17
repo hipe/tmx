@@ -593,6 +593,8 @@ module Skylab::Callback
     def with_name_symbol i
       self.class.new value_x, i
     end
+
+    alias_method :name_x, :name_symbol  # as you like it
   end
 
   class Trio  # :[#004].

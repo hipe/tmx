@@ -16,12 +16,21 @@ module Skylab::Snag::TestSupport
     it "ambiguity is ambiguous" do
 
       st = input_stream_via_array %w( is blue and pink or green )
-      _x = against_ st, & handle_event_selectively
-      _x.should eql false
+
+      _x = against_ st, & handle_event_selectively # , & _ignore_expecting
+      __expect_result_for_ambiguity _x, st
+    end
+
+    def __expect_result_for_ambiguity x, st
+
+      x.should eql false
+
       _ev = expect_not_OK_event :ambiguous
+
       black_and_white( _ev ).should eql(
         "'or' is ambiguous here because of a previous \"and\"" )
-      st.current_index.should eql 4
+
+      st.current_index.should eql 0
     end
 
     it "experimentally, ambiguity can be resolved by a context pop" do
@@ -125,6 +134,15 @@ module Skylab::Snag::TestSupport
       HERE
     end
 
+    def _ignore_expecting
+
+      -> * i_a, & ev_p do
+        if :expecting != i_a.last
+          handle_event_selectively.call( * i_a, & ev_p )
+        end
+      end
+    end
+
     def _expect_parsed_everything st
 
       if st.unparsed_exists
@@ -138,6 +156,10 @@ module Skylab::Snag::TestSupport
 
     def subject_object_
       _color_assoc_adaptr
+    end
+
+    def grammatical_context_
+      grammatical_context_for_singular_subject_number_
     end
 
     memoize_ :_color_assoc_adaptr do

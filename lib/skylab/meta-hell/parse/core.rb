@@ -29,6 +29,10 @@ module Skylab::MetaHell
         Parse_::Input_Stream_
       end
 
+      def output_node
+        Parse_::Output_Node_
+      end
+
       def parse_serial_optionals * a
         Parse_::Functions_::Serial_Optionals.parse_via_highlevel_arglist a
       end

@@ -406,7 +406,6 @@ module Skylab::Headless
         @monadic_lemma_box = Callback_::Box.new
         @last_lemmaless_id = 0
       end
-      private :initialize
 
       # `[]=` Add the lemma to the lexicon NOTE this is DSL-ish and it
       # mutates the lexeme by setting its lemma if it is not yet set!
@@ -505,8 +504,8 @@ module Skylab::Headless
         @monadic_form_box.has_name x
       end
 
-      def fetch_monadic_form x
-        @monadic_form_box.fetch x
+      def fetch_monadic_form x, & p
+        @monadic_form_box.fetch x, & p
       end
     end
 
@@ -697,8 +696,8 @@ module Skylab::Headless
         @monadic_lemma_box.has_name x
       end
 
-      def fetch_monadic_lexeme x
-        @monadic_lemma_box.fetch x
+      def fetch_monadic_lexeme x, & p
+        @monadic_lemma_box.fetch x, & p
       end
     end
 
@@ -783,8 +782,7 @@ module Skylab::Headless
         # first, and then the first group inline with the regulars in the
         # order of the regulars.
 
-        special_a = @irregular_box.instance_variable_get( :@a ) -
-          self.class.form_box.instance_variable_get( :@a )
+        special_a = @irregular_box.a_ - self.class.form_box.a_
 
         special_a.each do |k|
           y << @irregular_box.fetch( k )
@@ -1091,7 +1089,13 @@ module Skylab::Headless
 
     Phrase = NLP::EN::Part_Of_Speech::Phrase_.new :v, :np
 
-    lexicon[ 'have' ] = new preterite: 'had', singular_third_present: 'has'
+    lexicon[ 'have' ] = new(
+      preterite: 'had',
+      singular_third_present: 'has' )
+
+    lexicon[ 'is' ] = new(
+      preterite: 'was',
+      plural_third_present: 'are' ) # etc
 
   end
 

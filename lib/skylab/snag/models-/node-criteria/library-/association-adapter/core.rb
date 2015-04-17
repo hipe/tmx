@@ -7,7 +7,14 @@ module Skylab::Snag
       class Association_Adapter < Common_Adapter_
 
         Methodic_.call self, :simple, :properties,
-          :required, :property, :verb_lemma
+          :required, :property, :verb_lemma_and_phrase_head_s_a
+
+        attr_reader :verb_lemma_and_phrase_head_s_a
+
+        def initialize
+          @model_identifier = nil
+          super
+        end
 
       private
 
@@ -44,66 +51,158 @@ module Skylab::Snag
           KEEP_PARSING_
         end
 
+        def verb_lemma=
+          @verb_lemma_and_phrase_head_s_a = [ iambic_property ]
+          KEEP_PARSING_
+        end
+
       public
 
-        def output_node_via_input_stream st, & x_p
+        def interpret_out_of_under_ in_st, g_ctxt, & x_p
 
-          # spaghetti peek quite a bit before firing up a state machine
+          if in_st.unparsed_exists
 
-          x = DID_NOT_PARSE_
-          if st.unparsed_exists
+            d = in_st.current_index
 
-            d = scan_the_verb_token_ st
+            _did = scan_the_verb_phrase_head_out_of_under_ in_st, g_ctxt # :+#one , & x_p
 
-            if d  # is
+            if _did  # is
 
-              vmp = parse_a_verb_modifier_phrase_ st
+              x = interpret_verb_phrase_tail_out_of_under_ in_st, g_ctxt, & x_p
 
-              if vmp  # is pink
-
-                d = st.current_index
-
-                sym = parse_a_conjunctive_token_ st
-
-                if sym  # is pink or
-
-                  d_ = scan_the_verb_token_ st
-                  vmp_ = parse_a_verb_modifier_phrase_ st
-
-                  if d_  # is pink or is
-
-                    if vmp_  # is pink or is green
-
-                      x = __run_against_state_machine( :after_verb_phrase,
-                        vmp, sym, vmp_, st, self, & x_p )
-
-                    else # is pink «or is foo»
-                      st.current_index = d
-                      x = vmp
-                    end
-                  else
-
-                    if vmp_  # is pink or green
-
-                      x = __run_against_state_machine( :in_verb_modifier_phrase,
-                        vmp, sym, vmp_, st, self, & x_p )
-
-                    else  # is pink «or bleats»
-                      st.current_index = d
-                      x = vmp
-                    end
-                  end
-
-                else  # is pink «gazoink»
-                  x = vmp
-                end
-
-              else  # is «foo»
-                st.current_index = d
+              if ! x
+                in_st.current_index = d
               end
+
             end  # «bleats»
           end
           x
+        end
+
+        def interpret_verb_phrase_tail_out_of_under_ in_st, g_ctxt, & x_p
+
+          # spaghetti peek quite a bit before firing up a state machine
+          # (this is a primordial precursor to [#005] this one pattern, and could be tightened up)
+
+          if in_st.unparsed_exists
+
+            d = in_st.current_index
+            vmp = verb_modifier_phrase_via_input_stream_ in_st
+
+            if vmp  # is pink
+
+              d = in_st.current_index
+
+              sym = Parse_a_conjunction_[ in_st ]
+
+              if sym  # is pink or
+
+                # #open [#013] the below is probably an overreach - detecting
+                # a re-statement of the verb phrase head (even as it relates
+                # to this adapter) is probably out of scope for the adapter
+                # here, but rather it is something for some parent node to do
+                # but let's wait for [#005]
+
+                d_ = scan_the_verb_phrase_head_out_of_under_ in_st, g_ctxt #, & x_p  #:+#one
+
+                vmp_ = verb_modifier_phrase_via_input_stream_ in_st
+
+                if d_  # is pink or is
+
+                  if vmp_  # is pink or is green
+
+                    x = __run_against_state_machine( :after_verb_phrase,
+                      vmp, sym, vmp_, in_st, g_ctxt, self, & x_p )
+
+                  else # is pink «or is foo»
+                    in_st.current_index = d
+                    x = vmp
+                  end
+                else
+
+                  if vmp_  # is pink or green
+
+                    x = __run_against_state_machine( :in_verb_modifier_phrase,
+                      vmp, sym, vmp_, in_st, g_ctxt, self, & x_p )
+
+                  else  # is pink «or bleats»
+                    in_st.current_index = d
+                    x = vmp
+                  end
+                end
+
+              else  # is pink «gazoink»
+                x = vmp
+              end
+
+            else  # is «foo»
+              in_st.current_index = d
+            end
+          end
+          x
+        end
+
+        def interpret_verb_phrase_head_out_of_under_ in_st, g_ctxt, & x_p
+
+          _yes = scan_the_verb_phrase_head_out_of_under_ in_st, g_ctxt, & x_p
+          if _yes
+            self
+          end
+        end
+
+        def scan_the_verb_phrase_head_out_of_under_ in_st, g_ctxt, & x_p
+
+          send :"__scan_the_verb_phrase_head_for__#{
+            g_ctxt.subject_number }__via_input_stream", in_st, & x_p
+        end
+
+        def __scan_the_verb_phrase_head_for__singular__via_input_stream in_st, & x_p
+
+          Parse_static_sequence_[ in_st, @verb_lemma_and_phrase_head_s_a, & x_p ]
+        end
+
+        def __scan_the_verb_phrase_head_for__plural__via_input_stream in_st, & x_p
+
+          @___verb_head_string_array_for_plural ||=
+            __build_verb_head_string_array_for_plural
+
+          Parse_static_sequence_[
+            in_st, @___verb_head_string_array_for_plural, & x_p ]
+        end
+
+        def __build_verb_head_string_array_for_plural
+
+          s_a = @verb_lemma_and_phrase_head_s_a
+
+          s = s_a.fetch 0
+
+          v = Snag_.lib_.NLP::EN::POS::Verb
+
+          lexeme = v.lexicon.fetch_monadic_lexeme s do end
+
+          if ! lexeme
+            self._YAY
+            lexeme = v[ s ]
+          end
+
+          s_a_ = s_a.dup
+          s_a_[ 0 ] = lexeme.plural__third__present
+          s_a_
+        end
+
+        def verb_modifier_phrase_via_input_stream_ in_st, & x_p
+
+          Parse_first_match_via_box_[
+            in_st,
+            @named_functions_,
+            @model_identifier,
+            & x_p ]
+        end
+
+        attr_reader :model_identifier
+
+        def receive_model_identifier_ x
+          @model_identifier = x
         end
 
         def __run_against_state_machine * a, & x_p
@@ -111,9 +210,7 @@ module Skylab::Snag
           AA_::State_Machine__.new( * a, & x_p ).execute
         end
 
-        include Association_Parse_Functions_
-
-        attr_reader :named_functions_, :verb_lemma
+        attr_reader :named_functions_
 
         Autoloader_[ self ]
 

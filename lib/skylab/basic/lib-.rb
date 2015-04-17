@@ -67,6 +67,10 @@ module Skylab::Basic
       Callback_::Oxford_or[ a ]
     end
 
+    Parse_lib = -> do
+      MH__[]::Parse
+    end
+
     Pool = -> x do
       MH__[]::Pool.enhance x
     end

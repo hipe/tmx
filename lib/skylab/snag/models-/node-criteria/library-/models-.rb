@@ -8,6 +8,16 @@ module Skylab::Snag
 
       module Models_
 
+        class << self
+
+          meh_h = { and: :And, or: :Or }
+
+          define_method :class_via_symbol do | sym |
+            const_get meh_h.fetch( sym ), false
+          end
+
+        end  # >>
+
         Conjunctive_Tree__ = ::Class.new
 
         class And < Conjunctive_Tree__
@@ -24,8 +34,8 @@ module Skylab::Snag
 
         class Conjunctive_Tree__
 
-          def initialize
-            @a = []
+          def initialize a=[]
+            @a = a
           end
 
           def to_ascii_visualization_string_

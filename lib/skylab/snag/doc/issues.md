@@ -60,8 +60,10 @@
 [#016]       #done remove fixed field requirement
 [#015]       #done rearch to find issues.md
 [#014]       #done open issue report
-[#013]       #done shortcut to open issue
-[#012]       #done rename to snag
+[#013] #open overreach - #waiting-for: [#005]
+             ( #was: #done shortcut to open issue )
+[#012] #soon one day we will have proper 'expecting' support
+             ( #was: #done rename to snag )
 [#011]       #workflow #parent-node: [#037] the tags narrative ..
 [#010]       the delineate narrative ..
              ( #was: #done either do or don't do something about horrible
@@ -72,14 +74,17 @@
              ( #was: #done autoloadify )
 [#006]       #doc-node structures for our API implementation ..
              ( #was: reanme Api -> API, P-orcelain -> CLI)
-[#005]       #done get cli working again
+[#005] #track  this
+             ( #was: #done get cli working again )
 [#004]       thoughts on interpretation and expression ..
              ( #was: #done light fast solo CLI client 2012-11-12 )
 [#003]       #parent-node: [#057] the todo narrative ..
              ( #was: tree report of todos 2012-10-13 )
 [#002]       #used-in-tests
-             ( #was: #done 2012-08-19 basic CLI integration specs - essential coverage  )
-[#001]       #done tag negation in queries
-             ( #was: #done 2012-08-20 integrate the 'issue-all' one-off #deferred )
+             ( #was: #done 2012-08-19 basic CLI integration specs -
+               essential coverage  )
+[#001]       ( #was: #done tag negation in queries )
+             #re-opened 2012-08-20 integrate the 'issue-all' one-off #deferred
 [#sl-048]    #done show should list (for now) 2012-02-10
-[#sl-046]    #done #feature add verbose/debug mode, put such output there 2012-02-07
+[#sl-046]    #done #feature add verbose/debug mode,
+               put such output there 2012-02-07
