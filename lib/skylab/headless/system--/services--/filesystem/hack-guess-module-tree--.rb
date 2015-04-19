@@ -30,7 +30,7 @@ module Skylab::Headless
 
         class << self
 
-          def build_via_arglist a, & oes_p
+          def new_via_arglist a, & oes_p
             if 1 == a.length
               a.unshift :path
             end

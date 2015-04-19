@@ -100,14 +100,16 @@ module Skylab::Callback
         end
 
         def call_via_arglist a, & oes_p
-          curried = build_via_arglist a, & oes_p
+          curried = new_via_arglist a, & oes_p
           curried && curried.execute
         end
 
-        def build_via_arglist a, & oes_p
+        def new_via_arglist a, & oes_p
           ok = nil
           o = new do
-            @on_event_selectively ||= oes_p
+            if oes_p
+              @on_event_selectively ||= oes_p
+            end
             ok = process_arglist_fully a
           end
           ok && o

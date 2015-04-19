@@ -654,7 +654,7 @@ module Skylab::Callback
 
     class << self
 
-      def build_via_arglist a, & p
+      def new_via_arglist a, & p
 
         if a.length.nonzero? || p
           new( * a, & p )

@@ -1,16 +1,18 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../core'
+require_relative '../test-support'
 
-module Skylab::Test
+module Skylab::Slicer::TestSupport
 
-module Benchmarks::Eq_Eq_Eq_Vs_Kind_Of_  # losing 2x indent..
+  module Benchmarks::Eq_Eq_Eq_Vs_Kind_Of_
+
+    # <-2
 
 TIMES = 400_000  # this number is few enough so that you can see this
   # thing working right away and get a rough sense for the comparision.
   # a larger number will yield more precision.
 
-class Alt < Test_::Benchmark::Alternative
+class Alt < TestSupport_::Benchmark::Alternative
   def val
     if rand >= 0.5
       1
@@ -27,7 +29,7 @@ alts << Alt[ "==",       -> { ::Fixnum == val.class } ]
 
 _tests = lambda do
 
-  alt_ = ::Class.new( Test_::Benchmark::Alternative ).class_exec do
+  alt_ = ::Class.new( TestSupport_::Benchmark::Alternative ).class_exec do
     def initialize alt, val
       super( * alt.to_a )
       @val = val
@@ -36,7 +38,7 @@ _tests = lambda do
     self
   end
 
-  stderr = Stderr_[]
+  stderr = TestSupport_.debug_IO
 
   assert = ->(alt, input, output) {
     alt = alt_[ alt, input ]
@@ -61,10 +63,13 @@ _make_bm_jobs = ->(x) {
   alts.each { |a| x.report(a.label) { t.times { a.execute } } }
 }
 
-Test_::Benchmark.selftest_argparse[ -> do
+TestSupport_::Benchmark.selftest_argparse[ -> do
   _tests[]
 end, -> do
-  Test_::Benchmark.bmbm( & _make_bm_jobs )
+  TestSupport_::Benchmark.bmbm( & _make_bm_jobs )
 end ]
 
-end end  # indent lost 2 x
+# -> 2
+
+  end
+end

@@ -4,7 +4,7 @@ module Skylab::Slicer::TestSupport
 
   describe "[sl]" do
 
-    extend Slicer_TestSupport
+    extend TS_
 
     as :exp, /\AExpecting .*transfer/, :styled
     as :inv, /\Atry wtvr -h \[sub-cmd\] for help\.\z/i, :styled

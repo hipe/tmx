@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../core'
+require_relative '../test-support'
 
-module Skylab::Test
+module Skylab::Slicer::TestSupport
 
   module Benchmarks::Scan_vs_each__
 
@@ -74,15 +74,14 @@ module Skylab::Test
       end
     end
 
-    Test_::Benchmark.selftest_argparse[ -> y do
+    TestSupport_::Benchmark.selftest_argparse[ -> y do
       number_of_times = 1
       some_action = -> x { $stderr.puts "OK - #{ x }" }
-      invoke[ Test_::Benchmark::Mock_.new y ]
+      invoke[ TestSupport_::Benchmark::Mock_.new y ]
     end, -> do
       number_of_times = TIMES__
       some_action = -> _ { }
-      invoke[ Test_::Benchmark ]
+      invoke[ TestSupport_::Benchmark ]
     end ]
   end
 end
-

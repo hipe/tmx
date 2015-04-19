@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../core'
+require_relative '../test-support'
 
-module Skylab::Test
+module Skylab::Slicer::TestSupport
 
   module Benchmarks::Bitfield_vs_tuple_
 
@@ -57,10 +57,10 @@ module Skylab::Test
       end
     end
 
-    Test_::Benchmark.selftest_argparse[ -> y do
-      invoke[ Test_::Benchmark::Mock_.new y ]
+    TestSupport_::Benchmark.selftest_argparse[ -> y do
+      invoke[ TestSupport_::Benchmark::Mock_.new y ]
     end, -> do
-      invoke[ Test_::Benchmark ]
+      invoke[ TestSupport_::Benchmark ]
     end ]
   end
 end

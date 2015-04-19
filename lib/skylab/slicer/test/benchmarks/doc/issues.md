@@ -1,3 +1,4 @@
+[#010] #open todo: multi-variate data vizualization ..
 [#009] #open #in-situ (in skylab.rb) finally get to benchmarking this thing
                "pn.relative? is expensive and bloaty"
 [#008]       bitfield vs. tuple as result of method call

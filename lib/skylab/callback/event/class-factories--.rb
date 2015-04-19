@@ -22,10 +22,10 @@ module Skylab::Callback
       module Module_Methods__
 
         def [] * a
-          build_via_arglist a
+          new_via_arglist a
         end
 
-        def build_via_arglist a
+        def new_via_arglist a
           evnt_class.call_via_arglist a
         end
 
@@ -75,7 +75,7 @@ module Skylab::Callback
             end
           end
 
-          def build_via_arglist a
+          def new_via_arglist a
             new do
               @a = a
             end

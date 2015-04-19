@@ -1,8 +1,12 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../core'
+require_relative '../test-support'
 
-module Skylab::Test::Struct_Members_Vs_Ivars_Etc_
+module Skylab::Slicer::TestSupport
+
+  module Benchmarks::Struct_Members_Vs_Ivars_Etc_
+
+    # <-
 
   TIMES = 7_000_000  # this number has been adjusted down so that we can
   # see results "right away" (and make sure that the benchmark itself still
@@ -42,14 +46,12 @@ module Skylab::Test::Struct_Members_Vs_Ivars_Etc_
     end
   end
 
-  Test_ = ::Skylab::Test
-
   if ::ARGV.length.nonzero?
-    Test_::TestSupport.debug_IO.puts "unpexpected argument(s), #{
+    TestSupport_.debug_IO.puts "unpexpected argument(s), #{
       }skipping benchmark: #{ ::ARGV * ' ' } (from #{ self })"
   else
 
-  ::Skylab::Test::Benchmark.bmbm do |bm|
+  TestSupport_::Benchmark.bmbm do |bm|
     struct = SomeStructSubclass.new 3
     obj = SomeRegularClass.new 3
     bm.report "regular class object ivar" do
@@ -66,5 +68,9 @@ module Skylab::Test::Struct_Members_Vs_Ivars_Etc_
     end
   end
 
-  end  # indent broken to preserve history :/
+  end
+
+  # ->
+
+  end
 end

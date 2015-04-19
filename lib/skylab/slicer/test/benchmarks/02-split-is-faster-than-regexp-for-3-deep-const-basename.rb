@@ -1,9 +1,12 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../core'
+require_relative '../test-support'
 
-module Skylab::Test
-module Benchmarks::Split_vs_rx_  # losing 2x indent
+module Skylab::Slicer::TestSupport
+
+  module Benchmarks::Split_vs_rx_
+
+    # <- 2
 
 TIMES = 200_000  # this amount is few enough to see it working right away.
   # increase the number for more precise results.
@@ -15,7 +18,7 @@ module Foo
   end
 end
 
-alt = Test_::Benchmark::Alternative
+alt = TestSupport_::Benchmark::Alternative
 mod = Foo::BarBaz::BiffoBazzo
 mod_str = mod.to_s
 
@@ -26,20 +29,20 @@ alts << alt[ "3 lvl split pop", -> { mod_str.split('::').last } ]
 alts << alt[ "inline regex", -> { /[^:]+\z/.match(mod_str)[0] } ]
 alts << alt[ "regex var in outer scope", -> { re.match(mod_str)[0] } ]
 
-stderr = Stderr_
+stderr = TestSupport_.debug_IO
 
 test_that_benchmark_blocks_are_correct = -> do
   alts.each do |a|
     s = a.proc.call
-    stderr[].puts "OK?:#{ "%30s:------->%s<-------" % [a.label, s] }"
+    stderr.puts "OK?:#{ "%30s:------->%s<-------" % [a.label, s] }"
   end
 end
 
-Test_::Benchmark.selftest_argparse[ -> do
+TestSupport_::Benchmark.selftest_argparse[ -> do
   test_that_benchmark_blocks_are_correct[]
 end, -> do
   t = TIMES
-  Test_::Benchmark.bmbm do |bm|
+  TestSupport_::Benchmark.bmbm do |bm|
      alts.each do |a|
        bm.report a.label do
          t.times do
@@ -50,4 +53,7 @@ end, -> do
    end
 end ]
 
-end end  # lost 2x indent
+# -> 2
+
+  end
+end
