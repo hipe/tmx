@@ -48,41 +48,40 @@ module Skylab::Snag
 
       Actors_::Flyweighted_object_stream_via_substring = -> do
 
-        conventional_st_via_simple_st = -> st do
-          Callback_.stream do
+        # to leverage (rather than be penalized by) the flyweighting that the
+        # upstream provides (see), we must re-use the same stream object over
+        # all of the upstream lines.
 
-            o = st.gets
-            if o
-              if :tag == o.business_category_symbol
-                x = st.peek_for_value
-                if x
-                  self._DO_ME
-                end
-              end
-            end
-            o
-          end
-        end
+        p = -> sstr do  # the first time it its called ..
 
-        convential_stream = -> sstr do
+          fly = Snag_::Models::Hashtag::Stream[
+            :input_string, sstr.s,
+            :hashtag_class,
+            Snag_::Models_::Tag::Expression_Adapters::Byte_Stream::Models_::Tag
+          ].to_name_value_scanner
 
-          simple_st = Snag_::Models::Hashtag.interpret_simple_stream_from__(
-            sstr.begin, sstr.end, sstr.s,
-            Snag_::Models_::Tag.new( nil )  # one #flyweight to rule them all
-          ).flush_to_value_peeking_stream
+          scn = fly.string_scanner
+          scn.pos = sstr.begin
+          fly.end = sstr.end
 
-          convential_stream = -> sstr_ do
-            simple_st.reinitialize sstr_.begin, sstr_.end, sstr_.s
-            conventional_st_via_simple_st[ simple_st ]
+          p = -> sstr_ do  # subsequent times ..
+
+            scn = fly.string_scanner
+            scn.string = sstr_.s
+            scn.pos = sstr_.begin
+            fly.end = sstr_.end
+            fly
           end
 
-          conventional_st_via_simple_st[ simple_st ]
+          fly
         end
 
         -> sstr do
-          convential_stream[ sstr ]
+          p[ sstr ]
         end
       end.call
+
+      BS_ = self
     end
   end
 end

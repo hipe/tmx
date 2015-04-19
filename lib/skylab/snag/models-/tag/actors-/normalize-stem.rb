@@ -13,12 +13,12 @@ module Skylab::Snag
 
         @as_string = "##{ @symbol.id2name }"  # :+[#007] add hashtag prefix
 
-        st = Snag_::Models::Hashtag.interpret_simple_stream_from_string @as_string
+        st = Snag_::Models::Hashtag::Stream[ @as_string ]
 
         sym_o = st.gets
 
         if sym_o
-          if :hashtag == sym_o.nonterminal_symbol
+          if :hashtag == sym_o.category_symbol
             @symbol = sym_o
             _rest = st.gets
             if _rest

@@ -1,66 +1,33 @@
 digraph {
 
-  add_node_actor [label="add node\nactor"]
-  criteria_model [label="13. node\ncriteria model"]
+  aa [label="add\naction" ]
+  de [label="design & implement\ncriteria implementation"]
+  FS [label="14. expose the\nfilesystem"]
   line_upstream [label="11. line\nupstream" style=filled]
-  marshal_node_actor [label="marshal\nnode actor"]
-  mutate_node_actor [label="mutate\nnode actor"]
   NLP_experiment [label="12. NLP expression\nadapter facility" style=filled]
-  node_collection_model [label="node collection\nmodel"]
   node_identifier_model [label="9. node identifier\nmodel" style=filled]
   node_model [label="10. node model" style=filled]
   node_upstream [label="11. node\nupstream" style=filled]
-  reappropriation_session [label="reappropriation\nsession"]
+  oaa [label="ordinary\nadd action"]
+  rea [label="reappropriation\nintegrated into an\n\"add\" action" ]
+  rea_actor [label="find any best existing\nreappropriable node" ]
+  stru [label="13. experimental support\nfor structured tags"]
   tag_model [label="10. tag model" style=filled]
-  tempfile_model [label="tempfile\nmodel"]
 
+  aa->rea
+  rea->aa
+  aa->oaa
+  rea->rea_actor
 
-  reappropriation_session -> node_collection_model
+  rea_actor->de
+  de->NLP_experiment
+  de->FS
+  de->stru
 
-  node_collection_model -> node_upstream
   node_upstream -> line_upstream
   node_upstream -> node_model
 
-  reappropriation_session -> criteria_model
-  reappropriation_session -> node_identifier_model
-  reappropriation_session -> tempfile_model
-
-  criteria_model -> tag_model
-  criteria_model -> NLP_experiment
-
-  node_collection_model -> mutate_node_actor
-  node_collection_model -> add_node_actor
-
-  mutate_node_actor -> these
-  add_node_actor -> these
-
-  these -> node_identifier_model
-  these -> line_upstream
-  these -> marshal_node_actor
-  these -> node_upstream
-  these -> node_model
-  these -> tempfile_model
-
   node_model -> node_identifier_model
   node_model -> tag_model
-  marshal_node_actor -> node_model
-
-/*
-([sg] G.U CLI 1/3 [po] 1/2 [sg] 1/N deletes)
-([sg]   /N renames)
-([sg]   /N wippify all tests except "loads"
-([sg]   /N API ping spec
-([sg]   /N CLI integration (top)
-([sg]   /N date spec
-([sg]  7/N todo spec
-([sg]  8/N todo's stream (back)
-([sg]  9/N todo's stream (front)
-[ .. the above graph data .. ]
-([sg]   /N universal stream visual test
-([sg]   /N todo melt
-([sg]   /N digraph spec (make one)
-([sg]   /N find all
-*/
-
 
 }

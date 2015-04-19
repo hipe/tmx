@@ -60,6 +60,24 @@ module Skylab::Snag
 
   end  # >>
 
+  # ~ instance & module methods
+
+  module Actor_as_Model_Module_Methods_
+
+    def new_with * x_a, & oes_p
+      new_via_iambic x_a, & oes_p
+    end
+
+    def new_via_iambic x_a, & oes_p
+      new do
+        if oes_p
+          @on_event_selectively = oes_p
+        end
+        process_iambic_fully x_a
+      end
+    end
+  end
+
   Autoloader_ = Callback_::Autoloader
 
   module Models_

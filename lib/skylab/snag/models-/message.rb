@@ -19,6 +19,7 @@ module Skylab::Snag
         r = error_s_p[ errmsg ]
         res = r ? UNABLE_ : r  # [#017]
       end
+      self._REDO
       msg = x.to_s
       if blank_rx =~ msg
         err[ "message was blank." ]

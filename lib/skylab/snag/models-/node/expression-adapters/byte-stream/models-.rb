@@ -26,6 +26,14 @@ module Skylab::Snag
 
         def to_object_stream_
 
+          st = to_simple_stream_of_objects_
+          Callback_.stream do
+            st.gets
+          end
+        end
+
+        def to_simple_stream_of_objects_
+
           # for one line of one node, produce the strings and tags. this
           # will be used in whole-collection searched for tags, so etc..
 
@@ -68,17 +76,17 @@ module Skylab::Snag
 
         def entity_stream_via_model cls
 
-          sym = cls.business_category_symbol
+          sym = cls.category_symbol
 
           __to_object_stream.reduce_by do | x |
-            sym == x.business_category_symbol
+            sym == x.category_symbol
           end
         end
 
         def __to_object_stream
 
           __to_business_row_stream.expand_by do | row |
-            row.to_object_stream_
+            row.to_simple_stream_of_objects_
           end
         end
 
@@ -91,10 +99,6 @@ module Skylab::Snag
           end
         end
       end
-
-      BS_ = self
-
-      TAG_PREFIX___ = '#'
     end
   end
 end

@@ -22,11 +22,11 @@ module Skylab::Snag
 
       def entity_stream_via_model cls
 
-        sym = cls.business_category_symbol
+        sym = cls.category_symbol
 
         to_object_stream_.map_reduce_by do | o |
 
-          if sym == o.business_category_symbol
+          if sym == o.category_symbol
             o
           end
         end
@@ -35,6 +35,8 @@ module Skylab::Snag
       def to_object_stream_
         Callback_::Stream.via_nonsparse_array @_o_a
       end
+
+      alias_method :to_simple_stream_of_objects_, :to_object_stream_
 
       def append_object o, & oes_p
         @_o_a.push o

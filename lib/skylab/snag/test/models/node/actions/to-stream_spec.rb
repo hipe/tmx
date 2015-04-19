@@ -5,7 +5,6 @@ module Skylab::Snag::TestSupport
   describe "[sg] models - node - actions - to-stream" do
 
     extend TS_
-
     use :expect_event
 
     it "upstream identifer not resolved - you won't see it till you gets" do

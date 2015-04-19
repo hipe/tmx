@@ -53,7 +53,7 @@ module Skylab::Snag::TestSupport
       st = o.to_tag_stream
 
       tag = st.gets
-      tag.business_category_symbol.should eql :tag
+      tag.category_symbol.should eql :tag
       tag.intern.should eql :foo
 
       tag = st.gets

@@ -41,8 +41,9 @@ module Skylab::Snag
           o_a = _mutable_row_at_index( @r.begin ).o_a_
           if o_a.length.nonzero?
             o = o_a.first
-            if :space == o.business_category_symbol
+            if :space == o.category_symbol
               if WS__ !~ o.to_s[ 0 ]
+                self._REDO
                 o.to_s[ 0, 0 ] = SPACE_  # you can just
               end
             else
@@ -58,8 +59,9 @@ module Skylab::Snag
           o_a = _mutable_row_at_index( @r.end - 1 ).o_a_
           if o_a.length.nonzero?
             o = o_a.last
-            if :space == o.business_category_symbol
+            if :space == o.category_symbol
               if WS__ !~ o.to_s[ -1 ]
+                self._REDO
                 o.to_s.concat SPACE_  # you can just
               end
             else
@@ -107,6 +109,8 @@ module Skylab::Snag
           def to_object_stream_
             Callback_::Stream.via_nonsparse_array @o_a_
           end
+
+          alias_method :to_simple_stream_of_objects_, :to_object_stream_
         end
       end
     end

@@ -1,242 +1,333 @@
 module Skylab::Snag
 
-  class Models::Hashtag < ::Class.new  # see [#056]
+  class Models::Hashtag < ::Class.new  # origin story in [#056]
 
-    class << self
+    class Stream
 
-      define_method :interpret_out_of_under, INTERPRET_OUT_OF_UNDER_METHOD_
+      class << self
+        def [] * x_a
+          if 1 == x_a.length
+            x_a.unshift :input_string
+          end
+          new_via_iambic x_a
+        end
+      end  # >>
 
-      def interpret_simple_stream_from_string s
-        Hashtag_Simple_Stream__.new s
-      end
+      extend Actor_as_Model_Module_Methods_
 
-      def interpret_simple_stream_from__ begin_d, end_d, s, fly
-        Hashtag_Simple_Stream__.new begin_d, end_d, fly, s
-      end
-    end  # >>
+      Callback_::Actor.call self, :properties,
+        :hashtag_class,
+        :input_string,
+        :string_scanner
 
-    TO_A_METHOD__ = -> do  # etc. redundant with etc
+      def initialize
 
-      a = []
-      begin
-        x = gets
-        x or break
-        a.push x
-        redo
-      end while nil
-      a
-    end
-
-    class Value_Peeking_Simple_Stream___  # #note-25
-
-      def initialize st
-        @queue = []
-        @st = st
-      end
-
-      def reinitialize beg, end_, s
-        @queue.clear
-        @st.reinitialize beg, end_, s
-        NIL_
-      end
-
-      attr_reader :st  # hax
-
-      define_method :to_a, TO_A_METHOD__
-
-      def gets
-
-        if @queue.length.zero?
-          @st.gets
+        @end = nil
+        @hashtag_class = nil
+        @string_scanner = nil
+        super
+        @hashtag = if @hashtag_class
+          @hashtag_class.category_symbol
         else
-          @queue.shift
+          :hashtag
         end
       end
 
-      def peek_for_value
+      attr_writer :end
 
-        if @queue.length.zero?
-          x = @st.gets
-          x and @queue.push x
+    private
+
+      def process_iambic_fully( * )
+        super
+
+        scn = @string_scanner
+        if ! scn
+          scn = Snag_::Library_::StringScanner.new @input_string
+          @string_scanner = scn
         end
 
-        if @queue.length.nonzero? and
-            :hashtag_name_value_separator == @queue.first.nonterminal_symbol
+        @end ||= scn.string.length
 
-          if 2 > @queue.length
-            x = @st.gets
-            x and @queue.push x
+        begin_d = nil
+        @try_d = 0
+
+        state_a = [
+
+          -> do  # try to parse a string (no newline)
+
+            @try_d += 1  # next time try a hashtag first
+              # (whether or not we match here)
+
+            len = scn.skip STRING_RX___
+
+            if len
+              @result_for_string[ begin_d, len ]
+            end
+          end,
+
+          -> do  # try to parse a hashtag
+
+            @try_d = 0  # next time try a string
+              # (whether we match a hashtag or a newline here)
+
+            len = scn.skip HASHTAG_RX___
+
+            if len
+              @result_for_hashtag[ begin_d, len ]
+
+            else
+              len = scn.skip STRING_MULTILINE_RX___
+              len or self._SANITY
+              @result_for_string[ begin_d, len ]
+            end
+          end ]
+
+        @p = -> do
+          if scn.pos < @end
+            begin_d = scn.pos
+            begin
+              x = state_a.fetch( @try_d )[]
+              x and break
+              redo
+            end while nil
+            x
           end
-
-          if 1 < @queue.length and :hashtag_value == @queue[1].nonterminal_symbol
-            result = @queue[1]
-          end
         end
 
-        result
-      end
-    end
+        __init_piece_producers
 
-    class Hashtag_Simple_Stream__
-
-      # NOTE parsing is always greedy. the 'end' term will be used only ..
-
-      def initialize beg=nil, end_=nil, fly=nil, s
-
-        @cls = fly || Hashtag___
-        @end = end_ || s.length
-        @queue = []
-        @scn = Snag_::Library_::StringScanner.new s
-        if beg
-          @scn.pos = beg
-        end
+        ACHIEVED_
       end
 
-      def reinitialize beg, end_, s
+      _HASHTAG_ = '#[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*'
+      HASHTAG_RX___ = /#{ _HASHTAG_ }/
+      STRING_RX___           = /(?:(?!#{ _HASHTAG_ }).)+/
+      STRING_MULTILINE_RX___ = /(?:(?!#{ _HASHTAG_ }).)+/m
 
-        @end = end_
-        @queue.clear
-        @scn.string = s
-        @scn.pos = beg
+      def __init_piece_producers
+
+        @result_for_string = _build_piece_producer(
+          :@result_for_string, String_Piece )
+
+        @result_for_hashtag = _build_piece_producer(
+          :@result_for_hashtag, ( @hashtag_class || Hashtag__ ) )
+
         NIL_
       end
 
-      attr_reader :scn  # hax
+      def _build_piece_producer ivar, cls
 
-      def flush_to_puts_stream
+        -> begin_d, len do
 
-        Callback_::Scanner::Puts_Wrapper.new self
+          # the first time you build a piece, just build it
+
+          x = cls.new
+          x._reinitialize begin_d, len, @string_scanner.string
+
+          instance_variable_set ivar, -> begin_d_, len_ do
+
+            # the second time you build a piece, also just build it
+
+            x_ = cls.new
+            x_._reinitialize begin_d_, len_, @string_scanner.string
+
+            a = [ x, x_ ]
+            first = true
+
+            instance_variable_set ivar, -> begin_d__, len__ do
+
+              # the third time you build a piece, #note-125
+
+              if first
+                first = false
+                fly = a.fetch 0
+              else
+                first = true
+                fly = a.fetch 1
+              end
+
+              fly._reinitialize begin_d__, len__, @string_scanner.string
+              fly
+
+            end
+
+            x_
+          end
+
+          x
+        end
       end
 
-      def flush_to_value_peeking_stream
-
-        Value_Peeking_Simple_Stream___.new self
-      end
-
-      define_method :to_a, TO_A_METHOD__
+    public
 
       def gets
-        if @queue.length.nonzero?
-          @queue.shift
-        elsif @scn.pos < @end
-          __step
-        end
+        @p[]
       end
 
-      def __step
+      def change_input_string_ s
 
-        @str = @scn.scan NOT_HASHTAG_RX__
-        @tag_pos = @scn.pos
-        @tag = @scn.scan HASHTAG_RX__
-
-        if @str
-          __process_string
-          if @tag
-            _process_tag
-          end
-          @queue.shift
-
-        elsif @tag
-          _process_tag
-          @queue.shift
-
-        elsif ! ( @end && @end <= @scn.pos )
-
-          raise __say_parse_failure
-        end
-      end
-      _HASHTAG_ = '#[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*'
-      NOT_HASHTAG_RX__ = /(?:(?!#{ _HASHTAG_ }).)+/
-      HASHTAG_RX__ = /#{ _HASHTAG_ }/
-
-      def __say_parse_failure
-        "parse failure: #{ @scn.rest.inspect }"
+        @end = s.length
+        @string_scanner.string = s
+        @try_d = 0
+        NIL_
       end
 
-      def __process_string
-        @queue.push String_Piece.new @str
-      end
-
-      def _process_tag
-        @queue.push @cls.via_tag_position_and_tag_ @tag_pos, @tag
-        @sep = @scn.scan HASHTAG_NAME_VALUE_SEP_RX__
-        @sep and __process_sep ; nil
-      end
-      HASHTAG_NAME_VALUE_SEP_RX__ = /:[ ]*/
-
-      def __process_sep
-        @queue.push Name_And_Value_Separator__.new @sep
-        @value = @scn.scan HASHTAG_VALUE_RX__
-        @value and __process_value ; nil
-      end
-      HASHTAG_VALUE_RX__ = /[^[:space:],]+/
-
-      def __process_value
-        @queue.push Value__.new @value ; nil
-      end
+      attr_reader :string_scanner
     end
 
     Piece__ = superclass
+    Hashtag__ = self
 
-    class String_Piece < Piece__
+    class Hashtag__  # subclass of Piece__
 
-      def nonterminal_symbol
-        :string
-      end
-
-      alias_method :business_category_symbol, :nonterminal_symbol
-        # life is easier and more efficient if we add this one line
-    end
-
-    Hashtag___ = self
-
-    class Hashtag___  # descends from Piece__
-
-      class << self
-        alias_method :via_tag_position_and_tag_, :new
-      end  # >>
-
-      def initialize d, str
-        super str
-        @pos = d
-      end
-
-      attr_reader :pos
-
-      def nonterminal_symbol
+      def category_symbol
         :hashtag
       end
 
-      def local_normal_name
-        @lnn ||= get_stem_string.downcase.intern
-      end
-
       def get_stem_string
-        @to_s[ 1..-1 ]
+        @_string[ @_begin + 1, @_length - 1 ]
       end
     end
 
-    class Name_And_Value_Separator__ < Piece__
+    class String_Piece < Piece__
 
-      def nonterminal_symbol
-        :hashtag_name_value_separator
+      def initialize s=nil
+        if s
+          _reinitialize 0, s.length, s
+        end
       end
-    end
 
-    class Value__ < Piece__
-
-      def nonterminal_symbol
-        :hashtag_value
+      def category_symbol
+        :string
       end
     end
 
     class Piece__
 
-      def initialize str
-        @to_s = str
+      def _reinitialize begin_, length, s
+        @_begin = begin_
+        @_length = length
+        @_string = s
+        NIL_
       end
 
-      attr_reader :to_s
+      def get_string
+        @_string[ @_begin, @_length ]
+      end
+
+      attr_reader :_begin, :_string
     end
+
+    # ~ begin name-value-scanner extension
+
+    class Stream
+
+      def to_name_value_scanner
+
+        # with every tag piece that we would produce, peek ahead one piece
+        #
+
+        if ! @hashtag_class
+          @result_for_hashtag = _build_piece_producer(
+            :@result_for_hashtag, Hashtag_Possibly_with_Value___ )
+        end
+
+        upstream_p = @p
+        @p = @main_p = -> do
+
+          pc = upstream_p[]
+          if pc
+            if @hashtag == pc.category_symbol
+
+              pc_ = upstream_p[]
+              if pc_
+
+                if :string == pc_.category_symbol && NAME_VALUE_SEPARATOR__ ==
+                    pc_._string.getbyte( pc_._begin )
+
+                  pc = __produce_altered_piece pc_, pc
+                else
+
+                  @p = -> do  # "put it back"
+                    @p = @main_p
+                    pc_
+                  end
+                end
+              end
+            end
+            pc
+          end
+        end
+
+        self
+      end
+
+      NAME_VALUE_SEPARATOR__ = ':'.getbyte 0
+
+      def __produce_altered_piece pc_, pc  # assume offset 0 has the colon ..
+
+        # .. and assume the name and value are in the same "whole string",
+        # which is in the current string scanner..
+
+        scn = @string_scanner
+        scn.pos = pc_._begin
+        d = scn.skip VALUE_HEAD___
+        d or self._SANITY
+
+        x = pc.dup
+        x.__receive_knowledge_about_value(
+          d,
+          scn.skip( VALUE_TAIL___ ) )  # nil IFF colon was last char on the line
+        x
+      end
+
+      VALUE_HEAD___ = /:[[:space:]]*/
+      VALUE_TAIL___ = /[^[:space:],]+/  # might be at end of line
+    end
+
+    module Possibly_with_Value_Methods
+
+      attr_reader :value_is_known_is_known, :value_is_known
+
+      def _reinitialize( * )
+        @value_is_known = @value_is_known_is_known = nil
+        super
+      end
+
+      def get_name_string
+        @_string[ @_name_r ]
+      end
+
+      def get_value_string
+        @_string[ @_value_r ]
+      end
+
+      def __receive_knowledge_about_value d, d_
+
+        @value_is_known_is_known = true
+
+        name_begin = @_begin
+        name_end = name_begin + @_length
+        @_name_r = name_begin ... name_end
+        if d_
+          @value_is_known = true
+          value_begin = name_end + d
+          @_value_r = value_begin ... value_begin + d_
+          @_length += ( d + d_ )
+        else
+          @_length += d
+        end
+
+        NIL_
+      end
+    end
+
+    class Hashtag_Possibly_with_Value___ < Hashtag__
+
+      include Possibly_with_Value_Methods
+    end
+
+    # ~ end name-value-scanner extension
+
   end
 end

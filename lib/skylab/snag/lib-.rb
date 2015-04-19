@@ -44,7 +44,7 @@ module Skylab::Snag
     end
 
     Bound_call = -> * a do
-      Brazen[].bound_call.build_via_arglist a
+      Brazen[].bound_call.new_via_arglist a
     end
 
     Brazen = sidesys[ :Brazen ]

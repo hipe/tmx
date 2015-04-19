@@ -40,7 +40,7 @@ module Skylab::Snag
 
         def execute_agnostic
 
-          _delineate_object_stream @node.body.to_object_stream_
+          _delineate_object_stream @node.body.to_simple_stream_of_objects_
         end
 
         def __express_the_zero_or_more_non_business_leading_lines
@@ -74,7 +74,7 @@ module Skylab::Snag
           row_x = st.gets
           if row_x
             if row_x.is_mutable
-              _delineate_object_stream row_x.to_object_stream_, st
+              _delineate_object_stream row_x.to_simple_stream_of_objects_, st
             else
               begin
                 _express_immutable_row row_x
@@ -111,7 +111,7 @@ module Skylab::Snag
             # row: output the sub-margin unless *the* *first* object is a)
             # a tag that b) we want to emphasize. (etc)
 
-            unless :tag == o.business_category_symbol && :open == o.intern
+            unless :tag == o.category_symbol && :open == o.intern
               ww << ( SPACE_ * @expag.sub_margin_width )
             end
             _into_wordwrap_flush_remainder_of_object_stream ww, o, o_st
@@ -131,7 +131,7 @@ module Skylab::Snag
 
           ww = _start_word_wrap s.length
 
-          o_st = row.to_object_stream_
+          o_st = row.to_simple_stream_of_objects_
           o = o_st.gets
           if o
             _into_wordwrap_flush_remainder_of_object_stream ww, o, o_st
@@ -151,7 +151,7 @@ module Skylab::Snag
             row = row_st.gets
             row or break
 
-            o_st = row.to_object_stream_
+            o_st = row.to_simple_stream_of_objects_
             o = o_st.gets
             o or redo
             _into_wordwrap_flush_remainder_of_object_stream ww, o, o_st
@@ -168,9 +168,9 @@ module Skylab::Snag
             # character (either space or newline) between each "word".
             # having our own whitespace in the input confuses this so:
 
-            if :string == o.business_category_symbol
+            if :string == o.category_symbol
 
-              s = o.to_s
+              s = o.get_string
               if HAS_LEADING_OR_TRAILING_WHITESPACE___ =~ s
                 s = s.strip
               end
