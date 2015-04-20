@@ -22,6 +22,11 @@ module Skylab::Snag
     def initialize id_o=nil, body=nil
 
       @body = body
+
+      @_extended_content_adapter = if body
+        body.extended_content_adapter_
+      end
+
       @changed = false
       if id_o
         id_o.respond_to?( :suffix ) or raise ::ArgumentError, "where? #{ id_o.class }"
@@ -108,6 +113,12 @@ module Skylab::Snag
         ok and @changed = true
         ok
       end
+    end
+
+    # ~
+
+    def has_extended_content
+      @_extended_content_adapter.node_has_extended_content_via_node_id @ID
     end
 
     # ~

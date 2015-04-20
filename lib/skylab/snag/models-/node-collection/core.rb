@@ -4,6 +4,8 @@ module Skylab::Snag
 
     Actions = THE_EMPTY_MODULE_
 
+    Autoloader_[ Expression_Adapters = ::Module.new ]
+
     if false
 
     def add message, do_prepend_open_tag, dry_run, verbose_x, delegate

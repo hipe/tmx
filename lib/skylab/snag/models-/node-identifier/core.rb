@@ -90,10 +90,17 @@ module Skylab::Snag
 
             o = NI_.new
 
-            ok = _reinit_object_via_parse_identifier_and_any_suffix(
-              o,
-              Snag_::Library_::StringScanner.new( x ),
-              & oes_p )
+            ok = if x.respond_to? :bit_length
+
+              __reinit_object_via_number o, x, & oes_p
+
+            else
+
+              _reinit_object_via_parse_identifier_and_any_suffix(
+                o,
+                Snag_::Library_::StringScanner.new( x ),
+                & oes_p )
+            end
 
             ok and arg.new_with_value o
           else
@@ -147,6 +154,12 @@ module Skylab::Snag
       end
 
       DIGITS___ = /\d+/
+
+      def __reinit_object_via_number id, d
+
+        id.reinitialize nil, d
+        ACHIEVED_
+      end
 
       def __build_etc_event x
 

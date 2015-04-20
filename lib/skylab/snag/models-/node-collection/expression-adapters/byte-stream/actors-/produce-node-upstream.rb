@@ -9,6 +9,8 @@ module Skylab::Snag
         # parse the manifest file syntax: identifiers that start at column 1
 
         Callback_::Actor.call self, :properties,
+
+          :extended_content_adapter,
           :byte_upstream_ID
 
         def execute
@@ -63,6 +65,8 @@ module Skylab::Snag
           scn = Snag_::Library_::StringScanner.new s
 
           @body = o::Body.via_range_and_substring_array nil, a
+
+          @body.receive_extended_content_adapter__ @extended_content_adapter
 
           @ID = models::Node_Identifier.new
           @ID_ = models::Node_Identifier.new

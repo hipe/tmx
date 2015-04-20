@@ -52,6 +52,13 @@ module Skylab::Snag
           @sstr_a = sstr_a
         end
 
+        def receive_extended_content_adapter__ x
+          @extended_content_adapter_ = x
+          NIL_
+        end
+
+        attr_reader :extended_content_adapter_
+
         def reinitialize r
           @r = r
           NIL_

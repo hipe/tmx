@@ -2,7 +2,7 @@ digraph {
 
   aa [label="add\naction" ]
   de [label="design & implement\ncriteria implementation"]
-  FS [label="14. expose the\nfilesystem"]
+  FS [label="14. expose the\nfilesystem" style=filled]
   line_upstream [label="11. line\nupstream" style=filled]
   NLP_experiment [label="12. NLP expression\nadapter facility" style=filled]
   node_identifier_model [label="9. node identifier\nmodel" style=filled]
