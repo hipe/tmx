@@ -9,7 +9,7 @@ module Skylab::Snag
         # parse the manifest file syntax: identifiers that start at column 1
 
         Callback_::Actor.call self, :properties,
-          :path_identifier
+          :byte_upstream_ID
 
         def execute
 
@@ -35,11 +35,13 @@ module Skylab::Snag
 
         def __resolve_line_upstream
 
-          @line_upstream =
-            Snag_.lib_.system.filesystem.normalization.upstream_IO(
-              @path_identifier.path, & @on_event_selectively )
+          us = @byte_upstream_ID.to_simple_line_stream(
+            & @on_event_selectively )
 
-          @line_upstream && ACHIEVED_
+          us and begin
+            @line_upstream = us
+            ACHIEVED_
+          end
         end
 
         def __via_line_upstream_produce_first_node

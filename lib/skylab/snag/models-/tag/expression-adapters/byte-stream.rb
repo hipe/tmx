@@ -30,20 +30,30 @@ module Skylab::Snag
 
         def _reinitialize * a
           @_begin, @_length, @_string = a
-          NIL_
+          @value_is_known = @value_is_known_is_known = nil
         end
 
-        attr_reader :_begin, :_string
+        def initialize_copy _
+          NIL_  # just saying hello - nothing to do
+        end
 
-        include Snag_::Models::Hashtag::Possibly_with_Value_Methods
+        def get_string
+          @_string[ @_begin, @_length ]
+        end
 
         def intern
           if @value_is_known
-            @_string[ @_begin + 1 ... @_name_r.end ]
+            self._NOT_COVERED_YET
           else
             @_string[ @_begin + 1, @_length - 1 ].intern
           end
         end
+
+        attr_reader :_name_r, :_value_r
+
+        attr_accessor :_begin, :_length, :_string
+
+        include Snag_::Models::Hashtag::Possibly_with_Value_Methods
       end
     end
   end

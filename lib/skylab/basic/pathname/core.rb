@@ -89,7 +89,7 @@ module Skylab::Basic
       end
     end  # >>
 
-    class Identifier__
+    class Identifier__  # you might prefer [#hl-011] the FS byte upstream ID
 
       def initialize io=nil, path_x
 

@@ -2,7 +2,7 @@ module Skylab::Headless
 
   class System__::Services__::Filesystem
 
-    class Byte_Upstream_Identifier
+    class Byte_Upstream_Identifier  # [#011].
 
       # a :+[#br-019] unified interface for accessing the bytes in a file.
 
@@ -36,6 +36,10 @@ module Skylab::Headless
         :path
       end
 
+      def modality_const
+        :Byte_Stream
+      end
+
       attr_reader :path
 
       # ~~ off-grid reflection
@@ -54,8 +58,14 @@ module Skylab::Headless
         ::File.read @path
       end
 
-      def to_simple_line_stream
-        ::File.open @path, READ_MODE_
+      def to_simple_line_stream & oes_p
+
+        if block_given?  # experimental convenience exposure
+
+          Headless_.system.filesystem.normalization.upstream_IO @path, & oes_p
+        else
+          ::File.open @path, READ_MODE_
+        end
       end
 
       # ~ fun etc.

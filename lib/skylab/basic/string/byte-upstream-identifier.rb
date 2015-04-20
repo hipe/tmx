@@ -45,6 +45,9 @@ module Skylab::Basic
           :string
         end
 
+        def modality_const
+          :Byte_Stream
+        end
       end
     end
   end

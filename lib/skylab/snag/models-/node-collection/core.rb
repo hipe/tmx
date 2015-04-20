@@ -76,9 +76,13 @@ module Skylab::Snag
 
       def node_collection_via_upstream_identifier x, & oes_p
 
-        # for now all upstreams are byte-stream based (and etc..)
+        id = if x.respond_to? :to_simple_line_stream
+          x
 
-        id = Snag_.lib_.basic::Pathname.identifier x
+        else  # the current fallback assumption is that this is an FS path
+
+          Snag_.lib_.system.filesystem.class::Byte_Upstream_Identifier.new x
+        end
 
         NC_::Expression_Adapters.const_get( id.modality_const, false ).
           node_collection_via_upstream_identifier( id, & oes_p )

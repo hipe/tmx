@@ -80,13 +80,17 @@ module Skylab::Callback::TestSupport
 
       module Test_Context_Instance_Methods
 
-        def call_API * x_a
-          call_API_via_iambic x_a
+        def call_API * x_a, & x_p
+          call_API_via_iambic x_a, & x_p
         end
 
-        def call_API_via_iambic x_a
-          x_a.push :on_event_selectively, handle_event_selectively
-          @result = subject_API.call( * x_a )
+        def call_API_via_iambic x_a, & x_p
+
+          if ! block_given?
+            x_a.push :on_event_selectively, handle_event_selectively
+          end
+
+          @result = subject_API.call( * x_a, & x_p )
           NIL_
         end
 

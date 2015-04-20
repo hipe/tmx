@@ -24,14 +24,6 @@ module Skylab::Snag
           BS_::Mutable_Models_::Substring.new @begin, @end, @s.dup
         end
 
-        def to_object_stream_
-
-          st = to_simple_stream_of_objects_
-          Callback_.stream do
-            st.gets
-          end
-        end
-
         def to_simple_stream_of_objects_
 
           # for one line of one node, produce the strings and tags. this
@@ -39,6 +31,11 @@ module Skylab::Snag
 
           BS_::Actors_::Flyweighted_object_stream_via_substring[ self ]
         end
+
+        alias_method :to_object_stream_, :to_simple_stream_of_objects_
+          # we can do the above only while we using [#008] structured tags,
+          # which result in a common stream as a by-product; else :+#tombstone
+
       end
 
       class Models_::Body

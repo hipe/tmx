@@ -17,12 +17,12 @@ module Skylab::Snag
 
         def initialize id
 
-          @path_identifier = id
+          @byte_upstream_ID = id
         end
 
         def to_node_stream & oes_p
 
-          BS_::Actors_::Produce_node_upstream[ @path_identifier, & oes_p ]
+          BS_::Actors_::Produce_node_upstream[ @byte_upstream_ID, & oes_p ]
         end
       end
 

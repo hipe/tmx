@@ -39,6 +39,21 @@ module Skylab::Snag::TestSupport
     def memoize_ sym, & p
       define_method sym, Callback_.memoize( & p )
     end
+
+    def nasty_OCD_memoize_ sym, & p  # read caveat in [#ts-042]
+
+      did = false
+      x = nil
+
+      define_method sym do
+        if did
+          x
+        else
+          did = true
+          x = instance_exec( & p )
+        end
+      end
+    end
   end
 
   module InstanceMethods
@@ -150,6 +165,30 @@ module Skylab::Snag::TestSupport
     Callback_.test_support::Expect_Event[ tcm, x_a ]
   end
 
+  module Expect_Piece
+
+    class << self
+      def [] tcm
+        tcm.include self
+      end
+    end  # >>
+
+    def expect_piece_ i, x
+
+      part = @piece_st.gets
+      part or fail "expected more parts, had none"
+      part.category_symbol.should eql i
+      part.get_string.should eql x
+      part
+    end
+
+    def expect_no_more_pieces_
+
+      x = @piece_st.gets
+      x and fail "expecting no more parts, had #{ x.category_symbol }"
+    end
+  end
+
   Expect_Stdout_Stderr = -> tcm do
 
     tcm.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
@@ -194,6 +233,7 @@ module Skylab::Snag::TestSupport
   Snag_ = ::Skylab::Snag
 
   Callback_ = Snag_::Callback_
+  EMPTY_P_ = Snag_::EMPTY_P_
   NIL_ = nil
   SPACE_ = Snag_::SPACE_
   UNDERSCORE_ = '_'

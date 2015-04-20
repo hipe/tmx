@@ -1,3 +1,4 @@
+[#042]       "nasty OCD memoize" caveat (for [sg])..
 [#041]       [ sidesystem ]  (variants exist universally. this is #hub)
 [#040]       is find nearest TS file broken?
 [#039]       #parent-node: [#030] #tracking a `Subject_` parameter function

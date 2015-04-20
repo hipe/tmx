@@ -32,6 +32,10 @@ module Skylab::Basic
         :line_list
       end
 
+      def modality_const
+        :Byte_Stream
+      end
+
       # ~ data delivery
 
       def whole_string

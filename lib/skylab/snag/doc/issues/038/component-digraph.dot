@@ -11,7 +11,7 @@ digraph {
   oaa [label="ordinary\nadd action"]
   rea [label="reappropriation\nintegrated into an\n\"add\" action" ]
   rea_actor [label="find any best existing\nreappropriable node" ]
-  stru [label="13. experimental support\nfor structured tags"]
+  stru [label="13. experimental support\nfor structured tags" style=filled]
   tag_model [label="10. tag model" style=filled]
 
   aa->rea

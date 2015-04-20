@@ -197,7 +197,8 @@
 [#014]       yacc2treetop
 [#013]       (#repurposed:once) the core node narrative ..
 [#012] #open redesign this `with_client` nonsense
-[#011]       #done regrettify all tests in this subproduct
+[#011]       [ the filesystem byte upstream identifier ]
+             ( #was: #done regrettify all tests in this subproduct )
 [#010]       #repurposed:once the client tree model ..
 [#009]       #tracking-tag places where HL::Parameters show signs of strain; also general tracking of the node
 [#008]       `P::C::I_M` --> `SC::I_M` THIS WAS BAD see [#004], [#027]

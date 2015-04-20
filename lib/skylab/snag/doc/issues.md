@@ -69,7 +69,8 @@
              ( #was: #done either do or don't do something about horrible
              all.rb dep now )
 [#009] #open awesome semantic open tag search - ("smart twitter")
-[#008]       #done -n on all destructive actions
+[#008]       #feature structured tags
+             ( #was: #done -n on all destructive actions )
 [#007]       track places where we add (or "subtract") hashtag prefix
              ( #was: #done autoloadify )
 [#006]       #doc-node structures for our API implementation ..

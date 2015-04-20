@@ -5,35 +5,36 @@ module Skylab::Snag::TestSupport
   describe "[sg] models - hashtag" do
 
     extend TS_
+    use :expect_piece
 
     context "parses" do
 
       it "empty string" do
 
         _scan ''
-        _expect_no_more_parts
+        expect_no_more_pieces_
       end
 
       it "string with only one space" do
 
         _scan SPACE_
-        _expect_part :string, SPACE_
-        _expect_no_more_parts
+        expect_piece_ :string, SPACE_
+        expect_no_more_pieces_
       end
 
       it "string with only one tag" do
 
         _scan '#foo'
-        _expect_part :hashtag, '#foo'
-        _expect_no_more_parts
+        expect_piece_ :hashtag, '#foo'
+        expect_no_more_pieces_
       end
 
       it "two adjacent tags" do
 
         _scan '#a#b'
-        _expect_part :hashtag, '#a'
-        _expect_part :hashtag, '#b'
-        _expect_no_more_parts
+        expect_piece_ :hashtag, '#a'
+        expect_piece_ :hashtag, '#b'
+        expect_no_more_pieces_
       end
 
       it "minimal use-case of name-value extension" do
@@ -53,32 +54,32 @@ module Skylab::Snag::TestSupport
       it "normal complexity" do
 
         _scan _normal_complexity
-        _expect_part :string, 'this is some code '
-        _expect_part :hashtag, '#public-API'
-        _expect_part :string, ', '
-        _expect_part :hashtag, '#bill-Deblazio'
-        _expect_part :string, ':2014 wee'
-        _expect_no_more_parts
+        expect_piece_ :string, 'this is some code '
+        expect_piece_ :hashtag, '#public-API'
+        expect_piece_ :string, ', '
+        expect_piece_ :hashtag, '#bill-Deblazio'
+        expect_piece_ :string, ':2014 wee'
+        expect_no_more_pieces_
       end
 
       it "normal complexity (with name-value extension)" do
 
         _scan_with_values _normal_complexity
-        _expect_part :string, 'this is some code '
-        o = _expect_part :hashtag, '#public-API'
+        expect_piece_ :string, 'this is some code '
+        o = expect_piece_ :hashtag, '#public-API'
         o.value_is_known_is_known.should be_nil
 
-        _expect_part :string, ', '
+        expect_piece_ :string, ', '
 
-        o = _expect_part :hashtag, '#bill-Deblazio:2014'
+        o = expect_piece_ :hashtag, '#bill-Deblazio:2014'
 
         o.value_is_known.should eql true
 
         o.get_name_string.should eql '#bill-Deblazio'
         o.get_value_string.should eql '2014'
 
-        _expect_part :string ,' wee'
-        _expect_no_more_parts
+        expect_piece_ :string ,' wee'
+        expect_no_more_pieces_
       end
 
       memoize_ :_normal_complexity do
@@ -88,9 +89,9 @@ module Skylab::Snag::TestSupport
       it "edge case: a comma breaks the value" do  # :+#was:parse-values
 
         _scan '#foo:bar,baz'
-        _expect_part :hashtag, '#foo'
-        _expect_part :string, ':bar,baz'
-        _expect_no_more_parts
+        expect_piece_ :hashtag, '#foo'
+        expect_piece_ :string, ':bar,baz'
+        expect_no_more_pieces_
       end
     end
 
@@ -108,16 +109,16 @@ module Skylab::Snag::TestSupport
       it "x." do
 
         _scan "hi#there\n"
-        _expect_part :string, 'hi'
-        _expect_part :hashtag, '#there'
-        _expect_part :string, "\n"
-        _expect_no_more_parts
+        expect_piece_ :string, 'hi'
+        expect_piece_ :hashtag, '#there'
+        expect_piece_ :string, "\n"
+        expect_no_more_pieces_
 
-        @custom_st.change_input_string_ "#there hi\n"
-        _expect_part :hashtag, "#there"
-        _expect_part :string, ' hi'
-        _expect_part :string, "\n"
-        _expect_no_more_parts
+        @piece_st.reinitialize_string_scanner_ "#there hi\n"
+        expect_piece_ :hashtag, "#there"
+        expect_piece_ :string, ' hi'
+        expect_piece_ :string, "\n"
+        expect_no_more_pieces_
       end
     end
 
@@ -132,33 +133,24 @@ module Skylab::Snag::TestSupport
 
     def _scan_with_values s
 
-      @custom_st = _build_stream_via_string( s ).to_name_value_scanner
+      st = _build_stream_via_string s
+      st.become_name_value_scanner
+      @piece_st = st
+      st
     end
 
     def _scan s
 
-      @custom_st = _build_stream_via_string s
+      @piece_st = _build_stream_via_string s
       NIL_
     end
 
     def _build_stream_via_string s
 
-      _subject::Stream[ s ]
-    end
-
-    def _expect_part i, x
-
-      part = @custom_st.gets
-      part or fail "expected more parts, had none"
-      part.category_symbol.should eql i
-      part.get_string.should eql x
-      part
-    end
-
-    def _expect_no_more_parts
-
-      x = @custom_st.gets
-      x and fail "expecting no more parts, had #{ x.category_symbol }"
+      st = _subject::Stream.new
+      st.initialize_string_scanner_ s
+      st.init
+      st
     end
 
     def _subject

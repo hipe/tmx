@@ -4,52 +4,75 @@ module Skylab::Snag
 
     class Stream
 
+      # a "session" in the most extreme sense: user needs promiscuous knowledge
+
       class << self
-        def [] * x_a
-          if 1 == x_a.length
-            x_a.unshift :input_string
-          end
-          new_via_iambic x_a
+        def [] s
+          o = new
+          o.initialize_string_scanner_ s
+          o.init
+          o
         end
       end  # >>
 
-      extend Actor_as_Model_Module_Methods_
-
-      Callback_::Actor.call self, :properties,
-        :hashtag_class,
-        :input_string,
-        :string_scanner
-
       def initialize
-
-        @end = nil
-        @hashtag_class = nil
-        @string_scanner = nil
-        super
-        @hashtag = if @hashtag_class
-          @hashtag_class.category_symbol
-        else
-          :hashtag
-        end
+        NIL_  # just saying hello.
       end
 
-      attr_writer :end
+      attr_reader :string_scanner  # hax
 
-    private
+      def initialize_string_scanner_ * begin_and_end, s
 
-      def process_iambic_fully( * )
-        super
+        @string_scanner = Snag_::Library_::StringScanner.new s
 
-        scn = @string_scanner
-        if ! scn
-          scn = Snag_::Library_::StringScanner.new @input_string
-          @string_scanner = scn
+        _reinit_begin_and_end begin_and_end
+
+        NIL_
+      end
+
+      def reinitialize_string_scanner_ * begin_and_end, s
+
+        p = @main_p  # ick - a visitor from an extension below
+        if p
+          @p = p
         end
 
-        @end ||= scn.string.length
+        @string_scanner.string = s
+
+        _reinit_begin_and_end begin_and_end
+
+        @try_d = 0
+
+        NIL_
+      end
+
+      def _reinit_begin_and_end a
+
+        begin_, end_  = a
+
+        @string_scanner.pos = begin_ || 0
+
+        @end = end_ || @string_scanner.string.length
+
+        NIL_
+      end
+
+      def receive_hashtag_class_ cls
+
+        @hashtag_class = cls
+        @hashtag = cls.category_symbol
+        NIL_
+      end
+
+      def init
+
+        @hashtag ||= :hashtag
+        @hashtag_class ||= nil
+        @main_p = nil
+        @try_d = 0
 
         begin_d = nil
-        @try_d = 0
+        scn = @string_scanner
 
         state_a = [
 
@@ -163,16 +186,6 @@ module Skylab::Snag
       def gets
         @p[]
       end
-
-      def change_input_string_ s
-
-        @end = s.length
-        @string_scanner.string = s
-        @try_d = 0
-        NIL_
-      end
-
-      attr_reader :string_scanner
     end
 
     Piece__ = superclass
@@ -215,14 +228,15 @@ module Skylab::Snag
         @_string[ @_begin, @_length ]
       end
 
-      attr_reader :_begin, :_string
+      attr_accessor :_begin, :_string, :_length
+        # all writers and some readers are for hax only
     end
 
     # ~ begin name-value-scanner extension
 
     class Stream
 
-      def to_name_value_scanner
+      def become_name_value_scanner
 
         # with every tag piece that we would produce, peek ahead one piece
         #
@@ -259,7 +273,7 @@ module Skylab::Snag
           end
         end
 
-        self
+        NIL_
       end
 
       NAME_VALUE_SEPARATOR__ = ':'.getbyte 0
@@ -274,11 +288,11 @@ module Skylab::Snag
         d = scn.skip VALUE_HEAD___
         d or self._SANITY
 
-        x = pc.dup
-        x.__receive_knowledge_about_value(
+        pc.__receive_knowledge_about_value(  # NOTE still a flyweight!
           d,
           scn.skip( VALUE_TAIL___ ) )  # nil IFF colon was last char on the line
-        x
+
+        pc
       end
 
       VALUE_HEAD___ = /:[[:space:]]*/
@@ -320,6 +334,8 @@ module Skylab::Snag
 
         NIL_
       end
+
+      attr_writer :_name_r, :_value_r
     end
 
     class Hashtag_Possibly_with_Value___ < Hashtag__
