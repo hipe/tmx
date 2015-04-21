@@ -7,7 +7,7 @@ module Skylab::Snag
       def interpret_out_of_under_ x, x_, k, & oes_p
 
         Node_::Expression_Adapters.const_get( x.modality_const, false ).
-          interpret_out_of_under__ x, x_, k, & oes_p
+          interpret_out_of_under_ x, x_, k, & oes_p
       end
 
       def new_via_body body
@@ -84,6 +84,20 @@ module Skylab::Snag
     end
 
     # ~
+
+    def is_not_tagged_with sym
+      ! is_tagged_with sym
+    end
+
+    def is_tagged_with sym
+
+      _ = to_tag_stream.detect do | tag |
+
+        sym == tag.intern
+      end
+
+      _ ? true : false
+    end
 
     def to_tag_stream
 

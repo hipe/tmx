@@ -75,7 +75,9 @@
              ( #was: #done autoloadify )
 [#006]       #doc-node structures for our API implementation ..
              ( #was: reanme Api -> API, P-orcelain -> CLI)
-[#005] #track  this
+[#005] #open as an open issue, is the implementation of a general solution
+             for the algorithm described by this node. as a document,
+             #parent-node: [#029] towards tessellating phrasal boundaries ..
              ( #was: #done get cli working again )
 [#004]       thoughts on interpretation and expression ..
              ( #was: #done light fast solo CLI client 2012-11-12 )

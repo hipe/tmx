@@ -6,7 +6,7 @@ module Skylab::Snag
 
       class << self
 
-        def interpret_out_of_under__ tree, arg_h, kr, & oes_p
+        def interpret_out_of_under_ tree, arg_h, kr, & oes_p
 
           new( arg_h, tree, kr, & oes_p ).execute
         end
@@ -37,7 +37,7 @@ module Skylab::Snag
         st = @collection_x.to_node_stream( & @on_event_selectively )
         st and begin
 
-          p = @tree.to_criteria_proc_under__ method :lookup_associated_model__
+          p = @tree.to_criteria_proc_under_ method :lookup_associated_model__
 
           st.reduce_by do | node |
             p[ node ]
@@ -52,13 +52,32 @@ module Skylab::Snag
         end
       end
 
+      module Ext_Cnt
+
+        class << self
+
+          def to_criteria_proc_out_of_ tree_a, sym  # :yes_or_no
+
+            if tree_a.first  # :+#tree_a EN remanents ick
+              -> node do
+                ! node.has_extended_content
+              end
+            else
+              -> node do
+                node.has_extended_content
+              end
+            end
+          end
+        end  # >>
+      end
+
       module ID_Int
 
         class << self
 
-          def to_criteria_proc_out_of__ o
+          def to_criteria_proc_out_of_ tree_a, sym
 
-            send :"__#{ o.symbol }__", o.value_x.last  # EN remenants ick/meh
+            send :"__#{ sym }__", tree_a.last  # :+#tree_a EN remanents ick
           end
 
           def __less_than_or_equal_to__ d
@@ -82,6 +101,31 @@ module Skylab::Snag
           def __greater_than__ d
             -> node do
               d < node.ID.to_i
+            end
+          end
+        end  # >>
+      end
+
+      module Tags
+
+        class << self
+
+          def to_criteria_proc_out_of_ md, sym
+
+            send :"__#{ sym }__", md[ :tag_stem ].intern
+          end
+
+          def __negative_tag__ tag_sym
+
+            -> node do
+              node.is_not_tagged_with tag_sym
+            end
+          end
+
+          def __positive_tag__ tag_sym
+
+            -> node do
+              node.is_tagged_with tag_sym
             end
           end
         end  # >>

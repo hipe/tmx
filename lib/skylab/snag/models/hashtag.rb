@@ -2,6 +2,8 @@ module Skylab::Snag
 
   class Models::Hashtag < ::Class.new  # origin story in [#056]
 
+    RX_STRING = '#(?<tag_stem>[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*)'
+
     class Stream
 
       # a "session" in the most extreme sense: user needs promiscuous knowledge
@@ -122,7 +124,7 @@ module Skylab::Snag
         ACHIEVED_
       end
 
-      _HASHTAG_ = '#[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*'
+      _HASHTAG_ = RX_STRING
       HASHTAG_RX___ = /#{ _HASHTAG_ }/
       STRING_RX___           = /(?:(?!#{ _HASHTAG_ }).)+/
       STRING_MULTILINE_RX___ = /(?:(?!#{ _HASHTAG_ }).)+/m

@@ -28,30 +28,6 @@ module Skylab::Snag
         end
       end
 
-      Expecting_ = -> do
-
-        p = -> d, s_a do
-
-          Event_for_Expecting___ = Callback_::Event.prototype_with :expecting,
-              :word_s_a, nil,
-              :input_stream_index, nil,
-              :error_category, :argument_error,
-              :ok, false
-
-          p = -> d_, s_a_ do
-
-            Event_for_Expecting___.new_with :input_stream_index, d,
-              :word_s_a, s_a_
-          end
-
-          p[ d, s_a ]
-        end
-
-        -> d, * s_a do
-          p[ d, s_a ]
-        end
-      end.call
-
       class Grammatical_Context_
 
         extend Actor_as_Model_Module_Methods_
@@ -103,23 +79,7 @@ module Skylab::Snag
 
         if sym
 
-          Output_Node___.new obj.value_x, sym, id_x
-        end
-      end
-
-      class Output_Node___
-
-        def initialize x, sym, id_x
-
-          @associated_model_identifier = id_x
-          @symbol = sym
-          @value_x = x
-        end
-
-        attr_reader :associated_model_identifier, :symbol, :value_x
-
-        def to_tree_
-          LIB_.basic::Tree::Immutable_Leaf.new @symbol
+          Library_::Models_::Name_Value_Output_Node.new obj.value_x, sym, id_x
         end
       end
 
@@ -150,10 +110,12 @@ module Skylab::Snag
         cand_a = []
         max = 0
 
-        cache_expectations = -> * i_a, & ev_p do
-          e_a ||= []
-          e_a.push [ i_a, ev_p ]
-          UNABLE_
+        cache_expectations = if oes_p
+          -> * i_a, & ev_p do
+            e_a ||= []
+            e_a.push [ i_a, ev_p ]
+            UNABLE_
+          end
         end
 
         begin
@@ -217,7 +179,8 @@ module Skylab::Snag
             if oes_p
               d__ = in_st.current_index
               oes_p.call :error, :expecting do
-                Expecting_[ d__, s ]
+
+                Expecting_[ d__, s, in_st ]
               end
             end
             break
@@ -230,7 +193,8 @@ module Skylab::Snag
             if oes_p
               d__ = in_st.current_index
               oes_p.call :error, :expecting do
-                Expecting_[ d__, s ]
+
+                Expecting_[ d__, s, in_st ]
               end
             end
             break
@@ -302,6 +266,61 @@ module Skylab::Snag
           end
         end
       end
+
+      # ~~ parse functions - building expecting events
+
+      Build_aggregated_expecting_event_ = -> pairs do
+
+        idx_bx = Callback_::Box.new
+        word_bx = Callback_::Box.new
+
+        pairs.each_slice 2 do | i_a, ev_p |
+          :expecting == i_a.last or self._XX
+
+          ev = ev_p[]
+
+          ev.input_stream_indexes.each do | d |
+            idx_bx.touch d do true end
+          end
+
+          ev.word_s_a.each do | s |
+            word_bx.touch s do true end
+          end
+        end
+
+        Expecting_[ idx_bx.a_, word_bx.a_, @in_st ]
+      end
+
+      Expecting_ = -> do
+
+        p = -> index_x, word_x, in_st do
+
+          Event_for_Expecting___ = Callback_::Event.prototype_with :expecting,
+              :word_s_a, nil,
+              :input_stream_indexes, nil,
+              :input_stream, nil,
+              :error_category, :argument_error,
+              :ok, false
+
+          p = -> idx_x_, word_x_, in_st_ do
+
+            _idx_a = ::Array.try_convert( idx_x_ ) || [ idx_x_ ]
+            _word_a = ::Array.try_convert( word_x_ ) || [ word_x_ ]
+
+            Event_for_Expecting___.new_with(
+              :input_stream_indexes, _idx_a,
+              :word_s_a, _word_a,
+              :input_stream, in_st_
+            )
+          end
+
+          p[ index_x, word_x, in_st ]
+        end
+
+        -> index_x, word_x, in_st do
+          p[ index_x, word_x, in_st ]
+        end
+      end.call
 
       # ~
 

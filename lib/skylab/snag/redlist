@@ -10,6 +10,5 @@ test/models/node/actions/to-stream_spec.rb
 test/models/node-collection/expression-adapters/byte-stream/actors/marshal-node-attn-delineation_spec.rb
 test/models/node-collection/expression-adapters/byte-stream/actors/marshal-node_spec.rb
 test/models/node-collection/expression-adapters/byte-stream/actors/produce-tmpdir_spec.rb
-test/models/node-collection/expression-adapters/byte-stream/sessions/read_spec.rb
 test/models/tag/actions/add_spec.rb
 test/models/to-do/actions/melt_spec.rb

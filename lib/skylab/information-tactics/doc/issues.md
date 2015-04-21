@@ -1,3 +1,5 @@
+[#031]       being "optimally concise" may be one of the essential
+             vectors of langauge production, as far as we're concerned
 [#030]       #doc-point #parent:003 #body-is-inline-in-parent an optional
              kleene-plus is equivalent to a non-optional kleene-star.
 [#029]       #doc-point #parent:003 #body-is-inline-in-parent

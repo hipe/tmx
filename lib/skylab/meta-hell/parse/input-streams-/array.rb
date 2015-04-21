@@ -52,6 +52,10 @@ module Skylab::MetaHell
         @d += 1 ; nil
       end
 
+      def _ d=3  # peek, for debugging
+        @x_a[ @d, d ]
+      end
+
       define_singleton_method :the_empty_stream, -> do
         p = -> do
           x = new EMPTY_A_

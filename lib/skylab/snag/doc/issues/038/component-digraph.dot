@@ -1,16 +1,16 @@
 digraph {
 
-  aa [label="add\naction" ]
-  de [label="15. design & implement\ncriteria implementation"]
+  aa [label="17. add\naction" ]
+  de [label="15. design & implement\ncriteria implementation" style=filled]
   FS [label="14. expose the\nfilesystem" style=filled]
   line_upstream [label="11. line\nupstream" style=filled]
   NLP_experiment [label="12. NLP expression\nadapter facility" style=filled]
   node_identifier_model [label="9. node identifier\nmodel" style=filled]
   node_model [label="10. node model" style=filled]
   node_upstream [label="11. node\nupstream" style=filled]
-  oaa [label="ordinary\nadd action"]
-  rea [label="reappropriation\nintegrated into an\n\"add\" action" ]
-  rea_actor [label="find any best existing\nreappropriable node" ]
+  oaa [label="16. ordinary\nadd action"]
+  rea [label="17. reappropriation\nintegrated into an\n\"add\" action" ]
+  rea_actor [label="16. find any best existing\nreappropriable node" ]
   stru [label="13. experimental support\nfor structured tags" style=filled]
   tag_model [label="10. tag model" style=filled]
 

@@ -18,6 +18,36 @@ module Skylab::Snag
 
         end  # >>
 
+        class Name_Value_Output_Node
+
+          def initialize x, sym, id_x
+
+            @associated_model_identifier = id_x
+            @symbol = sym
+            @value_x = x
+          end
+
+          attr_reader :associated_model_identifier, :symbol, :value_x
+
+          def to_arguments_
+            [ @value_x, @symbol ]
+          end
+
+          def to_criteria_proc_under_ model_lookup_p
+
+            model_lookup_p[ @associated_model_identifier ].
+              to_criteria_proc_out_of_( * to_arguments_ )
+          end
+
+          def to_tree_
+            LIB_.basic::Tree::Immutable_Leaf.new @symbol
+          end
+
+          def modality_const
+            :Criteria_Tree
+          end
+        end
+
         Conjunctive_Tree__ = ::Class.new
 
         class And < Conjunctive_Tree__
@@ -133,13 +163,13 @@ module Skylab::Snag
 
           # ~ executable criteria production
 
-          def to_criteria_proc_under__ model_lookup_p
+          def to_criteria_proc_under_ model_lookup_p
 
             _p_a = @a.map do | o |
 
               _assoc_mod = model_lookup_p[ o.associated_model_identifier ]
 
-              _assoc_mod.to_criteria_proc_out_of__ o
+              _assoc_mod.to_criteria_proc_out_of_( * o.to_arguments_ )
             end
 
             _to_criteria_proc_via_proc_array_ _p_a

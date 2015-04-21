@@ -21,6 +21,7 @@ module Skylab::Snag
 
             ok = __resolve_any_article_and_subject_and_any_conjunction
             ok &&= __resolve_tree_of_predicates
+            ok &&= __confirm_that_all_is_parsed
             ok && @tree_of_predicates
           end
 
@@ -68,16 +69,14 @@ module Skylab::Snag
 
           def __resolve_tree_of_predicates  # this is an attempt at [#005] a model solution for this
 
-            ok = _interpret_one_verb_phrase
-            if ok
-
+            ok = _interpret_one_verb_phrase( & @on_event_selectively )
+            ok && begin
               ok_ = __interpret_first_AND_or_OR_verb_phrase
               while ok_
                 ok_ = __interpret_subsequent_particular_AND_or_OR_verb_phase
               end
               ok && __synthesize_tree_of_predicates
             end
-            ok
           end
 
           def __interpret_first_AND_or_OR_verb_phrase
@@ -88,31 +87,44 @@ module Skylab::Snag
             end
           end
 
-          def _interpret_one_verb_phrase
+          def _interpret_one_verb_phrase & x_p
 
-            _ok = __resolve_possible_assoc_adapters_against_head_verb
-            _ok &&= __via_assoc_adapters_resolve_tree_of_predicate_tails
+            _ok = __resolve_possible_assoc_adapters_against_head_verb( & x_p )
+            _ok &&= __via_assoc_adapters_resolve_tree_of_predicate_tails( & x_p )
           end
 
-          def __resolve_possible_assoc_adapters_against_head_verb
+          def __resolve_possible_assoc_adapters_against_head_verb & x_p
 
             x_a = []
             send :"__edit_grammatical_context_for__#{ @used_form_symbol }__", x_a
             @g_ctxt = Library_::Grammatical_Context_.new_via_iambic x_a
 
+            error_cache = nil
+            x_p_ = if x_p
+              -> * i_a, & ev_p do
+                error_cache ||= []
+                error_cache.push i_a, ev_p
+                UNABLE_
+              end
+            else
+              NIL_
+            end
+
             cand_a = @domain.possible_assoc_adptrs_through_longest_head_verb_(
                 @in_st,
                 @g_ctxt,
-                @model_reflection.identifier ) do | *i_a, & ev_p |
+                @model_reflection.identifier, & x_p_ )
 
-              _cache_error i_a, & ev_p
+            if cand_a.length.zero?
+              if x_p_
+                x_p_.call :error, :expecting do
+                  Build_aggregate_event_[ error_cache ]
+                end
+              end
               UNABLE_
-            end
-
-            if cand_a.length.nonzero?  # :+#one
+            else
 
               @in_st.current_index = cand_a.fetch( 0 ).distance
-              _clear_error_cache
 
               @assoc_ada_a = cand_a.map( & :adapter )
 
@@ -262,12 +274,13 @@ module Skylab::Snag
             ACHIEVED_
           end
 
-          def _cache_error( * )
-            # when [#012] expectings
-          end
+          def __confirm_that_all_is_parsed
 
-          def _clear_error_cache
-            # ditto
+            if @in_st.no_unparsed_exists
+              ACHIEVED_
+            else
+              self._THIS
+            end
           end
 
           # ~ abstraction candidates
