@@ -167,7 +167,7 @@ module Skylab::Brazen
       sess.edit_entity_class(
 
         :default_proc, -> action do
-          action.kernel_.model_class( :Workspace ).default_config_filename
+          action.kernel_.unbound( :Workspace ).default_config_filename
         end,
         :property, :config_filename,
 

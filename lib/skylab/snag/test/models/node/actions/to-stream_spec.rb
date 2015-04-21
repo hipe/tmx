@@ -109,8 +109,8 @@ module Skylab::Snag::TestSupport
       Fixture_file_[ :the_second_manifest ]
     end
 
-    memoize_ :_alpha_path do
-      ::File.join( Fixture_tree_[ :mock_project_alpha ], 'doc/issues.md' )
+    def _alpha_path
+      Path_alpha_[]
     end
   end
 end

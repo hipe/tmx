@@ -33,6 +33,11 @@ module Skylab::Snag
 
     define_method :express_into_under, EXPRESS_INTO_UNDER_
 
+    module Expression_Adapters
+      EN = nil
+      Autoloader_[ self ]
+    end
+
     Tag_ = self
   end
 end

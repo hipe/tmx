@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  module Models_::Node_Criteria
+  module Models_::Criteria
 
     module Library_
 
@@ -8,12 +8,49 @@ module Skylab::Snag
 
         # immutability? who needs it! conceived in [#029]
 
-        def initialize
+        class << self
 
+          def new_via_kernel_and_NLP_const kr, const
+
+            x = new kr
+            mod = kr.models_module
+
+            mod.constants.each do | const_ |
+
+              x_ = mod.const_get const_, false
+              x_.respond_to? :const_get or next
+
+              p = x_.const_get( :Expression_Adapters, false ).
+                const_get :EN, false
+
+              p or next
+              p[ x ]
+            end
+            x
+          end
+        end  # >>
+
+        def initialize kr
+
+          @_kernel = kr
           @model_box_ = Callback_::Box.new
         end
 
-        # ~ read
+        # ~ query (or just parse)
+
+        def produce_result_for_query_via_word_array s_a, arg_h, & oes_p
+
+          x = parse_query_via_word_array s_a, & oes_p
+
+          x && __produce_result_for_query_via_parse_tree( x, arg_h, & oes_p )
+        end
+
+        def __produce_result_for_query_via_parse_tree tr, arg_h, & oes_p
+
+          _mod = @_kernel.unbound_via_normal_identifier tr.name_x
+
+          _mod.interpret_out_of_under_ tr.value_x, arg_h, @_kernel, & oes_p
+        end
 
         def parse_query_via_word_array s_a, & x_p
 
@@ -36,6 +73,10 @@ module Skylab::Snag
             _normalize_model_identifier( id_x_ ) )
 
           NIL_
+        end
+
+        def module
+          Library_
         end
 
         # ~ support
@@ -185,6 +226,8 @@ module Skylab::Snag
 
           attr_reader :__association_adapters
         end
+
+        Autoloader_[ Actors_ = ::Module.new ]
 
         DA_ = self
       end

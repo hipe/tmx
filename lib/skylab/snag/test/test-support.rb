@@ -99,7 +99,7 @@ module Skylab::Snag::TestSupport
     def self.[] mod
       mod.include self
       def mod.subject_module_
-        Snag_::Models_::Node_Criteria::Library_
+        Snag_::Models_::Criteria::Library_
       end
     end
 
@@ -233,6 +233,12 @@ module Skylab::Snag::TestSupport
   Snag_ = ::Skylab::Snag
 
   Callback_ = Snag_::Callback_
+
+  Path_alpha_ = Callback_.memoize do
+
+    ::File.join( Fixture_tree_[ :mock_project_alpha ], 'doc/issues.md' )
+  end
+
   EMPTY_P_ = Snag_::EMPTY_P_
   NIL_ = nil
   SPACE_ = Snag_::SPACE_

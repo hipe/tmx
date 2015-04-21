@@ -93,7 +93,7 @@ module Skylab::Brazen
       end
 
       def via_entity_identifier_and_kernel_rslv_model_class
-        @model_class = @kernel.model_class_via_identifier @entity_identifier, & @on_event_selectively
+        @model_class = @kernel.unbound_via_identifier @entity_identifier, & @on_event_selectively
         @model_class ? ACHIEVED_ : UNABLE_
       end
 

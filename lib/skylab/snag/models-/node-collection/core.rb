@@ -26,45 +26,11 @@ module Skylab::Snag
       @manifest.change_node node, is_dry_run, verbose_x
     end
 
-    def fetch_node node_ref, delegate
-      @q = build_query [ :identifier_ref, node_ref ], A_COUNT_OF_ONE__, delegate
-      @q and via_query_fetch_node delegate
-    end
-  private
-    def via_query_fetch_node delegate
-      nodes = reduce_all_nodes_via_query @q
-      fly = nodes.gets
-      if fly
-        fly.collapse delegate, @API_client
-      else
-        when_not_found delegate
-      end
-    end
-    A_COUNT_OF_ONE__ = 1
-
     def when_not_found delegate
       _ev = Snag_::Model_::Event.inline :node_not_found, :query, @q do |y, o|
         y << "there is no node #{ o.query.phrasal_noun_modifier }"
       end
       delegate.receive_error_event _ev
-    end
-  public
-
-    def build_query query_sexp, max_count, delegate
-
-      _node_class.build_valid_query query_sexp, max_count, delegate
-    end
-
-    def reduce_all_nodes_via_query q
-      scan = all.reduce_by do |node|
-        q.match? node
-      end
-      if q.max_count
-        scan = scan.stop_when do |_|
-          q.it_is_time_to_stop
-        end
-      end
-      scan
     end
     end
 
@@ -89,6 +55,10 @@ module Skylab::Snag
         NC_::Expression_Adapters.const_get( id.modality_const, false ).
           node_collection_via_upstream_identifier( id, & oes_p )
       end
+    end
+
+    module Expression_Adapters
+      EN = nil
     end
 
     NC_ = self

@@ -93,6 +93,10 @@ module Skylab::Snag
     end
 
 
+    module Expression_Adapters
+      EN = nil
+    end
+
 
     Autoloader_[ Actions = ::Module.new, :boxxy ]
     Autoloader_[ Actors_ = ::Module.new ]

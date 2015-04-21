@@ -2,8 +2,6 @@ module Skylab::Snag
 
   class Models_::Tag
 
-    Expression_Adapters = ::Module.new
-
     module Expression_Adapters::Byte_Stream
 
       class << self

@@ -27,10 +27,8 @@ module Skylab::Snag::TestSupport
         @result.has_extended_content.should eql false
       end
 
-      memoize_ :_path do
-        ::File.join(
-          Fixture_tree_[ :mock_project_alpha ],
-          'doc/issues.md' )
+      def _path
+        Path_alpha_[]
       end
     end
 

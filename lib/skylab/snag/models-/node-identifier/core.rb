@@ -229,6 +229,10 @@ module Skylab::Snag
 
     # ~ end suffixes
 
+    module Expression_Adapters
+      EN = nil
+    end
+
     NI_ = self
   end
 end

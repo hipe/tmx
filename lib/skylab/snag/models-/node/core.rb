@@ -4,6 +4,12 @@ module Skylab::Snag
 
     class << self
 
+      def interpret_out_of_under_ x, x_, k, & oes_p
+
+        Node_::Expression_Adapters.const_get( x.modality_const, false ).
+          interpret_out_of_under__ x, x_, k, & oes_p
+      end
+
       def new_via_body body
         new nil, body
       end
@@ -134,6 +140,8 @@ module Skylab::Snag
       end
       NIL_
     end
+
+    Autoloader_[ Expression_Adapters = ::Module.new ]
 
     Autoloader_[ Models_ = ::Module.new ]
 

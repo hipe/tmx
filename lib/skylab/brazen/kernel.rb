@@ -3,13 +3,23 @@ module Skylab::Brazen
   class Kernel  # [#015]
 
     def initialize mod
+
       @models_mod = mod.const_get :Models_, false
       @module = mod
       @nm = nil
+      @silo_cache = -> do
+        x = Silo_Cache___.new @models_mod, self
+        @silo_cache = -> { x }
+        x
+      end
     end
 
     def members
       [ :app_name, :bound_call_via_mutable_iambic, :debug_IO, :module, :silo ]
+    end
+
+    def models_module
+      @models_mod
     end
 
     attr_reader :module
@@ -69,6 +79,33 @@ module Skylab::Brazen
       LIB_.system.IO.some_stderr_IO  # etc
     end
 
+    # ~ "unbound" ( e.g model class ) production
+
+    def unbound_via_normal_identifier const_a
+
+      unbound_via_normal_stream Callback_::Polymorphic_Stream.new( 0, const_a )
+    end
+
+    def unbound_via_normal_stream st
+
+      const = st.gets_one
+      if st.unparsed_exists
+        unbound( const ).unbound_via_normal_stream st
+      else
+        unbound const
+      end
+    end
+
+    def unbound_via_identifier id, & oes_p
+
+      silo = silo_via_identifier id, & oes_p
+      silo and silo.model_class
+    end
+
+    def unbound const_sym
+      @models_mod.const_get const_sym, false
+    end
+
     def to_unbound_action_stream
 
       _to_model_stream.expand_by do | item |
@@ -81,6 +118,7 @@ module Skylab::Brazen
     end
 
     def unbound_action_via_normalized_name i_a
+
       i_a.reduce self do |m, i|
         scn = m.to_unbound_action_stream
         while cls = scn.gets
@@ -202,13 +240,18 @@ module Skylab::Brazen
 
   public  # ~ silo production
 
-    def model_class const_sym
-      @models_mod.const_get const_sym, false
+    def silo_via_normal_identifier const_a
+
+      silo_via_normal_stream Callback_::Polymorphic_Stream.new( 0, const_a )
     end
 
-    def model_class_via_identifier id, & oes_p
-      silo = silo_via_identifier id, & oes_p
-      silo and silo.model_class
+    def silo_via_normal_stream st
+
+      x = @silo_cache[].__fetch_via_normal_identifier_component[ st.gets_one ]
+      if st.unparsed_exists
+        x = x.silo_via_normal_stream st
+      end
+      x
     end
 
     def silo sym, & oes_p  # (was `silo_via_symbol`)
@@ -219,7 +262,7 @@ module Skylab::Brazen
 
       if id.is_resolved
 
-        __silo_via_ID id
+        @silo_cache[].__fetch_via_identifier[ id ]
       else
         __silo_via_unresolved_id id, & oes_p
       end
@@ -257,12 +300,11 @@ module Skylab::Brazen
           _start_of_next_part = index - local_index + _num_parts
           id.add_demarcation_index _start_of_next_part
 
-          cls = node.const_get :Silo_Daemon, false
+          cls = node.const_get :Silo_Daemon, false  # one of #two
 
           if cls
             id.bake node
-
-            x = __silo_via_cls_and_ID cls, id
+            x = @silo_cache[].__touch_via_SD_class_and_identifier[ cls, id ]
             break
           end
           mod_a = nil
@@ -332,26 +374,46 @@ module Skylab::Brazen
       end
     end
 
-    def __silo_via_ID id
-      ( @touch_silo_p ||= _build_touch_silo_p )[ nil, id ]
-    end
+    class Silo_Cache___
 
-    def __silo_via_cls_and_ID cls, id
-      ( @touch_silo_p ||= _build_touch_silo_p )[ cls, id ]
-    end
+      def initialize models_mod, kernel
 
-    def _build_touch_silo_p
+        cache_h = {}
 
-      cache_h = {}
+        @__fetch_via_identifier = -> id do
 
-      -> cls, id do
+          cache_h.fetch id.silo_name_i
+        end
 
-        cache_h.fetch id.silo_name_i do
-          x = cls.new self, id.value
-          cache_h[ id.silo_name_i ] = x
-          x
+        @__fetch_via_normal_identifier_component = -> const do
+
+          sym = const.downcase
+
+          cache_h.fetch sym do
+
+            unbound = models_mod.const_get const, false
+
+            x = unbound.const_get( :Silo_Daemon, false ).
+              new kernel, unbound  # two of #two
+
+            cache_h[ sym ] = x
+            x
+          end
+        end
+
+        @__touch_via_SD_class_and_identifier = -> cls, id do
+
+          cache_h.fetch id.silo_name_i do
+            x = cls.new kernel, id.value
+            cache_h[ id.silo_name_i ] = x
+            x
+          end
         end
       end
+
+      attr_reader :__fetch_via_identifier,
+        :__fetch_via_normal_identifier_component,
+        :__touch_via_SD_class_and_identifier
     end
   end
 

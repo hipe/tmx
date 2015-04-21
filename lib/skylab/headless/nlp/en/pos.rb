@@ -1085,6 +1085,10 @@ module Skylab::Headless
       NLP::EN::POS::Noun[ @lemma ].plural  # wow
     end
 
+    as :plural_third_present do
+      @lemma.dup  # meh
+    end
+
     # `Verb::Phrase`
 
     Phrase = NLP::EN::Part_Of_Speech::Phrase_.new :v, :np

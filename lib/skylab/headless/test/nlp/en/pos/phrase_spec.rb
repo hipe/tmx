@@ -188,6 +188,8 @@ module Skylab::Headless::TestSupport::NLP::EN::POS
         sp.gender = :feminine
         sp.string.should eql( 'I balk' )
         sp.person = :third
+        sp.string.should eql "she balks or balk"
+        sp.number = :singular
         sp.string.should eql( 'she balks' )
       end
     end

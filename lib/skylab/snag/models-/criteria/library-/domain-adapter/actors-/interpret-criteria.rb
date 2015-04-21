@@ -1,12 +1,10 @@
 module Skylab::Snag
 
-  module Models_::Node_Criteria
+  module Models_::Criteria
 
     module Library_
 
       class Domain_Adapter
-
-        Actors_ = ::Module.new
 
         class Actors_::Interpret_criteria
 

@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  module Models_::Node_Criteria
+  module Models_::Criteria
 
     module Library_
 
@@ -21,14 +21,50 @@ module Skylab::Snag
         Conjunctive_Tree__ = ::Class.new
 
         class And < Conjunctive_Tree__
+
           def symbol
             :and
+          end
+
+          def _to_criteria_proc_via_proc_array_ p_a
+
+            last = p_a.length - 1
+            -> item_x do
+
+              d = 0
+              begin
+                yes = p_a.fetch( d )[ item_x ]
+                yes or break
+                last == d and break
+                d += 1
+                redo
+              end while nil
+              yes
+            end
           end
         end
 
         class Or < Conjunctive_Tree__
+
           def symbol
             :or
+          end
+
+          def _to_criteria_proc_via_proc_array_ p_a
+
+            last = p_a.length - 1
+            -> item_x do
+
+              d = 0
+              begin
+                yes = p_a.fetch( d )[ item_x ]
+                yes and break
+                last == d and break
+                d += 1
+                redo
+              end while nil
+              yes
+            end
           end
         end
 
@@ -37,6 +73,8 @@ module Skylab::Snag
           def initialize a=[]
             @a = a
           end
+
+          # ~ textual production
 
           def to_ascii_visualization_string_
             s = ""
@@ -93,6 +131,22 @@ module Skylab::Snag
             me
           end
 
+          # ~ executable criteria production
+
+          def to_criteria_proc_under__ model_lookup_p
+
+            _p_a = @a.map do | o |
+
+              _assoc_mod = model_lookup_p[ o.associated_model_identifier ]
+
+              _assoc_mod.to_criteria_proc_out_of__ o
+            end
+
+            _to_criteria_proc_via_proc_array_ _p_a
+          end
+
+          # ~ support & writers
+
           def length
             @a.length
           end
@@ -109,6 +163,10 @@ module Skylab::Snag
             x = @a.fetch( -1 )
             @a[ -1 ] = x_
             x
+          end
+
+          def modality_const
+            :Criteria_Tree
           end
         end
       end

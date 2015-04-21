@@ -38,5 +38,9 @@ module Skylab::Snag
     end
 
     attr_reader :string
+
+    module Expression_Adapters
+      EN = nil
+    end
   end
 end
