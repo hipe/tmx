@@ -179,7 +179,8 @@ module Skylab::Brazen
         end
 
         def via_edited_entity_produce_result  # :+#public-API
-          @edited_entity.result_for_persist self, & handle_event_selectively
+
+          @edited_entity.persist_via_action self, & handle_event_selectively
         end
       end
 
@@ -258,22 +259,15 @@ module Skylab::Brazen
         end
 
         def __for_one_resolve_entity_when_had_none & oes_p
+
           oes_p.call :error, :entity_not_found do
-            bld_entity_not_found_event
-          end
-          UNABLE_
-        end
 
-        def bld_entity_not_found_event
-          build_not_OK_event_with :entity_not_found,
+            AF_::Events::Entity_Not_Found_for_One.new_with(
               :model, _model_class,
-              :describable_source, entity_collection do |y, o|
-
-            _lemma = o.model.name_function.as_human
-            _source = o.describable_source.description_under self
-
-            y << "in #{ _source } there are no #{ plural_noun _lemma }"
+              :describable_source, entity_collection )
           end
+
+          UNABLE_
         end
 
         def __via_entity_send_one
@@ -347,6 +341,8 @@ module Skylab::Brazen
           self.class.model_class
         end
       end
+
+      AF_ = self
     end
   end
 end

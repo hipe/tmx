@@ -1,3 +1,5 @@
+[#145]       #bibliographic-reference: _The Art of Unix Programming_,
+               Eric S. Raymond, 2003
 [#144]       ( one more tag for ) this patern spawn-like dup and extend
 [#143]       #parent-node: [#137] "branch and divide.."
 [#142]       #bibliographic-reference: _Cocoa Programming for Mac OS X_,

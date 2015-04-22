@@ -23,6 +23,18 @@ module Skylab::Brazen
 
       alias_method :calculate, :instance_exec
 
+      # ~ begin :+#experiment s
+
+      def modality_const
+        :CLI
+      end
+
+      def new_expression_context
+        ::String.new
+      end
+
+      # ~ end
+
       def and_ a
         _NLP_agent.and_ a
       end

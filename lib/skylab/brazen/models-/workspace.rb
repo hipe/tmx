@@ -111,10 +111,10 @@ module Skylab::Brazen
 
     # ~~ c r u d
 
-    def receive_persist_entity act, ent, & oes_p
+    def persist_entity( x=nil, ent, & oes_p )
       doc = _document( & oes_p )
       doc and begin
-        doc.receive_persist_entity act, ent, & oes_p
+        doc.persist_entity( * x, ent, & oes_p )
       end
     end
 

@@ -14,6 +14,10 @@ module Skylab::Brazen
           Pair_
         end
 
+        def common_events
+          Model_::Action_Factory__::Events
+        end
+
         def entity * a, & p
           if a.length.nonzero?
             Model_::Entity.via_nonzero_length_arglist a, & p
@@ -650,12 +654,15 @@ module Skylab::Brazen
 
     # ~ c r u d
 
-    def intrinsic_create_before_create_in_datastore _action, & oes_p
+    def intrinsic_persist_before_persist_in_collection( *, & oes_p )
       ACHIEVED_
     end
 
-    def result_for_persist action, & oes_p
-      entity_collection.receive_persist_entity action, self, & oes_p
+    def persist_via_action action, & oes_p  # :+public-API :+#hook-in
+
+      # (override this if you need more than just the argument box)
+
+      entity_collection.persist_entity action.argument_box, self, & oes_p
     end
 
     def intrinsic_delete_before_delete_in_datastore _action, & oes_p

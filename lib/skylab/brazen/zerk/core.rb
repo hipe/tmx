@@ -219,13 +219,17 @@ module Skylab::Brazen
       end
 
       def maybe_send_event_via_channel i_a, & ev_p
+
         @parent.handle_event_selectively_via_channel.call i_a do
+
           ev = if ev_p
             ev_p[]
           else
             Brazen_.event.inline_via_normal_extended_mutable_channel i_a  # frontier of this #experiment
           end
+
           _NAME = @name
+
           ev.with_message_string_mapper -> s, d do
             if d.zero?
               if ev.ok || ev.ok.nil?

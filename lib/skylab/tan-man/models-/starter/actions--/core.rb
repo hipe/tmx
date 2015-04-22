@@ -127,10 +127,11 @@ module Skylab::TanMan
         @ws = bx.fetch :workspace
       end
 
-      def receive_persist_entity act, ent, & oes_p
+      def persist_entity x=nil, ent, & oes_p
+
         _ok = __normalize_entity_name_via_fuzzy_lookup ent, & oes_p
         _ok and begin
-          @ws.receive_persist_entity act, ent, & oes_p
+          @ws.persist_entity( * x, ent, & oes_p )
         end
       end
 

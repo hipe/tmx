@@ -8,6 +8,14 @@ module Skylab::Callback
 
         alias_method :calculate, :instance_exec
 
+        def modality_const
+          NIL_
+        end
+
+        def new_expression_context  # :+#experiment
+          ::String.new
+        end
+
         def method i
           p = build_stringer_proc_for_method_name i
           -> * args do

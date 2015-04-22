@@ -192,19 +192,26 @@ module Skylab::Callback
         end
 
       protected
-        def init_copy_via_iambic_and_message_proc x_a, p
+
+        def init_copy_via_iambic_and_message_proc_ x_a, p
+
           bx = ivar_box
-          x_a.each_slice( 2 ) do |i, x|
+
+          x_a.each_slice( 2 ) do | i, x |
             instance_variable_set bx.fetch( i ), x
           end
+
           if p  # or whtever
             define_singleton_method :message_proc do
               p
             end
           end
+
           self
         end
+
       private
+
         def ivar_box
           self.class.ivar_bx
         end

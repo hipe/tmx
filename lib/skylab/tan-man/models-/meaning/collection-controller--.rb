@@ -17,11 +17,15 @@ module Skylab::TanMan
 
       # ~ create
 
-      def receive_persist_entity action, ent, & oes_p
+      def persist_entity bx=nil, ent, & oes_p
+
+        _has_force = if bx
+          bx[ :force ]
+        end
 
         _ok = Meaning_::Actors__::Persist.call(
           _build_session,
-          action.argument_box[ :force ],
+          _has_force,
           ent,
           & oes_p )
 

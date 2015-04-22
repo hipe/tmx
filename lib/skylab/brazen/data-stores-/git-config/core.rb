@@ -45,7 +45,7 @@ module Skylab::Brazen
 
     def members
       [ :receive_delete_entity, :entity_stream_via_model,
-          :entity_via_key, :receive_persist_entity,
+          :entity_via_key, :persist_entity,
             :property_value_via_symbol ]
     end
 
@@ -60,11 +60,16 @@ module Skylab::Brazen
 
     # ~ persist
 
-    def receive_persist_entity action, entity, & oes_p
+    def persist_entity x=nil, ent, & oes_p
+
       ok = resolve_mutable_document( & oes_p )
-      ok &&= entity.intrinsic_create_before_create_in_datastore action, & oes_p
-      ok &&= Git_Config_::Mutable::Actors::Mutate[ entity, @mutable_document, & oes_p ]
-      ok and _via_mutated_mutable_document_write_file_via_persist( action, & oes_p )
+
+      ok &&= ent.intrinsic_persist_before_persist_in_collection( * x, & oes_p )
+
+      ok &&= Git_Config_::Mutable::Actors::Mutate.call(
+        ent, @mutable_document, & oes_p )
+
+      ok and _via_mutated_mutable_document_write_file_via_persist x, & oes_p
     end
 
     # ~ retrieve (one)
@@ -89,7 +94,7 @@ module Skylab::Brazen
       ok = resolve_mutable_document
       ok &&= entity.intrinsic_delete_before_delete_in_datastore( action, & oes_p )
       ok &&= Git_Config_::Mutable::Actors::Delete[ entity, @mutable_document, & oes_p ]
-      ok and _via_mutated_mutable_document_write_file_via_persist( action, & oes_p )
+      ok and _via_mutated_mutable_document_write_file_via_persist( action.argument_box, & oes_p )
     end
 
     # ~ atomic property values
@@ -144,10 +149,10 @@ module Skylab::Brazen
       ACHIEVED_
     end
 
-    def _via_mutated_mutable_document_write_file_via_persist action, & oes_p  # #covered-by [tm]
+    def _via_mutated_mutable_document_write_file_via_persist bx, & oes_p  # #covered-by [tm]
 
       Git_Config_::Mutable::Actors::Persist.with(
-        :is_dry, action.argument_box[ :dry_run ],
+        :is_dry, bx[ :dry_run ],
         :path, @mutable_document.input_id.to_path,
         :document, @mutable_document,
         & oes_p )

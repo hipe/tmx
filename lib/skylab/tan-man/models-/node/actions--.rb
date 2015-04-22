@@ -197,16 +197,21 @@ module Skylab::TanMan
         end
       end
 
-      def receive_persist_entity action, entity
-        _ok = mutate_via_verb_and_entity :create, entity
-        _ok and _commit_changes action
+      def persist_entity bx, byte_downstream_ID, entity, & oes_p
+
+        _ok = _mutate_via_verb_and_entity :create, entity, & oes_p
+        _ok and _commit_changes bx, byte_downstream_ID, & oes_p
       end
 
       def produce_relevant_sexp_via_touch_entity entity
-        mutate_via_verb_and_entity :touch, entity
+
+        _mutate_via_verb_and_entity :touch, entity
       end
 
       def receive_delete_entity action, ent, & oes_p
+
+        byte_downstream_ID = action.document_entity_byte_downstream_identifier
+        bx = action.argument_box
 
         _ok = Node_::Actors__::Mutate::Via_entity.call(
           :delete,
@@ -214,15 +219,16 @@ module Skylab::TanMan
           document_,
           @kernel, & ( oes_p || @on_event_selectively ) )
 
-        _ok and _commit_changes action
+        _ok and _commit_changes bx, byte_downstream_ID, & oes_p
       end
 
-      def mutate_via_verb_and_entity verb_i, entity
+      def _mutate_via_verb_and_entity verb_i, entity, & oes_p
+
         Node_::Actors__::Mutate::Via_entity.call(
           verb_i,
           entity,
           document_,
-          @kernel, & @on_event_selectively )
+          @kernel, & ( oes_p || @on_event_selectively ) )
       end
 
       def _entity_via_node node
@@ -231,12 +237,12 @@ module Skylab::TanMan
           __init_via_node_stmt_and_immutable_preconditions node, @precons_box_
       end
 
-      def _commit_changes action
+      def _commit_changes bx, byte_downstream_ID, & oes_p
 
         document_.persist_into_byte_downstream_identifier(
-          action.document_entity_byte_downstream_identifier,
-          :is_dry, action.argument_box[ :dry_run ],
-          & action.handle_event_selectively )
+          byte_downstream_ID,
+          :is_dry, bx[ :dry_run ],
+          & oes_p )
       end
     end
 

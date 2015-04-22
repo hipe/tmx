@@ -169,16 +169,21 @@ module Skylab::Callback
       end
 
       def new_with * x_a, & msg_p  # #note-25
-        dup.init_copy_via_iambic_and_message_proc x_a, msg_p
+        dup.init_copy_via_iambic_and_message_proc_ x_a, msg_p
       end
 
       def new_inline_with * x_a, & msg_p
+
         bx = __to_mutable_box
+
         x_a.each_slice 2 do | k, x |
           bx.set k, x
         end
+
         self.class.inline_via_mutable_box_and_terminal_channel_symbol(
-          bx, @terminal_channel_i, & ( msg_p || @message_proc ) )
+          bx,
+          terminal_channel_i,
+          & ( msg_p || message_proc ) )
       end
 
       def to_exception  # #note-85
@@ -207,18 +212,28 @@ module Skylab::Callback
         bx
       end
 
-    protected( def init_copy_via_iambic_and_message_proc x_a, p  # #note-70
+    protected
+
+      def init_copy_via_iambic_and_message_proc_ x_a, p  # #note-70
+
         bx = ivar_box
+
         x_a.each_slice( 2 ) do |i, x|
           instance_variable_set bx.fetch( i ), x
         end
+
         sc = singleton_class
+
         bx.each_name do |i|
           sc.send :attr_reader, i
         end
+
         p and @message_proc = p
+
         self
-      end )
+      end
+
+    public
 
       def has_tag i
         formal_properties.has_name i
@@ -337,17 +352,24 @@ module Skylab::Callback
           :o ]
 
         def execute
+
           @sp_as_s_a = @o.terminal_channel_i.to_s.split UNDERSCORE_
+
           maybe_replace_noun_phrase_with_prop
           rslv_item_x_from_first_tag
+
           if @has_first_tag
+
             did = maybe_describe_item_x
             did ||= maybe_pathify_item_x
             did || ickify_item_x
             @y << "#{ @sp_as_s_a * SPACE_ } - #{ @item_x }"
+
           else
             @y << "#{ @sp_as_s_a * SPACE_ }"
-          end ; nil
+          end
+
+          NIL_
         end
 
       private

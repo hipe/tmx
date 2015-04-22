@@ -6,8 +6,8 @@ module Skylab::TanMan
 
       Actor_.call self, :properties,
         :is_dry_run,
-        :action,
         :entity,
+        :template_values_provider,
         :workspace,
         :kernel
 
@@ -210,9 +210,12 @@ module Skylab::TanMan
       module Produce_upstream_lines___
 
         def execute
-          @value_fetcher = Value_Fetcher_Shell___.new Value_Fetcher_Kernel___.new @action
+
+          @value_fetcher =
+            Template_Values_Fetch_Proxy___.new( @template_values_provider )
+
           _x = __via_workspace_expect_lines
-          _x or __any_lines
+          _x || __any_lines
         end
 
         def __via_workspace_expect_lines
@@ -243,30 +246,14 @@ module Skylab::TanMan
         end
       end
 
-      class Value_Fetcher_Shell___
+      class Template_Values_Fetch_Proxy___ < ::BasicObject
 
-        # used by the template renderer to render its values
-
-        def initialize k
-          @kernel = k
+        def initialize o
+          @provider = o
         end
 
-        def fetch i
-          @kernel.__send__ i
-        end
-      end
-
-      class Value_Fetcher_Kernel___ < ::BasicObject
-
-        # the internal structure that effects the composition
-        # of available template value names for the above shell
-
-        def initialize provider
-          @provider = provider
-        end
-
-        def created_on
-          @provider.template_value :created_on_timestamp_string
+        def fetch sym
+          @provider.template_value sym
         end
       end
 

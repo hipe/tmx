@@ -25,14 +25,14 @@ module Skylab::TanMan
             :starter,
             :created_on )
 
-        def template_value i
-          send :"#{ i }_template_value"
+        def template_value sym
+
+          send :"__template_value_for__#{ sym }__"
         end
 
-        def created_on_timestamp_string_template_value
-          if @argument_box.has_name :created_on
-            @argument_box.fetch :created_on
-          else
+        def __template_value_for__created_on__
+
+          @argument_box.fetch :created_on do
             ::Time.now.utc.to_s
           end
         end
@@ -45,13 +45,15 @@ module Skylab::TanMan
 
     # c r u d
 
-    def intrinsic_create_before_create_in_datastore action, & oes_p
+    def intrinsic_persist_before_persist_in_collection bx, & oes_p
 
       Graph_::Actors__::Touch.call(
-
-        action.argument_box[ :dry_run ],
-
-        action, self, @preconditions.fetch( :workspace ), @kernel, & oes_p )
+        bx[ :dry_run ],
+        self,
+        bx.fetch( :template_values_provider_ ),
+        @preconditions.fetch( :workspace ),
+        @kernel,
+        & oes_p )
 
       # (result on success is bytes)
 
@@ -96,8 +98,8 @@ module Skylab::TanMan
         @ws = bx.fetch :workspace
       end
 
-      def receive_persist_entity action, ent, & oes_p
-        @ws.receive_persist_entity action, ent, & oes_p
+      def persist_entity x=nil, ent, & oes_p
+        @ws.persist_entity( * x, ent, & oes_p )
       end
     end
 

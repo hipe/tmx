@@ -69,7 +69,7 @@ module Skylab::Brazen
 
     module Actions
 
-      Add = make_action_class :Create
+      Create = make_action_class :Create
 
       Ls = make_action_class :List
 
@@ -93,12 +93,14 @@ module Skylab::Brazen
 
     # ~ c r u d
 
-    def receive_persist_entity act, entity, & oes_p
-      _ok = entity.intrinsic_create_before_create_in_datastore act, & oes_p
-      _ok && Couch_::Actors__::Persist[ act.argument_box[ :dry_run ], entity, self ]
+    def persist_entity bx, entity, & oes_p
+
+      _ok = entity.intrinsic_persist_before_persist_in_collection bx, & oes_p
+      _ok && Couch_::Actors__::Persist[ bx[ :dry_run ], entity, self, & oes_p ]
     end
 
-    def intrinsic_create_before_create_in_datastore _action, & oes_p
+    def intrinsic_persist_before_persist_in_collection _, & oes_p
+
       oes_p ||= handle_event_selectively
       Couch_::Actors__::Touch_datastore[ self, & oes_p ]
       PROCEDE_  # #note-085

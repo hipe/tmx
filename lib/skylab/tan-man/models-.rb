@@ -36,7 +36,7 @@ module Skylab::TanMan
         end
         super
       end
-    end
+    end  # >>
   end
 
   # ~ see [#024]:stubbing
@@ -296,7 +296,6 @@ module Skylab::TanMan
     end
   end
 
-
   # ~
 
   Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
@@ -378,7 +377,6 @@ module Skylab::TanMan
     end
   end
 
-
   class Models_::Graph < Model_
 
     @after_name_symbol = :init
@@ -393,6 +391,16 @@ module Skylab::TanMan
     end
 
     # desc "there's a lot you can tell about a man from his choice of words"
+
+    def persist_via_action act, & oes_p
+
+      # (the graph document is created thru a template that ultimately needs
+      #  an implementer to provide the values for its variables. it "feels
+      #  right" to appoint the particulr action class itself to this role.)
+
+      act.argument_box.add :template_values_provider_, act
+      super
+    end
   end
 
   class Graph_Document_Entity__ < Model_
@@ -421,7 +429,7 @@ module Skylab::TanMan
       def touch
         self::Actors__::Mutate::Touch
       end
-    end # >>
+    end  # >>
 
     def to_controller  # experiment
       Models_::Node::Controller__.new self, @preconditions.fetch( :dot_file )
@@ -435,6 +443,14 @@ module Skylab::TanMan
       Add = stub
       Ls = stub
       Rm = stub
+    end
+
+    def persist_via_action action, & oes_p  # #hook-in to [br]
+
+      entity_collection.persist_entity(
+        action.argument_box,
+        action.document_entity_byte_downstream_identifier,
+        self, & oes_p )
     end
 
     Node_ = self

@@ -189,13 +189,11 @@ module Skylab::TanMan
         end
       end
 
-      def receive_persist_entity action, entity, & oes_p
-
-        bx = action.argument_box
+      def persist_entity bx, entity, & oes_p
 
         x = bx[ :attrs ]
         if x
-          any_attrs_x = x  # :+[#007] should be a hash from iternal call..
+          any_attrs_x = x  # :+[#007] should be a hash from internal call..
             # (the front client would have to write a custom normalizer)
         end
 
