@@ -6,6 +6,7 @@ subgraph cluster_main {
 
   subgraph cluster_tag_actions {
     label="tag actions"
+    tl [label="17. list\n(of node)"]
     ta [label="add" ]
     tr [label="remove"]
   }

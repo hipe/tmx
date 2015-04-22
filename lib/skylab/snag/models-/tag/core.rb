@@ -2,8 +2,6 @@ module Skylab::Snag
 
   class Models_::Tag
 
-    Actions = THE_EMPTY_MODULE_
-
     class << self
 
       def category_symbol
@@ -37,6 +35,8 @@ module Skylab::Snag
       EN = nil
       Autoloader_[ self ]
     end
+
+    Brazen_ = Snag_.lib_.brazen
 
     Tag_ = self
   end

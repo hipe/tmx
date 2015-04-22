@@ -42,6 +42,13 @@ module Skylab::Brazen
       Brazen_::API::Produce_bound_call__[ x_a, self, @module ]
     end
 
+    def call_via_mutable_box * i_a, bx, & x_p  # [sg]
+
+      bc = bound_call_via_mutable_box i_a, bx, & x_p
+
+      bc and bc.receiver.send bc.method_name, * bc.args
+    end
+
     def bound_call_via_mutable_box i_a, bx, & x_p  # [bs] only so far
 
       Brazen_::API::Produce_bound_call__.start_via_iambic_and_mutable_box(

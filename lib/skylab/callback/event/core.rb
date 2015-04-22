@@ -221,11 +221,11 @@ module Skylab::Callback
       end )
 
       def has_tag i
-        reflection_box.has_name i
+        formal_properties.has_name i
       end
 
       def first_tag_name
-        reflection_box.first_name
+        formal_properties.first_name
       end
 
       def members  # :+[#061]
@@ -237,7 +237,7 @@ module Skylab::Callback
       end
 
       def get_tag_names
-        reflection_box.get_names
+        formal_properties.get_names
       end
 
     private
@@ -245,7 +245,7 @@ module Skylab::Callback
         @__ivar_box__
       end
 
-      def reflection_box
+      def formal_properties
         @__ivar_box__
       end
     public

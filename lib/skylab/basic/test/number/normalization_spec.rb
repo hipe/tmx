@@ -112,7 +112,7 @@ module Skylab::Basic::TestSupport::Numeric
     end
 
     def expected_terminal_channel
-      :value_not_in_number_set
+      :uninterpretable_under_number_set
     end
 
     Subject_ = -> do

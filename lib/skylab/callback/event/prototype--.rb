@@ -6,15 +6,15 @@ module Skylab::Callback
 
         class << self
           def via_deflist_and_message_proc i_a, p
-            Build__[ i_a, p ]
+            Make___[ i_a, p ]
           end
         end  # >>
 
-        class Build__
+        class Make___
 
-          Callback_::Actor[ self, :properties,
+          Callback_::Actor.call self, :properties,
             :deflist_a,
-            :message_proc ]
+            :message_proc
 
           def execute
             validate
@@ -40,8 +40,7 @@ module Skylab::Callback
             _MESSAGE_PROC_ = @message_proc
             cls.class_exec do
               extend Module_Methods__
-              _TERMINAL_CHANNEL_I_ = scn.gets_one
-              define_method :terminal_channel_i do _TERMINAL_CHANNEL_I_ end
+              const_set :TERMINAL_CHANNEL_SYMBOL___, scn.gets_one
               define_method :message_proc do _MESSAGE_PROC_ end
               _BOX_ = Callback_::Box.new
               while scn.unparsed_exists
@@ -51,7 +50,7 @@ module Skylab::Callback
               end
               _BOX_.freeze
               define_singleton_method :prop_bx do _BOX_ end
-              define_method :reflection_box do _BOX_ end
+              define_method :formal_properties do _BOX_ end
             end
             cls
           end
@@ -91,10 +90,16 @@ module Skylab::Callback
 
           def new_with * x_a
             construct do
-              init_via_even_iambic x_a
+              process_iambic_fully x_a
               freeze
             end
           end
+        end  # end module methds
+
+        # ~ instance methods of event class
+
+        def terminal_channel_i
+          self.class::TERMINAL_CHANNEL_SYMBOL___
         end
 
         def replace_some_values * value_a
@@ -105,29 +110,85 @@ module Skylab::Callback
 
       private
 
-        def init_via_value_list x_a
-          bx = reflection_box
+        def init_via_value_list x_a  # caller should freeze
+          bx = formal_properties
           x_a.length.times do |d|
             instance_variable_set bx.at_position( d ).name_as_ivar, x_a.fetch( d )
           end
           x_a.length.upto( bx.length - 1 ) do |d|
             prop = bx.at_position d
             instance_variable_set prop.name_as_ivar, prop.default_value
-          end ; nil  # caller should freeze
+          end
+          NIL_
         end
 
-        def init_via_even_iambic x_a
-          seen_h = {}
-          bx = reflection_box
-          x_a.each_slice 2 do |i, x|
-            prop = bx.fetch i
-            seen_h[ i ] = true
-            instance_variable_set prop.name_as_ivar, x
+        def have * x_a
+          _ok = process_iambic_fully x_a
+          _ok && freeze
+        end
+
+        def process_iambic_fully x_a  # caller should freeze
+
+          # (a custom amalgamation of the commonest two idioms: if it
+          #  has a formal property, set the ivar; else call a custom
+          #  iambic parsing method. also nil-out any not-set values.)
+
+          bx = formal_properties
+          ok = true
+          st = Callback_::Polymorphic_Stream.new 0, x_a
+
+          at_end = EMPTY_P_
+          once = -> do
+            once = EMPTY_P_
+            at_end = -> do
+              remove_instance_variable :@__methodic_actor_iambic_stream__
+            end
+            @__methodic_actor_iambic_stream__ = st
+            NIL_
           end
-          bx.each_value do |prop|
-            seen_h[ prop.name_symbol ] and next
-            instance_variable_set prop.name_as_ivar, prop.default_value
-          end ; nil  # caller should freeze
+
+          while st.unparsed_exists
+
+            sym = st.gets_one
+            prp = bx[ sym ]
+
+            if prp
+              instance_variable_set prp.name_as_ivar, st.gets_one
+              next
+            end
+
+            once[]
+
+            ok = send :"#{ sym }="
+            ok or break
+
+          end
+
+          at_end[]
+
+          if ok
+            __init_defaults
+          end
+
+          ok or raise ::ArgumentError  # until this is universally normalized
+        end
+
+        def __init_defaults
+
+          formal_properties.each_value do | prp |
+            ivar = prp.name_as_ivar
+            x = if instance_variable_defined? ivar
+              instance_variable_get ivar
+            end
+            if x.nil?
+              instance_variable_set ivar, prp.default_value
+            end
+          end
+          NIL_
+        end
+
+        def iambic_property  # :+#cp
+          @__methodic_actor_iambic_stream__.gets_one
         end
 
       protected

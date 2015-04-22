@@ -17,7 +17,7 @@ module Skylab::Brazen
         def start_via_iambic x_a, k, & oes_p
           new do
             _common_pre_init x_a, k, & oes_p
-            @box = nil
+            @mutable_box = nil
             _common_post_init
           end
         end
@@ -25,7 +25,7 @@ module Skylab::Brazen
         def start_via_iambic_and_mutable_box x_a, bx, k, & oes_p
           new do
             _common_pre_init x_a, k, & oes_p
-            @box = bx
+            @mutable_box = bx
             _common_post_init
           end
         end
@@ -33,7 +33,7 @@ module Skylab::Brazen
       end  # >>
 
       def initialize
-        @box = nil
+        @mutable_box = nil
         super
       end
 
@@ -51,8 +51,7 @@ module Skylab::Brazen
 
       def produce_bound_call
         _ok = __resolve_bound_action
-        _ok && __via_bound_action_resolve_bound_call
-        @bound_call
+        _ok && __via_bound_action_produce_bound_call
       end
 
       def receive_top_bound_node x
@@ -71,7 +70,7 @@ module Skylab::Brazen
 
         @bound = nil  # there is no parent bound action to start
 
-        if @box
+        if @mutable_box
           __init_when_iambic_and_box
         else
           __init_when_iambic
@@ -81,7 +80,7 @@ module Skylab::Brazen
       def __init_when_iambic_and_box
 
         @on_event_selectively ||= begin
-          _oes_p = @box.remove :on_event_selectively do end
+          _oes_p = @mutable_box.remove :on_event_selectively do end
           _oes_p || _produce_some_handle_event_selectively
         end
 
@@ -192,23 +191,20 @@ module Skylab::Brazen
           :local_node_name, @bound.name.as_lowercase_with_underscores_symbol
       end
 
-      def __via_bound_action_resolve_bound_call
+      def __via_bound_action_produce_bound_call
 
-        ok = true
-        if @box
+        if @mutable_box
+
           if @st.unparsed_exists
-            _end_in_error_with :no_such_action, :action_name, @st.current_token
-            ok = false
+
+            @bound.bound_call_against_polymorphic_stream_and_mutable_box(
+              @st, @mutable_box )
+
           else
-            bc = @bound.bound_call_against_box @box
+            @bound.bound_call_against_box @mutable_box
           end
         else
-          bc = @bound.bound_call_against_iambic_stream @st
-        end
-
-        ok and begin
-          @bound_call = bc
-          bc and OK_
+          @bound.bound_call_against_iambic_stream @st
         end
       end
 

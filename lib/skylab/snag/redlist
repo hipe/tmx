@@ -1,6 +1,5 @@
 models-/to-do/actions/melt.rb
 models-/to-do/actions/_melt_supplement_.rb
-models-/tag/actions.rb
 models-/tag/_actions-supplemental_.rb
 test/models/node/actions/add_spec.rb
 test/models/node/actions/close_spec.rb

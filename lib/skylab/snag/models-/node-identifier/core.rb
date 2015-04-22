@@ -146,7 +146,7 @@ module Skylab::Snag
 
           yes = false
           oes_p.call :error, :parse_error, :expecting_number do
-            __build_etc_event scn.string
+            __build_uninterpretable_as_integer_event scn.string
           end
         end
 
@@ -161,13 +161,15 @@ module Skylab::Snag
         ACHIEVED_
       end
 
-      def __build_etc_event x
+      def __build_uninterpretable_as_integer_event x
 
-        Snag_.lib_.brazen.model.entity.normalizers.number.new_event(  # #todo
-          :against_value, x,
+        Snag_.lib_.basic::Number::Uninterpretable.new_with(
+          :x, x,
           :property_name_symbol, :node_identifier_number_component,
           :minimum, 0,
-          :number_set, :integer )
+          :number_set, :integer,
+          :general_failure )
+
       end
     end
 

@@ -220,6 +220,13 @@ module Skylab::Brazen
 
   public
 
+    def bound_call_against_polymorphic_stream_and_mutable_box st, bx
+
+      _bound_call_against bx do
+        process_iambic_stream_fully st
+      end
+    end
+
     def bound_call_against_iambic_stream st
 
       # meet any preconditions before calling the user's `produce_result`.
@@ -307,9 +314,9 @@ module Skylab::Brazen
       end
     end
 
-    def _bound_call_against
+    def _bound_call_against bx=Box_.new
 
-      @argument_box = Box_.new
+      @argument_box = bx
       ok = yield
       if ok
         via_arguments_produce_bound_call

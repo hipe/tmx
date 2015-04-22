@@ -73,10 +73,11 @@ module Skylab::Snag::TestSupport
       call_API :node, :to_stream,
         :identifier, '-12'
 
-      _ev = expect_not_OK_event( :number_too_small ).to_event
+      _ev = expect_not_OK_event( :uninterpretable_under_number_set ).to_event
 
       black_and_white( _ev ).should eql(
-        "'node-identifier-number-component' must be non-negative integer, had '-12'" )
+        "'node-identifier-number-component' #{
+         }must be a non-negative integer, had '-12'" )
 
       expect_failed
     end

@@ -73,7 +73,7 @@ module Skylab::BeautySalon
 
       if ev.ok
         _receive_OK_line_stream st, en
-      elsif ok.nil?
+      elsif ev.ok.nil?
         _receive_neutral_line_stream st, en
       else
         _receive_unable_line_stream st, en
@@ -100,8 +100,9 @@ module Skylab::BeautySalon
 
 
     def _serr_with_prefix pfx_s, st
-      line = st.gets
-      if line
+
+      s = st.gets
+      if s
         @err.puts "#{ pfx_s }#{ s }"
         begin
           s = st.gets

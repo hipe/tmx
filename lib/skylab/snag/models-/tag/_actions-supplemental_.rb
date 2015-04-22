@@ -56,24 +56,6 @@ module Skylab::Snag
       end
     end
 
-    desc 'list the tags for a given node.'
-
-    inflection.inflect.noun :plural
-
-    def ls node_ref
-      call_API( [ :node, :tags, :ls ], {
-                    node_ref: node_ref,
-                 working_dir: working_directory_path
-        }, -> o do
-          o.on_error_event handle_error_event
-          o.on_tags do |tags|
-            tags.express_into_under y=[], expression_agent
-            send_payload_line y * SPACE_ ; nil
-          end
-
-        end )
-    end
-
     desc 'remove a tag from a node.'
 
     option_parser do |o|

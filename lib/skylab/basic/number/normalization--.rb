@@ -2,24 +2,6 @@ module Skylab::Basic
 
   module Number
 
-    class << self
-
-      def normalization
-        Number_::Normalization__
-      end
-
-      def of_digits_in_positive_integer d
-        digits = 1
-        begin
-          d /= 10
-          d.zero? and break
-          digits += 1
-          redo
-        end while nil
-        digits
-      end
-    end  # >>
-
     # ->
 
       class Normalization__
@@ -28,21 +10,6 @@ module Skylab::Basic
 
           def instance
             @inst ||= new
-          end
-
-          def new_event * a
-
-            h = {}
-            a.each_slice 2 do | k, x |
-              h[ k ] = x
-            end
-
-            x, prp_sym, min_d, set_sym = Basic_::Hash.unpack_subset(  # for now
-              h, :against_value, :property_name_symbol, :minimum, :number_set )
-
-            _prp = Minimal_Property.via_variegated_symbol prp_sym
-
-            _build_did_not_match_event x, _prp, min_d, set_sym
           end
 
           def new_with * a  # :+[#cb-063]
@@ -153,36 +120,12 @@ module Skylab::Basic
 
         def result_when_did_not_match
           maybe_send_event :error, :invalid_property_value do
-            self.class._build_did_not_match_event @x, @argument.property, @number_set
+
+            _new_invalid_event.did_not_match @x, @argument.property, @number_set
           end
         end
 
         include Simple_Selective_Sender_Methods_
-
-      class << self
-
-        def _build_did_not_match_event x, prp, min_d=nil, sym
-
-          if min_d
-            _build_number_too_small_event x, prp, min_d, sym
-          else
-            __build_not_in_number_set_event x, prp, sym
-          end
-        end
-
-        def __build_not_in_number_set_event x, prp, sym
-
-          build_argument_error_event_with_ :value_not_in_number_set,
-
-              :x, x, :prop, prp, :number_set, sym do | y, o |
-
-            y << "#{ par o.prop } must be #{
-             }#{ indefinite_noun o.number_set.id2name }, #{
-              }had #{ ick o.x }"
-
-          end
-        end
-      end  # >>
 
         def via_matchdata_resolve_integer_for_number
           @number = @md[ 0 ].to_i
@@ -199,41 +142,19 @@ module Skylab::Basic
         end
 
         def result_when_number_is_too_small
+
           maybe_send_event :error, :invalid_property_value do
-            self.class._build_number_too_small_event(
+
+            _new_invalid_event.number_too_small(
               @number, @argument.property, @minimum )
           end
         end
 
-      class << self
-
-        def _build_number_too_small_event x_number, prp, min_number, set_sym=nil
-
-          build_argument_error_event_with_ :number_too_small,
-
-              :number, x_number,
-              :minimum, min_number,
-              :prop, prp,
-              :number_set, set_sym do | y, o |
-
-            sym = o.number_set
-            if o.minimum.zero?
-
-              sym and _ = " #{ sym }"
-              y << "#{ par o.prop } must be non-negative#{ _ }, had #{ ick o.number }"
-
-            else
-
-              sym and _ = "#{ sym } "
-              y << "#{ par o.prop } must be #{ _ }greater than or equal to #{
-               }#{ val o.minimum }, had #{ ick o.number }"
-            end
-          end
+        def _new_invalid_event
+          Number_::Uninterpretable.new
         end
-      end  # >>
+      end
 
-      end  # n11n
-
-    Number_ = self
+      # <-
   end
 end
