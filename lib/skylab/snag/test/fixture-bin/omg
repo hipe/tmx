@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby -w
+
+# (we can read from stdin using just bash, but we can not `flock` in a
+#  sufficiently portable way, so we are using ruby for this guy too)
+
+file = $stdin.gets
+
+file.chop!
+
+fh = ::File.open file, ::File::CREAT | ::File::RDONLY
+
+d = fh.flock ::File::LOCK_EX | ::File::LOCK_NB
+
+if d
+
+  if d.zero?
+    $stdout.puts "OK, locked file: #{ file }"
+    $stdout.flush
+
+    xx = $stdin.gets
+    xx.chomp!
+    $stdout.puts "goodbye (#{ xx })."
+
+    # NOTE we leave the file open, to see if the O.S cleans up (ofc it does)
+
+    exit 0
+  else
+    $stderr.puts "failed to get that lock (exitstatus: #{ x })"
+    exit d
+  end
+else
+  $stderr.puts "failed to get that lock"
+  exit 5
+end

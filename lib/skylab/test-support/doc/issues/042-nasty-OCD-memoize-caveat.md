@@ -5,8 +5,8 @@
 realize the EXTREME danger in this: the first time the produced method
 is called, it produces its result by running the argument proc against
 whatever the test context happens to be at that time. each subsequent
-time the produced method is called it ** re-delivers that same object
-even though the test context may have changed **. so do NOT use this
+time the produced method is called it **re-delivers that same object
+even though the test context may have changed**. so do NOT use this
 to memoize anything that emits events, for example; or otherwise has
 side-effects on the test context when it is "used", because the effected
 test context will be stale and inaccesible during those subsequent calls;

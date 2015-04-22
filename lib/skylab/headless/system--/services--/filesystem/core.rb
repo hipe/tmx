@@ -49,6 +49,18 @@ module Skylab::Headless
         ::File.file? s
       end
 
+      # ~ begin write :+#core-service's
+
+      def mkdir path, * int
+        ::Dir.mkdir path, * int
+      end
+
+      def open filename, * rest, & p
+        ::File.open filename, * rest, & p
+      end
+
+      # ~ end
+
       def file_utils_controller & p
         if p
           Filesystem_::File_Utils_Controller__.new p

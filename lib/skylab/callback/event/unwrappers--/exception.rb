@@ -23,9 +23,19 @@ module Skylab::Callback
           end ; nil
         end
 
-        def exception_class_via_error_catgory i
-          _name = Callback_::Name.via_variegated_symbol i
-          ::Object.const_get _name.as_camelcase_const
+        def exception_class_via_error_catgory sym
+
+          first_guess_sym = Callback_::Name.via_variegated_symbol( sym ).
+            as_camelcase_const
+
+          if ::Object.const_defined? first_guess_sym
+
+            ::Object.const_get first_guess_sym
+          else
+            _s_a = sym.id2name.split UNDERSCORE_  # e.g `errno_enoent`
+
+            Callback_::Autoloader.const_reduce _s_a, ::Object
+          end
         end
 
         def resolve_message_string

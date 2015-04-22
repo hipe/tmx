@@ -1,6 +1,18 @@
 digraph {
 
-  aa [label="17. add\naction" ]
+subgraph cluster_main {
+
+  label="essential functions"
+
+  subgraph cluster_tag_actions {
+    label="tag actions"
+    ta [label="add" ]
+    tr [label="remove"]
+  }
+
+
+  aa [label="open node\naction" ]
+  ca [label="close node\naction" ]
   de [label="15. design & implement\ncriteria implementation" style=filled]
   FS [label="14. expose the\nfilesystem" style=filled]
   line_upstream [label="11. line\nupstream" style=filled]
@@ -8,13 +20,19 @@ digraph {
   node_identifier_model [label="9. node identifier\nmodel" style=filled]
   node_model [label="10. node model" style=filled]
   node_upstream [label="11. node\nupstream" style=filled]
-  oaa [label="16. ordinary\nadd action"]
-  rea [label="17. reappropriation\nintegrated into an\n\"add\" action" ]
-  rea_actor [label="16. find any best existing\nreappropriable node" ]
+  oaa [label="ordinary\nadd action"]
+  rea [label="reappropriation\nintegrated into an\n\"add\" action" ]
+  rea_actor [label="find any best existing\nreappropriable node" ]
   stru [label="13. experimental support\nfor structured tags" style=filled]
   tag_model [label="10. tag model" style=filled]
+  tmpdir [label="16. produce\ntmpdir" style=filled]
 
   aa->rea
+  aa->ta
+
+  ca->tr
+  ca->ta
+
   rea->aa
   aa->oaa
   rea->rea_actor
@@ -30,4 +48,19 @@ digraph {
   node_model -> node_identifier_model
   node_model -> tag_model
 
+  tr->tmpdir
+  ta->tmpdir
+
 }
+
+
+subgraph cluster_after {
+
+  label="auxiliary functions"
+  melt [label="melt todos\ninto issues"]
+  top_cli [label="toplevel\nCLI integration"]
+}
+
+melt->aa
+}
+

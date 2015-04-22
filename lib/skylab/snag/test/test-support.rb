@@ -58,23 +58,6 @@ module Skylab::Snag::TestSupport
 
   module InstanceMethods
 
-    def tmpdir
-      @tmpdir ||= Memoize_.call :tmpdir do
-        __build_tmpdir
-      end
-    end
-
-    def __build_tmpdir
-
-      TestSupport_.tmpdir.new(
-        :path, Snag_.lib_.system.filesystem.tmpdir_pathname.
-          join( 'snaggle' ).to_path,
-        :be_verbose, do_debug,
-        :debug_IO, debug_IO )
-    end
-
-    # ~ support & officious
-
     def debug!
       @do_debug = true
     end
@@ -83,14 +66,6 @@ module Skylab::Snag::TestSupport
 
     def debug_IO
       TestSupport_.debug_IO
-    end
-
-    def subject_API  # #hook-out for expect event
-      Snag_::API
-    end
-
-    def black_and_white_expression_agent_for_expect_event  # ditto
-      Snag_.lib_.brazen::API.expression_agent_instance
     end
   end
 
@@ -161,8 +136,22 @@ module Skylab::Snag::TestSupport
     end
   end.call
 
-  Expect_Event = -> tcm, x_a=nil do
-    Callback_.test_support::Expect_Event[ tcm, x_a ]
+  module Expect_Event
+
+    class << self
+      def [] tcm, x_a=nil
+        Callback_.test_support::Expect_Event[ tcm, x_a ]
+        tcm.include self
+      end
+    end  # >>
+
+    def subject_API
+      Snag_::API
+    end
+
+    def black_and_white_expression_agent_for_expect_event
+      Snag_.lib_.brazen::API.expression_agent_instance
+    end
   end
 
   module Expect_Piece
@@ -231,6 +220,35 @@ module Skylab::Snag::TestSupport
   end.call
 
   Snag_ = ::Skylab::Snag
+
+  My_Tmpdir_ = -> do
+
+    o = nil  # :+#nasty_OCD_memoize_ (see)
+
+    -> tcm do
+
+      tcm.send :define_method, :my_tmpdir_ do
+
+        if o
+          if do_debug
+            if ! o.be_verbose
+              o = o.new_with :debug_IO, debug_IO, :be_verbose, true
+            end
+          elsif o.be_verbose
+            o.new_with :be_verbose, false
+          end
+        else
+          o = TestSupport_.tmpdir.new(
+            :path, ::File.join(
+               Snag_.lib_.system.defaults.dev_tmpdir_path,
+               'snaggle' ),
+            :be_verbose, do_debug,
+            :debug_IO, debug_IO )
+        end
+        o
+      end
+    end
+  end.call
 
   Callback_ = Snag_::Callback_
 
