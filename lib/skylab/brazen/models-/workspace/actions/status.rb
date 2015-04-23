@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Models_::Workspace
 
-  class Actions::Status < Brazen_::Model_::Action
+  class Actions::Status < Brazen_::Model::Action
 
     edit_entity_class(
 

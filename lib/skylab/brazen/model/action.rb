@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Model_
+  class Model
 
   class Action  # see [#024]
 
@@ -36,7 +36,7 @@ module Skylab::Brazen
       # ~ reflection-like exposures for model API
 
       attr_accessor :after_name_symbol, :description_block,
-        :is_promoted, :precondition_controller_i_a
+        :is_promoted, :precondition_controller_i_a_
 
       def custom_action_inflection
       end
@@ -55,8 +55,8 @@ module Skylab::Brazen
       end
 
       def __resolve_precondition_controller_identifer_a
-        @preconditions = if precondition_controller_i_a
-          @precondition_controller_i_a.map do |i|
+        @preconditions = if precondition_controller_i_a_
+          @precondition_controller_i_a_.map do |i|
             Node_Identifier_.via_symbol i
           end
         else

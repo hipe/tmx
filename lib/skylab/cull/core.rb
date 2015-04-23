@@ -148,12 +148,12 @@ module Skylab::Cull
   Brazen_ = Autoloader_.require_sidesystem :Brazen
 
   ACHIEVED_ = true
-  Action_ = Brazen_.model.action_class  # for name stop index we need this const
+  Action_ = Brazen_::Model.common_action_class  # for name stop index we need this const
   Cull_ = self
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
   KEEP_PARSING_ = true
-  Model_ = Brazen_.model.model_class
+  Model_ = Brazen_::Model
   NIL_ = nil
   UNABLE_ = false
 

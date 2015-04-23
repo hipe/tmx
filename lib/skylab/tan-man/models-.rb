@@ -8,7 +8,7 @@ module Skylab::TanMan
     end ; nil
   end
 
-  class Model_ < Brazen_::Model_
+  class Model_ < Brazen_::Model
 
     define_singleton_method :desc, DESC_METHOD_
 
@@ -25,8 +25,6 @@ module Skylab::TanMan
       def entity_module
         Entity_
       end
-
-      public :make_common_properties, :common_properties_class  # b.c doc.ent
 
       def const_get _, __=nil  # local loading hack :(
         if :Silo_Daemon == _ && ! const_defined?( :Silo_Daemon, false )
@@ -99,7 +97,7 @@ module Skylab::TanMan
 
   # ~
 
-  class Action_ < Brazen_::Model_::Action
+  class Action_ < Brazen_::Model.common_action_class
 
     extend( module MM
 
@@ -165,15 +163,15 @@ module Skylab::TanMan
   end
 
 
-  Entity_ = Brazen_.model.entity do
+  Entity_ = Brazen_::Model.common_entity do
 
     # create an entity extension module whose foundation is another entity
     # extension module. effectively we inherit its metaproperties & ad-hoc
     # processors, etc. we may add to them but not (easily) take them away.
 
   end
-
   module Entity_
+
   public
 
     def property_value_via_symbol sym  # abstraction candidate
@@ -338,7 +336,6 @@ module Skylab::TanMan
     end
 
     # ~ all abstraction candidates:
-
 
     def business_property_value sym, & oes_p
 

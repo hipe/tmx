@@ -6,7 +6,7 @@ module Skylab::Cull
 
       @after_name_symbol = :edit
 
-      Brazen_.model.entity self,
+      Brazen_::Model.common_entity self,
 
         :reuse, COMMON_PROPERTIES_,
 

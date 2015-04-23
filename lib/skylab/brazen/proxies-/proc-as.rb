@@ -43,7 +43,8 @@ module Skylab::Brazen
         end
 
         def name_function_class  # #hook-in
-          Brazen_.model.action_class.name_function_class
+
+          Brazen_::Model.common_action_class.name_function_class
         end
 
         def custom_action_inflection
@@ -230,7 +231,7 @@ module Skylab::Brazen
 
             bx.add( name_symbol,
 
-            Brazen_.model.entity::Entity_Property.new do
+            Brazen_::Model.common_entity_module::Entity_Property.new do
 
               @argument_arity = argument_arity
               @name = Callback_::Name.via_variegated_symbol name_symbol

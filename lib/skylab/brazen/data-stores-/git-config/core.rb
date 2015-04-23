@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Data_Stores_::Git_Config < Brazen_::Model_
+  class Data_Stores_::Git_Config < Brazen_::Model
 
     class << self
 
@@ -438,20 +438,20 @@ module Skylab::Brazen
       end
 
       def to_pair_stream
-        d = -1 ; last = @a.length - 1
+
+        d = -1
+        last = @a.length - 1
+
         Callback_.stream do
-          while d < last
+
+          if d < last
             d += 1
             ast = @a.fetch d
-            x = Actual_Property__.new( ast.value_x, ast.external_normal_name_symbol )
-            break
+            Callback_::Pair.new ast.value_x, ast.external_normal_name_symbol
           end
-          x
         end
       end
     end
-
-    Actual_Property__ = Brazen_.model.actual_property
 
     class Assignment_
 

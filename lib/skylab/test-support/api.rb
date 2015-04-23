@@ -10,7 +10,7 @@ module Skylab::TestSupport
       # do we need the below, for support of procs as actions:
 
       def action_class
-        Brazen_.model.action_class
+        Brazen_::Model.common_action_class
       end
     end  # >>
 

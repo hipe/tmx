@@ -6,9 +6,9 @@ module Skylab::Snag
 
     Brazen_ = Snag_.lib_.brazen
 
-    class Actions::To_Stream < Brazen_.model.action_class
+    class Actions::To_Stream < Brazen_::Model.common_action_class
 
-      Brazen_.model.entity self,
+      Brazen_::Model.common_entity self,
 
         :required,
         :property, :upstream_identifier,

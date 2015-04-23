@@ -6,7 +6,7 @@ module Skylab::Treemap
 
       module Actions
 
-        class Ping < Brazen_.model.action_class
+        class Ping < Brazen_::Model.common_action_class
 
           @is_promoted = true
 

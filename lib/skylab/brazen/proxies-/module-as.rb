@@ -68,7 +68,7 @@ module Skylab::Brazen
 
       def to_lower_unbound_action_stream
 
-        _acr = Brazen_::Model_::Lazy_Action_Class_Reflection.new(
+        _acr = Brazen_::Model::Lazy_Action_Class_Reflection.new(
           @cls_pxy,
           @cls_pxy.__mod.const_get( ACTIONS_CONST_, false ) )
 

@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Models_::Source < Brazen_::Model_
+  class Models_::Source < Brazen_::Model
 
     edit_entity_class(
 

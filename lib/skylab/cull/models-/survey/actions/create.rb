@@ -8,7 +8,7 @@ module Skylab::Cull
 
     class Actions::Ping < Action_
 
-      @name_function = Brazen_.model.action_class.name_function_class.new(
+      @name_function = Brazen_::Model.common_action_class.name_function_class.new(
         self, Actions, :Ping )
 
       def produce_result
@@ -32,7 +32,7 @@ module Skylab::Cull
 
       @after_name_symbol = :ping
 
-      Brazen_.model.entity self,
+      Brazen_::Model.common_entity self,
 
         :flag, :property, :dry_run,
 

@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Models_::Workspace
 
-    class Actions::Summarize < Brazen_::Model_::Action
+    class Actions::Summarize < Brazen_::Model::Action
 
       edit_entity_class(
         :property_object, COMMON_PROPERTIES_[ :config_filename ],

@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Model_
+  class Model
 
     class Action_Factory__ < ::Module  # see [#046]
 
@@ -246,7 +246,9 @@ module Skylab::Brazen
         end
 
         def bld_single_entity_resolved_with_ambiguity
+
           build_neutral_event_with :single_entity_resolved_with_ambiguity,
+
               :model, _model_class,
               :describable_source, entity_collection do |y, o|
 

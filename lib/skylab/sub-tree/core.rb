@@ -18,7 +18,7 @@ module Skylab::SubTree
       end )
 
       def action_class_
-        SubTree_.lib_.brazen.model.action_class
+        SubTree_.lib_.brazen::Model.common_action_class
       end
     end  # >>
   end

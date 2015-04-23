@@ -4,11 +4,11 @@ module Skylab::BeautySalon
 
     Actions = ::Module.new
 
-    class Actions::Wrap < Brazen_.model.action_class  # :[#033]., :+[#ba-033]
+    class Actions::Wrap < Brazen_::Model.common_action_class  # :[#033]., :+[#ba-033]
 
       @is_promoted = true
 
-      Brazen_.model.entity self,
+      Brazen_::Model.common_entity self,
 
         :ad_hoc_normalizer, -> arg, & oes_p do
           Normalize_line_ranges___.new( arg, & oes_p ).execute

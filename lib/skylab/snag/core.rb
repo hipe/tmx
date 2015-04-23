@@ -47,7 +47,7 @@ module Skylab::Snag
 
     def action_class  # #hook-out for procs as actions (for name stop index)
 
-      lib_.brazen.model.action_class
+      lib_.brazen::Model.common_action_class
     end
 
     define_method :application_kernel_, ( Callback_.memoize do

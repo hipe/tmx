@@ -45,7 +45,7 @@ module Skylab::TanMan
 
         edit_entity_class :preconditions, [ :workspace, :starter ]
 
-        include Brazen_.model.retrieve_methods
+        include Brazen_::Model.common_retrieve_methods
 
         def produce_result
           produce_one_entity do | * i_a, & ev_p |

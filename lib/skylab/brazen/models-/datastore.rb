@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Models_::Datastore < Brazen_::Model_
+  class Models_::Datastore < Brazen_::Model
 
     edit_entity_class(
 
@@ -17,7 +17,7 @@ module Skylab::Brazen
       end
 
       def init_action_class_reflection
-        @acr = Model_::Lazy_Action_Class_Reflection.new self, Brazen_::Data_Stores_
+        @acr = Brazen_::Model::Lazy_Action_Class_Reflection.new self, Brazen_::Data_Stores_
         true
       end
     end  # >>

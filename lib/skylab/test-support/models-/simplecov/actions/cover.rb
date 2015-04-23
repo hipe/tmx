@@ -13,7 +13,7 @@ if __FILE__ == $PROGRAM_NAME
       TestSupport_ = self
       module API
         Brazen_ = ::Object.new
-        def Brazen_.model
+        def Brazen_::Model
           o = ::Object.new
           def o.entity( * )
           end
@@ -68,7 +68,7 @@ module Skylab::TestSupport
 
         end  # >>
 
-        Brazen_.model.entity self,
+        Brazen_::Model.common_entity self,
 
           :required, :argument_arity, :one_or_more, :property, :arg
 

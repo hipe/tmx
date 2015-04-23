@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Model_
+  class Model
 
     Entity = Brazen_::Entity.call do  # see [#047]
 
@@ -48,19 +48,19 @@ module Skylab::Brazen
 
       o :ad_hoc_processor, :preconditions, -> pc do
         pc.upstream.advance_one
-        a = pc.downstream.precondition_controller_i_a
+        a = pc.downstream.precondition_controller_i_a_
         a_ = pc.upstream.gets_one
         if a
           self._COVER_ME
         else
-          pc.downstream.precondition_controller_i_a = a_
+          pc.downstream.precondition_controller_i_a_ = a_
         end
         KEEP_PARSING_
       end
 
       o :ad_hoc_processor, :precondition, -> pc do
         pc.upstream.advance_one
-        i_a = ( pc.downstream.precondition_controller_i_a ||= [] )
+        i_a = ( pc.downstream.precondition_controller_i_a_ ||= [] )
         i = pc.upstream.gets_one
         i_a.include?( i ) or i_a.push i
         KEEP_PARSING_

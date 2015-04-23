@@ -59,10 +59,6 @@ module Skylab::Brazen
       singleton_class.instance_methods( false ) - [ :members ]
     end
 
-    def model
-      Brazen_::Model_::LIB
-    end
-
     def name_library
       NAME
     end

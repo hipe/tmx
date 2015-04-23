@@ -2,7 +2,7 @@ module Skylab::GitViz
 
   Models_ = ::Module.new  # ~ :+#stowaway (IFF all models in this file)
 
-  Action_ = GitViz_.lib_.brazen.model.action_class
+  Action_ = GitViz_.lib_.brazen::Model.common_action_class
 
   # ->
 
@@ -48,7 +48,7 @@ module Skylab::GitViz
 
       @is_promoted = true
 
-      GitViz_.lib_.brazen.model.entity self,
+      GitViz_.lib_.brazen::Model.common_entity self,
 
         :required, :property, :VCS_adapter_name,
 

@@ -10,7 +10,7 @@ module Skylab::SubTree
 
         @is_promoted = true
 
-        SubTree_.lib_.brazen.model.entity self,
+        SubTree_.lib_.brazen::Model.common_entity self,
 
           :desc, -> y do
             y << "inspired by unix builtin `tree`"

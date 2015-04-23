@@ -4,9 +4,9 @@ module Skylab::Snag
 
     Actions = ::Module.new
 
-    class Actions::To_Stream < Brazen_.model.action_class
+    class Actions::To_Stream < Brazen_::Model.common_action_class
 
-      Brazen_.model.entity self,
+      Brazen_::Model.common_entity self,
 
         :desc, -> y do
           y << 'list the tags for a given node.'

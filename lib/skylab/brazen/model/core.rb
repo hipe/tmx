@@ -1,158 +1,106 @@
 module Skylab::Brazen
 
-  class Model_  # read [#013]
-
-    module LIB
-
-      class << self
-
-        def action_class
-          Model_::Action
-        end
-
-        def actual_property
-          Pair_
-        end
-
-        def common_events
-          Model_::Action_Factory__::Events
-        end
-
-        def entity * a, & p
-          if a.length.nonzero?
-            Model_::Entity.via_nonzero_length_arglist a, & p
-          elsif p
-            Model_::Entity.via( & p )
-          else
-            Model_::Entity
-          end
-        end
-
-        def members
-          singleton_class.instance_methods( false ) - [ :members ]
-        end
-
-        def model_class
-          Model_
-        end
-
-        def name_function_class
-          Model_Name_Function_
-        end
-
-        def retrieve_methods
-          Model_::Action_Factory__.retrieve_methods
-        end
-      end
-    end
-
-    Pair_ = Callback_::Pair
+  class Model  # read [#013]
 
     class << self
-    private
 
-      def edit_entity_class * x_a, & edit_p  # if you are here the class is not yet initted
-        entity_module.call_via_client_class_and_iambic self, x_a, & edit_p
+      # ~ ordering writer (:+#experimental alternative to the iambic DSL)
+
+      def after sym
+        @after_name_symbol = sym ; nil
       end
 
-      def make_common_properties & sess_p
-        Common_Properties__.new entity_module, & sess_p
-      end
+      attr_accessor :after_name_symbol
 
-      def common_properties_class
-        Common_Properties__
-      end
+      # ~ description support
 
-    public
+      attr_accessor :description_block
 
-      def is_branch
-        true  # for now, every model node exists (in the eyes of invocation
-        # engines) only to dispatch each request down to one of its children
-      end
-
-      def is_promoted
-      end
-
-      attr_accessor :after_name_symbol, :description_block,
-        :precondition_controller_i_a
-
-      def natural_key_string
-        properties.fetch NAME_
-      end
-
-      def new_flyweight kernel, & oes_p
-        me = self
-        edit_entity_directly kernel, oes_p do
-          @property_box = Flyweight_Property_Box__.new me
-        end
-      end
-
-      def unmarshalled kernel, oes_p, & edit_p
-        edit_entity_directly kernel, oes_p do
-          @came_from_persistence = true
-        end.first_edit( & edit_p )
-      end
-
-      def edit_entity boundish, oes_p, & edit_p
-        new( boundish, & oes_p ).first_edit( & edit_p )
-      end
-
-      def edit_entity_directly boundish, oes_p, & edit_p
-        o = new boundish, & oes_p
-        o.instance_exec( & edit_p )
-        o
-      end
-
-      def persist_to= i
-        @persist_to_i = i
-      end
-      attr_reader :persist_to_i
-      def persist_to
-        @did_resolve_persist_to ||= resolve_persist_to
-        @persist_to
-      end
-    private
-      def resolve_persist_to
-        @persist_to = if persist_to_i
-          Node_Identifier_.via_symbol @persist_to_i
-        end
-        true
-      end
-    public
-
-      def preconditions
-        @__did_resolve_pcia ||= resolve_precondition_controller_identifer_a
-        @preconditions
-      end
-
-      def resolve_precondition_controller_identifer_a
-        if precondition_controller_i_a
-          a = @precondition_controller_i_a.map do |i|
-            Node_Identifier_.via_symbol i
-          end
-          persist_to and a.push @persist_to
-        elsif persist_to
-          a = [ @persist_to ]
-        end
-        @preconditions = a  # can be nil
-        ACHIEVED_
-      end
+      # ~ model identification
 
       def process_some_customized_inflection_behavior scanner
         Process_customized_model_inflection_behavior__[ scanner, self ]
+      end
+
+      def natural_key_string
+        properties.fetch NAME_
       end
 
       def node_identifier
         @node_id ||= Node_Identifier_.via_name_function name_function, self
       end
 
-    private
-
-      def name_function_class
+      def name_function_class  # #hook-in for above
         Model_Name_Function_
       end
 
-      def make_action_making_actions_module
+      # ~ persistence (reading, writing)
+
+      def unmarshalled kernel, oes_p, & edit_p  # produce an entity from pers.
+
+        edit_entity_directly kernel, oes_p do
+
+          @came_from_persistence = true
+
+        end.first_edit( & edit_p )
+      end
+
+      def persist_to
+
+        @did_resolve_persist_to ||= __resolve_persist_to
+        @persist_to
+      end
+
+      def __resolve_persist_to
+
+        sym = _persist_to_sym
+
+        @persist_to = if sym
+          Node_Identifier_.via_symbol sym
+        end
+
+        ACHIEVED_
+      end
+
+      attr_reader :_persist_to_sym
+
+      def persist_to= sym
+        @_persist_to_sym = sym
+      end
+
+      # ~ preconditions (reading, writing)
+
+      def preconditions
+        @__did_resolve_pcia ||= __resolve_precondition_controller_identifer_a
+        @preconditions
+      end
+
+      def __resolve_precondition_controller_identifer_a
+
+        i_a = precondition_controller_i_a_
+        x = persist_to
+
+        if i_a
+          a = i_a.map do |i|
+            Node_Identifier_.via_symbol i
+          end
+          if x
+            a.push x
+          end
+        elsif x
+          a = [ x ]
+        end
+
+        @preconditions = a  # can be nil
+        ACHIEVED_
+      end
+
+      attr_accessor :precondition_controller_i_a_
+
+      # ~ making actions
+
+      def make_action_making_actions_module  # writer
+
         factory = Model_::Action_Factory__.make self, action_class, entity_module
         const_set :Factory___, factory
         factory.make_actions_module
@@ -162,6 +110,52 @@ module Skylab::Brazen
         main_model_class.const_get :Action, false
       end
 
+      # ~ producing entities
+
+      def new_flyweight kernel, & oes_p
+
+        me = self
+        edit_entity_directly kernel, oes_p do
+          @property_box = Flyweight_Property_Box__.new me
+        end
+      end
+
+      def edit_entity boundish, oes_p, & edit_p
+
+        new( boundish, & oes_p ).first_edit( & edit_p )
+      end
+
+      def edit_entity_directly boundish, oes_p, & edit_p
+
+        o = new boundish, & oes_p
+        o.instance_exec( & edit_p )
+        o
+      end
+
+      # ~~ editing self as an entity
+
+      def edit_entity_class * x_a, & edit_p
+
+        entity_module.call_via_client_class_and_iambic self, x_a, & edit_p
+      end
+
+      # ~~ making & enhancing entity nodes
+
+      def entity * a, & edit_p  # :+#cp:here
+
+        if a.length.nonzero?
+          entity_module.via_nonzero_length_arglist a, & edit_p
+
+        elsif edit_p
+          entity_module.via( & edit_p )
+
+        else
+          self._FIX_ME
+        end
+      end
+
+      # ~~ support
+
       def entity_module
         main_model_class.const_get :Entity, false
       end
@@ -170,10 +164,54 @@ module Skylab::Brazen
         superclass
       end
 
-      # ~ experimental alternative do the iambic DSL
+      # ~ static properties
 
-      def after sym
-        @after_name_symbol = sym ; nil
+      def is_branch
+        true  # for now, every model node exists (in the eyes of invocation
+        # engines) only to dispatch each request down to one of its children
+      end
+
+      def is_promoted
+        NIL_
+      end
+
+      # Library Exposures
+
+      def common_action_class
+        Model_::Action
+      end
+
+      def common_entity * a, & edit_p  # :+#cp:here
+
+        if a.length.nonzero?
+          common_entity_module.via_nonzero_length_arglist a, & edit_p
+
+        elsif edit_p
+          common_entity_module.via( & edit_p )
+
+        else
+          self._FIX_ME
+        end
+      end
+
+      def common_entity_module
+        Model_::Entity
+      end
+
+      def common_events
+        Model_::Action_Factory__::Events
+      end
+
+      def make_common_properties & edit_p
+        common_properties_class.new entity_module, & edit_p
+      end
+
+      def common_properties_class
+        Common_Properties___
+      end
+
+      def common_retrieve_methods
+        Model_::Action_Factory__.retrieve_methods
       end
     end  # >>
 
@@ -286,7 +324,7 @@ module Skylab::Brazen
 
     def to_full_pair_stream
       Callback_::Stream.via_nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
-        Pair_.new any_property_value( i ), i
+        Callback_::Pair.new any_property_value( i ), i
       end
     end
 
@@ -942,7 +980,7 @@ module Skylab::Brazen
 
     # ~
 
-    class Common_Properties__ < ::Module
+    class Common_Properties___ < ::Module
 
       def initialize entity_module, & sess_p
 
@@ -1013,5 +1051,7 @@ module Skylab::Brazen
         self
       end
     end
+
+    Model_ = self
   end
 end

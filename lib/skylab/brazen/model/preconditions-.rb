@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Model_
+  class Model
 
     module Preconditions_
 

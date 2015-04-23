@@ -1,6 +1,6 @@
 module Skylab::BeautySalon
 
-  class Models_::Deliterate < BS_.lib_.brazen.model.action_class
+  class Models_::Deliterate < BS_.lib_.brazen::Model.common_action_class
 
     Actions = THE_EMPTY_MODULE_
 
@@ -52,7 +52,7 @@ module Skylab::BeautySalon
       O
     end
 
-    Brazen_.model.entity self, :properties,
+    Brazen_::Model.common_entity self, :properties,
           :input_path,
           :input_stream,
           :from_line,
@@ -84,7 +84,7 @@ module Skylab::BeautySalon
 
     def normalize_as_integers
       ok = true
-      integer = Brazen_.model.entity.normalizers.number.instance
+      integer = Brazen_::Model.common_entity.normalizers.number.instance
 
       @range.each do | arg |
 

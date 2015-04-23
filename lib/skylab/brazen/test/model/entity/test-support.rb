@@ -42,10 +42,11 @@ module Skylab::Brazen::TestSupport::Model::Entity
   end
 
   Subject_ = -> * a, & p do
+
     if a.length.nonzero? || p
-      Brazen_.model.entity.via_nonzero_length_arglist a, & p
+      Brazen_::Model.common_entity( * a, & p )
     else
-      Brazen_.model.entity
+      Brazen_::Model.common_entity_module
     end
   end
 end

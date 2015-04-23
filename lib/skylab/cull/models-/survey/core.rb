@@ -390,7 +390,7 @@ module Skylab::Cull
 
     module Survey_Action_Methods_
 
-      Brazen_.model.entity self do
+      Brazen_::Model.common_entity self do
 
         entity_property_class_for_write
 

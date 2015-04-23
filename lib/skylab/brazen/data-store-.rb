@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   module Data_Store_
 
-    class Model_ < Brazen_::Model_
+    class Model_ < Brazen_::Model
 
       class << self
         def main_model_class
@@ -14,7 +14,7 @@ module Skylab::Brazen
 
     end
 
-    class Action < Brazen_::Model_::Action
+    class Action < Brazen_::Model::Action
 
       NAME_STOP_INDEX = 1
 

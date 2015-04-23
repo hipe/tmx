@@ -591,14 +591,17 @@ module Skylab::Brazen
       end
 
       def touch_extends_and_includes_on_client_class cls
-        if cls.respond_to? :edit_entity_class
+
+        if cls.respond_to? :active_entity_edit_session
           did_already = true
         else
           Callback_::Actor.methodic cls
           cls.extend Module_Methods__
         end
+
         cls.extend self::Module_Methods
         cls.include self
+
         if did_already
           _my_box = self::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___
           _their_box = cls.entity_formal_property_method_names_box_for_write
@@ -606,7 +609,8 @@ module Skylab::Brazen
         else
           cls.entity_formal_property_method_names_box_for_write  # copy them now
         end
-        nil
+
+        NIL_
       end
     end
 

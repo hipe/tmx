@@ -59,9 +59,9 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
   Brazen_ = ::Skylab::Brazen
 
-  class Action__ < Brazen_.model.action_class
+  class Action__ < Brazen_::Model.common_action_class
 
-    Brazen_.model.entity self
+    Brazen_::Model.common_entity self
 
   end
 
@@ -621,7 +621,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
       end
     end
 
-    def __resolve_compiled_grammar_file  # _DOG_EAR
+    def __resolve_compiled_grammar_file
 
       if @filesystem.exist? @compiled_grammar_path
 

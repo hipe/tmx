@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Models_::Workspace < Brazen_::Model_  # see [#055]
+  class Models_::Workspace < Brazen_::Model  # see [#055]
 
     edit_entity_class(
 
@@ -189,7 +189,7 @@ module Skylab::Brazen
 
     module Actions
 
-      class Ping < Brazen_::Model_::Action
+      class Ping < Brazen_::Model::Action
 
         def produce_result
           maybe_send_event :payload, :ping do

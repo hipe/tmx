@@ -16,7 +16,7 @@ module Skylab::SubTree
 
       @is_promoted = true
 
-      SubTree_.lib_.brazen.model.entity self,
+      SubTree_.lib_.brazen::Model.common_entity self,
 
         :argument_arity, :one_or_more,
 

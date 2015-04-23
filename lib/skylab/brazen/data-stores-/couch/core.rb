@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Data_Stores_::Couch < Brazen_::Data_Store_::Model_  # see [#038]
 
-    Brazen_::Model_::Entity.call self do
+    Brazen_::Model::Entity.call self do
 
       o :desc, -> y do
         y << "manage couch datastores."
@@ -75,7 +75,7 @@ module Skylab::Brazen
 
       Rm = make_action_class :Delete do
 
-        Brazen_::Model_::Entity.call self do
+        Brazen_::Model::Entity.call self do
 
           o :description,
             -> y do

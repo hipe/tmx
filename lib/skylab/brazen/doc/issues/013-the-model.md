@@ -9,6 +9,8 @@ API iff it has an 'actions' node.  we take a nasty peak into the
 filesystem here for now.
 
 
+
+
 ## :#two.
 
 each given action node under the 'actions' node either does or does not
@@ -64,6 +66,8 @@ entry for itself.
 
 to summarize the above 4 points, the model node will promote itself IFF
 it has a nonzero number of child nodes that did not promote themselves.
+
+
 
 
 ## :#three.
