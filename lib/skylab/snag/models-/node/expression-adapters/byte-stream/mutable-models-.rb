@@ -70,6 +70,27 @@ module Skylab::Snag
           ACHIEVED_
         end
 
+        def __remove__object_ obj, & oes_p
+
+          did = false
+          x = nil
+
+          @row_a.each_with_index do | row, d |
+
+            d_ = row.detect_index_of_equivalent_object_ obj
+            if d_
+              row = _mutable_row_at_index d
+              a = row.o_a_
+              x = a.fetch d_
+              a[ d_, 1 ] = EMPTY_A_
+              did = true
+              break
+            end
+          end
+
+          did && x
+        end
+
         def _mutable_row_at_index d
 
           x = @row_a.fetch d

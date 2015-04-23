@@ -10,6 +10,8 @@ module Skylab::Headless
 
         alias_method :init_pathname, :initialize
 
+        # <- 2
+
     include Headless_::Library_::FileUtils
 
     Headless_.lib_.entity self do
@@ -95,9 +97,9 @@ module Skylab::Headless
 
     def copy pathname, dest_basename=nil
       source = ::Pathname.new pathname.to_s
-      dest = join( dest_basename || source.basename ) # where to? (basename)
+      dest = join dest_basename || source.basename
       cp source.to_s, dest.to_s, noop: @is_noop, verbose: @be_verbose
-      nil # result is undefined for now -- we might turn it into etc
+      dest
     end
 
     def mkdir path_tail, opt_h=nil
@@ -379,6 +381,8 @@ module Skylab::Headless
     def dirname
       @to_pathname.dirname
     end
+
+    # -> 2
 
       end
     end

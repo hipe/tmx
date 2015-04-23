@@ -116,6 +116,16 @@ module Skylab::Snag::TestSupport
     end
   end
 
+  Downstream_Identifier_To_Output_String = -> tcm do
+
+    tcm.send :define_method, :init_and_produce_DS_ID_ do
+
+      s = ""
+      @output_s = s
+      Snag_.lib_.basic::String::Byte_Downstream_Identifier.new s
+    end
+  end
+
   Expect_My_CLI = -> do
 
     p = -> tcm do

@@ -6,6 +6,7 @@ module Skylab::Snag::TestSupport
 
     extend TS_
     use :expect_event
+    use :downstream_identifier_to_output_string
 
     context "(with this manifest)" do
 
@@ -58,7 +59,7 @@ module Skylab::Snag::TestSupport
       it "to [#07] append tag '2014-ok'" do
 
         _call :node_identifier, 7, :tag, '2014-ok',
-          :downstream_identifier, _init_and_produce_DS_ID
+          :downstream_identifier, init_and_produce_DS_ID_
 
         scn = TestSupport_::Expect_Line::Scanner.via_string @output_s
         scn.next_line.should eql "[#03] this is three\n"
@@ -79,13 +80,6 @@ module Skylab::Snag::TestSupport
 
         call_API_via_iambic x_a, & x_p
         NIL_
-      end
-
-      def _init_and_produce_DS_ID
-
-        s = ""
-        @output_s = s
-        Snag_.lib_.basic::String::Byte_Downstream_Identifier.new s
       end
     end
   end

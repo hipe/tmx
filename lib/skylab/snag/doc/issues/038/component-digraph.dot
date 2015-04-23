@@ -8,7 +8,7 @@ subgraph cluster_main {
     label="tag actions"
     tl [label="17. list" style=filled]
     ta [label="18. create" style=filled]
-    tr [label="delete"]
+    tr [label="19. delete" style=filled]
   }
 
   aa [label="open" ]

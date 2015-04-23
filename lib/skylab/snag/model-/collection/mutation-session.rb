@@ -146,8 +146,8 @@ module Skylab::Snag
         @on_event_selectively.call :error, :entity_already_added do
 
           _event_class( :entity_already_added ).new_with(
-            :entity_collection, @_collection,
-            :entity, @_entity )
+            :entity, @_entity,
+            :entity_collection, @_collection )
         end
         UNABLE_
       end
@@ -170,8 +170,37 @@ module Skylab::Snag
 
         if ok
           @_collection.collection_was_changed_by_mutation_session_ = true
+
+          if :remove == @_verb_symbol
+            __maybe_emit_removed_entity_event ok
+          end
+
+        elsif :remove == @_verb_symbol
+          ok = __when_not_found
         end
         ok
+      end
+
+      def __maybe_emit_removed_entity_event ent
+
+        @on_event_selectively.call :info, :entity_removed do
+
+          _event_class( :entity_removed ).new_with(
+            :entity, ent,
+            :entity_collection, @_collection )
+        end
+        NIL_
+      end
+
+      def __when_not_found
+
+        @on_event_selectively.call :error, :entity_not_found do
+
+          _event_class( :entity_not_found ).new_with(
+            :entity, @_entity,
+            :entity_collection, @_collection )
+        end
+        UNABLE_
       end
 
       def _event_class sym  # (placeholder)

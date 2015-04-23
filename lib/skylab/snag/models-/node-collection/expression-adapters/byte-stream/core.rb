@@ -115,7 +115,11 @@ module Skylab::Snag
           Expression_Adapters::Filesystem::Extended_Content_Adapter.
             new_via_manifest_path_and_filesystem(
               @byte_upstream_ID.path,
-              Snag_.lib_.system.filesystem )
+              filesystem_ )
+        end
+
+        def filesystem_
+          Snag_.lib_.system.filesystem
         end
       end
 

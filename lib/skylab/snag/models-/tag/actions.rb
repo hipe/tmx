@@ -46,12 +46,10 @@ module Skylab::Snag
       )
 
       def produce_result
-
-        _ok = __resolve_node_collection_and_node_
-        _ok && __via_all
+        _resolve_all_
       end
 
-      def __via_all
+      def _via_all_
 
         h = @argument_box.h_
 
@@ -65,11 +63,45 @@ module Skylab::Snag
 
           & handle_event_selectively
 
-        _ok && __persist_
+        _ok && _persist_
+      end
+    end
+
+    class Actions::Delete < Tag_Action__
+
+      edit_entity_class(
+
+        :desc, -> y do
+          y << 'remove a tag from a node.'
+        end,
+
+        :property, :downstream_identifier,
+        :required, :property, :upstream_identifier,
+        :required, :property, :node_identifier,
+        :required, :property, :tag
+      )
+
+      def produce_result
+        _resolve_all_
+      end
+
+      def _via_all_
+
+        _h = @argument_box.h_
+
+        _ok = @node.edit :remove, :tag, :mixed, _h[ :tag ],
+          & handle_event_selectively
+
+        _ok && _persist_
       end
     end
 
     class Tag_Action__
+
+      def _resolve_all_
+        _ok = __resolve_node_collection_and_node_
+        _ok && _via_all_
+      end
 
       def __resolve_node_only_
 
@@ -122,7 +154,7 @@ module Skylab::Snag
         end
       end
 
-      def __persist_
+      def _persist_
 
         @node_collection.persist_entity(
           @argument_box,

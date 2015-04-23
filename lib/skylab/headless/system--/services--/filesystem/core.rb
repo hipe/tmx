@@ -55,6 +55,10 @@ module Skylab::Headless
         ::Dir.mkdir path, * int
       end
 
+      def copy src_s, dst_s
+        ::File.copy_stream src_s, dst_s
+      end
+
       def open filename, * rest, & p
         ::File.open filename, * rest, & p
       end

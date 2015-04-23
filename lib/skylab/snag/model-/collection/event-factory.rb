@@ -56,25 +56,51 @@ module Skylab::Snag
 
         :entity_not_found,
 
-        :xxx_o, nil
+        :entity, nil,
+        :entity_collection, nil,
+
+        :error_category, :key_error,
+        :ok, false
 
       ) do | y, o |
 
-        self._REVIEW
-        y << "#{ val o.identifier.render } is not tagged with #{
-          }#{ ick o.tag_s }"
+        a = []
+        subject = o.entity_collection.description_under self
+        subject and a.push subject
+
+        a.push 'does not have'  # (one day [#015])
+
+        object = o.entity.description_under self
+        object and a.push object
+
+        y << ( a * SPACE_ )
       end
 
       Entity_Removed = Callback_::Event.prototype_with(
 
         :entity_removed,
 
-        :tag_o, nil
+        :entity, nil,
+        :entity_collection, nil,
+
+        :is_completion, true,  # remember this? hehe
+        :ok, true
 
       ) do | y, o |
 
-        self._REVIEW
-        y << "removed #{ val o.rendered }"
+        a = []
+
+        a.push 'removed'  # (one day [#015])
+
+        object = o.entity.description_under self
+        object and a.push object
+
+        subject = o.entity_collection.description_under self
+        if subject
+          a.push 'from', subject
+        end
+
+        y << ( a * SPACE_ )
       end
     end
   end
