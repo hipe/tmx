@@ -1,26 +1,25 @@
 module Skylab::Snag
 
-  class Models::Manifest
+  module Models_::Node_Collection
 
-    class Node_edit__ < Agent_
+    module Expression_Adapters::Byte_Stream
 
-      Snag_.lib_.basic_fields :client, self,
-        :absorber, :absrb_iambic_fully,
-        :field_i_a, [ :is_dry_run, :verbose_x ]
+      class Actors_::Replace_node
 
-      def initialize x_a
-        @node, @client, @delegate = x_a.shift 3
-        x_a.length.nonzero? and absrb_iambic_fully x_a
-      end
+        Callback_::Actor.call self, :properties, :bx, :node, :collection
 
-      def execute
-        Manifest_::Line_edit_[
-          :at_position_x, @node.identifier.render,
-          :new_line_a, @client.render_line_a( nil, @node ),
-          :is_dry_run, @is_dry_run,
-          :verbose_x, @verbose_x,
-          :client, @client,
-          :delegate, @delegate ]
+        def execute
+
+          o = BS_::Sessions_::Rewrite_Stream_End_to_End.new(
+            @bx, @node, @collection, & @on_event_selectively )
+
+          ok = o.start_the_output_stream
+          ok &&= o.write_each_node_until_the_subject_node_is_found
+          ok &&= o.write_the_new_node
+          ok &&= o.write_the_remaining_nodes
+          ok && o.finish_the_output_stream
+
+        end
       end
     end
   end

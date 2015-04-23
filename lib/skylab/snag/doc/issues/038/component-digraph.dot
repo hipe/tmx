@@ -6,14 +6,13 @@ subgraph cluster_main {
 
   subgraph cluster_tag_actions {
     label="tag actions"
-    tl [label="17. list\n(of node)"]
-    ta [label="add" ]
-    tr [label="remove"]
+    tl [label="17. list" style=filled]
+    ta [label="18. create" style=filled]
+    tr [label="delete"]
   }
 
-
-  aa [label="open node\naction" ]
-  ca [label="close node\naction" ]
+  aa [label="open" ]
+  ca [label="close" ]
   de [label="15. design & implement\ncriteria implementation" style=filled]
   FS [label="14. expose the\nfilesystem" style=filled]
   line_upstream [label="11. line\nupstream" style=filled]
@@ -21,8 +20,8 @@ subgraph cluster_main {
   node_identifier_model [label="9. node identifier\nmodel" style=filled]
   node_model [label="10. node model" style=filled]
   node_upstream [label="11. node\nupstream" style=filled]
-  oaa [label="ordinary\nadd action"]
-  rea [label="reappropriation\nintegrated into an\n\"add\" action" ]
+  oaa [label="create"]
+  rea [label="integrated" ]
   rea_actor [label="find any best existing\nreappropriable node" ]
   stru [label="13. experimental support\nfor structured tags" style=filled]
   tag_model [label="10. tag model" style=filled]

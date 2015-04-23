@@ -27,35 +27,6 @@ module Skylab::Snag
 
   class CLI::Actions::Node::Actions::Tags < CLI::Action_::Box
 
-    box.desc 'actions for tags on a given node'
-
-    desc 'add a tag to a node.'
-
-    option_parser do |o|
-      dry_run_option o
-
-      o.on '-p', '--prepend', "prepend, as opposed to append, the tag #{
-        }to the message" do @param_h[:do_append] = false end
-
-      verbose_option o
-    end
-
-    inflection.inflect.noun :singular
-
-    def add node_ref, tag_name
-      call_API [ :node, :tags, :add ], {
-                 be_verbose: false,
-                  do_append: true,
-                    dry_run: false,
-                   node_ref: node_ref,
-                   tag_name: tag_name,
-                working_dir: working_directory_path
-      }.merge( @param_h ) do |o|
-        o.on_error_event handle_error_event
-        o.on_info_event handle_info_event
-      end
-    end
-
     desc 'remove a tag from a node.'
 
     option_parser do |o|

@@ -36,39 +36,37 @@ module Skylab::Snag
           @row_a
         end
 
-        def prepend_object obj, & oes_p
+        def __prepend__object_ obj, & oes_p
 
-          o_a = _mutable_row_at_index( @r.begin ).o_a_
-          if o_a.length.nonzero?
-            o = o_a.first
+          a = _mutable_row_at_index( @r.begin ).o_a_
+          if a.length.nonzero?
+            o = a.first
             if :space == o.category_symbol
-              if WS__ !~ o.to_s[ 0 ]
-                self._REDO
-                o.to_s[ 0, 0 ] = SPACE_  # you can just
+              if WS__ !~ o.mutable_string[ 0 ]
+                o.mutable_string[ 0, 0 ] = SPACE_
               end
             else
-              o_a.unshift Snag_::Models::Hashtag::String_Piece.new SPACE_
+              a.unshift Snag_::Models::Hashtag::String_Piece.new SPACE_
             end
           end
-          o_a.unshift obj
+          a.unshift obj
           ACHIEVED_
         end
 
-        def append_object obj, & oes_p
+        def __append__object_ obj, & oes_p
 
-          o_a = _mutable_row_at_index( @r.end - 1 ).o_a_
-          if o_a.length.nonzero?
-            o = o_a.last
+          a = _mutable_row_at_index( @r.end - 1 ).o_a_
+          if a.length.nonzero?
+            o = a.last
             if :space == o.category_symbol
-              if WS__ !~ o.to_s[ -1 ]
-                self._REDO
-                o.to_s.concat SPACE_  # you can just
+              if WS__ !~ o.mutable_string[ -1 ]
+                o.mutable_string.concat SPACE_
               end
             else
-              o_a.push Snag_::Models::Hashtag::String_Piece.new SPACE_
+              a.push Snag_::Models::Hashtag::String_Piece.new SPACE_
             end
           end
-          o_a.push obj
+          a.push obj
           ACHIEVED_
         end
 

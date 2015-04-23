@@ -38,18 +38,16 @@ module Skylab::Snag
       def __via_node_collection nc
 
         h = @argument_box.h_
+        id_o = h[ :identifier ]
+        if id_o
 
-        st = nc.to_node_stream( & handle_event_selectively )
-        st and begin
+         id_o.respond_to?( :suffix ) or self._SANITY  # prop needs a better name
 
-          id_o = h[ :identifier ]
-          if id_o
+          nc.entity_via_identifier_object id_o, & handle_event_selectively
+        else
 
-            __first_by st do | node |
-
-              id_o == node.ID
-            end
-          else
+          st = nc.to_node_stream( & handle_event_selectively )
+          st and begin
             d = h[ :number_limit ]
             if d
               __limit_by_count d, st
@@ -66,36 +64,15 @@ module Skylab::Snag
 
         Callback_::Stream.new st.upstream do
 
-          if count < end_
+          if end_ > count
             x = st.gets
             if x
               count += 1
+              x
             end
-            x
           end
         end
       end
-
-      def __first_by st, & p
-
-        # #todo:during:node-critera
-
-        begin
-          node = st.gets
-          node or break
-
-          _yes = p[ node ]
-          if _yes
-            st.upstream.release_resource
-            break
-          end
-          redo
-        end while nil
-        node
-      end
-
-      # send_info_string "found #{ valid_count } valid of #{ all_count } total nodes."
-
     end
   end
 end

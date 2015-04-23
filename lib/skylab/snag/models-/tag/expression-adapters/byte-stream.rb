@@ -8,7 +8,7 @@ module Skylab::Snag
 
         def express_into_under_of_ y, expag, tag
           y << "#{ HASHTAG_PREFIX___ }#{ tag.intern }"  # :+[#007]
-          NIL_
+          ACHIEVED_
         end
       end  # >>
 
@@ -23,6 +23,7 @@ module Skylab::Snag
         # same object), experimentally we duplicate some code from [#056]
 
         def initialize
+          @value_is_known_is_known = nil
           @value_is_known = nil
         end
 

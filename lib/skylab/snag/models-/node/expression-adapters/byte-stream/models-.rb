@@ -24,6 +24,28 @@ module Skylab::Snag
           BS_::Mutable_Models_::Substring.new @begin, @end, @s.dup
         end
 
+        def detect_index_of_equivalent_object_ obj
+
+          d = -1
+          st = to_object_stream_
+          sym = obj.category_symbol
+
+          begin
+            o = st.gets
+            o or break
+            d += 1
+            if sym == o.category_symbol
+              if obj == o
+                found_d = d
+                break
+              end
+            end
+            redo
+          end while nil
+
+          found_d
+        end
+
         def to_simple_stream_of_objects_
 
           # for one line of one node, produce the strings and tags. this
@@ -78,6 +100,32 @@ module Skylab::Snag
             via_range_and_substring_array__( @r, @sstr_a.dup )
         end
 
+        def express_N_units_into_under_ d, y, expag
+
+          :Byte_Stream == expag.modality_const or self._DO_ME
+
+          stay = if d && -1 != d
+            if 0 > d
+              d = 0
+            end
+            -> do
+              if d.nonzero?
+                d -= 1
+                true
+              end
+            end
+          else
+            MONADIC_TRUTH_
+          end
+
+          @sstr_a.each do | substring_o |
+            stay[] or break
+            y << substring_o.s
+          end
+
+          ACHIEVED_
+        end
+
         def entity_stream_via_model cls
 
           sym = cls.category_symbol
@@ -102,6 +150,8 @@ module Skylab::Snag
             a.fetch d
           end
         end
+
+        MONADIC_TRUTH_ = -> { true }
       end
     end
   end

@@ -6,6 +6,18 @@ module Skylab::Snag
 
     class << self
 
+      def try_convert x, & oes_p
+
+        _arg = Callback_::Pair.new x
+
+        arg_ = Expression_Adapters::User_Argument.interpret_out_of_under_(
+          _arg, nil, & oes_p )
+
+        arg_ and begin
+          arg_.value_x
+        end
+      end
+
       def new_via_integer d
         new nil, d
       end
@@ -68,9 +80,21 @@ module Skylab::Snag
 
         def express_into_under_of_ y, expag, id
 
-          y << "#{ OPEN_SEQUENCE__ }#{
+          _s = if expag.respond_to? :identifier_integer_width
+
             "%0#{ expag.identifier_integer_width }d" % id.to_i
-            }#{ CLOSE_SEQUENCE__ }"
+          else
+            id.to_i.to_s
+          end
+
+          sfx = id.suffix
+          if sfx
+            _s_ = sfx.description_under expag
+          end
+
+          y << "#{ OPEN_SEQUENCE__ }#{ _s }#{ _s_ }#{ CLOSE_SEQUENCE__ }"
+
+          ACHIEVED_
         end
       end  # >>
     end
@@ -182,7 +206,13 @@ module Skylab::Snag
 
     attr_reader :suffix, :to_i
 
-    define_method :express_into_under, EXPRESS_INTO_UNDER_
+    def description_under expag
+
+      y = expag.new_expression_context
+      y << "identifier "  # ick/meh
+      express_into_under y, expag
+      y
+    end
 
     def == otr
       ( self <=> otr ).zero?
@@ -231,9 +261,9 @@ module Skylab::Snag
 
     # ~ end suffixes
 
-    module Expression_Adapters
-      EN = nil
-    end
+    include Expression_Methods_
+
+    Expression_Adapters::EN = nil
 
     NI_ = self
   end

@@ -2,10 +2,6 @@ module Skylab::Snag
 
   module Models_::Node_Collection
 
-    Actions = THE_EMPTY_MODULE_
-
-    Autoloader_[ Expression_Adapters = ::Module.new ]
-
     if false
 
     def add message, do_prepend_open_tag, dry_run, verbose_x, delegate
@@ -57,8 +53,11 @@ module Skylab::Snag
       end
     end
 
+    Actions = THE_EMPTY_MODULE_
+
     module Expression_Adapters
       EN = nil
+      Autoloader_[ self ]
     end
 
     NC_ = self

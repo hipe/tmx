@@ -91,18 +91,16 @@ module Skylab::Snag
       :hello_from_snag
     end
 
-    Tag_Collection = :NO  # #todo:near-step:11
-
     Autoloader_[ self, :boxxy ]
   end
 
-  EXPRESS_INTO_UNDER_ = -> y, expag do
-
-    self.class::Expression_Adapters.const_get( expag.modality_const, false ).
-      express_into_under_of_ y, expag, self
-  end
-
   module Expression_Methods_
+
+    def description_under expag
+      y = expag.new_expression_context
+      express_into_under y, expag
+      y
+    end
 
     def express_into_under y, expag
 
@@ -115,7 +113,10 @@ module Skylab::Snag
     end
 
     def _expad_for expag
-      self.class::Expression_Adapters.const_get expag.modality_const, false
+
+      _const = expag.modality_const || :Byte_Stream
+
+      self.class::Expression_Adapters.const_get _const, false
     end
   end
 
@@ -124,6 +125,11 @@ module Skylab::Snag
     self::Expression_Adapters.const_get( moda.intern, false ).
 
       interpret_out_of_under_ x, moda, & oes_p
+  end
+
+  module Model_
+    Autoloader_[ Collection = ::Module.new ]
+    Autoloader_[ self ]
   end
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]

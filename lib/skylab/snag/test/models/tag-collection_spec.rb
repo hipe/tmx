@@ -117,8 +117,8 @@ module Skylab::Snag::TestSupport
     end
 
     def _expag d, d_, d__
-      Snag_::Models_::Node::Expression_Adapters::Byte_Stream::Sessions_::Expag___.
-        new( d, d_, d__ )
+      Snag_::Models_::Node_Collection::Expression_Adapters::
+        Byte_Stream::Expression_Agent_.new d, d_, d__
     end
 
     def _id d

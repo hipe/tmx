@@ -3,7 +3,7 @@
 [#067]       #parent-node: [#057] model support
 [#066] #open modernify events (we have a native implementation)
              ( #was: the actor dream, moved to [cb] )
-[#065] #open tall stacks swallow error results (most of these tests)
+[#065]       ( #was: tall stacks swallow error results (most of these tests) )
 [#064] #open hide `ping` action
 [#063]       #parent-node: [#057] the melt narrative ..
 [#062]       #parent-node: [#046] on success a cb's false-ish may be upgraded
@@ -58,7 +58,8 @@
 [#018]       #done functionality, interface for closing an issue
 [#017]       #parent-node: [#046] a cb error result may be translated
 [#016]       #done remove fixed field requirement
-[#015]       #done rearch to find issues.md
+[#015]       one day tie EN-like expression adaters in with etc ..
+             ( #was: #done rearch to find issues.md )
 [#014]       #done open issue report
 [#013] #open overreach - #waiting-for: [#005]
              ( #was: #done shortcut to open issue )

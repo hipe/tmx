@@ -16,31 +16,15 @@ module Skylab::Snag
 
           if body.is_mutable
             if :Byte_Stream == body.modality_const
-              Sessions_::Delineate[ d, y, expag, node ]
+              BS_::Sessions_::Delineate[ d, y, expag, node ]
             else
-              Sessions_::Delineate.new_with( d, y, expag, node ).execute_agnostic
+              BS_::Sessions_::Delineate.new_with( d, y, expag, node ).execute_agnostic
             end
           else
-            self.__TODO_express_immutable_body
+            body.express_N_units_into_under_ d, y, expag
           end
         end
       end  # >>
-
-      Autoloader_[ Sessions_ = ::Module.new ]
-
-      class Sessions_::Expag___  # will integrate
-
-        def initialize d, d_, d__
-
-          @identifier_integer_width = d__
-          @sub_margin_width = d_
-          @width = d
-          @modality_const = :Byte_Stream
-        end
-
-        attr_reader :identifier_integer_width, :modality_const,
-          :sub_margin_width, :width
-      end
 
       Actors_ = ::Module.new
 

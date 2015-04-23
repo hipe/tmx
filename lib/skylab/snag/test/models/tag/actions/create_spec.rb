@@ -2,67 +2,90 @@ require_relative '../../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - tag - actions - add", wip: true do
+  describe "[sg] models - tag - actions - create" do
 
     extend TS_
+    use :expect_event
 
     context "(with this manifest)" do
 
-      with_manifest <<-O.unindent
-        [#003] this is three
-        [#001] this is one #hi
-      O
+      it "the node identifier must be well-formed" do
 
-      it "0)" do
-        do_not_setup_tmpdir
-        invoke 'add'
-        expect %r(\Aexpecting: <node-ref>)i
+        _call :node_identifier, 'ziffy', :tag, :x
+
+        _ev = expect_not_OK_event :uninterpretable_under_number_set
+
+        black_and_white( _ev ).should eql(
+          "'node-identifier-number-component' #{
+            }must be a non-negative integer, had 'ziffy'" )
+
+        expect_failed
       end
 
-      it "1.4)"
-      false and begin
+      it "the node identifier's referrant must resolve" do
+
+        _call :node_identifier, '00002', :tag, :x
+
+        black_and_white( expect_not_OK_event :entity_not_found ).should match(
+          %r(\Athere is no node with identifier \[#2\]) )
+
+        expect_failed
+      end
+
+      it "the tag must be well-formed" do
+
         debug!
-        invoke 'add', '-h'
+
+        _call :node_identifier, 3, :tag, 'foo bar'
+
+        black_and_white( expect_not_OK_event :invalid_tag_stem ).should eql(
+          "tag must be alphanumeric separated with dashes - #{
+            }invalid tag name: '#foo bar'" )
+
+        expect_failed
       end
 
-      it "1.3)" do
-        do_not_setup_tmpdir
-        invoke 'add', 'x'
-        expect %r(\Aexpecting:? <tag-name>)i
+      it "it won't let you add a tag redundantly [#001] 'hi'" do
+
+        _call :node_identifier, 1, :tag, 'hi'
+
+        _ev = expect_not_OK_event :entity_already_added
+        black_and_white( _ev ).should eql "[#1] already has #hi"
+
+        expect_failed
       end
 
-      it "2.1x1)" do
-        do_not_setup_tmpdir
-        invoke 'add', 'x', 'y'
-        expect %r(\A#{ failed }invalid identifier name \"x\")i
+      it "to [#07] append tag '2014-ok'" do
+
+        _call :node_identifier, 7, :tag, '2014-ok',
+          :downstream_identifier, _init_and_produce_DS_ID
+
+        scn = TestSupport_::Expect_Line::Scanner.via_string @output_s
+        scn.next_line.should eql "[#03] this is three\n"
+        scn.next_line.should eql "        zygote\n"
+        scn.next_line.should eql "[#07] seven #hello in the middle #hi\n"  # NOTE untouched
+        scn.next_line.should eql "             bizmark wee #2014-ok\n"
+        scn.next_line.should eql "[#01] this is one #hi\n"
+        scn.next_line.should be_nil
+
+        expect_succeeded
       end
 
-      it "2.3x1) (not found)" do
-        do_not_setup_tmpdir
-        invoke 'add', '[#002]', 'x'
-        expect %r(\A#{ failed }there is no node with identifier .*"002")i
+      def _call * x_a, & x_p
+
+        x_a.unshift :tag, :create,
+          :upstream_identifier,
+          Fixture_file_[ :for_tag_create_mani ]
+
+        call_API_via_iambic x_a, & x_p
+        NIL_
       end
 
-      it "2.3x1)" do
-        setup_tmpdir_read_only
-        invoke 'add', '[#003]', 'foo bar'
-        expect %r(\A#{ failed }tag must be alphanumeric #{
-          }separated with dashes - invalid tag name: "#foo bar")i
-      end
+      def _init_and_produce_DS_ID
 
-      it "2.3x3)" do
-        invoke 'add', '[#003]', '2014-ok'
-        expect %r(\Awhile adding tag, appended #2014-ok)i
-      end
-
-      it "2.3x3) (when redundant)" do
-        setup_tmpdir_read_only
-        invoke 'add', '[#001]', 'hi'
-        expect %r(\A#{ failed }\[#001\] is already tagged with #hi)i
-      end
-
-      def failed
-        'failed to add tag - '
+        s = ""
+        @output_s = s
+        Snag_.lib_.basic::String::Byte_Downstream_Identifier.new s
       end
     end
   end

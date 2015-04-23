@@ -60,7 +60,7 @@ module Skylab::Snag
               _express_immutable_row @row_a.fetch d
             end
           end
-          NIL_
+          ACHIEVED_
         end
 
         def __express_the_business_rows

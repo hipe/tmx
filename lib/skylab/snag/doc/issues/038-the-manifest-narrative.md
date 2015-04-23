@@ -255,34 +255,7 @@ implementation if we ever need it.
 
 
 
-
-## line edit notes  :#note-9
-
-• `at_position_x`  when it is zero it means "insert the new lines at
-                   the begnning of the file" else it is expected to be a
-   rendered identifier, for which the the lines will replace the existing
-   lines for that node.
-
-
-• `is_dry_run`  will not actually move the final changed manifest into
-                place, but otherwise attempts a realistic simulation.
-
-
-• `new_line_a`  the array of lines to insert or replace
-
-
-• `verbose_x`  perhaps more events will be emitted depending on the value
-
-
-• `client` provides facilities needed by this agent like the manifest
-           file, access to a tmpdir, acces to a file utils controller.
-
-• `delegate` is per eventmodel
-
-
-
-
-## #note-73
+## (historical introduction to the next section)
 
 when you save a file in vi it appears to append a "\n" to the last line
 if there was not one already. we follow suit here when rewriting the

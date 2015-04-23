@@ -35,7 +35,14 @@ module Skylab::Brazen
 
         mo = o.model
         if mo
-          _subj = " #{ mo.name_function.as_human } with"
+
+          _nf = if mo.respond_to? :name_function
+            mo.name_function
+          else
+            Callback_::Name.via_module mo
+          end
+
+          _subj = " #{ _nf.as_human } with"
         end
 
         _identifier = o.identifier.description_under self

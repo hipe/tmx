@@ -590,11 +590,12 @@ module Skylab::Callback
   end
 
   Pair_ = Pair = ::Struct.new :value_x, :name_symbol do  # :[#055].
-    def with_name_symbol i
-      self.class.new value_x, i
-    end
 
     alias_method :name_x, :name_symbol  # as you like it
+
+    def new_with_value x
+      self.class.new x, name_symbol
+    end
   end
 
   class Trio  # :[#004].
