@@ -47,35 +47,30 @@ module Skylab::Snag
 
         @_args = nil
 
-        rst = Snag_.lib_.basic::List.line_stream x_a
+        st = Callback_::Polymorphic_Stream.new 0, x_a
+        @_verb_symbol = st.gets_one
+        @_association_symbol = st.gets_one
+        @_x = st.gets_one
+        @_shape_symbol = nil
 
-        @_x = rst.rgets
-
-        sym = rst.gets
-        sym and @_verb_symbol = sym
-
-        sym = rst.gets
-        sym and @_assocation_symbol = sym
-
-        @_shape_symbol = rst.rgets  # nil OK
-
-        if rst.eos?
+        if st.no_unparsed_exists
           ok = true
         else
-          @__methodic_actor_iambic_stream__ = rst  # lies
-          begin
-            sym = rst.gets
-            sym or break
-            ok = send :"#{ sym }="
-            ok or break
-            redo
-          end while nil
-          remove_instance_variable :@__methodic_actor_iambic_stream__
 
-          if ok
-            rst.eos? or raise ::ArgumentError  # sanity
-          end
+          @__methodic_actor_iambic_stream__ = st
+
+          begin
+            ok = send :"#{ st.gets_one }="
+            ok or break
+            if st.unparsed_exists
+              redo
+            end
+            break
+          end while nil
+
+          remove_instance_variable :@__methodic_actor_iambic_stream__
         end
+
         ok
       end
 
@@ -92,13 +87,19 @@ module Skylab::Snag
         KEEP_PARSING_
       end
 
-      def iambic_property
-        @__methodic_actor_iambic_stream__.gets  # ish
-      end
-
       def modifiers=
         ( @_args ||= [] ).push iambic_property
         KEEP_PARSING_
+      end
+
+      def which_is=
+        @_shape_symbol = iambic_property
+        KEEP_PARSING_
+      end
+
+
+      def iambic_property
+        @__methodic_actor_iambic_stream__.gets_one
       end
 
       public def execute
@@ -112,16 +113,11 @@ module Skylab::Snag
       def __resolve_entity
 
         cls = @_collection.send(
-          :"__#{ @_assocation_symbol }__class_for_mutation_session" )
+          :"__#{ @_association_symbol }__class_for_mutation_session" )
 
-        sym = @_shape_symbol
+        _m = :"new_via__#{ @_shape_symbol || :mixed }__"
 
-        ent = if sym
-
-          cls.send :"new_via__#{ sym }__", @_x, & @on_event_selectively
-        else
-          cls.new @_x
-        end
+        ent = cls.send _m, @_x, & @on_event_selectively
 
         ent and begin
           @_entity = ent
@@ -134,7 +130,7 @@ module Skylab::Snag
         if @_do_check_for_redundancy
 
           _yes = @_collection.send(
-            :"has_equivalent__#{ @_assocation_symbol }__object_",
+            :"has_equivalent__#{ @_association_symbol }__object_",
             @_entity )
 
           if _yes
@@ -172,7 +168,7 @@ module Skylab::Snag
       def __via_all
 
         _m = if :receive == @_verb_symbol
-          :"receive__#{ @_assocation_symbol }__for_mutation_session"
+          :"receive__#{ @_association_symbol }__for_mutation_session"
         else
           :"__#{ @_verb_symbol }__object_for_mutation_session"
         end

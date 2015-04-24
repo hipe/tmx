@@ -6,7 +6,7 @@ module Skylab::Snag::TestSupport
 
     extend TS_
     use :expect_event
-    use :downstream_identifier_to_output_string
+    use :downstream_redirect_to_string
 
     it "uses first available ID, placed in correct spot (integration)" do
 

@@ -66,7 +66,7 @@ module Skylab::Snag::TestSupport
         call_API :node, :to_stream, :upstream_identifier, _the_byte_upstream, & EMPTY_P_
         _node = @result.gets
         _body = _node.body
-        @piece_st = _body.__to_object_stream
+        @piece_st = _body.to_object_stream_
         NIL_
       end
 

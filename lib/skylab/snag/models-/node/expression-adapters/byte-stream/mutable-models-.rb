@@ -6,7 +6,7 @@ module Skylab::Snag
 
       Mutable_Models_ = ::Module.new
 
-      class Mutable_Models_::Body
+      class Mutable_Models_::Body < Row_Based_Body_
 
         class << self
 
@@ -18,22 +18,6 @@ module Skylab::Snag
         def initialize r, row_a
           @r = r
           @row_a = row_a
-        end
-
-        def is_mutable
-          true
-        end
-
-        def modality_const  # #experimental mechanic
-          :Byte_Stream
-        end
-
-        def r_
-          @r
-        end
-
-        def row_a_
-          @row_a
         end
 
         def __prepend__object_for_mutation_session obj, & oes_p
@@ -111,6 +95,31 @@ module Skylab::Snag
 
           @row_a[ d ] = mutable
           mutable
+        end
+
+        def to_business_row_stream_
+
+          a = @row_a
+
+          Callback_::Stream.via_range @r do | d |
+            a.fetch d
+          end
+        end
+
+        def r_
+          @r
+        end
+
+        def row_a_
+          @row_a
+        end
+
+        def is_mutable
+          true
+        end
+
+        def modality_const  # #experimental mechanic
+          :Byte_Stream
         end
 
         class Row___

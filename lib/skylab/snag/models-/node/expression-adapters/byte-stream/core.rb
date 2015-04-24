@@ -197,8 +197,17 @@ module Skylab::Snag
         alias_method :__reinitialize, :call
       end
 
-
       # ~ end
+
+      class Row_Based_Body_ < Common_Body_
+
+        def to_object_stream_
+
+          to_business_row_stream_.expand_by do | row |
+            row.to_simple_stream_of_objects_
+          end
+        end
+      end
 
       BS_ = self
     end

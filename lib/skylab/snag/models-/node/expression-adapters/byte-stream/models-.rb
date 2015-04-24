@@ -60,7 +60,7 @@ module Skylab::Snag
 
       end
 
-      class Models_::Body
+      class Models_::Body < Row_Based_Body_
 
         class << self
           def via_range_and_substring_array r, sstr_a
@@ -126,23 +126,7 @@ module Skylab::Snag
           ACHIEVED_
         end
 
-        def entity_stream_via_model cls
-
-          sym = cls.category_symbol
-
-          __to_object_stream.reduce_by do | x |
-            sym == x.category_symbol
-          end
-        end
-
-        def __to_object_stream
-
-          __to_business_row_stream.expand_by do | row |
-            row.to_simple_stream_of_objects_
-          end
-        end
-
-        def __to_business_row_stream
+        def to_business_row_stream_
 
           a = @sstr_a
 

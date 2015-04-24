@@ -2,21 +2,6 @@ module Skylab::Snag
 
   class Models_::Node_Collection
 
-    if false
-
-    def changed node, is_dry_run, verbose_x
-      node.delegate or self._SANITY
-      @manifest.change_node node, is_dry_run, verbose_x
-    end
-
-    def when_not_found delegate
-      _ev = Snag_::Model_::Event.inline :node_not_found, :query, @q do |y, o|
-        y << "there is no node #{ o.query.phrasal_noun_modifier }"
-      end
-      delegate.receive_error_event _ev
-    end
-    end
-
     class Silo_Daemon
 
       def initialize kr, mc

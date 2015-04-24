@@ -10,11 +10,6 @@ test/models/node/actions/open_spec.rb  #during:open
 
 
 
-test/models/node/actions/close_spec.rb  #during:close
-models-/tag/_actions-supplemental_.rb
-models-/node/actions/_core_supplement_.rb
-
-
 
 test/models/to-do/actions/melt_spec.rb  #during:melt
 models-/to-do/actions/melt.rb

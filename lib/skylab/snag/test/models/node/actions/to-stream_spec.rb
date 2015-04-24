@@ -40,12 +40,12 @@ module Skylab::Snag::TestSupport
       x.ID.to_i.should eql 1
       x_.ID.to_i.should eql 2
 
-      st = x.body.__to_business_row_stream
+      st = x.body.to_business_row_stream_
       st.gets.s.should eql "[#01]  this line is in\n"
       st.gets.s.should eql " part of the above\n"
       st.gets.should be_nil
 
-      st = x_.body.__to_business_row_stream
+      st = x_.body.to_business_row_stream_
       st.gets.s.should eql "[#02] hi\n"
       st.gets.should be_nil
     end
@@ -89,7 +89,7 @@ module Skylab::Snag::TestSupport
         :upstream_identifier, _alpha_path
 
       expect_no_events
-      st = @result.body.__to_business_row_stream
+      st = @result.body.to_business_row_stream_
 
       st.gets.s.should eql "[#002]       #done wizzle bizzle 2013-11-11\n"
       st.gets.s.should eql "               one more line\n"
@@ -101,7 +101,7 @@ module Skylab::Snag::TestSupport
         :identifier, '98.6',
         :upstream_identifier, _second_manifest
 
-      st = @result.body.__to_business_row_stream
+      st = @result.body.to_business_row_stream_
       st.gets.s.should eql "[#98.6]  don't use these\n"
       st.gets.should be_nil
     end

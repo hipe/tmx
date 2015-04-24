@@ -1,0 +1,4 @@
+[#003] #open biff bazz
+  this 2nd line indents but does not concat onto the first
+[#002]       #done this one is finished
+[#001]      this one has no markings and 6 spaces of ws

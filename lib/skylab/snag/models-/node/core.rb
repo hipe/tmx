@@ -155,18 +155,18 @@ module Skylab::Snag
 
     def prepend_tag symbol, & oes_p
 
-      edit :prepend, :tag, :symbol, symbol, & oes_p
+      edit :prepend, :tag, symbol, & oes_p
     end
 
     def append_tag symbol, & oes_p
 
-      edit :append, :tag, :symbol, symbol, & oes_p
+      edit :append, :tag, symbol, & oes_p
     end
 
     def remove_tag symbol, & oes_p
 
       self._COVER_ME
-      edit :remove, :tag, :symbol, symbol, & oes_p
+      edit :remove, :tag, symbol, & oes_p
     end
 
     # ~
@@ -302,6 +302,19 @@ module Skylab::Snag
           @argument_box,
           @node,
           & handle_event_selectively )
+      end
+    end
+
+    class Common_Body_  # (for three)
+
+      def entity_stream_via_model cls
+
+        sym = cls.category_symbol
+
+        to_object_stream_.reduce_by do | o |
+
+          sym == o.category_symbol
+        end
       end
     end
 

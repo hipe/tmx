@@ -50,12 +50,9 @@ module Skylab::Snag
 
         h = @argument_box.h_
 
-        _ok = @node.edit :append, :tag,
-
+        _ok = @node.edit :append, :tag, h[ :tag ],
           :do_prepend, h[ :prepend ],
           :check_for_redundancy,
-          :mixed, h[ :tag ],
-
           & handle_event_selectively
 
         _ok && persist_node_
@@ -84,7 +81,7 @@ module Skylab::Snag
 
         _h = @argument_box.h_
 
-        _ok = @node.edit :remove, :tag, :mixed, _h[ :tag ],
+        _ok = @node.edit :remove, :tag, _h[ :tag ],
           & handle_event_selectively
 
         _ok && persist_node_

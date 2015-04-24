@@ -206,6 +206,10 @@ module Skylab::Snag
 
     class String_Piece < Piece__
 
+      class << self
+        alias_method :new_via__mixed__, :new
+      end  # >>
+
       def initialize s=nil
         if s
           _reinitialize 0, s.length, s

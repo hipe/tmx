@@ -1,3 +1,5 @@
+[#086]       #track cases where failure is "fuzzy" (i.e non-atomic),
+               ignored for the greater good, for usability
 [#085]       [ module as model ]
 [#084]       :+#wishlist a `flag` meta-meta prperty
 [#083]       use blocks as selective event receiver (optionally) for proc as action

@@ -130,8 +130,9 @@ module Skylab::Brazen
         self,
         _HTTP_remote, & ( oes_p || handle_event_selectively ) )
 
-      # NOTE we ignore the above - we want failure of the one not to prevent
-      # the other from proceding (otherwise you couldn't remove rogue records)
+      # NOTE  :+[#086] any failure from above is ignored - we want the
+      # the failure of the one not to prevent the other from proceding
+      # (otherwise you wouldn't be able to remove rogue records)
 
       PROCEDE_
     end

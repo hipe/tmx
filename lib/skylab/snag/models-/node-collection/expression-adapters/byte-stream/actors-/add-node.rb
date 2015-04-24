@@ -22,7 +22,8 @@ module Skylab::Snag
 
             o.reset_the_entity_upstream
 
-            @node.edit :receive, :identifier, :object, id, & @on_event_selectively
+            @node.edit :receive, :identifier, id,
+              :which_is, :object, & @on_event_selectively
 
             o.write_each_node_whose_identifier_is_greater_than_that_of_subject
 

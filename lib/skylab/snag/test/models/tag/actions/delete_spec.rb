@@ -7,7 +7,7 @@ module Skylab::Snag::TestSupport
     extend TS_
     use :expect_event
     use :my_tmpdir_
-    use :downstream_identifier_to_output_string
+    use :downstream_redirect_to_string
 
     context "(with this manifest)" do
 

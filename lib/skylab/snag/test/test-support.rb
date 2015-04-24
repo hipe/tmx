@@ -135,7 +135,7 @@ module Skylab::Snag::TestSupport
     end
   end
 
-  module Downstream_Identifier_To_Output_String
+  module Downstream_Redirect_To_String
 
     class << self
       def [] tcm

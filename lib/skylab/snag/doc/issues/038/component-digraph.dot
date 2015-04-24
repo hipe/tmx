@@ -12,7 +12,7 @@ subgraph cluster_main {
   }
 
   aa [label="open" ]
-  ca [label="close" ]
+  ca [label="21. close" style=filled]
   de [label="15. design & implement\ncriteria implementation" style=filled]
   FS [label="14. expose the\nfilesystem" style=filled]
   line_upstream [label="11. line\nupstream" style=filled]

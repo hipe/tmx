@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::Node
 
-    class Models_::Agnostic_Mutable_Body
+    class Models_::Agnostic_Mutable_Body < Common_Body_
 
       def initialize
         @_o_a = []
@@ -18,18 +18,6 @@ module Skylab::Snag
 
       def r_
         0 ... 1
-      end
-
-      def entity_stream_via_model cls
-
-        sym = cls.category_symbol
-
-        to_object_stream_.map_reduce_by do | o |
-
-          if sym == o.category_symbol
-            o
-          end
-        end
       end
 
       def to_object_stream_
