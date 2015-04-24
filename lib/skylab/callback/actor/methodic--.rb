@@ -195,13 +195,19 @@ module Skylab::Callback
         end
 
         def process_iambic_stream_passively stream, & oes_p
+
           keep_parsing = true
+
           if stream.unparsed_exists
+
             method_name_p = iambic_writer_method_name_passive_lookup_proc
             m_i = method_name_p[ stream.current_token ]
+
             if m_i
+
               @__methodic_actor_iambic_stream__ = stream
               @__methodic_actor_handle_event_selectively__ = oes_p  # for [br] in one place
+
               begin
                 stream.advance_one
                 keep_parsing = send m_i
@@ -213,10 +219,12 @@ module Skylab::Callback
                 end
                 break
               end while nil
-              @__methodic_actor_iambic_stream__ = nil
-              @__methodic_actor_handle_event_selectively__ = nil
+
+              remove_instance_variable :@__methodic_actor_iambic_stream__
+              remove_instance_variable :@__methodic_actor_handle_event_selectively__
             end
           end
+
           keep_parsing
         end
 

@@ -2,36 +2,154 @@ module Skylab::Snag
 
   module Models_::Message
 
-    blank_rx = /\A[[:space:]]*\z/
-    nl_rx = /\n/
-    xnl_rx = /\\n/
+    class << self
 
-    _chars_limit = nil
-    define_singleton_method :chars_limit do
-      _chars_limit ||= begin
-        Models::Manifest.line_width - Models::Manifest.header_width
-      end
-    end
+      p = -> arg, & oes_p do
 
-    define_singleton_method :normal do | x, error_s_p, _=nil |
-      res = nil
-      err = -> errmsg do
-        r = error_s_p[ errmsg ]
-        res = r ? UNABLE_ : r  # [#017]
+        # we build this policy here but it could be anywhere. we memoize
+        # a singleton "formal set" here but in the future this might be
+        # built more dynamically, for example as a product of arguments
+        # or the environment
+
+        nx = Normalization___.new_with(
+
+          :must_be_trueish,
+          :no_blanks,
+          :no_escaped_newlines,
+          :no_newlines
+          # character_limit Models::Manifest.line_width - Models::Manifest.header_width
+        )
+
+        p = -> arg_, & oes_p_ do
+          nx.normalize_argument arg_, & oes_p_
+        end
+        p[ arg, & oes_p ]
       end
-      self._REDO
-      msg = x.to_s
-      if blank_rx =~ msg
-        err[ "message was blank." ]
-      elsif nl_rx =~ msg
-        err[ "message cannot contain newlines." ]
-      elsif xnl_rx =~ msg
-        err[ "message cannot contain (escaped or unescaped) newlines." ]
-      elsif false && msg.length > chars_limit # LOOK off for now!
-        err[ "for now, node messages have a narrow-assed limit #{
-        }of #{ chars_limit } - your message was #{ msg.length } chars" ]
-      else
-        res = msg
+
+      define_method :normalize_argument do | arg, & oes_p |
+        p[ arg, & oes_p ]
+      end
+    end  # >>
+
+    class Normalization___
+
+      Callback_::Actor.methodic self
+
+      def initialize & edit_p
+
+        @p_a = []
+        instance_exec( & edit_p )
+        @p_a.freeze
+        freeze
+      end
+
+    private
+
+      def character_limit=
+
+        d = iambic_property
+
+        @p_a.push -> arg, & oes_p do
+          s = arg.value_x
+          if d < s.length
+            _express arg, :character_limit_exceeded, oes_p do
+              "messages cannot be longer than #{ d } characters #{
+                } (your message was #{ s.length } chars"
+            end
+          else
+            arg
+          end
+        end
+        KEEP_PARSING_
+      end
+
+      def must_be_trueish=
+
+        @p_a.push -> arg, & oes_p do
+          x = arg.value_x
+          if x
+            arg
+          else
+            _express arg, :not_a_string, oes_p do
+              "need string, had #{ ick x }"
+            end
+          end
+        end
+        KEEP_PARSING_
+      end
+
+      def no_blanks=
+
+        _black_regex BLANK_RX___ do
+          "message was blank."
+        end
+      end
+      BLANK_RX___ = /\A[[:space:]]*\z/
+
+
+      def no_escaped_newlines=
+
+        _black_regex XNL_RX___ do
+          "message cannot contain escaped newlines"
+        end
+      end
+      XNL_RX___ = /\\n/
+
+
+      def no_newlines=
+
+        _black_regex NL_RX___ do
+          "message cannot contain newlines"
+        end
+      end
+      NL_RX___ = /\n/
+
+    public
+
+      def normalize_argument arg, & oes_p
+
+        @p_a.each do | p |
+
+          arg = p[ arg, & oes_p ]
+          arg or break
+        end
+        arg
+      end
+
+    private
+
+      def _black_regex rx, & str_p
+
+        @p_a.push -> arg, & oes_p do
+
+          if rx =~ arg.value_x
+            _express arg, :string_has_extraordinary_features, oes_p do
+
+              "#{ instance_exec( & str_p ) }: #{ ick arg.value_x }"
+            end
+          else
+            arg
+          end
+        end
+        KEEP_PARSING_
+      end
+
+      def _express arg, term_chan_sym, oes_p, & str_p
+
+        oes_p.call :error, :uninterpretable, term_chan_sym do
+
+          Callback_::Event.inline_not_OK_with(
+
+            term_chan_sym,
+            :x, arg.value_x,
+            :string_proc, str_p,
+            :error_category, :argument_error
+
+          ) do | y, o |
+            y << instance_exec( & o.string_proc )
+          end
+        end
+        UNABLE_
       end
     end
 

@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  module Models_::Node_Collection
+  class Models_::Node_Collection
 
     module Expression_Adapters::Byte_Stream
 
@@ -12,7 +12,7 @@ module Skylab::Snag
         end
       end  # >>
 
-      class Native_Collection___  # or whatever
+      class Native_Collection___ < NC_  # or whatever
 
         def initialize id
 
@@ -23,6 +23,18 @@ module Skylab::Snag
             @extc_adptr = -> { x }
             x
           end
+        end
+
+        # ~ inteface with the mutation session (compliments those in parent clas)
+
+        def receive_notification_of_change_during_mutation_session
+          # nothiing.
+          ACHIEVED_
+        end
+
+        def __add__object_for_mutation_session bx, node, & oes_p
+
+          persist_entity bx, node, & oes_p
         end
 
         # c r u d
@@ -103,7 +115,7 @@ module Skylab::Snag
           @byte_upstream_ID
         end
 
-        # ~
+        # ~ extended content & filesystem
 
         def node_has_extended_content_via_node_id id
 

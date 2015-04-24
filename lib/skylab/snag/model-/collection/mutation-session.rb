@@ -45,6 +45,8 @@ module Skylab::Snag
 
       def process_arglist_fully x_a
 
+        @_args = nil
+
         rst = Snag_.lib_.basic::List.line_stream x_a
 
         @_x = rst.rgets
@@ -94,9 +96,13 @@ module Skylab::Snag
         @__methodic_actor_iambic_stream__.gets  # ish
       end
 
+      def modifiers=
+        ( @_args ||= [] ).push iambic_property
+        KEEP_PARSING_
+      end
+
       public def execute
 
-        @_collection.collection_was_changed_by_mutation_session_ = false
         ok = __resolve_entity
         ok &&= __maybe_check_for_redundancy
         ok &&= __resolve_mutable_body
@@ -106,7 +112,7 @@ module Skylab::Snag
       def __resolve_entity
 
         cls = @_collection.send(
-          :"__#{ @_assocation_symbol }__class_for_mutation_session_" )
+          :"__#{ @_assocation_symbol }__class_for_mutation_session" )
 
         sym = @_shape_symbol
 
@@ -154,34 +160,53 @@ module Skylab::Snag
 
       def __resolve_mutable_body
 
-        body = @_collection.mutable_body_for_mutation_session_
-        body and begin
+        body = @_collection.mutable_body_for_mutation_session_by @_verb_symbol
+        if body
           @_body = body
           ACHIEVED_
+        else
+          self._SANITY
         end
       end
 
       def __via_all
 
-        ok = @_body.send(
-          :"__#{ @_verb_symbol }__object_",
-          @_entity,
-          & @on_event_selectively )
+        _m = if :receive == @_verb_symbol
+          :"receive__#{ @_assocation_symbol }__for_mutation_session"
+        else
+          :"__#{ @_verb_symbol }__object_for_mutation_session"
+        end
 
-        if ok
-          @_collection.collection_was_changed_by_mutation_session_ = true
+        ok_x = @_body.send _m, * @_args, @_entity, & @on_event_selectively
 
-          if :remove == @_verb_symbol
-            __maybe_emit_removed_entity_event ok
-          end
+        if ok_x
+
+          __result_for_mutation ok_x
 
         elsif :remove == @_verb_symbol
-          ok = __when_not_found
+
+          __when_not_found
+        else
+          ok_x
         end
-        ok
       end
 
-      def __maybe_emit_removed_entity_event ent
+      def __result_for_mutation ok_x
+
+        ok = @_collection.receive_notification_of_change_during_mutation_session
+        if ok
+          if :remove == @_verb_symbol
+
+            __result_for_removed_entity ok_x
+          else
+            ok_x
+          end
+        else
+          ok
+        end
+      end
+
+      def __result_for_removed_entity ent
 
         @on_event_selectively.call :info, :entity_removed do
 
@@ -189,7 +214,8 @@ module Skylab::Snag
             :entity, ent,
             :entity_collection, @_collection )
         end
-        NIL_
+
+        ent
       end
 
       def __when_not_found

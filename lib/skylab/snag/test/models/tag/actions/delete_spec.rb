@@ -34,9 +34,9 @@ module Skylab::Snag::TestSupport
       it "remove a tag at the end" do
 
         _call :node_identifier, 1, :tag, :two,
-          :downstream_identifier, init_and_produce_DS_ID_
+          :downstream_identifier, downstream_ID_around_input_string_
 
-        scn = TestSupport_::Expect_Line::Scanner.via_string @output_s
+        scn = scanner_via_output_string_
         scn.next_line.should eql "[#001]       keifer #one\n"
         scn.next_line.should eql "[#2] sutherland\n"
         scn.next_line.should eql "[#3]   donald #four\n"

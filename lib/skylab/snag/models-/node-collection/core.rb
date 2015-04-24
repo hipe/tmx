@@ -1,21 +1,8 @@
 module Skylab::Snag
 
-  module Models_::Node_Collection
+  class Models_::Node_Collection
 
     if false
-
-    def add message, do_prepend_open_tag, dry_run, verbose_x, delegate
-
-      o = Models::Node.build_controller delegate, @API_client
-      o.message = message
-      o.do_prepend_open_tag = do_prepend_open_tag
-      if o.is_valid
-        ok = @manifest.add_node o, dry_run, verbose_x
-        ok and delegate.receive_new_node( o ) || ok  # :+[#062] upgrade result
-      else
-        o.result_value
-      end
-    end
 
     def changed node, is_dry_run, verbose_x
       node.delegate or self._SANITY
@@ -53,13 +40,26 @@ module Skylab::Snag
       end
     end
 
-    Actions = THE_EMPTY_MODULE_
+    def edit * x_a, & x_p
+
+      Snag_::Model_::Collection::Mutation_Session.call x_a, self, & x_p
+    end
+
+    def __node__class_for_mutation_session
+      Snag_::Models_::Node
+    end
+
+    def mutable_body_for_mutation_session_by _
+      self
+    end
 
     module Expression_Adapters
       EN = nil
       Autoloader_[ self ]
     end
 
+    Actions = THE_EMPTY_MODULE_
     NC_ = self
+
   end
 end

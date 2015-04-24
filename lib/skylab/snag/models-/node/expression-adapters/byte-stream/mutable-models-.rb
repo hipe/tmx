@@ -36,7 +36,7 @@ module Skylab::Snag
           @row_a
         end
 
-        def __prepend__object_ obj, & oes_p
+        def __prepend__object_for_mutation_session obj, & oes_p
 
           a = _mutable_row_at_index( @r.begin ).o_a_
           if a.length.nonzero?
@@ -53,7 +53,7 @@ module Skylab::Snag
           ACHIEVED_
         end
 
-        def __append__object_ obj, & oes_p
+        def __append__object_for_mutation_session obj, & oes_p
 
           a = _mutable_row_at_index( @r.end - 1 ).o_a_
           if a.length.nonzero?
@@ -70,7 +70,7 @@ module Skylab::Snag
           ACHIEVED_
         end
 
-        def __remove__object_ obj, & oes_p
+        def __remove__object_for_mutation_session obj, & oes_p
 
           did = false
           x = nil

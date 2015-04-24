@@ -8,6 +8,7 @@ module Skylab::Snag::TestSupport
 
     extend TS_
     use :expect_event
+    use :byte_stream_support
 
     it "minimal positive case" do
 
@@ -116,10 +117,7 @@ module Skylab::Snag::TestSupport
 
     end
 
-    def _expag d, d_, d__
-      Snag_::Models_::Node_Collection::Expression_Adapters::
-        Byte_Stream::Expression_Agent_.new d, d_, d__
-    end
+    alias_method :_expag, :build_byte_stream_expag_
 
     def _id d
       Snag_::Models_::Node_Identifier.new_via_integer d

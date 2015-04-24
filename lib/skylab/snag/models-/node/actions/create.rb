@@ -1,41 +1,31 @@
 module Skylab::Snag
 
-  class CLI::Actions::Nodes < CLI::Action_::Box
+  class Models_::Node
 
-    box.desc 'make the magic happen'
+    class Actions::Create < Common_Action
 
-    desc "Add an \"issue\" line to #{ Snag_::API.manifest_file }"  #[#hl-025]
-    desc "Lines are added to the top and are sequentially numbered."
+      edit_entity_class(
 
-    # desc ' arguments:' #                      DESC # should be styled [#hl-025]
+                   :property, :downstream_identifier,
+        :required, :property, :upstream_identifier,
+        :required, :property, :message
+      )
 
-    # argument_syntax '<message>'
-    # desc '   <message>                        a one line description of the issue'
+      def produce_result
+        resolve_node_collection_then_
+      end
 
-    option_parser do |o|
-      dry_run_option o
-      verbose_option o
-    end
+      def via_node_collection_
 
-    def add message
-      call_API( [ :nodes, :add ], {
-                 be_verbose: false,
-                    dry_run: false,
-                    message: message,
-                working_dir: working_directory_path
-      }.merge( @param_h ) ) do |o|
-        o.on_error_event handle_error_event
-        o.on_error_string handle_error_string
-        o.on_info_event handle_info_event
-        o.on_info_line handle_inside_info_string
-        o.on_info_string handle_inside_info_string
-        o.on_new_node -> node do
-          # oops the manifest takes care of it
-          # send_info_string "added #{ node.identifier.render } #{ node_msg_smry node }"
-        end
-       nil
+        bx = @argument_box
+
+        @node_collection.edit :add, :node,
+          :modifiers, bx,
+          :message, bx.fetch( :message ),
+          & handle_event_selectively
       end
     end
   end
 end
+
 # :+#tombstone: `list` method was original conception point of #doc-point [#sl-102])

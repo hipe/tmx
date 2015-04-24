@@ -20,7 +20,7 @@ subgraph cluster_main {
   node_identifier_model [label="9. node identifier\nmodel" style=filled]
   node_model [label="10. node model" style=filled]
   node_upstream [label="11. node\nupstream" style=filled]
-  oaa [label="create"]
+  oaa [label="20. create" style=filled]
   rea [label="integrated" ]
   rea_actor [label="find any best existing\nreappropriable node" ]
   stru [label="13. experimental support\nfor structured tags" style=filled]

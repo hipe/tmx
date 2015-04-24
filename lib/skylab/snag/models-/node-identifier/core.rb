@@ -27,6 +27,10 @@ module Skylab::Snag
         new NI_::Models_::Suffix.interpret_out_of_under_( s, :String ), d
       end
 
+      def new_via__object__ x
+        x
+      end
+
       define_method :interpret_out_of_under, INTERPRET_OUT_OF_UNDER_METHOD_
 
     end  # >>

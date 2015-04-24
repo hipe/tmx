@@ -38,12 +38,12 @@ module Skylab::Snag
 
       alias_method :to_simple_stream_of_objects_, :to_object_stream_
 
-      def __append__object_ o, & oes_p
+      def __append__object_for_mutation_session o, & oes_p
         @_o_a.push o
         ACHIEVED_
       end
 
-      def __prepend__object_ o, & oes_p
+      def __prepend__object_for_mutation_session o, & oes_p
         @_o_a.unshift o
         ACHIEVED_
       end

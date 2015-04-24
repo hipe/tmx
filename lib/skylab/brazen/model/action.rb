@@ -287,7 +287,7 @@ module Skylab::Brazen
         keep_parsing or break
 
       end
-      @__methodic_actor_iambic_stream__ = nil
+      remove_instance_variable :@__methodic_actor_iambic_stream__
       keep_parsing
     end
 

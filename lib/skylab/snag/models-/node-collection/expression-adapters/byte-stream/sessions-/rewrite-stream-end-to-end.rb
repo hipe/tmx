@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  module Models_::Node_Collection
+  class Models_::Node_Collection
 
     module Expression_Adapters::Byte_Stream
 
@@ -17,10 +17,12 @@ module Skylab::Snag
           @collection = coll
           @do_double_buffering = false
           @downstream_identifier = bx[ :downstream_identifier ]
+
           @expression_agent = Expression_Agent_.new(
             WIDTH__,
             SUB_MARGIN_WIDTH__,
             IDENTIFIER_INTEGER_WIDTH___ )
+
           @on_event_selectively = oes_p
           @subject_entity = node
         end
@@ -121,47 +123,18 @@ module Skylab::Snag
           @_FS.copy fh.path, @_target_path  # bytes
         end
 
-        class Controller__ < ::BasicObject
+        def __entity_upstream__
 
-          # industrial strength silliness - proxy calls to the exposed
-          # methods, but only if everything is still OK. exception like
-
-          def initialize down
-
-            ok = true
-            wall = -> & p do
-              -> do
-                ok &&= p[]
-              end
-            end
-
-            @wen_p = wall.call do
-              down.__write_each_node_until_the_subject_node_is_found
-            end
-
-            @wnn_p = wall.call do
-              down.__write_the_new_node
-            end
-
-            @wrn_p = wall.call do
-              down.__write_the_remaining_nodes
-            end
-          end
-
-          def write_each_node_until_the_subject_node_is_found
-            @wen_p[]
-          end
-
-          def write_the_new_node
-            @wnn_p[]
-          end
-
-          def write_the_remaining_nodes
-            @wrn_p[]
-          end
+          @entity_upstream  # might be failed
         end
 
-        def __write_each_node_until_the_subject_node_is_found
+        def __reset_the_entity_upstream__
+
+          _d = @entity_upstream.upstream.rewind  # EEK
+          _d.zero?
+        end
+
+        def __write_each_node_until_the_subject_node_is_found__
 
           expag = @expression_agent
           id = @subject_entity.ID or self._SANITY
@@ -193,14 +166,57 @@ module Skylab::Snag
           end
         end
 
-        def __write_the_new_node
+        def __write_each_node_whose_identifier_is_greater_than_that_of_subject__
 
-          @subject_entity.express_into_under(
-            @downstream_lines,
-            @expression_agent )
+          expag = @expression_agent
+          id = @subject_entity.ID or self._SANITY
+          st = @entity_upstream
+          y = @downstream_lines
+
+          @has_floating = false
+
+          begin
+
+            ent = st.gets
+            ent or break
+
+            if id < ent.ID  # this ID is bigger than
+              # mine so it goes above me in the file
+
+              ent.express_into_under y, expag
+              redo
+            end
+
+            @has_floating = true
+            @floating = ent
+            break
+          end while nil
+
+          ACHIEVED_
         end
 
-        def __write_the_remaining_nodes
+        def __write_the_new_node__
+
+          @subject_entity.express_into_under(
+            @downstream_lines, @expression_agent )
+        end
+
+        def __write_any_floating_node__
+
+          if @has_floating
+
+            x = @floating.express_into_under(
+              @downstream_lines, @expression_agent )
+
+            @has_floating = false
+            @floating = nil
+            x
+          else
+            ACHIEVED_
+          end
+        end
+
+        def __write_the_remaining_nodes__
 
           expag = @expression_agent
           st = @entity_upstream
@@ -218,6 +234,59 @@ module Skylab::Snag
           end while nil
 
           ok
+        end
+
+        class Controller__
+
+          # industrial strength silliness - proxy calls to the exposed
+          # methods, but only if everything is still OK. exception like
+
+          Tuple___ = ::Struct.new :name_symbol, :ivar, :local_name_symbol
+
+          the_list = %i(
+
+            entity_upstream
+            reset_the_entity_upstream
+
+            write_each_node_until_the_subject_node_is_found
+            write_each_node_whose_identifier_is_greater_than_that_of_subject
+
+            write_the_new_node
+            write_any_floating_node
+            write_the_remaining_nodes
+
+          ).map do | sym |
+            Tuple___.new sym, :"@#{ sym }", :"__#{ sym }__"
+          end
+
+          define_method :initialize do | up |
+
+            ok = true
+
+            the_list.each do | tuple |
+
+              instance_variable_set tuple.ivar, -> do
+
+                if ok
+                  x = up.send tuple.local_name_symbol
+                  if ! x
+                    ok = x
+                  end
+                  x
+                else
+                  ok
+                end
+              end
+            end
+          end
+
+          the_list.each do | pair |
+
+            define_method pair.name_symbol do
+
+              instance_variable_get( pair.ivar ).call
+            end
+          end
         end
       end
     end

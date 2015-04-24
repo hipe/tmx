@@ -35,8 +35,6 @@ module Skylab::Snag::TestSupport
 
       it "the tag must be well-formed" do
 
-        debug!
-
         _call :node_identifier, 3, :tag, 'foo bar'
 
         black_and_white( expect_not_OK_event :invalid_tag_stem ).should eql(
@@ -59,9 +57,10 @@ module Skylab::Snag::TestSupport
       it "to [#07] append tag '2014-ok'" do
 
         _call :node_identifier, 7, :tag, '2014-ok',
-          :downstream_identifier, init_and_produce_DS_ID_
+          :downstream_identifier, downstream_ID_around_input_string_
 
-        scn = TestSupport_::Expect_Line::Scanner.via_string @output_s
+        scn = scanner_via_output_string_
+
         scn.next_line.should eql "[#03] this is three\n"
         scn.next_line.should eql "        zygote\n"
         scn.next_line.should eql "[#07] seven #hello in the middle #hi\n"  # NOTE untouched

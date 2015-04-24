@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module Tree
 
-    class Mutable_ < Callback_::Box  # :+#final
+    class Mutable_ < Callback_::Box
 
       # experiment: a mutable tree based on "box".
 
@@ -163,6 +163,33 @@ module Skylab::Basic
       def set_node_payload x
         @node_payload = x
         NIL_
+      end
+
+      class Frugal < self  # as-is (not complete), for [sg]
+
+        def initialize slug=nil
+          @a = nil
+          @slug = slug
+        end
+
+        def children_count
+          if @a
+            super
+          else
+            0
+          end
+        end
+
+        def touch i, & p
+          @a or _!
+          super
+        end
+
+        def _!
+          @a = []
+          @h = {}
+          NIL_
+        end
       end
     end
   end

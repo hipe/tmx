@@ -22,13 +22,40 @@ module Skylab::Snag
         new id_o, body
       end
 
+      def new_via__message__ s_OR_s_a, & oes_p
+
+        s_a = ::Array.try_convert s_OR_s_a
+        s_a ||= [ s_OR_s_a ]
+        __new_via_message_ary s_a, & oes_p
+      end
+
+      def __new_via_message_ary s_a, & oes_p
+
+        o = new
+        ok = true
+        s_a.each do | s |
+
+          arg = Snag_::Models_::Message.normalize_argument(
+            Callback_::Trio.new( s, true ), & oes_p )
+
+          if arg
+            ok = o.edit :append, :string, arg.value_x, & oes_p
+          else
+            ok = arg
+            break
+          end
+        end
+        ok && o
+      end
+
       private :new
     end
 
     def initialize id_o=nil, body=nil
 
       @body = body
-      @collection_was_changed_by_mutation_session_ = false
+
+      @_did_change = false
 
       @_extended_content_adapter = if body
         body.extended_content_adapter_
@@ -58,7 +85,7 @@ module Skylab::Snag
     attr_reader :body, :ID
 
     def changed
-      @muation_session_changed_collection_
+      @_did_change
     end
 
     # ~
@@ -69,6 +96,14 @@ module Skylab::Snag
       y = expag.new_expression_context
       @ID.express_into_under y, expag
       y
+    end
+
+    # ~
+
+    def receive__identifier__for_mutation_session o
+
+      @ID = o
+      ACHIEVED_
     end
 
     # ~
@@ -130,7 +165,8 @@ module Skylab::Snag
 
     def remove_tag symbol, & oes_p
 
-      self._SEE_STASH
+      self._COVER_ME
+      edit :remove, :tag, :symbol, symbol, & oes_p
     end
 
     # ~
@@ -140,7 +176,17 @@ module Skylab::Snag
       Snag_::Model_::Collection::Mutation_Session.call x_a, self, & x_p
     end
 
-    def mutable_body_for_mutation_session_
+    def mutable_body_for_mutation_session_by verb_symbol
+
+      case verb_symbol
+      when :receive
+        self
+      when :prepend, :append, :remove
+        __mutable_body
+      end
+    end
+
+    def __mutable_body
 
       if @body
         if ! @body.is_mutable
@@ -152,17 +198,26 @@ module Skylab::Snag
       @body
     end
 
-    def __string__class_for_mutation_session_
+    def __identifier__class_for_mutation_session
+
+      Snag_::Models_::Node_Identifier
+    end
+
+    def __string__class_for_mutation_session
 
       Snag_::Models::Hashtag::String_Piece
     end
 
-    def __tag__class_for_mutation_session_
+    def __tag__class_for_mutation_session
 
       Snag_::Models_::Tag
     end
 
-    attr_writer :collection_was_changed_by_mutation_session_
+    def receive_notification_of_change_during_mutation_session
+
+      @_did_change = true
+      ACHIEVED_
+    end
 
     # ~
 
@@ -172,11 +227,99 @@ module Skylab::Snag
 
     # ~
 
+    Brazen_ = Snag_.lib_.brazen
+
+    class Common_Action < Brazen_::Model.common_action_class
+
+      # (this could just as easily be a plain mixin module but it's slightly
+      # convenient to be able to establish the entity module in one place)
+
+      Brazen_::Model.common_entity self
+
+    private
+
+      def resolve_node_only_then_
+
+        _oes_p = handle_event_selectively
+
+        node = @kernel.call_via_mutable_box :node, :to_stream,
+
+          :identifier, @argument_box.remove( :node_identifier ),
+
+          @argument_box,
+          & _oes_p
+
+        node and begin
+          @node = node
+          via_node_only_
+        end
+      end
+
+      def resolve_node_collection_and_node_then_
+
+        ok = _resolve_node_collection
+        ok &&= __via_collection_resolve_node
+        ok && via_node_collection_and_node_
+      end
+
+      def resolve_node_collection_then_
+
+        _ok = _resolve_node_collection
+        _ok && via_node_collection_
+      end
+
+      def _resolve_node_collection
+
+        h = @argument_box.h_
+
+        _silo = @kernel.silo :node_collection
+
+        co = _silo.node_collection_via_upstream_identifier(
+          h.fetch( :upstream_identifier ),
+          & handle_event_selectively )
+
+        co and begin
+          @node_collection = co
+          ACHIEVED_
+        end
+      end
+
+      def __via_collection_resolve_node
+
+        node = @node_collection.entity_via_intrinsic_key(
+          @argument_box.fetch( :node_identifier ),
+          & handle_event_selectively )
+
+        node and begin
+          @node = node
+          ACHIEVED_
+        end
+      end
+
+      def persist_node_
+
+        @node_collection.persist_entity(
+          @argument_box,
+          @node,
+          & handle_event_selectively )
+      end
+    end
+
+    Normalize_ID_ = -> arg, & oes_p do
+
+      Snag_::Models_::Node_Identifier.
+        interpret_out_of_under( arg, :User_Argument, & oes_p )
+    end
+
+    # ~
+
+    Autoloader_[ ( Actions = ::Module.new ), :boxxy ]
+
     Autoloader_[ Expression_Adapters = ::Module.new ]
 
     Autoloader_[ Models_ = ::Module.new ]
 
-    Brazen_ = Snag_.lib_.brazen
     Node_ = self
+
   end
 end

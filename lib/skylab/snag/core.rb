@@ -148,6 +148,6 @@ module Skylab::Snag
   NEUTRAL_ = nil
   Snag_ = self
   SPACE_ = ' '.freeze
-  THE_EMPTY_MODULE_ = ::Module.new.freeze
+  THE_EMPTY_MODULE_ = nil
   UNABLE_ = false
 end

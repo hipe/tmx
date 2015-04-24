@@ -1,11 +1,30 @@
+test/models/node/test-support.rb #orphan #after:"last node action"
+test/models/node/actions/test-support.rb
+test/models/node-collection/test-support.rb
+test/models/node-collection/expression-adapters/byte-stream/test-support.rb
+models-/node/models-/flyweight.rb
+
+
+
+test/models/node/actions/open_spec.rb  #during:open
+
+
+
+test/models/node/actions/close_spec.rb  #during:close
+models-/tag/_actions-supplemental_.rb
 models-/node/actions/_core_supplement_.rb
-models-/node-collection/actions/_core_supplemental_.rb
+
+
+
+test/models/to-do/actions/melt_spec.rb  #during:melt
 models-/to-do/actions/melt.rb
 models-/to-do/actions/_melt_supplement_.rb
-models-/tag/_actions-supplemental_.rb
-test/models/node/actions/create_spec.rb
-test/models/node/actions/close_spec.rb
-test/models/node/actions/open_spec.rb
-test/models/node-collection/expression-adapters/byte-stream/actors/marshal-node-attn-delineation_spec.rb
-test/models/node-collection/expression-adapters/byte-stream/actors/marshal-node_spec.rb
-test/models/to-do/actions/melt_spec.rb
+
+
+
+models-/node-collection/actions/to-universal-node-stream.rb  #during:universal
+
+
+
+models-/node-collection/actions/digraph.rb  #during:digraph
+models-/node-collection/actions/_digraph_supplemental_.rb

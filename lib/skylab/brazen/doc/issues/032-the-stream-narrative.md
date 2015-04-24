@@ -1,4 +1,4 @@
-# the scan narrative :[#032]
+# the stream narrative :[#032]
 
 ## listing a collection of entities
 

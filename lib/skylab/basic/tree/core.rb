@@ -4,6 +4,10 @@ module Skylab::Basic
 
     class << self
 
+      def frugal_node
+        Tree_::Mutable_::Frugal
+      end
+
       def immutable_node
         Immutable_Node_
       end

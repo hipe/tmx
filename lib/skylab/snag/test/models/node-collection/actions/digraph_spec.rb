@@ -1,8 +1,8 @@
-require_relative '../../../../../test-support'
+require_relative '../../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] [..] marshal", wip: true do
+  describe "[sg] models - n.c - actions - digraph", wip: true do
 
     extend TS_
 

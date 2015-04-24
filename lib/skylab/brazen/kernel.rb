@@ -143,9 +143,14 @@ module Skylab::Brazen
       p = -> do
 
         box_mod = item::Actions
-        const_i_a = box_mod.constants
-        const_i_a.sort!
-        d = const_i_a.length
+
+        if box_mod
+          const_i_a = box_mod.constants
+          const_i_a.sort!
+          d = const_i_a.length
+        else
+          d = 0
+        end
         p = main
         p[]
       end

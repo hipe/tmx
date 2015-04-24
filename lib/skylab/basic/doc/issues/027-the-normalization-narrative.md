@@ -3,6 +3,13 @@ one day assimilating the older one into the newer one.)
 
 # the new normal :[#027]
 
+## synopsis
+
+    normalize_argument <trio>, & <oes_p>
+
+
+
+
 ## introduction
 
 
@@ -164,7 +171,10 @@ tranformation functions that you write, etc.
 the paradigm behind a "prototype-based" object-oriented language like
 Javascript is of course different than the idea behind class-based OOP:
 with prototypes there is a fuzzier distinction between what is a class
-and what is an object. a class is essentially an object that gets duped
+and what is an object. (more accurately there are no classes)
+
+the counterpart to a class in prototype-based langauge seems essentially
+to bean object that gets duped
 to make other objects. this different perspective has interesting
 ramifications that we find useful to leverage specifically in this domain
 of normalization.
@@ -411,7 +421,7 @@ the second control point is the `notification yielder`. to a developer with
 familiarity with any other validation / normalization solutions in any other
 framework, this facet of this system will likely seem much simpler than
 whatever they have worked with before, for better or worse depending on the
-developer's "perceived" "needs" ^_^.
+developer's "perceived" "needs" `^_^`.
 
 the `notification yielder` gets passed to the callable and is its *sole*
 means to signal back to the system that a validation error occurred.

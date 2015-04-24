@@ -69,6 +69,25 @@ module Skylab::Snag::TestSupport
     end
   end
 
+  module Byte_Stream_Support
+
+    class << self
+      def [] tcm
+        tcm.include self
+      end
+    end  # >>
+
+    def build_byte_stream_expag_ d, d_, d__
+
+      Snag_::Models_::Node_Collection::Expression_Adapters::
+        Byte_Stream::Expression_Agent_.new d, d_, d__
+    end
+
+    def scanner_via_string_ s
+      TestSupport_::Expect_Line::Scanner.via_string s
+    end
+  end
+
   module Criteria_Library_Support  # (draws from [mh] parse t.s)
 
     def self.[] mod
@@ -116,13 +135,23 @@ module Skylab::Snag::TestSupport
     end
   end
 
-  Downstream_Identifier_To_Output_String = -> tcm do
+  module Downstream_Identifier_To_Output_String
 
-    tcm.send :define_method, :init_and_produce_DS_ID_ do
+    class << self
+      def [] tcm
+        tcm.include self
+      end
+    end  # >>
+
+    def downstream_ID_around_input_string_
 
       s = ""
       @output_s = s
       Snag_.lib_.basic::String::Byte_Downstream_Identifier.new s
+    end
+
+    def scanner_via_output_string_
+      TestSupport_::Expect_Line::Scanner.via_string @output_s
     end
   end
 
@@ -267,8 +296,11 @@ module Skylab::Snag::TestSupport
     ::File.join( Fixture_tree_[ :mock_project_alpha ], 'doc/issues.md' )
   end
 
+  ACHIEVED_ = true
   EMPTY_P_ = Snag_::EMPTY_P_
+  EMPTY_S_ = Snag_::EMPTY_S_
   NIL_ = nil
+  NEWLINE_ = "\n"
   SPACE_ = Snag_::SPACE_
   UNDERSCORE_ = '_'
 

@@ -35,7 +35,7 @@
 [#036]       #parent-node: [#057] on the structure of manifests and nodes
 [#035]       #done throwing is always ugly. just don't
 [#034]       #parent-node: [#038] on doc-node trees and flat numberspaces ..
-[#033]       #tracking-tag non-deterministic smelly tests
+[#033] #done?  #tracking-tag non-deterministic smelly tests
 [#032]       see if we can unify find commands org wide #tracking-tag
 [#031]       #done NO. BAD. (horrible event wiring in todo tree) ..
                and some comments on UI vs. API and so on

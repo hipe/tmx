@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  module Models_::Node_Collection
+  class Models_::Node_Collection
 
     module Expression_Adapters::Filesystem
 

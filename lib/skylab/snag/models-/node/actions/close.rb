@@ -1,5 +1,15 @@
 module Skylab::Snag
 
+  class Models_::Node
+
+    class Actions::Close
+
+      def self.is_actionable
+        false
+      end
+
+      if false
+
   module API::Actions::Node
     # (as a fun exercise, can you spot the exploratory exercise in here?)
   end
@@ -23,5 +33,10 @@ module Skylab::Snag
     end
 
     make_sender_methods
+  end
+
+      end
+
+    end
   end
 end

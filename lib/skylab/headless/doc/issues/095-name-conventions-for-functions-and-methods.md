@@ -23,6 +23,10 @@ better this time.
   method must have no side-effects. (oops also see [#154] for the same
   thing written 10 months prior)
 
++ `_by` used frequently for method that necessarily take procs;
+  althgough this is also used when it is linguistically natural sounding
+  given the following formal argument(s).
+
 + `calculate`, `calculate_*` - method must take a block. result of method
   block (as determined by the user) be the result of the call to this
   method. the block will be executed in the
@@ -124,6 +128,10 @@ better this time.
   name - it should only be used the behavior that occurs in the method
   is exactly that as described by the name of the containing class.
 
++ `resolve_[..]_then` in a framework action, this is a call to a library
+  method that will try to resolve the `[..]` (to ivars) and then IFF
+  successful, call the client's `via_[..]` method. (this makes more
+  sense if you see it (originated in [sg]).)
 
 + `to_`, `_to_` - the second form is explicitly not defined conventionally
   here. use it as you would like to naturally. (but use `via` instead if

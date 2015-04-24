@@ -2,18 +2,11 @@ module Skylab::Snag
 
   class Models_::Node
 
-    Actions = ::Module.new
+    class Actions::To_Stream < Common_Action
 
-    class Actions::To_Stream < Brazen_::Model.common_action_class
+      edit_entity_class(
 
-      Brazen_::Model.common_entity self,
-
-        :ad_hoc_normalizer, -> arg, & oes_p do
-
-          Snag_::Models_::Node_Identifier.
-            interpret_out_of_under( arg, :User_Argument, & oes_p )
-
-        end, :property, :identifier,
+        :ad_hoc_normalizer, Normalize_ID_, :property, :identifier,
 
         :integer_greater_than_or_equal_to, 1,
         :description, -> y do
@@ -22,23 +15,18 @@ module Skylab::Snag
         :property, :number_limit,
 
         :required, :property, :upstream_identifier
+      )
 
       def produce_result
-
-        nc = @kernel.silo( :node_collection ).
-          node_collection_via_upstream_identifier(
-            @argument_box.fetch( :upstream_identifier ),
-            & handle_event_selectively )
-
-        nc and begin
-          __via_node_collection nc
-        end
+        resolve_node_collection_then_
       end
 
-      def __via_node_collection nc
+      def via_node_collection_
 
         h = @argument_box.h_
         id_o = h[ :identifier ]
+        nc = @node_collection
+
         if id_o
 
          id_o.respond_to?( :suffix ) or self._SANITY  # prop needs a better name

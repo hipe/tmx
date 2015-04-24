@@ -2,9 +2,7 @@ module Skylab::Snag
 
   class Models_::Tag
 
-    class Tag_Action__ < Brazen_::Model.common_action_class  # :+#stowaway, reopens
-      Brazen_::Model.common_entity self
-    end
+    Tag_Action__ = Snag_::Models_::Node::Common_Action  # stowaway
 
     Actions = ::Module.new
 
@@ -21,11 +19,10 @@ module Skylab::Snag
       )
 
       def produce_result
-        _ok = __resolve_node_only_
-        _ok && __via_node
+        resolve_node_only_then_
       end
 
-      def __via_node
+      def via_node_only_
         @node.to_tag_stream
       end
     end
@@ -46,24 +43,22 @@ module Skylab::Snag
       )
 
       def produce_result
-        _resolve_all_
+        resolve_node_collection_and_node_then_
       end
 
-      def _via_all_
+      def via_node_collection_and_node_
 
         h = @argument_box.h_
 
         _ok = @node.edit :append, :tag,
 
           :do_prepend, h[ :prepend ],
-
           :check_for_redundancy,
-
           :mixed, h[ :tag ],
 
           & handle_event_selectively
 
-        _ok && _persist_
+        _ok && persist_node_
       end
     end
 
@@ -82,84 +77,17 @@ module Skylab::Snag
       )
 
       def produce_result
-        _resolve_all_
+        resolve_node_collection_and_node_then_
       end
 
-      def _via_all_
+      def via_node_collection_and_node_
 
         _h = @argument_box.h_
 
         _ok = @node.edit :remove, :tag, :mixed, _h[ :tag ],
           & handle_event_selectively
 
-        _ok && _persist_
-      end
-    end
-
-    class Tag_Action__
-
-      def _resolve_all_
-        _ok = __resolve_node_collection_and_node_
-        _ok && _via_all_
-      end
-
-      def __resolve_node_only_
-
-        _oes_p = handle_event_selectively
-
-        node = @kernel.call_via_mutable_box :node, :to_stream,
-
-          :identifier, @argument_box.remove( :node_identifier ),
-
-          @argument_box,
-          & _oes_p
-
-        node and begin
-          @node = node
-          ACHIEVED_
-        end
-      end
-
-      def __resolve_node_collection_and_node_
-
-        _ok = __resolve_node_collection
-        _ok && __via_collection_resolve_node
-      end
-
-      def __resolve_node_collection
-
-        h = @argument_box.h_
-
-        _silo = @kernel.silo :node_collection
-
-        co = _silo.node_collection_via_upstream_identifier(
-          h.fetch( :upstream_identifier ),
-          & handle_event_selectively )
-
-        co and begin
-          @node_collection = co
-          ACHIEVED_
-        end
-      end
-
-      def __via_collection_resolve_node
-
-        node = @node_collection.entity_via_intrinsic_key(
-          @argument_box.fetch( :node_identifier ),
-          & handle_event_selectively )
-
-        node and begin
-          @node = node
-          ACHIEVED_
-        end
-      end
-
-      def _persist_
-
-        @node_collection.persist_entity(
-          @argument_box,
-          @node,
-          & handle_event_selectively )
+        _ok && persist_node_
       end
     end
   end

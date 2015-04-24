@@ -2,51 +2,31 @@ require_relative '../../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - node - actions -add", wip: true do
+  describe "[sg] models - node - actions - create" do
 
     extend TS_
+    use :expect_event
+    use :downstream_identifier_to_output_string
 
-    with_invocation 'nodes', 'add'
+    it "uses first available ID, placed in correct spot (integration)" do
 
-    with_tmpdir_patch do
+      call_API :node, :create, :message, 'ziff dizzle',
+        :upstream_identifier, Fixture_file_[ :rochambeaux_mani ],
+        :downstream_identifier, downstream_ID_around_input_string_
 
-      <<-O.unindent
-        diff --git a/#{ manifest_file } b/#{ manifest_file }
-        --- /dev/null
-        +++ b/#{ manifest_file }
-        @@ -0,0 +1,4 @@
-        +[#003] #open feep my deep
-        +[#002]       #done wizzle bizzle 2013-11-11
-        +               one more line
-        +[#001]       #done
-      O
-    end
+      # (was [#033] flickering test per setup tmpdir)
 
-    it "verbose dry run" do
-      setup_tmpdir_read_only
-      invoke '-n', '-v', 'foo bizzle'
+      scn = scanner_via_output_string_
+      scn.next_line.should eql "[#04] #open feep my deep\n"
+      scn.next_line.should eql "not business\n"
+      scn.next_line.should eql "[#003]       ziff dizzle\n"
+      scn.next_line.should eql "[#02]       #done wizzle bizzle 2013-11-11\n"
+      scn.next_line.should eql "               one more line\n"
+      scn.next_line.should eql NEWLINE_
+      scn.next_line.should eql "[#01]       #hi\n"
+      scn.next_line.should be_nil
 
-      o( / new line: / )
-      if output.lines.first.string =~ /mkdir .+snag-PROD/ # [#033]
-        output.lines.shift
-      elsif output.lines.first.string =~ / rm /
-        output.lines.shift
-      end
-      o( / mv /)
-      o( / mv /)
-      expect_done_line
-      o
-    end
-
-    it "non-verbose non-dry run" do
-      invoke 'foo bizzle'
-      o( /new line: \[#004\] {7}foo bizzle$/ )
-      expect_done_line
-      o
-    end
-
-    def expect_done_line
-      o %r(\Adone adding node\.\z)i
+      expect_succeeded
     end
   end
 end
