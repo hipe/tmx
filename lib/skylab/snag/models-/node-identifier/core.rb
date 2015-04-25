@@ -202,11 +202,24 @@ module Skylab::Snag
     end
 
     def reinitialize suffix_o=nil, d=nil
+
       @suffix = suffix_o
       @to_i = d
     end
 
     alias_method :initialize, :reinitialize
+
+    def reinitialize_copy_ fly
+
+      @suffix = fly.suffix
+      @to_i = fly.to_i
+      NIL_
+    end
+
+    def initialize_copy _
+      # hello - nothing to do (i.e. assume constituents don't mutate)
+      NIL_
+    end
 
     attr_reader :suffix, :to_i
 

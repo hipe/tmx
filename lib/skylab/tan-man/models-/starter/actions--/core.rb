@@ -149,8 +149,8 @@ module Skylab::TanMan
         end
       end
 
-      def entity_stream_via_model cls, & oes_p
-        _fs.entity_stream_via_model cls, & oes_p
+      def to_entity_stream_via_model cls, & oes_p
+        _fs.to_entity_stream_via_model cls, & oes_p
       end
 
       # ~
@@ -171,7 +171,7 @@ module Skylab::TanMan
 
       # ~ #hook-out's
 
-      def entity_stream_via_model _cls_, & oes_p
+      def to_entity_stream_via_model _cls_, & oes_p
 
         p = -> do
 

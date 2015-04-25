@@ -296,13 +296,13 @@ module Skylab::Snag
 
         pc.__receive_knowledge_about_value(  # NOTE still a flyweight!
           d,
-          scn.skip( VALUE_TAIL___ ) )  # nil IFF colon was last char on the line
+          scn.skip( VALUE_TAIL___ ) )  # nil when would be zero length
 
         pc
       end
 
       VALUE_HEAD___ = /:[[:space:]]*/
-      VALUE_TAIL___ = /[^[:space:],]+/  # might be at end of line
+      VALUE_TAIL___ = /[-a-z0-9_]+/i
     end
 
     module Possibly_with_Value_Methods

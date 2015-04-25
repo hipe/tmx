@@ -165,7 +165,7 @@ module Skylab::Snag::TestSupport
     memoize_ :_color_assoc_adaptr do
 
       subject_module_::Association_Adapter.new_with(
-        :verb_lemma, 'is',
+        :verb_lemma, 'be',
         :named_functions,
           :pin, :keyword, 'pink',
           :blu, :keyword, 'blue',

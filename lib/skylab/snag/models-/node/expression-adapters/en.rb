@@ -56,7 +56,7 @@ module Skylab::Snag
 
         da.module::Association_Adapter.new_with(
 
-          :verb_lemma_and_phrase_head_s_a, %w( is tagged with ),
+          :verb_lemma_and_phrase_head_s_a, %w( be tagged with ),
 
           :named_functions,
             :positive_tag, :regex, rx ) )
@@ -65,7 +65,7 @@ module Skylab::Snag
 
         da.module::Association_Adapter.new_with(
 
-          :verb_lemma_and_phrase_head_s_a, %w( is not tagged with ),
+          :verb_lemma_and_phrase_head_s_a, %w( be not tagged with ),
 
           :named_functions,
             :negative_tag, :regex, rx ) )

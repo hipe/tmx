@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  module Models_::Criteria
+  class Models_::Criteria
 
     module Library_
 
@@ -36,23 +36,8 @@ module Skylab::Snag
           @model_box_ = Callback_::Box.new
         end
 
-        # ~ query (or just parse)
 
-        def produce_result_for_query_via_word_array s_a, arg_h, & oes_p
-
-          x = parse_query_via_word_array s_a, & oes_p
-
-          x && __produce_result_for_query_via_parse_tree( x, arg_h, & oes_p )
-        end
-
-        def __produce_result_for_query_via_parse_tree tr, arg_h, & oes_p
-
-          _mod = @_kernel.unbound_via_normal_identifier tr.name_x
-
-          _mod.interpret_out_of_under_ tr.value_x, arg_h, @_kernel, & oes_p
-        end
-
-        def parse_query_via_word_array s_a, & x_p
+        def new_criteria_tree_via_word_array s_a, & x_p
 
           DA_::Actors_::Interpret_criteria.new( s_a, self, & x_p ).execute
         end

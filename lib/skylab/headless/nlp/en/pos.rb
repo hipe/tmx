@@ -1097,8 +1097,9 @@ module Skylab::Headless
       preterite: 'had',
       singular_third_present: 'has' )
 
-    lexicon[ 'is' ] = new(
+    lexicon[ 'be' ] = new(
       preterite: 'was',
+      singular_third_present: 'is',
       plural_third_present: 'are' ) # etc
 
   end

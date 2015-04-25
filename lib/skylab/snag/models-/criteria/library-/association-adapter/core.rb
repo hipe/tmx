@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  module Models_::Criteria
+  class Models_::Criteria
 
     module Library_
 
@@ -158,7 +158,11 @@ module Skylab::Snag
 
         def __scan_the_verb_phrase_head_for__singular__via_input_stream in_st, & x_p
 
-          Parse_static_sequence_[ in_st, @verb_lemma_and_phrase_head_s_a, & x_p ]
+          @___verb_head_string_array_for_singular ||=
+            __build_verb_head_string_array_for_singular
+
+          Parse_static_sequence_[
+            in_st, @___verb_head_string_array_for_singular, & x_p ]
         end
 
         def __scan_the_verb_phrase_head_for__plural__via_input_stream in_st, & x_p
@@ -170,7 +174,21 @@ module Skylab::Snag
             in_st, @___verb_head_string_array_for_plural, & x_p ]
         end
 
+        def __build_verb_head_string_array_for_singular
+
+          _build_verb_head_string_array_for do | lexeme |
+            lexeme.singular__third__present
+          end
+        end
+
         def __build_verb_head_string_array_for_plural
+
+          _build_verb_head_string_array_for do | lexeme |
+            lexeme.plural__third__present
+          end
+        end
+
+        def _build_verb_head_string_array_for
 
           s_a = @verb_lemma_and_phrase_head_s_a
 
@@ -181,12 +199,12 @@ module Skylab::Snag
           lexeme = v.lexicon.fetch_monadic_lexeme s do end
 
           if ! lexeme
-            self._YAY
+            self._WE_ALMOST_ALWAYS_USE_IRREGULR_VERB_LIKE_HAVE_AND_BE
             lexeme = v[ s ]
           end
 
           s_a_ = s_a.dup
-          s_a_[ 0 ] = lexeme.plural__third__present
+          s_a_[ 0 ] = yield lexeme
           s_a_
         end
 

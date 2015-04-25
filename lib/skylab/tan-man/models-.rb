@@ -206,7 +206,7 @@ module Skylab::TanMan
 
     def __reduce_to_array_against_natural_key_fuzzily name_s, & oes_p
 
-      st = entity_stream_via_model _model_class, & oes_p
+      st = to_entity_stream_via_model _model_class, & oes_p
 
       st and __fuzzy_reduce_to_array_stream_against_natkey st, name_s, & oes_p
     end
@@ -253,7 +253,7 @@ module Skylab::TanMan
 
     def __build_zero_entities_found_against_natural_key_event name_s
 
-      _scn = entity_stream_via_model _model_class do  # :+#hook-in
+      _scn = to_entity_stream_via_model _model_class do  # :+#hook-in
       end
 
       _a_few_ent_a = _scn.take A_FEW__ do |x|

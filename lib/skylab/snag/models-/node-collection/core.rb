@@ -2,28 +2,40 @@ module Skylab::Snag
 
   class Models_::Node_Collection
 
-    class Silo_Daemon
+    class << self
 
-      def initialize kr, mc
-        @kernel = kr
-        @model_class = mc
-        freeze
-      end
+      def new_via_upstream_identifier x, & oes_p
 
-      def node_collection_via_upstream_identifier x, & oes_p
+        if x.respond_to? :to_simple_line_stream
 
-        id = if x.respond_to? :to_simple_line_stream
-          x
+          _new_via_upstream_identifier x, & oes_p
+        else
 
-        else  # the current fallback assumption is that this is an FS path
-
-          Snag_.lib_.system.filesystem.class::Byte_Upstream_Identifier.new x
+          # (the current fallback assumption is that this is an FS path)
+          new_via_path x, & oes_p
         end
-
-        NC_::Expression_Adapters.const_get( id.modality_const, false ).
-          node_collection_via_upstream_identifier( id, & oes_p )
       end
-    end
+
+      def new_via_path path, & oes_p
+
+        _id = Snag_.lib_.
+          system.filesystem.class::Byte_Upstream_Identifier.new path
+
+        _new_via_upstream_identifier _id, & oes_p
+      end
+
+      def _new_via_upstream_identifier id, & oes_p
+
+        expression_adapter_( id.modality_const ).
+
+          node_collection_via_upstream_identifier_( id, & oes_p )
+      end
+
+      def expression_adapter_ modality_const
+
+        NC_::Expression_Adapters.const_get modality_const, false
+      end
+    end  # >>
 
     def edit * x_a, & x_p
 

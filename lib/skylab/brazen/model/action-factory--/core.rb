@@ -189,7 +189,7 @@ module Skylab::Brazen
         include Semi_Generated_Instance_Methods__
 
         def produce_result
-          entity_collection.entity_stream_via_model(
+          entity_collection.to_entity_stream_via_model(
             _model_class, & handle_event_selectively )
         end
       end
@@ -207,7 +207,7 @@ module Skylab::Brazen
 
         def produce_one_entity & oes_p
           oes_p ||= handle_event_selectively
-          @__entity_stream = entity_collection.entity_stream_via_model(
+          @__entity_stream = entity_collection.to_entity_stream_via_model(
             _model_class, & oes_p )
           __via_entity_stream_and_dsc_for_one_produce_entity( & oes_p )
         end

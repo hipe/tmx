@@ -35,7 +35,7 @@ module Skylab::Snag
 
         def __resolve_the_entity_upstream
 
-          st = @collection.to_node_stream( & @on_event_selectively )
+          st = @collection.to_entity_stream( & @on_event_selectively )
           st and begin
             @entity_upstream = st
             ACHIEVED_

@@ -57,7 +57,9 @@
 [#019]       #tracking-tag prefixes - places where they might bite
 [#018]       #done functionality, interface for closing an issue
 [#017]       #parent-node: [#046] a cb error result may be translated
-[#016]       #done remove fixed field requirement
+[#016] #idea "decision tree" - see why a particular entity failed
+               against the criteria as a subset tree of the crit. tree
+             ( #was: #done remove fixed field requirement )
 [#015]       one day tie EN-like expression adaters in with etc ..
              ( #was: #done rearch to find issues.md )
 [#014]       #done open issue report

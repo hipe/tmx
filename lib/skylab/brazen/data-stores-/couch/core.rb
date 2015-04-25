@@ -110,7 +110,7 @@ module Skylab::Brazen
       Couch_::Actors__::Retrieve_datastore_entity[ id, self, @kernel, & oes_p ]
     end
 
-    def entity_stream_via_model cls, & oes_p
+    def to_entity_stream_via_model cls, & oes_p
       Couch_::Actors__::Build_stream.with :model_class, cls,
         :datastore, self,
         :kernel, @kernel,

@@ -13,7 +13,7 @@ module Skylab::Snag::TestSupport
 
     it "go" do
 
-      o = _the_first_domain.parse_query_via_word_array(
+      o = _the_first_domain.new_criteria_tree_via_word_array(
         %w( things that are 6 feet wide or 10 feet tall ) )
 
       o.name_x.should eql %i( Thing )
@@ -44,7 +44,7 @@ module Skylab::Snag::TestSupport
 
       _h = mod::Association_Adapter.new_with(
 
-        :verb_lemma, 'is',
+        :verb_lemma, 'be',
 
         :named_functions,
 
@@ -58,7 +58,7 @@ module Skylab::Snag::TestSupport
 
       _w = mod::Association_Adapter.new_with(
 
-        :verb_lemma, 'is',
+        :verb_lemma, 'be',
 
         :named_functions,
 

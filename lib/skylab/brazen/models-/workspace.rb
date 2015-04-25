@@ -125,10 +125,10 @@ module Skylab::Brazen
       end
     end
 
-    def entity_stream_via_model cls, & oes_p
+    def to_entity_stream_via_model cls, & oes_p
       doc = _document( & oes_p )
       doc and begin
-        doc.entity_stream_via_model cls, & oes_p
+        doc.to_entity_stream_via_model cls, & oes_p
       end
     end
 

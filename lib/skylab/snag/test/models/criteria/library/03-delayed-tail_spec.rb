@@ -58,7 +58,7 @@ module Skylab::Snag::TestSupport
 
       subject_module_::Association_Adapter.new_with(
 
-        :verb_lemma, 'is',
+        :verb_lemma, 'be',
 
         :named_functions,
 

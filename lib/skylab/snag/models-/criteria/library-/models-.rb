@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  module Models_::Criteria
+  class Models_::Criteria
 
     module Library_
 
@@ -41,6 +41,10 @@ module Skylab::Snag
 
           def to_tree_
             LIB_.basic::Tree::Immutable_Leaf.new @symbol
+          end
+
+          def criteria_tree_shape_category_
+            :output_node
           end
 
           def modality_const
@@ -167,9 +171,16 @@ module Skylab::Snag
 
             _p_a = @a.map do | o |
 
-              _assoc_mod = model_lookup_p[ o.associated_model_identifier ]
+              if :conjunction == o.criteria_tree_shape_category_
 
-              _assoc_mod.to_criteria_proc_out_of_( * o.to_arguments_ )
+                o.to_criteria_proc_under_ model_lookup_p
+
+              else
+
+                _assoc_mod = model_lookup_p[ o.associated_model_identifier ]
+
+                _assoc_mod.to_criteria_proc_out_of_( * o.to_arguments_ )
+              end
             end
 
             _to_criteria_proc_via_proc_array_ _p_a
@@ -193,6 +204,10 @@ module Skylab::Snag
             x = @a.fetch( -1 )
             @a[ -1 ] = x_
             x
+          end
+
+          def criteria_tree_shape_category_
+            :conjunction
           end
 
           def modality_const

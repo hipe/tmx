@@ -70,9 +70,31 @@ module Skylab::Snag
         end  # >>
 
         def initialize r, sstr_a
-          @r = r
-          @sstr_a = sstr_a
+          @_r = r
+          @_sstr_a = sstr_a
         end
+
+        def reinitialize_copy_ src  # schlurp state from one fly to another
+          @_r = src._r
+          @_sstr_a = src._sstr_a.dup
+          NIL_
+        end
+
+        def reinitialize r  # when you are a flyweight, on to the next thing
+          @_r = r
+          NIL_
+        end
+
+        def initialize_copy src  # `dup`
+          @_sstr_a = src._sstr_a.dup
+          NIL_
+        end
+
+      protected
+
+        attr_reader :_r, :_sstr_a
+
+      public
 
         def receive_extended_content_adapter__ x
           @extended_content_adapter_ = x
@@ -81,23 +103,13 @@ module Skylab::Snag
 
         attr_reader :extended_content_adapter_
 
-        def reinitialize r
-          @r = r
-          NIL_
-        end
-
-        def initialize_copy _
-          @sstr_a = @sstr_a.dup
-          NIL_
-        end
-
         def is_mutable
           false
         end
 
         def to_mutable
           BS_::Mutable_Models_::Body.
-            via_range_and_substring_array__( @r, @sstr_a.dup )
+            via_range_and_substring_array__( @_r, @_sstr_a.dup )
         end
 
         def express_N_units_into_under_ d, y, expag
@@ -118,7 +130,7 @@ module Skylab::Snag
             MONADIC_TRUTH_
           end
 
-          @sstr_a.each do | substring_o |
+          @_sstr_a.each do | substring_o |
             stay[] or break
             y << substring_o.s
           end
@@ -128,9 +140,9 @@ module Skylab::Snag
 
         def to_business_row_stream_
 
-          a = @sstr_a
+          a = @_sstr_a
 
-          Callback_::Stream.via_range @r do | d |
+          Callback_::Stream.via_range @_r do | d |
             a.fetch d
           end
         end

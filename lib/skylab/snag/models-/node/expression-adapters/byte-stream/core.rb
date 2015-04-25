@@ -166,7 +166,6 @@ module Skylab::Snag
               # in cases where the mutated string piece ends up with no
               # content of its own, skip over it and produce deep pc now
 
-              self._COVER_ME
               deep_pc
             else
 

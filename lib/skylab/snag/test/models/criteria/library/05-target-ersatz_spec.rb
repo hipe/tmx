@@ -13,7 +13,7 @@ module Skylab::Snag::TestSupport
 
     it "go" do
 
-      o = _ersatz_domain.parse_query_via_word_array(
+      o = _ersatz_domain.new_criteria_tree_via_word_array(
         %w( the thing is marked with "sale" or "clearance" and
             has no particular shortcomings ) )
 
@@ -47,7 +47,7 @@ module Skylab::Snag::TestSupport
 
       sticker = mod::Association_Adapter.new_with(
 
-        :verb_lemma_and_phrase_head_s_a, %w( is marked with ),
+        :verb_lemma_and_phrase_head_s_a, %w( be marked with ),
 
         :named_functions,
 
@@ -56,7 +56,7 @@ module Skylab::Snag::TestSupport
 
       shortcomings = mod::Association_Adapter.new_with(
 
-        :verb_lemma, 'has',
+        :verb_lemma, 'have',
 
         :named_functions,
 

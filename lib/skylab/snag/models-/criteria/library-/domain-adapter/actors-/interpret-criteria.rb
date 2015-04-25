@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  module Models_::Criteria
+  class Models_::Criteria
 
     module Library_
 

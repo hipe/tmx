@@ -4,6 +4,23 @@ module Skylab::Snag
 
     class << self
 
+      def new_criteria s_a
+
+        cr = Snag_::Models_::Criteria.new Snag_.application_kernel_
+
+        ok = cr.receive_criteria_expression s_a
+        if ok
+          cr
+        else
+          ok
+        end
+      end
+
+      def collection_module_for_criteria_resolution
+
+        Snag_::Models_::Node_Collection
+      end
+
       def interpret_out_of_under_ x, x_, k, & oes_p
 
         Node_::Expression_Adapters.const_get( x.modality_const, false ).
@@ -62,23 +79,29 @@ module Skylab::Snag
       end
 
       if id_o
-        id_o.respond_to?( :suffix ) or raise ::ArgumentError, "where? #{ id_o.class }"
         @ID = id_o
       end
     end
 
     def reinitialize id_o
 
-      if id_o
-        id_o.respond_to?( :suffix ) or raise ::ArgumentError, "where? #{ id_o.class }"
-      end
-
       @ID = id_o
       NIL_
     end
 
-    def initialize_copy _
-      @body = @body.dup
+    def reinitialize_copy_ src
+
+      @body.reinitialize_copy_ src.body
+      @ID.reinitialize_copy_ src.ID
+
+      NIL_
+    end
+
+    def initialize_copy src
+
+      @body = src.body.dup
+      @ID = src.ID.dup
+
       NIL_
     end
 
@@ -134,6 +157,23 @@ module Skylab::Snag
       _ ? true : false
     end
 
+    def number_of_times_tagged_with sym
+
+      count = 0
+
+      st = to_tag_stream
+      begin
+        tag = st.gets
+        tag or break
+        if sym == tag.intern
+          count += 1
+        end
+        redo
+      end while nil
+
+      count
+    end
+
     def has_equivalent__tag__object_ o
 
       _ = to_tag_stream.detect do | tag |
@@ -147,7 +187,7 @@ module Skylab::Snag
     def to_tag_stream
 
       if @body
-        @body.entity_stream_via_model Snag_::Models_::Tag
+        @body.to_entity_stream_via_model Snag_::Models_::Tag
       else
         Callback_::Stream.the_empty_stream
       end
@@ -270,12 +310,8 @@ module Skylab::Snag
 
       def _resolve_node_collection
 
-        h = @argument_box.h_
-
-        _silo = @kernel.silo :node_collection
-
-        co = _silo.node_collection_via_upstream_identifier(
-          h.fetch( :upstream_identifier ),
+        co = Snag_::Models_::Node_Collection.new_via_upstream_identifier(
+          @argument_box.fetch( :upstream_identifier ),
           & handle_event_selectively )
 
         co and begin
@@ -307,7 +343,7 @@ module Skylab::Snag
 
     class Common_Body_  # (for three)
 
-      def entity_stream_via_model cls
+      def to_entity_stream_via_model cls
 
         sym = cls.category_symbol
 

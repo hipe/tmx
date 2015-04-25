@@ -36,7 +36,7 @@ module Skylab::TanMan
 
       # ~ retrieve (many)
 
-      def entity_stream_via_model cls, & oes_p
+      def to_entity_stream_via_model cls, & oes_p
 
         if @model_class == cls  # just to punish those who dare defy us
           _build_session.to_stream_of_meanings_with_mutable_string_metadata

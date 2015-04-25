@@ -7,7 +7,7 @@ up the pandora's box of queries, joins etc. we aren't going to get into
 all that just yet (as in, it's not implemented). instead, try:
 
 
-    entity_stream_via_model <cls>, & <on event selectively>
+    to_entity_stream_via_model <cls>, & <on event selectively>
 
 
 using a model class as the "query" is crude and won't scale, but it's

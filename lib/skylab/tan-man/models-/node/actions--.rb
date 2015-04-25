@@ -147,7 +147,7 @@ module Skylab::TanMan
         end
       end
 
-      def entity_stream_via_model model
+      def to_entity_stream_via_model model
         if @model_class == model
           to_node_sexp_stream.map_by do | node |
             _entity_via_node node

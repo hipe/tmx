@@ -22,7 +22,7 @@ subgraph cluster_main {
   node_upstream [label="11. node\nupstream" style=filled]
   oaa [label="20. create" style=filled]
   rea [label="integrated" ]
-  rea_actor [label="find any best existing\nreappropriable node" ]
+  rea_actor [label="22. find any best existing\nreappropriable node", style=filled]
   stru [label="13. experimental support\nfor structured tags" style=filled]
   tag_model [label="10. tag model" style=filled]
   tmpdir [label="16. produce\ntmpdir" style=filled]

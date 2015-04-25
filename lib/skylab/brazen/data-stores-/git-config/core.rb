@@ -44,7 +44,7 @@ module Skylab::Brazen
     end
 
     def members
-      [ :receive_delete_entity, :entity_stream_via_model,
+      [ :receive_delete_entity, :to_entity_stream_via_model,
           :entity_via_key, :persist_entity,
             :property_value_via_symbol ]
     end
@@ -80,7 +80,7 @@ module Skylab::Brazen
 
     # ~ retrieve (many)
 
-    def entity_stream_via_model cls, & oes_p
+    def to_entity_stream_via_model cls, & oes_p
       Git_Config_::Actors__::Build_stream[ cls, _document, @kernel, & oes_p ]
     end
 

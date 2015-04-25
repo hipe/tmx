@@ -24,7 +24,7 @@ module Skylab::Snag::TestSupport
 
       _o = _min_assoc_adptr
       _o.instance_variable_get( :@verb_lemma_and_phrase_head_s_a ).should(
-        eql %w( is ) )
+        eql %w( be ) )
     end
 
     it "the named functions gets parsed" do
@@ -173,7 +173,7 @@ module Skylab::Snag::TestSupport
     memoize_ :_min_assoc_adptr do
 
       subject_module_::Association_Adapter.new_with(
-        :verb_lemma, 'is',
+        :verb_lemma, 'be',
         :named_functions,
           :the_ON_form, :keyword, 'on',
           :the_OFF_form, :keyword, 'off'

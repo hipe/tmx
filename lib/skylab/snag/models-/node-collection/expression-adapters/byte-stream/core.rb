@@ -6,7 +6,7 @@ module Skylab::Snag
 
       class << self
 
-        def node_collection_via_upstream_identifier id, & oes_p
+        def node_collection_via_upstream_identifier_ id, & oes_p
 
           Native_Collection___.new id
         end
@@ -62,7 +62,7 @@ module Skylab::Snag
 
         def entity_via_identifier_object id_o, & oes_p
 
-          st = to_node_stream( & oes_p )
+          st = to_entity_stream( & oes_p )
 
           st and begin
 
@@ -103,9 +103,9 @@ module Skylab::Snag
           node
         end
 
-        # ~ retrive many ( counterpart to [#br-032] entity_stream_via_model )
+        # ~ retrive many ( counterpart to [#br-032] to_entity_stream_via_model )
 
-        def to_node_stream & oes_p  #
+        def to_entity_stream & oes_p  #
 
           BS_::Actors_::Produce_node_upstream[
             self, @byte_upstream_ID, & oes_p ]
@@ -124,10 +124,24 @@ module Skylab::Snag
 
         def __build_extc_adpr
 
-          Expression_Adapters::Filesystem::Extended_Content_Adapter.
-            new_via_manifest_path_and_filesystem(
-              @byte_upstream_ID.path,
-              filesystem_ )
+          bu_id = @byte_upstream_ID
+          if bu_id.respond_to? :path
+
+            Expression_Adapters::Filesystem::Extended_Content_Adapter.
+              new_via_manifest_path_and_filesystem(
+                bu_id.path, filesystem_ )
+          else
+            EC_Adapter_Dummy___[]
+          end
+        end
+
+        EC_Adapter_Dummy___ = Callback_.memoize do
+          o = ::Object.new
+          o.send :define_singleton_method,
+              :node_has_extended_content_via_node_id__ do | _ |
+            false
+          end
+          o
         end
 
         def filesystem_

@@ -41,8 +41,10 @@ module Skylab::Snag
         end
 
         def intern
+
           if @value_is_known
-            self._NOT_COVERED_YET
+
+            @_string[ @_name_r.begin + 1 ... @_name_r.end ].intern
           else
             @_string[ @_begin + 1, @_length - 1 ].intern
           end

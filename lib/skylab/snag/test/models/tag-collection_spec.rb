@@ -106,7 +106,7 @@ module Skylab::Snag::TestSupport
 
     def __expect_appended y
 
-      a = _body.instance_variable_get( :@sstr_a )
+      a = _body.send :_sstr_a
       y[ 0 ].should eql a[ 0 ].s
       y[ 1 ].should eql a[ 1 ].s
       y[ 2 ].should eql a[ 2 ].s

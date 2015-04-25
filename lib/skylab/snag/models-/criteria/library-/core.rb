@@ -1,10 +1,10 @@
 module Skylab::Snag
 
-  module Models_::Criteria
+  class Models_::Criteria
 
     module Library_
 
-      # library (local & iternal) name conventions:
+      # library (local & internal) name conventions:
       #
       #   • `interpret_` takes a in_st and a g.ctxt. result is o.n
       #

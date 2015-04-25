@@ -34,7 +34,7 @@ module Skylab::Snag
           nc.entity_via_identifier_object id_o, & handle_event_selectively
         else
 
-          st = nc.to_node_stream( & handle_event_selectively )
+          st = nc.to_entity_stream( & handle_event_selectively )
           st and begin
             d = h[ :number_limit ]
             if d
