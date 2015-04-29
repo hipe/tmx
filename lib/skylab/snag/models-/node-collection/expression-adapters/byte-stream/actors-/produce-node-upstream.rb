@@ -59,7 +59,7 @@ module Skylab::Snag
           if s
 
             @receive_first_line_of_stream[ s ]
-            __gets_first_node_via_first_line_of_stream s
+            __gets_first_node_via_first_line_of_stream
 
           else
             _EOF s
@@ -80,8 +80,8 @@ module Skylab::Snag
 
           # ~ ID related
 
-          @ID = _Models::Node_Identifier.new
-          @ID_ = _Models::Node_Identifier.new
+          @ID = _Models::Node_Identifier.new_empty
+          @ID_ = _Models::Node_Identifier.new_empty
 
           @reinterpret_ID = _Models::Node_Identifier::Expression_Adapters::
             Byte_Stream.build_reinterpreter _STRING_SCANNER
@@ -107,7 +107,7 @@ module Skylab::Snag
           NIL_
         end
 
-        def __gets_first_node_via_first_line_of_stream s  # may be used after rewind
+        def __gets_first_node_via_first_line_of_stream  # may be used after rewind
 
           _ok = __gather_up_leading_non_identifier_lines
           _ok && __gets_first_node

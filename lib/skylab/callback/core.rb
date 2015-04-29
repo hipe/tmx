@@ -488,7 +488,7 @@ module Skylab::Callback
 
   Polymorphic_Stream_via_Array_ = class Polymorphic_Stream  # :[#046]
 
-    def reinitialize d, x_a
+    def reinitialize d=0, x_a
       @d = d ; @x_a = x_a ; @x_a_length = x_a.length
     end
 

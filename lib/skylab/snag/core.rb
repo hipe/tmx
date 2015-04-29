@@ -60,7 +60,23 @@ module Skylab::Snag
 
   end  # >>
 
-  # ~ instance & module methods
+  Autoloader_ = Callback_::Autoloader
+
+  module Models_
+
+    Ping = -> act_pxy, & oes_p do
+
+      oes_p.call :info, :expression, :ping do | y |
+        y << "hello from #{ act_pxy.kernel.app_name }."
+      end
+
+      :hello_from_snag
+    end
+
+    Autoloader_[ self, :boxxy ]
+  end
+
+  # ~ support
 
   module Actor_as_Model_Module_Methods_
 
@@ -78,20 +94,21 @@ module Skylab::Snag
     end
   end
 
-  Autoloader_ = Callback_::Autoloader
+  Argument_interpreter_via_normalization_ = -> n11n do
 
-  module Models_
+    -> arg_st, & x_p do
 
-    Ping = -> act_pxy, & oes_p do
+      _trio = Callback_::Trio.new arg_st.gets_one, true
 
-      oes_p.call :info, :expression, :ping do | y |
-        y << "hello from #{ act_pxy.kernel.app_name }."
+      n11n.normalize_argument _trio do | * i_a, & ev_p |
+
+        if x_p
+          x_p[ * i_a, & ev_p ]
+        else
+          raise ev_p[].to_exception
+        end
       end
-
-      :hello_from_snag
     end
-
-    Autoloader_[ self, :boxxy ]
   end
 
   module Expression_Methods_
@@ -104,27 +121,34 @@ module Skylab::Snag
 
     def express_into_under y, expag
 
-      _expad_for( expag ).express_into_under_of_ y, expag, self
+      sym = expag.modality_const
+      if sym
+        _expad_for( sym ).express_into_under_of_ y, expag, self
+      else
+        express_into_ y
+      end
     end
 
     def express_N_units_into_under d, y, expag
 
-      _expad_for( expag ).express_N_units_into_under_of_ d, y, expag, self
+      sym = expag.modality_const
+      if sym
+        _expad_for( sym ).express_N_units_into_under_of_ d, y, expag, self
+      else
+        express_N_units_into_under_agnostic_ d, y, exag
+      end
     end
 
-    def _expad_for expag
+    def _expad_for sym
 
-      _const = expag.modality_const || :Byte_Stream
-
-      self.class::Expression_Adapters.const_get _const, false
+      self.class::Expression_Adapters.const_get sym, false
     end
   end
 
   INTERPRET_OUT_OF_UNDER_METHOD_ = -> x, moda, & oes_p do
 
     self::Expression_Adapters.const_get( moda.intern, false ).
-
-      interpret_out_of_under_ x, moda, & oes_p
+      const_get( :Interpret, false )[ x, moda, & oes_p ]
   end
 
   module Model_
@@ -139,15 +163,16 @@ module Skylab::Snag
   Bzn__ = Autoloader_.build_require_sidesystem_proc :Brazen
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> { }
-  EMPTY_S_ = ''.freeze
+  EMPTY_S_ = ''
   IDENTITY_ = -> x { x }
   stowaway :Library_, 'lib-'
-  LINE_SEP_ = "\n".freeze
+  LINE_SEP_ = "\n"
   NIL_ = nil
   KEEP_PARSING_ = true
   NEUTRAL_ = nil
   Snag_ = self
-  SPACE_ = ' '.freeze
+  SPACE_ = ' '
   THE_EMPTY_MODULE_ = nil
   UNABLE_ = false
+  UNDERSCORE_ = '_'
 end

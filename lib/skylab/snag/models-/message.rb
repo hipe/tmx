@@ -4,14 +4,22 @@ module Skylab::Snag
 
     class << self
 
-      p = -> arg, & oes_p do
+      def normalize_value__ x, & x_p  # valid values are true-ish
+
+        _trio = Callback_::Trio.new x, true
+        trio = N11n_instance___[].normalize_argument _trio, & x_p
+        trio and trio.value_x
+      end
+    end  # >>
+
+    N11n_instance___ = Callback_.memoize do
 
         # we build this policy here but it could be anywhere. we memoize
         # a singleton "formal set" here but in the future this might be
         # built more dynamically, for example as a product of arguments
         # or the environment
 
-        nx = Normalization___.new_with(
+        Normalization___.new_with(
 
           :must_be_trueish,
           :no_blanks,
@@ -19,17 +27,7 @@ module Skylab::Snag
           :no_newlines
           # character_limit Models::Manifest.line_width - Models::Manifest.header_width
         )
-
-        p = -> arg_, & oes_p_ do
-          nx.normalize_argument arg_, & oes_p_
-        end
-        p[ arg, & oes_p ]
-      end
-
-      define_method :normalize_argument do | arg, & oes_p |
-        p[ arg, & oes_p ]
-      end
-    end  # >>
+    end
 
     class Normalization___
 

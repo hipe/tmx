@@ -6,7 +6,7 @@ module Skylab::Snag::TestSupport
 
     extend TS_
     use :expect_event
-    use :downstream_redirect_to_string
+    use :byte_up_and_downstreams
 
     context "(with this manifest)" do
 
@@ -51,13 +51,13 @@ module Skylab::Snag::TestSupport
         _ev = expect_not_OK_event :entity_already_added
         black_and_white( _ev ).should eql "[#1] already has #hi"
 
-        expect_failed
+        expect_neutralled
       end
 
       it "to [#07] append tag '2014-ok'" do
 
         _call :node_identifier, 7, :tag, '2014-ok',
-          :downstream_identifier, downstream_ID_around_input_string_
+          :downstream_identifier, downstream_ID_for_output_string_ivar_
 
         scn = scanner_via_output_string_
 

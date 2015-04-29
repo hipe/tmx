@@ -7,9 +7,16 @@ module Skylab::Snag
     class Actors_::Normalize_stem
 
       Callback_::Actor.call self, :properties,
-        :symbol
+        :x
 
       def execute
+
+        x = @x
+        @symbol = if x.respond_to? :ascii_only?
+          x.intern
+        else
+          x  # assumed
+        end
 
         @as_string = "##{ @symbol.id2name }"  # :+[#007] add hashtag prefix
 

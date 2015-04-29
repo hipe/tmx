@@ -147,9 +147,14 @@ module Skylab::Callback
             NIL_
           end
 
+          seen_h = {}
+
           while st.unparsed_exists
 
             sym = st.gets_one
+
+            seen_h[ sym ] = true
+
             prp = bx[ sym ]
 
             if prp
@@ -167,19 +172,24 @@ module Skylab::Callback
           at_end[]
 
           if ok
-            __init_defaults
+            __init_defaults seen_h
           end
 
           ok or raise ::ArgumentError  # until this is universally normalized
         end
 
-        def __init_defaults
+        def __init_defaults seen_h
 
           formal_properties.each_value do | prp |
+
+            seen_h[ prp.name_symbol ] and next
+
             ivar = prp.name_as_ivar
+
             x = if instance_variable_defined? ivar
               instance_variable_get ivar
             end
+
             if x.nil?
               instance_variable_set ivar, prp.default_value
             end

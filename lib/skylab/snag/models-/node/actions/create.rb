@@ -19,11 +19,12 @@ module Skylab::Snag
 
         bx = @argument_box
 
-        @node_collection.edit :add, :node,
-          bx.fetch( :message ),
-          :which_is, :message,
-          :modifiers, bx,
-          & handle_event_selectively
+        @node_collection.edit(
+
+          :using, bx,
+          :add, :node,
+            :append, :message, bx.fetch( :message ),
+          & handle_event_selectively )
       end
     end
   end

@@ -8,7 +8,7 @@ module Skylab::Snag::TestSupport
 
     extend TS_
     use :expect_event
-    use :byte_stream_support
+    use :byte_up_and_downstreams
 
     it "minimal positive case" do
 
@@ -36,7 +36,7 @@ module Skylab::Snag::TestSupport
 
     it "create then express as byte stream" do
 
-      o = _subject.new_via_identifier _id 3  # the node identifier is '3'
+      o = _subject.send :new, _id( 3 )  # the node identifier is '3'
 
       o.append_tag :love
       o.append_string 'this'
@@ -68,7 +68,7 @@ module Skylab::Snag::TestSupport
 
     it "read from byte-strem then prepend" do
 
-      o = _subject.new_via_identifier_and_body _id( 4 ), _body
+      o = _new_node_via_identifier_and_body _id( 4 ), _body
 
       _ok = o.prepend_tag :boo, & handle_event_selectively
       expect_no_events
@@ -93,7 +93,7 @@ module Skylab::Snag::TestSupport
 
     it "read from byte-stream then append (it only re-writes the necessary lines)" do
 
-      o = _subject.new_via_identifier_and_body _id( 3 ), _body
+      o = _new_node_via_identifier_and_body _id( 3 ), _body
 
       _ok = o.append_tag :zoo, & handle_event_selectively
       expect_no_events
@@ -119,8 +119,13 @@ module Skylab::Snag::TestSupport
 
     alias_method :_expag, :build_byte_stream_expag_
 
+    def _new_node_via_identifier_and_body id, body
+
+      Snag_::Models_::Node.send :new, id, body
+    end
+
     def _id d
-      Snag_::Models_::Node_Identifier.new_via_integer d
+      Snag_::Models_::Node_Identifier.send :new, nil, d
     end
 
     memoize_ :_body do

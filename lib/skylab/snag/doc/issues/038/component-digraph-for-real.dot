@@ -1,0 +1,39 @@
+digraph {
+
+  label="the snag application"
+
+  nc[label="node\ncollection"]
+  nd[label="node"]
+
+  nc -> nd[label="has many"]
+
+  nid[label="node ID"]
+  nd->nid[label="has"]
+
+  nid_int[label="integer"]
+  nid_suffix[label="suffix"]
+
+  nid->nid_int[label="has"]
+  nid->nid_suffix[label="has"]
+
+  nid_suffix_cmpnt[label="suffix component"]
+  nid_suffix->nid_suffix_cmpnt[label="has many"]
+
+  nsc_sep[label="separator"]
+  nsc_str[label="string"]
+  nid_suffix_cmpnt->nsc_sep
+  nid_suffix_cmpnt->nsc_str
+
+  nbody[label="node\nbody"]
+  nd->nbody[label="has"]
+
+  nbody_obj[label="object"]
+  nbody->nbody_obj[label="has many"]
+
+  nbody_obj_string[label="string"]
+  nbody_obj_tag[label="tag"]
+
+  nbody_obj_string->nbody_obj[label="is"]
+  nbody_obj_tag->nbody_obj[label="is"]
+
+}

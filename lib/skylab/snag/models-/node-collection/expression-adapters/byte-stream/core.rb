@@ -27,7 +27,11 @@ module Skylab::Snag
 
         # ~ inteface with the mutation session (compliments those in parent clas)
 
-        def receive_notification_of_change_during_mutation_session
+        def mutable_body_for_mutation_session
+          self
+        end
+
+        def receive_changed_during_mutation_session
           # nothiing.
           ACHIEVED_
         end
@@ -54,7 +58,7 @@ module Skylab::Snag
 
         def entity_via_intrinsic_key node_id_x, & oes_p
 
-          id = Snag_::Models_::Node_Identifier.try_convert(
+          id = Snag_::Models_::Node_Identifier.new_via_user_value(
             node_id_x, & oes_p )
 
           id and entity_via_identifier_object id, & oes_p

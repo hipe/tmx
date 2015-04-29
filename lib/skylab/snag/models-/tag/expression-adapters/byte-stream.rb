@@ -6,7 +6,8 @@ module Skylab::Snag
 
       class << self
 
-        def express_into_under_of_ y, expag, tag
+        def express_into_under_of_ y, _expag, tag
+
           y << "#{ HASHTAG_PREFIX___ }#{ tag.intern }"  # :+[#007]
           ACHIEVED_
         end
@@ -22,15 +23,26 @@ module Skylab::Snag
         # the arbitrary business methods of our parent (all from the
         # same object), experimentally we duplicate some code from [#056]
 
-        def initialize
-          @value_is_known_is_known = nil
-          @value_is_known = nil
-        end
+        class << self
 
-        def _reinitialize * a
-          @_begin, @_length, @_string = a
-          @value_is_known = @value_is_known_is_known = nil
+          def new_via begin_, length, string
+
+            # play nice with hashtag lib. override parent - we keep this info
+
+            new begin_, length, string
+          end
+        end  # >>
+
+        def reinitialize begin_, length, string
+
+          @_begin = begin_
+          @_length = length
+          @_string = string
+
+          @value_is_known = nil
+          @value_is_known_is_known = nil
         end
+        alias_method :initialize, :reinitialize
 
         def initialize_copy _
           NIL_  # just saying hello - nothing to do
@@ -56,6 +68,8 @@ module Skylab::Snag
 
         include Snag_::Models::Hashtag::Possibly_with_Value_Methods
       end
+
+      BS_ = self
     end
   end
 end

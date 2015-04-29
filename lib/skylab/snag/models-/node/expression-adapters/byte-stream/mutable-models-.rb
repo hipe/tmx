@@ -30,7 +30,7 @@ module Skylab::Snag
                 o.mutable_string[ 0, 0 ] = SPACE_
               end
             else
-              a.unshift Snag_::Models::Hashtag::String_Piece.new SPACE_
+              a.unshift Space_piece_singleton__[]
             end
           end
           a.unshift obj
@@ -47,14 +47,19 @@ module Skylab::Snag
                 o.mutable_string.concat SPACE_
               end
             else
-              a.push Snag_::Models::Hashtag::String_Piece.new SPACE_
+              a.push Space_piece_singleton__[]
             end
           end
           a.push obj
           ACHIEVED_
         end
 
-        def __remove__object_for_mutation_session obj, & oes_p
+        Space_piece_singleton__ = Callback_.memoize do
+
+          Snag_::Models::Hashtag::String_Piece.new_via_string SPACE_
+        end
+
+        def __remove__object_for_mutation_session obj
 
           did = false
           x = nil
@@ -72,7 +77,11 @@ module Skylab::Snag
             end
           end
 
-          did && x
+          if did
+            x
+          else
+            self._SANTIY__redundancy_check_should_have_been_done_through_ACS
+          end
         end
 
         def _mutable_row_at_index d

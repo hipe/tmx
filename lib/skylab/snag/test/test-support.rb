@@ -69,7 +69,7 @@ module Skylab::Snag::TestSupport
     end
   end
 
-  module Byte_Stream_Support
+  module Byte_Up_And_Downstreams
 
     class << self
       def [] tcm
@@ -77,10 +77,25 @@ module Skylab::Snag::TestSupport
       end
     end  # >>
 
+    # ~ near downstream
+
     def build_byte_stream_expag_ d, d_, d__
 
       Snag_::Models_::Node_Collection::Expression_Adapters::
         Byte_Stream::Expression_Agent_.new d, d_, d__
+    end
+
+    def downstream_ID_for_output_string_ivar_
+
+      s = ""
+      @output_s = s
+      Snag_.lib_.basic::String::Byte_Downstream_Identifier.new s
+    end
+
+    # ~ near verification
+
+    def scanner_via_output_string_
+      scanner_via_string_ @output_s
     end
 
     def scanner_via_string_ s
@@ -103,10 +118,10 @@ module Skylab::Snag::TestSupport
 
     def against_ in_st, & x_p
 
-      _interpreter = subject_object_
+      _obj = subject_object_
       _context = grammatical_context_
 
-      _interpreter.interpret_out_of_under_ in_st, _context, & x_p
+      _obj.interpret_out_of_under_ in_st, _context, & x_p
     end
 
     define_method :grammatical_context_for_singular_subject_number_, -> do
@@ -132,26 +147,6 @@ module Skylab::Snag::TestSupport
 
     def subject_module_
       self.class.subject_module_
-    end
-  end
-
-  module Downstream_Redirect_To_String
-
-    class << self
-      def [] tcm
-        tcm.include self
-      end
-    end  # >>
-
-    def downstream_ID_around_input_string_
-
-      s = ""
-      @output_s = s
-      Snag_.lib_.basic::String::Byte_Downstream_Identifier.new s
-    end
-
-    def scanner_via_output_string_
-      TestSupport_::Expect_Line::Scanner.via_string @output_s
     end
   end
 
@@ -302,6 +297,6 @@ module Skylab::Snag::TestSupport
   NIL_ = nil
   NEWLINE_ = "\n"
   SPACE_ = Snag_::SPACE_
-  UNDERSCORE_ = '_'
+  UNDERSCORE_ = Snag_::UNDERSCORE_
 
 end

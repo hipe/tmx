@@ -31,6 +31,11 @@ module Skylab::Snag
           node_collection_via_upstream_identifier_( id, & oes_p )
       end
 
+      def __node__association_for_mutation_session
+
+        Models_::Node
+      end
+
       def expression_adapter_ modality_const
 
         NC_::Expression_Adapters.const_get modality_const, false
@@ -39,15 +44,11 @@ module Skylab::Snag
 
     def edit * x_a, & x_p
 
-      Snag_::Model_::Collection::Mutation_Session.call x_a, self, & x_p
+      Snag_::Model_::Mutation_Session.edit x_a, self, & x_p
     end
 
     def __node__class_for_mutation_session
       Snag_::Models_::Node
-    end
-
-    def mutable_body_for_mutation_session_by _
-      self
     end
 
     module Expression_Adapters

@@ -2,192 +2,179 @@ module Skylab::Snag
 
   class Models_::Node_Identifier
 
-    Actions = THE_EMPTY_MODULE_
+    Expression_Adapters = ::Module.new
+
+    class << ( Expression_Adapters::Byte_Stream = ::Module.new )
+
+      # parsing the byte stream is like parsing the user argument but:
+      #   • minus error reporting (because of its syntax) -AND-
+      #   • plus the requirement of the open and close sequence
+
+      def build_reinterpreter scn
+
+        -> node_id do
+
+          d = scn.pos
+
+          if scn.skip OPEN_SEQUENCE_RX___
+
+            ok = Parse__[ node_id, scn ]
+
+            if ok
+              ok = scn.skip CLOSE_SEQUENCE_RX___
+            end
+
+            if ! ok
+              scn.pos = d
+            end
+          end
+
+          ok
+        end
+      end
+
+      def express_into_under_of_ y, expag, id
+
+        y << OPEN_SEQUENCE__
+        y << "%0#{ expag.identifier_integer_width }d" % id.to_i
+
+        sfx = id.suffix
+        if sfx
+          sfx.express_into_under y, expag
+        end
+
+        y << CLOSE_SEQUENCE__
+
+        ACHIEVED_
+      end
+    end  # >>
+
+    CLOSE_SEQUENCE__ = ']'
+    OPEN_SEQUENCE__ = '[#'
+
+    CLOSE_SEQUENCE_RX___ = /#{ ::Regexp.escape CLOSE_SEQUENCE__ }/
+    OPEN_SEQUENCE_RX___ = /#{ ::Regexp.escape OPEN_SEQUENCE__ }/
 
     class << self
 
-      def try_convert x, & oes_p
+      def edit_entity * x_a, & x_p  # :+#ACS-tenet-2
+        Snag_::Model_::Mutation_Session.create x_a, self, & x_p
+      end
 
-        _arg = Callback_::Pair.new x
+      # ~ the associations
 
-        arg_ = Expression_Adapters::User_Argument.interpret_out_of_under_(
-          _arg, nil, & oes_p )
+      def __suffix__association_for_mutation_session  # :+#ACS-tenet-7
+        NI_::Models_::Suffix
+      end
 
-        arg_ and begin
-          arg_.value_x
+      define_method :__integer__association_for_mutation_session,
+
+        # :+#ACS-tenet-4
+        # a dedicated class for this association seems overkill when
+        # all we want is to effect the valid subset of all integers:
+
+        ( Callback_.memoize do
+
+          _n11n = Snag_.lib_.basic::Number.normalization.new_with(
+            :minimum, 1,
+            :number_set, :integer
+          )
+
+          Argument_interpreter_via_normalization_[ _n11n ]
+        end )
+
+      # ~ :+#ACS-tenet-8
+
+      # parsing the user value is like parsing "byte upstream" (below) but:
+      #   • plus error reporting -AND-
+      #   • minus the recognition of the open and close sequence
+
+      def new_via_user_value x, & x_p
+
+        if x
+          if x.respond_to? :bit_length
+            edit_entity :set, :integer, x, & x_p
+          else
+
+            id = new
+            _scn = Snag_::Library_::StringScanner.new x
+
+            ok = Parse__[ id, _scn, & x_p ]
+
+            ok && id
+          end
+        else
+          x
         end
       end
+
+      def new_via__object__ x  # ..
+        x
+      end
+
+      alias_method :new_empty, :new
 
       def new_via_integer d
         new nil, d
       end
 
-      def new_via_integer_and_suffix_string d, s
-
-        new NI_::Models_::Suffix.interpret_out_of_under_( s, :String ), d
+      def new_via__integer__ d
+        new nil, d
       end
 
-      def new_via__object__ x
-        x
+      def new_via__suffix_and_integer__ x, x_
+        new x, x_
       end
 
-      define_method :interpret_out_of_under, INTERPRET_OUT_OF_UNDER_METHOD_
+      # ~ (for existing entities)
 
+      def express_into_under_of_ y, expag, id
+
+        _s = if expag.respond_to? :identifier_integer_width
+
+          "%0#{ expag.identifier_integer_width }d" % id.to_i
+        else
+          id.to_i.to_s
+        end
+
+        sfx = id.suffix
+        if sfx
+          _s_ = sfx.description_under expag
+        end
+
+        y << "#{ OPEN_SEQUENCE__ }#{ _s }#{ _s_ }#{ CLOSE_SEQUENCE__ }"
+
+        ACHIEVED_
+      end
+
+      private :new  # :+#ACS-tenet-1
     end  # >>
 
-    CLOSE_SEQUENCE__ = ']'
     Parse__ = ::Module.new
-    OPEN_SEQUENCE__ = '[#'
+    class << Parse__  # experiment: stateless actor
 
-    Expression_Adapters = ::Module.new
-
-    module Expression_Adapters::Byte_Stream
-
-      # parsing the byte stream is like parsing the user argument but:
-      #   • minus error reporting (because syntax) -AND-
-      #   • plus the requirement of the open and close sequence
-
-      class << self
-
-        def build_reinterpreter scn
-
-          -> node_id do
-
-            pos = scn.pos
-
-            if scn.skip OPEN_SEQUENCE_RX___
-
-              ok = _reinit_object_via_parse_identifier_and_any_suffix(
-                node_id,
-                scn )
-
-              if ok
-                ok = scn.skip CLOSE_SEQUENCE_RX___
-              end
-
-              if ! ok
-                scn.pos = pos
-              end
-            end
-
-            ok
-          end
-        end
-      end  # >>
-
-      CLOSE_SEQUENCE_RX___ = /#{ ::Regexp.escape CLOSE_SEQUENCE__ }/
-      OPEN_SEQUENCE_RX___ = /#{ ::Regexp.escape OPEN_SEQUENCE__ }/
-
-      extend Parse__
-
-      class << self
-
-        def express_into_under_of_ y, expag, id
-
-          _s = if expag.respond_to? :identifier_integer_width
-
-            "%0#{ expag.identifier_integer_width }d" % id.to_i
-          else
-            id.to_i.to_s
-          end
-
-          sfx = id.suffix
-          if sfx
-            _s_ = sfx.description_under expag
-          end
-
-          y << "#{ OPEN_SEQUENCE__ }#{ _s }#{ _s_ }#{ CLOSE_SEQUENCE__ }"
-
-          ACHIEVED_
-        end
-      end  # >>
-    end
-
-    module Expression_Adapters::User_Argument
-
-      # parsing the user argument is like parsing the "byte upstream" but:
-      #   • plus error reporting -AND-
-      #   • minus the recognition of the open and close sequence
-
-      class << self
-
-        def interpret_out_of_under_ arg, _, & oes_p
-
-          x = arg.value_x
-          if x
-
-            o = NI_.new
-
-            ok = if x.respond_to? :bit_length
-
-              __reinit_object_via_number o, x, & oes_p
-
-            else
-
-              _reinit_object_via_parse_identifier_and_any_suffix(
-                o,
-                Snag_::Library_::StringScanner.new( x ),
-                & oes_p )
-            end
-
-            ok and arg.new_with_value o
-          else
-            arg
-          end
-        end
-      end  # >>
-
-      extend Parse__
-    end
-
-    module Parse__
-
-      def _reinit_object_via_parse_identifier_and_any_suffix id, scn, & oes_p
+      def [] id, scn, & oes_p
 
         d_s = scn.scan DIGITS___
+
         if d_s
-
           if scn.eos?
-            yes = true
+            id.reinitialize nil, d_s.to_i
+            ACHIEVED_
           else
-            pos = scn.pos
-            sfx = NI_::Models_::Suffix.interpret_out_of_under_(
-              scn, :Byte_Stream, & oes_p )
-
-            if sfx
-              yes = true
-            elsif oes_p
-              yes = false
-            else
-
-              # this will end up begin a non-busines line
-
-              scn.pos = pos
-              yes = true
+            __something_after_digit d_s.to_i, id, scn, & oes_p
+          end
+        else
+          if oes_p
+            oes_p.call :error, :parse_error, :expecting_number do
+              __build_uninterpretable_as_integer_event scn.string
             end
           end
-
-          if yes
-            id.reinitialize sfx, d_s.to_i
-          end
-        elsif oes_p
-
-          yes = false
-          oes_p.call :error, :parse_error, :expecting_number do
-            __build_uninterpretable_as_integer_event scn.string
-          end
+          UNABLE_
         end
-
-        yes
       end
 
       DIGITS___ = /\d+/
-
-      def __reinit_object_via_number id, d
-
-        id.reinitialize nil, d
-        ACHIEVED_
-      end
 
       def __build_uninterpretable_as_integer_event x
 
@@ -199,7 +186,25 @@ module Skylab::Snag
           :general_failure )
 
       end
-    end
+
+      def __something_after_digit integer_d, id, scn, & x_p
+
+        sfx = NI_::Models_::Suffix::Interpret[ scn, :Byte_Stream, & x_p ]
+
+        if sfx
+          id.reinitialize sfx, integer_d
+          ACHIEVED_
+
+        elsif x_p  # if error reporing was requested, it was delivered
+          UNABLE_
+
+        else  # take what we scanned and leave the rest for caller
+
+          id.reinitialize nil, integer_d
+          ACHIEVED_
+        end
+      end
+    end  # >>
 
     def reinitialize suffix_o=nil, d=nil
 
@@ -229,6 +234,17 @@ module Skylab::Snag
       y << "identifier "  # ick/meh
       express_into_under y, expag
       y
+    end
+
+    def express_into_ y
+
+      y << OPEN_SEQUENCE__
+      y << @to_i.to_s
+      if @suffix
+        @suffix.express_into_ y
+      end
+      y << CLOSE_SEQUENCE__
+      ACHIEVED_
     end
 
     def == otr
@@ -279,6 +295,8 @@ module Skylab::Snag
     # ~ end suffixes
 
     include Expression_Methods_
+
+    Actions = THE_EMPTY_MODULE_
 
     Expression_Adapters::EN = nil
 

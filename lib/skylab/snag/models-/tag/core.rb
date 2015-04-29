@@ -4,18 +4,19 @@ module Skylab::Snag
 
     class << self
 
-      def new_via__mixed__ x, & oes_p
+      def new_via begin_, length, string
 
-        if x.respond_to? :ascii_only?
-          x = x.intern
-        end
+        # act like a hashtag - we assume appropriate modality conventions
 
-        new_via__symbol__ x, & oes_p
+        new string[
+          begin_ + HASHTAG_PREFIX_LENGTH___,
+          length - HASHTAG_PREFIX_LENGTH___
+        ].intern
       end
 
-      def new_via__symbol__ symbol, & oes_p
+      def interpret_for_mutation_session arg_st, & x_p  # :+#ACS-tenet-5
 
-        arg = Tag_::Actors_::Normalize_stem[ symbol, & oes_p ]
+        arg = Tag_::Actors_::Normalize_stem[ arg_st.gets_one, & x_p ]
         arg and begin
           new arg.value_x
         end
@@ -24,11 +25,25 @@ module Skylab::Snag
       def category_symbol
         :tag
       end
+
+      private :new  # :+#ACS-tenet-1
     end  # >>
+
+    HASHTAG_PREFIX_LENGTH___ = 1
 
     def initialize sym
       @_sym = sym
       @value_is_known_is_known = nil
+    end
+
+    def express_into_ y
+
+      # only because expression for the tag under a byte-stream mode needs
+      # no assistance from the expression adapter can we do this reach-down
+      # but this is fragile, begin wholly dependant on that assumption.
+
+      Tag_::Expression_Adapters::Byte_Stream.express_into_under_of_(
+        y, nil, self )
     end
 
     def == otr  # assume same cat sym for now

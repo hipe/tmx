@@ -117,7 +117,7 @@ module Skylab::Basic
         o = self
         expag.calculate do
 
-          y << "#{ par o.prop } must be#{ o._ns }#{
+          y << "#{ par o.prop || 'number' } must be#{ o._ns }#{
            } greater than or equal to #{
             }#{ val o.minimum }, had #{ ick o.x }"
         end

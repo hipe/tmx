@@ -45,10 +45,13 @@
 [#028]       melt makes patch for whole codebase #deferred
 [#027]       #done move and maybe refactor todo -> todo find
 [#026]       #done refactor porcelain tree
-[#025]       #done fix and cover todo tree
-[#024]       #done inconsistencies over writing terminal newlines in file
-               #parent-node: [#020]
-[#023]       #done refactor whatever
+[#025] #hole
+             ( #was: #done fix and cover todo tree )
+[#024]       to emit or not to emit? (against [#sl-145] raymond)
+             ( #was: #done inconsistencies over writing terminal newlines
+               in file #parent-node: [#020] )
+[#023]       thoughts on the abstract component system experiment ..
+             ( #was: #done refactor whatever )
 [#022]       #done #gimmick thing that converts @todo's into issues!??
              2012-06-04   (formerly [#sl-097])
 [#021]       #parent-node:[#011] #tracking-tag - this conv. of indenting per `#open`

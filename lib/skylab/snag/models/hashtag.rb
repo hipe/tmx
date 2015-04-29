@@ -146,15 +146,13 @@ module Skylab::Snag
 
           # the first time you build a piece, just build it
 
-          x = cls.new
-          x._reinitialize begin_d, len, @string_scanner.string
+          x = cls.new_via begin_d, len, @string_scanner.string
 
           instance_variable_set ivar, -> begin_d_, len_ do
 
             # the second time you build a piece, also just build it
 
-            x_ = cls.new
-            x_._reinitialize begin_d_, len_, @string_scanner.string
+            x_ = cls.new_via begin_d_, len_, @string_scanner.string
 
             a = [ x, x_ ]
             first = true
@@ -171,7 +169,7 @@ module Skylab::Snag
                 fly = a.fetch 1
               end
 
-              fly._reinitialize begin_d__, len__, @string_scanner.string
+              fly.reinitialize begin_d__, len__, @string_scanner.string
               fly
 
             end
@@ -207,14 +205,17 @@ module Skylab::Snag
     class String_Piece < Piece__
 
       class << self
-        alias_method :new_via__mixed__, :new
-      end  # >>
 
-      def initialize s=nil
-        if s
-          _reinitialize 0, s.length, s
+        def interpret_for_mutation_session arg_st, & x_p  # :+#ACS-tenet-5
+
+          new_via_string arg_st.gets_one
         end
-      end
+
+        def new_via_string s
+
+          new 0, s.length, s
+        end
+      end  # >>
 
       def category_symbol
         :string
@@ -223,12 +224,20 @@ module Skylab::Snag
 
     class Piece__
 
-      def _reinitialize begin_, length, s
+      class << self
+        def new_via begin_, length, s
+          new begin_, length, s
+        end
+        private :new
+      end
+
+      def reinitialize begin_, length, s
         @_begin = begin_
         @_length = length
         @_string = s
         NIL_
       end
+      alias_method :initialize, :reinitialize
 
       def get_string
         @_string[ @_begin, @_length ]
@@ -309,7 +318,7 @@ module Skylab::Snag
 
       attr_reader :value_is_known_is_known, :value_is_known
 
-      def _reinitialize( * )
+      def reinitialize( * )
         @value_is_known = @value_is_known_is_known = nil
         super
       end

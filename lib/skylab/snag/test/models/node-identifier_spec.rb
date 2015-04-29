@@ -10,18 +10,6 @@ module Skylab::Snag::TestSupport
       _subject
     end
 
-    it "can be built via integer" do
-
-      _id = _subject.new_via_integer 3
-      _id.to_i.should eql 3
-    end
-
-    it "negative integers silently work FOR NOW" do
-
-      _id = _subject.new_via_integer( -3 )
-      _id.to_i.should eql( -3 )
-    end
-
     it "on two ID's without suffixes, comparison than works" do
 
       one = _one ; two = _two
@@ -38,9 +26,9 @@ module Skylab::Snag::TestSupport
 
     context "suffixes - use '.', '-', or '/' to separate components" do
 
-      it "nodes can be built with suffix (arbitrary string)" do
+      it "node identifiers (with suffix) are the frontier of ACS" do
 
-        _subject
+        _subject or fail
       end
 
       it "nodes with suffixes retain the separators used" do
@@ -79,7 +67,7 @@ module Skylab::Snag::TestSupport
 
       it "suffix components cannot be the empty string, so" do
 
-        o = _new_via_integer_and_suffix_string 0, '...'
+        o = _new_via_integer_and_suffix_string 1, '...'
         o.suffix_separator_at_index( 0 ).should eql '.'
         o.suffix_value_at_index( 0 ).should eql '..'
         o.suffix_separator_at_index( 1 ).should be_nil
@@ -88,7 +76,7 @@ module Skylab::Snag::TestSupport
 
       it "ditto" do
 
-        o = _new_via_integer_and_suffix_string 0, 'A'
+        o = _new_via_integer_and_suffix_string 1, 'A'
         o.suffix_separator_at_index( 0 ).should be_nil
         o.suffix_value_at_index( 0 ).should eql 'A'
       end
@@ -120,7 +108,11 @@ module Skylab::Snag::TestSupport
       end
 
       _New_via_integer_and_suffix_string = -> d, ss do
-        _Subject[].new_via_integer_and_suffix_string d, ss
+
+        _Subject[].edit_entity(
+          :via, :string, :set, :suffix, ss,
+          :set, :integer, d
+        )
       end
 
       define_method :_new_via_integer_and_suffix_string,
@@ -132,11 +124,15 @@ module Skylab::Snag::TestSupport
     end
 
     memoize_ :_one do
-      _Subject[].new_via_integer 1
+      _new_via_integer 1
     end
 
     memoize_ :_two do
-      _Subject[].new_via_integer 2
+      _new_via_integer 2
+    end
+
+    define_singleton_method :_new_via_integer do | d |
+      _Subject[].send :new, d
     end
 
     define_method :_subject do

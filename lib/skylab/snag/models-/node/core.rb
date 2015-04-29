@@ -2,18 +2,31 @@ module Skylab::Snag
 
   class Models_::Node
 
+    module Criteria  # ersatz class as proxy
+      class << self
+        def new s_a
+          cr = Snag_::Models_::Criteria.new Snag_.application_kernel_
+
+          ok = cr.receive_criteria_expression s_a
+          if ok
+            cr
+          else
+            ok
+          end
+        end
+      end  # >>
+    end
+
     class << self
 
-      def new_criteria s_a
+      def interpret_for_mutation_session arg_st, & x_p
 
-        cr = Snag_::Models_::Criteria.new Snag_.application_kernel_
+        Snag_::Model_::Mutation_Session.interpret arg_st, self, & x_p
+      end
 
-        ok = cr.receive_criteria_expression s_a
-        if ok
-          cr
-        else
-          ok
-        end
+      def edit_entity * x_a, & x_p  # ..
+
+        Snag_::Model_::Mutation_Session.create x_a, self, & x_p
       end
 
       def collection_module_for_criteria_resolution
@@ -21,52 +34,45 @@ module Skylab::Snag
         Snag_::Models_::Node_Collection
       end
 
-      def interpret_out_of_under_ x, x_, k, & oes_p
+      def new_via_body x  # :+#ACS-tenet-8B
 
-        Node_::Expression_Adapters.const_get( x.modality_const, false ).
-          interpret_out_of_under_ x, x_, k, & oes_p
+        new nil, x
       end
 
-      def new_via_body body
-        new nil, body
+      def new_via__identifier__ x
+
+        new x
       end
 
-      def new_via_identifier id_o
-        new id_o
+      def new_empty_for_mutation_session
+
+        new
       end
 
-      def new_via_identifier_and_body id_o, body
-        new id_o, body
+      # ~ :+#ACS-tenet-7
+
+      def __identifier__association_for_mutation_session
+
+        Snag_::Models_::Node_Identifier
       end
 
-      def new_via__message__ s_OR_s_a, & oes_p
+      def __message__association_for_mutation_session
 
-        s_a = ::Array.try_convert s_OR_s_a
-        s_a ||= [ s_OR_s_a ]
-        __new_via_message_ary s_a, & oes_p
+        Mixed_message___
       end
 
-      def __new_via_message_ary s_a, & oes_p
+      def __string__association_for_mutation_session
 
-        o = new
-        ok = true
-        s_a.each do | s |
-
-          arg = Snag_::Models_::Message.normalize_argument(
-            Callback_::Trio.new( s, true ), & oes_p )
-
-          if arg
-            ok = o.edit :append, :string, arg.value_x, & oes_p
-          else
-            ok = arg
-            break
-          end
-        end
-        ok && o
+        Snag_::Models::Hashtag::String_Piece
       end
 
-      private :new
-    end
+      def __tag__association_for_mutation_session
+
+        Snag_::Models_::Tag
+      end
+
+      private :new  # :+#ACS-tenet-1
+    end  # >>
 
     def initialize id_o=nil, body=nil
 
@@ -174,7 +180,7 @@ module Skylab::Snag
       count
     end
 
-    def has_equivalent__tag__object_ o
+    def has_equivalent__tag__for_mutation_session o
 
       _ = to_tag_stream.detect do | tag |
 
@@ -213,20 +219,10 @@ module Skylab::Snag
 
     def edit * x_a, & x_p
 
-      Snag_::Model_::Collection::Mutation_Session.call x_a, self, & x_p
+      Snag_::Model_::Mutation_Session.edit x_a, self, & x_p
     end
 
-    def mutable_body_for_mutation_session_by verb_symbol
-
-      case verb_symbol
-      when :receive
-        self
-      when :prepend, :append, :remove
-        __mutable_body
-      end
-    end
-
-    def __mutable_body
+    def mutable_body_for_mutation_session
 
       if @body
         if ! @body.is_mutable
@@ -238,22 +234,7 @@ module Skylab::Snag
       @body
     end
 
-    def __identifier__class_for_mutation_session
-
-      Snag_::Models_::Node_Identifier
-    end
-
-    def __string__class_for_mutation_session
-
-      Snag_::Models::Hashtag::String_Piece
-    end
-
-    def __tag__class_for_mutation_session
-
-      Snag_::Models_::Tag
-    end
-
-    def receive_notification_of_change_during_mutation_session
+    def receive_changed_during_mutation_session
 
       @_did_change = true
       ACHIEVED_
@@ -354,10 +335,50 @@ module Skylab::Snag
       end
     end
 
-    Normalize_ID_ = -> arg, & oes_p do
+    Mixed_message___ = -> arg_st, & x_p do
 
-      Snag_::Models_::Node_Identifier.
-        interpret_out_of_under( arg, :User_Argument, & oes_p )
+      # this is a virtual component: the "message" model is not integrated
+      # into the component system directly; rather we go through this proc
+      # to achieve our final goal: to append string pieces to mutable body
+
+      x = arg_st.gets_one
+      a = ::Array.try_convert x
+      a ||= [ x ]
+      ok = true
+      s_a = []
+
+      a.each do | x_ |
+
+        s = Snag_::Models_::Message.normalize_value__ x_, & x_p
+        if s
+          s_a.push s
+        else
+          ok = s
+          break
+        end
+      end
+
+      if ok
+        _ = Snag_::Models::Hashtag::String_Piece.new_via_string s_a * SPACE_
+        Callback_::Pair.new _
+      else
+        ok
+      end
+    end
+
+    Normalize_ID_ = -> arg, & x_p do
+
+      x = arg.value_x
+      if x
+        o = Snag_::Models_::Node_Identifier.new_via_user_value x, & x_p
+        if o
+          arg.new_with_value o
+        else
+          o
+        end
+      else  # let required/optional handle this, *not* us
+        arg
+      end
     end
 
     # ~

@@ -6,7 +6,7 @@ module Skylab::Snag::TestSupport
 
     extend TS_
     use :expect_event
-    use :downstream_redirect_to_string
+    use :byte_up_and_downstreams
 
     it "closing one with a funny looking name - whines gracefully" do
 
@@ -25,12 +25,12 @@ module Skylab::Snag::TestSupport
       _against '002'
       _expect :entity_not_found, "[#2] does not have #open"
       _expect :entity_already_added, "[#2] already has #done"
-      expect_failed
+      expect_neutralled
     end
 
     it "closing one that has no taggings at all - works, reindents" do
 
-      _DS_ID downstream_ID_around_input_string_
+      _DS_ID downstream_ID_for_output_string_ivar_
 
       _against '001'
 
@@ -53,7 +53,7 @@ module Skylab::Snag::TestSupport
 
     it "closing one that is open and has multiline - works, munges lines" do
 
-      _DS_ID downstream_ID_around_input_string_
+      _DS_ID downstream_ID_for_output_string_ivar_
       _against '0003'
 
       expect_OK_event :entity_removed, "removed #open from [#3]"

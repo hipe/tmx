@@ -16,22 +16,26 @@ module Skylab::Snag
 
           ).session do | o |
 
-            _tree = __build_tree_of_all_identifiers o.entity_upstream
-
-            id = __find_first_available_identifier_in_tree _tree
+            id = Find_first_available_identifier[ o.entity_upstream ]
 
             o.reset_the_entity_upstream
 
-            @node.edit :receive, :identifier, id,
-              :which_is, :object, & @on_event_selectively
-
-            o.write_each_node_whose_identifier_is_greater_than_that_of_subject
-
-            o.write_the_new_node
-            o.write_any_floating_node
-            o.write_the_remaining_nodes
+            Rewrite[ id, @node, o, & @on_event_selectively ]
 
           end
+        end
+
+        # <- 2
+
+    class Find_first_available_identifier
+
+      class << self
+
+        def [] ent_st
+
+          _tree = __build_tree_of_all_identifiers ent_st
+
+          __find_first_available_identifier_in_tree _tree
         end
 
         def __build_tree_of_all_identifiers node_st
@@ -64,7 +68,6 @@ module Skylab::Snag
             #  only the first one is counted; which is all that is necessary)
 
             if sfx
-              self._COVER_ME
               _tree_.touch sfx do
                 id
               end
@@ -95,6 +98,29 @@ module Skylab::Snag
 
           Snag_::Models_::Node_Identifier.new_via_integer int
         end
+      end # >>
+    end
+
+    Rewrite = -> id, node, o, & x_p do
+
+      ok = node.edit(
+
+        :via, :object,
+        :set, :identifier, id,
+        & x_p )
+
+      if ok
+
+        o.write_each_node_whose_identifier_is_greater_than_that_of_subject
+        o.write_the_new_node
+        o.write_any_floating_node
+        o.write_the_remaining_nodes
+      else
+        ok
+      end
+    end
+
+    # -> 2
       end
     end
   end

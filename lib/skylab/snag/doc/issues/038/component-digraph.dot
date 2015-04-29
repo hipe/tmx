@@ -11,7 +11,7 @@ subgraph cluster_main {
     tr [label="19. delete" style=filled]
   }
 
-  aa [label="open" ]
+  aa [label="23. open" ]
   ca [label="21. close" style=filled]
   de [label="15. design & implement\ncriteria implementation" style=filled]
   FS [label="14. expose the\nfilesystem" style=filled]

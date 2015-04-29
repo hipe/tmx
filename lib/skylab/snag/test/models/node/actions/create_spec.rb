@@ -6,13 +6,13 @@ module Skylab::Snag::TestSupport
 
     extend TS_
     use :expect_event
-    use :downstream_redirect_to_string
+    use :byte_up_and_downstreams
 
     it "uses first available ID, placed in correct spot (integration)" do
 
       call_API :node, :create, :message, 'ziff dizzle',
         :upstream_identifier, Fixture_file_[ :rochambeaux_mani ],
-        :downstream_identifier, downstream_ID_around_input_string_
+        :downstream_identifier, downstream_ID_for_output_string_ivar_
 
       # (was [#033] flickering test per setup tmpdir)
 

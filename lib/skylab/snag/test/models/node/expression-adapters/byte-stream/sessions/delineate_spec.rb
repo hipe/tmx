@@ -5,7 +5,7 @@ module Skylab::Snag::TestSupport
   describe "[sg] models - node [..] delineate" do
 
     extend TS_
-    use :byte_stream_support
+    use :byte_up_and_downstreams
 
     context "delineation" do
 
@@ -95,9 +95,14 @@ module Skylab::Snag::TestSupport
 
         _expag = build_byte_stream_expag_ @_width_x, @_sub_margin_x , 50
 
-        node = Snag_::Models_::Node.new_via__message__ @_message
+        node = Snag_::Models_::Node.edit_entity(
 
-        node.instance_variable_set :@ID, @_fake_ID_x
+          # ( obliquely (and unintentionally) covers [#023]:#note-89 )
+
+          :via, :object, :set, :identifier, @_fake_ID_x,
+          :append, :string, @_message )
+
+        node or fail
 
         y = ""
 

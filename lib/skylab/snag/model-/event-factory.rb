@@ -1,8 +1,19 @@
 module Skylab::Snag
 
-  module Model_::Collection
+  module Model_
 
     module Event_Factory
+
+      # (a placeholder for an idea)
+
+      class << self
+
+        def class_for sym
+
+          _const = Callback_::Name.via_variegated_symbol( sym ).as_const
+          const_get _const, false
+        end
+      end  # >>
 
       Entity_Already_Added = Callback_::Event.prototype_with(
 

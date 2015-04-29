@@ -12,7 +12,7 @@ module Skylab::Snag
 
       def execute
 
-        criteria_p = Snag_::Models_::Node.new_criteria( %w(
+        criteria_p = Snag_::Models_::Node::Criteria.new( %w(
           the node is tagged with #done or #hole and has
           no extended content ) ).to_proc
 

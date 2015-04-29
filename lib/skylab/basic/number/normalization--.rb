@@ -48,7 +48,7 @@ module Skylab::Basic
 
               x_p and self._NICE
 
-              _x = in_st.current_token_object.value_x
+              _x = in_st.current_token
               _trio = Callback_::Trio.new _x, true
 
               arg = normalize_argument _trio do | * i_a, & ev_p |

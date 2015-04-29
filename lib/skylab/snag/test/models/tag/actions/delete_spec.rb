@@ -7,7 +7,7 @@ module Skylab::Snag::TestSupport
     extend TS_
     use :expect_event
     use :my_tmpdir_
-    use :downstream_redirect_to_string
+    use :byte_up_and_downstreams
 
     context "(with this manifest)" do
 
@@ -28,13 +28,13 @@ module Skylab::Snag::TestSupport
         black_and_white( expect_not_OK_event :entity_not_found ).should eql(
           "[#1] does not have #three" )  # :+[#015]
 
-        expect_failed
+        expect_neutralled
       end
 
       it "remove a tag at the end" do
 
         _call :node_identifier, 1, :tag, :two,
-          :downstream_identifier, downstream_ID_around_input_string_
+          :downstream_identifier, downstream_ID_for_output_string_ivar_
 
         scn = scanner_via_output_string_
         scn.next_line.should eql "[#001]       keifer #one\n"

@@ -6,39 +6,34 @@ module Skylab::Snag
 
     class Models_::Suffix  # described in the node identifier spec
 
-      define_singleton_method :interpret_out_of_under_,
-        INTERPRET_OUT_OF_UNDER_METHOD_
+      Interpret = -> scn, _, & x_p do
 
-      Expression_Adapters = ::Module.new
-
-      module Expression_Adapters::Byte_Stream
-
-        class << self
-
-          def interpret_out_of_under_ scn, _, & oes_p
-            Interpret_out_of_string_scanner___[ scn, & oes_p ]
-          end
-        end  # >>
+        a = Interpret_out_of_string_scanner__[ scn, & x_p ]
+        a and new a
       end
 
-      module Expression_Adapters::String
+      class << self
 
-        class << self
+        def new_via__string__ s, & x_p
 
-          def interpret_out_of_under_ s, _, & oes_p
+          _scn = Snag_::Library_::StringScanner.new s
+          a = Interpret_out_of_string_scanner__[ _scn, & x_p ]
+          a and new a
+        end
 
-            _scn = Snag_::Library_::StringScanner.new s
-
-            Interpret_out_of_string_scanner___.call _scn do | *, & ev_p |
-
-              raise ev_p[].to_exception
-            end
-          end
-        end  # >>
-      end
+        private :new  # :+ACS-tenet-1
+      end  # >>
 
       def initialize a
         @to_a = a
+      end
+
+      def express_into_ y
+
+        @to_a.each do | x |
+          x.express_into_ y, expag
+        end
+        ACHIEVED_
       end
 
       attr_reader :to_a
@@ -92,7 +87,7 @@ module Skylab::Snag
         end
       end
 
-      Interpret_out_of_string_scanner___ = -> do
+      Interpret_out_of_string_scanner__ = -> do
 
         integer_value = / -? \d+ /x
 
@@ -145,7 +140,7 @@ module Skylab::Snag
           end while nil
 
           if a
-            Suffix_.new a.freeze
+            a.freeze
           elsif oes_p
             oes_p.call :error, :parse_error, :suffix_expected do
               Expecting___[ scn, :suffix ]
@@ -159,6 +154,12 @@ module Skylab::Snag
         def initialize *a
           @separator_string, @value_category_symbol, @value = a
           freeze
+        end
+
+        def express_into_ y
+          y << @separator_string
+          y << @value
+          ACHIEVED_
         end
 
         attr_reader :separator_string, :value_category_symbol, :value

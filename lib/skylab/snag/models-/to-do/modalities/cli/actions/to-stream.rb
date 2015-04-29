@@ -382,8 +382,6 @@ module Skylab::Snag
     # -> 2
 
       end
-
-      UNDERSCORE_ = '_'
     end
   end
 end

@@ -16,7 +16,7 @@ module Skylab::Snag
 
           @collection = coll
           @do_double_buffering = false
-          @downstream_identifier = bx[ :downstream_identifier ]
+          @downstream_identifier = bx && bx[ :downstream_identifier ]
 
           @expression_agent = Expression_Agent_.new(
             WIDTH__,
@@ -31,6 +31,16 @@ module Skylab::Snag
 
           _ok = __resolve_the_entity_upstream
           _ok && __against_appropriate_internal_session( & p )
+        end
+
+        def __subject_entity__ x
+
+          if x
+            @subject_entity = x
+            ACHIEVED_
+          else
+            x
+          end
         end
 
         def __resolve_the_entity_upstream
@@ -56,6 +66,7 @@ module Skylab::Snag
 
           down_ID = @downstream_identifier
           if down_ID
+
             __against_downstream_identifier down_ID, & p
           else
             __against_tmpfile( & p )
@@ -77,11 +88,13 @@ module Skylab::Snag
           ok = __resolve_filesystem
           ok &&= __resolve_target_path
           ok && begin
-            o = __build_tmpfile_session
-            o.session do | fh |
+            __lock_self_during_write do
+              o = __build_tmpfile_session
+              o.session do | fh |
 
-              ok = yield fh
-              ok and __finish_with_tmpfile fh
+                ok = yield fh
+                ok and __finish_with_tmpfile fh
+              end
             end
           end
         end
@@ -104,6 +117,27 @@ module Skylab::Snag
           end
         end
 
+        def __lock_self_during_write
+
+          # ALTHOUGH we accomplish the "write" by writing the full document
+          # to a tmpfile and then replacing the main file with the tmpfile,
+          # (and although the tmpfile itself is locked during this operation),
+          # if multiple processes did this around the same time the last one
+          # to finish would clobber the writes of all the others. as a measure
+          # against this, we open the main file for writing and lock it even
+          # though we will never write to it directly ..
+
+          fh = ::File.open @_target_path, ::File::WRONLY
+          es = fh.flock ::File::LOCK_EX | ::File::LOCK_NB
+          if es && es.zero?
+            x = yield
+            fh.flock ::File::LOCK_UN
+            x
+          else
+            self._BUSY  # not covered
+          end
+        end
+
         def __build_tmpfile_session
 
           o = Expression_Adapters::Filesystem::Sessions_::Tmpfile.new
@@ -113,7 +147,7 @@ module Skylab::Snag
 
           o.tmpdir_path _path
           o.create_at_most_N_directories 2
-          o.using_filesystem Snag_.lib_.system.filesystem
+          o.using_filesystem @_FS
           o
         end
 
@@ -245,6 +279,8 @@ module Skylab::Snag
 
           the_list = %i(
 
+            subject_entity
+
             entity_upstream
             reset_the_entity_upstream
 
@@ -265,10 +301,10 @@ module Skylab::Snag
 
             the_list.each do | tuple |
 
-              instance_variable_set tuple.ivar, -> do
+              instance_variable_set tuple.ivar, -> * a do
 
                 if ok
-                  x = up.send tuple.local_name_symbol
+                  x = up.send tuple.local_name_symbol, * a
                   if ! x
                     ok = x
                   end
@@ -282,9 +318,9 @@ module Skylab::Snag
 
           the_list.each do | pair |
 
-            define_method pair.name_symbol do
+            define_method pair.name_symbol do | *a |
 
-              instance_variable_get( pair.ivar ).call
+              instance_variable_get( pair.ivar ).call( *a )
             end
           end
         end
