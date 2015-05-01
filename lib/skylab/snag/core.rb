@@ -122,6 +122,7 @@ module Skylab::Snag
     def express_into_under y, expag
 
       sym = expag.modality_const
+
       if sym
         _expad_for( sym ).express_into_under_of_ y, expag, self
       else

@@ -294,10 +294,12 @@ module Skylab::TanMan::TestSupport
 
       _oes_p = -> * i_a, & ev_p do
 
-        if :using_parser_files != i_a.last
-          self._DO_ME
+        case i_a.last
+        when :using_parser_files, :creating
+          NIL_
+        else
+          raise ev_p[].to_exception
         end
-        nil
       end
 
       # but if you wanted to test for specific events here:
@@ -445,4 +447,6 @@ module Skylab::TanMan::TestSupport
       Callback_::Autoloader[ self ]
     end
   end
+
+  NIL_ = nil
 end

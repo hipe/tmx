@@ -83,6 +83,10 @@ module Skylab::Headless
       def shape_symbol
         :IO
       end
+
+      def modality_const
+        :Byte_Stream
+      end
     end
 
     MAXLEN_ = 4096  # ( 2 ** 12), or the number of bytes in about 50 lines

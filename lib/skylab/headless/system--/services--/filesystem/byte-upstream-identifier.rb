@@ -64,7 +64,7 @@ module Skylab::Headless
 
           Headless_.system.filesystem.normalization.upstream_IO @path, & oes_p
         else
-          ::File.open @path, READ_MODE_
+          ::File.open @path, ::File::RDONLY
         end
       end
 

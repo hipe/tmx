@@ -211,7 +211,7 @@ module Skylab::Headless
           end
 
           def set_IO_and_e
-            @IO = ::File.open @path, READ_MODE_  # :#open-filehandle-1 - don't loose track
+            @IO = ::File.open @path, ::File::RDONLY  # :#open-filehandle-1 - don't loose track
             @e = nil
             nil
           rescue ::SystemCallError => @e  # Errno::EISDIR, Errno::ENOENT etc

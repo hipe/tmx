@@ -97,7 +97,7 @@ module Skylab::Headless
         end
 
         def via_path_resolve_line_upstream
-          @line_upstream = ::File.open @path, READ_MODE_
+          @line_upstream = ::File.open @path, ::File::RDONLY
           @line_upstream ? ACHIEVED_ : UNABLE_
         end
 

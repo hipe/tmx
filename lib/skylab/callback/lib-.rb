@@ -121,9 +121,5 @@ module Skylab::Callback
     System = -> do
       HL__[].system
     end
-
-    Writemode = -> do
-      HL__[]::WRITE_MODE_
-    end
   end
 end

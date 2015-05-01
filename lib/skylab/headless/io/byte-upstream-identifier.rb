@@ -15,10 +15,6 @@ module Skylab::Headless
         "«input stream»"  # :+#guillemets
       end
 
-      def modality_const
-        :Byte_Stream
-      end
-
       # ~ data delivery
 
       def whole_string

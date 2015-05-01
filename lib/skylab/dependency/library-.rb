@@ -45,10 +45,6 @@ module Skylab::Dependency
     System = -> do
       HL__[].system
     end
-
-    Writemode = -> do
-      HL__[]::WRITE_MODE_
-    end
   end
 
   module Library_  # :+[#su-001]

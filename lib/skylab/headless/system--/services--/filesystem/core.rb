@@ -98,11 +98,11 @@ module Skylab::Headless
       end
 
       def line_stream_via_path path, num_bytes=nil
-        Headless_::IO.line_stream ::File.open( path, READ_MODE_ ), num_bytes
+        Headless_::IO.line_stream ::File.open( path, ::File::RDONLY ), num_bytes
       end
 
       def line_stream_via_pathname pn, num_bytes=nil
-        Headless_::IO.line_stream pn.open( READ_MODE_ ), num_bytes
+        Headless_::IO.line_stream pn.open( ::File::RDONLY ), num_bytes
       end
 
       def members

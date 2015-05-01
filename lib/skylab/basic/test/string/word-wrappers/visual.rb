@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module TestSupport_Visual
 
-    class String::Word_Wrap < Client_
+    class String::Word_Wrappers < Client_
 
       def usage_args_
         ' <width>:<height> <word> [<word> [..]]'

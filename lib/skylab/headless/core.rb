@@ -49,11 +49,9 @@ module Skylab::Headless  # ([#013] is reserved for a core node narrative - no st
   NEWLINE_ = LINE_SEPARATOR_STRING_
   NILADIC_TRUTH_ = -> { true }
   PROCEDE_ = true
-  READ_MODE_ = 'r'.freeze
   Scn_ = Callback_::Scn
   SPACE_ = ' '.freeze
   TERM_SEPARATOR_STRING_ = SPACE_
-  WRITE_MODE_ = 'w'.freeze
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
 

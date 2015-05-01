@@ -125,7 +125,7 @@ module Skylab::Basic
 
         cls = Autoloader_.const_reduce [ sym ], @viz_mod
 
-        Autoloader_[ cls, pn ]
+        Autoloader_[ cls, pn.to_path ]
 
         o = cls.new @stdin, @stdout, @stderr, @argv
 

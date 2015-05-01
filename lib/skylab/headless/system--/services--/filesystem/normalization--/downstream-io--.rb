@@ -242,7 +242,7 @@ module Skylab::Headless
           end
 
           def via_hopefully_still_available_path_open_file
-            set_IO_and_exception_via_open_mode WRITE_MODE_
+            set_IO_and_exception_via_open_mode ::File::CREAT | ::File::WRONLY
             if @IO
               @as_normal_value[ @IO ]
             else
@@ -290,8 +290,8 @@ module Skylab::Headless
             end
           end
 
-          def set_IO_and_exception_via_open_mode s
-            @IO = ::File.open @path, s
+          def set_IO_and_exception_via_open_mode d
+            @IO = ::File.open @path, d
             @e = nil
           rescue ::SystemCallError => @e  # Errno::EISDIR, Errno::ENOENT etc
             @IO = false

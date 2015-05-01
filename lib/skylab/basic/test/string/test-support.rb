@@ -14,4 +14,6 @@ module Skylab::Basic::TestSupport::String
 
   EMPTY_S_ = EMPTY_S_
 
+  SPACE_ = ' '.freeze  # don't load anything
+
 end

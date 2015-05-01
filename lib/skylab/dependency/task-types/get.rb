@@ -69,7 +69,7 @@ module Skylab::Dependency
       # the *only* distinguishing thing that adsf does in lieu of a 404 is
       # that it does not send a "last-modified" header (and writes a message in the body)
       if response.to_hash.key?('last-modified')
-        ::File.open to_file, Dep_.lib_.writemode do |fh|
+        ::File.open to_file, ::File::CREAT | ::File::WRONLY do |fh|
           fh.write response.body
         end
         true

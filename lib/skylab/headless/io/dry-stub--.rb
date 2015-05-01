@@ -25,6 +25,7 @@ module Skylab::Headless
       end
 
       APPEND_MODE_ = 'a'
+      WRITE_MODE_ = 'w'
 
       def __say_d mode_d
 

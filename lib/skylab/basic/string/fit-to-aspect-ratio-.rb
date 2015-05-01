@@ -2,31 +2,78 @@ module Skylab::Basic
 
   module String
 
-    module Fit_to_Aspect_Ratio_  # notes in [#033]
+    module Fit_to_Aspect_Ratio_  # see [#033]
 
-      module Methods
+      module Layout_Engine_Methods
+
+        def init_layout_engine_
+
+          init_tokenization_
+
+          @_ratio_a = remove_instance_variable( :@aspect_ratio )
+          @_token_o_a = []
+
+          NIL_
+        end
+
+        def << mixed_string
+
+          # unlike the base library counterpart, we do *no* continuous
+          # flushing here because that is antithetical to the algorithm.
+          # rather, we just memoize all of the contents of the tokenizer
+          # buffer and do the heavy lifting in `flush`.
+
+          @reinit_tokenizer_[ mixed_string ]
+
+          st = @tokenizer_.step_stream
+
+          begin
+            o = st.gets
+            o or break
+            @_token_o_a.push o.to_token
+            redo
+          end while nil
+
+          self
+        end
 
         def flush
-          flush_via_fit_ Find_Best_Fit__.
-            new( @pieces, * @ratio_a ).find_best_fit
+
+          ( @margin || @first_line_margin || @first_line_margin_width ) and
+            self._FIT_to_aspect_ratio_cannot_currently_work_with_margins
+
+          _fit = Find_Best_Fit___.new( @_token_o_a, * @_ratio_a ).find_best_fit
+
+          _fit.row_array.each do | row_o |
+
+            into_downstream_yielder_flush_these_mutable_tokens_(
+              row_o.token_array )
+
+          end
+
+          @downstream_yielder
         end
+
+        include String_::Word_Wrappers__::Calm::Parse_Context_Methods
       end
 
-      class Find_Best_Fit__
+      class Find_Best_Fit___
 
         def initialize pcs, ratio_width, ratio_height
+
           @pieces = pcs
-          @ratio_width = ratio_width
           @ratio_height = ratio_height
+          @ratio_width = ratio_width
         end
 
         def find_best_fit
-          __determine_total_unit_length_and_longest_nonwhite_space
+
+          __determine_total_unit_length_and_longest_word
           __determine_first_width_guess
           __find_best_fit
         end
 
-        def __determine_total_unit_length_and_longest_nonwhite_space
+        def __determine_total_unit_length_and_longest_word
 
           longest = 0
           total = 0
@@ -34,17 +81,17 @@ module Skylab::Basic
           @pieces.each do | piece |
             d = piece.length
             total += d
-            if :non_space == piece.category_symbol && longest < d
+            if :word == piece.symbol && longest < d
               longest = d
             end
           end
 
           @longest_d = longest
           @total = total
-          nil
+          NIL_
         end
 
-        def __determine_first_width_guess  # see note-A
+        def __determine_first_width_guess  # see "this formula" (#note-A)
 
           _sqrt_me = 1.0 * @total / @ratio_width / @ratio_height
 
@@ -62,12 +109,12 @@ module Skylab::Basic
             @first_width_guess = @longest_d
           end
 
-          nil
+          NIL_
         end
 
         def __find_best_fit
 
-          @fitter = Fitter___.new @pieces, @ratio_width, @ratio_height
+          @fitter = Tryer___.new @pieces, @ratio_width, @ratio_height
 
           @index_of_last_piece = @pieces.length - 1
 
@@ -75,16 +122,16 @@ module Skylab::Basic
 
           @do_look_wider = 1 < @fit.line_count
 
-          __find_ideal_narrowest_fit
+          __move_to_ideal_narrowest_fit
 
           if @do_look_wider
-            __find_ideal_widest_fit
+            __move_to_ideal_widest_fit
           end
 
           @fit
         end
 
-        def __find_ideal_narrowest_fit
+        def __move_to_ideal_narrowest_fit
 
           begin
 
@@ -98,7 +145,10 @@ module Skylab::Basic
 
             cmp = fit_.compared_against @fit
 
-            if cmp.is_better
+            _contender_is_better_than_current = cmp.is_better
+
+            if _contender_is_better_than_current
+
               @do_look_wider = false
               @fit = fit_
               if cmp.keep_looking
@@ -106,116 +156,80 @@ module Skylab::Basic
                 redo
               end
             end
+
+            break
+
+          end while nil
+
+          NIL_
+        end
+
+        def __move_to_ideal_widest_fit
+
+          best_fit = @fit
+
+          wider = _try_wider best_fit
+
+          if wider
+            __widening_shootout wider, best_fit
+          else
+            best_fit
+          end
+        end
+
+        def __widening_shootout wider, best_fit
+
+          did_second_try = false
+
+          begin
+
+            cmp = wider.compared_against best_fit
+
+            _contender_is_better_than_current = cmp.is_better
+
+            if _contender_is_better_than_current
+
+              did_second_try = false  # reset the clock on this here
+
+              best_fit = wider
+
+              # we found a better one. maybe keep looking in this direction
+
+              if ! cmp.keep_looking  # it has its own reasons
+                break
+              end
+
+              if 1 == best_fit.line_count  # you can't go wider than 1 line
+                break
+              end
+
+              wider = _try_wider best_fit
+              if wider
+                redo
+              end
+              break
+            end
+
+            # contender lost. sometimes a 2nd try finds a better fit
+
+            if did_second_try
+              break  # else we would keep trying *many* until one line
+            end
+
+            wider_ = _try_wider wider
+
+            if wider_
+              wider = wider_
+              did_second_try = true
+              redo
+            end
+
             break
           end while nil
-          nil
-        end
 
-        def __find_ideal_widest_fit
+          @fit = best_fit
 
-          begin
-
-            ok = __resolve_widening_pool
-            ok &&= __resolve_widening_range_boundaries
-            ok && __via_widening_range_boundaries_produce_ideal_fit
-
-            # (we used to loop this search forwards. now it's just one go.)
-
-          end while nil
-
-          @fit
-        end
-
-        def __resolve_widening_pool
-
-          fit = _try_wider @fit
-
-          if fit
-
-            pool = [ @fit, fit ]
-
-            if 1 < fit.line_count
-              fit_ = _try_wider fit
-              if fit_
-                pool.push fit_
-              end
-            end
-
-            @widening_pool = pool
-            ACHIEVED_
-          end
-        end
-
-        def __resolve_widening_range_boundaries
-
-          # find the range boundaries across two fields
-          # of the adjacent two or three next fits
-
-          pool = @widening_pool
-
-          st = Callback_::Stream.via_nonsparse_array pool
-
-          fit = st.gets
-          d = 0
-
-          @best_orph_idx = d
-          @worst_orph_idx = d
-          @best_orph_f = fit.orphanlessness
-          @worst_orph_f = @best_orph_f
-
-          @best_ratio_idx = d
-          @worst_ratio_idx = d
-          @best_ratio_f = fit.abs_ratio_delta
-          @worst_ratio_f = @best_ratio_f
-
-          begin
-            d += 1
-            fit = st.gets
-            fit or break
-
-            o_f = fit.orphanlessness
-            d_f = fit.abs_ratio_delta
-
-            if @best_orph_f < o_f
-              @best_orph_f = o_f
-              @best_orph_idx = d
-            elsif @worst_orph_f > o_f
-              @worst_orph_f = o_f
-              @worst_orph_idx = d
-            end
-
-            if @best_ratio_f > d_f
-              @best_ratio_f = d_f
-              @best_ratio_idx = d
-            elsif @worst_ratio_f < d_f
-              @worst_ratio_f = d_f
-              @worst_ratio_idx = d
-            end
-
-            redo
-          end while nil
-
-          ACHIEVED_
-        end
-
-        def __via_widening_range_boundaries_produce_ideal_fit
-
-          # if the fit with the best ratio has an orphanlesness of
-          # for e.g half the horizontal width or greater, just use that
-
-          fit = @widening_pool.fetch @best_ratio_idx
-
-          if ORPH_THRESHOLD__ <= fit.orphanlessness
-
-            @fit = fit
-
-          else  # let's just use the fit with the best
-            # best orphanlessness and be done with it
-
-            @fit = @widening_pool.fetch @best_orph_idx
-
-          end
-          nil
+          NIL_
         end
 
         def __try_narrower fit  # assume width is wider than etc.
@@ -242,150 +256,235 @@ module Skylab::Basic
           # result in the same delineation that we have now which would
           # be a waste to build. to use a width greater than this would
           # cause you to miss some ideal fits. if you find a value of 1
-          # you can stop looking immediately because it won't go lower.
+          # you can stop looking immediately because that's the floor.
 
-          lowest_width_amt = nil
-          pairs = fit.line_pairs
+          lowest_amt_of_width_needed_to_add = nil
+          row_a = fit.row_array
 
-          ( fit.line_count - 1 ).times do | pair_idx |
+          ( row_a.length - 1 ).times do | d |
 
-            pair_idx <<= 1
+            row = row_a.fetch d
 
-            width = __width_of_unused_tailspace_at_line pair_idx, fit
-            width.zero? and next
+            row_ = row_a.fetch d + 1
 
-            _pairs_index_of_last_piece_on_this_line = pair_idx + 1
+            # IFF the last token on this line and the first on the next
+            # are both words in order to get the jump to happen we need
+            # to add not only the width of the second word but also the
+            # separator that will need to go between them. also we make
+            # this assumption per our standard word-wrap algorithm: any
+            # first token on a row will be a word or a "special spaces"
+            # (a spaces token that is more than 1 character).
 
-            last_piece_on_this_line = @pieces.fetch pairs.fetch(
-              _pairs_index_of_last_piece_on_this_line )
+            tok = row.token_array.last
+            tok_ = row_.token_array.first
 
-            piece_index_of_first_piece_to_add = last_piece_on_this_line.piece_index + 1
+            width_needed_to_make_the_jump = tok_.length
 
-            # (we don't want the first piece on the next line, we want
-            # the piece after the last piece on this line - this way,
-            # in the jump we include the received whitespace.)
-
-            pc = _ending_content_piece_to_accomodate = _first_piece_from(
-              piece_index_of_first_piece_to_add, :non_space )
-
-            pc or break
-
-            _jump_width = ( piece_index_of_first_piece_to_add .. pc.piece_index ).reduce 0 do | m, d |
-              m + @pieces.fetch( d ).length
+            if :word == tok.symbol && :word == tok_.symbol
+              width_needed_to_make_the_jump += 1  # SPACE_.length
             end
 
-            amt_needed_to_add = _jump_width - width
+            # if the current line was any amount of orphan (that is it
+            # had more than zero "slots" of unused space at the end if
+            # compared to the longest line) then the "jump" we want to
+            # accomodate can use this empty space so it's less that we
+            # need to add to the width to get something to move.
+
+            _width_of_trailing_unused_space = fit.actual_width - row.width
+
+            amt_needed_to_add = width_needed_to_make_the_jump -
+              _width_of_trailing_unused_space
 
             case 1 <=> amt_needed_to_add
             when  1
               next
             when 0
-              lowest_width_amt = 1
+              lowest_amt_of_width_needed_to_add = 1
               break
             end
 
-            if ! lowest_width_amt
-              lowest_width_amt = amt_needed_to_add
-            elsif amt_needed_to_add < lowest_width_amt
-              lowest_width_amt = amt_needed_to_add
+            # (simple iterative min finder:)
+
+            if ! lowest_amt_of_width_needed_to_add
+              lowest_amt_of_width_needed_to_add = amt_needed_to_add
+            elsif amt_needed_to_add < lowest_amt_of_width_needed_to_add
+              lowest_amt_of_width_needed_to_add = amt_needed_to_add
             end
           end
 
-          if lowest_width_amt
-            _longer_width = fit.actual_width + lowest_width_amt
+          if lowest_amt_of_width_needed_to_add
+
+            _longer_width = fit.actual_width +
+              lowest_amt_of_width_needed_to_add
+
             @fitter.fit_to_width _longer_width
           end
         end
-
-        def _first_piece_from d, sym
-          begin
-            pc = @pieces.fetch d
-            if sym == pc.category_symbol
-              did_find = true
-              break
-            end
-            @index_of_last_piece == d and break
-            d += 1
-            redo
-          end while nil
-          did_find and pc
-        end
-
-        def __width_of_unused_tailspace_at_line d, fit
-
-          a = fit.line_pairs
-
-          _line_width = ( a.fetch( d ) .. a.fetch( d + 1 ) ).reduce 0 do | m, d_ |
-            m + @pieces.fetch( d_ ).length
-          end
-
-          fit.actual_width - _line_width
-        end
       end
 
-      class Fitter___
+      class Tryer___
 
         def initialize pieces, ratio_width, ratio_height
 
-          @implementation = String_::Word_Wrappers__::Calm::Fit_to_Width.new pieces
+          @_target_ratio = 1.0 * ratio_width / ratio_height
 
-          @target_calculation = Target_Calculation___.new ratio_width, ratio_height
-
+          @_tox = pieces
         end
 
         def fit_to_width width_d
 
-          fit = @implementation.fit_to_width width_d
-          if fit
+          A_Delineation_and_its_Metrics___.new( width_d, @_tox, @_target_ratio ).execute
+        end
+      end
 
-            Calculation_of_Fit__.new fit, @target_calculation
+      class A_Delineation_and_its_Metrics___
 
+        # given all of the tokens and one arbitrary width, make the tokens
+        # fit into the width using the standard algorithm whose module we
+        # use immediately below. as we do this and once we are finished, we
+        # calculate metrics intended specifically for the subject library.
+        # at the end of this we make ourselves a frozen structure with the
+        # results of these calculations.
+
+        include String_::Word_Wrappers__::Calm::Streaming_Layout_Algorithm_Methods
+
+        def initialize width, tox, trat
+
+          @_target_ratio = trat
+          @_tox = tox
+          @width = width
+        end
+
+        def execute
+
+          @actual_width = 0  # (i.e "widest width")
+          @current_width_ = 0
+          @line_count = 0
+          @_narrowest_width = nil
+
+          @tokens_ = []
+          @row_array = []
+
+          _st = Callback_::Stream.via_nonsparse_array @_tox
+          remove_instance_variable :@_tox
+
+          init_context_
+          init_tokenizer_via_stream_ _st
+
+          begin
+            _stay = @tokenizer_.unparsed_exists
+            _stay or break
+
+            send :"at__#{ @tokenizer_.step.symbol }__token"
+            redo
+          end while nil
+
+          if @tokens_.length.nonzero?
+            _realize_row
           end
+
+          remove_context_
+
+          %i(
+             @current_width_ @tokens_ @tokenizer_ @width
+          ).each do | ivar |
+            remove_instance_variable ivar
+          end
+
+          __calculate
         end
-      end
 
-      class Target_Calculation___
+        def flush
 
-        def initialize ratio_width, ratio_height
+          remove_trailing_spaces_
+          _realize_row
 
-          @target_ratio_factor = 1.0 * ratio_width / ratio_height
+          change_context_ :margin_end_
+          @current_width_ = 0
+          @tokens_ = []
 
+          NIL_
         end
 
-        attr_reader :target_ratio_factor
+        def _realize_row
 
-      end
+          row_o = Row___.new @line_count, @tokens_
+          @tokens_ = nil
 
-      class Calculation_of_Fit__
+          d = row_o.width
 
-        def initialize fit, target_calc
+          if @_narrowest_width
+            if @_narrowest_width > d
+              @_narrowest_width = d
+            end
+          else
+            @_narrowest_width = d
+          end
 
-          # target_calculation.target_ratio_factor
+          if @actual_width < d
+            @actual_width = d
+          end
 
-          @actual_width = fit.actual_width
-          @line_pairs = fit.line_pairs
+          @row_array.push row_o
+          @line_count += 1
 
-          @line_count = @line_pairs.length / 2
+          NIL_
+        end
+
+        class Row___
+
+          def initialize row_index, tox
+
+            @row_index = row_index
+
+            @token_array = tox
+
+            @width = tox.reduce 0 do | d, tok |
+              d + tok.length
+            end
+          end
+
+          attr_reader :row_index, :token_array, :width
+        end
+
+        def __calculate
 
           if @line_count.nonzero?
 
-            @orphanlessness = 1.0 * fit.narrowest_line_width / @actual_width
+            # how far away is our actual ratio from the target ratio? the
+            # "absolute ratio delta" measures this. the lower the number,
+            # the closer the match.
 
             @actual_ratio_factor = 1.0 * @actual_width / @line_count
 
-            @abs_ratio_delta = ( target_calc.target_ratio_factor -
-              @actual_ratio_factor ).abs
+              # (visible for debugging)
 
+            @abs_ratio_delta = ( @_target_ratio - @actual_ratio_factor ).abs
+
+            # our "orphan line" (shortest line), how short is it relative
+            # to our longest line? the "orphanlessness" measures this. a
+            # a score of 1.0 means we are a prefectly justified rectangle
+            # (of some ratio). the closer to zero we go, the more severe
+            # the visual effect of the orphan line.
+
+            @orphanlessness = 1.0 * @_narrowest_width / @actual_width
+
+            remove_instance_variable :@_narrowest_width
+            remove_instance_variable :@_target_ratio
+
+            freeze
           end
         end
 
         attr_reader :abs_ratio_delta,
-         :actual_width, :line_count, :line_pairs,
-          :orphanlessness
+         :actual_width,
+         :line_count,
+         :row_array,
+         :orphanlessness
 
-        def compared_against calc_fit
+        def compared_against current_champion_fit
 
-          Comparison__.new( self, calc_fit ).build_comparison
+          Comparison__.new( self, current_champion_fit ).build_comparison
         end
       end
 
@@ -471,42 +570,39 @@ module Skylab::Basic
 
         def __when_I_have_a_better_ratio_but_I_am_more_orphanic
 
-          @i_win, stop_looking = _tiebraker @me, @other
-          @keep_looking = ! stop_looking
+          if @me.orphanlessness <= ORPH_THRESHOLD__
 
+            @i_win = false
+          else
+            @i_win = true
+          end
+
+          # (since we had a better ratio, keep looking)
+          NIL_
         end
 
         def __when_I_have_a_worse_ratio_but_I_am_less_orphanic
 
-          other_wins, stop_looking = _tiebraker @other, @me
-          @i_win = ! other_wins
-          @keep_looking = ! stop_looking
-          nil
-        end
+          if @other.orphanlessness <= ORPH_THRESHOLD__
 
-        def _tiebraker better_ratio, less_orphanic
-
-          # true-ish means that the left one wins, else right wins
-
-          if ORPH_THRESHOLD__ > better_ratio.orphanlessness
-
-            # when we choose the less orphanic one over the better
-            # ratio, it means a direction change (maybe?). stop
-            # narrowing the search
-
-            [ false, true ]
+            @i_win = true
+            @keep_looking = false  # if we pull this "override",
+              # don't bother looking any more in this direction
 
           else
-
-            true
+            @i_win = false
           end
+
+          NIL_
         end
       end
 
-      ORPH_THRESHOLD__ = 0.5  # when the "wasted space" of the most
-        # orphanic line exceeds this share of the horizontal space,
-        # give more weight to de-orphanizing it than to approaching
-        # the target ratio
+      ORPH_THRESHOLD__ = 0.40  # when the aspect ratio of one is better
+      # but the orphanlessness of the other is better, this is how we
+      # resovle the "tiebraker": of the one with the worse justification,
+      # if the width of the narrowest line compared to the widest line is
+      # this ratio or less, then that delineation is "very orphanic" and
+      # can be beaten by a worse ratio that has better orphanlessness.
 
     end
   end

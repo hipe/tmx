@@ -70,7 +70,7 @@ module Skylab::Headless::TestSupport::System::Services
     def produce_temporary_starting_file
       td = prepared_tmpdir
       path = td.join( 'some-file' ).to_path
-      io = ::File.open( path, Headless_::WRITE_MODE_ )
+      io = ::File.open( path, ::File::CREAT | ::File::WRONLY  )
       io.write "before\n"
       io.close
       path
