@@ -2,115 +2,84 @@ require_relative '../../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - node - actions - open", wip: true do
+  describe "[sg] models - node - actions - open" do
 
     extend TS_
+    use :expect_event
+    use :my_tmpdir_
+    use :byte_up_and_downstreams
 
-    with_tmpdir do |o|
-      o.clear.write manifest_file, <<-O.unindent
-        [#004.2] #open this is #feature-creep but meh
-        [#004] #open here's an open guy
-                        with two lines
-        [#003]        not open because no such tag
-        [#002]       look for job #openings somewhere else
-        [#leg-001]   this is an old ticket that is still #open
-                       it has a prefix which will hopefully be ignored
-      O
-      nil
-    end
+    it "nothing is reappropriable, so allocate a new number" do
 
-    context "with options that don't make sense for that form" do
-      it '"foo is for X not Y"' do
-        do_not_setup_tmpdir
-        invoke 'open', '--dry-run'
-        expect %r(\Asorry - --dry-run is used for opening issues, not #{
-          }listing open issues\z)i
-        expect %r(\Asn0g open -h might have more information\z)i
-      end
-    end
+      path = _td.write( 'foo/col-1.mani', _collection_one_string ).to_path
+      # path = my_tmpdir_.join( 'foo/col-1.mani' ).to_path
 
-    context "with no arguments show a report of open tickets!" do
-
-      it "`open` (with no options) - shows a subset of lines from the file" do
-        setup_tmpdir_read_only
-        invoke 'o'
-        a = output.lines
-        :info == a.first.stream_symbol and a.shift
-        a.map(& :stream_symbol ).should eql(
-          [:pay, :pay, :pay, :pay, :pay, :info] )
-        exp = <<-O.unindent
-          [#004.2] #open this is #feature-creep but meh
-          [#004] #open here's an open guy
-                          with two lines
-          [#leg-001]   this is an old ticket that is still #open
-                         it has a prefix which will hopefully be ignored
-        O
-        act = a[0..-2].map(&:string).join
-        act.should eql( exp )
-      end
-
-      it "`open -v` - show it verbosely (the yaml report)" do
-        setup_tmpdir_read_only
-        invoke 'open', '-v'
-        act = output.lines.reduce( [] ) do |m, (x, _)|
-          if :pay == x.stream_symbol
-            m.push x.string
-            if 4 == m.length
-              break( m )
-            end
-          end
-          m
-        end.join
-        exp = <<-O.unindent
-          ---
-          identifier_body   : 004.2
-          first_line_body   : #open this is #feature-creep but meh
-          ---
-        O
-        exp.should eql( act )
-      end
-    end
-
-    context "with one argument" do
-
-      it "`open foo` opens a ticket" do
-        invoke 'open', 'foo'
-        output.lines.first.string.should match(
-          /new line: \[#005\] #open foo/ )
-        output.lines.clear
-        do_not_setup_tmpdir
-        invoke 'open', # eighty characters:
+      call_API(
+        :node, :open,
+        :try_to_reappropriate,
+        :upstream_identifier, path,
+        :message, [
 <<-O.chop
-1234 6789 2234 6789 3234 6789 4234 6789 5234 6789 6234 6789 7234 6789 8234 6789
+1___ 1b__ 2___ 2b__ 3___ 3b__ 4___ 4b__ 5___ 5b__ 6___ 6b__ 7___ 7b__ 8___ 8b__
 O
-        set_cut_width 'while opening, '.length
+        ] )
 
-        next_cut_line.should eql 'added new lines:'
+      expect_no_events  # for now
 
-        next_chopped_line.should eql(
- "[#006] #open 1234 6789 2234 6789 3234 6789 4234 6789 5234 6789 6234 6789 7234"
-        ) # 78 chars wide yay
-        next_chopped_line.should eql "             6789 8234 6789"  # DAMN STRA
+      fh = ::File.open path
+      fh.gets.should eql "[#03] B\n"
+      fh.gets.should eql(
+"[#002] #open 1___ 1b__ 2___ 2b__ 3___ 3b__ 4___ 4b__ 5___ 5b__ 6___ 6b__ 7___\n"
+      )
+      fh.gets.should eql "             7b__ 8___ 8b__\n"
+      fh.gets.should eql "[#01] A\n"
+      fh.gets.should be_nil
+    end
 
-        next_chopped_line.should eql 'done opening.'
-        output.lines.length.should be_zero
-      end
+    memoize_ :_collection_one_string do
+      <<-HERE.unindent.freeze
+        [#03] B
+        [#01] A
+      HERE
+    end
 
-      def set_cut_width d
-        @cut = -> str do
-          str[ d .. -1 ]
-        end ; nil
-      end
+    it "reappropriation" do
 
-      def next_cut_line
-        s = next_chopped_line
-        s and @cut[ s ]
-      end
+      _did = downstream_ID_via_array_ y=[]
 
-      def next_chopped_line
-        s = output.lines.shift.string
-        s.chop!
-        s
+      _uid = upstream_identifier_via_string_ <<-HERE.unindent.freeze
+        [#02] #done  item 2 line one
+          item 2 line two xyzyz
+        [#03] B
+        [#01] A
+      HERE
+
+      call_API(
+        :node, :open,
+        :try_to_reappropriate,
+        :upstream_identifier, _uid,
+        :downstream_identifier, _did,
+        :message, [ "so far", "so good" ]
+      )
+
+      y[ 0 ].should eql(
+"[#002] #open so far so good ( #was: #done  item 2 line one item 2 line two\n"
+      )
+      y[ 1 ].should eql "             xyzyz )\n"
+      y[ 2 ].should eql "[#03] B\n"
+      y[ 3 ].should eql "[#01] A\n"
+      y.length.should eql 4
+
+      _node = @result.fetch 0
+      _node.ID.to_i.should eql 2
+    end
+
+    def _td
+      td = my_tmpdir_
+      if td.exist?
+        td
+      else
+        td.clear
       end
     end
   end

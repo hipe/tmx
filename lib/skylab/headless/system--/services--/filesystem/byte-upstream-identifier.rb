@@ -58,7 +58,11 @@ module Skylab::Headless
         ::File.read @path
       end
 
-      def to_simple_line_stream & oes_p
+      def to_simple_line_stream & x_p
+        to_rewindable_line_stream( & x_p )
+      end
+
+      def to_rewindable_line_stream & oes_p
 
         if block_given?  # experimental convenience exposure
 

@@ -8,6 +8,7 @@ module Skylab::Snag::TestSupport
     use :expect_event
     use :my_tmpdir_
     use :byte_up_and_downstreams
+    use :node_support
 
     context "(with this manifest)" do
 
@@ -45,7 +46,7 @@ module Skylab::Snag::TestSupport
         _ev = expect_OK_event :entity_removed
         black_and_white( _ev ).should eql "removed #two from [#1]"
 
-        expect_succeeded
+        expect_noded_ 1
       end
 
       it "remove a tag in the middle (USE THE TEMPFILE)" do

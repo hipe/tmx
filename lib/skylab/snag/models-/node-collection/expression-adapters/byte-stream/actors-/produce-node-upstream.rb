@@ -11,7 +11,13 @@ module Skylab::Snag
         Callback_::Actor.call self, :properties,
 
           :extended_content_adapter,
-          :byte_upstream_ID
+          :byte_upstream_ID,
+            :simple_line_upstream  # (if set, will shadow any `byte_upstream_ID`)
+
+        def initialize
+          @simple_line_upstream = nil
+          super
+        end
 
         def execute
 
@@ -27,7 +33,7 @@ module Skylab::Snag
           end
         end
 
-        attr_reader :_line_upstream
+        attr_reader :simple_line_upstream
 
         def __gets_first_node_ever  # assume not after a rewind
 
@@ -37,11 +43,20 @@ module Skylab::Snag
 
         def __resolve_line_upstream
 
+          if @simple_line_upstream
+            ACHIEVED_
+          else
+            __via_etc_resolve_SLS
+          end
+        end
+
+        def __via_etc_resolve_SLS
+
           us = @byte_upstream_ID.to_simple_line_stream(
             & @on_event_selectively )
 
           us and begin
-            @_line_upstream = us
+            @simple_line_upstream = us
             ACHIEVED_
           end
         end
@@ -55,7 +70,7 @@ module Skylab::Snag
 
         def _gets_first_node_of_stream  # may be used after rewind *OR* EOF
 
-          s = @_line_upstream.gets
+          s = @simple_line_upstream.gets
           if s
 
             @receive_first_line_of_stream[ s ]
@@ -122,7 +137,7 @@ module Skylab::Snag
               break
             end
 
-            s = @_line_upstream.gets
+            s = @simple_line_upstream.gets
             if s
               @sstr_a.push @Substring.new nil, nil, @scn.string
               @scn.string = s
@@ -164,7 +179,7 @@ module Skylab::Snag
           __accept_first_node_line
           begin
 
-            s = @_line_upstream.gets
+            s = @simple_line_upstream.gets
             if ! s
               x = _EOF s
               break
@@ -197,7 +212,7 @@ module Skylab::Snag
           @business_line_range_end = @sstr_a.length
           begin
             @sstr_a.push @Substring.new( nil, nil, @scn.string )
-            s = @_line_upstream.gets
+            s = @simple_line_upstream.gets
             if ! s
               x = _EOF s
               break
@@ -281,11 +296,11 @@ module Skylab::Snag
 
               # :#here might be a better place to reset the state of the thing
 
-              actor._line_upstream.rewind
+              actor.simple_line_upstream.rewind
             end
 
             @rr = -> do
-              actor._line_upstream.close
+              actor.simple_line_upstream.close
             end
           end
 

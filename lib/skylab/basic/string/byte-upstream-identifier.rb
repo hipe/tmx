@@ -13,6 +13,10 @@ module Skylab::Basic
       end
 
       def to_simple_line_stream
+        to_rewindable_line_stream
+      end
+
+      def to_rewindable_line_stream
         String_.line_stream @s
       end
 

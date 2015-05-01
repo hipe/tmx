@@ -64,6 +64,25 @@ module Skylab::Snag::TestSupport
         scn.next_line.should be_nil
       end
 
+      it "gold star" do
+
+        _width 77
+        _sub_margin 7
+        _fake_ID _six_width_fake_ID
+
+        _message <<-O.chop
+1___ 1b__ 2___ 2b__ 3___ 3b__ 4___ 4b__ 5___ 5b__ 6___ 6b__ 7___ 7b__ 8___ 8b__
+        O
+
+        scn = _build_scanner
+        scn.next_line.should eql(
+"[#fake]       1___ 1b__ 2___ 2b__ 3___ 3b__ 4___ 4b__ 5___ 5b__ 6___ 6b__\n" )
+
+        scn.next_line.should eql(
+"              7___ 7b__ 8___ 8b__\n" )
+
+        scn.next_line.should be_nil
+      end
 
       def _width d
         @_width_x = d
@@ -71,6 +90,10 @@ module Skylab::Snag::TestSupport
 
       def _sub_margin d
         @_sub_margin_x = d
+      end
+
+      def _identifier_width x
+        @_identifier_width_x = x
       end
 
       def _max_lines d
@@ -89,11 +112,12 @@ module Skylab::Snag::TestSupport
         @_do_prepend_open_tag_x = true
       end
 
-      attr_reader :_do_prepend_open_tag_x
+      attr_reader :_do_prepend_open_tag_x, :_identifier_width_x
 
       def _build_scanner
 
-        _expag = build_byte_stream_expag_ @_width_x, @_sub_margin_x , 50
+        _expag = build_byte_stream_expag_ @_width_x, @_sub_margin_x ,
+          _identifier_width_x || 50
 
         node = Snag_::Models_::Node.edit_entity(
 

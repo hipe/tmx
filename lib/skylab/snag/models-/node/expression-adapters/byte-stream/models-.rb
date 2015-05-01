@@ -14,6 +14,10 @@ module Skylab::Snag
           @s = string
         end
 
+        def get_business_substring
+          @s[ @begin ... @end ]
+        end
+
         attr_reader :begin, :end, :s
 
         def is_mutable
@@ -145,6 +149,11 @@ module Skylab::Snag
           Callback_::Stream.via_range @_r do | d |
             a.fetch d
           end
+        end
+
+        def to_row_stream_
+
+          Callback_::Stream.via_nonsparse_array @_sstr_a
         end
 
         MONADIC_TRUTH_ = -> { true }

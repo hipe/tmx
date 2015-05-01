@@ -6,23 +6,20 @@ module Skylab::Snag
 
       class Actors_::Add_node
 
-        Callback_::Actor.call self, :properties, :bx, :node, :collection
+        Callback_::Actor.call self, :properties,
+          :session
 
         def execute
 
-          BS_::Sessions_::Rewrite_Stream_End_to_End.new(
-
-            @bx, @node, @collection, & @on_event_selectively
-
-          ).session do | o |
+          o = @session  # ->
 
             id = Find_first_available_identifier[ o.entity_upstream ]
 
             o.reset_the_entity_upstream
 
-            Rewrite[ id, @node, o, & @on_event_selectively ]
+            Rewrite[ id, o, & @on_event_selectively ]
 
-          end
+            # <-
         end
 
         # <- 2
@@ -45,9 +42,9 @@ module Skylab::Snag
           _Big_Tree = _Tree.mutable_node
           _Frugal_Tree = _Tree.frugal_node
 
-          # (in hindsight, using "frugal tree" here may have no gain: these
-          # these nodes are always branches, never leaves; nonetheless we
-          # leave it in as :+#grease)
+          # in hindsight using "frugal tree" here may have no gain: these
+          # nodes are always branches, never leaves; nonetheless we leave
+          # the frugal tree in here as :+#grease
 
           tree = _Big_Tree.new
 
@@ -101,9 +98,9 @@ module Skylab::Snag
       end # >>
     end
 
-    Rewrite = -> id, node, o, & x_p do
+    Rewrite = -> id, o, & x_p do
 
-      ok = node.edit(
+      ok = o.subject_entity.edit(
 
         :via, :object,
         :set, :identifier, id,
@@ -112,7 +109,7 @@ module Skylab::Snag
       if ok
 
         o.write_each_node_whose_identifier_is_greater_than_that_of_subject
-        o.write_the_new_node
+        o.write_the_subject_node
         o.write_any_floating_node
         o.write_the_remaining_nodes
       else

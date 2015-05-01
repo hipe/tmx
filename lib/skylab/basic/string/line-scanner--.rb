@@ -8,33 +8,6 @@ module Skylab::Basic
 
       class << self
 
-        def new * x_a, & p
-
-          case x_a.length
-          when 1
-            s = x_a.first  # meh
-            count = 0
-            scn = Basic_.lib_.string_scanner s
-            p = -> do
-              s = scn.scan LINE_RX__
-              if s
-                count += 1
-                s
-              else
-                p = EMPTY_P_
-                nil
-              end
-            end
-            super -> { count } do
-              p[]
-            end
-          when 0  # when maps, reduces etc are used, you lose the line count for now
-            superclass.new( & p )
-          end
-        end
-
-        LINE_RX__ = String.regex_for_line_scanning
-
         def reverse s
           if block_given?
             yield Reverse__[ s ]
@@ -42,24 +15,76 @@ module Skylab::Basic
             Reverse__[ s ]
           end
         end
+
+        def via_arglist a
+
+          upstream = Implementation___.new( * a )
+
+          new upstream do
+            upstream.__gets
+          end
+        end
       end  # >>
-
-      def initialize count_p, & p
-
-        @count_p = count_p
-        super( & p )
-      end
 
       def members
         [ :gets, :line_number ]
       end
 
-      def line_number
-        @count_p.call.nonzero?
+      def lineno
+        @upstream.__lineno
       end
 
-      private def new & p  # re-write parent, because we re-wrote `cls.new`
-        self.class.new( & p )
+      def line_number
+        @upstream.__lineno
+      end
+
+      def rewind
+        @upstream.__rewind
+      end
+
+      class Implementation___
+
+        # to be in the stream inheirance hierarchy we must contain all of our
+        # state in one object that can be passed around to derivative streams
+
+        def initialize s
+
+          lineno = 0
+
+          @_lineno = -> do
+            lineno
+          end
+
+          scn = Basic_.lib_.string_scanner s
+
+          @_gets = -> do
+            s = scn.scan LINE_RX___
+            if s
+              lineno += 1
+            end
+            s
+          end
+
+          @_rewind = -> do
+            lineno = 0
+            scn.pos = 0
+            0  # look like file IO
+          end
+        end
+
+        LINE_RX___ = String.regex_for_line_scanning
+
+        def __gets
+          @_gets[]
+        end
+
+        def __lineno
+          @_lineno[]
+        end
+
+        def __rewind
+          @_rewind[]
+        end
       end
 
       Reverse__ = -> mutable_string do  # see #the-reverse-scanner

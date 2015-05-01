@@ -7,6 +7,7 @@ module Skylab::Snag::TestSupport
     extend TS_
     use :expect_event
     use :byte_up_and_downstreams
+    use :node_support
 
     it "uses first available ID, placed in correct spot (integration)" do
 
@@ -26,7 +27,7 @@ module Skylab::Snag::TestSupport
       scn.next_line.should eql "[#01]       #hi\n"
       scn.next_line.should be_nil
 
-      expect_succeeded
+      expect_noded_ 3
     end
   end
 end

@@ -66,7 +66,7 @@ module Skylab::Snag::TestSupport
       st.gets.should be_nil
     end
 
-    it "read from byte-strem then prepend" do
+    it "read from byte-stream then prepend" do
 
       o = _new_node_via_identifier_and_body _id( 4 ), _body
 

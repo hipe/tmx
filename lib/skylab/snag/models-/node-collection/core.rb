@@ -47,10 +47,6 @@ module Skylab::Snag
       Snag_::Model_::Mutation_Session.edit x_a, self, & x_p
     end
 
-    def __node__class_for_mutation_session
-      Snag_::Models_::Node
-    end
-
     module Expression_Adapters
       EN = nil
       Autoloader_[ self ]

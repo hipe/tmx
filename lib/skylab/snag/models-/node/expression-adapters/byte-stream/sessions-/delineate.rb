@@ -18,7 +18,7 @@ module Skylab::Snag
               process_arglist_fully a
             end
           end
-        end
+        end  # >>
 
         def initialize( * )
 
@@ -33,17 +33,17 @@ module Skylab::Snag
           @r = body.r_
           @row_a = body.row_a_
 
-          __express_the_zero_or_more_non_business_leading_lines
-          __express_the_business_rows
-          __express_the_zero_or_more_non_business_trailing_lines
+          __express_any_leading_non_business_lines
+          __express_any_business_rows
+          __express_any_trailing_non_business_lines
         end
 
         def execute_agnostic
 
-          _delineate_object_stream @node.body.to_simple_stream_of_objects_
+          _from_head_via_object_stream @node.body.to_simple_stream_of_objects_
         end
 
-        def __express_the_zero_or_more_non_business_leading_lines
+        def __express_any_leading_non_business_lines
 
           if @r.begin.nonzero?
             @r.begin.times do | d |
@@ -53,7 +53,7 @@ module Skylab::Snag
           NIL_
         end
 
-        def __express_the_zero_or_more_non_business_trailing_lines
+        def __express_any_trailing_non_business_lines
 
           if @r.end < @row_a.length
             ( @r.end ... @row_a.length ).each do | d |
@@ -63,31 +63,59 @@ module Skylab::Snag
           ACHIEVED_
         end
 
-        def __express_the_business_rows
+        def __express_any_business_rows
 
-          @row_st = Callback_::Stream.via_range( @r ) do | d |
+          st = Callback_::Stream.via_range @r do | d |
             @row_a.fetch d
           end
 
-          st = @row_st
+          first_row = st.gets
 
-          row_x = st.gets
-          if row_x
-            if row_x.is_mutable
-              _delineate_object_stream row_x.to_simple_stream_of_objects_, st
-            else
-              begin
-                _express_immutable_row row_x
-                row_x = st.gets
-                row_x or break
-                if row_x.is_mutable
-                  __delineate_all_lines_from_NON_first_row row_x, st
-                  break
-                end
-                redo
-              end while nil
-            end
+          if first_row
+            __express_the_business_rows first_row, st
           end
+          NIL_
+        end
+
+        def __express_the_business_rows first_row, st
+
+          if first_row.is_mutable
+
+            _from_head_via_object_stream(
+              first_row.to_simple_stream_of_objects_,
+              st )
+          else
+
+            _express_immutable_row first_row
+            __express_any_subsequent_business_rows st
+          end
+          NIL_
+        end
+
+        def __express_any_subsequent_business_rows st
+
+          # with every zero or more remaining business row: if that row
+          # is non-mutable, output the raw, received string (just as it
+          # existed in the presumed upsream file). otherwise, (and that
+          # row is mutable), wordwrap into one flow all objects in that
+          # row and any remaining business rows of this node regardless
+          # of whether or not they were mutated; to preserves the human
+          # formatting where it can, and trample human formatting where
+          # the machine formatting would otherwise produce lines too wide
+          # or too narrow.
+
+          begin
+            row = st.gets
+            row or break
+
+            if row.is_mutable
+              __from_non_head_via_object_stream row, st
+              break
+            end
+            _express_immutable_row row
+            redo
+          end while nil
+          NIL_
         end
 
         def _express_immutable_row row
@@ -96,10 +124,9 @@ module Skylab::Snag
           NIL_
         end
 
-        def _delineate_object_stream o_st, row_st=nil
+        def _from_head_via_object_stream o_st, row_st=nil
 
-          s = ""
-          @node.ID.express_into_under s, @expag
+          s = _get_ID_description
 
           ww = _start_word_wrap s.length, :skip_margin_on_first_line
 
@@ -107,13 +134,16 @@ module Skylab::Snag
 
           o = o_st.gets
 
-          if o  # likely but not certain. special case for first business
-            # row: output the sub-margin unless *the* *first* object is a)
+          if o  # likely but not certain.
+
+            # :+#special-logic: special case for first business row:
+            # output the sub-margin unless *the* *first* object is a)
             # a tag that b) we want to emphasize. (etc)
 
             unless :tag == o.category_symbol && :open == o.intern
               ww << ( SPACE_ * @expag.sub_margin_width )
             end
+
             _into_wordwrap_flush_remainder_of_object_stream ww, o, o_st
           end
 
@@ -121,28 +151,40 @@ module Skylab::Snag
             _into_wordwrap_flush_remainder_of_rows ww, row_st
           end
 
-          ww.flush
+          ww.flush  # result is downstream context, i.e string
+
+          ACHIEVED_  # this is an endpoint for some (covered)
         end
 
-        def __delineate_all_lines_from_NON_first_row row, row_st
+        def __from_non_head_via_object_stream row, row_st
 
-          s = ""
-          @node.ID.express_into_under s, @expag
+          s = _get_ID_description
 
           ww = _start_word_wrap s.length
 
           o_st = row.to_simple_stream_of_objects_
           o = o_st.gets
+
           if o
             _into_wordwrap_flush_remainder_of_object_stream ww, o, o_st
           end
+
           _into_wordwrap_flush_remainder_of_rows ww, row_st
-          ww.flush
 
           # this method is different from the above counterpart in that
           # 1) it does not express the identifier (altho it does determine
           # the margin from its width) 2) it puts the same margin on every
           # line and 3) it does not do the emphasis hack.
+
+          ww.flush
+
+          NIL_
+        end
+
+        def _get_ID_description
+          s = ""
+          @node.ID.express_into_under s, @expag
+          s
         end
 
         def _into_wordwrap_flush_remainder_of_rows ww, row_st
@@ -184,6 +226,7 @@ module Skylab::Snag
               ww << s  # here (and for now) we don't defer to the string
                        # piece's own autonomy to express itself. we do it.
             else
+
               o.express_into_under ww, @expag  # probably a tag
             end
 
@@ -193,8 +236,6 @@ module Skylab::Snag
             o or break
             redo
           end while nil
-
-          ww.flush
         end
 
         HAS_LEADING_OR_TRAILING_WHITESPACE___ = /\A[ \t]|[ \t]\z/

@@ -11,7 +11,9 @@ subgraph cluster_main {
     tr [label="19. delete" style=filled]
   }
 
-  aa [label="23. open" ]
+  mr [label="24. design and implement\nfull-stack map-reduce\nagainst criteria API"]
+
+  aa [label="23. open" style=filled]
   ca [label="21. close" style=filled]
   de [label="15. design & implement\ncriteria implementation" style=filled]
   FS [label="14. expose the\nfilesystem" style=filled]
@@ -21,7 +23,7 @@ subgraph cluster_main {
   node_model [label="10. node model" style=filled]
   node_upstream [label="11. node\nupstream" style=filled]
   oaa [label="20. create" style=filled]
-  rea [label="integrated" ]
+  rea [label="integrated" style=filled]
   rea_actor [label="22. find any best existing\nreappropriable node", style=filled]
   stru [label="13. experimental support\nfor structured tags" style=filled]
   tag_model [label="10. tag model" style=filled]
@@ -52,13 +54,26 @@ subgraph cluster_main {
   ta->tmpdir
 
 }
-
-
 subgraph cluster_after {
 
-  label="auxiliary functions"
-  melt [label="melt todos\ninto issues"]
-  top_cli [label="toplevel\nCLI integration"]
+  label="auxiliaries"
+
+  subgraph cluster_reports {
+
+    label="auxiliary report actions"
+    macro_rep [label="macro (i.e\n\"universal\")\nreporting"]
+    digrah_ [label="generate digraph\nfrom collection"]
+
+  }
+
+  subgraph cluster_functions {
+
+    label="auxiliary actions & related"
+    melt [label="melt todos\ninto issues"]
+    top_cli [label="toplevel\nCLI integration"]
+    top_cli->mr
+
+  }
 }
 
 melt->aa

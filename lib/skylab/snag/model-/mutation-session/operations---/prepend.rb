@@ -20,6 +20,8 @@ module Skylab::Snag
 
         o.takes_modifier :via
 
+        o.has_non_boolean_result = true
+
         PREPEND = o.freeze
 
       end

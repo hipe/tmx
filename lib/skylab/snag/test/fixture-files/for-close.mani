@@ -1,4 +1,5 @@
 [#003] #open biff bazz
-  this 2nd line indents but does not concat onto the first
+  this 2nd will get flowed into the previous one because
+    it was edited (this line too).
 [#002]       #done this one is finished
 [#001]      this one has no markings and 6 spaces of ws

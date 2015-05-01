@@ -24,6 +24,14 @@ module Skylab::Headless
       def to_simple_line_stream
         @io
       end
+
+      def to_rewindable_line_stream
+        @io
+      end
+
+      def lockable_resource
+        @io
+      end
     end
   end
 end

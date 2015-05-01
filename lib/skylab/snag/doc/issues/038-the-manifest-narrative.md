@@ -223,29 +223,134 @@ so, for 1) (add a node by re-appropriating if possible)
       we did it
 
 
+## on locking (:#note-35) and related concerns
 
+### what do we mean by "mutating" the collection?
+
+let a node collection "mutation" be this:
+
+  1) there is a node collection that can give us a node upstream:
+
+     • as much as possible we should avoid knowing where this
+       collection came from (that is, its modality, i.e how or if
+       it is stored).
+
+     • the node upstream this collection can give us can yield each
+       of its nodes one by one, in a particular order decided by the
+       modality that is mostly meaningless to us.
+
+     • we do not have random access to the collection behind this
+       stream. we can only rewind the stream to start the reading
+       over from the beginning.
+
+  2) at some point we will have some or all of a node that represents
+     a "new" node we want to add or a presumed existing node that
+     based on ID we want to edit (actually, replace), or a node to
+     remove.
+
+  3) we effect the collection "mutation" by writing from beginning to
+     end our new, modified collection as a stream to some given
+     modality. so note there is really no direct way that we
+     "mutate" the "collection"; we really just write functions that
+     help output our desired collection, given an input collection.
+
+this is what is meant by "mutation" is the sometimes parallel process
+of reading from an upstream and writing to a downstream, with whatever
+filters we write in between.
+
+
+
+
+### we face special challenges in certain modalities
+
+when working with collection "mutations" under the "byte stream"
+modality, under certain conditions we have extra work to: both upstream
+and downstream can be but are not necessarily files.
+
+problems when the upstreams and/or downstreams are files:
+
+  1) if the upstream is a file, if it were to get mutated by another
+     process while we are reading from it, that would be problematic.
+
+  2) if the downstream is a file, we (of course) want no other process
+     to write to it while we are writing to it.
+
+  3) if the upstream and downstream are both files and both the same
+     file (which is the typical case), despite the `RDWR` mode we have
+     no idea whether and how this would work.
+
+
+
+
+### how we face problem (3)
+
+we can write our "mutated" collection to a tmpfile and once this is
+complete we can replace the main file with the tmpfile. writing the whole
+collection to an intermediate tmpfile solves two problems:
+
+  • it is the only reasonably feasible way we have come up with to get
+    around (3) above, the issue with reading from and simultaneously
+    mutating the same file.
+
+  • writing to an intermediate tmpfile can help us avoid (but does not
+    prevent) accidental corruption or loss of ** ALL THE DATA **, if
+    for example any error is encountered anywhere during the operation.
+    (this has certainly happened in the past, so we have always used
+     tmpfiles for "production" cases).
+
+*however*, using an intermediate tmpfile may counteract the desired
+mechanic based on what the downstream identifier is: specifically, if
+the downstream is something like a pipe, some arbitrary open IO handle,
+or even a simple string; then writing to the intermediate tmpfile itself
+may introduce its own problems:
+
+  • it may effect more moving parts than were intended (e.g it would
+    require access to resources like filesystem that it does not have
+    and does not need, given its operating environment and its
+    particular upstream and downstream shapes; respectively.)
+
+  • if the downstream is something like an open IO handle (or even a file
+    that is intended to be tailed), it may be that progressive, streaming
+    throughput is desired.
+
+  • if the downstream IO is something as simple as a string, including
+    an intermediate tmpfile in this pipeline is awkward at best.
+
+we will pick back up with tmpfiles in our stirring conclusion below.
+
+
+
+
+### how we face problems (1) & (2) and sythesize the rest:
+
+DURING the entire "muation session":
+
+  • IFF the upstream is a file (path) or filehandle, try to get a lock
+    on it. see appendix A for how to try to get this lock and what to
+    do in the else-case.
+
+  • likewise with the downstream, exactly as the previous bullet.
+
+  • this is something of a design choice, but for now let's say we'll
+    use the intermediate tmpfile IFF the upstream and downstream are
+    both file-based and (as far as we can tell) the same file. leave
+    open an upgrade path if we decide to make this an option. but as-is,
+    this is a solution for the tmpfile-related issues raised in the
+    previous section. (:#note-80)
+
+
+
+### appendix A - how to do lockfiles (:#note-65)
+
+because concurrency is something we want to build for but is not
+something we need on the ground floor, we request locks on filehandles
+with passing the "nonblock" bit turned on. this way if the file is busy
+we fail right away rather than blocking (perhaps for a long time)
+waiting for the file to become available. other options would include
+waiting indefinitely or waiting with a timeout.
 
 
 ----------------------
-
-## introduction
-
-would that it needs any introduction
-
-
-
-## #note-75
-
-using a hacky regex, scan all msgs emitted by the file utils client and with
-any string that looks like an aboslute path run it through a
-proc (*of the modality client*, e.g). in turn, `call_digraph_listeners`
-these messages as info to `info_event_p`, presumably to the same modality client.
-
-this hack grants us the novelty of letting FileUtils render its own messages
-(which it does heartily) while attempting possibly to mask full filenames for
-security reasons. but at the end of day, it is still a hack
-
-
 
 
 ## (random historical)

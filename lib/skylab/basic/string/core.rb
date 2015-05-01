@@ -46,7 +46,7 @@ module Skylab::Basic
         if a.length.zero?
           String_::Line_Scanner__
         else
-          String_::Line_Scanner__.new( * a )
+          String_::Line_Scanner__.via_arglist a
         end
       end
 

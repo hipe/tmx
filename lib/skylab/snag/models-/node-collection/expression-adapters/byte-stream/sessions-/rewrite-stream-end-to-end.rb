@@ -8,32 +8,166 @@ module Skylab::Snag
 
       class Sessions_::Rewrite_Stream_End_to_End  # see [#038]
 
-        WIDTH__ = 79  # for now
-        SUB_MARGIN_WIDTH__ = ' #open '.length  # for now
-        IDENTIFIER_INTEGER_WIDTH___ = 3  # for now
+        WIDTH__ = 79  # (defaults:)
+        SUB_MARGIN_WIDTH__ = ' #open '.length
+        IDENTIFIER_INTEGER_WIDTH___ = 3
 
-        def initialize bx, node, coll, & oes_p
+        def initialize & x_p
 
-          @collection = coll
-          @do_double_buffering = false
-          @downstream_identifier = bx && bx[ :downstream_identifier ]
+          @downstream_identifier = nil
 
           @expression_agent = Expression_Agent_.new(
             WIDTH__,
             SUB_MARGIN_WIDTH__,
             IDENTIFIER_INTEGER_WIDTH___ )
 
-          @on_event_selectively = oes_p
-          @subject_entity = node
+          @_locks = []
+
+          @on_event_selectively = x_p
         end
 
-        def session & p
+        attr_writer :collection, :downstream_identifier
 
-          _ok = __resolve_the_entity_upstream
-          _ok && __against_appropriate_internal_session( & p )
+        attr_reader :expression_agent
+
+        attr_writer :filesystem,
+                    :subject_entity, :tmpdir_path_proc
+
+        def during_locked_write_session  # note-35 (locking, tmpfiles)
+
+          ok = __resolve_and_possibly_lock_the_upstream
+          ok &&= __via_upstream_resolve_the_downstream_adapter
+          ok &&= __resolve_the_entity_upstream
+          if ok
+
+            x = @_ds_ad.downstream_lines_during_possibly_locked_session do | dsl |
+
+              @downstream_lines = dsl
+
+              yield Controller__.new self
+            end
+          end
+          __release_all_locks
+          ok && x
         end
 
-        def __subject_entity__ x
+        def __resolve_and_possibly_lock_the_upstream
+
+          bus_id = @collection.upstream_identifier
+
+          @_bus_id = bus_id
+
+          lus = bus_id.to_rewindable_line_stream( & @on_event_selectively )
+
+          if lus
+
+            @_simple_line_upstream = lus
+
+            case bus_id.shape_symbol
+            when :path
+              _attempt_to_lock lus
+            when :IO
+              _attempt_to_lock lus.lockable_resource
+            else
+              ACHIEVED_
+            end
+          else
+            lus
+          end
+        end
+
+        def _attempt_to_lock io  # :#note-65
+
+          d = io.flock ::File::LOCK_EX | ::File::LOCK_NB
+          if d
+            if d.zero?
+              @_locks.push io
+              ACHIEVED_
+            else
+              raise "unhandled case: filesystem lock error #{ d }"
+            end
+          else
+            __maybe_emit_for_cannot_lock io
+            UNABLE_
+          end
+        end
+
+        def __maybe_emit_for_cannot_lock io
+
+          @on_event_selectively.call :error, :resource_is_busy do
+
+            Callback_::Event.inline_not_OK_with( :resource_is_busy,
+              :resource, io
+            ) do | y, o |
+
+              y << "x."
+
+            end
+          end
+          NIL_
+        end
+
+        def __via_upstream_resolve_the_downstream_adapter
+
+          ds_id = @downstream_identifier
+          if ! ds_id
+            ds_id = @_bus_id.to_byte_downstream_identifier
+          end
+
+          ds_ad = if ds_id.is_same_waypoint_as @_bus_id  # #note-85
+
+            Tmpfile_Downstream_Adapter___.new(
+              ds_id,
+              @tmpdir_path_proc,
+              @filesystem,
+              & @on_event_selectively )
+
+          else
+
+            Direct_Downstream_Adapter___.new ds_id
+          end
+
+          ok = ds_ad.prepare
+          if ok
+            @_ds_ad = ds_ad
+            ACHIEVED_
+          else
+            ok
+          end
+        end
+
+        def __resolve_the_entity_upstream
+
+          st = BS_::Actors_::Produce_node_upstream.with(
+
+            :simple_line_upstream, @_simple_line_upstream,
+            :extended_content_adapter, @collection,
+            & @on_event_selectively )
+
+          if st
+            @entity_upstream = st
+            ACHIEVED_
+          else
+            st
+          end
+        end
+
+        def __release_all_locks
+
+          @_locks.each do | io |
+            io.flock ::File::LOCK_UN  # meh
+          end
+          @_locks.clear
+          NIL_
+        end
+
+        # ~
+
+        def __subject_entity__
+          @subject_entity
+        end
+
+        def __replace_subject_entity__ x
 
           if x
             @subject_entity = x
@@ -41,120 +175,6 @@ module Skylab::Snag
           else
             x
           end
-        end
-
-        def __resolve_the_entity_upstream
-
-          st = @collection.to_entity_stream( & @on_event_selectively )
-          st and begin
-            @entity_upstream = st
-            ACHIEVED_
-          end
-        end
-
-        def __against_appropriate_internal_session
-
-          __appropriate_temporary_line_downstream do | fh |
-
-            @downstream_lines = fh
-
-            yield Controller__.new self
-          end
-        end
-
-        def __appropriate_temporary_line_downstream & p
-
-          down_ID = @downstream_identifier
-          if down_ID
-
-            __against_downstream_identifier down_ID, & p
-          else
-            __against_tmpfile( & p )
-          end
-        end
-
-        def __against_downstream_identifier down_ID
-
-          # result is result. we don't close, we don't flush
-
-          dl = down_ID.to_minimal_yielder
-          dl and begin
-            yield dl
-          end
-        end
-
-        def __against_tmpfile
-
-          ok = __resolve_filesystem
-          ok &&= __resolve_target_path
-          ok && begin
-            __lock_self_during_write do
-              o = __build_tmpfile_session
-              o.session do | fh |
-
-                ok = yield fh
-                ok and __finish_with_tmpfile fh
-              end
-            end
-          end
-        end
-
-        def __resolve_filesystem
-
-          fs = @collection.filesystem_
-          fs and begin
-            @_FS = fs
-            ACHIEVED_
-          end
-        end
-
-        def __resolve_target_path
-
-          tp = @collection.upstream_identifier.to_path
-          tp and begin
-            @_target_path = tp
-            ACHIEVED_
-          end
-        end
-
-        def __lock_self_during_write
-
-          # ALTHOUGH we accomplish the "write" by writing the full document
-          # to a tmpfile and then replacing the main file with the tmpfile,
-          # (and although the tmpfile itself is locked during this operation),
-          # if multiple processes did this around the same time the last one
-          # to finish would clobber the writes of all the others. as a measure
-          # against this, we open the main file for writing and lock it even
-          # though we will never write to it directly ..
-
-          fh = ::File.open @_target_path, ::File::WRONLY
-          es = fh.flock ::File::LOCK_EX | ::File::LOCK_NB
-          if es && es.zero?
-            x = yield
-            fh.flock ::File::LOCK_UN
-            x
-          else
-            self._BUSY  # not covered
-          end
-        end
-
-        def __build_tmpfile_session
-
-          o = Expression_Adapters::Filesystem::Sessions_::Tmpfile.new
-
-          _path = ::File.join(
-            Snag_.lib_.system.defaults.dev_tmpdir_path, 'sn0g' )
-
-          o.tmpdir_path _path
-          o.create_at_most_N_directories 2
-          o.using_filesystem @_FS
-          o
-        end
-
-        def __finish_with_tmpfile fh
-
-          fh.close
-          @_FS.copy fh.path, @_target_path  # bytes
         end
 
         def __entity_upstream__
@@ -229,7 +249,7 @@ module Skylab::Snag
           ACHIEVED_
         end
 
-        def __write_the_new_node__
+        def __write_the_subject_node__
 
           @subject_entity.express_into_under(
             @downstream_lines, @expression_agent )
@@ -270,6 +290,77 @@ module Skylab::Snag
           ok
         end
 
+        class Tmpfile_Downstream_Adapter___
+
+          def initialize x, tdpp, fs, & x_p
+
+            @_ds_id = x
+            @_FS = fs
+            @_tmpdir_path_proc = tdpp
+            @on_event_selectively = x_p
+          end
+
+          def prepare
+
+            path = @_tmpdir_path_proc[]
+            if path
+
+              o = Expression_Adapters::Filesystem::Sessions_::Tmpfile.new
+
+              o.tmpdir_path path
+              o.create_at_most_N_directories 2  # etc
+              o.using_filesystem @_FS
+              @_tmpfile_session_maker = o
+
+              ACHIEVED_
+            else
+              path
+            end
+          end
+
+          def downstream_lines_during_possibly_locked_session
+
+            @_tmpfile_session_maker.session do | fh |
+
+              ok_x = yield fh
+
+              fh.close
+
+              if ok_x
+                _bytes = @_FS.copy fh.path, @_ds_id.path  # bytes
+                ok_x = _bytes
+              end
+
+              ok_x
+            end
+          end
+        end
+
+        class Direct_Downstream_Adapter___
+
+          def initialize x
+            @_ds_id = x
+          end
+
+          def prepare
+
+            y = @_ds_id.to_minimal_yielder
+            if y
+              @_minimal_yielder = y
+              ACHIEVED_
+            else
+              y
+            end
+          end
+
+          def downstream_lines_during_possibly_locked_session
+
+            yield @_minimal_yielder
+
+            # result is result. nothing to do.
+          end
+        end
+
         class Controller__
 
           # industrial strength silliness - proxy calls to the exposed
@@ -280,6 +371,7 @@ module Skylab::Snag
           the_list = %i(
 
             subject_entity
+            replace_subject_entity
 
             entity_upstream
             reset_the_entity_upstream
@@ -287,7 +379,7 @@ module Skylab::Snag
             write_each_node_until_the_subject_node_is_found
             write_each_node_whose_identifier_is_greater_than_that_of_subject
 
-            write_the_new_node
+            write_the_subject_node
             write_any_floating_node
             write_the_remaining_nodes
 
@@ -314,6 +406,8 @@ module Skylab::Snag
                 end
               end
             end
+
+            NIL_
           end
 
           the_list.each do | pair |

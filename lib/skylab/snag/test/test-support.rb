@@ -77,6 +77,13 @@ module Skylab::Snag::TestSupport
       end
     end  # >>
 
+    # ~ near upstream
+
+    def upstream_identifier_via_string_ s
+
+      Snag_.lib_.basic::String::Byte_Upstream_Identifier.new s
+    end
+
     # ~ near downstream
 
     def build_byte_stream_expag_ d, d_, d__
@@ -90,6 +97,11 @@ module Skylab::Snag::TestSupport
       s = ""
       @output_s = s
       Snag_.lib_.basic::String::Byte_Downstream_Identifier.new s
+    end
+
+    def downstream_ID_via_array_ a
+
+      Snag_.lib_.basic::List::Byte_Downstream_Identifier.new a
     end
 
     # ~ near verification
@@ -283,6 +295,21 @@ module Skylab::Snag::TestSupport
       end
     end
   end.call
+
+  module Node_Support
+
+    class << self
+
+      def [] tcm
+        tcm.send :define_method, :expect_noded_, EXPECT_NODED___
+      end  # >>
+
+      EXPECT_NODED___ = -> node_id_d do
+        expect_no_more_events
+        @result.ID.to_i.should eql node_id_d
+      end
+    end
+  end
 
   Callback_ = Snag_::Callback_
 

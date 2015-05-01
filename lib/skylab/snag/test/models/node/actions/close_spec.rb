@@ -7,6 +7,7 @@ module Skylab::Snag::TestSupport
     extend TS_
     use :expect_event
     use :byte_up_and_downstreams
+    use :node_support
 
     it "closing one with a funny looking name - whines gracefully" do
 
@@ -36,13 +37,11 @@ module Skylab::Snag::TestSupport
 
       _ev = expect_neutral_event :entity_not_found
       black_and_white( _ev ).should eql "[#1] does not have #open"
-      expect_succeeded
-
-      # (to do the above we do the crazy error caching / mutating experiment)
+      expect_noded_ 1
 
       scn = scanner_via_output_string_
 
-      s = scn.advance_N_lines 4
+      s = scn.advance_N_lines 5
 
       s.should eql(
         "[#001]       #done this one has no markings and 6 spaces of ws\n" )
@@ -58,15 +57,12 @@ module Skylab::Snag::TestSupport
 
       expect_OK_event :entity_removed, "removed #open from [#3]"
 
-      scn = scanner_via_output_string_
-
-      scn.next_line.should eql "[#003]       #done biff bazz\n"
-
-      scn.next_line.should eql(
-        "             this 2nd line indents#{
-          } but does not concat onto the first\n" )
-
-      scn.next_line[ 0, 6 ].should eql '[#002]'
+      @output_s.should eql <<-O
+[#003]       #done biff bazz this 2nd will get flowed into the previous one
+             because it was edited (this line too).
+[#002]       #done this one is finished
+[#001]      this one has no markings and 6 spaces of ws
+      O
     end
 
     def __DS_ID

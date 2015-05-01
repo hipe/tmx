@@ -23,16 +23,18 @@ module Skylab::Snag
             @extc_adptr = -> { x }
             x
           end
+
+          @_filesystem = Snag_.lib_.system.filesystem
         end
 
-        # ~ inteface with the mutation session (compliments those in parent clas)
+        # ~ interface with the mutation session (compliments those in parent clas)
 
         def mutable_body_for_mutation_session
           self
         end
 
         def receive_changed_during_mutation_session
-          # nothiing.
+          # nothing.
           ACHIEVED_
         end
 
@@ -45,12 +47,53 @@ module Skylab::Snag
 
         # ~ create / update
 
-        def persist_entity bx, node, & oes_p  # per [#br-011] in [#038] (pseudocode)
+        def persist_entity bx, node, & x_p  # per [#br-011] in [#038] (pseudocode)
 
-          if node.ID
-            BS_::Actors_::Replace_node.call bx, node, self, & oes_p
+          o = BS_::Sessions_::Rewrite_Stream_End_to_End.new( & x_p )
+
+          o.collection = self
+
+          o.downstream_identifier = bx && bx[ :downstream_identifier ]
+
+          o.filesystem = @_filesystem
+
+          o.tmpdir_path_proc = -> do  # (or push this up however)
+
+            ::File.join Snag_.lib_.system.defaults.dev_tmpdir_path, 'sn0g'
+
+          end
+
+          o.subject_entity = node
+
+          o.during_locked_write_session do | sess |
+
+            __mutate_collection bx, node, sess, & x_p
+          end
+        end
+
+        def __mutate_collection bx, node, sess, & x_p
+
+          p = bx[ :_mutate_node ]
+          if p
+            _node = p[ node, sess, & x_p ]
+            node = _node
+            sess.replace_subject_entity _node
+          end
+
+          if node
+
+            ok  = if node.ID
+              BS_::Actors_::Replace_node[ sess, & x_p ]
+            else
+              BS_::Actors_::Add_node[ sess, & x_p ]
+            end
+
+            if ok
+              # when the operaion succeeds, we result in the subject entity
+              sess.subject_entity
+            end
           else
-            BS_::Actors_::Add_node.call bx, node, self, & oes_p
+            node
           end
         end
 
@@ -133,7 +176,7 @@ module Skylab::Snag
 
             Expression_Adapters::Filesystem::Extended_Content_Adapter.
               new_via_manifest_path_and_filesystem(
-                bu_id.path, filesystem_ )
+                bu_id.path, @_filesystem )
           else
             EC_Adapter_Dummy___[]
           end
@@ -146,10 +189,6 @@ module Skylab::Snag
             false
           end
           o
-        end
-
-        def filesystem_
-          Snag_.lib_.system.filesystem
         end
       end
 

@@ -7,6 +7,7 @@ module Skylab::Snag::TestSupport
     extend TS_
     use :expect_event
     use :byte_up_and_downstreams
+    use :node_support
 
     context "(with this manifest)" do
 
@@ -68,7 +69,7 @@ module Skylab::Snag::TestSupport
         scn.next_line.should eql "[#01] this is one #hi\n"
         scn.next_line.should be_nil
 
-        expect_succeeded
+        expect_noded_ 7
       end
 
       def _call * x_a, & x_p
