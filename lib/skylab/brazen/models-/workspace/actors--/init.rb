@@ -36,7 +36,7 @@ module Skylab::Brazen
         # separator anchored to the head of the string or the tail.
 
       def resolve_document
-        @document = Brazen_::Data_Stores_::Git_Config::Mutable.new(
+        @document = Brazen_::Data_Stores::Git_Config::Mutable.new(
           & @on_event_selectively )
         into_document_add_comment
       end

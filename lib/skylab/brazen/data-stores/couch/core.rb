@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Data_Stores_::Couch < Brazen_::Data_Store_::Model_  # see [#038]
+  class Data_Stores::Couch < Brazen_::Data_Store_::Model_  # see [#038]
 
     Brazen_::Model::Entity.call self do
 

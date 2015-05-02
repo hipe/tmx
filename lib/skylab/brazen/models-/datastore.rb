@@ -17,7 +17,7 @@ module Skylab::Brazen
       end
 
       def init_action_class_reflection
-        @acr = Brazen_::Model::Lazy_Action_Class_Reflection.new self, Brazen_::Data_Stores_
+        @acr = Brazen_::Model::Lazy_Action_Class_Reflection.new self, Brazen_::Data_Stores
         true
       end
     end  # >>

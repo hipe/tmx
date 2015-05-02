@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Data_Stores_::Git_Config
+  class Data_Stores::Git_Config
 
     Git_Config_Actor_ = ::Class.new Brazen_::Data_Store_::Actor  # in [#028]
 

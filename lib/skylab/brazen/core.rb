@@ -32,7 +32,7 @@ module Skylab::Brazen
     end
 
     def cfg
-      Brazen_::Data_Stores_::Git_Config
+      Brazen_::Data_Stores::Git_Config
     end
 
     def data_store
@@ -40,7 +40,7 @@ module Skylab::Brazen
     end
 
     def data_stores
-      Brazen_::Data_Stores_
+      Brazen_::Data_Stores
     end
 
     def expression_agent_library
@@ -96,7 +96,7 @@ module Skylab::Brazen
 
   Autoloader_ = Callback_::Autoloader
 
-  module Data_Stores_
+  module Data_Stores
     class << self
       def name_function
         Models_::Datastore.name_function  # hack city

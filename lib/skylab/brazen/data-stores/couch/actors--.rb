@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Data_Stores_::Couch
+  class Data_Stores::Couch
 
     Couch_Actor_ = ::Class.new Brazen_::Data_Store_::Actor
 

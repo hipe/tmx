@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Data_Stores_::Couch
+  class Data_Stores::Couch
 
     class Actors__::Build_stream < Couch_Actor_
 

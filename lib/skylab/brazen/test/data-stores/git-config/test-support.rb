@@ -149,6 +149,6 @@ module Skylab::Brazen::TestSupport::Data_Stores::Git_Config
   end
 
   Subject_ = -> do
-    Brazen_::Data_Stores_::Git_Config
+    Brazen_::Data_Stores::Git_Config
   end
 end

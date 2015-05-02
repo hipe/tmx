@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Data_Stores_::Couch
+  class Data_Stores::Couch
 
     class HTTP_Remote__
 

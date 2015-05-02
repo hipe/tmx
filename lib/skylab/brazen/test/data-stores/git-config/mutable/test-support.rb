@@ -45,7 +45,7 @@ module Skylab::Brazen::TestSupport::Data_Stores::Git_Config::Mutable
   end
 
   Subject__ = -> do
-    Brazen_::Data_Stores_::Git_Config::Mutable
+    Brazen_::Data_Stores::Git_Config::Mutable
   end
 
   module InstanceMethods
@@ -57,7 +57,7 @@ module Skylab::Brazen::TestSupport::Data_Stores::Git_Config::Mutable
     define_method :subject, Subject__
 
     def super_subject
-      Brazen_::Data_Stores_::Git_Config
+      Brazen_::Data_Stores::Git_Config
     end
 
     def parse_context
