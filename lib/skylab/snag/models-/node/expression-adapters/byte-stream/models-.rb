@@ -28,10 +28,10 @@ module Skylab::Snag
           BS_::Mutable_Models_::Substring.new @begin, @end, @s.dup
         end
 
-        def detect_index_of_equivalent_object_ obj
+        def detect_index_of_equivalent_object_ obj, row_st
 
           d = -1
-          st = to_object_stream_
+          st = to_object_stream_ row_st
           sym = obj.category_symbol
 
           begin
@@ -50,18 +50,13 @@ module Skylab::Snag
           found_d
         end
 
-        def to_simple_stream_of_objects_
+        def to_object_stream_ row_st
 
           # for one line of one node, produce the strings and tags. this
           # will be used in whole-collection searched for tags, so etc..
 
-          BS_::Actors_::Flyweighted_object_stream_via_substring[ self ]
+          BS_::Actors_::Flyweighted_object_stream_via_substring[ self, row_st ]
         end
-
-        alias_method :to_object_stream_, :to_simple_stream_of_objects_
-          # we can do the above only while we using [#008] structured tags,
-          # which result in a common stream as a by-product; else :+#tombstone
-
       end
 
       class Models_::Body < Row_Based_Body_

@@ -42,6 +42,10 @@ module Skylab::Basic
         @upstream.__rewind
       end
 
+      def close
+        NIL_  # this is stateless unlike a real resource handle
+      end
+
       class Implementation___
 
         # to be in the stream inheirance hierarchy we must contain all of our

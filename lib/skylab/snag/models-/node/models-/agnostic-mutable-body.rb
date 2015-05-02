@@ -24,8 +24,6 @@ module Skylab::Snag
         Callback_::Stream.via_nonsparse_array @_o_a
       end
 
-      alias_method :to_simple_stream_of_objects_, :to_object_stream_
-
       def __append__object_for_mutation_session o, & oes_p
         @_o_a.push o
         ACHIEVED_

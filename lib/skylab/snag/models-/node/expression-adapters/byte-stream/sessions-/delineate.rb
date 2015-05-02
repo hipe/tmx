@@ -40,7 +40,7 @@ module Skylab::Snag
 
         def execute_agnostic
 
-          _from_head_via_object_stream @node.body.to_simple_stream_of_objects_
+          _from_head_via_object_stream @node.body.to_object_stream_
         end
 
         def __express_any_leading_non_business_lines
@@ -82,7 +82,8 @@ module Skylab::Snag
           if first_row.is_mutable
 
             _from_head_via_object_stream(
-              first_row.to_simple_stream_of_objects_,
+
+              first_row.to_object_stream_( st ),
               st )
           else
 
@@ -162,7 +163,8 @@ module Skylab::Snag
 
           ww = _start_word_wrap s.length
 
-          o_st = row.to_simple_stream_of_objects_
+          o_st = row.to_object_stream_ row_st
+
           o = o_st.gets
 
           if o
@@ -192,14 +194,14 @@ module Skylab::Snag
           begin
             row = row_st.gets
             row or break
-
-            o_st = row.to_simple_stream_of_objects_
+            o_st = row.to_object_stream_ row_st
             o = o_st.gets
-            o or redo
-            _into_wordwrap_flush_remainder_of_object_stream ww, o, o_st
-            @done and break
+            if o
+              _into_wordwrap_flush_remainder_of_object_stream ww, o, o_st
+            end
             redo
           end while nil
+          NIL_
         end
 
         def _into_wordwrap_flush_remainder_of_object_stream ww, o, o_st

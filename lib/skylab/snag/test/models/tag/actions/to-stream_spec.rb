@@ -6,6 +6,7 @@ module Skylab::Snag::TestSupport
 
     extend TS_
     use :expect_event
+    use :byte_up_and_downstreams
 
     context "(with this manifest)" do
 
@@ -36,6 +37,37 @@ module Skylab::Snag::TestSupport
 
         o = st.gets
         o.intern.should eql :two
+
+        st.gets.should be_nil
+      end
+    end
+
+    context "take this" do
+
+      it "x." do
+
+        _us_id = upstream_identifier_via_string_ <<-O
+[#77] ( #fml: x
+ y ) no see ( #fml: z )
+        O
+
+        call_API :tag, :to_stream,
+          :upstream_identifier, _us_id,
+          :node_identifier, 77, & EMPTY_P_
+
+        st = @result
+
+        o = st.gets
+
+        o.get_string.should eql "( #fml: x\n y )"
+        o.get_name_string.should eql '#fml'
+        o.get_value_string.should eql " x\n y "
+
+        o = st.gets
+
+        o.get_string.should eql "( #fml: z )"
+        o.get_name_string.should eql '#fml'
+        o.get_value_string.should eql ' z '
 
         st.gets.should be_nil
       end

@@ -64,18 +64,31 @@ module Skylab::Snag
           did = false
           x = nil
 
-          @row_a.each_with_index do | row, d |
+          d = 0 ; len = @row_a.length
+          row_st = Callback_.stream do
+            if d < len
+              x = @row_a.fetch d
+              d += 1
+              x
+            end
+          end
 
-            d_ = row.detect_index_of_equivalent_object_ obj
+          begin
+            row_d = d
+            row = row_st.gets
+            row or break
+
+            d_ = row.detect_index_of_equivalent_object_ obj, row_st
             if d_
-              row = _mutable_row_at_index d
+              row = _mutable_row_at_index row_d
               a = row.o_a_
               x = a.fetch d_
               a[ d_, 1 ] = EMPTY_A_
               did = true
               break
             end
-          end
+            redo
+          end while nil
 
           if did
             x
@@ -96,13 +109,24 @@ module Skylab::Snag
 
         def __convert_to_mutable_row d, ss
 
-          _a = ss.to_object_stream_.map_by do | o |  # because :+#flyweight
+          d_ = d ; last = @row_a.length - 1
+          _row_st = Callback_.stream do
+            if d_ != last
+              d_ += 1
+              @row_a.fetch d_
+            end
+          end
+
+          _a = ss.to_object_stream_( _row_st ).map_by do | o |  # because :+#flyweight
             o.dup
           end.to_a
 
           mutable = Row___.new _a
 
           @row_a[ d ] = mutable
+          if d_ != d
+            self._ERASE_MORE_ROWS
+          end
           mutable
         end
 
@@ -143,11 +167,9 @@ module Skylab::Snag
             true
           end
 
-          def to_object_stream_
+          def to_object_stream_ _
             Callback_::Stream.via_nonsparse_array @o_a_
           end
-
-          alias_method :to_simple_stream_of_objects_, :to_object_stream_
         end
       end
     end

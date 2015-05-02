@@ -26,7 +26,7 @@ module Skylab::Snag
         end
       end  # >>
 
-      Actors_ = ::Module.new
+      Autoloader_[ Actors_ = ::Module.new ]
 
       the_language_extension_for_structures = nil
 
@@ -36,7 +36,7 @@ module Skylab::Snag
         # upstream provides (see), we must re-use the same stream object over
         # all of the upstream lines.
 
-        p = -> sstr do  # the first time it its called ..
+        p = -> sstr, row_st do  # the first time it its called ..
 
           fly = Snag_::Models::Hashtag::Stream.new
 
@@ -50,13 +50,13 @@ module Skylab::Snag
 
           fly.become_name_value_scanner
 
-          fly_ = the_language_extension_for_structures[ fly ]
+          fly_ = the_language_extension_for_structures[ fly, row_st ]
 
-          p = -> sstr_ do  # subsequent times ..
+          p = -> sstr_, row_st_ do  # subsequent times ..
 
             fly.reinitialize_string_scanner_ sstr_.begin, sstr_.end, sstr_.s
 
-            fly_.upstream.__reinitialize
+            fly_.upstream.__reinitialize row_st_
 
             fly_
           end
@@ -64,8 +64,8 @@ module Skylab::Snag
           fly_
         end
 
-        -> sstr do
-          p[ sstr ]
+        -> sstr, row_st do
+          p[ sstr, row_st ]
         end
       end.call
 
@@ -74,114 +74,102 @@ module Skylab::Snag
       the_language_extension_for_structures = -> do
 
         open_paren_byte = '('.getbyte 0
+        p = nil
+        pc = nil
+        s = nil
         space_byte = SPACE_.getbyte 0
 
-        -> st do
+        -> st, row_st do
 
-          money = nil
+          main_p = nil
+          nested_parens = -> open_d, deep_pc, string_pc do
+
+            o = BS_::Actors_::Nested::Parens[
+              open_d, deep_pc, string_pc, st, row_st ]
+
+            pc = o.piece
+            pc_ = o.next_piece
+
+            # when single line parenthesis need to put its peek token back:
+
+            if pc_
+              p = -> do  # "push it back"
+                p = main_p
+                pc_
+              end
+            end
+
+            # when multiline parenthesis closes and there is something after:
+
+            x = o.string_scanner
+            if x
+              st.reinitialize_string_scanner_ x.pos, x.string.length, x.string
+            end
+
+            NIL_
+          end
+
+          find_last_non_space_index = -> do
+
+            # going backwards, skip over zero or more space (32) characters
+
+            s = st.string_scanner.string
+            last = pc._begin
+            d = last + pc._length - 1
+
+            stay = true
+            begin
+              if space_byte == s.getbyte( d )
+                if last == d
+                  stay = false
+                  break
+                end
+                d -= 1
+                redo
+              end
+              break
+            end while nil
+            stay && d
+          end
+
+          main_p = nil
+          at_string_piece = -> do
+
+            # if we have a string piece whose last non-space character
+            # is an open parenthesis AND the next piece after that is
+            # a tag with a value (i.e a colon), invoke the nesting parse
+
+            d = find_last_non_space_index[]
+
+            if d && open_paren_byte == s.getbyte( d )
+              pc_ = st.gets  # lookahead
+              if pc_
+                if :tag == pc_.category_symbol && pc_.value_is_known_is_known
+                  nested_parens[ d, pc_, pc ]
+                else
+                  p = -> do  # "put it back'
+                    p = main_p
+                    pc_
+                  end
+                end
+              end
+            end
+            NIL_
+          end
+
           p = main_p = -> do
 
             # look for pieces that are strings ending in open parenthesis
 
             pc = st.gets
             if pc && :string == pc.category_symbol
-
-              scn = st.string_scanner
-              s = scn.string
-              last = pc._begin
-              d = last + pc._length - 1
-
-              # going backwards, skip over zero or more space (32) characters
-              stay = true
-              begin
-                if space_byte == s.getbyte( d )
-                  if last == d
-                    stay = false
-                    break
-                  end
-                  d -= 1
-                  redo
-                end
-                break
-              end while nil
-
-              if stay && open_paren_byte == s.getbyte( d )
-
-                pc_ = st.gets  # lookahead
-                if pc_
-                  if :tag == pc_.category_symbol && pc_.value_is_known_is_known
-                    pc = money[ d, pc_, pc ]
-                  else
-                    p = -> do  # "put it back'
-                      p = main_p
-                      pc_
-                    end
-                  end
-                end
-              end
+              at_string_piece[]
             end
             pc
           end
 
-          close_paren = /[^)]*\)/
-          open_double_quote = /[^)"]*"/
-
-          money = -> open_d, deep_pc, string_pc do
-
-            scn = st.string_scanner
-
-            d = scn.skip open_double_quote
-            if d
-              self._HAVE_FUN_PARSING_QUOTES
-            end
-
-            d = scn.skip close_paren
-            if ! d
-              self._HAVE_FUN_PARSING_MULTI_LINE_DOO_HAS
-            end
-
-            # the received string piece is what would have gone out if we
-            # didn't engage this extension. mutate the string piece so
-            # it does not include the open paren:
-
-            string_pc._length = open_d - string_pc._begin
-
-            # mutate the "deep piece" so that it begins with the open paren
-
-            deep_pc._begin = open_d
-
-            # (note the deep piece's name string range stays the same)
-
-            # extend the deep piece's length so it ends with the close paren
-
-            deep_pc._length = scn.pos - open_d
-
-            # change the deep piece's value range to have everything from
-            # after the open colon to before the close paren
-
-            deep_pc._value_r = deep_pc._name_r.end + 1 ... scn.pos - 1
-
-            if string_pc._length.zero?
-
-              # in cases where the mutated string piece ends up with no
-              # content of its own, skip over it and produce deep pc now
-
-              deep_pc
-            else
-
-              # otherwise, result in this mutated string piece now and the
-              # deep piece next
-
-              p = -> do  # "push it back"
-                p = main_p
-                deep_pc
-              end
-
-              string_pc
-            end
-          end  # end money
-
-          _reinitializer = Reinitializer___.new do
+          _reinitializer = Reinitializer___.new do | row_st_ |
+            row_st = row_st_
             p = main_p
             NIL_
           end
@@ -202,8 +190,43 @@ module Skylab::Snag
 
         def to_object_stream_
 
-          to_business_row_stream_.expand_by do | row |
-            row.to_simple_stream_of_objects_
+          # this streaming pattern is so weird we don't have a name for
+          # it: each item (row) is able to consume items (subsequent rows)
+          # from the same stream it itself came from. this is to implement
+          # parsing of nested structures like parenthesis (and maybe one
+          # day quotes) that can span multiple lines. because some rows are
+          # "already parsed" (as mutable objects or whatever), they won't
+          # need to be this fancy, which is why we don't push this method
+          # up to be higher then at the row level.. :+#experimental
+
+          p = nil
+
+          st = to_business_row_stream_
+
+          upper_mode = -> do
+
+            row = st.gets
+            if row
+              st_ = row.to_object_stream_ st
+
+              p = -> do
+                x = st_.gets
+                if x
+                  x
+                else
+                  p = upper_mode
+                  p[]
+                end
+              end
+
+              p[]
+            end
+          end
+
+          p = upper_mode
+
+          Callback_.stream do
+            p[]
           end
         end
       end
