@@ -1,21 +1,23 @@
 module Skylab::TestSupport
 
-  class CLI < TestSupport_.lib_.brazen::CLI
+  class CLI::Test_Support_Client___ < TestSupport_.lib_.brazen::CLI
 
     # ~ we want this to go away eventually
 
     class << self
 
-      def new * a
+      def new_via_arglist a
         new_top_invocation a, TestSupport_::API.krnl
       end
     end  # >>
 
     # ~ the currently cludgy way we get resources directly to the model action
 
+    CLI_Client_ = self
+
     module Actions
 
-      class Cover < CLI::Action_Adapter
+      class Cover < CLI_Client_::Action_Adapter
 
         def receive_frame x
           super
@@ -30,6 +32,10 @@ module Skylab::TestSupport
           nil
         end
       end
+    end
+
+    def expression_agent_class
+      TestSupport_::CLI::Expression_Agent
     end
 
     # ~ for tmx integration

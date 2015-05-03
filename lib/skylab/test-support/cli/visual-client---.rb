@@ -1,26 +1,23 @@
-#!/usr/bin/env ruby -w
+module Skylab::TestSupport
 
-require_relative '../core'
+  class CLI::Visual_Client___ < ::Class.new( ::Class.new )
 
-module Skylab::Basic
+    Top_Client___ = self
 
-  module TestSupport_Visual  # :[#038].
+    Branch = superclass
 
-    Autoloader_[ self ]
+    Client = Branch.superclass
 
-    Client_ = ::Class.new
+    class Top_Client___
 
-    Branch_ = ::Class.new Client_
+      def initialize * a
 
-    class Client < Branch_
-
-      def initialize( * )
+        mod = a.pop
         super
 
-        require_relative 'test-support'
-        @pth_mod = Basic_::TestSupport
-        @viz_mod = Basic_::TestSupport_Visual
-        @the_dir_pathname_ = Basic_.dir_pathname.join 'test'
+        @pth_mod = mod::TestSupport
+        @viz_mod = mod::TestSupport_Visual
+        @the_dir_pathname_ = mod.dir_pathname.join 'test'
       end
 
       attr_reader :the_dir_pathname_
@@ -31,16 +28,17 @@ module Skylab::Basic
       end
 
       def write_name_parts a
-        a.push ::File.dirname $PROGRAM_NAME
+        a.push $PROGRAM_NAME
         a
       end
     end
 
-    class Client_
+    class Client
 
       def initialize i, o, e, argv
-        @stdin = i ; @stdout = o ; @stderr = e
+
         @argv = argv
+        @stdin = i ; @stdout = o ; @stderr = e
       end
 
       attr_reader :pth_mod, :viz_mod
@@ -93,7 +91,7 @@ module Skylab::Basic
       end
     end
 
-    class Branch_
+    class Branch
 
       def display_usage_
 
@@ -139,4 +137,3 @@ module Skylab::Basic
   end
 end
 
-::Skylab::Basic::TestSupport_Visual::Client.new( $stdin, $stdout, $stderr, ::ARGV ).execute

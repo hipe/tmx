@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby -w
+
+require_relative 'test-support'
+
+module Skylab::Snag
+
+  class TestSupport_Visual < ::Skylab::TestSupport::CLI.visual_client
+
+    def initialize * a
+      a.push Snag_
+      super
+    end
+
+    def produce_executable_when_nonzero_length_argv_
+
+      o = Snag_::Models_::Node_Collection::Actions::To_Universal_Node_Stream.new
+
+      o.sout_serr @stdout, @stderr
+      o.argv( * @argv )
+      o
+    end
+
+    def display_usage_
+      @stderr.puts "usage: #{ invocation_name_ }#{ usage_args_ }"
+      NIL_
+    end
+
+    def usage_args_
+      ' <dir>'
+    end
+  end
+end
+
+Skylab::Snag::TestSupport_Visual.new(
+
+  $stdin, $stdout, $stderr, ::ARGV
+
+).execute

@@ -91,8 +91,50 @@ module Skylab::Snag
       end
     end
 
+    class Stub__  # this again.
 
-    Actions = THE_EMPTY_MODULE_
+      class << self
+        def make
+          ::Class.new self
+        end
+
+        alias_method :orig_new, :new
+
+        def new
+
+          singleton_class.send :undef_method, :new
+          __load
+          new
+        end
+
+        def __load
+
+          mod = Snag_.lib_.basic::Module
+
+          chain = mod.chain_via_module self
+          first = chain.pop
+          chain.pop
+
+          model_class = chain.last.value_x
+
+          _slug = Callback_::Name.via_const( first.name_symbol ).as_slug
+          _path = model_class.dir_pathname.join( 'actions', _slug ).to_path
+
+          require _path
+
+          NIL_
+        end
+      end
+    end
+
+    module Actions
+
+      Digraph = Stub__.make
+
+      To_Universal_Node_Stream = Stub__.make
+
+    end
+
     NC_ = self
 
   end

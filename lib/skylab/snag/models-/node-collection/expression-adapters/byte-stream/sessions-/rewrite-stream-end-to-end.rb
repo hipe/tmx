@@ -8,18 +8,14 @@ module Skylab::Snag
 
       class Sessions_::Rewrite_Stream_End_to_End  # see [#038]
 
-        WIDTH__ = 79  # (defaults:)
-        SUB_MARGIN_WIDTH__ = ' #open '.length
-        IDENTIFIER_INTEGER_WIDTH___ = 3
-
         def initialize & x_p
 
           @downstream_identifier = nil
 
           @expression_agent = Expression_Agent_.new(
-            WIDTH__,
-            SUB_MARGIN_WIDTH__,
-            IDENTIFIER_INTEGER_WIDTH___ )
+            DEFAULT_WIDTH_,
+            DEFAULT_SUB_MARGIN_WIDTH_,
+            DEFAULT_IDENTIFIER_INTEGER_WIDTH_ )
 
           @_locks = []
 

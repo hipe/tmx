@@ -1,7 +1,6 @@
 module Skylab::TestSupport
 
-  class CLI
-
+  module CLI
 
     class Expression_Agent
 

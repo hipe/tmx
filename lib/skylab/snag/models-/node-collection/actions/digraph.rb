@@ -1,19 +1,12 @@
 module Skylab::Snag
 
-  class CLI::Actions::Doc < CLI::Action_::Box
-
-    box.desc 'documentation generation.'
-
-    desc "write to STDOUT a digraph of the ##{}doc-node's"
-
-    def digraph path=nil
-      d = @bound_downtree_action
-      d.init
-      d.path = path
-      d.execute
-    end
+  class Models_::Node_Collection
 
     class Actions::Digraph
+
+      if false
+
+    desc "write to STDOUT a digraph of the ##{}doc-node's"
 
       def init
         @fillcolor = '#b5d5fb'
@@ -155,9 +148,10 @@ module Skylab::Snag
           end ; nil
         end
       end
+
+      QUOTE_ = '"'.freeze ; BACKSLASH_QUOTE_ = '\\"'.freeze
+
+      end
     end
-
-    QUOTE_ = '"'.freeze ; BACKSLASH_QUOTE_ = '\\"'.freeze
-
   end
 end

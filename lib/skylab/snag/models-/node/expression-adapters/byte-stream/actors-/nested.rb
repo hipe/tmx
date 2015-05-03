@@ -21,18 +21,12 @@ module Skylab::Snag
 
           @_scn = @hashtag_st.string_scanner
 
-          d = @_scn.skip OPEN_DOUBLE_QUOTE___
-          if d
-            self._HAVE_FUN_PARSING_QUOTES
-          else
-
-            _d = @_scn.skip CLOSE_PAREN__
-            __common do
-              if _d
-                __one_line_paren_expression
-              else
-                __multi_line_paren_expression
-              end
+          _d = @_scn.skip CLOSE_PAREN__
+          __common do
+            if _d
+              __one_line_paren_expression
+            else
+              __multi_line_paren_expression
             end
           end
         end
@@ -169,8 +163,6 @@ module Skylab::Snag
         CLOSE_PAREN__ = /[^)]*\)/
 
         EOL___ = /$/
-
-        OPEN_DOUBLE_QUOTE___ = /[^)"]*"/
 
         Parens = ::Class.new self
       end

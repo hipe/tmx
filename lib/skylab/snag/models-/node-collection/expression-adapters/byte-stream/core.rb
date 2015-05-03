@@ -4,7 +4,22 @@ module Skylab::Snag
 
     module Expression_Adapters::Byte_Stream
 
+      # ~ for use with Expression_Agent_ below
+
+      DEFAULT_WIDTH_ = 79
+      DEFAULT_SUB_MARGIN_WIDTH_ = ' #open '.length
+      DEFAULT_IDENTIFIER_INTEGER_WIDTH_ = 3
+
+      # ~
+
       class << self
+
+        def build_default_expression_agent
+          Expression_Agent_.new(
+            DEFAULT_WIDTH_,
+            DEFAULT_SUB_MARGIN_WIDTH_,
+            DEFAULT_IDENTIFIER_INTEGER_WIDTH_ )
+        end
 
         def node_collection_via_upstream_identifier_ id, & oes_p
 
@@ -200,6 +215,12 @@ module Skylab::Snag
 
         attr_reader :identifier_integer_width, :modality_const,
           :sub_margin_width, :width
+
+        def new_expression_context
+          # (note the expags for [br] API and CLI implement this too
+          # and you might want to be using those instead..)
+          ::String.new
+        end
       end
 
       Autoloader_[ Actors_ = ::Module.new ]

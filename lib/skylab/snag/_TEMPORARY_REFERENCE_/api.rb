@@ -33,8 +33,6 @@ module Skylab::Snag
       end
     end
 
-    DEFAULT_MANIFEST_FILE__ = 'doc/issues.md'.freeze
-
     DEFAULT__MAX_NUM_DIRS_TO_SEARCH_FOR_MANIFEST_FILE__ = 15  # wuh-evuh
 
     # ~ produce bound call & support
