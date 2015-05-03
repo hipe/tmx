@@ -1,227 +1,289 @@
 module Skylab::Snag
 
-  module Models::Digraph
+  class Models_::Node_Collection
 
-    class << self
+    Sessions_ = ::Module.new
 
-      def shell & p
-        trigger = nil
-        p[ Shell__.new { |p_| trigger = p_ } ]
-        trigger.call
-      end
-    end
+    class Sessions_::Build_Digraph
 
-    class Shell__
-      def initialize
-        @kernel = Kernel__.new
-        yield @kernel.method :get_stream
-      end
-      def delegate= x
-        @kernel.delegate= x
-      end
-      def nodes= x
-        @kernel.nodes= x
-      end
-    end
-
-    class Kernel__
-
-      Snag_::Model_::Actor[ self ]
-
-      def initialize
+      def initialize & x_p
+        if x_p
+          @_oes_p = x_p
+        end
       end
 
-      attr_writer :delegate, :nodes
+      attr_writer :node_upstream
 
-      def get_stream
-        a = produce_every_node_with_a_doc_node_tag_or_parent_node_tag
-        produce_hashes_associating_every_parent_node_to_child_node a
-        if @parent_h.length.zero?
-          stream_when_zero_doc_nodes
+      def execute
+
+        ok = __resolve_stream_of_every_node_tagged_doc_node_or_parent_node
+
+        ok &&= __resolve_hashes_associating_every_parent_node_to_every_child
+
+        ok && __via_hashes
+      end
+
+      def __via_hashes
+
+        if @_parent_h.length.zero?
+          _when_zero_doc_nodes
+
         else
-          @node_a = a
-          stream_when_nonzero_doc_nodes
+
+          __via_nonzero_doc_nodes_stream
         end
       end
 
-    private
+      def __resolve_stream_of_every_node_tagged_doc_node_or_parent_node
 
-      def produce_every_node_with_a_doc_node_tag_or_parent_node_tag
-        y = [] ; scan = @nodes.all
-        while (( node = scan.gets ))
-          node.is_valid or next
-          TAG_RX__ =~ node.first_line or next
-          y.push node.collapse @delegate, :_no_API_client_
+        @_total_count = 0
+
+        @_reduced_node_st = @node_upstream.reduce_by do | node |
+
+          @_total_count += 1
+
+          _a = node.is_tagged_with :"doc-node"
+          _a or _b = node.is_tagged_with( :"parent-node" )
+
+          _a || _b
         end
-        y
-      end
-      TAG_RX__ = /#(?:doc-(?:node|point)|parent-node)\b/  # ick, an optimization
 
-      def produce_hashes_associating_every_parent_node_to_child_node a
-        @parent_h = {} ; @child_h = {}
-        a.each do |node|
-          node.tags.each do |tag|
-            case tag.stem_i
+        ACHIEVED_
+      end
+
+      def __resolve_hashes_associating_every_parent_node_to_every_child
+
+        @_child_h = {}
+        @_parent_h = {}
+
+        __prepare_to_iterate
+
+        @_reduced_node_st.each do | node |
+
+          node.to_tag_stream.each do | tag |
+
+            case tag.intern
             when :'parent-node'
-              process_parent_node_tag tag, node
+              __process_parent_node_tag tag, node
+
             when :'doc-node'
-              ( @child_h[ nil ] ||= [] ).push node.identifier.body_s
+              ( @_child_h[ nil ] ||= [] ).push node.ID.to_i  # etc
             end
           end
-        end ; nil
+        end
+
+        ACHIEVED_
       end
 
-      def process_parent_node_tag tag, node
-        child_id_s = node.identifier.body_s
-        @parent_h.key? child_id_s and when_multi_parent( node )
-        value_s = tag.value
-        if value_s
-          id_o = normalize_identifier_string value_s
-          if id_o
-            parent_id_s = id_o.body_s
-            @parent_h[ child_id_s ] = parent_id_s
-            ( @child_h[ parent_id_s ] ||= [] ).push child_id_s
+      def __prepare_to_iterate  # take this and the other and abstract it one day ..
+
+        nid = Snag_::Models_::Node_Identifier.new_empty
+        @_nid_fly = nid
+
+        @__scan_for_nid = -> str do
+
+          strscn = Snag_::Library_::StringScanner.new str
+
+          p = Snag_::Models_::Node_Identifier::Expression_Adapters::Byte_Stream.
+            build_reinterpreter strscn
+
+          @__scan_for_nid = -> str_ do
+            strscn.string = str_
+            p[ nid ]
           end
-        end ; nil
+          p[ nid ]
+        end
       end
 
-      def normalize_identifier_string s
-        Snag_::Models::Identifier.normal s, @delegate
+      def __process_parent_node_tag tag, node
+
+        child_id_d = node.ID.to_i
+
+        if @_parent_h.key? child_id_d
+          __express_notice_about__multi_parent node
+        end
+
+        if tag.value_is_known
+
+          _str = tag.get_value_string
+
+          _x = @__scan_for_nid[ _str ]
+
+          if _x
+
+            parent_id_d = @_nid_fly.to_i
+
+            @_parent_h[ child_id_d ] = parent_id_d
+            ( @_child_h[ parent_id_d ] ||= [] ).push child_id_d
+          end
+        end
+
+        NIL_
       end
 
-      def when_multi_parent node
-        send_info_string "#{ node.identifier.render } has multiple parents - #{
-          }using last one." ; nil
+      def __express_notice_about__multi_parent node
+
+        self._WAS
+
+        _send_info_string "#{ node.identifier.render } has multiple parents - #{
+          }using last one."
+
+        NIL_
       end
 
-      def when_zero
-        send_info_string "no nodes in the collection have any parents#{
-          } or are doc nodes." ; nil
-      end
+      def __via_nonzero_doc_nodes_stream
 
-      def stream_when_nonzero_doc_nodes
-        h = determine_every_node_that_is_a_doc_node_recursively
+        h = __build_a_truth_hash_of_every_node_that_is_a_focus_node_indirectly
+
         if h.length.zero?
-          stream_when_zero_doc_nodes
+          _when_zero_doc_nodes
+
         else
-          @is_doc_node_h = h
-          stream_when_graph
+          @_is_doc_node_h = h
+          __rewind_and_produce_node_stream_via_the_is_doc_node_hash
         end
       end
 
-      def determine_every_node_that_is_a_doc_node_recursively
-        seen_h = {} ; is_h = {}
-        visit_branch_node_p = -> s_a do
-          s_a.each do |s|
-            seen_h[ s ] and next
-            seen_h[ s ] = true
-            is_h[ s ] = true
-            child_s_a = @child_h[ s ]
-            if child_s_a
-              visit_branch_node_p[ child_s_a ]
+      def __build_a_truth_hash_of_every_node_that_is_a_focus_node_indirectly
+
+        is_h = {}
+        seen_h = {}
+
+        visit_branch_node_p = -> d_a do
+
+          d_a.each do | d |
+
+            seen_h[ d ] and next
+            seen_h[ d ] = true
+            is_h[ d ] = true
+            child_d_a = @_child_h[ d ]
+
+            if child_d_a
+              visit_branch_node_p[ child_d_a ]
             end
           end
         end
-        visit_branch_node_p[ @child_h[ nil ] || EMPTY_A_ ]
+
+        visit_branch_node_p[ @_child_h[ nil ] || EMPTY_A_ ]
+
         is_h
       end
 
-      def stream_when_zero_doc_nodes
-        send_info_string "no nodes in the collection are doc nodes."
+      def _when_zero_doc_nodes
+
+        _send_info_string "none of the #{ @_total_count }#{
+          } nodes in the collection are doc nodes."
+
         Callback_::Scn.the_empty_stream
       end
 
-      def stream_when_graph
-        @node_scn = bld_node_stream
-        @advancer_p = method :advance
-        @p = @advancer_p
-        Callback_::Scn.new do
-          @p[]
+      def _send_info_string  s
+        @_oes_p.call :info, :expression do | y |
+          y << s
+        end
+        NIL_
+      end
+
+      def __rewind_and_produce_node_stream_via_the_is_doc_node_hash
+
+        @node_upstream.upstream.rewind or fail
+
+        @_p = @_advance  = method :__advance
+
+        Callback_.stream do
+          @_p[]
         end
       end
 
-      def bld_node_stream
-        d = -1 ; last = @node_a.length - 1
-        Callback_::Scn.new do
-          if d < last
-            @node_a.fetch d += 1
-          end
-        end
-      end
+      def __advance
 
-      def advance
         x = nil
+
         begin
-          @node = @node_scn.gets
-          @node or break
-          @parent_s = @node.identifier.body_s
-          if @is_doc_node_h[ @parent_s ]
-            x = when_doc_node
+
+          @_node = @node_upstream.gets
+          @_node or break
+
+          if @_is_doc_node_h[ @_node.ID.to_i ]
+            x = __via_doc_node
             break
           end
-        end while true
+          redo
+        end while nil
+
         x
       end
 
-      def when_doc_node
-        _x = Draw_Node__.new @node
-        @s_a = @child_h[ @parent_s ]
-        @p = if @s_a
-          build_driller
+      def __via_doc_node
+
+        _op = Draw_Node___.new @_node
+
+        @_d_a = @_child_h[ @_node.ID.to_i ]
+
+        @_p = if @_d_a
+          __build_driller_proc
         else
-           @advancer_p
+          @_advance
         end
-        _x
+
+        _op
       end
 
-      def build_driller
-        scn = bld_doc_child_node_stream
+      def __build_driller_proc
+
+        st = __build_doc_child_node_stream
+
         -> do
-          x = scn.gets
+          x = st.gets
           if ! x
-            @p = @advancer_p
-            x = @p[]
+            @_p = @_advance
+            x = @_p[]
           end
           x
         end
       end
 
-      def bld_doc_child_node_stream
-        scn = bld_child_node_stream
-        Callback_::Scn.new do
+      def __build_doc_child_node_stream
+
+        st = Callback_::Stream.via_nonsparse_array @_d_a
+
+        Callback_.stream do
           begin
-            s = scn.gets
-            s or break
-            if @is_doc_node_h[ s ]
-              ev = Draw_Arc__.new s, @parent_s
+            d = st.gets
+            d or break
+            if @_is_doc_node_h[ d ]
+              op = Draw_Arc___.new d, @_node.ID.to_i
               break
             end
           end while true
-          ev
+          op
         end
       end
 
-      def bld_child_node_stream
-        d = -1 ; last = @s_a.length - 1
-        Callback_::Scn.new do
-          if d < last
-            @s_a.fetch d += 1
-          end
-        end
-      end
+      class Draw_Node___ # < [ operation ]
 
-      Draw_Node__ = Snag_::Model_::Event.new :node do
-        def terminal_channel_i
+        def initialize x
+          @node = x
+        end
+
+        attr_reader :node
+
+        def name_symbol
           :draw_node
         end
       end
 
-      Draw_Arc__ = Snag_::Model_::Event.new :child_s, :parent_s do
-        def terminal_channel_i
-          :draw_arc
+      class Draw_Arc___  # < [ operation ]
+
+        def initialize child_d, parent_d
+          @child_d = child_d
+          @parent_d = parent_d
         end
-        message_proc do |y, o|
-          y << "#{ o.child_s } -> #{ o.parent_s }"
+
+        attr_reader :child_d, :parent_d
+
+        def name_symbol
+          :draw_arc
         end
       end
     end

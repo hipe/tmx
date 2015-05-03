@@ -5,69 +5,56 @@ module Skylab::Snag::TestSupport
   describe "[sg] models - n.c - actions - digraph", wip: true do
 
     extend TS_
+    use :expect_event
 
-    context "minimal expemplary" do
+    it "if no focus nodes in upstream, produces empty digraph with message" do
 
-      it "ok" do
-        @message_s = 'foo boff biz bazz'
-        subject
-        @line_a.should eql [ "foo", "boff biz", "bazz" ]
-        expect_succeeded
-      end
+      debug!
+
+      y = []
+      call_API :node_collection, :digraph,
+        :byte_downstream, y,
+        :upstream_identifier, Fixture_file_[ :rochambeaux_mani ]
+
+      expect_neutral_event :generic_info,
+        "none of the 3 nodes in the collection are doc nodes."
+
+      y.length.should eql 3  # digraph open, thing ding, digraph close
+
+      @result.should eql true
     end
 
-    context "but alas, when exceeds line limit" do
+    it "the focused subset of the dependency graph is shown. escapes 2 things" do
 
-      let :max_lines do 2 end
+      lines = [] # (for debugging, assign this variable instead to stderr)
 
-      it "x" do
-        @message_s = 'foo boff biz bazz'
-        subject
-        expect :error_event, :message_line_limit_exceeded do |ev|
-          s = render_terminal_event ev
-          s.should match %r(\b2 line limit\b)
-          s.should be_include '(near (ick bazz))'
-        end
-      end
+      call_API :node_collection, :digraph,
+        :byte_downstream, lines,
+        :upstream_identifier, Fixture_file_[ :for_digraph_simple_mani ]
+
+      __expect_these_line lines
     end
 
-    def subject
-      @result = Snag_::Models::Node::Controller__::Delineate_message__[
-        extra_lines_header, line_width, listener_spy,
-        max_lines, message_s,
-        do_prepend_open_tag, do_prepend_open_tag_ws, y_p ]
-    end
+    def __expect_these_line lines
 
-    def extra_line_a
-      @extra_line_a ||= []
-    end
+      st = Callback_::Stream.via_nonsparse_array lines
 
-    attr_reader :extra_lines_header
+      st.gets.should eql "digraph {\n"
+      st.gets[ 0, 8 ].should eql '  node ['
 
-    def first_line_p
-      @first_line_a ||+ []
-      @first_line_p ||= -> s do
-        @first_line_a.push s ; nil
-      end
-    end
+      s = st.gets
+      s.chop!
+      s.should eql '  5 [label="i said\n\"hi\"\n[#005]"]'
 
-    def line_width
-      10
-    end
+      s = st.gets
+      s.chop!
+      s.should eql '  4 [label="some\ntopic\na-\>b\n[#004]"]'
 
-    def max_lines
-      3
-    end
+      st.gets.should eql "  5->4\n"
+      st.gets.should eql "}\n"
+      st.gets.should be_nil
 
-    attr_reader :message_s
-
-    attr_reader :do_prepend_open_tag
-
-    attr_reader :do_prepend_open_tag_ws
-
-    def y_p
-      @line_a ||= []
-      @y_p ||= -> s { @line_a.push s }
+      expect_succeeded
     end
   end
 end

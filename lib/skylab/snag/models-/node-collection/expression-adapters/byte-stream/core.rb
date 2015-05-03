@@ -161,7 +161,7 @@ module Skylab::Snag
           node
         end
 
-        # ~ retrive many ( counterpart to [#br-032] to_entity_stream_via_model )
+        # ~ retrieve many ( counterpart to [#br-032] to_entity_stream_via_model )
 
         def to_entity_stream & oes_p  #
 

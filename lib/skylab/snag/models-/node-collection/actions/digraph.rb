@@ -4,154 +4,238 @@ module Skylab::Snag
 
     class Actions::Digraph
 
-      if false
+      WORDWRAP_ASPECT_RATIO___ = [ 3, 1 ]
 
-    desc "write to STDOUT a digraph of the ##{}doc-node's"
+      class << self
+        alias_method :new, :orig_new
+      end  # >>
 
-      def init
+      Brazen_::Model.common_entity( self,
+
+        :desc, -> y do
+          y << "write to the output stream a digrpah of doc nodes"
+        end,
+
+        :required, :property, :byte_downstream,
+        :required, :property, :upstream_identifier
+      )
+
+      def initialize( * )
+        __init_default_styles
+        super
+      end
+
+      def produce_result
+
+        @byte_downstream = @argument_box.fetch :byte_downstream
+
+        ok = __resolve_node_upstream
+        ok &&= __express_opening
+        ok &&= __express_body
+        ok && __express_closing
+      end
+
+      def __init_default_styles
+
         @fillcolor = '#b5d5fb'
         @fontname = 'Helvetica-Narrow'
         @label = '\\N'
         @penwidth = '1.1566'
         @shape = 'Mrecord'
         @style = 'filled'
+        NIL_
       end
+
       NODE_ATTR_I_A__ = [ :fillcolor, :fontname, :label,
         :penwidth, :shape, :style ]
 
+      def __resolve_node_upstream
 
-      attr_writer :path
+        p = handle_event_selectively
 
-      def execute
-        ok = output_opening
-        ok &&= output_body
-        ok && output_closing
+        _us_id = @argument_box.fetch :upstream_identifier
+
+        nc = NC_.new_via_upstream_identifier _us_id, & p
+
+        if nc
+
+          st = nc.to_entity_stream( & p )
+
+          if st
+            @_node_upstream = st
+            ACHIEVED_
+          else
+            st
+          end
+        else
+          nc
+        end
       end
 
-    private
+      def __express_opening
 
-      def output_opening
-        send_payload_line 'digraph {'
-        @path and output_label
-        output_prototype_node
+        _express_unindented_line 'digraph {'
+        __express_label
+        __express_prototype_node
       end
 
-      def output_label
-        send_payload_line "label=\"docs for #{ esc @path }\""
+      def __express_label
+
+        uid = @argument_box[ :upstream_identifier ]
+        if uid.respond_to? :to_path
+
+          _express_line "label=\"docs for #{ _esc uid.to_path }\""
+        end
+        NIL_
       end
 
-      def output_prototype_node
+      def __express_prototype_node
+
         _a = NODE_ATTR_I_A__.reduce [] do |m, i|
           x = instance_variable_get :"@#{ i }"
           x or next m
-          m.push "#{ i }=\"#{ esc x }\""
+          m.push "#{ i }=\"#{ _esc x }\""
           m
         end
-        send_payload_line "node [#{ _a * ', ' }]"
-        ACHIEVED_
-      end
-      def esc s
-        s.gsub QUOTE_, BACKSLASH_QUOTE_
-      end
 
-      def output_body
-        @scn = produce_stream_for_output_body
-        @scn && output_body_with_stream
-      end
+        _express_line "node [#{ _a * ', ' }]"
 
-      def produce_stream_for_output_body
-        call_API [ :doc, :digraph ],
-          :on_info_line, handle_info_line,
-          :on_error_event, handle_error_event,
-          :working_dir, @path
-      end
-
-      def output_body_with_stream
-        @oy = ::Enumerator::Yielder.new( & delegate.method( :receive_payload_line ))
-        @ev = @scn.gets
-        while @ev
-          send @ev.terminal_channel_i
-          @ev = @scn.gets
-        end
         ACHIEVED_
       end
 
-      def draw_arc
-        @ev.express_into_under @oy, expression_agent ; nil
+      def _esc s
+        s = s.dup
+        _mutate_string_by_escaping s
+        s
       end
 
-      def draw_node
-        node = @ev.node
-        id_s = node.identifier.body_s
-        s = node.first_line_body
-        s_ = Remove_uninteresting_hashtags__[ s ]
-        s = s_
-        s.strip!
-        s.gsub! QUOTE_, BACKSLASH_QUOTE_
-        send_payload_line "#{ id_s } [label=\"[##{ id_s }] #{ s }\"]"
-        nil
+      def __express_body
+
+        st = __produce_stream_for_output_body
+
+        st and __express_body_via_stream st
       end
 
-      def output_closing
-        send_payload_line '}'
+      def __produce_stream_for_output_body
+
+        o = NC_::Sessions_::Build_Digraph.new( & handle_event_selectively )
+
+        o.node_upstream = @_node_upstream
+
+        o.execute
       end
 
-      class Remove_uninteresting_hashtags__
-        Snag_::Model_::Actor[ self,
-          :properties, :s
-        ]
+      def __express_body_via_stream st
 
-        def initialize a
-          super
-          @scn = Snag_::Models::Hashtag.
-            interpret_simple_stream_from_string( @s ).
-             flush_to_puts_stream
-        end
-        def execute
-          @y = []
-          @o = @scn.gets
-          while @o
-            send H__.fetch @o.nonterminal_symbol
-            @o = @scn.gets
-          end
-          @y * EMPTY_S_
-        end
-        H__ = { string: :process_string, hashtag: :process_hashtag }.freeze
-        def process_string
-          @y << @o.to_s ; nil
-        end
-        def process_hashtag
-          _stem = @o.get_stem_string
-          case _stem
-          when PARENT_NODE__ ; skip_any_hashtag_value
-          when DOC_NODE__ ; passthru_any_hashtag_value
-          else ; passthru_hashtag
-          end ; nil
-        end
-        DOC_NODE__ = 'doc-node' ; PARENT_NODE__ = 'parent-node'.freeze
-        def passthru_hashtag
-          @y << @o.to_s
-          passthru_any_hashtag_value
-        end
-        def passthru_any_hashtag_value
-          with_any_value -> { @y << @scn.gets.to_s }
-        end
-        def skip_any_hashtag_value
-          with_any_value -> { @scn.advance_one }
-        end
-        def with_any_value p
-          if o = @scn.peek and :hashtag_name_value_separator == o.nonterminal_symbol
-            p[]
-            if o = @scn.peek and :hashtag_value == o.nonterminal_symbol
-              p[]
+        __init_rendering_ivars
+
+        begin
+          op = st.gets
+          op or break
+          send :"__#{ op.name_symbol }__", op
+          redo
+        end while nil
+
+        ACHIEVED_
+      end
+
+      def __draw_arc__ op
+
+        _express_line "#{ op.child_d }->#{ op.parent_d }"
+
+        NIL_
+      end
+
+      def __init_rendering_ivars
+
+        @_expag = Snag_::Models_::Node_Collection::Expression_Adapters::Byte_Stream.
+          build_default_expression_agent
+
+        NIL_
+      end
+
+      def __draw_node__ op
+
+        node = op.node
+        s_a = []
+        ww = Snag_.lib_.basic::String.word_wrappers.calm.new_with(
+          :downstream_yielder, s_a,
+          :aspect_ratio, WORDWRAP_ASPECT_RATIO___ )
+
+
+        _id_s = node.ID.express_under @_expag
+
+        st = node.body.to_object_stream_
+        begin
+          o = st.gets
+          o or break
+
+          if :tag == o.category_symbol
+
+            case o.intern
+            when PARENT_NODE___
+              # nothing
+            when DOC_NODE___
+              # also nothing
+            else
+              # what to do with ags you encouner
+              ww << o.get_string
             end
-          end ; nil
+          else
+            ww << o.get_string.strip
+          end
+          redo
+        end while nil
+
+        ww << _id_s
+
+        ww.flush
+        s_a.each do | s |
+          _mutate_string_by_escaping s
         end
+
+        _long_label = s_a.join '\n'
+
+        _express_line "#{ node.ID.to_i } [label=\"#{ _long_label }\"]"
+
+        NIL_
       end
 
-      QUOTE_ = '"'.freeze ; BACKSLASH_QUOTE_ = '\\"'.freeze
+      DOC_NODE___ = :'doc-node'
+      PARENT_NODE___ = :'parent-node'
 
+      def _mutate_string_by_escaping s
+
+        s.gsub! QUOTE___, BACKSLASH_QUOTE___
+        s.gsub! GT___, BACKSLASH_GT___
+
+        NIL_
       end
+
+      BACKSLASH_GT___ = '\\>'
+      BACKSLASH_QUOTE___ = '\\"'.freeze
+      GT___ = '>'
+      QUOTE___ = '"'.freeze
+
+      def __express_closing
+
+        _express_unindented_line '}'
+      end
+
+      def _express_line s
+
+        @byte_downstream << "  #{ s }#{ NEWLINE_ }"
+
+        ACHIEVED_
+      end
+
+      def _express_unindented_line s
+
+        @byte_downstream << "#{ s }#{ NEWLINE_ }"
+
+        ACHIEVED_
+      end
+
     end
   end
 end

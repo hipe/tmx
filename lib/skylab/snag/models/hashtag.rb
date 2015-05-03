@@ -311,7 +311,7 @@ module Skylab::Snag
       end
 
       VALUE_HEAD___ = /:[[:space:]]*/
-      VALUE_TAIL___ = /[-a-z0-9_]+/i
+      VALUE_TAIL___ = /[-\[\#a-z0-9_\]]+/i
     end
 
     module Possibly_with_Value_Methods

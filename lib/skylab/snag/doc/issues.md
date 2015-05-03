@@ -29,7 +29,7 @@
 [#042]       #parent-node: [#040] #in-situ method names are not channel names
 [#041]       #parent-node: [#040] #in-situ callbacks should be readable
 [#040]       #parent-node: [#039] the listeners manifesto
-[#039]       #doc-point logical conventions and ideas
+[#039]       #doc-node logical conventions and ideas
 [#038]       #parent-node: [#036] the manifest narrative ..
 [#037]       #parent-node: [#036] on the structure of nodes
 [#036]       #parent-node: [#057] on the structure of manifests and nodes

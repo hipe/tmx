@@ -86,7 +86,7 @@ subgraph cluster_after {
 
     label="auxiliary report actions"
     macro_rep [label="27. macro (i.e\n\"universal\")\nreporting" style=filled]
-    digrah_ [label="generate digraph\nfrom collection"]
+    digrah_ [label="28. generate digraph\nfrom collection" style=filled]
 
   }
 

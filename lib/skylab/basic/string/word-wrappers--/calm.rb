@@ -171,22 +171,35 @@ module Skylab::Basic
 
           # this is not for "hyphen"-style dashes, only for those that
           # came at the beginning of input or after a space.. [sg]
-          # it's also a good introduction to the general pattern here
+          # it's also a good example of the general pattern here
 
           width = @current_width_ + _width_of_current_token
 
-          if _next_token_is :word
-            self._COVER_ME  # you probably want to treat this as one word
+          accept_current_tokens = if _next_token_is :word  # e.g " a -> b " [sg]
+
+            width += @tokenizer_.next_step.length
+
+            -> do
+              _accept_current_token
+              _accept_current_token
+            end
+          else
+            -> do
+              _accept_current_token
+            end
           end
 
           case @width <=> width
+
           when 1  # under
-            _accept_current_token
+            accept_current_tokens[]
+
           when -1  # over
             flush
-            _accept_current_token
+            accept_current_tokens[]
+
           when 0  # money
-            _accept_current_token
+            accept_current_tokens[]
             flush
           end
 

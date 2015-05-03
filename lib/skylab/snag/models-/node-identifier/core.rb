@@ -236,6 +236,13 @@ module Skylab::Snag
       y
     end
 
+    def express_under expag
+
+      y = expag.new_expression_context
+      express_into_under y, expag
+      y
+    end
+
     def express_into_ y
 
       y << OPEN_SEQUENCE__

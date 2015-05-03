@@ -1,0 +1,5 @@
+[#005] #parent-node: [#004] i said "hi"
+[#004] #doc-node some topic a->b
+[#003] #parent-node: [#002] does not appear
+[#002] some topic
+[#001] does not appear

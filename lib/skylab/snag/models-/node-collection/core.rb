@@ -91,20 +91,31 @@ module Skylab::Snag
       end
     end
 
-    class Stub__  # this again.
+    Brazen_ = Snag_.lib_.brazen
+
+    class Stub__ < Brazen_::Model::Action  # this again. :+#exerimental
 
       class << self
+
         def make
           ::Class.new self
         end
 
         alias_method :orig_new, :new
 
-        def new
+        def new( * a, & x_p )
 
           singleton_class.send :undef_method, :new
           __load
-          new
+          new( * a, & x_p )
+        end
+
+        def is_actionable
+          true
+        end
+
+        def is_promoted
+          false
         end
 
         def __load
