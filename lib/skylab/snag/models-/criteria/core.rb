@@ -2,11 +2,15 @@ module Skylab::Snag
 
   class Models_::Criteria
 
+    PERSISTED_CRITERIA_FILENAME___ = 'data-documents-/persisted-criteria'
+
     Brazen_ = Snag_.lib_.brazen
 
     Actions = ::Module.new
 
-    class Actions::To_Stream < Brazen_::Model.common_action_class
+    Action__ = Brazen_::Model.common_action_class
+
+    class Actions::Criteria_To_Stream < Action__
 
       Brazen_::Model.common_entity self,
 
@@ -19,19 +23,27 @@ module Skylab::Snag
 
       def produce_result
 
-        c = Criteria_.new @kernel, & handle_event_selectively
-
         h = @argument_box.h_
 
-        ok = c.receive_criteria_expression h.fetch( :criteria )
+        c = Criteria_.new_via_expression(
+          h.fetch( :criteria ),
+          @kernel,
+          & handle_event_selectively )
 
-        if ok
-
+        if c
           c.to_reduced_entity_stream_via_collection_identifier(
             h.fetch( :upstream_identifier ) )
         else
-          ok
+          c
         end
+      end
+    end
+
+    class Actions::To_Criteria_Stream < Action__
+
+      def produce_result
+
+        @kernel.silo( :criteria )._cc.to_entity_stream
       end
     end
 
@@ -39,15 +51,71 @@ module Skylab::Snag
 
       def initialize kr, _mod
 
-        @EN_domain_adapter = Criteria_::Library_::Domain_Adapter.
-          new_via_kernel_and_NLP_const( kr, :EN )
-
+        @_kr = kr
       end
 
-      attr_reader :EN_domain_adapter
+      def _cc
+
+        @__cc ||= Brazen_::Data_Stores:: Directory_as_Collection.new(
+          @_kr
+        ) do | o |
+
+          o.directory_is_assumed_to_exist = false
+
+          o.directory_path = Snag_.dir_pathname.join(
+            PERSISTED_CRITERIA_FILENAME___
+          ).to_path
+
+          o.filename_pattern = /\A[a-z0-9]+(?:[-_][a-z0-9]+)*\z/i
+
+          o.filesystem = Snag_.lib_.system.filesystem
+
+          o.flyweight_class = Criteria_
+
+        end
+      end
+
+      def EN_domain_adapter
+
+        @__eda ||= Criteria_::Library_::Domain_Adapter.
+          new_via_kernel_and_NLP_const( @_kr, :EN )
+      end
     end
 
+
     # -> ( criteria model )
+
+      class << self
+
+        def new_flyweight kr, & x_p
+          new kr, & x_p
+        end
+
+        def new_via_expression x, kr, & x_p
+
+          c = new kr, & x_p
+          ok = c.__receive_criteria_expression x
+          if ok
+            c
+          else
+            ok
+          end
+        end
+
+        def properties
+          Properties___[]
+        end
+
+        private :new
+      end  # >>
+
+      Properties___ =  Callback_.memoize do  # a sketch for front client integ.
+        [
+          Callback_::Actor.methodic.simple_property_class.new_via_name_symbol(
+            :name
+          )
+        ].freeze
+      end
 
       def initialize k, & oes_p
 
@@ -56,7 +124,24 @@ module Skylab::Snag
         @ok = true
       end
 
-      def receive_criteria_expression x
+      # ~ for listing persisted critiera
+
+      def reinitialize_via_path_for_directory_as_collection path
+        @__path = path
+        NIL_
+      end
+
+      def property_value_via_symbol sym
+        send :"__#{ sym }__property_value"
+      end
+
+      def __name__property_value
+        ::File.basename @__path
+      end
+
+      # ~
+
+      def __receive_criteria_expression x
 
         _ct = if x.respond_to? :value_x
           x

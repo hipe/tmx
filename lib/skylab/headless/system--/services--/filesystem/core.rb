@@ -16,11 +16,13 @@ module Skylab::Headless
         Filesystem_
       end
 
-      def directory? s  # :+#core-service
+      # ~ read :+#core-services
+
+      def directory? s
         ::File.directory? s
       end
 
-      def entry_stream abs_path  # :+#core-service
+      def entry_stream abs_path
 
         a = ::Dir.entries abs_path
         d = 0
@@ -45,11 +47,15 @@ module Skylab::Headless
         end
       end
 
-      def file? s  # :+#core-service
+      def file? s
         ::File.file? s
       end
 
-      # ~ begin write :+#core-service's
+      def glob * a
+        ::Dir.glob( * a )
+      end
+
+      # ~ write :+#core-services
 
       def mkdir path, * int
         ::Dir.mkdir path, * int
@@ -63,7 +69,7 @@ module Skylab::Headless
         ::File.open filename, * rest, & p
       end
 
-      # ~ end
+      # ~
 
       def file_utils_controller & p
         if p

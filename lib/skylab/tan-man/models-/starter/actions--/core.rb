@@ -8,7 +8,7 @@ module Skylab::TanMan
 
     class << self
 
-      def path_for_directory_as_collection
+      def path_for_directory_as_collection_
         @__path ||= TanMan_.dir_pathname.join( RELPATH___ ).to_path
       end
     end  # >>
@@ -65,7 +65,7 @@ module Skylab::TanMan
     def to_path
 
       @__path ||= ::File.join(
-        Starter_.path_for_directory_as_collection,
+        Starter_.path_for_directory_as_collection_,
         property_value_via_symbol( :name ) )
     end
 
@@ -169,6 +169,8 @@ module Skylab::TanMan
       Brazen_::Data_Stores::Directory_as_Collection.new(
         kr
       ) do | o |
+        o.directory_path = Starter_.path_for_directory_as_collection_
+        o.filesystem = TanMan_.lib_.system.filesystem
         o.flyweight_class = Starter_
       end
     end

@@ -65,7 +65,7 @@
              ( #was: #done remove fixed field requirement )
 [#015]       one day tie EN-like expression adaters in with etc ..
              ( #was: #done rearch to find issues.md )
-[#014]       #done open issue report
+[#014]       the open issue report, stored critera ..
 [#013] #open overreach - #waiting-for: [#005]
              ( #was: #done shortcut to open issue )
 [#012] #soon one day we will have proper 'expecting' support

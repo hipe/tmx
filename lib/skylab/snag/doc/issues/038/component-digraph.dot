@@ -19,18 +19,22 @@ subgraph cluster_main {
 
     mr_abs [label="24.D - [tm]\nextraction" style=filled]
 
-    mr_s [label="24.E\nstream"]
+    mr_s [label="24.E\nstream" style=filled]
     mr_s->mr_abs
     mr->mr_s
 
-    mr_c [label="25. create"]
-    mr->mr_c
-
-    mr_e [label="26. edit"]
-    mr->mr_e
-
-    mr_r [label="27. remove"]
+    mr_r [label="25. remove"]
     mr->mr_r
+    mr_r->mr_s
+
+    mr_c [label="26. create"]
+    mr->mr_c
+    mr_c->mr_r
+
+    mr_e [label="27. edit"]
+    mr->mr_e
+    mr_e->mr_r
+    mr_e->mr_c
   }
 
   aa [label="23. open" style=filled]

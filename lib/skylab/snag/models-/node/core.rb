@@ -3,16 +3,14 @@ module Skylab::Snag
   class Models_::Node
 
     module Criteria  # ersatz class as proxy
-      class << self
-        def new s_a
-          cr = Snag_::Models_::Criteria.new Snag_.application_kernel_
 
-          ok = cr.receive_criteria_expression s_a
-          if ok
-            cr
-          else
-            ok
-          end
+      class << self
+
+        def new s_a
+
+          Snag_::Models_::Criteria.new_via_expression(
+            s_a,
+            Snag_.application_kernel_ )
         end
       end  # >>
     end
