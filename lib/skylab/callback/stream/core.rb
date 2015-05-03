@@ -202,20 +202,26 @@ module Skylab::Callback
       end
     end
 
-    def take d, & p
+    def take d, & map_reduce_p
 
       a = []
       count = 0
+
       while count < d
+
         x = gets
         x or break
-        if p
-          x = p[ x ]
+
+        if map_reduce_p
+          x = map_reduce_p[ x ]
           x or break
         end
-        count += 1
+
         x and a.push x
+
+        count += 1
       end
+
       a
     end
 

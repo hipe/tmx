@@ -39,6 +39,7 @@ module Skylab::TanMan
   FILE_SEPARATOR_ = ::File::SEPARATOR
   stowaway :Kernel_, 'models-'
   NEWLINE_ = "\n".freeze
+  NIL_ = nil
   SPACE_ = ' '.freeze
   TanMan_ = self
   UNABLE_ = false

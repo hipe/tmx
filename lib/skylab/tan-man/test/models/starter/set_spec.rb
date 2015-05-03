@@ -22,10 +22,13 @@ module Skylab::TanMan::TestSupport::Models::Starter
         :name, 'wiz',
         :workspace_path, @ws_pn.to_path, :config_filename, cfn
 
-      expect_not_OK_event :entity_not_found do |ev_|
-        ev = ev_.to_event
-        s_a = ev.a_few_ent_a.map( & :natural_key_string )
-        s_a.should eql [ "digraph.dot", "holy-smack.dot", "minimal.dot" ]
+      expect_not_OK_event :entity_not_found do | ev |
+
+        ev = ev.to_event
+
+        _s_a = ev.a_few_ent_a.map( & :natural_key_string )
+        _s_a.should eql %w( digraph.dot holy-smack.dot minimal.dot )
+
         ev.name_string.should eql 'wiz'
       end
 

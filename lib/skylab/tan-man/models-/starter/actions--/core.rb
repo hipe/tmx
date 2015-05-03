@@ -8,8 +8,8 @@ module Skylab::TanMan
 
     class << self
 
-      def __dir_pn_instance
-        @dpn ||= TanMan_.dir_pathname.join RELPATH___
+      def path_for_directory_as_collection
+        @__path ||= TanMan_.dir_pathname.join( RELPATH___ ).to_path
       end
     end  # >>
 
@@ -37,7 +37,7 @@ module Skylab::TanMan
         edit_entity_class :preconditions, EMPTY_A_
 
         def entity_collection
-          @___col ||= Collection_in_Filesystem_Controller__.new @kernel
+          @___col ||= Build_collection__[ @kernel ]
         end
       end
 
@@ -63,14 +63,14 @@ module Skylab::TanMan
     end
 
     def to_path
-      to_pathname.to_path
-    end
 
-    def to_pathname
-      @pn ||= Starter_.__dir_pn_instance.join property_value_via_symbol :name
+      @__path ||= ::File.join(
+        Starter_.path_for_directory_as_collection,
+        property_value_via_symbol( :name ) )
     end
 
     def entity_collection
+
       @__col ||= Hybrid_Collection_Controller___.new @preconditions, self.class, @kernel
     end
 
@@ -159,42 +159,17 @@ module Skylab::TanMan
       include Common_Collection_Controller_Methods_
 
       def _fs
-        @fs ||= Collection_in_Filesystem_Controller__.new @kernel
+
+        @__fs ||= Build_collection__[ @kernel ]
       end
     end
 
-    class Collection_in_Filesystem_Controller__
+    Build_collection__ = -> kr do
 
-      def initialize k
-        @kernel = k
-      end
-
-      # ~ #hook-out's
-
-      def to_entity_stream_via_model _cls_, & oes_p
-
-        p = -> do
-
-          fly = Starter_.new_flyweight @kernel, & oes_p
-          props = fly.properties
-
-          base_pn = Starter_.__dir_pn_instance
-
-          _pn_a = base_pn.children false
-
-          scan = Callback_::Stream.via_nonsparse_array( _pn_a ).map_reduce_by do |pn|
-            props.replace_hash 'name' => pn.to_path
-            fly
-          end
-          p = -> do
-            scan.gets
-          end
-          scan.gets
-        end
-
-        Callback_.stream do
-          p[]
-        end
+      Brazen_::Data_Stores::Directory_as_Collection.new(
+        kr
+      ) do | o |
+        o.flyweight_class = Starter_
       end
     end
 

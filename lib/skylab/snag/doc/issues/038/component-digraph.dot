@@ -11,7 +11,27 @@ subgraph cluster_main {
     tr [label="19. delete" style=filled]
   }
 
-  mr [label="24. design and implement\nfull-stack map-reduce\nagainst criteria API"]
+  mr [label="design and implement\nfull-stack map-reduce\nagainst criteria API"]
+
+  subgraph cluster_criteria_actions {
+
+    label="criteria actions"
+
+    mr_abs [label="24.D - [tm]\nextraction" style=filled]
+
+    mr_s [label="24.E\nstream"]
+    mr_s->mr_abs
+    mr->mr_s
+
+    mr_c [label="25. create"]
+    mr->mr_c
+
+    mr_e [label="26. edit"]
+    mr->mr_e
+
+    mr_r [label="27. remove"]
+    mr->mr_r
+  }
 
   aa [label="23. open" style=filled]
   ca [label="21. close" style=filled]

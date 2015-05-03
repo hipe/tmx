@@ -253,11 +253,12 @@ module Skylab::TanMan
 
     def __build_zero_entities_found_against_natural_key_event name_s
 
-      _scn = to_entity_stream_via_model _model_class do  # :+#hook-in
+      _st = to_entity_stream_via_model _model_class do  # :+#hook-in
+        self._HELLO
       end
 
-      _a_few_ent_a = _scn.take A_FEW__ do |x|
-        x.dup
+      _a_few_ent_a = _st.take A_FEW__ do | _fly |
+        _fly.dup
       end
 
       build_not_OK_event_with :entity_not_found,
@@ -524,6 +525,14 @@ module Skylab::TanMan
         Models_::Starter::Actions__::Lines.session( * a, & p )
       end
     end
+
+    def reinitialize_via_path_for_directory_as_collection path
+
+      @property_box.replace_name_in_hash ::File.basename path
+      NIL_
+    end
+
+    NAME_S___ = 'name'
   end
 
   Models_::Paths = -> path, verb, call, & oes_p do

@@ -1,6 +1,5 @@
 require_relative 'test-support'
 
-
 module Skylab::TanMan::TestSupport::Models::Starter
 
   describe "[tm] models starter get" do
