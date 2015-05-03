@@ -46,14 +46,33 @@ module Skylab::Brazen
 
         :entity_added,
 
-        :verb_i, nil,
-        :tag_s, nil
+        :entity, nil,
+        :entity_collection, nil,
 
-      ) do | y, o|
+        :verb_symbol, :add,
 
-        self._REVIEW
-        y << "#{ Brazen_.lib_.NLP::EN::POS::Verb[
-          o.verb_i.to_s ].preterite } #{ val o.tag_s }" ; nil
+        :ok, true
+
+      ) do | y, o |
+
+        _s = Brazen_.lib_.NLP::EN::POS::Verb[ o.verb_symbol.to_s ].preterite
+
+        a = [ _s ]
+
+        object = o.entity.description_under self
+        if object
+          a.push object
+        end
+
+        subject = o.entity_collection.description_under self
+        if subject
+          a.push 'to'
+          a.push subject
+        end
+
+        y << ( a * SPACE_ )
+
+        NIL_
       end
 
       def __WAS__verb_i

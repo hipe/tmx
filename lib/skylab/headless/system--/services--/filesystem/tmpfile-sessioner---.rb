@@ -1,12 +1,10 @@
-module Skylab::Snag
+module Skylab::Headless
 
-  class Models_::Node_Collection
+  module System__
 
-    module Expression_Adapters::Filesystem
+    class Services__::Filesystem
 
-      Sessions_ = ::Module.new
-
-      class Sessions_::Tmpfile
+      class Tmpfile_Sessioner___
 
         # produce an empty tmpfile open for reading and writing that (through
         # nonblocking calls to `flock`) "belongs to" this process and no
@@ -155,7 +153,7 @@ module Skylab::Snag
 
           max = @_max_number_of_simulatenous_files
 
-          _ = Snag_.lib_.basic::Number.of_digits_in_positive_integer max
+          _ = Headless_.lib_.basic::Number.of_digits_in_positive_integer max
           fmt = "%0#{ _ }d"
           fs = @_FS
           pth = @_tmpdir_path

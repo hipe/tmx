@@ -30,8 +30,8 @@ module Skylab::Snag
 
         attr_reader :expression_agent
 
-        attr_writer :filesystem,
-                    :subject_entity, :tmpdir_path_proc
+        attr_writer :FS_adapter,
+                    :subject_entity
 
         def during_locked_write_session  # note-35 (locking, tmpfiles)
 
@@ -118,8 +118,7 @@ module Skylab::Snag
 
             Tmpfile_Downstream_Adapter___.new(
               ds_id,
-              @tmpdir_path_proc,
-              @filesystem,
+              @FS_adapter,
               & @on_event_selectively )
 
           else
@@ -292,26 +291,18 @@ module Skylab::Snag
 
         class Tmpfile_Downstream_Adapter___
 
-          def initialize x, tdpp, fs, & x_p
+          def initialize x, fsa, & x_p
 
             @_ds_id = x
-            @_FS = fs
-            @_tmpdir_path_proc = tdpp
+            @_FS_adapter = fsa
             @on_event_selectively = x_p
           end
 
           def prepare
 
-            path = @_tmpdir_path_proc[]
-            if path
-
-              o = Expression_Adapters::Filesystem::Sessions_::Tmpfile.new
-
-              o.tmpdir_path path
-              o.create_at_most_N_directories 2  # etc
-              o.using_filesystem @_FS
-              @_tmpfile_session_maker = o
-
+            o = @_FS_adapter.tmpfile_sessioner
+            if o
+              @__tmpfile_sessioner = o
               ACHIEVED_
             else
               path
@@ -320,14 +311,14 @@ module Skylab::Snag
 
           def downstream_lines_during_possibly_locked_session
 
-            @_tmpfile_session_maker.session do | fh |
+            @__tmpfile_sessioner.session do | fh |
 
               ok_x = yield fh
 
               fh.close
 
               if ok_x
-                _bytes = @_FS.copy fh.path, @_ds_id.path  # bytes
+                _bytes = @_FS_adapter.filesystem.copy fh.path, @_ds_id.path
                 ok_x = _bytes
               end
 

@@ -19,6 +19,18 @@ module Skylab::Snag
 
       edit_entity_class(
 
+        :description, -> y do
+          y << "adds to the persisted criteria collection"
+        end,
+        :argument_moniker, :name,
+        :property, :save,
+
+        :description, -> y do
+          y << "replaces an existing persisted critera with this name"
+        end,
+        :argument_moniker, :name,
+        :property, :edit,
+
         :required,
         :property, :upstream_identifier,
 
@@ -30,19 +42,81 @@ module Skylab::Snag
 
       def produce_result
 
+        ok = __resolve_any_persistence_operation
+        ok &&= __resolve_criteria
+        ok &&= __persist_if_necessary
+        ok && __stream_via_criteria
+      end
+
+      def __resolve_any_persistence_operation
+
+        ok = ACHIEVED_
         h = @argument_box.h_
+        save_x = h[ :save ]
+        edit_x = h[ :edit ]
+
+        if save_x
+          if edit_x
+            handle_event_selectively.call :error, :expression, :syntax do | y |
+              y << "can't simultaneously #{ par 'save' } and #{ par 'edit' }"
+            end
+            ok = UNABLE_
+          else
+            @_persistence_verb = :save
+            @_persistence_arg = save_x
+          end
+        elsif edit_x
+          @_persistence_verb = :edit
+          @_persistence_arg = edit_x
+        else
+          @_persistence_verb = :we_are_not_persisting
+        end
+        ok
+      end
+
+      def __resolve_criteria
 
         c = Criteria_.new_via_expression(
-          h.fetch( :criteria ),
+          @argument_box.fetch( :criteria ),
           @kernel,
           & handle_event_selectively )
 
         if c
-          c.to_reduced_entity_stream_via_collection_identifier(
-            h.fetch( :upstream_identifier ) )
+          @_criteria = c
+          ACHIEVED_
         else
           c
         end
+      end
+
+      def __persist_if_necessary
+
+        send :"__#{ @_persistence_verb }__criteria"
+      end
+
+      def __we_are_not_persisting__criteria
+        ACHIEVED_
+      end
+
+      def __save__criteria
+
+        @_criteria.__receive_persistence_slug_and_cetera(
+          @_persistence_arg,
+          @kernel.silo( :node_collection ).FS_adapter_.tmpfile_sessioner )
+
+        a = _cc.edit(
+          :via, :object,
+          :unless_present,
+          :add, :criteria, @_criteria,
+          & handle_event_selectively )
+
+        a && ACHIEVED_
+      end
+
+      def __stream_via_criteria
+
+        _us_id = @argument_box.fetch :upstream_identifier
+        @_criteria.to_reduced_entity_stream_via_collection_identifier _us_id
       end
     end
 
@@ -173,6 +247,10 @@ module Skylab::Snag
           o
         end
 
+        def new_via__object__ x
+          x
+        end
+
         def properties
           Properties___[]
         end
@@ -195,26 +273,55 @@ module Skylab::Snag
         @ok = true
       end
 
+      # ~ for unmarshaling a persisted
+
+      def unmarshal & x_p
+
+        x_p and @on_event_selectively = x_p  # meh
+
+        s_a = ::File.read( @_path ).split SPACE_
+        if s_a.length.nonzero?
+          @_word_array = s_a
+          _ct = _via_word_array_produce_criteria_tree
+          _receive _ct, :criteria_tree
+        end
+      end
+
+      # ~ for persisting
+
+      def __receive_persistence_slug_and_cetera x, y
+        _set_name_slug x
+        @_tmpfile_sessioner = y
+        NIL_
+      end
+
+      def express_into_under x, expad, & x_p
+        send :"express_into__#{ expad.modality_const }__under", x, expad, & x_p
+      end
+
+      def express_into__Filesystem__under col_x, fs, & x_p
+
+        Criteria_::Expression_Adapters::Filesystem[
+          col_x, @_word_array, self, @_tmpfile_sessioner, fs, & x_p ]
+      end
+
       # ~ for listing, deleting persisted critiera
 
       def __init_as_flyweight
 
         @_name_proc = -> do
-          ::File.basename @__path
+          ::File.basename @_path
         end
         NIL_
       end
 
       def __init_as_reference slug
 
-        @_name_proc = -> do
-          slug
-        end
-        NIL_
+        _set_name_slug slug
       end
 
       def reinitialize_via_path_for_directory_as_collection path
-        @__path = path
+        @_path = path
         NIL_
       end
 
@@ -237,6 +344,16 @@ module Skylab::Snag
         @_name_proc[]
       end
 
+      # ~ support of above 3
+
+      def _set_name_slug slug
+
+        @_name_proc = -> do
+          slug
+        end
+        NIL_
+      end
+
       # ~
 
       def __receive_criteria_expression x
@@ -244,13 +361,19 @@ module Skylab::Snag
         _ct = if x.respond_to? :value_x
           x
         else
+          @_word_array = x
 
-          @kernel.silo( :criteria ).EN_domain_adapter.
-            new_criteria_tree_via_word_array(
-              x, & @on_event_selectively )
+          _via_word_array_produce_criteria_tree
         end
 
         _receive _ct, :criteria_tree
+      end
+
+      def _via_word_array_produce_criteria_tree
+
+        @kernel.silo( :criteria ).EN_domain_adapter.
+          new_criteria_tree_via_word_array(
+            @_word_array, & @on_event_selectively )
       end
 
       def __receive_trueish__criteria_tree__ ct
@@ -334,6 +457,7 @@ module Skylab::Snag
 
     module Expression_Adapters
       EN = nil
+      Autoloader_[ self ]
     end
 
     Criteria_ = self

@@ -24,7 +24,9 @@ module Skylab::Snag
             x
           end
 
-          @_filesystem = Snag_.lib_.system.filesystem
+          @_FS_adapter = Snag_.application_kernel_.silo(
+            :node_collection
+          ).FS_adapter_
         end
 
         # ~ interface with the mutation session (compliments those in parent clas)
@@ -55,13 +57,7 @@ module Skylab::Snag
 
           o.downstream_identifier = bx && bx[ :downstream_identifier ]
 
-          o.filesystem = @_filesystem
-
-          o.tmpdir_path_proc = -> do  # (or push this up however)
-
-            ::File.join Snag_.lib_.system.defaults.dev_tmpdir_path, 'sn0g'
-
-          end
+          o.FS_adapter = @_FS_adapter
 
           o.subject_entity = node
 
@@ -176,7 +172,7 @@ module Skylab::Snag
 
             Expression_Adapters::Filesystem::Extended_Content_Adapter.
               new_via_manifest_path_and_filesystem(
-                bu_id.path, @_filesystem )
+                bu_id.path, @_FS_adapter.filesystem )
           else
             EC_Adapter_Dummy___[]
           end

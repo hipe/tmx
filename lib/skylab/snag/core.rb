@@ -171,6 +171,7 @@ module Skylab::Snag
   NIL_ = nil
   KEEP_PARSING_ = true
   NEUTRAL_ = nil
+  NEWLINE_ = "\n"
   Snag_ = self
   SPACE_ = ' '
   THE_EMPTY_MODULE_ = nil

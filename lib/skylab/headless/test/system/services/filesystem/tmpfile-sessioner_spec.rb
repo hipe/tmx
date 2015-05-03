@@ -1,8 +1,8 @@
-require_relative '../../../../../test-support'
+require_relative 'test-support'
 
-module Skylab::Snag::TestSupport
+module Skylab::Headless::TestSupport::System::Services::Filesystem
 
-  describe "[sg] [..] tmpfile" do
+  describe "[hl] system - filesystem - tmpfile sessioner" do
 
     extend TS_
     use :my_tmpdir_
@@ -65,8 +65,8 @@ module Skylab::Snag::TestSupport
       sess = _common_setup_two
       2 == sess.__resolve_directory.length or fail
 
-      _exe_path = TS_.dir_pathname.join( 'fixture-bin/omg' ).to_path
-      i, o, _e, t = Snag_::Library_::Open3.popen3 _exe_path
+      _exe_path = Headless_::TestSupport.dir_pathname.join( 'fixture-bin/omg' ).to_path
+      i, o, _e, t = Headless_::Library_::Open3.popen3 _exe_path
 
       _tmpdir_path = sess.instance_variable_get :@_tmpdir_path
       _file_path = ::File.join _tmpdir_path, '0'
@@ -94,7 +94,7 @@ module Skylab::Snag::TestSupport
 
       o.tmpdir_path ::File.join( td.path, 'one/two' )
       o.create_at_most_N_directories 2
-      o.using_filesystem Snag_.lib_.system.filesystem
+      o.using_filesystem Headless_.system.filesystem
 
       o
     end
@@ -116,7 +116,7 @@ module Skylab::Snag::TestSupport
     end
 
     def _subject
-      Snag_::Models_::Node_Collection::Expression_Adapters::Filesystem::Sessions_::Tmpfile
+      Headless_::System__::Services__::Filesystem::Tmpfile_Sessioner___
     end
   end
 end

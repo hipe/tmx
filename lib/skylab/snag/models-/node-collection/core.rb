@@ -52,6 +52,46 @@ module Skylab::Snag
       Autoloader_[ self ]
     end
 
+    class Silo_Daemon
+
+      def initialize kr, mc
+        @_kernel = kr
+      end
+
+      def FS_adapter_
+        @___fsa ||= Filesystem_Adapter___.new Snag_.lib_.system.filesystem
+      end
+    end
+
+    class Filesystem_Adapter___
+
+      def initialize fs
+        @filesystem = fs
+      end
+
+      attr_reader :filesystem
+
+      def tmpfile_sessioner
+        @___tfs ||= __build_tmpfile_sessioner
+      end
+
+      def __build_tmpfile_sessioner
+
+        o = Snag_.lib_.system.filesystem.tmpfile_sessioner.new
+
+        o.tmpdir_path ::File.join(
+          Snag_.lib_.system.defaults.dev_tmpdir_path,
+          'sn0g' )
+
+        o.create_at_most_N_directories 2  # etc
+
+        o.using_filesystem @filesystem
+
+        o
+      end
+    end
+
+
     Actions = THE_EMPTY_MODULE_
     NC_ = self
 

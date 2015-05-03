@@ -327,7 +327,6 @@ module Skylab::Snag
       DID_NOT_PARSE_ = nil
       Library_ = self  # future proof the name, avoid mis-accessing super
       LIB_ = Snag_.lib_
-      NEWLINE_ = "\n"
     end
   end
 end

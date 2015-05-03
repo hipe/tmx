@@ -33,6 +33,72 @@ module Skylab::Brazen
 
     # ~ c.r.u.d
 
+    # ~~ create (by way of ACS)
+
+    def __add__object_for_mutation_session o, & x_p
+
+      ok = __resolve_entry_name o, & x_p
+      ok &&= __resolve_destination_directory( & x_p )
+      ok && __finish_add( o, & x_p )
+    end
+
+    def __resolve_entry_name o, & x_p
+
+      if @filename_pattern
+        ok = @filename_pattern =~ o.natural_key_string
+        if ok
+          ok
+        else
+          x_p.call :error, :expression, :invalid_name do | y |
+            y << "invalid name #{ ick o.natural_key_string }"
+          end
+          UNABLE_
+        end
+      else
+        ACHIEVED_
+      end
+    end
+
+    def __resolve_destination_directory & x_p
+
+      if @filesystem.directory? @directory_path
+        ACHIEVED_
+      elsif @directory_is_assumed_to_exist
+        x_p.call :error, :expression, :noent do | y |
+          y < "no. (hl-xyzzy)"
+        end
+        UNABLE_
+      else
+
+        # we can make 2. meh
+
+        path = ::File.dirname @directory_path
+        ok = if @filesystem.directory? path
+          ACHIEVED_
+        else
+          @filesystem.mkdir path  # -p meh
+        end
+        if ok
+          if path == @directory_path
+            ok
+          else
+            @filesystem.mkdir @directory_path
+          end
+        else
+          ok
+        end
+      end
+    end
+
+    def __finish_add o, & x_p
+
+      o.express_into_under self, @filesystem, & x_p
+    end
+
+    attr_reader :directory_path
+
+
+
     # ~~ delete (by way of ACS)
 
     def __remove__object_for_mutation_session o, & x_p

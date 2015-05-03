@@ -16,9 +16,11 @@ module Skylab::Brazen
 
         o.operation_category_symbol = :add
 
-        # (modifiers to add as covered: `unless_present`, `via`)
+        o.takes_modifier :is_flag, :unless_present
 
         o.takes_modifier :using
+
+        o.takes_modifier :via
 
         o.has_non_boolean_result = true
 

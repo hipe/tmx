@@ -37,6 +37,10 @@ module Skylab::Brazen
           o._macro_operation_method_name = :__interpret
           o.execute
         end
+
+        def event_class sym  # :#twice
+          MS_::Event_Factory_.class_for sym
+        end
       end  # >>
 
       def initialize & x_p
@@ -498,7 +502,7 @@ module Skylab::Brazen
           @subject_component.mutable_body_for_mutation_session
         end
 
-        def event_class_ sym  # placeholder
+        def event_class_ sym  # placeholder, #twice
           MS_::Event_Factory_.class_for sym
         end
       end

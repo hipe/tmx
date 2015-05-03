@@ -26,7 +26,7 @@ we hope to use natural keys and we hope that those fields are always named
 'name'. we hope never to support compound keys.
 
 for now we will assume natural keys, and hope that an entity can
-represent itself unambiguous,nly with the combinaton of its name and its
+represent itself unambiguously with the combinaton of its name and its
 model class (with emphasis on "for now").
 
 

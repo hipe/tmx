@@ -74,7 +74,8 @@ module Skylab::Headless
             NIL_
           end.mv src, dst, * h
         else
-          file_utils_controller.mv src, dst, * h
+
+          Headless_::Library_::FileUtils.mv src, dst, * h
         end
       end
 
@@ -161,12 +162,20 @@ module Skylab::Headless
         @tmpdir_pathname ||= ::Pathname.new Headless_::Library_::Tmpdir.tmpdir
       end
 
+      def tmpfile_sessioner
+        Filesystem_::Tmpfile_Sessioner___
+      end
+
       def walk * x_a, & oes_p
         if x_a.length.nonzero? || block_given?
           Filesystem_::Walk__.call_via_iambic x_a, & oes_p
         else
           Filesystem_::Walk__
         end
+      end
+
+      def modality_const
+        :Filesystem
       end
 
       DIRECTORY_FTYPE = 'directory'.freeze
