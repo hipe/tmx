@@ -1,6 +1,6 @@
-module Skylab::Snag
+module Skylab::Brazen
 
-  module Model_
+  # ->
 
     class Mutation_Session  # see [#023]
 
@@ -280,7 +280,6 @@ module Skylab::Snag
 
           moddy = available_modifiers_box[ arg_st.current_token ]
           if moddy
-            self._WAHOO_ride_me
             redo
           end
 
@@ -332,7 +331,7 @@ module Skylab::Snag
 
         _ctxt = if @arg_st.unparsed_exists
           _x = @arg_st.current_token
-          " (had: #{ Snag_.lib_.basic::String.via_mixed _x })"
+          " (had: #{ Brazen_.lib_.basic::String.via_mixed _x })"
         else
           " at end of input"
         end
@@ -500,7 +499,7 @@ module Skylab::Snag
         end
 
         def event_class_ sym  # placeholder
-          Model_::Event_Factory.class_for sym
+          MS_::Event_Factory_.class_for sym
         end
       end
 
@@ -707,5 +706,6 @@ module Skylab::Snag
       MS_ = self
 
     end
-  end
+
+    # <-
 end

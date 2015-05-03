@@ -58,7 +58,7 @@ module Skylab::Snag
     class << self
 
       def edit_entity * x_a, & x_p  # :+#ACS-tenet-2
-        Snag_::Model_::Mutation_Session.create x_a, self, & x_p
+        Snag_.lib_.brazen::Mutation_Session.create x_a, self, & x_p
       end
 
       # ~ the associations

@@ -208,7 +208,7 @@ module Skylab::TanMan
         _mutate_via_verb_and_entity :touch, entity
       end
 
-      def receive_delete_entity action, ent, & oes_p
+      def delete_entity action, ent, & oes_p
 
         byte_downstream_ID = action.document_entity_byte_downstream_identifier
         bx = action.argument_box

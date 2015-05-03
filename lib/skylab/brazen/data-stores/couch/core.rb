@@ -117,7 +117,7 @@ module Skylab::Brazen
         & oes_p
     end
 
-    def receive_delete_entity action, ent, & oes_p
+    def delete_entity action, ent, & oes_p
       _ok = ent.intrinsic_delete_before_delete_in_datastore action, & oes_p
       _ok && Couch_::Actors__::Delete[ action, ent, self, & oes_p ]
     end

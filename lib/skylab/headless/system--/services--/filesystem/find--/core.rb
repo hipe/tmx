@@ -374,8 +374,6 @@ module Skylab::Headless
           my.names -> n { y << "named #{ or_ n.map(& val ) }" }, e[ :names ]
           my.patrn -> p { y << "with the pattern #{ val[ p ] }" }, e[ :pattern ]
         end
-
-        NIL_ = nil
       end
     end
   end

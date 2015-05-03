@@ -254,18 +254,26 @@ module Skylab::Snag::TestSupport
   end.call
 
   Fixture_tree_ = -> do
+
     h = {}
+
     -> sym do
       h.fetch sym do
-        h[ sym ] = TS_.dir_pathname.join(
-          'fixture-trees',
-          Callback_::Name.via_variegated_symbol( sym ).as_slug
-        ).to_path
+        h[ sym ] = ::File.join(
+          Fixture_tree_dir___[],
+          Callback_::Name.via_variegated_symbol( sym ).as_slug )
       end
     end
   end.call
 
   Snag_ = ::Skylab::Snag
+
+  Callback_ = Snag_::Callback_
+
+  Fixture_tree_dir___ = Callback_.memoize do
+
+    TS_.dir_pathname.join( 'fixture-trees' ).to_path
+  end
 
   My_Tmpdir_ = -> do
 
@@ -310,8 +318,6 @@ module Skylab::Snag::TestSupport
       end
     end
   end
-
-  Callback_ = Snag_::Callback_
 
   Path_alpha_ = Callback_.memoize do
 

@@ -44,7 +44,7 @@ module Skylab::Brazen
     end
 
     def members
-      [ :receive_delete_entity, :to_entity_stream_via_model,
+      [ :delete_entity, :to_entity_stream_via_model,
           :entity_via_key, :persist_entity,
             :property_value_via_symbol ]
     end
@@ -90,7 +90,7 @@ module Skylab::Brazen
 
     # ~ delete
 
-    def receive_delete_entity action, entity, & oes_p
+    def delete_entity action, entity, & oes_p
       ok = resolve_mutable_document
       ok &&= entity.intrinsic_delete_before_delete_in_datastore( action, & oes_p )
       ok &&= Git_Config_::Mutable::Actors::Delete[ entity, @mutable_document, & oes_p ]

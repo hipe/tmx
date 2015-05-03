@@ -19,12 +19,12 @@ module Skylab::Snag
 
       def interpret_for_mutation_session arg_st, & x_p
 
-        Snag_::Model_::Mutation_Session.interpret arg_st, self, & x_p
+        Snag_.lib_.brazen::Mutation_Session.interpret arg_st, self, & x_p
       end
 
       def edit_entity * x_a, & x_p  # ..
 
-        Snag_::Model_::Mutation_Session.create x_a, self, & x_p
+        Snag_.lib_.brazen::Mutation_Session.create x_a, self, & x_p
       end
 
       def collection_module_for_criteria_resolution
@@ -217,7 +217,7 @@ module Skylab::Snag
 
     def edit * x_a, & x_p
 
-      Snag_::Model_::Mutation_Session.edit x_a, self, & x_p
+      Snag_.lib_.brazen::Mutation_Session.edit x_a, self, & x_p
     end
 
     def mutable_body_for_mutation_session

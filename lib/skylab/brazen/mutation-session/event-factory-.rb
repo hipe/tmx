@@ -1,8 +1,8 @@
-module Skylab::Snag
+module Skylab::Brazen
 
-  module Model_
+  class Mutation_Session
 
-    module Event_Factory
+    module Event_Factory_
 
       # (a placeholder for an idea)
 
@@ -52,7 +52,7 @@ module Skylab::Snag
       ) do | y, o|
 
         self._REVIEW
-        y << "#{ Snag_.lib_.NLP::EN::POS::Verb[
+        y << "#{ Brazen_.lib_.NLP::EN::POS::Verb[
           o.verb_i.to_s ].preterite } #{ val o.tag_s }" ; nil
       end
 

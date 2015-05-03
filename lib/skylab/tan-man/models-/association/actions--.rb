@@ -68,7 +68,7 @@ module Skylab::TanMan
           remove Brazen_::NAME_  # ouch/meh
 
         def produce_result
-          entity_collection.receive_delete_entity(
+          entity_collection.delete_entity(
             self, nil, & handle_event_selectively )
         end
       end
@@ -249,7 +249,7 @@ module Skylab::TanMan
 
       Info___ = ::Struct.new :did_mutate
 
-      def receive_delete_entity action, _, & oes_p
+      def delete_entity action, _, & oes_p
 
         bx = action.argument_box
 

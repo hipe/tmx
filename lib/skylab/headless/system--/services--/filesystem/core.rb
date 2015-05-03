@@ -61,6 +61,23 @@ module Skylab::Headless
         ::Dir.mkdir path, * int
       end
 
+      def mv src, dst, h=nil, & x_p
+
+        if x_p
+          file_utils_controller do | msg |
+
+            x_p.call :info, :file_utils_message do
+
+              _ev = Callback_::Event.wrap.file_utils_message msg
+              _ev or Callback_::Event.inline_neutral_with( :fu_msg, :msg, msg )
+            end
+            NIL_
+          end.mv src, dst, * h
+        else
+          file_utils_controller.mv src, dst, * h
+        end
+      end
+
       def copy src_s, dst_s
         ::File.copy_stream src_s, dst_s
       end
@@ -163,6 +180,8 @@ module Skylab::Headless
       FILE_SEPARATOR_BYTE = ::File::SEPARATOR.getbyte 0
 
       Filesystem_ = self
+
+      NIL_ = nil
 
     end
   end

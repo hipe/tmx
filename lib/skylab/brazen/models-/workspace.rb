@@ -132,10 +132,10 @@ module Skylab::Brazen
       end
     end
 
-    def receive_delete_entity act, ent, & oes_p
+    def delete_entity act, ent, & oes_p
       doc = _document( & oes_p )
       doc and begin
-        doc.receive_delete_entity act, ent, & oes_p
+        doc.delete_entity act, ent, & oes_p
       end
     end
 

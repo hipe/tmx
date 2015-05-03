@@ -303,7 +303,7 @@ module Skylab::Brazen
           ok &&= @subject_entity.intrinsic_delete_before_delete_in_datastore(
             self, & oes_p )
 
-          ok and entity_collection.receive_delete_entity self, @subject_entity, & oes_p
+          ok and entity_collection.delete_entity self, @subject_entity, & oes_p
         end
 
         def __init_selective_listener_proc_for_delete

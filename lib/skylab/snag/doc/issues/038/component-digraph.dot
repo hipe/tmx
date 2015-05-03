@@ -23,7 +23,7 @@ subgraph cluster_main {
     mr_s->mr_abs
     mr->mr_s
 
-    mr_r [label="25. remove"]
+    mr_r [label="25. remove" style=filled]
     mr->mr_r
     mr_r->mr_s
 

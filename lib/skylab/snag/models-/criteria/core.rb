@@ -8,11 +8,16 @@ module Skylab::Snag
 
     Actions = ::Module.new
 
-    Action__ = Brazen_::Model.common_action_class
+    class Action__ < Brazen_::Model.common_action_class  # re-opens
+
+      Brazen_::Model.common_entity self do
+
+      end
+    end
 
     class Actions::Criteria_To_Stream < Action__
 
-      Brazen_::Model.common_entity self,
+      edit_entity_class(
 
         :required,
         :property, :upstream_identifier,
@@ -20,6 +25,8 @@ module Skylab::Snag
         :required,
         :argument_arity, :one_or_more,
         :property, :criteria
+
+      )
 
       def produce_result
 
@@ -43,7 +50,34 @@ module Skylab::Snag
 
       def produce_result
 
-        @kernel.silo( :criteria )._cc.to_entity_stream
+        _cc.to_entity_stream
+      end
+    end
+
+    class Actions::Delete < Action__
+
+      edit_entity_class(
+
+        :desc, -> y do
+          y << "(actually \"archives\")"
+        end,
+
+        :required, :property, :name
+      )
+
+      def produce_result
+
+        _cc.edit(
+          :if_present,
+          :via, :slug,
+          :remove, :critera, @property_box.fetch( :name ),
+          & handle_event_selectively )
+      end
+    end
+
+    class Action__
+      def _cc
+        @kernel.silo( :criteria )._cc
       end
     end
 
@@ -55,10 +89,12 @@ module Skylab::Snag
       end
 
       def _cc
+        @__cc ||= self.class.__build_collection_via_kernel @_kr
+      end
 
-        @__cc ||= Brazen_::Data_Stores:: Directory_as_Collection.new(
-          @_kr
-        ) do | o |
+      def self.__build_collection_via_kernel kr
+
+        Directory_as_collection_class___[].new( kr ) do | o |
 
           o.directory_is_assumed_to_exist = false
 
@@ -72,6 +108,8 @@ module Skylab::Snag
 
           o.flyweight_class = Criteria_
 
+          yield o if block_given?
+
         end
       end
 
@@ -82,13 +120,40 @@ module Skylab::Snag
       end
     end
 
+    Directory_as_collection_class___ = Callback_.memoize do
+
+      class D_as_C____ < Brazen_::Data_Stores::Directory_as_Collection
+
+        class << self
+
+          def __criteria__association_for_mutation_session
+            Criteria_
+          end
+        end  # >>
+
+        def has_equivalent__criteria__for_mutation_session c
+          has_equivalent_item_for_mutation_session c
+        end
+
+        def description_under expag
+          expag.calculate do
+            'persisted criteria collection'
+          end
+        end
+
+        self
+      end
+    end
 
     # -> ( criteria model )
 
       class << self
 
         def new_flyweight kr, & x_p
-          new kr, & x_p
+
+          o = new kr, & x_p
+          o.__init_as_flyweight
+          o
         end
 
         def new_via_expression x, kr, & x_p
@@ -100,6 +165,12 @@ module Skylab::Snag
           else
             ok
           end
+        end
+
+        def new_via__slug__ x, & x_p
+          o = new :_no_kernel_
+          o.__init_as_reference x
+          o
         end
 
         def properties
@@ -124,19 +195,46 @@ module Skylab::Snag
         @ok = true
       end
 
-      # ~ for listing persisted critiera
+      # ~ for listing, deleting persisted critiera
+
+      def __init_as_flyweight
+
+        @_name_proc = -> do
+          ::File.basename @__path
+        end
+        NIL_
+      end
+
+      def __init_as_reference slug
+
+        @_name_proc = -> do
+          slug
+        end
+        NIL_
+      end
 
       def reinitialize_via_path_for_directory_as_collection path
         @__path = path
         NIL_
       end
 
+      def description_under expag
+        me = self
+        expag.calculate do
+          val me.natural_key_string
+        end
+      end
+
       def property_value_via_symbol sym
         send :"__#{ sym }__property_value"
       end
 
+      def natural_key_string
+        @_name_proc[]
+      end
+
       def __name__property_value
-        ::File.basename @__path
+        @_name_proc[]
       end
 
       # ~

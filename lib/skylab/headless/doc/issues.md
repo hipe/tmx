@@ -17,7 +17,7 @@
 [#160]       #parent-node: [#161] the tmpdir narrative ..
 [#159]       #node-identity: (e.g IO interceptors filter) #marker
 [#158]       what we did to get tall mixed stacks (`tall_spec`) to work
-[#157]       #parent-node: [#161] the file utils agent
+[#157] #open #parent-node: [#161] the file utils agent should emit oes
 [#156]       (reserved for a forthcoming entry about filenames)
 [#155]       (reserved for a forthcoming entry about const names)
 [#154]       #parent-node: [#095] the control flow method-naming idiomspace ..

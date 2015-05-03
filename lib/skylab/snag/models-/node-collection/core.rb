@@ -44,7 +44,7 @@ module Skylab::Snag
 
     def edit * x_a, & x_p
 
-      Snag_::Model_::Mutation_Session.edit x_a, self, & x_p
+      Snag_.lib_.brazen::Mutation_Session.edit x_a, self, & x_p
     end
 
     module Expression_Adapters
