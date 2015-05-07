@@ -1,10 +1,13 @@
-require_relative '../test-support'
+require_relative '../../../test-support'
 
-module Skylab::Headless::TestSupport::System::Services::Filesystem::Path_Tools
+module Skylab::System::TestSupport
 
-  describe "[hl] CLI path-tools" do
+  describe "[sy] - services - filesystem - path-tools" do
+
+    extend TS_
 
     define_singleton_method :o do |str, capture, *tags|
+
       vp = if capture
         "sees #{ capture.inspect }"
       else
@@ -13,7 +16,7 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem::Path_Tools
 
       it "in '#{ str }' it #{ vp }", *tags do
 
-        md = Headless_.system.filesystem.path_tools.absolute_path_hack_rx.match str
+        md = services_.filesystem.path_tools.absolute_path_hack_rx.match str
 
         if capture
           md[0].should eql capture

@@ -1,8 +1,10 @@
-module Skylab::Headless
+module Skylab::System
 
-  module System__
 
-    class Services__::Which
+    class Services___::Which
+
+      def initialize _services
+      end
 
       def call exe_name
         if SAFE_NAME_RX__ =~ exe_name
@@ -14,7 +16,7 @@ module Skylab::Headless
       SAFE_NAME_RX__ = /\A[-a-z0-9_]+\z/i
 
       def wch_exe_safe exe_name
-        out = Headless_::Library_::Open3.popen3 'which', exe_name do |_, o, e|
+        out = System_.lib_.open3.popen3 'which', exe_name do |_, o, e|
           err = e.read
           if EMPTY_S_ != err
             _msg = "unexpected response from `which` - #{ err }"
@@ -27,5 +29,5 @@ module Skylab::Headless
         end
       end
     end
-  end
+
 end

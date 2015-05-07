@@ -1,17 +1,16 @@
 require_relative 'test-support'
 
-module Skylab::Headless::TestSupport::System
+module Skylab::System::TestSupport
 
-  describe "[hl] system (front)" do
+  describe "[sy] system (front) (stub)" do
 
     extend TS_
 
     it "loads" do
-      subject
+      services_
     end
 
-    it "reflects members #fragile" do
-      subject.members.should eql [ :defaults, :diff, :environment, :filesystem, :IO, :patch, :which ]
-    end
+    # it "reflects"
+
   end
 end

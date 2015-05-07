@@ -1,8 +1,6 @@
-module Skylab::Headless
+module Skylab::System
 
-  module System__
-
-    class Services__::Patch
+  class Services___::Patch
 
   class Models__::Chunk
 
@@ -71,6 +69,5 @@ module Skylab::Headless
   end  # Side__
   end  # Chunk__
 
-    end
   end
 end

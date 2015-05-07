@@ -1,8 +1,8 @@
-module Skylab::Headless
+module Skylab::System
 
   module IO
 
-    Line_Scanner__ = Headless_.lib_.ivars_with_procs_as_methods.new :count, :gets, :line_number
+    Line_Scanner__ = System_.lib_.ivars_with_procs_as_methods.new :count, :gets, :line_number
 
     class Line_Scanner__  # read [#164]
 
@@ -13,7 +13,7 @@ module Skylab::Headless
         count = 0
         gets = scn = nil
         advance_scanner = -> do
-          scn = Headless_::Library_::StringScanner.new buffer
+          scn = System_.lib_.string_scanner buffer
           advance_scanner = -> do
             scn.string = buffer ; nil
           end ; nil
@@ -66,13 +66,15 @@ module Skylab::Headless
 
       attr_reader :fh, :pathname
 
-      LINE_RX__ = Headless_.lib_.string_lib.regex_for_line_scanning
+      LINE_RX__ = System_.lib_.basic::String.regex_for_line_scanning
 
       # ~
 
       def to_identifier
-        Headless_.lib_.basic::Pathname.identifier @pathname
+        System_.lib_.basic::Pathname.identifier @pathname
       end
+
+      EMPTY_P_ = -> {}
     end
   end
 end

@@ -1,8 +1,8 @@
-module Skylab::Headless
+module Skylab::System
 
   module IO
 
-  Select__ = Headless_.lib_.ivars_with_procs_as_methods.new :select do
+  Select__ = System_.lib_.ivars_with_procs_as_methods.new :select do
 
     # Select - a chunking, multstream `select` wrapper
     #
@@ -64,7 +64,7 @@ module Skylab::Headless
           raise ::ArgumentError, "attempted to add multiple listeners #{
             }to one stream - this is not yet supported - #{ io }"
         else
-          down_h[ io.to_i ] = Headless_::IO::Mappers::Chunkers::Common.new line
+          down_h[ io.to_i ] = System_::IO::Mappers::Chunkers::Common.new line
           up_a << io
         end
       end

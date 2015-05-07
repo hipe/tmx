@@ -1,14 +1,14 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Headless::TestSupport::IO::Mappers
+module Skylab::System::TestSupport
 
-  describe "[hl] IO interceptors filter" do
+  describe "[sy] IO - mappers - filter" do
 
     context "without a line boundary event handler" do
 
       it "leaves brittany alone" do
         downstream = ::StringIO.new
-        stream = Headless_::IO::Mappers::Filter.new(downstream)
+        stream = System_::IO::Mappers::Filter.new(downstream)
         stream.write('a')
         downstream.string.should eql('a')
         stream.puts('b')
@@ -19,7 +19,7 @@ module Skylab::Headless::TestSupport::IO::Mappers
     context "with a line boundary event handler" do
       let(:downstream) { ::StringIO.new }
       let(:stream) do
-        o = Headless_::IO::Mappers::Filter.new(
+        o = System_::IO::Mappers::Filter.new(
           :downstream_IO, downstream,
           :line_begin_proc, -> do
             o.downstream_IO.write 'Z '
@@ -56,7 +56,7 @@ module Skylab::Headless::TestSupport::IO::Mappers
     context "with a puts filter" do
       it "works with one filter" do
         downstream = ::StringIO.new
-        stream = Headless_::IO::Mappers::Filter.new(
+        stream = System_::IO::Mappers::Filter.new(
           :downstream_IO, downstream,
           :puts_map_proc, -> x do
             "  << epic: #{ x } >>\n"
@@ -66,6 +66,10 @@ module Skylab::Headless::TestSupport::IO::Mappers
         stream.puts( 'bcd' )
         downstream.string.should eql( "a  << epic: bcd >>\n" )
       end
+    end
+
+    before :all do
+      System_.lib_.string_IO
     end
   end
 end

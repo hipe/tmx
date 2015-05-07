@@ -1,8 +1,7 @@
-module Skylab::Headless
+module Skylab::System
 
-  module System__
 
-    class Services__::Filesystem
+    class Services___::Filesystem
 
     module Path_Tools__  # #open [#031] new will move here, clobber this  read [#031] the path tools narrative
 
@@ -23,14 +22,14 @@ module Skylab::Headless
 
           -> path_string do
             path_string.sub rx do
-              Headless_.system.environment.any_home_directory_path || $~[ 0 ]
+              System_.services.environment.any_home_directory_path || $~[ 0 ]
             end
           end
         end.call
 
         def contract_tilde path_s
 
-          home_s = Headless_.system.environment.any_home_directory_path
+          home_s = System_.services.environment.any_home_directory_path
 
           if home_s && path_s.index( home_s ).zero? and
               home_s.length == path_s.length || '/' == path_s[ home_s.length ]
@@ -68,7 +67,7 @@ module Skylab::Headless
 
 
     home__ = -> do
-      Headless_.system.environment.any_home_directory_path
+      System_.services.environment.any_home_directory_path
     end
 
     pwd__ = -> do
@@ -119,7 +118,9 @@ module Skylab::Headless
       end
     end
 
-    memo = Callback_.memoize
+    memo = -> p do
+      Callback_.memoize( & p )
+    end
 
     Pretty_path____ = -> home_, home_rx_, pwd_, pwd_rx_ do
       home =    memo[ home_ ]
@@ -157,7 +158,7 @@ module Skylab::Headless
       Escape_path__ = -> path do
         path = "#{ path }"
         if / |\$|'/ =~ path
-          Headless_::Library_::Shellwords.shellescape path
+          System_.lib_.shellwords.shellescape path
         else
           path
         end
@@ -170,5 +171,4 @@ module Skylab::Headless
 
     end
     end
-  end
 end

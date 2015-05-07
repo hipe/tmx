@@ -1,10 +1,12 @@
-module Skylab::Headless
+module Skylab::System
 
-  module System__
 
-    class Services__::Environment
+    class Services___::Environment
 
-      Headless_::Lib_::Properties_stack_frame.call self,
+      def initialize _
+      end
+
+      System_.lib_.properties_stack_frame self,
 
         :memoized, :proc, :any_home_directory_path, -> do
           ::ENV[ 'HOME' ]
@@ -13,10 +15,6 @@ module Skylab::Headless
         :memoized, :inline_method, :any_home_directory_pathname, -> do
           s = any_home_directory_path and ::Pathname.new( s )
         end
-
-      def initialize _system_front
-        super() do end
-      end
     end
-  end
+
 end

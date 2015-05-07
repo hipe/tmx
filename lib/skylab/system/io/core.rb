@@ -1,4 +1,4 @@
-module Skylab::Headless
+module Skylab::System
 
   module IO
 
@@ -89,6 +89,8 @@ module Skylab::Headless
       end
     end
 
+    IO_ = self
+
     MAXLEN_ = 4096  # ( 2 ** 12), or the number of bytes in about 50 lines
 
     METHOD_I_A_ = [
@@ -102,6 +104,7 @@ module Skylab::Headless
       :write
     ].freeze
 
-    IO_ = self
+    NEWLINE_ = "\n"
+
   end
 end

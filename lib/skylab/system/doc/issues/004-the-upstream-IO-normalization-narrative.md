@@ -1,4 +1,4 @@
-# the CLI upstream resolution narrative :[#022]
+# the CLI upstream resolution narrative :[#004]
 
 
 ## synopsis
@@ -93,7 +93,7 @@ shifting this one arg off of it, it will open this filehandle (!!),
 get overwritten by that call!! :#open-filehandle-1
 
 this is an #experimental attempt to generalize this stuff, but is
-still premature in its current state, hence [#022] will be
+still premature in its current state, hence [#004] will be
 expected to be active for a while.
 
 at this time there exists in headless CLI code an empty stub method
@@ -115,7 +115,7 @@ we can say that for sure we would do different now than those years back:
 we would not now build so many features into the client).
 
 what we have lost is that now it is not hookable at all. so it was at this
-sentence that we jumped over to writing [#139] the perfect agent interaction
+sentence that we jumped over to writing [#hl-139] the perfect agent interaction
 model.
 
 so this would serve as a good prototyping ground for that.

@@ -2,7 +2,8 @@ module Skylab::TanMan
 
   class Services::Diff::Diff
 
-  public
+    def initialize _svx
+    end
 
     def diff file_path_before, file_path_after, opts=nil, error=nil, info=nil
       changeset = nil

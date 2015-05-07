@@ -1,19 +1,40 @@
-require_relative 'cache/test-support'
+require_relative '../../test-support'
 
-module Skylab::Headless::TestSupport::System::Services::Filesystem::Cache
+module Skylab::System::TestSupport
 
-  describe "[hl] system - services - filesystem - cache (manual)" do
+  module Svcs_FS_Cche___  # (modules are added to here during tests)
+
+    subject_front = -> do
+      System_.services.filesystem.cache
+    end
+
+    Subject__ = -> *a do
+
+      if a.length.zero?
+        subject_front[]
+      else
+        _p = subject_front[].cache_pathname_proc_via_module( * a )
+        a.first.define_singleton_method :cache_pathname, _p
+        nil
+      end
+    end
+
+    TMPDIR_PATH__ = ::Pathname.new ::File.join( TS_.tmpdir_path_, 'woo-wee' )
+
+    # <-
+
+  TS_.describe "[sy] - services - filesystem - cache (manual)" do
 
     extend TS_
 
     it "loads" do
-      subject
+      Subject__[]
     end
 
     it "won't apply to a toplevel module #scary-test" do
       _rx = %r(\bcan't operate on toplevel module - #{ ::Skylab.name }\b)
       -> do
-        Subject_[ ::Skylab ]
+        Subject__[ ::Skylab ]
       end.should raise_error ::ArgumentError, _rx
     end
 
@@ -22,7 +43,7 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem::Cache
       before :all do
 
         module Wiz_Waz
-          Subject_[ self ]
+          Subject__[ self ]
         end
       end
 
@@ -43,11 +64,11 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem::Cache
       before :all do
         module Wiff_Waff
           def self.cache_pathname
-            Woo_Wee_PATHNAME
+            TMPDIR_PATH__
           end
 
           module Weezy_Deezy
-            Subject_[ self, :abbrev, "zoipey/../doipey" ]
+            Subject__[ self, :abbrev, "zoipey/../doipey" ]
           end
         end
       end
@@ -66,11 +87,11 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem::Cache
       before :all do
         module Woo_Wee
           def self.cache_pathname
-            Woo_Wee_PATHNAME
+            TMPDIR_PATH__
           end
 
           module BarBaz
-            Subject_[ self ]
+            Subject__[ self ]
           end
         end
       end
@@ -90,7 +111,7 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem::Cache
         pn = tmpdir_pn
         pn.prepare
         pn_ = Woo_Wee::BarBaz.cache_pathname
-        pn_.to_path.should match %r([a-z]/woo-wee/bar-baz\z)
+        pn_.to_path.should match %r(\[sy\]/woo-wee/bar-baz\z)
         pn.should be_exist
       end
     end
@@ -100,11 +121,11 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem::Cache
       before :all do
         module Hiff_Heff
           def self.cache_pathname
-            Woo_Wee_PATHNAME
+            TMPDIR_PATH__
           end
 
           module Wip_Nizzle
-            Subject_[ self, :abbrev, 'zee_dee-doo-789' ]
+            Subject__[ self, :abbrev, 'zee_dee-doo-789' ]
           end
         end
       end
@@ -112,14 +133,14 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem::Cache
       it "ok" do
         tmpdir_pn.prepare
         pn = Hiff_Heff::Wip_Nizzle.cache_pathname
-        pn.to_path.match( %r([^/]/[^/]+/[^/]+\z) )[ 0 ].
-          should eql "e/woo-wee/zee_dee-doo-789"
+        pn.to_path.match( %r([^/]{4}/[^/]+/[^/]+\z) )[ 0 ].
+          should eql "[sy]/woo-wee/zee_dee-doo-789"
         pn.should be_exist
       end
     end
 
     def tmpdir_pathname_path
-      Woo_Wee_PATHNAME.to_path
+      TMPDIR_PATH__.to_path
     end
 
     def tmpdir_pn
@@ -127,11 +148,13 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem::Cache
     end
 
     def bld_tmpdir_pn
-      Headless_.system.filesystem.tmpdir(
+      services_.filesystem.tmpdir(
         :path, tmpdir_pathname_path,
         :be_verbose, do_debug,
         :debug_IO, debug_IO,
         :max_mkdirs, 6 )  # make the `hl` dir if necessary
     end
+  end
+# ->
   end
 end

@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby -w
+
+require_relative 'test-support'
+
+module Skylab::System
+
+  module TestSupport_Visual
+
+    Autoloader_[ self ]
+
+    lib = ::Skylab::TestSupport::CLI.visual_client
+
+    Client_ = lib::Client
+
+    Branch_ = lib::Branch
+
+  end
+end
+
+Skylab::TestSupport::CLI.visual_client.new(
+
+  $stdin, $stdout, $stderr, ::ARGV, Skylab::System
+
+).execute

@@ -1,17 +1,17 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Headless::TestSupport::System::Services
+module Skylab::System::TestSupport
 
-  describe "[hl] system services filesystem" do
+  describe "[sy] services - filesystem (stub)" do
 
     extend TS_
 
     it "loads" do
-      subject
+      __subject
     end
 
-    def subject
-      super.filesystem
+    def __subject
+      services_.filesystem
     end
   end
 end

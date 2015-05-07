@@ -1,10 +1,9 @@
 # (predecessor to this line was poster-child beautification candidate [#bs-011])
 
-module Skylab::Headless
+module Skylab::System
 
-  module System__
 
-    class Services__::Filesystem
+    class Services___::Filesystem
 
       class Tmpdir__ < ::Pathname
 
@@ -12,9 +11,9 @@ module Skylab::Headless
 
         # <- 2
 
-    include Headless_::Library_::FileUtils
+    include System_.lib_.file_utils
 
-    Headless_.lib_.entity self do
+    System_.lib_.entity self do
 
       o :iambic_writer_method_name_suffix, :'=',
 
@@ -52,9 +51,9 @@ module Skylab::Headless
         instance_exec( & p )
       end
 
-      @debug_IO ||= Headless_.system.IO.some_stderr_IO
+      @debug_IO ||= System_.services.IO.some_stderr_IO
       @max_mkdirs ||= 1
-      @path_x ||= Headless_.system.filesystem.tmpdir_path
+      @path_x ||= System_.services.filesystem.tmpdir_path
       super @path_x do end
       init_path_derivatives
       freeze
@@ -124,7 +123,7 @@ module Skylab::Headless
 
     def _patch * x_a
 
-      Headless_.system.patch(
+      System_.services.patch(
 
           :target_directory, to_path,
            :is_dry_run, @is_noop,
@@ -144,7 +143,7 @@ module Skylab::Headless
     end
 
     def ___expag
-      Headless_::Lib_::Bzn_[]::API.expression_agent_instance
+      services.lib_.brazen::API.expression_agent_instance
     end
 
   public
@@ -212,7 +211,7 @@ module Skylab::Headless
       self
     end
 
-    def prepare  # #note-130, keep eye on :+[#hl-022]:directory
+    def prepare  # #note-130, keep eye on :+[#sy-004]:directory
       if exist?
         prepare_when_exist
       else
@@ -250,7 +249,7 @@ module Skylab::Headless
 
       if Sanity_check_pathname__[ self ]
 
-        _path_ = Headless_::Library_::Shellwords.shellescape @path_s
+        _path_ = System_.lib_.shellwords.shellescape @path_s
 
         path_a = ::Dir[ "#{ _path_ }/{*,.?*}" ]  # include dotfiles and '..'
 
@@ -386,5 +385,4 @@ module Skylab::Headless
 
       end
     end
-  end
 end

@@ -1,8 +1,7 @@
-module Skylab::Headless
+module Skylab::System
 
-  module System__
 
-    class Services__::Filesystem
+    class Services___::Filesystem
 
       class Find__  # see [#171].
 
@@ -265,7 +264,7 @@ module Skylab::Headless
 
            :find_command_args, :find_command_args, nil, :ok, nil ) do | y, o |
 
-          sw = Headless_.lib_.shellwords
+          sw = System_.lib_.shellwords
 
           _ = o.find_command_args.map do | s |
             sw.shellescape s
@@ -376,7 +375,6 @@ module Skylab::Headless
         end
       end
     end
-  end
 end
 # :+#posterity :+#tombstone `collapse` was an early ancestor of the n11n pattern
 # :+#posterity :+#tombstone the find node that used to be in [st] deleted

@@ -1,8 +1,7 @@
-module Skylab::Headless
+module Skylab::System
 
-  module System__
 
-    class Services__::Filesystem
+    class Services___::Filesystem
 
       class Grep__  # see [#173]. this particular node models the command itself
 
@@ -73,7 +72,7 @@ module Skylab::Headless
         end
 
         def via_ruby_regexp_mixed_result
-          opts = Headless_.lib_.basic::Regexp.options_via_regexp @ruby_regexp
+          opts = System_.lib_.basic::Regexp.options_via_regexp @ruby_regexp
           xtra_i_a = nil
           if opts.is_multiline
             ( xtra_i_a ||= [] ).push :MULTILINE
@@ -110,7 +109,7 @@ module Skylab::Headless
 
         def get_busy
 
-          shellwords = Headless_.lib_.shellwords
+          shellwords = System_.lib_.shellwords
 
           y = [ 'grep', '-E' ]
           if @do_ignore_case
@@ -152,7 +151,7 @@ module Skylab::Headless
           thread = nil
 
           p = -> do
-            _, o, e, thread = Headless_::Library_::Open3.popen3 command_string
+            _, o, e, thread = System_.lib_.open3.popen3 command_string
             err_s = e.gets
             if err_s && err_s.length.nonzero?
               o.close
@@ -202,5 +201,4 @@ module Skylab::Headless
 
       end
     end
-  end
 end

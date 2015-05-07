@@ -1,53 +1,27 @@
-require_relative '../test-support'
+module Skylab::System::TestSupport
 
-module Skylab::Headless::TestSupport::System::Services::Filesystem
+  module Services::Filesystem::Tmpdir
 
-  ::Skylab::Headless::TestSupport::System::Services[ TS_ = self ]
+    class << self
 
-  include Constants
+      def [] tcm
+        tcm.include self
+      end
+    end  # >>
 
-  extend TestSupport_::Quickie
-
-  module ModuleMethods
-
-    def use sym
-
-      TS_.const_get(
-        Callback_::Name.via_variegated_symbol( sym ).as_const, false
-      )[ self ]
-
-      NIL_
-    end
-  end
-
-  module InstanceMethods
-    def subject
-      super.filesystem
-    end
-  end
-
-  # ~
-
-  module TestLib_
-
-    include Constants::TestLib_
-
-    File_utils = -> do
-      Headless_::Library_::FileUtils
+    def anchor_
+      services_.defaults.dev_tmpdir_pathname
     end
 
-    Tmpdir_pathname = -> do
-      Headless_.system.defaults.dev_tmpdir_pathname
+    def fu_
+      System_.lib_.file_utils
     end
-  end
 
-  My_Tmpdir_ = -> do
+    define_method :my_tmpdir_, -> do
 
-    o = nil  # :+#nasty_OCD_memoize (see similar in [sg])
+      o = nil  # :+#nasty_OCD_memoize (see similar in [sg])
 
-    -> tcm do
-
-      tcm.send :define_method, :my_tmpdir_ do
+      -> do
 
         if o
           if do_debug
@@ -59,22 +33,12 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem
           end
         else
           o = TestSupport_.tmpdir.new(
-            :path, TS_.tmpdir_pathname,
+            :path, TS_.tmpdir_path_,
             :be_verbose, do_debug,
             :debug_IO, debug_IO )
         end
         o
       end
-    end
-  end.call
-
-  # ~
-
-  Callback_ = Headless_::Callback_
-  Headless_ = Headless_
-  NIL_ = nil
-
-  module Constants
-    TestLib_ = TestLib_
+    end.call
   end
 end

@@ -1,4 +1,4 @@
-module Skylab::Headless
+module Skylab::System
 
   module IO
 
@@ -11,9 +11,9 @@ module Skylab::Headless
           # map reduce/expand upstream chunks of data into downstream lines
 
           def initialize p
-            @buffer = Headless_::Library_::StringIO.new
+            @buffer = System_.lib_.string_IO.new
             @p = p
-            @scn = Headless_::Library_::StringScanner.new EMPTY_S_
+            @scn = System_.lib_.string_scanner EMPTY_S_
             @separator = NEWLINE_
             @separator_rx = /#{ ::Regexp.escape @separator }/
           end

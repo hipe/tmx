@@ -1,8 +1,7 @@
-module Skylab::Headless
+module Skylab::System
 
-  module System__
 
-    class Services__::Filesystem
+    class Services___::Filesystem
 
       class Flock_first_available_path__  # :[#002].
 
@@ -23,7 +22,7 @@ module Skylab::Headless
         end
 
         def execute
-          p = Headless_.lib_.basic::String.succ.call_via_iambic @x_a
+          p = System_.lib_.basic::String.succ.call_via_iambic @x_a
           begin
             path = p[]
 
@@ -38,5 +37,4 @@ module Skylab::Headless
         end
       end
     end
-  end
 end

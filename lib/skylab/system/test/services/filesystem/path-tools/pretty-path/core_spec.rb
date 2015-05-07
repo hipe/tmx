@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../../../test-support'
 
 Skylab::TestSupport::Quickie.enable_kernel_describe
 
-describe "[hl] CLI path-tools pretty-path" do
+describe "[sy] - serivces - filesystem - path-tools pretty-path" do
 
-  extend Skylab::Headless::TestSupport::System::Services::Filesystem::Path_Tools::Pretty_Path
+  extend Skylab::System::TestSupport
+  use :services_filesystem_path_tools_pretty_path_test_support
 
   frame do
     home '/home/rms'

@@ -1,8 +1,8 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Headless::TestSupport::System::Services::Filesystem
+module Skylab::System::TestSupport
 
-  describe "[hl] system - services - filesystem - flock first avail[..]" do
+  describe "[sy] - services - filesystem - flock first avail[..]" do
 
     extend TS_
 
@@ -24,7 +24,7 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem
 
     def _init_tmppdir
 
-      fs = Headless_.system.filesystem
+      fs = services_.filesystem
 
       @td = fs.tmpdir(
         :path, fs.tmpdir_pathname.join( 'hl-flock-etc' ).to_path,
@@ -37,7 +37,7 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem
     end
 
     def _same
-      subject.call_with(
+      _subject.call_with(
         :first_item_does_not_use_number,
         :beginning_width, 2,
         :template, '{{ head }}{{ sep if ID }}{{ ID }}{{ ext }}',
@@ -52,8 +52,8 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem
       nil
     end
 
-    def subject
-      Headless_.system.filesystem.flock_first_available_path
+    def _subject
+      services_.filesystem.flock_first_available_path
     end
   end
 end

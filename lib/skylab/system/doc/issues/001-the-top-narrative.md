@@ -1,8 +1,8 @@
-# the system narrative :[#140]
+# the top narrative :[#001]
 
 ## :#section-1 introduction
 
-welcome to the headless system node. thie node provides system / environment
+welcome to the system sidesystem. thie node provides system / environment
 reflection and defaults access in a zero-configuration manner, e.g things
 like the pathname to a usable cache dir or temp dir, for whatever the
 particular system is that we are running on.
@@ -11,6 +11,9 @@ it does not have an especially robust or adaptable implementation yet, but
 it stands as façade for such a future; and to any extent that it works now
 and will work then, clients need be none the wiser.
 
+(historical note: this was extracted from [hl] and promoted into its own
+sidesystem. before it became a sidesystem, we had once said:)
+
 the whole premise of this node is dubious; but its implementation is so neato
 that it makes it worth it. at worst it puts tracking leashes on all of its
 uses throughout the system until we figure out what the 'Right Way' is.
@@ -18,29 +21,66 @@ uses throughout the system until we figure out what the 'Right Way' is.
 
 
 
-## :#note-40
+## justification and role (introduction to the "interaction idiom")
 
-when args are pased and the service isn't available we fail hard by
-raising an exception. this is an explanation of why.
+this is meant to replace what in more one-off type implementations is
+achieved through "backticks" calls (like `grep foo .`) AND EVEN the
+types calls commonly used to interact with the filesystem, like `open`
+etc.
 
-when args are passed and the service is available, it is shorthand for
-sending those args to the `call` method of the service. it is totally up
-to the service what the semantics are of the result value.
+this "interaction idiom" is intended to give *your* system "better"
+design in a "poka-yoke" manner, by forcing you to interact with "external
+services" though a controlled conduit as opposed to accessing such
+services through a language feature (backticks) or corelib (e.g Kernel)
+methods like `open`
 
-in cases where the service isn't available, if we were to result in e.g
-`false`, there would be no telling whether that value came from the service
-or came as a result of the service not being available. hence, in order
-to avoid a potentially catastrophic loss of meaning with the result
-value, in cases where args are passed and the service isn't available we
-must take more drastic measures than e.g merely resulting in false.
+yes, under our idiom, even the filesystem is modeled as an "external
+service", for what else is it but a storage and retrieval system that
+is very well suited for certain kinds of data?
 
-if there is any doubt whether the service will be available check first
-by accessing the service itself before using its `call` method.
+
+### the pro's
+
+  • it makes you think about what external dependencies your app is
+    incurring by making your code exhibit those dependencies explicitly
+    (through calls to `[sy].services.foo` etc). the hope is it makes
+    your project more portable to other environments and even platforms
+    by modularizing and compartmentalizing the system dependencies it
+    has.
+
+  • accessing system services through "system conduits" makes testing
+    easier, sometimes significantly so. (for example, covering whether
+    your system has a "/tmp" directory. the solutions of "not testing
+    for this at all" and "testing for this without mocking it" both
+    feel awful.)
+
+### the con's
+
+  • you have to buy-in to our dogma with your code. typically it doesn't
+    come at a huge cost in codesize.
 
 
 
 
 ## :#section-2 introduction to the front client
+
+the main utility (as in value) of this sidesystem is in its "services"
+interface object. each of its methods correspond to the services that
+are supposedly availble on this system. that is all. note how simple
+that is.
+
+   • this services interface object is effectively (and actually) a
+     singleton object. there are good arguments against singletons
+     in general: they are bad for testing and they are bad for system
+     design in general. however, we procede to use the singleton with
+     the justification that
+
+     * we have not yet come up with a better design. suggestions
+       welcome.
+
+     * this "interface object" is for accessing resources on "the
+       system". the interaction idioms that this facility replaces are
+       things like calling system calls with backticks,
 
 we implement the methods and services of the "system" through this private
 client class because given how bad singletons are for testing and for
@@ -48,6 +88,35 @@ sofware design in general, this will get our code from both sides used to
 the idea of accessing and delivering these values through some sort of
 agent, albeit one that perhaps now in its current form is not much
 different than a singleton.
+
+   • one day we would like a reflection API that lets clients check
+     first (or with a `fetch`-like method) whether a service has been
+     found to be available on the system. this interface object is not
+     that. its public method namespace is #cordoned-off, reserved
+     strictly for the names of available services.
+
+   • such a reflection API is not yet implemented, although we are
+     leaving room for it conceptually, in our minds. clients that call
+     services without checking if they are loaded do so at their own
+     cost with the possibility for an *undefined* exception being
+     raised in such cases.
+
+     whether to raise e.g NoMethodError or SystemCallError in such cases
+     is a design choice up to us, and should *not* be coded around by the
+     client! this will remain undefined. the right way to handle such
+     a case is for exaple to use
+
+         Top.service.fetch :grep
+
+     instead of the easier to read
+
+         Top.services.grep
+
+     IFF the client want to be more environmentally agnostic. again this
+     is not yet implemented, as it would be premature to implement this
+     yet, given the scope of the project at this phase.
+
+
 
 
 

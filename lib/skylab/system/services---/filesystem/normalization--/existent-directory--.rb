@@ -1,8 +1,7 @@
-module Skylab::Headless
+module Skylab::System
 
-  module System__
 
-    class Services__::Filesystem
+    class Services___::Filesystem
 
       class Normalization__
 
@@ -120,7 +119,7 @@ module Skylab::Headless
           end
 
           def work
-            Headless_.system.filesystem.file_utils_controller do |msg|
+            System_.services.filesystem.file_utils_controller do |msg|
               maybe_send_event :info, :file_utils_event do
                 Event_.wrap.file_utils_message msg
               end
@@ -248,7 +247,7 @@ module Skylab::Headless
           end
 
           def result
-            Headless_.lib_.basic.trio(
+            System_.lib_.basic.trio(
               ( if @is_dry_run
                 Mock_Dir__.new @path
               else
@@ -257,8 +256,9 @@ module Skylab::Headless
           end
 
           Mock_Dir__ = ::Struct.new :to_path
+
+          NILADIC_FALSEHOOD_ = -> { false }
         end
       end
     end
-  end
 end

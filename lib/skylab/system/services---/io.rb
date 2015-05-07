@@ -1,8 +1,10 @@
-module Skylab::Headless
+module Skylab::System
 
-  module System__
 
-    class Services__::IO
+    class Services___::IO
+
+      def initialize _services
+      end
 
       def some_two_IOs
         [ some_stdout_IO, some_stderr_IO ]
@@ -31,5 +33,4 @@ module Skylab::Headless
 
       end.call
     end
-  end
 end

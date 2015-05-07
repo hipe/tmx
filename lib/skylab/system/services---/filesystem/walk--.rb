@@ -1,8 +1,7 @@
-module Skylab::Headless
+module Skylab::System
 
-  module System__
 
-    class Services__::Filesystem
+    class Services___::Filesystem
 
       class Walk__  # :[#176] (was [#ts-019], then [#st-007]. was once tagged [#cu-003])
 
@@ -125,7 +124,7 @@ module Skylab::Headless
 
         def __found found_path, surrounding_path
 
-          _ok = Headless_.system.filesystem.normalization.upstream_IO(
+          _ok = System_.services.filesystem.normalization.upstream_IO(
               :only_apply_expectation_that_path_is_ftype_of, ( @ftype || FILE_FTYPE ),
               :path, found_path, & @on_event_selectively )
 
@@ -179,5 +178,4 @@ module Skylab::Headless
         Walk_ = self
       end
     end
-  end
 end

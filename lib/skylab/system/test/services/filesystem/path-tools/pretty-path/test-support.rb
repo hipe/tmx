@@ -1,12 +1,18 @@
-require_relative '../test-support'
+module Skylab::System::TestSupport
 
-module Skylab::Headless::TestSupport::System::Services::Filesystem::Path_Tools::Pretty_Path
+  module Services::Filesystem::Path_Tools::Pretty_Path::Test_Support
 
-  ::Skylab::Headless::TestSupport::System::Services::Filesystem::Path_Tools[ self ]
+    class << self
+      def [] tcm
+        tcm.extend ModuleMethods
 
-  include Constants
+        tcm.send :define_method, :__parent_subject, ( Callback_.memoize do
+          System_.services.filesystem.path_tools
+        end )
+      end
+    end  # >>
 
-  Headless_ = Headless_
+    # <-
 
   module ModuleMethods
 
@@ -31,14 +37,16 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem::Path_Tools::
 
     def exemplifying s, * a, & p
 
+      empty_p = -> {}  # `EMPTY_P`
+
       setup_frame_p = -> do
 
         _home_p = -> { home_x }
         _pwd_p = -> { pwd_x }
 
-        Headless_::System__::Services__::Filesystem::Path_Tools__::Clear__[ _home_p, _pwd_p ]
+        System_::Services___::Filesystem::Path_Tools__::Clear__[ _home_p, _pwd_p ]
 
-        setup_frame_p = Headless_::EMPTY_P_
+        setup_frame_p = empty_p
       end
 
       define_method :setup_frame do
@@ -60,7 +68,7 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem::Path_Tools::
       it "#{ input.inspect } #{ _verb_phrase_s }", * a do
 
         setup_frame
-        result_x = subject.pretty_path input
+        result_x = __parent_subject.pretty_path input
         result_x.should eql expected
       end
     end
@@ -71,15 +79,6 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem::Path_Tools::
     def pwd_x
     end
   end
-
-  module InstanceMethods
-
-    define_method :subject, -> do
-      subj = nil
-      -> do
-        subj ||= super()
-      end
-    end.call
-
+# ->
   end
 end

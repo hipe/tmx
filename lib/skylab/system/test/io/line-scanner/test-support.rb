@@ -1,16 +1,15 @@
-require_relative '../test-support'
+module Skylab::System::TestSupport
 
-module Skylab::Headless::TestSupport::IO::Line_Scanner
+  module IO::Line_Scanner::Test_Support
 
-  ::Skylab::Headless::TestSupport::IO[ TS_ = self ]
+    class << self
+      def [] tcm
+        tcm.extend ModuleMethods
+        tcm.include InstanceMethods
+      end
+    end  # >>
 
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  Headless_ = Headless_
-
-  TestSupport_ = TestSupport_
+    # <-
 
   module ModuleMethods
 
@@ -24,11 +23,11 @@ module Skylab::Headless::TestSupport::IO::Line_Scanner
   module InstanceMethods
 
     def subject_via_pathname pn, d=nil
-      Headless_.system.filesystem.line_stream_via_pathname pn, d
+      System_.services.filesystem.line_stream_via_pathname pn, d
     end
 
     def subject_via_filehandle fh, d
-      Headless_::IO.line_stream fh, d
+      System_::IO.line_stream fh, d
     end
 
     def resolve_some_pathname path_s, o_p
@@ -48,7 +47,7 @@ module Skylab::Headless::TestSupport::IO::Line_Scanner
 
     Resolve_some_tmpdir__ = -> do
       p = -> io do
-        x_a = [ :max_mkdirs, 3, :path, TS_.tmpdir_pathname ]
+        x_a = [ :max_mkdirs, 3, :path, TS_.tmpdir_path_ ]
         if io
           x_a.push :be_verbose, true, :infostream, io
         end
@@ -59,5 +58,8 @@ module Skylab::Headless::TestSupport::IO::Line_Scanner
       end
       -> io { p[ io ] }
     end.call
+  end
+
+# ->
   end
 end

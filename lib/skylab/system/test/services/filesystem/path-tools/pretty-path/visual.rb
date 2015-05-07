@@ -1,11 +1,9 @@
-require_relative '../../../../../../core'
-
-module Skylab::Headless
+module Skylab::System
 
   # try running this from various locations, both inside and outside of
   # your home dir
 
-  o = Headless_.system.filesystem.path_tools
+  o = System_.services.filesystem.path_tools
 
   pwd = ::Dir.getwd
 

@@ -1,19 +1,20 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../test-support'
+require_relative '../../../test-support'
 
-module Skylab::Headless::TestSupport::IO::Select
+module Skylab::System::TestSupport
 
   stderr = ::Skylab::TestSupport.debug_IO
 
-  from_dir = TS_.dir_pathname.join( 'visual' ).to_s
+  from_dir = TS_.dir_pathname.join( 'io/select/visual-' ).to_path
 
-  Headless_::Library_::FileUtils.cd from_dir, verbose: true do
+  System_.lib_.file_utils.cd from_dir, verbose: true do
 
-    select = Headless_::IO.select.new
+    select = System_::IO.select.new
     select.timeout_seconds = 0.3
 
-    Headless_::Library_::Open4.open4 'sh' do |pid, sin, sout, serr|
+    System_.lib_.open3.popen3 'sh' do |sin, sout, serr, t|
+
       sin.puts 'source tmp.sh'
       sin.close
 

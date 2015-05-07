@@ -1,11 +1,9 @@
-module Skylab::Headless
+module Skylab::System
 
-  module System__
 
-    class Services__::Filesystem  # :[#130].
+    class Services___::Filesystem  # :[#130].
 
-      def initialize system
-        @system = system
+      def initialize _svx
       end
 
       def cache
@@ -75,7 +73,7 @@ module Skylab::Headless
           end.mv src, dst, * h
         else
 
-          Headless_::Library_::FileUtils.mv src, dst, * h
+          System_.lib_.file_utils.mv src, dst, * h
         end
       end
 
@@ -122,11 +120,11 @@ module Skylab::Headless
       end
 
       def line_stream_via_path path, num_bytes=nil
-        Headless_::IO.line_stream ::File.open( path, ::File::RDONLY ), num_bytes
+        System_::IO.line_stream ::File.open( path, ::File::RDONLY ), num_bytes
       end
 
       def line_stream_via_pathname pn, num_bytes=nil
-        Headless_::IO.line_stream pn.open( ::File::RDONLY ), num_bytes
+        System_::IO.line_stream pn.open( ::File::RDONLY ), num_bytes
       end
 
       def members
@@ -159,7 +157,7 @@ module Skylab::Headless
       end
 
       def tmpdir_pathname
-        @tmpdir_pathname ||= ::Pathname.new Headless_::Library_::Tmpdir.tmpdir
+        @tmpdir_pathname ||= ::Pathname.new System_.lib_.tmpdir
       end
 
       def tmpfile_sessioner
@@ -178,20 +176,17 @@ module Skylab::Headless
         :Filesystem
       end
 
+      CONST_SEP_ = '::'
       DIRECTORY_FTYPE = 'directory'.freeze
-
       DOT_ = '.'.freeze
-
       DOT_DOT__ = '..'
-
       FILE_FTYPE = 'file'
-
       FILE_SEPARATOR_BYTE = ::File::SEPARATOR.getbyte 0
-
       Filesystem_ = self
-
+      IDENTITY_ = -> x { x }
       NIL_ = nil
+      PROCEDE_ = true
+      UNABLE_ = false
 
     end
-  end
 end

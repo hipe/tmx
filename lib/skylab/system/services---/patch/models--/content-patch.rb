@@ -1,10 +1,10 @@
-module Skylab::Headless
+module Skylab::System
 
-  module System__
+  class Services___::Patch
 
-    class Services__::Patch
+    class Models__::ContentPatch  # builds a patch progressively.
 
-      class Models__::ContentPatch  # builds a patch progressively.
+      # <-
 
     def initialize patch_content_x
       @chunks = []
@@ -62,7 +62,8 @@ module Skylab::Headless
     end
 
     def render_simple
-      io = Headless_::Library_::StringIO.new
+
+      io = System_.lib_.string_IO.new
       write_simple io
       io.rewind
       io.read
@@ -101,7 +102,7 @@ module Skylab::Headless
 
     end.call
 
-      end
+  # ->
     end
   end
 end

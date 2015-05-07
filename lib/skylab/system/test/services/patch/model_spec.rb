@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::Headless::TestSupport::System::Services
+module Skylab::System::TestSupport
 
-  describe "[hl] system services patch - model" do
+  describe "[sy] services - patch - model" do
 
     extend TS_
 
@@ -106,7 +106,7 @@ module Skylab::Headless::TestSupport::System::Services
     end
 
     def patch
-      subject.patch
+      services_.patch
     end
   end
 end

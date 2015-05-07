@@ -1,8 +1,7 @@
-module Skylab::Headless
+module Skylab::System
 
-  module System__
 
-    class Services__::Filesystem
+    class Services___::Filesystem
 
       class Hack_guess_module_tree__  # :[#107].
 
@@ -268,7 +267,7 @@ module Skylab::Headless
           nil
         end
 
-        Immu_Node__ = Headless_.lib_.tree_lib.immutable_node
+        Immu_Node__ = System_.lib_.basic::Tree.immutable_node
 
         def OK
           ACHIEVED_
@@ -304,5 +303,4 @@ module Skylab::Headless
         end
       end
     end
-  end
 end

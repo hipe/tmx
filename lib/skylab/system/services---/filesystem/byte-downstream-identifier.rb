@@ -1,6 +1,6 @@
-module Skylab::Headless
+module Skylab::System
 
-  class System__::Services__::Filesystem
+  class Services___::Filesystem
 
     class Byte_Downstream_Identifier
 
@@ -18,7 +18,7 @@ module Skylab::Headless
       end
 
       def description_under expag
-        Headless_.lib_.basic::Pathname.description_under_of_path expag, @path
+        System_.lib_.basic::Pathname.description_under_of_path expag, @path
       end
 
       def EN_preposition_lexeme

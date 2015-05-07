@@ -1,10 +1,8 @@
-module Skylab::Headless
+module Skylab::System
 
-  module System__
+  class Services___::Filesystem
 
-    class Services__::Filesystem
-
-      class File_Utils_Controller__  # :[#157] FileUtils reconceived as a..
+    class File_Utils_Controller__  # :[#157] FileUtils reconceived as a..
 
         # controller-like "agent" that is by default verbose whose output
         # is bound to the argument proc used in its construction. send the
@@ -17,7 +15,9 @@ module Skylab::Headless
         # objects of these side-effects by allowing them to focus the event
         # wiring into fileutils into one place.
 
-    include Headless_::Library_::FileUtils
+      # <-
+
+    include System_.lib_.file_utils
 
     def initialize * a, & p
       p and a.push p
@@ -39,8 +39,7 @@ module Skylab::Headless
     def fu_output_message msg
       @p[ msg ]
     end
-
-      end
+  # ->
     end
   end
 end

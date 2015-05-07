@@ -1,12 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Headless::TestSupport::System::Services::Filesystem
+module Skylab::System::TestSupport
 
-  describe "[hl] system - services - filesystem - hack guess module tree" do
-
-    TestLib_::Expect_event[ self ]
+  describe "[sy] - services - filesystem - hack guess module tree" do
 
     extend TS_
+    use :expect_event
 
     it "simple - OK" do
 
@@ -29,9 +28,9 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem
         end
       HERE
 
-      _lines = Headless_.lib_.string_lib.line_stream _whole_s
+      _lines = System_.lib_.basic::String.line_stream _whole_s
 
-      root = subject :line_upstream, _lines
+      root = __subject :line_upstream, _lines
 
       o = root
       o.child_count.should eql 1
@@ -54,8 +53,9 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem
 
     # (currently this gets more coverage in [#ts-015] doc-test)
 
-    def subject * x_a, & p
-      super().hack_guess_module_tree( * x_a, & p )
+    def __subject * x_a, & p
+
+      services_.filesystem.hack_guess_module_tree( * x_a, & p )
     end
   end
 end

@@ -1,6 +1,6 @@
-module Skylab::Headless
+module Skylab::System
 
-  class System__::Services__::Filesystem
+  class Services___::Filesystem
 
     class Byte_Upstream_Identifier  # [#011].
 
@@ -29,7 +29,7 @@ module Skylab::Headless
       end
 
       def description_under expr
-        Headless_.lib_.basic::Pathname.description_under_of_path expr, @path
+        System_.lib_.basic::Pathname.description_under_of_path expr, @path
       end
 
       def shape_symbol
@@ -66,7 +66,7 @@ module Skylab::Headless
 
         if block_given?  # experimental convenience exposure
 
-          Headless_.system.filesystem.normalization.upstream_IO @path, & oes_p
+          System_.services.filesystem.normalization.upstream_IO @path, & oes_p
         else
           ::File.open @path, ::File::RDONLY
         end

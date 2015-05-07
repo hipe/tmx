@@ -1,8 +1,7 @@
-module Skylab::Headless
+module Skylab::System
 
-  module System__
 
-    class Services__::Patch
+    class Services___::Patch
 
       # using the host system's `patch` utility (whatever it is (if any)),
       # apply a patch specified in a string or via a path to the specified
@@ -24,12 +23,19 @@ module Skylab::Headless
       # object; which is behavior perhaps not yet fully implemented.
       #
 
+      def initialize _svx
+      end
+
       def new patch_content_x
         Patch_::Models__::ContentPatch.new patch_content_x
       end
 
-      def call * x_a, & p
-        Curry__.call_via_iambic x_a, & p
+      def call_via_arglist x_a, & p
+        if x_a.length.nonzero? || p
+          Curry__.call_via_iambic x_a, & p
+        else
+          self
+        end
       end
 
       class Curry__
@@ -119,7 +125,7 @@ module Skylab::Headless
 
         def wait_process
 
-          i, o, e, w = Headless_::Library_::Open3.popen3 build_command_string
+          i, o, e, w = System_.lib_.open3.popen3 build_command_string
 
           if :via_patch_string == @patch_method
             i.write @patch_string
@@ -187,12 +193,11 @@ module Skylab::Headless
             cmd.push esc @target_file
           end
 
-
           cmd * SPACE_
         end
 
         def esc s
-          Headless_::Library_::Shellwords.shellescape s
+          System_.lib_.shellwords.shellescape s
         end
 
         Process_Line_ = Callback_::Event.message_class_factory.new :ok, nil do | line |
@@ -202,5 +207,4 @@ module Skylab::Headless
 
       Patch_ = self
     end
-  end
 end

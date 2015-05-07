@@ -1,12 +1,14 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Headless::TestSupport::System::Services::Filesystem
+module Skylab::System::TestSupport
 
-  describe "[hl] system - services - filesystem - find" do
+  describe "[sy] - services - filesystem - find" do
+
+    extend TS_
 
     it "minimal working example - find one file" do
 
-      args = parent_subject.find :path, TS_.dir_pathname.to_path,
+      args = _parent_subject.find :path, TS_.dir_pathname.to_path,
         :filename, 'find_spec.*',
         :as_normal_value, -> command do
           command.args
@@ -20,7 +22,7 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem
 
       ev = nil
 
-      _cmd_o = parent_subject.find(
+      _cmd_o = _parent_subject.find(
         :path, 'doozie',
         :filename, '&![]',
         :as_normal_value, -> cmd_o do
@@ -37,8 +39,8 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem
       ev.find_command_args.should eql _cmd_o.args
     end
 
-    def parent_subject
-      Headless_.system.filesystem
+    def _parent_subject
+      services_.filesystem
     end
   end
 end

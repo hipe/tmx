@@ -1,67 +1,87 @@
-module Skylab::Headless
+require_relative '..'
 
-  module System__  # read [#140] #section-1
+require_relative '../callback/core'
 
-    class Front  # read [#140] #section-2 introduction to the front client
+module Skylab::System
 
-      def initialize
-        @mod = System__::Services__
-        @svc_i_a = []
-        @svc_h = {}
+  # see [#001] #section-1 (introduction)
 
-        use_name = ::Hash.new { |h, k| k }
-        use_name[ :io ] = :IO  # hard-coded name changes meh
+  class << self
 
-        @mod.entry_tree.to_stream.each do | normpath |
-          name_i = use_name[ normpath.name.as_variegated_symbol ]
-          @svc_i_a.push name_i
-          define_singleton_method name_i, bld_reader_method_via_variegated_name_i( name_i )
-        end
-      end
+    def lib_
 
-      def members
-        @svc_i_a.dup
-      end
-
-    private
-
-      def bld_reader_method_via_variegated_name_i name_i
-
-        -> * x_a, & p do
-          front = @svc_h.fetch name_i do
-            @svc_h[ name_i ] = bld_any_service_by_variegated_name_i name_i
-          end
-          if x_a.length.nonzero? || p
-            if front
-              front.call( * x_a, & p )
-            else
-              raise ::SystemCallError, say_system_not_available( name_i )  # #note-40
-            end
-          else
-            front
-          end
-        end
-      end
-
-      def bld_any_service_by_variegated_name_i name_i
-        name = Callback_::Name.via_variegated_symbol name_i
-          # yes make a second name object, this one has the corrected name
-        cls = System__::Services__.const_get name.as_const, false
-        if cls.instance_method( :initialize ).arity.zero?
-          cls.new
-        else
-          cls.new self
-        end
-      end
-
-      def say_system_not_available name_i
-        "system not available - '#{ name_i }'"
-      end
+      @___lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+        self::Lib_, self )
     end
 
-    KEEP_PARSING_ = true
-    PROCEDE_ = true
-    UNABLE_ = false
+    def services
+      Services_front___[]
+    end
+  end  # >>
 
+  Callback_ = ::Skylab::Callback
+
+  Services_front___ = Callback_.memoize do  # #section-2 intro to the front
+
+    class Front___ < ::BasicObject
+
+      box_mod = Services___
+
+      box_mod.entry_tree.to_stream.each do | entry |
+
+        h = {}
+        name = entry.name
+        k = name.as_variegated_symbol
+
+        define_method name.as_variegated_symbol do
+          h.fetch k do
+            x = box_mod.const_get( name.as_const, false ).new self
+            h[ k ] = x
+            x
+          end
+        end
+      end
+
+      alias_method :IO, :io  # the isomorphicism in this direction is lossy
+
+      # ~ rather then globbing all calls or loading all nodes, do it manually:
+
+      alias_method :___patch, :patch
+
+      def patch * x_a, & x_p
+        ___patch.call_via_arglist x_a, & x_p
+      end
+
+      alias_method :___which, :which
+
+      def which s
+        ___which.call s
+      end
+
+      self
+    end.new
   end
+
+  Autoloader_ = Callback_::Autoloader
+
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
+  Autoloader_[ Services___ = ::Module.new, :boxxy ]
+
+  ACHIEVED_ = true
+
+  KEEP_PARSING_ = true
+
+  EMPTY_S_ = ''.freeze
+
+  NIL_ = nil
+
+  NILADIC_TRUTH_ = -> { true }
+
+  SPACE_ = ' '.freeze
+
+  System_ = self
+
 end
+
+# :#tombstone: failed to start service

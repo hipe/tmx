@@ -1,10 +1,12 @@
-require_relative 'line-scanner/test-support'
+require_relative '../test-support'
 
-module Skylab::Headless::TestSupport::IO::Line_Scanner
+module Skylab::System::TestSupport
 
-  describe "[hl] IO line scanner" do
+  describe "[sy] IO - line scanner" do
 
     extend TS_
+
+    use :IO_line_scanner_test_support
 
     context "normal case" do
 
@@ -94,8 +96,10 @@ module Skylab::Headless::TestSupport::IO::Line_Scanner
     end
 
     context "empty file" do
+
       with "empty-lsfr.txt" do |o|
       end
+
       it "hi" do
         scn = subject_via_pathname pathname
         scn.fh.closed?.should eql false

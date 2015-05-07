@@ -1,11 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Headless::TestSupport::System::Services::Filesystem
+module Skylab::System::TestSupport
 
-  describe "[hl] system - filesystem - tmpfile sessioner" do
+  describe "[sy] - filesystem - tmpfile sessioner" do
 
     extend TS_
-    use :my_tmpdir_
+    use :services_filesystem_tmpdir
 
     it "won't create more directories than it is allowed to" do
 
@@ -65,8 +65,8 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem
       sess = _common_setup_two
       2 == sess.__resolve_directory.length or fail
 
-      _exe_path = Headless_::TestSupport.dir_pathname.join( 'fixture-bin/omg' ).to_path
-      i, o, _e, t = Headless_::Library_::Open3.popen3 _exe_path
+      _exe_path = System_::TestSupport.dir_pathname.join( 'fixture-bin/omg' ).to_path
+      i, o, _e, t = System_.lib_.open3.popen3 _exe_path
 
       _tmpdir_path = sess.instance_variable_get :@_tmpdir_path
       _file_path = ::File.join _tmpdir_path, '0'
@@ -94,7 +94,7 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem
 
       o.tmpdir_path ::File.join( td.path, 'one/two' )
       o.create_at_most_N_directories 2
-      o.using_filesystem Headless_.system.filesystem
+      o.using_filesystem services_.filesystem
 
       o
     end
@@ -116,7 +116,7 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem
     end
 
     def _subject
-      Headless_::System__::Services__::Filesystem::Tmpfile_Sessioner___
+      System_::Services___::Filesystem::Tmpfile_Sessioner___
     end
   end
 end

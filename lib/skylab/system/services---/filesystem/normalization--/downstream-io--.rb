@@ -1,8 +1,7 @@
-module Skylab::Headless
+module Skylab::System
 
-  module System__
 
-    class Services__::Filesystem
+    class Services___::Filesystem
 
       class Normalization__
 
@@ -21,7 +20,7 @@ module Skylab::Headless
 
             def path=
               @do_execute = true
-              @path_arg = Headless_.lib_.basic.trio.
+              @path_arg = System_.lib_.basic.trio.
                 via_value_and_variegated_symbol iambic_property, :path
               KEEP_PARSING_
             end
@@ -144,7 +143,7 @@ module Skylab::Headless
           def __go
             snd_creating_event_for_file
             if @is_dry_run
-              @as_normal_value[ Headless_::IO.dry_stub_instance ]
+              @as_normal_value[ System_::IO.dry_stub_instance ]
             else
               via_hopefully_still_available_path_open_file
             end
@@ -193,7 +192,7 @@ module Skylab::Headless
             snd_updating_event_for_file
 
             if @is_dry_run
-              @as_normal_value[ Headless_::IO.dry_stub_instance ]
+              @as_normal_value[ System_::IO.dry_stub_instance ]
             else
               via_hopefully_still_occupied_path_open_file
             end
@@ -305,5 +304,4 @@ module Skylab::Headless
         end
       end
     end
-  end
 end

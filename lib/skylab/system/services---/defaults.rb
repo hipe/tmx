@@ -1,21 +1,21 @@
-module Skylab::Headless
+module Skylab::System
 
-  module System__
 
-    class Services__::Defaults  # read [#140] #section-3 - the introduction to the def..
+    class Services___::Defaults  # read [#140] #section-3 - the introduction to the def..
 
-      def initialize x
-        @system = x
+      def initialize svx
+
+        @__sytem_services = svx
       end
 
-      Headless_.lib_.properties_stack_frame self,
+      System_.lib_.properties_stack_frame self,
 
         :memoized, :inline_method, :bin_pathname, -> do
           top_of_the_universe_pathname.join 'bin'
         end,
 
         :memoized, :inline_method, :cache_pathname, -> do
-          pn = @system.filesystem.tmpdir_pathname.join CACHE_FILE__
+          pn = @__sytem_services.filesystem.tmpdir_pathname.join CACHE_FILE__
           pn.exist? or ::Dir.mkdir pn.to_s, 0766  # same perms as `TemporaryItems`
           pn
         end,
@@ -48,5 +48,4 @@ module Skylab::Headless
         CACHE_FILE__ = 'sl.skylab'.freeze  # covered
 
     end
-  end
 end

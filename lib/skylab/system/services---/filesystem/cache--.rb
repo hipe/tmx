@@ -1,8 +1,7 @@
-module Skylab::Headless
+module Skylab::System
 
-  module System__
 
-    class Services__::Filesystem
+    class Services___::Filesystem
 
       module Cache__
 
@@ -256,5 +255,4 @@ module Skylab::Headless
         end
       end
     end
-  end
 end
