@@ -21,8 +21,6 @@ module Skylab::MetaHell
       Basic[]::List
     end
 
-    HL__ = sidesys[ :Headless ]
-
     IT__ = sidesys[ :InformationTactics ]
 
     Meso_box_lib = -> do

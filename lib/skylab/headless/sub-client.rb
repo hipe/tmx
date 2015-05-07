@@ -127,7 +127,7 @@ end
                                   # that out of the box this is reflective
                                   # of anything that you think it is.  caution!
 
-    def escape_path x             # (this is the closing of [#031])
+    def escape_path x             # (this is the closing of (now) [#sy-005])
       request_client.send :escape_path, x
     end
 

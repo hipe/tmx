@@ -2,22 +2,34 @@ module Skylab::GitViz
 
   module Lib_  # :+[#ss-001]
 
-    memo, sidesys, stdlib = Autoloader_.at :memoize,
-      :build_require_sidesystem_proc, :build_require_stdlib_proc
+    sidesys, stdlib = Autoloader_.at(
+      :build_require_sidesystem_proc,
+      :build_require_stdlib_proc )
+
+    define_singleton_method :_memoize, Callback_::Memoize
 
     gem = stdlib
 
     wall = -> do
 
-      skylab_top = memo[ -> do require_relative '..'  end ]
+      skylab_top = _memoize do
+        require_relative '..'
+        NIL_
+      end
 
-      -> i do
-        memo[ -> do
-          /\Arbx\b/i =~ ::RUBY_ENGINE and raise "cannot load '#{ i }' in rbx!"
+      -> sym do
+
+        _memoize do
+
+          /\Arbx\b/i =~ ::RUBY_ENGINE and raise "cannot load '#{ sym }' in rbx!"
+
           skylab_top[]
-          require "skylab/#{ Callback_::Name.via_const( i ).as_slug }/core"
-          ::Skylab.const_get i, false
-        end ]
+
+          require "skylab/#{ Callback_::Name.via_const( sym ).as_slug }/core"
+
+          ::Skylab.const_get sym, false
+
+        end
       end
     end.call
 
@@ -35,13 +47,19 @@ module Skylab::GitViz
       HL__[]::CLI
     end
 
-    Date_time = memo[ -> do require 'date' ; ::DateTime end ]
+    Date_time = _memoize do
+      require 'date'
+      ::DateTime
+    end
 
     Formal_attribute_definer = -> mod do
       MH__[]::Formal::Attribute::Definer[ mod ] ; nil
     end
 
-    Grit = memo[ -> do require 'grit' ; ::Grit end ]
+    Grit = _memoize do
+      require 'grit'
+      ::Grit
+    end
 
     HL__ = sidesys[ :Headless ]
 
@@ -59,7 +77,10 @@ module Skylab::GitViz
 
     MH__ = wall[ :MetaHell ]
 
-    MD5 = memo[ -> do require 'digest/md5' ; ::Digest::MD5 end ]
+    MD5 = _memoize do
+      require 'digest/md5'
+      ::Digest::MD5
+    end
 
     NLP = -> do
       HL__[]::NLP
@@ -67,7 +88,10 @@ module Skylab::GitViz
 
     Open3 = stdlib[ :Open3 ]
 
-    Option_parser = memo[ -> do require 'optparse' ; ::OptionParser end ]
+    Option_parser = _memoize do
+      require 'optparse'
+      ::OptionParser
+    end
 
     oxford = Callback_::Oxford
 
@@ -93,11 +117,17 @@ module Skylab::GitViz
       MH__[].strange 120, x
     end
 
-    String_scanner = memo[ -> do require 'strscan' ; ::StringScanner end ]
+    String_scanner = _memoize do
+      require 'strscan'
+      ::StringScanner
+    end
+
 
     System = -> do
-      HL__[].system
+      System_lib__[].services
     end
+
+    System_lib__ = sidesys[ :System ]
 
     Test_support = wall[ :TestSupport ]
 

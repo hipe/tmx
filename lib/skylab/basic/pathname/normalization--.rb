@@ -4,7 +4,7 @@ module Skylab::Basic
 
       class Normalization__
 
-        # do not let this seep into the scope of [#hl-022]. do not use FS here
+        # do not let this seep into the scope of [#sy-004]. do not use FS here
 
         class << self
 

@@ -44,6 +44,7 @@ module Skylab::Basic
 
     module Constants
       Basic_ = Basic_
+      Callback_ = Basic_::Callback_
       TestLib_ = TestLib_
       TestSupport_ = TestSupport_
     end

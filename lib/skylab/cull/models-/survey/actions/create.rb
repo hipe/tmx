@@ -8,8 +8,8 @@ module Skylab::Cull
 
     class Actions::Ping < Action_
 
-      @name_function = Brazen_::Model.common_action_class.name_function_class.new(
-        self, Actions, :Ping )
+      @name_function = Brazen_::Model.common_action_class.
+        name_function_class.new_via( self, Actions, :Ping )
 
       def produce_result
 

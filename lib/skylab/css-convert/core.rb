@@ -20,14 +20,20 @@ module Skylab::CSS_Convert
     sidesys = Autoloader_.build_require_sidesystem_proc
 
     CLI_lib = -> do
-      HL__[]::CLI
+      HL___[]::CLI
     end
 
-    HL__ = sidesys[ :Headless ]
+    HL___ = sidesys[ :Headless ]
 
     Path_tools = -> do
-      HL__[].system.filesystem.path_tools
+      System[].filesystem.path_tools
     end
+
+    System = -> do
+      System_lib___[].services
+    end
+
+    System_lib___ = sidesys[ :System ]
 
     Treetop_tools = -> do
       TM__[]::Input_Adapters_::Treetop
@@ -73,7 +79,7 @@ module Skylab::CSS_Convert
     param :dump_directives_and_exit, boolean: true
     param :force_overwrite, boolean: true
     param :tmpdir_absolute, accessor: true,
-      default: Headless_.system.defaults.dev_tmpdir_pathname.join( 'css-cnvrt' )
+      default: LIB_.system.defaults.dev_tmpdir_pathname.join( 'css-cnvrt' )
   end
 
   module Core::Client

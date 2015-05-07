@@ -9,4 +9,7 @@ module Skylab::InformationTactics
   IDENTITY_ = -> x { x }
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
+  stowaway :Library_, 'lib-'
+
 end

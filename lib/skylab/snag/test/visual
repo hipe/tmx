@@ -20,12 +20,12 @@ module Skylab::Snag
       o
     end
 
-    def display_usage_
-      @stderr.puts "usage: #{ invocation_name_ }#{ usage_args_ }"
+    def display_usage
+      @stderr.puts "usage: #{ invocation_name_ }#{ usage_args }"
       NIL_
     end
 
-    def usage_args_
+    def usage_args
       ' <dir>'
     end
   end

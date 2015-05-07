@@ -138,7 +138,7 @@ module Skylab::Brazen
         nil
       end
       SPACE_GLYPH__ = '  '.freeze
-      CROOK_GLYPH__ = '└ '.freeze  # copy-pasted from [#hl-171]
+      CROOK_GLYPH__ = '└ '.freeze  # copy-pasted from [#sy-016]
 
       def display_description
       end

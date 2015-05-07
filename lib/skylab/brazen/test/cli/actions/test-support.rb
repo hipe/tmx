@@ -156,7 +156,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
     end
     File_utils_class = memoize[ -> do
       require 'fileutils'
-      class FU_Agent__  # re-write of similar [#hl-157]
+      class FU_Agent__  # re-write of similar [#sy-011]
         include ::FileUtils
         def initialize do_debug_proc, io
           @do_debug_p = do_debug_proc

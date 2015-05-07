@@ -39,7 +39,7 @@ module Skylab::Face  # read [#011] the top node narrative
 
   module Lib_
 
-    memo, sidesys = Autoloader_.at :memoize, :build_require_sidesystem_proc
+    sidesys = Autoloader_.build_require_sidesystem_proc
 
     Arity_space_create = -> p, p_ do
       HL__[]::Arity::Space.create p, & p_
@@ -149,9 +149,11 @@ module Skylab::Face  # read [#011] the top node narrative
       Bsc__[]::String
     end
 
-    System_IO = memo[ -> do
-      HL__[].system.IO
-    end ]
+    Sys___ = sidesys[ :System ]
+
+    System_IO = -> do
+      Sys___[].IO
+    end
 
     Touch_proc = -> do
       MH__[]::Module::Accessors::Touch

@@ -31,7 +31,7 @@ module Skylab::TestSupport
 
   module Lib_
 
-    memoize, sidesys = Autoloader_.at :memoize, :build_require_sidesystem_proc
+    sidesys = Autoloader_.build_require_sidesystem_proc
 
     API = -> do
       Face__[]::API
@@ -114,7 +114,7 @@ module Skylab::TestSupport
     end
 
     IO = -> do
-      HL__[]::IO
+      System_lib__[]::IO
     end
 
     IT__ = sidesys[ :InformationTactics ]
@@ -156,10 +156,10 @@ module Skylab::TestSupport
 
     Snag__ = sidesys[ :Snag ]
 
-    Skylab__ = memoize[ -> do
+    Skylab__ = Callback_.memoize do
       require_relative DOT_DOT_
       ::Skylab
-    end ]
+    end
 
     Stderr = -> { ::STDERR }
       # [#035]:the-reasons-to-access-system-resources-this-way
@@ -174,8 +174,10 @@ module Skylab::TestSupport
     end
 
     System = -> do
-      HL__[].system
+      System_lib__[].services
     end
+
+    System_lib__ = sidesys[ :System ]
 
     Tmpdir = -> do
       System[].filesystem.tmpdir

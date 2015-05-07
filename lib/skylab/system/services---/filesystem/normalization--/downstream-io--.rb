@@ -5,7 +5,7 @@ module Skylab::System
 
       class Normalization__
 
-        class Downstream_IO__ < self  # see [#022]:##write
+        class Downstream_IO__ < self  # near [#004]
 
           extend Common_Module_Methods_
 

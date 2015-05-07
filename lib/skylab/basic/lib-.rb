@@ -2,8 +2,9 @@ module Skylab::Basic
 
   module Lib_
 
-    memo, sidesys, stdlib = Autoloader_.at :memoize,
-      :build_require_sidesystem_proc, :build_require_stdlib_proc
+    sidesys, stdlib = Autoloader_.at(
+      :build_require_sidesystem_proc,
+      :build_require_stdlib_proc )
 
     Brazen = sidesys[ :Brazen ]
 
@@ -42,15 +43,11 @@ module Skylab::Basic
     HL__ = sidesys[ :Headless ]
 
     IO_lib = -> do
-      HL__[]::IO
+      System_lib__[]::IO
     end
 
     Ivars_with_procs_as_methods = -> * a do
       MH__[]::Ivars_with_Procs_as_Methods.call_via_arglist a
-    end
-
-    Memoize = -> x do
-      Callback_.memoize[ x ]
     end
 
     MH__ = sidesys[ :MetaHell ]
@@ -86,7 +83,7 @@ module Skylab::Basic
     Set__ = stdlib[ :Set ]
 
     Some_stderr_IO = -> do
-      HL__[]::System::IO.some_stderr_IO
+      System_lib__[]::IO.some_stderr_IO
     end
 
     Strange = -> x do
@@ -103,6 +100,12 @@ module Skylab::Basic
       StringScanner__[].new str
     end
 
-    StringScanner__ = memo[ -> do require 'strscan' ; ::StringScanner end ]
+    StringScanner__ = Callback_.memoize do
+      require 'strscan'
+      ::StringScanner
+    end
+
+    System_lib__ = sidesys[ :System ]
+
   end
 end

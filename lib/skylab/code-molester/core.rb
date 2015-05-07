@@ -30,7 +30,7 @@ module Skylab::CodeMolester
   DID_ = true
   EMPTY_A_ = [].freeze
   EMPTY_S_ = ''.freeze
-  stowaway :Lib_, 'library-'
+  stowaway :Library_, 'lib-'
   MONADIC_TRUTH_ = -> _ { true }
   NEWLINE_ = "\n".freeze
   NILADIC_EMPTINESS_ = -> { false }

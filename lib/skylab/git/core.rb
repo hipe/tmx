@@ -26,7 +26,7 @@ module Skylab::Git
 
   DASH_ = '-'.freeze
   Git_ = self
-  stowaway :Lib_, 'library-'
+  stowaway :Library_, 'lib-'
   UNDERSCORE_ = '_'.freeze
 
 end

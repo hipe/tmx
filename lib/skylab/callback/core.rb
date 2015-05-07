@@ -24,17 +24,7 @@ module Skylab::Callback
       @__lib ||= produce_library_shell_via_library_and_app_modules self::Lib_, self
     end
 
-    def memoize * a, & p
-      if a.length.zero?
-        if block_given?
-          Memoize_.call_( & p )
-        else
-          Memoize_
-        end
-      else
-        Memoize_.call_( & a.fetch( a.length - 1 << 1 ) )
-      end
-    end
+    # memoize defined below
 
     def produce_library_shell_via_library_and_app_modules lib_mod, app_mod
       Callback_::Librication__[ lib_mod, app_mod ]
@@ -589,9 +579,9 @@ module Skylab::Callback
     self
   end
 
-  Pair_ = Pair = ::Struct.new :value_x, :name_symbol do  # :[#055].
+  Pair_ = Pair = ::Struct.new :value_x, :name_x do  # :[#055].
 
-    alias_method :name_x, :name_symbol  # as you like it
+    alias_method :name_symbol, :name_x  # as you like it
 
     def new_with_value x
       self.class.new x, name_symbol
@@ -1140,18 +1130,23 @@ module Skylab::Callback
     end
 
     class File_Normpath_ < Normpath_
+
       def has_directory
         false
       end
+
       def some_dir_path
         some_dir_pathname.to_path
       end
+
       def some_dir_pathname
         @dir_pn ||= __build_dir_pathname
       end
+
       def __build_dir_pathname
         @parent_pn.join @file_entry.corename
       end
+
       SNGL_LTR = 'F'.freeze
     end
 
@@ -1223,33 +1218,50 @@ module Skylab::Callback
           @did_index_all = index_all
           @normpath_lookup_p[ i ]
         end
-        make_directory_listing_cache
+        __init_directory_listing_cache
       end
-    private
-      def make_directory_listing_cache
-        a = [] ; h = {}
-        foreach_entry_s do |entry_s|
+
+      def __init_directory_listing_cache
+
+        a = []
+        h = {}
+
+        __foreach_entry_s do |entry_s|
+
           DOT__ == entry_s.getbyte( 0 ) and next
+
           md = WHITE_DIR_ENTRY_RX__.match entry_s
           md or next
+
           _entry = if md[2]
             File_Entry_.new md[0], md[1]
           else
             Dir_Entry_.new md[0]
           end
+
           a << entry_s
+
           h[ entry_s ] = _entry
         end
+
         a.sort!  # #must-sort
-        @a = a.freeze ; @h = h.freeze ; nil
+
+        @a = a.freeze
+        @h = h.freeze
+        NIL_
       end
+
       DOT__ = '.'.getbyte 0
+
       EXTNAME_RXS_ = ::Regexp.escape EXTNAME_
+
       WHITE_DIR_ENTRY_RX__ = /\A([a-z][-_a-z0-9]*)(#{ EXTNAME_RXS_ })?\z/
 
-      def foreach_entry_s & p
+      def __foreach_entry_s & p
+
         ::Dir.foreach @dir_pn.to_path, &p
-      rescue ::Errno::ENOENT
+
+      rescue ::Errno::ENOENT, ::Errno::ENOTDIR
       end
     end
 
@@ -1665,7 +1677,7 @@ module Skylab::Callback
 
       def build_require_sidesystem_proc * i_a  # #open [#053]
         proc_or_call_or_map i_a do |x|
-          memoize do
+          Memoize.call do
             require_sidesystem x
           end
         end
@@ -1673,7 +1685,7 @@ module Skylab::Callback
 
       def build_require_stdlib_proc * i_a
         proc_or_call_or_map i_a do |x|
-          memoize do
+          Memoize.call do
             require_stdlib x
           end
         end
@@ -1696,10 +1708,6 @@ module Skylab::Callback
         self::Boxxy_::EACH_CONST_VALUE_METHOD_P
       end
 
-      def memoize *a, &p
-        Memoize_.call_via_arglist a, & p
-      end
-
       def names_method
         self::Boxxy_::NAMES_METHOD_P
       end
@@ -1713,13 +1721,12 @@ module Skylab::Callback
           end
         end
       end
-    private
+
       def without_warning
         prev = $VERBOSE ; $VERBOSE = nil
         r = yield  # 'ensure' is out of scope
         $VERBOSE = prev ; r
       end
-    public
 
       define_method :require_sidesystem, -> do
 
@@ -1793,25 +1800,35 @@ module Skylab::Callback
         s.downcase.intern
       end
 
-      def any_valid_via_const const_i
-        VALID_CONST_RX__ =~ const_i and
-          allocate_with :initialize_with_const_i, const_i
+      def any_valid_via_const const_sym
+
+        if VALID_CONST_RX__ =~ const_sym
+          _new_via :init_via_const_, const_sym
+        end
       end
 
-      def via_const const_i
-        VALID_CONST_RX__ =~ const_i or raise ::NameError, say_wrong( const_i )
-        allocate_with :initialize_with_const_i, const_i
+      def via_const const_sym
+
+        if VALID_CONST_RX__ =~ const_sym
+          _new_via :init_via_const_, const_sym
+        else
+          raise ::NameError, __say_wrong( const_sym )
+        end
+      end
+
+      def __say_wrong const_sym
+        "wrong constant name #{ const_sym }"
       end
 
       def via_human human_s
-        allocate_with :initialize_with_human, human_s
+        _new_via :__init_via_human, human_s
       end
 
       def via_module mod
         s = mod.name
         d = s.rindex CONST_SEP_
         d and s = s[ d + 2 .. -1 ]
-        allocate_with :initialize_with_const_i, s.intern
+        _new_via :init_via_const_, s.intern
       end
 
       def via_module_name_anchored_in_module_name s, s_
@@ -1820,48 +1837,46 @@ module Skylab::Callback
       end
 
       def via_slug s
-        allocate_with :initialize_with_slug, s
+        _new_via :__init_via_slug, s
       end
 
       def via_variegated_symbol i
-        allocate_with :initialize_with_variegated_symbol, i
+        _new_via :__init_via_variegated_symbol, i
+      end
+
+      def _new_via method_sym, x
+        new do
+          send method_sym, x
+        end
       end
 
       private :new
-    private
-      def say_wrong const_i
-        "wrong constant name #{ const_i }"
-      end
-      def allocate_with method_i, x
-        new = allocate
-        new.send method_i, x
-        new
-      end
     end  # >>
-  private
-    def initialize_with_const_i const_i
-      @as_const = const_i
-      @const_is_resolved = true
+
+    def initialize & edit_p
+      @const_is_resolved_ = false
+      instance_exec( & edit_p )
     end
-    def initialize_with_human human_s
+
+    def init_via_const_ const_i
+      @as_const = const_i
+      @const_is_resolved_ = true
+    end
+
+    def __init_via_human human_s
       @as_human = human_s.freeze
       @as_slug = human_s.gsub( SPACE__, DASH_ ).downcase.freeze
-      initialize
     end
-    def initialize_with_slug s
+
+    def __init_via_slug s
       @as_slug = s.freeze
-      initialize
     end
-    def initialize_with_variegated_symbol i
+
+    def __init_via_variegated_symbol i
       @as_variegated_symbol = i
       @as_slug = i.to_s.gsub( NORMALIZE_CONST_RX__, DASH_ ).
         gsub( UNDERSCORE_, DASH_ ).downcase.freeze
-      initialize
     end
-    def initialize
-      @const_is_resolved = false
-    end
-  public
 
     def express_into_under y, expag  # #hook-out [#br-023]
       name = self
@@ -1872,88 +1887,110 @@ module Skylab::Callback
     end
 
     def as_camelcase_const
-      @camelcase_const_is_resolved ||= resolve_camelcase_const
+      @___camelcase_const_is_resolved ||= __resolve_camelcase_const
       @camelcase_const
     end
+
+    $x = 0
+
     def as_const
-      @const_is_resolved || resolve_const
+      @const_is_resolved_ || __resolve_const
       @as_const
     end
+
     def as_distilled_stem
       @as_distilled_stem ||= Distill_[ as_const ]
     end
+
     def as_doc_slug
-      @as_doc_slug ||= build_doc_slug
+      @as_doc_slug ||= __build_doc_slug
     end
+
     def as_human
-      @as_human ||= build_human
+      @as_human ||= __build_human
     end
+
     def as_ivar
-      @as_ivar ||= bld_ivar
+      @as_ivar ||= __build_ivar
     end
+
     def as_lowercase_with_underscores_symbol
       @a_lwus ||= build_lwus
     end
+
     def as_parts
       @as_parts ||= as_variegated_string.split( UNDERSCORE_ ).freeze
     end
+
     def description  # for our minimal expression agent under event
       as_slug
     end
+
     def as_slug
-      @as_slug ||= build_slug
+      @as_slug ||= __build_slug
     end
+
     def as_trimmed_variegated_symbol
-      @as_trimmed_variegated_symbol ||= build_trimmed_variegated_symbol
+      @as_trimmed_variegated_symbol ||= __build_trimmed_variegated_symbol
     end
+
     def as_variegated_string
       @as_variegated_string ||= as_variegated_symbol.id2name.freeze
     end
+
     def as_variegated_symbol
-      @as_variegated_symbol ||= build_variegated_symbol
+      @as_variegated_symbol ||= __build_variegated_symbol
     end
-  private
-    def build_doc_slug
-      as_normalized_const.gsub( SLUGIFY_CONST_RX__, & :downcase ).
+
+    def __build_doc_slug
+      _as_normalized_const.gsub( SLUGIFY_CONST_RX__, & :downcase ).
         gsub( UNDERSCORE_, DASH_ ).freeze
     end
-    def build_human
+
+    def __build_human
       s = as_slug.dup
       s.gsub! TRAILING_DASHES_RX, EMPTY_S_
       s.gsub! DASH_, SPACE__
       s.freeze
     end
+
     def build_lwus
       as_slug.gsub( DASH_, UNDERSCORE_ ).downcase.intern
     end
-    def bld_ivar
+
+    def __build_ivar
       :"@#{ as_variegated_symbol }"
     end
-    def build_slug
-      as_normalized_const.gsub( UNDERSCORE_, DASH_ ).downcase.freeze
+
+    def __build_slug
+      _as_normalized_const.gsub( UNDERSCORE_, DASH_ ).downcase.freeze
     end
-    def build_variegated_symbol
+
+    def __build_variegated_symbol
       s = as_slug.dup
       s.gsub! DASH_, UNDERSCORE_
       s.intern
     end
-    def build_trimmed_variegated_symbol
+
+    def __build_trimmed_variegated_symbol
       s = as_slug.dup
       s.gsub! TRAILING_DASHES_RX, EMPTY_S_
       s.gsub! DASH_, UNDERSCORE_
       s.intern
     end
-    def as_normalized_const
+
+    def _as_normalized_const
       as_const.to_s.gsub NORMALIZE_CONST_RX__, UNDERSCORE_
     end
-    def resolve_camelcase_const
-      @camelcase_const_is_resolved = true
+
+    def __resolve_camelcase_const
       @camelcase_const = ( i = as_const and
         i.to_s.gsub( UNDERSCORE_, THE_EMPTY_STRING__ ).intern  )
       true
     end
-    def resolve_const
-      @const_is_resolved = true
+
+    def __resolve_const
+      @const_is_resolved_ = true
       @as_const = Constify_if_possible_[ as_variegated_symbol.to_s ]
     end
 
@@ -1994,32 +2031,18 @@ module Skylab::Callback
     end
   end.call
 
-  module Memoize_
-    class << self
-      def _call * a, & p
-        call_via_arglist a, & p
-      end
-      def call_via_arglist a, & p
-        if a.length.zero?
-          if block_given?
-            call_( & p )
-          else
-            self
-          end
-        else
-          call_( & a.fetch( a.length - 1 << 1 ) )
-        end
-      end
-      alias_method :[], :_call
-      alias_method :call, :_call
-      def call_ & p
-        p_ = -> do
-          x = p[] ; p_ = -> { x } ; x
-        end
-        -> { p_.call }
-      end
+  Memoize = -> & p do
+    p_ = -> do
+      x = p[]
+      p_ = -> { x }
+      x
+    end
+    -> do
+      p_[]
     end
   end
+
+  define_singleton_method :memoize, Memoize
 
   Module_path_value_via_parts = -> x_a do  # :+[#ba-034]
     x_a.reduce ::Object do |mod, x|

@@ -128,8 +128,10 @@ module Skylab::Snag
     end
 
     System = -> do
-      HL__[].system
+      System_lib___[].services
     end
+
+    System_lib___ = sidesys[ :System ]
 
     Tmpdir_pathname = -> do
       System[].filesystem.tmpdir_pathname

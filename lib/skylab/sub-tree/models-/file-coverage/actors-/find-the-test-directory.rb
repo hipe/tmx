@@ -11,7 +11,7 @@ module Skylab::SubTree
       # since we are using `find` anyway, we go ahead and add the critera
       # of ftype=directory, and use regex as a broader solution.
       #
-      # if ever this is needed elsewhere, push it up to [#hl-176]
+      # if ever this is needed elsewhere, push it up to [#sy-018]
 
       Callback_::Actor.call self, :properties,
 

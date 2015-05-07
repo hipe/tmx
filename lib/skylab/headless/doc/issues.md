@@ -1,23 +1,31 @@
-[#176]       #parent-node: [#130] walk.
+[#176] #hole ( #moved-to: [#sy-018] )
+             ( #was: #parent-node: [#130] walk. )
 [#175]       #parent-node: [#095] "naming conventions around events.."
 [#174]       #done waiting for [#cb-060] property parsing issue
-[#173]       #parent-node: [#14] the grep narrative ..
+[#173] #hole ( #moved-to: [#sy-017] )
+             ( #was: #parent-node: [#14] the grep narrative .. )
 [#172]       #parent-node: [#126]  [ CLI tree glyphs ]
-[#171]       #parent-node: [#140] the find narrative ..
-[#170] #open stateful IO dry stub so that `close` is better mocked
-[#169]       #doc-node [ IO mapppers tee ]
+[#171]       ( #moved-to: [#sy-016] )
+             ( #was: #parent-node: [#140] the find narrative .. )
+[#170] #hole ( #moved-to: [#sy-015] )
+             ( #was: #open stateful IO dry stub so that `close` is better mocked )
+[#169] #hole ( #moved-to: [#sy-014] )
+             ( #was: #doc-node [ IO mapppers tee ] )
 [#168]       #doc-node option scan ..
 [#167]       #parent-node: [#098] "name conventions for classes.."
 [#166]       #parent-node: [#098] "name conventions for non-class modules.."
 [#165] #open unify the new post-F-UN strategties
-[#164]       #parent-node: [#161] the IO line scannar narrative ..
+[#164] #hole ( #moved-to: [#sy-013] )
+             ( #was:  #parent-node: [#161] the IO line scannar narrative .. )
 [#163] #open merge ellipsify with [#ba-032]
 [#162]       #done re-write patch to be an actor; patch can be string or path
 [#161]       #doc-node the headless IO node
 [#160]       #parent-node: [#161] the tmpdir narrative ..
-[#159]       #node-identity: (e.g IO interceptors filter) #marker
+[#159] #hole ( #moved-to: [#sy-012] )
+             ( #was: #node-identity: (e.g IO interceptors filter) #marker )
 [#158]       what we did to get tall mixed stacks (`tall_spec`) to work
-[#157] #open #parent-node: [#161] the file utils agent should emit oes
+[#157] #hole ( #moved-to: [#sy-011] )
+             ( #was: #open #parent-node: [#161] the file utils agent should emit oes )
 [#156]       (reserved for a forthcoming entry about filenames)
 [#155]       (reserved for a forthcoming entry about const names)
 [#154]       #parent-node: [#095] the control flow method-naming idiomspace ..
@@ -34,7 +42,8 @@
 [#143]       #parent-node: [#064] "understanding the queue - the narrative ..
 [#142]       #stub #parent-node: [#135] the CLI argument syntax DSL ..
 [#141]       #parent-node: [#125] the real deal with expression agents #pen
-[#140]       #parent-node: [#125] the System narrative ..
+[#140] #hole ( #moved-to: [#sy-010] )
+             ( #was: #parent-node: [#125] the System narrative .. )
 [#139]       #doc-node the perfect agent interaction model ..
 [#138]       #parent-node: [#125] the Action narrative ..
 [#137]       #parent-node: [#126] the CLI box narrative ..
@@ -44,14 +53,16 @@
 [#133]       #parent-node: [#125] headless testing conventions ..
 [#132]       #in-situ the magical, multipurpose Event base class and variants
 [#131]       #parent-node: [#125] the notificate narrative ..
-[#130]       #parent-node: [#140]  [ filesystem ]
+[#130]       ( #moved-to: [#sy-009] )
+             ( #was: #parent-node: [#140]  [ filesystem ] )
              ( #re-purposed:thrice. moved to [#cb-058]
                was: #parent-node: [#017] our own hand-rolled parameter library
                #parent-in-universe: [#mh-053] )
              (#re-purposed: once. before above, became [#su-001] then
                dissolved to `Lib_`)
 [#129]       #parent-node: [#126] headless CLI client DSL narrative
-[#128]       #in-situ (?) hard-coded in-project tmpdir path!
+[#128] #hole ( #moved-to: [#sy-008] )
+             ( #was: #in-situ (?) hard-coded in-project tmpdir path! )
 [#126]       #parent-node: [#125] headless CLI component & theory narratives ..
 [#125]       #doc-point headless component, facet, & theory narratives
              (see also [#br-063] emergent interfaces through isomorphicism)
@@ -74,7 +85,8 @@
 [#109]       #parent-node: [#050] "noise.."
 [#108]       #parent-node: [#093] on structural isomorphicisms to the
               natural language syntactic structures ..
-[#107]       #parent-node: [#130] hack guess module tree (docs #in-situ)
+[#107] #hole ( #moved-to: [#sy-007] )
+             ( #was: #parent-node: [#130] hack guess module tree (docs #in-situ) )
 [#106]       #parent-node: [#050] idioms grow from ubiquity ..
 [#105]       #parent-node: [#093] "the rule of business object variable.."
 [#104]       #parent-node: [#093] "list of variable name patterns.."
@@ -146,7 +158,8 @@
 [#050]       #doc-point name conventions!
 [#049]       #later formal parameters deep audit and refactor, [#009]
              [#049.1] - set becomes box
-[#048]       #tracking-tag for select / Select in this library
+[#048]       ( #moved-to: [#sy-006] )
+             ( #was: #tracking-tag for select / Select in this library )
 [#047]       #tracking-tag for cool short algos that illustrate simple things
              well - i mean this is a placeholder for [#sl-116] that one thing
 [#046]       #tracking-tag for CLI facilities that facilitate rendering trees
@@ -166,7 +179,8 @@
               `normalized_invocation_string`
 [#033]       #function-point #tracking-tag #node-tracker `desc` (and docs)
 [#032]       #done #low-priority do we care about our call-stack height for CLI?
-[#031] #open new path-tools will move here and clobber old
+[#031] #hole ( #moved-to: [#sy-005] )
+             ( #was: #open new path-tools will move here and clobber old )
              (formerly: #parent-node: [#xxx] the path-tools narrative)
              (formerly: #done a petition to get escape_path pushed up here)
 [#030]       #done the raw dog experiment
@@ -181,7 +195,8 @@
 [#024]       #tracking-tag we only parse options at beginning in case we
              have sub-actions, but maybe we could improve this for leaf nodes
 [#023]       #parent-node: [#sl-123] support for exit statuses might get silly
-[#022]       #watch #pattern #tracking-tag of resolving upstream logic (dry?)
+[#022] #hole ( #moved-to: [#sy-004] )
+             #watch #pattern #tracking-tag of resolving upstream logic (dry?)
                (this is now a blanket tracker of file-services-related dryables)
 [#021]       #feature #deferred #CLI - be sure to provide a (flatten) --tree
                option when looking at a branch help screen!
@@ -197,7 +212,8 @@
 [#014]       yacc2treetop
 [#013]       (#repurposed:once) the core node narrative ..
 [#012] #open redesign this `with_client` nonsense
-[#011]       [ the filesystem byte upstream identifier ]
+[#011] #hole ( #moved-to: [#sy-003] )
+             [ the filesystem byte upstream identifier ]
              ( #was: #done regrettify all tests in this subproduct )
 [#010]       #repurposed:once the client tree model ..
 [#009]       #tracking-tag places where HL::Parameters show signs of strain; also general tracking of the node
@@ -210,7 +226,7 @@
 [#004]       #doc-point the deprecation and rebirth of the sub-client pattern ..
 [#003]       [ CLI option ]
              ( #was; #done #refactor: use en.rb in sub-client )
-[#002]       [ flock etc ]
+[#002] #hole ( #moved-to: [#sy-002]  [ flock etc ] )
              ( was: #done 2012-08-29 #refactor : interceptors under one roof )
 [#001] #open 2012-08-18 #feature : term2html (and architecture)
 [#sl-100] 2012-06-08 #open integrate porcelain and face and bleeding et. al

@@ -77,7 +77,7 @@ module Skylab::Brazen::TestSupport
 
   module TestLib_
 
-    memoize = Brazen_::Callback_.memoize
+    memoize = Brazen_::Callback_::Memoize
 
     Expect_event = -> test_context_cls do
       Callback_.test_support::Expect_Event[ test_context_cls ]

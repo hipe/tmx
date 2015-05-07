@@ -161,7 +161,7 @@ module Skylab::Brazen
           parent = mod
           break
         end
-        name_function_class.new self, parent, i
+        name_function_class.new_via self, parent, i
       end
 
       def some_name_stop_index
@@ -182,13 +182,23 @@ module Skylab::Brazen
     end
 
     class Name_Function__ < Callback_::Name
+
       class << self
-        public :new
-      end
-      def initialize _mod, parent, const_i
+
+        def new_via mod, parent, const
+
+          new do
+            init_via_three_ mod, parent, const
+          end
+        end
+      end  # >>
+
+      def init_via_three_ _mod, parent, const
+
         @parent = parent
-        initialize_with_const_i const_i
+        init_via_const_ const
       end
+
       attr_reader :parent
     end
 
@@ -197,9 +207,11 @@ module Skylab::Brazen
 
   module Lib_
 
-    memoize = Callback_.memoize
+    sidesys, stdlib = Autoloader_.at(
+      :build_require_sidesystem_proc,
+      :build_require_stdlib_proc )
 
-    sidesys = Autoloader_.build_require_sidesystem_proc
+    define_singleton_method :_memoize, Callback_::Memoize
 
     Basic = sidesys[ :Basic ]
 
@@ -209,11 +221,11 @@ module Skylab::Brazen
 
     HL__ = sidesys[ :Headless ]
 
-    IO = -> do
-      HL__[]::IO
+    IO_lib = -> do
+      System_lib__[]::IO
     end
 
-    JSON = memoize[ -> { require 'json' ; ::JSON  } ]
+    JSON = stdlib[ :JSON ]
 
     Module_lib = -> do
       Basic[]::Module
@@ -227,7 +239,10 @@ module Skylab::Brazen
       Brazen_.event::N_Lines
     end
 
-    Net_HTTP = memoize[ -> { require 'net/http' ; ::Net::HTTP } ]
+    Net_HTTP = _memoize do
+      require 'net/http'
+      ::Net::HTTP
+    end
 
     NLP = -> do
       HL__[]::NLP
@@ -237,10 +252,7 @@ module Skylab::Brazen
       HL__[]::CLI
     end
 
-    Open3 = Callback_.memoize do
-      require 'open3'
-      ::Open3
-    end
+    Open3 = stdlib[ :Open3 ]
 
     Proxy_lib = -> do
       Callback_::Proxy
@@ -252,19 +264,18 @@ module Skylab::Brazen
       Autoloader_.require_sidesystem( :MetaHell ).strange x
     end
 
-    String_IO = -> do
-      require 'stringio'
-      ::StringIO
-    end
+    String_IO = stdlib[ :StringIO ]
 
-    String_scanner = memoize[ -> do
+    String_scanner = _memoize do
       require 'strscan'
       ::StringScanner
-    end ]
+    end
 
     System = -> do
-      HL__[].system
+      System_lib__[].services
     end
+
+    System_lib__ = sidesys[ :System ]
 
     Trio = -> do
       Basic[].trio

@@ -16,12 +16,13 @@ module Skylab::Permute
 
   module Lib_
 
-    memo, sidesys, req = Autoloader_.at :memoize,
-      :build_require_sidesystem_proc, :require_sidesystem
+    sidesys, req = Autoloader_.at(
+      :build_require_sidesystem_proc,
+      :require_sidesystem )
 
-    Bleeding__ = memo[ -> do
+    Bleeding__ = Callback_.memoize do
       req[ :Porcelain ]::Bleeding
-    end ]
+    end
 
     CLI_Action = -> do
       Bleeding__[]::Action

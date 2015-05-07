@@ -798,7 +798,8 @@ module Skylab::Brazen
 
     class Model_Name_Function_ < Brazen_.name_library.name_function_class
 
-      def initialize cls, parent, const_i
+      def init_via_three_ cls, parent, const_i
+
         @cls = cls
         super
       end

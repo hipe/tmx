@@ -788,7 +788,7 @@ module Skylab::Headless
         PROCEDE__ = nil
       end
 
-      class Plugin_Conduit_  # see [#031]:#understanding-plugin-shells
+      class Plugin_Conduit_  # see [#sy-005]:#understanding-plugin-shells
         def initialize y, real
           @up_p = -> { real }
           @stderr_line_yielder = y

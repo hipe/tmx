@@ -8,6 +8,8 @@ module Skylab::Basic::TestSupport::Digraph::Core
 
   extend TestSupport_::Quickie
 
+  Callback_ = Callback_
+
   describe "[ba] digraph" do
 
     it "here have an empty one" do
@@ -143,24 +145,87 @@ module Skylab::Basic::TestSupport::Digraph::Core
 
     context "THE DIFFERENCE ENGINE" do
 
-      memoize = Basic_::Lib_::Memoize
+      context "(you can distill graphs down to a flat list of associations)" do
 
-      define_singleton_method :digraph do |meth, arr|
-        define_method meth, & memoize[ -> do
+        it "zero" do
+
+          _describe( :zero ).should eql '# (empty)'
+        end
+
+        it "one" do
+
+          _describe( :one ).should eql 'one'
+        end
+
+        it "b_a" do
+
+          _describe( :b_a ).should eql 'b->a'
+        end
+
+        it "f_m_l" do
+
+          _describe( :f_m_l ).should eql <<-O.unindent.chop
+            f->a
+            l->a
+            m->l
+            p->l
+          O
+        end
+
+        it "orph" do
+
+          _describe( :orph ).should eql "c\nb->a"
+        end
+
+        def _describe sym
+
+          send( sym ).describe_digraph
+        end
+      end
+
+      context "you can invert a graph" do
+
+        it "zero" do
+
+          _invert( :zero ).should eql '# (empty)'
+        end
+
+        it "one" do
+
+          _invert( :one ).should eql 'one'
+        end
+
+        it "b_a" do
+
+          _invert( :b_a ).should eql 'a->b'
+        end
+
+        it "f_m_l" do
+
+          _invert( :f_m_l ).should eql <<-O.unindent.chop
+            a->f
+            a->l
+            l->m
+            l->p
+          O
+        end
+
+        it "orph" do
+          _invert( :orph ).should eql "c\na->b"
+        end
+
+        def _invert sym
+
+          send( sym ).invert.describe_digraph
+        end
+      end
+
+      define_singleton_method :digraph do | meth, arr |
+
+        define_method meth, ( Callback_.memoize do
+
           Basic_::Digraph[ * arr ]
-        end ]
-      end
-
-      def self.describe_as from, exp, *tags
-        it "#{ from }", *tags do
-          send( from ).describe_digraph.should eql exp
-        end
-      end
-
-      def self.invert_as from, exp, *tags
-        it "#{ from }", *tags do
-          send( from ).invert.describe_digraph.should eql exp
-        end
+        end )
       end
 
       digraph :zero,  []
@@ -168,35 +233,6 @@ module Skylab::Basic::TestSupport::Digraph::Core
       digraph :b_a,   [ b: :a ]
       digraph :f_m_l, [ f: :a, l: :a, m: :l, p: :l ]
       digraph :orph,  [ :c, b: :a ]
-
-      context "(you can distill graphs down to a flat list of associations)" do
-        describe_as :zero, '# (empty)'
-        describe_as :one,  'one'
-        describe_as :b_a,  'b->a'
-        exp = <<-O.unindent.chop
-          f->a
-          l->a
-          m->l
-          p->l
-        O
-        describe_as :f_m_l, exp
-        describe_as :orph, "c\nb->a"
-      end
-
-      context "you can invert a graph" do
-        invert_as :zero, '# (empty)'
-        invert_as :one,  'one'
-        invert_as :b_a,  'a->b'
-        exp = <<-O.unindent.chop
-          a->f
-          a->l
-          l->m
-          l->p
-        O
-        invert_as :f_m_l, exp
-        invert_as :orph, "c\na->b"
-      end
-
       digraph :real,  [row: :text, info: :text, empty: :info, row_count: :data ]
 
       # cb-digraph-viz headless/core.rb Skylab::H-eadless::CLI::Table::Shell --ope

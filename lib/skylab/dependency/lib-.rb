@@ -5,7 +5,7 @@ module Skylab::Dependency
     sidesys = Autoloader_.build_require_sidesystem_proc
 
     CLI_lib = -> do
-      HL__[]::CLI
+      HL___[]::CLI
     end
 
     CodeMolester__ = sidesys[ :CodeMolester ]
@@ -13,10 +13,10 @@ module Skylab::Dependency
     Face__ = sidesys[ :Face ]
 
     Home_dir_pn = -> do
-      System__[].environment.any_home_directory_pathname
+      System_lib___[].services.environment.any_home_directory_pathname
     end
 
-    HL__ = sidesys[ :Headless ]
+    HL___ = sidesys[ :Headless ]
 
     MH__ = sidesys[ :MetaHell ]
 
@@ -29,7 +29,7 @@ module Skylab::Dependency
     end
 
     Path_tools = -> do
-      HL__[].system.filesystem.path_tools
+      System[].filesystem.path_tools
     end
 
     Proxy = -> do
@@ -43,8 +43,10 @@ module Skylab::Dependency
     Slake = sidesys[ :Slake ]
 
     System = -> do
-      HL__[].system
+      System_lib___[].services
     end
+
+    System_lib___ = sidesys[ :System ]
   end
 
   module Library_  # :+[#su-001]

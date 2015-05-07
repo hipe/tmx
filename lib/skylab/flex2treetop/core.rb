@@ -384,7 +384,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
     HL__ = sidesys[ :Headless ]
 
     IO = -> do
-      HL__[]::IO
+      System[]::IO
     end
 
     Option_parser = -> { require 'optparse' ; ::OptionParser }
@@ -409,8 +409,10 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
     String_scanner = -> { require 'strscan' ; ::StringScanner }
 
     System = -> do
-      HL__[].system
+      System_lib___[].services
     end
+
+    System_lib___ = sidesys[ :System ]
 
     Treetop = vendor[ :Treetop ]
   end
@@ -452,7 +454,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
   Deferred_actor__ = -> p do  # #storypoint-415
 
-    cls_p = Callback_.memoize p
+    cls_p = Callback_::Memoize[ & p ]
 
     -> * x_a, & oes_p do
 

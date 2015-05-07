@@ -27,7 +27,9 @@ module Skylab::CodeMolester
 
   module Lib_
 
-    memo, sidesys = Autoloader_.at :memoize, :build_require_sidesystem_proc
+    sidesys = Autoloader_.build_require_sidesystem_proc
+
+    define_singleton_method :_memoize, Callback_::Memoize
 
     Bsc__ = sidesys[ :Basic ]
 
@@ -35,14 +37,14 @@ module Skylab::CodeMolester
 
     Brazen = sidesys[ :Brazen ]
 
-    Cache_pathname = memo[ -> do
+    Cache_pathname = _memoize do
       module CM_::Cache
         _p = Cache_pathname_lib[].cache_pathname_proc_via_module(
           self, :abbrev, 'cm' )
         define_singleton_method :pathname, _p
         self
       end.pathname
-    end ]
+    end
 
     Cache_pathname_base = -> do
       System[].defaults.cache_pathname
@@ -143,12 +145,14 @@ module Skylab::CodeMolester
     end
 
     System = -> do
-      HL__[].system
+      System_lib__[].services
     end
 
-    System_default_tmpdir_pathname = memo[ -> do
+    System_lib__ = sidesys[ :System ]
+
+    System_default_tmpdir_pathname = _memoize do
       System[].filesystem.tmpdir_pathname.join 'co-mo'
-    end ]
+    end
 
     INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(
       self, CM_ )

@@ -2,7 +2,7 @@
 
 ## `write` is very evented :[#006]
 
-(historical note, this was the original inspiration-point for [#hl-022].)
+(historical note, this was the original inspiration-point for [#sy-004].)
 
 `write` - because so many different interesting things can happen when we
 set out to write a file, we have a custom emitter class that models this

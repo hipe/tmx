@@ -377,7 +377,7 @@ module Skylab::Brazen
           COMMON_SETUP_[ _PROP ]
 
           _MONADIC_P_ = if _PROP.is_memoized
-            Callback_.memoize _PROP.literal_proc
+            Callback_.memoize( & _PROP.literal_proc )
           else
             _PROP.literal_proc
           end

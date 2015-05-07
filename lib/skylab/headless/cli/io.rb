@@ -11,19 +11,23 @@ module Skylab::Headless
       end
 
       def some_instream_IO
-        Headless_.system.IO.some_stdin_IO
+        _IO.some_stdin_IO
       end
 
       def some_outstream_IO
-        Headless_.system.IO.some_stdout_IO
+        _IO.some_stdout_IO
       end
 
       def some_errstream_IO
-        Headless_.system.IO.some_stderr_IO
+        _IO.some_stderr_IO
       end
 
       def three_streams
-        Headless_.system.IO.some_three_streams
+        _IO.some_three_streams
+      end
+
+      def _IO
+        Headless_.lib_.system.IO
       end
 
       self

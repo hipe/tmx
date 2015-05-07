@@ -18,7 +18,7 @@ module Skylab::SubTree
 
   module Lib_
 
-    _memo, sidesys = Autoloader_.at :memoize, :build_require_sidesystem_proc
+    sidesys = Autoloader_.build_require_sidesystem_proc
 
     Basic = sidesys[ :Basic ]
 
@@ -53,8 +53,10 @@ module Skylab::SubTree
     end
 
     System = -> do
-      HL__[].system
+      System_lib___[].services
     end
+
+    System_lib___ = sidesys[ :System ]
 
     Test_file_suffix_a = -> do
       [ TS___[].spec_rb ]

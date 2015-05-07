@@ -98,7 +98,11 @@ module Skylab::Snag
 
         def _produce_one_model_reflection_by in_st, oes_p, & rfx_p
 
-          _f = Snag_.lib_.parse_lib.function( :item_from_matrix ).new do
+          _f = Snag_.lib_.parse_lib.function(
+
+            :item_from_matrix
+
+          ).new_via_item_stream_proc do
 
             _to_model_reflection_stream( & rfx_p )
           end

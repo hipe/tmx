@@ -31,8 +31,10 @@ module Skylab::Dependency::TestSupport
     MH__ = sidesys[ :MetaHell ]
 
     System = -> do
-      HL__[].system
+      System_lib___[].services
     end
+
+    System_lib___ = sidesys[ :System ]
 
     Tmpdir_path = -> do
       System[].filesystem.tmpdir_path

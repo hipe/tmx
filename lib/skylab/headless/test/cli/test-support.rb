@@ -164,7 +164,8 @@ module Skylab::Headless::TestSupport::CLI
       a_few_more.should be_include number_of_reamaining_stderr_lines
     end
 
-    define_method :a_few_more,Headless_::Library_::Memoize[ -> { 1..2 } ]
+    define_method :a_few_more,
+      Headless_::Library_::Memoize[ -> { 1..2 } ]
 
     def number_of_reamaining_stderr_lines
       serr_a.length

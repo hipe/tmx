@@ -37,7 +37,7 @@ module Skylab::CSS_Convert
 
     end
 
-    DIR_N11N__ = Headless_.system.filesystem.normalization.
+    DIR_N11N__ = LIB_.system.filesystem.normalization.
       existent_directory :create_if_not_exist, :max_mkdirs, 1
 
     def entity_noun_stem

@@ -218,7 +218,7 @@ module Skylab::CodeMolester
       end
     end
 
-    class Read__  # experimental interface "shell" for [#hl-022]:read
+    class Read__  # experimental interface "shell" for [#sy-004]:read
       def initialize
         @error, @invalid, @is_not_file, @no_ent, @read_error = nil
       end

@@ -27,4 +27,6 @@ module Skylab::InformationTactics
       o
     end.call
   end
+
+  Lib_ = :_hi_
 end

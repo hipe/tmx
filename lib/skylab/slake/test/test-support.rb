@@ -21,10 +21,13 @@ module Skylab::Slake::TestSupport
   end
 
   module TestLib_
+
     sidesys = Autoloader_.build_require_sidesystem_proc
+
     Tee = -> do
-      HL__[]::IO::Mappers::Tee
+      System_lib___[]::IO::Mappers::Tee
     end
-    HL__ = sidesys[ :Headless ]
+
+    System_lib___ = sidesys[ :System ]
   end
 end

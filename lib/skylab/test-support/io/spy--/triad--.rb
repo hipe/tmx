@@ -40,7 +40,7 @@ module Skylab::TestSupport
         x or next
         if x.respond_to? :debug!
           x.debug! prepnd
-        else  # assume it is an [#hl-169] IO tee. ignoring `prepnd` for now
+        else  # assume it is an [#sy-014] IO tee. ignoring `prepnd` for now
           x[ :debug ] = Prefixed_debugging_IO__[ i, TestSupport_.debug_IO ]
         end
       end

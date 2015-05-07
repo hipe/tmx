@@ -7,7 +7,7 @@ module Skylab::MetaHell::TestSupport::Parse
     extend TS_
     use :expect_event
 
-    context "(bilbos)" do
+    context "(against first grammar)" do
 
       it "find the longest whole match, skipping over the shorter one" do
 
@@ -80,7 +80,7 @@ module Skylab::MetaHell::TestSupport::Parse
         in_st.current_index.should be_zero
       end
 
-      memoize_ :subject_f do
+      memoize_ :_subject_f do
 
         _build_function_against_matrix(
           %w( frodo baggins ),
@@ -91,7 +91,7 @@ module Skylab::MetaHell::TestSupport::Parse
       end
     end
 
-    context "(backtracking)" do
+    context "(against second grammar)" do
 
       it "backtracks to last full match" do
 
@@ -102,10 +102,10 @@ module Skylab::MetaHell::TestSupport::Parse
 
         _go( in_st ).value_x.should eql :__elizabeth_keen_tom_keen__
 
-        in_st.current_index.should eql 7
+        in_st.current_index.should eql 5
       end
 
-      memoize_ :subject_f do
+      memoize_ :_subject_f do
 
         _build_function_against_matrix(
           %w( elizabeth keen ),
@@ -114,9 +114,28 @@ module Skylab::MetaHell::TestSupport::Parse
       end
     end
 
+    context "(against third grammar)" do
+
+      it "edge case" do
+
+        in_st = input_stream_via_array %w( xx yy )
+
+        _go( in_st, & handle_event_selectively ).value_x.should(
+          eql :__xx_yy__ )
+
+        in_st.current_index.should eql 2
+      end
+
+      memoize_ :_subject_f do
+
+        _build_function_against_matrix(
+          %w( xx yy ) )
+      end
+    end
+
     it "you can build it with a proc that produces the stream" do
 
-      _o = self.class._function_class.new do
+      _o = self.class._function_class.new_via_item_stream_proc do
         self.class._build_item_stream_via_string_matrix [ [ 'a', 'b' ] ]
       end
 
@@ -126,7 +145,7 @@ module Skylab::MetaHell::TestSupport::Parse
     end
 
     def _go in_st, & x_p
-      subject_f.output_node_via_input_stream in_st, & x_p
+      _subject_f.output_node_via_input_stream in_st, & x_p
     end
 
     def _expect_common_event

@@ -62,7 +62,7 @@ module Skylab::GitViz
 
       Find_repository_pathname___ = -> repo_cls, pathname, & oes_p do
 
-        # we gotta use this and not :+[#hl-176] (tree walk) while #open [#004]
+        # we gotta use this and not :+[#sy-018] (tree walk) while #open [#004]
 
         if SEP_BYTE___ != pathname.instance_variable_get( :@path ).getbyte( 0 )
           # use of pathname is "temporary"

@@ -32,9 +32,9 @@ module Skylab::Callback::TestSupport
       TestSupport_.debug_IO
     end
 
-    define_method :fixtures_dir_pn, Callback_.memoize[ -> do
+    define_method :fixtures_dir_pn, ( Callback_.memoize do
       Callback_::TestSupport.dir_pathname.join 'fixtures'
-    end ]
+    end )
   end
 
   LIB_ = ::Object.new

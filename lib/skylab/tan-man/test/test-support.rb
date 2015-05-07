@@ -9,24 +9,26 @@ module Skylab::TanMan::TestSupport
 
   class << self
 
-    def tmpdir_pathname
+    def tmpdir_pathname_
       @tdpn ||= TanMan_.lib_.dev_tmpdir_pathname.join 'tm-testing'
     end
   end
 
   module TestLib_
 
-    memoize = TanMan_::Callback_.memoize
+    sidesys, stdlib = TanMan_::Autoloader_.at(
+      :build_require_sidesystem_proc,
+      :build_require_stdlib_proc )
 
-    sidesys = TanMan_::Autoloader_.build_require_sidesystem_proc
+    define_singleton_method :_memoize, TanMan_::Callback_::Memoize
 
     Bsc__ = sidesys[ :Basic ]
 
-    Base_tmpdir__ = memoize[ -> do
+    Base_tmpdir__ = _memoize do
       TanMan_.lib_.system.filesystem.tmpdir(
-        :path, TS_.tmpdir_pathname.to_path,
+        :path, TS_.tmpdir_pathname_.to_path,
         :max_mkdirs, 1 )
-    end ]
+    end
 
     CLI_lib = -> do
       HL__[]::CLI
@@ -48,17 +50,15 @@ module Skylab::TanMan::TestSupport
       HL__[]::DEV::Client
     end
 
-    Empty_dir_pn = memoize[ -> do
+    Empty_dir_pn = _memoize do
       Base_tmpdir__[].tmpdir_via_join 'empty-tmpdir', :max_mkdirs, 2
-    end ]
+    end
 
     Entity = -> do
       TanMan_::Brazen_::Entity
     end
 
-    File_utils = memoize[ -> do
-      require 'fileutils' ; ::FileUtils
-    end ]
+    File_utils = stdlib[ :FileUtils ]
 
     FUC = -> do
       System[].filesystem.file_utils_controller
@@ -70,9 +70,7 @@ module Skylab::TanMan::TestSupport
       HL__[]::TestSupport::IO_Adapter_Spy
     end
 
-    JSON = memoize[ -> do
-      require 'json' ; ::JSON
-    end ]
+    JSON = stdlib[ :JSON ]
 
     Let = -> mod do
       mod.extend MetaHell__[]::Let
@@ -80,17 +78,13 @@ module Skylab::TanMan::TestSupport
 
     MetaHell__ = sidesys[ :MetaHell ]
 
-    PP = memoize[ -> do
-      require 'pp' ; ::PP
-    end ]
+    PP = stdlib[ :PP ]
 
     String_lib = -> do
       Bsc__[]::String
     end
 
-    Shellwords = memoize[ -> do
-      require 'shellwords' ; ::Shellwords
-    end ]
+    Shellwords = stdlib[ :Shellwords ]
 
     System = -> do
       HL__[].system
@@ -102,9 +96,9 @@ module Skylab::TanMan::TestSupport
 
     TS__ = sidesys[ :TestSupport ]
 
-    Volatile_tmpdir = memoize[ -> do
+    Volatile_tmpdir = _memoize do
       Base_tmpdir__[].tmpdir_via_join 'volatile-tmpdir', :max_mkdirs, 2
-    end ]
+    end
 
     # ~
 
@@ -329,7 +323,7 @@ module Skylab::TanMan::TestSupport
 
       Memoize_GGD_path__ = -> do_debug, debug_IO do
 
-        pn = TS_.tmpdir_pathname.join 'grammerz'
+        pn = TS_.tmpdir_pathname_.join 'grammerz'
         _PATH = pn.to_path
 
         if ! pn.exist?

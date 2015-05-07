@@ -40,7 +40,9 @@ module Skylab::FileMetrics
 
   module Lib_
 
-    memo, sidesys = Autoloader_.at :memoize, :build_require_sidesystem_proc
+    sidesys = Autoloader_.build_require_sidesystem_proc
+
+    define_singleton_method :_memoize, Callback_::Memoize
 
     Bsc__ = sidesys[ :Basic ]
 
@@ -82,9 +84,9 @@ module Skylab::FileMetrics
 
     MH__ = sidesys[ :MetaHell ]
 
-    NLP_EN__ = memo[ -> do
+    NLP_EN__ = _memoize do
       HL__[]::NLP::EN
-    end ]
+    end
 
     Proxy_lib = -> do
       Callback_::Proxy
@@ -99,19 +101,21 @@ module Skylab::FileMetrics
     end
 
     Select = -> do
-      HL__[]::IO.select.new
+      System_lib__[]::IO.select.new
     end
 
-    Shellescape_path = memo[ -> do
+    Shellescape_path = _memoize do
       rx = /[ $']/
       -> x do
         rx =~ x ? Library_::Shellwords.shellescape( x ) : x
       end
-    end ]
+    end
 
     System = -> do
-      HL__[].system
+      System_lib__[].services
     end
+
+    System_lib__ = sidesys[ :System ]
 
     System_open2 = -> mod do
       mod.include Face__[]::Open2

@@ -4,7 +4,7 @@ module Skylab::Brazen
 
     class Expression_Agent
 
-      class Pretty_Path__  # re-write [#hl-031]
+      class Pretty_Path__  # re-write [#sy-005]
 
         Callback_::Actor[ self, :properties, :path ]
 

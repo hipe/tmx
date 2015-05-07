@@ -9,7 +9,7 @@ one that we pull in universally).
 here we certainly do not seek to replace it. rather we complement it
 with *normalization*-related facilities that *do not* ever rely on the
 filesystem. any time a method here would incur a hit to the filesystem it
-*MUST* not live here but should live at to [#hl-130] the filesystem node
+*MUST* not live here but should live at to [#sy-009] the filesystem node
 or a child node of that node.
 
 

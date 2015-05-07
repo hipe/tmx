@@ -47,8 +47,10 @@ module Skylab::TestSupport
       end
 
       System = -> do
-        HL__[].system
+        System_lib__[].services
       end
+
+      System_lib__ = sidesys[ :System ]
 
       if false
 

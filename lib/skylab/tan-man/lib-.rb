@@ -2,8 +2,6 @@ module Skylab::TanMan
 
   module Lib_
 
-    memoize = Callback_.memoize
-
     sidesys, stdlib = Autoloader_.at :build_require_sidesystem_proc, :build_require_stdlib_proc
 
     Basic = sidesys[ :Basic ]
@@ -32,9 +30,7 @@ module Skylab::TanMan
       Brazen_::Entity
     end
 
-    File_utils = memoize.call do
-      require 'fileutils' ; ::FileUtils
-    end
+    File_utils = stdlib[ :FileUtils ]
 
     Home_directory_pathname = -> do
       System[].environment.any_home_directory_pathname
@@ -65,7 +61,7 @@ module Skylab::TanMan
     end
 
     Path_tools = -> do
-      HL__[].system.filesystem.path_tools
+      System[].filesystem.path_tools
     end
 
     Pretty_print = stdlib[ :PP ]
@@ -80,27 +76,28 @@ module Skylab::TanMan
       System[].IO.some_stderr_IO
     end
 
-    String_IO = memoize[ -> do
-      require 'stringio' ; ::StringIO
-    end ]
+    String_IO = stdlib[ :StringIO ]
 
     String_lib = -> do
       Basic[]::String
     end
 
-    String_scanner = memoize[ -> do
-      require 'strscan' ; ::StringScanner
-    end ]
-
-    System = -> do
-      HL__[].system
+    String_scanner = Callback_.memoize do
+      require 'strscan'
+      ::StringScanner
     end
 
-    Tmpdir_stem = memoize[ -> { 'tina-man'.freeze } ]
+    System = -> do
+      System_lib___[].services
+    end
 
-    TT = memoize[ -> do
-      require 'treetop' ; ::Treetop
-    end ]
+    System_lib___ = sidesys[ :System ]
+
+    Tmpdir_stem = Callback_.memoize do
+      'tina-man'.freeze
+    end
+
+    TT = stdlib[ :Treetop ]
 
     INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(
       self, TanMan_ )

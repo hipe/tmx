@@ -20,10 +20,6 @@ module Skylab::Headless  # ([#013] is reserved for a core node narrative - no st
       @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
         self::Lib_, self )
     end
-
-    def system
-      @system ||= Headless_::System__::Front.new
-    end
   end  # >>
 
   Callback_ = ::Skylab::Callback
@@ -38,11 +34,10 @@ module Skylab::Headless  # ([#013] is reserved for a core node narrative - no st
   DASH_ = '-'.freeze
   DASH_BYTE_ = DASH_.getbyte 0
   EMPTY_A_ = [].freeze
-  EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
   Headless_ = self
   IDENTITY_ = -> x { x }
-  stowaway :Lib_, 'library-'
+  stowaway :Library_, 'lib-'
   LINE_SEPARATOR_STRING_ = "\n".freeze
   MONADIC_EMPTINESS_ = -> _ {}
   MONADIC_TRUTH_ = -> _ { true }

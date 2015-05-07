@@ -8,18 +8,17 @@ module Skylab::Headless
     o[ :CodeMolester ] = sidesys
     o[ :FileUtils ] = stdlib
     o[ :InformationTactics ] = o[ :MetaHell ] = sidesys
-    o[ :Open3 ] = stdlib
-    o[ :Open4 ] = -> { Autoloader_.require_quiety( 'open4' ) ; ::Open4 }
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
     o[ :Callback ] = sidesys
     o[ :Set ] = stdlib
-    o[ :Shellwords ] = o[ :StringIO ] = stdlib
+    o[ :StringIO ] = stdlib
     o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
-    o[ :Tmpdir ] = -> _ { require 'tmpdir' ; ::Dir }
 
     # ~ just do it live and implement small things here potentially redundantly
 
-    Memoize = Callback_.memoize
+    Memoize = -> p do  # (legacy interface)
+      Callback_::Memoize[ & p ]
+    end
 
     def self.const_missing i
       const_set i, @o.fetch( i )[ i ]
@@ -36,22 +35,12 @@ module Skylab::Headless
       Basic[]::Box
     end
 
-    Bzn_ = sidesys[ :Brazen ]
-
     Bundle = -> do
       MH__[]::Bundle
     end
 
     DSL_DSL = -> mod, p do
       MH__[]::DSL_DSL.enhance mod, &p
-    end
-
-    Entity = -> * a, & p do
-      if a.length.zero? && ! p
-        Bzn_[]::Entity
-      else
-        Bzn_[]::Entity.call_via_arglist a, & p
-      end
     end
 
     Enumerator_lib = -> do
@@ -90,25 +79,12 @@ module Skylab::Headless
       MH__[]::Parse
     end
 
-    Properties_stack_frame = -> *a do
-      Bzn_[].properties_stack.common_frame.call_via_arglist a
-    end
-
     Pool = -> do
       MH__[]::Pool
     end
 
-    Proxy_lib = -> do
-      Callback_::Proxy
-    end
-
     Reasonably_short = -> do
       MH__[].strange::A_REASONABLY_SHORT_LENGTH_FOR_A_STRING
-    end
-
-    Shellwords = Callback_.memoize do
-      require 'shellwords'
-      ::Shellwords
     end
 
     Strange = -> x do
@@ -119,8 +95,10 @@ module Skylab::Headless
       Basic[]::String
     end
 
-    Tree_lib = -> do
-      Basic[]::Tree
+    System = -> do
+      System_lib___[].services
     end
+
+    System_lib___ = sidesys[ :System ]
   end
 end

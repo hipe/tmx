@@ -45,7 +45,7 @@ module Skylab::Brazen
         end
 
         def via_stream io
-          Brazen_.lib_.IO::Byte_Upstream_Identifier.new io
+          Brazen_.lib_.IO_lib::Byte_Upstream_Identifier.new io
         end
 
         def via_line_array s_a
@@ -79,7 +79,7 @@ module Skylab::Brazen
         end
 
         def via_stream io
-          Brazen_.lib_.IO::Byte_Downstream_Identifier.new io
+          Brazen_.lib_.IO_lib::Byte_Downstream_Identifier.new io
         end
 
         def via_line_array s_a

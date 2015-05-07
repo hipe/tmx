@@ -55,20 +55,34 @@ module Skylab::TestSupport
       end
 
       def produce_executable_
-        if @argv.length.zero? or /\A--?h(?:elp)?\z/i =~ @argv.fetch( 0 )
-          display_usage_
-          nil
+
+        if @argv.length.zero?
+
+          when_no_args
+
+        elsif /\A--?h(?:elp)?\z/i =~ @argv.fetch( 0 )
+
+          display_usage
+
         else
           produce_executable_when_nonzero_length_argv_
         end
       end
 
-      def display_usage_
-        @stderr.puts "usage: #{ invocation_name_ }#{ usage_args_ }"
-        nil
+      def when_no_args
+        display_usage
       end
 
-      def usage_args_
+      def display_usage
+        @stderr.puts usage_line
+        NIL_
+      end
+
+      def usage_line
+        "usage: #{ invocation_name_ }#{ usage_args }"
+      end
+
+      def usage_args
         ' [args]'
       end
 
@@ -93,7 +107,7 @@ module Skylab::TestSupport
 
     class Branch
 
-      def display_usage_
+      def display_usage
 
         o = @stderr
         o.puts "usage: #{ invocation_name_ } [ <facility> [..]] [args]"

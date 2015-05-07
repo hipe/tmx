@@ -72,11 +72,12 @@ module Skylab::TestSupport
       MH__ = sidesys[ :MetaHell ]
 
       Name_symbol_to_label = -> i do
+        self._HELLO
         HL__[]::Name.labelize( i ).downcase
       end
 
       Pretty_path_proc = -> do
-        HL__[].system.filesystem.path_tools.pretty_path
+        Sys__[].filesystem.path_tools.pretty_path
       end
     end
   end

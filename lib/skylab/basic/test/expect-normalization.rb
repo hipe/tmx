@@ -73,7 +73,7 @@ module Skylab::Basic
     end
   end
 
-  Mock_arg__ = Callback_.memoize[ -> do
+  Mock_arg__ = Callback_.memoize do
 
     module Mock_Arg__
 
@@ -121,7 +121,7 @@ module Skylab::Basic
 
       self
     end
-  end ]
+  end
 
     end
   end

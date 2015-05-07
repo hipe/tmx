@@ -4,7 +4,7 @@ module Skylab::Basic
 
     class String::Word_Wrappers < Client_
 
-      def usage_args_
+      def usage_args
         ' <width>:<height> <word> [<word> [..]]'
       end
 

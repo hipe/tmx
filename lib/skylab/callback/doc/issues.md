@@ -5,7 +5,7 @@
 [#061]       the box narrative ..
 [#060]       the name narrative ..
 [#059]       #done #parent-node: [#044] "signal processing scans.." )
-[#058]       #parent-node: [#042] methodic actor (was: [#hl-130]) :+[#mh-058]..
+[#058]       #parent-node: [#042] methodic actor (was: [#sy-009]) :+[#mh-058]..
 [#057]       #parent-node: [#046] "the ideal mixed syntax.."
 [#056]       #parent-node: [#050] track similar things
 [#055]       #parent-node: [#br-059]  the "pair" structure.

@@ -86,8 +86,10 @@ module Skylab::Git::TestSupport
     end
 
     System = -> do
-      HL__[].system
+      System_lib___[].services
     end
+
+    System_lib___ = Git_::Lib_::System_lib__
 
     Tmpdir = -> do
       TestSupport_.tmpdir

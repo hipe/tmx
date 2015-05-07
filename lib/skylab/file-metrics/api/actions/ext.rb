@@ -107,7 +107,7 @@ module Skylab::FileMetrics
 
       _, o, e = FM_::Library_::Open3.popen3( * cmd.args )  # :+[#004]
 
-        # used to use [#fa-003], redundant with  [#hl-048] but can't
+        # used to use [#fa-003], redundant with  [#sy-006] but can't
         # because it takes command strings and must be annnihilated
 
       s = e.gets

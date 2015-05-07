@@ -26,7 +26,7 @@ directory.
   an IO stream to receive the string messages for verbose output (what
   you might otherwise have to write an `fu_output_message` method for).
 
-• see also [#157] 'fu'. when needed we will subsume its interface.
+• see also [#011] 'fu'. when needed we will subsume its interface.
 
 • `patch` - apply a patch to a (should be empty) directory to create an
   arbitrary filetree in it.

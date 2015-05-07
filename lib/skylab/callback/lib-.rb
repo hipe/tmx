@@ -58,7 +58,7 @@ module Skylab::Callback
     HL__ = sidesys[ :Headless ]
 
     IO_lib = -> do
-      HL__[]::IO
+      System_lib__[]::IO
     end
 
     Ivars_with_procs_as_methods = -> * a do
@@ -90,7 +90,7 @@ module Skylab::Callback
     end
 
     Some_stderr = -> do
-      HL__[]::System::IO.some_stderr_IO
+      System_lib__[]::IO.some_stderr_IO
     end
 
     Stdlib_option_parser = -> do
@@ -119,7 +119,9 @@ module Skylab::Callback
     end
 
     System = -> do
-      HL__[].system
+      System_lib__[].services
     end
+
+    System_lib__ = sidesys[ :System ]
   end
 end

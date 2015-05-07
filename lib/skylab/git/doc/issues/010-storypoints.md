@@ -111,7 +111,7 @@ adapter.
 
 # :#storypoint-8.5
 
-[#hl-031] it is necessary to reset the "pretty path" facility between
+[#sy-005] it is necessary to reset the "pretty path" facility between
 directory changes. at the time of this writing, this is revealed as an
 issue if you run e.g the [hl] testsuite before this one.
 

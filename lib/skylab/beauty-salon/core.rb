@@ -49,7 +49,7 @@ module Skylab::BeautySalon
     end
 
     CLI_lib = -> do
-      HL__[]::CLI
+      HL___[]::CLI
     end
 
     File_utils = Callback_.memoize do
@@ -59,7 +59,7 @@ module Skylab::BeautySalon
 
     Face__ = sidesys[ :Face ]
 
-    HL__ = sidesys[ :Headless ]
+    HL___ = sidesys[ :Headless ]
 
     Ivars_with_procs_as_methods = -> do
       MH__[]::Ivars_with_Procs_as_Methods
@@ -92,8 +92,10 @@ module Skylab::BeautySalon
     end
 
     System = -> do
-      HL__[].system
+      System_lib___[].services
     end
+
+    System_lib___ = sidesys[ :System ]
 
     Token_buffer = -> x, y do
       Basic[]::Token::Buffer.new x, y

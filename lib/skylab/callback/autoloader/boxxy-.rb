@@ -68,8 +68,8 @@ module Skylab::Callback
       NAMES_METHOD_P = -> do
         ::Enumerator.new do |y|
           fly = Names__::Get_fly[]
-          constants.each do |i|
-            fly.replace_with_constant_i i
+          constants.each do | const |
+            fly.__reinitialize const
             y << fly
           end ; nil
         end
@@ -85,19 +85,26 @@ module Skylab::Callback
 
           class Fly_ < Callback_::Name
 
-            def replace_with_constant_i sym
-              @as_const = sym
-              @as_slug = nil
-              nil
+            class << self
+              def __new_flyweight
+                new do
+                end
+              end
             end
 
-            def _init
-              @const_is_resolved = true
-              self
+            def __reinitialize const
+              @as_const = const
+              @as_slug = nil
+              NIL_
+            end
+
+            def initialize
+              super
+              @const_is_resolved_ = true
             end
 
             self
-          end.allocate._init
+          end.__new_flyweight
         end
       end
 
