@@ -1,8 +1,8 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
-    class Functions_::Non_Negative_Integer < Parse::Function_::Field
+    class Functions_::Non_Negative_Integer < Parse_::Function_::Field
 
       # this function :+#cannot-operate-on-the-empty-stream.
 
@@ -21,5 +21,5 @@ module Skylab::MetaHell
       define_singleton_method :output_node_via_input_stream, same_method
 
     end
-  end
+    # <-
 end

@@ -1,14 +1,18 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::MetaHell::TestSupport::Parse::Functions::Serial_Optionals
+module Skylab::Parse::TestSupport
 
-  describe "[mh] parse functions - serial optionals - integrate w/ int & kw" do
+  module Fz_SO_I___  # :+#throwaway-module for constants generated during tests
+
+    # <-
+
+  TS_.describe "[pa] parse functions - serial optionals - integrate w/ int & kw" do
 
     extend TS_
 
     before :all do
 
-      G = Subject_[].new_with(
+      G = Parse_.function( :serial_optionals ).new_with(
         :functions,
           :non_negative_integer,
             :moniker_symbol, :integer,
@@ -29,7 +33,7 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Serial_Optionals
 
       G.express_all_segments_into_under( "",
 
-        :any_first_constituent_string, MetaHell_::IDENTITY_,
+        :any_first_constituent_string, IDENTITY_,
 
         :any_subsequent_constituent_string, -> s { " #{ s }" },
 
@@ -51,7 +55,7 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Serial_Optionals
     end
 
     it "against the empty array, does nothing" do
-      against
+      _against
       @int.should be_nil
       @kw.should be_nil
       @did_parse.should eql false
@@ -59,7 +63,7 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Serial_Optionals
     end
 
     it "against one strange string, does not against" do
-      against 'frinkle'
+      _against 'frinkle'
       @int.should be_nil
       @kw.should be_nil
       @did_parse.should eql false
@@ -67,7 +71,7 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Serial_Optionals
     end
 
     it "good first token, strange second one" do
-      against '3', 'frinkle'
+      _against '3', 'frinkle'
       @int.should eql 3
       @kw.should be_nil
       @did_parse.should eql true
@@ -75,7 +79,7 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Serial_Optionals
     end
 
     it "two good tokens" do
-      against '3', 'random'
+      _against '3', 'random'
       @int.should eql 3
       @kw.should eql :random
       @did_parse.should eql true
@@ -83,7 +87,7 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Serial_Optionals
     end
 
     it "only one token - a production of the first formal symbol" do
-      against '3'
+      _against '3'
       @int.should eql 3
       @kw.should be_nil
       @did_parse.should eql true
@@ -91,14 +95,14 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Serial_Optionals
     end
 
     it "only one token - *the* production of the second formal symbol" do
-      against 'random'
+      _against 'random'
       @int.should be_nil
       @kw.should eql :random
       @did_parse.should eql true
       @is_complete.should eql true
     end
 
-    def against * s_a
+    def _against * s_a
       st = input_stream_via_array s_a
       d = st.current_index
       on = G.output_node_via_input_stream st
@@ -115,5 +119,7 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Serial_Optionals
       end
       nil
     end
+  end
+  # ->
   end
 end

@@ -1,6 +1,6 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
     # unlike "serial optionals" and "simple pool", this non-terminal function
     # frontiers the use of the new `function_is_spent` field:
@@ -26,7 +26,7 @@ module Skylab::MetaHell
     #
     # a parser with no nodes in it will always report 'no parse' and 'spent':
     #
-    #     None[ MetaHell_::EMPTY_A_ ]  # => nil
+    #     None[ EMPTY_A_ ]  # => nil
     #
     #
     # even if the input is rando calrissian:
@@ -79,7 +79,7 @@ module Skylab::MetaHell
     #
     # does nothing with nothing:
     #
-    #     Digits[ MetaHell_::EMPTY_A_ ]  # => nil
+    #     Digits[ EMPTY_A_ ]  # => nil
     #
     #
     # parses one digit:
@@ -217,5 +217,5 @@ module Skylab::MetaHell
         end
       end
     end
-  end
+    # <-
 end

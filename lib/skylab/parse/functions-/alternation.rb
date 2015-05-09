@@ -1,6 +1,6 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
     # like all others, this nonterminal parse function is an aggregation
     # composed of N other parse functions. it passes the input stream to
@@ -46,7 +46,7 @@ module Skylab::MetaHell
         end
       end
     end
-  end
+    # <-
 
   # the output node reports the winning index. can be called inline.
   #

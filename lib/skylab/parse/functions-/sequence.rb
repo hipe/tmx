@@ -1,6 +1,6 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
     class Functions_::Sequence < Parse_::Function_::Currying
 
@@ -87,5 +87,5 @@ module Skylab::MetaHell
         nil
       end
     end
-  end
+    # <-
 end

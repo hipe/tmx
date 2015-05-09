@@ -1,6 +1,8 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse  # see [#029]
+  # ->
+
+    # see [#004]
 
     # a "serial optionals" parse function never fails. any input stream is
     # passed to the first constituent. if this parse succeeds, any remaining
@@ -83,7 +85,7 @@ module Skylab::MetaHell
     #     argv = [ '30', 'm', "Mom's", "Mom's again" ]
     #     P[ argv ]  # => ArgumentError: unrecognized argument 'Mom's..
 
-    class Functions_::Serial_Optionals < Parse::Function_::Currying
+    class Functions_::Serial_Optionals < Parse_::Function_::Currying
 
       class << self
 
@@ -189,5 +191,5 @@ module Skylab::MetaHell
     # no longer is the simple true-ishness of your result used to determine
     # whether there was a match. instead, `nil?` is used.
 
-  end
+    # <-
 end

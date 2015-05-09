@@ -1,11 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::MetaHell::TestSupport::Parse::Functions::Alternation
+module Skylab::Parse::TestSupport
 
-  describe "[mh] Parse::Functions_::Alternation" do
+  describe "[pa] functions - alternation" do
 
     it "the output node reports the winning index. can be called inline." do
-      on = Subject_[].with(
+      on = subject_parse_module_.with(
         :input_array, [ :b ],
         :functions,
           :trueish_single_value_mapper, -> x { :a == x and :A },
@@ -17,7 +17,7 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Alternation
     context "you can curry the parser separately" do
 
       before :all do
-        P = Subject_[].new_with(
+        P = subject_parse_module_.new_with(
           :functions,
             :trueish_single_value_mapper, -> x { :a == x and :A },
             :trueish_single_value_mapper, -> x { :b == x and :B } ).
@@ -32,13 +32,13 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Alternation
       end
     end
     it "in the minimal case, the empty parser always results in nil" do
-      g = Subject_[].new_with :functions
+      g = subject_parse_module_.new_with :functions
       g.output_node_via_single_token_value( :bizzie ).should eql nil
     end
     context "maintaining parse state (artibrary extra arguments)" do
 
       before :all do
-        g = Subject_[].new_with(
+        g = subject_parse_module_.new_with(
           :functions,
             :trueish_single_value_mapper, -> x { :one == x and :is_one },
             :trueish_single_value_mapper, -> x { :two == x and :is_two } )
@@ -58,6 +58,14 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Alternation
       it "but it won't parse two after one" do
         P_[ :one, :two ].should eql nil
       end
+    end
+
+    def self.subject_parse_module_
+      Parse_.function :alternation
+    end
+
+    def subject_parse_module_
+      self.class.subject_parse_module_
     end
   end
 end

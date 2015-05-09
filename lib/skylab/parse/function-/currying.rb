@@ -1,6 +1,6 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
     class Function_::Currying
 
@@ -91,7 +91,7 @@ module Skylab::MetaHell
             if :end_functions == sym
               nil  # not false
             else
-              Parse_.function_( sym ).new_via_iambic_stream_passively st
+              Parse_.function( sym ).new_via_iambic_stream_passively st
             end
           end
         end
@@ -218,8 +218,6 @@ module Skylab::MetaHell
         Parse_::Input_Streams_::Array.new a
       end
 
-      UNABLE_ = false
-
     end
-  end
+    # <-
 end

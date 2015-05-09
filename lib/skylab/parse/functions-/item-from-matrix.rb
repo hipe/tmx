@@ -1,6 +1,6 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
     class Functions_::Item_From_Matrix  # :[#002]:
 
@@ -283,5 +283,5 @@ module Skylab::MetaHell
         end
       end
     end
-  end
+    # <-
 end

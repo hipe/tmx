@@ -1,4 +1,4 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
   module DSL_DSL  # #borrow-one-indent
 
@@ -25,7 +25,7 @@ module Skylab::MetaHell
   # if you define an `atom` field called 'wiz':
   #
   #     class Foo
-  #       MetaHell_::DSL_DSL.enhance self do
+  #       Parse_::DSL_DSL.enhance self do
   #         atom :wiz                     # make an atomic (basic) field
   #       end                             # called `wiz`
   #
@@ -93,7 +93,7 @@ module Skylab::MetaHell
     nil
   end
 
-  Story = MetaHell_::Ivars_with_Procs_as_Methods.new(
+  Story = Callback_::Session::Ivars_with_Procs_as_Methods.new(
     :atom, :atom_accessor, :list, :block )
 
   class Story
@@ -166,7 +166,7 @@ module Skylab::MetaHell
     # a `block` field called 'zinger' gives you an eponymous proc writer:
     #
     #     class Fob
-    #       MetaHell_::DSL_DSL.enhance self do
+    #       Parse_::DSL_DSL.enhance self do
     #         block :zinger
     #       end
     #     end
@@ -189,7 +189,7 @@ module Skylab::MetaHell
     # if you define an `atom_accessor` field 'with_name'
     #
     #     class Foc
-    #       MetaHell_::DSL_DSL.enhance self do
+    #       Parse_::DSL_DSL.enhance self do
     #         atom_accessor :with_name
     #       end
     #     end
@@ -209,7 +209,7 @@ module Skylab::MetaHell
   # if you must, use a module and not a class to encapsulate reusability:
   #
   #     module Fod
-  #       MetaHell_::DSL_DSL.enhance_module self do
+  #       Parse_::DSL_DSL.enhance_module self do
   #         atom :pik
   #       end
   #     end
@@ -238,8 +238,10 @@ module Skylab::MetaHell
     nil
   end
 
-  Enhance_Module_Adapter__ = MetaHell_::Ivars_with_Procs_as_Methods.new(
+  Enhance_Module_Adapter__ = Callback_::Session::Ivars_with_Procs_as_Methods.new(
+
     :add_field, :add_or_change_value )
+
   class Enhance_Module_Adapter__
     def initialize
       @add_field = -> mm, im, fs do

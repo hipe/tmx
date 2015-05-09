@@ -1,6 +1,6 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
     class Functions_::Simple_Matcher < Parse_::Function_::Field::Proc_Based
 
@@ -23,5 +23,5 @@ module Skylab::MetaHell
         end
       end
     end
-  end
+    # <-
 end

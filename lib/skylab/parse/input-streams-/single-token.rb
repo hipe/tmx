@@ -1,6 +1,6 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
     class Input_Streams_::Single_Token
 
@@ -25,5 +25,5 @@ module Skylab::MetaHell
         nil
       end
     end
-  end
+    # <-
 end

@@ -1,6 +1,6 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
     class Functions_::Regex
 
@@ -45,5 +45,5 @@ module Skylab::MetaHell
         end
       end
     end
-  end
+    # <-
 end

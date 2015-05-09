@@ -1,6 +1,6 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
     class Functions_::Proc < Parse_::Function_::Field::Proc_Based
 
@@ -10,5 +10,5 @@ module Skylab::MetaHell
         @p[ in_st ]
       end
     end
-  end
+    # <-
 end

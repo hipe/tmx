@@ -1,8 +1,8 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
-    # :[#027]: this function cannot fail. output value is a tuple (array)
+    # :[#003]: this function cannot fail. output value is a tuple (array)
     # whose length is the number of constituents in the grammar.
     #
     # inspired by the packrat parser algorithm. the constituent parse
@@ -75,7 +75,7 @@ module Skylab::MetaHell
     #     argv.length  # => 3
     #
 
-    class Functions_::Simple_Pool < Parse::Function_::Currying
+    class Functions_::Simple_Pool < Parse_::Function_::Currying
 
       def accept_function_ f
         maybe_send_sibling_sandbox_to_function_ f
@@ -111,5 +111,5 @@ module Skylab::MetaHell
         Parse_::Output_Node_.new res_a
       end
     end
-  end
+    # <-
 end

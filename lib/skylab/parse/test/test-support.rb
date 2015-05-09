@@ -1,26 +1,33 @@
-require_relative '../test-support'
+require_relative '../core'
+require 'skylab/test-support/core'
 
-module Skylab::MetaHell::TestSupport::Parse
+module Skylab::Parse::TestSupport
 
-  ::Skylab::MetaHell::TestSupport[ TS_ = self ]
+  TestSupport_ = ::Skylab::TestSupport
 
-  include Constants
-
-  MetaHell_ = MetaHell_
+  TestSupport_::Regret[ TS_ = self ]
 
   extend TestSupport_::Quickie
 
   module ModuleMethods
 
-    def memoize_subject & build_p
-      define_method :subject, Callback_.memoize( & build_p )
-      nil
+    def memoize_subject_parse_function_ & build_p
+
+      define_method :subject_parse_function_, Callback_::Memoize[ & build_p ]
+      NIL_
+    end
+
+    def use sym
+      Test_Support_Bundles___.const_get(
+        Callback_::Name.via_variegated_symbol( sym ).as_const,
+        false
+      )[ self ]
     end
   end
 
   module InstanceMethods
 
-    def against * s_a
+    def against_ * s_a
       against_input_array s_a
     end
 
@@ -29,11 +36,11 @@ module Skylab::MetaHell::TestSupport::Parse
     end
 
     def against_input_stream st
-      subject.output_node_via_input_stream st
+      subject_parse_function_.output_node_via_input_stream st
     end
 
     def the_empty_input_stream
-      Subject_[]::Input_Streams_::Array.the_empty_stream
+      Parse_::Input_Streams_::Array.the_empty_stream
     end
 
     def input_stream_containing * x_a
@@ -41,37 +48,42 @@ module Skylab::MetaHell::TestSupport::Parse
     end
 
     def input_stream_via_array s_a
-      Subject_[]::Input_Streams_::Array.new s_a
+      Parse_::Input_Streams_::Array.new s_a
+    end
+
+    def do_debug
+      false
     end
   end
 
-  LIB_ = ::Object.new
-  class << LIB_
+  module Test_Support_Bundles___
 
-    def DSL_DSL
-      MetaHell_::DSL_DSL
+    Expect_Event = -> tcm do
+
+      Callback_.test_support::Expect_Event[ tcm ]
+
+      tcm.send(
+        :define_method,
+        :black_and_white_expression_agent_for_expect_event
+      ) do
+
+        Autoloader_.require_sidesystem( :Brazen )::API.expression_agent_instance
+
+      end
     end
   end
 
-  Subject_ = -> do
-    MetaHell_::Parse
-  end
+  Parse_ = ::Skylab::Parse
 
-  Callback_ = Constants::Callback_
-  Constants::LIB_ = LIB_
-  Constants::Subject_ = Subject_
+  Autoloader_ = Parse_::Autoloader_
+  Callback_ = Parse_::Callback_
+  EMPTY_A_ = Parse_::EMPTY_A_
+  IDENTITY_ = -> x { x }
+  NIL_ = nil
   UNDERSCORE_ = '_'
 
-end
-
-module Skylab::MetaHell::TestSupport::Parse::Functions
-
-  ::Skylab::MetaHell::TestSupport::Parse[ self ]
-
   module Constants
-
-    Parse_lib_ = -> do
-      MetaHell_::Parse
-    end
+    Parse_ = Parse_
+    TestSupport_ = TestSupport_
   end
 end

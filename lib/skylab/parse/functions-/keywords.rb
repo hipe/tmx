@@ -1,7 +1,7 @@
 
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
     class Functions_::Keywords
 
@@ -59,5 +59,5 @@ module Skylab::MetaHell
         @p[ in_st ]
       end
     end
-  end
+    # <-
 end

@@ -1,14 +1,18 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::DSL_DSL
+module Skylab::Parse::TestSupport
 
-  describe "[mh] DSL_DSL" do
+  module DD___  # :+#throwaway-module for constants created during tests
+
+    # <-
+
+  TS_.describe "[pa] DSL_DSL" do
 
     context "if you define an `atom` field called 'wiz'" do
 
       before :all do
         class Foo
-          MetaHell_::DSL_DSL.enhance self do
+          Parse_::DSL_DSL.enhance self do
             atom :wiz                     # make an atomic (basic) field
           end                             # called `wiz`
 
@@ -19,24 +23,28 @@ module Skylab::MetaHell::TestSupport::DSL_DSL
           wiz :piz                        # then set the value of `wiz`
         end
       end
+
       it "you can read this value on the pertinent classes with `wiz_value`" do
         Bar.wiz_value.should eql :piz
       end
+
       it "these setter module methods are by default private" do
         -> do
           Bar.wiz :other
         end.should raise_error( NoMethodError,
                      ::Regexp.new( "\\Aprivate\\ method\\ `wiz'\\ called" ) )
       end
+
       it "you get a public instance getter of the same name (no `_value` suffix)" do
         Bar.new.wiz.should eql :piz
       end
     end
+
     context "a `block` field called 'zinger' gives you an eponymous proc writer" do
 
       before :all do
         class Fob
-          MetaHell_::DSL_DSL.enhance self do
+          Parse_::DSL_DSL.enhance self do
             block :zinger
           end
         end
@@ -48,32 +56,36 @@ module Skylab::MetaHell::TestSupport::DSL_DSL
           end
         end
       end
+
       it "you must use `zinger.call` on the instance" do
         bar = Bab.new
         bar.zinger.call.should eql 1
         bar.zinger.call.should eql 2
       end
     end
+
     context "if you define an `atom_accessor` field 'with_name'" do
 
       before :all do
         class Foc
-          MetaHell_::DSL_DSL.enhance self do
+          Parse_::DSL_DSL.enhance self do
             atom_accessor :with_name
           end
         end
       end
+
       it "in the instance you can write to the field in the same DSL-y way" do
         foo = Foc.new
         foo.with_name :x
         foo.with_name.should eql :x
       end
     end
+
     context "if you must, use a module and not a class to encapsulate reusability" do
 
       before :all do
         module Fod
-          MetaHell_::DSL_DSL.enhance_module self do
+          Parse_::DSL_DSL.enhance_module self do
             atom :pik
           end
         end
@@ -84,10 +96,13 @@ module Skylab::MetaHell::TestSupport::DSL_DSL
           pik :nic
         end
       end
+
       it "you can enhance a class with your module with the above two steps" do
         Badd.pik_value.should eql :nic
         Badd.new.pik.should eql :nic
       end
     end
+  end
+# ->
   end
 end

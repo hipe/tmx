@@ -1,42 +1,42 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::Parse::Functions::Sequence
+module Skylab::Parse::TestSupport
 
-  describe "[mh] parse functions - sequence" do
+  describe "[pa] functions - sequence" do
 
     extend TS_
 
     context "the empty sequence" do
 
-      memoize_subject do
-        Subject_[].new_with :functions
+      memoize_subject_parse_function_ do
+        subject_parse_module_.new_with :functions
       end
 
       it "builds" do
-        subject
+        subject_parse_function_
       end
 
       it "against nothing - succeeds" do
-        against.value_x.should eql MetaHell_::EMPTY_A_
+        against_.value_x.should eql EMPTY_A_
       end
 
       it "against something - parses nothing and succeeds" do
         st = input_stream_containing :foo
-        against_input_stream( st ).value_x.should eql MetaHell_::EMPTY_A_
+        against_input_stream( st ).value_x.should eql EMPTY_A_
         st.current_index.should be_zero
       end
     end
 
     context "a sequence of two rigid atomic items" do
 
-      memoize_subject do
-        Subject_[].new_with :functions,
+      memoize_subject_parse_function_ do
+        subject_parse_module_.new_with :functions,
           :keyword, 'foo',
           :keyword, 'bar'
       end
 
       it "against nothing - fails" do
-        against.should be_nil
+        against_.should be_nil
       end
 
       it "against one wrong token" do
@@ -60,14 +60,14 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Sequence
 
     context "non-colliding range item, keyword (enter monadic range)" do
 
-      memoize_subject do
-        Subject_[].new_with( :functions,
+      memoize_subject_parse_function_ do
+        subject_parse_module_.new_with( :functions,
           :zero_or_one, :keyword, 'foo',
           :keyword, 'bar' )
       end
 
       it "against nothing, nothing" do
-        against.should be_nil
+        against_.should be_nil
       end
 
       it "against strange, nothing" do
@@ -103,14 +103,14 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Sequence
 
     context "non-colliding unbound range item, keyword (enter unbound range)" do
 
-      memoize_subject do
-        Subject_[].new_with :functions,
+      memoize_subject_parse_function_ do
+        subject_parse_module_.new_with :functions,
           :zero_or_more, :keyword, 'foo',
           :keyword, 'bar'
       end
 
       it "against nothing, nothing" do
-        against.should be_nil
+        against_.should be_nil
       end
 
       it "against strange, nothing" do
@@ -121,7 +121,7 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Sequence
 
       it "against minimal good" do
         st = input_stream_containing 'bar'
-        against_input_stream( st ).value_x.should eql [ MetaHell_::EMPTY_A_, :bar ]
+        against_input_stream( st ).value_x.should eql [ EMPTY_A_, :bar ]
         st.current_index.should eql 1
       end
 
@@ -146,8 +146,8 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Sequence
 
     context "the minimal colliding sequence whose range term is monadic" do
 
-      memoize_subject do
-        Subject_[].new_with :functions,
+      memoize_subject_parse_function_ do
+        subject_parse_module_.new_with :functions,
           :zero_or_one, :keyword, 'zep',
           :keyword, 'zep'
       end
@@ -167,15 +167,15 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Sequence
 
     context "the minimal colliding sequence whose range term is unbound" do
 
-      memoize_subject do
-        Subject_[].new_with :functions,
+      memoize_subject_parse_function_ do
+        subject_parse_module_.new_with :functions,
           :zero_or_more, :keyword, 'zo',
           :keyword, 'zo'
       end
 
       it "against minimal good" do
         st = input_stream_containing 'zo'
-        against_input_stream( st ).value_x.should eql [ MetaHell_::EMPTY_A_, :zo ]
+        against_input_stream( st ).value_x.should eql [ EMPTY_A_, :zo ]
         st.current_index.should eql 1
       end
 
@@ -194,15 +194,15 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Sequence
 
     context "A+ A (enter any token, one or more)" do
 
-      memoize_subject do
-        Subject_[].new_with :functions,
+      memoize_subject_parse_function_ do
+        subject_parse_module_.new_with :functions,
           :one_or_more, :any_token,
           :keyword, 'zoink', :minimum_number_of_characters, 1
 
       end
 
       it "builds" do
-        subject
+        subject_parse_function_
       end
 
       it "one random keyword (satisfies first but not second term)" do
@@ -232,8 +232,8 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Sequence
 
     context "A A+ (trailing unbound)" do
 
-      memoize_subject do
-        Subject_[].new_with :functions,
+      memoize_subject_parse_function_ do
+        subject_parse_module_.new_with :functions,
           :keyword, 'zank',
           :one_or_more, :any_token
       end
@@ -253,8 +253,8 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Sequence
 
     context "A+ A A+" do
 
-      memoize_subject do
-        Subject_[].new_with :functions,
+      memoize_subject_parse_function_ do
+        subject_parse_module_.new_with :functions,
           :one_or_more, :any_token,
           :keyword, 'has', :minimum_number_of_characters, 1,
           :one_or_more, :any_token
@@ -299,8 +299,8 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Sequence
 
     context "the catalyst case (enter a compound grammar (curries inside curries))" do
 
-      memoize_subject do
-        Subject_[].new_with :functions,
+      memoize_subject_parse_function_ do
+        subject_parse_module_.new_with :functions,
           :one_or_more, :any_token,
           :sequence, :functions,
             :keyword, "would",
@@ -310,7 +310,7 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Sequence
       end
 
       it "builds" do
-        subject
+        subject_parse_function_
       end
 
       it "omg minimal passing" do
@@ -331,9 +331,13 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Sequence
       end
 
       it "render the syntax string with the default design" do
-        subject.express_all_segments_into_under( "" ).should eql(
+        subject_parse_function_.express_all_segments_into_under( "" ).should eql(
           '(ANY_TOKEN)+ would like (ANY_TOKEN)+' )
       end
+    end
+
+    def self.subject_parse_module_
+      Parse_.function :sequence
     end
   end
 end

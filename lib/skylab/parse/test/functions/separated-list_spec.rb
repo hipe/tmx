@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::Parse
+module Skylab::Parse::TestSupport
 
-  describe "[mh] parse functions - separated list" do
+  describe "[pa] functions - separated list" do
 
     extend TS_
 
@@ -15,7 +15,7 @@ module Skylab::MetaHell::TestSupport::Parse
     context "single sep" do
 
       it "builds" do
-        _sep
+        subject_parse_function_
       end
 
       it "against empty input - does not parse" do
@@ -67,12 +67,8 @@ module Skylab::MetaHell::TestSupport::Parse
         st.current_index.should eql 5
       end
 
-      def subject
-        _sep
-      end
-
-      memoize_ :_sep do
-        _subject.new_with(
+      memoize_subject_parse_function_ do
+        _subject_parse_module.new_with(
           :item, :proc, same_item_proc,
           :separator, :keyword, 'or' )
       end
@@ -110,8 +106,8 @@ module Skylab::MetaHell::TestSupport::Parse
         st.current_index.should eql 7
       end
 
-      memoize_ :subject do
-        _subject.new_with(
+      memoize_subject_parse_function_ do
+        _subject_parse_module.new_with(
           :item, :proc, same_item_proc,
           :ultimate_separator, :keyword, 'or',
           :non_ultimate_separator, :keyword, ',' )
@@ -138,8 +134,8 @@ module Skylab::MetaHell::TestSupport::Parse
       st.current_index.should be_zero
     end
 
-    define_singleton_method :_subject do
-      Subject_[].function_ :separated_list
+    def self._subject_parse_module
+      Parse_.function :separated_list
     end
   end
 end

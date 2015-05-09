@@ -1,6 +1,6 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
     module Function_
 
@@ -50,7 +50,7 @@ module Skylab::MetaHell
 
           # we need at least and at most one parse function.
 
-          f = Parse_.function_( st.gets_one ).new_via_iambic_stream_passively( st )
+          f = Parse_.function( st.gets_one ).new_via_iambic_stream_passively( st )
           f and begin
             @f = f
             KEEP_PARSING_
@@ -311,7 +311,9 @@ module Skylab::MetaHell
 
           nil
         end
+
+        EMPTY_P_ = -> {}
       end
     end
-  end
+    # <-
 end

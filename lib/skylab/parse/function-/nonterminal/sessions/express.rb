@@ -1,6 +1,6 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
     module Function_::Nonterminal
 
@@ -144,7 +144,7 @@ module Skylab::MetaHell
         end
 
         EXPRESSION_AGENT = Expag__.new_with(
-          :any_first_constituent_string, MetaHell_::IDENTITY_,
+          :any_first_constituent_string, -> x { x },  # `IDENTITY_`
           :any_subsequent_constituent_string, -> s { " #{ s }" },
           :express_all_segments_into_under_of_constituent_reflective_function,
             -> y, expag, f do
@@ -187,5 +187,5 @@ module Skylab::MetaHell
         end
       end
     end
-  end
+    # <-
 end

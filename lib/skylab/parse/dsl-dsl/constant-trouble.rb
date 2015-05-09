@@ -1,4 +1,4 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
   class DSL_DSL::Constant_Trouble  # this was test-first driven, covered.
 

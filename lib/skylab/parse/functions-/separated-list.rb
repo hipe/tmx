@@ -1,6 +1,6 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
     class Functions_::Separated_List  # the compliment to "oxford comma" BUT
 
@@ -47,7 +47,7 @@ module Skylab::MetaHell
 
         _sym = @__methodic_actor_iambic_stream__.gets_one
 
-        _cls = Parse_.function_( _sym )
+        _cls = Parse_.function( _sym )
 
         o = _cls.new_via_iambic_stream_passively @__methodic_actor_iambic_stream__
 
@@ -149,5 +149,5 @@ module Skylab::MetaHell
         @p[ in_st ]
       end
     end
-  end
+    # <-
 end

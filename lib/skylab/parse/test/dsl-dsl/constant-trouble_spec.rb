@@ -1,16 +1,11 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::DSL_DSL::Constant_Trouble
+module Skylab::Parse::TestSupport
 
-  ::Skylab::MetaHell::TestSupport::DSL_DSL[ TS_ = self ]
+  module DD_CT___  # :+#throwaway-namespace for constants created in tests
+    # <-
 
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  MetaHell_ = MetaHell_
-
-  describe "[mh] DSL_DSL::Constant_Trouble" do
+  TS_.describe "[pa] DSL DSL - constant trouble" do
 
     # OK, deep breath, here goes: constant trouble is a facility for producing
     # classes. Specifically it is a class that produces a subclass of itself
@@ -29,7 +24,7 @@ module Skylab::MetaHell::TestSupport::DSL_DSL::Constant_Trouble
                         # enhance you with.
           end
 
-          DSL = MetaHell_::DSL_DSL::Constant_Trouble.
+          DSL = Parse_::DSL_DSL::Constant_Trouble.
             new :Blammo_, Blammo, [ :hip_hop, :horay ]
 
                         # you will get one called this that descends from
@@ -99,7 +94,7 @@ module Skylab::MetaHell::TestSupport::DSL_DSL::Constant_Trouble
       m = -> do
         module M2
           class Bongo
-            Enhancer_ = MetaHell_::DSL_DSL::Constant_Trouble.
+            Enhancer_ = Parse_::DSL_DSL::Constant_Trouble.
               new :Bongo_, self, [ :wiptastik, :plastik ]
           end
           class Yours
@@ -130,5 +125,7 @@ module Skylab::MetaHell::TestSupport::DSL_DSL::Constant_Trouble
         y.plastik.should eql( :sure )
       end
     end
+  end
+# ->
   end
 end

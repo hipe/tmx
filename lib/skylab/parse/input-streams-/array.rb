@@ -1,6 +1,6 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
     class Input_Streams_::Array
 
@@ -72,5 +72,5 @@ module Skylab::MetaHell
         end
       end.call
     end
-  end
+    # <-
 end

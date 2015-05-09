@@ -1,8 +1,8 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
-    class Functions_::Any_Token < Parse::Function_::Field
+    class Functions_::Any_Token < Parse_::Function_::Field
 
       # this function is :+#empty-stream-safe
 
@@ -21,5 +21,5 @@ module Skylab::MetaHell
         Callback_::Name.via_variegated_symbol :any_token
       end
     end
-  end
+    # <-
 end

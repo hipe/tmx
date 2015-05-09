@@ -1,6 +1,6 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
     class Output_Node_
 
@@ -73,5 +73,5 @@ module Skylab::MetaHell
         @try_next = x ; nil
       end
     end
-  end
+    # <-
 end

@@ -1,4 +1,4 @@
-# the parse series narrative :[#029]
+# the parse serial optionals narrative :[#004]
 
 ## (legacy documentation, kept for posterity and amusement)
 

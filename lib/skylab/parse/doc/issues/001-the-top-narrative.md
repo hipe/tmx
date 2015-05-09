@@ -1,4 +1,4 @@
-# the parse narrative :[#011]
+# the parse narrative :[#001]
 
 ## introduction
 
@@ -18,6 +18,9 @@ of parse functions in this library, it is essential that we express a
 specification for all parse functions that defines exactly what is assumed
 and allowed of them in terms of input, output, and any side-effects.
 
+
+
+
 ## parse functions
 
 ### input scanners
@@ -36,6 +39,11 @@ a platform array of mixed (any) values. in the future we would like for
 this to work for stream-style scanners as well that for e.g are reading
 from a long file, data dump (e.g twitter feed) etc.)
 
+(also we are side-stepping the question of lookahead/backtracking. the
+short answer is, one parse function need *arbitrary* lookahead. if ever
+we were to make this truly streaming rather than just parsing arrays, we
+would have to reconcile the two.)
+
 (the parse function may or may not accept as a logical second parameter a
 "selective event listener". if it does so we will use the platform
 "block" argument so to implement this will be unobtrusive, and so we can
@@ -51,7 +59,7 @@ the case it evokes some potentially interesting ramifications for how
 some sort of fuzzy parsing could work; but that is not for today).
 
 a call to a parse function that did succeed will typically result in the
-side-effect of having mutating the input scanner (by advancing it across
+side-effect of having mutated the input scanner (by advancing it across
 one or more tokens). we have not yet worked with parse functions that do
 not do this and so do not here prescribe it as a thing whose behavior is
 defined, except to say "that might be interesting."
@@ -74,6 +82,9 @@ defined, except to say "that might be interesting."
        PERHAPS we will define what this means one day. currently we can
        speculate that while possible, this might lead to infinte loops
        for some grammars.
+
+
+
 
 ### output nodes
 

@@ -1,6 +1,6 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
     class Functions_::Keyword < Parse_::Function_::Field
 
@@ -134,7 +134,7 @@ module Skylab::MetaHell
           :keyword == f.function_category_symbol
         end.to_a
 
-        MetaHell_.lib_.basic::String.
+        Parse_.lib_.basic::String.
           shortest_unique_or_first_headstrings(
             f_a.map( & :formal_string )
           ).each_with_index do | s, d |
@@ -176,5 +176,5 @@ module Skylab::MetaHell
       QUOTE_ME_RX__ = /["'\\[:space:]]/
 
     end
-  end
+    # <-
 end

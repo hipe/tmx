@@ -1,6 +1,6 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
     module Input_Stream_
 
@@ -25,5 +25,5 @@ module Skylab::MetaHell
         attr_reader :value_x
       end
     end
-  end
+    # <-
 end

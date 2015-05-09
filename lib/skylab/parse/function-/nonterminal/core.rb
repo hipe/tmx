@@ -1,6 +1,6 @@
-module Skylab::MetaHell
+module Skylab::Parse
 
-  module Parse
+  # ->
 
     module Function_::Nonterminal
 
@@ -15,5 +15,5 @@ module Skylab::MetaHell
         end
       end
     end
-  end
+    # <-
 end

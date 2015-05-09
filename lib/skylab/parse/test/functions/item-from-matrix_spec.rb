@@ -1,11 +1,16 @@
 require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::Parse
+module Skylab::Parse::TestSupport
 
-  describe "[mh] parse functions - item from matrix" do
+  describe "[pa] functions - item from matrix" do
 
     extend TS_
     use :expect_event
+
+    define_singleton_method :memoize_ do | sym, & p |
+
+      define_method sym, Callback_::Memoize[ & p ]
+    end
 
     context "(against first grammar)" do
 
@@ -185,7 +190,7 @@ module Skylab::MetaHell::TestSupport::Parse
       end
 
       def _function_class
-        Subject_[].function_ :item_from_matrix
+        Parse_.function :item_from_matrix
       end
     end  # >>
   end
