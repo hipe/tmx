@@ -38,7 +38,7 @@ module Skylab::Basic
           o.relative_path_parts = i_a
           o.execute
         else
-          Callback_::Module_path_value_via_parts[ i_a ]
+          Callback_::Const_value_via_parts[ i_a ]
         end
       end
 

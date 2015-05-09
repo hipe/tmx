@@ -1,39 +1,37 @@
 require_relative '../test-support'
 
-module Skylab::Basic::TestSupport::Module
+module Skylab::Basic::TestSupport
 
-  ::Skylab::Basic::TestSupport[ self ]
+  module Mdl_C___  # :+#throwaway-module for constants created here
 
-  include Constants
+    # <-
 
-  extend TestSupport_::Quickie
-
-  Basic_ = Basic_
-
-  describe "[ba] Module" do
+  TS_.describe "[ba] module" do
 
     context "value via relative path" do
 
       it "loads" do
+
         Basic_::Module
       end
 
       it "ok" do
-        mod = subject Basic_::Module, '..'
-        mod.should eql Basic_
+
+        _subject( Basic_::Module, '..' ).should eql Basic_
       end
 
       it "when you dotdot above a toplevel path - nil" do
-        mod = subject ::Skylab, '..'
-        mod.should be_nil
+
+        _subject( ::Skylab, '..' ).should be_nil
       end
 
-      def subject mod, path
+      def _subject mod, path
+
         Basic_::Module.value_via_relative_path mod, path
       end
     end
 
-    it "Mutex" do
+    it "does mutex" do
 
       module Zinger
 
@@ -50,12 +48,21 @@ module Skylab::Basic::TestSupport::Module
       end
 
       Zinger.push :x
-      Zinger.a.should eql %i( _x_ )
-      _rx = /\bmodule mutex failure .+\bZinger\b/
-      -> do
-        Zinger.push :y
-      end.should raise_error ::RuntimeError, _rx
 
+      Zinger.a.should eql %i( _x_ )
+
+      _rx = /\bmodule mutex failure .+\bZinger\b/
+
+      begin
+        Zinger.push :y
+      rescue ::RuntimeError => e
+      end
+
+      if _rx !~ e.message
+        raise e
+      end
     end
+  end
+# ->
   end
 end

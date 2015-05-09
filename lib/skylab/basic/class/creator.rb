@@ -1,4 +1,8 @@
-module Skylab::MetaHell::Class::Creator
+module Skylab::Basic
+
+  module Class
+
+    module Creator
 
   # DSL for creating classes, for things like testing metaprogramming,
   # or testing libraries that do extensive reflection on class hierarchies,
@@ -7,18 +11,26 @@ module Skylab::MetaHell::Class::Creator
   #
   #   **very** #experimental
 
-  MetaHell_ = ::Skylab::MetaHell
-  Class = MetaHell_::Class
-  Module = MetaHell_::Module
+      class << self
 
+        def extended mod
+          self._PLEASE_UPDATE_YOUR_SYNTAX  # :+[#sl-109] deprecated
+        end
 
-  def self.extended mod # #sl-109
-    mod.extend ModuleMethods
-    mod.send :include, InstanceMethods
-  end
+        def [] mod
+          mod.extend ModuleMethods
+          mod.include InstanceMethods
+          NIL_
+        end
+      end  # >>
+
+      Let__ = Basic_.lib_.test_support::Let
+
+      # <- 2
 
   module ModuleMethods
-    include Module::Creator::ModuleMethods # needed for impl. e.g. `M`
+
+    include Basic_::Module::Creator::ModuleMethods  # `metahell_known_graph_`
 
     o = { }
 
@@ -39,7 +51,7 @@ module Skylab::MetaHell::Class::Creator
                                   # depending on if this is a create or update:
 
       create = -> name do         # Lambda for creating the metadata for the kls
-        m = Class::Meta.new name  # The only chance in the DSL you can set the
+        m = Class_::Models_::Plan.new name  # The only chance in the DSL you can set the
         if ! a.empty?             # parent class (symbolically) is now so
           m.optionals! a          # we process it here and then below validate
         end                       # that you're not trying to change it.
@@ -55,7 +67,7 @@ module Skylab::MetaHell::Class::Creator
       [create, update]
     end
 
-    K = MetaHell_.struct_via_hash o
+    K = Basic_::Struct.via_hash o
 
     def klass full_name, *a, &class_body # `a` is extra args, e.g. extends:
                                   # see extensive comments at klass! for now.
@@ -70,7 +82,7 @@ module Skylab::MetaHell::Class::Creator
         define_method :_nearest_klass_full_name do fullname end
       end.call
 
-      kg = __metahell_known_graph # (avoid spreading this around)
+      kg = metahell_known_graph_  # (avoid spreading this around)
 
       me = self                   # make self scope-visible for the below
 
@@ -87,15 +99,23 @@ module Skylab::MetaHell::Class::Creator
         end                       # time we build our own nodes.
       ]
     end
+
+    define_method :let, Let__::LET_METHOD
   end
 
-
   module InstanceMethods
-    extend MetaHell_::Let::ModuleMethods
 
-    include Module::Creator::InstanceMethods # M_IM, Memo
+    define_singleton_method :let, Let__::LET_METHOD
 
     K = ModuleMethods::K # hey can *i* borrow *this*
+    mc = Basic_::Module::Creator
+    mm = mc::ModuleMethods
+    im = mc::InstanceMethods
+
+    include im  # you can say `modul!` too
+    M = mm::M
+    Memo = im::Memo
+    M_IM = im::M_IM
 
     let( :klass ) { send _nearest_klass_full_name } # courtesy
 
@@ -138,7 +158,7 @@ module Skylab::MetaHell::Class::Creator
 
                                   # Resolve and normalize parent now:
       if ! opts.empty?            # iff you were given a symbolic name for a
-        m = Class::Meta.new full_name # parent class, any autovivification of it
+        m = Class_::Models_::Plan.new full_name # parent class, any autovivification of it
         m.optionals! opts         # must come early, in the edge case that the
         if ::Symbol === m.extends # child you will autovivify would be inside
           opts = [ { extends: vivify_parent[ m ] } ] # parent (weird, why?) you
@@ -153,7 +173,7 @@ module Skylab::MetaHell::Class::Creator
         existing = memo.mod
         ::Class == existing.class or fail ::TypeError.exception "#{
         full_name} is not a class (it's a #{ existing.class })"
-        meta = Class::Meta.new memo.name # spoof one
+        meta = Class_::Models_::Plan.new memo.name # spoof one
         parent = existing.ancestors[1..-1].detect { |x| ::Class == x.class }
         meta.extends = (::Object == parent) ? nil : parent # ick ?
         update_meta[ meta ]       # Process `opts`, tripping validation about
@@ -173,5 +193,10 @@ module Skylab::MetaHell::Class::Creator
         M_IM._bang_p[ self, build, update ]    # and similar behavior for leaves
       ].mod
     end
+  end
+# -> 2
+    end
+
+    Class_ = self
   end
 end

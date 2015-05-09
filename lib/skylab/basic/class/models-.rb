@@ -1,6 +1,12 @@
-module Skylab::MetaHell
-  class Class::Meta < MetaHell_::Module::Meta
-    include MetaHell_::Let::InstanceMethods # __memoized #impl
+module Skylab::Basic
+
+  module Class
+
+    Models_ = ::Module.new
+
+    class Models_::Plan < Basic_::Module::Models_::Plan
+
+      # <-
 
     # This metadata class (like its parent) has two distinct purposes :
     # 1) represent all data presented using the DSL in a lightweight way
@@ -14,12 +20,17 @@ module Skylab::MetaHell
       o
     end
 
-    def extends # non-normalized .. we use a hash to hold this so we can have
-      __memoized[:extends]        # meaningful nils, i.e. "this was set and is
-    end                           # known not to exist.", which is used below.
+    def extends
+
+      # non-normalized .. we use the memo hash to hold this so we can have
+      # meaningful nils, i.e. "this was set and is known not to exist.",
+      # which is used below.
+
+      memoized_[ :extends ]
+    end
 
     def _freeze!
-      __memoized[:extends] ||= nil
+      memoized_[ :extends ] ||= nil
     end
 
     def optionals! a              # ( we do a little validation here of
@@ -31,9 +42,7 @@ module Skylab::MetaHell
       nil
     end
 
-  private
-
-    def _option! k, v
+  private def _option! k, v
       if respond_to?( m = "_set_#{k}!" )
         send m, v
       else
@@ -96,18 +105,29 @@ module Skylab::MetaHell
 
     end.call
 
-    public :extends=
-
     def _set_extends! mixed
-      if __memoized.key? :extends # if its value is known
+
+      if memoized_.key? :extends # if its value is known
+
         if extends != mixed       # normalizing is out of scope
-          raise ::TypeError.exception("superklass mismatch for #{name} (#{
-            extends || 'nothing' } then #{ mixed || 'nothing' })")
+          raise ::TypeError.exception, __say_superclass_mismatch( mixed )
         end                       # else nothing to set
       else
-        __memoized[:extends] = mixed
+        memoized_[ :extends ] = mixed
       end
     end
-    public :_set_extends!
+
+    def __say_superclass_mismatch mixed
+
+      "superklass mismatch for #{ name } (#{  # spelling sic
+        }#{ extends || 'nothing' } then #{ mixed || 'nothing' })"
+    end
+
+    define_method :memoized_, Basic_.lib_.test_support::Let::MEMOIZED_METHOD
+    define_method :__memoized, Basic_.lib_.test_support::Let::MEMOIZED_METHOD
+
+  # ->
+
+    end
   end
 end

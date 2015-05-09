@@ -1,21 +1,52 @@
-require_relative '../test-support'
+module Skylab::Basic::TestSupport
 
-module Skylab::MetaHell::TestSupport::Module::Creator
+  module Module::Creator
 
-  ::Skylab::MetaHell::TestSupport::Module[ TS_ = self ]
+    Define_Klass = -> tcm, _BOX_MOD do
 
-  include Constants
+      sbox_class_counter = 0
 
-  module ModuleMethods
-    include Constants
-    def snip &f
-      let :klass do
-        ::Class.new.class_eval do
-          extend MetaHell_::Let  # #comport
-          extend MetaHell_::Module::Creator
-          let( :meta_hell_anchor_module ) { ::Module.new }
-          class_exec(& f) if f
-          self
+      tcm.send :define_singleton_method, :define_klass_ do | & eval_p |
+
+        let :klass_ do
+
+          ::Class.new.class_eval do
+
+            _BOX_MOD.const_set(
+              :"Generated_Sandbox_Class__#{ sbox_class_counter += 1 }__",
+              self )
+
+            class << self
+              TestSupport_::Let[ self ]  # EEK the class itself must memoize
+            end
+
+            sbox_mod_counter = 0
+
+            define_method :initialize do
+
+              @___my_box_mod = self.class.const_set(
+
+                :"Generated_Sandbox_Module__#{ sbox_mod_counter += 1 }__",
+                ::Module.new )
+            end
+
+            TestSupport_::Let[ self ]  # EEK and the instance
+
+            Basic_::Module::Creator[ self ]
+
+            if eval_p
+              class_exec( & eval_p )
+            end
+
+            m = :meta_hell_anchor_module
+            if ! method_defined? m
+              define_method m do
+                @___my_box_mod
+              end
+            end
+
+            self
+          end
         end
       end
     end

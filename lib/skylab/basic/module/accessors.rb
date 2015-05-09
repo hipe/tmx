@@ -1,10 +1,8 @@
-module Skylab::MetaHell
-
-  Module = ::Module.new  # ~ stowaway
+module Skylab::Basic
 
   module Module::Accessors
 
-    # (see also the simpler [#ba-034])
+    # (this immigrated from [mh]. see also the simpler [#034])
 
     # a lightweight enhancer that for the module using it generates instance
     # methods for that module each of which access a particular "significant
@@ -37,7 +35,7 @@ module Skylab::MetaHell
     #
     #     module MyApp
     #       class CLI::Client
-    #         MetaHell_::Module::Accessors.enhance self do
+    #         Basic_::Module::Accessors.enhance self do
     #           public_methods do
     #             module_reader :API_client_module, '../../API/Client'
     #           end
@@ -65,7 +63,7 @@ module Skylab::MetaHell
     #
     #     class Foo
     #
-    #       MetaHell_::Module::Accessors.enhance self do
+    #       Basic_::Module::Accessors.enhance self do
     #
     #         private_module_autovivifier_reader :zapper, 'Ohai_',
     #           -> do  # when didn't exist
@@ -111,10 +109,9 @@ module Skylab::MetaHell
     #     bar.run
     #     Bar::Ohai_.instance_variable_get( :@counter )  # => 11
 
-
     def self.enhance host_mod, &enhance_blk
 
-      cnd = Shell_.new -> access, meth, path, create_blk=nil, extend_blk=nil do
+      cnd = Shell__.new -> access, meth, path, create_blk=nil, extend_blk=nil do
 
         ivar = "@#{ meth }".intern
 
@@ -124,8 +121,10 @@ module Skylab::MetaHell
               instance_variable_get ivar
             else
 
-              md = MetaHell_.lib_.module_lib.
-                touch_value_via_relative_path mod[ self ], path, create_blk
+              md = Basic_::Module.touch_value_via_relative_path(
+                mod[ self ],
+                path,
+                create_blk )
 
               if extend_blk
                 md.module_exec( & extend_blk )  # future i am sorry
@@ -152,18 +151,18 @@ module Skylab::MetaHell
         cnd.instance_exec( & enhance_blk  )
         nil
       else
-        Shell_::OneShot_.new cnd  # (custom)
+        Shell__::OneShot.new cnd  # (custom)
       end
     end
 
-    class Shell_
+    class Shell__
 
       def initialize mod_bumper
         @stack = []
         @mod_bumper = mod_bumper
       end
 
-      A__ = [ ]   # (expose only these for the custom OneShot_)
+      A__ = []   # (expose only these for the custom OneShot_)
 
       def module_reader meth, path, &blk
         @mod_bumper[ @stack.last, meth, path, nil, blk ]
@@ -172,6 +171,7 @@ module Skylab::MetaHell
       def private_module_reader meth, path, &blk
         @mod_bumper[ :private, meth, path, nil, blk ]
       end
+
       A__ << :private_module_reader
 
       def module_autovivifier meth, path, &blk
@@ -185,6 +185,7 @@ module Skylab::MetaHell
       def private_module_autovivifier_reader meth, path, viv, init
         @mod_bumper[ :private, meth, path, viv, init ]
       end
+
       A__ << :private_module_autovivifier_reader
 
       def private_methods &blk
@@ -207,7 +208,7 @@ module Skylab::MetaHell
       end
     end
 
-    class Shell_::OneShot_
+    class Shell__::OneShot
 
       # (it's easier and clearer to just implement this "by hand" here.)
 
@@ -215,7 +216,7 @@ module Skylab::MetaHell
         @cnd = cnd
       end
 
-      Shell_::A__.each do |i|
+      Shell__::A__.each do |i|
         define_method i do |*a, &b|
           @mutex = i
           freeze

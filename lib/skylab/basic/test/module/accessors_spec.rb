@@ -1,20 +1,17 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::Module::Accessors
+module Skylab::Basic::TestSupport
 
-  ::Skylab::MetaHell::TestSupport::Module[ self ]
+  module Mdl_A___  # :+#throwaway-module for contants set during tests
 
-  include Constants
+    # <-
 
-  extend TestSupport_::Quickie
+  TS_.describe "[ba] module accessors" do
 
-  MetaHell_ = MetaHell_
-
-  describe "[mh] Module::Accessors" do
-
-    context "imagine a constant tree with the below five modules" do
+    context "imagine a module graph with the below five modules" do
 
       before :all do
+
         module MyApp
           module CLI
             class Client
@@ -27,10 +24,12 @@ module Skylab::MetaHell::TestSupport::Module::Accessors
           end
         end
       end
+
       it "from one instance you can reach a module in its class's graph" do
+
         module MyApp
           class CLI::Client
-            MetaHell_::Module::Accessors.enhance self do
+            Basic_::Module::Accessors.enhance self do
               public_methods do
                 module_reader :API_client_module, '../../API/Client'
               end
@@ -42,12 +41,14 @@ module Skylab::MetaHell::TestSupport::Module::Accessors
         cli.API_client_module.should eql MyApp::API::Client
       end
     end
+
     context "here's the autovivifying hack" do
 
       before :all do
+
         class Foo
 
-          MetaHell_::Module::Accessors.enhance self do
+          Basic_::Module::Accessors.enhance self do
 
             private_module_autovivifier_reader :zapper, 'Ohai_',
               -> do  # when didn't exist
@@ -67,12 +68,16 @@ module Skylab::MetaHell::TestSupport::Module::Accessors
           end
         end
       end
+
       it "the first time the thing is accessed, the two procs are called" do
+
         foo = Foo.new
         foo.touch
         Foo::Ohai_.instance_variable_get( :@counter ).should eql 1
       end
+
       it "if you create the thing before it is accessed, etc" do
+
         class Bar < Foo
           module Ohai_
             @counter = 10
@@ -90,5 +95,7 @@ module Skylab::MetaHell::TestSupport::Module::Accessors
         Bar::Ohai_.instance_variable_get( :@counter ).should eql 11
       end
     end
+  end
+# ->
   end
 end

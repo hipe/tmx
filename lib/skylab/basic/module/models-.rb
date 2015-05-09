@@ -1,9 +1,16 @@
-module Skylab::MetaHell
-  class Module::Meta
-    extend MetaHell_::Let
+module Skylab::Basic
 
-    SEP  = '::'
-    SEP_ = Module::Creator::SEP_
+  module Module
+
+    Models_ = ::Module.new
+
+    # <-
+
+  class Models_::Plan
+
+    Basic_.lib_.test_support::Let[ self ]
+
+    NAME_SEP__ = Module::Creator::NAME_SEPARATOR
 
     attr_reader :name, :children, :blocks
 
@@ -28,7 +35,7 @@ module Skylab::MetaHell
       end
     end
 
-    let( :const ) { @name.to_s.split( SEP_ ).last.intern }
+    let( :const ) { @name.to_s.split( NAME_SEP__ ).last.intern }
 
     def _lock!   ; @locked and fail('sanity') ; @locked = true end
     def _locked? ; @locked end
@@ -47,7 +54,7 @@ module Skylab::MetaHell
         alias_method :meta_hell_original_name, :name
         alias_method :meta_hell_original_to_s, :to_s
       end
-      pretty = name.to_s.gsub SEP_, SEP
+      pretty = name.to_s.gsub NAME_SEP__, CONST_SEP_
       o.define_singleton_method :to_s do pretty end
       o.singleton_class.send :alias_method, :name, :to_s
       fail "circular dependency on #{name} - should you be using ruby #{
@@ -59,5 +66,7 @@ module Skylab::MetaHell
       _unlock!
       nil
     end
+  end
+# ->
   end
 end

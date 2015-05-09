@@ -1,13 +1,27 @@
-require_relative '../test-support'
+module Skylab::Basic::TestSupport
 
-module Skylab::MetaHell::TestSupport::Class::Creator
+  module Class::Creator::Define_Klass
 
-  ::Skylab::MetaHell::TestSupport::Class[ TS_ = self ]
+    class << self
 
-  include Constants
+      def [] tcm, box_mod
+
+        tcm.extend ModuleMethods
+
+        tcm.let :o do
+          self.klass.new
+        end
+
+        tcm.send :define_singleton_method, :snip, Build_Snip_Method___[ box_mod ]
+
+        NIL_
+      end
+    end  # >>
+
+    # <-
 
   module ModuleMethods
-    include Constants
+
     def borks msg
       it "raises error with message - #{ msg }" do
         -> do
@@ -15,27 +29,43 @@ module Skylab::MetaHell::TestSupport::Class::Creator
         end.should raise_error( msg )
       end
     end
+
     def doing &f
       let :subject do
         -> { instance_exec(& f) } # yeah, wow
       end
     end
-    def snip &f
+  end
+
+  Build_Snip_Method___ = -> box_mod do
+
+    counter = 0
+
+    -> & f do
+
       let :klass do
+
         ::Class.new.class_eval do
-          extend MetaHell_::Let  # #comport
-          extend MetaHell_::Class::Creator
-          let( :meta_hell_anchor_module ) { ::Module.new }
+
+          Basic_::Class::Creator[ self ]
+
+          define_method :memoized_, TestSupport_::Let::MEMOIZED_METHOD
+
+          let :meta_hell_anchor_module do
+
+            box_mod.const_set(
+              :"Gennd_Box_Mod__#{ counter += 1 }__",
+              ::Module.new )
+          end
+
           class_exec(& f) if f
+
           self
         end
       end
     end
   end
 
-
-  module InstanceMethods
-    include Constants
-    extend MetaHell_::Let
+# ->
   end
 end

@@ -1,4 +1,4 @@
-require_relative 'mm/test-support'
+require_relative '../../test-support'
 
 # the below tests are especially ugly because they themselves are testing
 # how this library affects modules, yet the whole purpose of this library
@@ -7,15 +7,19 @@ require_relative 'mm/test-support'
 # library itself here, hence they are very ugly, hence in a way, right here
 # in this very file is the darkest of all the circles of meta-hell.
 
-module Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
+module Skylab::Basic::TestSupport
+
+  module Mdl_Crtr_MM___  # :+#throwaway-module for constants created below
+
+    # <-
 
   module Scenario_One
 
     Once__ = Callback_.memoize do  # we want something more explicit than before( :all ) for now
 
       module Some_Module_Definer_Methods
-        extend Module::Creator
-        extend MetaHell_::Let
+
+        Basic_::Module::Creator[ self ]
 
         modul :Wank do
           def worked
@@ -24,32 +28,30 @@ module Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
       end
 
       class Class
+
         include Some_Module_Definer_Methods
-        extend MetaHell_::Let::ModuleMethods
+
+        TestSupport_::Let[ self ]
 
         let :meta_hell_anchor_module do
           ::Module.new
         end
-
       end
 
       :__done__
     end
 
-    describe "[mh] Module::Creator::ModuleMethods (*on* modules, #{
+    TS_.describe "[mh] Module::Creator::ModuleMethods (*on* modules, #{
       }not classes" do
 
-      extend MC_MM_TS_
+      extend TS_
 
-      context "minimal" do
+      it "a klass can include modules that have graphs, and work" do
 
-        it "a klass can include modules that have graphs, and work" do
+        Once__[]
 
-          Once__[]
+        Class.new._Wank.instance_methods.should eql [ :worked ]
 
-          Class.new._Wank.instance_methods.should eql [ :worked ]
-
-        end
       end
     end
   end
@@ -59,21 +61,30 @@ module Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
       Once__ = Callback_.memoize do
 
         module OneGuy
-          extend Module::Creator, MetaHell_::Let
-          modul :Lawrence__Fishburne
 
+          Basic_::Module::Creator[ self ]
+
+          modul :Lawrence__Fishburne
         end
+
         module AnotherGuy
-          extend Module::Creator, MetaHell_::Let
+
+          Basic_::Module::Creator[ self ]
+
           modul :Lawrence__Kasdan
+
           modul :Lawrence__Arabia
         end
+
         class SomeClass
+
           include OneGuy, AnotherGuy
 
-          extend MetaHell_::Let::ModuleMethods
+          TestSupport_::Let[ self ]
 
-          let(:meta_hell_anchor_module) { ::Module.new }
+          let :meta_hell_anchor_module do
+            ::Module.new
+          end
         end
 
       :__dne__
@@ -84,10 +95,10 @@ module Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
                                   # this file alone)
 
 
-    describe "[mh] Module::Creator::ModuleMethods scenario 2 - #{
+    TS_.describe "[mh] Module::Creator::ModuleMethods scenario 2 - #{
       }this is fucking amazing - composing different module graphs WTF" do
 
-      extend MC_MM_TS_
+      extend TS_
 
       before :all do
         Once__[]
@@ -120,5 +131,7 @@ module Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
         o1.Lawrence::Arabia.constants.should eql([:Flavia])
       end
     end
+  end
+# ->
   end
 end

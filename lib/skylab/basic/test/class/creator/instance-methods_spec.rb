@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::MetaHell::TestSupport::Class::Creator
+module Skylab::Basic::TestSupport
 
-  describe "[mh] class creator instance methods" do
+  describe "[ba] class - creator - instance methods" do
 
     extend TS_
+    use :class_creator_define_klass, Cls_Crtr_IM___ = ::Module.new
 
     context "minimal" do
       snip

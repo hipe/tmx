@@ -1,17 +1,40 @@
-module Skylab::MetaHell::Module::Creator
+module Skylab::Basic
 
-  Creator = self
-  MetaHell_ = ::Skylab::MetaHell
-  Module = MetaHell_::Module
-  SEP_ = '__'
+  module Module
 
-  def self.extended mod # #sl-109
-    mod.extend ModuleMethods
-    mod.send :include, InstanceMethods
-  end
+    module Creator
 
-  module ModuleMethods # expects you to define your own let()
-    extend MetaHell_::Let # #impl
+      class << self
+
+        def extended _  # :+[#sl-109] is deprecated  #todo
+          self._PLEASE_UPDATE_YOUR_SYNTAX
+        end
+
+        def [] mod
+          mod.extend ModuleMethods
+          mod.include InstanceMethods
+          NIL_
+        end
+      end  # >>
+
+      # warning: it gets nasty below. *early* dalliance with functionalism
+
+      module Memo_Methods__
+
+        def initialize x
+          super x, []
+        end
+
+        def name
+          ModuleMethods::M.name[ seen ]
+        end
+      end
+
+      # <- 2
+
+  Let__ = Basic_.lib_.test_support::Let
+
+  module ModuleMethods  # assumes `let`
 
     o = ::Hash.new
 
@@ -26,7 +49,10 @@ module Skylab::MetaHell::Module::Creator
       define_method( "_#{full_module_name}" ) { send full_module_name }
     end
 
-    o[:create_meta] = ->( name ) { Module::Meta.new name }
+    o[ :create_meta ] = -> name_sym do
+
+      Module_::Models_::Plan.new name_sym
+    end
 
     o[:define_methods] = -> me, name, build_module do
       M.memoize[ me, name, build_module ]
@@ -135,9 +161,9 @@ module Skylab::MetaHell::Module::Creator
       memo
     end
 
-    o[:name] = -> parts { parts.join( SEP_ ).intern }
+    o[:name] = -> parts { parts.join( SEP__ ).intern }
 
-    o[:parts] = -> full_name { full_name.to_s.split SEP_ }
+    o[:parts] = -> full_name { full_name.to_s.split SEP__ }
 
     o[:reduce] = -> full_name, memo, branch_p, leaf_p=nil do
       leaf_p ||= branch_p
@@ -155,9 +181,11 @@ module Skylab::MetaHell::Module::Creator
       memo
     end
 
-    M = MetaHell_.struct_via_hash o
+    M = Basic_::Struct.via_hash o
 
-    let :__metahell_known_graph do
+    define_singleton_method :let, Basic_.lib_.test_support::Let::LET_METHOD
+
+    let :metahell_known_graph_ do
       # #note the below causes core dumps yay [#006]
       # if defined? super  # does this even make sense ? will it ever trigger?
       #   fail "implement me - dealing with ancestor chain ~meta hell"
@@ -172,7 +200,7 @@ module Skylab::MetaHell::Module::Creator
       # 1) define some methods iff necessary and 2) update the graph
       # storing away any method body lamba somewhere.
 
-      kg = __metahell_known_graph # (maybe try to avoid spreading this around)
+      kg = metahell_known_graph_  # (maybe try to avoid spreading this around)
       me = self
 
       build_meta = M.build_meta_p[ me, kg ]
@@ -187,10 +215,18 @@ module Skylab::MetaHell::Module::Creator
       ]
       nil
     end
+
+    define_method :let, Let__::LET_METHOD
+
+    define_method :memoized_, Let__::MEMOIZED_METHOD
+    define_method :__memoized, Let__::MEMOIZED_METHOD
+
+    Memo = ::Struct.new :known_graph, :seen do
+      include Memo_Methods__
+    end
   end
 
   module InstanceMethods
-    extend MetaHell_::Let::ModuleMethods
 
     # (note: although we have a "sophisticated" mechanism for managing
     # definitions of module graphs in our complimentary module above,
@@ -242,8 +278,7 @@ module Skylab::MetaHell::Module::Creator
       sing_class.class_exec name, & M.convenience
     end
 
-    M_IM = MetaHell_.struct_via_hash o
-
+    M_IM = Basic_::Struct.via_hash o
 
     def modul! full_name, &module_body
       # get this module by name now, autovivifying any modules necessary to
@@ -270,23 +305,19 @@ module Skylab::MetaHell::Module::Creator
         mod.const_get const, false
       end ]
     end
-  end
 
-  module Memo_Methods
-    M = ModuleMethods::M
-    def name
-      M.name[ seen ]
-    end
-    def initialize mixed
-      super mixed, [ ]
+    define_method :memoized_, Let__::MEMOIZED_METHOD
+    define_method :__memoized, Let__::MEMOIZED_METHOD
+
+    Memo = ::Struct.new :mod, :seen do
+      include Memo_Methods__
     end
   end
 
-  class ModuleMethods::Memo < ::Struct.new :known_graph, :seen
-    include Memo_Methods
-  end
+# -> 2
 
-  class InstanceMethods::Memo < ::Struct.new :mod, :seen
-    include Memo_Methods
+      SEP__ = NAME_SEPARATOR = '__'
+
+    end
   end
 end
