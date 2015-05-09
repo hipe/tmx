@@ -1,79 +1,11 @@
-require_relative '../core'
-require 'skylab/test-support/core'
+module Skylab::Brazen
 
-module Skylab::System::TestSupport
+  Bundle = ::Module.new
 
-  TestSupport_ = ::Skylab::TestSupport
-
-  TestSupport_::Regret[ TS_ = self ]
-
-  extend TestSupport_::Quickie
-
-  module ModuleMethods
-
-    define_method :use, -> do
-
-      cache_h = {}
-
-      -> sym do
-
-        ( cache_h.fetch sym do
-
-          const = Callback_::Name.via_variegated_symbol( sym ).as_const
-
-          x = if Common_Bundles___.const_defined? const, false
-            Common_Bundles___.const_get const, false
-          else
-            Fancy_bundle_lookup___[ sym ]
-          end
-          cache_h[ sym ] = x
-          x
-        end )[ self ]
-      end
-
-    end.call
-  end
-
-  module InstanceMethods
-
-    def services_
-      System_.services
-    end
-
-    attr_reader :do_debug
-
-    def debug!
-      @do_debug = true
-    end
-
-    def debug_IO
-      TestSupport_.debug_IO
-    end
-  end
-
-  module Common_Bundles___
-
-    Expect_Event = -> test_context_class do
-      Callback_.test_support::Expect_Event[ test_context_class ]
-    end
-  end
-
-  System_ = ::Skylab::System
-
-  Callback_ = System_::Callback_
-
-  class << self
-
-    define_method :tmpdir_path_, ( Callback_.memoize do
-
-      ::File.join( System_.services.filesystem.tmpdir_path, '[sy]' )  # :+#FS-eek
-    end )
-  end  # >>
-
-  Fancy_bundle_lookup___ = -> do  # exegesis at [#019]
+  Bundle::Fancy_lookup = -> do  # exegesis at [#043]
 
     parse_lib = -> do
-      System_.lib_.parse_lib
+      Brazen_.lib_.parse_lib
     end
 
     skip_rx = /_spec\z/
@@ -128,7 +60,7 @@ module Skylab::System::TestSupport
       end
     end
 
-    -> sym do
+    -> sym, mod do
 
       s = sym.id2name
 
@@ -137,8 +69,6 @@ module Skylab::System::TestSupport
       received_s_a = s.split UNDERSCORE_
 
       to_const = build_to_const[ received_s_a, in_st ]
-
-      mod = TS_
 
       et = mod.entry_tree
 
@@ -194,15 +124,4 @@ module Skylab::System::TestSupport
       mod.const_get const, false
     end
   end.call
-
-  DASH_ = '-'
-
-  EMPTY_S_ = System_::EMPTY_S_
-
-  NIL_ = System_::NIL_
-
-  UNDERSCORE_ = '_'
-
-  NIL
-
 end

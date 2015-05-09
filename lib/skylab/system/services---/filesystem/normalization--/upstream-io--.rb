@@ -41,6 +41,11 @@ module Skylab::System
               ACHIEVED_
             end
 
+            def result_in_IO_stream_identifier_trio=
+              @do_result_in_IO_stream_identifier_trio = true
+              KEEP_PARSING_
+            end
+
             def only_apply_expectation_that_path_is_ftype_of=
               @only_apply_ftype_expectation = true
               @expected_ftype = iambic_property
@@ -51,10 +56,18 @@ module Skylab::System
                 :as_normal_value,
                 :instream,
                 :stat
+
+            def dash_means=
+              @dash_means = iambic_property
+              KEEP_PARSING_
+            end
           end
 
           def initialize & edit_p
+            @dash_means = nil
             @do_execute = false
+            @do_recognize_common_string_patterns = nil
+            @do_result_in_IO_stream_identifier_trio = nil
             @instream = nil
             @only_apply_ftype_expectation = false
             @path_arg_was_explicit = false
@@ -84,7 +97,7 @@ module Skylab::System
               if instream_is_noninteractive_and_open
                 when_actual_both
               else
-                when_actual_path
+                _via_arg
               end
             elsif instream_is_noninteractive_and_open
               when_actual_instream
@@ -99,7 +112,7 @@ module Skylab::System
 
           def when_formal_path
             if @path_arg.is_known_known
-              when_actual_path
+              _via_arg
             else
               when_path_not_provided
             end
@@ -152,17 +165,37 @@ module Skylab::System
             @as_normal_value[ @instream ]
           end
 
-          def when_actual_path
+          def _via_arg
 
             if @value_is_pathname
               pn = @path_arg.value_x
-              pathname_exists_and_set_stat_and_stat_error pn
               @path = pn.to_path
+              pathname_exists_and_set_stat_and_stat_error pn
+              _via_stat
             else
-              @path = @path_arg.value_x
-              path_exists_and_set_stat_and_stat_error @path
+              if @do_recognize_common_string_patterns
+                md_x = via_path_arg_match_common_pattern_
+              end
+              if md_x
+                via_common_pattern_match_ md_x
+              else
+                @path = @path_arg.value_x
+                path_exists_and_set_stat_and_stat_error @path
+                _via_stat
+              end
             end
+          end
 
+          def via_system_resource_identifier_ d
+            case d
+            when 0
+              via_stdin_
+            else
+              when_invalid_system_resource_identifier_ d, 0
+            end
+          end
+
+          def _via_stat
             if @stat
               via_stat_execute
             else
@@ -176,11 +209,12 @@ module Skylab::System
             end
           end
 
-          def via_stat_execute
+          def via_stat_execute  # :+#public-API
+
             if @only_apply_ftype_expectation
               via_stat_and_expected_ftype_exert_expectation
             elsif FILE_FTYPE == @stat.ftype
-              via_path_open_file
+              __via_path_open_file
             else
               maybe_send_event :error, :wrong_ftype do
                 build_wrong_ftype_event_ @path_arg.value_x, @stat, FILE_FTYPE
@@ -198,15 +232,24 @@ module Skylab::System
             end
           end
 
-          def via_path_open_file
+          def __via_path_open_file
+
             set_IO_and_e
             if @IO
-              @as_normal_value[ @IO ]
+              if @do_result_in_IO_stream_identifier_trio
+                via_trueish_IO_stream_ @IO
+              else
+                @as_normal_value[ @IO ]
+              end
             else
               maybe_send_event :error, :exception do
                 wrap_excetion @e
               end
             end
+          end
+
+          def byte_whichstream_identifier_
+            System_::IO::Byte_Upstream_Identifier
           end
 
           def set_IO_and_e
@@ -231,6 +274,10 @@ module Skylab::System
             Event_.wrap.exception e, :path_hack, * _xtra,
               :properties, :path_arg, @path_arg
 
+          end
+
+          def which_stream_
+            :upstream
           end
         end
       end

@@ -221,7 +221,7 @@ module Skylab::Callback
     end
 
     def iambic_stream_via_iambic_array x_a
-      Polymorphic_Stream_via_Array_.new 0, x_a
+      Polymorphic_Stream_via_Array_.new x_a
     end
 
     def formal_fields_ivar_box_for_read_
@@ -680,176 +680,218 @@ module Skylab::Callback
 
   end
 
-  # ~ the #employment story
-
   module Autoloader  # read [#024] the new autoloader narrative
 
     class << self
-      def [] mod, * x_a
-        if x_a.length.zero?
-          mod.respond_to? :dir_pathname and raise say_not_idempotent( mod )
-          mod.extend Methods__
+
+      def [] mod, * x_a, & p
+
+        if x_a.length.nonzero? || p
+
+          Effect_edit_session___.new( mod, x_a, & p ).execute
+
         else
-          employ_iambic_fully x_a, mod
+
+          mod.respond_to? :dir_pathname and raise __say_not_idempotent( mod )
+          mod.extend Methods__
         end
         mod
       end
-    private
-      def say_not_idempotent mod  # #not-idemponent
+      alias_method :call, :[]
+
+      def __say_not_idempotent mod  # #not-idemponent
         "this operation is not idempotent. autoloader will not enhance #{
           }an object that already responds to 'dir_pathname': #{ mod }"
       end
-      def employ_iambic_fully x_a, mod   # [ dir_pn ] [ 'boxxy' ]
-        Employment_Parse__.new( self, x_a, mod ).parse
-      end
-    end
-
-    class Employment_Parse__
-      def initialize employee_mod, x_a, employer_mod
-        @actual_p_a = []
-        @employer_mod = employer_mod
-        @possible_p_a = POSSIBLE_P_A_
-        @possible_d_a = @possible_p_a.length.times.to_a
-        @x_a = x_a
-      end
-      def parse
-        begin
-          p = nil ; x = @x_a.shift
-          idx = @possible_d_a.index do |d|
-            p = @possible_p_a.fetch( d )[ x ]
-          end
-          idx or raise ::ArgumentError, say_bad_term( x )
-          @actual_p_a[ @possible_d_a.fetch idx ] = p
-          @possible_d_a[ idx, 1 ] = EMPTY_A_
-        end while @x_a.length.nonzero?
-        flush
-      end
-    private
-      def say_bad_term x
-        "unexpected argument #{ Callback_.lib_.strange x }. #{
-          }expecting #{ say_expecting }"
-      end
-      def say_expecting
-        _a = @possible_d_a.map do |d|
-          name_s = @possible_p_a.fetch( d ).name.to_s
-          md = TERM_PARSER_NAME_MATCHER_RX__.match name_s
-          stem, type = if md
-            [ md[ 1 ], md[ 2 ].intern ]
-          else
-            [ name_s, :argument ]
-          end
-          send :"render_stem_as_#{ type }", stem
-        end
-        Oxford_or[ _a ]
-      end
-
-      TERM_PARSER_NAME_MATCHER_RX__ = %r(\A(.+)_(argument|keyword)\z)
-
-      def render_stem_as_argument s
-        "<#{ s }>"
-      end
-      def render_stem_as_keyword s
-        "'#{ s }'"
-      end
-      def flush
-        @actual_p_a.compact!
-        @actual_p_a.each do |p|
-          p[ @employer_mod ]
-        end ; nil
-      end
-    end
-
-    class << self  # methods that implement the different employment features
-
-      def dir_path_argument x
-        if x.respond_to? :ascii_only?
-          -> mod do
-            mod.module_exec do
-              @dir_pathname = ::Pathname.new( x )
-              extend Methods__
-            end
-          end
-        end
-      end
-
-      def methods_keyword x
-        if :methods == x
-          -> mod do
-            mod.module_exec do
-              extend Methods__
-            end
-          end
-        end
-      end
-
-      def boxxy_keyword x
-        if :boxxy == x
-          -> mod do
-            mod.respond_to? :dir_pathname or
-              mod.extend Methods__
-            mod.extend self::Boxxy_::Methods ; nil
-          end
-        end
-      end
-    end
-
-    POSSIBLE_P_A_ = [
-      method( :dir_path_argument ),
-      method( :methods_keyword ),
-      method( :boxxy_keyword )
-    ].freeze
-
+    end  # >>
 
     Methods__ = ::Module.new
 
     self[ self ]  # eat our own dogfood as soon as possible for #grease
+
+    class Effect_edit_session___  # assume nonzero tokens
+
+      # this is the *only* way to apply "modifiers" to an autoloaderization
+
+      def initialize mod, x_a, & edit_p
+
+        @edit_p = edit_p
+        @in_st = if x_a.length.nonzero?
+          Polymorphic_Stream_via_Array_.new x_a
+        end
+        @mod = mod
+      end
+
+      def execute
+
+        @_do_boxxy = nil ; @_do_common = nil
+        @_FS_entry_string = nil
+        @_path = nil ; @_pmod = nil
+
+        if @edit_p
+          @edit_p[ self ]
+        end
+
+        if @in_st
+
+          x = @in_st.current_token
+          if x.respond_to? :ascii_only?
+            _process_path_phrase
+          end
+
+          while @in_st.unparsed_exists
+            send :"process__#{ @in_st.gets_one }__phrase"
+          end
+        end
+
+        __flush
+        NIL_
+      end
+
+      # ~ three idioms: `_internal`, `_internal_setter=`, `etc__public__etc`
+
+      def process__boxxy__phrase
+
+        @_do_boxxy = true
+      end
+
+      def _filesystem_entry_string= x
+        @_do_common = true
+        @_FS_entry_string = x
+        x
+      end
+
+      def process__methods__phrase
+
+        @_do_common = true
+      end
+
+      def _process_path_phrase
+
+        @_do_common = true
+        @_path = @in_st.gets_one
+      end
+
+      # alias_method :process__path__phrase, :_process_path_phrase  # makes it public
+
+      def _presumably_autoloaderized_parent_module= x
+
+        @_do_common = true
+        @_pmod = x
+        x
+      end
+
+      # ~
+
+      def __flush  # see #note-785
+
+        do_boxxy = @_do_boxxy ; do_common = @_do_common
+        fs_entry = @_FS_entry_string ; path = @_path
+        pmod = @_pmod
+
+        @mod.module_exec do
+
+          if do_common
+            extend Methods__
+          end
+
+          if pmod
+            @_parent_module_is_known_is_known = true
+            @_parent_module = pmod
+          end
+
+          if path
+
+            if fs_entry
+              raise ::ArgumentError
+            end
+
+            if instance_variable_defined? :@dir_pathname
+
+              self._SANITY
+            end
+
+            @dir_pathname = ::Pathname.new path
+
+          elsif fs_entry
+
+            @_filesystem_entry_name = Name.via_slug fs_entry
+          end
+
+          if do_boxxy
+
+            if ! respond_to? :dir_pathname
+              extend Methods__
+            end
+
+            extend Autoloader_::Boxxy_::Methods
+          end
+        end
+        NIL_
+      end
+    end
 
     # ~ the dir_pathname feature & related (e.g child class)
 
     module Methods__
 
       def dir_pathname
-        @_did_resolve_dir_pathname ||= __resolve_dir_pathname
+
+        @___dpn_is_known_is_known ||= __resolve_dir_pathname
         @dir_pathname
       end
 
-      def autoloader_name
-        @did_orient_for_autoloader ||= orient_for_autoloader
-        @autoloader_name
-      end
-
-    private
-
       def __resolve_dir_pathname
+
         @dir_pathname ||= __produce_any_dir_pathname
         true
       end
 
       def __produce_any_dir_pathname
 
-        mod = autoloader_parent_module
-        mod.respond_to? :dir_pathname or raise ::NoMethodError,
-          autoloader_say_no_dirpathname( mod )
-        dpn = mod.dir_pathname
+        _resolve_parent_module_and_filesystem_entry_name
+
+        pmod = @_parent_module
+
+        if ! pmod.respond_to? :dir_pathname
+          raise ::NoMethodError, __autoloader_say_no_dirpathname( pmod )
+        end
+
+        dpn = pmod.dir_pathname
         if dpn
-          dpn.join @autoloader_name.as_slug
+          dpn.join @_filesystem_entry_name.as_slug
         end
       end
 
-      def autoloader_say_no_dirpathname mod
+      def __autoloader_say_no_dirpathname mod
         "needs 'dir_pathname': #{ mod }"
       end
 
-      def autoloader_parent_module
-        @did_orient_for_autoloader ||= orient_for_autoloader
-        @autoloader_parent_module
+      def _resolve_parent_module_and_filesystem_entry_name
+
+        @_parent_module_is_known_is_known ||= _induce_parent_module
+
+        @_filesystem_entry_name ||= __isomoprh_filesystem_entry_name
+
+        NIL_
       end
 
-      def orient_for_autoloader
+      def _induce_parent_module  # memoizes another along the way
+
         s_a = name.split CONST_SEP_
-        @autoloader_name = Name.via_const s_a.pop
-        @autoloader_parent_module = Module_path_value_via_parts[ s_a ]
+        const_basename = s_a.pop
+
+        @_filesystem_entry_name ||= Name.via_const( const_basename )
+
+        @_parent_module = Const_value_via_parts[ s_a ]
+
         true
+      end
+
+      def __isomoprh_filesystem_entry_name
+
+        s = name  # `::Module#name`
+        Callback_::Name.via_const s[ s.rindex( CONST_SEP_ ) + 2 .. -1 ]
       end
     end
 
@@ -1059,7 +1101,8 @@ module Skylab::Callback
 
     class File_Entry_
       def initialize entry_s, corename
-        @corename = corename ; @entry_s = entry_s
+        @corename = corename
+        @entry_s = entry_s
       end
       attr_reader :entry_s
     end
@@ -1077,7 +1120,7 @@ module Skylab::Callback
       end
 
       def to_stream  # :+#public-API, #the-fuzzily-unique-entry-scanner, #fuzzy-sibling-pairs
-        @did_index_all ||= index_all
+        @_did_index_all ||= _index_all
         a = @stem_i_a ; d = -1 ; last = a.length - 1
         Callback_.stream do
           if d < last
@@ -1104,28 +1147,34 @@ module Skylab::Callback
     module Methods__
 
       def autoloaderize_with_normpath_value np, x
+
         np.set_value x
+
         _is_module_esque = x.respond_to? :module_exec  # not all x are modules.
+
         if _is_module_esque && ! x.respond_to?( :dir_pathname )
-          Autoloader[ x, np.some_dir_path ]  # some x wire themselves.
+          Autoloader_[ x, np.some_dir_path ]  # some x wire themselves.
         end
-        # all x with a corresponding dir must take this now to avoid redundant
-        # filesystem hits. in the case of of nodes that first resolve their
-        # dir tree then XYZZY
-        if np.has_directory and x.respond_to? :did_resolve_entry_tree
-          if x.did_resolve_entry_tree
+
+        # all x with a corresponding dir must take this now so we can avoid
+        # redundant filesystem hits.
+
+        if np.has_directory and x.respond_to? :entry_tree_is_known_is_known_
+
+          if x.entry_tree_is_known_is_known_
             # [#032] document why & when this gets here (e.g via the [sg] client)
           else
             # when dir exists but no file, WTF
             x.__set_entry_tree np
           end
-        end ; nil
+        end
+        NIL_
       end
 
     protected def __set_entry_tree x
-        did_resolve_entry_tree and self._SANITY
-        @did_resolve_entry_tree = true
-        @any_built_entry_tree = x ; nil
+        entry_tree_is_known_is_known_ and self._SANITY
+        @entry_tree_is_known_is_known_ = true
+        @any_built_entry_tree_ = x ; nil
       end
     end
 
@@ -1164,41 +1213,75 @@ module Skylab::Callback
     module Methods__
 
       def entry_tree
-        @did_resolve_entry_tree ||= __resolve_entry_tree_by_looking_upwards
-        @any_built_entry_tree
+
+        @entry_tree_is_known_is_known_ ||= __resolve_entry_tree_by_looking_upwards
+        @any_built_entry_tree_
       end
-      attr_reader :did_resolve_entry_tree
+
+      attr_reader :entry_tree_is_known_is_known_
 
       def __resolve_entry_tree_by_looking_upwards
-        any_dpn = dir_pathname
-        apm = autoloader_parent_module or self._HOLE
-        apm.respond_to? :entry_tree and pet = apm.entry_tree
+
+        _resolve_parent_module_and_filesystem_entry_name
+
+        pmod = @_parent_module
+        pmod or self._HOLE
+
+        if pmod.respond_to? :entry_tree
+          pet = pmod.entry_tree
+        end
+
         if pet
-          np = pet.normpath_from_distilled @autoloader_name.as_distilled_stem
-          np and np.has_directory and et = np
+
+          np = pet.normpath_from_distilled(
+            @_filesystem_entry_name.as_distilled_stem )
+
+          if np && np.has_directory
+            et = np
+          end
         end
-        @any_built_entry_tree = if et
+
+        @any_built_entry_tree_ = if et
           et
-        elsif any_dpn
-          LOOKAHEAD_[ any_dpn ]
+        else
+
+          any_dpn = dir_pathname
+          if any_dpn
+            LOOKAHEAD_[ any_dpn ]
+          end
         end
+
         true
       end
     end
 
     LOOKAHEAD_ = -> do  # #on-the-ugliness-of-global-caches
-      h = { }
+
+      h = {}
+
       -> pn do
-        et = h[ pn.dirname ]
+
+        path = pn.to_path
+
+        dir = ::File.dirname path
+        entry = ::File.basename path
+
+        et = h[ dir ]
+
         if et
-          et_ = et.normpath_from_distilled Distill_[ pn.basename.to_path ]
+          et_ = et.normpath_from_distilled Distill_[ entry ]
         end
+
         if et_
           et_
         else
-          h.fetch pn do
-            h[ pn ] = Entry_Tree_.new pn.dirname, nil,
-              Dir_Entry_.new( pn.basename.to_path )
+
+          h.fetch path do
+
+            h[ path ] = Entry_Tree_.new(
+              ::Pathname.new( dir ),
+              nil,
+              Dir_Entry_.new( entry ) )
           end
         end
       end
@@ -1215,7 +1298,7 @@ module Skylab::Callback
       def initialize parent_pn, file_entry, dir_entry
         super parent_pn, file_entry, dir_entry  # trip sanity checks early
         @normpath_lookup_p = -> i do
-          @did_index_all = index_all
+          @_did_index_all = _index_all
           @normpath_lookup_p[ i ]
         end
         __init_directory_listing_cache
@@ -1268,11 +1351,12 @@ module Skylab::Callback
     # ~ the indexing sub-story
 
     class Entry_Tree_
+
       def normpath_from_distilled stem_i
         @normpath_lookup_p[ stem_i ]
       end
-    private
-      def index_all  # from the set of all entries eagerly build the set of
+
+      def _index_all  # from the set of all entries eagerly build the set of
         # all mutable norm paths (a set whose size will be lesser than or
         # equal to the size of the input set). along the way also make note of
         # the distilled stems that correspond to the three "any"'s. the actual
@@ -1421,7 +1505,7 @@ module Skylab::Callback
 
         x = @mod.stowaway_h.fetch @name.as_const
         if x.respond_to? :split
-          Autoloader::Stowaway_Actors__::Produce_x[ self, x ]
+          Autoloader_::Stowaway_Actors__::Produce_x[ self, x ]
         else
           x.call
         end
@@ -1435,14 +1519,14 @@ module Skylab::Callback
       attr_reader :norm_pathname
 
       def name_symbol  # :+#public-API
-        name_for_lookup.as_variegated_symbol
+        name_for_lookup_.as_variegated_symbol
       end
 
       def name  # :+#public-API
-        name_for_lookup
+        name_for_lookup_
       end
 
-      def name_for_lookup
+      def name_for_lookup_
         @nm ||= Name.via_slug ( @file_entry || @dir_entry ).corename
       end
     end
@@ -1546,7 +1630,7 @@ module Skylab::Callback
           @mod.autoloaderize_with_normpath_value @normpath, @adjunct_value
           @normpath.change_state_to :loaded
         end
-        @adjunct_value.did_resolve_entry_tree or self._SANITY
+        @adjunct_value.entry_tree_is_known_is_known_ or self._SANITY
         NIL_
       end
 
@@ -1561,12 +1645,12 @@ module Skylab::Callback
             if :loading == np.state_i
               np.change_state_to :loaded
             end
-            mod = fuzzy_lookup_name_in_module_ np.name_for_lookup, from_mod
+            mod = fuzzy_lookup_name_in_module_ np.name_for_lookup_, from_mod
             from_mod.autoloaderize_with_normpath_value np, mod
           end
           if np.has_directory and d < last ||
-              mod.respond_to?( :did_resolve_entry_tree )
-            mod.did_resolve_entry_tree or self._SANITY
+              mod.respond_to?( :entry_tree_is_known_is_known_ )
+            mod.entry_tree_is_known_is_known_ or self._SANITY
           end
           np.assert_state :loaded
           from_mod = mod
@@ -1582,12 +1666,14 @@ module Skylab::Callback
     end
 
     class Entry_Tree_
+
       def any_file_normpath
-        @did_index_all ||= index_all
+        @_did_index_all ||= _index_all
         @any_file_i and normpath_from_distilled @any_file_i
       end
+
       def any_dir_normpath
-        @did_index_all ||= index_all
+        @_did_index_all ||= _index_all
         @any_dir_i and normpath_from_distilled @any_dir_i
       end
     end
@@ -1597,7 +1683,7 @@ module Skylab::Callback
     class Entry_Tree_
     private
       def has_corefile
-        @did_index_all ||= index_all
+        @_did_index_all ||= _index_all
         @any_corefile_i
       end
       # normpath_from_distilled @any_corefile_i
@@ -1611,7 +1697,8 @@ module Skylab::Callback
 
     class File_Entry_
       def is_corefile
-        CORE_ == @corename  # or CORE_FILE_ == @entry_s
+        CORE_ == @corename
+        # CORE_FILE_ == @entry_s
       end
     end
 
@@ -1622,7 +1709,7 @@ module Skylab::Callback
 
     module Methods__
       def const_reduce a=nil, & p
-        Autoloader.const_reduce do |cr|
+        Autoloader_.const_reduce do |cr|
           cr.from_module self
           if a
             cr.const_path a
@@ -1653,15 +1740,30 @@ module Skylab::Callback
         @parent_pn.join( @file_entry.corename ).to_path
       end
     end
+
+    Autoloader_ = self
   end
 
   Autoloader[ Actor ]
   Autoloader[ Box ]
 
   module Autoloader  # ~ service methods outside the immediate scope of a.l
+
     module Methods__
-      def autoloaderize_with_filename_child_node fn, cn
-        Autoloader[ cn, dir_pathname.join( fn ).to_path ] ; nil
+
+      def autoloaderize_child_node x
+
+        Autoloader_.call x do | sess |
+          sess._presumably_autoloaderized_parent_module = self
+        end
+      end
+
+      def using_file_entry_string_autoloaderize_child_node s, x
+
+        Autoloader_.call x do | sess |
+          sess._presumably_autoloaderized_parent_module = self
+          sess._filesystem_entry_string = s
+        end
       end
     end
   end
@@ -2002,6 +2104,12 @@ module Skylab::Callback
     VALID_CONST_RX__ = /\A[A-Z][A-Z_a-z0-9]*\z/
   end
 
+  Const_value_via_parts = -> x_a do  # :+[#ba-034]
+    x_a.reduce ::Object do |mod, x|
+      mod.const_get x, false
+    end
+  end
+
   Constify_if_possible_ = -> do
     white_rx = %r(\A[a-z][-_a-z0-9]*\z)i
     gsub_rx = /([-_]+)([a-z])?/
@@ -2043,12 +2151,6 @@ module Skylab::Callback
   end
 
   define_singleton_method :memoize, Memoize
-
-  Module_path_value_via_parts = -> x_a do  # :+[#ba-034]
-    x_a.reduce ::Object do |mod, x|
-      mod.const_get x, false
-    end
-  end
 
   Oxford = -> separator, none, final_sep, a do
     if a.length.zero?

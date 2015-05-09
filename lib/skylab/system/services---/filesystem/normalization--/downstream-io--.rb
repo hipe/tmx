@@ -45,21 +45,33 @@ module Skylab::System
               KEEP_PARSING_
             end
 
-            o :properties, :last_looks, :force_arg,
-                :is_dry_run, :on_event_selectively
+            def result_in_IO_stream_identifier_trio=
+              @do_result_in_IO_stream_identifier_trio = true
+              KEEP_PARSING_
+            end
+
+            o :properties,
+              :dash_means,
+              :force_arg,
+              :is_dry_run,
+              :last_looks
 
           end
 
-          def initialize & p
+          def initialize & edit_p
+            @dash_means = nil
             @do_execute = false
+            @do_recognize_common_string_patterns = false
+            @do_result_in_IO_stream_identifier_trio = nil
             @force_arg = nil
             @ftype = FILE_FTYPE
             @is_dir_mode = false
             @is_dry_run = false
             @last_looks = nil
             @outstream = nil
+            @on_event_selectively = nil
             @path_arg = nil
-            instance_exec( & p )
+            instance_exec( & edit_p )
             @as_normal_value ||= IDENTITY_
           end
 
@@ -72,6 +84,7 @@ module Skylab::System
           end
 
           def execute
+
             @path = if @path_arg
               @path_arg.value_x
             end
@@ -98,7 +111,31 @@ module Skylab::System
           end
 
           def via_path
-            path_exists_and_set_stat_and_stat_error @path  # #note-76
+
+            if @do_recognize_common_string_patterns
+              md_x = via_path_arg_match_common_pattern_
+            end
+
+            if md_x
+              via_common_pattern_match_ md_x
+            else
+              path_exists_and_set_stat_and_stat_error @path  # #note-76
+              _via_stat
+            end
+          end
+
+          def via_system_resource_identifier_ d
+            case d
+            when 1
+              via_stdout_
+            when 2
+              via_stderr_
+            else
+              when_invalid_system_resource_identifier_ d, 1, 2
+            end
+          end
+
+          def _via_stat
             if @stat
               when_stat
             else
@@ -243,12 +280,20 @@ module Skylab::System
           def via_hopefully_still_available_path_open_file
             set_IO_and_exception_via_open_mode ::File::CREAT | ::File::WRONLY
             if @IO
-              @as_normal_value[ @IO ]
+              if @do_result_in_IO_stream_identifier_trio
+                via_trueish_IO_stream_ @IO
+              else
+                @as_normal_value[ @IO ]
+              end
             else
               maybe_send_event :error, :exception do
                 wrap_exception @e
               end
             end
+          end
+
+          def byte_whichstream_identifier_
+            System_::IO::Byte_Downstream_Identifier
           end
 
           def via_hopefully_still_occupied_path_open_file
@@ -300,6 +345,10 @@ module Skylab::System
           def wrap_exception e
             Event_.wrap.exception e, :path_hack,
               :properties, :path_arg, @path_arg
+          end
+
+          def which_stream_
+            :downstream
           end
         end
       end

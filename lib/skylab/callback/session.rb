@@ -1,6 +1,8 @@
-module Skylab::MetaHell
+module Skylab::Callback
 
-  module Ivars_with_Procs_as_Methods
+  Session = ::Module.new
+
+  module Session::Ivars_with_Procs_as_Methods
 
 
     # enhance a class via enabling ivars to hold procs that act as methods
@@ -83,7 +85,7 @@ module Skylab::MetaHell
         case 1 <=> a.length
         when -1 ; via_client_and_iambic a.shift, a
         when  0 ; shell_for a.first
-        else    ; MetaHell_::Ivars_with_Procs_as_Methods
+        else    Session::Ivars_with_Procs_as_Methods
         end
       end
 

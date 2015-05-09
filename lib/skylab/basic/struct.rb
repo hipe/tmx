@@ -66,6 +66,10 @@ module Skylab::Basic
         THE_EMPTY_STRUCT__
       end
 
+      def via_hash h
+        ::Struct.new( * h.keys ).new( * h.values )
+      end
+
     private
 
       def make_struct_class_via_arglist member_i_a

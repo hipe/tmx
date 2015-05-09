@@ -5,16 +5,22 @@ module Skylab::TestSupport
     class << self
 
       def [] mod
-      if ! mod.respond_to? :dir_pathname  # #storypoint-35
-        s_a = mod.name.split CONST_SEP_  # rewrite of :+[#ba-034]
-        s_a.pop
-        _parent_mod = s_a.reduce( ::Object ) { |m, s| m.const_get s, false }
-        Autoloader_[ mod, _parent_mod.dir_pathname.join( TEST_DIR_FILENAME_ ).to_path ]
+
+        if ! mod.respond_to? :dir_pathname  # #storypoint-35
+
+          s_a = mod.name.split CONST_SEP_
+          s_a.pop  # autoloader doesn't care that our const name is TestSupp..
+          _pmod = Callback_::Const_value_via_parts[ s_a ]
+
+          _pmod.using_file_entry_string_autoloaderize_child_node(
+            TEST_DIR_FILENAME_,
+            mod )
+        end
+
+        mod.extend Anchor_ModuleMethods
+        mod.initialize_for_regret_with_parent_anchor_mod nil
       end
-      mod.extend Anchor_ModuleMethods
-      mod.initialize_for_regret_with_parent_anchor_mod nil
-      end
-    end
+    end  # >>
 
     module Anchor_ModuleMethods
 
@@ -22,6 +28,20 @@ module Skylab::TestSupport
 
         if ! mod.respond_to? :dir_pathname
 
+          if x_a.length.nonzero? && :filename == x_a.first  # :+[#br-049]
+            filename  = x_a.fetch 1
+            x_a[ 0, 2 ] = EMPTY_A_
+          end
+
+          if filename
+            using_file_entry_string_autoloaderize_child_node filename, mod
+          else
+            autoloaderize_child_node mod
+          end
+
+          # alternate:
+
+          if false
           _filename = if x_a.length.nonzero? && :filename == x_a.first
             x = x_a.fetch 1  # :+[#br-049]
             x_a[ 0, 2 ] = EMPTY_A_
@@ -33,7 +53,7 @@ module Skylab::TestSupport
             ).as_slug
           end
 
-          autoloaderize_with_filename_child_node _filename, mod
+          end
         end
 
         mod.extend Anchor_ModuleMethods
@@ -75,7 +95,14 @@ module Skylab::TestSupport
         end ]
 
         o[ :InstanceMethods, -> do
-          extend TestSupport_.lib_.let::ModuleMethods
+
+          if ! singleton_class.method_defined? :let
+
+              # some define it early to use it inline
+
+            define_singleton_method :let, TestSupport_::Let::LET_METHOD
+          end
+
           pam and include pam.instance_methods_module
         end ]
 

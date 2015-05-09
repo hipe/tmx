@@ -1,28 +1,31 @@
-module Skylab::MetaHell
+module Skylab::Callback
 
-  module Pool
+  Memoization = ::Module.new
 
-    # Pool's `with_instance` enhancement is a partial implementation of
-    # a flyweight pattern. It is for when you want to
+  module Memoization::Pool
+
+    # the below enhancement that the subject offers is a partial
+    # implementation of a flyweight pattern. It is for when you want to
     # avoid incurring the overhead of allocating and de-allocating lots of
     # objects that you expect to need for perhaps only a short time or
     # limited scope.
     #
-    # example of enhancing a class with `with_instance`:
+    # example of enhancing a class by defining on it this method:
     #
     #     class Foo
-    #       Pool.enhance( self ).with_with_instance
+    #       Pool[ self ]
+    #         instances_can_only_be_accessed_through_instance_sessions
     #     end
     #
     #     Foo.new  # => NoMethodError: private method `new' called for [..]
     #
-    #     Foo.with_instance do |f|
+    #     Foo.instance_session do |f|
     #       # .. ( use f )
     #     end
     #
     # This implementation requires that your class define a `clear_for_pool`
     # instance method that will be called to reset the object back to an
-    # empty state after it is used in each `with_instance` block.
+    # empty state after it is used in each `instance_session` block.
     #
     # ( Be forewarned that flyweighting can cause hard to track down bugs
     # if used frivolously. You've got to make sure that `clear_for_pool`
@@ -32,33 +35,39 @@ module Skylab::MetaHell
     #
 
     class << self
-      def enhance mod
+
+      def [] mod
         Shell__.new Kernel__.new mod
       end
-    end
+    end  # >>
 
     class Shell__
 
-      MetaHell_::Ivars_with_Procs_as_Methods.call self,
-        :with_with_instance,
-        :with_with_instance_optionally,
-        :with_lease_and_release
+      Callback_::Session::Ivars_with_Procs_as_Methods.call self,
+        :instances_can_only_be_accessed_through_instance_sessions,
+        :instances_can_be_accessed_through_instance_sessions,
+        :lease_by
 
       def initialize k
+
         x_a = []
+
         flush = -> do
           x_a_ = x_a ; x_a = nil
           k.receive_iambic x_a_
         end
-        @with_with_instance_optionally = -> do
-          x_a.push :new_stays_public, true, :apply_with_instance
+
+        @instances_can_be_accessed_through_instance_sessions = -> do
+          x_a.push :new_stays_public, true, :define_instance_session_method
           flush[]
         end
-        @with_with_instance = -> do
-          x_a.push :new_stays_public, false, :apply_with_instance
+
+        @instances_can_only_be_accessed_through_instance_sessions = -> do
+          x_a.push :new_stays_public, false, :define_instance_session_method
           flush[]
         end
-        @with_lease_and_release = -> p=nil do
+
+        @lease_by = -> &p do
           if p
             x_a.push :fly_p, p
           end
@@ -71,10 +80,14 @@ module Skylab::MetaHell
     class Kernel__
 
       def initialize mod
-        @apply_with_instance = @apply_lease_and_release = nil
+
+        @do_define_instance_session_method = nil
+        @apply_lease_and_release = nil
+
         @fly_p = -> do
-          new  # context is flyweigtht class
+          new  # context is the flyweigtht class!
         end
+
         @make_new_private = false
         @mod = mod
       end
@@ -88,8 +101,8 @@ module Skylab::MetaHell
 
     private
 
-      def apply_with_instance=
-        @apply_with_instance = true
+      def define_instance_session_method=
+        @do_define_instance_session_method = true
         KEEP_PARSING_
       end
 
@@ -109,22 +122,26 @@ module Skylab::MetaHell
       end
 
       def execute
-        if @apply_with_instance
-          Apply_with_instance__[ @mod, @fly_p ]
+
+        if @do_define_instance_session_method
+          Define_instance_session_method___[ @mod, @fly_p ]
         end
+
         if @apply_lease_and_release
-          Apply_lease_and_release__[ @mod, @fly_p ]
+          Define_lease_and_releae_methods___[ @mod, @fly_p ]
         end
+
         if @make_new_private
           @mod.singleton_class.send :private, :new
         end
-        nil
+
+        NIL_
       end
     end
 
-    Apply_with_instance__ = -> mod, fly_p do
+    Define_instance_session_method___ = -> mod, fly_p do
 
-      mod.define_singleton_method :with_instance, -> do
+      mod.define_singleton_method :instance_session, -> do
         a = []
 
         -> & p do
@@ -141,7 +158,7 @@ module Skylab::MetaHell
       end.call ; nil
     end
 
-    Apply_lease_and_release__ = -> mod, fly_p do
+    Define_lease_and_releae_methods___ = -> mod, fly_p do
 
       a = []
 
@@ -159,8 +176,8 @@ module Skylab::MetaHell
       end
     end
 
-      # The Pool's `with_lease_and_release` enhancement follows the same idea
-      # as the `with_with_instance` enhancement, but instead of wrapping
+      # The Pool's `lease_by` enhancement follows the same idea
+      # as the above  enhancement, but instead of wrapping
       # the flyweight iteration in a block, it lets you call `lease` and
       # `release` explicitly.
       #

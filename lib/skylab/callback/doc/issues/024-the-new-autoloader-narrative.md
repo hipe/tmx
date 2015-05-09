@@ -15,6 +15,8 @@ combinations of stowaways, autovivified branch nodes, core-files and
 directories with no leaf nodes in them that it may in fact be counter-
 productive to try to cover them all with dedicated specs (but maybe not).
 
+(EDIT: below needs the names modernized)
+
 running "tmx regret doc-test" ("trd") recursively on the universe takes about
 two seconds, and can be run from the universe root with something like:
 
@@ -23,7 +25,7 @@ two seconds, and can be run from the universe root with something like:
 running doc-test recursive on the whole universe is useful because of the
 way it is implemented: it just so happens to push autoloading to its limit:
 unlike "normal" autoloading where you start with a constant and need to load a
-correct file to resolve the constant, "trd" (tmx-regret doc-test) starts with
+correct file to resolve the constant, the subject operation starts with
 a filesystem path and attempts to resolve one or more nested const values
 from that path.
 
@@ -48,19 +50,23 @@ stories are exercized.
 
 • because isomorphic simplicity. for some applications it can be useful to
   define a collection of constants each in their own file that represent
-  business entities (typically something like "actions"). in a hack we call
-  :#isomorphic-inference, we may indicate to the autoloader that certain
-  particular modules leverage this relationship with the filesystem, such
-  that a directory listing from the filsystem can give us hints about the
-  constants that would be defined were we to load these files.
-  it may be convenient to iterate over the "constants" such a "box module" and
-  have it "just work", yielding each const even though the files have not yet
-  been loaded. (this is #the-boxxy-methods behaviorset).
+  business entities (typically something like "actions" or "plugins").
+  by a process we refer to as :#isomorphic-inference, we may indicate
+  to the autoloader that certain particular modules leverage this
+  relationship with the filesystem, such that a directory listing from the
+  filsystem can give us hints about the constants that would be defined
+  were we to load these files.
 
-• because efficiency (for certain use-cases, #experimentally). with
-  #the-boxxy-methods behaviorset, we can infer fuzzily that certain fuzzy sets
-  of constants probably have values associated with them, without even needing
-  to load the files.
+  it may be convenient to iterate over the "constants" of such a
+  "box module" and have it "just work", yielding each inferred `const`
+  even though the files have not yet been loaded.
+  (this is #the-boxxy-methods behaviorset).
+
+• because efficiency (for certain use-cases, #experimentally): by the
+  #the-boxxy-methods behaviorset described above, we can infer fuzzily that
+  certain fuzzy sets of constants probably "exist" (i.e have values
+  associated with them ) withouth needing to load all (or any) of their
+  respective files.
 
 
 
@@ -96,40 +102,6 @@ autoloader stack:
 • #death-to-the-peek-hack. we need this to go away, certainly.
 
 
-
-
-## new cleverness in the :#employment phase
-
-this phase refers to when the client (some module) indicates that it wants to
-employ the bundle (this autoloader), specifically having to do with the
-syntax of how options ("features") are expressed and how they are parsed,
-i.e how their "employment" is "reified".
-
-the focus of the below is more about the novel way we implemented feature
-parsing, and less to do with what the features actually are.
-
-
-• employment features ('boxxy', explicit specification of dir pathname) are
-  implemented each as a singleton methods on the autoloader module (currently
-  there is only one but this is desiged to be amenable to rearrangement such
-  that it makes a stack of modules each "extending" the former, in terms of
-  features explained below).
-
-• these "feature functions" are implemented as methods but float around in
-  space as if they are procs, which is win-win: we get the narrative
-  extensibiltiy of methods but the "first-class-object" nature of procs.
-
-• each such method is passed the x_a (an array of objects of no certain
-  shape) and if the feature decides it matches the x_a it mutates it
-  accordingly (or perhaps not, in theory) and results in a proc that might
-  eventually be passsed the "employer" module as its one argument.
-
-• (any such method must result in either a false-ish or a proc-ish. and any
-  such proc-ish must accept exactly one argument).
-
-• the only possible outward signal that an error occurred parsing the iambic
-  arguments is if there is any remainder to the x_a array after all the
-  features have attempted to parse something out of it.
 
 
 #### when such a parse error occurs, argument error message generation is novel:
@@ -191,6 +163,7 @@ the entry tree is a merging of what were formerly two separate entities:
 
 
 
+
 ### the directory listing cache
 
 this cache answer the questions, "does this file or folder exist?" and
@@ -207,7 +180,6 @@ that we *never* made a reduntant trip to the filesystem for the same
 directory listing in a dictum we call :#the-conservation-of-entry-trees.
 as it turns out this is an architectural principle that is challenging to
 adhere to, given some other parameters in our universe.
-
 
 no cache-clearing facility has yet been implemented nor has yet been
 necessary, but it is certainly feasible to create one if ever necessary.

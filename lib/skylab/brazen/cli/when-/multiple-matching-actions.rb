@@ -13,20 +13,14 @@ module Skylab::Brazen
 
       def produce_result
 
-        o = @help_renderer
+        hr = @help_renderer
 
-        a = @a ; token = @token
+        _ev = Brazen_.properties_stack.build_ambiguous_property_event(
+          @a, @token, :action )
 
-        o.express do
+        _ev.express_into_under hr.y, hr.expression_agent
 
-          _s_a = a.map do | adapter |
-            ick adapter.name.as_slug
-          end
-
-          "ambiguous action #{ ick token } - did you mean #{ or_ _s_a }?"
-        end
-
-        o.output_invite_to_general_help
+        hr.output_invite_to_general_help
 
         GENERIC_ERROR_
       end

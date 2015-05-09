@@ -20,7 +20,9 @@
 [#076] #open end-client gets [#021] magic for `retrieve` (was: [same for list])
 [#075]    #tracking :+#wishlist optionally generate ivar-based iambic writers
 [#074] #hole ( was: #parent-node: [#011] the codifying expression agents)
-[#073] #hole ( was: #parent-node: [#011] selective event listening via methods )
+[#073] #open awareness of system environment does not belong in the model -
+             front clients should do this mapping somehow..
+             ( was: #parent-node: [#011] selective event listening via methods )
 [#072]       #done `is_silo` can probably go away
              ( #was: modernize this interface )
 [#071]       #tracking-tag wrap
@@ -62,8 +64,12 @@
 [#045]       #parent-node: [#001] "the meta-properties narrative.."
 [#044]       [ expect section ]
              ( #was: #done graph has an action so maybe we don't need to pass it everywhere )
-[#043] #hole ( #was: #tracking-tag loading hacks )
-[#042]      #tracking-tag mutate formal properties by front client etc ..
+[#043]       the fancy bundle lookup exegesis ..
+             ( #was: #tracking-tag loading hacks )
+[#042] #open here is the plan with this one: this BS being done here
+             now, make the brazen *app* client somehow do it on its own.
+             and instead make the default be handing for `sin` `sout` `serr`
+             #tracking-tag mutate formal properties by front client etc ..
              ( #was: #done make persit entity interface symmetrical with delete entity )
 [#041]       #sibling: [#021] magic property names case studies ..
              ( #was: #done rename "collections controller" to "silo controller" )

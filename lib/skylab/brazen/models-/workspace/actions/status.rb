@@ -23,7 +23,8 @@ module Skylab::Brazen
         end
         y << "how far up do we look?#{ _dflt }"
       end,
-      :environment, :non_negative_integer,
+      :environment,  # #open [#073] move to front somehow
+      :non_negative_integer,
       :default, '1',
       :property, :max_num_dirs,
 

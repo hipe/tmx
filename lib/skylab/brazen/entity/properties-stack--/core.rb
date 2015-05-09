@@ -4,6 +4,10 @@ module Skylab::Brazen
 
     class << self
 
+      def build_ambiguous_property_event *a
+        Build_ambiguous_property_event__[ *a ]
+      end
+
       def build_extra_properties_event *a
         Build_extra_properties_event__[ *a ]
       end
@@ -108,16 +112,39 @@ module Skylab::Brazen
       end.flush_to_immutable_with_random_access_keyed_to_method :name_symbol
     end
 
-    Build_extra_properties_event__ = -> name_i_a, did_you_mean_i_a=nil, lemma=nil, adj=nil do
+    Build_ambiguous_property_event__ = -> ent_a, x, lemma=nil do
+
+      _slug_a = ent_a.map do | ent |
+        ent.name.as_slug
+      end
+
+      Brazen_.event.inline_with( :ambiguous_property,
+        :x, x,
+        :name_s_a, _slug_a,
+        :lemma, lemma,
+        :error_category, :argument_error,
+        :ok, false
+      ) do | y, o |
+
+        _s_a = o.name_s_a.map( & method( :val ) )
+
+        _lemma = o.lemma || DEFAULT_PROPERTY_LEMMA__
+
+        y << "ambiguous #{ _lemma } #{ ick o.x } - did you mean #{ or_ _s_a }?"
+
+      end
+    end
+
+    Build_extra_properties_event__ = -> name_x_a, did_you_mean_i_a=nil, lemma=nil, adj=nil do
 
       Brazen_.event.inline_with :extra_properties,
-          :name_i_a, name_i_a,
+          :name_x_a, name_x_a,
           :did_you_mean_i_a, did_you_mean_i_a,
           :lemma, lemma,
           :error_category, :argument_error,
           :ok, false do |y, o|
 
-        s_a = o.name_i_a.map( & method( :ick ) )
+        s_a = o.name_x_a.map( & method( :ick ) )
 
         _lemma = o.lemma || DEFAULT_PROPERTY_LEMMA__
 

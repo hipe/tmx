@@ -258,7 +258,7 @@ module Skylab::Brazen
       def _bound_call_via_action_looking_first_argument
 
         token = @resources.argv.shift
-        @adapter_a = find_matching_action_adapters_against_tok token
+        @adapter_a = find_matching_action_adapters_against_tok_ token
 
         case 1 <=> @adapter_a.length
 
@@ -309,7 +309,7 @@ module Skylab::Brazen
         end
       end
 
-      def find_matching_action_adapters_against_tok tok
+      def find_matching_action_adapters_against_tok_ tok
 
         _unbound_a = __array_of_matching_unbounds_against_token tok
 
@@ -1716,6 +1716,11 @@ module Skylab::Brazen
 
     class Action_Adapter  # re-open
 
+      MUTATE_THESE_PROPERTIES = %i(
+        config_filename
+        max_num_dirs
+        workspace_path )
+
       def resolve_properties  # :+[#042] #nascent-operation
 
         @mutable_back_properties = nil
@@ -1724,16 +1729,16 @@ module Skylab::Brazen
         @back_properties = @bound.formal_properties  # nil ok
 
         if @back_properties
-          if @back_properties.has_name :config_filename
-            _mutate_config_filename_properties
-          end
 
-          if @back_properties.has_name :max_num_dirs
-            _mutate_max_num_dirs_properties
-          end
+          sym_a = self.class::MUTATE_THESE_PROPERTIES
+          if sym_a
 
-          if @back_properties.has_name :workspace_path
-            _mutate_workspace_path_properties
+            bp = @back_properties
+            sym_a.each do | sym |
+              if bp.has_name sym
+                send :"mutate__#{ sym }__properties"
+              end
+            end
           end
         end
 
@@ -1742,16 +1747,14 @@ module Skylab::Brazen
         nil
       end
 
-    private
-
-      def _mutate_config_filename_properties
+      def mutate__config_filename__properties
 
         # exclude this formal property from the front. leave back as-is.
 
         mutable_front_properties.remove :config_filename
       end
 
-      def _mutate_max_num_dirs_properties
+      def mutate__max_num_dirs__properties  # ALSO handwritten below!
 
         # exclude this formal property from the front. in back, unbound it.
 
@@ -1759,10 +1762,9 @@ module Skylab::Brazen
         mutable_back_properties.replace_by :max_num_dirs do | prp |
           prp.without_default
         end
-
       end
 
-      def _mutate_workspace_path_properties
+      def mutate__workspace_path__properties
 
         # exclude this formal property from the front. default the back to CWD
 
@@ -1818,7 +1820,7 @@ module Skylab::Brazen
           nil
         end
 
-        def _mutate_max_num_dirs_properties
+        def mutate__max_num_dirs__properties
           # override above - we do nothing. this tests env. vars. near [#017]
         end
       end

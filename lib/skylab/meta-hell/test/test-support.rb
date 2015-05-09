@@ -26,7 +26,6 @@ module Skylab::MetaHell::TestSupport
 
   module InstanceMethods
 
-    extend MetaHell_::Let
 
     def debug!
       @do_debug = true
@@ -55,19 +54,6 @@ module Skylab::MetaHell::TestSupport
   end
 
   NIL_ = nil
-
-  module Ivars_with_Procs_as_Methods
-
-    # #tracking [#ts-039] frontier for a possible new argument function for `Subject_`
-
-    Skylab::MetaHell::TestSupport[ self ]
-
-    Subject_ = -> * x_a, & p do
-
-      MetaHell_::Ivars_with_Procs_as_Methods[ * x_a, & p ]
-
-    end
-  end
 
   module Constants
 
