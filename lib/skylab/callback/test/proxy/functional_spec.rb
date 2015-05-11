@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Callback::TestSupport::Proxy
 
-  describe "[cb] proxy - functional" do
+  describe "[ca] proxy - functional" do
 
     context "one." do
 

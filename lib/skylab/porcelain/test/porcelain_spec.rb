@@ -9,6 +9,9 @@ module Skylab::Porcelain::TestSupport
 
 
 
+
+  Porcelain = Porcelain_  # (only for this file!)
+
   describe "[po] legacy" do
     extend Porcelain_TestSupport
     def _stderr  # wind this back to see an even messier version
@@ -29,13 +32,13 @@ module Skylab::Porcelain::TestSupport
           # (tombstone of a great [#bm-008] vector)
           o.on_all do |e|
             _stderr.puts e.text  # might be styled
-            do_debug and TestSupport.debug_IO.puts "(dbg:#{ e.text })"
+            do_debug and TestSupport_.debug_IO.puts "(dbg:#{ e.text })"
             nil
           end
         end
       else
         if do_debug
-          @_stderr ||= TestSupport::IO.spy( :do_debug, true, :debug_IO, debug_IO )
+          @_stderr ||= TestSupport_::IO.spy( :do_debug, true, :debug_IO, debug_IO )
         end
         inst = kls.new nil, _stderr, _stderr
       end

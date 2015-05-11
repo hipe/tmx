@@ -437,7 +437,7 @@ module Skylab::MetaHell
       def say_unexpected_iambic
         x = @iambic_scan.first_unparsed_arg
         _a = field_box.get_names
-        "unrecognized keyword #{ MetaHell_.strange x }#{
+        "unrecognized keyword #{ MetaHell_.lib_.strange x }#{
          } - did you mean #{ say_lev x, _a }?"
       end
       def say_lev x, a

@@ -16,7 +16,7 @@ module Skylab::Callback::TestSupport::Actor::Methodic::MP
 
   KEEP_PARSING_ = KEEP_PARSING_
 
-  describe "[cb] actor - methodic - enhancer modules" do
+  describe "[ca] actor - methodic - enhancer modules" do
 
     context "a 'simple properties' enhancer module can access its properties class" do
 

@@ -77,7 +77,7 @@ module Skylab::System
 
         private
 
-          def via_stat_execute
+          def via_stat_execute  # :+#public-API
             m_i = :"when_path_is_#{ @stat.ftype }"
             if respond_to? m_i
               send m_i

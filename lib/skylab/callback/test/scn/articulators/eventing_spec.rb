@@ -8,7 +8,7 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Eventing
 
   extend TestSupport_::Quickie
 
-  describe "[cb] scn articulators - eventing" do
+  describe "[ca] scn articulators - eventing" do
 
     context "can operate in \"scanner\" mode or \"buffering\" mode" do
 

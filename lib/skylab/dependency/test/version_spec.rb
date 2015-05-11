@@ -7,7 +7,7 @@ module Skylab::Dependency::TestSupport
 
   Slake_TestSupport::UI::Tee || nil #(#kick) laod it now so prettier below
 
-  describe Dep_::Version do
+  describe "[de] version" do
 
     include Dependency_TestSupport # so constants are avail. in i.m.'s below
 

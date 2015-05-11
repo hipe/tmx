@@ -28,7 +28,7 @@ module Skylab::Callback
     Brazen = sidesys[ :Brazen ]
 
     Class_lib = -> do
-      MH__[]::Class
+      Basic[]::Class
     end
 
     CLI_lib = -> do
@@ -59,14 +59,6 @@ module Skylab::Callback
 
     IO_lib = -> do
       System_lib__[]::IO
-    end
-
-    Ivars_with_procs_as_methods = -> * a do
-      MH__[]::Ivars_with_Procs_as_Methods.call_via_arglist a
-    end
-
-    Let = -> do
-      MH__[]::Let
     end
 
     Levenshtein = -> do
@@ -100,7 +92,7 @@ module Skylab::Callback
     Strange = -> do
       p = -> x do
         _LENGTH_OF_A_LONG_LINE = 120
-        p = MH__[].strange.curry[ _LENGTH_OF_A_LONG_LINE ]
+        p = Basic[]::String.via_mixed.curry[ _LENGTH_OF_A_LONG_LINE ]
         p[ x ]
       end
       -> x { p[ x ] }
@@ -123,5 +115,7 @@ module Skylab::Callback
     end
 
     System_lib__ = sidesys[ :System ]
+
+    Test_support = sidesys[ :TestSupport ]
   end
 end

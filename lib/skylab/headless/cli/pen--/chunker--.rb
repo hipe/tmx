@@ -2,7 +2,7 @@ module Skylab::Headless
 
   module CLI::Pen__
 
-    Chunker__ = Headless_.lib_.ivars_with_procs_as_methods.new :gets
+    Chunker__ = Callback_::Session::Ivars_with_Procs_as_Methods.new :gets
 
     class Chunker__
 

@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Callback::TestSupport::Selective_Listener
 
-  describe "[cb] selective listener - via digraph [emitter]" do
+  describe "[ca] selective listener - via digraph [emitter]" do
 
     extend TS__
 

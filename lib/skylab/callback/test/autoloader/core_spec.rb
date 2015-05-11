@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Callback::TestSupport::Autoloader
 
-  describe "[cb] autoloader core" do
+  describe "[ca] autoloader core" do
 
     context "for a const_missing, in order it will try:" do
 

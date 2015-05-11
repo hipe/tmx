@@ -1,3 +1,4 @@
+[#043]       [ tree from indented line stream ] #parent-node: [#001]
 [#042]       #parent-node: [#033] calm wordwrap "continuous" mode is
                a partially implemented feature
 [#041]       a concept network towards universal abstract operations ..
@@ -33,7 +34,7 @@
                hash and switch statement have `semantic intersect`
 [#016]       #doc-point #parent:006 #body-is-inline-in-parent
                `semantic subset` / `semantic supeset` loosely defined
-[#015]       [ this common fuzzy algorithm, externally only in universe ]
+[#015]       [ fuzzy ]
              (was #moved-to: [#cb-047])
              (was: #tracking-tag - places that could benefit maybe from something
                like basic list evented articulation)

@@ -275,7 +275,7 @@ module Skylab::Basic
         end
       end
 
-      Margin_Engine__ = Basic_.lib_.ivars_with_procs_as_methods.new :give, :take do
+      Margin_Engine__ = Callback_::Session::Ivars_with_Procs_as_Methods.new :give, :take do
 
         # read #about-margins
 

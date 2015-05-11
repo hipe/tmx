@@ -6,6 +6,6 @@ module Skylab::Porcelain::TestSupport::Bleeding::Action
 
   include Constants # so we can say 'Bleeding' in specs!
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
 end

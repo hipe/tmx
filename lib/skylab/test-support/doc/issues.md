@@ -1,3 +1,5 @@
+[#044]       "the new test architecture convention" (with fewer t.s nodes)
+[#043] #open modernize doc-test templates
 [#042]       "nasty OCD memoize" caveat (for [sg])..
 [#041]       [ sidesystem ]  (variants exist universally. this is #hub)
 [#040]       is find nearest TS file broken?

@@ -81,7 +81,7 @@ module Skylab::Treemap
       nil
     end
 
-    Treemap_.lib_.ivars_with_procs_as_methods( self ).as_public_getter :@rc, :mode_client
+    Callback_::Session::Ivars_with_Procs_as_Methods[ self ].as_public_getter :@rc, :mode_client
 
     public :actions_const_get  # (child s.c only)
 

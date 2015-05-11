@@ -2,7 +2,7 @@ require_relative 'my-test-support'
 
 module Skylab::Flex2Treetop::MyTestSupport
 
-  describe "[f2tt] API" do
+  describe "[f2] API" do
 
     extend Top_TS_
 

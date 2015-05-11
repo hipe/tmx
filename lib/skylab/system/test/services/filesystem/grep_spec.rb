@@ -15,17 +15,23 @@ module Skylab::System::TestSupport
     end
 
     it "unsupported options, listener" do
+
       a = []
+
       _x = _parent_subject.grep( :ruby_regexp, /foo/imx,
         :on_event_selectively, -> * i_a, & ev_p do
         a.push ev_p[]
         a.push i_a
         :_nerp_
       end )
+
       _x.should eql :_nerp_
+
       a.last.should eql [ :error, :regexp_option_not_supported ]
+
       a.first.express_into_under y=[],
-        System_::Lib_::Bzn__[]::API.expression_agent_instance
+        System_.lib_.brazen::API.expression_agent_instance
+
       y.should eql [ "non convertible regexp options - '[:MULTILINE, :EXTENDED]'" ]
     end
 

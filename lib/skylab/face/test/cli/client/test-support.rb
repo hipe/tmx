@@ -50,16 +50,12 @@ module Skylab::Face::TestSupport::CLI::Client
     end
 
     DSL_DSL = -> x, p do
-      MH__[]::DSL_DSL.enhance_module x, & p
+      Parse_lib___[]::DSL_DSL.enhance_module x, & p
     end
 
     HL__ = Face_::Lib_::HL__
 
-    Let = -> mod do
-      mod.extend MH__[]::Let
-    end
-
-    MH__ = Face_::Lib_::MH__
+    Parse_lib___ = Face_::Lib_::Parse_lib
 
     Sout_serr = -> do
       sys = LIB_.system_IO
@@ -79,8 +75,6 @@ module Skylab::Face::TestSupport::CLI::Client
   module ModuleMethods
 
     include Constants
-
-    TestLib_::Let[ self ]
 
     -> do
       fmt = "%-6s %-35s %-12s %s"
@@ -104,12 +98,17 @@ module Skylab::Face::TestSupport::CLI::Client
       end
     end.call
 
+    define_singleton_method :let, TestSupport_::Let::LET_METHOD
+
     let :client_class do
       kls = Sandbox.produce_subclass
       with_body_value or raise "sanity - `client_class` or `with_body { .. }` expected"
       kls.class_exec( & with_body_value )
       kls
     end
+
+    define_method :__memoized, TestSupport_::Let::MEMOIZED_METHOD
+      # for memoizing **into** the test context **class**
 
     def as sym, rx, modifier, strm=:err
       as = Whereby.new( sym, rx, modifier, strm ).freeze
@@ -296,10 +295,14 @@ module Skylab::Face::TestSupport::CLI::Client
     end
 
     let :lines do
+
       # (the below noize is simply grinding up the stream spy and turning
       # it into two arrrays of lines.)
-      isg = @__memoized.fetch :io_spy_triad
-      @__memoized[:io_spy_triad] = nil  # careful - we are 'digesting' it
+
+      isg = __memoized.fetch :io_spy_triad  # `memoized_`, but r.s compat
+
+      __memoized[ :io_spy_triad ] = nil  # careful - we are 'digesting' it
+
       o, e = [ :outstream, :errstream ].map do |x|
         str = isg[x].string
         isg[ x ] = nil

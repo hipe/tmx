@@ -19,7 +19,7 @@ module Skylab::Headless
         end
       end
 
-      Recorder__ = Headless_.lib_.ivars_with_procs_as_methods.new :on, :@on, :define do
+      Recorder__ = Callback_::Session::Ivars_with_Procs_as_Methods.new :on, :@on, :define do
 
         def initialize option_p
           @on = -> * a, & p  do

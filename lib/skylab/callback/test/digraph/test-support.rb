@@ -61,8 +61,6 @@ module Skylab::Callback::TestSupport::Digraph
 
   module InstanceMethods
 
-    extend Callback_.lib_.let::ModuleMethods
-
     include Callback_.lib_.class_lib::Creator::InstanceMethods
 
     let :meta_hell_anchor_module do ::Module.new end

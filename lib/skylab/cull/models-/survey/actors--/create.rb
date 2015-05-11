@@ -22,7 +22,7 @@ module Skylab::Cull
           :path, @survey.workspace_path_,
           :is_dry_run, true,  # always true, we are checking only
           :ftype, fs.constants::DIRECTORY_FTYPE,
-          :on_event_selectively, @on_event_selectively ) and
+          & @on_event_selectively ) and
 
         when_dir
       end

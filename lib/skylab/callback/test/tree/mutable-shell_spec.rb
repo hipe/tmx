@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Callback::TestSupport::Tree
 
-  describe "[gv] lib- callbacks-tree: mutable shell" do
+  describe "[ca] tree - mutable shell" do
 
     context "one" do
 

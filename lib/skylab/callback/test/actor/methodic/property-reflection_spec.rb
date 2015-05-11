@@ -12,7 +12,7 @@ module Skylab::Callback::TestSupport::Actor::Methodic::PR
 
   Grandparent_Subject_ = Parent_TS_::Parent_subject_
 
-  describe "[cb] actor - methodic - property reflection" do
+  describe "[ca] actor - methodic - property reflection" do
 
     context "two unadorned monadic properties" do
 

@@ -280,7 +280,7 @@ module Skylab::Brazen
       end
     end
 
-    def __silo_via_unresolved_id id, & oes_p  # #note-40, :+[#mh-002]
+    def __silo_via_unresolved_id id, & oes_p  # #note-40, :+[#pa-002]
 
       id = id.as_mutable_for_resolving
 

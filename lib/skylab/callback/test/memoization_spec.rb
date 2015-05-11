@@ -1,21 +1,12 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::Pool
+module Skylab::Callback::TestSupport
 
-  ::Skylab::MetaHell::TestSupport[ TS_ = self ]
+  module Mmztn___  # :+#throwaway-module for constants created during tests
 
-  ::Skylab::TestSupport::Sandbox::Host[ self ]
+    # <-
 
-  Constants::Sandbox = ::Module.new
-
-  include Constants
-
-  MetaHell_ = MetaHell_
-  Sandbox = Sandbox
-
-  extend TestSupport_::Quickie
-
-  describe "[mh] Pool" do
+  TS_.describe "[ca] memoization" do
 
     extend TS_
 
@@ -23,18 +14,19 @@ module Skylab::MetaHell::TestSupport::Pool
 
       context "uses the same objects, kept in a pool, for each block" do
 
-        define_sandbox_constant :wat_kls do
+        before :all do
 
-          class Sandbox::Wat
+          class Wat
 
-            MetaHell_::Pool.enhance( self ).with_with_instance
+            Callback_::Memoization::Pool[ self ].
+              instances_can_only_be_accessed_through_instance_sessions
 
             count = 0
             define_method :initialize do
               @count = ( count += 1 )
             end
 
-            @@clear_was_called_a = [ ]
+            @@clear_was_called_a = []
 
             define_method :clear_for_pool do
               @@clear_was_called_a << @count
@@ -52,30 +44,31 @@ module Skylab::MetaHell::TestSupport::Pool
         # that the pool is used as a stack.
 
         it "we see that the pool is used as a stack" do
-          kls = wat_kls
 
-          kls.with_instance do |o|
+          cls = Wat
+
+          cls.instance_session do |o|
             o.count.should eql( 1 )
           end
 
-          kls.with_instance do |o|
+          cls.instance_session do |o|
             o.count.should eql( 1 )
-            kls.with_instance do |p|
+            cls.instance_session do |p|
               p.count.should eql( 2 )
             end
           end
 
-          kls.with_instance do |o|
+          cls.instance_session do |o|
             o.count.should eql( 1 )
-            kls.with_instance do |p|
+            cls.instance_session do |p|
               p.count.should eql( 2 )
-              kls.with_instance do |q|
+              cls.instance_session do |q|
                 q.count.should eql( 3 )
               end
             end
           end
 
-          Sandbox::Wat.cwc_a.should eql( [ 1, 2, 1, 3, 2, 1 ] )
+          cls.cwc_a.should eql( [ 1, 2, 1, 3, 2, 1 ] )
         end
       end
     end
@@ -84,11 +77,12 @@ module Skylab::MetaHell::TestSupport::Pool
 
       it "uses `lease` and `release` to yield the same objects from a pool" do
 
-        class Sandbox::How
+        class How
 
           count = 0
 
-          MetaHell_::Pool.enhance( self ).with_lease_and_release -> do
+          Callback_::Memoization::Pool[ self ].lease_by do
+
             o = new( count += 1 )
             o.message = "i am the #{ count }th nerk"
             o
@@ -111,23 +105,25 @@ module Skylab::MetaHell::TestSupport::Pool
           end
         end
 
-        kls = Sandbox::How
+        cls = How
 
-        o1 = kls.lease
+        o1 = cls.lease
         o1.say.should eql( "i am the 1th nerk which came after 0" )
         o1.rando = :first
 
-        o2 = kls.lease
+        o2 = cls.lease
         o2.say.should eql( "i am the 2th nerk which came after 1" )
         o2.rando = :second
 
-        kls.release o1  # does nothing but add it back to the pool!
+        cls.release o1  # does nothing but add it back to the pool!
         o1.say.should eql( "i am the 1th nerk which came after 0" )
 
-        o3_1 = kls.lease
+        o3_1 = cls.lease
         o3_1.say.should eql( "i am the 1th nerk which came after 0" )
         o3_1.rando.should eql( :first )
       end
     end
+  end
+# ->
   end
 end

@@ -24,12 +24,6 @@ module Skylab::Dependency::TestSupport
 
     HL__ = sidesys[ :Headless ]
 
-    Let = -> do
-      MH__[]::Let
-    end
-
-    MH__ = sidesys[ :MetaHell ]
-
     System = -> do
       System_lib___[].services
     end
@@ -62,7 +56,6 @@ module Skylab::Dependency::TestSupport
 
   module InstanceMethods
 
-    extend TestLib_::Let[]::ModuleMethods
     include TestLib_::CLI_lib[].pen.style_methods_module  # `unstyle`
 
     def debug!

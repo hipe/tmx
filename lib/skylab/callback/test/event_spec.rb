@@ -10,7 +10,7 @@ module Skylab::Callback::TestSupport::Event_Tests__
 
   extend TestSupport_::Quickie
 
-  describe "[cb] event" do
+  describe "[ca] event" do
 
     extend TS_
 
@@ -291,15 +291,12 @@ module Skylab::Callback::TestSupport::Event_Tests__
       Callback_::TestSupport::Old_Expect_Event::Assertion
     end
 
-    -> do
-      stderr = ::STDERR
-      define_method :stdinfo do stderr end
-    end.call
-
     def match x
+
       res = nub.match x
+
       if do_debug
-        e = stdinfo
+        e = debug_IO
         e.puts "(with `num.match #{ x.inspect }`)"
         e.puts "(result - #{ res.inspect })"
         e.puts "(description - #{ nub.description.inspect })"
@@ -307,14 +304,19 @@ module Skylab::Callback::TestSupport::Event_Tests__
           e.puts "(fmfs - #{ nub.failure_message_for_should.inspect })"
         end
       end
-      __memoized[:last_result] = res
-      nil
+
+      memoized_[ :last_result ] = res
+
+      NIL_
     end
 
     def expect_result x
-      __memoized.fetch( :last_result ).should eql x
-      nil
+
+      memoized_.fetch( :last_result ).should eql x
+      NIL_
     end
+
+    TestSupport_::Let[ self ]  # since we diverged from r.s in this respect
 
     def expect_description x
       nub.description.should eql x
@@ -338,6 +340,8 @@ module Skylab::Callback::TestSupport::Event_Tests__
     Textual_Old_Event___ = ::Struct.new :text, :stream_symbol do
       alias_method :payload_x, :text
     end
+
+    NIL_ = nil
 
   end
 end

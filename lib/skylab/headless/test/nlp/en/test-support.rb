@@ -14,8 +14,7 @@ module Skylab::Headless::TestSupport::NLP::EN
 
   module ModuleMethods
 
-    include Headless_::Lib_::MH__[]::Class::Creator::ModuleMethods  # #todo :+#will-sunset
-
+    include Headless_.lib_.basic::Class::Creator::ModuleMethods  # #todo: +#will-sunset
   end
 
   module InstanceMethods

@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Callback::TestSupport::Box
 
-  describe "[cb] box struct" do
+  describe "[ca] box struct" do
 
     extend TS_
 

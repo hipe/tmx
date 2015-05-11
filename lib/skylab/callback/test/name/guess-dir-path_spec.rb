@@ -18,7 +18,7 @@ module Skylab::Callback::TestSupport::Name::Guess_dir_path
 
   # ( [#054] explains why we have fully qualified names below )
 
-  describe "[cb] name guess-dir-path" do
+  describe "[ca] name guess-dir-path" do
 
     context "infers a path based on simple heuristics." do
 

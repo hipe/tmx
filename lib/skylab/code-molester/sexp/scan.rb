@@ -17,7 +17,8 @@ module Skylab::CodeMolester
         end
       end
 
-      CM_.lib_.pool_lib.enhance( self ).with_with_instance_optionally
+      Callback_::Memoization::Pool[ self ].
+        instances_can_be_accessed_through_instance_sessions
 
       def initialize k
         @k = k

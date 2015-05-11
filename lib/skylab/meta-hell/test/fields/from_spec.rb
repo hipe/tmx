@@ -7,6 +7,7 @@ module Skylab::MetaHell::TestSupport::Fields::From
     context "in this primordial ancestor of `entity`, define fields with methods" do
 
       before :all do
+
         class Foo
 
           def one
@@ -27,16 +28,22 @@ module Skylab::MetaHell::TestSupport::Fields::From
           end
         end
       end
+
       it "the \"absorber\" you defined was globbing, and was `initialize` so" do
+
         Foo.new( :two, "foozle" ).two_value.should eql 'foozle'
       end
+
       it "a subclass will inherit the same behavior and fieldset (by default)" do
+
         class Bar < Foo
         end
 
         Bar.new( :two, "fazzle" ).two_value.should eql 'fazzle'
       end
+
       it "a subclasss can mutate its own fieldset without disturbing parent" do
+
         class Baz < Foo
 
           MetaHell_::Fields::From.methods :argful do
@@ -49,15 +56,17 @@ module Skylab::MetaHell::TestSupport::Fields::From
         end
 
         Baz.new( :four, "frick" ).four_value.should eql 'frick'
+        _rx = ::Regexp.new( "\\Aunrecognized\\ keyword\\ 'four'\\ \\-\\ did\\ you\\ mean\\ two\\?\\z" )
         -> do
           Foo.new( :four, "frick" )
-        end.should raise_error( ArgumentError,
-                     ::Regexp.new( "\\Aunrecognized\\ keyword\\ 'four'\\ \\-\\ did\\ you\\ mean\\ two\\?\\z" ) )
+        end.should raise_error( ArgumentError, _rx )
       end
     end
+
     context "use the experimental `use_o_DSL` to give yourself the 'o' method" do
 
       before :all do
+
         class Fob
           MetaHell_::Fields::From.methods :use_o_DSL do
 
@@ -72,11 +81,15 @@ module Skylab::MetaHell::TestSupport::Fields::From
           end
         end
       end
+
       it "you can add desc strings in long lists or one at a time" do
+
         Fob::FIELDS_[:foo].desc_p[ a = [] ]
         a.should eql %w( a b c )
       end
+
       it "you can define desc strings by defining functions that will produce them" do
+
         Fob::FIELDS_[:bar].desc_p[ a = [] ]
         a.first.should eql "ok."
       end

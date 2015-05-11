@@ -144,7 +144,7 @@ module Skylab::FileMetrics
         end
       end
 
-      LIB_.ivars_with_procs_as_methods( self, :summary_rows )
+      Callback_::Session::Ivars_with_Procs_as_Methods[ self, :summary_rows ]
 
       def prerender_summary_row h
         @order.map do |sym|

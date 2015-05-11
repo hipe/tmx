@@ -15,7 +15,7 @@ module Skylab::TanMan::TestSupport::Sexp
 
     extend module ModuleMethods
 
-      TestLib_::Let[ self ]
+      TestSupport_::Let[ self ]
 
       let :fixtures_dir_pathname do
         dir_pathname.join('../fixtures').to_s
@@ -79,7 +79,7 @@ module Skylab::TanMan::TestSupport::Sexp
 
     #        ----*-  private methods, alphabetical  -*----
 
-    TestLib_::Let[ self ]
+    TestSupport_::Let[ self ]
 
     let :anchor_dir_pathname do
       self.class.grammars_module.dir_pathname.join stem_path

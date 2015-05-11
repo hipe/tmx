@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Callback::TestSupport::Digraph
 
-  describe "[cb] digraph crazy graphs" do
+  describe "[ca] digraph crazy graphs" do
 
     extend Callback_::TestSupport::Digraph
 

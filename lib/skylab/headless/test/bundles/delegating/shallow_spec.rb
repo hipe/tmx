@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Headless::TestSupport::Bundles::Delegating
 
-  describe "[hl] bundle: delegating - surface" do
+  describe "[hl] bundle: delegating - shallow" do
 
     it "'delegate' lets you delegate simply" do
 
@@ -64,13 +64,16 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
 
     it "'to_method' doesn't make sense with multiple delegatee methods - X" do
 
-      -> do
+      _rx = %r/\bcannot delegate these to the same method: 'frik', 'frak'/
+
+      begin
         class Client_Not_Multiple_to_method_Surface
           Headless_::Delegating[ self ]
           delegating :to_method, :bar, %i( frik frak )
         end
-      end.should raise_error ::ArgumentError, /\bcannot delegate #{
-        }these to the same method: 'frik', 'frak'/
+      rescue ::ArgumentError => e
+      end
+      e.message.should match _rx
     end
 
     it "'to' lets you specify various delegatees - meth if looks like meth" do

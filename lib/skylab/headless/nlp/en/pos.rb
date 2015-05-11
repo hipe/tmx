@@ -104,7 +104,7 @@ module Skylab::Headless
     #
     # (if you are familiar, `as` is a lot like ::Rspec's `let`,
     # the main difference being it memoizes to an ivar named after
-    # the property rather than writing to e.g. `@__memoized`.)
+    # the property rather than writing to e.g. `@memoized_`.)
 
     def self.as combination_ref, &block
       c = build_immutable_combination combination_ref

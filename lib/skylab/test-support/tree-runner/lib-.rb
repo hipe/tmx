@@ -74,12 +74,9 @@ module Skylab::TestSupport
       Face__[]::Plugin
     end
 
-    MH__ = sidesys[ :MetaHell ]
+    MH___ = sidesys[ :MetaHell ]
 
-
-    Parse_lib = -> do
-      MH__[]::Parse
-    end
+    Parse_lib = sidesys[ :Parse ]
 
     Pretty_path_proc = -> do
       HL__[].system.filesystem.path_tools.pretty_path
@@ -98,7 +95,7 @@ module Skylab::TestSupport
     TestSupport__ = sidesys[ :TestSupport ]
 
     Touch_const = -> do
-      MH__[].touch_const
+      MH___[].touch_const
     end
 
       end

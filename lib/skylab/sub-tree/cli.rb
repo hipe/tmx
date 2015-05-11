@@ -111,6 +111,7 @@ module Skylab::SubTree
       end
 
       define_method :ick, lib.strange_proc.curry[ 60 ]
+      alias_method :val, :ick
 
       def par_via_sym sym
 

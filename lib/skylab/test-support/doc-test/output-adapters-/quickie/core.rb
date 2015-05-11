@@ -478,11 +478,11 @@ module Skylab::TestSupport
           if 1 == d
             top_usually_ignored
           else
-            medallion = "[#{ Infer_initials_via_const__[ sidesys ] }]"
+            sigil = "[#{ Infer_initials_via_const__[ sidesys ] }]"
             if 2 == d
-              "#{ medallion } #{ s_a * CONST_SEP_ }"
+              "#{ sigil } #{ s_a * CONST_SEP_ }"
             else
-              "#{ medallion } #{ rest * CONST_SEP_ }"
+              "#{ sigil } #{ rest * CONST_SEP_ }"
             end
           end
         end

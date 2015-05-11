@@ -64,7 +64,7 @@ module Skylab::Face  # read [#011] the top node narrative
     end
 
     DSL_DSL_story = -> * a do
-      MH__[]::DSL_DSL::Story.new( * a )
+      Parse_lib[]::DSL_DSL::Story.new( * a )
     end
 
     EN_add_private_methods_to_module = -> i_a, mod do
@@ -99,10 +99,6 @@ module Skylab::Face  # read [#011] the top node narrative
 
     HL__ = sidesys[ :Headless ]
 
-    Ivars_with_procs_as_methods = -> do
-      MH__[]::Ivars_with_Procs_as_Methods
-    end
-
     MH__ = sidesys[ :MetaHell ]
 
     Module_lib = -> do
@@ -125,6 +121,8 @@ module Skylab::Face  # read [#011] the top node narrative
       Callback_::Name.via_variegated_symbol( i ).as_slug
     end
 
+    Parse_lib = sidesys[ :Parse ]
+
     Plugin_lib = -> do
       Face_::Plugin
     end
@@ -137,12 +135,8 @@ module Skylab::Face  # read [#011] the top node narrative
       Bsc__[]::List.line_stream a
     end
 
-    Parse_lib = -> do
-      MH__[]::Parse
-    end
-
     Strange_proc = -> do
-      MH__[].strange.to_proc
+      Basic[]::String.via_mixed.to_proc
     end
 
     String_lib = -> do
@@ -154,6 +148,8 @@ module Skylab::Face  # read [#011] the top node narrative
     System_IO = -> do
       Sys___[].IO
     end
+
+    Test_support = sidesys[ :TestSupport ]
 
     Touch_proc = -> do
       MH__[]::Module::Accessors::Touch

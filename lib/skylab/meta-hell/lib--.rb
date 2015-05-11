@@ -121,7 +121,7 @@ module Skylab::MetaHell
         _did_you_mean = " - did you mean #{ _s }?"
       end
 
-      "not found #{ MetaHell_.strange k }#{ _did_you_mean }"
+      "not found #{ MetaHell_.lib_.strange k }#{ _did_you_mean }"
     end
 
     Say_not_found = Say_not_found_.curry[ A_HANDFUL_ ]

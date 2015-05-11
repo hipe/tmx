@@ -103,7 +103,7 @@ module Skylab::TanMan
       g = @grammar_a.last
       i_a = g.module_name_i_a.dup
       i_a[ -1 ] = :"#{ i_a.last }Parser"
-      cls = Callback_::Module_path_value_via_parts[ i_a ]
+      cls = Callback_::Const_value_via_parts[ i_a ]
       a = enhance_parser_with
       if a
         cls = enhance_parser_via_a cls, a

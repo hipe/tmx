@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Callback::TestSupport::Autoloader
 
-  describe "[cb] autoloader \"boxxy\"" do
+  describe "[ca] autoloader \"boxxy\"" do
 
     context "this is a live test, must happen in one big story" do
 

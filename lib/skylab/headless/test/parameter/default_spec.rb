@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-describe 'If you have an object "object" that has a ' <<
+describe '[hl] If you have an object "object" that has a ' <<
   "#{::Skylab::Headless::Parameter} \"foo\"" do
 
   extend ::Skylab::Headless::TestSupport::Parameter

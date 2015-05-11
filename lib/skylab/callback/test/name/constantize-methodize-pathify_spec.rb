@@ -26,7 +26,7 @@ module Skylab::Callback::Test::Name::CMP_
     Callback_::Name.lib.pathify_name
   end
 
-  describe "[cb] name (multiple methods)" do
+  describe "[ca] name (multiple methods)" do
 
     format = "%-48s %18s => %s"
 

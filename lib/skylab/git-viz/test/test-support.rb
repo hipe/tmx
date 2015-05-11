@@ -178,8 +178,5 @@ module Skylab::GitViz::TestSupport
     Top_TS_ = TS_
   end
 
-  # ~ set it up so we peek into the FS to autoload usees
-
-  Autoloader_[ self, :boxxy, GitViz_.dir_pathname.join( 'test' ).to_path ]
-
+  Autoloader_[ self, :boxxy ]  # ..
 end

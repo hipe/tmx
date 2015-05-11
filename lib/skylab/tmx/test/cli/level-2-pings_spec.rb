@@ -140,7 +140,7 @@ module Skylab::TMX::TestSupport::CLI::L2P
 
     def _confirm_out_and_err_streams i, arg=PING_ARG_
       x = invoke "#{ i.to_s.gsub UNDERSCORE_, DASH_ }", arg
-      iog = @__memoized.fetch :io_spy_triad  # dear future - i am sorry:
+      iog = __memoized.fetch :io_spy_triad  # dear future - i am sorry:
       # calling `lines` does hackery that won't work with our hackery, maybe.
 
       oa, ea = [ :outstream, :errstream ].map do |ii|

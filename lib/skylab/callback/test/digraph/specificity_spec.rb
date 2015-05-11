@@ -8,7 +8,7 @@ module Skylab::Callback::TestSupport::Digraph::Specificity
 
   extend TestSupport_::Quickie
 
-  describe "[cb] digraph specificity" do
+  describe "[ca] digraph specificity" do
 
     extend Specificity_TestSupport
 

@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Callback::TestSupport::Proxy
 
-  describe "[cb] proxy - inline" do
+  describe "[ca] proxy - inline" do
 
     it "2 equivalent ways to construct it" do
       p2 = Subject_[].inline :bar, -> { :ba }

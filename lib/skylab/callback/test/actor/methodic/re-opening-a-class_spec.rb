@@ -12,7 +12,7 @@ module Skylab::Callback::TestSupport::Actor::Methodic::ROAC
 
   Grandparent_Subject_ = Parent_TS_::Parent_subject_
 
-  describe "[cb] actor - methodic - re-opening a class" do
+  describe "[ca] actor - methodic - re-opening a class" do
 
     context "you do it with 'o'" do
 

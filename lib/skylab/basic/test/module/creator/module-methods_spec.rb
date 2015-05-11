@@ -41,7 +41,7 @@ module Skylab::Basic::TestSupport
       :__done__
     end
 
-    TS_.describe "[mh] Module::Creator::ModuleMethods (*on* modules, #{
+    TS_.describe "[ba] Module::Creator::ModuleMethods (*on* modules, #{
       }not classes" do
 
       extend TS_
@@ -95,7 +95,7 @@ module Skylab::Basic::TestSupport
                                   # this file alone)
 
 
-    TS_.describe "[mh] Module::Creator::ModuleMethods scenario 2 - #{
+    TS_.describe "[ba] Module::Creator::ModuleMethods scenario 2 - #{
       }this is fucking amazing - composing different module graphs WTF" do
 
       extend TS_

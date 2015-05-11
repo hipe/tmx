@@ -10,7 +10,7 @@ module Skylab::FileMetrics::TestSupport::CLI
 
   FM_ = FM_
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   module ModuleMethods
 

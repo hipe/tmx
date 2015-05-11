@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Callback::TestSupport::Tree
 
-  describe "[gv] lib- callbacks-tree: handlers" do
+  describe "[ca] tree - handlers" do
 
     context "a typical handlers tree" do
 

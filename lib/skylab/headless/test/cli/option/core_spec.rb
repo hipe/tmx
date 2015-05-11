@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::CLI::Option
 
-  describe "[he] CLI::Option__" do
+  describe "[hl] CLI::Option__" do
 
     it "`basic_switch_index_curry` is a hack to see if a basic switch is present" do
       p = Subject_[].basic_switch_index_curry '--foom'

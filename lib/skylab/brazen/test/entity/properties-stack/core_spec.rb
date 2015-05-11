@@ -32,7 +32,7 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Core
       x = stack.push_frame_with :derp, :Z, :b, :B, :nerp, :Q
       x.should eql false
       expect_not_OK_event :extra_properties do |ev|
-        ev.name_i_a.should eql [ :derp, :nerp ]
+        ev.name_x_a.should eql [ :derp, :nerp ]
       end
       expect_no_more_events
     end
@@ -63,7 +63,7 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Core
       stack.push_frame_with :b, :B2
       x = stack.property_value_via_symbol :c
       expect_not_OK_event :extra_properties do |ev|
-        ev.name_i_a.should eql [ :c ]
+        ev.name_x_a.should eql [ :c ]
       end
       expect_no_more_events
       x.should eql false

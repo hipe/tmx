@@ -19,13 +19,17 @@ module Skylab::TestSupport
       end
 
       define_method :_service_instance, -> do  # #storypoint-25
+
         p = -> do
-          x = Service__.new nil, LIB_.stdout, LIB_.stderr
+          lib = TestSupport_.lib_
+          x = Service__.new nil, lib.stdout, lib.stderr
           x.listen
           p = -> { x }
           x
         end
+
         -> { p[] }
+
       end.call
     end
 
@@ -176,9 +180,6 @@ module Skylab::TestSupport
         end
       end
 
-      TestSupport_.lib_  # loads LIB_, Library_
-      LIB_.let_methods self
-
       def initialize rt
         @__quickie_runtime = rt
       end
@@ -190,6 +191,9 @@ module Skylab::TestSupport
       def __quickie_failed
         @__quickie_runtime.failed
       end
+
+      TestSupport_::Let[ self ]
+
     end  # will re-open below
 
     class Tagset__

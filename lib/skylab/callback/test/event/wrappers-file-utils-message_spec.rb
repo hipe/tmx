@@ -1,14 +1,8 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Callback::TestSupport::Event::Wrap_FU_msg
+module Skylab::Callback::TestSupport
 
-  ::Skylab::Callback::TestSupport::Event[ self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  describe "[br] entity event wrappers - file utils message" do
+  describe "[ca] event - wrappers file utils message" do
 
     context 'mkdir -p' do
 
@@ -27,7 +21,7 @@ module Skylab::Callback::TestSupport::Event::Wrap_FU_msg
 
     def expect expect_s
       s = fu_output_message_for cmd, arg
-      md = Subject_[].match s
+      md = _subject.match s
       md or fail "did not match: #{ s.inspect }"
       md[ :predicate ].should eql expect_s
       md[ :argument ].should eql arg
@@ -42,7 +36,7 @@ module Skylab::Callback::TestSupport::Event::Wrap_FU_msg
       message
     end
 
-    Subject_ = -> do
+    def _subject
       Callback_::Event::Wrappers__::File_utils_message::PATH_HACK_RX__
     end
   end

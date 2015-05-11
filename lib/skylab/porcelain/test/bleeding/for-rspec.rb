@@ -1,6 +1,6 @@
 module Skylab::Porcelain::TestSupport::Bleeding
 
-  mustache_rx = Porcelain.lib_.string_lib.mustache_regexp
+  mustache_rx = Porcelain_.lib_.string_lib.mustache_regexp
 
   ::RSpec::Matchers.define :be_action do |expected|
     actual = nil ; fails = [] ; desc = {}

@@ -16,7 +16,7 @@ module Skylab::Porcelain
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
-    Bsc__ = sidesys[ :Basic ]
+    Basic = sidesys[ :Basic ]
 
     CLI_lib = -> do
       HL__[]::CLI
@@ -29,8 +29,10 @@ module Skylab::Porcelain
     end
 
     String_lib = -> do
-      Bsc__[]::String
+      Basic[]::String
     end
+
+    Test_support = sidesys[ :TestSupport ]
 
     INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(
       self, Porcelain_ )

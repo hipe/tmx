@@ -9,8 +9,10 @@ module Skylab::Porcelain::TestSupport::Bleeding::Runtime
   TestLib_ = TestLib_
 
   class Frame < ::Struct.new :klass, :argv, :debug
+
     include Constants
-    TestLib_::Let[ self ]
+
+    TestSupport_::Let[ self ]
 
     let :client do
       o = klass.new
@@ -70,9 +72,8 @@ module Skylab::Porcelain::TestSupport::Bleeding::Runtime
   end
 
   module InstanceMethods
-    include Constants
 
-    TestLib_::Let[ self ]
+    include Constants
 
     def _build_frame
       Frame.new klass, argv, debug

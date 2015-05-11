@@ -88,7 +88,7 @@ module Skylab::Headless::TestSupport::NLP::EN::AAIH
     end
   end
 
-  describe "the industrious action class" do
+  describe "[hl] the industrious action class" do
     extend TS_
 
     TestSupport_::Quickie.apply_experimental_specify_hack self

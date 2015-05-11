@@ -54,10 +54,10 @@ module Skylab::Callback
 
     class Normpath_
       def corename_as_const
-        name_for_lookup.as_const
+        name_for_lookup_.as_const
       end
       def corename_as_distilled_stem
-        name_for_lookup.as_distilled_stem
+        name_for_lookup_.as_distilled_stem
       end
     end
 

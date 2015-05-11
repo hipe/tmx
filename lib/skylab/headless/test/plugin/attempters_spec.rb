@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::Plugin
 
-  describe "[gv] test-lib- mock system plugin- attempters" do
+  describe "[hl] test-lib- mock system plugin- attempters" do
 
     context "one" do
 

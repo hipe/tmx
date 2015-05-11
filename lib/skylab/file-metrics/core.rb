@@ -51,7 +51,7 @@ module Skylab::FileMetrics
     end
 
     DSL_DSL_enhance_module = -> x, p do
-      MH__[]::DSL_DSL.enhance_module x, & p
+      Parse_lib__[]::DSL_DSL.enhance_module x, & p
     end
 
     EN_agent = -> do
@@ -74,26 +74,14 @@ module Skylab::FileMetrics
 
     HL__ = sidesys[ :Headless ]
 
-    Ivars_with_procs_as_methods = -> * a do
-      MH__[]::Ivars_with_Procs_as_Methods.call_via_arglist a
-    end
-
-    Let = -> do
-      MH__[]::Let
-    end
-
-    MH__ = sidesys[ :MetaHell ]
-
     NLP_EN__ = _memoize do
       HL__[]::NLP::EN
     end
 
+    Parse_lib__ = sidesys[ :Parse ]
+
     Proxy_lib = -> do
       Callback_::Proxy
-    end
-
-    Nice_proxy = -> * a do
-      MH__[]::Proxy.nice.call_via_arglist a
     end
 
     Reverse_string_scanner = -> s do
@@ -120,6 +108,8 @@ module Skylab::FileMetrics
     System_open2 = -> mod do
       mod.include Face__[]::Open2
     end
+
+    Test_support = sidesys[ :TestSupport ]
   end
 
   EMPTY_S_ = ''.freeze

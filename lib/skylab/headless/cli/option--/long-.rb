@@ -4,9 +4,14 @@ module Skylab::Headless
 
     Long_ = ::Struct.new :__, :no, :stem, :arg do
 
-      Headless_.lib_.pool.enhance( self ).with_lease_and_release -> do
+      _DOUBLE_DASH = '--'.freeze
+
+      Callback_::Memoization::Pool[ self ].lease_by do
+
         # this is how we construct (*not* re-init) a flyweight.
-        new '--'  # this never changes
+
+        new _DOUBLE_DASH  # this never changes
+
       end
 
       class << self

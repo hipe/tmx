@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module Tree
 
-    class Input_Adapters__::Indented_Line_Stream
+    class Input_Adapters__::Indented_Line_Stream  # :[#043].
 
       Callback_::Actor.call self, :properties,
 

@@ -10,7 +10,7 @@ module Skylab::Callback::TestSupport::OD__
 
   Subject_ = -> { Callback_::Ordered_Dictionary }
 
-  describe "[cb] ordered dictionary" do
+  describe "[ca] ordered dictionary" do
 
     context "when you make a \"static\" listener class" do  # #needs-indent
 

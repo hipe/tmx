@@ -25,7 +25,7 @@ module Skylab::Headless::TestSupport::CLI::Box
       end
 
       it "loads" do
-        puts "ok: #{ box_class }"
+        box_class or fail
       end
 
       it "builds" do

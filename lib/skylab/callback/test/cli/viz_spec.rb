@@ -1,16 +1,10 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Callback::TestSupport::CLI::Viz
+module Skylab::Callback::TestSupport
 
-  ::Skylab::Callback::TestSupport::CLI[ TS__ = self ]
+  describe "[ca] CLI - viz" do
 
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  describe "[cb] viz" do
-
-    extend TS__
+    extend TS_
 
     it "with the ideal case - works" do
       g = TestSupport_::IO.spy.triad nil

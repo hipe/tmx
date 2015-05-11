@@ -40,7 +40,7 @@ module Skylab::Headless
     end
 
     DSL_DSL = -> mod, p do
-      MH__[]::DSL_DSL.enhance mod, &p
+      Parse_lib[]::DSL_DSL.enhance mod, &p
     end
 
     Enumerator_lib = -> do
@@ -51,10 +51,6 @@ module Skylab::Headless
 
     Funcy_globful = -> cls do
       MH__[].funcy_globful cls
-    end
-
-    Ivars_with_procs_as_methods = -> * a do
-      MH__[]::Ivars_with_Procs_as_Methods.call_via_arglist a
     end
 
     List_lib = -> do
@@ -75,20 +71,14 @@ module Skylab::Headless
       Face___[]::CLI::Table.call_via_iambic x_a
     end
 
-    Parse_lib = -> do
-      MH__[]::Parse
-    end
-
-    Pool = -> do
-      MH__[]::Pool
-    end
+    Parse_lib = sidesys[ :Parse ]
 
     Reasonably_short = -> do
-      MH__[].strange::A_REASONABLY_SHORT_LENGTH_FOR_A_STRING
+      Strange_lib[]::A_REASONABLY_SHORT_LENGTH_FOR_A_STRING
     end
 
     Strange = -> x do
-      MH__[].strange x
+      Basic[]::String.via_mixed x
     end
 
     String_lib = -> do

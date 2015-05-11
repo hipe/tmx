@@ -4,7 +4,7 @@ module Skylab::Callback::TestSupport::Digraph
 
   # Quickie.
 
-  describe "[cb] digraph" do
+  describe "[ca] digraph" do
 
     extend Digraph_TestSupport
 

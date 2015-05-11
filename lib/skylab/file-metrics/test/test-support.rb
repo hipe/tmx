@@ -9,7 +9,7 @@ module Skylab::FileMetrics
 
     module Constants
       FM_ = ::Skylab::FileMetrics
-      TestSupport = ::Skylab::TestSupport
+      TestSupport_ = ::Skylab::TestSupport
     end
   end
 end

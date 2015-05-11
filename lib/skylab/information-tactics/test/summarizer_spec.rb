@@ -2,7 +2,7 @@ require_relative '../summarizer'
 require_relative 'test-support'
 
 module Skylab::InformationTactics::TestSupport
-  describe "Summarizer#summarize()" do
+  describe "[it] Summarizer#summarize()" do
     include ::Skylab::InformationTactics::Summarizer
     context "truncates strings" do
       def self.o maxlen, input, expected, *r

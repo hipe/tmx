@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Basic::TestSupport::String
 
-  describe "[mh] \"strange\" (the summarization-aware `inspect`-ish)" do
+  describe "[ba] \"strange\" (the summarization-aware `inspect`-ish)" do
 
     it "a string 9 chars wide gets quoted and becomes 11 wide" do
       expect_quotes 'nine_char'

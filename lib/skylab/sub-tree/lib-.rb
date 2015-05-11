@@ -42,10 +42,8 @@ module Skylab::SubTree
 
     IT___ = sidesys[ :InformationTactics ]
 
-    MH___ = sidesys[ :MetaHell ]
-
     Strange_proc = -> do
-      MH___[].strange.to_proc
+      Basic[]::String.via_mixed.to_proc
     end
 
     Summarize_time = -> x do

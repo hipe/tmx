@@ -4,7 +4,7 @@ module Skylab::BeautySalon
 
   Models_::Text::Sessions_::Wrapping_Buffer =
 
-      BS_.lib_.ivars_with_procs_as_methods.new :flush do
+      Callback_::Session::Ivars_with_Procs_as_Methods.new :flush do
 
     def initialize num_chars_wide, flush_line
       num_chars_wide < 1 and fail "sanity - #{ num_chars_wide } chars wide?"

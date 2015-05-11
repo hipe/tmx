@@ -114,7 +114,7 @@ module Skylab::GitViz
     end
 
     Strange = -> x do
-      MH__[].strange 120, x
+      Basic[]::String.via_mixed 120, x
     end
 
     String_scanner = _memoize do

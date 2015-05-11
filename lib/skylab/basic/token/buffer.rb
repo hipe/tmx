@@ -43,7 +43,7 @@ module Skylab::Basic
     Ellipsatize__ = Basic_::String.ellipsify.
       curry[ A_RATHER_SHORT_LENGTH_FOR_A_STRING__ ]
 
-    Basic_.lib_.ivars_with_procs_as_methods self,
+    Callback_::Session::Ivars_with_Procs_as_Methods.call self,
       :gets, :@gets_proc, :gets_proc=
 
   end

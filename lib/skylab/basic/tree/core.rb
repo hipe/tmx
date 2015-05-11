@@ -146,7 +146,7 @@ module Skylab::Basic
           if x.respond_to? :is_leaf
             y << x
           else
-            Pooled_Leaf__.with_instance do |tl|
+            Pooled_Leaf__.instance_session do |tl|
               tl.init_from_pool x
               y << tl
             end
@@ -185,7 +185,8 @@ module Skylab::Basic
 
   class Pooled_Leaf__
 
-    Basic_.lib_.pool( self ).with_with_instance
+    Callback_::Memoization::Pool[ self ].
+      instances_can_only_be_accessed_through_instance_sessions
 
     def init_from_pool x
       @leaf_data = x

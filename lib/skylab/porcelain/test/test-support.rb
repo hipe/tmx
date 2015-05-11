@@ -6,31 +6,18 @@ module Skylab::Porcelain::TestSupport
   ::Skylab::TestSupport::Regret[ Porcelain_TestSupport = self ]
 
   Callback_ = ::Skylab::Callback
-    Autoloader_ = Callback_::Autoloader
 
-  TestLib_ = ::Module.new
+  Autoloader_ = Callback_::Autoloader
 
-  module Constants
-    Bleeding = ::Skylab::Porcelain::Bleeding
-    Callback_ = Callback_
-    Porcelain = ::Skylab::Porcelain
-    TestLib_ = TestLib_
-    TestSupport = ::Skylab::TestSupport
-  end
+  TestSupport_ = ::Skylab::TestSupport
 
-  include Constants
-
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   module TestLib_
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
-    Bsc__ = sidesys[ :Basic ]
-
-    Class_creator = -> do
-      MH__[]::Class::Creator
-    end
+    Basic = sidesys[ :Basic ]
 
     CLI_lib = -> do
       HL__[]::CLI
@@ -42,28 +29,24 @@ module Skylab::Porcelain::TestSupport
 
     HL__ = sidesys[ :Headless ]
 
-    Let = -> mod do
-      mod.extend MH__[]::Let
-    end
-
-    MH__ = sidesys[ :MetaHell ]
+    MH___ = sidesys[ :MetaHell ]
 
     Method_is_defined_by_module = -> i, mod do
-      MH__[].method_is_defined_by_module i, mod
-    end
-
-    Module_creator = -> do
-      MH__[]::Module::Creator
+      MH___[].method_is_defined_by_module i, mod
     end
 
     String_lib = -> do
-      Bsc__[]::String
+      Basic[]::String
     end
   end
 
+  Porcelain_ = ::Skylab::Porcelain
+
   module ModuleMethods
+
     include Constants
-    include TestLib_::Class_creator[]::ModuleMethods  # klass etc
+
+    include Porcelain_.lib_.basic::Class::Creator::ModuleMethods  # `klass!` etc
 
     define_method :constantize, & TestLib_::Constantize_proc[]
 
@@ -83,8 +66,10 @@ module Skylab::Porcelain::TestSupport
   end
 
   module InstanceMethods
+
    include Constants
-   include TestLib_::Class_creator[]::InstanceMethods  # klass!
+
+   include Porcelain_.lib_.basic::Class::Creator::InstanceMethods  # for `klass!`
 
    define_method :style_free, TestLib_::CLI_lib[].pen.unstyle
 
@@ -101,5 +86,13 @@ module Skylab::Porcelain::TestSupport
    infostream = ::STDERR
 
    define_method :infostream do infostream end
+  end
+
+  module Constants
+    Bleeding = Porcelain_::Bleeding  # :+#wontfix
+    Callback_ = Callback_
+    Porcelain_ = ::Skylab::Porcelain
+    TestLib_ = TestLib_
+    TestSupport_ = TestSupport_
   end
 end

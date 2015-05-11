@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Callback::TestSupport::Tree
 
-  describe "[gv] lib- callbacks-tree: listeners" do
+  describe "[ca] tree - listeners" do
 
     context "minimal normative example" do
 

@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Callback::TestSupport::Proxy
 
-  describe "[cb] proxy - nice" do
+  describe "[ca] proxy - nice" do
 
     extend TS_
 

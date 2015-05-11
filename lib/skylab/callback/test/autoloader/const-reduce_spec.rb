@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Callback::TestSupport::Autoloader
 
-  describe "[cb] autoloader const reduce is an improvement on boxxy" do
+  describe "[ca] autoloader const reduce is an improvement on boxxy" do
 
     context "in that from the ground up it does not assume a mutated module" do
 

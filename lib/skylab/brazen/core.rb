@@ -97,11 +97,13 @@ module Skylab::Brazen
   Autoloader_ = Callback_::Autoloader
 
   module Data_Stores
+
     class << self
       def name_function
         Models_::Datastore.name_function  # hack city
       end
-    end
+    end  # >>
+
     Autoloader_[ self, :boxxy ]
   end
 
@@ -254,6 +256,8 @@ module Skylab::Brazen
 
     Open3 = stdlib[ :Open3 ]
 
+    Parse_lib = sidesys[ :Parse ]
+
     Proxy_lib = -> do
       Callback_::Proxy
     end
@@ -261,7 +265,7 @@ module Skylab::Brazen
     Snag_ = sidesys[ :Snag ]
 
     Strange = -> x do
-      Autoloader_.require_sidesystem( :MetaHell ).strange x
+      Basic[]::String.via_mixed x
     end
 
     String_IO = stdlib[ :StringIO ]

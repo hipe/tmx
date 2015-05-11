@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
 
-  describe "[cb] scn articulators - aggregating (features)" do
+  describe "[ca] scn articulators - aggregating (features)" do
 
     extend TS_
 

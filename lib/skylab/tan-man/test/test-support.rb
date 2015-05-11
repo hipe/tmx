@@ -22,7 +22,7 @@ module Skylab::TanMan::TestSupport
 
     define_singleton_method :_memoize, TanMan_::Callback_::Memoize
 
-    Bsc__ = sidesys[ :Basic ]
+    Basic = sidesys[ :Basic ]
 
     Base_tmpdir__ = _memoize do
       TanMan_.lib_.system.filesystem.tmpdir(
@@ -32,10 +32,6 @@ module Skylab::TanMan::TestSupport
 
     CLI_lib = -> do
       HL__[]::CLI
-    end
-
-    Class_creator_module_methods_module = -> mod do
-      mod.include MetaHell__[]::Class::Creator::ModuleMethods ; nil
     end
 
     Constantize = -> x do
@@ -72,16 +68,10 @@ module Skylab::TanMan::TestSupport
 
     JSON = stdlib[ :JSON ]
 
-    Let = -> mod do
-      mod.extend MetaHell__[]::Let
-    end
-
-    MetaHell__ = sidesys[ :MetaHell ]
-
     PP = stdlib[ :PP ]
 
     String_lib = -> do
-      Bsc__[]::String
+      Basic[]::String
     end
 
     Shellwords = stdlib[ :Shellwords ]

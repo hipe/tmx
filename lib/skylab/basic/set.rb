@@ -45,7 +45,7 @@ module Skylab::Basic
         if x.respond_to? :each_with_index then With_members_as_a__
         elsif x.respond_to? :call then With_members_as_p__
         else raise ::ArgumentError,
-          "member set? #{ Basic_.lib_.strange x }" end ) ; nil
+          "member set? #{ Basic_::String.via_mixed x }" end ) ; nil
     end
     With_members_as_a__ = -> a do
       a.frozen? or raise ::ArgumentError, "when providing an array to #{

@@ -10,32 +10,24 @@ module Skylab::System
 
     Basic = sidesys[ :Basic ]
 
-    Bzn__ = sidesys[ :Brazen ]  # used in tests too
+    Brazen = sidesys[ :Brazen ]  # used in tests too
 
     Entity = -> * a, & p do
       if a.length.zero? && ! p
-        Bzn__[]::Entity
+        Brazen[]::Entity
       else
-        Bzn__[]::Entity.call_via_arglist a, & p
+        Brazen[]::Entity.call_via_arglist a, & p
       end
     end
 
     File_utils = stdlib[ :FileUtils ]
 
-    Ivars_with_procs_as_methods = -> * a do
-      MH__[]::Ivars_with_Procs_as_Methods.call_via_arglist a
-    end
-
-    MH__ = sidesys[ :MetaHell ]
-
     Open3 = stdlib[ :Open3 ]
 
-    Parse_lib = -> do
-      MH__[]::Parse
-    end
+    Parse_lib = sidesys[ :Parse ]
 
     Properties_stack_frame = -> *a do
-      Bzn__[].properties_stack.common_frame.call_via_arglist a
+      Brazen[].properties_stack.common_frame.call_via_arglist a
     end
 
     Shellwords = stdlib[ :Shellwords ]

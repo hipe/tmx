@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Callback::TestSupport::Box
 
-  describe "[cb] box (algorithms)" do
+  describe "[ca] box (algorithms)" do
 
     extend TS_
 

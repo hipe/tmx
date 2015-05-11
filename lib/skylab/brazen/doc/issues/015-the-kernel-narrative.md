@@ -46,7 +46,7 @@ because these two concerns are munged into one name we need to do some
 parsing to determine where the one ends and the other begins.
 
 a year later we would try to abtract a general algorithm from this
-as [#mh-002] for use elswhere. but currently its native implementation
+as [#pa-002] for use elswhere. but currently its native implementation
 is too entrenched, so for now thy exist separately but with the same
 idea behind them.
 

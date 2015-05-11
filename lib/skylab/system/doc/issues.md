@@ -16,4 +16,3 @@
 [#016]       the find narrative ..
 [#017]       the grep narrative ..
 [#018]       [ walk ] #parent-node: [#009]
-[#019]       the top test support narrative..

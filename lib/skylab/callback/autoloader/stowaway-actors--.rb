@@ -133,7 +133,7 @@ module Skylab::Callback
 
             const_i = @const_missing.fuzzy_lookup_name_in_module_(
 
-              np.name_for_lookup, mod,
+              np.name_for_lookup_, mod,
 
               -> x_ { x_ },  # IDENTITY_ when exactly one is found, result is const
 
@@ -186,8 +186,8 @@ module Skylab::Callback
           if @do_add_core_file
             Autoloader[ x, np.some_dir_path ]
             x.module_exec do
-              @did_resolve_entry_tree = true
-              @any_built_entry_tree = np
+              @entry_tree_is_known_is_known_ = true
+              @any_built_entry_tree_ = np
             end
           end
           if x.respond_to?( :dir_pathname ) &&
@@ -267,7 +267,7 @@ module Skylab::Callback
       def when_is_different  # near :+[#ba-034]
         const_a = @mod.name.split CONST_SEP_
         const_a[ - ( @existant_a.length ) .. -1 ] = EMPTY_A_
-        _mod = Module_path_value_via_parts[ const_a ]
+        _mod = Const_value_via_parts[ const_a ]
         _mod_ = Autoloader.const_reduce do |cr|
           cr.from_module _mod
           cr.const_path @imagined_a

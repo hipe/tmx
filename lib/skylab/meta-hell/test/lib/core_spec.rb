@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::Lib
 
-  describe "[mh] Lib__" do
+  describe "[mh] \"lib--\"" do
 
     context "given a queue of functions and one seed value, produce one result" do
 

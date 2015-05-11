@@ -12,7 +12,7 @@ end
 
 module Skylab::Callback::TestSupport::Proxy::Tee
 
-  describe "[cb] proxy tee" do
+  describe "[ca] proxy tee" do
 
     extend TS_
 

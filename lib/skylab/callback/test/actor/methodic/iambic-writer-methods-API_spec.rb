@@ -14,7 +14,7 @@ module Skylab::Callback::TestSupport::Actor::Methodic::IWM
 
   Grandparent_Subject_ = Parent_TS_::Parent_subject_
 
-  describe "[cb] actor - methodic - iambic writer methods API" do
+  describe "[ca] actor - methodic - iambic writer methods API" do
 
     context "`iambic_writer_method_to_be_provided`" do
 

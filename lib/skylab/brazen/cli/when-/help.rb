@@ -23,7 +23,7 @@ module Skylab::Brazen
       def whn_command_string
 
         aa = @aa
-        a = aa.find_matching_action_adapters_against_tok @any_cmd_string
+        a = aa.find_matching_action_adapters_against_tok_ @any_cmd_string
 
         case 1 <=> a.length
         when  0

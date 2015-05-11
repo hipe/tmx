@@ -1,18 +1,20 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Callback::TestSupport::Event::Class_Factories::MSG
+module Skylab::Callback::TestSupport
 
-  ::Skylab::Callback::TestSupport::Event::Class_Factories[ self ]
+  module Evnt_Clss_Fctrs_Mssg___  # :+#throwaway-module for test consts
 
-  include Constants
+    # <-
 
-  extend TestSupport_::Quickie
+  TS_.describe "[ca] event - class factories - message" do
 
-  describe "[br] events - class factories - message" do
+    subject = -> do
+      Callback_::Event.message_class_factory
+    end
 
     before :all do
 
-      My_Fun_Message__ = Subject_[].new do |foo, bar|
+      My_Fun_Message = subject[].new do |foo, bar|
         "ermegerd #{ ick foo } (#{ val bar })"
       end
     end
@@ -22,7 +24,7 @@ module Skylab::Callback::TestSupport::Event::Class_Factories::MSG
 
     it "is an easy way to build one-line, NOT OK message events" do
 
-      msg = My_Fun_Message__[ :_Foo_, :_Bar_ ]
+      msg = My_Fun_Message[ :_Foo_, :_Bar_ ]
 
       # (for now, message objects themselves are useless. once did something)
 
@@ -33,9 +35,7 @@ module Skylab::Callback::TestSupport::Event::Class_Factories::MSG
 
       y.should eql ["ermegerd '_Foo_' (:_Bar_)"]
     end
-
-    Subject_ = -> do
-      Callback_::Event.message_class_factory
-    end
+  end
+# ->
   end
 end

@@ -12,7 +12,7 @@ module Skylab::Headless::TestSupport::Arity
 
   Sandboxer = TestSupport_::Sandbox::Spawner.new
 
-  describe "a Skylab::Headless::Arity" do
+  describe "[hl] a Skylab::Headless::Arity" do
 
     context "Space when sent" do
 

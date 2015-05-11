@@ -89,14 +89,14 @@ module Skylab::Face
     end
   end
 
-  CLI::Lipstick::Class__ = LIB_.ivars_with_procs_as_methods.new :cook_rendering_proc
+  CLI::Lipstick::Class__ = Callback_::Session::Ivars_with_Procs_as_Methods.new :cook_rendering_proc
 
   class CLI::Lipstick::Class__
 
     DEFAULT_GLYPH__ = '.'
     FINAL_DEFAULT_WIDTH__ = 72
 
-    Pen_ = LIB_.ivars_with_procs_as_methods.new :cook
+    Pen_ = Callback_::Session::Ivars_with_Procs_as_Methods.new :cook
 
     class Pen_
       def initialize glyph, color

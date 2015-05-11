@@ -56,5 +56,7 @@ module Skylab::TanMan::TestSupport::Models::Meaning
 
       ::File.read( dotfile_path ).should eql _exp
     end
+
+    ignore_these_events :using_parser_files
   end
 end

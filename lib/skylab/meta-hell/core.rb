@@ -52,10 +52,6 @@ module Skylab
         lib_.basic::String.via_mixed.call_via_arglist a
       end
 
-      def struct_via_hash h  # :#deprecated
-        ::Struct.new( * h.keys ).new( * h.values )
-      end
-
       def touch_const * a
         if a.length.zero?
           MetaHell_::Lib__::Touch_const

@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Callback::TestSupport::Actor
 
-  describe "[cb] actor" do
+  describe "[ca] actor" do
 
     before :all do
 

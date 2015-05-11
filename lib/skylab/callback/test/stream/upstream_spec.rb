@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Callback::TestSupport
 
-  describe "[cb] stream - signals" do
+  describe "[ca] stream - signals" do
 
     it "has it" do
 

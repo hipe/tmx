@@ -46,10 +46,6 @@ module Skylab::Basic
       System_lib__[]::IO
     end
 
-    Ivars_with_procs_as_methods = -> * a do
-      MH__[]::Ivars_with_Procs_as_Methods.call_via_arglist a
-    end
-
     MH__ = sidesys[ :MetaHell ]
 
     NLP_EN = -> do
@@ -64,13 +60,7 @@ module Skylab::Basic
       Callback_::Oxford_or[ a ]
     end
 
-    Parse_lib = -> do
-      MH__[]::Parse
-    end
-
-    Pool = -> x do
-      MH__[]::Pool.enhance x
-    end
+    Parse_lib = sidesys[ :Parse ]
 
     Scn_lib = -> do
       Callback_::Scn
@@ -86,8 +76,8 @@ module Skylab::Basic
       System_lib__[]::IO.some_stderr_IO
     end
 
-    Strange = -> x do
-      MH__[].strange x
+    Strange = -> x do  # looks better in expressions for this to be here
+      Basic_::String.via_mixed x
     end
 
     String_IO = -> do
@@ -106,6 +96,8 @@ module Skylab::Basic
     end
 
     System_lib__ = sidesys[ :System ]
+
+    Test_support = sidesys[ :TestSupport ]
 
   end
 end

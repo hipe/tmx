@@ -61,15 +61,9 @@ module Skylab::BeautySalon
 
     HL___ = sidesys[ :Headless ]
 
-    Ivars_with_procs_as_methods = -> do
-      MH__[]::Ivars_with_Procs_as_Methods
-    end
-
     List_scanner = -> x do
       Callback_::Scn.try_convert x
     end
-
-    MH__ = sidesys[ :MetaHell ]
 
     Old_CLI_lib = -> do
       Face__[]::CLI

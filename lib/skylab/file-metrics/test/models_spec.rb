@@ -4,11 +4,13 @@ module Skylab::FileMetrics::TestSupport::Models
 
   ::Skylab::FileMetrics::TestSupport[ TS_ = self ]
 
-  module Sandbox
-    ::Skylab::TestSupport::Sandbox.enhance( self ).kiss_with 'KLS_'
-  end
-
   include Constants
+
+  TestSupport_ = TestSupport_
+
+  module Sandbox
+    TestSupport_::Sandbox.enhance( self ).kiss_with 'KLS_'
+  end
 
   FM_.lib_.DSL_DSL_enhance_module self, -> do
     block :with_klass
@@ -16,25 +18,28 @@ module Skylab::FileMetrics::TestSupport::Models
 
   module ModuleMethods
 
-    include Constants
+    # exeriment - is this worth it? this is for the "nonstandard thing" below
+    # that memoized **into** the test context **class**
 
-    extend FM_.lib_.let
+    define_singleton_method :let, TestSupport_::Let::LET_METHOD
 
     let :klass do
-      TS_::Sandbox.kiss with_klass_value.call
+       TS_::Sandbox.kiss with_klass_value.call
     end
+
+    define_method :__memoized, TestSupport_::Let::MEMOIZED_METHOD
   end
 
   module InstanceMethods
-    Sandbox = Sandbox
-    def klass
+
+    def klass  # nonstandard thing: ..
       self.class.klass
     end
   end
 
   # --*--
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[fm] models" do
 
@@ -47,10 +52,12 @@ module Skylab::FileMetrics::TestSupport::Models
       end
 
       it "trying to pass too many args - arg error" do
-        -> do
-          k = klass
-          k.new :one, :two
-        end.should raise_error( ::ArgumentError, /wrong number.+\(2 for 1\)/ )
+        cls = klass
+        begin
+          cls.new :one, :two
+        rescue ::ArgumentError => e
+        end
+        e.message.should match %r(\bwrong number.+\(2 for 1\))
       end
 
       it "trying to pass too few args - ok, you get nil (and reader)" do
@@ -82,9 +89,11 @@ module Skylab::FileMetrics::TestSupport::Models
       end
 
       it "it complains about strange fields in the hash" do
-        -> do
+        begin
           klass.new fizzle: :F
-        end.should raise_error( ::KeyError, /\Akey not found: :fizzle/ )
+        rescue ::KeyError => e
+        end
+        e.message.should match %r(\Akey not found: :fizzle)
       end
     end
 

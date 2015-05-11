@@ -33,7 +33,7 @@ module Skylab::TestSupport::TestSupport::DocTest
         expect_one_event_and_neutral_result :wrote
       end
 
-      it "two-part business path OK - intentional redundancy with \"medallion\"" do
+      it "two-part business path OK - intentional redundancy with \"sigil\"" do
 
         against 'WizzieWazzie::Moo_Moo',
           "THEN IT totally rocks:\n",

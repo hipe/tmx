@@ -2,7 +2,7 @@ require_relative 'methodic/test-support'
 
 module Skylab::Callback::TestSupport::Actor::Methodic
 
-  describe "[cb] actors - methodic" do
+  describe "[ca] actors - methodic" do
 
     context "with three" do
 

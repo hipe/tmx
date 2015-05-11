@@ -97,8 +97,6 @@ module Skylab::Brazen
 
     attr_reader :directory_path
 
-
-
     # ~~ delete (by way of ACS)
 
     def __remove__object_for_mutation_session o, & x_p

@@ -5,7 +5,7 @@ module Skylab::Yacc2Treetop::TestSupport::CLI
   include InstanceMethods  # for constants (1.9.2 to 1.9.3)
 # ..
 
-describe "[y2tt] CLI integration" do
+describe "[y2] CLI integration" do
 
   extend ::Skylab::Yacc2Treetop::TestSupport::CLI
 

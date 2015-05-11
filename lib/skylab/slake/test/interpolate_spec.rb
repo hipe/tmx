@@ -4,7 +4,7 @@ Skylab::TestSupport::Quickie.enable_kernel_describe
 
 module Skylab::Slake  # [#ts-010]
 # ..
-describe "[sl] interpolate" do
+describe "[sla] interpolate" do
   # include ::Skylab::Slake
 
   it "works" do

@@ -101,9 +101,7 @@ module Skylab::Snag
       HL__[]::Model::Event.apply_on_client mod
     end
 
-    Parse_lib = -> do
-      MH__[]::Parse
-    end
+    Parse_lib = sidesys[ :Parse ]
 
     Patch_lib = -> do
       System[].patch
@@ -120,7 +118,7 @@ module Skylab::Snag
     end
 
     Strange = -> * x_a do
-      MH__[].strange.call_via_arglist x_a
+      Basic[].strange.call_via_arglist x_a
     end
 
     String_lib = -> do

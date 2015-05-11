@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Slicer::TestSupport
 
-  describe "[sl]" do
+  describe "[sli]" do
 
     extend TS_
 

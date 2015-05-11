@@ -47,10 +47,10 @@
                was: API-lock on 'replace' as a flyweight-related meth name)
 [#030] #open get flowchard graphic from phone to here, for `sequence` and `range`
              (was: #the-stowaway-experiment)
-[#029]       #parent-node: [#011] the parse series narrative ..
+[#029]       ( #moved-to: [#pa-004] )
              (was: #doc-point the autovivifying autoloader narrative )
 [#028]       #tracking-tag `without_warning`
-[#027]       a freeeform "serial optionals" basically like minimal packrat parser
+[#027]       ( #moved-to: [#pa-003] )
 [#026]       #doc-point "tuple tower" defined ..
 [#025]       #doc-point #parent:024 #body-is-inline-in-parent
                `formal` defined informally.
@@ -68,12 +68,12 @@
 [#019]       #done move parse out of fun (was: #node-tracker: #boxxy)
 [#018]       #done corral proxies
 [#017]       #done corral tees
-[#016]       #tracking-tag wow hash-like iterators are sure annoying
+[#016]       #tracking-t ag wow hash-like iterators are sure annoying
 [#015]       #tracking-tag early deep-copy vs. lazy deep-copy of defaults
 [#014] #done? #tracking-tag #attr #doc-point dup[e]ing behavior
 [#013]       #done move porcelain attribtues to here, then clean up
 [#012]       #done foo/ and foo.rb should be automagic, no declaration of module
-[#011]       #doc-node the parse narrative ..
+[#011]       ( #moved-to: [#pa-001] )
              (#re-purposed:once, became [#su-001] (which dissolved to `Lib_`))
 [#010]       #done pull in D-elegatesTo from porcelain!
 [#009]       #done when you made plastic you didn't know about `define_singleton_method`
@@ -86,7 +86,7 @@
                `meta_hell` prefix )
 [#003]       there is a possible new parse function we might subsume in [sg]
              ( #was: #done consider scrapping `_p` name convention for.. )
-[#002]       this one parse function with list against matrix
+[#002]       ( #moved-to: [#pa-002] )
              ( #was: #done instance method klass creator tests )
 [#001]       [ bundle ]
              ( #was: #done metahell tests and resolve #kick issue maybe )

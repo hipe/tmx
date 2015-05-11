@@ -97,7 +97,7 @@ module Skylab::TestSupport
             ACHIEVED_  # don't stop the batch job
           end
 
-          def via_bound_action_mutate_mutable_backbound_iambic x_a  # EEEW :+[#br-078]
+          def via_bound_action_mutate_mutable_backbound_iambic x_a  # EEEW :+[#br-078], but maybe see [#br-042]
 
             if :path == x_a[ -2 ]
               path = x_a.last

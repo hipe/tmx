@@ -22,7 +22,8 @@ module Skylab::CodeMolester
 
         LIB_.field_reflection_enhance( self ).with _STORY.host_module
 
-        LIB_.pool_lib.enhance( self ).with_with_instance_optionally
+        Callback_::Memoization::Pool[ self ].
+          instances_can_be_accessed_through_instance_sessions
 
         self
       end

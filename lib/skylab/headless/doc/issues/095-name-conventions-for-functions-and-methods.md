@@ -24,7 +24,7 @@ better this time.
   thing written 10 months prior)
 
 + `_by` used frequently for method that necessarily take procs;
-  althgough this is also used when it is linguistically natural sounding
+  although this is also used when it is linguistically natural sounding
   given the following formal argument(s).
 
 + `calculate`, `calculate_*` - method must take a block. result of method

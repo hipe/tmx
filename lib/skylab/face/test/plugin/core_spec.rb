@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Face::TestSupport::Plugin
 
-  describe "[hl] plugin" do  # loaded late for coverage
+  describe "[fa] plugin" do  # loaded late for coverage
 
     context "basic - just host with nothing" do
       it "the module graph builds." do

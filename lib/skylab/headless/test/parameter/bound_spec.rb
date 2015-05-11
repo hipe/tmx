@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-describe Skylab::Headless::Parameter::Bound do
+describe "[hl] parameter - bound" do
 
   # (no Q-uickie because `before` blocks are used!)
 

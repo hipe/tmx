@@ -31,9 +31,9 @@ module Skylab::CodeMolester
 
     define_singleton_method :_memoize, Callback_::Memoize
 
-    Bsc__ = sidesys[ :Basic ]
+    Basic = sidesys[ :Basic ]
 
-    Bsc_ = Bsc__
+    Bsc_ = Basic
 
     Brazen = sidesys[ :Brazen ]
 
@@ -59,7 +59,7 @@ module Skylab::CodeMolester
     end
 
     Constant_trouble = -> do
-      MH__[]::DSL_DSL::Constant_Trouble
+      Parse_lib___[]::DSL_DSL::Constant_Trouble
     end
 
     Delegating = -> mod, *a  do
@@ -73,15 +73,15 @@ module Skylab::CodeMolester
     Face__ = sidesys[ :Face ]
 
     Field_box_enhance = -> x, p do
-      Bsc__[]::Field.box.via_client_and_proc x, p
+      Basic[]::Field.box.via_client_and_proc x, p
     end
 
     Field_reflection = -> x do
-      Bsc__[]::Field.reflection[ x ]
+      Basic[]::Field.reflection[ x ]
     end
 
     Field_reflection_enhance = -> x do
-      Bsc__[]::Field.reflection.enhance x
+      Basic[]::Field.reflection.enhance x
     end
 
     FUC = -> do
@@ -91,15 +91,11 @@ module Skylab::CodeMolester
     HL__ = sidesys[ :Headless ]
 
     Hash_lib = -> do
-      Bsc__[]::Hash
+      Basic[]::Hash
     end
 
     IO_chunker_yielder = -> p do
       HL__[]::IO::Mappers::Chunkers::Functional.new p
-    end
-
-    Ivars_with_procs_as_methods = -> *a do
-      MH__[]::Ivars_with_Procs_as_Methods.call_via_arglist a
     end
 
     MH__ = sidesys[ :MetaHell ]
@@ -113,7 +109,7 @@ module Skylab::CodeMolester
     end
 
     Module_lib = -> do
-      Bsc__[]::Module
+      Basic[]::Module
     end
 
     New_event_lib = -> do
@@ -128,12 +124,10 @@ module Skylab::CodeMolester
       Face__[]::Model::Event
     end
 
-    Pool_lib = -> do
-      MH__[]::Pool
-    end
+    Parse_lib___ = sidesys[ :Parse ]
 
     Strange = -> x do
-      MH__[].strange x
+      Basic[]::String.via_mixed x
     end
 
     Simple_shell = -> a do
@@ -141,7 +135,7 @@ module Skylab::CodeMolester
     end
 
     String_lib = -> do
-      Bsc__[]::String
+      Basic[]::String
     end
 
     System = -> do

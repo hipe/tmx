@@ -46,8 +46,6 @@ module Skylab::TanMan
       Basic[]::Module
     end
 
-    MH__ = sidesys[ :MetaHell ]
-
     NLP_EN_methods = -> do
       HL__[].expression_agent.NLP_EN_methods
     end
@@ -56,9 +54,7 @@ module Skylab::TanMan
       HL__[]::Parameter
     end
 
-    Parse_lib = -> do
-      MH__[]::Parse
-    end
+    Parse_lib = sidesys[ :Parse ]
 
     Path_tools = -> do
       System[].filesystem.path_tools

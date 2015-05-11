@@ -41,6 +41,10 @@ module Skylab::MetaHell
 
     Stdlib_set = stdlib[ :Set ]
 
+    Strange = -> x do
+      Basic[]::String.via_mixed x
+    end
+
     Struct_lib = -> do
       Basic[]::Struct
     end

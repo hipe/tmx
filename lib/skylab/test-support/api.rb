@@ -66,10 +66,8 @@ module Skylab::TestSupport
       HL__ = sidesys[ :Headless ]
 
       Ick = -> x do
-        MH__[].strange x
+        Basic[]::String.via_mixed x
       end
-
-      MH__ = sidesys[ :MetaHell ]
 
       Name_symbol_to_label = -> i do
         self._HELLO

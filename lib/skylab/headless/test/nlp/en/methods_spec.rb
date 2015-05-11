@@ -1,7 +1,5 @@
 require_relative 'test-support'
 
-describe Skylab::Headless::NLP::EN::Methods do
-
   describe "[hl] NLP EN methods (oxford comma)" do
 
     include ::Skylab::Headless::NLP::EN::Methods
@@ -37,4 +35,3 @@ describe Skylab::Headless::NLP::EN::Methods do
       specify { should eql('eenie, meenie, miney and moe') }
     end
   end
-end

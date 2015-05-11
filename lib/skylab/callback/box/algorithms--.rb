@@ -47,7 +47,7 @@ module Skylab::Callback
         "name not found: #{ name.inspect }"
       end
 
-      def retrieve * a, & p
+      def retrieve * a, & p  # (somewhat near [#ba-015])
 
         # with `match_p [ <else_p>]` find first entry that matches `match_p`
         # or call `else_p`. result is value or pair per arity of `match_p`.

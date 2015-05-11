@@ -7,14 +7,6 @@ module Skylab::Porcelain::Bleeding
 
   Porcelain_ = ::Skylab::Porcelain # #hiccup
 
-  module Lib_
-    sidesys = Autoloader_.build_require_sidesystem_proc
-    Let = -> mod do
-      mod.extend MetaHell__[]::Let
-    end
-    MetaHell__ = sidesys[ :MetaHell ]
-  end
-
   NLP_ = Porcelain_.lib_.NLP
 
   module Styles
@@ -516,7 +508,7 @@ module Skylab::Porcelain::Bleeding
 
   class ArgumentSyntax < ::Struct.new :params, :takes_options
 
-    Lib_::Let[ self ]  # we freeze and memoize
+    Porcelain_.lib_.test_support::Let[ self ]  # we freeze and memoize
 
     parameter_string = -> o do
       pre, post = case o.type
@@ -577,7 +569,7 @@ module Skylab::Porcelain::Bleeding
   private
 
     def initialize *a
-      @__memoized = { } # ick, before the freeze
+      @memoized_ = {}  # ick, before the freeze
       super
       freeze
     end

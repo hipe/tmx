@@ -81,14 +81,14 @@ module Skylab::CodeMolester
     end
 
     def via_scan_calculate & p
-      Sexp_::Scan.with_instance do |scn|
+      Sexp_::Scan.instance_session do |scn|
         scn.set_identity self
         p[ scn ]
       end
     end
 
     def via_scan_calculate_for i, & p
-      Sexp_::Scan.with_instance do |scn|
+      Sexp_::Scan.instance_session do |scn|
         scn.set_identity self, i
         p[ scn ]
       end

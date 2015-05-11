@@ -89,7 +89,7 @@ module Skylab::Basic
       @set_unexpected_proc = -> x {  up = x }
     end
 
-    Basic_.lib_.ivars_with_procs_as_methods self,
+    Callback_::Session::Ivars_with_Procs_as_Methods.call self,
       :@set_unexpected_proc, :unexpected_proc=,
         :@set_string, :string=, :gets
 

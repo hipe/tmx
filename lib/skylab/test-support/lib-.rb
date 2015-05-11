@@ -109,24 +109,11 @@ module Skylab::TestSupport
       Callback_::Polymorphic_Stream
     end
 
-    Ivars_with_procs_as_methods = -> * a do
-      MH__[]::Ivars_with_Procs_as_Methods.call_via_arglist a
-    end
-
     IO = -> do
       System_lib__[]::IO
     end
 
     IT__ = sidesys[ :InformationTactics ]
-
-    Let = -> do
-      MH__[]::Let
-    end
-
-    Let_methods = -> mod do
-      mod.extend MH__[]::Let::ModuleMethods
-      mod.include MH__[]::Let::InstanceMethods
-    end
 
     Levenshtein = -> * x_a do
       IT__[]::Levenshtein.call_via_iambic x_a

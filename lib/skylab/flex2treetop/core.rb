@@ -399,7 +399,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
     end
 
     Strange = -> x do
-      MH__[].strange x
+      Basic[]::String.via_mixed x
     end
 
     String_lib = -> do

@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::Models::Workspace
 
-  describe "[ta] models - workspace create" do
+  describe "[tm] models - workspace create" do
 
     extend TS_
 

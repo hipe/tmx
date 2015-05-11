@@ -7,11 +7,12 @@ module Skylab::Porcelain::TestSupport::Bleeding
 
   include Constants
 
+  Porcelain_ = Porcelain_
   TestLib_ = TestLib_
 
   module ModuleMethods
-    extend TestLib_::Module_creator[]
-    include TestLib_::Class_creator[]
+
+    Porcelain_.lib_.basic::Module::Creator[ self ]
 
     include Constants
 

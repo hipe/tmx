@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Callback::TestSupport::Scn
 
-  describe "[ba] list scanner power (\"power scanner\")" do
+  describe "[ca] scn - multi-step" do
 
     it "simply wraps an init-phase along with a 'gets' phase and enumerates" do
       a = d = last = nil
