@@ -1,16 +1,17 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Headless::TestSupport::NLP::EN::AAIH
+module Skylab::Human::TestSupport
 
-  ::Skylab::Headless::TestSupport::NLP::EN[ TS_ = self ]
+  module NLP_EN_AAIH___  # :+#throwaway-module
 
-  include Constants
+    Subject_module__ = -> do  # (used by two describe blocks below ick)
 
-  extend TestSupport_::Quickie
+      Hu_::NLP::EN::API_Action_Inflection_Hack
+    end
 
-  Headless_ = Headless_
+    # <-
 
-  describe "[hl] NLP EN API action inflection hack (the class using it..)" do
+  TS_.describe "[hu] NLP EN API action inflection hack (the class using it..)" do
 
     extend TS_
 
@@ -19,7 +20,7 @@ module Skylab::Headless::TestSupport::NLP::EN::AAIH
     before :all do
 
       class MyAction
-        extend Headless_::NLP::EN::API_Action_Inflection_Hack
+        extend Subject_module__[]
       end
 
       module MyWidget # a noun
@@ -81,14 +82,18 @@ module Skylab::Headless::TestSupport::NLP::EN::AAIH
       end
 
       context "it's dumb to ask the base class for its inflection ",
+
         "but let's see what happens" do
+
         let(:inflection) { MyAction.inflection }
-          specify { should eql("my actioning aaih") }  # AAIH -> this module
+
+        specify { should eql("my actioning nlp en aaih") }
       end
     end
   end
 
-  describe "[hl] the industrious action class" do
+  describe "[hu] the industrious action class" do
+
     extend TS_
 
     TestSupport_::Quickie.apply_experimental_specify_hack self
@@ -96,7 +101,7 @@ module Skylab::Headless::TestSupport::NLP::EN::AAIH
     before :all do
 
       class MyAwesomeAction
-        extend Headless_::NLP::EN::API_Action_Inflection_Hack
+        extend Subject_module__[]
       end
 
       module Flugelhorn
@@ -130,5 +135,7 @@ module Skylab::Headless::TestSupport::NLP::EN::AAIH
       let(:action) { Flugelhorn::TheDerpAction }
       specify { should eql(action.inflection.lexemes.noun.singular) }
     end
+  end
+# ->
   end
 end

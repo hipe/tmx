@@ -49,7 +49,7 @@ module Skylab::Headless
       end
 
       Inflection = -> _ do
-        extend Headless_::NLP::EN::API_Action_Inflection_Hack ; nil
+        extend Headless_.lib_.human::NLP::EN::API_Action_Inflection_Hack ; nil
       end
 
       Headless_.lib_.bundle::Multiset[ self ]

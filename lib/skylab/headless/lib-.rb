@@ -52,6 +52,8 @@ module Skylab::Headless
       MH__[].funcy_globful cls
     end
 
+    Human = sidesys[ :Human ]
+
     List_lib = -> do
       Basic[]::List
     end

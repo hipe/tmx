@@ -90,6 +90,8 @@ module Skylab::CodeMolester
 
     HL__ = sidesys[ :Headless ]
 
+    Hu___ = sidesys[ :Human ]
+
     Hash_lib = -> do
       Basic[]::Hash
     end
@@ -117,7 +119,7 @@ module Skylab::CodeMolester
     end
 
     NLP_EN_methods = -> mod do
-      HL__[]::NLP::EN::Methods[ mod ]
+      Hu___[]::NLP::EN::Methods[ mod ]
     end
 
     Old_event_lib = -> do

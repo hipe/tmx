@@ -157,7 +157,7 @@ module Skylab::TestSupport
         act num_too_shallow + num_too_deep, path_s_a
       end
 
-      def report lo, hi, lo_, hi_  # :+[#it-002]
+      def report lo, hi, lo_, hi_  # :+[#hu-002]
         s_p_a = nil
         noun = -> d do
           r = "#{ d } spec file#{ 's' if 1 != d }"

@@ -24,8 +24,10 @@ module Skylab::Porcelain
 
     HL__ = sidesys[ :Headless ]
 
+    Hu___ = sidesys[ :Human ]
+
     NLP = -> do
-      HL__[]::NLP
+      Hu___[]::NLP
     end
 
     String_lib = -> do

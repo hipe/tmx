@@ -1,4 +1,4 @@
-module Skylab::Headless
+module Skylab::Human
 
   module NLP
 
@@ -22,7 +22,7 @@ module Skylab::Headless
       %w(twelve twelf)
     ]
 
-    _TERM_SEPARATOR_STRING = ::Skylab::Headless::TERM_SEPARATOR_STRING_
+    _TERM_SEPARATOR_STRING = SPACE_
 
     big = [ nil, nil, nil, 'hundred', 'thousand',
             nil, nil, 'million',

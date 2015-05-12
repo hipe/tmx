@@ -200,7 +200,7 @@ module Skylab::TanMan
           # rationale: a workspace-related argument (unlike an argument under
           # opposing classifications) is potentially dual-purpose, expressing
           # a means of both input and output. hence arguments of the opposing
-          # classifications may be interpreted to be more specific. [#it-006]
+          # classifications may be interpreted to be more specific. [#hu-006]
           # this is an example of the principle that specificity may be a
           # reasonable characteristic to help resolve ambiguity disputes.
 

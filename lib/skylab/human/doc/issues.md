@@ -1,3 +1,5 @@
+[#033]       understanding the EN module graph .. #parent-node:[#002]
+[#032]       the NLP en methods ..
 [#031]       being "optimally concise" may be one of the essential
              vectors of langauge production, as far as we're concerned
 [#030]       #doc-point #parent:003 #body-is-inline-in-parent an optional
@@ -18,7 +20,7 @@
 [#023]       #doc-point #parent:003
                avoid category-spaces with non-unique exponents..
 [#022]       #doc-point "ASCII semantic ERD". a pseudo graph language.
-               examples appear in the documents:( [#it-003], [#ba-006] )
+               examples appear in the documents:( [#hu-003], [#ba-006] )
                not yet defined formally anywhere.
 [#021]       #doc-point #parent:003 #body-is-inline-in-parent
                does a continuous category have exponents?

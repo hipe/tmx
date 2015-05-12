@@ -108,8 +108,10 @@
 [#089]       #parent-node: [#126] the CLI client narrative ..
 [#088]       #track labelize
 [#087]       updated parameter controller event model
-[#086]       #doc-node: NLP, NLP EN, NLP EN "methods"
-[#085]       #parent-node: [#086] what the hell is that sneeze at the top..
+[#086] #hole ( #moved-to: [#hu-032] )
+             ( #was: #doc-node: NLP, NLP EN, NLP EN "methods" )
+[#085] #hole ( #moved-to: [#hu-033] )
+             ( #was: #parent-node: [#086] what the hell is that sneeze at the top.. )
              (once collided with what is now [#159])
 [#084]       #doc-point the great fire and earthquake (originally:
                "what is the deal with expression agents")

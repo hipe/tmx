@@ -1,23 +1,31 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-describe "[hl] NLP EN number" do
+describe "[hu] NLP EN number" do
 
-  extend ::Skylab::Headless::TestSupport::NLP
+  -> do
 
-  include self::Headless_::NLP::EN::Number::Methods
+    m = :number
+    d = 42388
+    s = "forty two thousand three hundred eighty eight"
 
-  def self.does mixed, str
-    let( :subject ) { send meth, mixed }
-    it("#{mixed} becomes #{str.inspect}") { subject.should eql(str) }
-  end
+    it "via #{ m }, #{ s } becomes #{ d }" do
+      _common s, d, m
+    end
+  end.call
 
-  context "number" do
-    let( :meth ) { :number }
-    does 42388, 'forty two thousand three hundred eighty eight'
-  end
+  -> do
 
-  context "num2ord" do
-    let( :meth ) { :num2ord }
-    does 42388, 'forty two thousand three hundred eighty eighth'
+    m = :num2ord
+    d = 42388
+    s = "forty two thousand three hundred eighty eighth"
+
+    it "via #{ m }, #{ s } becomes #{ d }" do
+      _common s, d, m
+    end
+  end.call
+
+  def _common s, d, m
+
+    ::Skylab::Human::NLP::EN::Number.send( m, d ).should eql s
   end
 end

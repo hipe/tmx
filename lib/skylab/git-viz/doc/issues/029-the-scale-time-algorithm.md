@@ -4,7 +4,7 @@
 
 this algorithm is concerned with maximizing dynamically the amount of
 information that is conveyed within a fixed horizontal space. as such
-it is :+[#it-001] a form of summarization (by some .. ahem ..  stretch).
+it is :+[#hu-001] a form of summarization (by some .. ahem ..  stretch).
 
 
 
@@ -150,7 +150,7 @@ through example:
     quantity" over time ); with such a matrix and the use of "bucketing"
     we can expand and collapse how the data is presented, with a savings
     in horizontal real estate that comes at a cost of detail (which is a
-    good general description of :+[#it-001] summarization).
+    good general description of :+[#hu-001] summarization).
 
 
 for ease of implemetation at this early stage:

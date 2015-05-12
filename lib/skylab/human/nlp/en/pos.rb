@@ -1,4 +1,4 @@
-module Skylab::Headless
+module Skylab::Human
 
   module NLP::EN::Part_Of_Speech
 
@@ -1232,7 +1232,7 @@ module Skylab::Headless
     def string  # 2x [#068] (sort of)
       y = [ ]
       render y
-      y * TERM_SEPARATOR_STRING_ if y.length.nonzero?
+      y * SPACE_ if y.length.nonzero?
     end
 
     -> do  # `render` (le hack)

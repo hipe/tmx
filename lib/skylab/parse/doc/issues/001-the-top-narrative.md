@@ -52,7 +52,7 @@ is formally part of this specification.)
 
 as a result given the input state (the input scanner) that is passed to it,
 the function either does or does not succeed. it may be overkill to
-state this explicitly, but the success of the parse is a [#it-003]
+state this explicitly, but the success of the parse is a [#hu-003]
 "discrete" value, specifically a boolean. there is no "sort of"
 succeeding, it either did or it didn't (but certainly if this were not
 the case it evokes some potentially interesting ramifications for how

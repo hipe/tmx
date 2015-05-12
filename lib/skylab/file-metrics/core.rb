@@ -74,8 +74,10 @@ module Skylab::FileMetrics
 
     HL__ = sidesys[ :Headless ]
 
+    Hu___ = sidesys[ :Human ]
+
     NLP_EN__ = _memoize do
-      HL__[]::NLP::EN
+      Hu___[]::NLP::EN
     end
 
     Parse_lib__ = sidesys[ :Parse ]

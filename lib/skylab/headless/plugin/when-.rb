@@ -28,7 +28,7 @@ module Skylab
 
           :box, nil, :steps, nil, :plugins, nil do | y, o |
 
-        # just for fun we make a hand-written :+[#it-002] EN expression of
+        # just for fun we make a hand-written :+[#hu-002] EN expression of
         # aggregation:
         #
         # "the application would finish by expressing help before it would

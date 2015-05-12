@@ -101,7 +101,7 @@ for your business concerns.
 
 + `s`   - passed a value that be resolved as a count-ish, hack the
           letter `s` to hack-pluralize a singular into a plural for EN.
-          this same method, being one of [#hl-086]:#these-methods,
+          this same method, being one of [#hu-002]:#these-methods,
           may be used to do much more, i.e inflecting other semantic
           categories as well.
 

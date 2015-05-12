@@ -1,4 +1,4 @@
-module Skylab::Headless
+module Skylab::Human
 
 module NLP::EN::API_Action_Inflection_Hack  # see [#018]. compare [#hl-005]. was: [#sl-123] exempt
 
@@ -119,7 +119,7 @@ module NLP::EN::API_Action_Inflection_Hack  # see [#018]. compare [#hl-005]. was
     end
 
     def bld_noun  # #note-130
-      chain = Headless_.lib_.module_lib.chain_via_module @klass
+      chain = Hu_.lib_.basic::Module.chain_via_module @klass
       mod = chain[ -2 ].value_x
       mod_ = chain[ -3 ].value_x
       if mod_ && mod_.respond_to?( :unbound_action_box )
@@ -170,13 +170,15 @@ module NLP::EN::API_Action_Inflection_Hack  # see [#018]. compare [#hl-005]. was
     def name_pieces
       @name_pieces ||= @klass.to_s.split CONST_SEP_
     end
+
+    CONST_SEP_ = '::'
   end
 
   class Inflect
 
     # for setting how to inflect things
 
-    Headless_.lib_.DSL_DSL self, -> do
+    Hu_.lib_.parse::DSL_DSL.enhance self do
       atom_accessor :noun
       atom_accessor :verb
     end

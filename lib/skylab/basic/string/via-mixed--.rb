@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module String
 
-  module Via_Mixed__  # :[#019] #:+[#it-002] summarization (trivial)
+  module Via_Mixed__  # :[#019] #:+[#hu-002] summarization (trivial)
 
     # like sending `inspect` to a mixed value; but with some ad-hoc heuristics
     # for avoiding (but not preventing) outputting strings that meet or exceed

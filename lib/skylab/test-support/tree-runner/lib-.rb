@@ -30,10 +30,12 @@ module Skylab::TestSupport
 
       Face__ = sidesys[ :Face ]
 
+      Hu___  = sidesys[ :Human ]
+
       HL__ = sidesys[ :Headless ]
 
       NLP = -> do
-        HL__[]::NLP
+        Hu___[]::NLP
       end
 
       Open3 = -> do

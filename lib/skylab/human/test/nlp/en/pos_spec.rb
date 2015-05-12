@@ -1,31 +1,45 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Headless::TestSupport::NLP::EN
+module Skylab::Human::TestSupport
 
-  describe "[hl] NLP EN POS" do
+  describe "[hu] NLP EN POS" do
+
+    extend TS_
 
     context "noun" do
 
-      let :subject do
-        Subject_[]::POS::Noun[ 'foot' ]
-      end
-
       it "default inflection is singular" do
-        subject.lemma.should eql( 'foot' )
+
+        _subject.lemma.should eql 'foot'
       end
 
       it "plural sure-al" do
-        subject.plural.should eql( 'foots' )
+
+        _subject.plural.should eql 'foots'
       end
 
       it "`singular=` - redefines singular (e.g. if source is not sing.)" do
-        subject.singular = 'ferk'
-        subject.singular.should eql( 'ferk' )
+
+        _mutable_subject.singular = 'ferk'
+        _mutable_subject.singular.should eql 'ferk'
       end
 
       it "`plural=` - e.g you can define irregular plurals for that noun" do
-        subject.plural = 'feet'
-        subject.plural.should eql( 'feet' )
+
+        _mutable_subject.plural = 'feet'
+        _mutable_subject.plural.should eql 'feet'
+      end
+
+      same = -> do
+        Hu_::NLP::EN::POS::Noun[ 'foot' ]
+      end
+
+      let :_mutable_subject do
+        same[]
+      end
+
+      memoize_ :_subject do
+        same[]
       end
     end
 
@@ -34,30 +48,31 @@ module Skylab::Headless::TestSupport::NLP::EN
       context "`preterite`" do
 
         it "when not ends in 'e' - adds an 'ed'" do
-          v = subject::Verb[ 'add' ]
-          v.preterite.should eql( 'added' )
+
+          _subject_module::Verb[ 'add' ].preterite.should eql 'added'
         end
 
         it "when ends in 'e' - adds a 'd'" do
-          v = subject::Verb[ 'realize' ]
-          v.preterite.should eql( 'realized' )
+
+          _subject_module::Verb[ 'realize' ].preterite.should eql 'realized'
         end
       end
 
       context "`progressive`" do
+
         it "if ends in 'e', drops it" do
-          v = subject::Verb[ 'mate' ]
-          v.progressive.should eql( 'mating' )
+
+          _subject_module::Verb[ 'mate' ].progressive.should eql 'mating'
         end
 
         it "but normally, just adds 'ing'" do
-          v = subject::Verb[ 'do' ]
-          v.progressive.should eql( 'doing' )
+
+          _subject_module::Verb[ 'do' ].progressive.should eql 'doing'
         end
       end
 
-      def subject
-        Subject_[]::POS
+      def _subject_module
+        Hu_::NLP::EN::POS
       end
     end
   end

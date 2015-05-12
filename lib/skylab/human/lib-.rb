@@ -2,13 +2,17 @@ module Skylab::Human
 
   module Lib_
 
-    _sidesys, stdlib = Autoloader_.at(
+    sidesys, stdlib = Autoloader_.at(
       :build_require_sidesystem_proc,
       :build_require_stdlib_proc )
 
     gemlib = stdlib
 
+    Basic = sidesys[ :Basic ]
+
     Levenshtein = gemlib[ :Levenshtein ]
+
+    Parse = sidesys[ :Parse ]
 
     Time = stdlib[ :Time ]
 

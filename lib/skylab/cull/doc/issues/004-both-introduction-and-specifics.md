@@ -138,7 +138,7 @@ their respective sets of features (and no, we haven't defined "feature" yet.)
 
 it may be the case that these features themselves are discrete binary
 properties: either the thing "has" or "does not have" the feature, in a
-direct way. ([#it-011] for wayyy to much explanation on this sort of thing.)
+direct way. ([#hu-011] for wayyy to much explanation on this sort of thing.)
 
 at this moment the topic commit is towards an exploration around this case
 study.

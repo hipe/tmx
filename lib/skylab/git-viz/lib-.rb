@@ -63,6 +63,8 @@ module Skylab::GitViz
 
     HL__ = sidesys[ :Headless ]
 
+    Hu___ = sidesys[ :Human ]
+
     Ick = -> x do  # this one is not behind a wall, but #todo:when-ba-purifies
       x.inspect  # placeholder for the future from the past
     end
@@ -83,7 +85,7 @@ module Skylab::GitViz
     end
 
     NLP = -> do
-      HL__[]::NLP
+      Hu___[]::NLP
     end
 
     Open3 = stdlib[ :Open3 ]

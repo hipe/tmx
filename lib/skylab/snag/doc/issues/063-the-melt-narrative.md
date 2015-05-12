@@ -47,4 +47,4 @@ taking into account spaces and ellispes, etc
 arrived at heuristically, min num words from msg to
 bother including in the replacement line - (too few sounds dumb,
 
-an interesting nlp problems similar to summarization :+[#it-001]
+an interesting nlp problems similar to summarization :+[#hu-001]

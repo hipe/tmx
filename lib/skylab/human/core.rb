@@ -1,6 +1,6 @@
 require_relative '../callback/core'
 
-module Skylab::Human
+module Skylab::Human  # :[#001].
 
   class << self
 
@@ -16,8 +16,9 @@ module Skylab::Human
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
+  EMPTY_S_ = ''
   Hu_ = self
-
   IDENTITY_ = -> x { x }
+  SPACE_ = ' '
 
 end

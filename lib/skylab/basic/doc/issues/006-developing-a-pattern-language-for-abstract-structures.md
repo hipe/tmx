@@ -28,7 +28,7 @@ data-types not at all when possible. what we are doing is trying to develop
 our own information theory based on observations we have made of shadows on
 the wall of a cave we are chained to.
 
-down deep, in tandem with [#it-003], what we are really attempting is to
+down deep, in tandem with [#hu-003], what we are really attempting is to
 develop a lexicon of the structures (and patterns?) of meaning, to an
 extent that it is both useful and elegant for the purpose of specifying,
 developing, and understanding API's.
@@ -42,16 +42,16 @@ definitions. to delve not into a programming language but rather its
 surrounding oral tradition: ruby provides a sublime example in its culture's
 use of the concepts of "true-ish" and "false-ish". it hits right on the money
 the sense we are after - to the uninformed, the above `category` `exponents`
-[#it-007], [#it-009] may sound fuzzy ("how can it be true-ish but not true?").
+[#hu-007], [#hu-009] may sound fuzzy ("how can it be true-ish but not true?").
 
 but in fact "true-ish" and "false-ish" are not fuzzy. they are indeed
-`discrete` [#it-010]: any expression in ruby either is or is not "true-ish",
+`discrete` [#hu-010]: any expression in ruby either is or is not "true-ish",
 and any experssion in ruby either is or is not "false-ish".
 
-indeed, this `category` [#it-007] that we will here call `truthiness` --
-of which `true-ish` and `false-ish` are the only two `exponents` [#it-009] --
-is a `discrete binary category` [#it-012], *and* it is `universal`
-[#it-013] to each member of the set of all ruby expressions.
+indeed, this `category` [#hu-007] that we will here call `truthiness` --
+of which `true-ish` and `false-ish` are the only two `exponents` [#hu-009] --
+is a `discrete binary category` [#hu-012], *and* it is `universal`
+[#hu-013] to each member of the set of all ruby expressions.
 
 i.e any expression in ruby is either "true-ish" or "false-ish". it has to be
 one of those and cannot be both of those.
@@ -200,7 +200,7 @@ amount spent on all other.
   `discrete binary category` that we will call `enumerability`.
   so the set of `atom-ish` and `list-ish` is the comprehensive set of
   `exponents` that makes up the `enumerability` `category`
-  (again [#it-012], [#it-009], [#it-007]).
+  (again [#hu-012], [#hu-009], [#hu-007]).
 
   (although it may be tempting to substitute the term `enumerable` for
   `list-ish`, we do not to avoid consfusion with the underlying discrete
@@ -234,7 +234,7 @@ amount spent on all other.
 
   `atom-ish` - (the exponent introduced above) is a node that is not
   `list-ish` in a given context. because `list-ish` and `atom-ish` are the two
-  ends of a `discrete binary category` [#it-012], then it follows that
+  ends of a `discrete binary category` [#hu-012], then it follows that
   `not list-ish` is the same as `atom-ish`, and conversely, `not atom-ish`
   is the same as `list-ish`. it then also follows that the above definition of
   `list-ish` cited two examples of `atom-ish` without saying it.
@@ -252,7 +252,7 @@ one of them being `destructiveness`, i.e whether the operation attempts to
 but first, some recursively nesting definition/examples yay:
 
   any `operation` is defined in association with at least one
-  `semantic structure` [#it-004]. (conversely, semantic structures are defined
+  `semantic structure` [#hu-004]. (conversely, semantic structures are defined
   by one or more operations.) the same `operation` can be a part of multiple
   structure definitions. :[#007]
 
@@ -263,7 +263,7 @@ but first, some recursively nesting definition/examples yay:
   `universality` is itself an `operational meta-category`, that is, it is
   a category that we apply to operational categories. it is `discrete` and
   `binary`. (the comparable `meta-category` 'applicability' is developed at
-  [#it-013].)
+  [#hu-013].)
 
   `universality` the category is itself universal, that is, any operational
   category can be said to be either `universal` or not.
@@ -275,7 +275,7 @@ but first, some recursively nesting definition/examples yay:
   (don't worry if your eyes glazed over at that last half above, it's more
   for fun than anything.)
 
-to build on the above, but this time with a fancy ASCII semantic ERD [#it-022]:
+to build on the above, but this time with a fancy ASCII semantic ERD [#hu-022]:
 
     +-----------+
     | semantic  |                        +-------------+    +----------------+
@@ -319,7 +319,7 @@ what are the operational categories that we can use to categories operations?
   is offered. it is merely a theoretical axiom.
 
   (given that this is a tag-like universal discrete binary category, it is
-  tautologically univeral [#it-014])
+  tautologically univeral [#hu-014])
 
   (note too that we used the `operational meta-category` of `universality`
   defined above.)

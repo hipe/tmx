@@ -1,13 +1,12 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-  describe "[hl] NLP EN methods (oxford comma)" do
-
-    include ::Skylab::Headless::NLP::EN::Methods
+  describe "[hu] NLP EN methods (oxford comma)" do
 
     ::Skylab::TestSupport::Quickie.apply_experimental_specify_hack self
 
-    let :subject do
-      oxford_comma arr
+    me = self
+    before :all do
+      me.include ::Skylab::Human::NLP::EN::Methods
     end
 
     context(a = %w()) do
@@ -33,5 +32,9 @@ require_relative 'test-support'
     context(e = %w(eenie meenie miney moe)) do
       let(:arr) { e }
       specify { should eql('eenie, meenie, miney and moe') }
+    end
+
+    let :subject do
+      oxford_comma arr
     end
   end

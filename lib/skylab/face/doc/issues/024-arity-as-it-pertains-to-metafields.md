@@ -26,7 +26,7 @@ the "polyadic arities", i.e having more than one thing.
 
 although at its essence an arity is formally defined (by us) to be a
 series of non-overlapping unbound postive ranges, in practice we often
-model arities as a [#it-003] "category of exponents", i.e something like
+model arities as a [#hu-003] "category of exponents", i.e something like
 an "enum".
 
 to start with, our most basic implementations that use parameter arity
@@ -400,7 +400,7 @@ absolutely no meaningful difference between doing it this way and the
 would-be other way of doing it. (for the zero-or-more, e.g we could say
 `parameter arity` of `one` and `argument arity` of `zero or more`, -OR EVEN-
 `parameter arity` of `zero or one` and `argument arity` of `one or more`.
-(this property is tagged as [#it-030] and explored further there.))
+(this property is tagged as [#hu-030] and explored further there.))
 
 yes we *could* do the above if our model supported polyadic argument arities,
 but as it stands it doesn't. and the reason we don't add it in is because

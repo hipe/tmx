@@ -338,7 +338,7 @@ end
       end ]
 
       o[ :indefinite_noun ] = -> do
-        Headless_::NLP::EN::POS.indefinite_noun
+        Headless_.lib_.human::NLP::EN::POS.indefinite_noun
       end
 
       o[ :or_ ] = memoize_length[ -> a do
@@ -346,15 +346,15 @@ end
       end ]
 
       o[ :plural_noun ] = -> do
-        Headless_::NLP::EN::POS.plural_noun
+        Headless_.lib_.human::NLP::EN::POS.plural_noun
       end
 
       o[ :preterite_verb ] = -> do
-        Headless_::NLP::EN::POS.preterite_verb
+        Headless_.lib_.human::NLP::EN::POS.preterite_verb
       end
 
       o[ :progressive_verb ] = -> do
-        Headless_::NLP::EN::POS.progressive_verb
+        Headless_.lib_.human::NLP::EN::POS.progressive_verb
       end
 
       bld_oxford_comma = -> sep do
@@ -371,7 +371,7 @@ end
       Or__ = bld_oxford_comma[ ' or ' ]
 
       _EN = Headless_::Callback_.memoize do  # necessary because circular dependency
-        Headless_::NLP::EN
+        Headless_.lib_.human::NLP::EN
       end
 
       @struct = ::Struct.new( * @i_a ).new( * @p_a )

@@ -1,0 +1,3 @@
+#!/usr/bin/env ruby -w
+
+require_relative 'nlp/en/number/visual'

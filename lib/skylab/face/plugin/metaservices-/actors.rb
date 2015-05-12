@@ -23,7 +23,7 @@ module Skylab::Face
 
       private
 
-        def bld_message_proc  # [#it-002] NLP aggregation experiment
+        def bld_message_proc  # [#hu-002] NLP aggregation experiment
           -> do
 
             common_first = -> y, x do

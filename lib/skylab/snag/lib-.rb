@@ -91,8 +91,10 @@ module Skylab::Snag
 
     HL__ = sidesys[ :Headless ]
 
+    Hu__ = sidesys[ :Human ]
+
     NLP = -> do
-      HL__[]::NLP
+      Hu__[]::NLP
     end
 
     MH__ = sidesys[ :MetaHell ]

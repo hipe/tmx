@@ -57,14 +57,14 @@ module Skylab::Callback
 
     HL__ = sidesys[ :Headless ]
 
-    Hu___ = sidesys[ :Human ]
+    Hu__ = sidesys[ :Human ]
 
     IO_lib = -> do
       System_lib__[]::IO
     end
 
     Levenshtein = -> do
-      Hu___[]::Levenshtein
+      Hu__[]::Levenshtein
     end
 
     List_lib = -> do
@@ -78,7 +78,7 @@ module Skylab::Callback
     end
 
     Num2ord = -> x do
-      HL__[]::NLP::EN::Number::Num2ord[ x ]
+      Hu__[]::NLP::EN::Number::Num2ord[ x ]
     end
 
     Some_stderr = -> do

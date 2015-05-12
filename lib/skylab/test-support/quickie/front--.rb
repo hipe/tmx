@@ -244,18 +244,20 @@ module Skylab::TestSupport
       Basic = parent::Basic
 
       CLI_lib = -> do
-        HL__[]::CLI
+        HL___[]::CLI
       end
 
       EN_number = -> d do
-        HL__[]::NLP::EN::Number.number d
+        NLP__[]::EN::Number.number d
       end
 
       Function_chain = -> * p_a do
         MH__[].function_chain[ p_a, nil ]
       end
 
-      HL__ = parent::HL__
+      HL___ = parent::HL__
+
+      Hu___ = parent::Hu___
 
       MH__ = parent::MH__
 
@@ -263,13 +265,13 @@ module Skylab::TestSupport
         TestSupport_.constant( :TEST_DIR_NAME_A ).method :include?
       end
 
+      NLP__ = -> do
+        Hu___[]::NLP
+      end
+
       Oxford_and = Callback_::Oxford_and
 
       Oxford_or = Callback_::Oxford_or
-
-      Pretty_path = -> x do
-        HL__[].system.file_system.path_toosl.pretty_path x
-      end
 
       Stream = Lib_::Stream
 

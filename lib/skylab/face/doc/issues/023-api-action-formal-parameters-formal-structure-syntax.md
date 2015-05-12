@@ -17,7 +17,7 @@ pieces:
     not to be confused with `actual` parameters.
 
   `formal structure syntax` - if we just said `structure syntax` we could be
-    talking about the structure syntax [#it-003] of the formal
+    talking about the structure syntax [#hu-003] of the formal
     parameters of the particular formal action!..
 
 .. because we say `formal paramters formal structure syntax`, we are defining
@@ -36,7 +36,7 @@ with this; a calculus that was created with the primary purpose of bolstering
 (allowing even) this structure syntax presented here.
 
 (that document in turn spun off into "approaching a pattern language for
-semantic structures" [#it-003] which is also relevant reading.)
+semantic structures" [#hu-003] which is also relevant reading.)
 
 second off, let's be clear: there are at least two structure syntaxes we
 care about here:

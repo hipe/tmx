@@ -84,7 +84,7 @@ module Skylab::Basic
         def silly
 
           # arbitrary ASCII aesthetics for making the default glyph degrade
-          # "gracefully" for small widths. :+[#it-001]
+          # "gracefully" for small widths. :+[#hu-001]
 
           case @max_width
           when 0 ;

@@ -105,7 +105,7 @@ module Skylab::TestSupport
 
     Heavy_plugin = Heavy_plugin_lib
 
-    Hu___ = sidesys[ :Human ]
+    Hu___ = sidesys[ :Human ]  # ..
 
     Iambic_scanner = -> do
       Callback_::Polymorphic_Stream

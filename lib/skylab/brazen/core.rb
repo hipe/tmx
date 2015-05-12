@@ -223,6 +223,8 @@ module Skylab::Brazen
 
     HL__ = sidesys[ :Headless ]
 
+    Hu___ = sidesys[ :Human ]
+
     IO_lib = -> do
       System_lib__[]::IO
     end
@@ -247,7 +249,7 @@ module Skylab::Brazen
     end
 
     NLP = -> do
-      HL__[]::NLP
+      Hu___[]::NLP
     end
 
     Old_CLI_lib = -> do

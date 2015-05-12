@@ -374,7 +374,7 @@ one of those nodes may have the "true" value at any given time (and
 possibly none of them have it).
 
 (this isomorphicism is further explored in "the axiom of binary
-convertability" in [#it-003]: an enum field may be represented generally
+convertability" in [#hu-003]: an enum field may be represented generally
 and losslessly as a group of boolean fields whose truth is mutually
 exclusive, and the converse is true; hence they are two different
 surface representations of a deeper structure.)

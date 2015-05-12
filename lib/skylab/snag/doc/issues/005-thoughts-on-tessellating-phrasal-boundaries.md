@@ -39,7 +39,7 @@ that the above can be expanded to express **the same thing** as:
 
 
 i.e the latter example is a longer way of saying the former. in fact, we
-may call the former [#it-031] "optimally concise" because by our rules
+may call the former [#hu-031] "optimally concise" because by our rules
 this is the densest we can get this expression to go without losing
 information (i.e becoming ambiguous or otherwise uninterpretable).
 

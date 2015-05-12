@@ -61,7 +61,7 @@ whenever a semi-formal definition is presented it is indented like so):
   an `exponent` is a value of a `category`. i.e an `exponent` belongs to
   a `category`. [#009]
 
-this is an "ASCII semantic ERD" (entity relationship diagram) [#it-022].
+this is an "ASCII semantic ERD" (entity relationship diagram) [#hu-022].
 note in our ERD's that a line with a circle at the end of it means
 something like "is associated with many":
 
@@ -75,7 +75,7 @@ conversely, we will define `category` circularly as:
   `exponents`. :[#007]
 
 (if there exist two exponents with the same "names" but in different
-categories, they are different exponents, but see [#it-023])
+categories, they are different exponents, but see [#hu-023])
 
 ## `categorization` vs `category`
 
@@ -763,7 +763,7 @@ where every picture (every picture) had a cat in it. at best, it would be
 meaningless to tag every picture with this tag. at worst, every picture
 would have a cat in it.)
 
-using `the axiom of universal applicability` [#it-027] above, any
+using `the axiom of universal applicability` [#hu-027] above, any
 `sparse tag` category can be converted to what we for now call a
 `universal discrete binary category`. BOOM [#012]:
 

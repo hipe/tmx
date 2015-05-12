@@ -17,7 +17,7 @@ module Skylab::Brazen
           pair or next
 
           if UNDERSCORE_RX__ =~ pair.name_symbol   # note-023
-            pair.name_symbol = pair.name_symbol.id2name.gsub( UNDERSCORE_, DASH_ ).intern
+            pair.name_x = pair.name_symbol.id2name.gsub( UNDERSCORE_, DASH_ ).intern
           end
 
           @pair_a.push pair
