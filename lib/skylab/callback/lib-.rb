@@ -57,19 +57,19 @@ module Skylab::Callback
 
     HL__ = sidesys[ :Headless ]
 
+    Hu___ = sidesys[ :Human ]
+
     IO_lib = -> do
       System_lib__[]::IO
     end
 
     Levenshtein = -> do
-      IT__[]::Levenshtein
+      Hu___[]::Levenshtein
     end
 
     List_lib = -> do
       Basic[]::List
     end
-
-    IT__ = sidesys[ :InformationTactics ]
 
     MH__ = sidesys[ :MetaHell ]
 

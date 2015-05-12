@@ -7,7 +7,8 @@ module Skylab::Headless::TestSupport::Plugin
   include Constants
 
   Headless_ = Headless_
-  Callback = Headless_::Library_::Callback
+
+  Callback_ = Headless_::Callback_
 
   extend TestSupport_::Quickie
 

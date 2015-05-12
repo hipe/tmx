@@ -1,18 +1,19 @@
 require_relative 'test-support'
 
-module Skylab::InformationTactics::TestSupport
+module Skylab::Human::TestSupport
 
-  describe "[it] Levenshtein" do
+  describe "[hu] levenshtein" do
 
     it "levenshtein distance is kind of amazing" do
-      a = [ :apple, :banana, :ernana, :onono, :strawberry, :orange ]
 
-      a_ = IT_::Levenshtein.with(
+      _a = [ :apple, :banana, :ernana, :onono, :strawberry, :orange ]
+
+      _a_ = Hu_::Levenshtein.with(
         :item, :bernono,
-        :items, a,
+        :items, _a,
         :closest_N_items, 3 )
 
-      a_.should eql [ :onono, :ernana, :banana ]
+      _a_.should eql [ :onono, :ernana, :banana ]
     end
   end
 end

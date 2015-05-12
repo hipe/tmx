@@ -1,4 +1,4 @@
-information-tactics q [ ]
+human               q [ ]
 
 flex2treetop        q [ ]
 yacc2treetop        q [ ]
@@ -32,8 +32,10 @@ porcelain           Q [ ]
 brazen              q [ ]
 callback            q [ ]
 headless            q [ ]
+system              q [ ]
 basic               q [ ]
 meta-hell           q [ ]
+parse               q [ ]
 
 test-support        q [ ]
 tmx                 q [ ]

@@ -5,7 +5,7 @@ module Skylab::Headless
     Parse_styles = -> do
       # Parse a string with ascii styles into an S-expression.
 
-      sexp = Headless_::Library_::CodeMolester::Sexp
+      sexp = Headless_.lib_.code_molester::Sexp
 
       rx = /\A (?<string>[^\e]+)?  \e\[
         (?<digits> \d+  (?: ; \d+ )* )  m  (?<rest> .*) \z/mx

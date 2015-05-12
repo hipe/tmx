@@ -13,15 +13,15 @@ module Skylab::MetaHell
       Brazen[]::Entity
     end
 
+    Hu___ = sidesys[ :Human ]
+
     Levenshtein = -> do
-      IT__[]::Levenshtein
+      Hu___[]::Levenshtein
     end
 
     List_lib = -> do
       Basic[]::List
     end
-
-    IT__ = sidesys[ :InformationTactics ]
 
     Meso_box_lib = -> do
       Basic[]::Box

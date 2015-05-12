@@ -2,14 +2,11 @@ module Skylab::Headless
 
   module Library_
 
-    stdlib, sidesys = Autoloader_.at :require_stdlib, :require_sidesystem
+    stdlib = Autoloader_.method :require_stdlib
 
     o = { }
-    o[ :CodeMolester ] = sidesys
     o[ :FileUtils ] = stdlib
-    o[ :InformationTactics ] = o[ :MetaHell ] = sidesys
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
-    o[ :Callback ] = sidesys
     o[ :Set ] = stdlib
     o[ :StringIO ] = stdlib
     o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
@@ -30,6 +27,8 @@ module Skylab::Headless
     sidesys = Autoloader_.build_require_sidesystem_proc
 
     Basic = sidesys[ :Basic ]
+
+    Code_molester = sidesys[ :CodeMolester ]
 
     Meso_box_lib = -> do
       Basic[]::Box

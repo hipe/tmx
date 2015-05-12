@@ -658,12 +658,10 @@ module Skylab::Headless
         cls.include Host_Instance_Methods__ ; nil
       end
 
-      Callback = Headless_::Library_::Callback
-
       module Host_Module_Methods__
 
         define_method :build_mutable_callback_tree_specification,
-          Callback::Tree::Methods::
+          Callback_::Tree::Methods::
             Build_mutable_callback_tree_specification
 
         def plugin_conduit_class
@@ -718,7 +716,7 @@ module Skylab::Headless
 
         def vivify_autoloading_plugin_box
           mod = self.class.const_set PLUGIN_BOX__, ::Module.new
-          Callback::Autoloader[ mod, :boxxy ]
+          Callback_::Autoloader[ mod, :boxxy ]
           mod
         end
 

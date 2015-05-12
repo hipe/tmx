@@ -1,10 +1,13 @@
 module Skylab ; end # etc
 
-module Skylab::InformationTactics
+module Skylab::Human
+
   module Summarizer
+
     def ellipsis
       '..'
     end
+
     # precondition: `out` "strlen" is less than maxlen (when maxlen not nil)
     STEP = ->(out, struct, maxlen) do
       hot = (0..out.length-1).map { |i| i if ::String != out[i].class }.compact

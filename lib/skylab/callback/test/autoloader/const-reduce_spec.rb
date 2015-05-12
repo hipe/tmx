@@ -188,10 +188,7 @@ module Skylab::Callback::TestSupport::Autoloader
       _Skylab = TS_::Const_Reduce::Fixtures::For_Skerlerb
       Autoloader_.const_reduce %i( Infermershern ), _Skylab
     end
-
-    if false  # integ
-      Autoloader_.const_reduce %i( InformationTactics ), ::Skylab
-      Autoloader_.const_reduce %i( Levenshtein ), ::Skylab::InformationTactics
-    end
   end
 end
+
+# :+#tombstone: original issue

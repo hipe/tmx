@@ -1,4 +1,4 @@
-module Skylab::InformationTactics
+module Skylab::Human
 
   #                      ~ this is only a sketch ~                       #
 

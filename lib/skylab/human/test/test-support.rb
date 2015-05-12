@@ -1,17 +1,15 @@
 require_relative '../core'
 
-::Skylab::InformationTactics::Autoloader_.require_sidesystem :TestSupport
+Skylab::Human::Autoloader_.require_sidesystem :TestSupport
 
-module Skylab::InformationTactics::TestSupport
+module Skylab::Human::TestSupport
 
-  ::Skylab::TestSupport::Regret[ self ]
+  TestSupport_ = ::Skylab::TestSupport
 
-  module Constants
-    IT_ = ::Skylab::InformationTactics
-    TestSupport_ = ::Skylab::TestSupport
-  end
-
-  include Constants
+  TestSupport_::Regret[ self ]
 
   extend TestSupport_::Quickie
+
+  Hu_ = ::Skylab::Human
+
 end

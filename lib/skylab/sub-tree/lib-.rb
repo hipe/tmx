@@ -38,16 +38,16 @@ module Skylab::SubTree
 
     FA___ = sidesys[ :Face ]
 
-    HL__ = sidesys[ :Headless ]
+    Hu___ = sidesys[ :Human ]
 
-    IT___ = sidesys[ :InformationTactics ]
+    HL__ = sidesys[ :Headless ]
 
     Strange_proc = -> do
       Basic[]::String.via_mixed.to_proc
     end
 
     Summarize_time = -> x do
-      IT___[]::Summarize::Time[ x ]
+      Hu___[]::Summarize::Time[ x ]
     end
 
     System = -> do

@@ -1,10 +1,10 @@
-module Skylab::InformationTactics
+module Skylab::Human
 
   # levenshtein distance is kind of amazing
   #
   #     a = [ :apple, :banana, :ernana, :onono, :strawberry, :orange ]
   #
-  #     a_ = IT_::Levenshtein.with(
+  #     a_ = Hu_::Levenshtein.with(
   #       :item, :bernono,
   #       :items, a,
   #       :closest_N_items, 3 )
@@ -60,6 +60,6 @@ module Skylab::InformationTactics
 
     Item__ = ::Struct.new :item_x, :distance_d
 
-    IT_::Library_.touch :Levenshtein
+    Hu_.lib_.levenshtein  # load it
   end
 end

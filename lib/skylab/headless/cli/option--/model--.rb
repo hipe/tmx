@@ -190,7 +190,7 @@ module Skylab::Headless
 
       def _classify_args  # @args => @norm_short_str @long_sexp @sexp
 
-        o = Headless_::Library_::CodeMolester::Sexp
+        o = Headless_.lib_.code_molester::Sexp
         sexp = o[ :opt ]
         h = {}
         add = -> k, v do

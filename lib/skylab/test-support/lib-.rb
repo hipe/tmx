@@ -105,6 +105,8 @@ module Skylab::TestSupport
 
     Heavy_plugin = Heavy_plugin_lib
 
+    Hu___ = sidesys[ :Human ]
+
     Iambic_scanner = -> do
       Callback_::Polymorphic_Stream
     end
@@ -113,10 +115,8 @@ module Skylab::TestSupport
       System_lib__[]::IO
     end
 
-    IT__ = sidesys[ :InformationTactics ]
-
     Levenshtein = -> * x_a do
-      IT__[]::Levenshtein.call_via_iambic x_a
+      Hu___[]::Levenshtein.call_via_iambic x_a
     end
 
     MH__ = sidesys[ :MetaHell ]

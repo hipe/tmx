@@ -1,32 +1,16 @@
-module Skylab::InformationTactics
+module Skylab::Human
 
-  module Library_
+  module Lib_
 
-    class << self
+    _sidesys, stdlib = Autoloader_.at(
+      :build_require_sidesystem_proc,
+      :build_require_stdlib_proc )
 
-      def touch i
-        if ! const_defined? i, false
-          const_get i, false
-        end ; nil
-      end
-    end  # >>
+    gemlib = stdlib
 
-    -> o do
+    Levenshtein = gemlib[ :Levenshtein ]
 
-      gemlib = stdlib = Autoloader_.method :require_stdlib
+    Time = stdlib[ :Time ]
 
-      o[ :Levenshtein ] = gemlib
-
-      o[ :Time ] = stdlib
-
-    end.call -> do
-      o = {}
-      define_singleton_method :const_missing do |i|
-        const_set i, o.fetch( i )[ i ]
-      end
-      o
-    end.call
   end
-
-  Lib_ = :_hi_
 end

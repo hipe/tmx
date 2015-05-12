@@ -1,15 +1,23 @@
 require_relative '../callback/core'
 
-module Skylab::InformationTactics
+module Skylab::Human
+
+  class << self
+
+    def lib_
+      @___lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+        self::Lib_, self )
+    end
+  end  # >>
 
   Callback_ = ::Skylab::Callback
 
   Autoloader_ = Callback_::Autoloader
-  IT_ = self
-  IDENTITY_ = -> x { x }
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
-  stowaway :Library_, 'lib-'
+  Hu_ = self
+
+  IDENTITY_ = -> x { x }
 
 end

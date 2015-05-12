@@ -1,15 +1,15 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::InformationTactics::TestSupport::Summarize
+module Skylab::Human::TestSupport
 
-  describe "[it] summarize time" do
+  describe "[hu] summarize time" do
 
     it "2 days" do
 
-      time_a = IT_::Library_::Time.parse '2012-06-16 12:01 PM'
+      time_a = Hu_.lib_.time.parse '2012-06-16 12:01 PM'
       time_b = ::Time.parse '2012-06-18 12:02 PM'
-      unit, amt = IT_::Summarize::Time[ time_a - time_b ]
-      "#{ amt.to_i } #{ unit }s".should eql('2 days')
+      unit, amt = Hu_::Summarize::Time[ time_a - time_b ]
+      "#{ amt.to_i } #{ unit }s".should eql '2 days'
     end
   end
 end
