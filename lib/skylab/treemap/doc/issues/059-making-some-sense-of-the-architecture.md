@@ -1,5 +1,11 @@
 # making some sense of the architecture :[#059]
 
+(EDIT: below the dashed line is unintegrated old content, *all* of which
+is no longer releveant, but is left intact for historic interest)
+
+
+--------
+
 this application has gone through at least three almost ground-up rewrites,
 yet it is still almost untenably confusing to understand without some
 narrative, verbal/visual introduction (even for the author).

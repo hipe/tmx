@@ -1,5 +1,7 @@
 # things to change about o.p here (all DONE) :[#014]
 
+(EDIT: deprecated..)
+
 [#014.1] - there is some fun novelty in the dynamic op but change the
    setters of functions!
 [#014.2] - give heavy thought to what can be resasonably pushed up

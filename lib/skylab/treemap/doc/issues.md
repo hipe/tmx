@@ -56,5 +56,7 @@
 [#005] #open verbose mode
 [#004]       #done rid of Skylab constants everywhere
 [#003]       #while name collision with MetaHell
-[#002]       #done make core.rb
+[#002]       the build leaf stream narrative ..
+             ( #was: #done make core.rb )
+[#001]       [ reserved for introduction ]
 [#sl-102] #open 2012-06-08 #open treemap, ofc!

@@ -1,5 +1,7 @@
 # why use private methods block? :[#057]
 
+(EDIT: deprecated..)
+
 ruby doesn't apply any previous `private` declaration (call) to methods that
 are created "dynamically" with e.g `define_method`. if you have the special
 case of a module that needs (or wants) some group of its methods to be private

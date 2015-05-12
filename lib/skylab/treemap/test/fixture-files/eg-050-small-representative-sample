@@ -1,0 +1,27 @@
+Run options: exclude {:wip=>true}
+
+[ab] topic 1
+  some test
+
+[ab] topic 2
+  test 1
+  [xy] test 2
+
+[cd] WIZ waz wafoo
+  topic 3
+    
+    0)  hi
+
+Pending:
+  [cssc] with 'just-a-comment.css' should parse and unparse
+    # Not yet implemented
+    # /[scrubbed]/css-parsing_spec.rb:7
+  [tm] models - meaning - hear map (integration, [br] frontier) add meaning
+    # Not yet implemented
+    # /[scrubbed]/integration_spec.rb:11
+  [tm] models - meaning - list when input does not parse as a graph-viz dotfile (it borks)
+    # Not yet implemented
+    # /[scrubbed]/list_spec.rb:50
+
+Finished in 6.18 seconds
+1264 examples, 0 failures, 3 pending

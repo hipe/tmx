@@ -142,5 +142,78 @@ module Skylab::Brazen
     end
 
     DIRECTION_SHAPE_RX = /\A(?<direction>.+)_(?<shape> path | stream | string )\z/x
+
+    class Common_fuzzy_retrieve
+
+      name_map = -> o do
+        o.name.as_slug
+      end
+
+      p = -> trio, col, & oes_p do
+
+        x = trio.value_x
+
+        if x.respond_to? :id2name
+          self._DO_ME_exact_match
+        else
+
+          _st = col.to_entity_stream
+          _lib = Brazen_.lib_.basic::Fuzzy
+
+          o_a = _lib.reduce_to_array_stream_against_string(
+            _st,
+            x,
+            name_map,
+            -> ent do
+              ent.dup
+            end )
+
+          case 1 <=> o_a.length
+          when 0
+            o_a.fetch 0
+
+          when 1
+            new( col, name_map ).__not_found trio, & oes_p
+
+          when -1
+            new( col, name_map ).__ambiguous o_a, trio, & oes_p
+          end
+        end
+      end
+
+      define_singleton_method :call, p
+      define_singleton_method :[], p
+
+      def initialize col, p
+        @_col = col
+        @_name_map = p
+      end
+
+      def __ambiguous o_a, trio, & oes_p
+
+        self._COVER_ME
+        oes_p.call :error, :ambiguous_property do
+          Brazen_.properties_stack.build_ambiguous_property_event(
+            o_a,
+            trio.value_x,
+            trio.name_symbol )
+        end
+      end
+
+      def __not_found trio, & oes_p
+
+        oes_p.call :error, :extra_properties do
+
+          _did_you_mean_s_a = @_col.to_entity_stream.map_by do | ent |
+            ent.name.as_slug
+          end.to_a
+
+          Brazen_.properties_stack.build_extra_properties_event(
+            [ trio.value_x ],
+            _did_you_mean_s_a,
+            trio.name_symbol )
+        end
+      end
+    end
   end
 end

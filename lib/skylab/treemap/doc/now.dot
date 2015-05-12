@@ -18,7 +18,7 @@ label="Treemap Focus"
 #                green : fillcolor="#79f233"
 
 node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
-node [label="[#050]"]
+node_ [label="[#050]"]
 abstract [fillcolor="#79f233", label="abstract tabular\n[#018]"]
 audit [fillcolor="#79f233", label="audit method visibility\n[#008]"]
 cli [label="cli audit org wide\n[#016]"]
@@ -33,7 +33,7 @@ abstract -> much
 audit -> existing
 cli -> existing
 existing -> get
-node -> stylus
+node_ -> stylus
 singleton -> much
 stylus -> much
 }

@@ -1,5 +1,5 @@
 require_relative '..'
-require_relative '../brazen/core'
+require 'skylab/callback/core'
 
 module Skylab::Treemap
 
@@ -8,15 +8,59 @@ module Skylab::Treemap
   class << self
 
     define_method :application_kernel_, ( Callback_.memoize do
-      Brazen_::Kernel.new Treemap_
+
+      Tr_.lib_.brazen::Kernel.new Tr_
     end )
+
+    def lib_
+
+      @___lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+        Lib_, self )
+    end
   end  # >>
 
-  Brazen_ = ::Skylab::Brazen
-  IDENTITY_ = -> { x }
-  Treemap_ = self
+  module Model_
+
+    define_singleton_method :common_action_class, ( Callback_.memoize do
+
+      class Common_Action_Class___ < Tr_.lib_.brazen::Model.common_action_class
+
+        Tr_.lib_.brazen::Model.common_entity_module[ self ]
+
+        self
+      end
+    end )
+  end
 
   Autoloader_ = Callback_::Autoloader
 
+  module Lib_
+
+    sidesys = Autoloader_.build_require_sidesystem_proc
+
+    Basic = sidesys[ :Basic ]
+
+    Brazen = sidesys[ :Brazen ]
+
+    System = -> do
+      System_lib___[].services
+    end
+
+    System_lib___ = sidesys[ :System ]
+
+  end
+
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
+  ACHIEVED_ = true
+  Autoloader_[ Input_Adapters_ = ::Module.new ]
+  Autoloader_[ Models_ = ::Module.new, :boxxy ]
+  EMPTY_P_ = -> {}
+  EMPTY_S_ = ''
+  NIL_ = nil
+  Autoloader_[ Output_Adapters_ = ::Module.new, :boxxy ]
+  SPACE_ = ' '
+  Tr_ = self
+  UNABLE_ = false
+
 end

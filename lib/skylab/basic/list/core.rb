@@ -8,6 +8,22 @@ module Skylab::Basic
         Build_each_pairable_via_even_iambic__[ a ]
       end
 
+      def index_of_deepest_common_element list_A_a, list_B_a
+
+        deepest_index = nil
+
+        [ list_A_a.length, list_B_a.length ].min.times do | d |
+
+          if list_A_a.fetch( d ) == list_B_a.fetch( d )
+            deepest_index = d
+          else
+            break
+          end
+        end
+
+        deepest_index
+      end
+
       def line_stream * a
         if a.length.zero?
           List_::Line_Scanner__

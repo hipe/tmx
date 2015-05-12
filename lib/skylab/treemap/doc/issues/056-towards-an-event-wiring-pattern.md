@@ -1,5 +1,7 @@
 # towards an event wiring pattern.. :[#056]
 
+(EDIT: deprecated..)
+
 How about this: some modality nerk, let's say the modality client,
 defines methods named for the common types of events:
 `wire_payload`, `wire_info`, `wire_error`. (interestingly applications
