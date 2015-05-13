@@ -33,7 +33,7 @@ module Skylab::Basic
 
       def template=
         _receive_template_string iambic_property
-        st = @__methodic_actor_iambic_stream__
+        st = polymorphic_upstream
         h = @tmpl_var_bx.h_
         while st.unparsed_exists
           sym = st.gets_one.intern

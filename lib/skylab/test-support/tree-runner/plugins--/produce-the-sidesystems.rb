@@ -284,7 +284,7 @@ module Skylab::TestSupport
               ick mtch.s
             end
 
-            y << "#{ and_ a } #{ s a, :does } not match any subsystem#{ s a }."
+            y << "#{ and_ a } #{ s a, :does } not match any subsystem#{ s a }."  # :+[#hu-034]:candidate
           end
         end
 

@@ -54,7 +54,7 @@ module Skylab::Callback
 
       def template=
         @nucleus.template = Callback_.lib_.string_lib.template.via_string iambic_property
-        via_template_parse_remainder_of_iambic_stream @__methodic_actor_iambic_stream__
+        via_template_parse_remainder_of_iambic_stream polymorphic_upstream
       end
 
       def via_template_parse_remainder_of_iambic_stream st
@@ -159,7 +159,7 @@ module Skylab::Callback
           end
 
           def on_subsequent_mentions_of=
-            st = @__methodic_actor_iambic_stream__
+            st = polymorphic_upstream
             i = st.current_token
             case i
             when :frame

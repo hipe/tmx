@@ -1,3 +1,8 @@
+[#038]       do we cache every lexeme, by adding it to the lexicon?
+[#037]       [ POS ]
+[#036]       track different way we do the same list expression
+[#035] #hole
+[#034]       expression frames
 [#033]       understanding the EN module graph .. #parent-node:[#002]
 [#032]       the NLP en methods ..
 [#031]       being "optimally concise" may be one of the essential

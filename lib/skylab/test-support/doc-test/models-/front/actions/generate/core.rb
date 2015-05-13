@@ -365,7 +365,7 @@ module Skylab::TestSupport
 
             pfunc.call(
               self,
-              @__methodic_actor_iambic_stream__.gets_one,
+              polymorphic_upstream.gets_one,
               & oes_p )
           else
 
@@ -376,7 +376,7 @@ module Skylab::TestSupport
         def __parse_output_adapter_pfunc
 
           @output_adapter_o.receive_stream_and_pfunc_prop(
-            @__methodic_actor_iambic_stream__,
+            polymorphic_upstream,
             @__O_A_param_func_prop__ )
         end
 

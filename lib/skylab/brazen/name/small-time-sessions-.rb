@@ -72,7 +72,7 @@ module Skylab::Brazen
       def express_into_yielder_any_object_noun y
         n_o = _any_curried_object_noun
         if n_o
-          y << n_o.string
+          y << n_o.to_string
           DONE_
         end
       end

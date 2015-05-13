@@ -194,6 +194,10 @@ module Skylab::Callback
           end
         end
 
+        def polymorphic_upstream
+          @__methodic_actor_iambic_stream__
+        end
+
         def process_iambic_stream_passively stream, & oes_p
 
           keep_parsing = true

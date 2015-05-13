@@ -53,7 +53,7 @@ module Skylab::Parse
       end
 
       def matcher_functions=
-        st = @__methodic_actor_iambic_stream__
+        st = polymorphic_upstream
         @function_a = []
         cls = Parse_::Functions_::Simple_Matcher
         while st.unparsed_exists
@@ -64,7 +64,7 @@ module Skylab::Parse
 
       def functions=
 
-        _process_functions_via_polymorphic_stream @__methodic_actor_iambic_stream__
+        _process_functions_via_polymorphic_stream polymorphic_upstream
       end
 
       def _process_functions_via_polymorphic_stream st

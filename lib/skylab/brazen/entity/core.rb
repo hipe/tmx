@@ -819,7 +819,7 @@ module Skylab::Brazen
       end
 
       def properties=
-        st = @__methodic_actor_iambic_stream__
+        st = polymorphic_upstream
         ok = true
         while st.unparsed_exists
           ok = nil

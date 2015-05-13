@@ -1,0 +1,33 @@
+digraph {
+
+  label="(a rough sketch -\nsubject to change)"
+
+  exp_cmb [ label="exponent\ncombination\n(class)" ]
+  /*  exp_pr [ label="exponent\npair" ]   not interesting */
+  /* exp_val [ label="exponent\nvalue" ]  not interesting */
+
+  ffrm [ label="formal\nform"]
+  fimp [ label="inflection\nimplementation" ]
+  fp [ label="formal\nphrase\n(class)" ]
+
+  lxc [ label="lexcion" ]
+  lxm_o [ label="lexeme" ]
+  lxm_c [ label="lexeme\n(class)" ]
+  lxm_cat [ label="grammatical\ncategory" ]
+  lxp [ label="lexeme\nproduction\n(class)" ]
+
+
+  /* ~ the assocations */
+
+  ffrm->fimp [ label="can produce one" ]
+  lxc->lxm_o [ label="has many" ]
+
+  lxm_c->lxp [ label="has one" ]
+  lxm_c->fp [ label="has one" ]
+  lxm_c->exp_cmb [ label="has one" ]
+
+  lxm_o->lxm_c [ label="built from" ]
+  lxm_o->ffrm [ label="has many" ]
+
+
+}

@@ -370,7 +370,7 @@ module Skylab::BeautySalon
           @serr.puts
           y = @y
           expression_agent.calculate do
-            y << "(#{ match_count } match#{ s match_count, :es } #{
+            y << "(#{ match_count } match#{ s match_count, :es } #{  # :+[#hu-034]:candidate
               }in #{ file_count } file#{ s file_count })"
           end
           nil

@@ -31,7 +31,7 @@ module Skylab::Brazen
 
         mprop.add_to_write_proc_chain do
           -> do
-            _ctx = Parse_Context____.new @__methodic_actor_iambic_stream__
+            _ctx = Parse_Context____.new polymorphic_upstream
             _against_ec = instance_exec _ctx, & recv_parse_ctx_p
             against_entity_class( & _against_ec )
             KEEP_PARSING_
@@ -70,7 +70,7 @@ module Skylab::Brazen
 
         mprop.add_to_write_proc_chain do
           -> do
-            _ctx = Parse_Context____.new @__methodic_actor_iambic_stream__
+            _ctx = Parse_Context____.new polymorphic_upstream
             _recv_prop = recv_parse_ctx_p[ _ctx ]
             _recv_prop[ self ]
           end

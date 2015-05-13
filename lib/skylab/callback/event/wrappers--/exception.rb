@@ -23,7 +23,7 @@ module Skylab::Callback
           end
 
           def properties
-            @xtra_prop_x_a = @__methodic_actor_iambic_stream__.flush_remaining_to_array
+            @xtra_prop_x_a = polymorphic_upstream.flush_remaining_to_array
             KEEP_PARSING_  # altho we should stop now, it looks like error otherwise
           end
 

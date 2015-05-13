@@ -59,7 +59,7 @@ communicate frames of ideas nearby each other that have something
 similar about them, we are expected to insert words that cradle these
 similarities.
 
-the other strategy (that is perhaps at odds with the first) is
+the other strategy (that is perhaps in opposition to the first) is
 "aggregation". aggregation re-bundles in the information in a new way to
 reduce the redundacy. we think of it as lossless information compression.
 

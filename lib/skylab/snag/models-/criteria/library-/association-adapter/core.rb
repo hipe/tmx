@@ -21,7 +21,7 @@ module Skylab::Snag
         def named_functions=
 
           bx = Callback_::Box.new
-          st = @__methodic_actor_iambic_stream__
+          st = polymorphic_upstream
           name_sym = st.gets_one
           func_sym = st.gets_one
           begin

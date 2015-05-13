@@ -134,11 +134,11 @@
 [#071] #open the possibility of stateless #plugin hosts
 [#070]       #plugins! the plugin libraries narrative ..
 [#069]       #doc-point (sorry to jump ahead) "ouroboros"
-[#068]       track this redundancy during a hack
+[#068] #hole ( #was: track this redundancy during a hack )
 [#067]       #node-tracker "client-services" #in-situ
              #repurposed:once (was: move scanners to [ba])
-[#066]       track this combinatorial dichototmy
-[#065]       how / when are things added to the lexicon
+[#066] #hole ( #was: track this combinatorial dichototmy )
+[#065] #hole ( #was: how / when are things added to the lexicon )
 [#064]       #parent-node: [#126] the CLI action core instance methods narr ..
 [#063] #open track the smells because of CLI action hybridization
 [#062] #open the sweeping architecture change to accomodate homonyms
