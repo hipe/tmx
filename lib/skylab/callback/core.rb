@@ -567,14 +567,15 @@ module Skylab::Callback
     attr_accessor :x_a_length
 
     class << self
+
+      def the_empty_polymorphic_stream
+        @__teps ||= via_array EMPTY_A_
+      end
+
       def via_array x_a
         new 0, x_a
       end
-
-      def the_empty_iambic_stream
-        @__teis ||= via_array EMPTY_A_
-      end
-    end
+    end  # >>
 
     self
   end

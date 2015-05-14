@@ -12,9 +12,8 @@ module Skylab::Basic::TestSupport::Range::N11n
 
   describe "[ba] range normalization" do
 
-    TestLib_::Expect_event[ self ]
-
     extend TS_
+    use :expect_event
 
     context "inline via 3" do
 

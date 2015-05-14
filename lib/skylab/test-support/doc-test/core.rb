@@ -85,7 +85,7 @@ module Skylab::TestSupport
 
     # ~ support for parsing
 
-    class State_Machine_
+    class State_Machine_  # ( mentors :+[#ba-044] )
 
       def initialize & p
         @h = {}

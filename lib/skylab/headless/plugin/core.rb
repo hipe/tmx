@@ -207,7 +207,7 @@ module Skylab::Headless
 
       # ~ dispatcher ancillaries
 
-      class State_Machine___
+      class State_Machine___  # ( :+[#ba-044] mentor )
 
         def initialize tuples
           @state_symbol = :started

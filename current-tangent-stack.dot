@@ -1,0 +1,9 @@
+digraph g {
+
+  state_machine [ style=filled ]
+  permute->state_machine
+  expression_frames->doc_test
+  doc_test->permute
+  snag->expression_frames
+  unification->snag
+}

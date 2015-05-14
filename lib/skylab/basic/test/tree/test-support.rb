@@ -10,13 +10,6 @@ module Skylab::Basic::TestSupport::Tree_TS
 
   module ModuleMethods
 
-    def use sym
-
-      TS_.const_get(
-        Callback_::Name.via_variegated_symbol( sym ).as_const, false
-      )[ self ]
-    end
-
     def memoize_ i, & p
       define_method i, ( Callback_.memoize do
         p[]
@@ -37,11 +30,6 @@ module Skylab::Basic::TestSupport::Tree_TS
         s
       end
     end.call
-  end
-
-  Expect_Event = -> tcm do
-
-    Basic_::TestSupport::TestLib_::Expect_event[ tcm ]
   end
 
   Subject_ = -> do

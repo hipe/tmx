@@ -4,7 +4,7 @@ module Skylab::Snag
 
     module Library_
 
-      class Association_Adapter::State_Machine__
+      class Association_Adapter::State_Machine__  # ( :+[#ba-044] mentor )
 
         def initialize * a, & oes_p
 

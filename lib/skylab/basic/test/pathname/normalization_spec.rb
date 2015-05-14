@@ -12,11 +12,9 @@ module Skylab::Basic::TestSupport::Pathname::N11n
 
   describe "[ba] pathname normalization" do
 
-    TestLib_::Expect_event[ self ]
-
-    TestLib_::Expect_normalization[ self ]
-
     extend TS_
+    use :expect_event
+    use :expect_normalization
 
     it "loads" do
       subject

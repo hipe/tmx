@@ -27,8 +27,17 @@ module Skylab::Basic
 
         ( cache_h.fetch sym do
 
-          cache_h[ sym ] = Basic_.lib_.brazen::Bundle::Fancy_lookup[ sym, TS_ ]
+          const = Callback_::Name.via_variegated_symbol( sym ).as_const
 
+          x = if TS_.const_defined? const, false
+            TS_.const_get const, false
+          else
+            Basic_.lib_.brazen::Bundle::Fancy_lookup[ sym, TS_ ]
+          end
+
+          cache_h[ sym ] = x
+
+          x
         end )[ tcm, * args ]
       end
     end.call
@@ -50,15 +59,9 @@ module Skylab::Basic
       end
     end
 
-    module TestLib_
+    Expect_Event = -> test_context_class do
 
-      Expect_event = -> test_ctxt_cls do
-        Basic_::Callback_.test_support::Expect_Event[ test_ctxt_cls ]
-      end
-
-      Expect_normalization = -> test_ctxt_cls do
-        Basic_::TestSupport::Expect_Normalization[ test_ctxt_cls ]
-      end
+      Basic_::Callback_.test_support::Expect_Event[ test_context_class ]
     end
 
     Basic_ = ::Skylab::Basic
@@ -69,7 +72,6 @@ module Skylab::Basic
     module Constants
       Basic_ = Basic_
       Callback_ = Callback_
-      TestLib_ = TestLib_
       TestSupport_ = TestSupport_
     end
   end
