@@ -4,11 +4,9 @@ module Skylab::TestSupport::TestSupport::DocTest
 
   describe "[ts] doc-test - [ actions ] - generate" do
 
-    TestLib_::Expect_event[ self ]
-
-    TestSupport_::Expect_line[ self ]
-
     extend TS_
+    use :expect_event
+    use :expect_line
 
     it "for the output adapter indicate no name" do
       call_API_with :output_adapter, nil

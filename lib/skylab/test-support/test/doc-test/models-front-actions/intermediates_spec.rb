@@ -4,9 +4,8 @@ module Skylab::TestSupport::TestSupport::DocTest
 
   describe "[ts] doc-test - [ actions ] - intermediates" do
 
-    TestLib_::Expect_event[ self ]
-
     extend TS_
+    use :expect_event
 
     it "no path" do
       -> do

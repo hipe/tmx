@@ -4,25 +4,26 @@ module Skylab::TestSupport::TestSupport::DocTest
 
   ::Skylab::TestSupport::TestSupport[ TS_ = self ]
 
-  if false  # #todo
-  def self.apply_x_a_on_child_test_node x_a, child
-    parent_anchor_module.apply_x_a_on_child_test_node x_a, child
-  end
-  end
-
   include Constants
 
   extend TestSupport_::Quickie
 
-  TestLib_ = TestLib_
-
-  TestSupport_ = TestSupport_
-
-  Callback_ = TestSupport_::Callback_
-
-  DocTest_ = TestSupport_::DocTest
-
   module ModuleMethods
+
+    define_method :use, -> do
+
+      cache_h = {}
+
+      -> sym do
+
+        ( cache_h.fetch sym do
+          _const = Callback_::Name.via_variegated_symbol( sym ).as_const
+          x = Bundles___.const_get _const, false
+          cache_h[ sym ] = x
+          x
+        end )[ self ]
+      end
+    end.call
 
     def with_big_file_path & p
       define_method :big_file_path, & p
@@ -75,8 +76,8 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
 
     def fake_file_structure_for_path path
-      CACHE__.fetch path do
-        CACHE__[ path ] = Build_fake_file_structure_for_path[ path ]
+      CACHE___.fetch path do
+        CACHE___[ path ] = Build_fake_file_structure_for_path[ path ]
       end
     end
 
@@ -137,13 +138,14 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
   end
 
-  CACHE__ = {}
+  Build_fake_file_structure_for_path = -> do
 
-  Build_fake_file_structure_for_path = -> path do
-    const_get( :"Build_#{ NUM_RX__.match( ::File.basename path )[ 0 ] }" )[ path ]
-  end
+    rx = /\A\d+/
 
-  NUM_RX__ = /\A\d+/
+    -> path do
+      const_get( :"Build_#{ rx.match( ::File.basename path )[ 0 ] }" )[ path ]
+    end
+  end.call
 
   Build_fake_file_structure__ = ::Class.new
 
@@ -178,7 +180,6 @@ module Skylab::TestSupport::TestSupport::DocTest
       read_case_pair
       nil
     end
-
   end
 
   class Build_fake_file_structure__
@@ -188,7 +189,7 @@ module Skylab::TestSupport::TestSupport::DocTest
       def [] path
         new( path ).build
       end
-    end
+    end  # >>
 
     def initialize path
       @ad_hoc_code_blocks = nil
@@ -287,7 +288,7 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
   end
 
-  class Omni_Mock_
+  class Omni_Mock_  # (used in 1 test)
     def initialize x
       @x = x
     end
@@ -295,7 +296,43 @@ module Skylab::TestSupport::TestSupport::DocTest
     alias_method :a, :x
   end
 
+  Fixture_file_ = -> do
+
+    p = -> filename do
+
+      dirname = TS_.dir_pathname.join( 'fixture-files' ).to_path
+
+      p = -> filename_ do
+        ::File.join dirname, filename_
+      end
+
+      p[ filename ]
+    end
+
+    -> filename do
+      p[ filename ]
+    end
+  end.call
+
+  module Bundles___
+
+    Expect_Event = -> tcc do
+      TestSupport_::Callback_.test_support::Expect_Event[ tcc ]
+    end
+
+    Expect_Line = -> tcc do
+      TestSupport_::Expect_line[ tcc ]
+    end
+  end
+
   Subject_ = -> do
     TestSupport_::DocTest
   end
+
+  TestSupport_ = TestSupport_
+
+  CACHE___ = {}
+  Callback_ = TestSupport_::Callback_
+  DocTest_ = TestSupport_::DocTest
+
 end

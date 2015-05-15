@@ -7,6 +7,10 @@ module Skylab::TMX
 
   -> o, h do
 
+    o[ :bin_path ] = Callback_.memoize do
+      Autoloader_.require_sidesystem( :System ).services.defaults.bin_path
+    end
+
     o[ :bin_pathname ] = Callback_.memoize do
       Autoloader_.require_sidesystem( :System ).services.defaults.bin_pathname
     end

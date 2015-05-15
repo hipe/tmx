@@ -4,12 +4,13 @@ module Skylab::TestSupport::TestSupport::DocTest
 
   describe "[ts] doc-test - actors - infer business module name loadlessly" do
 
-    TestLib_::Expect_event[ self ]
-
     extend TS_
+    use :expect_event
 
     it "when matching leaf nodes not found, search branch nodes" do
-      _path = ::Skylab.dir_pathname.join( 'basic/method.rb' ).to_path
+
+      _path = ::File.join Top_TS_.skylab_dir_path, 'basic/method.rb'
+
       subject( _path ).should eql "Skylab::Basic::Method"
     end
 

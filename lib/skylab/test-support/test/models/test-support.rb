@@ -8,7 +8,8 @@ module Skylab::TestSupport::TestSupport::Models
 
   extend TestSupport_::Quickie
 
-  def self.apply_x_a_on_child_test_node x_a, child  # ok to move up one level
-    self._WHAT  # :#tombstone:
-  end
+  Top_TS_ = TestSupport_::TestSupport
+
 end
+
+# :+#tombstone: `apply_x_a_on_child_test_node`

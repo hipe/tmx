@@ -4,11 +4,9 @@ module Skylab::TestSupport::TestSupport::DocTest
 
   describe "[ts] doc-test - output adapters - quickie ( & OA's in general )" do
 
-    TestLib_::Expect_event[ self ]
-
-    TestSupport_::Expect_line[ self ]
-
     extend TS_
+    use :expect_event
+    use :expect_line
 
     it "loads" do
       subject

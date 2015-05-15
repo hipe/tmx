@@ -10,7 +10,6 @@ module Skylab::TestSupport
 
         @cache = cache
         @dir = dir
-
       end
 
       def template sym

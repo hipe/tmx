@@ -8,9 +8,7 @@ module Skylab::TestSupport::TestSupport::Models
 
     it "SO BEAUTIFUL / SO UGLY : test simplecov CLI integration in a #sub-process" do
 
-      _exe = "#{
-        ::File.dirname( ::File.dirname ::Skylab.dir_pathname.to_path )
-      }/bin/tmx-test-support"
+      _exe = ::File.join Top_TS_.universal_skylab_bin_path, 'tmx-test-support'
 
       _exe_ = TestSupport_.dir_pathname.join(
         'test/fixture-executables/for-simplecov.rb'

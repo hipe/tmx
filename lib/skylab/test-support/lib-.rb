@@ -79,6 +79,8 @@ module Skylab::TestSupport
       end
     end
 
+    Permute = sidesys[ :Permute ]
+
     Properties_stack_frame = -> * a do
       Brazen[].properties_stack.common_frame.call_via_arglist a
     end
@@ -112,7 +114,7 @@ module Skylab::TestSupport
     end
 
     IO = -> do
-      System_lib__[]::IO
+      System_lib[]::IO
     end
 
     Levenshtein = -> * x_a do
@@ -161,10 +163,10 @@ module Skylab::TestSupport
     end
 
     System = -> do
-      System_lib__[].services
+      System_lib[].services
     end
 
-    System_lib__ = sidesys[ :System ]
+    System_lib = sidesys[ :System ]
 
     Tmpdir = -> do
       System[].filesystem.tmpdir

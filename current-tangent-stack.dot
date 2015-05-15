@@ -1,8 +1,8 @@
 digraph g {
 
-  state_machine [style=filled]
+  doc_test [style=filled]
   permute [style=filled]
-
+  state_machine [style=filled]
 
   permute->state_machine
   expression_frames->doc_test

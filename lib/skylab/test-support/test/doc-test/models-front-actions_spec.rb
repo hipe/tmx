@@ -4,9 +4,8 @@ module Skylab::TestSupport::TestSupport::DocTest
 
   describe "[ts] doc-test - models - front - actions" do
 
-    TestLib_::Expect_event[ self ]
-
     extend TS_
+    use :expect_event
 
     it "no such action" do
       call_API

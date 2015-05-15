@@ -47,7 +47,6 @@ module Skylab::TestSupport
         @test_support_file_p[]
       end
 
-
       def file_must_exist x, & oes_p
 
         fs = TestSupport_.lib_.system.filesystem

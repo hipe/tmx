@@ -10,6 +10,10 @@ module Skylab::System
 
       System_.lib_.properties_stack_frame self,
 
+        :memoized, :inline_method, :bin_path, -> do
+          bin_pathname.to_path
+        end,
+
         :memoized, :inline_method, :bin_pathname, -> do
           top_of_the_universe_pathname.join 'bin'
         end,

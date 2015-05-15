@@ -4,10 +4,9 @@ module Skylab::TestSupport::TestSupport::DocTest
 
   describe "[ts] doc-test - [ actions ] - recursive " do
 
-    # TestLib_::Mock_FS[ self ]
-    TestLib_::Expect_event[ self ]
-
     extend TS_
+    use :expect_event
+    # use :mock_FS
 
     it "path is required" do
       _rx = /\Amissing required property 'path'\z/

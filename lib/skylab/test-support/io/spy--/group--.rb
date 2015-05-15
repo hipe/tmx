@@ -11,6 +11,21 @@ module Skylab::TestSupport
     attr_reader :debug
     attr_writer :debug_IO, :line_a  # hax
 
+    def flush_to_strings_for * syms
+
+      out_h = ::Hash[ syms.map { | sym | [ sym, "" ] } ]
+
+      @line_a.each do | line |
+
+        s = out_h[ line.stream_symbol ]
+        if s
+          s.concat line.string
+        end
+      end
+      @line_a = nil
+      syms.map { | sym | out_h.fetch sym }
+    end
+
     def flush_to_line_stream_on sym  # lines as strings, not as objects
 
       a = @line_a

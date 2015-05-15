@@ -23,7 +23,7 @@ module Skylab::Permute
       end
 
       def summary_indent
-        'XX'
+        '  '
       end
 
       def summary_width
@@ -51,11 +51,19 @@ module Skylab::Permute
 
       def main_syntax_string_parts
 
-        [ '--your-category YOUR-VALUE',
+        s_a = [ '--your-category YOUR-VALUE',
           '[ -y VALUE2 [ -y VAL3 [..]]]',
           '--other-cat VAL',
           '[ -o V2 [ -o V3 [..]]]' ]
+
+        if @mutate_syntax_string_parts
+          @mutate_syntax_string_parts[ s_a ]
+        end
+
+        s_a
       end
+
+      attr_writer :mutate_syntax_string_parts
 
       # ~ begin mock another object with same class
 
