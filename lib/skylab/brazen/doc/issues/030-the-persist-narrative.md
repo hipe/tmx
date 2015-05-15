@@ -25,7 +25,7 @@ pipeline.
 in breaking tradition with the stricter UAO's that take only required
 parameters we stipulate that the implementing method *may* accept any
 number of additional parameters (required, optional or globbed as may
-be desiged) so that both imlementation-specific datastore identifiers
+be desiged) so that both imlementation-specific collection identifiers
 and "adverbs" may be passed, that may be necessary to effect behavior
 beyond the information containted in the entity.
 

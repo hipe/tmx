@@ -95,7 +95,7 @@ module Skylab::TanMan
               maybe_send_event :error, :stdin_should_probably_not_be_interactive
               UNABLE_
             else
-              Brazen_.data_store::Byte_Upstream_Identifier.via_stream sin
+              Brazen_::Collection::Byte_Upstream_Identifier.via_stream sin
             end
           else
             id
@@ -111,7 +111,7 @@ module Skylab::TanMan
         def __maybe_convert_to_stdout_stream id
 
           if id && :path == id.shape_symbol && DASH_ == id.path
-            Brazen_.data_store::Byte_Downstream_Identifier.via_stream stdout_
+            Brazen_::Collection::Byte_Downstream_Identifier.via_stream stdout_
           else
             id
           end
@@ -559,7 +559,7 @@ module Skylab::TanMan
 
         def __solve_for_normal
 
-          id = Brazen_.data_store.const_get(
+          id = Brazen_::Collection.const_get(
 
             @parent.const_via_direction_ @arg.property.direction_specific_symbol
 

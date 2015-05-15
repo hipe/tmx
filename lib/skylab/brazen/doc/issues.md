@@ -75,7 +75,7 @@
              ( #was: #done rename "collections controller" to "silo controller" )
 [#040] #open in git-config, for set value, nil as literal value is undefined
 [#039]       #tracking-tag whether and where we change case of env vars
-[#038]       #parent-node: [#010] the couch datastore narrative ..
+[#038]       #parent-node: [#010] the couch collection narrative ..
 [#037]       [ this feature of unmarshal ]
 [#036]    #watching to go from a literal to a resolved const its kind of awful
              to lose and re-parse the demarcation that is already present
@@ -87,7 +87,7 @@
 [#031]       #parent-node: [#026] the retrieving narrative ..
 [#030]       #parent-node: [#026] the creating narrative ..
 [#029]       #parent-node: [#028] "a universal normal name convention.."
-[#028]       #parent-node: [#010] the datastore actor narrative ...
+[#028]       #parent-node: [#010] the collection actor narrative ...
 [#027] #open #tracking the zero-configuration dream - one day, [br]-powered
                API's should need not define a 'Kernel' / 'Kernel_' nor have
                a dedicated 'API' file - just limit it to a singleton

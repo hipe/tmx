@@ -28,7 +28,7 @@ module Skylab::Cull::TestSupport
         :path, td.to_path
 
       expect_neutral_event :added_function_call
-      expect_OK_event :datastore_resource_committed_changes
+      expect_OK_event :collection_resource_committed_changes
 
       content_of_the_file( td ).scan( /(?<=^function = ).+/ ).should(
         eql( [

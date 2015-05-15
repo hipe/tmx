@@ -1,6 +1,6 @@
 require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport::Datastores__Couch__Actions__Create
+module Skylab::Brazen::TestSupport::Collection_Adapters__Couch__Actions__Create
 
   ::Skylab::Brazen::TestSupport[ TS_ = self ]
 
@@ -8,7 +8,7 @@ module Skylab::Brazen::TestSupport::Datastores__Couch__Actions__Create
 
   extend TestSupport_::Quickie
 
-  describe "[br] datastores - couch - actions - create (COVER edit sess, precons)" do
+  describe "[br] collections - couch - actions - create (COVER edit sess, precons)" do
 
     Constants::TestLib_::Expect_event[ self ]
 
@@ -16,7 +16,7 @@ module Skylab::Brazen::TestSupport::Datastores__Couch__Actions__Create
 
     it "with no name: missing required property: argument error" do
       begin
-        call_API :datastore, :couch, :create
+        call_API :collection, :couch, :create
       rescue ::ArgumentError => e
       end
       e.message.should match(
@@ -25,7 +25,7 @@ module Skylab::Brazen::TestSupport::Datastores__Couch__Actions__Create
 
     it "with no workspace path: missing required property: argument error" do
       begin
-        call_API :datastore, :couch, :create, :name, 'zeep'
+        call_API :collection, :couch, :create, :name, 'zeep'
       rescue ::ArgumentError => e
       end
       e.message.should match( /\bmissing required property 'workspace-path'/ )
@@ -33,7 +33,7 @@ module Skylab::Brazen::TestSupport::Datastores__Couch__Actions__Create
 
     it "with a noent workspace path" do
 
-      call_API :datastore, :couch, :create, :name, 'zeep',
+      call_API :collection, :couch, :create, :name, 'zeep',
         :workspace_path,
         TestSupport_::Data::Universal_Fixtures[ :not_here ]
 
@@ -43,7 +43,7 @@ module Skylab::Brazen::TestSupport::Datastores__Couch__Actions__Create
 
     it "with an empty directory workspace path" do
 
-      call_API :datastore, :couch, :create, :name, 'zeep',
+      call_API :collection, :couch, :create, :name, 'zeep',
         :workspace_path,
         TestSupport_::Data::Universal_Fixtures[ :empty_esque_directory ]
 

@@ -110,7 +110,7 @@ module Skylab::TanMan
 
       def precondition_for_self _act, _id, box, & oes_p
 
-        # the datastore for starters is the config file
+        # the collection for starters is the config file
 
         box.fetch :workspace
       end
@@ -166,7 +166,7 @@ module Skylab::TanMan
 
     Build_collection__ = -> kr do
 
-      Brazen_::Data_Stores::Directory_as_Collection.new(
+      Brazen_::Collection_Adapters::Directory_as_Collection.new(
         kr
       ) do | o |
         o.directory_path = Starter_.path_for_directory_as_collection_

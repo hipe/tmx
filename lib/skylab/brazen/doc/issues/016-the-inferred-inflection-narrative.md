@@ -78,7 +78,7 @@ in such cases for the phrases to tranform appropriately into
 approximations of English we must put the (adjective-like) qualifier
 word before the noun:
 
-   "we have a couch-db datastore."  ( NOT "we have a datastore couch-db" )
+   "we have a couch-db collection."  ( NOT "we have a collection couch-db" )
 
 
 at risk of jumping too far into the future, we do the above

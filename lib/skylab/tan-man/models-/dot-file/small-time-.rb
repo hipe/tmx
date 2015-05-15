@@ -25,7 +25,7 @@ module Skylab::TanMan
       def execute
 
         y = if @is_dry
-          Brazen_.data_store::Byte_Downstream_Identifier.the_dry_identifier.to_minimal_yielder
+          Brazen_::Collection::Byte_Downstream_Identifier.the_dry_identifier.to_minimal_yielder
         else
           @byte_downstream_identifier.to_minimal_yielder
         end

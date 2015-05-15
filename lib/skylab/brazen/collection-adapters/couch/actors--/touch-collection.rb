@@ -1,8 +1,8 @@
 module Skylab::Brazen
 
-  class Data_Stores::Couch
+  class Collection_Adapters::Couch
 
-    class Actors__::Touch_datastore < Couch_Actor_
+    class Actors__::Touch_collection < Couch_Actor_
 
       Actor_.call self, :properties,
         :entity
@@ -17,26 +17,26 @@ module Skylab::Brazen
     public
 
       def ensure_exists_when_201_created _
-        @on_event_selectively.call :info, :created_datastore do
-          bld_created_datastore_event
+        @on_event_selectively.call :info, :created_collection do
+          bld_created_collection_event
         end
         ACHIEVED_
       end
 
-      def bld_created_datastore_event
-        build_OK_event_with :created_datastore, :description,
+      def bld_created_collection_event
+        build_OK_event_with :created_collection, :description,
           @entity.description, * @entity.to_even_iambic
       end
 
       def ensure_exists_when_412_precondition_failed o
-        @on_event_selectively.call :info, :datastore_exists do
-          bld_datastore_exists_event
+        @on_event_selectively.call :info, :collection_exists do
+          bld_collection_exists_event
         end
         nil
       end
 
-      def bld_datastore_exists_event
-        build_OK_event_with :datastore_exists, :description,
+      def bld_collection_exists_event
+        build_OK_event_with :collection_exists, :description,
           @entity.description, * @entity.to_even_iambic
       end
     end

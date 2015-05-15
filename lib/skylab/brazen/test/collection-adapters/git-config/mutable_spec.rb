@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::Brazen::TestSupport::Data_Stores::Git_Config
+module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
 
   describe "[br] data stores: git config (mutable!)" do
 
@@ -74,7 +74,7 @@ module Skylab::Brazen::TestSupport::Data_Stores::Git_Config
     end
 
     def subject
-      Brazen_::Data_Stores::Git_Config::Mutable
+      Brazen_::Collection_Adapters::Git_Config::Mutable
     end
 
     def expect_unparses

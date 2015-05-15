@@ -138,7 +138,7 @@ module Skylab::TanMan
             asc = asc_
           end
 
-          info = _info_via_into_datastore_marshal_entity(
+          info = _info_via_into_collection_marshal_entity(
             nil, nil, asc, & oes_p )
           info and asc
         end
@@ -151,7 +151,7 @@ module Skylab::TanMan
 
         asc and begin
 
-          info = _info_via_into_datastore_marshal_entity(
+          info = _info_via_into_collection_marshal_entity(
             nil, nil, asc, & oes_p )
 
           info and asc
@@ -202,7 +202,7 @@ module Skylab::TanMan
           any_proto_sym = x.intern
         end
 
-        info = _info_via_into_datastore_marshal_entity(
+        info = _info_via_into_collection_marshal_entity(
           any_attrs_x,
           any_proto_sym,
           entity, & oes_p )
@@ -210,7 +210,7 @@ module Skylab::TanMan
         info and flush_maybe_changed_document_to_output_adapter__ info.did_mutate
       end
 
-      def _info_via_into_datastore_marshal_entity any_attrs_x, any_proto_sym, entity, & oes_p
+      def _info_via_into_collection_marshal_entity any_attrs_x, any_proto_sym, entity, & oes_p
 
         oes_p ||= @on_event_selectively
 

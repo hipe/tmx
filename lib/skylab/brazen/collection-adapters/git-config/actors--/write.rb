@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Data_Stores::Git_Config
+  class Collection_Adapters::Git_Config
 
     class Actors__::Write
 

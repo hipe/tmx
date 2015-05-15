@@ -7,10 +7,10 @@
 
 consider that each model class is pictured to live at the top of a vertical
 "silo" of the tiers described in [#025]. now imagine that one silo exists to
-model an entire datastore (which is fine). (some prefer "adapter".)
+model an entire collection (which is fine). (some prefer "adapter".)
 
 now imagine that some other silo exists to model some particular
-business entity, and it decides to store itself in the datastore represented
+business entity, and it decides to store itself in the collection represented
 by the first silo.
 
 it order for the second to get back data from the first it will have to
@@ -44,7 +44,7 @@ model is, or what the handlers do in the case of the various events that
 may occur.
 
 2) in a long-running process with perhaps multiple silos querying the
-same datastore, it may be impractical (or just too much code bloat) to
+same collection, it may be impractical (or just too much code bloat) to
 model this as having one collection controller per query.
 
 (were there ever to come a time that we did indeed want a collection
@@ -102,7 +102,7 @@ a collection controller is a more abstract façade than even that:
 consider the old "data-mapper" ORM that was once offered up as an
 alternative to active record. one particular innovation it proffered
 was the isomorphism between database "entites" and the runtime's
-objectspace (that is, memory): entities that came up from the datastore
+objectspace (that is, memory): entities that came up from the collection
 would exist one-to-one with objects in the runtime's memory. if you got
 back the same result entity in two different queries, it could give you
 a reference to *the same* object, which, depending on what you are doing,
@@ -111,7 +111,7 @@ could be useful.
 the "collection controller" façade exists as a simple, solid wall with
 very few holes of very particular shapes, behind which similiar kinds
 of innovations could be developed: maybe you are querying a relational
-database, maybe you are querying a key-value datastore, maybe you are
+database, maybe you are querying a key-value collection, maybe you are
 even querying an in-memory database like memcached or even some crazy
 future combination, or things we haven't even thought of yet.
 

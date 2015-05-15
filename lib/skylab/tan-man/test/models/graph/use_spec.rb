@@ -136,7 +136,7 @@ module Skylab::TanMan::TestSupport::Models::Graph
 
           shared_setup_via_config_line '[wiw]'
 
-          expect_OK_event :datastore_resource_committed_changes
+          expect_OK_event :collection_resource_committed_changes
 
           _read_config_file
 
@@ -167,7 +167,7 @@ module Skylab::TanMan::TestSupport::Models::Graph
           @ev_a[ 0 .. -3 ] = TanMan_::EMPTY_A_
 
           expect_OK_event :wrote_file
-          expect_OK_event :datastore_resource_committed_changes
+          expect_OK_event :collection_resource_committed_changes
           expect_succeeded
 
           _read_config_file
@@ -237,7 +237,7 @@ module Skylab::TanMan::TestSupport::Models::Graph
               wrote_file: [ true,
                 /\Awrote make-me\.dot \([456]\d bytes\)/ ],
 
-              datastore_resource_committed_changes: [ true,
+              collection_resource_committed_changes: [ true,
                 %r(\Aupdated config \(\d{2} bytes\)) ] )
 
             io = dg_pn.sub_ext( '.dot' ).open( ::File::RDONLY )
@@ -267,7 +267,7 @@ module Skylab::TanMan::TestSupport::Models::Graph
               using_default: nil,
               before_probably_creating_new_file: nil,
               wrote_file: IDENTITY_,
-              datastore_resource_committed_changes: nil )
+              collection_resource_committed_changes: nil )
 
             ::File.basename( ev.to_event.path ).should eql 'make-this.wtvr'
 

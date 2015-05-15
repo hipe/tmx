@@ -62,7 +62,7 @@ terms of the model object ("entity")..
 random list of [components/operations] that we can probably [use/need]:
 
 for edit, an edit session will have a "line upstream", holding the zero
-or more lines existing in the line-based collection datastore.
+or more lines existing in the line-based collection collection.
 
   • a stream-like (but not just a common stream) that reads every line
     from a file, maybe knows its upstream identifier, but definitely knows

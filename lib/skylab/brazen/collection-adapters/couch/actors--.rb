@@ -1,16 +1,16 @@
 module Skylab::Brazen
 
-  class Data_Stores::Couch
+  class Collection_Adapters::Couch
 
-    Couch_Actor_ = ::Class.new Brazen_::Data_Store_::Actor
+    Couch_Actor_ = ::Class.new Brazen_::Collection::Actor
 
     module Actors__
 
-      class Retrieve_datastore_entity < Couch_Actor_
+      class Retrieve_collection_entity < Couch_Actor_
 
         Actor_.call self, :properties,
           :entity_identifier,
-          :datastore,
+          :collection,
           :kernel
 
         def execute
@@ -28,7 +28,7 @@ module Skylab::Brazen
         end
 
         def via_native_entity_identifier_rslv_payload_h
-          @payload_h = @datastore.get @native_entity_identifier_s,
+          @payload_h = @collection.get @native_entity_identifier_s,
             :response_receiver, @response_receiver
           @payload_h ? PROCEDE_ : UNABLE_
         end

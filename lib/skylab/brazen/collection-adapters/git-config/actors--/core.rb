@@ -1,8 +1,8 @@
 module Skylab::Brazen
 
-  class Data_Stores::Git_Config
+  class Collection_Adapters::Git_Config
 
-    Git_Config_Actor_ = ::Class.new Brazen_::Data_Store_::Actor  # in [#028]
+    Git_Config_Actor_ = ::Class.new Brazen_::Collection::Actor  # in [#028]
 
     Actors__ = ::Module.new
 
@@ -212,7 +212,7 @@ module Skylab::Brazen
           o.edit_pairs @section.assignments do | x |
             if ! x.nil?
               x.to_s  # life is easier if string is the great equalizer:
-              # just because the datastore thinks it's e.g. an int or a
+              # just because the collection thinks it's e.g. an int or a
               # boolean doesn't mean it "is"
             end
           end

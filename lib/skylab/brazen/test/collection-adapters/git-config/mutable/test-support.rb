@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport::Data_Stores::Git_Config::Mutable
+module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config::Mutable
 
-  ::Skylab::Brazen::TestSupport::Data_Stores::Git_Config[ TS_ = self ]
+  ::Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config[ TS_ = self ]
 
   include Constants
 
@@ -45,7 +45,7 @@ module Skylab::Brazen::TestSupport::Data_Stores::Git_Config::Mutable
   end
 
   Subject__ = -> do
-    Brazen_::Data_Stores::Git_Config::Mutable
+    Brazen_::Collection_Adapters::Git_Config::Mutable
   end
 
   module InstanceMethods
@@ -57,7 +57,7 @@ module Skylab::Brazen::TestSupport::Data_Stores::Git_Config::Mutable
     define_method :subject, Subject__
 
     def super_subject
-      Brazen_::Data_Stores::Git_Config
+      Brazen_::Collection_Adapters::Git_Config
     end
 
     def parse_context

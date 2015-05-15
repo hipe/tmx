@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Data_Stores::Module_as_Collection
+  class Collection_Adapters::Module_as_Collection
 
     class << self
 

@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  module Data_Store_
+  module Collection
 
     class Model_ < Brazen_::Model
 
@@ -10,7 +10,7 @@ module Skylab::Brazen
         end
       end
 
-      NAME_STOP_INDEX = 1  # sl brzn datastore actions couch add
+      NAME_STOP_INDEX = 1  # sl brzn dratastore actions couch add
 
     end
 

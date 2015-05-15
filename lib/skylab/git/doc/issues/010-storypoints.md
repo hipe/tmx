@@ -35,7 +35,7 @@ attractive to stand as a model medium-sized general purpose utility:
  • it has multiple client layers that interface with each other (CLI and API).
  • it has a mostly standalone implementation for CRUD, for its "business
    entities": list, add, remove etc.
- • it implements a trivial but custom datastore (grafted on top of the
+ • it implements a trivial but custom collection (grafted on top of the
    filesystem).
  • it interfaces with an external service (namely 'git') - one that relies
    on underlying system interaction - to a somewhat non-trivial degree.

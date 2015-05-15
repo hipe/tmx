@@ -33,7 +33,7 @@ let's get right to it:
 
 each object at each step comes from the object at the previous (below) step,
 except for those models that chose to skip intermediate tiers (the middle
-two may sometimes be munged depending on things like the datastore paradigm).
+two may sometimes be munged depending on things like the collection paradigm).
 
 
 
@@ -78,7 +78,7 @@ database exists and that there is a connection to it and so on.
 
 typically these silo controllers will operate in this doamin: to
 make sure that the connection (in whatever form it takes) is made to the
-datastore (in whatever shape it is, even if it is just a config file).
+collection (in whatever shape it is, even if it is just a config file).
 
 
 

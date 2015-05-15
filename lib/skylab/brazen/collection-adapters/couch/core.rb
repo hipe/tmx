@@ -1,15 +1,15 @@
 module Skylab::Brazen
 
-  class Data_Stores::Couch < Brazen_::Data_Store_::Model_  # see [#038]
+  class Collection_Adapters::Couch < Brazen_::Collection::Model_  # see [#038]
 
     Brazen_::Model::Entity.call self do
 
       o :desc, -> y do
-        y << "manage couch datastores."
+        y << "manage couch collections."
       end
 
       o :persist_to, :workspace,
-        :preconditions, [ :datastore_couch ]
+        :preconditions, [ :collection_couch ]
 
       o :description, -> y do
         y << "the name of the database"
@@ -102,29 +102,29 @@ module Skylab::Brazen
     def intrinsic_persist_before_persist_in_collection _, & oes_p
 
       oes_p ||= handle_event_selectively
-      Couch_::Actors__::Touch_datastore[ self, & oes_p ]
+      Couch_::Actors__::Touch_collection[ self, & oes_p ]
       PROCEDE_  # #note-085
     end
 
     def entity_via_intrinsic_key id, & oes_p
-      Couch_::Actors__::Retrieve_datastore_entity[ id, self, @kernel, & oes_p ]
+      Couch_::Actors__::Retrieve_collection_entity[ id, self, @kernel, & oes_p ]
     end
 
     def to_entity_stream_via_model cls, & oes_p
       Couch_::Actors__::Build_stream.with :model_class, cls,
-        :datastore, self,
+        :collection, self,
         :kernel, @kernel,
         & oes_p
     end
 
     def delete_entity action, ent, & oes_p
-      _ok = ent.intrinsic_delete_before_delete_in_datastore action, & oes_p
+      _ok = ent.intrinsic_delete_before_delete_in_collection action, & oes_p
       _ok && Couch_::Actors__::Delete[ action, ent, self, & oes_p ]
     end
 
-    def intrinsic_delete_before_delete_in_datastore action, & oes_p
+    def intrinsic_delete_before_delete_in_collection action, & oes_p
 
-      Couch_::Actors__::Delete_datastore.call(
+      Couch_::Actors__::Delete_collection.call(
         action.trio( :dry_run ),
         action.trio( :force ),
         self,
@@ -168,13 +168,13 @@ module Skylab::Brazen
     class Silo_Daemon < Silo_Daemon
 
       def precondition_for_self _action, _id, box, & oes_p
-        :"???"  # we might want to use this for write-datastore operations
+        :"???"  # we might want to use this for write-collection operations
       end
 
       def precondition_for act, id, box, & oes_p
         box.fetch( :workspace ).entity_via_intrinsic_key id do | * i_a, & ev_p |
           oes_p.call( * i_a  ) do
-            ev_p[].new_inline_with :invite_to_action, [ :datastore, :couch, :add ]
+            ev_p[].new_inline_with :invite_to_action, [ :collection, :couch, :add ]
           end
         end
       end
@@ -187,6 +187,6 @@ module Skylab::Brazen
     end  # >>
 
     Couch_ = self
-    Data_Store_ = Brazen_::Data_Store_
+    Collection = Brazen_::Collection
   end
 end

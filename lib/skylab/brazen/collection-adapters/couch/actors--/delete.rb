@@ -1,13 +1,13 @@
 module Skylab::Brazen
 
-  class Data_Stores::Couch
+  class Collection_Adapters::Couch
 
     class Actors__::Delete < Couch_Actor_
 
       Actor_.call self, :properties,
         :action,
         :entity,
-        :datastore
+        :collection
 
       def execute  # any result
         init_ivars
@@ -24,7 +24,7 @@ module Skylab::Brazen
 
         @rev = @entity.couch_entity_revision_
 
-        @datastore.delete @native_entity_identifier_s,
+        @collection.delete @native_entity_identifier_s,
           :add_HTTP_parameter, :rev, @rev,
           :response_receiver, @response_receiver
       end

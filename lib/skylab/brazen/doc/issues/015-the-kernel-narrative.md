@@ -40,7 +40,7 @@ this is an area of some experimentation: the 'persist to' identifiers
 hold both would-be "model identifiers" and "collection identifier" (e.g
 database names). for readability (and fun) we munge these parts together
 inline with the word-parts that a would-be model name might have (e.g
-"git-config" as a datastore name has the two parts, "git" and "config").
+"git-config" as a collection name has the two parts, "git" and "config").
 
 because these two concerns are munged into one name we need to do some
 parsing to determine where the one ends and the other begins.

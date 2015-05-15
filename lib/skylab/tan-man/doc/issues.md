@@ -3,7 +3,7 @@
 [#092]       #done #list-API unmunge `_insert_item_before_item` et. a.
 [#091]       #done #list-API improve the implementation of \`unparse\`
 [#090]       #done make association magnetic
-[#089]       #done [br] datastore / file-based [ file etc ] <= [ttt]
+[#089]       #done [br] collection / file-based [ file etc ] <= [ttt]
 [#088]       #done same issue as below with graph use
 [#087]       #done setting a starter doesn't remove the last one
 [#086]       #done on first test run with an empty "[tmx root]/tmp/", the
@@ -137,6 +137,6 @@
              ( #was: #done 2012-08-30 rename `remote*` to fit a pattern (e.g. controller )
                examples-controller -> example-collection)
 [#001] #open refactor out the repetition among document entity actions:
-             resolve one layer where all datastore persists happen (i.e
+             resolve one layer where all collection persists happen (i.e
              should collection controllers write files or should actions?)
              ( #was: #done tan -w ok, #depends-on:(#sl-unwip) )

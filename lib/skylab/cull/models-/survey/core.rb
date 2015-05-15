@@ -103,7 +103,7 @@ module Skylab::Cull
 
       _config_path = ::File.join ws_path, CONFIG_FILENAME_
 
-      cfg = Brazen_.data_stores::Git_Config.parse_path(
+      cfg = Brazen_.collections::Git_Config.parse_path(
         _config_path,
         & handle_event_selectively )
 
@@ -147,7 +147,7 @@ module Skylab::Cull
 
     def re_persist is_dry  # assume a config for read
 
-      @cfg_for_write = Brazen_.data_stores::Git_Config::Mutable.parse_input_id(
+      @cfg_for_write = Brazen_.collections::Git_Config::Mutable.parse_input_id(
         @cfg_for_read.input_id,
         & handle_event_selectively )
 
@@ -194,7 +194,7 @@ module Skylab::Cull
 
     def __create_editable_document
       @cfg_for_read = nil
-      @cfg_for_write = Brazen_.data_stores::Git_Config::Mutable.new(
+      @cfg_for_write = Brazen_.collections::Git_Config::Mutable.new(
         & handle_event_selectively )
       ACHIEVED_
     end

@@ -300,7 +300,7 @@ module Skylab::Brazen
 
           ok = __via_args_resolve_subject_entity
 
-          ok &&= @subject_entity.intrinsic_delete_before_delete_in_datastore(
+          ok &&= @subject_entity.intrinsic_delete_before_delete_in_collection(
             self, & oes_p )
 
           ok and entity_collection.delete_entity self, @subject_entity, & oes_p

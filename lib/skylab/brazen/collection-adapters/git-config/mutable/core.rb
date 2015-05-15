@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Data_Stores::Git_Config
+  class Collection_Adapters::Git_Config
 
     module Mutable  # see [#008]
 
@@ -52,10 +52,10 @@ module Skylab::Brazen
             @receiver = x
           end
           def via_path x
-            @receiver.accept_input_ID Brazen_::Data_Store_::Byte_Upstream_Identifier.via_path x
+            @receiver.accept_input_ID Brazen_::Collection::Byte_Upstream_Identifier.via_path x
           end
           def via_string x
-            @receiver.accept_input_ID Brazen_::Data_Store_::Byte_Upstream_Identifier.via_string x
+            @receiver.accept_input_ID Brazen_::Collection::Byte_Upstream_Identifier.via_string x
           end
           def via_input_adapter x
             @receiver.accept_input_ID x

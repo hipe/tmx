@@ -236,21 +236,21 @@ would have ambiguous semantics.
 ## :#note-023
 
 our "normal persistece names" are lowercase with underscores. in the
-datastore, variable names cannot have underscores but dashes are OK. so a
+collection, variable names cannot have underscores but dashes are OK. so a
 conversion is necessary in both directions.
 
-it is "right" for the datastore to expect to receive only valid names,
-because otherwise how should the datastore decide how to do a conversion
+it is "right" for the collection to expect to receive only valid names,
+because otherwise how should the collection decide how to do a conversion
 of names, when that conversion might be lossy?
 
 (information is lost: `foo-bar_baz` -> `foo-bar-baz` -> `foo_bar_baz`)
 
 on the other end, the problem of making names 'look right' for the
-datastore should not be a concern of the business objects: the datastore
+collection should not be a concern of the business objects: the collection
 may certainly change and we want the business layer to be insulated from
 this. busiess objects are providing name value pairs in a format that is
 "normal" by some standard, and somewhere in this pipeline we need to
-convert those names to names compatible with the datastore.
+convert those names to names compatible with the collection.
 
 for now, that place is here. but this has become [#029], which suggests
 a possible better way.

@@ -196,7 +196,7 @@ module Skylab::Snag
 
     Directory_as_collection_class___ = Callback_.memoize do
 
-      class D_as_C____ < Brazen_::Data_Stores::Directory_as_Collection
+      class D_as_C____ < Brazen_::Collection_Adapters::Directory_as_Collection
 
         class << self
 

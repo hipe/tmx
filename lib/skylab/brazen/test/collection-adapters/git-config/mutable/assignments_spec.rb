@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::Brazen::TestSupport::Data_Stores::Git_Config::Mutable
+module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config::Mutable
 
   describe "[br] data stores: git config mutable assignments" do
 

@@ -81,7 +81,7 @@ module Skylab::TanMan::TestSupport::Models::Starter
         :config_filename, cfn
 
       expect_OK_event :normalized_value
-      expect_OK_event :datastore_resource_committed_changes do |ev|
+      expect_OK_event :collection_resource_committed_changes do |ev|
         ev.to_event.bytes.should eql 64
       end
       expect_succeeded

@@ -37,7 +37,7 @@ module Skylab::Cull::TestSupport
     it "go money" do
       call_API :create, :path, prepare_tmpdir.to_path
       expect_neutral_event :creating_directory
-      expect_OK_event :datastore_resource_committed_changes
+      expect_OK_event :collection_resource_committed_changes
       expect_OK_event :survey
       expect_succeeded
     end

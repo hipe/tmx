@@ -161,7 +161,7 @@ module Skylab::TanMan
 
             if :path == id.shape_symbol && DASH_ == id.path
 
-              id = Brazen_.data_store::Byte_Downstream_Identifier.via_stream(
+              id = Brazen_::Collection::Byte_Downstream_Identifier.via_stream(
                 @trio_box.fetch( :stdout ).value_x )
             end
 

@@ -1,11 +1,11 @@
 module Skylab::Brazen
 
-  class Models_::Datastore < Brazen_::Model
+  class Models_::Collection < Brazen_::Model
 
     edit_entity_class(
 
       :desc, -> y do
-        y << "manage datastores."
+        y << "manage collections."
       end,
 
       :after, :workspace )
@@ -17,7 +17,7 @@ module Skylab::Brazen
       end
 
       def init_action_class_reflection
-        @acr = Brazen_::Model::Lazy_Action_Class_Reflection.new self, Brazen_::Data_Stores
+        @acr = Brazen_::Model::Lazy_Action_Class_Reflection.new self, Brazen_::Collection_Adapters
         true
       end
     end  # >>

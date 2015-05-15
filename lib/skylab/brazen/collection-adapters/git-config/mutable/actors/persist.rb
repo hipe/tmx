@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Data_Stores::Git_Config
+  class Collection_Adapters::Git_Config
 
     module Mutable
 
@@ -93,7 +93,7 @@ module Skylab::Brazen
 
         def build_wrote_file_event d
 
-          build_OK_event_with( :datastore_resource_committed_changes,
+          build_OK_event_with( :collection_resource_committed_changes,
               :bytes, d,
               :is_completion, true,
               :is_dry, @is_dry,

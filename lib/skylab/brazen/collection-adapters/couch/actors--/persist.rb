@@ -1,13 +1,13 @@
 module Skylab::Brazen
 
-  class Data_Stores::Couch
+  class Collection_Adapters::Couch
 
     class Actors__::Persist < Couch_Actor_
 
       Actor_.call self, :properties,
         :is_dry,
         :entity,
-        :datastore
+        :collection
 
       def execute
         init_ivars
@@ -48,7 +48,7 @@ module Skylab::Brazen
         _h = bld_entity_as_document_h
         _s = _JSON.pretty_generate _h
 
-        @datastore.put _s,
+        @collection.put _s,
           :native_entity_identifier_s, @native_entity_identifier_s,
           :entity_identifier_strategy, :native_entity_identifier_string,
           :response_receiver, @response_receiver  # is some
@@ -76,9 +76,9 @@ module Skylab::Brazen
 
       def when_404_object_not_found o
         maybe_send_event :error, :not_found do
-          ds_i = @datastore_i.to_s
+          ds_i = @collection_i.to_s
           o.response_body_to_not_OK_event do |y, ev|
-            y << "there is no #{ val ds_i } couch datastore (#{ val ev.reason })"
+            y << "there is no #{ val ds_i } couch collection (#{ val ev.reason })"
           end
         end
       end

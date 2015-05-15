@@ -33,7 +33,7 @@ throughout your graph? the listener is like a golden snitch. no it isn't.
 ## :#storypoint-200
 
 the snitch itself is technically "immutable" but it just closes around the
-vtuple and relies on the vtuple as the datastore. if the vtuple changes its
+vtuple and relies on the vtuple as the collection. if the vtuple changes its
 state (in terms of its category values, not its categories!) the snitch will
 act accordingly.
 

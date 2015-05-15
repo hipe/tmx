@@ -16,7 +16,7 @@ module Skylab::TanMan::TestSupport::Models::Workspace
 
       _expected_config_path = @ws_pn.join( config_filename ).to_path
 
-      expect_OK_event :datastore_resource_committed_changes
+      expect_OK_event :collection_resource_committed_changes
 
       o = TestSupport_::Expect_Line::Scanner.via_line_stream(
         io = ::File.open( _expected_config_path ) )

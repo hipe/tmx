@@ -54,8 +54,8 @@ module Skylab::Brazen::TestSupport::CLI
       expect_item :workspace, %r(\bmanage workspaces\b)
     end
 
-    def expect_datastore_item
-      expect_item :datastore, %r(\bmanage datastores\b)
+    def expect_collection_item
+      expect_item :collection, %r(\bmanage collections\b)
     end
 
     def expect_source_item
@@ -67,6 +67,6 @@ module Skylab::Brazen::TestSupport::CLI
       expect_help_screen_for_init
     end
 
-    self::EXPECTED_ACTION_NAME_S_A = [ 'init', 'status', 'workspace', 'datastore', 'source' ].freeze
+    self::EXPECTED_ACTION_NAME_S_A = [ 'init', 'status', 'workspace', 'collection', 'source' ].freeze
   end
 end

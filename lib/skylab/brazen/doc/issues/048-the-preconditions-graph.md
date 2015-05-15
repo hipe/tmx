@@ -4,7 +4,7 @@
 ### introduction to preconditions
 
 frequently the [#025] model silos interdepend on one another. for
-example we may have a business silo that depends on its datastore silo
+example we may have a business silo that depends on its collection silo
 (let's say its a database of some sort). the database silo might depend
 on a 'workspace' silo (a workspace being sort of a high level wrapper
 around a config file). the workspace silo in turn may depend on a config
@@ -34,7 +34,7 @@ we can put this in terms of graph theory and say that this is an
 "acyclic directed graph".
 
 now, consider the above graph and the app you might write around it.
-you want to render a listing of the business widgets? ok, is the datastore
+you want to render a listing of the business widgets? ok, is the collection
 silo produced? if no, well we need a workspace controller to produce it. is
 the workpace silo produced? if no, is the config silo produced? etc.
 

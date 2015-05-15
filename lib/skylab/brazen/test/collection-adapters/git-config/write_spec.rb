@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::Brazen::TestSupport::Data_Stores::Git_Config
+module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
 
   describe "[br] data stores - git config - write" do
 

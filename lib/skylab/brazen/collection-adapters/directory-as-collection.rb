@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Data_Stores::Directory_as_Collection
+  class Collection_Adapters::Directory_as_Collection
 
     class << self
       def is_actionable

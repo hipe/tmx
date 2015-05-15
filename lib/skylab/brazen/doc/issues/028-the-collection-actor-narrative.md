@@ -1,4 +1,4 @@
-# the datastore actor narrative :[#028]
+# the collection actor narrative :[#028]
 
 ## a universal normal name convention :[#029]
 
@@ -9,19 +9,19 @@ the things with dashes we call "slugs"). (but yes, we like the look of
 "slugs" better so we are glad git adopted this as the standard).
 
 hence we are left with conversion work to do: going into and coming out
-of the datastore we need to convert dashes to underscores in field
+of the collection we need to convert dashes to underscores in field
 names. furthermore we haven't yet said anything about all the other kinds
 of characters, like numbers, mixed case names and beyond.
 
-as it stands this is work left for the client to do; the datastore
+as it stands this is work left for the client to do; the collection
 merely borks with a message when invalid names are passed. and this is
-halfway to the way it should be: if the datastore makes decisions about
+halfway to the way it should be: if the collection makes decisions about
 how to convert invalid names to valid ones, information may be lost,
-which is tautologically the wrong way for a datastore to behave:
+which is tautologically the wrong way for a collection to behave:
 
     `foo-bar_baz`   ->   `foo-bar-baz`    ->   `foo_bar_baz`
 
-   contrived name        datastore name        incorrect guess
+   contrived name        collection name        incorrect guess
 
 
 a better way might be to agree in one place universally on a set of
@@ -38,10 +38,10 @@ occuring in multiples adjacently).
 might then shoehorn into this term of `variegated_symbol` that
 we've been using.)
 
-if both the business layer and the datastore know that this is the
+if both the business layer and the collection know that this is the
 standard, *and* the character classes variously that the standard speaks
-of either *are* or *are not* allowed in the datastore and in the cases
+of either *are* or *are not* allowed in the collection and in the cases
 where they are *not* there are other characters available to substitute;
 characters not included in the standard (whew), THEN it might be that
-the datastore can do the name conversions, rather than the business
+the collection can do the name conversions, rather than the business
 layer having to worry about it, which would be optimal.

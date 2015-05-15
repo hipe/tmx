@@ -148,7 +148,7 @@ module Skylab::TanMan
 
         @i_a.map do | direction_symbol |
 
-          Brazen_.data_store.const_get(
+          Brazen_::Collection.const_get(
 
             Model_::Document_Entity::CONST_VIA_DIRECTION.fetch direction_symbol
           ).via_path path

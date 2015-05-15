@@ -8,9 +8,9 @@ module Skylab::Brazen
         y << "manage sources."
       end,
 
-      :after, :datastore,
+      :after, :collection,
 
-      :persist_to, :datastore_couch_primary,
+      :persist_to, :collection_couch_primary,
 
       :required,
       :property, :name,

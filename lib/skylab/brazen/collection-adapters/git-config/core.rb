@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Data_Stores::Git_Config < Brazen_::Model
+  class Collection_Adapters::Git_Config < Brazen_::Model
 
     class << self
 
@@ -92,7 +92,7 @@ module Skylab::Brazen
 
     def delete_entity action, entity, & oes_p
       ok = resolve_mutable_document
-      ok &&= entity.intrinsic_delete_before_delete_in_datastore( action, & oes_p )
+      ok &&= entity.intrinsic_delete_before_delete_in_collection( action, & oes_p )
       ok &&= Git_Config_::Mutable::Actors::Delete[ entity, @mutable_document, & oes_p ]
       ok and _via_mutated_mutable_document_write_file_via_persist( action.argument_box, & oes_p )
     end
@@ -170,7 +170,7 @@ module Skylab::Brazen
 
       def initialize a, & oes_p
         input_method_i, input_x = a
-        @input_id = Brazen_::Data_Store_::Byte_Upstream_Identifier.send input_method_i, input_x
+        @input_id = Brazen_::Collection::Byte_Upstream_Identifier.send input_method_i, input_x
         @on_event_selectively = oes_p
       end
 

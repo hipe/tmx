@@ -1,12 +1,12 @@
 module Skylab::Brazen
 
-  class Data_Stores::Couch
+  class Collection_Adapters::Couch
 
     class Actors__::Build_stream < Couch_Actor_
 
       Actor_[ self, :properties,
         :model_class,
-        :datastore,
+        :collection,
         :kernel, :on_event_selectively ]
 
       def execute
@@ -31,7 +31,7 @@ module Skylab::Brazen
       def try_retrieve_payload
         @two_times = false
         _s = view_document_URI_tail
-        @datastore.get _s, :response_receiver, @response_receiver
+        @collection.get _s, :response_receiver, @response_receiver
       end
 
       def view_document_URI_tail
@@ -53,7 +53,7 @@ module Skylab::Brazen
 
         _rr = @response_receiver.new_with :channel, :my_face
 
-        @datastore.put _body,
+        @collection.put _body,
           :entity_identifier_strategy, :append_URI_tail,
           :URI_tail, '_design/vu',
           :response_receiver, _rr

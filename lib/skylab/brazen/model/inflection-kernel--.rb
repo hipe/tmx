@@ -195,7 +195,7 @@ module Skylab::Brazen
           if @ci && @ci.has_noun_exponent_combination
             @ci.noun_exponent_combination_i
           else
-            :indefinite_singular  # "add a couch db datastore"
+            :indefinite_singular  # "add a couch db collection"
           end
         end
       end

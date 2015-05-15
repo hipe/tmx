@@ -125,7 +125,7 @@ module Skylab::Cull::TestSupport
 
       expect_not_OK_event :path_must_be_absolute
       ev = expect_OK_event :deleted_upstreams
-      expect_event :datastore_resource_committed_changes
+      expect_event :collection_resource_committed_changes
       s = black_and_white ev
       s.should eql "deleted 3 'upstreams'"
       expect_succeeded
@@ -161,7 +161,7 @@ module Skylab::Cull::TestSupport
     def expect_common_OK
 
       expect_OK_event :json_upstream
-      ev = expect_OK_event :datastore_resource_committed_changes
+      ev = expect_OK_event :collection_resource_committed_changes
       ev.to_event.is_completion.should eql true
       expect_succeeded
     end

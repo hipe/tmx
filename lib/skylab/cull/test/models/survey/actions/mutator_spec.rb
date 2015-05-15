@@ -29,7 +29,7 @@ module Skylab::Cull::TestSupport
 
       expect_event :added_function_call
 
-      expect_event :datastore_resource_committed_changes
+      expect_event :collection_resource_committed_changes
 
       expect_succeeded
 
@@ -150,7 +150,7 @@ module Skylab::Cull::TestSupport
     def _expect_remove_worked td
 
       expect_neutral_event :removed_function_call
-      expect_OK_event :datastore_resource_committed_changes
+      expect_OK_event :collection_resource_committed_changes
       expect_succeeded
       sh = _line_shell td
       sh.advance_to_next_rx %r(\A\[ *report *\])

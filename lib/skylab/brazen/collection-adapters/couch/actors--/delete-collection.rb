@@ -1,8 +1,8 @@
 module Skylab::Brazen
 
-  class Data_Stores::Couch
+  class Collection_Adapters::Couch
 
-    class Actors__::Delete_datastore < Couch_Actor_
+    class Actors__::Delete_collection < Couch_Actor_
 
       Actor_.call self, :properties,
         :dry_run_arg,
@@ -19,8 +19,8 @@ module Skylab::Brazen
     private
 
       def init_ivars
-        @datastore_s = @entity.property_value_via_symbol :name
-        init_response_receiver_for_self_on_channel :delete_datastore
+        @collection_s = @entity.property_value_via_symbol :name
+        init_response_receiver_for_self_on_channel :delete_collection
         nil
       end
 
@@ -47,7 +47,7 @@ module Skylab::Brazen
 
       def work
         if @dry_run_arg.value_x
-          delete_datastore_when_dry_run
+          delete_collection_when_dry_run
           PROCEDE_
         else
           x_a = []
@@ -59,21 +59,21 @@ module Skylab::Brazen
 
     public
 
-      def delete_datastore_when_dry_run
+      def delete_collection_when_dry_run
         maybe_send_event :info, :pretending_for_dry_run do
           build_OK_event_with :pretending_for_dry_run, :pretending, :pretending
         end ; nil
       end
 
-      def delete_datastore_when_200_ok o
+      def delete_collection_when_200_ok o
         maybe_send_event :info, :removed do
-          o.response_body_to_completion_event :name, @datastore_s do |y, ev|
-            y << "#{ ev.message } - removed datastore #{ val ev.name }"
+          o.response_body_to_completion_event :name, @collection_s do |y, ev|
+            y << "#{ ev.message } - removed collection #{ val ev.name }"
           end
         end ; nil
       end
 
-      def delete_datastore_when_404_object_not_found o
+      def delete_collection_when_404_object_not_found o
         maybe_send_event :error, :not_found do
           o.response_body_to_not_OK_event
         end ; nil

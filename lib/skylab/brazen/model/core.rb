@@ -703,7 +703,7 @@ module Skylab::Brazen
       entity_collection.persist_entity action.argument_box, self, & oes_p
     end
 
-    def intrinsic_delete_before_delete_in_datastore _action, & oes_p
+    def intrinsic_delete_before_delete_in_collection _action, & oes_p
       ACHIEVED_
     end
 
@@ -997,8 +997,8 @@ module Skylab::Brazen
         id = @model_class.persist_to
         if id
 
-          # assume this is an "ordinary" business silo with datastore and so
-          # its precondition *is* the datastore. we could also place a dummy
+          # assume this is an "ordinary" business silo with collection and so
+          # its precondition *is* the collection. we could also place a dummy
           # value here and let the entity fetch the d.s from the box itself.
 
           box.fetch id.full_name_i

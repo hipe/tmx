@@ -152,7 +152,7 @@ module Skylab::Brazen
     def _document & oes_p
       @___did_attempt_to_resolve_document ||= begin
 
-        @document_ = Brazen_::Data_Stores::Git_Config.via_path_and_kernel(
+        @document_ = Brazen_::Collection_Adapters::Git_Config.via_path_and_kernel(
           existent_config_path, @kernel, & oes_p )
 
         true

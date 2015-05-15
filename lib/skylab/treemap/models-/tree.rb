@@ -68,9 +68,9 @@ module Skylab::Treemap
 
           lib = Tr_.lib_.brazen
 
-          oa = lib.data_store::Common_fuzzy_retrieve[
+          oa = lib::Collection::Common_fuzzy_retrieve[
             trio( :output_adapter ),
-            lib::Data_Stores::Module_as_Collection[ Output_Adapters_ ],
+            lib::Collection_Adapters::Module_as_Collection[ Output_Adapters_ ],
             & handle_event_selectively ]
 
           if oa

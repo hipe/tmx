@@ -19,13 +19,13 @@ advantages from the perspective of the collection controller:
   invoke the same mechanics we already had in place for when this would
   happen for a retrieve operation.
 
-• your custom datastore can leverage existing logic you wrote do do
+• your custom collection can leverage existing logic you wrote do do
   things like persist.
 
 • your custom silo may need to invoke logic that is better suited to live
   in the entity (class) itself rather than in the controller:
-  the entity may be for example a datastore entity itself, (that is, an
-  entity that represents a datastore), and have additional cleanup to do
-  aside from just being deleted in its host datastore.
+  the entity may be for example a collection entity itself, (that is, an
+  entity that represents a collection), and have additional cleanup to do
+  aside from just being deleted in its host collection.
 
   to have the entity in place to do this lays out a better design.

@@ -13,7 +13,7 @@ the only reason.
 ## #note-085
 
 whether or not the call to the couch server succeeds we always want to
-procede with the attempt at saving the datastore as an entity (a
+procede with the attempt at saving the collection as an entity (a
 "record") in for e.g a config file.
 
 if we don't do this, we get locked out from making the two ends match

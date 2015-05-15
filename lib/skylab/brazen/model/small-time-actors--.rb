@@ -4,7 +4,7 @@ module Skylab::Brazen
 
     module Small_Time_Actors__
 
-      class When_datastore_not_indicated  # :+[#035] should probably not be UI-level
+      class When_collection_not_indicated  # :+[#035] should probably not be UI-level
 
         Actor_.call self, :properties,
           :controller

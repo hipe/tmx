@@ -24,23 +24,19 @@ module Skylab::Brazen
     end
 
     def byte_downstream_identifier
-      Brazen_::Data_Store_::Byte_Downstream_Identifier
+      Brazen_::Collection::Byte_Downstream_Identifier
     end
 
     def byte_upstream_identifier
-      Brazen_::Data_Store_::Byte_Upstream_Identifier
+      Brazen_::Collection::Byte_Upstream_Identifier
     end
 
     def cfg
-      Brazen_::Data_Stores::Git_Config
+      Brazen_::Collection_Adapters::Git_Config
     end
 
-    def data_store
-      Brazen_::Data_Store_
-    end
-
-    def data_stores
-      Brazen_::Data_Stores
+    def collections
+      Brazen_::Collection_Adapters
     end
 
     def expression_agent_library
@@ -96,11 +92,11 @@ module Skylab::Brazen
 
   Autoloader_ = Callback_::Autoloader
 
-  module Data_Stores
+  module Collection_Adapters
 
     class << self
       def name_function
-        Models_::Datastore.name_function  # hack city
+        Models_::Collection.name_function  # hack city
       end
     end  # >>
 
