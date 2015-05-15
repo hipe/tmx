@@ -56,15 +56,25 @@ module Skylab::Human
       end.call
 
       Oxford_comma__ = -> sep, ult, a do
+
         if a.length.nonzero?
-          res = ( 1 .. ( a.length - 2 ) ).reduce [ a[0] ] do |ar, idx|
-            ar.push sep, a[idx]
-            ar
+
+          st = Callback_::Polymorphic_Stream.via_array a.reverse
+
+          x = st.gets_one
+
+          if st.no_unparsed_exists
+            x
+          else
+            y = [ x, ult, st.gets_one ]
+
+            while st.unparsed_exists
+
+              y.push sep, st.gets_one
+            end
+            y.reverse!
+            y * EMPTY_S_
           end
-          if 1 < a.length
-            res.push ult, a.last
-          end
-          res * EMPTY_S_
         end
       end
 
@@ -150,6 +160,8 @@ module Skylab::Human
       end.call
 
       EN_ = self
+
+      Autoloader_[ Expression_Frames___ = ::Module.new, :boxxy ]
 
     end  # EN
   end

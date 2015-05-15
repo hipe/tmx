@@ -14,9 +14,20 @@ module Skylab::Human::TestSupport
 
   module ModuleMethods
 
-    def use sym
-      self._FUN
-    end
+    define_method :use, -> do
+
+      cache_h = {}
+
+      -> sym do
+
+        ( cache_h.fetch sym do
+
+          cache_h[ sym ] = Hu_.lib_.brazen::Bundle::Fancy_lookup[ sym, TS_ ]
+
+        end )[ self ]
+        NIL_
+      end
+    end.call
 
     def memoize_ sym, & p
 
@@ -37,6 +48,7 @@ module Skylab::Human::TestSupport
     end
   end
 
+  EMPTY_A_ = [].freeze
   Hu_ = ::Skylab::Human
-
+  NIL_ = nil
 end

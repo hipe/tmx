@@ -1,3 +1,4 @@
+[#045]       permute (as a doctest action)
 [#044]       "the new test architecture convention" (with fewer t.s nodes)
 [#043] #open modernize doc-test templates
 [#042]       "nasty OCD memoize" caveat (for [sg])..

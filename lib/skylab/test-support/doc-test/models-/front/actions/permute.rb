@@ -4,7 +4,7 @@ module Skylab::TestSupport
 
     module Models_::Front
 
-      class Actions::Permute < Action_
+      class Actions::Permute < Action_  # :[#045].
 
         edit_entity_class(
 
