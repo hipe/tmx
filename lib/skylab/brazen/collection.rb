@@ -8,7 +8,7 @@ module Skylab::Brazen
         def main_model_class
           superclass.superclass
         end
-      end
+      end  # >>
 
       NAME_STOP_INDEX = 1  # sl brzn dratastore actions couch add
 
@@ -191,12 +191,11 @@ module Skylab::Brazen
 
       def __ambiguous o_a, trio, & oes_p
 
-        self._COVER_ME
         oes_p.call :error, :ambiguous_property do
           Brazen_.properties_stack.build_ambiguous_property_event(
             o_a,
             trio.value_x,
-            trio.name_symbol )
+            trio.name )
         end
       end
 
@@ -211,7 +210,7 @@ module Skylab::Brazen
           Brazen_.properties_stack.build_extra_properties_event(
             [ trio.value_x ],
             _did_you_mean_s_a,
-            trio.name_symbol )
+            trio.name.as_human )
         end
       end
     end

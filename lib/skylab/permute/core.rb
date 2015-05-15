@@ -5,8 +5,15 @@ module Skylab::Permute
 
   class << self
 
+    def application_kernel_
+
+      @___kr ||= Pe_.lib_.brazen::Kernel.new Pe_
+    end
+
     def lib_
-      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+
+      @___lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+        Lib_, self )
     end
   end  # >>
 
@@ -16,35 +23,18 @@ module Skylab::Permute
 
   module Lib_
 
-    sidesys, req = Autoloader_.at(
-      :build_require_sidesystem_proc,
-      :require_sidesystem )
+    sidesys = Autoloader_.build_require_sidesystem_proc
 
-    Bleeding__ = Callback_.memoize do
-      req[ :Porcelain ]::Bleeding
-    end
-
-    CLI_Action = -> do
-      Bleeding__[]::Action
-    end
-
-    CLI_Client = -> do
-      Bleeding__[]::Runtime
-    end
-
-    CLI_lib = -> do
-      HL__[]::CLI
-    end
-
-    HL__ = sidesys[ :Headless ]
-
-    Table = -> do
-      HL__[]::CLI::Table
-    end
+    Basic = sidesys[ :Basic ]
+    Brazen = sidesys[ :Brazen ]
   end
-
-  Permute_ = self
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
+  ACHIEVED_ = true
+  KEEP_PARSING_ = true
+  NIL_ = nil
+  Pe_ = self
+  UNABLE_ = false
+  UNDERSCORE_ = '_'
 end

@@ -94,6 +94,36 @@ module Skylab::GitViz::TestSupport
     end
   end
 
+  module Expect_CLI
+
+    class << self
+
+      def [] test_cls
+
+        Expect_CLI_lib[][ test_cls ]
+
+        test_cls.include self
+
+      end
+    end  # >>
+
+    def subject_CLI
+      GitViz_::CLI
+    end
+
+    def get_invocation_strings_for_expect_stdout_stderr
+      %w( gvz )
+    end
+
+    def the_list_of_all_visible_actions_for_expect_CLI
+      %w( ping hist-tree )
+    end
+  end
+
+  Expect_CLI_lib = -> do
+    GitViz_.lib_.brazen.test_support.CLI::Expect_CLI
+  end
+
   Expect_Event = -> test_mod do  # generated from `expect_event`
 
     test_mod.include(

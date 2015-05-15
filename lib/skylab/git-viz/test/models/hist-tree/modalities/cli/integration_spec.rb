@@ -64,7 +64,7 @@ module Skylab::GitViz::TestSupport::Models
     def _common_prepare
 
       @for_expect_stdout_stderr_prepare_invocation = method :__prepare_invo
-      @stderr_for_expect_stdout_stderr = mock_stderr_instance
+      @stderr_for_expect_stdout_stderr = mock_stderr_instance_for_expect_CLI
     end
 
     def __prepare_invo invo

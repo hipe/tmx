@@ -1,5 +1,5 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -w
 
-require File.expand_path('../../lib/skylab/permute/cli', __FILE__)
+require_relative '../lib/skylab/permute/core'
 
 Skylab::Permute::CLI.new( nil, $stdout, $stderr ).invoke ARGV

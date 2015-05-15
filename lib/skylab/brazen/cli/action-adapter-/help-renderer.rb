@@ -12,7 +12,7 @@ module Skylab::Brazen
           @action_adapter = ad.action_adapter
           @expression_agent = ad.expression_agent
           @invocation = ad.invocation
-          set_op op
+          __receive_any_option_parser op
           @section_a = []
           @section_separator_p = -> { @y << nil }
           @y = ::Enumerator::Yielder.new( & ad.stderr.method( :puts ) )
@@ -25,60 +25,117 @@ module Skylab::Brazen
 
         attr_writer :arg_a
 
-        def set_op op
+        def __receive_any_option_parser op
+
           @op = op
-          op and use_formatting_of_option_parser op ; nil
+          if op
+            __init_formatting_via_option_parser op
+          end
+          NIL_
         end
 
-        def use_formatting_of_option_parser op
+        def __init_formatting_via_option_parser op
+
           @summary_indent = op.summary_indent
-          @summary_width = op.summary_width ; nil
+          @summary_width = op.summary_width
+          NIL_
         end
 
         def output_help_screen
+
           output_usage
-          @action.has_description and output_description
+
+          if @action.has_description
+            output_description
+          end
+
           @section_a.each( & method( :output_section ) )
-          nil
+          NIL_
         end
 
         # ~ usage lines
 
         def output_primary_usage_line
-          subject.write_any_primary_syntax_string a=[]
+
+          a = []
+          subject.write_any_primary_syntax_string a
           output_single_line_section 'usage', a[ 0 ]
           @action
         end
 
         def output_usage
+
           section_boundary
-          a = get_full_syntax_strings
-          output_usage_section_via_full_syntax_strings a
+          output_usage_section_via_full_syntax_strings get_full_syntax_strings
+          NIL_
         end
 
         def output_usage_section_via_full_syntax_strings a
-          output_multiline_section_tight 'usage', a ; nil
+
+          output_multiline_section_tight 'usage', a
+          NIL_
         end
 
         def get_full_syntax_strings
-          subject.write_full_syntax_strings__ a=[]
+          a = []
+          subject.write_full_syntax_strings__ a
           a
         end
 
         def produce_full_main_syntax_string
+
           y = [ subject_invocation_string ]
-          a = any_main_syntax_string_parts and y.concat a
+          a = any_main_syntax_string_parts
+          if a
+            y.concat a
+          end
           y * SPACE_
         end
 
         def produce_main_syntax_string
-          a = any_main_syntax_string_parts and a * SPACE_
+
+          a = any_main_syntax_string_parts
+          if a
+            a * SPACE_
+          end
         end
 
         def any_main_syntax_string_parts
-          r = any_option_glyphs
-          a = any_argument_glyphs and r ? r.concat( a ) : ( r = a )
-          r
+
+          @___custom_SSP_is_known_is_known ||= begin
+
+            # :+#experimental: :+#public-API-for-custom-option-parsers
+
+            if @op.respond_to? :main_syntax_string_parts
+
+              @_custom_SSP_is_known = true
+              @_custom_SSP = @op.main_syntax_string_parts  # nil OK
+            else
+              @_custom_SSP_is_known = false
+            end
+            ACHIEVED_
+          end
+
+          if @_custom_SSP_is_known
+            @_custom_SSP
+          else
+            __via_optparse_components_any_main_syntax_string_parts
+          end
+        end
+
+        def __via_optparse_components_any_main_syntax_string_parts
+
+          a = any_option_glyphs
+          a_ = any_argument_glyphs
+
+          if a
+            if a_
+              a.concat a_
+            end
+            a
+          else
+            a_
+          end
         end
 
         def any_option_glyphs
@@ -101,34 +158,47 @@ module Skylab::Brazen
         SHORT_HELP__ = '-h'.freeze
 
         def render_native_opt_switch_with_arg opt
+
           arity_i = argument_arity_from_native_optparse_switch opt
+
           if :zero != arity_i
             moniker = some_arg_moniker_for_switch opt
           end
+
           tail = render_argument_moniker_and_arity moniker, arity_i
+
           sw = shortest_moniker_for_opt opt
+
           "#{ sw }#{ tail }"
         end
 
         def as_opt_render_property prop
+
           look_for = "--#{ prop.name.as_slug }"
+
           found = @op.top.list.detect do |arg|
             look_for == arg.long.first
           end
+
           if found
             as_opt_render_property_when_found_opt prop, found
           end
         end
 
         def as_opt_render_property_when_found_opt prop, opt
-          arity_i = argument_arity_from_native_optparse_switch opt
+
+          arity_sym = argument_arity_from_native_optparse_switch opt
+
           head = shortest_moniker_for_opt opt
             ( opt.short ? opt.short : opt.long ).first
-          if :zero != arity_i
+
+          if :zero != arity_sym
             moniker = prop.argument_moniker
             moniker ||= some_arg_moniker_for_switch opt
           end
-          tail = render_argument_moniker_and_arity moniker, arity_i
+
+          tail = render_argument_moniker_and_arity moniker, arity_sym
+
           "#{ head }#{ tail }"
         end
 
@@ -160,6 +230,8 @@ module Skylab::Brazen
           when ::OptionParser::Switch::NoArgument ; :zero
           when ::OptionParser::Switch::PlacedArgument ; :zero_or_one_placed
           when ::OptionParser::Switch::OptionalArgument ; :zero_or_one_misplaced
+          else
+            arg.option_argument_arity
           end
         end
 

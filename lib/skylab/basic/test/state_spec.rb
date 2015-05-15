@@ -10,6 +10,8 @@ module Skylab::Basic::TestSupport
     _SM = nil
     before :all do
 
+      # (based off of the frontier production use-case)
+
       _LONG_RX___ = /\A
         --
         (?<switch> [a-zA-Z0-9]+ (?:-[a-zA-Z0-9]+)* )

@@ -1,51 +1,79 @@
 require_relative '../core'
 require 'skylab/test-support/core'
-require 'skylab/headless/test/test-support'
 
-module Skylab::Permute::TestSupport  # (was [#ts-010])
+module Skylab::Permute::TestSupport
 
-  TestLib_ = ::Module.new
+  TestSupport_ = ::Skylab::TestSupport
 
-  module Constants
-    Callback_ = ::Skylab::Callback
-    Permute_ = ::Skylab::Permute
-    TestLib_ = TestLib_
-    TestSupport_ = ::Skylab::TestSupport
-  end
+  TestSupport_::Regret[ TS_ = self ]
 
-  include Constants
+  extend TestSupport_::Quickie
 
-  # (no quickie - `after`)
+  module ModuleMethods
 
-  Callback_ = Callback_
+    def use sym
 
-  TestSupport_ = TestSupport_
-
-  TestSupport_::Regret[ self ]
-
-  module TestLib_
-
-    HL__ = Callback_::Autoloader.build_require_sidesystem_proc :Headless
-
-    Spy = -> do
-      Callback_.test_support.call_digraph_listeners_spy
-    end
-
-    Unstyle = -> do
-      HL__[]::CLI.pen.unstyle
+      _const = Callback_::Name.via_variegated_symbol( sym ).as_const
+      TS_.const_get( _const, false )[ self ]
+      NIL_
     end
   end
 
   module InstanceMethods
 
+    attr_reader :do_debug
+
     def debug!
       @do_debug = true
     end
 
-    attr_reader :do_debug
-
     def debug_IO
       TestSupport_.debug_IO
     end
+
+    def subject_API
+      Pe_.application_kernel_
+    end
+
+    def black_and_white_expression_agent_for_expect_event
+      Pe_.lib_.brazen::API.expression_agent_instance
+    end
   end
+
+  module Expect_CLI
+
+    class << self
+
+      def [] test_cls
+
+        Pe_.lib_.brazen.test_support.CLI::Expect_CLI[ test_cls ]
+
+        test_cls.include self
+
+      end
+    end  # >>
+
+    def subject_CLI
+      Pe_::CLI
+    end
+
+    def get_invocation_strings_for_expect_stdout_stderr
+      %w( pmt )
+    end
+
+    def the_list_of_all_visible_actions_for_expect_CLI
+      %w( ping generate )
+    end
+  end
+
+  Expect_Event = -> tcm do
+    Callback_.test_support::Expect_Event[ tcm ]
+  end
+
+  EMPTY_S_ = ''
+  NIL_ = nil
+  Pe_ = ::Skylab::Permute
+  Callback_ = Pe_::Callback_
 end
+
+# :+#tombstone: was [#ts-010] dark hack "one weird old tr.."

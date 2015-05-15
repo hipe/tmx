@@ -44,7 +44,7 @@ module Skylab::Brazen
 
         __resolve_name
 
-        p = __per_item_proc
+        p = __proc_for_express_all_items_via_first_item
 
         @count = 1
         begin
@@ -68,57 +68,69 @@ module Skylab::Brazen
         @name = if @item.respond_to? :name
           @item.name
         else
-          Callback_::Name.via_module @item.class
+
+          cls = @item.class
+
+          name_s = cls.name
+          if name_s
+            Callback_::Name.via_module_name name_s
+          else
+            Callback_::Name.via_module cls.superclass
+          end
         end
         NIL_
       end
 
-      def __per_item_proc
+      def __proc_for_express_all_items_via_first_item
 
-        if @item.respond_to? :execute or
-          @item.respond_to? :express_into_under or
-            ! @item.class.respond_to? :properties
+        o = @item
+        if o.respond_to? :execute
 
-          method :per_item
+          method :__express_item_via_execute
 
+        elsif o.respond_to? :express_into_under
+
+          method :__express_item_via_into_under
+
+        elsif o.respond_to? :properties
+
+          _build_listing_expresser
+
+        elsif o.respond_to? :members
+
+          _build_listing_expresser
         else
-          __build_listing_expresser
+
+          method :__express_item_via_to_s
         end
       end
 
-      def __build_listing_expresser
+      def __express_item_via_execute
+
+        @ok = @item.execute
+        NIL_
+      end
+
+      def __express_item_via_into_under
+
+        @ok = @item.express_into_under @y, @expag
+        NIL_
+      end
+
+      def __express_item_via_to_s
+
+        @y << @item
+        @ok = true
+        NIL_
+      end
+
+      def _build_listing_expresser
 
         p = When_Result_::Looks_like_stream__::Build_listing_expresser[ @expag, @item ]
         -> do
           @ok = p[ @item, @y ]
           nil
         end
-      end
-
-      def per_item
-
-        if @item.respond_to? :execute
-          via_item_execute
-
-        elsif @item.respond_to? :express_into_under
-          @ok = @item.express_into_under @y, @expag
-
-        else
-          @y << @item
-          @ok = true
-
-        end
-
-        if ! @ok
-          @count -= 1  # since it will short circuit ..
-        end
-
-        NIL_
-      end
-
-      def via_item_execute
-        @ok = @item.execute
-        nil
       end
 
       def finish_when_at_least_one

@@ -1,4 +1,4 @@
-module Skylab::GitViz::TestSupport
+module Skylab::Brazen::TestSupport::CLI
 
   module Expect_CLI
 
@@ -9,6 +9,19 @@ module Skylab::GitViz::TestSupport
         tcm.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
         tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
         tcm.include self
+
+        mem = Yikes_memoizer_for___[ tcm ]
+
+        mem.call :program_name_for_expect_CLI do
+          invocation_strings_for_expect_stdout_stderr.join SPACE_
+        end
+
+        mem.call :invocation_strings_for_expect_stdout_stderr do
+          get_invocation_strings_for_expect_stdout_stderr.
+            each( & :freeze ).freeze
+        end
+
+        mem.call :short_category_s
       end
 
       def mock_stderr_instance
@@ -17,7 +30,7 @@ module Skylab::GitViz::TestSupport
       end
     end  # >>
 
-    def mock_stderr_instance
+    def mock_stderr_instance_for_expect_CLI
 
       MOCK_STDERR__
     end
@@ -25,15 +38,6 @@ module Skylab::GitViz::TestSupport
     def invoke * argv
       using_expect_stdout_stderr_invoke_via_argv argv
     end
-
-    def subject_CLI
-      GitViz_::CLI
-    end
-
-    define_method :invocation_strings_for_expect_stdout_stderr, -> do
-      x = [ 'gvz'.freeze ].freeze
-      -> { x }
-    end.call
 
     # ~ assertion phase (ad-hocs)
 
@@ -51,7 +55,9 @@ module Skylab::GitViz::TestSupport
       _s = expect( :styled ) { |x| x }  # IDENTITY_
       _a = /\Aknown actions are \('([^\)]+)'\)\z/.match( _s )[ 1 ].split( "', '" )
 
-      h = ::Hash[ the_list_of_all_visible_actions.map { |s| [ s, true ] } ]
+      _s_a = the_list_of_all_visible_actions_for_expect_CLI
+
+      h = ::Hash[ _s_a.map { |s| [ s, true ] } ]
 
       _a.each do | s |
         h.delete( s ) or fail self.__TODO_say_extra_action( s )
@@ -72,7 +78,7 @@ module Skylab::GitViz::TestSupport
     end
 
     def expect_usage_line
-      expect :styled, "usage: gvz <action> [..]"
+      expect :styled, "usage: #{ program_name_for_expect_CLI } <action> [..]"
     end
 
     def expect_generically_invited
@@ -80,47 +86,68 @@ module Skylab::GitViz::TestSupport
       expect_failed
     end
 
+    def expect_specifically_invited_to sym
+      expect_specific_invite_line_to sym
+      expect_failed
+    end
+
     def expect_generic_invite_line
-      expect :styled, "use 'gvz -h' for help"
+
+      _expect_styled_invite_to program_name_for_expect_CLI
+    end
+
+    def expect_specific_invite_line_to sym
+
+      _expect_styled_invite_to program_name_for_expect_CLI, sym
+    end
+
+    def _expect_styled_invite_to * parts
+
+      # we are saving name inflection for when we need it
+
+      parts.push '-h'
+      expect :styled, "use '#{ parts * SPACE_ }' for help"
     end
 
     def result_for_failure_for_expect_stdout_stderr
       _memo.generic_error
     end
 
-    # ~ more ad-hoc
-
-    def the_list_of_all_visible_actions
-      %w( ping hist-tree )
-    end
-
-    # ~
-
     MOCK_STDERR__ = class Mock_Stderr___
       def write s
-        NIL_
+        nil  # NIL_
       end
       self
     end.new
 
-    define_method :_memo, -> do
-      p = -> do
+    define_method :_memo, ( Callback_.memoize do
 
-        a = [] ; a_ = []
+      a = [] ; a_ = []
 
-        es = GitViz_.lib_.brazen::API.exit_statii
-        a.push :generic_error ; a_.push es.fetch( :generic_error )
+      es = Brazen_::API.exit_statii
 
-        Memo___ = ::Struct.new( * a ).new( * a_ )
-        p = -> do
-          Memo___
+      a.push :generic_error ; a_.push es.fetch( :generic_error )
+
+      Memo___ = ::Struct.new( * a ).new( * a_ )
+    end )
+
+    Yikes_memoizer_for___ = -> cls do
+
+      -> m, & p do
+
+        val_p = nil
+
+        cls.send :define_method, m do
+
+          if val_p
+            val_p[]
+          else
+            x = instance_exec( & p )
+            val_p = -> { x }
+            x
+          end
         end
-        Memo___
       end
-      -> do
-        p[]
-      end
-    end.call
-
+    end
   end
 end

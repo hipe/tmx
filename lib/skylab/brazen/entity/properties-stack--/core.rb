@@ -112,25 +112,34 @@ module Skylab::Brazen
       end.flush_to_immutable_with_random_access_keyed_to_method :name_symbol
     end
 
-    Build_ambiguous_property_event__ = -> ent_a, x, lemma=nil do
+    Build_ambiguous_property_event__ = -> ent_a, x, lemma_x=nil do
 
       _slug_a = ent_a.map do | ent |
         ent.name.as_slug
       end
 
+      if lemma_x
+        _name = if lemma_x.respond_to? :id2name
+          Callback_::Name.via_variegated_symbol lemma_x
+        else
+          lemma_x
+        end
+      end
+
       Brazen_.event.inline_with( :ambiguous_property,
         :x, x,
         :name_s_a, _slug_a,
-        :lemma, lemma,
+        :name, _name,
         :error_category, :argument_error,
         :ok, false
       ) do | y, o |
 
         _s_a = o.name_s_a.map( & method( :val ) )
 
-        _lemma = o.lemma || DEFAULT_PROPERTY_LEMMA__
+        name = o.name
+        name ||= Callback_::Name.via_variegated_symbol DEFAULT_PROPERTY_LEMMA__
 
-        y << "ambiguous #{ _lemma } #{ ick o.x } - did you mean #{ or_ _s_a }?"
+        y << "ambiguous #{ o.name.as_human } #{ ick o.x } - did you mean #{ or_ _s_a }?"
 
       end
     end

@@ -604,9 +604,7 @@ module Skylab::Brazen
         end
       end
 
-      def via_bound_action_mutate_mutable_backbound_iambic x_a  # :+#public-API :+#hook-in but..
-
-        # .. we don't love this so use it sparingly. it might go away
+      def via_bound_action_mutate_mutable_backbound_iambic x_a  # :+#public-API :+#hook-in
 
         # ~ begin experiment: one way to give stdout to the action
 
@@ -1045,6 +1043,10 @@ module Skylab::Brazen
         EMPTY_A_
       end
 
+      def begin_option_parser  # :+#public-API
+        option_parser_class.new
+      end
+
       def option_parser_class
         Option_parser__[]
       end
@@ -1417,9 +1419,16 @@ module Skylab::Brazen
       end
 
       def __resolve_option_parser
-        op = @adapter.option_parser_class.new
-        @opt_a and @adapter.__populate_option_parser_with_generated_opts op, @opt_a
-        @op = op
+
+        op = @adapter.begin_option_parser
+        if op
+          if @opt_a
+            @adapter.__populate_option_parser_with_generated_opts op, @opt_a
+          end
+          @op = op
+        else
+          @op = nil
+        end
         NIL_
       end
 

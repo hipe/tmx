@@ -28,8 +28,11 @@ module Skylab::TestSupport
     end
 
     def release_lines
+
       @line_a or raise "lines already released"
-      r = @line_a ; @line_a = @stream_h = nil ; r
+      x = @line_a
+      @line_a = @stream_h = nil
+      x
     end
 
     def keys

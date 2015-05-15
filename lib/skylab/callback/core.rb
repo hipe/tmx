@@ -1928,7 +1928,10 @@ module Skylab::Callback
       end
 
       def via_module mod
-        s = mod.name
+        via_module_name mod.name
+      end
+
+      def via_module_name s
         d = s.rindex CONST_SEP_
         d and s = s[ d + 2 .. -1 ]
         _new_via :init_via_const_, s.intern

@@ -74,7 +74,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
   MOCK_RSX___ = class Mock_Resources___
 
     def stderr
-      Top_TS_::Expect_CLI.mock_stderr_instance
+      Top_TS_::Expect_CLI_lib[].mock_stderr_instance
     end
 
     self

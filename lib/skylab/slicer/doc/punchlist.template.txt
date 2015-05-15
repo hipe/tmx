@@ -14,7 +14,7 @@ slicer              q [ ]
 beauty-salon        q [ ]
 cull                q [ ]
 
-permute             Q [ ]
+permute             q [ ]
 file-metrics        q [ ]
 
 git                 Q [ ]

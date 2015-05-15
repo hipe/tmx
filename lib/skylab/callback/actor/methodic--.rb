@@ -354,7 +354,6 @@ module Skylab::Callback
       class Simple_Property__  # :+[#mh-053] (was [#hl-030])
 
         Actor.methodic self, :properties,
-          :argument_arity,
           :ivar,
           :parameter_arity
 
@@ -401,6 +400,7 @@ module Skylab::Callback
         end  # >>
 
         def initialize & edit_p
+          @argument_arity = nil
           @iambic_writer_method_proc_is_generated = true  # :+#public-API (name)
           @parameter_arity = :zero_or_one
           instance_exec( & edit_p )
@@ -416,9 +416,19 @@ module Skylab::Callback
 
       private
 
+        def argument_arity=
+          x = iambic_property
+          @argument_arity = x
+          if :custom == x
+            @iambic_writer_method_proc_is_generated = false
+            @iambic_writer_method_proc_proc = nil
+          end
+          KEEP_PARSING_
+        end
+
         def ignore=
           @parameter_arity = nil
-          ACHIEVED_
+          KEEP_PARSING_
         end
 
         def property=

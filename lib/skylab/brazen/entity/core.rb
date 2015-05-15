@@ -1108,7 +1108,12 @@ module Skylab::Brazen
     public  # ~ lib internal
 
       def via_name_build_internal_iambic_writer_meth_nm
-        :"___entity_#{ @name.as_variegated_symbol }_iambic_writer___"
+
+        if :custom == @argument_arity
+          :"#{ @name.as_variegated_symbol }="
+        else
+          :"___entity_#{ @name.as_variegated_symbol }_iambic_writer___"
+        end
       end
 
       class << self

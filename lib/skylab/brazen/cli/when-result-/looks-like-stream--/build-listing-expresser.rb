@@ -24,9 +24,11 @@ module Skylab::Brazen
               post_first_item = true
             end
 
+            @_ent = entity
+
             _FIELD_I_A.each do | sym |
 
-              y << _FORMAT_H.fetch( sym ) % entity.property_value_via_symbol( sym )
+              y << _FORMAT_H.fetch( sym ) % @_value_p[ sym ]
 
             end
 
@@ -38,19 +40,49 @@ module Skylab::Brazen
 
         def build_black_and_white_property_formatters
 
-          prps = @first_item.class.properties.to_a
+          __init_via_signature_of_first_item
 
-          fmt = property_value_format_string_via_props prps
+          fmt = property_value_format_string_via_props @_prps
 
           field_i_a = [] ; format_h = {}
 
-          prps.each do | prp |
+          @_prps.each do | prp |
             sym = prp.name.as_lowercase_with_underscores_symbol
             field_i_a.push sym
             format_h[ sym ] = "#{ fmt % prp.name.as_human }: %s"
           end
 
           [ field_i_a, format_h ]
+        end
+
+        def __init_via_signature_of_first_item
+
+          cls = @first_item.class
+
+          if cls.respond_to? :properties
+
+            @_prps = cls.properties.to_a
+
+            @_value_p = -> sym do
+              @_ent.property_value_via_symbol sym
+            end
+
+          else
+
+            pcls = Callback_::Actor.methodic_lib.simple_property_class
+
+            @_prps = cls.members.map do | sym |
+              pcls.new do
+                @name = Callback_::Name.via_variegated_symbol sym
+              end
+            end
+
+            @_value_p = -> sym do
+              @_ent[ sym ]
+            end
+          end
+
+          NIL_
         end
 
         def property_value_format_string_via_props props

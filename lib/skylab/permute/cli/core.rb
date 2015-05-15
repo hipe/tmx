@@ -1,238 +1,129 @@
-require_relative 'core'
-
 module Skylab::Permute
 
-  class CLI < Permute_.lib_.CLI_Client
+  class CLI < Pe_.lib_.brazen::CLI
 
-    desc "minimal permutations generator."
+    class << self
+      def new * a
+        new_top_invocation a, Pe_.application_kernel_
+      end
+    end  # >>
 
-    def self.build_client_instance rt, tok # #compat
-      app = new
-      app.parent = rt
-      app.program_name = "#{ rt.program_name } #{ tok }"
-      app
+    def expression_agent_class
+      Pe_.lib_.brazen::CLI.expression_agent_class
     end
 
-    def self.porcelain # #compat
+    Actions = ::Module.new
+    class Actions::Generate < Action_Adapter
+
+      MUTATE_THESE_PROPERTIES = [ :pair ]
+
+      def mutate__pair__properties
+
+        # exclude this formal property from the front. leave back as-is.
+
+        mutable_front_properties.remove :pair
+        NIL_
+      end
+
+      # ~ the remainder of this class is the crazy optparse
+
+      undef_method :option_parser_class  # sanity
+
+      def begin_option_parser
+
+        Sessions_::Custom_Option_Parser.new do | * i_a, & ev_p |
+
+          i_a_ = i_a.dup
+          if :directive == i_a.first
+            i_a_.reverse!
+          else
+            i_a_.unshift i_a_.pop
+          end
+
+          m = :"__receive__#{ i_a_ * UNDERSCORE_ }__"
+
+          send m, ev_p[]
+        end
+      end
+
+      def __receive__help_directive__ st
+
+        st.advance_one
+
+        if st.unparsed_exists
+          arg_s = st.current_token  # downstream this isn't used anyway so meh
+        end
+
+        @op.help_pair.last.call arg_s  # probably nil
+        NIL_
+      end
+
+      def __receive__no_arguments_case__ _
+
+        io = @resources.serr
+        io.puts 'please provide one or more name-value pairs'
+        hr = help_renderer
+        # hr.output_primary_usage_line
+        hr.output_invite_to_general_help
+        @_a = false
+        maybe_use_exit_status CLI::GENERIC_ERROR_
+        UNABLE_
+      end
+
+      def __receive__no_available_state_transition_error_case__ ev
+
+        _ev_ = ev.new_with :error_category, :optionparser_parseerror
+
+        _ex_ = _ev_.to_exception
+
+        raise _ex_  # sadly, it is "best" to follow unpleasant stdlib o.p API
+      end
+
+      def __receive__parsed_nodes_payload_array__ a
+
+        @_a = a
+        NIL_
+      end
+
+      def via_bound_action_mutate_mutable_backbound_iambic x_a
+
+        if @_a
+          Actors_::Convert_parse_tree_into_iambic_arguments[
+            x_a, @_a, & handle_event_selectively ]
+        else
+          @_a
+        end
+      end
+    end
+
+    Client = self
+
+    module Adapter
+      module For
+        module Face
+          module Of
+            Hot = -> namespace_sheet, my_CLI_class do
+              -> k, _ do
+
+                s_a = k.get_normal_invocation_string_parts
+                s_a.push namespace_sheet.name.as_slug
+
+                my_CLI_class.new( k.istream, k.ostream, k.estream, s_a )
+              end
+            end
+          end
+        end
+      end
+    end
+    def pre_execute
+      ACHIEVED_
+    end
+    def invokee
       self
     end
 
-  private
-
-    param_h = {
-      0 => -> _, b do
-        if b
-          b[ self ]
-        else
-          # fail "block?" - egads no, testing
-        end
-      end,
-      3 => -> a, b do
-        if b
-          fail "block and args?"
-        else
-          self.parent = Permute_.lib_.CLI_lib::IO::Adapter::Minimal.new( *a )
-        end
-      end
-    }
-
-    define_method :initialize do |*a, &b|      # please pardon our blood
-      instance_exec a, b, & param_h.fetch( a.length )
-    end
-
-    Client = self  # #tmx-compat
-  end
-
-  class CLI::Action
-
-    extend Permute_.lib_.CLI_Action
-
-    Callback_[ self, :employ_DSL_for_digraph_emitter ]
-
-    listeners_digraph  syntax_error: :info
-
-    def self.build runtime
-      act = new
-      act.parent = runtime
-      act.on_info do |e|
-        runtime.call_digraph_listeners :info, e
-      end
-      act.on_payload do |e|
-        runtime.call_digraph_listeners :payload, e
-      end
-      act
-    end
-
-    def build_digraph_event x, _i, _esg
-      x
-    end
-  end
-
-  module CLI::Actions
-  end
-
-  class HackParse
-
-    attr_accessor :live_action
-
-    def any?
-      true
-    end
-
-    def help line
-      str = @live_action.instance_exec do
-        "#{ hdr 'syntax:' } for now, the namespace of all switches is only #{
-          }for your aspect values."
-      end
-      line[ str ]
-      nil
-    end
-
-    class Enum
-
-      attr_reader :local_normal_name
-
-      attr_reader :value_a
-
-      def length
-        @value_a.length
-      end
-
-      def label
-        @local_normal_name.to_s
-      end
-
-      def initialize norm_name
-        @value_a = []
-        @local_normal_name = norm_name
-      end
-    end
-
-    def parse argv, args, help, error  # (unhack as needed)
-      extent = argv.reduce(
-        ::Struct.new( :long, :short, :short_of_long ).new(
-          * 3.times.map { ::Hash.new 0 }
-        )
-      ) do |m, token|
-        case token
-        when /^--(?!help)(([-a-zA-Z0-9])[-a-zA-Z0-9]*)/
-          m.long[$1]  += 1
-          m.short_of_long[$2] += 1
-        when /^-(?!h)([a-zA-Z0-9])/
-          m.short[$1] += 1
-        end
-        m
-      end
-
-      list = []
-      hash = ::Hash.new do |h, k|
-        x = Enum.new k
-        list << x
-        h[k] = x
-      end
-
-      done = false ; res = nil
-      op = ::OptionParser.new  # as soon as you have to nerk with this [#ps-008]
-      b = -> name do
-        -> value do
-          hash[name.intern].value_a << value
-          nil
-        end
-      end
-      len = ( extent.short.keys - extent.short_of_long.keys ).length
-      if 0 == len
-        extent.long.keys.each do |n|
-          op.on "-#{ n[0, 1] }<VALUE>", "--#{ n } <VALUE>",
-            "a value of #{ n }", & b[n]
-        end
-      else
-        extent.long.keys.each do |n|
-          op.on "--#{ n } <VALUE>", "a value of #{ n }", & b[n]
-        end
-        extent.short.keys.each do |n|
-          op.on "-#{ n }<VALUE>", "a value of #{ n }", & b[n]
-        end
-      end
-      if 2 > argv.length  # omg so weird - don't process '-h' as help when..
-        op.on '-h', '--help' do
-          res = help[]
-          done = true
-        end
-      end
-      begin
-        op.parse!(argv)
-      rescue ::OptionParser::ParseError => e
-        error[ e ]
-        res = false
-        done = true
-      end
-      if ! done
-        if list.empty?
-          res = error[ 'please provide one or more --<aspect> values.' ]
-          done = false
-        else
-          args.push list
-          res = true
-        end
-      end
-      res
-    end
-
-    def string
-      "--a-aspect <val1> -a<v2> --b-aspect <val3> -b<v4> [..]"
-    end
-  end
-
-  class CLI::Actions::Ping < CLI::Action
-
-    listeners_digraph  :info, help: :info
-
-    def on_payload
-      # we don't actually, and we don't want to lie about it.
-    end
-
-    def process
-      call_digraph_listeners :info, "hello from permute."
-      :hello_from_permute
-    end
-  end
-
-  class CLI::Actions::Generate < CLI::Action
-
-    desc "generate permutations."
-
-    listeners_digraph  :payload, :info, help: :info
-
-    opt_syn = -> do  # hacklund
-      op = HackParse.new
-      opt_syn = -> { op }
-      op
-    end
-
-    define_singleton_method :option_syntax do opt_syn[] end
-
-    define_method :option_syntax do
-      hack = opt_syn.call
-      hack.live_action = self # so so bad
-      hack
-    end
-
-    def process enum_a
-      Permute_::API::Actions::Generate.new enum_a do |o|
-        row_a = []
-        o.on_header do |pairs|
-          row_a << pairs.map { |_, label| hdr label }
-        end
-        o.on_row do |pairs|
-          row_a << pairs.map { |_, value| value }
-        end
-        o.on_finished do
-          Permute_.lib_.table.render row_a do |oo|
-            oo.on_info { |txt| call_digraph_listeners :info, txt }
-            oo.on_row  { |txt| call_digraph_listeners :payload, txt }
-          end
-        end
-      end.execute
-    end
+    Autoloader_[ Actors_ = ::Module.new ]
+    EMPTY_A_ = [].freeze
+    Autoloader_[ Sessions_ = ::Module.new ]
   end
 end

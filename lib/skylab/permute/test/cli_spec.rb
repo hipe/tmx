@@ -1,94 +1,80 @@
 require_relative 'test-support'
-require 'skylab/callback/test/test-support'  # keep here until needed elsewhere
 
-module Skylab::Permute::TestSupport::CLI  # (was [#ts-010])
+module Skylab::Permute::TestSupport
 
-  ::Skylab::Permute::TestSupport[ TS_ = self ]
+  describe "[pe] CLI" do
 
-  include Constants
+    extend TS_
+    use :expect_CLI
 
-  Permute_ = Permute_
-  TestLib_ = TestLib_
+    # INVITE_RX = /try.+permoot.+for help/
+    it '0     no args - says expecting / usage / invite' do
 
-describe "[pe] CLI" do  # :+#no-quickie because `after`
-
-  extend TS_
-
-  before :all do  # just a bad idea all around, but we want to see how it goes
-    cli = Permute_::CLI.new
-    cli.program_name = 'permoot'
-    spy = TestLib_::Spy[].new(
-      :debug_IO, debug_IO,
-      :do_debug_proc, -> { do_debug } )
-    cli.singleton_class.send(:define_method, :call_digraph_listeners) do |type, payload|
-      spy.call_digraph_listeners(type, payload)
-    end
-    @cli = cli ; @spy = spy
-  end
-
-  after { @spy.clear! } # you are so dumb
-
-  attr_reader :cli, :spy
-
-  unstyle = TestLib_::Unstyle[]
-
-  let :out do
-    spy.emission_a.map do |e| unstyle[ e.payload_x ] end
-  end
-
-  USAGE_RX = /usage.+permoot.+opts.+args/
-
-  INVITE_RX = /try.+permoot.+for help/
-
-  context 'no args' do
-    it 'says expecting / usage / invite' do
-      cli.invoke([])
-      out.shift.should match(/expecting.+generate/)
-      out.shift.should match(USAGE_RX)
-      out.shift.should match(INVITE_RX)
-      out.should be_empty
-    end
-  end
-
-  context 'one wrong arg' do
-    it 'says invalid action / usage / invite' do
-      cli.invoke(['foiple'])
-      out.shift.should match(/invalid action.+foiple.+expecting/)
-      out.shift.should match(USAGE_RX)
-      out.shift.should match(INVITE_RX)
-      out.should be_empty
-    end
-  end
-
-  context 'when using the "generate" subcommand' do
-    context 'with no other args' do
-      it 'says custom expecting / custom usage / invite' do
-        cli.invoke(['generate'])
-        out.shift.should match(/please provide one or more/)
-        out.shift.should match(/usage.+permoot generate --a-aspect/)
-        out.shift.should match(INVITE_RX)
-        out.should be_empty
-      end
+      invoke
+      expect_generic_expecting_line
+      expect_usaged_and_invited
     end
 
-    context 'with one lovely set of args' do
-      it 'works splendidly' do
-        cli.invoke( %w(generate --flavor vanilla -fchocolate
-          --cone sugar -cwaffe -ccup) )
-        exp = <<-HERE.gsub(/^ +/, '').strip
-          flavor    cone
-          vanilla   sugar
-          chocolate sugar
-          vanilla   waffe
-          chocolate waffe
-          vanilla   cup
-          chocolate cup
-        HERE
-        act = out.map(&:strip).join("\n")
-        act.should eql(exp)
-      end
+    it '1.1   one wrong arg - says invalid action / usage / invite' do
+
+      invoke 'foiple'
+      expect_whine_about_unrecognized_action :foiple
+      expect_express_all_known_actions
+      expect_generically_invited
+    end
+
+    it '0     (under generate cmd) says custom expecting / invite' do
+
+      invoke 'generate'
+      expect %r(\bplease provide one or more\b)
+      expect_specifically_invited_to :generate
+    end
+
+    it "MONEY SHOT - the pipeline complains about ambiguity" do
+
+      using_expect_stdout_stderr_invoke_via_argv(
+        %w( generate --county=washtenaw --coint=pariah -c fooz ) )
+
+      expect :styled,
+        'ambiguous category letter \'c\' - did you mean "county" or "coint"?'
+
+      expect_specifically_invited_to :generate
+    end
+
+    it "k." do
+
+      using_expect_stdout_stderr_invoke_via_argv(
+        %w(generate --flavor vanilla -fchocolate --cone sugar -cwaffle -ccup) )
+
+      _a =  @IO_spy_group_for_expect_stdout_stderr.release_lines
+
+      _act = _a.map( & :string ).join( EMPTY_S_ ).should eql(
+
+      <<-HERE.unindent
+        flavor: vanilla
+          cone: sugar
+        ---
+        flavor: chocolate
+          cone: sugar
+        ---
+        flavor: vanilla
+          cone: waffle
+        ---
+        flavor: chocolate
+          cone: waffle
+        ---
+        flavor: vanilla
+          cone: cup
+        ---
+        flavor: chocolate
+          cone: cup
+        (6 structs total)
+      HERE
+      )
+
+      @exitstatus.should be_zero
     end
   end
 end
-# ..
-end
+
+# :+#tombstone: was [#ts-010]
