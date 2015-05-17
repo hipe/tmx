@@ -48,11 +48,11 @@ module Skylab::Brazen::TestSupport::Entity
             end
 
             def mingle
-              @mingle_x = iambic_property
+              @mingle_x = gets_one_polymorphic_value
             end
 
             def mongle
-              @mongle_x = iambic_property
+              @mongle_x = gets_one_polymorphic_value
             end
           end
 

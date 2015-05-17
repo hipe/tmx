@@ -56,41 +56,41 @@ module Skylab::Callback
       end
 
       def process_iambic_fully x_a
-        process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+        process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
         nil
       end
 
-      include Callback_::Actor.methodic_lib.iambic_processing_instance_methods
+      include Callback_::Actor.methodic_lib.polymorphic_processing_instance_methods
 
     private
 
       def key_method_name=
-        @key_method_name = iambic_property
+        @key_method_name = gets_one_polymorphic_value
         KEEP_PARSING_
       end
 
       def each_pair_mapper=
-        @each_pair_mapper = iambic_property
+        @each_pair_mapper = gets_one_polymorphic_value
         KEEP_PARSING_
       end
 
       def on_assignment_via_value_and_name=
-        @on_assignment_via_value_and_name = iambic_property
+        @on_assignment_via_value_and_name = gets_one_polymorphic_value
         KEEP_PARSING_
       end
 
       def upstream=  # use for one-offs, not curries
-        _receive_upstream iambic_property
+        _receive_upstream gets_one_polymorphic_value
         KEEP_PARSING_
       end
 
       def upstream_proc=  # use for curries, not one-offs
-        @produce_upstream_p = iambic_property
+        @produce_upstream_p = gets_one_polymorphic_value
         KEEP_PARSING_
       end
 
       def value_mapper=  # #ra-105 in [#044]
-        @value_mapper = iambic_property
+        @value_mapper = gets_one_polymorphic_value
         KEEP_PARSING_
       end
 

@@ -19,24 +19,24 @@ module Skylab::System
 
           Entity_.call self do
 
-            o :iambic_writer_method_name_suffix, :"="
+            o :polymorphic_writer_method_name_suffix, :"="
 
             def path=
               @do_execute = true
-              @path_arg = Callback_::Trio.via_x_and_i iambic_property, :path
+              @path_arg = Callback_::Trio.via_x_and_i gets_one_polymorphic_value, :path
               ACHIEVED_
             end
 
             def pathname=
               @do_execute = true
-              @path_arg = Callback_::Trio.via_x_and_i iambic_property, :path
+              @path_arg = Callback_::Trio.via_x_and_i gets_one_polymorphic_value, :path
               @value_is_pathname = true
               ACHIEVED_
             end
 
             def path_arg=  # LOOK a trio, not a value
               @do_execute = true
-              @path_arg = iambic_property
+              @path_arg = gets_one_polymorphic_value
               @path_arg_was_explicit = true
               ACHIEVED_
             end
@@ -48,7 +48,7 @@ module Skylab::System
 
             def only_apply_expectation_that_path_is_ftype_of=
               @only_apply_ftype_expectation = true
-              @expected_ftype = iambic_property
+              @expected_ftype = gets_one_polymorphic_value
               ACHIEVED_
             end
 
@@ -58,7 +58,7 @@ module Skylab::System
                 :stat
 
             def dash_means=
-              @dash_means = iambic_property
+              @dash_means = gets_one_polymorphic_value
               KEEP_PARSING_
             end
           end

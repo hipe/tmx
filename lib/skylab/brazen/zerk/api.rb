@@ -72,7 +72,7 @@ module Skylab::Brazen
       end
 
       def when_second_node_is_leaf
-        x = @node_.receive_iambic_stream @scan
+        x = @node_.receive_polymorphic_stream @scan
         if @node_.is_terminal_node
           @reached_terminal_node = true
           @result = Brazen_.bound_call.via_value x

@@ -13,12 +13,12 @@ module Skylab::Brazen::TestSupport::Entity
           Subject_[].call self do
 
             def foo
-              @foo = iambic_property
+              @foo = gets_one_polymorphic_value
               true
             end
 
             def bar
-              @bar = iambic_property
+              @bar = gets_one_polymorphic_value
               true
             end
           end

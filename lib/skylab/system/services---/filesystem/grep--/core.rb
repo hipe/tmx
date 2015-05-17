@@ -10,20 +10,20 @@ module Skylab::System
           def mixed_via_iambic x_a, & oes_p
 
             new do
-              process_iambic_stream_fully iambic_stream_via_iambic_array( x_a ), & oes_p
+              process_polymorphic_stream_fully polymorphic_stream_via_iambic( x_a ), & oes_p
             end.mixed_result
           end
         end
 
         Callback_::Actor.methodic self, :simple, :properties,
 
-          :iambic_writer_method_to_be_provided, :property, :ignore_case,
+          :polymorphic_writer_method_to_be_provided, :property, :ignore_case,
 
-          :iambic_writer_method_to_be_provided, :property, :do_ignore_case,
+          :polymorphic_writer_method_to_be_provided, :property, :do_ignore_case,
 
-          :iambic_writer_method_to_be_provided, :property, :path,
+          :polymorphic_writer_method_to_be_provided, :property, :path,
 
-          :iambic_writer_method_to_be_provided, :property, :paths,
+          :polymorphic_writer_method_to_be_provided, :property, :paths,
 
           :properties, :grep_extended_regexp_string, :ruby_regexp,
             :on_event_selectively, :as_normal_value
@@ -48,17 +48,17 @@ module Skylab::System
 
         def do_ignore_case=
           @ignore_case_is_known = true
-          @do_ignore_case = iambic_property
+          @do_ignore_case = gets_one_polymorphic_value
           KEEP_PARSING_
         end
 
         def path=
-          ( @unescaped_path_s_a ||= [] ).clear.push iambic_property
+          ( @unescaped_path_s_a ||= [] ).clear.push gets_one_polymorphic_value
           KEEP_PARSING_
         end
 
         def paths=
-          @unescaped_path_s_a = iambic_property
+          @unescaped_path_s_a = gets_one_polymorphic_value
           KEEP_PARSING_
         end
 

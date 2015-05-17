@@ -13,11 +13,11 @@ module Skylab::Brazen::TestSupport::Entity
           Subject_[].call self do
 
             def foo
-              @foo_x = iambic_property
+              @foo_x = gets_one_polymorphic_value
             end
 
             def bar
-              @bar_x = iambic_property
+              @bar_x = gets_one_polymorphic_value
             end
 
           end
@@ -60,9 +60,9 @@ module Skylab::Brazen::TestSupport::Entity
     it "DSL syntax fail - strange value" do
       -> do
         class FooI_PityVal
-          Subject_[][ self, :iambic_writer_method_name_suffix ]
+          Subject_[][ self, :polymorphic_writer_method_name_suffix ]
         end
-      end.should raise_error ::ArgumentError, /\bexpecting a value for 'iambic_/
+      end.should raise_error ::ArgumentError, /\bexpecting a value for 'polymorphic_/
     end
 
     context "iambic writer postfix option (& introduction to using the DSL)" do
@@ -70,9 +70,9 @@ module Skylab::Brazen::TestSupport::Entity
       before :all do
         class FooI_With_Postfix
           attr_reader :x
-          Subject_[].call self, :iambic_writer_method_name_suffix, :'=' do
+          Subject_[].call self, :polymorphic_writer_method_name_suffix, :'=' do
             def some_writer=
-              @x = iambic_property
+              @x = gets_one_polymorphic_value
             end
           end
           Enhance_for_test_[ self ]
@@ -87,7 +87,7 @@ module Skylab::Brazen::TestSupport::Entity
         _rx = /\bdid not have expected suffix '_derp': 'ferp'/
         -> do
         class FooI_Bad_Suffixer
-          Subject_[].call self, :iambic_writer_method_name_suffix, :_derp do
+          Subject_[].call self, :polymorphic_writer_method_name_suffix, :_derp do
             def ferp
             end
           end

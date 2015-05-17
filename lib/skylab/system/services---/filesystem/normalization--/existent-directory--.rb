@@ -11,7 +11,7 @@ module Skylab::System
 
           Entity_.call self do
 
-            o :iambic_writer_method_name_suffix, :'='
+            o :polymorphic_writer_method_name_suffix, :'='
 
             def create_if_not_exist=
               @do_create_if_not_exist = true
@@ -19,7 +19,7 @@ module Skylab::System
 
             def path=
               @ready_to_execute = true
-              @path_x = iambic_property
+              @path_x = gets_one_polymorphic_value
             end
 
             o :properties,
@@ -56,7 +56,7 @@ module Skylab::System
 
           def init * x_a, & oes_p
             @on_event_selectively = oes_p
-            process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+            process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
             nil
           end
 

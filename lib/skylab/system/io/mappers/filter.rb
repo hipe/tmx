@@ -14,22 +14,22 @@ module Skylab::System
 
         System_.lib_.entity self do
 
-          o :iambic_writer_method_name_suffix, :'='
+          o :polymorphic_writer_method_name_suffix, :'='
 
           def line_begin_string=
-            s = iambic_property
+            s = gets_one_polymorphic_value
             s and set_line_begin_proc -> { @downstream_IO.write s }
             ACHIEVED_
           end
 
           def line_begin_proc=
-            p = iambic_property
+            p = gets_one_polymorphic_value
             p and set_line_begin_proc p
             ACHIEVED_
           end
 
           def line_end_proc=
-            p = iambic_property
+            p = gets_one_polymorphic_value
             p and set_line_end_proc p
             ACHIEVED_
           end
@@ -40,7 +40,7 @@ module Skylab::System
             # in the order received in a reduce operation, the result being
             # what is finally passed to puts
 
-            p = iambic_property
+            p = gets_one_polymorphic_value
             p and ( @puts_map_p_a ||= [] ).push p
             ACHIEVED_
           end
@@ -64,7 +64,7 @@ module Skylab::System
             x_a.unshift :downstream_IO
           end
 
-          process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+          process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
 
           @niladic_pass_filter_proc ||= NILADIC_TRUTH_
 

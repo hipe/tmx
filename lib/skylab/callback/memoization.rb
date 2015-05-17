@@ -93,11 +93,11 @@ module Skylab::Callback
       end
 
       def receive_iambic x_a
-        _ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+        _ok = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
         _ok and execute
       end
 
-      include Callback_::Actor.methodic_lib.iambic_processing_instance_methods
+      include Callback_::Actor.methodic_lib.polymorphic_processing_instance_methods
 
     private
 
@@ -112,12 +112,12 @@ module Skylab::Callback
       end
 
       def fly_p=
-        @fly_p = iambic_property
+        @fly_p = gets_one_polymorphic_value
         KEEP_PARSING_
       end
 
       def new_stays_public=
-        @make_new_private = ! iambic_property
+        @make_new_private = ! gets_one_polymorphic_value
         KEEP_PARSING_
       end
 

@@ -23,7 +23,7 @@ module Skylab::Parse
         end
 
         def accept_iambic x_a
-          process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+          process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
           nil
         end
 
@@ -33,26 +33,26 @@ module Skylab::Parse
 
         def any_first_constituent_string=
           @expag = nil
-          @x_h[ :any_first_constituent_string ] = iambic_property
+          @x_h[ :any_first_constituent_string ] = gets_one_polymorphic_value
           KEEP_PARSING_
         end
 
         def any_subsequent_constituent_string=
           @expag = nil
-          @x_h[ :any_subsequent_constituent_string ] = iambic_property
+          @x_h[ :any_subsequent_constituent_string ] = gets_one_polymorphic_value
           KEEP_PARSING_
         end
 
         def constituent_string_via_constituent_badge=
           @cdpsbs = false
           @expag = nil
-          @x_h[ :constituent_string_via_constituent_badge ] = iambic_property
+          @x_h[ :constituent_string_via_constituent_badge ] = gets_one_polymorphic_value
           KEEP_PARSING_
         end
 
         def express_all_segments_into_under_of_constituent_reflective_function=
           @expag = nil
-          @x_h[ :express_all_segments_into_under_of_constituent_reflective_function ] = iambic_property
+          @x_h[ :express_all_segments_into_under_of_constituent_reflective_function ] = gets_one_polymorphic_value
           KEEP_PARSING_
         end
 
@@ -136,7 +136,7 @@ module Skylab::Parse
           def new_via_iambic x_a
             ok = nil
             x = dup.instance_exec do
-              ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+              ok = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
               self
             end
             ok && x.freeze

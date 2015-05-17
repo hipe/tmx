@@ -98,7 +98,7 @@ module Skylab::TestSupport
           nil
         end
 
-        def bound_call_against_iambic_stream st, & oes_p
+        def bound_call_against_polymorphic_stream st, & oes_p
 
           :arg == st.gets_one or raise ::ArgumentError
           a = st.gets_one

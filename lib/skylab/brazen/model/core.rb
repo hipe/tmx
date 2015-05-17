@@ -219,7 +219,7 @@ module Skylab::Brazen
 
     # [#013]:#note-A the below order
 
-    include Callback_::Actor.methodic_lib.iambic_processing_instance_methods
+    include Callback_::Actor.methodic_lib.polymorphic_processing_instance_methods
 
     include Brazen_::Entity::Instance_Methods
 
@@ -933,7 +933,7 @@ module Skylab::Brazen
         sess.receive_top_bound_node @model_class.new( @kernel, & oes_p )
 
         if sess.via_current_branch_resolve_action_promotion_insensitive
-          st = sess.iambic_stream
+          st = sess.polymorphic_stream
           h = { trio_box: nil, preconditions: nil }
           while st.unparsed_exists
             if :with == st.current_token
@@ -960,7 +960,7 @@ module Skylab::Brazen
             ok = act.process_pair_box_passively trio_box
           end
 
-          ok &&= act.process_iambic_stream_fully_ st
+          ok &&= act.process_polymorphic_stream_fully_ st
           ok and act.via_arguments_produce_bound_call
         else
           sess.bound_call

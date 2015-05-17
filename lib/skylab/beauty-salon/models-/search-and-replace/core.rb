@@ -335,8 +335,8 @@ module Skylab::BeautySalon
         marshal_load s
       end
 
-      def against_nonempty_iambic_stream stream
-        against_nonempty_iambic_stream_assume_string stream
+      def against_nonempty_polymorphic_stream stream
+        against_nonempty_polymorphic_stream_assume_string stream
       end
 
       def marshal_load s
@@ -402,7 +402,7 @@ module Skylab::BeautySalon
         PROCEDE_
       end
 
-      def against_nonempty_iambic_stream stream
+      def against_nonempty_polymorphic_stream stream
         @rx = stream.gets_one
         ACHIEVED_
       end
@@ -477,7 +477,7 @@ module Skylab::BeautySalon
         @o ? ACHIEVED_ : UNABLE_
       end
 
-      def against_nonempty_iambic_stream st
+      def against_nonempty_polymorphic_stream st
 
         if st.current_token.respond_to? :call
           receive_matchdata_values = st.gets_one
@@ -486,7 +486,7 @@ module Skylab::BeautySalon
           end
           ACHIEVED_
         else
-          against_nonempty_iambic_stream_assume_string st
+          against_nonempty_polymorphic_stream_assume_string st
         end
       end
 
@@ -569,7 +569,7 @@ module Skylab::BeautySalon
         end
       end
 
-      def against_nonempty_iambic_stream stream
+      def against_nonempty_polymorphic_stream stream
         s = stream.gets_one
         if SOME_SPACE_RX_ =~ s
           maybe_send_event :error do

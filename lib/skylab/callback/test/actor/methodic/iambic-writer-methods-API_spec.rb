@@ -16,18 +16,18 @@ module Skylab::Callback::TestSupport::Actor::Methodic::IWM
 
   describe "[ca] actor - methodic - iambic writer methods API" do
 
-    context "`iambic_writer_method_to_be_provided`" do
+    context "`polymorphic_writer_method_to_be_provided`" do
 
       before :all do
 
         class A
           Grandparent_Subject_[].methodic self, :simple, :properties,
-            :iambic_writer_method_to_be_provided, :property, :zippy
+            :polymorphic_writer_method_to_be_provided, :property, :zippy
 
         private
           def zippy=
-            @tungsten = iambic_property
-            @bungsten = iambic_property
+            @tungsten = gets_one_polymorphic_value
+            @bungsten = gets_one_polymorphic_value
           end
 
           Enhance_for_test_[ self ]
@@ -47,14 +47,14 @@ module Skylab::Callback::TestSupport::Actor::Methodic::IWM
       end
     end
 
-    context "`iambic_writer_method_proc_proc`" do
+    context "`polymorphic_writer_method_proc_proc`" do
 
       before :all do
 
         Do_this_thing = -> prop do
           _IVAR = prop.as_ivar
           -> do
-            x = iambic_property
+            x = gets_one_polymorphic_value
             instance_variable_set _IVAR, "<< #{ x.upcase } >>"
           end
         end
@@ -62,7 +62,7 @@ module Skylab::Callback::TestSupport::Actor::Methodic::IWM
         class B
 
           Grandparent_Subject_[].methodic self, :simple, :properties,
-            :iambic_writer_method_proc_proc, Do_this_thing, :property, :ohai,
+            :polymorphic_writer_method_proc_proc, Do_this_thing, :property, :ohai,
             :property, :hey
 
           alias_method :initialize, :instance_exec

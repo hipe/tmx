@@ -43,7 +43,7 @@ module Skylab::Basic
 
       def input_string=
 
-        x = iambic_property
+        x = gets_one_polymorphic_value
         if x
           if @_input_shape
             raise ::ArgumentError
@@ -56,7 +56,7 @@ module Skylab::Basic
 
       def input_words=
 
-        x = iambic_property
+        x = gets_one_polymorphic_value
         if x
           if @_input_shape
             raise ::ArgumentError

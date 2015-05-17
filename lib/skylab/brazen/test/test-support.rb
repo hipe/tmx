@@ -104,7 +104,7 @@ module Skylab::Brazen::TestSupport
   WITH_MODULE_METHOD_ = -> * x_a do
     ok = nil
     x = new do
-      ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+      ok = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
     end
     ok && x
   end
@@ -114,14 +114,14 @@ module Skylab::Brazen::TestSupport
     attr_reader :bx
 
     def process_fully * x_a
-      process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+      process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
     end
 
   private
 
     def procez * x_a
-      _st = iambic_stream_via_iambic_array x_a
-      _ok = process_iambic_stream_fully _st
+      _st = polymorphic_stream_via_iambic x_a
+      _ok = process_polymorphic_stream_fully _st
       _ok && normalize
     end
 

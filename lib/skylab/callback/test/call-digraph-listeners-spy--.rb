@@ -4,7 +4,7 @@ module Skylab::Callback::TestSupport
 
     Callback_.lib_.entity self do
 
-      o :iambic_writer_method_name_suffix, :'='
+      o :polymorphic_writer_method_name_suffix, :'='
 
       def debug=
         @do_debug_proc = Callback_::NILADIC_TRUTH_
@@ -24,7 +24,7 @@ module Skylab::Callback::TestSupport
 
     def init_via_iambic x_a
       @emission_a = []
-      process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+      process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
       @do_debug_proc ||= EMPTY_P_
     end
 

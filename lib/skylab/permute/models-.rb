@@ -41,9 +41,9 @@ module Skylab::Permute
 
       def pair=   # must be public here, distinct from actor
 
-        name_x = iambic_property
+        name_x = gets_one_polymorphic_value
 
-        _pair = Callback_::Pair.new iambic_property, name_x
+        _pair = Callback_::Pair.new gets_one_polymorphic_value, name_x
 
         @argument_box.touch :pair do
           []

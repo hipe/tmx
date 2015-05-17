@@ -414,7 +414,7 @@ module Skylab::MetaHell
         @d = 0
       end
     private
-      def iambic_property
+      def gets_one_polymorphic_value
         @iambic_scan.gets_one
       end
     public

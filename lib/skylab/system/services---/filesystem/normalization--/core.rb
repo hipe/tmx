@@ -67,7 +67,7 @@ module Skylab::System
               @on_event_selectively = x_p
             end
 
-            ok = process_iambic_stream_fully st
+            ok = process_polymorphic_stream_fully st
           end
           ok && o.execute
         end
@@ -118,7 +118,7 @@ module Skylab::System
               ok = nil
               x = new do
                 accept_selective_listener_proc oes_p
-                ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+                ok = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
               end
               ok and x.produce_mixed_result
             else

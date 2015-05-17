@@ -39,9 +39,9 @@ module Skylab::System
 
         Callback_::Actor.methodic self, :simple, :properties,
 
-          :iambic_writer_method_to_be_provided, :property, :line_upstream,
+          :polymorphic_writer_method_to_be_provided, :property, :line_upstream,
 
-          :iambic_writer_method_to_be_provided, :property, :path,
+          :polymorphic_writer_method_to_be_provided, :property, :path,
 
           :property, :on_event_selectively
 
@@ -61,7 +61,7 @@ module Skylab::System
         end
 
         def line_upstream=
-          x = iambic_property
+          x = gets_one_polymorphic_value
           if x
             @line_upstream = x
             @resolve_line_upstream_method_name = :OK
@@ -70,7 +70,7 @@ module Skylab::System
         end
 
         def path=
-          x = iambic_property
+          x = gets_one_polymorphic_value
           if x
             @path = x
             @resolve_line_upstream_method_name = :via_path_resolve_line_upstream

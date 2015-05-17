@@ -32,9 +32,9 @@ module Skylab::Brazen::TestSupport::Entity
         class AHP_Child < AHP_Base
           attr_reader :foo, :baz
           Subject_[].call self do
-            o :iambic_writer_method_name_suffix, :'='
+            o :polymorphic_writer_method_name_suffix, :'='
             def foo=
-              @foo = iambic_property
+              @foo = gets_one_polymorphic_value
             end
             o :gazoink, [ :bar, :baz ]
             def biff=

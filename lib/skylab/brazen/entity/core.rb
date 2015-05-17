@@ -29,7 +29,7 @@ module Skylab::Brazen
         Callback_::Event
       end
 
-      def mutable_iambic_stream
+      def mutable_polymorphic_stream
         Entity::Compound_Iambic_Scanner__::Mutable_Iambic_Scanner
       end
 
@@ -99,7 +99,7 @@ module Skylab::Brazen
       end
 
       def initialize up
-        @p = up.method :process_iambic_stream_passively
+        @p = up.method :process_polymorphic_stream_passively
       end
 
       def receive_parse_context pc
@@ -168,7 +168,7 @@ module Skylab::Brazen
       attr_reader :edit_session, :upstream
 
       def downstream
-        @edit_session.iambic_writer_method_writee_module
+        @edit_session.polymorphic_writer_method_writee_module
       end
     end
 
@@ -176,7 +176,7 @@ module Skylab::Brazen
 
     class Module_Edit_Session__
 
-      include METHODIC_.iambic_processing_instance_methods
+      include METHODIC_.polymorphic_processing_instance_methods
 
     end
 
@@ -188,25 +188,25 @@ module Skylab::Brazen
 
       def init_to_create_new_module
 
-        @iambic_writer_method_writee_module = ::Module.new
+        @polymorphic_writer_method_writee_module = ::Module.new
         @writable_formal_propery_method_names_box = Callback_::Box.new
         @formal_property_writee_module = ::Module.new
 
-        @iambic_writer_method_writee_module.include METHODIC_.iambic_processing_instance_methods
+        @polymorphic_writer_method_writee_module.include METHODIC_.polymorphic_processing_instance_methods
 
-        @iambic_writer_method_writee_module.include Instance_Methods
+        @polymorphic_writer_method_writee_module.include Instance_Methods
 
         nil
       end
 
       def init_to_produce_extension_of_extension extmod
 
-        @iambic_writer_method_writee_module = ::Module.new
+        @polymorphic_writer_method_writee_module = ::Module.new
         @writable_formal_propery_method_names_box =
           extmod::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___.dup
         @formal_property_writee_module = ::Module.new
 
-        @iambic_writer_method_writee_module.include extmod
+        @polymorphic_writer_method_writee_module.include extmod
         @formal_property_writee_module.include extmod::Module_Methods
 
         nil
@@ -214,7 +214,7 @@ module Skylab::Brazen
 
       def execute
 
-        mod = @iambic_writer_method_writee_module
+        mod = @polymorphic_writer_method_writee_module
         box = @writable_formal_propery_method_names_box
         mod_ = @formal_property_writee_module
 
@@ -238,7 +238,7 @@ module Skylab::Brazen
     class Class_Edit_Session__ < Module_Edit_Session__
 
       def initialize cls
-        @iambic_writer_method_writee_module = cls
+        @polymorphic_writer_method_writee_module = cls
         cls.include Instance_Methods
         init_edit_session_via_extended_included_client_module cls
         @formal_property_writee_module = cls.singleton_class
@@ -261,7 +261,7 @@ module Skylab::Brazen
           Methodic_as_Nonterminal_[ self ] )
       end
 
-      attr_reader :iambic_writer_method_writee_module  # for e.g p.stack
+      attr_reader :polymorphic_writer_method_writee_module  # for e.g p.stack
 
       attr_reader :property_related_nonterminal  # hax only (covered)
 
@@ -281,9 +281,9 @@ module Skylab::Brazen
         end
         if x
           if edit_p
-            x = @iambic_writer_method_writee_module.module_exec( & edit_p )  # so result is user's result
+            x = @polymorphic_writer_method_writee_module.module_exec( & edit_p )  # so result is user's result
           else
-            x = @iambic_writer_method_writee_module  # so `[]` is wrappable
+            x = @polymorphic_writer_method_writee_module  # so `[]` is wrappable
           end
         end
         x
@@ -292,7 +292,7 @@ module Skylab::Brazen
       def receive_parse_context pc
         # if this object added itself to the @nonterminal_queue, then this
         # method is where we receive calls to attempt to parse the stream.
-        process_iambic_stream_passively pc.upstream
+        process_polymorphic_stream_passively pc.upstream
       end
 
     private
@@ -300,7 +300,7 @@ module Skylab::Brazen
       # these are the iambic symbols exposed by the edit session itself,
       # that may mutate its state and/or affect its behavior
 
-      def iambic_writer_method_name_suffix=
+      def polymorphic_writer_method_name_suffix=
         against_iambic_property do | suffix_i |  # covered, :+#grease
           _RX = /\A.+(?=#{ ::Regexp.escape suffix_i }\z)/
           @method_added_filter = -> m_i, & oes_p do  # #experimetal
@@ -318,17 +318,17 @@ module Skylab::Brazen
       end
 
       def ad_hoc_processor=
-        @iambic_writer_method_writee_module.
-          entity_ad_hocs_for_wrt.add_processor( iambic_property, iambic_property )
+        @polymorphic_writer_method_writee_module.
+          entity_ad_hocs_for_wrt.add_processor( gets_one_polymorphic_value, gets_one_polymorphic_value )
         ACHIEVED_
       end
 
-      METHODIC_.cache_iambic_writer_methods self
+      METHODIC_.cache_polymorphic_writer_methods self
 
     public
 
       def receive_metaproperty mprop
-        @iambic_writer_method_writee_module.
+        @polymorphic_writer_method_writee_module.
           entity_property_class_for_write.class_exec( & mprop.apply )
       end
 
@@ -360,7 +360,7 @@ module Skylab::Brazen
       def receive_prop prop
         ok = true
         if prop.against_EC_p_a
-          _ec = @iambic_writer_method_writee_module
+          _ec = @polymorphic_writer_method_writee_module
           prop.against_EC_p_a.each do |p|
             ok = _ec.class_exec prop, & p
             ok or break
@@ -373,10 +373,10 @@ module Skylab::Brazen
 
         if prop.do_define_method
           while_ignoring_method_added do
-            @iambic_writer_method_writee_module.send(
+            @polymorphic_writer_method_writee_module.send(
               :define_method,
-              prop.iambic_writer_method_name,
-              prop.iambic_writer_method_proc )
+              prop.polymorphic_writer_method_name,
+              prop.polymorphic_writer_method_proc )
           end
         end
 
@@ -704,12 +704,12 @@ module Skylab::Brazen
         LIB_.trio.new x, had, prop
       end
 
-      def iambic_writer_method_name_passive_lookup_proc  # [cb] #hook-in
+      def polymorphic_writer_method_name_passive_lookup_proc  # [cb] #hook-in
         formals = formal_properties
         -> name_symbol do
           prp = formals[ name_symbol ]
           if prp
-            prp.iambic_writer_method_name
+            prp.polymorphic_writer_method_name
           end
         end
       end
@@ -731,7 +731,7 @@ module Skylab::Brazen
 
     class Property_Related_Nonterminal__
 
-      include METHODIC_.iambic_processing_instance_methods
+      include METHODIC_.polymorphic_processing_instance_methods
 
       def initialize * a
         @edit_session, @property_class = a
@@ -770,7 +770,7 @@ module Skylab::Brazen
           if cls.is_keyword pc.upstream.current_token
             st = pc.upstream
             d = st.current_index
-            mprop = cls.via_iambic_stream st do |*|
+            mprop = cls.via_polymorphic_stream st do |*|
               st.current_index = d
               false
             end
@@ -794,7 +794,7 @@ module Skylab::Brazen
           prop = if pcls.is_keyword pc.upstream.current_token
             st = pc.upstream
             d = st.current_index
-            pcls.via_iambic_stream st do | i, * i_a, & ev_p |
+            pcls.via_polymorphic_stream st do | i, * i_a, & ev_p |
               case i
               when :no_name
                 if st.unparsed_exists && :meta_property == st.current_token
@@ -825,8 +825,8 @@ module Skylab::Brazen
           ok = nil
           prop = @property_class.new do
             @name = Callback_::Name.via_variegated_symbol st.gets_one
-            @iambic_writer_method_proc_is_generated = true
-            @iwmn = via_name_build_internal_iambic_writer_meth_nm
+            @polymorphic_writer_method_proc_is_generated = true
+            @iwmn = via_name_build_internal_polymorphic_writer_meth_nm
             ok = normalize_property
           end
           ok &&= @edit_session.receive_prop prop
@@ -837,7 +837,7 @@ module Skylab::Brazen
 
       def reuse=
         ok = true
-        _prop_a = iambic_property
+        _prop_a = gets_one_polymorphic_value
         _prop_a.each do | prop |
           ok = @edit_session.receive_prop prop
           ok or break
@@ -846,10 +846,10 @@ module Skylab::Brazen
       end
 
       def property_object=
-        @edit_session.receive_prop iambic_property
+        @edit_session.receive_prop gets_one_polymorphic_value
       end
 
-      METHODIC_.cache_iambic_writer_methods self
+      METHODIC_.cache_polymorphic_writer_methods self
 
     public
 
@@ -864,10 +864,10 @@ module Skylab::Brazen
         prop = cls.new do
           @name = Callback_::Name.via_variegated_symbol name_i
           if proc_is_generated
-            @iambic_writer_method_proc_is_generated = proc_is_generated
+            @polymorphic_writer_method_proc_is_generated = proc_is_generated
           else
-            @iambic_writer_method_proc_is_generated = proc_is_generated
-            @iambic_writer_method_proc_proc ||= nil
+            @polymorphic_writer_method_proc_is_generated = proc_is_generated
+            @polymorphic_writer_method_proc_proc ||= nil
           end
           @iwmn = meth_i
           ok = normalize_property
@@ -878,7 +878,7 @@ module Skylab::Brazen
 
     class Property_or_MetaProperty__ < METHODIC_.simple_property_class
 
-      METHODIC_.cache_iambic_writer_methods self, superclass do |h|
+      METHODIC_.cache_polymorphic_writer_methods self, superclass do |h|
         h.delete :property  # this must not be in the syntax of metaproperties
         h
       end
@@ -886,9 +886,9 @@ module Skylab::Brazen
       # ~ internal support
 
       def add_to_write_proc_chain & p
-        if @iambic_writer_method_proc_is_generated
-          @iambic_writer_method_proc_is_generated = false
-          @iambic_writer_method_proc_proc = p
+        if @polymorphic_writer_method_proc_is_generated
+          @polymorphic_writer_method_proc_is_generated = false
+          @polymorphic_writer_method_proc_proc = p
         else
           self._DO_ME
         end
@@ -901,23 +901,23 @@ module Skylab::Brazen
     private
 
       def default=
-        Entity_::Meta_Property__::Apply_default[ self, iambic_property ]
+        Entity_::Meta_Property__::Apply_default[ self, gets_one_polymorphic_value ]
       end
 
       def entity_class_hook=
-        Entity_::Meta_Property__::Apply_entity_class_hook[ self, iambic_property ]
+        Entity_::Meta_Property__::Apply_entity_class_hook[ self, gets_one_polymorphic_value ]
       end
 
       def enum=
-        Entity_::Meta_Property__::Apply_enum[ self, iambic_property ]
+        Entity_::Meta_Property__::Apply_enum[ self, gets_one_polymorphic_value ]
       end
 
       def property_hook=
-        Entity_::Meta_Property__::Apply_property_hook[ self, iambic_property ]
+        Entity_::Meta_Property__::Apply_property_hook[ self, gets_one_polymorphic_value ]
       end
 
       def meta_property=
-        @name = Callback_::Name.via_variegated_symbol iambic_property
+        @name = Callback_::Name.via_variegated_symbol gets_one_polymorphic_value
         STOP_PARSING_
       end
 
@@ -953,16 +953,16 @@ module Skylab::Brazen
       end
 
       def bld_and_init_after_write_hooks
-        before_p_p = if @iambic_writer_method_proc_is_generated
-          @iambic_writer_method_proc_is_generated = false
+        before_p_p = if @polymorphic_writer_method_proc_is_generated
+          @polymorphic_writer_method_proc_is_generated = false
           -> mprop do
-            mprop.iambic_writer_method_proc_when_arity_is__one__
+            mprop.polymorphic_writer_method_proc_when_arity_is__one__
           end
         else
-          @iambic_writer_method_proc_proc
+          @polymorphic_writer_method_proc_proc
         end
         after_write_hook_p_a = []
-        @iambic_writer_method_proc_proc = -> mprop do
+        @polymorphic_writer_method_proc_proc = -> mprop do
           logic_p = before_p_p[ mprop ]
           -> do
             ok = instance_exec( & logic_p )
@@ -977,17 +977,17 @@ module Skylab::Brazen
         end
         after_write_hook_p_a
       end
-      public :iambic_writer_method_proc_when_arity_is__one__
+      public :polymorphic_writer_method_proc_when_arity_is__one__
 
       def dflt_apply
         -> mprop do
           name_i = mprop.name_symbol
           meth_i = :"#{ name_i }="
-          _meth_p = mprop.iambic_writer_method_proc
+          _meth_p = mprop.polymorphic_writer_method_proc
           attr_reader name_i
           define_method meth_i, _meth_p
           private meth_i
-          clear_iambic_writer_method_name_passive_proc
+          clear_polymorphic_writer_method_name_passive_proc
           KEEP_PARSING_
         end
       end
@@ -1045,10 +1045,10 @@ module Skylab::Brazen
       end
 
       def do_define_method
-        @iambic_writer_method_proc_is_generated || @iambic_writer_method_proc_proc
+        @polymorphic_writer_method_proc_is_generated || @polymorphic_writer_method_proc_proc
       end
 
-      def iambic_writer_method_name
+      def polymorphic_writer_method_name
         @iwmn
       end
 
@@ -1068,14 +1068,14 @@ module Skylab::Brazen
 
       def property=
         x = super
-        @iwmn ||= via_name_build_internal_iambic_writer_meth_nm
+        @iwmn ||= via_name_build_internal_polymorphic_writer_meth_nm
         x
       end
 
-      def iambic_writer_method_proc_when_arity_is__one__
+      def polymorphic_writer_method_proc_when_arity_is__one__
         _SYM = name_symbol
         -> do
-          receive_value_of_entity_property iambic_property, (
+          receive_value_of_entity_property gets_one_polymorphic_value, (
             self.class.send(
               self.class.
                 entity_formal_property_method_names_box_for_write.fetch _SYM ) )
@@ -1083,7 +1083,7 @@ module Skylab::Brazen
         end
       end
 
-      def iambic_writer_method_proc_when_arity_is__zero__
+      def polymorphic_writer_method_proc_when_arity_is__zero__
         _SYM = name_symbol
         -> do
           receive_value_of_entity_property true,
@@ -1094,10 +1094,10 @@ module Skylab::Brazen
         end
       end
 
-      def iambic_writer_method_proc_when_arity_is__one_or_more__
+      def polymorphic_writer_method_proc_when_arity_is__one_or_more__
         _SYM = name_symbol
         -> do
-          receive_list_of_entity_property iambic_property,
+          receive_list_of_entity_property gets_one_polymorphic_value,
             self.class.send(
               self.class.
                 entity_formal_property_method_names_box_for_write.fetch _SYM )
@@ -1107,12 +1107,12 @@ module Skylab::Brazen
 
     public  # ~ lib internal
 
-      def via_name_build_internal_iambic_writer_meth_nm
+      def via_name_build_internal_polymorphic_writer_meth_nm
 
         if :custom == @argument_arity
           :"#{ @name.as_variegated_symbol }="
         else
-          :"___entity_#{ @name.as_variegated_symbol }_iambic_writer___"
+          :"___entity_#{ @name.as_variegated_symbol }_polymorphic_writer___"
         end
       end
 

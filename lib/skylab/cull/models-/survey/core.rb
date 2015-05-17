@@ -399,11 +399,11 @@ module Skylab::Cull
         private
 
           def list=  # :+#[br-082]
-            @iambic_writer_method_proc_is_generated = false
-            @iambic_writer_method_proc_proc = -> prp do
+            @polymorphic_writer_method_proc_is_generated = false
+            @polymorphic_writer_method_proc_proc = -> prp do
               _SYM = prp.name_symbol
               -> do
-                ( @argument_box.touch _SYM do [] end ).push iambic_property
+                ( @argument_box.touch _SYM do [] end ).push gets_one_polymorphic_value
                 KEEP_PARSING_
               end
             end

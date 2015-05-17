@@ -15,7 +15,7 @@ module Skylab::Brazen
           # are the [meta] meta properties of interest (derived from
           # set arithmetic on ivars and classes SO FRAGILE SO FUN)
 
-          _i_a = @prop.class.iambic_writer_method_name_dictionary.keys
+          _i_a = @prop.class.polymorphic_writer_method_name_dictionary.keys
 
           _i_a_ = @prop.instance_variables.map do | ivar |
             ivar.id2name[ 1 .. -1 ].intern

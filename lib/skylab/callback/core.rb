@@ -197,7 +197,7 @@ module Skylab::Callback
       NIL_
     end
 
-    def process_iambic_stream_fully st
+    def process_polymorphic_stream_fully st
       bx = formal_fields_ivar_box_for_read_
       while st.unparsed_exists
         instance_variable_set bx.fetch( st.gets_one ), st.gets_one
@@ -206,10 +206,10 @@ module Skylab::Callback
     end
 
     def process_iambic_passively x_a
-      process_iambic_stream_passively iambic_stream_via_iambic_array x_a
+      process_polymorphic_stream_passively polymorphic_stream_via_iambic x_a
     end
 
-    def process_iambic_stream_passively st
+    def process_polymorphic_stream_passively st
       bx = formal_fields_ivar_box_for_read_
       while st.unparsed_exists
         ivar = bx[ st.current_token ]
@@ -220,7 +220,7 @@ module Skylab::Callback
       KEEP_PARSING_  # we never fail softly
     end
 
-    def iambic_stream_via_iambic_array x_a
+    def polymorphic_stream_via_iambic x_a
       Polymorphic_Stream_via_Array_.new x_a
     end
 

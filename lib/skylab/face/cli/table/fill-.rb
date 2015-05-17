@@ -114,10 +114,10 @@ module Skylab::Face
       LIB_.fields_from_methods :niladic, :passive, :absorber, :absrb,
           -> do
         def parts
-          @fill.parts_x = iambic_property
+          @fill.parts_x = gets_one_polymorphic_value
         end
         def with
-          @fill.with_x = iambic_property
+          @fill.with_x = gets_one_polymorphic_value
         end
       end
       end

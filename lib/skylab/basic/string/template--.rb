@@ -44,18 +44,18 @@ module Skylab::Basic
 
       def path=
         @buid = Basic_.lib_.brazen.byte_upstream_identifier.via_path(
-          iambic_property )
+          gets_one_polymorphic_value )
         KEEP_PARSING_
       end
 
       def string=
         @buid = Basic_.lib_.brazen.byte_upstream_identifier.via_string(
-          iambic_property )
+          gets_one_polymorphic_value )
         KEEP_PARSING_
       end
 
       def surface_pair_mapper=
-        @surface_pair_mapper = iambic_property
+        @surface_pair_mapper = gets_one_polymorphic_value
         KEEP_PARSING_
       end
 

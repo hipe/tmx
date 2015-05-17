@@ -14,14 +14,14 @@ module Skylab::Callback::TestSupport::Actor::Methodic
 
     mod.module_exec do
 
-      public :iambic_stream_via_iambic_array, :process_iambic_stream_passively
+      public :polymorphic_stream_via_iambic, :process_polymorphic_stream_passively
 
       def process_passively * x_a
-        process_iambic_stream_passively iambic_stream_via_iambic_array x_a
+        process_polymorphic_stream_passively polymorphic_stream_via_iambic x_a
       end
 
       def process_fully * x_a
-        process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+        process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
       end
     end
 

@@ -6,7 +6,7 @@ module Skylab::Parse
 
       class << self
 
-        def new_via_iambic_stream_passively st
+        def new_via_polymorphic_stream_passively st
 
           rx = st.gets_one
           if st.unparsed_exists && :becomes_symbol == st.current_token

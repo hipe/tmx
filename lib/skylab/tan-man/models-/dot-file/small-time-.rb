@@ -18,7 +18,7 @@ module Skylab::TanMan
         @is_dry = false
         @on_event_selectively = oes_p
         if x_a.length.nonzero?
-          process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+          process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
         end
       end
 

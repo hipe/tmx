@@ -10,7 +10,7 @@ module Skylab::System
           class << self
             def mixed_via_iambic x_a
               new do
-                process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+                process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
                 @x_a = @d = @x_a_length = nil  # #todo
               end.produce_mixed_result
             end

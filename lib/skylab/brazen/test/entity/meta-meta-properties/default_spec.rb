@@ -12,7 +12,7 @@ module Skylab::Brazen::TestSupport::Entity
 
           attr_reader :foo, :bar, :baz
 
-          Subject_[].call self, :iambic_writer_method_name_suffix, :"=" do
+          Subject_[].call self, :polymorphic_writer_method_name_suffix, :"=" do
 
             o :default, 22,
               :meta_property, :importance,
@@ -20,17 +20,17 @@ module Skylab::Brazen::TestSupport::Entity
               :importance, 10
 
             def foo=
-              @foo = iambic_property
+              @foo = gets_one_polymorphic_value
             end
 
             o :importance, 20
 
             def bar=
-              @bar = iambic_property
+              @bar = gets_one_polymorphic_value
             end
 
             def baz=
-              @baz = iambic_property
+              @baz = gets_one_polymorphic_value
             end
 
           end

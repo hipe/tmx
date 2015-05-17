@@ -620,7 +620,7 @@ module Skylab::Brazen
 
       def __bound_call_via_bound_action_and_mutated_backbound_iambic
 
-        bc = @bound.bound_call_against_iambic_stream(
+        bc = @bound.bound_call_against_polymorphic_stream(
 
           Callback_::Polymorphic_Stream.via_array @mutable_backbound_iambic )
 

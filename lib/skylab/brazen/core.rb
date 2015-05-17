@@ -232,7 +232,7 @@ module Skylab::Brazen
     end
 
     Mutable_iambic_scanner = -> do
-      Brazen_::Entity.mutable_iambic_stream
+      Brazen_::Entity.mutable_polymorphic_stream
     end
 
     N_lines = -> do

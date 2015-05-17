@@ -45,8 +45,8 @@ module Skylab::Callback::TestSupport::Actor::Methodic
 
       it "passive - succeeds but stops at first unrec arg. stream reflects this" do
         foo = self.foo
-        st = foo.iambic_stream_via_iambic_array [ :xiao, :X, :wuu, :jiang, :J ]
-        x = foo.process_iambic_stream_passively st
+        st = foo.polymorphic_stream_via_iambic [ :xiao, :X, :wuu, :jiang, :J ]
+        x = foo.process_polymorphic_stream_passively st
         x.should eql true
         foo.xiao.should eql :X
         foo.jiang.should be_nil

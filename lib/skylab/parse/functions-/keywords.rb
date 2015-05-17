@@ -7,7 +7,7 @@ module Skylab::Parse
 
       class << self
 
-        def new_via_iambic_stream_passively st
+        def new_via_polymorphic_stream_passively st
           new st.gets_one
         end
 

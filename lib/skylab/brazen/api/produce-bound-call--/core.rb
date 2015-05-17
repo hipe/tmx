@@ -62,7 +62,7 @@ module Skylab::Brazen
 
       attr_reader :bound, :bound_call
 
-      def iambic_stream
+      def polymorphic_stream
         @st
       end
 
@@ -204,7 +204,7 @@ module Skylab::Brazen
             @bound.bound_call_against_box @mutable_box
           end
         else
-          @bound.bound_call_against_iambic_stream @st
+          @bound.bound_call_against_polymorphic_stream @st
         end
       end
 

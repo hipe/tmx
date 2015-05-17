@@ -54,7 +54,7 @@ module Skylab::Brazen::TestSupport::Entity
         hey.is_florg.should eql false
       end
 
-      it "..and in this case set a custom 'iambic_writer_method_proc'." do
+      it "..and in this case set a custom 'polymorphic_writer_method_proc'." do
         ok = nil
         o = MPEF_Business_Widget.new do
           ok = process_fully :hi, :hey, :ho

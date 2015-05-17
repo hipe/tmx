@@ -49,7 +49,7 @@ module Skylab::Parse
 
         _cls = Parse_.function( _sym )
 
-        o = _cls.new_via_iambic_stream_passively polymorphic_upstream
+        o = _cls.new_via_polymorphic_stream_passively polymorphic_upstream
 
         o and begin
           instance_variable_set ivar, o

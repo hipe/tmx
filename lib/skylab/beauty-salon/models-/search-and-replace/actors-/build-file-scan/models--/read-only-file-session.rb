@@ -11,7 +11,7 @@ module Skylab::BeautySalon
           def producer_via_iambic x_a
             ok = nil
             x = Producer__.new do
-              ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+              ok = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
             end
             ok && x
           end

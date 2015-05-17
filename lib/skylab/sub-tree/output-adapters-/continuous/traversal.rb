@@ -27,7 +27,7 @@ module Skylab::SubTree
 
       def output_proc=
 
-        p = iambic_property
+        p = gets_one_polymorphic_value
 
         case p.arity
         when 3     ; __resolve_downstream_proc_via_arity_of_three p

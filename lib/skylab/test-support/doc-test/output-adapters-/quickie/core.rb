@@ -24,7 +24,7 @@ module Skylab::TestSupport
         :property, :line_downstream,
         :property, :node_upstream,
         :property, :on_shared_resources_created,
-        :iambic_writer_method_to_be_provided, :property, :arbitrary_proc_array,
+        :polymorphic_writer_method_to_be_provided, :property, :arbitrary_proc_array,
         :property, :shared_resources
 
       def initialize
@@ -51,7 +51,7 @@ module Skylab::TestSupport
     private
 
       def arbitrary_proc_array=
-        x = iambic_property
+        x = gets_one_polymorphic_value
         if x
           if @arbitrary_proc_array
             @arbitrary_proc_array.concat x

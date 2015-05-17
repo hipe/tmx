@@ -10,10 +10,10 @@ module Skylab::Brazen::TestSupport::Entity
 
           Subject_[].call self do
 
-            o :iambic_writer_method_name_suffix, :_ZOINK
+            o :polymorphic_writer_method_name_suffix, :_ZOINK
 
             def foo_bar_ZOINK
-              @foo_bar = iambic_property
+              @foo_bar = gets_one_polymorphic_value
             end
 
           end
@@ -31,20 +31,20 @@ module Skylab::Brazen::TestSupport::Entity
 
           Subject_[].call self do
 
-            o :iambic_writer_method_name_suffix, :_ZEE
+            o :polymorphic_writer_method_name_suffix, :_ZEE
 
             def foo_ZEE
-              @foo = iambic_property
+              @foo = gets_one_polymorphic_value
             end
 
-            o :iambic_writer_method_name_suffix, :_ZOO
+            o :polymorphic_writer_method_name_suffix, :_ZOO
 
             def bar_ZOO
-              @bar = iambic_property
+              @bar = gets_one_polymorphic_value
             end
 
             def baz_ZOO
-              @baz = iambic_property
+              @baz = gets_one_polymorphic_value
             end
           end
 

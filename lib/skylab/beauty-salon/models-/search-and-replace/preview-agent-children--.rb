@@ -32,7 +32,7 @@ module Skylab::BeautySalon
 
     private
 
-      alias_method :against_empty_iambic_stream, :receive_focus
+      alias_method :against_empty_polymorphic_stream, :receive_focus
 
       def resolve_command
         @cmd = build_command( & handle_unsigned_event_selectively )
@@ -293,7 +293,7 @@ module Skylab::BeautySalon
         end
 
         def receive_focus
-          @stream = against_empty_iambic_stream
+          @stream = against_empty_polymorphic_stream
           @stream and via_stream
           change_focus_to @parent
           ACHIEVED_
@@ -301,7 +301,7 @@ module Skylab::BeautySalon
 
       private
 
-        def against_empty_iambic_stream
+        def against_empty_polymorphic_stream
           @paths_agent_group.active_boolean.build_path_stream
         end
 
@@ -354,7 +354,7 @@ module Skylab::BeautySalon
 
       private
 
-        def against_empty_iambic_stream
+        def against_empty_polymorphic_stream
           @grep_boolean_field.build_counts_stream
         end
 
@@ -409,7 +409,7 @@ module Skylab::BeautySalon
 
       private
 
-        def against_empty_iambic_stream
+        def against_empty_polymorphic_stream
           resolve_file_stream && execute_via_file_stream_when_non_interactive
         end
 

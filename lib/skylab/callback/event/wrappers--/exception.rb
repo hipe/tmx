@@ -28,8 +28,8 @@ module Skylab::Callback
           end
 
           def search_and_replace_hack
-            rx = iambic_property
-            p = iambic_property
+            rx = gets_one_polymorphic_value
+            p = gets_one_polymorphic_value
             add_mutator do |o|
               prev_proc = o.message_proc
               o.message_proc = -> y, ev do

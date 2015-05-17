@@ -115,20 +115,20 @@ module Skylab::Face
       end
 
       def header
-        x = iambic_property
+        x = gets_one_polymorphic_value
         :none == x or raise ::ArgumentError, "only 'none' is allowed (#{ x })"
         @kernel.do_show_header = false
         KEEP_PARSING_
       end
 
       def left
-        @kernel.left_x = iambic_property
+        @kernel.left_x = gets_one_polymorphic_value
         KEEP_PARSING_
       end
 
       def read_rows_from
 
-        x = iambic_property
+        x = gets_one_polymorphic_value
 
         if ! x.respond_to? :gets
 
@@ -144,17 +144,17 @@ module Skylab::Face
       end
 
       def right
-        @kernel.right_x = iambic_property
+        @kernel.right_x = gets_one_polymorphic_value
         KEEP_PARSING_
       end
 
       def sep
-        @kernel.sep_x = iambic_property
+        @kernel.sep_x = gets_one_polymorphic_value
         KEEP_PARSING_
       end
 
       def show_header
-        @kernel.do_show_header = iambic_property
+        @kernel.do_show_header = gets_one_polymorphic_value
         KEEP_PARSING_
       end
 
@@ -165,7 +165,7 @@ module Skylab::Face
 
       def write_lines_to
 
-        _x = iambic_property
+        _x = gets_one_polymorphic_value
 
         @kernel.line_downstream_yielder = _x
 
@@ -205,7 +205,7 @@ module Skylab::Face
         :niladic, :passive, :absorber, :absrb_passive,
       -> do
         def cel_renderer_builder
-          x = iambic_property
+          x = gets_one_polymorphic_value
           if x.respond_to? :id2name
             @field.cel_renderer_p_p = Table_::Fill_.p_p_from_i x
           else
@@ -219,10 +219,10 @@ module Skylab::Face
           @d = shell.d ; @field.fill = shell.fill
         end
         def id  # typically for fields w/o labels, i.e non-displayed headers
-          @field.name_symbol = iambic_property
+          @field.name_symbol = gets_one_polymorphic_value
         end
         def label
-          @field.label_s = iambic_property
+          @field.label_s = gets_one_polymorphic_value
           @field.name_symbol.nil? and @field.name_symbol = @field.label_s.intern
         end
         def left

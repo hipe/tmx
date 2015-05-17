@@ -35,7 +35,7 @@ module Skylab::Snag
       end
 
       def invoke_via_argument_stream st
-        process_iambic_stream_fully st
+        process_polymorphic_stream_fully st
         if_any_missing_required_raise_argument_error
         execute
       end
@@ -150,17 +150,17 @@ module Skylab::Snag
 
             @name = Callback_::Name.via_variegated_symbol stem_symbol
 
-            @iambic_writer_method_proc_is_generated = false
+            @polymorphic_writer_method_proc_is_generated = false
 
-            @iwmn = via_name_build_internal_iambic_writer_meth_nm  # #todo publicize this [br] ivar
+            @iwmn = via_name_build_internal_polymorphic_writer_meth_nm  # #todo publicize this [br] ivar
 
             _IVAR = :"@#{ stem_symbol }"
 
-            @iambic_writer_method_proc_proc = -> _prp do
+            @polymorphic_writer_method_proc_proc = -> _prp do
 
               -> do
 
-                _x = iambic_property
+                _x = gets_one_polymorphic_value
 
                 _dlg = some_delegate
 

@@ -51,7 +51,7 @@ module Skylab::TestSupport
 
       def against * x_a
         before_call
-        _ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+        _ok = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
         _ok and execute
       end
 

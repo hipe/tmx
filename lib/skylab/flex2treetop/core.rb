@@ -433,7 +433,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
         @on_event_selectively = oes_p
       end
 
-      process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+      process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
       via_default_proc_and_is_required_normalize
 
       super( & nil )

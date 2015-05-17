@@ -27,7 +27,7 @@ module Skylab::Parse
         super
       end
 
-      def process_iambic_stream_passively st
+      def process_polymorphic_stream_passively st
 
         # :+#experimental custom syntax - enclosing a flat list of
         # constituents in an array: nicer than a `end_functions` token?
@@ -48,7 +48,7 @@ module Skylab::Parse
     private
 
       def input_array=
-        @input_stream = _input_stream_via_array iambic_property
+        @input_stream = _input_stream_via_array gets_one_polymorphic_value
         KEEP_PARSING_
       end
 
@@ -91,7 +91,7 @@ module Skylab::Parse
             if :end_functions == sym
               nil  # not false
             else
-              Parse_.function( sym ).new_via_iambic_stream_passively st
+              Parse_.function( sym ).new_via_polymorphic_stream_passively st
             end
           end
         end
@@ -111,7 +111,7 @@ module Skylab::Parse
       end
 
       def function_objects_array=
-        @function_a = iambic_property
+        @function_a = gets_one_polymorphic_value
         KEEP_PARSING_
       end
 

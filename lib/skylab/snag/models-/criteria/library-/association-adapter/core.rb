@@ -36,7 +36,7 @@ module Skylab::Snag
 
             _cls = Parse__.function func_sym
 
-            _f = _cls.new_via_iambic_stream_passively st_
+            _f = _cls.new_via_polymorphic_stream_passively st_
 
             bx.add name_sym, _f
 
@@ -52,7 +52,7 @@ module Skylab::Snag
         end
 
         def verb_lemma=
-          @verb_lemma_and_phrase_head_s_a = [ iambic_property ]
+          @verb_lemma_and_phrase_head_s_a = [ gets_one_polymorphic_value ]
           KEEP_PARSING_
         end
 

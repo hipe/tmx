@@ -48,26 +48,26 @@ module Skylab::Callback
     private
 
       def on_zero_items=
-        @nucleus.on_zero_items_p = iambic_property
+        @nucleus.on_zero_items_p = gets_one_polymorphic_value
         KEEP_PARSING_
       end
 
       def template=
-        @nucleus.template = Callback_.lib_.string_lib.template.via_string iambic_property
-        via_template_parse_remainder_of_iambic_stream polymorphic_upstream
+        @nucleus.template = Callback_.lib_.string_lib.template.via_string gets_one_polymorphic_value
+        via_template_parse_remainder_of_polymorphic_stream polymorphic_upstream
       end
 
-      def via_template_parse_remainder_of_iambic_stream st
+      def via_template_parse_remainder_of_polymorphic_stream st
         bx = Box.new
         @nucleus.template.to_formal_variable_stream.each do | param |
           bx.add param.name_symbol, Field__.new( param )
         end
         @nucleus.field_box = bx
         @nucleus.name_i_a = bx.get_names.freeze
-        via_template_variables_parse_remainder_of_iambic_stream st
+        via_template_variables_parse_remainder_of_polymorphic_stream st
       end
 
-      def via_template_variables_parse_remainder_of_iambic_stream st
+      def via_template_variables_parse_remainder_of_polymorphic_stream st
         bx = @nucleus.field_box
         while st.unparsed_exists
           field = bx[ st.current_token ]
@@ -132,29 +132,29 @@ module Skylab::Callback
         end
 
         def process_iambic_passively_via_st st
-          process_iambic_stream_passively st
+          process_polymorphic_stream_passively st
           nil
         end
 
-        include Callback_::Actor.methodic_lib.iambic_processing_instance_methods
+        include Callback_::Actor.methodic_lib.polymorphic_processing_instance_methods
 
       private
 
           def aggregate=
             @does_field_aggregation = true
-            @aggregate_p = iambic_property
+            @aggregate_p = gets_one_polymorphic_value
             KEEP_PARSING_
           end
 
           def on_first_mention=
             @does_field_redundancy = true
-            @when_field_value_count_is_one_p = iambic_property
+            @when_field_value_count_is_one_p = gets_one_polymorphic_value
             KEEP_PARSING_
           end
 
           def on_subsequent_mentions=
             @does_field_redundancy = true
-            @when_field_value_count_is_two_or_more_p = iambic_property
+            @when_field_value_count_is_two_or_more_p = gets_one_polymorphic_value
             KEEP_PARSING_
           end
 

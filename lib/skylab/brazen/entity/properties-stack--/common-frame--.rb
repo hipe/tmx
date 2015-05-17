@@ -147,7 +147,7 @@ module Skylab::Brazen
           def inline_method=
             @reader_classification = :inline_method
             read_name
-            @literal_proc = iambic_property
+            @literal_proc = gets_one_polymorphic_value
             STOP_PARSING_
           end
 
@@ -164,7 +164,7 @@ module Skylab::Brazen
           def proc=
             @reader_classification = :proc
             read_name
-            @literal_proc = iambic_property
+            @literal_proc = gets_one_polymorphic_value
             STOP_PARSING_
           end
 
@@ -174,7 +174,7 @@ module Skylab::Brazen
           end
 
           def read_name
-            @name = Callback_::Name.via_variegated_symbol iambic_property
+            @name = Callback_::Name.via_variegated_symbol gets_one_polymorphic_value
             STOP_PARSING_
           end
 
@@ -222,16 +222,16 @@ module Skylab::Brazen
             @external_read_proc = p ; nil
           end
 
-          def set_iambic_writer_method_name x
+          def set_polymorphic_writer_method_name x
             @iwmn = x ; nil
           end
 
-          def set_iambic_writer_method_proc_is_generated x
-            @iambic_writer_method_proc_is_generated = x ; nil
+          def set_polymorphic_writer_method_proc_is_generated x
+            @polymorphic_writer_method_proc_is_generated = x ; nil
           end
 
-          def set_iambic_writer_method_proc_proc x
-            @iambic_writer_method_proc_proc = x ; nil
+          def set_polymorphic_writer_method_proc_proc x
+            @polymorphic_writer_method_proc_proc = x ; nil
           end
 
           def set_internal_read_proc & p
@@ -398,7 +398,7 @@ module Skylab::Brazen
 
           COMMON_SETUP_[ prop ]
 
-          _WRITER_METHOD_NAME = prop.via_name_build_internal_iambic_writer_meth_nm
+          _WRITER_METHOD_NAME = prop.via_name_build_internal_polymorphic_writer_meth_nm
 
           prop.during_apply do | prop_ |
 
@@ -409,14 +409,14 @@ module Skylab::Brazen
               end
 
               define_method _WRITER_METHOD_NAME do
-                set_val_of_property iambic_property, prop_
+                set_val_of_property gets_one_polymorphic_value, prop_
               end
 
             end
             ACHIEVED_
           end
 
-          prop.set_iambic_writer_method_name _WRITER_METHOD_NAME
+          prop.set_polymorphic_writer_method_name _WRITER_METHOD_NAME
 
           Read_via_Method_.write_external_read_proc prop
         end
@@ -427,19 +427,19 @@ module Skylab::Brazen
             entity.any_property_value_via_property prop_
           end
 
-          _WRITER_METHOD_NAME = prop.via_name_build_internal_iambic_writer_meth_nm
+          _WRITER_METHOD_NAME = prop.via_name_build_internal_polymorphic_writer_meth_nm
 
           prop.during_apply do | prop_ |
 
             @active_entity_edit_session.while_ignoring_method_added do
 
               define_method _WRITER_METHOD_NAME do
-                set_val_of_property iambic_property, prop_
+                set_val_of_property gets_one_polymorphic_value, prop_
               end
             end
           end
 
-          prop.set_iambic_writer_method_name _WRITER_METHOD_NAME
+          prop.set_polymorphic_writer_method_name _WRITER_METHOD_NAME
 
           ACHIEVED_
         end
@@ -448,8 +448,8 @@ module Skylab::Brazen
 
         COMMON_SETUP_ = -> prop do
           prop.set_argument_arity :_not_applicable_
-          prop.set_iambic_writer_method_proc_is_generated false
-          prop.set_iambic_writer_method_proc_proc nil
+          prop.set_polymorphic_writer_method_proc_is_generated false
+          prop.set_polymorphic_writer_method_proc_proc nil
           nil
         end
 

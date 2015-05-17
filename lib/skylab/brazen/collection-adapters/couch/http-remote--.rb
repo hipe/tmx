@@ -46,7 +46,7 @@ module Skylab::Brazen
           @body_s = nil
           @entity_identifier_strategy = nil
           @HTTP_param_box = nil
-          process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+          process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
           @need_to_prepare_URI = true
         end
 
@@ -60,7 +60,7 @@ module Skylab::Brazen
       private
 
         def add_HTTP_parameter=
-          add_HTTP_param iambic_property, iambic_property
+          add_HTTP_param gets_one_polymorphic_value, gets_one_polymorphic_value
         end
 
       public

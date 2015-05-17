@@ -34,11 +34,11 @@ module Skylab::TestSupport
 
       TestSupport_.lib_.entity self do
 
-        o :iambic_writer_method_name_suffix, :'='
+        o :polymorphic_writer_method_name_suffix, :'='
 
         def do_debug=
           @do_debug_value_was_passed = true
-          @do_debug_x = iambic_property
+          @do_debug_x = gets_one_polymorphic_value
           ACHIEVED_
         end
 
@@ -54,7 +54,7 @@ module Skylab::TestSupport
 
       def initialize x_a
         @is_standard = true
-        process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+        process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
       end
 
       attr_reader( * properties.get_names )

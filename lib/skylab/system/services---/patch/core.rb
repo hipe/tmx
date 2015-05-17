@@ -58,17 +58,17 @@ module Skylab::System
         end
 
         def is_dry_run=
-          @dry = iambic_property
+          @dry = gets_one_polymorphic_value
           KEEP_PARSING_
         end
 
         def on_event_selectively=
-          @on_event_selectively = iambic_property
+          @on_event_selectively = gets_one_polymorphic_value
           KEEP_PARSING_
         end
 
         def patch_file=
-          x = iambic_property
+          x = gets_one_polymorphic_value
           if x
             @patch_method = :via_patch_file
             @patch_file = x
@@ -79,7 +79,7 @@ module Skylab::System
         end
 
         def patch_string=
-          x = iambic_property
+          x = gets_one_polymorphic_value
           if x
             @patch_method = :via_patch_string
             @patch_string = x
@@ -90,7 +90,7 @@ module Skylab::System
         end
 
         def target_directory=
-          x = iambic_property
+          x = gets_one_polymorphic_value
           if x
             @target_method = :against_directory
             @target_directory = x
@@ -101,7 +101,7 @@ module Skylab::System
         end
 
         def target_file=
-          x = iambic_property
+          x = gets_one_polymorphic_value
           if x
             @target_method = :against_file
             @target_file = x

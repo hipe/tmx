@@ -9,12 +9,12 @@ module Skylab::BeautySalon
       Callback_::Actor.methodic self, :simple, :properties,
 
         :property, :upstream_path_stream,
-        :iambic_writer_method_to_be_provided, :property, :ruby_regexp,
-        :iambic_writer_method_to_be_provided, :property, :grep_extended_regexp_string,
-        :iambic_writer_method_to_be_provided, :property, :do_highlight,
-        :iambic_writer_method_to_be_provided, :property, :read_only,
-        :iambic_writer_method_to_be_provided, :property, :for_interactive_search_and_replace,
-        :iambic_writer_method_to_be_provided, :property, :max_file_size_for_multiline_mode,
+        :polymorphic_writer_method_to_be_provided, :property, :ruby_regexp,
+        :polymorphic_writer_method_to_be_provided, :property, :grep_extended_regexp_string,
+        :polymorphic_writer_method_to_be_provided, :property, :do_highlight,
+        :polymorphic_writer_method_to_be_provided, :property, :read_only,
+        :polymorphic_writer_method_to_be_provided, :property, :for_interactive_search_and_replace,
+        :polymorphic_writer_method_to_be_provided, :property, :max_file_size_for_multiline_mode,
         :property, :on_event_selectively
 
       def initialize
@@ -26,17 +26,17 @@ module Skylab::BeautySalon
     private
 
       def ruby_regexp=
-        @currier_x_a.push :ruby_regexp, iambic_property
+        @currier_x_a.push :ruby_regexp, gets_one_polymorphic_value
         KEEP_PARSING_
       end
 
       def grep_extended_regexp_string=
-        @currier_x_a.push :grep_extended_regexp_string, iambic_property
+        @currier_x_a.push :grep_extended_regexp_string, gets_one_polymorphic_value
         KEEP_PARSING_
       end
 
       def do_highlight=
-        @currier_x_a.push :do_highlight, iambic_property
+        @currier_x_a.push :do_highlight, gets_one_polymorphic_value
         KEEP_PARSING_
       end
 
@@ -51,7 +51,7 @@ module Skylab::BeautySalon
       end
 
       def max_file_size_for_multiline_mode=
-        @currier_x_a.push :max_file_size_for_multiline_mode, iambic_property
+        @currier_x_a.push :max_file_size_for_multiline_mode, gets_one_polymorphic_value
         KEEP_PARSING_
       end
 

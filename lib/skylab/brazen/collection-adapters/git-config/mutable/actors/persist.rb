@@ -19,7 +19,7 @@ module Skylab::Brazen
 
         def edit_via_iambic x_a
           if x_a.length.nonzero?
-            process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+            process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
           else
             true
           end and self
@@ -37,22 +37,22 @@ module Skylab::Brazen
       private
 
         def is_dry=
-          @is_dry = iambic_property
+          @is_dry = gets_one_polymorphic_value
           KEEP_PARSING_
         end
 
         def document=
-          @document = iambic_property
+          @document = gets_one_polymorphic_value
           KEEP_PARSING_
         end
 
         def on_event_selectively=
-          @on_event_selectively = iambic_property
+          @on_event_selectively = gets_one_polymorphic_value
           KEEP_PARSING_
         end
 
         def path=
-          @path = iambic_property
+          @path = gets_one_polymorphic_value
           KEEP_PARSING_
         end
 

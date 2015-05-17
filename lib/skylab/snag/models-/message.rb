@@ -45,7 +45,7 @@ module Skylab::Snag
 
       def character_limit=
 
-        d = iambic_property
+        d = gets_one_polymorphic_value
 
         @p_a.push -> arg, & oes_p do
           s = arg.value_x

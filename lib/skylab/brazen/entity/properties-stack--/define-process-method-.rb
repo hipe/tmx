@@ -15,7 +15,7 @@ module Skylab::Brazen
         end
 
         def execute
-          keep_parsing = process_iambic_stream_passively @parse_context.upstream
+          keep_parsing = process_polymorphic_stream_passively @parse_context.upstream
           if @is_complete
             via_parse_context_flush
           elsif keep_parsing
@@ -34,7 +34,7 @@ module Skylab::Brazen
 
         def processor=
           @is_complete = true
-          @method_name = iambic_property
+          @method_name = gets_one_polymorphic_value
           STOP_PARSING_
         end
 
@@ -44,21 +44,21 @@ module Skylab::Brazen
         end
 
         def via_parse_context_flush
-          ent_class = @parse_context.edit_session.iambic_writer_method_writee_module
+          ent_class = @parse_context.edit_session.polymorphic_writer_method_writee_module
           is_globbing = @is_globbing
           method_name = @method_name
           ent_class.class_exec do
             @active_entity_edit_session.while_ignoring_method_added do
               if is_globbing
                 define_method method_name do | * x_a |
-                  _keep_parsing = process_iambic_stream_fully(
-                    iambic_stream_via_iambic_array x_a )
+                  _keep_parsing = process_polymorphic_stream_fully(
+                    polymorphic_stream_via_iambic x_a )
                   _keep_parsing && normalize
                 end
               else
                 define_method method_name do | x_a |
-                  _keep_parsing = process_iambic_stream_fully(
-                    iambic_stream_via_iambic_array x_a )
+                  _keep_parsing = process_polymorphic_stream_fully(
+                    polymorphic_stream_via_iambic x_a )
                   _keep_parsing && normalize
                 end
               end

@@ -11,15 +11,15 @@ module Skylab::Basic
       private
 
         def begin=
-          touch_current_mutable_range.set_begin iambic_property
+          touch_current_mutable_range.set_begin gets_one_polymorphic_value
         end
 
         def end=
-          touch_current_mutable_range.set_end iambic_property
+          touch_current_mutable_range.set_end gets_one_polymorphic_value
         end
 
         def is=
-          x = iambic_property
+          x = gets_one_polymorphic_value
           rng = touch_current_mutable_range
           rng.set_begin x
           rng.set_end x
@@ -32,11 +32,11 @@ module Skylab::Basic
         # ~ for a particular act of normalization:
 
         def x=
-          set_arg Callback_::Trio.new iambic_property, true, Basic_.default_property
+          set_arg Callback_::Trio.new gets_one_polymorphic_value, true, Basic_.default_property
         end
 
         def arg=
-          set_arg iambic_property
+          set_arg gets_one_polymorphic_value
         end
 
       # Callback_::Event.selective_builder_sender_receiver self
@@ -96,7 +96,7 @@ module Skylab::Basic
     protected
 
       def init_copy_with * x_a
-        process_iambic_stream_fully iambic_stream_via_iambic_array x_a ; nil
+        process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a ; nil
       end
 
       def execute_is_valid

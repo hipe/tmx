@@ -141,9 +141,9 @@ module Skylab::Callback
           once = -> do
             once = EMPTY_P_
             at_end = -> do
-              remove_instance_variable :@__methodic_actor_iambic_stream__
+              remove_instance_variable :@__methodic_actor_polymorphic_stream__
             end
-            @__methodic_actor_iambic_stream__ = st
+            @__methodic_actor_polymorphic_stream__ = st
             NIL_
           end
 
@@ -197,8 +197,8 @@ module Skylab::Callback
           NIL_
         end
 
-        def iambic_property  # :+#cp
-          @__methodic_actor_iambic_stream__.gets_one
+        def gets_one_polymorphic_value  # :+#cp
+          @__methodic_actor_polymorphic_stream__.gets_one
         end
 
       protected

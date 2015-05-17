@@ -11,7 +11,7 @@ module Skylab::Basic
 
 
       def initialize g, x_a
-        process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+        process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
         nilify_uninitialized_ivars
         @association_st = g.to_node_edge_stream_
         init_IO

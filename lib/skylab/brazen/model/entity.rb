@@ -84,7 +84,7 @@ module Skylab::Brazen
 
           def ad_hoc_normalizer=
 
-            _append_ad_hoc_normalizer( & iambic_property )
+            _append_ad_hoc_normalizer( & gets_one_polymorphic_value )
             KEEP_PARSING_
           end
 
@@ -219,12 +219,12 @@ module Skylab::Brazen
         private
 
           def default=
-            set_primitive_default iambic_property
+            set_primitive_default gets_one_polymorphic_value
             KEEP_PARSING_
           end
 
           def default_proc=
-            set_default_proc( & iambic_property )
+            set_default_proc( & gets_one_polymorphic_value )
             KEEP_PARSING_
           end
 
@@ -285,7 +285,7 @@ module Skylab::Brazen
         private
 
           def description=
-            x = iambic_property
+            x = gets_one_polymorphic_value
             if x.respond_to? :ascii_only?
               _STRING = x
               x = -> y do
@@ -336,7 +336,7 @@ module Skylab::Brazen
         private
 
           def integer_greater_than_or_equal_to=
-            add_normalizer_for_greater_than_or_equal_to_integer iambic_property
+            add_normalizer_for_greater_than_or_equal_to_integer gets_one_polymorphic_value
           end
 
           def add_normalizer_for_greater_than_or_equal_to_integer d
@@ -449,7 +449,7 @@ module Skylab::Brazen
         private
 
           def name_symbol=
-            @name = Callback_::Name.via_variegated_symbol iambic_property
+            @name = Callback_::Name.via_variegated_symbol gets_one_polymorphic_value
             KEEP_PARSING_
           end
 

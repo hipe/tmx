@@ -13,7 +13,7 @@ module Skylab::Basic
 
          :argument_arity, :zero, :property, :first_item_does_not_use_number,
 
-         :iambic_writer_method_to_be_provided, :property, :template
+         :polymorphic_writer_method_to_be_provided, :property, :template
 
 
       def initialize
@@ -32,7 +32,7 @@ module Skylab::Basic
     private
 
       def template=
-        _receive_template_string iambic_property
+        _receive_template_string gets_one_polymorphic_value
         st = polymorphic_upstream
         h = @tmpl_var_bx.h_
         while st.unparsed_exists

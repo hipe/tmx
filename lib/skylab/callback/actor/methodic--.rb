@@ -6,12 +6,12 @@ module Skylab::Callback
 
       class << self
 
-        def cache_iambic_writer_methods * a, & p
-          Cache_iambic_writer_methods__.call( * a, & p )
+        def cache_polymorphic_writer_methods * a, & p
+          Cache_polymorphic_writer_methods__.call( * a, & p )
         end
 
-        def iambic_processing_instance_methods
-          Iambic_Processing_Instance_Methods__
+        def polymorphic_processing_instance_methods
+          Polymorphic_Processing_Instance_Methods__
         end
 
         def simple_property_class
@@ -24,7 +24,7 @@ module Skylab::Callback
 
         def via_client_and_iambic cls, i_a
           cls.extend Module_Methods__
-          cls.include Iambic_Processing_Instance_Methods__
+          cls.include Polymorphic_Processing_Instance_Methods__
           if i_a.length.zero?
             cls
           else
@@ -77,7 +77,7 @@ module Skylab::Callback
                 _IVAR = :"@#{ sym }"
 
                 define_method :"#{ sym }=" do
-                  instance_variable_set _IVAR, iambic_property
+                  instance_variable_set _IVAR, gets_one_polymorphic_value
                   KEEP_PARSING_
                 end
               end
@@ -96,7 +96,7 @@ module Skylab::Callback
         # ~ ways to call your actor (pursuant to [#hl-103] name conventions)
 
         def with * x_a, & oes_p
-          call_via_iambic_stream iambic_stream_via_iambic_array( x_a ), & oes_p
+          call_via_polymorphic_stream polymorphic_stream_via_iambic( x_a ), & oes_p
         end
 
         def call_via_arglist a, & oes_p
@@ -116,43 +116,43 @@ module Skylab::Callback
         end
 
         def call_via_iambic x_a, & oes_p
-          call_via_iambic_stream iambic_stream_via_iambic_array( x_a ), & oes_p
+          call_via_polymorphic_stream polymorphic_stream_via_iambic( x_a ), & oes_p
         end
 
-        def call_via_iambic_stream st, & oes_p
-          curried = new_via_iambic_stream st, & oes_p
+        def call_via_polymorphic_stream st, & oes_p
+          curried = new_via_polymorphic_stream st, & oes_p
           curried && curried.execute
         end
 
         # ~ ways to build a "curried" actor (to use these makes you a collaborator)
 
         def new_with * x_a, & oes_p
-          new_via_iambic_stream iambic_stream_via_iambic_array( x_a ), & oes_p
+          new_via_polymorphic_stream polymorphic_stream_via_iambic( x_a ), & oes_p
         end
 
         def new_via_iambic x_a, & oes_p
-          new_via_iambic_stream iambic_stream_via_iambic_array( x_a ), & oes_p
+          new_via_polymorphic_stream polymorphic_stream_via_iambic( x_a ), & oes_p
         end
 
-        def new_via_iambic_stream st, & oes_p
+        def new_via_polymorphic_stream st, & oes_p
           ok = nil
           x = new do
             oes_p and accept_selective_listener_proc oes_p  # :+#public-API :+#hook-out #hook-near
-            ok = process_iambic_stream_fully st
+            ok = process_polymorphic_stream_fully st
           end
           ok && x
         end
 
-        def new_via_iambic_stream_passively st, & oes_p
+        def new_via_polymorphic_stream_passively st, & oes_p
           ok = nil
           x = new do
             oes_p and accept_selective_listener_proc oes_p  # same as above
-            ok = process_iambic_stream_passively st
+            ok = process_polymorphic_stream_passively st
           end
           ok && x
         end
 
-        def iambic_stream_via_iambic_array x_a
+        def polymorphic_stream_via_iambic x_a
           Polymorphic_Stream_via_Array_.new 0, x_a
         end
 
@@ -165,26 +165,26 @@ module Skylab::Callback
         # (experimental features near here exist in: [#br-081])
       end
 
-      module Iambic_Processing_Instance_Methods__
+      module Polymorphic_Processing_Instance_Methods__
 
       private
 
         def process_arglist_fully a  # :+#experiment, seed properties only
 
-          process_iambic_stream_fully Polymorphic_Stream_via_Arglist___.new(
+          process_polymorphic_stream_fully Polymorphic_Stream_via_Arglist___.new(
             a, self.class.const_get( BX_ ).a_ )
         end
 
         def process_iambic_fully x_a
-          process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+          process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
         end
 
-        def iambic_stream_via_iambic_array x_a
+        def polymorphic_stream_via_iambic x_a
           Polymorphic_Stream_via_Array_.new 0, x_a
         end
 
-        def process_iambic_stream_fully stream  # :+#public-API :+#hook-in
-          _keep_parsing = process_iambic_stream_passively stream
+        def process_polymorphic_stream_fully stream  # :+#public-API :+#hook-in
+          _keep_parsing = process_polymorphic_stream_passively stream
           _keep_parsing and begin
             if stream.no_unparsed_exists
               ACHIEVED_
@@ -195,21 +195,21 @@ module Skylab::Callback
         end
 
         def polymorphic_upstream
-          @__methodic_actor_iambic_stream__
+          @__methodic_actor_polymorphic_stream__
         end
 
-        def process_iambic_stream_passively stream, & oes_p
+        def process_polymorphic_stream_passively stream, & oes_p
 
           keep_parsing = true
 
           if stream.unparsed_exists
 
-            method_name_p = iambic_writer_method_name_passive_lookup_proc
+            method_name_p = polymorphic_writer_method_name_passive_lookup_proc
             m_i = method_name_p[ stream.current_token ]
 
             if m_i
 
-              @__methodic_actor_iambic_stream__ = stream
+              @__methodic_actor_polymorphic_stream__ = stream
               @__methodic_actor_handle_event_selectively__ = oes_p  # for [br] in one place
 
               begin
@@ -224,7 +224,7 @@ module Skylab::Callback
                 break
               end while nil
 
-              remove_instance_variable :@__methodic_actor_iambic_stream__
+              remove_instance_variable :@__methodic_actor_polymorphic_stream__
               remove_instance_variable :@__methodic_actor_handle_event_selectively__
             end
           end
@@ -233,8 +233,8 @@ module Skylab::Callback
         end
 
         def against_iambic_property no_p=nil  # experimental, :+#public-API
-          if @__methodic_actor_iambic_stream__.unparsed_exists
-            yield iambic_property
+          if @__methodic_actor_polymorphic_stream__.unparsed_exists
+            yield gets_one_polymorphic_value
           elsif no_p
             no_p[]
           else
@@ -246,18 +246,18 @@ module Skylab::Callback
 
         def bld_missing_required_properties_event
           build_not_OK_event_with :missing_required_properties,
-              :previous_token, @__methodic_actor_iambic_stream__.previous_token,
+              :previous_token, @__methodic_actor_polymorphic_stream__.previous_token,
               :error_category, :argument_error do |y, o|
 
             y << "expecting a value for #{ code o.previous_token }"
           end
         end
 
-        def iambic_property  # :+#public-API #hook-in
-          @__methodic_actor_iambic_stream__.gets_one
+        def gets_one_polymorphic_value  # :+#public-API #hook-in
+          @__methodic_actor_polymorphic_stream__.gets_one
         end
 
-        def iambic_writer_method_name_passive_lookup_proc  # :+#public-API #hook-in
+        def polymorphic_writer_method_name_passive_lookup_proc  # :+#public-API #hook-in
           cls = self.class
           -> name_i do
             m_i = :"#{ name_i }="
@@ -359,13 +359,13 @@ module Skylab::Callback
 
         class << self
 
-          def via_iambic_stream stream, & oes_p  # :+public-API  #hook-in
+          def via_polymorphic_stream stream, & oes_p  # :+public-API  #hook-in
             name_was_reached = false
             keep_parsing = nil
             ok = nil
             x = new do
               @name = nil
-              keep_parsing = process_iambic_stream_passively stream, & oes_p
+              keep_parsing = process_polymorphic_stream_passively stream, & oes_p
               @name and name_was_reached = true
               if name_was_reached || keep_parsing
                 ok = normalize_property
@@ -401,7 +401,7 @@ module Skylab::Callback
 
         def initialize & edit_p
           @argument_arity = nil
-          @iambic_writer_method_proc_is_generated = true  # :+#public-API (name)
+          @polymorphic_writer_method_proc_is_generated = true  # :+#public-API (name)
           @parameter_arity = :zero_or_one
           instance_exec( & edit_p )
           @argument_arity ||= :one
@@ -417,11 +417,11 @@ module Skylab::Callback
       private
 
         def argument_arity=
-          x = iambic_property
+          x = gets_one_polymorphic_value
           @argument_arity = x
           if :custom == x
-            @iambic_writer_method_proc_is_generated = false
-            @iambic_writer_method_proc_proc = nil
+            @polymorphic_writer_method_proc_is_generated = false
+            @polymorphic_writer_method_proc_proc = nil
           end
           KEEP_PARSING_
         end
@@ -432,7 +432,7 @@ module Skylab::Callback
         end
 
         def property=
-          @name = Callback_::Name.via_variegated_symbol iambic_property
+          @name = Callback_::Name.via_variegated_symbol gets_one_polymorphic_value
           STOP_PARSING_
         end
 
@@ -463,29 +463,29 @@ module Skylab::Callback
           NIL_
         end
 
-        def iambic_writer_method_proc
-          if @iambic_writer_method_proc_is_generated
+        def polymorphic_writer_method_proc
+          if @polymorphic_writer_method_proc_is_generated
             if @parameter_arity
-              send :"iambic_writer_method_proc_when_arity_is__#{ @argument_arity }__"
+              send :"polymorphic_writer_method_proc_when_arity_is__#{ @argument_arity }__"
             else
               IAMBIC_WRITER_METHOD_BODY_WHEN_IGNORE_H__.fetch @argument_arity
             end
-          elsif @iambic_writer_method_proc_proc
-            @iambic_writer_method_proc_proc[ self ]
+          elsif @polymorphic_writer_method_proc_proc
+            @polymorphic_writer_method_proc_proc[ self ]
           end
         end
 
       private
 
-        def iambic_writer_method_proc_when_arity_is__one__
+        def polymorphic_writer_method_proc_when_arity_is__one__
           _IVAR = as_ivar
           -> do
-            instance_variable_set _IVAR, iambic_property
+            instance_variable_set _IVAR, gets_one_polymorphic_value
             KEEP_PARSING_
           end
         end
 
-        def iambic_writer_method_proc_when_arity_is__zero__
+        def polymorphic_writer_method_proc_when_arity_is__zero__
           _IVAR = as_ivar
           -> do
             instance_variable_set _IVAR, true
@@ -503,27 +503,27 @@ module Skylab::Callback
           ACHIEVED_
         end,
         one: -> do
-          iambic_property
+          gets_one_polymorphic_value
           ACHIEVED_
         end
       }.freeze
 
       class Apply_simple_enhancement__
 
-        def initialize cls, iambic_stream
+        def initialize cls, polymorphic_stream
           @cls = cls
           @cls.extend Proprietor_Module_Methods__
           @cls.include Proprietor_Instance_Methods__
-          @iambic_stream = iambic_stream
+          @polymorphic_stream = polymorphic_stream
         end
 
         def execute
-          stream = @iambic_stream
+          stream = @polymorphic_stream
           if :properties == stream.current_token
             stream.advance_one
             resolve_property_class
             resolve_writable_box
-            ok = prcs_iambic_stream_fully_for_properties stream
+            ok = prcs_polymorphic_stream_fully_for_properties stream
             ok && @cls
           else
             receive_extra_iambic Stranger_[ stream.current_token, [ :properties ] ]  # #hook-in (local)
@@ -532,7 +532,7 @@ module Skylab::Callback
 
       private
 
-        def prcs_iambic_stream_fully_for_properties stream
+        def prcs_polymorphic_stream_fully_for_properties stream
           ok = true
           while stream.unparsed_exists
             if :properties == stream.current_token
@@ -540,7 +540,7 @@ module Skylab::Callback
               do_flush_rest = true
               break
             end
-            prop = @property_class.via_iambic_stream stream
+            prop = @property_class.via_polymorphic_stream stream
             if prop
               ok = accept_prop prop
               ok or break
@@ -595,7 +595,7 @@ module Skylab::Callback
           @cls.send :define_singleton_method, m_i do
             prop
           end
-          method_p = prop.iambic_writer_method_proc
+          method_p = prop.polymorphic_writer_method_proc
           if method_p
             m_i = :"#{ name_i }="
             @cls.send :define_method, m_i, method_p
@@ -752,15 +752,15 @@ module Skylab::Callback
 
       private
 
-        def iambic_writer_method_to_be_provided=
-          @iambic_writer_method_proc_is_generated = false
-          @iambic_writer_method_proc_proc = nil
+        def polymorphic_writer_method_to_be_provided=
+          @polymorphic_writer_method_proc_is_generated = false
+          @polymorphic_writer_method_proc_proc = nil
           ACHIEVED_
         end
 
-        def iambic_writer_method_proc_proc=
-          @iambic_writer_method_proc_is_generated = false
-          @iambic_writer_method_proc_proc = iambic_property
+        def polymorphic_writer_method_proc_proc=
+          @polymorphic_writer_method_proc_is_generated = false
+          @polymorphic_writer_method_proc_proc = gets_one_polymorphic_value
           ACHIEVED_
         end
       end
@@ -844,7 +844,7 @@ module Skylab::Callback
 
       # ~ totally independent experimental enhancement (#note-650)
 
-      module Cache_iambic_writer_methods__
+      module Cache_polymorphic_writer_methods__
 
         class << self
 
@@ -852,9 +852,9 @@ module Skylab::Callback
 
             top_class.class_exec do
 
-              extend Cache_iambic_writer_methods__
+              extend Cache_polymorphic_writer_methods__
 
-              def iambic_writer_method_name_passive_lookup_proc  # #hook-in
+              def polymorphic_writer_method_name_passive_lookup_proc  # #hook-in
                 self.class.iamb_writer_method_name_passive_proc
               end
 
@@ -869,7 +869,7 @@ module Skylab::Callback
                 h = edit_hash_p[ h ]
               end
 
-              @iambic_writer_method_name_dictionary = h.freeze  # top class only
+              @polymorphic_writer_method_name_dictionary = h.freeze  # top class only
             end
             nil
           end
@@ -881,33 +881,33 @@ module Skylab::Callback
         # ~ courtesies
 
         def is_keyword i
-          iambic_writer_method_name_dictionary.key? i
+          polymorphic_writer_method_name_dictionary.key? i
         end
 
-        def clear_iambic_writer_method_name_passive_proc
-          @iambic_writer_method_name_dictionary = nil
-          @iambic_writer_method_name_passive_proc = nil
+        def clear_polymorphic_writer_method_name_passive_proc
+          @polymorphic_writer_method_name_dictionary = nil
+          @polymorphic_writer_method_name_passive_proc = nil
         end
 
         # ~ implementation
 
         def iamb_writer_method_name_passive_proc
-          @iambic_writer_method_name_passive_proc ||= bld_iambic_writer_method_name_passive_proc
+          @polymorphic_writer_method_name_passive_proc ||= bld_polymorphic_writer_method_name_passive_proc
         end
 
-        private def bld_iambic_writer_method_name_passive_proc
-          h = iambic_writer_method_name_dictionary
+        private def bld_polymorphic_writer_method_name_passive_proc
+          h = polymorphic_writer_method_name_dictionary
           -> prop_i do
             h[ prop_i ]
           end
         end
 
-        def iambic_writer_method_name_dictionary
-          @iambic_writer_method_name_dictionary ||= bld_iambic_writer_method_name_dictionary
+        def polymorphic_writer_method_name_dictionary
+          @polymorphic_writer_method_name_dictionary ||= bld_polymorphic_writer_method_name_dictionary
         end
 
-        private def bld_iambic_writer_method_name_dictionary
-          h = superclass.iambic_writer_method_name_dictionary.dup
+        private def bld_polymorphic_writer_method_name_dictionary
+          h = superclass.polymorphic_writer_method_name_dictionary.dup
           ( private_instance_methods( false ).each do | meth_i |
             md = IAMBIC_WRITER_METHOD_NAME_RX__.match meth_i
             md or next

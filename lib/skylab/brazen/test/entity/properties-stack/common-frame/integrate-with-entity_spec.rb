@@ -23,7 +23,7 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Common_Frame::IWE
 
         Brazen_::Entity.call self do
           def biz
-            @biz_x = iambic_property
+            @biz_x = gets_one_polymorphic_value
             true
           end
         end

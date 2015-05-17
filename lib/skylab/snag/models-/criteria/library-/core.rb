@@ -20,9 +20,9 @@ module Skylab::Snag
 
       class Common_Adapter_
 
-        include Methodic_.iambic_processing_instance_methods
+        include Methodic_.polymorphic_processing_instance_methods
 
-        def process_iambic_stream_fully st
+        def process_polymorphic_stream_fully st
           _ok = super
           _ok && via_default_proc_and_is_required_normalize
         end

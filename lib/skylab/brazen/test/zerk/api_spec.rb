@@ -65,7 +65,7 @@ module Skylab::Brazen::TestSupport::Zerk::API
 
           class Field_Field < Zerk_::Field
 
-            def against_nonempty_iambic_stream stream
+            def against_nonempty_polymorphic_stream stream
               @s = stream.gets_one
               true
             end
@@ -86,7 +86,7 @@ module Skylab::Brazen::TestSupport::Zerk::API
               true
             end
 
-            def receive_iambic_stream _
+            def receive_polymorphic_stream _
 
               be = @parent[ :be_excited ].is_activated
               s = @parent[ :field ].s

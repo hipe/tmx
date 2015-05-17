@@ -163,7 +163,7 @@ module Skylab::TanMan
             end
 
             def for_direction=
-              @direction_symbols.push iambic_property
+              @direction_symbols.push gets_one_polymorphic_value
               KEEP_PARSING_
             end
           end

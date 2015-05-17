@@ -94,7 +94,7 @@ module Skylab::TestSupport
             :meta_property, :origin_category,
 
 
-            :iambic_writer_method_name_suffix, :"="
+            :polymorphic_writer_method_name_suffix, :"="
 
           # NOTE those properties that want to trigger side-effects are
           # written by hand below, and for readability they write their
@@ -109,7 +109,7 @@ module Skylab::TestSupport
           end
 
           def business_module_name=
-            @business_module_name = iambic_property
+            @business_module_name = gets_one_polymorphic_value
             KEEP_PARSING_
           end
 
@@ -132,7 +132,7 @@ module Skylab::TestSupport
           o :hidden
 
           def line_downstream=
-            x = iambic_property
+            x = gets_one_polymorphic_value
             if x
               @do_emit_current_output_path = true
               @line_downstream = x
@@ -145,7 +145,7 @@ module Skylab::TestSupport
           o :hidden
 
           def line_upstream=
-            x = iambic_property
+            x = gets_one_polymorphic_value
             if x
               @line_upstream = x
               @resolve_line_upstream_method_name = :OK
@@ -156,7 +156,7 @@ module Skylab::TestSupport
           o :hidden
 
           def arbitrary_proc_array=
-            @arbiitrary_proc_a = iambic_property
+            @arbiitrary_proc_a = gets_one_polymorphic_value
             KEEP_PARSING_
           end
 
@@ -175,7 +175,7 @@ module Skylab::TestSupport
             # act on this immediately because it affects our syntax
 
             befor = @output_adapter
-            x = iambic_property
+            x = gets_one_polymorphic_value
             if x
               x = x.intern
             end
@@ -193,7 +193,7 @@ module Skylab::TestSupport
           end
 
           def output_path=
-            x = iambic_property
+            x = gets_one_polymorphic_value
             if x
               @do_emit_current_output_path = false
                 # (because an actor will emit a more specialized event)
@@ -205,7 +205,7 @@ module Skylab::TestSupport
           end
 
           def upstream_path=
-            x = iambic_property
+            x = gets_one_polymorphic_value
             if x
               @upstream_path = x
               @resolve_line_upstream_method_name =
@@ -270,8 +270,8 @@ module Skylab::TestSupport
 
         protected def recv_dup_iambic x_a
 
-          _ok = process_iambic_stream_fully(
-            iambic_stream_via_iambic_array x_a )
+          _ok = process_polymorphic_stream_fully(
+            polymorphic_stream_via_iambic x_a )
 
           _ok && self
         end
@@ -294,12 +294,12 @@ module Skylab::TestSupport
 
         # ~ begin experiment with dynamic syntax e.t al
 
-        def receive_iambic_stream_ st
+        def receive_polymorphic_stream_ st
 
           # for collaboration with a modal client
 
           befor = [ @dry_run, @output_adapter ]  # ick
-          ok = process_iambic_stream_fully st
+          ok = process_polymorphic_stream_fully st
           if ok
             aftr = [ @dry_run, @output_adapter ]
             if befor != aftr
@@ -313,7 +313,7 @@ module Skylab::TestSupport
           @output_adapter_o
         end
 
-        def iambic_writer_method_name_passive_lookup_proc  # #hook-in [cb]
+        def polymorphic_writer_method_name_passive_lookup_proc  # #hook-in [cb]
 
           formal_properties
 
@@ -340,7 +340,7 @@ module Skylab::TestSupport
         def __method_name_and_prepare_to_parse prp
           case prp.origin_category
           when :intrinsic
-            prp.iambic_writer_method_name
+            prp.polymorphic_writer_method_name
           when :common_pfunc
             @__parameter_function_property__ = prp
             :__parse_parameter_function_property

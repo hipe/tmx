@@ -23,7 +23,7 @@ module Skylab::System
           def mixed_via_iambic x_a, & oes_p
             new do
               @on_event_selectively = oes_p
-              process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+              process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
             end.__mixed_result
           end
 
@@ -80,7 +80,7 @@ module Skylab::System
 
           oes_p and accept_selective_listener_proc oes_p
 
-          ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+          ok = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
 
           ok and begin
             _decide_if_curry_and_resolve_command_args
@@ -114,13 +114,13 @@ module Skylab::System
       private
 
         def filename=
-          @unescaped_filename_a.clear.push iambic_property
+          @unescaped_filename_a.clear.push gets_one_polymorphic_value
           KEEP_PARSING_
         end
 
         def filenames=
           # an "or" list
-          x = iambic_property
+          x = gets_one_polymorphic_value
           if x
             @unescaped_filename_a.replace x
           else
@@ -134,7 +134,7 @@ module Skylab::System
           # for now a hack to effect "-type d" etc. if we find ourselves
           # leveraging this more than once in the same "way", abstract.
 
-          arg = _normalize_unsanititized_freeform_string_array iambic_property
+          arg = _normalize_unsanititized_freeform_string_array gets_one_polymorphic_value
           arg and begin
             @sanitized_freeform_query_infix_words = arg.value_x   # nil OK
             KEEP_PARSING_
@@ -143,7 +143,7 @@ module Skylab::System
 
         def freeform_query_postfix_words=
 
-          arg = _normalize_unsanititized_freeform_string_array iambic_property
+          arg = _normalize_unsanititized_freeform_string_array gets_one_polymorphic_value
           arg and begin
             @sanitized_freeform_query_postfix_words = arg.value_x  # nil OK
             KEEP_PARSING_
@@ -151,23 +151,23 @@ module Skylab::System
         end
 
         def ignore_dirs=
-          @unescaped_ignore_dir_a.replace iambic_property
+          @unescaped_ignore_dir_a.replace gets_one_polymorphic_value
           KEEP_PARSING_
         end
 
         def path=
-          @unescaped_path_a.clear.push iambic_property
+          @unescaped_path_a.clear.push gets_one_polymorphic_value
           KEEP_PARSING_
         end
 
         def paths=
-          @unescaped_path_a.clear.replace iambic_property
+          @unescaped_path_a.clear.replace gets_one_polymorphic_value
           KEEP_PARSING_
         end
 
         def trusted_strings=  # WARNING the hash is not currently dup-aware
           h = ( @trusted_string_h ||= {} )
-          iambic_property.each do | s |
+          gets_one_polymorphic_value.each do | s |
             h[ s ] = true
           end
           KEEP_PARSING_

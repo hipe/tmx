@@ -15,19 +15,19 @@ module Skylab::System
 
     System_.lib_.entity self do
 
-      o :iambic_writer_method_name_suffix, :'=',
+      o :polymorphic_writer_method_name_suffix, :'=',
 
         :property, :debug_IO,
 
         :property, :max_mkdirs
 
       def noop=
-        @is_noop = iambic_property
+        @is_noop = gets_one_polymorphic_value
         KEEP_PARSING_
       end
 
       def path=
-        @path_x = iambic_property
+        @path_x = gets_one_polymorphic_value
         KEEP_PARSING_
       end
 
@@ -44,7 +44,7 @@ module Skylab::System
       @be_verbose = false
 
       if x_a.length.nonzero?
-        process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+        process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
       end
 
       if p  # prolly mutex w/ above
@@ -79,7 +79,7 @@ module Skylab::System
     end
   protected
     def _init_copy_via_iambic x_a
-      process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+      process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
       if @path_x
         init_pathname @path_x
         init_path_derivatives

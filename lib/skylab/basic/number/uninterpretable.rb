@@ -67,7 +67,7 @@ module Skylab::Basic
 
       def minimum=
 
-        x = iambic_property
+        x = gets_one_polymorphic_value
         if x
           @minimum = x
           @terminal_channel_i = :number_too_small
@@ -77,7 +77,7 @@ module Skylab::Basic
 
       def property_name_symbol=
 
-        sym = iambic_property
+        sym = gets_one_polymorphic_value
         if sym
           @prop = Minimal_Property.via_variegated_symbol sym
           KEEP_PARSING_

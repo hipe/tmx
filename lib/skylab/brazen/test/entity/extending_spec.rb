@@ -24,12 +24,12 @@ module Skylab::Brazen::TestSupport::Entity
         FooE_Two = Subject_[].call do
 
           def foo
-            @foo_x = iambic_property
+            @foo_x = gets_one_polymorphic_value
             true
           end
 
           def bar
-            @bar_x = iambic_property
+            @bar_x = gets_one_polymorphic_value
             true
           end
 
@@ -54,7 +54,7 @@ module Skylab::Brazen::TestSupport::Entity
             end
 
             def baz
-              @baz_x = iambic_property
+              @baz_x = gets_one_polymorphic_value
               true
             end
           end
@@ -79,12 +79,12 @@ module Skylab::Brazen::TestSupport::Entity
         FooE_Props = Subject_[].call do
 
           def uh
-            @uh_x = iambic_property
+            @uh_x = gets_one_polymorphic_value
             true
           end
 
           def ah
-            @ah_x = iambic_property
+            @ah_x = gets_one_polymorphic_value
             true
           end
 
@@ -116,12 +116,12 @@ module Skylab::Brazen::TestSupport::Entity
         FooE_Left = Subject_[].call do
 
           def one
-            @one_x = iambic_property
+            @one_x = gets_one_polymorphic_value
             true
           end
 
           def two
-            @one_x = iambic_property
+            @one_x = gets_one_polymorphic_value
             true
           end
         end
@@ -129,12 +129,12 @@ module Skylab::Brazen::TestSupport::Entity
         FooE_Right = Subject_[].call do
 
           def two
-            @two_x = iambic_property.to_s.upcase.intern
+            @two_x = gets_one_polymorphic_value.to_s.upcase.intern
             true
           end
 
           def three
-            @three_x = iambic_property
+            @three_x = gets_one_polymorphic_value
             true
           end
         end

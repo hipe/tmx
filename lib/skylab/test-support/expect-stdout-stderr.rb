@@ -343,12 +343,12 @@ module Skylab::TestSupport
 
     class Expectation__
 
-      include METHODIC_.iambic_processing_instance_methods
+      include METHODIC_.polymorphic_processing_instance_methods
 
       def initialize st, & p
         @expect_is_styled = false
         @method_name = :_sout_serr_expect_and_resolve_emission
-        process_iambic_stream_passively st
+        process_polymorphic_stream_passively st
         while st.unparsed_exists
           process_the_rest_using_shape_hack st
         end
@@ -388,7 +388,7 @@ module Skylab::TestSupport
         KEEP_PARSING_
       end
 
-      METHODIC_.cache_iambic_writer_methods self
+      METHODIC_.cache_polymorphic_writer_methods self
     end
   end
 end

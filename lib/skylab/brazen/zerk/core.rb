@@ -93,11 +93,11 @@ module Skylab::Brazen
 
       # ~~ hook-ins for non-interactive
 
-      def receive_iambic_stream stream
+      def receive_polymorphic_stream stream
         if stream.unparsed_exists
-          against_nonempty_iambic_stream stream
+          against_nonempty_polymorphic_stream stream
         else
-          against_empty_iambic_stream
+          against_empty_polymorphic_stream
         end
       end
 
@@ -160,7 +160,7 @@ module Skylab::Brazen
 
       # ~~ support for non-interactive behavior
 
-      def against_nonempty_iambic_stream stream  # this is the default
+      def against_nonempty_polymorphic_stream stream  # this is the default
         # behavior for terminal ("do something") nodes.. tossed here just b/c.
 
         maybe_send_event :error do
@@ -449,7 +449,7 @@ module Skylab::Brazen
         end
       end
 
-      def against_nonempty_iambic_stream_assume_string scan
+      def against_nonempty_polymorphic_stream_assume_string scan
         s = scan.gets_one
         if s.length.zero?
           when_passed_zero_length_string
@@ -501,7 +501,7 @@ module Skylab::Brazen
         ok and when_value_changed
       end
 
-      def against_empty_iambic_stream
+      def against_empty_polymorphic_stream
         maybe_send_event :error do
           build_request_ended_prematurely_event
         end
@@ -560,7 +560,7 @@ module Skylab::Brazen
         end
       end
 
-      def receive_iambic_stream _
+      def receive_polymorphic_stream _
         if @group
           @group.activate name_symbol
         elsif @is_activated

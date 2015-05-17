@@ -6,15 +6,15 @@ module Skylab::Parse
 
       class << self
 
-        def new_via_iambic_stream st
+        def new_via_polymorphic_stream st
           new do
-            _custom_syntax( st ) and process_iambic_stream_fully( st )
+            _custom_syntax( st ) and process_polymorphic_stream_fully( st )
           end
         end
 
-        def new_via_iambic_stream_passively st
+        def new_via_polymorphic_stream_passively st
           new do
-            _custom_syntax( st ) and process_iambic_stream_passively( st )
+            _custom_syntax( st ) and process_polymorphic_stream_passively( st )
           end
         end
       end  # >>

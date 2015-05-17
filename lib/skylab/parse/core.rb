@@ -21,7 +21,7 @@ module Skylab::Parse  # see [#001]
 
       def function_via_definition_array x_a
         st = Callback_::Polymorphic_Stream.via_array x_a
-        function( st.gets_one ).new_via_iambic_stream st
+        function( st.gets_one ).new_via_polymorphic_stream st
       end
 
       def fuzzy_matcher * a

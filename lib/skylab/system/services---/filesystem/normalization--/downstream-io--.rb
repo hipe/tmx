@@ -11,34 +11,34 @@ module Skylab::System
 
           Entity_.call self do
 
-            o :iambic_writer_method_name_suffix, :'='
+            o :polymorphic_writer_method_name_suffix, :'='
 
             def ftype=
-              @ftype = iambic_property
+              @ftype = gets_one_polymorphic_value
               KEEP_PARSING_
             end
 
             def path=
               @do_execute = true
               @path_arg = System_.lib_.basic.trio.
-                via_value_and_variegated_symbol iambic_property, :path
+                via_value_and_variegated_symbol gets_one_polymorphic_value, :path
               KEEP_PARSING_
             end
 
             def path_arg=
               @do_execute = true
-              @path_arg = iambic_property
+              @path_arg = gets_one_polymorphic_value
               KEEP_PARSING_
             end
 
             def outstream=
               @do_execute = true
-              @outstream = iambic_property
+              @outstream = gets_one_polymorphic_value
               KEEP_PARSING_
             end
 
             def on_event=
-              oe_p = iambic_property
+              oe_p = gets_one_polymorphic_value
               @on_event_selectively = -> *, & ev_p do
                 oe_p[ ev_p[] ]
               end

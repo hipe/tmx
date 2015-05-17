@@ -56,7 +56,7 @@ module Skylab::Basic
 
           _o = new do
             @name_symbol = st.gets_one
-            process_iambic_stream_passively st
+            process_polymorphic_stream_passively st
           end
 
           Callback_::Pair.new _o
@@ -89,7 +89,7 @@ module Skylab::Basic
 
       def can_transition_to=
 
-        a = iambic_property
+        a = gets_one_polymorphic_value
 
         if a
           case 1 <=> a.length
@@ -121,12 +121,12 @@ module Skylab::Basic
     private
 
       def entered_by=
-        _accept_entered_by( & iambic_property )
+        _accept_entered_by( & gets_one_polymorphic_value )
         KEEP_PARSING_
       end
 
       def entered_by_regex=
-        _RX = iambic_property
+        _RX = gets_one_polymorphic_value
         _accept_entered_by do | st |
 
           if st.unparsed_exists
@@ -148,7 +148,7 @@ module Skylab::Basic
       end
 
       def on_entry=
-        @handle_entry = iambic_property
+        @handle_entry = gets_one_polymorphic_value
         KEEP_PARSING_
       end
     end

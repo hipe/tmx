@@ -11,7 +11,7 @@ module Skylab::Parse
           # ~ narrative (not alpha) order
 
           def new_via_arglist a
-            new_via_iambic_stream iambic_stream_via_iambic_array a
+            new_via_polymorphic_stream polymorphic_stream_via_iambic a
           end
 
           # ~ others
@@ -36,7 +36,7 @@ module Skylab::Parse
       private
 
         def moniker_symbol=  # a "moniker" is a name that has zero imapct on logic - it is for humans only
-          @moniker_symbol = iambic_property
+          @moniker_symbol = gets_one_polymorphic_value
           KEEP_PARSING_
         end
 
@@ -77,7 +77,7 @@ module Skylab::Parse
 
         class << self
 
-          def new_via_iambic_stream_passively st
+          def new_via_polymorphic_stream_passively st
             new_via_proc st.gets_one
           end
 

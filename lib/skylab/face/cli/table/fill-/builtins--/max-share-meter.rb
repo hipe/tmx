@@ -53,10 +53,10 @@ module Skylab::Face
             @is_from_right = true
           end
           def glyph
-            @glyph = iambic_property
+            @glyph = gets_one_polymorphic_value
           end
           def background_glyph
-            @background_glyph = iambic_property
+            @background_glyph = gets_one_polymorphic_value
           end
         end
 

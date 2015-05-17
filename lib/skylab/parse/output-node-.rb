@@ -10,8 +10,8 @@ module Skylab::Parse
         def new_with * x_a
           ok = nil
           x = new do
-            ok = __init_with_magic_syntax_via_iambic_stream(
-              iambic_stream_via_iambic_array x_a )
+            ok = __init_with_magic_syntax_via_polymorphic_stream(
+              polymorphic_stream_via_iambic x_a )
           end
           ok && x
         end
@@ -40,25 +40,25 @@ module Skylab::Parse
         otr = dup
         ok = nil
         otr.instance_exec do
-          ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+          ok = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
         end
         ok && otr
       end
 
     private
 
-      def __init_with_magic_syntax_via_iambic_stream st
+      def __init_with_magic_syntax_via_polymorphic_stream st
         @value_x = st.gets_one
-        process_iambic_stream_fully st
+        process_polymorphic_stream_fully st
       end
 
       def constituent_index=
-        @constituent_index = iambic_property
+        @constituent_index = gets_one_polymorphic_value
         KEEP_PARSING_
       end
 
       def did_spend_function=
-        @function_is_spent = iambic_property
+        @function_is_spent = gets_one_polymorphic_value
         KEEP_PARSING_
       end
 

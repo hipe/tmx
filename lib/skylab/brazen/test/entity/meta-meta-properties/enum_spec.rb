@@ -25,7 +25,7 @@ module Skylab::Brazen::TestSupport::Entity
 
               :meta_property, :color,
 
-              :iambic_writer_method_name_suffix, :"=",
+              :polymorphic_writer_method_name_suffix, :"=",
 
               :color, :red
 

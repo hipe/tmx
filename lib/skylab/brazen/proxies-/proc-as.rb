@@ -243,11 +243,11 @@ module Skylab::Brazen
           bx
         end
 
-        def bound_call_against_iambic_stream st  # #hook-out
+        def bound_call_against_polymorphic_stream st  # #hook-out
 
           arglist = []
 
-          h = __hash_via_flushing_probably_iambic_stream st
+          h = __hash_via_flushing_probably_polymorphic_stream st
 
           miss_sym_a = nil
 
@@ -280,7 +280,7 @@ module Skylab::Brazen
           end
         end
 
-        def __hash_via_flushing_probably_iambic_stream st
+        def __hash_via_flushing_probably_polymorphic_stream st
 
           h = {}
           while st.unparsed_exists

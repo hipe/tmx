@@ -95,7 +95,7 @@ module Skylab::Brazen
 
     # [#013]:#note-A the below order
 
-    include Callback_::Actor.methodic_lib.iambic_processing_instance_methods
+    include Callback_::Actor.methodic_lib.polymorphic_processing_instance_methods
 
     include Brazen_::Entity::Instance_Methods
 
@@ -223,18 +223,18 @@ module Skylab::Brazen
     def bound_call_against_polymorphic_stream_and_mutable_box st, bx
 
       _bound_call_against bx do
-        process_iambic_stream_fully st
+        process_polymorphic_stream_fully st
       end
     end
 
-    def bound_call_against_iambic_stream st
+    def bound_call_against_polymorphic_stream st
 
       # meet any preconditions before calling the user's `produce_result`.
       # to meet preconditions we have to parse the iambic stream. to parse
       # the iambic stream we have to call `normalize`.
 
       _bound_call_against do
-        process_iambic_stream_fully st
+        process_polymorphic_stream_fully st
       end
     end
 
@@ -243,16 +243,16 @@ module Skylab::Brazen
       # exactly as above
 
       _bound_call_against do
-        __process_box_as_iambic_stream_fully box
+        __process_box_as_polymorphic_stream_fully box
       end
     end
 
-    def __process_box_as_iambic_stream_fully bx  # experimental
+    def __process_box_as_polymorphic_stream_fully bx  # experimental
 
       keep_parsing = true
       formals = formal_properties
       pxy = Value_As_Stream_Like_Proxy___.new
-      @__methodic_actor_iambic_stream__ = pxy
+      @__methodic_actor_polymorphic_stream__ = pxy
       bx.each_pair do | k, x |
 
         prp = formals[ k ]
@@ -266,7 +266,7 @@ module Skylab::Brazen
         if prp.takes_argument
 
           pxy.accept_current_token_ x
-          keep_parsing = send prp.iambic_writer_method_name
+          keep_parsing = send prp.polymorphic_writer_method_name
 
         elsif x
 
@@ -274,7 +274,7 @@ module Skylab::Brazen
           # the actual value is, in the interest of iambic isomorphism.
 
           pxy.clear
-          keep_parsing = send prp.iambic_writer_method_name
+          keep_parsing = send prp.polymorphic_writer_method_name
 
         else
 
@@ -287,7 +287,7 @@ module Skylab::Brazen
         keep_parsing or break
 
       end
-      remove_instance_variable :@__methodic_actor_iambic_stream__
+      remove_instance_variable :@__methodic_actor_polymorphic_stream__
       keep_parsing
     end
 
@@ -362,13 +362,13 @@ module Skylab::Brazen
 
     def process_pair_box_passively bx  # wants to go up. #magnetic
 
-      method_name_p = iambic_writer_method_name_passive_lookup_proc
+      method_name_p = polymorphic_writer_method_name_passive_lookup_proc
       keep_parsing = true
 
       bx.each_pair do | k, single |
         m_i = method_name_p[ k ]
         m_i or next
-        @__methodic_actor_iambic_stream__ = Gets_One_Value_Proxy___.new single.value_x
+        @__methodic_actor_polymorphic_stream__ = Gets_One_Value_Proxy___.new single.value_x
         keep_parsing = send m_i
         keep_parsing or break
       end
@@ -378,8 +378,8 @@ module Skylab::Brazen
 
     Gets_One_Value_Proxy___ = ::Struct.new :gets_one
 
-    def process_iambic_stream_fully_ x
-      process_iambic_stream_fully x
+    def process_polymorphic_stream_fully_ x
+      process_polymorphic_stream_fully x
     end
 
     class Edit_Session__
@@ -399,28 +399,28 @@ module Skylab::Brazen
 
     # (end experiment)
 
-    def iambic_writer_method_name_passive_lookup_proc  # #hook-in to [cb]
+    def polymorphic_writer_method_name_passive_lookup_proc  # #hook-in to [cb]
 
       # bend [cb] methodic to accomodate [#046] mutable formal properties
 
       formals = formal_properties
 
       if formals
-        __iambic_writer_method_name_passive_lookup_proc_via_formals formals
+        __polymorphic_writer_method_name_passive_lookup_proc_via_formals formals
       else
         -> _ { }  # MONADIC_EMPTINESS_
       end
     end
 
-    def __iambic_writer_method_name_passive_lookup_proc_via_formals formals
+    def __polymorphic_writer_method_name_passive_lookup_proc_via_formals formals
 
       cls = self.class
 
       -> sym do
         prp = formals[ sym ]
         if prp
-          if cls.method_defined? prp.iambic_writer_method_name  # not private - this is not actor
-            prp.iambic_writer_method_name
+          if cls.method_defined? prp.polymorphic_writer_method_name  # not private - this is not actor
+            prp.polymorphic_writer_method_name
           else
             @__last_formal_property__ = prp
             # either this hack or duplicate actor's logic
@@ -433,7 +433,7 @@ module Skylab::Brazen
     def __via_last_formal_property_process_iambic_argument
       prp = @__last_formal_property__
       if prp.takes_argument
-         @argument_box.add prp.name_symbol, iambic_property
+         @argument_box.add prp.name_symbol, gets_one_polymorphic_value
       else
         @argument_box.add prp.name_symbol, true
       end
@@ -442,7 +442,7 @@ module Skylab::Brazen
 
     def via_arguments_produce_bound_call  # :+#public-API [ts]
 
-      # expose the moment between `process_iambic_stream_fully` and `normalize`
+      # expose the moment between `process_polymorphic_stream_fully` and `normalize`
 
       ok = normalize
       ok &&= __resolve_preconditions
@@ -689,11 +689,11 @@ module Skylab::Brazen
 
       def execute
         @inflection = Customized_Action_Inflection__.new
-        process_iambic_stream_passively @upstream
+        process_polymorphic_stream_passively @upstream
         acpt @inflection
       end
 
-      include Callback_::Actor.methodic_lib.iambic_processing_instance_methods
+      include Callback_::Actor.methodic_lib.polymorphic_processing_instance_methods
 
     private
 

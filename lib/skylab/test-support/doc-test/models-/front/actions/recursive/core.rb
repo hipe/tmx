@@ -17,7 +17,7 @@ module Skylab::TestSupport
 
             def enum=
 
-              set_sym_a = iambic_property
+              set_sym_a = gets_one_polymorphic_value
 
               _ENUM_BOX_P = Callback_.memoize do
                 bx = Callback_::Box.new
@@ -29,7 +29,7 @@ module Skylab::TestSupport
 
               add_to_write_proc_chain do | _PROP |
                 -> do
-                  x = iambic_property.intern
+                  x = gets_one_polymorphic_value.intern
                   if _ENUM_BOX_P[][ x ]
                     receive_value_of_entity_property x, _PROP
                   else

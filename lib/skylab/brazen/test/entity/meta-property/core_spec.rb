@@ -55,7 +55,7 @@ module Skylab::Brazen::TestSupport::Entity
             o :meta_property, :fun_ness
             o :fun_ness, :really_fun
             def foo
-              @foo = iambic_property
+              @foo = gets_one_polymorphic_value
             end
           end
 
