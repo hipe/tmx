@@ -60,8 +60,8 @@ module Skylab::TanMan
         val x
       end
 
-      def indefinite_noun * a
-        _NLP_agent.indefinite_noun.call_via_arglist a
+      def indefinite_noun lemma_s
+        _NLP_agent.indefinite_noun lemma_s
       end
 
       def kbd s
@@ -84,7 +84,7 @@ module Skylab::TanMan
       end
 
       def plural_noun * a
-        _NLP_agent.plural_noun.call_via_arglist a
+        _NLP_agent.plural_noun( * a )
       end
 
       def pth s

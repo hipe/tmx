@@ -176,15 +176,17 @@ module Skylab::Snag
 
         def __build_verb_head_string_array_for_singular
 
-          _build_verb_head_string_array_for do | lexeme |
-            lexeme.singular__third__present
+          _build_verb_head_string_array_for do | adapter |
+
+            adapter.singular_third_present
           end
         end
 
         def __build_verb_head_string_array_for_plural
 
-          _build_verb_head_string_array_for do | lexeme |
-            lexeme.plural__third__present
+          _build_verb_head_string_array_for do | adapter |
+
+            adapter.plural_third_present
           end
         end
 
@@ -194,17 +196,14 @@ module Skylab::Snag
 
           s = s_a.fetch 0
 
-          v = Snag_.lib_.NLP::EN::POS::Verb
+          adapter = Snag_.lib_.NLP::EN::POS::Verb[ s ]
 
-          lexeme = v.lexicon.fetch_monadic_lexeme s do end
-
-          if ! lexeme
-            self._WE_ALMOST_ALWAYS_USE_IRREGULR_VERB_LIKE_HAVE_AND_BE
-            lexeme = v[ s ]
+          if ! adapter.lexeme.is_irregular
+            self._SANITY_we_almost_always_use_irregulr_verb_like_have_and_be
           end
 
           s_a_ = s_a.dup
-          s_a_[ 0 ] = yield lexeme
+          s_a_[ 0 ] = yield adapter
           s_a_
         end
 

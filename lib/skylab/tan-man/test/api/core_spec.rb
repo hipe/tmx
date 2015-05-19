@@ -21,7 +21,7 @@ module Skylab::TanMan::TestSupport::API
     it "xtra tokens on a ping" do
       call_API :ping, :wahootey
       ev = expect_not_OK_event :extra_properties,
-        'unrecognized (plural_noun ["property", 1]) (and_ ["(ick :wahootey)"])'
+        'unrecognized (plural_noun [1, "property"]) (and_ ["(ick :wahootey)"])'
       black_and_white( ev ).should eql "unrecognized property :wahootey"
       expect_failed
     end

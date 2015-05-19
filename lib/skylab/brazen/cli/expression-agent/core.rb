@@ -68,8 +68,8 @@ module Skylab::Brazen
         code s
       end
 
-      def indefinite_noun * a
-        _NLP_agent.indefinite_noun.call_via_arglist a
+      def indefinite_noun lemma_s
+        _NLP_agent.indefinite_noun lemma_s
       end
 
       def nm name
@@ -86,7 +86,7 @@ module Skylab::Brazen
       end
 
       def plural_noun * a
-        _NLP_agent.plural_noun.call_via_arglist a
+        _NLP_agent.plural_noun( * a )
       end
 
       def preterite_verb lemma_i

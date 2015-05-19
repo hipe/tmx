@@ -1,8 +1,8 @@
 module Skylab::Human
 
-    # (will rewrite)
+  module NLP::EN
 
-    module NLP::EN::POS
+    module POS  # intro at [#037]. three laws all the way.
 
       # this is strictly a cordoned-off box module only for parts of speech
       # modules. a parts of speech box module may only contain parts of
@@ -10,31 +10,32 @@ module Skylab::Human
 
       class << self
 
-        attr_reader :_abbrev_box
-
-        def abbrev h
-          @_abbrev_box.merge! h ; nil
+        def indefinite_noun lemma_s
+          _lib::Noun::Indefinite[ lemma_s ]
         end
 
-        def indefinite_noun
-          Indefinite_noun__
+        def plural_noun count_d=nil, lemma_s
+          _lib::Noun::Plural[ count_d, lemma_s ]
         end
 
-        def plural_noun
-          Plural_noun__
+        def preterite_verb lemma_s
+          _lib::Verb::Preterite[ lemma_s ]
         end
 
-        def preterite_verb
-          Preterite_verb___
+        def progressive_verb lemma_s
+          _lib::Verb::Progressive[ lemma_s ]
         end
 
-        def progressive_verb
-          Progressive_verb___
+        def third_person lemma_s
+          _lib::Verb::Third[ lemma_s ]
         end
 
-        def third_person
-          Third_person___
+        def _lib
+          EN_::Phrase_Structure_::Oneliner_Adapters
         end
       end  # >>
+
+      Autoloader_[ self ]
     end
+  end
 end

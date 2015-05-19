@@ -6,6 +6,8 @@ module Skylab::Permute
 
       def initialize & x_p
 
+        @mutate_syntax_string_parts = nil
+
         @__receive_help = -> a, p do
           @help_pair = [ a, p ]
           @__receive_help = nil

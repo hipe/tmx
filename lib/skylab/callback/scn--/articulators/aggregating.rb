@@ -105,7 +105,7 @@ module Skylab::Callback
             code i
           end
 
-          y << "unrecognized #{ plural_noun 'template variable', s_a.length }#{
+          y << "unrecognized #{ plural_noun s_a.length, 'template variable' }#{
             } #{ and_ s_a }"
           y << "did you mean #{ or_ _s_a_ }?"
         end

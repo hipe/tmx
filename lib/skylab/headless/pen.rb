@@ -39,8 +39,8 @@ module Skylab::Headless
       s
     end
 
-    def indefinite_noun * a
-      _NLP_agent.indefinite_noun.call_via_arglist a
+    def indefinite_noun lemma_s
+      _NLP_agent.indefinite_noun lemma_s
     end
 
     def kbd s

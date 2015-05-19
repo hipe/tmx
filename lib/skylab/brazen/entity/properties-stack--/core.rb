@@ -163,7 +163,7 @@ module Skylab::Brazen
           adj_ = "#{ adj } "
         end
 
-        y << "#{ adj_ }#{ plural_noun _lemma, s_a.length }#{
+        y << "#{ adj_ }#{ plural_noun s_a.length, _lemma }#{
           } #{ and_ s_a }"
 
         if o.did_you_mean_i_a
@@ -192,7 +192,7 @@ module Skylab::Brazen
 
         _lemma = o.lemma || DEFAULT_PROPERTY_LEMMA__
 
-        y << "#{ _nv }missing required #{ plural_noun _lemma, s_a.length } #{
+        y << "#{ _nv }missing required #{ plural_noun s_a.length, _lemma } #{
           }#{ and_ s_a }"
       end
     end

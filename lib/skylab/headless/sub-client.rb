@@ -337,24 +337,25 @@ end
         _EN[].both a
       end ]
 
-      o[ :indefinite_noun ] = -> do
-        Headless_.lib_.human::NLP::EN::POS.indefinite_noun
+      o[ :indefinite_noun ] = -> lemma_s do
+
+        Headless_.lib_.human::NLP::EN::POS.indefinite_noun lemma_s
       end
 
       o[ :or_ ] = memoize_length[ -> a do
         Or__[ a ]
       end ]
 
-      o[ :plural_noun ] = -> do
-        Headless_.lib_.human::NLP::EN::POS.plural_noun
+      o[ :plural_noun ] = -> count_d=nil, lemma_s do
+        Headless_.lib_.human::NLP::EN::POS.plural_noun count_d, lemma_s
       end
 
-      o[ :preterite_verb ] = -> do
-        Headless_.lib_.human::NLP::EN::POS.preterite_verb
+      o[ :preterite_verb ] = -> lemma_s do
+        Headless_.lib_.human::NLP::EN::POS.preterite_verb lemma_s
       end
 
-      o[ :progressive_verb ] = -> do
-        Headless_.lib_.human::NLP::EN::POS.progressive_verb
+      o[ :progressive_verb ] = -> lemma_s do
+        Headless_.lib_.human::NLP::EN::POS.progressive_verb lemma_s
       end
 
       bld_oxford_comma = -> sep do

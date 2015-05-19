@@ -132,12 +132,14 @@ module Skylab::Human
 
         def __express_subject
 
-          prd = EN_::POS::Noun.new_production_via @_idea.subject_atom.to_s
+          prd = EN_::POS::Noun[ @_idea.subject_atom.to_s ]
+          @__hax = prd
+          prd << :_do_not_use_article_
 
           if @_use_plural
-            prd.mutate_against_exponent_name_and_value :number, :plural
+            prd << :plural
           elsif @_is_one
-            prd.mutate_against_exponent_name_and_value :number, :singular
+            prd << :singular
           end
 
           _say prd.to_string
@@ -145,12 +147,15 @@ module Skylab::Human
 
         def __express_verb
 
-          prd = EN_::POS::Verb.new_production_via __some_verb_string
+          pron = EN_::POS::Noun[ 'eew' ]
+          pron << :third
 
           if @_use_plural
-            prd.mutate_against_exponent_name_and_value :number, :plural
+            pron << :plural
+          else
+            pron << :singular
           end
-
+          prd = EN_::POS::Verb[ pron, __some_verb_string ]
           _say prd.to_string
 
           if @_idea.is_negative && ! @_is_zero  # no dbl negs
@@ -164,11 +169,11 @@ module Skylab::Human
           if @_VERB_ETC_TODO
             self._ETC
           else
-            DEFAULT_VERB_LEXEME___
+            DEFAULT_VERB_LEMMA___
           end
         end
 
-        DEFAULT_VERB_LEXEME___ = 'is'.freeze
+        DEFAULT_VERB_LEMMA___ = 'be'.freeze
 
         def _say_yet_or_already
 

@@ -57,7 +57,7 @@ module Skylab::Brazen
       def express_into_yielder_any_prefixed_verb y, prefix_s
         v_o = _any_curried_verb
         if v_o
-          y << "#{ prefix_s } #{ v_o.lexeme.lemma }"
+          y << "#{ prefix_s } #{ v_o.lemma }"
           DONE_
         end
       end
@@ -78,10 +78,13 @@ module Skylab::Brazen
       end
 
       def _any_curried_verb
+
         if 1 < @len
+
           s = @slug_a.fetch( -1 )
           s.respond_to?( :ascii_only? ) or self._DO_ME
-          Brazen_.lib_.NLP::EN::POS::Verb[ s ].bind_to_exponent :lemma
+
+          Brazen_.lib_.NLP::EN::POS::Verb[ s ]
         end
       end
 
@@ -90,10 +93,12 @@ module Skylab::Brazen
       end
 
       def _any_curried_object_noun
+
         if 2 < @len
+
           s = @slug_a.fetch( -2 )
           s.respond_to?( :ascii_only? ) or raise self._DO_ME
-          Brazen_.lib_.NLP::EN::POS::Noun[ s ].bind_to_exponent :singular
+          Brazen_.lib_.NLP::EN::POS::Noun[ s ] << :_do_not_use_article_
         end
       end
     end

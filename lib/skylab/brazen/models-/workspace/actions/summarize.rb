@@ -65,7 +65,7 @@ module Skylab::Brazen
             d, i = pair.to_a
             s = i.id2name
             s.gsub! DASH_, SPACE_
-            y << "  • #{ d } #{ plural_noun s, d }"
+            y << "  • #{ d } #{ plural_noun d, s }"
           end
           y << "#{ count } section#{ s count } total"
         end

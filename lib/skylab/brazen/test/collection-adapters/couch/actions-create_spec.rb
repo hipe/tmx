@@ -15,12 +15,13 @@ module Skylab::Brazen::TestSupport::Collection_Adapters__Couch__Actions__Create
     extend TS_
 
     it "with no name: missing required property: argument error" do
+
+      _rx = /\bmissing required properties 'workspace-path' and 'name'/
       begin
         call_API :collection, :couch, :create
       rescue ::ArgumentError => e
       end
-      e.message.should match(
-        /\bmissing required properties 'workspace-path' and 'name'/ )
+      e.message.should match _rx
     end
 
     it "with no workspace path: missing required property: argument error" do

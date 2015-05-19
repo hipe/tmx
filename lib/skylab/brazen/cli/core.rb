@@ -774,7 +774,7 @@ module Skylab::Brazen
         end
       end
 
-      # ~ begin implement :+[#br-023]:
+      # ~ begin implement :+[#023]:
 
       def receive__error__expression sym, & msg_p
 

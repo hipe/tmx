@@ -512,7 +512,7 @@ module Skylab::BeautySalon
                 y << "in the 1 file that was opened, there were no matches"
               else
                 y << "none of the #{ file_count } #{
-                  }#{ plural_noun 'file', file_count } matched the pattern"
+                  }#{ plural_noun file_count, 'file' } matched the pattern"
               end
             end
           end ; nil
@@ -623,7 +623,7 @@ module Skylab::BeautySalon
           if @is_interactive
             y = @y
             expression_agent.calculate do
-              y << "finished (#{ file_count } #{ plural_noun 'file', file_count } total)."
+              y << "finished (#{ file_count } #{ plural_noun file_count, 'file' } total)."
             end
             change_focus_to nil
             @parent.change_focus_to @parent
@@ -639,10 +639,10 @@ module Skylab::BeautySalon
           ev = ev.with_message_string_mapper -> msg, d do
             if d.zero?
               _changes = if used_match_d == seen_match_d
-                "#{ used_match_d } #{ plural_noun 'change', seen_match_d }"
+                "#{ used_match_d } #{ plural_noun seen_match_d, 'change' }"
               else
                 "#{ used_match_d } of #{ seen_match_d } #{
-                  }#{ plural_noun 'match', seen_match_d }"
+                  }#{ plural_noun seen_match_d, 'match' }"
               end
               "file #{ file_d }: #{ _changes }. #{ msg }"
             else

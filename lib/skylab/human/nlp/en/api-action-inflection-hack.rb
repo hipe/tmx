@@ -228,9 +228,10 @@ module NLP::EN::API_Action_Inflection_Hack  # see [#018]. compare [#hl-005]. was
     end
 
     def get_bound_pos_for_exponent_i i
+
       _lex = lexemes[ i ]
       _inf_i = inflect[ i ]
-      _lex.bind_to_exponent _inf_i
+      _lex << _inf_i
     end
 
   private
