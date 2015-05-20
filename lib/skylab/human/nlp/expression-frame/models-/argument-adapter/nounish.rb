@@ -2,102 +2,112 @@ module Skylab::Human
 
   class NLP::Expression_Frame
 
-    class Models_::Argument
+    class Models_::Argument_Adapter
 
-      undef_method :to_s
+      class Nounish < self
 
-      class Nounish_Argument__ < self
+        attr_reader :role_symbol
 
-        class << self
+        module Object
 
-          def new_via__polymorphic_upstream__ st
+          class << self
+
+            def new_via__polymorphic_upstream__ st
+              Nounish.new do
+                @role_symbol = :object
+                _receive_etc st
+              end
+            end
+          end # >>
+        end
+
+        module Subject
+
+          class << self
+
+            def new_via__polymorphic_upstream__ st
+              Nounish.new do
+                @role_symbol = :subject
+                _receive_etc st
+              end
+            end
+          end  # >>
+        end
+
+        def slot_symbol
+          :"#{ @role_symbol }_#{ @received_shape }"
+        end
+
+        attr_reader :is_adjectivial
+
+        def _receive_etc st
+
+          x = st.gets_one
+
+          if x.respond_to? :id2name
+            :adjectivial == x or raise ::ArgumentError
+            @is_adjectivial = true
 
             x = st.gets_one
+          end
 
-            _shape_symbol = if x.respond_to? :each_index
-              :array
-            elsif x.respond_to? :ascii_only?
-              :string
-            else
-              self._FUN
-            end
+          if x.respond_to? :each_with_index
+            __init_via_array x
 
-            new do
-              send :"__initialize_around__#{ _shape_symbol }__", x
+          elsif x.respond_to? :ascii_only?
+            init_via_string x
+
+          else
+            raise ::ArgumentError
+          end
+        end
+
+        def __init_via_array a
+
+          extend Array_Methods___
+          @to_array = a
+          @received_shape = :list
+          NIL_
+        end
+
+        def init_via_string s
+          class << self
+            attr_reader :to_string
+          end
+          @to_string = s
+          @received_shape = :atom
+          NIL_
+        end
+
+        module Array_Methods___
+
+          def to_atom_argument
+            if 1 == @to_array.length
+              me = self
+              Nounish_.new do
+                @role_symbol = me.role_symbol
+                init_via_string me.to_array.fetch 0
+              end
             end
           end
 
-          private :new
-        end  # >>
+          def quad_count_category
+            case @to_array.length
+            when 0
+              :none
+            when 1
+              :one
+            when 2
+              :two
+            else
+              :more_than_two
+            end
+          end
 
-        def initialize & edit_p
-          instance_exec( & edit_p )
+          attr_reader :to_array
         end
 
-        attr_reader :shape_category_symbol
-
-        def __initialize_around__array__ x
-
-          extend Methods_for_Array_as_Nounish_Argument___
-          __initialize_around_array x
-        end
-
-        def __initialize_around__string__ s
-          extend Methods_for_String_as_Nounish_Argument___
-          __initialize_around_string s
-        end
-      end
-
-      module Methods_for_Array_as_Nounish_Argument___
-
-        def length
-          @_a.length
-        end
-
-        def to_a
-          @_a
-        end
-
-        def shape_category_symbol_
-          :list
-        end
-
-        def __initialize_around_array a
-
-          @_a = a
-          NIL_
-        end
-      end
-
-      module Methods_for_String_as_Nounish_Argument___
-
-        def to_s
-          @__s
-        end
-
-        def shape_category_symbol_
-          :atom
-        end
-
-        def __initialize_around_string s
-
-          @__s = s
-          NIL_
-        end
-      end
-
-      class Object_Argument < Nounish_Argument__
-
-        def term_category_symbol_
-          :object
-        end
-      end
-
-      class Subject_Argument < Nounish_Argument__
-
-        def term_category_symbol_
-          :subject
-        end
+        Nounish_ = self
       end
     end
   end

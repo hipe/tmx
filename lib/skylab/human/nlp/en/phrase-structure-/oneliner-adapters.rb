@@ -99,7 +99,7 @@ module Skylab::Human
             # produces compound phrases like "is loving" instead of just
             # "loving". but clients need just the one word so:
 
-            @_vp.lexeme.__inflect_for__progressive__tense( [] ) * SPACE_
+            @_vp.lexeme.inflect_for_progressive_tense_( [] ) * SPACE_
           end
 
           def singular_third_present

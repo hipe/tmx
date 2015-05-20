@@ -37,6 +37,10 @@ module Skylab::Human
         @to_lemma_string = lemma_form_string
       end
 
+      def lemma_x
+        to_lemma_string
+      end
+
       attr_reader :to_lemma_string
 
       class Omni_Phrase
@@ -60,12 +64,17 @@ module Skylab::Human
         end
 
         def express_words_into y
-          self.class::ORDER.each do | sym |
+
+          determine_constituent_phrase_order_.each do | sym |
             x = send sym
             x or next
             inflect_child_production_ y, x
           end
           y
+        end
+
+        def determine_constituent_phrase_order_
+          self.class::ORDER
         end
       end
     end

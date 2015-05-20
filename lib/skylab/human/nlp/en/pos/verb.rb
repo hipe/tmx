@@ -77,43 +77,38 @@ module Skylab::Human
 
       class Omni_Phrase < Omni_Phrase
 
-        ORDER = [ :auxiliary, :negation, :early_adverb, :lexeme ]  # etc
+        ORDER_WHEN_NORMAL___ = [
+
+          # "is definitely not yet supported easily"
+
+          :lexeme,
+          # early adverb?
+          :negation,
+          :middle_adverb_phrase,
+          :object_noun_phrase,
+          :late_adverb_phrase,
+        ]  # or whatever
+
+        ORDER_WHEN_AUXILIARY___ = [
+
+          # "can not easily make things quickly"
+
+          :auxiliary,
+          :negation,
+          :middle_adverb_phrase,
+          :lexeme_as_auxiliary_counterpart,
+          :object_noun_phrase,
+          :late_adverb_phrase
+        ]
 
         UNIQUE_EXPONENTS = UNIQUE_EXPONENTS
 
         def initialize noun_phrase, lexeme
 
           super lexeme
+          @is_negative = false
           @_spc = Sentence_Phrase_Constituency_.new noun_phrase, self
           @_tense = nil
-        end
-
-        # "can not adequetly fail"
-
-        def inflect_child_production_ y, phrase
-
-          phrase.inflect_words_into_against_sentence_phrase y, @_spc
-        end
-
-        def auxiliary
-
-          if :progressive == @_tense
-
-            # "i am having a time" (conjugate "be" for the noun)
-
-            Verb_[ @_spc.noun_phrase, BE___ ]
-          end
-        end
-        BE___ = 'be'
-
-        def negation
-        end
-
-        def early_adverb
-        end
-
-        def tense
-          @_tense || :present
         end
 
         def << exponent_symbol
@@ -124,9 +119,132 @@ module Skylab::Human
           self
         end
 
+        # ~ experimentally, exponents, constituent phrase structures and
+        #     "phrase properties" are all here:
+
+        # ~ a
+
+        def auxiliary  # assume etc
+
+          send :"__build__#{ _auxiliary_reason }__"
+        end
+
+        # ~ l
+
+        attr_reader :late_adverb_phrase
+
+        def initialize_late_adverb_via_lemma s
+
+          @late_adverb_phrase = if s
+            EN_::Phrase_Structure::Sentence_inflectee_via_string[ s ]
+          else
+            s
+          end
+          NIL_
+        end
+
+        # ~ m
+
+        attr_reader :middle_adverb_phrase
+
+        def initialize_middle_adverb_via_lemma s
+          @middle_adverb_phrase = if s
+            EN_::Phrase_Structure::Sentence_inflectee_via_string[ s ]
+          else
+            s
+          end
+          NIL_
+        end
+
+        # ~ n
+
+        def negation
+          if @is_negative
+            THE_NEGATION_PHRASE___
+          end
+        end
+
+        attr_reader :is_negative
+
+        def become_negative
+          @is_negative = true
+          NIL_
+        end
+
+        # ~ o
+
+        attr_accessor :object_noun_phrase
+
+        # ~ t
+
+        def tense
+          @_tense || :present
+        end
+
         def __change__tense__ to
           @_tense = to
           NIL_
+        end
+
+        # ~ support & hook-outs
+
+        def inflect_child_production_ y, phrase
+
+          phrase.inflect_words_into_against_sentence_phrase y, @_spc
+        end
+
+        def determine_constituent_phrase_order_
+
+          if _auxiliary_reason
+            ORDER_WHEN_AUXILIARY___
+          else
+            ORDER_WHEN_NORMAL___
+          end
+        end
+
+        def _auxiliary_reason
+
+          if :progressive == @_tense  # "runs" => "is running"
+
+            # (progressive can be negated, so check progressive before negation)
+
+            :auxiliary_because_progressive
+
+          elsif @is_negative
+
+            s = @lexeme.lemma_x
+
+            if ! ( BE__ == s )
+
+              # "is not", !"does not be"
+              # !"does not", "does not do"  # we might change this
+
+              :auxiliary_because_regular_negation
+            end
+          end
+        end
+
+        def __build__auxiliary_because_progressive__
+
+          # "i am not having a good time" (conjugate "be" for the noun)
+
+          Verb_[ @_spc.noun_phrase, BE__ ]
+        end
+
+        def __build__auxiliary_because_regular_negation__
+
+          Verb_[ @_spc.noun_phrase, DO__ ]
+        end
+
+        BE__ = 'be' ; DO__ = 'do'
+
+        def lexeme_as_auxiliary_counterpart
+
+          if :progressive == @_tense
+            @lexeme
+          else
+            For_Auxiliary_Counterpart_Use_Uninflected_Lemma___[ @lexeme ]
+          end
         end
       end
 
@@ -155,7 +273,11 @@ module Skylab::Human
         end
       end
 
-      def __inflect_for__progressive__tense y, _sp=nil
+      def __inflect_for__progressive__tense y, _sp
+        inflect_for_progressive_tense_ y
+      end
+
+      def inflect_for_progressive_tense_ y
 
         s = @to_lemma_string
 
@@ -177,6 +299,28 @@ module Skylab::Human
       ENDS_IN_E_RX__ = /e\z/i
 
       DOUBLE_T_RX___ = /[aeiou]t\z/
+
+      module THE_NEGATION_PHRASE___
+        class << self
+          def inflect_words_into_against_sentence_phrase y, sp
+
+            # if is casual "'nt" eek
+            y << 'not'
+          end
+        end  # >>
+      end
+
+      class For_Auxiliary_Counterpart_Use_Uninflected_Lemma___
+        class << self
+          alias_method :[], :new
+        end
+        def initialize lx
+          @_lexeme = lx
+        end
+        def inflect_words_into_against_sentence_phrase y, sp
+          y << @_lexeme.to_lemma_string
+        end
+      end
 
       Verb_ = self
     end

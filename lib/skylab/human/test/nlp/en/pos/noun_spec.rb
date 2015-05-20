@@ -17,7 +17,7 @@ module Skylab::Human::TestSupport
       it "request components of the phrase" do
 
         _np = _build_common_phrase
-        _np.adjective.should be_nil
+        _np.adjective_phrase.should be_nil
       end
 
       it "out of the box you get a certain form" do

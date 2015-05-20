@@ -13,6 +13,8 @@ module Skylab::Human
         indefinite: :definity,
         definite: :definity,
         _do_not_use_article_: :definity,
+        the_negative_determiner: :definity,
+        the_counterpart_quantity_determiner: :definity,
 
         singular: :number,
         plural: :number,
@@ -38,13 +40,12 @@ module Skylab::Human
 
       class Omni_Phrase < Omni_Phrase
 
-        ORDER = %i( article adjective lexeme )
+        ORDER = %i( article adjective_phrase lexeme )
 
         UNIQUE_EXPONENTS = UNIQUE_EXPONENTS
 
         def initialize any_lexeme
 
-          @adjective = nil
           @_article = nil
           @_number = nil
           @_person = nil
@@ -53,57 +54,7 @@ module Skylab::Human
           super
         end
 
-        attr_reader :adjective
-
-        def express_words_into y
-
-          if @_use_pronoun
-            @_pronoun.inflect_words_into_against_noun_phrase y, self
-          else
-            super
-          end
-        end
-
-        def inflect_child_production_ y, phrase
-          phrase.inflect_words_into_against_noun_phrase y, self
-        end
-
-        def article
-          @_article || Article__.default_instance
-        end
-
-        def number
-          @_number || Number___.default_instance
-        end
-
-        def person
-          @_person
-        end
-
-        def lemma_string= s
-          @lexeme = Noun_.in_lexicon_touch_lemma_via_string s
-          @_use_pronoun = false
-          s
-        end
-
-        def clear_grammatical_category cat_sym
-
-          ivar = Noun_.__irreg_idx.my_category_ivar_h[ cat_sym ]
-
-          if ivar
-            instance_variable_set ivar, nil
-          else
-
-            pn = @_pronoun
-            pn.clear_grammatical_category cat_sym
-            if pn.is_empty
-              @_use_pronoun = false
-            end
-          end
-          NIL_
-        end
-
-        # ~ begin legacy oneliners for #open [#035]
+        # ~ legacy oneliners for #open [#035]
 
         def indefinite_singular
 
@@ -130,6 +81,21 @@ module Skylab::Human
 
         # ~ end
 
+        def express_words_into y
+
+          if @_use_pronoun
+            @_pronoun.inflect_words_into_against_noun_phrase y, self
+          else
+            super
+          end
+        end
+
+        def inflect_child_production_ y, phrase
+          phrase.inflect_words_into_against_noun_phrase y, self
+        end
+
+        # ~ experimentally, both exponents and constituent phrase structures:
+
         def << exponent_symbol
 
           cat_sym = self.class::UNIQUE_EXPONENTS[ exponent_symbol ]
@@ -139,23 +105,6 @@ module Skylab::Human
             __change_exponent_of_pronoun exponent_symbol
           end
           self
-        end
-
-        def __change__definity__ def_or_indef
-
-          @_article = Article__.send def_or_indef
-          @_use_pronoun = false
-          NIL_
-        end
-
-        def __change__number__ plur_or_sing
-          @_number = plur_or_sing
-          NIL_
-        end
-
-        def __change__person__ first_second_third
-          @_person = first_second_third
-          NIL_
         end
 
         def __change_exponent_of_pronoun sym
@@ -169,6 +118,74 @@ module Skylab::Human
 
           NIL_
         end
+
+        def clear_grammatical_category cat_sym
+
+          ivar = Noun_.__irreg_idx.my_category_ivar_h[ cat_sym ]
+
+          if ivar
+            instance_variable_set ivar, nil
+          else
+
+            pn = @_pronoun
+            pn.clear_grammatical_category cat_sym
+            if pn.is_empty
+              @_use_pronoun = false
+            end
+          end
+          NIL_
+        end
+
+        attr_reader :adjective_phrase
+
+        def remove_adjective_phrase
+          remove_instance_variable :@adjective_phrase
+        end
+
+        def initialize_adjective_phrase x
+
+          @adjective_phrase ||= begin
+            yes = true
+            x
+          end
+          yes or self._NO_CLOBBER
+          NIL_
+        end
+
+        def article
+          @_article || Article__.default_instance
+        end
+
+        def __change__definity__ def_or_indef
+
+          @_article = Article__.send def_or_indef
+          @_use_pronoun = false
+          NIL_
+        end
+
+        def lemma_string= s
+          @lexeme = Noun_.in_lexicon_touch_lemma_via_string s
+          @_use_pronoun = false
+          s
+        end
+
+        def number
+          @_number || Number___.default_instance
+        end
+
+        def __change__number__ plur_or_sing
+          @_number = plur_or_sing
+          NIL_
+        end
+
+        def person
+          @_person
+        end
+
+        def __change__person__ first_second_third
+          @_person = first_second_third
+          NIL_
+        end
       end
 
       define_singleton_method :__irreg_idx, IRREGULAR_INDEX_METHOD_
@@ -180,21 +197,32 @@ module Skylab::Human
         # as syntactic categories proper (for now).
 
         class << self
-          attr_reader :default_instance, :definite, :indefinite
-          attr_reader :_do_not_use_article_
+
+          attr_reader(
+            :definite,
+            :_do_not_use_article_,
+            :indefinite,
+            :the_counterpart_quantity_determiner,
+            :the_negative_determiner,
+            :default_instance )
         end
 
-        @definite = module Definite___
-          class << self
+        @definite = module DEFINITE___
 
-            def inflect_words_into_against_noun_phrase y, phrase
-              y << 'the'
-            end
+          def self.inflect_words_into_against_noun_phrase y, phrase
+            y << 'the'
           end
           self
         end
 
-        @indefinite = module Indefinite____
+        @_do_not_use_article_ = module DO_NOT_USE_ARTICLE___
+          def self.inflect_words_into_against_noun_phrase y, phrase
+            y
+          end
+          self
+        end
+
+        @indefinite = module INDEFINITE___
 
           class << self
 
@@ -229,12 +257,25 @@ module Skylab::Human
           self
         end
 
-        @_do_not_use_article_ = module DNUA___
-          class << self
-            def inflect_words_into_against_noun_phrase y, phrase
-              y
+        @the_counterpart_quantity_determiner =
+        module THE_COUTERPART_QUANTITY_DETERMINER___
+          def self.inflect_words_into_against_noun_phrase y, np
+            y << 'any'
+          end
+          self
+        end
+
+        @the_negative_determiner = module THE_NEGATIVE_DETERMINER___
+
+          def self.inflect_words_into_against_noun_phrase y, np
+            sing_or_plur = np.person
+            if sing_or_plur
+              # 'not' ?
+              y << 'no'
+            else
+              y << 'no'
             end
-          end  # >>
+          end
           self
         end
 

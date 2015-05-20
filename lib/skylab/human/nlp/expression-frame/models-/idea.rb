@@ -7,27 +7,18 @@ module Skylab::Human
       Callback_::Actor.methodic self
 
       def initialize & edit_p
+
+        @__slots = Callback_::Box.new
         instance_exec( & edit_p )
+        h = remove_instance_variable( :@__slots ).h_
+        h.each_pair do | sym, x |
+          instance_variable_set :"@#{ sym }", x
+        end
       end
 
-      # ~ object & subject
+      attr_reader :object_atom, :object_list
 
-      attr_reader(
-        :has__object__,
-        :has__object_atom__,
-        :has__object_list__,
-        :object_atom,
-        :object_list,
-
-        :has__subject__,
-        :has__subject_atom__,
-        :has__subject_list__,
-        :subject_atom,
-        :subject_list )
-
-    private
-
-      def object=
+      private def object=
 
         _edit_self(
           :via, :polymorphic_upstream,
@@ -37,10 +28,12 @@ module Skylab::Human
       end
 
       def self.__object_argument__association_for_mutation_session
-        EF_::Models_::Argument::Object_Argument
+        EF_::Models_::Argument_Adapter::Nounish::Object
       end
 
-      def subject=
+      attr_reader :subject_atom, :subject_list
+
+      private def subject=
 
         _edit_self(
           :via, :polymorphic_upstream,
@@ -50,36 +43,37 @@ module Skylab::Human
       end
 
       def self.__subject_argument__association_for_mutation_session
-        EF_::Models_::Argument::Subject_Argument
+        EF_::Models_::Argument_Adapter::Nounish::Subject
       end
 
-    public
+      private def verb=
 
-      # ~ verb & modification (in subjective descending popularity order)
-
-      def is_negative
-        has__negative__
+        _edit_self(
+          :via, :polymorphic_upstream,
+          :add,
+          :verb,
+          polymorphic_upstream )
       end
 
-      attr_reader :has__negative__
-
-      def has_implication_of_future
-        has__implication_of_future__
+      def self.__verb__association_for_mutation_session
+        EF_::Models_::Argument_Adapter::Verbish
       end
+
+      attr_reader :verb_argument
+
+      attr_reader :is_negative
 
     private def negative=
 
-        @has__negative__ = true
+        @is_negative = true
         KEEP_PARSING_
       end
 
-      # ~
-
-      attr_reader :has__implication_of_future__
+      attr_reader :implies_the_future
 
     private def imply_the_future=
 
-        @has__implication_of_future__ = true
+        @implies_the_future = true
         KEEP_PARSING_
       end
 
@@ -96,16 +90,7 @@ module Skylab::Human
 
       def __add__object_for_mutation_session o
 
-        instance_variable_set(
-          :"@has__#{ o.term_category_symbol_ }__",
-          true )
-
-        sym = :"#{ o.term_category_symbol_ }_#{ o.shape_category_symbol_ }"
-
-        instance_variable_set( :"@has__#{ sym }__", true )
-
-        instance_variable_set :"@#{ sym }", o
-
+        @__slots.add o.slot_symbol, o
         ACHIEVED_
       end
 

@@ -23,7 +23,7 @@ module Skylab::Human
 
           y = _exp_fr.express_into []
 
-          1 == y.length or fail
+          1 == y.length or fail "expression frames produce strings not arrays"
 
           y.fetch( 0 ).should eql expected_string
         end

@@ -35,8 +35,20 @@ module Skylab::Human
       s_a_ * EMPTY_S_
     end
 
-    EF_ = self
     Autoloader_[ Models_ = ::Module.new ]
-    PUNCT_RX___ = /\A:/  # etc
+
+    class Models_::Argument_Adapter
+
+      undef_method :to_s
+
+      def initialize & edit_p
+        instance_exec( & edit_p )
+      end
+
+      Autoloader_[ self ]
+    end
+
+    EF_ = self
+    PUNCT_RX___ = /\A[:,]/  # etc
   end
 end

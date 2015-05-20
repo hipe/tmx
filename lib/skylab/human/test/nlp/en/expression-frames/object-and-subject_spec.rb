@@ -163,7 +163,7 @@ module Skylab::Human::TestSupport
 
     memoize_ :_same do
 
-      [ :object, 'supported',
+      [ :object, :adjectivial, 'supported',
         :subject, 'character',
       ].freeze
     end

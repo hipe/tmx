@@ -59,26 +59,46 @@ module Skylab::Human
 
         if a.length.nonzero?
 
-          st = Callback_::Polymorphic_Stream.via_array a.reverse
-
-          x = st.gets_one
-
-          if st.no_unparsed_exists
-            x
-          else
-            y = [ x, ult, st.gets_one ]
-
-            while st.unparsed_exists
-
-              y.push sep, st.gets_one
-            end
-            y.reverse!
-            y * EMPTY_S_
-          end
+          Oxford_comma_into[ [], a, ult, sep ] * EMPTY_S_
         end
       end
 
-      AND__ = ' and '.freeze ; COMMA__ = ', '.freeze
+      Oxford_comma_into = -> y, a, ult, sep=COMMA__ do
+
+        stack = []
+
+        st = Callback_::Polymorphic_Stream.via_array a
+
+        if st.unparsed_exists  # if there's a last one
+          -> x do
+            stack.push -> do
+              y << x
+            end
+          end.call st.pop_
+        end
+
+        if st.unparsed_exists  # if there's a second to last one
+          -> x do
+            stack.push -> do
+              y << x
+              y << ult
+            end
+          end.call st.pop_
+        end
+
+        if st.unparsed_exists  # if there are any others
+          stack.push -> do
+            begin
+              y << st.gets_one
+              y << sep
+            end while st.unparsed_exists
+          end
+        end
+
+        p = nil
+        p[] while p = stack.pop
+        y
+      end
 
       S__ = -> do
 
@@ -149,7 +169,7 @@ module Skylab::Human
           end
         end
 
-        o[ :oxford_comma ] = -> a, ult=AND__, sep=COMMA__ do
+        o[ :oxford_comma ] = -> a, ult=AND___, sep=COMMA__ do
           Oxford_comma__[ sep, ult, a ]
         end
 
@@ -158,6 +178,10 @@ module Skylab::Human
         @method = ::Struct.new( * i_a ).new( * p_a )
 
       end.call
+
+      AND___ = ' and '.freeze
+
+      COMMA__ = ', '.freeze
 
       EN_ = self
 
