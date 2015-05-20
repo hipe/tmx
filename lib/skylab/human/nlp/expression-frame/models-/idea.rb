@@ -4,7 +4,9 @@ module Skylab::Human
 
     class Models_::Idea
 
-      Callback_::Actor.methodic self
+      Callback_::Actor.methodic self, :properties,
+
+        :syntactic_category
 
       def initialize & edit_p
 
@@ -14,6 +16,12 @@ module Skylab::Human
         h.each_pair do | sym, x |
           instance_variable_set :"@#{ sym }", x
         end
+      end
+
+      attr_reader :syntactic_category
+
+      def object
+        ( object_atom || object_list ) && true
       end
 
       attr_reader :object_atom, :object_list
@@ -31,7 +39,11 @@ module Skylab::Human
         EF_::Models_::Argument_Adapter::Nounish::Object
       end
 
-      attr_reader :subject_atom, :subject_list
+      def subject
+        ( subject_atom || subject_list ) && true
+      end
+
+      attr_reader :subject_atom, :subject_list, :subject_integer
 
       private def subject=
 
@@ -61,19 +73,19 @@ module Skylab::Human
 
       attr_reader :verb_argument
 
-      attr_reader :is_negative
+      attr_reader :negative
 
     private def negative=
 
-        @is_negative = true
+        @negative = true
         KEEP_PARSING_
       end
 
-      attr_reader :implies_the_future
+      attr_reader :implication_of_future
 
     private def imply_the_future=
 
-        @implies_the_future = true
+        @implication_of_future = true
         KEEP_PARSING_
       end
 

@@ -342,6 +342,13 @@ end
         Headless_.lib_.human::NLP::EN::POS.indefinite_noun lemma_s
       end
 
+      o[ :noun_phrase ] = -> * x_a do
+
+        x_a.push :syntactic_category, :noun_phrase
+        _fr = Headless_.lib_.human::NLP::EN.expression_frame_via_iambic x_a
+        _fr.express_into ""
+      end
+
       o[ :or_ ] = memoize_length[ -> a do
         Or__[ a ]
       end ]
@@ -356,6 +363,13 @@ end
 
       o[ :progressive_verb ] = -> lemma_s do
         Headless_.lib_.human::NLP::EN::POS.progressive_verb lemma_s
+      end
+
+      o[ :sentence_phrase_via_mutable_iambic ] = -> x_a do
+
+        x_a.push :syntactic_category, :sentence_phrase
+        _fr = Headless_.lib_.human::NLP::EN.expression_frame_via_iambic x_a
+        _fr.express_into ""
       end
 
       bld_oxford_comma = -> sep do

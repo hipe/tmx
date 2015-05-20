@@ -2156,21 +2156,47 @@ module Skylab::Callback
 
   define_singleton_method :memoize, Memoize
 
-  Oxford = -> separator, none, final_sep, a do
-    if a.length.zero?
-      none
+  Oxford = -> separator, when_none_x, final_separator, a do
+
+    y = Oxford_comma_into[ [], a, final_separator, separator ]
+    if y.length.zero?
+      when_none_x
     else
-      p = -> do
-        h = { 0 => nil, 1 => final_sep }
-        h.default_proc = -> _, _ do separator end
-        h.method :[]
-      end.call
-      last = a.length - 1
-      a[ 1 .. -1 ].each_with_index.reduce( [ a.first ] ) do |m, (s, d)|
-        m << p[ last - d ] ; m << s ; m
-      end * EMPTY_S_
+      y * EMPTY_S_
     end
   end
+
+  Oxford_comma_into = -> y, a, final_separator, separator do
+
+    st = Polymorphic_Stream.via_array a
+
+    if st.unparsed_exists  # if there's a last one
+
+      stack = []
+
+      last_x = st.pop_
+      stack.push -> do
+        y << last_x
+      end
+
+      if st.unparsed_exists  # if there's a second to last one
+        penult_x = st.pop_
+        stack.push -> do
+          y << penult_x
+          y << final_separator
+        end
+
+        while st.unparsed_exists  # with the any remaining at indexes 0 .. N-3
+          y << st.gets_one
+          y << separator
+        end
+      end
+
+      p = nil
+      p[] while p = stack.pop
+    end
+    y
+  end  # a storied history :#tombstone
 
   class Scn < ::Proc  # see [#049]
 

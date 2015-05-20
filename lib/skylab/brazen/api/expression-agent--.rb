@@ -60,6 +60,10 @@ module Skylab::Brazen
         "'#{ name.as_slug }'"
       end
 
+      def np_ d, s
+        _NLP_agent.noun_phrase :subject, d, :subject, s
+      end
+
       def or_ x
         _NLP_agent.or_ x
       end
@@ -112,7 +116,8 @@ module Skylab::Brazen
 
       NLP_agent__ = Callback_.memoize do
         NLP_Agent__ = LIB.make_NLP_agent :public,
-          [ :and_, :indefinite_noun, :or_, :plural_noun,
+          [ :and_, :indefinite_noun,
+            :noun_phrase, :or_, :plural_noun,
             :preterite_verb, :progressive_verb, :s ]
       end
 

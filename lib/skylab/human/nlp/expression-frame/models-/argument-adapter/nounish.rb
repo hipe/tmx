@@ -57,6 +57,9 @@ module Skylab::Human
           elsif x.respond_to? :ascii_only?
             init_via_string x
 
+          elsif x.respond_to? :bit_length
+            __init_via_integer x
+
           else
             raise ::ArgumentError
           end
@@ -76,6 +79,15 @@ module Skylab::Human
           end
           @to_string = s
           @received_shape = :atom
+          NIL_
+        end
+
+        def __init_via_integer d
+          class << self
+            attr_reader :to_integer
+          end
+          @to_integer = d
+          @received_shape = :integer
           NIL_
         end
 

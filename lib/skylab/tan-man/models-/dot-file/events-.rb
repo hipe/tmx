@@ -8,13 +8,14 @@ module Skylab::TanMan
 
         prototype_with :invalid_characters, :chars, nil, :ok, false do |y, o|
 
-      s_a = o.chars
-      d = s_a.length
-      _s_a_ = s_a.map { |s| "#{ s.inspect } (#{ '%03d' % [ s.ord ] })" } * ', '
+      _s_a = o.chars.map { |s| "#{ s.inspect } (#{ '%03d' % [ s.ord ] })" }
 
-      y << "html-escaping support is currently very limited. the following #{  # :+[#hu-034]:candidate
-       }character#{ s d } #{ s d, :is } not yet supported: #{ _s_a_ }"
+      y << "html-escaping support is currently very limited - #{
+            }#{ sp_ :subject, 'character', :subject, _s_a,
+               :negative, :imply_the_future,
+               :object, :adjectivial, 'supported' }"
 
+      # eg. "the following characters are not yet suported:"
     end
   end
 end

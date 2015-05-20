@@ -284,7 +284,12 @@ module Skylab::TestSupport
               ick mtch.s
             end
 
-            y << "#{ and_ a } #{ s a, :does } not match any subsystem#{ s a }."  # :+[#hu-034]:candidate
+            y << "#{ sp_(
+              :subject, a, :negative, :verb, 'match', :object, 'subsystem'
+            ) }."
+              # e.g. "X and Y do not match any subsystems."
+
+            NIL_
           end
         end
 

@@ -105,6 +105,11 @@ module Skylab::TanMan
         end
       end
 
+      def sp_ * x_a
+
+        _NLP_agent.sentence_phrase_via_mutable_iambic x_a
+      end
+
       def val x
         x.inspect
       end
@@ -114,8 +119,11 @@ module Skylab::TanMan
       end
 
       NLP_agent___ = Callback_.memoize do
-        NLP_Agent____ = Brazen_.expression_agent_library.make_NLP_agent :public,
-          [ :and_, :indefinite_noun, :or_, :plural_noun, :s ]
+        NLP_Agent____ = Brazen_.expression_agent_library.make_NLP_agent(
+          :public,
+          [ :and_, :indefinite_noun,
+            :or_, :plural_noun,
+            :s, :sentence_phrase_via_mutable_iambic ] )
       end
     end
   end

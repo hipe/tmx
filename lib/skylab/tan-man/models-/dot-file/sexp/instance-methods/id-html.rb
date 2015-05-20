@@ -11,34 +11,37 @@ module Skylab::TanMan
     }
 
     define_method :_escape_string do | string, & oes_p |
-      # for now we go with a narrow whitelist, in future we could expand
-      # trivially, but for now extensive html escaping support is wayy outside
-      # the scope of all this.
-      #
-      res = nil
-      begin
-        bad = nil
 
-        out = string.gsub deny_rx do
-          str = $~[1]
-          ent = html_entities[ str ]
-          if ent
-            "&#{ ent };"
-          else
-            ( bad ||= [] ) << str
-            nil
-          end
-        end
+      # currently we go with a narrow whitelist. in the future we could
+      # expand this trivially but currently extenstive support for HTML
+      # escaping is wayy outside the scope of all of this
 
-        if bad
-          res = oes_p.call :error, :invalid_characters do
-            Models_::DotFile::Events_::Invalid_Characters.new_with :chars, bad.uniq
-          end
-          break
+      xtra_a = nil
+      x = string.gsub deny_rx do
+
+        s = $~[1]
+        ent = html_entities[ s ]
+
+        if ent
+          "&#{ ent };"
+        else
+          ( xtra_a ||= [] ).push s
+          nil
         end
-        res = out
-      end while nil
-      res
+      end
+
+      if xtra_a
+        oes_p.call :error, :invalid_characters do
+          __build_invalid_characters_event xtra_a.uniq
+        end
+      else
+        x
+      end
+    end
+
+    def __build_invalid_characters_event xtra_a
+
+      Models_::DotFile::Events_::Invalid_Characters.new_with :chars, xtra_a
     end
 
     def normalized_string

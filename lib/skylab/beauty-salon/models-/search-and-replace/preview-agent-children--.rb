@@ -369,9 +369,12 @@ module Skylab::BeautySalon
           end
           @serr.puts
           y = @y
+
           expression_agent.calculate do
-            y << "(#{ match_count } match#{ s match_count, :es } #{  # :+[#hu-034]:candidate
-              }in #{ file_count } file#{ s file_count })"
+
+            y << "(#{ np_ match_count, 'match' } in #{ np_ file_count, 'file' })"
+
+              # e.g. "(X matches in Y files)"
           end
           nil
         end

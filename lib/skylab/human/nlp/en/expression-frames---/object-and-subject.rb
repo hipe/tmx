@@ -18,6 +18,8 @@ module Skylab::Human
 
         OPTIONAL_TERMS = [ :negative, :implication_of_future ]
 
+        PRODUCES = [ :sentence_phrase ]
+
         def initialize idea
 
           si = Idiomization_::Sessions::Nounish.begin
@@ -32,7 +34,7 @@ module Skylab::Human
 
           vp.object_noun_phrase = oi.noun_phrase
 
-          if idea.is_negative || si.can_express_negativity
+          if idea.negative || si.can_express_negativity
             __ideate_negativity_minimally oi, si, vp
           end
 
@@ -40,7 +42,7 @@ module Skylab::Human
             __inflect_object_number_with_subject_number oi, si, idea
           end
 
-          if idea.implies_the_future
+          if idea.implication_of_future
             __emphasize_contrast_with_future oi, si, vp, idea
           end
 
@@ -98,7 +100,7 @@ module Skylab::Human
 
         def __emphasize_contrast_with_future oi, si, vp, idea
 
-          is_negative = if idea.is_negative
+          is_negative = if idea.negative
             true
           elsif si.can_express_negativity
             true

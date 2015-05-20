@@ -93,7 +93,7 @@ module Skylab::BeautySalon
         o.new(
           o::Release_Resource_Proxy.new do
             if st
-              st.x.release_resource
+              st.upstream.release_resource
             else
               ACHIEVED_
             end

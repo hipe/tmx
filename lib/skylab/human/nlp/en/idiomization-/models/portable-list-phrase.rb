@@ -16,7 +16,7 @@ module Skylab::Human
 
       def inflect_words_into_against_noun_phrase y, _
 
-        EN_::Oxford_comma_into[ y, @_list_arg.to_array, 'and', ',' ]
+        Callback_::Oxford_comma_into[ y, @_list_arg.to_array, 'and', ',' ]
       end
     end
   end

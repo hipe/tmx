@@ -116,17 +116,19 @@ module Skylab::TanMan::TestSupport::Models::Node
       "big-ass-prototype-with-html-in-it-watchya-gonna-do-now-omg.dot" ) do
 
       -> do
-        msg = <<-O.unindent.strip
-          html-escaping support is currently very limited. #{
-          }the following character(s 3) (s [3, :is]) not yet supported: "\\t" (009), #{
-          }"\\n" (010), "\\u007F" (127)
-        O
+        exp = "html-escaping support is currently very limited - #{
+          }the following characters are not yet supported: #{
+           }#{ %s<"\t" (009), "\n" (010) and "\u007F" (127)> }"
 
         it "when you try to use weird chars for labels - #{
-          }\"#{ msg[ 0..96 ] }[..]\"" do
+          }\"#{ exp[ 0..96 ] }[..]\"" do
 
           touch_node_via_label "\t\t\n\x7F"
-          expect_not_OK_event :invalid_characters, msg
+
+          _ev = expect_not_OK_event :invalid_characters
+
+          black_and_white( _ev ).should eql exp
+
           expect_no_more_events
         end
       end.call

@@ -76,6 +76,10 @@ module Skylab::Brazen
         "'#{ name.as_slug }'"
       end
 
+      def np_ d, s
+        _NLP_agent.noun_phrase :subject, d, :subject, s
+      end
+
       def or_ x
         _NLP_agent.or_ x
       end

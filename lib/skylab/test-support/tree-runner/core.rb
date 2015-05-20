@@ -259,6 +259,10 @@ module Skylab
 
       # ~ style-related classifications
 
+      def _curry x
+        Tree_Runner_::Lib_::CLI_lib[].pen.stylify.curry[ [ * x ] ]
+      end
+
       def ick msg  # e.g divide
         "\"#{ msg }\""
       end
@@ -280,15 +284,24 @@ module Skylab
 
       # ~ linguistic- (and EN-) related classifications of string
 
+      def sp_ * x_a
+        x_a.push :syntactic_category, :sentence_phrase
+        _fr = Tree_Runner_::Lib_::NLP[]::EN.expression_frame_via_iambic x_a
+        _fr.express_into ""
+      end
+
       def and_ s_a
+        self._WHERE
         Callback_::Oxford_and[ s_a ]
       end
 
       def both x
+        self._WHERE
         Tree_Runner_::Lib_::NLP[]::EN.both x
       end
 
       def indefinite_noun s
+        self._WHERE
         _NLP_agent.indefinite_noun[ s ]
       end
 
@@ -297,25 +310,24 @@ module Skylab
       end
 
       def progressive_verb s
-        _with_split_and_join :progressive_verb, s
+        _inflect_first_word s, :progressive_verb
       end
 
       def s * x_a
+        self._WHERE
         Tree_Runner_::Lib_::NLP[]::EN::s( * x_a )
       end
 
       def third_person s
-        _with_split_and_join :third_person, s
+        self._WHERE
+        _inflect_first_word s, :third_person
       end
 
-      def _with_split_and_join meth, s
+      def _inflect_first_word s, meth
+
         s_a = s.split SPACE_
-        s_a[ 0 ] = _NLP_agent.send( meth )[ s_a[ 0 ] ]
+        s_a[ 0 ] = _NLP_agent.send meth, s_a.fetch( 0 )
         s_a * SPACE_
-      end
-
-      def _curry x
-        Tree_Runner_::Lib_::CLI_lib[].pen.stylify.curry[ [ * x ] ]
       end
 
       def _NLP_agent

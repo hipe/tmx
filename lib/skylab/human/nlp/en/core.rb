@@ -18,6 +18,27 @@ module Skylab::Human
           Both__[ a ]
         end
 
+        # ~ begin
+
+        def expression_frame_for * x_a
+          expression_frame_via_iambic x_a
+        end
+
+        def expression_frame_via_iambic x_a
+          __expression_frame_collection.expression_frame_via_iambic x_a
+        end
+
+        def __expression_frame_collection
+          @___exp_fr_col ||= __build_EFC
+        end
+
+        def __build_EFC
+          NLP_::Expression_Frame::Models::Collection.new_via_module(
+            EN_::Expression_Frames___ )
+        end
+
+        # ~ end
+
         def oxford_comma * a
           d = a.length
           if d.zero?
@@ -57,47 +78,10 @@ module Skylab::Human
 
       Oxford_comma__ = -> sep, ult, a do
 
-        if a.length.nonzero?
-
-          Oxford_comma_into[ [], a, ult, sep ] * EMPTY_S_
+        y = Callback_::Oxford_comma_into[ [], a, ult, sep ]
+        if y.length.nonzero?
+          y * EMPTY_S_
         end
-      end
-
-      Oxford_comma_into = -> y, a, ult, sep=COMMA__ do
-
-        stack = []
-
-        st = Callback_::Polymorphic_Stream.via_array a
-
-        if st.unparsed_exists  # if there's a last one
-          -> x do
-            stack.push -> do
-              y << x
-            end
-          end.call st.pop_
-        end
-
-        if st.unparsed_exists  # if there's a second to last one
-          -> x do
-            stack.push -> do
-              y << x
-              y << ult
-            end
-          end.call st.pop_
-        end
-
-        if st.unparsed_exists  # if there are any others
-          stack.push -> do
-            begin
-              y << st.gets_one
-              y << sep
-            end while st.unparsed_exists
-          end
-        end
-
-        p = nil
-        p[] while p = stack.pop
-        y
       end
 
       S__ = -> do
@@ -169,7 +153,7 @@ module Skylab::Human
           end
         end
 
-        o[ :oxford_comma ] = -> a, ult=AND___, sep=COMMA__ do
+        o[ :oxford_comma ] = -> a, ult=AND___, sep=COMMA___ do
           Oxford_comma__[ sep, ult, a ]
         end
 
@@ -181,7 +165,7 @@ module Skylab::Human
 
       AND___ = ' and '.freeze
 
-      COMMA__ = ', '.freeze
+      COMMA___ = ', '.freeze
 
       EN_ = self
 
