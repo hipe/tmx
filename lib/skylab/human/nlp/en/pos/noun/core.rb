@@ -24,23 +24,92 @@ module Skylab::Human
         third: :person
       }
 
+      # ~ for the lexical categories in our lexicon (noun only for now):
+
+      Callback_::Actor.methodic self
+
+      class << self
+
+        def new_via_lemma_and_iambic lemma_x, x_a
+
+          st = polymorphic_stream_via_iambic x_a
+
+          ok = false
+          lemma = new lemma_x do
+            ok = process_polymorphic_stream_fully st
+          end
+          ok && lemma
+
+        end
+      end  # (..)
+
+      attr_reader :is_mass_noun
+
+      private def mass_noun=
+        @is_mass_noun = true
+        KEEP_PARSING_
+      end
+
+      # ~ end
+
       class << self
 
         def [] lemma_s=nil
 
           if lemma_s
-            _lexeme = in_lexicon_touch_lemma_via_string lemma_s
-          end
 
-          self::Omni_Phrase.new _lexeme
+            if PRONOUN_GATEWAY___ == lemma_s
+              __pronoun_macro
+            else
+              self::Omni_Phrase.new in_lexicon_touch_lemma_via_string lemma_s
+            end
+          else
+            self::Omni_Phrase.new nil
+          end
+        end
+
+        def __pronoun_macro  # see [#037] #the-pronoun-gateway-hack
+
+          np = self::Omni_Phrase.new nil
+          np << :neuter << :singular << :third
+          np << :objective   # we don't technicallly know this but meh
+        end
+
+        def phrase_via_parse st
+          Noun_::Hacktors_::Parse_noun_phrase.via_parse st
+        end
+
+        def phrase_via_string s
+          Noun_::Hacktors_::Parse_noun_phrase.via_string s
+        end
+
+        def lexeme_class
+          self
         end
       end  # >>
 
-      @lexicon_ = Callback_::Box.new
+      PRONOUN_GATEWAY___ = 'it'
+
+      @lexicon_ = Lazy_lexicon_[ self, :LEXICON_PROTOTYPE___ ]
 
       class Omni_Phrase < Omni_Phrase
 
-        ORDER = %i( article adjective_phrase lexeme )
+        ORDER_WHEN_NORMAL___ = %i(
+
+          quantity_hack_
+          article
+          adjective_phrase
+          lexeme
+          prepositional_phrases )
+
+        ORDER_WHEN_PRONOUN_IS_ACTIVE___ = %i(
+
+          quantity_hack_
+          adjective_phrase
+          _pronoun
+          prepositional_phrases
+
+        )  # "neither of them"
 
         UNIQUE_EXPONENTS = UNIQUE_EXPONENTS
 
@@ -50,7 +119,7 @@ module Skylab::Human
           @_number = nil
           @_person = nil
           @_pronoun = nil
-          @_use_pronoun = false
+          @pronoun_is_active = false
           super
         end
 
@@ -81,13 +150,10 @@ module Skylab::Human
 
         # ~ end
 
-        def express_words_into y
+        def inflect_words_into_against_noun_phrase y, _np
 
-          if @_use_pronoun
-            @_pronoun.inflect_words_into_against_noun_phrase y, self
-          else
-            super
-          end
+          # ..
+          express_words_into y
         end
 
         def inflect_child_production_ y, phrase
@@ -107,11 +173,13 @@ module Skylab::Human
           self
         end
 
+        attr_reader :pronoun_is_active
+
         def __change_exponent_of_pronoun sym
 
           if ! @_pronoun
             @_pronoun = EN_::POS::Pronoun.new_production
-            @_use_pronoun = true
+            @pronoun_is_active = true
           end
 
           @_pronoun << sym
@@ -130,7 +198,7 @@ module Skylab::Human
             pn = @_pronoun
             pn.clear_grammatical_category cat_sym
             if pn.is_empty
-              @_use_pronoun = false
+              @pronoun_is_active = false
             end
           end
           NIL_
@@ -138,34 +206,53 @@ module Skylab::Human
 
         attr_reader :adjective_phrase
 
-        def remove_adjective_phrase
+        def remove_adjective_phrases
           remove_instance_variable :@adjective_phrase
         end
 
-        def initialize_adjective_phrase x
+        def remove_first_adjective
 
-          @adjective_phrase ||= begin
-            yes = true
-            x
-          end
-          yes or self._NO_CLOBBER
-          NIL_
+          @adjective_phrase.remove_first_item
+        end
+
+        def prepend_adjective_via_lemma s
+
+          _ = EN_::Phrase_Structure::Noun_inflectee_via_string[ s ]
+          prepend_adjective_phrase _
+        end
+
+        def prepend_adjective_phrase x
+          touch_and_prepend_noun_inflectee_into_ :@adjective_phrase, x
         end
 
         def article
           @_article || Article__.default_instance
         end
 
+        def use_indefinite_article_if_appropriate
+
+          if @lexeme.is_mass_noun
+            NIL_
+          else
+            _change_definity :indefinite
+            ACHIEVED_
+          end
+        end
+
         def __change__definity__ def_or_indef
+          _change_definity def_or_indef
+        end
+
+        def _change_definity def_or_indef
 
           @_article = Article__.send def_or_indef
-          @_use_pronoun = false
+          @pronoun_is_active = false  # why ?
           NIL_
         end
 
         def lemma_string= s
           @lexeme = Noun_.in_lexicon_touch_lemma_via_string s
-          @_use_pronoun = false
+          @pronoun_is_active = false
           s
         end
 
@@ -182,9 +269,27 @@ module Skylab::Human
           @_person
         end
 
+        attr_reader :_pronoun
+
         def __change__person__ first_second_third
           @_person = first_second_third
           NIL_
+        end
+
+        attr_reader :prepositional_phrases
+
+        def append_prepositional_phrase x
+          touch_and_append_noun_inflectee_into_ :@prepositional_phrases, x
+        end
+
+        attr_accessor :quantity_hack_
+
+        def current_phrase_order_
+          if @pronoun_is_active
+            ORDER_WHEN_PRONOUN_IS_ACTIVE___
+          else
+            ORDER_WHEN_NORMAL___
+          end
         end
       end
 
@@ -208,17 +313,30 @@ module Skylab::Human
         end
 
         @definite = module DEFINITE___
+        class << self
 
-          def self.inflect_words_into_against_noun_phrase y, phrase
+          def inflect_words_into_against_noun_phrase y, phrase
             y << 'the'
           end
+
+          def intern
+            :definite
+          end
+        end # >>
           self
         end
 
         @_do_not_use_article_ = module DO_NOT_USE_ARTICLE___
-          def self.inflect_words_into_against_noun_phrase y, phrase
+        class << self
+
+          def inflect_words_into_against_noun_phrase y, phrase
             y
           end
+
+          def intern
+            :_do_not_use_article_
+          end
+        end # >>
           self
         end
 
@@ -253,21 +371,33 @@ module Skylab::Human
                 end
               end
             end.call
+
+            def intern
+              :indefinite
+            end
           end  # >>
           self
         end
 
         @the_counterpart_quantity_determiner =
         module THE_COUTERPART_QUANTITY_DETERMINER___
-          def self.inflect_words_into_against_noun_phrase y, np
+        class << self
+
+          def inflect_words_into_against_noun_phrase y, np
             y << 'any'
           end
+
+          def intern
+            :the_counterpart_quantity_determiner
+          end
+        end  # >>
           self
         end
 
         @the_negative_determiner = module THE_NEGATIVE_DETERMINER___
+        class << self
 
-          def self.inflect_words_into_against_noun_phrase y, np
+          def inflect_words_into_against_noun_phrase y, np
             sing_or_plur = np.person
             if sing_or_plur
               # 'not' ?
@@ -276,6 +406,11 @@ module Skylab::Human
               y << 'no'
             end
           end
+
+          def intern
+            :the_negative_determiner
+          end
+        end # >>
           self
         end
 

@@ -10,7 +10,7 @@ module Skylab::Human
 
       class NLP::EN::Expression_Frames___::Count_and_Noun < EF_
 
-        REQUIRED_TERMS = [ :subject_atom, :subject_integer ]
+        REQUIRED_TERMS = [ :subject_atom, :subject_count ]
 
         OPTIONAL_TERMS = nil
 
@@ -18,11 +18,11 @@ module Skylab::Human
 
         def initialize idea
 
-          d = idea.subject_integer.to_integer
+          d = idea.subject_count.to_integer
 
           np = EN_::POS::Noun[ idea.subject_atom.to_string ]
 
-          np.initialize_adjective_phrase(
+          np.prepend_adjective_phrase(
             EN_::Phrase_Structure::Noun_inflectee_via_string[ d.to_s ] )
 
           @noun_phrase = case 1 <=> d.abs

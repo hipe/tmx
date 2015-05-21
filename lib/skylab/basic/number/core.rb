@@ -20,6 +20,25 @@ module Skylab::Basic
       end
     end  # >>
 
+    class As_noun_inflectee  # an [#hu-037] adapter
+
+      # this is a production - it can hold aribrary state representing
+      # how it is to be expressed (for example degrees of precision,
+      # maybe it will do num2s etc)
+
+      class << self
+        alias_method :[], :new
+      end  # >>
+
+      def initialize assume_d
+        @_x = assume_d
+      end
+
+      def inflect_words_into_against_noun_phrase y, np
+        y << "#{ @_x }"  # etc
+      end
+    end
+
     Number_ = self
   end
 end

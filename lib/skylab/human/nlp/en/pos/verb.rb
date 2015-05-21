@@ -193,7 +193,7 @@ module Skylab::Human
           phrase.inflect_words_into_against_sentence_phrase y, @_spc
         end
 
-        def determine_constituent_phrase_order_
+        def current_phrase_order_
 
           if _auxiliary_reason
             ORDER_WHEN_AUXILIARY___
@@ -318,7 +318,7 @@ module Skylab::Human
           @_lexeme = lx
         end
         def inflect_words_into_against_sentence_phrase y, sp
-          y << @_lexeme.to_lemma_string
+          y << @_lexeme.lemma_x
         end
       end
 

@@ -16,6 +16,11 @@ module Skylab::Human
 
     Parse = sidesys[ :Parse ]
 
+    String_scanner = -> s do
+      require 'strscan'
+      ::StringScanner.new s
+    end
+
     Time = stdlib[ :Time ]
 
   end

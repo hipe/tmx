@@ -83,28 +83,37 @@ module Skylab::Human
         end
 
         def __init_via_integer d
-          class << self
-            attr_reader :to_integer
-          end
+
+          extend Integer_Methods___
           @to_integer = d
-          @received_shape = :integer
+          @received_shape = :count
           NIL_
         end
 
         module Array_Methods___
 
-          def to_atom_argument
-            if 1 == @to_array.length
-              me = self
-              Nounish_.new do
-                @role_symbol = me.role_symbol
-                init_via_string me.to_array.fetch 0
-              end
-            end
+          def quad_count_category
+            Quad_category_via_integer_[ @to_array.length ]
           end
 
+          attr_reader :to_array
+        end
+
+        module Integer_Methods___
+
           def quad_count_category
-            case @to_array.length
+            Quad_category_via_integer_[ @to_integer ]
+          end
+
+          attr_reader :to_integer
+        end
+
+        Quad_category_via_integer_ = -> d do
+
+          if 0 > d
+            :negative
+          else
+            case d
             when 0
               :none
             when 1
@@ -115,8 +124,6 @@ module Skylab::Human
               :more_than_two
             end
           end
-
-          attr_reader :to_array
         end
 
         Nounish_ = self

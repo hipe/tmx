@@ -26,22 +26,40 @@ module Skylab::Human
           end
         end
 
+        def replace_lexicon x_
+          x = @lexicon_
+          @lexicon_ = x_
+          x
+        end
+
         private :new
       end  # >>
 
-      def initialize lemma_form_string
+      # ~ this is the beginning and the end of the base
+      #   instance methods for your lexeme subclass:
 
-        if ! lemma_form_string.frozen?
-          lemma_form_string.freeze
-        end
+      def initialize lemma_form_string, & edit_p
+
         @to_lemma_string = lemma_form_string
+
+        if edit_p
+          instance_exec( & edit_p )
+        end
+
+        # (:+#tombstone: freezing)
       end
 
       def lemma_x
+
+        # this form is compatible with e.g irregular lexemes that don't
+        # have a stringular lemma of their own, for e.g The Pronoun
+
         to_lemma_string
       end
 
       attr_reader :to_lemma_string
+
+      # ~ that's the end of it
 
       class Omni_Phrase
 
@@ -65,7 +83,7 @@ module Skylab::Human
 
         def express_words_into y
 
-          determine_constituent_phrase_order_.each do | sym |
+          current_phrase_order_.each do | sym |
             x = send sym
             x or next
             inflect_child_production_ y, x
@@ -73,8 +91,70 @@ module Skylab::Human
           y
         end
 
-        def determine_constituent_phrase_order_
+        def current_phrase_order_
           self.class::ORDER
+        end
+
+        # ~ mutation API
+
+        def touch_and_prepend_noun_inflectee_into_ ivar, x
+
+          _touch_mutable_noun_inflectee_list ivar, x do | list |
+            list.prepend_noun_inflectee x
+          end
+          NIL_
+        end
+
+        def touch_and_append_noun_inflectee_into_ ivar, x
+
+          _touch_mutable_noun_inflectee_list ivar, x do | list |
+            list.append_noun_inflectee x
+          end
+          NIL_
+        end
+
+        def touch_and_prepend_sentence_inflectee_into_ ivar, x
+
+          _touch_mutable_sentence_inflectee_list ivar, x do | list |
+            list.prepend_sentence_inflectee x
+          end
+          NIL_
+        end
+
+        def touch_and_append_sentence_inflectee_into_ ivar, x
+
+          _touch_mutable_sentence_inflectee_list ivar, x do | list |
+            list.append_sentence_inflectee x
+          end
+          NIL_
+        end
+
+        def _touch_mutable_noun_inflectee_list ivar, x, & p
+
+          touch_mutable_list_ ivar,
+            EN_::Phrase_Structure::Mutable_phrase_list_as_noun_inflectee,
+            x, & p
+        end
+
+        def _touch_mutable_sentence_inflectee_list ivar, x, & p
+
+          touch_mutable_list_ ivar,
+            EN_::Phrase_Structure::Mutable_phrase_list_as_sentence_inflectee,
+            x, & p
+        end
+
+        def touch_mutable_list_ ivar, cls, x
+
+          if instance_variable_defined? ivar
+            mutable_list = instance_variable_get ivar
+          end
+
+          if mutable_list
+            yield mutable_list
+          else
+            instance_variable_set ivar, cls[ x ]
+          end
+          NIL_
         end
       end
     end

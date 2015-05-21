@@ -21,10 +21,14 @@ module Skylab::Human
       attr_reader :syntactic_category
 
       def object
-        ( object_atom || object_list ) && true
+        ( object_atom || object_list || object_count ) && true
       end
 
-      attr_reader :object_atom, :object_list
+      def to_object_count_and_list_and_atom
+        [ object_count, object_list, object_atom ]
+      end
+
+      attr_reader :object_atom, :object_count, :object_list
 
       private def object=
 
@@ -40,10 +44,14 @@ module Skylab::Human
       end
 
       def subject
-        ( subject_atom || subject_list ) && true
+        ( subject_atom || subject_list || subject_count ) && true
       end
 
-      attr_reader :subject_atom, :subject_list, :subject_integer
+      def to_subject_count_and_list_and_atom
+        [ subject_count, subject_list, subject_atom ]
+      end
+
+      attr_reader :subject_atom, :subject_count, :subject_list
 
       private def subject=
 
@@ -81,11 +89,18 @@ module Skylab::Human
         KEEP_PARSING_
       end
 
-      attr_reader :implication_of_future
+      attr_reader :later_is_expected
 
-    private def imply_the_future=
+    private def later_is_expected=
 
-        @implication_of_future = true
+        @later_is_expected = true
+        KEEP_PARSING_
+      end
+
+      attr_reader :more_is_expected
+
+    private def more_is_expected=
+        @more_is_expected = true
         KEEP_PARSING_
       end
 

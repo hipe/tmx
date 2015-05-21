@@ -169,4 +169,18 @@ two steps from three, in contrast to the functions that bring you down
 to one. this is an interface best suited to particular expressing clients
 where the lemma is determined early but the desired form is not know
 until later, e.g [#br-016].
+
+
+
+
+## :#the-pronoun-gateway-hack
+
+in the spirit of this whole library, this is a convenient while
+icky "macro" that hard codes the below magic meaning to the lemma
+"it", which allows us to interpret long strings that end in 'it'
+more usefully.
+
+we are giving "it" special meaning as a macro, that is not associated
+with the other pronouns ("her" etc).
+
 _

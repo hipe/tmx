@@ -35,6 +35,8 @@ module Skylab::Human
       s_a_ * EMPTY_S_
     end
 
+    Autoloader_[ Models = ::Module.new ]
+
     Autoloader_[ Models_ = ::Module.new ]
 
     class Models_::Argument_Adapter

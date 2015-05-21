@@ -149,7 +149,7 @@ module Skylab::Human::TestSupport
       a.push :subject, _ary
 
       if yes_future
-        a.push :imply_the_future
+        a.push :later_is_expected
       end
 
       if ! yes_positive

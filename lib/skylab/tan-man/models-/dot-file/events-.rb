@@ -12,7 +12,7 @@ module Skylab::TanMan
 
       y << "html-escaping support is currently very limited - #{
             }#{ sp_ :subject, 'character', :subject, _s_a,
-               :negative, :imply_the_future,
+               :negative, :later_is_expected,
                :object, :adjectivial, 'supported' }"
 
       # eg. "the following characters are not yet suported:"

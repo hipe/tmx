@@ -2,8 +2,6 @@ module Skylab::Human
 
   class NLP::Expression_Frame
 
-    Models = ::Module.new
-
     class Models::Collection
 
       class << self

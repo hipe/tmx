@@ -69,6 +69,29 @@ module Skylab::Human
         end
       end
 
+      class Lazy_lexicon_
+
+        # a new experiment, similar to above
+
+        class << self
+          alias_method :[], :new
+          private :new
+        end  # >>
+
+        def initialize mod, const
+          @_const = const
+          @_mod = mod
+        end
+
+        def touch lemma_x, & create_p
+
+          lex = @_mod.const_get @_const, false
+          lex.init_lexicon @_mod
+          @_mod.replace_lexicon lex
+          lex.touch lemma_x, & create_p
+        end
+      end
+
       IRREGULAR_INDEX_METHOD_ = -> do
         @___irregular_index ||= Models::Irregular::Index.new self
       end
