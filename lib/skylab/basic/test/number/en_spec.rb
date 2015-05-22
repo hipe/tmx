@@ -1,6 +1,10 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-describe "[hu] NLP EN number" do
+module Skylab::Basic::TestSupport
+
+  # <-
+
+describe "[ba] number en" do
 
   -> do
 
@@ -26,6 +30,8 @@ describe "[hu] NLP EN number" do
 
   def _common s, d, m
 
-    ::Skylab::Human::NLP::EN::Number.send( m, d ).should eql s
+    Basic_::Number::EN.send( m, d ).should eql s
   end
+end
+# ->
 end

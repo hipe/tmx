@@ -1,18 +1,24 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
-module Skylab::Human::TestSupport
+module Skylab::Basic::TestSupport_Visual
+
+  class Number
+
+    class EN
+
+      _Execute = -> stderr do
+
+        # <- 3
 
   # visual-test only! see also unit tests
 
-  fun = Hu_::NLP::EN::Number
+  fun = ::Skylab::Basic::Number::EN
 
   number = fun.number
 
   num2ord = fun.num2ord
 
   method = nil
-
-  stderr = TestSupport_.debug_IO
 
   print = -> x do
 
@@ -33,5 +39,28 @@ module Skylab::Human::TestSupport
     [1000, 1001, 1423, 1900, 1999, 2000, 2001].each(&print)
     [42388].each(&print)
     [7000_000_000_000_000_000_000_000].each(&print)
+  end
+# -> 3
+      end
+
+      def initialize _i, o, e, _a
+        @_e = e
+        @_o = o
+      end
+
+      def receive_parent_ par, const, slug
+
+      end
+
+      def produce_executable_
+        self
+      end
+
+      define_method :execute do
+        _Execute[ @_o ]
+        @_e.puts "(done with visual test)"
+        true
+      end
+    end
   end
 end

@@ -203,6 +203,7 @@ module Skylab::Basic  # introduction at [#020]
   NIL_ = nil
   NILADIC_FALSEHOOD_ = -> { false }
   PROCEDE_ = true
+  SPACE_ = ' '.freeze
   UNABLE_ = false
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]

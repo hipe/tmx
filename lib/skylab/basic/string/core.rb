@@ -146,8 +146,6 @@ module Skylab::Basic
 
     NEWLINE_ = "\n".freeze
 
-    SPACE_ = ' '.freeze
-
     String_ = self
   end
 end

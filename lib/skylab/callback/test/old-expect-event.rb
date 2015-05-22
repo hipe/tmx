@@ -249,7 +249,7 @@ module Skylab::Callback::TestSupport
             up.change_actual_index_to d
             @d = d ; @idx = idx
             _ord_s = if -1 == d then LAST_S_ else
-              Callback_.lib_.num2ord( d + 1 )
+              Callback_.lib_.basic::Number::EN.num2ord( d + 1 )
             end
             @description_x = '%-6s' % _ord_s
             super()

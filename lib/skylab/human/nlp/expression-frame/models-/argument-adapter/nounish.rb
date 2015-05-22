@@ -13,7 +13,7 @@ module Skylab::Human
           class << self
 
             def new_via__polymorphic_upstream__ st
-              Nounish.new do
+              Nounish._new do
                 @role_symbol = :object
                 _receive_etc st
               end
@@ -26,13 +26,24 @@ module Skylab::Human
           class << self
 
             def new_via__polymorphic_upstream__ st
-              Nounish.new do
+              Nounish._new do
                 @role_symbol = :subject
                 _receive_etc st
               end
             end
           end  # >>
         end
+
+        class << self
+          def new_via_array a
+            Nounish._new do
+              @role_symbol = :_neither_
+              _init_via_array a
+            end
+          end
+          alias_method :_new, :new
+          private :new
+        end  # >
 
         def slot_symbol
           :"#{ @role_symbol }_#{ @received_shape }"
@@ -52,7 +63,7 @@ module Skylab::Human
           end
 
           if x.respond_to? :each_with_index
-            __init_via_array x
+            _init_via_array x
 
           elsif x.respond_to? :ascii_only?
             init_via_string x
@@ -65,7 +76,7 @@ module Skylab::Human
           end
         end
 
-        def __init_via_array a
+        def _init_via_array a
 
           extend Array_Methods___
           @to_array = a

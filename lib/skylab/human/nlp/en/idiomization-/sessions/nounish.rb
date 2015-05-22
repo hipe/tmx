@@ -164,7 +164,7 @@ module Skylab::Human
       def _init_noun_phrase_plus_adjective_list
 
         _init_noun_phrase
-        _ = Models::Portable_List_Phrase.new @_list_arg
+        _ = Models::Portable_List_Phrase.new_via_list_arg @_list_arg
         @noun_phrase.prepend_adjective_phrase _
         NIL_
       end

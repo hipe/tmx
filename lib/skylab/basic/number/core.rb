@@ -22,7 +22,7 @@ module Skylab::Basic
 
     class As_noun_inflectee  # an [#hu-037] adapter
 
-      # this is a production - it can hold aribrary state representing
+      # this is a production - it can hold arbitrary state representing
       # how it is to be expressed (for example degrees of precision,
       # maybe it will do num2s etc)
 

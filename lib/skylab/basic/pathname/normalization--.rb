@@ -255,7 +255,7 @@ module Skylab::Basic
           UNABLE_
         end
 
-        UNDERSCORE_ = '_' ; SPACE_ = ' '
+        UNDERSCORE_ = '_'
 
         include Simple_Selective_Sender_Methods_  # instead of "entity"'s
           # event-building stuff, just for consistency within the library

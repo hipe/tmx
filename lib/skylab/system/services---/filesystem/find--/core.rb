@@ -17,6 +17,7 @@ module Skylab::System
         #   • this node itself is concerned with modeling the entity not
         #     finding the files, however producing an array of paths for
         #     the latter is the default behavior for some forms of call.
+        #     as well there exists (recommended) progressive streaming.
 
         class << self
 
@@ -111,6 +112,14 @@ module Skylab::System
 
         attr_reader :args
 
+        def filename_array
+          @unescaped_filename_a
+        end
+
+        def path_array
+          @unescaped_path_a
+        end
+
       private
 
         def filename=
@@ -119,6 +128,7 @@ module Skylab::System
         end
 
         def filenames=
+
           # an "or" list
           x = gets_one_polymorphic_value
           if x
@@ -234,43 +244,38 @@ module Skylab::System
 
         def to_path_stream
           @args and begin
-            Find__::Build_path_stream__[ @args, & @on_event_selectively ]
+            Find__::Actors_::Build_path_stream[ @args, & @on_event_selectively ]
           end
         end
 
         def express_into_under y, expag
 
-          if @args
-            Command_Args_Event__[ @args ].express_into_under y, expag
-            ACHIEVED_
-          else
-            UNABLE_
-          end
+          express_under( expag ).express_into_under y, expag
         end
 
+
         def __resolve_valid_command_args  # amazing hax #note-130
+
           otr = dup
           otr.extend Command_Building_Methods__  # pattern :+[#sl-144]
           @args = otr.__args_via_flush
           if @args && @on_event_selectively
             @on_event_selectively.call :info, :event, :find_command_args do
-              Command_Args_Event__[ @args ]
+
+              express_under :Event
             end
           end
           NIL_
         end
 
-        Command_Args_Event__ = Callback_::Event.prototype_with(
+        def express_under modality_x
 
-           :find_command_args, :find_command_args, nil, :ok, nil ) do | y, o |
+          __adapter_for( modality_x )[ self ]
+        end
 
-          sw = System_.lib_.shellwords
+        def __adapter_for x
 
-          _ = o.find_command_args.map do | s |
-            sw.shellescape s
-          end.join SPACE_
-
-          y << "generated `find` command: \"#{ _ }\""
+          Find_::Expression_Adapters.const_get x.intern, false
         end
 
         module Command_Building_Methods__
@@ -368,11 +373,9 @@ module Skylab::System
 
         end
 
-        if false  # (was [#sg-029]) a structured EN description builder `to_phrasal_noun_modifier_event`
-          my.paths -> p { y << "in #{ and_ p.map(& val ) }" }, e[ :paths ]
-          my.names -> n { y << "named #{ or_ n.map(& val ) }" }, e[ :names ]
-          my.patrn -> p { y << "with the pattern #{ val[ p ] }" }, e[ :pattern ]
-        end
+        Autoloader_[ Expression_Adapters = ::Module.new ]
+
+        Find_ = self
       end
     end
 end

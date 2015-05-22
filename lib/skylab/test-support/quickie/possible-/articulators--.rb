@@ -17,14 +17,14 @@ module Skylab::TestSupport
               when 0 ; 'no'
               when 1 ; 'the only'
               when 2 ; 'both of the'
-              else   ; "all #{ QuicLib_::EN_number[ n ] } of"
+              else   ; "all #{ QuicLib_::Basic[]::Number::EN.number n } of"
               end
             end,
             exclusive: -> n do
               case n
               when 0 ; 'no'
               when 1 ; 'the only'
-              else   ; "none of the #{ QuicLib_::EN_number[ n ] }"
+              else   ; "none of the #{ QuicLib_::Basic[]::Number::EN.number n }"
               end
             end
           }.freeze

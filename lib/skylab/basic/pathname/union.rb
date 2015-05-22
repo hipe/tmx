@@ -166,7 +166,7 @@ module Skylab::Basic
       end
     end
 
-    EMPTY_S_ = ''.freeze ; PERIOD_ = '.'.freeze ; SPACE_ = ' '.freeze
+    EMPTY_S_ = ''.freeze ; PERIOD_ = '.'.freeze
   end
 
   Pathname::Union::Elim_ = ::Struct.new :shorter, :longer

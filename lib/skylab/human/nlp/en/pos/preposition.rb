@@ -25,10 +25,13 @@ module Skylab::Human
       end  # >>
 
       PREP_LEXICON__ = ::Hash[
-        %w(
-          after
-          of
-        ).map { | s | [ s, true ] } ]
+        [
+          "after",  # tests here
+          "in",  # [sy]
+          "of",
+          "with",  # [sy]
+
+        ].map { | s | [ s, true ] } ]
 
       def initialize
       end
@@ -58,6 +61,11 @@ module Skylab::Human
         if @_np.pronoun_is_active
           Callback_::Stream.via_item @_np
         end
+      end
+
+      def express_words_into_under y, expag
+        y << @_lemma
+        @_np.express_words_into_under y, expag
       end
 
       def inflect_words_into_against_noun_phrase y, np

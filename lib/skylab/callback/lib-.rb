@@ -77,10 +77,6 @@ module Skylab::Callback
       Basic[]::Module
     end
 
-    Num2ord = -> x do
-      Hu__[]::NLP::EN::Number::Num2ord[ x ]
-    end
-
     Some_stderr = -> do
       System_lib__[]::IO.some_stderr_IO
     end

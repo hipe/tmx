@@ -1,8 +1,10 @@
-module Skylab::Human
+module Skylab::Basic
 
-  module NLP
+  module Number
 
-    module EN::Number
+    module EN
+
+      # <- 2
 
   -> o do
 
@@ -46,7 +48,7 @@ module Skylab::Human
 
     o[ :number ] = number
 
-    o[ :num2ord ] = Num2ord = -> x do
+    o[ :num2ord ] = -> x do
       return x unless x % 1 == 0 && x > 0 # positive integers only
       mod = x % (m = 100)
       if mod >= arr.length and !(13..19).include? mod
@@ -88,7 +90,8 @@ module Skylab::Human
         else
           p[ * a ]
         end
-      end ; nil
+      end
+      NIL_
     end
     class << o
       alias_method :[]=, :call
@@ -96,13 +99,7 @@ module Skylab::Human
     o
   end.call
 
-      Number_ = self
-
-      module Methods
-        define_method :number, Number_.number
-        define_method :num2ord, Number_.num2ord
-      end
-
-    end  # EN::Number
-  end  # NLP
+# -> 2
+    end
+  end
 end

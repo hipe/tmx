@@ -48,12 +48,20 @@ module Skylab::Human
           end
         end
 
+        def portable_list_phrase
+          EN_::Idiomization_::Models::Portable_List_Phrase
+        end
+
         def s * a
           if a.length.zero?
             S__
           else
             S__[ * a ]
           end
+        end
+
+        def sentence_string_head_via_words s_a
+          NLP::Expression_Frame.sentence_string_head_via_words s_a
         end
       end  # >>
 

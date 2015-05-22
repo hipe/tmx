@@ -247,9 +247,6 @@ module Skylab::TestSupport
         HL___[]::CLI
       end
 
-      EN_number = -> d do
-        NLP__[]::EN::Number.number d
-      end
 
       Function_chain = -> * p_a do
         MH__[].function_chain[ p_a, nil ]

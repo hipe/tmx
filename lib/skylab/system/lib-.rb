@@ -22,6 +22,8 @@ module Skylab::System
 
     File_utils = stdlib[ :FileUtils ]
 
+    Human = sidesys[ :Human ]
+
     Open3 = stdlib[ :Open3 ]
 
     Parse_lib = sidesys[ :Parse ]

@@ -39,6 +39,40 @@ module Skylab::System::TestSupport
       ev.find_command_args.should eql _cmd_o.args
     end
 
+    it "(experiment with EN)" do
+
+      _x = _dangerously_memoized
+
+      _np_like = _x.express_under :EN
+
+      _expag = System_.lib_.brazen::API.expression_agent_instance
+
+      _s_a = _np_like.express_words_into_under [], _expag
+
+      _s = System_.lib_.human::NLP::EN.sentence_string_head_via_words _s_a
+
+      _s.should eql 'whose name matched "*.code" in «x» and «y»'
+    end
+
+    define_method :_dangerously_memoized, -> do
+      x = nil
+      -> do
+        x ||= __build
+      end
+    end.call
+
+    def __build
+
+      _parent_subject.find(
+        :paths, [ 'x', 'y' ],
+        :filename, '*.code',
+        :as_normal_value, _subject_module::IDENTITY_ )
+    end
+
+    def _subject_module
+      System_::Services___::Filesystem
+    end
+
     def _parent_subject
       services_.filesystem
     end

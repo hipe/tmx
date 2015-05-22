@@ -45,6 +45,10 @@ module Skylab::Human
           s or self._SANITY
           @_s = s
         end
+
+        def express_words_into_under y, expag
+          y << @_s
+        end
       end
 
       class Noun_inflectee_via_string < Via_string__
@@ -68,104 +72,156 @@ module Skylab::Human
         end  # >>
 
         def initialize s_a
+
           @_s_a = s_a
+
+          p = -> y, ph, s_a_ do
+
+            s_a_.each do | s |
+              y << s
+            end
+            y
+          end
+
+          @inflect_words_into_against_noun_phrase = p
+
+          @inflect_words_into_against_sentence_phrase = p
+
         end
 
-        def _go y
-          @_s_a.each do | s |
-            y << s
-          end
-          y
+        def inflect_words_into_against_noun_phrase_under y, np, expag
+          @inflect_words_into_against_noun_phrase_under[ y, np, expag, @_s_a ]
         end
+
+        attr_writer :inflect_words_into_against_noun_phrase
+
+        attr_writer :inflect_words_into_against_noun_phrase_under
+
+        attr_writer :inflect_words_into_against_sentence_phrase
       end
 
       class Noun_inflectee_via_word_array < Via_w_ary__
 
-        def inflect_words_into_against_noun_phrase y, _
-          _go y
+        def inflect_words_into_against_noun_phrase y, np
+          @inflect_words_into_against_noun_phrase[ y, np, @_s_a ]
         end
       end
 
       class Sentence_inflectee_via_word_array < Via_w_ary__
 
-        def inflect_words_into_against_sentence_phrase y, _
-          _go y
+        def inflect_words_into_against_sentence_phrase y, sp
+          @inflect_words_into_against_sentence_phrase[ y, sp, @_s_a ]
         end
       end
 
-      class Via_p_ary__
+      class Via_ph_ary__
 
         class << self
+
+          def via_phrases x, * a
+
+            list = new x
+            m = _append_method_
+            a.each do | x_ |
+              list.send m, x_
+            end
+            list
+          end
+
           alias_method :[], :new
+          private :new
         end  # >>
 
         def initialize x
-          @_p_a = [ x ]
+          @_ph_a = [ x ]
+        end
+
+        def express_words_into_under y, expag
+
+          @_ph_a.each do | ph |
+            ph.express_words_into_under y, expag
+          end
+          y
         end
 
         def to_stream_of_pronouns
 
-          Callback_::Stream.via_nonsparse_array( @_p_a ).expand_by do | ph |
+          Callback_::Stream.via_nonsparse_array( @_ph_a ).expand_by do | ph |
             ph.to_stream_of_pronouns
           end
         end
 
         def replace_only_item x_
 
-          x =  @_p_a.fetch @_p_a.length << 1 - 2
-          @_p_a[ 0 ] = x_
+          x =  @_ph_a.fetch @_ph_a.length << 1 - 2
+          @_ph_a[ 0 ] = x_
           x
         end
 
         def replace_first_item x_
 
-          x = @_p_a.fetch 0
-          @_p_a[ 0 ] = x_
+          x = @_ph_a.fetch 0
+          @_ph_a[ 0 ] = x_
           x
         end
 
         def fetch_last_item
-          @_p_a.fetch( -1 )
+          @_ph_a.fetch( -1 )
         end
       end
 
-      class Mutable_phrase_list_as_noun_inflectee < Via_p_ary__
+      class Mutable_phrase_list_as_noun_inflectee < Via_ph_ary__
 
-        def inflect_words_into_against_noun_phrase y, x
-          @_p_a.each do | ph |
-            ph.inflect_words_into_against_noun_phrase y, x
+        def inflect_words_into_against_noun_phrase y, np
+          @_ph_a.each do | ph |
+            ph.inflect_words_into_against_noun_phrase y, np
+          end
+          y
+        end
+
+        def inflect_words_into_against_noun_phrase_under y, np, expag
+          @_ph_a.each do | ph |
+            ph.inflect_words_into_against_noun_phrase_under y, np, expag
           end
           y
         end
 
         def prepend_noun_inflectee x
-          @_p_a.unshift x
+          @_ph_a.unshift x
           NIL_
         end
 
         def append_noun_inflectee x
-          @_p_a.push x
+          @_ph_a.push x
           NIL_
+        end
+
+        def self._append_method_
+          :append_noun_inflectee
         end
       end
 
-      class Mutable_phrase_list_as_sentence_inflectee < Via_p_ary__
+      class Mutable_phrase_list_as_sentence_inflectee < Via_ph_ary__
 
         def inflect_words_into_against_sentence_phrase y, x
-          @_p_a.each do | ph |
+          @_ph_a.each do | ph |
             ph.inflect_words_into_against_sentence_phrase y, x
           end
           y
         end
 
         def prepend_sentence_inflectee x
-          @_p_a.unshift x
+          @_ph_a.unshift x
           NIL_
         end
 
         def append_sentence_inflectee x
-          @_p_a.push x
+          @_ph_a.push x
           NIL_
+        end
+
+        def self._append_method_
+          :append_sentence_inflectee
         end
       end
     end

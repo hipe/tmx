@@ -16,18 +16,6 @@ module Skylab::Brazen
 
       alias_method :calculate, :instance_exec
 
-      # ~ begin :#exeriment s
-
-      def modality_const
-        NIL_
-      end
-
-      def new_expression_context
-        ::String.new
-      end
-
-      # ~ end
-
       def and_ x
         _NLP_agent.and_ x
       end
@@ -103,6 +91,22 @@ module Skylab::Brazen
         s.inspect
       end
 
+      # ~ begin :#exeriment
+
+      def new_expression_context
+        ::String.new
+      end
+
+      def modality_const
+        NIL_
+      end
+
+      def intern  # what expression adapter?
+        :Event
+      end
+
+      # ~ end
+
       def _NLP_agent
         @context ||= self.class.NLP_agent.new
       end
@@ -112,7 +116,7 @@ module Skylab::Brazen
         def NLP_agent
           const_get( :NLP_agent__, false ).call
         end
-      end
+      end  # >>
 
       NLP_agent__ = Callback_.memoize do
         NLP_Agent__ = LIB.make_NLP_agent :public,

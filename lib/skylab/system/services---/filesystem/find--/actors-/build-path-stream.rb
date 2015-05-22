@@ -6,7 +6,9 @@ module Skylab::System
 
   class Find__
 
-    class Build_path_stream__
+    Actors_ = ::Module.new
+
+    class Actors_::Build_path_stream
 
       Callback_::Actor.call self, :properties, :args
 
