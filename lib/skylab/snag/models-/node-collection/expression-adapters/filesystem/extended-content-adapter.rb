@@ -31,7 +31,11 @@ module Skylab::Snag
           @index = -> do
 
             bx = Callback_::Box.new
-            st = fs.entry_stream dir
+            st = begin
+              fs.entry_stream dir
+            rescue  ::Errno::ENOENT
+              Callback_::Stream.the_empty_stream
+            end
 
             begin
 

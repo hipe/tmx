@@ -95,28 +95,46 @@ module Skylab::Human
       S__ = -> do
 
         inflected = {
-              a: [ 'no ', 'a ' ],  # no birds  / a bird   / birds
-             an: [ 'no ', 'an ' ],  # no errors / an error / errors
-           does: [ 'do', 'does', 'do' ],
+              a: [ 'no ', 'a ', nil ],  # no birds  / a bird   / birds
+             an: [ 'no ', 'an ', nil ],  # no errors / an error / errors
+           does: [ 'do', 'does' ],
              es: [ 'es', nil, 'es' ],  # matches / match
           exist: [ 'exist', 'is', 'are' ],
-             is: [ 'are', 'is', 'are' ],
-             no: [ 'no ', 'the only ' ],
+             is: [ 'are', 'is' ],
+             no: [ 'no ', 'the only ', nil ],
          one_of: [  nil, nil, 'one of '  ],
-              s: [ 's', nil, 's' ],
+              s: [ 's', nil ],
              _s: [  nil, 's'  ],  # it requires, they require
-           this: [ 'these', 'this', 'these' ],
-            was: [ 'were', 'was', 'were' ],
-           them: [ 'them', 'it', 'them' ],
-              y: [ 'ies', 'y', 'ies' ]
+           this: [ 'these', 'this' ],
+            was: [ 'were', 'was' ],
+           them: [ 'them', 'it' ],
+              y: [ 'ies', 'y' ]
           }
 
-        ( norm = { 0 => 0, 1 => 1 } ).default = 2
+        # for the above rows that have two cels, if it's a count of zero,
+        # use the first cel. if it's a count of one, use the second cel.
+        # otherwise use the first cel:
 
-        -> lengthable_x, i=:s do
+        ( norm_for_two = { 0 => 0, 1 => 1 } ).default = 0
+
+        # for the above rows that hav three cels, if it's a count of zero
+        # or one, do as above; otherwise use the *third* (last) cel.
+
+        ( norm_for_three = { 0 => 0, 1 => 1 } ).default = 2
+
+          # rows that have three columns, the default cel to use is the 3rd
+
+        -> lengthable_x, row_sym=:s do
+
           d = Try_convert_to_length__[ lengthable_x ]
           if d
-            inflected.fetch( i )[ norm[ d ] ]
+
+            row = inflected.fetch row_sym
+            if 2 == row.length
+              row.fetch norm_for_two[ d ]
+            else
+              row.fetch norm_for_three[ d ]
+            end
           end
         end
       end.call

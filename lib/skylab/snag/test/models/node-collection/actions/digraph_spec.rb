@@ -2,14 +2,12 @@ require_relative '../../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - n.c - actions - digraph", wip: true do
+  describe "[sg] models - n.c - actions - digraph" do
 
     extend TS_
     use :expect_event
 
     it "if no focus nodes in upstream, produces empty digraph with message" do
-
-      debug!
 
       y = []
       call_API :node_collection, :digraph,

@@ -14,8 +14,9 @@ module Skylab::Snag
     DEFAULT_PATTERN_STRINGS___ = [ '#todo\>'.freeze ]
 
     def initialize
-      @ending_of_message = nil
+      @_index_of_ending_of_message = nil
       yield self
+      @_late = {}
       freeze
     end
 
@@ -25,17 +26,21 @@ module Skylab::Snag
     end
 
     def accept_header_range begin_, end_
-      @header_r = begin_ ... end_
+      @_header_r = begin_ ... end_
       NIL_
     end
 
+    def body_range
+      @_body_r
+    end
+
     def accept_body_range begin_, end_
-      @body_r = begin_ ... end_
+      @_body_r = begin_ ... end_
       NIL_
     end
 
     def accept_ending_of_message d
-      @ending_of_message = d
+      @_index_of_ending_of_message = d
       NIL_
     end
 
@@ -43,29 +48,44 @@ module Skylab::Snag
 
       o = @_matching_line
       y << "#{ o.path }:#{ o.line_number }:#{ o.full_source_line }"
-      ACHIEVED_
     end
 
     # ~ begin
 
     def any_pre_tag_string
 
-      if @header_r.begin.nonzero?
+      if @_header_r.begin.nonzero?
 
-        full_source_line[ 0 ... @header_r.begin ]
+        full_source_line[ 0 ... @_header_r.begin ]
       end
     end
 
     def tag_string
 
-      full_source_line[ @body_r ]
+      full_source_line[ @_body_r ]
+    end
+
+    def chomped_post_tag_string
+
+      @_late[ :chomped_post_tag_string ] ||= __frozen_chomped_post_tag_string
+    end
+
+    def __frozen_chomped_post_tag_string
+
+      s = any_post_tag_string
+      if s
+        s.chomp!
+        s.freeze
+      else
+        EMPTY_S_
+      end
     end
 
     def any_post_tag_string  # almost always exists b.c newline
 
       s = full_source_line
-      d = @body_r.end
-      d_ = @ending_of_message
+      d = @_body_r.end
+      d_ = @_index_of_ending_of_message
       if d_
         self._FUN  # #todo cover this
       else
@@ -89,16 +109,20 @@ module Skylab::Snag
     end
 
     def beginning_of_header
-      @header_r.begin
+      @_header_r.begin
     end
 
+    module Actions
+
+      To_Stream = Make_action_loader_[]
+
+      Melt = Make_action_loader_[]
+    end
 
     module Expression_Adapters
       EN = nil
     end
 
-
-    Autoloader_[ Actions = ::Module.new, :boxxy ]
     Autoloader_[ Actors_ = ::Module.new ]
     Brazen_ = Snag_.lib_.brazen
     PIPE_ = '|'.freeze

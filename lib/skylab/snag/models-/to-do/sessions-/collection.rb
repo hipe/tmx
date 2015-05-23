@@ -19,9 +19,12 @@ module Skylab::Snag
         cmd = build_system_command
         cmd and begin
 
+          @command = cmd
+
           p = @on_event_selectively
 
-          st = Actors_::Matching_line_stream_via_find_command[ cmd, @system_conduit, & p ]
+          st = Actors_::Matching_line_stream_via_find_command[
+            cmd, @system_conduit, & p ]
 
           st and begin
 
@@ -30,6 +33,8 @@ module Skylab::Snag
           end
         end
       end
+
+      attr_reader :command
 
       def build_system_command
 

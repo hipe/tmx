@@ -2,7 +2,25 @@ module Skylab::Snag
 
   class Models_::Node_Collection
 
+    COMMON_MANIFEST_FILENAME_ = 'doc/issues.md'.freeze
+
     class << self
+
+      def nearest_path dir, & x_p
+
+        fn = COMMON_MANIFEST_FILENAME_
+
+        sp = Walk_upwards_to_find_nearest_surrounding_path_[
+          dir,
+          fn,
+          & x_p ]
+
+        if sp
+          ::File.join sp, fn
+        else
+          sp
+        end
+      end
 
       def new_via_upstream_identifier x, & oes_p
 
@@ -91,59 +109,23 @@ module Skylab::Snag
       end
     end
 
-    Brazen_ = Snag_.lib_.brazen
-
-    class Stub__ < Brazen_::Model::Action  # this again. :+#exerimental
-
-      class << self
-
-        def make
-          ::Class.new self
-        end
-
-        alias_method :orig_new, :new
-
-        def new( * a, & x_p )
-
-          singleton_class.send :undef_method, :new
-          __load
-          new( * a, & x_p )
-        end
-
-        def is_actionable
-          true
-        end
-
-        def is_promoted
-          false
-        end
-
-        def __load
-
-          mod = Snag_.lib_.basic::Module
-
-          chain = mod.chain_via_module self
-          first = chain.pop
-          chain.pop
-
-          model_class = chain.last.value_x
-
-          _slug = Callback_::Name.via_const( first.name_symbol ).as_slug
-          _path = model_class.dir_pathname.join( 'actions', _slug ).to_path
-
-          require _path
-
-          NIL_
-        end
-      end
-    end
-
     module Actions
 
-      Digraph = Stub__.make
+      Digraph = Make_action_loader_[]
 
-      To_Universal_Node_Stream = Stub__.make
+      To_Universal_Node_Stream = Make_action_loader_[]
 
+    end
+
+    Walk_upwards_to_find_nearest_surrounding_path_ = -> s, fn, & x_p do
+
+      Snag_.lib_.system.filesystem.walk.new_with(
+        :filename, fn,
+        :max_num_dirs_to_look, 10,  # whatever
+        :property_symbol, :dir,
+        :start_path, s,
+        & x_p
+      ).find_any_nearest_surrounding_path
     end
 
     NC_ = self

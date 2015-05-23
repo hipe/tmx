@@ -2,7 +2,9 @@ module Skylab::Snag
 
   class Models_::To_Do
 
-    Actors_::Matching_line_stream_via_find_command = -> cmd, system_conduit, & x_p do
+    module Actors_::Matching_line_stream_via_find_command
+      # <-
+    define_singleton_method :[] do | cmd,  system_conduit, & x_p |
 
       p = -> do
 
@@ -32,9 +34,8 @@ module Skylab::Snag
             line_s = e.gets
             if line_s
               t.terminate
-              self._TODO__receive_error_line line_s
               p = EMPTY_P_
-              NIL_
+              When_error_line___[ line_s, e, & x_p ]
             else
               p = EMPTY_P_
               NIL_
@@ -47,6 +48,17 @@ module Skylab::Snag
 
       Callback_.stream do
         p[]
+      end
+    end
+    # ->
+
+      When_error_line___ = -> line, e, & x_p do
+
+        x_p.call :error, :expression, :sytem_call_error do | y |
+          y << line
+        end
+
+        UNABLE_
       end
     end
   end

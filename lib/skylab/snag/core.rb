@@ -152,6 +152,69 @@ module Skylab::Snag
       const_get( :Interpret, false )[ x, moda, & oes_p ]
   end
 
+  Make_action_loader_ = -> do  # this is [#006]:[#026]
+
+    p = -> do
+
+      class Actn_Ldr____ < Snag_.lib_.brazen::Model::Action
+
+        class << self
+
+          def make
+            ::Class.new self
+          end
+
+          alias_method :orig_new, :new
+
+          def new( * a, & x_p )
+
+            singleton_class.send :undef_method, :new
+            __load
+            new( * a, & x_p )
+          end
+
+          def is_actionable
+            true
+          end
+
+          def is_promoted
+            false
+          end
+
+          def __load
+
+            mod = Snag_.lib_.basic::Module
+
+            chain = mod.chain_via_module self
+            first = chain.pop
+            chain.pop
+
+            model_class = chain.last.value_x
+
+            _slug = Callback_::Name.via_const( first.name_symbol ).as_slug
+            _path = model_class.dir_pathname.join( 'actions', _slug ).to_path
+
+            require _path
+
+            singleton_class.send :alias_method, :new, :orig_new
+
+            NIL_
+          end
+        end  # >>
+      end
+
+      p = -> do
+        Actn_Ldr____.make
+      end
+
+      p[]
+    end
+
+    -> do
+      p[]
+    end
+  end.call
+
   module Model_
     Autoloader_[ Collection = ::Module.new ]
     Autoloader_[ self ]

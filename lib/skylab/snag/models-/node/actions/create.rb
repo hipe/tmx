@@ -48,13 +48,6 @@ module Skylab::Snag
       def via_node_collection_
 
         bx = @argument_box
-        x_p = handle_event_selectively
-
-        if bx[ :try_to_reappropriate ]
-          bx.add :_mutate_node, -> node, sess do
-            Try_to_reappropriate___[ node, sess, & x_p ]
-          end
-        end
 
         @node_collection.edit(
 
@@ -62,10 +55,10 @@ module Skylab::Snag
           :add, :node,
             :append, :tag, :open,
             :append, :message, bx.fetch( :message ),
-          & x_p )
+          & handle_event_selectively )
       end
 
-      Try_to_reappropriate___ = -> node_, sess, & x_p do
+      Try_to_reappropriate = -> node_, sess, & x_p do
 
         node =
         Snag_::Models_::Node_Collection::Actors_::Find_reappropriablest_node[
@@ -127,21 +120,20 @@ module Skylab::Snag
 
         def __etc row, st
 
-          s_a = []
-          _s = row.get_business_substring
-          last_string = "( #was: #{ _s }"
-
-          s_a.push last_string
+          s = "( #was: #{ row.get_business_substring }"
+          s_a = [ s ]
 
           begin
             row = st.gets
             row or break
-            last_string = row.get_business_substring
-            s_a.push last_string
+            s_ = row.get_business_substring
+            s_ or break  # blank line
+            s = s_
+            s_a.push s
             redo
           end while nil
 
-          last_string.concat " )"
+          s.concat " )"
 
           ok = @node_.edit(
             :append, :message, s_a,

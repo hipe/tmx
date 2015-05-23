@@ -17,16 +17,21 @@ module Skylab::Snag
             DEFAULT_SUB_MARGIN_WIDTH_,
             DEFAULT_IDENTIFIER_INTEGER_WIDTH_ )
 
+          @is_dry = nil
+
           @_locks = []
 
           @on_event_selectively = x_p
         end
 
-        attr_writer :collection, :downstream_identifier
+        attr_writer :collection, :downstream_identifier,
+
+                    :expression_adapter_actor_box
 
         attr_reader :expression_agent
 
         attr_writer :FS_adapter,
+                    :is_dry,
                     :subject_entity
 
         def during_locked_write_session  # note-35 (locking, tmpfiles)
@@ -40,7 +45,9 @@ module Skylab::Snag
 
               @downstream_lines = dsl
 
-              yield Controller__.new self
+              @_self = Controller__.new self
+
+              yield @_self
             end
           end
           __release_all_locks
@@ -113,13 +120,14 @@ module Skylab::Snag
           ds_ad = if ds_id.is_same_waypoint_as @_bus_id  # #note-85
 
             Tmpfile_Downstream_Adapter___.new(
+              @is_dry,
               ds_id,
               @FS_adapter,
               & @on_event_selectively )
 
           else
 
-            Direct_Downstream_Adapter___.new ds_id
+            Direct_Downstream_Adapter___.new @is_dry, ds_id
           end
 
           ok = ds_ad.prepare
@@ -157,6 +165,29 @@ module Skylab::Snag
         end
 
         # ~
+
+        def __mutate_collection_and_subject_entity_by_reappropriation__
+
+          _ = Snag_::Models_::Node::Actions::Open::Try_to_reappropriate
+
+          x = _[ @subject_entity, @_self, & @on_event_selectively ]
+          if x
+            __replace_subject_entity__ x
+          else
+            x
+          end
+        end
+
+        def __against_collection_add_or_replace_subject_entity__
+
+          x_p = @on_event_selectively
+
+          if @subject_entity.ID
+            @expression_adapter_actor_box::Replace_node[ @_self, & x_p ]
+          else
+            @expression_adapter_actor_box::Add_node[ @_self, & x_p ]
+          end
+        end
 
         def __subject_entity__
           @subject_entity
@@ -287,10 +318,11 @@ module Skylab::Snag
 
         class Tmpfile_Downstream_Adapter___
 
-          def initialize x, fsa, & x_p
+          def initialize is_dry, x, fsa, & x_p
 
             @_ds_id = x
             @_FS_adapter = fsa
+            @_is_dry = is_dry
             @on_event_selectively = x_p
           end
 
@@ -314,7 +346,16 @@ module Skylab::Snag
               fh.close
 
               if ok_x
-                _bytes = @_FS_adapter.filesystem.copy fh.path, @_ds_id.path
+
+                _bytes = if @_is_dry
+                  0
+                else
+
+                  @_FS_adapter.filesystem.copy(
+                    fh.path,
+                    @_ds_id.path )
+                end
+
                 ok_x = _bytes
               end
 
@@ -325,11 +366,20 @@ module Skylab::Snag
 
         class Direct_Downstream_Adapter___
 
-          def initialize x
+          def initialize is_dry, x
             @_ds_id = x
+            @_is_dry = is_dry
           end
 
           def prepare
+            if @_is_dry
+              self._DESIGN_ME
+            else
+              __resolve_yielder
+            end
+          end
+
+          def __resolve_yielder
 
             y = @_ds_id.to_minimal_yielder
             if y
@@ -358,6 +408,9 @@ module Skylab::Snag
           the_list = %i(
 
             subject_entity
+
+            mutate_collection_and_subject_entity_by_reappropriation
+            against_collection_add_or_replace_subject_entity
             replace_subject_entity
 
             entity_upstream

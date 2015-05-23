@@ -70,6 +70,7 @@ module Skylab::System::TestSupport
     end )
   end  # >>
 
+  EMPTY_A_ = [].freeze
   EMPTY_S_ = System_::EMPTY_S_
 
   NIL_ = System_::NIL_

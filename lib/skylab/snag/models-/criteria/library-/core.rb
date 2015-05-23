@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::Criteria
 
-    module Library_
+    module Library_  # near [#029]
 
       # library (local & internal) name conventions:
       #

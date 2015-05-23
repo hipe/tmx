@@ -44,8 +44,6 @@ module Skylab::Snag
         end
 
         y << CLOSE_SEQUENCE__
-
-        ACHIEVED_
       end
     end  # >>
 
@@ -143,8 +141,6 @@ module Skylab::Snag
         end
 
         y << "#{ OPEN_SEQUENCE__ }#{ _s }#{ _s_ }#{ CLOSE_SEQUENCE__ }"
-
-        ACHIEVED_
       end
 
       private :new  # :+#ACS-tenet-1

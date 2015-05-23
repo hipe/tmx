@@ -66,13 +66,9 @@ module Skylab::Snag
 
         def persist_entity bx, node, & x_p  # per [#br-011] in [#038] (pseudocode)
 
-          o = BS_::Sessions_::Rewrite_Stream_End_to_End.new( & x_p )
-
-          o.collection = self
+          o = start_sessioner( & x_p )
 
           o.downstream_identifier = bx && bx[ :downstream_identifier ]
-
-          o.FS_adapter = @_FS_adapter
 
           o.subject_entity = node
 
@@ -82,30 +78,25 @@ module Skylab::Snag
           end
         end
 
+        def start_sessioner & x_p
+
+          o = BS_::Sessions_::Rewrite_Stream_End_to_End.new( & x_p )
+          o.collection = self
+          o.expression_adapter_actor_box = BS_::Actors_
+          o.FS_adapter = @_FS_adapter
+          o
+        end
+
         def __mutate_collection bx, node, sess, & x_p
 
-          p = bx[ :_mutate_node ]
-          if p
-            _node = p[ node, sess, & x_p ]
-            node = _node
-            sess.replace_subject_entity _node
+          if bx[ :try_to_reappropriate ]
+
+            sess.mutate_collection_and_subject_entity_by_reappropriation
           end
 
-          if node
+          _ok = sess.against_collection_add_or_replace_subject_entity
 
-            ok  = if node.ID
-              BS_::Actors_::Replace_node[ sess, & x_p ]
-            else
-              BS_::Actors_::Add_node[ sess, & x_p ]
-            end
-
-            if ok
-              # when the operaion succeeds, we result in the subject entity
-              sess.subject_entity
-            end
-          else
-            node
-          end
+          _ok && sess.subject_entity
         end
 
         # ~ retrieve one

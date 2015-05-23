@@ -7,7 +7,7 @@ module Skylab::Snag::TestSupport
     extend TS_
 
     # (what is here is the salvagable remanents of reduction and CLI-
-    # integration-related tests that used to be in what is now `crete_spec`)
+    # integration-related tests that used to be in what is now `create_spec`)
     #
 
     it "etc", wip: true

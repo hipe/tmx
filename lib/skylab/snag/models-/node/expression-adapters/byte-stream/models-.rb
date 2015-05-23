@@ -15,7 +15,9 @@ module Skylab::Snag
         end
 
         def get_business_substring
-          @s[ @begin ... @end ]
+          if @begin
+            @s[ @begin ... @end ]
+          end
         end
 
         attr_reader :begin, :end, :s

@@ -103,8 +103,5 @@ module Skylab::System
       :truncate,  # idem
       :write
     ].freeze
-
-    NEWLINE_ = "\n"
-
   end
 end

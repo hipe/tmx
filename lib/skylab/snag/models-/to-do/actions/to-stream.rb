@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::To_Do
 
-    class Actions::To_Stream < Brazen_::Model.common_action_class
+    class Actions::To_Stream  # < Brazen_::Model.common_action_class  # re-open because [#026]
 
       Brazen_::Model.common_entity self,
 

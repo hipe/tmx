@@ -1,8 +1,48 @@
 # the API narrative :[#006]
 
-## introduction
+## action loader stubs :[#026]
+
+this again.
+
+in a short- (and hopefully fast-) running process like the typical CLI
+invocation (or even a "raw" invocation by a test), without the subject
+enhancement, for the API to process the request of the front- (or
+human- ) client, it must load every action of every model (and allocate
+memory for each of their every properties etc) on every request.
+
+this both effects responsivenes and introducess unnecessary load
+dependencies; and does so proportionally worse at scale.
+
+with this, the model makes it look like it has loaded its actions
+already by placing these lighter weight "stubs" in their place. the first
+time `.new` is called on one of these stubs, the file is loaded.
+
+the costs of using this is:
+
+  1) many assumptions are made about the metadata of your action..
+
+  2) weird issues can crop us if loading doesn't trigger when you
+     expect that it should have
+
+
+this enhancement is in a memoizing proc so that we don't load brazen
+right away at the top of the application (again to avoid load-
+dependencies).
+
+things like this exist in [tm] and probably elsewhere. we aren't event
+considering trying to unify this pattern yet because of how chunky it is
+(ok we are *considering* it but that's all).
+
+in the future we may try to simplify this to leverage peeking at the
+FS instead of needing to construct the stubs "manually".
+
+
+
+
+--------------
 
 (EDIT: all of the below is made historical by the advent of [br])
+(and should probably be merged into [br] for some of its ideas)
 
 at the time of this writing the API "client" is conceived of as a
 would-be long-running (daemon-like) process that would possibly serve

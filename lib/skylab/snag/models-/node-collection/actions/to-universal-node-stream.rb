@@ -4,8 +4,6 @@ module Skylab::Snag
 
     class Actions::To_Universal_Node_Stream  # [#001].
 
-      COMMON_MANIFEST_FILENAME___ = 'doc/issues.md'.freeze
-
       class << self
         alias_method :new, :orig_new
       end
@@ -50,9 +48,9 @@ module Skylab::Snag
 
       def __resolve_path
 
-        @fn = COMMON_MANIFEST_FILENAME___
+        @fn = COMMON_MANIFEST_FILENAME_
 
-        path = Walk_upwards_to_find_nearest_surrounding_path[
+        path = Walk_upwards_to_find_nearest_surrounding_path_[
           @dir, @fn, & @_oes_p ]
 
         if path
@@ -129,30 +127,6 @@ module Skylab::Snag
         @e.puts "(#{ focus_count } of #{ total_count } nodes open)"
 
         ACHIEVED_
-      end
-
-      class Walk_upwards_to_find_nearest_surrounding_path
-
-        def self.[] * a, & x_p
-          new( * a, & x_p ).execute
-        end
-
-        def initialize s, fn, & x_p
-          @dir = s
-          @fn = fn
-          @_x_p = x_p
-        end
-
-        def execute
-
-          _walk = Snag_.lib_.system.filesystem.walk.new_with(
-            :filename, COMMON_MANIFEST_FILENAME___,
-            :max_num_dirs_to_look, 10,  # whatever
-            :property_symbol, :dir,
-            :start_path, @dir, & @_x_p )
-
-          _walk.find_any_nearest_surrounding_path
-        end
       end
     end
   end

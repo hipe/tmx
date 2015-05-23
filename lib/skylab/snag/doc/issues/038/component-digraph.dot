@@ -93,7 +93,7 @@ subgraph cluster_after {
   subgraph cluster_functions {
 
     label="auxiliary actions & related"
-    melt [label="melt todos\ninto issues"]
+    melt [label="29. melt todos\ninto issues" style=filled]
     top_cli [label="toplevel\nCLI integration"]
     top_cli->mr
 

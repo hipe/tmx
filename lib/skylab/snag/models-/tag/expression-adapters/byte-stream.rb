@@ -9,7 +9,6 @@ module Skylab::Snag
         def express_into_under_of_ y, _expag, tag
 
           y << "#{ HASHTAG_PREFIX___ }#{ tag.intern }"  # :+[#007]
-          ACHIEVED_
         end
       end  # >>
 

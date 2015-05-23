@@ -26,26 +26,30 @@ module Skylab::System
       def initialize _svx
       end
 
-      def new patch_content_x
-        Patch_::Models__::ContentPatch.new patch_content_x
+      def new_via_file_content_before file_content_x
+
+        Patch_::Models__::Mutable_Progressive.new_via_file_content_before_ file_content_x
       end
 
       def call_via_arglist x_a, & p
         if x_a.length.nonzero? || p
-          Curry__.call_via_iambic x_a, & p
+          Curry___.call_via_iambic x_a, & p
         else
           self
         end
       end
 
-      class Curry__
+      class Curry___
 
-        Callback_::Actor.methodic self
+        Callback_::Actor.methodic self, :properties,
+
+          :system_conduit
 
         def initialize & edit_p
           @on_event_selectively = nil
           @dry = nil
           @patch_method = nil
+          @system_conduit = nil
           @target_method = nil
           instance_exec( & edit_p )
         end
@@ -62,11 +66,6 @@ module Skylab::System
           KEEP_PARSING_
         end
 
-        def on_event_selectively=
-          @on_event_selectively = gets_one_polymorphic_value
-          KEEP_PARSING_
-        end
-
         def patch_file=
           x = gets_one_polymorphic_value
           if x
@@ -74,6 +73,17 @@ module Skylab::System
             @patch_file = x
           elsif :via_patch_file == @patch_method
             @file = x
+          end
+          KEEP_PARSING_
+        end
+
+        def patch_lines=
+          x = gets_one_polymorphic_value
+          if x
+            @patch_method = :via_lines
+            @patch_lines = x
+          elsif :via_lines == @patch_method
+            @patch_lines = x
           end
           KEEP_PARSING_
         end
@@ -111,9 +121,8 @@ module Skylab::System
           KEEP_PARSING_
         end
 
-      public
+        public def execute
 
-        def execute
           if @target_method
             wait_process
           else
@@ -121,58 +130,129 @@ module Skylab::System
           end
         end
 
-      private
-
         def wait_process
 
-          i, o, e, w = System_.lib_.open3.popen3 build_command_string
+          _cond = @system_conduit || System_.lib_.open3
 
-          if :via_patch_string == @patch_method
-            i.write @patch_string
-            i.close
+          i, o, e, w = _cond.popen3( * build_command_string_array )
+
+          send :"__#{ @patch_method }__write_into_stdin", i  # closes stdin
+
+          s = e.gets
+          if s
+            __when_error_line s, e, w
+          else
+            __when_probably_succeeded o, w
           end
+        end
 
-          x = e.read
-          if x.length.nonzero?
-            serr_line = x
-          end
+        def __when_probably_succeeded o, w
 
-          s = o.gets
-          while s
-            if @on_event_selectively
+          if @on_event_selectively
+
+            begin
+              s = o.gets
+              s or break
               @on_event_selectively.call :info, :process_line do
                 Process_Line_[ s ].to_event
               end
-            end
-            s = o.gets
+              redo
+            end while nil
           end
 
-          status = w.value
-
-          if status.exitstatus.zero?
-            serr_line and self._DO_ME
+          d = w.value.exitstatus
+          if d.zero?
             ACHIEVED_
-          elsif @on_event_selectively
+          else
+            _maybe_emit_failure_event w
+          end
+        end
+
+        def __when_error_line first_s, e, w
+
+          # we run the error stream down to the end and ignore the out
+          # stream. we "wait the thread" below, not wanting the event
+          # handler to be the one that decides when to finish the process.
+
+          s_a = []
+
+          if first_s
+            s_a.push first_s
+          end
+
+          begin
+            s = e.gets
+            s or break
+            s_a.push s
+          end while nil
+
+          _maybe_emit_failure_event s_a, w
+        end
+
+        def _maybe_emit_failure_event s_a=nil, w
+
+          d = e.value.exitstatus
+
+          if @on_event_selectively
+
             @on_event_selectively.call :error, :nonzero_exitstatus do
-              build_nonzero_event status, serr_line
+
+              __build_nonzero_event d, s_a
             end
           else
-            raise ::SystemCallError, ( serr_line || "patch failed" )
+            _s = if s_a
+              s_a.first
+            end
+            raise ::SystemCallError, ( _s || "patch failed" )
           end
         end
 
-        def build_nonzero_event status, serr_line
+        def __build_nonzero_event s_a, d
 
-          Callback_::Event.inline_not_OK_with :nonzero_exitstatus,
-              :exitstatus, status.exitstatus,
-              :first_error_line, serr_line do | y, o_ |
+          Callback_::Event.inline_not_OK_with(
 
-            y << "#{ o_.first_error_line || 'nonzero exitstatus' } #{
-              }(exitstatus: #{ o_.exitstatus })"
+            :nonzero_exitstatus,
+            :exitstatus, d,
+            :error_lines, s_a
+
+          ) do | y, o |
+
+            if o.error_lines
+              _s = o.error_lines.first
+            end
+
+            y << "#{ _s || 'nonzero exitstatus' } #{
+              }(exitstatus: #{ o.exitstatus })"
           end
         end
 
-        def build_command_string
+        def __via_patch_file__write_into_stdin i
+
+          # the file argument was passes as an argument (option)
+          i.close
+          NIL_
+        end
+
+        def __via_lines__write_into_stdin i
+
+          st = @patch_lines
+          begin
+            line = st.gets
+            line or break
+            i.puts line  # or `write` if you're feeling lucky
+            redo
+          end while nil
+          i.close  # nil
+          NIL_
+        end
+
+        def __via_patch_string__write_into_stdin i
+
+          i.write @patch_string
+          i.close
+          NIL_
+        end
+        def build_command_string_array
 
           cmd = [ 'patch' ]
 
@@ -193,7 +273,7 @@ module Skylab::System
             cmd.push esc @target_file
           end
 
-          cmd * SPACE_
+          cmd
         end
 
         def esc s

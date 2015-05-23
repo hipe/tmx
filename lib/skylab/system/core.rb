@@ -74,6 +74,8 @@ module Skylab::System
 
   EMPTY_S_ = ''.freeze
 
+  NEWLINE_ = "\n"
+
   NIL_ = nil
 
   NILADIC_TRUTH_ = -> { true }

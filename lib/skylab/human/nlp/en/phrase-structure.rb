@@ -136,6 +136,12 @@ module Skylab::Human
           @_ph_a = [ x ]
         end
 
+        def express_string_into_under y, expag  # :+#experimenal here
+
+          _y_ = express_words_into_under [], expag
+          y << NLP::Expression_Frame.sentence_string_head_via_words( _y_ )
+        end
+
         def express_words_into_under y, expag
 
           @_ph_a.each do | ph |

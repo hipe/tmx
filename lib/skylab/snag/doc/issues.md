@@ -44,8 +44,9 @@
              (#tracking-tag #pattern of `instance_eval` for rendering)
 [#028]       melt makes patch for whole codebase #deferred
 [#027]       #done move and maybe refactor todo -> todo find
-[#026]       #done refactor porcelain tree
-[#025] #hole
+[#026]       #parent-node: [#006] "action loader stubs.."
+             ( #was: #done refactor porcelain tree )
+[#025]       structures that can express themselves in EN #parent-node:[#029]
              ( #was: #done fix and cover todo tree )
 [#024]       to emit or not to emit? (against [#sl-145] raymond)
              ( #was: #done inconsistencies over writing terminal newlines

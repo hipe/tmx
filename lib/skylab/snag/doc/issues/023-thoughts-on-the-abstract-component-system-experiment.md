@@ -42,7 +42,7 @@ be a bit arbitrary. as it is etc.)
 
      that is, the component designer decides "autonomously" whether or not
      to expose this method in an opt-in manner; it is not exposed by the
-     library unilaterally.  this component class must follow (9) described
+     library unilaterally. this component class must follow (9) described
      below.
 
      this library's `create` singleton method can help implement such

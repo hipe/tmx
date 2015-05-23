@@ -96,6 +96,11 @@ module Skylab::Snag::TestSupport
 
       s = ""
       @output_s = s
+      downstream_ID_via_string_ s
+    end
+
+    def downstream_ID_via_string_ s
+
       Snag_.lib_.basic::String::Byte_Downstream_Identifier.new s
     end
 
