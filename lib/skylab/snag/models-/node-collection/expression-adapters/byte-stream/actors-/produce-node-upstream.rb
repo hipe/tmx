@@ -37,8 +37,8 @@ module Skylab::Snag
 
         def __gets_first_node_ever  # assume not after a rewind
 
-          ok = __resolve_line_upstream
-          ok && _gets_first_node_of_stream
+          _ok = __resolve_line_upstream
+          _ok && _gets_first_node_of_stream
         end
 
         def __resolve_line_upstream

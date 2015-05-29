@@ -59,13 +59,6 @@ module Skylab::Snag::TestSupport
       st = @result
       st.gets.ID.to_i.should eql 5
       st.gets.should be_nil
-
-    end
-
-    it "with `list -2` - also works (-<n> option yay)", wip: true do
-      setup_tmpdir_read_only
-      invoke '-2'
-      output.lines.last.string.should match( /found 2 nodes with validity/ )
     end
 
     it "`identifier` where number is too low" do

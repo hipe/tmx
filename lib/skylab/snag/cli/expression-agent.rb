@@ -2,27 +2,39 @@ module Skylab::Snag
 
   class CLI
 
-    class Expression_Agent_
+    class Expression_Agent
 
       # subclass Snag_.lib_.CLI_lib::Pen::Minimal for less DIY
 
-      def initialize retrieve_param
-        @retrieve_param = retrieve_param
+      def initialize prp_index
+        @_prp_index = prp_index
+
+        @_up =
+          Snag_::Models_::Node_Collection::Expression_Adapters::Byte_Stream.
+            build_default_expression_agent
       end
 
       alias_method :calculate, :instance_exec
 
-      h = { strong: 1, green: 32 }.freeze
-      o = -> * i_a do
-        fmt = "\e[#{ i_a.map { |i| h.fetch i } * ';' }m"
-        -> x do
-          "#{ fmt }#{ x }\e[0m"
-        end
+      attr_writer :current_property
+
+      # ~
+
+      def code s
+        _technical s
       end
 
-      define_method :em, o[ :strong, :green ]
+      def em s
+        _strongly_emphasized s
+      end
 
-      define_method :h2, o[ :green ]
+      def h2 s
+        _somewhat_emphasized s
+      end
+
+      def hdr s
+        _somewhat_emphasized s
+      end
 
       define_method :ick, -> do
         p = -> x do
@@ -32,16 +44,30 @@ module Skylab::Snag
         -> x { p[ x ] }
       end.call
 
-      define_method :kbd, o[ :green ]
-
-      def par i  # :+[#hl-036]
-        param = @retrieve_param[ i ]
-        if param.is_option
-          param.as_parameter_signifier
-        elsif param.is_argument
-          "<#{ param.as_slug }>"
-        end
+      def kbd s
+        _technical s
       end
+
+      # ~~ (
+
+      def par x  # :+[#hl-036]
+        _unstyled = send @_prp_index.rendering_method_name_for_property( x ), x
+        _strongly_emphasized _unstyled
+      end
+
+      def render_property_as__argument__ prp
+        "<#{ prp.name.as_slug }>"
+      end
+
+      def render_property_as__option__ prp
+        "--#{ prp.name.as_slug }"
+      end
+
+      def render_property_as_unknown prp
+        "«#{ prp.name.as_slug }»"  # :+#guillemets
+      end
+
+      # ~~ )
 
       def pth x
         if x.respond_to? :to_path
@@ -51,32 +77,68 @@ module Skylab::Snag
       end
 
       def val x
-        em x
+        _strongly_emphasized x
+      end
+
+      # ~
+
+      h = { strong: 1, green: 32 }.freeze
+      o = -> * i_a do
+        fmt = "\e[#{ i_a.map { |i| h.fetch i } * ';' }m"
+        -> x do
+          "#{ fmt }#{ x }\e[0m"
+        end
+      end
+
+      define_method :_somewhat_emphasized, o[ :green ]  # no effect on my term
+
+      define_method :_strongly_emphasized, o[ :strong, :green ]
+
+      def _technical x
+        _somewhat_emphasized "'#{ x }'"
       end
 
       # ~
 
       def and_ a
-        prpnd ; and_ a
+        _NLP_agent.and_ a
+      end
+
+      def indefinite_noun s
+        _NLP_agent.indefinite_noun s
       end
 
       def or_ a
-        prpnd ; or_ a
+        _NLP_agent.or_ a
+      end
+
+      def plural_noun d=nil, s
+        _NLP_agent.plural_noun d, s
       end
 
       def s * a
-        prpnd ; s( * a )
+        _NLP_agent.s( * a )
       end
 
-      def prpnd
-        self.class.prepend Prepend___[] ; nil
+      def _NLP_agent
+
+        @___NLP_agent ||= Brazen_::API.expression_agent_class.NLP_agent.new
       end
 
-      Prepend___ = -> do
-        Prepend__ = ::Module.new.module_exec do
-          Snag_.lib_.NLP_EN_methods( self, :private, [ :and_, :or_, :s ] )
-          self
-        end
+      # ~
+
+      def identifier_integer_width
+        @_up.identifier_integer_width
+      end
+
+      # ~
+
+      def modality_const
+        :CLI
+      end
+
+      def intern
+        :Event
       end
     end
   end

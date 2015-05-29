@@ -26,7 +26,7 @@ module Skylab::Snag::TestSupport
       def subject s
 
         @result = Snag_::Models_::Date.normalize_argument(
-          Callback_::Trio.new( s, true ),
+          Callback_::Trio.via_value( s ),
           & handle_event_selectively )
 
         NIL_

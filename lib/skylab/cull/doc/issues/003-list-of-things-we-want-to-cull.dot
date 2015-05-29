@@ -45,7 +45,24 @@ most difficult-ish is at top
   CLI -> API
   CLI -> Event
   CLI -> Property
-  Property-> Param
+  Property -> Param
+
+  subgraph cluster_c1 {
+
+    pu_fa [label="[fa]"]
+    Plugin -> pu_fa
+
+    pu_hl [label="[hl]"]
+    Plugin -> pu_hl
+
+    subgraph cluster_c2 {
+      label="clients"
+      pu_cl_tr [label="[ts] tree\nrunner"]
+      pu_cl_tr -> pu_hl
+
+      pu_fa -> NOTHING
+    }
+  }
 
   /* that one color of blue: fillcolor="#b5d5fb" */
 

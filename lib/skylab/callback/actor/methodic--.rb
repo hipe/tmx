@@ -195,45 +195,20 @@ module Skylab::Callback
         end
 
         def polymorphic_upstream
-          @__methodic_actor_polymorphic_stream__
+          @polymorphic_upstream_
         end
 
-        def process_polymorphic_stream_passively stream, & oes_p
+        def process_polymorphic_stream_passively st, & oes_p
 
-          keep_parsing = true
-
-          if stream.unparsed_exists
-
-            method_name_p = polymorphic_writer_method_name_passive_lookup_proc
-            m_i = method_name_p[ stream.current_token ]
-
-            if m_i
-
-              @__methodic_actor_polymorphic_stream__ = stream
-              @__methodic_actor_handle_event_selectively__ = oes_p  # for [br] in one place
-
-              begin
-                stream.advance_one
-                keep_parsing = send m_i
-                if keep_parsing
-                  if stream.unparsed_exists
-                    m_i = method_name_p[ stream.current_token ]
-                    m_i and redo
-                  end
-                end
-                break
-              end while nil
-
-              remove_instance_variable :@__methodic_actor_polymorphic_stream__
-              remove_instance_variable :@__methodic_actor_handle_event_selectively__
-            end
-          end
-
-          keep_parsing
+          Process_polymorphic_stream_passively__[
+            st,
+            self,
+            polymorphic_writer_method_name_passive_lookup_proc,
+            & oes_p ]
         end
 
         def against_iambic_property no_p=nil  # experimental, :+#public-API
-          if @__methodic_actor_polymorphic_stream__.unparsed_exists
+          if @polymorphic_upstream_.unparsed_exists
             yield gets_one_polymorphic_value
           elsif no_p
             no_p[]
@@ -246,7 +221,7 @@ module Skylab::Callback
 
         def bld_missing_required_properties_event
           build_not_OK_event_with :missing_required_properties,
-              :previous_token, @__methodic_actor_polymorphic_stream__.previous_token,
+              :previous_token, @polymorphic_upstream_.previous_token,
               :error_category, :argument_error do |y, o|
 
             y << "expecting a value for #{ code o.previous_token }"
@@ -254,17 +229,11 @@ module Skylab::Callback
         end
 
         def gets_one_polymorphic_value  # :+#public-API #hook-in
-          @__methodic_actor_polymorphic_stream__.gets_one
+          @polymorphic_upstream_.gets_one
         end
 
         def polymorphic_writer_method_name_passive_lookup_proc  # :+#public-API #hook-in
-          cls = self.class
-          -> name_i do
-            m_i = :"#{ name_i }="
-            if cls.private_method_defined? m_i
-              m_i
-            end
-          end
+          Method_name_proc_via_class__[ self.class ]
         end
 
         def when_after_process_iambic_fully_stream_has_content stream  # :+#public-API
@@ -287,6 +256,68 @@ module Skylab::Callback
 
         def receive_extra_iambic ev  # :+#public-API (name) :+#hook-in
           raise ev.to_exception
+        end
+      end
+
+      Process_polymorphic_stream_fully = -> st, o, & oes_p do
+
+        _meth_p = Method_name_proc_via_class__[ o.singleton_class ]
+
+        kp = Process_polymorphic_stream_passively__[ st, o, _meth_p, & oes_p ]
+        if kp
+          if st.unparsed_exists
+            raise Stranger_[ st.current_token ].to_exception
+          else
+            ACHIEVED_
+          end
+        else
+          kp
+        end
+      end
+
+      Process_polymorphic_stream_passively__ = -> st, o, meth_p=nil, & oes_p do
+
+        keep_parsing = true
+
+        if st.unparsed_exists
+
+          meth_p ||= Method_name_proc_via_class__[ o.class ]
+          meth = meth_p[ st.current_token ]
+          if meth
+
+            o.instance_variable_set :@polymorphic_upstream_, st
+
+            o.instance_variable_set(
+              :@__methodic_actor_handle_event_selectively__,
+              oes_p )  # for [br] in one place
+
+            begin
+              st.advance_one
+              keep_parsing = o.send meth
+              keep_parsing or break
+              st.unparsed_exists or break
+              meth = meth_p[ st.current_token ]
+              meth or break
+              redo
+            end while nil
+
+            o.remove_instance_variable :@polymorphic_upstream_
+            o.remove_instance_variable :@__methodic_actor_handle_event_selectively__
+          end
+        end
+
+        keep_parsing
+      end
+
+      Method_name_proc_via_class__ = -> cls do
+
+        -> name_symbol do
+
+          meth = :"#{ name_symbol }="
+
+          if cls.private_method_defined? meth
+            meth
+          end
         end
       end
 
@@ -412,6 +443,24 @@ module Skylab::Callback
 
         def members
           [ :argument_arity, :ivar, :name, :name_symbol, :parameter_arity ]
+        end
+
+        def new_with * x_a
+          otr = _new_or_dup_with_iambic x_a
+          otr && otr.freeze
+        end
+
+        def dup_with * x_a
+          _new_or_dup_with_iambic x_a
+        end
+
+        def _new_or_dup_with_iambic x_a
+          otr = dup
+          ok = nil
+          otr.instance_exec do
+            ok = process_iambic_fully x_a
+          end
+          ok && otr
         end
 
       private

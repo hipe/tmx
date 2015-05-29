@@ -266,6 +266,8 @@ module Skylab::Snag
         ].freeze
       end
 
+      # ~ as class
+
       def initialize k, & oes_p
 
         @kernel = k

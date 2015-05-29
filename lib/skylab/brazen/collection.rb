@@ -124,20 +124,24 @@ module Skylab::Brazen
         # to be able to pass stream-like mixed values in for a path.
 
         if @x.respond_to? :ascii_only?
-          Brazen_.bound_call @x, nil, :via_path
+
+          Callback_::Bound_Call.via_args_and_method_name @x, :via_path
+
         elsif @x.respond_to? :each_with_index
-          Brazen_.bound_call [ @x ], nil, :via_line_array
+
+          Callback_::Bound_Call.via_args_and_method_name [ @x ], :via_line_array
+
         else
           stream
         end
       end
 
       def stream
-        Brazen_.bound_call @x, nil, :via_stream
+        Callback_::Bound_Call.via_args_and_method_name @x, :via_stream
       end
 
       def string
-        Brazen_.bound_call @x, nil, :via_string
+        Callback_::Bound_Call.via_args_and_method_name @x, :via_string
       end
     end
 

@@ -34,32 +34,11 @@ module Skylab::Brazen
 
     class As_Bound_Model___
 
-      class << self
-        def after_name_symbol
-        end
-      end
-
       def initialize cls_pxy, kr, & oes_p
 
         @cls_pxy = cls_pxy
         @kernel = kr
         @on_event_selectively = oes_p
-      end
-
-      def is_branch
-        true  # modules are always treated as branch nodes
-      end
-
-      def is_visible
-        true
-      end
-
-      def name
-        @cls_pxy.name_function
-      end
-
-      def has_description
-        false
       end
 
       def to_unbound_action_stream
@@ -75,8 +54,28 @@ module Skylab::Brazen
         _acr.to_lower_action_class_stream_
       end
 
+      def name
+        @cls_pxy.name_function
+      end
+
       def to_kernel
         @kernel
+      end
+
+      def after_name_symbol
+        NIL_
+      end
+
+      def has_description
+        false
+      end
+
+      def is_branch
+        true  # modules are always treated as branch nodes
+      end
+
+      def is_visible
+        true
       end
     end
   end

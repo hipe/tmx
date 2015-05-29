@@ -39,13 +39,17 @@ module Skylab::Snag
 
             begin
 
-              dir_ = st.gets
-              dir_ or break
+              entry = st.gets
+              entry or break
 
-              md = RX___.match dir_
+              md = RX___.match entry
               md or redo
 
-              bx.add md[ :integer ].to_i, true  # etc
+              _d = md[ :integer ].to_i
+
+              bx.add_or_replace _d, -> { entry }, -> existing do
+                existing.length > entry.length ? existing : entry
+              end
 
               redo
             end while nil
@@ -60,9 +64,14 @@ module Skylab::Snag
 
         RX___ = /\A (?<integer> [0-9]+ ) /x
 
-        def node_has_extended_content_via_node_id__ id
+        def node_has_extended_content_via_node_ID__ id
 
           @index[].h_.key? id.to_i
+        end
+
+        def any_extended_content_filename_via_node_ID__ id
+
+          @index[][ id.to_i ]
         end
       end
     end

@@ -309,6 +309,15 @@ module Skylab::Brazen
         end
       end
 
+      def to_adapter_stream
+
+        to_child_unbound_action_stream.map_by do | unbound |
+
+          _adapter_via_unbound unbound
+
+        end
+      end
+
       def find_matching_action_adapters_against_tok_ tok
 
         _unbound_a = __array_of_matching_unbounds_against_token tok
@@ -320,30 +329,28 @@ module Skylab::Brazen
         end
       end
 
-      def to_adapter_stream
-
-        # rely on your associated bound action to give you an unbound action
-        # stream representing its children. your bound action may be for e.g
-        # a model instance just querying its child consts, or maybe it is an
-        # arbitrary kernel doing something else, you neither know nor care.
-
-        bound_action.to_unbound_action_stream.map_by do | unbound |
-
-          _adapter_via_unbound unbound
-
-        end
-      end
-
       def __array_of_matching_unbounds_against_token tok
+
         Brazen_.lib_.basic::Fuzzy.reduce_to_array_stream_against_string(
-          bound_action.to_unbound_action_stream,
+          to_child_unbound_action_stream,
           tok,
           -> unbound do
             unbound.name_function.as_slug
           end )
       end
 
+      def to_child_unbound_action_stream  # :+#public-API
+
+        # rely on your associated bound action to give you an unbound action
+        # stream representing its children. your bound action may be for e.g
+        # a model instance just querying its child consts, or maybe it is an
+        # arbitrary kernel doing something else, you neither know nor care.
+
+        bound_action.to_unbound_action_stream
+      end
+
       def _adapter_via_unbound unbound
+
         if unbound.is_branch
           __branch_class_for_unbound_action( unbound ).new unbound, bound_action
         else
@@ -370,15 +377,18 @@ module Skylab::Brazen
       def __any_specialized_adapter_under_model_node_for unbound  # leaf
 
         mc = unbound.model_class
-        if mc.respond_to?( :entry_tree ) && mc.entry_tree.has_entry( MODA___ )
 
-          # hacking a peek into the filesystem (for free) here is not as ugly
-          # as a) needing to opt-in to boxxy everywhere or b) requiring stubs
+        if mc
+          if mc.respond_to?( :entry_tree ) && mc.entry_tree.has_entry( MODA___ )
 
-          mc.const_get :Modalities, false
-        end
-        if mc.const_defined? :Modalities
-          __any_branch_or_leaf_class_for_unoubnd_when_modalities unbound
+            # hacking a peek into the filesystem (for free) here is not as ugly
+            # as a) needing to opt-in to boxxy everywhere or b) requiring stubs
+
+            mc.const_get :Modalities, false
+          end
+          if mc.const_defined? :Modalities
+            __any_branch_or_leaf_class_for_unoubnd_when_modalities unbound
+          end
         end
       end
 
@@ -488,11 +498,16 @@ module Skylab::Brazen
       end
 
       def _to_full_inferred_property_stream
+
+        to_property_stream.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :help
+      end
+
+      def to_property_stream
         if @front_properties
           @front_properties.to_stream
         else
           Callback_::Stream.via_nonsparse_array EMPTY_A_
-        end.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :help
+        end
       end
 
       def receive_show_help_ otr
@@ -509,7 +524,8 @@ module Skylab::Brazen
       end
 
       def _bound_call_via_parsed_options
-        if @seen_h[ :help ]
+
+        if @seen[ :help ]
           bound_call_for_help_request
         else
           __bound_call_via_ARGV
@@ -576,10 +592,15 @@ module Skylab::Brazen
         env = @resources.env
 
         @categorized_properties.env_a.each do | prp |
+
           s = env[ environment_variable_name_string_via_property prp ]
           s or next
           cased_i = prp.name_symbol.downcase  # [#039] casing
-          @seen_h[ cased_i ] and next
+
+          if @seen[ cased_i ]
+            next
+          end
+
           @mutable_backbound_iambic.push cased_i, s
         end
         NIL_
@@ -595,7 +616,7 @@ module Skylab::Brazen
 
       def __bound_call_via_mutable_backbound_iambic
 
-        ok = via_bound_action_mutate_mutable_backbound_iambic @mutable_backbound_iambic
+        ok = prepare_backstream_call @mutable_backbound_iambic
 
         if ok
           __bound_call_via_bound_action_and_mutated_backbound_iambic
@@ -604,7 +625,7 @@ module Skylab::Brazen
         end
       end
 
-      def via_bound_action_mutate_mutable_backbound_iambic x_a  # :+#public-API :+#hook-in
+      def prepare_backstream_call x_a  # :+#public-API :+#hook-in
 
         # ~ begin experiment: one way to give stdout to the action
 
@@ -638,6 +659,79 @@ module Skylab::Brazen
 
       self
     end
+
+    # ~ for [#066] a modality-only action adapter
+
+    class Mock_Unbound
+
+      def initialize ada_cls
+
+        @_ada_cls = ada_cls
+        @name_function = Callback_::Name.via_module ada_cls
+      end
+
+      attr_reader :name_function
+
+      def model_class
+        NIL_
+      end
+
+      def is_branch
+        false
+      end
+
+      # ~
+
+      def new bnd, & x_p
+        @_ada_cls::Mock_Bound.new bnd, self, & x_p
+      end
+    end
+
+    class Mock_Bound
+
+      def initialize bnd, mock_unb, & x_p
+        @_bnd = bnd
+        @_mock_unb = mock_unb
+        @_x_p = x_p
+      end
+
+      def accept_parent_node_ x
+        @_par_nod = x
+        NIL_
+      end
+
+      def after_name_symbol
+        NIL_
+      end
+
+      def has_description
+        true
+      end
+
+      def is_visible
+        true
+      end
+
+      def under_expression_agent_get_N_desc_lines expag, d=nil
+
+        me = self
+        _p_a = [ -> y do
+          me.describe_into_under y, self  # :+#hook-out
+        end ]
+
+        LIB_.N_lines.call [], d, _p_a, expag
+      end
+
+      def formal_properties
+        @__fp ||= produce_formal_properties
+      end
+
+      def name
+        @_mock_unb.name_function
+      end
+    end
+
+    # ~
 
     class As_Bound_Call_
 
@@ -1031,7 +1125,7 @@ module Skylab::Brazen
       end
 
       def after_name_value_for_order
-        @bound.class.after_name_symbol
+        @bound.after_name_symbol
       end
     end
 
@@ -1048,7 +1142,7 @@ module Skylab::Brazen
       end
 
       def option_parser_class
-        Option_parser__[]
+        Option_parser___[]
       end
 
       def __receive_categorized_properties cp
@@ -1066,9 +1160,9 @@ module Skylab::Brazen
         y << name.as_slug ; nil
       end
 
-      def __populate_option_parser_with_generated_opts op, opt_a
+      def produce_populated_option_parser op, opt_a
 
-        h = Build_unique_letter_hash__[ opt_a ]
+        h = Build_unique_letter_hash___[ opt_a ]
 
         opt_a.each do |prp|
 
@@ -1091,7 +1185,8 @@ module Skylab::Brazen
           prp.has_description and __render_property_description args, prp
           op.on( * args, & _p )
         end
-        NIL_
+
+        op
       end
 
       # ~ begin
@@ -1115,60 +1210,70 @@ module Skylab::Brazen
 
           if prp.takes_many_arguments
 
-            __receive_list_option x, prp
+            _mutate_backbound_iambic prp, [ x ]
           else
-            __receive_common_argumented_option x, prp
+
+            _mutate_backbound_iambic prp, x
           end
         elsif :zero_or_more == prp.parameter_arity
 
-          __receive_incrementing_option prp
+          _mutate_backbound_iambic( prp )._increment_seen_count
         else
 
-          __receive_flag_option prp
+          _mutate_backbound_iambic prp
         end
         NIL_
       end
 
-      def __receive_list_option x, prp
+      def _mutate_backbound_iambic prp, * rest
 
-        @seen_h[ prp.name_symbol ] = true
-        @mutable_backbound_iambic.push prp.name_symbol, [ x ]  # hm..
-        NIL_
-      end
-
-      def __receive_common_argumented_option x, prp
-
-        @seen_h[ prp.name_symbol ] = true
-        @mutable_backbound_iambic.push prp.name_symbol, x
-        NIL_
-      end
-
-      def __receive_incrementing_option prp
-
+        a = @mutable_backbound_iambic
         k = prp.name_symbol
-        increment_seen_count k
-        @mutable_backbound_iambic.push k
+
+        d = a.length
+        a.push k, * rest
+
+        amd = touch_argument_metadata k
+
+        amd.add_seen_at_index d
+
+        amd
+      end
+
+      def increment_seen_count name_symbol
+
+        touch_argument_metadata( name_symbol ).__increment_seen_count
         NIL_
       end
 
-      def increment_seen_count k
+      def touch_argument_metadata k
 
-        yes = true
-        @seen_h.fetch k do
-          yes = false
-          @seen_h[ k ] = 1
+        @seen.touch k do
+          Argument_Metadata___.new
         end
-        if yes
-          @seen_h[ k ] += 1
-        end
-        NIL_
       end
 
-      def __receive_flag_option prp
+      class Argument_Metadata___
 
-        @seen_h[ prp.name_symbol ] = true
-        @mutable_backbound_iambic.push prp.name_symbol
-        NIL_
+        def initialize
+        end
+
+        attr_reader :last_seen_index
+
+        def add_seen_at_index d
+          @last_seen_index = d
+          NIL_
+        end
+
+        attr_reader :seen_count
+
+        def __increment_seen_count
+          if seen_count.nil?
+            @seen_count = 1
+          else
+            @seen_count += 1
+          end
+        end
       end
 
       # ~ end
@@ -1210,8 +1315,9 @@ module Skylab::Brazen
       end
 
       def prepare_to_parse_parameters  # :+#public-API :+#hook-in
+
         @mutable_backbound_iambic = []  # :+#public-API (name)
-        @seen_h = {}
+        @seen = Callback_::Box.new
         NIL_
       end
 
@@ -1268,13 +1374,14 @@ module Skylab::Brazen
       end
 
       def resolve_categorized_properties
+
         @categorized_properties = Categorize_properties___[
           _to_full_inferred_property_stream, self ]
         NIL_
       end
     end
 
-    Option_parser__ = Callback_.memoize do
+    Option_parser___ = Callback_.memoize do
       require 'optparse'
       ::OptionParser
     end
@@ -1423,7 +1530,7 @@ module Skylab::Brazen
         op = @adapter.begin_option_parser
         if op
           if @opt_a
-            @adapter.__populate_option_parser_with_generated_opts op, @opt_a
+            op = @adapter.produce_populated_option_parser op, @opt_a
           end
           @op = op
         else
@@ -1522,7 +1629,7 @@ module Skylab::Brazen
       end
     end
 
-    Build_unique_letter_hash__ = -> opt_a do
+    Build_unique_letter_hash___ = -> opt_a do
       h = { } ; num_times_seen_h = ::Hash.new { |h_, k| h_[ k ] = 0 }
       opt_a.each do |prop|
         name_s = prop.name.as_variegated_string
@@ -1553,6 +1660,7 @@ module Skylab::Brazen
     end
 
     class Property__
+
       def initialize name_i, * x_a
         @argument_arity = :one
         @custom_moniker = nil
@@ -1563,6 +1671,7 @@ module Skylab::Brazen
         end
         freeze
       end
+
       attr_reader :desc, :name,
         :argument_arity,
         :argument_moniker,
@@ -1588,7 +1697,8 @@ module Skylab::Brazen
       end
 
       def under_expression_agent_get_N_desc_lines expag, d=nil
-        LIB_.N_lines.new( [], d, [ @desc ], expag ).execute
+
+        LIB_.N_lines.call [], d, [ @desc ], expag
       end
 
       def takes_argument  # zero to many takes argument
@@ -1780,7 +1890,7 @@ module Skylab::Brazen
         mutable_front_properties.remove :workspace_path
         mutable_back_properties.replace_by :workspace_path do | prp |
           prp.dup.set_default_proc do
-            _present_working_directory
+            present_working_directory
           end.freeze
         end
       end
@@ -1811,12 +1921,12 @@ module Skylab::Brazen
 
         mutable_back_properties.replace_by sym do | prp |
           prp.dup.set_default_proc do
-            _present_working_directory
+            present_working_directory
           end.freeze
         end ; nil
       end
 
-      def _present_working_directory
+      def present_working_directory
         ::Dir.pwd
       end
     end

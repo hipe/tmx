@@ -593,15 +593,31 @@ module Skylab::Callback
 
     class << self
 
-      def via_value_and_variegated_symbol x, i
+      def via_arglist args
+        new( * args )
+      end
+
+      def via_value x
+        new x, true, nil
+      end
+
+      alias_method :via_value_and_had_and_property, :new
+
+      def via_value_and_property x, prp
+        new x, true, prp
+      end
+
+      def via_value_and_variegated_symbol x, sym
         new x, true,
-          Callback_.lib_.basic::Minimal_Property.via_variegated_symbol( i )
+          Callback_.lib_.basic::Minimal_Property.via_variegated_symbol( sym )
       end
 
       alias_method :via_x_and_i, :via_value_and_variegated_symbol
-    end
 
-    def initialize x, b, prp=nil
+      private :new
+    end  # >>
+
+    def initialize x, b, prp
       @is_known_known = b
       @property = prp
       @value_x = x
@@ -646,17 +662,16 @@ module Skylab::Callback
 
     class << self
 
-      def new_via_arglist a, & p
-
-        if a.length.nonzero? || p
-          new( * a, & p )
-        else
-          self
-        end
-      end
-
       def the_empty_call
         @tec ||= new EMPTY_P_, :call
+      end
+
+      def via_args_and_method_name a, mn, & p
+        new a, nil, mn, & p
+      end
+
+      def via_receiver_and_method_name rc, mn, & p
+        new nil, rc, mn, & p
       end
 
       def via_this & p
@@ -668,16 +683,18 @@ module Skylab::Callback
       end
     end  # >>
 
-    def initialize * a, & p  # volatility order (subjective)
-      @args, @receiver, @method_name = a
+    def initialize args, receiver, method_name, & p  # volatility order (subjective)
+      @args = args
       @block = p
+      @method_name = method_name
+      @receiver = receiver
     end
 
     def members
-      [ :args, :receiver, :method_name, :block ]
+      [ :args, :block, :method_name, :receiver ]
     end
 
-    attr_reader :args, :receiver, :method_name, :block
+    attr_reader :args, :block, :method_name, :receiver
 
   end
 
@@ -2098,6 +2115,10 @@ module Skylab::Callback
     def __resolve_const
       @const_is_resolved_ = true
       @as_const = Constify_if_possible_[ as_variegated_symbol.to_s ]
+    end
+
+    def name_function  # use a name object as a mock for something else
+      self
     end
 
     NORMALIZE_CONST_RX__ = /(?<=[a-z])(?=[A-Z])/

@@ -521,10 +521,9 @@ module Skylab::TestSupport
 
         def via_output_path_rslv_line_downstream
 
-          _force_arg = TestSupport_.lib_.basic.trio(
+          _force_arg = Callback_::Trio.via_value_and_property(
             # because we use ivars and not property boxes, we must make this manually
             @force,
-            true,
             self.class.property_via_symbol( :force ) )
 
           io = TestSupport_.lib_.system.filesystem.normalization.downstream_IO(

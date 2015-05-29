@@ -20,8 +20,8 @@ module Skylab::System
 
             def path=
               @do_execute = true
-              @path_arg = System_.lib_.basic.trio.
-                via_value_and_variegated_symbol gets_one_polymorphic_value, :path
+              @path_arg = Callback_::Trio.via_value_and_variegated_symbol(
+                gets_one_polymorphic_value, :path )
               KEEP_PARSING_
             end
 

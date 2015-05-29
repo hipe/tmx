@@ -284,8 +284,6 @@ module Skylab::Snag
             * skip_margin )
 
         end
-
-        MONADIC_EMPTINESS_ = -> _ { }
       end
     end
   end

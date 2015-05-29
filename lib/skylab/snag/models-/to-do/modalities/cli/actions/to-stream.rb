@@ -109,8 +109,10 @@ module Skylab::Snag
 
         def bound_call_via_bound_call_from_back bc  # :+[#br-060]
 
-          d = @seen_h[ :tree ]
-          if d
+          occurrences = @seen[ :tree ]
+          if occurrences
+
+            d = occurrences.seen_count or self._SANITY
 
             Callback_::Bound_Call.via_this do
               __express_as_tree d, bc

@@ -6,7 +6,7 @@ module Skylab::Snag
 
       def normalize_value__ x, & x_p  # valid values are true-ish
 
-        _trio = Callback_::Trio.new x, true
+        _trio = Callback_::Trio.via_value x
         trio = N11n_instance___[].normalize_argument _trio, & x_p
         trio and trio.value_x
       end

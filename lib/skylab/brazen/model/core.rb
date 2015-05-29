@@ -4,23 +4,11 @@ module Skylab::Brazen
 
     class << self
 
-      # ~ ordering writer (:+#experimental alternative to the iambic DSL)
+      # ~ model API ancillaries & adjunctives
 
-      def after sym
-        @after_name_symbol = sym ; nil
-      end
-
-      attr_accessor :after_name_symbol
-
-      # ~ description support
+      # ~~ description & name
 
       attr_accessor :description_block
-
-      # ~ model identification
-
-      def process_some_customized_inflection_behavior scanner
-        Process_customized_model_inflection_behavior__[ scanner, self ]
-      end
 
       def natural_key_string
         properties.fetch NAME_
@@ -33,6 +21,20 @@ module Skylab::Brazen
       def name_function_class  # #hook-in for above
         Model_Name_Function_
       end
+
+      # ~~ inflection
+
+      def process_some_customized_inflection_behavior scanner
+        Process_customized_model_inflection_behavior__[ scanner, self ]
+      end
+
+      # ~~ placement
+
+      def after sym
+        @after_name_symbol = sym ; nil
+      end
+
+      attr_accessor :after_name_symbol
 
       # ~ persistence (reading, writing)
 
@@ -166,16 +168,25 @@ module Skylab::Brazen
 
       # ~ static properties
 
-      def is_branch
-        true  # for now, every model node exists (in the eyes of invocation
-        # engines) only to dispatch each request down to one of its children
+      def is_branch  # 1 of 2
+        true
       end
 
       def is_promoted
         NIL_
       end
 
-      # Library Exposures
+      # ~
+
+      def make_common_properties & edit_p
+        common_properties_class.new entity_module, & edit_p
+      end
+
+      def make_common_common_properties & edit_p
+        common_properties_class.new common_entity_module, & edit_p
+      end
+
+      # ~ library exposures
 
       def common_action_class
         Model_::Action
@@ -202,10 +213,6 @@ module Skylab::Brazen
         Model_::Action_Factory__::Events
       end
 
-      def make_common_properties & edit_p
-        common_properties_class.new entity_module, & edit_p
-      end
-
       def common_properties_class
         Common_Properties___
       end
@@ -225,23 +232,11 @@ module Skylab::Brazen
 
     include module Interface_Element_Instance_Methods___
 
+      # ~~ description & name
+
       def name
         self.class.name_function
       end
-
-      def is_visible
-        ! is_invisible
-      end
-
-      def is_branch
-        true  # see comments at same method above
-      end
-
-      def to_kernel
-        @kernel
-      end
-
-      attr_reader :is_invisible
 
       def has_description
         ! self.class.description_block.nil?
@@ -253,16 +248,37 @@ module Skylab::Brazen
            execute
       end
 
+      # ~~ placement & visibility
+
+      def after_name_symbol
+        self.class.after_name_symbol
+      end
+
+      def is_visible
+        true
+      end
+
+      # ~~ properties
+
       def action_property_value i
         ivar = :"@#{ i }"
-        instance_variable_defined?( ivar ) or raise say_no_action_prop( i )
+        instance_variable_defined?( ivar ) or raise __say_no_action_prop( i )
         instance_variable_get ivar
       end
 
-    private
-
-      def say_no_action_prop i
+      def __say_no_action_prop i
         "action prop not set: '#{ i }'"
+      end
+
+      # ~~ statics
+
+      def is_branch  # 2 of 2
+        true  # for now, every model node exists (in the eyes of invocation
+        # engines) only to dispatch each request down to one of its children
+      end
+
+      def to_kernel
+        @kernel
       end
 
       self
@@ -303,10 +319,6 @@ module Skylab::Brazen
 
     attr_reader :came_from_persistence
 
-    def is_visible
-      true
-    end
-
     def to_even_iambic
       y = []
       st = to_full_pair_stream
@@ -345,7 +357,7 @@ module Skylab::Brazen
     end
 
     def trio sym  # #hook-near action. may soften if needed.
-      LIB_.basic.trio(
+      Callback_::Trio.via_value_and_had_and_property(
         @property_box.fetch( sym ), true, formal_properties.fetch( sym ) )
     end
 
@@ -737,7 +749,9 @@ module Skylab::Brazen
       @kernel.silo_via_identifier self.class.node_identifier
     end
 
- public  # ~ multipurpose internal readers & callbacks
+ public
+
+    #  ~ readers for collaborators
 
     attr_reader :preconditions
 
@@ -745,7 +759,7 @@ module Skylab::Brazen
       @property_box or fail "no prop box for #{ self.class }"
     end
 
-    # ~ adjunct & experiments
+    # ~ writers for collaborators
 
     def __accept_selective_event_listener x
       @__HESVC_p__ = nil

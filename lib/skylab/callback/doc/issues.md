@@ -49,7 +49,8 @@
 [#019]       #parent-node: [#034] the digraph narrative ..
 [#018]       #parent-node: [#019] the CLI node narrative
 [#017]       #parent-node: [#034] the selective listener node
-[#016]       #done iambify extension interface
+[#016]       bids for a `limit_by` in [#044] stream
+             ( #was: #done iambify extension interface )
 [#015]       #nichepoint "event factory structural" (there are others..)
 [#014]       #parent-node:[#019] the reflection API
 [#013]       #parent-node: [#017] selective listener methodic

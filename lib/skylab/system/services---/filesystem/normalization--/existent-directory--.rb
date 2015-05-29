@@ -247,12 +247,13 @@ module Skylab::System
           end
 
           def result
-            System_.lib_.basic.trio(
-              ( if @is_dry_run
+            Callback_::Trio.via_value(
+              if @is_dry_run
                 Mock_Dir__.new @path
               else
                 ::Dir.new @path
-              end ), true )
+              end
+            )
           end
 
           Mock_Dir__ = ::Struct.new :to_path

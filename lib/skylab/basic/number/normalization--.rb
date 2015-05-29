@@ -49,7 +49,7 @@ module Skylab::Basic
               x_p and self._NICE
 
               _x = in_st.current_token
-              _trio = Callback_::Trio.new _x, true
+              _trio = Callback_::Trio.via_value _x
 
               arg = normalize_argument _trio do | * i_a, & ev_p |
 
@@ -88,7 +88,7 @@ module Skylab::Basic
             ok = via_number_and_minimum_validate
           end
           if ok
-            Callback_::Trio.new @number, true
+            Callback_::Trio.via_value @number
           else
             @result
           end

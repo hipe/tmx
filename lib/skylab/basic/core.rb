@@ -37,14 +37,6 @@ module Skylab::Basic  # introduction at [#020]
     def normalizers
       Normalizers_instance__[]
     end
-
-    def trio * x_a
-      if x_a.length.zero?
-        Callback_::Trio
-      else
-        Callback_::Trio.new( * x_a )
-      end
-    end
   end  # >>
 
   Callback_ = ::Skylab::Callback

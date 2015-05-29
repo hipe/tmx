@@ -83,7 +83,7 @@ module Skylab::TestSupport
             NIL_
           end
 
-          def via_bound_action_mutate_mutable_backbound_iambic x_a
+          def prepare_backstream_call x_a
 
             if @_a
 

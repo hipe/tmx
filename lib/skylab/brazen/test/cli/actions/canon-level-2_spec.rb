@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
 module Skylab::Brazen::TestSupport::CLI::Actions
 
-  describe "[br] CLI actions - level-2 - canon" do
+  describe "[br] CLI actions - canon level-2" do
 
     extend TS_
 

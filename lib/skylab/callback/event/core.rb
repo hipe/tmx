@@ -304,6 +304,12 @@ module Skylab::Callback
 
       class N_Lines < ::Enumerator::Yielder
 
+        class << self
+          def call * a
+            new( * a ).execute
+          end
+        end  # >>
+
         def initialize y, n, p_a, expag
           @do_first_line = true ; @expag = expag ; @p_a = p_a ; @y = y
           if n
@@ -531,7 +537,7 @@ module Skylab::Callback
         end
 
         def handle_event_selectively
-          @on_event_selectively ||= prdc_HES
+          @on_event_selectively ||= __produce_handle_event_selectively_proc
         end
 
         def handle_event_selectively_via_channel
@@ -540,7 +546,7 @@ module Skylab::Callback
 
       private
 
-        def prdc_HES
+        def __produce_handle_event_selectively_proc
           if handle_event_selectively_via_channel
             -> * i_a, & ev_p do
               @__HESVC_p__.call i_a, & ev_p

@@ -46,10 +46,6 @@ module Skylab::TestSupport
 
         class << self
 
-          def after_name_symbol
-            nil
-          end
-
           def is_branch
             false
           end
@@ -75,6 +71,10 @@ module Skylab::TestSupport
         def initialize _boundish, & oes_p
 
           @on_event_selectively = oes_p
+        end
+
+        def after_name_symbol
+          nil
         end
 
         def is_visible
@@ -114,7 +114,7 @@ module Skylab::TestSupport
 
           @argv = a
 
-          Callback_::Bound_Call.new nil, self, :execute
+          Callback_::Bound_Call.via_receiver_and_method_name self, :execute
         end
 
         attr_accessor :invocation_s_a, :serr, :sout

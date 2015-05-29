@@ -28,48 +28,92 @@ module Skylab::Headless
 
       def load_plugins_in_module mod
 
-        pu_d = nil
+        _st = Callback_::Stream.via_nonsparse_array mod.constants do | const |
 
-        digraph = @state_machine.digraph
-
-        mod.constants.each do | const |
-
-          pu_d = @plugin_a.length
-
-          pu = mod.const_get( const, false ).new pu_d, @resources,
-            & @on_event_selectively
-
-          pu.each_reaction do | tr |
-
-            tr_i = tr.transition_symbol
-
-            tr.each_catalyzing_formal do | formal |
-              _register_occurrence formal, tr_i, pu_d, true
-            end
-
-            tr.each_ancillary_formal_option do | formal |
-              _register_occurrence formal, tr_i, pu_d
-            end
-          end
-
-          pu.each_capability do | tr |
-
-            tr_i = tr.transition_symbol
-            h = @all_capabilities
-
-            h.fetch( digraph.source_state_of_transition tr_i ) do | k |
-              h[ k ] = []
-            end.push Step.new( tr_i, pu_d )
-
-            tr.each_ancillary_formal_option do | formal |
-              _register_occurrence formal, tr_i, pu_d
-            end
-          end
-
-          @plugin_a.push pu
+          mod.const_get const, false
 
         end
-        nil
+
+        load_plugins_in_prototype_stream _st
+      end
+
+      def load_plugins_in_prototype_stream st
+
+        st.each do | plugin_class_like |
+
+          add_plugin_via_prototype plugin_class_like
+        end
+        NIL_
+      end
+
+      def add_plugin_via_prototype plugin_class_like
+
+        pu_d = @plugin_a.length
+
+        pu = plugin_class_like.new_via_plugin_identifier_and_resources(
+          pu_d, @resources, & @on_event_selectively )
+
+        _accept_plugin pu_d, pu
+        NIL_
+      end
+
+      def create_plugin_via_option_parser name_symbol
+
+        pu_d = @plugin_a.length
+
+        pu = Mutable___.new_via_name_and_plugin_identifier_and_resources(
+          Callback_::Name.via_variegated_symbol( name_symbol ),
+          pu_d,
+          @resources )
+
+        reac = Reaction__.new name_symbol
+
+        sess = Formal_Edit_Session__.new [ name_symbol ] do | fo |
+
+          reac.ancillary_formals.push fo
+          NIL_
+        end
+
+        yield sess
+
+        pu.reactions.push reac
+
+        _accept_plugin pu_d, pu
+
+        pu
+      end
+
+      def _accept_plugin pu_d, pu
+
+        pu.each_reaction do | tr |
+
+          tr_i = tr.transition_symbol
+
+          tr.each_catalyzing_formal do | formal |
+            _register_occurrence formal, tr_i, pu_d, true
+          end
+
+          tr.each_ancillary_formal_option do | formal |
+            _register_occurrence formal, tr_i, pu_d
+          end
+        end
+
+        pu.each_capability do | tr |
+
+          tr_i = tr.transition_symbol
+          h = @all_capabilities
+
+          h.fetch( @state_machine.digraph.source_state_of_transition tr_i ) do | k |
+            h[ k ] = []
+          end.push Step.new( tr_i, pu_d )
+
+          tr.each_ancillary_formal_option do | formal |
+            _register_occurrence formal, tr_i, pu_d
+          end
+        end
+
+        @plugin_a[ pu_d ] = pu
+        NIL_
       end
 
       # ~ ( for collaborators
@@ -492,10 +536,11 @@ module Skylab::Headless
       attr_reader :_cap_a, :_reac_a
 
       def does transition_symbol, & dsl_p
+
         tr = Reaction__.new transition_symbol
         dsl_p[ tr ]
         ( @_reac_a ||= [] ).push tr
-        nil
+        NIL_
       end
 
       def can transition_symbol, & dsl_p
@@ -506,6 +551,9 @@ module Skylab::Headless
         ( @_cap_a ||= [] ).push tr
         nil
       end
+
+      alias_method :new_via_plugin_identifier_and_resources, :new
+      private :new
     end  # >>
 
     # ~ ancillaries for plugin capabilities specification
@@ -513,7 +561,7 @@ module Skylab::Headless
     class Capability__
 
       def initialize sym
-        @ancillary_formals = nil
+        @ancillary_formals = []
         @transition_symbol = sym
       end
 
@@ -535,10 +583,10 @@ module Skylab::Headless
           op_p
         ) do | op |
 
-          ( @ancillary_formals ||= [] ).push op ; nil
+          @ancillary_formals.push op ; nil
         end
 
-        nil
+        NIL_
       end
 
       def my_symbol_
@@ -546,7 +594,7 @@ module Skylab::Headless
       end
 
       def each_option_in_as_ * id_a, op_p, & op_o_p
-        op_p[ Formal_Edit_Session___.new( id_a, & op_o_p ) ]
+        op_p[ Formal_Edit_Session__.new( id_a, & op_o_p ) ]
         nil
       end
     end
@@ -586,7 +634,7 @@ module Skylab::Headless
       end
     end
 
-    class Formal_Edit_Session___
+    class Formal_Edit_Session__
 
       def initialize id_prefix_x, & p
         @id_prefix_x = id_prefix_x
@@ -617,7 +665,7 @@ module Skylab::Headless
     end
 
     def each_reaction & yld_p
-      a = self.class._reac_a
+      a = reactions
       if a
         a.each( & yld_p )
       end
@@ -625,7 +673,7 @@ module Skylab::Headless
     end
 
     def each_capability & yld_p
-      a = self.class._cap_a
+      a = capabilities
       if a
         a.each( & yld_p )
       end
@@ -650,6 +698,23 @@ module Skylab::Headless
     end
 
     Plugin_ = self
+
+    class Mutable___ < self
+
+      class << self
+
+        alias_method :new_via_name_and_plugin_identifier_and_resources, :new
+        public :new_via_name_and_plugin_identifier_and_resources
+      end  # >>
+
+      def initialize name, * rest
+        @reactions = []
+        @name = name
+        super( * rest )
+      end
+
+      attr_reader :reactions, :name
+    end
 
       # ~ legacy below here -- see [#077] (bottom half)
 

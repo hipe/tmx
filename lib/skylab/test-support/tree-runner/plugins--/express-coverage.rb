@@ -201,6 +201,11 @@ module Skylab::TestSupport
 
       # ~ as plugin (we have to re-write looking like a plugin because [#002])
 
+      class << self
+        alias_method :new_via_plugin_identifier_and_resources, :new
+        private :new
+      end  # >>
+
       def initialize _plugin_idx, _resources, & oes_p
       end
 

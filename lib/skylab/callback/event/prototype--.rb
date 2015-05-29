@@ -141,9 +141,9 @@ module Skylab::Callback
           once = -> do
             once = EMPTY_P_
             at_end = -> do
-              remove_instance_variable :@__methodic_actor_polymorphic_stream__
+              remove_instance_variable :@polymorphic_upstream_
             end
-            @__methodic_actor_polymorphic_stream__ = st
+            @polymorphic_upstream_ = st
             NIL_
           end
 
@@ -198,7 +198,7 @@ module Skylab::Callback
         end
 
         def gets_one_polymorphic_value  # :+#cp
-          @__methodic_actor_polymorphic_stream__.gets_one
+          @polymorphic_upstream_.gets_one
         end
 
       protected

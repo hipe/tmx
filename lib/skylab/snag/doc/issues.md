@@ -39,7 +39,8 @@
 [#032]       see if we can unify find commands org wide #tracking-tag
 [#031]       #done NO. BAD. (horrible event wiring in todo tree) ..
                and some comments on UI vs. API and so on
-[#030]       #done we would love to have -1, -2 etc
+[#030]       #moved-to: [#br-074]
+             ( #was: #done we would love to have -1, -2 etc )
 [#029]       [ THIS DOCUMENT NLP domain formal entity set ] ..
              (#tracking-tag #pattern of `instance_eval` for rendering)
 [#028]       melt makes patch for whole codebase #deferred

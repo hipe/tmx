@@ -104,7 +104,7 @@ module Skylab::TestSupport
       # ~ simple expect "macros"
 
       def expect_header_line s
-        expect :styled, "#{ s }:"
+        expect :styled, s  # no expectation of colons here, because [#072]
       end
 
       # ~ expect

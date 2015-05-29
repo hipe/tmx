@@ -90,7 +90,18 @@ module Skylab::Brazen
 
         elsif o.respond_to? :express_into_under
 
-          method :__express_item_via_into_under
+          if o.respond_to? :express_of_via_into_under
+
+            pr = o.express_of_via_into_under @y, @expag
+          end
+          if pr
+            @ok = true
+            @__prepared_expresser = pr
+            method :__express_item_via_prepared_expresser
+          else
+            @ok = true
+            method :__express_item_via_into_under
+          end
 
         elsif o.respond_to? :properties
 
@@ -111,9 +122,17 @@ module Skylab::Brazen
         NIL_
       end
 
+      def __express_item_via_prepared_expresser
+
+        _y = @__prepared_expresser.call @item
+        _y or @ok = false
+        NIL_
+      end
+
       def __express_item_via_into_under
 
-        @ok = @item.express_into_under @y, @expag
+        _y = @item.express_into_under @y, @expag
+        _y or @ok = false
         NIL_
       end
 

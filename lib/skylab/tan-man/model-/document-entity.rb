@@ -404,7 +404,7 @@ module Skylab::TanMan
                 next
               end
 
-              yield Callback_::Trio.new( x, true, prp )
+              yield Callback_::Trio.via_value_and_property( x, prp )
             end
           else
 

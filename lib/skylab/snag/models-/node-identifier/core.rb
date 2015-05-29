@@ -35,17 +35,30 @@ module Skylab::Snag
 
       def express_into_under_of_ y, expag, id
 
-        y << OPEN_SEQUENCE__
-        y << "%0#{ expag.identifier_integer_width }d" % id.to_i
-
-        sfx = id.suffix
-        if sfx
-          sfx.express_into_under y, expag
-        end
-
-        y << CLOSE_SEQUENCE__
+        y << Expression_Adapters::CLI.express_of_via_under( expag )[ id ]
       end
     end  # >>
+
+    module Expression_Adapters::CLI ; class << self
+
+      def express_of_via_under expag
+
+        fmt = "%0#{ expag.identifier_integer_width }d"
+
+        -> id do
+
+          sfx = id.suffix
+          if sfx
+            _sfx = sfx.express_into_under "", expag
+          end
+
+          "#{ OPEN_SEQUENCE__ }#{
+          }#{ fmt % id.to_i }#{
+          }#{ _sfx }#{
+          }#{ CLOSE_SEQUENCE__ }"
+        end
+      end
+    end ; end
 
     CLOSE_SEQUENCE__ = ']'
     OPEN_SEQUENCE__ = '[#'

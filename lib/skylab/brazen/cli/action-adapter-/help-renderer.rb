@@ -268,9 +268,15 @@ module Skylab::Brazen
         # ~ section rendering (description, options, arguments, child actions)
 
         def output_description
+
           section_boundary
-          output_multiline_section 'description', @action.
-            under_expression_agent_get_N_desc_lines( @expression_agent ) ; nil
+
+          output_multiline_section(
+            'description',
+            @action.under_expression_agent_get_N_desc_lines(
+              @expression_agent ) )
+
+          NIL_
         end
 
         def output_option_parser_summary
@@ -422,7 +428,7 @@ module Skylab::Brazen
         def output_single_line_section hdr_s, line
           y = @y
           @expression_agent.calculate do
-            y << "#{ hdr hdr_s } #{ line }"
+            y << "#{ hdr hdr_s }: #{ line }"  # :[#072].
           end
           nil
         end

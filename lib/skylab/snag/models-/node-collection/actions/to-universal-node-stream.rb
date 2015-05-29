@@ -51,7 +51,7 @@ module Skylab::Snag
         @fn = COMMON_MANIFEST_FILENAME_
 
         path = Walk_upwards_to_find_nearest_surrounding_path_[
-          @dir, @fn, & @_oes_p ]
+          @dir, @fn, self._FILESYSTEM, & @_oes_p ]
 
         if path
           @_path = path

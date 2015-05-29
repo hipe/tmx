@@ -3,32 +3,6 @@ require 'skylab/callback/core'
 
 module Skylab::Snag
 
-  module CLI
-
-    class << self
-
-      def new * a
-
-        Snag_.lib_.brazen::CLI.new_top_invocation a, Snag_.application_kernel_
-      end
-    end  # >>
-
-    # ~ begin :+#hook-out for tmx
-    Client = self
-    module Adapter
-      module For
-        module Face
-          module Of
-            Hot = -> x, x_ do
-              Snag_.lib_.brazen::CLI::Client.fml Snag_, x, x_
-            end
-          end
-        end
-      end
-    end
-    # ~ end
-  end
-
   module API
 
     class << self
@@ -98,7 +72,7 @@ module Skylab::Snag
 
     -> arg_st, & x_p do
 
-      _trio = Callback_::Trio.new arg_st.gets_one, true
+      _trio = Callback_::Trio.via_value arg_st.gets_one
 
       n11n.normalize_argument _trio do | * i_a, & ev_p |
 
@@ -124,7 +98,7 @@ module Skylab::Snag
       sym = expag.modality_const
 
       if sym
-        _expad_for( sym ).express_into_under_of_ y, expag, self
+        expad_for_( sym ).express_into_under_of_ y, expag, self
       else
         express_into_ y
       end
@@ -134,13 +108,13 @@ module Skylab::Snag
 
       sym = expag.modality_const
       if sym
-        _expad_for( sym ).express_N_units_into_under_of_ d, y, expag, self
+        expad_for_( sym ).express_N_units_into_under_of_ d, y, expag, self
       else
         express_N_units_into_under_agnostic_ d, y, exag
       end
     end
 
-    def _expad_for sym
+    def expad_for_ sym
 
       self.class::Expression_Adapters.const_get sym, false
     end
@@ -233,6 +207,7 @@ module Skylab::Snag
   LINE_SEP_ = "\n"
   NIL_ = nil
   KEEP_PARSING_ = true
+  MONADIC_EMPTINESS_ = -> _ { }
   NEUTRAL_ = nil
   NEWLINE_ = "\n"
   Snag_ = self

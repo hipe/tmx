@@ -6,7 +6,15 @@ module Skylab::Headless
 
       class Formal
 
-        def initialize a, x, & any_p
+        def initialize * args, & x_p
+          if args.length.zero?
+            instance_exec( & x_p )
+          else
+            __init( * args, & x_p )
+          end
+        end
+
+        def __init a, x, & any_p
           @arg_category_string = nil
           @args = a
           @block = any_p
@@ -194,19 +202,15 @@ module Skylab::Headless
         end
       end
 
-      class Produce_bound_call
+      class Aggregate_Parse_Session
 
-        # #storypoint-11, #storypoint-21
+        def initialize input_x, indexes, & oes_p
 
-        def initialize input_x, state_machine, indexes, & oes_p
-
-          @digraph = state_machine.digraph
           @indexes = indexes
           @input_x = input_x
           @occurrence_a = indexes.occurrence_a
           @on_event_selectively = oes_p
           @plugin_a = indexes.plugin_a
-          @state_machine = state_machine
 
           # ~ written to when the parse happens:
 
@@ -214,46 +218,10 @@ module Skylab::Headless
           @traversals = {}
         end
 
-        def execute
+        def _build_option_parser_and_parse_options
 
           __init_canary_option_parser
-          ok = __via_canary_parser_parse_options
-          ok &&= __via_normal_input_resolve_steps
-          ok && __via_steps_decide_who_gets_ARGV
-          ok && __deliver_the_goods
-        end
-
-        def __init_canary_option_parser
-
-          op = Headless_::Library_::OptionParser.new
-
-          @indexes.each_short_long_combo do | slc |
-
-            formal = @occurrence_a.fetch( slc.occurrences.fetch( 0 ) ).formal
-
-            op.define( * formal.barebones_arguments,
-
-              & __callback_for( formal, slc ) )
-
-          end
-          @canary_option_parser = op
-          nil
-        end
-
-        def __callback_for formal, slc
-
-          if formal.arg_category_string  # ick
-            -> x do
-              _receive_knowledge_of slc, [ x ]
-              nil
-            end
-          else
-            -> _ do
-              true == _ or self._SANITY  # #todo remove after :+#dev
-              _receive_knowledge_of slc
-              nil
-            end
-          end
+          __via_canary_parser_parse_options
         end
 
         def __via_canary_parser_parse_options
@@ -271,6 +239,39 @@ module Skylab::Headless
           UNABLE_
         end
 
+        def __init_canary_option_parser
+
+          op = Headless_::Library_::OptionParser.new
+
+          @indexes.each_short_long_combo do | slc |
+
+            formal = @occurrence_a.fetch( slc.occurrences.fetch( 0 ) ).formal
+
+            op.define( * formal.barebones_arguments,
+
+              & __callback_for( formal, slc ) )
+
+          end
+          @canary_option_parser = op
+          NIL_
+        end
+
+        def __callback_for formal, slc
+
+          if formal.arg_category_string  # ick
+            -> x do
+              _receive_knowledge_of slc, [ x ]
+              NIL_
+            end
+          else
+            -> _ do
+              true == _ or self._SANITY  # #todo remove after :+#dev
+              _receive_knowledge_of slc
+              NIL_
+            end
+          end
+        end
+
         def _receive_knowledge_of slc, args=nil
 
           slc.occurrences.each do | occurrence_idx |
@@ -278,19 +279,7 @@ module Skylab::Headless
             occu = @occurrence_a.fetch occurrence_idx
 
             if occu.is_catalyst
-
-              # key this invocation to the source node
-
-              h = @traversals
-
-              h.fetch(
-                @digraph.source_state_of_transition occu.transition_symbol
-              ) do | k |
-                h[ k ] = []
-              end.push( Plugin_::Dispatcher::Step.
-                new( occu.transition_symbol, occu.plugin_idx ) )
-
-              nil
+              __receive_knowledge_of_catalyst occu
             end
 
             # when traversing this arc with this plugin, give it the
@@ -304,9 +293,46 @@ module Skylab::Headless
               h[ k ] = []
             end.push args, occu.formal.formal_path_x  # etc
 
-            nil
+            NIL_
           end
-          nil
+          NIL_
+        end
+
+        def __receive_knowledge_of_catalyst occu
+
+          # key this invocation to the source node
+
+          h = @traversals
+
+          h.fetch(
+            @digraph.source_state_of_transition occu.transition_symbol
+          ) do | k |
+            h[ k ] = []
+          end.push( Plugin_::Dispatcher::Step.
+            new( occu.transition_symbol, occu.plugin_idx ) )
+
+          NIL_
+        end
+      end
+
+      class Produce_bound_call < Aggregate_Parse_Session
+
+        # #storypoint-11, #storypoint-21
+
+        def initialize input_x, state_machine, indexes, & oes_p
+
+          @digraph = state_machine.digraph
+          @state_machine = state_machine
+
+          super( input_x, indexes, & oes_p )
+        end
+
+        def execute
+
+          ok = _build_option_parser_and_parse_options
+          ok &&= __via_normal_input_resolve_steps
+          ok && __via_steps_decide_who_gets_ARGV
+          ok && __deliver_the_goods
         end
 
         def __via_normal_input_resolve_steps
@@ -342,7 +368,7 @@ module Skylab::Headless
 
         def __deliver_the_goods
 
-          Callback_::Bound_Call.new( nil,
+          Callback_::Bound_Call.via_receiver_and_method_name(
 
             Plan___.new(
               @argv_2, @input_x, @prcs_argv_meth_name,
@@ -356,6 +382,7 @@ module Skylab::Headless
       class Plan___
 
         def initialize working_argv, real_argv, input_method_name, step_a, idxs, & oes_p
+
           @input_method_name = input_method_name
           @on_event_selectively = oes_p
           @plugin_a = idxs.plugin_a
@@ -377,7 +404,7 @@ module Skylab::Headless
           ok = true
 
           if input_x.length.nonzero? && ! @input_method_name
-            _when_unprocessed_input
+            _when_unprocessed_input input_x
             ok = UNABLE_
           else
 
@@ -392,7 +419,7 @@ module Skylab::Headless
                 ok or break
 
                 if step.is_last_to_process_input && input_x.length.nonzero?
-                  _when_unprocessed_input
+                  _when_unprocessed_input input_x
                   ok = UNABLE_
                   break
                 end
@@ -404,6 +431,13 @@ module Skylab::Headless
           end
 
           ok
+        end
+
+        def _when_unprocessed_input input_x
+          @on_event_selectively.call :error, :expression do | y |
+            y << "unhandled argument: #{ input_x.first.inspect }"
+          end
+          NIL_
         end
       end
     end

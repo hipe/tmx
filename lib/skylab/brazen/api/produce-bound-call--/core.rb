@@ -214,7 +214,7 @@ module Skylab::Brazen
           Callback_::Event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, nil
         end
 
-        @bound_call = Brazen_.bound_call.via_value _result
+        @bound_call = Callback_::Bound_Call.via_value _result
 
         UNABLE_
       end

@@ -41,7 +41,7 @@ module Skylab::TanMan
               ::Dir.pwd
             end
             ok &&= sess.touch_graph
-            Brazen_.bound_call.via_value ok
+            Callback_::Bound_Call.via_value ok
           end
 
           class Custom_Session___

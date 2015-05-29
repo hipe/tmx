@@ -49,6 +49,10 @@ module Skylab::Snag
 
       # ~ :+#ACS-tenet-7
 
+      def __extended_content__association_for_mutation_session
+        EC___
+      end
+
       def __identifier__association_for_mutation_session
 
         Snag_::Models_::Node_Identifier
@@ -56,7 +60,7 @@ module Skylab::Snag
 
       def __message__association_for_mutation_session
 
-        Mixed_message___
+        Mixed_Message___
       end
 
       def __string__association_for_mutation_session
@@ -117,6 +121,17 @@ module Skylab::Snag
 
     # ~
 
+    def express_of_via_into_under y, expag
+
+      sym = expag.modality_const
+
+      if sym
+        expad_for_( sym ).express_of_via_into_under_of y, expag, self
+      else
+        express_into_ y
+      end
+    end
+
     include Expression_Methods_
 
     def description_under expag
@@ -125,6 +140,32 @@ module Skylab::Snag
       y
     end
 
+    def property_value_via_property prp
+      send :"__property_value_for__#{ prp.name_symbol }__"
+    end
+
+    def __property_value_for__identifier__
+      @ID
+    end
+
+    def __property_value_for__message__
+      @body
+    end
+
+    def __property_value_for__extended_content__
+
+      @_extended_content_adapter.any_extended_content_filename_via_node_ID @ID
+    end
+
+    define_method :formal_properties, ( Callback_.memoize do
+
+      p = Callback_.lib_.basic::Minimal_Property.method :via_variegated_symbol
+
+      [ p[ :identifier ],
+        p[ :message ],
+        p[ :extended_content ]
+      ].freeze
+    end )
     # ~
 
     def receive__identifier__for_mutation_session o
@@ -241,10 +282,8 @@ module Skylab::Snag
     # ~
 
     def has_extended_content
-      @_extended_content_adapter.node_has_extended_content_via_node_id @ID
+      @_extended_content_adapter.node_has_extended_content_via_node_ID @ID
     end
-
-    # ~
 
     Brazen_ = Snag_.lib_.brazen
 
@@ -333,11 +372,40 @@ module Skylab::Snag
       end
     end
 
-    Mixed_message___ = -> arg_st, & x_p do
+    module Mixed_Message___
 
-      # this is a virtual component: the "message" model is not integrated
-      # into the component system directly; rather we go through this proc
-      # to achieve our final goal: to append string pieces to mutable body
+      # the "message" "component" is something of a virtual component: there
+      # is no message "model" per se, however we implement particular
+      # messsage-like input and output methods here to accomplish a final
+      # goal, for example to append string pieces to a mutable body, or
+      # to assemble all of the body lines as one string.
+
+      Expression_Adapters = ::Module.new
+      module Expression_Adapters::CLI ; class << self
+        def express_of_via_under _expag
+          -> body do
+            y = []
+            body.to_business_row_stream_.each do | row |
+              s = row.get_business_substring
+              s or next
+              y << s
+            end
+            if y.length.nonzero?
+              y * SPACE_  # meh
+            end
+          end
+        end
+      end ; end
+
+      class << self
+
+        def interpret_for_mutation_session arg_st, & x_p
+          Interpret_mixed_message___[ arg_st, & x_p ]
+        end
+      end  # >>
+    end
+
+    Interpret_mixed_message___ = -> arg_st, & x_p do
 
       x = arg_st.gets_one
       a = ::Array.try_convert x
@@ -357,8 +425,7 @@ module Skylab::Snag
       end
 
       if ok
-        _ = Snag_::Models::Hashtag::String_Piece.new_via_string s_a * SPACE_
-        Callback_::Pair.new _
+        Snag_::Models::Hashtag::String_Piece.new_via_string s_a * SPACE_
       else
         ok
       end
@@ -376,6 +443,19 @@ module Skylab::Snag
         end
       else  # let required/optional handle this, *not* us
         arg
+      end
+    end
+
+    module EC___
+      module Expression_Adapters
+        module CLI ; class << self
+          def express_of_via_under _expag
+            -> entry_s do
+
+              entry_s
+            end
+          end
+        end ; end
       end
     end
 

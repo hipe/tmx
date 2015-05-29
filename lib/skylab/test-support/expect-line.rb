@@ -264,9 +264,19 @@ module Skylab::TestSupport
 
         s = expect_styled_line
         if s
-          exp = "#{ sym }:\n"
-          exp == s or fail "had: #{ s.inspect }, expected: #{ exp.inspect }"
-          NIL_
+
+          exp = "#{ sym }\n"
+          if exp == s
+            NIL_  # ok - multi-line style, with no trailing colon
+          else
+
+            exp_ = "#{ sym }:\n"
+            if exp_ == s
+              self._WHERE  # still used?
+            else
+              fail "expecting #{ exp.inspect } or #{ exp_.inspect }"
+            end
+          end
         end
       end
 

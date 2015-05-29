@@ -140,7 +140,7 @@ module Skylab::SubTree
             x or next
             prp = @formal_properties[ k ]
             prp.is_extension or next
-            ok = __load_extension Callback_::Trio.new( x, true, prp )
+            ok = __load_extension Callback_::Trio.via_value_and_property( x, prp )
             ok or break
           end
 

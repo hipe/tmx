@@ -24,18 +24,6 @@ module Skylab::Snag::TestSupport
       NIL_
     end
 
-    def with_invocation * i_a
-    end
-
-    def with_manifest s
-    end
-
-    def with_tmpdir_patch
-    end
-
-    def with_tmpdir
-    end
-
     def memoize_ sym, & p
       define_method sym, Callback_.memoize( & p )
     end

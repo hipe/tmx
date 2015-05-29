@@ -9,10 +9,6 @@ module Skylab::Brazen
         def normalizers
           LIB_.basic.normalizers
         end
-
-        def trio
-          LIB_.trio
-        end
       end  # >>
 
       # ~ ad-hoc processors
@@ -80,6 +76,19 @@ module Skylab::Brazen
 
         class self::Entity_Property
 
+          def normalize trio, & x_p  # assume some normalizer (for now)
+
+            # an alternative means of running the normalizers,
+            # divorced from the action API. compare to #here
+
+            arg = trio
+            @norm_p_a.each do | p |
+              arg = p[ arg, & x_p ]
+              arg or break
+            end
+            arg
+          end
+
         private
 
           def ad_hoc_normalizer=
@@ -113,12 +122,16 @@ module Skylab::Brazen
           end
         end
 
-        def _apply_ad_hoc_normalizers pr  # this evolved from [#ba-027]
+
+        def _apply_ad_hoc_normalizers prp  # this evolved from [#ba-027]
+
+          # the integrated way of running these. compare to #here
+
           ok = true
           bx = actual_property_box_for_write
-          pr.norm_p_a.each do | arg_and_oes_block_p |
+          prp.norm_p_a.each do | arg_and_oes_block_p |
 
-            arg = trio_via_property pr
+            arg = trio_via_property prp
               # at each step, value might have changed.
               # [#053] bound is not truly bound.
 

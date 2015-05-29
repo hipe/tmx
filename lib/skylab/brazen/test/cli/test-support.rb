@@ -128,7 +128,7 @@ module Skylab::Brazen::TestSupport::CLI
     end
 
     def expect_arguments
-      expect :styled, %r(\Aarguments?:\z)
+      expect :styled, %r(\Aarguments?\z)  # no colon because [#072]
       expect_these_arguments
       expect_maybe_a_blank_line
     end

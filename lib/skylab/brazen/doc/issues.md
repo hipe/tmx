@@ -19,11 +19,13 @@
 [#077] #open maybe try a positive meta-property with a default instead of `hidden`.
 [#076] #open end-client gets [#021] magic for `retrieve` (was: [same for list])
 [#075]    #tracking :+#wishlist optionally generate ivar-based iambic writers
-[#074] #hole ( was: #parent-node: [#011] the codifying expression agents)
+[#074]       option parser hack for '-1', '-2' etc ..
+             ( #was: #parent-node: [#011] the codifying expression agents)
 [#073] #open awareness of system environment does not belong in the model -
              front clients should do this mapping somehow..
              ( was: #parent-node: [#011] selective event listening via methods )
-[#072]       #done `is_silo` can probably go away
+[#072]       where the colon goes on headers! #parent-node: [#002]
+             ( #was: #done `is_silo` can probably go away )
              ( #was: modernize this interface )
 [#071]       #tracking-tag wrap
 [#070]       #tracking-tag when we intentionally expose a mechanical
@@ -34,7 +36,8 @@
                API friendly and result
                in a stream instead of emitting one event for each item *maybe*
 [#067] #open smooth different interfacings with API actions taxonomy
-[#066]       #done cool new build-less events
+[#066]       [branch adapter] how add modality-only action #parent-node: [#003]
+             ( #was: #done cool new build-less events )
 [#065]       #track procs are always not-promoted
              ( #was: #done implement unmarshaling for strings with newlines (git-config) )
 [#064] #open either rename `desc` to `entity_description` or make

@@ -95,7 +95,8 @@ module Skylab::Basic
             MOCK_PROPERTY__
           end
 
-          Basic_.trio.new value_x, actuals_has_name, _prop
+          Callback_::Trio.via_value_and_had_and_property(
+            value_x, actuals_has_name, _prop )
         end
       end
 

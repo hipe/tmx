@@ -42,6 +42,7 @@ module Skylab::Headless  # ([#013] is reserved for a core node narrative - no st
   MONADIC_EMPTINESS_ = -> _ {}
   MONADIC_TRUTH_ = -> _ { true }
   NEWLINE_ = LINE_SEPARATOR_STRING_
+  NIL_ = nil
   NILADIC_TRUTH_ = -> { true }
   PROCEDE_ = true
   Scn_ = Callback_::Scn

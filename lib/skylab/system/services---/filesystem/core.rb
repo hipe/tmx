@@ -45,12 +45,24 @@ module Skylab::System
         end
       end
 
+      def exist? s
+        ::File.exist? s
+      end
+
+      def expand_path fn, ds=nil
+        ::File.expand_path fn, ds
+      end
+
       def file? s
         ::File.file? s
       end
 
       def glob * a
         ::Dir.glob( * a )
+      end
+
+      def stat path
+        ::File::Stat.new path
       end
 
       # ~ write :+#core-services

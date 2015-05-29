@@ -46,7 +46,8 @@ module Skylab::TestSupport
 
             if :help == prop.name_symbol
               -> _ do
-                @seen_h[ :help ] = true  # important
+                touch_argument_metadata :help
+                NIL_
               end
             else
               super
@@ -60,7 +61,7 @@ module Skylab::TestSupport
             # the output adapter was indicated explicitly in the ARGV buffer
             # alongside the --help flag
 
-            if @seen_h[ :output_adapter ]
+            if @seen[ :output_adapter ]
 
               _ok = @bound.receive_polymorphic_stream_(
                 Callback_::Polymorphic_Stream_via_Array_.new 0, @mutable_backbound_iambic )
@@ -97,7 +98,7 @@ module Skylab::TestSupport
             ACHIEVED_  # don't stop the batch job
           end
 
-          def via_bound_action_mutate_mutable_backbound_iambic x_a  # EEEW :+[#br-078], but maybe see [#br-042]
+          def prepare_backstream_call x_a  # :+[#br-078], [#br-042]
 
             if :path == x_a[ -2 ]
               path = x_a.last

@@ -1,60 +1,104 @@
-module Skylab::Snag
+module Skylab::Brazen
 
-  class CLI::Option_Parser__ < Snag_::Library_::OptionParser
+  class CLI
 
-    # off the chain [#030] custom parsing of e.g -1, -2 just because
+    Option_Parser = ::Module.new  # :+#stowaway
 
-    # example:
-    if false
-      o.regexp_replace_tokens %r(^-(?<num>\d+)$) do |md|   # replace -1, -2 etc
-        [ '--max-count', md[:num] ]                        # with this, before
-      end                                                  # o.p gets it [#030]
-    end
-                                                           # (AMAZING HACK)
-    def initialize( * )
-      @regexp_filters = nil
-      super
-    end
+    Option_Parser::Experiments = ::Module.new  # :+#stowaway
 
-    def regexp_replace_tokens rx, & p
-      ( @regexp_filters ||= [] ).push RX_Filter__.new rx, p ; nil
-    end
-    RX_Filter__ = ::Struct.new :rx, :block
+    class Option_Parser::Experiments::Regexp_Replace_Tokens  # see [#074]
 
-    def parse! argv
-      @regexp_filters and do_regexp_replace_tokens argv
-      super
-    end
-  private
-    def do_regexp_replace_tokens argv
-      begin
-        again = do_regexp_replace_tokens_once argv
-      end while again ; nil
-    end
+      def initialize op, * pairs
 
-    def do_regexp_replace_tokens_once argv
-      do_again = false
-      @regexp_filters.each_with_index do |filter, filter_idx|
-        token, idx = argv.each.with_index.detect { |t, i| filter.rx =~ t }
-        idx or next
-        orig_token = token.dup
-        res_a = filter.block.call $~, argv, idx
-        res_a.respond_to?( :each_with_index ) or raise ::TypeError, say_not( a )
-        orig_token == res_a.first and raise say_did_not_change( orig_token )
-        argv[ idx, 1 ] = res_a
-        do_again = true
-        break # stop processing the rest of the filters, run all filters
-        # again on the new argv!
+        a = []
+        pairs.each_slice 2 do | rx, p |
+          a.push RX_Filter___[ rx, p ]
+        end
+
+        @_op = op
+        @_regexp_filters = a
       end
-      do_again
-    end
 
-    def say_not a
-      "filter blocks must result in Array, not #{ a.class }"
-    end
+      RX_Filter___ = ::Struct.new :rx, :p
 
-    def say_did_not_change orig_token
-      "filter would infinite loop, it did not change: #{ orig_token.inspect }"
+      def parse! argv
+        __replace_tokens argv
+        @_op.parse! argv
+      end
+
+      def __replace_tokens argv
+
+        begin
+          _again = __replace_tokens_once argv
+          if _again
+            redo
+          end
+          break
+        end while nil
+        NIL_
+      end
+
+      def __replace_tokens_once argv
+
+        do_again = false
+
+        @_regexp_filters.each_with_index do | filter, filter_idx |
+
+          md = nil
+          token, idx = argv.each.with_index.detect do | s, d |
+            md = filter.rx.match s
+          end
+
+          idx or next
+
+          orig_token = token.dup
+
+          a = filter.p.call md  # , argv, idx
+
+          if ! a.respond_to? :each_with_index
+            raise ::TypeError, __say_type_error( a )
+          end
+
+          if orig_token == a.first
+            raise __say_did_not_change orig_token
+          end
+
+          argv[ idx, 1 ] = a
+
+          do_again = true
+
+          break  # stop processing the rest of the filters, run all filters
+          # again on the new argv!
+        end
+
+        do_again
+      end
+
+      def __say_type_error x
+        "filter blocks must result in Array, not #{ x.class }"
+      end
+
+      def __say_did_not_change orig_token
+        "filter would infinite loop; token did not change: #{ orig_token.inspect }"
+      end
+
+      # ~
+
+      def summarize * a, & p
+        @_op.summarize( * a, & p )
+      end
+
+      def summary_indent
+        @_op.summary_indent
+      end
+
+      def summary_width
+        @_op.summary_width
+      end
+
+      def top
+        @_op.top
+      end
     end
   end
 end

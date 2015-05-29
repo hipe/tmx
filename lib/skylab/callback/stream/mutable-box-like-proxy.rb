@@ -119,6 +119,13 @@ module Skylab::Callback
         had and raise ::KeyError, "won't clobber existing '#{ sym }'"
       end
 
+      def touch sym, & p
+        @h.fetch sym do
+          @a.push sym
+          @h[ sym ] = p[]
+        end
+      end
+
       def replace i, x
         x_ = @h.fetch i
         @h[ i ] = x

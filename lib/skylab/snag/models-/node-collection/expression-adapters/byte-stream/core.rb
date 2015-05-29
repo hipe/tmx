@@ -166,9 +166,14 @@ module Skylab::Snag
 
         # ~ extended content & filesystem
 
-        def node_has_extended_content_via_node_id id
+        def node_has_extended_content_via_node_ID id
 
-          @extc_adptr[].node_has_extended_content_via_node_id__ id
+          @extc_adptr[].node_has_extended_content_via_node_ID__ id
+        end
+
+        def any_extended_content_filename_via_node_ID id
+
+          @extc_adptr[].any_extended_content_filename_via_node_ID__ id
         end
 
         def __build_extc_adpr
@@ -187,7 +192,7 @@ module Skylab::Snag
         EC_Adapter_Dummy___ = Callback_.memoize do
           o = ::Object.new
           o.send :define_singleton_method,
-              :node_has_extended_content_via_node_id__ do | _ |
+              :node_has_extended_content_via_node_ID__ do | _ |
             false
           end
           o

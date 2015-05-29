@@ -75,7 +75,7 @@ module Skylab::Brazen
         x = @node_.receive_polymorphic_stream @scan
         if @node_.is_terminal_node
           @reached_terminal_node = true
-          @result = Brazen_.bound_call.via_value x
+          @result = Callback_::Bound_Call.via_value x
           ok = ACHIEVED_
         else
           @result = x

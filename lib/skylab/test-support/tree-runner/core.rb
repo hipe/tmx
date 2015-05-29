@@ -81,13 +81,21 @@ module Skylab
 
           :started, :build_sidesystem_tree, :produced_sidesystem_tree,
 
-          :produced_sidesystem_tree, :flush_the_sidesystem_tree, :finished,
+          :produced_sidesystem_tree,
+          :flush_the_sidesystem_tree,
+          :finished,
 
-          :produced_sidesystem_tree, :reduce_the_sidesystem_tree, :produced_sidesystem_tree,
+          :produced_sidesystem_tree,
+          :reduce_the_sidesystem_tree,
+          :produced_sidesystem_tree,
 
-          :produced_sidesystem_tree, :build_the_test_files, :produced_the_test_files,
+          :produced_sidesystem_tree,
+          :build_the_test_files,
+          :produced_the_test_files,
 
-          :produced_the_test_files, :reduce_the_test_files, :produced_the_test_files,
+          :produced_the_test_files,
+          :reduce_the_test_files,
+          :produced_the_test_files,
 
           :produced_the_test_files, :flush_the_test_files, :finished )
 

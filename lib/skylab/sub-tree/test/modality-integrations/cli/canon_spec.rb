@@ -75,7 +75,7 @@ module Skylab::SubTree::TestSupport::Modality_Integrations::CLI
 
       # ~
 
-      usage_rx = /\Ausage #{ cmd_name } <action> \[\.\.\]$/
+      usage_rx = /\Ausage: #{ cmd_name } <action> \[\.\.\]$/
 
       define_method :_usage_rx do
         usage_rx

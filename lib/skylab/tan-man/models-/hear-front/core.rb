@@ -28,7 +28,7 @@ module Skylab::TanMan
 
         bx = to_trio_box_
 
-        bx.add :stdout, TanMan_.lib_.basic.trio( stdout_, true, nil )
+        bx.add :stdout, Callback_::Trio.via_value( stdout_ )
 
         bc = @kernel.silo( :hear_front ).__bound_call_via_trio_box(
           bx,

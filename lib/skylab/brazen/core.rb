@@ -12,17 +12,6 @@ module Skylab::Brazen
       Brazen_::Kernel.new Brazen_
     end )
 
-    def bound_call * a, & x_p
-
-      if a.length.nonzero? || x_p
-
-        Callback_::Bound_Call.new( * a, & x_p )
-      else
-
-        Callback_::Bound_Call
-      end
-    end
-
     def byte_downstream_identifier
       Brazen_::Collection::Byte_Downstream_Identifier
     end
@@ -278,10 +267,6 @@ module Skylab::Brazen
     end
 
     System_lib__ = sidesys[ :System ]
-
-    Trio = -> do
-      Basic[].trio
-    end
 
     Two_streams = -> do
       System[].IO.some_two_IOs

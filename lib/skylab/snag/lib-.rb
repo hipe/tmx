@@ -43,10 +43,6 @@ module Skylab::Snag
       end
     end
 
-    Bound_call = -> * a do
-      Brazen[].bound_call.new_via_arglist a
-    end
-
     Brazen = sidesys[ :Brazen ]
 
     CLI_legacy_DSL = -> mod do
@@ -113,6 +109,10 @@ module Skylab::Snag
       System[].filesystem.path_tools
     end
 
+    Plugin = -> do
+      HL__[]::Plugin
+    end
+
     Porcelain__ = sidesys[ :Porcelain ]
 
     Pretty_path = -> x do
@@ -120,7 +120,7 @@ module Skylab::Snag
     end
 
     Strange = -> * x_a do
-      Basic[].strange.call_via_arglist x_a
+      Basic[]::String.via_mixed.call_via_arglist x_a
     end
 
     String_lib = -> do

@@ -117,11 +117,13 @@ module Skylab::TanMan
     private
 
       def bound_call_for_ping
+
         _x = maybe_send_event :payload, :ping_for_action do
           build_OK_event_with :ping_from_action, :name_symbol,
             name.as_lowercase_with_underscores_symbol
         end
-        Brazen_.bound_call.via_value _x
+
+        Callback_::Bound_Call.via_value _x
       end
 
       def receive_extra_iambic ev  # #hook-in [cb]
@@ -149,11 +151,14 @@ module Skylab::TanMan
       attr_reader :stdin_, :stdout_
 
       def to_trio_box_
+
         bx = Callback_::Box.new
         fo = formal_properties
-        _Trio = TanMan_.lib_.basic.trio
+
         ( @argument_box.each_pair do | k, x |
-          bx.add k, _Trio.new( x, true, fo.fetch( k ) )
+
+          bx.add k, Callback_::Trio.via_value_and_property( x, fo.fetch( k ) )
+
         end )
         bx
       end

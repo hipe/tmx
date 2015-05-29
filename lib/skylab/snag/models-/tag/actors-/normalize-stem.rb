@@ -31,7 +31,7 @@ module Skylab::Snag
             if _rest
               _when_invalid
             else
-              Snag_.lib_.basic.trio @symbol.get_stem_string.intern, true, nil
+              Callback_::Trio.via_value @symbol.get_stem_string.intern
             end
           else
             _when_invalid

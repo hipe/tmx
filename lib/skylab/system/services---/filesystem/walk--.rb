@@ -20,22 +20,36 @@ module Skylab::System
           end
         end  # >>
 
-        Callback_::Actor.call self,
-          :properties,
-            :start_path,
-            :filename,
-            :filename_rx,
-            :ftype,
-            :max_num_dirs_to_look,
-            :prop,
-            :property_symbol
+        Callback_::Actor.methodic self, :properties,
+
+          :start_path,
+          :filename,
+          :ftype,
+          :max_num_dirs_to_look,
+          :prop,
+          :property_symbol,
+          :filesystem
 
         Callback_::Event.selective_builder_sender_receiver self
 
         def initialize & edit_p
-          @ftype = @prop = @property_symbol = nil
-          super( & edit_p )
+
+          @argument_path_might_be_target_path = @ftype =
+            @prop = @property_symbol = nil
+
+          instance_exec( & edit_p )
+
+          @filesystem ||= System_.services.filesystem
         end
+
+      private
+
+        def argument_path_might_be_target_path=
+          @argument_path_might_be_target_path = true
+          ACHIEVED_
+        end
+
+      public
 
         def find_any_nearest_surrounding_path  # :+#public-API
           execute
@@ -50,7 +64,7 @@ module Skylab::System
 
         def __init_ivars
           if FILE_SEPARATOR_BYTE != @start_path.getbyte( 0 )
-            @start_path = ::File.expand_path @start_path
+            @start_path = @filesystem.expand_path @start_path
           end
           nil
         end
@@ -58,9 +72,17 @@ module Skylab::System
         def __work
           st, e = __stat_and_stat_error
           if st
+
             if DIRECTORY_FTYPE == st.ftype
+
               __find_any_nearest_file_when_start_path_exist
+
+            elsif __maybe_determine_if_argument_path_is_target_path st
+
+              @__result_for_when_argument_path_is_target_path
+
             else
+
               __when_start_directory_is_not_directory st
             end
           else
@@ -69,9 +91,32 @@ module Skylab::System
         end
 
         def __stat_and_stat_error
-          ::File::Stat.new @start_path
+          @filesystem.stat @start_path
         rescue ::Errno::ENOENT => e
           [ nil, e ]
+        end
+
+        def __maybe_determine_if_argument_path_is_target_path st
+
+          @argument_path_might_be_target_path &&
+            FILE_FTYPE == st.ftype &&
+              __determine_if_argument_path_is_target_path
+        end
+
+        def __determine_if_argument_path_is_target_path
+
+          tgt = "#{ ::File::SEPARATOR }#{ @filename }"
+          d = tgt.length
+
+          if tgt == @start_path[ -d .. -1 ]
+
+            @__result_for_when_argument_path_is_target_path =
+              @start_path[ 0 ... -d ]
+
+            true
+          else
+            false
+          end
         end
 
         def __when_start_directory_is_not_directory st
@@ -105,7 +150,8 @@ module Skylab::System
           while continue_searching[]
             count += 1
             try = ::File.join path, @filename
-            if ::File.exist? try
+
+            if @filesystem.exist? try
               found_path = try
               surrounding_path = path
               break

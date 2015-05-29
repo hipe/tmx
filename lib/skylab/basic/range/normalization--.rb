@@ -32,7 +32,8 @@ module Skylab::Basic
         # ~ for a particular act of normalization:
 
         def x=
-          set_arg Callback_::Trio.new gets_one_polymorphic_value, true, Basic_.default_property
+          set_arg Callback_::Trio.via_value_and_property(
+            gets_one_polymorphic_value, Basic_.default_property )
         end
 
         def arg=

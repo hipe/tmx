@@ -696,12 +696,16 @@ module Skylab::Brazen
           method( :trio_via_property ), formal_properties ]
       end
 
-      def trio_via_property prop
+      def trio_via_property prp
+
         had = true
-        x = actual_property_box.fetch prop.name_symbol do
-          had = false ; nil
+
+        x = actual_property_box.fetch prp.name_symbol do
+          had = false
+          nil
         end
-        LIB_.trio.new x, had, prop
+
+        Callback_::Trio.via_value_and_had_and_property x, had, prp
       end
 
       def polymorphic_writer_method_name_passive_lookup_proc  # [cb] #hook-in

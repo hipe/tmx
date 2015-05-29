@@ -157,12 +157,6 @@ module Skylab::Brazen
 
       class As_Bound_Action___
 
-        class << self
-          def after_name_symbol
-            # for now
-          end
-        end  # >>
-
         def initialize cx, k, action_class_like, & oes_p
 
           @action_class_like = action_class_like
@@ -171,18 +165,10 @@ module Skylab::Brazen
           @signature_classifications = cx
         end
 
-        def is_branch
-          false  # :+ procs are never branches
-        end
-
         attr_reader :action_class_like, :kernel
 
         def members
           [ :action_class_like, :kernel, :maybe_receive_event ]
-        end
-
-        def is_visible
-          true  # for now
         end
 
         def accept_parent_node_ _
@@ -190,10 +176,6 @@ module Skylab::Brazen
 
         def name
           @action_class_like.name_function
-        end
-
-        def has_description
-          # for now
         end
 
         def formal_properties
@@ -297,7 +279,7 @@ module Skylab::Brazen
             __build_when_extra_arguments_event extra_sym_a
           end
 
-          Brazen_.bound_call.via_value _x
+          Callback_::Bound_Call.via_value _x
         end
 
         def __build_when_extra_arguments_event extra_sym_a
@@ -312,7 +294,7 @@ module Skylab::Brazen
             __build_missing_arguments_event miss_sym_a
           end
 
-          Brazen_.bound_call.via_value _x
+          Callback_::Bound_Call.via_value _x
         end
 
         def __build_missing_arguments_event miss_sym_a
@@ -335,7 +317,7 @@ module Skylab::Brazen
             p = @on_event_selectively
           end
 
-          Brazen_.bound_call arglist, @action_class_like.p, :call, & p
+          Callback_::Bound_Call.new arglist, @action_class_like.p, :call, & p
         end
 
         def _maybe_send_event * i_a, & ev_p
@@ -346,6 +328,22 @@ module Skylab::Brazen
         def _sign_event ev
           _nf = @action_class_like.name_function
           Brazen_.event.wrap.signature _nf, ev
+        end
+
+        def after_name_symbol
+          NIL_
+        end
+
+        def has_description
+          NIL_  # for now
+        end
+
+        def is_branch
+          false  # :+ procs are never branches
+        end
+
+        def is_visible
+          true  # for now
         end
       end
     end

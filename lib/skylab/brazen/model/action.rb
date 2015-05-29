@@ -5,49 +5,40 @@ module Skylab::Brazen
   class Action  # see [#024]
 
     class << self
-    private
 
-      # ~ mutators that define the action:
+      # ~ model API ancillaries & adjunctives
 
-      def edit_entity_class * x_a, & edit_p  # if you are here the class is not yet initted
-        entity_module.call_via_client_class_and_iambic self, x_a, & edit_p
+      # ~~ description & name
+
+      def name_function_class
+        Action_Name_Function__
       end
 
-      def entity_module
-        model_class.superclass.const_get :Entity, false
+      attr_accessor :description_block
+
+      # ~~ inflection
+
+      def custom_action_inflection
+        NIL_
       end
-
-      def after sym  # experimental alternative to the iambic DSL
-        @after_name_symbol = sym ; nil
-      end
-
-    public
-
-      # ~ exposures of adjunct & experimental algorithms
 
       def process_some_customized_inflection_behavior upstream
         Process_customized_action_inflection_behavior__.new( upstream, self ).execute
       end
 
-      def edit_and_call boundish, oes_p, & edit_p
-        new( boundish, & oes_p ).__edit_and_call( & edit_p )
+      # ~~ placement
+
+      attr_accessor :after_name_symbol
+
+      private def after sym  # experimental alternative to the iambic DSL
+        @after_name_symbol = sym
       end
 
-      # ~ reflection-like exposures for model API
+      attr_accessor :is_promoted
 
-      attr_accessor :after_name_symbol, :description_block,
-        :is_promoted, :precondition_controller_i_a_
+      # ~~ preconditions
 
-      def custom_action_inflection
-      end
-
-      def is_actionable
-        true
-      end
-
-      def is_branch  # see commment at same instance method
-        false
-      end
+      attr_accessor :precondition_controller_i_a_
 
       def preconditions
         @__did_resolve_pcia ||= __resolve_precondition_controller_identifer_a
@@ -70,24 +61,47 @@ module Skylab::Brazen
         true
       end
 
-      def model_class
-        name_function.parent
+      # ~~ statics and/or defaults
+
+      def is_actionable
+        true
       end
 
-      def name_function_class
-        Action_Name_Function__
+      def is_branch  # 1 of 2
+        false
       end
 
-      # ~ default #hook-outs for entity lib (default is no properties)
-
-      def properties
-        nil
+      def properties  # default is no properties
+        NIL_
       end
 
       def any_property_via_symbol _
-        nil
+        NIL_
       end
 
+      # ~ custom internal invocation interface
+
+      def edit_and_call boundish, oes_p, & edit_p  # experimental
+        new( boundish, & oes_p ).__edit_and_call( & edit_p )
+      end
+
+    private
+
+      # ~ the common mutation inteface (defining an action)
+
+      def edit_entity_class * x_a, & edit_p  # if you are here the class is not yet initted
+        entity_module.call_via_client_class_and_iambic self, x_a, & edit_p
+      end
+
+      def entity_module
+        model_class.superclass.const_get :Entity, false
+      end
+
+    public
+
+      def model_class
+        name_function.parent
+      end
     end  # >>
 
     extend Brazen_.name_library.name_function_proprietor_methods
@@ -112,10 +126,6 @@ module Skylab::Brazen
       @kernel = boundish.to_kernel
 
       accept_selective_listener_proc oes_p
-    end
-
-    def is_branch  # see comment above
-      false  # for now, every action node is always a terminal (leaf) node
     end
 
     def accept_selective_listener_proc oes_p  # name might change to expose [ca]
@@ -252,7 +262,7 @@ module Skylab::Brazen
       keep_parsing = true
       formals = formal_properties
       pxy = Value_As_Stream_Like_Proxy___.new
-      @__methodic_actor_polymorphic_stream__ = pxy
+      @polymorphic_upstream_ = pxy
       bx.each_pair do | k, x |
 
         prp = formals[ k ]
@@ -287,7 +297,7 @@ module Skylab::Brazen
         keep_parsing or break
 
       end
-      remove_instance_variable :@__methodic_actor_polymorphic_stream__
+      remove_instance_variable :@polymorphic_upstream_
       keep_parsing
     end
 
@@ -321,10 +331,9 @@ module Skylab::Brazen
       if ok
         via_arguments_produce_bound_call
       else
-        Brazen_.bound_call.via_value ok
+        Callback_::Bound_Call.via_value ok
       end
     end
-
 
     # ~ experiment: is it worth it hacking external API actions for internal calls? [tm]
 
@@ -368,7 +377,7 @@ module Skylab::Brazen
       bx.each_pair do | k, single |
         m_i = method_name_p[ k ]
         m_i or next
-        @__methodic_actor_polymorphic_stream__ = Gets_One_Value_Proxy___.new single.value_x
+        @polymorphic_upstream_ = Gets_One_Value_Proxy___.new single.value_x
         keep_parsing = send m_i
         keep_parsing or break
       end
@@ -447,9 +456,9 @@ module Skylab::Brazen
       ok = normalize
       ok &&= __resolve_preconditions
       if ok
-        Brazen_.bound_call nil, self, :produce_result
+        Callback_::Bound_Call.via_receiver_and_method_name self, :produce_result
       else
-        Brazen_.bound_call.via_value ok
+        Callback_::Bound_Call.via_value ok
       end
     end
 
@@ -491,11 +500,12 @@ module Skylab::Brazen
     # ~ accessors for arguments & related experimentals
 
     def to_full_trio_box
+
       bx = Callback_::Box.new
-      _Trio = Trio__[]
       h = @argument_box.h_
       st = formal_properties.to_stream
       prp = st.gets
+
       while prp
         sym = prp.name_symbol
         had = true
@@ -503,9 +513,13 @@ module Skylab::Brazen
           had = false
           nil
         end
-        bx.add sym, _Trio.new( x, had, prp )
+
+        bx.add sym, Callback_::Trio.
+          via_value_and_had_and_property( x, had, prp )
+
         prp = st.gets
       end
+
       bx
     end
 
@@ -528,7 +542,7 @@ module Skylab::Brazen
       def any_trueish k
         x = @argument_box[ k ]
         x and begin
-          Trio__[].new x, true, @fo.fetch( k )
+          Callback_::Trio.via_value_and_property x, @fo.fetch( k )
         end
       end
 
@@ -553,7 +567,7 @@ module Skylab::Brazen
           end
 
           if had_f || had_x
-            Trio__[].new x, had_x, f
+            Callback_::Trio.via_value_and_had_and_property x, had_x, f
           elsif p
             p[]
           else
@@ -563,51 +577,57 @@ module Skylab::Brazen
       end
 
       def to_value_stream
+
         a = @argument_box.a_
         fo = @fo
         h = @argument_box.h_
-        _Trio = Trio__[]
 
         Callback_::Stream.via_times a.length do | d |
+
           k = a.fetch d
-          _Trio.new h.fetch( k ), true, fo.fetch( k )
+          Callback_::Trio.via_value_and_property(
+            h.fetch( k ), fo.fetch( k ) )
         end
       end
     end
 
     def to_trio_box_except__ * i_a  # [cu]
-      _Trio = Trio__[]
+
       fo = formal_properties
       h = @argument_box.h_
       a_ = @argument_box.a_ - i_a
       h_ = {}
+
       a_.each do | k |
-        h_[ k ] = _Trio.new h.fetch( k ), true, fo.fetch( k )
+
+        h_[ k ] = Callback_::Trio.via_value_and_property(
+          h.fetch( k ), fo.fetch( k ) )
       end
+
       Callback_::Box.allocate.init a_, h_
     end
 
     def to_trio_stream
-      _Trio = Trio__[]
+
       fp = formal_properties
       a = @argument_box.a_ ; h = @argument_box.h_
       d = 0 ; len = a.length
+
       Callback_.stream do
+
         if d < len
           k = a.fetch d
           d += 1
-          _Trio.new h.fetch( k ), true, fp.fetch( k )
+          Callback_::Trio.via_value_and_property h.fetch( k ), fp.fetch( k )
         end
       end
     end
 
     def trio sym  # #hook-near model. may soften if needed.
-      Trio__[].new(
-        @argument_box[ sym ], true, formal_properties.fetch( sym ) )
-    end
 
-    Trio__ = -> do
-      Callback_::Trio
+      Callback_::Trio.via_value_and_property(
+        @argument_box[ sym ],
+        formal_properties.fetch( sym ) )
     end
 
     def argument_value sym
@@ -658,17 +678,14 @@ module Skylab::Brazen
 
   public
 
-    def accept_parent_node_ x
-      @parent_node = x ; nil
-    end
-
-    def change_formal_properties x
-      @formal_properties = x
-      nil
-    end
+    # ~ readers for collaborators
 
     def controller_nucleus  # :+#experimental
       [ @kernel, handle_event_selectively ]
+    end
+
+    def is_branch  # 2 of 2
+      false  # for now, every action node is always a terminal (leaf) node
     end
 
     def kernel_
@@ -679,7 +696,20 @@ module Skylab::Brazen
       @preconditions
     end
 
+    # ~ writers for collaborators
+
+    def accept_parent_node_ x
+      @parent_node = x ; nil
+    end
+
+    def change_formal_properties x
+      @formal_properties = x
+      nil
+    end
+
     # (was #note-160)
+
+    # ~ support structures
 
     class Process_customized_action_inflection_behavior__
 

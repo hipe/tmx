@@ -6,8 +6,6 @@ module Skylab::TanMan::TestSupport::Models::DotFile
 
   include Constants
 
-  TanMan_ = TanMan_
-
   class << self
 
     def client_class
@@ -26,4 +24,7 @@ module Skylab::TanMan::TestSupport::Models::DotFile
       true
     end
   end
+
+  Callback_ = Callback_
+  TanMan_ = TanMan_
 end

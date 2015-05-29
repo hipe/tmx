@@ -63,90 +63,53 @@ module Skylab::Snag::TestSupport
         expect_succeeded
       end
 
-      it "2.3x4H (good arg/good opt) (help postfix) (param API)", wip: true do
-        invoke 'todo', '-h'
-        c = output.class::Composite.of output.lines
-        c.unique_stream_name_order_i_a.should eql %i( info )
-        c.full_text.should be_include(
-          'usage: sn0g todo [<action>] [<args> [..]]' )
-        c.full_text.should be_include( 'sub-action help' )
-        c.full_text.should be_include( 'EXPERIMENTAL' )
+      it "2.3x4H (good arg/good opt) (help postfix) (param API)" do
+
+        invoke 'to-do', '-h'
+
+        _st = sout_serr_line_stream_for_contiguous_lines_on_stream :e
+
+        tree = Snag_.lib_.brazen.test_support.CLI::Expect_Section.
+          tree_via_line_stream _st
+
+        cx = tree.children
+
+        cx.first.x.unstyled_header_content.should eql 'usage'
+
+        cx.last.x.unstyled_content.should eql(
+          "use 'sn0g to-do -h <action>' for help on that action." )
+
+        cx[ 1 ].x.unstyled_header_content.should eql 'actions'
+
+        3 == cx.length or fail
+
+        cx = cx[ 1 ].children
+        cx.first.x.line_content.should match(
+          /\A-h, --help \[cmd\] {2,}this screen \(or help for action\)\z/ )
+
+        cx[ 1 ].x.line_content.should match(
+          /\Ato-stream {2,}a report of the ##{}todo's/ )
+
+        cx[ 2 ].x.line_content.should match %r(\Amelt\b)
       end
     end
 
-    context "'numbers' with", wip: true do
+    it "numeric option, yaml" do
 
-      with_invocation 'numbers'
+      invoke 'open', '-1', '--upstream-identifier', Path_alpha_[]
 
-      # with_default_expected_stream_name :pay #see
+      on_stream :o
+      expect '---'
+      expect %r(\Aidentifier[ ]+: \[#005\]\z)
+      expect %r(\Amessage[ ]+: #open \.\z)
 
-      context "a manifest with two good lines" do
+      expect :e, "(one node total)"
 
-        with_manifest <<-O.unindent
-          [#001] foo
-          [#3] bar
-        O
+      expect_no_more_lines
 
-        it "ok" do
-          setup_tmpdir_read_only
-          invoke
-          o '[#001]'
-          o '[#3]'
-          o :info, found_N_valid_of_N_total( 2, 2 )
-          expect_succeeded
-        end
-      end
-
-      context "a manifest with no lines" do
-
-        with_manifest TestSupport_::EMPTY_S_
-
-        it "ok." do
-          setup_tmpdir_read_only
-          invoke
-          o :info, found_N_valid_of_N_total( 0, 0 )
-          expect_succeeded
-        end
-      end
-
-      context "no manifest" do
-
-        with_tmpdir do |o|
-          o.clear
-        end
-
-        it "ok. (note the event is SIGNED TWICE - by both CLI and API!)" do
-          setup_tmpdir_read_only
-          with_API_max_num_dirs 1
-          invoke
-          expect :info,
-            %r(\Afailed to numbers because failed to find manifest file - #{
-              }"[^"]+" not found in \.\z)i
-          expect :info, %r(\Asn0g numbers -h might have more info)i
-          expect_failed
-        end
-      end
-
-      context "a manifest with two good one bad" do
-        with_manifest <<-O.unindent
-          [#01]
-          fml
-          [#99]
-        O
-        it "ok." do
-          setup_tmpdir_read_only
-          invoke
-          o '[#01]'
-          o :info, %r(\bexpecting identifier near fml \(\./doc/issues\.md:2\))i
-          o '[#99]'
-          o :info, found_N_valid_of_N_total( 2, 3 )
-          expect_succeeded
-        end
-      end
-
-      def found_N_valid_of_N_total d, d_
-        "found #{ d } valid of #{ d_ } total nodes."
-      end
+      @exitstatus.should be_zero
     end
   end
 end
+
+# :+#tombstone: specs for the old "numbers" action

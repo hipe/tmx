@@ -43,8 +43,11 @@ module Skylab::Brazen
       end
       CODE_STYLE__ = [ GREEN__ ].freeze
 
-      def hdr string
-        styl HIGHLIGHT_STYLE__, "#{ string }:"
+      def hdr s
+
+        # (trailing colon must not happen here but at [#072])
+
+        styl HIGHLIGHT_STYLE__, "#{ s }"
       end
 
       def highlight string

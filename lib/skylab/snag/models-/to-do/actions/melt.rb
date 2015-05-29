@@ -49,7 +49,7 @@ module Skylab::Snag
 
         def initialize kr, & x_p
 
-          @be_verbose = true  # will probaly go away
+          @be_verbose = true  # will probably go away
 
           @is_dry = nil
           @_kernel = kr
@@ -79,7 +79,7 @@ module Skylab::Snag
           if ! @downstream_identifier
 
             path = Snag_::Models_::Node_Collection.nearest_path(
-              @paths.fetch( 0 ), & @_oes_p )
+              @paths.fetch( 0 ), @filesystem_conduit, & @_oes_p )
 
             if path
               @downstream_identifier = path

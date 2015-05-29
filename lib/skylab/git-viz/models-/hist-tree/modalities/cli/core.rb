@@ -90,7 +90,7 @@ module Skylab::GitViz
             NIL_
           end
 
-          def via_bound_action_mutate_mutable_backbound_iambic x_a
+          def prepare_backstream_call x_a
 
             # :+[#br-049] hacks like these are temporary.
             # this is a :+#frontier for a front-only prop with validation
@@ -118,7 +118,7 @@ module Skylab::GitViz
 
             @bound_call_from_back = bc
 
-            Callback_::Bound_Call.new nil, self, :__render
+            Callback_::Bound_Call.via_receiver_and_method_name self, :__render
           end
 
           def __render

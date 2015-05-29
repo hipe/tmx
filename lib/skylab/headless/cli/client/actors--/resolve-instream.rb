@@ -56,12 +56,15 @@ module Skylab::Headless
       end
 
       def build_path_arg
+
         _prp = resolve_property
-        actuals_has_name = true
+        had = true
         x = @argv.fetch 0 do
-          actuals_has_name = false ; nil
+          had = false
+          nil
         end
-        Headless_.lib_.basic.trio x, actuals_has_name, _prp
+
+        Callback_::Trio.via_value_and_had_and_property x, had, _prp
       end
 
       def resolve_property  # (was: `infile_moniker`)

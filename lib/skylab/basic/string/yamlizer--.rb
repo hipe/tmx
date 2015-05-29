@@ -4,36 +4,64 @@ module Skylab::Basic
 
       class Yamlizer__  # for now covered by [sg]  #todo
 
-        Callback_::Actor.call self, :properties,
-          :output_line_yielder,
-          :field_names
-
         def initialize
-          super
-          init_format
+          NIL_
         end
 
-      private
+        attr_writer :line_downstream
 
-        def init_format
-          _maxlen = @field_names.reduce( 0 ) do |m, i|
-            x = i.to_s.length
-            m > x ? m : x
+        def register_properties
+
+          a = [] ; h = {}
+          p = -> prp, & exp_p do
+            a.push prp
+            h[ prp.name_symbol ] = exp_p
+            NIL_
           end
-          @fmt = "%-#{ _maxlen }s" ; nil
+          p.singleton_class.send :alias_method, :register_property, :call
+          yield p
+          __init_format a
+          @__properties = a
+          @__expressers = h
+
+          NIL_
         end
 
-      public
+        def __init_format prp_a
 
-        def << pairs
-          @output_line_yielder << BAR__
-          pairs.each_pair do |i, s|
-            @output_line_yielder << "#{ @fmt % i } : #{ s }"
+          _maxlen = prp_a.reduce 0 do | m, prp |
+
+            d = prp.name.as_slug.length
+            m > d ? m : d
+          end
+
+          @__fmt = "%-#{ _maxlen }s"
+
+          NIL_
+        end
+
+        def << item
+
+          @line_downstream << BAR___
+
+          @__properties.each do | prp |
+
+            x = item.property_value_via_property prp
+            if x.nil?
+              next  # (alternately we might pass these to the expresser)
+            end
+
+            _p = @__expressers.fetch prp.name_symbol
+
+            s = _p[ x ]
+            if s
+              @line_downstream << "#{ @__fmt % prp.name.as_slug } : #{ s }"
+            end
           end
           self
         end
 
-        BAR__ = '---'.freeze
+        BAR___ = '---'.freeze
       end
 
   end

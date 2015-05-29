@@ -6,13 +6,15 @@ module Skylab::Snag
 
     class << self
 
-      def nearest_path dir, & x_p
+      def nearest_path dir, filesystem, & x_p
 
         fn = COMMON_MANIFEST_FILENAME_
 
         sp = Walk_upwards_to_find_nearest_surrounding_path_[
           dir,
           fn,
+          filesystem,
+          :argument_path_might_be_target_path,
           & x_p ]
 
         if sp
@@ -117,13 +119,16 @@ module Skylab::Snag
 
     end
 
-    Walk_upwards_to_find_nearest_surrounding_path_ = -> s, fn, & x_p do
+    Walk_upwards_to_find_nearest_surrounding_path_ = -> s, fn, fs, * x_a, & x_p do
 
       Snag_.lib_.system.filesystem.walk.new_with(
+
         :filename, fn,
         :max_num_dirs_to_look, 10,  # whatever
         :property_symbol, :dir,
         :start_path, s,
+        :filesystem, fs,
+        * x_a,
         & x_p
       ).find_any_nearest_surrounding_path
     end
