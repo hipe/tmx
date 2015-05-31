@@ -1,18 +1,17 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Core
+module Skylab::Brazen::TestSupport::Pstack
 
-  ::Skylab::Brazen::TestSupport::Entity::Properties_Stack[ TS_ = self ]
+  ::Skylab::Brazen::TestSupport[ TS_ = self ]
 
   include Constants
 
   extend TestSupport_::Quickie
 
-  describe "[br] properties stack" do
+  describe "[br] property - stack" do
 
     extend TS_
-
-    TestLib_::Expect_event[ self ]
+    use :expect_event
 
     it "the empty stack will never find anything" do
       stack = Subject_[].new
@@ -40,10 +39,11 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Core
     it "strange name frame with no event receiver will raise an exeption" do
       stack = Subject_[].new
       stack.push_frame_with :a, :X, :b, :Y
-      -> do
+      begin
         stack.push_frame_with :derp, :Z, :b, :B, :nerp, :Q
-      end.should raise_error ::ArgumentError,
-          %r(\Aunrecognized properties 'derp' and 'nerp')
+      rescue ::ArgumentError => e
+      end
+      e.message.should match %r(\Aunrecognized properties 'derp' and 'nerp')
     end
 
     it "topmost frame wins" do
@@ -70,7 +70,7 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Core
     end
 
     Subject_ = -> do
-      Brazen_.properties_stack
+      Brazen_::Property::Stack
     end
   end
 end

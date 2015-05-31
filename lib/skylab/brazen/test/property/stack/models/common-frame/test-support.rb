@@ -1,25 +1,24 @@
-require_relative '../test-support'
+require_relative '../../../../test-support'
 
-module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Common_Frame
+module Skylab::Brazen::TestSupport::Pstack_Cframe
 
-  ::Skylab::Brazen::TestSupport::Entity::Properties_Stack[ self ]
+  ::Skylab::Brazen::TestSupport[ self ]
 
   include Constants
 
   extend TestSupport_::Quickie
 
-  Brazen_ = Brazen_
-
   module Constants
 
     Subject_ = -> * a do
       if a.length.zero?
-        Brazen_.properties_stack.common_frame
+        Brazen_::Property::Stack.common_frame
       else
-        Brazen_.properties_stack.common_frame.call_via_arglist a
+        Brazen_::Property::Stack.common_frame.call_via_arglist a
       end
     end
   end
 
+  Brazen_ = Brazen_
   Subject_ = Subject_
 end

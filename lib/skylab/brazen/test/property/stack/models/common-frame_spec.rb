@@ -1,8 +1,8 @@
 require_relative 'common-frame/test-support'
 
-module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Common_Frame
+module Skylab::Brazen::TestSupport::Pstack_Cframe
 
-  describe "[br] entity properties stack common frame" do
+  describe "[br] property - stack - common frame" do
 
     it "loads." do
 
@@ -11,12 +11,17 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Common_Frame
     end
 
     it "whines on weirdness" do
+
       _rx = /\bunrecognized property 'weirdness'/
-      -> do
-        module Foo_Thing
+
+      begin
+        class Foo_Thing
           Subject_[ self, :weirdness ]
         end
-      end.should raise_error ::ArgumentError, _rx
+      rescue ::ArgumentError => e
+      end
+
+      e.message.should match _rx
     end
 
     context "a class with one property, a `method` macro" do
@@ -25,7 +30,7 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Common_Frame
 
         class CF_One_Property
 
-          Brazen_.properties_stack.common_frame self,
+          Brazen_::Property::Stack.common_frame self,
             :method, :foo_diddle
 
           def foo_diddle
@@ -75,7 +80,7 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Common_Frame
       it "loads" do
       end
 
-      it "reads (fresh call each time), makes reader methods too" do
+      it "reads (fresh call each time), makes reader methods too", f:true do
         entity = CF_Prop_Simple.new { }
         entity.property_value_via_symbol( :wiz_waz ).should eql "wiz waz: 1"
         entity.property_value_via_symbol( :wiz_waz ).should eql "wiz waz: 2"
@@ -115,11 +120,17 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Common_Frame
     context "`memoized` cannot be used on" do
 
       it "`method`" do
+
         _rx = /\Apre-existing methods cannot be memoized\b/
-        CF_Memoized_Method = ::Module.new
-        -> do
+
+        CF_Memoized_Method = ::Class.new
+
+        begin
           Subject_.call CF_Memoized_Method, :memoized, :method, :jib_jab
-        end.should raise_error ::ArgumentError, _rx
+        rescue ::ArgumentError => e
+        end
+
+        e.message.should match _rx
       end
     end
 
@@ -238,9 +249,11 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Common_Frame
 
         entity.respond_to?( :bar ).should eql false
 
-        -> do
+        begin
           entity.property_value_via_symbol :bar
-        end.should raise_error %r(\Aproperty is not readable - 'bar'\z)
+        rescue ::NameError => e
+        end
+        e.message.should match %r(\Aproperty is not readable - 'bar'\z)
       end
 
       it "when non-required fields missing" do
@@ -250,10 +263,15 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Common_Frame
       end
 
       it "when required field missing" do
+
         _rx = /\Amissing required field - 'baz'\z/
-        -> do
+
+        begin
           CF_Field_Required.new
-        end.should raise_error ::ArgumentError, _rx
+        rescue ::ArgumentError => e
+        end
+
+        e.message.should match _rx
       end
     end
 
@@ -275,10 +293,15 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Common_Frame
       end
 
       it "when no" do
+
         _rx = /\Amissing required field - 'foo'\z/
-        -> do
+
+        begin
           CF_Field_Required_.new
-        end.should raise_error ::ArgumentError, _rx
+        rescue ::ArgumentError => e
+        end
+
+        e.message.should match _rx
       end
     end
   end

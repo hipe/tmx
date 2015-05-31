@@ -1,56 +1,63 @@
 module Skylab::Brazen
 
-  class Entity::Properties_Stack__  # :[#057].
+  module Property  # :+#stowaway
 
     class << self
 
       def build_ambiguous_property_event *a
-        Build_ambiguous_property_event__[ *a ]
+        Build_ambiguous_property_event___[ *a ]
       end
 
-      def build_extra_properties_event *a
-        Build_extra_properties_event__[ *a ]
+      def build_extra_values_event *a
+        Build_extra_properties_event___[ *a ]
       end
 
       def build_missing_required_properties_event *a
-        Build_missing_required_properties_event__[ *a ]
+        Build_missing_required_properties_event___[ *a ]
       end
+    end # >>
+  end
 
+  class Property::Stack  # :[#057].
+
+    class << self
       def common_frame * a
         if a.length.zero?
-          self::Common_Frame__
+          Pstack_::Models_::Common_Frame
         else
-          self::Common_Frame__.call_via_arglist a
+          Pstack_::Models_::Common_Frame.call_via_arglist a
         end
       end
-    end
-
-    DEFAULT_PROPERTY_LEMMA__ = 'property'.freeze
+    end  # >>
 
     def initialize namelist=nil, & oes_p
       @a = []
       @d = -1
       @on_event_selectively = oes_p
       if namelist
-        push_frame Pstack_::Models__::Name_frame_via_namelist[ namelist ]
+        push_frame Pstack_::Models_::Name_frame_via_namelist[ namelist ]
       end
     end
 
-    def property_value_via_symbol i
-      pptr = any_proprietor_of i
+    def property_value_via_symbol sym
+
+      pptr = any_proprietor_of sym
+
       if pptr
-        pptr.property_value_via_symbol i
+
+        pptr.property_value_via_symbol sym
+
       else
         maybe_send_event :error, :extra_properties do
-          bld_extra_properties_event [ i ]
+          _build_extra_properties_event [ sym ]
         end
       end
     end
 
-    def any_proprietor_of i
+    def any_proprietor_of sym
       d = @d
       while -1 != d
-        x = @a.fetch( d ).any_proprietor_of i
+        x = @a.fetch( d ).any_proprietor_of sym
         x and break
         d -= 1
       end
@@ -58,11 +65,11 @@ module Skylab::Brazen
     end
 
     def push_frame_with * x_a
-      push_frame Pstack_::Models__::Frame_via_iambic[ x_a ]
+      push_frame Pstack_::Models_::Frame_via_iambic[ x_a ]
     end
 
     def push_frame_via_box bx
-      push_frame Pstack_::Models__::Frame_via_box[ bx ]
+      push_frame Pstack_::Models_::Frame_via_box[ bx ]
     end
 
     def push_frame x
@@ -88,12 +95,12 @@ module Skylab::Brazen
 
     def when_xtra xtra_a
       maybe_send_event :error, :extra_properties do
-        bld_extra_properties_event xtra_a
+        _build_extra_properties_event xtra_a
       end
     end
 
-    def bld_extra_properties_event xtra_a
-      Pstack_.build_extra_properties_event xtra_a
+    def _build_extra_properties_event xtra_a
+      Property.build_extra_values_event xtra_a
     end
 
     def maybe_send_event * i_a, & ev_p
@@ -104,15 +111,12 @@ module Skylab::Brazen
       end
     end
 
-    # ~
+    Pstack_ = self
+  end
 
-    Bound_properties = -> bp_p, properties do
-      properties.to_stream.map_by do |prop|
-        bp_p[ prop ]
-      end.flush_to_immutable_with_random_access_keyed_to_method :name_symbol
-    end
+  module Property  # re-open
 
-    Build_ambiguous_property_event__ = -> ent_a, x, lemma_x=nil do
+    Build_ambiguous_property_event___ = -> ent_a, x, lemma_x=nil do
 
       _slug_a = ent_a.map do | ent |
         ent.name.as_slug
@@ -126,7 +130,7 @@ module Skylab::Brazen
         end
       end
 
-      Brazen_.event.inline_with( :ambiguous_property,
+      Callback_::Event.inline_with( :ambiguous_property,
         :x, x,
         :name_s_a, _slug_a,
         :name, _name,
@@ -144,9 +148,9 @@ module Skylab::Brazen
       end
     end
 
-    Build_extra_properties_event__ = -> name_x_a, did_you_mean_i_a=nil, lemma=nil, adj=nil do
+    Build_extra_properties_event___ = -> name_x_a, did_you_mean_i_a=nil, lemma=nil, adj=nil do
 
-      Brazen_.event.inline_with :extra_properties,
+      Callback_::Event.inline_with :extra_properties,
           :name_x_a, name_x_a,
           :did_you_mean_i_a, did_you_mean_i_a,
           :lemma, lemma,
@@ -163,6 +167,8 @@ module Skylab::Brazen
           adj_ = "#{ adj } "
         end
 
+        # e.g: "unrecognized property 'foo'"
+
         y << "#{ adj_ }#{ plural_noun s_a.length, _lemma }#{
           } #{ and_ s_a }"
 
@@ -173,9 +179,9 @@ module Skylab::Brazen
       end
     end
 
-    Build_missing_required_properties_event__ = -> miss_a, lemma=nil, nv=nil do
+    Build_missing_required_properties_event___ = -> miss_a, lemma=nil, nv=nil do
 
-      Brazen_.event.inline_with :missing_required_properties,
+      Callback_::Event.inline_with :missing_required_properties,
           :miss_a, miss_a,
           :lemma, lemma,
           :nv, nv,
@@ -197,6 +203,7 @@ module Skylab::Brazen
       end
     end
 
-    Pstack_ = self
+    DEFAULT_PROPERTY_LEMMA__ = 'property'.freeze
+
   end
 end

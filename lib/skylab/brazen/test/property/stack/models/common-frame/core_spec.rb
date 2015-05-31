@@ -1,14 +1,14 @@
 require_relative 'test-support'
 
-module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Common_Frame
+module Skylab::Brazen::TestSupport::Pstack_Cframe
 
-  describe "[br] Entity::Properties_Stack__::Common_Frame__" do
+  describe "[br] property - stack - common frame" do
 
     context "you can define [non-]memoized { proc | inline } methods" do
 
       before :all do
         class Foo
-          Brazen_.properties_stack.common_frame self,
+          Brazen_::Property::Stack.common_frame self,
             :proc, :foo, -> do
                d = 0
                -> { d += 1 }
@@ -50,7 +50,7 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Common_Frame
 
       before :all do
         class Bar
-          Brazen_.properties_stack.common_frame self,
+          Brazen_::Property::Stack.common_frame self,
             :globbing, :processor, :initialize,
             :required, :readable, :field, :foo,
             :readable, :field, :bar

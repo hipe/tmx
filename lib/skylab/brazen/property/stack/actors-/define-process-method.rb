@@ -1,72 +1,93 @@
 module Skylab::Brazen
 
-  module Entity
+  class Property::Stack
 
-    class Properties_Stack__
+    Actors_ = ::Module.new
 
-      class Define_process_method_  # rewrite of [#mh-060]
+    # ->
 
-        Callback_::Actor.methodic self
+      class Actors_::Define_process_method  # rewrite of [#mh-060]
 
-        def initialize parse_context
-          @is_complete = false
-          @is_globbing = false
-          @parse_context = parse_context
+        Callback_::Actor.methodic self, :properties, :sess
+
+        class << self
+          def [] * a, & x_p
+            call_via_arglist a, & x_p
+          end
+        end  # >>
+
+        def initialize & edit_p
+
+          @_is_complete = false
+          @_is_globbing = false
+          instance_exec( & edit_p )
         end
 
         def execute
-          keep_parsing = process_polymorphic_stream_passively @parse_context.upstream
-          if @is_complete
-            via_parse_context_flush
-          elsif keep_parsing
-            when_incomplete
+
+          kp = process_polymorphic_stream_passively @sess.upstream
+
+          if @_is_complete
+
+            __via_parse_context_flush
+
+          elsif kp
+
+            self._DESIGN_ME__when_incomplete
+
           else
-            keep_parsing
+            kp
           end
         end
 
       private
 
         def globbing=
-          @is_globbing = true
+
+          @_is_globbing = true
           KEEP_PARSING_
         end
 
         def processor=
-          @is_complete = true
-          @method_name = gets_one_polymorphic_value
+
+          @_is_complete = true
+          @_method_name = gets_one_polymorphic_value
           STOP_PARSING_
         end
 
-        def when_incomplete
-          self._RIDE_ME
-          @parse_context.edit_session.maybe_receive_event :error, :incomplete
-        end
+        def __via_parse_context_flush
 
-        def via_parse_context_flush
-          ent_class = @parse_context.edit_session.polymorphic_writer_method_writee_module
-          is_globbing = @is_globbing
-          method_name = @method_name
+          ent_class = @sess.client
+
+          do_glob = @_is_globbing
+          m = @_method_name
+
           ent_class.class_exec do
-            @active_entity_edit_session.while_ignoring_method_added do
-              if is_globbing
-                define_method method_name do | * x_a |
-                  _keep_parsing = process_polymorphic_stream_fully(
-                    polymorphic_stream_via_iambic x_a )
-                  _keep_parsing && normalize
-                end
-              else
-                define_method method_name do | x_a |
-                  _keep_parsing = process_polymorphic_stream_fully(
-                    polymorphic_stream_via_iambic x_a )
-                  _keep_parsing && normalize
-                end
+
+            if do_glob
+
+              define_method m do | * x_a |
+
+                _kp = process_polymorphic_stream_fully(
+                  Callback_::Polymorphic_Stream.via_array x_a )
+
+                _kp && normalize
+              end
+
+            else
+
+              define_method m do | x_a |
+
+                _kp = process_polymorphic_stream_fully(
+                  Callback_::Polymorphic_Stream.via_array x_a )
+
+                _kp && normalize
               end
             end
           end
           ACHIEVED_
         end
       end
-    end
+      # <-
   end
 end

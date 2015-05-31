@@ -1,14 +1,12 @@
 module Skylab::Brazen
 
-  module Entity
-
-    class Properties_Stack__
+  class Property::Stack
 
       # enhance a class as a `common_frame`
       # you can define [non-]memoized { proc | inline } methods
       #
       #     class Foo
-      #       Brazen_.properties_stack.common_frame self,
+      #       Brazen_::Property::Stack.common_frame self,
       #         :proc, :foo, -> do
       #            d = 0
       #            -> { d += 1 }
@@ -52,35 +50,69 @@ module Skylab::Brazen
       #     foo.baz  # => "<5>"
       #     foo.baz.object_id  # => foo.baz.object_id
 
+      Models_::Common_Frame = Brazen_::Entity.call do
 
-      Common_Frame__ = Entity_.call do
+        # (really we want the below thing to be its own nonterminal mixed
+        # in with the other nonterminals of the session, but we don't have
+        # an API for that yet..)
+
+        o(
+          :ad_hoc_processor, :globbing, -> sess do
+            sess.upstream.backtrack_one
+            Pstack_::Actors_::Define_process_method[ sess ]
+          end,
+
+          :ad_hoc_processor, :processor, -> sess do
+            sess.upstream.backtrack_one
+            Pstack_::Actors_::Define_process_method[ sess ]
+          end
+        )
+      end
+
+      module Models_::Common_Frame
 
         class << self
 
           def call_via_arglist x_a
+
             st = Callback_::Polymorphic_Stream.via_array x_a
-            client_cls = st.gets_one
-            self[ client_cls ]
-            client_cls.edit_entity_class do |sess|
-              sess.receive_edit st  # on success result is client class
-            end  # result is same
-            nil
+
+            cls = st.gets_one
+
+            cls.class_exec do
+
+              define_singleton_method :receive_entity_property, RP_METH___
+
+              define_method :normalize, NORMALIZE_METH___
+
+              define_method :receive_missing_required_properties_array,
+                RMRP_METH___
+            end
+
+            Entity::Edit_client_class_via_polymorphic_stream_over_extmod[
+              cls, st, self ]
+
+            NIL_
+          end
+        end  # >>
+
+        self::Property = ::Class.new Brazen_::Entity::Property
+
+        RP_METH___ = -> prp do
+
+          p_a = prp._against_EC_p_a
+
+          if p_a
+            kp = true
+            p_a.each do | p |
+              kp = class_exec prp, & p
+              kp or break
+            end
+            kp
+          else
+            KEEP_PARSING_
           end
         end
-
-        o :ad_hoc_processor, :globbing, -> pc do
-            Properties_Stack__::Define_process_method_.new( pc ).execute
-          end,
-
-          :ad_hoc_processor, :processor, -> pc do
-            Properties_Stack__::Define_process_method_.new( pc ).execute
-          end
-
-        entity_property_class_for_write
-
-      end  # end the edit sesson of the extension module
-
-      module Common_Frame__  # open it with lexical scope and no edit session
 
         def any_all_names
           all_names
@@ -91,35 +123,57 @@ module Skylab::Brazen
         end
 
         def all_names
-          self.class.entity_formal_property_method_names_box_for_read.get_names
+          self.class.properties.get_names
         end
 
         def any_proprietor_of i
-          if self.class.entity_formal_property_method_names_box_for_read.has_name i
+          if self.class.properties.has_name i
             self
           end
         end
 
         def property_value_via_symbol name_i
-          prop = self.class.property_via_symbol name_i
-          p = prop.external_read_proc
+
+          prp = self.class.properties.fetch name_i
+
+          p = prp.external_read_proc
           if p
-            p[ self, prop ]
+            p[ self, prp ]
           else
-            prp_val_when_property_not_readable prop
+            __property_value_when_property_not_readable prp
           end
         end
 
-      private
+        def __property_value_when_property_not_readable prp
 
-        def prp_val_when_property_not_readable prop
           maybe_send_event :error, :property_is_not_readable do
-            build_not_OK_event_with :property_is_not_readable, :property, prop
+
+            Callback_::Event.inline_not_OK_with(
+              :property_is_not_readable,
+              :property, prp,
+              :error_category, :name_error )
           end
         end
 
-        def set_val_of_property x, prop
-          instance_variable_set prop.as_ivar, x
+        def fetch_property_value_via_property prp, & else_p  # #hook-near
+
+          ivar = prp.ivar
+
+          if instance_variable_defined? ivar
+            instance_variable_get ivar
+          elsif else_p
+            else_p[]
+          else
+            raise ::NameError, __say_no_ivar( ivar )
+          end
+        end
+
+        def __say_no_ivar ivar
+          "instance variable #{ ivar } not defined"
+        end
+
+        def _set_value_of_property x, prp
+          instance_variable_set prp.as_ivar, x
           ACHIEVED_
         end
 
@@ -127,7 +181,7 @@ module Skylab::Brazen
           raise ev_p[].to_exception
         end
 
-        class Entity_Property
+        class Property
 
           def initialize
             @is_memoized = false
@@ -141,12 +195,12 @@ module Skylab::Brazen
             if @reader_classification.nil?
               @reader_classification = :no_reader
             end
-            read_name
+            _read_name
           end
 
           def inline_method=
             @reader_classification = :inline_method
-            read_name
+            _read_name
             @literal_proc = gets_one_polymorphic_value
             STOP_PARSING_
           end
@@ -158,12 +212,12 @@ module Skylab::Brazen
 
           def method=
             @reader_classification = :method
-            read_name
+            _read_name
           end
 
           def proc=
             @reader_classification = :proc
-            read_name
+            _read_name
             @literal_proc = gets_one_polymorphic_value
             STOP_PARSING_
           end
@@ -173,24 +227,38 @@ module Skylab::Brazen
             KEEP_PARSING_
           end
 
-          def read_name
+          def _read_name
             @name = Callback_::Name.via_variegated_symbol gets_one_polymorphic_value
             STOP_PARSING_
           end
 
           def required=
+
             @parameter_arity = :one
-            @did_hack_for_required_check ||= begin
-              during_apply do
-                include When_Parameter_Arity_Of_One_Instance_Methods__
-                p_a = normz_for_wrt
-                p = Missing_required_check_do_this_once__
-                if ! p_a.include? p
-                  define_singleton_method :reqrd_prop_a, REQUIRED_PROP_METHOD__
-                  p_a.push p
+
+            @___did_add_required_check ||= __add_required_check
+            KEEP_PARSING_
+          end
+
+          def __add_required_check
+
+            _during_apply do
+
+              if const_defined? NORM_BOX__
+                nb = const_get NORM_BOX__
+                if ! const_defined? NORM_BOX__, false
+                  const_set NORM_BOX__, nb.dup
                 end
-                KEEP_PARSING_
+              else
+                nb = Callback_::Box.new
+                const_set NORM_BOX__, nb
               end
+
+              nb.touch :__check_for_missing_requireds__ do
+                Check_for_missing_requireds___
+              end
+
+              KEEP_PARSING_
             end
             KEEP_PARSING_
           end
@@ -206,35 +274,29 @@ module Skylab::Brazen
 
         public  # ~ internal
 
-          attr_reader :against_EC_p_a  # #hook-over
+          attr_reader :_against_EC_p_a
 
-          def during_apply & p
-            ( @against_EC_p_a ||= [] ).push p ; nil
+          def _during_apply & p
+            ( @_against_EC_p_a ||= [] ).push p ; nil
           end
 
-          def set_argument_arity x
+          def __set_argument_arity x
             @argument_arity = x ; nil
           end
 
           attr_reader :external_read_proc
 
-          def external_read & p
+          def __external_read & p
             @external_read_proc = p ; nil
           end
 
-          def set_polymorphic_writer_method_name x
-            @iwmn = x ; nil
+          def __set_polymorphic_writer_method_proc_is_generated x
+
+            @has_custom_polymorphic_writer_method = ! x
+            NIL_
           end
 
-          def set_polymorphic_writer_method_proc_is_generated x
-            @polymorphic_writer_method_proc_is_generated = x ; nil
-          end
-
-          def set_polymorphic_writer_method_proc_proc x
-            @polymorphic_writer_method_proc_proc = x ; nil
-          end
-
-          def set_internal_read_proc & p
+          def __set_internal_read_proc & p
             @internal_read_proc = p ; nil
           end
 
@@ -252,7 +314,7 @@ module Skylab::Brazen
     # [ `required` ] `field`s -
     #
     #     class Bar
-    #       Brazen_.properties_stack.common_frame self,
+    #       Brazen_:Property::Stack.common_frame self,
     #         :globbing, :processor, :initialize,
     #         :required, :readable, :field, :foo,
     #         :readable, :field, :bar
@@ -279,43 +341,43 @@ module Skylab::Brazen
     #     Bar.new( :foo, :x, :bar, nil ).bar  # => nil
     #
 
-        Common_Methods__ = ::Module.new
-
         READER_TECHNIQUE__ = {}
 
         # ~ inline method
 
-        module Read_via_Inline_Method__ extend Common_Methods__
+        module Read_via_Inline_Method__
 
           READER_TECHNIQUE__[ :inline_method ] = self
 
           class << self
 
-            def [] prop
-              common_setup prop
-              if prop.is_memoized
-                when_memoized prop
+            def [] prp
+              Edit_property_common__[ prp ]
+              if prp.is_memoized
+                when_memoized prp
               else
-                when_not_memoized prop
+                when_not_memoized prp
               end
             end
 
-            def when_not_memoized prop
-              Read_via_Method_.write_external_read_proc prop
-              prop.during_apply do | prop_ |
-                @active_entity_edit_session.while_ignoring_method_added do
-                  define_method prop_.name_symbol, prop_.literal_proc ; nil
-                end
-                ACHIEVED_
+            def when_not_memoized prp
+
+              Read_via_Method_.write_external_read_proc prp
+
+              prp._during_apply do | prp_ |
+
+                define_method prp_.name_symbol, prp_.literal_proc
+                KEEP_PARSING_
               end
+
               ACHIEVED_
             end
 
-            def when_memoized prop  # (was: [#062] "i just blue myself")
-              _METH_I_ = prop.name_symbol
+            def when_memoized prp  # (was: [#062] "i just blue myself")
+              _METH_I_ = prp.name_symbol
               _METHOD_NAME = :"__NON_MEMOIZED_#{ _METH_I_ }"
               _IVAR = :"@use_memoized_#{ _METH_I_  }"
-              _IVAR_ = prop.as_ivar
+              _IVAR_ = prp.as_ivar
               _METH_P = -> do
                 if instance_variable_defined?( _IVAR ) and instance_variable_get( _IVAR )
                   instance_variable_get _IVAR_
@@ -324,47 +386,52 @@ module Skylab::Brazen
                   instance_variable_set _IVAR_, send( _METHOD_NAME )
                 end
               end
-              prop.during_apply do | prop_ |
-                @active_entity_edit_session.while_ignoring_method_added do
-                  define_method _METHOD_NAME, prop_.literal_proc
-                  define_method _METH_I_, _METH_P
-                end
-                ACHIEVED_
+              prp._during_apply do | prp_ |
+
+                define_method _METHOD_NAME, prp_.literal_proc
+
+                define_method _METH_I_, _METH_P
+
+                KEEP_PARSING_
               end
-              Read_via_Method_.write_external_read_proc prop
+              Read_via_Method_.write_external_read_proc prp
             end
           end
         end
 
         # ~ method
 
-        module Read_via_Method_ extend Common_Methods__
+        module Read_via_Method_
 
           READER_TECHNIQUE__[ :method ] = self
 
           class << self
 
-            def [] prop
-              common_setup prop
-              if prop.is_memoized
-                raise ::ArgumentError, say_no_memo_meth
+            def [] prp
+              Edit_property_common__[ prp ]
+              if prp.is_memoized
+                raise ::ArgumentError, __say_no_memo_meth
               else
-                write_external_read_proc prop
+                write_external_read_proc prp
                 ACHIEVED_
               end
             end
 
-            def say_no_memo_meth
+            def __say_no_memo_meth
               "pre-existing methods cannot be memoized - won't overwrite #{
-               }original mehtod and won't allow original method and reader #{
+               }original method and won't allow original method and reader #{
                 }proc to have different behavior."
             end
 
-            def write_external_read_proc prop
-              _READ_METHOD_NAME = prop.name_symbol
-              prop.external_read do | entity |
+            def write_external_read_proc prp
+
+              _READ_METHOD_NAME = prp.name_symbol
+
+              prp.__external_read do | entity |
+
                 entity.__send__ _READ_METHOD_NAME
               end
+
               ACHIEVED_
             end
           end
@@ -374,7 +441,7 @@ module Skylab::Brazen
 
         READER_TECHNIQUE__[ :proc ] = -> _PROP do
 
-          COMMON_SETUP_[ _PROP ]
+          Edit_property_common__[ _PROP ]
 
           _MONADIC_P_ = if _PROP.is_memoized
             Callback_.memoize( & _PROP.literal_proc )
@@ -382,11 +449,9 @@ module Skylab::Brazen
             _PROP.literal_proc
           end
 
-          _PROP.during_apply do
-            @active_entity_edit_session.while_ignoring_method_added do
-              define_method _PROP.name_symbol, _MONADIC_P_
-            end
-            ACHIEVED_
+          _PROP._during_apply do
+            define_method _PROP.name_symbol, _MONADIC_P_
+            KEEP_PARSING_
           end
 
           Read_via_Method_.write_external_read_proc _PROP
@@ -394,82 +459,141 @@ module Skylab::Brazen
 
         # ~ [no] reader
 
-        READER_TECHNIQUE__[ :reader ] = -> prop do
+        READER_TECHNIQUE__[ :reader ] = -> prp do
 
-          COMMON_SETUP_[ prop ]
+          Edit_property_common__[ prp ]
 
-          _WRITER_METHOD_NAME = prop.via_name_build_internal_polymorphic_writer_meth_nm
+          _WRITER_METHOD_NAME = prp.conventional_polymorphic_writer_method_name
 
-          prop.during_apply do | prop_ |
+          prp._during_apply do | prp_ |
 
-            @active_entity_edit_session.while_ignoring_method_added do
-
-              define_method prop_.name_symbol do
-                any_property_value_via_property prop_
-              end
-
-              define_method _WRITER_METHOD_NAME do
-                set_val_of_property gets_one_polymorphic_value, prop_
-              end
-
+            define_method prp_.name_symbol do
+              fetch_property_value_via_property prp_ do end
             end
-            ACHIEVED_
+
+            define_method _WRITER_METHOD_NAME do
+              _set_value_of_property gets_one_polymorphic_value, prp_
+            end
+
+            KEEP_PARSING_
           end
 
-          prop.set_polymorphic_writer_method_name _WRITER_METHOD_NAME
+          prp.set_polymorphic_writer_method_name _WRITER_METHOD_NAME
 
-          Read_via_Method_.write_external_read_proc prop
+          Read_via_Method_.write_external_read_proc prp
         end
 
-        READER_TECHNIQUE__[ :no_reader ] = -> prop do
-          COMMON_SETUP_[ prop ]
-          prop.set_internal_read_proc do | entity, prop_ |
-            entity.any_property_value_via_property prop_
+        READER_TECHNIQUE__[ :no_reader ] = -> prp do
+
+          Edit_property_common__[ prp ]
+
+          prp.__set_internal_read_proc do | entity, prp_ |
+
+            entity.fetch_property_value_via_property prp_ do end
           end
 
-          _WRITER_METHOD_NAME = prop.via_name_build_internal_polymorphic_writer_meth_nm
+          _WRITER_METHOD_NAME = prp.conventional_polymorphic_writer_method_name
 
-          prop.during_apply do | prop_ |
+          prp._during_apply do | prp_ |
 
-            @active_entity_edit_session.while_ignoring_method_added do
-
-              define_method _WRITER_METHOD_NAME do
-                set_val_of_property gets_one_polymorphic_value, prop_
-              end
+            define_method _WRITER_METHOD_NAME do
+              _set_value_of_property gets_one_polymorphic_value, prp_
             end
           end
 
-          prop.set_polymorphic_writer_method_name _WRITER_METHOD_NAME
+          prp.set_polymorphic_writer_method_name _WRITER_METHOD_NAME
 
-          ACHIEVED_
+          KEEP_PARSING_
         end
 
         # ~ support
 
-        COMMON_SETUP_ = -> prop do
-          prop.set_argument_arity :_not_applicable_
-          prop.set_polymorphic_writer_method_proc_is_generated false
-          prop.set_polymorphic_writer_method_proc_proc nil
-          nil
+        Edit_property_common__ = -> prp do
+
+          prp.__set_argument_arity :_not_applicable_
+          prp.__set_polymorphic_writer_method_proc_is_generated false
+
+          NIL_
         end
 
-        module Common_Methods__
-          define_method :common_setup, COMMON_SETUP_
-        end
+        NORMALIZE_METH___ = -> do
 
-        Missing_required_check_do_this_once__ = -> entity do
-          _prop_a = entity.class.reqrd_prop_a
-          miss_a = _prop_a.reduce nil do | m, prop |
-            x = entity.val_via_prop prop
-            if x.nil?
-              ( m ||= [] ).push prop
-            end
-            m
+          cls = self.class
+          if cls.const_defined? NORM_BOX__
+            nb = cls.const_get NORM_BOX__
           end
+
+          kp = true
+          if nb
+            nb.each_value do | p |
+              kp = p[ self ]
+              kp or break
+            end
+          end
+          kp
+        end
+
+        NORM_BOX__ = :NORM_BOX___
+
+        Check_for_missing_requireds___ = -> entity do  # near [#087]
+
+          miss_a = nil
+
+          entity.class.properties.each_value do | prp |
+
+            prp.is_required or next
+
+            p = prp.external_read_proc
+
+            x = entity.fetch_property_value_via_property prp do end
+
+            if false
+
+            x = if p
+              p[ entity, prp ]
+            else
+              prp.internal_read_proc[ entity, prp ]
+            end
+            end
+
+            if x.nil?
+              ( miss_a ||= [] ).push prp
+            end
+          end
+
           if miss_a
-            entity.receive_missing_required_props miss_a
+            entity.receive_missing_required_properties_array miss_a
           else
             KEEP_PARSING_
+          end
+        end
+
+        RMRP_METH___ = -> miss_a do  # `receive_missing_required_properties_array` etc
+
+          _ev = Build_missing_requireds_event___[ miss_a ]
+          raise _ev.to_exception
+          # maybe_send_event # :error, :missing_required_properties do
+        end
+
+        Build_missing_requireds_event___ = -> miss_prp_a do
+
+          Callback_::Event.inline_not_OK_with(
+
+            :missing_required_properties,
+            :error_category, :argument_error,
+            :miss_a, miss_prp_a
+
+          ) do | y, o |
+
+            s_a = o.miss_a.map do |prp|
+              par prp
+            end
+
+            1 == s_a.length or ( op, cp = %w[ ( ) ] )
+
+            _x = "#{ op }#{ s_a * ', ' }#{ cp }"
+
+            y << "missing required field#{ s s_a } - #{ _x }"
           end
         end
 
@@ -477,47 +601,9 @@ module Skylab::Brazen
           @reqd_prop_a ||= properties.reduce_by( & :is_required ).to_a.freeze
         end
 
-        module When_Parameter_Arity_Of_One_Instance_Methods__
-
-          def val_via_prop prop
-            p = prop.external_read_proc
-            if p
-              p[ self, prop ]
-            else
-              prop.internal_read_proc[ self, prop ]
-            end
-          end
-
-          def receive_missing_required_props miss_prop_a
-            maybe_send_event :error, :missing_required_properties do
-              bld_missing_required_properties_event miss_prop_a
-            end
-          end
-
-        private
-
-          def bld_missing_required_properties_event miss_prop_a
-            build_not_OK_event_with :missing_required_properties,
-                :error_category, :argument_error,
-                :miss_a, miss_prop_a do |y, o|
-
-              s_a = o.miss_a.map do |prop|
-                par prop
-              end
-
-              1 == s_a.length or ( op, cp = %w[ ( ) ] )
-
-              _x = "#{ op }#{ s_a * ', ' }#{ cp }"
-
-              y << "missing required field#{ s s_a } - #{ _x }"
-            end
-          end
-
-          def build_not_OK_event_with * i_a, & msg_p
-            Entity_.event.inline_not_OK_via_mutable_iambic_and_message_proc i_a, msg_p
-          end
-        end
+        CF_ = self
       end
-    end
+
+      # <-
   end
 end

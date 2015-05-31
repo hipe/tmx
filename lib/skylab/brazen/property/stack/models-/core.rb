@@ -1,8 +1,8 @@
 module Skylab::Brazen
 
-  class Entity::Properties_Stack__
+  class Property::Stack
 
-    module Models__
+    module Models_
 
       Frame_via_Box__ = ::Class.new
 

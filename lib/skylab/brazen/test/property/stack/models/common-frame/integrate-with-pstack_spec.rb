@@ -1,20 +1,12 @@
 require_relative 'test-support'
 
-module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Common_Frame::IWP
+module Skylab::Brazen::TestSupport::Pstack_Cframe
 
-  ::Skylab::Brazen::TestSupport::Entity::Properties_Stack::Common_Frame[ self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  Brazen_ = Brazen_ ; Subject_ = Subject_
-
-  describe "[br] properties stack common frame - integrate with pstack" do
+  describe "[br] property - stack - common frame - integrate with pstack" do
 
     before :all do
 
-      class Base_Frame
+      class IWP_Base_Frame
 
         Subject_.call self,
 
@@ -48,13 +40,15 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Common_Frame::IWP
     end
 
     it "ok" do
-      frame = Base_Frame.new {}
-      stack = Brazen_.properties_stack.new
+      frame = IWP_Base_Frame.new {}
+      stack = Brazen_::Property::Stack.new
       stack.push_frame frame
       stack.push_frame_with :foo, :FOO
       stack.property_value_via_symbol( :foo ).should eql :FOO
       stack.property_value_via_symbol( :bar ).should eql 1
       stack.property_value_via_symbol( :bar ).should eql 1
+
+      stack.property_value_via_symbol( :baz ).should eql 'baz.'
       stack.property_value_via_symbol( :boffo ).should eql "Foo: 1"
     end
   end
