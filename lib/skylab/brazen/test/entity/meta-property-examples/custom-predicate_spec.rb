@@ -14,9 +14,7 @@ module Skylab::Brazen::TestSupport::Entity
 
             :meta_property, :arety
 
-          entity_property_class_for_write
-
-          class self::Entity_Property
+          self::Property.class_exec do
 
             def is_necessary
               arety == :"1"
@@ -30,7 +28,6 @@ module Skylab::Brazen::TestSupport::Entity
             end
           end
         end
-
 
         class MPEC_Business_Widget
 

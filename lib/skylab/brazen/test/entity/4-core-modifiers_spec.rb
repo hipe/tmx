@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity DSL compound flush" do
+  describe "[br] entity - 4. core modifiers" do
 
     it "minimal" do
 

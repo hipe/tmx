@@ -2,11 +2,15 @@ module Skylab::Brazen
 
   module Entity
 
-    module Small_Time_Actors__
+    module Concerns_::Property
 
-      class Prop_desc_wonderhack
+      Small_Time_Actors = ::Module.new
+      class Small_Time_Actors::Prop_desc_wonderhack
 
-        Callback_::Actor[ self, :properties, :expag, :prop ]
+        Callback_::Actor.call self, :properties,
+
+          :expag,
+          :property
 
         def execute
 
@@ -15,38 +19,30 @@ module Skylab::Brazen
           # are the [meta] meta properties of interest (derived from
           # set arithmetic on ivars and classes SO FRAGILE SO FUN)
 
-          _i_a = @prop.class.polymorphic_writer_method_name_dictionary.keys
+          prp = @property
 
-          _i_a_ = @prop.instance_variables.map do | ivar |
+          mine = _of prp.class
+
+          base = _of Callback_::Actor::Methodic::Property
+
+          uniq = mine - base
+
+          ivars = prp.instance_variables.map do | ivar |
             ivar.id2name[ 1 .. -1 ].intern
           end
 
-          existent = _i_a & _i_a_
+          set = ivars & uniq
 
-          rx = /=$/
-
-          _intrinsic = Callback_::Actor::Methodic__::Simple_Property__.
-            private_instance_methods( false ).reduce [] do | m, m_i |
-              md = rx.match m_i
-              if md
-                m.push md.pre_match.intern
-              end
-              m
-            end
-
-          any = existent - _intrinsic
-
-          use = if any.length.nonzero?
-            any
-          elsif existent.length.nonzero?
-            existent
+          use = if set.length.nonzero?
+            set
+          elsif ivars.length.nonzero?
+            ivars
           end
 
           if use
-            prop = @prop
             @expag.calculate do
               _ast_a = use.map do | sym |
-                _x = prop.instance_variable_get :"@#{ sym }"
+                _x = prp.instance_variable_get :"@#{ sym }"
                 "#{ sym } = #{ ick _x }"
               end
               "(#{ _ast_a * ', ' })"
@@ -55,6 +51,18 @@ module Skylab::Brazen
             "[ no name yet ]"
           end
         end
+
+        def _of cls
+          a = []
+          cls.private_instance_methods.each do | sym |
+            md = RX__.match sym
+            md or next
+            a.push md[ 0 ].intern
+          end
+          a
+        end
+
+        RX__ = /\A.+(?==\z)/
       end
     end
   end

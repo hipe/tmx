@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity" do
+  describe "[br] entity - 1. classic property creation" do
 
     context "minimal non-empty" do
 
@@ -19,18 +19,37 @@ module Skylab::Brazen::TestSupport::Entity
       end
 
       it "knows the number of properties" do
-        subject.length.should eql 1
+
+        _subject.length.should eql 1
       end
 
       it "knows the local normal names of the properties" do
-        a = subject.get_names
+
+        o = _subject
+        a = o.get_names
         a.should eql [ :foo ]
-        a_ = subject.get_names
+        a_ = o.get_names
         ( a.object_id == a_.object_id ).should eql false
       end
 
-      def subject
-        @properties ||= Foo.properties
+      context "(property as model)" do
+
+        it "description 1" do
+          _subject.description.should eql :foo
+        end
+
+        it "description 2" do
+          _subject.description_under( Brazen_::API.expression_agent_instance ).
+            should eql "'foo'"
+        end
+
+        def _subject
+          super.fetch :foo
+        end
+      end
+
+      def _subject
+        Foo.properties
       end
     end
 

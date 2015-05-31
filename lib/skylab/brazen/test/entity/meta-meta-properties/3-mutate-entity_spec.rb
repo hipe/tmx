@@ -2,31 +2,34 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity meta-meta-properties: property hook" do
+  describe "[br] entity - meta-meta-properties - 3. mutate entity (ISLAND)" do  # :+[#sl-134]..
 
-    context "happens when property is build before it is frozen." do
+    # define a meta-entity by what it does to the entity.
+    #
+    # .. this feature is an "island" - although it may seem useful (doesn't
+    #    it?), it appears that this is used nowhere in production.)
+
+    # ( the only context ) ->
 
       before :all do
 
         MMPH_Entity = Subject_[].call do
 
-          o :property_hook, -> parse_context do
-              t_or_f = parse_context.upstream.gets_one
-              -> prop do
-                prop.wants_to_know = t_or_f
-                true
-              end
+          o :mutate_entity, -> prp, st do
+
+              prp.wants_to_know = st.gets_one
+              KEEP_PARSING_
             end,
+
             :meta_property, :teach_me_how_to_dougie
 
-          entity_property_class_for_write
-          class self::Entity_Property
-            attr_accessor :wants_to_know
-          end
+          self::Property.send :attr_accessor, :wants_to_know
         end
 
         class MMPH_Business_Widget
+
           MMPH_Entity.call self do
+
             o :teach_me_how_to_dougie, true, :property, :hi
             o :property, :hey
           end
@@ -39,5 +42,5 @@ module Skylab::Brazen::TestSupport::Entity
         hey.wants_to_know.should eql nil
       end
     end
-  end
+    # <-
 end

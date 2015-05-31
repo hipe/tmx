@@ -4,1032 +4,1015 @@ module Skylab::Brazen
 
     class << self
 
-      def [] * a
-        call_via_arglist a
+      def call * a, & edit_p
+        _call_via_arglist a, & edit_p
       end
 
-      def build_bad_enum_value_event_method_proc
-        -> x, name_sym, enum_box do
-          build_not_OK_event_with :invalid_property_value,
-            :x, x, :name_symbol, name_sym,
-            :enum_box, enum_box,
-            :error_category, :argument_error do |y, o|
-              _a = o.enum_box.get_names
-              y << "invalid #{ o.name_symbol } #{ ick o.x }, #{
-               }expecting { #{ _a * ' | ' } }"
-          end
-        end
+      def [] * a, & edit_p
+        _call_via_arglist a, & edit_p
       end
 
-      def call * a, & p
-        call_via_arglist a, & p
-      end
-
-      def event
-        Callback_::Event
-      end
-
-      def mutable_polymorphic_stream
-        Entity::Compound_Iambic_Scanner__::Mutable_Iambic_Scanner
-      end
-
-      def properties_stack
-        self::Properties_Stack__
-      end
-
-      def proprietor_methods
-        Proprietor_Methods__
-      end
-
-      def scope_kernel
-        Scope_Kernel__
-      end
-
-      def call_via_arglist x_a, & edit_p
-        d = x_a.length
-        if d.zero?
-          o = Extension_Module_Production_Session__.new( & edit_p )
-          o.init_to_create_new_module
-          o.execute
-        else
-          # ~ #duped-here
-          st = Callback_::Polymorphic_Stream.via_array x_a
-          cls = st.gets_one
-          Callback_::Actor.methodic cls
-          cls.extend Module_Methods__
-          cls.edit_entity_class do |sess|
-            sess.receive_edit st, & edit_p
-          end
-        end
-      end
-    end
-
-    MODULE_ATTR_READER_WRITER_METHOD__ = -> rd_i=nil, wrt_i, _CONST, _IVAR, & bld_p do  # #note-065
-
-      if rd_i
-        define_method rd_i do
-          const_get _CONST
-        end
-      end
-
-      define_method wrt_i do
-        if instance_variable_defined? _IVAR
-          instance_variable_get _IVAR
-        else
-          x = bld_p[ self ]
-          const_set _CONST, x
-          instance_variable_set _IVAR, x
-          x
-        end
-      end ; nil
-    end
-
-    # ~ parsing support
-
-    METHODIC_ = Callback_::Actor.methodic_lib
-
-    class Nonterminal_ < ::Proc
-      alias_method :receive_parse_context, :call
-    end
-
-    class Methodic_as_Nonterminal_
-
-      class << self
-        alias_method :[], :new
-      end
-
-      def initialize up
-        @p = up.method :process_polymorphic_stream_passively
-      end
-
-      def receive_parse_context pc
-        @p[ pc.upstream ]
-      end
-    end
-
-    class Adaptive_Nonterminal_Queue_  # read #note-185
-
-      def initialize * passive_parsers, & oes_p
-        @on_event_selectively = oes_p
-        @a = passive_parsers
-      end
-
-      def receive_parse_context pc
-        ok = true
-        nonfront_matching_index = nil
-        st = pc.upstream
-        while st.unparsed_exists
-          d = st.current_index
-          input_was_consumed = false
-          @a.each_with_index do |cx, idx|
-            ok = cx.receive_parse_context pc
-            ok or break
-            if d != st.current_index
-              idx.nonzero? and nonfront_matching_index = idx
-              input_was_consumed = true
-              break
-            end
-          end
-          input_was_consumed or break
-        end
-        nonfront_matching_index and reorder nonfront_matching_index
-        ok
-      end
-
-      private def reorder d
-        a = ::Array.new @a.length
-        a[ 0 ] = @a.fetch d
-        a[ 1, d ] = @a[ 0, d ]
-        if d < @a.length - 1
-          same = d + 1 ... @a.length
-          a[ same ] = @a[ same ]
-        end
-        @a = a
-        nil
-      end
-
-      def replace_item x, x_
-        oid = x.object_id
-        _d = @a.index do |x__|
-          oid == x__.object_id
-        end
-        @a[ _d ] = x_
-        nil
-      end
-    end
-
-    class Parse_Context__
-
-      def initialize upstream, edit_session
-        @edit_session = edit_session
-        @upstream = upstream
-      end
-
-      attr_reader :edit_session, :upstream
-
-      def downstream
-        @edit_session.polymorphic_writer_method_writee_module
-      end
-    end
-
-    # ~ parsing the DSL: edit sessions for modules and classes
-
-    class Module_Edit_Session__
-
-      include METHODIC_.polymorphic_processing_instance_methods
-
-    end
-
-    class Extension_Module_Production_Session__ < Module_Edit_Session__
-
-      def initialize & edit_p
-        @edit_p = edit_p
-      end
-
-      def init_to_create_new_module
-
-        @polymorphic_writer_method_writee_module = ::Module.new
-        @writable_formal_propery_method_names_box = Callback_::Box.new
-        @formal_property_writee_module = ::Module.new
-
-        @polymorphic_writer_method_writee_module.include METHODIC_.polymorphic_processing_instance_methods
-
-        @polymorphic_writer_method_writee_module.include Instance_Methods
-
-        nil
-      end
-
-      def init_to_produce_extension_of_extension extmod
-
-        @polymorphic_writer_method_writee_module = ::Module.new
-        @writable_formal_propery_method_names_box =
-          extmod::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___.dup
-        @formal_property_writee_module = ::Module.new
-
-        @polymorphic_writer_method_writee_module.include extmod
-        @formal_property_writee_module.include extmod::Module_Methods
-
-        nil
-      end
-
-      def execute
-
-        mod = @polymorphic_writer_method_writee_module
-        box = @writable_formal_propery_method_names_box
-        mod_ = @formal_property_writee_module
-
-        init_edit_session_via_extended_included_client_module mod
-
-        mod.const_set :Module_Methods, mod_  # :+#public-API (the name)
-        mod.const_set :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___, box
-        mod.instance_variable_set(
-          :@entity_formal_property_method_nms_bx_for_wrt, box )
-
-        mod.extend Extension_Module_Methods__
-
-        mod.active_entity_edit_session = self
-        mod.module_exec( & @edit_p )
-        mod.active_entity_edit_session = nil
-
-        finish mod
-      end
-    end
-
-    class Class_Edit_Session__ < Module_Edit_Session__
-
-      def initialize cls
-        @polymorphic_writer_method_writee_module = cls
-        cls.include Instance_Methods
-        init_edit_session_via_extended_included_client_module cls
-        @formal_property_writee_module = cls.singleton_class
-        @writable_formal_propery_method_names_box =
-          cls.entity_formal_property_method_names_box_for_write
-      end
-    end
-
-    class Module_Edit_Session__
-
-      private def init_edit_session_via_extended_included_client_module mod
-        @method_added_filter = IDENTITY_
-        @pay_attention_to_method_added = true
-        @property_related_nonterminal = mod::Entity_Property.nonterminal_for self
-        @ad_hoc_nonterminal_queue = mod::ENTITY_AD_HOCS___
-
-        @nonterminal_queue = Adaptive_Nonterminal_Queue_.new(  # #note-330
-          * @ad_hoc_nonterminal_queue,
-          @property_related_nonterminal,
-          Methodic_as_Nonterminal_[ self ] )
-      end
-
-      attr_reader :polymorphic_writer_method_writee_module  # for e.g p.stack
-
-      attr_reader :property_related_nonterminal  # hax only (covered)
-
-      def edit_entity_class * x_a, & edit_p
-        receive_edit Callback_::Polymorphic_Stream.via_array( x_a ), & edit_p
-        nil
-      end
-
-      def receive_edit st, & edit_p
-        x = true
-        if st.unparsed_exists
-          pc = Parse_Context__.new st, self
-          x = @nonterminal_queue.receive_parse_context pc
-          if x && st.unparsed_exists
-            x = when_after_process_iambic_fully_stream_has_content st
-          end
-        end
-        if x
-          if edit_p
-            x = @polymorphic_writer_method_writee_module.module_exec( & edit_p )  # so result is user's result
-          else
-            x = @polymorphic_writer_method_writee_module  # so `[]` is wrappable
-          end
-        end
-        x
-      end
-
-      def receive_parse_context pc
-        # if this object added itself to the @nonterminal_queue, then this
-        # method is where we receive calls to attempt to parse the stream.
-        process_polymorphic_stream_passively pc.upstream
-      end
-
-    private
-
-      # these are the iambic symbols exposed by the edit session itself,
-      # that may mutate its state and/or affect its behavior
-
-      def polymorphic_writer_method_name_suffix=
-        against_iambic_property do | suffix_i |  # covered, :+#grease
-          _RX = /\A.+(?=#{ ::Regexp.escape suffix_i }\z)/
-          @method_added_filter = -> m_i, & oes_p do  # #experimetal
-            md = _RX.match m_i
-            if md
-              md[ 0 ].intern
-            else
-              oes_p.call :error, :method_added_without_suffix do
-                bld_method_added_without_suffix_event m_i, suffix_i
-              end
-            end
-          end
-          ACHIEVED_
-        end
-      end
-
-      def ad_hoc_processor=
-        @polymorphic_writer_method_writee_module.
-          entity_ad_hocs_for_wrt.add_processor( gets_one_polymorphic_value, gets_one_polymorphic_value )
-        ACHIEVED_
-      end
-
-      METHODIC_.cache_polymorphic_writer_methods self
-
-    public
-
-      def receive_metaproperty mprop
-        @polymorphic_writer_method_writee_module.
-          entity_property_class_for_write.class_exec( & mprop.apply )
-      end
-
-      def receive_method_added_name m_i
-        if @pay_attention_to_method_added
-          name_i = @method_added_filter.call m_i do | *, & ev_p |
-            receive_invalid_propery ev_p[]
-            UNABLE_
-          end
-          name_i and begin
-            @property_related_nonterminal.
-              finish_property_with_three false, m_i, name_i
-          end
-        end
-      end
-
-      def property_class  # :+#public-API
-        @property_related_nonterminal.property_cls
-      end
-
-      def receive_new_property_cls x
-        @property_related_nonterminal.receive_new_prop_cls x
-      end
-
-      def receive_property pr  # :+#public-API
-        receive_prop pr
-      end
-
-      def receive_prop prop
-        ok = true
-        if prop.against_EC_p_a
-          _ec = @polymorphic_writer_method_writee_module
-          prop.against_EC_p_a.each do |p|
-            ok = _ec.class_exec prop, & p
-            ok or break
-          end
-        end
-        ok and acpt_prop prop
-      end
-
-      def acpt_prop prop
-
-        if prop.do_define_method
-          while_ignoring_method_added do
-            @polymorphic_writer_method_writee_module.send(
-              :define_method,
-              prop.polymorphic_writer_method_name,
-              prop.polymorphic_writer_method_proc )
-          end
-        end
-
-        box = @writable_formal_propery_method_names_box
-        name_i = prop.name_symbol
-        do_add = false
-        meth_i = box.fetch name_i do
-          do_add = true
-          :"___#{ name_i }_property_"
-        end
-        if do_add
-          box.add name_i, meth_i
-        end
-
-        _PROPERTY = prop
-        @formal_property_writee_module.send :define_method, meth_i do
-          _PROPERTY
-        end
-
-        ACHIEVED_
-      end
-
-      def while_ignoring_method_added
-        befor = @pay_attention_to_method_added
-        @pay_attention_to_method_added = false
-        x = yield
-        @pay_attention_to_method_added = befor
-        x
-      end
-
-      def ignore_methods_added
-        @pay_attention_to_method_added = false
-      end
-
-      def finish x
-        if @property_related_nonterminal.last_incomplete_property
-          pr = @property_related_nonterminal.last_incomplete_property
-          maybe_send_event :error, :property_or_metaproperty_never_received_a_name do
-            build_not_OK_event_with :property_or_metaproperty_never_received_a_name,
-              :property_or_metaproperty, pr,
-              :error_category, :argument_error
-          end
-        else
-          x
-        end
-      end
-
-    private
-
-      def bld_method_added_without_suffix_event m_i, sfx
-        build_not_OK_event_with :method_added_without_suffix,
-            :method_name, m_i,
-            :suffix, sfx,
-            :error_category, :name_error do |y, o|
-
-          y << "did not have expected suffix '#{ o.suffix }': #{
-           }#{ ick o.method_name }"
-        end
-      end
-
-      def receive_invalid_propery ev  # possible placeholder
-        receive_event ev
-      end
-
-    public
-
-      def maybe_receive_event * i_a, & ev_p
-        receive_event ev_p[]
-      end
-
-      def receive_event ev
-        raise ev.to_exception
-      end
-
-    private
-
-      def maybe_send_event *, & ev_p  # #hook-OUT of [cb]
-        raise ev_p[].to_exception
-      end
-    end
-
-    # ~ the modules that enhance the extension modules or entity classes
-
-    module Common_Module_Methods_
-
-      def properties
-        @properties ||= build_immutable_properties_stream_with_random_access_
-      end
-
-      def build_immutable_properties_stream_with_random_access_
-        entity_formal_property_method_names_box_for_read.to_value_stream.map_by do |i|
-          send i
-        end.flush_to_immutable_with_random_access_keyed_to_method :name_symbol
-      end
-
-      def any_property_via_symbol i
-        m_i = entity_formal_property_method_names_box_for_read[ i ]
-        m_i and send m_i
-      end
-
-      def property_via_symbol i
-        send entity_formal_property_method_names_box_for_read.fetch i
-      end
-
-      def method_added m_i
-        if active_entity_edit_session
-          @active_entity_edit_session.receive_method_added_name m_i
-        end
-        super
-      end
-
-      define_singleton_method :module_attr_reader_writer, MODULE_ATTR_READER_WRITER_METHOD__
-
-      module_attr_reader_writer(
-        :entity_ad_hocs_for_rd,
-        :entity_ad_hocs_for_wrt,
-        :ENTITY_AD_HOCS___,
-        :@__entity_AHFW__ ) do |o|
-          otr = o::ENTITY_AD_HOCS___
-          if otr
-            self._DO_ME
-          else
-            Entity_::Ad_Hoc_Processor__::Mutable_Nonterminal_Queue.new
-          end
-        end
-
-      module_attr_reader_writer(
-        :entity_formal_property_method_names_box_for_read,
-        :entity_formal_property_method_names_box_for_write,  # :+#public-API (name)
-        :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___,
-        :@entity_formal_property_method_nms_bx_for_wrt ) do |o|
-          o::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___.dup
-        end
-
-      def entity_property_class_for_write
-        @__entity_PCFW__ ||= begin
-          new_cls = ::Class.new self::Entity_Property
-          const_set :Entity_Property, new_cls
-          @active_entity_edit_session.receive_new_property_cls new_cls
-          new_cls
-        end
-      end
-
-    private
-
-      def o * x_a, & edit_p
-        @active_entity_edit_session.receive_edit(
-          Callback_::Polymorphic_Stream.via_array( x_a ), & edit_p )
-      end
-
-      def during_entity_normalize & p
-        normz_for_wrt.push p ; nil
-      end
-
-      module_attr_reader_writer :normz_for_wrt, :ENTITY_NORM_P_A, :@ent_norm_p_a do |o|
-        o::ENTITY_NORM_P_A ? o::ENTITY_NORM_P_A.dup : []
-      end
-    end
-
-    module Extension_Module_Methods__
-
-      include Common_Module_Methods_
-
-      attr_accessor :active_entity_edit_session
-
-      def [] cls, * rest, & edit_p
-        call_via_client_class_and_iambic cls, rest, & edit_p
-      end
-
-      def call cls, * rest, & edit_p
-        call_via_client_class_and_iambic cls, rest, & edit_p
-      end
-
-      def via_nonzero_length_arglist a, & edit_p
-        st = Callback_::Polymorphic_Stream.via_array a
-        _enhance_to_and_edit_entity_class_via_any_nonempty_stream(
-          st.gets_one, st, & edit_p )
-      end
-
-      def via & edit_p
-        o = Extension_Module_Production_Session__.new( & edit_p )
-        o.init_to_produce_extension_of_extension self
+      def _call_via_arglist a, & edit_p
+
+        o = Session__.new
+        o.arglist = a
+        o.block = edit_p
         o.execute
       end
+    end  # >>
 
-      def call_via_client_class_and_iambic cls, x_a, & edit_p
-        if x_a.length.nonzero?
-          st = Callback_::Polymorphic_Stream.via_array x_a
-        end
-        _enhance_to_and_edit_entity_class_via_any_nonempty_stream cls, st, & edit_p
+    EXTMOD_CALL_METHOD__ = -> * x_a, & edit_p do
+
+      o = Session__.new
+      o.arglist = x_a
+      o.block = edit_p
+      o.extmod = self
+      o.execute
+    end
+
+    EEC_METHOD__ = -> * a, & edit_p do
+
+      o = Session__.new
+      o.client = self
+      o.arglist = a
+      o.block = edit_p
+      o.execute
+    end
+
+    Edit_client_class_via_polymorphic_stream_over_extmod = -> (
+      cls, st, extmod
+    ) do
+
+      o = Session__.new
+      o.block = NIL_
+      o.client = cls
+      o.extmod = extmod
+      o.upstream = st
+      o.execute
+    end
+
+    class Session__
+
+      attr_reader :client, :upstream
+      alias_method :downstream, :client  # for now
+
+      def initialize
+
+        @_ad_hoc_processor_processor = nil
+        @client = nil
+        @extmod = nil
+        @_floating = nil
+        @_mprop_hooks_is_known_is_known = false
+
+        @_optimism = [
+          :_maybe_a_property_or_meta_property,
+          :_maybe_a_builtin_term,
+          :_maybe_an_ad_hoc
+        ]
+
+        @_writer_rx = nil
       end
 
-      def _enhance_to_and_edit_entity_class_via_any_nonempty_stream cls, st, & edit_p
+      def arglist= x_a
+        @upstream = Callback_::Polymorphic_Stream.via_array x_a
+        x_a
+      end
 
-        # when an edit block is passed, result is the result of the block.
-        # otherwise, result is always the argument class to allow for
-        # nested enhancement calls e.g if the call used the `[]` form
+      attr_writer(
+        :block,
+        :client,
+        :extmod,
+        :upstream,
+      )
 
-        touch_extends_and_includes_on_client_class cls
-        if edit_p || st
-          cls.edit_entity_class do |sess|
-            if st
-              sess.receive_edit st, & edit_p
-            else
-              # for #grease, here is how you can fulfill only the block
-              cls.module_exec( & edit_p )
+      def execute  # assume upstream and block
+
+        if @upstream.unparsed_exists
+          if @block
+            __when_args_and_block
+          else
+            __when_args_only
+          end
+        else
+          @upstream = nil
+          if @block
+            __when_block_only
+          else
+            Entity_
+          end
+        end
+      end
+
+      def __when_args_and_block
+
+        _enter
+        _process_block
+        _exit
+      end
+
+      def __when_args_only
+
+        _enter
+        _exit
+      end
+
+      def __when_block_only
+
+        if @client  # a re-open, or creating a "common properties" mod
+
+          _enter
+          _process_block
+          _exit
+
+        else  # make new or derived extension module
+
+          @client = ::Module.new
+          # ..
+          _enter_module
+          _process_block
+          _exit
+
+          @client
+        end
+      end
+
+      def _enter
+
+        if ! @client
+          @client = @upstream.gets_one
+        end
+
+        if @client.respond_to? :superclass
+          if @extmod
+            __enter_class_against_extmod
+          else
+            __enter_class_bluesky
+          end
+          _any_args
+        else
+          _enter_module
+        end
+      end
+
+      def _enter_module
+
+        if @extmod
+          __enter_module_against_extmod
+        else
+          __enter_module_bluesky
+        end
+        _any_args
+      end
+
+      def _any_args
+
+        if @upstream
+          if @upstream.unparsed_exists
+            _process_remainder_of_upstream
+          end
+          @upstream = nil
+        end
+      end
+
+      # ~~ ancestor chain & method definitions
+
+      def __enter_class_against_extmod
+
+        @client.include @extmod  # BEFORE DEFINE METHODS
+
+        _maybe_gently_add_methods_to_class
+
+        if @extmod.const_defined? :Module_Methods
+
+          __xfer_properties_into_class
+        end
+
+        NIL_
+      end
+
+      def __enter_class_bluesky
+
+        _maybe_gently_add_methods_to_class
+
+        NIL_
+      end
+
+      def _maybe_gently_add_methods_to_class
+
+        sess = self
+        @client.class_exec do
+
+          @___did_gently_add_methods_once ||= begin
+
+             # because we don't have an ancestor chain checking this for us
+
+             sess.__gently_define_class_methods
+
+             ACHIEVED_
+          end
+        end
+        NIL_
+      end
+
+      def __enter_module_against_extmod
+
+        @client.include @extmod
+        _maybe_extmod_methods
+        __xfer_properties_into_module
+        NIL_
+      end
+
+      def __enter_module_bluesky
+
+        if ! @client.const_defined? :ENTITY_ENHANCEMENT_MODULE, false
+
+          @client.const_set :ENTITY_ENHANCEMENT_MODULE, @client
+
+          # #explanation-235
+        end
+
+        _maybe_extmod_methods
+
+        NIL_
+      end
+
+      def _maybe_extmod_methods
+
+        if @client.respond_to? :[]
+
+          # e.g a common properties module already uses this & needs it
+
+          if ! @client.respond_to? :properties
+
+            @client.send :define_singleton_method,
+              :properties, PROPERTIES_METHOD_FOR_MODULE__
+
+            if ! @client.respond_to? :receive_entity_property
+              @client.send :define_singleton_method,
+                :receive_entity_property, RECV_ENT_PRP_METHOD__
             end
           end
         else
-          cls
+          @client.extend Extmod_Methods___
         end
       end
 
-      def touch_extends_and_includes_on_client_class cls
+      # ~~ property transfer
 
-        if cls.respond_to? :active_entity_edit_session
-          did_already = true
+      def __xfer_properties_into_class  # assume extmod has m.m
+
+        @client.extend @extmod::Module_Methods
+
+        prps = @client.properties
+        if prps
+          prps.merge_box! @extmod.properties
         else
-          Callback_::Actor.methodic cls
-          cls.extend Module_Methods__
+          self._DONK
+          # @client.properties
+        end
+        NIL_
+      end
+
+      def __xfer_properties_into_module
+
+        if @extmod.const_defined? :Module_Methods
+
+          @client.properties.merge_box! @extmod.properties
+
+          @client::Module_Methods.include @extmod::Module_Methods
+        end
+        NIL_
+      end
+
+      define_method :__gently_define_class_methods, ( -> do
+
+        # #explanation-290
+
+        # ~ mm
+        eec = :edit_entity_class
+        rep = :receive_entity_property
+        # ~ im
+        fps = :formal_properties
+        ppsf = :process_polymorphic_stream_fully
+        ppsp = :process_polymorphic_stream_passively
+        rpp = :receive_polymorphic_property
+        gopv = :gets_one_polymorphic_value
+
+        -> do
+
+          @client.class_exec do
+
+            define_singleton_method :properties, PROPERTIES_METHOD_FOR_CLASS___
+              # (trump any existing one)
+
+            if ! respond_to? eec
+              define_singleton_method eec, EEC_METHOD__
+            end
+
+            if ! respond_to? rep
+              define_singleton_method rep, RECV_ENT_PRP_METHOD__
+            end
+
+            # ~ im
+
+            if ! method_defined? fps
+              define_method fps, FORMAL_PRPS_METHOD__
+            end
+
+            if ! method_defined? rpp
+              define_method rpp, RPP_METHOD___
+            end
+
+            if ! private_method_defined? ppsf
+              define_method ppsf, PPSF_METHOD_
+            end
+
+          private
+
+            if ! private_method_defined? ppsp
+              define_method ppsp, PPSP_METHOD_
+            end
+
+            if ! private_method_defined? gopv
+              define_method gopv, GOPV_METHOD___
+            end
+
+            NIL_
+          end  # end class exec
+        end  # end method p
+      end ).call
+
+      def _process_block
+
+        if ! @client.respond_to? :method_added
+          did_define = true
+          __define_DSL_methods
         end
 
-        cls.extend self::Module_Methods
-        cls.include self
+        @client.instance_variable_set :@entity_edit_session, self
+        @client.module_exec( & @block )
+        @client.instance_variable_set :@entity_edit_session, nil
 
-        if did_already
-          _my_box = self::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___
-          _their_box = cls.entity_formal_property_method_names_box_for_write
-          _their_box.ensuring_same_values_merge_box! _my_box
+        if did_define
+
+          # because of the OCD (reasonably so?) of wanting to
+          # avoid the superfluous calls to our handler:
+
+          @client.singleton_class.send :remove_method, :method_added
+        end
+        NIL_
+      end
+
+      def __define_DSL_methods
+
+        @client.module_exec do
+          define_singleton_method :method_added, METHOD_ADDED_METHOD___
+          define_singleton_method :o, O_METHOD___
+        end
+      end
+
+      # ~ argument session ( could be its own session )
+
+      def __receive_iambic x_a
+
+        @upstream and self._SANITY
+        @upstream = Callback_::Polymorphic_Stream.via_array x_a
+        _process_remainder_of_upstream
+        NIL_
+      end
+
+      def _process_remainder_of_upstream  # assume at least one. #note-185
+
+        did = nil
+        m = nil
+        st = @upstream
+
+        h = {
+
+          _maybe_a_property_or_meta_property: -> do
+
+            pcls = property_class  # renew this at every step, in case mprops
+
+            if pcls.private_method_defined? m
+              did = true
+              prp_ = pcls.__consume_from self
+              if prp_._is_meta_property
+                __receive_meta_property prp_
+              else
+                __session_receive_property prp_
+              end
+            else
+              KEEP_PARSING_
+            end
+          end,
+
+          _maybe_a_builtin_term: -> do
+
+            cls = self.class
+
+            -> do
+
+              if cls.private_method_defined? m
+                did = true
+                st.advance_one
+                send m
+              else
+                KEEP_PARSING_
+              end
+            end
+          end.call,
+
+          _maybe_an_ad_hoc: -> do
+
+            ahp = nil
+
+            -> do
+
+              ahp ||= ( @___ahp ||= Concerns_::Ad_Hoc::Processors.new self )
+
+              d_ = st.current_index
+              kp_ = ahp.consume_passively
+              did = d_ != st.current_index
+              kp_
+            end
+          end.call,
+        }
+
+        a = @_optimism
+        d = 0
+        last = a.length - 1
+        m = :"#{ st.current_token }="
+
+        begin
+
+          did = nil
+          kp = ( h.fetch a.fetch d ).call
+          if did
+
+            if st.no_unparsed_exists  # the only way you get out of here OK
+              @upstream = nil
+              break
+            end
+
+            if ! kp  # a nonterminal wants to stop ALL parsing now (ick)
+              break
+            end
+
+            m = :"#{ st.current_token }="
+
+            if d.zero?  # the first nonterminal matched normally
+              redo
+            end
+
+            # whatever nonterminal matched, re-sort so this is at front
+
+            hot = a.fetch d
+            a[ d, 1 ] = EMPTY_A_
+            a.unshift hot
+            d = 0
+            redo
+          end
+
+          if last == d  # none of the nonterminals matched. leave now.
+            break
+          end
+
+          d += 1  # try the next nonterminal
+          redo
+        end while nil
+
+        if ! did
+          raise ::ArgumentError, "unrecognized property '#{ st.current_token }'"
+        end
+        kp
+      end
+
+    private
+
+      # ~~
+
+      def ad_hoc_processor=
+
+        ahpp = @_ad_hoc_processor_processor
+        if ! ahpp
+          ahpp = Concerns_::Ad_Hoc::Processor_Processor.new self
+          @_ad_hoc_processor_processor = ahpp
+        end
+        ahpp.consume
+      end
+
+      def polymorphic_writer_method_name_suffix=
+
+        if @upstream.unparsed_exists
+
+          s = @upstream.gets_one
+          @_writer_rx = /\A(?<variegated>.+)#{ ::Regexp.escape s }\z/
+          @_expected_suffix = s
+          KEEP_PARSING_
         else
-          cls.entity_formal_property_method_names_box_for_write  # copy them now
+          raise ::ArgumentError, _say_expected_value_for_here
+        end
+      end
+
+      def property=
+
+        add_property_with_variegated_name @upstream.gets_one
+      end
+
+      def properties=
+
+        kp = nil
+        st = @upstream
+        begin
+          kp = add_property_with_variegated_name st.gets_one
+          kp or break
+          if st.unparsed_exists
+            redo
+          end
+          break
+        end while nil
+        kp
+      end
+
+      def reuse=
+
+        kp = true
+
+        _prp_a = @upstream.gets_one
+
+        _prp_a.each do | prp |
+
+          kp = _receive_complete_property prp
+          kp or break
+        end
+        kp
+      end
+
+      def property_object=
+
+        _receive_complete_property @upstream.gets_one
+      end
+
+    public
+
+      def _say_expected_value_for_here
+
+        _a = caller_locations 1, 1
+        _m = _a.first.base_label[ 0 .. -2 ]
+        "expecting a value for '#{ _m }'"
+      end
+
+      # ~ properties ( creating & accepting )
+
+      def __receive_method_added m
+
+        if @_writer_rx
+          md = @_writer_rx.match m
+          if md
+            _accept_method_added md, m
+          else
+            raise ::NameError, __say_expected_suffix( m )
+          end
+        else
+          _accept_method_added m
+        end
+      end
+
+      def __say_expected_suffix m
+        "did not have expected suffix '#{ @_expected_suffix }': '#{ m }'"
+      end
+
+      def _accept_method_added md=nil, m
+
+        sym = if md
+          md[ :variegated ].intern
+        else
+          m
+        end
+
+        if @_floating
+          flot = @_floating
+          @_floating = nil
+        end
+
+        sess = self
+        same = -> do
+          @name = Callback_::Name.via_variegated_symbol sym
+          @custom_polymorphic_writer_method_name = m
+          sess._shake_it_up self
+          normalize_property
+        end
+
+        if flot
+
+          prp = flot.dup
+          prp.instance_exec do
+            instance_exec( & same )
+            freeze
+          end
+        else
+          prp = property_class.new do
+            instance_exec( & same )
+          end
+        end
+
+        _receive_complete_property prp
+      end
+
+      def add_property_with_variegated_name sym
+
+        sess = self
+        _prp = property_class.new do
+
+          @name = Callback_::Name.via_variegated_symbol sym
+          sess._shake_it_up self
+          normalize_property
+        end
+
+        _receive_complete_property _prp
+      end
+
+      def _shake_it_up prp
+
+        if ! prp._is_meta_property
+
+          if prp.name
+            prp._shibboleth = :"__#{ prp.name.as_variegated_symbol }__property"
+          end
+
+          @_mprop_hooks_is_known_is_known || __know_mprop_hooks
+          if @_prop_normalizer
+            @_prop_normalizer.normalize_mutable_property prp
+          end
+        end
+
+        NIL_
+      end
+
+      def __know_mprop_hooks
+
+        @_mprop_hooks_is_known_is_known = true
+
+        cls = property_class
+        if cls.const_defined? METAPROPERTIES_WITH_HOOKS_
+          @_prop_normalizer = Concerns_::Meta_Property::Normalizer.new self
+        else
+          @_prop_normalizer = false
+        end
+        NIL_
+      end
+
+      def property_class
+        @__pcls ||= __determine_property_class
+      end
+
+      def __determine_property_class
+        if @client.const_defined? :Property
+          @client.const_get :Property
+        else
+          Property
+        end
+      end
+
+      def pcls_changed
+
+        @_mprop_hooks_is_known_is_known = false
+        @_prop_normalizer = nil
+        @__pcls = nil
+      end
+
+      def __session_receive_property prp
+
+        if prp.name
+          @_floating and self._SANITY
+          _receive_complete_property prp
+        else
+          @_floating = prp
+          KEEP_PARSING_
+        end
+      end
+
+      def _receive_complete_property prp
+
+        @client.properties.__box_receive_property prp
+        @client.receive_entity_property prp
+      end
+
+      def __receive_meta_property prp
+
+        ( @___mpp ||= Concerns_::Meta_Property::Processor.new self ) << prp
+
+        KEEP_PARSING_
+      end
+
+      def _exit
+
+        if @_floating
+          raise ::ArgumentError, __say_floating
+        end
+
+        NIL_
+      end
+
+      def __say_floating
+        _s = Concerns_::Property::Small_Time_Actors::Prop_desc_wonderhack[
+          Brazen_::API.expression_agent_instance, @_floating ]
+        "property or metaproperty never received a name - #{ _s }"
+      end
+    end
+    Session = Session__  # :+#experimental
+
+    # ~ module methods (some)
+
+    PROPERTIES_METHOD_FOR_CLASS___ = -> do
+      @properties ||= Build_properties_box__.__for_class self
+    end
+
+    PROPERTIES_METHOD_FOR_MODULE__ = -> do
+      @properties ||= Build_properties_box__.__for_module self
+    end
+
+    module Build_properties_box__ ; class << self  # #explanation-735
+
+      def __for_class cls
+
+        sc = cls.superclass
+
+        if sc.respond_to? :properties
+          otr = sc.properties  # might be stub method from base class
+        end
+
+        if otr
+          otr = otr.dup
+          otr.__init_copy cls, cls.singleton_class
+          otr
+        else
+          _new_box cls, cls.singleton_class
+        end
+      end
+
+      def __for_module client
+
+        if client.const_defined? :Module_Methods
+
+          mm = client::Module_Methods
+
+          if ! client.const_defined? :Module_Methods, false
+
+            mm_ = ::Module.new
+            mm_.include mm
+            client.const_set :Module_Methods, mm_
+            mm = mm_
+          end
+        else
+          mm = ::Module.new
+          client.const_set :Module_Methods, mm
+        end
+
+        rmod = ::Module.new
+        client.const_set :READER_SINGLETON_FOR_EXTENSION_MODULE___, rmod
+        rmod.extend mm
+
+        _new_box rmod, mm
+      end
+
+      def _new_box rmod, wmod
+        Property_Box___.new rmod, wmod
+      end
+    end ; end
+
+    O_METHOD___ = -> * x_a do
+
+      block_given? and raise ::ArgumentError
+
+      @entity_edit_session.__receive_iambic x_a
+      NIL_
+    end
+
+    METHOD_ADDED_METHOD___ = -> m do
+
+      sess = @entity_edit_session
+      if sess
+        sess.__receive_method_added m
+      end
+      NIL_
+    end
+
+    RECV_ENT_PRP_METHOD__ = -> prp do
+      KEEP_PARSING_
+    end
+
+    module Extmod_Methods___
+
+      define_method :call, EXTMOD_CALL_METHOD__
+      define_method :[], EXTMOD_CALL_METHOD__
+
+      define_method :properties, PROPERTIES_METHOD_FOR_MODULE__
+      define_method :receive_entity_property, RECV_ENT_PRP_METHOD__
+    end
+
+    # ~ instance methods
+
+    RPP_METHOD___ = -> prp do  # "receive polymorphic property"
+
+      case prp.argument_arity
+      when :one
+        instance_variable_set prp.ivar, gets_one_polymorphic_value
+      when :zero
+        instance_variable_set prp.ivar, true
+      else
+        self._COVER_ME
+      end
+      KEEP_PARSING_
+    end
+
+    FORMAL_PRPS_METHOD__ = -> do  # the instance method
+      self.class.properties
+    end
+
+    GOPV_METHOD___ = -> do  # "gets one polymorphic value"
+      @polymorphic_upstream_.gets_one
+    end
+
+    # ~ models
+
+    class Property_Box___
+
+      def initialize rmod, wmod
+
+        @_a = [] ; @_h = {}
+        @_rmod = rmod ; @_wmod = wmod
+      end
+
+      def initialize_copy _
+
+        @_a = @_a.dup ; @_h = @_h.dup
+        @_rmod = @_wmod = nil
+      end
+
+      def __init_copy rmod, wmod
+        @_rmod = rmod ; @_wmod = wmod
+        NIL_
+      end
+
+      # ~ conversion operations
+
+      def to_mutable_box_like_proxy
+        to_new_mutable_box_like_proxy
+      end
+
+      def to_new_mutable_box_like_proxy
+
+        bx = Callback_::Box.new
+        to_value_stream.each do | prp |
+          bx.add prp.name_symbol, prp
+        end
+        bx
+      end
+
+      # ~ reduce operations
+
+      def length
+        @_a.length
+      end
+
+      def has_name k
+        @_h.key? k
+      end
+
+      def [] k
+        fetch k do end
+      end
+
+      def fetch k
+
+        shib = @_h[ k ]
+        if shib
+          @_rmod.send shib
+        elsif block_given?
+          yield
+        else
+          raise ::KeyError, "key not found: '#{ k }'"
+        end
+      end
+
+      def group_by & p
+        h = {}
+        each_value do | x |
+          k = p[ x ]
+          h.fetch k do
+            h[ k ] = []
+          end.push x
+        end
+        h
+      end
+
+      def reduce_by & p
+        to_value_stream.reduce_by( & p )
+      end
+
+      def at * k_a
+        k_a.map( & method( :fetch ) )
+      end
+
+      # ~ map operations & support
+
+      def get_names
+        @_a.dup
+      end
+
+      def each_name( & x_p )
+        @_a.each( & x_p )
+      end
+
+      def each_value
+        if block_given?
+          to_value_stream.each do | prp |
+            yield prp
+          end
+        else
+          enum_for :each_value
+        end
+      end
+
+      def to_value_stream
+
+        a = @_a ; mod = @_rmod ; d = -1 ; h = @_h ; last = a.length - 1
+
+        Callback_.stream do
+          if d != last
+            d += 1
+            mod.send h.fetch a.fetch d
+          end
+        end
+      end
+
+      # ~ mutators
+
+      def remove k  # :+#by:tm
+        x = @_h.fetch k
+        @_h.delete k
+        @_a[ @_a.index( k ), 1 ] = EMPTY_A_
+        x
+      end
+
+      def merge_box! otr
+
+        a = @_a ; h = @_h
+        h_ = otr._h
+        otr._a.each do | sym |
+          h.fetch sym do
+            a.push sym
+            h[ sym ] = h_.fetch sym
+            NIL_
+          end
+        end
+        NIL_
+      end
+
+      protected
+      attr_reader :_a, :_h
+      public
+
+      def __box_receive_property prp
+
+        k = prp.name.as_variegated_symbol
+        shib = prp._shibboleth
+
+        @_h.fetch k do
+          @_a.push k
+          @_h[ k ] = shib
+          NIL_
+        end
+
+        @_wmod.send :define_method, shib do
+          prp
         end
 
         NIL_
       end
     end
 
-    module Module_Methods__
-
-      include Common_Module_Methods_
-
-      attr_reader :active_entity_edit_session
-
-      def edit_entity_class * x_a
-
-        sess = Class_Edit_Session__.new self
-        @active_entity_edit_session = sess
-
-        if x_a.length.nonzero?
-          x = sess.receive_edit Callback_::Polymorphic_Stream.via_array x_a
-        end
-
-        if block_given?
-          x = yield sess
-        end
-
-        @active_entity_edit_session = nil
-        sess.finish x
-      end
-    end
-
-    module Instance_Methods
-
-      ENTITY_AD_HOCS___ = nil
-
-      ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___ = Callback_::Box.the_empty_box
-
-      ENTITY_NORM_P_A = nil
-
-      # Entity_Property = Property__ below
-
-      def initialize * a, & p  # #experimental
-        instance_exec( & p )
-        super( * a, & nil )
-      end
-
-      def any_property_value_via_property prop
-        if instance_variable_defined? prop.as_ivar
-          instance_variable_get prop.as_ivar
-        end
-      end
-
-      def property_value_via_property prop
-        instance_variable_get prop.as_ivar
-      end
-
-      def receive_value_of_entity_property x, prop
-        instance_variable_set prop.as_ivar, x
-        ACHIEVED_
-      end
-
-      def argument sym
-        trio_via_property formal_property_via_symbol sym
-      end
-
-      def formal_property_via_symbol sym
-        formal_properties.fetch sym
-      end
-
-      def any_formal_property_via_symbol sym
-        fo = formal_properties
-        fo and fo[ sym ]
-      end
-
-      def get_formal_property_name_symbols
-        formal_properties.get_names
-      end
-
-      def formal_properties  # :+#hook-in for sure
-        self.class.properties
-      end
-
-    private
-
-      def bound_properties
-        @bp ||= Entity::Properties_Stack__::Bound_properties[
-          method( :trio_via_property ), formal_properties ]
-      end
-
-      def trio_via_property prp
-
-        had = true
-
-        x = actual_property_box.fetch prp.name_symbol do
-          had = false
-          nil
-        end
-
-        Callback_::Trio.via_value_and_had_and_property x, had, prp
-      end
-
-      def polymorphic_writer_method_name_passive_lookup_proc  # [cb] #hook-in
-        formals = formal_properties
-        -> name_symbol do
-          prp = formals[ name_symbol ]
-          if prp
-            prp.polymorphic_writer_method_name
-          end
-        end
-      end
-
-      def normalize
-        ok = true
-        p_a = self.class::ENTITY_NORM_P_A
-        if p_a
-          p_a.each do |p|
-            ok = p[ self ]
-            ok or break
-          end
-        end
-        ok
-      end
-    end
-
-    # ~ the property implementation
-
-    class Property_Related_Nonterminal__
-
-      include METHODIC_.polymorphic_processing_instance_methods
-
-      def initialize * a
-        @edit_session, @property_class = a
-        @property_nonterminal = bld_property_nonterminal @property_class
-        @adaptive_nonterminal_queue = Adaptive_Nonterminal_Queue_.new(
-          @property_nonterminal,
-          bld_metaproperty_nonterminal,
-          Methodic_as_Nonterminal_[ self ] )
-        @last_incomplete_property = nil
-      end
-
-      def property_cls
-        @property_class
-      end
-
-      attr_reader :last_incomplete_property
-
-      def receive_parse_context pc
-        @adaptive_nonterminal_queue.receive_parse_context pc
-      end
-
-      def receive_new_prop_cls pcls
-        @property_class = pcls
-        new = bld_property_nonterminal pcls
-        @adaptive_nonterminal_queue.replace_item @property_nonterminal, new
-        @property_nonterminal = new
-        nil
-      end
-
-    private
-
-      def bld_metaproperty_nonterminal
-        cls = MetaProperty__
-        Nonterminal_.new do |pc|
-
-          if cls.is_keyword pc.upstream.current_token
-            st = pc.upstream
-            d = st.current_index
-            mprop = cls.via_polymorphic_stream st do |*|
-              st.current_index = d
-              false
-            end
-            if mprop
-              @edit_session.receive_metaproperty mprop
-            else
-              KEEP_PARSING_
-            end
-          else
-            KEEP_PARSING_
-          end
-        end
-      end
-
-      def bld_property_nonterminal pcls
-
-        Nonterminal_.new do |pc|
-
-          last_incomplete_prop = nil
-
-          prop = if pcls.is_keyword pc.upstream.current_token
-            st = pc.upstream
-            d = st.current_index
-            pcls.via_polymorphic_stream st do | i, * i_a, & ev_p |
-              case i
-              when :no_name
-                if st.unparsed_exists && :meta_property == st.current_token
-                  st.current_index = d
-                else
-                  last_incomplete_prop = ev_p[]
-                end
-                false  # NO PROP
-              else
-                @edit_session.maybe_receive_event i, * i_a, & ev_p
-              end
-            end
-          end
-
-          @last_incomplete_property = last_incomplete_prop
-          if prop
-            @edit_session.receive_prop prop
-          else
-            KEEP_PARSING_
-          end
-        end
-      end
-
-      def properties=
-        st = polymorphic_upstream
-        ok = true
-        while st.unparsed_exists
-          ok = nil
-          prop = @property_class.new do
-            @name = Callback_::Name.via_variegated_symbol st.gets_one
-            @polymorphic_writer_method_proc_is_generated = true
-            @iwmn = via_name_build_internal_polymorphic_writer_meth_nm
-            ok = normalize_property
-          end
-          ok &&= @edit_session.receive_prop prop
-          ok or break
-        end
-        ok
-      end
-
-      def reuse=
-        ok = true
-        _prop_a = gets_one_polymorphic_value
-        _prop_a.each do | prop |
-          ok = @edit_session.receive_prop prop
-          ok or break
-        end
-        ok
-      end
-
-      def property_object=
-        @edit_session.receive_prop gets_one_polymorphic_value
-      end
-
-      METHODIC_.cache_polymorphic_writer_methods self
-
-    public
-
-      def finish_property_with_three proc_is_generated, meth_i, name_i
-        if @last_incomplete_property
-          cls = @last_incomplete_property
-          @last_incomplete_property = nil
-        else
-          cls = @property_class
-        end
-        ok = nil
-        prop = cls.new do
-          @name = Callback_::Name.via_variegated_symbol name_i
-          if proc_is_generated
-            @polymorphic_writer_method_proc_is_generated = proc_is_generated
-          else
-            @polymorphic_writer_method_proc_is_generated = proc_is_generated
-            @polymorphic_writer_method_proc_proc ||= nil
-          end
-          @iwmn = meth_i
-          ok = normalize_property
-        end
-        ok and @edit_session.receive_prop prop
-      end
-    end
-
-    class Property_or_MetaProperty__ < METHODIC_.simple_property_class
-
-      METHODIC_.cache_polymorphic_writer_methods self, superclass do |h|
-        h.delete :property  # this must not be in the syntax of metaproperties
-        h
-      end
-
-      # ~ internal support
-
-      def add_to_write_proc_chain & p
-        if @polymorphic_writer_method_proc_is_generated
-          @polymorphic_writer_method_proc_is_generated = false
-          @polymorphic_writer_method_proc_proc = p
-        else
-          self._DO_ME
-        end
-        nil
-      end
-    end
-
-    class MetaProperty__ < Property_or_MetaProperty__
-
-    private
-
-      def default=
-        Entity_::Meta_Property__::Apply_default[ self, gets_one_polymorphic_value ]
-      end
-
-      def entity_class_hook=
-        Entity_::Meta_Property__::Apply_entity_class_hook[ self, gets_one_polymorphic_value ]
-      end
-
-      def enum=
-        Entity_::Meta_Property__::Apply_enum[ self, gets_one_polymorphic_value ]
-      end
-
-      def property_hook=
-        Entity_::Meta_Property__::Apply_property_hook[ self, gets_one_polymorphic_value ]
-      end
-
-      def meta_property=
-        @name = Callback_::Name.via_variegated_symbol gets_one_polymorphic_value
-        STOP_PARSING_
-      end
-
-    public
-
-      # ~ internal support
-
-      def apply
-        p_a = aply_chain || [ dflt_apply ]
-        mprop = self
-        -> do
-          ok = true
-          p_a.each do |p|
-            ok = instance_exec mprop, & p
-            ok or break
-          end
-          ok
-        end
-      end
-
-      attr_reader :aply_chain
-
-      def against_property_class & p
-        @aply_chain ||= [ dflt_apply ]
-        @aply_chain.push p
-        nil
-      end
-
-      def after_wrt & p
-        @aftr_write_hooks ||= bld_and_init_after_write_hooks
-        @aftr_write_hooks.push p
-        nil
-      end
-
-      def bld_and_init_after_write_hooks
-        before_p_p = if @polymorphic_writer_method_proc_is_generated
-          @polymorphic_writer_method_proc_is_generated = false
-          -> mprop do
-            mprop.polymorphic_writer_method_proc_when_arity_is__one__
-          end
-        else
-          @polymorphic_writer_method_proc_proc
-        end
-        after_write_hook_p_a = []
-        @polymorphic_writer_method_proc_proc = -> mprop do
-          logic_p = before_p_p[ mprop ]
-          -> do
-            ok = instance_exec( & logic_p )
-            if ok
-              after_write_hook_p_a.each do |p|
-                ok = p[ self ]
-                ok or break
-              end
-            end
-            ok
-          end
-        end
-        after_write_hook_p_a
-      end
-      public :polymorphic_writer_method_proc_when_arity_is__one__
-
-      def dflt_apply
-        -> mprop do
-          name_i = mprop.name_symbol
-          meth_i = :"#{ name_i }="
-          _meth_p = mprop.polymorphic_writer_method_proc
-          attr_reader name_i
-          define_method meth_i, _meth_p
-          private meth_i
-          clear_polymorphic_writer_method_name_passive_proc
-          KEEP_PARSING_
-        end
-      end
-
-      Autoloader_[ Self_ = self ]
-    end
-
-    class Property__ < Property_or_MetaProperty__
+    class Property < Callback_::Actor::Methodic::Property
 
       class << self
 
-        def nonterminal_for edit_session
-          Property_Related_Nonterminal__.new edit_session, self
+        def __consume_from sess
+
+          # don't propagate kp here - it is used to stop when
+          # the name is reached, not to signal an error state
+
+          new do
+            process_polymorphic_stream_passively sess.upstream
+            sess._shake_it_up self
+            normalize_property
+          end
         end
       end  # >>
 
-      def without_default & edit_p
-        otr = dup
-        otr.init_without_default_
-        if edit_p
-          otr.instance_exec( & edit_p )
-        end
-        otr
-      end
+      # ~ description (for [#cb-010])
 
-      protected def init_without_default_
-        @has_default = false
-        @default_p = nil
-        nil
-      end
-
-      def new & edit_p
-        otr = dup
-        otr.instance_exec( & edit_p )
-        otr
-      end
-
-      def description  # for [#cb-010]
+      def description
         if @name
           @name.as_variegated_symbol
         else
@@ -1038,116 +1021,160 @@ module Skylab::Brazen
       end
 
       def description_under expag
-        if @name
-          symbol = @name.as_variegated_symbol
+        nm = @name
+        if nm
           expag.calculate do
-            code symbol
+            code nm.as_variegated_symbol
           end
         else
-          Entity_::Small_Time_Actors__::Prop_desc_wonderhack[ expag, self ]
+          Concerns_::Property::Small_Time_Actors::Prop_desc_wonderhack[
+            expag, self ]
         end
       end
 
-      def do_define_method
-        @polymorphic_writer_method_proc_is_generated || @polymorphic_writer_method_proc_proc
+      # ~ name & related
+
+      def property_reader_method_name
+        @name.as_variegated_symbol
       end
 
-      def polymorphic_writer_method_name
-        @iwmn
+      def conventional_polymorphic_writer_method_name
+        :"#{ @name.as_variegated_symbol }="
       end
 
-      def any_value_of_metaprop mprop
-        send mprop.name_symbol
+      attr_reader :custom_polymorphic_writer_method_name
+
+      def set_polymorphic_writer_method_name x
+        @custom_polymorphic_writer_method_name = x
+        NIL_
       end
 
-      def set_value_of_metaprop x, mprop
-        instance_variable_set mprop.as_ivar, x
-        nil
+      def ivar  # override parent
+        @name.as_ivar
       end
 
-      def against_EC_p_a  # :+#hook-over
+      attr_reader :property_setter_method_name
+
+      attr_accessor :_shibboleth
+
+      # ~ default (a meta-meta property)
+
+      attr_reader :has_default
+
+      def new_without_default
+        new_with_default
       end
 
-    private
+      def new_with_default & default_x_p
+        prp = dup
+        prp._set_default_proc( & default_x_p )
+        prp.freeze  # not for sure
+      end
+
+      def default=
+        x = gets_one_polymorphic_value
+        _set_default_proc do
+          x
+        end
+      end
+
+      def default_proc=
+        _set_default_proc( & gets_one_polymorphic_value )
+      end
+
+      def set_default_proc & p
+        _set_default_proc( & p )
+        self
+      end
+
+      def _set_default_proc & p
+        if block_given?
+          @has_default = true
+          @default_proc = p
+        else
+          remove_instance_variable :@has_default
+          remove_instance_variable :@default_proc
+        end
+        KEEP_PARSING_
+      end
+
+      # ~~ enum (a meta-meta-property)
+
+      attr_reader :enum_box
+
+      def enum=
+
+        _sym_ary = gets_one_polymorphic_value
+        bx = Callback_::Box.new
+        _sym_ary.each do | sym |
+          bx.add sym, nil
+        end
+        @enum_box = bx.freeze
+        _touch_norm_box.touch :__enum__ do
+          Entity_::Meta_Meta_Properties::Enum::Entity_against_meta_entity
+        end
+
+        KEEP_PARSING_
+      end
+
+      # ~~ mutate entity (a meta-meta-property, and hook. maybe [#sl-134] island)
+
+      attr_reader :mutate_entity_proc_
+
+      def mutate_entity=
+
+        @argument_arity = :custom
+        @mutate_entity_proc_ = gets_one_polymorphic_value
+        KEEP_PARSING_
+      end
+
+      # ~~ support
+
+      attr_reader :norm_box_
+
+      def _touch_norm_box
+        @norm_box_ ||= Callback_::Box.new
+      end
+
+      # ~~ syntactic finishing of the parse
 
       def property=
-        x = super
-        @iwmn ||= via_name_build_internal_polymorphic_writer_meth_nm
-        x
+
+        @name = Callback_::Name.via_variegated_symbol gets_one_polymorphic_value
+        STOP_PARSING_
       end
 
-      def polymorphic_writer_method_proc_when_arity_is__one__
-        _SYM = name_symbol
-        -> do
-          receive_value_of_entity_property gets_one_polymorphic_value, (
-            self.class.send(
-              self.class.
-                entity_formal_property_method_names_box_for_write.fetch _SYM ) )
-          # RESULT VALUE
-        end
+      attr_reader :_is_meta_property
+
+      def meta_property=
+
+        @_is_meta_property = true
+
+        sym = gets_one_polymorphic_value
+        @name = Callback_::Name.via_variegated_symbol sym
+        @property_setter_method_name = :"set_#{ sym }"
+
+        STOP_PARSING_
       end
 
-      def polymorphic_writer_method_proc_when_arity_is__zero__
-        _SYM = name_symbol
-        -> do
-          receive_value_of_entity_property true,
-            self.class.send(
-              self.class.
-                entity_formal_property_method_names_box_for_write.fetch _SYM )
-          # RESULT VALUE
-        end
+      def normalize_property  # ~ your last hookpoint before freezing
+        ACHIEVED_
       end
 
-      def polymorphic_writer_method_proc_when_arity_is__one_or_more__
-        _SYM = name_symbol
-        -> do
-          receive_list_of_entity_property gets_one_polymorphic_value,
-            self.class.send(
-              self.class.
-                entity_formal_property_method_names_box_for_write.fetch _SYM )
-          # RESULT
-        end
-      end
-
-    public  # ~ lib internal
-
-      def via_name_build_internal_polymorphic_writer_meth_nm
-
-        if :custom == @argument_arity
-          :"#{ @name.as_variegated_symbol }="
-        else
-          :"___entity_#{ @name.as_variegated_symbol }_polymorphic_writer___"
-        end
-      end
-
-      class << self
-
-      private
-
-        def during_property_normalize & p
-          nrmlz_wrt.push p
-          nil
-        end
-
-        define_singleton_method :module_attr_reader_writer, MODULE_ATTR_READER_WRITER_METHOD__
-
-        module_attr_reader_writer :nrmlz_wrt, :NORM_P_A, :@nrmlz do |o|
-          a = o::NORM_P_A
-          if a
-            a.dup
-          else
-            []
-          end
-        end
-      end
-
-      NORM_P_A = nil
+      private(
+        :default=,
+        :default_proc=,
+        :enum=,
+        :meta_property=,
+        :mutate_entity=,
+        :property=,
+      )
     end
 
-    module Instance_Methods
-      Entity_Property = Property__  # as promised above
-    end
-
+    Autoloader_[ Concerns_ = ::Module.new ]
     Entity_ = self
+    METAPROPERTIES_WITH_HOOKS_ = :METAPROPERTIES_WITH_HOOKS___
+
   end
 end
+# :+#tombsone: class for #note-185 self-adapting syntax

@@ -10,13 +10,26 @@ module Skylab::Brazen::TestSupport::Entity
 
   extend TestSupport_::Quickie
 
-  Test_Instance_Methods_ = Parent_::Test_Instance_Methods_
+  Add_common_methods_ = -> mod do
 
-  Enhance_for_test_ = Parent_::Enhance_for_test_
+    mod.send :define_method, :initialize do | & edit_p |
+      instance_exec( & edit_p )
+    end
 
-  WITH_MODULE_METHOD_ = Parent_::WITH_MODULE_METHOD_
+    mod.send :define_singleton_method, :with, WITH_MODULE_METHOD_
+
+    NIL_
+  end
 
   Subject_ = -> do
     Brazen_::Entity
   end
+
+  Callback_ = Callback_
+  Enhance_for_test_ = Parent_::Enhance_for_test_
+  KEEP_PARSING_ = true
+  NIL_ = nil
+  Test_Instance_Methods_ = Parent_::Test_Instance_Methods_
+  WITH_MODULE_METHOD_ = Parent_::WITH_MODULE_METHOD_
+
 end

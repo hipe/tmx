@@ -2,123 +2,132 @@ module Skylab::Brazen
 
   module Entity
 
-    module Meta_Property__
+    module Concerns_::Meta_Property
 
-      Apply_default = -> mprop, default_x do
+      class Processor
 
-        mprop.against_property_class do
+        def initialize sess
+          @_cls = nil
+          @_sess = sess
+        end
 
-          during_property_normalize do |prop|
-            x = prop.any_value_of_metaprop mprop
-            if x.nil?
-              prop.set_value_of_metaprop default_x, mprop
+        def << prp
+
+          @_cls || __init_mutable_property_class
+
+          send :"__when_argument_arity_of__#{ prp.argument_arity }__", prp
+
+          if prp.has_default || prp.norm_box_
+            __memoize_metapropery_because_it_has_a_hook prp
+          end
+
+          self
+        end
+
+        def __init_mutable_property_class
+
+          mod = @_sess.client
+          if mod.const_defined? :Property
+            if mod.const_defined? :Property, false
+              @_cls = mod.const_get :Property
+            else
+              @_cls = ::Class.new mod.const_get :Property
+              mod.const_set :Property, @_cls
+              @_sess.pcls_changed
             end
-            KEEP_PARSING_
-          end
-
-          include Evented_Property_Common_Instance_Methods__
-
-          KEEP_PARSING_
-        end
-        KEEP_PARSING_
-      end
-
-      Apply_entity_class_hook = -> mprop, recv_parse_ctx_p do
-
-        mprop.against_property_class do
-          include Evented_Property_Common_Instance_Methods__
-        end
-
-        mprop.add_to_write_proc_chain do
-          -> do
-            _ctx = Parse_Context____.new polymorphic_upstream
-            _against_ec = instance_exec _ctx, & recv_parse_ctx_p
-            against_entity_class( & _against_ec )
-            KEEP_PARSING_
-          end
-        end
-
-        KEEP_PARSING_
-      end
-
-      Apply_enum = -> mprop, enum_i_a do
-
-        _ENUM_BOX = Callback_::Box.new
-
-        enum_i_a.each do |i|
-          _ENUM_BOX.add i, true
-        end
-
-        mprop.against_property_class do
-          include Evented_Property_Common_Instance_Methods__
-          KEEP_PARSING_
-        end
-
-        mprop.after_wrt do |prop|
-          x = prop.any_value_of_metaprop mprop
-          if _ENUM_BOX[ x ]
-            KEEP_PARSING_
           else
-            prop.receive_bad_enum_value x, mprop.name_symbol, _ENUM_BOX
+            @_cls = ::Class.new Property
+            mod.const_set :Property, @_cls
+            @_sess.pcls_changed
           end
+          NIL_
         end
 
-        KEEP_PARSING_
-      end
+        def __when_argument_arity_of__zero__ prp
 
-      Apply_property_hook = -> mprop, recv_parse_ctx_p do
+          nm = prp.name
+          ivar = nm.as_ivar
+          rm = nm.as_variegated_symbol
+          wm = prp.conventional_polymorphic_writer_method_name
 
-        mprop.add_to_write_proc_chain do
-          -> do
-            _ctx = Parse_Context____.new polymorphic_upstream
-            _recv_prop = recv_parse_ctx_p[ _ctx ]
-            _recv_prop[ self ]
-          end
-        end
+          @_cls.class_exec do
 
-        KEEP_PARSING_
-      end
+            attr_accessor rm
+            alias_method :"set_#{ rm }", wm
 
-      Parse_Context____ = ::Struct.new :upstream
-
-      module Evented_Property_Common_Instance_Methods__
-
-        def against_entity_class & p
-          ( @against_EC_p_a ||= [] ).push p
-          nil
-        end
-
-        attr_reader :against_EC_p_a
-
-        def normalize_property
-
-          if self.class::NORM_P_A
-            p_a = self.class::NORM_P_A
-          end
-
-          if p_a
-            ok = true
-            p_a.each do |p|
-              ok = p[ self ]
-              ok or break
+            define_method wm do
+              instance_variable_set ivar, true
+              KEEP_PARSING_
             end
-            ok && super
+
+            private wm
+          end
+
+          NIL_
+        end
+
+        def __when_argument_arity_of__one__ prp
+
+          nm = prp.name
+          ivar = nm.as_ivar
+          rm = nm.as_variegated_symbol
+          wm = prp.conventional_polymorphic_writer_method_name
+
+          @_cls.class_exec do
+
+            attr_accessor rm
+            alias_method :"set_#{ rm }", wm
+
+            define_method wm do
+
+              instance_variable_set ivar, gets_one_polymorphic_value
+              KEEP_PARSING_
+            end
+
+            private wm
+          end
+
+          NIL_
+        end
+
+        def __when_argument_arity_of__custom__ prp
+
+          mutate_entity_against_upstream = prp.mutate_entity_proc_
+          wm = prp.conventional_polymorphic_writer_method_name
+
+          @_cls.class_exec do
+
+            define_method wm do
+
+              mutate_entity_against_upstream[ self, @polymorphic_upstream_ ]
+            end
+
+            private wm
+          end
+          NIL_
+        end
+
+        def __memoize_metapropery_because_it_has_a_hook prp
+
+          cls = @_cls
+
+          if cls.const_defined? CONST__
+            if cls.const_defined? CONST__, false
+              a = cls.const_get CONST__
+            else
+              a = cls.const_get CONST__
+              a = a.dup
+              cls.const_set CONST__, a
+            end
           else
-            super
+            a = []
+            cls.const_set CONST__, a
           end
+          a.push prp
+          NIL_
         end
 
-        def receive_bad_enum_value x, name_i, enum_box  # :+#hook-near
-          maybe_send_event :error, :invalid_property_value do
-            bld_bad_enum_value_event x, name_i, enum_box
-          end
-        end
-
-        define_method :bld_bad_enum_value_event, Entity_.build_bad_enum_value_event_method_proc
-
-        def maybe_send_event * i_a, & ev_p
-          @__methodic_actor_handle_event_selectively__.call( * i_a, & ev_p )
-        end
+        CONST__ = METAPROPERTIES_WITH_HOOKS_
       end
     end
   end

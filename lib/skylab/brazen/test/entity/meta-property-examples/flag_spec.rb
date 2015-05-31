@@ -4,45 +4,37 @@ module Skylab::Brazen::TestSupport::Entity
 
   describe "[br] entity meta-properties examples: flag." do
 
-    context "associate with a metaproperty a hook that the property.." do
+    # implement a flag-like property...
+
+    # ( the only context ) ->
 
       before :all do
 
         MPEF_Entity = Subject_[].call do
 
-          entity_property_class_for_write
-          class self::Entity_Property
-
-            def initialize
-              @arg_aruty = :one
-              super
-            end
+          class self::Property < Brazen_::Entity::Property
 
             def is_florg
-              :zero == @arg_aruty
+              :zero == @argument_arity
             end
 
           private
 
             def florg=
-              @arg_aruty = :zero
-              add_to_write_proc_chain do |_PROP|
-                -> do
-                  receive_value_of_entity_property true, _PROP
-                  true
-                end
-              end
-              true
+              @argument_arity = :zero
+              KEEP_PARSING_
             end
           end
         end
 
         class MPEF_Business_Widget
+
           attr_reader :hi, :hey
-          MPEF_Entity.call self do
-            o :florg, :property, :hi
-            o :property, :hey
-          end
+
+          MPEF_Entity.call self,
+
+            :florg, :property, :hi,
+            :property, :hey
 
           Enhance_for_test_[ self ]
         end
@@ -55,14 +47,17 @@ module Skylab::Brazen::TestSupport::Entity
       end
 
       it "..and in this case set a custom 'polymorphic_writer_method_proc'." do
-        ok = nil
+
+        kp = nil
+
         o = MPEF_Business_Widget.new do
-          ok = process_fully :hi, :hey, :ho
+          kp = process_fully :hi, :hey, :ho
         end
 
         o.hi.should eql true
         o.hey.should eql :ho
+        kp.should eql true
       end
-    end
+    # <-
   end
 end

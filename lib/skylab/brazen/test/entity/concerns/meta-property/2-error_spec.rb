@@ -1,4 +1,4 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
@@ -12,7 +12,7 @@ module Skylab::Brazen::TestSupport::Entity
 
           o :meta_property, :aruty
 
-       end
+        end
       end
 
       context "a 'def' or 'property' is expected at the end of the input" do

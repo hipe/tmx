@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity ad-hoc processors" do
+  describe "[br] entity - concerns - ad-hoc" do
 
     context "for e.g a DSL extension that adds properties" do
 
@@ -15,22 +15,23 @@ module Skylab::Brazen::TestSupport::Entity
         end
 
         class Gazoink_
+
           def initialize pc
             @pc = pc
           end
+
           def go
-            @pc.upstream.advance_one  # skip name
-            a = @pc.upstream.gets_one
-            a.each do |i|
-              @pc.edit_session.property_related_nonterminal.finish_property_with_three(
-                :do_define_method, :"#{ i }=", i )
+
+            _a = @pc.upstream.gets_one
+            _a.each do | sym |
+              @pc.add_property_with_variegated_name sym
             end
             true
           end
         end
 
         class AHP_Child < AHP_Base
-          attr_reader :foo, :baz
+
           Subject_[].call self do
             o :polymorphic_writer_method_name_suffix, :'='
             def foo=
@@ -41,6 +42,8 @@ module Skylab::Brazen::TestSupport::Entity
             end
           end
 
+          attr_reader :foo, :baz
+
           Enhance_for_test_[ self ]
         end
       end
@@ -49,7 +52,7 @@ module Skylab::Brazen::TestSupport::Entity
       end
 
       it "reflects" do
-        AHP_Child.properties.each_value.map( & :name_symbol ).
+        AHP_Child.properties.get_names.
           should eql [ :foo, :bar, :baz, :biff ]
       end
 

@@ -1,4 +1,4 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
@@ -33,7 +33,7 @@ module Skylab::Brazen::TestSupport::Entity
             o :fun_ness, :really_fun, :property, :foo
           end
 
-          define_singleton_method :with, WITH_MODULE_METHOD_
+          Add_common_methods_[ self ]
         end
       end
 
@@ -51,15 +51,18 @@ module Skylab::Brazen::TestSupport::Entity
       before :all do
 
         class MP_Bar
+
           Subject_[].call self do
+
             o :meta_property, :fun_ness
             o :fun_ness, :really_fun
+
             def foo
               @foo = gets_one_polymorphic_value
             end
           end
 
-          define_singleton_method :with, WITH_MODULE_METHOD_
+          Add_common_methods_[ self ]
         end
       end
 

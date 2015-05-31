@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity iambic" do
+  describe "[br] entity - 2. processing the polymorphic upstrem" do
 
     context "basics" do
 
@@ -50,19 +50,27 @@ module Skylab::Brazen::TestSupport::Entity
     end
 
     it "DSL syntax fail - strange name" do
-      -> do
+
+      begin
         class FooI_Pity
           Subject_[][ self, :VAG_rounded ]
         end
-      end.should raise_error ::ArgumentError, unrec_rx( :VAG_rounded )
+      rescue ::ArgumentError => e
+      end
+
+      e.message.should match unrec_rx :VAG_rounded
     end
 
     it "DSL syntax fail - strange value" do
-      -> do
+
+      begin
         class FooI_PityVal
           Subject_[][ self, :polymorphic_writer_method_name_suffix ]
         end
-      end.should raise_error ::ArgumentError, /\bexpecting a value for 'polymorphic_/
+      rescue ::ArgumentError => e
+      end
+
+      e.message.should match %r(\bexpecting a value for 'polymorphic_)
     end
 
     context "iambic writer postfix option (& introduction to using the DSL)" do

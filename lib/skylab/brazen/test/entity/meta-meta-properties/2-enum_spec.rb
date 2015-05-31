@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity meta-meta-properties: enum" do
+  describe "[br] entity - meta-meta-properties - 2. enum" do
 
     it "(minimal)" do
 
@@ -60,11 +60,11 @@ module Skylab::Brazen::TestSupport::Entity
       end
     end
 
-
     it "enums try and prevent you from being naughty" do
 
-       -> do
+      _rx = /\Ainvalid color 'red', expecting { green \| purple }/
 
+      begin
         class MME_Bar
 
           Subject_[].call self do
@@ -78,7 +78,10 @@ module Skylab::Brazen::TestSupport::Entity
             end
           end
         end
-      end.should raise_error ::ArgumentError, /\Ainvalid color 'red', expecting { green \| purple }/
+      rescue ::ArgumentError => e
+      end
+
+      e.message.should match _rx
     end
   end
 end
