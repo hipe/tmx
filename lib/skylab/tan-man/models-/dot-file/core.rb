@@ -33,7 +33,7 @@ module Skylab::TanMan
       # ~ support
 
       def node_identifier
-        @nid ||= Brazen_::Node_Identifier_.via_symbol :dot_file
+        @___nid ||= Brazen_::Concerns_::Identifier.via_symbol :dot_file  # :+#encapsulation-violation
       end
 
       def preconditions

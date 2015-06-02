@@ -28,13 +28,12 @@ module Skylab::TanMan
 
       class Add
 
-        edit_entity_class do
-
-          o :reuse, Model_::Document_Entity.IO_properties,
-            :property, :attrs,
-            :property, :prototype,
-            :flag, :property, :ping
-        end
+        edit_entity_class(
+          :reuse, Model_::Document_Entity.IO_properties,
+          :property, :attrs,
+          :property, :prototype,
+          :flag, :property, :ping
+        )
 
         def via_arguments_produce_bound_call
           if @argument_box[ :ping ]
@@ -64,8 +63,9 @@ module Skylab::TanMan
           :required, :property, :from_node_label,
           :required, :property, :to_node_label )
 
-        entity_formal_property_method_names_box_for_write.
-          remove Brazen_::NAME_  # ouch/meh
+
+        properties.remove Brazen_::NAME_SYMBOL  # it's ok to mutate this, yeah?
+
 
         def produce_result
           entity_collection.delete_entity(
@@ -98,14 +98,14 @@ module Skylab::TanMan
           end
           m
         end
-        receive_missing_required_props _miss_prp_a
+        receive_missing_required_properties_array _miss_prp_a
         UNABLE_
       end
     end
 
     attr_reader :has_both_labels_, :has_both_IDs_
 
-    class Silo_Daemon < Silo_Daemon
+    class Silo_Daemon < superclass::Silo_Daemon
 
       def association_collection_controller_via_preconditions bx, & oes_p
 

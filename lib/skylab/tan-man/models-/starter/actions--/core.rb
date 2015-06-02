@@ -74,7 +74,7 @@ module Skylab::TanMan
       @__col ||= Hybrid_Collection_Controller___.new @preconditions, self.class, @kernel
     end
 
-    class Silo_Daemon < Silo_Daemon
+    class Silo_Daemon < superclass::Silo_Daemon
 
       # ~ custom exposures
 

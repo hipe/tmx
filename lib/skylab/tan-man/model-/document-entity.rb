@@ -33,6 +33,10 @@ module Skylab::TanMan
 
       class Action < Action_
 
+        # we've got to get in front of `normalize` so ..
+
+        include Brazen_::Model::Entity
+
         def document_entity_byte_upstream_identifier
           @_DEBUID
         end
@@ -128,10 +132,10 @@ module Skylab::TanMan
 
       IO_PROPERTIES__ = Model_.make_common_properties do | sess |
 
-        sess.edit_entity_class do
+        sess.edit_common_properties_module do
 
-          entity_property_class_for_write  # (was until #wishlist [#br-084] a flag meta meta property)
-          class self::Entity_Property
+          const_set :Property, ::Class.new( Brazen_::Model::Entity::Property )
+          class self::Property
 
             def initialize
               @direction_symbols = []
@@ -211,7 +215,7 @@ module Skylab::TanMan
 
         define_singleton_method :output_stream, ( Callback_.memoize do  # hidden for now, for #feature [#037]
 
-          self::Entity_Property.new do
+          self::Property.new do
             @name = Callback_::Name.via_variegated_symbol :output_stream
           end
         end )
@@ -219,7 +223,7 @@ module Skylab::TanMan
 
       INPUT_PROPERTIES___ = Model_.common_properties_class.new( nil ).set_properties_proc do
 
-        IO_PROPERTIES__.to_stream.reduce_by do | prp |
+        IO_PROPERTIES__.to_value_stream.reduce_by do | prp |
 
           prp.direction_symbols.include? :input
 
@@ -488,7 +492,7 @@ module Skylab::TanMan
 
               i = o.direction_i
 
-              _s_a = o.formals.map_reduce_by do | prp |
+              _s_a = o.formals.to_value_stream.map_reduce_by do | prp |
                 if prp.respond_to?( :expresses_direction ) &&
                     prp.direction_symbols.include?( i ) &&
                       prp.is_essential_to_direction
@@ -639,8 +643,15 @@ module Skylab::TanMan
         end
 
         def __when_document_did_not_change
+
           maybe_send_event :info, :document_did_not_change do
-            build_neutral_event_with :document_did_not_change do |y, o|
+
+            Callback_::Event.inline_neutral_with(
+
+              :document_did_not_change
+
+            ) do | y, o |
+
               y << "document did not change."
             end
           end ; nil

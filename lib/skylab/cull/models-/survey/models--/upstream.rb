@@ -23,7 +23,7 @@ module Skylab::Cull
           __unmarshal_id s
         end
 
-        st = sect.assignments.to_stream
+        st = sect.assignments.to_value_stream
 
         while ast = st.gets
           m = :"___unmarshal_#{ ast.external_normal_name_symbol }_property"

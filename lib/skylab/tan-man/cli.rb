@@ -29,12 +29,17 @@ module Skylab::TanMan
       include Previous_Actions___
 
       class Status < Action_Adapter
+
         def resolve_properties  # :+[#br-042] #nascent-operation
+
           super
+
           mutable_back_properties.replace_by :path do | prp |
+
             prp.dup.set_default_proc do
               ::Dir.pwd
             end.set_is_not_required.freeze
+
           end
           @front_properties = @mutable_back_properties
           nil

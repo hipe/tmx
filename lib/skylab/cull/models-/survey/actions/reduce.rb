@@ -6,12 +6,14 @@ module Skylab::Cull
 
       @after_name_symbol = :edit
 
+      _prp = Models_::Upstream::Actions::Map::TABLE_NUMBER_PROPERTY.
+        new_without_default
+
       Brazen_::Model.common_entity self,
 
         :reuse, COMMON_PROPERTIES_,
 
-        :property_object,
-          Models_::Upstream::Actions::Map::TABLE_NUMBER_PROPERTY.without_default,
+        :property_object, _prp,
 
         :description, -> y do
           y << "if provided, this survey will be used as a startingpoint."

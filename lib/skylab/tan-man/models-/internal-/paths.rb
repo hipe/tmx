@@ -101,7 +101,7 @@ module Skylab::TanMan
 
           if @on_event_selectively
 
-            maybe_receive_event_via_channel i_a do
+            @on_event_selectively.call( * i_a ) do
               _ev = ev_p[]
               _ev.with_message_string_mapper MSG_MAP__
             end

@@ -349,30 +349,52 @@ module Skylab::TanMan
     end
 
     def send_overwriting_event exist_g_a
-      i = @force_overwrite ? :rewriting_parser_files : :using_parser_files
-      _ev = build_neutral_event_with i, :exist_g_a, exist_g_a do |y, o|
+
+      sym = @force_overwrite ? :rewriting_parser_files : :using_parser_files
+
+      _ev = Callback_::Event.inline_neutral_with(
+        sym,
+        :exist_g_a, exist_g_a,
+        :sym, sym
+
+      ) do | y, o |
+
         _s_a = o.exist_g_a.map do |g|
           pth g.out_pn
         end
-        y << "#{ i }: #{ _s_a * ', ' }"
+
+        y << "#{ o.sym }: #{ _s_a * ', ' }"
       end
+
       send_info_event _ev
     end
 
     def send_creating_event create_g_a
-      _ev = build_neutral_event_with :creating, :create_g_a, create_g_a do |y, o|
+
+      _ev = Callback_::Event.inline_neutral_with(
+        :creating,
+        :create_g_a, create_g_a
+      ) do | y, o |
+
         _s_a = o.create_g_a.map do |g|
           pth g.out_pn
         end
+
         y << "creating: #{ _s_a * ', ' }"
       end
+
       send_info_event _ev
     end
 
     def send_none_event
-      _ev = build_neutral_event_with :none do |y, o|
+
+      _ev = Callback_::Event.inline_neutral_with(
+        :none
+      ) do | y, o |
+
         y << "none."
       end
+
       send_info_event _ev
     end
 

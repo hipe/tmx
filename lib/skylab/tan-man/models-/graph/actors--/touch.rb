@@ -127,8 +127,15 @@ module Skylab::TanMan
         end
 
         def __build_adding_extension_event
-          build_neutral_event_with :adding_extension,
-              :extension, @ext, :path, @arg.value_x do | y, o |
+
+          Callback_::Event.inline_neutral_with(
+
+            :adding_extension,
+            :extension, @ext,
+            :path, @arg.value_x
+
+          ) do | y, o |
+
             y << "adding #{ o.extension } extension to #{ pth o.path }"
           end
         end

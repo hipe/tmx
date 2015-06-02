@@ -21,7 +21,7 @@ module Skylab::Cull
 
         @call_a = []
 
-        st = sect.assignments.to_stream
+        st = sect.assignments.to_value_stream
 
         while ast = st.gets
 

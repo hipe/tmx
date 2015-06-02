@@ -17,6 +17,8 @@ module Skylab::Cull
         end,
         :required, :property, :path
 
+      include Survey_Action_Methods_
+
       def produce_result
 
         @survey = @parent_node.edit do | edit |

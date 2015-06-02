@@ -50,7 +50,7 @@ module Skylab::Cull
       def when_prefix
         maybe_send_event :error, :invalid_prefix do
 
-          Brazen_::Entity.properties_stack.build_extra_properties_event(
+          Brazen_::Property.build_extra_values_event(
             [ @prefix ],
             get_available_prefixes,
             'prefix' )
@@ -166,7 +166,7 @@ module Skylab::Cull
             ".#{ nm.as_slug }"
           end
 
-          Brazen_::Entity.properties_stack.build_extra_properties_event(
+          Brazen_::Property.build_extra_values_event(
             [ extname ],
             _s_a,
             'extension' )
@@ -182,7 +182,7 @@ module Skylab::Cull
             nm.as_lowercase_with_underscores_symbol
           end
 
-          Brazen_::Entity.properties_stack.build_extra_properties_event(
+          Brazen_::Property.build_extra_values_event(
             [ sym ],
             _s_a,
             'upstream adapter' )

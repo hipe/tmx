@@ -63,7 +63,7 @@ module Skylab::TanMan
     end  # >>
 
 
-    class Silo_Daemon < Silo_Daemon
+    class Silo_Daemon < superclass::Silo_Daemon
 
       def node_collection_controller_via_document_controller dc, & oes_p
 
@@ -129,7 +129,7 @@ module Skylab::TanMan
 
       def entity_via_intrinsic_key node_identifier, & oes_p
 
-        label_s = node_identifier.entity_name_s
+        label_s = node_identifier.entity_name_string
 
         node = to_node_sexp_stream.detect do | node_ |
           label_s == node_.label
@@ -142,7 +142,7 @@ module Skylab::TanMan
         elsif oes_p
           oes_p.call :info, :entity_not_found do
             Callback_::Event.inline_neutral_with :entity_not_found,
-              :entity_name_string, node_identifier.entity_name_s
+              :entity_name_string, node_identifier.entity_name_string
           end
         end
       end

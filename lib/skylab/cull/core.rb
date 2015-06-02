@@ -55,7 +55,7 @@ module Skylab::Cull
     x = new do
       seen = true
 
-      st = self.class.properties.to_stream
+      st = self.class.properties.to_value_stream
 
       values.length.times do | d |
         instance_variable_set(
@@ -84,7 +84,7 @@ module Skylab::Cull
     x = new do
       seen = true
 
-      st = self.class.properties.to_stream
+      st = self.class.properties.to_value_stream
 
       prp = st.gets
       while prp

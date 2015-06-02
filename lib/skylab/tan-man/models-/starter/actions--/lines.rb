@@ -95,9 +95,13 @@ module Skylab::TanMan
 
         def bld_using_default_event strtr, d
 
-          build_neutral_event_with :using_default,
-              :name_s, strtr.natural_key_string,
-              :num, d do |y, o|
+          Callback_::Event.inline_neutral_with(
+
+            :using_default,
+            :name_s, strtr.natural_key_string,
+            :num, d
+
+          ) do | y, o |
 
             y << "using default starter #{ val o.name_s } #{
              }(the last of #{ o.num } starter#{ s o.num })"
@@ -145,7 +149,8 @@ module Skylab::TanMan
         end
 
         def via_enoent_bld_event
-          LIB_.entity.event.wrap.exception.with(
+
+          Callback_::Event.wrap.exception.with(
             :path_hack,
             :terminal_channel_i, :resource_not_found,
             :exception, @enoent )

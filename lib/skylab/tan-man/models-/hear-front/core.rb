@@ -62,7 +62,7 @@ module Skylab::TanMan
 
         upstream = TanMan_.lib_.parse_lib.input_stream.via_array word_s_a
 
-        st = @definition_collection.to_stream
+        st = @definition_collection.to_value_stream
         dfn = st.gets
         while dfn
           on = dfn.parse_function.output_node_via_input_stream upstream
@@ -116,7 +116,7 @@ module Skylab::TanMan
 
         oes_p.call :error, :unrecognized_utterance do
 
-          _f_a = @definition_collection.to_stream.map_by do | x |
+          _f_a = @definition_collection.to_value_stream.map_by do | x |
             x.parse_function
           end.to_a
 

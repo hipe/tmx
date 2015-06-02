@@ -14,19 +14,19 @@ module Skylab::TanMan
 
     class << self
 
-      def action_class
+      def action_base_class
         Action_
+      end
+
+      def entity_enhancement_module
+        Entity_
       end
 
       def stubber
         Stub_Making_Action_Box_Module__.new self
       end
 
-      def entity_module
-        Entity_
-      end
-
-      def const_get _, __=nil  # local loading hack :(
+      def const_get _, __=true  # local loading hack :(
         if :Silo_Daemon == _ && ! const_defined?( :Silo_Daemon, false )
           if const_defined? :Stub_, false
             const_get :Actions__, false
@@ -101,11 +101,10 @@ module Skylab::TanMan
 
     extend( module MM
 
-    private
-
       define_method :desc, DESC_METHOD_
+      private :desc
 
-      def entity_module
+      def entity_enhancement_module
         Entity_
       end
 
@@ -114,9 +113,8 @@ module Skylab::TanMan
 
     include module IM
 
-    private
 
-      def bound_call_for_ping
+    private def bound_call_for_ping
 
         _x = maybe_send_event :payload, :ping_for_action do
           build_OK_event_with :ping_from_action, :name_symbol,
@@ -126,13 +124,11 @@ module Skylab::TanMan
         Callback_::Bound_Call.via_value _x
       end
 
-      def receive_extra_iambic ev  # #hook-in [cb]
+      def receive_extra_values_event ev  # #hook-in [cb]
         maybe_send_event :error do
           ev
         end
       end
-
-    public
 
       def krnl
         @kernel
@@ -167,7 +163,6 @@ module Skylab::TanMan
     end
   end
 
-
   Entity_ = Brazen_::Model.common_entity do
 
     # create an entity extension module whose foundation is another entity
@@ -175,15 +170,16 @@ module Skylab::TanMan
     # processors, etc. we may add to them but not (easily) take them away.
 
   end
+
   module Entity_
 
   public
 
     def property_value_via_symbol sym  # abstraction candidate
-      property_value_via_property self.class.property_via_symbol sym
+      property_value_via_property self.class.properties.fetch sym
     end
 
-    def receive_missing_required_properties ev  # #hook-in [br]
+    def receive_missing_required_properties_event ev  # #hook-in [br]
       receive_missing_required_properties_softly ev  # #experimental
     end
   end
@@ -309,19 +305,21 @@ module Skylab::TanMan
     set_workspace_config_filename 'tanman-workspace/config'
 
     class << self
+
       def common_properties
         COMMON_PROPERTIES___
       end
 
-      def entity_module  # for below
-        Entity_
+      def entity_enhancement_module
+        Entity_  # for below
       end
     end  # >>
 
     COMMON_PROPERTIES___ = make_common_properties do | sess |
 
       otr = Brazen_::Models_::Workspace.common_properties
-      sess.edit_entity_class(
+
+      sess.edit_common_properties_module(
         :property_object, otr.fetch( :config_filename ),
         :property_object, otr.fetch( :max_num_dirs ),
         :property_object, otr.fetch( :workspace_path ) )
@@ -410,7 +408,7 @@ module Skylab::TanMan
 
     class << self
 
-      def action_class  # #hook-in to [br]'s action factory
+      def action_base_class  # #hook-in to [br]'s action factory
         TanMan_::Model_::Document_Entity::Action
       end
 

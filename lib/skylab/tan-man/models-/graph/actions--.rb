@@ -68,7 +68,7 @@ module Skylab::TanMan
         path = path.path
       end
 
-      bx.add Brazen_::NAME_,
+      bx.add Brazen_::NAME_SYMBOL,
         @preconditions.fetch( :workspace ).from_asset_directory_relativize_path__( path )
 
       bx.to_pair_stream
@@ -78,7 +78,7 @@ module Skylab::TanMan
       @property_box.fetch :digraph_path
     end
 
-    class Silo_Daemon < Silo_Daemon
+    class Silo_Daemon < superclass::Silo_Daemon
 
       def produce_byte_stream_identifiers_at_in i_a, ws, & oes_p
         Produce_byte_stream_identifiers_at_in___.new( i_a, ws, & oes_p ).go
@@ -117,7 +117,7 @@ module Skylab::TanMan
       def go
 
         @graph_path = @workspace.business_property_value(
-            Graph_.persist_to.full_name_i ) do | * i_a, & ev_p |
+            Graph_.persist_to.full_name_symbol ) do | * i_a, & ev_p |
 
           if :property_not_found == i_a[ 1 ]
             __invite( i_a, & ev_p )

@@ -11,7 +11,7 @@ module Skylab::TanMan
         # "waypoints": input, "hereput" and output. see [#026] for
         # more about the architecture of syncing.
 
-        Entity_Property = DocEnt_.entity_property_class
+        Property = DocEnt_.entity_property_class
 
         edit_entity_class(
 

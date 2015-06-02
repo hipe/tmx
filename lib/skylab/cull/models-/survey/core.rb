@@ -274,7 +274,7 @@ module Skylab::Cull
 
     def ___all_become_one section_symbol
 
-      st = @cfg_for_write.sections.to_stream.reduce_by do | x |
+      st = @cfg_for_write.sections.to_value_stream.reduce_by do | x |
         section_symbol == x.external_normal_name_symbol
       end
 
@@ -299,7 +299,7 @@ module Skylab::Cull
 
       cfg = @cfg_for_write
 
-      st = cfg.sections.to_stream.reduce_by do | x |
+      st = cfg.sections.to_value_stream.reduce_by do | x |
         section_sym == x.external_normal_name_symbol
       end
 
@@ -388,24 +388,59 @@ module Skylab::Cull
       stowaway :Aggregator, same
     end
 
+    LIST_WRITER_MPP___ = -> prp do  # must be defined before below
+
+      _SYM = prp.name_symbol
+
+      -> do
+        _x = gets_one_polymorphic_value
+        ( @argument_box.touch _SYM do [] end ).push _x
+        KEEP_PARSING_
+      end
+    end
+
     module Survey_Action_Methods_
+
+      def self.receive_entity_property prp
+
+        if prp.has_custom_polymorphic_writer_method
+
+          m = prp.custom_polymorphic_writer_method_name
+          _method_definition = prp.polymorphic_writer_method_proc_proc[ prp ]
+
+          es = @entity_edit_session
+          @entity_edit_session = nil
+          define_method m, & _method_definition
+          @entity_edit_session = es
+
+          private m
+        end
+        KEEP_PARSING_
+      end
 
       Brazen_::Model.common_entity self do
 
-        entity_property_class_for_write
+        const_set :Property, ::Class.new( const_get( :Property  ) )
 
-        class self::Entity_Property
+        class self::Property
+
+          attr_reader :_wmeth
 
         private
 
           def list=  # :+#[br-082]
-            @polymorphic_writer_method_proc_is_generated = false
-            @polymorphic_writer_method_proc_proc = -> prp do
-              _SYM = prp.name_symbol
-              -> do
-                ( @argument_box.touch _SYM do [] end ).push gets_one_polymorphic_value
-                KEEP_PARSING_
-              end
+
+            @argument_arity = :_defined_manually_
+            @has_custom_polymorphic_writer_method = true
+            @polymorphic_writer_method_proc_proc = LIST_WRITER_MPP___
+            KEEP_PARSING_
+          end
+
+          def normalize_property
+
+            if has_custom_polymorphic_writer_method
+              set_polymorphic_writer_method_name(
+                conventional_polymorphic_writer_method_name )
             end
             KEEP_PARSING_
           end
@@ -428,8 +463,10 @@ module Skylab::Cull
 
       def via_path_argument_resolve_existent_survey
 
+        _trio = trio :path
+
         path = Models_::Survey.any_nearest_path_via_looking_upwards_from_path(
-          argument( :path ),
+          _trio,
           & handle_event_selectively )
 
         path and rslv_existent_survey_via_existent_path path
@@ -448,7 +485,7 @@ module Skylab::Cull
       end
     end
 
-    COMMON_PROPERTIES_ = Survey_Action_Methods_.properties.to_a
+    COMMON_PROPERTIES_ = Survey_Action_Methods_.properties.to_value_stream.to_a
     CONFIG_FILENAME_ = 'config'.freeze
     FILENAME_ = 'cull-survey'.freeze
     Survey_ = self
