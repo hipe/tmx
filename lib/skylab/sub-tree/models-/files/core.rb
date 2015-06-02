@@ -114,9 +114,15 @@ module Skylab::SubTree
         end
 
         def __when_many_upstreams a
+
           maybe_send_event :error, :irreconcilable_upstream do
 
-            build_not_OK_event_with :irreconcilable_upstream, :a, a do | y, o |
+            Callback_::Event.inline_not_OK_with(
+
+              :irreconcilable_upstream,
+              :a, a
+
+            ) do | y, o |
 
               _s_a = o.a.map do | trio |
                 par trio.property
@@ -173,12 +179,13 @@ module Skylab::SubTree
             if :find_command_args == i_a.last
               if @argument_box[ :show_find_command ]
 
-                maybe_receive_event_via_channel i_a, & ev_p
+                maybe_send_event( * i_a, & ev_p )
 
                 NIL_
               end
             else
-              maybe_receive_event_via_channel i_a, & ev_p
+
+              maybe_send_event( * i_a, & ev_p )
             end
           end
 
@@ -194,10 +201,15 @@ module Skylab::SubTree
 
           maybe_send_event :info, :find_command do
 
-            build_neutral_event_with :find_command, :args, x_p[].args do | y, o |
+            Callback_::Event.inline_neutral_with(
+              :find_command,
+              :args, x_p[].args
 
-              _s_a = x_p[].args.map( &
-                SubTree_::Library_::Shellwords.method( :shellescape ) )
+            ) do | y, o |
+
+              _p = SubTree_::Library_::Shellwords.method :shellescape
+
+              _s_a = x_p[].args.map( & _p )
 
               y << "find command: #{ _s_a * SPACE_ }"
 
@@ -283,9 +295,12 @@ module Skylab::SubTree
 
           @on_event_selectively.call :payload, :result_table do
 
-            build_neutral_event_with :result_table,
+            Callback_::Event.inline_neutral_with(
 
-                :line_item_array, node_a do | y, o |
+              :result_table,
+              :line_item_array, node_a
+
+            ) do | y, o |
 
               express_into_yielder_line_items__ y, o.line_item_array  # experiment
             end

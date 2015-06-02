@@ -44,7 +44,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
   class << self
 
-    def action_class  # #hook-out for [br] for using procs as actions (if ever)
+    def action_base_class  # #hook-out for [br] for using procs as actions (if ever)
       Action__
     end
 
@@ -329,7 +329,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
               @verb_s = send :"__verb_given__#{ i_a.last }__"
             end
 
-            handle_event_selectively_via_channel[ i_a, & ev_p ]
+            handle_event_selectively[ * i_a, & ev_p ]
           end
 
           io and begin
@@ -441,7 +441,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
     def build_missing_required_properties_event miss_a  # #hook-in->[cb]
 
-      Brazen_::Entity.properties_stack.
+      Brazen_::Property.
         build_missing_required_properties_event(
           miss_a, 'iambic parameter', "'#{ __moniker_for_errmsg }' is" )
     end

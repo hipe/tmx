@@ -230,8 +230,10 @@ module Skylab::BeautySalon
     end
 
     NO_KERNEL__ = class No_Kernel__
+
       def to_kernel
       end
+
       self
     end.new
 

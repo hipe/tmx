@@ -9,11 +9,14 @@ module Skylab::Treemap
         @is_promoted = true
 
         def produce_result
+
           maybe_send_event :info, :ping do
-            build_neutral_event_with :ping do | y, o |
+
+            Callback_::Event.inline_neutral_with :ping do | y, o |
               y << "hello from #{ app_name }."
             end
           end
+
           :hello_from_treemap
         end
       end

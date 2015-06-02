@@ -75,11 +75,14 @@ module Skylab::CodeMolester::TestSupport::Config::File
     end
 
     def black_and_white ev
+
       join_with_newlines_under ev, TestLib_::Bzn[]::API.expression_agent_instance
     end
 
     def render_as_codified ev
-      join_with_newlines_under ev, TestLib_::Bzn[].event.codifying_expression_agent
+
+      _expag = ::Skylab::Callback::Event.codifying_expression_agent
+      join_with_newlines_under ev, _expag
     end
 
     def join_with_newlines_under ev, expag

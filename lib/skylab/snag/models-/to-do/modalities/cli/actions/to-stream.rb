@@ -52,7 +52,7 @@ module Skylab::Snag
           bp = @bound.formal_properties
           fp = bp.to_mutable_box_like_proxy
 
-          cls = @bound.class::Entity_Property
+          cls = @bound.class::Property
 
           prp = cls.new_with :name_symbol, :verbose, :flag
           fp.add prp.name_symbol, prp

@@ -28,14 +28,6 @@ module Skylab::Basic
       MH__[]::Enhance::Shell.new a
     end
 
-    Entity = -> * a, & edit_p do
-      if a.length.nonzero? || edit_p
-        Brazen[]::Entity.call_via_arglist a, & edit_p
-      else
-        Brazen[]::Entity
-      end
-    end
-
     Funcy_globful = -> x do
       MH__[].funcy_globful x
     end

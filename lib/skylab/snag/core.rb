@@ -19,7 +19,7 @@ module Skylab::Snag
 
   class << self
 
-    def action_class  # #hook-out for procs as actions (for name stop index)
+    def action_base_class  # #hook-out for procs as actions (for name stop index)
 
       lib_.brazen::Model.common_action_class
     end
@@ -130,7 +130,7 @@ module Skylab::Snag
 
     p = -> do
 
-      class Actn_Ldr____ < Snag_.lib_.brazen::Model::Action
+      class Actn_Ldr____ < Snag_.lib_.brazen::Action
 
         class << self
 

@@ -37,7 +37,7 @@ module Skylab::CodeMolester
       instance_exec( & p )
     end
 
-    CM_.lib_.new_event_lib.selective_builder_sender_receiver self
+    Callback_::Event.selective_builder_sender_receiver self
 
   private
 
@@ -433,12 +433,16 @@ module Skylab::CodeMolester
         @dry_run = x
       end
 
-      def build_digraph_event x, i, esg
+      def build_digraph_event x, sym, esg
+
         if x.respond_to? :to_event
           x
+
         elsif x.respond_to? :each_pair
-          CM_.lib_.brazen.event.inline_neutral_with i, *
-            ( x.to_a.flatten( 1 ) )
+
+          Callback_::Event.inline_neutral_with(
+            sym, * x.to_a.flatten( 1 ) )
+
         else
           self._DO_ME
         end

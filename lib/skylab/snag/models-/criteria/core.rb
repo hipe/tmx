@@ -10,9 +10,8 @@ module Skylab::Snag
 
     class Action__ < Brazen_::Model.common_action_class  # re-opens
 
-      Brazen_::Model.common_entity self do
+      Brazen_::Model.common_entity self
 
-      end
     end
 
     class Actions::Criteria_To_Stream < Action__
@@ -260,7 +259,7 @@ module Skylab::Snag
 
       Properties___ =  Callback_.memoize do  # a sketch for front client integ.
         [
-          Callback_::Actor.methodic.simple_property_class.new_via_name_symbol(
+          Callback_::Actor::Methodic::Property.new_via_name_symbol(
             :name
           )
         ].freeze

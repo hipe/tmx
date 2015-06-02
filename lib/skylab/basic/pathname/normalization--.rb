@@ -6,51 +6,41 @@ module Skylab::Basic
 
         # do not let this seep into the scope of [#sy-004]. do not use FS here
 
-        class << self
+        Callback_::Actor.methodic self
 
-          def new_with * x_a  # was there, then went away. may go back there.
-            ok = nil
-            x = new do
-              ok = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
-            end
-            ok && x
-          end
-        end  # >>
+      private
 
-        Basic_.lib_.entity self do
-
-          def absolute
-            @relative_is_OK = false
-            KEEP_PARSING_
-          end
-
-          def relative
-            @absolute_is_OK = false
-            KEEP_PARSING_
-          end
-
-          def downward_only
-            add_content_validation_against :dot_dot
-            KEEP_PARSING_
-          end
-
-          def no_single_dots
-            add_content_validation_against :single_dot
-            KEEP_PARSING_
-          end
-
-          def no_dotfiles
-            add_content_validation_against :dot_file
-            KEEP_PARSING_
-          end
+        def absolute=
+          @relative_is_OK = false
+          KEEP_PARSING_
         end
 
-        def initialize & p
+        def relative=
+          @absolute_is_OK = false
+          KEEP_PARSING_
+        end
+
+        def downward_only=
+          add_content_validation_against :dot_dot
+          KEEP_PARSING_
+        end
+
+        def no_single_dots=
+          add_content_validation_against :single_dot
+          KEEP_PARSING_
+        end
+
+        def no_dotfiles=
+          add_content_validation_against :dot_file
+          KEEP_PARSING_
+        end
+
+        def initialize & edit_p
           @content_validation_is_required = false
           @content_validation_is_activated = false
           @disallow_h = nil
           @absolute_is_OK = @relative_is_OK = true
-          instance_exec( & p )
+          instance_exec( & edit_p )
           freeze
         end
 
@@ -60,8 +50,6 @@ module Skylab::Basic
             @disallow_h = @disallow_h.dup
           end
         end
-
-      private
 
         def add_content_validation_against i
           if ! @content_validation_is_activated

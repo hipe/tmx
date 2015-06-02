@@ -16,7 +16,7 @@ module Skylab::Snag
 
       # ~ models & like
 
-      Methodic_ = Callback_::Actor.methodic_lib
+      Methodic_ = Callback_::Actor::Methodic
 
       class Common_Adapter_
 

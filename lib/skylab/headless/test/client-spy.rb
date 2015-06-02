@@ -49,10 +49,13 @@ module Skylab::Headless::TestSupport
     end
 
     def bld_IO_adapter
+
       _pen = resolve_pen
-      Headless_::TestSupport::IO_Adapter_Spy.new(
+
+      Headless_::TestSupport::IO_Adapter_Spy.new_with(
         :pen, _pen,
-        :do_debug_proc, -> { @debug.call } )
+        :do_debug_proc, -> { @debug.call }
+      )
     end
 
     def resolve_pen

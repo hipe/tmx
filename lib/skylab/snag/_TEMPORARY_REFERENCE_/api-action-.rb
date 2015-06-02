@@ -18,7 +18,7 @@ module Skylab::Snag
 
         entity_property_class_for_write
 
-        class self::Entity_Property
+        class self::Property
 
         private
 
@@ -150,7 +150,7 @@ module Skylab::Snag
 
             @name = Callback_::Name.via_variegated_symbol stem_symbol
 
-            @polymorphic_writer_method_proc_is_generated = false
+            @has_custom_polymorphic_writer_method = true
 
             @iwmn = via_name_build_internal_polymorphic_writer_meth_nm  # #todo publicize this [br] ivar
 

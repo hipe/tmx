@@ -31,7 +31,9 @@ module Skylab::Snag
         mutable_front_properties.replace_by :upstream_identifier do | prp |
 
           prp.dup.set_default_proc do
+
             present_working_directory
+
           end.freeze
         end
 
@@ -97,7 +99,7 @@ module Skylab::Snag
         a = []
         ks = bx.get_names
 
-        PROPERTIES_FOR_REPORT___.to_stream.each do | prp |
+        PROPERTIES_FOR_REPORT___.to_value_stream.each do | prp |
 
           k = prp.name_symbol
           had = true
@@ -151,7 +153,7 @@ module Skylab::Snag
       _prp_a = Snag_::Models_::Node::Actions::To_Stream.
         properties.at :number_limit, :upstream_identifier
 
-      sess.edit_entity_class :reuse, _prp_a
+      sess.edit_common_properties_module :reuse, _prp_a
 
     end
 
@@ -196,7 +198,7 @@ module Skylab::Snag
 
         _st = Callback_::Polymorphic_Stream.via_array x_a
 
-        kp = Callback_::Actor.methodic_lib::
+        kp = Callback_::Actor::Methodic::
           Process_polymorphic_stream_fully.call _st, self
 
         if kp
@@ -214,7 +216,7 @@ module Skylab::Snag
 
         _x = @polymorphic_upstream_.gets_one
 
-        arg = prp.normalize(
+        arg = prp.normalize_argument(
           Callback_::Trio.via_value_and_property( _x, prp ),
           & @_oes_p )
 

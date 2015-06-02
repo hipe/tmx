@@ -114,10 +114,6 @@ module Skylab::CodeMolester
       Basic[]::Module
     end
 
-    New_event_lib = -> do
-      Brazen[].event
-    end
-
     NLP_EN_methods = -> mod do
       Hu___[]::NLP::EN::Methods[ mod ]
     end

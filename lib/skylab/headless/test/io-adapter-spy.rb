@@ -6,14 +6,13 @@ module Skylab::Headless::TestSupport
     # call_digraph_listeners-spy-style testing of our all-important IO::Adapter, which is like
     # an call_digraph_listeners spy but also needs to provide a Pen.
 
-
-    def initialize * x_a
-      :pen == x_a.first or raise ::ArgumentError, "iambic hack"
-      @pen = x_a.fetch 1
-      x_a[ 0, 2 ] = EMPTY_A_
-      init_via_iambic x_a
-    end
-
     attr_reader :pen
+
+  private
+
+    def pen=
+      @pen = gets_one_polymorphic_value
+      true  # as in KEEP_PARSING_
+    end
   end
 end
