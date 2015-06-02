@@ -1,0 +1,87 @@
+#!/usr/bin/env ruby -w
+
+require_relative '../core'
+
+module Skylab::Slicer
+
+  class EG_BR____ < Slicer_::Modality_Adapters_::CLI
+
+    def initialize( * )
+
+      super
+    end
+
+    def execute
+      if @argv.length.zero?
+        __go
+      else
+        @stderr.puts "builds a graph of all the guys that use [br]"
+        express_usage
+      end
+    end
+
+    def __go
+
+      _o = Slicer_::Sessions_::Traversal.new
+      path_a = []
+
+      path_to_ss = {}
+
+      _o.to_sidesystem_stream.each do | ss |
+
+        s = ss.get_core_path
+        path_to_ss[ s ] = ss
+        path_a.push s
+      end
+
+      require 'open3'
+
+      keyword = 'application_kernel_'
+
+      _, o, e, w = ::Open3.popen3 'grep', '-lw', keyword, * path_a
+
+      a = []
+      s = e.gets and fail s
+      begin
+        s = o.gets
+        s or break
+        s.chomp!
+        a.push path_to_ss.fetch( s )
+        redo
+      end while nil
+
+      d = w.value.exitstatus
+      d.zero? or fail "huh? #{ d }"
+
+      if a.length.zero?
+        @stderr.puts "none found with #{ keyword.inspect }."
+        NIL_
+      else
+        __yes a
+      end
+    end
+
+    def __yes a
+
+      @stdout.puts "digraph g {"
+
+      graph_viz_labeller = Slicer_::Output_Adapters_::Graph_Viz::Labeller.new(
+        @stdout )
+
+      Slicer_::Actors_::Determine_and_distribute_medallions[ a ].each do | ss |
+
+        graph_viz_labeller << ss
+      end
+
+      a.each do | ss |
+        @stdout.puts "#{ ss.medo } -> br"
+      end
+
+      @stdout.puts "}"
+
+      NIL_
+    end
+  end
+end
+
+Skylab::Slicer::EG_BR____.new( nil, $stdout, $stderr, ::ARGV ).execute

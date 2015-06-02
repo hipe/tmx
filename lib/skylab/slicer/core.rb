@@ -29,7 +29,10 @@ module Skylab::Slicer
     Face__ = sidesys[ :Face ]
   end
 
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
+  ACHIEVED_ = true
+  NIL_ = nil
   Slicer_ = self
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 end
