@@ -21,8 +21,10 @@ module Skylab::Porcelain::TestSupport::Bleeding::Runtime
     end
 
     let :parent_client do
-      Callback_.test_support.call_digraph_listeners_spy.new(
-        :do_debug_proc, -> { debug } )
+
+      Callback_.test_support.call_digraph_listeners_spy.new_with(
+        :do_debug_proc, -> { debug }
+      )
     end
 
     let :result do

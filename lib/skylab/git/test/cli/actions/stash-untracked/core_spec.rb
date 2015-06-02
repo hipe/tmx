@@ -1,18 +1,10 @@
 require_relative 'test-support'
 
-module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked::Core__
-
-  ::Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked[ TS__ = self ]
-
-  include Constants
-
-  OUT_I = OUT_I ; ERR_I = ERR_I
-
-  extend TestSupport_::Quickie
+module Skylab::Git::TestSupport::CLI::SU
 
   describe "[gi] CLI gsu core" do
 
-    extend TS__
+    extend TS_
 
     it "CLI client loads" do  # can be moved up when appropriate
       Git_::CLI::Client

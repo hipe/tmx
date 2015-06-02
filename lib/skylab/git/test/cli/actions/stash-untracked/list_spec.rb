@@ -1,16 +1,10 @@
 require_relative 'test-support'
 
-module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked::List__
-
-  ::Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked[ TS__ = self ]
-
-  include Constants
-
-  GSU = GSU ; OUT_I = OUT_I
+module Skylab::Git::TestSupport::CLI::SU
 
   describe "[gi] CLI actions gsu list" do  # :+#no-quickie because: `.stub`-ing
 
-    extend TS__
+    extend TS_
 
     context "two files" do
 

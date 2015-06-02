@@ -1,18 +1,10 @@
 require_relative 'test-support'
 
-module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked::Actions__
-
-  ::Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked[ TS__ = self ]
-
-  include Constants
-
-  GSU = GSU
-
-  extend TestSupport_::Quickie
+module Skylab::Git::TestSupport::CLI::SU
 
   describe "[gi] CLI actions gsu actions" do
 
-    extend TS__
+    extend TS_
 
     describe "status" do
 
@@ -232,7 +224,11 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked::Actions__
       end
 
       def omg str, omg_a
+
+        _OMG_RX = /(?<=\A# )[^ ]+(?=[ ])/
+
         line_a = str.split "\n"
+
         begin
           s = omg_a.shift
           if s.respond_to? :ascii_only?
@@ -243,8 +239,8 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked::Actions__
           end
           d.times do
             line = line_a.shift or fail "expected one more line had none"
-            md = OMG_RX__.match line
-            md or fail "expected line to match /#{ OMG_RX__.source }/ - #{
+            md = _OMG_RX.match line
+            md or fail "expected line to match /#{ _OMG_RX.source }/ - #{
               line.inspect }"
             _s = md[ 0 ]
             _s == s or fail "expected #{ _s.inspect } to match #{ s.inspect }"
@@ -254,8 +250,6 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked::Actions__
           fail "expected no more lines had : #{ line_a[ 0 ].inspect }"
         end
       end
-
-      OMG_RX__ = /(?<=\A# )[^ ]+(?=[ ])/
     end
   end
 end

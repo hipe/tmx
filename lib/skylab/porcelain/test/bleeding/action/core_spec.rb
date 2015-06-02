@@ -17,8 +17,12 @@ module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
       klass :HerpDerp__FerpMerp
       remove_method :subject # avoids a warning # ./test/all req -v porcelain
       let(:subject) { -> { fetch } }
-      specify { should raise_error( ::NameError,
-                           /undefined method `process' for class.+FerpMerp/) }
+
+      _rx = /undefined method `process' for class.+FerpMerp/
+
+      specify do
+        should raise_error( ::NameError, _rx )
+      end
     end
 
     context "So if you make an action class called FerpMerp that does #{

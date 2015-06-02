@@ -1,20 +1,12 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked
+module Skylab::Git::TestSupport::CLI::SU
 
-  ::Skylab::Git::TestSupport::CLI::Actions[ self ]
+  ::Skylab::Git::TestSupport::CLI[ TS_ = self ]
 
-  module Constants
-    GSU = -> do
-      Git_::CLI::Actions::Stash_Untracked
-    end
-    WAZZLE = 'wazzle'.freeze
-  end
   include Constants
-  Git_ = Git_
-  GSU = GSU
-  TestLib_ = TestLib_
-  WAZZLE = WAZZLE
+
+  extend TestSupport_::Quickie
 
   module InstanceMethods
 
@@ -73,15 +65,28 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked
     end
     #
     GSU_Tmpdir__ = -> do
+
       p = -> do_dbg do
+
         _tdpn = TestLib_::Tmpdir_pathname[].join 'gsu-xyzzy'
-        _GSU_tmpdir = TestLib_::Tmpdir[].new :path, _tdpn.to_s, :max_mkdirs, 2
+
+        _GSU_tmpdir = TestLib_::Tmpdir[].new_with(
+          :path, _tdpn.to_s,
+          :max_mkdirs, 2
+        )
+
         if do_dbg
           _GSU_tmpdir.debug!
         end
+
         p = -> _ { _GSU_tmpdir } ; _GSU_tmpdir
+
       end
-      -> do_dbg { p[ do_dbg ] }
+
+      -> do_dbg do
+        p[ do_dbg ]
+      end
+
     end.call
 
 
@@ -89,6 +94,15 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked
       expect_no_more_lines
       @result.should eql GSU[]::CLI::SUCCESS_EXITSTATUS
     end
-
   end
+
+  Git_ = Git_
+
+  GSU = -> do
+    Git_::CLI::Actions::Stash_Untracked
+  end
+
+  TestLib_ = TestLib_
+
+  WAZZLE = 'wazzle'.freeze
 end
