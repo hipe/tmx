@@ -82,11 +82,11 @@ module Skylab::System
               x_a.unshift :path
             end
 
-            Normalization__::Downstream_IO__.mixed_via_iambic x_a, & oes_p
+            Normalization__::Downstream_IO__.mixed_via_iambic_ x_a, & oes_p
           end
 
           def existent_directory * x_a, & oes_p
-            Normalization__::Existent_Directory__.mixed_via_iambic x_a, & oes_p
+            Normalization__::Existent_Directory__.mixed_via_iambic_ x_a, & oes_p
           end
 
           def members
@@ -99,28 +99,28 @@ module Skylab::System
               x_a.unshift :path
             end
 
-            Normalization__::Upstream_IO__.mixed_via_iambic x_a, & oes_p
+            Normalization__::Upstream_IO__.mixed_via_iambic_ x_a, & oes_p
           end
 
           def unlink_file * x_a, & oes_p
-            Normalization__::Unlink_File__.mixed_via_iambic x_a, & oes_p
+            Normalization__::Unlink_File__.mixed_via_iambic_ x_a, & oes_p
           end
         end  # >>
 
         module Common_Module_Methods_
 
-          def mixed_with * x_a, & oes_p
-            mixed_via_iambic x_a, & oes_p
+          def mixed_with__ * x_a, & oes_p
+            mixed_via_iambic_ x_a, & oes_p
           end
 
-          def mixed_via_iambic x_a, & oes_p
+          def mixed_via_iambic_ x_a, & oes_p
             if x_a.length.nonzero?
               ok = nil
               x = new do
                 accept_selective_listener_proc oes_p
                 ok = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
               end
-              ok and x.produce_mixed_result
+              ok and x.produce_mixed_result_
             else
               self
             end
@@ -259,11 +259,7 @@ module Skylab::System
           end
         end
 
-        Entity_ = System_.lib_.entity
-
-        Event_ = Entity_.event
-
-        Event_.selective_builder_sender_receiver self
+        Callback_::Event.selective_builder_sender_receiver self
 
         N11n_ = self
       end

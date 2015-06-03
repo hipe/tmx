@@ -12,14 +12,6 @@ module Skylab::System
 
     Brazen = sidesys[ :Brazen ]  # used in tests too
 
-    Entity = -> * a, & p do
-      if a.length.zero? && ! p
-        Brazen[]::Entity
-      else
-        Brazen[]::Entity.call_via_arglist a, & p
-      end
-    end
-
     File_utils = stdlib[ :FileUtils ]
 
     Human = sidesys[ :Human ]
@@ -29,7 +21,7 @@ module Skylab::System
     Parse_lib = sidesys[ :Parse ]
 
     Properties_stack_frame = -> *a do
-      Brazen[].properties_stack.common_frame.call_via_arglist a
+      Brazen[]::Property::Stack.common_frame.call_via_arglist a
     end
 
     Shellwords = stdlib[ :Shellwords ]

@@ -1,25 +1,42 @@
 module Skylab::System
 
+  class Services___::Filesystem
 
-    class Services___::Filesystem
+    class Normalization__
 
-      class Normalization__
+      class Upstream_IO__ < self  # see [#022]
 
-        class Upstream_IO__ < self  # see [#022]
+        class << self
 
-          class << self
+          def call path_arg, & oes_p
+            mixed_with__ :path_arg, path_arg, & oes_p
+          end
+        end  # >>
 
-            def call path_arg, & oes_p
+        extend Common_Module_Methods_
 
-              mixed_with :path_arg, path_arg, & oes_p
-            end
-          end  # >>
+        def initialize & edit_p
+          @dash_means = nil
+          @do_execute = false
+          @do_recognize_common_string_patterns = nil
+          @do_result_in_IO_stream_identifier_trio = nil
+          @instream = nil
+          @only_apply_ftype_expectation = false
+          @path_arg_was_explicit = false
+          @value_is_pathname = false
+          instance_exec( & edit_p )
+          @as_normal_value ||= IDENTITY_
+        end
 
-          extend Common_Module_Methods_
+        edit_actor_class :properties,
 
-          Entity_.call self do
+          :as_normal_value,
+          :instream,
+          :stat
 
-            o :polymorphic_writer_method_name_suffix, :"="
+      private
+
+        # -> 2
 
             def path=
               @do_execute = true
@@ -52,31 +69,16 @@ module Skylab::System
               ACHIEVED_
             end
 
-            o :properties,
-                :as_normal_value,
-                :instream,
-                :stat
-
             def dash_means=
               @dash_means = gets_one_polymorphic_value
               KEEP_PARSING_
             end
-          end
 
-          def initialize & edit_p
-            @dash_means = nil
-            @do_execute = false
-            @do_recognize_common_string_patterns = nil
-            @do_result_in_IO_stream_identifier_trio = nil
-            @instream = nil
-            @only_apply_ftype_expectation = false
-            @path_arg_was_explicit = false
-            @value_is_pathname = false
-            instance_exec( & edit_p )
-            @as_normal_value ||= IDENTITY_
-          end
+            # <- 1
 
-          def produce_mixed_result
+        public
+
+          def produce_mixed_result_
             if @do_execute
               execute  # is an inline normalization
             else
@@ -91,6 +93,8 @@ module Skylab::System
               when_formal_path
             end
           end
+
+        private
 
           def when_formal_both
             if @path_arg.is_known_known
@@ -209,7 +213,7 @@ module Skylab::System
             end
           end
 
-          def via_stat_execute  # :+#public-API
+          public def via_stat_execute  # :+#public-API
 
             if @only_apply_ftype_expectation
               via_stat_and_expected_ftype_exert_expectation
@@ -271,7 +275,7 @@ module Skylab::System
                 end ]
             end
 
-            Event_.wrap.exception e, :path_hack, * _xtra,
+            Callback_::Event.wrap.exception e, :path_hack, * _xtra,
               :properties, :path_arg, @path_arg
 
           end
@@ -279,7 +283,10 @@ module Skylab::System
           def which_stream_
             :upstream
           end
-        end
+
+          # <- 1
+
       end
     end
+  end
 end

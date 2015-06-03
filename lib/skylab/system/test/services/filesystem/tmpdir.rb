@@ -32,7 +32,7 @@ module Skylab::System::TestSupport
             o.new_with :be_verbose, false
           end
         else
-          o = TestSupport_.tmpdir.new(
+          o = TestSupport_.tmpdir.new_with(
             :path, TS_.tmpdir_path_,
             :be_verbose, do_debug,
             :debug_IO, debug_IO )

@@ -192,8 +192,10 @@ module Skylab::System
         end
 
         def bld_property
+
           sym = @property_symbol || :path
-          Callback_::Actor.methodic_lib.simple_property_class.new do
+
+          Callback_::Actor::Methodic::Property.new do
             @name = Callback_::Name.via_variegated_symbol sym
           end
         end

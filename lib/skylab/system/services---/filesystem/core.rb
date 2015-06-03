@@ -111,7 +111,7 @@ module Skylab::System
         if x_a.length.zero?
           Filesystem_::Find__
         else
-          Filesystem_::Find__.mixed_via_iambic x_a, & oes_p
+          Filesystem_::Find__.mixed_via_iambic_ x_a, & oes_p
         end
       end
 
@@ -124,7 +124,7 @@ module Skylab::System
       end
 
       def grep * x_a
-        Filesystem_::Grep__.mixed_via_iambic x_a
+        Filesystem_::Grep__.mixed_via_iambic_ x_a
       end
 
       def hack_guess_module_tree * x_a, & oes_p

@@ -2,172 +2,222 @@ module Skylab::System
 
   module IO
 
-    module Mappers
+    class Mappers::Filter  # :[#159]
 
-      Autoloader_[ Interceptors_ = self ]  # ~ stowaway, a.l needed in this file!
+      # intercept write-like messages intended for an ::IO, but do something
+      # magical with the content. Don't forget to call `flush!` at the end.
 
-      class Filter  # :[#159]
+      # -- Invocation alternatives
 
-    # intercept write-like messages intended for an ::IO, but do something
-    # magical with the content. Don't forget to call flush! at the end.
+      class << self
 
-
-        System_.lib_.entity self do
-
-          o :polymorphic_writer_method_name_suffix, :'='
-
-          def line_begin_string=
-            s = gets_one_polymorphic_value
-            s and set_line_begin_proc -> { @downstream_IO.write s }
-            ACHIEVED_
-          end
-
-          def line_begin_proc=
-            p = gets_one_polymorphic_value
-            p and set_line_begin_proc p
-            ACHIEVED_
-          end
-
-          def line_end_proc=
-            p = gets_one_polymorphic_value
-            p and set_line_end_proc p
-            ACHIEVED_
-          end
-
-          def puts_map_proc=
-
-            # each data passed to puts will first be run through each filter
-            # in the order received in a reduce operation, the result being
-            # what is finally passed to puts
-
-            p = gets_one_polymorphic_value
-            p and ( @puts_map_p_a ||= [] ).push p
-            ACHIEVED_
-          end
-
-          o :properties,
-            :downstream_IO,
-            :niladic_pass_filter_proc
-
+        def [] x
+          new_with :downstream_IO, x
         end
 
-        include Interceptors_::Tee::Is_TTY_Instance_Methods
+        private :new
+      end  # >>
 
-        def initialize * x_a
+      # -- Construction arguments
 
-          @check_for_line_boundaries = @line_begin_p = @line_end_p =
-            @niladic_pass_filter_proc = @puts_map_p_a = nil
+      Callback_::Actor.methodic self, :properties,
 
-          @prev_was_NL = true
+        :downstream_IO,
+        :niladic_pass_filter_proc
 
-          if 1 == x_a.length
-            x_a.unshift :downstream_IO
+    private
+
+      def line_begin_string=
+
+        s = gets_one_polymorphic_value
+        if s
+          _set_line_begin_proc -> { @downstream_IO.write s }
+        end
+        KEEP_PARSING_
+      end
+
+      def line_begin_proc=
+
+        p = gets_one_polymorphic_value
+        if p
+          _set_line_begin_proc p
+        end
+        KEEP_PARSING_
+      end
+
+      def line_end_proc=
+
+        p = gets_one_polymorphic_value
+        if p
+          _set_line_proc :@_line_end_p, p
+        end
+        KEEP_PARSING_
+      end
+
+      def _set_line_begin_proc p
+
+        _set_line_proc :@_line_begin_p, p
+        NIL_
+      end
+
+      def _set_line_proc ivar, p
+
+        instance_variable_set ivar, p
+        @_do_check_for_line_boundaries = true
+        NIL_
+      end
+
+      def puts_map_proc=
+
+        # each data passed to puts will first be run through each filter
+        # in the order received in a reduce operation, the result being
+        # what is finally passed to puts
+
+        p = gets_one_polymorphic_value
+        if p
+          ( @_puts_map_p_a ||= [] ).push p
+        end
+        KEEP_PARSING_
+      end
+
+      # ~ construction internals
+
+      def initialize( & edit_p )
+
+        @_do_check_for_line_boundaries = false
+
+        @_line_begin_p = @_line_end_p = nil
+
+        @niladic_pass_filter_proc = @_puts_map_p_a = nil
+
+        @_was_newline = true
+
+        instance_exec( & edit_p )
+
+        @niladic_pass_filter_proc ||= NILADIC_TRUTH_
+
+      end
+
+    public
+
+      # -- Readers & delegators
+
+      include Mappers::Tee::Is_TTY_Instance_Methods
+
+      def downstream_IO
+        @downstream_IO
+      end
+
+      %i( close closed? rewind truncate ).each do | sym |
+
+        define_method sym do | * a |
+
+          if @downstream_IO.respond_to? sym
+            @downstream_IO.send sym, * a
           end
+        end
+      end
 
-          process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
+      def puts *a
+        if _yes
+          __puts_via_array a
+        end
+      end
 
-          @niladic_pass_filter_proc ||= NILADIC_TRUTH_
+      def << str
+        if _yes
+          _write str
+        end
+        self
+      end
 
+      def write str
+        if _yes
+          _write str
+        else
+          "#{ str }".length
+        end
+      end
+
+      def _yes
+        @niladic_pass_filter_proc.call
+      end
+
+      def __puts_via_array a
+
+        a = a.flatten
+        if a.length.zero?
+          a.push EMPTY_S_
         end
 
-        def downstream_IO
-          @downstream_IO
-        end
+        a.each do | s |
 
-        %i( close closed? rewind truncate ).each do |i|
-          define_method i do |*a|
-            if @downstream_IO.respond_to? i
-              @downstream_IO.send i, *a
+          if @_puts_map_p_a
+            s = @_puts_map_p_a.reduce s do | m, p |
+              p[ m ]
             end
           end
-        end
 
-        def puts *a
-          if do_pass
-            do_puts_via_a a
+          s = s.to_s
+
+          if NEWLINE_CHAR___ != s.getbyte( -1 )
+            s = "#{ s }#{ NEWLINE_ }"
           end
+
+          _write s  # route everything through write()
         end
 
-        def << str
-          if do_pass
-            do_write str
-          end
-          self
-        end
-
-        def write str
-          if do_pass
-            do_write str
-          else
-            "#{ str }".length
-          end
-        end
-
-      private
-
-        def set_line_begin_proc p
-          set_line_proc :@line_begin_p, p ; nil
-        end
-
-        def set_line_end_proc p
-          set_line_proc :@line_end_p, p ; nil
-        end
-
-        def set_line_proc ivar, p
-          instance_variable_set ivar, p
-          @check_for_line_boundaries = true ; nil
-        end
-
-    def do_puts_via_a a
-      a = a.flatten
-      a.length.zero? and a.push EMPTY_S_
-      a.each do |s|
-        if @puts_map_p_a
-          s = @puts_map_p_a.reduce( s ) { |m, p| p[ m ] }
-        end
-        s = s.to_s
-        if NEWLINE_CHAR__ != s.getbyte( -1 )
-          s = "#{ s }#{ NEWLINE_ }"
-        end
-        do_write s  # route everything through write()
+        NIL_  # per ::IO#puts, but consider it undefined.
       end
-      nil  # per ::IO#puts, but consider it undefined.
-    end
-    NEWLINE_CHAR__ = NEWLINE_.getbyte 0
 
-    def do_write str
-      begin
-        if str.length.zero? || ! @check_for_line_boundaries
-          break(( length = @downstream_IO.write str ))
+      NEWLINE_CHAR___ = NEWLINE_.getbyte 0
+
+      def _write s
+
+        if s.length.zero? || ! @_do_check_for_line_boundaries
+
+          @downstream_IO.write s  # result is bytes
+        else
+          __write_while_checking_for_line_boundaries s
         end
-        was_NL = @prev_was_NL
-        @prev_was_NL = NEWLINE_ == str[ -1 ]
+      end
+
+      def __write_while_checking_for_line_boundaries str
+
+        was_NL = @_was_newline
+        @_was_newline = NEWLINE_ == str[ -1 ]
+
         a = str.split NEWLINE_, -1
         last_d = a.length - 1
-        a.each_with_index do |s, d|
-          is_not_first = d.nonzero?
-          is_not_last = last_d != d
+
+        a.each_with_index do | s, d |
+
+          is_subsequent = d.nonzero?
+          _is_not_last = last_d != d
           has_width = s.length.nonzero?
-          if is_not_first
+
+          if is_subsequent
+
             @downstream_IO.write NEWLINE_
-            @line_end_p and @line_end_p[]
+
+            if @_line_end_p
+              @_line_end_p[]
+            end
           end
-          if is_not_first || was_NL and
-            is_not_last || has_width and @line_begin_p
-            @line_begin_p[]
+
+          if is_subsequent || was_NL and
+              _is_not_last || has_width and
+              @_line_begin_p
+
+            @_line_begin_p[]
           end
+
           if has_width
             @downstream_IO.write s
           end
         end
-        length = str.length
-      end while nil
-      length
-    end
 
-        def do_pass
-          @niladic_pass_filter_proc.call
-        end
+        str.length
       end
     end
   end

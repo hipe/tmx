@@ -1,44 +1,41 @@
 module Skylab::System
 
+  class Services___::Filesystem
 
-    class Services___::Filesystem
+    class Normalization__
 
-      class Normalization__
+      class Existent_Directory__ < self
 
-        class Existent_Directory__ < self
+        extend Common_Module_Methods_
 
-          extend Common_Module_Methods_
+        Callback_::Actor.methodic self, :properties,
+          :is_dry_run,
+          :max_mkdirs
 
-          Entity_.call self do
-
-            o :polymorphic_writer_method_name_suffix, :'='
-
-            def create_if_not_exist=
-              @do_create_if_not_exist = true
-            end
-
-            def path=
-              @ready_to_execute = true
-              @path_x = gets_one_polymorphic_value
-            end
-
-            o :properties,
-
-              :on_event_selectively,
-
-              :is_dry_run,
-              :max_mkdirs
+      private
+        # ->
+          def create_if_not_exist=
+            @do_create_if_not_exist = true
+            KEEP_PARSING_
           end
 
-          def initialize & p
+          def path=
+            @ready_to_execute = true
+            @path_x = gets_one_polymorphic_value
+            KEEP_PARSING_
+          end
+
+          def initialize & edit_p
             @do_create_if_not_exist = nil
             @is_dry_run = false
             @max_mkdirs = 1
             @ready_to_execute = false
-            instance_exec( & p )
+            instance_exec( & edit_p )
           end
 
-          def produce_mixed_result
+        public
+
+          def produce_mixed_result_
             if @ready_to_execute
               execute  # an inline normalization
             else
@@ -119,13 +116,22 @@ module Skylab::System
           end
 
           def work
-            System_.services.filesystem.file_utils_controller do |msg|
-              maybe_send_event :info, :file_utils_event do
-                Event_.wrap.file_utils_message msg
-              end
+
+            System_.services.filesystem.file_utils_controller do | msg |
+              __fu_msg msg
             end.mkdir_p @path, noop: @is_dry_run  # result is array of argument paths
+
             @result = result
             PROCEDE_
+          end
+
+          def __fu_msg msg
+
+            maybe_send_event :info, :file_utils_event do
+
+              Callback_::Event.wrap.file_utils_message msg
+            end
+            NIL_
           end
 
           def can_create  # assume @path does not exist
@@ -216,7 +222,7 @@ module Skylab::System
           end
 
           def via_no_ent_stat_error_build_event
-            Event_.wrap.exception @stat_e, :path_hack
+            Callback_::Event.wrap.exception @stat_e, :path_hack
           end
 
           def via_stat_and_pn_build_wrong_ftype_event expected_ftype_s
@@ -235,10 +241,14 @@ module Skylab::System
           end
 
           def via_strange_stat_error_build_event
-            _ev = Event_.wrap.exception @stat_e, :path_hack
+
+            _ev = Callback_::Event.wrap.exception @stat_e, :path_hack
+
             i_a = _ev.to_iambic
+
             # (we used to add more members here, now we don't)
-            Event_.inline_via_iambic_and_message_proc i_a, -> y, o do
+
+            Callback_::Event.inline_via_iambic_and_message_proc i_a, -> y, o do
 
               y << "cannot create #{ pth o.pathname } because #{
                 }some parent path in it is #{ o.message_head.downcase }"
@@ -259,7 +269,9 @@ module Skylab::System
           Mock_Dir__ = ::Struct.new :to_path
 
           NILADIC_FALSEHOOD_ = -> { false }
-        end
+
+          # <-
       end
     end
+  end
 end

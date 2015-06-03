@@ -2,9 +2,7 @@ module Skylab::System
 
   module IO
 
-  module Mappers
-
-  Tee = Callback_::Proxy.tee.call_via_arglist IO_::METHOD_I_A_  # :[#169].
+    Mappers::Tee = Callback_::Proxy.tee.call_via_arglist IO_::METHOD_I_A_  # :[#169].
 
     # Inspired by (but probably not that similar to) Perl's IO::Tee,
     # an IO::Mappers::Tee is a simple multiplexer that intercepts
@@ -16,23 +14,24 @@ module Skylab::System
     # remembered and they are retrieved by their key, usually a symbol.
     # (we refer to this structure as a "box".)
 
-  class Tee
+    class Mappers::Tee
 
-    include( module Is_TTY_Instance_Methods
-      # Mock whether or not this stream is an interactive terminal (see `IO#tty?`)
+      include(
+      module Is_TTY_Instance_Methods
 
-      def tty!
-        @is_tty = true
+        # Mock whether or not this stream is an interactive terminal (see `IO#tty?`)
+
+        def tty!
+          @is_tty = true
+          self
+        end
+
+        attr_accessor :is_tty
+
+        alias_method :tty?, :is_tty
+
         self
-      end
-
-      attr_accessor :is_tty
-
-      alias_method :tty?, :is_tty
-
-      self
-    end )
-  end
-  end
+      end )
+    end
   end
 end

@@ -8,13 +8,13 @@ module Skylab::System
         class Unlink_File__ < self
 
           class << self
-            def mixed_via_iambic x_a
+            def mixed_via_iambic_ x_a
               new do
                 process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
                 @x_a = @d = @x_a_length = nil  # #todo
-              end.produce_mixed_result
+              end.produce_mixed_result_
             end
-          end
+          end  # >>
 
           Callback_::Actor.methodic self, :simple, :properties,
             :path,
@@ -23,7 +23,7 @@ module Skylab::System
 
           # #todo this is just a stub
 
-          def produce_mixed_result
+          def produce_mixed_result_
             if @if_exists
               when_if_exists
             else

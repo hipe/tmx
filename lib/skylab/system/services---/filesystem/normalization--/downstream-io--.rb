@@ -1,17 +1,23 @@
 module Skylab::System
 
+  class Services___::Filesystem
 
-    class Services___::Filesystem
+    class Normalization__
 
-      class Normalization__
+      class Downstream_IO__ < self  # near [#004]
 
-        class Downstream_IO__ < self  # near [#004]
+        extend Common_Module_Methods_
 
-          extend Common_Module_Methods_
+        Callback_::Actor.methodic self, :properties,
+          :properties,
+          :dash_means,
+          :force_arg,
+          :is_dry_run,
+          :last_looks
 
-          Entity_.call self do
+      private
 
-            o :polymorphic_writer_method_name_suffix, :'='
+      # -> 2
 
             def ftype=
               @ftype = gets_one_polymorphic_value
@@ -50,13 +56,7 @@ module Skylab::System
               KEEP_PARSING_
             end
 
-            o :properties,
-              :dash_means,
-              :force_arg,
-              :is_dry_run,
-              :last_looks
-
-          end
+            # <- 1
 
           def initialize & edit_p
             @dash_means = nil
@@ -75,7 +75,7 @@ module Skylab::System
             @as_normal_value ||= IDENTITY_
           end
 
-          def produce_mixed_result
+          public def produce_mixed_result_
             if @do_execute
               execute  # is inline normalization
             else
@@ -83,7 +83,7 @@ module Skylab::System
             end
           end
 
-          def execute
+          public def execute
 
             @path = if @path_arg
               @path_arg.value_x
@@ -98,12 +98,14 @@ module Skylab::System
           end
 
           def when_neither
+
             maybe_send_event :error, :missing_required_properties do
               bld_missing_path_event
             end
           end
 
           def bld_missing_path_event
+
             build_not_OK_event_with :missing_required_properties,
                 :path_property, @path_arg.property do |y, o|
               y << "expecting #{ par o.path_property }"
@@ -125,6 +127,7 @@ module Skylab::System
           end
 
           def via_system_resource_identifier_ d
+
             case d
             when 1
               via_stdout_
@@ -136,6 +139,7 @@ module Skylab::System
           end
 
           def _via_stat
+
             if @stat
               when_stat
             else
@@ -144,11 +148,14 @@ module Skylab::System
           end
 
           def when_no_stat
+
             send :"when_no_stat_for_#{ @ftype }"
           end
 
           def when_no_stat_for_directory
-            snd_creating_event_for_directory
+
+            __send_creating_event_for_directory
+
             d = if @is_dry_run
               0
             else
@@ -162,7 +169,9 @@ module Skylab::System
           end
 
           def when_no_stat_for_file
+
             dir = ::File.dirname @path
+
             if ::File.directory? dir
               __go
             else
@@ -171,6 +180,7 @@ module Skylab::System
           end
 
           def __when_no_dirname dir
+
             maybe_send_event :resource_not_found, :parent_directory_must_exist  do
               build_not_OK_event_with :parent_directory_must_exist, :path, dir
             end
@@ -178,7 +188,9 @@ module Skylab::System
           end
 
           def __go
-            snd_creating_event_for_file
+
+            __send_creating_event_for_file
+
             if @is_dry_run
               @as_normal_value[ System_::IO.dry_stub_instance ]
             else
@@ -187,16 +199,19 @@ module Skylab::System
           end
 
           def when_stat
+
             send :"when_stat_for_#{ @ftype }"
           end
 
           def when_stat_for_directory
+
             maybe_send_event :error, :directory_exists do
               build_not_OK_event_with :directory_exists, :path, @path
             end
           end
 
           def when_stat_for_file
+
             if @force_arg
               if @force_arg.value_x
                 when_stat_is_file_OK_to_overwrite
@@ -209,12 +224,14 @@ module Skylab::System
           end
 
           def via_force_arg_not_OK_to_overwrite
+
             maybe_send_event :error, :missing_required_properties do
               __build_missing_force_event
             end
           end
 
           def __build_missing_force_event
+
             build_not_OK_event_with :missing_required_permission,
                 :force_arg, @force_arg, :path_arg, @path_arg do |y, o|
 
@@ -226,6 +243,7 @@ module Skylab::System
           end
 
           def when_stat_is_file_OK_to_overwrite
+
             snd_updating_event_for_file
 
             if @is_dry_run
@@ -237,13 +255,15 @@ module Skylab::System
 
           # ~ pairs
 
-          def snd_creating_event_for_file
+          def __send_creating_event_for_file
+
             maybe_send_event :info, :before_probably_creating_new_file do
               __build_BPCNF_event_for_file
             end
           end
 
           def __build_BPCNF_event_for_file
+
             build_neutral_event_with :before_probably_creating_new_file,
                 :path_arg, @path_arg do |y, o|
 
@@ -251,7 +271,8 @@ module Skylab::System
             end
           end
 
-          def snd_creating_event_for_directory
+          def __send_creating_event_for_directory
+
             maybe_send_event :info, :creating_directory do
               build_neutral_event_with :creating_directory,
                 :path, @path, :path_arg, @path_arg
@@ -259,12 +280,14 @@ module Skylab::System
           end
 
           def snd_updating_event_for_file
+
             maybe_send_event :info, :before_editing_existing_file do
               bld_BEEF_event_for_file
             end
           end
 
           def bld_BEEF_event_for_file
+
             build_neutral_event_with :before_editing_existing_file,
                 :path_arg, @path_arg, :stat, @stat do |y, o|
 
@@ -278,7 +301,9 @@ module Skylab::System
           end
 
           def via_hopefully_still_available_path_open_file
+
             set_IO_and_exception_via_open_mode ::File::CREAT | ::File::WRONLY
+
             if @IO
               if @do_result_in_IO_stream_identifier_trio
                 via_trueish_IO_stream_ @IO
@@ -286,6 +311,7 @@ module Skylab::System
                 @as_normal_value[ @IO ]
               end
             else
+
               maybe_send_event :error, :exception do
                 wrap_exception @e
               end
@@ -293,10 +319,12 @@ module Skylab::System
           end
 
           def byte_whichstream_identifier_
+
             System_::IO::Byte_Downstream_Identifier
           end
 
           def via_hopefully_still_occupied_path_open_file
+
             set_IO_and_exception_via_open_mode 'r+'
             if @e
               maybe_send_event :error, :exception do
@@ -314,6 +342,7 @@ module Skylab::System
           # ~ support
 
           def when_last_looks
+
             _ev = build_neutral_event_with :for_last_looks,
               :IO, @IO, :path, @path, :stat, @stat
 
@@ -335,22 +364,27 @@ module Skylab::System
           end
 
           def set_IO_and_exception_via_open_mode d
+
             @IO = ::File.open @path, d
             @e = nil
+
           rescue ::SystemCallError => @e  # Errno::EISDIR, Errno::ENOENT etc
             @IO = false
             nil
           end
 
           def wrap_exception e
-            Event_.wrap.exception e, :path_hack,
+
+            Callback_::Event.wrap.exception e, :path_hack,
               :properties, :path_arg, @path_arg
           end
 
           def which_stream_
             :downstream
           end
-        end
+
+          # <-
       end
     end
+  end
 end

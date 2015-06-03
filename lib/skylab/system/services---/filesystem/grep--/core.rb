@@ -7,7 +7,7 @@ module Skylab::System
 
         class << self
 
-          def mixed_via_iambic x_a, & oes_p
+          def mixed_via_iambic_ x_a, & oes_p
 
             new do
               process_polymorphic_stream_fully polymorphic_stream_via_iambic( x_a ), & oes_p
