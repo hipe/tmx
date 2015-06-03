@@ -64,10 +64,6 @@ module Skylab::Brazen
       self  # the top
     end
 
-    def kernel_
-      self
-    end
-
     def app_name
       ( if @nm
         @nm
@@ -266,15 +262,20 @@ module Skylab::Brazen
       x
     end
 
-    def silo sym, & oes_p  # (was `silo_via_symbol`)
-      silo_via_identifier Node_Identifier_.via_symbol( sym ), & oes_p
+    def silo sym, & x_p  # (was `silo_via_symbol`)
+
+      silo_via_identifier(
+        Concerns_::Identifier.via_symbol( sym ),
+        & x_p )
     end
 
     def silo_via_identifier id, & oes_p
 
       if id.is_resolved
 
-        @silo_cache[].__fetch_via_identifier[ id ]
+        @silo_cache[]._touch_via_silo_daemon_class_and_identifier[
+          id.value.const_get( SILO_DAEMON_CONST__, false ),
+          id ]
       else
         __silo_via_unresolved_id id, & oes_p
       end
@@ -312,11 +313,11 @@ module Skylab::Brazen
           _start_of_next_part = index - local_index + _num_parts
           id.add_demarcation_index _start_of_next_part
 
-          cls = node.const_get :Silo_Daemon, false  # one of #two
+          cls = node.const_get SILO_DAEMON_CONST__, false
 
           if cls
             id.bake node
-            x = @silo_cache[].__touch_via_SD_class_and_identifier[ cls, id ]
+            x = @silo_cache[]._touch_via_silo_daemon_class_and_identifier[ cls, id ]
             break
           end
           mod_a = nil
@@ -346,7 +347,7 @@ module Skylab::Brazen
 
     def _build_model_not_found_event id, s
 
-      Brazen_.event.inline_with :node_not_found,
+      Callback_::Event.inline_with :node_not_found,
         :token, s, :identifier, id,
         :error_category, :name_error
     end
@@ -392,11 +393,6 @@ module Skylab::Brazen
 
         cache_h = {}
 
-        @__fetch_via_identifier = -> id do
-
-          cache_h.fetch id.silo_name_i
-        end
-
         @__fetch_via_normal_identifier_component = -> const do
 
           sym = const.downcase
@@ -405,7 +401,7 @@ module Skylab::Brazen
 
             unbound = models_mod.const_get const, false
 
-            x = unbound.const_get( :Silo_Daemon, false ).
+            x = unbound.const_get( SILO_DAEMON_CONST__, false ).
               new kernel, unbound  # two of #two
 
             cache_h[ sym ] = x
@@ -413,21 +409,23 @@ module Skylab::Brazen
           end
         end
 
-        @__touch_via_SD_class_and_identifier = -> cls, id do
+        @_touch_via_silo_daemon_class_and_identifier = -> cls, id do
 
-          cache_h.fetch id.silo_name_i do
+          cache_h.fetch id.silo_name_symbol do
             x = cls.new kernel, id.value
-            cache_h[ id.silo_name_i ] = x
+            cache_h[ id.silo_name_symbol ] = x
             x
           end
         end
       end
 
-      attr_reader :__fetch_via_identifier,
+      attr_reader(
         :__fetch_via_normal_identifier_component,
-        :__touch_via_SD_class_and_identifier
+        :_touch_via_silo_daemon_class_and_identifier,
+      )
     end
   end
 
+  SILO_DAEMON_CONST__ = :Silo_Daemon
   SILO_DAEMON_FILE___ = "silo-daemon#{ Autoloader_::EXTNAME }"
 end

@@ -4,79 +4,133 @@ module Skylab::Brazen
 
     Entity = Brazen_::Entity.call do  # see [#047]
 
-      class << self
-
-        def normalizers
-          LIB_.basic.normalizers
-        end
-      end  # >>
-
       # ~ ad-hoc processors
 
-      o :ad_hoc_processor, :after, -> pc do  # pc = "parse context"
-        pc.upstream.advance_one
-        pc.downstream.after_name_symbol = pc.upstream.gets_one
+      o :ad_hoc_processor, :after, -> o do  # o = "session"
+
+        o.downstream.after_name_symbol = o.upstream.gets_one
         KEEP_PARSING_
       end
 
-      o :ad_hoc_processor, :desc, -> pc do
-        pc.upstream.advance_one  # `desc`
-        pc.downstream.description_block = pc.upstream.gets_one
+      o :ad_hoc_processor, :desc, -> o do
+
+        o.downstream.description_block = o.upstream.gets_one
         KEEP_PARSING_
       end
 
-      o :ad_hoc_processor, :inflect, -> pc do
-        pc.upstream.advance_one  # `inflect`
-        pc.downstream.process_some_customized_inflection_behavior pc.upstream
+      o :ad_hoc_processor, :inflect, -> o do
+
+        o.downstream.process_some_customized_inflection_behavior o.upstream
       end
 
-      o :ad_hoc_processor, :promote_action, -> pc do
-        pc.upstream.advance_one
-        pc.downstream.is_promoted = true
+      o :ad_hoc_processor, :promote_action, -> o do
+
+        o.downstream.is_promoted = true
         KEEP_PARSING_
       end
 
-      o :ad_hoc_processor, :persist_to, -> pc do
-        pc.upstream.advance_one
-        pc.downstream.persist_to = pc.upstream.gets_one
+      o :ad_hoc_processor, :persist_to, -> o do
+
+        o.downstream.persist_to = o.upstream.gets_one
         KEEP_PARSING_
       end
 
-      o :ad_hoc_processor, :preconditions, -> pc do
-        pc.upstream.advance_one
-        a = pc.downstream.precondition_controller_i_a_
-        a_ = pc.upstream.gets_one
+      o :ad_hoc_processor, :preconditions, -> o do
+
+        a = o.downstream.precondition_controller_i_a_
+        _a_ = o.upstream.gets_one
         if a
           self._COVER_ME
         else
-          pc.downstream.precondition_controller_i_a_ = a_
+          o.downstream.precondition_controller_i_a_ = _a_
         end
         KEEP_PARSING_
       end
 
-      o :ad_hoc_processor, :precondition, -> pc do
-        pc.upstream.advance_one
-        i_a = ( pc.downstream.precondition_controller_i_a_ ||= [] )
-        i = pc.upstream.gets_one
-        i_a.include?( i ) or i_a.push i
+      o :ad_hoc_processor, :precondition, -> o do
+
+        i_a = ( o.downstream.precondition_controller_i_a_ ||= [] )
+        sym = o.upstream.gets_one
+        i_a.include?( i ) or i_a.push sym
         KEEP_PARSING_
+      end
+
+      # ~ simple metaproperties
+
+      # • "argument moniker" (used in some modalities to label the arg itself)
+
+      o :meta_property, :argument_moniker
+
+    end
+
+    module Entity
+
+      def receive_polymorphic_property prp  # (method MUST be public)
+
+        # (overwrite this #hook-out so we write not to ivars but to our box)
+
+        case prp.argument_arity
+
+        when :one
+          _set_property_value gets_one_polymorphic_value, prp
+
+        when :zero
+          _set_property_value true, prp
+
+        when :custom
+          send prp.conventional_polymorphic_writer_method_name  # :+#by:pe
+
+        when :one_or_more  # :+#by:st
+          _set_property_value gets_one_polymorphic_value, prp
+
+        else
+          raise ::NameError, __say_arg_arity( prp )
+        end
+
+        KEEP_PARSING_
+      end
+
+    private  # important
+
+      def __say_arg_arity prp
+        "write a dipatcher method or whatever for '#{ prp.argument_arity }'"
+      end
+
+      public def _set_property_value x, prp
+
+        actual_property_box_for_write.set prp.name_symbol, x  # (changed from `add`)
+        KEEP_PARSING_
+      end
+
+
+
+      # ~ n11n is here for now
+
+      def normalize
+        ok = true
+        self.class::MOENT_NORM_P_A___.each do | p |
+          ok = p[ self ]
+          ok or break
+        end
+        ok
+      end
+
+      def self.__during_entity_normalize & into_ent_p  # e.g
+        a = []
+        const_set :MOENT_NORM_P_A___, a  # etc
+        a.push into_ent_p
+        NIL_
       end
 
       # ~ metaproperties (support)
 
-      @active_entity_edit_session.ignore_methods_added
-
-        # hack turn this off. we won't be adding any fields via
-        # method deinitions in this edit session
-
-
-      entity_property_class_for_write  # touch our own `Entity_Property` cls
+      const_get :Property, false  # sanity
 
       # • ad-hoc normalizer
 
-        class self::Entity_Property
+        class self::Property
 
-          def normalize trio, & x_p  # assume some normalizer (for now)
+          def normalize_argument trio, & x_p  # :+[#ba-027] assume some normalizer (for now)
 
             # an alternative means of running the normalizers,
             # divorced from the action API. compare to #here
@@ -99,11 +153,11 @@ module Skylab::Brazen
 
         public
 
-          attr_reader :has_ad_hoc_normalizers, :norm_p_a
+          attr_reader :_has_ad_hoc_normalizers, :norm_p_a
 
           def prepend_ad_hoc_normalizer & arg_and_oes_block_p
 
-            @has_ad_hoc_normalizers = true
+            @_has_ad_hoc_normalizers = true
             ( @norm_p_a ||= [] ).unshift arg_and_oes_block_p
             self
           end
@@ -116,14 +170,13 @@ module Skylab::Brazen
 
           def _append_ad_hoc_normalizer & arg_and_oes_block_p
 
-            @has_ad_hoc_normalizers = true
+            @_has_ad_hoc_normalizers = true
             ( @norm_p_a ||= [] ).push arg_and_oes_block_p
             NIL_
           end
         end
 
-
-        def _apply_ad_hoc_normalizers prp  # this evolved from [#ba-027]
+        public( def _apply_ad_hoc_normalizers prp  # this evolved from [#ba-027]
 
           # the integrated way of running these. compare to #here
 
@@ -131,7 +184,7 @@ module Skylab::Brazen
           bx = actual_property_box_for_write
           prp.norm_p_a.each do | arg_and_oes_block_p |
 
-            arg = trio_via_property prp
+            arg = trio_via_property_ prp
               # at each step, value might have changed.
               # [#053] bound is not truly bound.
 
@@ -139,7 +192,10 @@ module Skylab::Brazen
             if 2 == arg_and_oes_block_p.arity
               args.push self
             end
-            ok_arg = arg_and_oes_block_p.call( * args, & handle_event_selectively )  # was [#072]
+
+            _oes_p = @on_event_selectively
+
+            ok_arg = arg_and_oes_block_p.call( * args, & _oes_p )  # was [#072]
 
             if ok_arg
               bx.set arg.name_symbol, ok_arg.value_x
@@ -150,13 +206,25 @@ module Skylab::Brazen
             end
           end
           ok
+        end )
+
+        def trio_via_property_ prp
+
+          had = true
+
+          x = actual_property_box.fetch prp.name_symbol do
+            had = false
+            nil
+          end
+
+          Callback_::Trio.via_value_and_had_and_property x, had, prp
         end
 
 
 
       # • "argument arity"
 
-        class self::Entity_Property
+        class self::Property
 
           def argument_is_required  # *not the same as* parameter is required
             :one == @argument_arity || :one_or_more == @argument_arity
@@ -178,101 +246,37 @@ module Skylab::Brazen
           end
         end
 
-        def receive_list_of_entity_property a, prp  # #hook-out to [cb]
-          receive_value_of_entity_property a, prp
-        end
-
-        def receive_value_of_entity_property x, prp  # #hook-in
-
-          # overwrite this hook-in called by our produced iambic writer methods
-          # (determiend by topic) so that we write not to ivars but to this box.
-
-          actual_property_box_for_write.set prp.name_symbol, x  # (changed from `add`)
-          KEEP_PARSING_
-        end
-
         def actual_property_box_for_write
           actual_property_box  # :+#hook-out
         end
 
-        def any_property_value_via_property prop
-          actual_property_box[ prop.name_symbol ]  # :++#hook-out
+        public def fetch_property_value_via_property prp, & else_p  # #hook-near
+          actual_property_box.fetch prp.name_symbol, & else_p
         end
 
 
 
-      # • "argument moniker" (used in some modalities to label the arg iteslf)
+      # • default (that which is not covered by parent - it is a meta-meta-property)
 
-      o :meta_property, :argument_moniker
-
-
-
-      # • default (used to be a declared metaproperty, now is hand-written)
-
-        class self::Entity_Property
+        class self::Property
 
           # ~ :*#public-API
 
           def default_value_via_any_entity ent
-            if @default_p.arity.zero?
-              @default_p[]
+            if @default_proc.arity.zero?
+              @default_proc[]
             else
-              @default_p[ ent ]
+              @default_proc[ ent ]
             end
           end
 
-          def default_proc
-            @default_p
-          end
-
-          attr_reader :has_default, :has_primitive_default, :primitive_default_value
-
-          # ~
-
-        private
-
-          def default=
-            set_primitive_default gets_one_polymorphic_value
-            KEEP_PARSING_
-          end
-
-          def default_proc=
-            set_default_proc( & gets_one_polymorphic_value )
-            KEEP_PARSING_
-          end
-
-        protected
-
-          def init_without_default_
-            super
-            @has_primitive_default = false
-            @primitive_default_value = nil
-            nil
-          end
-
-        public
-
-          def new_with_default & p
-            dup.set_default_proc( & p ).freeze
-          end
-
-          def new_with_primitive_default x
-            dup.set_primitive_default( x ).freeze
-          end
-
-          def set_default_proc & p
-            @has_default = true
-            @has_primitive_default = false
-            @primitive_default_value = nil
-            @default_p = p
-            self
-          end
+          attr_reader :has_primitive_default, :primitive_default_value
 
           def set_primitive_default x
             @has_default = true
             @has_primitive_default = true
             @primitive_default_value = x
-            @default_p = -> do
+            @default_proc = -> do
               @primitive_default_value
             end
             self
@@ -283,7 +287,7 @@ module Skylab::Brazen
 
       # • "description"
 
-        class self::Entity_Property
+        class self::Property
 
           # ~ :*#public-API
 
@@ -323,7 +327,7 @@ module Skylab::Brazen
 
       # • "environment", "hidden" (experiment)
 
-        class self::Entity_Property
+        class self::Property
 
           attr_reader :can_be_from_environment, :is_hidden
 
@@ -345,16 +349,16 @@ module Skylab::Brazen
 
       # • "integer" related
 
-        class self::Entity_Property
+        class self::Property
         private
 
           def integer_greater_than_or_equal_to=
             add_normalizer_for_greater_than_or_equal_to_integer gets_one_polymorphic_value
           end
 
-          def add_normalizer_for_greater_than_or_equal_to_integer d
+          def add_normalizer_for_greater_than_or_equal_to_integer d  # :+#public-API
 
-            _NORMER = Model_::Entity.normalizers.number(
+            _NORMER = Brazen_.lib_.basic.normalizers.number(
               :number_set, :integer,
               :minimum, d )
 
@@ -370,7 +374,7 @@ module Skylab::Brazen
 
           def non_negative_integer=
 
-            _NORMER = Model_::Entity.normalizers.number(
+            _NORMER = Brazen_.lib_.basic.normalizers.number(
               :number_set, :integer,
               :minimum, 0 )
 
@@ -390,7 +394,7 @@ module Skylab::Brazen
 
       # • "parameter arity" - read synopsis [#fa-024]
 
-        class self::Entity_Property
+        class self::Property
 
           def set_is_not_required
             @parameter_arity = :zero_or_one
@@ -398,14 +402,17 @@ module Skylab::Brazen
           end
         end
 
-        def receive_missing_required_props miss_prop_a
-          _ev = Brazen_::Entity.properties_stack.
-            build_missing_required_properties_event miss_prop_a
-          receive_missing_required_properties _ev
-        end
+        public def receive_missing_required_properties_array miss_prop_a  # :+#public-API #hook-in #universal
 
-        def receive_missing_required_properties ev  # :+#public-API #hook-in #universal
-          raise ev.to_exception
+          ev = Brazen_::Property.
+            build_missing_required_properties_event miss_prop_a
+
+          if respond_to? :receive_missing_required_properties_event
+
+            receive_missing_required_properties_event ev
+          else
+            raise ev.to_exception
+          end
         end
 
         def receive_missing_required_properties_softly ev  # popular :+#hook-with
@@ -417,48 +424,63 @@ module Skylab::Brazen
 
 
 
-        during_entity_normalize do | ent |  # see [#006]:#specific-code-annotation
+        __during_entity_normalize do | ent |
 
-          ok = true
+          # :+[#087] common n11n algo. see [#006]:#specific-code-annotation
+
+          kp = KEEP_PARSING_
           miss_prop_a = nil
-          st = ent.formal_properties.to_stream
+          st = ent.formal_properties.to_value_stream
           prp = st.gets
 
           while prp
 
-            x = ent.any_property_value_via_property prp
+            x = ent.fetch_property_value_via_property prp do end
 
             if x.nil? and prp.has_default
               x = prp.default_value_via_any_entity ent
-              ok = ent.receive_value_of_entity_property x, prp
-              ok or break
+              kp = ent._set_property_value x, prp
+              kp or break
             end
 
-            if prp.has_ad_hoc_normalizers
-              ok = ent._apply_ad_hoc_normalizers prp
-              ok or break
-              x = ent.any_property_value_via_property prp
+            # ( while #open [#088] ..
+            if prp.norm_box_
+
+              oes_p = ent.handle_event_selectively
+
+              prp.norm_box_.each_value do | norm_p |
+
+                kp = norm_p[ ent, prp, & oes_p ]
+                kp or break
+              end
+            end
+            # )
+
+            if prp._has_ad_hoc_normalizers
+              kp = ent._apply_ad_hoc_normalizers prp
+              kp or break
+              x = ent.fetch_property_value_via_property prp do end
             end
 
             if x.nil? && prp.is_required
               ( miss_prop_a ||= [] ).push prp
-              ok = false
+              kp = false
             end
 
             prp = st.gets
           end
 
           if miss_prop_a
-            ent.receive_missing_required_props miss_prop_a
+            ent.receive_missing_required_properties_array miss_prop_a
           end
 
-          ok
+          kp
         end
 
 
       # • misc for nomenclature, description, etc.
 
-        class self::Entity_Property
+        class self::Property
         private
 
           def name_symbol=
@@ -472,19 +494,19 @@ module Skylab::Brazen
             false
           end
 
-          def under_expression_agent_get_N_desc_lines expression_agent, n=nil
-            LIB_.N_lines.
-              new( [], n, @desc_p_a, expression_agent ).execute
+          def under_expression_agent_get_N_desc_lines expag, n=nil
+
+            LIB_.N_lines[ [], n, @desc_p_a, expag ]
           end
         end
 
       # ~ support
 
-      Brazen_.event.selective_builder_sender_receiver self
+      # Callback_::Event.selective_builder_sender_receiver self
 
       private
 
-        def produce_handle_event_selectively_via_channel  # :+#public-API (#hook-in)
+        def ____NO__ # produce_handle_event_selectively_via_channel  # :+#public-API (#hook-in)
 
           # allow us to `maybe_send_event` at any cost
 
@@ -504,10 +526,12 @@ module Skylab::Brazen
 
 
     def via_properties_init_ivars  # #note-360
-      formal = self.formal_properties
-      scn = formal.to_stream
 
-      stack = Brazen_::Entity.properties_stack.new formal.get_names  # could pass oes
+      formals = self.formal_properties
+
+      scn = formals.to_value_stream
+      stack = Brazen_::Property::Stack.new formals.get_names  # could pass oes
+
       bx = any_secondary_box
       bx and stack.push_frame_via_box bx
       stack.push_frame_via_box primary_box
@@ -527,15 +551,16 @@ module Skylab::Brazen
         is_defined and x_ = instance_variable_get( ivar )
         if is_defined && ! x_.nil?
           if had_value
-            raise say_wont_clobber_ivar( x, x_, ivar )
+            raise __say_wont_clobber_ivar( x, x_, ivar )
           end
         else
           instance_variable_set ivar, x
         end
-      end ; nil
+      end
+      NIL_
     end
 
-    def say_wont_clobber_ivar x_, x, ivar
+    def __say_wont_clobber_ivar x_, x, ivar
       p = Brazen_::Lib_::Strange
       "sanity - won't clobber existing #{ ivar } #{
         }(#{ p[ x ] }) with new value (#{ p[ x_ ] })"

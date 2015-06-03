@@ -1,10 +1,12 @@
+[#088]       fully unify props & mprops near normalization (see universe)
+[#087]       #track similar normalization logics (this might be a redundant tracker)
 [#086]       #track cases where failure is "fuzzy" (i.e non-atomic),
                ignored for the greater good, for usability
 [#085]       [ module as model ]
 [#084]       :+#wishlist a `flag` meta-meta prperty
 [#083]       use blocks as selective event receiver (optionally) for proc as action
              ( #was: #done workspace `init` action should not default to '.' in API )
-[#082]       #tracking `list` implementations
+[#082]       #track meta-meta-property candidates (list, enum etc)
 [#081]       #track experimental extensions to Actor
 [#080]       #parent-node:[#013] actors, agents and models ..
 [#079]       #parent-node:[#050] the API API components narrative (#re-purposed [#hl-017])
@@ -99,7 +101,7 @@
              ( #was: #done do not throw exceptions for parse errors )
 [#026]       #parent-node: [#025] the collection controller narrative ..
 [#025]       #doc-node: the brazen four layer model model ..
-[#024]       #parent-node: [#025] the model action narrative ..
+[#024]       #parent-node: [#025] the action narrative ..
 [#023]       #experimental-feature-tracker: `expression` as a level-2
                channel that works not in event objects but expresssions
                directly

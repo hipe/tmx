@@ -1,121 +1,104 @@
 module Skylab::Brazen
 
-  class Model
+  class Action < Interface_Tree_Node_  # see [#024]
 
-  class Action  # see [#024]
+    # -- Concerns --
+
+    # ~ actionability - identity in & navigation of the interface tree
 
     class << self
 
-      # ~ model API ancillaries & adjunctives
+      def entity_enhancement_module
 
-      # ~~ description & name
-
-      def name_function_class
-        Action_Name_Function__
-      end
-
-      attr_accessor :description_block
-
-      # ~~ inflection
-
-      def custom_action_inflection
-        NIL_
-      end
-
-      def process_some_customized_inflection_behavior upstream
-        Process_customized_action_inflection_behavior__.new( upstream, self ).execute
-      end
-
-      # ~~ placement
-
-      attr_accessor :after_name_symbol
-
-      private def after sym  # experimental alternative to the iambic DSL
-        @after_name_symbol = sym
-      end
-
-      attr_accessor :is_promoted
-
-      # ~~ preconditions
-
-      attr_accessor :precondition_controller_i_a_
-
-      def preconditions
-        @__did_resolve_pcia ||= __resolve_precondition_controller_identifer_a
-        @preconditions
-      end
-
-      def __resolve_precondition_controller_identifer_a
-        @preconditions = if precondition_controller_i_a_
-          @precondition_controller_i_a_.map do |i|
-            Node_Identifier_.via_symbol i
-          end
+        if const_defined? :ENTITY_ENHANCEMENT_MODULE
+          self::ENTITY_ENHANCEMENT_MODULE
         else
-          mc = model_class
-          if mc
-            if mc.respond_to? :preconditions
-              mc.preconditions
-            end
-          end
+          model_class.superclass.entity_enhancement_module
         end
-        true
       end
-
-      # ~~ statics and/or defaults
 
       def is_actionable
         true
       end
 
-      def is_branch  # 1 of 2
+      def is_branch
         false
       end
-
-      def properties  # default is no properties
-        NIL_
-      end
-
-      def any_property_via_symbol _
-        NIL_
-      end
-
-      # ~ custom internal invocation interface
-
-      def edit_and_call boundish, oes_p, & edit_p  # experimental
-        new( boundish, & oes_p ).__edit_and_call( & edit_p )
-      end
-
-    private
-
-      # ~ the common mutation inteface (defining an action)
-
-      def edit_entity_class * x_a, & edit_p  # if you are here the class is not yet initted
-        entity_module.call_via_client_class_and_iambic self, x_a, & edit_p
-      end
-
-      def entity_module
-        model_class.superclass.const_get :Entity, false
-      end
-
-    public
 
       def model_class
         name_function.parent
       end
     end  # >>
 
-    extend Brazen_.name_library.name_function_proprietor_methods
+    def controller_nucleus  # :+#experimental
+      [ @kernel, handle_event_selectively ]
+    end
+
+    def is_branch
+      false
+    end
+
+    def model_class
+      self.class.model_class
+    end
+
+    def accept_parent_node_ x
+      @parent_node = x ; nil
+    end
+
+    # ~ description & inflection
+
+    class << self
+
+      def custom_action_inflection
+        NIL_
+      end
+
+      def process_some_customized_inflection_behavior upstream
+        Concerns__::Inflection.new( upstream, self ).execute
+      end
+    end
+
+    # ~ name
+
+    class << self
+
+      def name_function_class
+        Concerns__::Name
+      end
+    end
+
     NAME_STOP_INDEX = 2  # sl br models
 
-    # [#013]:#note-A the below order
+    Autoloader_[ Concerns__ = ::Module.new, :boxxy ]
 
-    include Callback_::Actor.methodic_lib.polymorphic_processing_instance_methods
+    class Concerns__::Name < Concerns_::Name
 
-    include Brazen_::Entity::Instance_Methods
+      def inflected_verb
+        _inflection.inflected_verb
+      end
 
-    Brazen_.event.selective_builder_sender_receiver self
+      def verb_lexeme
+        _inflection.verb_lexeme
+      end
 
-    include Interface_Element_Instance_Methods___
+      def verb_as_noun_lexeme
+        _inflection.verb_as_noun_lexeme
+      end
+
+      def _inflection
+        @___inflecion ||= Brazen_::Concerns_::Inflection.for_action self
+      end
+    end
+
+    # ~ placement & visibility
+
+    class << self
+
+      attr_accessor :is_promoted
+    end
+
+    # ~ as instance
 
     def initialize boundish, & oes_p
 
@@ -128,14 +111,381 @@ module Skylab::Brazen
       accept_selective_listener_proc oes_p
     end
 
+    # ~ invocation ( various means )  ( #todo needs streamlining )
+
+    def bound_call_against_polymorphic_stream_and_mutable_box st, bx
+
+      _bound_call_against bx do
+        process_polymorphic_stream_fully st
+      end
+    end
+
+    def bound_call_against_polymorphic_stream st
+
+      # (see etc at `via_arguments_produce_bound_call`)
+
+      _bound_call_against do
+        process_polymorphic_stream_fully st
+      end
+    end
+
+    ## ~~ ( experimental
+
+    def bound_call_against_box box
+
+      # exactly as above
+
+      _bound_call_against do
+        Concerns__::Properties::Input::Via_value_box[ self, box ]
+      end
+    end
+
+    attr_writer :polymorphic_upstream_  # hax only (like above)
+
+    def _bound_call_against bx=Box_.new
+
+      @argument_box = bx
+      ok = yield
+      if ok
+        via_arguments_produce_bound_call
+      else
+        Callback_::Bound_Call.via_value ok
+      end
+    end
+
+    ## ~~ end experimental)
+
+    class << self
+
+      def edit_and_call boundish, oes_p, & edit_p  # experimental
+        new( boundish, & oes_p ).__edit_and_call( & edit_p )
+      end
+    end
+
+    def __edit_and_call & edit_p  # in the spirit of `<model class>.edit`
+
+      first_edit( & edit_p )
+
+      bc = via_arguments_produce_bound_call
+      bc and begin
+        bc.receiver.send bc.method_name, * bc.args
+      end
+    end
+
+    def first_edit & edit_p  # :+#public-API [tm]. cannot fail
+
+      @argument_box = Callback_::Box.new
+
+      if edit_p
+        edit_p[ es = Edit_Session___.new ]
+        mf, @preconditions = es.to_a  # nil ok on both.
+
+        if mf
+          formal_properties
+          @formal_properties = @formal_properties.to_mutable_box_like_proxy  # might be same object
+          mf[ @formal_properties ]
+        end
+      end
+      nil
+    end
+
+    class Edit_Session___
+      def initialize
+        @fo = @pcns = nil
+      end
+      def preconditions x
+        @pcns = x
+      end
+      def mutate_formal_properties & p
+        @fo = p ; nil
+      end
+      def to_a
+        [ @fo, @pcns ]
+      end
+    end
+
+    def via_arguments_produce_bound_call  # :+#public-API [ts]
+
+      # expose the moment between `process_polymorphic_stream_fully` and `normalize`
+
+      # when we call the user's `produce_result` we must have fulfilled
+      # any preconditions. to fulfill preconditions may require that we
+      # have a complete, normal set of arguments (i.e that defaults are
+      # applied and required's may be assumed (i.e that `normalize` was
+      # called). in order to normalize we need to have parsed the arguments.
+
+      ok = normalize
+      ok &&= __resolve_preconditions
+      if ok
+        Callback_::Bound_Call.via_receiver_and_method_name self, :produce_result
+      else
+        Callback_::Bound_Call.via_value ok
+      end
+    end
+
+    def normalize
+      ACHIEVED_  # OK is the default. override or use entity lib to go nuts
+    end
+
+    # ~ preconditions
+
+    class << self
+
+      def resolve_precondition_controller_identifer_array
+
+        @preconditions = if precondition_controller_i_a_
+
+          @precondition_controller_i_a_.map do | sym |
+
+            Concerns_::Identifier.via_symbol sym
+          end
+
+        else
+          mc = model_class
+          if mc
+            if mc.respond_to? :preconditions
+              mc.preconditions
+            end
+          end
+        end
+        ACHIEVED_
+      end
+    end  # >>
+
+    def preconditions  # for a collaborator that knows they exist & what they are
+      @preconditions
+    end
+
+    def receive_starting_preconditions bx
+      @preconditions = bx
+      nil
+    end
+
+    def __resolve_preconditions
+
+      # the [#048] preconditions "pipeline" starts here, from the action.
+
+      a = _formal_preconditions
+
+      if a && a.length.nonzero?
+        __resolve_preconditions_via_formal_preconditions a
+      else
+        ACHIEVED_
+      end
+    end
+
+    def _formal_preconditions  # maybe one day there will be mutable preconditions
+      self.class.preconditions
+    end
+
+    def __resolve_preconditions_via_formal_preconditions a
+
+      oes_p = handle_event_selectively
+
+      bx = Brazen_::Concerns_::Preconditions::Produce_Box.new(
+        a,  # the identifiers for silos i depend on
+        @preconditions,  # any starting box
+        model_class.node_identifier,  # my identifier
+        self,  # the action
+        @kernel,
+        & oes_p ).produce_box
+
+      bx and begin
+        @preconditions = bx
+        ACHIEVED_
+      end
+    end
+
+    # ~ properties ( name conventions express visibility for ALL methods )
+
+    ## ~~ readers
+
+    def to_full_trio_box
+
+      bx = Callback_::Box.new
+      h = @argument_box.h_
+      st = formal_properties.to_value_stream
+      prp = st.gets
+
+      while prp
+        sym = prp.name_symbol
+        had = true
+        x = h.fetch sym do
+          had = false
+          nil
+        end
+
+        bx.add sym, Callback_::Trio.
+          via_value_and_had_and_property( x, had, prp )
+
+        prp = st.gets
+      end
+
+      bx
+    end
+
+    def to_trio_box_proxy
+      Concerns__::Properties::Output::Trio_Box_Proxy.
+        new @argument_box, formal_properties
+    end
+
+    def to_trio_box_except__ * i_a  # [cu]
+
+      fo = formal_properties
+      h = @argument_box.h_
+      a_ = @argument_box.a_ - i_a
+      h_ = {}
+
+      a_.each do | k |
+
+        h_[ k ] = Callback_::Trio.via_value_and_property(
+          h.fetch( k ), fo.fetch( k ) )
+      end
+
+      Callback_::Box.allocate.init a_, h_
+    end
+
+    def to_trio_stream
+
+      fp = formal_properties
+      a = @argument_box.a_ ; h = @argument_box.h_
+      d = 0 ; len = a.length
+
+      Callback_.stream do
+
+        if d < len
+          k = a.fetch d
+          d += 1
+          Callback_::Trio.via_value_and_property h.fetch( k ), fp.fetch( k )
+        end
+      end
+    end
+
+    def argument_value sym
+      @argument_box.fetch sym
+    end
+
+    def argument_box
+      @argument_box
+    end
+
+    ## ~~ writers ( for actual properties ( "values" ) ) & support
+
+    def process_trio_box_passively__ bx
+
+      Concerns__::Properties::Input::Via_trio_box[ self, bx ]  # result is result
+    end
+
+    def set_polymorphic_upstream__ x
+      @polymorphic_upstream_ = x
+    end
+
+    def remove_polymorphic_upstream__
+      remove_instance_variable :@polymorphic_upstream_
+    end
+
+    def when_after_process_iambic_fully_stream_has_content st
+
+      _a = [ st.current_token ]
+
+      _ev = Callback_::Actor::Methodic::Build_extra_values_event[ _a ]
+
+      receive_extra_values_event _ev
+    end
+
+    def receive_extra_values_event ev
+
+      raise ev.to_exception
+    end
+
+    module Concerns__::Properties
+      Autoloader_[ Input = ::Module.new ]
+      Autoloader_[ self ]
+    end
+
+    ## ~~ the formal properties
+
+    class << self
+
+      def properties  # default is no properties
+        NIL_
+      end
+    end
+
+    def formal_properties
+      @formal_properties or init_formal_properties_ super
+    end
+
+    def change_formal_properties x  # :+#public-API (for collaborators)
+      @formal_properties = x
+      NIL_
+    end
+
+    def init_formal_properties_ x
+
+      a = _formal_preconditions
+
+      if a and a.length.nonzero?
+        a.each do | precon_id |
+          otr = @kernel.silo_via_identifier( precon_id ).
+            any_mutated_formals_for_depender_action_formals x
+          otr and x = otr
+        end
+      end
+
+      @formal_properties = x  # result
+    end
+
+    ## ~~ related #hook-outs/in's
+
+  private
+
+    def primary_box
+      @argument_box
+    end
+
+    def any_secondary_box  # #todo - after universal integration, get rid of secondary box of action
+      NIL_
+    end
+
+    def actual_property_box  # #hook-out for entity
+      @argument_box
+    end
+
+    # ~ event .. ( all method & ivar names :+#public-API per name conv. )
+
+    ## ~~ sending
+
+    def maybe_send_event_via_channel i_a, & ev_p
+
+      handle_event_selectively[ * i_a, & ev_p ]
+    end
+
+    def build_not_OK_event_with * x_a, & msg_p
+
+      Callback_::Event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, msg_p
+    end
+
+    def build_OK_event_with * x_a, & msg_p
+
+      Callback_::Event.inline_OK_via_mutable_iambic_and_message_proc x_a, msg_p
+    end
+
+    ## ~~ receiving
+
+  public
+
     def accept_selective_listener_proc oes_p  # name might change to expose [ca]
 
-      accept_selective_listener_via_channel_proc( -> i_a, & ev_p do
+      @on_event_selectively = -> * i_a, & ev_p do
 
         receive_uncategorized_emission oes_p, i_a, & ev_p
 
-      end )
+      end
+      NIL_
     end
+
+  private
 
     def receive_uncategorized_emission oes_p, i_a, & x_p  # #note-100
 
@@ -202,7 +552,7 @@ module Skylab::Brazen
 
       _term_chan = _any_expr_chan( rest ) || :generic_info
 
-      build_neutral_event_with _term_chan do | y, _o |
+      Callback_::Event.inline_neutral_with _term_chan do | y, _o |
 
         calculate y, & msg_p
       end
@@ -225,300 +575,5 @@ module Skylab::Brazen
       when 3     ; i_a.fetch 2
       end
     end
-
-    # ~ end
-
-  public
-
-    def bound_call_against_polymorphic_stream_and_mutable_box st, bx
-
-      _bound_call_against bx do
-        process_polymorphic_stream_fully st
-      end
-    end
-
-    def bound_call_against_polymorphic_stream st
-
-      # meet any preconditions before calling the user's `produce_result`.
-      # to meet preconditions we have to parse the iambic stream. to parse
-      # the iambic stream we have to call `normalize`.
-
-      _bound_call_against do
-        process_polymorphic_stream_fully st
-      end
-    end
-
-    def bound_call_against_box box
-
-      # exactly as above
-
-      _bound_call_against do
-        __process_box_as_polymorphic_stream_fully box
-      end
-    end
-
-    def _bound_call_against bx=Box_.new
-
-      @argument_box = bx
-      ok = yield
-      if ok
-        via_arguments_produce_bound_call
-      else
-        Callback_::Bound_Call.via_value ok
-      end
-    end
-
-    # ~ experiment: is it worth it hacking external API actions for internal calls? [tm]
-
-    def __edit_and_call & edit_p  # in the spirit of `<model class>.edit`
-
-      first_edit( & edit_p )
-
-      bc = via_arguments_produce_bound_call
-      bc and begin
-        bc.receiver.send bc.method_name, * bc.args
-      end
-    end
-
-    def process_polymorphic_stream_fully_ x
-      process_polymorphic_stream_fully x
-    end
-
-    # (end experiment)
-
-    def polymorphic_writer_method_name_passive_lookup_proc  # #hook-in to [cb]
-
-      # bend [cb] methodic to accomodate [#046] mutable formal properties
-
-      formals = formal_properties
-
-      if formals
-        __polymorphic_writer_method_name_passive_lookup_proc_via_formals formals
-      else
-        -> _ { }  # MONADIC_EMPTINESS_
-      end
-    end
-
-    def __polymorphic_writer_method_name_passive_lookup_proc_via_formals formals
-
-      cls = self.class
-
-      -> sym do
-        prp = formals[ sym ]
-        if prp
-          if cls.method_defined? prp.polymorphic_writer_method_name  # not private - this is not actor
-            prp.polymorphic_writer_method_name
-          else
-            @__last_formal_property__ = prp
-            # either this hack or duplicate actor's logic
-            :__via_last_formal_property_process_iambic_argument
-          end
-        end
-      end
-    end
-
-    def __via_last_formal_property_process_iambic_argument
-      prp = @__last_formal_property__
-      if prp.takes_argument
-         @argument_box.add prp.name_symbol, gets_one_polymorphic_value
-      else
-        @argument_box.add prp.name_symbol, true
-      end
-      KEEP_PARSING_
-    end
-
-    def via_arguments_produce_bound_call  # :+#public-API [ts]
-
-      # expose the moment between `process_polymorphic_stream_fully` and `normalize`
-
-      ok = normalize
-      ok &&= __resolve_preconditions
-      if ok
-        Callback_::Bound_Call.via_receiver_and_method_name self, :produce_result
-      else
-        Callback_::Bound_Call.via_value ok
-      end
-    end
-
-  private
-
-    def __resolve_preconditions
-
-      # the [#048] preconditions "pipeline" starts here, from the action.
-
-      a = _formal_preconditions
-
-      if a && a.length.nonzero?
-        __resolve_preconditions_via_formal_preconditions a
-      else
-        ACHIEVED_
-      end
-    end
-
-    def __resolve_preconditions_via_formal_preconditions a
-
-      oes_p = handle_event_selectively
-
-      bx = Model_::Preconditions_::Produce_Box.new(
-        a,  # the identifiers for silos i depend on
-        @preconditions,  # any starting box
-        model_class.node_identifier,  # my identifier
-        self,  # the action
-        @kernel,
-        & oes_p ).produce_box
-
-      bx and begin
-        @preconditions = bx
-        ACHIEVED_
-      end
-    end
-
-  public
-
-    # ~ accessors for arguments & related experimentals
-
-    def to_full_trio_box
-
-      bx = Callback_::Box.new
-      h = @argument_box.h_
-      st = formal_properties.to_stream
-      prp = st.gets
-
-      while prp
-        sym = prp.name_symbol
-        had = true
-        x = h.fetch sym do
-          had = false
-          nil
-        end
-
-        bx.add sym, Callback_::Trio.
-          via_value_and_had_and_property( x, had, prp )
-
-        prp = st.gets
-      end
-
-      bx
-    end
-
-    def to_trio_box_except__ * i_a  # [cu]
-
-      fo = formal_properties
-      h = @argument_box.h_
-      a_ = @argument_box.a_ - i_a
-      h_ = {}
-
-      a_.each do | k |
-
-        h_[ k ] = Callback_::Trio.via_value_and_property(
-          h.fetch( k ), fo.fetch( k ) )
-      end
-
-      Callback_::Box.allocate.init a_, h_
-    end
-
-    def to_trio_stream
-
-      fp = formal_properties
-      a = @argument_box.a_ ; h = @argument_box.h_
-      d = 0 ; len = a.length
-
-      Callback_.stream do
-
-        if d < len
-          k = a.fetch d
-          d += 1
-          Callback_::Trio.via_value_and_property h.fetch( k ), fp.fetch( k )
-        end
-      end
-    end
-
-    def trio sym  # #hook-near model. may soften if needed.
-
-      Callback_::Trio.via_value_and_property(
-        @argument_box[ sym ],
-        formal_properties.fetch( sym ) )
-    end
-
-    def argument_value sym
-      @argument_box.fetch sym
-    end
-
-    def argument_box
-      @argument_box
-    end
-
-    def formal_properties
-      @formal_properties or init_formal_properties_ super
-    end
-
-    def init_formal_properties_ x
-      a = _formal_preconditions
-      if a and a.length.nonzero?
-        a.each do | precon_id |
-          otr = @kernel.silo_via_identifier( precon_id ).
-            any_mutated_formals_for_depender_action_formals x
-          otr and x = otr
-        end
-      end
-      @formal_properties = x  # result
-    end
-
-    def _formal_preconditions  # maybe one day there will be mutable preconditions
-      self.class.preconditions
-    end
-
-  private
-
-    def primary_box
-      @argument_box
-    end
-
-    def any_secondary_box  # #todo - after universal integration, get rid of secondary box of action
-      Callback_::Box.the_empty_box
-    end
-
-    def actual_property_box
-      @argument_box
-    end
-
-    def model_class
-      self.class.model_class
-    end
-
-  public
-
-    # ~ readers for collaborators
-
-    def controller_nucleus  # :+#experimental
-      [ @kernel, handle_event_selectively ]
-    end
-
-    def is_branch  # 2 of 2
-      false  # for now, every action node is always a terminal (leaf) node
-    end
-
-    def kernel_
-      @kernel
-    end
-
-    def preconditions  # for a collaborator that knows they exist & what they are
-      @preconditions
-    end
-
-    # ~ writers for collaborators
-
-    def accept_parent_node_ x
-      @parent_node = x ; nil
-    end
-
-    def change_formal_properties x
-      @formal_properties = x
-      nil
-    end
-
-    # (was #note-160)
-
-  end
   end
 end

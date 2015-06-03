@@ -1,10 +1,31 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport::Model::Entity
+module Skylab::Brazen::TestSupport::Mo_Ent
+
+  o = ::Skylab::Brazen::TestSupport
+
+  o[ TS_ = self ]
+
+  include Constants
+
+  extend TestSupport_::Quickie
 
   describe "[br] model entity" do
 
-    extend TS_
+    class << self
+
+      def _with_class & p
+
+        tcm = self
+
+        before :all do
+          _THE_CLASS_ = nil.instance_exec( & p )
+          tcm.send :define_method, :_subject_class do
+            _THE_CLASS_
+          end
+        end
+      end
+    end
 
     it "loads" do
       Subject_[]
@@ -12,7 +33,7 @@ module Skylab::Brazen::TestSupport::Model::Entity
 
     context "defaulting" do
 
-      with_class do
+      _with_class do
 
         class E__Small_Agent_With_Defaults
 
@@ -28,31 +49,30 @@ module Skylab::Brazen::TestSupport::Model::Entity
 
       it "(with defaulting)" do
         ok = nil
-        ent = subject_class.new do
+        ent = _subject_class.new do
           ok = procez
         end
         ok.should eql true
         ent.bx.fetch( :foo ).should eql :yay
       end
 
-      it "(without defaulting)" do
+      it "(without defaulting)", f:true do
         ok = nil
-        ent = subject_class.new do
+        ent = _subject_class.new do
           ok = procez :foo, :bar
         end
         ent.bx.fetch( :foo ).should eql :bar
       end
     end
 
-
     context "integer-related metaproperty (this covers some ad-hoc n11n)" do
 
-      with_class do
+      _with_class do
 
         class E__Integer
 
           def initialize
-            @on_event_selectively = nil  # avoid a warning
+            @on_event_selectively = nil
             super
           end
 
@@ -62,6 +82,10 @@ module Skylab::Brazen::TestSupport::Model::Entity
             o :integer_greater_than_or_equal_to, -2, :property, :zoip
           end
 
+          def handle_event_selectively
+            @on_event_selectively
+          end
+
           self
         end
       end
@@ -69,14 +93,14 @@ module Skylab::Brazen::TestSupport::Model::Entity
       it "when yes" do
 
         ok = nil
-        ent = subject_class.new do
+        ent = _subject_class.new do
           ok = procez :zoip, -2
         end
         ent.bx.fetch( :zoip ).should eql( -2 )
         ok.should eql true
       end
 
-      it "when no" do
+      it "when no", f:true do
         _i_a = ev = nil
         p = -> * i_a, & ev_p do
           _i_a = i_a
@@ -84,19 +108,20 @@ module Skylab::Brazen::TestSupport::Model::Entity
           false
         end
         ok = nil
-        subject_class.new do
+
+        _subject_class.new do
           @on_event_selectively = p
           ok = procez :zoip, -3
         end
         ok.should eql false
-        _i_a.should eql [ :error, :invalid_property_value]
+        _i_a.should eql [ :error, :invalid_property_value ]
         ev.terminal_channel_i.should eql :number_too_small
       end
     end
 
     context "required fields" do
 
-      with_class do
+      _with_class do
 
         class E__Small_Agent_With_Required_Properties
 
@@ -112,12 +137,12 @@ module Skylab::Brazen::TestSupport::Model::Entity
       end
 
       it "loads agent class" do
-        subject_class
+        _subject_class
       end
 
       it "when all requireds are provided" do
         ok = nil
-        ent = subject_class.new do
+        ent = _subject_class.new do
           ok = procez :foo, :a, :bar, :b, :baz, :c
         end
         ok.should eql true
@@ -125,12 +150,31 @@ module Skylab::Brazen::TestSupport::Model::Entity
       end
 
       it "when required args are missing, throws exception with same msg as app" do
-        -> do
-          subject_class.new do
+
+        begin
+          _subject_class.new do
             procez :bif, :x, :baz, :y
           end
-        end.should raise_error ::ArgumentError, "missing required properties 'foo' and 'bar'"
+        rescue ::ArgumentError => e
+        end
+
+        e.message.should eql "missing required properties 'foo' and 'bar'"
       end
     end
+
+    Subject_ = -> * a, & p do
+
+      if a.length.nonzero? || p
+        Brazen_::Model.common_entity( * a, & p )
+      else
+        Brazen_::Model.common_entity_module
+      end
+    end
+
+    Brazen_ = Brazen_
+    Enhance_for_test_ = o::Enhance_for_test_
+    NIL_ = nil
+    WITH_MODULE_METHOD_ = o::WITH_MODULE_METHOD_
+    Test_Instance_Methods_ = o::Test_Instance_Methods_
   end
 end

@@ -1,4 +1,17 @@
-# the model action narrative :[#024]
+# the action narrative :[#024]
+
+## the list of shared concerns (between model & action)
+
+  • actionability - identity in & navigation of the interface tree
+  • description & inflection
+  • name
+  • placement & visibility
+  • preconditions
+  • properties
+  • event receiving & sending
+
+
+
 
 ## :#note-70
 
@@ -24,9 +37,3 @@ callback, it is up to "us" to decide how the event is built.
 when the action receives a potential event (eg from one of its
 collaborating actors), we call our received selective listener
 with the same channel, and if it wants the event we wrap it.
-
-
-## :#note-160
-
-we break the event barrier here because we haven't designed a better way
-around it.
