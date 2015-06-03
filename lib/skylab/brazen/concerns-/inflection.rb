@@ -1,202 +1,268 @@
 module Skylab::Brazen
 
-  class Model
+  module Concerns_::Inflection  # see [#016]
 
-    module Inflection_Kernel__  # see [#016]
-      class << self
+    class << self
 
-        def for_model nf
-          Model_Inflection_Kernel__.new nf
+      def for_model nf
+        Model_Inflection_Implementor__.new nf
+      end
+
+      def for_action nf
+        Action_Inflection_Implementor___.new nf
+      end
+    end  # >>
+
+    class Model_Inflection_Implementor__
+
+      def initialize name_function
+
+        cls = name_function.class_
+
+        @_custom_action_inflection = if cls.respond_to? :custom_branch_inflection
+          cls.custom_branch_inflection
         end
 
-        def for_action nf
-          Action_Inflection_Kernel__.new nf
+        @_class = cls
+
+        @_name_function = name_function
+      end
+
+      def noun_lexeme
+
+        @___noun_lexeme ||= __produce_noun_lexeme
+      end
+
+      def __produce_noun_lexeme
+
+        s = if @_custom_action_inflection && @_custom_action_inflection.has_noun_lemma
+          @_custom_action_inflection.noun_lemma
+        else
+          __infer_noun_stem
+        end
+        s and LIB_.NLP::EN::POS::Noun[ s ]
+      end
+
+      def __infer_noun_stem  # #to-determine-a-noun
+
+        produce_noun_stem_from_node_path 0
+      end
+
+      def produce_noun_stem_from_node_path ignore_num
+
+        scn = get_lemma_scan ignore_num
+        s_a = scn.to_a
+        if s_a.length.nonzero?  # perhaps a top-most verb
+          s_a.reverse!  # it was built from deepest to shallowest
+
+          if 1 < s_a.length  # #the-flip
+            s = s_a[ 0 ]
+            s_a[ 0 ] = s_a[ 1 ]
+            s_a[ 1 ] = s
+          end
+          s_a * SPACE_
         end
       end
 
-      class Model_Inflection_Kernel__
+      def get_lemma_scan ignore_num
 
-        def initialize name_function
-          @nf = name_function
-          @cls = @nf.cls
-          @ci = if @cls.respond_to? :custom_branch_inflection
-            @cls.custom_branch_inflection
+        scn = get_module_scan_upwards
+        ignore_num.times do
+          scn.gets
+        end
+        scn.map_by do |mod|
+          if mod.respond_to? :custom_branch_inflection
+            cbi = mod.custom_branch_inflection
+            cbi and noun_s = cbi.noun_lemma
           end
+          noun_s or get_clean_noun_stem_from_module mod
         end
+      end
 
-        def noun_lexeme
-          @noun_lexeme ||= produce_noun_lexeme
-        end
+      def get_module_scan_upwards
 
-      private
+        mod = @_class
+        etc = nil
 
-        def produce_noun_lexeme
-          s = if @ci && @ci.has_noun_lemma
-            @ci.noun_lemma
-          else
-            infer_noun_stem
-          end
-          s and LIB_.NLP::EN::POS::Noun[ s ]
-        end
-
-        def infer_noun_stem  # #to-determine-a-noun
-          produce_noun_stem_from_node_path 0
-        end
-
-        def produce_noun_stem_from_node_path ignore_num
-          scn = get_lemma_scan ignore_num
-          s_a = scn.to_a
-          if s_a.length.nonzero?  # perhaps a top-most verb
-            s_a.reverse!  # it was built from deepest to shallowest
-
-            if 1 < s_a.length  # #the-flip
-              s = s_a[ 0 ]
-              s_a[ 0 ] = s_a[ 1 ]
-              s_a[ 1 ] = s
-            end
-            s_a * SPACE_
-          end
-        end
-
-        def get_lemma_scan ignore_num
-          scn = get_module_scan_upwards
-          ignore_num.times do
-            scn.gets
-          end
-          scn.map_by do |mod|
-            if mod.respond_to? :custom_branch_inflection
-              cbi = mod.custom_branch_inflection
-              cbi and noun_s = cbi.noun_lemma
-            end
-            noun_s or get_clean_noun_stem_from_module mod
-          end
-        end
-
-        def get_module_scan_upwards
-          mod = @cls
-          Callback_.stream do
-            if mod
+        p = -> do
+          if mod
+            if mod.respond_to? :name_function
               x = mod
               mod = mod.name_function.parent
+              x
+            else
+              etc[]
             end
-            x
           end
         end
 
-        # ~ cleaning
-
-        def get_clean_noun_stem_from_module cls
-          nf = cls.name_function
-          s = nf.as_const.to_s
-          remove_trailing_underscores s
-          remove_interceding_underscores s
-          depluralize s
-          nf.class.via_const( s ).as_human
+        etc = -> do
+          x_a = Brazen_.lib_.basic::Module.chain_via_module mod
+          stru = x_a[ -3 ]
+          x = mod
+          mod = if stru
+            stru.value_x
+          end
+          x
         end
 
-        def remove_trailing_underscores s
-          s.gsub! TRAILING_UNDERSCORES_RX__, EMPTY_S_ ; s
+        Callback_.stream do
+          p[]
         end
-        TRAILING_UNDERSCORES_RX__ = /_+$/
-
-        def remove_interceding_underscores s
-          s.gsub! INTERCEDING_UNDERSCORES_RX__ do
-            $1.downcase
-          end ; s
-        end
-        INTERCEDING_UNDERSCORES_RX__ = /_([A-Z])/
-
-        def depluralize s
-          s.gsub! TRAILING_LETTER_S_RX__, EMPTY_S_ ; s
-        end
-        TRAILING_LETTER_S_RX__ = /s\z/
-
       end
 
-      class Action_Inflection_Kernel__ < Model_Inflection_Kernel__
+      # ~ cleaning
 
-        def initialize name_function
-          @nf = name_function
-          @cls = @nf.cls
-          @ci = @cls.custom_action_inflection
+      def get_clean_noun_stem_from_module cls
+
+        nf = if cls.respond_to? :name_function
+          cls.name_function
+        else
+          Callback_::Name.via_module cls
         end
 
-        def inflected_verb
-          verb_lexeme.send verb_exponent_combination_i
+        s = nf.as_const.to_s
+
+        __mutate_by_removing_trailing_underscores s
+        __mutate_by_removing_interceding_underscores s
+        __mutate_by_depluralizing s
+
+        nf.class.via_const( s ).as_human
+      end
+
+      def __mutate_by_removing_trailing_underscores s
+
+        s.gsub! TRAILING_UNDERSCORES_RX___, EMPTY_S_ ; s
+      end
+
+      TRAILING_UNDERSCORES_RX___ = /_+$/
+
+      def __mutate_by_removing_interceding_underscores s
+
+        s.gsub! INTERCEDING_UNDERSCORES_RX___ do
+          $1.downcase
+        end
+        NIL_
+      end
+
+      INTERCEDING_UNDERSCORES_RX___ = /_([A-Z])/
+
+      def __mutate_by_depluralizing s
+        s.gsub! TRAILING_LETTER_S_RX___, EMPTY_S_
+        NIL_
+      end
+
+      TRAILING_LETTER_S_RX___ = /s\z/
+
+    end
+
+    class Action_Inflection_Implementor___ < Model_Inflection_Implementor__
+
+      def initialize name_function
+
+        @_name_function = name_function
+
+        @_class = @_name_function.class_
+
+        @_custom_action_inflection = @_class.custom_action_inflection
+      end
+
+      def inflected_verb
+        verb_lexeme.send verb_exponent_combination_symbol
+      end
+
+      def verb_lexeme
+
+        @___vl ||= __produce_verb_lexeme
+      end
+
+      def verb_as_noun_lexeme
+
+        @___did_resolve_verb_as_noun_lexeme ||= __rslv_VAN_lexeme
+        @__any_verb_as_noun_lexeme
+      end
+
+      def verb_exponent_combination_symbol
+
+        @___vec_i ||= __some_verb_exponent_combination_symbol
+      end
+
+      def inflected_noun
+
+        o = noun_lexeme
+        if o
+          o.send noun_exponent_combination_symbol
+        end
+      end
+
+      def noun_exponent_combination_symbol
+
+        @___nec_i ||= __some_noun_exponent_combination_symbol
+      end
+
+      def __produce_verb_lexeme
+
+        ci = @_custom_action_inflection
+
+        if ci
+          s = ci.verb_lemma
         end
 
-        def verb_lexeme
-          @verb_lexeme ||= produce_verb_lexeme
-        end
+        s ||= @_name_function.as_human
 
-        def verb_as_noun_lexeme
-          @__did_resolve_verb_as_noun_lexeme__ ||= __rslv_VAN_lexeme
-          @any_verb_as_noun_lexeme
-        end
+        LIB_.NLP::EN::POS::Verb[ s ]
+      end
 
-        def verb_exponent_combination_i
-          @verb_exponent_combination_i ||= prdc_verb_exponent_combination_i
-        end
+      def __rslv_VAN_lexeme
 
-        def inflected_noun
-          if noun_lexeme
-            noun_lexeme.send noun_exponent_combination_i
+        ci = @_custom_action_inflection
+
+        if ci
+          if ci.has_verb_as_noun_lemma
+            x = LIB_.NLP::EN::POS::Noun[ ci.verb_as_noun_lemma ]
           end
         end
 
-        def noun_exponent_combination_i
-          @noun_exponent_combination_i ||= prdc_noun_exponent_combination_i
+        @__any_verb_as_noun_lexeme = x
+        ACHIEVED_
+      end
+
+      def __some_verb_exponent_combination_symbol
+
+        ci = @_custom_action_inflection
+
+        if ci && ci.has_verb_exponent_combination
+          ci.verb_exponent_combination_symbol
+        else
+          :lemma  # i.e do not inflect, just use the "dictionary entry" word
         end
+      end
 
-      private
+      def __infer_noun_stem  # #to-determine-a-noun
 
-        def produce_verb_lexeme
-          _s = if @ci and s = @ci.verb_lemma
-            s
-          else
-            @nf.as_human
-          end
-          LIB_.NLP::EN::POS::Verb[ _s ]
+        s = produce_noun_stem_from_node_path 1
+        s or __infer_noun_stem_when_node_is_topmost_node
+      end
+
+      def __infer_noun_stem_when_node_is_topmost_node  # #note-170
+
+        ci = @_custom_action_inflection
+
+        if ci && ci.has_verb_lemma
+          @_name_function.as_human
         end
+      end
 
-        def __rslv_VAN_lexeme
+      def __some_noun_exponent_combination_symbol
 
-          if @ci
-            if @ci.has_verb_as_noun_lemma
-              _s = @ci.verb_as_noun_lemma
-              x = LIB_.NLP::EN::POS::Noun[ _s ]
-            end
-          end
+        ci = @_custom_action_inflection
 
-          @any_verb_as_noun_lexeme = x
-          ACHIEVED_
-        end
+        if ci && ci.has_noun_exponent_combination
 
-        def prdc_verb_exponent_combination_i
-          if @ci && @ci.has_verb_exponent_combination
-            @ci.verb_exponent_combination_i
-          else
-            :lemma  # i.e do not inflect, just use the "dictionary entry" word
-          end
-        end
+          ci.noun_exponent_combination_symbol
 
-        def infer_noun_stem  # #to-determine-a-noun
-          s = produce_noun_stem_from_node_path 1
-          s or infer_noun_stem_when_node_is_topmost_node
-        end
-
-        def infer_noun_stem_when_node_is_topmost_node  # #note-170
-          if @ci && @ci.has_verb_lemma
-            @nf.as_human
-          end
-        end
-
-        def prdc_noun_exponent_combination_i
-          if @ci && @ci.has_noun_exponent_combination
-            @ci.noun_exponent_combination_i
-          else
-            :indefinite_singular  # "add a couch db collection"
-          end
+        else
+          :indefinite_singular  # "add a couch db collection"
         end
       end
     end
