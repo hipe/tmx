@@ -35,7 +35,7 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
 
     it "1.3) money" do
 
-      td = TestSupport_::Lib_::System[].filesystem.tmpdir.new(
+      td = TestSupport_::Lib_::System[].filesystem.tmpdir.new_with(
         :be_verbose, do_debug,
         :debug_IO, debug_IO )
 

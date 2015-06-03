@@ -30,11 +30,15 @@ module Skylab::TestSupport
       end
     end
 
-    class Shell__  # too hard to do this in a basic object
+    class Shell___  # too hard to do this in a basic object
 
-      TestSupport_.lib_.entity self do
+      Callback_::Actor.methodic self, :simple, :properties, :properties,
+        :debug_IO,
+        :debug_prefix,
+        :do_debug_proc,
+        :puts_map_proc
 
-        o :polymorphic_writer_method_name_suffix, :'='
+      private  # ->
 
         def do_debug=
           @do_debug_value_was_passed = true
@@ -47,23 +51,23 @@ module Skylab::TestSupport
           ACHIEVED_
         end
 
-        o :properties, :debug_IO, :debug_prefix, :do_debug_proc,
-          :puts_map_proc
-
-      end
+        # <-
 
       def initialize x_a
         @is_standard = true
         process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
       end
 
+    public
+
       attr_reader( * properties.get_names )
+
       attr_reader :do_debug_value_was_passed, :do_debug_x, :is_standard
 
     end
 
     def initialize * x_a
-      o = Shell__.new x_a
+      o = Shell___.new x_a
       @debug_IO = o.debug_IO
       @debug_prefix = o.debug_prefix
       @puts_map_proc = o.puts_map_proc
@@ -101,22 +105,30 @@ module Skylab::TestSupport
     # ~ debugging
 
     def add_debugging_downstream
+
       _downstream_IO = @debug_IO || TestSupport_.lib_.stderr
+
       @debug_IO = nil
+
       if @debug_prefix
         _line_begin_string = @debug_prefix
         @debug_prefix = nil
       end
+
       if @puts_map_proc
         _puts_map_proc = @puts_map_proc
       end
+
       _niladic_pass_filter_proc = @do_debug_p
-      _io = TestSupport_.lib_.IO::Mappers::Filter.new(
+
+      _io = TestSupport_.lib_.IO::Mappers::Filter.new_with(
         :downstream_IO, _downstream_IO,
         :line_begin_string, _line_begin_string,
         :niladic_pass_filter_proc, _niladic_pass_filter_proc,
         :puts_map_proc, _puts_map_proc )
-      @muxer.add DEBUG_I__, _io ; nil
+
+      @muxer.add DEBUG_I__, _io
+      NIL_
     end
 
     BUFFER_I__ = :buffer

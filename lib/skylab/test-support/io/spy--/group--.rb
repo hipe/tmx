@@ -103,35 +103,57 @@ module Skylab::TestSupport
 
       downstream_IO = TestSupport_::Library_::StringIO.new
 
-      _filter = TestSupport_.lib_.IO::Mappers::Filter.new(
-        :downstream_IO, downstream_IO,
-        :line_end_proc, -> do
-          downstream_IO.rewind
-          s = downstream_IO.string.dup  # you gotta
-          downstream_IO.truncate 0
-          @line_map_p_a and s = @line_map_p_a.reduce( s ) { |x, p| p[x] }
-          line = Line__.new name_x, s
-          if @debug and @debug.condition_p[]
-            @debug.emit_line_p[ line ]
+      _line_end_proc = -> do
+
+        downstream_IO.rewind
+
+        s = downstream_IO.string.dup  # you gotta
+
+        downstream_IO.truncate 0
+
+        if @line_map_p_a
+          s = @line_map_p_a.reduce s do | x, p |
+            p[ x ]
           end
-          @line_a.push line ; nil
-        end )
+        end
+
+        line = Line___.new name_x, s
+
+        if @debug and @debug.condition_p[]
+          @debug.emit_line_p[ line ]
+        end
+
+        @line_a.push line
+        NIL_
+      end
+
+      _filter = TestSupport_.lib_.IO::Mappers::Filter.new_with(
+        :downstream_IO, downstream_IO,
+        :line_end_proc, _line_end_proc,
+      )
 
       spy = IO.spy :nonstandard
       spy[ :line_emitter ] = _filter
-      init_p and init_p[ spy ]
+      if init_p
+        init_p[ spy ]
+      end
       spy
     end
-    #
-    class Line__  # :+[#ts-007]
+
+    class Line___  # :+[#ts-007]
+
       def initialize stream_symbol, string
         @stream_symbol = stream_symbol ; @string = string
       end
+
       attr_reader :stream_symbol, :string
+
       alias_method :channel_x, :stream_symbol
+
       def payload_x
         @string.chop
       end
+
       def to_a
         [ @stream_symbol, @string ]
       end

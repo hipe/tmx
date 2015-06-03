@@ -9,7 +9,7 @@ module Skylab::TestSupport
       # sketchy #stowaway: only when the [ts] interactive API is being called
       # do we need the below, for support of procs as actions:
 
-      def action_class
+      def action_base_class
         Brazen_::Model.common_action_class
       end
     end  # >>

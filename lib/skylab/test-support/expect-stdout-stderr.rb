@@ -339,7 +339,7 @@ module Skylab::TestSupport
 
     SIMPLE_STYLE_RX__ = /\e  \[  \d+  (?: ; \d+ )*  m  /x  # copy-paste [hl]
 
-    METHODIC_ = Callback_::Actor.methodic_lib
+    METHODIC_ = Callback_::Actor::Methodic
 
     class Expectation__
 

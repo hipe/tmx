@@ -19,7 +19,6 @@ module Skylab::TestSupport
             :noun, 'test document',
             :verb_as_noun, 'permutation',
 
-          :argument_arity, :custom,
           :required, :property, :permutations,
 
           :required, :property, :stdout,

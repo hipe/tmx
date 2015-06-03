@@ -61,19 +61,19 @@ module Skylab::TestSupport
 
           def via_both path, post_path_content
 
-            st = TestSupport_.lib_.hashtag.
-              interpret_simple_stream_from_string( post_path_content ).
-                flush_to_value_peeking_stream
+            _ = TestSupport_.lib_.hashtag
+            st = _::Stream[ post_path_content ]
+            st.become_name_value_scanner
 
             tagging_a = nil
 
             x = st.gets
             while x
 
-              case x.symbol_i
+              case x.category_symbol
               when :hashtag
                 tagging_a ||= []
-                tagging_a.push bld_tagging( x, st )
+                tagging_a.push __build_tagging( x, st )
 
               when :string
 
@@ -87,13 +87,12 @@ module Skylab::TestSupport
             _new path, tagging_a
           end
 
-          def bld_tagging x, st
+          def __build_tagging pc, st
 
-            _sym = x.get_stem_s.gsub( DASH_, UNDERSCORE_ ).intern
+            _sym = pc.get_stem_string.gsub( DASH_, UNDERSCORE_ ).intern
 
-            _val_s = if st.peek_for_value
-              st.gets  # skip the colon
-              st.gets.to_s
+            if pc.value_is_known
+              _val_s = pc.get_value_string
             end
 
             Tagging__.new _sym, _val_s

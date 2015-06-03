@@ -103,7 +103,6 @@ module Skylab::TestSupport
             end
           end
 
-
           def __the_rest x_a, y
 
             y.unshift :generate

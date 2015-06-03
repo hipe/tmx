@@ -102,7 +102,6 @@ module Skylab::TestSupport
           # write all properties this way, otherwise we straddle values
           # being stored in two ways. maybe we'll automate it [#br-075]
 
-
           o :description, -> y do
             y << "if this main `Foo::Bar::Baz` subject of your file is"
             y << "not specified here, a guess is attempted with a hack"
@@ -246,7 +245,7 @@ module Skylab::TestSupport
 
           filesys_idioms  # build them now so you don't do so repeatedly
 
-          recv_dup_iambic x_a  # CAREFUL - same method that children use
+          _receive_dup_iambic x_a  # CAREFUL - same method that children use
         end
 
         def new_via_iambic x_a  # :+#frontier for [br]
@@ -258,7 +257,7 @@ module Skylab::TestSupport
           # but note that normalize isn't called yet. care must be taken
           # that the duped action will not have side-effects on this one
 
-          dup.recv_dup_iambic x_a
+          dup._receive_dup_iambic x_a
         end
 
         def initialize_copy _
@@ -268,10 +267,11 @@ module Skylab::TestSupport
           nil
         end
 
-        protected def recv_dup_iambic x_a
+        protected def _receive_dup_iambic x_a
 
-          _ok = process_polymorphic_stream_fully(
-            polymorphic_stream_via_iambic x_a )
+          _st = Callback_::Polymorphic_Stream.via_array x_a
+
+          _ok = process_polymorphic_stream_fully _st
 
           _ok && self
         end
@@ -411,7 +411,7 @@ module Skylab::TestSupport
 
           bx = Callback_::Box.new
 
-          st = properties.to_stream
+          st = properties.to_value_stream
 
           prp = st.gets
           while prp
@@ -431,7 +431,7 @@ module Skylab::TestSupport
 
             prop = Parameter_Function_::Build_property_for_function.call(
               :common_pfunc,
-              self::Entity_Property,
+              self::Property,
               _x,
               sym )
 
@@ -524,7 +524,7 @@ module Skylab::TestSupport
           _force_arg = Callback_::Trio.via_value_and_property(
             # because we use ivars and not property boxes, we must make this manually
             @force,
-            self.class.property_via_symbol( :force ) )
+            self.class.properties.fetch( :force ) )
 
           io = TestSupport_.lib_.system.filesystem.normalization.downstream_IO(
             :path, @output_path,

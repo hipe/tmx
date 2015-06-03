@@ -71,18 +71,10 @@ module Skylab::TestSupport
       MH__[]::Enhance::Shell.new i_a
     end
 
-    Entity = -> * a, & p do
-      if a.length.nonzero? || p
-        Brazen[]::Entity.call_via_arglist a, & p
-      else
-        Brazen[]::Entity
-      end
-    end
-
     Permute = sidesys[ :Permute ]
 
     Properties_stack_frame = -> * a do
-      Brazen[].properties_stack.common_frame.call_via_arglist a
+      Brazen[]::Property::Stack.common_frame.call_via_arglist a
     end
 
     Funcy_globful = -> mod do

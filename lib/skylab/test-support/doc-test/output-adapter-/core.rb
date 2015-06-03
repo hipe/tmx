@@ -37,7 +37,7 @@ module Skylab::TestSupport
 
         mod = self.class.const_get :Parameter_Functions_, false  # etc
 
-        pcls = DocTest::Models_::Front::Actions::Generate::Entity_Property
+        pcls = DocTest::Models_::Front::Actions::Generate::Property
 
         mod.constants.map do | sym |
 

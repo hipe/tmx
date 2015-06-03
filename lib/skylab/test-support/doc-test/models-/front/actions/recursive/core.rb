@@ -6,61 +6,31 @@ module Skylab::TestSupport
 
       class Actions::Recursive < Action_
 
-        # ~ enum experiment ( abstraction candidate )
+        # ~ :+[#br-082] abstraction candidate - enum
 
-        edit_entity_class do
-
-          entity_property_class_for_write  # abstraction candidate
-
-          class self::Entity_Property
-          private
-
-            def enum=
-
-              set_sym_a = gets_one_polymorphic_value
-
-              _ENUM_BOX_P = Callback_.memoize do
-                bx = Callback_::Box.new
-                set_sym_a.each do | sym |
-                  bx.add sym, true
-                end
-                bx
-              end
-
-              add_to_write_proc_chain do | _PROP |
-                -> do
-                  x = gets_one_polymorphic_value.intern
-                  if _ENUM_BOX_P[][ x ]
-                    receive_value_of_entity_property x, _PROP
-                  else
-                    receive_bad_enum_value x, _PROP.name_symbol, _ENUM_BOX_P[]
-                  end
-                end
-              end
-
-              @enum_members_p = -> do
-                set_sym_a.dup
-              end
-
-              KEEP_PARSING_
-            end
-
-          public
-
-            def enum_members
-              @enum_members_p[]
-            end
-          end
+        # ~~ ( not used yet (per se):
+        _base_cls = if const_defined? :Property
+          self::Property
+        else
+          Brazen_::Model::Entity::Property
         end
 
-        def receive_bad_enum_value x, name_sym, enum_box  # #hook-near [br]
+        const_set :Property, ::Class.new( _base_cls )
+        # ~~ )
+
+        def sub_action  # while #open [#br-088]
+
+          @argument_box[ :sub_action ]  # often nil
+        end
+
+        def ___ME_receive_bad_enum_value x, prp_name, x_a
+
           maybe_send_event :error, :invalid_property_value do
-            bld_bad_enum_value_event x, name_sym, enum_box
+
+            Brazen_::Entity::Meta_Meta_Properties::Enum::
+              Build_extra_value_event[ x, prp_name, enum_box.get_names ]
           end
         end
-
-        define_method :bld_bad_enum_value_event,
-          Brazen_::Entity.build_bad_enum_value_event_method_proc
 
         # ~ end experiments
 
@@ -73,8 +43,8 @@ module Skylab::TestSupport
               :noun, 'document',
 
             :desc, -> y do
-                y << 'generate multiple documents at once'
-                y << 'using a manifest file'
+              y << 'generate multiple documents at once'
+              y << 'using a manifest file'
             end,
 
             :description, -> y do
@@ -92,8 +62,10 @@ module Skylab::TestSupport
 
             :enum, [ :list, :preview ],
             :description, -> y do
-              _prop = Recursive_.property_via_symbol :sub_action
-              y << "{ #{ _prop.enum_members * ' | ' } }"
+
+              _prp = Recursive_.properties.fetch :sub_action
+              y << "{ #{ _prp.enum_box.get_names * ' | ' } }"
+
             end,
             :property, :sub_action,
 
@@ -106,12 +78,10 @@ module Skylab::TestSupport
             :hidden, :property, :downstream,
 
             :required,
-              :description, -> y do
-
-                y << "a file or directory of code as input"
-
-              end,
-              :property, :path
+            :description, -> y do
+              y << "a file or directory of code as input"
+            end,
+            :property, :path
 
 
         def initialize boundish  # and oes_p
@@ -119,10 +89,10 @@ module Skylab::TestSupport
         end
 
         def normalize
-          super and _normalize
+          super and __my_normalize
         end
 
-        def _normalize
+        def __my_normalize
 
           via_properties_init_ivars
 
@@ -138,9 +108,9 @@ module Skylab::TestSupport
 
           if :preview == @sub_action && ! @downstream
             maybe_send_event :error, :missing_required_properties do
-              TestSupport_.lib_.entity.properties_stack.
+              TestSupport_.lib_.brazen::Property.
                 build_missing_required_properties_event(
-                  [ self.class.property_via_symbol( :downstream ) ] )
+                  [ self.class.properties.fetch( :downstream ) ] )
             end
             UNABLE_
           else
@@ -153,7 +123,7 @@ module Skylab::TestSupport
           struct = Recursive_::Actors__::Produce_manifest_entry_stream[
             @path,
             @doc_test_files_file,
-            self.class.property_via_symbol( :path ),
+            self.class.properties.fetch( :path ),
             & handle_event_selectively ]
 
           struct and begin
@@ -213,12 +183,18 @@ module Skylab::TestSupport
               :upstream_path, entry.get_absolute_path ]
 
             tagging_a = entry.tagging_a
+
             if tagging_a
+
               tagging_a.each do | tagging |
+
                 x = tagging.value_x
                 if x.nil?
+
                   x_a.push tagging.normal_name_symbol
+
                 else
+
                   x_a.push tagging.normal_name_symbol, x
                 end
               end

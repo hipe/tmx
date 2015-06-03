@@ -30,9 +30,7 @@ module Skylab::TestSupport
 
       class Actions::Ping < Action_
 
-        edit_entity_class do
-          o :promote_action
-        end
+        edit_entity_class :promote_action
 
         def produce_result
 

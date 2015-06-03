@@ -9,16 +9,24 @@ module Skylab::TestSupport::TestSupport::DocTest
     # use :mock_FS
 
     it "path is required" do
+
       _rx = /\Amissing required property 'path'\z/
-      -> do
-        call_API :recursive  # (worked)
-      end.should raise_error ::ArgumentError, _rx
+
+      begin
+        call_API :recursive
+      rescue ::ArgumentError => e
+      end
+
+      e.message.should match _rx
     end
 
     it "enum works #frontier" do
+
       call_API :recursive, :path, 'not-there', :sub_action, :no_wai
+
       expect_not_OK_event :invalid_property_value,
-        "invalid sub_action (ick :no_wai), expecting { list | preview }"
+        "invalid sub action (ick :no_wai), expecting { list | preview }"
+
       expect_failed
     end
 
@@ -50,6 +58,8 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
 
     it "'preview' results in a stream of \"generation\"s", wip: true do
+
+      self._WIP
 
       downstream = build_IO_spy_downstream_for_doctest
 

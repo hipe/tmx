@@ -230,8 +230,8 @@ module Skylab::TestSupport
     private
 
       def build_unrecognized_param_arg ok_x_a
-        TestSupport_.lib_.entity.properties_stack.
-          build_extra_properties_event(
+        TestSupport_.lib_.brazen::Property::
+          build_extra_values_event(
             [ @value_x ],
             ok_x_a,
             "parameter argument" )
