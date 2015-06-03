@@ -810,30 +810,6 @@ module Skylab::Brazen
 
     end
 
-    class Model_Name_Function_ < Brazen_.name_library.name_function_class
-
-      def init_via_three_ cls, parent, const_i
-
-        @cls = cls
-        super
-      end
-
-      attr_reader :cls
-
-      def inflected_noun
-        inflection_kernel.inflected_noun
-      end
-
-      def noun_lexeme
-        inflection_kernel.noun_lexeme
-      end
-
-    private
-      def inflection_kernel
-        @inflection_kernel ||= Model_::Inflection_Kernel__.for_model self
-      end
-    end
-
     class Flyweighted_Property_Box__
 
       # if iterating over a dataset, only allocate memory when you chose to
