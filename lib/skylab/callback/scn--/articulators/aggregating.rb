@@ -109,7 +109,7 @@ module Skylab::Callback
             } #{ and_ s_a }"
           y << "did you mean #{ or_ _s_a_ }?"
         end
-        receive_extra_iambic _ev  # #hook-in (local)
+        receive_extra_values_event _ev  # #hook-in (local)
       end
 
       def when_parsed_fields_OK
@@ -136,7 +136,7 @@ module Skylab::Callback
           nil
         end
 
-        include Callback_::Actor.methodic_lib.polymorphic_processing_instance_methods
+        include Callback_::Actor::Methodic.polymorphic_processing_instance_methods
 
       private
 
@@ -174,8 +174,8 @@ module Skylab::Callback
               @when_field_value_count_is_two_or_more_p = st.gets_one  # BE CAREFUL
               KEEP_PARSING_
             else
-              _ev = build_extra_iambic_event_via [ i ], [ :frame, :field ]
-              receive_extra_iambic _ev  # #hook-in (local)
+              _ev = build_extra_values_event [ i ], [ :frame, :field ]
+              receive_extra_values_event _ev  # #hook-in (local)
             end
           end
 

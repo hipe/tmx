@@ -2,7 +2,7 @@ module Skylab::Callback
 
   module Actor
 
-    module Methodic__  # see [#058]
+    module Methodic  # see [#058]
 
       class << self
 
@@ -12,10 +12,6 @@ module Skylab::Callback
 
         def polymorphic_processing_instance_methods
           Polymorphic_Processing_Instance_Methods__
-        end
-
-        def simple_property_class
-          Simple_Property__
         end
 
         def call cls, * i_a
@@ -66,9 +62,21 @@ module Skylab::Callback
 
             mod.module_exec do
 
-              private
+              if const_defined? BX_
+                bx = const_get BX_
+                if const_defined? BX_, false
+                  sym_a = bx.a_
+                else
+                  bx = bx.dup
+                  const_set BX_, bx
+                  sym_a = bx.a_
+                end
+              else
+                sym_a = []
+                const_set BX_, Box_Lite___.new( sym_a )  # :+#experiment
+              end
 
-              sym_a = []
+            private
 
               start_index.upto( i_a.length - 1 ) do |d|
 
@@ -81,15 +89,18 @@ module Skylab::Callback
                   KEEP_PARSING_
                 end
               end
-
-              const_set BX_, Mock_Box___.new( sym_a )  # :+#experiment
             end
-            nil
+            NIL_
           end
         end  # >>
       end
 
-      Mock_Box___ = ::Struct.new :a_
+      Box_Lite___ = ::Struct.new :a_ do
+
+        def initialize_copy otr
+          self.a_ = otr.a_.dup
+        end
+      end
 
       module Module_Methods__
 
@@ -200,7 +211,7 @@ module Skylab::Callback
 
         def process_polymorphic_stream_passively st, & oes_p
 
-          Process_polymorphic_stream_passively__[
+          Process_polymorphic_stream_passively[
             st,
             self,
             polymorphic_writer_method_name_passive_lookup_proc,
@@ -237,24 +248,21 @@ module Skylab::Callback
         end
 
         def when_after_process_iambic_fully_stream_has_content stream  # :+#public-API
-          _ev = build_extra_iambic_event_via [ stream.current_token ]
-          receive_extra_iambic _ev
+
+          _ev = build_extra_values_event [ stream.current_token ]
+          receive_extra_values_event _ev
         end
 
-        def build_extra_iambic_event_via name_i_a, did_you_mean_i_a=nil
-          if 1 == name_i_a.length
-            Stranger_[ name_i_a.first, did_you_mean_i_a ]
-          else
-            Callback_.lib_.entity.properties_stack.
-              build_extra_properties_event name_i_a, did_you_mean_i_a
-          end
+        def build_extra_values_event name_i_a, did_you_mean_i_a=nil
+
+          Build_extra_values_event[ name_i_a, did_you_mean_i_a ]
         end
 
         def build_not_OK_event_with * i_a, & msg_p
           Callback_::Event.inline_not_OK_via_mutable_iambic_and_message_proc i_a, msg_p
         end
 
-        def receive_extra_iambic ev  # :+#public-API (name) :+#hook-in
+        def receive_extra_values_event ev  # :+#public-API (name) :+#hook-in
           raise ev.to_exception
         end
       end
@@ -263,7 +271,7 @@ module Skylab::Callback
 
         _meth_p = Method_name_proc_via_class__[ o.singleton_class ]
 
-        kp = Process_polymorphic_stream_passively__[ st, o, _meth_p, & oes_p ]
+        kp = Process_polymorphic_stream_passively[ st, o, _meth_p, & oes_p ]
         if kp
           if st.unparsed_exists
             raise Stranger_[ st.current_token ].to_exception
@@ -275,7 +283,7 @@ module Skylab::Callback
         end
       end
 
-      Process_polymorphic_stream_passively__ = -> st, o, meth_p=nil, & oes_p do
+      Process_polymorphic_stream_passively = -> st, o, meth_p=nil, & oes_p do
 
         keep_parsing = true
 
@@ -382,7 +390,7 @@ module Skylab::Callback
         end
       end
 
-      class Simple_Property__  # :+[#mh-053] (was [#hl-030])
+      class Property  # :+[#mh-053] (was [#hl-030])
 
         Actor.methodic self, :properties,
           :ivar,
@@ -432,7 +440,6 @@ module Skylab::Callback
 
         def initialize & edit_p
           @argument_arity = nil
-          @polymorphic_writer_method_proc_is_generated = true  # :+#public-API (name)
           @parameter_arity = :zero_or_one
           instance_exec( & edit_p )
           @argument_arity ||= :one
@@ -469,7 +476,7 @@ module Skylab::Callback
           x = gets_one_polymorphic_value
           @argument_arity = x
           if :custom == x
-            @polymorphic_writer_method_proc_is_generated = false
+            @has_custom_polymorphic_writer_method = true
             @polymorphic_writer_method_proc_proc = nil
           end
           KEEP_PARSING_
@@ -508,12 +515,11 @@ module Skylab::Callback
           :one == @parameter_arity
         end
 
-        def default_proc  # :+#hook-in
-          NIL_
-        end
+        attr_reader :default_proc  # :+#hook-in-esque. the ivar is not set here
 
         def polymorphic_writer_method_proc
-          if @polymorphic_writer_method_proc_is_generated
+
+          if ! has_custom_polymorphic_writer_method
             if @parameter_arity
               send :"polymorphic_writer_method_proc_when_arity_is__#{ @argument_arity }__"
             else
@@ -523,6 +529,8 @@ module Skylab::Callback
             @polymorphic_writer_method_proc_proc[ self ]
           end
         end
+
+        attr_reader :has_custom_polymorphic_writer_method
 
       private
 
@@ -575,7 +583,7 @@ module Skylab::Callback
             ok = prcs_polymorphic_stream_fully_for_properties stream
             ok && @cls
           else
-            receive_extra_iambic Stranger_[ stream.current_token, [ :properties ] ]  # #hook-in (local)
+            receive_extra_values_event Stranger_[ stream.current_token, [ :properties ] ]  # #hook-in (local)
           end
         end
 
@@ -620,7 +628,7 @@ module Skylab::Callback
           @property_class = if @cls.const_defined? PC_
             @cls.const_get PC_
           else
-            Simple_Property__
+            Property
           end ; nil
         end
 
@@ -660,11 +668,25 @@ module Skylab::Callback
           end
 
           def __build_properties
-            _BX = const_get BX_
-            Callback_::Stream.via_nonsparse_array _BX.a_ do |i|
-              send _BX.fetch i
-            end.flush_to_immutable_with_random_access_keyed_to_method :name_symbol
+
+            bx = const_get BX_
+
+            _st = Callback_::Stream.via_nonsparse_array bx.a_ do | sym |
+              send bx.fetch sym
+            end
+
+            _st.flush_to_immutable_with_random_access_keyed_to_method :name_symbol
           end
+        end
+      end
+
+      Build_extra_values_event = -> name_i_a, did_you_mean_i_a=nil do
+
+        if 1 == name_i_a.length
+          Stranger_[ name_i_a.first, did_you_mean_i_a ]
+        else
+          Callback_.lib_.brazen::Property.
+            build_extra_values_event name_i_a, did_you_mean_i_a
         end
       end
 
@@ -708,8 +730,8 @@ module Skylab::Callback
         end
 
         def flush
-          Callback_.lib_.entity.properties_stack.
-            build_extra_properties_event [ @strange_x_ ], @exp_x_a
+          Callback_.lib_.brazen::Property.
+            build_extra_values_event [ @strange_x_ ], @exp_x_a
         end
       end
 
@@ -743,7 +765,7 @@ module Skylab::Callback
           end
 
           def o * x_a
-            Methodic__.via_client_and_iambic self, x_a
+            Methodic.via_client_and_iambic self, x_a
           end
 
         private
@@ -755,7 +777,7 @@ module Skylab::Callback
               const_set PC_,( if const_defined? PC_
                 ::Class.new const_get PC_
               else
-                ::Class.new Simple_Property__
+                ::Class.new Property
               end )
             end
           end
@@ -792,23 +814,25 @@ module Skylab::Callback
             end
             @client.include @mod  # this adds 4 modules to the chain!
             @mod.properties.length.nonzero? and self._DO_ME
-            Methodic__.via_client_and_iambic @client, @x_a
+            Methodic.via_client_and_iambic @client, @x_a
           end
         end
       end  # Apply_simple_enhancement__
 
-      class Simple_Property__
+      class Property
+
+        attr_reader :polymorphic_writer_method_proc_proc
 
       private
 
         def polymorphic_writer_method_to_be_provided=
-          @polymorphic_writer_method_proc_is_generated = false
+          @has_custom_polymorphic_writer_method = true
           @polymorphic_writer_method_proc_proc = nil
           ACHIEVED_
         end
 
         def polymorphic_writer_method_proc_proc=
-          @polymorphic_writer_method_proc_is_generated = false
+          @has_custom_polymorphic_writer_method = true
           @polymorphic_writer_method_proc_proc = gets_one_polymorphic_value
           ACHIEVED_
         end
@@ -836,7 +860,7 @@ module Skylab::Callback
           def via_default_proc_and_is_required_normalize  # #note-515, :+#courtesy
 
             miss_a = nil
-            st = self.class.properties.to_stream
+            st = self.class.properties.to_value_stream
 
             begin
               prp = st.gets
@@ -864,7 +888,7 @@ module Skylab::Callback
 
             if miss_a
               _ev = build_missing_required_properties_event miss_a
-              receive_missing_required_properties _ev
+              receive_missing_required_properties_event _ev
               UNABLE_
 
             else
@@ -873,16 +897,16 @@ module Skylab::Callback
           end
 
           def build_missing_required_properties_event miss_a
-            Callback_.lib_.entity.properties_stack.
+            Callback_.lib_.brazen::Property.
               build_missing_required_properties_event( miss_a )
           end
 
-          def receive_missing_required_properties ev
+          def receive_missing_required_properties_event ev
             raise ev.to_exception
           end
 
           def nilify_uninitialized_ivars  # :+#courtesy
-            scn = self.class.properties.to_stream
+            scn = self.class.properties.to_value_stream
             while prop = scn.gets
               instance_variable_defined? prop.as_ivar and next
               instance_variable_set prop.as_ivar, nil

@@ -11,7 +11,8 @@ module Skylab::Callback
       # too much with other uses of the word elsewhere. also it's probably
       # for the better that we don't expose a box interface whole-hog, and
       # rather that we just bring box-like methods in piecemeal as we need
-      # them.
+      # them.  #todo :+[#sl-134] this may have changed -- we may now use
+      # plain old box this purpose .. maybe do away with this node ..
 
       class << self
         def via_flushable_stream__ st, method
@@ -84,16 +85,16 @@ module Skylab::Callback
       # ~ (
 
       def map_reduce_by & x_p
-        to_stream.map_reduce_by( & x_p )
+        to_value_stream.map_reduce_by( & x_p )
       end
 
       def reduce_by & x_p
-        to_stream.reduce_by( & x_p )
+        to_value_stream.reduce_by( & x_p )
       end
 
       # ~ )
 
-      def to_stream
+      def to_value_stream
         Callback_::Stream.via_times @a.length do | d |  # we could make this accomodate growable boxes during iteration if we needed to
           @h.fetch @a.fetch d
         end

@@ -4,90 +4,105 @@ module Skylab::Callback
 
       class Wrappers__::Exception
 
-        Callback_.lib_.entity self do
-
-          def path_hack  # :[#052].
-            add_mutator do |o|
-              md = PATH_HACK_RX__.match o.message
-              if md
-                o.push :message_head, md.pre_match
-                o.push :rb_function_name, md[ :rb_function_name ].intern
-                o.push :path, md.post_match
-                o.message_proc = -> y, ev do
-                  y << "#{ ev.message_head } - #{ pth ev.path }"
-                end
-              else
-                o.message_proc = terse_message_proc
-              end
-            end
-          end
-
-          def properties
-            @xtra_prop_x_a = polymorphic_upstream.flush_remaining_to_array
-            KEEP_PARSING_  # altho we should stop now, it looks like error otherwise
-          end
-
-          def search_and_replace_hack
-            rx = gets_one_polymorphic_value
-            p = gets_one_polymorphic_value
-            add_mutator do |o|
-              prev_proc = o.message_proc
-              o.message_proc = -> y, ev do
-                _y_ = ::Enumerator::Yielder.new do |s|
-                  s.gsub! rx do
-                    calculate ev, & p
-                  end
-                  y << s
-                end
-                calculate _y_, ev, & prev_proc
-              end
-            end
-          end
-
-          o :properties,
-            :exception,
-            :terminal_channel_i
-
-        end
-
-        Event_.selective_builder_sender_receiver self
-
-        PATH_HACK_RX__ = / @ rb_(?<rb_function_name>[_a-z]+) - /
+        Callback_::Actor.methodic self, :properties,
+          :exception,
+          :terminal_channel_i
 
         def initialize & p
-          @mutator_p_a = nil
-          @xtra_prop_x_a = nil
+          @_mutator_p_a = nil
+          @_xtra_prop_x_a = nil
           instance_exec( & p )
         end
 
-        def add_mutator & p
-          ( @mutator_p_a ||= [] ).push p
+      private
+
+        def path_hack=  # :[#052].
+
+          _add_mutator do |o|
+
+            md = PATH_HACK_RX___.match o.message
+
+            if md
+              o.push :message_head, md.pre_match
+              o.push :rb_function_name, md[ :rb_function_name ].intern
+              o.push :path, md.post_match
+              o.message_proc = -> y, ev do
+                y << "#{ ev.message_head } - #{ pth ev.path }"
+              end
+
+            else
+
+              o.message_proc = __build_terse_message_proc
+            end
+          end
+        end
+
+        PATH_HACK_RX___ = / @ rb_(?<rb_function_name>[_a-z]+) - /
+
+        def properties=
+
+          @_xtra_prop_x_a = polymorphic_upstream.flush_remaining_to_array
+
+          KEEP_PARSING_  # altho we should stop now, it looks like error otherwise
+        end
+
+        def search_and_replace_hack=
+
+          rx = gets_one_polymorphic_value
+          p = gets_one_polymorphic_value
+
+          _add_mutator do | o |
+
+            prev_proc = o.message_proc
+
+            o.message_proc = -> y, ev do
+
+              _y_ = ::Enumerator::Yielder.new do | s |
+
+                s.gsub! rx do
+                  calculate ev, & p
+                end
+
+                y << s
+              end
+
+              calculate _y_, ev, & prev_proc
+            end
+          end
+        end
+
+      public
+
+        def _add_mutator & p
+          ( @_mutator_p_a ||= [] ).push p
           KEEP_PARSING_
         end
 
         def execute
-          resolve_terminal_channel_i
-          begin_edit
+
+          @terminal_channel_i ||= __infer_terminal_channel_symbol
+
+          __begin_edit
+
           if @exception.respond_to? :members
-            via_exception_add_members_to_edit
+            __via_exception_add_members_to_edit
           end
-          if @xtra_prop_x_a
-            @edit.concat @xtra_prop_x_a
-            @xtra_prop_x_a = nil
+
+          if @_xtra_prop_x_a
+            @_sess.concat @_xtra_prop_x_a
+            @_xtra_prop_x_a = nil
           end
-          if @mutator_p_a
-            @mutator_p_a.each do |p|
-              p[ @edit ]
+
+          if @_mutator_p_a
+            @_mutator_p_a.each do | p |
+              p[ @_sess ]
             end
           end
-          flush
+
+          __flush
         end
 
-        def resolve_terminal_channel_i
-          @terminal_channel_i ||= infer_terminal_channel_i ; nil
-        end
-
-        def infer_terminal_channel_i
+        def __infer_terminal_channel_symbol
 
           # the exception class's name is transformed to a terminal channel
           # name by using the trailing two or one consts of the exception
@@ -96,42 +111,61 @@ module Skylab::Callback
           #     ::Foo::Bar_::Baz_Exception__ => :bar_baz_exception
 
           s_a = @exception.class.name.split Callback_.const_sep
+
           sub_slice = s_a[ -2, 2 ]
+
           sub_slice ||= s_a
-          s_a_ = sub_slice.map { |s| s.sub TRAILING_UNDERSCORES_RX__, EMPTY_S_ }
+
+          s_a_ = sub_slice.map do |s|
+            s.sub TRAILING_UNDERSCORES_RX___, EMPTY_S_
+          end
+
           s_a_.join( UNDERSCORE_ ).downcase.intern
         end
 
-        TRAILING_UNDERSCORES_RX__ = /_+\z/
+        TRAILING_UNDERSCORES_RX___ = /_+\z/
 
-        def begin_edit
-          o = Mutable_Edit__.new @terminal_channel_i, @exception
+        def __begin_edit
+
+          o = Sessoin___.new @terminal_channel_i, @exception
           o.push :exception, @exception, :ok, false
-          o.message_proc = UNMAPPED_MESSAGE_PROC__
-          @edit = o ; nil
+          o.message_proc = UNMAPPED_MESSAGE_PROC___
+          @_sess = o
+          NIL_
         end
 
-        UNMAPPED_MESSAGE_PROC__ = -> y, o do
+        UNMAPPED_MESSAGE_PROC___ = -> y, o do
           y << o.exception.message
         end
 
-        def via_exception_add_members_to_edit
-          @exception.members.each do |i|
-            @edit.push i, @exception.send( i )
-          end ; nil
+        def __via_exception_add_members_to_edit
+
+          @exception.members.each do |sym|
+
+            @_sess.push sym, @exception.send( sym )
+          end
+          NIL_
         end
 
-        def terse_message_proc
+        def __build_terse_message_proc
+
           -> y, o do
-            y << "« #{ o.terminal_channel_i.id2name.gsub UNDERSCORE_, SPACE_ } »"  # :+#guillemets
-          end ; nil
+
+            _s = o.terminal_channel_i.id2name.gsub UNDERSCORE_, SPACE_
+
+            y << "« #{ _s  } »"  # :+#guillemets
+          end
         end
 
-        def flush
-          build_event_via_iambic_and_message_proc( * @edit.flush )
+        def __flush
+
+          _x_a, _p = @_sess.flush
+
+          Callback_::Event.
+            inline_via_iambic_and_any_message_proc_to_be_defaulted _x_a, _p
         end
 
-        class Mutable_Edit__
+        class Sessoin___
 
           def initialize tc_i, e
             @x_a = [ tc_i ]

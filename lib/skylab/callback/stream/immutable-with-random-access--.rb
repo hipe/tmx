@@ -25,19 +25,25 @@ module Skylab::Callback
         otr.init_copy_via_iambic x_a
         otr
       end
+
     protected
+
       def init_copy_via_iambic x_a
         process_iambic_fully x_a
         _receive_upstream @produce_upstream_p.call
         nil
       end
+
     private
 
       def initialize * a, & p
+
         @each_pair_mapper = @value_mapper = nil
+
         if a.length.nonzero?
-          init_identity_via_args a
+          __init_identity_via_args( * a )
         end
+
         p and instance_exec( & p )
       end
 
@@ -45,14 +51,21 @@ module Skylab::Callback
         process_iambic_fully x_a ; nil
       end
 
-      def init_identity_via_args a
-        st, key_method_name, x_a  = a
-        st and _receive_upstream st
-        key_method_name and @key_method_name = key_method_name
+      def __init_identity_via_args st, key_method_name, x_a=nil
+
+        if st
+          _receive_upstream st
+        end
+
+        if key_method_name
+          @key_method_name = key_method_name
+        end
+
         if x_a and x_a.length.nonzero?
           process_iambic_fully x_a
         end
-        nil
+
+        NIL_
       end
 
       def process_iambic_fully x_a
@@ -60,7 +73,7 @@ module Skylab::Callback
         nil
       end
 
-      include Callback_::Actor.methodic_lib.polymorphic_processing_instance_methods
+      include Callback_::Actor::Methodic.polymorphic_processing_instance_methods
 
     private
 
@@ -339,9 +352,9 @@ module Skylab::Callback
 
       def to_value_stream
         if @done
-          to_stream_when_done Callback_::Scn
+          to_stream_when_done Callback_::Stream
         else
-          to_stream_when_not_done Callback_::Scn
+          to_stream_when_not_done Callback_::Stream
         end
       end
 
@@ -352,14 +365,6 @@ module Skylab::Callback
       end
 
       # ~ )
-
-      def to_stream
-        if @done
-          to_stream_when_done Stream_
-        else
-          to_stream_when_not_done Stream_
-        end
-      end
 
     private
 

@@ -3,11 +3,13 @@ require_relative '../core'
 module Skylab::Callback::TestSupport
 
   class << self
+
     def call_digraph_listeners_spy *a
+
       if a.length.zero?
         TS_::Call_Digraph_Listeners_Spy__
       else
-        TS_::Call_Digraph_Listeners_Spy__.new( * a )
+        TS_::Call_Digraph_Listeners_Spy__.new_via_iambic a
       end
     end
   end  # >>

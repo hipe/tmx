@@ -127,7 +127,7 @@ module Skylab::Callback::TestSupport::Actor::Methodic::MP
 
           module ModuleMethods
             def to_required_properties_stream
-              properties.to_stream.reduce_by do |prop|
+              properties.to_value_stream.reduce_by do |prop|
                 prop.is_required
               end
             end

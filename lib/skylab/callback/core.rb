@@ -52,11 +52,7 @@ module Skylab::Callback
       end
 
       def methodic cls, * i_a
-        Actor::Methodic__.via_client_and_iambic cls, i_a
-      end
-
-      def methodic_lib
-        Actor::Methodic__
+        Actor::Methodic.via_client_and_iambic cls, i_a
       end
 
       def via_client_and_iambic cls, i_a
@@ -412,10 +408,24 @@ module Skylab::Callback
       end
     end
 
+    def add_to_front sym, x
+      had = true
+      @h.fetch sym do
+        @a[ 0, 0 ] = [ sym ]
+        @h[ sym ] = x
+        had = nil
+      end
+      had and raise ::KeyError, _say_wont_clobber( sym )
+    end
+
     def add i, x
       had = true
       @h.fetch i do had = nil ; @a.push i ; @h[ i ] = x end
-      had and raise ::KeyError, "won't clobber existing '#{ i }'"
+      had and raise ::KeyError, _say_wont_clobber( i )
+    end
+
+    def _say_wont_clobber sym
+      "won't clobber existing '#{ sym }'"
     end
 
     def replace i, x_
@@ -423,7 +433,7 @@ module Skylab::Callback
       x = @h.fetch i do
         had = false
       end
-      had or raise ::KeyError, say_not_found( i )
+      had or raise ::KeyError, _say_not_found( i )
       @h[ i ] = x_ ; x
     end
 
@@ -432,7 +442,7 @@ module Skylab::Callback
       x = @h.fetch i do
         had = false
       end
-      had or raise ::KeyError, say_not_found( i )
+      had or raise ::KeyError, _say_not_found( i )
       @h[ i ] = p[ x ]
     end
 
@@ -444,21 +454,33 @@ module Skylab::Callback
       elsif else_p
         else_p[]
       else
-        raise ::KeyError, say_not_found( i )
+        raise ::KeyError, _say_not_found( i )
       end
     end
 
+    # ~ conversion
+
     def algorithms  # ~ experimental bridge to the past
       @_alogrithms ||= Box::Algorithms__.new( @a, @h, self )
+    end
+
+    def to_mutable_box_like_proxy
+      self
+    end
+
+    def to_new_mutable_box_like_proxy
+      dup
     end
 
     def to_struct  # ~ ditto
       Box::Proxies::Struct::For[ @a, @h, self ]
     end
 
-    private def say_not_found i
+    private def _say_not_found i
       "key not found: #{ i.inspect }"
     end
+
+    # ~ collaborators
 
     def a_
       @a
@@ -553,6 +575,12 @@ module Skylab::Callback
 
     def pop_
       @x_a.fetch( @x_a_length -= 1 )
+    end
+
+    def backtrack_one
+      @d.zero? and raise ::IndexError
+      @d -= 1
+      NIL_
     end
 
     def reverse_advance_one_
@@ -1923,14 +1951,14 @@ module Skylab::Callback
       def any_valid_via_const const_sym
 
         if VALID_CONST_RX__ =~ const_sym
-          _new_via :init_via_const_, const_sym
+          _new_via :init_via_const, const_sym
         end
       end
 
       def via_const const_sym
 
         if VALID_CONST_RX__ =~ const_sym
-          _new_via :init_via_const_, const_sym
+          _new_via :init_via_const, const_sym
         else
           raise ::NameError, __say_wrong( const_sym )
         end
@@ -1951,7 +1979,7 @@ module Skylab::Callback
       def via_module_name s
         d = s.rindex CONST_SEP_
         d and s = s[ d + 2 .. -1 ]
-        _new_via :init_via_const_, s.intern
+        _new_via :init_via_const, s.intern
       end
 
       def via_module_name_anchored_in_module_name s, s_
@@ -1981,8 +2009,8 @@ module Skylab::Callback
       instance_exec( & edit_p )
     end
 
-    def init_via_const_ const_i
-      @as_const = const_i
+    def init_via_const const  # :+#public-API
+      @as_const = const
       @const_is_resolved_ = true
     end
 

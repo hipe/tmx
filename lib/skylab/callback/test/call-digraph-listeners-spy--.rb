@@ -2,49 +2,57 @@ module Skylab::Callback::TestSupport
 
   class Call_Digraph_Listeners_Spy__  # read [#022] the narrative  #storypoint-1
 
-    Callback_.lib_.entity self do
-
-      o :polymorphic_writer_method_name_suffix, :'='
-
-      def debug=
-        @do_debug_proc = Callback_::NILADIC_TRUTH_
-        KEEP_PARSING_
-      end
-
-      o :properties, :do_debug_proc, :debug_IO
-
+    class << self
+      private :new
     end
 
-    EMPTY_P_ = Callback_::EMPTY_P_
+    Callback_::Actor.methodic self, :properties,
+      :debug_IO,
+      :do_debug_proc
 
-    def initialize * x_a
-      block_given? and self._FIXME
-      init_via_iambic x_a
-    end
+    def initialize & edit_p
 
-    def init_via_iambic x_a
       @emission_a = []
-      process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
+      instance_exec( & edit_p )
       @do_debug_proc ||= EMPTY_P_
     end
+
+  private
+
+    def debug=
+      @do_debug_proc = Callback_::NILADIC_TRUTH_
+      KEEP_PARSING_
+    end
+
+  public
+
+    EMPTY_P_ = Callback_::EMPTY_P_
 
     attr_reader :emission_a
 
     def call_digraph_listeners stream, payload_x  # per spec [#001]
-      @emission_a.push Emission__.new( stream, payload_x )
+
+      @emission_a.push Emission___.new( stream, payload_x )
+
       if @do_debug_proc.call
+
         o = @emission_a.last
-        @debug_IO.puts [ o.stream_symbol, o.payload_x ].inspect
-      end ; nil
-    end
 
-    class Emission__
-
-      def initialize *a
-        @stream_symbol, @payload_x = a
+        @debug_IO.puts o.to_a.inspect
       end
 
-      attr_reader :stream_symbol, :payload_x
+      NIL_
+    end
+
+    class Emission___
+
+      def initialize ss, pl
+
+        @payload_x = pl
+        @stream_symbol = ss
+      end
+
+      attr_reader :payload_x, :stream_symbol
 
       alias_method :channel_x, :stream_symbol
 
@@ -60,7 +68,9 @@ module Skylab::Callback::TestSupport
     end
 
     def delete_emission_a
-      r = @emission_a ; @emission_a = nil ; r
+      x = @emission_a
+      @emission_a = nil
+      x
     end
   end
 end

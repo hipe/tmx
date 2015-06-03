@@ -290,7 +290,8 @@ module Skylab::Callback
       end
 
       def render_into_yielder_N_lines_under y, d, expag
-        N_Lines.new( y, d, [ message_proc ], expag ).execute self
+
+        N_Lines.new_via_four( y, d, [ message_proc ], expag ).execute self
       end
 
       def to_stream_of_lines_rendered_under expag  # (imagine threads)
@@ -305,13 +306,30 @@ module Skylab::Callback
       class N_Lines < ::Enumerator::Yielder
 
         class << self
+
+          def [] * a
+            _call_via_arglist a
+          end
+
           def call * a
+            _call_via_arglist a
+          end
+
+          def _call_via_arglist  a
             new( * a ).execute
           end
+
+          alias_method :new_via_four, :new
+          private :new
         end  # >>
 
         def initialize y, n, p_a, expag
-          @do_first_line = true ; @expag = expag ; @p_a = p_a ; @y = y
+
+          @do_first_line = true
+          @expag = expag
+          @p_a = p_a
+          @y = y
+
           if n
             if 1 > n
               @do_first_line = false
@@ -322,20 +340,29 @@ module Skylab::Callback
           else
             tick_p = NILADIC_TRUTH_
           end
-          super() do |line|
+
+          super() do | line |
             @y << line
-            tick_p[] or throw :__done_with_N_lines__ ; nil
+            tick_p[] or throw :__done_with_N_lines__
+            NIL_
           end
         end
+
         def execute( * a )
+
           if @do_first_line
+
             catch :__done_with_N_lines__ do
-              @p_a.each do |p|
+
+              @p_a.each do | p |
+
                 p ||= Inferred_Message.to_proc
+
                 @expag.calculate self, * a, & p
               end
             end
           end
+
           @y
         end
       end
@@ -532,7 +559,7 @@ module Skylab::Callback
 
       public  # ~ event receiving
 
-        def maybe_receive_event_via_channel i_a, & ev_p
+        def receive_possible_event_via_channel i_a, & ev_p
           handle_event_selectively_via_channel.call i_a, & ev_p
         end
 
@@ -541,7 +568,7 @@ module Skylab::Callback
         end
 
         def handle_event_selectively_via_channel
-          @__HESVC_p__ ||= produce_handle_event_selectively_via_channel
+          @handle_event_selectively_via_channel_proc ||= produce_handle_event_selectively_via_channel
         end
 
       private
@@ -549,7 +576,7 @@ module Skylab::Callback
         def __produce_handle_event_selectively_proc
           if handle_event_selectively_via_channel
             -> * i_a, & ev_p do
-              @__HESVC_p__.call i_a, & ev_p
+              @handle_event_selectively_via_channel_proc.call i_a, & ev_p
             end
           end
         end
@@ -566,7 +593,7 @@ module Skylab::Callback
 
         def change_selective_listener_via_channel_proc x
           @on_event_selectively = nil
-          @__HESVC_p__ = x ; nil
+          @handle_event_selectively_via_channel_proc = x ; nil
         end
 
         def accept_selective_listener_proc oes_p
@@ -574,11 +601,7 @@ module Skylab::Callback
         end
 
         def accept_selective_listener_via_channel_proc hesvc_p
-          @__HESVC_p__ = hesvc_p ; nil
-        end
-
-        def event_lib
-          Event_
+          @handle_event_selectively_via_channel_proc = hesvc_p ; nil
         end
       end
 
