@@ -164,10 +164,10 @@ module Skylab::Brazen
 
     COMMON_PROPERTIES_ = make_common_properties do | sess |
 
-      sess.edit_entity_class(
+      sess.edit_common_properties_module(
 
         :default_proc, -> action do
-          action.kernel_.unbound( :Workspace ).default_config_filename
+          action.to_kernel.unbound( :Workspace ).default_config_filename
         end,
         :property, :config_filename,
 
@@ -189,7 +189,7 @@ module Skylab::Brazen
 
     module Actions
 
-      class Ping < Brazen_::Model::Action
+      class Ping < Brazen_::Action
 
         def produce_result
           maybe_send_event :payload, :ping do
@@ -206,7 +206,7 @@ module Skylab::Brazen
 
     # ~ the custom stack
 
-    class Silo_Daemon < Silo_Daemon
+    class Silo_Daemon < superclass::Silo_Daemon
 
       # ~ custom exposures
 
@@ -217,13 +217,17 @@ module Skylab::Brazen
       # ~ hook-outs / hook-ins
 
       def precondition_for action, id, box, & oes_p
-        WS_via_trio_box___.
-          new( action.to_trio_box_proxy, @model_class, @kernel, & oes_p ).execute
+
+        _bx = action.to_trio_box_proxy
+
+        WS_via_trio_box___.new( _bx, @model_class, @kernel, & oes_p ).execute
       end
 
       def any_mutated_formals_for_depender_action_formals x
+
         bx = x.to_mutable_box_like_proxy
-        st = COMMON_PROPERTIES_.to_stream
+        st = COMMON_PROPERTIES_.to_value_stream
+
         begin
           prp = st.gets
           prp or break
@@ -244,9 +248,9 @@ module Skylab::Brazen
         @model_class = mc
         @on_event_selectively = oes_p
 
-        @oes_p = Callback_::Event.
-          produce_handle_event_selectively_through_methods.
-            bookends self, :Workspace_via_trio_boX do | * i_a, & ev_p |
+        _ = Callback_::Event.produce_handle_event_selectively_through_methods
+
+        @oes_p = _.bookends self, :Workspace_via_trio_boX do | * i_a, & ev_p |
           maybe_send_event_via_channel i_a, & ev_p
         end
       end
@@ -258,7 +262,7 @@ module Skylab::Brazen
           __execute_via_workspace_path ws_path
         else
           @on_event_selectively.call :error, :missing_required_properties do
-            Brazen_.properties_stack.build_missing_required_properties_event [ :workspace_path ]
+            Brazen_::Property.build_missing_required_properties_event [ :workspace_path ]
           end
           UNABLE_
         end
@@ -285,10 +289,15 @@ module Skylab::Brazen
         _did_find and begin
 
           trio = bx[ :verbose ]
+
           if trio and trio.value_x  # #tracking :+[#069] verbose manually
+
             maybe_send_event :info, :verbose, :using_workspace do
-              build_neutral_event_with :using_workspace,
+
+              Callback_::Event.inline_neutral_with(
+                :using_workspace,
                 :config_path, @ws.existent_config_path
+              )
             end
           end
 

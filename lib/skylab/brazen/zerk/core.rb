@@ -164,14 +164,14 @@ module Skylab::Brazen
         # behavior for terminal ("do something") nodes.. tossed here just b/c.
 
         maybe_send_event :error do
-          build_extra_properties_event stream
+          build_extra_values_event stream
         end
         UNABLE_
       end
 
-      def build_extra_properties_event stream
-        Brazen_::Entity.properties_stack.
-          build_extra_properties_event [ stream.current_token ], nil, 'iambic token'
+      def build_extra_values_event stream
+        Brazen_::Property.
+          build_extra_values_event [ stream.current_token ], nil, 'iambic token'
       end
 
     public
@@ -225,7 +225,7 @@ module Skylab::Brazen
           ev = if ev_p
             ev_p[]
           else
-            Brazen_.event.inline_via_normal_extended_mutable_channel i_a  # frontier of this #experiment
+            Callback_::Event.inline_via_normal_extended_mutable_channel i_a  # frontier of this #experiment
           end
 
           _NAME = @name
@@ -245,11 +245,11 @@ module Skylab::Brazen
       end
 
       def build_not_OK_event_with * x_a, & p
-        Brazen_.event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, p
+        Callback_::Event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, p
       end
 
       def build_OK_event_with * x_a, & p
-        Brazen_.event.inline_OK_via_mutable_iambic_and_message_proc x_a, p
+        Callback_::Event.inline_OK_via_mutable_iambic_and_message_proc x_a, p
       end
     end
 

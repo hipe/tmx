@@ -51,7 +51,7 @@ module Skylab::Brazen
 
       def when_no_sections
         @on_event_selectively.call :info, :no_sections do
-          Brazen_.event.inline_with :no_sections,
+          Callback_::Event.inline_with :no_sections,
               :path, @path, :ok, nil do |y, o |
             y << "no sections found. empty file? - #{ pth o.path }"
           end
@@ -96,7 +96,7 @@ module Skylab::Brazen
 
       def when_no_such_node
         @on_event_selectively.call :error do
-          Brazen_.event.inline_not_OK_with :no_such_node, :name_symbol, @name_symbol
+          Callback_::Event.inline_not_OK_with :no_such_node, :name_symbol, @name_symbol
         end
         UNABLE_
       end

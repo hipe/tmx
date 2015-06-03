@@ -4,17 +4,11 @@ module Skylab::Brazen
 
     class Model_ < Brazen_::Model
 
-      class << self
-        def main_model_class
-          superclass.superclass
-        end
-      end  # >>
-
       NAME_STOP_INDEX = 1  # sl brzn dratastore actions couch add
 
     end
 
-    class Action < Brazen_::Model::Action
+    class Action < Brazen_::Action
 
       NAME_STOP_INDEX = 1
 
@@ -196,7 +190,7 @@ module Skylab::Brazen
       def __ambiguous o_a, trio, & oes_p
 
         oes_p.call :error, :ambiguous_property do
-          Brazen_.properties_stack.build_ambiguous_property_event(
+          Brazen_::Property.build_ambiguous_property_event(
             o_a,
             trio.value_x,
             trio.name )
@@ -211,7 +205,7 @@ module Skylab::Brazen
             ent.name.as_slug
           end.to_a
 
-          Brazen_.properties_stack.build_extra_properties_event(
+          Brazen_::Property.build_extra_values_event(
             [ trio.value_x ],
             _did_you_mean_s_a,
             trio.name.as_human )

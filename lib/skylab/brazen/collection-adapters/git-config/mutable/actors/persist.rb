@@ -110,7 +110,7 @@ module Skylab::Brazen
         module Simple_Event_Builder_Methods_
         private
           def build_OK_event_with * x_a, & p
-            Brazen_.event.inline_OK_via_mutable_iambic_and_message_proc x_a, p
+            Callback_::Event.inline_OK_via_mutable_iambic_and_message_proc x_a, p
           end
         end
 

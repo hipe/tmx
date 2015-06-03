@@ -47,7 +47,7 @@ module Skylab::Brazen
           st = @entity.to_pair_stream_for_persist
 
           while pair = st.gets
-            if NAME_ == pair.name_symbol
+            if NAME_SYMBOL == pair.name_symbol
               did_see_name = true
               @name_x = pair.value_x
               next
@@ -202,7 +202,8 @@ module Skylab::Brazen
         end
 
         def maybe_send_event * i_a, & ev_p
-          @entity.maybe_receive_event_via_channel i_a, & ev_p
+
+          @entity.receive_possible_event_via_channel i_a, & ev_p
         end
       end
     end

@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Models_::Workspace
 
-  class Actions::Status < Brazen_::Model::Action
+  class Actions::Status < Brazen_::Action
 
     edit_entity_class(
 
@@ -52,21 +52,28 @@ module Skylab::Brazen
 
     def __via_workspace
 
-      _oes_p = event_lib.produce_handle_event_selectively_through_methods.
-        bookends self, :status do | * i_a, & ev_p |
-          @user_result = maybe_send_event_via_channel i_a, & ev_p
-          UNABLE_
-        end
+      _prp = formal_properties.fetch :path
+      _oes = __event_dispatcher
 
       _ok = @ws.resolve_nearest_existent_surrounding_path(
         @argument_box.fetch( :max_num_dirs ),
-        :prop, formal_property_via_symbol( :path ),
-        & _oes_p )
+        :prop, _prp,
+        & _oes )
 
       if _ok
         __when_found
       else
         @user_result
+      end
+    end
+
+    def __event_dispatcher
+
+      _ = Callback_::Event.produce_handle_event_selectively_through_methods
+      _.bookends self, :status do | * i_a, & ev_p |
+
+        @user_result = maybe_send_event_via_channel i_a, & ev_p
+        UNABLE_
       end
     end
 

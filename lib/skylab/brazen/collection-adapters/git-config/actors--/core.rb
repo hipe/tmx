@@ -53,7 +53,7 @@ module Skylab::Brazen
 
       def via_model_class_prdc_section_name_i
         @model_class.node_identifier.
-          silo_name_i.id2name.gsub( UNDERSCORE_, DASH_ ).intern
+          silo_name_symbol.id2name.gsub( UNDERSCORE_, DASH_ ).intern
       end
 
       def via_any_subsection_name_query_rslv_section_scan
@@ -65,13 +65,17 @@ module Skylab::Brazen
       end
 
       def when_all_rslv_section_scan
-        @section_scan = @document.sections.to_stream ; nil
+
+        @section_scan = @document.sections.to_value_stream
+        NIL_
       end
 
       def via_subsection_name_query_rslv_section_scan
-        @section_scan = @document.sections.to_stream.reduce_by do |x|
+
+        @section_scan = @document.sections.to_value_stream.reduce_by do | x |
           @subsection_name_query.call x
-        end ; nil
+        end
+        NIL_
       end
 
       def via_section_scan_produce_scan
@@ -85,7 +89,7 @@ module Skylab::Brazen
       def via_section_scan_and_model_class_produce_entity_scan
         fly = @model_class.new_flyweight @kernel, & @on_event_selectively
         box = fly.properties
-        name_name_s = NAME_.to_s
+        name_name_s = NAME_SYMBOL.to_s
         @section_scan.map_by do |sect|
           h = { name_name_s => sect.subsect_name_s }
           sect.assignments.each_normalized_pair do |i, x|
@@ -108,8 +112,8 @@ module Skylab::Brazen
 
       def __via_entity_identifier_resolve_both_strings
         id = @entity_identifier
-        @section_s = id.silo_name_i.id2name.gsub UNDERSCORE_, DASH_
-        @subsection_s = id.entity_name_s ; nil
+        @section_s = id.silo_name_symbol.id2name.gsub UNDERSCORE_, DASH_
+        @subsection_s = id.entity_name_string ; nil
       end
 
       def via_entity_resolve_subsection_id__
@@ -128,7 +132,7 @@ module Skylab::Brazen
 
       def via_model_class_resolve_section_string
         @section_s = @model_class.
-          node_identifier.silo_name_i.id2name.gsub UNDERSCORE_, DASH_ ; nil
+          node_identifier.silo_name_symbol.id2name.gsub UNDERSCORE_, DASH_ ; nil
       end
 
       def via_entity_resolve_subsection_string
@@ -149,18 +153,33 @@ module Skylab::Brazen
       end
 
       def via_subsection_id_resolve_section_
-        scan = @document.sections.to_stream
+
+        count = 0
+        found = false
+
         ss = @subsection_id
-        s_i = ss.section_s.intern ; ss_s = ss.subsection_s
-        found = false ; count = 0
-        while sect = scan.gets
-          s_i == sect.external_normal_name_symbol or next
+        st = @document.sections.to_value_stream
+
+        s_i = ss.section_s.intern
+        ss_s = ss.subsection_s
+
+        while sect = st.gets
+
+          if s_i != sect.external_normal_name_symbol
+            next
+          end
+
           count += 1
-          ss_s == sect.subsect_name_s or next
+
+          if ss_s != sect.subsect_name_s
+            next
+          end
+
           found = true
           @section = sect
           break
         end
+
         if found
           ACHIEVED_
         else
@@ -196,9 +215,13 @@ module Skylab::Brazen
       end
 
       def __via_subsection_id_resolve_model_class
-        _i = @subsection_id.to_silo_name_i
-        _id = Node_Identifier_.via_symbol _i
+
+        _sym = @subsection_id.to_silo_name_i
+
+        _id = Concerns_::Identifier.via_symbol _sym
+
         silo = @kernel.silo_via_identifier _id, & @on_event_selectively
+
         if silo
           @model_class = silo.model_class
           ACHIEVED_
@@ -208,7 +231,7 @@ module Skylab::Brazen
       def __via_section_and_model_class_resolve_unmarshal_result
 
         @result = @model_class.unmarshalled @kernel, @on_event_selectively do |o|
-          o.edit_pair @section.subsect_name_s, NAME_
+          o.edit_pair @section.subsect_name_s, NAME_SYMBOL
           o.edit_pairs @section.assignments do | x |
             if ! x.nil?
               x.to_s  # life is easier if string is the great equalizer:

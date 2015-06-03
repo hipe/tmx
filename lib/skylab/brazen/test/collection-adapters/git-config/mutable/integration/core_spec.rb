@@ -5,8 +5,7 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config::Mutable
   describe "[br] data stores: git config mutable integration" do
 
     extend TS_
-
-    TestLib_::Expect_event[ self ]
+    use :expect_event
 
     with_a_document_with_a_section_called_foo
 

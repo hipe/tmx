@@ -10,7 +10,7 @@ module Skylab::Brazen
         end
       end
 
-      Brazen_.event.selective_builder_sender_receiver self
+      Callback_::Event.selective_builder_sender_receiver self
 
       def initialize x_a, branch
         @scan = Callback_::Polymorphic_Stream.via_array x_a

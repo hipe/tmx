@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Models_::Workspace
 
-    class Actions::Summarize < Brazen_::Model::Action
+    class Actions::Summarize < Brazen_::Action
 
       edit_entity_class(
         :property_object, COMMON_PROPERTIES_[ :config_filename ],
@@ -25,10 +25,18 @@ module Skylab::Brazen
             :config_filename, bx.fetch( :config_filename ) )
         end
 
-        @ws and @ws.resolve_nearest_existent_surrounding_path(
-          ONLY_LOOK_IN_THE_FIRST_DIRECTORY___,
-          :prop, formal_property_via_symbol( :path ),
-          & handle_event_selectively )
+        if @ws
+
+          _prp = formal_properties.fetch :path
+
+          @ws.resolve_nearest_existent_surrounding_path(
+            ONLY_LOOK_IN_THE_FIRST_DIRECTORY___,
+            :prop, _prp,
+            & handle_event_selectively )
+
+        else
+          @ws
+        end
       end
 
       ONLY_LOOK_IN_THE_FIRST_DIRECTORY___ = 1  # for now, searching upwards is not an option

@@ -432,7 +432,7 @@ module Skylab::Brazen
         end
 
         def members
-          [ :length, :first, :to_stream ]
+          [ :length, :first, :to_value_stream ]
         end
 
         def length
@@ -447,7 +447,7 @@ module Skylab::Brazen
           @collection_kernel.map_nodes self.class::SYMBOL_I, p
         end
 
-        def to_stream
+        def to_value_stream
           @collection_kernel._to_node_stream_via_symbol self.class::SYMBOL_I
         end
 
@@ -460,7 +460,7 @@ module Skylab::Brazen
 
         def touch_comparable_item item, compare_p, & x_p  # :+[#011]
 
-          st = to_stream
+          st = to_value_stream
 
           begin
             x = st.gets
@@ -1690,10 +1690,11 @@ module Skylab::Brazen
       class Event_Sending_Node__
       private
 
-        Brazen_.event.selective_builder_sender_receiver self
+        Callback_::Event.selective_builder_sender_receiver self
 
         def maybe_send_event * i_a, & ev_p
-          @parse.maybe_receive_event_via_channel i_a, & ev_p
+
+          @parse.receive_possible_event_via_channel i_a, & ev_p
         end
       end
 

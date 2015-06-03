@@ -29,7 +29,7 @@ module Skylab::Brazen
         end
 
         def __via_bx_resolve_subsection_string
-          s = @bx.fetch NAME_
+          s = @bx.fetch NAME_SYMBOL
           if s
             s = s.strip  # b.c it has been frozen in the past
             if s.length.nonzero?

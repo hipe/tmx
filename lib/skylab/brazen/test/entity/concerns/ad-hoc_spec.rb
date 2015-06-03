@@ -9,6 +9,7 @@ module Skylab::Brazen::TestSupport::Entity
       before :all do
 
         class AHP_Base
+
           Subject_[].call self do
             o :ad_hoc_processor, :gazoink, -> x { Gazoink_.new( x ).go }
           end

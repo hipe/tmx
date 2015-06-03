@@ -132,10 +132,10 @@ module Skylab::Brazen
 
         @on_event_selectively.call :error, :directory_already_has_config_file do
 
-          build_not_OK_event_with :directory_already_has_config_file,
-             :config_path, @path,
-             :prop, @prop
-
+          Callback_::Event.inline_not_OK_with(
+            :directory_already_has_config_file,
+           :config_path, @path,
+           :prop, @prop )
         end
       end
     end

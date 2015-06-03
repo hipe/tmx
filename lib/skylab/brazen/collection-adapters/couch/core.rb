@@ -25,7 +25,7 @@ module Skylab::Brazen
 
         else
           oes_p.call :error, :invalid_property_value do
-            Brazen_.event.inline_not_OK_with(
+            Callback_::Event.inline_not_OK_with(
               :name_must_be_lowercase_alphanumeric_with_dashes,
                 :name_s, arg.value_x )
           end
@@ -53,7 +53,7 @@ module Skylab::Brazen
             arg
           else
             oes_p.call :error, :invalid_property_value do
-              Brazen_.event.inline_not_OK_with(
+              Callback_::Event.inline_not_OK_with(
                 :port_must_be_one_to_four_digits, :port_s, x )
             end
           end
@@ -165,7 +165,7 @@ module Skylab::Brazen
 
   public  # ~ hook out's & hook in's
 
-    class Silo_Daemon < Silo_Daemon
+    class Silo_Daemon < Brazen_::Model::Silo_Daemon
 
       def precondition_for_self _action, _id, box, & oes_p
         :"???"  # we might want to use this for write-collection operations

@@ -1,14 +1,8 @@
-require_relative 'test-support'
+require_relative '../../../test-support'
 
-module Skylab::Brazen::TestSupport::Name
+module Skylab::Brazen::TestSupport
 
-  ::Skylab::Brazen::TestSupport[ self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  describe "[br] name (deep action isomorphicism for EN)" do
+  describe "[br] concerns - name - sessions - deep action isomorphicism for EN" do
 
     it "loads" do
       subject
@@ -50,7 +44,8 @@ module Skylab::Brazen::TestSupport::Name
     end
 
     def subject
-      Brazen_::NAME::Small_Time_Sessions_::Deep_Action_Isomorphicism_for_EN
+
+      Brazen_::Concerns_::Name::Sessions_::Deep_Action_Isomorphicism_for_EN
     end
   end
 end

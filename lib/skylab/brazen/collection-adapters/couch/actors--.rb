@@ -62,7 +62,7 @@ module Skylab::Brazen
         def bld_not_found_event response
           response.response_body_to_not_OK_event :eid, @entity_identifier do |y, o|
             y << "there is no #{ o.eid.silo_name_parts.reverse * SPACE_ }#{
-             } with the name #{ ick o.eid.entity_name_s }#{
+             } with the name #{ ick o.eid.entity_name_string }#{
               } (#{ o.code } - entity not found)"
           end
         end
@@ -98,8 +98,12 @@ module Skylab::Brazen
       end
 
       def via_entity_identifier_when_valid_rslv_native_entity_identifier
+
+        o = @entity_identifier
+
         @native_entity_identifier_s =
-          "#{ @entity_identifier.silo_slug }--#{ @entity_identifier.entity_name_s }"
+          "#{ o.silo_slug }--#{ o.entity_name_string }"
+
         ACHIEVED_
       end
 

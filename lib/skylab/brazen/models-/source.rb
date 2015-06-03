@@ -31,5 +31,15 @@ module Skylab::Brazen
       Rm = make_action_class :Delete
 
     end
+
+    class Silo_Daemon
+
+      def initialize kr, mod
+      end
+
+      def precondition_for add, my_node_id, precons
+        :_hi_
+      end
+    end
   end
 end

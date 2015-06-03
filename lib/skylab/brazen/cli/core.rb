@@ -205,12 +205,13 @@ module Skylab::Brazen
     private
 
       def resolve_properties
-        @front_properties = Properties__.new
+        @front_properties = STANDARD_BRANCH_PROPERTY_BOX__
       end
 
       def _to_full_inferred_property_stream
-        st = @front_properties.to_stream
-        st.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :ellipsis
+
+        _st = @front_properties.to_value_stream
+        _st.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :ellipsis
       end
 
     public
@@ -503,8 +504,9 @@ module Skylab::Brazen
       end
 
       def to_property_stream
+
         if @front_properties
-          @front_properties.to_stream
+          @front_properties.to_value_stream
         else
           Callback_::Stream.via_nonsparse_array EMPTY_A_
         end
@@ -629,7 +631,11 @@ module Skylab::Brazen
 
         # ~ begin experiment: one way to give stdout to the action
 
-        prp = @bound.any_formal_property_via_symbol :downstream
+        fp = @bound.formal_properties
+        if fp
+          prp = fp[ :downstream ]
+        end
+
         if prp && prp.is_hidden
           x_a.push :downstream, @resources.sout
         end
@@ -776,6 +782,7 @@ module Skylab::Brazen
     module Adapter_Methods__
 
       def initialize unbound, boundish  # :+#public-API
+
         @bound = unbound.new boundish, & handle_event_selectively
       end
 
@@ -854,7 +861,7 @@ module Skylab::Brazen
         # will for example first check if a special method is defined which
         # corresponds to the channel name in some way and instead use that.
 
-        -> * i_a, & x_p do
+        @___oes_p ||= -> * i_a, & x_p do
           receive_uncategorized_emission i_a, & x_p
         end
       end
@@ -1644,21 +1651,6 @@ module Skylab::Brazen
       h
     end
 
-    class Properties__
-      def initialize
-        @box = STANDARD_BRANCH_PROPERTY_BOX__
-      end
-      def fetch i
-        @box.fetch i
-      end
-      def to_stream
-        scn = @box.to_value_stream
-        Callback_.stream do
-          scn.gets
-        end
-      end
-    end
-
     class Property__
 
       def initialize name_i, * x_a
@@ -1733,15 +1725,21 @@ module Skylab::Brazen
     end.call
 
     STANDARD_BRANCH_PROPERTY_BOX__ = -> do
-      box = Box_.new
-      box.add :action, Property__.new( :action, :is_required, true )
-      box.add :help, Property__.new( :help,
+
+      bx = Box_.new
+
+      bx.add :action, Property__.new( :action, :is_required, true )
+
+      bx.add :help, Property__.new( :help,
+
         :argument_arity, :zero_or_one,
         :argument_moniker, 'cmd',
         :desc, -> y do
           y << 'this screen (or help for action)'
-      end )
-      box.freeze
+       end )
+
+      bx.freeze
+
     end.call
 
     class Actual_Parameter_Scanner__
@@ -1879,7 +1877,7 @@ module Skylab::Brazen
 
         mutable_front_properties.remove :max_num_dirs
         mutable_back_properties.replace_by :max_num_dirs do | prp |
-          prp.without_default
+          prp.new_without_default
         end
       end
 
@@ -1888,8 +1886,11 @@ module Skylab::Brazen
         # exclude this formal property from the front. default the back to CWD
 
         mutable_front_properties.remove :workspace_path
+
         mutable_back_properties.replace_by :workspace_path do | prp |
+
           prp.dup.set_default_proc do
+
             present_working_directory
           end.freeze
         end
@@ -1906,11 +1907,16 @@ module Skylab::Brazen
       end
 
       def mutable_back_properties
-        if ! @mutable_back_properties
-          @mutable_back_properties = @back_properties.to_mutable_box_like_proxy
-          @bound.change_formal_properties @mutable_back_properties  # might be same object
+
+        if @mutable_back_properties
+          @mutable_back_properties
+        else
+
+          bx = @back_properties.to_mutable_box_like_proxy
+          @mutable_back_properties = bx
+          @bound.change_formal_properties bx  # might be same object
+          bx
         end
-        @mutable_back_properties
       end
 
       def _common_CLI_changes_for_path_property sym
@@ -1920,8 +1926,11 @@ module Skylab::Brazen
         end
 
         mutable_back_properties.replace_by sym do | prp |
+
           prp.dup.set_default_proc do
+
             present_working_directory
+
           end.freeze
         end ; nil
       end

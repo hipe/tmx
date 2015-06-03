@@ -16,8 +16,8 @@ module Skylab::Brazen
         Callback_::Stream.via_item self
       end
 
-      def init_action_class_reflection
-        @acr = Brazen_::Model::Lazy_Action_Class_Reflection.new self, Brazen_::Collection_Adapters
+      def init_action_class_reflection_
+        @acr = Brazen_::Model::Child_Node_Index.new self, Brazen_::Collection_Adapters
         true
       end
     end  # >>

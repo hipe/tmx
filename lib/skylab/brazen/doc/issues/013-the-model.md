@@ -1,11 +1,13 @@
 # the model :[#013]
 
+(see [#024] for concerns shared by actions & models)
+
 
 
 ## :#one.
 
 a particular model node (that is, business model class) has an exposed
-API iff it has an 'actions' node.  we take a nasty peak into the
+API IFF it has an 'actions' node. we take a nasty peak into the
 filesystem here for now.
 
 

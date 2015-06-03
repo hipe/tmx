@@ -2,11 +2,9 @@ module Skylab::Brazen
 
     module Proxies_::Proc_As  # see [#083]
 
-      # #todo - covered only by: [tm], [cu], [sg]
+      # :+#by:tm, cu, sg
 
       class Unbound_Action
-
-        include NAME.name_function_proprietor_methods
 
         def initialize p, const_sym, box_mod, model_cls
 
@@ -34,12 +32,12 @@ module Skylab::Brazen
 
         attr_reader :p, :box_module, :model_class
 
-        def name
-          @name_s
+        def name_function
+          @___nf ||= Concerns_::Name::Build_name_function[ self ]
         end
 
-        def name_function
-          super  # hello
+        def name
+          @name_s
         end
 
         def name_function_class  # #hook-in
@@ -63,12 +61,12 @@ module Skylab::Brazen
           As_Bound_Action___.new @cx, k, self, & oes_p
         end
 
-      private
-
         def some_name_stop_index
           @did_search_for_name_stop_index ||= search_for_name_stop_index
           @name_stop_index
         end
+
+      private
 
         def search_for_name_stop_index
 
@@ -109,7 +107,7 @@ module Skylab::Brazen
             # mod is the application class. to use procs in this way you
             # must define the following method.
 
-            reference_class = focus_mod.action_class
+            reference_class = focus_mod.action_base_class
           end
 
           @name_stop_index = reference_class::NAME_STOP_INDEX
@@ -182,10 +180,6 @@ module Skylab::Brazen
           _parameter_box
         end
 
-        def any_formal_property_via_symbol sym
-          _parameter_box[ sym ]
-        end
-
         def _parameter_box
           @pbx ||= __build_parameter_box
         end
@@ -213,7 +207,7 @@ module Skylab::Brazen
 
             bx.add( name_symbol,
 
-            Brazen_::Model.common_entity_module::Entity_Property.new do
+            Brazen_::Model.common_entity_module::Property.new do
 
               @argument_arity = argument_arity
               @name = Callback_::Name.via_variegated_symbol name_symbol
@@ -284,8 +278,8 @@ module Skylab::Brazen
 
         def __build_when_extra_arguments_event extra_sym_a
 
-          _sign_event Brazen_::Entity.properties_stack.
-            build_extra_properties_event extra_sym_a, nil, 'argument', 'unexpected'
+          _sign_event Brazen_::Property.
+            build_extra_values_event extra_sym_a, nil, 'argument', 'unexpected'
         end
 
         def __bc_when_miss miss_sym_a
@@ -299,7 +293,7 @@ module Skylab::Brazen
 
         def __build_missing_arguments_event miss_sym_a
 
-          _sign_event Brazen_::Entity.properties_stack.
+          _sign_event Brazen_::Property.
             build_missing_required_properties_event miss_sym_a, 'argument'
         end
 
@@ -327,7 +321,7 @@ module Skylab::Brazen
 
         def _sign_event ev
           _nf = @action_class_like.name_function
-          Brazen_.event.wrap.signature _nf, ev
+          Callback_::Event.wrap.signature _nf, ev
         end
 
         def after_name_symbol

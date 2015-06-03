@@ -12,7 +12,7 @@ module Skylab::Brazen::TestSupport::Entity
 
           o :ad_hoc_processor, :wizzzle, -> sess do
 
-            sess.client_module.x = sess.upstream.gets_one
+            sess.client.x = sess.upstream.gets_one
             KEEP_PARSING_
           end
         end

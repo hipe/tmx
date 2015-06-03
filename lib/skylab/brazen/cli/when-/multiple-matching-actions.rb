@@ -15,7 +15,7 @@ module Skylab::Brazen
 
         hr = @help_renderer
 
-        _ev = Brazen_.properties_stack.build_ambiguous_property_event(
+        _ev = Brazen_::Property.build_ambiguous_property_event(
           @a, @token, :action )
 
         _ev.express_into_under hr.y, hr.expression_agent

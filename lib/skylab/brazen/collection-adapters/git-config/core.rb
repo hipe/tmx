@@ -166,7 +166,7 @@ module Skylab::Brazen
         end
       end  # >>
 
-      Brazen_.event.selective_builder_sender_receiver self
+      Callback_::Event.selective_builder_sender_receiver self
 
       def initialize a, & oes_p
         input_method_i, input_x = a
@@ -329,36 +329,44 @@ module Skylab::Brazen
       end
 
       def to_section_stream & oes_p
-        @sections.to_stream( & oes_p )
+        @sections.to_value_stream( & oes_p )
       end
     end
 
     class Box__
+
       def initialize
         @a = [] ; @h = {}
       end
+
       def members
         [ :length, :first, :to_stream ]
       end
+
       def length
         @a.length
       end
+
       def first
         @a.first
       end
+
       def [] i
         idx = @h[ i ]
         idx && @a.fetch( idx )
       end
-      def to_stream
+
+      def to_value_stream
         Callback_::Stream.via_nonsparse_array @a
       end
+
       def each_pair
         @a.each do | ast |
           :assignment == ast.nonterminal_symbol or next
           yield ast.external_normal_name_symbol, ast.value_x
         end
       end
+
       def map & p
         @a.map( & p )
       end

@@ -1,8 +1,8 @@
 module Skylab::Brazen
 
-  class Model
+  # ->
 
-    module Preconditions_
+    module Concerns_::Preconditions
 
       class Produce_Box
 
@@ -31,7 +31,7 @@ module Skylab::Brazen
 
             # in the normal case, first resolve the preconditions, then the self
 
-            me_k = me_id.full_name_i
+            me_k = me_id.full_name_symbol
             ok = true
 
             _seen_ = seen.fetch me_k do seen[ me_k ] = true ; false end
@@ -43,7 +43,7 @@ module Skylab::Brazen
 
               id_a.each do | id |
 
-                k = id.full_name_i
+                k = id.full_name_symbol
                 done_h.key? k and next
 
                 if me_k == k
@@ -79,6 +79,6 @@ module Skylab::Brazen
         end
       end
     end
-  end
+  # <-
 end
 # :+#tombstone: cyclic dependency event

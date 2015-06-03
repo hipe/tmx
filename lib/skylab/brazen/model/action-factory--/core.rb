@@ -23,92 +23,106 @@ module Skylab::Brazen
 
     private
 
-      def init_via_model_action_entity m_cls, a_cls, e_cls
-        @mc = m_cls ; @cls1 = a_cls ; @ent = e_cls
-        resolve_cls2
+      def init_via_model_action_entity model_cls, action_base_cls, extmod
+
+        @_action_base_class_of_application = action_base_cls
+        @_extmod = extmod
+
+        __make_generated_action_base_class model_cls
       end
 
-      def resolve_cls2
+      def __make_generated_action_base_class _MODEL_CLASS_
 
-        @cls2 = const_set :Semi_Generated_Action, ::Class.new( @cls1 )
+        cls = ::Class.new @_action_base_class_of_application
 
-        _MODEL_CLASS_ = @mc
+        const_set :Semi_Generated_Action, cls
 
-        @cls2.class_exec do
+        @__generated_action_base_class = cls
 
-          extend Brazen_::Entity::Common_Module_Methods_  # before next line
+        cls.class_exec do
 
-          class << self
-            alias_method :build_action_props, :build_immutable_properties_stream_with_random_access_
-          end
-
-          extend Semi_Generated_Module_Methods__
+          extend Semi_Generated_Module_Methods___
 
           define_singleton_method :model_class do
             _MODEL_CLASS_
           end
 
-        end ; nil
+        end
+        NIL_
       end
 
     public
 
       def make_actions_module
+
         mod = ::Module.new
+
         _FACTORY_ = self
-        mod.define_singleton_method :make_action_class do |i, & p|
-          _FACTORY_.make_action_class_via_name_and_proc i, p
+
+        mod.define_singleton_method :make_action_class do | const, & edit_p |
+          _FACTORY_.__make_action_class const, & edit_p
         end
+
         mod
       end
 
-      def make_action_class_via_name_and_proc i, p
-        cls = send :"make_#{ i }"
-        p and cls.class_exec( & p )
+      def __make_action_class const, & edit_p
+
+        cls = send :"__make__#{ const }__"
+
+        if block_given?
+          cls.class_exec( & edit_p )
+        end
+
         cls
       end
 
     private
 
-      def make_Create
-        cls = begin_class
-        @ent.call cls do
-          o :flag, :property, :dry_run
-          o :flag, :property, :verbose
-        end
-        cls.include Create_Methods__
+      def __make__Create__
+
+        cls = _begin_class
+
+        @_extmod.call cls,
+          :flag, :property, :dry_run,
+          :flag, :property, :verbose
+
+        cls.include Create_Methods___
         cls
       end
 
-      def make_List
-        cls = begin_class
-        @ent.call cls do
-          o :inflect, :verb, :with_lemma, 'list', :noun, :plural
-          o :flag, :property, :verbose
-        end
-        cls.include List_Methods__
+      def __make__List__
+
+        cls = _begin_class
+
+        @_extmod.call cls,
+          :inflect, :verb, :with_lemma, 'list', :noun, :plural,
+          :flag, :property, :verbose
+
+        cls.include List_Methods___
         cls
       end
 
-      def make_Delete
-        cls = begin_class
-        @ent.call cls do
-          o :inflect, :verb, :with_lemma, 'delete'
-          o :required, :property, NAME_
-          o :flag, :property, :dry_run
-          o :flag, :property, :verbose
-        end
-        cls.include Delete_Methods__
+      def __make__Delete__
+
+        cls = _begin_class
+
+        @_extmod.call cls,
+          :inflect, :verb, :with_lemma, 'delete',
+          :required, :property, NAME_SYMBOL,
+          :flag, :property, :dry_run,
+          :flag, :property, :verbose
+
+        cls.include Delete_Methods___
+
         cls
       end
 
-    private
-
-      def begin_class
-        ::Class.new @cls2
+      def _begin_class
+        ::Class.new @__generated_action_base_class
       end
 
-      module Semi_Generated_Module_Methods__
+      module Semi_Generated_Module_Methods___
 
         def has_description
           true
@@ -125,7 +139,7 @@ module Skylab::Brazen
 
       Semi_Generated_Instance_Methods__ = ::Module.new
 
-      module Create_Methods__
+      module Create_Methods___
 
         include Semi_Generated_Instance_Methods__
 
@@ -136,19 +150,28 @@ module Skylab::Brazen
           # formals (continued at #note-135..)
 
           super x  # any preconditions will add their properties here. maybe [#018] order sensitive
-          st = _model_class.properties.to_stream
+
+          st = _model_class.properties.to_value_stream
           prp = st.gets
+
           if prp
+
             bx = @formal_properties.to_mutable_box_like_proxy
             @formal_properties = bx  # may be same object
+
             begin
+
               if bx.has_name prp.name_symbol
                 self._NEEDS_POLICY  # #todo
               end
+
               bx.add prp.name_symbol, prp
               prp = st.gets
+
             end while prp
+
           end
+
           @formal_properties
         end
 
@@ -158,7 +181,7 @@ module Skylab::Brazen
 
             # experimentally, the child action "takes over" the parent
 
-            @parent_node.__accept_selective_event_listener @on_event_selectively
+            @parent_node.accept_selective_event_listener__ @on_event_selectively
 
             @edited_entity = @parent_node.first_edit do | o |
               o.preconditions @preconditions
@@ -184,7 +207,7 @@ module Skylab::Brazen
         end
       end
 
-      module List_Methods__
+      module List_Methods___
 
         include Semi_Generated_Instance_Methods__
 
@@ -240,17 +263,20 @@ module Skylab::Brazen
 
         def __via_dsc_for_one_produce_entity_when_had_many_via_last one, & oes_p
           oes_p.call :info, :single_entity_resolved_with_ambiguity do
-            bld_single_entity_resolved_with_ambiguity
+            __build_single_entity_resolved_with_ambiguity
           end
           one
         end
 
-        def bld_single_entity_resolved_with_ambiguity
+        def __build_single_entity_resolved_with_ambiguity
 
-          build_neutral_event_with :single_entity_resolved_with_ambiguity,
+          Callback_::Event.inline_neutral_with(
 
-              :model, _model_class,
-              :describable_source, entity_collection do |y, o|
+            :single_entity_resolved_with_ambiguity,
+            :model, _model_class,
+            :describable_source, entity_collection
+
+          ) do | y, o |
 
             _lemma = o.model.name_function.as_human
             _source = o.describable_source.description_under self
@@ -288,7 +314,7 @@ module Skylab::Brazen
         end
       end
 
-      module Delete_Methods__
+      module Delete_Methods___
 
         include Semi_Generated_Instance_Methods__
 
@@ -307,11 +333,19 @@ module Skylab::Brazen
         end
 
         def __init_selective_listener_proc_for_delete
-          @on_event_selectively = event_lib.
-            produce_handle_event_selectively_through_methods.
-              full self, :while_deleting_entity do | * i_a, & ev_p |
-            maybe_receive_event_via_channel i_a, & ev_p
+
+          _ = Callback_::Event.produce_handle_event_selectively_through_methods
+
+          upstream_oes_p = @on_event_selectively
+
+          _oes_p = _.full self, :while_deleting_entity do | * i_a, & ev_p |
+
+            upstream_oes_p[ * i_a, & ev_p ]
           end
+
+          @on_event_selectively = _oes_p
+
+          NIL_
         end
 
         def __via_args_resolve_subject_entity
@@ -320,7 +354,7 @@ module Skylab::Brazen
         end
 
         def __via_args_resolve_identifier
-          _name_s = @argument_box.fetch NAME_
+          _name_s = @argument_box.fetch NAME_SYMBOL
           id = _model_class.node_identifier.with_local_entity_identifier_string _name_s
           @identifier = id
           PROCEDE_
@@ -336,7 +370,7 @@ module Skylab::Brazen
       private
 
         def entity_collection  # :+#public-API #hook-in
-          @preconditions.fetch _model_class.persist_to.full_name_i
+          @preconditions.fetch _model_class.persist_to.full_name_symbol
         end
 
         def _model_class

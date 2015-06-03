@@ -21,9 +21,11 @@ module Skylab::Brazen
           /(?:\b|_)entity(?:\b|_)/ =~ @label_s and lbl_s = @label_s
 
           build_not_OK_event_with :method_not_implemented,
-              :model_class, @controller.class, :lbl, lbl_s do |y, o|
+              :model_class, @controller.class, :lbl, lbl_s do | y, o |
 
-            y << "the #{ val o.model_class.node_identifier.full_name_i.id2name } #{
+            _s = o.model_class.node_identifier.full_name_symbol.id2name
+
+            y << "the #{ val _s } #{
              }model does not indicate a #{ val :persist_to } model and so has #{
               }no strategy to fall back on for this persist-related operation."
 

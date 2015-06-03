@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Models_::Workspace
 
-  class Actions::Init < Brazen_::Model::Action
+  class Actions::Init < Brazen_::Action
 
     edit_entity_class(
 
@@ -30,25 +30,36 @@ module Skylab::Brazen
       # (the above order is the frontier for [#018] the ordering rationale)
 
     def produce_result
+
       bx = @argument_box
+
       @ws = model_class.edit_entity @kernel, handle_event_selectively do | ent |
         ent.edit_with(
           :surrounding_path, bx.fetch( :path ),
           :config_filename, bx.fetch( :config_filename ) )
       end
+
       @ws and __via_workspace
     end
 
     def __via_workspace
 
+      _prp = formal_properties.fetch :path
+      _oes = __event_dispatcher
+
       _ok = @ws.init_workspace(
         :is_dry, @argument_box[ :dry_run ],
         :app_name, @kernel.app_name,
-        :prop, formal_property_via_symbol( :path ),
-        & event_lib.produce_handle_event_selectively_through_methods.
-          bookends( self, :init ) )
+        :prop, _prp,
+        & _oes )
 
       _ok and @ws  # experiment
+    end
+
+    def __event_dispatcher
+
+      _ = Callback_::Event.produce_handle_event_selectively_through_methods
+      _.bookends self, :init
     end
 
     def on_init_resource_not_found_via_channel i_a, & ev_p

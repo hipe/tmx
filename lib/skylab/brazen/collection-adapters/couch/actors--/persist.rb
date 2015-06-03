@@ -56,7 +56,7 @@ module Skylab::Brazen
 
       def bld_entity_as_document_h
 
-        h = { entity_model: @entity_identifier.silo_name_i,
+        h = { entity_model: @entity_identifier.silo_name_symbol,
               properties: ( h_ = {} ) }
 
         while actual = @property_scan.gets

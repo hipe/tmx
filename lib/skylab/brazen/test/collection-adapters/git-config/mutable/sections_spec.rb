@@ -5,8 +5,7 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config::Mutable
   describe "[br] data stores: git config mutable sections" do
 
     extend TS_
-
-    TestLib_::Expect_event[ self ]
+    use :expect_event
 
     context "to an empty document" do
 

@@ -61,7 +61,7 @@ module Skylab::Brazen
 
           if cls.respond_to? :properties
 
-            @_prps = cls.properties.to_a
+            @_prps = cls.properties.to_value_stream.to_a
 
             @_value_p = -> sym do
               @_ent.property_value_via_symbol sym
@@ -69,7 +69,7 @@ module Skylab::Brazen
 
           else
 
-            pcls = Callback_::Actor.methodic_lib.simple_property_class
+            pcls = Callback_::Actor::Methodic::Property
 
             @_prps = cls.members.map do | sym |
               pcls.new do

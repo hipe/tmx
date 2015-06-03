@@ -234,7 +234,7 @@ module Skylab::Brazen
             if ev_p
               ev_p[]
             else
-              Brazen_.event.inline_via_normal_extended_mutable_channel i_a
+              Callback_::Event.inline_via_normal_extended_mutable_channel i_a
             end
           end
         end

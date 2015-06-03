@@ -1,6 +1,6 @@
 require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport::Collection_Adapters__Couch__Actions__Create
+module Skylab::Brazen::TestSupport::Collection_Adapters__Couch_OMNI_MODULE
 
   ::Skylab::Brazen::TestSupport[ TS_ = self ]
 
@@ -10,9 +10,8 @@ module Skylab::Brazen::TestSupport::Collection_Adapters__Couch__Actions__Create
 
   describe "[br] collections - couch - actions - create (COVER edit sess, precons)" do
 
-    Constants::TestLib_::Expect_event[ self ]
-
     extend TS_
+    use :expect_event
 
     it "with no name: missing required property: argument error" do
 

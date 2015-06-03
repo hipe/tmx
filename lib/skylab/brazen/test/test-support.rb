@@ -21,18 +21,15 @@ module Skylab::Brazen::TestSupport
 
   TestSupport_::Regret[ TS_ = self ]
 
-  Brazen_ = ::Skylab::Brazen
+  module ModuleMethods
 
-  Callback_ = Brazen_::Callback_
+    def use sym
 
-  TestLib_ = ::Module.new
-
-  module Constants
-    Brazen_ = Brazen_
-    EMPTY_S_ = ''.freeze
-    SPACE_ = ' '.freeze
-    TestLib_ = TestLib_
-    TestSupport_ = TestSupport_
+      s = sym.id2name
+      _const = :"#{ s[ 0 ].upcase }#{ s[ 1 .. -1 ] }"
+      TestLib_.const_get( _const, false )[ self ]
+      NIL_
+    end
   end
 
   module InstanceMethods
@@ -75,9 +72,12 @@ module Skylab::Brazen::TestSupport
     end
   end
 
+  Brazen_ = ::Skylab::Brazen
+  Callback_ = ::Skylab::Callback
+
   module TestLib_
 
-    memoize = Brazen_::Callback_::Memoize
+    memoize = Callback_::Memoize
 
     Expect_event = -> test_context_cls do
       Callback_.test_support::Expect_Event[ test_context_cls ]
@@ -104,23 +104,30 @@ module Skylab::Brazen::TestSupport
   WITH_MODULE_METHOD_ = -> * x_a do
     ok = nil
     x = new do
-      ok = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
+      ok = process_polymorphic_stream_fully(
+        Callback_::Polymorphic_Stream.via_array x_a )
     end
     ok && x
   end
 
   module Test_Instance_Methods_
 
+    def initialize & edit_p
+      instance_exec( & edit_p )
+    end
+
     attr_reader :bx
 
     def process_fully * x_a
-      process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
+
+      process_polymorphic_stream_fully(
+        Callback_::Polymorphic_Stream.via_array x_a )
     end
 
   private
 
     def procez * x_a
-      _st = polymorphic_stream_via_iambic x_a
+      _st = Callback_::Polymorphic_Stream.via_array x_a
       _ok = process_polymorphic_stream_fully _st
       _ok && normalize
     end
@@ -136,5 +143,16 @@ module Skylab::Brazen::TestSupport
 
   module Zerk
     Callback_::Autoloader[ self ]  # don't load spec file when autoloading lib
+  end
+
+  NIL_ = nil
+
+  module Constants
+    Brazen_ = Brazen_
+    Callback_ = Callback_
+    EMPTY_S_ = ''.freeze
+    SPACE_ = ' '.freeze
+    TestLib_ = TestLib_
+    TestSupport_ = TestSupport_
   end
 end

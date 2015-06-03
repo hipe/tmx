@@ -5,8 +5,7 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config::Mutable
   describe "[br] data stores: git config mutable assignments" do
 
     extend TS_
-
-    TestLib_::Expect_event[ self ]
+    use :expect_event
 
     context "to a section with no assignments" do
 

@@ -62,10 +62,11 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
           :default, :zero_or_one,
           :meta_property, :parameter_arity
 
+      end
 
-        entity_property_class_for_write
+      module Entete_
 
-        class self::Entity_Property
+        const_get( :Property, false ).class_exec do
 
           def is_required
             :one == @parameter_arity

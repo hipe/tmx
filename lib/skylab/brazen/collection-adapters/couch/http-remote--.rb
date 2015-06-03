@@ -255,7 +255,7 @@ module Skylab::Brazen
         end
 
         def build_event_via_iambic_and_message_proc a, p
-          Brazen_.event.inline_via_iambic_and_any_message_proc_to_be_defaulted a, p
+          Callback_::Event.inline_via_iambic_and_any_message_proc_to_be_defaulted a, p
         end
 
       public

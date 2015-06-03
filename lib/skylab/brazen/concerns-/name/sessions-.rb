@@ -1,10 +1,14 @@
 module Skylab::Brazen
 
-  module NAME  # :[#005].
+  class Concerns_::Name
 
-    Small_Time_Sessions_ = ::Module.new
+    Sessions_ = ::Module.new
 
-    class Small_Time_Sessions_::Deep_Action_Isomorphicism_for_EN  # compare [#hl-018]
+    class Sessions_::Deep_Action_Isomorphicism_for_EN  # compare [#hl-018]
+
+      # :+[#sl-134] this is a feature island - this is covered ONLY by a
+      # spec but  it is not currently used anywhere in production. however
+      # we retain it for the tme being for now for possible
 
       def initialize slug_a
         @len = slug_a.length
