@@ -39,9 +39,13 @@ module Skylab::Brazen::TestSupport::Entity
       end
 
       it "do parse strange does not work" do
-        -> do
+
+        begin
           Foo_Iamb.with :wiz
-        end.should raise_error ::ArgumentError, unrec_rx( :wiz )
+        rescue ::ArgumentError => e
+        end
+
+        e.message.should match unrec_rx( :wiz )
       end
 
       it "do parse none does work" do

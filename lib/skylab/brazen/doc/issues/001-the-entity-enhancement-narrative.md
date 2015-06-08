@@ -65,24 +65,59 @@ an alternative is to check for the defined-ness under both
 classifications per method, or just insist that it all be public.
 
 the only method that we trump is the one used as a null hook-in
-(stub) in the wild - `properties`  for the rest, we check for
-collision first before defining them for complex reasons [#xx-xx]
+(stub) in the wild - `properties`. for the rest, we check for
+collision first before defining them these complex reasons:
 
-the reasons complicated to explain are this-
-
-1) the overarching objective is not to clutter the client
+1) the overarching tactical objective is not to clutter the client
    ancestorchain space or method namespace. the primary utility
    of the entity library is to create the "properties" structure
    (perhaps by defining and using metaproperties). as such, we
    accomplish this by writing as few methods is practical to do
-   so *directly* onto the client.
+   so *directly* onto the client, rather than adding to the client's
+   ancestor chain:
 
-2) much like a typical client might enhance itself with one module
-   and then pull another one in after it expecting the other one
-   to override things, we instead expect that the typical client
-   will have a base class that has defined things it overrides.
-   however we don't want the base class to have to load or know
-   about the entity library. ..
+   in the wild what often happens is this: (let "client" mean an
+   application-specific action class or model class.) one
+   business-semi-specific "extmod" is created, and some (but not all)
+   client classes are enhanced with this extmod, as well as perhaps adding
+   their own properties and maybe meta-properties too. those clients that
+   need nothing to do with this entity library or the extmod are left
+   alone, yet they can share a common application-specific base class
+   with the other clients.
+
+2) in the typical OOP design that might take place in the host platform,
+   a client class might "pull in" one "mixin module" and then another
+   one after it, expecting correctly that this second module will
+   effectively "override" methods in the first module, because the
+   second module ends up closer to the subject on the ancestor chain
+   than the first module. furthermore the client class itself may define
+   methods that effectively override methods in this second module.
+
+   because our overarchign design axiom here is that of minimizing
+   activity on the ancestor chain of clients, we do not rely on the
+   above model to achieve this described effect of inheritence with
+   overriding. instead we attempt to accomplish a similar effect through
+   this means:
+
+   our hand-written mechanics add methods *directly* the client
+   *passively*. this means that if a client defines her own this or that
+   method before we get there, we won't add our version. but if the client
+   has not yet defined the method, it gets *its own* definition of that
+   method from us.
+
+   (note that one cost of this technique is that the client-defined
+   method cannot "call up" to one of our definitions with `super`,
+   because our definition won't be anywhere on the ancestor chain.
+   however, our methods are always reachable by some means because
+   ultimately they are all individually defined as procs first.)
+
+   the end result of all this (to put a finer point on something hinted
+   at in (1)) is this: the client application can write one base class to
+   rule them all. some child classes of this base class may not need the
+   entity library, and those ones will not get their ancestor chain
+   "polluted" by anything related to the entity lib. those that *do* will
+   get their chain polluted by *only* the application-specific extmod
+   defined by the client (human).
 
 
 

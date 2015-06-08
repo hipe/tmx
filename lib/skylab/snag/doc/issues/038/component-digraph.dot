@@ -31,7 +31,7 @@ subgraph cluster_main {
     mr->mr_c
     mr_c->mr_r
 
-    mr_e [label="(edit)"]
+    mr_e [label="(edit)" style=filled]
     mr->mr_e
     mr_e->mr_r
     mr_e->mr_c
@@ -94,7 +94,7 @@ subgraph cluster_after {
 
     label="auxiliary actions & related"
     melt [label="29. melt todos\ninto issues" style=filled]
-    top_cli [label="toplevel\nCLI integration"]
+    top_cli [label="toplevel\nCLI integration\n(30 & 31)" style=filled]
     top_cli->mr
 
   }

@@ -61,99 +61,43 @@ module Skylab::Brazen
         resolve_categorized_properties
         bc = _some_bound_call
         x = bc.receiver.send bc.method_name, * bc.args, & bc.block
-        flush_any_invitations
+        __flush_any_invitations
         if x
-          whn_result_is_trueish x
+          __when_result_is_trueish x
         else
           @exit_status
         end
       end
 
-    public
+      # ~ ( others at top, then the list from [#024] )
 
-      def bound_
-        @app_kernel
-      end
+      ## ~~ invitations
 
-      def bound_action
-        @app_kernel
-      end
+      def __flush_any_invitations
 
-      def application_kernel
-        @app_kernel
-      end
-
-      def action_adapter
-        nil
-      end
-
-      def invocation
-        self
-      end
-
-      def write_invocation_string_parts y
-        y.concat @resources.invocation_s_a ; nil
-      end
-
-      def app_name
-        Callback_::Name.via_module( @mod ).as_slug  # etc.
-      end
-
-      def get_styled_description_string_array_via_name nm  # for #ouroboros
-        [ "the #{ nm.as_slug } utility" ]  # placeholder
-      end
-
-      def has_description
-      end
-
-      def receive_invitation ev, adapter
-        ( @invite_ev_a ||= [] ).push [ ev, adapter ] ; nil
-      end
-
-      attr_reader :invite_ev_a
-
-      def maybe_use_exit_status d  # #note-075
-        if ! instance_variable_defined? :@exit_status or @exit_status < d
-          @exit_status = d ; nil
+        if _invite_ev_a
+          __flush_invitations
         end
       end
 
-      def unbound_action_via_normalized_name i_a
-        @app_kernel.unbound_action_via_normalized_name i_a
-      end
+      def __flush_invitations
 
-      def payload_output_line_yielder
-        @poly ||= ::Enumerator::Yielder.new( & @resources.sout.method( :puts ) )
-      end
+        seen_i_a_h = {}
+        seen_general_h = {}
 
-      def leaf_class
-        self.class::Action_Adapter
-      end
+        a = _invite_ev_a
 
-      def branch_class
-        self.class::Branch_Adapter
-      end
+        a.each do | ev, adapter |
 
-      def expression_agent_class
-        self.class.const_get :Expression_Agent, false
-      end
-
-    private
-
-      def flush_any_invitations
-        invite_ev_a and flush_invitations
-      end
-
-      def flush_invitations
-        seen_i_a_h = {} ; seen_general_h = {}
-        invite_ev_a.each do |ev, adapter|
           ev_ = ev.to_event
+
           if ev_.has_tag :invite_to_action
             i_a = ev_.invite_to_action
             seen_i_a_h.fetch i_a do
               adapter.help_renderer.output_invite_to_particular_action i_a
               seen_i_a_h[ i_a ] = true
             end
+
           else
             k_x = adapter.bound_action.class.name.intern  # must work for proc proxies too
             seen_general_h.fetch k_x do
@@ -161,10 +105,22 @@ module Skylab::Brazen
               adapter.output_invite_to_general_help
             end
           end
-        end.clear
+
+        end
+        a.clear
+        NIL
       end
 
-      def whn_result_is_trueish x
+      def _receive_invitation ev, adapter
+        ( @_invite_ev_a ||= [] ).push [ ev, adapter ]
+        NIL_
+      end
+
+      attr_reader :_invite_ev_a
+
+      ## ~~ exitstatus & result handling
+
+      def __when_result_is_trueish x
 
         if ACHIEVED_ == x  # covered
           SUCCESS_
@@ -178,6 +134,76 @@ module Skylab::Brazen
         else
           CLI_::When_Result_::Looks_like_stream.new( @adapter, x ).execute
         end
+      end
+
+      ## ~~ actionability (near "navigation of the interface tree")
+
+      def action_adapter
+        NIL_
+      end
+
+      def application_kernel
+        @app_kernel
+      end
+
+      def bound_
+        @app_kernel
+      end
+
+      def bound_action
+        @app_kernel
+      end
+
+      def branch_class
+        self.class::Branch_Adapter
+      end
+
+      def leaf_class  # (related to above)
+        self.class::Action_Adapter
+      end
+
+      def invocation
+        self
+      end
+
+      def unbound_action_via_normalized_name i_a
+        @app_kernel.unbound_action_via_normalized_name i_a
+      end
+
+      ## ~~ description & inflection
+
+      def has_description
+        false  # for now
+      end
+
+      def get_styled_description_string_array_via_name nm  # for #ouroboros
+        [ "the #{ nm.as_slug } utility" ]  # placeholder
+      end
+
+      ## ~~ name & related
+
+      def write_invocation_string_parts y
+        y.concat @resources.invocation_s_a ; nil
+      end
+
+      def app_name
+        Callback_::Name.via_module( @mod ).as_slug  # etc.
+      end
+
+      ## ~~ event receiving & sending
+
+      def maybe_use_exit_status d  # #note-075
+        if ! instance_variable_defined? :@exit_status or @exit_status < d
+          @exit_status = d ; nil
+        end
+      end
+
+      def payload_output_line_yielder
+        @poly ||= ::Enumerator::Yielder.new( & @resources.sout.method( :puts ) )
+      end
+
+      def expression_agent_class
+        self.class.const_get :Expression_Agent, false
       end
     end
 
@@ -918,10 +944,10 @@ module Skylab::Brazen
         maybe_use_exit_status SUCCESS_ ; nil
       end
 
-      attr_reader :invite_ev_a
+      attr_reader :_invite_ev_a
 
-      def receive_invitation ev, adapter
-        @parent.receive_invitation ev, adapter ; nil
+      def _receive_invitation ev, adapter
+        @parent._receive_invitation ev, adapter ; nil
       end
 
       def output_invite_to_general_help
@@ -949,7 +975,7 @@ module Skylab::Brazen
     private
 
       def send_invitation ev
-        @parent.receive_invitation ev, self
+        @parent._receive_invitation ev, self
       end
 
       def maybe_inflect_line_for_positivity_via_event s, ev
@@ -969,17 +995,22 @@ module Skylab::Brazen
       end
 
       def __ilfp s, ev
+
         open, inside, close = unparenthesize s
+
         downcase_first inside
+
         n_s = ev.inflected_noun
         v_s = ev.verb_lexeme.progressive
         gerund_phrase = "#{ [ v_s, n_s ].compact * SPACE_ }"
-        inside_ = if HACK_IS_ONE_WORD_RX__ =~ inside
+
+        _inside_ = if LOOKS_LIKE_ONE_WORD_RX__ =~ inside
           "#{ inside } #{ gerund_phrase }"
         else
           "while #{ gerund_phrase }, #{ inside }"
         end
-        "#{ open }#{ inside_ }#{ close }"
+
+        "#{ open }#{ _inside_ }#{ close }"
       end
 
       def maybe_inflect_line_for_negativity_via_event s, ev
@@ -1002,22 +1033,30 @@ module Skylab::Brazen
       end
 
       def __milfc s, ev
+
         open, inside, close = unparenthesize s
         downcase_first inside
-        if HACK_IS_ONE_WORD_RX__ =~ inside
+
+        if LOOKS_LIKE_ONE_WORD_RX__ =~ inside
+
           maybe_inflect_line_for_positivity_via_event s, ev
+
         else
+
           n_s = ev.inflected_noun
           v_s = ev.verb_lexeme.preterite
+
           prefix = if n_s
             "#{ v_s } #{ n_s }: "
           else
             v_s
           end
+
           "#{ open }#{ prefix }#{ inside }#{ close }"
         end
       end
-      HACK_IS_ONE_WORD_RX__ = /\A[a-z]+\z/
+
+      LOOKS_LIKE_ONE_WORD_RX__ = /\A[a-z]+\z/
 
       def unparenthesize s
         LIB_.basic::String.unparenthesize_message_string s
@@ -1148,8 +1187,12 @@ module Skylab::Brazen
             args.push base
           end
 
+          if prp.has_description
+            __render_property_description args, prp
+          end
+
           _p = optparse_behavior_for_property prp
-          prp.has_description and __render_property_description args, prp
+
           op.on( * args, & _p )
         end
 
@@ -1248,7 +1291,8 @@ module Skylab::Brazen
       def __render_property_description a, prop
         expag = expression_agent
         expag.current_property = prop
-        a.concat prop.under_expression_agent_get_N_desc_lines expag ; nil
+        a.concat prop.under_expression_agent_get_N_desc_lines expag
+        NIL_
       end
 
       def write_full_syntax_strings__ y
@@ -1341,7 +1385,6 @@ module Skylab::Brazen
       end
 
       def resolve_categorized_properties
-
 
         o = Categorize_properties___.new
         o.st = _to_full_inferred_property_stream
@@ -1685,12 +1728,15 @@ module Skylab::Brazen
     end
 
     STANDARD_ACTION_PROPERTY_BOX__ = -> do
+
       box = Box_.new
+
       box.add :help, Property__.new( :help,
         :argument_arity, :zero,
         :desc, -> y do
           y << "this screen"
         end )
+
       box.add :ellipsis, Property__.new( :ellipsis,
         # :argument_arity, :zero_or_more,
         :argument_arity, :zero_or_one,

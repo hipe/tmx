@@ -36,6 +36,12 @@ module Skylab::Snag
       @value_is_known_is_known = nil
     end
 
+    def express_under expag
+
+      Tag_::Expression_Adapters::Byte_Stream.express_into_under_of_(
+        "", expag, self )
+    end
+
     def express_into_ y
 
       # only because expression for the tag under a byte-stream mode needs

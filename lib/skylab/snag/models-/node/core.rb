@@ -154,7 +154,10 @@ module Skylab::Snag
 
     def __property_value_for__extended_content__
 
-      @_extended_content_adapter.any_extended_content_filename_via_node_ID @ID
+      eca = @_extended_content_adapter
+      if eca
+        eca.any_extended_content_filename_via_node_ID @ID
+      end
     end
 
     define_method :formal_properties, ( Callback_.memoize do
@@ -282,7 +285,11 @@ module Skylab::Snag
     # ~
 
     def has_extended_content
-      @_extended_content_adapter.node_has_extended_content_via_node_ID @ID
+
+      eca = @_extended_content_adapter
+      if eca
+        eca.node_has_extended_content_via_node_ID @ID
+      end
     end
 
     Brazen_ = Snag_.lib_.brazen
@@ -381,21 +388,29 @@ module Skylab::Snag
       # to assemble all of the body lines as one string.
 
       Expression_Adapters = ::Module.new
-      module Expression_Adapters::CLI ; class << self
+
+      Expression_Adapters::CLI = ::Module.new
+
+      class << Expression_Adapters::CLI
+
         def express_of_via_under _expag
+
           -> body do
+
             y = []
+
             body.to_business_row_stream_.each do | row |
               s = row.get_business_substring
               s or next
               y << s
             end
+
             if y.length.nonzero?
               y * SPACE_  # meh
             end
           end
         end
-      end ; end
+      end
 
       class << self
 

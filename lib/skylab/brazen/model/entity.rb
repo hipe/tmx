@@ -66,7 +66,7 @@ module Skylab::Brazen
 
     module Entity
 
-      def receive_polymorphic_property prp  # (method MUST be public)
+      def receive_polymorphic_property prp  # (method MUST be public)  :.A
 
         # (overwrite this #hook-out so we write not to ivars but to our box)
 
@@ -101,16 +101,17 @@ module Skylab::Brazen
 
       # ~ normalization (a thin layer on top of entity concerns)
 
-      def normalize
+      def normalize  # :.B
 
         # since we have reached ths method at all it is safe to
         # assume that the entity has some formal properties.
 
-        _st = formal_properties.to_value_stream
 
-        Concerns_::Normalization::Against_model_stream[
+        Concerns_::Normalization::Against_model_stream.call(
 
-          self, _st, & handle_event_selectively ]
+          self,
+          formal_properties.to_value_stream,
+          & handle_event_selectively )
       end
 
       public def set_value_of_formal_property_ x, prp
@@ -129,7 +130,7 @@ module Skylab::Brazen
 
       const_get :Property, false  # sanity - do *not* create this class below
 
-      # ~ metaproperties (support)
+      # ~ metaproperties
 
       ## ~~ ad-hoc normalizer
 
@@ -157,8 +158,6 @@ module Skylab::Brazen
             self
           end
         end
-
-
 
       ## ~~ argument arity
 
@@ -203,8 +202,6 @@ module Skylab::Brazen
           end
         end
 
-
-
       ## ~~ description
 
         class self::Property
@@ -215,9 +212,16 @@ module Skylab::Brazen
             @desc_p_a.fetch @desc_p_a.length - 1 << 1
           end
 
-          attr_reader :has_description, :desc_p_a
+          def has_description
+            desc_p_a
+          end
 
-          # ~
+          attr_accessor :desc_p_a
+
+          def under_expression_agent_get_N_desc_lines expag, n=nil
+
+            LIB_.N_lines[ [], n, @desc_p_a, expag ]
+          end
 
         private
 
@@ -234,7 +238,6 @@ module Skylab::Brazen
 
           def accept_description_proc p
             if p
-              @has_description = true
               ( @desc_p_a ||= [] ).push p
               KEEP_PARSING_
             else
@@ -242,8 +245,6 @@ module Skylab::Brazen
             end
           end
         end
-
-
 
       ## ~~ integer related
 
@@ -288,8 +289,6 @@ module Skylab::Brazen
           end
         end
 
-
-
       ## ~~ parameter arity - read synopsis [#090]
 
         class self::Property
@@ -320,7 +319,7 @@ module Skylab::Brazen
           end
         end
 
-      ## ~~ description, nomenclature and reltated
+      ## ~~ name & related
 
         class self::Property
         private
@@ -335,13 +334,7 @@ module Skylab::Brazen
           def has_custom_moniker  # [#014] maybe a smell, maybe not
             false
           end
-
-          def under_expression_agent_get_N_desc_lines expag, n=nil
-
-            LIB_.N_lines[ [], n, @desc_p_a, expag ]
-          end
         end
-
 
       # ~ courtesy
 

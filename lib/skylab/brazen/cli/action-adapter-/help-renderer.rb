@@ -359,7 +359,7 @@ module Skylab::Brazen
           label_p ||= DEFAULT_LABELIZE_P__
           ex = @expression_agent
           no_desc = bld_item_without_desc_outputter y, label_p
-          desc = bld_item_with_desc_outputter y, ex, num_lines_per, label_p
+          desc = __build_item_with_desc_outputter y, ex, num_lines_per, label_p
           -> x do
             ( x.has_description ? desc : no_desc )[ x ]
           end
@@ -375,22 +375,30 @@ module Skylab::Brazen
           end
         end
 
-        def bld_item_with_desc_outputter y, expag, num_lines_per, labelize_p
-          d = @summary_width ; s = @summary_indent
+        def __build_item_with_desc_outputter y, expag, num_lines_per, labelize_p
+
+          d = @summary_width
+          s = @summary_indent
           first_line_item_format = "#{ s }%-#{ d }s %s"
           d_ = d + s.length + 1  # " " is 1 char wide
           subsequent_line_item_format = "#{ SPACE_ * d_ }%s"
+
           -> prp do
+
             expag.current_property = prp
             a = prp.under_expression_agent_get_N_desc_lines expag, num_lines_per
+
             if a.length.zero?
               y << "#{ s }#{ labelize_p[ prp ] }"
             else
               y << first_line_item_format % [ labelize_p[ prp ], a.fetch( 0 ) ]
             end
+
             1.upto( a.length - 1 ) do |idx|
               y << subsequent_line_item_format % a.fetch( idx )
-            end ; nil
+            end
+
+            NIL_
           end
         end
 

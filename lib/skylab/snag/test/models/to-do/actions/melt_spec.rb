@@ -75,6 +75,13 @@ module Skylab::Snag::TestSupport
         :path, [ td.to_path ],
         :name, [ '*.sc' ]
 
+      __expect_these_events
+    end
+
+    def __expect_these_events
+
+      expect_OK_event :wrote
+
       ev = expect_neutral_event :process_line
       black_and_white( ev ).should match %r(\Apatching file .+jeebis.sc$)
 
@@ -108,8 +115,15 @@ module Skylab::Snag::TestSupport
         :pattern, [ '%to-dew' ],
         :dry_run
 
-      _ev1 = expect_neutral_event :process_line
-      _ev2 = expect_neutral_event :process_line
+      __expect_these_multiple_files_events
+    end
+
+    def __expect_these_multiple_files_events
+
+      expect_OK_event :wrote
+      expect_neutral_event :process_line
+      expect_OK_event :wrote
+      expect_neutral_event :process_line
       _ev = expect_OK_event :summary
 
       black_and_white( _ev ).should eql(

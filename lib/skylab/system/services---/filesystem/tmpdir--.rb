@@ -298,21 +298,40 @@ module Skylab::System
 
       # -- Producing directories & files
 
-      def copy x, dest_basename=nil
+      def copy_r path, dest_basename=nil  # no dry run.
 
-        _path = if x.respond_to? :to_path
-          x.to_path
+        self._ETC
+
+        _dest_path = if dest_basename
+          join( dest_basename )
         else
-          x
+          self
+        end.to_path
+
+        _fuc = System.services.filesystem.file_utils_controller do
+
         end
 
-        src = ::Pathname.new _path
+        _x = _fuc.cp_r path, _dest_path, verbose: true
+      end
 
-        dst = join dest_basename || src.basename
+      def copy src_path_s, dest_basename=nil
 
-        cp src.to_path, dst.to_path, noop: @is_noop, verbose: @be_verbose
+        if src_path_s.respond_to? :to_path
+          src_path_s = src_path_s.to_path
+        end
 
-        dst
+        dst_pn = if dest_basename
+          join dest_basename
+        else
+          join ::File.basename src_path_s
+        end
+
+        cp src_path_s, dst_pn.to_path, noop: @is_noop, verbose: @be_verbose
+
+        # ( result of above is nil on success )
+
+        dst_pn
       end
 
       def mkdir path_tail, opt_h=nil

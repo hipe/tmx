@@ -111,40 +111,37 @@ module Skylab::Brazen
       accept_selective_listener_proc oes_p
     end
 
-    # ~ invocation ( various means )  ( #todo needs streamlining )
+    # ~ invocation ( various means )
 
     def bound_call_against_polymorphic_stream_and_mutable_box st, bx
 
-      _bound_call_against bx do
+      @argument_box = bx
+
+      _bound_call_after do
         process_polymorphic_stream_fully st
       end
     end
 
     def bound_call_against_polymorphic_stream st
 
-      # (see etc at `via_arguments_produce_bound_call`)
-
-      _bound_call_against do
+      _bound_call_after do
         process_polymorphic_stream_fully st
       end
     end
 
-    ## ~~ ( experimental
-
     def bound_call_against_box box
 
-      # exactly as above
-
-      _bound_call_against do
+      _bound_call_after do
         Concerns__::Properties::Input::Via_value_box[ self, box ]
       end
     end
 
     attr_writer :polymorphic_upstream_  # hax only (like above)
 
-    def _bound_call_against bx=Box_.new
+    def _bound_call_after
 
-      @argument_box = bx
+      @argument_box ||= Callback_::Box.new
+
       ok = yield
       if ok
         via_arguments_produce_bound_call
@@ -153,7 +150,7 @@ module Skylab::Brazen
       end
     end
 
-    ## ~~ end experimental)
+    attr_writer :argument_box  # hax only
 
     class << self
 

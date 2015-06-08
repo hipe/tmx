@@ -347,19 +347,38 @@ module Skylab::Snag
 
               if ok_x
 
-                _bytes = if @_is_dry
+                path = @_ds_id.path
+
+                bytes = if @_is_dry
                   0
                 else
-
-                  @_FS_adapter.filesystem.copy(
-                    fh.path,
-                    @_ds_id.path )
+                  @_FS_adapter.filesystem.copy fh.path, path
                 end
 
-                ok_x = _bytes
+                @on_event_selectively.call :info, :wrote do
+                  __build_wrote_event bytes, path
+                end
+
+                # ok_x = _bytes ; not this - when you create
+                # or reappropriate an entity, result in it.
               end
 
               ok_x
+            end
+          end
+
+          def __build_wrote_event d, path
+
+            Callback_::Event.inline_OK_with(
+
+              :wrote,
+              :bytes, d,
+              :path, path,
+              :is_completion, true
+
+            ) do | y, o |
+
+              y << "updated #{ pth o.path } (#{ o.bytes } bytes)"
             end
           end
         end

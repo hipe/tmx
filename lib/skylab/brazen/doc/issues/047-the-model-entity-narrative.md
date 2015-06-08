@@ -37,3 +37,8 @@ then hypothetically OK to use #experimentally.
 regardless, as a safeguard a runtime error is raised if a non-nil-holding
 ivar would otherwise be clobbered by this. this is the part that
 guarantees that your code is not necessarily future-proof.
+
+
+## subsections
+
+( :.A, :.B are inline )

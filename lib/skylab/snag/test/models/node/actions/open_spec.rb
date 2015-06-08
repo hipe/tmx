@@ -24,7 +24,9 @@ module Skylab::Snag::TestSupport
 O
         ] )
 
-      expect_no_events  # for now
+      ev = expect_OK_event( :wrote ).to_event
+      ev.bytes or fail
+      ev.path or fail
 
       fh = ::File.open path
       fh.gets.should eql "[#03] B\n"
@@ -70,7 +72,7 @@ O
       y[ 3 ].should eql "[#01] A\n"
       y.length.should eql 4
 
-      _node = @result.fetch 0
+      _node = @result
       _node.ID.to_i.should eql 2
     end
 

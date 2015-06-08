@@ -2,6 +2,8 @@ module Skylab::Snag
 
   class CLI < Snag_.lib_.brazen::CLI
 
+    Brazen_ = Snag_.lib_.brazen
+
     class << self
 
       def new * a
@@ -28,7 +30,13 @@ module Skylab::Snag
 
       def mutate__upstream_identifier__properties
 
-        mutable_front_properties.replace_by :upstream_identifier do | prp |
+        _mutate_upstream_adapter_in mutable_front_properties
+        NIL_
+      end
+
+      def _mutate_upstream_adapter_in bx
+
+        bx.replace_by :upstream_identifier do | prp |
 
           prp.dup.set_default_proc do
 
@@ -36,140 +44,24 @@ module Skylab::Snag
 
           end.freeze
         end
-
         NIL_
       end
     end
 
     Actions = ::Module.new
 
-    Actions::Open = ::Class.new Action_Adapter  # will re-open
+    class Actions::Open < Action_Adapter
 
-    class Actions::Open::Mock_Bound < CLI::Mock_Bound
+      def produce_populated_option_parser _op, _opt_a
 
-      # .. we have to make one of these when don't have a backstream action
-
-      def describe_into_under y, expag
-
-        y << "open an issue or stream open issues"
-      end
-
-      attr_reader :_keys_that_pertain_to_create_only,
-        :_keys_that_pertain_to_report_only,
-        :_the_create_action
-
-      def produce_formal_properties
-
-        mod = Snag_::Models_::Node::Actions
-
-        @_the_create_action = mod::Open
-          # (we are dreaming of persisted macros instead)
-
-        bx = @_the_create_action.properties.to_new_mutable_box_like_proxy
-
-        __modify_properties_that_pertain_to_create bx
-
-        __add_properties_that_pertain_to_report bx
-
-        bx
-      end
-
-      # ~
-
-      def __modify_properties_that_pertain_to_create bx
-
-        # make the message optional not required; the defining mechanic
-
-        bx.replace_by :message do | prp |
-
-          prp.new_with(
-            :argument_arity, :zero_or_more,
-            :parameter_arity, :zero_or_one,
-            :description, -> y do
-              y << "if provided, act similar to `node open`"
-              y << "(and all above options pertain unless stated)"
-              y << "otherwise run \"open\" report or equivalent"
-            end )
-        end
-        NIL_
-      end
-
-      # ~
-
-      def __add_properties_that_pertain_to_report bx
-
-        a = []
-        ks = bx.get_names
-
-        PROPERTIES_FOR_REPORT___.to_value_stream.each do | prp |
-
-          k = prp.name_symbol
-          had = true
-          bx.touch k do
-            had = false
-            prp
-          end
-
-          if had
-            d = ks.index k
-            ks[ d ] = nil
-            ks.compact!
-          else
-            a.push k
-          end
-        end
-
-        @_keys_that_pertain_to_create_only = ks
-        @_keys_that_pertain_to_report_only = a
-
-        NIL_
-      end
-
-      def __produce_number_limit_property prp
-
-        otr = prp.dup_with(
-          :description, -> y do
-            y << "`-<number>` too"
-          end )
-
-        __mutate_property_by_adding_description_wrapper otr
-        otr
-      end
-
-      def __mutate_property_by_adding_description_wrapper otr
-
-        def otr.under_expression_agent_get_N_desc_lines expag, d=nil
-          s_a = super expag, d
-          s_a[ 0 ] = "(when listing:) #{ s_a.fetch 0 }"
-          s_a
-        end
-        NIL_
-      end
-    end
-
-    Brazen_ = ::Skylab::Brazen
-
-    PROPERTIES_FOR_REPORT___ = Brazen_::Model.make_common_common_properties(
-    ) do | sess |
-
-      _prp_a = Snag_::Models_::Node::Actions::To_Stream.
-        properties.at :number_limit, :upstream_identifier
-
-      sess.edit_common_properties_module :reuse, _prp_a
-
-    end
-
-    class Actions::Open  # re-open
-
-      # ~ hook-ins
-
-      def produce_populated_option_parser op, opt_a
-
-        op = super
+        _op_ = super
 
         CLI.superclass::Option_Parser::Experiments::Regexp_Replace_Tokens.new(
-          op,
+
+          _op_,
+
           %r(\A-(?<num>\d+)\z),
+
           -> md do
             [ '--number-limit', md[ :num ] ]
           end )
@@ -180,145 +72,90 @@ module Skylab::Snag
         @_filesystem = Snag_.lib_.system.filesystem
         @_oes_p = handle_event_selectively
 
-        ok = __process_all_backbound_arguments_now x_a
-        ok &&= __normalize_all_actuals_now
-        ok && __resolve_bound_action_appropriately
-      end
+        @_hy = @bound.hybrid
 
-      # ~ we do this early as an easy way to tackle the shared processing
-      # for those formal(s) that exist in both "actions"; at the cost of
-      # this node needing to know the whole set union of all properties,
-      # and needing to write the common normalization steps itself.
+        _mutate_upstream_adapter_in @_hy.moz
 
-      # because we don't have a normal action (for now), we will need to
-      # trigger "manually" the normalizations of those formals with them.
+        o = Brazen_::Property::Sessions::Value_Processing.new
 
-      def __process_all_backbound_arguments_now x_a
+        bx = Callback_::Box.new
 
-        @number_limit = nil
-        @upstream_identifier = nil
+        o.value_collection = bx
+        o.iambic = x_a
+        o.value_models = @_hy.moz
+        o.execute
+        x_a.clear
+        x_a = nil  # because assume processed fully
 
-        _st = Callback_::Polymorphic_Stream.via_array x_a
+        # ( not here, but where?
 
-        kp = Callback_::Actor::Methodic::
-          Process_polymorphic_stream_fully.call _st, self
-
-        if kp
-          x_a.clear
-        end
-
-        kp
-      end
-
-    private
-
-      def number_limit=
-
-        # #todo - tighten this up once the API settles
-
-        _x = @polymorphic_upstream_.gets_one
-
-        _kn = Callback_::Known.new_known _x
-
-        _prp = @bound.formal_properties.fetch :number_limit
-
-        kn_ = _prp.normalize_argument _kn, & @_oes_p
-
-        if kn_
-          @number_limit = kn_.value_x
-          KEEP_PARSING_
-        else
-          UNABLE_  # "downgrade" nil to false to get invites
-        end
-      end
-
-      def upstream_identifier=
-        @upstream_identifier = @polymorphic_upstream_.gets_one
-        KEEP_PARSING_
-      end
-
-      # ~
-
-      def __normalize_all_actuals_now
-
-        path = @upstream_identifier
-        prp = @mutable_front_properties.fetch :upstream_identifier
-
-        if ! path
-          path = prp.default_proc.call
-        end
-
-        path or self._SANITY
-
+        path = bx.fetch :upstream_identifier
         path = Snag_::Models_::Node_Collection.nearest_path(
           path, @_filesystem, & @_oes_p )
 
+        # )
+
         if path
-          @upstream_identifier = path
-          ACHIEVED_
+          bx.replace :upstream_identifier, path
+
+          __finish_prepare_backstream_call bx
         else
           path
         end
       end
 
-      # ~
+      def __finish_prepare_backstream_call bx
 
-      def __resolve_bound_action_appropriately
+        hy = @_hy
+        h = hy.category_lookup_table
+        lefts = nil
+        rights = nil
+        bx.a_.each do | k |
+          cat_sym = h.fetch k
+          case cat_sym
+          when :left_only
+            ( lefts ||= [] ).push k
+          when :right_only
+            ( rights ||= [] ).push k
+          when :shared_allegiance
+            NIL_  # nothing
+          else
+            raise ::NameError, cat_sym
+          end
+        end
 
-        if @seen[ :message ]
-          self._TODO_init_bound_ivar_for_create
+        if bx.has_name :message
+
+          if lefts
+            _when_non_pertient lefts, :right_unbound, :left_unbound
+          else
+            __prepare_backstream_for_opening bx
+          end
         else
-          __resolve_bound_action_for_report
+          if rights
+            _when_non_pertient rights, :left_unbound, :right_unbound
+          else
+            __prepare_backstream_for_report bx
+          end
         end
       end
 
-      def __resolve_bound_action_for_report
+      def _when_non_pertient bad_sym_a, wont_work_for_this_sym, but_this_sym
 
-        bnd = @bound
+        hy = @_hy
 
-        bad_a = @seen.a_ & bnd._keys_that_pertain_to_create_only
+        mz = hy.moz
 
-        if bad_a.length.zero?
-
-          __flush_resolution_of_bound_report
-        else
-
-          _when_bad bad_a,
-            _Report_of_Open_Nodes.name_function,
-            bnd._the_create_action.name_function
+        prp_a = bad_sym_a.map do | k |
+          mz.fetch k
         end
-      end
 
-      def __flush_resolution_of_bound_report
-
-        o = _Report_of_Open_Nodes.new( & @_oes_p )
-        o.filesystem = @_filesystem
-        o.kernel = @parent.bound_
-        o.name = name
-        o.number_limit = @number_limit
-        o.upstream_identifier = @upstream_identifier
-
-        @bound = o
-        ACHIEVED_
-      end
-
-      def _Report_of_Open_Nodes
-        Snag_::Models_::Node_Collection::Sessions::Report_of_Open_Nodes
-      end
-
-      # ~ shared
-
-      def _when_bad bad_sym_a, wont_work_for_this, but_this
-
-        bx = @bound.formal_properties
-
-        prop_a = bad_sym_a.map do | k |
-          bx.fetch k
-        end
+        wont_work_for_this = hy.send wont_work_for_this_sym
+        but_this = hy.send but_this_sym
 
         receive__error__expression :non_pertinent_arguments do | y |
 
-          _s_a = prop_a.map do | prp |
+          _s_a = prp_a.map do | prp |
             par prp
           end
 
@@ -331,6 +168,249 @@ module Skylab::Snag
           y << "#{ _ } can be used for #{ val _ok } but not for #{ val _no }"
         end
         UNABLE_  # ("downgrade" result of above from nil to false)
+      end
+
+      def __prepare_backstream_for_report bx
+
+        o = Snag_::Models_::Node_Collection::Sessions::Report_of_Open_Nodes.
+          new( & @_oes_p )
+
+        o.filesystem = @_filesystem
+        o.kernel = _top_kernel
+        o.name = self.name
+        o.number_limit = bx[ :number_limit ]
+        o.upstream_identifier = bx.fetch :upstream_identifier
+
+        @bound = o  # overwrites mock bound
+
+        ACHIEVED_
+      end
+
+      def __prepare_backstream_for_opening bx
+
+        o = Snag_::Models_::Node::Actions::Open.new( _top_kernel, & @_oes_p )
+
+        o.argument_box = bx
+
+        @bound = Customization_Layer_for_Open___.new o
+          # overwrites mock bound
+
+        ACHIEVED_
+      end
+
+      def _top_kernel
+        @parent.bound_
+      end
+    end
+
+    class Customization_Layer_for_Open___
+
+      def initialize x
+        @_up = x
+      end
+
+      def bound_call_against_polymorphic_stream st
+
+        @_bc = @_up.bound_call_against_polymorphic_stream st
+
+        Callback_::Bound_Call.via_receiver_and_method_name self, :execute
+      end
+
+      def execute
+
+        bc = @_bc
+        bc.receiver.send bc.method_name, * bc.args, & bc.block
+
+        # (result is entity, which is OK for now. so this class does nothing)
+      end
+    end
+
+    class Actions::Open::Mock_Bound < CLI::Mock_Bound
+
+      attr_reader :hybrid
+
+      # .. we have to make one of these when don't have a backstream action
+
+      def describe_into_under y, expag
+
+        y << "open an issue or stream open issues"
+      end
+
+      def produce_formal_properties
+
+        __init_hybrid
+        @hybrid.moz
+      end
+
+      def __init_hybrid
+
+        hy = Hybrid___.new
+
+        hy.left_unbound =
+          Snag_::Models_::Node::Actions::To_Stream
+
+        hy.right_unbound =
+          Snag_::Models_::Node::Actions::Open
+
+        hy.init_formal_properties_box
+
+        @hybrid = hy
+        bx = hy.moz
+
+        __mutate_message_property
+        __mutate_number_limit
+
+        s = 'used for report only'
+        hy.left_only.each do | k |
+          _hack_qualify_description k, bx, s
+        end
+
+        s = 'used for opening issue only'
+        hy.right_only.each do | k |
+          :message == k and next  # because it's semantically redundant
+          _hack_qualify_description k, bx, s
+        end
+
+        s = 'used in both forms'
+        hy.shared_allegiance.each do | k |
+          _hack_qualify_description k, bx, s
+        end
+
+        NIL_
+      end
+
+      def __mutate_message_property
+
+        # make the message optional not required; the defining mechanic
+
+        @hybrid.moz.replace_by :message do | prp |
+
+          prp.new_with(
+            :argument_arity, :zero_or_more,
+            :parameter_arity, :zero_or_one,
+            :description, -> y do
+              y << "if provided, act similar to `node open`"
+              y << "otherwise run \"open\" report or equivalent"
+            end )
+        end
+        NIL_
+      end
+
+      def __mutate_number_limit
+
+        @hybrid.moz.replace_by :number_limit do | prp |
+
+          prp.new_with(
+            :description, -> y do
+              y << "`-<number>` too"
+            end )
+        end
+        NIL_
+      end
+
+      def _hack_qualify_description k, bx, s
+
+        prp = bx.fetch k
+        p_a = prp.desc_p_a
+
+        if prp.frozen?
+
+          prp = prp.dup
+          bx.replace k, prp
+          if p_a
+            p_a = p_a.dup
+            prp.desc_p_a = p_a
+          end
+        end
+
+        addendum = "(#{ s })"
+
+        if p_a
+
+          orig_p = p_a.last
+
+          p_a[ -1 ] = -> y do
+
+            a = orig_p[ [] ]
+
+            if a.last.length > addendum.length  # break line if etc. eew
+              a.push addendum
+            else
+              a[ -1 ] = "#{ a.last } #{ addendum }"
+            end
+
+            a.each do | s_ |
+              y << s_
+            end
+            y
+          end
+        else
+          prp.desc_p_a = [ -> y do
+            y << addendum
+          end  ]
+        end
+
+        NIL_
+      end
+    end
+
+    class Hybrid___
+
+      attr_reader(
+        :left_unbound,
+        :right_unbound )
+
+      attr_writer(
+        :left_unbound,
+        :right_unbound )
+
+      attr_reader(
+        :category_lookup_table,
+        :left_only,
+        :moz,
+        :right_only,
+        :shared_allegiance )
+
+      def init_formal_properties_box
+
+        bx = @left_unbound.properties.to_new_mutable_box_like_proxy
+
+        shared_allegiance = []
+        right_only = []
+
+        @right_unbound.properties.to_value_stream.each do | prp |
+
+          k = prp.name_symbol
+          had = true
+          bx.touch k do
+            had = false
+            prp
+          end
+
+          if had
+            shared_allegiance
+          else
+            right_only
+          end.push k
+        end
+
+        left_only = bx.a_ - ( shared_allegiance + right_only )
+
+        @left_only = left_only
+        @right_only = right_only
+        @shared_allegiance = shared_allegiance
+
+        # (you might want to set the arrays themselves to ivars here)
+
+        h = {}
+        left_only.each { | k | h[ k ] = :left_only }
+        shared_allegiance.each { | k | h[ k ] = :shared_allegiance }
+        right_only.each { | k | h[ k ] = :right_only }
+
+        @category_lookup_table = h
+
+        @moz = bx
+        NIL_
       end
     end
 

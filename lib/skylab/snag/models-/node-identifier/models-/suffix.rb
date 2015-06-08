@@ -28,12 +28,20 @@ module Skylab::Snag
         @to_a = a
       end
 
+      def express_into_under y, expag
+
+        @to_a.each do | x |
+          x.express_into_under y, expag
+        end
+        y
+      end
+
       def express_into_ y
 
         @to_a.each do | x |
-          x.express_into_ y, expag
+          x.express_into_ y
         end
-        ACHIEVED_
+        y
       end
 
       attr_reader :to_a
@@ -156,9 +164,16 @@ module Skylab::Snag
           freeze
         end
 
+        def express_into_under y, expag
+
+          :Event == expag.intern or self._DO_ME
+          express_into_ y
+          y
+        end
+
         def express_into_ y
           y << @separator_string
-          y << @value
+          y << @value.to_s
           ACHIEVED_
         end
 

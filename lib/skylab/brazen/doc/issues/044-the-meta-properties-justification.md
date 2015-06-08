@@ -44,3 +44,10 @@ need to.
 
 (EDIT: find a quintessential use-case for m.p's in the wild and examp it
 here)
+
+
+
+
+## alternatives ( :.B )
+
+in practice it will sometimes be easier (ETC)

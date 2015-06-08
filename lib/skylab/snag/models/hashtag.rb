@@ -239,6 +239,10 @@ module Skylab::Snag
       end
       alias_method :initialize, :reinitialize
 
+      def express_under _expag
+        get_string
+      end
+
       def get_string
         @_string[ @_begin, @_length ]
       end

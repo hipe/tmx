@@ -65,7 +65,8 @@ module Skylab::Snag::TestSupport
         ev.entity.intern.should eql :one
         black_and_white( ev ).should eql "removed #one from [#1]"
 
-        @result.should eql 61
+        @result.ID.to_i.should eql 1
+
         fh = ::File.open my_tmpfile_path
         fh.gets.should eql "[#001]       keifer #two\n"
         fh.close  # (um you already know the number of bytes)

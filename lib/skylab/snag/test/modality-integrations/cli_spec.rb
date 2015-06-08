@@ -7,6 +7,7 @@ module Skylab::Snag::TestSupport
     extend TS_
 
     use :expect_my_CLI
+    use :my_tmpdir_
 
     expecting_rx = %r{\Aexpecting <action>\z}i
 
@@ -94,13 +95,13 @@ module Skylab::Snag::TestSupport
       end
     end
 
-    it "numeric option, yaml" do
+    it "open - as report - numeric option, yaml" do
 
       invoke 'open', '-1', '--upstream-identifier', Path_alpha_[]
 
       on_stream :o
       expect '---'
-      expect %r(\Aidentifier[ ]+: \[#005\]\z)
+      _expect_identifier '005'
       expect %r(\Amessage[ ]+: #open \.\z)
 
       expect :e, "(one node total)"
@@ -108,6 +109,65 @@ module Skylab::Snag::TestSupport
       expect_no_more_lines
 
       @exitstatus.should be_zero
+    end
+
+    it 'open - as report - suffix' do
+
+      invoke 'open', '--upstream-identifier',
+        Fixture_tree_[ :for_report_01_small_variety ]
+
+      on_stream :o
+      _expect_separator
+
+      _expect_identifier '004.2'
+      expect %r(\Amessage[ ]+: ##{}open this is #feature-creep but meh\z)
+
+      _expect_separator
+      _expect_identifier '004'
+      expect %r(\Amessage[ ]+: ##{}open here's an open guy with two lines\z)
+
+      expect :e, "(2 nodes total)"
+
+      expect_no_more_lines
+
+      @exitstatus.should be_zero
+    end
+
+    it 'open - as muation' do
+
+      td = my_tmpdir_
+
+      td.prepare
+
+      td.mkdir 'doc'
+
+      td.copy Fixture_file_[ :rochambeaux_mani ], 'doc/issues.md'  # (result is pn)
+
+      invoke 'open', 'wazeezle', '--try-to-reappropriate',
+        '--upstream-identifier', td.to_path
+
+      expect :e, %r(\Aopened a snag node: updated [^ ]+ \(131 bytes\)\z)
+
+      on_stream :o
+      _expect_separator
+      _expect_identifier '002'
+      expect %r(\Amessage +: #open wazeezle \( #was: #done wiz.+\)\z)
+
+      expect_no_more_lines
+
+      @exitstatus.should be_zero
+    end
+
+    define_method :_expect_separator, ( -> do
+      bar = '---'
+      -> do
+        expect bar
+      end
+    end.call )
+
+    def _expect_identifier s
+
+      expect %r(\Aidentifier[ ]+: \[##{ ::Regexp.escape s }\]\z)
     end
   end
 end

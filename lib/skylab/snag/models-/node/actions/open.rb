@@ -49,13 +49,15 @@ module Skylab::Snag
 
         bx = @argument_box
 
-        @node_collection.edit(
+        a = @node_collection.edit(
 
           :using, bx,
           :add, :node,
             :append, :tag, :open,
             :append, :message, bx.fetch( :message ),
           & handle_event_selectively )
+
+        a && a.fetch( 0 )
       end
 
       Try_to_reappropriate = -> node_, sess, & x_p do

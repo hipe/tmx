@@ -43,7 +43,7 @@ module Skylab::Snag
             @filesystem_conduit.open @_path )
 
           ok = true
-          _x = @sessioner.during_locked_write_session do | sess |
+          @sessioner.during_locked_write_session do | sess |
 
             @_sess = sess
             @_match_a.each do | match |

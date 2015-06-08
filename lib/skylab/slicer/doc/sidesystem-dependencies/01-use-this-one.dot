@@ -1,141 +1,161 @@
-# created by tan-man on 2013-02-07 02:15:19 UTC
-
-/* this file was (re) created with:
-
-  ./slicer/script/sidesystem-dependencies | tan-man graph sync --input-path - ./slicer/doc/sidesystem-dependencies/01-use-this-one.dot
-
-*/
-
-
 digraph {
-
-/*
-  example stmt_list:
-    foo -> bar
-    biff -> baz
-
-  example node_stmt:
-    learn_c [label="learn C somehow"]
-*/
-
-
-#                 blue : fillcolor="#b5d5fb"
-#                green : fillcolor="#79f233"
-
-# node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
-
-ba [label=Basic]
-bs [label=BeautySalon]
-b2 [label=Bnf2Treetop]
-br [label=Brazen]
-cs [label=CSS_Convert]
-ca [label=Callback]
-cm [label=CodeMolester]
-cu [label=Cull]
-de [label=Dependency]
-fa [label=Face]
-fm [label=FileMetrics]
-f2 [label=Flex2Treetop]
-gi [label=Git]
-gv [label=GitViz]
-he [label=Headless]
-it [label=InformationTactics]
-mh [label=MetaHell]
-pe [label=Permute]
-po [label=Porcelain]
-sla [label=Slake]
-sli [label=Slicer]
-sn [label=Snag]
-st [label=SubTree]
-tmx [label=TMX]
-tan [label=TanMan]
-ts [label=TestSupport]
-to [label=Tolerance]
-tr [label=Treemap]
-y2 [label=Yacc2Treetop]
-ba -> br
-ba -> he
-ba -> mh
-br -> ba
-br -> he
-br -> sn
-bs -> ba
-bs -> br
-bs -> fa
-bs -> he
-bs -> mh
-bs -> st
-ca -> ba
-ca -> br
-ca -> he
-ca -> it
-ca -> mh
-cm -> ba
-cm -> br
-cm -> fa
-cm -> he
-cm -> mh
-cs -> he
-cs -> tan
-cu -> ba
-cu -> he
-de -> cm
-de -> fa
-de -> he
-de -> mh
-de -> sla
-f2 -> ba
-f2 -> br
-f2 -> he
-f2 -> mh
-fa -> ba
-fa -> he
-fa -> mh
-fm -> ba
-fm -> fa
-fm -> he
-fm -> mh
-gi -> ba
-gi -> fa
-gi -> he
-gi -> mh
-gv -> he
-gv -> st
-he -> ba
-he -> br
-he -> mh
-mh -> ba
-mh -> br
-mh -> he
-mh -> it
-pe -> he
-po -> ba
-po -> he
-sla -> mh
-sli -> fa
-sn -> ba
-sn -> br
-sn -> he
-sn -> mh
-sn -> po
-sn -> st
-st -> ba
-st -> br
-st -> fa
-st -> he
-st -> it
-st -> mh
-st -> po
-st -> ts
-tan -> ba
-tan -> he
-tan -> mh
-tan -> sn
-ts -> ba
-ts -> br
-ts -> fa
-ts -> he
-ts -> it
-ts -> mh
-ts -> sn
+  ba [ label="Basic" ]
+  bs [ label="BeautySalon" ]
+  b2 [ label="Bnf2Treetop" ]
+  br [ label="Brazen" ]
+  ca [ label="Callback" ]
+  cm [ label="CodeMolester" ]
+  cs [ label="CSS_Convert" ]
+  cu [ label="Cull" ]
+  de [ label="Dependency" ]
+  fa [ label="Face" ]
+  fm [ label="FileMetrics" ]
+  f2 [ label="Flex2Treetop" ]
+  gi [ label="Git" ]
+  gv [ label="GitViz" ]
+  he [ label="Headless" ]
+  hu [ label="Human" ]
+  mh [ label="MetaHell" ]
+  pa [ label="Parse" ]
+  pe [ label="Permute" ]
+  po [ label="Porcelain" ]
+  sla [ label="Slake" ]
+  sli [ label="Slicer" ]
+  sn [ label="Snag" ]
+  st [ label="SubTree" ]
+  sy [ label="System" ]
+  tan [ label="TanMan" ]
+  tmx [ label="TMX" ]
+  ts [ label="TestSupport" ]
+  to [ label="Tolerance" ]
+  tr [ label="Treemap" ]
+  y2 [ label="Yacc2Treetop" ]
+  ba -> br
+  ba -> he
+  ba -> hu
+  ba -> mh
+  ba -> pa
+  ba -> sy
+  ba -> ts
+  bs -> ba
+  bs -> fa
+  bs -> he
+  bs -> st
+  bs -> sy
+  br -> ba
+  br -> he
+  br -> hu
+  br -> pa
+  br -> sn
+  br -> sy
+  ca -> ba
+  ca -> br
+  ca -> he
+  ca -> hu
+  ca -> mh
+  ca -> sy
+  ca -> ts
+  cm -> ba
+  cm -> br
+  cm -> fa
+  cm -> he
+  cm -> hu
+  cm -> mh
+  cm -> pa
+  cm -> sy
+  cs -> he
+  cs -> sy
+  cs -> tan
+  cu -> ba
+  cu -> sy
+  de -> cm
+  de -> fa
+  de -> he
+  de -> mh
+  de -> sla
+  de -> sy
+  fa -> br
+  fa -> ba
+  fa -> he
+  fa -> mh
+  fa -> pa
+  fa -> sy
+  fa -> ts
+  fm -> ba
+  fm -> fa
+  fm -> he
+  fm -> hu
+  fm -> pa
+  fm -> sy
+  fm -> ts
+  f2 -> ba
+  f2 -> he
+  f2 -> sy
+  gi -> ba
+  gi -> fa
+  gi -> he
+  gi -> mh
+  gi -> pa
+  gi -> sy
+  gv -> br
+  gv -> he
+  gv -> hu
+  gv -> sy
+  he -> ba
+  he -> cm
+  he -> fa
+  he -> hu
+  he -> mh
+  he -> pa
+  he -> sy
+  hu -> ba
+  hu -> br
+  hu -> pa
+  mh -> ba
+  mh -> br
+  mh -> hu
+  pe -> ba
+  pe -> br
+  po -> ba
+  po -> he
+  po -> hu
+  po -> ts
+  sla -> mh
+  sli -> fa
+  sn -> ba
+  sn -> br
+  sn -> he
+  sn -> hu
+  sn -> mh
+  sn -> pa
+  sn -> po
+  sn -> sy
+  st -> ba
+  st -> br
+  st -> fa
+  st -> hu
+  st -> he
+  st -> sy
+  st -> ts
+  sy -> ba
+  sy -> br
+  sy -> hu
+  sy -> pa
+  tan -> ba
+  tan -> he
+  tan -> pa
+  tan -> sn
+  tan -> sy
+  ts -> ba
+  ts -> br
+  ts -> pe
+  ts -> fa
+  ts -> he
+  ts -> hu
+  ts -> mh
+  ts -> sn
+  ts -> sy
+  tr -> ba
+  tr -> br
+  tr -> sy
 }

@@ -51,15 +51,22 @@ module Skylab::Brazen
       def produce_noun_stem_from_node_path ignore_num
 
         scn = get_lemma_scan ignore_num
+
         s_a = scn.to_a
+
         if s_a.length.nonzero?  # perhaps a top-most verb
+
           s_a.reverse!  # it was built from deepest to shallowest
 
-          if 1 < s_a.length  # #the-flip
+          # (if it's exactly two elements, leave it as is)
+
+          if 2 < s_a.length  # #the-flip
+
             s = s_a[ 0 ]
             s_a[ 0 ] = s_a[ 1 ]
             s_a[ 1 ] = s
           end
+
           s_a * SPACE_
         end
       end
