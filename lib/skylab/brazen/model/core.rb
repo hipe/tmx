@@ -507,15 +507,17 @@ module Skylab::Brazen
 
       y = []
       st = to_qualified_knownness_stream_
+
       begin
-        known = st.gets
-        known or break
-        _x = if known.is_known_is_known
-          known.value_x
+        kn = st.gets
+        kn or break
+        _x = if kn.is_known
+          kn.value_x
         end
-        y.push known.name_symbol, _x
+        y.push kn.name_symbol, _x
         redo
       end while nil
+
       y
     end
 

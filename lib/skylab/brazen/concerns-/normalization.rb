@@ -34,7 +34,7 @@ module Skylab::Brazen
 
         kn = entity_x.knownness_via_property_ prp
 
-        if kn.is_known_is_known && kn.is_known
+        if kn.is_known
           was_known = true
           orig_x = kn.value_x
         else
@@ -44,18 +44,16 @@ module Skylab::Brazen
         kn = normalize_argument[ kn, prp ]
         kn or break
 
-        _is_known = ( kn.is_known_is_known && kn.is_known )
-
         yes = nil
         if was_known
-          if _is_known
+          if kn.is_known
             if orig_x != kn.value_x
               yes = true
             end
           else
             self._STRANGE
           end
-        elsif _is_known
+        elsif kn.is_known
           yes = true
         end
 
@@ -70,9 +68,7 @@ module Skylab::Brazen
       end while nil
 
       if miss_prp_a
-        _ = entity_x.receive_missing_required_properties_array miss_prp_a
-        _
-
+        entity_x.receive_missing_required_properties_array miss_prp_a
       elsif kn
         ACHIEVED_
       else
@@ -94,9 +90,15 @@ module Skylab::Brazen
 
           # 1. if value is unknown and defaulting is available, apply it.
 
-          if ! ( kn.is_known_is_known && kn.is_known ) && model.has_default
+          __is_unknown = if kn.is_known
+            kn.value_x.nil?
+          else
+            true
+          end
 
-            kn = Callback_::Knownness.new_known @apply_default[ model ]
+          if __is_unknown && model.has_default
+
+            kn = Callback_::Known.new_known @apply_default[ model ]
           end
 
           # (it may be that you don't know the value and there is no default)
@@ -109,14 +111,24 @@ module Skylab::Brazen
           end
 
           # 3. if this is a required property and it is unknown, act.
+          #    (skip this if the field failed a normalization above.)
 
-          if kn && ! ( kn.is_known_is_known && kn.is_known ) && model.is_required
+          if kn
+            __is_unknown = if kn.is_known
+              kn.nil?
+            else
+              true
+            end
 
-            kn = @when_missing.call kn, MISSING___ do
-              Brazen_::Property.build_missing_required_properties_event(
-                [ model ] )
+            if __is_unknown && model.is_required
+
+              kn = @when_missing.call kn, MISSING___ do
+                Brazen_::Property.build_missing_required_properties_event(
+                  [ model ] )
+              end
             end
           end
+
           kn
         end
       end

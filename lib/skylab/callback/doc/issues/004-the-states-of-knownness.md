@@ -12,39 +12,18 @@ its brevity and historical significance. however this tuple at first grew
 to have more than three components and then fractured into a family of
 closely related singletons and one class:
 
-(EDIT: writing this document helped us realize this document is wrong)
-
 a "knownness" can be:
 
-  • the "unknown unknown" singleton -OR-
   • the "known unknown" singleton -OR-
-  • a "known known" instance
+  • a "known" instance
+
+the first singleton and instances of the second class all answer the
+question `is_known`. the first always answers the question `false`. the
+second always answers the question `true`, *even when the known value is
+`nil`*.
 
 
-the "unknown unknown" singleton only answer the question:
-
-  • `is_known_is_known` - is true IFF we know *whether* we know the
-                          actual value of the field; else false..
-
-this "unknown unknown" singleton always answers the above question with
-false.
-
-then there is the "known unknown" singleton. it always answers the
-above question with `true`. furthermore it has the field:
-
-  • `is_known` - this field is meaningful IFF the above field is true
-                 (i.e, otherwise it is meaningless). IFF this field is
-                 true, we "know" the actual value of the field (whose
-                 valid values may include `false` and/or `nil`)
-
-the "known unknown" always answers the above question with `false`.
-finally, we have a "known known" instance. such an instance answers the
-above two questions, and has:
-
-  • the `value_x` actual value, when has meaning IFF the above field
-                  is true.
-
-from any of these we can build a "qualified knowness". the qualified
+from any of these we can build a "qualified knownness". the qualified
 knowness answers either some or all of the above questions, and also:
 
   • the `name_symbol` of the field (derived from the any "model" next)
@@ -52,8 +31,15 @@ knowness answers either some or all of the above questions, and also:
   • the `model` of the field (see #intentionally-confusing below).
 
 
-the fact that there are two different boolean fields relating to whether
-we know something or not, this is certainly confusing at first:
+the fun of working with knowing what we don't know was the focus of the
+
+this document was born from a cluster of work whose focus was to toy
+with the idea of modeling formally "knowing what we don't know". in
+fact, we experimentally added one more boolean field to manage trying to
+model an unknown unknown until we realized that didn't make any sense
+(see tombstone at the end of this file).
+
+
 
 
 
@@ -173,24 +159,29 @@ but we are going to classify this as a distraction for now..
 ## arbitrary?
 
 given the above longwinded restaurant analogy, it may seem arbitrary
-that we chose "two" for the number of boolean metafields, since it seems
-like we could have also had just one or more than two.
+that we chose "one" for the number of boolean metafields, since it seems
+like we could have maybe wanted two or three. (this explanation came
+from back when we modeled the "unknown unknown". it may be less punchy
+now.)
 
 well here's the exact reason:
 
-with two such fields *and* a value field, we can "isomorph" a
-subset of a "value collection" against a "formal property collection",
-*and* allow for meaningful `nil`.
+with this number of metafields we can model "isomorphically" and
+losslessly all of the formal propertie of an entity's model as well as
+the actual values of the entity. we can do this just as easily if the
+entity is represented by an object (i.e instance of the model class) or
+in some other collection of values, like a hash, "iambic" array or
+"box".
 
-(#open this theory is not yet proven)
-
-the `is_known_is_known` field indicates whether the association exists
-in the value collection. so for a "full" collection of knonnesses built
+the `is_known` field indicates whether the association exists
+in the value collection. so for a "full" collection of knownness built
 from an entity, the number of knownnesses will correspond to the number
-of formal properties, and the number of those that are known knowns will
-correspond to the number of values assigned to that entity (even those
-that are `nil`).
+of formal properties, and the number of those whose `is_known` is true
+will correspond to the number of elements in the value collection.
 
 now, of those that are `nil`, someone has to decide what `nil` means.
-this `is_known` field is reserved to aid in the interpreation of `nil`,
-although it may prove unnecessary..
+but we see that as a business concern outside of the scope of this
+"knownness" structure.
+
+_
+:+#tombstone: when we used to have one more field, to model unknown unknown

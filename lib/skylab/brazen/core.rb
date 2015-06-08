@@ -256,13 +256,9 @@ module Skylab::Brazen
       end
 
       if had
-        if x.nil?
-          Callback_::Knownness::KNOWN_UNKNOWN
-        else
-          Callback_::Knownness.new_known x
-        end
+        Callback_::Known.new_known x
       else
-        Callback_::Knownness::UNKNOWN_UNKNOWN
+        Callback_::Known::UNKNOWN
       end
     end
 
@@ -320,17 +316,13 @@ module Skylab::Brazen
 
     if instance_variable_defined? ivar
 
-      x = instance_variable_get ivar
-      if x.nil?
-        Callback_::Knownness::KNOWN_UNKNOWN
-      else
-        Callback_::Knownness.new_known x
-      end
+      Callback_::Known.new_known instance_variable_get ivar
     else
-      Callback_::Knownness::UNKNOWN_UNKNOWN
+      Callback_::Known::UNKNOWN
       # raise ::NameError, __say_no_ivar( ivar )
     end
   end
+
   Autoloader_ = Callback_::Autoloader
 
   module Collection_Adapters

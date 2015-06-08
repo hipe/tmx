@@ -300,7 +300,7 @@ module Skylab::Brazen
 
           q = bx[ :verbose ]
 
-          if q && q.is_known_is_known && q.is_known && q.value_x  # #tracking :+[#069] verbose manually
+          if q && q.is_known && q.value_x  # #tracking :+[#069] verbose manually
 
             maybe_send_event :info, :verbose, :using_workspace do
 

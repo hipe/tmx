@@ -258,7 +258,7 @@ module Skylab::System
 
           def result
 
-            Callback_::Knownness.new_known(
+            Callback_::Known.new_known(
               if @is_dry_run
                 Mock_Dir__.new @path
               else

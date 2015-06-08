@@ -60,7 +60,7 @@ module Skylab::TanMan
 
           q = @trio_box[ :use_default ]
 
-          if q && q.is_known_is_known && q.is_known && q.value_x
+          if q && q.is_known && q.is_known && q.value_x
 
             via_default
           else

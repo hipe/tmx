@@ -453,8 +453,10 @@ module Skylab::Brazen
           prp._during_apply do | prp_ |
 
             define_method prp_.name_symbol do
+
               kn = self.knownness_via_property_ prp_
-              if kn.is_known_is_known && kn.is_known
+
+              if kn.is_known
                 kn.value_x
               end
             end
@@ -478,7 +480,8 @@ module Skylab::Brazen
           prp.__set_internal_read_proc do | entity, prp_ |
 
             kn = entity.knownness_via_property_ prp
-            if kn.is_known_is_known && kn.is_known
+
+            if kn.is_known
               known.value_x
             end
           end
@@ -536,7 +539,13 @@ module Skylab::Brazen
 
             kn = entity.knownness_via_property_ prp
 
-            if ! ( kn.is_known_is_known && kn.is_known )
+            __is_unknown = if kn.is_known
+              kn.value_x.nil?
+            else
+              true
+            end
+
+            if __is_unknown
               ( miss_a ||= [] ).push prp
             end
           end

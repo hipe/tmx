@@ -218,7 +218,7 @@ module Skylab::Snag
 
         _x = @polymorphic_upstream_.gets_one
 
-        _kn = Callback_::Knownness.new_known _x
+        _kn = Callback_::Known.new_known _x
 
         _prp = @bound.formal_properties.fetch :number_limit
 

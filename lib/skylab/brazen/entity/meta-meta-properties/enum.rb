@@ -10,7 +10,7 @@ module Skylab::Brazen
 
         enum_bx = qkn.model.enum_box
 
-        if qkn.is_known_is_known && qkn.is_known
+        if qkn.is_known
 
           if enum_bx.has_name qkn.value_x
             qkn

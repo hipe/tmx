@@ -119,20 +119,18 @@ module Skylab::Brazen::TestSupport
   # ~ to be an entity (model or action) you have to:
 
     def knownness_via_property_ prp  # :+#cp
+
       if bx
         had = true
         x = bx.fetch prp.name_symbol do
           had = false
         end
       end
+
       if had
-        if x.nil?
-          Callback_::Knownness::KNOWN_UNKNOWN
-        else
-          Callback_::Knownness.new_known x
-        end
+        Callback_::Known.new_known x
       else
-        Callback_::Knownness::UNKNOWN_UNKNOWN
+        Callback_::Known::UNKNOWN
       end
     end
 

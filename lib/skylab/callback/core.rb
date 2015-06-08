@@ -617,24 +617,9 @@ module Skylab::Callback
     end
   end
 
-  class Knownness  # see [#004]
+  class Known  # see [#004]
 
-    module UNKNOWN_UNKNOWN ; class << self
-
-      def is_known_is_known
-        false
-      end
-
-      def to_qualified_known_around prp
-        Qualified_Knownness.via_model prp
-      end
-    end ; end
-
-    module KNOWN_UNKNOWN ; class << self
-
-      def is_known_is_known
-        true
-      end
+    module UNKNOWN ; class << self
 
       def is_known
         false
@@ -659,10 +644,6 @@ module Skylab::Callback
         self.class.new_known x
       end
 
-      def is_known_is_known
-        true
-      end
-
       def is_known
         true
       end
@@ -680,19 +661,23 @@ module Skylab::Callback
     class << self
 
       def via_model prp
-        new false, true, prp
+        new false, prp
       end
 
       def via_value_and_had_and_model x, b, prp
-        new x, b, true, prp
+        if b
+          new x, true, prp
+        else
+          new false, prp
+        end
       end
 
       def via_value_and_model x, prp
-        new x, true, true, prp
+        new x, true, prp
       end
 
       def via_value_and_variegated_symbol x, sym
-        new x, true, true,
+        new x, true,
           Callback_.lib_.basic::Minimal_Property.via_variegated_symbol( sym )
       end
 
@@ -702,9 +687,8 @@ module Skylab::Callback
       private :new
     end  # >>
 
-    def initialize vx=nil, ik, ikik, prp
+    def initialize vx=nil, ik, prp
       @is_known = ik
-      @is_known_is_known = ikik
       @model = prp
       if ik
         @__value_x = vx
@@ -717,10 +701,10 @@ module Skylab::Callback
     end
 
     def new_with_value x
-      self.class._new x, @is_known, @is_known_is_known, @model
+      self.class._new x, @is_known, @model
     end
 
-    attr_reader :is_known, :is_known_is_known, :model
+    attr_reader :is_known, :model
 
     def value_x
       if @is_known

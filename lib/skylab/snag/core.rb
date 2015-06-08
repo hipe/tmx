@@ -72,7 +72,7 @@ module Skylab::Snag
 
     -> arg_st, & x_p do
 
-      _trio = Callback_::Knownness.new_known arg_st.gets_one
+      _trio = Callback_::Known.new_known arg_st.gets_one
 
       n11n.normalize_argument _trio do | * i_a, & ev_p |
 
