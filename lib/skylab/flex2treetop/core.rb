@@ -277,7 +277,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
         def __resolve_upstream
 
-          path_arg = trio :flexfile
+          path_arg = qualified_knownness :flexfile
           path = path_arg.value_x
 
           if DASH_ == path
@@ -310,7 +310,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
         def __resolve_normal_downstream
 
-          path_arg = trio :output_path
+          path_arg = qualified_knownness :output_path
           path = path_arg.value_x
 
           if DASH_ == path
@@ -321,7 +321,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
             :path_arg, path_arg,
             :outstream, @resources.sout,
-            :force_arg, trio( :force )
+            :force_arg, qualified_knownness( :force )
 
           ) do | * i_a, & ev_p |
 
@@ -439,11 +439,11 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
       super( & nil )
     end
 
-    def build_missing_required_properties_event miss_a  # #hook-in->[cb]
+    def build_missing_required_properties_event miss_prp_a  # #hook-in->[cb]
 
       Brazen_::Property.
         build_missing_required_properties_event(
-          miss_a, 'iambic parameter', "'#{ __moniker_for_errmsg }' is" )
+          miss_prp_a, 'iambic parameter', "'#{ __moniker_for_errmsg }' is" )
     end
 
     def __moniker_for_errmsg

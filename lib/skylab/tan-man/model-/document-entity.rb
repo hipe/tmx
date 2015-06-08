@@ -382,7 +382,7 @@ module Skylab::TanMan
 
           __each_relevant_trio do | trio |
 
-            trio.property.direction_symbols.each do | sym |
+            trio.model.direction_symbols.each do | sym |
 
               a = bucket_h[ sym ]
               a or next
@@ -408,13 +408,13 @@ module Skylab::TanMan
                 next
               end
 
-              yield Callback_::Trio.via_value_and_property( x, prp )
+              yield Callback_::Qualified_Knownness.via_value_and_model( x, prp )
             end
           else
 
             @trio_box.each_value do | trio |
 
-              if ! trio.property.respond_to? :expresses_direction
+              if ! trio.model.respond_to? :expresses_direction
                 next
               end
 
@@ -436,7 +436,7 @@ module Skylab::TanMan
           others = nil
 
           sort_me.each do | arg |
-            prp = arg.property
+            prp = arg.model
             if 1 == prp.direction_symbols.length
               ( specifics ||= [] ).push arg
             elsif prp.is_essential_to_direction
@@ -504,7 +504,7 @@ module Skylab::TanMan
               _xtra = " (provide #{ or_ _s_a })"
             else
               _s_a = arg_a.map do |arg|
-                par arg.property
+                par arg.model
               end
               _xtra = " (#{ _s_a * ', ' })"
             end
@@ -565,7 +565,7 @@ module Skylab::TanMan
 
           id = Brazen_::Collection.const_get(
 
-            @parent.const_via_direction_ @arg.property.direction_specific_symbol
+            @parent.const_via_direction_ @arg.model.direction_specific_symbol
 
           ).via_trios(
             @arglist, & @parent.oes_p_ )

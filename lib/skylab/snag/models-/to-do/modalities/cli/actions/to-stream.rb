@@ -16,6 +16,8 @@ module Skylab::Snag
 
         def initialize unbound, boundish
 
+          super nil, nil
+
           @be_verbose = false
           @bound = unbound.new boundish do | * i_a, & ev_p |
 

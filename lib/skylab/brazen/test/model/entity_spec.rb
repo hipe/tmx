@@ -50,7 +50,7 @@ module Skylab::Brazen::TestSupport::Mo_Ent
       it "(with defaulting)" do
         ok = nil
         ent = _subject_class.new do
-          ok = procez
+          ok = process_and_normalize_for_test_
         end
         ok.should eql true
         ent.bx.fetch( :foo ).should eql :yay
@@ -59,7 +59,7 @@ module Skylab::Brazen::TestSupport::Mo_Ent
       it "(without defaulting)", f:true do
         ok = nil
         ent = _subject_class.new do
-          ok = procez :foo, :bar
+          ok = process_and_normalize_for_test_ :foo, :bar
         end
         ent.bx.fetch( :foo ).should eql :bar
       end
@@ -94,7 +94,7 @@ module Skylab::Brazen::TestSupport::Mo_Ent
 
         ok = nil
         ent = _subject_class.new do
-          ok = procez :zoip, -2
+          ok = process_and_normalize_for_test_ :zoip, -2
         end
         ent.bx.fetch( :zoip ).should eql( -2 )
         ok.should eql true
@@ -111,7 +111,7 @@ module Skylab::Brazen::TestSupport::Mo_Ent
 
         _subject_class.new do
           @on_event_selectively = p
-          ok = procez :zoip, -3
+          ok = process_and_normalize_for_test_ :zoip, -3
         end
         ok.should eql false
         _i_a.should eql [ :error, :invalid_property_value ]
@@ -143,7 +143,7 @@ module Skylab::Brazen::TestSupport::Mo_Ent
       it "when all requireds are provided" do
         ok = nil
         ent = _subject_class.new do
-          ok = procez :foo, :a, :bar, :b, :baz, :c
+          ok = process_and_normalize_for_test_ :foo, :a, :bar, :b, :baz, :c
         end
         ok.should eql true
         ent.bx.at( :foo, :bar, :baz ).should eql [ :a, :b, :c ]
@@ -153,7 +153,7 @@ module Skylab::Brazen::TestSupport::Mo_Ent
 
         begin
           _subject_class.new do
-            procez :bif, :x, :baz, :y
+            process_and_normalize_for_test_ :bif, :x, :baz, :y
           end
         rescue ::ArgumentError => e
         end

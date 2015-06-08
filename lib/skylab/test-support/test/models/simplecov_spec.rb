@@ -23,11 +23,29 @@ module Skylab::TestSupport::TestSupport::Models
 
       tmpdir.prepare
 
+      command_a = [
+        _exe, 'cover', 'for-simplec', '--', _exe_
+      ]
+      command_h = {
+        chdir: tmpdir.path }
+
       _i, o, e, w = TestSupport_::Library_::Open3.popen3(
+        * command_a, command_h )
 
-        _exe, 'cover', 'for-simplec', '--', _exe_, chdir: tmpdir.path )
+      s = o.gets
 
-      o.gets.should match %r(\ACoverage report generated for for-simplecov\.rb)
+      if s
+        __expect_success s, o, e, w
+      else
+        __explain_failure e, w, command_a, command_h
+      end
+
+      tmpdir.UNLINK_FILES_RECURSIVELY_
+    end
+
+    def __expect_success s, o, e, w
+
+      s.should match %r(\ACoverage report generated for for-simplecov\.rb)
 
       o.gets.should be_nil
 
@@ -42,9 +60,26 @@ module Skylab::TestSupport::TestSupport::Models
       e.gets.should be_nil
 
       w.value.exitstatus.should be_zero
+    end
 
-      tmpdir.UNLINK_FILES_RECURSIVELY_
+    def __explain_failure e, w, command_a, command_w
 
+      io = debug_IO
+
+      io.puts "from command #{ command_a.inspect } #{ command_w.inspect }"
+
+      d = w.value.exitstatus
+      d.should eql 0
+      io.puts "\n\n<< here is hopefully the stacktrace to the above issue:"
+      begin
+        s = e.gets
+        s or break
+        s.chomp!
+        io.puts "(#{ s } )"
+        redo
+      end while nil
+      io.puts ">>\n\n\n"
+      nil
     end
   end
 end

@@ -212,11 +212,6 @@ of concerns.) whew!
 
 
 
-## (would be: the meta-properties narrative :[#045])
-
-
-
-
 ## :#stowaway-1 ( in [br] "core.rb" )
 
 although this method is expected only to be needed by nodes that

@@ -225,15 +225,19 @@ module Skylab::Brazen
 
           h = __hash_via_flushing_probably_polymorphic_stream st
 
-          miss_sym_a = nil
+          miss_prp_a = nil
 
           @signature_classifications.business_parameters.each do | orr, name_sym |
 
             x = h.delete name_sym
 
             if :req == orr && x.nil?
-              miss_sym_a ||= []
-              miss_sym_a.push name_sym
+
+              _prp = Brazen_.lib_.basic::Minimal_Property.
+                via_variegated_symbol name_sym
+
+              miss_prp_a ||= []
+              miss_prp_a.push _prp
             else
               arglist.push x
             end
@@ -247,9 +251,9 @@ module Skylab::Brazen
 
             __bc_when_extra extra_sym_a
 
-          elsif miss_sym_a
+          elsif miss_prp_a
 
-            __bc_when_miss miss_sym_a
+            __bc_when_miss miss_prp_a
           else
 
             __bc_via_arglist arglist
@@ -282,19 +286,19 @@ module Skylab::Brazen
             build_extra_values_event extra_sym_a, nil, 'argument', 'unexpected'
         end
 
-        def __bc_when_miss miss_sym_a
+        def __bc_when_miss miss_prp_a
 
           _x = _maybe_send_event :error do
-            __build_missing_arguments_event miss_sym_a
+            __build_missing_arguments_event miss_prp_a
           end
 
           Callback_::Bound_Call.via_value _x
         end
 
-        def __build_missing_arguments_event miss_sym_a
+        def __build_missing_arguments_event miss_prp_a
 
           _sign_event Brazen_::Property.
-            build_missing_required_properties_event miss_sym_a, 'argument'
+            build_missing_required_properties_event miss_prp_a, 'argument'
         end
 
         def __bc_via_arglist arglist

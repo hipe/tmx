@@ -59,7 +59,9 @@ module Skylab::GitViz
 
             fp.remove :system_conduit
 
-            sys_cond = @parent.env_[ :__system_conduit__ ]  # let hacks in
+            sys_cond = @parent.top_invocation_environment_x[ :__system_conduit__ ]
+              # (let hacks in - the way this is written is nasty #todo)
+
             sys_cond ||= GitViz_.lib_.open3
 
             bp.replace_by :system_conduit do | prp |
@@ -97,11 +99,14 @@ module Skylab::GitViz
 
             sym = x_a.fetch 0
 
-            _arg = Callback_::Trio.via_value_and_variegated_symbol(
+            _arg = Callback_::Qualified_Knownness.via_value_and_variegated_symbol(
               x_a.fetch( 1 ), sym )
 
-            arg = @front_properties.fetch( sym ).
-              norm_p_a.first.call _arg do | * i_a, & ev_p |
+            bx = @front_properties.fetch( sym ).ad_hoc_normalizer_box
+
+            _p = bx.h_.fetch( bx.a_.first )
+
+            arg = _p.call _arg do | * i_a, & ev_p |
 
               receive_event_on_channel ev_p[], i_a
             end

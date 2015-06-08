@@ -125,7 +125,7 @@ module Skylab::SubTree
             ) do | y, o |
 
               _s_a = o.a.map do | trio |
-                par trio.property
+                par trio.model
               end
 
               y << "can't read input from #{ both _s_a }#{ and_ _s_a } at the same time"
@@ -146,7 +146,7 @@ module Skylab::SubTree
             x or next
             prp = @formal_properties[ k ]
             prp.is_extension or next
-            ok = __load_extension Callback_::Trio.via_value_and_property( x, prp )
+            ok = __load_extension Callback_::Qualified_Knownness.via_value_and_model( x, prp )
             ok or break
           end
 

@@ -26,7 +26,7 @@ module Skylab::System
 
             def path=
               @do_execute = true
-              @path_arg = Callback_::Trio.via_value_and_variegated_symbol(
+              @path_arg = Callback_::Qualified_Knownness.via_value_and_variegated_symbol(
                 gets_one_polymorphic_value, :path )
               KEEP_PARSING_
             end
@@ -85,7 +85,7 @@ module Skylab::System
 
           public def execute
 
-            @path = if @path_arg
+            @path = if @path_arg && @path_arg.is_known
               @path_arg.value_x
             end
             if @path
@@ -107,7 +107,7 @@ module Skylab::System
           def bld_missing_path_event
 
             build_not_OK_event_with :missing_required_properties,
-                :path_property, @path_arg.property do |y, o|
+                :path_property, @path_arg.model do |y, o|
               y << "expecting #{ par o.path_property }"
             end
           end
@@ -213,7 +213,7 @@ module Skylab::System
           def when_stat_for_file
 
             if @force_arg
-              if @force_arg.value_x
+              if @force_arg.is_known && @force_arg.value_x
                 when_stat_is_file_OK_to_overwrite
               else
                 via_force_arg_not_OK_to_overwrite
@@ -235,9 +235,9 @@ module Skylab::System
             build_not_OK_event_with :missing_required_permission,
                 :force_arg, @force_arg, :path_arg, @path_arg do |y, o|
 
-              y << "#{ par o.path_arg.property } #{
+              y << "#{ par o.path_arg.model } #{
                }exists, won't overwrite without #{
-                }#{ par o.force_arg.property }: #{
+                }#{ par o.force_arg.model }: #{
                  }#{ pth o.path_arg.value_x }"
             end
           end

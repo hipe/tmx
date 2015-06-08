@@ -4,6 +4,8 @@ module Skylab::Basic
 
     # (this was written way after "formal box" as a lightweight segway to it)
 
+    # ([#ca-061] will likely deprecate this)
+
     def self.from_a_and_h a, h
       allocate.instance_exec do
         @a = a ; @h = h ; self

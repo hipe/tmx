@@ -56,18 +56,29 @@ module Skylab::Brazen::TestSupport::Pstack_Cframe
             :readable, :field, :bar
         end
       end
+
       it "failing to provide a required field triggers an argument error" do
-        -> do
+
+        _rx = ::Regexp.new "\\Amissing\\ required\\ field\\ \\-\\ 'foo'\\z"
+        begin
           Bar.new
-        end.should raise_error( ArgumentError,
-                     ::Regexp.new( "\\Amissing\\ required\\ field\\ \\-\\ 'foo'\\z" ) )
+        rescue ::ArgumentError => e
+        end
+        e.message.should match _rx
       end
+
       it "passing nil is considered the same as not passing an argument" do
-        -> do
-          Bar.new( :foo, nil )
-        end.should raise_error( ArgumentError,
-                     ::Regexp.new( "\\Amissing\\ required\\ field\\ \\-\\ 'foo'\\z" ) )
+
+        _rx = ::Regexp.new "\\Amissing\\ required\\ field\\ \\-\\ 'foo'\\z"
+
+        begin
+          Bar.new :foo, nil
+        rescue ::ArgumentError => e
+        end
+
+        e.message.should match _rx
       end
+
       it "passing false is not the same as passing nil, passing false is valid." do
         Bar.new( :foo, false ).foo.should eql false
       end

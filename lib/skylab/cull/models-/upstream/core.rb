@@ -16,9 +16,9 @@ module Skylab::Cull
       def mutable_trio_box bx
 
         @bx.add :upstream, bx[ :upstream ].value_x
-        x = bx[ :upstream_adapter ]
-        if x
-          @bx.add :upstream_adapter, x.value_x
+        kn = bx[ :upstream_adapter ]
+        if kn
+          @bx.add :upstream_adapter, ( kn.value_x if kn.is_known )
         end
 
         nil

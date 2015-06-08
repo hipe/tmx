@@ -617,72 +617,129 @@ module Skylab::Callback
     end
   end
 
-  class Trio  # :[#004].
+  class Knownness  # see [#004]
+
+    module UNKNOWN_UNKNOWN ; class << self
+
+      def is_known_is_known
+        false
+      end
+
+      def to_qualified_known_around prp
+        Qualified_Knownness.via_model prp
+      end
+    end ; end
+
+    module KNOWN_UNKNOWN ; class << self
+
+      def is_known_is_known
+        true
+      end
+
+      def is_known
+        false
+      end
+
+      def to_qualified_known_around prp
+        Qualified_Knownness.via_model prp
+      end
+    end ; end
+
+    class << self
+      alias_method :new_known, :new
+      private :new
+    end  # >>
+
+    # ->
+      def initialize x
+        @value_x = x
+      end
+
+      def new_with_value x
+        self.class.new_known x
+      end
+
+      def is_known_is_known
+        true
+      end
+
+      def is_known
+        true
+      end
+
+      attr_reader :value_x
+
+      def to_qualified_known_around prp
+        Qualified_Knownness.via_value_and_model @value_x, prp
+      end
+      # <-
+  end
+
+  class Qualified_Knownness  # :[#004]. (near [#br-088]. intro at [#ba-027])
 
     class << self
 
-      def via_arglist args
-        new( * args )
+      def via_model prp
+        new false, true, prp
       end
 
-      def via_value x
-        new x, true, nil
+      def via_value_and_had_and_model x, b, prp
+        new x, b, true, prp
       end
 
-      alias_method :via_value_and_had_and_property, :new
-
-      def via_value_and_property x, prp
-        new x, true, prp
+      def via_value_and_model x, prp
+        new x, true, true, prp
       end
 
       def via_value_and_variegated_symbol x, sym
-        new x, true,
+        new x, true, true,
           Callback_.lib_.basic::Minimal_Property.via_variegated_symbol( sym )
       end
 
       alias_method :via_x_and_i, :via_value_and_variegated_symbol
 
+      alias_method :_new, :new
       private :new
     end  # >>
 
-    def initialize x, b, prp
-      @is_known_known = b
-      @property = prp
-      @value_x = x
+    def initialize vx=nil, ik, ikik, prp
+      @is_known = ik
+      @is_known_is_known = ikik
+      @model = prp
+      if ik
+        @__value_x = vx
+      end
       freeze
     end
 
-    def members
-      [ :property, :is_known_known, :name, :name_symbol, :value_x ]
-    end
-
-    attr_reader :property
-
-    attr_accessor :is_known_known, :value_x
-
-    def name_symbol
-      @property.name_symbol
-    end
-
-    def name
-      @property.name
-    end
-
     def to_unknown
-      otr = dup
-      otr.value_x = nil
-      otr.is_known_known = false
-      otr.freeze
+      self.class._new false, true, @model
     end
 
     def new_with_value x
-      otr = dup
-      otr.value_x = x
-      otr.freeze
+      self.class._new x, @is_known, @is_known_is_known, @model
+    end
+
+    attr_reader :is_known, :is_known_is_known, :model
+
+    def value_x
+      if @is_known
+        @__value_x
+      else
+        raise "unknown: '#{ @model.name_function.as_variegated_symbol }'"
+      end
+    end
+
+    def name_symbol
+      @model.name_function.as_variegated_symbol
+    end
+
+    def name
+      @model.name
     end
 
     def description  # look good for [#010]
-      "«trio#{ ":#{ @property.name.as_slug }" if @property }»"  # :+#guillemets
+      "«qualified-known#{ ":#{ @model.name.as_slug }" if @model}»"  # :+#guillemets
     end
   end
 

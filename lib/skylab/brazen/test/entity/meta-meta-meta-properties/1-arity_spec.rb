@@ -1,23 +1,15 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Headless::TestSupport::Arity
+module Skylab::Brazen::TestSupport::Entity
 
-  ::Skylab::Headless::TestSupport[ self ]
+  module MMMP
 
-  include Constants
+  TS_.describe "[br] entity - meta-meta-meta-properties - arity" do
 
-  extend TestSupport_::Quickie
-
-  Headless_ = Headless_
-
-  Sandboxer = TestSupport_::Sandbox::Spawner.new
-
-  describe "[hl] a Skylab::Headless::Arity" do
-
-    context "Space when sent" do
+    context "an arity space when sent .." do
 
       before :all do
-        S = Headless_::Arity::Space.create do
+        S = Brazen_::Entity::Meta_Meta_Meta_Properties::Arity::Space.create do
           self::ZERO_OR_ONE = new 0, 1
           self::ONE_OR_MORE = new 1, nil
         end
@@ -56,8 +48,8 @@ module Skylab::Headless::TestSupport::Arity
           S.fetch :zero_or_one
         end
 
-        it "local_normal_name - ok" do
-          arity.local_normal_name.should eql( :zero_or_one )
+        it "name_symbol - ok" do
+          arity.name_symbol.should eql( :zero_or_one )
         end
 
         it "includes_zero - yes" do
@@ -87,8 +79,8 @@ module Skylab::Headless::TestSupport::Arity
           S.fetch :one_or_more
         end
 
-        it "local_normal_name - ok" do
-          arity.local_normal_name.should eql( :one_or_more )
+        it "name_symbol - ok" do
+          arity.name_symbol.should eql( :one_or_more )
         end
 
         it "includes_zero - no" do
@@ -112,5 +104,6 @@ module Skylab::Headless::TestSupport::Arity
         end
       end
     end
+  end
   end
 end

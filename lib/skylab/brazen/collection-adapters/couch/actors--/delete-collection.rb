@@ -40,7 +40,7 @@ module Skylab::Brazen
       end
 
       def bld_missing_force_event
-        build_not_OK_event_with :missing_force, :prop, @force_arg.property do |y, o|
+        build_not_OK_event_with :missing_force, :prop, @force_arg.model do |y, o|
           y << "missing required #{ par o.prop }"
         end
       end

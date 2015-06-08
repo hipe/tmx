@@ -32,7 +32,7 @@ module Skylab::Basic
         # ~ for a particular act of normalization:
 
         def x=
-          set_arg Callback_::Trio.via_value_and_property(
+          set_arg Callback_::Qualified_Knownness.via_value_and_model(
             gets_one_polymorphic_value, Basic_.default_property )
         end
 
@@ -153,7 +153,7 @@ module Skylab::Basic
           adj_p_s_a.push range.phrase_under self
         end
 
-        y << "#{ par o.bp.property } must be #{ or_ adj_p_s_a }. #{
+        y << "#{ par o.bp.model } must be #{ or_ adj_p_s_a }. #{
           }had #{ ick o.bp.value_x }"
 
       end

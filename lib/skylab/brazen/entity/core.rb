@@ -655,7 +655,7 @@ module Skylab::Brazen
 
         cls = property_class
         if cls.const_defined? METAPROPERTIES_WITH_HOOKS_
-          @_prop_normalizer = Concerns_::Meta_Property::Normalizer.new self
+          @_prop_normalizer = Concerns_::Meta_Property::Property_Normalizer.new self
         else
           @_prop_normalizer = false
         end
@@ -1034,30 +1034,79 @@ module Skylab::Brazen
 
       # ~ name & related
 
-      def property_reader_method_name
-        @name.as_variegated_symbol
-      end
-
       def conventional_polymorphic_writer_method_name
         :"#{ @name.as_variegated_symbol }="
       end
 
       attr_reader :custom_polymorphic_writer_method_name
 
+      def ivar  # override parent
+        @name.as_ivar
+      end
+
+      def name_function
+        @name
+      end
+
       def set_polymorphic_writer_method_name x
         @custom_polymorphic_writer_method_name = x
         NIL_
       end
 
-      def ivar  # override parent
-        @name.as_ivar
-      end
-
-      attr_reader :property_setter_method_name
-
       attr_accessor :_shibboleth
 
-      # ~ default (a meta-meta property)
+      # ~~ normalization API
+
+      define_method :knownness_via_property_, KNOWNNESS_VIA_IVAR_METHOD_
+
+      def normalize_argument kn, & x_p  # :+[#ba-027] assume some normalizer (for now)
+
+        Brazen_::Concerns_::Normalization::Against_model[ kn, self, & x_p ]
+      end
+
+      def is_normalizable_
+
+        if has_default
+          PROCEDE_
+        elsif ad_hoc_normalizer_box
+          PROCEDE_
+        elsif __parameter_arity_object.begin.nonzero?
+          PROCEDE_
+        end
+      end
+
+      attr_reader :ad_hoc_normalizer_box
+
+      def prepend_ad_hoc_normalizer_ & arg_and_oes_and_block_p
+
+        bx = _touch_AHN_box
+        _d = bx.length
+        bx.add_to_front _d, arg_and_oes_and_block_p
+        NIL_
+      end
+
+      def append_ad_hoc_normalizer_ & arg_and_oes_and_block_p
+
+        bx = _touch_AHN_box
+        _d = bx.length
+        bx.add _d, arg_and_oes_and_block_p
+        NIL_
+      end
+
+      def _touch_AHN_box
+
+        @ad_hoc_normalizer_box ||= Callback_::Box.new
+      end
+
+      public def set_value_of_formal_property_ x, prp
+
+        # this is actually for setting a *meta*property value on the property!
+
+        instance_variable_set prp.ivar, x
+        KEEP_PARSING_
+      end
+
+      ## ~~ default (a meta-meta property & part of the normalization API)
 
       attr_reader :has_default
 
@@ -1069,6 +1118,15 @@ module Skylab::Brazen
         prp = dup
         prp._set_default_proc( & default_x_p )
         prp.freeze  # not for sure
+      end
+
+      def default_value_via_entity_ entity_x
+
+        if @default_proc.arity.zero?
+          @default_proc[]
+        else
+          @default_proc[ entity_x ]
+        end
       end
 
       def default=
@@ -1098,20 +1156,23 @@ module Skylab::Brazen
         KEEP_PARSING_
       end
 
-      # ~~ enum (a meta-meta-property)
+      ## ~~ enum (a meta-meta-property & indirectly part of the normalization API)
 
       attr_reader :enum_box
 
       def enum=
 
-        _sym_ary = gets_one_polymorphic_value
         bx = Callback_::Box.new
-        _sym_ary.each do | sym |
-          bx.add sym, nil
+        _x_a = gets_one_polymorphic_value
+
+        _x_a.each do | x |
+          bx.add x, nil
         end
+
         @enum_box = bx.freeze
-        _touch_norm_box.touch :__enum__ do
-          Entity_::Meta_Meta_Properties::Enum::Entity_against_meta_entity
+
+        _touch_AHN_box.touch :__enum__ do
+          Entity_::Meta_Meta_Properties::Enum::Normalize_via_qualified_known
         end
 
         KEEP_PARSING_
@@ -1128,13 +1189,32 @@ module Skylab::Brazen
         KEEP_PARSING_
       end
 
-      # ~~ support
+      ## ~~ parameter arity (a meta-meta property & part of the n11n API)
 
-      attr_reader :norm_box_
-
-      def _touch_norm_box
-        @norm_box_ ||= Callback_::Box.new
+      def __parameter_arity_object
+        __parameter_arity_space.fetch @parameter_arity
       end
+
+      define_method :__parameter_arity_space, ( -> do
+
+        # (for better regressions we load this late)
+
+        build_the_space = -> do
+
+          Parameter_Arity_Space___ =
+              Entity_::Meta_Meta_Meta_Properties::Arity::Space.create do
+
+            self::ZERO_OR_ONE = new 0, 1
+            self::ONE = new 1, 1
+          end
+        end
+
+        x = nil
+
+        -> do
+          x ||= build_the_space[]
+        end
+      end.call )
 
       # ~~ syntactic finishing of the parse
 
@@ -1152,7 +1232,6 @@ module Skylab::Brazen
 
         sym = gets_one_polymorphic_value
         @name = Callback_::Name.via_variegated_symbol sym
-        @property_setter_method_name = :"set_#{ sym }"
 
         STOP_PARSING_
       end

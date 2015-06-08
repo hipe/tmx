@@ -79,9 +79,6 @@ module Skylab::Brazen
         @do_prepend ? :prepend : :append
       end
 
-      # (try to add when alreayd exists:)
-      # :+[#044] inline events exper. ( was )
-
       Entity_Not_Found = Callback_::Event.prototype_with(
 
         :entity_not_found,

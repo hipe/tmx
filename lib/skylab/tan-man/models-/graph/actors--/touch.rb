@@ -17,8 +17,10 @@ module Skylab::TanMan
       end
 
       def __init_downstream_identifier
-        @arg = @entity.trio :digraph_path
+
+        @arg = @entity.qualified_knownness :digraph_path
         x = @arg.value_x
+
         if x.respond_to? :write
           @down_ID = Brazen_.byte_downstream_identifier.via_stream x
         else
@@ -53,12 +55,16 @@ module Skylab::TanMan
         end
 
         def __path_is_absolute
+
           ok_arg = TanMan_.lib_.basic::Pathname.
             normalization.new_with( :absolute ).normalize_argument(
               @arg, & @on_event_selectively )
-          ok_arg and begin
+
+          if ok_arg
             @arg = ok_arg
             ACHIEVED_
+          else
+            ok_arg
           end
         end
 

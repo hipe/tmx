@@ -8,9 +8,13 @@ module Skylab::TestSupport::TestSupport::DocTest
     use :expect_event
 
     it "no path" do
-      -> do
+
+      begin
         call_API :intermediates
-      end.should raise_error ::ArgumentError, "missing required property 'path'"
+      rescue ::ArgumentError => e
+      end
+
+      e.message.should eql "missing required property 'path'"
     end
 
     it "path must be absolute" do

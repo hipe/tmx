@@ -143,13 +143,13 @@ module Skylab::Brazen
 
         include Semi_Generated_Instance_Methods__
 
-        def init_formal_properties_ x
+        def init_formal_properties_ fp_bx
 
           # the first time during the lifetime of this action that our formals
           # are accessed, add in *all* model class formal next to our "adverb"
           # formals (continued at #note-135..)
 
-          super x  # any preconditions will add their properties here. maybe [#018] order sensitive
+          super fp_bx  # any preconditions will add their properties here. maybe [#018] order sensitive
 
           st = _model_class.properties.to_value_stream
           prp = st.gets

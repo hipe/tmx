@@ -121,7 +121,7 @@ module Skylab::Snag::TestSupport
 
         node = Snag_::Models_::Node.edit_entity(
 
-          # ( obliquely (and unintentionally) covers [#023]:#note-89 )
+          # ( obliquely (and unintentionally) covers [#br-089]:#note-89 )
 
           :via, :object, :set, :identifier, @_fake_ID_x,
           :append, :string, @_message )

@@ -12,8 +12,10 @@ module Skylab::Porcelain::Legacy
     sidesys = Autoloader_.build_require_sidesystem_proc
 
     Arity = -> do
-      HL__[]::Arity
+      Br___[]::Entity::Meta_Meta_Meta_Properties::Arity
     end
+
+    Br___ = sidesys[ :Brazen ]
 
     Face__ = sidesys[ :Face ]
 
@@ -1313,7 +1315,7 @@ module Skylab::Porcelain::Legacy
       nil
     end
 
-    # the "argument arity" standard - [#fa-024]
+    # the "argument arity" standard - [#br-090]
 
     def is_required
       ! @arity.includes_zero

@@ -129,7 +129,7 @@ range for a number of exponents for an instance to have?".
 
 when dealing with expressing the sensical range for a certain count in
 general, we call that `arity` -- a concept that is introduced an explored
-in [#fa-024]. to avoid a confusion that will become evident below, we will
+in [#br-090]. to avoid a confusion that will become evident below, we will
 always call this the `categorization exponent arity` because it represents
 the sensical range for the count of exponents in a `categorization`.
 
@@ -179,7 +179,7 @@ categorization, that it may be either `unary` or `N-ary`, with `unary` being
 the default but `N-ary` begin possible. however, there is a chance that if
 a) we find that in The Literature [#015] "category" almost always
 means `unary`, and / or if we decide to merge our nascent "field theory"
-[#fa-013] into this, we may decide that `category` is a subset of `field` --
+[#br-045] into this, we may decide that `category` is a subset of `field` --
 that subset of `field` with an `categorization exponent arity` of 1. but for
 now, in our head at least, we are painting it as that `field` is a concrete
 implementation of the `category` theory we are building here. :[#020])
@@ -454,7 +454,7 @@ noun have multiple genders? etc.)
 
 we can now also model `categorization exponent arity` as a category (but note
 that it is a `categorization` of the arity and not a representation of it -
-it is lossy. arity representation is explored in [#fa-024].)
+it is lossy. arity representation is explored in [#br-090].)
 
                   +-----------------+    +---------------+
                   | cat. exp. arity |--->| meta-category |

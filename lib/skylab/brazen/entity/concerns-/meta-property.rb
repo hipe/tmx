@@ -4,6 +4,33 @@ module Skylab::Brazen
 
     module Concerns_::Meta_Property
 
+      class Property_Normalizer
+
+        def initialize sess
+
+          @_mprp_a = sess.property_class.const_get METAPROPERTIES_WITH_HOOKS_
+        end
+
+        def normalize_mutable_property prp
+
+          # • assume that there is one or more metaproperties with hooks
+          #
+          # • you never know whether or not a new meta-property has been
+          #   added since the last time you received a property, so we
+          #   memoize nothing like that here.
+          #
+          # • we pass no event handler because to fail normalization of a
+          #   property against a metaproperty is not hookable: it is supposed
+          #   to fail loudly and early always.
+
+          Brazen_::Concerns_::Normalization::Against_model_stream[
+
+            prp, Callback_::Stream.via_nonsparse_array( @_mprp_a ) ]
+
+          NIL_  # exceptions must be raised on failure
+        end
+      end
+
       class Processor
 
         def initialize sess
@@ -11,14 +38,14 @@ module Skylab::Brazen
           @_sess = sess
         end
 
-        def << prp
+        def << mprp
 
           @_cls || __init_mutable_property_class
 
-          send :"__when_argument_arity_of__#{ prp.argument_arity }__", prp
+          send :"__when_argument_arity_of__#{ mprp.argument_arity }__", mprp
 
-          if prp.has_default || prp.norm_box_
-            __memoize_metapropery_because_it_has_a_hook prp
+          if mprp.is_normalizable_
+            __memoize_metapropery_because_it_has_a_hook mprp
           end
 
           self
@@ -107,7 +134,7 @@ module Skylab::Brazen
           NIL_
         end
 
-        def __memoize_metapropery_because_it_has_a_hook prp
+        def __memoize_metapropery_because_it_has_a_hook mprp
 
           cls = @_cls
 
@@ -123,7 +150,7 @@ module Skylab::Brazen
             a = []
             cls.const_set CONST__, a
           end
-          a.push prp
+          a.push mprp
           NIL_
         end
 

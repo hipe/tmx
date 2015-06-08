@@ -201,10 +201,23 @@ module Skylab::Brazen
 
     # ~ properties ( these :#hook-out's MUST get overridden by property lib )
 
-    class << self
+    ## ~~ readers (narrated)
 
-      def properties
-        NIL_  # by default you have none, be you action or model
+    def to_qualified_knownness_stream_
+
+      foz = formal_properties
+
+      if foz
+
+        sym_a = foz.get_names
+        sym_a.sort!
+
+        Callback_::Stream.via_nonsparse_array( sym_a ).map_by do | sym |
+
+          qualified_knownness sym
+        end
+      else
+        Callback_::Stream.the_empty_stream
       end
     end
 
@@ -212,23 +225,53 @@ module Skylab::Brazen
       self.class.properties
     end
 
+    class << self
+
+      def properties
+        NIL_  # by default you have none, be you action or model
+      end
+    end
+
+    def knownness_via_property_ prp
+
+      knownness prp.name_symbol
+    end
+
+    def qualified_knownness sym
+
+      had = true
+      x = as_entity_actual_property_box_.fetch sym do
+        had = false
+      end
+
+      Callback_::Qualified_Knownness.via_value_and_had_and_model(
+        x, had, formal_properties.fetch( sym ) )
+    end
+
+    def knownness sym
+
+      had = true
+      x = as_entity_actual_property_box_.fetch sym do
+        had = false
+      end
+
+      if had
+        if x.nil?
+          Callback_::Knownness::KNOWN_UNKNOWN
+        else
+          Callback_::Knownness.new_known x
+        end
+      else
+        Callback_::Knownness::UNKNOWN_UNKNOWN
+      end
+    end
+
+    ## ~~ writers ( & related )
+
     define_method :process_polymorphic_stream_fully, PPSF_METHOD_
     ppsp = :process_polymorphic_stream_passively
     define_method ppsp, PPSP_METHOD_
     private ppsp
-
-    def trio sym  # may soften..
-
-      _prp = formal_properties.fetch sym
-
-      had = true
-      x = actual_property_box.fetch sym do
-        had = false
-        nil
-      end
-
-      Callback_::Trio.via_value_and_had_and_property x, had, _prp
-    end
 
     def receive_missing_required_properties_event ev
 
@@ -271,6 +314,23 @@ module Skylab::Brazen
     end
   end
 
+  KNOWNNESS_VIA_IVAR_METHOD_ = -> prp do
+
+    ivar = prp.ivar
+
+    if instance_variable_defined? ivar
+
+      x = instance_variable_get ivar
+      if x.nil?
+        Callback_::Knownness::KNOWN_UNKNOWN
+      else
+        Callback_::Knownness.new_known x
+      end
+    else
+      Callback_::Knownness::UNKNOWN_UNKNOWN
+      # raise ::NameError, __say_no_ivar( ivar )
+    end
+  end
   Autoloader_ = Callback_::Autoloader
 
   module Collection_Adapters

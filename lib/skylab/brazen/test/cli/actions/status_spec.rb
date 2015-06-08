@@ -11,31 +11,45 @@ module Skylab::Brazen::TestSupport::CLI::Actions
     var = 'max num dirs'
 
     context "with #{ var } set to 'potato'" do
-      with_max_num_dirs 'potato'
+
+      with_max_num_dirs_ 'potato'
+
       it "whines about non-integer environment variable" do
+
         invoke 'x'
+
         expect :styled, /#{ env 'max-num-dirs' } must be an #{
           }integer, had #{ ick 'potato' }\z/
+
         expect_localized_invite_line
         expect_errored
       end
     end
 
     context "with #{ var } set to '-1'" do
-      with_max_num_dirs '-1'
+
+      with_max_num_dirs_ '-1'
+
       it "whines about integer being too low" do
+
         invoke 'x'
+
         expect :styled, /#{ env 'max-num-dirs' } must be non-negative, #{
           }had #{ ick '-1' }/
+
         expect_localized_invite_line
         expect_errored
       end
     end
 
     context "with #{ var } set to '0'" do
-      with_max_num_dirs '0'
+
+      with_max_num_dirs_ '0'
+
       it "ok, but never does anything" do
+
         invoke '.'
+
         expect %r(\bno directories were searched\.\z)
         expect_exitstatus_for_resource_not_found
       end
@@ -46,17 +60,24 @@ module Skylab::Brazen::TestSupport::CLI::Actions
       from_empty_directories_two_deep
 
       context "with #{ var } set to '2'" do
-        with_max_num_dirs '2'
+
+        with_max_num_dirs_ '2'
+
         it "finds nothing" do
+
           invoke '.'
+
           expect :styled,
             %r('#{ ::Regexp.escape cfg_filename }' not found in \. or 1 dir up\b)
+
           expect_exitstatus_for_resource_not_found
         end
       end
 
       context "with #{ var } set to 1" do
-        with_max_num_dirs '1'
+
+        with_max_num_dirs_ '1'
+
         it "not found, and note the language change" do
           invoke '.'
           expect_same_result

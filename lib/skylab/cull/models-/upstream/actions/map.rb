@@ -9,7 +9,7 @@ module Skylab::Cull
       Brazen_::Model.common_entity self,
 
           :ad_hoc_normalizer, -> arg, & oes_p do
-            if arg.is_known_known
+            if arg.is_known
               Cull_.lib_.basic::Number.normalization.with(
                 :argument, arg,
                 :number_set, :integer,

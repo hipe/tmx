@@ -41,7 +41,7 @@ module Skylab::TestSupport
 
           io =
           TestSupport_.lib_.system.filesystem.normalization.upstream_IO.with(
-            :path_arg, trio( :test_file ),
+            :path_arg, knownness( :test_file ),
             & handle_event_selectively )
 
           if io

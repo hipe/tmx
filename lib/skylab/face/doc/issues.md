@@ -49,7 +49,7 @@
 [#026]       #doc-point #parent:025 #body-is-inline-in-parent
                the facet's `enhance` API
 [#025]       #doc-node #parent:022 facets introduced ..
-[#024]       #doc-node #parent:013 arity as it pertains to meta-fields ..
+[#024] #hole ( #was:  #doc-node #parent:013 arity as it pertains to meta-fields ..
 [#023]       #doc-point #parent:007
                the API action formal parameters formal structure syntax ..
 [#022]       #doc-point #parent:007 the API API
@@ -69,8 +69,9 @@
 [#015]       #doc-point #parent:006 #isomorphic argument syntax (this same
                behavior is implemented in [#hl-146] where it is documented)
 [#014]       #doc-point CLI revelation integration intro #parent:006
-[#013]       #doc-point #parent:005 #initials:mf
-               metafields are the light, they are the way ..
+[#013] #hole #moved-to: [#br-044]
+             ( #was: #doc-point #parent:005 #initials:mf
+               metafields are the light, they are the way .. )
 [#012]       #doc-point the sacred four explained #parent:005
 [#011]       #doc-node the [fa] top node narrative ..
                (formerly what became #it-003])

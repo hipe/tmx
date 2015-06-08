@@ -155,22 +155,7 @@ module Skylab::Brazen
           end
         end
 
-        def fetch_property_value_via_property prp, & else_p  # #hook-near
-
-          ivar = prp.ivar
-
-          if instance_variable_defined? ivar
-            instance_variable_get ivar
-          elsif else_p
-            else_p[]
-          else
-            raise ::NameError, __say_no_ivar( ivar )
-          end
-        end
-
-        def __say_no_ivar ivar
-          "instance variable #{ ivar } not defined"
-        end
+        define_method :knownness_via_property_, KNOWNNESS_VIA_IVAR_METHOD_
 
         def _set_value_of_property x, prp
           instance_variable_set prp.as_ivar, x
@@ -468,7 +453,10 @@ module Skylab::Brazen
           prp._during_apply do | prp_ |
 
             define_method prp_.name_symbol do
-              fetch_property_value_via_property prp_ do end
+              kn = self.knownness_via_property_ prp_
+              if kn.is_known_is_known && kn.is_known
+                kn.value_x
+              end
             end
 
             define_method _WRITER_METHOD_NAME do
@@ -489,7 +477,10 @@ module Skylab::Brazen
 
           prp.__set_internal_read_proc do | entity, prp_ |
 
-            entity.fetch_property_value_via_property prp_ do end
+            kn = entity.knownness_via_property_ prp
+            if kn.is_known_is_known && kn.is_known
+              known.value_x
+            end
           end
 
           _WRITER_METHOD_NAME = prp.conventional_polymorphic_writer_method_name
@@ -543,20 +534,9 @@ module Skylab::Brazen
 
             prp.is_required or next
 
-            p = prp.external_read_proc
+            kn = entity.knownness_via_property_ prp
 
-            x = entity.fetch_property_value_via_property prp do end
-
-            if false
-
-            x = if p
-              p[ entity, prp ]
-            else
-              prp.internal_read_proc[ entity, prp ]
-            end
-            end
-
-            if x.nil?
+            if ! ( kn.is_known_is_known && kn.is_known )
               ( miss_a ||= [] ).push prp
             end
           end

@@ -8,7 +8,7 @@ create a custom extension module here.
 the extension module we create here models meta-properties that have
 business-specific utility for us in this app, but as well these
 meta-properties will be used to model the properties of entities and
-actions in other applications as well.
+actions in other applications.
 
 
 

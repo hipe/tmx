@@ -257,13 +257,23 @@ module Skylab::Brazen
 
       def execute
 
-        ws_path = @bx.fetch( :workspace_path ).value_x
+        qkn = @bx.fetch :workspace_path
+        if qkn.is_known
+          ws_path = qkn.value_x
+        end
+
         if ws_path
           __execute_via_workspace_path ws_path
         else
+
           @on_event_selectively.call :error, :missing_required_properties do
-            Brazen_::Property.build_missing_required_properties_event [ :workspace_path ]
+
+            _prp = Brazen_.lib_.basic::Minimal_Property.via_variegated_symbol(
+              :workspace_path )
+
+            Brazen_::Property.build_missing_required_properties_event [ _prp ]
           end
+
           UNABLE_
         end
       end
@@ -283,14 +293,14 @@ module Skylab::Brazen
 
         _did_find = @ws.resolve_nearest_existent_surrounding_path(
           bx.fetch( :max_num_dirs ).value_x,
-          :prop, bx.fetch( :workspace_path ).property,
+          :prop, bx.fetch( :workspace_path ).model,
           & @oes_p )
 
         _did_find and begin
 
-          trio = bx[ :verbose ]
+          q = bx[ :verbose ]
 
-          if trio and trio.value_x  # #tracking :+[#069] verbose manually
+          if q && q.is_known_is_known && q.is_known && q.value_x  # #tracking :+[#069] verbose manually
 
             maybe_send_event :info, :verbose, :using_workspace do
 

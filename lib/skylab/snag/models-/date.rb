@@ -8,7 +8,7 @@ module Skylab::Snag
 
       def normalize_argument arg, & oes_p  # :+[#ba-027]
 
-        if arg.is_known_known
+        if arg.is_known
 
           if RX___ =~ arg.value_x
 

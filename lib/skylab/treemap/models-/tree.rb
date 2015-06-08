@@ -72,7 +72,7 @@ module Skylab::Treemap
           lib = Tr_.lib_.brazen
 
           oa = lib::Collection::Common_fuzzy_retrieve[
-            trio( :output_adapter ),
+            qualified_knownness( :output_adapter ),
             lib::Collection_Adapters::Module_as_Collection[ Output_Adapters_ ],
             & handle_event_selectively ]
 
@@ -107,7 +107,7 @@ module Skylab::Treemap
 
           _resolve_waypoint(
             :@upstream_ID,
-            trio( :upstream_identifier ),
+            qualified_knownness( :upstream_identifier ),
             :up, :stdin )
         end
 
@@ -119,7 +119,7 @@ module Skylab::Treemap
 
             _resolve_waypoint(
               :@throughstream_ID,
-              trio( :throughstream_identifier ),
+              qualified_knownness( :throughstream_identifier ),
               :down, :stderr )
           else
             @throughstream_ID = nil
@@ -131,7 +131,7 @@ module Skylab::Treemap
 
           _resolve_waypoint(
             :@downstream_ID,
-            trio( :downstream_identifier ),
+            qualified_knownness( :downstream_identifier ),
             :down, :stdout )
         end
 

@@ -93,7 +93,7 @@ module Skylab::Brazen
       end
 
       def property_default
-        @current_property.default_value_via_any_entity nil  # etc
+        @current_property.default_value_
       end
 
       def pth s

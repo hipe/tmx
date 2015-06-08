@@ -28,11 +28,11 @@ module Skylab::Brazen
               next
             end
 
-            if ! trio.is_known_known  # formal only, no value - disregard
+            if ! trio.is_known  # formal only, no value - disregard
               next
             end
 
-            prp = trio.property
+            prp = trio.model
             x = trio.value_x
 
             if :zero == prp.argument_arity && ! x

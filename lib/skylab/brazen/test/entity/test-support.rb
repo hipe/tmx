@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport::Entity
 
   Parent_ = ::Skylab::Brazen::TestSupport
 
-  Parent_[ self ]
+  Parent_[ TS_ = self ]
 
   include Constants
 
@@ -25,6 +25,7 @@ module Skylab::Brazen::TestSupport::Entity
     Brazen_::Entity
   end
 
+  Brazen_ = Brazen_
   Callback_ = Callback_
   Enhance_for_test_ = Parent_::Enhance_for_test_
   KEEP_PARSING_ = true

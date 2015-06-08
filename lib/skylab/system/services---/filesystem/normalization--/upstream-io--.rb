@@ -40,13 +40,13 @@ module Skylab::System
 
             def path=
               @do_execute = true
-              @path_arg = Callback_::Trio.via_x_and_i gets_one_polymorphic_value, :path
+              @path_arg = Callback_::Qualified_Knownness.via_x_and_i gets_one_polymorphic_value, :path
               ACHIEVED_
             end
 
             def pathname=
               @do_execute = true
-              @path_arg = Callback_::Trio.via_x_and_i gets_one_polymorphic_value, :path
+              @path_arg = Callback_::Qualified_Knownness.via_x_and_i gets_one_polymorphic_value, :path
               @value_is_pathname = true
               ACHIEVED_
             end
@@ -97,7 +97,7 @@ module Skylab::System
         private
 
           def when_formal_both
-            if @path_arg.is_known_known
+            if @path_arg.is_known
               if instream_is_noninteractive_and_open
                 when_actual_both
               else
@@ -115,7 +115,7 @@ module Skylab::System
           end
 
           def when_formal_path
-            if @path_arg.is_known_known
+            if @path_arg.is_known
               _via_arg
             else
               when_path_not_provided
@@ -132,7 +132,7 @@ module Skylab::System
             build_not_OK_event_with :ambiguous_upstream_arguments,
                 :path_arg, @path_arg do |y, o|
 
-              _prop = o.path_arg.property
+              _prop = o.path_arg.model
 
               y << "ambiguous upstream arguments - cannot read from both #{
                 }STDIN and #{ par _prop }"
@@ -147,7 +147,7 @@ module Skylab::System
 
           def bld_MRP_no_path_or_STDIN
             build_not_OK_event_with :missing_required_properties,
-                :path_property, @path_arg.property do |y, o|
+                :path_property, @path_arg.model do |y, o|
               y << "expecting #{ par o.path_property } or STDIN"
             end
           end
@@ -160,7 +160,7 @@ module Skylab::System
 
           def bld_MRP_no_path
             build_not_OK_event_with :missing_required_properties,
-                :path_property, @path_arg.property do |y, o|
+                :path_property, @path_arg.model do |y, o|
               y << "expecting #{ par o.path_property }"
             end
           end
@@ -271,7 +271,7 @@ module Skylab::System
               _xtra = [ :search_and_replace_hack,
                 %r(\bfile or directory\b),
                 -> o do
-                  par o.path_arg.property
+                  par o.path_arg.model
                 end ]
             end
 

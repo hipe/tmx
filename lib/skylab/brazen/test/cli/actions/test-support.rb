@@ -12,11 +12,12 @@ module Skylab::Brazen::TestSupport::CLI::Actions
 
   module ModuleMethods
 
-    def with_max_num_dirs d
-      add_env_setting :MAX_NUM_DIRS, d ; nil
+    def with_max_num_dirs_ d
+      __add_env_setting :MAX_NUM_DIRS, d ; nil
     end
 
-    def add_env_setting sym, x
+    def __add_env_setting sym, x
+
       env_p_a_for_write.push( -> env do
         env[ "BRAZEN_#{ sym }" ] = x
       end )

@@ -41,6 +41,8 @@ module Skylab::Snag
       end
     end
 
+    Actions = ::Module.new
+
     Actions::Open = ::Class.new Action_Adapter  # will re-open
 
     class Actions::Open::Mock_Bound < CLI::Mock_Bound
@@ -212,16 +214,18 @@ module Skylab::Snag
 
       def number_limit=
 
-        prp = @bound.formal_properties.fetch :number_limit
+        # #todo - tighten this up once the API settles
 
         _x = @polymorphic_upstream_.gets_one
 
-        arg = prp.normalize_argument(
-          Callback_::Trio.via_value_and_property( _x, prp ),
-          & @_oes_p )
+        _kn = Callback_::Knownness.new_known _x
 
-        if arg
-          @number_limit = arg.value_x
+        _prp = @bound.formal_properties.fetch :number_limit
+
+        kn_ = _prp.normalize_argument _kn, & @_oes_p
+
+        if kn_
+          @number_limit = kn_.value_x
           KEEP_PARSING_
         else
           UNABLE_  # "downgrade" nil to false to get invites

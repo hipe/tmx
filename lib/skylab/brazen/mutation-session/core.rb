@@ -266,7 +266,7 @@ module Skylab::Brazen
         begin  # with each modifier reduce the boxes & parse any next modifier
 
           arg_st.advance_one
-          modifier_a.push moddy.formal.parse arg_st
+          modifier_a.push moddy.model.parse arg_st
 
           available_modifiers_box = Callback_::Box.new
           available_op_box = Callback_::Box.new
@@ -513,12 +513,12 @@ module Skylab::Brazen
 
           @p = -> mdfr, op do
 
-            @formal = mdfr
+            @model = mdfr
             @op_a = [ op ]
 
             @p = -> mdfr_, op_ do
 
-              if @formal == mdfr_
+              if @model == mdfr_
                 @op_a.push op_
               else
                 raise ::ArgumentError, __say_mismatch( mdfr_ )
@@ -529,10 +529,10 @@ module Skylab::Brazen
           end
         end
 
-        attr_reader :formal, :op_a
+        attr_reader :model, :op_a
 
         def __say_mismatch mdfr
-          "modifier mismatch: #{ @formal.description } then #{
+          "modifier mismatch: #{ @model.description } then #{
            }#{ mdfr.description }"
         end
 

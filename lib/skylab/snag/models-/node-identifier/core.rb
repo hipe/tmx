@@ -264,7 +264,12 @@ module Skylab::Snag
     end
 
     def == otr
-      ( self <=> otr ).zero?
+      d = self <=> otr
+      if d
+        d.zero?
+      else
+        false
+      end
     end
 
     alias_method :eql?, :==

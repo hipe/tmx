@@ -128,8 +128,6 @@ module Skylab::TestSupport
             KEEP_PARSING_
           end
 
-          o :hidden
-
           def line_downstream=
             x = gets_one_polymorphic_value
             if x
@@ -141,8 +139,6 @@ module Skylab::TestSupport
             KEEP_PARSING_
           end
 
-          o :hidden
-
           def line_upstream=
             x = gets_one_polymorphic_value
             if x
@@ -152,10 +148,8 @@ module Skylab::TestSupport
             KEEP_PARSING_
           end
 
-          o :hidden
-
           def arbitrary_proc_array=
-            @arbiitrary_proc_a = gets_one_polymorphic_value
+            @_arbitrary_proc_a = gets_one_polymorphic_value
             KEEP_PARSING_
           end
 
@@ -216,7 +210,7 @@ module Skylab::TestSupport
         end
 
         def initialize boundish  # and oes_p
-          @arbiitrary_proc_a = nil
+          @_arbitrary_proc_a = nil
           @arbitrary_O_A_proc_array = nil
           @business_module_name = nil
           @dry_run = false
@@ -521,7 +515,7 @@ module Skylab::TestSupport
 
         def via_output_path_rslv_line_downstream
 
-          _force_arg = Callback_::Trio.via_value_and_property(
+          _force_arg = Callback_::Qualified_Knownness.via_value_and_model(
             # because we use ivars and not property boxes, we must make this manually
             @force,
             self.class.properties.fetch( :force ) )
@@ -601,7 +595,7 @@ module Skylab::TestSupport
             Infer_business_module_name_loadlessly.call(
                @upstream_path, & handle_event_selectively )
           if @business_module_name
-            if @arbiitrary_proc_a
+            if @_arbitrary_proc_a
               when_arbitrary_procs
             else
               ACHIEVED_
@@ -614,7 +608,7 @@ module Skylab::TestSupport
 
         def when_arbitrary_procs
           ok = true
-          @arbiitrary_proc_a.each do |p|
+          @_arbitrary_proc_a.each do |p|
             ok = p[ self ]
             ok or break
           end

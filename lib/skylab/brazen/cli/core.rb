@@ -5,7 +5,7 @@ module Skylab::Brazen
     class << self
 
       def arguments
-        CLI_::Action_Adapter_::Arguments
+        CLI_::Action_Adapter::Arguments
       end
 
       def expression_agent_class
@@ -35,8 +35,9 @@ module Skylab::Brazen
     class Top_Invocation__
 
       def initialize a, ak
+
         @app_kernel = ak
-        @env = nil
+        @_env = nil
         @mod = ak.module
         @resources = Resources__.new a, @mod
         # (abstract base class "invocation" has no initialize method)
@@ -46,14 +47,6 @@ module Skylab::Brazen
         [ :application_kernel, :bound_action, * super ]
       end
 
-      def receive_environment x  # experiment
-        @env = x ; nil
-      end
-
-      def env_
-        @env
-      end
-
       def invoke argv
 
         if @resources.frozen?  # :+#experimental: subsequent invocation
@@ -61,7 +54,7 @@ module Skylab::Brazen
           @resources = @resources.new argv
         else
 
-          @resources.complete @env || ::ENV, argv
+          @resources.complete @_env || ::ENV, argv
         end
 
         resolve_properties
@@ -485,13 +478,18 @@ module Skylab::Brazen
 
     Adapter_Methods__ = ::Module.new
 
-    Action_Adapter = class Action_Adapter_ < Invocation__
+    Action_Adapter =
+    class Action_Adapter_ < Invocation__
 
       include Adapter_Methods__
 
       def initialize unbound, boundish
-        super
-        @bound.accept_parent_node_ boundish
+
+        @_settable_by_environment_h = nil
+        if unbound
+          super
+          @bound.accept_parent_node_ boundish
+        end
       end
 
       def members
@@ -551,7 +549,7 @@ module Skylab::Brazen
 
       def __bound_call_via_ARGV
 
-        _n11n = Action_Adapter_::Arguments.normalization(
+        _n11n = Action_Adapter::Arguments.normalization(
           @categorized_properties.arg_a || EMPTY_A_ )
 
         @arg_parse = _n11n.new_via_argv argv
@@ -589,33 +587,6 @@ module Skylab::Brazen
         end
       end
 
-      def __process_environment
-
-        env = @resources.env
-
-        @categorized_properties.env_a.each do | prp |
-
-          s = env[ environment_variable_name_string_via_property prp ]
-          s or next
-          cased_i = prp.name_symbol.downcase  # [#039] casing
-
-          if @seen[ cased_i ]
-            next
-          end
-
-          @mutable_backbound_iambic.push cased_i, s
-        end
-        NIL_
-      end
-
-      def environment_variable_name_string_via_property prp
-        "#{ __APPNAME }_#{ prp.name.as_lowercase_with_underscores_symbol.id2name.upcase }"
-      end
-
-      def __APPNAME
-        @__APPNAME ||= application_kernel.app_name.gsub( /[^[:alnum:]]+/, EMPTY_S_ ).upcase
-      end
-
       def __bound_call_via_mutable_backbound_iambic
 
         ok = prepare_backstream_call @mutable_backbound_iambic
@@ -628,19 +599,6 @@ module Skylab::Brazen
       end
 
       def prepare_backstream_call x_a  # :+#public-API :+#hook-in
-
-        # ~ begin experiment: one way to give stdout to the action
-
-        fp = @bound.formal_properties
-        if fp
-          prp = fp[ :downstream ]
-        end
-
-        if prp && prp.is_hidden
-          x_a.push :downstream, @resources.sout
-        end
-
-        # ~ end
 
         ACHIEVED_
       end
@@ -1140,6 +1098,8 @@ module Skylab::Brazen
 
     class Invocation__
 
+      MUTATE_THESE_PROPERTIES = nil
+
       def members
         EMPTY_A_
       end
@@ -1382,8 +1342,12 @@ module Skylab::Brazen
 
       def resolve_categorized_properties
 
-        @categorized_properties = Categorize_properties___[
-          _to_full_inferred_property_stream, self ]
+
+        o = Categorize_properties___.new
+        o.st = _to_full_inferred_property_stream
+        o.adapter = self
+        o.settable_by_environment_h = __build_settable_by_environment_h_
+        o.execute
         NIL_
       end
     end
@@ -1397,14 +1361,23 @@ module Skylab::Brazen
 
     class Categorize_properties___  # #note-600
 
-      Actor_.call self, :properties, :scn, :adapter
+      attr_accessor(
+        :st,
+        :settable_by_environment_h,
+        :adapter
+      )
 
       def execute
+
         Categorized_Properties___.new do | cp |
+
           @adapter.__receive_categorized_properties cp
+
           @categorized_properties = cp
+
           __work
         end
+
         @categorized_properties
       end
 
@@ -1414,20 +1387,20 @@ module Skylab::Brazen
 
         d = 0 ; @original_index = {}
 
+        env_h = @settable_by_environment_h || MONADIC_EMPTINESS_
+
         begin
-          prp = @scn.gets
+          prp = @st.gets
           prp or break
 
           @original_index[ prp.name_symbol ] = ( d += 1 )
 
-          if prp.can_be_from_environment  # probably goes away
+          if env_h[ prp.name_symbol ]
             ( @env_a ||= [] ).push prp
             redo
           end
 
-          if prp.is_hidden
-            redo
-          end
+          # if is_hidden ; redo
 
           if prp.takes_many_arguments
             ( @many_a ||= [] ).push prp
@@ -1466,6 +1439,8 @@ module Skylab::Brazen
         o.opt_a = @opt_a.freeze
         NIL_
       end
+
+      MONADIC_EMPTINESS_ = -> _ { }
 
       def __maybe_make_experimental_aesthetic_readjustment  # #note-575
 
@@ -1524,8 +1499,13 @@ module Skylab::Brazen
         @help_renderer || __resolve_help_renderer
       end
 
-      attr_accessor :opt_a, :arg_a, :env_a
-      attr_accessor :adapter
+      attr_accessor(
+        :adapter,
+        :arg_a,
+        :env_a,
+        :opt_a,
+      )
+
       attr_reader :expression_agent, :help_renderer, :categorized_properties
 
       def __resolve_expression_agent
@@ -1667,14 +1647,9 @@ module Skylab::Brazen
       attr_reader :desc, :name,
         :argument_arity,
         :argument_moniker,
-        :can_be_from_environment,
         :custom_moniker,
         :is_required,
         :parameter_arity
-
-      def is_hidden
-        false
-      end
 
       def name_symbol
         @name.as_variegated_symbol
@@ -1789,7 +1764,9 @@ module Skylab::Brazen
       end
 
       def complete env, argv
-        @argv = argv ; @env = env ; freeze ; nil
+        @argv = argv
+        @env = env
+        freeze
       end
 
       def new argv
@@ -1819,26 +1796,182 @@ module Skylab::Brazen
       end
     end
 
+    # ~ environment concern
+
+    class Branch_Invocation__
+      def __build_settable_by_environment_h_
+        NIL_
+      end
+    end
+
+    class Action_Adapter
+
+      SETTABLE_BY_ENVIRONMENT = nil
+
+      def __build_settable_by_environment_h_
+
+        a = self.class::SETTABLE_BY_ENVIRONMENT
+
+        h = @_settable_by_environment_h
+
+        if a
+
+          h ||= {}
+          a.each do | sym |
+            h[ sym ] = true
+          end
+        end
+
+        h
+      end
+    end
+
+    class Top_Invocation__
+
+      def top_invocation_environment_x
+        @_env
+      end
+
+      def receive_environment x
+        @_env = x
+        NIL_
+      end
+    end
+
+    class Action_Adapter  # re-open
+
+      def __process_environment
+
+        env = @resources.env
+
+        @categorized_properties.env_a.each do | prp |
+
+          s = env[ environment_variable_name_string_via_property prp ]
+          s or next
+          cased_i = prp.name_symbol.downcase  # [#039] casing
+
+          if @seen[ cased_i ]
+            next
+          end
+
+          @mutable_backbound_iambic.push cased_i, s
+        end
+        NIL_
+      end
+
+      def environment_variable_name_string_via_property prp
+        "#{ __APPNAME }_#{ prp.name.as_lowercase_with_underscores_symbol.id2name.upcase }"
+      end
+
+      def __APPNAME
+        @__APPNAME ||= application_kernel.app_name.gsub( /[^[:alnum:]]+/, EMPTY_S_ ).upcase
+      end
+    end
+
     CLI_ = self
     DASH_BYTE_ = '-'.getbyte 0
     GENERIC_ERROR_ = 5
     NOTHING_ = nil
     SUCCESS_ = 0
 
-    # we demonstrate how to mutate properties back-to-front with this bit of
-    # ick (which crams these business-specifics into this node): at the time
-    # the action is invoked, mutate the properties we get from the API to be
-    # customized for this modality for these actions. it's CLI so there's no
-    # point in memoizing anything: load-time and run-time are the same time.
+    # ~ demonstration of modality-specific formal property mutation
 
-    class Action_Adapter  # re-open
+    class Client_for_Brazen_as_Application < self
 
-      MUTATE_THESE_PROPERTIES = %i(
-        config_filename
-        max_num_dirs
-        workspace_path )
+      # (normally you would call your subclass `CLI`, but we can't here)
+
+      class Action_Adapter < Action_Adapter  # #pedgogy-1875
+
+        MUTATE_THESE_PROPERTIES = [
+          :config_filename,
+          :config_path,
+          :max_num_dirs,
+          :path,
+          :workspace_path ]
+
+        def mutate__config_filename__properties
+
+          # exclude this formal property from the front. leave back as-is.
+
+          mutable_front_properties.remove :config_filename
+          NIL_
+        end
+
+        def mutate__max_num_dirs__properties  # ALSO handwritten below!
+
+          # in the front, tag this property as mutable by the environment
+
+          @_settable_by_environment_h ||= {}
+          @_settable_by_environment_h[ :max_num_dirs ] = true
+
+          mutable_back_properties.replace_by :max_num_dirs do | prp |
+
+            # tricky - the back is written around having a default so it
+            # expects the element to be set always in its box hence we change
+            # the default to be nil rather than removing the default
+            # entirely (covered)
+
+            prp.new_with_default do
+              NIL_
+            end
+          end
+
+          NIL_
+        end
+
+        def mutate__path__properties
+
+          _mutate_path_property_to_default_to_PWD :path
+        end
+
+        def mutate__workspace_path__properties
+
+          # exclude this formal property from the front. default the back to CWD
+
+          mutable_front_properties.remove :workspace_path
+
+          mutable_back_properties.replace_by :workspace_path do | prp |
+
+            prp.new_with_default do
+              present_working_directory
+            end.freeze
+          end
+          NIL_
+        end
+      end
+
+      def expression_agent_class
+
+        # normal client clients will implement their own expag class, and
+        # the parent implementation of this (which effectivey uses auto-
+        # loading) will "just work". but this client client is not normal.
+
+        self.class.superclass.const_get :Expression_Agent, false
+      end
+
+      Actions = ::Module.new  # #pedagogy-1975
+
+      class Actions::Init < Action_Adapter
+
+        def mutate__path__properties
+
+          # override parent to do nothing. we want the `path` property to
+          # stay required. we do not do any defaulting for this field for
+          # this action. the user must indicate the path explicitly here.
+        end
+      end
+    end
+
+    ## ~~ here is our support in the library for the above
+
+    class Action_Adapter  # re-re-open
 
       def resolve_properties  # :+[#042] #nascent-operation
+
+        # at the time the action is invoked, mutate the properties we get
+        # from the API to be customized for this modality for these actions.
+        # it's CLI so there's no point in memoizing anything. load-time and
+        # run-time are the same time.
 
         @mutable_back_properties = nil
         @mutable_front_properties = nil
@@ -1847,7 +1980,14 @@ module Skylab::Brazen
 
         if @back_properties
 
-          sym_a = self.class::MUTATE_THESE_PROPERTIES
+          cls = self.class
+          if cls.const_defined? :MUTATE_THESE_PROPERTIES
+            sym_a = cls::MUTATE_THESE_PROPERTIES
+          else
+            raise __say_no_const( cls, :MUTATE_THESE_PROPERTIES )
+          end
+
+          @_env = nil
           if sym_a
 
             bp = @back_properties
@@ -1864,39 +2004,9 @@ module Skylab::Brazen
         nil
       end
 
-      def mutate__config_filename__properties
-
-        # exclude this formal property from the front. leave back as-is.
-
-        mutable_front_properties.remove :config_filename
+      def __say_no_const mod, const
+        "what you have here is an uninitialized constant: #{ mod }::#{ const }"
       end
-
-      def mutate__max_num_dirs__properties  # ALSO handwritten below!
-
-        # exclude this formal property from the front. in back, unbound it.
-
-        mutable_front_properties.remove :max_num_dirs
-        mutable_back_properties.replace_by :max_num_dirs do | prp |
-          prp.new_without_default
-        end
-      end
-
-      def mutate__workspace_path__properties
-
-        # exclude this formal property from the front. default the back to CWD
-
-        mutable_front_properties.remove :workspace_path
-
-        mutable_back_properties.replace_by :workspace_path do | prp |
-
-          prp.dup.set_default_proc do
-
-            present_working_directory
-          end.freeze
-        end
-      end
-
-      # ~ support
 
       def mutable_front_properties
         if ! @mutable_front_properties
@@ -1919,7 +2029,10 @@ module Skylab::Brazen
         end
       end
 
-      def _common_CLI_changes_for_path_property sym
+      def _mutate_path_property_to_default_to_PWD sym
+
+        # make this property not required in the eyes of the front.
+        # in the back, default it to the pwd.
 
         mutable_front_properties.replace_by sym do | prp |
           prp.dup.set_is_not_required.freeze
@@ -1932,37 +2045,23 @@ module Skylab::Brazen
             present_working_directory
 
           end.freeze
-        end ; nil
+        end
+        NIL_
       end
+
+      # ~ property mutation API & support (#experimental)
 
       def present_working_directory
         ::Dir.pwd
       end
-    end
 
-    module Actions
-      class Status < Action_Adapter
-        def resolve_properties
-          super
-          _common_CLI_changes_for_path_property :path
-          nil
-        end
-
-        def mutate__max_num_dirs__properties
-          # override above - we do nothing. this tests env. vars. near [#017]
-        end
+      def remove_property_from_front sym  # :+#by:ts
+        mutable_front_properties.remove sym
+        NIL_
       end
 
-      class Workspace < Branch_Adapter
-        Actions = ::Module
-        class Actions::Summarize < Action_Adapter
-          def resolve_properties
-            super
-            _common_CLI_changes_for_path_property :path
-            nil
-          end
-        end
-      end
+      # ~
+
     end
   end
 end

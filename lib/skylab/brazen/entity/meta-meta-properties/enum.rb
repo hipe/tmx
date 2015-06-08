@@ -6,19 +6,19 @@ module Skylab::Brazen
 
     module Meta_Meta_Properties::Enum
 
-      Entity_against_meta_entity = -> prp, mprp, & oes_p do
+      Normalize_via_qualified_known = -> qkn, & oes_p do
 
-        enum_bx = mprp.enum_box
-        x = prp.send mprp.property_reader_method_name
+        enum_bx = qkn.model.enum_box
 
-        if x
+        if qkn.is_known_is_known && qkn.is_known
 
-          if enum_bx.has_name x
-            prp
+          if enum_bx.has_name qkn.value_x
+            qkn
           else
 
             event = -> do
-              Build_extra_value_event[ x, mprp.name, enum_bx.get_names ]
+              Build_extra_value_event[
+                qkn.value_x, qkn.model.name_function, enum_bx.get_names ]
             end
 
             if oes_p
@@ -30,7 +30,7 @@ module Skylab::Brazen
             end
           end
         else
-          prp  # whether or not this is a required field is not our concern
+          qkn  # whether or not the field is required is not our concern
         end
       end
 

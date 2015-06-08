@@ -45,7 +45,7 @@ module Skylab::SubTree
 
         :ad_hoc_normalizer, -> arg, & oes_p do
 
-          if arg.value_x
+          if arg.is_known && arg.value_x
             SubTree_.lib_.basic::Pathname.normalization.new_with( :absolute ).
               normalize_argument( arg, & oes_p )
           else

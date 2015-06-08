@@ -7,7 +7,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
     extend TS_
 
     with_invocation 'init', '.'
-    with_max_num_dirs '1'
+    with_max_num_dirs_ '1'
 
     context "from within empty directory ( NOTE misspelling in preterite :P )" do
 

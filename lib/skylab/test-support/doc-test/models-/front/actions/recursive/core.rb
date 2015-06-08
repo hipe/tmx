@@ -75,7 +75,7 @@ module Skylab::TestSupport
             end,
             :property, :dry_run,
 
-            :hidden, :property, :downstream,
+            :property, :downstream,
 
             :required,
             :description, -> y do

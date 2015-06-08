@@ -5,7 +5,11 @@ one day assimilating the older one into the newer one.)
 
 ## synopsis
 
-    normalize_argument <trio>, & <oes_p>
+for a single, unified solution that is universally applicable,
+recognizable, and poka-yoke; we have adopted this one method name,
+signature and semantics:
+
+    normalize_argument <qualified-knownness>, & <oes_p>
 
 
 
@@ -16,6 +20,7 @@ one day assimilating the older one into the newer one.)
 we have finally arrived at a normalization API we are happy with. here
 we sing about it. you may be looking for the old [fa] normalization
 document. that is the second half of this document.
+
 
 
 
@@ -40,6 +45,11 @@ internet at this moment) the resource does not exist or cannot be reached,
 it perhaps makes sense to approach this problem like other normalization
 problems provided that the abstraction is not too leaky.
 
+(and note too that URL's themselves have a formal structure that
+defines the valid forms they may assume. so there's certainly more than
+one way to "normalize" a URL, based on what your normalizing agent
+(or "model", if you like) actually does.)
+
 even an HTTP "PUT" operation can be conceived of as a normalization. you
 model the formal behavior that you would like to occur (send a request,
 get a certain kind of response) and then you apply it to actual values and
@@ -53,7 +63,7 @@ it into something far more embarassing than that..
 
 ## normalizing vs. validation
 
-in our universe normalization is a superset of validation. validation
+in our universe, normalization is a superset of validation. validation
 sounds like "is it valid?" and suggests that it results in a boolean
 value of "yes" or "no". normalization is that and more (potentially). an
 act of normalization can tranform the input value into a different value
@@ -65,22 +75,18 @@ facilities do not actually tranform values, they just validate. but
 nonetheless we maintain a uniform interface for these two related
 operations, and use the name that is more correct (that of the superset).
 
-the most interesting part of the normalization has to do with emission
-of events. typically this is done when an input value is invalid or
-perhaps even when the input value is valid but gets normalized.
+subjectively the more interesting part of the normalization has to do
+with emission of events. typically this is done when an input value is
+invalid or perhaps even when the input value is valid but gets normalized.
 
 
 
 
 ## the normal value normalization method
 
-for a single, unified solution that is universally applicable,
-recognizable, and poka-yoke; we have adopted this one method name,
-signature and semantics: `normalize_argument`. we will present
-its signature below; but first, a historical aside to give us some
-context to the scope of this:
+a historical aside to give us some context to the scope of this:
 
-(this one subject method replaces all of what were once 5 (five)
+this one subject method replaces all of what were once 5 (five)
  variants of it (each documented at the time (tombstone at end)):
 
     any_error_event_via_validate_x
@@ -89,30 +95,44 @@ context to the scope of this:
     normalize_via_two
     normalize_via_three
 
- perhaps we should conceptualize it as one of our :+[#ba-041] universal
- abstract operations.
-)
+perhaps we should conceptualize it as one of our :+[#ba-041] universal
+abstract operations.
 
-the signature:
+the method takes on arugment and optionally one block.
 
-  `normalize_argument` - argument ("arg") is a [#ca-004]  ("trio")
-     argument structure. optional block is a [#ca-017] selective listener.
-
-this arg structure has at least the below fields (see subject for more):
-
-  • the `name_symbol` of the field
-
-  • `is_known_known` a boolean-ish indicating whether or not we know
-       what the actual value is of this field
-
-  • the `value_x` actual value, when the above is trueo
-
-  • the (formal) `property` of the field (if any)
+  • the argument is a [#ca-004] "knownness"
+  • the optional block is a [#ca-017] selective listener.
 
 
-if it is known to have been passed, note that depending on your
-interface the incoming value may be `false`, `nil`, or any other
-value (e.g arbitrary objects).
+understanding [#ca-004] "the states of knownness" is *essential* here,
+and it is highly recommened that you read its doc-node before proceding.
+we use a "knowness" structure to represent the argument and all of the
+relevant metadata around it that we will work with..
+
+
+
+
+### `nil` may be just another value
+
+this "knownness" structure holds any argument value that may have been
+passed from some "upstream" of information. this upstream may be a human
+user, a human user behind a front client, another system, whatever.
+
+with this knownness structure we can know whether or not the argument
+value was provided by this agent, including whether the agent explicitly
+passed `false` or `nil` for the value.
+
+in our conception of normalization, having passed `nil` explicitly is
+seen as having significance that may possibly be distinct from the value
+having not been passed at all.
+
+that is, we don't require that this distinction be made, but we allow
+for the possibility that it might be, per the design of the client.
+
+
+
+
+### you may change the value
 
 depending on your definition for what is normal for that field
 (and more broadly what is valid), you may transform the incoming
@@ -120,28 +140,50 @@ value into any other value (for example, convert a string "1" into
 a native integer `1`). if it is already valid and normal as it is
 you may leave it as it is.
 
+in such cases where you want to change the value to make it "normal"
+be useful to use the `new_with_value` method of [#ca-004] to create
+a modified frozen dup of the incoming argument structure, but with
+the new desired value.
+
+
+
+
+### the semantics of your result
+
 if based on your definition of normal this normalization was
 successful, your result *must* be another or the same [#ca-004]-shaped
 argument structure containing the new (or same) value for the argument
-value.
+value. that is:
 
 any true-ish result that you return will be assumed to be an object
 of this shape. if the incoming result was itself already valid and
 normal as-is, you may result in this same object as your result.
 
-(in the case where you tranformed the value in some way, it may
-be useful to use the `new_with_value` method of [#ca-004] to create
-a modified frozen dup of the incoming argument structure, but with
-the new desired value.)
-
 any false-ish result that you return will be assumed to signify that
 the incoming argument value (or absence of value) was invalid.
 
-in the cases where the value was invalid or the value was changed for
-normalization -AND- and event listener was passed (the optional block
-argument), you can emit possible events. it is recommended that you do
-so for all such cases when the value is invalid, but you should
-always check whether the listener was passed at all first.
+
+
+
+### recommendations for side-effects
+
+in cases where the value was invalid it is recommended that you use any
+passed event handler to emit an event expressing as much. if no handler
+was passed under such a case the behavior is up to your design, but
+design something. what is recommended is that in the case where a
+handler wasn't passed, you turn the event you would have emitted into an
+exception and raise it.
+
+in the cases where the value was changed significantly per normalization,
+we recommended that you emit an informational event expressing as much.
+if you did not change the semantic value of the event, but only the
+type (for example, coverting "1" (the string) to `1` (the integer), it
+is recommended that you *not* emit any event.
+
+for all above cases be aware that an event handler may not have been
+passed. anticipate this possibilty as apporpriate for the semantics of
+the would-be event and/or the content in which your normalization will
+execute.
 
 
 

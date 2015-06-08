@@ -69,7 +69,7 @@ module Skylab::Basic
         def normalize_value x, & oes_p
 
           normalize_argument(
-            Callback_::Trio.via_value_and_variegated_symbol( x, :path ),
+            Callback_::Qualified_Knownness.via_value_and_variegated_symbol( x, :path ),
             & oes_p )
         end
 
@@ -229,10 +229,16 @@ module Skylab::Basic
         end
 
         def nope terminal_channel_symbol
+
           @result = maybe_send_event :error, :invalid_property_value do
-            build_argument_error_event_with_ terminal_channel_symbol,
-                :path, @value_x,
-                :prop, @arg.property do | y, o |
+
+            build_argument_error_event_with_(
+
+              terminal_channel_symbol,
+              :path, @value_x,
+              :prop, @arg.model
+
+           ) do | y, o |
 
               s_a = o.terminal_channel_i.to_s.split UNDERSCORE_
               s_a.shift

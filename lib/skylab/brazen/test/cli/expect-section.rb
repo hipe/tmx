@@ -1,6 +1,6 @@
 module Skylab::Brazen::TestSupport::CLI
 
-  module Expect_Section  # :[#044].
+  module Expect_Section  # :[#045].
 
     # in one go, parse a whole "screen" with indentation-sensitive syntax
     # reminiscent of a super simplified python or OGDL. the result data

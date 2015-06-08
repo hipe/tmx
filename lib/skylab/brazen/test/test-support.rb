@@ -116,24 +116,49 @@ module Skylab::Brazen::TestSupport
       instance_exec( & edit_p )
     end
 
-    attr_reader :bx
+  # ~ to be an entity (model or action) you have to:
 
-    def process_fully * x_a
-
-      process_polymorphic_stream_fully(
-        Callback_::Polymorphic_Stream.via_array x_a )
+    def knownness_via_property_ prp  # :+#cp
+      if bx
+        had = true
+        x = bx.fetch prp.name_symbol do
+          had = false
+        end
+      end
+      if had
+        if x.nil?
+          Callback_::Knownness::KNOWN_UNKNOWN
+        else
+          Callback_::Knownness.new_known x
+        end
+      else
+        Callback_::Knownness::UNKNOWN_UNKNOWN
+      end
     end
 
-  private
+    def as_entity_actual_property_box_
+      @bx ||= Brazen_::Box_.new
+    end
 
-    def procez * x_a
+    def handle_event_selectively
+      NIL_
+    end
+
+  # ~ for these tests
+
+    attr_reader :bx
+
+    private def process_and_normalize_for_test_ * x_a
+
       _st = Callback_::Polymorphic_Stream.via_array x_a
       _ok = process_polymorphic_stream_fully _st
       _ok && normalize
     end
 
-    def actual_property_box
-      @bx ||= Brazen_::Box_.new
+    def process_fully_for_test_ * x_a
+
+      process_polymorphic_stream_fully(
+        Callback_::Polymorphic_Stream.via_array x_a )
     end
   end
 

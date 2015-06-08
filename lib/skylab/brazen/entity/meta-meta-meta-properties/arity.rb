@@ -1,6 +1,8 @@
-module Skylab::Headless
+module Skylab::Brazen
 
-  class Arity < ::Module
+  Entity::Meta_Meta_Meta_Properties = ::Module.new
+
+  class Entity::Meta_Meta_Meta_Properties::Arity < ::Module
 
     # (the spec provides comprehensive documentation and 100% coverage)
 
@@ -28,7 +30,7 @@ module Skylab::Headless
     public
 
       def new lo, hi
-        Arity.new lo, hi
+        Arity_.new lo, hi
       end
 
       def each
@@ -45,7 +47,9 @@ module Skylab::Headless
       end
 
       def members
-        box.map( & :local_normal_name )
+        box.to_value_stream.map do | arity |
+          arity.name_symbol
+        end
       end
 
       def [] nn
@@ -64,10 +68,10 @@ module Skylab::Headless
       end
 
       def index
-        bx = Headless_.lib_.meso_box_lib.new
+        bx = Callback_::Box.new
         constants.each do |c|
           ar = const_get c, false
-          bx.add ar.local_normal_name, ar
+          bx.add ar.name_symbol, ar
         end
         @indexed = true
         @box = bx
@@ -92,12 +96,12 @@ module Skylab::Headless
     end
   private
     def bld_lnf
-      Callback_::Name.via_variegated_symbol local_normal_name
+      Callback_::Name.via_variegated_symbol name_symbol
     end
   public
 
-    def local_normal_name
-      @local_normal_name ||= bld_lnn
+    def name_symbol
+      @name_symbol ||= bld_lnn
     end
   private
     def bld_lnn
@@ -109,5 +113,7 @@ module Skylab::Headless
     def include? d
       @begin <= d and @end.nil? || @end >= d
     end
+
+    Arity_ = self
   end
 end

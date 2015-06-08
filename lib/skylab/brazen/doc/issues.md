@@ -1,4 +1,8 @@
-[#088]       fully unify props & mprops near normalization (see universe)
+[#091]       [ entity identifier ]
+             ( #moved-from [#here-022] )
+[#090]       arity ..
+[#089]       the ACS (autonomous component system) ..
+[#088]       the meta-meta-properties justification ..
 [#087]       #track similar normalization logics (this might be a redundant tracker)
 [#086]       #track cases where failure is "fuzzy" (i.e non-atomic),
                ignored for the greater good, for usability
@@ -23,7 +27,7 @@
 [#075]    #tracking :+#wishlist optionally generate ivar-based iambic writers
 [#074]       option parser hack for '-1', '-2' etc ..
              ( #was: #parent-node: [#011] the codifying expression agents)
-[#073] #open awareness of system environment does not belong in the model -
+[#073] #hole #done awareness of system environment does not belong in the model -
              front clients should do this mapping somehow..
              ( was: #parent-node: [#011] selective event listening via methods )
 [#072]       where the colon goes on headers! #parent-node: [#002]
@@ -66,9 +70,9 @@
 [#048]       #parent-node: [#024] "#action-preconditions.."
 [#047]       #parent-node: [#013] the model entity narrative
 [#046]       #parent-ndoe: [#024] the action factory narrative ..
-[#045]       #parent-node: [#001] "the meta-properties narrative.."
-[#044]       [ expect section ]
+[#045]       [ expect section ]
              ( #was: #done graph has an action so maybe we don't need to pass it everywhere )
+[#044]       #parent-node: [#001] the meta-properties justification ..
 [#043]       the fancy bundle lookup exegesis ..
              ( #was: #tracking-tag loading hacks )
 [#042] #open here is the plan with this one: this BS being done here
@@ -106,7 +110,8 @@
                channel that works not in event objects but expresssions
                directly
              ( was: #parent-node: [#011] event prototype )
-[#022]       [ entity identifier ]
+[#022]       [ EDIT: document formal properties  ]
+             ( #was: entity identifier. #moved-to: [#here-091] )
              ( #was: #done obliterate `receive_negative_event` and the rest - single
              entrypoint is better. rely on `ok` : false )
 [#021]       the API magic result shape narrative .. (was "scope kernel")

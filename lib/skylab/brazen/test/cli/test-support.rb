@@ -40,7 +40,7 @@ module Skylab::Brazen::TestSupport::CLI
     end
 
     def subject_CLI  # for above
-      Brazen_::CLI
+      Brazen_::CLI::Client_for_Brazen_as_Application
     end
 
     def invocation_strings_for_expect_stdout_stderr

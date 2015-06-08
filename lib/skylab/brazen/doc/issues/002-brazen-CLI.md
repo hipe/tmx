@@ -187,3 +187,84 @@ sadly we still have some cases to filter out. in the cases where
 properties are actually "officious" options (things like --version and
 --help, actually more like actions than options); we don't want these to
 become arguments. this could stand to be improved.
+
+
+
+
+## :#pedagogy-1875
+
+### fine-tuning modality expression decisions
+
+depending on the simplicity of your action, "isomorphic inference" may
+"just work" and you won't have to make a custom action adapter.
+
+but sometimes of out usability and sometimes out of necessity you will
+need to modify the choices that would have otherwise been made by
+inference; when expressing outwards and interpreting inwards the data
+for and of your particular actions.
+
+here, because we have subclassed the library's action adapter base class
+*and set it to this same exact const name in our modality class*, it is
+this class that will be used as a base class for the generated action
+adapters of this modality client.
+
+
+### fine-tuning the formal properties
+
+for any "action adapter" for which you want to modify the formal properties
+of the (back) action somehow, use the below const name to indicate the list
+of names of such formal properties.
+
+(we put "back" in parenthesis because all actions are "back actions" --
+when dealing with the front we always call them "action adapters" to at
+least *help* with the possible confusion.)
+
+some important facets of this employed here:
+
+  • the fact that we have set this const in our action adapter *base*
+    class will be equivalent to having set this const to this value
+    in all of its subclasses, because that's the way constants work
+    in the platform (provided you access them in the inheritence-
+    sensitive way we do).
+
+  • every *generated* action adapter in our application will be built of
+    this class for the reason explained in the previous section (namely,
+    that the const that holds this class has this particular magic name).
+    as such, this "list of names" (of formal properties to modify) applies
+    to these generated action adapters as well.
+
+  • it will have no effect for a name to appear in the list that does not
+    correspond to a formal property for the action. this is by design, so
+    that you can create one "master list" of names of properties you want
+    to mutate in your base class, and have it not break on those actions
+    that do not have this or that property.
+
+  • setting the list-of-names const to false-ish is equivalent to the
+    empty list. you may want to modify your base class to ignore a list
+    set by a parent class.
+
+
+
+## :#pedagogy-1975
+
+here is a crash-course on how you make a custom action adapter:
+
+  • from the top of inside your modality client, you must use a "box
+    module" with this exact const name. ("box modules" are modules that
+    strictly contain nothing but other modules (e.g classes), and
+    typically contain a business-like collection).
+
+  • note that we *do* take into account any "promotions" here -
+    the "init" action lives under the  is "promoted", we still write this
+    around where it lives in the module taxonomy.
+
+  • if we needed to customize the action adapter for a node that (after
+    promotion) is not in the top level, we would need to follow the same
+    taxonomy here, reconstructing the tree as necessary, but written to
+    correspond to the tree after promotion.
+    (EDIT: something about `Branch_Adapter`)
+
+  • we subclass our custom action adapter class. if you had none you
+    would use the base class of the same name from the [br] lib, which
+    might actually look exactly the same because of how consts work.
+_

@@ -2,5 +2,7 @@
 
 require_relative '../lib/skylab/brazen/core'
 
-x = Skylab::Brazen::CLI.new( $stdin, $stdout, $stderr ).invoke ARGV
-$stderr.puts "(existatus: #{ x })"
+_x = Skylab::Brazen::CLI::Client_for_Brazen_as_Application.new(
+  $stdin, $stdout, $stderr ).invoke ARGV
+
+$stderr.puts "(existatus: #{ _x })"

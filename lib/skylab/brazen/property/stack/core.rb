@@ -181,6 +181,8 @@ module Skylab::Brazen
 
     Build_missing_required_properties_event___ = -> miss_a, lemma=nil, nv=nil do
 
+      miss_a.first.respond_to?( :id2name ) and raise ::ArgumentError
+
       Callback_::Event.inline_with :missing_required_properties,
           :miss_a, miss_a,
           :lemma, lemma,
@@ -188,8 +190,8 @@ module Skylab::Brazen
           :error_category, :argument_error,
           :ok, false do |y, o|
 
-        s_a = o.miss_a.map do |prop|
-          par prop
+        s_a = o.miss_a.map do | prp |
+          par prp
         end
 
         if o.nv

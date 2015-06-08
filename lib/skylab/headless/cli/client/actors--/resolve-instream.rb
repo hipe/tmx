@@ -64,7 +64,7 @@ module Skylab::Headless
           nil
         end
 
-        Callback_::Trio.via_value_and_had_and_property x, had, _prp
+        Callback_::Qualified_Knownness.via_value_and_had_and_model x, had, _prp
       end
 
       def resolve_property  # (was: `infile_moniker`)

@@ -57,7 +57,11 @@ module Skylab::TanMan
         attr_writer :starter, :trio_box, :value_fetcher
 
         def via_trio_box
-          if @trio_box[ :use_default ] && @trio_box[ :use_default ].value_x
+
+          q = @trio_box[ :use_default ]
+
+          if q && q.is_known_is_known && q.is_known && q.value_x
+
             via_default
           else
             via_workspace_related_arguments

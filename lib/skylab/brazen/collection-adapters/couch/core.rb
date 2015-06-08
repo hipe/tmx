@@ -16,7 +16,7 @@ module Skylab::Brazen
       end,
       :ad_hoc_normalizer, -> arg, & oes_p do
 
-        if arg.value_x.nil?
+        if ! arg.is_known || arg.value_x.nil?
           # fallthru. let missing required check catch it.
           arg
 
@@ -47,7 +47,9 @@ module Skylab::Brazen
       end,
       :default, '5984',
       :ad_hoc_normalizer, -> arg, & oes_p do
-        x = arg.value_x
+        if arg.is_known
+          x = arg.value_x
+        end
         if x
           if /\A[0-9]{1,4}\z/ =~ x
             arg
@@ -125,8 +127,8 @@ module Skylab::Brazen
     def intrinsic_delete_before_delete_in_collection action, & oes_p
 
       Couch_::Actors__::Delete_collection.call(
-        action.trio( :dry_run ),
-        action.trio( :force ),
+        action.knownness( :dry_run ),
+        action.knownness( :force ),
         self,
         _HTTP_remote, & ( oes_p || handle_event_selectively ) )
 

@@ -49,7 +49,7 @@ module Skylab::Basic
               x_p and self._NICE
 
               _x = in_st.current_token
-              _trio = Callback_::Trio.via_value _x
+              _trio = Callback_::Knownness.new_known _x
 
               arg = normalize_argument _trio do | * i_a, & ev_p |
 
@@ -88,7 +88,7 @@ module Skylab::Basic
             ok = via_number_and_minimum_validate
           end
           if ok
-            Callback_::Trio.via_value @number
+            Callback_::Knownness.new_known @number
           else
             @result
           end
@@ -121,7 +121,7 @@ module Skylab::Basic
         def result_when_did_not_match
           maybe_send_event :error, :invalid_property_value do
 
-            _new_invalid_event.did_not_match @x, @argument.property, @number_set
+            _new_invalid_event.did_not_match @x, @argument.model, @number_set
           end
         end
 
@@ -146,7 +146,7 @@ module Skylab::Basic
           maybe_send_event :error, :invalid_property_value do
 
             _new_invalid_event.number_too_small(
-              @number, @argument.property, @minimum )
+              @number, @argument.model, @minimum )
           end
         end
 

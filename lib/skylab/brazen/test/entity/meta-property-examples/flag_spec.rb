@@ -51,7 +51,7 @@ module Skylab::Brazen::TestSupport::Entity
         kp = nil
 
         o = MPEF_Business_Widget.new do
-          kp = process_fully :hi, :hey, :ho
+          kp = process_fully_for_test_ :hi, :hey, :ho
         end
 
         o.hi.should eql true

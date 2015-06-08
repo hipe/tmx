@@ -859,7 +859,7 @@ module Skylab::Callback
 
           def via_default_proc_and_is_required_normalize  # #note-515, :+#courtesy
 
-            miss_a = nil
+            miss_prp_a = nil
             st = self.class.properties.to_value_stream
 
             begin
@@ -880,14 +880,14 @@ module Skylab::Callback
               end
 
               if prp.is_required && x.nil?
-                ( miss_a ||= [] ).push prp
+                ( miss_prp_a ||= [] ).push prp
               end
 
               redo
             end while nil
 
-            if miss_a
-              _ev = build_missing_required_properties_event miss_a
+            if miss_prp_a
+              _ev = build_missing_required_properties_event miss_prp_a
               receive_missing_required_properties_event _ev
               UNABLE_
 
@@ -896,9 +896,9 @@ module Skylab::Callback
             end
           end
 
-          def build_missing_required_properties_event miss_a
+          def build_missing_required_properties_event miss_prp_a
             Callback_.lib_.brazen::Property.
-              build_missing_required_properties_event( miss_a )
+              build_missing_required_properties_event( miss_prp_a )
           end
 
           def receive_missing_required_properties_event ev

@@ -503,45 +503,29 @@ module Skylab::Brazen
 
     # ~ properties
 
-    def to_even_iambic
+    def to_even_iambic  # :+#public-API
+
       y = []
-      st = to_full_pair_stream
-      pair = st.gets
-      while pair
-        y.push pair.name_symbol, pair.value_x
-        pair = st.gets
-      end
+      st = to_qualified_knownness_stream_
+      begin
+        known = st.gets
+        known or break
+        _x = if known.is_known_is_known
+          known.value_x
+        end
+        y.push known.name_symbol, _x
+        redo
+      end while nil
       y
     end
 
-    def to_pair_stream_for_persist
-      to_full_pair_stream
+    def to_pair_stream_for_persist  # :+public-API
+      to_qualified_knownness_stream_
     end
 
-    def to_full_pair_stream
-      Callback_::Stream.via_nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
-        Callback_::Pair.new any_property_value( i ), i
-      end
-    end
+    def property_value_via_property prp  # :+#public-API (limited but varied use)
 
-    def to_normalized_bound_property_scan
-      props = formal_properties
-      Callback_::Stream.via_nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
-        trio_via_property_ props.fetch i
-      end
-    end
-
-    def get_sorted_property_name_i_a
-      i_a = formal_properties.get_names
-      i_a.sort! ; i_a
-    end
-
-    def any_property_value i
-      @property_box[ i ]
-    end
-
-    def property_value_via_property prp
-      @property_box.fetch prp.name_symbol
+      knownness_via_property_( prp ).value_x
     end
 
     def normalize_property_value_via_normal_entity prp, ent, & oes_p
@@ -584,15 +568,15 @@ module Skylab::Brazen
 
   private
 
-    def actual_property_box
+    def as_entity_actual_property_box_
       @property_box
     end
 
-    def primary_box
+    def primary_box__
       @property_box
     end
 
-    def any_secondary_box
+    def any_secondary_box__
       @parameter_box
     end
 

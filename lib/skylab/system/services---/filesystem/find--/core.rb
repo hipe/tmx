@@ -188,7 +188,7 @@ module Skylab::System
           if s_a
             __normalze_trueish_unsanitized_freeform_string_array s_a
           else
-            Callback_::Trio.via_value s_a  # a false-ish value is valid
+            Callback_::Knownness.new_known s_a  # a false-ish value is valid
           end
         end
 
@@ -206,7 +206,7 @@ module Skylab::System
           if extra_a
             raise ::ArgumentError, "looks strange: #{ s_a.map( & :inspect ) } * ', ' }"
           else
-            Callback_::Trio.via_value s_a
+            Callback_::Knownness.new_known s_a
           end
         end
 

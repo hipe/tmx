@@ -22,7 +22,7 @@ module Skylab::TestSupport
 
           :flag, :property, :dry_run,
 
-          :hidden, :property, :downstream,
+          :property, :downstream,
 
           :required,
 
@@ -32,7 +32,7 @@ module Skylab::TestSupport
 
           :ad_hoc_normalizer, -> arg, & oes_p do
 
-            if arg.value_x
+            if arg.is_known && arg.value_x
               TestSupport_.lib_.basic::Pathname.normalization.new_with(
                 :absolute, :downward_only,
                 :no_single_dots,

@@ -511,7 +511,7 @@ module Skylab::Brazen
       def build_request_ended_prematurely_event
         build_not_OK_event_with :request_ended_prematurely,
             :name, @name do |y, o|
-          _prop = LIB_.basic.minimal_property o.name
+          _prop = LIB_.basic::Minimal_Property.via_name_function o.name
           y << "request ended prematurely - expecting value for #{ par _prop }"
         end
       end

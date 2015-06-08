@@ -15,7 +15,7 @@ module Skylab::Cull
           :filename, FILENAME_,
           :ftype, fs.constants::DIRECTORY_FTYPE,
           :max_num_dirs_to_look, -1,
-          :prop, arg.property
+          :prop, arg.model
         ) do | * i_a, & ev_p |
           result = oes_p[ * i_a, & ev_p ]
           UNABLE_
@@ -124,7 +124,7 @@ module Skylab::Cull
     def _edit_via_mutable_trio_box bx
 
       arg_a = bx.to_value_stream.reduce_by do | arg |
-        arg.is_known_known && :path != arg.name_symbol
+        arg.is_known && :path != arg.name_symbol
       end.to_a
 
       if arg_a.length.zero?
@@ -463,7 +463,7 @@ module Skylab::Cull
 
       def via_path_argument_resolve_existent_survey
 
-        _trio = trio :path
+        _trio = qualified_knownness :path
 
         path = Models_::Survey.any_nearest_path_via_looking_upwards_from_path(
           _trio,

@@ -28,7 +28,7 @@ module Skylab::TestSupport
 
       def __normalize_number
 
-        _arg = Callback_::Trio.via_value_and_variegated_symbol @N, :number
+        _arg = Callback_::Qualified_Knownness.via_value_and_variegated_symbol @N, :number
 
         ok_arg = Lib_::Basic[]::Number.normalization.with(
           :argument, _arg,

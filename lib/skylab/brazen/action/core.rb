@@ -315,8 +315,8 @@ module Skylab::Brazen
           nil
         end
 
-        bx.add sym, Callback_::Trio.
-          via_value_and_had_and_property( x, had, prp )
+        bx.add sym, Callback_::Qualified_Knownness.
+          via_value_and_had_and_model( x, had, prp )
 
         prp = st.gets
       end
@@ -338,7 +338,7 @@ module Skylab::Brazen
 
       a_.each do | k |
 
-        h_[ k ] = Callback_::Trio.via_value_and_property(
+        h_[ k ] = Callback_::Qualified_Knownness.via_value_and_model(
           h.fetch( k ), fo.fetch( k ) )
       end
 
@@ -356,7 +356,7 @@ module Skylab::Brazen
         if d < len
           k = a.fetch d
           d += 1
-          Callback_::Trio.via_value_and_property h.fetch( k ), fp.fetch( k )
+          Callback_::Qualified_Knownness.via_value_and_model h.fetch( k ), fp.fetch( k )
         end
       end
     end
@@ -440,15 +440,15 @@ module Skylab::Brazen
 
   private
 
-    def primary_box
+    def primary_box__
       @argument_box
     end
 
-    def any_secondary_box  # #todo - after universal integration, get rid of secondary box of action
+    def any_secondary_box__
       NIL_
     end
 
-    def actual_property_box  # #hook-out for entity
+    def as_entity_actual_property_box_
       @argument_box
     end
 

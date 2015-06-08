@@ -19,15 +19,41 @@ module Skylab::TestSupport
 
       CLI_LIB_ = superclass
 
+      # ~ universal action adapter customization
+
+      class Action_Adapter < CLI_LIB_::Action_Adapter
+
+        MUTATE_THESE_PROPERTIES = [ :downstream ]
+
+        def mutate__downstream__properties
+          remove_property_from_front :downstream
+        end
+      end
+
       # ~ specific action customization
 
-      Experimental_Hax__ = ::Module.new  # below
+      Actions = ::Module.new
 
-      module Actions
+      # ->
 
-        class Generate < CLI_LIB_::Action_Adapter
+        class Actions::Generate < Action_Adapter
 
           # here is one way to hack modality-specific defaults ( WILL DEPERECATE see :+[#br-042]
+
+          MUTATE_THESE_PROPERTIES = [
+            :arbitrary_proc_array,
+            :line_downstream,
+          ]
+
+          def mutate__arbitrary_proc_array__properties
+            remove_property_from_front :arbitrary_proc_array
+            NIL_
+          end
+
+          def mutate__line_downstream__properties
+            remove_property_from_front :line_downstream
+            NIL_
+          end
 
           def prepare_to_parse_parameters  # #hook-in to [br]
             super
@@ -36,6 +62,7 @@ module Skylab::TestSupport
               :line_downstream, @resources.sout )
                 # hidden property, can't be overwritten except
                 # effectively so with the --output-path option
+            NIL_
           end
 
           # ~ experiment
@@ -85,9 +112,11 @@ module Skylab::TestSupport
           end
         end
 
-        class Intermediates < CLI_LIB_::Action_Adapter
+        Action_Adapter_Event_Handling_Customizations__ = ::Module.new  # re-opened below
 
-          include Experimental_Hax__
+        class Actions::Intermediates < Action_Adapter
+
+          include Action_Adapter_Event_Handling_Customizations__
 
           def writing ev
             render_event_as_first_in_multipart_line ev
@@ -112,13 +141,13 @@ module Skylab::TestSupport
           end
         end
 
-        class Recursive < CLI_LIB_::Action_Adapter
+        class Actions::Recursive < Action_Adapter
 
           # do not put a trailing newline on these ones - they
           # are first of a pair and "look better" in one line.
           # this behavior will probably become [#ba-021] magic
 
-          include Experimental_Hax__
+          include Action_Adapter_Event_Handling_Customizations__
 
           def current_output_path ev, i_a
             receive_event_on_channel ev, i_a
@@ -152,9 +181,13 @@ module Skylab::TestSupport
           attr_reader :_saw_first_part
         end
 
-      end
+        # <-
 
-      module Experimental_Hax__
+      module Action_Adapter_Event_Handling_Customizations__
+
+        # #hook-in to [br] in two places, one to route events
+        # customly, and one to express them customly
+
       private
 
         def handle_event_selectively  # #hook-in [br]

@@ -26,9 +26,10 @@ module Skylab::TanMan
 
       def produce_result
 
-        bx = to_trio_box_
+        bx = to_trio_box__
 
-        bx.add :stdout, Callback_::Trio.via_value( stdout_ )
+        bx.add :stdout, Callback_::Qualified_Knownness.
+          via_value_and_model( stdout_, :__no_model__ )
 
         bc = @kernel.silo( :hear_front ).__bound_call_via_trio_box(
           bx,

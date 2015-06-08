@@ -136,7 +136,7 @@ module Skylab::Brazen::TestSupport::Entity
 
       def _expect cls
         subj = cls.new { }
-        subj.process_fully :foo, :x, :bar, :y
+        subj.process_fully_for_test_ :foo, :x, :bar, :y
         subj.instance_variable_get( :@foo ).should eql :x
         subj.instance_variable_get( :@bar ).should eql :y
       end

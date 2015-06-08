@@ -39,7 +39,9 @@ module Skylab::Cull
           cfg.add_comment "ohai"
         end
 
-        @survey.write_ @dry_run_arg.value_x
+        kn = @dry_run_arg
+
+        @survey.write_( ( kn.value_x if kn.is_known ) )
 
       end
     end

@@ -30,10 +30,6 @@ module Skylab::Basic  # introduction at [#020]
         self::Lib_, self )
     end
 
-    def minimal_property name
-      Minimal_Property.new name
-    end
-
     def normalizers
       Normalizers_instance__[]
     end
@@ -111,7 +107,10 @@ module Skylab::Basic  # introduction at [#020]
       def via_variegated_symbol i
         new Callback_::Name.via_variegated_symbol i
       end
-    end
+
+      alias_method :via_name_function, :new
+      private :new
+    end  # >>
 
     def initialize name
       @name = name

@@ -95,7 +95,7 @@ module Skylab::Basic
             MOCK_PROPERTY__
           end
 
-          Callback_::Trio.via_value_and_had_and_property(
+          Callback_::Qualified_Knownness.via_value_and_had_and_model(
             value_x, actuals_has_name, _prop )
         end
       end
