@@ -1,0 +1,11 @@
+slicer              q [ done ]
+
+file-metrics        q [ TODO ]
+
+beauty-salon        q [ TODO ]
+
+git                 Q [ TODO ]
+
+sub-tree            q [ TODO ]
+
+tmx                 q [ TODO ]

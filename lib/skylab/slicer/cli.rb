@@ -1,53 +1,21 @@
 module Skylab::Slicer
 
-  class CLI::Client < Slicer_.lib_.CLI_client
+  class CLI < Brazen_::CLI
 
-    def initialize( * )
-      super
-      @param_h = { }
-    end
-
-    use :hi, :last_hot
-
-    set :node, :ping, :invisible
-
-    def ping
-      @y << "hello from slicer."
-      :hello_from_slicer
-    end
-
-    option_parser do |o|
-      o.separator "#{ hi 'description:' } just raw-ass file copy to the slice!"
-      o.separator "#{ hi 'options:' }"
-      dry_run_option o
-
-      o.banner = last_hot.usage_line
-    end
-
-    aliases :xfer
-
-    def transfer
-      api
-    end
-
-  dsl_off
-  private
-
-    def dry_run_option o
-      @param_h[ :dry_run ] = false
-      o.on '-n', '--dry-run', 'dry run.' do
-        @param_h[ :dry_run ] = true
+    class << self
+      def new * a
+        new_top_invocation a, Slicer_.application_kernel_
       end
+    end  # >>
+
+    def expression_agent_class
+      self.class.superclass::Expression_Agent
     end
 
-    def on_info_line e
-      @y << e.payload_a.fetch( 0 )
-      nil
+    def self.unbound_for_face _
+      self
     end
 
-    def on_info_message e
-      @y << "#{ @mechanics.last_hot_nis }: #{ e.payload_a.fetch 0 }"
-      nil
-    end
+    Client = self
   end
 end

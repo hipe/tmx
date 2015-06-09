@@ -229,9 +229,13 @@ module Skylab::Face
             end
           end,
           function: -> _ do
-            strange_mod = @surface_mod[]
-            if strange_mod
-              strange_mod::Adapter::For::Face::Of::Hot[ self, strange_mod ]
+            mod = @surface_mod[]
+            if mod
+              if mod.respond_to? :unbound_for_face
+                Common_Adapter___.new mod
+              else
+                mod::Adapter::For::Face::Of::Hot[ self, mod ]
+              end
             end
           end,
           blocks: -> parent_svcs do
@@ -304,6 +308,45 @@ module Skylab::Face
         end, -> do
           oro
         end
+      end
+    end
+
+    class Common_Adapter___
+
+      def initialize _
+        @_cls = _
+      end
+
+      def call o, s
+
+        @_o = o
+        @_s = s
+
+        self
+      end
+
+      def pre_execute
+        true
+      end
+
+      def is_autonomous
+        true
+      end
+
+      def get_autonomous_quad argv
+
+        o = @_o.instance_variable_get( :@surface ).call
+
+        _pn = o.instance_variable_get( :@program_name ) ||
+          ::File.basename( $PROGRAM_NAME )
+
+        _rcvr = @_cls.new(
+          o.instance_variable_get( :@sin ),
+          o.instance_variable_get( :@out ),
+          o.instance_variable_get( :@err ),
+          [ _pn, @_s ] )
+
+        [ _rcvr, :invoke, [ argv ], nil ]
       end
     end
   end

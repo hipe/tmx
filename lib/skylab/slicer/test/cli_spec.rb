@@ -2,20 +2,17 @@ require_relative 'test-support'
 
 module Skylab::Slicer::TestSupport
 
-  describe "[sli]" do
+  describe "[sli] CLI cannon" do
 
     extend TS_
+    use :expect_CLI
 
-    as :exp, /\AExpecting .*transfer/, :styled
-    as :inv, /\Atry wtvr -h \[sub-cmd\] for help\.\z/i, :styled
+    it "1.3" do
 
-    context "canon" do
-
-      it "0" do
-        # debug!
-        invoke []
-        expect [ :exp, :inv ]
-      end
+      invoke 'ping'
+      expect :e, "hello from slicer."
+      expect_no_more_lines
+      @exitstatus.should eql :hello_from_slicer
     end
   end
 end

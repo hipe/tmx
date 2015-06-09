@@ -3,26 +3,47 @@ require 'skylab/test-support/core'
 
 module Skylab::Slicer::TestSupport
 
-  Slicer_ = ::Skylab::Slicer
   TestSupport_ = ::Skylab::TestSupport
 
   TestSupport_::Regret[ TS_ = self ]
-
-  Slicer_::Lib_::Face__[]::TestSupport::CLI::Client[ self ]
 
   extend TestSupport_::Quickie
 
   module ModuleMethods
 
-    def client_class
-      Slicer_::CLI::Client
+    def use sym
+      :expect_CLI == sym or fail
+      Brazen_.test_support.CLI::Expect_CLI[ self ]
+      NIL_
     end
   end
 
-  Benchmarks = ::Module.new
+  module InstanceMethods
 
-  module Constants
-    Slicer_ = Slicer_
-    TestSupport = TestSupport_
+    attr_reader :do_debug
+
+    def debug!
+      @do_debug = true
+    end
+
+    def debug_IO
+      TestSupport_.debug_IO
+    end
+
+    def subject_CLI
+      Slicer_::CLI
+    end
+
+    define_method :get_invocation_strings_for_expect_stdout_stderr, -> do
+      s_a = [ 'sli' ]
+      -> do
+        s_a
+      end
+    end.call
   end
+
+  Slicer_ = ::Skylab::Slicer
+
+  Brazen_ = Slicer_::Brazen_
+  NIL_ = nil
 end
