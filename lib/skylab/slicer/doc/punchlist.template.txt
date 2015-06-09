@@ -18,7 +18,7 @@ permute             q [ ]
 file-metrics        q [ ]
 
 git                 Q [ ]
-git-viz (item 16)   q [ ]
+git-viz (item 15)   q [ ]
 
 sub-tree            q [ ]
 snag                q [ ]
@@ -27,7 +27,6 @@ tan-man             q [ ]
 treemap             Q [ ]
 
 face                q [ ]
-porcelain           Q [ ]
 
 brazen              q [ ]
 callback            q [ ]

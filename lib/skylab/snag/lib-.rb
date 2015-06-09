@@ -10,7 +10,6 @@ module Skylab::Snag
     o[ :FileUtils ] = stdlib
     o[ :Open3 ] = stdlib
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
-    o[ :Porcelain__ ] = -> _ { subsystem[ :Porcelain ] }
     o[ :Shellwords ] = stdlib
     o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
 
@@ -112,8 +111,6 @@ module Skylab::Snag
     Plugin = -> do
       HL__[]::Plugin
     end
-
-    Porcelain__ = sidesys[ :Porcelain ]
 
     Pretty_path = -> x do
       Brazen[]::CLI.pretty_path x
