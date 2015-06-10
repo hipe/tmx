@@ -1,33 +1,37 @@
 require_relative '../test-support'
 
-module Skylab::Headless::TestSupport::CLI::Pen
+module Skylab::Brazen::TestSupport::CLI
 
-  ::Skylab::Headless::TestSupport::CLI[ self ]
+  describe "[br] CLI - styling - chunker" do
 
-  include Constants
+    it "loads" do
+      _subject_module::Chunker
+    end
 
-  extend TestSupport_::Quickie
+    it "chunks & unstyles" do
 
-  describe "[hl] CLI pen chunker" do
+      mod = _subject_module
 
-    stylize = Headless_::CLI.pen.stylize
+      _s = "foo #{ mod.stylize 'bar', :blue } baz"
 
-    parse_styles = Headless_::CLI.parse_styles
+      _sexp = mod.parse_styles _s
 
-    unstyle_sexp = Headless_::CLI.unstyle_sexp
+      types = []
+      strings = []
 
-    it "look, wow" do
+      mod::Chunker.via_sexp( _sexp ).each do | pt |
 
-      styl = "foo #{ stylize[ 'bar', :blue ] } baz"
-      sexp = parse_styles[ styl ]
-      parts = Headless_::CLI.pen.chunker.scan( sexp ).to_a
-      types, strings = parts.reduce [[],[]] do |(tp, st), pt|
-        tp << pt[0][0]
-        st << unstyle_sexp[ pt ]
-        [ tp, st ]  # just cute not good
+        types.push pt.fetch( 0 ).fetch( 0 )
+        strings.push mod.unstyle_sexp pt
       end
-      types.should eql( [ :string, :style, :string] )
-      strings.should eql( ["foo ", "bar", " baz"] )
+
+      types.should eql [ :string, :style, :string ]
+
+      strings.should eql ["foo ", "bar", " baz" ]
+    end
+
+    def _subject_module
+      Brazen_::CLI::Styling
     end
   end
 end

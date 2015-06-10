@@ -1,4 +1,4 @@
-# name conventions for functions and methods :[#095]
+# name conventions for functions and methods :[#028]
 
 
 ## introduction
@@ -8,19 +8,19 @@ we say "function" to give these ideas a bit of platform independence;
 however in the context of the current host platform, when we say "function"
 we always mean "proc" or proc-like.
 
-this is a re-creation of a document lost in the [#084] fire. it will be
+this is a re-creation of a document lost in the [#br-092] fire. it will be
 better this time.
 
 
-## the list of conventional method prefixes/suffixes/names.. :[#103]
+## the list of conventional method prefixes/suffixes/names.. :[#.A]
 
 ..and an introduction to their semantics.
 
-+ `build_` (and often `bld_` per [#119]) - result is a new instance of a
++ `build_` (and often `bld_` per [#.D]) - result is a new instance of a
   class (either library, stdlib or corelib) that is not one of the
   classes described by `get_` below. the object may or may not be
   initialized in some special way as decribed by the method name. this
-  method must have no side-effects. (oops also see [#154] for the same
+  method must have no side-effects. (oops also see [#031] for the same
   thing written 10 months prior)
 
 + `_by` used frequently for method that necessarily take procs;
@@ -38,7 +38,7 @@ better this time.
 + `call` - for proc-like objects (typically [#cb-045] actors or
   [#br-001] entities), must do the same as `[]` for this object.
   in these kind of objects, arguments are a (non-iambic) (positional)
-  arglist. must not be used for non-proc-like classes. :+[#020]
+  arglist. must not be used for non-proc-like classes. :+[#.E]
 
 + `curry_with` - see the #iambic family of method name conventions
 
@@ -48,7 +48,7 @@ better this time.
   one #hook-out method the client must supply. it must take no
   arguments. [#cb-042] actors exemplify these semantics, as well as many
   of the base-classes called something like "action" in many of our
-  frameworks :+[#020]
+  frameworks :+[#.E]
 
 + `[..]_for_[..]` - this is becoming a convention for "#hook-out"
   methods (defined somewhere): e.g `foo_bar_for_biff_baz` is a method that
@@ -63,7 +63,7 @@ better this time.
 + `get_` - result is the result object of having allocated new memory
   for and initialized an object that is either of a native "primitive
   data structure or type" or a ubiquitous low-level utilty class (stream,
-  box, hash, array etc). see [#094] dedicated section on this. this method
+  box, hash, array etc). see [#.B] dedicated section on this. this method
   must have no side-effects.
 
 + `flush` is our "go-to" name for something that cannot fail and
@@ -77,7 +77,7 @@ better this time.
   parent. `init_copy` is a suggested default name for this (to
   compliment the platform-recognized `initialize_copy`). 2) `init_foo`
   should typically init the ivar `@foo` in a way that cannot fail. if it
-  may fail (as would be evinced by a result value) use [#154] `resolve_`.
+  may fail (as would be evinced by a result value) use [#031] `resolve_`.
   `init_ivars` is a popular method name employed in [#cb-042] actors for
   initting those ivars that cannot in the current state fail to be
   initted.
@@ -85,11 +85,11 @@ better this time.
 + `invoke` - deprecated as a bareword method name. used a lot in legacy
   frameworks to be an entrypoint method that takes arguments. it is
   deprecated because it expresses neither what it accepts or what shape
-  its result is. :+[#020]
+  its result is. :+[#.E]
 
 + `new_with` - see the #iambic family of method name conventions below.
 
-+ `on_` see [#175] method naming conventions around events below.
++ `on_` see [#.C] method naming conventions around events below.
 
 + `produce_`, `_produce[_]` - result is the subject object as described
   by the rest of the method name. whether or not new memory is being
@@ -100,10 +100,10 @@ better this time.
 
 + `reduce_with` - see the #iambic family of method name conventions below
 
-+ `resolve_` - has a dedicated [#154] document that needs a rewrite.
++ `resolve_` - has a dedicated [#031] document that needs a rewrite.
 
 + `run_` - this is reserved for starting a long-running process, so in
-  practice it is rarely used on this platform :+[#020].
+  practice it is rarely used on this platform :+[#.E]
 
 + `via_` will one day have its own section #todo
 
@@ -147,10 +147,12 @@ better this time.
 
 
 
-### the `get_` prefix semantics as a nod to an ObjC convention :[#094]
+### the `get_` prefix semantics as a nod to an ObjC convention :[#.B]
+
+(NOTE: there is some spurious confusion btwn this node and [#hl-094] )
 
 it is perhaps a misunderstanding of the convention, but we base these
-semantics off of something we read in the [#sk-142] hilleglas book: "In the common
+semantics off of something we read in the [#sl-142] hilleglas book: "In the common
 idioms of Objective-C, a method prefixed with `get` takes an address
 where data can be copied. [..]" [3][3]  We take a very liberal
 interpretatin of this convention to make it one of ours: whereas in the
@@ -163,7 +165,18 @@ is for the simpler operations, `build_` is for the more complex ones.)
 
 
 
-## naming conventions around events :[#175]
+## :[#.E]
+
+`invoke` `execute` `run`, and ( `call`, `[]` ) have distinct meanings and
+consistent signatures within modalities. these are reserved names in the
+sense that if they are used they must accord with the conventional
+semantics. this tag tracks their occurrences under this document node,
+at which a semantic proscribement for each name can be found.
+
+
+
+
+## naming conventions around events :[#.C]
 
 because most of these are method naming conventions we put this node
 here but there are some that are not.
@@ -542,7 +555,7 @@ we must follow suit with the existing word, so please see `reduce_with`.
 
 
 
-## the method naming shibbloleth :[#119]
+## the method naming shibbloleth :[#.D]
 
 ### edit: the simplified version:
 
@@ -616,7 +629,7 @@ shorthand. this section describes both the pattern behind this chaos
 and the utility of it.
 
 in summary the pattern has to do with visibility and at some level is
-comparable to the [#079] three levels of visibility as expressed by
+comparable to the [#029.G] three levels of visibility as expressed by
 trailing underscores of const names. what we mean by "visiblity" and how
 this may be different than the visibility you are familiar with will be
 explained below.
@@ -789,10 +802,10 @@ of the following section.
 
 (spoiler alert for the eager and precocious: these three levels of
 visibiy have semantics similar but not the same as the three levels of
-visibility decribed by [#079] the trailing underscore convention for
+visibility decribed by [#029.G] the trailing underscore convention for
 const names.)
 
-recall from [#094] that when we say "node" in the context of the
+recall from [#.B] that when we say "node" in the context of the
 native platform usually (but not always) mean "module" (e.g "class").
 
 an "API public" method is part of the "public API" of the node as is

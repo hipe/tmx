@@ -4,7 +4,7 @@ module Skylab::Parse
 
     class Functions_::Sequence < Parse_::Function_::Currying
 
-      # ([#sl-129] three laws all the way. [#hl-119] name conventions.)
+      # ([#sl-129] three laws all the way. [#bs-028.D] name conventions.)
 
       def parse_
 

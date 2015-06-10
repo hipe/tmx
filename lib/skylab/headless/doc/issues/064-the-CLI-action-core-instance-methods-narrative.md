@@ -135,7 +135,7 @@ in the implementation of this method note:
 ## :#storypoint-30 ugly names
 
 intentionally ugly names are employed by this node for certain methods, and
-they have a specific semantics and scope as described in [#119] "the method
+they have a specific semantics and scope as described in [#bs-028.D] "the method
 naming shibboleh". (in fact these conventions only grew stronger while re-
 working this node.)
 
@@ -324,7 +324,7 @@ API, and we reserve the right to change or eliminate them.
 
 `say` is arguably the most important method of this node. perhaps it is the
 most important mechanism in the [#010] client tree model. this private method
-is part of our :#public-API. we pick this dialog up in [#141] the expression
+is part of our :#public-API. we pick this dialog up in [#br-094] the expression
 agents story, because it could get lengthy. (it does, and it has an ASCII
 graphic!)
 
@@ -423,7 +423,7 @@ of this library.
 for some action nodes, the question will have to be asked "what argument
 syntax is "current" or "active"?. this implementation is a bit of a small
 mess, so #todo:during-merge. result is is an object not a string per our
-[#095] method naming conventions, but confusion will be forgiven in this case.
+[#bs-028] method naming conventions, but confusion will be forgiven in this case.
 (there is another method naming convention at work here, one that will be
 described below).
 
@@ -463,7 +463,7 @@ are the subject of a syntax error.
 (there is significance that this happens here and not in an auxiliary
 "agent"-type object yet.)
 
-(with regards to the method name, get this: an INSANE spin on [#119] the
+(with regards to the method name, get this: an INSANE spin on [#bs-028.D] the
 method naming shibboleth: we use a de-vowelated words in the method, but
 they occur at the end and we do not de-vowelate any words not at the end.
 this is our way of telling ourselves that the method is API private but

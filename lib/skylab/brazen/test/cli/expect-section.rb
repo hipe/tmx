@@ -139,19 +139,8 @@ module Skylab::Brazen::TestSupport::CLI
       end
 
       def unstyled_content
-        @__UC__ ||= __unstyle_content
+        @__UC__ ||= Brazen_::CLI::Styling.unstyle line_content
       end
-
-      define_method :__unstyle_content, ( -> do
-
-        pp = Callback_.memoize do
-          Brazen_.lib_.old_CLI_lib.pen.unstyle
-        end
-
-        -> do
-          pp[][ line_content ]
-        end
-      end.call )
 
       def line_content
         @line_content ||= @line[ @content_range ]

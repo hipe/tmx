@@ -1,22 +1,25 @@
-module Skylab::CodeMolester
+module Skylab::Basic
 
   class Sexp < ::Array  # (apologies to zenspider)
 
+    # (NOTE: this is *ancient* - here only to support legacies for now)
+
     class << self
+
       def members
         if const_defined? :MEMBER_I_A__, true
           self::MEMBER_I_A__
         end
       end
 
-      def scan * a
+      def stream_via * a
         if a.length.zero?
-          Sexp_::Scan
+          Sexp_::Stream
         else
-          Sexp_::Scan.new( * a )
+          Sexp_::Stream.new( * a )
         end
       end
-    end
+    end  # >>
 
     def members
       self.class.members
@@ -43,7 +46,7 @@ module Skylab::CodeMolester
     end
 
     def unparse
-      sio = CM_::Library_::StringIO.new
+      sio = Basic_.lib_.string_IO
       unparse_to sio
       sio.string
     end
@@ -60,37 +63,43 @@ module Skylab::CodeMolester
       end ; nil
     end
 
-    def children i, & p
-      produce_scan_for( i ).each( & p )
+    def children sym, & p
+
+      produce_scan_for( sym ).each( & p )
     end
 
-    def child i
-      via_scan_calculate_for i do |scn|
-        scn.gets
+    def child sym
+
+      via_scan_calculate_for sym do | st |
+        st.gets
       end
     end
 
-    def rchild i
-      via_scan_calculate_for i do |scn|
-        scn.last
+    def rchild sym
+
+      via_scan_calculate_for sym do | st |
+        st.last
       end
     end
 
-    def produce_scan_for i
-      Sexp_::Scan.new self, i
+    def produce_scan_for sym
+
+      Sexp_::Stream.new self, sym
     end
 
     def via_scan_calculate & p
-      Sexp_::Scan.instance_session do |scn|
-        scn.set_identity self
-        p[ scn ]
+
+      Sexp_::Stream.instance_session do | st |
+        st.set_identity self
+        p[ st ]
       end
     end
 
-    def via_scan_calculate_for i, & p
-      Sexp_::Scan.instance_session do |scn|
-        scn.set_identity self, i
-        p[ scn ]
+    def via_scan_calculate_for sym, & p
+
+      Sexp_::Stream.instance_session do | st |
+        st.set_identity self, sym
+        p[ st ]
       end
     end
 

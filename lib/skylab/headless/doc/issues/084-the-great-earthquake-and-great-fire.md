@@ -1,4 +1,4 @@
-# what is the deal with expression agents :[#084]
+# what is the deal with expression agents :[#br-092]
 
 `Pen` (at this level) is an experimental attempt to generalize and unify a
 subset of interface-level string decorating functions so that the same
@@ -14,12 +14,12 @@ INTERJECTION: this following thing we're about to explain to ourselves is
 hilarious to us. we just found the initial trigger of the "great earthquake"
 (which lead to the great fire)..
 
-(EDIT: you may be looking for [#141] the real with with expression agents
+(EDIT: you may be looking for [#br-094] the real with with expression agents
 if you mistakenly assumed that the title of this document reflected its
 contents)
 
 the uptake of all of it is this essay is shadowed by a same-titled one over
-at [#fa-052], "what is the deal with expression agents?". but what we're about
+at [#br-093], "what is the deal with expression agents?". but what we're about
 to say is more interesting to us..
 
 

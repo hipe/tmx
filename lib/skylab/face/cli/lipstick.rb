@@ -106,11 +106,21 @@ module Skylab::Face
         norm = -> x do
           [ [ x, 0.0 ].max, 1.0 ].min
         end
+
         @cook = -> my_room do
+
+          # ~ ( note to the future - it's ok to rewrite this
+
           # `normalized_float` below must be nil or btwn 0.0 and 1.0 inclusive
+
           styliz = if color
-            LIB_.CLI_lib.pen.stylify.curry[ [ color ] ]
-          else IDENTITY_ end
+            Face_.lib_.brazen::CLI::Styling::Stylify.curry[ [ color ] ]
+          else
+            IDENTITY_
+          end
+
+          # ~ )
+
           -> normalized_float do
             if normalized_float  # allow nil to mean "don't do it"
               styliz[ glyph * ( norm[ normalized_float ] * my_room ).to_i ]

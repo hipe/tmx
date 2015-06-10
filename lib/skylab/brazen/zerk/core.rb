@@ -198,7 +198,7 @@ module Skylab::Brazen
 
       # ~ sending & receiving events, public interface & support
       #
-      #   follows [#hl-175] name conventions. see #note-185
+      #   follows [#bs-028.C] name conventions. see #note-185
 
       def maybe_receive_unsigned_event_via_channel i_a, & ev_p  # for familiars
         maybe_send_event_via_channel i_a, & ev_p

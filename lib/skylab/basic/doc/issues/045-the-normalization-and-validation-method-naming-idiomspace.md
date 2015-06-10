@@ -1,4 +1,13 @@
-# the method-naming idiomspace of validation :[#153]
+# the method-naming idiomspace of validation :[#045]
+
+## introduction in context
+
+this is a historical document kept because it informs ideas that went on
+to become [#027]; so that document should be seen as a "solution" to the
+problems introduced here. NOTE that everything after this sentence is
+historical and may no longer be accurate.
+
+
 
 
 ## purpose and scope
@@ -112,7 +121,7 @@ these issues.
 • if you want something like a "validate" method that has no behavioral
   (or otherwise) side-effects, then you must not name your method with
   "validate" as as stem. name your method something like `foo_is_valid` or
-  simply `is_valid` as appropriate; which, purusant to the [#095] name
+  simply `is_valid` as appropriate; which, purusant to the [#bs-028] name
   convention for methods that result in boolean-ish, confers that this method
   results in a semantic boolean-ish with no side effects at all.
 

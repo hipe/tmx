@@ -16,11 +16,14 @@ module Skylab::Headless
         class << self
 
           def [] op_x
-            _scan = Option_.scan op_x
-            _scan_ = _scan.map_by do |sw|
+
+            _st = Headless_.lib_.brazen::CLI::Option_Parser::Option_stream[ op_x ]
+
+            _st_ = _st.map_by do | sw |
               Option_.build_via_switch sw
             end
-            new_with :upstream, _scan_, :key_method_name, :normalized_parameter_name
+
+            new_with :upstream, _st_, :key_method_name, :normalized_parameter_name
           end
 
           def weak_identifier_for_switch sw

@@ -1,6 +1,6 @@
-# name conventions for constants :[#097]
+# name conventions for constants :[#029]
 
-(this is a ground-up re-write of a document "lost in the [#084] fire".)
+(this is a ground-up re-write of a document "lost in the [#br-092] fire".)
 
 ## introduction
 
@@ -23,18 +23,23 @@ dimensions:
     2) the name will reflect the "scope" of the thing being named.
 
 
-### the way shape is reflected in a const name :[#102]
+### the way shape is reflected in a const name :.A
 
 the name we choose will assume different "inflection" based on whether,
-variously, it references [#166] a non-class module, [#167] a class,
-[#101] a proc or proc-like, or [#114] any other value not in that list.
+variously, it references
+
+  • [#.E] a non-class module,
+  • [#.F] a class,
+  • [#.C] a proc or proc-like
+  • or [#.B] any other value not in the above list.
+
 we will present the conventions here in order from "smallest" to "biggest",
 idiomatically:
 
 
 
 
-#### the name convention for arbitrary values not in the list :[#114]
+#### the name convention for arbitrary values not in the list :.B
 
 adopting the C-like convention, we use names in all caps whose
 constituent words are separated by underscores:
@@ -44,14 +49,14 @@ constituent words are separated by underscores:
 the above is an example of a const that holds a regex.
 
 in practice, we will often see our const names containing one or more
-[#079] trailing underscores because of [[#165]] "rounded API's".
+[#.G] trailing underscores because of [#xxx] "rounded API's".
 
 that is all.
 
 
 
 
-#### the name conventions for proc-like consts :[#101]
+#### the name conventions for proc-like consts :.C
 
 
 for a proc when that proc is assigned to a const, or other proc-like
@@ -71,8 +76,8 @@ the exception is for acronyms. those must be in all uppercase:
 
 
 the justification for the utility of such a convention is as follows: if
-we just made such names follow [#114] the convention for arbitrary
-values or [#098] the convention for modules, then these names would carry
+we just made such names follow [#.B] the convention for arbitrary
+values or [#.D] the convention for modules, then these names would carry
 less information and the code would be less self-documenting.
 
 the rationale behind the general convention is that this makes the
@@ -84,17 +89,17 @@ is sometimes lossy, and always ugly.
 
 
 
-#### the name convention for module names :[#098]
+#### the name convention for module names :.D
 
 
 
 
-##### the const name conventions for a non-class module :[#166]
+##### the const name conventions for a non-class module :.E
 
 
 
 
-##### the const name conventions for a class :[#167]
+##### the const name conventions for a class :.F
 
 
 
@@ -103,7 +108,7 @@ is sometimes lossy, and always ugly.
 
 
 
-### scope is reflected in const names by trailing underscores :[#079]
+### scope is reflected in const names by trailing underscores :.G
 
 perhaps the most visually prominent name convention of them all in this
 universe, we employ this convention heavily: how many underscores trail
@@ -114,7 +119,7 @@ a const name indicates how private the value is:
 #### a const with no trailing uderscores is..
 
 .. part of the surrounding node's public API. (for a review of what we
-mean by "node" see [#094].)
+mean by "node" see [#028.B].)
 
 this means that the characters that make up this const's name and the
 semantics of what this const references must not change during this

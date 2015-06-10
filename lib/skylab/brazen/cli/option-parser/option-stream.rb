@@ -1,65 +1,81 @@
-module Skylab::Headless
+module Skylab::Brazen
 
-  module CLI::Option__
+  class CLI
 
-    class Scan__  # see [#168]
+    class Option_Parser::Option_stream  # see [#095]
 
-      Callback_::Actor[ self, :properties,
-        :x ]
+      Callback_::Actor.call self, :properties,
+        :x
+
+      def initialize
+        super
+        @pass_p ||= Default_pass__
+      end
 
       def execute
-        resolve_pass_proc
-        resolve_enumerator
+
+        ea = __produce_some_enumerator
+
         Callback_.stream do
-          while true
+
+          begin
             begin
-              sw = @enumerator.next
-              sw or next
+
+              sw = ea.next
+              sw or redo
+
               _b = @pass_p[ sw ]
-              _b or next
-              switch = sw
+              _b or redo
+
+              x = sw
               break
+
             rescue ::StopIteration
               break
             end
-          end
-          switch
+
+            redo
+          end while nil
+
+          x
         end
-      end
-
-    private
-
-      def resolve_pass_proc
-        @pass_p ||= Default_pass__
       end
 
       Default_pass__ = -> sw do
 
-        ok = ! SHORT_LONG_I_A__.detect do |i|
-          ! sw.respond_to? i
+        _found = ! SHORT_LONG_I_A__.detect do | sym |
+          ! sw.respond_to? sym
         end
 
-        ok and SHORT_LONG_I_A__.detect do |i|
-          x = sw.send i
-          x and x.length.nonzero?
+        if _found
+
+          SHORT_LONG_I_A__.detect do | sym |
+            x = sw.send sym
+            x or next
+            x.length.nonzero?
+          end
         end
       end
 
       SHORT_LONG_I_A__ = [ :short, :long ].freeze
 
-      def resolve_enumerator
+      def __produce_some_enumerator
+
         if @x.respond_to? :each
-          @enumerator = @x
+          @x
         else
-          @enumerator = build_enumerator
+          __build_enumerator
         end
       end
 
-      def build_enumerator
+      def __build_enumerator
+
         ::Enumerator.new do |y|
+
           @x.send :visit, :each_option do |sw|
             y << sw
-          end ; nil
+          end
+          NIL_
         end
       end
     end

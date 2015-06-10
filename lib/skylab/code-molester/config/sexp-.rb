@@ -2,11 +2,11 @@ module Skylab::CodeMolester
 
   module Config
 
-    class Sexp_ < CM_::Sexp
+    class Sexp_ < CM_.lib_.basic::Sexp
 
       LIB_.delegating self, :employ_the_DSL_method_called_delegates_to
 
-      CM_::Sexp::Registrar[ self ]
+      CM_.lib_.basic::Sexp::Registrar[ self ]
 
       def build_comment_line line
         line = "# #{line.gsub(/[[:space:]#]+/, SPACE_ ).strip}\n" # could be improved

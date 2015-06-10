@@ -67,6 +67,7 @@ module Skylab::Basic
     Basic_ = ::Skylab::Basic
     Callback_ = Basic_::Callback_
     EMPTY_A_ = Basic_::EMPTY_A_
+    EMPTY_S_ = Basic_::EMPTY_S_
     NIL_ = nil
 
     module Constants

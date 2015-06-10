@@ -55,6 +55,6 @@ module Skylab::Yacc2Treetop::TestSupport
       err.size.should eql(0)
     end
 
-    define_method :unstyle, & ::Skylab::Headless::CLI.pen.unstyle
+    define_method :unstyle, & ::Skylab::Brazen::CLI::Styling::Unstyle
   end
 end

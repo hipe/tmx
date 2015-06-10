@@ -42,14 +42,14 @@ module Skylab::Face  # read [#011] the top node narrative
     sidesys = Autoloader_.build_require_sidesystem_proc
 
     Arity_space_create = -> p, p_ do
-      Br___[]::Arity::Space.create p, & p_
+      Brazen[]::Arity::Space.create p, & p_
     end
 
     Basic_fields = -> * x_a do
       MH__[]::Basic_Fields.call_via_iambic x_a
     end
 
-    Br___ = sidesys[ :Brazen ]
+    Brazen = sidesys[ :Brazen ]
 
     Bsc__ = sidesys[ :Basic ]
 

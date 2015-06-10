@@ -29,7 +29,7 @@ module Skylab::TestSupport
       # ~
 
       def code x
-        LIB_.CLI_lib.pen.stylize x, :green
+        LIB_.brazen::CLI.stylize x, :green
       end
 
       def escape_path pn
@@ -37,11 +37,11 @@ module Skylab::TestSupport
       end
 
       def highlight s # [br]
-        LIB_.CLI_lib.pen.stylize s, :green
+        LIB_.brazen::CLI::Styling.stylize s, :green
       end
 
       def hdr s  # [br]
-        LIB_.CLI_lib.pen.stylize s, :strong, :green
+        LIB_.brazen::CLI::Styling.stylize s, :strong, :green
       end
 
       def ick x

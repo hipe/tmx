@@ -77,11 +77,11 @@ module Skylab::Git::TestSupport::CLI
       s
     end
 
-    pen = Git_.lib_.CLI_lib.pen
+    styling = Git_.lib_.brazen::CLI::Styling
 
-    STYLE_RX__ = pen.simple_style_rx
+    STYLE_RX__ = styling::SIMPLE_STYLE_RX
 
-    pen.each_pair_at :unstyle_styled, & method( :define_method )
+    styling.each_pair_at :unstyle_styled, & method( :define_method )
 
     def contiguous_string_from_lines_on i
       line_a = bkd_a

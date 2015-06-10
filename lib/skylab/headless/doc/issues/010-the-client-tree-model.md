@@ -51,7 +51,7 @@ related articles:
 
 • in [#fa-030] trending away from sub-clients, we whine about them there.
 
-• [#fa-052] "what is the deal with expression agents" discovers the big
+• [#br-093] "what is the deal with expression agents" discovers the big
   problem with sub-clients (as they were implemented) and tries to fix them
-  and then makes a big mess. (our [#084] spares us no detail of the story
+  and then makes a big mess. (our [#br-092] spares us no detail of the story
   of the great earthquake and fire that ensued.)

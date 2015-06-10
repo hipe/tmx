@@ -1,213 +1,184 @@
-module Skylab::Headless
+module Skylab::Brazen
 
-  module CLI::Pen__  # [#084]
+  class CLI
 
-    class << self
+    module Styling  # :[#092].
 
-      def chunker
-        Pen_::Chunker__
+      bx = Callback_::Box.new
+
+      define_singleton_method :o do | k, p |
+        bx.add k, p
       end
 
-      def each_pair_at * i_a, & p
-        METHODS__.each_pair_at_via_arglist i_a, & p
+      # ~ styling
+
+      Stylize = -> s, * i_a do
+        Stylify[ i_a, s ]
       end
 
-      def instance_methods_module
-        Instance_Methods__
+      o :stylize, Stylize
+
+      style_h = nil
+
+      Stylify = -> i_a, s do
+        "\e[#{ i_a.map { |i| style_h.fetch i }.compact * ';' }m#{ s }\e[0m"
       end
 
-      def minimal_class
-        Minimal__
+      o :stylify, Stylify
+
+      # ~ un-styling
+
+      Unstyle = -> s do
+        Unstyle_styled[ s ] || s
       end
 
-      def minimal_instance
-        MINIMAL__
+      o :unstyle, Unstyle
+
+      Unstyle_styled = -> s do
+        s.dup.gsub! SIMPLE_STYLE_RX, EMPTY_S_
       end
 
-      def simple_style_rx
-        SIMPLE_STYLE_RX__
-      end
+      SIMPLE_STYLE_RX = /\e  \[  \d+  (?: ; \d+ )*  m  /x
 
-      def style_methods_module
-        Style_Methods__
-      end
+      o :unstyle_styled, Unstyle_styled
 
-      def stylify *a
-        if a.length.zero?
-          Stylify__
-        else
-          Stylify__[ * a ]
+      # ~ parsing & unparsing
+
+      Parse_styles = -> do
+
+        # produce a structured S-expression from a string with ASCII styles
+
+        rx = /\A
+          (?<string>[^\e]+)?  \e\[
+          (?<digits> \d+  (?: ; \d+ )* )  m
+          (?<rest> .*)
+        \z/mx
+
+        sexp = nil
+
+        -> s do
+
+          sexp ||= Brazen_.lib_.basic::Sexp
+
+          y = []
+          begin
+
+            md = rx.match s
+            md or break
+
+            s_ = md[ :string ]
+            if s_
+              y.push sexp[ :string, s_ ]
+            end
+
+            _s_a = md[ :digits ].split ';'
+            _d_a = _s_a.map( & :to_i )
+
+            y.push sexp[ :style, * _d_a ]
+
+            s = md[ :rest ]
+            redo
+          end while nil
+
+          if y.length.nonzero?
+            if s.length.nonzero?
+              y.push sexp[ :string, s ]
+            end
+            y
+          end
         end
-      end
+      end.call
 
-      def stylize * a
-        if a.length.zero?
-          Stylize__
-        else
-          Stylize__[ * a ]
-        end
-      end
+      o :parse_styles, Parse_styles
 
-      def unstyle * a
-        if a.length.zero?
-          Unstyle__
-        else
-          Unstyle__[ * a ]
-        end
-      end
+      Unstyle_sexp = -> sx do
 
-      def unstyle_styled * a
-        if a.length.zero?
-          Unstyle_styled__
-        else
-          Unstyle_styled__[ * a ]
-        end
-      end
-    end
+        # from an S-expression produced by the above function,
+        # produce a string representing only the content, with
+        # the styling directives removed.
 
-    # ~
+        a = []
 
-    Stylize__ = -> s, * i_a do
-      Stylify__[ i_a, s ]
-    end
-
-    Stylify__ = -> style_a, str do
-      "\e[#{ style_a.map { |i| CODE_H__.fetch i }.compact * ';' }m#{ str }\e[0m"
-    end
-
-    CODE_H__ = ::Hash[ [ [ :strong, 1 ], [ :reverse, 7 ] ].
-        concat [ :red, :green, :yellow, :blue, :purple, :cyan, :white ].
-          each.with_index.map { |v, i| [ v, i + 31 ] } ]
-            # ascii-table.com/ansi-escape-sequences.php  (red = 31, etc)
-
-    CODE_I_A__ = CODE_H__.keys.freeze
-
-    Unstyle__ = -> s do
-      Unstyle_styled__[ s ] || s
-    end
-
-    Unstyle_styled__ = -> str do
-      str.dup.gsub! SIMPLE_STYLE_RX__, EMPTY_S_
-    end
-
-    SIMPLE_STYLE_RX__ = /\e  \[  \d+  (?: ; \d+ )*  m  /x
-
-    # ~
-
-    METHODS__ = -> do
-      i_a = [] ; p_a = []
-      o = -> i, p do
-        i_a.push i ; p_a.push p
-      end
-      o.singleton_class.send :alias_method, :[]=, :call
-
-      o[ :stylize ] = Stylize__
-
-      o[ :unstyle ] = Unstyle__
-
-      o[ :unstyle_styled ] = Unstyle_styled__
-
-      ::Struct.new( * i_a ).new( * p_a )
-    end.call
-
-    class << METHODS__
-
-      def each_pair_at * i_a, & p
-        each_pair_at_via_arglist i_a, & p
-      end
-
-      def each_pair_at_via_arglist i_a
-        if block_given?
-          i_a.each do |i|
-            yield i, self[ i ]
-          end ; nil
-        else
-          enum_for :each_pair_at_via_arglist, i_a
-        end
-      end
-    end
-
-    # ~
-
-    module Style_Methods__
-
-      METHODS__.each_pair_at :stylize, :unstyle, & method( :define_method )
-
-      if false  # #todo
-
-      ( CODE_I_A__ - [ :strong ] ).each do |i|   # away at [#pl-013]
-
-        define_method i do |s|
-          stylize s, i
+        sx.each do | x |
+          :string == x.first or next
+          a.push x.fetch 1
         end
 
-        define_method i.upcase do |s|
-          stylize s, :strong, i
+        a * EMPTY_S_
+      end
+
+      o :unstyle_sexp, Unstyle_sexp
+
+      Unparse_style_sexp = -> do
+
+        # from an S-expression produced by function 2 functions above,
+        # produce a string that includes the styling represnted therein.
+
+        h = {
+
+          string: -> sexp do
+            sexp.fetch 1
+          end,
+
+          style: -> sexp do
+            "\e[#{ sexp[ 1 .. -1 ] * ';' }m"
+          end
+        }
+
+        -> sexp do
+
+          a = []
+
+          sexp.each do | x |
+            a.push h.fetch( x.first ).call x
+          end
+
+          a * EMPTY_S_
         end
-      end
+      end.call
 
-      end
-    end
 
-    module Instance_Methods__
+      # ~ reflection & direct exposure
 
-      include Headless_::Pen::InstanceMethods   # (see)
+      -> box do
 
-      # the below methods follow [#fa-052]-#the-semantic-markup-guidelines
+        h = box.h_
 
-      def em s
-        stylize s, :strong, :green
-      end
+        define_singleton_method :each_pair_at do | * i_a, & p |
 
-      def h2 s
-        stylize s, :green
-      end
+          i_a.each do | sym |
 
-      def ick mixed
-        %|"#{ mixed }"|
-      end
-
-      def kbd s
-        stylize s, :green
-      end
-
-      def omg x
-        x = x.to_s
-        x = x.inspect unless x.index TERM_SEPARATOR_STRING_
-        stylize x, :strong, :red
-      end
-
-      def par x
-        _slug = if x.respond_to? :name
-          x.name.as_slug
-        else
-          x.id2name.gsub UNDERSCORE_, DASH_
+            p[ sym, h.fetch( sym ) ]
+          end
+          NIL_
         end
-        kbd "<#{ _slug }>"
+
+        h.each_pair do | sym, p |
+
+          define_singleton_method sym, p
+        end
+
+      end.call bx
+      bx = nil
+
+      # ~ implementation
+
+      bx = Callback_::Box.new
+      bx.add :strong, 1
+      bx.add :reverse, 7
+      a = bx.a_ ; h = bx.h_
+
+      [ :red, :green, :yellow, :blue, :purple, :cyan, :white ].
+
+          each_with_index do | sym, d |
+
+        a.push sym
+        h[ sym ] = ( d + 31 )  # ASCII escape sequences, red = 31
       end
 
-      def param i
-        i
-      end
+      style_h = bx.h_
 
-      def pth x
-        x.respond_to? :to_path and x = x.to_path
-        "«#{ ::File.basename "#{ x }" }»"  # :+#guillemets
-      end
-
-      # def `val` - how may votes? (1: sg) [#051]
-
-      METHODS__.each_pair_at :stylize, & method( :define_method )
-
+      Styling_ = self
     end
-
-    class Minimal__
-      include Instance_Methods__
-    end
-
-    MINIMAL__ = Minimal__.new
-
-    Pen_ = self
-
   end
 end

@@ -52,7 +52,12 @@ module Skylab::FileMetrics
     CelPxy_ = LIB_.proxy_lib.nice :length, :respond_to?, :normalized_scalar
 
     def sum_of sym
-      each_child.map(& sym ).reduce :+
+
+      x_a = each_child.map( & sym )
+      x_a.compact!
+      x_a.reduce :+
+
+      # each_child.map(& sym ).reduce :+
         # http://howfuckedismydatabase.com/nosql
     end
 

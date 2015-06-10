@@ -96,7 +96,7 @@ module Skylab::Callback
         call_via_arglist a, & oes_p
       end
 
-      def with * x_a, & oes_p  # :+[#hl-095] reserved method name
+      def with * x_a, & oes_p  # :+[#bs-028] reserved method name
         call_via_iambic x_a, & oes_p
       end
 

@@ -299,7 +299,7 @@ module Skylab::Snag
         @path_style_a = [ :strong, :green ].freeze
         @tag_style_a = [ :reverse, :yellow ].freeze  # #etc
         @fun = -> do
-          fun = Snag_.lib_.CLI_lib.pen
+          fun = Snag_.lib_.brazen::CLI::Styling
           @fun = -> { fun }
           fun
         end
@@ -377,7 +377,7 @@ module Skylab::Snag
       end
 
       def unstyle s
-        @fun[].unstyle[ s ]
+        @fun[].unstyle s
       end
 
       Item__ = ::Struct.new :s, :d, :todo

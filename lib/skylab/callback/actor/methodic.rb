@@ -104,7 +104,7 @@ module Skylab::Callback
 
       module Module_Methods__
 
-        # ~ ways to call your actor (pursuant to [#hl-103] name conventions)
+        # ~ ways to call your actor (pursuant to [#bs-028.A] name conventions)
 
         def with * x_a, & oes_p
           call_via_polymorphic_stream polymorphic_stream_via_iambic( x_a ), & oes_p

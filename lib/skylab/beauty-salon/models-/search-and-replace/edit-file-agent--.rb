@@ -208,7 +208,7 @@ module Skylab::BeautySalon
       def style_line line, style
         line = line.dup
         did = line.chomp!
-        "#{ BS_.lib_.CLI_lib.pen.stylify style, line }#{ NEWLINE_ if did }"
+        "#{ BS_.lib_.brazen::CLI::Styling.stylify style, line }#{ NEWLINE_ if did }"
       end
 
       NUM_LINES_BEFORE__ = NUM_LINES_AFTER__ = 2

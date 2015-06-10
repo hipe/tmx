@@ -18,7 +18,7 @@ module Skylab::Dependency
 
     include Dep_.lib_.path_tools.instance_methods_module
 
-    include Dep_.lib_.CLI_lib.pen.instance_methods_module  # `stylize`
+    define_method :stylize, Dep_.lib_.brazen::CLI::Styling::Stylize
 
     def hi str ; stylize str, :strong, :green end
 

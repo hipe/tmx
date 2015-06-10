@@ -540,7 +540,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
         & @on_event_selectively )
     end
 
-    # ~ we comport with [#hl-154] control-flow method-naming idioms
+    # ~ we comport with [#bs-031] control-flow method-naming idioms
 
     def __use_FS_parser
 

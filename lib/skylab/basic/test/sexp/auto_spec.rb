@@ -1,34 +1,18 @@
 require_relative 'auto/test-support'
 
-module Skylab::CodeMolester::TestSupport
+module Skylab::Basic::TestSupport
 
-describe "[cm] sexp auto" do
+  # <-
+
+describe "[ba] sexp - auto" do
 
   ::Skylab::TestSupport::Quickie.apply_experimental_specify_hack self
-
-  cache = { }                     # avoid warnings about etc. don't worry,
-                                  # cacheing like this is *always* fine
-
-  let :parser_class do
-    wat = cache.fetch( grammar ) do |str|
-      g = CM_::Library_::Treetop.load_from_string str
-      cache[ str ] = g
-      g
-    end
-    wat
-  end
-
-
-  let(:parser) { parser_class.new }
-  let(:parse_result) { parser.parse(input) }
-  let(:sexp) { parse_result.sexp }
-  let(:subject) { parse_result.sexp }
 
   context "With a grammar for first names" do
 
     let :grammar do
       <<-HERE.unindent
-        module Skylab::CodeMolester::TestNamespace
+        module Skylab::Basic::TestSupport
           grammar PersonName_01
             rule person_name
               [a-z]+ <Node>
@@ -39,29 +23,44 @@ describe "[cm] sexp auto" do
     end
 
     it "(the treetop grammar parses inputs like normal)" do
-      parser.parse('mary').should be_kind_of(
-        CM_::Library_::Treetop::Runtime::SyntaxNode )
-      parser.parse('joe bob').should be_nil
+
+      _ = parser.parse 'mary'
+
+      _.should be_kind_of _Treetop::Runtime::SyntaxNode
+
+      _ = parser.parse 'joe bob'
+
+      _.should be_nil
     end
 
     it "parse trees get a method called 'sexp'" do
-      node = parser.parse('mary')
-      node.should be_respond_to(:sexp)
+
+      _node = parser.parse 'mary'
+      _node.sexp
     end
 
     context "it does nothing interesting with a not complex grammar" do
+
       context 'the sexp for the string \"mary\"' do
-        let(:input) { "mary" }
-        let(:expected) { "mary" }
-        specify { should eql(expected) }
+
+        let :input do
+          'mary'
+        end
+
+        specify do
+          should eql 'mary'
+        end
       end
     end
   end
 
   context "With a grammar for first and last names" do
-    let :grammar do
+
+    def grammar
+
       <<-HERE.unindent
-        module Skylab::CodeMolester::TestNamespace
+
+        module Skylab::Basic::TestSupport
           grammar PersonName_02
             rule person_name
               t_1_first:( [a-z]+ )
@@ -77,20 +76,28 @@ describe "[cm] sexp auto" do
     end
 
     it "(the treetop grammar parses inputs like normal)" do
-      parser.parse( 'mary' ).should be_kind_of CM_::TestNamespace::PersonName_02::Node
-      parser.parse('joe bob').should be_kind_of CM_::TestNamespace::PersonName_02::Node
-      parser.parse('joe bob briggs').should be_nil
+
+      pa = parser
+
+      _ = pa.parse 'mary'
+      _.should be_kind_of Basic_::TestSupport::PersonName_02::Node
+
+      _ = pa.parse 'joe bob'
+      _.should be_kind_of Basic_::TestSupport::PersonName_02::Node
+
+      _ = pa.parse 'joe bobo briggs'
+      _.should be_nil
     end
 
     context "because the grammar is more complex, stuff starts to happen magically" do
 
       context 'the sexp for the string "mary"' do
 
-        let :input do
+        def input
           "mary"
         end
 
-        let :expected do
+        def expected
           [ :person_name, [ :first, "mary" ], [ :last, '' ] ]
         end
 
@@ -99,22 +106,32 @@ describe "[cm] sexp auto" do
         end
 
         specify do
-          should be_kind_of CM_::Sexp
+          should be_kind_of Basic_::Sexp
         end
       end
 
       context 'the sexp for the string "joe bob" (note it is sub-optimal)' do
-        let(:input) { "joe bob" }
-        let(:expected) { [:person_name, [:first, "joe"], [:last, " bob"] ] }
-        specify { should eql(expected) }
+
+        def input
+          'joe bob'
+        end
+
+        def expected
+          [ :person_name, [ :first, "joe" ], [ :last, " bob" ] ]
+        end
+
+        specify do
+          should eql expected
+        end
       end
     end
   end
 
   context "With a grammar for first and last names broken up differently" do
-    let :grammar do
+
+    def grammar
       <<-HERE.unindent
-        module Skylab::CodeMolester::TestNamespace
+        module Skylab::Basic::TestSupport
           grammar PersonName_03
             rule person_name
               t_1_first:name
@@ -134,34 +151,60 @@ describe "[cm] sexp auto" do
     end
 
     it "(the treetop grammar parses inputs like normal)" do
+
       o = parser
-      o.parse( 'mary' ).nil?.should eql false
-      o.parse( 'joe bob' ).nil?.should eql false
-      o.parse( 'joe bob briggs' ).should be_nil
+      _ = o.parse 'mary'
+      _ or fail
+
+      _ = o.parse 'joe bob'
+      _ or fail
+
+      _ = o.parse 'joe bob briggs'
+      _.should be_nil
     end
 
     context "because the grammar is broken up more optimally" do
 
       context 'the sexp for the string "mary"' do
-        let(:input) { "mary" }
-        let(:expected) { [:person_name, [:first, "mary"], [:last, '']] }
-        specify { should eql(expected) }
+
+        def input
+          'mary'
+        end
+
+        def expected
+
+          [ :person_name, [ :first, "mary" ], [ :last, EMPTY_S_ ] ]
+        end
+
+        specify do
+          should eql expected
+        end
       end
 
       context 'the sexp for the string "joe bob" now has a thing that is accessible' do
-        let(:input) { "joe bob" }
-        let(:expected) { [:person_name, [:first, "joe"], [:last, " ", "bob"] ] }
-        specify { should eql(expected) }
+
+        def input
+          'joe bob'
+        end
+
+        def expected
+
+          [ :person_name, [ :first, "joe" ], [ :last, " ", "bob" ] ]
+        end
+
+        specify do
+          should eql expected
+        end
       end
     end
   end
 
   context "When you want custom sexp classes" do
 
-    module ::Skylab::CodeMolester::TestNamespace
+    module ::Skylab::Basic::TestSupport
 
-      class MySexp < CM_::Sexp
-        CM_::Sexp::Registrar[ self ]
+      class MySexp < Basic_::Sexp
+        Basic_::Sexp::Registrar[ self ]
       end
 
       class Bread < MySexp
@@ -176,17 +219,17 @@ describe "[cm] sexp auto" do
 
       module Sandwich
 
-        class MyNode < CM_::Library_::Treetop::Runtime::SyntaxNode
+        class MyNode < Basic_.lib_.treetop::Runtime::SyntaxNode
 
-          CM_::Sexp::Auto.enhance( self ).with_sexp_auto_class MySexp
+          Basic_::Sexp::Auto.enhance( self ).with_sexp_auto_class MySexp
 
         end
       end
     end
 
-    let :grammar do
+    def grammar
       <<-HERE.unindent
-        module Skylab::CodeMolester::TestNamespace
+        module Skylab::Basic::TestSupport
           grammar Sandwich
             rule sandwich
               t_1_top_slice:bread
@@ -214,11 +257,12 @@ describe "[cm] sexp auto" do
     end
 
     context "(this tree is ANNOYING)" do
-      let :input do
+
+      def input
         'rye lettuce tomato rye'
       end
 
-      let :expected do
+      def expected
         [ :sandwich,
           [:top_slice, "rye"],
           [:items, [:item, "lettuce"], [:more_items, " tomato"]],
@@ -226,33 +270,79 @@ describe "[cm] sexp auto" do
       end
 
       it 'works' do
-        raw_tree = parse_result
-        s = raw_tree.sexp
-        s.should eql( expected )
+
+        _raw_tree = parse_result
+
+        _s = _raw_tree.sexp
+
+        _s.should eql expected
       end
     end
 
     context "you register them as above and everything just works magically" do
 
-      let :input do
+      def input
         '7 grain lettuce tomato 7 grain'
       end
 
       it "a sexp node with whose label you registered a custom class, #{
           }e.g. Bread" do
 
-        raw_tree = parse_result
-        sexp = raw_tree.sexp
-        ts = sexp.child :top_slice
-        ts.class.should eql( CM_::TestNamespace::Bread )
+        _raw_tree = parse_result
+
+        _sexp = _raw_tree.sexp
+
+        _ts = _sexp.child :top_slice
+        _ts.class.should eql Basic_::TestSupport::Bread
       end
 
       context 'calling the custom method ("calories") on your custom sexp class' do
-        let(:subject) { sexp.child(:top_slice).calories }
-        specify { should eql("7 grain has 100 calories") }
+
+        specify do
+          should eql '7 grain has 100 calories'
+        end
+
+        def subject
+
+          sexp.child( :top_slice ).calories
+        end
       end
     end
   end
+
+  def subject
+    sexp
+  end
+
+  let :sexp do
+    parse_result.sexp
+  end
+
+  let :parse_result do
+    parser.parse input
+  end
+
+  let :parser do
+    parser_class.new
+  end
+
+  cache_h = {}  # only build each grammar for each string once
+
+  let :parser_class do
+
+    cache_h.fetch grammar do | s |
+
+      g = Basic_.lib_.treetop.load_from_string s
+      cache_h[ s ] = g
+      g
+    end
+  end
+
+  def _Treetop
+    Basic_.lib_.treetop
+  end
 end
-# ..
+
+# ->
+
 end

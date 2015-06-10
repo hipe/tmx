@@ -55,8 +55,9 @@ module Skylab::Treemap::TestSupport::CLI
       @streams ||= TestSupport::IO.spy.triad.new nil  # no $stdin
     end
 
-    def styled str
-      LIB_.CLI_lib.pen.unstyle_styled str
+    def styled s
+
+      LIB_.brazen::CLI::Styling.unstyle_styled s
     end
 
     def styld exp

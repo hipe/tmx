@@ -1,22 +1,25 @@
-module Skylab::Headless
+module Skylab::Brazen
 
-  module CLI::Pen__
+  class CLI
 
-    Chunker__ = Callback_::Session::Ivars_with_Procs_as_Methods.new :gets
+    module Styling
 
-    class Chunker__
+      module Chunker
 
-      class << self
+        class << self
 
-        def scan sexp
-          scn = Chunker__.new sexp
-          Callback_.stream do
-            scn.gets
+          def via_sexp sexp
+
+            st = Implementor___.new sexp
+            Callback_.stream do
+              st._gets
+            end
           end
-        end
-      end
+        end  # >>
 
-  private
+        Implementor___ = Callback_::Session::Ivars_with_Procs_as_Methods.new :_gets
+
+        # <- 2
 
     -> do
 
@@ -52,18 +55,21 @@ module Skylab::Headless
         }
       }
 
-      define_method :initialize do |sexp|
+      Implementor___.send :define_method, :initialize do | sexp |
+
         state = :initial
         hot = true
-        scn = Headless_.lib_.list_lib.line_stream sexp
+
+        st = Callback_::Polymorphic_Stream.via_array sexp
+
         building = nil
 
         fetch = -> x do
-          curr = state_h.fetch state do |st|
-            raise ::KeyError, "nothing known about current state :#{ st }"
+          curr = state_h.fetch state do |sta|
+            raise ::KeyError, "nothing known about current state :#{ sta }"
           end
-          func = curr.fetch x[0] do |st|
-            raise ::KeyError, "no transition from :#{ state } to :#{ st }"
+          func = curr.fetch x[0] do |sta|
+            raise ::KeyError, "no transition from :#{ state } to :#{ sta }"
           end
           func[ x ]
         end
@@ -79,8 +85,8 @@ module Skylab::Headless
         x = stay = res = nil
 
         op_h = {
-          move: -> st do
-            state = st
+          move: -> sta do
+            state = sta
           end,
           start: -> do
             building and fail 'sanity'
@@ -96,14 +102,16 @@ module Skylab::Headless
           end
         }
 
-        @gets = -> do
+        @_gets = -> do
           res = nil
           while hot
-            if scn.eos?
+
+            if st.no_unparsed_exists
               building and op_h.fetch(:cut)[]
               break( hot = nil )
             end
-            x = scn.gets
+
+            x = st.gets_one
             op_a = fetch[ x ]
             stay = true
             run[ op_a ]
@@ -113,6 +121,8 @@ module Skylab::Headless
         end
       end
     end.call
+    # -> 2
+      end
     end
   end
 end

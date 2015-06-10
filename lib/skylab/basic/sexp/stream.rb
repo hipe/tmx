@@ -1,8 +1,8 @@
-module Skylab::CodeMolester
+module Skylab::Basic
 
   class Sexp
 
-    class Scan < Callback_::Stream
+    class Stream < Callback_::Stream
 
       class << self
 

@@ -44,6 +44,8 @@ module Skylab::FileMetrics
 
     define_singleton_method :_memoize, Callback_::Memoize
 
+    Brazen = sidesys[ :Brazen ]
+
     Bsc__ = sidesys[ :Basic ]
 
     CLI_lipstick = -> *a do

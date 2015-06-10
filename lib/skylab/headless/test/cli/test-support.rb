@@ -106,14 +106,18 @@ module Skylab::Headless::TestSupport::CLI
     end
 
     def expect_that_this_line_is_styled_and_unstyle_it line
-      line_ = Headless_::CLI.pen.unstyle_styled line
+
+      line_ = Headless_.lib_.brazen::CLI::Styling.unstyle_styled line
       line_ or raise "expected line to be styled, was not: #{ line.inspect }"
       line_
     end
 
     def crunchify
+
       s = expect_at_least_one_more_serr_line
-      x = Headless_::CLI.parse_styles s
+
+      x = Headless_.lib_.brazen::CLI::Styling.parse_styles s
+
       x or fail "expected styled string, had: #{ s.inspect }"
       y = []
       if :string == x.fetch( 0 ).first

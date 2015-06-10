@@ -19,6 +19,8 @@ module Skylab::CSS_Convert
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
+    Brazen = sidesys[ :Brazen ]
+
     CLI_lib = -> do
       HL___[]::CLI
     end
@@ -302,7 +304,10 @@ module Skylab::CSS_Convert
         "a #{ s }"
       end
     end
+
     STARTS_WITH_VOWEL_RX__ = /\A[aeiouy]/i
+
+    define_method :stylize, LIB_.brazen::CLI::Styling::Stylize
   end
 
   CLI::VisualTest = ::Module.new
@@ -310,13 +315,22 @@ module Skylab::CSS_Convert
   module CLI::VisualTest::InstanceMethods
   private
     def color_test _
-      pen = io_adapter.pen ; width = 50
-      code_names = LIB_.CLI_lib.pen.code_name_a
+
+      styling = CSSC_.lib_.brazen::CLI::Styling
+      width = 50
+
+      code_names = LIB_.brazen::CLI::Styling.code_name_symbol_array
+
       ( code_names - [ :strong ] ).each do |c|
         [[c], [:strong, c]].each do |a|
+
+          _style_label = a.map( & :to_s ).join SPACE_
+
           s = "would you like some " <<
-            "#{pen.stylize(a.map(&:to_s).join( SPACE_ ), *a)} with that?"
-          u = pen.unstyle(s)
+            "#{ styling.stylize _style_label, *a } with that?"
+
+          u = styling.unstyle s
+
           fill = SPACE_ * [ width - u.length, 0 ].max
           send_payload_message "#{ fill }#{ s } - #{ u }"
         end

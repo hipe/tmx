@@ -1,6 +1,6 @@
 module Skylab::Headless
 
-  module Pen  # [#084] what is the deal with expression agents..
+  module Pen  # [#092] what is the deal with expression agents..
     module Bundles
       Expressive_agent = -> _ do  # :+[#121] bundle as def macro
       private
@@ -13,7 +13,7 @@ module Skylab::Headless
 
   module Pen::InstanceMethods
 
-    # follows [#fa-052]:#the-semantic-markup-guidelines
+    # follows [#br-093]:#the-semantic-markup-guidelines
 
     alias_method :calculate, :instance_exec
 

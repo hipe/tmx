@@ -12,7 +12,7 @@ but at this level, how are we to know?
 
 this one node (specifically the i.m node) represents the biggest loss we
 had in the great :#fire, whose gory detail you can read all about in
-in a long anecdote in [#084] the expression agents doc if you really want to.
+in a long anecdote in [#br-092] the expression agents doc if you really want to.
 
 because we had once embarked on an abitious rewrite there and then lost
 everything, we re-approach this same same task today with some exasperation,
@@ -24,12 +24,12 @@ was lost.
 
 ## :#storypoint-7 (these constants)
 
-per [#050] name conventions, the terminating 'X' in these constant names
+per [#bs-030] name conventions, the terminating 'X' in these constant names
 signifies that the caller does not know anything about the shape of these
 values and must behave around them accordingly.  i.e if we change these
 values here nothing within the library should behave any differently.
 
-to review, the trailing uderscore means [#079] they are protected
+to review, the trailing uderscore means [#bs-029.G] they are protected
 constants, and not part of our public API.
 
 
@@ -44,17 +44,17 @@ you are "at" but the calculus still holds.)
 
 a lot of developers might take issue with a module named 'IMs' and/or a
 file named "ims.rb", and they would be justified in their scrutiny. but in
-fact given our name conventions we have exactly no other choice. our [#079]
-naming conventions are now so tight (and valuable in their precision) that
-names like these actually chose themselves without us needing to spend much
-thought:
+fact given our name conventions we have exactly no other choice. our
+[#bs-029.G] naming conventions are now so tight (and valuable in their
+precision) that names like these actually chose themselves without us
+needing to spend much thought:
 
 • the module itself is not an part of our public API (that is, it must not
   be included directly), so to give it a full name 'InstanceMethods' would
   not only be misleading, it would be incorrect.
 
 • our normal tactic in such a situation is to give a const name one or two
-  trailing underscores as appropriate per our [#079] name conventions for
+  trailing underscores as appropriate per our [#bs-029.G] name conventions for
   constants. however, this too would be incorrect, because this module
   is private to the library but not within it. (that is, it is part of our
   :#private-API). in fact it must be public (not just protected) within the
@@ -62,7 +62,7 @@ thought:
   node. hence a const name with trailing underscores would also be incorrect.
 
 the only choice we are left with is to give the module an intentionally terse
-name as described in [#119] its essay that describes the rationale behind
+name as described in [#bs-028.D] its essay that describes the rationale behind
 this. a name like 'IMs' is supposed to look weird and supposeed to be a red
 flag that what you are seeing is not part of a public API. there is simply no
 other way to name the node given its designed scopes of visibility. and so too

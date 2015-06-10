@@ -1,4 +1,6 @@
-# what is the deal with expression agents? :[#052]
+# what is the deal with expression agents? :[#093]
+
+(EDIT: parts of this document are very old..)
 
 in simplest terms the expression agent is the context in which your UI
 strings are evaluated to be rendered for your particular modality.
@@ -14,7 +16,7 @@ we just went and obliterated pen, and here is all that remains of its once
 vast empire: this one grain of sand: "Pen (at this level) is an experimental
 attempt to generalize and unify a subset of the interface-level string
 decorating functions so that the same utterances can be articulated across
-multiple modalities to whatever extent possible :[#hl-084]"
+multiple modalities to whatever extent possible :[#br-092]"
 
 
 

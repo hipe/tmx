@@ -232,9 +232,12 @@ module Skylab::Headless::CLI::Table  # :[#005].
 
   module Table::Cels
 
-    parse_styles   = Headless_::CLI.parse_styles
-    unparse_styles = Headless_::CLI.unparse_styles
-    unstyle      = Headless_::CLI.pen.unstyle
+    mod = Headless_.lib_.brazen::CLI::Styling
+    unstyle = mod::Unstyle
+
+    parse_styles = mod::Parse_styles
+    unparse_styles = mod::Unparse_style_sexp
+
     hackable_a = [ :style, :string, :style ]
 
     common = -> fld do
@@ -301,7 +304,7 @@ module Skylab::Headless::CLI::Table  # :[#005].
 
     blank_rx = Table::Cels::BLANK.rx
 
-    unstyle = Headless_::CLI.pen.unstyle
+    unstyle = Headless_.lib_.brazen::CLI::Styling::Unstyle
 
     start_type = Table::Cels::INTEGER
     float_detail_rx = Table::Cel::FLOAT_DETAIL_RX

@@ -281,11 +281,21 @@ module Skylab::Headless
         end
 
         def visible_ops  # #storypoint-320
+
           ::Enumerator.new do |y|
+
             p = swtch_wth_obj_id_is_visible_p
-            CLI.option.enumerator( option_documenter ).each do | sw |
-              sw.respond_to?( :short ) && p[ sw.object_id ] and y << sw
-            end ; nil
+
+            _st = Headless_.lib_.brazen::CLI::Option_Parser::Option_stream[
+              option_documenter ]
+
+            _st.each do | sw |
+              if sw.respond_to?( :short ) && p[ sw.object_id ]
+                y << sw
+              end
+            end
+
+            NIL_
           end
         end
 
@@ -880,12 +890,17 @@ module Skylab::Headless
         end ; public :some_summary_ln
 
         def smry_ln_from_op
+
           od = option_documenter
-          if (( s = ::String.try_convert od.top.list.first ))
-            s_ = CLI.pen.unstyle s
-            s_.gsub STRIP_DESCRIPTION_LABEL_RX__, EMPTY_S_
+
+          s = ::String.try_convert od.top.list.first
+
+          if s
+            s_ = Headless_.lib_.brazen::CLI::Styling.unstyle s
+            s_.gsub! STRIP_DESCRIPTION_LABEL_RX__, EMPTY_S_
+            s_
           else
-            CLI.pen.unstyle usage_line
+            Headless_.lib_.brazen::CLI::Styling.unstyle usage_line
           end
         end
 

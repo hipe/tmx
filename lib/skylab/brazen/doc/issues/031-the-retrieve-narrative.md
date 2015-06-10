@@ -86,7 +86,7 @@ entities of different model classes (silos), consider using an [#022]
 
 you might be wondering why we don't call the thing "retrieve". but first:
 
-we don't use "get" for reasons that will one day be [#hl-095] explained.
+we don't use "get" for reasons that will one day be [#bs-028] explained.
 
 "fetch" is ok, but the semantics of this family of method names are almost
 exclusively that this takes exactly one key-like argument. so it's close

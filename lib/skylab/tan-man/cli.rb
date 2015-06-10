@@ -90,7 +90,7 @@ module Skylab::TanMan
 
     private
 
-      # follows [#fa-052]:#the-semantic-markup-guidelines
+      # follows [#br-093]:#the-semantic-markup-guidelines
 
       green = 32 ; strong = 1
 

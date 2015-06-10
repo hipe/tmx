@@ -336,7 +336,7 @@ module Skylab::Callback::TestSupport
         STYLED__ = 'styled'.freeze
         def see_when_event act
           s = act.matchable_string
-          s_ = Callback_.lib_.CLI_lib.unstyle_styled s
+          s_ = Callback_.lib_.brazen::CLI::Styling.unstyle_styled s
           if s_
             act.change_matchable_string! s_
           else
@@ -365,7 +365,7 @@ module Skylab::Callback::TestSupport
       end
       def unstyle_all_styled!
         @ass.set_legacy_string_map_proc -> s, &p do
-          s_ = Callback_.lib_.CLI_lib.unstyle_styled s
+          s_ = Callback_.lib_.brazen::CLI::Styling.unstyle_styled s
           s_ and p[ s_ ] ; nil
         end ; nil
       end

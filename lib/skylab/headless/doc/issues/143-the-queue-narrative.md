@@ -19,7 +19,7 @@ single word dedicated to it.
 significant portions of the queue's interface are :#API-private which means
 it is subject to change radically at any time, or even be obliterated
 completely. we follow strictly our own name conventions for reflecting the
-API-visibility of methods in their names, as is or will be described in [#119].
+API-visibility of methods in their names, as is or will be described in [#bs-028.D].
 
 
 

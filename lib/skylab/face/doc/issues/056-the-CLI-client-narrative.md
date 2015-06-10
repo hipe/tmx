@@ -53,7 +53,7 @@ that for further description of the `CLI` class.
 
 ## :#storypoint-75 - method
 
-the only public method. #existential-workhorse. accords with [#hl-020]
+the only public method. #existential-workhorse. accords with [#bs-028.E]
 
 
 

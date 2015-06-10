@@ -1,4 +1,4 @@
-module Skylab::CodeMolester
+module Skylab::Basic
 
   module Sexp::Auto
 
@@ -91,7 +91,7 @@ module Skylab::CodeMolester
   end
 end
 
-module Skylab::CodeMolester::Sexp::Auto
+module Skylab::Basic::Sexp::Auto
 
   EXPAND = { 't' => :terminal, 'n' => :nonterminal, 'w' => :whitespace }
   Ele = Struct.new(:method, :type, :index, :name)

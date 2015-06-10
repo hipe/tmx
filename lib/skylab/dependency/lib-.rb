@@ -4,6 +4,10 @@ module Skylab::Dependency
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
+    Ba___ = sidesys[ :Basic ]
+
+    Brazen = sidesys[ :Brazen ]
+
     CLI_lib = -> do
       HL___[]::CLI
     end
@@ -37,7 +41,7 @@ module Skylab::Dependency
     end
 
     Sexp = -> do
-      CodeMolester__[]::Sexp
+      Ba___[]::Sexp
     end
 
     Slake = sidesys[ :Slake ]

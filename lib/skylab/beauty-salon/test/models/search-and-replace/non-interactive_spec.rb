@@ -95,7 +95,9 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
       o = m.to_line_stream
       s = o.gets
       o.gets.should be_nil
-      haha = BS_::Lib_::CLI_lib[].parse_styles s
+
+      haha = BS_.lib_.brazen::CLI::Styling.parse_styles s
+
       haha.map( & :first ).should eql [ :string, :style, :string, :style, :string ]
     end
 

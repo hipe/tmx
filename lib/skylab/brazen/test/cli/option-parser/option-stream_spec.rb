@@ -1,15 +1,15 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Headless::TestSupport::CLI::Option
+module Skylab::Brazen::TestSupport::CLI
 
-  describe "[hl] CLI option scan" do
+  describe "[br] CLI - option parser - option stream" do
 
     it "normative" do
 
-      op = Headless_::Library_::OptionParser.new
+      op = Brazen_::CLI::Option_parser___[].new
       op.on '-x', '--ex'
       op.on '-y', '--yes[=ok]'
-      scn = Subject_[].scan op
+      scn = Brazen_::CLI::Option_Parser::Option_stream[ op ]
       sw = scn.gets
       sw.short.last.should eql '-x'
       sw = scn.gets

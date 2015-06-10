@@ -22,7 +22,7 @@ module Skylab::TanMan
 
     # ~
 
-    class Expression_Agent__  # follows [#fa-052]:#the-semantic-markup-guidelines
+    class Expression_Agent__  # follows [#br-093]:#the-semantic-markup-guidelines
 
       class << self
         def NLP_agent_class

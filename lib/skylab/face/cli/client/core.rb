@@ -895,14 +895,20 @@ module Skylab::Face
       end
 
       def bld_option_enumerator
+
         @op.nil? and init_op
+
         fly = LIB_.CLI_lib.option.new_flyweight
-        _scan = LIB_.CLI_lib.option.scan op
-        _scan_ = _scan.map_by do |sw|
+
+        _st = LIB_.brazen::CLI::Option_Parser::Option_stream[ op ]
+
+        _st_ = _st.map_by do |sw|
+
           fly.replace_with_switch sw
           fly
         end
-        _scan_.each
+
+        _st_.each
       end
 
       def options  # #called-by self `parameters`
@@ -1381,11 +1387,18 @@ module Skylab::Face
           header_rx = /\A[^ ]+:[ ]?\z/  # no tabs [#hl-056]
 
           h = {
+
             string: -> m, x, _ do
-              m << LIB_.CLI_lib.unstyle_sexp( x ) ; nil
+
+              m << LIB_.brazen::CLI::Styling.unstyle_sexp( x )
+              nil
+
             end,
+
             style: -> m, x, usg_hdr_txt do
-              s = LIB_.CLI_lib.unstyle_sexp x
+
+              s = LIB_.brazen::CLI::Styling.unstyle_sexp x
+
               # ICK only let a header through if it says "usage:" ICK
               m << s if usg_hdr_txt == s || header_rx !~ s
               nil
@@ -1393,7 +1406,7 @@ module Skylab::Face
           }.freeze
 
           -> sexp, usg_hdr_txt do
-            ea = LIB_.CLI_lib.pen.chunker.scan( sexp ).each
+            ea = LIB_.brazen::CLI::Styling::Chunker.via_sexp( sexp ).each
             a = ea.reduce [] do |m, x|
               h.fetch( x[0][0] )[ m, x, usg_hdr_txt ]
               m
@@ -1405,7 +1418,9 @@ module Skylab::Face
         restyle = -> a, usg_hdr_txt do
           a.length.times do |idx|
             line = a[ idx ]
-            sexp = LIB_.CLI_lib.parse_styles line
+
+            sexp = LIB_.brazen::CLI::Styling.parse_styles line
+
             if sexp
               a[ idx ] = restyle_sexp[ sexp, usg_hdr_txt ]
             else

@@ -16,10 +16,6 @@ module Skylab::Headless
         Option_::Model__.build_via_switch sw
       end
 
-      def enumerator x
-        scan( x ).each
-      end
-
       def local_normal_name_as_long i
         Local_normal_name_as_long__[ i ]
       end
@@ -54,10 +50,6 @@ module Skylab::Headless
 
       def parser
         Option_::Parser__
-      end
-
-      def scan x
-        Option_::Scan__[ x ]
       end
 
       def simple_short_rx

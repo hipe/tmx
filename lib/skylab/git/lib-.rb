@@ -41,6 +41,8 @@ module Skylab::Git
       System[].defaults.bin_pathanem
     end
 
+    Brazen = sidesys[ :Brazen ]
+
     Bundle = -> do
       MH__[]::Bundle
     end

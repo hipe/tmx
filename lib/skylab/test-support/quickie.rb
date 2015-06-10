@@ -1047,7 +1047,7 @@ module Skylab::TestSupport
 
     class << self
       def active_session
-        _service_instance.active_sssn  # name convention [#hl-119]
+        _service_instance.active_sssn  # name convention [#bs-028.D]
       end
     end
 

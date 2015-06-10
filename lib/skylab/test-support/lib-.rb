@@ -55,10 +55,6 @@ module Skylab::TestSupport
       Face__[]::CLI::Client
     end
 
-    CLI_pen = -> do
-      HL__[]::CLI.pen
-    end
-
     CLI_table = -> * x_a do
       Face__[]::CLI::Table.call_via_iambic x_a
     end

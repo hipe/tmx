@@ -6,7 +6,7 @@ module Skylab::Brazen
 
       class << self
 
-        def instance  # see #note-br-10 in [#fa-052]. this is for hacks
+        def instance  # see #note-br-10 in [#br-093]. this is for hacks
           @inst ||= Singleton_instance__[]
         end
 
@@ -125,7 +125,7 @@ module Skylab::Brazen
       end
 
       public def stylize s, * i_a
-        LIB_.old_CLI_lib.pen.stylify i_a, s
+        Brazen_::CLI::Styling.stylify i_a, s
       end
 
       def val s

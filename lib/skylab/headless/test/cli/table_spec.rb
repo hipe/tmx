@@ -149,7 +149,7 @@ module Skylab::Headless::TestSupport::CLI::Table
         o.field!( :header ).style =
           Headless_::CLI.pen.minimal_instance.method :hdr
         o.on_row do |txt|
-          a.push Headless_::CLI.pen.unstyle txt
+          a.push Headless_.lib_.brazen::CLI::Styling.unstyle txt
         end
       end
       lengths = a.map { |s| s.match(/^[^\t]*/)[0].length }

@@ -24,6 +24,14 @@ document. that is the second half of this document.
 
 
 
+## historical context
+
+ideas put forth in the historical [#045] hold a snapshot of what was
+going on when we synthesized these ideas.
+
+
+
+
 ## a broad view
 
 broadly we conceive of normalization as both the process and modeling

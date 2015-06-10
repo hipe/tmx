@@ -237,9 +237,11 @@ module Skylab::Face::TestSupport::CLI::Client
       end
     end
 
-    define_method :unstyle, TestLib_::CLI_lib[].pen.unstyle
+    styling = Face_.lib_.brazen::CLI::Styling
 
-    define_method :unstyle_styled, TestLib_::CLI_lib[].pen.unstyle_styled
+    define_method :unstyle, styling::Unstyle
+
+    define_method :unstyle_styled, styling::Unstyle_styled
 
     def expect_styled line
       text = unstyle_styled line
@@ -322,7 +324,7 @@ module Skylab::Face::TestSupport::CLI::Client
 
     -> do  # `expect_nonstyled_line`
 
-      simple_style_rx = TestLib_::CLI_lib[].pen.simple_style_rx
+      simple_style_rx = Face_.lib_.brazen::CLI::Styling::SIMPLE_STYLE_RX
 
       define_method :expect_nonstyled_line do |rx, idx_ref=true, sn=:err|
         line = expect_line idx_ref, sn

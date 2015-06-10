@@ -1,3 +1,4 @@
+[#045]       the normalization & validation method naming idiomspace ..
 [#044]       [ state machine ]
 [#043]       [ tree from indented line stream ] #parent-node: [#001]
 [#042]       #parent-node: [#033] calm wordwrap "continuous" mode is

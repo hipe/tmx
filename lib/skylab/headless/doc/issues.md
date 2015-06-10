@@ -11,16 +11,16 @@
              ( #was: #open stateful IO dry stub so that `close` is better mocked )
 [#169] #hole ( #moved-to: [#sy-014] )
              ( #was: #doc-node [ IO mapppers tee ] )
-[#168]       #doc-node option scan ..
-[#167]       #parent-node: [#098] "name conventions for classes.."
-[#166]       #parent-node: [#098] "name conventions for non-class modules.."
+[#168]       ( #moved-to: [#br-095] )
+[#167]       -
+[#166]       -
 [#165] #open unify the new post-F-UN strategties
 [#164] #hole ( #moved-to: [#sy-013] )
              ( #was:  #parent-node: [#161] the IO line scannar narrative .. )
 [#163] #open merge ellipsify with [#ba-032]
 [#162]       #done re-write patch to be an actor; patch can be string or path
 [#161]       #doc-node the headless IO node
-[#160]       #parent-node: [#161] the tmpdir narrative ..
+[#160]       ( #moved-to: [#sy-020] )
 [#159] #hole ( #moved-to: [#sy-012] )
              ( #was: #node-identity: (e.g IO interceptors filter) #marker )
 [#158]       what we did to get tall mixed stacks (`tall_spec`) to work
@@ -28,8 +28,8 @@
              ( #was: #open #parent-node: [#161] the file utils agent should emit oes )
 [#156]       (reserved for a forthcoming entry about filenames)
 [#155]       (reserved for a forthcoming entry about const names)
-[#154]       #parent-node: [#095] the control flow method-naming idiomspace ..
-[#153]       #parent-node: [#154] method naming idiomspace: validation ..
+[#154]       ( #moved-to: [#bs-031] )
+[#153]       ( #moved-to [#ba-045] )
 [#152] #hole ( was: `Name` node, assimilated into [#cb-060] )
 [#151]       #doc-point #in-situ explains a certain #API-private meth. sig.
 [#150]       #node-tracker this whole `expecting` pattern
@@ -41,7 +41,7 @@
 [#144]       #node-tracker go away the client spy? #testing
 [#143]       #parent-node: [#064] "understanding the queue - the narrative ..
 [#142]       #stub #parent-node: [#135] the CLI argument syntax DSL ..
-[#141]       #parent-node: [#125] the real deal with expression agents #pen
+[#141]       ( #moved-to: [#br-094] )
 [#140] #hole ( #moved-to: [#sy-010] )
              ( #was: #parent-node: [#125] the System narrative .. )
 [#139]       #doc-node the perfect agent interaction model ..
@@ -68,40 +68,39 @@
              (see also [#br-063] emergent interfaces through isomorphicism)
 [#124]       #i18n thought and touch tracker
 [#123]       one-line / multi-line #behavior-tracker
-[#122]       #parent-node: [#050] a list of hash tags and their tentative m..
+[#122]       ( #moved-to: [#sg-023] )
 [#121]       #parent-node: [#120] "bundle as method definitions macro.."
 [#120]       #parent-node: [#090] patterns for developing bundles ..
-[#119]       #parent-node: [#095] "the method naming shibboleth.."
+[#119]       ( #moved-to: [#bs-028.B] )
 [#118]       #parent-node: [#092] "memberhood" defined
 [#117]       #parent-node: [#069] what does "application" even mean?
-[#116]       #parent-node: [#050] "vectors of concern defined.."
+[#116]       ( #moved-to: [#bs-029.E] )
 [#115]       #biliographic-reference: the Wikipedia page on _Idiom_
               (the text cited is from user Glane23 from 2010-03-11)
-[#114]       #parent-node: [#097] "name conventions for const values.."
+[#114]       ( #moved-to: [#bs-029.B] )
 [#113]       #parent-node: [#091] "the meaning of node in this context.."
-[#112]       #parent-node: [#106] "a list of idioms.."
+[#112]       -
 [#111]       #parent-node: [#093] "the idiomacy of plural noun phrases.."
-[#110]       #parent-node: [#101] "exception to the verb pattern.."
-[#109]       #parent-node: [#050] "noise.."
+[#110]       -
+[#109]       -
 [#108]       #parent-node: [#093] on structural isomorphicisms to the
               natural language syntactic structures ..
 [#107] #hole ( #moved-to: [#sy-007] )
              ( #was: #parent-node: [#130] hack guess module tree (docs #in-situ) )
-[#106]       #parent-node: [#050] idioms grow from ubiquity ..
+[#106]       -
 [#105]       #parent-node: [#093] "the rule of business object variable.."
 [#104]       #parent-node: [#093] "list of variable name patterns.."
-[#103]       #parent-node: [#095] "list of method prefixes and suffixes.."
-[#102]       #parent-node: [#097] "the way shape is reflected in.."
-[#101]       #parent-node: [#097] "the name conventions for proc-like consts.."
+[#103]       ( #moved-to: [#bs-028.A] )
+[#102]       ( #moved-to: [#bs-029.A] )
+[#101]       ( #moved-to: [#bs-029.C] )
 [#100]       #tracking-tag for everything not threadsafe
-             (was: #parent-node: [#097] "multiple trailing underscores in..")
-[#099]       #parent-node: [#098] module visibility thru architected ..
-[#098]       #parent-node: [#097] module name conventions..
+[#099]       -
+[#098]       ( #moved-to [#bs-029.D] )
 [#097]       #parent-node: [#050] name conventions for constants ..
-[#096]       #parent-node: [#098] "verbish names are used for verbish.."
-[#095]       #parent-node: [#050] name conventions for functions and ..
+[#096]       -
+[#095]       ( #moved-to [#bs-028] )
 [#094]       #parent-node: [#095] ObjectiveC/Cocoa semantics for `get_*` ..
-[#093]       #parent-node: [#050] name conventions for variables ..
+[#093]       ( #movd-to [#bs-032] )
 [#092]       #doc-node POS .. (historically, lost in fire: "change is certain")
 [#091]       #doc-point precedence rules for logical taxonomies ..
 [#090]       #doc-point what is the deal with bundles ..
@@ -113,16 +112,14 @@
 [#085] #hole ( #moved-to: [#hu-033] )
              ( #was: #parent-node: [#086] what the hell is that sneeze at the top.. )
              (once collided with what is now [#159])
-[#084]       #doc-point the great fire and earthquake (originally:
-               "what is the deal with expression agents")
+[#084]       #moved-to: [#br-092]
+             ( #was: #doc-point the great fire and earthquake (originally:
+               "what is the deal with expression agents") )
 [#083]       #node-tracker: name function (and #in-situ comment)
 [#082]       #done adapter for face of hot (kind of [#054])
 [#081]       #doc-point the `norm*` family of functions..
 [#080]       #doc-point `facet`s are like IoC/dependency injection #plugins ..
-[#079]       #parent-node: [#097] constants whose name ends in one or more
-             underscores ("trailing underscores") are API private -
-             there must be no knowledge of their existence outside of
-             their parent node.
+[#079]       (#moved-to [#bs-029.G])
 [#078]       #doc-point shells, stories and kernels
 [#077]       #doc-point the plugin narrative ..
 [#076]       #parent:070 #future-feature enable/disable a particular plugin
@@ -146,7 +143,7 @@
 [#060]       #doc-node: bundles
              #repurposed:once (was: norm'd line consumer, now "reverse scanner")
 [#059]       #tracking places where we nerk with detecting o.p dflt --help -h
-[#058]       #doc-point narrative pre-order ("outside-in") ..
+[#058]       (#moved-to [#bs-027])
 [#057] #open see how throwing a :terminate could help with o.p deep graphs
 [#056]       #doc-point "parsing argv is (almost) always destructive,
                to facilitate agnostic, progressive chaining.."
@@ -157,7 +154,7 @@
 [#053]       #tracking-tag for anything related to h.l option scanner
 [#052]       module i.m init experiment - "init hooks"
 [#051]       #subscription `val` as a canonical decorator
-[#050]       #doc-point name conventions!
+[#050]       (#moved-to: [#bs-030])
 [#049]       #later formal parameters deep audit and refactor, [#009]
              [#049.1] - set becomes box
 [#048]       ( #moved-to: [#sy-006] )
@@ -202,8 +199,7 @@
                (this is now a blanket tracker of file-services-related dryables)
 [#021]       #feature #deferred #CLI - be sure to provide a (flatten) --tree
                option when looking at a branch help screen!
-[#020]       #convention `invoke` `execute` `run` `call` have distinct meanings
-               and consistent signatures within modalities
+[#020]       #moved-to [#bs-028.E]
 [#019]       #pattern #convention iff CLI action invoke is false, invite
                (referred to now as the "common triad" #doc-point) ..
 [#018]       #doc-node the API action inflection hack narrative ..

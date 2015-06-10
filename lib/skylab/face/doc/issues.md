@@ -8,7 +8,8 @@
 [#054]       #parent-node: [#hl-070] the first plugin library (#broadened-from:
                [#hl-077] #API-point track how `initialize` looks in #plugins)
 [#053]       #tracking-tag #the-caculate-pattern
-[#052]       #doc-point what is the deal with expression agents?
+[#052]       #moved-to: [#br-093]
+             ( #was: #doc-point what is the deal with expression agents? )
 [#051]       #tracking-tag the idea of the #snitch is tracked by this tag
 [#050]       #doc-point when mono mono and we get an array..
 [#049]       #in-situ

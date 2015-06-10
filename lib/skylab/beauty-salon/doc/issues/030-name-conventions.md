@@ -1,4 +1,4 @@
-# name conventions :[#050]
+# name conventions :[#030]
 
 (EDIT: this document is old. it is still 95% relevant but could use some
 cleanup near style :+#todo. the child nodes of this node is where it gets
@@ -7,6 +7,11 @@ more interesting).
 
 
 ## some thoughts on the name `name`
+
+(EDIT: we use the name `name` strictly for name functions..but this may
+change. the platform uses it for a const name, we may eschew using it at
+all for this reason - collisions with the platform method are
+problematic)
 
 Don't use it. As a complete variable or method name, "name" is so vague
 that it itself is almost useless as a name. Is it a symbol or a string?

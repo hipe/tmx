@@ -57,7 +57,7 @@ module Skylab::FileMetrics::TestSupport::CLI
       it does do
         invoke argv
         x = whole_err_string
-        str = TestLib_::CLI_lib[].pen.unstyle_styled x
+        str = FM_.lib_.brazen::CLI::Styling.unstyle_styled x
         str.should match( /^usage: fm line-count (?:\[[^\[]+){7,}/ )
         str.should match( /^description:.+usage:.+options:.+/m )
       end

@@ -24,68 +24,16 @@ module Skylab::Headless
         CLI::Client.call_via_arglist a
       end
 
-      def cols * a
-        if a.length.zero?
-          CLI::Lib__::Cols
-        else
-          CLI::Lib__::Cols[ * a ]
-        end
-      end
-
-      def occurrence_stream * a
-        if a.length.zero?
-          CLI::Lib__::Occurrence_scanner
-        else
-          CLI::Lib__::Occurrence_scanner[ * a ]
-        end
-      end
-
       def option
         CLI::Option__
-      end
-
-      def parse_styles * a
-        if a.length.zero?
-          CLI::Lib__::Parse_styles
-        else
-          CLI::Lib__::Parse_styles[ * a ]
-        end
       end
 
       def pen
         CLI::Pen__
       end
 
-      def summary_width * a
-        if a.length.zero?
-          CLI::Lib__::Summary_width
-        else
-          CLI::Lib__::Summary_width[ * a ]
-        end
-      end
-
       def tree
         CLI::Tree__
-      end
-
-      def unstyle_sexp * a
-        if a.length.zero?
-          CLI::Lib__::Unstyle_sexp
-        else
-          CLI::Lib__::Unstyle_sexp[ * a ]
-        end
-      end
-
-      def unstyle_styled * a
-        CLI.pen.unstyle_styled( * a )
-      end
-
-      def unparse_styles * a
-        if a.length.zero?
-          CLI::Lib__::Unparse_styles
-        else
-          CLI::Lib__::Unparse_styles[ * a ]
-        end
       end
     end  # >>
   end
@@ -104,7 +52,8 @@ module Skylab::Headless
 
       def summary_width op, max=0  # hack a peek into the o.p to
         # decide how wide to make column A (one space comes from the o.p)
-        _max_d = CLI.summary_width op, max
+
+        _max_d = Headless_.lib_.brazen::CLI::Option_Parser.summary_width op, max
         _max_d + op.summary_indent.length - 1
       end
 

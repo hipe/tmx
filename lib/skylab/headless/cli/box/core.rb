@@ -30,7 +30,7 @@ module Skylab::Headless
         DISPATCH_METHOD_I_
       end
 
-      # #storypoint-30 [#119] intentionally ugly names are used here
+      # #storypoint-30 [#bs-028.D] intentionally ugly names are used here
 
       def dsptch action=nil, *args  # #storypoint-20, NOTE [#145] params
         disp = disptch_p[ self, action, args ]

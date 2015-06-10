@@ -1,46 +1,17 @@
-module Skylab::Headless
+module Skylab::Brazen
 
-  module CLI::Lib__
+  class CLI
 
-    Parse_styles = -> do
-      # Parse a string with ascii styles into an S-expression.
+    module Option_Parser
 
-      sexp = Headless_.lib_.code_molester::Sexp
+      class << self
 
-      rx = /\A (?<string>[^\e]+)?  \e\[
-        (?<digits> \d+  (?: ; \d+ )* )  m  (?<rest> .*) \z/mx
-
-      -> s do
-        y = [] ; begin
-          md = rx.match( s ) or break
-          md[ :string ] and y << sexp[ :string, md[ :string ] ]
-          y << sexp[ :style, * md[ :digits ].split( ';' ).map( & :to_i ) ]
-          s = md[ :rest ]
-        end while true
-        if y.length.nonzero?
-          s.length.nonzero? and y << sexp[ :string, s ]
-          y
+        def summary_width _, __
+          Summary_width___[ _, __ ]
         end
-      end
-    end.call
+      end  # >>
 
-    Unparse_styles = -> do
-      h = {
-        string: -> sexp { sexp[1] },
-        style: -> sexp {  "\e[#{ sexp[1..-1].join ';' }m" }
-      }
-      -> sexp do
-        sexp.reduce [] do |m, sxp|
-          m << h.fetch( sxp.first ).call( sxp )
-        end.join EMPTY_S_
-      end
-    end.call
-
-    Unstyle_sexp = -> sx do
-      sx.reduce [] do |m, x|
-        :string == x.first and m << x[ 1 ] ; m
-      end.join EMPTY_S_
-    end
+      # <-
 
     left_peeker_hack = -> summary_width do     # i'm sorry -- there was no
       max = summary_width - 1                  # other way
@@ -72,34 +43,35 @@ module Skylab::Headless
       end
     end
 
-    Summary_width = -> option_parser, max=0 do  # find the width of the widest
-      # content that will go in column A in the help screen of this o.p
+    Summary_width___ = -> option_parser, max=0 do
+
+      # find the width of the widest content that will
+      # go in column A in the help screen of this o.p
+
       left_peek = left_peeker_hack[ option_parser.summary_width ]
-      CLI.option.enumerator( option_parser ).reduce max do | m, x |
+
+      _st = CLI_::Option_Parser::Option_stream[ option_parser ]
+
+      _st.each.reduce max do | m, x |
+
         if x.respond_to? :summarize
-          left_peek.call( x ) do |str|
-            str.length > m and m = str.length
+
+          left_peek.call x do | s |
+
+            if m < s.length
+              m = s.length
+            end
           end
         end
+
         m
       end
     end
 
-    Cols = -> do
-      cols_p = -> else_p do
-        begin require 'ncurses' ; rescue ::LoadError => e ; end
-        if e then else_p[] else
-          v = $VERBOSE ; $VERBOSE = nil
-          ::Ncurses.initscr
-          # #todo easy patch snowleopard-ncurses ncurses_wrap.c:1951
-          $VERBOSE = v
-          cols = ::Ncurses.COLS
-          ::Ncurses.endwin
-          cols_p = -> { cols } ; cols
-        end
-      end
-      -> else_p { cols_p[ else_p ] }
-    end.call
+    # ->
 
+      TERM_SEPARATOR_STRING_ = SPACE_
+    end
   end
 end
+# :#tombstone: ncurses

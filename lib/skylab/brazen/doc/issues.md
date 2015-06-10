@@ -1,3 +1,6 @@
+[#094]       expression agents adjunct notes ..
+[#093]       what is the deal with expression agents ..
+[#092]       [ CLI styling ]
 [#091]       [ entity identifier ]
              ( #moved-from [#here-022] )
 [#090]       arity ..
@@ -27,7 +30,8 @@
 [#075]    #tracking :+#wishlist optionally generate ivar-based iambic writers
 [#074]       option parser hack for '-1', '-2' etc ..
              ( #was: #parent-node: [#011] the codifying expression agents)
-[#073] #hole #done awareness of system environment does not belong in the model -
+[#073]       lipstick ..
+             ( #was: #done awareness of system environment does not belong in the model - )
              front clients should do this mapping somehow..
              ( was: #parent-node: [#011] selective event listening via methods )
 [#072]       where the colon goes on headers! #parent-node: [#002]

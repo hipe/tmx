@@ -77,9 +77,9 @@ module Skylab::SubTree
 
       lib = SubTree_.lib_
 
-      pen = lib.CLI_lib.pen
+      styling = lib.brazen::CLI::Styling
 
-      define_method :stylify_, pen.stylify
+      define_method :stylify_, styling::Stylify
 
       # ~ experimental model-specific customization
 
@@ -155,7 +155,7 @@ module Skylab::SubTree
         "<#{ prp.name.as_slug }>"
       end
 
-      define_method :_strong, pen.stylify.curry[ %i( green ) ]
+      define_method :_strong, styling::Stylify.curry[ %i( green ) ]
 
       # ~ EN NLP
 

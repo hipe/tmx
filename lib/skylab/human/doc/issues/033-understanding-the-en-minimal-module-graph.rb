@@ -51,7 +51,7 @@ production, and per above all these must fit under "EN", which reasonably will
 be a module. but:
 
 2) we also want this "front object" (EN) to itself act as an
-"expression agent" [#fa-052], which means that (per above) it will be a module
+"expression agent" [#br-093], which means that (per above) it will be a module
 that itself must respond to particular messages related to articulation.
 
 given the above requirements, namely that we need a module that itself has

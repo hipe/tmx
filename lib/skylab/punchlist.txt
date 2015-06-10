@@ -2,6 +2,18 @@ slicer              q [ done ]
 
 file-metrics        q [ TODO ]
 
+  + N (1/2) mv CLI stylers
+  + N (2/2) rewrite & integrate
+  + N-1 (1/2) mv lipstick
+  + N-1 (2/2) rewrite & integrate
+  + N-2 lc
+  + N-3   dirs
+  + N-4   ext
+  + N-5   integ
+
+  • there is a lot about how it was written that we don't do anymore:
+    * x..
+
 beauty-salon        q [ TODO ]
 
 git                 Q [ TODO ]

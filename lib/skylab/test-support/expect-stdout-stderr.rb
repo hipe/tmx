@@ -337,7 +337,7 @@ module Skylab::TestSupport
 
     Callback_ = ::Skylab::Callback
 
-    SIMPLE_STYLE_RX__ = /\e  \[  \d+  (?: ; \d+ )*  m  /x  # copy-paste [hl]
+    SIMPLE_STYLE_RX__ = TestSupport_.lib_.brazen::CLI::Styling::SIMPLE_STYLE_RX
 
     METHODIC_ = Callback_::Actor::Methodic
 

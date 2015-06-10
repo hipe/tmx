@@ -50,7 +50,7 @@ whether to render given an event.
 different client of different modalities or purposes may implement their
 own expression agents that effectively style and render the events.
 
-(EDIT: The above would do well to go in [#hl-141] the expag doc node)
+(EDIT: The above would do well to go in [#br-094] the expag doc node)
 
 
 

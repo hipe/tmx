@@ -1,5 +1,7 @@
 # precedence rules for logical taxonomies :[#094]
 
+(NOTE there is some spurious confusion with this node and [#bs-028.B])
+
 # the purpose and scope of this document..
 
 ..is to present the concept of "node" and "taxonomy", and then the concept

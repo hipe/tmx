@@ -14,6 +14,8 @@ module Skylab::Bnf2Treetop::TestSupport
       HL__[]::CLI
     end
 
+    Brazen = sidesys[ :Brazen ]
+
     HL__ = sidesys[ :Headless ]
 
   end
@@ -75,7 +77,7 @@ module Skylab::Bnf2Treetop::TestSupport
     def out    ; _frame.out_p.call   end
 
     def unstyle x
-      TestLib_::CLI_lib[].pen.unstyle x
+      TestLib_::Brazen[]::CLI::Styling.unstyle x
     end
   end
 end

@@ -2,8 +2,6 @@ module Skylab::Brazen
 
   class CLI
 
-    Option_Parser = ::Module.new  # :+#stowaway
-
     Option_Parser::Experiments = ::Module.new  # :+#stowaway
 
     class Option_Parser::Experiments::Regexp_Replace_Tokens  # see [#074]

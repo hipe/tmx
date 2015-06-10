@@ -1159,7 +1159,8 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
   end
 
-  define_singleton_method :stylize, Git_.lib_.CLI_lib.pen.stylize  # #posterity for the below ancient lines
+  define_singleton_method :stylize, Git_.lib_.brazen::CLI::Styling::Stylize
+    # ( #posterity for the below ancient lines )
 
   PATCH_STYLE_P_A__ = [
     ->(s) { stylize(s, :strong, :red) },

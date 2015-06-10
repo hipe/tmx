@@ -1,32 +1,30 @@
 require_relative '../../test-support'
 
-module Skylab::CodeMolester
+module Skylab::Basic::TestSupport
 
-  const_get( :Config, false ).const_get( :File )  # ick load treetop :(
+  # below we violate some norms
 
-  module TestNamespace            # we could etc. but we etc.
-    include CM_::TestSupport::Constants
-  end
+  module PersonName_01
 
-  # (the below mess avoids warnings, is probably closer to the "right" way,
-  # and give you an idea what kind of things gave rise to
-  # the metahell experiments.)
+    class Node < Basic_.lib_.treetop::Runtime::SyntaxNode
 
-  module TestNamespace::PersonName_01
-    class Node < CM_::Library_::Treetop::Runtime::SyntaxNode
-      CM_::Sexp::Auto[ self ]
+      Basic_::Sexp::Auto[ self ]
     end
   end
 
-  module TestNamespace::PersonName_02
-    class Node < CM_::Library_::Treetop::Runtime::SyntaxNode
-      CM_::Sexp::Auto[ self ]
+  module PersonName_02
+
+    class Node < Basic_.lib_.treetop::Runtime::SyntaxNode
+
+      Basic_::Sexp::Auto[ self ]
     end
   end
 
-  module TestNamespace::PersonName_03
-    class Node < CM_::Library_::Treetop::Runtime::SyntaxNode
-      CM_::Sexp::Auto[ self ]
+  module PersonName_03
+
+    class Node < Basic_.lib_.treetop::Runtime::SyntaxNode
+
+      Basic_::Sexp::Auto[ self ]
     end
   end
 end

@@ -18,6 +18,8 @@ module Skylab::Dependency::TestSupport
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
+    Brazen = sidesys[ :Brazen ]
+
     CLI_lib = -> do
       HL__[]::CLI
     end
@@ -58,7 +60,7 @@ module Skylab::Dependency::TestSupport
 
   module InstanceMethods
 
-    include TestLib_::CLI_lib[].pen.style_methods_module  # `unstyle`
+    define_method :unstyle, TestLib_::Brazen[]::CLI::Styling::Unstyle
 
     def debug!
       @do_debug = true

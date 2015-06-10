@@ -28,6 +28,8 @@ module Skylab::Headless
 
     Basic = sidesys[ :Basic ]
 
+    Brazen = sidesys[ :Brazen ]
+
     Code_molester = sidesys[ :CodeMolester ]
 
     Meso_box_lib = -> do
