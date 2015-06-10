@@ -1,5 +1,5 @@
-human               q [ ]
-
+slicer              q [ ]
+permute             q [ ]
 flex2treetop        q [ ]
 yacc2treetop        q [ ]
 bnf2treetop         q [ ]
@@ -9,32 +9,33 @@ code-molester       Q [ ]
 
 dependency          Q [ ]
 slake               q [ ]
+treemap             q [ ]
 
-slicer              q [ ]
+file-metrics        q [ ]
+git                 Q [ ]
 beauty-salon        q [ ]
 cull                q [ ]
-
-permute             q [ ]
-file-metrics        q [ ]
-
-git                 Q [ ]
-git-viz (item 15)   q [ ]
-
-sub-tree            q [ ]
 snag                q [ ]
+test-support        q [ ]
 
 tan-man             q [ ]
-treemap             Q [ ]
+git-viz             q [ ]
+
+# libs
 
 face                q [ ]
+headless            q [ ]
+meta-hell           q [ ]
+
+sub-tree            q [ ]
+
+basic               q [ ]
 
 brazen              q [ ]
 callback            q [ ]
-headless            q [ ]
-system              q [ ]
-basic               q [ ]
-meta-hell           q [ ]
-parse               q [ ]
 
-test-support        q [ ]
+parse               q [ ]
+system              q [ ]
+human               q [ ]
+
 tmx                 q [ ]

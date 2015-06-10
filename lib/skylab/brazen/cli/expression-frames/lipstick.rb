@@ -1,197 +1,255 @@
-module Skylab::Face
+module Skylab::Brazen
 
-  class CLI::Lipstick < ::Module
+  CLI::Expression_Frames = ::Module.new
 
-    # a "lipstick" is an abstract rendering entity whose job it is to render
-    # with glyphs (e.g "+" (pluses)) a certain normalized scalar (a "ratio"
-    # between 0.0 and 1.0 inclusive), taking into account how wide the screen
-    # is at some particular time, and how wide the "pane" is of available
-    # screen-rendering real estate.
-    #
-    # its inspiration is the green and red pluses and minuses that appear in a
-    # typical `git show --stat` (although we noticed only after implementing
-    # this that `git show --stat` does not appear to exhibit the same
-    # adaptive behavior that this "lipstick" facility exhibits.)
-    #
-    # to determine the width of the terminal, Lipstick requires the
-    # `ruby-ncurses` gem, but if for some reason this is unavailable or the
-    # terminal width otherwise cannot be determined dynamically, a fallback
-    # width may be provided explicitly.
-    #
-    # although it has gone through three complete overahauls, the API is still
-    # obtuse for reasons: to get to the rendering of a single "lipstick" series
-    # of characters we must do three things: 1) create our own lipstick module.
-    # 2) "cook" a rendering function. 3) call the function. The steps can be
-    # simple, but are nonetheless separate currently. here is
-    # an illustration of the steps for building and using a lipstick:
-    #
-    #     _LIPSTICK = Face_::CLI::Lipstick.new '*', :yellow, -> { 20 }
-    #       # we want to render yellow '*' characters. a fallback width
-    #       # is the (quite narrow) 20 characters, for the whole pane "screen"
-    #
-    #     rendering_proc = _LIPSTICK.instance.cook_rendering_proc [ 12 ]
-    #       # to "cook" a rendering function, we tell it that we will have a
-    #       # table on the left half of the screen that has one column that
-    #       # is 12 characters wide.
-    #
-    #     ohai = rendering_proc[ 0.50 ]
-    #       # to render we pass one float that is supposed to be a normalized
-    #       # scalar between 0.0 and 1.0 inclusive.
-    #
-    #     ( 3..150 ).include?( ohai.match( /\*+/ )[ 0 ].length ) # => true
-    #       # the width you get may vary based on your terminal's width when
-    #       # you run this!
+  module CLI::Expression_Frames::Lipstick  # see [#073]
 
-    # You can also render compound "tuple ratios":
-    #
-    #     _LIPSTICK = Face_::CLI::Lipstick.new [ ['+', :green], ['-', :red] ]
-    #       # first arg is instead an array of "pen tuples"
-    #       # we chose not to provide a 2nd arg (default width function).
-    #
-    #     p = _LIPSTICK.instance.cook_rendering_proc [ 28 ], 60
-    #       # existing table is 1 column, 28 chars wide. explicitly set
-    #       # the "panel" width to 60 (overriding any attempt at ncurses).
-    #
-    #     ohai = p[ 0.50, 0.25 ]  # we have 32 chars to work within..
-    #     num_pluses = /\++/.match( ohai )[ 0 ].length
-    #     num_minuses = /-+/.match( ohai )[ 0 ].length
-    #     num_pluses # => 15
-    #     num_minuses # => 7
-    #
+    # ~ phase 1: "static" definition
 
-    # The reasons for the convoluted API are these: the multistep sequence is
-    # an optimiztion. The first step, making your lipstick module, allows us
-    # to store the raw "configuation data" about how you want to render things
-    # without doing any heavy lifting at all -- this may come in handy if, for
-    # example, you don't need to render any lipsticks at all during your
-    # program execution. The second step, "cooking" your rendering function,
-    # is where all the heavy lifting happens. in one step we hook out to
-    # ncurses to determine screen width. then, on subsequence calls to your
-    # rendering function, it only does as few calculations as necessary to
-    # render its particular lipstick string.
+    class << self
 
-    def initialize *a
-      @a = a
-      @instance = nil
-      const_set :Class_, ::Class.new( Class__ )
-      nil
-    end
-
-    def instance
-      if ! @instance
-        @instance = self::Class_.new( * @a )
+      def build_with * x_a
+        o = Build_class___.new
+        o.x_a = x_a
+        o.execute
       end
-      @instance
+    end  # >>
+
+    class Build_class___
+
+      attr_writer :x_a
+
+      def execute
+
+        @_cls = ::Class.new Expressor___
+        @_seg_a = nil
+        @_ewp = nil
+
+        process_iambic_fully remove_instance_variable :@x_a
+
+        cls = remove_instance_variable :@_cls
+        cls.const_set :EXPRESSION_WIDTH_PROC, @_ewp  # migth be nil
+        cls.const_set :SEGMENTS, @_seg_a  # might be nil
+        cls
+      end
+
+      Callback_::Actor.methodic self
+
+    private
+
+      def expression_width_proc=
+        @_ewp = gets_one_polymorphic_value
+        KEEP_PARSING_
+      end
+
+      def segment=
+
+        seg = Formal_Segment___.new_via_polymorphic_stream_passively(
+          @polymorphic_upstream_ )
+
+        ( @_seg_a ||= [] ).push seg
+
+        KEEP_PARSING_
+      end
     end
 
-    def self.cols
-      # #ncurses
+    class Formal_Segment___
+
+      same = :color, :glyph
+
+      attr_reader( * same )
+
+      Callback_::Actor.call self, :properties, * same
+
+      def initialize
+
+        @color = nil
+
+        super
+
+        @glyph ||= GLYPH___
+
+        if 1 != @glyph.length
+          raise ::ArgumentError, __say_glyph_width
+        end
+      end
+
+      def __say_glyph_width
+        "glyph must be of width 1: #{ @glyph.inspect }"
+      end
+
+      def __build_style_proc
+        if @color
+          Brazen_::CLI::Styling::Stylify.curry[ [ @color ] ]
+        else
+          IDENTITY_
+        end
+      end
     end
-  end
 
-  CLI::Lipstick::Class__ = Callback_::Session::Ivars_with_Procs_as_Methods.new :cook_rendering_proc
+    # ~ phase 2: building the proc
 
-  class CLI::Lipstick::Class__
+    class Expressor___
 
-    DEFAULT_GLYPH__ = '.'
-    FINAL_DEFAULT_WIDTH__ = 72
+      # assume these consts: `EXPRESSION_WIDTH_PROC`, `SEGMENTS`
 
-    Pen_ = Callback_::Session::Ivars_with_Procs_as_Methods.new :cook
+      class << self
 
-    class Pen_
-      def initialize glyph, color
-        glyph ||= DEFAULT_GLYPH__
-        1 == glyph.length or raise "glyph must be of length 1 (had #{
-          }#{ glyph.inspect })"
-        norm = -> x do
-          [ [ x, 0.0 ].max, 1.0 ].min
+        def new_expressor
+          new._to_proc
         end
 
-        @cook = -> my_room do
+        def new_expressor_with * x_a
 
-          # ~ ( note to the future - it's ok to rewrite this
+          new do
+            process_iambic_fully x_a
+          end._to_proc
+        end
 
-          # `normalized_float` below must be nil or btwn 0.0 and 1.0 inclusive
+        private :new
+      end  # >>
 
-          styliz = if color
-            Face_.lib_.brazen::CLI::Styling::Stylify.curry[ [ color ] ]
+      def initialize & edit_p
+
+        @expression_width = nil
+
+        if block_given?
+          instance_exec( & edit_p )
+        end
+
+        cls = self.class
+
+        @expression_width_proc ||= cls::EXPRESSION_WIDTH_PROC
+
+        @segments ||= cls::SEGMENTS
+
+        @_number_of_segments = @segments.length
+      end
+
+      Callback_::Actor.call( self, :properties,
+
+        :expression_width,
+      )
+
+      def _to_proc
+
+        # this produces a proc that anticipates being called for perhaps
+        # *many* records, so every calculation that can be done early is.
+
+        # however, it also anticipates getting strange data thrown at it,
+        # so every single "record"'s worth of floats is validated.
+
+        express_via_normal_floats = __build_express_via_normal_floats_proc
+
+        -> * f_a do
+
+          if @_number_of_segments == f_a.length
+
+            sum = 0.0
+            f_a.each_with_index do | f, d |
+              if ! f
+                f = 0.0
+                f_a[ d ] = f
+              end
+              if NORMAL_FLOAT_RANGE__.include? f
+                sum += f
+              else
+                raise ::ArgumentError, __say_abnormal_float( f )
+              end
+            end
+
+            if NORMAL_FLOAT_RANGE__.include? sum
+              express_via_normal_floats[ f_a ]
+            else
+              raise ::ArgumentError, __say_abnormal_sum( sum, f_a )
+            end
           else
-            IDENTITY_
+            raise ::ArgumentError, __say_arglength( f_a.length )
           end
+        end
+      end
 
-          # ~ )
+      def __say_abnormal_float f
+        "must be #{ NORMAL_FLOAT_RANGE__ }: #{ f }"
+      end
 
-          -> normalized_float do
-            if normalized_float  # allow nil to mean "don't do it"
-              styliz[ glyph * ( norm[ normalized_float ] * my_room ).to_i ]
+      def __say_abnormal_sum sum, f_a
+        "sum must be #{ NORMAL_FLOAT_RANGE__ } (had #{ sum }) of #{
+          }(#{ f_a * ', ' })"
+      end
+
+      def __say_arglength d
+        "wrong number of arguments (#{ d } for #{ @segments.length })"
+      end
+
+      def __build_express_via_normal_floats_proc
+
+        segment_expressors = __build_segment_expressors
+
+        -> f_a do  # assume each component is normal and sum is normal
+
+          s_a = []
+          @_number_of_segments.times do | d |
+            s = segment_expressors.fetch( d ).call f_a.fetch( d )
+            if s
+              s_a.push s
             end
           end
+          s_a * EMPTY_S_
         end
       end
-    end
 
-    # `initialize`
-    #   arguments: [glyph-string] [color-symbol] [default-cols-func]
-    #          or: <tuple-array> [default-cols-func]
-    #
+      def __build_segment_expressors
 
-    def initialize *args
+        w = __produce_some_width
+        w_f = w.to_f
 
-      pen_a =
-      if args.length.nonzero? and args.fetch( 0 ).respond_to?(:each_with_index)
-        _tuple_a = args.shift
+        surplus_f = 0.0  # this is sketchy just floating here, but it will
+          # work as long as our rendering logic doesn't change. see below
 
-        user_default_width, = LIB_.parse_lib.parse_serial_optionals args,
-          -> x { x.respond_to? :call }
+        @segments.map do | seg |
 
-        _tuple_a.map do |tpl_a|
+          glyph_s = seg.glyph
 
-          Pen_.new( * LIB_.parse_lib.parse_serial_optionals( tpl_a,
-            -> x { x.respond_to? :ascii_only? },
-            -> x { x.respond_to? :id2name } ) )
-        end
-      else
+          style_p = seg.__build_style_proc
 
-        glyph, color, user_default_width = LIB_.parse_lib.parse_serial_optionals args,
-          -> x { x.respond_to? :ascii_only? },
-          -> x { x.respond_to? :id2name },
-          -> x { x.respond_to? :call }
+          -> normal_f do
 
-        [ Pen_.new( glyph, color ) ]
-      end
+            glyph_f = w_f * normal_f
 
-      user_default_width ||= NILADIC_EMPTINESS_
-      min_room = 4 ; margin = 1 ; penlen = pen_a.length
-      @cook_rendering_proc = -> col_width_a, cols=nil, seplen=nil do
-        seplen ||= 0
-        render_a = -> do
-          my_room = -> do
-            pane_width = cols || CLI::Lipstick.cols
-            pane_width ||= user_default_width[] || FINAL_DEFAULT_WIDTH__
-            width_before_lipstick = col_width_a.reduce( :+ ) +
-              ( [ col_width_a.length - 1, 0 ].max * seplen )
-            # minus one because it's a separator, minus one b.c we don't count
-            # lipstick, and then plus one for the left margin hack [#fm-008]
-            [ min_room,
-              ( width_before_lipstick + seplen ) * -1 + pane_width - margin
-            ].max
-          end.call
-          pen_a.map { |p| p.cook my_room }
-        end.call
-        -> * normalized_float_a do
-          penlen == normalized_float_a.length or raise ::ArgumentError,
-            "wrong number of arguments #{ normalized_float_a.length } for #{
-            }#{ penlen })"
-          tot = normalized_float_a.reduce 0.0 do |m, x|
-            m + ( x || 0.0 )
-          end
-          if 0.0 <= tot && tot <= 1.0   # if the sum of your normalized floats
-            penlen.times.map do |idx|   # is outside of unit range: NOTHING.
-              render_a.fetch( idx ).call normalized_float_a.fetch( idx )
-            end * EMPTY_S_
+            glyph_d, extra_f = glyph_f.divmod 1.0
+
+            surplus_f += extra_f  # #explanation-185
+            if 1.0 <= surplus_f
+              glyph_d += 1
+              surplus_f -= 1.0
+            end
+
+            style_p[ glyph_s * glyph_d ]
           end
         end
       end
+
+      def __produce_some_width
+
+        w = @expression_width
+
+        if ! w
+
+          p = @expression_width_proc
+
+          if p
+            w = p[]
+          end
+
+          w ||= WIDTH___
+        end
+        w
+      end
     end
+
+    GLYPH___ = '.'
+    NORMAL_FLOAT_RANGE__ = 0.0 .. 1.0
+    WIDTH___ = 72
   end
 end

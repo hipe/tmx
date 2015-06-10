@@ -48,10 +48,6 @@ module Skylab::FileMetrics
 
     Bsc__ = sidesys[ :Basic ]
 
-    CLI_lipstick = -> *a do
-      Face__[]::CLI::Lipstick.new( * a )
-    end
-
     DSL_DSL_enhance_module = -> x, p do
       Parse_lib__[]::DSL_DSL.enhance_module x, & p
     end

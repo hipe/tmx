@@ -1,47 +1,67 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Face::TestSupport::CLI::Lipstick
+module Skylab::Brazen::TestSupport::CLI
 
-  ::Skylab::Face::TestSupport::CLI[ self ]
+  describe "[br] CLI - expr-frames - lipstick" do
 
-  include Constants
+    it "one segment" do
 
-  extend TestSupport_::Quickie
+      _LIPSTICK = _subject_module.build_with(
 
-  Face_ = Face_
+        :segment,
+          :glyph, '*',
+          :color, :yellow,
+        :expression_width_proc, -> { 20 } )
 
-  describe "[fa] CLI::Lipstick" do
+      _rendering_proc = _LIPSTICK.new_expressor
 
-    it "an illustration of the steps for building and using a lipstick" do
-      _LIPSTICK = Face_::CLI::Lipstick.new '*', :yellow, -> { 20 }
-        # we want to render yellow '*' characters. a fallback width
-        # is the (quite narrow) 20 characters, for the whole pane "screen"
+      line = _rendering_proc[ 0.50 ]  # must be btwn 0.0 and 1.0 inclusive
 
-      rendering_proc = _LIPSTICK.instance.cook_rendering_proc [ 12 ]
-        # to "cook" a rendering function, we tell it that we will have a
-        # table on the left half of the screen that has one column that
-        # is 12 characters wide.
+      line = _unstyle_styled line
 
-      ohai = rendering_proc[ 0.50 ]
-        # to render we pass one float that is supposed to be a normalized
-        # scalar between 0.0 and 1.0 inclusive.
+      md = /\A\*+\z/.match line
 
-      ( 3..150 ).include?( ohai.match( /\*+/ )[ 0 ].length ).should eql true
+      ( 3 .. 150 ).should be_include md[ 0 ].length  # :+[#073.A]
     end
-    it "You can also render compound \"tuple ratios\"" do
-      _LIPSTICK = Face_::CLI::Lipstick.new [ ['+', :green], ['-', :red] ]
-        # first arg is instead an array of "pen tuples"
-        # we chose not to provide a 2nd arg (default width function).
 
-      p = _LIPSTICK.instance.cook_rendering_proc [ 28 ], 60
-        # existing table is 1 column, 28 chars wide. explicitly set
-        # the "panel" width to 60 (overriding any attempt at ncurses).
+    it "multiple segments" do
 
-      ohai = p[ 0.50, 0.25 ]  # we have 32 chars to work within..
-      num_pluses = /\++/.match( ohai )[ 0 ].length
-      num_minuses = /-+/.match( ohai )[ 0 ].length
-      num_pluses.should eql 15
-      num_minuses.should eql 7
+      _LIPSTICK = _subject_module.build_with(
+
+        :segment,
+          :glyph, '+',
+          :color, :green,
+        :segment,
+          :glyph, '-',
+          :color, :red
+
+        # expression width should default to for e.g 72
+      )
+
+      _rendering_proc = _LIPSTICK.new_expressor_with(
+        :expression_width, 60
+      )
+
+      line = _rendering_proc[ 0.50, 0.25 ]
+
+      line = _unstyle_styled line
+
+      line.should eql "#{ '+' * 30 }#{ '-' * 15 }"
+
+    end
+
+    def _subject_module
+      Brazen_::CLI::Expression_Frames::Lipstick
+    end
+
+    def _unstyle_styled s
+
+      s_ = Brazen_::CLI::Styling.unstyle_styled s
+      if s_
+        s_
+      else
+        fail "was not styled: #{ s.inspect }"
+      end
     end
   end
 end

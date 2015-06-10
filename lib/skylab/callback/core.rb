@@ -56,7 +56,10 @@ module Skylab::Callback
       end
 
       def via_client_and_iambic cls, i_a
-        cls.extend MM__ ; cls.include self
+
+        cls.extend MM___
+        cls.include self
+
         while i_a.length.nonzero?
           case i_a.first
           when :properties
@@ -100,6 +103,20 @@ module Skylab::Callback
         call_via_iambic x_a, & oes_p
       end
 
+      def call_via_arglist a, & oes_p
+        new do
+          @on_event_selectively ||= oes_p
+          process_arglist_fully a
+        end.execute
+      end
+
+      def call_via_iambic x_a, & oes_p
+        new do
+          @on_event_selectively ||= oes_p
+          process_iambic_fully x_a
+        end.execute
+      end
+
       def backwards_curry
         -> * xx_a do
           new do
@@ -117,22 +134,24 @@ module Skylab::Callback
         end
       end
 
-      def call_via_arglist a, & oes_p
+      def new_via_polymorphic_stream_passively st
         new do
-          @on_event_selectively ||= oes_p
-          process_arglist_fully a
-        end.execute
-      end
-
-      def call_via_iambic x_a, & oes_p
-        new do
-          @on_event_selectively ||= oes_p
-          process_iambic_fully x_a
-        end.execute
+          bx = formal_fields_ivar_box_for_read_
+          begin
+            ivar = bx.fetch st.current_token do end
+            ivar or break
+            st.advance_one
+            instance_variable_set ivar, st.gets_one
+            if st.no_unparsed_exists
+              break
+            end
+            redo
+          end while nil
+        end
       end
     end
 
-    module MM__
+    module MM___
 
       include Call_Methods_
 
