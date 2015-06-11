@@ -4,175 +4,184 @@ module Skylab::FileMetrics
 
     class Actions::Ext < Report_Action_
 
-      if false
+      @is_promoted = true
 
-      option_parser do |op|
+      edit_entity_class(
 
-        op.banner = <<-O.gsub( /^ +/, EMPTY_S_ )  # #todo
-          #{ hi 'description:' }#{
-          } just report on the number of files with different extensions,
-          ordered by frequency of extension
-        O
+        :desc, -> y do
+          y << "just report on the number of files with different extensions,"
+          y << "ordered by frequency of extension"
+        end,
 
-        req = op_common_head
+        :reuse, COMMON_PROPERTIES_.at(
+          :exclude_dir,
+          :include_name,
+        ),
 
-        req[:git] = true
-        op.on('--[no-]git-aware', "be aware of git commit objects,",
-          "glob them in to one category (default: #{req[:git]})"
-        ) { |x| req[:git] = x }
+        :parameter_arity, :one,
+        :argument_arity, :one_or_more,
+        :property, :path,
+      )
 
-        req[:group_singles] = true
-        op.on('--[no-]group-singles',
-          "by default, extensions that occur only once are globbed",
-          "together. Use the --no form of this flag to flatten them and",
-          "count them inline with the rest (default: #{req[:group_singles]})"
-        ) { |x| req[:group_singles] = x }
+      def produce_result
 
-        op_common_tail
+        @_totes_class = Totaller_class___[]
+
+        _ok = __resolve_extension_count_box
+        _ok && __totaller_via_extension_count_box
       end
 
-      def ext *paths
-        opts = @param_h
-        paths.empty? and paths.push('.')
-        opts[:paths] = paths
-        api_call :ext
+      Totaller_class___ = Callback_.memoize do
+        Totaller____  = FM_::Models_::Totaller.subclass(
+          :total_share,
+          :normal_share,
+        )
       end
 
-      # <-
-    LIB_.system_open2 self
+      def __totaller_via_extension_count_box
 
-    -> do
+        _bx = __group_by_count
+        __totaller_via_grouped_by_count _bx
+      end
 
-      _NLP_EN_agent = nil
+      def __group_by_count
 
-      define_method :run do ||
-        res = false
-        begin
-          ext_count_h = get_ext_count_h or break
-          count = Totaller.new 'Extension Counts'
-          single_a = nil
-          ext_count_h.values.each do |cnt|
-            if 1 == cnt.count and @req[:group_singles]
-              ( single_a ||= [ ] ) << cnt.extension
+        sp = remove_instance_variable :@_specials
+        bx = remove_instance_variable :@_extension_box
+        bx_ = Callback_::Box.new
+
+        bx.each_pair do | ext, d |
+          bx_.touch d do
+            []
+          end.push Extension___.new( ext )
+        end
+
+        if sp
+          sp.each_pair do | sym, d |
+            bx_.touch d do
+              []
+          end.push Special___.new( sym )
+          end
+        end
+        bx_
+      end
+
+      class Extension___
+        def initialize s
+          @ext = s
+        end
+        attr_reader :ext
+        def is_special
+          false
+        end
+      end
+
+      class Special___
+        def initialize sym
+          @sym = sym
+        end
+        attr_reader :sym
+        def is_special
+          true
+        end
+      end
+
+      def __totaller_via_grouped_by_count bx
+
+        totes = @_totes_class.new 'Extension Counts'
+        y = []
+        bx.each_pair do | d, o_a |
+
+          y.clear
+          o_a.each do | o |
+
+            y.push( if o.is_special
+              Hack_lemma_via_symbol_[ o.sym ]
             else
-              count << Totaller.new( "*#{ cnt.extension }", cnt.count )
+              "*#{ o.ext }"
+            end )
+          end
+
+          totes << @_totes_class.new( y * COMMA___, d )
+        end
+
+        totes.mutate_by_common_sort
+        totes
+      end
+      COMMA___ = ', '
+
+      def __resolve_extension_count_box
+
+        ok = __resolve_find_files_command
+        ok &&= __via_find_files_comand_resolve_file_stream
+        ok && __via_file_stream_resolve_extension_count_box
+      end
+
+      def __via_file_stream_resolve_extension_count_box
+
+        bx = Callback_::Box.new
+        specials = nil
+
+        @_file_stream.each do | file |
+
+          file.chomp!
+
+          ext = ::File.extname file
+          if ext.length.zero?
+
+            bn = ::File.basename file
+            if DOT_BYTE___ == bn.getbyte( 0 )
+
+              specials ||= Callback_::Box.new
+              specials.touch :dotfiles do
+                0
+              end
+              specials.h_[ :dotfiles ] += 1
             end
-          end
-          if single_a
-            count << Totaller.new( '(monadic *)', single_a.length )
-          end
-          if count.zero_children?
-            @ui.err.puts "(no extensions)"
-            res = nil
           else
-            count.mutate_by_common_sort or break
-            render_table count, @ui.err
-            if single_a
-              @ui.err.puts( _NLP_EN_agent.calculate do
-                "(* only occuring once #{ s single_a, :was }: #{
-                  }#{ and_ single_a })"
-              end )
+            bx.touch ext do
+              0
             end
-            res = true
+            bx.h_[ ext ] += 1
           end
-        end while nil
-        res
-      end
-
-      _NLP_EN_agent = LIB_.EN_agent
-
-    end.call
-
-  private
-
-    Totaller = FM_::Models::Totaller.subclass :total_share, :normal_share
-
-    Count_ = ::Struct.new :extension, :count
-
-    -> do  # `get_ext_count_h`
-
-      define_method :get_ext_count_h do
-        res = false
-        begin
-          file_a = get_file_a or break
-          pat_a = []
-          pat_a << Pattern_h.fetch( :git_object ) if @req[:git]  # eew
-          pat_a << Pattern_h.fetch( :dotfile )
-          ext_count_h = ::Hash.new do |h, k|
-            h[k] = Count_[ k, 0 ]
-          end
-          # resolve *some* logical extension ("type") for each file - for those
-          # files without an actual extension use the patterns.
-          file_a.each do |file|
-            pn = ::Pathname.new file
-            use_ext = pn.extname.to_s
-            # (please leave this line intact, below was *perfect* [#bs-010])
-            if EMPTY_S_ == use_ext  # (yes, '.foo' has an extname of '' thankfully)
-              pat = pat_a.detect { |p| p.rx =~ file }
-              use_ext = if pat then pat.label else pn.basename.to_s end
-            end
-            ext_count_h[ use_ext ].count += 1
-          end
-          res = ext_count_h
-        end while nil
-        res
-      end
-      private :get_ext_count_h
-
-      Pattern_ = ::Struct.new :rx, :label
-
-      Pattern_h = {
-        git_object: Pattern_[ /\A[0-9a-f]{38,40}\z/, 'git object' ],
-        dotfile: Pattern_[ /\A\./, 'dotfile' ],
-        no_extension: Pattern_[ nil, 'no extension' ]
-      }
-
-    end.call
-
-    def get_file_a
-
-      cmd = build_find_files_command @req[ :paths ]
-
-      if @req[ :show_commands ] || @req.fetch( :debug_volume )
-        @ui.err.puts cmd.string
-      end
-
-      _, o, e = self._TODO_system_conduit.popen3( * cmd.args )  # :+[#004]
-
-        # used to use [#fa-003], redundant with  [#sy-006] but can't
-        # because it takes command strings and must be annnihilated
-
-      s = e.gets
-      if s
-        s.chomp!
-        fail "not exptecting stderr output from find cmd - #{ s.inspect }"
-      end
-
-      y = []
-      out = if @req.fetch( :debug_volume )
-        -> line do
-          y.push line
-          @ui.err.write line
         end
-      else
-        -> line do
-          y.push line
+
+        @_extension_box = bx
+        @_specials = specials
+        ACHIEVED_
+      end
+
+      DOT_BYTE___ = '.'.getbyte 0
+
+      def __via_find_files_comand_resolve_file_stream
+
+        st = stdout_line_stream_via_args_( @_find_files_command.args )
+        if st
+          @_file_stream = st
+          ACHIEVED_
+        else
+          st
         end
       end
 
-      begin
-        s = o.gets
-        s or break
-        s.chomp!
-        out[ s ]
-        redo
-      end while nil
+      def __resolve_find_files_command
 
-      y
-    end
+        cmd = build_find_files_command_via_paths_ @argument_box.fetch :path
+        if cmd
 
-    # ->
-      end  # if false
+          @on_event_selectively.call :info, :find_files_command do
+            cmd.to_event
+          end
+
+          @_find_files_command = cmd
+
+          ACHIEVED_
+        else
+          cmd
+        end
+      end
     end
   end
 end
+
+# :+#tombstone: (please leave this line intact, below was *perfect* [#bs-010])

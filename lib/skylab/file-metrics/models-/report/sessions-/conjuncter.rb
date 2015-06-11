@@ -123,15 +123,9 @@ module Skylab::FileMetrics
         np << :plural
       end
 
-      def _hack_lemma_via_symbol sym
-
-        s = sym.id2name
-        s.gsub! UNDERSCORE_, SPACE_
-        s
-      end
+      define_method :_hack_lemma_via_symbol, Hack_lemma_via_symbol_
 
       AND__ = 'and'
-      UNDERSCORE_ = '_'
     end
   end
 end

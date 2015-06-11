@@ -119,6 +119,14 @@ module Skylab::FileMetrics
       )
     end
 
+    Hack_lemma_via_symbol_ = -> sym do
+      s = sym.id2name
+      s.gsub! UNDERSCORE_, SPACE_
+      s
+    end
+
+    UNDERSCORE_ = '_'
+
     module Actions
 
       class Ping < Report_Action_

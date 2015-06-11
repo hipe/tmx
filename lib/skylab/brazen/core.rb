@@ -95,7 +95,7 @@ module Skylab::Brazen
 
     if st.unparsed_exists
 
-      bx ||= EMPTY_P_
+      bx ||= MONADIC_EMPTINESS_
 
       instance_variable_set :@polymorphic_upstream_, st
 
@@ -435,6 +435,7 @@ module Skylab::Brazen
   IDENTITY_ = -> x { x }
   KEEP_PARSING_ = true
   LIB_ = Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+  MONADIC_EMPTINESS_ = -> _ { }
   NAME_SYMBOL = :name
   NEWLINE_ = "\n".freeze
   NIL_ = nil

@@ -1483,8 +1483,6 @@ module Skylab::Brazen
         NIL_
       end
 
-      MONADIC_EMPTINESS_ = -> _ { }
-
       def __maybe_make_experimental_aesthetic_readjustment  # #note-575
 
         if ! @many_a && @opt_a && ( ! @arg_a || @opt_a.last.takes_argument  ) # (a), (b) and (c)
