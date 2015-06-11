@@ -37,9 +37,9 @@ module Skylab::FileMetrics::TestSupport
 
       totes = @result
       totes.count.should eql 9
-      totes.collapse_and_distribute
+      totes.mutate_by_common_sort
 
-      a = totes.child_a
+      a = totes.children
       2 == a.length or fail
       x = a.fetch 0
       o = a.fetch 1

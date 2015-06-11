@@ -43,7 +43,7 @@ module Skylab::FileMetrics::TestSupport
       it "internally, nils are set for all fields" do
         me = klass.new :A, fum: :D
         ( a = me.instance_variables ).sort_by! { |x| x.to_s }
-        a.should eql( [ :@child_a, :@fee, :@fi, :@fo, :@fum ] )
+        a.should eql( [ :@children, :@fee, :@fi, :@fo, :@fum ] )
         a.map { |ivar| me.instance_variable_get ivar }.should eql(
           [ nil, :A, nil, nil, :D ]
         )

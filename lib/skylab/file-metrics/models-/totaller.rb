@@ -11,20 +11,30 @@ module Skylab::FileMetrics
       if @count || zero_children?
         @count
       else
-        @child_a.map(& :count ).reduce :+  # cute
+        @children.map(& :count ).reduce :+  # cute
       end
     end
 
-    def collapse_and_distribute &ping_each_child
+    def mutate_by_common_sort
+      _mutate_by_sort
+    end
+
+    def mutate_by_visit_then_sort & visit_p
+      _mutate_by_sort( & visit_p )
+    end
+
+    def _mutate_by_sort & visit_p
+
       # all your children are in. tell them now which one is your favorite.
+
       if nonzero_children?
-        max_p = @child_a.reduce { |a, b| b.count > a.count ? b : a }.count.to_f
-        total_p = @child_a.reduce 0 do |m, x| m += x.count ; m end.to_f
-        @child_a.each do |c|
+        max_p = @children.reduce { |a, b| b.count > a.count ? b : a }.count.to_f
+        total_p = @children.reduce 0 do |m, x| m += x.count ; m end.to_f
+        @children.each do |c|
           c.set_field :total_share, c.count.to_f / total_p
           share_of_max = c.count.to_f / max_p
           c.set_field :normal_share, share_of_max
-          ping_each_child and ping_each_child[ c ]
+          visit_p and visit_p[ c ]
         end
         sort_children_by! { |c| -1 * c.count }
       end

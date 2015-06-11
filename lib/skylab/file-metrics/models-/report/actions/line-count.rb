@@ -8,7 +8,7 @@ module Skylab::FileMetrics
 
       o = COMMON_PROPERTIES_.method :fetch
 
-      Entity_.call self,
+      edit_entity_class(
 
         :desc, -> y do
           y << "Shows the linecount of each file, longest first."
@@ -35,11 +35,12 @@ module Skylab::FileMetrics
 
         :property_object, o[ :include_name ],
 
-        :property_object, o[ :show_report ],
+        :property_object, o[ :skip_report ],
 
         :argument_arity, :one_or_more,
         :parameter_arity, :one,
-        :property, :path
+        :property, :path,
+      )
 
       def produce_result
 
@@ -53,10 +54,10 @@ module Skylab::FileMetrics
           @file_array_
         end
 
-        if @argument_box[ :show_report ]
-          __work
-        else
+        if @argument_box[ :skip_report ]
           ACHIEVED_
+        else
+          __work
         end
       end
 
@@ -85,12 +86,11 @@ module Skylab::FileMetrics
 
       def __resolve_file_array
 
-        @_fs = filesystem_conduit_
         y = []
 
         @argument_box.fetch( :path ).each do | path |
 
-          stat, e = __stat_and_exception path
+          stat, e = stat_and_exception_ path
 
           if stat
             if stat.file?
@@ -101,11 +101,9 @@ module Skylab::FileMetrics
               self._COVER_ME
             end
           else
-            __maybe_send_event_about_noent e
+            maybe_send_event_about_noent_ e
           end
         end
-
-        remove_instance_variable :@_fs
 
         if y.length.zero?
           NIL_
@@ -113,29 +111,6 @@ module Skylab::FileMetrics
           @file_array_ = y
           ACHIEVED_
         end
-      end
-
-      def __stat_and_exception path
-
-        stat = begin  # :+[#sy-021]
-          e = nil
-          @_fs.stat path
-        rescue ::Errno::ENOENT => e
-          false
-        end
-        [ stat, e ]
-      end
-
-      def __maybe_send_event_about_noent e
-
-        @on_event_selectively.call :info, :enoent do
-
-          Callback_::Event.wrap.exception.with(
-            :exception, e,
-            :path_hack,
-            :terminal_channel_i, :enoent )
-        end
-        NIL_
       end
 
       def __recurse y, path

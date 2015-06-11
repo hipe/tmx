@@ -65,7 +65,7 @@ module Skylab::FileMetrics
             @ui.err.puts "(no extensions)"
             res = nil
           else
-            count.collapse_and_distribute or break
+            count.mutate_by_common_sort or break
             render_table count, @ui.err
             if single_a
               @ui.err.puts( _NLP_EN_agent.calculate do

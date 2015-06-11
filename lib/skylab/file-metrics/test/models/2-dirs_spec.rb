@@ -1,0 +1,32 @@
+require_relative '../test-support'
+
+module Skylab::FileMetrics::TestSupport
+
+  describe "[fm] models - 2. dirs" do
+
+    extend TS_
+    use :expect_event
+
+    it "ok." do
+
+      call_API :dirs,
+        :path, Fixture_tree_directory_[]
+
+      t = @result
+      a = t.children
+      2 == a.length or fail
+
+      a.map( & :label ).should eql %w( fixture-files-one fixture-files-two )
+      x = a.first
+      o = a.last
+
+      x.num_files.should eql 3
+      x.num_lines.should eql 12
+
+      o.num_files.should eql 2
+      o.num_lines.should eql 3
+
+      # (we are ignoring ~ 6 events)
+    end
+  end
+end

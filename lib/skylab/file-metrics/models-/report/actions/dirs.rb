@@ -6,117 +6,187 @@ module Skylab::FileMetrics
 
       @is_promoted = true
 
-      if false
+      edit_entity_class(
 
-      option_parser do |op|
-        op.banner = <<-DESC.gsub(/^ +/, EMPTY_S_)
-          #{ hi 'description:' }#{
-          } Experimental report. With all folders one level under <path>,
-          for each of them report number of files and total sloc,
-          and show them in order of total sloc.
-        DESC
-        op_common_head
-        op_common_tail
+        :desc, -> y do
+           y << "with each immediate child directory of <path>"
+           y << "report its number of files and total SLOC,"
+           y << "and display them in descending order of SLOC."
+        end,
+
+        :reuse, COMMON_PROPERTIES_.at(
+          :exclude_dir,
+          :include_name
+        ),
+
+        :parameter_arity, :one,
+        :property, :path
+      )
+
+      def produce_result
+
+        _ok = __resolve_dirs
+        _ok && __via_dirs
       end
 
-      def dirs path=nil
-        opts = @param_h
-        opts[:path] = path || '.'
-        api_call :dirs
+      def __via_dirs
+
+        @_totes_class = Totaller_class___[]
+
+        @_totes = @_totes_class.new "folders summary"
+
+        ok = ACHIEVED_
+        @_dirs.each do | dir |
+          ok = __visit_dir dir
+          ok or break
+        end
+        ok && __synthesize
       end
 
-      # <-
-    def run
+      Totaller_class___ = Callback_.memoize do
 
-      c = FM_::Models::Totaller.new("folders summary")
-
-      dirs = build_find_dirs_command.to_path_stream.to_a
-
-      if @req[:show_file_list] || @req.fetch( :debug_volume )
-        @ui.err.puts( dirs )
+        Totaller____ = FM_::Models_::Totaller.subclass(
+          :num_files,
+          :num_lines,
+          :total_share,
+          :normal_share )
       end
-      dirs.each do |dir|
-        cmd = build_find_files_command( [ dir ] ) or break
-        st = stdout_line_stream_via_args cmd.args
-        st or break
 
-        # (for fun, leaving below antique lines intact as long as possible!)
-        _dir_count = Models::Totaller.new(dir, nil)
-        _ok_files = []; _errs = []
+      def __synthesize
 
-        begin
-          f = st.gets
-          f or break
-          f.chomp!
-          if File.exist?(f)
-            if File.readable?(f)
-              _ok_files.push(f)
-            else
-              _dir_count.add_child(Models::Totaller.new(f, nil, :notice => "not readable"))
-            end
-          else
-            _dir_count.add_child(Models::Totaller.new(f, nil, :notice => "bad link"))
-          end
-          redo
-        end while nil
+        @_totes.mutate_by_visit_then_sort do | cx |
 
-        o = Report_::Sessions_::Line_Count.new
-        o.count_blank_lines = h[ :count_blank_lines ]
-        o.count_comment_lines = h[ :count_comment_lines ]
-        o.file_array = _ok.files
-        o.label = ::File.basename dir
-        o.on_event_selectively = @on_event_selectively
-
-        folder_count = o.execute
-        folder_count.count ||= 0
-        c.add_child folder_count
-      end
-      if c.zero_children?
-        @ui.err.puts "(no dirs)"
-        nil
-      else
-        c.collapse_and_distribute do |cx|
           cx.set_field :num_files, cx.nonzero_children?  # ick / meh
           cx.set_field :num_lines, cx.count  # just to be clear
         end
+        @_totes
       end
-      render_table c, @ui.err
-    end
 
-    # (we are trying to keep some ancient code for posterity for now ..)
-    module Models
-      Totaller = FM_::Models::Totaller.subclass(
-        :num_files,
-        :num_lines,
-        :total_share,
-        :normal_share )
-    end
+      def __visit_dir dir
 
-    LineCount = Models::Totaller
+        y = __produce_dir_files dir
+        y and __visit_dir_via_files y, dir
+      end
 
-  private
+      def __visit_dir_via_files y, dir
 
-    def build_find_dirs_command
-      FM_.lib_.system.filesystem.find(
-        :path, @req[ :path ],
-        :ignore_dirs, @req[ :exclude_dirs ],
-        :filenames, @req[ :include_names ],
-        :freeform_query_infix_words, %w'-a -maxdepth 1 -type d',
-        :as_normal_value, IDENTITY_
-      ) do | i, *_, & ev_p |
-        if :info == i
-          if @req[ :show_commands ]
-            _ev = p[]
-            @ui.err.puts _ev.command_string
-          end
+        h = @argument_box.h_
+
+        o = Report_::Sessions_::Line_Count.new
+        o.count_blank_lines = ! h[ :without_blank_lines ]
+        o.count_comment_lines = ! h[ :without_comment_lines ]
+        o.file_array = y
+        o.label = ::File.basename dir
+        o.on_event_selectively = @on_event_selectively
+        o.system_conduit = system_conduit_
+        o.totaller_class = @_totes_class
+
+        totes = o.execute
+        if totes
+          totes.count or self._WHEN
+          @_totes.add_child totes
+          ACHIEVED_
         else
-          raise ev.to_exception
+          totes
         end
       end
-    end
 
-      end  # if false
-      # <-
+      def __produce_dir_files dir
+
+        cmd = build_find_files_command_via_paths_ [ dir ]
+
+        if cmd
+
+          st = stdout_line_stream_via_args_ cmd.args
+          if st
+
+            __produce_dir_files_via_path_stream st, dir
+          else
+            st
+          end
+        else
+          cmd
+        end
+      end
+
+      def __produce_dir_files_via_path_stream st, dir
+
+        # #todo - consdier adding a mapper to the other
+
+        ok = ACHIEVED_
+        y = []
+        begin
+          s = st.gets
+          s or break
+          s.chomp!
+
+          stat, e = stat_and_exception_ s
+          if stat
+            if stat.file? || stat.directory?
+              y << s
+            else
+              self._SQUAWK
+            end
+          else
+            maybe_send_event_about_noent_ e
+            ok = UNABLE_
+            break
+          end
+          redo
+        end while nil
+        ok && y
+      end
+
+      def __resolve_dirs
+
+        _ok = __resolve_find_dirs_command
+        _ok && __via_find_dirs_command_resolve_dirs
+      end
+
+      def __via_find_dirs_command_resolve_dirs
+
+        _, o, e, w = system_conduit_.popen3( * @_find_dirs_command.args )
+
+        y = Report_::Sessions_::Synchronous_Read[
+          [], nil, o, e, w, & @on_event_selectively ]
+
+        if y
+          @_dirs = y
+
+          @on_event_selectively.call :info, :data, :file_list do
+            @_dirs
+          end
+
+          ACHIEVED_
+        else
+          y
+        end
+      end
+
+      def __resolve_find_dirs_command
+
+        h = @argument_box.h_
+
+        cmd = FM_.lib_.system.filesystem.find(
+
+          :path, h.fetch( :path ),
+          :ignore_dirs, h.fetch( :exclude_dir ),
+          :filenames, h[ :include_name ],
+          :freeform_query_infix_words, %w'-a -maxdepth 1 -type d',
+          :as_normal_value, IDENTITY_ )
+
+        if cmd
+
+          @on_event_selectively.call :info, :find_dirs_command do
+            cmd.to_event
+          end
+
+          @_find_dirs_command = cmd
+          ACHIEVED_
+        else
+          cmd
+        end
+      end
     end
   end
 end

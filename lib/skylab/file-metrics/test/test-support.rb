@@ -69,7 +69,13 @@ module Skylab::FileMetrics::TestSupport
   Callback_ = FM_::Callback_
 
   Fixture_file_directory_ = Callback_.memoize do
-    TS_.dir_pathname.join( 'fixture-trees/fixture-tree-one/fixture-files-one' ).to_path
+
+    ::File.join Fixture_tree_directory_[], 'fixture-files-one'
+  end
+
+  Fixture_tree_directory_ = Callback_.memoize do
+
+    TS_.dir_pathname.join( 'fixture-trees/fixture-tree-one' ).to_path
   end
 
   module Sandbox_

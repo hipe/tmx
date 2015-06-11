@@ -661,6 +661,13 @@ module Skylab::Brazen
         @_box[].has_name sym
       end
 
+      def at * sym_a
+        bx = @_box[]
+        sym_a.map do | sym |
+          bx.fetch sym
+        end
+      end
+
       def [] sym
         @_box[][ sym ]
       end

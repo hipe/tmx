@@ -57,7 +57,7 @@ module Skylab::FileMetrics
           if c.zero_children?  # (linecount)
             @ui.err.puts "(no files)"
           else
-            c.collapse_and_distribute
+            c.mutate_by_common_sort
             render_table c, @ui.err
           end
         end

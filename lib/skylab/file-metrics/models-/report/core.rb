@@ -4,9 +4,14 @@ module Skylab::FileMetrics
 
     br = FM_.lib_.brazen
 
-    emod = br::Model::Entity
+    My_Entity__ = br::Model::Entity
 
     class Report_Action_ < br::Action
+
+      def self.entity_enhancement_module
+        My_Entity__
+      end
+
     private
 
       def build_find_files_command_via_paths_ path_a
@@ -29,6 +34,36 @@ module Skylab::FileMetrics
         end
       end
 
+      def stat_and_exception_ path  # :+[#sy-021]
+
+        stat = begin
+          e = nil
+          filesystem_conduit_.stat path
+        rescue ::Errno::ENOENT => e
+          false
+        end
+        [ stat, e ]
+      end
+
+      def maybe_send_event_about_noent_ e
+
+        @on_event_selectively.call :info, :enoent do
+
+          Callback_::Event.wrap.exception.with(
+            :exception, e,
+            :path_hack,
+            :terminal_channel_i, :enoent )
+        end
+        NIL_
+      end
+
+      def stdout_line_stream_via_args_ a
+        o = Report_::Sessions_::Stdout_Stream.new( & @on_event_selectively )
+        o.args = a
+        o.system_conduit = system_conduit_
+        o.execute
+      end
+
       def filesystem_conduit_
         FM_.lib_.system.filesystem
       end
@@ -38,18 +73,7 @@ module Skylab::FileMetrics
       end
     end
 
-    Entity_ = -> action_cls, * x_a do
-
-      raise ::ArgumentError if block_given?
-
-      br::Entity::Edit_client_class_via_polymorphic_stream_over_extmod[
-
-        action_cls,
-        Callback_::Polymorphic_Stream.via_array( x_a ),
-        emod ]
-    end
-
-    COMMON_PROPERTIES_ = br::Model.common_properties_class.new emod do | sess |
+    COMMON_PROPERTIES_ = br::Model.common_properties_class.new My_Entity__ do | sess |
 
       sess.edit_common_properties_module(
 
@@ -89,9 +113,9 @@ module Skylab::FileMetrics
         :description, -> y do
           y <<  "whether or not to actually run the report (dry-run-esque)"
         end,
-        :default, true,
         :flag,
-        :property, :show_report,
+        :default, false,
+        :property, :skip_report,
       )
     end
 

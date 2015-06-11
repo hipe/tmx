@@ -84,6 +84,7 @@ module Skylab::FileMetrics
   end
 
   ACHIEVED_ = true
+  EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
   FM_ = self
   IDENTITY_ = -> x { x }

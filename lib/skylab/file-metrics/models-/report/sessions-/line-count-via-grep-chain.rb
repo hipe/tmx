@@ -52,7 +52,7 @@ module Skylab::FileMetrics
         if ok
 
           totes = @_totes
-          _d = totes.child_a.reduce 0 do | m, cx |
+          _d = totes.children.reduce 0 do | m, cx |
             m + cx.count
           end
           totes.count = _d

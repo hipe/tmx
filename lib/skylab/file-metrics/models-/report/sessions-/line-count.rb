@@ -35,7 +35,7 @@ module Skylab::FileMetrics
           o.filter_array = filter_a
         end
 
-        # (no `collapse_and_distribute` here, caller might customize its call)
+        # (no `mutate_by_visit_then_sort` here, caller might customize its call)
         o.execute
 
       end

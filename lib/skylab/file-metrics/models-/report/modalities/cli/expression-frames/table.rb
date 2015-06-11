@@ -388,8 +388,6 @@ module Skylab::FileMetrics
         nil
       end
 
-      EMPTY_P_ = -> {}
-
         # `Table::Render::Design_::Shell_` - the shell is the ..er..
         # shell through which we express how we want to create the
         # immutable design.

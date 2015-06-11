@@ -5,16 +5,16 @@ module Skylab::FileMetrics
   class Model_::Tree_Branch
 
     def initialize
-      @child_a = nil
+      @children = nil
     end
 
     #                     ~ read about the children ~
 
-    attr_reader :child_a
+    attr_reader :children
 
     def first_child  # meh
       if nonzero_children?
-        @child_a[ 0 ]
+        @children[ 0 ]
       end
     end
 
@@ -27,19 +27,19 @@ module Skylab::FileMetrics
     end
 
     def child_count
-      @child_a ? @child_a.length : 0
+      @children ? @children.length : 0
     end
 
     def each_child & yld_p
-      if @child_a
-        @child_a.each( & yld_p )
+      if @children
+        @children.each( & yld_p )
       end
     end
 
     #                       ~ mutate constituency ~
 
     def add_child child
-      ( @child_a ||= [] ).push child
+      ( @children ||= [] ).push child
       nil
     end
 
@@ -48,7 +48,7 @@ module Skylab::FileMetrics
     #                     ~ mutate (non-constituency) ~
 
     def sort_children_by! & p  # assume children
-      @child_a.sort_by!( & p )
+      @children.sort_by!( & p )
       nil
     end
 
