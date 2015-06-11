@@ -1,8 +1,8 @@
 module Skylab::FileMetrics
 
-  Model = ::Module.new  # tree with struct-like nodes
+  Model_ = ::Module.new  # tree with struct-like nodes
 
-  class Model::Node
+  class Model_::Tree_Branch
 
     def initialize
       @child_a = nil
@@ -54,7 +54,7 @@ module Skylab::FileMetrics
 
   end
 
-  class Model::Node::Structure < Model::Node
+  class Model_::Tree_Branch::Structure < Model_::Tree_Branch
 
     class << self
 

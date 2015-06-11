@@ -1,54 +1,15 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::FileMetrics::TestSupport::Models
+module Skylab::FileMetrics::TestSupport
 
-  ::Skylab::FileMetrics::TestSupport[ TS_ = self ]
-
-  include Constants
-
-  TestSupport_ = TestSupport_
-
-  module Sandbox
-    TestSupport_::Sandbox.enhance( self ).kiss_with 'KLS_'
-  end
-
-  FM_.lib_.DSL_DSL_enhance_module self, -> do
-    block :with_klass
-  end
-
-  module ModuleMethods
-
-    # exeriment - is this worth it? this is for the "nonstandard thing" below
-    # that memoized **into** the test context **class**
-
-    define_singleton_method :let, TestSupport_::Let::LET_METHOD
-
-    let :klass do
-       TS_::Sandbox.kiss with_klass_value.call
-    end
-
-    define_method :__memoized, TestSupport_::Let::MEMOIZED_METHOD
-  end
-
-  module InstanceMethods
-
-    def klass  # nonstandard thing: ..
-      self.class.klass
-    end
-  end
-
-  # --*--
-
-  extend TestSupport_::Quickie
-
-  describe "[fm] models" do
+  describe "[fm] model - tree-branch [ struct ]" do
 
     extend TS_
 
     context "a produced subclass with one field" do
 
       with_klass do
-        FM_::Model::Node::Structure.new :foo
+        FM_::Model_::Tree_Branch::Structure.new :foo
       end
 
       it "trying to pass too many args - arg error" do
@@ -76,7 +37,7 @@ module Skylab::FileMetrics::TestSupport::Models
     context "a produced subclass with multiple fields" do
 
       with_klass do
-        FM_::Model::Node::Structure.new :fee, :fi, :fo, :fum
+        FM_::Model_::Tree_Branch::Structure.new :fee, :fi, :fo, :fum
       end
 
       it "internally, nils are set for all fields" do
@@ -100,12 +61,12 @@ module Skylab::FileMetrics::TestSupport::Models
     context "but it gets kray - what is the one thing you can't do w/ struct" do
 
       it "does" do
-        kls1 = ::Class.new(
-          FM_::Model::Node::Structure.new :foo, :bar )
 
-        Sandbox.kiss kls1
+        kls1 = ::Class.new( _subject_module::Structure.new( :foo, :bar ) )
 
-        kls2 = Sandbox.kiss( kls1.subclass :wing, :wang )
+        Sandbox_.kiss kls1
+
+        kls2 = Sandbox_.kiss( kls1.subclass :wing, :wang )
 
         kls2.members.should eql( [ :foo, :bar, :wing, :wang ] )
 
@@ -121,6 +82,10 @@ module Skylab::FileMetrics::TestSupport::Models
         o2.bar.should eql( 'BAR' )
         o2.wang.should eql( :wung )
       end
+    end
+
+    def _subject_module
+      FM_::Model_::Tree_Branch
     end
   end
 end

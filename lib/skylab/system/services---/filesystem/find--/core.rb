@@ -242,6 +242,11 @@ module Skylab::System
           end
         end
 
+        def to_event
+          Find_::Expression_Adapters::Event.new_with(
+            :find_command_args, @args )
+        end
+
         def to_path_stream
           @args and begin
             Find__::Actors_::Build_path_stream[ @args, & @on_event_selectively ]
@@ -252,7 +257,6 @@ module Skylab::System
 
           express_under( expag ).express_into_under y, expag
         end
-
 
         def __resolve_valid_command_args  # amazing hax #note-130
 

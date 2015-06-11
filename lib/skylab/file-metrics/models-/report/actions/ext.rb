@@ -1,11 +1,44 @@
 module Skylab::FileMetrics
 
-  class API::Actions::Ext
+  class Models_::Report
 
-    extend API::Common::ModuleMethods
+    class Actions::Ext < Report_Action_
 
-    include API::Common::InstanceMethods
+      if false
 
+      option_parser do |op|
+
+        op.banner = <<-O.gsub( /^ +/, EMPTY_S_ )  # #todo
+          #{ hi 'description:' }#{
+          } just report on the number of files with different extensions,
+          ordered by frequency of extension
+        O
+
+        req = op_common_head
+
+        req[:git] = true
+        op.on('--[no-]git-aware', "be aware of git commit objects,",
+          "glob them in to one category (default: #{req[:git]})"
+        ) { |x| req[:git] = x }
+
+        req[:group_singles] = true
+        op.on('--[no-]group-singles',
+          "by default, extensions that occur only once are globbed",
+          "together. Use the --no form of this flag to flatten them and",
+          "count them inline with the rest (default: #{req[:group_singles]})"
+        ) { |x| req[:group_singles] = x }
+
+        op_common_tail
+      end
+
+      def ext *paths
+        opts = @param_h
+        paths.empty? and paths.push('.')
+        opts[:paths] = paths
+        api_call :ext
+      end
+
+      # <-
     LIB_.system_open2 self
 
     -> do
@@ -16,17 +49,17 @@ module Skylab::FileMetrics
         res = false
         begin
           ext_count_h = get_ext_count_h or break
-          count = Count.new 'Extension Counts'
+          count = Totaller.new 'Extension Counts'
           single_a = nil
           ext_count_h.values.each do |cnt|
             if 1 == cnt.count and @req[:group_singles]
               ( single_a ||= [ ] ) << cnt.extension
             else
-              count << Count.new( "*#{ cnt.extension }", cnt.count )
+              count << Totaller.new( "*#{ cnt.extension }", cnt.count )
             end
           end
           if single_a
-            count << Count.new( '(monadic *)', single_a.length )
+            count << Totaller.new( '(monadic *)', single_a.length )
           end
           if count.zero_children?
             @ui.err.puts "(no extensions)"
@@ -52,8 +85,7 @@ module Skylab::FileMetrics
 
   private
 
-    Count = FM_::Models::Count.subclass :total_share, :max_share,
-      :lipstick_float
+    Totaller = FM_::Models::Totaller.subclass :total_share, :normal_share
 
     Count_ = ::Struct.new :extension, :count
 
@@ -105,7 +137,7 @@ module Skylab::FileMetrics
         @ui.err.puts cmd.string
       end
 
-      _, o, e = FM_::Library_::Open3.popen3( * cmd.args )  # :+[#004]
+      _, o, e = self._TODO_system_conduit.popen3( * cmd.args )  # :+[#004]
 
         # used to use [#fa-003], redundant with  [#sy-006] but can't
         # because it takes command strings and must be annnihilated
@@ -139,24 +171,8 @@ module Skylab::FileMetrics
       y
     end
 
-    -> do  # `render_table`
-
-      percent = -> v { "%0.2f%%" % ( v * 100 ) }
-
-      define_method :render_table do |count, out|
-        rndr_tbl out, count, -> do
-          fields [
-            [ :label,               header: 'Extension' ],
-            [ :count,               header: 'Num Files' ],
-            [ :rest,                :rest ],  # if we forgot any fields, glob them here
-            [ :total_share,         prerender: percent ],
-            [ :max_share,           prerender: percent ],
-            [ :lipstick_float,      :noop ],
-            [ :lipstick,            FM_::CLI::Build_custom_lipstick_field[] ]
-          ]
-        end
-      end
-      private :render_table
-    end.call
+    # ->
+      end  # if false
+    end
   end
 end

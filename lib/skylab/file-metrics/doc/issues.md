@@ -1,3 +1,4 @@
+[#010]       conjuncter ..
 [#009] #idea imagine a facility that let you see every occurence of a
              semantic construct (like initializing a class with a certain
              local name, or including a module statically in a class) and
@@ -13,4 +14,4 @@
              (was: consider replacing every backticks with an open3 wrapper)
 [#003]       #tracking-tag where should the sort happen
 [#002] #open wait to hear back from [#bm-002]
-[#001]       #doc-point just let `wc` do the addition for us
+[#001]       the pipey wc narrative ..

@@ -339,8 +339,20 @@ module Skylab::Callback::TestSupport
 
         def __receive_on_channel_unclassified i_a, & x_p
 
-          if i_a && :expression == i_a[ 1 ]  # buy-in to :+[#br-023]
+          # buy-in to :+[#br-023]
+
+          if i_a
+            special_channel = i_a[ 1 ]
+          end
+
+          case special_channel
+
+          when :expression
             __receive_expression i_a, & x_p
+
+          when :data
+            __receive_data i_a, & x_p
+
           else
             _receive_passed_event(
               if x_p
@@ -351,13 +363,25 @@ module Skylab::Callback::TestSupport
           end
         end
 
+        def __receive_data i_a, & data_p
+
+          _ok = _ok_value_via_first_channel i_a.first
+
+          _x = data_p[]
+
+          same_sym = i_a.fetch 2
+
+          _ev = Callback_::Event.inline_with(
+            same_sym,
+            same_sym, _x,
+            :ok, _ok )
+
+          _receive_passed_event _ev
+        end
+
         def __receive_expression i_a, & msg_p
 
-          _ok = case i_a.first
-          when :info    ; nil
-          when :payload ; true
-          else          ; false  # meh
-          end
+          _ok = _ok_value_via_first_channel i_a.first
 
           _ev = Callback_::Event.inline_with(
 
@@ -367,6 +391,15 @@ module Skylab::Callback::TestSupport
           end
 
           _receive_passed_event _ev
+        end
+
+        def _ok_value_via_first_channel sym
+
+          case sym
+          when :info    ; nil
+          when :payload ; true
+          else          ; false  # meh
+          end
         end
 
         def handle_event_selectively

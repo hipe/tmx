@@ -3,12 +3,9 @@ require 'skylab/face/test/cli/test-support'
 
 module Skylab::FileMetrics::TestSupport::CLI
 
-  ::Skylab::FileMetrics::Face_::TestSupport::CLI::Client[ self ]  # KRAY
   ::Skylab::FileMetrics::TestSupport[ TS_ = self ]
 
-  include Constants
-
-  FM_ = FM_
+  TestSupport_ = ::Skylab::TestSupport
 
   extend TestSupport_::Quickie
 
@@ -20,6 +17,24 @@ module Skylab::FileMetrics::TestSupport::CLI
       FM_::CLI
     end
 
+    def as _, _, _
+    end
+    def argv *_
+    end
+    def desc _
+    end
+    def expt *a
+    end
+    def expt_desc _
+    end
+    def memoize_output_lines
+    end
+    def ptrn _
+    end
+
+    def does
+      '(skipping)'
+    end
   end
 
   module InstanceMethods
@@ -78,6 +93,8 @@ module Skylab::FileMetrics::TestSupport::CLI
       end
     end.call
   end
+
+  FM_ = ::Skylab::FileMetrics
 
   module TestLib_
 

@@ -1,3 +1,4 @@
+[#021]       track a shared maneuver (stat)
 [#020]       the tmpdir narrative
 [#019]       #parent-node: [#016]
 [#001] #open the top narrative ..

@@ -1,3 +1,4 @@
+[#095]       features that [fa] has that you don't #universal
 [#094]       expression agents adjunct notes ..
 [#093]       what is the deal with expression agents ..
 [#092]       [ CLI styling ]
@@ -110,9 +111,7 @@
 [#026]       #parent-node: [#025] the collection controller narrative ..
 [#025]       #doc-node: the brazen four layer model model ..
 [#024]       #parent-node: [#025] the action narrative ..
-[#023]       #experimental-feature-tracker: `expression` as a level-2
-               channel that works not in event objects but expresssions
-               directly
+[#023]       #experimental-feature-tracker: ( described in [#024] )
              ( was: #parent-node: [#011] event prototype )
 [#022]       [ EDIT: document formal properties  ]
              ( #was: entity identifier. #moved-to: [#here-091] )

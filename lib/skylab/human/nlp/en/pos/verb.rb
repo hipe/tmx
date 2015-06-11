@@ -106,6 +106,7 @@ module Skylab::Human
         def initialize noun_phrase, lexeme
 
           super lexeme
+          @be_gerund = false  # hact'd for now
           @is_negative = false
           @_spc = Sentence_Phrase_Constituency_.new noun_phrase, self
           @_tense = nil
@@ -128,6 +129,10 @@ module Skylab::Human
 
           send :"__build__#{ _auxiliary_reason }__"
         end
+
+        # ~ g
+
+        attr_writer :be_gerund  # hact for now
 
         # ~ l
 
@@ -204,7 +209,11 @@ module Skylab::Human
 
         def _auxiliary_reason
 
-          if :progressive == @_tense  # "runs" => "is running"
+          if @be_gerund
+
+            NIL_
+
+          elsif :progressive == @_tense  # "runs" => "is running"
 
             # (progressive can be negated, so check progressive before negation)
 

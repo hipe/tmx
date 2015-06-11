@@ -2,9 +2,7 @@ require_relative 'test-support'
 
 module Skylab::FileMetrics::TestSupport::CLI
 
-  # Quickie.
-
-  describe "[fm] CLI" do
+  describe "[fm] CLI", wip: true do
 
     extend TS_
 

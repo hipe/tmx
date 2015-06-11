@@ -236,7 +236,7 @@ module Skylab::System
           _set_stat_and_stat_error_by { ::File.stat path }
         end
 
-        def _set_stat_and_stat_error_by
+        def _set_stat_and_stat_error_by  # :+[#021] (common maneuver)
 
           @stat_e = nil
           @stat = yield

@@ -161,6 +161,11 @@ module Skylab::Callback
         self
       end
 
+      def << x
+        puts x  # result is nil
+        self
+      end
+
       def puts x
         @did_hack_gets_under ||= hack_gets_under
         @x = x

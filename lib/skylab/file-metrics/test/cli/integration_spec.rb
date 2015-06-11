@@ -4,7 +4,7 @@ module Skylab::FileMetrics::TestSupport::CLI
 
   # Quickie - but NOTE it gets whacky b.c of ncurses!
 
-  describe "[fm] CLI - integration" do
+  describe "[fm] CLI - integration", wip: true do
 
     extend TS_
 
@@ -21,14 +21,15 @@ module Skylab::FileMetrics::TestSupport::CLI
       expt_desc "header / first line / summary line"
 
       memoize_output_lines do
-        FM_::Library_::FileUtils.cd FM_.dir_pathname.to_s do
+
+        FM_.lib_.file_utils.cd FM_.dir_pathname.to_s do
           invoke [ 'lc', '.' ]  # le dorky [#006], [#007]
         end
       end
 
       it "header" do
         headers_hack( output_lines[ 0 ] ).should eql(
-          [ :file, :lines, :total_share, :max_share ]
+          [ :file, :lines, :total_share, :normal_share ]
         )
       end
 
@@ -56,14 +57,15 @@ module Skylab::FileMetrics::TestSupport::CLI
       expt_desc 'header looks good'
 
       memoize_output_lines do
-        FM_::Library_::FileUtils.cd FM_.dir_pathname.to_s do
+
+        FM_.lib_.file_utils.cd FM_.dir_pathname.to_s do
           invoke [ 'ext', '.' ]  # more dorky [#006], [#007]
         end
       end
 
       it "header" do
         headers_hack( output_lines[0] ).should eql(
-          [ :extension, :num_files, :total_share, :max_share ] )
+          [ :extension, :num_files, :total_share, :normal_share ] )
       end
 
       it "body" do
@@ -92,14 +94,15 @@ module Skylab::FileMetrics::TestSupport::CLI
       ptrn '2.3x3'
 
       memoize_output_lines do
-        FM_::Library_::FileUtils.cd( FM_.dir_pathname.to_s ) do
+
+        FM_.lib_.file_utils.cd FM_.dir_pathname.to_s do
           invoke [ 'dirs', '.' ]  # still dorky [#006], [#007]
         end
       end
 
       it "header" do
         headers_hack( output_lines[0] ).should eql(
-          [ :directory, :num_files, :num_lines, :total_share, :max_share ] )
+          [ :directory, :num_files, :num_lines, :total_share, :normal_share ] )
       end
 
       it "body" do

@@ -37,3 +37,25 @@ callback, it is up to "us" to decide how the event is built.
 when the action receives a potential event (eg from one of its
 collaborating actors), we call our received selective listener
 with the same channel, and if it wants the event we wrap it.
+
+
+
+
+## visiting:
+
+### :[#023.A]:
+
+this tag tracks the experiment (fruitful so far) of using `expression`
+as a special, "magical" level-2 channel name. "events" on this channel
+are assumed not to have representation thru event objects but rather are
+assuemd to be "expressions" that express themselves into the expression
+context in the block when called.
+
+
+
+
+### :[#023.B]:
+
+`data` as similar to above, but what is assumed of the block is that it
+produces some arbitrary `x` that the client must do something with
+(typically "manually").

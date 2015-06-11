@@ -1,93 +1,183 @@
 module Skylab::FileMetrics
 
-  class API::Actions::LineCount
+  class Models_::Report
 
-    extend API::Common::ModuleMethods
+    class Actions::Line_Count < Report_Action_
 
-    include API::Common::InstanceMethods
+      @is_promoted = true
 
-    def run
-      res = false
-      begin
-        @path_a = @req[:paths]
-        file_a = get_file_a or break
-        @ui.err.puts file_a if @req[:show_file_list]
-        if ! @req[:show_report]
-          break( res = true )
+      o = COMMON_PROPERTIES_.method :fetch
+
+      Entity_.call self,
+
+        :desc, -> y do
+          y << "Shows the linecount of each file, longest first."
+          y << "Show percentages of max for each file."
+        end,
+
+        # aliases :lc, :sloc  # :+[#br-095]
+
+        :description, -> y do
+          y << "whether to count a line that looks like a shell-style comment"
+        end,
+        :flag,
+        :default, false,
+        :property, :without_comment_lines,
+
+        :description, -> y do
+          y << "whether to count blank lines"
+        end,
+        :flag,
+        :default, false,
+        :property, :without_blank_lines,
+
+        :property_object, o[ :exclude_dir ],
+
+        :property_object, o[ :include_name ],
+
+        :property_object, o[ :show_report ],
+
+        :argument_arity, :one_or_more,
+        :parameter_arity, :one,
+        :property, :path
+
+      def produce_result
+
+        _ok = __resolve_file_array
+        _ok && __via_file_array
+      end
+
+      def __via_file_array
+
+        @on_event_selectively.call :info, :data, :file_list do
+          @file_array_
+        end
+
+        if @argument_box[ :show_report ]
+          __work
         else
-          c = count_lines( file_a ) or break
-          if c.zero_children?
-            @ui.err.puts "(no files)"
+          ACHIEVED_
+        end
+      end
+
+      def __work
+
+        h = @argument_box.h_
+
+        o = Report_::Sessions_::Line_Count.new
+
+        o.count_blank_lines = ! h[ :without_blank_lines ]
+        o.count_comment_lines = ! h[ :without_comment_lines ]
+        o.file_array = @file_array_
+        o.label = '.'
+        o.on_event_selectively = @on_event_selectively
+        o.system_conduit = system_conduit_
+        o.totaller_class = Totaller_class___[]
+        o.execute
+      end
+
+      Totaller_class___ = Callback_.memoize do
+
+        Totaller____ = FM_::Models_::Totaller.subclass(
+          :total_share,
+          :normal_share )
+      end
+
+      def __resolve_file_array
+
+        @_fs = filesystem_conduit_
+        y = []
+
+        @argument_box.fetch( :path ).each do | path |
+
+          stat, e = __stat_and_exception path
+
+          if stat
+            if stat.file?
+              y << path
+            elsif stat.directory?
+              __recurse y, path
+            else
+              self._COVER_ME
+            end
           else
-            c.collapse_and_distribute
-            render_table c, @ui.err
+            __maybe_send_event_about_noent e
           end
         end
-      end while false
-      res
-    end
 
-    LineCount = FM_::Models::Count.subclass :total_share, :max_share, :lipstick_float
+        remove_instance_variable :@_fs
 
-  private
-
-    def get_file_a
-      res_a = [ ]
-      y = ::Enumerator::Yielder.new do |line|  # (just grease the wheels..)
-        res_a << line
-      end
-      @path_a.reduce y do |path_y, path|
-        st = begin ::File::Stat.new( path ) ; rescue ::Errno::ENOENT => e ; end
-        if ! st
-          @ui.err.puts "skipping - #{ e.message.sub(/^[A-Z]/) {$~[0].downcase}}"
-        elsif st.file?
-          path_y << path
-        elsif st.directory?
-          files_in_dir path, path_y or break
-        end
-        path_y
-      end
-      res_a
-    end
-
-    def files_in_dir path, line_y
-      cmd = build_find_files_command @path_a
-      if cmd
-        if @req[:show_commands] || @req.fetch( :debug_volume )
-          _ = cmd.args.map( & FM_::Library_::Shellwords.method( :shellescape ) )
-          @ui.err.puts ( _ * SPACE_ )
-        end
-        stdout_lines_into_from_command_args line_y, cmd.args
-      end
-    end
-
-    -> do  # `render_table`
-
-      percent = -> v { "%0.2f%%" % ( v * 100 ) }
-
-      define_method :render_table do |count, out|
-        rndr_tbl out, count, -> do
-          fields [
-            [ :label,               header: 'File' ],
-            [ :count,               header: 'Lines' ],
-            [ :rest,                :rest ],  # if we forgot any fields, glob them here
-            [ :total_share,         prerender: percent ],
-            [ :max_share,           prerender: percent ],
-            [ :lipstick_float,      :noop ],
-            [ :lipstick,            FM_::CLI::Build_custom_lipstick_field[] ]
-          ]
-          field[:label].summary -> do
-              "Total: #{ count.child_count }"
-            end, -> do
-              fail "helf"
-            end
-          field[:count].summary -> do
-              "%d" % count.sum_of( :count )
-            end
-          field[:lipstick].summary nil
+        if y.length.zero?
+          NIL_
+        else
+          @file_array_ = y
+          ACHIEVED_
         end
       end
-      private :render_table
-    end.call
+
+      def __stat_and_exception path
+
+        stat = begin  # :+[#sy-021]
+          e = nil
+          @_fs.stat path
+        rescue ::Errno::ENOENT => e
+          false
+        end
+        [ stat, e ]
+      end
+
+      def __maybe_send_event_about_noent e
+
+        @on_event_selectively.call :info, :enoent do
+
+          Callback_::Event.wrap.exception.with(
+            :exception, e,
+            :path_hack,
+            :terminal_channel_i, :enoent )
+        end
+        NIL_
+      end
+
+      def __recurse y, path
+
+        cmd = build_find_files_command_via_paths_ [ path ]
+        if cmd
+          __recurse_via_command y, cmd
+        else
+          cmd
+        end
+      end
+
+      def __recurse_via_command y, cmd
+
+        @on_event_selectively.call :info, :command do  # ancitipating an active front
+          cmd.to_event
+        end
+
+        _sin, sout, serr, wait = system_conduit_.popen3( * cmd.args )
+
+        d = y.length
+
+        ok = Report_::Sessions_::Synchronous_Read.call(
+          y, nil, sout, serr, wait
+
+        ) do  | * i_a, & ev_p |
+          if :done == i_a.last
+            # skip
+          else
+            self._DO_ME  # needs visual testing
+          end
+        end
+
+        if ok
+          if d == y.length
+            self._SQUAK_AND_COVER_ME
+          end
+          ok
+        else
+          ok
+        end
+      end
+    end
   end
 end

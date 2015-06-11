@@ -127,7 +127,7 @@ module Skylab::Callback
 
         def __begin_edit
 
-          o = Sessoin___.new @terminal_channel_i, @exception
+          o = Session___.new @terminal_channel_i, @exception
           o.push :exception, @exception, :ok, false
           o.message_proc = UNMAPPED_MESSAGE_PROC___
           @_sess = o
@@ -165,7 +165,7 @@ module Skylab::Callback
             inline_via_iambic_and_any_message_proc_to_be_defaulted _x_a, _p
         end
 
-        class Sessoin___
+        class Session___
 
           def initialize tc_i, e
             @x_a = [ tc_i ]

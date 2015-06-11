@@ -84,6 +84,9 @@ module Skylab::Brazen
         when :one_or_more  # :+#by:st
           set_value_of_formal_property_ gets_one_polymorphic_value, prp
 
+        when :zero_or_more  # :+#by:fm
+          set_value_of_formal_property_ gets_one_polymorphic_value, prp
+
         else
           raise ::NameError, __say_arg_arity( prp )
         end

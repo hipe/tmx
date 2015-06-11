@@ -1,3 +1,4 @@
+[#041]       track wishes for conjunction phrase support #universal
 [#040]       a note
 [#039]       the "reduce forms" "algorithm" ..
 [#038]       do we cache every lexeme, by adding it to the lexicon?

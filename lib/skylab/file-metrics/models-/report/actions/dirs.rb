@@ -1,18 +1,38 @@
 module Skylab::FileMetrics
 
-  class API::Actions::Dirs
+  class Models_::Report
 
-    extend API::Common::ModuleMethods
+    class Actions::Dirs < Report_Action_
 
-    include API::Common::InstanceMethods
+      @is_promoted = true
 
+      if false
+
+      option_parser do |op|
+        op.banner = <<-DESC.gsub(/^ +/, EMPTY_S_)
+          #{ hi 'description:' }#{
+          } Experimental report. With all folders one level under <path>,
+          for each of them report number of files and total sloc,
+          and show them in order of total sloc.
+        DESC
+        op_common_head
+        op_common_tail
+      end
+
+      def dirs path=nil
+        opts = @param_h
+        opts[:path] = path || '.'
+        api_call :dirs
+      end
+
+      # <-
     def run
 
-      c = FM_::Models::Count.new("folders summary")
+      c = FM_::Models::Totaller.new("folders summary")
 
       dirs = build_find_dirs_command.to_path_stream.to_a
 
-      if @req[:show_files_list] || @req.fetch( :debug_volume )
+      if @req[:show_file_list] || @req.fetch( :debug_volume )
         @ui.err.puts( dirs )
       end
       dirs.each do |dir|
@@ -21,7 +41,7 @@ module Skylab::FileMetrics
         st or break
 
         # (for fun, leaving below antique lines intact as long as possible!)
-        _dir_count = Models::Count.new(dir, nil)
+        _dir_count = Models::Totaller.new(dir, nil)
         _ok_files = []; _errs = []
 
         begin
@@ -32,16 +52,24 @@ module Skylab::FileMetrics
             if File.readable?(f)
               _ok_files.push(f)
             else
-              _dir_count.add_child(Models::Count.new(f, nil, :notice => "not readable"))
+              _dir_count.add_child(Models::Totaller.new(f, nil, :notice => "not readable"))
             end
           else
-            _dir_count.add_child(Models::Count.new(f, nil, :notice => "bad link"))
+            _dir_count.add_child(Models::Totaller.new(f, nil, :notice => "bad link"))
           end
           redo
         end while nil
-        _folder_count = count_lines(_ok_files, File.basename(dir))
-        _folder_count.count ||= 0
-        c.add_child _folder_count
+
+        o = Report_::Sessions_::Line_Count.new
+        o.count_blank_lines = h[ :count_blank_lines ]
+        o.count_comment_lines = h[ :count_comment_lines ]
+        o.file_array = _ok.files
+        o.label = ::File.basename dir
+        o.on_event_selectively = @on_event_selectively
+
+        folder_count = o.execute
+        folder_count.count ||= 0
+        c.add_child folder_count
       end
       if c.zero_children?
         @ui.err.puts "(no dirs)"
@@ -57,11 +85,14 @@ module Skylab::FileMetrics
 
     # (we are trying to keep some ancient code for posterity for now ..)
     module Models
-      Count = FM_::Models::Count.subclass :num_files,
-        :num_lines, :total_share, :max_share, :lipstick_float
+      Totaller = FM_::Models::Totaller.subclass(
+        :num_files,
+        :num_lines,
+        :total_share,
+        :normal_share )
     end
 
-    LineCount = Models::Count
+    LineCount = Models::Totaller
 
   private
 
@@ -84,39 +115,8 @@ module Skylab::FileMetrics
       end
     end
 
-    -> do  # `render_table`
-
-      percent = -> v { "%0.2f%%" % ( v * 100 ) if v }
-
-      define_method :render_table do |count, out|
-
-        rndr_tbl out, count, -> do
-          fields [
-            [ :label,               header: 'Directory' ],
-            [ :count,               :noop ],
-            [ :num_files,           prerender: -> x { x.to_s } ],
-            [ :num_lines,           prerender: -> x { x.to_s } ],
-            [ :rest,                :rest ],  # any fields not stated here, glob them
-            [ :total_share,         prerender: percent ],
-            [ :max_share,           prerender: percent ],
-            [ :lipstick_float,      :noop ],
-            [ :lipstick,            FM_::CLI::Build_custom_lipstick_field[] ]
-          ]
-          field[:label].summary -> do
-            'Total: '
-          end, -> do
-            fail 'me'
-          end
-          field[:num_files].summary -> do
-            "%d" % count.sum_of( :num_files )
-          end
-          field[:num_lines].summary -> do
-            "%d" % count.sum_of( :num_lines )
-          end
-          field[:lipstick].summary nil
-        end
-      end
-    end.call
-    private :render_table
+      end  # if false
+      # <-
+    end
   end
 end

@@ -69,19 +69,29 @@ module Skylab::Human
 
           @case = nil
           @gender = nil
+          @number = nil
+          @person = nil
         end
 
-        attr_reader :case, :gender
+        attr_reader :case, :gender, :number, :person
 
         def is_empty
 
-          ! ( @case || @gender )
+          ! ( @case || @gender || @number || @person )
         end
 
         def << exp_sym  # :+#ac
 
-          _ivar = _exponent_index.my_exponent_ivar_h.fetch exp_sym
-          instance_variable_set _ivar, exp_sym
+          ivar = _exponent_index.my_exponent_ivar_h[ exp_sym ]
+
+          if ! ivar
+
+            # hacked for now..
+            _ = PARENT[]::UNIQUE_EXPONENTS.fetch exp_sym
+            ivar = :"@#{ _ }"
+
+          end
+          instance_variable_set ivar, exp_sym
           self
         end
 

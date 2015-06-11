@@ -1,5 +1,7 @@
 module Skylab::FileMetrics
 
+  self._K
+
   module Library_::Table
 
     # There is no representation of a phycial table here, just a

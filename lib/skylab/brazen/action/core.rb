@@ -486,13 +486,13 @@ module Skylab::Brazen
 
     def receive_uncategorized_emission oes_p, i_a, & x_p  # #note-100
 
-      # this is :[#023]: (still experimental) `expression` as a level-2
-      # channel name has the following magic treatment
-
-      if :expression == i_a[ 1 ]
+      case i_a[ 1 ]
+      when :expression  # this is [#023.A].
 
         __maybe_emit_expression oes_p, i_a, & x_p
+      when :data
 
+        __maybe_emit_data oes_p, i_a, & x_p
       else
 
         maybe_emit_wrapped_or_autovivified_event oes_p, i_a, & x_p
@@ -513,7 +513,18 @@ module Skylab::Brazen
       end
     end
 
-    # ~ begin experimental [#023] feature
+    # ~ the map filter for [#023.B] `data`-style events
+
+    def __maybe_emit_data oes_p, i_a, & x_p
+
+      # for now, all the onus is on the client to handle these.
+
+      oes_p.call( * i_a ) do
+        x_p[]
+      end
+    end
+
+    # ~ the map filter for [#023.A] `expression`-style events
 
     def __maybe_emit_expression oes_p, i_a, & msg_p
 

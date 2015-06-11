@@ -1,7 +1,10 @@
 module Skylab::FileMetrics
 
-  Models::Count = Model::Node::Structure.new :label, :count
-  class Models::Count
+  Models_::Totaller = FM_::Model_::Tree_Branch::Structure.new :label, :count
+
+  class Models_::Totaller
+
+    Actions = THE_EMPTY_MODULE_
 
     undef_method :count
     def count
@@ -20,8 +23,7 @@ module Skylab::FileMetrics
         @child_a.each do |c|
           c.set_field :total_share, c.count.to_f / total_p
           share_of_max = c.count.to_f / max_p
-          c.set_field :max_share, share_of_max
-          c.set_field :lipstick_float, share_of_max
+          c.set_field :normal_share, share_of_max
           ping_each_child and ping_each_child[ c ]
         end
         sort_children_by! { |c| -1 * c.count }
@@ -29,7 +31,7 @@ module Skylab::FileMetrics
       true  # future-proof
     end
 
-    attr_writer :lipstick_float  # ratio of 0 to 1?
+    attr_writer :normal_share  # ratio of 0 to 1?
 
     def lipstick
       @lipstick_pxy ||= bld_lipstick_pxy
@@ -44,7 +46,7 @@ module Skylab::FileMetrics
         :respond_to? => MONADIC_TRUTH_,  # catch errors
 
         :normalized_scalar => -> do
-          @lipstick_float
+          @normal_share
         end
       )
     end
