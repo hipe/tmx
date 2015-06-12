@@ -82,5 +82,8 @@ module Skylab::FileMetrics::TestSupport
     TestSupport_::Sandbox.enhance( self ).kiss_with 'KLS_'
   end
 
+  EMPTY_S_ = FM_::EMPTY_S_
+  NEWLINE_ = "\n"
   NIL_ = nil
+  SPACE_ = FM_::SPACE_
 end

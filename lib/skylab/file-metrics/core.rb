@@ -27,10 +27,10 @@ module Skylab::FileMetrics
 
     Brazen = sidesys[ :Brazen ]
 
-    Bsc__ = sidesys[ :Basic ]
+    Basic = sidesys[ :Basic ]
 
     DSL_DSL_enhance_module = -> x, p do
-      Parse_lib__[]::DSL_DSL.enhance_module x, & p
+      Parse[]::DSL_DSL.enhance_module x, & p
     end
 
     EN_agent = -> do
@@ -45,14 +45,14 @@ module Skylab::FileMetrics
 
     Open_3 = stdlib[ :Open3 ]
 
-    Parse_lib__ = sidesys[ :Parse ]
+    Parse = sidesys[ :Parse ]
 
     Proxy_lib = -> do
       Callback_::Proxy
     end
 
     Reverse_string_scanner = -> s do
-      Bsc__[]::String.line_stream.reverse s
+      Basic[]::String.line_stream.reverse s
     end
 
     Select = -> do

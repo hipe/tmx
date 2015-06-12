@@ -32,10 +32,7 @@ module Skylab::FileMetrics
       end
 
       Totaller_class___ = Callback_.memoize do
-        Totaller____  = FM_::Models_::Totaller.subclass(
-          :total_share,
-          :normal_share,
-        )
+        Totaller____ = FM_::Models_::Totaller.new
       end
 
       def __totaller_via_extension_count_box
@@ -88,7 +85,8 @@ module Skylab::FileMetrics
 
       def __totaller_via_grouped_by_count bx
 
-        totes = @_totes_class.new 'Extension Counts'
+        totes = @_totes_class.new
+        totes.slug = 'Extension Counts'
         y = []
         bx.each_pair do | d, o_a |
 
@@ -102,10 +100,14 @@ module Skylab::FileMetrics
             end )
           end
 
-          totes << @_totes_class.new( y * COMMA___, d )
+          totes_ = @_totes_class.new
+          totes_.slug = y * COMMA___
+          totes_.count = d
+
+          totes.append_child_ totes_
         end
 
-        totes.mutate_by_common_sort
+        totes.finish
         totes
       end
       COMMA___ = ', '

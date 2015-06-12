@@ -79,9 +79,7 @@ module Skylab::FileMetrics
 
       Totaller_class___ = Callback_.memoize do
 
-        Totaller____ = FM_::Models_::Totaller.subclass(
-          :total_share,
-          :normal_share )
+        Totaller____ = FM_::Models_::Totaller.new
       end
 
       def __resolve_file_array

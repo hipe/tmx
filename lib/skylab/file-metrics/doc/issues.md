@@ -1,3 +1,4 @@
+[#011]       tbl ..
 [#010]       conjuncter ..
 [#009] #idea imagine a facility that let you see every occurence of a
              semantic construct (like initializing a class with a certain

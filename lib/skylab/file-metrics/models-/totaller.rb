@@ -1,25 +1,23 @@
 module Skylab::FileMetrics
 
-  Models_::Totaller = FM_::Model_::Tree_Branch::Structure.new :label, :count
-
-  class Models_::Totaller
+  class Models_::Totaller < FM_::Model_::Tree_Branch
 
     Actions = THE_EMPTY_MODULE_
 
-    undef_method :count
-    def count
-      if @count || zero_children?
-        @count
-      else
-        @children.map(& :count ).reduce :+  # cute
-      end
+    def initialize
+      super()
     end
 
-    def mutate_by_common_sort
+    attr_accessor(
+      :count,
+      :total_share,
+      :normal_share )
+
+    def finish
       _mutate_by_sort
     end
 
-    def mutate_by_visit_then_sort & visit_p
+    def accept_and_finish_by & visit_p
       _mutate_by_sort( & visit_p )
     end
 
@@ -27,52 +25,61 @@ module Skylab::FileMetrics
 
       # all your children are in. tell them now which one is your favorite.
 
-      if nonzero_children?
-        max_p = @children.reduce { |a, b| b.count > a.count ? b : a }.count.to_f
-        total_p = @children.reduce 0 do |m, x| m += x.count ; m end.to_f
-        @children.each do |c|
-          c.set_field :total_share, c.count.to_f / total_p
-          share_of_max = c.count.to_f / max_p
-          c.set_field :normal_share, share_of_max
-          visit_p and visit_p[ c ]
+      if children_count.nonzero?
+
+        cx_a = to_child_stream.to_a
+
+        max = 0
+        tot = 0
+
+        cx_a.each do | cx |
+
+          d = cx.count
+          tot += d
+          if max < d
+            max = d
+          end
+
         end
-        sort_children_by! { |c| -1 * c.count }
+
+        cx_a.each do | cx |
+
+          f = cx.count.to_f
+
+          cx.total_share = f / tot
+
+          cx.normal_share = f / max
+
+          if visit_p
+            visit_p[ cx ]
+          end
+        end
+
+        @a.sort_by! do | sym |
+          -1 * @h.fetch( sym ).count
+        end
       end
-      true  # future-proof
+      ACHIEVED_
     end
-
-    attr_writer :normal_share  # ratio of 0 to 1?
-
-    def lipstick
-      @lipstick_pxy ||= bld_lipstick_pxy
-    end
-
-    def bld_lipstick_pxy
-      CelPxy_.new(
-
-        # we act like a string during the pre-render, and don't ever add
-        :length => -> { 0 },  # any width, you are strictly a decoration.
-
-        :respond_to? => MONADIC_TRUTH_,  # catch errors
-
-        :normalized_scalar => -> do
-          @normal_share
-        end
-      )
-    end
-
-    CelPxy_ = LIB_.proxy_lib.nice :length, :respond_to?, :normalized_scalar
 
     def sum_of sym
 
-      x_a = each_child.map( & sym )
-      x_a.compact!
-      x_a.reduce :+
+      st = to_child_stream
+      o = st.gets
+      if o
+
+        x = o.send sym
+        begin
+          o = st.gets
+          o or break
+          x += ( o.send sym )
+          redo
+        end while nil
+        x
+      end
 
       # each_child.map(& sym ).reduce :+
         # http://howfuckedismydatabase.com/nosql
     end
-
-    # `initialize` - note any ivars you would set would look ugly in big trees
   end
 end

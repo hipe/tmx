@@ -15,7 +15,9 @@ module Skylab::FileMetrics
 
       def execute
 
-        @_totes = @totaller_class.new @label
+        totes = @totaller_class.new
+        totes.slug = @label
+        @_totes = totes
 
         _ok = if @file_array.length.zero?
 
@@ -54,12 +56,14 @@ module Skylab::FileMetrics
         cmd_s = cmd * SPACE_  # BE CAREFUL
 
         @on_event_selectively.call :info, :data, :wc_command do
-          cmd_s
+          WC_Command___.new cmd_s
         end
 
         @_command_string = cmd_s
         ACHIEVED_
       end
+
+      WC_Command___ = ::Struct.new :to_string
 
       def __via_command_string_resolve_output_lines
 
@@ -137,7 +141,10 @@ module Skylab::FileMetrics
           line = line_a.fetch d
           md = rx.match line  # :[#002]
           if md
-            @_totes << @totaller_class.new( md[ :label ], md[ :num ].to_i )
+            totes = @totaller_class.new
+            totes.slug = md[ :label ]
+            totes.count = md[ :num ].to_i
+            @_totes.append_child_ totes
           else
             raise ::SystemError, __say( line )
           end

@@ -1,4 +1,4 @@
-require_relative '../test-support'
+require_relative '../../../test-support'
 
 module Skylab::FileMetrics::TestSupport
 
@@ -13,10 +13,10 @@ module Skylab::FileMetrics::TestSupport
         :path, Fixture_tree_directory_[]
 
       t = @result
-      a = t.children
+      a = t.to_child_stream.to_a
       2 == a.length or fail
 
-      a.map( & :label ).should eql %w( fixture-files-one fixture-files-two )
+      a.map( & :slug ).should eql %w( fixture-files-one fixture-files-two )
       x = a.first
       o = a.last
 

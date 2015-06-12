@@ -1,4 +1,4 @@
-require_relative '../test-support'
+require_relative '../../../test-support'
 
 module Skylab::FileMetrics::TestSupport
 
@@ -14,14 +14,14 @@ module Skylab::FileMetrics::TestSupport
 
       expect_neutral_event :find_command_args
 
-      a = @result.children
+      a = @result.to_child_stream.to_a
       2 == a.length or fail
       x = a.first
       o = a.last
-      x.label.should eql '*.code'
+      x.slug.should eql '*.code'
       x.count.should eql 2
 
-      o.label.should eql '*.file'
+      o.slug.should eql '*.file'
       o.count.should eql 1
 
     end

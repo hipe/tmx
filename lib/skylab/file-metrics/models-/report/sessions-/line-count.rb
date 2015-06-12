@@ -35,7 +35,7 @@ module Skylab::FileMetrics
           o.filter_array = filter_a
         end
 
-        # (no `mutate_by_visit_then_sort` here, caller might customize its call)
+        # (no `accept_and_finish_by` here, caller might customize its call)
         o.execute
 
       end
@@ -65,13 +65,8 @@ module Skylab::FileMetrics
           filter_a << "grep -v '^[ \t]*#'"
         end
 
-        @on_event_selectively.call :info, :expression, :linecount_conj_p do | y |
-
-          y_ = o.express_into_line_context []
-          y_.fetch( 0 )[ 0, 0 ] = '('
-          y_.fetch( -1 ).concat ')'
-          y_.each( & y.method( :<< ) )
-          y
+        @on_event_selectively.call :info, :data, :linecount_NLP_frame do | y |
+          o
         end
 
         filter_a

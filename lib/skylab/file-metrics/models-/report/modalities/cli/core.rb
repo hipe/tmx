@@ -6,6 +6,8 @@ module Skylab::FileMetrics
 
     module Modalities::CLI
 
+      if false  # (tmp)
+
       Actions = ::Module.new
 
       Action_Adapter__ = ::Class.new FM_::CLI::Action_Adapter
@@ -15,8 +17,6 @@ module Skylab::FileMetrics
           "%0.2f%%" % ( d * 100 )
         end
       end
-
-      if false
 
         # e.g - fatal error warning notice info debug trace
 
@@ -39,6 +39,8 @@ module Skylab::FileMetrics
           end
         end
       end
+
+      if false  # (tmp)
 
       class Actions::Line_Count < Action_Adapter__
 
@@ -174,6 +176,7 @@ module Skylab::FileMetrics
           end
         end
       end
+      end  # (tmp)
     end
   end
 end

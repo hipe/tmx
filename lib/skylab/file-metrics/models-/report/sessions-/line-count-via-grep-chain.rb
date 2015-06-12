@@ -22,7 +22,9 @@ module Skylab::FileMetrics
         a.push 'wc -l'
         cmd_tail_s = a.join ' | '
 
-        @_totes = @totaller_class.new @label
+        totes = @totaller_class.new
+        totes.slug = @label
+        @_totes = totes
 
         lib = FM_.lib_
 
@@ -52,7 +54,7 @@ module Skylab::FileMetrics
         if ok
 
           totes = @_totes
-          _d = totes.children.reduce 0 do | m, cx |
+          _d = totes.to_child_stream.each.reduce 0 do | m, cx |
             m + cx.count
           end
           totes.count = _d
@@ -84,10 +86,11 @@ module Skylab::FileMetrics
         md = RX___.match line
         if md
 
-          totes = @totaller_class.new file
+          totes = @totaller_class.new
+          totes.slug = file
           totes.count = md[ :num ].to_i
 
-          @_totes << totes
+          @_totes.append_child_ totes
 
           ACHIEVED_
         else

@@ -300,6 +300,20 @@ module Skylab::TestSupport
 
       # ~ advancing by searching for a regexp (positively or negatively)
 
+      def << expected_s
+
+        @line = @up.gets
+        if @line
+          if expected_s == @line
+            self
+          else
+            fail "expected #{ expected_s.inspect }, had #{ @line.inspect }"
+          end
+        else
+          fail "expected #{ expected_s.inspect }, had no more lines"
+        end
+      end
+
       def expect_nonblank_line
 
         @line = @up.gets
@@ -384,6 +398,13 @@ module Skylab::TestSupport
           break
         end while nil
         count
+      end
+
+      def expect_no_more_lines
+        @line = @up.gets
+        if @line
+          fail "expected no more lines, had #{ @line.inspect }"
+        end
       end
 
       # ~ building fake files

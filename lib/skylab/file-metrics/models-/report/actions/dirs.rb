@@ -33,7 +33,9 @@ module Skylab::FileMetrics
 
         @_totes_class = Totaller_class___[]
 
-        @_totes = @_totes_class.new "folders summary"
+        totes = @_totes_class.new
+        totes.slug = "folders summary"
+        @_totes = totes
 
         ok = ACHIEVED_
         @_dirs.each do | dir |
@@ -45,19 +47,18 @@ module Skylab::FileMetrics
 
       Totaller_class___ = Callback_.memoize do
 
-        Totaller____ = FM_::Models_::Totaller.subclass(
+        Totaller____ = FM_::Models_::Totaller.new(
           :num_files,
           :num_lines,
-          :total_share,
-          :normal_share )
+        )
       end
 
       def __synthesize
 
-        @_totes.mutate_by_visit_then_sort do | cx |
+        @_totes.accept_and_finish_by do | cx |
 
-          cx.set_field :num_files, cx.nonzero_children?  # ick / meh
-          cx.set_field :num_lines, cx.count  # just to be clear
+          cx.num_files = cx.children_count
+          cx.num_lines = cx.count  # redundant, but more clear
         end
         @_totes
       end
@@ -84,7 +85,7 @@ module Skylab::FileMetrics
         totes = o.execute
         if totes
           totes.count or self._WHEN
-          @_totes.add_child totes
+          @_totes.append_child_ totes
           ACHIEVED_
         else
           totes

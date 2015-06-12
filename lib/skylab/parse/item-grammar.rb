@@ -37,6 +37,21 @@ module Skylab::Parse
 
       # ~ singleton methods for subclasses
 
+      def parse_one_item_via_iambic_fully x_a
+
+        st = Callback_::Polymorphic_Stream.via_array x_a
+        st_ = simple_stream_of_items_via_polymorpic_stream st
+        x = st_.gets
+        if x
+          if st.unparsed_exists
+            raise ::ArgumentError
+          end
+          x
+        else
+          raise ::ArgumentError
+        end
+      end
+
       def simple_stream_of_items_via_polymorpic_array x_a
 
         _st = Callback_::Polymorphic_Stream.via_array x_a

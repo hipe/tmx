@@ -1,150 +1,132 @@
 module Skylab::FileMetrics
 
-  Model_ = ::Module.new  # tree with struct-like nodes
+  Model_ = ::Module.new
 
-  class Model_::Tree_Branch
-
-    def initialize
-      @children = nil
-    end
-
-    #                     ~ read about the children ~
-
-    attr_reader :children
-
-    def first_child  # meh
-      if nonzero_children?
-        @children[ 0 ]
-      end
-    end
-
-    def nonzero_children?
-      child_count.nonzero?
-    end
-
-    def zero_children?
-      child_count.zero?
-    end
-
-    def child_count
-      @children ? @children.length : 0
-    end
-
-    def each_child & yld_p
-      if @children
-        @children.each( & yld_p )
-      end
-    end
-
-    #                       ~ mutate constituency ~
-
-    def add_child child
-      ( @children ||= [] ).push child
-      nil
-    end
-
-    alias_method :<<, :add_child  # NOTE experimental!
-
-    #                     ~ mutate (non-constituency) ~
-
-    def sort_children_by! & p  # assume children
-      @children.sort_by!( & p )
-      nil
-    end
-
-  end
-
-  class Model_::Tree_Branch::Structure < Model_::Tree_Branch
+  class Model_::Tree_Branch < FM_.lib_.basic::Tree.mutable_node::Frugal
 
     class << self
 
-      def members
-        self::IVAR_BOX__.get_names
-      end
-
-      alias_method :orig_new, :new
+      alias_method :__orig_new, :new
 
       def new * sym_a
 
-        cls = ::Class.new self
+        ::Class.new( self ).class_exec do
 
-        class << cls
-          alias_method :new, :orig_new
+          class << self
+            alias_method :new, :__orig_new
+          end
+
+          const_set BX__, Callback_::Box.new
+
+          _edit_via_symbols sym_a
+
+          self
         end
-
-        cls.class_exec do
-
-          const_set :IVAR_BOX__, Callback_::Box.new
-          _accept_symbols sym_a
-        end
-
-        cls
       end
 
       def subclass * sym_a
 
-        cls = ::Class.new self
+        ::Class.new( self ).class_exec do
 
-        cls.class_exec do
+          const_set BX__, const_get( BX__ ).dup
 
-          const_set :IVAR_BOX__, self::IVAR_BOX__.dup
-          _accept_symbols sym_a
+          _edit_via_symbols sym_a
+
+          self
         end
-
-        cls
       end
 
-    private
+      def _edit_via_symbols sym_a
 
-      def _accept_symbols sym_a
-        bx = const_get :IVAR_BOX__, false
+        bx = const_get BX__, false
+
         sym_a.each do | sym |
-          attr_accessor sym
-          bx.add sym, :"@#{ sym }"
+
+          define_method sym do
+            _read sym
+          end
+
+          define_method :"#{ sym }=" do | x |
+            _write x, sym
+          end
+
+          bx.add sym, sym
         end
-        nil
+        NIL_
       end
     end  # >>
 
-    def initialize * x_a
-
+    def initialize * a
       super()
 
-      bx = self.class::IVAR_BOX__
-
-      if x_a.length > bx.length
-        raise ::ArgumentError, "wrong number of args (#{ x_a.length } for #{
-          }#{ bx.length })"
-      end
-
-      h = ::Hash.try_convert x_a.last
-      if h
-        x_a.pop
-      end
-
-      x_a.each_with_index do | x, d |
-        instance_variable_set bx.at_position( d ), x
-      end
-
-      ( x_a.length ... bx.length ).each do | d |
-        instance_variable_set bx.at_position( d ), nil
-      end
-
-      if h
-        h.each_pair do | k, x |
-          instance_variable_set bx.fetch( k ), x
+      if a.length.zero?
+        if _properties.length.nonzero?
+          # if there "should be" a userdata hash, nil all of them out
+          _init_via_arglist a
         end
+      else
+        _init_via_arglist a
       end
+    end
+
+    def _init_via_arglist a
+
+      h = {}
+
+      bx = _properties
+
+      len = bx.length
+
+      if a.length > len
+        raise ::ArgumentError, __say( a, len )
+      end
+
+      a.each_with_index do | x, d |
+
+         h[ bx.at_position( d ) ] = x
+      end
+
+      ( a.length ... len ).each do | d |
+        h[ bx.at_position( d ) ] = nil
+      end
+
+      @user_data_h_ = h
+
+      NIL_
+    end
+
+    attr_writer :slug  # because you changed the constructor
+
+    def __say x_a, len
+      "wrong number of args (#{ x_a.length } for #{ len })"
     end
 
     def [] k
-      send k  # meh
+      @user_data_h_.fetch k
     end
 
-    def set_field k, x
-      instance_variable_set self.class::IVAR_BOX__.fetch( k ), x
-      nil
+    def _read k
+      @user_data_h_.fetch k
     end
+
+    def _write x, k
+      _properties.fetch( k )
+      @user_data_h_ ||= {}
+      @user_data_h_[ k ] = x
+      NIL_
+    end
+
+    def append_child_ x
+      @a or _!
+      add @a.length, x
+    end
+
+    def _properties
+      self.class.const_get BX__
+    end
+
+    BX__ = :BX____
+
   end
 end
 # :+#tombstone the predecessor to this is HILARIOUS function soup

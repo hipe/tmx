@@ -1,4 +1,4 @@
-require_relative '../test-support'
+require_relative '../../../test-support'
 
 module Skylab::FileMetrics::TestSupport
 
@@ -28,25 +28,25 @@ module Skylab::FileMetrics::TestSupport
       call_API :line_count, * _same
 
       _conj = _expect_these_events
+      y = _conj.linecount_NLP_frame.express_into_line_context( [] )
 
-      black_and_white( _conj ).should eql(
-        '(including blank lines and comment lines)' )
+      y.should eql [ 'including blank lines and comment lines' ]
 
       expect_neutral_event :wc_command
       expect_no_more_events
 
       totes = @result
       totes.count.should eql 9
-      totes.mutate_by_common_sort
+      totes.finish
 
-      a = totes.children
+      a = totes.to_child_stream.to_a
       2 == a.length or fail
       x = a.fetch 0
       o = a.fetch 1
 
       x.count.should eql 6
 
-      ::File.basename( o.label ).should eql 'some more.code'
+      ::File.basename( o.slug ).should eql 'some more.code'
 
       ( 0.65 .. 0.67 ).should be_include x.total_share
       ( 0.32 .. 0.34 ).should be_include o.total_share
@@ -64,8 +64,9 @@ module Skylab::FileMetrics::TestSupport
 
       _conj = _expect_these_events
 
-      black_and_white( _conj ).should eql(
-        '(excluding blank lines and comment lines)' )
+      y = _conj.linecount_NLP_frame.express_into_line_context []
+
+      y.should eql [ 'excluding blank lines and comment lines' ]
 
       expect_neutral_event :wc_pipey_command_string
       expect_neutral_event :wc_pipey_command_string
@@ -82,7 +83,7 @@ module Skylab::FileMetrics::TestSupport
 
       expect_neutral_event :find_command_args
       expect_neutral_event :file_list
-      expect_neutral_event :linecount_conj_p
+      expect_neutral_event :linecount_NLP_frame
 
     end
   end

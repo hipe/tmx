@@ -1,6 +1,11 @@
 module Skylab::FileMetrics
 
-  class CLI < Brazen_::CLI
+  class CLI # < Brazen_::CLI
+
+    class Action_Adapter
+    end
+
+    if false  # (tmp)
 
     Build_custom_lipstick_field = -> do
 
@@ -26,7 +31,8 @@ module Skylab::FileMetrics
           taken_width = col_width_a.reduce :+
           if len.nonzero?
             taken_width += ( seplen * ( len - 1 ) )
-
+          end
+        end
 
         if 1 < available_width
 
@@ -52,5 +58,7 @@ module Skylab::FileMetrics
       :expression_width_proc, -> { 160 } )
 
     Client = self  # #tmx-compat
+
+    end  # (tmp)
   end
 end
