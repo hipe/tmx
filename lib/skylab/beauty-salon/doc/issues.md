@@ -1,4 +1,9 @@
 [#033]       [ word wrap (here) ]
+[#032]       name conventions for variables .. #parent-node:[#030]
+[#031]       name conventions for methods (adjunct) ..  #parent-node:[#030]
+[#030]       name conventions ..
+[#029]       name conventions for constants .. #parent-node:[#030]
+[#028]       name conventions for functions and methods ..  #parent-node:[#030]
 [#026]       #parent-node: [#010] procedurally find the smaller methods
 [#025] #open have the multiple forms save to one file
 [#024] #open explicit choice of single line v. multiline

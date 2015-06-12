@@ -17,10 +17,6 @@ module Skylab::Callback
       end
     end
 
-    Bundle_item_grammar = -> do
-      MH__[]::Bundle::Item_Grammar
-    end
-
     Bundle_multiset = -> x do
       MH__[]::Bundle::Multiset[ x ]
     end
@@ -76,6 +72,8 @@ module Skylab::Callback
     Module_lib = -> do
       Basic[]::Module
     end
+
+    Parse = sidesys[ :Parse ]
 
     Some_stderr = -> do
       System_lib__[]::IO.some_stderr_IO

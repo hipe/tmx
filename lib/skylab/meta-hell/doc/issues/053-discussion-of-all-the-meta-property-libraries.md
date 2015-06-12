@@ -106,7 +106,7 @@ synthesize many of our favorite implementation for the simpler bulk of those
 features:
 
   • a flat iambic interface for its DSL, one that starts to approach
-    the [#mh-047] #item-grammar but simplifies by needing no prepositional
+    the [#pa-005] #item-grammar but simplifies by needing no prepositional
     phrases: our grammar prefers simple flag adjectives to key-value pair
     predicates, arguing that the former can often replace the latter to make
     for more readable specifications. (for example, ":argument_arity,

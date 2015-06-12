@@ -22,7 +22,8 @@
              ( was:  #family "strange" (as used in "ick", formerly "inspect") )
 [#049]       #tracking-tag :#fuzzy
 [#048]       #doc-point what are touchers and when should you use them ..
-[#047]       #doc-point this class of grammars, and this parser..
+[#047]       ( #moved-to: [#pa-005] )
+             ( #was: #doc-point this class of grammars, and this parser.. )
              (#re-purpoesd:once. original may have been lost.)
 [#046]       #doc-point extension nodes?
 [#045]       #tracking-tag track various #touchers in the wild

@@ -88,6 +88,8 @@ module Skylab::Parse  # see [#001]
     module Lib___
 
       Basic = Autoloader_.build_require_sidesystem_proc[ :Basic ]
+
+      Stdlib_set = Autoloader_.build_require_stdlib_proc[ :Set ]
     end
 
     Autoloader_[ self ]

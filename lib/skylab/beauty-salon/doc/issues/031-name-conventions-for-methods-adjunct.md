@@ -1,7 +1,8 @@
-# the control-flow method-naming idiomspace :[#0154]
+# the control-flow method-naming idiomspace :[#031]
 
 (EDIT: the meaning of the `resolve_` prefix has changed subtly,
-necessitating a rewrite for this document #todo)
+necessitating a rewrite for this document.
+as well, it is generally very old, and may be archived entirely.)
 
 the overblown title of this article is a formal way of saying something like
 this: if a method results in true-ish then it means keep going. otherwise
@@ -15,7 +16,7 @@ are the focus of this article.
 
 
 
-## the "resolve_" family of constructions
+## the `resolve_` family of constructions
 
 this particular family of method names was the original motivator behind this
 article. we use this stem often enough that it has become necessary to define
@@ -27,14 +28,14 @@ after the noun conveys that there is some work to be done, work that could
 potentially result in a failure to yield the desired object or value, states
 that in turn could potentially lead to side-effects behavioral and otherwise.
 
-the "resolve_" class of methods has three forms, all prefixes: "resolve_some_",
-"resolve_any_", and "resolve_" (not followed by "some" or "any"). each form
-has a corresponding #de-vowelated form with "rslv_". we cover them one-by-one
+the `resolve_` class of methods has three forms, all prefixes: `resolve_some_`,
+`resolve_any_`, and `resolve_` (not followed by "some" or "any"). each form
+has a corresponding #de-vowelated form with `rslv_`. we cover them one-by-one
 below.
 
 
 
-### the plain old "resolve_" (alternately: "attempt_[to_]") prefix
+### the plain old `resolve_` (alternately: `attempt_[to_]`) prefix
 
 the plain old `resolve_` method (that is, any method whose name starts with
 `resolve_` (or the #de-vowelated form `rslv_`) and is not followed by `some_`
@@ -98,14 +99,14 @@ so we needed some form to cover this other signature, and no other form was
 availble that did not sound awkward (we considereed `attempt_resolve_` for
 this.) but since "some" and "any" are already constructions in broad use by us
 and they cover the semantics more precisely, we tighted the meaning of plain
-old "resolve_" down to this.
+old `resolve_` down to this.
 
 
 
 #### "attempt_[to_]" as a variant
 
 in some cases it reads better semantically to use "attempt_[to_]" instead of
-"resolve_", for cases where the thing you are resolving is more of a verb-
+`resolve_`, for cases where the thing you are resolving is more of a verb-
 like action than a noun; but often verbs and nouns have isomporphs to one
 another, so for e.g between the names `attempt_to_connect`,
 `attempt_connection`, or `resolve_connection`, it can be chef's choice for
@@ -114,18 +115,18 @@ is that any and all of these surface forms in their use in the field must
 comply to the criteria prescribed above.
 
 as tempting as it may be we do not use the shorter but otherwise semantically
-similar prefix "try_", to avoid any confusion with the popular language
+similar prefix `try_`, to avoid any confusion with the popular language
 construct from many languages that pertains to exception handling.
 
 as stated above, the above pertains just to methods that begin with a
-"resolve_" or "rslv_" *not* followed by "some_" or or "any_". we cover those
+`resolve_` or `rslv_` *not* followed by `some_` or or `any_`. we cover those
 now:
 
 
 
 ### `resolve_some_`
 
-in contrast to plain old "resolve_", the business payload of a call to a
+in contrast to plain old `resolve_`, the business payload of a call to a
 `resolve_some_`-style method is in its result value.
 
 the "some" in any method is generally an assertion that under normal, non-
@@ -275,9 +276,9 @@ there is a significant drop-off point somewhere below with regards to their
 frequency of use.
 
 
-### the "build_" family of prefixes
+### the `build_` family of prefixes
 
-a method whose name starts with "build_" (or the #de-vowelated form "bld_")
+a method whose name starts with `build_` (or the #de-vowelated form `bld_`)
 must follow every point of this criteria:
   • it must result in a new object that it constructs.
   • the object must not be assigned to an ivar inside of the method body.
@@ -287,8 +288,8 @@ must follow every point of this criteria:
     the method itself must set no ivars or effect any behavior side-effects
     (e.g emitting events). (however methods it calls may have artibraray side
     effects but should not have any. see discussion below.)
-  • there is a fuzzy distinction between when to use "build_" vs. [#094]
-    "get_", but generally the former is for objects of business classes
+  • there is a fuzzy distinction between when to use `build_` vs. [#094]
+    `get_`, but generally the former is for objects of business classes
     and/or stdlib classes, and the latter is for hashes, arrays and strings
     that may be mutated. generally the former is expected to be called once
     for the lifetime of the object (but not necessarily) and is often private

@@ -93,7 +93,7 @@ module Skylab::TestSupport::TestSupport
         nil
       end
 
-      def build_baked_em_a
+      def flush_baked_emission_array
         x = @em_a
         @em_a = nil
         x
@@ -197,7 +197,7 @@ module Skylab::TestSupport::TestSupport
 
           public :expect, :expect_no_more_lines
 
-          def build_baked_em_a
+          def flush_baked_emission_array
             x = @_baked_em_a
             @_baked_em_a = nil
             x

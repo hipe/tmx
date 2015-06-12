@@ -1,3 +1,4 @@
+[#006]       [ the item grammar ]
 [#001]       the top narrative ..
 [#002]       this one parse function with list against matrix
 [#003]       a freeeform "serial optionals" basically like minimal packrat parser

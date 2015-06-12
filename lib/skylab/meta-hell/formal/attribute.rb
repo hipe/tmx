@@ -33,25 +33,47 @@ module Skylab::MetaHell
       g = if const_defined? :Item_Grammar__, false
         self::Item_Grammar__
       else
-        const_set :Item_Grammar__, module_exec( & Build_item_grammar__ )
+        const_set :Item_Grammar__, module_exec( & Build_item_grammar___ )
       end
-      p = g.build_parser_for a
-      while (( sp = p[] ))
+
+      pa = g.simple_stream_of_items_via_polymorpic_array a
+
+      begin
+        sp = pa.gets
+        sp or break
         h = { }
         sp.adj and sp.adj.keys.each { |i| h[ i ] = true }
         sp.pp and sp.pp.each_pair { |i, x| h[ i ] = x }
         attribute sp.keyword_value_x, h
-      end
-      nil
+        redo
+      end while nil
+      NIL_
     end
-    #
-    Build_item_grammar__ = -> do
-      which_h = { 1 => (( mono_i_a = [ ] )), 2 => (( diad_i_a = [ ] )) }
-      meta_attributes.each do |matr|
-        _arity = (( h = matr.hook_p )) ? h.arity : 1
-        which_h.fetch( _arity ) << matr.local_normal_name
+
+    Build_item_grammar___ = -> do
+
+      mono_i_a = []
+      diad_i_a = []
+
+      which_h = {
+        1 => mono_i_a,
+        2 => diad_i_a
+      }
+
+      meta_attributes.each do | matr |
+
+        p = matr.hoop_p
+
+        _d = if p
+          p.arity
+        else
+          1
+        end
+
+        which_h.fetch( _d ).push matr.local_normal_name
       end
-      MetaHell_::Bundle::Item_Grammar.new mono_i_a, :attribute, diad_i_a
+
+      MetaHell_.lib_.parse::Item_Grammar.new mono_i_a, :attribute, diad_i_a
     end
 
     DSL = -> mod do

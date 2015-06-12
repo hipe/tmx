@@ -32,11 +32,12 @@ important facilities:
 
 3. (was B-oxxy, replaced by [#ca-030])
 
-4. (the `Item_Grammar` is pretty great)
+4. (was `I-tem_Grammar`,  moved to [#pa-005])
 
 5. (was formal box, the juggernaut that got assimilated into [cb])
 
-6. fun fields (contoured, etc) were an important frontier space for the
+6. (moved to [pa]..)
+   fun fields (contoured, etc) were an important frontier space for the
    early exploration of things like iambic DSL's.
 
 

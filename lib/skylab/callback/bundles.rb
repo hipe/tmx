@@ -20,7 +20,7 @@ module Skylab::Callback
 
     module Digraph_methods  # assumes an `call_digraph_listeners` method
 
-      Item_Grammar__ = Callback_.lib_.bundle_item_grammar.
+      Item_Grammar__ = Callback_.lib_.parse::Item_Grammar.
         new %i( structure structifiying ), :emitter, %i( emits_to_channel )
 
       build_method = -> sp do
@@ -44,13 +44,21 @@ module Skylab::Callback
       end
 
       to_proc = -> a do
+
         include Digraph_methods
-        p = Item_Grammar__.build_parser_for a
-        while (( sp = p[] ))
+
+        pa = Item_Grammar__.simple_stream_of_items_via_polymorpic_array a
+
+        begin
+          sp = pa.gets
+          sp or break
           define_method sp.keyword_value_x, & build_method[ sp ]
           private sp.keyword_value_x
-        end
+          redo
+        end while nil
+        NIL_
       end
+
       define_singleton_method :to_proc do to_proc end
 
       def emit_to_channel_structifiable chan_i, ev

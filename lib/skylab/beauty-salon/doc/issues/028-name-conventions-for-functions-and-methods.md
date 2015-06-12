@@ -1,5 +1,81 @@
 # name conventions for functions and methods :[#028]
 
+## synopsis
+
+how a method is named with respect to the use of underscores expesses
+its "API scope". here is a summary of the N tiers of scope:
+
+    this_is_a_public_API_method   # #tier-0: no leading or trailing underscores
+
+    this_method_has_library_scope_  # #tier-1: one trailing underscore
+
+    _we_call_this_cozy_scope  # #tier-2: one leading underscore
+
+    __we_call_this_one_off_scope  # #tier-3: two leading underscores
+
+
+
+
+## sneak preview of scopes
+
+
+### :#tier-0: "public API"
+
+this method is part of the public API of the node that defines it. to
+change this method in terms of signature or effective behavior is a
+viloation of semantic versioning (semver.org).
+
+note that this scope is only with respect to the node itself. if there
+is a "public API" method defined on a node that is itself private to a
+library, the method does *not* then become part of the public API of the
+library. the scope of the node itself [#031] is a sort of "contract"
+between the node and its intended audience. the scope of the methods
+on the node is a sort of "sub-contract" with this same audience. this
+whole paragraph may change.
+
+
+
+
+### :#tier-1: "library scope"
+
+this strange looking but often used convention has a variety of similar
+meanings:
+
+  • if you're seeing this in a method call, the method is defined
+    somewhere "above" the node you found it in, but still in the same
+    library (usu. sidesystem).
+
+    if you're reading this as a method definition, it is intended to be
+    used only from within nodes "below" yours.
+
+    we see this particular use often in our tests by test support
+    methods that are used in more than one file but still just a part
+    of the test suite itself and not an external library.
+
+  • we often use this convention to indicate that the method has a
+    definition in something like an abstract base class - the method
+    is intended to be used by instances of child classes of the base
+    class. if you're seeing this in a call, it means you proably want
+    to look to a parent class (or just module) for the definition.
+
+  • "collaborator" - if you're calling such a method and you are
+    crossing library (i.e sidesystem) lines, this means you are
+    knowingly circumventing the public API of the object, and you run
+    the risk of getting broken if its implementation changes.
+
+
+
+
+## :#tier-2 and :#tier-3
+
+"cozy scope" means the method is not called outside of the file it is
+defined in.  "one-off scope" is cozy scope but furthermore the method is
+only ever called from one place. the significance of these tiers
+corresponds exactly to the same tiers described in [#029].
+
+
+
+
 
 ## introduction
 
@@ -557,6 +633,8 @@ we must follow suit with the existing word, so please see `reduce_with`.
 
 ## the method naming shibbloleth :[#.D]
 
+
+### edit: half redundant with an earlier section
 ### edit: the simplified version:
 
 synopsis:

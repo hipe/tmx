@@ -63,7 +63,7 @@ module Skylab::Brazen
         x = bc.receiver.send bc.method_name, * bc.args, & bc.block
         __flush_any_invitations
         if x
-          __when_result_is_trueish x
+          __result_as_top_via_trueish_backstream_result x
         else
           @exit_status
         end
@@ -120,7 +120,7 @@ module Skylab::Brazen
 
       ## ~~ exitstatus & result handling
 
-      def __when_result_is_trueish x
+      def __result_as_top_via_trueish_backstream_result x
 
         if ACHIEVED_ == x  # covered
           SUCCESS_
@@ -543,7 +543,6 @@ module Skylab::Brazen
       end
 
       def _some_bound_call
-
         prepare_to_parse_parameters
         bc = bound_call_from_parse_options
         bc or _bound_call_via_parsed_options
@@ -850,16 +849,35 @@ module Skylab::Brazen
         end
       end
 
+      # ~ begin implement :+[#023]:
+
       def receive_uncategorized_emission i_a, & x_p
 
-        if i_a && :expression == i_a[ 1 ]
+        if i_a
+          sym = i_a[ 1 ]
+        end
+
+        case sym
+        when :expression
+
           send :"receive__#{ i_a[ 0 ] }__expression", * i_a[ 2 .. -1 ], & x_p
+
+        when :data
+
+          __receive_data_emission i_a, & x_p
+
         else
+
           receive_event_on_channel x_p[], i_a
         end
       end
 
-      # ~ begin implement :+[#023]:
+      def __receive_data_emission i_a, & x_p  # publicize whenever
+
+        # NOTE below signature is :+#experimental. we may later omit the channel
+
+        send :"receive__#{ i_a.fetch( 2 ) }__data", i_a, & x_p
+      end
 
       def receive__error__expression sym, & msg_p
 
@@ -1252,7 +1270,7 @@ module Skylab::Brazen
 
       def increment_seen_count name_symbol
 
-        touch_argument_metadata( name_symbol ).__increment_seen_count
+        touch_argument_metadata( name_symbol )._increment_seen_count
         NIL_
       end
 
@@ -1277,7 +1295,7 @@ module Skylab::Brazen
 
         attr_reader :seen_count
 
-        def __increment_seen_count
+        def _increment_seen_count
           if seen_count.nil?
             @seen_count = 1
           else

@@ -2,6 +2,81 @@
 
 (this is a ground-up re-write of a document "lost in the [#br-092] fire".)
 
+## synopsis
+
+we use these conventions not because they are pretty (they are not) but
+because they pack a lot of self-documentation into a small space.
+
+a const's style exhibits both is "scope" and the kind of object it
+references. here is a summary of the N tiers of scope:
+
+    Public_API  # this const assignment is part of your (semver) pub. API
+
+    Library_Scope_  # may be used by this node (file) and any child nodes
+
+    Cozy_Scope__  # (2) this const is used *only* by this file
+
+    One_Off_Scope___  # (3) set in only 1 place, referenced in only 1 other
+
+    Singleton_Scope____   # (4) this const (as string) only exists in 1 place
+
+    Flagged_for_Elimination_____  # (5) referrant is not used. OK to remove
+
+
+here is an overview of how the "shape" of the referenced object inflects
+the name (we will use "cozy" scope becuase it is common):
+
+    Module_eg_Class_in_Contemorary_Style__
+
+    ModuleOrClassInLegacyStyle__
+
+    This_casing_is_reserved_for_proc_likes_eg_actors__
+
+    ANY_OBJECT_TREATED_AS_A_VALUE__
+
+
+
+
+## justification (preview)
+
+these conventions are both ugly and near perfect. there is a case to be
+made for an intuitive semantic value in their ugliness: the uglier the
+name is (the more trailing underscores it has), the less intended it is
+for public consumption. i.e if you don't like the way a name looks it
+probably doesn't like you either.
+
+names like these are optimized for refactorability and comprehensivenes
+though what they self-document. by seeing a const we immediately know
+two things from which we can infer many others:
+
+  1) through its shape we know rougly what it is and how we are
+     expected to interact with it.
+
+  2) to be able to know its scope at a glance has two important
+     ramifications for what we can know about a const assignment right
+     away:
+
+     A) we know immediately how far we have to look for documentiation
+        (at best) or (at least) a home for the const. const assignments at
+        tier 0 should always be documented, and consts at tier 1 should
+        usually be. (so we also know something about our chances for
+        finding documentation - you can know right away whether a const
+        at tier 2 and below is documented because you are already "in"
+        the node that owns it.)
+
+     B) if we want to change the const (or are at least considering it),
+        we get an immediate estimate of how broad an impact that change
+        might have on the broader system: a const assignment at tier
+        5 is tautologically OK to removed. removing or changing a const
+        at tier 0, on the other hand, is a violation of "semver.org".
+
+        (consts at tier 2 and below are usually trivial to change.
+        at tier 1 is somewhere in between.)
+
+
+
+
+
 ## introduction
 
 remember that a constant in ruby can refer to any arbitrary value.

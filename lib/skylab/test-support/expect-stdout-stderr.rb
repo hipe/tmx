@@ -2,7 +2,7 @@ module Skylab::TestSupport
 
   module Expect_Stdout_Stderr  # see [#029] the expect omnibus and narrative #intro-to-gamma
 
-    # assumes {  @IO_spy_group_for_expect_stdout_stderr | your own `build_baked_em_a` }
+    # assumes {  @IO_spy_group_for_expect_stdout_stderr | your own `flush_baked_emission_array` }
 
     # NOTE currently this mutates emission strings!
 
@@ -148,13 +148,15 @@ module Skylab::TestSupport
 
       def _bake_sout_serr
         @__sout_serr_actual_stream__ = Callback_::Polymorphic_Stream.via_array(
-          build_baked_em_a )
+          flush_baked_emission_array )
 
         true
       end
 
-      def build_baked_em_a  # :+#hook-near #universal
-        @IO_spy_group_for_expect_stdout_stderr.release_lines
+      def flush_baked_emission_array  # :+#hook-near #universal
+
+        sg = remove_instance_variable :@IO_spy_group_for_expect_stdout_stderr
+        sg.release_lines
       end
 
       # ~ for the end
