@@ -4,179 +4,417 @@ module Skylab::FileMetrics
 
     Modalities = ::Module.new
 
-    module Modalities::CLI
-
-      if false  # (tmp)
+    module Modalities::CLI  # (notes in [#005])
 
       Actions = ::Module.new
 
-      Action_Adapter__ = ::Class.new FM_::CLI::Action_Adapter
+      # ~ the mutable front properties API frontier
 
-      Common_percent_formatting__ = -> f do
-        if d
-          "%0.2f%%" % ( d * 100 )
+      class Action_Adapter__ < FM_::CLI::Action_Adapter
+
+        MUTATE_PRPS__ = nil
+
+        class << self
+          def _mutate_properties & p
+            const_set :MUTATE_PRPS__, p
+          end
+        end  # >>
+
+        def resolve_properties
+          super
+          p = self.class::MUTATE_PRPS__
+          if p
+
+            sess = Modz_CLI_::Sessions_::Property_Mutation_Session.new
+            sess.extmod = EXTMOD__
+            sess.mutable_front_props = mutable_front_properties
+            sess.mutable_back_props = mutable_back_properties
+            p[ sess ]
+          end
+          NIL_
         end
       end
 
-        # e.g - fatal error warning notice info debug trace
+      # ~ our common properties
 
-        ( volume_a = [ :info_volume, :debug_volume, :trace_volume ].freeze ).
+      bz = FM_.lib_.brazen
+      EXTMOD__ = bz::Model::Entity
 
-          each { |k| req[k] = nil }  # so we can fetch them
+      Common_properties__ = bz::Model.common_properties_class.new(
+        EXTMOD__
+      ) do | sess |
 
-        op.on('-v', '--verbose',
-          'e.g. show the generated {find|wc} commands we (would) use, etc',
-          '(try using multiple -v for more detail)') do
-          not_yet_set = volume_a.detect { |k| ! req[ k ] }
-          if not_yet_set then req[ not_yet_set ] = true else
-            @did_emit_verbose_max_volume_notice ||= begin
+        sess.edit_common_properties_module(
 
-              _s = FM_.lib_.human::NLP::EN::Number.number volume_a.length
+          :description, -> y do
 
-              @err.puts "(#{ _s } is the max number of -v.)"
-              true
+            y << "raise the verbosity level by one \"unit\""
+
+          end,
+          :argument_arity, :zero,
+          :parameter_arity, :zero_or_more,
+          :property, :verbose,
+
+        )
+      end
+
+      # ~ misc support for our action adapters
+
+      fmt = "%0.2f%%"
+      Common_percent_formatting__ = -> f do
+        fmt % ( f * 100 )
+      end
+
+      # ~ our default hook-in behavior for particular shared events
+
+      class Action_Adapter__
+
+        # ~ most of our events ore on the "data" channel but see #note-075
+
+        def receive_conventional_emission i_a, & ev_p
+
+          if :info == i_a.first
+            send :"receive__#{ i_a.fetch 1 }__data", i_a, & ev_p
+          else
+            super
+          end
+        end
+
+        def receive__file_list__data i_a, & x_p
+
+          if _verbosity_is_at_level_for_lists
+
+            _files = x_p.call
+            io = @resources.serr
+
+            _files.each do | file |
+
+              io.puts file
             end
+            NIL_
+          end
+        end
+
+        def receive__find_dirs_command__data i_a, & x_p
+
+          if _verbosity_is_at_level_for_commands
+
+            receive_event_on_channel x_p[], i_a
+          end
+        end
+
+        def receive__find_files_command__data i_a, & x_p
+
+          if _verbosity_is_at_level_for_commands
+
+            receive_event_on_channel x_p[], i_a
+          end
+        end
+
+        def receive__line_count_command__data i_a, & ev_p
+
+          if _verbosity_is_at_level_for_commands
+
+            receive_event_on_channel ev_p[], i_a
+          end
+        end
+
+        def receive__linecount_NLP_frame__data i_a, & x_p
+
+          if _verbosity_is_at_entry_level
+
+            _o = x_p[]
+            y = _o.express_into_line_context []
+            y.fetch( 0 )[ 0, 0 ] = '('
+            y.fetch( -1 ).concat ')'
+            y.each do | s |
+              @resources.serr.puts s
+            end
+            NIL_
+          end
+        end
+
+        def receive__wc_command__data i_a, & x_p
+
+          if _verbosity_is_at_level_for_commands
+
+            cmd = x_p.call
+            @resources.serr.puts cmd.to_string
+            NIL_
           end
         end
       end
 
-      if false  # (tmp)
+      # ~ our universal customization to achieve final custom rendering
+
+      class Action_Adapter__
+
+        def bound_call_via_bound_call_from_back bc
+
+          Callback_::Bound_Call.via_this do
+
+            totes = bc.receiver.send bc.method_name, * bc.args
+            if totes
+              _result_via_backstream_result totes
+            else
+              totes
+            end
+          end
+        end
+
+        def _result_via_backstream_result totes
+
+          if totes.children_count.zero?
+            __when_zero_children
+          else
+            _express_totals_when_nonzero_children totes
+          end
+        end
+
+        def __when_zero_children
+          @resources.serr.puts "(no files)"
+          NIL_
+        end
+      end
+
+      # ~ our action adapters
 
       class Actions::Line_Count < Action_Adapter__
 
-        self._EG(
-
-          :description, -> y do
-            y << 'list the resulting files that match the query (before running reports)'
-          end,
-          :default, false,
-          :flag,
-          :property, :show_file_list,
-        )
-
-        def _WHAT
-
-          if c.zero_children?  # (linecount)
-            @ui.err.puts "(no files)"
-          else
-            c.mutate_by_common_sort
-            render_table c, @ui.err
-          end
+        _mutate_properties do | sess |
+          sess.add_additional_properties(
+            :property_object, Common_properties__.fetch( :verbose ),
+          )
         end
 
-        define_method :render_table, -> do
+        def _express_totals_when_nonzero_children totes
+
+          totes.finish
+          __express_totals_as_table @resources.sout, totes
+        end
+
+        def __express_totals_as_table out, totes
 
           percent = Common_percent_formatting__
 
-          -> count, out do
+          tbl = _begin_table
 
-            rndr_tbl out, count, -> do
+          tbl.edit_table(
 
-              fields [
-                [ :label,               header: 'File' ],
-                [ :count,               header: 'Lines' ],
-                [ :rest,                :rest ],  # if we forgot any fields, glob them here
-                [ :total_share,         prerender: percent ],
-                [ :normal_share,        prerender: percent ],
-                [ :lipstick_float,      :noop ],
-                [ :lipstick,            FM_::CLI::Build_custom_lipstick_field[] ]
-              ]
+            :field, :named, :slug,
+              :label, 'File',
+              :summary, -> totes_ do
+                "Total: #{ totes_.children_count }"
+              end,
 
-              field[:label].summary -> do
-                  "Total: #{ count.child_count }"
-                end, -> do
-                  fail "helf"
-                end
-              field[:count].summary -> do
-                  "%d" % count.sum_of( :count )
-                end
-              field[:lipstick].summary nil
-            end
-          end
-        end.call
-      end
+            :field, :named, :count,
+              :label, 'Lines',
+              :summary, -> totes_ do
+                "%d" % totes_.sum_of( :count )
+              end,
 
-      class Actions::Dirs < Action_Adapter__
+            :field, :named, :total_share, :map, percent,
 
-        define_method :render_table, -> do
+            :field, :named, :normal_share, :map, percent,
 
-          percent = Common_percent_formatting__
+            :field, :named, :_lipstick_,
+              :label, EMPTY_S_,
+              :edit, FM_::CLI::Build_custom_lipstick_field )
 
-          -> count, out do
+          tbl.expression_width = _lookup_expression_width
 
-            rndr_tbl out, count, -> do
-              fields [
-                [ :label,               header: 'Directory' ],
-                [ :count,               :noop ],
-                [ :num_files,           prerender: -> x { x.to_s } ],
-                [ :num_lines,           prerender: -> x { x.to_s } ],
-                [ :rest,                :rest ],  # any fields not stated here, glob them
-                [ :total_share,         prerender: percent ],
-                [ :normal_share,        prerender: percent ],
-                [ :lipstick_float,      :noop ],
-                [ :lipstick,            FM_::CLI::Build_custom_lipstick_field[] ]
-              ]
-              field[:label].summary -> do
-                'Total: '
-              end, -> do
-                fail 'me'
-              end
-              field[:num_files].summary -> do
-                "%d" % count.sum_of( :num_files )
-              end
-              field[:num_lines].summary -> do
-                "%d" % count.sum_of( :num_lines )
-              end
-              field[:lipstick].summary nil
-            end
-          end
-        end.call
+          tbl.express_into_IO_data_tree out, totes
+
+          NIL_  # important - don't result in the output context
+        end
       end
 
       class Actions::Ext < Action_Adapter__
 
-        define_method :render_table, -> do
+        _mutate_properties do | sess |
+          sess.add_additional_properties(
+            :property_object, Common_properties__.fetch( :verbose ),
+          )
+        end
+
+        def _express_totals_when_nonzero_children totes
+
+          # (no need to `finish` the node here, it is done by back)
+
+          __express_totals_as_table @resources.sout, totes
+        end
+
+        def __express_totals_as_table out, totes
 
           percent = Common_percent_formatting__
 
-          define_method :render_table do | count, out |
-            rndr_tbl out, count, -> do
-              fields [
-                [ :label,               header: 'Extension' ],
-                [ :count,               header: 'Num Files' ],
-                [ :rest,                :rest ],  # if we forgot any fields, glob them here
-                [ :total_share,         prerender: percent ],
-                [ :normal_share,        prerender: percent ],
-                [ :lipstick_float,      :noop ],
-                [ :lipstick,            FM_::CLI::Build_custom_lipstick_field[] ]
-              ]
-            end
+          tbl = _begin_table
+
+          tbl.edit_table(
+
+            :field, :named, :slug,
+              :label, 'Extension',
+              :summary, -> totes_ do
+                "Total: #{ totes_.children_count }"
+              end,
+
+            :field, :named, :count,
+              :label, 'Num Files',
+              :summary, -> totes_ do
+                "%d" % totes_.sum_of( :count )
+              end,
+
+            :field, :named, :total_share,
+              :map, percent,
+
+            :field, :named, :normal_share,
+              :map, percent,
+
+            :field, :named, :_lipstick_,
+              :label, EMPTY_S_,
+              :edit, FM_::CLI::Build_custom_lipstick_field )
+
+          tbl.expression_width = _lookup_expression_width
+
+          y = tbl.express_into_IO_data_tree out, totes
+
+          y && ACHIEVED_  # important - don't result in the output context
+        end
+      end
+
+      class Actions::Dirs < Action_Adapter__
+
+        _mutate_properties do | sess |
+          sess.add_additional_properties(
+            :property_object, Common_properties__.fetch( :verbose ),
+          )
+        end
+
+        def _express_totals_when_nonzero_children totes
+
+          # (no need to `finish` the node here, it is done by back)
+
+          __express_totals_as_table @resources.sout, totes
+        end
+
+        def __express_totals_as_table out, totes
+
+          integer_format = '%d'
+          integer = -> x do
+            integer_format % x
           end
 
-        end.call
+          percent = Common_percent_formatting__
+
+          tbl = _begin_table
+
+          tbl.edit_table(
+
+            :field, :named, :slug,
+              :label, 'Directory',
+              :summary, -> totes_ do
+                'Total: '
+              end,
+
+            :field, :named, :num_files,
+              :map, integer,
+              :summary, -> totes_ do
+                integer_format % totes_.sum_of( :num_files )
+              end,
+
+            :field, :named, :num_lines,
+              :map, integer,
+              :summary, -> totes_ do
+                integer_format % totes_.sum_of( :num_lines )
+              end,
+
+            :field, :named, :total_share,
+              :map, percent,
+
+            :field, :named, :normal_share,
+              :map, percent,
+
+            :field, :named, :_lipstick_,
+              :label, EMPTY_S_,
+              :edit, FM_::CLI::Build_custom_lipstick_field
+          )
+
+          tbl.expression_width = _lookup_expression_width
+
+          y = tbl.express_into_IO_data_tree out, totes
+
+          y && ACHIEVED_  # important - don't result in the output context
+        end
       end
+
+      # ~ support for table rendering
 
       class Action_Adapter__
 
-        def rndr_tbl out, count, design
+        def _begin_table
+          Modz_CLI_::Expression_Frames::Table.new
+        end
 
-          if count.zero_children?
-            out.puts "(table has no rows)"  # last ditch fallback.
-            false
-          else
-
-            FM_::Whatever::Table::Render[ out, count.each_child, [ design,
-              -> d do  # grease wheels
-                d.the_rest count.first_child.class.members  # did we forget any?
-                d.hdr do |sym|  # hack a header from the field id as a default
-                  sym.to_s.split( '_' ).map(& :capitalize ) * ' '
-                end
-              end
-            ] ]
-          end
+        def _lookup_expression_width
+          FM_::CLI::Lipsticker::EXPRESSION_WIDTH_PROC[]
         end
       end
-      end  # (tmp)
+
+      # ~ a model frontier for verbosities
+
+      class Action_Adapter__
+
+        # the canonical levels: ( fatal error warning notice info trace )
+
+        def _verbosity_is_at_least_NOTICE
+
+          0 < _the_number_of_Vs
+        end
+
+        alias_method :_verbosity_is_at_entry_level,
+          :_verbosity_is_at_least_NOTICE
+
+        def _verbosity_is_at_least_INFO
+
+          1 < _the_number_of_Vs
+        end
+
+        alias_method :_verbosity_is_at_level_for_commands,
+          :_verbosity_is_at_least_INFO
+
+        def _verbosity_is_at_least_TRACE
+
+          2 < _the_number_of_Vs
+        end
+
+        alias_method :_verbosity_is_at_level_for_lists,
+          :_verbosity_is_at_least_TRACE
+
+        def _the_number_of_Vs
+          seen = @seen[ :verbose ]
+          if seen
+            d = seen.seen_count
+            if 3 < d
+              @__did_warn_about_too_many_Vs ||= __warn_about_too_many_Vs( d, 3 )
+            end
+            d
+          else
+            0
+          end
+        end
+
+        def __warn_about_too_many_Vs d, d_
+
+          lib = FM_.lib_.basic::Number::EN
+
+          @resources.serr.puts "(verbosity level #{ lib.number d_ } #{
+            }is highest (had #{ lib.number d }).)"  # meh
+
+          ACHIEVED_
+        end
+      end
+
+      Modz_CLI_ = self
     end
   end
 end

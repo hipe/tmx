@@ -34,7 +34,7 @@ module Skylab::System
 
       # ~ data acceptance exposures
 
-      def to_minimal_yielder  # :+#open-filehandle
+      def to_minimal_yielder  # :+#open-filehandle  :+[#ba-046]
         ::File.open @path, ::File::CREAT | ::File::WRONLY # | ::File::EXCL
       end
     end

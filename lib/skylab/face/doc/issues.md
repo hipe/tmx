@@ -29,7 +29,7 @@
                allows for the (e.g branch) client to vivify lazily on-demand
 [#037]       #eventpoint, #parent-node: [#040] : fundamentally rearchitect Face
                to deal with the DSL public instance method namespace problem.
-[#036]       #doc-node the CLI table narrative
+[#036]       #doc-node the CLI table narrative ( #moved-to:[#br-096] )
        #todo replace universe with `tableize` with [ face cli table ]
 [#035]       #tracking-tag #experiment with a `unary` discrete categorization
                for our main 3 classes (for which we make two exponents) ..
@@ -84,7 +84,7 @@
 [#005]       #parent-node:[#011] introducing the entity library #initials:`el` ..
 [#004]       argument error hack
 [#003] #open Face::Open2 is superseded by [hl] IO select
-[#002]       the CLI tables narrative ..
+[#002]       ( #moved-to: [#br-096]. #was: the CLI tables narrative .. )
              ( #was: #done path-tools to e.g. headless )
 [#001]       #postponed shorten wide lines #open #depends-on:sl-104
 [#sl-100.100.500] 2012-06-08 #open index all features

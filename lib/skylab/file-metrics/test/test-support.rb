@@ -19,8 +19,14 @@ module Skylab::FileMetrics::TestSupport
 
     def use sym
 
-      :expect_event == sym or self._NEAT
-      Callback_.test_support::Expect_event[ self ]
+      case sym
+      when :expect_event
+        Callback_.test_support::Expect_event[ self ]
+      when :classify_common_screen
+        CLI::Classify_Common_Screen[ self ]
+      else
+        raise ::KeyError, sym
+      end
       NIL_
     end
 

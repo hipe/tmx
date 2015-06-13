@@ -1,4 +1,74 @@
-# the CLI table narrative :[#036]
+# the table narrative :[#096]
+
+
+## about this document & the many tables
+
+we almost called this "the omni table narrative", but didn't because our
+longerm goal is to unify all table implementions:
+
+    [#fm-011]  2013-03-13  ad-hoc for application. rewritten once.
+
+    [#hl-126]  2012-03-16  the old functional experiment
+
+    [#fa-036]  2011-08-22  the "main" one
+
+    [#fa-048]  2011-08-22  a tiny deprecated one
+
+because we are not there yet, this document is divided by horizontal
+"lines" into sections corresponding to the respective implementations.
+
+we *certainly* want to make a [cu]-like feature comparison meta-table
+(that is, a table about tables :P ) and then reduce these down to one..
+
+
+----------------
+
+# the fourth table narrative [#fa-011]
+
+## justification
+
+at writing this was re-written from the ground up. we did not use
+[#fa-036] for this because of the product of these factors:
+
+  • we were in the middle of a full rewrite of the application itself.
+    to try and fold-in a unification of libraries on top of this would
+    be decidedly out of scope.
+
+  • this custom implementation has at least one feature that the others
+    don't (an optional summary row that knows that a "data object" is
+    a thing).
+
+however, "very soon" we hope to unify the implementations; an effort for
+which the work here will likely serve as a major contribution, being as
+it is informed by all that came before it.
+
+
+
+
+
+## :#note-fm-315
+
+although it may have "CLI" in the name, we don't want the subject node
+to have to concern itself too deeply with this modality. the subject
+produces "lines", and it would be nice if that were it.
+
+the above when taken on its own makes the existence of this method here
+seem a bit like a sore thumb.
+
+so we ended up writing [#ba-046] was written to justify the existence
+of this method.
+
+although it interrupts the "purity" of this subject node otherwise not
+having to know what a newline is, it is convenient to implement this
+necesary (per the above mentioned doc node) mapper here instead of
+clients needing to deal with it on their own.
+
+
+
+
+----------------
+
+# the CLI table narrative :[#fa-036]
 
 ## :#storypoint-5
 

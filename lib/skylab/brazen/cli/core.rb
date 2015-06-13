@@ -183,7 +183,9 @@ module Skylab::Brazen
       ## ~~ name & related
 
       def write_invocation_string_parts y
-        y.concat @resources.invocation_s_a ; nil
+
+        y.concat @resources.invocation_string_array
+        NIL_
       end
 
       def app_name
@@ -868,7 +870,7 @@ module Skylab::Brazen
 
         else
 
-          receive_event_on_channel x_p[], i_a
+          receive_conventional_emission i_a, & x_p
         end
       end
 
@@ -903,12 +905,20 @@ module Skylab::Brazen
 
       # ~ end
 
+      def receive_conventional_emission i_a, & ev_p  # :+#public-API
+
+        receive_event_on_channel ev_p[], i_a
+      end
+
       def receive_event_on_channel ev, i_a  # :+#public-API
+
         ev_ = ev.to_event
+
         has_OK_tag = if ev_.has_tag :ok
           ok_x = ev_.ok
           true
         end
+
         if has_OK_tag && ! ok_x.nil?
           if ok_x
             if ev_.has_tag :is_completion and ev_.is_completion
@@ -1806,23 +1816,28 @@ module Skylab::Brazen
     class Resources__
 
       def initialize a, mod
+
         @mod = mod
-        @sin, @sout, @serr, @s_a = a
-        if @s_a
-          @s_a.last.nil? and @s_a[ -1 ] = Callback_::Name.via_module( @mod ).as_slug
+        @sin, @sout, @serr, s_a = a
+
+        @_s_a = if s_a
+          if s_a.last.nil?
+            s_a[ -1 ] = Callback_::Name.via_module( @mod ).as_slug
+          end
+          s_a
         else
-          @s_a = [ ::File.basename( $PROGRAM_NAME ) ].freeze
+          [ ::File.basename( $PROGRAM_NAME ) ].freeze
         end
       end
 
       def members
-        [ :argv, :env, :invocation_s_a, :mod, :sin, :sout, :serr ]
+        [ :argv, :env, :invocation_string_array, :mod, :sin, :sout, :serr ]
       end
 
       attr_reader :argv, :env, :sin, :sout, :serr, :mod
 
-      def invocation_s_a
-        @s_a
+      def invocation_string_array
+        @_s_a
       end
 
       def complete env, argv

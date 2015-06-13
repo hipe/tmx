@@ -41,7 +41,7 @@ module Skylab::Callback
 
             _TEE_ID_ = Next_id__[]
             desc_p = -> do
-              "#<#{ name }:(tee #{ _TEE_ID_ })>"
+              "#<#{ name }:(generated tee class #{ _TEE_ID_ })>"
             end  # basic objects don't respond to `class`, basic objects don't care
 
             define_method :initialize do
@@ -70,7 +70,6 @@ module Skylab::Callback
       def nil?  # if you are proxying to actual nil, go somewhere else
         false
       end
-
 
     # as a compromise for readable code and easier debugging, we make it
     # hard for you to proxy out the following methods. alternatives include
@@ -115,13 +114,18 @@ module Skylab::Callback
         end
 
         def mux meth_i, a, p
-          d = -1 ; last = @a.length - 1
+
+          d = -1
+          last = @a.length - 1
+
           if d < last
             first_x = @h.fetch( @a.fetch d += 1 ).__send__ meth_i, * a, & p
           end
+
           while d < last
             @h.fetch( @a.fetch d += 1 ).__send__ meth_i, * a, & p
           end
+
           first_x
         end
       end

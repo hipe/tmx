@@ -1,4 +1,4 @@
-[#011]       tbl ..
+[#011]       our CLI table is documented IN [#br-096]
 [#010]       conjuncter ..
 [#009] #idea imagine a facility that let you see every occurence of a
              semantic construct (like initializing a class with a certain
@@ -10,7 +10,8 @@
                because although ugly, we *really* like the simplicity of
                always showing the raw filepaths in the application code.
 [#006]       #tracking-tag all the places where you do self-reflexive tests
-[#005]       #done is trailing options in argv borked?
+[#005]       our CLI notes
+             ( #was: #done is trailing options in argv borked? )
 [#004] #open ( sync vs. async IPC )
              (was: consider replacing every backticks with an open3 wrapper)
 [#003]       #tracking-tag where should the sort happen

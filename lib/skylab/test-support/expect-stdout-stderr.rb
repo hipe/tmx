@@ -91,6 +91,7 @@ module Skylab::TestSupport
     private
 
       def for_expect_stdout_stderr_prepare_invocation _  # :+#hook-in
+        NIL_
       end
 
       # ~ end
@@ -146,19 +147,6 @@ module Skylab::TestSupport
         Expectation__
       end
 
-      def _bake_sout_serr
-        @__sout_serr_actual_stream__ = Callback_::Polymorphic_Stream.via_array(
-          flush_baked_emission_array )
-
-        true
-      end
-
-      def flush_baked_emission_array  # :+#hook-near #universal
-
-        sg = remove_instance_variable :@IO_spy_group_for_expect_stdout_stderr
-        sg.release_lines
-      end
-
       # ~ for the end
 
       def expect_failed
@@ -183,9 +171,8 @@ module Skylab::TestSupport
 
       def expect_maybe_a_blank_line
 
-        @__sout_serr_is_baked__ ||= _bake_sout_serr
+        st = _actual_stream_from_expect_stdout_stderr
 
-        st = @__sout_serr_actual_stream__
         if st.unparsed_exists and NEWLINE_ == st.current_token.string
           st.advance_one
           nil
@@ -194,10 +181,10 @@ module Skylab::TestSupport
 
       def expect_no_more_lines
 
-        @__sout_serr_is_baked__ ||= _bake_sout_serr
+        st = _actual_stream_from_expect_stdout_stderr
 
-        if @__sout_serr_actual_stream__.unparsed_exists
-          _x = @__sout_serr_actual_stream__.current_token
+        if st.unparsed_exists
+          _x = st.current_token
           fail "expected no more lines, had #{ _x.to_a.inspect }"
         end
       end
@@ -226,6 +213,34 @@ module Skylab::TestSupport
           em = st.gets
         end
         io.string
+      end
+
+      def flush_to_expect_stdout_stderr_emission_summary_expecter
+
+        # (it would be nice to use Enumerable.chunk by we have a reduce too)
+
+        st = _actual_stream_from_expect_stdout_stderr
+        y = []
+
+        sym = nil
+        begin
+
+          if st.no_unparsed_exists
+            break
+          end
+
+          em = st.gets_one
+
+          if sym != em.stream_symbol
+            a = []
+            sym = em.stream_symbol
+            y.push Chunk___.new( sym, a )
+          end
+          a.push em.string
+          redo
+        end while nil
+
+        Emissions_Element___.new y
       end
 
       def flush_to_content_scanner
@@ -331,6 +346,26 @@ module Skylab::TestSupport
           fail "expected an emission, had none"
         end
       end
+
+      def _actual_stream_from_expect_stdout_stderr
+
+        @__sout_serr_is_baked__ ||= _bake_sout_serr
+
+        @__sout_serr_actual_stream__
+      end
+
+      def _bake_sout_serr
+        @__sout_serr_actual_stream__ = Callback_::Polymorphic_Stream.via_array(
+          flush_baked_emission_array )
+
+        true
+      end
+
+      def flush_baked_emission_array  # :+#hook-near #universal
+
+        sg = remove_instance_variable :@IO_spy_group_for_expect_stdout_stderr
+        sg.release_lines
+      end
     public
 
 
@@ -391,6 +426,61 @@ module Skylab::TestSupport
       end
 
       METHODIC_.cache_polymorphic_writer_methods self
+    end
+
+    # ~ for "summary"
+
+    class Emissions_Element___
+
+      def initialize a
+        @_a = a
+        @_st = Callback_::Stream.via_nonsparse_array a
+      end
+
+      def expect_chunk num_x=nil, stream_symbol
+
+        cx = @_st.gets
+        if cx
+          if stream_symbol == cx.stream_symbol
+            if num_x
+              d = cx._a.length
+              ok = if num_x.respond_to? :include?
+                num_x.include? d
+              else
+                num_x == d
+              end
+              if ! ok
+                fail "expected #{ num_x } `#{ stream_symbol }` lines, had  #{ d }"
+              end
+            end
+          else
+            fail "expected `#{ stream_symbol }`, had `#{ cx.stream_symbol }`.."
+          end
+        else
+          fail "expected `#{ stream_symbol }` chunk, had no more chunks"
+        end
+      end
+
+      def expect_no_more_chunks
+        cx = @_st.gets
+        if cx
+          fail "expected no more chunks, had #{ cx.describe }"
+        end
+      end
+    end
+
+    class Chunk___
+
+      attr_reader( :_a, :stream_symbol )
+
+      def initialize sym, a
+        @_a = a
+        @stream_symbol = sym
+      end
+
+      def describe
+        "#{ @_a.length } `#{ @stream_symbol }` emission(s)"
+      end
     end
   end
 end

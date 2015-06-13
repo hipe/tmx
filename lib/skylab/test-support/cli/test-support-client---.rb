@@ -23,7 +23,8 @@ module Skylab::TestSupport
           super
           @bound.sout = @resources.sout
           @bound.serr = @resources.serr
-          @bound.invocation_s_a = @resources.invocation_s_a
+          @bound.invocation_string_array =
+            @resources.invocation_string_array
           nil
         end
 

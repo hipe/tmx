@@ -1,5 +1,8 @@
 slicer              q [ done ]
 
+
+
+
 file-metrics        q [ TODO ]
 
   3) wc
@@ -10,10 +13,48 @@ file-metrics        q [ TODO ]
   • there is a lot about how it was written that we don't do anymore:
     * x..
 
-beauty-salon        q [ TODO ]
 
-git                 Q [ TODO ]
+
 
 sub-tree            q [ TODO ]
 
+  • already has a [br] interacting model
+  • it appears that its only depends on [fa] for table
+
+
+
+
+beauty-salon        q [ TODO ]
+
+  • directories are already in [br]-ish place
+  • CLI needs to be melted in the common way
+  • Actions:
+    * ping
+    * wrap: covered (CLI int.)
+    * deliterate: not covered. has a "model" node.
+    * S & R: covered (CLI int.)
+
+
+
+
+git                 Q [ TODO ]
+
+  • needs a full restructuring
+  • it would be good to detach it from r.s
+  • Actions:
+    * spread
+    * scoot
+    * gsu ping
+    * gsu status
+    * gsu save
+    * gsu show
+    * gsu list
+    * gsu pop
+
+
+
+
 tmx                 q [ TODO ]
+
+  • oh my god how great will it be
+_

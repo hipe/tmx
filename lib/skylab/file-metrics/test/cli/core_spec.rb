@@ -2,63 +2,36 @@ require_relative 'test-support'
 
 module Skylab::FileMetrics::TestSupport::CLI
 
-  describe "[fm] CLI", wip: true do
+  describe "[fm] CLI" do
 
     extend TS_
+    use :expect_CLI
 
-    exptng = 'line-count or dirs or ext'  # string *and* rx fragment
+    it "0.0 - nothing" do
 
-    as :expecting, /\AExpecting #{ exptng }\.\z/i, :styled
-    as :invite, /\ATry fm -h \[sub-cmd\] for help\.?\z/i, :styled
+      invoke
 
-    context "nothing" do
-      ptrn '0'
-      desc 'nothing'
-      argv
-      expt :expecting, :invite
-      it does do
-        invoke argv
-        expect expt
-      end
+      expect_generic_expecting_line
+      expect_usaged_and_invited
     end
 
-    as :usage, /\Ausage: fm \{line-count\|dirs\|ext\} \[opts\] \[args\]\z/i,
-      :styled
-    as :adtl_usage, /\A {2,}fm \{-h \[cmd\]\}\z/, :nonstyled
-    as :option_hdr, /\Aoption:\z/i, :styled
-    as :help_option,
-      /\A {2,}-h, --help \[cmd\] {2,}this screen.+sub/i, :nonstyled
-    as :command_hdr, /\Acommands:\z/i, :styled
-    as :branch_invite,
-      /\ATry fm -h <sub-cmd> for help on a particular command\.?\z/i, :styled
+    it "1.4 - help at level 0" do
 
-    context "help lvl 0" do
-      ptrn '1.3'
-      desc 'help lvl 0'
-      argv '-h'
-      expt :usage, :adtl_usage, :option_hdr, :help_option, :command_hdr
-      it does do
-        invoke argv
-        expect_partial expt
-        expect_styled_line( /\A {2,}line-count {2,}[^ ]/ )
-        expect_styled_line( /\A {2,}dirs {2,}[^ ]/ )
-        expect_styled_line( /\A {2,}ext {2,}[^ ]/ )
-        expect [ :branch_invite ]
-      end
+      invoke '-h'
+
+      exp = flush_to_expect_stdout_stderr_emission_summary_expecter
+
+      exp.expect_chunk 14, :e
+      exp.expect_no_more_chunks
     end
 
-    context "help lvl 1" do
-      ptrn '2.3x4'
-      desc 'help lvl 1'
-      argv 'lc', '-h'
-      expt_desc 'the whole screen'
-      it does do
-        invoke argv
-        x = whole_err_string
-        str = FM_.lib_.brazen::CLI::Styling.unstyle_styled x
-        str.should match( /^usage: fm line-count (?:\[[^\[]+){7,}/ )
-        str.should match( /^description:.+usage:.+options:.+/m )
-      end
+    it "2.4 - help at level 1" do
+
+      invoke 'line-count', '-h'
+
+      exp = flush_to_expect_stdout_stderr_emission_summary_expecter
+      exp.expect_chunk 24, :e
+      exp.expect_no_more_chunks
     end
   end
 end

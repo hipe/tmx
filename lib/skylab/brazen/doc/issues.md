@@ -1,3 +1,4 @@
+[#096] #open the (CLI) table narrative ..
 [#095]       features that [fa] has that you don't #universal
 [#094]       expression agents adjunct notes ..
 [#093]       what is the deal with expression agents ..

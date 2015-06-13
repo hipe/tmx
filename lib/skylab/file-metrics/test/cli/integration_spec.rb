@@ -2,121 +2,165 @@ require_relative 'test-support'
 
 module Skylab::FileMetrics::TestSupport::CLI
 
-  # Quickie - but NOTE it gets whacky b.c of ncurses!
-
-  describe "[fm] CLI - integration", wip: true do
+  describe "[fm] CLI - integration" do
 
     extend TS_
-
-    floor = 4 #  OMG this test fails if you run them in a
-      # terminal screen that is too narrow  # #todo
-
-    MAX_NUM_PLUSES__ = 204
+    use :expect_CLI
+    use :classify_common_screen
 
     context "lc" do
 
-      desc 'give me `lc` here and now'
-      argv 'lc', '[fm dir]'
-      ptrn '2.3x3'
-      expt_desc "header / first line / summary line"
+      it "info" do  # :+#bad-test
 
-      memoize_output_lines do
-
-        FM_.lib_.file_utils.cd FM_.dir_pathname.to_s do
-          invoke [ 'lc', '.' ]  # le dorky [#006], [#007]
+        st = build_info_line_stream_
+        st.gets.should match %r(\Agenerated `find` command\b)
+        d = '/'.getbyte 0
+        path = -> do
+          s = st.gets
+          d == s.getbyte( 0 ) or fail "expected absolute path: #{ s.inspect }"
         end
+        path[]
+        path[]
+        path[]
+        st.gets.should eql "(including blank lines and comment lines)\n"
+        st.gets.should match %r(\Awc -l \/)
+        st.gets.should be_nil
       end
 
-      it "header" do
-        headers_hack( output_lines[ 0 ] ).should eql(
-          [ :file, :lines, :total_share, :normal_share ]
-        )
+      it "headers" do
+
+        headers_.should eql(
+         [ :file, :lines, :total_share, :normal_share, :_blank_header_ ] )
       end
 
-      it "body" do  # see OMG above
-        arr = cels_hack output_lines[ 1 ]
-        arr.length.should eql( 5 )
-        fl, ln, pc1, pc2, lip = arr
-        fl.should eql './library-/table.rb'  # meh
-        expect_integer ln, 400 .. 450
-        expect_percent pc1
-        expect_percent pc2, 100.0
-        expect_pluses lip, floor..MAX_NUM_PLUSES__
+      it "body" do
+
+        sm = string_matrix_
+
+        4 == sm.length or fail
+
+        _expect_absolute_path sm.fetch( 0 ).fetch( 0 )
+        _expect_integer sm.fetch( 0 ).fetch( 1 )
+        _expect_percent sm.fetch( 1 ).fetch( 2 )
+        _expect_percent sm.fetch( 2 ).fetch( 3 )
+        _expect_pluses sm.fetch( 2 ).fetch( 4 ), 7..7
       end
 
       it "summary" do
-        output_lines[ -1 ].should match( /\A +total: +\d{2} +\d{4} +\z/i )
+
+        _sm = string_matrix_
+
+        _sm.fetch( 3 ).should eql(
+          [ "Total: 3", "12", EMPTY_S_, EMPTY_S_, EMPTY_S_ ] )
+      end
+
+      memoize_output_lines_ do
+
+        # (was [#006], [#007])
+
+        invoke 'line-count', Fixture_file_directory_[], '-vvv'
       end
     end
 
-    context "ext - lines:" do
+    context "ext" do
 
-      desc 'i want `ext` here now'
-      argv 'ext', '[fm dir]'
-      ptrn '2.3x3'
-      expt_desc 'header looks good'
+      it "info" do
 
-      memoize_output_lines do
+        st = build_info_line_stream_
+        st.gets.should eql "(verbosity level three is highest (had four).)\n"
+        st.gets.should match %r(\Agenerated `find` command\b)
+        st.gets.should be_nil
+      end
 
-        FM_.lib_.file_utils.cd FM_.dir_pathname.to_s do
-          invoke [ 'ext', '.' ]  # more dorky [#006], [#007]
+      it "headers" do
+
+        headers_.should eql(
+          [ :extension, :num_files, :total_share, :normal_share, :_blank_header_ ] )
+      end
+
+      it "body" do
+
+        sm = string_matrix_
+
+        3 == sm.length or fail
+
+        row1 = sm.fetch 0
+        row2 = sm.fetch 1
+
+        row1.fetch( 0 ).should eql '*.code'
+        row2.fetch( 0 ).should eql '*.file'
+
+        _expect_integer row1.fetch( 1 ), 2..2
+        _expect_integer row2.fetch( 1 ), 1..1
+
+        _expect_percent row1.fetch( 2 )
+        _expect_percent row2.fetch( 3 )
+
+        _expect_pluses row2.fetch( 4 )
+      end
+
+      it "summary" do
+
+        _sm = string_matrix_
+
+        _sm.last.should eql [ "Total: 2", "3", EMPTY_S_, EMPTY_S_, EMPTY_S_ ]
+      end
+
+      memoize_output_lines_ do
+
+        invoke 'ext', Fixture_file_directory_[], '-vvvv'
+      end
+    end
+
+    context "dirs" do
+
+      memoize_output_lines_ do
+
+        invoke 'dirs', Fixture_tree_directory_[]  # intentionally without verbose
+
+      end
+
+      it "info" do
+
+        st = build_info_line_stream_
+        s = st.gets
+        if s
+          fail "expected no info lines (because no verbose flag), had: #{ s.inspect }"
         end
       end
 
       it "header" do
-        headers_hack( output_lines[0] ).should eql(
-          [ :extension, :num_files, :total_share, :normal_share ] )
+
+        headers_.should eql(
+          [ :directory, :num_files, :num_lines, :total_share, :normal_share, :_blank_header_ ] )
       end
 
-      it "body" do
-        ( 4..6 ).should be_include( output_lines.length )
-        arr = cels_hack output_lines[ 1 ]
-        arr.length.should eql( 5 )
-        lbl, num, pc1, pc2, lip = arr
-        lbl.should eql( '*.rb' )
-        expect_integer num, 14..15  # greetings from the past
-        expect_percent pc1
-        expect_percent pc2, 100.0
-        expect_pluses lip, floor..MAX_NUM_PLUSES__
-      end
+      it "body & summary" do
 
-      it "final" do
-        output_lines[ -1 ].should eql(  # will loosen up later #todo
-          "(* only occuring once were: .one and .two)" )
-        # (note there are no summary lines for the ext report)
-      end
-    end
+        sm = string_matrix_
 
-    context "dirs - lines:" do
+        len = 3
 
-      desc 'show me the `dirs`'
-      argv 'dirs', '[fm dir]'
-      ptrn '2.3x3'
+        len == sm.length or fail
 
-      memoize_output_lines do
+        column = -> d do
 
-        FM_.lib_.file_utils.cd FM_.dir_pathname.to_s do
-          invoke [ 'dirs', '.' ]  # still dorky [#006], [#007]
+          len.times.map do | d_ |
+            sm.fetch( d_ ).fetch( d ).strip
+          end
         end
-      end
 
-      it "header" do
-        headers_hack( output_lines[0] ).should eql(
-          [ :directory, :num_files, :num_lines, :total_share, :normal_share ] )
-      end
+        column[ 0 ].should eql %w(
+          fixture-files-one fixture-files-two Total: )
 
-      it "body" do
-        dr, nf, nl, ts, ms, lp = output_lines[1].strip.split( /(?!< ) +(?! )/ )
-        dr.should eql( 'api' )
-        expect_integer nf, 3..10
-        expect_integer nl, 550..575  # hello from the past
-        expect_percent ts
-        expect_percent ms, 100.0
-        expect_pluses lp, floor..MAX_NUM_PLUSES__
-      end
+        column[ 1 ].should eql %w( 3 2 5 )
 
-      it "sumary" do
-        output_lines[ -1 ].should match( /\A +total: +\d{2,3} +\d{4} +\z/i )
+        column[ 2 ].should eql %w( 12 3 15 )
+
+        _expect_percent sm[ 0 ][ 3 ], 80.0
+        _expect_percent sm[ 1 ][ 4 ], 25.0
+
+        _expect_pluses sm[ 1 ][ 5 ]
       end
     end
   end

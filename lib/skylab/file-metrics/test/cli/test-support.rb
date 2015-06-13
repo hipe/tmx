@@ -3,103 +3,98 @@ require 'skylab/face/test/cli/test-support'
 
 module Skylab::FileMetrics::TestSupport::CLI
 
-  ::Skylab::FileMetrics::TestSupport[ TS_ = self ]
+  Parent__ = ::Skylab::FileMetrics::TestSupport
+
+  Parent__[ TS_ = self ]
 
   TestSupport_ = ::Skylab::TestSupport
 
   extend TestSupport_::Quickie
 
-  module ModuleMethods
+  # ~ table-specific layer atop "execution snapshot"
 
-    include Constants
+  module InstanceMethods
 
-    def client_class
+    def subject_CLI
       FM_::CLI
     end
 
-    def as _, _, _
-    end
-    def argv *_
-    end
-    def desc _
-    end
-    def expt *a
-    end
-    def expt_desc _
-    end
-    def memoize_output_lines
-    end
-    def ptrn _
-    end
+    define_method :get_invocation_strings_for_expect_stdout_stderr, -> do
 
-    def does
-      '(skipping)'
+      s_a = [ '[flz]' ]
+      -> do
+        s_a
+      end
+    end.call
+  end
+
+  # ~ experimental "execution snapshot"
+
+  module ModuleMethods
+
+    def memoize_output_lines_ & p
+
+      memoized_structure = nil
+
+      define_method :execution_snapshot_ do
+
+        memoized_structure ||= __flush_execution p
+      end
     end
   end
 
   module InstanceMethods
 
-    include Constants
+    def __flush_execution p
 
-    def program_name
-      'fm'
+      instance_exec( & p )
+
+      _em_a = flush_baked_emission_array
+      Execution_Snapshot___.new _em_a, @exitstatus
     end
-
-    def headers_hack line
-      cels_hack( line ).map { |x| x.downcase.gsub( ' ', '_' ).intern }
-    end
-
-    def cels_hack line
-      line.strip.split( / {2,}/ )
-    end
-
-    -> do  # `expect_integer`
-      rx = /\A\d+\z/
-      define_method :expect_integer do |x, range=nil|
-        if rx =~ x then $~[0].to_i else
-          fail "expecting this to look like integer - #{ x.inspect }"
-        end
-        if range
-          if ! range.include? x.to_i
-            fail "expecting integer #{ x.to_i } to be btwn #{ range }"
-          end
-        end
-        nil
-      end
-    end.call
-
-    -> do  # `expect_percent`
-      rx = /\A\d{1,3}\.\d\d%\z/
-      define_method :expect_percent do |x, pct_p=nil|
-        if rx !~ x then
-          fail "expecting this to look like percent - #{ x.inspect }"
-        elsif pct_p
-          f = $~[0].to_f
-          f.should eql( pct_p )
-        end
-        nil
-      end
-    end.call
-
-    -> do  # `expect_pluses`
-      rx = /\A\++\z/
-      define_method :expect_pluses do |x, range|
-        if rx !~ x then
-          fail "expecting this to look like pluses - #{ x.inspect }"
-        elsif ! range.include? x.length
-          fail "expecting number of pluses #{ x.length } to be btwn #{ range }"
-        end
-        nil
-      end
-    end.call
   end
+
+  class Execution_Snapshot___
+
+    def initialize x, x_
+      @exitstatus = x_
+      @output_lines = x
+      @memo = {}
+    end
+
+    attr_reader :exitstatus, :memo, :output_lines
+  end
+
+  # ~ standard
+
+  module ModuleMethods
+
+    def use sym
+
+      case sym
+      when :expect_CLI
+        FM_.lib_.brazen.test_support.CLI::Expect_CLI[ self ]
+
+      when :classify_common_screen
+        TS_::Classify_Common_Screen[ self ]
+
+      else
+        raise ::KeyError, sym
+      end
+      NIL_
+    end
+  end
+
+  o = Parent__
 
   FM_ = ::Skylab::FileMetrics
 
-  module TestLib_
-
-    CLI_lib = -> do
-      FM_::Lib_::HL__[]::CLI
-    end
-  end
+  Callback_ = FM_::Callback_
+  EMPTY_S_ = o::EMPTY_S_
+  Fixture_file_directory_ = o::Fixture_file_directory_
+  Fixture_tree_directory_ = o::Fixture_tree_directory_
+  NEWLINE_ = o::NEWLINE_
+  NIL_ = nil
+  SPACE_ = FM_::SPACE_
+  UNDERSCORE_ = '_'
 end

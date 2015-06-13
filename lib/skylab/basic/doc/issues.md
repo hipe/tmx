@@ -1,3 +1,4 @@
+[#046]       the minimal yielder ..
 [#045]       the normalization & validation method naming idiomspace ..
 [#044]       [ state machine ]
 [#043]       [ tree from indented line stream ] #parent-node: [#001]

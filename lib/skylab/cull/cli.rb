@@ -43,7 +43,8 @@ module Skylab::Cull
     end
 
     def name
-      @__nf__ ||= Callback_::Name.via_slug( @resources.invocation_s_a.last )
+      @__nf__ ||= Callback_::Name.via_slug(
+        @resources.invocation_string_array.last )
     end
 
     def get_summary_a_from_sheet _

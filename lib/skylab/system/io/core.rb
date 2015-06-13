@@ -39,7 +39,7 @@ module Skylab::System
 
       # ~ data acceptance exposures
 
-      def to_minimal_yielder
+      def to_minimal_yielder  # :+[#ba-046]
         @io
       end
     end

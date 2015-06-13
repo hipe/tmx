@@ -40,7 +40,7 @@ module Skylab::Basic
 
       # ~ data acceptance exposures
 
-      def to_minimal_yielder
+      def to_minimal_yielder  # :+[#046]
         @s_a.clear
         @s_a
       end

@@ -6,9 +6,9 @@ module Skylab::FileMetrics
 
       Expression_Frames = ::Module.new
 
-      class Expression_Frames::Table
+      class Expression_Frames::Table  # see [#011] (in [#br-096])
 
-        # ~ definition
+        # ~ defining a table
 
         def initialize
 
@@ -312,6 +312,16 @@ module Skylab::FileMetrics
           end
         end
 
+        def express_into_IO_data_tree io, tr  # #note-fm-315
+
+          _y = ::Enumerator::Yielder.new do | s |
+            io << "#{ s }#{ NEWLINE_ }"  # not `puts`. we are strict abt it
+          end
+
+          x = express_into_line_context_data_tree _y, tr
+          x && io
+        end
+
         def express_into_line_context_data_tree y, tr
           o = _begin
           o.downstream_lines = y
@@ -361,22 +371,39 @@ module Skylab::FileMetrics
             __init_elements
 
             pcs = ::Array.new( ( @_w << 1 ) + 1 )
-            re = @_row_element
+
+            __place_the_glyphs_only_once pcs
+
+            __associate_fields_with_cels_and_render_glyphs pcs
+
             y = @downstream_lines
 
-            # render the glyphs only one time
+            @_flush_row = -> do
 
-            re.glyphs_element.accept( Glyph_Visitor__.new do | g |
+              y << ( pcs * EMPTY_S_ )
+            end
+
+            __express_any_header_row
+
+            __express_body_and_summary_rows
+
+            y
+          end
+
+          def __place_the_glyphs_only_once pcs
+
+            @_row_element.glyphs_element.accept( Glyph_Visitor__.new do | g |
 
               pcs[ g.glyph_index << 1 ] = g.s
 
             end )
+          end
+
+          def __associate_fields_with_cels_and_render_glyphs pcs
 
             # in one pass, associate each field with its cel and ..
 
-            cels_element = re.cels_element
-
-            cels_element.accept_by do | ce |
+            @_row_element.cels_element.accept_by do | ce |
 
               pcs[ ( ce.cel_index << 1 ) + 1 ] = ce.mutable_string
 
@@ -391,39 +418,52 @@ module Skylab::FileMetrics
 
               NIL_
             end
+          end
 
-            row = -> do
-              y << ( pcs * EMPTY_S_ )
-            end
+          def __express_any_header_row
 
             if @do_show_header_row
-
-              cels_element.accept_by do | ce |
+              @_row_element.cels_element.accept_by do | ce |
                 _s = ce.field.some_header_content_string
                 ce.mutable_string.replace _s
-                ce.celify_header_proc[]
+                ce.celify_header[]
               end
-              row[]
+              @_flush_row[]
             end
+          end
+
+          def __express_body_and_summary_rows
+
+            cels_element = @_row_element.cels_element
 
             @_content_matrix.rows_element.accept_by do | content_row_element |
 
               s_a = content_row_element.content_string_array
               dao = content_row_element.data_object
 
-              cels_element.accept_by do | ce |
+              if :_no_data_object_for_summary_row_ == dao
 
-                _s = s_a.fetch ce.cel_index
+                cels_element.accept_by do | ce |
 
-                ce.mutable_string.replace _s
+                  _s = s_a.fetch ce.cel_index
 
-                ce.celify_proc[ dao ]
+                  ce.mutable_string.replace _s
 
+                  ce.celify_header[]
+                end
+              else
+
+                cels_element.accept_by do | ce |
+
+                  _s = s_a.fetch ce.cel_index
+
+                  ce.mutable_string.replace _s
+
+                  ce.celify[ dao ]
+                end
               end
-              row[]
+              @_flush_row[]
             end
-
-            y
           end
 
           def __init_elements
@@ -501,7 +541,6 @@ module Skylab::FileMetrics
             NIL_
           end
 
-
           def __see_header_row
 
             if @do_show_header_row
@@ -530,7 +569,9 @@ module Skylab::FileMetrics
                   s = if fld.no_data
                     EMPTY_S_
                   else
-                    fld._map_value_to_content_string o.send m_a.fetch d
+                    _s_ = o.send m_a.fetch d
+                    _ = fld._map_value_to_content_string _s_
+                    _ or self._SANITY
                   end
                   row_a[ d ] = s
                   see[ s, d ]
@@ -543,8 +584,11 @@ module Skylab::FileMetrics
           end
 
           def __do_summary_row
+
             if @_do_summary_row
+
               _row :_no_data_object_for_summary_row_ do | row_a |
+
                 @_accept.call do | d, fld |
                   s = if fld.does_summary
                     fld.summary_proc[ @summaries_argument ]
@@ -558,6 +602,7 @@ module Skylab::FileMetrics
               end
             end
           end
+
           def __init_see_content_proc
 
             maxes = @_w.times.map { 0 }
@@ -698,8 +743,8 @@ module Skylab::FileMetrics
 
           attr_reader(
             :cel_index,
-            :celify_header_proc,
-            :celify_proc,
+            :celify,
+            :celify_header,
             :field,
             :mutable_string,
           )
@@ -714,11 +759,11 @@ module Skylab::FileMetrics
           end
 
           def __receive_celify_proc p
-            @celify_proc = p
+            @celify = p
           end
 
           def __receive_celify_header_proc p
-            @celify_header_proc = p
+            @celify_header = p
           end
         end
 
@@ -751,6 +796,7 @@ module Skylab::FileMetrics
       end
 
       KEEP_PARSING_ = true
+      NEWLINE_ = "\n"
     end
   end
 end

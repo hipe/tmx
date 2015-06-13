@@ -58,7 +58,7 @@ module Skylab::System
       module THE_DRY_BYTE_DOWNSTREAM_IDENTIFIER___
 
         class << self
-          def to_minimal_yielder
+          def to_minimal_yielder  # :+[#ba-046]
             LT_LT___
           end
         end  # >>

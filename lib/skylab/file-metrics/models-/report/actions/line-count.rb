@@ -123,7 +123,7 @@ module Skylab::FileMetrics
 
       def __recurse_via_command y, cmd
 
-        @on_event_selectively.call :info, :command do  # ancitipating an active front
+        @on_event_selectively.call :info, :line_count_command do  # ancitipating an active front
           cmd.to_event
         end
 

@@ -117,7 +117,7 @@ module Skylab::TestSupport
           Callback_::Bound_Call.via_receiver_and_method_name self, :execute
         end
 
-        attr_accessor :invocation_s_a, :serr, :sout
+        attr_accessor :invocation_string_array, :serr, :sout
 
         attr_writer :argv  # for standalone mode only
 
@@ -251,7 +251,7 @@ module Skylab::TestSupport
         end
 
         def _program_name
-          @__pn__ ||= "#{ @invocation_s_a * SPACE_ } cover".freeze
+          @__pn__ ||= "#{ @invocation_string_array * SPACE_ } cover".freeze
         end
       end
 
@@ -267,7 +267,7 @@ end
 if is_standalone
 
   o = Skylab::TestSupport::Models_::Simplecov::Actions::Cover.new nil
-  o.invocation_s_a = [ $PROGRAM_NAME ]
+  o.invocation_string_array = [ $PROGRAM_NAME ]
   o.sout = $stdout
   o.serr = $stderr
   o.argv = ::ARGV
