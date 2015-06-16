@@ -18,7 +18,7 @@ module Skylab::Callback
     end
 
     Bundle_multiset = -> x do
-      MH__[]::Bundle::Multiset[ x ]
+      Plugin[]::Bundle::Multiset[ x ]
     end
 
     Brazen = sidesys[ :Brazen ]

@@ -44,7 +44,7 @@ module Skylab::Git
     Brazen = sidesys[ :Brazen ]
 
     Bundle = -> do
-      MH__[]::Bundle
+      Plugin[]::Bundle
     end
 
     CLI_lib = -> do
@@ -79,9 +79,7 @@ module Skylab::Git
       System[].filesystem.path_tools
     end
 
-    Plugin = -> do
-      HL__[]::Plugin
-    end
+    Plugin = sidesys[ :Plugin ]
 
     Scanner = -> x do
       Callback_::Scn.try_convert x

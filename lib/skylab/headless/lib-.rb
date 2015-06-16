@@ -37,7 +37,7 @@ module Skylab::Headless
     end
 
     Bundle = -> do
-      MH__[]::Bundle
+      Plugin___[]::Bundle
     end
 
     DSL_DSL = -> mod, p do
@@ -71,6 +71,8 @@ module Skylab::Headless
     end
 
     Parse_lib = sidesys[ :Parse ]
+
+    Plugin___ = sidesys[ :Plugin ]
 
     Reasonably_short = -> do
       Strange_lib[]::A_REASONABLY_SHORT_LENGTH_FOR_A_STRING

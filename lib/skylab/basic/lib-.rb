@@ -9,11 +9,11 @@ module Skylab::Basic
     Brazen = sidesys[ :Brazen ]
 
     Bundle_Directory = -> mod do
-      MH__[]::Bundle::Directory[ mod ]
+      Plugin[]::Bundle::Directory[ mod ]
     end
 
     Bundle_Multiset = -> mod do
-      MH__[]::Bundle::Multiset[ mod ]
+      Plugin[]::Bundle::Multiset[ mod ]
     end
 
     CLI_lib = -> do

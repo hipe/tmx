@@ -121,8 +121,9 @@ just a plain old module. no further magic is required of it.
 the `Bundles__` module on the other hand will typically want to have an
 owner-node-private API with which the owner node will apply an iambic array
 to a client module.  currently this can be achieved by enhancing the
-`Bundles__` module with a node called `Multiset` (its location at the time
-of this writing is [hl]::Bundle::Multiset). this enhancement will assume
+`Bundles__` module with [#pl-002] `Multiset`.
+
+this enhancement will assume
 that its client is a module, and it will define on that module's singleton
 class methods that will apply iambic arrays to client modules.
 
