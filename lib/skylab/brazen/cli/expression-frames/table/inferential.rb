@@ -1,4 +1,16 @@
-module Skylab::Headless::CLI::Table  # :[#005].
+module Skylab::Brazen
+
+  module CLI::Expression_Frames::Table::Inferential  # [#096.C]
+
+    # emigrated from [hl] - this file has some ANCIENT style in it...
+
+    class << self
+      def render row_enum, param_h=nil, & x_p
+        Render___[ row_enum, param_h, & x_p ]
+      end
+    end # >>
+
+    # <-
 
   # (emigrated from porcelain, one of its last remaining useful nerks)
   # a rewrite of a table renderer that, as an excercise:
@@ -8,17 +20,11 @@ module Skylab::Headless::CLI::Table  # :[#005].
   #
   #   * left/right alignment config options
 
-  Headless_ = ::Skylab::Headless
+  class Table_Session__
 
-  Autoloader_ = Headless_::Autoloader_
-  Callback_ = Headless_::Callback_
-  Table = self  # partly b.c Callback_ is not part of headless proper
-  TERM_SEPARATOR_STRING_ = Headless_::TERM_SEPARATOR_STRING_
-
-  class Table::Shell
     # here have a goofy experiment - the public methods here (direct and
     # derived) are isomorphic with the parameters you can pass as settings
-    # to your call to Table.render (or you can manipualte it directly in
+    # to your call to render (or you can manipualte it directly in
     # the block).
 
     Callback_[ self, :employ_DSL_for_digraph_emitter ]
@@ -37,7 +43,7 @@ module Skylab::Headless::CLI::Table  # :[#005].
 
     def field! symbol
       @field_box.touch symbol do
-        Table::Field::Shell.new
+        Field_Session___.new
       end
     end
 
@@ -46,23 +52,28 @@ module Skylab::Headless::CLI::Table  # :[#005].
     end
   end
 
-  module Table
+  class Field_Session___
+    attr_accessor :style  # a function
+  end
+
+
+  Render___ = -> do
 
     shell_and_result = -> param_h, blk do
-      shell = Shell.new ; res = nil
+      shell = Table_Session__.new
       param_h.each { |k, v| shell.send "#{ k }=", v } if param_h
       if blk then blk[ shell ] else
-        res = Headless_::Library_::StringIO.new
-        shell.on_text { |txt| res.puts txt }
+        x = Brazen_.lib_.string_IO.new
+        shell.on_text { |txt| x.puts txt }
       end
       shell.instance_exec do
-        @head ||=nil ; @tail ||= nil ; @separator ||= TERM_SEPARATOR_STRING_
+        @head ||=nil ; @tail ||= nil ; @separator ||=  SPACE_  # TERM_SEPARATOR_STRING_
       end
-      [ shell, res ]
+      [ shell, x ]
     end
 
     census_and_rows = -> row_enum, shell do
-      census = Census.new
+      census = Census___.new
       field_box = shell.instance_variable_get :@field_box
       rows_cache = row_enum.reduce [] do |rows, cel_enum|
         rows << ( cel_enum.each_with_index.reduce [] do |cels, (cel_x, idx)|
@@ -86,16 +97,17 @@ module Skylab::Headless::CLI::Table  # :[#005].
       [ census, rows_cache ]
     end
 
-    render = -> row_enum, param_h=nil, &blk do
-      shell, sio = shell_and_result[ param_h, blk ]
+    -> row_enum, param_h=nil, & edit_p do
+
+      shell, sio = shell_and_result[ param_h, edit_p ]
+
       census, rows = census_and_rows[ row_enum, shell ]
-      Table::Engine.new( shell, census, rows, sio ).render
+
+      Implementation___.new( shell, census, rows, sio ).render
     end
+  end.call
 
-    define_singleton_method :render, &render
-  end
-
-  class Table::Engine < Table::Shell
+  class Implementation___ < Table_Session__
 
     def render
       call_digraph_listeners :row_count, @row_a.length
@@ -116,8 +128,6 @@ module Skylab::Headless::CLI::Table  # :[#005].
       end
     end
 
-  private
-
     def initialize shell, census, rows, sio
       shell.instance_variables.each do |ivar|
         instance_variable_set ivar, shell.instance_variable_get( ivar )
@@ -128,14 +138,14 @@ module Skylab::Headless::CLI::Table  # :[#005].
       census.fields.each do |stats|
         if stats.has_information
           @idx_a << stats.index
-          @field_h[ stats.index ] = Table::Field.new stats.index, stats
+          @field_h[ stats.index ] = Field___.new stats.index, stats
         end
       end
-      nil
+      NIL_
     end
   end
 
-  class Table::Census
+  class Census___
 
     def fields
       ::Enumerator.new do |y|
@@ -158,19 +168,17 @@ module Skylab::Headless::CLI::Table  # :[#005].
 
     def see idx, text
       @hash.fetch idx do
-        @hash[ idx ] = Table::Cel::Stats.new idx
+        @hash[ idx ] = Type_Stats___.new idx
       end.see text
       nil
     end
-
-  private
 
     def initialize
       @hash = { }
     end
   end
-                                  # (it's really cel-type but we don't model
-  class Table::Cel                #  cels directly and it's a nicer name)
+
+  class Field_Type__
 
     attr_reader :align
 
@@ -186,8 +194,6 @@ module Skylab::Headless::CLI::Table  # :[#005].
 
     attr_reader :symbol
 
-  private
-
     param_h_h = {
       align: -> v { @align = v },
       ancestor: -> v { @ancestor_i = v },
@@ -202,7 +208,7 @@ module Skylab::Headless::CLI::Table  # :[#005].
         instance_exec v, & param_h_h.fetch( k )
       end
       @ancestor = if @ancestor_i
-        Autoloader_.const_reduce [@ancestor_i], Table::Cels
+        Autoloader_.const_reduce [ @ancestor_i ], Types__
       end
       freeze
     end
@@ -218,21 +224,19 @@ module Skylab::Headless::CLI::Table  # :[#005].
     public def _ancestor_names_recursive box
       if @ancestor
         bx.touch @ancestor do
-          Table::Cels.fetch( @ancestor )._ancestor_names_recursive bx
-          true
+          Types__.fetch( @ancestor )._ancestor_names_recursive bx
+          ACHIEVED_
         end
       end
       nil
     end
   end
 
-  class Table::Cel
-    FLOAT_DETAIL_RX = /\A(-?\d+)((?:\.\d+)?)\z/  # used 2x
-  end
+  FLOAT_DETAIL_RX__ = /\A(-?\d+)((?:\.\d+)?)\z/  # used 2x
 
-  module Table::Cels
+  module Types__
 
-    mod = Headless_.lib_.brazen::CLI::Styling
+    mod = Brazen_::CLI::Styling
     unstyle = mod::Unstyle
 
     parse_styles = mod::Parse_styles
@@ -257,7 +261,7 @@ module Skylab::Headless::CLI::Table  # :[#005].
       end
     end
 
-    float_detail_rx = Table::Cel::FLOAT_DETAIL_RX
+    float_detail_rx = FLOAT_DETAIL_RX__
 
     float = -> fld do
       int_max = fld.max_width :int_part
@@ -274,40 +278,41 @@ module Skylab::Headless::CLI::Table  # :[#005].
       end
     end
 
-    STRING = Table::Cel.new :string, rx: //, align: :left, render: common
+    STRING = Field_Type__.new :string, rx: //, align: :left, render: common
 
 
-    BLANK = Table::Cel.new :blank, ancestor: :string,
+    BLANK = Field_Type__.new :blank, ancestor: :string,
                                    rx: /\A[[:space:]]*\z/, render: common
 
-    FLOAT = Table::Cel.new :float, ancestor: :string,
+    FLOAT = Field_Type__.new :float, ancestor: :string,
                                    rx: /\A-?\d+(?:\.\d+)?\z/, render: float
 
-    INTEGER = Table::Cel.new :integer, ancestor: :float, align: :right,
+    INTEGER = Field_Type__.new :integer, ancestor: :float, align: :right,
                                        rx: /\A-?\d+\z/, render: common
 
   end
 
-  class Table::Cel::Stats
+  class Type_Stats___
 
     def has_information
       0 < @num_non_nil_seen
     end
 
-    attr_reader :index
-
-    attr_reader :max_h
-
-    attr_reader :type_h
+    attr_reader(
+      :index,
+      :max_h,
+      :type_h,
+    )
 
     # --*--
 
-    blank_rx = Table::Cels::BLANK.rx
+    blank_rx = Types__::BLANK.rx
 
-    unstyle = Headless_.lib_.brazen::CLI::Styling::Unstyle
+    float_detail_rx = FLOAT_DETAIL_RX__
 
-    start_type = Table::Cels::INTEGER
-    float_detail_rx = Table::Cel::FLOAT_DETAIL_RX
+    start_type = Types__::INTEGER
+
+    unstyle = Brazen_::CLI::Styling::Unstyle
 
     define_method :see do |cel_x|  # `cel_x` must be ::String or nil
       if ! cel_x.nil?
@@ -331,8 +336,6 @@ module Skylab::Headless::CLI::Table  # :[#005].
       end
     end
 
-  private
-
     def initialize idx
       @num_non_nil_seen = 0
       @index = idx
@@ -342,7 +345,7 @@ module Skylab::Headless::CLI::Table  # :[#005].
     end
   end
 
-  class Table::Field
+  class Field___
 
     attr_reader :is_align_left
 
@@ -354,21 +357,17 @@ module Skylab::Headless::CLI::Table  # :[#005].
       @render[ str ]
     end
 
-  private
-
     def initialize index, stats
       @index = index
       mode = stats.type_h.reduce( [ :string, 0 ] ) do |m, pair|
         pair.last > m.last ? pair : m
       end.first
-      @cel = Autoloader_.const_reduce [ mode ], Table::Cels
+      @cel = Autoloader_.const_reduce [ mode ], Types__
       @stats = stats
       @is_align_left = :left == @cel.align
       @render = @cel.render[ self ]
     end
   end
-
-  class Table::Field::Shell
-    attr_accessor :style  # a function
+  # ->
   end
 end

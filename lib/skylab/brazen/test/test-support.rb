@@ -168,13 +168,16 @@ module Skylab::Brazen::TestSupport
     Callback_::Autoloader[ self ]  # don't load spec file when autoloading lib
   end
 
+  EMPTY_S_ = ''.freeze
+  Home_ = Brazen_
   NIL_ = nil
+  SPACE_ = ' '.freeze
 
   module Constants
     Brazen_ = Brazen_
     Callback_ = Callback_
-    EMPTY_S_ = ''.freeze
-    SPACE_ = ' '.freeze
+    EMPTY_S_ = EMPTY_S_
+    SPACE_ = SPACE_
     TestLib_ = TestLib_
     TestSupport_ = TestSupport_
   end

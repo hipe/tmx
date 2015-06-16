@@ -6,13 +6,13 @@
 we almost called this "the omni table narrative", but didn't because our
 longerm goal is to unify all table implementions:
 
-    [#fm-011]  2013-03-13  ad-hoc for application. rewritten once.
+    [#.D]  2013-03-13  ad-hoc for application. rewritten once.
 
-    [#hl-126]  2012-03-16  the old functional experiment
+    [#.C]  2012-03-16  the old functional experiment
 
-    [#fa-036]  2011-08-22  the "main" one
+    [#.B]  2011-08-22  the "main" one
 
-    [#fa-048]  2011-08-22  a tiny deprecated one
+    [#.A]  2011-08-22  a tiny, almost minimal one
 
 because we are not there yet, this document is divided by horizontal
 "lines" into sections corresponding to the respective implementations.
@@ -23,12 +23,12 @@ we *certainly* want to make a [cu]-like feature comparison meta-table
 
 ----------------
 
-# the fourth table narrative [#fa-011]
+# the fourth table narrative :[#.D]
 
 ## justification
 
 at writing this was re-written from the ground up. we did not use
-[#fa-036] for this because of the product of these factors:
+[#.B] for this because of the product of these factors:
 
   • we were in the middle of a full rewrite of the application itself.
     to try and fold-in a unification of libraries on top of this would
@@ -68,12 +68,25 @@ clients needing to deal with it on their own.
 
 ----------------
 
-# the CLI table narrative :[#fa-036]
+# the CLI table ACTOR narrative :[#.B]
 
-## :#storypoint-5
+## introduction
 
-this is one of several CLI table implementations. one day we will designate
-one of the narratives as the home to sort these out.
+during the "pre-unification" phase, we designated this implementation as
+"actor" based solely on how it was typically intefaced with: it was
+"called" like a proc in order to express a table, so we named it
+"actor".
+
+below the surface however, the salience of this implementation during
+the rewrite is is this: wherease [#.D] ended up becoming an excercize in
+"visitor pattern", this implementation will be a grand exercize in
+dependency injection..
+
+the wikipedia article there tells us there are "setter-", "interface-"
+and "constructor-" based implementations. none of that is exactly what
+we want.
+
+
 
 
 
