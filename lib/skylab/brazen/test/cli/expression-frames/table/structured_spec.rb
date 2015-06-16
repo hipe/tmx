@@ -1,8 +1,8 @@
-require_relative '../../../../../test-support'
+require_relative '../../../test-support'
 
-module Skylab::FileMetrics::TestSupport
+module Skylab::Brazen::TestSupport
 
-  MRMCEFT_Struct__ = ::Struct.new :x, :y  # meh
+  C_EF_T_S_Struct__ = ::Struct.new :x, :y  # meh
 
   describe "[fm] models - report - modalities - CLI - expression-frames - t" do
 
@@ -127,7 +127,9 @@ module Skylab::FileMetrics::TestSupport
 
     define_method :_common_tree, ( Callback_.memoize do
 
-      _T = FM_::Models_::Report::Actions::Line_Count::Totaller_class___[]
+      _FM = Brazen_::Autoloader_.require_sidesystem :FileMetrics  # #todo - mock this?
+
+      _T = _FM::Models_::Report::Actions::Line_Count::Totaller_class___[]
 
       t = _T.new
       t_ = _T.new
@@ -145,14 +147,14 @@ module Skylab::FileMetrics::TestSupport
     def _fake_data_stream * s_a_a
 
       _a = s_a_a.map do | s_a |
-        MRMCEFT_Struct__.new( * s_a )
+        C_EF_T_S_Struct__.new( * s_a )
       end
 
       Callback_::Stream.via_nonsparse_array _a
     end
 
     def _begin_table
-      FM_::Models_::Report::Modalities::CLI::Expression_Frames::Table.new
+      Brazen_::CLI::Expression_Frames::Table::Structured.new
     end
 
     def _line_expector_via_array y

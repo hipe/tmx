@@ -1,12 +1,8 @@
-module Skylab::FileMetrics
+module Skylab::Brazen
 
-  class Models_::Report
+  # -> 2
 
-    module Modalities::CLI
-
-      Expression_Frames = ::Module.new
-
-      class Expression_Frames::Table  # see [#011] (in [#br-096])
+      class CLI::Expression_Frames::Table::Structured  # see [#096.D]
 
         # ~ defining a table
 
@@ -95,7 +91,7 @@ module Skylab::FileMetrics
           @polymorphic_upstream_.gets_one
         end
 
-        IG__ = FM_.lib_.parse::Item_Grammar.new(
+        IG__ = Brazen_.lib_.parse::Item_Grammar.new(
 
           [
             :no_data,
@@ -795,8 +791,6 @@ module Skylab::FileMetrics
         end
       end
 
-      KEEP_PARSING_ = true
-      NEWLINE_ = "\n"
-    end
-  end
+      # <- 2
+
 end

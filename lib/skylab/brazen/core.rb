@@ -387,7 +387,7 @@ module Skylab::Brazen
 
     Open3 = stdlib[ :Open3 ]
 
-    Parse_lib = sidesys[ :Parse ]
+    Parse = sidesys[ :Parse ]
 
     Proxy_lib = -> do
       Callback_::Proxy

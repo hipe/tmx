@@ -352,7 +352,7 @@ module Skylab::FileMetrics
       class Action_Adapter__
 
         def _begin_table
-          Modz_CLI_::Expression_Frames::Table.new
+          FM_.lib_.brazen::CLI::Expression_Frames::Table::Structured.new
         end
 
         def _lookup_expression_width
