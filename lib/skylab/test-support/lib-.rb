@@ -64,10 +64,12 @@ module Skylab::TestSupport
     end
 
     Enhancement_shell = -> * i_a do
-      MH__[]::Enhance::Shell.new i_a
+      Plugin[]::Bundle::Enhance::Shell.new i_a
     end
 
     Permute = sidesys[ :Permute ]
+
+    Plugin = sidesys[ :Plugin ]
 
     Properties_stack_frame = -> * a do
       Brazen[]::Property::Stack.common_frame.call_via_arglist a

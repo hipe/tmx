@@ -32,7 +32,7 @@ module Skylab::Callback
     end
 
     Enhancement_shell = -> a do
-      MH__[]::Enhance::Shell.new a
+      Plugin[]::Bundle::Enhance::Shell.new a
     end
 
     Entity = -> * a, & edit_p do
@@ -74,6 +74,8 @@ module Skylab::Callback
     end
 
     Parse = sidesys[ :Parse ]
+
+    Plugin = sidesys[ :Plugin ]
 
     Some_stderr = -> do
       System_lib__[]::IO.some_stderr_IO

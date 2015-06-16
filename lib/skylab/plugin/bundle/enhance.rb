@@ -1,12 +1,10 @@
-module Skylab::MetaHell
+module Skylab::Plugin
 
-  module Enhance
+  module Bundle::Enhance  # :+#deprecated. see [#033]
 
-    # support for the "contained DSL" pattern (#todo wherd is that writeup?)
+    # <-
 
-  end
-
-  class Enhance::Shell
+  class Shell
 
     class << self
       alias_method :mh_new, :new
@@ -25,12 +23,12 @@ module Skylab::MetaHell
           end
         end
 
-        const_set :One_Shot_, Enhance::OneShot.new( a )
+        const_set :One_Shot_, Enhance_::OneShot.new( a )
 
         const_set :A_, a  # exposed for hacking
 
-        define_singleton_method :to_struct, & FUN_.to_struct
-        define_singleton_method    :struct, & FUN_.struct
+        define_singleton_method :to_struct, TO_STRUCT_METHOD___
+        define_singleton_method    :struct, STRUCT_METHOD___
 
         self
       end
@@ -48,40 +46,41 @@ module Skylab::MetaHell
         self
       end
     end
-  end
 
-  Enhance::Shell::FUN_ = -> do
-
-    o = { }
 
     # `to_struct` - this is defined as a "class method" on the generated
     # shell class. pass it a `def_blk` - type function and it will result
     # in a struct with members corresponding to the members of the shell,
     # with each "macro" strictly taking one argument.
 
-    o[:to_struct] = -> f do
+    TO_STRUCT_METHOD___ = -> edit_p do
+
       st = struct.new
+
       new( * const_get( :A_, false ).map do |i|
         -> x do
           st[ i ] = x
           nil  # change it if needed
         end
-      end ).instance_exec( & f )
+      end ).instance_exec( & edit_p )
+
       st
     end
 
-    o[:struct] = -> do
+    STRUCT_METHOD___ = -> do
+
       if const_defined? :Struct_, false
-              const_get :Struct_, false
-      else    const_set :Struct_, ::Struct.new( * const_get( :A_, false ) )
+        const_get :Struct_, false
+
+      else
+        const_set :Struct_, ::Struct.new( * const_get( :A_, false ) )
+
       end
     end
+  end
 
-    ::Struct.new( * o.keys ).new( * o.values )
 
-  end.call
-
-  class Enhance::OneShot
+  class OneShot
 
     # per the `enhance` pattern, make one-shot shells easy & paranoid.
     #
@@ -133,20 +132,22 @@ module Skylab::MetaHell
         end
       }
       define_method :initialize do |* shell_flush_a|
+
         shell, flush = instance_exec( * shell_flush_a, &
           h.fetch( shell_flush_a.length ) )
+
         @execute = -> meth_i, arg_a, block_b do
           @mutex = meth_i
           freeze
-          r = shell.send meth_i, * arg_a, & block_b
+          x = shell.send meth_i, * arg_a, & block_b
           flush.call
-          r
+          x
         end
       end
     end.call
 
     class << self
-      alias_method :meta_hell_new, :new
+      alias_method :orig_new__, :new
     end
 
     def self.new meth_a
@@ -154,7 +155,7 @@ module Skylab::MetaHell
       ::Class.new( self ).class_exec do
 
         class << self
-          alias_method :new, :meta_hell_new
+          alias_method :new, :orig_new__
         end
 
         meth_a.each do |i|
@@ -166,5 +167,8 @@ module Skylab::MetaHell
         self
       end
     end
+  end
+  # ->
+    Enhance_ = self
   end
 end

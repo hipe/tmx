@@ -129,7 +129,7 @@ module Skylab::CodeMolester
     end
 
     Simple_shell = -> a do
-      MH__[]::Enhance::Shell.new a
+      Plugin[]::Bundle::Enhance::Shell.new a
     end
 
     String_lib = -> do
