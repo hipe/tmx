@@ -1,3 +1,4 @@
+[#038]       ( ancient ancient artifact, moved here from [#sl-074])
 [#037] #open speedup..
 [#036] #open #parent-node:[#017]
                redudnancy with mapping real SHA's to commitpoint SHA's

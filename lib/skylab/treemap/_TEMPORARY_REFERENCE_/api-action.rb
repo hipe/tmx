@@ -15,7 +15,7 @@ module Skylab::Treemap
     inflection.lexemes.noun = 'treemap'          # idem (might be smell in api)
 
 
-    extend MetaHell::Formal::Attribute::Definer # formal attributes can be used
+    extend M_etaHell::Formal::Attribute::Definer # formal attributes can be used
                                                # for the 95% use case of
                                                # parameter validation
 

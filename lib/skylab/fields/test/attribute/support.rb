@@ -1,39 +1,36 @@
-require_relative '../test-support'
+module Skylab::Fields::TestSupport
 
-module Skylab::MetaHell::TestSupport::Formal::Attribute
+  module Attribute::Support
 
-  ::Skylab::MetaHell::TestSupport::Formal[ TS_ = self ]
+    TS_::A_Subject_Module_ = Home_::Attribute
 
-  include Constants
+    class << self
 
-  MetaHell_ = MetaHell_
+      def [] tcm
 
-  Formal_TS_ = Formal_TS_
-
-  MetaHell_.lib_.stdlib_set
-
-  extend TestSupport_::Quickie
-
-  module Methods
-
-    include Constants
-
-    def one_such_class & p
-      _const_i = :"KLS_#{ Formal_TS_.next_id }"
-      _cls = TS_.const_set _const_i, ::Class.new
-      _cls.class_exec do
-        MetaHell_::Formal::Attribute::DSL[ self ]
-        class_exec( & p )
-        self
+        tcm.send :define_method, :one_such_class_, ONE_SUCH_CLASS_METHOD__
+        tcm.send :define_singleton_method, :one_such_class_, ONE_SUCH_CLASS_METHOD__
       end
-    end
-  end
+    end  # >>
 
-  module ModuleMethods
-    include Methods
-  end
+    ONE_SUCH_CLASS_METHOD__ = -> do
 
-  module InstanceMethods
-    include Methods
+      next_id = Build_next_integer_generator_starting_after[ 0 ]
+
+      -> & def_p do
+
+        _const = :"KLS_#{ next_id[] }"
+
+        _cls = Me_.const_set _const, ::Class.new
+
+        ( _cls.class_exec do
+          A_Subject_Module_::DSL[ self ]
+          class_exec( & def_p )
+          self
+        end )
+      end
+    end.call
+
+    Me_ = self
   end
 end

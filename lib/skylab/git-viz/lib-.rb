@@ -52,10 +52,6 @@ module Skylab::GitViz
       ::DateTime
     end
 
-    Formal_attribute_definer = -> mod do
-      MH__[]::Formal::Attribute::Definer[ mod ] ; nil
-    end
-
     Grit = _memoize do
       require 'grit'
       ::Grit
@@ -76,8 +72,6 @@ module Skylab::GitViz
     Local_normal_name_from_module = -> x do
       Callback_::Name.via_module( x ).as_lowercase_with_underscores_symbol
     end
-
-    MH__ = wall[ :MetaHell ]
 
     MD5 = _memoize do
       require 'digest/md5'

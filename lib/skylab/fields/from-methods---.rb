@@ -11,7 +11,7 @@ module Skylab::Fields
     #       def one
     #       end
     #
-    #       MetaHell_::Fields::From.methods(
+    #       M_etaHell_::Fields::From.methods(
     #         :overriding, :argful, :destructive, :globbing, :absorber, :initialize
     #       ) do
     #
@@ -44,7 +44,7 @@ module Skylab::Fields
     #
     #     class Baz < Foo
     #
-    #       MetaHell_::Fields::From.methods :argful do
+    #       M_etaHell_::Fields::From.methods :argful do
     #         def four a
     #           @four_value = a.shift
     #         end
@@ -164,7 +164,7 @@ module Skylab::Fields
 
     MACRO_H___ = { argful: _x }
 
-      class Touch_method_added_muxer_of__  # moved back to [mh] from [br]
+      class Touch_method_added_muxer_of__  # it went [m-h]->[br]->[here]
 
         class << self
           def [] mod
@@ -218,7 +218,7 @@ module Skylab::Fields
     # use the experimental `use_o_DSL` to give yourself the 'o' method
     #
     #     class Fob
-    #       MetaHell_::Fields::From.methods :use_o_DSL do
+    #       M_etaHell_::Fields::From.methods :use_o_DSL do
     #
     #         o :desc, "a", "b"
     #         o :desc, "c"

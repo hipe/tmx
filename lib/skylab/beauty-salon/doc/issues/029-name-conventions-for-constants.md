@@ -257,6 +257,38 @@ interface or removing it altogether.
 
 
 
+## peripherally related style convention: the OCD of literals in consts :[#.H]
+
+(this moved here from the sunsetting [m-h])
+
+this counter-cultural habbit sprung out of the OCD compulsion not to allocate
+memory for objects that we knew would need never be more than their primitive,
+monadic forms. consider: at the time of this writing, the frozen empty array
+constant is used in about 40 places. granted, allocating memory for 40 arrays
+as opposed to one would have a negligible impact on resources when e.g we run
+all of our tests, but our reasoning behind this has evolved:
+
+1) for the same reason we use constants in place of literal values generally,
+using constants for these values can give the code a louder voice. consider
+the case of throwing the empty proc around. if we are frequently passing this
+value to the same function from different places, it may be an indication that
+this callack argument should perhaps be made optional, or eliminated all
+together.
+
+more than just making the code self-documenting, a pattern like this can
+transform the code into a sentient being that expresses original thoughts back
+up to us.
+
+2) in the case of a potentially mutable value like an array or string, the
+fact that these values are frozen acts as a small assertion that the
+participating code is not mutating these values (if that is indeed what we
+expect). again this makes to code more expressive (but this time at runtime),
+perhaps telling us things we didn't know about our logic.
+
+
+
+
+
 ## references
 
 [1]: http://semver.org

@@ -100,14 +100,8 @@ module Skylab::CodeMolester
       HL__[]::IO::Mappers::Chunkers::Functional.new p
     end
 
-    MH__ = sidesys[ :MetaHell ]
-
     Model_enhance = -> x, p do
       Face__[]::Model.enhance x, & p
-    end
-
-    Module_accessors = -> do
-      MH__[]::Module::Accessors
     end
 
     Module_lib = -> do

@@ -22,8 +22,6 @@ module Skylab::Dependency
 
     HL___ = sidesys[ :Headless ]
 
-    MH__ = sidesys[ :MetaHell ]
-
     Methodize = -> i do
       Callback_::Name.lib.methodize i
     end
@@ -34,10 +32,6 @@ module Skylab::Dependency
 
     Path_tools = -> do
       System[].filesystem.path_tools
-    end
-
-    Proxy = -> do
-      MH__[]::Proxy
     end
 
     Sexp = -> do

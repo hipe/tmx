@@ -73,7 +73,7 @@ stories are exercized.
 
 ## goals for ths phase of re-working
 
-gleaning from what we've learned of several years (!?) with the old [mh]
+gleaning from what we've learned of several years (!?) with the old [m-h]
 autoloader stack:
 
 • the primary impetus is this new design goal that universide-wide all

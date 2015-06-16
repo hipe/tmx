@@ -1,7 +1,7 @@
 # names :[#059]
 
 
-"actual value" vs. "formal value" is defined [#mh-025] here.
+"actual value" vs. "formal value" is defined [#fi-025] here.
 
 "property" generally means the formal property as object. we now may use
 this generally to refer to the structure representing the metatdata for

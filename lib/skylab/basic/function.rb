@@ -26,7 +26,7 @@ module Skylab::Basic
     #       end ]
     #
     #
-    #       MetaHell_.function_chain.curry[ _p_a ]
+    #       M_etaHell_.function_chain.curry[ _p_a ]
     #     end
     #
     #

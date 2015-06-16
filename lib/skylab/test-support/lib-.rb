@@ -103,8 +103,6 @@ module Skylab::TestSupport
       Hu___[]::Levenshtein.call_via_iambic x_a
     end
 
-    MH__ = sidesys[ :MetaHell ]
-
     Name_from_const_to_method = -> i do
       Callback_::Name.lib.methodize i
     end

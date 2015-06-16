@@ -1,17 +1,21 @@
 require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::Formal
+module Skylab::Fields::TestSupport
 
   # this is a somewhat built-out convolution we used to discover a wicked
   # trip-up we hit when refactoring attributes. it revealed how important
   # the delta changeset logic was when dealing with inheritance graphs
   # together with hook chains. You may recognize some of the names from
-  # elsewhere, which was where the issue was first discovered. Also: Quickie.
+  # elsewhere, which was where the issue was first discovered.
 
-  build_modules = -> o do
+  # EDIT: broadly this sort of "pattern" could perhaps be better achieved
+  # with a "normalization box" (which is ordered) of [#br-022] properties,
+  # which would avoid the below nastiness with alias method chains.
+
+  build_modules_into = -> o do
 
     class o::Lib_Task
-      MetaHell_::Formal::Attribute::DSL[ self ]
+      A_Subject_Module_::DSL[ self ]
     end
 
     class o::Task < o::Lib_Task
@@ -54,17 +58,26 @@ module Skylab::MetaHell::TestSupport::Formal
       attribute :build_dir, required: true, pathname: true, from_context: true
     end
 
-    nil
+    NIL_
   end
 
+  next_id = Build_next_integer_generator_starting_after[ 0 ]
+
   scenario_module = -> do
-    mod = Formal_TS_.const_set :"MOD_#{ Formal_TS_.next_id }", ::Module.new
-    build_modules[ mod ] # we could module_exec but it's not much prettier
+
+    mod = TS_.const_set :"A_S1_#{ next_id[] }", ::Module.new
+
+    build_modules_into[ mod ] # we could module_exec but it's not much prettier
+
     scenario_module = -> { mod }
+
     mod
   end
 
-  describe "[mh] formal attribute - scenario 1" do
+  describe "[fi] attribute - scenario 1" do
+
+    extend TS_
+    use :attribute_support
 
     it "four-node inheritance chain and hook chain - whew" do
 

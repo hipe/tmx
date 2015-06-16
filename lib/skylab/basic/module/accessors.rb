@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module Module::Accessors
 
-    # (this immigrated from [mh]. see also the simpler [#034])
+    # (this immigrated from [m-h]. see also the simpler [#034])
 
     # a lightweight enhancer that for the module using it generates instance
     # methods for that module each of which access a particular "significant

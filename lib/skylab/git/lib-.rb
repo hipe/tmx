@@ -65,8 +65,6 @@ module Skylab::Git
 
     HL__ = sidesys[ :Headless ]
 
-    MH__ = sidesys[ :MetaHell ]
-
     Parse_lib = sidesys[ :Parse ]
 
     Path_tools = -> do

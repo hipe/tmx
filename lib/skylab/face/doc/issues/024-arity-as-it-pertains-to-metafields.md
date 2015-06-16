@@ -5,7 +5,7 @@
 
 prerequisites:
 
-  • the concept of parameter arity employs the notions of [#mh-025]
+  • the concept of parameter arity employs the notions of [#fi-025]
     formal-vs-actual parameters. in summary; the former refers to what is
     specified/declared/programmed for, and the latter refers to what is
     passed in actual requests/calls.
@@ -100,7 +100,7 @@ who wants you to trust them with the words they made up.)
 associated with a particular formal number describing the sensical range for
 the actual numbers that will be associated with that formal number." we mean
 formal/actual in the sense of formal-vs-actual parameters to a function,
-(presented at [#mh-025]), although typically the number we are referring to
+(presented at [#fi-025]), although typically the number we are referring to
 is not itself a parameter but a `count` derived (in some way) from other
 parameters (either formal or actual), and the relationships therebetween!
 

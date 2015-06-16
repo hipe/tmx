@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module Module
 
-    module Creator
+    module Creator  # (tracked *under* [#048])
 
       class << self
 

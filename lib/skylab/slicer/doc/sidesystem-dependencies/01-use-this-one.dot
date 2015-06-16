@@ -9,15 +9,16 @@ digraph {
   cu [ label="Cull" ]
   de [ label="Dependency" ]
   fa [ label="Face" ]
+  fi [ label="Fields" ]
   fm [ label="FileMetrics" ]
   f2 [ label="Flex2Treetop" ]
   gi [ label="Git" ]
   gv [ label="GitViz" ]
   he [ label="Headless" ]
   hu [ label="Human" ]
-  mh [ label="MetaHell" ]
   pa [ label="Parse" ]
   pe [ label="Permute" ]
+  pl [ label="Plugin" ]
   sla [ label="Slake" ]
   sli [ label="Slicer" ]
   sn [ label="Snag" ]
@@ -32,8 +33,8 @@ digraph {
   ba -> br
   ba -> he
   ba -> hu
-  ba -> mh
   ba -> pa
+  ba -> pl
   ba -> sy
   ba -> ts
   bs -> ba
@@ -51,7 +52,8 @@ digraph {
   ca -> br
   ca -> he
   ca -> hu
-  ca -> mh
+  ca -> pa
+  ca -> pl
   ca -> sy
   ca -> ts
   cm -> ba
@@ -59,27 +61,33 @@ digraph {
   cm -> fa
   cm -> he
   cm -> hu
-  cm -> mh
   cm -> pa
   cm -> sy
+  cs -> br
   cs -> he
   cs -> sy
   cs -> tan
   cu -> ba
   cu -> sy
+  de -> ba
+  de -> br
   de -> cm
   de -> fa
   de -> he
-  de -> mh
   de -> sla
   de -> sy
   fa -> br
   fa -> ba
+  fa -> fi
   fa -> he
-  fa -> mh
   fa -> pa
   fa -> sy
   fa -> ts
+  fi -> ba
+  fi -> br
+  fi -> hu
+  fi -> pl
+  fm -> br
   fm -> ba
   fm -> fa
   fm -> he
@@ -91,37 +99,39 @@ digraph {
   f2 -> he
   f2 -> sy
   gi -> ba
+  gi -> br
   gi -> fa
+  gi -> fi
   gi -> he
-  gi -> mh
   gi -> pa
+  gi -> pl
   gi -> sy
   gv -> br
   gv -> he
   gv -> hu
   gv -> sy
   he -> ba
+  he -> br
   he -> cm
   he -> fa
   he -> hu
-  he -> mh
   he -> pa
+  he -> pl
   he -> sy
   hu -> ba
   hu -> br
   hu -> pa
-  mh -> ba
-  mh -> br
-  mh -> hu
+  hu -> pl
   pe -> ba
   pe -> br
-  sla -> mh
-  sli -> fa
+  pl -> ba
+  pl -> br
+  pl -> pa
+  sla -> fi
   sn -> ba
   sn -> br
   sn -> he
   sn -> hu
-  sn -> mh
   sn -> pa
   sn -> sy
   st -> ba
@@ -135,6 +145,7 @@ digraph {
   sy -> br
   sy -> hu
   sy -> pa
+  sy -> pl
   tan -> ba
   tan -> he
   tan -> pa
@@ -143,10 +154,10 @@ digraph {
   ts -> ba
   ts -> br
   ts -> pe
+  ts -> pl
   ts -> fa
   ts -> he
   ts -> hu
-  ts -> mh
   ts -> sn
   ts -> sy
   tr -> ba

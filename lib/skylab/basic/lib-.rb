@@ -36,8 +36,6 @@ module Skylab::Basic
       System_lib__[]::IO
     end
 
-    MH__ = sidesys[ :MetaHell ]
-
     NLP_EN = -> do
       Hu___[]::NLP::EN
     end

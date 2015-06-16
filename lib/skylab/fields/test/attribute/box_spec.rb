@@ -1,21 +1,16 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::Formal::Attribute::Box
+module Skylab::Fields::TestSupport
 
-  ::Skylab::MetaHell::TestSupport::Formal::Attribute[ TS_ = self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  describe "[mh] formal attribute box" do
+  describe "[fi] attribute - box" do
 
     extend TS_
+    use :attribute_support
 
     context "`with` - doesn't care about truthiness just has?" do
 
-      subject -> do
-        MetaHell_::Formal::Attribute::Box[ [
+      subject do
+        A_Subject_Module_::Formal_Attribute_Box___[ [
           [:one, { name: :foo, ready: true, flavor: :bland } ],
           [:two, { name: :bar, ready: false} ],
           [:three, { name: :baz, ready: true, flavor: :spicy } ],
@@ -46,7 +41,7 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute::Box
 
         st = ::Struct.new :name, :ready, :flavor
 
-        box = MetaHell_::Formal::Attribute::Box.new
+        box = A_Subject_Module_::Formal_Attribute_Box___.new
 
         box.add :one,   st[ :foo,   true, :bland ]
         box.add :two,   st[ :bar,   false ]

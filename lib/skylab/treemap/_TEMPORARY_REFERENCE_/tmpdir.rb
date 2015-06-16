@@ -44,7 +44,7 @@ module Skylab::Treemap
     def initialize path, &wire
       wire or raise ::ArgumentError, 'block required'
       @is_normalized = false
-      super path, MetaHell::MONADIC_TRUTH_  # always lack required force
+      super path, M_etaHell::MONADIC_TRUTH_  # always lack required force
       wire[ self ]
       nil
     end

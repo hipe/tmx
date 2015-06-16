@@ -68,10 +68,6 @@ module Skylab::Snag
       System[].filesystem.file_utils_controller
     end
 
-    Formal_attribute = -> do
-      MH__[]::Formal::Attribute
-    end
-
     HL__ = sidesys[ :Headless ]
 
     Hu__ = sidesys[ :Human ]
@@ -79,8 +75,6 @@ module Skylab::Snag
     NLP = -> do
       Hu__[]::NLP
     end
-
-    MH__ = sidesys[ :MetaHell ]
 
     Model_event = -> mod do
       HL__[]::Model::Event.apply_on_client mod

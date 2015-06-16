@@ -5,7 +5,7 @@ require_relative '../../test-support'
 # was to make things like testing modules prettier, hence as a quintessential
 # meta-bootstrapping problem we cannot (or, at least, should not) use the
 # library itself here, hence they are very ugly, hence in a way, right here
-# in this very file is the darkest of all the circles of meta-hell.
+# in this very file is the darkest of all the circles of m-eta-hell.
 
 module Skylab::Basic::TestSupport
 

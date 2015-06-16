@@ -4,7 +4,7 @@
 [#013] #open was SubTree::CLI.expression_agent  but it sucks so hard
 [#012] #open change this to reduce when it works
 [#011] #open - cover this
-[#010] #open in cov replace olschool [mh] basic fields with actors
+[#010] #open in cov replace olschool [m-h] basic fields with actors
 [#009]       the compound tree algorithm ..
              ( #was #done gut the borked event model of `cov` )
 [#008]       :+[#003] all relevant files have one extension

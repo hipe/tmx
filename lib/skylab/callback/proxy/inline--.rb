@@ -14,7 +14,7 @@ module Skylab::Callback
       #
       #     pxy.biz  # => :baz
       #
-      # (was [#mh-009] - this is essentially a convenience wrapper around
+      # (was [#pl-009] - this is essentially a convenience wrapper around
       # `define_singelton_method`.)
       #
       # (past names for this include:

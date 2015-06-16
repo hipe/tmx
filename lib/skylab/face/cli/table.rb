@@ -72,7 +72,7 @@ module Skylab::Face
 
     attr_accessor :row_upstream, :line_downstream_yielder
 
-    alias_method :dupe, :dup  # :+[#mh-021] (ok)
+    alias_method :dupe, :dup  # :+[#sl-146] (ok)
 
     def initialize_copy _otr_
       # @do_show_header, @left_x @right_x, @sep_x copy-by-reference

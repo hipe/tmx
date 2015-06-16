@@ -65,7 +65,6 @@ module Skylab::TMX
       Callback_::Distill_[ i ]
     end
     Face__ = sidesys[ :Face ]
-    MetaHell__ = sidesys[ :MetaHell ]
     Proxy_lib = -> do
       Callback_::Proxy
     end

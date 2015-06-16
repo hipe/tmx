@@ -85,14 +85,8 @@ module Skylab::Face  # read [#011] the top node narrative
 
     HL__ = sidesys[ :Headless ]
 
-    MH__ = sidesys[ :MetaHell ]
-
     Module_lib = -> do
       Bsc__[]::Module
-    end
-
-    Module_accessors = -> x, p=nil do
-      MH__[]::Module::Accessors.enhance x, & p
     end
 
     Name_from_symbol = -> sym do
@@ -137,9 +131,6 @@ module Skylab::Face  # read [#011] the top node narrative
 
     Test_support = sidesys[ :TestSupport ]
 
-    Touch_proc = -> do
-      MH__[]::Module::Accessors::Touch
-    end
   end
 
   LIB_ = lib_

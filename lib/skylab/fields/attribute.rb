@@ -1,12 +1,13 @@
-module Skylab::MetaHell
+module Skylab::Fields
 
-  class Formal::Attribute < Callback_::Box # read [#024] the form. #storypoint-5
+  class Attribute < Callback_::Box  # see [#002] (intro at #storypoint-5)
 
     module Definer
 
       def self.[] mod
         DSL[ mod ]
-        mod.module_exec EMPTY_A_, & Bundles::Attributes.to_proc ; nil
+        mod.module_exec EMPTY_A_, & Bundles::Attributes.to_proc
+        NIL_
       end
 
       def self.extended mod  # :+#deprecation:until-universal-unification
@@ -15,6 +16,7 @@ module Skylab::MetaHell
     end
 
     module Bundles
+
       Meta_attributes = -> a do
         DSL[ self ]  # for now
         meta_attribute( * a.shift )
@@ -22,14 +24,14 @@ module Skylab::MetaHell
       end
 
       Attributes = -> a do  # #idempotent
-        include Reflection_IM__
+        include Reflection_IM___
         if a.length.nonzero?
-          module_exec a, & Parse_the_attributes__
+          module_exec a, & Parse_the_attributes___
         end
       end
     end
-    #
-    Parse_the_attributes__ = -> a do
+
+    Parse_the_attributes___ = -> a do
       g = if const_defined? :Item_Grammar__, false
         self::Item_Grammar__
       else
@@ -73,17 +75,18 @@ module Skylab::MetaHell
         which_h.fetch( _d ).push matr.local_normal_name
       end
 
-      MetaHell_.lib_.parse::Item_Grammar.new mono_i_a, :attribute, diad_i_a
+      Fields_.lib_.parse::Item_Grammar.new mono_i_a, :attribute, diad_i_a
     end
 
     DSL = -> mod do
-      mod.extend Formal::Attribute::Definer::Methods
+      mod.extend Formal_Attribute_Definer_Methods___
       # no instance methods - that is what meta-attributes are for
-      nil
+      NIL_
     end
-  end
 
-  module Formal::Attribute::Definer::Methods  # #storypoint-10
+    # <-
+
+  module Formal_Attribute_Definer_Methods___  # #storypoint-10
 
     def attributes
       @attributes ||= bld_attributes
@@ -93,7 +96,7 @@ module Skylab::MetaHell
 
     def bld_attributes
       dupe_ancestor_attr :attributes do
-        Formal::Attribute::Box.new
+        Formal_Attribute_Box___.new
       end
     end
 
@@ -141,19 +144,17 @@ module Skylab::MetaHell
       send m_i, * a ; nil
     end
 
-    public ; attr_reader :attribute_metadata_class_is_defined ; private
-
     def attribute_metadata_class cls=nil, &p
       do_define = -> do
         define_singleton_method :atr_metadata_class do
           cls
         end
-        @attribute_metadata_class_is_defined = true
+        @_attribute_metadata_class_is_defined = true
       end
       if cls
         if p
           raise Class_and_block_are_mutex__[]
-        elsif attribute_metadata_class_is_defined
+        elsif _attribute_metadata_class_is_defined
           raise "won't clobber existing custom class (for now)"
         else
           do_define[]
@@ -174,8 +175,12 @@ module Skylab::MetaHell
       end
     end
 
+    public
+    attr_reader :_attribute_metadata_class_is_defined
+    private
+
     Class_and_block_are_mutex__ = -> do
-      ArgumentError.new "passing class and block are mutually exclusive."
+      ::ArgumentError.new "passing class and block are mutually exclusive."
     end
 
     def dupe_ancestor_attr meth_i, & else_p
@@ -195,7 +200,7 @@ module Skylab::MetaHell
     end
 
     def atr_metadata_class
-      Formal::Attribute
+      Attribute_
     end
 
     def merge_defaults_into_delta atr_delta_metadata
@@ -211,7 +216,7 @@ module Skylab::MetaHell
 
     def meta_attribute first, * rest, & p  # #storypoint-30
       matrs = meta_attributes
-      pair_a = Normalize_meta_attribute_args__[ first, rest, p ]
+      pair_a = Normalize_meta_attribute_args___[ first, rest, p ]
       pair_a.each do |atr_x, p_|
         p_ and next prcss_meta_attribute_proc atr_x, p_
         atr_x.respond_to? :id2name and next matrs.touch_matr_w_nm atr_x
@@ -221,7 +226,7 @@ module Skylab::MetaHell
       end ; nil
     end
 
-    Normalize_meta_attribute_args__ = -> first, rest, p do
+    Normalize_meta_attribute_args___ = -> first, rest, p do
       if rest.length.nonzero?
         if ::Hash.try_convert rest.last
           first = rest.pop.merge( _unsanitized_name: first )
@@ -241,7 +246,7 @@ module Skylab::MetaHell
     def prcss_meta_attribute_proc atr_i, p
       atr_i.respond_to?( :id2name ) or raise Arg_error__[ atr_i ]
         # truncate the args if for e.g. the hook doesn't need metadata
-      compress_p = Build_compressor__[ p.arity ]
+      compress_p = Build_compressor___[ p.arity ]
       define_singleton_method :"on_#{ atr_i }_attribute" do |*a|
         instance_exec( * compress_p[ a ] , & p )
       end
@@ -266,7 +271,7 @@ module Skylab::MetaHell
       ::ArgumentError.new "cannot define a meta attribute with #{ x.class }"
     end
 
-    Build_compressor__ = -> d do
+    Build_compressor___ = -> d do
       if d < 1 then IDENTITY_ else
         -> a { a[ 0, d ] }
       end
@@ -280,7 +285,7 @@ module Skylab::MetaHell
   private
     def bld_meta_attributes
       dupe_ancestor_attr :meta_attributes do
-        Formal::Attribute::Matrs__.new
+        MetaAttribute_Box___.new
       end
     end
   public
@@ -305,7 +310,7 @@ module Skylab::MetaHell
     end
   end
 
-  class Formal::Attribute::Matr__  # #storypoint-40
+  class MetaAttribute___  # #storypoint-40
 
     def initialize local_normal_name
       @default_value = @has_default = nil
@@ -315,7 +320,7 @@ module Skylab::MetaHell
     end
     attr_reader :has_default, :hook_name, :hook_p, :local_normal_name
 
-    # ~ :+[#021] a typical base class implementation:
+    # ~ :+[#sl-146] a typical base class implementation:
     def dupe
       dup
     end
@@ -351,7 +356,7 @@ module Skylab::MetaHell
     end
   end
 
-  class Formal::Attribute::Matrs__ < Callback_::Box  # #storypoint-50
+  class MetaAttribute_Box___ < Callback_::Box  # #storypoint-50
 
     def a_  # read only!
       @a
@@ -380,7 +385,7 @@ module Skylab::MetaHell
 
     def touch_matr_w_nm atr_i
       touch atr_i do
-        Formal::Attribute::Matr__.new atr_i
+        MetaAttribute___.new atr_i
       end
     end
 
@@ -389,7 +394,9 @@ module Skylab::MetaHell
     end
   end
 
-  class Formal::Attribute  #re-open, is a Box subclass  # #storypoint-60
+  # -> 1
+
+    # ~ subject as model (is box subclass), #storypoint-60
 
     def initialize local_normal_name
       local_normal_name.respond_to?( :id2name ) or self._sanity_
@@ -398,10 +405,6 @@ module Skylab::MetaHell
     end
 
     attr_reader :local_normal_name
-
-    def a_  # read only!
-      @a
-    end
 
     def reader_method_name
       @local_normal_name
@@ -455,12 +458,13 @@ module Skylab::MetaHell
     end
 
     def add_dflt name, val
-      # add name, MetaHell_.lib_.basic.dup_mixed( val )
+      # add name, Fields_.lib_.basic.dup_mixed( val )
       add name, val
     end
-  end
 
-  class Formal::Attribute::Box < Callback_::Box  # #storypoint-90
+    # <-
+
+  class Formal_Attribute_Box___ < Callback_::Box  # #storypoint-90
 
     def self.[] i_h_pair_a  # #storypoint-95
       me = new
@@ -479,7 +483,7 @@ module Skylab::MetaHell
 
     def init_from_i_h_pair_a i_h_pair_a
       i_h_pair_a.each do |i, h|
-        atr = Formal::Attribute.allocate
+        atr = Attribute_.allocate
         atr.initialize_atr_spcl i, h
         accept_atr atr
       end ; nil
@@ -549,21 +553,22 @@ module Skylab::MetaHell
     end
   end
 
-  class Formal::Attribute
+  # ->
+    # ~ subject as model again
 
     def initialize_atr_spcl i, h
       @a = h.keys
       @local_normal_name = i
       @h = h
-      nil
+      NIL_
     end
 
-    module Reflection_IM__
+    module Reflection_IM___
 
       def get_names  # #comport to #box-API
         attribute_definer.attributes.get_names
       end
-      #
+
       def fetch i, &p  # #storypoint-135
 
         atr = attribute_definer.attributes.fetch( i ) { }
@@ -575,7 +580,12 @@ module Skylab::MetaHell
             true
           end
         end
-        if did then x elsif p then p.call else
+
+        if did
+          x
+        elsif p
+         p.call
+        else
           raise ::KeyError.exception "key not found: #{ i.inspect }"
         end
       end
@@ -600,7 +610,7 @@ module Skylab::MetaHell
       end
 
       def get_bound_attribute_stream
-        Bound_Attributes_Scanner__.
+        Bound_Attributes_Scanner___.
           new formal_attributes, get_bound_attribute_reader
       end
 
@@ -620,6 +630,7 @@ module Skylab::MetaHell
     end
 
     class Bound_Attributes_Scanner__
+
       def initialize atr_box, reader_p
         @p = -> do
           a, h = atr_box._raw_constituency ; d = 0 ; len = a.length
@@ -631,10 +642,14 @@ module Skylab::MetaHell
           end )).call
         end
       end
-      def gets ; @p.call end
+
+      def gets
+        @p.call
+      end
     end
 
     class Bound_Attribute__
+
       def initialize reader_p, atr
         @reader_p = reader_p ; @atr = atr
       end
@@ -653,5 +668,7 @@ module Skylab::MetaHell
         end
       end
     end
+
+    Attribute_ = self
   end
 end

@@ -18,11 +18,7 @@ module Skylab::Slake
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
-    Formal_attribute = -> do
-      MH__[]::Formal::Attribute
-    end
-
-    MH__ = sidesys[ :MetaHell ]
+    Fields = sidesys[ :Fields ]
 
     String_IO = -> do
       require 'stringio' ; ::StringIO

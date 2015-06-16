@@ -11,7 +11,7 @@ module Skylab::TestSupport
   #
   # These "sandbox" enhancements here, then, represent a year-ish worth of
   # distillation of such testy things we tended to do, things that were
-  # intented to be more readable than [mh]::{ Klass | Modul }::Creator,
+  # intented to be more readable than [#ba-048] module & class creator
   # but more concise (and de-facto tagged) than writing these kind of things
   # always by hand.
 

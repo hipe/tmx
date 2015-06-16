@@ -4,9 +4,9 @@
 (EDIT: this document is old)
 
 
-## an overview of the field libs in [mh]
+## an overview of the field libs in [here]
 
-1) originally "fun fields" (now [mh] "basic fields", not to be confused with
+1) originally "fun fields" (now [#004] "basic fields", not to be confused with
 [ba] fields) was a non-extensible simple implementation that used a hash
 to map a field's normalized name to its ivar.
 

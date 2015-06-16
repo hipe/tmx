@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module Class
 
-    module Creator
+    module Creator  # (tracked *under* [#048])
 
   # DSL for creating classes, for things like testing metaprogramming,
   # or testing libraries that do extensive reflection on class hierarchies,

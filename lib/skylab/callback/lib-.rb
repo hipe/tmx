@@ -67,8 +67,6 @@ module Skylab::Callback
       Basic[]::List
     end
 
-    MH__ = sidesys[ :MetaHell ]
-
     Module_lib = -> do
       Basic[]::Module
     end

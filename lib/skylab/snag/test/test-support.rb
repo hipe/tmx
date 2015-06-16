@@ -108,7 +108,7 @@ module Skylab::Snag::TestSupport
     end
   end
 
-  module Criteria_Library_Support  # (draws from [mh] parse t.s)
+  module Criteria_Library_Support  # (disciple of [pa] t.s)
 
     def self.[] mod
       mod.include self

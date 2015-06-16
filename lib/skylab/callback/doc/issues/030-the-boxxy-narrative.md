@@ -3,7 +3,7 @@
 ## introduction
 
 this incarnation of boxxy is a rewrite of the legacy boxxy which has been
-removed from the current universe but exists in history as "[mh]/boxxy.rb"
+removed from the current universe but exists in history as "[m-h]/boxxy.rb"
 
 boxxy is an enhancer for modules. it is essentially a collection of methods
 that affect these modules with a set of behaviors each of which falls into

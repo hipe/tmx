@@ -10,7 +10,7 @@ pieces:
     modality. (and still we didn't say whether this means "formal" action
     or actual action (instance)).
 
-  (for an explanation of `formal` vs. `actual` please see [#mh-025].
+  (for an explanation of `formal` vs. `actual` please see [#fi-025].
    familiarity is hereafter assumed.)
 
   `formal parameters` - the parameters we're talking about here are `formal`,

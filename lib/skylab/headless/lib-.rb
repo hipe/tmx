@@ -56,8 +56,6 @@ module Skylab::Headless
       Basic[]::List
     end
 
-    MH__ = sidesys[ :MetaHell ]
-
     Method_lib = -> do
       Basic[]::Method
     end

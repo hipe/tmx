@@ -63,7 +63,7 @@
 [#042]       #done FileUtils as a service (JSON)
 [#041] #open #feature workspace status is furloughed
 [#040]       #done make your own SubClient::InstanceMethods to DRY CLI & API
-[#039]       #done API::Whatever becomes [mh] generic
+[#039]       #done API::Whatever becomes [m-h] generic
 [#038]       #done `text_styler` away!
 [#037]       #feature stdout as an `output_stream`
              ( #was: #done reconceive stdout, stderr -> infostream, paystream, errstream

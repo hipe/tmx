@@ -205,7 +205,7 @@ conceptually into two parts (at least):
     1) defining the formal property
     2) normalizing the actual property against the formal
 
-this pairing of ideas relates exactly to the discussion of [#mh-025] formal
+this pairing of ideas relates exactly to the discussion of [#fi-025] formal
 vs. actual values.
 
 conceptually you can think of the formal property as a formal set of all

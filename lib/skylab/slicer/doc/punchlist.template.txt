@@ -23,9 +23,11 @@ git-viz             q [ ]
 
 # libs
 
+plugin              q [ ]
+fields              q [ ]
+
 face                q [ ]
 headless            q [ ]
-meta-hell           q [ ]
 
 sub-tree            q [ ]
 

@@ -1,15 +1,18 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::Formal::Attribute
+module Skylab::Fields::TestSupport
 
-  describe "[mh] formal attribute" do
+  describe "[fi] attribute" do
 
     extend TS_
+    use :attribute_support
 
     it "creates getter/setters on classes" do
-      klass = one_such_class do
+
+      klass = one_such_class_ do
         attribute :foo
       end
+
       o = klass.new
       o.foo.should eql(nil)
       o.foo = 'bar'
@@ -17,15 +20,18 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute
     end
 
     it "allows reflection of what attribute names have been defined" do
-      klass = one_such_class do
+
+      klass = one_such_class_ do
         attribute :foo
         attribute :bar
       end
-      klass.attributes.get_names.to_set.should eql([:bar, :foo].to_set)
+
+      klass.attributes.a_.should eql [ :foo, :bar ]
     end
 
     context "when dealing with class inheritance" do
-      klass_a = one_such_class do
+
+      klass_a = one_such_class_ do
         attribute :foo
       end
 
@@ -41,14 +47,14 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute
       end
 
       it "inherits the reflection" do
-        klass_b.attributes.get_names.to_set.should eql([:foo, :bar].to_set)
+        klass_b.attributes.a_.should eql [ :foo, :bar ]
       end
     end
 
     context "class inheritance with regards to metaproperties" do
 
       let :klass_a do
-        one_such_class do
+        one_such_class_ do
           meta_attribute :fooish
           attribute :foo, :fooish => true
         end
@@ -71,7 +77,7 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute
 
       it "won't let you make them willy nilly" do
         lambda do
-          one_such_class do
+          one_such_class_ do
             attribute :derp, :herp => :lerp
           end
         end.should raise_error(::RuntimeError, /meta attributes must first be declared: :herp/)
@@ -80,7 +86,7 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute
       context "they get inherited from parent" do
 
         let :klass_a do
-          one_such_class do
+          one_such_class_ do
             meta_attribute :height
             class << self
               public :meta_attribute, :meta_attributes
@@ -96,21 +102,25 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute
         end
 
         it "as here" do
-          klass_b.meta_attributes.get_names.to_set.should eql([:height, :weight].to_set)
+          klass_b.meta_attributes.a_.should eql [ :height, :weight ]
         end
 
         it "but adding things to the parent dynamically won't inherit" do
+
+          same = [ :height, :age, :weight ]
+
           klass_a.meta_attribute :age
-          klass_b.meta_attributes.get_names.to_set.should eql([:height, :weight, :age].to_set)
+          klass_b.meta_attributes.a_.should eql same
           klass_a.meta_attribute :volume
-          klass_b.meta_attributes.get_names.to_set.should eql([:height, :weight, :age].to_set)
+          klass_b.meta_attributes.a_.should eql same
         end
       end
 
       context "you can define hooks" do
 
         it "that are called when you define attributes with those meta attributes" do
-          klass_a = one_such_class do
+
+          klass_a = one_such_class_ do
             meta_attribute :whoopie
             def self.on_whoopie_attribute name, meta
               remove_method name
@@ -144,7 +154,9 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute
       before :all do
 
         module Defining_Module
-          MetaHell_::Formal::Attribute::Definer[ self ]
+
+          A_Subject_Module_::Definer[ self ]
+
           meta_attribute :regex do |name, meta|
             alias_method(after = "#{name}_after_regex=", "#{name}=")
             define_method("#{name}=") do |str|
@@ -162,18 +174,24 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute
         end
 
         class Importing_Class
-          MetaHell_::Formal::Attribute::Definer[ self ]
+
+          A_Subject_Module_::Definer[ self ]
+
           meta_attribute Defining_Module
+
           class << self
             public :meta_attributes
           end
         end
 
         class Child_Class < Importing_Class
+
           def initialize espy
             @emit_spy = espy
           end
+
           attribute :first_name, :regex => /^[A-Z]/
+
           def call_digraph_listeners i, s
             @emit_spy.call_digraph_listeners i, s ; nil
           end
@@ -193,18 +211,21 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute
       end
 
       it "which transfers the same matr object to child (should be ok)" do
+
         _ = importing_class.meta_attributes[ :regex ]
-        _.should be_kind_of MetaHell_::Formal::Attribute::Matr__
+        _.should be_kind_of A_Subject_Module_::MetaAttribute___
         importing_class.meta_attributes[:regex].object_id.should eql(defining_module.meta_attributes[:regex].object_id)
       end
 
       it "also it transfers the attribute definition hook from the module" do
+
         defining_module.should be_respond_to(:on_regex_attribute)
         importing_class.should be_respond_to(:on_regex_attribute)
       end
 
       it "and which will work e.g. from an object of a child class" do
-        o = child_class.new build_and_attach_to_emit_spy
+
+        o = child_class.new __build_and_attach_to_emit_spy
         o.first_name.should be_nil
         o.first_name = "Billford Brimley"
         o.first_name.should eql "Billford Brimley"
@@ -217,7 +238,7 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute
         o.first_name.should eql "Billford Brimley"
       end
 
-      def build_and_attach_to_emit_spy
+      def __build_and_attach_to_emit_spy
 
         es = Callback_.test_support.
           call_digraph_listeners_spy(

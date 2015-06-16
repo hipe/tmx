@@ -4,8 +4,8 @@
 
 the immediate reason that [pl] was created was to be a more focused,
 dedicated sidesystem for the somewhat ancient bundle- and plugin-related
-"leftover scraps" from [mh] as it was dissolved: we wanted to get rid of
-[mh] proper, but some of facilities were still needed by some legacy
+"leftover scraps" from [m-h] as it was dissolved: we wanted to get rid of
+that lib proper, but some of its facilities were still needed by some legacy
 applications.
 
 but when we moved [#024] the "fancy lookup" proc to here, [pl] became an

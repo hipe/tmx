@@ -56,7 +56,7 @@ from it all.
     [po] | WILL SUNSET
 
     [hl] | WILL DISSOLVE
-    [mh] | WILL DISSOLVE
+    [m-h]| WILL DISSOLVE
 
     [br] |     PANTHEON
     [cb] |     PANTHEON

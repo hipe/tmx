@@ -22,7 +22,7 @@ that is a proxy (in its way) back to a struct.
 ## originally
 
 this node was much more complex and did a lot more. during the move from
-[mh] to [cb] we simplified out much of what was here.
+[m-h] to [cb] we simplified out much of what was here.
 
 if ever we needed more than just a few box-like methods we would
 re-architect simple box into its readers and writers and re-establish

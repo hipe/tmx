@@ -269,8 +269,6 @@ module Skylab::TestSupport
 
       Hu___ = parent::Hu___
 
-      MH__ = parent::MH__
-
       Match_test_dir_proc = -> do
         TestSupport_.constant( :TEST_DIR_NAME_A ).method :include?
       end

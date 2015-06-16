@@ -3,7 +3,7 @@ require_relative '..'
 
 module Skylab::Fields
 
-  # (a new file created after dissolution of [mh] - has little history. see [#001])
+  # (a new file created after dissolution of [m-h] - has little history. see [#001])
 
   class << self
 

@@ -76,8 +76,6 @@ module Skylab::TestSupport
       Face__[]::Plugin
     end
 
-    MH___ = sidesys[ :MetaHell ]
-
     Parse_lib = sidesys[ :Parse ]
 
     Pretty_path_proc = -> do
