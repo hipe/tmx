@@ -393,7 +393,7 @@ module Skylab::Git
 
         Entity_ = -> client, _fields_, * field_i_a do
           :fields == _fields_ or raise ::ArgumentError
-          Git_.lib_.basic_fields :client, client,
+          Git_.lib_.fields::Basic.with :client, client,
             :absorber, :initialize,
             :field_i_a, field_i_a
         end

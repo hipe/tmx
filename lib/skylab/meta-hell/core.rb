@@ -5,17 +5,9 @@ module Skylab
 
   module MetaHell  # welcome to meta hell. please read [#041] #storypoint-005
 
-    # (this file is temporary to this phase)
+    # (this file is :+#temporary-to-this-phase.)
 
     class << self
-
-      def function_chain * a
-        if a.length.zero?
-          MetaHell_::Lib__::Function_chain
-        else
-          MetaHell_::Lib__::Function_chain[ a, a.shift ]
-        end
-      end
 
       def import_contants from_mod, i_a, to_mod
         MetaHell_::Lib__::Import_constants[ from_mod, i_a, to_mod ]

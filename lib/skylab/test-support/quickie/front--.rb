@@ -55,15 +55,24 @@ module Skylab::TestSupport
       end
 
       def invoke argv
-        bc = QuicLib_::Function_chain[
+
+        _p = QuicLib_::Function_chain[
+
           -> do
             ready_plugins
-          end, -> do
+          end,
+
+          -> do
             parse_argv argv
-          end, -> sig_a do
+          end,
+
+          -> sig_a do
+
             produce_bound_call_via_sig_a sig_a
           end ]
-        bc and begin
+
+        bc = _p[]
+        if bc
           bc.receiver.send bc.method_name, * bc.args
         end
       end
@@ -143,10 +152,15 @@ module Skylab::TestSupport
       end
 
       def parse_argv argv
-        a = QuicLib_::Function_chain[
+
+        _p = QuicLib_::Function_chain[  # #todo - this thing is .. bad
           -> { collect_signatures argv },
           -> sig_a { check_if_argv_is_completely_parsed sig_a } ]
-        a and [ true, a ]
+
+        _array_of_one_element = _p[]
+        if _array_of_one_element
+          [ true, _array_of_one_element ]
+        end
       end
 
       def collect_signatures argv
@@ -247,9 +261,8 @@ module Skylab::TestSupport
         HL___[]::CLI
       end
 
-
       Function_chain = -> * p_a do
-        MH__[].function_chain[ p_a, nil ]
+        Basic[]::Function.chain p_a
       end
 
       HL___ = parent::HL__

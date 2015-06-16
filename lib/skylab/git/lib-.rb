@@ -25,14 +25,6 @@ module Skylab::Git
 
     Basic = sidesys[ :Basic ]
 
-    Basic_fields = -> * x_a do
-      if x_a.length.zero?
-        MH__[]::Basic_Fields
-      else
-        MH__[]::Basic_Fields.call_via_iambic x_a
-      end
-    end
-
     Box = -> do
       Basic[]::Box
     end
@@ -64,6 +56,8 @@ module Skylab::Git
     end
 
     Face__ = sidesys[ :Face ]
+
+    Fields = sidesys[ :Fields ]
 
     FUC = -> do
       System[].filesystem.file_utils_controller

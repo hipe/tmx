@@ -1,9 +1,24 @@
-# discussion of all the meta-property libraries :[#053]
+# discussion of all the meta-property libraries :[#001]
 
 ## introduction
 
 this is the world of :#parameter-library's, "field libraries", actors
 and entites.
+
+
+
+
+## introduction to the [fi] sidesystem
+
+this sidesystem was created long after all the below facilities were
+created; *only* as an intermediate step to help gather many of them into
+one place ("pre-unification"), towards the effort of full unification.
+that is, just because [fi] is relatively modern in terms of when it was
+created as a sidesystem, this does *not* mean it contains the latest and
+greatest property modeling facilities. in fact, the opposite is true:
+at writing, [br] is that place, and subject has all the ancient stuff.
+
+
 
 
 ## a cursory overview
@@ -24,13 +39,13 @@ first, a quick history (most recent at top):
 
     [#br-058] Fields_ DSL --> "contoured fields" --> [br]     2013-07-18
 
-    [#mh-061] basic fields                                    2013-07-05
+       [#004] basic fields                                    2013-07-05
 
     [#ba-003] the basic field                                 2013-04-11
 
     [#hl-009] the headless parameter                          2012-08-29
 
-    [#mh-024] the metahell formal attributes                  2011-09-11
+       [#002] the metahell formal attributes                  2011-09-11
 
 
 annotation (most recent at top, start at bottom for a narrative):
@@ -41,7 +56,7 @@ annotation (most recent at top, start at bottom for a narrative):
   • then, during the "headless earthquake" of late 2013.. (well, read below)
   • then there was the basic "field" [#ba-003]
   • then there was the headless "parameter" [#hl-009]
-  • first, there was the metahell "formal attributes" [#024]
+  • first, there was the metahell "formal attributes" [#002]
 
 
 
@@ -85,7 +100,7 @@ hooks?          |             no way    | you can write some | an overwrought
 ## a detailed shootout
 
 
-entity name          | [#mh-024] |
+entity name          | [#002]    |
 has mprops?          | yes       |
 avoids native hashes | no        |
 uses iambics in DSL  | no        |

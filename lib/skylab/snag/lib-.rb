@@ -34,14 +34,6 @@ module Skylab::Snag
 
     Basic = sidesys[ :Basic ]
 
-    Basic_fields = -> * x_a do
-      if x_a.length.zero?
-        MH__[]::Basic_Fields
-      else
-        MH__[]::Basic_Fields.call_via_iambic x_a
-      end
-    end
-
     Brazen = sidesys[ :Brazen ]
 
     CLI_legacy_DSL = -> mod do

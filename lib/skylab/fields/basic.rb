@@ -1,6 +1,6 @@
-module Skylab::MetaHell
+module Skylab::Fields
 
-  module Basic_Fields  # [#061].
+  module Basic  # :[#004]. :+#deprecated for methodic?
 
     # the basic fields facility out of the box is a low-frills, low-level
     # means of defining "absorber" methods (frequently but not always
@@ -9,8 +9,10 @@ module Skylab::MetaHell
     #
     # enhance your class using the iambic DSL:
     #
+    #     self._REDO_ALL  # from tests
+    #
     #     class Foo
-    #       MetaHell_::Basic_Fields.with :client, self,
+    #       M_etaHell_::Basic_Fields.with :client, self,
     #         :globbing, :absorber, :initialize,
     #         :field_i_a, [ :ding, :bat ]
     #     end
@@ -40,13 +42,16 @@ module Skylab::MetaHell
     #
     #     Foo.new( :ding, :x, :bat, :y, :bazzle, :z )  # => KeyError: key not found: :bazzle
 
-    def self.with * x_a
-      Shell__.new( x_a ).execute
-    end
 
-    def self.call_via_iambic x_a
-      Shell__.new( x_a ).execute
-    end
+    class << self
+      def with * x_a
+        Shell__.new( x_a ).execute
+      end
+
+      def call_via_iambic x_a
+        Shell__.new( x_a ).execute
+      end
+    end  # >>
 
     class Shell__
       def initialize x_a=nil
@@ -84,7 +89,7 @@ module Skylab::MetaHell
         @client.const_set :BASIC_FIELDS_H_,
           ::Hash[ @field_i_a.map { |i| [ i, :"@#{ i }" ] } ].freeze
         @is_struct_like and
-          Define_struct_like_methods__[ @client, @field_i_a ]
+          Define_struct_like_methods___[ @client, @field_i_a ]
         @absorber_a and @absorber_a.each do |absorber|
           absorber.execute_on_client @client
         end ; nil
@@ -118,7 +123,7 @@ module Skylab::MetaHell
         ( @absorber_a ||= [] ).push abs ; nil
       end
       def active_absorber
-        @absorber ||= Absorber__.new
+        @absorber ||= Absorber___.new
       end
       def parse_struct_like
         @absorber and raise bld_interrupted_absorber_exception
@@ -133,7 +138,7 @@ module Skylab::MetaHell
       end
     end
 
-    class Absorber__
+    class Absorber___
       def initialize
         @is_globbing = @is_passive = @is_supering = nil
       end
@@ -171,7 +176,8 @@ module Skylab::MetaHell
               break
             end
           end
-          Nil_out_the_rest__[ ivar_h, instance, used_i_a ] ; nil
+          Nil_out_the_rest___[ ivar_h, instance, used_i_a ]
+          NIL_
         end
       end
     end
@@ -179,7 +185,7 @@ module Skylab::MetaHell
     # when you use the "struct like" "macro",
     #
     #     class Bar
-    #       MetaHell_::Basic_Fields.with :client, self, :struct_like,
+    #       M_etaHell_::Basic_Fields.with :client, self, :struct_like,
     #         :globbing, :absorber, :initialize,
     #         :field_i_a, [ :fiz, :faz ]
     #     end
@@ -203,7 +209,7 @@ module Skylab::MetaHell
     #     Bar[ :fiz, :hoo, :faz, :harf ].fiz  # => :hoo
     #
 
-    Define_struct_like_methods__ = -> mod, field_i_a do
+    Define_struct_like_methods___ = -> mod, field_i_a do
       field_i_a.freeze  # we take what is not ours
       mod.class_exec do
         const_set :BASIC_FIELD_A_, field_i_a
@@ -215,7 +221,7 @@ module Skylab::MetaHell
       end ; nil
     end
 
-    Nil_out_the_rest__ = -> ivar_h, obj, i_a do
+    Nil_out_the_rest___ = -> ivar_h, obj, i_a do
       obj.instance_exec do
         ( ivar_h.keys - i_a ).each do |ii|
           ivar = ivar_h.fetch ii
@@ -223,21 +229,5 @@ module Skylab::MetaHell
         end
       end
     end
-
-    def self.iambic_detect
-      Iambic_detect__
-    end
-
-    Iambic_detect__ = -> i, a do
-      ( 0 ... ( a.length / 2 )).reduce 0 do |_, idx|
-        i == a[ idx * 2 ] and break a[ idx * 2 + 1 ]
-      end
-    end
-
-    # `iambic_detect` is a hack to peek into an iambic array
-    #
-    #     a = [ :one, 'two', :three, 'four' ]
-    #     MetaHell_::Basic_Fields.iambic_detect[ :three, a ]  # => 'four'
-
   end
 end

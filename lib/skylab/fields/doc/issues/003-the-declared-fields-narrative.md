@@ -1,21 +1,7 @@
-# the metahell fields narrative
+# the declared fields narrative :[#003]
 
 
-
-## original introduction for posterity
-
-this is now the center of metahell. these are the tools of metahell.
-an extension node - know its implications [#046]. lots of touchers [#048]
-abstracted from siblings, whence comes its coverage
-
-
-
-## introduction to the new editon
-
-at the time of this writing there are at least three field-like
-implementations in [mh] alone, of which only one of them is reflected in
-the [#053] "comprehensive"/historical list.
-
+(EDIT: this document is old)
 
 
 ## an overview of the field libs in [mh]
@@ -42,6 +28,7 @@ on-demadn. this may have been the first field-like DSL with a syntax.
 
 what is significant is that nodes 2 & 3 share an underlying "field box"
 implementation.
+
 
 
 

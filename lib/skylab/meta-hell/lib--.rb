@@ -2,7 +2,7 @@ module Skylab::MetaHell
 
   module Lib__
 
-    # (this file is temporary to the top phase it was created under)
+    # (this file is :+#temporary-to-this-phase.)
 
     Say_not_found_ = -> d, a, k do
 
