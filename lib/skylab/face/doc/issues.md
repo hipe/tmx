@@ -6,8 +6,6 @@
 [#056]       #parent-node:[#todo] the CLI client narrative ..
 [#055]       #SUNSETTED #parent-node:[#007] the API client narrative ..
 [#054] #hole ( removed plugin library. thew whole facility sunsetted.)
-             ( #was: #parent-node: [#hl-070] the first plugin library (#broadened-from:
-               [#hl-077] #API-point track how `initialize` looks in #plugins) )
 [#053]       #tracking-tag #the-caculate-pattern
 [#052]       #moved-to: [#br-093]
              ( #was: #doc-point what is the deal with expression agents? )

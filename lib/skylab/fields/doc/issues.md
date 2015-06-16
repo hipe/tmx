@@ -1,4 +1,5 @@
 [#025]       #parent-node: [#002] "formal vs. actual attributes.."
+[#008]       #in-situ [ the absorber method maker ]
 [#006]       for retrospective ..
 [#005]       [ from ]
 [#004]       [ basic fields ]

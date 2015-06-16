@@ -4,8 +4,6 @@ module Skylab::TestSupport
 
     class Plugins__::Load_The_Test_Files < Plugin_
 
-      # ( was: [#hl-070-002] something about names )
-
       can :flush_the_test_files do | tr |
 
         tr.if_transition_is_effected do | o |

@@ -165,7 +165,7 @@ module Skylab::Snag
 
       Parse_static_sequence_ = -> in_st, s_a, & oes_p do
 
-        # ~ :+#abstraction-candidate [#pl-004]
+        # ~ :+#abstraction-candidate :[#pa-008].
 
         d = in_st.current_index
         d_ = 0

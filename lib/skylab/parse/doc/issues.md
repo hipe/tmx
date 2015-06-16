@@ -1,3 +1,5 @@
+[#009]       #api-point constant trouble's fields are immutable (ergo dupable)
+[#008]       tracking "parse static sequence" as abstraction candidate
 [#007]       legacy parsing terms defined
 [#006]       [ the item grammar ]
 [#001]       the top narrative ..

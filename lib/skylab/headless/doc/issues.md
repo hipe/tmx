@@ -121,15 +121,15 @@
 [#080]       #doc-point `facet`s are like IoC/dependency injection #plugins ..
 [#079]       (#moved-to [#bs-029.G])
 [#078]       #doc-point shells, stories and kernels
-[#077]       #doc-point the plugin narrative ..
+[#077] #hole ( #is [#pl-004] )
 [#076]       #parent:070 #future-feature enable/disable a particular plugin
              (don't start on this until we actually need it)
 [#075] #open ingest as method (plugin)
-[#074]       #doc-point #parent:[#070] whether or not `[]` is special
+[#074] #hole
 [#073]       #doc-point extrinsic / intrinsic ..
 [#072]       #tracking-tag #parent:070 chained proxy hosts, chaining in gen.
 [#071] #open the possibility of stateless #plugin hosts
-[#070]       #plugins! the plugin libraries narrative ..
+[#070] #hole ( #is [#pl-001] )
 [#069]       #doc-point (sorry to jump ahead) "ouroboros"
 [#068] #hole ( #was: track this redundancy during a hack )
 [#067]       #node-tracker "client-services" #in-situ

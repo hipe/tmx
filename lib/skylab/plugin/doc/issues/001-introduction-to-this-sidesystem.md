@@ -1,4 +1,33 @@
-# the plugin libraries narrative :[#070]
+# introduction to this sidesystem :[#001]
+
+## meta-introduction
+
+the immediate reason that [pl] was created was to be a more focused,
+dedicated sidesystem for the somewhat ancient bundle- and plugin-related
+"leftover scraps" from [m-h] as it was dissolved: we wanted to get rid of
+that lib proper, but some of its facilities were still needed by some legacy
+applications.
+
+but when we moved [#024] the "fancy lookup" proc to here, [pl] became an
+essential member of The Pantheon of skylab support libraries.  as such,
+the subject has become *the* home for all plugin-like solutions.
+
+
+
+
+## where are the tests?
+
+the old bundle facilities were frequently either abstracted out of
+working applications with their own test coverage, *or* were implemented to
+help implement tests themselves. so sadly, as this became its own formal
+thing, it did not have its own formal tests that travelled with it.
+
+
+
+
+
+------------------------------
+# comparison of the legacy solutions (historic)
 
 ## the scope and purpose of this document is..
 
@@ -9,6 +38,8 @@ injection framework") in the skylab universe past, present and future.
 the purpose of this document is *not* to give comprehensive documentation for
 each such library, but where other documenation exists this document will
 serve as a hub of references to those documents.
+
+
 
 
 ## the structure of this document
@@ -33,25 +64,27 @@ document.
 
 ## a justification for the utility of dependency injection frameworks..
 
-is outside the scope of this document ^_^ #yolo ¯\_(ツ)_/¯
+is outside the scope of this document `^_^ #yolo ¯\_(ツ)_/¯`
 
 
 
 ## a one-line summary of each item
 
- 7. [ts] digraph-powered simplification of belowFeb.,  2015
- 6. [hl] import [gv]'s custom facility (best)   Jan.,  2014
- 5. [ts] quickie rolls a custom solution        June,  2013
- 4. [fa] the forgettable 'Services_'            June,  2013
- 3. [fa] Plugin abstracted out of test/all      April, 2013
- 2. [tr] "adapter" (plugin) facility            June,  2012
- 1. [as] an "assesss" take on plugins           March, 2010
+ 7. [pl] digraph-powered simplification of below Feb.,  2015  active
+ 6. [  ] import [gv]'s custom facility           Jan.,  2014  sunsetted
+ 5. [ts] quickie rolls a custom solution         June,  2013  active (custom)
+ 4. [fa] the forgettable `Services_`             June,  2013  sunsetting
+ 3. [  ] Plugin abstracted out of test/all       April, 2013  sunsetted
+ 2. [tr] "adapter" (plugin) facility             June,  2012  paved
+ 1. [as] an "assesss" take on plugins            March, 2010  antique
 
 
 
 ## library 7 of N: digraph-powered simplification of predecessor
 
-this is a synopsis of what is at [#hl-077]:
+
+
+this is a synopsis of what is at [#004]:
 
   • no more shell/kernel pattern. there is just one plugin dispatcher
     class, one plugin base class, and tons of little ancillary classes.
@@ -96,9 +129,14 @@ following reasons:
 
 ## library 5 of N: [ts] Quickie rolls a reasonable custom solution.
 
+for quickie to have its own custom solution makes like easier because
+we can use the quickie in the same distribution as the plugin lib
+(or whichever) we are developing without breaking quickie.
+
 although it's not as minimal and powerful as our latest effort, this stab
 at plugins is easiliy comprehendable; and by this point it's clear that 90%
 of what we are doing "now" was established by this point.
+
 
 
 
@@ -115,13 +153,10 @@ out-of-date style and is being considered now as only a historical artifact.
 
 originally abstracted out of the toplevel test-runner in mid-April of 2013,
 this was the first time that we really considered this as a valuable thing
-to have in its own right. if we can settle the dust eventually, this is the
-likely home for any kind of silver-bullet solution; but we are currently
-considering leaving our separate solutions separate and just letting them
-cross-pollinate. or maybe not.
+to have in its own right.
 
-regadless, this library is used by at least four other subsystems so it
-won't be going anywhere any time soon.
+it was at one point used by at least four other subsystems. it helped
+cross-polinate its descendants; and was then sunsetted.
 
 
 

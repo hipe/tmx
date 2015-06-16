@@ -38,7 +38,8 @@
 [#030]       #done things to integrate old boxxy/a.l with new a.l
 [#029]       #parent-node:[#024] const reduce ..
 [#028]       #done during:regret-integration-with-new-autoloader
-[#027]       #done things that exist to comport with old a.l (or fwd with new)
+[#027]       #track effected by platform `constants` order is non-deterministic
+             #done things that exist to comport with old a.l (or fwd with new)
 [#026]       #doc-point the F-UN narrative ..
 [#025] #open #wishlist: an event duper that lets you add new properties
              ( was: isomorphic event factory is deprecated .. )

@@ -79,7 +79,7 @@
 [#045]       [ expect section ]
              ( #was: #done graph has an action so maybe we don't need to pass it everywhere )
 [#044]       #parent-node: [#001] the meta-properties justification ..
-[#043] #hole ( #moved-to: [#pl-024] )
+[#043] #hole ( #moved-to: [#pa-008] was tracking abstraction cand. )
              ( #was: the fancy bundle lookup exegesis .. )
              ( #was: #tracking-tag loading hacks )
 [#042] #open here is the plan with this one: this BS being done here

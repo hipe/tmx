@@ -1,14 +1,14 @@
 module Skylab
 
-  module Headless
+  module Plugin
 
-    class Plugin
+    class Digraphic
 
-      When_ = ::Module.new
+      Events_ = ::Module.new
 
       _Ev = Callback_::Event
 
-      When_::Ambiguous_Next_Step = _Ev.prototype_with :ambiguous_next_step,
+      Events_::Ambiguous_Next_Step = _Ev.prototype_with :ambiguous_next_step,
 
           :steps, nil, :plugin_a, nil, :digraph, nil do | y, o |
 
@@ -24,7 +24,7 @@ module Skylab
 
       end
 
-      When_::Unused_Actuals = _Ev.prototype_with :unused_actuals,
+      Events_::Unused_Actuals = _Ev.prototype_with :unused_actuals,
 
           :box, nil, :steps, nil, :plugins, nil do | y, o |
 
@@ -77,7 +77,7 @@ module Skylab
         end while nil
       end
 
-      class When_::Express_Help < Callback_::Event
+      class Events_::Express_Help < Callback_::Event
 
         class << self
           public :new
@@ -212,9 +212,11 @@ module Skylab
               __write_to_matrix_formal_group_under fo_a
             end
 
-            Headless_.lib_.other_CLI_table(
+            Plugin_.lib_.IN_MOTION_table_actor(
 
-              :left, '  ', :right, EMPTY_S_, :sep, '  ',
+              :left, '  ',
+              :right, EMPTY_S_,
+              :sep, '  ',
               :field, :right,
               :field, :left,
               :header, :none,

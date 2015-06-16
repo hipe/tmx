@@ -6,7 +6,7 @@ module Skylab::Brazen
 
     # ->
 
-      class Actors_::Define_process_method  # rewrite of [#pl-060]
+      class Actors_::Define_process_method  # rewrite of [#fi-008]
 
         Callback_::Actor.methodic self, :properties, :sess
 

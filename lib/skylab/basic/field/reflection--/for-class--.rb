@@ -43,7 +43,7 @@ module Skylab::Basic
       end
 
       def get_fields  # #base-version - will be called by children
-        _get_fields dsl_fields.dup  # ok because of #api-point [#pl-032]
+        _get_fields dsl_fields.dup  # ok because of #api-point [#pa-009]
       end
 
       module Child_Class_Overwrite_

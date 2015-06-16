@@ -30,13 +30,9 @@ module Skylab::TestSupport
 
       Face__ = sidesys[ :Face ]
 
-      Hu___  = sidesys[ :Human ]
+      Human  = sidesys[ :Human ]
 
       HL__ = sidesys[ :Headless ]
-
-      NLP = -> do
-        Hu___[]::NLP
-      end
 
       Open3 = -> do
         require 'open3'
@@ -48,58 +44,19 @@ module Skylab::TestSupport
         ::OptionParser
       end
 
+      Plugin___ = sidesys[ :Plugin ]
+
       System = -> do
         System_lib__[].services
       end
 
       System_lib__ = sidesys[ :System ]
 
-      if false
-
-
-    Basic_Mutex = -> do
-      Bsc__[]::Mutex
-    end
-
-    Basic_Tree = -> do
-      Bsc__[]::Tree
-    end
-
-
-    EN_calculate = -> & p do
-      HL__[].expression_agent.NLP_EN_agent.calculate( & p )
-    end
-
-
-
-    Heavy_plugin = -> do
-      Face__[]::Plugin
-    end
-
-    Parse_lib = sidesys[ :Parse ]
-
-    Pretty_path_proc = -> do
-      HL__[].system.filesystem.path_tools.pretty_path
-    end
-
-    Reparenthesize = -> p, msg do
-      Face__[]::CLI.reparenthesize[ p, msg ]
-    end
-
-    Set = stdlib[ :Set ]
-
-    Spec_rb = -> do
-      TestSupport__[].spec_rb
-    end
-
-    TestSupport__ = sidesys[ :TestSupport ]
-
-      end
     end  # Lib_
 
     # ~
 
-    Plugin_ = Lib_::HL__[]::Plugin
+    Plugin_ = Lib_::Plugin___[]::Digraphic
 
     class Plugins__::Express_Help < Plugin_
 

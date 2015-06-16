@@ -273,7 +273,7 @@ module Skylab::Fields
       end
     end
 
-    class Absorber_Method_ < Method_Characteristics__  # :[#pl-060].
+    class Absorber_Method_ < Method_Characteristics__  # :[#008].
 
       def self.unobtrusive_passive_scan d, i_a
         if METHOD_OP_H__.key? i_a.fetch d

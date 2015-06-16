@@ -294,18 +294,18 @@ module Skylab
 
       def sp_ * x_a
         x_a.push :syntactic_category, :sentence_phrase
-        _fr = Tree_Runner_::Lib_::NLP[]::EN.expression_frame_via_iambic x_a
+        _fr = Tree_Runner_::Lib_::Human[]::NLP::EN.expression_frame_via_iambic x_a
         _fr.express_into ""
       end
 
       def and_ s_a
-        self._WHERE
+        # #covered-by: in tree runner, list files and do counts
         Callback_::Oxford_and[ s_a ]
       end
 
       def both x
-        self._WHERE
-        Tree_Runner_::Lib_::NLP[]::EN.both x
+        # #covered-by: same as above
+        Tree_Runner_::Lib_::Human[]::NLP::EN.both x
       end
 
       def indefinite_noun s
@@ -323,7 +323,7 @@ module Skylab
 
       def s * x_a
         self._WHERE
-        Tree_Runner_::Lib_::NLP[]::EN::s( * x_a )
+        Tree_Runner_::Lib_::Human[]::NLP::EN::s( * x_a )
       end
 
       def third_person s
@@ -339,7 +339,7 @@ module Skylab
       end
 
       def _NLP_agent
-        Tree_Runner_::Lib_::NLP[]::EN::POS
+        Tree_Runner_::Lib_::Human[]::NLP::EN::POS
       end
     end
 

@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module Tree
 
-    class Sessions_::Merge  # towards [#040], part of :+[#pl-014] diaspora
+    class Sessions_::Merge  # towards [#040]
 
       class << self
 

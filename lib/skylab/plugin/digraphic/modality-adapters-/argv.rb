@@ -1,8 +1,135 @@
-module Skylab::Headless
+module Skylab::Plugin
 
-  class Plugin  # [#077] (top half)
+  class Digraphic
 
-    module ARGV__
+    Modality_Adapters_ = ::Module.new
+
+    module Modality_Adapters_::ARGV
+
+      class Monitor
+
+        def initialize occurrence_a
+
+          @_long_to_short_long_combo = {}
+          @occurrence_a = occurrence_a
+          @_short_long_combo_a = []
+          @_short_long_combo_occurrence_a = []
+          @_short_long_combo_occurrence_h = {}
+          @_short_to_short_long_combo = {}
+        end
+
+        def accept & yld_p
+          @_short_long_combo_a.each( & yld_p )
+          NIL_
+        end
+
+        def register_occurrence occu
+
+          # group all occurrences of all formals in all plugins by their
+          # short-long combination ensuring there are no conflicts.
+
+          formal = occu.formal
+
+          short_a = formal.short_id_s_a
+          long = formal.long_id_s
+
+          if short_a
+            __note_any_short_long_combos_that_have_these_shorts short_a
+          end
+
+          if long
+            __note_any_short_long_combos_that_has_this_long long
+          end
+
+          case 1 <=> @_short_long_combo_occurrence_a.length
+          when  1
+            __this_is_a_new_short_long_combo_never_seen_before occu
+          when 0
+            __maybe_add_this_occurrence_to_the_short_long_combo occu
+          else
+            self.__TODO_never_OK_this_occurrence_matches_several_existing_SLCs
+          end
+
+          @_short_long_combo_occurrence_a.clear
+          @_short_long_combo_occurrence_h.clear
+
+          NIL_
+        end
+
+        def __note_any_short_long_combos_that_have_these_shorts s_a
+
+          h = @_short_to_short_long_combo
+
+          s_a.each do | short |
+
+            idx = h[ short ]
+            if idx && ! @_short_long_combo_occurrence_h[ idx ]
+              @_short_long_combo_occurrence_a.push idx
+              @_short_long_combo_occurrence_h[ idx ] = true
+            end
+          end
+
+          nil
+        end
+
+        def __note_any_short_long_combos_that_has_this_long long
+
+          idx = @_long_to_short_long_combo[ long ]
+
+          if idx && ! @_short_long_combo_occurrence_h[ idx ]
+            @_short_long_combo_occurrence_a.push idx
+            @_short_long_combo_occurrence_h[ idx ] = true
+          end
+
+          nil
+        end
+
+        def __this_is_a_new_short_long_combo_never_seen_before occu
+
+          formal = occu.formal
+          shorts = formal.short_id_s_a
+          long = formal.long_id_s
+
+          my_index = @_short_long_combo_a.length
+
+          slc = Short_Long_Combo___.new(
+            my_index, shorts, long, [ occu.occurrence_index ] )
+
+          if shorts
+            shorts.each do | short_s |
+              @_short_to_short_long_combo[ short_s ] = my_index
+            end
+          end
+
+          if long
+            @_long_to_short_long_combo[ long ] = my_index
+          end
+
+          @_short_long_combo_a[ my_index ] = slc
+
+          NIL_
+        end
+
+        Short_Long_Combo___ = ::Struct.new(
+          :SLC_index, :shorts, :long, :occurrences )
+
+        def __maybe_add_this_occurrence_to_the_short_long_combo occu
+
+          # assume exactly one existing short long combo is on deck
+
+          slc = @_short_long_combo_a.fetch @_short_long_combo_occurrence_a.fetch 0
+
+          diff = occu.formal.build_LR_difference_against(
+            @occurrence_a.fetch( slc.occurrences.fetch 0 ).formal )
+
+          if diff
+            self.__TODO_when_incompatible_differences diff
+          else
+            slc.occurrences.push occu.occurrence_index
+          end
+          nil
+        end
+      end
 
       class Formal
 
@@ -241,9 +368,9 @@ module Skylab::Headless
 
         def __init_canary_option_parser
 
-          op = Headless_::Library_::OptionParser.new
+          op = Plugin_.lib_.stdlib_option_parser.new
 
-          @indexes.each_short_long_combo do | slc |
+          @indexes.accept do | slc |
 
             formal = @occurrence_a.fetch( slc.occurrences.fetch( 0 ) ).formal
 
@@ -308,7 +435,7 @@ module Skylab::Headless
             @digraph.source_state_of_transition occu.transition_symbol
           ) do | k |
             h[ k ] = []
-          end.push( Plugin_::Dispatcher::Step.
+          end.push( Me_::Dispatcher::Step.
             new( occu.transition_symbol, occu.plugin_idx ) )
 
           NIL_
@@ -337,7 +464,7 @@ module Skylab::Headless
 
         def __via_normal_input_resolve_steps
 
-          @step_a = Plugin_::Dispatcher::Find_plan.new(
+          @step_a = Me_::Dispatcher::Find_plan.new(
             @actuals_known, @traversals, @state_machine, @indexes,
             & @on_event_selectively ).execute
 

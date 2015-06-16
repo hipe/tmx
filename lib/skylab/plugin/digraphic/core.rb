@@ -1,6 +1,6 @@
-module Skylab::Headless
+module Skylab::Plugin
 
-  class Plugin  # [#077] (top half)
+  class Digraphic  # see [#004]
 
     class Dispatcher
 
@@ -14,11 +14,8 @@ module Skylab::Headless
         # ~ for indexing plugins:
 
         @all_capabilities = {}
-        @long_to_short_long_combo = {}
-        @short_long_combo_a = []
-        @short_long_combo_occurrence_a = []
-        @short_long_combo_occurrence_h = {}
-        @short_to_short_long_combo = {}
+
+        @_monitor = Me_::Modality_Adapters_::ARGV::Monitor.new( @occurrence_a )
       end
 
       def state_machine * tuples
@@ -124,129 +121,38 @@ module Skylab::Headless
         @state_machine.digraph
       end
 
-      def each_short_long_combo & yld_p
-        @short_long_combo_a.each( & yld_p ) ; nil
+      def accept & yld_p
+        @_monitor.accept( & yld_p )
+        NIL_
       end
 
       # ~ )
 
       def _register_occurrence formal, tr_i, pu_d, is_catalyst=nil
 
-        # group all occurrences of all formals in all plugins by their
-        # short-long combination ensuring there are no conflicts.
+        # group all occurrences of all formals in all plugins by
+        # however the monitor wants to group them..
 
         occu_idx = @occurrence_a.length
         occu = Occurrence__.new occu_idx, formal, pu_d, tr_i, is_catalyst
 
-        short_a = formal.short_id_s_a
-        long = formal.long_id_s
-
-        if short_a
-          __note_any_short_long_combos_that_have_these_shorts short_a
-        end
-
-        if long
-          __note_any_short_long_combos_that_has_this_long long
-        end
-
-        case 1 <=> @short_long_combo_occurrence_a.length
-        when  1
-          __this_is_a_new_short_long_combo_never_seen_before occu
-        when 0
-          __maybe_add_this_occurrence_to_the_short_long_combo occu
-        else
-          self.__TODO_never_OK_this_occurrence_matches_several_existing_SLCs
-        end
-
-        @short_long_combo_occurrence_a.clear
-        @short_long_combo_occurrence_h.clear
+        @_monitor.register_occurrence occu
 
         @occurrence_a[ occu_idx ] = occu
-        nil
+
+        NIL_
       end
 
       Occurrence__ = ::Struct.new :occurrence_index, :formal, :plugin_idx,
         :transition_symbol, :is_catalyst
 
-      def __note_any_short_long_combos_that_have_these_shorts s_a
-
-        h = @short_to_short_long_combo
-
-        s_a.each do | short |
-
-          idx = h[ short ]
-          if idx && ! @short_long_combo_occurrence_h[ idx ]
-            @short_long_combo_occurrence_a.push idx
-            @short_long_combo_occurrence_h[ idx ] = true
-          end
-        end
-
-        nil
-      end
-
-      def __note_any_short_long_combos_that_has_this_long long
-
-        idx = @long_to_short_long_combo[ long ]
-
-        if idx && ! @short_long_combo_occurrence_h[ idx ]
-          @short_long_combo_occurrence_a.push idx
-          @short_long_combo_occurrence_h[ idx ] = true
-        end
-
-        nil
-      end
-
-      def __this_is_a_new_short_long_combo_never_seen_before occu
-
-        formal = occu.formal
-        shorts = formal.short_id_s_a
-        long = formal.long_id_s
-
-        my_index = @short_long_combo_a.length
-
-        slc = Short_Long_Combo___.new(
-          my_index, shorts, long, [ occu.occurrence_index ] )
-
-        if shorts
-          shorts.each do | short_s |
-            @short_to_short_long_combo[ short_s ] = my_index
-          end
-        end
-
-        if long
-          @long_to_short_long_combo[ long ] = my_index
-        end
-
-        @short_long_combo_a[ my_index ] = slc
-
-        nil
-      end
-
-      Short_Long_Combo___ = ::Struct.new(
-        :SLC_index, :shorts, :long, :occurrences )
-
-      def __maybe_add_this_occurrence_to_the_short_long_combo occu
-
-        # assume exactly one existing short long combo is on deck
-
-        slc = @short_long_combo_a.fetch @short_long_combo_occurrence_a.fetch 0
-
-        diff = occu.formal.build_LR_difference_against(
-          @occurrence_a.fetch( slc.occurrences.fetch 0 ).formal )
-
-        if diff
-          self.__TODO_when_incompatible_differences diff
-        else
-          slc.occurrences.push occu.occurrence_index
-        end
-        nil
-      end
-
       def bound_call_via_ARGV input_x
 
-        Plugin_::ARGV__::Produce_bound_call.new(
+        Me_::Modality_Adapters_::ARGV::Produce_bound_call.new(
 
-          input_x, @state_machine, self, & @on_event_selectively ).execute
+          input_x, @state_machine, self, & @on_event_selectively
+
+        ).execute
       end
 
       # ~ dispatcher ancillaries
@@ -404,7 +310,7 @@ module Skylab::Headless
         def __when_ambiguous a
 
           @on_event_selectively.call :error, :event, :ambiguous_next_step do
-            Plugin_::When_::Ambiguous_Next_Step.new_with(
+            Me_::Events_::Ambiguous_Next_Step.new_with(
               :steps, a, :plugin_a, @plugin_a, :digraph, @state_machine.digraph )
           end
           nil
@@ -496,7 +402,7 @@ module Skylab::Headless
 
           if bx
             @on_event_selectively.call :error, :event, :unused_actuals do
-              Plugin_::When_::Unused_Actuals.new_with(
+              Me_::Events_::Unused_Actuals.new_with(
                 :box, bx, :steps, @step_a, :plugins, @plugin_a )
             end
             UNABLE_
@@ -515,7 +421,7 @@ module Skylab::Headless
     class << self
 
       def express_help_into rsc, & oes_p
-        Plugin_::When_::Express_Help.new( rsc, & oes_p ).execute
+        Me_::Events_::Express_Help.new( rsc, & oes_p ).execute
       end
     end  # >>
 
@@ -643,7 +549,7 @@ module Skylab::Headless
       end
 
       def on * a, & any_p
-        @op_o_p[ Plugin_::ARGV__::Formal.new a,
+        @op_o_p[ Me_::Modality_Adapters_::ARGV::Formal.new a,
           [ ( @d += 1 ), * @id_prefix_x ],
           & any_p ]
         nil
@@ -697,8 +603,6 @@ module Skylab::Headless
       self.class._cap_a
     end
 
-    Plugin_ = self
-
     class Mutable___ < self
 
       class << self
@@ -715,5 +619,7 @@ module Skylab::Headless
 
       attr_reader :reactions, :name
     end
+
+    Me_ = self
   end
 end

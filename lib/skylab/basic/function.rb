@@ -108,7 +108,7 @@ module Skylab::Basic
         end
 
         if 2 > x_a.length
-          x_a.fetch 0
+          x_a[ 0 ]  # not fetch
         else
           x_a
         end
