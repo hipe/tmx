@@ -2,6 +2,4 @@
 
 require_relative '../lib/skylab/slicer/core'
 
-::Skylab::Slicer::CLI::Client.
-  new( * ::Skylab::Face::FUN.three_streams[] ).
-    invoke ::ARGV
+Skylab::Slicer::CLI::Client.new( $stdin, $stdout, $stderr ).invoke ARGV

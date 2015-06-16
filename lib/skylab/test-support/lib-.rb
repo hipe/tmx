@@ -73,14 +73,6 @@ module Skylab::TestSupport
       Brazen[]::Property::Stack.common_frame.call_via_arglist a
     end
 
-    Funcy_globful = -> mod do
-      MH__[].funcy_globful mod
-    end
-
-    Funcy_globless = -> mod do
-      MH__[].funcy_globless mod
-    end
-
     Face__ = sidesys[ :Face ]
 
     HL__ = sidesys[ :Headless ]

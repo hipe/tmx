@@ -425,7 +425,7 @@ module Skylab::Git
 
         class Actions::Evenulate < Branch_Mungulator_
 
-          Git_.lib_.funcy_globless self
+          Git_.lib_.basic::Function.globless_actor self
 
           Entity_[ self, :fields, :branches, :outstream, :snitch ]
 
@@ -453,7 +453,7 @@ module Skylab::Git
 
         class Actions::Spread < Branch_Mungulator_
 
-          Git_.lib_.funcy_globless self
+          Git_.lib_.basic::Function.globless_actor self
 
           Entity_[ self, :fields, :branches, :move_request_a,
             :outstream, :snitch ]

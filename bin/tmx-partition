@@ -1,0 +1,370 @@
+#!/usr/bin/env ruby -w
+
+# class Skylab::Some_App
+#   model Models_::Some_Model
+#    class Sessions_::This_File
+
+    class Skylab__Some_App_Some_Model__Partition____
+
+      def initialize i, o, e, a, pn
+
+        @argv = a
+        @program_name = ::File.basename pn
+        @serr = e
+        @sin = i
+        @sout = o
+      end
+
+      def execute
+
+        require_relative '../lib/skylab/callback/core'
+        Me_.const_set :Callback_, ::Skylab::Callback  # etc
+
+        _ok = __parse_argv
+        _ok && __work
+      end
+
+      # ~ phase 1 - parsing ARGV
+
+      def __parse_argv
+        _ok = __parse_opts
+        _ok && __parse_args
+      end
+
+      def __parse_opts
+
+        require 'optparse'
+
+        op = ::OptionParser.new
+
+        x = ACHIEVED_
+        op.on '--help', 'this screen' do
+
+          io = @serr
+
+          y = ::Enumerator::Yielder.new do | s |
+            if s
+              io.puts "  #{ s }"
+            else
+              io.puts s
+            end
+          end
+
+          io.puts "synopsis: #{ @program_name } <file>"
+          io.puts
+
+        #12345_(10)12345_(20)12345_(30)12345_(40)12345_(50)12345_(60)12345_(70)12345_(80)
+io.puts 'description: for every nonblank line in <file>, the first "word" of that line'
+
+   #12345_(10)12345_(20)12345_(30)12345_(40)12345_(50)12345_(60)12345_(70)12345_(80)
+y << "is taken to represent a path to a file (typically in the current directory)"
+y << "into which the remainder of the line after this word (and whitespace(s)) is"
+y << "to be concatted."
+y << nil
+y << "since this doesn't sound immediately useful, consider that it is an attempt"
+y << "to emulate the workflow of an interactive `git` rebase but for general use."
+y << "if this still doesn't sound useful then it probably is not. :P"
+y << nil
+y << "this is done in a SEMI-atomic way whereby each file is confirmed to *exist*"
+y << "as a file before all the units of work are flushed. but NOTE that we do NOT"
+y << 'lock *any* files or check permissions, so integrity is not "guaranteed".'
+
+          io.puts
+
+          io.puts 'options:'
+
+          op.summarize io
+
+          io.puts
+
+          io.puts 'argument:'
+
+          _ = SPACE_ * 27
+
+          io.puts "    <file>#{ _ }(as described in the description)"
+
+          x = CEASE_
+        end
+
+        begin
+          op.parse! @argv
+        rescue ::OptionParser::ParseError => e
+          @serr.puts e.message
+          _invite
+          x = UNABLE_
+        end
+
+        x
+      end
+
+      def __parse_args
+
+        case 1 <=> @argv.length
+        when 0
+          __when_argv
+
+        when -1
+          __when_extra_argv
+
+        when  1
+          __when_no_argv
+        end
+      end
+
+      def __when_no_argv
+
+        @serr.puts "expecting <file>"
+        _invite
+        UNABLE_
+      end
+
+      def __when_extra_argv
+
+        @serr.puts "unpexpected argument: #{ @argv[ 1 ].inspect }"
+        _invite
+        UNABLE_
+      end
+
+      def __when_argv
+
+        @_upstream_path = @argv.fetch 0
+        ACHIEVED_
+      end
+
+      # ~ phase 2
+
+      def __work
+
+        w = Worker___.new
+        w.path = @_upstream_path
+        w.on_event_selectively = -> i_or_e, expr, _, & s_p do
+
+          :expression == expr or fail
+          case i_or_e
+          when :info
+
+            _y = ::Enumerator::Yielder.new do | s |
+              @serr.puts s
+            end
+
+            s_p[ _y ]
+            NIL_
+
+          else
+
+            _y = ::Enumerator::Yielder.new do | s |
+              @sout.puts s
+            end
+
+            s_p[ _y ]
+            UNABLE_
+          end
+        end
+        ok = w.work
+        if ! ok
+          _invite
+        end
+        ok
+      end
+
+      # ~ support
+
+      def _invite
+        @serr.puts "see '#{ @program_name } --help'"
+        NIL_
+      end
+
+      class Worker___
+
+        attr_writer(
+          :on_event_selectively,
+          :path,
+        )
+
+        def work
+
+          @_bx = Callback_::Box.new
+          @_io = ::File.open @path
+          @_ok = true
+
+          blank_rx = /\A[[:space:]]*\z/
+
+          begin
+            @_line = @_io.gets
+            @_line or break
+
+            if blank_rx =~ @_line
+              redo
+            end
+
+            @_line.chomp!
+
+            _ok = __process_line
+            _ok or break
+            redo
+          end while nil
+
+          if @_ok
+            __finish
+          else
+            @_ok
+          end
+        end
+
+        def __process_line
+
+          @_md = WORD_RX___.match @_line
+
+          if @_md
+            __when_md
+          else
+            __when_no_md
+          end
+        end
+
+        WORD_RX___ = /\A
+
+          [[:space:]]*
+
+          (?<word>
+            [a-z0-9] (?: [-_a-z0-9]* [a-z0-9] )?
+          )
+
+          [[:space:]]*
+
+          (?<content> .+ )?
+        \z/ix
+
+        def __when_no_md
+
+          @on_event_selectively.call :error, :expression, :not_a_valid_word do | y |
+            y << "not a valid word: #{ _etc }"
+          end
+
+          _common_error
+        end
+
+        def __when_md
+
+          if @_md[ :content ]
+
+            __when_normal_line
+          else
+            __when_no_content
+          end
+        end
+
+        def __when_no_content
+
+          @on_event_selectively.call :error, :expression, :single_word_line do | y |
+
+            y << "single word line?: #{ line.inspect } (line #{ io.lineno })"
+          end
+
+          _common_error
+        end
+
+        def __when_normal_line
+
+          word = @_md[ :word ]
+          _uow = @_bx.touch word do
+            Unit_of_Work___.new word
+          end
+
+          _uow.add_line @_md[ :content ]
+          KEEP_PARSING_
+        end
+
+        def __finish
+
+          if @_bx.length.zero?
+            __when_empty
+          else
+            _ok = __verify_files
+            _ok && __flush
+          end
+        end
+
+        def __verify_files
+
+          missing = nil
+          @_bx.each_value do | uow |
+            if ::File.file? uow.path
+              next
+            end
+            ( missing ||= [] ).push uow.path
+          end
+
+          if missing
+            __when_missing_files missing
+          else
+            ACHIEVED_
+          end
+        end
+
+        def __when_missing_files missing
+
+          @on_event_selectively.call :error, :expression, :noent do | y |
+            missing.each do | s |
+              y << "not a file: #{ s }"
+            end
+          end
+
+          _common_error
+        end
+
+        def _common_error
+
+          @_io.close
+          @_ok = UNABLE_
+          STOP_PARSING_
+        end
+
+        def __flush
+
+          d = 0
+          d_ = 0
+
+          @_bx.each_value do | uow |
+            ::File.open uow.path, ::File::WRONLY do | fh |
+              d += 1
+              uow.lines.each do | line |
+                d_ += fh.write( "#{ line }#{ NEWLINE_ }" )
+              end
+            end
+          end
+
+          @on_event_selectively.call :info, :expression, :summary do | y |
+
+            y << "(done - wrote #{ d_ } bytes in #{ d } files)"
+          end
+          ACHIEVED_
+        end
+      end
+
+      class Unit_of_Work___
+
+        attr_reader :lines, :path
+
+        def initialize path
+          @lines = []
+          @path = path
+        end
+
+        def add_line line
+          @lines.push line
+          NIL_
+        end
+      end
+
+      ACHIEVED_ = true
+      CEASE_ = nil
+      NIL_ = nil
+      KEEP_PARSING_ = true
+      Me_ = self
+      NEWLINE_ = "\n"
+      STOP_PARSING_ = false
+      UNABLE_ = false
+
+    self
+    end.new( $stdin, $stdout, $stderr, ::ARGV, $PROGRAM_NAME ).execute

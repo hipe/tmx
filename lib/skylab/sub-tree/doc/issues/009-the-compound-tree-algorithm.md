@@ -12,7 +12,7 @@ module Skylab::SubTree
       # parent of the test tree. it makes more sense if you use the "-tct"
       # option to see the two trees that go into making the final tree.
 
-      LIB_.funcy_globless self
+      LIB_.f_uncy_globless self
 
       Entity_[ self, :properties, :app_hub_pn, :test_dir_pn, :tree ]
 

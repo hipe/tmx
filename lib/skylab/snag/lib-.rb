@@ -76,10 +76,6 @@ module Skylab::Snag
       System[].filesystem.file_utils_controller
     end
 
-    Funcy_globless = -> x do
-      MH__[].funcy_globless x
-    end
-
     Formal_attribute = -> do
       MH__[]::Formal::Attribute
     end

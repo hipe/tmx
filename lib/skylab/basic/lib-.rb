@@ -28,10 +28,6 @@ module Skylab::Basic
       MH__[]::Enhance::Shell.new a
     end
 
-    Funcy_globful = -> x do
-      MH__[].funcy_globful x
-    end
-
     HL__ = sidesys[ :Headless ]
 
     Hu___ = sidesys[ :Human ]

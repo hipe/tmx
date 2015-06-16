@@ -32,12 +32,16 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       end
     end
 
-    Funcy_globful = -> _ do
-      Git_.lib_.funcy_globful self ; nil
+    Globful_actor = -> _ do
+
+      Git_.lib_.basic::Function.globful_actor self
+      nil
     end
 
-    Funcy_globless = -> _ do
-      Git_.lib_.funcy_globless self ; nil
+    Globless_actor = -> _ do
+
+      Git_.lib_.basic::Function.globless_actor self
+      nil
     end
 
     Emit_payload_line_to_listener = -> _ do
@@ -892,7 +896,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
         :initialize_basic_set_with_iambic,
         :with_members, %i( filename_s is_dry quiet_h stash_pn ).freeze,
       :emitters,
-      :funcy_globless,
+      :globless_actor,
       :file_utils, :mkdir_p, :move
     ]
 
@@ -940,7 +944,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
         :initialize_basic_set_with_iambic,
       :file_utils,
         :mkdir_p, :move, :rmdir,
-      :funcy_globless, :popener3, :shellesc ]
+      :globless_actor, :popener3, :shellesc ]
 
     def initialize x_a
       client = x_a.shift
@@ -1086,7 +1090,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
     Sub_client__[ self,
       :file_utils, :cd,
-      :funcy_globful,
+      :globful_actor,
       :popener3 ]
 
     class << self
@@ -1121,12 +1125,15 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
   end
 
   class Make_patch_for_file__
-    Sub_client__[ self, :emit_payload_line_to_listener, :funcy_globful, :popener3 ]
+
+    Sub_client__[ self, :emit_payload_line_to_listener, :globful_actor, :popener3 ]
+
     def initialize client, file_s, listener_p
       @file_s = file_s ; @listener_p = listener_p
       client_notify client
       super()
     end
+
     def execute
       _i, o, e, _w = popen3 'file', '--brief', @file_s
       s = e.gets and fail "no: #{ s.inspect }"
@@ -1194,7 +1201,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
         :initialize_basic_set_with_iambic,
       :color_inquisitor,
       :emit_payload_line_to_listener,
-      :funcy_globful,
+      :globful_actor,
       :say ]
 
     def initialize client, * x_a

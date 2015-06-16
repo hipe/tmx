@@ -4,6 +4,8 @@ module Skylab::GitViz
 
     class Models_::Filechange
 
+      ROCKET__ = ' => '
+
       class << self
 
         def via_normal_string s
@@ -26,25 +28,66 @@ module Skylab::GitViz
 
           s_ = md[ :the_rest ]
 
-          d = s_.index ROCKET_SHIP__
+          d = s_.index ROCKET__
 
           if d
             is_rename = true
-            source_path, destination_path = Parse_rename___[ d, s_ ]
+            source_path, destination_path = Parse_rename__[ d, s_ ]
           end
 
-          new do
+          if is_rename
+            _new_rename source_path, destination_path
+          else
+           __new_common insertion_count, deletion_count, s_
+          end
+        end
 
-            @insertion_count = insertion_count
+        def any_via_possible_rename_line line
+
+          md = RENAME_RX___.match line
+          if md
+
+            _content = md[ :content ]
+
+            _content_begin = md.offset( :content ).fetch 0
+            _rocket_begin = md.offset( :rocket ).fetch 0
+
+            _adjusted_rocket_begin = _rocket_begin - _content_begin
+
+            _path, _path_ = Parse_rename__[ _adjusted_rocket_begin, _content ]
+
+            _new_rename _path, _path_
+          end
+        end
+
+        RENAME_RX___ = /\A [ ] rename [ ]
+
+        (?<content> .+ (?<rocket> #{ ::Regexp.escape ROCKET__ } ) .+ )
+
+          [ ]\(\d{1,3}%\)  # e.g " (100%)"
+
+        \n?\z/x
+
+        def __new_common insertion_count, deletion_count, path
+
+          new do
+            @change_count = insertion_count + deletion_count
             @deletion_count = deletion_count
-            @change_count = @insertion_count + @deletion_count
-            if is_rename
-              @is_rename =  true
-              @source_path = source_path
-              @destination_path = destination_path
-            else
-              @path = s_
-            end
+            @insertion_count = insertion_count
+            @path = path
+            freeze
+          end
+        end
+
+        def _new_rename path, path_
+
+          new do
+            @change_count = 0
+            @deletion_count = 0
+            @destination_path = path_
+            @insertion_count = 0
+            @is_rename = true
+            @source_path = path
             freeze
           end
         end
@@ -59,8 +102,6 @@ module Skylab::GitViz
         (?<deletion_count> \d+ ) \t
 
         (?<the_rest>.+) \z/x
-
-      ROCKET_SHIP__ = ' => '.freeze
 
       def initialize & edit_p
         @is_rename = false
@@ -88,7 +129,7 @@ module Skylab::GitViz
         end
       end
 
-      Parse_rename___ = -> rocket_d, s do
+      Parse_rename__ = -> rocket_d, s do
 
         # git does no escaping of filenames in their rendering here, so if
         # they contain any of the special characters used below, there is
@@ -107,7 +148,7 @@ module Skylab::GitViz
 
           src_s = s[ open_d + 1 ... rocket_d ]  # zero length OK
 
-          dst_s = s[ rocket_d + ROCKETSHIP_LENGTH__ ... close_d ]  # zero length OK
+          dst_s = s[ rocket_d + ROCKET_LENGTH__ ... close_d ]  # zero length OK
 
           source_path = if src_s.length.zero?
             ::File.join head_s, tail_s
@@ -125,13 +166,13 @@ module Skylab::GitViz
 
         else
 
-          [ s[ 0, rocket_d ], s[ rocket_d + ROCKETSHIP_LENGTH__ .. -1 ] ]
+          [ s[ 0, rocket_d ], s[ rocket_d + ROCKET_LENGTH__ .. -1 ] ]
         end
       end
 
       CLOSE_CURLY___ = '}'
       OPEN_CURLY___ = '{'
-      ROCKETSHIP_LENGTH__ = ROCKET_SHIP__.length
+      ROCKET_LENGTH__ = ROCKET__.length
 
     end
   end

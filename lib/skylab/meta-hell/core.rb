@@ -15,18 +15,6 @@ module Skylab
         end
       end
 
-      def funcy_globful cls
-        def cls.[] * x_a
-          new( * x_a ).execute
-        end
-      end
-
-      def funcy_globless cls
-        def cls.[] * x_a
-          new( x_a ).execute
-        end
-      end
-
       def import_contants from_mod, i_a, to_mod
         MetaHell_::Lib__::Import_constants[ from_mod, i_a, to_mod ]
       end

@@ -8,22 +8,25 @@
 
 class Skylab_Git_Models_Whatever_Unrename
 
-        def initialize _, o, e, a, pn
+        def initialize i, o, e, a, pn
 
           @argv = a
           @do_forward = true
           @pairs = []
           @program_name = ::File.basename pn
           @serr = e
+          @sin = i
           @sout = o
         end
 
         def execute
 
           ok = __parse_argv
-          ok &&= __resolve_commit
-          ok && __via_commit
+          ok &&= __resolve_filechange_stream
+          ok && __via_filechange_stream
         end
+
+        # ~ phase 1 - parsing ARGV
 
         def __parse_argv
           _ok = __parse_opts
@@ -42,23 +45,36 @@ class Skylab_Git_Models_Whatever_Unrename
             @do_forward = false
           end
 
-
           x = ACHIEVED_
           op.on '--help', 'this screen' do
 
-            @serr.puts "synopsis: output the text for the git commands that\n#{
+            io = @serr
+
+            io.puts "synopsis: output the text for the git commands that\n#{
               }          unrename (or rename) files per the renames in the commit\n\n"
 
-            @serr.puts "usage: #{ @program_name } [ -R ] <commit>"
+            io.puts "usage: #{ @program_name } [ -R ] [ <commit> ]"
 
-            @serr.puts
+            io.puts
 
-            @serr.puts 'options:'
+            io.puts 'options:'
 
-            op.summarize @serr
+            op.summarize io
 
-            @serr.puts "example:"
-            @serr.puts "    #{ @program_name } HEAD#{ SPACE_ * 12 }#{
+            io.puts
+
+            io.puts 'argument:'
+
+            _ = SPACE_ * 25
+
+            io.puts "    <commit>#{ _ }if not provided, treats <stdin> as the"
+
+            io.puts "            #{ _ }output of `git log -1 --summary -M` for e.g"
+
+            io.puts
+
+            io.puts "example:"
+            io.puts "    #{ @program_name } HEAD#{ SPACE_ * 12 }#{
               }# produces unrenames for renames in HEAD commit"
 
             x = CEASE_
@@ -76,38 +92,148 @@ class Skylab_Git_Models_Whatever_Unrename
         end
 
         def __parse_args
+
+          is_interactive = @sin.tty?
+
           case 1 <=> @argv.length
           when 0
-            @commit_reference_s = @argv.fetch 0
-            ACHIEVED_
+            if is_interactive
+              __when_argv
+            else
+              __when_both
+            end
+
           when -1
-            @serr.puts "unpexpected argument: #{ @argv[ 1 ].inspect }"
-            __invite
-            UNABLE_
+            if is_interactive
+              __when_extra_argv
+            else
+              __when_both
+            end
+
           when  1
-            @serr.puts "expectin <commit>"
-            __invite
-            UNABLE_
+            if is_interactive
+              __when_neither
+            else
+              __when_stdin
+            end
           end
         end
 
-        def __invite
+        def __when_both
+
+          @serr.puts "can't take input from both STDIN and commit (#{
+            }#{ @argv[ 0 ].inspect })"
+          _invite
+          UNABLE_
+        end
+
+        def __when_neither
+
+          @serr.puts "expecting <commit> or STDIN"
+          _invite
+          UNABLE_
+        end
+
+        def __when_extra_argv
+
+          @serr.puts "unpexpected argument: #{ @argv[ 1 ].inspect }"
+          __invite
+          UNABLE_
+        end
+
+        def __when_argv
+
+          @_resolve_filechange_stream_by = :__resolve_FC_stream_via_commit
+          @commit_reference_s = @argv.fetch 0
+          ACHIEVED_
+        end
+
+        def __when_stdin
+
+          @_resolve_filechange_stream_by = :__resolve_FC_stream_via_line_stream
+          ACHIEVED_
+        end
+
+        def _invite
           @serr.puts "see '#{ @program_name } --help'"
           nil
         end
 
-        def __resolve_commit
+        # ~ phase 2 branch 1: via commit
+
+        def __resolve_filechange_stream
 
           require_relative '../lib/skylab'
           require 'skylab/git-viz/core'
 
-          @repo = ::Skylab::GitViz.repository.new_via_path( ::Dir.pwd )
+          @_lib = ::Skylab::GitViz
+          @repo = @_lib.repository.new_via_path( ::Dir.pwd )
 
-          @ci = @repo.fetch_commit_via_identifier @commit_reference_s  # etc
+          send @_resolve_filechange_stream_by
+        end
+
+        def __resolve_FC_stream_via_commit
+
+          ok &&= __resolve_commit
+          ok && __via_commit_resolve_filechange_stream
+        end
+
+        def __resolve_commit
+
+          @ci = @repo.fetch_commit_via_identifier(
+            @commit_reference_s
+
+          ) do | * i_a, & ev_p |
+
+            # check out this total hack of [br]'s event expression logic:
+
+            _s_a = i_a.map do | sym |
+              sym.id2name.gsub UNDERSCORE_, SPACE_
+            end
+
+            @serr.puts "#{ _s_a * ', ' }: #{ ev_p[].to_exception.message }"
+            _invite
+
+            UNABLE_
+          end
           @ci && ACHIEVED_
         end
 
-        def __via_commit
+        def __via_commit_resolve_filechange_stream
+
+          fcs = @ci.to_filechange_stream
+          if fcs
+            @_filechange_stream = fcs
+            ACHIEVED_
+          else
+            fcs
+          end
+        end
+
+        # ~ phase 2 branch 2: via stdin
+
+        def __resolve_FC_stream_via_line_stream
+
+          _FC = @_lib::VCS_Adapters_::Git::Models_::Filechange
+
+          @_filechange_stream = ::Skylab::Callback.stream do
+
+            begin
+              line = @sin.gets
+              line or break
+
+              x = _FC.any_via_possible_rename_line line
+              if x
+                break
+              end
+              redo
+            end while nil
+            x
+          end
+          ACHIEVED_
+        end
+
+        def __via_filechange_stream
 
           exe = @repo.vendor_program_name
 
@@ -121,7 +247,7 @@ class Skylab_Git_Models_Whatever_Unrename
             end
           end
 
-          st = @ci.to_filechange_stream.reduce_by do | fc |
+          st = @_filechange_stream.reduce_by do | fc |
             fc.is_rename
           end
 
@@ -145,6 +271,7 @@ class Skylab_Git_Models_Whatever_Unrename
         CEASE_ = nil
         SPACE_ = ' '
         UNABLE_ = false
+        UNDERSCORE_ = '_'
 
   self
 end.new( $stdin, $stdout, $stderr, ::ARGV, $PROGRAM_NAME ).execute

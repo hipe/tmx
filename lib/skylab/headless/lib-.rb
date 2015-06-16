@@ -50,10 +50,6 @@ module Skylab::Headless
 
     Face___ = sidesys[ :Face ]
 
-    Funcy_globful = -> cls do
-      MH__[].funcy_globful cls
-    end
-
     Human = sidesys[ :Human ]
 
     List_lib = -> do

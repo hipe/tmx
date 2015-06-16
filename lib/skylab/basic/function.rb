@@ -86,7 +86,7 @@ module Skylab::Basic
     end
 
     GLOBLESS_CALL_METHOD__ = -> * x_a do
-      new( a ).execute
+      new( x_a ).execute
     end
 
     Function_chain___ = -> p_a do  # see [#047]

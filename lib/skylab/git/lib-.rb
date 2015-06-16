@@ -23,7 +23,7 @@ module Skylab::Git
       HL__[]::Action.apply_iambic_on_client x_a, client
     end
 
-    Bsc__ = sidesys[ :Basic ]
+    Basic = sidesys[ :Basic ]
 
     Basic_fields = -> * x_a do
       if x_a.length.zero?
@@ -34,7 +34,7 @@ module Skylab::Git
     end
 
     Box = -> do
-      Bsc__[]::Box
+      Basic[]::Box
     end
 
     Bin_pathname = -> do
@@ -69,14 +69,6 @@ module Skylab::Git
       System[].filesystem.file_utils_controller
     end
 
-    Funcy_globful = -> x do
-      MH__[].funcy_globful x
-    end
-
-    Funcy_globless = -> x do
-      MH__[].funcy_globless x
-    end
-
     HL__ = sidesys[ :Headless ]
 
     MH__ = sidesys[ :MetaHell ]
@@ -104,11 +96,11 @@ module Skylab::Git
     end
 
     Set = -> do
-      Bsc__[]::Set
+      Basic[]::Set
     end
 
     Struct = -> * i_a do
-      Bsc__[]::Struct.make_via_arglist i_a
+      Basic[]::Struct.make_via_arglist i_a
     end
 
     System = -> do
@@ -118,7 +110,7 @@ module Skylab::Git
     System_lib__ = sidesys[ :System ]
 
     Word_wrap = -> do
-      Bsc__[]::String.word_wrap
+      Basic[]::String.word_wrap
     end
   end
 end

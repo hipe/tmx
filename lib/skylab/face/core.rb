@@ -95,10 +95,6 @@ module Skylab::Face  # read [#011] the top node narrative
       MH__[]::Fields::From.methods.iambic_and_block a, p
     end
 
-    Funcy_globful = -> mod do
-      MH__[].funcy_globful mod
-    end
-
     HL__ = sidesys[ :Headless ]
 
     MH__ = sidesys[ :MetaHell ]
