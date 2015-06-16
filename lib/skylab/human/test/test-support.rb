@@ -22,7 +22,7 @@ module Skylab::Human::TestSupport
 
         ( cache_h.fetch sym do
 
-          cache_h[ sym ] = Hu_.lib_.brazen::Bundle::Fancy_lookup[ sym, TS_ ]
+          cache_h[ sym ] = Hu_.lib_.plugin::Bundle::Fancy_lookup[ sym, TS_ ]
 
         end )[ self ]
         NIL_

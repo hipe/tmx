@@ -20,6 +20,8 @@ module Skylab::System
 
     Parse_lib = sidesys[ :Parse ]
 
+    Plugin = sidesys[ :Plugin ]
+
     Properties_stack_frame = -> *a do
       Brazen[]::Property::Stack.common_frame.call_via_arglist a
     end

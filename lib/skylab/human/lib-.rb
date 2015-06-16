@@ -16,6 +16,8 @@ module Skylab::Human
 
     Parse = sidesys[ :Parse ]
 
+    Plugin = sidesys[ :Plugin ]
+
     String_scanner = -> s do
       require 'strscan'
       ::StringScanner.new s

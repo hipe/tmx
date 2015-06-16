@@ -32,7 +32,7 @@ module Skylab::Basic
           x = if TS_.const_defined? const, false
             TS_.const_get const, false
           else
-            Basic_.lib_.brazen::Bundle::Fancy_lookup[ sym, TS_ ]
+            Basic_.lib_.plugin::Bundle::Fancy_lookup[ sym, TS_ ]
           end
 
           cache_h[ sym ] = x

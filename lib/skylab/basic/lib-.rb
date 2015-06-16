@@ -52,6 +52,8 @@ module Skylab::Basic
 
     Parse_lib = sidesys[ :Parse ]
 
+    Plugin = sidesys[ :Plugin ]
+
     Scn_lib = -> do
       Callback_::Scn
     end

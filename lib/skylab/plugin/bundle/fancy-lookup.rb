@@ -1,11 +1,9 @@
-module Skylab::Brazen
+module Skylab::Plugin
 
-  Bundle = ::Module.new
-
-  Bundle::Fancy_lookup = -> do  # exegesis at [#043]
+  Bundle::Fancy_lookup = -> do  # exegesis at [#024]
 
     parse_lib = -> do
-      Brazen_.lib_.parse_lib
+      Plugin_.lib_.parse
     end
 
     skip_rx = /_spec\z/
