@@ -1,3 +1,4 @@
+[#007]       legacy parsing terms defined
 [#006]       [ the item grammar ]
 [#001]       the top narrative ..
 [#002]       this one parse function with list against matrix

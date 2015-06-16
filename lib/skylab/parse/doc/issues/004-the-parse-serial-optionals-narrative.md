@@ -66,7 +66,7 @@ concise in both their calls and implementation
 orderd) parsing - we wanted it to be relatively fast, and also possibly
 to leverage precedence to avoid grammar ambiguities.)
 
-as such, "scanning" (parsing, even (detailed discussion at [#037])) had
+as such, "scanning" (parsing, even (detailed discussion at [#007])) had
 no real meaning in that context - we were just trying to expand an
 ordered subset of items to fit within the defined superset, positionally.
 the actual "identity" of the items stayed the same.
@@ -74,7 +74,8 @@ the actual "identity" of the items stayed the same.
 any who dad doo, the point of all this is that although it doesn't
 out of the box treat your functions as scanners, you may find yourself
 wishing that it did, and that you could easily take care of semantic
-representation in addition to parsing (again see [#037]).
+representation in addition to parsing (again see referenced document
+above).
 
 note that while we keep the method signatures simple (monadic in/out),
 one way to do scanning in addition to matching is to

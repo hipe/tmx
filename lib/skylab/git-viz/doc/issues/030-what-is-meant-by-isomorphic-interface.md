@@ -7,13 +7,13 @@ of a now ancient effort started at [#fa-006] (currently undocumented) that
 was never fully realized.
 
 a compliment to that effort (in all of its incarnations) is a parameter
-library. the parameter library introduced here is part of a [#mh-053] long thread
+library. the parameter library introduced here is part of a [#fi-001] long thread
 of such efforts, in fact it is (at least) the sixth such reboot. (granted,
 with the later re-takes we started to shy away from a silver-bullet style
 super-library, and started just hand-rolling each new one from scratch ad-hoc
 as we have done here. still we hope one day to unify all of them.)
 
-this parameter library is [#mh-053] compared and contrasted to its cousins
+this parameter library is [#fi-001] compared and contrasted to its cousins
 in terms of the kinds of features they offer and the different techniques
 often employed in their implementation. because it is the sole focus of that
 document, discussions of the particulars of our parameter library here occur

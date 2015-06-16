@@ -55,7 +55,7 @@
 [#006]       #done get CLI working again
 [#005] #open verbose mode
 [#004]       #done rid of Skylab constants everywhere
-[#003]       #while name collision with MetaHell
+[#003]       #while name collision with [mh]
 [#002]       the build leaf stream narrative ..
              ( #was: #done make core.rb )
 [#001]       [ reserved for introduction ]

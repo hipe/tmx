@@ -21,7 +21,7 @@ but hold that thought..)
 
 this can probably serve as a replacement for every similar library that
 came before it that does *not* support meta-properties. as such it is
-among the top three most important entries in :+[#mh-053] the parameter
+among the top three most important entries in :+[#fi-001] the parameter
 library pantheon (and see "compared to the others" below).
 
 we borrow the term from the 'actor' pattern, to which this is currently
@@ -142,7 +142,7 @@ namespace to make as many private support methods as you need.
 
 ## actors compared to the others
 
-see [#mh-053] the comprehensive list of libraries like this.
+see [#fi-001] the comprehensive list of libraries like this.
 
 
 here is how it compares:
@@ -151,7 +151,7 @@ here is how it compares:
    probably never will) support meta-properties (like `required` and so
    on). actors embody an intentional simplification of entities.
 
- + [#mh-061] basic fields will nil out fields for you; this does not.
+ + [#fi-004] basic fields will nil out fields for you; this does not.
    however this will probably replace that. (yes: with [#058] methodic
    actors.)
 

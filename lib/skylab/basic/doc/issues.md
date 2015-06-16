@@ -1,3 +1,4 @@
+[#047]       f.chain ..
 [#046]       the minimal yielder ..
 [#045]       the normalization & validation method naming idiomspace ..
 [#044]       [ state machine ]

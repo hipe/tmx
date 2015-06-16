@@ -52,14 +52,6 @@ module Skylab
         lib_.basic::String.via_mixed.call_via_arglist a
       end
 
-      def touch_const * a
-        if a.length.zero?
-          MetaHell_::Lib__::Touch_const
-        else
-          MetaHell_::Lib__::Touch_const[ * a ]
-        end
-      end
-
       def touch_const_reader a, b, c, d, e
         MetaHell_::Lib__::Touch_const_reader[ a, b, c, d, e ]
       end

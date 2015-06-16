@@ -2,7 +2,7 @@
 
 ## introduction to basic fields
 
-see [#mh-053] the comprehensive list of field libraries to see how this
+see [#001] the comprehensive list of field libraries to see how this
 fits in to the broader history of this kind of library.
 
 

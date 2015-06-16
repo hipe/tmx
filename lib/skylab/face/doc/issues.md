@@ -13,7 +13,8 @@
 [#051]       #tracking-tag the idea of the #snitch is tracked by this tag
 [#050]       #doc-point when mono mono and we get an array..
 [#049]       #in-situ
-[#048]       #parent-node: [#002]  [ this other tiny deprecated CLI table lib ]
+[#048] #hole ( #moved-to: [#br-096.A] )
+             ( #parent-node: [#002]  [ this other tiny deprecated CLI table lib ] )
              ( #was #done `t-ablify` - cleanup signature (#rip) )
 [#047]       #doc-point visibility of the node is *not* in the domain ..
 [#046]       #feature-point `Magic_Touch_`
@@ -29,8 +30,9 @@
                allows for the (e.g branch) client to vivify lazily on-demand
 [#037]       #eventpoint, #parent-node: [#040] : fundamentally rearchitect Face
                to deal with the DSL public instance method namespace problem.
-[#036]       #doc-node the CLI table narrative ( #moved-to:[#br-096] )
-       #todo replace universe with `tableize` with [ face cli table ]
+[#036] #hole ( #moved-to: [#br-096.B] )
+             ( #was: #doc-node the CLI table narrative )
+             ( #was: replace universe with `t_ableize` with [ face cli table ] )
 [#035]       #tracking-tag #experiment with a `unary` discrete categorization
                for our main 3 classes (for which we make two exponents) ..
 [#034]       #doc-point the magical significance of nil ..

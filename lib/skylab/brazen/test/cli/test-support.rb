@@ -33,6 +33,8 @@ module Skylab::Brazen::TestSupport::CLI
 
     define_method :expect, instance_method( :expect )  # because rspec
 
+    # #todo - a lot of this is redundant with `expect-CLI`
+
     # ~ invoke phase ("action under test")
 
     def invoke * argv

@@ -5,7 +5,7 @@
 this is legacy. included in this node is the "worst thing i've ever done",
 at #storypoint-280. we intend to kill this with fire.
 
-the fate of this node is discussed at [#mh-053] "discussion of the [..]". be
+the fate of this node is discussed at [#fi-001] "discussion of the [..]". be
 sure to read that before investing in this at all. and then no matter what,
 don't invest in this at all.
 

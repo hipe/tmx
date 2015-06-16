@@ -7,6 +7,7 @@ module Skylab::Slicer
     def to_sidesystem_stream
 
       _path_a = ::Dir[ "#{ ::Skylab.dir_pathname.to_path }/*/core.rb" ]  # :+[#118]
+
       _st = Callback_::Stream.via_nonsparse_array _path_a
 
       _st.map_reduce_by do | path |

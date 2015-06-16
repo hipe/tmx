@@ -25,7 +25,7 @@ module Skylab::Basic
       @normalized_local_node_name = nln
     end
 
-    # ~ :+[#mh-021] a typical base class implementation:
+    # ~ :+[#sl-146] a typical base class implementation:
     def dupe
       dup
     end
@@ -85,7 +85,7 @@ module Skylab::Basic
       @node_class ||= Basic_::Digraph.node_class
     end
 
-    # ~ :+[#mh-021] typical base class implementation:
+    # ~ :+[#sl-146] typical base class implementation:
     def dupe
       dup
     end

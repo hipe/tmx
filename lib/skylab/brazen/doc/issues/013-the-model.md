@@ -117,7 +117,7 @@ in us mistakenly thinking that an entity is valid.
 ## :#note-120 ("model ivars" #open :[#018])
 
 we say "actual property" with the exact sense of "actual"
-from [#mh-025], [#mh-024]:#formal-attributes-vs-actual-attributes.
+from [#fi-025], [#fi-002]:#formal-attributes-vs-actual-attributes.
 
 using ivars to hold actual properties where the ivar's name is unadorned
 will create problems and is not sustainable in the current

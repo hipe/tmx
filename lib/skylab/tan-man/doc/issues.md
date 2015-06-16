@@ -13,7 +13,7 @@
 [#084]       #parent-node: [#024] of node ..
 [#083]       #doc-node kernel
 [#082]       #parent-node: [#083] the kernel properties narrative ..
-[#081]       config shell (lost). part of [#mh-053]
+[#081]       config shell (lost). part of [#fi-001]
 [#078]       #tracking-tag this spot with `const_set`
 [#077]       #done services.rb wat
 [#076]       [ meaning graph ]  (comments inline)
@@ -63,7 +63,7 @@
 [#042]       #done FileUtils as a service (JSON)
 [#041] #open #feature workspace status is furloughed
 [#040]       #done make your own SubClient::InstanceMethods to DRY CLI & API
-[#039]       #done API::Whatever becomes MetaHell::Generic
+[#039]       #done API::Whatever becomes [mh] generic
 [#038]       #done `text_styler` away!
 [#037]       #feature stdout as an `output_stream`
              ( #was: #done reconceive stdout, stderr -> infostream, paystream, errstream

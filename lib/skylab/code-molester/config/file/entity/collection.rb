@@ -138,7 +138,7 @@ module Skylab::CodeMolester
     def add field_h, opt_h, event_h
       ent = nil
       _WRAP_AGAIN = -> x { -> { x } }
-      ev_p = [  # looks like [#mh-026] function chain but might be different
+      ev_p = [  # looks like [#ba-047] function chain but might be different
 
         -> do
           configs.if_config NILADIC_EMPTINESS_, _WRAP_AGAIN

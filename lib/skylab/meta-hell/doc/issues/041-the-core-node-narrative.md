@@ -1,8 +1,11 @@
-# the core node narrative :[#041]
+# the bundle narrative :[#002]
+
+(EDIT: lots of stuff is still in here from when bundle was defined in
+the top node of the now sunsetted [mh])
 
 ## :#storypoint-005 introduction
 
-MetaHell [mh] was the first low-level subsystem, which is to say it was the
+[mh] was the first low-level subsystem, which is to say it was the
 first subsystem used consistently by other subsystems (which in turn get used
 by applications). it remains perhaps the most widespread and most ultimately
 depended-upon subsystem. while [ba] Basic is hot on its tail, [ba] will likely
@@ -10,7 +13,7 @@ always serve as a compliment to it rather than ever being a replacement for it.
 
 the 'Meta' in "meta-hell" refers of course (?) to meta-programming. as is the
 trend with nodes with facetiously negative-sounding names ("regret"),
-MetaHell was brought into this world under a heavy shadow of suspicion, and
+[mh] was brought into this world under a heavy shadow of suspicion, and
 wa
  it started
 out and remains largely a home for any re-usable facilites we build that do

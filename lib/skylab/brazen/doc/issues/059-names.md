@@ -7,7 +7,7 @@
 this generally to refer to the structure representing the metatdata for
 this formal, business-specific conception that we have referred to
 in the past variously as "attribute", "parameter", "field" in our
-[#mh-053] various takes on this through history.
+[#fi-001] various takes on this through history.
 
 `property_value_via_symbol` is one method you can use to get the actual
 value from the formal value's name symbol.

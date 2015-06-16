@@ -24,6 +24,11 @@ module Skylab::Basic
         end
       end
 
+      def touch_const * a
+
+        Touch_const[ * a ]
+      end
+
       def touch_value_via_relative_path mod, path, create_p
         o = Touch__.new mod
         o.create_p = create_p
@@ -72,6 +77,14 @@ module Skylab::Basic
         pair_a[ d ] = _Pair.new( mod, s.intern )
       end
       pair_a
+    end
+
+    Touch_const = -> do_inherit, create_p, c, mod, create_arg_x do  # :+#curry-friendly
+      if mod.const_defined? c, do_inherit
+        mod.const_get c
+      else
+        mod.const_set c, create_p[ create_arg_x ]
+      end
     end
 
     class Touch__

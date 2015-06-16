@@ -1,4 +1,4 @@
-# the formal attribute narrative :[#024]
+# the formal attribute narrative :[#022]
 
 FOREWORD: this puppy is very old. it was rewritten once then lost in the fire,
 and has since been obviated several times by other efforts. however, some time
@@ -9,7 +9,7 @@ formatted to fit this screen, but it otherwise often historic.
 
 ## :#storypoint-5 introduction (:#formal-attributes-vs-actual-attributes) :[#025]
 
-(the fate of this node is discussed at [#053] "discussion of the..")
+(the fate of this node is discussed at [#001] "discussion of the..")
 
 What is the esssence of all data in the universe? It starts from within. with
 metaprogramming.

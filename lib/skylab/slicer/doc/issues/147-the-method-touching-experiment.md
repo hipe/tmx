@@ -1,4 +1,4 @@
-# what are touchers and when should you use them? :[#048]
+# what are touchers and when should you use them? :[#147]
 
 touchers are an experimental new way to extend modules. we don't know if
 they're a good way.

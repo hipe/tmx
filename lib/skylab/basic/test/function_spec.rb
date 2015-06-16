@@ -1,13 +1,14 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::Lib
+module Skylab::Basic::TestSupport
 
-  describe "[mh] \"lib--\"" do
+  describe "[ba] function (chain)" do
 
-    context "given a queue of functions and one seed value, produce one result" do
+    context "given a queue of [..]" do
+
+      _FUNC = nil
 
       before :all do
-        FUNC = begin
 
         _p_a = [
           -> item do
@@ -26,24 +27,30 @@ module Skylab::MetaHell::TestSupport::Lib
             end
           end ]
 
-
-          MetaHell_.function_chain.curry[ _p_a ]
-        end
+        _FUNC = Basic_::Function.chain _p_a
       end
-      it "this short circuits at te first branch, resulting in a value" do
-        s = FUNC[ 'cilantro' ]
+
+      it "this short circuits at [..[" do
+
+        s = _FUNC[ 'cilantro' ]
         s.should eql 'i hate cilantro'
       end
-      it "resulting in a single true-ish item will result in that value" do
-        s = FUNC[ 'carrots' ]
+
+      it "resulting in a [..]" do
+
+        s = _FUNC[ 'carrots' ]
         s.should eql "let's have carrots and potato"
       end
-      it "resulting in the tuple [ false, X ] gives you X" do
-        s = FUNC[ 'red' ]
+
+      it "resulting in the tuple [..]" do
+
+        s = _FUNC[ 'red' ]
         s.should eql 'nope i hate tomato'
       end
+
       it "this followed all the way through to the end with a true-ish itme" do
-        x = FUNC[ 'blue' ]
+
+        x = _FUNC[ 'blue' ]
         x.should eql [ 'blue', 'potato' ]
       end
     end

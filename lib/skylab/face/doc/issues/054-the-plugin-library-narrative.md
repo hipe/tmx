@@ -22,7 +22,7 @@ are part of the node's public API, if that (something we used to do until the
 excessive effort has been expended to make the corresponding spec for this
 node serve as comprehensive API documentation (or at least, a source for it).)
 
-here we use "contained DSL's" [#mh-033] implemented using coduits et. al
+here we use "contained DSL's" [#pl-033] implemented using coduits et. al
 [#078], API-private modules [#079]. we write in narrative pre-order [#058],
 broken into facets [#080].
 

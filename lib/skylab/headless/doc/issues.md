@@ -57,7 +57,7 @@
              ( #was: #parent-node: [#140]  [ filesystem ] )
              ( #re-purposed:thrice. moved to [#cb-058]
                was: #parent-node: [#017] our own hand-rolled parameter library
-               #parent-in-universe: [#mh-053] )
+               #parent-in-universe: [#fi-001] )
              (#re-purposed: once. before above, became [#su-001] then
                dissolved to `Lib_`)
 [#129]       #parent-node: [#126] headless CLI client DSL narrative
@@ -219,7 +219,7 @@
 [#007]       #change-vector: less pathname, *no* direct interaction with filesystem
              ( #was: #done use of Parameter::Set#list, unify with B-oxxy interface )
 [#006]       #parent-node: [#sl-116], #facility-tracker `error_count`
-[#005]       #parent-node: [#126]  [ CLI table ]
+[#005]       ( #moved-to: [#br-096.B] #parent-node: [#126]  [ CLI table ] )
              ( #was: unify concepts let sub-client trump rename `parent_runtime` `par_client` )
 [#004]       #doc-point the deprecation and rebirth of the sub-client pattern ..
 [#003]       [ CLI option ]

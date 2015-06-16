@@ -2,7 +2,7 @@
 
 ## introduction
 
-the "entity" facility continues a [#mh-053] long line of entity- and
+the "entity" facility continues a [#fi-001] long line of entity- and
 property-modeling libraries. of them all this is the most overwrought,
 and as this is written is undergoing its first overhaul.
 

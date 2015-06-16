@@ -100,7 +100,7 @@ module Skylab::Headless
         super()
       end
 
-      # ~ :[#mh-021] custom implementation (just for getting slices)
+      # ~ :[#sl-146] custom implementation (just for getting slices)
     private
       def dupe
         dup

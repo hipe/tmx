@@ -1,4 +1,7 @@
-# Preload modules when toplevel name exists. :[#035]
+# Preload modules when toplevel name exists. :[#064]
+
+
+(EDIT: very legacy, probably no longer relevant)
 
 when we use names that are toplevel constants
 our autoloading will fail, opting instead to use the toplevel constant

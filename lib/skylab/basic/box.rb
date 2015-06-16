@@ -16,7 +16,7 @@ module Skylab::Basic
       @a = [ ] ; @h = { }
     end
 
-    # ~ :+[#mh-021] a typical base class implementation:
+    # ~ :+[#sl-146] a typical base class implementation:
     def dupe
       dup
     end

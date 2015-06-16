@@ -1,9 +1,10 @@
-module Skylab::MetaHell
+module Skylab::Basic
 
-  module Lib__
+  module Function
 
     # given a queue of functions and one seed value, produce one result
     #
+    #   self._REDO etc
     #
     #     FUNC = begin
     #
@@ -55,95 +56,63 @@ module Skylab::MetaHell
     #
     # Blue potato. everything should be perfectly clear now.
 
-    Function_chain = -> p_a, first_arg_a do  # see [#026]
-      res_a = p_a.reduce first_arg_a do |arg_a, p|
-        ok, *rest = p[ * arg_a ]
-        if ok
-          true == ok or rest.unshift( ok )  # "double-duty" term
-          rest
+    class << self
+
+      def chain p_a
+        Function_chain___[ p_a ]
+      end
+
+      def globful_actor cls
+
+        cls.class_exec do
+          define_singleton_method :[], GLOBFUL_CALL_METHOD__
+          define_singleton_method :call, GLOBFUL_CALL_METHOD__
+        end
+        NIL_
+      end
+
+      def globless_actor cls
+
+        cls.class_exec do
+          define_singleton_method :[], GLOBLESS_CALL_METHOD__
+          define_singleton_method :call, GLOBLESS_CALL_METHOD__
+        end
+        NIL_
+      end
+    end  # >>
+
+    GLOBFUL_CALL_METHOD__ = -> * x_a do
+      new( * x_a ).execute
+    end
+
+    GLOBLESS_CALL_METHOD__ = -> * x_a do
+      new( a ).execute
+    end
+
+    Function_chain___ = -> p_a do  # see [#047]
+
+      -> * arg_a do
+
+        x_a = p_a.reduce arg_a do | arg_a_, p |
+
+          ok_x, * x_a_ = p[ * arg_a_ ]
+          if ok_x
+
+            if true != ok_x  # hackish double-duty term
+              x_a_.unshift ok_x
+            end
+            x_a_
+          else
+            break x_a_
+          end
+        end
+
+        if 2 > x_a.length
+          x_a.fetch 0
         else
-          break rest
+          x_a
         end
       end
-      if res_a.length < 2
-        res_a.first
-      else
-        res_a
-      end
-    end
-
-    Import_constants__ = -> from_mod, i_a, to_mod do
-      i_a.each do |i|
-        to_mod.const_set i, from_mod.const_get( i, false )
-      end
-    end
-
-    Import_methods__ = -> from, i_a, priv_pub, to_mod do  # #todo-no longer used?
-      to_mod.module_exec do
-        i_a.each do |i|
-          define_method i, & from[ i ]
-        end
-        :private == priv_pub and private( * i_a )
-      end
-      nil
-    end
-
-    Is_primitive_esque__ = -> x do
-      ! x or case x
-      when ::TrueClass, ::Numeric, ::Symbol, ::String, ::Module ; true
-      end
-    end
-
-    Levenshtein_default_proc___ = -> d, h, k do
-      raise ::KeyError, Say_not_found[ d, h.keys, k ]
-    end
-
-    A_HANDFUL_ = 5
-
-    Levenshtein_default_proc__ = Levenshtein_default_proc___.curry[ A_HANDFUL_ ]
-
-    Memoize_to_const_method__ = -> p, c do  # use with `define_method`
-      touch = Touch_const.curry[ false, -> _ { p.call }, c ]
-      -> do
-        touch[ self, nil ]
-      end
-    end
-
-    Say_not_found_ = -> d, a, k do
-
-      s = MetaHell_.lib_.levenshtein.with(
-        :item, k,
-        :items, a,
-        :closest_N_items, d,
-        :aggregation_proc, -> a_ { a_ * ' or ' } )
-
-      if s
-        _did_you_mean = " - did you mean #{ _s }?"
-      end
-
-      "not found #{ MetaHell_.lib_.strange k }#{ _did_you_mean }"
-    end
-
-    Say_not_found = Say_not_found_.curry[ A_HANDFUL_ ]
-
-    Touch_const_reader = -> do_inherit, create_p, c, mod, arg do
-      p = Touch_const.curry[ do_inherit, create_p, c, mod ]
-      -> { p[ arg ] }
-    end
-
-    Touch_const = -> do_inherit, create_p, c, mod, create_arg_x do  # :+#curry-friendly
-      if mod.const_defined? c, do_inherit
-        mod.const_get c
-      else
-        mod.const_set c, create_p[ create_arg_x ]
-      end
-    end
-
-    Without_warning__ = -> p do
-      x = $VERBOSE; $VERBOSE = nil
-      r = p.call  # `ensure` is out of scope for now
-      $VERBOSE = x
-      r
     end
   end
 end

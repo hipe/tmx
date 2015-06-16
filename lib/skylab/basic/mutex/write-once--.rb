@@ -10,7 +10,7 @@ module Skylab::Basic
     attr_reader :held_by
     alias_method :is_held, :held_by
 
-    # ~ :+[#mh-021] typical base class implementation:
+    # ~ :+[#sl-146] typical base class implementation:
     def dupe
       dup
     end

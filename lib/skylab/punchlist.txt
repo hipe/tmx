@@ -1,25 +1,83 @@
 slicer              q [ done ]
+file-metrics        q [ done ]
+
+
+
+"sub-tree"          q [ TODO ]
+
+  • subject only depended on [fa] for "table",
+  • so we were like "let's get [fa] table out of [fa]"
+  • which blew up into pre-unifying table
+  • which blew up into sunsetting [mh]
+  • also, one table wanted plugin, so pre-unify plugin ..
+
+
+  SO:
+
+    • p.u plugin (1/N): [hl] (1 & 2)
+    • p.u plugin (2/N): [fa]
+
+    • p.u table (1/4): minimal (1 & 2)
+    • p.u table (2/4): inferential (1 & 2)
+    • p.u table (3/4): structured (1 & 2 )
 
 
 
 
-file-metrics        q [ TODO ]
-
-  3) wc
-  4) dirs
-  5) ext
-  6) innteg
-
-  • there is a lot about how it was written that we don't do anymore:
-    * x..
 
 
 
+  all tables now live under [#ba-096]:
 
-sub-tree            q [ TODO ]
+    fa-048 (simple) => A
+    fa-036 (actor)  => B
+    hl-005 (inferential) => C
+    fa-011 (structured) => D
 
-  • already has a [br] interacting model
-  • it appears that its only depends on [fa] for table
+  while we are at it, sunset [mh]:
+
+    mh-021 -> sl 146
+    mh-024 formal attributes -> fields[ 002 ]
+    mh-025 -> fi-025
+    mh-026 f.chain -> [#ba-047]
+    mh-033 -> plugin-033
+    mh-035 -> ca-064
+    mh-037 -> [pa] 007 legacy parsing terms defined
+    mh-039 -> sunsetted
+    mh-041 -> plugin 002
+    mh-043 -> sunsetted
+    mh-046 -> sunsetted
+    mh-048 -> sl-147
+    mh-051 -> sl-148
+    mh-052 -> sl-150
+    mh-053 -> fi-001
+    mh-056 "countoured fields" -> fi-003
+    mh-058 -> sl 148
+    mh-061 basic fields -> [fi-004]
+    mh-066 the "fields" (now "declared") narrative -> fi-003
+
+    (the above list inverted:)
+
+    ba-047 <- mh-026   rw,
+
+    ca-064 <- mh-035   doc
+
+    fi-001 <- mh-053
+    fi-002 <- mh-024
+    fi-003 <- mh-066
+    fi-025 <- mh-025
+    fi-004 <- mh-061
+
+    pa-007 <- mh-037
+
+    pl-002 <- mh-041
+    pl-033 <- mh-033
+
+    sl-146 <- mh-021
+    sl-147 <- mh-048
+    sl-148 <- mh-052 ?? 058
+
+    _
 
 
 

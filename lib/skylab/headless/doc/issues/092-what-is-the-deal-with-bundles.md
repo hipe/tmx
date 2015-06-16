@@ -44,7 +44,7 @@ module (or both).
 a justifiction for bundles is served by an explanation of how they evolved:
 before bundles got a proper name and face, they fell under the general rubric
 that came to be called "method cherry-picking", an umbrella of strategies
-explored at historical [#mh-051].
+explored at historical [#sl-148].
 
 the first dedicated support node for bundles was born in headless core
 and coincided with the "great earthquake" of headless. to understand the

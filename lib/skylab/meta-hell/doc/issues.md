@@ -2,7 +2,7 @@
 [#068]       #done rewrite contoured parsing to be unobtrusive
 [#067]       #done in contoured, absorption methods should be self-contained
 [#066]       #doc-point the metahell fields narrative ..
-[#065]       #done unify use of `MetaHell_` not MetaHell
+[#065]       #done use subsystem const with one trailing underscore
 [#064]       #done fix syntax sharing
 [#063]       #done get rid of argful field parsers
 [#062]       #done get rid of ridiculous attempts at currying methods
@@ -31,9 +31,10 @@
 [#043]       #boxxy the stemmy tree issue - try autoloading the value corresp.
                to the path "headless/nlp/en/levenshtein-.rb"
 [#042] #hole #moved-to:[#cb-046]  (was: #doc-point introducting tagged argument lists (#iambics) ..
-[#041]       #doc-node the core node narrative ..
+[#041] #hole ( #moved-to HERE 002 )
+             ( #doc-node the core node narrative .. )
 [#040]       #autoloading: convenient to have `const_missing` result in value
-[#039]       #deprecated `private_attr_reader`
+[#039] #hole #deprecated `p_rivate_attr_reader`
 [#038]       #experimental hack - when the set of all local `private` methods
                in a class is one-to-one isomorphic with the set of all DSL
                entrypoint keywords. makes things concise, but is a hack.
@@ -53,9 +54,12 @@
 [#028]       #tracking-tag `without_warning`
 [#027]       ( #moved-to: [#pa-003] )
 [#026]       #doc-point "tuple tower" defined ..
-[#025]       #doc-point #parent:024 #body-is-inline-in-parent
-               `formal` defined informally.
-[#024]       #doc-node the formal attribute narrative .
+[#025] #hole ( #moved to same number in fi )
+             ( #was: #doc-point #parent:024 #body-is-inline-in-parent:
+               `formal` defined informally. )
+[#024]       bundle
+             ( #moved-to: [#fi-003] )
+             ( #was: #doc-node the formal attribute narrative .. )
 [#023] #open merge the 2 pool enhancements
 [#022]       #tracking-tag #boxxy's relationship to a.l
 [#021] #open universe-wide re-audit these knowing now that `initialize_copy`
@@ -89,5 +93,5 @@
              ( #was: #done consider scrapping `_p` name convention for.. )
 [#002]       ( #moved-to: [#pa-002] )
              ( #was: #done instance method klass creator tests )
-[#001]       [ bundle ]
+[#001]       sidesystem intro ..
              ( #was: #done metahell tests and resolve #kick issue maybe )

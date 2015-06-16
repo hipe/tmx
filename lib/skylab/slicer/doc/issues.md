@@ -1,3 +1,8 @@
+[#150]       whining about ruby implementation of struct ..
+[#149]       method cherry-picking ..
+[#148]       the touch method function ..
+[#147]       the method touching experiment ..
+[#146]       justifying the `dupe` method ..
 [#145]       #bibliographic-reference: _The Art of Unix Programming_,
                Eric S. Raymond, 2003
 [#144]       ( one more tag for ) this patern spawn-like dup and extend

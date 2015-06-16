@@ -96,10 +96,6 @@ module Skylab::TestSupport
 
     TestSupport__ = sidesys[ :TestSupport ]
 
-    Touch_const = -> do
-      MH___[].touch_const
-    end
-
       end
     end  # Lib_
 

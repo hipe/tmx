@@ -138,13 +138,13 @@ module Skylab::MetaHell
     # ~ #curry-friendly support procs
 
     Touch_const_with_dupe_for___ = -> p, c, mod do
-      MetaHell_.touch_const false, -> _ do
+      MetaHell_.lib_.basic::Module::Touch_const[ false, -> _ do
         if mod.const_defined? c
           mod.const_get( c ).dupe_for mod
         else
           p[ mod ]
         end
-      end, c, mod, nil
+      end, c, mod, nil ]  # #todo-temporary to this phase
     end
 
     Touch_singleton_method____ = -> priv_pub, m, p, client do  # #curry-friendly

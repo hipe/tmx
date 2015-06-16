@@ -1,7 +1,7 @@
 digraph g {
 
-  mh_024 [ label="[#mh-024]\nformal attributes" ]
+  002 [ label="[#002]\nformal attributes" ]
 
-  de -> mh_024
-  sg -> mh_024
+  de -> 002
+  sg -> 002
 }
