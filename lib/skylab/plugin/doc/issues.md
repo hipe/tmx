@@ -1,5 +1,6 @@
 [#033]       explaining the enhance method ..
 [#024]       the bundle fancy lookup exegesis ..
+[#005]       [ pub-sub ]
 [#004]       digraphic ..
 [#003]       there is a possible new parse function we might subsume in [sg]
              ( #was: #done consider scrapping `_p` name convention for.. )

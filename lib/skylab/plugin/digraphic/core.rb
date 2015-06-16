@@ -2,56 +2,22 @@ module Skylab::Plugin
 
   class Digraphic  # see [#004]
 
-    class Dispatcher
+    class Dispatcher < Dispatcher_
 
       def initialize resources, & oes_p
 
-        @occurrence_a = []
-        @on_event_selectively = oes_p
-        @plugin_a = []
-        @resources = resources
-
-        # ~ for indexing plugins:
-
         @all_capabilities = {}
 
-        @_monitor = Me_::Modality_Adapters_::ARGV::Monitor.new( @occurrence_a )
+        a = []
+        @_monitor = Me_::Modality_Adapters_::ARGV::Monitor.new a
+        @occurrence_a = a
+
+        super
       end
 
       def state_machine * tuples
         @state_machine = State_Machine___.new tuples
         nil
-      end
-
-      def load_plugins_in_module mod
-
-        _st = Callback_::Stream.via_nonsparse_array mod.constants do | const |
-
-          mod.const_get const, false
-
-        end
-
-        load_plugins_in_prototype_stream _st
-      end
-
-      def load_plugins_in_prototype_stream st
-
-        st.each do | plugin_class_like |
-
-          add_plugin_via_prototype plugin_class_like
-        end
-        NIL_
-      end
-
-      def add_plugin_via_prototype plugin_class_like
-
-        pu_d = @plugin_a.length
-
-        pu = plugin_class_like.new_via_plugin_identifier_and_resources(
-          pu_d, @resources, & @on_event_selectively )
-
-        _accept_plugin pu_d, pu
-        NIL_
       end
 
       def create_plugin_via_option_parser name_symbol
@@ -80,7 +46,7 @@ module Skylab::Plugin
         pu
       end
 
-      def _accept_plugin pu_d, pu
+      def receive_plugin pu_d, pu
 
         pu.each_reaction do | tr |
 
@@ -109,8 +75,7 @@ module Skylab::Plugin
           end
         end
 
-        @plugin_a[ pu_d ] = pu
-        NIL_
+        super
       end
 
       # ~ ( for collaborators

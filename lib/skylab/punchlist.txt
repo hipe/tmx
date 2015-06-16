@@ -25,58 +25,12 @@ file-metrics        q [ done ]
 
 
 
-
-
   all tables now live under [#ba-096]:
 
     fa-048 (simple) => A
     fa-036 (actor)  => B
     hl-005 (inferential) => C
     fa-011 (structured) => D
-
-  while we are at it, sunset [mh]:
-
-    mh-021 -> sl 146
-    mh-024 formal attributes -> fields[ 002 ]
-    mh-025 -> fi-025
-    mh-026 f.chain -> [#ba-047]
-    mh-033 -> plugin-033
-    mh-035 -> ca-064
-    mh-037 -> [pa] 007 legacy parsing terms defined
-    mh-039 -> sunsetted
-    mh-041 -> plugin 002
-    mh-043 -> sunsetted
-    mh-046 -> sunsetted
-    mh-048 -> sl-147
-    mh-051 -> sl-148
-    mh-052 -> sl-150
-    mh-053 -> fi-001
-    mh-056 "countoured fields" -> fi-003
-    mh-058 -> sl 148
-    mh-061 basic fields -> [fi-004]
-    mh-066 the "fields" (now "declared") narrative -> fi-003
-
-    (the above list inverted:)
-
-    ba-047 <- mh-026   rw,
-
-    ca-064 <- mh-035   doc
-
-    fi-001 <- mh-053
-    fi-002 <- mh-024
-    fi-003 <- mh-066
-    fi-025 <- mh-025
-    fi-004 <- mh-061
-
-    pa-007 <- mh-037
-
-    pl-002 <- mh-041
-    pl-033 <- mh-033
-
-    sl-146 <- mh-021
-    sl-147 <- mh-048
-    sl-148 <- mh-052 ?? 058
-
     _
 
 
