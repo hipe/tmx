@@ -111,8 +111,10 @@ module Skylab::Face
             end
           end ; nil
         end
-      LIB_.fields_from_methods :niladic, :passive, :absorber, :absrb,
-          -> do
+
+      LIB_.fields.from_methods(
+        :niladic, :passive, :absorber, :absrb,
+      ) do
         def parts
           @fill.parts_x = gets_one_polymorphic_value
         end

@@ -81,18 +81,7 @@ module Skylab::Face  # read [#011] the top node narrative
       Bsc__[]::Field
     end
 
-    Fields = -> mod, * field_i_a do
-
-      Fields_lib___[]::Basic.with :client, mod,
-        :globbing, :absorber, :initialize,
-        :field_i_a, field_i_a
-    end
-
-    Fields_lib___ = sidesys[ :Fields ]
-
-    Fields_from_methods = -> *a, p do
-      MH__[]::Fields::From.methods.iambic_and_block a, p
-    end
+    Fields = sidesys[ :Fields ]
 
     HL__ = sidesys[ :Headless ]
 

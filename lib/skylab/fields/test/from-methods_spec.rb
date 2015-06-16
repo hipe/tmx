@@ -1,19 +1,23 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::Fields::From
+module Skylab::Fields::TestSupport
 
-  describe "[mh] Fields::From" do
+  describe "[fi] from-methods" do
+
+    FM_subject_module__ = -> do
+      Home_
+    end
 
     context "in this primordial ancestor of `entity`, define fields with methods" do
 
       before :all do
 
-        class Foo
+        class FM_Foo
 
           def one
           end
 
-          MetaHell_::Fields::From.methods(
+          FM_subject_module__[].from_methods(
             :overriding, :argful, :destructive, :globbing, :absorber, :initialize
           ) do
 
@@ -31,22 +35,22 @@ module Skylab::MetaHell::TestSupport::Fields::From
 
       it "the \"absorber\" you defined was globbing, and was `initialize` so" do
 
-        Foo.new( :two, "foozle" ).two_value.should eql 'foozle'
+        FM_Foo.new( :two, "foozle" ).two_value.should eql 'foozle'
       end
 
       it "a subclass will inherit the same behavior and fieldset (by default)" do
 
-        class Bar < Foo
+        class FM_Bar < FM_Foo
         end
 
-        Bar.new( :two, "fazzle" ).two_value.should eql 'fazzle'
+        FM_Bar.new( :two, "fazzle" ).two_value.should eql 'fazzle'
       end
 
       it "a subclasss can mutate its own fieldset without disturbing parent" do
 
-        class Baz < Foo
+        class FM_Baz < FM_Foo
 
-          MetaHell_::Fields::From.methods :argful do
+          FM_subject_module__[]::from_methods :argful do
             def four a
               @four_value = a.shift
             end
@@ -55,11 +59,16 @@ module Skylab::MetaHell::TestSupport::Fields::From
           attr_reader :four_value
         end
 
-        Baz.new( :four, "frick" ).four_value.should eql 'frick'
+        FM_Baz.new( :four, "frick" ).four_value.should eql 'frick'
+
         _rx = ::Regexp.new( "\\Aunrecognized\\ keyword\\ 'four'\\ \\-\\ did\\ you\\ mean\\ two\\?\\z" )
-        -> do
-          Foo.new( :four, "frick" )
-        end.should raise_error( ArgumentError, _rx )
+
+        begin
+          FM_Foo.new :four, "frick"
+        rescue ::ArgumentError => e
+        end
+
+        e.message.should match _rx
       end
     end
 
@@ -67,8 +76,9 @@ module Skylab::MetaHell::TestSupport::Fields::From
 
       before :all do
 
-        class Fob
-          MetaHell_::Fields::From.methods :use_o_DSL do
+        class FM_Fob
+
+          FM_subject_module__[].from_methods :use_o_DSL do
 
             o :desc, "a", "b"
             o :desc, "c"
@@ -84,13 +94,13 @@ module Skylab::MetaHell::TestSupport::Fields::From
 
       it "you can add desc strings in long lists or one at a time" do
 
-        Fob::FIELDS_[:foo].desc_p[ a = [] ]
+        FM_Fob::FIELDS_[ :foo ].desc_p[ a = [] ]
         a.should eql %w( a b c )
       end
 
       it "you can define desc strings by defining functions that will produce them" do
 
-        Fob::FIELDS_[:bar].desc_p[ a = [] ]
+        FM_Fob::FIELDS_[ :bar ].desc_p[ a = [] ]
         a.first.should eql "ok."
       end
     end

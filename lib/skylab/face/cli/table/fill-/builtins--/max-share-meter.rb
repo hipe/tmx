@@ -48,7 +48,9 @@ module Skylab::Face
             "for now, all 'max share meter' columns must be 'fill' columns."
           end
 
-        LIB_.fields_from_methods :absorber, :absrb_iambic_fully, -> do
+          LIB_.fields.from_methods(
+            :absorber, :absrb_iambic_fully
+          ) do
           def from_right
             @is_from_right = true
           end

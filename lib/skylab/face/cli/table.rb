@@ -106,7 +106,9 @@ module Skylab::Face
         end
       end
 
-    LIB_.fields_from_methods :niladic, :absorber, :absrb, -> do
+    LIB_.fields.from_methods(
+      :niladic, :absorber, :absrb
+    ) do
 
       def field
         bx = (( @field_box ||= LIB_.box.new ))
@@ -201,9 +203,10 @@ module Skylab::Face
         bx.add @field.name_symbol, @field ; nil
       end
       attr_reader :d
-      LIB_.fields_from_methods(
-        :niladic, :passive, :absorber, :absrb_passive,
-      -> do
+
+      LIB_.fields.from_methods(
+        :niladic, :passive, :absorber, :absrb_passive
+      ) do
         def cel_renderer_builder
           x = gets_one_polymorphic_value
           if x.respond_to? :id2name
@@ -231,7 +234,7 @@ module Skylab::Face
         def right
           @field.align_i = :right
         end
-      end )
+      end
     end
 
     # add field modifiers between the `field` keyword and its label (left/right):
