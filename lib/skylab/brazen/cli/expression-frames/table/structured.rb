@@ -508,7 +508,7 @@ module Skylab::Brazen
             __gather_up_body
             __do_summary_row
 
-            Content_Matrix___.new @_maxes, @_content_row_a
+            Content_Matrix___.new @_column_widths, @_content_row_a
           end
 
           def __initial_horizontal_pass
@@ -602,7 +602,7 @@ module Skylab::Brazen
           def __init_see_content_proc
 
             maxes = @_w.times.map { 0 }
-            @_maxes = maxes
+            @_column_widths = maxes
             @_see_content = -> s, d do
               d_ = s.length
               if maxes.fetch( d ) < d_

@@ -19,6 +19,8 @@ module Skylab::Plugin
       @resources = resources
     end
 
+    undef_method :initialize_dup
+
     def load_plugins_in_module mod
 
       _st = Callback_::Stream.via_nonsparse_array mod.constants do | const |

@@ -1,67 +1,76 @@
-require_relative 'test-support'
+require_relative '../../../../test-support'
 
-module Skylab::Face::TestSupport::CLI::Table
+module Skylab::Brazen::TestSupport
 
-  describe "[fa] CLI table progression" do
+  describe "[fa] CLI table progression", wip: true do
 
     it "loads" do
-      subject
+      _subject
     end
 
     it "basic two-pass aligns right" do
-      subject[ :read_rows_from,
-        [ [ 'abcde', 0.123 ], [ 4.56, 'fghijk' ] ],
-         * typical ]
 
-      expect '| abcde |  0.123 |'
-      expect '|  4.56 | fghijk |'
-      done
+      _subject[ :read_rows_from,
+        [ [ 'abcde', 0.123 ], [ 4.56, 'fghijk' ] ],
+         * __typical ]
+
+      _expect '| abcde |  0.123 |'
+      _expect '|  4.56 | fghijk |'
+      _done
+    end
+
+    def __typical
+
+      [ :left, '| ', :right, ' |', :sep, ' | ',
+        :write_lines_to, _write_lines_to ]
     end
 
     it "the decimal line up, intermixed with strings" do
-      subject[ :read_rows_from,
-        [ [ 0.123, 4.56 ], [ 'hi', 78.9 ], [ 45.6, 'helllo' ] ],
-         * visible ]
 
-      expect '|_ 0.123_|_  4.56_|'
-      expect '|_    hi_|_ 78.90_|'
-      expect '|_45.600_|_helllo_|'
-      done
+      _subject[ :read_rows_from,
+        [ [ 0.123, 4.56 ], [ 'hi', 78.9 ], [ 45.6, 'helllo' ] ],
+         * _visible ]
+
+      _expect '|_ 0.123_|_  4.56_|'
+      _expect '|_    hi_|_ 78.90_|'
+      _expect '|_45.600_|_helllo_|'
+      _done
     end
 
     it "just strings and just integers, with nil-holes" do
-      subject[ :read_rows_from,
-        [['foo', -4567], [nil, 89], ['bo', nil]], * visible ]
-      expect '|_foo_|_-4567_|'
-      expect '|_   _|_   89_|'
-      expect '|_bo _|_     _|'
-      done
+
+      _subject[ :read_rows_from,
+        [['foo', -4567], [nil, 89], ['bo', nil]], * _visible ]
+
+      _expect '|_foo_|_-4567_|'
+      _expect '|_   _|_   89_|'
+      _expect '|_bo _|_     _|'
+      _done
     end
 
-    def subject
-      Subject__[]
-    end
-
-    def typical
-      [ :left, '| ', :right, ' |', :sep, ' | ',
-        :write_lines_to, write_lines_to ]
-    end
-
-    def visible
+    def _visible
       [ :left, '|_', :right, '_|', :sep, '_|_',
-        :write_lines_to, write_lines_to ]
+        :write_lines_to, _write_lines_to ]
     end
 
-    def write_lines_to
-      @y ||= []
+    def _write_lines_to
+
+      @_y ||= []
     end
 
-    def expect s
-      @y.shift.should eql s
+    def _subject
+
+      @_counter = -1
+      Brazen_::CLI::Expression_Frames::Table::Actor
     end
 
-    def done
-      @y.length.should be_zero
+    def _expect s
+
+      @_y.fetch( @_counter += 1 ).should eql s
+    end
+
+    def _done
+      @_y.length.should eql ( @_counter + 1 )
     end
   end
 end

@@ -1,4 +1,6 @@
 [#033]       explaining the enhance method ..
+[#007]       the strategy narrative ..
+[#006]       #track pub-sub hacks (mutations) #universal
 [#024]       the bundle fancy lookup exegesis ..
 [#005]       [ pub-sub ]
 [#004]       digraphic ..

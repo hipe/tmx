@@ -24,6 +24,7 @@
                branches of unused code from sourcecode, programattically!
 [#010] #open sl/test-support/tmpdir is a great subject
              (this has become more generally a #tracking-tag for same.)
+             :[#.B] (in [pl])
 [#009]       #backburner unwrap -- terrible idea
 [#008] #open index all the vectors of `porcelain/test/porcelain_spec.rb`
 [#007] #open (put this information somewhere) there is ..

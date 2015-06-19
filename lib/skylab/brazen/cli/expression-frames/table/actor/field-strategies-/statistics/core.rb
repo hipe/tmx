@@ -1,6 +1,13 @@
-module Skylab::Face
+module Skylab::Brazen
 
-  class CLI::Table  # read [#036] the CLI table narrative #storypoint-5
+  class CLI::Expression_Frames::Table::Actor
+
+    class Strategies___::Field_Statistics < Argumentative_strategy_class_[]
+
+      PROPERTIES = [
+      ]
+
+      # <- NOTHING below this line is functioning
 
     # it is a pesudo-proc ..
     #
@@ -43,138 +50,6 @@ module Skylab::Face
     #     HERE
     #     act  # => exp
 
-    class << self
-
-      def [] * x_a
-        new( x_a ).execute
-      end
-
-      def call_via_iambic x_a
-        if x_a.length.zero?
-          self
-        else
-          new( x_a ).execute
-        end
-      end
-    end  # >>
-
-    def initialize x_a
-
-      @do_show_header = @field_box = @left_x = @right_x =
-        @sep_x = @target_width_d = nil
-
-      @row_upstream = @line_downstream_yielder = nil
-
-      Table_Shell__.new 0, x_a, self
-    end
-
-    attr_writer :do_show_header, :field_box, :left_x, :right_x, :sep_x
-
-    attr_accessor :row_upstream, :line_downstream_yielder
-
-    alias_method :dupe, :dup  # :+[#sl-146] (ok)
-
-    def initialize_copy _otr_
-      # @do_show_header, @left_x @right_x, @sep_x copy-by-reference
-
-      # ALSO @row_upstream, @line_downstream_yielder  copy-by-reference (for now)
-
-      @field_box and @field_box = @field_box.dupe  # deep copy #storypoint-80
-      nil
-    end
-
-    class Table_Shell__
-
-      def initialize d, x_a, kernel
-
-        @d = d ; @kernel = kernel ; @x_a = x_a
-
-        @field_box = nil
-
-        if 1 == @x_a.length
-          # hack - whenever exactly 1 element is passed
-          # assume it is a rows enumerator.
-          @x_a.unshift :read_rows_from
-        end
-
-        absrb
-
-        if @field_box
-          @kernel.do_show_header.nil? and @kernel.do_show_header = true
-          @kernel.field_box and raise "field merge not implemented"
-          @kernel.field_box = @field_box
-        end
-      end
-
-    LIB_.fields.from_methods(
-      :niladic, :absorber, :absrb
-    ) do
-
-      def field
-        bx = (( @field_box ||= LIB_.box.new ))
-        shell = Field_Shell__.new @d, @x_a, bx
-        @d = shell.d
-      end
-
-      def header
-        x = gets_one_polymorphic_value
-        :none == x or raise ::ArgumentError, "only 'none' is allowed (#{ x })"
-        @kernel.do_show_header = false
-        KEEP_PARSING_
-      end
-
-      def left
-        @kernel.left_x = gets_one_polymorphic_value
-        KEEP_PARSING_
-      end
-
-      def read_rows_from
-
-        x = gets_one_polymorphic_value
-
-        if ! x.respond_to? :gets
-
-          if x.respond_to? :each_with_index and x.respond_to? :[]
-            x = Callback_::Stream.via_nonsparse_array x
-          elsif x.respond_to? :call
-            x = Callback_.stream( & x )
-          end
-        end
-
-        @kernel.row_upstream = x
-        KEEP_PARSING_
-      end
-
-      def right
-        @kernel.right_x = gets_one_polymorphic_value
-        KEEP_PARSING_
-      end
-
-      def sep
-        @kernel.sep_x = gets_one_polymorphic_value
-        KEEP_PARSING_
-      end
-
-      def show_header
-        @kernel.do_show_header = gets_one_polymorphic_value
-        KEEP_PARSING_
-      end
-
-      def target_width
-        @kernel.accept_target_width_from_stream @iambic_scan
-        KEEP_PARSING_
-      end
-
-      def write_lines_to
-
-        _x = gets_one_polymorphic_value
-
-        @kernel.line_downstream_yielder = _x
-
-        KEEP_PARSING_
-      end
-    end
-    end
 
     # specify custom headers, separators, and output functions:
     #
@@ -652,63 +527,7 @@ module Skylab::Face
     #     q[ :sep, '_' ]  # => "<a_b>\n"
     #     q[]  # => "<aXb>\n"
 
-    class << self
-      def curry * x_a
-        new( x_a ).freeze
-      end
+    # ->
     end
-  public
-    def curry * x_a
-      mutable_kernel = dupe
-      mutable_kernel.absorb_iambic_flly x_a
-      mutable_kernel.freeze
-    end
-    def [] * x_a  # typically from a frozen, curried kernel
-      mutable_kernel = dupe
-      mutable_kernel.absorb_iambic_flly x_a
-      mutable_kernel.execute
-    end
-  protected
-    def absorb_iambic_flly x_a
-      Table_Shell__.new 0, x_a, self
-    end
-
-    # ~ done with currying
-
-    # ~ support for the "fill" subsystem
-
-    def self.some_screen_width
-      Table_::Fill_.some_screen_w
-    end
-
-    def self.any_calculated_screen_width
-      Table_::Fill_.any_calculated_screen_w
-    end
-
-  public
-
-    def accept_target_width_from_stream scan
-      @target_width_d = scan.gets_one ; nil
-    end
-
-  private
-
-    class Field__
-      attr_accessor :fill
-    end
-
-    def prdc_late_pass_renderers a
-      Table_::Fill_.produce_late_pass_renderers a do |o|
-        o.field_fetcher = @field_fetcher
-        o.field_stats = @field_stats
-        o.left = @left_x ; o.sep = @sep_x ; o.right = @right_x
-        o.num_fields = @widest_row_cels_count
-        o.target_width_d = @target_width_d
-      end ; nil
-    end
-
-    KEEP_PARSING_ = true
-    MINUS_ = '-'.freeze
-    Table_ = self
   end
 end

@@ -235,7 +235,7 @@ module Skylab::Basic::TestSupport::Digraph::Core
       digraph :orph,  [ :c, b: :a ]
       digraph :real,  [row: :text, info: :text, empty: :info, row_count: :data ]
 
-      # cb-digraph-viz headless/core.rb Skylab::H-eadless::CLI::Table::Shell --ope
+      # cb-digraph-viz brazen/core.rb [some moudule] --ope
 
       context "you can ACHIEVE SEMANTIC DIFFERENCE" do
 

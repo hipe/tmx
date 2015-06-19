@@ -53,7 +53,10 @@ module Skylab::Callback
       end
 
       def template=
-        @nucleus.template = Callback_.lib_.string_lib.template.via_string gets_one_polymorphic_value
+
+        @nucleus.template = Callback_.lib_.basic::String.template.via_string(
+          gets_one_polymorphic_value )
+
         via_template_parse_remainder_of_polymorphic_stream polymorphic_upstream
       end
 

@@ -8,7 +8,7 @@ module Skylab::System
         # synopsis:
         #
         #   • this is a :+[#ba-027]:#normal-normalizer: once built this entity
-        #     is :+[#bs-018] immutable, effecting :+[#sl-016] spawn-and-mutate
+        #     is :+[#bs-018] immutable, effecting :+[#sl-023] dup-and-mutate
         #
         #   • when successful the entity holds a tokenized array of strings
         #     (the "command args") obviating the need to shellescape here
@@ -261,7 +261,7 @@ module Skylab::System
         def __resolve_valid_command_args  # amazing hax #note-130
 
           otr = dup
-          otr.extend Command_Building_Methods__  # pattern :+[#sl-144]
+          otr.extend Command_Building_Methods__  # pattern :+[#sl-023.B]
           @args = otr.__args_via_flush
           if @args && @on_event_selectively
             @on_event_selectively.call :info, :event, :find_command_args do

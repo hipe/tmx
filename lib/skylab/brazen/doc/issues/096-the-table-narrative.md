@@ -70,25 +70,88 @@ clients needing to deal with it on their own.
 
 # the CLI table ACTOR narrative :[#.B]
 
-## introduction
+## introduction (leads to [#.G])
 
 during the "pre-unification" phase, we designated this implementation as
-"actor" based solely on how it was typically intefaced with: it was
-"called" like a proc in order to express a table, so we named it
-"actor".
+"actor" based solely on how it was typically interfaced with: calling it
+in the "one-shot"/"inline" form had the appearance of calling a proc.
 
-below the surface however, the salience of this implementation during
-the rewrite is is this: wherease [#.D] ended up becoming an excercize in
-"visitor pattern", this implementation will be a grand exercize in
-dependency injection..
+furthermore; like a proc, this object can be "curried". this makes it
+superficially like the [#.D] "structured" table, but we take a tack that
+is more simple or more complicated, depending on whether or not you are
+using or implementing this facility (respectively):
 
-the wikipedia article there tells us there are "setter-", "interface-"
-and "constructor-" based implementations. none of that is exactly what
-we want.
+in contrast to [#.D], we make no distinction between a "declaration"
+phase and a "rendering" phase: any data that you would provide during
+the one you can also provide during the other, and vice-versa.
+
+below the surface, the salience of this implementation during the rewrite
+is this: whereas [#.D] ended up becoming an excercize in "visitor pattern",
+this implementation will be a grand exercize in finding the "right" pattern
+to make this code more navigable (by way of having some formal
+modularization).
+
+to this end:
+
+  • at first we thought we wanted "dependency injection"
+  • then maybe "service locator" pattern
+  • then we settled on "strategy" pattern (for now)
+
+interspersed with a long excerpt from the article on dependency
+injection (from the usual source) is our annotation in square brackets
+indicating whether our implementation & needs qualify with the previous
+point:
+
+  "Dependency injection is a software design pattern in which one or
+   more dependencies (or services) are injected, or passed by reference,
+   into a depedent object (or client) and are made art of the client's
+   state [yes, sounds good].
+
+   Dependency injection involves four elements: the implementation of a
+   service object [sure]; the client object depending on the service
+   [yep]; the interface the client uses to communicate with the service
+   [yes: our event model]; and the injector object, which is responsible
+   for injecting the service into the client [no, this is probably too
+   much software for our needs].
+
+   [this next paragraph is key:]
+
+   Implementation of dependency injection is often identical to that of
+   the strategy pattern, but while the strategy pattern is intended for
+   dependencies to be interchangeable throughout an object's lifetime,
+   in dependency injection only a single instance of a dependency is
+   used. [BOOM.]
+
+the last paragraph of the above excerpt makes our decision for us: we
+want the dependencies to be interchangeable throughout the lifetime of
+the object, so what we probably wants is closer to the strategy pattern.
+:[#.G]  (then we abstracted [#pl-007] from this.)
 
 
 
 
+## :#note-act-170
+
+at first it may seem superflous to go through event dispatching for
+every row. but this allows for (hypothetically) a pager, etc
+
+
+
+
+## :[#.E]
+
+fields should be immutable.
+
+
+
+
+## :[#.F]
+
+the default is to align left.
+
+
+
+# ~ (( BEGIN erase all these
 
 ## :#storypoint-80
 
@@ -146,3 +209,5 @@ the way we do this is we floor the floating point number (3.5 down to 3)
 and then with the amount of width that is left over (in this case 1), we
 distribute it from left to right, in a "one-for-you, one-for-you"
 manner.
+
+# ~ ))

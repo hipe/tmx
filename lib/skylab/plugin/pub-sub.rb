@@ -4,46 +4,109 @@ module Skylab::Plugin
 
     class Dispatcher < Dispatcher_
 
-      def initialize resources=nil, emit_sym_a, & oes_p
+      def initialize resources=nil, emit_sym_a, & x_p
 
         bx = Callback_::Box.new
         emit_sym_a.each do | sym |
-          bx.add sym, Callback_::Box.new
+          bx.add sym, []
         end
-        @_bx = bx
 
-        super resources || self, & oes_p
+        @_subscriptions_bx = bx
+
+        super resources || self, & x_p
         freeze
       end
 
-      def receive_plugin pu_d=nil, pu
+      # ~ ( duping a dispatcher is non-trivial:
 
-        bx = @_bx
-        sym_a = pu.subscription_name_symbols
+      def dup  # FOLLOW
 
-        if ! pu_d
-          pu_d = @_bx.length
+        otr = super
+        yield otr  # caller must set oes_p and resources
+        otr.__via_resources_initialize_dup @_subscriptions_bx, @plugin_a
+        otr
+      end
+
+      def initialize_dup _
+
+        # the onus is on caller to reconcile:
+
+        @on_event_selectively = false
+        @plugin_a = false
+        @resources = false
+
+        # we will do this later:
+
+        @_subscriptions_bx = false
+      end
+
+      attr_accessor(  # for initting dups only
+        :on_event_selectively,
+        :resources,
+      )
+
+      def __via_resources_initialize_dup subs_bx, plugin_a
+
+        # the dup gets its own deep copy of the subscription
+        # tree, which itslef has no objects, just primitives
+
+        bx_ = subs_bx.class.new
+
+        subs_bx.each_pair do | sym, listeners_a |
+          bx_.add sym, listeners_a.dup
         end
 
-        if sym_a
+        @_subscriptions_bx = bx_
+
+        # each plugin (or strategy etc) might need to freeze immediately,
+        # so when it is duped it must be able to access the correct rsx
+
+        @plugin_a = plugin_a.map do | pu |
+
+          pu.dup do
+            self
+          end
+        end
+
+        NIL_
+      end
+
+      # ~ )
+
+      def receive_plugin pu_d=nil, pu
+
+        sym_a = pu.subscription_name_symbols
+
+        if sym_a && sym_a.length.nonzero?
+
+          pu_d ||= @plugin_a.length
+
           sym_a.each do | sym |
 
-            bx.fetch( sym ).set pu_d, true
+            @_subscriptions_bx.fetch( sym ).push pu_d
           end
         end
 
         super
       end
 
-      def accept sym, & each_pu
+      def accept sym, & visit
 
         ok = KEEP_PARSING_
-        @_bx.fetch( sym ).a_.each do | pu_d |
+        @_subscriptions_bx.fetch( sym ).each do | pu_d |
 
-          ok = each_pu[ @plugin_a.fetch( pu_d ) ]
+          ok = visit[ @plugin_a.fetch( pu_d ) ]
           ok or break
         end
         ok
+      end
+
+      def subscriptions
+        @_subscriptions_bx
+      end
+
+      def retrieve_plugin d
+        @plugin_a.fetch d
       end
     end
 
@@ -73,7 +136,7 @@ module Skylab::Plugin
       def subscription_name_symbols
 
         @subscription_name_symbols or
-          self.class.const_get :SUBSCRIPTIONS, false  # until etc
+          self.class::SUBSCRIPTIONS  # you must look up
       end
 
       attr_writer(

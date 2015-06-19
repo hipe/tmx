@@ -5,6 +5,7 @@
 [#146]       justifying the `dupe` method ..
 [#145]       #bibliographic-reference: _The Art of Unix Programming_,
                Eric S. Raymond, 2003
+[#144]       #moved-to: (HERE) [#023]
 [#144]       ( one more tag for ) this patern spawn-like dup and extend
 [#143]       #parent-node: [#137] "branch and divide.."
 [#142]       #bibliographic-reference: _Cocoa Programming for Mac OS X_,
@@ -122,7 +123,13 @@
 [#026] 2011-12-27 MUXER, simplecov, hellof shits
 [#025] 2011-11-22 @closed added little -d option
 [#024] 2011-11-10 @closed fun little kurse cusrses progress bar thing
-[#023] 2011-11-22 @closed hacking dependency to let it get uglier
+[#023]       #track #universal the "dup and mutate" pattern: achieve an effect
+             akin to the "curry" operation on a proc, but with an object
+             that is treated as an actor; by duping the object and
+             modifying the dup (which in turn can be duped and modified
+             again and so on.)
+             :[#.B] when we add a module to the singleton ancestor chain too
+             ( #was: 2011-11-22 @closed hacking dependency to let it get uglier )
 [#022] 2011-11-01 @closed ascii tree viewing utility like we've written like 5 times before
 [#021] 2011-10-30 @closed build more dry run into config make make install
 [#020] 2011-10-29 @closed various small fixes and improvements

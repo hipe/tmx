@@ -345,6 +345,7 @@ module Skylab::Brazen
     define_singleton_method :_memoize, Callback_::Memoize
 
     Basic = sidesys[ :Basic ]
+    Fields = sidesys[ :Fields ]
 
     NLP_EN_methods = -> do
       HL__[].expression_agent.NLP_EN_methods
@@ -388,6 +389,8 @@ module Skylab::Brazen
     Open3 = stdlib[ :Open3 ]
 
     Parse = sidesys[ :Parse ]
+
+    Plugin = sidesys[ :Plugin ]
 
     Proxy_lib = -> do
       Callback_::Proxy

@@ -42,8 +42,12 @@ module Skylab::Callback::TestSupport
   LIB_ = ::Object.new
   class << LIB_
 
+    def basic
+      Callback_.lib_.basic
+    end
+
     def list_lib
-      Callback_.lib_.basic::List
+      basic::List
     end
   end
 

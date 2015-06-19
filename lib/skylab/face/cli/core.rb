@@ -11,13 +11,6 @@ module Skylab::Face
       def stylify
         LIB_.brazen::CLI::Styling::Stylify
       end
-
-      def tableize rows, p=nil, opts={}, & p_
-        a = [ p, p_ ]
-        a.compact!
-        p = a.fetch a.length - 1 << 1
-        CLI::Tableize__[ opts, p, rows ]
-      end
     end
 
     module Lib_

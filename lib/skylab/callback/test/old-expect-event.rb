@@ -177,21 +177,32 @@ module Skylab::Callback::TestSupport
       def increment_symbol_count
         @symbol_count += 1
       end
+
       def get_some_description_string
+
         scn = get_element_stream
+
         h = { }
+
         while (( el = scn.gets ))
           h[ el.description_slot_i ] = el.description_x
         end
-        h.length.zero? ? 'nothing' : rslv_dsc_str( h )
+        if h.length.zero?
+          'nothing'
+        else
+          __resolve_description_string h
+        end
       end
-      def rslv_dsc_str h
-        _output_s = TEMPLATE_S__.gsub Callback_.lib_.string_lib.mustache_regexp do
+
+      def __resolve_description_string h
+
+        TEMPLATE_S__.gsub(
+          Callback_.lib_.basic::String.mustache_regexp
+        ) do
           did_have = true
           x = h.fetch $1.intern do did_have = nil end
           did_have and " #{ x }"
         end
-        _output_s
       end
 
       TEMPLATE_S__ = 'emit{{pos}}{{adj}}{{channel}}{{msg}}'.freeze

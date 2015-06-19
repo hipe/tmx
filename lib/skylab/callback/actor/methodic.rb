@@ -115,6 +115,21 @@ module Skylab::Callback
           curried && curried.execute
         end
 
+        def call_via_iambic x_a, & oes_p
+          call_via_polymorphic_stream polymorphic_stream_via_iambic( x_a ), & oes_p
+        end
+
+        def call_via_polymorphic_stream st, & oes_p
+          curried = new_via_polymorphic_stream st, & oes_p
+          curried && curried.execute
+        end
+
+        # ~ ways to build a "curried" actor
+        #
+        #   ( near [#sl-023] the "dup and mutate" patttern, to use these
+        #     crosses the abstraction boundary of "simple actor" and you
+        #     become a collaborator with subject. )
+
         def new_via_arglist a, & oes_p
           ok = nil
           o = new do
@@ -125,17 +140,6 @@ module Skylab::Callback
           end
           ok && o
         end
-
-        def call_via_iambic x_a, & oes_p
-          call_via_polymorphic_stream polymorphic_stream_via_iambic( x_a ), & oes_p
-        end
-
-        def call_via_polymorphic_stream st, & oes_p
-          curried = new_via_polymorphic_stream st, & oes_p
-          curried && curried.execute
-        end
-
-        # ~ ways to build a "curried" actor (to use these makes you a collaborator)
 
         def new_with * x_a, & oes_p
           new_via_polymorphic_stream polymorphic_stream_via_iambic( x_a ), & oes_p

@@ -80,9 +80,11 @@ module Skylab::Callback
     end
   end  # module methods
 
-  Digraph::Stream__ = ::Class.new Callback_.lib_.digraph_lib.node_class
+  _Digraph = Callback_.lib_.basic::Digraph
 
-  class Digraph::Stream_Digraph__ < Callback_.lib_.digraph_lib
+  Digraph::Stream__ = ::Class.new _Digraph.node_class
+
+  class Digraph::Stream_Digraph__ < _Digraph
 
     def initialize
       @taxonomic_stream_i_a = nil

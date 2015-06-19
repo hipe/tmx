@@ -1,8 +1,8 @@
-require_relative 'test-support'
+require_relative '../../../../test-support'
 
-module Skylab::Face::TestSupport::CLI::Table
+module Skylab::Brazen::TestSupport
 
-  describe "[fa] CLI table" do
+  describe "[fa] CLI table", wip: true do
 
     it "custom cel rederers can be built from field stats" do
       _DOT = "•"

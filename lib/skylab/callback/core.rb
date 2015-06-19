@@ -619,6 +619,27 @@ module Skylab::Callback
         @__teps ||= via_array EMPTY_A_
       end
 
+      def try_convert x  # :+[#056]
+
+        if x.respond_to? :each_index
+          via_array x
+
+        elsif x.respond_to? :read
+
+          Callback_.lib_.system.IO.polymorphic_stream_via_readable x
+
+        elsif x.respond_to? :each
+
+          Callback_.lib_.basic::Enumerator.polymorphic_stream_via_eachable x
+
+        elsif x.respond_to? :ascii_only?
+
+          Callback_.lib_.basic::String.polymorphic_stream_via_string x
+        else
+          UNABLE_
+        end
+      end
+
       def via_array x_a
         new 0, x_a
       end

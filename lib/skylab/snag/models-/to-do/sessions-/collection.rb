@@ -39,7 +39,7 @@ module Skylab::Snag
       def build_system_command
 
         otr = dup
-        otr.extend To_Do_::Actors_::Build_the_find_command  # pattern :+[#sl-144]
+        otr.extend To_Do_::Actors_::Build_the_find_command  # pattern :+[#sl-023.B]
         otr.execute
       end
     end

@@ -47,18 +47,26 @@ module Skylab::Face  # read [#011] the top node narrative
 
     Brazen = sidesys[ :Brazen ]
 
-    Bsc__ = sidesys[ :Basic ]
+    Basic = sidesys[ :Basic ]
 
     Box = -> do
-      Bsc__[]::Box
+      Basic[]::Box
     end
 
     CLI_lib = -> do
       HL__[]::CLI
     end
 
+    Common_basic_fields = -> mod, * field_i_a do
+
+      Fields___[]::Basic.with :client, mod,
+        :globbing, :absorber, :initialize,
+        :field_i_a, field_i_a
+    end
+
+
     Counting_yielder = -> p do
-      Bsc__[]::Yielder::Counting.new( & p )
+      Basic[]::Yielder::Counting.new( & p )
     end
 
     DSL_DSL_story = -> * a do
@@ -74,11 +82,11 @@ module Skylab::Face  # read [#011] the top node narrative
     end
 
     Field_box_enhance = -> x, p do
-      Bsc__[]::Field.box.via_client_and_proc x, p
+      Basic[]::Field.box.via_client_and_proc x, p
     end
 
     Field_class = -> do
-      Bsc__[]::Field
+      Basic[]::Field
     end
 
     Fields = sidesys[ :Fields ]
@@ -86,7 +94,7 @@ module Skylab::Face  # read [#011] the top node narrative
     HL__ = sidesys[ :Headless ]
 
     Module_lib = -> do
-      Bsc__[]::Module
+      Basic[]::Module
     end
 
     Name_from_symbol = -> sym do
@@ -112,7 +120,7 @@ module Skylab::Face  # read [#011] the top node narrative
     end
 
     Scanner_for_array = -> a do
-      Bsc__[]::List.line_stream a
+      Basic[]::List.line_stream a
     end
 
     Strange_proc = -> do
@@ -120,7 +128,7 @@ module Skylab::Face  # read [#011] the top node narrative
     end
 
     String_lib = -> do
-      Bsc__[]::String
+      Basic[]::String
     end
 
     Sys___ = sidesys[ :System ]

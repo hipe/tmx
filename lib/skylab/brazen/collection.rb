@@ -59,6 +59,24 @@ module Skylab::Brazen
       extend Byte_Stream_Singleton_Methods__
     end
 
+    Byte_downstream_identifier_via_mixed = -> x do
+
+      # the counterpart to [#cb-056]
+
+      if x.respond_to? :push
+
+        Byte_Downstream_Identifier.via_line_array x
+
+      elsif x.respond_to? :puts
+
+        Byte_Downstream_Identifier.via_stream x
+
+      elsif x.respond_to? :ascii_only?
+
+        Byte_Downstream_Identifier.via_string s
+      end
+    end
+
     module Byte_Downstream_Identifier
 
       class << self
