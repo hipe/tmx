@@ -6,78 +6,139 @@ module Skylab::Brazen
 
     class Strategies___::Row_Formatter::Models__::Field
 
-      Callback_::Actor.methodic self
+      class Builder
 
-      def some_label
-        @label or self._SANITY
-      end
+        # (this is the would-be "assembler" of dependency injection)
 
-      attr_reader(
-        :celifier_builder,
-        :fill_parts,
-        :is_fill,
-        :is_right,
-        :label,
-      )
+        def initialize parent_x
 
-      def initialize & edit_p
+          disp = Brazen_.lib_.plugin::Pub_Sub::Dispatcher.new self, EMITS__
 
-        @_needs_label = true
-        instance_exec( & edit_p )
-      end
+          disp.load_plugins_in_module Table_Impl_::Field_Strategies_
 
-    private
+          disp.receive_plugin Core_Properties___.new_via_resources self
 
-      def celifier_builder=
-        @celifier_builder = gets_one_polymorphic_value
-        KEEP_PARSING_
-      end
+          @_disp = disp
 
-      def fill=
-        @is_fill = true
-        st = @polymorphic_upstream_
-        @fill_parts = if :parts == st.current_token
-          st.advance_one
-          st.gets_one
+          @_parent_x = parent_x
         end
-        KEEP_PARSING_
-      end
 
-      def label=
-        @_needs_label = false
-        @label = gets_one_polymorphic_value
-        KEEP_PARSING_
-      end
+        def new_via_polymorphic_stream_passively st
 
-      def left=
-        KEEP_PARSING_
-      end
+          if st.no_unparsed_exists
 
-      def right=
-        @is_right = true
-        KEEP_PARSING_
-      end
+            Field_.new
 
-      # ~ hack methodic's syntax
+          elsif st.current_token.respond_to? :ascii_only?
 
-      def process_polymorphic_stream_passively st
+            # special terse form: IFF the first term after the `field`
+            # keyword is a string, treat it as a label argument AND finish
+            # the field (i.e. don't parse anything else after towards this
+            # field). (makes definitions for commonest fields more readable.)
 
-        kp = super
-        if kp
-          if @_needs_label
-            remove_instance_variable :@_needs_label
-            @label = st.gets_one
+            Field_.new do | f |
+              f.label = st.gets_one
+            end
+
+          else
+
+            __one_field_via_nonempty_upstream st
           end
         end
-        kp
+
+        def __one_field_via_nonempty_upstream st
+
+          o = Brazen_.lib_.plugin::Sessions::Shared_Parse.new
+          o.be_passive = true
+          o.dispatcher = @_disp
+          o.upstream = st
+          Field_.new do | f |
+            @_current_field = f
+            o.execute or raise ::Argumentative_strategy_class_
+            remove_instance_variable :@_current_field
+          end
+        end
+
+        def current_field
+          @_current_field
+        end
+
+        # ~ etc API
+
+        def touch_role k, & x_p
+          @_parent_x.touch_role k, & x_p
+        end
       end
 
-      def polymorphic_writer_method_name_passive_lookup_proc
-        p = super
-        -> x do
-          if x.respond_to? :id2name
-            p[ x ]
+      class Core_Properties___ < Argumentative_strategy_class_[]
+
+        PROPERTIES = [
+          :argument_arity, :one, :property, :celifier_builder,
+          :argument_arity, :one, :property, :label,
+          :argument_arity, :zero, :property, :left,
+          :argument_arity, :zero, :property, :right,
+        ]
+
+        def receive__celifier_builder__argument x
+          @resources.current_field.celifier_builder = x
+          KEEP_PARSING_
+        end
+
+        def receive__label__argument x
+          @resources.current_field.label = x
+          KEEP_PARSING_
+        end
+
+        def receive__left__
+
+          # (although "is left" is the default, we may be overwriting a
+          # value that was previously expressed explicitly by the user)
+
+          @resources.current_field.is_right = false
+          KEEP_PARSING_
+        end
+
+        def receive__right__
+          @resources.current_field.is_right = true
+          KEEP_PARSING_
+        end
+      end
+
+      Field_ = self
+
+      class Field_  # self as class
+
+        attr_accessor(
+          :celifier_builder,
+          :is_right,
+          :label,
+        )
+
+        def initialize
+          @_component_box = nil
+          yield self
+          freeze
+          if @_component_box
+            @_component_box.freeze
           end
+        end
+
+        def mutate_client
+          NIL_
+        end
+
+        # ~ "components"
+
+        def [] sym
+          if @_component_box
+            @_component_box[ sym ]
+          end
+        end
+
+        def add_component sym, x
+          @_component_box ||= Callback_::Box.new
+          @_component_box.add sym, x
+          NIL_
         end
       end
     end

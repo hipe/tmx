@@ -38,22 +38,32 @@ module Skylab::Brazen
 
         def receive_user_row x_a
 
-          mx = @_column_widths
-          s_a = []
+          session_for_adding_content_row do
 
-          x_a.each_with_index do | x, d |
+            x_a.each_with_index( &
 
-            s = x.to_s
-            w = mx[ d ]
-            w_ = s.length
-            if w < w_
-              mx[ d ] = w_
-            end
-            s_a[ d ] = s
-          end
+              method( :for_current_content_row_receive_user_datapoint ) )
+           end
+        end
 
-          @_s_a_a.push s_a
+        def session_for_adding_content_row
+
+          @_current_content_row = []
+          yield self
+          @_s_a_a.push remove_instance_variable :@_current_content_row
           KEEP_PARSING_
+        end
+
+        def for_current_content_row_receive_user_datapoint x, d
+
+          s = x.to_s
+          w = @_column_widths[ d ]
+          w_ = s.length
+          if w < w_
+            @_column_widths[ d ] = w_
+          end
+          @_current_content_row[ d ] = s
+          NIL_
         end
 
         def receive_table

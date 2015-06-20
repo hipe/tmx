@@ -1,12 +1,17 @@
-module Skylab::Face
+module Skylab::Brazen
 
-  class CLI::Table
+  class CLI::Expression_Frames::Table::Actor
 
-    class Fill_
+    class Field_Strategies_::Max_Share_Meter < Argumentative_strategy_class_[]
 
-      module Builtins__
+      PROPERTIES = EMPTY_A_
 
-        class Max_Share_Meter
+      def initialize plugin_ID, resources
+        super
+      end
+
+      # -> 2 (nothing here is re-integrated yet)
+
           def self.p_p ; PROC__ end
           PROC__ = -> column do
             new( column ).to_proc
@@ -32,11 +37,11 @@ module Skylab::Face
             freeze
           end
 
-          SPACE__ = ' '.freeze
           DEFAULT_GLYPH__ = '+'.freeze
-          DEFAULT_BACKGROUND_GLYPH__ = SPACE__
+          DEFAULT_BACKGROUND_GLYPH__ = SPACE_
 
         private
+
           def absrb_any_iambic_fully column
             fill = column.field.fill
             fill or raise ::ArgumentError, say_not_fill
@@ -63,6 +68,7 @@ module Skylab::Face
         end
 
         public
+
           def to_proc
             -> cel do
               if cel
@@ -72,18 +78,21 @@ module Skylab::Face
               end
             end
           end
+
         private
+
           def when_no_cel
             @when_no_cel_string
           end
+
           def when_cel cel
             max_share = cel.x / @max
             num_glyphs = ( max_share * @width ).floor
             num_backgrounds = @width - num_glyphs
             @render[ num_glyphs, num_backgrounds ]
           end
-        end
-      end
+
+          # <- 2
     end
   end
 end

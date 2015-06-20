@@ -90,6 +90,19 @@ module Skylab::Plugin
         super
       end
 
+      def session_for_adding_dependency pu  # less API than above
+
+        pu_d = @plugin_a.length  # etc
+        @plugin_a[ pu_d ] = pu
+
+        _y = ::Enumerator::Yielder.new do | sym |
+
+          @_subscriptions_bx.fetch( sym ).push pu_d
+        end
+        yield _y
+        NIL_
+      end
+
       def accept sym, & visit
 
         ok = KEEP_PARSING_
@@ -127,7 +140,11 @@ module Skylab::Plugin
       )
 
       def initialize pu_d, resc, & oes_p
-        @on_event_selectively = oes_p
+
+        if oes_p
+          @on_event_selectively = oes_p
+        end
+
         @plugin_identifier = pu_d
         @resources = resc
         @subscription_name_symbols = nil

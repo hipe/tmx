@@ -219,7 +219,7 @@ module Skylab::Brazen
 
             glyph_d, extra_f = glyph_f.divmod 1.0
 
-            surplus_f += extra_f  # #explanation-185
+            surplus_f += extra_f  # #.B
             if 1.0 <= surplus_f
               glyph_d += 1
               surplus_f -= 1.0

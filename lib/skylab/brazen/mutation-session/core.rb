@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   # ->
 
-    class Mutation_Session  # see [#023]
+    class Mutation_Session  # see [#089]
 
       # an attempt to generalize prepends, appends, and removes
       # for all collections of associated entites of all entities

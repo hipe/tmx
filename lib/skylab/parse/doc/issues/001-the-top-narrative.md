@@ -107,3 +107,12 @@ encapsulates (and exposes):
      to associate a particular value for this parse is meaningless, all
      that matters is whether or not the parse succeeded for this
      particular function.)
+
+
+
+
+## node :[#.A]: a jargon glossary
+
+  + "head token": whatever token is at the front of the token stream at
+    that moment; specifically when a parsing agent is not in the middle
+    of parsing from it.

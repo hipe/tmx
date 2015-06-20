@@ -201,7 +201,7 @@ better this time.
   that is done in an [#cb-042] actor's `execute` methods after the
   un-interesting initting and validation is performed. a method with
   this bareword name must not accept any arguments. this is a lazy method
-  name - it should only be used the behavior that occurs in the method
+  name - it should only be used if the behavior that occurs in the method
   is exactly that as described by the name of the containing class.
 
 + `resolve_[..]_then` in a framework action, this is a call to a library

@@ -85,7 +85,6 @@ module Skylab::Brazen
         NIL_
       end
 
-
       def << x
 
         @_yielder_x << x

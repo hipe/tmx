@@ -1,163 +1,205 @@
-module Skylab::Face
+module Skylab::Brazen
 
-  class CLI::Table
+  class CLI::Expression_Frames::Table::Actor
 
-    class Fill_
+    class Field_Strategies_::Fill < Argumentative_strategy_class_[]
 
-      def self.produce_late_pass_renderers a
-        shell = new
-        shell.cel_renderer_a = a
-        yield shell
-        shell.execute
+      PROPERTIES = [
+        :argument_arity, :custom, :property, :fill
+      ]
+
+      def initialize plugin_ID, resources
+        super
       end
 
-      def initialize
-      end
+      def receive_stream_after__fill__ st
 
-      attr_accessor :cel_renderer_a, :field_fetcher,
-        :field_stats, :left, :sep, :right, :num_fields,
-        :target_width_d
+        _x = Model___.new_via_polymorphic_stream_passively st
 
-      def execute
-        calc_width_taken_and_parts_total
-        @fill_d_a && calc_and_distribute_remaining_width
-        rslv_renderers ; nil
-      end
-    private
-      def rslv_renderers
-        @render_d_a.each do |d|
-          field = @field_fetcher[ d ]
-          @cel_renderer_a[ d ] = field.cel_renderer_p_p[
-            Column__.new( d, @width_h.fetch( d ),
-              @field_stats.fetch( d ), field ) ]
-        end ; nil
-      end
+        @resources.current_field.add_component :fill, _x
 
-      class Column__
-        def initialize d, width, stats, field
-          @d = d ; @width = width ; @stats = stats ; @field = field
+        @resources.touch_role :_fill_ do
+
+          [ :mutate_per, Change_wiring___ ]
         end
-        attr_reader :d, :width, :stats, :field
+
+        KEEP_PARSING_
       end
 
-      def calc_width_taken_and_parts_total
-        @fill_d_a = nil ; @width_h = {}
-        @width_taken_by_data = 0
-        @parts_total = 0.0 ; @render_d_a = []
-        @num_fields.times do |d|
-          field = @field_fetcher[ d ]
-          fill = field.fill
-          if fill
-            @render_d_a.push d
-            ( @fill_d_a ||= [] ).push d
-            @parts_total += fill.some_parts_x
-          else
-            width = @field_stats.fetch( d ).max_strlen
-            if field.cel_renderer_p_p
-              @render_d_a.push d
-              @width_h[ d ] = width
+      class Model___
+
+        attr_reader(
+          :glyph,
+          :parts_float,
+        )
+
+        Callback_::Actor.methodic self
+
+        def initialize & edit_p
+          instance_exec( & edit_p )
+        end
+
+      private
+
+        def glyph=
+          @glyph = gets_one_polymorphic_value
+          KEEP_PARSING_
+        end
+
+        def parts=
+          x = gets_one_polymorphic_value
+          @parts_float = if x
+            x.to_f
+          end
+          KEEP_PARSING_
+        end
+      end
+
+      module Change_wiring___ ; class << self
+
+        def [] row_formatter
+
+          # (the fact that we change the row receiver when there is
+          #  a target width is a bit OCD; chalk it up as an exercise)
+
+          row_formatter.user_matrix_receiver.replace_row_receiver_by do | prev |
+
+            Row_Receiver___.new prev
+          end
+
+          row_formatter.session_for_adding_dependency(
+            User_Data_Receiver___.new
+          ) do | y |
+            y << :user_data_metrics
+          end
+
+          NIL_
+        end
+      end ; end
+
+      class User_Data_Receiver___
+
+        def receive_user_data_metrics udm
+          Width_Distribution_Calculation___.new( udm ).execute
+        end
+      end
+
+      class Row_Receiver___
+
+        # as an exercise, the point of this row receiver is to be placed
+        # in front of the default one, and all it does is it skips entirely
+        # the act of producing a "content" string for those user datapoints
+        # that are nil (because the cels that correspond to such fields are
+        # typically nil, and there's no point in turning them into empty
+        # strings, because of the custom celifiers that are produced).
+
+        def initialize drr
+
+          @_downstream_row_receiver = drr
+        end
+
+        def receive_user_row x_a
+
+          @_downstream_row_receiver.session_for_adding_content_row do | o |
+
+            x_a.each_with_index do | x, d |
+
+              if ! x.nil?
+                o.for_current_content_row_receive_user_datapoint x, d
+              end
             end
-            @width_taken_by_data += width
           end
         end
       end
 
-      def calc_and_distribute_remaining_width
-        available_width = avail_width
-        used_width = 0
-        @fill_d_a.each do |d|
-          field = @field_fetcher[ d ]
-          width_f = field.fill.some_parts_x / @parts_total * available_width
-          width_d = width_f.floor
-          @width_h[ d ] = width_d
-          used_width += width_d
+      class Width_Distribution_Calculation___
+
+        # for the one or more "fill" columns, decide how wide each such
+        # column can be (if at all) given how wide the user data columns
+        # are, how wide the glyphs are, and the target width of the table.
+        #
+        # the mutable "column widths" hash gets mutated with the results.
+
+        def initialize user_data_metrics
+          @_udm = user_data_metrics
         end
-        overage = available_width - used_width  # see #overage-here
-        if 0 < overage
-          last = @fill_d_a.length - 1
-          overage.times do |d|
-            @width_h[ @fill_d_a[ last - d ] ] += 1
+
+        def execute
+
+          udm = remove_instance_variable :@_udm
+
+          @_fill_column_index_a = []
+          fld_a = udm.fields
+          @_maxes = udm.column_widths
+          num_fields = fld_a.length
+          @_part_f_a = []
+
+          total_used_width = 0
+          @_total_parts_f = 0.0
+
+          fld_a.each_with_index do | fld, d |
+
+            fill = fld[ :fill ]
+
+            if fill
+              fill_f = fill.parts_float || 1.0
+              @_total_parts_f += fill_f
+              @_part_f_a.push fill_f
+              @_fill_column_index_a.push d
+            else
+              total_used_width += @_maxes.fetch( d )
+              # by this selfsame comment as declaration, the width
+              # of all non-fill columns must be known by now
+            end
           end
-        end ; nil
-      end
 
-      def avail_width
-        @target_width_d or raise "implement me - ncurses"
-        x = @target_width_d
-        x -= @width_taken_by_data
-        @right and x -= @right.length
-        @left and x -= @left.length
-        if @sep
-          x -= ( @num_fields - 1 ) * @sep.length
-        end
-        0 < x ? x : 0
-      end
+          total_used_width += ( udm.left_w + udm.right_w )
+          if 1 < num_fields
+            total_used_width += ( udm.sep_w * ( num_fields - 1 ) )
+          end
 
-      class Shell
-        def initialize
-          @previous_fill = nil
-        end
-        attr_writer :previous_fill
-        attr_reader :d, :fill
-        def from_d_parse_iambic_passively d, x_a
-          @d = d ; @x_a = x_a
-          if @previous_fill
-            @previous_fill.dupe do |fill|
-              @fill = fill ; absrb
-            end
+          @_available_width = udm.target_width - total_used_width
+
+          if 1 > @_available_width
+            __when_no_remaining_width
           else
-            Fill__.new do |fill|
-              @fill = fill ; absrb
+            __when_remaining_width
+          end
+        end
+
+        def __when_no_remaining_width
+
+          # even though zero is supposed to be the default value for the
+          # hash, we explicitly zero out the columns because `fetch`.
+
+          @_fill_column_index_a.each do | d |
+            @_maxes[ d ] = 0
+          end
+          NIL_
+        end
+
+        def __when_remaining_width
+
+          # each fill column, get it its fraction of the available width
+          # rounded down, with the spillover algorithm :+[#073.B]
+
+          spillover_f = 0.0
+
+          @_part_f_a.each_with_index do | part_f, idx |
+
+            d, f = ( @_available_width * part_f ).divmod @_total_parts_f
+
+            spillover_f += f
+
+            if @_total_parts_f <= spillover_f
+              spillover_f -= @_total_parts_f
+              d += 1
             end
-          end ; nil
-        end
 
-      LIB_.fields.from_methods(
-        :niladic, :passive, :absorber, :absrb,
-      ) do
-        def parts
-          @fill.parts_x = gets_one_polymorphic_value
-        end
-        def with
-          @fill.with_x = gets_one_polymorphic_value
-        end
-      end
-      end
+            @_maxes[ @_fill_column_index_a.fetch( idx ) ] = d
+          end
 
-      class Fill__
-        def initialize
-          @parts_x = nil
-          yield self
-          freeze
-        end
-        def dupe
-          yield( otr = dup )
-          otr.freeze
-        end
-        attr_accessor :parts_x, :with_x
-        def some_parts_x
-          @parts_x || 1.0
-        end
-      end
-
-      # ~ builtins
-
-      def self.p_p_from_i i
-        Autoloader_.const_reduce( [ i ], Builtins__ ).p_p
-      end
-
-      module Builtins__
-        Autoloader_[ self, :boxxy ]
-      end
-
-      # ~ ncurses
-
-      class << self
-        # placeholders for #nucurses
-        def any_calculated_screen_w
-        end
-        def some_screen_w
-          79
+          NIL_
         end
       end
     end

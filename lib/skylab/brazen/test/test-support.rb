@@ -23,13 +23,25 @@ module Skylab::Brazen::TestSupport
 
   module ModuleMethods
 
-    def use sym
+    define_method :use, -> do
 
-      s = sym.id2name
-      _const = :"#{ s[ 0 ].upcase }#{ s[ 1 .. -1 ] }"
-      TestLib_.const_get( _const, false )[ self ]
-      NIL_
-    end
+      cache_h = {}
+
+      -> sym do
+        ( cache_h.fetch sym do
+
+          s = sym.id2name
+          const = :"#{ s[ 0 ].upcase }#{ s[ 1 .. -1 ] }"
+          x = if TestLib_.const_defined? const, false
+            TestLib_.const_get const
+          else
+            Home_.lib_.plugin::Bundle::Fancy_lookup[ sym, TS_ ]
+          end
+          cache_h[ sym ] = x
+          x
+        end )[ self ]
+      end
+    end.call
   end
 
   module InstanceMethods

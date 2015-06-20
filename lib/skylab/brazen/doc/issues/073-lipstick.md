@@ -43,9 +43,7 @@ render its particular lipstick string.
 
 
 
-## explanations
-
-### the "remainder threshold" algorithm :#explanation-185
+### the "remainder threshold" algorithm :[#.B]
 
 the floaty numbers we calculate are "continuous", but the pixels or
 character columns we render into are "discrete". to make floats fit into
@@ -81,12 +79,15 @@ this has the effect of distorting the relative widths of the segments
 with respect to each other, but overall the figure is not shrunken,
 which for whatever reason we find preferable.
 
+we achieve this by keeping track of the remainder each time we round
+down, and adding these "spillover" values into one sum, and whenver that
+sum meets or exceeds 1.0, we "chip off" 1.0 from the sum and add it to
+whatever current segment we are calculating.
 
 
 
-## suffixes
 
-### :.A
+## :[#.A]
 
 synopsis: this tag suffix tracks aspects of unit tests that should be
 broken out into visual tests.
@@ -104,5 +105,5 @@ is an explicit, hard-coded window width being passed to the renderer.
 since that day has not yet arrived, we leave this cruft in here with
 this note for now.
 
-on that subject, althogh ncurses integration would be ideal, it is seen
+on that subject, although ncurses integration would be ideal, it is seen
 as auxiliary to the central work that the subject facility does.
