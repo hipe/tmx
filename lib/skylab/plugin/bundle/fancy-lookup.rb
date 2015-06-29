@@ -3,7 +3,7 @@ module Skylab::Plugin
   Bundle::Fancy_lookup = -> do  # exegesis at [#024]
 
     parse_lib = -> do
-      Plugin_.lib_.parse
+      Home_.lib_.parse
     end
 
     skip_rx = /_spec\z/

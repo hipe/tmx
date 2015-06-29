@@ -2,29 +2,30 @@ module Skylab::Brazen
 
   class CLI::Expression_Frames::Table::Actor
 
-    class Strategies___::Downstream_First_Receiver < Argumentative_strategy_class_[]
+    class Strategies___::Downstream_First_Receiver
 
-      SUBSCRIPTIONS = [
-        :arity_for,
-        :produce_downstream_element
-      ]
-
-      PROPERTIES = [
+      ARGUMENTS = [
         :argument_arity, :one, :property, :write_lines_to,
       ]
 
-      def initialize( * )
+      ROLES = [
+        :downstream_context_producer
+      ]
+
+      Table_Impl_::Strategy_::Has_arguments[ self ]
+
+      def initialize x
+        @parent = x
         @_was_provided_by_user = false
-        super
       end
 
-      def initialize_dup _
+      def dup( * )
 
-        # do not carry these across the dup boundary:
-        #   ( @_result_proc, @_was_provided_by_user, @_yielder_x )
+        # our policy is that across a dup boundary, a subject node carries
+        # neither its state nor its existence. a new subject node will be
+        # created lazily as needed.
 
-        super
-        @_was_provided_by_user = false
+        NIL_
       end
 
       def receive__write_lines_to__argument x
@@ -45,7 +46,7 @@ module Skylab::Brazen
         end
       end
 
-      def produce_downstream_element
+      def produce_downstream_context
 
         if ! @_was_provided_by_user
           __establish_default_downstream_context

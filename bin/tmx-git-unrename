@@ -174,7 +174,7 @@ class Skylab_Git_Models_Whatever_Unrename
 
         def __resolve_FC_stream_via_commit
 
-          ok &&= __resolve_commit
+          ok = __resolve_commit
           ok && __via_commit_resolve_filechange_stream
         end
 

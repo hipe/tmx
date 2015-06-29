@@ -2,10 +2,10 @@ module Skylab::Brazen
 
   class CLI::Expression_Frames::Table::Actor
 
-    class Strategies___::Field_Statistics < Argumentative_strategy_class_[]
+    class Field_Strategies_::Statistics
 
-      PROPERTIES = [
-      ]
+      ROLES = nil
+      SUBSCRIPTIONS = nil
 
       # <- NOTHING below this line is functioning
 

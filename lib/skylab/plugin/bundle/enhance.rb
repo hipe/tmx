@@ -119,7 +119,7 @@ module Skylab::Plugin
         # that that input (method) receives.
 
         1 => -> func do
-          cnd_kls = Plugin_.lib.basic::Module.value_via_relative_path self.class, '..'
+          cnd_kls = Home_.lib.basic::Module.value_via_relative_path self.class, '..'
           ex = nil
           cnd = cnd_kls.new -> x do
             ex = x

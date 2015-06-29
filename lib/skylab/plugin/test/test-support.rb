@@ -21,7 +21,11 @@ module Skylab::Plugin::TestSupport
 
           const = Callback_::Name.via_variegated_symbol( sym ).as_const
 
-          x = TS_.const_get const, false
+          x = if TS_.const_defined? const, false
+            TS_.const_get const, false
+          else
+            Home_::Bundle::Fancy_lookup[ sym, TS_ ]
+          end
           cache_h[ sym ] = x
           x
         end )[ self ]
@@ -39,6 +43,13 @@ module Skylab::Plugin::TestSupport
 
     def debug_IO
       TestSupport_.debug_IO
+    end
+  end
+
+  Dangerous_memoize_ = -> & meth_p do
+    x = nil
+    -> do
+      x ||= instance_exec( & meth_p )
     end
   end
 

@@ -2,36 +2,50 @@ module Skylab::Brazen
 
   class CLI::Expression_Frames::Table::Actor
 
-    class Strategies___::Upstream_First_Receiver < Argumentative_strategy_class_[]
+    class Strategies___::Upstream_First_Receiver
 
-      SUBSCRIPTIONS = [
-        :arity_for,
-        :receive_unsanitized_user_row_upstream
-      ]
-
-      PROPERTIES = [
+      ARGUMENTS = [
         :argument_arity, :one, :property, :read_rows_from,
       ]
 
-      def initialize_dup _
+      ROLES = [
+        :mixed_user_data_upstream_receiver
+      ]
 
-        # (assume no policy ivars)
+      Table_Impl_::Strategy_::Has_arguments[ self ]
 
-        super
+      def initialize x
+        @parent = x
+      end
+
+      def dup( * )
+
+        # our policy is that across a dup boundary, a subject node carries
+        # neither its state nor its existence. a new subject node will be
+        # created lazily as needed. at writing subject node has no state
+        # anyway.
+
+        NIL_
       end
 
       def receive__read_rows_from__argument x
 
-        receive_unsanitized_user_row_upstream x
+        _same x
+        ACHIEVED_
       end
 
-      def receive_unsanitized_user_row_upstream enum_x
+      def receive_mixed_user_data_upstream enum_x
+
+        _same enum_x
+      end
+
+      def _same enum_x
 
         row_st = Callback_::Polymorphic_Stream.try_convert enum_x
         if row_st
 
-          @resources.receive_sanitized_user_row_upstream row_st
-          ACHIEVED_
+          @parent.receive_sanitized_user_row_upstream row_st
+          NIL_
         else
           raise ::ArgumentError, __say( enum_x )
         end

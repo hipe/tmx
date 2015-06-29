@@ -90,9 +90,10 @@ module Skylab::Plugin
 
   ACHIEVED_ = true
   DASH_ = '-'
+  EMPTY_A_ = [].freeze
+  Home_ = self
   KEEP_PARSING_ = true
   NIL_ = nil
-  Plugin_ = self
   SPACE_ = ' '
   UNABLE_ = false
   UNDERSCORE_ = '_'

@@ -95,9 +95,16 @@ module Skylab::Brazen::TestSupport
 
       it "you can even curry the curried \"function\", curry the data, and so on -" do
 
-        q = _P.curry :read_rows_from, [ %w( a b ) ], :sep, 'X'
-        q[ :sep, '_' ].should eql "<a_b>\n"
-        q[ :read_rows_from, [ %w'c d' ]].should eql "<cXd>\n"
+        q = _P.curry :sep, '_'
+
+        q[
+          :read_rows_from, [ %w( a b ) ],
+        ].should eql "<a_b>\n"
+
+        q[
+          :read_rows_from, [ %w'c d' ],
+          :left, 'HUZZAH ',
+        ].should eql "HUZZAH c_d>\n"
       end
     end
 

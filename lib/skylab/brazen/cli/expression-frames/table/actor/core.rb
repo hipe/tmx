@@ -6,7 +6,7 @@ module Skylab::Brazen
 
       same = -> * x_a, & p do
         o = new( & p )
-        o._load_strategies_and_receive_polymorphic_argument_array x_a
+        o._init_arg_upstream_and_depdendencies x_a
         o._execute
       end
 
@@ -16,40 +16,57 @@ module Skylab::Brazen
 
       def curry * x_a
         o = new
-        o._load_strategies_and_receive_polymorphic_argument_array x_a
+        o._init_arg_upstream_and_depdendencies x_a
         o._produce_self_as_curry
       end
     end  # >>
 
-    def initialize & oes_p
+    def initialize
 
+      block_given? and self._COVER_ME
+
+      @_deps = nil
       @_down_st = nil
-
-      if oes_p
-        @on_event_selectively = oes_p
-      end
     end
 
-    def _load_strategies_and_receive_polymorphic_argument_array x_a
+    def _init_arg_upstream_and_depdendencies x_a
 
-      _receive_polymorphic_argument_array x_a
+      _init_argument_upstream x_a
 
-      disp = Brazen_.lib_.plugin::Pub_Sub::Dispatcher.new self, EMITS__
+      o = Home_.lib_.plugin::Dependencies.new self
 
-      disp.load_plugins_in_module Strategies___
+      o.roles = ROLES__
+      o.emits = EVENTS__
+      o.index_dependencies_in_module Strategies___
 
-      @_disp = disp
+      @_deps = o
+    end
+
+    def dup  # see [#.I]
+
+      otr = self.class.new
+      otr.__init_dup @_deps
+      otr
+    end
+
+    def __init_dup deps
+
+      if deps
+        @_deps = deps.dup self
+      end
 
       NIL_
     end
 
-    EMITS__ = []  # (added to throughout this file)
+    Autoloader_[ ( Field_Strategies_ = ::Module.new ), :boxxy ]
+
+    Autoloader_[ ( Row_Strategies_ = ::Module.new ), :boxxy ]
 
     Autoloader_[ ( Strategies___ = ::Module.new ), :boxxy ]
 
     def curry * x_a, & x_p
       otr = dup
-      otr._receive_polymorphic_argument_array x_a, & x_p
+      otr._init_argument_upstream x_a, & x_p
       otr._produce_self_as_curry
     end
 
@@ -66,7 +83,7 @@ module Skylab::Brazen
     as_curry_call = -> * x_a, & x_p do
 
       otr = dup
-      otr._receive_polymorphic_argument_array x_a, & x_p
+      otr._init_argument_upstream x_a, & x_p
       otr._execute
     end
 
@@ -74,41 +91,12 @@ module Skylab::Brazen
 
     define_method :call, as_curry_call
 
-    def initialize_dup _
+    def _init_argument_upstream x_a, & x_p
 
-      # when we dup self (for example as a curry to spawn & execute), we
-      # will need to dup every strategy as well. some strategies will need
-      # to freeze so we have to get all the building done atomically:
-
-      disp = @_disp.dup do | disp_ |
-        disp_.resources = self
-        if @_disp.on_event_selectively
-          self._SIGN_OFF_ON_THIS  # just assign it
-        else
-          disp_.on_event_selectively = nil  # from false
-        end
-      end
-
-      @_disp = disp
-
-      # once you have duped but before you do anything else, give strategies
-      # chance to do any re-initialization that requires the whole graph.
-
-      @_disp.accept :init_dup do | pu |
-        pu.init_dup or fail
-      end
-
-      NIL_
-    end
-
-    EMITS__.push :init_dup
-
-    def _receive_polymorphic_argument_array x_a, & x_p
+      block_given? and self._COVER_ME
 
       @_argument_upstream = Callback_::Polymorphic_Stream.via_array x_a
-      if x_p
-        @on_event_selectively = x_p
-      end
+
       NIL_
     end
 
@@ -122,52 +110,73 @@ module Skylab::Brazen
 
     def __execute_when_some_arguments
 
-      st = @_argument_upstream
-      x = st.gets_one
-      kp = if st.no_unparsed_exists
-        @_disp.accept :receive_unsanitized_user_row_upstream do | pu |
-          pu.receive_unsanitized_user_row_upstream x
-        end
-        KEEP_PARSING_
-      else
-        st.backtrack_one  # LOOK
-        _process_arguments
-      end
+      kp = __process_argument_or_arguments
+      kp &&= __normalize_fields
       kp &&= __resolve_downstream
       kp &&= __resolve_upstream
       kp && __interpret_and_express_table
     end
 
-    EMITS__.push :receive_unsanitized_user_row_upstream
+    def __process_argument_or_arguments
 
-    def _process_arguments
-      @_disp.accept :receive_unclassified_argument_stream do | pu |
-        pu.receive_unclassified_argument_stream @_argument_upstream
+      st = @_argument_upstream
+
+      x = st.gets_one
+      if st.no_unparsed_exists
+        __receive_mixed_user_data_upstream x
+        KEEP_PARSING_
+      else
+        st.backtrack_one  # LOOK
+        _process_arguments
       end
     end
 
-    EMITS__.push :receive_unclassified_argument_stream
+    def __receive_mixed_user_data_upstream x  # (see next method)
+
+      @_deps[ :mixed_user_data_upstream_receiver ].
+        receive_mixed_user_data_upstream x
+
+      NIL_
+    end
+
+    def _process_arguments
+
+      @_deps.process_polymorphic_stream_fully @_argument_upstream
+    end
+
+    ROLES__ = []
+    ROLES__.push :mixed_user_data_upstream_receiver
+
+    def receive_sanitized_user_row_upstream x  # (hookback from prev method)
+      @_row_upstream = x
+      NIL_
+    end
+
+    def __normalize_fields
+
+      _x = @_deps[ :field_normalizer ].receive_normalize_fields
+      _x or fail
+      KEEP_PARSING_
+    end
+
+    ROLES__.push :field_normalizer
 
     def __resolve_downstream
 
       if @_down_st
         KEEP_PARSING_
       else
-        x = nil
-        @_disp.accept :produce_downstream_element do | pu |
-          x = pu.produce_downstream_element
-          ! x  # stop at the first one you find
-        end
-        if x
-          @_down_st = x
-          KEEP_PARSING_
-        else
-          STOP_PARSING_
-        end
+
+        x = @_deps[ :downstream_context_producer ].produce_downstream_context
+        x or fail
+
+        @_down_st = x
+
+        KEEP_PARSING_
       end
     end
 
-    EMITS__.push :produce_downstream_element
+    ROLES__.push :downstream_context_producer
 
     def __resolve_upstream
 
@@ -175,83 +184,50 @@ module Skylab::Brazen
 
       if @_row_upstream
         KEEP_PARSING_
+      else
+        fail
       end
-    end
-
-    def receive_sanitized_user_row_upstream x
-      @_row_upstream = x
-      NIL_
     end
 
     def __interpret_and_express_table
 
-      disp = @_disp
+      @_deps[ :downstream_context_receiver ].
+        receive_downstream_context @_down_st
 
-      disp.accept :receive_downstream_element do | pu |
-        pu.receive_downstream_element @_down_st
-      end
+      @_deps[ :user_data_upstream_receiver ].
+        receive_user_data_upstream @_row_upstream
+    end
 
-      kp = KEEP_PARSING_
-      st = @_row_upstream
+    ROLES__.push :downstream_context_receiver
+    ROLES__.push :user_data_upstream_receiver
+    ROLES__.freeze
 
-      begin
+    EVENTS__ = []
+    EVENTS__.push :argument_bid_for
+    EVENTS__.freeze
 
-        if st.no_unparsed_exists
-          break
+    # ~ service API
+
+    def dependencies  # #experimental
+      @_deps
+    end
+
+    module Strategy_
+      p = nil
+      Has_arguments = -> cls do
+        if ! p
+          p = Brazen_.lib_.plugin::Dependencies::Argument::Has_arguments
         end
 
-        user_row_x = st.gets_one
-
-        disp.accept :receive_user_row do | pu |  # #note-act-170
-
-          kp = pu.receive_user_row user_row_x
-          kp or break
-        end
-
-        kp or break
-
-        redo
-      end while nil
-
-      if kp
-        kp = disp.accept :receive_table do | pu |
-          pu.receive_table
-        end
-      end
-      if kp
-        @_down_st.appropriate_result
-      else
-        kp
+        p[ cls ]
       end
     end
-
-    EMITS__.push(
-      :arity_for,  # used by a strategy
-      :receive_downstream_element,
-      :receive_user_row,
-      :receive_table
-    )
-
-    # ~ support for strategies
-
-    def dispatcher
-      @_disp
-    end
-
-    Argumentative_strategy_class_ = -> do
-      Table_Impl_::Strategy_::Argumentative
-    end
-
-    Simple_strategy_class_ = -> do
-      Table_Impl_::Strategy_::Common
-    end
-
-    # (see how neutral we are:)
 
     LEFT_GLYPH_ = '| '
     RIGHT_GLYPH_ = ' |'
     SEP_GLYPH_ = ' | '
 
+    Home_ = ::Skylab::Brazen  # will prolly move up
     Table_Impl_ = self
   end
 end

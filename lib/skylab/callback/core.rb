@@ -302,8 +302,8 @@ module Skylab::Callback
       @a.dup
     end
 
-    def [] i
-      @h[ i ]
+    def [] sym
+      @h[ sym ]
     end
 
     def fetch i, & p

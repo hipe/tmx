@@ -47,7 +47,7 @@ module Skylab::Plugin
 
       def __say_bundle_not_found k, a
 
-        Plugin_.basic::List::EN.say_not_found k, a
+        Home_.lib_.basic::List::EN.say_not_found k, a
       end
 
       def to_proc

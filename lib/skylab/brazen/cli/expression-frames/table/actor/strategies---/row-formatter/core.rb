@@ -2,215 +2,204 @@ module Skylab::Brazen
 
   class CLI::Expression_Frames::Table::Actor
 
-    class Strategies___::Row_Formatter < Argumentative_strategy_class_[]
+    class Strategies___::Row_Formatter
 
-      SUBSCRIPTIONS = [ :arity_for, :init_dup ]
-
-      PROPERTIES = [
+      ARGUMENTS = [
         :argument_arity, :custom, :property, :field,
-        :argument_arity, :one, :property, :header,
-        :argument_arity, :one, :property, :left,
-        :argument_arity, :one, :property, :right,
-        :argument_arity, :one, :property, :sep,
-        :argument_arity, :one, :property, :target_width,
+        :argument_arity, :one, :property, :target_width
       ]
 
-      def initialize( * )
-        @_do_header = nil
-        @_disp = Brazen_.lib_.plugin::Pub_Sub::Dispatcher.new self, EMITS__
+      ROLES = nil
+
+      Table_Impl_::Strategy_::Has_arguments[ self ]
+
+      # ~
+
+      def initialize x
+
+        @_deps = nil
         @_fld_a = nil
-        @_left_flank = nil
-        @_role_box = Callback_::Box.new
-        @_right_flank = nil
-        @_separator_glyph = nil
+        @parent = x
         @_target_width = nil
-        super
       end
 
-      def initialize_dup _
+      def dup x
 
-        carry_over_dup_boundary_ CARRY_THESE_IVARS_OVER_THE_DUP_BOUNDARY___ do
-          super
+        otr = super()
+        otr.__init_dup x
+        otr
+      end
+
+      def __init_dup x
+
+        if @_deps
+          @_deps = @_deps.dup self
         end
 
-        if @_fld_a  # treat fields as immutable but our list may grow or shrink
+        if @_fld_a  # assume fields themselves are immutable-ish
           @_fld_a = @_fld_a.dup
         end
 
-        @_role_box = @_role_box.dup
+        @parent = x
+
+        # @_target_width  keep
+        NIL_
       end
 
-      CARRY_THESE_IVARS_OVER_THE_DUP_BOUNDARY___ = %i(
-        @_do_header
-        @_fld_a
-        @_left_flank
-        @_right_flank
-        @_role_box
-        @_separator_glyph
-        @_target_width
-      )
+      # ~ begin frontier
 
-      def init_dup
+      def argument_bid_for tok
 
-        # once the parent has a complete graph of dependencies:
-
-        @_disp = Brazen_.lib_.plugin::Pub_Sub::Dispatcher.new self, EMITS__
-
-        @_role_box.each_value do | * method_and_args |
-          send( * method_and_args )
+        my_bid = super
+        if my_bid
+          my_bid
+        else
+          @_deps || _init_deps
+          g = @_deps.argument_bid_group_for tok
+          if g
+            @_deps.class::Argument::Bid.new( self, g.arity_symbol, g )
+          end
         end
-        KEEP_PARSING_
       end
+
+      def receive_term term, bid
+
+        g = bid.implementation_x
+        if g
+
+          # one or more of your depdendencies bid on the argument, ergo
+          # make sure you are active so you get control of rendering
+
+          _be_active
+
+          @_deps.class::Argument::Dispatch_term[ g, term ]
+        else
+          super
+        end
+      end
+
+      # ~ end
 
       def receive_stream_after__field__ st
 
-        @___field_builder ||= Me_the_Strategy_::Models__::Field::Builder.new self
+        @__field_builder ||= Me_the_Strategy_::Models__::Field::Builder.new self
 
-        fld = @___field_builder.new_via_polymorphic_stream_passively st
+        fld = @__field_builder.new_via_polymorphic_stream_passively st
 
         ( @_fld_a ||= [] ).push fld
 
-        _be_table_receiver
+        _be_active
 
-        p = fld.mutate_client
-        if p
-          p[ self ]
-        end
         KEEP_PARSING_
       end
 
-      def receive__header__argument x
-
-        case x
-        when :none
-          @_do_header = false
-          _be_table_receiver
-        else
-          raise ::ArgumentError
-        end
-      end
-
-      def receive__left__argument x
-
-        @_left_flank = x
-        _be_table_receiver
-      end
-
-      def receive__right__argument x
-
-        @_right_flank  = x
-        _be_table_receiver
-      end
-
-      def receive__sep__argument x
-
-        @_separator_glyph = x
-        _be_table_receiver
-      end
-
       def receive__target_width__argument x
-
-        $stderr.puts "TODO - will need to use target width somewhere"
-
         @_target_width = x
+        KEEP_PARSING_
       end
 
-      def after_fields_ & p
-        @resources.after_fields_( & p )
+      # ~
+
+      def _be_active
+        @___is_active ||= __become_active
+        NIL_
       end
 
-      def receive_table
+      def __become_active
 
-        @_column_widths = @_downstream_table_receiver.get_column_widths
+        @parent.dependencies.change_strategies(
+          :downstream_context_receiver,
+          :field_normalizer,
+          :user_data_upstream_receiver,
+          self )
 
-        if @_fld_a && false != @_do_header
-          do_express_headers = true
-        end
-
-        if do_express_headers
-          __add_field_labels_to_maxes
-        end
-
-        __normalize_glyphs  # before next
-
-        @_disp.accept :user_data_metrics do | dep |
-          ( @_user_data_metrics ||= __user_data_metrics )[ dep ]
-        end
-
-        __init_celifiers
-        __normalize_for_expression
-
-        if do_express_headers
-          __express_headers
-        end
-
-        __express_body
+        ACHIEVED_
       end
 
-      def __user_data_metrics
+      ROLES___ = [
+        :argument_matrix_expresser,
+        :unused_width_consumer,
+      ]
 
-        udm = User_Data_Metrics___.new @_column_widths, @_fld_a,
-          ( @_left_flank || EMPTY_S_ ).length,
-          ( @_right_flank || EMPTY_S_ ).length,
-          ( @_separator_glyph || EMPTY_S_ ).length,
-          @_target_width
+      EVENTS___ = [
+        :argument_bid_for,
+        :before_first_row,
+        :known_width,
+        :receive_complete_field_list,
+      ]
 
-        -> dep do
+      # ~
 
-          dep.receive_user_data_metrics udm
-          KEEP_PARSING_
-        end
-      end
+      def receive_normalize_fields  # assume the list of fields is complete
 
-      User_Data_Metrics___ = ::Struct.new(
-        :column_widths, :fields, :left_w, :right_w, :sep_w, :target_width )
+        # observes raw values of certain columns in user-provided rows:
 
-      EMITS__ = []
-      EMITS__.push :user_data_metrics
+        @_user_datapoint_observers = MONADIC_EMPTINESS_
 
-      def __add_field_labels_to_maxes
+        # converts user datapoints into the arguments passed to celifiers:
 
-        mx = @_column_widths
-        @_fld_a.each_with_index do | fld, d |
-          w = mx[ d ]
-          s = fld.label
-          if s
-            w_ = s.length
-            if w < w_
-              mx[ d ] = w_
+        @_argument_normalizers = ::Hash.new DEFAULT_NORMALIZER___
+
+        # observes the results of above:
+
+        @_argument_observers = ::Hash.new do | h, d |
+          h[ d ] = -> s do
+            if @_widths[ d ] < s.length
+              @_widths[ d ] = s.length
             end
+            NIL_
           end
         end
-        NIL_
-      end
 
-      def __init_celifiers
+        # the default observational behavior on arguments is to track the width:
 
-        h = {}
+        @_widths = ::Hash.new 0
 
-        fld_a = @_fld_a
+        # converts (celifier) "arguments" to cel strings:
 
-        @_column_widths.each_pair do | d, w |
+        @_celifiers = __build_celifiers_hash
 
-          h[ d ] = __some_celifier_for_width_and_field( w, if fld_a
-            fld_a[ d ]
-          end )
+        a = @_fld_a
+
+        @_deps.accept_by :receive_complete_field_list do | pl |
+          pl.receive_complete_field_list a
+          KEEP_PARSING_
         end
 
-        @_celifiers = h
-        NIL_
+        KEEP_PARSING_
       end
 
-      def __some_celifier_for_width_and_field w, fld
+      DEFAULT_NORMALIZER___ = -> x do
+        x.to_s  # nil OK, false OK
+      end
 
-        if fld
-          p = fld.celifier_builder
-        end
-        if p
-          _wrap = Column_Metrics___.new w, fld
-          p[ _wrap ]
-        else
-          __LR_celifier_for_width_and_field w, fld
+      def __build_celifiers_hash
+
+        fld_a = @_fld_a  # any
+
+        ::Hash.new do | h, d |
+
+          # the first time a celifier is called for a given column
+
+          if fld_a
+            fld = fld_a[ d ]
+          end
+
+          if fld
+            p = fld.celifier_builder
+          end
+
+          w = @_widths[ d ]
+
+          p_ = if p
+            p[ Column_Metrics___.new( w, fld ) ]
+          else
+            __LR_celifier_for_width_and_field w, fld
+          end
+
+          h[ d ] = p_  # we cache this decision so we don't make it
+                       # again for this column on subsequent rows
+          p_
         end
       end
 
@@ -228,114 +217,147 @@ module Skylab::Brazen
         end
       end
 
-      def __normalize_glyphs
-        @_left_flank ||= LEFT_GLYPH_
-        @_right_flank ||= RIGHT_GLYPH_
-        @_separator_glyph ||= SEP_GLYPH_
-        NIL_
+      def receive_downstream_context o
+
+        @_deps[ :argument_matrix_expresser ].receive_downstream_context o
+
+        # (when the above is too rigid, memoize the received argument here)
       end
 
-      def __normalize_for_expression
+      def receive_user_data_upstream st
 
-        @_downstream_yielder_x = @_downstream_table_receiver.downstream_yielder_x
+        @_am = Table_Impl_::Models_::Argument_Matrix.new
 
-        @_num_columns = if @_fld_a
-          @_fld_a.length
+        if st.no_unparsed_exists
+          __when_no_user_data_rows
         else
-          @_column_widths.keys.max + 1
+          @_up_st = st
+          __when_some_user_data_rows
         end
-
-        NIL_
       end
 
-      def __express_headers
+      def __when_some_user_data_rows
 
-        cx = @_celifiers
+        @_deps.accept_by :before_first_row do | pl |
+          pl.before_first_row
+        end
 
-        _express_row( @_fld_a.each_with_index.map do | fld, d |
+        begin
 
-          s = fld.label
-          if s
-            cx.fetch( d )[ s ]
-          else
-            cx.fetch( d )[ EMPTY_S_ ]
+          begin_argument_row
+
+          _x_a = @_up_st.gets_one
+
+          _x_a.each_with_index do | x, d |
+
+            p_a = @_user_datapoint_observers[ d ]
+            if p_a
+              self._YAY
+            end
+
+            _x_ = @_argument_normalizers[ d ][ x ]
+
+            receive_celifier_argument _x_, d
           end
-        end )
+
+          finish_argument_row
+
+          if @_up_st.no_unparsed_exists
+            break
+          end
+          redo
+        end while nil
+
+        __at_end_of_user_data
       end
 
-      def __express_body
+      def __at_end_of_user_data
 
-        @_downstream_table_receiver.accept( & method( :_express_row ) )
-        KEEP_PARSING_
-      end
-
-      def _express_row s_a
-
-        _s_a_ = @_num_columns.times.map do | d |
-
-          @_celifiers.fetch( d )[ s_a[ d ] ]  # (`s_a` might be sparse)
+        if @_target_width && @_deps[ :unused_width_consumer ]
+          __distribute_width
         end
 
-        @_downstream_yielder_x <<
-          "#{ @_left_flank }#{ _s_a_ * @_separator_glyph }#{ @_right_flank }"
-
-        KEEP_PARSING_
+        @_deps[ :argument_matrix_expresser ].
+          express_argument_matrix_against_celifiers @_am, @_celifiers
       end
 
-      # ~ experimental API-ish for roles (strategies)
+      def __distribute_width
 
-      def _be_table_receiver
+        w = 0
+        @_deps.accept_by :known_width do | pl |
 
-        @_role_box.touch :_table_ do
-          _become_table_receiver
-          :_become_table_receiver
+          w += pl.known_width
+          NIL_
         end
-        KEEP_PARSING_  # important!
-      end
 
-      def _become_table_receiver
+        w += @_widths.values.reduce( 0, & :+ )
 
-        _umr = user_matrix_receiver
+        _available_width = @_target_width - w  # NOTE whether this
+        # is negative, zero or positive we send it just the same.
 
-        @_downstream_table_receiver = _umr.replace_table_receiver self
+        @_deps[ :unused_width_consumer ].receive_unused_width(
+          _available_width, self )
 
-        ACHIEVED_
-      end
-
-      def touch_role k, & x_p
-
-        @_role_box.touch k do
-          method_and_args = x_p[]
-          send method_and_args.fetch( 0 ), * method_and_args[ 1 .. -1 ]
-          method_and_args
-        end
         NIL_
       end
 
-      # ~ this API
+      # ~ service API
 
-      def mutate_per p
+      def known_columns_count
 
-        p[ self ]
+        @_fld_a.length  # while it works..
+      end
+
+      def field_array
+
+        @_fld_a
+      end
+
+      def mutable_column_widths
+        @_widths
+      end
+
+      def begin_argument_row
+
+        @_am.begin_row
         NIL_
       end
 
-      def user_matrix_receiver
+      def receive_celifier_argument x, d
 
-        disp = @resources.dispatcher
-
-        _id_of_row_first_receiver =
-          disp.subscriptions.fetch( :receive_user_row ).first
-
-        disp.retrieve_plugin _id_of_row_first_receiver
-      end
-
-      def session_for_adding_dependency dependency, & edit_p
-
-        @_disp.session_for_adding_dependency dependency, & edit_p
+        @_argument_observers[ d ][ x ]
+        @_am.accept_argument x, d
         NIL_
       end
 
+      def finish_argument_row
+
+        @_am.finish_row
+        NIL_
+      end
+
+      def receive_subscription dep, sym
+
+        @_deps.add_subscriptions sym, dep
+      end
+
+      def touch_dynamic_dependency cls
+
+        @_deps || _init_deps
+        @_deps.touch_dynamic_dependency cls
+      end
+
+      # ~
+
+      def _init_deps
+
+        o = Home_.lib_.plugin::Dependencies.new self
+        o.roles = ROLES___
+        o.emits = EVENTS___
+        o.index_dependencies_in_module Table_Impl_::Row_Strategies_
+        @_deps = o
+        NIL_
+      end
       Me_the_Strategy_ = self
     end
   end

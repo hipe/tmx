@@ -212,7 +212,7 @@ module Skylab
               __write_to_matrix_formal_group_under fo_a
             end
 
-            Plugin_.lib_.IN_MOTION_table_actor(
+            Home_.lib_.IN_MOTION_table_actor(
 
               :left, '  ',
               :right, EMPTY_S_,

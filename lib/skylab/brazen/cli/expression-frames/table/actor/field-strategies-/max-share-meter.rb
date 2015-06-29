@@ -2,13 +2,10 @@ module Skylab::Brazen
 
   class CLI::Expression_Frames::Table::Actor
 
-    class Field_Strategies_::Max_Share_Meter < Argumentative_strategy_class_[]
+    class Field_Strategies_::Max_Share_Meter
 
-      PROPERTIES = EMPTY_A_
-
-      def initialize plugin_ID, resources
-        super
-      end
+      ROLES = nil
+      SUBSCRIPTIONS = nil
 
       # -> 2 (nothing here is re-integrated yet)
 
@@ -17,7 +14,7 @@ module Skylab::Brazen
             new( column ).to_proc
           end
 
-          def initialize column
+          def initialize_AGAIN column
             @max = column.stats.max_numeric_x.to_f
             @width = column.width
             @is_from_right = false

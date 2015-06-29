@@ -104,7 +104,7 @@ point:
 
   "Dependency injection is a software design pattern in which one or
    more dependencies (or services) are injected, or passed by reference,
-   into a depedent object (or client) and are made art of the client's
+   into a depedent object (or client) and are made part of the client's
    state [yes, sounds good].
 
    Dependency injection involves four elements: the implementation of a
@@ -130,10 +130,9 @@ the object, so what we probably wants is closer to the strategy pattern.
 
 
 
-## :#note-act-170
+## understanding multi-pass table rendering
 
-at first it may seem superflous to go through event dispatching for
-every row. but this allows for (hypothetically) a pager, etc
+(should rewrite)
 
 
 
@@ -151,63 +150,66 @@ the default is to align left.
 
 
 
-# ~ (( BEGIN erase all these
 
-## :#storypoint-80
+## (method documentation) :[#.H]
 
-keep in mind what is happening here - *every* time you call the curried
-executable, it makes a deep copy of the whole field box. it feels like we
-should optimize this but it depends on the usage whether this is helpful: we
-don't expect our usage patterns to justify such an optimization at this point
+an essential part of our implementation of the [#sl-023]: we send,
+`.dup` to a curry to create another curry from it or to create an
+executable dup of a curry.
 
-
-
-## understanding multi-pass table rendering
-
-text-based table-rendering is not fun or interesting unless we do
-"dynamic column alignment". to do this necessitates that we hold the entire
-table (in some form) in memory as we determine the statistics for each column,
-so that we can know how much whitespace to pad each cel of each column with.
-
-algorithmically, alternatives probably exist to acheive a simliar end but they
-are beyond the scope of this project.
+the *whole* dependencies tree must be duped recursively in a non-
+trivial manner implemented ad-hoc as appropriate for each node.
 
 
 
-## :#the-data-pass
 
-in the data pass we flush every row of data from the producer, and along
-the way we gather statistical data about each field from its each cel.
+## the tricky implementation of fill [#.I]
 
-once we get to the end of the rows of data from the producer we can
-know statistical metrics about the field, like what is the widest width
-of all of its cels in terms of characters when stringified, or what is
-the minimum and maximum values for the field when numeric.
+the point of fill fields is that we distribute unused remaining width
+to them; but we cannot do this until all of:
 
-we want to store the values of each cel in memory rather than iterate multiple
-times over the same producer (if it were even possible) because the producer
-might for e.g be a randomized functional tree in which case iterating over
-it multiple times would probably yield different results which may obviate
-attempts at building statistical data.
+  • the target width is known
+  • all formal fields are known
+  • all user data has pushed the column widths outward
 
-random gotcha: some custom enums want to short circuit the entire rendering of
-the table rather than render anything.
+furthermore, this may be the first ever fill field for this table or it
+may be a subsequent one. this table may have inherited other fill fields
+from a curry, and likewise this table may itself become a curry. so note
+this field may be used across several tables and so should not directly
+hold for example procs that close around this particular table or any
+part of its dependency tree.
+
+all of the above means we certainly cannot process this fill field
+fully now, at the moment after it is created. it is a model use-case for
+an event: an event should be emitted by the top node when all the above
+preconditions are met, and a subscriber (which must itself be a node
+in our dependency tree) should handle distributing the remaining width
+out to all fill fields all at once.
+
+however, we don't want to re-subscribe to the same event channel more
+that once, which is what would happen if we subscribe each time we hit a
+fill field and there are multiple fill fields. what we want is a
+subscription that:
+
+  • fits in cleanly as part of the dependency tree (duping for free)
+
+  • persists across dups (so no closures)
+
+  • is only added as a subscription once per table.
 
 
+our solution for this is to use the dependency tree, but we create a
+custom dependecy class for this specific behavior:
 
-## :#overage-here
+  • once we get it into the dependency tree it will persist across
+    the dup boundary
 
-imagine a table whose target width is 20. it has four columns. two of
-them are "ordianary" data cels and two are fill columns. let's say that
-the data columns end up with widths that add up to 13. (we're going to
-ignore the idea of separators and margins for now). that leaves us with
-a width of 7 that our two fill columns have to share. let's say our fill
-columns each declare the same relative widths (the same 'parts' number).
+  • if we make the class model an immutable (i.e stateless) object,
+    we get the correct dup behavior "for free"
 
-what we want is that one column ends up with 3 and one ends up with 4.
-the way we do this is we floor the floating point number (3.5 down to 3)
-and then with the amount of width that is left over (in this case 1), we
-distribute it from left to right, in a "one-for-you, one-for-you"
-manner.
+  • for now we need to hack something to guarantee we only add such
+    a thing once per table..
 
-# ~ ))
+we achieve the last point above by introducing the mechanism of
+[#007.H] dynamic dependencies" which we are formulating presently..
+_

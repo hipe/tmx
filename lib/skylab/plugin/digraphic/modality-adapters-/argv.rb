@@ -368,7 +368,7 @@ module Skylab::Plugin
 
         def __init_canary_option_parser
 
-          op = Plugin_.lib_.stdlib_option_parser.new
+          op = Home_.lib_.stdlib_option_parser.new
 
           @indexes.accept do | slc |
 

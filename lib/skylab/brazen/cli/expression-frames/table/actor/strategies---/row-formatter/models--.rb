@@ -12,14 +12,13 @@ module Skylab::Brazen
 
         def initialize parent_x
 
-          disp = Brazen_.lib_.plugin::Pub_Sub::Dispatcher.new self, EMITS__
+          o = Home_.lib_.plugin::Dependencies.new self
+          o.emits = [ :argument_bid_for ].freeze
+          o.roles = EMPTY_A_
+          o.index_dependencies_in_module Table_Impl_::Field_Strategies_
+          o.index_dependency Core_Properties___
 
-          disp.load_plugins_in_module Table_Impl_::Field_Strategies_
-
-          disp.receive_plugin Core_Properties___.new_via_resources self
-
-          @_disp = disp
-
+          @_deps = o
           @_parent_x = parent_x
         end
 
@@ -48,58 +47,68 @@ module Skylab::Brazen
 
         def __one_field_via_nonempty_upstream st
 
-          o = Brazen_.lib_.plugin::Sessions::Shared_Parse.new
-          o.be_passive = true
-          o.dispatcher = @_disp
-          o.upstream = st
           Field_.new do | f |
+
             @_current_field = f
-            o.execute or raise ::Argumentative_strategy_class_
+
+            _kp = @_deps.process_polymorphic_stream_passively st
+            _kp or raise ::ArgumentError
+
             remove_instance_variable :@_current_field
           end
         end
+
+        # ~ service API
 
         def current_field
           @_current_field
         end
 
-        # ~ etc API
-
-        def touch_role k, & x_p
-          @_parent_x.touch_role k, & x_p
+        def field_parent
+          @_parent_x
         end
       end
 
-      class Core_Properties___ < Argumentative_strategy_class_[]
+      class Core_Properties___
 
-        PROPERTIES = [
+        ARGUMENTS = [
           :argument_arity, :one, :property, :celifier_builder,
           :argument_arity, :one, :property, :label,
           :argument_arity, :zero, :property, :left,
           :argument_arity, :zero, :property, :right,
         ]
 
+        ROLES = nil
+
+        Table_Impl_::Strategy_::Has_arguments[ self ]
+
+        def initialize x
+          @parent = x
+        end
+
+        undef_method :dup  # needs impl
+
         def receive__celifier_builder__argument x
-          @resources.current_field.celifier_builder = x
+          @parent.current_field.celifier_builder = x
           KEEP_PARSING_
         end
 
         def receive__label__argument x
-          @resources.current_field.label = x
+          @parent.current_field.label = x
           KEEP_PARSING_
         end
 
-        def receive__left__
+        def receive__left__flag
 
           # (although "is left" is the default, we may be overwriting a
           # value that was previously expressed explicitly by the user)
 
-          @resources.current_field.is_right = false
+          @parent.current_field.is_right = false
           KEEP_PARSING_
         end
 
-        def receive__right__
-          @resources.current_field.is_right = true
+        def receive__right__flag
+          @parent.current_field.is_right = true
           KEEP_PARSING_
         end
       end
@@ -111,7 +120,7 @@ module Skylab::Brazen
         attr_accessor(
           :celifier_builder,
           :is_right,
-          :label,
+          :label
         )
 
         def initialize
@@ -121,10 +130,6 @@ module Skylab::Brazen
           if @_component_box
             @_component_box.freeze
           end
-        end
-
-        def mutate_client
-          NIL_
         end
 
         # ~ "components"

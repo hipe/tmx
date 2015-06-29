@@ -30,14 +30,14 @@ module Skylab::Basic
 
     HL__ = sidesys[ :Headless ]
 
-    Hu___ = sidesys[ :Human ]
+    Human = sidesys[ :Human ]
 
     IO_lib = -> do
       System_lib__[]::IO
     end
 
     NLP_EN = -> do
-      Hu___[]::NLP::EN
+      Human[]::NLP::EN
     end
 
     NLP_EN_agent = -> do
