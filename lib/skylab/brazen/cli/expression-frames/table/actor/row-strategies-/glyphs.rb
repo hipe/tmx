@@ -11,7 +11,7 @@ module Skylab::Brazen
       ]
 
       ROLES = [
-        :argument_matrix_expresser,
+        :matrix_expresser,
       ]
 
       SUBSCRIPTIONS = [
@@ -78,7 +78,7 @@ module Skylab::Brazen
         total
       end
 
-      def express_argument_matrix_against_celifiers am, c
+      def express_matrix_against_celifiers am, c
 
         lf = @_left_flank
         rf = @_right_flank

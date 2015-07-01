@@ -223,6 +223,10 @@ module Skylab::Brazen
       end
     end
 
+    DEFAULT_STRINGIFIER_ = -> x do
+      x.to_s  # nil OK, false OK
+    end
+
     LEFT_GLYPH_ = '| '
     RIGHT_GLYPH_ = ' |'
     SEP_GLYPH_ = ' | '

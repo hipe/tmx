@@ -4,92 +4,128 @@ module Skylab::Brazen
 
     class Field_Strategies_::Max_Share_Meter
 
+      ARGUMENTS = [
+        :argument_arity, :custom, :property, :max_share_meter,
+      ]
+
       ROLES = nil
-      SUBSCRIPTIONS = nil
 
-      # -> 2 (nothing here is re-integrated yet)
+      Table_Impl_::Strategy_::Has_arguments[ self ]
 
-          def self.p_p ; PROC__ end
-          PROC__ = -> column do
-            new( column ).to_proc
+      def initialize x
+        @parent = x
+      end
+
+      def receive_stream_after__max_share_meter__ st
+
+        guy = Guy___.new_via_polymorphic_stream_passively st
+        d = guy.of_column or raise ::ArgumentError
+
+        fld = @parent.current_field
+        par = @parent.field_parent
+
+        fld.add_component :fill, guy.fill
+
+        par.touch_dynamic_dependency(
+          Field_Strategies_::Fill::Dynamic_Dependency )
+
+        fld.add_component :formula_proc, ( -> row, col do
+
+          d_or_f = row[ d ]
+          if d_or_f
+            1.0 * d_or_f / col.column_at( d )[ :stats ].numeric_max
           end
+        end )
 
-          def initialize_AGAIN column
-            @max = column.stats.max_numeric_x.to_f
-            @width = column.width
-            @is_from_right = false
-            absrb_any_iambic_fully column
-            @glyph ||= DEFAULT_GLYPH__
-            @background_glyph ||= DEFAULT_BACKGROUND_GLYPH__
-            @when_no_cel_string = ( SPACE__ * @width ).freeze
-            @render = if @is_from_right
-              -> x, y do
-                "#{ @background_glyph * y }#{ @glyph * x }"
-              end
-            else
-              -> x, y do
-                "#{ @glyph * x }#{ @background_glyph * y }"
-              end
-            end
-            freeze
+        fld.stringifier = nil  # pass the above value thru to the celifier
+
+        fld.celifier_builder = Celifier_builder___
+
+        par.touch_dynamic_dependency(
+          Field_Strategies_::Statistics::Dynamic_Dependency )
+
+        KEEP_PARSING_
+      end
+
+      Celifier_builder___ = -> mtx do
+
+        fld = mtx.field
+
+        fill = fld[ :fill ]
+
+        bg_glyph = fill.background_glyph
+        glyph = fill.glyph
+        width = mtx.column_width
+
+        final = if fill.do_from_right
+          -> num_pluses, num_spaces do
+            "#{ bg_glyph * num_spaces }#{ glyph * num_pluses }"
           end
-
-          DEFAULT_GLYPH__ = '+'.freeze
-          DEFAULT_BACKGROUND_GLYPH__ = SPACE_
-
-        private
-
-          def absrb_any_iambic_fully column
-            fill = column.field.fill
-            fill or raise ::ArgumentError, say_not_fill
-            fill and with_x = fill.with_x
-            with_x and absrb_iambic_fully with_x ; nil
-          end
-
-          def say_not_fill
-            "for now, all 'max share meter' columns must be 'fill' columns."
-          end
-
-          LIB_.fields.from_methods(
-            :absorber, :absrb_iambic_fully
-          ) do
-          def from_right
-            @is_from_right = true
-          end
-          def glyph
-            @glyph = gets_one_polymorphic_value
-          end
-          def background_glyph
-            @background_glyph = gets_one_polymorphic_value
+        else
+          -> num_pluses, num_spaces do
+            "#{ glyph * num_pluses }#{ bg_glyph * num_spaces }"
           end
         end
 
-        public
+        -> max_share_f do
 
-          def to_proc
-            -> cel do
-              if cel
-                when_cel cel
-              else
-                when_no_cel
-              end
-            end
+          if max_share_f  # none for header row
+
+            num_pluses = ( max_share_f * width ).floor
+            final[ num_pluses, width - num_pluses ]
+          end
+        end
+      end
+
+      class Guy___
+
+        Callback_::Actor.methodic self
+
+        class << self
+          alias_method :new_via_polymorphic_stream_passively, :new
+        end
+
+        attr_reader(
+          :fill,
+          :of_column
+        )
+
+        def initialize st
+
+          d = st.current_token
+
+          process_polymorphic_stream_passively st
+
+          if d == st.current_token
+            try_again = true
           end
 
-        private
+          @fill = Field_Strategies_::Fill::Fill_Model.new do
 
-          def when_no_cel
-            @when_no_cel_string
+            process_iambic_fully [
+              :background_glyph, DEFAULT_BACKGROUND_GLYPH___,
+              :glyph, DEFAULT_GLYPH___
+            ]
+
+            process_polymorphic_stream_passively st
           end
 
-          def when_cel cel
-            max_share = cel.x / @max
-            num_glyphs = ( max_share * @width ).floor
-            num_backgrounds = @width - num_glyphs
-            @render[ num_glyphs, num_backgrounds ]
+          if try_again
+            process_polymorphic_stream_passively st
           end
+        end
 
-          # <- 2
+      private
+
+        def of_column=
+          @of_column = gets_one_polymorphic_value
+          KEEP_PARSING_
+        end
+
+        DEFAULT_GLYPH___ = '+'.freeze
+        DEFAULT_BACKGROUND_GLYPH___ = SPACE_
+
+      end
     end
   end
 end

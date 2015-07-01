@@ -21,6 +21,36 @@ we *certainly* want to make a [cu]-like feature comparison meta-table
 (that is, a table about tables :P ) and then reduce these down to one..
 
 
+
+
+## the general table proto-algorithm [#.K]
+
+whether or not we'd like to admit it, the common thread behind all of
+these libraries is they implement the logic necessary to render tables
+from dynamic content to a monospaced-font, fixed-with textual output
+context (that is, usually a "terminal" or console (or maybe a text
+document)).
+
+the general priciple is that we have to iterate over the collection
+of rows (in some form) two times, memoizing the entire table somehow
+in between these two passes:
+
+in the first pass, we note how wide the rendered data is (or will
+be) for each cel, all the while memoizing each widest width encountered
+per column.
+
+in the second pass we use this widest width of each column to determine
+how we render each cel, and then render each row with this renderer,
+creating the final output.
+
+note that in the first pass, as we process each user-provided row of
+data we memoize it (in some form) for use in the second pass, rather
+than relying on the user data source as a means of reliably re-creating
+this exact same matrix again. note that this would not scale out to
+"large" datasets as written, but could be modified to do so with these
+general principles and behavior intact.
+
+
 ----------------
 
 # the fourth table narrative :[#.D]
@@ -130,35 +160,37 @@ the object, so what we probably wants is closer to the strategy pattern.
 
 
 
-## understanding multi-pass table rendering
 
-(should rewrite)
+## the rendering pipeline :[.#J]
 
+putting a finer point on [#.K] the general algorithm:
 
+we anticipate one day overhauling this to become based on a user-defined
+dependency graph (something like excel spreadsheets). also, our
+terminology is likely to change; but we cannot find the perfect words
+unless we build a bridge to them using imperfect words as a start.
 
+we frame our general pipeline (to be explained in more detail below) in
+terms of the lifecycle of how a user-provided "datatpoint" eventually
+becomes an individual rendered "cel" in the finished output:
 
-## :[#.E]
-
-fields should be immutable.
-
-
-
-
-## :[#.F]
-
-the default is to align left.
-
-
-
-
-## (method documentation) :[#.H]
-
-an essential part of our implementation of the [#sl-023]: we send,
-`.dup` to a curry to create another curry from it or to create an
-executable dup of a curry.
-
-the *whole* dependencies tree must be duped recursively in a non-
-trivial manner implemented ad-hoc as appropriate for each node.
+    +----------------+
+    | user datapoint |   # of mixed (unknown) shape, raw data from user
+    +----------------+
+            |
+      [ argumenter ]     # an argumenter converts datapoints to arguments
+            |
+            v
+    +----------------+
+    |   "argument"   |   # of mixed shape, an argument to the celifier
+    +----------------+
+            |
+       [ celifier ]      # a celifier converts arguments to cels
+            |
+            v
+    +----------------+
+    |      cel       |   # a string of some fixed width per column,
+    +----------------+   # ready to be assembled by glyphs to make a row
 
 
 
@@ -212,4 +244,31 @@ custom dependecy class for this specific behavior:
 
 we achieve the last point above by introducing the mechanism of
 [#007.H] dynamic dependencies" which we are formulating presently..
+
+
+
+
+## (method documentation) :[#.H]
+
+an essential part of our implementation of the [#sl-023]: we send,
+`.dup` to a curry to create another curry from it or to create an
+executable dup of a curry.
+
+the *whole* dependencies tree must be duped recursively in a non-
+trivial manner implemented ad-hoc as appropriate for each node.
+
+
+
+
+
+## :[#.E]
+
+fields should be immutable.
+
+
+
+
+## :[#.F]
+
+the default is to align left.
 _

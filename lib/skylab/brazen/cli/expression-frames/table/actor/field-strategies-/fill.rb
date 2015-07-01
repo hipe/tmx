@@ -17,24 +17,25 @@ module Skylab::Brazen
       end
 
       def dup
-        $stderr.puts "\n\nSTATELESS, RIGHT?\n\n"
-        NIL_
+        self._DESIGN_ME
       end
 
       def receive_stream_after__fill__ st  # see article [#096.I]
 
-        _fill = Fill_Model___.new_via_polymorphic_stream_passively st
+        _fill = Fill_Model.new_via_polymorphic_stream_passively st
 
         @parent.current_field.add_component :fill, _fill
 
-        @parent.field_parent.touch_dynamic_dependency Dynamic_Dependency_for_Fill___
+        @parent.field_parent.touch_dynamic_dependency Dynamic_Dependency
 
         KEEP_PARSING_
       end
 
-      class Fill_Model___  # (this is so great how simple it is)
+      class Fill_Model  # (this is so great how simple it is)
 
         attr_reader(
+          :background_glyph,
+          :do_from_right,
           :glyph,
           :parts_float,
         )
@@ -42,13 +43,24 @@ module Skylab::Brazen
         Callback_::Actor.methodic self
 
         def initialize & edit_p
+          @background_glyph = SPACE_
           instance_exec( & edit_p )
         end
 
       private
 
+        def background_glyph=
+          @background_glyph = gets_one_polymorphic_value
+          KEEP_PARSING_
+        end
+
         def glyph=
           @glyph = gets_one_polymorphic_value
+          KEEP_PARSING_
+        end
+
+        def from_right=
+          @do_from_right = true
           KEEP_PARSING_
         end
 
@@ -61,7 +73,7 @@ module Skylab::Brazen
         end
       end
 
-      class Dynamic_Dependency_for_Fill___  # adapt to [pl]
+      class Dynamic_Dependency  # adapt to [pl]
 
         def initialize _
           freeze

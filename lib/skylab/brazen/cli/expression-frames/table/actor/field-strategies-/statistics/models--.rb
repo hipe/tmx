@@ -4,10 +4,7 @@ module Skylab::Brazen
 
     class Field_Strategies_::Statistics
 
-      ROLES = nil
-      SUBSCRIPTIONS = nil
-
-      # <- NOTHING below this line is functioning
+      # (the below moved here with the file but have become detached frm tests)
 
     # it is a pesudo-proc ..
     #
@@ -50,7 +47,6 @@ module Skylab::Brazen
     #     HERE
     #     act  # => exp
 
-
     # specify custom headers, separators, and output functions:
     #
     #     a = []
@@ -61,56 +57,6 @@ module Skylab::Brazen
     #
     #     x  # => nil
     #     ( a * 'X' )  # => "(Food,Drink      )X(nut ,pomegranate)"
-
-    class Field_Shell__
-      def initialize d, x_a, bx
-        @d = d ; @x_a = x_a
-        prepare_peaceful_parse
-        Field__.new do |fld|
-          @field = fld
-          if @x_a.fetch( @d ).respond_to? :ascii_only?
-            label
-          else
-            absrb_passive
-          end
-          @field.name_symbol ||= :"#{ bx.length }"
-        end
-        bx.add @field.name_symbol, @field ; nil
-      end
-      attr_reader :d
-
-      LIB_.fields.from_methods(
-        :niladic, :passive, :absorber, :absrb_passive
-      ) do
-        def cel_renderer_builder
-          x = gets_one_polymorphic_value
-          if x.respond_to? :id2name
-            @field.cel_renderer_p_p = Table_::Fill_.p_p_from_i x
-          else
-            @field.cel_renderer_p_p = x
-          end ; nil
-        end
-        def fill
-          shell = CLI::Table::Fill_::Shell.new
-          @field.fill and shell.previous_fill = @field.fill
-          shell.from_d_parse_iambic_passively @d, @x_a
-          @d = shell.d ; @field.fill = shell.fill
-        end
-        def id  # typically for fields w/o labels, i.e non-displayed headers
-          @field.name_symbol = gets_one_polymorphic_value
-        end
-        def label
-          @field.label_s = gets_one_polymorphic_value
-          @field.name_symbol.nil? and @field.name_symbol = @field.label_s.intern
-        end
-        def left
-          @field.align_i = :left
-        end
-        def right
-          @field.align_i = :right
-        end
-      end
-    end
 
     # add field modifiers between the `field` keyword and its label (left/right):
     #
@@ -125,106 +71,6 @@ module Skylab::Brazen
     #       |   headless | 99             |
     #     HERE
     #     str # => exp
-
-    class Field__
-      def initialize
-        @cel_renderer_p_p = nil
-        yield self
-        freeze  # ensure that we can dupe with shallow copies
-      end
-      attr_accessor :align_i, :label_s, :name_symbol, :cel_renderer_p_p
-    end
-
-  public
-
-    def execute
-      ok = ( @row_upstream || @line_downstream_yielder )  # else don't bother
-      ok &&= __string_pass
-      ok && __render_pass
-    end
-
-    # ~ the string pass
-
-    def __string_pass
-      The_String_Pass__.new( self ).field_stats_and_cel_matrix do |fs, cm|
-        @cel_matrix = cm
-        @field_stats = fs
-      end
-    end
-
-    class The_String_Pass__
-
-      def initialize kernel
-        @kernel = kernel
-      end
-
-      def field_stats_and_cel_matrix
-
-        @up_st = __build_row_stream
-        if @up_st
-
-          yield( * __via_upstream_produce_two )
-
-        else
-          yield @up_st
-        end
-      end
-
-      def __build_row_stream
-
-        st = @kernel.row_upstream
-
-        p = if @kernel.do_show_header
-
-          -> do
-            p = -> do
-              st.gets
-            end
-            @kernel.field_box.map( & :label_s )
-          end
-        else
-          -> do
-            st.gets
-          end
-        end
-
-        Callback_::Scn.new do
-          p[]
-        end
-      end
-
-      def __via_upstream_produce_two
-
-        h = ::Hash.new do |h_, d|
-          h_[ d ] = Field_Statistics__.new d
-        end
-
-        cel_matrix = []
-
-        begin
-
-          row = @up_st.gets
-          row or break
-
-          cel_row = []
-          cel_matrix.push cel_row
-
-          row.each_with_index do |cel_x, d|
-            cel_row.push h[ d ].see_value_and_build_cel( cel_x )
-          end
-
-          redo
-        end while nil
-
-        [ h.length.times.map do |d|
-            h.fetch( d ).finish_string_pass
-          end, cel_matrix ]
-      end
-    end
-
-  public
-
-    attr_reader :do_show_header, :field_box
 
     class Field_Statistics__
 
@@ -330,88 +176,6 @@ module Skylab::Brazen
       attr_reader :x
       def type_i
         :numeric
-      end
-    end
-
-  private
-
-    # ~ the render pass
-
-    def __render_pass
-
-      cel_renderers = __produce_cel_renderers
-
-      y = @line_downstream_yielder
-
-      if ! y
-        io = Library_::StringIO.new
-        y = io
-      end
-
-      left = @left_x || DEFAULT_LEFT_MARGIN__
-      sep = @sep_x || DEFAULT_SEPARATOR__
-      right = @right_x || DEFAULT_RIGHT_MARGIN__
-
-      st = __cel_row_stream
-      begin
-        row = st.gets
-        row or break
-        y << "#{ left }#{
-          ( row.map.with_index do |cel, d|
-            cel_renderers.fetch( d ).call cel
-          end ) * ( sep ) }#{
-          }#{ right }"
-        redo
-      end while nil
-
-      io && io.string
-    end
-
-    DEFAULT_LEFT_MARGIN__ = '| '.freeze
-    DEFAULT_SEPARATOR__ = ' | '.freeze
-    DEFAULT_RIGHT_MARGIN__ = " |\n".freeze
-
-    def __cel_row_stream
-
-      Callback_::Stream.via_nonsparse_array @cel_matrix
-    end
-
-    def __produce_cel_renderers
-      @widest_row_cels_count = @field_stats.length
-      @field_fetcher = __produce_field_fetcher
-      early_pass_only = true
-      a = @widest_row_cels_count.times.map do |d|
-        x = @field_fetcher[ d ].
-          prdc_early_pass_cel_renderer_via_stats @field_stats.fetch d
-        if x
-          x
-        else
-          early_pass_only = nil
-        end
-      end
-      early_pass_only or prdc_late_pass_renderers a
-      a
-    end
-
-    def __produce_field_fetcher
-      if @field_box
-        field_a = @field_box.values
-        fields_count = field_a.length
-        overage = @widest_row_cels_count - fields_count
-        if 0 < overage
-          field_a.concat overage.times.map { DEFAULT_FIELD__ }
-        end
-        -> d { field_a.fetch d }
-      else
-        -> _ { DEFAULT_FIELD__ }
-      end
-    end
-    DEFAULT_FIELD__ = Field__.new { }
-
-    class Field__
-      def prdc_early_pass_cel_renderer_via_stats stats
-        ! @cel_renderer_p_p and
-          Cel_Renderer__.produce_via_field_and_stats self, stats
       end
     end
 
@@ -527,7 +291,6 @@ module Skylab::Brazen
     #     q[ :sep, '_' ]  # => "<a_b>\n"
     #     q[]  # => "<aXb>\n"
 
-    # ->
     end
   end
 end

@@ -17,33 +17,35 @@ module Skylab::Brazen
 
       def initialize x
 
+        @_col_bx = nil
         @_deps = nil
         @_fld_a = nil
+        @_do_calculation_pass = false
         @parent = x
         @_target_width = nil
       end
 
       def dup x
 
-        otr = super()
-        otr.__init_dup x
-        otr
-      end
-
-      def __init_dup x
+        otr = self.class.new x
 
         if @_deps
-          @_deps = @_deps.dup self
+          deps = @_deps.dup otr
         end
 
-        if @_fld_a  # assume fields themselves are immutable-ish
-          @_fld_a = @_fld_a.dup
+        if @_fld_a
+          fld_a = @_fld_a.dup  # assume fields themselves are immutable-ish
         end
 
-        @parent = x
+        tw = @_target_width  # as-is
 
-        # @_target_width  keep
-        NIL_
+        otr.instance_exec do
+          @_deps = deps
+          @_fld_a = fld_a
+          @_target_width = tw
+        end
+
+        otr
       end
 
       # ~ begin frontier
@@ -117,7 +119,7 @@ module Skylab::Brazen
       end
 
       ROLES___ = [
-        :argument_matrix_expresser,
+        :matrix_expresser,
         :unused_width_consumer,
       ]
 
@@ -130,22 +132,22 @@ module Skylab::Brazen
 
       # ~
 
-      def receive_normalize_fields  # assume the list of fields is complete
+      def receive_normalize_fields  # assume post-dup & field list complete
 
-        # observes raw values of certain columns in user-provided rows:
-
-        @_user_datapoint_observers = MONADIC_EMPTINESS_
+        # see [#096.J] the cel pipeline
 
         # converts user datapoints into the arguments passed to celifiers:
 
-        @_argument_normalizers = ::Hash.new DEFAULT_NORMALIZER___
+        @_stringifier = __build_stringifier_hash
 
         # observes the results of above:
 
-        @_argument_observers = ::Hash.new do | h, d |
+        @_string_observers = ::Hash.new do | h, d |
           h[ d ] = -> s do
-            if @_widths[ d ] < s.length
-              @_widths[ d ] = s.length
+            if s
+              if @_widths[ d ] < s.length
+                @_widths[ d ] = s.length
+              end
             end
             NIL_
           end
@@ -157,23 +159,41 @@ module Skylab::Brazen
 
         # converts (celifier) "arguments" to cel strings:
 
-        @_celifiers = __build_celifiers_hash
+        @_column_p = __build_proc_for_column_for
+        @_celifiers = __build_celifiers_hash @_column_p
 
-        a = @_fld_a
-
+        fld_a = @_fld_a
         @_deps.accept_by :receive_complete_field_list do | pl |
-          pl.receive_complete_field_list a
+          pl.receive_complete_field_list fld_a
           KEEP_PARSING_
         end
 
         KEEP_PARSING_
       end
 
-      DEFAULT_NORMALIZER___ = -> x do
-        x.to_s  # nil OK, false OK
+      def __build_stringifier_hash
+
+        fld_a = @_fld_a  # any
+
+        ::Hash.new do | h, d |
+
+          if fld_a
+            fld = fld_a[ d ]
+          end
+
+          h[ d ] = if fld
+
+            # if there's a field, use whatever the field
+            # says to use even if it's false-ish
+
+            fld.stringifier
+          else
+            DEFAULT_STRINGIFIER_
+          end
+        end
       end
 
-      def __build_celifiers_hash
+      def __build_celifiers_hash column_for
 
         fld_a = @_fld_a  # any
 
@@ -189,12 +209,18 @@ module Skylab::Brazen
             p = fld.celifier_builder
           end
 
-          w = @_widths[ d ]
-
           p_ = if p
-            p[ Column_Metrics___.new( w, fld ) ]
+
+            col = column_for[ d ]
+
+            _mtx = Me_the_Strategy_::Models__::ColumnMetrics.new(
+              @_widths[ d ],
+              col,
+              col.field )
+
+            p[ _mtx ]
           else
-            __LR_celifier_for_width_and_field w, fld
+            __LR_celifier_for_width_and_field @_widths[ d ], fld
           end
 
           h[ d ] = p_  # we cache this decision so we don't make it
@@ -202,8 +228,6 @@ module Skylab::Brazen
           p_
         end
       end
-
-      Column_Metrics___ = ::Struct.new :column_width, :field
 
       def __LR_celifier_for_width_and_field w, fld
 
@@ -219,7 +243,7 @@ module Skylab::Brazen
 
       def receive_downstream_context o
 
-        @_deps[ :argument_matrix_expresser ].receive_downstream_context o
+        @_deps[ :matrix_expresser ].receive_downstream_context o
 
         # (when the above is too rigid, memoize the received argument here)
       end
@@ -229,7 +253,7 @@ module Skylab::Brazen
         @_am = Table_Impl_::Models_::Argument_Matrix.new
 
         if st.no_unparsed_exists
-          __when_no_user_data_rows
+          self._COVER_ME__when_no_user_data_rows
         else
           @_up_st = st
           __when_some_user_data_rows
@@ -237,6 +261,47 @@ module Skylab::Brazen
       end
 
       def __when_some_user_data_rows
+
+        if @_do_calculation_pass
+          __do_calculation_passes
+        else
+          _do_rendering_passes @_up_st
+        end
+      end
+
+      def __do_calculation_passes  # (we would like this to go down)
+
+        mutable = @_up_st.flush_remaining_to_array
+
+        # pass 1 - send all user datapoints to all user datapoint observers
+
+        known_columns_count.times do | d |
+
+          p_a = @_datapoint_observers[ d ]
+          p_a or next
+          p_a.each do | p |
+            mutable.length.times do | row_d |
+              p[ mutable.fetch( row_d ).fetch( d ) ]
+            end
+          end
+        end
+
+        # pass 2 - for each column with a formula, run the formula on each row
+
+        @_formulas.each_with_index do | p, d |
+          p or next
+
+          col = @_column_p[ d ]
+          # run the formula for the particular cel in each row
+          mutable.each do | mutable_row |
+            mutable_row[ d ] = p[ mutable_row.dup.freeze, col ]
+          end
+        end
+
+        _do_rendering_passes Callback_::Polymorphic_Stream.via_array mutable
+      end
+
+      def _do_rendering_passes up_st
 
         @_deps.accept_by :before_first_row do | pl |
           pl.before_first_row
@@ -246,23 +311,22 @@ module Skylab::Brazen
 
           begin_argument_row
 
-          _x_a = @_up_st.gets_one
+          _x_a = up_st.gets_one
+          _x_a.each_with_index do | datapoint_x, d |
 
-          _x_a.each_with_index do | x, d |
-
-            p_a = @_user_datapoint_observers[ d ]
-            if p_a
-              self._YAY
+            p = @_stringifier[ d ]
+            if p
+              s = p[ datapoint_x ]
+              s or self._SANITY
+              receive_string s, d
+            else
+              receive_datapoint datapoint_x, d
             end
-
-            _x_ = @_argument_normalizers[ d ][ x ]
-
-            receive_celifier_argument _x_, d
           end
 
           finish_argument_row
 
-          if @_up_st.no_unparsed_exists
+          if up_st.no_unparsed_exists
             break
           end
           redo
@@ -277,8 +341,8 @@ module Skylab::Brazen
           __distribute_width
         end
 
-        @_deps[ :argument_matrix_expresser ].
-          express_argument_matrix_against_celifiers @_am, @_celifiers
+        @_deps[ :matrix_expresser ].
+          express_matrix_against_celifiers @_am, @_celifiers
       end
 
       def __distribute_width
@@ -301,21 +365,97 @@ module Skylab::Brazen
         NIL_
       end
 
-      # ~ service API
+      # ~ The Service API
+
+      ## ~~ field API
 
       def known_columns_count
-
         @_fld_a.length  # while it works..
-      end
-
-      def field_array
-
-        @_fld_a
       end
 
       def mutable_column_widths
         @_widths
       end
+
+      def field_array
+        @_fld_a
+      end
+
+      ## ~~ user datapoint observation API
+
+      def add_user_datapoint_observer d, & p  # assume post-dup
+
+        @_do_calculation_pass = true
+        @_datapoint_observers ||= []
+        a = @_datapoint_observers[ d ]
+        if ! a
+          a = []
+          @_datapoint_observers[ d ] = a
+        end
+        a.push p
+        NIL_
+      end
+
+      ## ~~ column observation & writing API
+
+      def set_formula d, & p  # assume post-dup
+
+        @_do_calculation_pass = true
+        a = ( @_formulas ||= [] )
+        did = false
+        a.fetch d do
+          a[ d ] = p
+          did = true
+        end
+        did or raise Definition_Conflict, __say_formula( d )
+        NIL_
+      end
+
+      def __say_formula d
+        "formula can only be set once for column at offset #{ d }"
+      end
+
+      def __build_proc_for_column_for  # assume post-dup
+
+        cache = []
+
+        p = -> d do  # assume fields and field
+
+          col = cache[ d ]
+          if ! col
+
+            col = Me_the_Strategy_::Models__::Column.new do | cl |
+              cl.receive_column_box __release_column_box d
+              cl.field = @_fld_a[ d ]
+              cl.receive_column_proc p
+                # give this column the ability to access the other columns
+            end
+            cache[ d ] = col
+          end
+          col
+        end
+      end
+
+      def __release_column_box d
+        if @_col_bx
+          @_col_bx.delete d
+        end
+      end
+
+      def add_column_element x, sym, d
+
+        h = ( @_col_bx ||= {} )
+
+        _bx = h.fetch d do
+          h[ d ] = Callback_::Box.new
+        end
+
+        _bx.add sym, x
+
+        NIL_
+      end
+
+      ## ~~ argument writing API
 
       def begin_argument_row
 
@@ -323,9 +463,17 @@ module Skylab::Brazen
         NIL_
       end
 
-      def receive_celifier_argument x, d
+      def receive_string s, d
 
-        @_argument_observers[ d ][ x ]
+        s or self._SANITY
+
+        @_string_observers[ d ][ s ]
+        @_am.accept_argument s, d
+        NIL_
+      end
+
+      def receive_datapoint x, d
+
         @_am.accept_argument x, d
         NIL_
       end
@@ -335,6 +483,8 @@ module Skylab::Brazen
         @_am.finish_row
         NIL_
       end
+
+      ## ~~ dependency mutation API
 
       def receive_subscription dep, sym
 
@@ -347,7 +497,7 @@ module Skylab::Brazen
         @_deps.touch_dynamic_dependency cls
       end
 
-      # ~
+      # ~ ( end The Service API )
 
       def _init_deps
 

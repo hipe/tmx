@@ -11,9 +11,9 @@ module Skylab::Brazen::TestSupport
 
       _DOT = "•"
 
-      _celifier_builder = -> column_metrics do
+      _celifier_builder = -> mtx do
 
-        w = column_metrics.column_width
+        w = mtx.column_width
 
         -> s do
 
@@ -54,8 +54,8 @@ module Skylab::Brazen::TestSupport
 
       _UNDR = '_'.freeze
 
-      underscores = -> column_metrics do
-        w = column_metrics.column_width
+      underscores = -> mtx do
+        w = mtx.column_width
         -> cel do
           _UNDR * w
         end
@@ -85,9 +85,9 @@ module Skylab::Brazen::TestSupport
       done_
     end
 
-    _FILL = -> column_metrics do
-      char = column_metrics.field[ :fill ].glyph
-      width = column_metrics.column_width
+    _FILL = -> mtx do
+      char = mtx.field[ :fill ].glyph
+      width = mtx.column_width
       -> _cel_ do
         char * width
       end

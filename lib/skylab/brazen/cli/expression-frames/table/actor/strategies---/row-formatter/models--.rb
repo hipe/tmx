@@ -72,6 +72,7 @@ module Skylab::Brazen
       class Core_Properties___
 
         ARGUMENTS = [
+          :argument_arity, :one, :property, :stringifier,
           :argument_arity, :one, :property, :celifier_builder,
           :argument_arity, :one, :property, :label,
           :argument_arity, :zero, :property, :left,
@@ -107,6 +108,11 @@ module Skylab::Brazen
           KEEP_PARSING_
         end
 
+        def receive__stringifier__argument x
+          @parent.current_field.stringifier = x
+          KEEP_PARSING_
+        end
+
         def receive__right__flag
           @parent.current_field.is_right = true
           KEEP_PARSING_
@@ -120,11 +126,13 @@ module Skylab::Brazen
         attr_accessor(
           :celifier_builder,
           :is_right,
-          :label
+          :label,
+          :stringifier,
         )
 
         def initialize
           @_component_box = nil
+          @stringifier = DEFAULT_STRINGIFIER_  # might get false-ish-ified
           yield self
           freeze
           if @_component_box
@@ -147,5 +155,40 @@ module Skylab::Brazen
         end
       end
     end
+
+    class Strategies___::Row_Formatter::Models__::Column
+
+      # in contrast to a "field", a "column" is a function of the
+      # particular user data for this one table (rendering)
+
+      attr_accessor(
+        :field,
+      )
+
+      def initialize
+        yield self
+        freeze
+      end
+
+      def receive_column_box bx
+        @_bx = bx ; nil
+      end
+
+      def receive_column_proc p
+        @_column_p = p ; nil
+      end
+
+      def [] sym
+        @_bx[ sym ]
+      end
+
+      def column_at d
+        @_column_p[ d ]
+      end
+    end
+
+    Strategies___::Row_Formatter::Models__::ColumnMetrics =
+      ::Struct.new :column_width, :column, :field
+
   end
 end

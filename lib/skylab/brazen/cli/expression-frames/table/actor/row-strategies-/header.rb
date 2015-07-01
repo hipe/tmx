@@ -71,9 +71,9 @@ module Skylab::Brazen
         @_fld_a.each_with_index do | fld, d |
           s = fld.label
           if s
-            @parent.receive_celifier_argument s, d
+            @parent.receive_string s, d
           else
-            @parent.receive_celifier_argument EMPTY_S_, d
+            @parent.receive_datapoint s, d
           end
         end
         @parent.finish_argument_row
