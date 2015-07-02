@@ -16,7 +16,7 @@ module Skylab::FileMetrics
 
         def add_additional_properties * x_a
 
-          lib = FM_.lib_.brazen
+          lib = Home_.lib_.brazen
 
           empty_module  = ::Module.new
           sess = lib::Entity::Session.new

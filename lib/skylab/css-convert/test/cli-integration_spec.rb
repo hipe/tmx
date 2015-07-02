@@ -12,7 +12,7 @@ module Skylab::CSS_Convert::TestSupport
 
     let :stderr do
       raw = client.send( :io_adapter ).errstream[ :buffer ].string
-      clean = CSSC_.lib_.brazen::CLI::Styling.unstyle raw
+      clean = Home_.lib_.brazen::CLI::Styling.unstyle raw
       clean.split "\n"
     end
 

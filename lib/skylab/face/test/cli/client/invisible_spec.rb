@@ -16,7 +16,7 @@ module Skylab::Face::TestSupport::CLI::Client::Invisible
 
       module Cornholius  # guess where this module goes to live
 
-        class CLI_Client < Face_::CLI::Client
+        class CLI_Client < Home_::CLI::Client
 
           def glo
           end
@@ -47,7 +47,7 @@ module Skylab::Face::TestSupport::CLI::Client::Invisible
 
     context "implicit, afterhand" do
       module Dornholius
-        class CLI_Client < Face_::CLI::Client
+        class CLI_Client < Home_::CLI::Client
           def doo
             :doox
           end
@@ -72,7 +72,7 @@ module Skylab::Face::TestSupport::CLI::Client::Invisible
 
       module Eornholius
 
-        class CLI_Client < Face_::CLI::Client
+        class CLI_Client < Home_::CLI::Client
 
           def glouchester
           end
@@ -115,7 +115,7 @@ module Skylab::Face::TestSupport::CLI::Client::Invisible
 
     context "exlicit during" do
       module Fornholius
-        class CLI_Client < Face_::CLI::Client
+        class CLI_Client < Home_::CLI::Client
           option_parser do |o|
           end
           set :node, :foo, :invisible
@@ -140,7 +140,7 @@ module Skylab::Face::TestSupport::CLI::Client::Invisible
 
     context "explicit after" do
       module Gornholius
-        class CLI_Client < Face_::CLI::Client
+        class CLI_Client < Home_::CLI::Client
           option_parser do |o|
           end
           def goo

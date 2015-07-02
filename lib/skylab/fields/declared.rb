@@ -158,7 +158,7 @@ module Skylab::Fields
 
       def bld_fld_box
 
-        Fields_.lib_.basic::Box.new
+        Home_.lib_.basic::Box.new
       end
     end
 
@@ -166,7 +166,7 @@ module Skylab::Fields
 
     Touch_const_with_dupe_for___ = -> p, c, mod do
 
-      Fields_.lib_.basic::Module.touch_const false, -> _ do
+      Home_.lib_.basic::Module.touch_const false, -> _ do
         if mod.const_defined? c
           mod.const_get( c ).dupe_for mod
         else
@@ -530,7 +530,7 @@ module Skylab::Fields
 
         _a = field_box.get_names
 
-        _s = Fields_.lib_.basic::String.via_mixed x
+        _s = Home_.lib_.basic::String.via_mixed x
 
         "unrecognized keyword #{ _s }#{
           } - did you mean #{ say_lev x, _a }?"
@@ -538,7 +538,7 @@ module Skylab::Fields
 
       def say_lev x, a
 
-        Fields_.lib_.human::Levenshtein.with(
+        Home_.lib_.human::Levenshtein.with(
           :item, x,
           :items, a,
           :closest_N_items, 3,

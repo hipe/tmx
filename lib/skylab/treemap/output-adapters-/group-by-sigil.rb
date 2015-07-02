@@ -84,7 +84,7 @@ module Skylab::Treemap
 
           bs_ = build_branch_stack_for[ o ]
 
-          idx_ = Tr_.lib_.basic::List.index_of_deepest_common_element(
+          idx_ = Home_.lib_.basic::List.index_of_deepest_common_element(
             branch_number_stack,
             bs_ )
 

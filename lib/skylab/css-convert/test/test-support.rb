@@ -6,8 +6,8 @@ module Skylab::CSS_Convert::TestSupport
   ::Skylab::TestSupport::Regret[ TS_ = self ]
 
   module Constants
-    CSSC_ = ::Skylab::CSS_Convert
-    Headless_ = CSSC_::Headless_
+    Home_ = ::Skylab::CSS_Convert
+    Headless_ = Home_::Headless_
     TestSupport_ = ::Skylab::TestSupport
   end
 
@@ -37,7 +37,7 @@ module Skylab::CSS_Convert::TestSupport
       @cli_instance ||= begin
         streams = TestSupport_::IO.spy.triad.new
         _a = streams.values
-        app = CSSC_::CLI.new( * _a )
+        app = Home_::CLI.new( * _a )
         app.send :program_name=, 'nerk'
         do_debug and streams.debug!
         app
@@ -45,18 +45,18 @@ module Skylab::CSS_Convert::TestSupport
     end
 
     def fixture_path tail
-      CSSC_.dir_pathname.join('test/fixtures', tail)
+      Home_.dir_pathname.join('test/fixtures', tail)
     end
 
     def parse_css_in_file pathname
-      build_parser(CSSC_::CSS_::Parser).parse_path pathname.to_path
+      build_parser(Home_::CSS_::Parser).parse_path pathname.to_path
     end
 
     def parse_directives_in_file pathname
-      build_parser(CSSC_::Directive__::Parser).parse_path pathname.to_path
+      build_parser(Home_::Directive__::Parser).parse_path pathname.to_path
     end
 
-    define_method :unstyle, CSSC_.lib_.brazen::CLI::Styling::Unstyle
+    define_method :unstyle, Home_.lib_.brazen::CLI::Styling::Unstyle
 
   end
 end

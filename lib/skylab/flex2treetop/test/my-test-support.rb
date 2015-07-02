@@ -96,7 +96,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
     Tmpdir___ = -> do
       p = -> dbg_IO_p do
-        _pn = F2TT_::LIB_.system.filesystem.tmpdir_pathname.join 'f2tt'
+        _pn = Home_::LIB_.system.filesystem.tmpdir_pathname.join 'f2tt'
         x_a = [ :path, _pn ]
         dbg_IO = dbg_IO_p[]
         if dbg_IO
@@ -123,7 +123,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
     def black_and_white_expression_agent_for_expect_event
 
-      F2TT_::Brazen_::API.expression_agent_instance
+      Home_::Brazen_::API.expression_agent_instance
     end
   end
 
@@ -157,8 +157,8 @@ module Skylab::Flex2Treetop::MyTestSupport
   end
 
 
-  F2TT_ = ::Skylab::Flex2Treetop
-  FIXTURE_FILES_DIR_ = F2TT_.dir_pathname.join( 'test/fixture-files' ).to_path
+  Home_ = ::Skylab::Flex2Treetop
+  FIXTURE_FILES_DIR_ = Home_.dir_pathname.join( 'test/fixture-files' ).to_path
   ICK_ = '@ rb_file_s_stat '.freeze  # 2.1.0 added this
   NIL_ = nil
   REAL_PROGNAME_ = 'flex2treetop'.freeze  # no easy way to mutate this?

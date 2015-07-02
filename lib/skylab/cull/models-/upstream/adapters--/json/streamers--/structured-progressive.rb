@@ -38,7 +38,7 @@ module Skylab::Cull
             @first_open_line = line
             line_cache = []
 
-            Cull_.lib_.load_JSON_lib
+            Home_.lib_.load_JSON_lib
 
             @p = -> do
               begin

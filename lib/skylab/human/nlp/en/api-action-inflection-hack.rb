@@ -119,7 +119,7 @@ module NLP::EN::API_Action_Inflection_Hack  # see [#018]. compare ?![#hl-005]. w
     end
 
     def bld_noun  # #note-130
-      chain = Hu_.lib_.basic::Module.chain_via_module @klass
+      chain = Home_.lib_.basic::Module.chain_via_module @klass
       mod = chain[ -2 ].value_x
       mod_ = chain[ -3 ].value_x
       if mod_ && mod_.respond_to?( :unbound_action_box )
@@ -178,7 +178,7 @@ module NLP::EN::API_Action_Inflection_Hack  # see [#018]. compare ?![#hl-005]. w
 
     # for setting how to inflect things
 
-    Hu_.lib_.parse::DSL_DSL.enhance self do
+    Home_.lib_.parse::DSL_DSL.enhance self do
       atom_accessor :noun
       atom_accessor :verb
     end

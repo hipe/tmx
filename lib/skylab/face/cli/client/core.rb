@@ -914,7 +914,7 @@ module Skylab::Face
       def options  # #called-by self `parameters`
         @options ||= -> do
           scn = nil ; op_x = option_parser ? @op : Empty_A_
-          Face_::Options.new(
+          Home_::Options.new(
             fetch: -> ref, &blk do
               scn ||= LIB_.CLI_lib.option.parser.scanner op_x
               scn.fetch ref, &blk
@@ -922,7 +922,7 @@ module Skylab::Face
         end.call
       end
 
-      Face_::Options = LIB_.proxy_lib.functional :fetch
+      Home_::Options = LIB_.proxy_lib.functional :fetch
 
     end
 
@@ -1157,7 +1157,7 @@ module Skylab::Face
     private
 
       def parameters  # #called-by self - `subcommand_help`
-        @parameters ||= Face_::Parameters.new(
+        @parameters ||= Home_::Parameters.new(
           fetch: -> ref, &blk do
             ok = false
             res = options.fetch ref do ok = true end
@@ -1172,7 +1172,7 @@ module Skylab::Face
           end )
       end
 
-      Face_::Parameters = LIB_.proxy_lib.nice :fetch  # only here b.c etc
+      Home_::Parameters = LIB_.proxy_lib.nice :fetch  # only here b.c etc
 
       # `subcmd_help` - #result-is-tuple. a hook for the benefit of both child
       # classes and nodes - it corrals help requests coming in from 2 places:
@@ -1907,7 +1907,7 @@ module Skylab::Face
       end
     end.call
 
-    Face_ = Face_  # sub-sub libs expect this in client
+    Home_ = Home_  # sub-sub libs expect this in client
 
   end
 end

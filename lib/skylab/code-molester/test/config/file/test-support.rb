@@ -8,7 +8,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
 
   extend TestSupport_::Quickie
 
-  CM_ = CM_
+  Home_ = Home_
 
   TestLib_ = TestLib_
 
@@ -45,7 +45,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
     end
 
     def config_file_class
-      CM_::Config::File::Model
+      Home_::Config::File::Model
     end
 
     let :tmpdir do
@@ -87,7 +87,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
 
     def join_with_newlines_under ev, expag
       scan = ev.to_stream_of_lines_rendered_under expag
-      scan.to_a.join CM_::NEWLINE_
+      scan.to_a.join Home_::NEWLINE_
     end
   end
 end

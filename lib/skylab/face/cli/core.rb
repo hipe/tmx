@@ -15,7 +15,7 @@ module Skylab::Face
 
     module Lib_
 
-      include Face_::Lib_
+      include Home_::Lib_
 
     end
   end

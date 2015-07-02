@@ -19,9 +19,9 @@ module Skylab::Face::TestSupport::CLI::Client
   TestSupport_ = TestSupport_
 
   TestSupport_::Sandbox.enhance( Sandbox ).
-    produce_subclasses_of -> { Face_::CLI::Client }
+    produce_subclasses_of -> { Home_::CLI::Client }
 
-  Face_ = Face_
+  Home_ = Home_
 
   extend TestSupport_::Quickie
 
@@ -36,7 +36,7 @@ module Skylab::Face::TestSupport::CLI::Client
       @child::Constants.const_set :Sandbox, @child::Sandbox
     end
     def CLI_party=
-      @child.const_set :Face_, Face_
+      @child.const_set :Home_, Home_
       @child.const_set :TS__, @child
       @child.include @parent::Constants
       @child.extend TestSupport_::Quickie
@@ -53,9 +53,9 @@ module Skylab::Face::TestSupport::CLI::Client
       Parse_lib___[]::DSL_DSL.enhance_module x, & p
     end
 
-    HL__ = Face_::Lib_::HL__
+    HL__ = Home_::Lib_::HL__
 
-    Parse_lib___ = Face_::Lib_::Parse_lib
+    Parse_lib___ = Home_::Lib_::Parse_lib
 
     Sout_serr = -> do
       sys = LIB_.system_IO
@@ -237,7 +237,7 @@ module Skylab::Face::TestSupport::CLI::Client
       end
     end
 
-    styling = Face_.lib_.brazen::CLI::Styling
+    styling = Home_.lib_.brazen::CLI::Styling
 
     define_method :unstyle, styling::Unstyle
 
@@ -324,7 +324,7 @@ module Skylab::Face::TestSupport::CLI::Client
 
     -> do  # `expect_nonstyled_line`
 
-      simple_style_rx = Face_.lib_.brazen::CLI::Styling::SIMPLE_STYLE_RX
+      simple_style_rx = Home_.lib_.brazen::CLI::Styling::SIMPLE_STYLE_RX
 
       define_method :expect_nonstyled_line do |rx, idx_ref=true, sn=:err|
         line = expect_line idx_ref, sn

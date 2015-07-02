@@ -6,9 +6,9 @@ module Skylab::Git
   class << self
     def check_SCM * a
       if a.length.zero?
-        Git_::Actors__::Check_SCM
+        Home_::Actors__::Check_SCM
       else
-        Git_::Actors__::Check_SCM[ * a ]
+        Home_::Actors__::Check_SCM[ * a ]
       end
     end
 
@@ -25,7 +25,7 @@ module Skylab::Git
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   DASH_ = '-'.freeze
-  Git_ = self
+  Home_ = self
   stowaway :Library_, 'lib-'
   NIL_ = nil
   UNDERSCORE_ = '_'.freeze

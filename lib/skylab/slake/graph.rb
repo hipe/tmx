@@ -2,7 +2,7 @@ require 'rake' # for fun and as an implementation detail we use it
 
 module Skylab::Slake
   class Graph
-    include Slake_::Parenthood
+    include Home_::Parenthood
     include ::Rake::TaskManager
     def []=(name, task)
       name = name.to_s

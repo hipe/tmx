@@ -1,11 +1,11 @@
 module Skylab::Dependency
 
-  class TaskTypes::ConfigureMakeMakeInstall < Dep_::Task
+  class TaskTypes::ConfigureMakeMakeInstall < Home_::Task
 
-    Dep_.lib_.open_2 self
+    Home_.lib_.open_2 self
 
-    include Dep_.lib_.system.filesystem.path_tools.instance_methods_module
-    include Dep_::TaskTypes::TarballTo::Constants
+    include Home_.lib_.system.filesystem.path_tools.instance_methods_module
+    include Home_::TaskTypes::TarballTo::Constants
     attribute :configure_make_make_install
     attribute :prefix
     attribute :configure_with, :required => false
@@ -111,9 +111,9 @@ module Skylab::Dependency
         _show_bash cmd
       end
       # multiplex two output streams into a total of four things
-      Dep_::Library_.kick :StringIO
-      out = Dep_.lib_.proxy::Tee.new out: ui.out, buffer: ::StringIO.new
-      err = Dep_.lib_.proxy::Tee.new out: ui.err, buffer: ::StringIO.new
+      Home_::Library_.kick :StringIO
+      out = Home_.lib_.proxy::Tee.new out: ui.out, buffer: ::StringIO.new
+      err = Home_.lib_.proxy::Tee.new out: ui.err, buffer: ::StringIO.new
       open2(cmd, out, err)
       err[:buffer].rewind ; s = err[:buffer].read
       if "" != (s)

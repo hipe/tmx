@@ -14,7 +14,7 @@ class Skylab::Face::CLI::Client
       end
     end
 
-    Ouroboros_Sheet_ = Face_::LIB_.proxy_lib.nice :name, :set_a, :is_ok,
+    Ouroboros_Sheet_ = Home_::LIB_.proxy_lib.nice :name, :set_a, :is_ok,
       :do_include, :is_prenatal, :all_aliases,
       :desc_proc_a, :command_tree, :option_sheet_a,
       :has_default_argv, :has_option_sheets, :fetch_constituent,

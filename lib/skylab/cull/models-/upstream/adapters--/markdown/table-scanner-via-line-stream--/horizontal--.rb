@@ -32,7 +32,7 @@ module Skylab::Cull
 
             line = p[]
 
-            scn = Cull_.lib_.string_scanner line
+            scn = Home_.lib_.string_scanner line
 
             if scn.match? ANY_WHITESPACE_AND_A_PIPE_RX_
               has_aesthetic_leading_pipe = true

@@ -75,7 +75,7 @@ module Skylab::Fields
         which_h.fetch( _d ).push matr.local_normal_name
       end
 
-      Fields_.lib_.parse::Item_Grammar.new mono_i_a, :attribute, diad_i_a
+      Home_.lib_.parse::Item_Grammar.new mono_i_a, :attribute, diad_i_a
     end
 
     DSL = -> mod do
@@ -458,7 +458,7 @@ module Skylab::Fields
     end
 
     def add_dflt name, val
-      # add name, Fields_.lib_.basic.dup_mixed( val )
+      # add name, Home_.lib_.basic.dup_mixed( val )
       add name, val
     end
 

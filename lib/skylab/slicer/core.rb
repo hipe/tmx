@@ -7,7 +7,7 @@ module Skylab::Slicer
 
     def application_kernel_
 
-      @___ak ||= Brazen_::Kernel.new Slicer_
+      @___ak ||= Brazen_::Kernel.new Home_
     end
 
     def lib_
@@ -32,7 +32,7 @@ module Skylab::Slicer
   Brazen_ = Autoloader_.require_sidesystem :Brazen
   Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
   NIL_ = nil
-  Slicer_ = self
+  Home_ = self
   THE_EMPTY_MODULE_ = ::Module.new
 
 end

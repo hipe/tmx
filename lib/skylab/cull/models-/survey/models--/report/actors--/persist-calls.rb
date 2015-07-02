@@ -48,7 +48,7 @@ module Skylab::Cull
         def add_span main_node, node_a
 
           if main_node
-            func = Cull_::Models_::Function_.unmarshal(
+            func = Home_::Models_::Function_.unmarshal(
               main_node.value_x, & @on_event_selectively )
             if func
               __add_span func, node_a

@@ -98,7 +98,7 @@ module Skylab::BeautySalon
         :sin )
 
       def expression_agent
-        BS_.lib_.brazen::API.expression_agent_instance
+        Home_.lib_.brazen::API.expression_agent_instance
       end
     end
 
@@ -143,7 +143,7 @@ module Skylab::BeautySalon
 
       Final_fallback_on_event_selectively_via_channel__ = -> sout, serr do
 
-        lib = BS_.lib_.brazen::API
+        lib = Home_.lib_.brazen::API
 
         evr = lib.two_stream_event_expresser.new(
           sout, serr, lib.expression_agent_instance )
@@ -200,7 +200,7 @@ module Skylab::BeautySalon
       end
     end
 
-    Brazen_ = BS_.lib_.brazen
+    Brazen_ = Home_.lib_.brazen
 
     Zerk_ = Brazen_::Zerk
 
@@ -409,7 +409,7 @@ module Skylab::BeautySalon
 
       def marshal_load s, & p
 
-        @rx = BS_.lib_.basic::Regexp.marshal_load s do | * i_a, & ev_p |
+        @rx = Home_.lib_.basic::Regexp.marshal_load s do | * i_a, & ev_p |
 
           if :error == i_a.first
             p[ wrap_marshal_load_event ev_p[] ]
@@ -706,7 +706,7 @@ module Skylab::BeautySalon
         @my_files_agent.build_command do | * i_a, & ev_p|
           ev = ev_p[]
           if :info == i_a.first && :find_command_args == i_a[ 1 ]
-            _s_a = ev.find_command_args.map( & BS_.lib_.shellwords.method( :shellescape ) )
+            _s_a = ev.find_command_args.map( & Home_.lib_.shellwords.method( :shellescape ) )
             @serr.puts
             @serr.puts "current find command: #{ _s_a * SPACE_ }"
           else

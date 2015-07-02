@@ -69,7 +69,7 @@ module Skylab::Treemap
 
         def __resolve_output_adapter
 
-          lib = Tr_.lib_.brazen
+          lib = Home_.lib_.brazen
 
           oa = lib::Collection::Common_fuzzy_retrieve[
             qualified_knownness( :output_adapter ),
@@ -88,7 +88,7 @@ module Skylab::Treemap
 
           h = @argument_box.h_
 
-          _ = Tr_.lib_.system.filesystem.normalization
+          _ = Home_.lib_.system.filesystem.normalization
 
           @_no = _.new_with(
             :stdin, h.fetch( :stdin ),

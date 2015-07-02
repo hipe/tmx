@@ -7,7 +7,7 @@ module Skylab::CodeMolester::TestSupport
   TestLib_ = ::Module.new
 
   module Constants
-    CM_ = ::Skylab::CodeMolester
+    Home_ = ::Skylab::CodeMolester
     TestSupport_ = ::Skylab::TestSupport
   end
 
@@ -19,12 +19,12 @@ module Skylab::CodeMolester::TestSupport
 
   TestSupport_::Quickie.enable_kernel_describe
 
-  CM_ = CM_
+  Home_ = Home_
 
-  Constants::Tmpdir_instance_ = CM_::Callback_.memoize do
+  Constants::Tmpdir_instance_ = Home_::Callback_.memoize do
     TestSupport_.tmpdir.new_with(
       :max_mkdirs, 2,
-      :path, CM_.lib_.system_default_tmpdir_pathname.join( 'co-mo' ),
+      :path, Home_.lib_.system_default_tmpdir_pathname.join( 'co-mo' ),
       :be_verbose, false )
   end
 
@@ -46,7 +46,7 @@ module Skylab::CodeMolester::TestSupport
   module Constants::TestLib_
 
     Bzn = -> do
-      CM_::Lib_::Brazen[]
+      Home_::Lib_::Brazen[]
     end
 
     Expect_line = -> do

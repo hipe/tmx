@@ -9,7 +9,7 @@ describe "[y2] CLI integration" do
 
   extend ::Skylab::Yacc2Treetop::TestSupport::CLI
 
-  self::Y2TT_ = ::Skylab::Yacc2Treetop
+  self::Home_ = ::Skylab::Yacc2Treetop
 
   context 'doing nothing' do
     invoke

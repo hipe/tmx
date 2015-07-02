@@ -1,6 +1,6 @@
 module Skylab::Face
 
-  module Face_::CLI::Client::Adapter::For::Face
+  module Home_::CLI::Client::Adapter::For::Face
 
     Hotmm_ = -> slug, lo_class, arg_sht_p do  # hot maker maker
       -> hi_svcs, _slug_used_str=nil do
@@ -19,7 +19,7 @@ module Skylab::Face
     module Of
 
       Sheet = -> hi_sheet, lo_sheet do
-        Face_::CLI::Client::Namespace_::Adapter::For::Face::Ouroboros_Sheet[
+        Home_::CLI::Client::Namespace_::Adapter::For::Face::Ouroboros_Sheet[
           hi_sheet, lo_sheet ]
       end
 

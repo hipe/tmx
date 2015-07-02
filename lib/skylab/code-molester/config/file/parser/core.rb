@@ -71,7 +71,7 @@ module Skylab::CodeMolester
         else
           compile_parser[ o_pn ] or break  # (result is num bytes)
         end
-        CM_::Library_.touch :Treetop  # load it late, close to where it is used
+        Home_::Library_.touch :Treetop  # load it late, close to where it is used
         load o_pn.to_s
         parent_module.const_defined? const, false or fail "we expected but #{
           }did not see #{ parent_module }::#{ const } in #{ o_pn }"
@@ -81,9 +81,9 @@ module Skylab::CodeMolester
       mkdir_p = nil
       compile_parser = -> o_pn do
 
-        i_pn = CM_.dir_pathname.join( Path_part__[] ).  # hack around
+        i_pn = Home_.dir_pathname.join( Path_part__[] ).  # hack around
           dirname.join( 'grammar.treetop' )                  #   'version-'
-        cmp = CM_::Library_::Treetop::Compiler::GrammarCompiler.new
+        cmp = Home_::Library_::Treetop::Compiler::GrammarCompiler.new
         ovr = o_pn.exist?  # even if we never overwrite we don't know that here.
         if debug
           y << "#{ ovr ? 'overwriting existing' : 'creating new' } #{
@@ -142,7 +142,7 @@ module Skylab::CodeMolester
           version_s = head_pn.join( 'VERSION' ).read
           version_s.chomp!
           _full_pn = head_pn.join "version-#{ version_s }#{ Autoloader_::EXTNAME }"
-          _full_pn.relative_path_from( CM_.dir_pathname ).to_path
+          _full_pn.relative_path_from( Home_.dir_pathname ).to_path
         end
 
         Parser_ = self

@@ -1,6 +1,6 @@
 module Skylab::Treemap
 
-  class CLI < Tr_.lib_.brazen::CLI
+  class CLI < Home_.lib_.brazen::CLI
 
     # desc "experiments with R."
 
@@ -8,13 +8,13 @@ module Skylab::Treemap
 
       def new * a
 
-        new_top_invocation a, Tr_.application_kernel_
+        new_top_invocation a, Home_.application_kernel_
       end
     end  # >>
 
     def expression_agent_class
 
-      Tr_.lib_.brazen::CLI.expression_agent_class
+      Home_.lib_.brazen::CLI.expression_agent_class
     end
 
     class Action_Adapter < Action_Adapter

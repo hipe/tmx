@@ -31,7 +31,7 @@ module Skylab::Slicer::TestSupport
     end
 
     def subject_CLI
-      Slicer_::CLI
+      Home_::CLI
     end
 
     define_method :get_invocation_strings_for_expect_stdout_stderr, -> do
@@ -42,8 +42,8 @@ module Skylab::Slicer::TestSupport
     end.call
   end
 
-  Slicer_ = ::Skylab::Slicer
+  Home_ = ::Skylab::Slicer
 
-  Brazen_ = Slicer_::Brazen_
+  Brazen_ = Home_::Brazen_
   NIL_ = nil
 end

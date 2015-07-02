@@ -13,7 +13,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
 
         s_a = []
 
-        _SEP = BS_::CONST_SEP_
+        _SEP = Home_::CONST_SEP_
 
         tree.children_depth_first_via_args_hook nil do |node, x, p|
           a = []
@@ -38,7 +38,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
       end
 
       def subject * x_a, & p
-        BS_::Lib_::System[].filesystem.hack_guess_module_tree( * x_a, & p )
+        Home_::Lib_::System[].filesystem.hack_guess_module_tree( * x_a, & p )
       end
 
   end

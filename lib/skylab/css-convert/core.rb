@@ -111,7 +111,7 @@ module Skylab::CSS_Convert
   private
 
     def version
-      send_payload_message "#{ program_name } #{ CSSC_::VERSION }"
+      send_payload_message "#{ program_name } #{ Home_::VERSION }"
       SUCCEEDED_
     end
   end
@@ -150,13 +150,13 @@ module Skylab::CSS_Convert
       result = :error
       begin
         set! or break
-        p = CSSC_::Directive__::Parser.new self
+        p = Home_::Directive__::Parser.new self
         d = p.parse_stream( io_adapter.instream ) or break
         if ! dump_directives d
           result = :ok
           break
         end
-        r = CSSC_::Directive__::Runner.new self
+        r = Home_::Directive__::Runner.new self
         r.invoke d or break
         result = :ok
       end while false
@@ -316,7 +316,7 @@ module Skylab::CSS_Convert
   private
     def color_test _
 
-      styling = CSSC_.lib_.brazen::CLI::Styling
+      styling = Home_.lib_.brazen::CLI::Styling
       width = 50
 
       code_names = LIB_.brazen::CLI::Styling.code_name_symbol_array
@@ -408,8 +408,8 @@ module Skylab::CSS_Convert
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
-  CSSC_ = self
-  FIXTURES_DIR = CSSC_.dir_pathname.join 'test/fixtures'
+  Home_ = self
+  FIXTURES_DIR = Home_.dir_pathname.join 'test/fixtures'
   SPACE_ = ' '.freeze
   SUCCEEDED_ = true
   UNABLE_ = false

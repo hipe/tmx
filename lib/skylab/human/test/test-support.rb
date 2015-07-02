@@ -22,7 +22,7 @@ module Skylab::Human::TestSupport
 
         ( cache_h.fetch sym do
 
-          cache_h[ sym ] = Hu_.lib_.plugin::Bundle::Fancy_lookup[ sym, TS_ ]
+          cache_h[ sym ] = Home_.lib_.plugin::Bundle::Fancy_lookup[ sym, TS_ ]
 
         end )[ self ]
         NIL_
@@ -31,7 +31,7 @@ module Skylab::Human::TestSupport
 
     def memoize_ sym, & p
 
-      define_method sym, Hu_::Callback_.memoize( & p )
+      define_method sym, Home_::Callback_.memoize( & p )
     end
   end
 
@@ -49,6 +49,6 @@ module Skylab::Human::TestSupport
   end
 
   EMPTY_A_ = [].freeze
-  Hu_ = ::Skylab::Human
+  Home_ = ::Skylab::Human
   NIL_ = nil
 end

@@ -12,14 +12,14 @@ module Skylab::Face::TestSupport::CLI::Client::Metastory
       modex = :CLI_
       context "from libville" do
         it "CLI (modality client baseclass)" do
-          Face_::CLI::Client.metastory.modality_exponent.should eql modex
+          Home_::CLI::Client.metastory.modality_exponent.should eql modex
         end
         it "Namespace" do
-          Face_::CLI::Client::Namespace_.
+          Home_::CLI::Client::Namespace_.
             metastory.modality_exponent.should eql modex
         end
         it "Command" do
-          Face_::CLI::Client::Command_.
+          Home_::CLI::Client::Command_.
             metastory.modality_exponent.should eql modex
         end
       end
@@ -66,7 +66,7 @@ module Skylab::Face::TestSupport::CLI::Client::Metastory
         triforce_exponent :Modality_Client_
         trio true, true, false
         context "libville baseclass" do
-          metastory { Face_::CLI::Client.metastory }
+          metastory { Home_::CLI::Client.metastory }
           it "#{ explain_i }" do
             metastory.triforce_exponent.should eql( triforce_exponent )
           end
@@ -88,7 +88,7 @@ module Skylab::Face::TestSupport::CLI::Client::Metastory
         triforce_exponent :Namespace_
         trio false, true, false
         context "libville baseclass" do
-          metastory { Face_::CLI::Client::Namespace_.metastory }
+          metastory { Home_::CLI::Client::Namespace_.metastory }
           it "#{ explain_i }" do
             metastory.triforce_exponent.should eql( triforce_exponent )
           end
@@ -110,7 +110,7 @@ module Skylab::Face::TestSupport::CLI::Client::Metastory
         triforce_exponent :Action_
         trio false, false, true
         context "libville baseclass" do
-          metastory { Face_::CLI::Client::Command_.metastory }
+          metastory { Home_::CLI::Client::Command_.metastory }
           it "#{ explain_i }" do
             metastory.triforce_exponent.should eql( triforce_exponent )
           end
@@ -132,10 +132,10 @@ module Skylab::Face::TestSupport::CLI::Client::Metastory
 
     define_sandbox_constant :businessland_cli_module do
       module Sandbox::CLI
-        Client = ::Class.new Face_::CLI::Client
-        class Particular_Namespace < Face_::CLI::Client::Namespace_
+        Client = ::Class.new Home_::CLI::Client
+        class Particular_Namespace < Home_::CLI::Client::Namespace_
         end
-        class Particular_Command < Face_::CLI::Client::Command_  # not in the wild
+        class Particular_Command < Home_::CLI::Client::Command_  # not in the wild
         end
       end
     end

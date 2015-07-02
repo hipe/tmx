@@ -4,7 +4,7 @@ module Skylab::Human::TestSupport
 
   describe "[hu] summarizer" do
 
-    include Hu_::Summarizer
+    include Home_::Summarizer
 
     context "truncates strings" do
       def self.o maxlen, input, expected, *r

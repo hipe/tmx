@@ -189,7 +189,7 @@ module Skylab::CodeMolester
     -> do  # `_get_normalized_pairs` - do not re-write these.
            # they lose whitespace formatting. also there are some gothas #todo
 
-      scn = CM_::Library_::StringScanner.new EMPTY_S_
+      scn = Home_::Library_::StringScanner.new EMPTY_S_
       white = /[ \t]+/
       a = [ ]
       lit_rx = /(?:true|false)\b/

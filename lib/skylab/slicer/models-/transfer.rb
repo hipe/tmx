@@ -42,7 +42,7 @@ module Skylab::Slicer
           redo
         end while nil
 
-        _tv = Slicer_::Sessions_::Traversal.new
+        _tv = Home_::Sessions_::Traversal.new
         st = _tv.to_sidesystem_stream
 
         _TEST_DIR = 'test'

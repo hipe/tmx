@@ -6,7 +6,7 @@ module Skylab::FileMetrics
   class << self
 
     def application_kernel_
-      @___kr ||= FM_.lib_.brazen::Kernel.new FM_
+      @___kr ||= Home_.lib_.brazen::Kernel.new Home_
     end
 
     def lib_
@@ -86,9 +86,9 @@ module Skylab::FileMetrics
   ACHIEVED_ = true
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
-  FM_ = self
+  Home_ = self
   IDENTITY_ = -> x { x }
-  LIB_ = FM_.lib_
+  LIB_ = Home_.lib_
   Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
   MONADIC_TRUTH_ = -> _ { true }
   NIL_ = nil

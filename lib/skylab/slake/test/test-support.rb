@@ -6,7 +6,7 @@ module Skylab::Slake::TestSupport
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
-  Slake_ = ::Skylab::Slake
+  Home_ = ::Skylab::Slake
 
   TestSupport_ = ::Skylab::TestSupport
 

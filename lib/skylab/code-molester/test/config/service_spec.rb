@@ -10,7 +10,7 @@ module Skylab::CodeMolester::TestSupport::Config::Service
 
   extend TestSupport_::Quickie
 
-  CM_ = CM_
+  Home_ = Home_
 
   describe "[cm] config service" do
 
@@ -18,7 +18,7 @@ module Skylab::CodeMolester::TestSupport::Config::Service
       m = -> do
         module M1
           class Client
-            CM_::Config::Service.enhance self do
+            Home_::Config::Service.enhance self do
               filename 'foo.config'
               search_num_dirs do 3 end
             end
@@ -39,7 +39,7 @@ module Skylab::CodeMolester::TestSupport::Config::Service
       m = -> do
         module M2
           class Client
-            CM_::Config::Service.enhance self
+            Home_::Config::Service.enhance self
           end
         end
         m = -> { }
@@ -60,7 +60,7 @@ module Skylab::CodeMolester::TestSupport::Config::Service
       m = -> do
         module M3
           class Client
-            CM_::Config::Service.enhance self do
+            Home_::Config::Service.enhance self do
               search_start_path '/wizzo'
             end
           end

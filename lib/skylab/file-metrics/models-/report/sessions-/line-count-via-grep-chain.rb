@@ -26,7 +26,7 @@ module Skylab::FileMetrics
         totes.slug = @label
         @_totes = totes
 
-        lib = FM_.lib_
+        lib = Home_.lib_
 
         ok = ACHIEVED_
 

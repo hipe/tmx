@@ -6,7 +6,7 @@ module Skylab::CodeMolester
         _data = nil
         begin
           s = ::File.read @path
-          _data = CM_::Library_::JSON.parse s
+          _data = Home_::Library_::JSON.parse s
           @data = _data
         rescue ::JSON::ParserError => e
           @last_parser_error = e

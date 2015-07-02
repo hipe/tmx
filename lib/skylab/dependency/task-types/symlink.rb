@@ -1,5 +1,5 @@
 module Skylab::Dependency
-  class TaskTypes::Symlink < Dep_::Task
+  class TaskTypes::Symlink < Home_::Task
     attribute :symlink
     attribute :target
     def slake

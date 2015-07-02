@@ -10,11 +10,11 @@ module Skylab::Face::TestSupport::CLI::Client::Namespace::Via_Mod_Func
 
   module Wizzle
     module CLI
-      class Client < Face_::CLI::Client
+      class Client < Home_::CLI::Client
         namespace :'data-source', -> { Actions::DataSrc }, aliases: [ 'ds' ]
       end
       module Actions
-        class DataSrc < Face_::CLI::Client::Namespace_
+        class DataSrc < Home_::CLI::Client::Namespace_
         end
       end
     end

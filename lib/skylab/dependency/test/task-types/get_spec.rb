@@ -10,7 +10,7 @@ module Skylab::Dependency::TestSupport::Tasks
     let(:context) { { :build_dir => build_dir } }
     let(:host) { ::Pathname.new('http://localhost:1324/') }
     let(:klass) { TaskTypes::Get }
-    let(:log) { Dep_::Library_::StringIO.new }
+    let(:log) { Home_::Library_::StringIO.new }
     before(:each) { BUILD_DIR.prepare }
     before(:all) { FILE_SERVER.run }
 

@@ -8,7 +8,7 @@ module Skylab::Human::TestSupport
 
       _a = [ :apple, :banana, :ernana, :onono, :strawberry, :orange ]
 
-      _a_ = Hu_::Levenshtein.with(
+      _a_ = Home_::Levenshtein.with(
         :item, :bernono,
         :items, _a,
         :closest_N_items, 3 )

@@ -9,7 +9,7 @@ describe "[sla] interpolate" do
 
   it "works" do
     src = ::Struct.new(:a, :b).new('one', 'two')
-    Slake_::Interpolate.interpolate( '{a}AND{b}', src ).
+    Home_::Interpolate.interpolate( '{a}AND{b}', src ).
       should eql( 'oneANDtwo' )
   end
 
@@ -17,7 +17,7 @@ describe "[sla] interpolate" do
     let(:klass) do
       ::Class.new.class_eval do
         def self.to_s ; 'Foo' end
-        include Slake_::Interpolator
+        include Home_::Interpolator
         def one
           interpolate "{two}"
         end

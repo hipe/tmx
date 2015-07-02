@@ -42,9 +42,9 @@ module Skylab::BeautySalon::TestSupport::Models::S_and_R::Actors_BFS
       mid_match_line = ls.gets
       ls.gets.should be_nil
 
-      last_match_line = last_match.to_line_stream.to_a.join BS_::EMPTY_S_
+      last_match_line = last_match.to_line_stream.to_a.join Home_::EMPTY_S_
 
-      p = BS_.lib_.brazen::CLI::Styling::Parse_styles
+      p = Home_.lib_.brazen::CLI::Styling::Parse_styles
 
       mid_sexp = p[ mid_match_line ]
       last_sexp = p[ last_match_line ]

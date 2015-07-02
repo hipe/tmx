@@ -1,8 +1,8 @@
 module Skylab::Dependency
 
-  class TaskTypes::MkdirP < Dep_::Task
+  class TaskTypes::MkdirP < Home_::Task
 
-    include Dep_::Library_::FileUtils
+    include Home_::Library_::FileUtils
 
     alias_method :fu_mkdir_p, :mkdir_p
     attribute :dry_run, :boolean => true, :from_context => true, :default => false
@@ -17,7 +17,7 @@ module Skylab::Dependency
 
       valid? or fail(invalid_reason)
 
-      _n11n = Dep_.lib_.system.filesystem.normalization
+      _n11n = Home_.lib_.system.filesystem.normalization
 
       did_send_event = nil
 

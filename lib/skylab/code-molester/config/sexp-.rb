@@ -2,11 +2,11 @@ module Skylab::CodeMolester
 
   module Config
 
-    class Sexp_ < CM_.lib_.basic::Sexp
+    class Sexp_ < Home_.lib_.basic::Sexp
 
       LIB_.delegating self, :employ_the_DSL_method_called_delegates_to
 
-      CM_.lib_.basic::Sexp::Registrar[ self ]
+      Home_.lib_.basic::Sexp::Registrar[ self ]
 
       def build_comment_line line
         line = "# #{line.gsub(/[[:space:]#]+/, SPACE_ ).strip}\n" # could be improved
@@ -35,7 +35,7 @@ module Skylab::CodeMolester
       end
 
       private def say_not_string x
-        _ = CM_.lib_.strange x
+        _ = Home_.lib_.strange x
         "no implicit conversion of #{ _ } into String"
       end
     end

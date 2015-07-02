@@ -6,7 +6,7 @@ module Skylab::FileMetrics::TestSupport
 
     before :all do
 
-      FMMT_One = FM_::Models_::Totaller.new :a, :b
+      FMMT_One = Home_::Models_::Totaller.new :a, :b
     end
 
     it "makes" do

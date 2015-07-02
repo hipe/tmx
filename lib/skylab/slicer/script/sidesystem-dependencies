@@ -4,7 +4,7 @@ require_relative '../core'
 
 module Skylab::Slicer
 
-  class SS_Dep__ < Slicer_::Modality_Adapters_::CLI
+  class SS_Dep__ < Home_::Modality_Adapters_::CLI
 
     def initialize( * )
 
@@ -25,7 +25,7 @@ module Skylab::Slicer
 
       @stdout.puts "digraph {"
 
-      _o = Slicer_::Sessions_::Traversal.new
+      _o = Home_::Sessions_::Traversal.new
 
       _o.to_sidesystem_stream.each do | ss |
 
@@ -35,10 +35,10 @@ module Skylab::Slicer
         @a.push ss
       end
 
-      graph_viz_labeller = Slicer_::Output_Adapters_::Graph_Viz::Labeller.new(
+      graph_viz_labeller = Home_::Output_Adapters_::Graph_Viz::Labeller.new(
         @stdout )
 
-      _ea = Slicer_::Actors_::Determine_and_distribute_medallions[ @a ]
+      _ea = Home_::Actors_::Determine_and_distribute_medallions[ @a ]
 
       _ea.each do | ss |
         graph_viz_labeller << ss

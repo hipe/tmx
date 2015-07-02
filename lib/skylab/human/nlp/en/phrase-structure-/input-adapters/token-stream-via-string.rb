@@ -21,7 +21,7 @@ module Skylab::Human
 
           @_cached = false
 
-          scn = Hu_.lib_.string_scanner string
+          scn = Home_.lib_.string_scanner string
 
           sp = /[[:space:]]+/
           quot = /['"]/

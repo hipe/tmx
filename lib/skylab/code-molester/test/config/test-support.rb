@@ -21,6 +21,6 @@ module Skylab::CodeMolester::TestSupport::Config
 
   TestSupport_::Quickie.enable_kernel_describe
 
-  CM_ = CM_
+  Home_ = Home_
 
 end

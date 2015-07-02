@@ -9,7 +9,7 @@ module Skylab::Treemap
 
     define_method :application_kernel_, ( Callback_.memoize do
 
-      Tr_.lib_.brazen::Kernel.new Tr_
+      Home_.lib_.brazen::Kernel.new Home_
     end )
 
     def lib_
@@ -23,9 +23,9 @@ module Skylab::Treemap
 
     define_singleton_method :common_action_class, ( Callback_.memoize do
 
-      class Common_Action_Class___ < Tr_.lib_.brazen::Model.common_action_class
+      class Common_Action_Class___ < Home_.lib_.brazen::Model.common_action_class
 
-        Tr_.lib_.brazen::Model.common_entity_module[ self ]
+        Home_.lib_.brazen::Model.common_entity_module[ self ]
 
         self
       end
@@ -60,7 +60,7 @@ module Skylab::Treemap
   NIL_ = nil
   Autoloader_[ Output_Adapters_ = ::Module.new, :boxxy ]
   SPACE_ = ' '
-  Tr_ = self
+  Home_ = self
   UNABLE_ = false
 
 end

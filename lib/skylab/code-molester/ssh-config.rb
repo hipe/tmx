@@ -24,7 +24,7 @@ module Skylab::CodeMolester
     end
     def _parse string
       hosts = []
-      scn = CM_::Library_::StringScanner.new string
+      scn = Home_::Library_::StringScanner.new string
       scn.skip(/[[:space:]]+/)
       loop do
         ok = scn.skip %r(Host  *)

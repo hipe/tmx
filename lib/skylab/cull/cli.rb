@@ -4,7 +4,7 @@ module Skylab::Cull
 
     class << self
       def new * a
-        new_top_invocation a, Cull_.application_kernel_
+        new_top_invocation a, Home_.application_kernel_
       end
     end  # >>
 
@@ -71,7 +71,7 @@ module Skylab::Cull
         if @mechanics.last_api_executable.be_verbose
           pn.to_s
         else
-          Cull_.lib_.pretty_path_safe pn
+          Home_.lib_.pretty_path_safe pn
         end
       end
     end
@@ -188,7 +188,7 @@ module Skylab::Cull
           @pth = pth
         end
 
-        include Cull_::Lib_::HL__[]::SubClient::InstanceMethods  # :+#experimental
+        include Home_::Lib_::HL__[]::SubClient::InstanceMethods  # :+#experimental
 
         alias_method :calculate, :instance_exec
 

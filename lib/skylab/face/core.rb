@@ -112,7 +112,7 @@ module Skylab::Face  # read [#011] the top node narrative
     Parse_lib = sidesys[ :Parse ]
 
     Plugin_lib = -> do
-      Face_::Plugin
+      Home_::Plugin
     end
 
     Proxy_lib = -> do
@@ -471,21 +471,13 @@ module Skylab::Face  # read [#011] the top node narrative
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   DASH_ = '-'.freeze
-
   EMPTY_S_ = ''.freeze
-
-  Face_ = self
-
+  Home_ = self
   IDENTITY_ = -> x { x }
-
   Name_ = Callback_::Name
-
   MONADIC_TRUTH_ = -> _ { true }
-
   NILADIC_EMPTINESS_ = -> { }
-
   SPACE_ = ' '.freeze
-
   UNDERSCORE_ = '_'.freeze
 
   stowaway :TestSupport, 'test/test-support'  # [#045] part of our public API

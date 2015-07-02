@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Bnf2Treetop::TestSupport
 
-  BNF2TT_ = ::Skylab::Bnf2Treetop
+  Home_ = ::Skylab::Bnf2Treetop
   Callback_ = ::Skylab::Callback
   TestSupport_ = ::Skylab::TestSupport
 
@@ -34,7 +34,7 @@ module Skylab::Bnf2Treetop::TestSupport
       let(:_frame) do
         errstream = TestSupport_::IO.spy.new
         outstream = TestSupport_::IO.spy.new
-        cli = BNF2TT_::CLI.new(outstream, errstream)
+        cli = Home_::CLI.new(outstream, errstream)
         cli.program_name = 'bnf2treetop'
         o = ::Struct.new(:debug_p, :err_p, :out_p).new  # :+[#hl-078] "shell"
         o.debug_p = ->{ outstream.debug!; errstream.debug! }

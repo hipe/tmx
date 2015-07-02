@@ -4,7 +4,7 @@ module Skylab::FileMetrics
 
     class << self
       def new * a
-        new_top_invocation a, FM_.application_kernel_
+        new_top_invocation a, Home_.application_kernel_
       end
     end  # >>
 

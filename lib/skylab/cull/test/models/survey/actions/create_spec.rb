@@ -10,12 +10,12 @@ module Skylab::Cull::TestSupport
 
     it "loads" do
 
-      Cull_::API
+      Home_::API
 
     end
 
     it "ping the top" do
-      x = Cull_::API.call :ping, :on_event_selectively, handle_event_selectively
+      x = Home_::API.call :ping, :on_event_selectively, handle_event_selectively
       expect_neutral_event :ping, "hello from cull."
       expect_no_more_events
       x.should eql :hello_from_cull

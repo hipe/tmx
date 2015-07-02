@@ -7,7 +7,7 @@ module Skylab::CodeMolester
   class << self
 
     def cache_pathname
-      CM_.lib_.cache_pathname_base
+      Home_.lib_.cache_pathname_base
     end
 
     def lib_
@@ -26,7 +26,7 @@ module Skylab::CodeMolester
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
-  CM_ = self
+  Home_ = self
   DID_ = true
   EMPTY_A_ = [].freeze
   EMPTY_S_ = ''.freeze

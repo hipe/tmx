@@ -1,8 +1,8 @@
 module Skylab::Dependency
 
-  class TaskTypes::Executable < Dep_::Task
+  class TaskTypes::Executable < Home_::Task
 
-    Dep_.lib_.open_2 self
+    Home_.lib_.open_2 self
 
     attribute :executable, :required => true
 

@@ -20,7 +20,7 @@ module Skylab::BeautySalon
 
           # ( was :+[#ba-027] with [#fa-019] shape )
 
-          BS_.lib_.basic::Number.normalization.with(
+          Home_.lib_.basic::Number.normalization.with(
             :number_set, :integer,
             :minimum, 1,
             :argument, arg, & oes_p )
@@ -99,7 +99,7 @@ module Skylab::BeautySalon
 
         @line_no_fmt = '%4d'
 
-        @token_buffer = BS_.lib_.token_buffer %r([[:space:]]*), %r([^[:space:]]+)
+        @token_buffer = Home_.lib_.token_buffer %r([[:space:]]*), %r([^[:space:]]+)
 
         @upstream_path = h.fetch :input_path
 
@@ -129,13 +129,13 @@ module Skylab::BeautySalon
       def __resolve_line_upstream
         io = __produce_open_file_IO
         io and begin
-          @line_upstream = BS_.lib_.list_scanner io
+          @line_upstream = Home_.lib_.list_scanner io
           ACHIEVED_
         end
       end
 
       def __produce_open_file_IO
-        BS_.lib_.system.filesystem.normalization.upstream_IO @upstream_path, & @on_event_selectively
+        Home_.lib_.system.filesystem.normalization.upstream_IO @upstream_path, & @on_event_selectively
       end
 
       def __process_upstream_lines
@@ -282,7 +282,7 @@ module Skylab::BeautySalon
 
         def __when_value
 
-          @upstream = BS_.lib_.list_scanner @x
+          @upstream = Home_.lib_.list_scanner @x
           __init_range_list_scanner
           __init_union
 
@@ -311,7 +311,7 @@ module Skylab::BeautySalon
 
         def __init_range_list_scanner
 
-          pa = BS_.lib_.basic::Range::Positive::List::Scanner.new
+          pa = Home_.lib_.basic::Range::Positive::List::Scanner.new
 
           pa.unexpected_proc = -> x, exp_a do
 
@@ -345,7 +345,7 @@ module Skylab::BeautySalon
 
         def __init_union
 
-          un = BS_.lib_.basic::Range::Positive::Union.new
+          un = Home_.lib_.basic::Range::Positive::Union.new
 
           un.unexpected_proc = -> msg_s do
 

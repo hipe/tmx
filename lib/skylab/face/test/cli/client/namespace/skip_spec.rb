@@ -8,7 +8,7 @@ module Skylab::Face::TestSupport::CLI::Client::Namespace::Skip
 
   module Wiffle
     module CLI
-      class Client < Face_::CLI::Client
+      class Client < Home_::CLI::Client
         namespace :'alcoa', aliases: ['ac'], skip: true do
           def foo
           end
@@ -21,7 +21,7 @@ module Skylab::Face::TestSupport::CLI::Client::Namespace::Skip
         end, :skip, true, :aliases, ['tt']
       end
     end
-    class TT < Face_::CLI::Client::Namespace_
+    class TT < Home_::CLI::Client::Namespace_
       def bar
       end
     end

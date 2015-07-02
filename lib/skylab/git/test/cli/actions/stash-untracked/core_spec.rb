@@ -7,11 +7,11 @@ module Skylab::Git::TestSupport::CLI::SU
     extend TS_
 
     it "CLI client loads" do  # can be moved up when appropriate
-      Git_::CLI::Client
+      Home_::CLI::Client
     end
 
     it "CLI box action loads" do
-      Git_::CLI::Actions::Stash_Untracked
+      Home_::CLI::Actions::Stash_Untracked
     end
 
     it "ping CLI payload line" do

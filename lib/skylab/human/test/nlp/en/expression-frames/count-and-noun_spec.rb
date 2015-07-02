@@ -20,7 +20,7 @@ module Skylab::Human::TestSupport
 
     it "x." do
 
-      _ef = Hu_::NLP::EN.expression_frame_for(
+      _ef = Home_::NLP::EN.expression_frame_for(
         :syntactic_category, :noun_phrase,
         :subject, 3, :subject, 'amigo' )
 
@@ -44,7 +44,7 @@ module Skylab::Human::TestSupport
     end
 
     def frame_module_
-      Hu_::NLP::EN::Expression_Frames___::Count_and_Noun
+      Home_::NLP::EN::Expression_Frames___::Count_and_Noun
     end
   end
 end

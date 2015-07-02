@@ -49,7 +49,7 @@ module Skylab::Cull::TestSupport
       e = st.gets
       e_ = st.gets
 
-      st.gets.should eql Cull_::NIL_
+      st.gets.should eql Home_::NIL_
 
       e.to_even_iambic.should eql(
         [ :"First Header", "Content Cell",

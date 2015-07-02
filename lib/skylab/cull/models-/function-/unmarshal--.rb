@@ -9,7 +9,7 @@ module Skylab::Cull
       end
 
       def unmarshal s
-        @scn = Cull_.lib_.string_scanner s
+        @scn = Home_.lib_.string_scanner s
         ok = parse_prefix_and_resolve_box_module
         ok &&= parse_function_name_and_resolve_function
         ok &&= parse_any_args
@@ -20,9 +20,9 @@ module Skylab::Cull
         @box_mod = box_mod
 
         @prefix_name = Callback_::Name.via_module(
-          Cull_.lib_.basic::Module.value_via_relative_path( box_mod, '..' ) )
+          Home_.lib_.basic::Module.value_via_relative_path( box_mod, '..' ) )
 
-        @scn = Cull_.lib_.string_scanner s
+        @scn = Home_.lib_.string_scanner s
         ok = parse_function_name_and_resolve_function
         ok &&= parse_any_args
         ok and flush
@@ -56,7 +56,7 @@ module Skylab::Cull
 
         @prefix_name = Callback_::Name.via_slug @prefix
 
-        @box_mod = Cull_::Models_.const_get(
+        @box_mod = Home_::Models_.const_get(
           @prefix_name.as_const,
           false )::Items__
 
@@ -84,7 +84,7 @@ module Skylab::Cull
         nm = Callback_::Name.via_slug @function_name
         i_a = @box_mod.constants
 
-        found_a = Cull_.lib_.basic::Fuzzy.reduce_array_against_string(
+        found_a = Home_.lib_.basic::Fuzzy.reduce_array_against_string(
           i_a, nm.as_const.id2name.downcase )
 
         case 1 <=> found_a.length

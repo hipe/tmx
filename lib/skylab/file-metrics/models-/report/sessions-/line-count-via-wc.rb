@@ -44,7 +44,7 @@ module Skylab::FileMetrics
 
         cmd = [ 'wc', '-l' ]
 
-        sw = FM_.lib_.shellwords
+        sw = Home_.lib_.shellwords
 
         @file_array.each do | s |
           s or self._SANITY

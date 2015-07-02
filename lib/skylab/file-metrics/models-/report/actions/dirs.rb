@@ -47,7 +47,7 @@ module Skylab::FileMetrics
 
       Totaller_class___ = Callback_.memoize do
 
-        Totaller____ = FM_::Models_::Totaller.new(
+        Totaller____ = Home_::Models_::Totaller.new(
           :num_files,
           :num_lines,
         )
@@ -168,7 +168,7 @@ module Skylab::FileMetrics
 
         h = @argument_box.h_
 
-        cmd = FM_.lib_.system.filesystem.find(
+        cmd = Home_.lib_.system.filesystem.find(
 
           :path, h.fetch( :path ),
           :ignore_dirs, h.fetch( :exclude_dir ),

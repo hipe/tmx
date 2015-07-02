@@ -11,7 +11,7 @@ module Skylab::Face::TestSupport::CLI::Client
       end
 
       it "the doohah loads" do
-        Face_::CLI::Client
+        Home_::CLI::Client
       end
     end
 

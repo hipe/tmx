@@ -8,12 +8,12 @@ module Skylab::BeautySalon
     class << self
 
       def call * x_a, & oes_p
-        bc = BS_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
+        bc = Home_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
         bc and bc.receiver.send bc.method_name, * bc.args
       end
 
       def call_via_mutable_box__ * i_a, bx, & x_p
-        bc = BS_.application_kernel_.bound_call_via_mutable_box i_a, bx, & x_p
+        bc = Home_.application_kernel_.bound_call_via_mutable_box i_a, bx, & x_p
         bc and bc.receiver.send bc.method_name, * bc.args
       end
     end  # >>
@@ -24,7 +24,7 @@ module Skylab::BeautySalon
   class << self
 
     define_method :application_kernel_, ( Callback_.memoize do
-      Brazen_::Kernel.new BS_
+      Brazen_::Kernel.new Home_
     end )
 
     def lib_
@@ -32,7 +32,7 @@ module Skylab::BeautySalon
     end
 
     def search_and_replace
-      BS_::Models_::Search_and_Replace
+      Home_::Models_::Search_and_Replace
     end
   end  # >>
 
@@ -102,7 +102,7 @@ module Skylab::BeautySalon
 
   ACHIEVED_ = true
   Brazen_ = Autoloader_.require_sidesystem :Brazen
-  BS_ = self
+  Home_ = self
   CONST_SEP_ = '::'.freeze
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze

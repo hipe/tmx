@@ -108,7 +108,7 @@ module Skylab::Human
 
       def _edit_self * x_a, & x_p
 
-        Hu_.lib_.brazen::Mutation_Session.edit x_a, self, & x_p
+        Home_.lib_.brazen::Mutation_Session.edit x_a, self, & x_p
       end
 
       def mutable_body_for_mutation_session

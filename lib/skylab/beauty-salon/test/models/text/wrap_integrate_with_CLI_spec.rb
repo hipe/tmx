@@ -6,7 +6,7 @@ module Skylab::BeautySalon::TestSupport::Integrate_with_CLI
 
   include Constants
 
-  BS_::Lib_::Face__[]::TestSupport::CLI::Client[ self ]
+  Home_::Lib_::Face__[]::TestSupport::CLI::Client[ self ]
 
   extend TestSupport_::Quickie
 
@@ -15,7 +15,7 @@ module Skylab::BeautySalon::TestSupport::Integrate_with_CLI
     extend TS___
 
     def self.client_class
-      BS_::CLI::Client
+      Home_::CLI::Client
     end
 
     it "win" do

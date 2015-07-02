@@ -7,7 +7,7 @@ module Skylab::Git::TestSupport::CLI
   include Constants
 
   ERR_I__ = :errstream
-  Git_ = Git_
+  Home_ = Home_
   OUT_I__ = :outstream
   TestLib_ = TestLib_
 
@@ -21,7 +21,7 @@ module Skylab::Git::TestSupport::CLI
     # ~ test-time support
 
     def invoke_from_workdir * x_a
-      r = nil ; Git_::Library_::FileUtils.cd workdir_pn.to_s do
+      r = nil ; Home_::Library_::FileUtils.cd workdir_pn.to_s do
         r = invk x_a
       end ; r
     end
@@ -77,7 +77,7 @@ module Skylab::Git::TestSupport::CLI
       s
     end
 
-    styling = Git_.lib_.brazen::CLI::Styling
+    styling = Home_.lib_.brazen::CLI::Styling
 
     STYLE_RX__ = styling::SIMPLE_STYLE_RX
 

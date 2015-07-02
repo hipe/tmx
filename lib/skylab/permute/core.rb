@@ -7,7 +7,7 @@ module Skylab::Permute
 
     def application_kernel_
 
-      @___kr ||= Pe_.lib_.brazen::Kernel.new Pe_
+      @___kr ||= Home_.lib_.brazen::Kernel.new Home_
     end
 
     def lib_
@@ -34,7 +34,7 @@ module Skylab::Permute
   ACHIEVED_ = true
   KEEP_PARSING_ = true
   NIL_ = nil
-  Pe_ = self
+  Home_ = self
   UNABLE_ = false
   UNDERSCORE_ = '_'
 end

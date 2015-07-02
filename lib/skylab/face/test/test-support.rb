@@ -2,12 +2,12 @@ require_relative '../core'
 
 module Skylab::Face::TestSupport
 
-  Face_ = ::Skylab::Face
+  Home_ = ::Skylab::Face
   TestLib_ = ::Module.new
-  TestSupport_ = Face_::Autoloader_.require_sidesystem :TestSupport
+  TestSupport_ = Home_::Autoloader_.require_sidesystem :TestSupport
 
   module Constants
-    Face_ = ::Skylab::Face
+    Home_ = ::Skylab::Face
     TestLib_ = TestLib_
     TestSupport_ = TestSupport_
   end
@@ -43,8 +43,8 @@ module Skylab::Face::TestSupport
     def sandboxes_et_al=
       @child.const_set :TS__, @child
       @child.include @child.const_get( :Constants, false )
-      @child.const_set :Face_, Face_
-      @child.const_set :Sandbox, Face_::Autoloader_[ ::Module.new ]
+      @child.const_set :Home_, Home_
+      @child.const_set :Sandbox, Home_::Autoloader_[ ::Module.new ]
       @child::Sandbox.dir_pathname
       @child::Constants.const_set :Sandbox, @child::Sandbox
       @child.extend TestSupport_::Quickie ; nil

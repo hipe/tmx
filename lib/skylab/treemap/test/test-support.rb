@@ -13,7 +13,7 @@ module Skylab::Treemap::TestSupport
 
     def use sym
       :expect_event == sym or fail
-      Tr_::Callback_.test_support::Expect_Event[ self ]
+      Home_::Callback_.test_support::Expect_Event[ self ]
     end
   end
 
@@ -29,11 +29,11 @@ module Skylab::Treemap::TestSupport
     end
 
     def subject_API
-      Tr_.application_kernel_
+      Home_.application_kernel_
     end
 
     def black_and_white_expression_agent_for_expect_event
-      Tr_.lib_.brazen::API.expression_agent_instance
+      Home_.lib_.brazen::API.expression_agent_instance
     end
   end
 
@@ -59,5 +59,5 @@ module Skylab::Treemap::TestSupport
     end
   end  # >>
 
-  Tr_ = ::Skylab::Treemap
+  Home_ = ::Skylab::Treemap
 end

@@ -7,7 +7,7 @@ module Skylab::Face::TestSupport::CLI::Client::Option::Help
   ::Skylab::Face::TestSupport::CLI::Client::Option[ self, :CLI_sandbox ]
 
   module Beffer
-    class CLI_Client < Face_::CLI::Client
+    class CLI_Client < Home_::CLI::Client
       use :hi
 
       option_parser do |o|
@@ -51,7 +51,7 @@ module Skylab::Face::TestSupport::CLI::Client::Option::Help
 
     module Deffer
 
-      class CLI_Client < Face_::CLI::Client
+      class CLI_Client < Home_::CLI::Client
 
         set :num_summary_lines, 3
 

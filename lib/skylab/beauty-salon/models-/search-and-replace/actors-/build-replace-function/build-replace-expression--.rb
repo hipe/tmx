@@ -168,7 +168,7 @@ module Skylab::BeautySalon
           end
 
           def resolve_tree_guess_via_path
-            @tree = BS_.lib_.system.filesystem.hack_guess_module_tree @path, & @oes
+            @tree = Home_.lib_.system.filesystem.hack_guess_module_tree @path, & @oes
             @tree ? ACHIEVED_ : UNABLE_
           end
 

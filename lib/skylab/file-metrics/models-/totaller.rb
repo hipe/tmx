@@ -1,6 +1,6 @@
 module Skylab::FileMetrics
 
-  class Models_::Totaller < FM_::Model_::Tree_Branch
+  class Models_::Totaller < Home_::Model_::Tree_Branch
 
     Actions = THE_EMPTY_MODULE_
 

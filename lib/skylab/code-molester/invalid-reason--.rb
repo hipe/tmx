@@ -21,7 +21,7 @@ module Skylab::CodeMolester
     end
     #
     def render_with * x_a
-      CM_::Expression_Agent__.new( x_a ).
+      Home_::Expression_Agent__.new( x_a ).
         instance_exec( * to_a, & message_proc )
     end
     #
@@ -57,7 +57,7 @@ module Skylab::CodeMolester
 
     # result : start_idx_of_line, line_number (1-indexed), line_width
     Line_info__ = -> string, seek_idx do
-      scn = CM_::Library_::StringScanner.new string
+      scn = Home_::Library_::StringScanner.new string
       at_idx = -1
       line_idx = 0
       content = nil

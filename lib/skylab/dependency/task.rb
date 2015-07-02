@@ -1,6 +1,6 @@
 module Skylab::Dependency
 
-  class Task < Dep_.lib_.slake::Task
+  class Task < Home_.lib_.slake::Task
 
     attribute_metadata_class do
       def [] k ; fetch( k ) { } end # soften it
@@ -16,9 +16,9 @@ module Skylab::Dependency
 
     Callback_[ self, :employ_DSL_for_digraph_emitter ]   # child classes decide what to call_digraph_listeners
 
-    include Dep_.lib_.path_tools.instance_methods_module
+    include Home_.lib_.path_tools.instance_methods_module
 
-    define_method :stylize, Dep_.lib_.brazen::CLI::Styling::Stylize
+    define_method :stylize, Home_.lib_.brazen::CLI::Styling::Stylize
 
     def hi str ; stylize str, :strong, :green end
 
@@ -111,7 +111,7 @@ module Skylab::Dependency
 
     def _view_tree
       raise "needs testing and re-development (very old)"  # #todo:meh
-      trav = Dep_::Library_::Tree::Locus.new
+      trav = Home_::Library_::Tree::Locus.new
       color = ui.out.tty?
       trav.traverse self do |card|
         ui.out.puts "#{ loc.prefix card }#{

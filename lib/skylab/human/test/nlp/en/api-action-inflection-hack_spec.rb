@@ -6,7 +6,7 @@ module Skylab::Human::TestSupport
 
     Subject_module__ = -> do  # (used by two describe blocks below ick)
 
-      Hu_::NLP::EN::API_Action_Inflection_Hack
+      Home_::NLP::EN::API_Action_Inflection_Hack
     end
 
     # <-

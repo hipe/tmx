@@ -169,7 +169,7 @@ module Skylab::Human::TestSupport
     end
 
     def frame_module_
-      Hu_::NLP::EN::Expression_Frames___::Object_and_Subject
+      Home_::NLP::EN::Expression_Frames___::Object_and_Subject
     end
   end
 end

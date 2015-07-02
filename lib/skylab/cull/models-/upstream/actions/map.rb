@@ -10,7 +10,7 @@ module Skylab::Cull
 
           :ad_hoc_normalizer, -> arg, & oes_p do
             if arg.is_known
-              Cull_.lib_.basic::Number.normalization.with(
+              Home_.lib_.basic::Number.normalization.with(
                 :argument, arg,
                 :number_set, :integer,
                 :minimum, 1,

@@ -59,7 +59,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
     end
 
     def cd path
-      BS_.lib_.file_utils.cd path
+      Home_.lib_.file_utils.cd path
     end
 
     def first_workspace

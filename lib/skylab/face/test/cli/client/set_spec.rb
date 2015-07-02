@@ -8,7 +8,7 @@ module Skylab::Face::TestSupport::CLI::Client::Set
 
   module Awoooga
 
-    class CLI_Client < Face_::CLI::Client
+    class CLI_Client < Home_::CLI::Client
 
       set :margin, 12
 

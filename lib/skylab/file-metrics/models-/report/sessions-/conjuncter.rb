@@ -25,7 +25,7 @@ module Skylab::FileMetrics
 
         @_Articulators = Callback_::Scn.articulators  # load it late
 
-        @_POS = FM_.lib_.human::NLP::EN::POS  # load it late
+        @_POS = Home_.lib_.human::NLP::EN::POS  # load it late
 
         @_zero = -> y do
           y << "(none)"

@@ -12,7 +12,7 @@ module Skylab::Face
     end
   end
 
-  class Model::Shell_ < Face_::Plugin::Shell_
+  class Model::Shell_ < Home_::Plugin::Shell_
     def do_memoize
       @story.do_memoize!
     end
@@ -21,7 +21,7 @@ module Skylab::Face
     end
   end
 
-  class Model::Metaservices_ < Face_::Plugin::Metaservices_
+  class Model::Metaservices_ < Home_::Plugin::Metaservices_
     def self.do_memoize!
       const_set :DO_MEMOIZE_, true
     end

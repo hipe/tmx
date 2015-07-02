@@ -47,7 +47,7 @@ module Skylab::BeautySalon
       end
 
       def via_fresh_values_build_command & oes_p
-        BS_.lib_.system.filesystem.find(
+        Home_.lib_.system.filesystem.find(
           :filenames, @glob_list,
           :paths, @path_list,
           :freeform_query_infix_words, %w'-type f',
@@ -702,7 +702,7 @@ module Skylab::BeautySalon
           func = replace_function
 
           write_file = curry_file_writer(
-            BS_.lib_.system.defaults.dev_tmpdir_path,
+            Home_.lib_.system.defaults.dev_tmpdir_path,
             handle_unsigned_event_selectively )
 
           @file_stream.expand_by do |edit_session|

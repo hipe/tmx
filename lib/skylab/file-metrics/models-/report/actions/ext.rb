@@ -32,7 +32,7 @@ module Skylab::FileMetrics
       end
 
       Totaller_class___ = Callback_.memoize do
-        Totaller____ = FM_::Models_::Totaller.new
+        Totaller____ = Home_::Models_::Totaller.new
       end
 
       def __totaller_via_extension_count_box

@@ -21,7 +21,7 @@ module Skylab::Git::TestSupport::CLI::SU
 
     let :_CLI_client do
       _i, _o, _e = [ nil, * two_spy_group.to_a ]
-      cli = Git_::CLI::Actions::Stash_Untracked::CLI.new _i, _o, _e
+      cli = Home_::CLI::Actions::Stash_Untracked::CLI.new _i, _o, _e
       cli.program_name = WAZZLE
       cli
     end
@@ -32,7 +32,7 @@ module Skylab::Git::TestSupport::CLI::SU
       ctx = self
       _CLI_client.define_singleton_method :popen3_notify do |cmd_s, &p|
         ctx.last_popen3_command_string = cmd_s
-        p[ nil, Git_::Library_::StringIO.new( str ), ::StringIO.new( '' ) ]
+        p[ nil, Home_::Library_::StringIO.new( str ), ::StringIO.new( '' ) ]
       end
     end
     #
@@ -42,7 +42,7 @@ module Skylab::Git::TestSupport::CLI::SU
     # ~ test-time support
 
     def cd path, & p
-      Git_::Library_::FileUtils.cd path.to_s, & p
+      Home_::Library_::FileUtils.cd path.to_s, & p
     end
 
     def workdir_pn  # #hookout
@@ -96,10 +96,10 @@ module Skylab::Git::TestSupport::CLI::SU
     end
   end
 
-  Git_ = Git_
+  Home_ = Home_
 
   GSU = -> do
-    Git_::CLI::Actions::Stash_Untracked
+    Home_::CLI::Actions::Stash_Untracked
   end
 
   TestLib_ = TestLib_

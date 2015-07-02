@@ -38,7 +38,7 @@ module Skylab::CodeMolester
     Brazen = sidesys[ :Brazen ]
 
     Cache_pathname = _memoize do
-      module CM_::Cache
+      module Home_::Cache
         _p = Cache_pathname_lib[].cache_pathname_proc_via_module(
           self, :abbrev, 'cm' )
         define_singleton_method :pathname, _p
@@ -141,7 +141,7 @@ module Skylab::CodeMolester
     end
 
     INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(
-      self, CM_ )
+      self, Home_ )
 
   end
 

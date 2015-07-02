@@ -7,7 +7,7 @@ module Skylab::Cull
     class << self
 
       def call * x_a, & oes_p
-        bc = Cull_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
+        bc = Home_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
         bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
       end
 
@@ -40,7 +40,7 @@ module Skylab::Cull
   class << self
 
     define_method :application_kernel_, ( Callback_.memoize do
-      Brazen_::Kernel.new Cull_
+      Brazen_::Kernel.new Home_
     end )
 
     def lib_
@@ -149,7 +149,7 @@ module Skylab::Cull
 
   ACHIEVED_ = true
   Action_ = Brazen_::Model.common_action_class  # for name stop index we need this const
-  Cull_ = self
+  Home_ = self
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
   KEEP_PARSING_ = true

@@ -201,7 +201,7 @@ module Skylab::Human
 
         _init_noun_phrase
 
-        _ = Hu_.lib_.basic::Number::As_noun_inflectee[ @_count_arg.to_integer ]
+        _ = Home_.lib_.basic::Number::As_noun_inflectee[ @_count_arg.to_integer ]
 
         @noun_phrase.prepend_adjective_phrase _
 

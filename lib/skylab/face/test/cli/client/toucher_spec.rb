@@ -17,7 +17,7 @@ module Skylab::Face::TestSupport::CLI::Client::Toucher
         end
         def foo
         end
-        class self::Kernel_ < Face_::CLI::Client::CLI_Kernel_  # sketchville
+        class self::Kernel_ < Home_::CLI::Client::CLI_Kernel_  # sketchville
           def touch
             @sheet.node_open!
             @sheet.close_node do |a|

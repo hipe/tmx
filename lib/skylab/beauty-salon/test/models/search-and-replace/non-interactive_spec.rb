@@ -96,7 +96,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
       s = o.gets
       o.gets.should be_nil
 
-      haha = BS_.lib_.brazen::CLI::Styling.parse_styles s
+      haha = Home_.lib_.brazen::CLI::Styling.parse_styles s
 
       haha.map( & :first ).should eql [ :string, :style, :string, :style, :string ]
     end
@@ -123,9 +123,9 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
       _line = st.gets
       _line.should eql " foo(\n"
 
-      s = match.to_line_stream.to_a.join BS_::EMPTY_S_
-      s_ = match_.to_line_stream.to_a.join BS_::EMPTY_S_
-      "#{ s }#{ s_ }".should eql <<-O.gsub( /^[ ]{8}/, BS_::EMPTY_S_ )
+      s = match.to_line_stream.to_a.join Home_::EMPTY_S_
+      s_ = match_.to_line_stream.to_a.join Home_::EMPTY_S_
+      "#{ s }#{ s_ }".should eql <<-O.gsub( /^[ ]{8}/, Home_::EMPTY_S_ )
          foo(
            bar
          ) # baz

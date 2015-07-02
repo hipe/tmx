@@ -9,7 +9,7 @@ module Skylab::FileMetrics::TestSupport
     context "a produced subclass with one field" do
 
       with_klass do
-        FM_::Model_::Tree_Branch.new :foo
+        Home_::Model_::Tree_Branch.new :foo
       end
 
       it "trying to pass too many args - arg error" do
@@ -47,7 +47,7 @@ module Skylab::FileMetrics::TestSupport
       end
 
     def _subject_class
-      FM_::Model_::Tree_Branch
+      Home_::Model_::Tree_Branch
     end
   end
 end

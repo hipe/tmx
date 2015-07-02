@@ -8,7 +8,7 @@ module Skylab::Dependency::TestSupport
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
-  Dep_ = ::Skylab::Dependency
+  Home_ = ::Skylab::Dependency
 
   TestSupport_ = ::Skylab::TestSupport
 
@@ -54,7 +54,7 @@ module Skylab::Dependency::TestSupport
   Constants::FILE_SERVER = file_server # #bound
 
   module Constants
-    Dep_ = Dep_
+    Home_ = Home_
     TestSupport_ = TestSupport_
   end
 

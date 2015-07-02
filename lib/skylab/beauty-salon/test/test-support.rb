@@ -8,8 +8,8 @@ module Skylab::BeautySalon::TestSupport
   TestLib_ = ::Module.new
 
   module Constants
-    BS_ = ::Skylab::BeautySalon
-    Callback_ = BS_::Callback_
+    Home_ = ::Skylab::BeautySalon
+    Callback_ = Home_::Callback_
     TestLib_ = TestLib_
     TestSupport_ = ::Skylab::TestSupport
   end
@@ -18,7 +18,7 @@ module Skylab::BeautySalon::TestSupport
 
   TestSupport_ = TestSupport_
 
-  BS_ = BS_
+  Home_ = Home_
 
   module InstanceMethods
 
@@ -59,9 +59,9 @@ module Skylab::BeautySalon::TestSupport
 
     Memoize_tmpdir__ = -> do_debug, debug_IO do
 
-      _pn = BS_.lib_.system.defaults.dev_tmpdir_pathname.join 'bertie-serern'
+      _pn = Home_.lib_.system.defaults.dev_tmpdir_pathname.join 'bertie-serern'
 
-      _TMPDIR = BS_.lib_.system.filesystem.tmpdir :path, _pn.to_path,
+      _TMPDIR = Home_.lib_.system.filesystem.tmpdir :path, _pn.to_path,
         :be_verbose, do_debug,
         :debug_IO, debug_IO,
         :max_mkdirs, 1
@@ -79,7 +79,7 @@ module Skylab::BeautySalon::TestSupport
     end
 
     Expect_interactive = -> x do
-      BS_.lib_.brazen.test_support.expect_interactive x
+      Home_.lib_.brazen.test_support.expect_interactive x
     end
 
   end

@@ -48,7 +48,7 @@ module Skylab::Cull
 
             @sym_a = sym_a
             @line_stream = ls
-            @scn = Cull_.lib_.string_scanner EMPTY_S_
+            @scn = Home_.lib_.string_scanner EMPTY_S_
           end
 
           def gets

@@ -10,11 +10,11 @@ module Skylab::Slake
 
   class Task < ::Rake::Task
 
-    Slake_.lib_.fields::Attribute::DSL[ self ]
+    Home_.lib_.fields::Attribute::DSL[ self ]
 
-    extend Slake_::Interpolate
+    extend Home_::Interpolate
     extend TaskClassMethods
-    include Slake_::Parenthood
+    include Home_::Parenthood
     def action= action
       @actions.push action
     end

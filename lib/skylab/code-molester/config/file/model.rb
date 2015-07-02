@@ -65,7 +65,7 @@ module Skylab::CodeMolester
 
     attr_reader :entity_noun_stem, :pathname
 
-    CM_.lib_.delegating self,
+    Home_.lib_.delegating self,
 
       :to, :sexp, :if, -> { valid? },
 
@@ -191,7 +191,7 @@ module Skylab::CodeMolester
       else
         # (leave content as the invalid string)
         ( @pathname && @pathname_was_read ) and use_pn = @pathname
-        @invalid_reason = CM_::Invalid_Reason__.new parser, use_pn
+        @invalid_reason = Home_::Invalid_Reason__.new parser, use_pn
         @is_valid = false
       end
       nil
@@ -203,7 +203,7 @@ module Skylab::CodeMolester
       p and p[ read ]
       error_x = nil
 
-      io = ( CM_.lib_.system.filesystem.normalization.upstream_IO(
+      io = ( Home_.lib_.system.filesystem.normalization.upstream_IO(
 
           :path, @pathname.to_path ) do | *, & ev_p |
 
@@ -314,7 +314,7 @@ module Skylab::CodeMolester
     def wrt_when_valid w
       @write_verb_i = nil
       not_OK_ev = nil
-      io = CM_.lib_.system.filesystem.normalization.downstream_IO(
+      io = Home_.lib_.system.filesystem.normalization.downstream_IO(
         :is_dry_run, w.is_dry,
         :path, @pathname.to_path,
         :on_event, -> ev do

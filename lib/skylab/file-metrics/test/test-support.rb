@@ -9,9 +9,9 @@ module Skylab::FileMetrics::TestSupport
 
   extend TestSupport_::Quickie
 
-  FM_ = ::Skylab::FileMetrics
+  Home_ = ::Skylab::FileMetrics
 
-  FM_.lib_.DSL_DSL_enhance_module self, -> do
+  Home_.lib_.DSL_DSL_enhance_module self, -> do
     block :with_klass
   end
 
@@ -59,11 +59,11 @@ module Skylab::FileMetrics::TestSupport
     end
 
     def subject_API
-      FM_.application_kernel_
+      Home_.application_kernel_
     end
 
     def black_and_white_expression_agent_for_expect_event
-      FM_.lib_.brazen::API.expression_agent_instance
+      Home_.lib_.brazen::API.expression_agent_instance
     end
   end
 
@@ -72,7 +72,7 @@ module Skylab::FileMetrics::TestSupport
     ::File.join Fixture_file_directory_[], s
   end
 
-  Callback_ = FM_::Callback_
+  Callback_ = Home_::Callback_
 
   Fixture_file_directory_ = Callback_.memoize do
 
@@ -88,8 +88,8 @@ module Skylab::FileMetrics::TestSupport
     TestSupport_::Sandbox.enhance( self ).kiss_with 'KLS_'
   end
 
-  EMPTY_S_ = FM_::EMPTY_S_
+  EMPTY_S_ = Home_::EMPTY_S_
   NEWLINE_ = "\n"
   NIL_ = nil
-  SPACE_ = FM_::SPACE_
+  SPACE_ = Home_::SPACE_
 end

@@ -94,7 +94,7 @@ module Skylab::Human::TestSupport
 
     def _POS
 
-      Hu_::NLP::EN::POS
+      Home_::NLP::EN::POS
     end
   end
 end

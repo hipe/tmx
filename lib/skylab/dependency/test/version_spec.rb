@@ -30,7 +30,7 @@ module Skylab::Dependency::TestSupport
     it "whines on ambiguity" do
       ui = UI::Tee.new silent: true
       str = "abc1.2.3def4.5"
-      sexp = Dep_::Version.parse_string_with_version str do |o|
+      sexp = Home_::Version.parse_string_with_version str do |o|
         o.on_error do |e|
           ui.err.puts e.text
         end
@@ -40,9 +40,9 @@ module Skylab::Dependency::TestSupport
     end
 
     it "allows version bumps" do
-      sexp = Dep_::Version::parse_string_with_version( "abc-1.4.7-def" )
+      sexp = Home_::Version::parse_string_with_version( "abc-1.4.7-def" )
       ver = sexp.child( :version )
-      ver.class.should eql( Dep_::Version )
+      ver.class.should eql( Home_::Version )
       ver.unparse.should eql( "1.4.7" )
       ver.bump! :major
       sexp.unparse.should eql( "abc-2.4.7-def" )
@@ -59,7 +59,7 @@ module Skylab::Dependency::TestSupport
 
     def _parse str
       ui = UI::Tee.new
-      sexp = Dep_::Version::parse_string_with_version(str) do |o|
+      sexp = Home_::Version::parse_string_with_version(str) do |o|
         o.on_informational { |e| ui.err.puts("#{e.stream_symbol}: #{e.text}") }
       end
       sexp.unparse.should eql(str)

@@ -1,9 +1,9 @@
 module Skylab::Dependency
 
-  class TaskTypes::MoveTo < Dep_::Task
+  class TaskTypes::MoveTo < Home_::Task
 
-    include Dep_.lib_.path_tools.instance_methods_module
-    include Dep_::Library_::FileUtils
+    include Home_.lib_.path_tools.instance_methods_module
+    include Home_::Library_::FileUtils
 
     # @todo look below etc
     attribute :move_to, :required => true

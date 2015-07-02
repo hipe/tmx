@@ -7,7 +7,7 @@ Skylab::TestSupport::Quickie.enable_kernel_describe
 
 module Skylab::Yacc2Treetop::TestSupport
 
-  Y2TT_ = ::Skylab::Yacc2Treetop
+  Home_ = ::Skylab::Yacc2Treetop
 
   module CLI
     def self.extended mod
@@ -23,7 +23,7 @@ module Skylab::Yacc2Treetop::TestSupport
       let(:_frame) do
         errstream = ::Skylab::TestSupport::IO.spy.new
         outstream = ::Skylab::TestSupport::IO.spy.new
-        cli = Y2TT_::CLI.new(outstream, errstream)
+        cli = Home_::CLI.new(outstream, errstream)
         cli.program_name = 'yacc2treetop'
         o = ::Struct.new(:debug_p, :err_p, :out_p).new  # :+[#hl-078] "shell"
         o.debug_p = ->{ outstream.debug!; errstream.debug! }

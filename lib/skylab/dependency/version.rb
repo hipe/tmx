@@ -1,12 +1,12 @@
 module Skylab::Dependency
 
-  class Version < Dep_.lib_.sexp
+  class Version < Home_.lib_.sexp
 
     REGEX      = /(\d+)\.(\d+)(?:\.(\d+))?/ # #bound
 
     split_rx = /\A(?<prefix>.*[^\.\d])?(?<scalar>#{REGEX.source})\z/
 
-    s = ->(* a) { Dep_.lib_.sexp.new a }
+    s = ->(* a) { Home_.lib_.sexp.new a }
 
     define_singleton_method :parse_string_with_version do |str, &err|
       res = nil
@@ -15,7 +15,7 @@ module Skylab::Dependency
         res = shell.error msg
       end
       begin
-        scn = Dep_::Library_::StringScanner.new str
+        scn = Home_::Library_::StringScanner.new str
         capture = scn.scan_until REGEX
         capture or break error[
           "version pattern not matched anywhere in string: #{ str.inspect }" ]
@@ -62,7 +62,7 @@ module Skylab::Dependency
   class Version::Parse
 
     def self.loud_singleton
-      @loud ||= Dep_::Version::Parse.new( -> o do
+      @loud ||= Home_::Version::Parse.new( -> o do
         o.on_informational do |e|
           fail "find me an outstream"  # #todo
         end

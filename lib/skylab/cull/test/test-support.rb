@@ -7,7 +7,7 @@ module Skylab::Cull::TestSupport
   ::Skylab::TestSupport::Regret[ TS_ = self ]
 
   module Constants
-    Cull_ = ::Skylab::Cull
+    Home_ = ::Skylab::Cull
     TestSupport_ = ::Skylab::TestSupport
   end
 
@@ -17,7 +17,7 @@ module Skylab::Cull::TestSupport
 
   extend TestSupport_::Quickie
 
-  Cull_ = Cull_
+  Home_ = Home_
 
   module InstanceMethods
 
@@ -55,7 +55,7 @@ module Skylab::Cull::TestSupport
 
     def prepare_tmpdir
 
-      td = Cull_.lib_.filesystem.tmpdir(
+      td = Home_.lib_.filesystem.tmpdir(
         :path, tmpdir_path,
         :be_verbose, do_debug,
         :debug_IO, debug_IO )
@@ -64,7 +64,7 @@ module Skylab::Cull::TestSupport
     end
 
     def tmpdir_path
-      Cull_.lib_.filesystem.tmpdir_pathname.join( 'culio' ).to_path
+      Home_.lib_.filesystem.tmpdir_pathname.join( 'culio' ).to_path
     end
 
     # ~ assertion support
@@ -80,21 +80,21 @@ module Skylab::Cull::TestSupport
     # ~ #hook-outs for [br]
 
     def black_and_white_expression_agent_for_expect_event
-      Cull_::Brazen_::API.expression_agent_instance
+      Home_::Brazen_::API.expression_agent_instance
     end
 
     def subject_API
-      Cull_::API
+      Home_::API
     end
   end
 
-  Config_filename___ = Cull_::Callback_.memoize do
-    o = Cull_::Models_::Survey
+  Config_filename___ = Home_::Callback_.memoize do
+    o = Home_::Models_::Survey
     ::File.join o::FILENAME_, o::CONFIG_FILENAME_
   end
 
   Expect_event_ = -> test_context_module do
-    Cull_::Callback_.test_support::Expect_Event[ test_context_module ]
+    Home_::Callback_.test_support::Expect_Event[ test_context_module ]
   end
 
   DASH_ = '-'

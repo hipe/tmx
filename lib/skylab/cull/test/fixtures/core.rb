@@ -10,7 +10,7 @@ module Skylab::Cull::TestSupport
         end
       end
 
-      Cull_::Autoloader_[ self ]
+      Home_::Autoloader_[ self ]
 
     end
 
@@ -40,7 +40,7 @@ module Skylab::Cull::TestSupport
 
       BLACK_RX__ = /[^[:alnum:]]/
 
-      Cull_::Autoloader_[ self ]
+      Home_::Autoloader_[ self ]
 
     end
 
@@ -52,7 +52,7 @@ module Skylab::Cull::TestSupport
         end
       end
 
-      Cull_::Autoloader_[ self ]
+      Home_::Autoloader_[ self ]
 
     end
 

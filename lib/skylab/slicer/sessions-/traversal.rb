@@ -21,7 +21,7 @@ module Skylab::Slicer
 
     def __begin_sidesystem_via_path path
 
-      ss = Slicer_::Models_::Sidesystem.new
+      ss = Home_::Models_::Sidesystem.new
       ss.norm = ::File.dirname path
       ss.stem = ::File.basename ss.norm
       _mod = Autoloader_.const_reduce [ ss.stem ], ::Skylab do end

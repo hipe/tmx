@@ -23,7 +23,7 @@ module Skylab::Human  # :[#001].
 
   ACHIEVED_ = true
   EMPTY_S_ = ''
-  Hu_ = self
+  Home_ = self
   IDENTITY_ = -> x { x }
   NIL_ = nil
   KEEP_PARSING_ = true

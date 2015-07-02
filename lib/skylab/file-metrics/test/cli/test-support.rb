@@ -16,7 +16,7 @@ module Skylab::FileMetrics::TestSupport::CLI
   module InstanceMethods
 
     def subject_CLI
-      FM_::CLI
+      Home_::CLI
     end
 
     define_method :get_invocation_strings_for_expect_stdout_stderr, -> do
@@ -73,7 +73,7 @@ module Skylab::FileMetrics::TestSupport::CLI
 
       case sym
       when :expect_CLI
-        FM_.lib_.brazen.test_support.CLI::Expect_CLI[ self ]
+        Home_.lib_.brazen.test_support.CLI::Expect_CLI[ self ]
 
       when :classify_common_screen
         TS_::Classify_Common_Screen[ self ]
@@ -87,14 +87,14 @@ module Skylab::FileMetrics::TestSupport::CLI
 
   o = Parent__
 
-  FM_ = ::Skylab::FileMetrics
+  Home_ = ::Skylab::FileMetrics
 
-  Callback_ = FM_::Callback_
+  Callback_ = Home_::Callback_
   EMPTY_S_ = o::EMPTY_S_
   Fixture_file_directory_ = o::Fixture_file_directory_
   Fixture_tree_directory_ = o::Fixture_tree_directory_
   NEWLINE_ = o::NEWLINE_
   NIL_ = nil
-  SPACE_ = FM_::SPACE_
+  SPACE_ = Home_::SPACE_
   UNDERSCORE_ = '_'
 end

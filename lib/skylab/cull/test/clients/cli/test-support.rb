@@ -6,7 +6,7 @@ module Skylab::Cull::TestSupport::Clients_CLI
 
   include Constants
 
-  Cull_ = Cull_
+  Home_ = Home_
 
   TestSupport_ = TestSupport_
 
@@ -32,7 +32,7 @@ module Skylab::Cull::TestSupport::Clients_CLI
 
       @IO_spy_group_for_expect_stdout_stderr = g
 
-      @exitstatus = Cull_::CLI.new( nil, * g.values_at( :o, :e ), [ 'kul' ] ).invoke argv
+      @exitstatus = Home_::CLI.new( nil, * g.values_at( :o, :e ), [ 'kul' ] ).invoke argv
 
       nil
     end
@@ -42,7 +42,7 @@ module Skylab::Cull::TestSupport::Clients_CLI
     def expect_exitstatus_for_general_failure
 
       @exitstatus.should eql(
-        Cull_::Brazen_::API.exit_statii.fetch :generic_error )
+        Home_::Brazen_::API.exit_statii.fetch :generic_error )
     end
   end
 end

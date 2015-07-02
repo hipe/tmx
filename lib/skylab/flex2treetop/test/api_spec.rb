@@ -11,7 +11,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
       it "load" do
 
-        F2TT_::API
+        Home_::API
       end
 
       it "ping" do
@@ -358,7 +358,7 @@ module Skylab::Flex2Treetop::MyTestSupport
       end
 
       def subject_API
-        F2TT_::API
+        Home_::API
       end
   end
 end

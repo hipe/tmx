@@ -104,7 +104,7 @@ module Skylab::Flex2Treetop::MyTestSupport
       end
 
       def subject_CLI
-        F2TT_::CLI
+        Home_::CLI
       end
 
       define_method :invocation_strings_for_expect_stdout_stderr, -> do
@@ -134,7 +134,7 @@ module Skylab::Flex2Treetop::MyTestSupport
       end
 
       def result_for_failure_for_expect_stdout_stderr
-        F2TT_::Brazen_::CLI::GENERIC_ERROR_
+        Home_::Brazen_::CLI::GENERIC_ERROR_
       end
 
       define_method :_program_name, -> do

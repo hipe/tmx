@@ -3,15 +3,15 @@ require 'skylab/test-support/core'
 
 module Skylab::Git::TestSupport
 
-  Git_ = ::Skylab::Git
-    Autoloader_ = Git_::Autoloader_
+  Home_ = ::Skylab::Git
+    Autoloader_ = Home_::Autoloader_
   TestLib_ = ::Module.new
   TestSupport_ = ::Skylab::TestSupport
 
   TestSupport_::Regret[ self ]
 
   module Constants
-    Git_ = Git_
+    Home_ = Home_
     TestSupport_ = TestSupport_
     TestLib_ = TestLib_
   end
@@ -75,7 +75,7 @@ module Skylab::Git::TestSupport
 
   module Constants::TestLib_
 
-    HL__ = Git_::Lib_::HL__
+    HL__ = Home_::Lib_::HL__
 
     IO_spy_group = -> do
       TestSupport_::IO.spy.group
@@ -89,7 +89,7 @@ module Skylab::Git::TestSupport
       System_lib___[].services
     end
 
-    System_lib___ = Git_::Lib_::System_lib__
+    System_lib___ = Home_::Lib_::System_lib__
 
     Tmpdir = -> do
       TestSupport_.tmpdir

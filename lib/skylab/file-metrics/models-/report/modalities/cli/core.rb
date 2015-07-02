@@ -10,7 +10,7 @@ module Skylab::FileMetrics
 
       # ~ the mutable front properties API frontier
 
-      class Action_Adapter__ < FM_::CLI::Action_Adapter
+      class Action_Adapter__ < Home_::CLI::Action_Adapter
 
         MUTATE_PRPS__ = nil
 
@@ -37,7 +37,7 @@ module Skylab::FileMetrics
 
       # ~ our common properties
 
-      bz = FM_.lib_.brazen
+      bz = Home_.lib_.brazen
       EXTMOD__ = bz::Model::Entity
 
       Common_properties__ = bz::Model.common_properties_class.new(
@@ -219,7 +219,7 @@ module Skylab::FileMetrics
 
             :field, :named, :_lipstick_,
               :label, EMPTY_S_,
-              :edit, FM_::CLI::Build_custom_lipstick_field )
+              :edit, Home_::CLI::Build_custom_lipstick_field )
 
           tbl.expression_width = _lookup_expression_width
 
@@ -272,7 +272,7 @@ module Skylab::FileMetrics
 
             :field, :named, :_lipstick_,
               :label, EMPTY_S_,
-              :edit, FM_::CLI::Build_custom_lipstick_field )
+              :edit, Home_::CLI::Build_custom_lipstick_field )
 
           tbl.expression_width = _lookup_expression_width
 
@@ -336,7 +336,7 @@ module Skylab::FileMetrics
 
             :field, :named, :_lipstick_,
               :label, EMPTY_S_,
-              :edit, FM_::CLI::Build_custom_lipstick_field
+              :edit, Home_::CLI::Build_custom_lipstick_field
           )
 
           tbl.expression_width = _lookup_expression_width
@@ -352,11 +352,11 @@ module Skylab::FileMetrics
       class Action_Adapter__
 
         def _begin_table
-          FM_.lib_.brazen::CLI::Expression_Frames::Table::Structured.new
+          Home_.lib_.brazen::CLI::Expression_Frames::Table::Structured.new
         end
 
         def _lookup_expression_width
-          FM_::CLI::Lipsticker::EXPRESSION_WIDTH_PROC[]
+          Home_::CLI::Lipsticker::EXPRESSION_WIDTH_PROC[]
         end
       end
 
@@ -405,7 +405,7 @@ module Skylab::FileMetrics
 
         def __warn_about_too_many_Vs d, d_
 
-          lib = FM_.lib_.basic::Number::EN
+          lib = Home_.lib_.basic::Number::EN
 
           @resources.serr.puts "(verbosity level #{ lib.number d_ } #{
             }is highest (had #{ lib.number d }).)"  # meh

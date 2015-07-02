@@ -52,7 +52,7 @@ module Skylab::Cull
         def event_for_fell_short_of_count wanted_number, had_number
 
           build_not_OK_event_with :early_end_of_stream,
-              :stream_identifier, Cull_.lib_.basic::Pathname.identifier.new( @path ),
+              :stream_identifier, Home_.lib_.basic::Pathname.identifier.new( @path ),
               :wanted_number, wanted_number,
               :had_number, had_number do | y, o |
 

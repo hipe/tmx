@@ -12,7 +12,7 @@ module Skylab::BeautySalon::TestSupport::Models::S_and_R::Actors_BFS
 
   Callback_ = Callback_
 
-  DELIMITER_ = BS_::NEWLINE_
+  DELIMITER_ = Home_::NEWLINE_
 
   TestSupport_ = TestSupport_
 

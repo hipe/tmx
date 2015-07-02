@@ -2,11 +2,11 @@ require 'net/http'
 
 module Skylab::Dependency
 
-  class TaskTypes::Get < Dep_::Task
+  class TaskTypes::Get < Home_::Task
 
-    Dep_.lib_.open_2 self
+    Home_.lib_.open_2 self
 
-    include Dep_.lib_.path_tools.instance_methods_module
+    include Home_.lib_.path_tools.instance_methods_module
 
     attribute :from
     attribute :get, :required => true

@@ -2,7 +2,7 @@ module Skylab::FileMetrics
 
   Model_ = ::Module.new
 
-  class Model_::Tree_Branch < FM_.lib_.basic::Tree.mutable_node::Frugal
+  class Model_::Tree_Branch < Home_.lib_.basic::Tree.mutable_node::Frugal
 
     class << self
 

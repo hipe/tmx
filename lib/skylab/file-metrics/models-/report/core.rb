@@ -2,7 +2,7 @@ module Skylab::FileMetrics
 
   class Models_::Report
 
-    br = FM_.lib_.brazen
+    br = Home_.lib_.brazen
 
     My_Entity__ = br::Model::Entity
 
@@ -18,7 +18,7 @@ module Skylab::FileMetrics
 
         h = @argument_box.h_
 
-        FM_.lib_.system.filesystem.find(
+        Home_.lib_.system.filesystem.find(
 
           :paths, path_a,
           :ignore_dirs, h.fetch( :exclude_dir ),
@@ -65,11 +65,11 @@ module Skylab::FileMetrics
       end
 
       def filesystem_conduit_
-        FM_.lib_.system.filesystem
+        Home_.lib_.system.filesystem
       end
 
       def system_conduit_
-        FM_.lib_.open_3
+        Home_.lib_.open_3
       end
     end
 

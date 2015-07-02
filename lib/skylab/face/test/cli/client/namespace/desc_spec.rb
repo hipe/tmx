@@ -8,7 +8,7 @@ module Skylab::Face::TestSupport::CLI::Client::Namespace::Desc
 
   module Wowzaa
     module CLI
-      class Client < Face_::CLI::Client
+      class Client < Home_::CLI::Client
 
         set :num_summary_lines, 2
 

@@ -31,7 +31,7 @@ module Skylab::CSS_Convert
   private
 
     def css_parser
-      @css_parser ||= CSSC_::CSS_::Parser.new request_client
+      @css_parser ||= Home_::CSS_::Parser.new request_client
     end
   end
 end

@@ -12,7 +12,7 @@ module Skylab::Git::TestSupport::API::Actions::Spread
 
   extend TestSupport_::Quickie
 
-  Spread = Git_::CLI::Actions::Spread
+  Spread = Home_::CLI::Actions::Spread
 
   describe "[gi] API actions spread" do
 
@@ -32,7 +32,7 @@ module Skylab::Git::TestSupport::API::Actions::Spread
     def self.branches a
       let :branches do
         Spread::API_Model::Branches.from_line_scanner(
-          Git_.lib_.scanner( a ), snitch )
+          Home_.lib_.scanner( a ), snitch )
       end
     end
 

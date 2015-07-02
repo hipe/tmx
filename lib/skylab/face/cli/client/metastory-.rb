@@ -7,18 +7,18 @@ module Skylab::Face
       end  #kick-the-loading-warninglessly-and-trackably
     end
 
-    Face_::Metastory.enhance self, :CLI_, :Modality_Client_
+    Home_::Metastory.enhance self, :CLI_, :Modality_Client_
 
     class Namespace_
-      Face_::Metastory.enhance self, :CLI_, :Namespace_
+      Home_::Metastory.enhance self, :CLI_, :Namespace_
     end
 
     class NS_Sheet_
-      Face_::Metastory.enhance self, :CLI_, :Namespace_
+      Home_::Metastory.enhance self, :CLI_, :Namespace_
     end
 
     class Command_
-      Face_::Metastory.enhance self, :CLI_, :Action_
+      Home_::Metastory.enhance self, :CLI_, :Action_
     end
 
     #  class Cmd_Sheet_  # #todo only when needed

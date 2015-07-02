@@ -12,9 +12,9 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
 
   include Constants
 
-  BS_ = BS_
+  Home_ = Home_
 
-  Callback_ = BS_::Callback_
+  Callback_ = Home_::Callback_
 
   extend TestSupport_::Quickie
 
@@ -65,13 +65,13 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
     end
 
     def black_and_white_expression_agent_for_expect_event
-      BS_.lib_.brazen::API.expression_agent_instance
+      Home_.lib_.brazen::API.expression_agent_instance
     end
 
     # ~ assertion support
 
     def unindent s
-      s.gsub! UNINDENT_RX__, BS_::EMPTY_S_
+      s.gsub! UNINDENT_RX__, Home_::EMPTY_S_
       s
     end
     UNINDENT_RX__ = %r(^[ ]+)
@@ -79,14 +79,14 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
   end
 
   Bin_path_ = Callback_.memoize do
-    BS_.lib_.system.defaults.bin_pathname.
+    Home_.lib_.system.defaults.bin_pathname.
       join( 'tmx-beauty-salon search-and-r' ).to_path
   end
 
-  NEWLINE_ = BS_::NEWLINE_
+  NEWLINE_ = Home_::NEWLINE_
 
   Subject_ = -> do
-    BS_::Models_::Search_and_Replace
+    Home_::Models_::Search_and_Replace
   end
 
   SLASH_ = '/'.freeze

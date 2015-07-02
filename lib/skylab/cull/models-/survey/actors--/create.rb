@@ -16,7 +16,7 @@ module Skylab::Cull
         # using dry run, check to see that we could create the directory
         # if we wanted to -- that is, that it does not already exist.
 
-        fs = Cull_.lib_.filesystem
+        fs = Home_.lib_.filesystem
 
         fs.normalization.downstream_IO(
           :path, @survey.workspace_path_,

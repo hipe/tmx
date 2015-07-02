@@ -39,7 +39,7 @@ module Skylab::Git
   private
 
     def build_bound i
-      unbound = Git_::CLI::Actions.const_get i, false
+      unbound = Home_::CLI::Actions.const_get i, false
       if unbound.const_defined? :CLI, false
         unbound = unbound::CLI
       end
@@ -55,11 +55,11 @@ module Skylab::Git
     end
 
     def program_name
-      @program_name || Git_.lib_.CLI_program_basename
+      @program_name || Home_.lib_.CLI_program_basename
     end
 
     def hi msg
-      @hi ||= Git_.lib_.CLI_lib.pen.stylify.curry[ [ :green ] ]
+      @hi ||= Home_.lib_.CLI_lib.pen.stylify.curry[ [ :green ] ]
       @hi[ msg ]
     end
 
@@ -74,9 +74,9 @@ module Skylab::Git
     end
 
     def head argv
-      load Git_.lib_.bin_pathname.join 'tmx-git-head'
+      load Home_.lib_.bin_pathname.join 'tmx-git-head'
       _progname = "#{ program_name } head"
-      Git_::CLI::Actions::Head[ get_y, _progname, argv ]
+      Home_::CLI::Actions::Head[ get_y, _progname, argv ]
     end
 
     def scoot argv
@@ -119,7 +119,7 @@ module Skylab::Git
                 Adapter_.new( ns_sheet, my_client_class, mechanics )
               end
             end
-            class Adapter_ < Git_::Lib_::Face__[]::CLI::Client::Adapter::For::Face::Of::Hot
+            class Adapter_ < Home_::Lib_::Face__[]::CLI::Client::Adapter::For::Face::Of::Hot
               def get_summary_a_from_sheet _
                 [ "assorted git-focused one-offs." ]
               end

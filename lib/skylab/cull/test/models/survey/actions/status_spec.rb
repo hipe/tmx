@@ -9,19 +9,19 @@ module Skylab::Cull::TestSupport
     extend TS_
 
     it "with a noent path" do
-      against Cull_.dir_pathname.join( 'no-ent' ).to_path
+      against Home_.dir_pathname.join( 'no-ent' ).to_path
       expect_not_OK_event :start_directory_does_not_exist
       expect_failed
     end
 
     it "with a path that is a file" do
-      against Cull_.dir_pathname.join( 'core.rb' ).to_path
+      against Home_.dir_pathname.join( 'core.rb' ).to_path
       expect_not_OK_event :start_directory_is_not_directory
       expect_failed
     end
 
     it "with a path that is a directory but workspace not found #egads" do
-      against Cull_.lib_.filesystem.tmpdir_path
+      against Home_.lib_.filesystem.tmpdir_path
       expect_not_OK_event :resource_not_found
       expect_failed
     end

@@ -37,7 +37,7 @@ first, a quick history (most recent at top):
 
     [#ba-030] the basic struct                                2013-07-21
 
-    [#br-058] Fields_ DSL --> "contoured fields" --> [br]     2013-07-18
+    [#br-058] Home_ DSL --> "contoured fields" --> [br]     2013-07-18
 
        [#004] basic fields                                    2013-07-05
 

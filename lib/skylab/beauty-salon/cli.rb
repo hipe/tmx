@@ -10,7 +10,7 @@ module Skylab::BeautySalon
     end  # >>
   end
 
-  class CLI::Client < BS_.lib_.old_CLI_lib::Client
+  class CLI::Client < Home_.lib_.old_CLI_lib::Client
 
     def initialize( * )
       super
@@ -213,11 +213,11 @@ module Skylab::BeautySalon
 
     option_parser do |o|
 
-      @action = BS_::Models_::Deliterate.new NO_KERNEL__ do | *, & ev_p |
+      @action = Home_::Models_::Deliterate.new NO_KERNEL__ do | *, & ev_p |
 
         ev_p[].express_into_under @y,
 
-          BS_.lib_.brazen::CLI.expression_agent_instance
+          Home_.lib_.brazen::CLI.expression_agent_instance
 
         false
       end
@@ -268,7 +268,7 @@ module Skylab::BeautySalon
     end
 
     option_parser do |o|
-      @client = BS_::Models_::Search_and_Replace.client_for_three @sin, @out, @err
+      @client = Home_::Models_::Search_and_Replace.client_for_three @sin, @out, @err
       @client.write_options o
       nil
     end
@@ -290,7 +290,7 @@ module Skylab::BeautySalon
         bx.add sym, x_a.fetch( d )
       end
 
-      BS_::API.call_via_mutable_box__ method.name, bx, & @on_event_selectively
+      Home_::API.call_via_mutable_box__ method.name, bx, & @on_event_selectively
     end
 
     def on_info_string e  # meh
@@ -321,7 +321,7 @@ module Skylab::BeautySalon
         _A_RATHER_SHORT_LENGTH = 8
 
         p = -> s do
-          p = BS_.lib_.basic::String.ellipsify.curry[ _A_RATHER_SHORT_LENGTH ]
+          p = Home_.lib_.basic::String.ellipsify.curry[ _A_RATHER_SHORT_LENGTH ]
           p[ s ]
         end
 

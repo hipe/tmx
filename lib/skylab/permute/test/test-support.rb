@@ -32,11 +32,11 @@ module Skylab::Permute::TestSupport
     end
 
     def subject_API
-      Pe_.application_kernel_
+      Home_.application_kernel_
     end
 
     def black_and_white_expression_agent_for_expect_event
-      Pe_.lib_.brazen::API.expression_agent_instance
+      Home_.lib_.brazen::API.expression_agent_instance
     end
   end
 
@@ -46,7 +46,7 @@ module Skylab::Permute::TestSupport
 
       def [] test_cls
 
-        Pe_.lib_.brazen.test_support.CLI::Expect_CLI[ test_cls ]
+        Home_.lib_.brazen.test_support.CLI::Expect_CLI[ test_cls ]
 
         test_cls.include self
 
@@ -54,7 +54,7 @@ module Skylab::Permute::TestSupport
     end  # >>
 
     def subject_CLI
-      Pe_::CLI
+      Home_::CLI
     end
 
     def get_invocation_strings_for_expect_stdout_stderr
@@ -72,8 +72,8 @@ module Skylab::Permute::TestSupport
 
   EMPTY_S_ = ''
   NIL_ = nil
-  Pe_ = ::Skylab::Permute
-  Callback_ = Pe_::Callback_
+  Home_ = ::Skylab::Permute
+  Callback_ = Home_::Callback_
 end
 
 # :+#tombstone: was [#ts-010] dark hack "one weird old tr.."

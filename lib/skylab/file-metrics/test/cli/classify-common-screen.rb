@@ -184,7 +184,7 @@ module Skylab::FileMetrics::TestSupport::CLI
 
         -> x, expect_range=nil do
 
-          s = FM_.lib_.brazen::CLI::Styling.unstyle_styled x
+          s = Home_.lib_.brazen::CLI::Styling.unstyle_styled x
 
           if s
             if rx =~ s

@@ -19,11 +19,11 @@ module Skylab::BeautySalon
         @grep_extended_regexp_string = @ruby_regexp = nil
         super
         @chunk_size ||= 50  # meh etc
-        @shellwords = BS_.lib_.shellwords
+        @shellwords = Home_.lib_.shellwords
       end
 
       def execute
-        @command = BS_.lib_.system.filesystem.grep(
+        @command = Home_.lib_.system.filesystem.grep(
           :grep_extended_regexp_string, @grep_extended_regexp_string,
           :ruby_regexp, @ruby_regexp,
           :on_event_selectively, -> * i_a, & ev_p do

@@ -1,12 +1,12 @@
 module Skylab::Dependency
 
-  class TaskTypes::UnzipTarball < Dep_::Task
+  class TaskTypes::UnzipTarball < Home_::Task
 
-    Dep_.lib_.open_2 self
+    Home_.lib_.open_2 self
 
-    include Dep_.lib_.path_tools.instance_methods_module
+    include Home_.lib_.path_tools.instance_methods_module
 
-    include Dep_::TaskTypes::TarballTo::Constants
+    include Home_::TaskTypes::TarballTo::Constants
 
     attribute :unzip_tarball, :required => true, :pathname => true
     attribute :build_dir, :from_context => true, :pathname => true, :required => true
@@ -39,7 +39,7 @@ module Skylab::Dependency
     def _execute
       cmd = "cd #{escape_path build_dir}; tar -xzvf #{escape_path @unzip_tarball.basename}"
       call_digraph_listeners(:shell, cmd)
-      err = Dep_::Library_::StringIO.new
+      err = Home_::Library_::StringIO.new
       bytes, seconds =  open2(cmd) do |on|
         on.out { |s| call_digraph_listeners(:out, s) }
         on.err { |s| call_digraph_listeners(:err, s) ; err.write(s) }
@@ -58,7 +58,7 @@ module Skylab::Dependency
       super
     end
 
-    version_rx = /-#{ Dep_::Version::REGEX.source }/
+    version_rx = /-#{ Home_::Version::REGEX.source }/
 
     define_method :unzipped_dir_basename do
       @unzipped_dir_basename ||= begin

@@ -4,7 +4,7 @@ module Skylab::Human
   #
   #     a = [ :apple, :banana, :ernana, :onono, :strawberry, :orange ]
   #
-  #     a_ = Hu_::Levenshtein.with(
+  #     a_ = Home_::Levenshtein.with(
   #       :item, :bernono,
   #       :items, a,
   #       :closest_N_items, 3 )
@@ -60,6 +60,6 @@ module Skylab::Human
 
     Item__ = ::Struct.new :item_x, :distance_d
 
-    Hu_.lib_.levenshtein  # load it
+    Home_.lib_.levenshtein  # load it
   end
 end

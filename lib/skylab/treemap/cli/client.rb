@@ -11,7 +11,7 @@ module Skylab::Treemap
             module Of
               Hot = -> x, x_ do
 
-                Tr_.lib_.brazen::CLI::Client.fml Tr_, x, x_
+                Home_.lib_.brazen::CLI::Client.fml Home_, x, x_
               end
             end
           end

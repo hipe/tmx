@@ -20,7 +20,7 @@ module Skylab::Permute
         Callback_::Pair.new v_x, n_x
       end
 
-      o = Pe_.lib_.basic::State::Machine::Edit_Session.new
+      o = Home_.lib_.basic::State::Machine::Edit_Session.new
 
       o.add_state :beginning,
         :can_transition_to, [ :long_switch ]

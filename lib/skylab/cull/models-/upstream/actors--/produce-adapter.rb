@@ -101,7 +101,7 @@ module Skylab::Cull
 
       def process_as_file_absolute_path path
 
-        fs = Cull_.lib_.filesystem
+        fs = Home_.lib_.filesystem
 
         _ok = fs.normalization.upstream_IO(
           :path, path,

@@ -108,7 +108,7 @@ module Skylab::Cull::TestSupport
 
     it "unset - no" do
       call_API :survey, :edit,
-        :upstream, Cull_::EMPTY_S_,
+        :upstream, Home_::EMPTY_S_,
         :path, freshly_initted_path
 
       expect_not_OK_event :no_upstream_set
@@ -120,7 +120,7 @@ module Skylab::Cull::TestSupport
       td = prepare_tmpdir_with_patch :many_upstreams
 
       call_API :survey, :edit,
-        :upstream, Cull_::EMPTY_S_,
+        :upstream, Home_::EMPTY_S_,
         :path, td.to_path
 
       expect_not_OK_event :path_must_be_absolute

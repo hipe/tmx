@@ -1,10 +1,10 @@
 module Skylab::BeautySalon
 
-  class Models_::Deliterate < BS_.lib_.brazen::Model.common_action_class
+  class Models_::Deliterate < Home_.lib_.brazen::Model.common_action_class
 
     Actions = THE_EMPTY_MODULE_
 
-    Brazen_ = BS_.lib_.brazen
+    Brazen_ = Home_.lib_.brazen
 
     def write_options o
 
@@ -101,7 +101,7 @@ module Skylab::BeautySalon
 
     def normalize_range           # for example,
       okay = true                 # you could deliterate
-      o = BS_.lib_.basic::Range   # just these three lines
+      o = Home_.lib_.basic::Range   # just these three lines
       ok = o.normalize_argument @from_line, :begin, 1, & handle_event_selectively
       ok or okay = false
       ok = o.normalize_argument @to_line, :is, -1, :or, :begin, 1, & handle_event_selectively

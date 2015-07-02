@@ -25,7 +25,7 @@ module Skylab::Slake
     end
   end
 
-  Slake_ = self
+  Home_ = self
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 end

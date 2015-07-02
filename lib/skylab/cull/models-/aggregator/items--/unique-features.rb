@@ -67,7 +67,7 @@ module Skylab::Cull
             of_entity_unique_features_h.fetch occurrence.entity_name_string do
               of_entity_unique_features_h[ occurrence.entity_name_string ] = []
             end.push (
-              ( Cull_::Models_::Entity_.new do | ent |
+              ( Home_::Models_::Entity_.new do | ent |
                 ent.add_actual_property_value_and_name(
                   occurrence.entity_name_string,
                   :"entity name" )

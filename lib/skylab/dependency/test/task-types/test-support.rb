@@ -5,7 +5,7 @@ module Skylab::Dependency::TestSupport::Tasks
   ::Skylab::Dependency::TestSupport[ TS_ = self ]
 
   module Constants
-    include Dep_
+    include Home_
   end
 
   include Constants  # include them here for use in specs
