@@ -62,7 +62,7 @@ module Skylab::GitViz
 
           end
 
-          @tree = GitViz_.lib_.tree.via :node_identifiers, _ea
+          @tree = Home_.lib_.tree.via :node_identifiers, _ea
 
           fh.close
 

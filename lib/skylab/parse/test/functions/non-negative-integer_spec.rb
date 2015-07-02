@@ -25,7 +25,7 @@ module Skylab::Parse::TestSupport
     def _against s
 
       on = subject_parse_function_.output_node_via_input_stream(
-        Parse_::Input_Streams_::Single_Token.new s )
+        Home_::Input_Streams_::Single_Token.new s )
 
       if on
         on.value_x
@@ -34,7 +34,7 @@ module Skylab::Parse::TestSupport
 
     memoize_subject_parse_function_ do
 
-      Parse_.function( :non_negative_integer ).new_via_polymorphic_stream_passively(
+      Home_.function( :non_negative_integer ).new_via_polymorphic_stream_passively(
         Callback_::Polymorphic_Stream.the_empty_polymorphic_stream
       )
     end

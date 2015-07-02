@@ -30,7 +30,7 @@ module Skylab::TanMan
       module Of_string__
 
         def self.[] str
-          scn = TanMan_.lib_.string_scanner.new str
+          scn = Home_.lib_.string_scanner.new str
           scan = Stream__.new scn do
             if ! scn.eos?
               scan.last_start_position = scn.pos
@@ -48,7 +48,7 @@ module Skylab::TanMan
       module Of_comment_string__
 
         def self.[] str
-          scn = TanMan_.lib_.string_scanner.new str
+          scn = Home_.lib_.string_scanner.new str
           scn.skip SPACE_RX__
           type = if scn.skip C_STYLE_COMMENT_OPENER_RX__
             :C_Style__

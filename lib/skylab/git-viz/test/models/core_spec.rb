@@ -8,7 +8,7 @@ module Skylab::GitViz::TestSupport::Models
     use :expect_event
 
     it "loads" do
-      GitViz_::API
+      Home_::API
     end
 
     it "ping with strange parameters - emits expression of failure" do

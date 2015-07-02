@@ -6,11 +6,11 @@ module Skylab::GitViz::TestSupport::Test_Lib::Mock_FS
 
   include Constants
 
-  Mock_FS_Parent_Module__ = GitViz_::Test_Lib_
+  Mock_FS_Parent_Module__ = Home_::Test_Lib_
 
   extend TestSupport_::Quickie
 
-  GitViz_::Autoloader_[ Fixtures = ::Module.new ]
+  Home_::Autoloader_[ Fixtures = ::Module.new ]
 
   module ModuleMethods
     def memoize_ i, &p  # this is used for OCD reasons, but can be problematic

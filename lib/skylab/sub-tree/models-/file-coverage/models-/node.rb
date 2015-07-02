@@ -13,7 +13,7 @@ module Skylab::SubTree
 
       def merge_destructively otr
 
-        SubTree_.lib_.basic::Tree.merge_destructively.via_ivars(
+        Home_.lib_.basic::Tree.merge_destructively.via_ivars(
           otr, self, :@asset_dir_entry_s_a, :@asset_file_entry_s_a,
             :@has_assets, :@has_tests,
             :@test_dir_entry_s_a, :@test_file_entry_s_a )

@@ -8,7 +8,7 @@ module Skylab::Parse::TestSupport
 
     memoize_subject_parse_function_ do
 
-      Parse_.fuzzy_matcher 'foobie', :minimum_number_of_characters, 3
+      Home_.fuzzy_matcher 'foobie', :minimum_number_of_characters, 3
     end
 
     it "won't match if number of chars is under the minimum" do

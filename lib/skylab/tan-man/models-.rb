@@ -214,7 +214,7 @@ module Skylab::TanMan
 
     def __fuzzy_reduce_to_array_stream_against_natkey st, name_s, & oes_p
 
-      TanMan_.lib_.basic::Fuzzy.reduce_to_array_stream_against_string(
+      Home_.lib_.basic::Fuzzy.reduce_to_array_stream_against_string(
 
         st,
 
@@ -409,7 +409,7 @@ module Skylab::TanMan
     class << self
 
       def action_base_class  # #hook-in to [br]'s action factory
-        TanMan_::Model_::Document_Entity::Action
+        Home_::Model_::Document_Entity::Action
       end
 
       def document_in_workspace_identifier_symbol  # #hook-out to doc.ent

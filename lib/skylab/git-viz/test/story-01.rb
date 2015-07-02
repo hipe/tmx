@@ -6,8 +6,8 @@ module Skylab::GitViz::TestSupport
 
       def [] ctx
 
-        GitViz_::Test_Lib_::Mock_FS[ ctx ]
-        GitViz_::Test_Lib_::Mock_System[ ctx ]
+        Home_::Test_Lib_::Mock_FS[ ctx ]
+        Home_::Test_Lib_::Mock_System[ ctx ]
 
         ctx.include Instance_Methods___
       end

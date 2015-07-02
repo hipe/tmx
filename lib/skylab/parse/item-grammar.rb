@@ -80,7 +80,7 @@ module Skylab::Parse
       end
 
       def initialize( * )
-        @_key_set = Parse_.lib_.stdlib_set.new
+        @_key_set = Home_.lib_.stdlib_set.new
         super
       end
 

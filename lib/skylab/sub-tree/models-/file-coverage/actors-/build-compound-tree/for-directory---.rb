@@ -23,7 +23,7 @@ module Skylab::SubTree
 
         def __resolve_the_big_tree
 
-          _st = SubTree_.lib_.system.filesystem.find( :path, @business_hub_dir_,
+          _st = Home_.lib_.system.filesystem.find( :path, @business_hub_dir_,
               :filename, "*#{ Autoloader_::EXTNAME }",  # here we :+[#008] assume all relevant files have one same extension
               :freeform_query_infix_words, TYPE_FILE___,
               :as_normal_value, -> cmd do
@@ -36,7 +36,7 @@ module Skylab::SubTree
             path[ r ]
           end
 
-          @big_tree = SubTree_::lib_.tree.via :paths, _st
+          @big_tree = Home_::lib_.tree.via :paths, _st
           ACHIEVED_
         end
         TYPE_FILE___ = %w( -type file )
@@ -169,7 +169,7 @@ module Skylab::SubTree
           file_key = @nc.method file_key
 
           depth = 0
-          output_node = SubTree_.lib_.tree.mutable_node.new
+          output_node = Home_.lib_.tree.mutable_node.new
           parents = []
           st = tree.to_classified_stream
           tree_ = output_node

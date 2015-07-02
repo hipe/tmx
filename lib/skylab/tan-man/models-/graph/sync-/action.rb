@@ -21,7 +21,7 @@ module Skylab::TanMan
 
           :flag, :property, :dry_run,
 
-          :reuse, TanMan_::Model_::Document_Entity.IO_properties,
+          :reuse, Home_::Model_::Document_Entity.IO_properties,
 
           :for_direction, :hereput, :property, :hereput_string,
           :for_direction, :hereput, :property, :hereput_path

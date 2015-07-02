@@ -24,7 +24,7 @@ module Skylab::System::TestSupport
           x = if Test_Support_Bundles___.const_defined? const, false
             Test_Support_Bundles___.const_get const, false
           else
-            System_.lib_.plugin::Bundle::Fancy_lookup[ sym, TS_ ]
+            Home_.lib_.plugin::Bundle::Fancy_lookup[ sym, TS_ ]
           end
           cache_h[ sym ] = x
           x
@@ -37,7 +37,7 @@ module Skylab::System::TestSupport
   module InstanceMethods
 
     def services_
-      System_.services
+      Home_.services
     end
 
     attr_reader :do_debug
@@ -58,22 +58,22 @@ module Skylab::System::TestSupport
     end
   end
 
-  System_ = ::Skylab::System
+  Home_ = ::Skylab::System
 
-  Callback_ = System_::Callback_
+  Callback_ = Home_::Callback_
 
   class << self
 
     define_method :tmpdir_path_, ( Callback_.memoize do
 
-      ::File.join( System_.services.filesystem.tmpdir_path, '[sy]' )  # :+#FS-eek
+      ::File.join( Home_.services.filesystem.tmpdir_path, '[sy]' )  # :+#FS-eek
     end )
   end  # >>
 
   EMPTY_A_ = [].freeze
-  EMPTY_S_ = System_::EMPTY_S_
+  EMPTY_S_ = Home_::EMPTY_S_
 
-  NIL_ = System_::NIL_
+  NIL_ = Home_::NIL_
 
 end
 

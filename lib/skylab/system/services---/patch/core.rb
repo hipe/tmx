@@ -132,7 +132,7 @@ module Skylab::System
 
         def wait_process
 
-          _cond = @system_conduit || System_.lib_.open3
+          _cond = @system_conduit || Home_.lib_.open3
 
           i, o, e, w = _cond.popen3( * build_command_string_array )
 
@@ -277,7 +277,7 @@ module Skylab::System
         end
 
         def esc s
-          System_.lib_.shellwords.shellescape s
+          Home_.lib_.shellwords.shellescape s
         end
 
         Process_Line_ = Callback_::Event.message_class_factory.new :ok, nil do | line |

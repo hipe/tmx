@@ -12,7 +12,7 @@ module Skylab::Parse::TestSupport
 
       args = [ '30', 'other' ]
 
-      age, sex, loc =  Parse_.parse_serial_optionals args,
+      age, sex, loc =  Home_.parse_serial_optionals args,
         -> a { /\A\d+\z/ =~ a },
         -> s { /\A[mf]\z/i =~ s },
         -> l { /./ =~ l }
@@ -25,7 +25,7 @@ module Skylab::Parse::TestSupport
     context "curried usage" do
 
       before :all do
-        P = Parse_.function( :serial_optionals ).new_with(
+        P = Home_.function( :serial_optionals ).new_with(
           :matcher_functions,
             -> age do
               /\A\d+\z/ =~ age
@@ -73,14 +73,14 @@ module Skylab::Parse::TestSupport
           if feet_rx =~ st.current_token_object.value_x
             tok = st.current_token_object
             st.advance_one
-            Parse_::Output_Node_.new tok.value_x.to_i
+            Home_::Output_Node_.new tok.value_x.to_i
           end
         end,
         :proc, -> st do
           if inch_rx =~ st.current_token_object.value_x
             tok = st.current_token_object
             st.advance_one
-            Parse_::Output_Node_.new tok.value_x.to_f
+            Home_::Output_Node_.new tok.value_x.to_f
           end
         end ).to_parse_array_fully_proc
 
@@ -94,7 +94,7 @@ module Skylab::Parse::TestSupport
     end
 
     def subject_parse_module_
-      Parse_.function :serial_optionals
+      Home_.function :serial_optionals
     end
   end
   # <-

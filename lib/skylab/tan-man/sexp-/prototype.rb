@@ -31,7 +31,7 @@ module Skylab::TanMan
       KEYWORD__ = 'example'.freeze
 
       def line_rx
-        TanMan_.lib_.string_lib.regex_for_line_scanning
+        Home_.lib_.string_lib.regex_for_line_scanning
       end
 
       def rex * a
@@ -201,11 +201,11 @@ module Skylab::TanMan
     end
 
     def debug?
-      TanMan_::Sexp_::Auto.debug?
+      Home_::Sexp_::Auto.debug?
     end
 
     def send_info_string msg
-      TanMan_::Sexp_::Auto.debug_stream.puts msg
+      Home_::Sexp_::Auto.debug_stream.puts msg
     end
 
     def grammar

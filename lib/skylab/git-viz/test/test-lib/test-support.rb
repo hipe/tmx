@@ -16,7 +16,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
   end
 
   Callback_ = Callback_
-  GitViz_ = GitViz_
+  Home_ = Home_
   Top_TS_ = Top_TS_
 
 end

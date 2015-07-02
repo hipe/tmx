@@ -40,7 +40,7 @@ module Skylab::Parse::TestSupport
     end
 
     def the_empty_input_stream
-      Parse_::Input_Streams_::Array.the_empty_stream
+      Home_::Input_Streams_::Array.the_empty_stream
     end
 
     def input_stream_containing * x_a
@@ -48,7 +48,7 @@ module Skylab::Parse::TestSupport
     end
 
     def input_stream_via_array s_a
-      Parse_::Input_Streams_::Array.new s_a
+      Home_::Input_Streams_::Array.new s_a
     end
 
     def do_debug
@@ -73,17 +73,17 @@ module Skylab::Parse::TestSupport
     end
   end
 
-  Parse_ = ::Skylab::Parse
+  Home_ = ::Skylab::Parse
 
-  Autoloader_ = Parse_::Autoloader_
-  Callback_ = Parse_::Callback_
-  EMPTY_A_ = Parse_::EMPTY_A_
+  Autoloader_ = Home_::Autoloader_
+  Callback_ = Home_::Callback_
+  EMPTY_A_ = Home_::EMPTY_A_
   IDENTITY_ = -> x { x }
   NIL_ = nil
   UNDERSCORE_ = '_'
 
   module Constants
-    Parse_ = Parse_
+    Home_ = Home_
     TestSupport_ = TestSupport_
   end
 end

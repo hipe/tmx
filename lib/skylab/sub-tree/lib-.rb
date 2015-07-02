@@ -67,7 +67,7 @@ module Skylab::SubTree
     TS___ = sidesys[ :TestSupport ]
 
     INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(
-      self, SubTree_ )  # at the end
+      self, Home_ )  # at the end
 
   end
 end

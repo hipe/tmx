@@ -119,12 +119,12 @@ module Skylab::TanMan
 
               ext = ::File.extname abspath_base
               if ext.length.zero?
-                ext = TanMan_::Models_::DotFile::DEFAULT_EXTENSION
+                ext = Home_::Models_::DotFile::DEFAULT_EXTENSION
               else
                 abspath_base = abspath_base[ 0 .. - ext.length - 1 ]
               end
 
-              TanMan_.lib_.system.filesystem.flock_first_available_path(
+              Home_.lib_.system.filesystem.flock_first_available_path(
 
                 :first_item_does_not_use_number,
                 :beginning_width, 2,

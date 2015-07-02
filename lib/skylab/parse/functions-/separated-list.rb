@@ -47,7 +47,7 @@ module Skylab::Parse
 
         _sym = polymorphic_upstream.gets_one
 
-        _cls = Parse_.function( _sym )
+        _cls = Home_.function( _sym )
 
         o = _cls.new_via_polymorphic_stream_passively polymorphic_upstream
 
@@ -86,7 +86,7 @@ module Skylab::Parse
           end while nil
 
           if a && 1 < a.length
-            Parse_::Output_Node_.new a
+            Home_::Output_Node_.new a
           else
             in_st.current_index = d
             NIL_
@@ -135,7 +135,7 @@ module Skylab::Parse
           end
 
           if a
-            Parse_::Output_Node_.new a
+            Home_::Output_Node_.new a
           else
             in_st.current_index = d
             NIL_

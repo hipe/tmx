@@ -2,7 +2,7 @@ module Skylab::Parse
 
   # ->
 
-    class Functions_::Proc < Parse_::Function_::Field::Proc_Based
+    class Functions_::Proc < Home_::Function_::Field::Proc_Based
 
       # :+#empty-stream-behavior-is-determined-by-user.
 

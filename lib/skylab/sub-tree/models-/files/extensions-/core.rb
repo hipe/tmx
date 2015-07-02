@@ -2,7 +2,7 @@ module Skylab::SubTree
 
   module API
 
-    module SubTree_::Models_::Files
+    module Home_::Models_::Files
 
       class Mutable_Leaf_Item_  # #stowaway
 

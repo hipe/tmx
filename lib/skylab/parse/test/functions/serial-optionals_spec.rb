@@ -11,7 +11,7 @@ describe "[pa] fuctions - serial optionals" do
 
     memoize_subject_parse_function_ do
 
-      Parse_.function( :serial_optionals ).new_with(
+      Home_.function( :serial_optionals ).new_with(
         :functions,
           :keyword,
             'randomize', :minimum_number_of_characters, 3,
@@ -29,7 +29,7 @@ describe "[pa] fuctions - serial optionals" do
 
   it "minimal high level" do
 
-    is_A, is_B = Parse_.parse_serial_optionals [ :B ],
+    is_A, is_B = Home_.parse_serial_optionals [ :B ],
       -> x { :A == x and :foo },
       -> x { :B == x and :bar }
 
@@ -40,7 +40,7 @@ describe "[pa] fuctions - serial optionals" do
 
   context "periphery" do
 
-    Parse_::DSL_DSL.enhance self do
+    Home_::DSL_DSL.enhance self do
 
       atom :_formal_symbol_h
       list :_formal_symbols
@@ -114,7 +114,7 @@ describe "[pa] fuctions - serial optionals" do
 
     h = _formal_symbol_h
 
-    Parse_.parse_serial_optionals args, * (
+    Home_.parse_serial_optionals args, * (
       _formal_symbols.map do | sym |
         h.fetch sym
       end )

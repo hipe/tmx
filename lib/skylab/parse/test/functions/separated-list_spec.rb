@@ -135,7 +135,7 @@ module Skylab::Parse::TestSupport
     end
 
     def self._subject_parse_module
-      Parse_.function :separated_list
+      Home_.function :separated_list
     end
   end
 end

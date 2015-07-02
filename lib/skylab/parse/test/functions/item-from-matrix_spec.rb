@@ -190,7 +190,7 @@ module Skylab::Parse::TestSupport
       end
 
       def _function_class
-        Parse_.function :item_from_matrix
+        Home_.function :item_from_matrix
       end
     end  # >>
   end

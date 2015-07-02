@@ -14,7 +14,7 @@ module Skylab::System
         count = 0
         gets = scn = nil
         advance_scanner = -> do
-          scn = System_.lib_.string_scanner buffer
+          scn = Home_.lib_.string_scanner buffer
           advance_scanner = -> do
             scn.string = buffer ; nil
           end ; nil
@@ -67,12 +67,12 @@ module Skylab::System
 
       attr_reader :fh, :pathname
 
-      LINE_RX__ = System_.lib_.basic::String.regex_for_line_scanning
+      LINE_RX__ = Home_.lib_.basic::String.regex_for_line_scanning
 
       # ~
 
       def to_identifier
-        System_.lib_.basic::Pathname.identifier @pathname
+        Home_.lib_.basic::Pathname.identifier @pathname
       end
 
       EMPTY_P_ = -> {}

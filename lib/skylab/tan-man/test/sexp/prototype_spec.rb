@@ -63,7 +63,7 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
 
         exp = 'faeioup ;  fooooop ;  fuuup'
         o.unparse.should eql exp
-        @result.unparse.split( TanMan_::NEWLINE_ ).last.should eql exp
+        @result.unparse.split( Home_::NEWLINE_ ).last.should eql exp
 
         o.insert_item_before_item_string_ 'faeup', 'fooooop'
         o.unparse.should eql 'faeioup ;  faeup ;  fooooop ;  fuuup'
@@ -72,7 +72,7 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
       it "append an invalid node - raises" do
         -> do
           result.node_list.append_item_via_string_ 'fzzzp'
-        end.should raise_error TanMan_::Sexp_::Auto::Parse_Failure
+        end.should raise_error Home_::Sexp_::Auto::Parse_Failure
       end
     end
   end
@@ -105,7 +105,7 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
       it "append valid strings - separator semantics because prototype" do
 
         o = result.node_list
-        o.nodes.should eql TanMan_::EMPTY_A_
+        o.nodes.should eql Home_::EMPTY_A_
 
         x = o.append_item_via_string_ 'fiiiiip;'
         x.object_id.should eql o.object_id
@@ -119,7 +119,7 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
 
         -> do
           result.node_list.append_item_via_string_ 'fzzzp'
-        end.should raise_error TanMan_::Sexp_::Auto::Parse_Failure
+        end.should raise_error Home_::Sexp_::Auto::Parse_Failure
       end
     end
   end
@@ -133,7 +133,7 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
     ignore_these_events :using_parser_files
 
     def subject
-      TanMan_::Sexp_::Prototype
+      Home_::Sexp_::Prototype
     end
   end
 end

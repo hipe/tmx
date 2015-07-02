@@ -126,7 +126,7 @@ module Skylab::TanMan
         end
 
         def via_starter
-          @template = TanMan_.lib_.string_lib.template.via_path @starter.to_path
+          @template = Home_.lib_.string_lib.template.via_path @starter.to_path
 
           if ! @value_fetcher
             @value_fetcher = Mocking_Fetcher___.new
@@ -161,7 +161,7 @@ module Skylab::TanMan
         end
 
         def via_output_s
-          TanMan_.lib_.string_IO.new @output_s
+          Home_.lib_.string_IO.new @output_s
         end
 
         class Mocking_Fetcher___

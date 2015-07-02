@@ -51,7 +51,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
     end
 
     def subject
-      GitViz_::Test_Lib_::Mock_System
+      Home_::Test_Lib_::Mock_System
     end
   end
 end

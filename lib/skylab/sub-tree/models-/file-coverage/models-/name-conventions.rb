@@ -10,7 +10,7 @@ module Skylab::SubTree
 
         @N = 1
 
-        @test_file_patterns = SubTree_.lib_.basic::Pathname::Patterns[
+        @test_file_patterns = Home_.lib_.basic::Pathname::Patterns[
           test_file_name_pattern_a ]
       end
 

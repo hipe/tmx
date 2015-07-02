@@ -82,7 +82,7 @@ module Skylab::TanMan::TestSupport::Models::Meaning
 
       stmt = graph.node_statements.gets.stmt
       alist = stmt.attr_list.content
-      alist.class.should eql TanMan_::Models_::DotFile::Sexps::AList  # meh
+      alist.class.should eql Home_::Models_::DotFile::Sexps::AList  # meh
       alist.prototype_ = graph.class.parse :a_list, 'a=b, c=d'
       alist.unparse.should eql( 'label=barl' )
       alist.prototype_.unparse.should eql( 'a=b, c=d' )

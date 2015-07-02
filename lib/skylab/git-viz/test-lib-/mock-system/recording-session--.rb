@@ -25,7 +25,7 @@ module Skylab::GitViz
 
           block_given? and raise ::ArgumentError
 
-          _i, o, e, t = GitViz_.lib_.open3.popen3( * args )
+          _i, o, e, t = Home_.lib_.open3.popen3( * args )
 
           co = Mock_System_::Models_::Command.new
 

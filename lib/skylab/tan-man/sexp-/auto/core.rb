@@ -11,7 +11,7 @@ module Skylab::TanMan
       attr_accessor :do_debug
 
       def debug_stream
-        TanMan_.lib_.some_stderr
+        Home_.lib_.some_stderr
       end
     end
 
@@ -44,7 +44,7 @@ module Skylab::TanMan
       im = [
         :Sexp,
         :InstanceMethods,
-        TanMan_.lib_.constantize( tree_cls.rule ) ].
+        Home_.lib_.constantize( tree_cls.rule ) ].
       reduce(
         tree_cls.grammar.anchor_module ) do | mod_, i |
 
@@ -580,7 +580,7 @@ module Skylab::TanMan
   private
 
     def bld_anchor_mod
-      TanMan_.lib_.module_lib.value_via_parts_and_relative_path prts, '../..'
+      Home_.lib_.module_lib.value_via_parts_and_relative_path prts, '../..'
     end
 
     def prts

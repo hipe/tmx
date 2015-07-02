@@ -52,7 +52,7 @@ module Skylab::GitViz
 
             __init_category_list
 
-            _B_tree = GitViz_.lib_.basic::Tree::Binary.
+            _B_tree = Home_.lib_.basic::Tree::Binary.
               via_sorted_range_list @category_list
 
             Baked___.new( _B_tree, @glyphs, @create_glyph )

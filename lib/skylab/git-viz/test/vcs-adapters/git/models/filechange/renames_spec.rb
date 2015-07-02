@@ -45,7 +45,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
       h = {}
 
-      GitViz_.repository.new_via_pathname(
+      Home_.repository.new_via_pathname(
         mock_pathname( '/the/repo' ), mock_system_conduit ).
 
       fetch_commit_via_identifier( 'head' ).filechanges.each do | fc |

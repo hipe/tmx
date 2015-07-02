@@ -25,7 +25,7 @@ module Skylab::Parse
   # if you define an `atom` field called 'wiz':
   #
   #     class Foo
-  #       Parse_::DSL_DSL.enhance self do
+  #       Home_::DSL_DSL.enhance self do
   #         atom :wiz                     # make an atomic (basic) field
   #       end                             # called `wiz`
   #
@@ -166,7 +166,7 @@ module Skylab::Parse
     # a `block` field called 'zinger' gives you an eponymous proc writer:
     #
     #     class Fob
-    #       Parse_::DSL_DSL.enhance self do
+    #       Home_::DSL_DSL.enhance self do
     #         block :zinger
     #       end
     #     end
@@ -189,7 +189,7 @@ module Skylab::Parse
     # if you define an `atom_accessor` field 'with_name'
     #
     #     class Foc
-    #       Parse_::DSL_DSL.enhance self do
+    #       Home_::DSL_DSL.enhance self do
     #         atom_accessor :with_name
     #       end
     #     end
@@ -209,7 +209,7 @@ module Skylab::Parse
   # if you must, use a module and not a class to encapsulate reusability:
   #
   #     module Fod
-  #       Parse_::DSL_DSL.enhance_module self do
+  #       Home_::DSL_DSL.enhance_module self do
   #         atom :pik
   #       end
   #     end

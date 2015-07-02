@@ -13,7 +13,7 @@ module Skylab::TanMan::TestSupport::Models::Association
   module InstanceMethods
 
     def collection_class
-      TanMan_::Models::Association::Collection
+      Home_::Models::Association::Collection
     end
 
     def module_with_subject_fixtures_node

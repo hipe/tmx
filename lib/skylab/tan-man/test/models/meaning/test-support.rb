@@ -10,6 +10,6 @@ module Skylab::TanMan::TestSupport::Models::Meaning
 
   extend TestSupport_::Quickie
 
-  # TanMan_::Models::Meaning.const_get :Graph, false # jerks
+  # Home_::Models::Meaning.const_get :Graph, false # jerks
 
 end

@@ -15,7 +15,7 @@ module Skylab::SubTree
 
         instance_exec( & edit_p )
 
-        @glyph_set ||= SubTree_.lib_.CLI_lib.tree.glyph_sets_module::WIDE
+        @glyph_set ||= Home_.lib_.CLI_lib.tree.glyph_sets_module::WIDE
         @sep ||= SEP_
       end
 
@@ -223,7 +223,7 @@ module Skylab::SubTree
 
   private
 
-    SubTree_.lib_.CLI_lib.tree.glyphs.each_const_value do |glyph|
+    Home_.lib_.CLI_lib.tree.glyphs.each_const_value do |glyph|
       m = glyph.normalized_glyph_name
       define_method m do
         @glyph_set[ m ]

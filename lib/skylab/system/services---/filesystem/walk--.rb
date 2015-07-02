@@ -39,7 +39,7 @@ module Skylab::System
 
           instance_exec( & edit_p )
 
-          @filesystem ||= System_.services.filesystem
+          @filesystem ||= Home_.services.filesystem
         end
 
       private
@@ -170,7 +170,7 @@ module Skylab::System
 
         def __found found_path, surrounding_path
 
-          _ok = System_.services.filesystem.normalization.upstream_IO(
+          _ok = Home_.services.filesystem.normalization.upstream_IO(
               :only_apply_expectation_that_path_is_ftype_of, ( @ftype || FILE_FTYPE ),
               :path, found_path, & @on_event_selectively )
 

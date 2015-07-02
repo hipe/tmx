@@ -12,7 +12,7 @@ module Skylab::Parse::TestSupport
 
       before :all do
         class Foo
-          Parse_::DSL_DSL.enhance self do
+          Home_::DSL_DSL.enhance self do
             atom :wiz                     # make an atomic (basic) field
           end                             # called `wiz`
 
@@ -44,7 +44,7 @@ module Skylab::Parse::TestSupport
 
       before :all do
         class Fob
-          Parse_::DSL_DSL.enhance self do
+          Home_::DSL_DSL.enhance self do
             block :zinger
           end
         end
@@ -68,7 +68,7 @@ module Skylab::Parse::TestSupport
 
       before :all do
         class Foc
-          Parse_::DSL_DSL.enhance self do
+          Home_::DSL_DSL.enhance self do
             atom_accessor :with_name
           end
         end
@@ -85,7 +85,7 @@ module Skylab::Parse::TestSupport
 
       before :all do
         module Fod
-          Parse_::DSL_DSL.enhance_module self do
+          Home_::DSL_DSL.enhance_module self do
             atom :pik
           end
         end

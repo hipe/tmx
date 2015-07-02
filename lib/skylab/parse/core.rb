@@ -8,11 +8,11 @@ module Skylab::Parse  # see [#001]
     class << self
 
       def alternation
-        Parse_::Alternation__
+        Home_::Alternation__
       end
 
       def function sym
-        Parse_::Functions_.const_get(
+        Home_::Functions_.const_get(
           Callback_::Name.via_variegated_symbol( sym ).as_const,
           false )
       end
@@ -25,11 +25,11 @@ module Skylab::Parse  # see [#001]
       end
 
       def fuzzy_matcher * a
-        Parse_::Functions_::Keyword.new_via_arglist( a ).to_matcher
+        Home_::Functions_::Keyword.new_via_arglist( a ).to_matcher
       end
 
       def input_stream
-        Parse_::Input_Stream_
+        Home_::Input_Stream_
       end
 
       def lib_
@@ -38,15 +38,15 @@ module Skylab::Parse  # see [#001]
       end
 
       def output_node
-        Parse_::Output_Node_
+        Home_::Output_Node_
       end
 
       def parse_serial_optionals * a
-        Parse_::Functions_::Serial_Optionals.parse_via_highlevel_arglist a
+        Home_::Functions_::Serial_Optionals.parse_via_highlevel_arglist a
       end
 
       def via_set
-        Parse_::Via_Set__
+        Home_::Via_Set__
       end
     end  # >>
 
@@ -97,7 +97,7 @@ module Skylab::Parse  # see [#001]
     EMPTY_A_ = [].freeze
     KEEP_PARSING_ = true
     NIL_ = nil
-    Parse_ = self
+    Home_ = self
     UNABLE_ = false
 
   # <-

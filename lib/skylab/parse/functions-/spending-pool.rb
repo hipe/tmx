@@ -136,7 +136,7 @@ module Skylab::Parse
     #     on.value_x  # => [ [ :foo ], nil, [ 1, 2 ] ]
 
 
-    class Functions_::Spending_Pool < Parse_::Function_::Currying
+    class Functions_::Spending_Pool < Home_::Function_::Currying
 
       def accept_function_ f
         maybe_send_sibling_sandbox_to_function_ f
@@ -212,7 +212,7 @@ module Skylab::Parse
 
         if did_parse_any
 
-          Parse_::Output_Node_.new_with res_a, :did_spend_function, did_spend_all
+          Home_::Output_Node_.new_with res_a, :did_spend_function, did_spend_all
 
         end
       end

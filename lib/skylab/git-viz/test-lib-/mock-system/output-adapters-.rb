@@ -143,7 +143,7 @@ module Skylab::GitViz
 
         def __write_multiline_escaped_string is_addtnl, string, margin
 
-          st = GitViz_.lib_.basic::String.line_stream string
+          st = Home_.lib_.basic::String.line_stream string
 
           s = st.gets
           if s

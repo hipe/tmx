@@ -7,7 +7,7 @@ module Skylab::System::TestSupport
         tcm.extend ModuleMethods
 
         tcm.send :define_method, :__parent_subject, ( Callback_.memoize do
-          System_.services.filesystem.path_tools
+          Home_.services.filesystem.path_tools
         end )
       end
     end  # >>
@@ -44,7 +44,7 @@ module Skylab::System::TestSupport
         _home_p = -> { home_x }
         _pwd_p = -> { pwd_x }
 
-        System_::Services___::Filesystem::Path_Tools__::Clear__[ _home_p, _pwd_p ]
+        Home_::Services___::Filesystem::Path_Tools__::Clear__[ _home_p, _pwd_p ]
 
         setup_frame_p = empty_p
       end

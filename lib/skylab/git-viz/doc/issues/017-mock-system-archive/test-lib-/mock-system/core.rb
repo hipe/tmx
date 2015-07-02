@@ -443,7 +443,7 @@ module Skylab::GitViz
       end
       class Unexpected_Term_Parse_Error < Entry_Parse_Error
         def initialize s, a, path, line_no
-          _s = GitViz_.lib_.oxford_or a
+          _s = Home_.lib_.oxford_or a
           super "unexpected term. did you mean #{ _s }?",
             path, "#{ ELLIPSIS__ }#{ s }", line_no, COLUMN__
         end
@@ -576,9 +576,9 @@ module Skylab::GitViz
           end
         end
         def prs_opt_s
-          h = GitViz_.lib_.JSON.parse @any_opt_s, symbolize_names: true
+          h = Home_.lib_.JSON.parse @any_opt_s, symbolize_names: true
           @any_opt_h = h.freeze ; CONTINUE_
-        rescue GitViz_.lib_.JSON::ParserError => e
+        rescue Home_.lib_.JSON::ParserError => e
           respond_with_general_parse_error e.message
         end
         def respond_with_general_parse_error msg_s
@@ -740,7 +740,7 @@ module Skylab::GitViz
           if @scn
             @scn.string = s
           else
-            @scn = GitViz_.lib_.string_scanner.new s
+            @scn = Home_.lib_.string_scanner.new s
           end ; nil
         end
       end
@@ -802,13 +802,13 @@ module Skylab::GitViz
       class Incoming_Command_
         def initialize env_h, cmd_s_a, opt_h
           env_h and raise ::NotImplementedError, "env too? #{ env_h }"
-          @normalized_cmd_s = GitViz_.lib_.shellwords.shelljoin cmd_s_a
+          @normalized_cmd_s = Home_.lib_.shellwords.shelljoin cmd_s_a
           opt_h and init_opt_h opt_h ; nil
         end
         attr_reader :normalized_cmd_s, :any_opt_s
       private
         def init_opt_h opt_h
-          @any_opt_s = GitViz_.lib_.JSON.generate opt_h ; nil
+          @any_opt_s = Home_.lib_.JSON.generate opt_h ; nil
         end
       end
 

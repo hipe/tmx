@@ -61,7 +61,7 @@ module Skylab::Parse::TestSupport
     end
 
     def self.subject_parse_module_
-      Parse_.function :alternation
+      Home_.function :alternation
     end
 
     def subject_parse_module_

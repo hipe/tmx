@@ -56,7 +56,7 @@ module Skylab::TanMan
 
         def __path_is_absolute
 
-          ok_arg = TanMan_.lib_.basic::Pathname.
+          ok_arg = Home_.lib_.basic::Pathname.
             normalization.new_with( :absolute ).normalize_argument(
               @arg, & @on_event_selectively )
 
@@ -120,7 +120,7 @@ module Skylab::TanMan
 
         def __add_extension_to_path
 
-          @ext = TanMan_::Models_::DotFile::DEFAULT_EXTENSION
+          @ext = Home_::Models_::DotFile::DEFAULT_EXTENSION
 
           maybe_send_event :info, :adding_extension do
             __build_adding_extension_event
@@ -166,7 +166,7 @@ module Skylab::TanMan
         end
 
         def _fs
-          @fs ||= TanMan_.lib_.system.filesystem
+          @fs ||= Home_.lib_.system.filesystem
         end
 
         include Callback_::Event::Selective_Builder_Receiver_Sender_Methods

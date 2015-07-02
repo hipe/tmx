@@ -8,11 +8,11 @@ module Skylab::TanMan
   class << self
 
     define_method :application_kernel_, ( Callback_.memoize do
-      Brazen_::Kernel.new TanMan_
+      Brazen_::Kernel.new Home_
     end )
 
     def lib_
-      @lib ||= TanMan_::Lib_::INSTANCE
+      @lib ||= Home_::Lib_::INSTANCE
     end
 
     def name_function
@@ -41,7 +41,7 @@ module Skylab::TanMan
   NEWLINE_ = "\n".freeze
   NIL_ = nil
   SPACE_ = ' '.freeze
-  TanMan_ = self
+  Home_ = self
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
 

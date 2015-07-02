@@ -16,7 +16,7 @@ module Skylab::SubTree
 
       @is_promoted = true
 
-      SubTree_.lib_.brazen::Model.common_entity self,
+      Home_.lib_.brazen::Model.common_entity self,
 
         :argument_arity, :one_or_more,
 
@@ -30,7 +30,7 @@ module Skylab::SubTree
         end ),
 
         :default_proc, -> do
-          SubTree_.lib_.test_file_suffix_a
+          Home_.lib_.test_file_suffix_a
         end,
 
         :property, :test_file_suffix,
@@ -46,7 +46,7 @@ module Skylab::SubTree
         :ad_hoc_normalizer, -> arg, & oes_p do
 
           if arg.is_known && arg.value_x
-            SubTree_.lib_.basic::Pathname.normalization.new_with( :absolute ).
+            Home_.lib_.basic::Pathname.normalization.new_with( :absolute ).
               normalize_argument( arg, & oes_p )
           else
             arg
@@ -108,7 +108,7 @@ module Skylab::SubTree
 
       def __via_path_classification_resolve_the_tree
 
-        _filesystem = SubTree_.lib_.system.filesystem
+        _filesystem = Home_.lib_.system.filesystem
 
         tree = File_Coverage_::Actors_::Build_compound_tree[
 
@@ -149,7 +149,7 @@ module Skylab::SubTree
 
     File_Coverage_ = self
 
-    FILENAMES___ = SubTree_::Lib_::Test_dir_name_a[]
+    FILENAMES___ = Home_::Lib_::Test_dir_name_a[]
 
     Autoloader_[ Models_ = ::Module.new ]
 

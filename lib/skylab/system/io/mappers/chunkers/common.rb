@@ -11,9 +11,9 @@ module Skylab::System
           # map reduce/expand upstream chunks of data into downstream lines
 
           def initialize p
-            @buffer = System_.lib_.string_IO.new
+            @buffer = Home_.lib_.string_IO.new
             @p = p
-            @scn = System_.lib_.string_scanner EMPTY_S_
+            @scn = Home_.lib_.string_scanner EMPTY_S_
             @separator = NEWLINE_
             @separator_rx = /#{ ::Regexp.escape @separator }/
           end

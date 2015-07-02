@@ -31,7 +31,7 @@ module Skylab::System::TestSupport
     end
 
     def __class
-      System_::IO::Mappers::Chunkers::Common
+      Home_::IO::Mappers::Chunkers::Common
     end
 
     def _expect act, *exp

@@ -45,11 +45,11 @@ module Skylab::System::TestSupport
 
       _np_like = _x.express_under :EN
 
-      _expag = System_.lib_.brazen::API.expression_agent_instance
+      _expag = Home_.lib_.brazen::API.expression_agent_instance
 
       _s_a = _np_like.express_words_into_under [], _expag
 
-      _s = System_.lib_.human::NLP::EN.sentence_string_head_via_words _s_a
+      _s = Home_.lib_.human::NLP::EN.sentence_string_head_via_words _s_a
 
       _s.should eql 'whose name matched "*.code" in «x» and «y»'
     end
@@ -70,7 +70,7 @@ module Skylab::System::TestSupport
     end
 
     def _subject_module
-      System_::Services___::Filesystem
+      Home_::Services___::Filesystem
     end
 
     def _parent_subject

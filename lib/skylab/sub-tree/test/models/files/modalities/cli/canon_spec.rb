@@ -36,7 +36,7 @@ module Skylab::SubTree::TestSupport::Models_Files::The_CLI_Modality
       # but in this case we place this test later so that we cover that the
       # expag is autoloaded by the app and not by us. :(
 
-      _expag = SubTree_::Models_::Files::Modalities::CLI::EXPRESSION_AGENT
+      _expag = Home_::Models_::Files::Modalities::CLI::EXPRESSION_AGENT
 
       _s = _expag.calculate do
 

@@ -8,7 +8,7 @@ module Skylab::SubTree
 
       Actions = ::Module.new  # THE_EMPTY_MODULE_
 
-      EXPRESSION_AGENT = class Expression_Agent___ < SubTree_::CLI::Expression_Agent
+      EXPRESSION_AGENT = class Expression_Agent___ < Home_::CLI::Expression_Agent
 
         # see [#br-093]:#case-study-st-2 ("when to subclass expression agents")
 
@@ -18,7 +18,7 @@ module Skylab::SubTree
 
         # ~ supplemental EN NLP
 
-        SubTree_.lib_.EN_add_methods self, :private, %i( and_ both )
+        Home_.lib_.EN_add_methods self, :private, %i( and_ both )
 
         self
       end.new nil  # [#br-093]:#point-10 is relevant here (expag state)
@@ -70,7 +70,7 @@ module Skylab::SubTree
 
         def __render_table_via_row_string_array row_s_a
 
-          _ = SubTree_.lib_.brazen::CLI::Expression_Frames::Table::Actor
+          _ = Home_.lib_.brazen::CLI::Expression_Frames::Table::Actor
 
           _x = _[
 

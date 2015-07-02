@@ -44,7 +44,7 @@ module Skylab::GitViz::TestSupport::Models
     end
 
     def _subject
-      GitViz_::Models_::Hist_Tree::Modalities::CLI::Models_::Sparse_Matrix_of_Content
+      Home_::Models_::Hist_Tree::Modalities::CLI::Models_::Sparse_Matrix_of_Content
     end
 
     def manifest_path_for_mock_FS

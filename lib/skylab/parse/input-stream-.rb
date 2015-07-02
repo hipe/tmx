@@ -7,7 +7,7 @@ module Skylab::Parse
       class << self
 
         def via_array x
-          Parse_::Input_Streams_::Array.new x
+          Home_::Input_Streams_::Array.new x
         end
       end  # >>
 

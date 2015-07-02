@@ -2,7 +2,7 @@ module Skylab::Parse
 
   # ->
 
-    class Functions_::Keyword < Parse_::Function_::Field
+    class Functions_::Keyword < Home_::Function_::Field
 
       class << self
 
@@ -50,7 +50,7 @@ module Skylab::Parse
         -> input_token_s do
 
           on = p.output_node_via_input_stream(
-            Parse_::Input_Streams_::Single_Token.new input_token_s )
+            Home_::Input_Streams_::Single_Token.new input_token_s )
 
           if on
             on.value_x  # sanity
@@ -110,7 +110,7 @@ module Skylab::Parse
                             tok_s[ @hotstring_length .. -1 ] )
 
                 in_st.advance_one
-                Parse_::Output_Node_.new @moniker_symbol
+                Home_::Output_Node_.new @moniker_symbol
 
               end
             end
@@ -134,7 +134,7 @@ module Skylab::Parse
           :keyword == f.function_category_symbol
         end.to_a
 
-        Parse_.lib_.basic::String.
+        Home_.lib_.basic::String.
           shortest_unique_or_first_headstrings(
             f_a.map( & :formal_string )
           ).each_with_index do | s, d |

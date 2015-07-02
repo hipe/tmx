@@ -8,11 +8,11 @@ module Skylab::SubTree::TestSupport
 
     it "works" do
 
-      io = SubTree_::Library_::StringIO.new
+      io = Home_::Library_::StringIO.new
 
       _tree = __build_tree
 
-      SubTree_::Output_Adapters_::Continuous.with(
+      Home_::Output_Adapters_::Continuous.with(
 
         :upstream_tree, _tree,
         :output_line_downstream_yielder, io,

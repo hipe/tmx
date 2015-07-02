@@ -2,9 +2,9 @@ require_relative 'core'
 
 module Skylab::SubTree
 
-  class CLI < SubTree_.lib_.brazen::CLI
+  class CLI < Home_.lib_.brazen::CLI
 
-    Brazen_ = SubTree_.lib_.brazen
+    Brazen_ = Home_.lib_.brazen
 
     # ~ begin #hook-out for [tmx] integration
 
@@ -15,7 +15,7 @@ module Skylab::SubTree
           module Of
             Hot = -> x, x_ do
 
-              Brazen_::CLI::Client.fml SubTree_, x, x_
+              Brazen_::CLI::Client.fml Home_, x, x_
             end
           end
         end
@@ -75,7 +75,7 @@ module Skylab::SubTree
 
       # ~
 
-      lib = SubTree_.lib_
+      lib = Home_.lib_
 
       styling = lib.brazen::CLI::Styling
 

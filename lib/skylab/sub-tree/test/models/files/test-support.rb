@@ -11,7 +11,7 @@ module Skylab::SubTree::TestSupport::Models_Files
   module InstanceMethods
 
     def build_string_IO
-      SubTree_::Library_::StringIO.new
+      Home_::Library_::StringIO.new
     end
 
     def fixture_file sym
@@ -26,8 +26,8 @@ module Skylab::SubTree::TestSupport::Models_Files
 
       # don't autoload yourself just to get the expag - ..
 
-      if SubTree_.const_defined? :API
-        SubTree_::Models_::Files::Modalities::CLI::EXPRESSION_AGENT
+      if Home_.const_defined? :API
+        Home_::Models_::Files::Modalities::CLI::EXPRESSION_AGENT
       else
         fail
       end
@@ -76,7 +76,7 @@ module Skylab::SubTree::TestSupport::Models_Files
   DASH_ = DASH_
   EMPTY_A_ = EMPTY_A_
   EMPTY_S_ = EMPTY_S_
-  SubTree_ = SubTree_
+  Home_ = Home_
   UNDERSCORE_ = UNDERSCORE_
 
 end

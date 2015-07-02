@@ -20,7 +20,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
       io = new_string_IO_
       co.write_to io
 
-      st = GitViz_.lib_.basic::String.line_stream io.string
+      st = Home_.lib_.basic::String.line_stream io.string
 
       st.gets.should eql "command\n"
       st.gets.should eql "  argv\n"
@@ -48,7 +48,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
     end
 
     def subject
-      GitViz_::Test_Lib_::Mock_System
+      Home_::Test_Lib_::Mock_System
     end
   end
 end

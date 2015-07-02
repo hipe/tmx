@@ -14,7 +14,7 @@ module Skylab::SubTree
 
       Actions = ::Module.new  # THE_EMPTY_MODULE_
 
-      class Actions::File_Coverage < SubTree_::CLI::Action_Adapter
+      class Actions::File_Coverage < Home_::CLI::Action_Adapter
 
         def resolve_properties  # #nascent-operation :+[#br-042]
 

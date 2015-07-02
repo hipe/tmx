@@ -2,12 +2,12 @@ module Skylab::SubTree
 
   module API
 
-    module SubTree_::Models_::Files
+    module Home_::Models_::Files
 
       class Extensions_::Mtime
 
         def initialize trio, & _
-          @now_t = SubTree_::Library_::Time.new  # doesn't get cleared anywhere
+          @now_t = Home_::Library_::Time.new  # doesn't get cleared anywhere
           @trio = trio
         end
 
@@ -25,7 +25,7 @@ module Skylab::SubTree
             # (consider memoizing stat in leaf if ever optimal)
 
           seconds_old = @now_t - stat.mtime
-          unit_i, amt_f = SubTree_.lib_.summarize_time seconds_old
+          unit_i, amt_f = Home_.lib_.summarize_time seconds_old
           leaf.add_subcel "#{ amt_f.round } #{ ABBR_H_[ unit_i ] }"
 
           ACHIEVED_

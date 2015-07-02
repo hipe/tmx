@@ -303,7 +303,7 @@ module Skylab::GitViz::TestSupport::Models
 
     memoize_ :__glyph_mapper do
 
-      GitViz_::Models_::Hist_Tree::Modalities::CLI::Sessions_::
+      Home_::Models_::Hist_Tree::Modalities::CLI::Sessions_::
         Glyph_Mapper.start nil, 'c', 'b', 'a'
 
     end
@@ -314,7 +314,7 @@ module Skylab::GitViz::TestSupport::Models
     end
 
     def at_times * s_a
-      _DT = GitViz_.lib_.date_time
+      _DT = Home_.lib_.date_time
       @datetimes = s_a.map do | s |
         _DT.parse s
       end
@@ -345,12 +345,12 @@ module Skylab::GitViz::TestSupport::Models
     end
 
     def __subject
-      GitViz_::Models_::Hist_Tree::Modalities::CLI::Actors_::Scale_time
+      Home_::Models_::Hist_Tree::Modalities::CLI::Actors_::Scale_time
     end
 
     def _expect_headers * s_a
 
-      st = GitViz_.lib_.basic::String.line_stream @io.string
+      st = Home_.lib_.basic::String.line_stream @io.string
       s_a_ = ::Array.new 4
       4.times do | d |
         s_a_[ d ] = st.gets

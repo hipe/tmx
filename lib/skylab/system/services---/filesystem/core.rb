@@ -85,7 +85,7 @@ module Skylab::System
           end.mv src, dst, * h
         else
 
-          System_.lib_.file_utils.mv src, dst, * h
+          Home_.lib_.file_utils.mv src, dst, * h
         end
       end
 
@@ -132,11 +132,11 @@ module Skylab::System
       end
 
       def line_stream_via_path path, num_bytes=nil
-        System_::IO.line_stream ::File.open( path, ::File::RDONLY ), num_bytes
+        Home_::IO.line_stream ::File.open( path, ::File::RDONLY ), num_bytes
       end
 
       def line_stream_via_pathname pn, num_bytes=nil
-        System_::IO.line_stream pn.open( ::File::RDONLY ), num_bytes
+        Home_::IO.line_stream pn.open( ::File::RDONLY ), num_bytes
       end
 
       def members
@@ -169,7 +169,7 @@ module Skylab::System
       end
 
       def tmpdir_pathname
-        @tmpdir_pathname ||= ::Pathname.new System_.lib_.tmpdir
+        @tmpdir_pathname ||= ::Pathname.new Home_.lib_.tmpdir
       end
 
       def tmpfile_sessioner

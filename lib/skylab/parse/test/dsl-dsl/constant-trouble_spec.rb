@@ -24,7 +24,7 @@ module Skylab::Parse::TestSupport
                         # enhance you with.
           end
 
-          DSL = Parse_::DSL_DSL::Constant_Trouble.
+          DSL = Home_::DSL_DSL::Constant_Trouble.
             new :Blammo_, Blammo, [ :hip_hop, :horay ]
 
                         # you will get one called this that descends from
@@ -94,7 +94,7 @@ module Skylab::Parse::TestSupport
       m = -> do
         module M2
           class Bongo
-            Enhancer_ = Parse_::DSL_DSL::Constant_Trouble.
+            Enhancer_ = Home_::DSL_DSL::Constant_Trouble.
               new :Bongo_, self, [ :wiptastik, :plastik ]
           end
           class Yours

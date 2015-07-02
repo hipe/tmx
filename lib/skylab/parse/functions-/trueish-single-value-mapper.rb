@@ -2,7 +2,7 @@ module Skylab::Parse
 
   # ->
 
-    class Functions_::Trueish_Single_Value_Mapper < Parse_::Function_::Field::Proc_Based
+    class Functions_::Trueish_Single_Value_Mapper < Home_::Function_::Field::Proc_Based
 
       # the user function receives the front token *value* of the input
       # stream. a true-ish result signifies both that this is a "match"
@@ -18,7 +18,7 @@ module Skylab::Parse
         x = @p[ in_st.current_token_object.value_x ]
         if x
           in_st.advance_one
-          Parse_::Output_Node_.new x
+          Home_::Output_Node_.new x
         end
       end
     end

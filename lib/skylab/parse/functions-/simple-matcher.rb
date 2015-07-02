@@ -2,7 +2,7 @@ module Skylab::Parse
 
   # ->
 
-    class Functions_::Simple_Matcher < Parse_::Function_::Field::Proc_Based
+    class Functions_::Simple_Matcher < Home_::Function_::Field::Proc_Based
 
       # the user function receives the front token *value* of the input
       # stream. the true-ish-ness of this callback's result signifies

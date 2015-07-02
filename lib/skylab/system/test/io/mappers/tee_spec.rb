@@ -7,7 +7,7 @@ module Skylab::System::TestSupport
     context "with 2 downstreams" do
 
       it "dispatches the message out to both" do
-        tee = System_::IO::Mappers::Tee.new
+        tee = Home_::IO::Mappers::Tee.new
         tee[:foo] = ::StringIO.new
         tee[:bar] = ::StringIO.new
         tee.write('a')
@@ -20,19 +20,19 @@ module Skylab::System::TestSupport
 
     context "with 0 downstreams" do
       it "does nothing" do
-        tee = System_::IO::Mappers::Tee.new
+        tee = Home_::IO::Mappers::Tee.new
         tee.write('a')
       end
     end
 
     it "responds to respond_to? appropriately (based on the list)" do
-      tee = System_::IO::Mappers::Tee.new
+      tee = Home_::IO::Mappers::Tee.new
       tee.respond_to?( :foo ).should eql false
       tee.respond_to?( :puts ).should eql true
     end
 
     before :all do
-      System_.lib_.string_IO
+      Home_.lib_.string_IO
     end
   end
 end

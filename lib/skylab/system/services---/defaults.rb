@@ -8,7 +8,7 @@ module Skylab::System
         @__sytem_services = svx
       end
 
-      System_.lib_.properties_stack_frame self,
+      Home_.lib_.properties_stack_frame self,
 
         :memoized, :inline_method, :bin_path, -> do
           bin_pathname.to_path

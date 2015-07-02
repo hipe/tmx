@@ -23,7 +23,7 @@ module Skylab::System::TestSupport
 
       _subject  # sic
 
-      _fn = System_::Services___::Defaults::CACHE_FILE__
+      _fn = Home_::Services___::Defaults::CACHE_FILE__
 
       _subject.cache_pathname.join( "FOO" ).to_path.
         should be_include( "#{ _fn }/FOO" )

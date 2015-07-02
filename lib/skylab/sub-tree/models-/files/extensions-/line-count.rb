@@ -2,7 +2,7 @@ module Skylab::SubTree
 
   module API
 
-    module SubTree_::Models_::Files
+    module Home_::Models_::Files
 
       class Extensions_::Line_Count
 
@@ -62,7 +62,7 @@ module Skylab::SubTree
               :s_a, s_a do | y, o |
 
             _s_a = o.s_a.map( &
-              SubTree_::Library_::Shellwords.method( :shellescape ) )
+              Home_::Library_::Shellwords.method( :shellescape ) )
 
             y << "wordcount command: #{ _s_a * SPACE_ }"
           end
@@ -70,7 +70,7 @@ module Skylab::SubTree
 
         def __execute_command
 
-          _, o, e, t = SubTree_::Library_::Open3.popen3( * @cmd_s_a )
+          _, o, e, t = Home_::Library_::Open3.popen3( * @cmd_s_a )
 
           s = e.read
           if s && s.length.nonzero?

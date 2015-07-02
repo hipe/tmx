@@ -2,7 +2,7 @@ module Skylab::GitViz
 
   Models_ = ::Module.new  # ~ :+#stowaway (IFF all models in this file)
 
-  Action_ = GitViz_.lib_.brazen::Model.common_action_class
+  Action_ = Home_.lib_.brazen::Model.common_action_class
 
   # ->
 
@@ -48,7 +48,7 @@ module Skylab::GitViz
 
       @is_promoted = true
 
-      GitViz_.lib_.brazen::Model.common_entity self,
+      Home_.lib_.brazen::Model.common_entity self,
 
         :required, :property, :VCS_adapter_name,
 
@@ -79,7 +79,7 @@ module Skylab::GitViz
 
       def __resolve_VCS_adapter
 
-        _VCS_mod = GitViz_::VCS_Adapters_.const_get(
+        _VCS_mod = Home_::VCS_Adapters_.const_get(
           Callback_::Name.via_slug(
             @argument_box.fetch( :VCS_adapter_name ).to_s
           ).as_const, false )

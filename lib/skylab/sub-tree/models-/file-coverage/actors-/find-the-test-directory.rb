@@ -65,7 +65,7 @@ module Skylab::SubTree
 
       def __when_not_found num_dirs_looked
         @on_event_selectively.call :error, :resource_not_found do
-          SubTree_.lib_.system.filesystem.walk.build_resource_not_found_event(
+          Home_.lib_.system.filesystem.walk.build_resource_not_found_event(
             @start_path,
             @filenames,
             num_dirs_looked )
@@ -76,7 +76,7 @@ module Skylab::SubTree
 
         @find_was_OK = true
 
-        _fs = SubTree_.lib_.system.filesystem
+        _fs = Home_.lib_.system.filesystem
 
         @find = _fs.find.new_with(
           :filenames, @filenames,  # "always safe"

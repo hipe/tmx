@@ -6,12 +6,12 @@ module Skylab::GitViz::TestSupport::Test_Lib::Mock_System
 
   include Constants
 
-  GitViz_ = GitViz_
+  Home_ = Home_
 
   extend TestSupport_::Quickie
 
-  GitViz_::Autoloader_[ self, :boxxy ]  # find bundles sibling to this node
+  Home_::Autoloader_[ self, :boxxy ]  # find bundles sibling to this node
 
-  GitViz_::Autoloader_[ Fixtures = ::Module.new ]
+  Home_::Autoloader_[ Fixtures = ::Module.new ]
 
 end

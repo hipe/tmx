@@ -7,7 +7,7 @@ module Skylab::TanMan::TestSupport
     # the smaller ad-hoc grammars we have in testing.
 
     def initialize oes_p
-      @bx = TanMan_::Callback_::Box.new
+      @bx = Home_::Callback_::Box.new
       @on_event_selectively = oes_p
       yield self
     end
@@ -32,12 +32,12 @@ module Skylab::TanMan::TestSupport
     # ~ work phase
 
     def parse_file path
-      @bx.set :buid, TanMan_::Brazen_.byte_upstream_identifier.via_path( path )
+      @bx.set :buid, Home_::Brazen_.byte_upstream_identifier.via_path( path )
       _work
     end
 
     def parse_string s
-      @bx.set :buid, TanMan_::Brazen_.byte_upstream_identifier.via_string( s )
+      @bx.set :buid, Home_::Brazen_.byte_upstream_identifier.via_string( s )
       _work
     end
 
@@ -45,7 +45,7 @@ module Skylab::TanMan::TestSupport
       Produce_parse_tree_custom___.new( @bx, & @on_event_selectively ).execute
     end
 
-    class Produce_parse_tree_custom___ < TanMan_::Models_::DotFile::Sessions__::Produce_Parse_Tree
+    class Produce_parse_tree_custom___ < Home_::Models_::DotFile::Sessions__::Produce_Parse_Tree
 
       def initialize bx, & oes_p
         @_h = bx.h_
@@ -56,7 +56,7 @@ module Skylab::TanMan::TestSupport
 
       def produce_parser_class_  # override the parent's version of this :#hook-out for [ttt]
 
-        TanMan_::Input_Adapters_::Treetop::Load.new( :_xxx_,
+        Home_::Input_Adapters_::Treetop::Load.new( :_xxx_,
           -> o do
             o.generated_grammar_dir @_h.fetch :generated_grammar_dir_path
             o.root_for_relative_paths @_h.fetch :root_for_relative_paths_for_load

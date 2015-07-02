@@ -35,7 +35,7 @@ module Skylab::Parse
 
       def current_token_object
         if ! @token_cache_a[ @d ]  # sure, let it be sparse, why not
-          @token_cache_a[ @d ] = Parse_::Input_Stream_::Token.new @x_a.fetch @d
+          @token_cache_a[ @d ] = Home_::Input_Stream_::Token.new @x_a.fetch @d
         end
         @token_cache_a.fetch @d
       end

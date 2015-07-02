@@ -2,7 +2,7 @@ module Skylab::Parse
 
   # ->
 
-    Functions_::Zero_Or_One = Parse_::Function_::Contiguous_Function_Success_Range.new 0, 1 do
+    Functions_::Zero_Or_One = Home_::Function_::Contiguous_Function_Success_Range.new 0, 1 do
 
       # ~ #hook-ins for adjunct facets
 

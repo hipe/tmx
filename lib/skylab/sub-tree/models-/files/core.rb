@@ -2,7 +2,7 @@ module Skylab::SubTree
 
   module API
 
-    module SubTree_::Models_::Files
+    module Home_::Models_::Files
 
       Actions = ::Module.new
 
@@ -10,7 +10,7 @@ module Skylab::SubTree
 
         @is_promoted = true
 
-        SubTree_.lib_.brazen::Model.common_entity self,
+        Home_.lib_.brazen::Model.common_entity self,
 
           :desc, -> y do
             y << "inspired by unix builtin `tree`"
@@ -207,7 +207,7 @@ module Skylab::SubTree
 
             ) do | y, o |
 
-              _p = SubTree_::Library_::Shellwords.method :shellescape
+              _p = Home_::Library_::Shellwords.method :shellescape
 
               _s_a = x_p[].args.map( & _p )
 
@@ -223,7 +223,7 @@ module Skylab::SubTree
             _when_pattern
           else
 
-            io = SubTree_.lib_.system.filesystem.normalization.upstream_IO(
+            io = Home_.lib_.system.filesystem.normalization.upstream_IO(
               :path_arg, @upstream_arg, & handle_event_selectively )
 
             io and begin
@@ -306,7 +306,7 @@ module Skylab::SubTree
               # on `self` here, but which action adapter you have (the
               # top node or the 'files' node) is unreliable here.)
 
-              _self = SubTree_::Models_::Files::Modalities::CLI::EXPRESSION_AGENT
+              _self = Home_::Models_::Files::Modalities::CLI::EXPRESSION_AGENT
 
               _self.express_into_yielder_line_items__ y, o.line_item_array
             end
@@ -359,7 +359,7 @@ module Skylab::SubTree
 
         def _init_traversal
 
-          @tr = SubTree_::Output_Adapters_::Continuous::Traversal.new_with(
+          @tr = Home_::Output_Adapters_::Continuous::Traversal.new_with(
 
             :output_proc, @downstream_p,
             :do_verbose_lines, @argument_box[ :show_lines ],

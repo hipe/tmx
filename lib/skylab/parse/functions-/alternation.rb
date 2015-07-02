@@ -22,7 +22,7 @@ module Skylab::Parse
     #
     # this function is :+#empty-stream-safe.
 
-    class Functions_::Alternation < Parse_::Function_::Currying
+    class Functions_::Alternation < Home_::Function_::Currying
 
       def accept_function_ f
         maybe_send_sibling_sandbox_to_function_ f
@@ -39,7 +39,7 @@ module Skylab::Parse
 
           if on
 
-            break Parse_::Output_Node_.new_with on.value_x,
+            break Home_::Output_Node_.new_with on.value_x,
               :constituent_index, d
 
           end

@@ -26,7 +26,7 @@ module Skylab::TanMan::TestSupport::Models::Graph
 
     it "case 4 with input syntax failure" do
 
-      out_a = TanMan_::EMPTY_A_
+      out_a = Home_::EMPTY_A_
       call_API :graph, :sync,
         :input_string, "wazoozle\n",
         :output_path, out_a
@@ -57,7 +57,7 @@ module Skylab::TanMan::TestSupport::Models::Graph
 
     it "case 5 - you can't copy a graph to the same waypoint" do
 
-      same_path = TanMan_::TestSupport::Fixtures::Graphs[ :the_empty_graph ]
+      same_path = Home_::TestSupport::Fixtures::Graphs[ :the_empty_graph ]
       same_path_ = same_path.dup
 
       call_API :graph, :sync,

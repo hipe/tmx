@@ -23,11 +23,11 @@ module Skylab::System::TestSupport
   module InstanceMethods
 
     def subject_via_pathname pn, d=nil
-      System_.services.filesystem.line_stream_via_pathname pn, d
+      Home_.services.filesystem.line_stream_via_pathname pn, d
     end
 
     def subject_via_filehandle fh, d
-      System_::IO.line_stream fh, d
+      Home_::IO.line_stream fh, d
     end
 
     def resolve_some_pathname path_s, o_p

@@ -8,7 +8,7 @@ module Skylab::Parse::TestSupport
 
     before :all do
 
-      Bazzle = Parse_.function( :alternation ).new_with(
+      Bazzle = Home_.function( :alternation ).new_with(
         :functions,
           :keyword, '--help',
             :moniker_symbol, :do_help,

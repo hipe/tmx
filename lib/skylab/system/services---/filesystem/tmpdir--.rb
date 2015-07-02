@@ -67,9 +67,9 @@ module Skylab::System
 
         instance_exec( & edit_p )
 
-        @debug_IO ||= System_.services.IO.some_stderr_IO
+        @debug_IO ||= Home_.services.IO.some_stderr_IO
         @max_mkdirs ||= 1
-        @_path_x ||= System_.services.filesystem.tmpdir_path
+        @_path_x ||= Home_.services.filesystem.tmpdir_path
         super @_path_x do end
         _init_path_derivatives
         freeze
@@ -171,7 +171,7 @@ module Skylab::System
 
         if Sanity_check_pathname__[ self ]
 
-          _path_ = System_.lib_.shellwords.shellescape @_path_s
+          _path_ = Home_.lib_.shellwords.shellescape @_path_s
 
           path_a = ::Dir[ "#{ _path_ }/{*,.?*}" ]  # include dotfiles and '..'
 
@@ -368,7 +368,7 @@ module Skylab::System
 
       def _patch * x_a
 
-        System_.services.patch(
+        Home_.services.patch(
           :target_directory, to_path,
           :is_dry_run, @is_noop,
           * x_a
@@ -454,7 +454,7 @@ module Skylab::System
         "must be relative - #{ file }"
       end
 
-      include System_.lib_.file_utils
+      include Home_.lib_.file_utils
 
       alias_method :_tmpdir_original_touch, :touch
 
@@ -482,7 +482,7 @@ module Skylab::System
 
       def __express_event_as_string ev
 
-        _expag = System_.lib_.brazen::API.expression_agent_instance
+        _expag = Home_.lib_.brazen::API.expression_agent_instance
         ev.render_each_line_under _expag do | line |
           _send_debug_string line
         end

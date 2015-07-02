@@ -61,7 +61,7 @@ module Skylab::TanMan
 
         word_s_a = bx.fetch( :word ).value_x
 
-        upstream = TanMan_.lib_.parse_lib.input_stream.via_array word_s_a
+        upstream = Home_.lib_.parse_lib.input_stream.via_array word_s_a
 
         st = @definition_collection.to_value_stream
         dfn = st.gets
@@ -84,7 +84,7 @@ module Skylab::TanMan
 
         __to_name_of_module_that_has_hear_map_stream.expand_by do | nm |
 
-          bx = TanMan_::Models_.const_get( nm.as_const, false ).const_get( :Hear_Map, false )::Definitions
+          bx = Home_::Models_.const_get( nm.as_const, false ).const_get( :Hear_Map, false )::Definitions
 
           Callback_::Stream.via_nonsparse_array bx.constants do | const |
 
@@ -146,7 +146,7 @@ module Skylab::TanMan
         @name_value_for_order = [ nm.as_lowercase_with_underscores_symbol,
           Callback_::Name.via_const( const ).as_lowercase_with_underscores_symbol ]
 
-        @parse_function = TanMan_.lib_.parse_lib.function_via_definition_array(
+        @parse_function = Home_.lib_.parse_lib.function_via_definition_array(
           @external_definition.definition )
 
       end

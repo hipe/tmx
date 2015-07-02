@@ -25,14 +25,14 @@ module Skylab::TanMan::TestSupport::Models::DotFile
 
     def _doc_controller_via_name_value_pair sym, x
 
-      TanMan_::Models_.class
+      Home_::Models_.class
 
-      bx = TanMan_::Callback_::Box.new
+      bx = Home_::Callback_::Box.new
 
       bx.add sym, Callback_::Qualified_Knownness.via_value_and_model( x,
-        TanMan_::Model_::Document_Entity::IO_PROPERTIES__.fetch( sym ) )
+        Home_::Model_::Document_Entity::IO_PROPERTIES__.fetch( sym ) )
 
-      TanMan_.application_kernel_.silo( :dot_file ).
+      Home_.application_kernel_.silo( :dot_file ).
         document_controller_via_trio_box bx, & @on_event_selectively
     end
   end

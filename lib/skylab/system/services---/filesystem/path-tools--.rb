@@ -22,14 +22,14 @@ module Skylab::System
 
           -> path_string do
             path_string.sub rx do
-              System_.services.environment.any_home_directory_path || $~[ 0 ]
+              Home_.services.environment.any_home_directory_path || $~[ 0 ]
             end
           end
         end.call
 
         def contract_tilde path_s
 
-          home_s = System_.services.environment.any_home_directory_path
+          home_s = Home_.services.environment.any_home_directory_path
 
           if home_s && path_s.index( home_s ).zero? and
               home_s.length == path_s.length || '/' == path_s[ home_s.length ]
@@ -67,7 +67,7 @@ module Skylab::System
 
 
     home__ = -> do
-      System_.services.environment.any_home_directory_path
+      Home_.services.environment.any_home_directory_path
     end
 
     pwd__ = -> do
@@ -158,7 +158,7 @@ module Skylab::System
       Escape_path__ = -> path do
         path = "#{ path }"
         if / |\$|'/ =~ path
-          System_.lib_.shellwords.shellescape path
+          Home_.lib_.shellwords.shellescape path
         else
           path
         end

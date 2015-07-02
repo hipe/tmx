@@ -26,7 +26,7 @@ module Skylab::TanMan
 
       def execute
 
-        o = TanMan_::Input_Adapters_::Treetop.new_parse
+        o = Home_::Input_Adapters_::Treetop.new_parse
 
         o.receive_byte_upstream_identifier @byte_upstream_identifier
 
@@ -52,7 +52,7 @@ module Skylab::TanMan
 
       def __build_parser_class
 
-        TanMan_::Input_Adapters_::Treetop::Load.new( self,
+        Home_::Input_Adapters_::Treetop::Load.new( self,
 
           -> o do
 
@@ -141,7 +141,7 @@ module Skylab::TanMan
       end
 
       def __excerpt_lines
-        scn = TanMan_.lib_.string_scanner.new parser.input
+        scn = Home_.lib_.string_scanner.new parser.input
         stop_at = parser.failure_line
         line_no = 0
         begin

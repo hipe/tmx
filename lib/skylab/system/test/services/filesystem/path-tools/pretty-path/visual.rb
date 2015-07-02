@@ -3,7 +3,7 @@ module Skylab::System
   # try running this from various locations, both inside and outside of
   # your home dir
 
-  o = System_.services.filesystem.path_tools
+  o = Home_.services.filesystem.path_tools
 
   pwd = ::Dir.getwd
 

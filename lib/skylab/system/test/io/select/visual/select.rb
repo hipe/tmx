@@ -8,12 +8,12 @@ module Skylab::System::TestSupport
 
   from_dir = TS_.dir_pathname.join( 'io/select/visual-' ).to_path
 
-  System_.lib_.file_utils.cd from_dir, verbose: true do
+  Home_.lib_.file_utils.cd from_dir, verbose: true do
 
-    select = System_::IO.select.new
+    select = Home_::IO.select.new
     select.timeout_seconds = 0.3
 
-    System_.lib_.open3.popen3 'sh' do |sin, sout, serr, t|
+    Home_.lib_.open3.popen3 'sh' do |sin, sout, serr, t|
 
       sin.puts 'source tmp.sh'
       sin.close

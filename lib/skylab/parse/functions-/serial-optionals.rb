@@ -85,7 +85,7 @@ module Skylab::Parse
     #     argv = [ '30', 'm', "Mom's", "Mom's again" ]
     #     P[ argv ]  # => ArgumentError: unrecognized argument 'Mom's..
 
-    class Functions_::Serial_Optionals < Parse_::Function_::Currying
+    class Functions_::Serial_Optionals < Home_::Function_::Currying
 
       class << self
 
@@ -150,7 +150,7 @@ module Skylab::Parse
           end
         end
 
-        Parse_::Output_Node_.new output_a
+        Home_::Output_Node_.new output_a
       end
 
       # #hook-out for adjunct facet: syntax expression

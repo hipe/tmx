@@ -7,7 +7,7 @@ module Skylab::TanMan
     class << self
 
       def call * x_a, & oes_p
-        bc = TanMan_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
+        bc = Home_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
         bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
       end
 
@@ -16,7 +16,7 @@ module Skylab::TanMan
       end
 
       def expression_agent_instance  # :+[#051]
-        @expag ||= Expression_Agent__.new TanMan_.application_kernel_
+        @expag ||= Expression_Agent__.new Home_.application_kernel_
       end
     end  # >>
 
@@ -41,7 +41,7 @@ module Skylab::TanMan
       end
 
       def app_name
-        TanMan_.name_function.as_human
+        Home_.name_function.as_human
       end
 
       def code s

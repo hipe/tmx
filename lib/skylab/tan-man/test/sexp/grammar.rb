@@ -28,8 +28,8 @@ module Skylab::TanMan::TestSupport::Sexp
       self
     end
 
-    include TanMan_::Models_::DotFile::Parser::InstanceMethods  # err msg porcelain
-    include TanMan_::TestSupport::Tmpdir::InstanceMethods  # prepared_tanman_tmpdir
+    include Home_::Models_::DotFile::Parser::InstanceMethods  # err msg porcelain
+    include Home_::TestSupport::Tmpdir::InstanceMethods  # prepared_tanman_tmpdir
 
     TestLib_::CLI_lib[].client self
 
@@ -180,7 +180,7 @@ module Skylab::TanMan::TestSupport::Sexp
 
     def verbose_parsing= bool     # `verbose_parsing` as a concept is confined
       if bool                     # to this file for now!
-        TanMan_::Sexp_::Auto.do_debug = true
+        Home_::Sexp_::Auto.do_debug = true
       end
     end
   end

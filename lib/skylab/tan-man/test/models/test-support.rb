@@ -8,11 +8,11 @@ module Skylab::TanMan::TestSupport::Models
 
   extend TestSupport_::Quickie
 
-  Brazen_ = TanMan_::Brazen_
+  Brazen_ = Home_::Brazen_
 
-  Callback_ = TanMan_::Callback_
+  Callback_ = Home_::Callback_
 
-  TanMan_ = TanMan_
+  Home_ = Home_
 
   TestLib_ = TestLib_
 
@@ -102,7 +102,7 @@ module Skylab::TanMan::TestSupport::Models
     end
 
     def __generate_unique_id_for_label lbl_s
-      s_a = lbl_s.split TanMan_::SPACE_
+      s_a = lbl_s.split Home_::SPACE_
       s_a_ = s_a[ 0, 1 ]
       len = s_a.length
       d = 1

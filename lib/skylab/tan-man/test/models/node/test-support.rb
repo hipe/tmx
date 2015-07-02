@@ -10,7 +10,7 @@ module Skylab::TanMan::TestSupport::Models::Node
 
   EMPTY_S_ = TestLib_::EMPTY_S_
   NEWLINE_ = TestLib_::NEWLINE_
-  TanMan_ = TanMan_
+  Home_ = Home_
 
   module InstanceMethods
 
@@ -76,7 +76,7 @@ module Skylab::TanMan::TestSupport::Models::Node
       # into out tests, we just hack-build an actual preconditions box here
       # manually until the four or so tests that need this can be improved.
 
-      kr = TanMan_.application_kernel_
+      kr = Home_.application_kernel_
 
       silo = kr.silo :node
 
@@ -88,7 +88,7 @@ module Skylab::TanMan::TestSupport::Models::Node
         send( :"__via__#{ input_mechanism_i }__build_byte_upstream_identifier" ),
         kr, & oes_p )
 
-      bx = TanMan_::Callback_::Box.new
+      bx = Home_::Callback_::Box.new
       bx.add :dot_file,
         kr.silo( :dot_file ).precondition_for( action, id, :_no_box_, & oes_p )
 
@@ -97,7 +97,7 @@ module Skylab::TanMan::TestSupport::Models::Node
 
     def __via__input_file_granule__build_byte_upstream_identifier
 
-      TanMan_::Brazen_.byte_upstream_identifier.via_path input_file_path
+      Home_::Brazen_.byte_upstream_identifier.via_path input_file_path
 
     end
   end

@@ -2,9 +2,9 @@ require_relative '../core'
 
 module Skylab::GitViz::TestSupport
 
-  GitViz_ = ::Skylab::GitViz
+  Home_ = ::Skylab::GitViz
 
-  Callback_ = GitViz_::Callback_
+  Callback_ = Home_::Callback_
 
   class << self
 
@@ -18,7 +18,7 @@ module Skylab::GitViz::TestSupport
     end )
   end  # >>
 
-  TestSupport_ = GitViz_.lib_.test_support
+  TestSupport_ = Home_.lib_.test_support
 
   TestSupport_::Regret[ TS_ = self ]
 
@@ -38,7 +38,7 @@ module Skylab::GitViz::TestSupport
         end
         mod_ = mod.parent_anchor_module
         if ! mod_
-          found_callable = GitViz_::Test_Lib_.const_get const_i, false
+          found_callable = Home_::Test_Lib_.const_get const_i, false
           break
         end
         mod = mod_
@@ -59,7 +59,7 @@ module Skylab::GitViz::TestSupport
     attr_reader :do_debug
 
     def debug_IO
-      GitViz_.lib_.some_stderr_IO
+      Home_.lib_.some_stderr_IO
     end
 
     def cache_hash_for_mock_FS
@@ -108,7 +108,7 @@ module Skylab::GitViz::TestSupport
     end  # >>
 
     def subject_CLI
-      GitViz_::CLI
+      Home_::CLI
     end
 
     def get_invocation_strings_for_expect_stdout_stderr
@@ -121,13 +121,13 @@ module Skylab::GitViz::TestSupport
   end
 
   Expect_CLI_lib = -> do
-    GitViz_.lib_.brazen.test_support.CLI::Expect_CLI
+    Home_.lib_.brazen.test_support.CLI::Expect_CLI
   end
 
   Expect_Event = -> test_mod do  # generated from `expect_event`
 
     test_mod.include(
-      GitViz_::Callback_.test_support::Expect_event::Test_Context_Instance_Methods )
+      Home_::Callback_.test_support::Expect_event::Test_Context_Instance_Methods )
 
     nil
   end
@@ -178,7 +178,7 @@ module Skylab::GitViz::TestSupport
     end
   end
 
-  Autoloader_ = GitViz_::Autoloader_
+  Autoloader_ = Home_::Autoloader_
 
   module VCS_Adapters
     module Git
@@ -197,7 +197,7 @@ module Skylab::GitViz::TestSupport
 
   module Constants
     Callback_ = Callback_
-    GitViz_ = GitViz_
+    Home_ = Home_
     GIT_FIXTURE_STORIES_ = GIT_FIXTURE_STORIES_
     GIT_STORY_03_COMMANDS_ = GIT_STORY_03_COMMANDS_
     GIT_STORY_03_PATHS_ = GIT_STORY_03_PATHS_

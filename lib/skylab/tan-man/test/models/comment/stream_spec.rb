@@ -8,10 +8,10 @@ module Skylab::TanMan::TestSupport::Models::Comment
 
   extend TestSupport_::Quickie
 
-  TanMan_ = TanMan_
+  Home_ = Home_
 
-  EMPTY_S_ = TanMan_::EMPTY_S_
-  NEWLINE_ = TanMan_::NEWLINE_
+  EMPTY_S_ = Home_::EMPTY_S_
+  NEWLINE_ = Home_::NEWLINE_
 
   module ModuleMethods
     def use _METH_I_
@@ -24,7 +24,7 @@ module Skylab::TanMan::TestSupport::Models::Comment
       @s = s
     end
     def expect * s_a
-      _subject = TanMan_::Models_::Comment::Line_Stream
+      _subject = Home_::Models_::Comment::Line_Stream
       scn = _subject.send use_method, @s
       a = []
       while s = scn.gets

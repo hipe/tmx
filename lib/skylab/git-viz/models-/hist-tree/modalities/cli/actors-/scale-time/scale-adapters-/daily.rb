@@ -37,7 +37,7 @@ module Skylab::GitViz
               d = sumzn.subject.normal_datetime.mday
 
               sumzn.downstream << (
-                MDAY_FORMAT___ % [ d, GitViz_.lib_.basic::Number::EN.ord( d ) ] )
+                MDAY_FORMAT___ % [ d, Home_.lib_.basic::Number::EN.ord( d ) ] )
 
               NIL_
             end

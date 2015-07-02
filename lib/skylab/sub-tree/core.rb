@@ -14,11 +14,11 @@ module Skylab::SubTree
       end
 
       define_method :application_kernel_, ( Callback_.memoize do
-        SubTree_.lib_.brazen::Kernel.new SubTree_
+        Home_.lib_.brazen::Kernel.new Home_
       end )
 
       def action_class_
-        SubTree_.lib_.brazen::Model.common_action_class
+        Home_.lib_.brazen::Model.common_action_class
       end
     end  # >>
   end
@@ -26,7 +26,7 @@ module Skylab::SubTree
   class << self
 
     def lib_
-      @lib ||= SubTree_::Lib_::INSTANCE
+      @lib ||= Home_::Lib_::INSTANCE
     end
   end  # >>
 
@@ -37,37 +37,21 @@ module Skylab::SubTree
   Autoloader_[ Models_ = ::Module.new, :boxxy ]
 
   ACHIEVED_ = true
-
   DASH_ = '-'.freeze
-
   DEFAULT_GLYPHSET_IDENTIFIER_ = :narrow
-
   DOT_ = '.'.freeze
-
   EMPTY_A_ = [].freeze
-
   EMPTY_P_ = -> {}
-
   EMPTY_S_ = ''.freeze
-
   KEEP_PARSING_ = true
-
   IDENTITY_ = -> x { x }
-
   stowaway :Library_, 'lib-'
-
   NEWLINE_ = "\n"
-
   NIL_ = nil
-
   SEP_ = ::File::SEPARATOR
-
-  SubTree_ = self
-
+  Home_ = self
   SPACE_ = ' '.freeze
-
   UNABLE_ = false
-
   UNDERSCORE_ = '_'.freeze
 end
 

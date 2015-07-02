@@ -26,5 +26,5 @@ module Skylab::TanMan::TestSupport::Models::DotFile
   end
 
   Callback_ = Callback_
-  TanMan_ = TanMan_
+  Home_ = Home_
 end

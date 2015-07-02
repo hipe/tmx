@@ -53,13 +53,13 @@ module Skylab::GitViz::TestSupport::Test_Lib
     end
 
     def against s
-      _st = GitViz_.lib_.basic::String.line_stream s
+      _st = Home_.lib_.basic::String.line_stream s
       @st = subject::Models_::Command.unmarshalling_stream _st, :OGDL
       NIL_
     end
 
     def subject
-      GitViz_::Test_Lib_::Mock_System
+      Home_::Test_Lib_::Mock_System
     end
   end
 end

@@ -96,7 +96,7 @@ module Skylab::TanMan
     TT = stdlib[ :Treetop ]
 
     INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(
-      self, TanMan_ )
+      self, Home_ )
   end
 
   LIB_ = Lib_::INSTANCE

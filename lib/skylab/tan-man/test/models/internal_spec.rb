@@ -45,7 +45,7 @@ module Skylab::TanMan::TestSupport::Models::Internal
       it "retrieves (and possibly generates) the GGD path" do
         # it may or may not emit events based on whether the dir already existed
         call_API :paths, :path, :generated_grammar_dir, :verb, :retrieve
-        %r([^/]+\z).match( @result )[ 0 ].should eql TanMan_.lib_.tmpdir_stem
+        %r([^/]+\z).match( @result )[ 0 ].should eql Home_.lib_.tmpdir_stem
       end
     end
   end

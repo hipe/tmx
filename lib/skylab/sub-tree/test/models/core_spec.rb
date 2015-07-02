@@ -9,7 +9,7 @@ module Skylab::SubTree::TestSupport
 
     it "loads." do
 
-      SubTree_::API
+      Home_::API
 
     end
 

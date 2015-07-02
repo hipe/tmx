@@ -19,7 +19,7 @@ module Skylab::GitViz
 
         def initialize lines
           @lines = lines
-          @scn = GitViz_.lib_.string_scanner.new EMPTY_S_
+          @scn = Home_.lib_.string_scanner.new EMPTY_S_
           @stack = [ Frame__.new( 0, Root_Node___.new ) ]
         end
 

@@ -5,27 +5,27 @@ module Skylab::TanMan::TestSupport
 
   ::Skylab::TestSupport::Regret[ TS_ = self ]
 
-  TanMan_ = ::Skylab::TanMan
+  Home_ = ::Skylab::TanMan
 
   class << self
 
     def tmpdir_pathname_
-      @tdpn ||= TanMan_.lib_.dev_tmpdir_pathname.join 'tm-testing'
+      @tdpn ||= Home_.lib_.dev_tmpdir_pathname.join 'tm-testing'
     end
   end
 
   module TestLib_
 
-    sidesys, stdlib = TanMan_::Autoloader_.at(
+    sidesys, stdlib = Home_::Autoloader_.at(
       :build_require_sidesystem_proc,
       :build_require_stdlib_proc )
 
-    define_singleton_method :_memoize, TanMan_::Callback_::Memoize
+    define_singleton_method :_memoize, Home_::Callback_::Memoize
 
     Basic = sidesys[ :Basic ]
 
     Base_tmpdir__ = _memoize do
-      TanMan_.lib_.system.filesystem.tmpdir(
+      Home_.lib_.system.filesystem.tmpdir(
         :path, TS_.tmpdir_pathname_.to_path,
         :max_mkdirs, 1 )
     end
@@ -35,7 +35,7 @@ module Skylab::TanMan::TestSupport
     end
 
     Constantize = -> x do
-      TanMan_::Callback_::Name.lib.constantize[ x ]
+      Home_::Callback_::Name.lib.constantize[ x ]
     end
 
     Debug_IO = -> do
@@ -51,7 +51,7 @@ module Skylab::TanMan::TestSupport
     end
 
     Entity = -> do
-      TanMan_::Brazen_::Entity
+      Home_::Brazen_::Entity
     end
 
     File_utils = stdlib[ :FileUtils ]
@@ -92,21 +92,21 @@ module Skylab::TanMan::TestSupport
 
     # ~
 
-    EMPTY_S_ = TanMan_::EMPTY_S_
+    EMPTY_S_ = Home_::EMPTY_S_
 
     DASH_ = '-'.freeze
 
-    NEWLINE_ = TanMan_::NEWLINE_
+    NEWLINE_ = Home_::NEWLINE_
 
-    SPACE_ = TanMan_::SPACE_
+    SPACE_ = Home_::SPACE_
 
-    UNDERSCORE_ = TanMan_::UNDERSCORE_
+    UNDERSCORE_ = Home_::UNDERSCORE_
 
   end
 
   module Constants
-    Callback_ = TanMan_::Callback_
-    TanMan_ = TanMan_
+    Callback_ = Home_::Callback_
+    Home_ = Home_
     TestLib_ = TestLib_
     TestSupport_  = ::Skylab::TestSupport
   end
@@ -115,7 +115,7 @@ module Skylab::TanMan::TestSupport
 
   Callback_ = Callback_
 
-  Expect_Event__ = TanMan_::Callback_.test_support::Expect_Event
+  Expect_Event__ = Home_::Callback_.test_support::Expect_Event
 
   TestSupport_ = TestSupport_
 
@@ -212,7 +212,7 @@ module Skylab::TanMan::TestSupport
     end
 
     def black_and_white_expression_agent_for_expect_event
-      TanMan_::API::expression_agent_instance
+      Home_::API::expression_agent_instance
     end
 
     # ~ grammar testing support
@@ -318,7 +318,7 @@ module Skylab::TanMan::TestSupport
 
         if ! pn.exist?
 
-          _tmpdir = TanMan_.lib_.system.filesystem.tmpdir :path, _PATH,
+          _tmpdir = Home_.lib_.system.filesystem.tmpdir :path, _PATH,
             :be_verbose, do_debug,
             :debug_IO, debug_IO,
             :max_mkdirs, 2
@@ -393,7 +393,7 @@ module Skylab::TanMan::TestSupport
     # ~ hook-outs to ancillary API's
 
     def subject_API
-      TanMan_::API
+      Home_::API
     end
 
     # ~ misc business
@@ -424,7 +424,7 @@ module Skylab::TanMan::TestSupport
       class << self
         def [] sym
           dir_pathname.join(
-            "#{ sym.id2name.gsub( TanMan_::UNDERSCORE_, TanMan_::DASH_ ) }.dot"
+            "#{ sym.id2name.gsub( Home_::UNDERSCORE_, Home_::DASH_ ) }.dot"
           ).to_path
         end
       end

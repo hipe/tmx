@@ -8,11 +8,11 @@ module Skylab::SubTree::TestSupport::Models_Files::The_CLI_Modality
 
   extend TestSupport_::Quickie
 
-  SubTree_ = SubTree_
+  Home_ = Home_
 
   module InstanceMethods
 
-    include SubTree_::TestSupport::Modality_Integrations::CLI::Expect_expression::Instance_Methods
+    include Home_::TestSupport::Modality_Integrations::CLI::Expect_expression::Instance_Methods
 
     define_method :expect, instance_method( :expect )  # because rspec
 
@@ -26,7 +26,7 @@ module Skylab::SubTree::TestSupport::Models_Files::The_CLI_Modality
 
     def make expect_str
 
-      io = SubTree_::Library_::StringIO.new @paths_string
+      io = Home_::Library_::StringIO.new @paths_string
       io.rewind
       @stdin_for_expect_stdout_stderr = io
       local_invoke
@@ -50,7 +50,7 @@ module Skylab::SubTree::TestSupport::Models_Files::The_CLI_Modality
     # ~ #hook-outs
 
     def subject_CLI
-      SubTree_::CLI
+      Home_::CLI
     end
 
     define_method :invocation_strings_for_expect_stdout_stderr, -> do

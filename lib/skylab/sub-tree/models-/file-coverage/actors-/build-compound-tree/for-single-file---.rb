@@ -76,7 +76,7 @@ module Skylab::SubTree
 
           @test_local_range = produce_local_range_ @test_dir
 
-          @tree = SubTree_.lib_.tree.mutable_node.new
+          @tree = Home_.lib_.tree.mutable_node.new
 
           NIL_
         end

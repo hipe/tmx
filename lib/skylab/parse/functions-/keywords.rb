@@ -36,7 +36,7 @@ module Skylab::Parse
               in_st.advance_one
 
               if last == d
-                x = Parse_::Output_Node_.new :_some_keywords_
+                x = Home_::Output_Node_.new :_some_keywords_
                 break
               end
 

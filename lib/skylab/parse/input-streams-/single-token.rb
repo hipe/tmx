@@ -6,7 +6,7 @@ module Skylab::Parse
 
       def initialize x
         @is_hot = true
-        @current_token_object = Parse_::Input_Stream_::Token.new x
+        @current_token_object = Home_::Input_Stream_::Token.new x
       end
 
       attr_reader :current_token_object

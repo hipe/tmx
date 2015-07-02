@@ -40,7 +40,7 @@ module Skylab::TanMan
 
       Rm = make_action_class :Delete
 
-      class Associate < TanMan_::Model_::Document_Entity::Action
+      class Associate < Home_::Model_::Document_Entity::Action
 
         Entity_.call self,
 
@@ -50,7 +50,7 @@ module Skylab::TanMan
 
           :preconditions, [ :dot_file, :meaning, :node ],
 
-          :reuse, TanMan_::Model_::Document_Entity.IO_properties,
+          :reuse, Home_::Model_::Document_Entity.IO_properties,
           :flag, :property, :dry_run,
           :required, :property, :meaning_name,
           :required, :property, :node_label

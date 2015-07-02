@@ -29,7 +29,7 @@ module Skylab::System
       end
 
       def description_under expr
-        System_.lib_.basic::Pathname.description_under_of_path expr, @path
+        Home_.lib_.basic::Pathname.description_under_of_path expr, @path
       end
 
       def shape_symbol
@@ -66,7 +66,7 @@ module Skylab::System
 
         if block_given?  # experimental convenience exposure
 
-          System_.services.filesystem.normalization.upstream_IO @path, & oes_p
+          Home_.services.filesystem.normalization.upstream_IO @path, & oes_p
         else
           ::File.open @path, ::File::RDONLY
         end

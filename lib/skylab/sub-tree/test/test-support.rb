@@ -2,8 +2,8 @@ require_relative '../core'
 
 module Skylab::SubTree::TestSupport
 
-  SubTree_ = ::Skylab::SubTree
-  Autoloader_ = SubTree_::Autoloader_
+  Home_ = ::Skylab::SubTree
+  Autoloader_ = Home_::Autoloader_
 
   TestSupport_ = Autoloader_.require_sidesystem :TestSupport
 
@@ -12,7 +12,7 @@ module Skylab::SubTree::TestSupport
   TS_ = self
 
   module Constants
-    SubTree_ = SubTree_
+    Home_ = Home_
     TestSupport_ = TestSupport_
   end
 
@@ -66,7 +66,7 @@ module Skylab::SubTree::TestSupport
     end.call
 
     def subject_API
-      SubTree_::API
+      Home_::API
     end
   end
 
@@ -76,20 +76,20 @@ module Skylab::SubTree::TestSupport
 
   end
 
-  Callback_ = SubTree_::Callback_
+  Callback_ = Home_::Callback_
 
-  DASH_ = SubTree_::DASH_
+  DASH_ = Home_::DASH_
 
-  EMPTY_S_ = SubTree_::EMPTY_S_
+  EMPTY_S_ = Home_::EMPTY_S_
 
-  UNDERSCORE_ = SubTree_::UNDERSCORE_
+  UNDERSCORE_ = Home_::UNDERSCORE_
 
   module Constants
     Callback_ = Callback_
     DASH_ = DASH_
-    EMPTY_A_ = SubTree_::EMPTY_A_
+    EMPTY_A_ = Home_::EMPTY_A_
     EMPTY_S_ = EMPTY_S_
-    NIL_ = SubTree_::NIL_
+    NIL_ = Home_::NIL_
     Top_TS_ = TS_
     UNDERSCORE_ = UNDERSCORE_
   end

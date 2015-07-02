@@ -64,7 +64,7 @@ module Skylab::Parse::TestSupport
 
       TS_.const_set(
         :IG_Shh___,
-        Parse_::Item_Grammar.new( [ :hot, :cold ], :tea, [ :with, :and ] ) )
+        Home_::Item_Grammar.new( [ :hot, :cold ], :tea, [ :with, :and ] ) )
     end
   end
 end

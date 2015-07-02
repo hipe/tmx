@@ -8,7 +8,7 @@ module Skylab::TanMan::TestSupport::Models::Graph
 
   extend TestSupport_::Quickie
 
-  EMPTY_S_ = TanMan_::EMPTY_S_
+  EMPTY_S_ = Home_::EMPTY_S_
 
   IDENTITY_ = -> x { x }
 

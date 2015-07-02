@@ -8,7 +8,7 @@ module Skylab::TanMan
 
       :required, :property, :digraph_path )
 
-    DocEnt_ = TanMan_::Model_::Document_Entity
+    DocEnt_ = Home_::Model_::Document_Entity
 
     Actions__ = make_action_making_actions_module
 

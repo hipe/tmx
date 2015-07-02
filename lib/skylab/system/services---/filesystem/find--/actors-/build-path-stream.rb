@@ -22,7 +22,7 @@ module Skylab::System
 
         p = -> do
 
-          _, o, e, thread = System_.lib_.open3.popen3( * @args )
+          _, o, e, thread = Home_.lib_.open3.popen3( * @args )
 
           p = -> do
             s = o.gets

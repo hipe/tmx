@@ -33,7 +33,7 @@ module Skylab::TanMan::TestSupport::Models::Workspace
     end
 
     def expected_config_path
-      @ws_pn.join( TanMan_::Models_::Workspace.config_filename ).to_path
+      @ws_pn.join( Home_::Models_::Workspace.config_filename ).to_path
     end
 
   end

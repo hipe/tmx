@@ -6,7 +6,7 @@ module Skylab::GitViz
 
       class << self
 
-        def new_via_path path, sys_cond=GitViz_.lib_.open3, & oes_p
+        def new_via_path path, sys_cond=Home_.lib_.open3, & oes_p
           new_via_pathname ::Pathname.new( path ), sys_cond, & oes_p
         end
 
@@ -32,7 +32,7 @@ module Skylab::GitViz
 
         @system_conduit = sys_cond
 
-        # M-etaHell::F-UN.without_warning { GitViz_.lib_.grit }  # see [#016]:#as-for-grit
+        # M-etaHell::F-UN.without_warning { Home_.lib_.grit }  # see [#016]:#as-for-grit
         # @inner = ::Grit::Repo.new absolute_pn.to_path ; nil
       end
 

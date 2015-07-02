@@ -192,7 +192,7 @@ module Skylab::System
             __send_creating_event_for_file
 
             if @is_dry_run
-              @as_normal_value[ System_::IO.dry_stub_instance ]
+              @as_normal_value[ Home_::IO.dry_stub_instance ]
             else
               via_hopefully_still_available_path_open_file
             end
@@ -247,7 +247,7 @@ module Skylab::System
             snd_updating_event_for_file
 
             if @is_dry_run
-              @as_normal_value[ System_::IO.dry_stub_instance ]
+              @as_normal_value[ Home_::IO.dry_stub_instance ]
             else
               via_hopefully_still_occupied_path_open_file
             end
@@ -320,7 +320,7 @@ module Skylab::System
 
           def byte_whichstream_identifier_
 
-            System_::IO::Byte_Downstream_Identifier
+            Home_::IO::Byte_Downstream_Identifier
           end
 
           def via_hopefully_still_occupied_path_open_file

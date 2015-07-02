@@ -2,7 +2,7 @@ module Skylab::SubTree
 
   module API
 
-    module SubTree_::Models_::Files
+    module Home_::Models_::Files
 
       Small_Time_Sessions_ = ::Module.new
 
@@ -31,7 +31,7 @@ module Skylab::SubTree
             _pattern_part = [ :filename, @pattern ]
           end
 
-          @cmd_o = SubTree_.lib_.system.filesystem.find(
+          @cmd_o = Home_.lib_.system.filesystem.find(
             :paths, @paths,
             * _pattern_part,
             :freeform_query_infix_words, %w'-type file',
@@ -42,7 +42,7 @@ module Skylab::SubTree
 
         def __via_command_produce_upstream
 
-          i, o, e, @thread = SubTree_::Library_::Open3.popen3( * @cmd_o.args )
+          i, o, e, @thread = Home_::Library_::Open3.popen3( * @cmd_o.args )
           i.close
           s = e.read
           if s && s.length.nonzero?

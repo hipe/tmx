@@ -72,7 +72,7 @@ module Skylab::System
         end
 
         def via_ruby_regexp_mixed_result
-          opts = System_.lib_.basic::Regexp.options_via_regexp @ruby_regexp
+          opts = Home_.lib_.basic::Regexp.options_via_regexp @ruby_regexp
           xtra_i_a = nil
           if opts.is_multiline
             ( xtra_i_a ||= [] ).push :MULTILINE
@@ -109,7 +109,7 @@ module Skylab::System
 
         def get_busy
 
-          shellwords = System_.lib_.shellwords
+          shellwords = Home_.lib_.shellwords
 
           y = [ 'grep', '-E' ]
           if @do_ignore_case
@@ -151,7 +151,7 @@ module Skylab::System
           thread = nil
 
           p = -> do
-            _, o, e, thread = System_.lib_.open3.popen3 command_string
+            _, o, e, thread = Home_.lib_.open3.popen3 command_string
             err_s = e.gets
             if err_s && err_s.length.nonzero?
               o.close

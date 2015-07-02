@@ -34,7 +34,7 @@ module Skylab::GitViz
 
           _s = "#{ _date }T#{ _time }#{ _zone }"  # [#009]:#storypoint-36 git might have an issue
 
-          @ci.author_datetime = GitViz_.lib_.date_time.iso8601 _s  # raised a.e
+          @ci.author_datetime = Home_.lib_.date_time.iso8601 _s  # raised a.e
 
           NIL_
         end

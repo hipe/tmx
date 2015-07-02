@@ -84,7 +84,7 @@ module Skylab::TanMan
 
       def receive_trio_box bx
 
-        o = TanMan_::Model_::Document_Entity::
+        o = Home_::Model_::Document_Entity::
           Byte_Stream_Identifier_Resolver.new(
             @kernel, & @on_event_selectively )
 

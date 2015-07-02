@@ -2,7 +2,7 @@ module Skylab::Parse
 
   # ->
 
-    class Functions_::Sequence < Parse_::Function_::Currying
+    class Functions_::Sequence < Home_::Function_::Currying
 
       # ([#sl-129] three laws all the way. [#bs-028.D] name conventions.)
 
@@ -78,7 +78,7 @@ module Skylab::Parse
       end
 
       def __flush
-        Parse_::Output_Node_.new @result_x_a
+        Home_::Output_Node_.new @result_x_a
       end
 
       # ~ #hook-ins for adjunct facets

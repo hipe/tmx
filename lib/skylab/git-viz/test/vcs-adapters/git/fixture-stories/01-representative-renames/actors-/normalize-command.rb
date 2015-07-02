@@ -179,7 +179,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
       def _mutate_string_by_converting_each_line_content screen
 
-        st = GitViz_.lib_.basic::String.line_stream screen
+        st = Home_.lib_.basic::String.line_stream screen
 
         a = []
         begin

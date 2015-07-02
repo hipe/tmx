@@ -13,7 +13,7 @@ module Skylab::SubTree::TestSupport::Modality_Integrations::CLI
   module InstanceMethods
 
     def subject_CLI
-      SubTree_::CLI
+      Home_::CLI
     end
 
     define_method :invocation_strings_for_expect_stdout_stderr, -> do
@@ -28,7 +28,7 @@ module Skylab::SubTree::TestSupport::Modality_Integrations::CLI
 
   NIL_ = NIL_
 
-  SubTree_ = SubTree_
+  Home_ = Home_
 
   TestSupport_ = TestSupport_
 

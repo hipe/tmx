@@ -10,7 +10,7 @@ module Skylab::GitViz
 
       module Actions
 
-        class Hist_Tree < GitViz_.lib_.brazen::CLI::Action_Adapter
+        class Hist_Tree < Home_.lib_.brazen::CLI::Action_Adapter
 
           GLYPHS___ =
             # "\u2058",  # Four Dot Punctuation - ⁘
@@ -62,7 +62,7 @@ module Skylab::GitViz
             sys_cond = @parent.top_invocation_environment_x[ :__system_conduit__ ]
               # (let hacks in - the way this is written is nasty #todo)
 
-            sys_cond ||= GitViz_.lib_.open3
+            sys_cond ||= Home_.lib_.open3
 
             bp.replace_by :system_conduit do | prp |
               prp.new_with_default do
@@ -158,7 +158,7 @@ module Skylab::GitViz
 
           def __via_sparse_matrix_of_content_resolve_column_A
 
-            st = GitViz_.lib_.tree.via( :node_identifiers,
+            st = Home_.lib_.tree.via( :node_identifiers,
               @matrix.rows ).to_classified_stream_for :text
 
             st.gets  # the first node is always the root node,

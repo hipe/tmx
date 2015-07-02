@@ -147,7 +147,7 @@ module Skylab::TanMan
 
         def __do_persist
 
-          o = TanMan_::Model_::Document_Entity::
+          o = Home_::Model_::Document_Entity::
             Byte_Stream_Identifier_Resolver.new(
               @kernel, & @on_event_selectively )
 

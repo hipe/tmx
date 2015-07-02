@@ -44,7 +44,7 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
     end
 
     def subject_CLI
-      SubTree_::CLI
+      Home_::CLI
     end
 
     _PROG_NAME = '-s-t-'
@@ -76,7 +76,7 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
     def result_for_failure_for_expect_stdout_stderr
 
-      SubTree_.lib_.brazen::CLI::GENERIC_ERROR_
+      Home_.lib_.brazen::CLI::GENERIC_ERROR_
     end
   end
 end

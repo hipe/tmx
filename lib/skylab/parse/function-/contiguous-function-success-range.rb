@@ -4,7 +4,7 @@ module Skylab::Parse
 
     module Function_
 
-      class Contiguous_Function_Success_Range < Parse_::Function_::Field
+      class Contiguous_Function_Success_Range < Home_::Function_::Field
 
         class << self
 
@@ -50,7 +50,7 @@ module Skylab::Parse
 
           # we need at least and at most one parse function.
 
-          f = Parse_.function( st.gets_one ).new_via_polymorphic_stream_passively( st )
+          f = Home_.function( st.gets_one ).new_via_polymorphic_stream_passively( st )
           f and begin
             @f = f
             KEEP_PARSING_
@@ -94,7 +94,7 @@ module Skylab::Parse
 
             # a re-parse for the monadic function is always for the zero-width case
 
-            Parse_::Output_Node_.the_empty_node
+            Home_::Output_Node_.the_empty_node
           end
 
           def _flush  # assume num times succeeded satisifes min
@@ -106,7 +106,7 @@ module Skylab::Parse
               _try_next = self
             end
 
-            Parse_::Output_Node_.new_with ov_x, :try_next, _try_next
+            Home_::Output_Node_.new_with ov_x, :try_next, _try_next
           end
 
           def _become_first_next_try
@@ -126,7 +126,7 @@ module Skylab::Parse
           def _init_for_parse in_st
             super
 
-            @long_running_mutable_output_node = Parse_::Output_Node_.new(
+            @long_running_mutable_output_node = Home_::Output_Node_.new(
               @mutable_outout_value_x_a = [] )
 
             @num_times_succeeded_hit_MAX = if -1 == @max

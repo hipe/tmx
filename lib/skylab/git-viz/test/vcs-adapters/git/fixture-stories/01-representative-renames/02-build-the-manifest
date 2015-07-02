@@ -110,7 +110,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
       def models
 
-        GitViz_::VCS_Adapters_::Git::Models_
+        Home_::VCS_Adapters_::Git::Models_
       end
 
       def session
@@ -122,7 +122,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
       def start_session
 
         @fh = ::File.open @path, ::File::CREAT | ::File::TRUNC | ::File::WRONLY
-        @sess = GitViz_::Test_Lib_::Mock_System.recording_session @fh
+        @sess = Home_::Test_Lib_::Mock_System.recording_session @fh
         NIL_
       end
 

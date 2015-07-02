@@ -8,7 +8,7 @@ module Skylab::System::TestSupport
 
       it "leaves brittany alone" do
         downstream = ::StringIO.new
-        stream = System_::IO::Mappers::Filter[ downstream ]
+        stream = Home_::IO::Mappers::Filter[ downstream ]
         stream.write('a')
         downstream.string.should eql('a')
         stream.puts('b')
@@ -19,7 +19,7 @@ module Skylab::System::TestSupport
     context "with a line boundary event handler" do
       let(:downstream) { ::StringIO.new }
       let(:stream) do
-        o = System_::IO::Mappers::Filter.new_with(
+        o = Home_::IO::Mappers::Filter.new_with(
           :downstream_IO, downstream,
           :line_begin_proc, -> do
             o.downstream_IO.write 'Z '
@@ -56,7 +56,7 @@ module Skylab::System::TestSupport
     context "with a puts filter" do
       it "works with one filter" do
         downstream = ::StringIO.new
-        stream = System_::IO::Mappers::Filter.new_with(
+        stream = Home_::IO::Mappers::Filter.new_with(
           :downstream_IO, downstream,
           :puts_map_proc, -> x do
             "  << epic: #{ x } >>\n"
@@ -69,7 +69,7 @@ module Skylab::System::TestSupport
     end
 
     before :all do
-      System_.lib_.string_IO
+      Home_.lib_.string_IO
     end
   end
 end

@@ -75,7 +75,7 @@ module Skylab::Parse
     #     argv.length  # => 3
     #
 
-    class Functions_::Simple_Pool < Parse_::Function_::Currying
+    class Functions_::Simple_Pool < Home_::Function_::Currying
 
       def accept_function_ f
         maybe_send_sibling_sandbox_to_function_ f
@@ -108,7 +108,7 @@ module Skylab::Parse
           end
         end
 
-        Parse_::Output_Node_.new res_a
+        Home_::Output_Node_.new res_a
       end
     end
     # <-

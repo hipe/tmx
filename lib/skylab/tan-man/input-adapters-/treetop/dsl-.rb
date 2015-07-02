@@ -11,7 +11,7 @@ module Skylab::TanMan
       end
     end
 
-    LIB_ = TanMan_.lib_
+    LIB_ = Home_.lib_
 
     PROCEDE_ = true
 

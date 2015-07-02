@@ -128,7 +128,7 @@ module Skylab::System::TestSupport
 
     def black_and_white_expression_agent_for_expect_event
 
-      System_.lib_.brazen::API.expression_agent_instance
+      Home_.lib_.brazen::API.expression_agent_instance
     end
 
     # ~ expected files

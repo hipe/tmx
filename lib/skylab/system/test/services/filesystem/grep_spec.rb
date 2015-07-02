@@ -30,7 +30,7 @@ module Skylab::System::TestSupport
       a.last.should eql [ :error, :regexp_option_not_supported ]
 
       a.first.express_into_under y=[],
-        System_.lib_.brazen::API.expression_agent_instance
+        Home_.lib_.brazen::API.expression_agent_instance
 
       y.should eql [ "non convertible regexp options - '[:MULTILINE, :EXTENDED]'" ]
     end
@@ -42,7 +42,7 @@ module Skylab::System::TestSupport
 
       cmd_string = cmd.string
 
-      _, o, e, t = System_.lib_.open3.popen3 cmd_string
+      _, o, e, t = Home_.lib_.open3.popen3 cmd_string
 
       e.gets.should be_nil
       line = o.gets

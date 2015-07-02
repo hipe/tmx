@@ -24,11 +24,11 @@ module Skylab::GitViz::TestSupport::Models
   module InstanceMethods
 
     def subject_API  # #hook-out for "expect event"
-      GitViz_::API
+      Home_::API
     end
 
     def black_and_white_expression_agent_for_expect_event
-      GitViz_.lib_.brazen::API.expression_agent_instance
+      Home_.lib_.brazen::API.expression_agent_instance
     end
   end
 
@@ -48,8 +48,8 @@ module Skylab::GitViz::TestSupport::Models
       def [] tcm
 
         Top_TS_::Expect_Event[ tcm ]
-        GitViz_::Test_Lib_::Mock_FS[ tcm ]
-        GitViz_::Test_Lib_::Mock_System[ tcm ]
+        Home_::Test_Lib_::Mock_FS[ tcm ]
+        Home_::Test_Lib_::Mock_System[ tcm ]
 
         tcm.include self
 
@@ -77,7 +77,7 @@ module Skylab::GitViz::TestSupport::Models
   # ~
 
   Callback_ = Callback_
-  GitViz_ = GitViz_
+  Home_ = Home_
   Mock_Filechange_ = ::Struct.new :author_datetime, :change_count
   Mock_Row_ = ::Struct.new :to_a
   NIL_ = NIL_

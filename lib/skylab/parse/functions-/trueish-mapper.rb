@@ -2,7 +2,7 @@ module Skylab::Parse
 
   # ->
 
-    class Functions_::Trueish_Mapper < Parse_::Function_::Field::Proc_Based
+    class Functions_::Trueish_Mapper < Home_::Function_::Field::Proc_Based
 
       # pass to the user proc the input stream. if the result is true-ish,
       # assume this is a mixed output value and that the use proc advanced
@@ -16,7 +16,7 @@ module Skylab::Parse
       def output_node_via_input_stream in_st
         x = @p[ in_st ]
         if x
-          Parse_::Output_Node_.new x
+          Home_::Output_Node_.new x
         end
       end
     end

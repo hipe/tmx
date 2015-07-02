@@ -8,7 +8,7 @@ module Skylab::System
 
          :find_command_args, :find_command_args, nil, :ok, nil ) do | y, o |
 
-        sw = System_.lib_.shellwords
+        sw = Home_.lib_.shellwords
 
         _ = o.find_command_args.map do | s |
           sw.shellescape s

@@ -9,7 +9,7 @@ module Skylab::TanMan
     class << self
 
       def path_for_directory_as_collection_
-        @__path ||= TanMan_.dir_pathname.join( RELPATH___ ).to_path
+        @__path ||= Home_.dir_pathname.join( RELPATH___ ).to_path
       end
     end  # >>
 
@@ -170,7 +170,7 @@ module Skylab::TanMan
         kr
       ) do | o |
         o.directory_path = Starter_.path_for_directory_as_collection_
-        o.filesystem = TanMan_.lib_.system.filesystem
+        o.filesystem = Home_.lib_.system.filesystem
         o.flyweight_class = Starter_
       end
     end

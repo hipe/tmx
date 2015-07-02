@@ -164,7 +164,7 @@ module Skylab::TanMan::TestSupport::Models::Graph
             :digraph_path, _file,
             :workspace_path, @ws_pn.to_path, :config_filename, cfn
 
-          @ev_a[ 0 .. -3 ] = TanMan_::EMPTY_A_
+          @ev_a[ 0 .. -3 ] = Home_::EMPTY_A_
 
           expect_OK_event :wrote_file
           expect_OK_event :collection_resource_committed_changes

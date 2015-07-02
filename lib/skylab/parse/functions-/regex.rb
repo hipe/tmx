@@ -39,7 +39,7 @@ module Skylab::Parse
             if md
 
               in_st.advance_one
-              Parse_::Output_Node_.new( @becomes_symbol || md )
+              Home_::Output_Node_.new( @becomes_symbol || md )
             end
           end
         end

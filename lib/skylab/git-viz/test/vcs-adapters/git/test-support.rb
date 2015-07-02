@@ -12,7 +12,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
   include Constants
 
-  GitViz_ = GitViz_
+  Home_ = Home_
 
   extend TestSupport_::Quickie
 
@@ -28,7 +28,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
     end
 
     def subject_VCS
-      GitViz_::VCS_Adapters_::Git
+      Home_::VCS_Adapters_::Git
     end
 
     def expect_result_for_failure  # #hook-out
@@ -36,7 +36,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
     end
 
     def black_and_white_expression_agent_for_expect_event
-      GitViz_.lib_.brazen::API.expression_agent_instance
+      Home_.lib_.brazen::API.expression_agent_instance
     end
   end
 
@@ -88,8 +88,8 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
   Repository_Support = -> tcm do
 
     Top_TS_::Expect_Event[ tcm ]
-    GitViz_::Test_Lib_::Mock_FS[ tcm ]
-    GitViz_::Test_Lib_::Mock_System[ tcm ]
+    Home_::Test_Lib_::Mock_FS[ tcm ]
+    Home_::Test_Lib_::Mock_System[ tcm ]
 
     tcm.send :define_method, :init_respository_via_pathname_ do | s |
       x = front_.new_repository_via_pathname mock_pathname s
@@ -110,12 +110,12 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
   Autoloader_ = Callback_::Autoloader
   ACHIEVED_ = true
   Callback_ = Callback_
-  DASH_ = GitViz_::DASH_
-  DOT_ = GitViz_::DOT_
-  EMPTY_S_ = GitViz_::EMPTY_S_
+  DASH_ = Home_::DASH_
+  DOT_ = Home_::DOT_
+  EMPTY_S_ = Home_::EMPTY_S_
   GENERAL_ERROR_ = 128
   NIL_ = nil
-  UNDERSCORE_ = GitViz_::UNDERSCORE_
+  UNDERSCORE_ = Home_::UNDERSCORE_
 
   SHORT_SHA_LENGTH_ = 7
 

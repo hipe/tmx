@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport::Sexp
 
   include Constants
 
-  TanMan_ = TanMan_
+  Home_ = Home_
   TestLib_ = TestLib_
   EMPTY_S_ = TestLib_::EMPTY_S_
 
@@ -22,7 +22,7 @@ module Skylab::TanMan::TestSupport::Sexp
   end
 
   module Grammars
-    TanMan_::Autoloader_[ self ]
+    Home_::Autoloader_[ self ]
   end
 
   class Grammar

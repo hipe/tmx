@@ -58,7 +58,7 @@ module Skylab::GitViz::TestSupport::Models
 
     memoize_ :_mapper do
 
-      GitViz_::Models_::Hist_Tree::Modalities::CLI::Sessions_::Glyph_Mapper.
+      Home_::Models_::Hist_Tree::Modalities::CLI::Sessions_::Glyph_Mapper.
         start 'Cr', 'A', 'B', 'C'
     end
 

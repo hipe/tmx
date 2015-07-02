@@ -57,7 +57,7 @@ module Skylab::System
           end
 
           def _EN
-            System_.lib_.human::NLP::EN
+            Home_.lib_.human::NLP::EN
           end
         end  # >>
       end

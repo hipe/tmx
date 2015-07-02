@@ -55,7 +55,7 @@ module Skylab::Parse
       def matcher_functions=
         st = polymorphic_upstream
         @function_a = []
-        cls = Parse_::Functions_::Simple_Matcher
+        cls = Home_::Functions_::Simple_Matcher
         while st.unparsed_exists
           @function_a.push cls.new_via_proc st.gets_one
         end
@@ -91,7 +91,7 @@ module Skylab::Parse
             if :end_functions == sym
               nil  # not false
             else
-              Parse_.function( sym ).new_via_polymorphic_stream_passively st
+              Home_.function( sym ).new_via_polymorphic_stream_passively st
             end
           end
         end
@@ -128,7 +128,7 @@ module Skylab::Parse
 
       def express_all_segments_into_under y, * x_a
 
-        Parse_::Function_::Nonterminal::Sessions::Express.session do | o |
+        Home_::Function_::Nonterminal::Sessions::Express.session do | o |
 
           case 1 <=> x_a.length
           when  0
@@ -215,7 +215,7 @@ module Skylab::Parse
     private
 
       def _input_stream_via_array a
-        Parse_::Input_Streams_::Array.new a
+        Home_::Input_Streams_::Array.new a
       end
 
     end

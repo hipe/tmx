@@ -4,7 +4,7 @@ module Skylab::TanMan
 
     class << self
       def new * a
-        new_top_invocation a, TanMan_.application_kernel_
+        new_top_invocation a, Home_.application_kernel_
       end
     end  # >>
 
@@ -85,7 +85,7 @@ module Skylab::TanMan
       end
 
       def invoke_notify
-        TanMan_.lib_.old_path_tools.clear
+        Home_.lib_.old_path_tools.clear
       end
 
     private
@@ -169,7 +169,7 @@ module Skylab::TanMan
       end
 
       def _NLP_agent
-        @NLP_agent ||= TanMan_::API.expression_agent_class.NLP_agent_class.new
+        @NLP_agent ||= Home_::API.expression_agent_class.NLP_agent_class.new
       end
     end
 
@@ -182,7 +182,7 @@ module Skylab::TanMan
           module Of
             Hot = -> x, x_ do
 
-              Brazen_::CLI::Client.fml TanMan_, x, x_
+              Brazen_::CLI::Client.fml Home_, x, x_
             end
           end
         end

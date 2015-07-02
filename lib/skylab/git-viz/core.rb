@@ -11,8 +11,8 @@ module Skylab::GitViz
 
       def new * a
 
-        client = GitViz_.lib_.brazen::CLI.new_top_invocation(
-          a, GitViz_.application_kernel_ )
+        client = Home_.lib_.brazen::CLI.new_top_invocation(
+          a, Home_.application_kernel_ )
 
         client.receive_environment MONADIC_EMPTINESS_
 
@@ -27,7 +27,7 @@ module Skylab::GitViz
         module Face
           module Of
             Hot = -> x, x_ do
-              GitViz_.lib_.brazen::CLI::Client.fml GitViz_, x, x_
+              Home_.lib_.brazen::CLI::Client.fml Home_, x, x_
             end
           end
         end
@@ -41,7 +41,7 @@ module Skylab::GitViz
     class << self
 
       def call * x_a, & oes_p
-        bc = GitViz_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
+        bc = Home_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
         bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
       end
     end  # >>
@@ -52,7 +52,7 @@ module Skylab::GitViz
   class << self
 
     define_method :application_kernel_, ( Callback_.memoize do
-      GitViz_.lib_.brazen::Kernel.new GitViz_
+      Home_.lib_.brazen::Kernel.new Home_
     end )
 
     def lib_
@@ -61,11 +61,11 @@ module Skylab::GitViz
     end
 
     def mock_FS
-      GitViz_::Test_Lib_::Mock_FS
+      Home_::Test_Lib_::Mock_FS
     end
 
     def repository
-      GitViz_::VCS_Adapters_::Git.repository
+      Home_::VCS_Adapters_::Git.repository
     end
   end  # >>
 
@@ -78,7 +78,7 @@ module Skylab::GitViz
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
-  GitViz_ = self
+  Home_ = self
   Name_ = Callback_::Name
   NEWLINE_ = "\n"
   NIL_ = nil

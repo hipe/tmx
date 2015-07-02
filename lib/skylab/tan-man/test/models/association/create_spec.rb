@@ -67,7 +67,7 @@ module Skylab::TanMan::TestSupport::Models::Association
 
       it 'does not associate again redundantly' do
         associate 'alpha', 'gamma'
-        @ev_a[ 0 .. -2 ] = TanMan_::EMPTY_A_  # hack ignore 3 events
+        @ev_a[ 0 .. -2 ] = Home_::EMPTY_A_  # hack ignore 3 events
         expect_neutral_event :document_did_not_change
         expect_neutralled
       end

@@ -22,7 +22,7 @@ module Skylab::TanMan
 
     def initialize meaning_st
 
-      g = TanMan_.lib_.basic::Digraph.new
+      g = Home_.lib_.basic::Digraph.new
       h = ::Hash.new { |h_, k| h_[ k ] = [] }
 
       mn = meaning_st.gets
@@ -101,7 +101,7 @@ module Skylab::TanMan
       end
     end
 
-    CircleHash__ = TanMan_.lib_.proxy_lib.nice :[], :[]=, :fetch
+    CircleHash__ = Home_.lib_.proxy_lib.nice :[], :[]=, :fetch
 
     Interminable__ = Callback_::Event.prototype_with :interminable,
         :trail_a, nil, :reason, :interminal, :ok, false do | y, o |

@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport::Models::Meaning::Graph
 
   include Constants
 
-  TanMan_ = TanMan_
+  Home_ = Home_
 
   extend TestSupport_::Quickie
 
@@ -14,9 +14,9 @@ module Skylab::TanMan::TestSupport::Models::Meaning::Graph
 
     def graph_from * s_pair_a
 
-      TanMan_::Models_::Meaning::Graph__.new(
-        TanMan_::Callback_::Stream.via_nonsparse_array( s_pair_a ) do | s, s_ |
-          TanMan_::Models_::Meaning.new s, s_
+      Home_::Models_::Meaning::Graph__.new(
+        Home_::Callback_::Stream.via_nonsparse_array( s_pair_a ) do | s, s_ |
+          Home_::Models_::Meaning.new s, s_
         end )
     end
   end

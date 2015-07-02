@@ -69,20 +69,13 @@ module Skylab::System
   Autoloader_[ Services___ = ::Module.new, :boxxy ]
 
   ACHIEVED_ = true
-
   KEEP_PARSING_ = true
-
   EMPTY_S_ = ''.freeze
-
   NEWLINE_ = "\n"
-
   NIL_ = nil
-
   NILADIC_TRUTH_ = -> { true }
-
   SPACE_ = ' '.freeze
-
-  System_ = self
+  Home_ = self
 
 end
 

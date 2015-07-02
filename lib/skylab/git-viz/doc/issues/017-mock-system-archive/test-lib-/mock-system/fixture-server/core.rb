@@ -4,7 +4,7 @@ module Skylab::GitViz
 
     class Fixture_Server  # read [#018]:#introduction-to-the-middle-end
 
-      GitViz_.lib_.plugin::Host[ self ]
+      Home_.lib_.plugin::Host[ self ]
       Mock_System::Socket_Agent_[ self ]
       include Socket_Agent_Constants_
 

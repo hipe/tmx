@@ -337,7 +337,7 @@ module Skylab::Parse::TestSupport
     end
 
     def self.subject_parse_module_
-      Parse_.function :sequence
+      Home_.function :sequence
     end
   end
 end

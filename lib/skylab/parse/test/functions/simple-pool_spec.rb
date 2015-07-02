@@ -11,7 +11,7 @@ module Skylab::Parse::TestSupport
       before :all do
         bill_rx = /bill/i
 
-        SP = Parse_.function( :simple_pool ).new_with(
+        SP = Home_.function( :simple_pool ).new_with(
           :functions,
             :trueish_mapper, -> in_st do
               if bill_rx =~ in_st.current_token_object.value_x
