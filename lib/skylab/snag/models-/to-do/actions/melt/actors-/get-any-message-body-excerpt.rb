@@ -8,7 +8,7 @@ self._THE_DEAL  # ..here is that we went ahead and re-wrote "melt" without
 
     class Get_any_message_body_excerpt__
 
-      Snag_::Model_::Actor[ self,
+      Home_::Model_::Actor[ self,
         :properties, :new_line, :todo_o ]
 
       def execute

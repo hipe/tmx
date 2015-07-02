@@ -33,10 +33,10 @@ module Skylab::Basic::TestSupport::Tree_TS
   end
 
   Subject_ = -> do
-    Basic_::Tree
+    Home_::Tree
   end
 
-  o = Basic_
+  o = Home_
 
   Callback_ = o::Callback_
   EMPTY_A_ = o::EMPTY_A_
@@ -48,7 +48,7 @@ module Skylab::Basic::TestSupport::Tree_TS
     Subject_ = Subject_
   end
 
-  Basic_ = Basic_
+  Home_ = Home_
 end
 
 # #tombstone legacy artifacts of early early test setup

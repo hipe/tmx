@@ -121,7 +121,7 @@ module Skylab::Snag
     end  # >>
 
     @instance = Callback_.produce_library_shell_via_library_and_app_modules(
-      self, Snag_ )
+      self, Home_ )
   end
 
   LIB_ = Lib_.instance

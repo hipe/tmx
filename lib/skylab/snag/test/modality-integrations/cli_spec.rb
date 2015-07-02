@@ -70,7 +70,7 @@ module Skylab::Snag::TestSupport
 
         _st = sout_serr_line_stream_for_contiguous_lines_on_stream :e
 
-        tree = Snag_.lib_.brazen.test_support.CLI::Expect_Section.
+        tree = Home_.lib_.brazen.test_support.CLI::Expect_Section.
           tree_via_line_stream _st
 
         cx = tree.children

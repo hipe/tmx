@@ -8,13 +8,13 @@ module Skylab::Basic::TestSupport::Hash::Order_Proxy
 
   extend TestSupport_::Quickie
 
-  Basic_ = Basic_
+  Home_ = Home_
 
   Subject_ = -> * x_a, & p do
     if x_a.length.nonzero? || p
-      Basic_::Hash::Order_Proxy[ * x_a, & p ]
+      Home_::Hash::Order_Proxy[ * x_a, & p ]
     else
-      Basic_::Hash::Order_Proxy
+      Home_::Hash::Order_Proxy
     end
   end
 

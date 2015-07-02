@@ -6,7 +6,7 @@ module Skylab::Snag
 
       WORDWRAP_ASPECT_RATIO___ = [ 3, 1 ]
 
-      Snag_.lib_.brazen::Model.common_entity( self,
+      Home_.lib_.brazen::Model.common_entity( self,
 
         :desc, -> y do
           y << "write to the output stream a digrpah of doc nodes"
@@ -144,7 +144,7 @@ module Skylab::Snag
 
       def __init_rendering_ivars
 
-        @_expag = Snag_::Models_::Node_Collection::Expression_Adapters::Byte_Stream.
+        @_expag = Home_::Models_::Node_Collection::Expression_Adapters::Byte_Stream.
           build_default_expression_agent
 
         NIL_
@@ -154,7 +154,7 @@ module Skylab::Snag
 
         node = op.node
         s_a = []
-        ww = Snag_.lib_.basic::String.word_wrappers.calm.new_with(
+        ww = Home_.lib_.basic::String.word_wrappers.calm.new_with(
           :downstream_yielder, s_a,
           :aspect_ratio, WORDWRAP_ASPECT_RATIO___ )
 

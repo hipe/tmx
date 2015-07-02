@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Collection_Adapters::Git_Config
 
-    Git_Config_Actor_ = ::Class.new Brazen_::Collection::Actor  # in [#028]
+    Git_Config_Actor_ = ::Class.new Home_::Collection::Actor  # in [#028]
 
     Actors__ = ::Module.new
 

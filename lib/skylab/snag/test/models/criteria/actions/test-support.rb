@@ -92,7 +92,7 @@ module Skylab::Snag::TestSupport
         end
       end
 
-      setup_once = Snag_::EMPTY_P_
+      setup_once = Home_::EMPTY_P_
 
       NIL_
     end
@@ -117,8 +117,8 @@ module Skylab::Snag::TestSupport
 
     Path__ = Callback_.memoize do
 
-      Snag_.dir_pathname.join(
-        Snag_::Models_::Criteria::PERSISTED_CRITERIA_FILENAME___
+      Home_.dir_pathname.join(
+        Home_::Models_::Criteria::PERSISTED_CRITERIA_FILENAME___
       ).to_path
 
     end

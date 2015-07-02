@@ -4,7 +4,7 @@ module Skylab::Snag
 
     class Actions::Melt  # see [#063]
 
-      Snag_.lib_.brazen::Model.common_entity( self,
+      Home_.lib_.brazen::Model.common_entity( self,
 
         :default_proc, -> do
           To_Do_.default_pattern_strings
@@ -36,11 +36,11 @@ module Skylab::Snag
 
         o.is_dry = h[ :dry_run ]
         o.downstream_identifier = h[ :downstream_identifier ]
-        o.filesystem_conduit = Snag_.lib_.system.filesystem
+        o.filesystem_conduit = Home_.lib_.system.filesystem
         o.names = h[ :name ]
         o.paths = h[ :path ]
         o.patterns = h[ :pattern ]
-        o.system_conduit = Snag_::Library_::Open3
+        o.system_conduit = Home_::Library_::Open3
 
         o.execute
       end
@@ -78,7 +78,7 @@ module Skylab::Snag
 
           if ! @downstream_identifier
 
-            path = Snag_::Models_::Node_Collection.nearest_path(
+            path = Home_::Models_::Node_Collection.nearest_path(
               @paths.fetch( 0 ), @filesystem_conduit, & @_oes_p )
 
             if path
@@ -97,7 +97,7 @@ module Skylab::Snag
 
         def __via_downstream_identifier_resolve_collection
 
-          col = Snag_::Models_::Node_Collection.new_via_upstream_identifier(
+          col = Home_::Models_::Node_Collection.new_via_upstream_identifier(
             @downstream_identifier, & @_oes_p )
           if col
             @_collection = col

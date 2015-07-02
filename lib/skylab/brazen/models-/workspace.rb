@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Models_::Workspace < Brazen_::Model  # see [#055]
+  class Models_::Workspace < Home_::Model  # see [#055]
 
     edit_entity_class(
 
@@ -152,7 +152,7 @@ module Skylab::Brazen
     def _document & oes_p
       @___did_attempt_to_resolve_document ||= begin
 
-        @document_ = Brazen_::Collection_Adapters::Git_Config.via_path_and_kernel(
+        @document_ = Home_::Collection_Adapters::Git_Config.via_path_and_kernel(
           existent_config_path, @kernel, & oes_p )
 
         true
@@ -189,7 +189,7 @@ module Skylab::Brazen
 
     module Actions
 
-      class Ping < Brazen_::Action
+      class Ping < Home_::Action
 
         def produce_result
           maybe_send_event :payload, :ping do
@@ -268,10 +268,10 @@ module Skylab::Brazen
 
           @on_event_selectively.call :error, :missing_required_properties do
 
-            _prp = Brazen_.lib_.basic::Minimal_Property.via_variegated_symbol(
+            _prp = Home_.lib_.basic::Minimal_Property.via_variegated_symbol(
               :workspace_path )
 
-            Brazen_::Property.build_missing_required_properties_event [ _prp ]
+            Home_::Property.build_missing_required_properties_event [ _prp ]
           end
 
           UNABLE_

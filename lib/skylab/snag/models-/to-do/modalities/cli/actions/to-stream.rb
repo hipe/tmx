@@ -158,7 +158,7 @@ module Skylab::Snag
 
       def execute
 
-        @tree = Snag_.lib_.basic::Tree.mutable_node.new
+        @tree = Home_.lib_.basic::Tree.mutable_node.new
         populate_tree
         prune_tree
         resolve_line_stream
@@ -299,7 +299,7 @@ module Skylab::Snag
         @path_style_a = [ :strong, :green ].freeze
         @tag_style_a = [ :reverse, :yellow ].freeze  # #etc
         @fun = -> do
-          fun = Snag_.lib_.brazen::CLI::Styling
+          fun = Home_.lib_.brazen::CLI::Styling
           @fun = -> { fun }
           fun
         end

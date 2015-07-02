@@ -82,7 +82,7 @@ module Skylab::Basic
 
     def initialize
       @a = [] ; @h = {}  # #open [#037]
-      @node_class ||= Basic_::Digraph.node_class
+      @node_class ||= Home_::Digraph.node_class
     end
 
     # ~ :+[#sl-146] typical base class implementation:
@@ -116,7 +116,7 @@ module Skylab::Basic
     end
 
     def describe_digraph * x_a
-      Basic_::Digraph::Describe__.new( self, x_a ).execute
+      Home_::Digraph::Describe__.new( self, x_a ).execute
     end
 
     def fetch name_i, &b

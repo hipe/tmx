@@ -5,12 +5,12 @@ module Skylab::Brazen::TestSupport::Zerk
   ::Skylab::Brazen::TestSupport[ self ]
 
   module Constants
-    Zerk_ = Brazen_::Zerk
+    Zerk_ = Home_::Zerk
   end
 
   include Constants
 
-  Brazen_ = Brazen_
+  Home_ = Home_
   Zerk_ = Zerk_
 
   module InstanceMethods

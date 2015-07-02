@@ -35,7 +35,7 @@ module Skylab::Basic
     #
     #     module MyApp
     #       class CLI::Client
-    #         Basic_::Module::Accessors.enhance self do
+    #         Home_::Module::Accessors.enhance self do
     #           public_methods do
     #             module_reader :API_client_module, '../../API/Client'
     #           end
@@ -63,7 +63,7 @@ module Skylab::Basic
     #
     #     class Foo
     #
-    #       Basic_::Module::Accessors.enhance self do
+    #       Home_::Module::Accessors.enhance self do
     #
     #         private_module_autovivifier_reader :zapper, 'Ohai_',
     #           -> do  # when didn't exist
@@ -121,7 +121,7 @@ module Skylab::Basic
               instance_variable_get ivar
             else
 
-              md = Basic_::Module.touch_value_via_relative_path(
+              md = Home_::Module.touch_value_via_relative_path(
                 mod[ self ],
                 path,
                 create_blk )

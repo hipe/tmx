@@ -6,7 +6,7 @@ module Skylab::Basic::TestSupport::Method
 
   include Constants
 
-  Basic_ = Basic_
+  Home_ = Home_
 
   extend TestSupport_::Quickie
 

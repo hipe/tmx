@@ -8,7 +8,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
 
   extend TestSupport_::Quickie
 
-  Brazen_ = Brazen_
+  Home_ = Home_
 
   module ModuleMethods
 

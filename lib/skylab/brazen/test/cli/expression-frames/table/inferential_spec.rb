@@ -54,7 +54,7 @@ module Skylab::Brazen::TestSupport
         o.tail = '>>'
 
         o.on_text do | s |
-          y.push "#{ s }#{ Brazen_::NEWLINE_ }"
+          y.push "#{ s }#{ Home_::NEWLINE_ }"
         end
       end
 
@@ -138,10 +138,10 @@ module Skylab::Brazen::TestSupport
       _when_rendering row_enum, separator: "\t" do |o|
 
         o.field!( :header ).style =
-          Brazen_::CLI.expression_agent_instance.method( :hdr )
+          Home_::CLI.expression_agent_instance.method( :hdr )
 
         o.on_row do |txt|
-          a.push Brazen_::CLI::Styling.unstyle txt
+          a.push Home_::CLI::Styling.unstyle txt
         end
       end
 
@@ -153,7 +153,7 @@ module Skylab::Brazen::TestSupport
 
     def _when_rendering * ea_and_h, & edit_p
 
-      Brazen_::CLI::Expression_Frames::Table::Inferential.
+      Home_::CLI::Expression_Frames::Table::Inferential.
         render( * ea_and_h, & edit_p )
     end
   end

@@ -1,8 +1,8 @@
 module Skylab::Brazen
 
-  class Collection_Adapters::Couch < Brazen_::Collection::Model_  # see [#038]
+  class Collection_Adapters::Couch < Home_::Collection::Model_  # see [#038]
 
-    Brazen_::Model::Entity.call self do
+    Home_::Model::Entity.call self do
 
       o :desc, -> y do
         y << "manage couch collections."
@@ -77,7 +77,7 @@ module Skylab::Brazen
 
       Rm = make_action_class :Delete do
 
-        Brazen_::Model::Entity.call self do
+        Home_::Model::Entity.call self do
 
           o :description,
             -> y do
@@ -167,7 +167,7 @@ module Skylab::Brazen
 
   public  # ~ hook out's & hook in's
 
-    class Silo_Daemon < Brazen_::Model::Silo_Daemon
+    class Silo_Daemon < Home_::Model::Silo_Daemon
 
       def precondition_for_self _action, _id, box, & oes_p
         :"???"  # we might want to use this for write-collection operations
@@ -189,6 +189,6 @@ module Skylab::Brazen
     end  # >>
 
     Couch_ = self
-    Collection = Brazen_::Collection
+    Collection = Home_::Collection
   end
 end

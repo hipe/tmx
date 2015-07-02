@@ -56,7 +56,7 @@ module Skylab::Snag
 
         Space_piece_singleton__ = Callback_.memoize do
 
-          Snag_::Models::Hashtag::String_Piece.new_via_string SPACE_
+          Home_::Models::Hashtag::String_Piece.new_via_string SPACE_
         end
 
         def __remove__object_for_mutation_session obj

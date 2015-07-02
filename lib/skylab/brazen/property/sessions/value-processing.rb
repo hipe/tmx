@@ -94,7 +94,7 @@ module Skylab::Brazen
 
       def receive_missing_required_properties_array mo_a  # compare to etc
 
-        _ev = Brazen_::Property.build_missing_required_properties_event mo_a
+        _ev = Home_::Property.build_missing_required_properties_event mo_a
         raise _ev.to_exception
       end
     end

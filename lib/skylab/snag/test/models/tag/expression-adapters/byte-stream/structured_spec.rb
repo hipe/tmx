@@ -72,7 +72,7 @@ module Skylab::Snag::TestSupport
 
       memoize_ :_the_byte_upstream do
 
-        Snag_.lib_.basic::String::Byte_Upstream_Identifier.new(
+        Home_.lib_.basic::String::Byte_Upstream_Identifier.new(
 
           "[#07] hi #normal-tag ( #wiz: hey #other-tag hi ) and #normal-again.\n"
         )

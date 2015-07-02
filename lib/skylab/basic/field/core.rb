@@ -120,7 +120,7 @@ module Skylab::Basic
 
   end  # ..
 
-  Shell__ = Basic_.lib_.enhancement_shell %i(
+  Shell__ = Home_.lib_.enhancement_shell %i(
     meta_fields
     fields
     field_class_instance_methods
@@ -237,7 +237,7 @@ module Skylab::Basic
         def initialize( (*x_a), depth=1 )
           super( * x_a[ 0..0 ] )
           if 1 < x_a.length
-            scn = Basic_::List.line_stream x_a
+            scn = Home_::List.line_stream x_a
             scn.gets  # toss first match that was handled above
             begin
               i = scn.gets
@@ -430,7 +430,7 @@ module Skylab::Basic
     def hook_notify name_x, p
       (( @hook_box ||= begin
         @has_hooks = true
-        Basic_::Box.new
+        Home_::Box.new
       end )).add name_x, p
       nil
     end

@@ -80,7 +80,7 @@ module Skylab::Brazen
 
       def __build_style_proc
         if @color
-          Brazen_::CLI::Styling::Stylify.curry[ [ @color ] ]
+          Home_::CLI::Styling::Stylify.curry[ [ @color ] ]
         else
           IDENTITY_
         end

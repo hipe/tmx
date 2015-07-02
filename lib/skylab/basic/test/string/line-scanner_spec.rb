@@ -85,9 +85,9 @@ module Skylab::Basic::TestSupport::String
 
     def subject( * a )
       if a.length.zero?
-        Basic_::String.line_stream
+        Home_::String.line_stream
       else
-        Basic_::String.line_stream( * a )
+        Home_::String.line_stream( * a )
       end
     end
 

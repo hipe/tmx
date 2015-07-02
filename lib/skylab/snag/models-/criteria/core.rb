@@ -4,7 +4,7 @@ module Skylab::Snag
 
     PERSISTED_CRITERIA_FILENAME___ = 'data-documents-/persisted-criteria'
 
-    Brazen_ = Snag_.lib_.brazen
+    Brazen_ = Home_.lib_.brazen
 
     Actions = ::Module.new
 
@@ -171,13 +171,13 @@ module Skylab::Snag
 
           o.directory_is_assumed_to_exist = false
 
-          o.directory_path = Snag_.dir_pathname.join(
+          o.directory_path = Home_.dir_pathname.join(
             PERSISTED_CRITERIA_FILENAME___
           ).to_path
 
           o.filename_pattern = /\A[a-z0-9]+(?:[-_][a-z0-9]+)*\z/i
 
-          o.filesystem = Snag_.lib_.system.filesystem
+          o.filesystem = Home_.lib_.system.filesystem
 
           o.flyweight_class = Criteria_
 

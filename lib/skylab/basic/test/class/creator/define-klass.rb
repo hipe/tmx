@@ -47,7 +47,7 @@ module Skylab::Basic::TestSupport
 
         ::Class.new.class_eval do
 
-          Basic_::Class::Creator[ self ]
+          Home_::Class::Creator[ self ]
 
           define_method :memoized_, TestSupport_::Let::MEMOIZED_METHOD
 

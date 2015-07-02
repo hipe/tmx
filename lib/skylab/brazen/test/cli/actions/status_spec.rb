@@ -112,7 +112,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
 
     def expect_negative_exitstatus
       expect_no_more_lines
-      @exitstatus.should eql Brazen_::API.exit_statii.fetch :is_negative
+      @exitstatus.should eql Home_::API.exit_statii.fetch :is_negative
     end
   end
 end

@@ -155,7 +155,7 @@ module Skylab::Snag::TestSupport
 
     def _subject
 
-      Snag_::Models::Hashtag
+      Home_::Models::Hashtag
     end
   end
 end

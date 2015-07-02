@@ -63,7 +63,7 @@ module Skylab::Brazen
       shell = Table_Session__.new
       param_h.each { |k, v| shell.send "#{ k }=", v } if param_h
       if blk then blk[ shell ] else
-        x = Brazen_.lib_.string_IO.new
+        x = Home_.lib_.string_IO.new
         shell.on_text { |txt| x.puts txt }
       end
       shell.instance_exec do
@@ -236,7 +236,7 @@ module Skylab::Brazen
 
   module Types__
 
-    mod = Brazen_::CLI::Styling
+    mod = Home_::CLI::Styling
     unstyle = mod::Unstyle
 
     parse_styles = mod::Parse_styles
@@ -312,7 +312,7 @@ module Skylab::Brazen
 
     start_type = Types__::INTEGER
 
-    unstyle = Brazen_::CLI::Styling::Unstyle
+    unstyle = Home_::CLI::Styling::Unstyle
 
     define_method :see do |cel_x|  # `cel_x` must be ::String or nil
       if ! cel_x.nil?

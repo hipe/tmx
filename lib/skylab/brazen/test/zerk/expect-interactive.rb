@@ -159,7 +159,7 @@ module Skylab::Brazen
         attr_reader :err
 
         def start
-          @in, @out, @err, @thread = Brazen_::LIB_.open3.popen3 @bin_path,
+          @in, @out, @err, @thread = Home_::LIB_.open3.popen3 @bin_path,
             chdir: @chdir_path
           self
         end
@@ -205,7 +205,7 @@ module Skylab::Brazen
         end
       end
 
-      BLANK_RX_ = Brazen_::Zerk::BLANK_RX_
+      BLANK_RX_ = Home_::Zerk::BLANK_RX_
 
       LINE_DELIM_RX__ = /(?<=\n)/
 

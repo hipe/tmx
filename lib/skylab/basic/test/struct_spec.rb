@@ -8,13 +8,13 @@ module Skylab::Basic::TestSupport::Struct
 
   extend TestSupport_::Quickie
 
-  Basic_ = Basic_
+  Home_ = Home_
 
   Subject_ = -> * x_a, & p do
     if x_a.length.nonzero? || p
-      Basic_::Struct[ * x_a, & p ]
+      Home_::Struct[ * x_a, & p ]
     else
-      Basic_::Struct
+      Home_::Struct
     end
   end
 
@@ -23,7 +23,7 @@ module Skylab::Basic::TestSupport::Struct
     context "make a basic struct class with a list of member names (like ::Struct)" do
 
       before :all do
-        Foo = Basic_::Struct.new :nerp
+        Foo = Home_::Struct.new :nerp
       end
       it "build an instance with `new`, by default the member is nil (like ::Struct)" do
         Foo.new.nerp.should eql nil

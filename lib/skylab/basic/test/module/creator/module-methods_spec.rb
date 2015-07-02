@@ -19,7 +19,7 @@ module Skylab::Basic::TestSupport
 
       module Some_Module_Definer_Methods
 
-        Basic_::Module::Creator[ self ]
+        Home_::Module::Creator[ self ]
 
         modul :Wank do
           def worked
@@ -62,14 +62,14 @@ module Skylab::Basic::TestSupport
 
         module OneGuy
 
-          Basic_::Module::Creator[ self ]
+          Home_::Module::Creator[ self ]
 
           modul :Lawrence__Fishburne
         end
 
         module AnotherGuy
 
-          Basic_::Module::Creator[ self ]
+          Home_::Module::Creator[ self ]
 
           modul :Lawrence__Kasdan
 

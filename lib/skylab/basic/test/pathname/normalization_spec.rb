@@ -28,7 +28,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
     context "the empty normalizer" do
 
       before :all do
-        EMPTY = Subject_[].new_via_iambic Basic_::EMPTY_A_
+        EMPTY = Subject_[].new_via_iambic Home_::EMPTY_A_
       end
 
       it "against nil does nothing - checking required-ness is outside of scope" do
@@ -44,7 +44,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
       end
 
       it 'against the empty string - "your value cannot be empty" (ever)' do
-        normalize_against Basic_::EMPTY_S_
+        normalize_against Home_::EMPTY_S_
         output_value_was_not_written
         @result_x.should eql false
         expect_event :path_cannot_be_empty,
@@ -217,7 +217,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
     end
 
     Subject_ = -> do
-      Basic_::Pathname.normalization
+      Home_::Pathname.normalization
     end
   end
 end

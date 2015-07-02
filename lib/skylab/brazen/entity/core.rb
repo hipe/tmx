@@ -716,7 +716,7 @@ module Skylab::Brazen
 
       def __say_floating
         _s = Concerns_::Property::Small_Time_Actors::Prop_desc_wonderhack[
-          Brazen_::API.expression_agent_instance, @_floating ]
+          Home_::API.expression_agent_instance, @_floating ]
         "property or metaproperty never received a name - #{ _s }"
       end
     end
@@ -1061,7 +1061,7 @@ module Skylab::Brazen
 
       def normalize_argument kn, & x_p  # :+[#ba-027] assume some normalizer (for now)
 
-        Brazen_::Concerns_::Normalization::Against_model[ kn, self, & x_p ]
+        Home_::Concerns_::Normalization::Against_model[ kn, self, & x_p ]
       end
 
       def is_normalizable_

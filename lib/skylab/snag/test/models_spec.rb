@@ -9,7 +9,7 @@ module Skylab::Snag::TestSupport
 
     it "loads" do
 
-      Snag_::Models_
+      Home_::Models_
     end
 
     it "pings" do

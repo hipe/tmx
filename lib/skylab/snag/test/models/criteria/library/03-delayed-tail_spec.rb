@@ -53,7 +53,7 @@ module Skylab::Snag::TestSupport
 
     memoize_ :_simplest_width do
 
-      n11n = Snag_.lib_.basic::Number.normalization.new_with(
+      n11n = Home_.lib_.basic::Number.normalization.new_with(
         :number_set, :integer, :minimum, 0 ).to_parser_proc
 
       subject_module_::Association_Adapter.new_with(

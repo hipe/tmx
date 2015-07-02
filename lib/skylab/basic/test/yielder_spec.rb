@@ -12,7 +12,7 @@ module Skylab::Basic::TestSupport::Yielder
 
     it "counts" do
       yes = nil
-      y = Basic_::Yielder::Counting.new do |msg|
+      y = Home_::Yielder::Counting.new do |msg|
         yes = msg
       end
 

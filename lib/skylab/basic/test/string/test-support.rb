@@ -9,7 +9,7 @@ module Skylab::Basic::TestSupport::String
   extend TestSupport_::Quickie
 
   module Constants
-    EMPTY_S_ = Basic_::String::EMPTY_S_
+    EMPTY_S_ = Home_::String::EMPTY_S_
   end
 
   EMPTY_S_ = EMPTY_S_

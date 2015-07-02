@@ -8,7 +8,7 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config::Mutable
 
   extend TestSupport_::Quickie
 
-  Brazen_ = Brazen_
+  Home_ = Home_
   EMPTY_S_ = EMPTY_S_
 
   module ModuleMethods
@@ -45,7 +45,7 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config::Mutable
   end
 
   Subject__ = -> do
-    Brazen_::Collection_Adapters::Git_Config::Mutable
+    Home_::Collection_Adapters::Git_Config::Mutable
   end
 
   module InstanceMethods
@@ -57,7 +57,7 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config::Mutable
     define_method :subject, Subject__
 
     def super_subject
-      Brazen_::Collection_Adapters::Git_Config
+      Home_::Collection_Adapters::Git_Config
     end
 
     def parse_context

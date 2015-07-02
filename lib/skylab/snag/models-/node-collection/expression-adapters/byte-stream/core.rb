@@ -39,7 +39,7 @@ module Skylab::Snag
             x
           end
 
-          @_FS_adapter = Snag_.application_kernel_.silo(
+          @_FS_adapter = Home_.application_kernel_.silo(
             :node_collection
           ).FS_adapter_
         end
@@ -103,7 +103,7 @@ module Skylab::Snag
 
         def entity_via_intrinsic_key node_id_x, & oes_p
 
-          id = Snag_::Models_::Node_Identifier.new_via_user_value(
+          id = Home_::Models_::Node_Identifier.new_via_user_value(
             node_id_x, & oes_p )
 
           id and entity_via_identifier_object id, & oes_p
@@ -132,7 +132,7 @@ module Skylab::Snag
 
           Brazen_::Model.common_events::Entity_Not_Found.new_with(
             :identifier, id_o,
-            :model, Snag_::Models_::Node,
+            :model, Home_::Models_::Node,
             :describable_source, @byte_upstream_ID )
         end
 
@@ -220,7 +220,7 @@ module Skylab::Snag
       end
 
       Autoloader_[ Actors_ = ::Module.new ]
-      Brazen_ = Snag_.lib_.brazen
+      Brazen_ = Home_.lib_.brazen
       BS_ = self
     end
   end

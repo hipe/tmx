@@ -42,7 +42,7 @@ module Skylab::Brazen::TestSupport::CLI
     end
 
     def subject_CLI  # for above
-      Brazen_::CLI::Client_for_Brazen_as_Application
+      Home_::CLI::Client_for_Brazen_as_Application
     end
 
     def invocation_strings_for_expect_stdout_stderr
@@ -191,7 +191,7 @@ module Skylab::Brazen::TestSupport::CLI
     end
 
     def expect_exitstatus_for i
-      @exitstatus.should eql Brazen_::API.exit_statii.fetch i
+      @exitstatus.should eql Home_::API.exit_statii.fetch i
     end
 
     def expect_errored
@@ -200,12 +200,12 @@ module Skylab::Brazen::TestSupport::CLI
     end
 
     def expect_generic_error_exitstatus
-      @exitstatus.should eql Brazen_::CLI::GENERIC_ERROR_
+      @exitstatus.should eql Home_::CLI::GENERIC_ERROR_
     end
 
     def expect_succeeded
       expect_no_more_lines
-      @exitstatus.should eql Brazen_::CLI::SUCCESS_
+      @exitstatus.should eql Home_::CLI::SUCCESS_
     end
 
     def expect_option i, rx=nil
@@ -245,12 +245,12 @@ module Skylab::Brazen::TestSupport::CLI
 
   FAKE_INVO_STRING_ARY___ = [ FAKE_APP_NAME__ ].freeze
 
-  Brazen_ = ::Skylab::Brazen
-  Callback_ = Brazen_::Callback_
-  SPACE_ = Brazen_::SPACE_
+  Home_ = ::Skylab::Brazen
+  Callback_ = Home_::Callback_
+  SPACE_ = Home_::SPACE_
 
   module Constants
-    Brazen_ = Brazen_
+    Home_ = Home_
     TestSupport_ = TestSupport_
   end
 end

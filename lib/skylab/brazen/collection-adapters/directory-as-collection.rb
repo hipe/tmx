@@ -103,7 +103,7 @@ module Skylab::Brazen
 
       # per ACS, assume that last we checked, item is present in collection
 
-      succ = Brazen_.lib_.basic::String.succ.with(
+      succ = Home_.lib_.basic::String.succ.with(
 
         :beginning_width, 2,
         :first_item_does_not_use_number,
@@ -227,7 +227,7 @@ module Skylab::Brazen
 
     def edit * x_a, & x_p
 
-      Brazen_::Mutation_Session.edit x_a, self, & x_p
+      Home_::Mutation_Session.edit x_a, self, & x_p
     end
 
     def mutable_body_for_mutation_session

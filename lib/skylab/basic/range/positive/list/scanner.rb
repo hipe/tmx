@@ -44,7 +44,7 @@ module Skylab::Basic
 
       reset[]
 
-      scn = Basic_.lib_.empty_string_scanner
+      scn = Home_.lib_.empty_string_scanner
 
       @set_string = -> x do
         reset[]

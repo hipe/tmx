@@ -17,7 +17,7 @@ module Skylab::Brazen::TestSupport
     end
 
     it "(the empty array of slugs yields the empty string)" do
-      _expect_X_from_Y Brazen_::EMPTY_S_, Brazen_::EMPTY_A_
+      _expect_X_from_Y Home_::EMPTY_S_, Home_::EMPTY_A_
     end
 
     o [ 'tanman' ],
@@ -39,13 +39,13 @@ module Skylab::Brazen::TestSupport
        "tanman trepidatious external services failed to delete connection"
 
     def _expect_X_from_Y expected_s, a
-      ( subject.new( a ).to_string_array_for_failed * Brazen_::SPACE_  ).
+      ( subject.new( a ).to_string_array_for_failed * Home_::SPACE_  ).
         should eql expected_s
     end
 
     def subject
 
-      Brazen_::Concerns_::Name::Sessions_::Deep_Action_Isomorphicism_for_EN
+      Home_::Concerns_::Name::Sessions_::Deep_Action_Isomorphicism_for_EN
     end
   end
 end

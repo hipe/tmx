@@ -43,8 +43,8 @@ module Skylab::Snag::TestSupport
 
     def _init_cc_via_path path
 
-      @cc = Snag_::Models_::Criteria::Silo_Daemon.__build_collection_via_kernel(
-        Snag_.application_kernel_
+      @cc = Home_::Models_::Criteria::Silo_Daemon.__build_collection_via_kernel(
+        Home_.application_kernel_
       ) do | o |
         o.directory_path =  path
       end

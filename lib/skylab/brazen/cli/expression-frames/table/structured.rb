@@ -91,7 +91,7 @@ module Skylab::Brazen
           @polymorphic_upstream_.gets_one
         end
 
-        IG__ = Brazen_.lib_.parse::Item_Grammar.new(
+        IG__ = Home_.lib_.parse::Item_Grammar.new(
 
           [
             :no_data,

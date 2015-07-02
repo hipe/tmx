@@ -6,7 +6,7 @@ module Skylab::Brazen::TestSupport::Zerk::API
 
   include Constants
 
-  Brazen_ = Brazen_
+  Home_ = Home_
   Zerk_ = Zerk_
 
   extend TestSupport_::Quickie
@@ -22,7 +22,7 @@ module Skylab::Brazen::TestSupport::Zerk::API
         class Mezo_Branch < Zerk_::Branch_Node
 
           def initialize x
-            @children = Brazen_::EMPTY_A_
+            @children = Home_::EMPTY_A_
             super
           end
         end
@@ -118,7 +118,7 @@ module Skylab::Brazen::TestSupport::Zerk::API
             end
 
             def set_name_symbol name_i
-              @name = Brazen_::Callback_::Name.via_variegated_symbol name_i
+              @name = Home_::Callback_::Name.via_variegated_symbol name_i
               nil
             end
           end

@@ -123,7 +123,7 @@ module Skylab::Brazen
             if __is_unknown && model.is_required
 
               kn = @when_missing.call kn, MISSING___ do
-                Brazen_::Property.build_missing_required_properties_event(
+                Home_::Property.build_missing_required_properties_event(
                   [ model ] )
               end
             end

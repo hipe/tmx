@@ -54,7 +54,7 @@ module Skylab::Snag
         o.filename_pattern_s_a = h[ :name ]
         o.path_s_a = h.fetch :path
         o.pattern_s_a = h.fetch :pattern
-        o.system_conduit = Snag_::Library_::Open3
+        o.system_conduit = Home_::Library_::Open3
 
         if h[ :show_command_only ]
 

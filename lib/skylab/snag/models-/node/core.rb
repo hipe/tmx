@@ -8,9 +8,9 @@ module Skylab::Snag
 
         def new s_a
 
-          Snag_::Models_::Criteria.new_via_expression(
+          Home_::Models_::Criteria.new_via_expression(
             s_a,
-            Snag_.application_kernel_ )
+            Home_.application_kernel_ )
         end
       end  # >>
     end
@@ -19,17 +19,17 @@ module Skylab::Snag
 
       def interpret_for_mutation_session arg_st, & x_p
 
-        Snag_.lib_.brazen::Mutation_Session.interpret arg_st, self, & x_p
+        Home_.lib_.brazen::Mutation_Session.interpret arg_st, self, & x_p
       end
 
       def edit_entity * x_a, & x_p  # ..
 
-        Snag_.lib_.brazen::Mutation_Session.create x_a, self, & x_p
+        Home_.lib_.brazen::Mutation_Session.create x_a, self, & x_p
       end
 
       def collection_module_for_criteria_resolution
 
-        Snag_::Models_::Node_Collection
+        Home_::Models_::Node_Collection
       end
 
       def new_via_body x  # :+#ACS-tenet-8B
@@ -55,7 +55,7 @@ module Skylab::Snag
 
       def __identifier__association_for_mutation_session
 
-        Snag_::Models_::Node_Identifier
+        Home_::Models_::Node_Identifier
       end
 
       def __message__association_for_mutation_session
@@ -65,12 +65,12 @@ module Skylab::Snag
 
       def __string__association_for_mutation_session
 
-        Snag_::Models::Hashtag::String_Piece
+        Home_::Models::Hashtag::String_Piece
       end
 
       def __tag__association_for_mutation_session
 
-        Snag_::Models_::Tag
+        Home_::Models_::Tag
       end
 
       private :new  # :+#ACS-tenet-1
@@ -235,7 +235,7 @@ module Skylab::Snag
     def to_tag_stream
 
       if @body
-        @body.to_entity_stream_via_model Snag_::Models_::Tag
+        @body.to_entity_stream_via_model Home_::Models_::Tag
       else
         Callback_::Stream.the_empty_stream
       end
@@ -261,7 +261,7 @@ module Skylab::Snag
 
     def edit * x_a, & x_p
 
-      Snag_.lib_.brazen::Mutation_Session.edit x_a, self, & x_p
+      Home_.lib_.brazen::Mutation_Session.edit x_a, self, & x_p
     end
 
     def mutable_body_for_mutation_session
@@ -292,7 +292,7 @@ module Skylab::Snag
       end
     end
 
-    Brazen_ = Snag_.lib_.brazen
+    Brazen_ = Home_.lib_.brazen
 
     class Common_Action < Brazen_::Model.common_action_class
 
@@ -335,7 +335,7 @@ module Skylab::Snag
 
       def _resolve_node_collection
 
-        co = Snag_::Models_::Node_Collection.new_via_upstream_identifier(
+        co = Home_::Models_::Node_Collection.new_via_upstream_identifier(
           @argument_box.fetch( :upstream_identifier ),
           & handle_event_selectively )
 
@@ -430,7 +430,7 @@ module Skylab::Snag
 
       a.each do | x_ |
 
-        s = Snag_::Models_::Message.normalize_value__ x_, & x_p
+        s = Home_::Models_::Message.normalize_value__ x_, & x_p
         if s
           s_a.push s
         else
@@ -440,7 +440,7 @@ module Skylab::Snag
       end
 
       if ok
-        Snag_::Models::Hashtag::String_Piece.new_via_string s_a * SPACE_
+        Home_::Models::Hashtag::String_Piece.new_via_string s_a * SPACE_
       else
         ok
       end
@@ -450,7 +450,7 @@ module Skylab::Snag
 
       x = ( arg.value_x if arg.is_known )
       if x
-        o = Snag_::Models_::Node_Identifier.new_via_user_value x, & x_p
+        o = Home_::Models_::Node_Identifier.new_via_user_value x, & x_p
         if o
           arg.new_with_value o
         else

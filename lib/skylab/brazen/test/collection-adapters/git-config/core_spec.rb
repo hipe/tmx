@@ -43,7 +43,7 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
     end
 
     def subject
-      Brazen_::Collection_Adapters::Git_Config
+      Home_::Collection_Adapters::Git_Config
     end
 
   end

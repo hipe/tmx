@@ -12,7 +12,7 @@ module Skylab::Brazen::TestSupport::Entity
 
         MPEF_Entity = Subject_[].call do
 
-          class self::Property < Brazen_::Entity::Property
+          class self::Property < Home_::Entity::Property
 
             def is_florg
               :zero == @argument_arity

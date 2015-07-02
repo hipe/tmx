@@ -59,7 +59,7 @@ module Skylab::Basic
             lineno
           end
 
-          scn = Basic_.lib_.string_scanner s
+          scn = Home_.lib_.string_scanner s
 
           @_gets = -> do
             s = scn.scan LINE_RX___

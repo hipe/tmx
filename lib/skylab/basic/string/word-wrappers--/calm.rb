@@ -497,7 +497,7 @@ module Skylab::Basic
 
         def init_via_string string
 
-          @_scn = Basic_.lib_.string_scanner string
+          @_scn = Home_.lib_.string_scanner string
           _via_string_scanner_reinit_step_stream
           NIL_
         end

@@ -7,13 +7,13 @@ module Skylab::Snag
   class TestSupport_Visual < ::Skylab::TestSupport::CLI.visual_client
 
     def initialize * a
-      a.push Snag_
+      a.push Home_
       super
     end
 
     def produce_executable_when_nonzero_length_argv_
 
-      o = Snag_::Models_::Node_Collection::Actions::To_Universal_Node_Stream.new
+      o = Home_::Models_::Node_Collection::Actions::To_Universal_Node_Stream.new
 
       o.sout_serr @stdout, @stderr
       o.argv( * @argv )

@@ -30,7 +30,7 @@ module Skylab::Brazen::TestSupport::Pstack_Cframe
 
         class CF_One_Property
 
-          Brazen_::Property::Stack.common_frame self,
+          Home_::Property::Stack.common_frame self,
             :method, :foo_diddle
 
           def foo_diddle

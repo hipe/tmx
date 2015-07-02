@@ -16,7 +16,7 @@ module Skylab::Brazen
     #
     #     self._TODO: reverse write
     #
-    #     y = Brazen_::CLI::Expression_Frames::Table.express_minimally_into [],
+    #     y = Home_::CLI::Expression_Frames::Table.express_minimally_into [],
     #       [ food: 'donuts', drink: 'coffee' ], -> line { y << line } )
     #
     #     y.shift   # => "|   Food  |   Drink |"

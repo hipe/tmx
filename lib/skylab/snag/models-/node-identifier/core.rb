@@ -69,7 +69,7 @@ module Skylab::Snag
     class << self
 
       def edit_entity * x_a, & x_p  # :+#ACS-tenet-2
-        Snag_.lib_.brazen::Mutation_Session.create x_a, self, & x_p
+        Home_.lib_.brazen::Mutation_Session.create x_a, self, & x_p
       end
 
       # ~ the associations
@@ -86,7 +86,7 @@ module Skylab::Snag
 
         ( Callback_.memoize do
 
-          _n11n = Snag_.lib_.basic::Number.normalization.new_with(
+          _n11n = Home_.lib_.basic::Number.normalization.new_with(
             :minimum, 1,
             :number_set, :integer
           )
@@ -108,7 +108,7 @@ module Skylab::Snag
           else
 
             id = new
-            _scn = Snag_::Library_::StringScanner.new x
+            _scn = Home_::Library_::StringScanner.new x
 
             ok = Parse__[ id, _scn, & x_p ]
 
@@ -187,7 +187,7 @@ module Skylab::Snag
 
       def __build_uninterpretable_as_integer_event x
 
-        Snag_.lib_.basic::Number::Uninterpretable.new_with(
+        Home_.lib_.basic::Number::Uninterpretable.new_with(
           :x, x,
           :property_name_symbol, :node_identifier_number_component,
           :minimum, 0,

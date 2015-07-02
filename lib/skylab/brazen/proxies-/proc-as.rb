@@ -42,7 +42,7 @@ module Skylab::Brazen
 
         def name_function_class  # #hook-in
 
-          Brazen_::Model.common_action_class.name_function_class
+          Home_::Model.common_action_class.name_function_class
         end
 
         def custom_action_inflection
@@ -207,7 +207,7 @@ module Skylab::Brazen
 
             bx.add( name_symbol,
 
-            Brazen_::Model.common_entity_module::Property.new do
+            Home_::Model.common_entity_module::Property.new do
 
               @argument_arity = argument_arity
               @name = Callback_::Name.via_variegated_symbol name_symbol
@@ -233,7 +233,7 @@ module Skylab::Brazen
 
             if :req == orr && x.nil?
 
-              _prp = Brazen_.lib_.basic::Minimal_Property.
+              _prp = Home_.lib_.basic::Minimal_Property.
                 via_variegated_symbol name_sym
 
               miss_prp_a ||= []
@@ -282,7 +282,7 @@ module Skylab::Brazen
 
         def __build_when_extra_arguments_event extra_sym_a
 
-          _sign_event Brazen_::Property.
+          _sign_event Home_::Property.
             build_extra_values_event extra_sym_a, nil, 'argument', 'unexpected'
         end
 
@@ -297,7 +297,7 @@ module Skylab::Brazen
 
         def __build_missing_arguments_event miss_prp_a
 
-          _sign_event Brazen_::Property.
+          _sign_event Home_::Property.
             build_missing_required_properties_event miss_prp_a, 'argument'
         end
 

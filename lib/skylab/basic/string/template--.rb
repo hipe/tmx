@@ -43,13 +43,13 @@ module Skylab::Basic
     private
 
       def path=
-        @buid = Basic_.lib_.brazen.byte_upstream_identifier.via_path(
+        @buid = Home_.lib_.brazen.byte_upstream_identifier.via_path(
           gets_one_polymorphic_value )
         KEEP_PARSING_
       end
 
       def string=
-        @buid = Basic_.lib_.brazen.byte_upstream_identifier.via_string(
+        @buid = Home_.lib_.brazen.byte_upstream_identifier.via_string(
           gets_one_polymorphic_value )
         KEEP_PARSING_
       end
@@ -182,7 +182,7 @@ module Skylab::Basic
 
           plain_rx = /(?: (?! #{ var_rx.source } ) . )+/mx
 
-          scn = Basic_.lib_.string_scanner @buid.whole_string
+          scn = Home_.lib_.string_scanner @buid.whole_string
           @scn = scn
 
           p = -> do
@@ -227,7 +227,7 @@ module Skylab::Basic
         end
       end
 
-      VAR_RX__ = Basic_::String.mustache_regexp
+      VAR_RX__ = Home_::String.mustache_regexp
 
       Name_symbol_via_surface_string__ = -> s do
         s.strip.intern

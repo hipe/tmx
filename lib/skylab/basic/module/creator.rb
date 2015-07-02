@@ -32,7 +32,7 @@ module Skylab::Basic
 
       # <- 2
 
-  Let__ = Basic_.lib_.test_support::Let
+  Let__ = Home_.lib_.test_support::Let
 
   module ModuleMethods  # assumes `let`
 
@@ -181,9 +181,9 @@ module Skylab::Basic
       memo
     end
 
-    M = Basic_::Struct.via_hash o
+    M = Home_::Struct.via_hash o
 
-    define_singleton_method :let, Basic_.lib_.test_support::Let::LET_METHOD
+    define_singleton_method :let, Home_.lib_.test_support::Let::LET_METHOD
 
     let :metahell_known_graph_ do
       # #note the below causes core dumps yay [#006]
@@ -278,7 +278,7 @@ module Skylab::Basic
       sing_class.class_exec name, & M.convenience
     end
 
-    M_IM = Basic_::Struct.via_hash o
+    M_IM = Home_::Struct.via_hash o
 
     def modul! full_name, &module_body
       # get this module by name now, autovivifying any modules necessary to

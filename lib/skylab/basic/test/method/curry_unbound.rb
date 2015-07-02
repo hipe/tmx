@@ -8,7 +8,7 @@ module Skylab::Basic::TestSupport::Method::CU
 
   extend TestSupport_::Quickie
 
-  Basic_ = Basic_
+  Home_ = Home_
 
   describe "[ba] method curry unbound - good for ONE curry" do
 
@@ -60,7 +60,7 @@ module Skylab::Basic::TestSupport::Method::CU
     end
 
     Parent_Subject_ = -> do
-      Basic_::Method.curry
+      Home_::Method.curry
     end
   end
 end

@@ -87,7 +87,7 @@ module Skylab::Basic
 
       def shortest_unique_or_first_headstrings a
         h = nil
-        Basic_::Hash.determine_hotstrings( a ).each_with_index.map do | hs, d |
+        Home_::Hash.determine_hotstrings( a ).each_with_index.map do | hs, d |
           if hs
             hs.hotstring
           else

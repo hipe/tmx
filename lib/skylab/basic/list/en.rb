@@ -4,7 +4,7 @@ module Skylab::Basic
 
     Say_not_found = -> d, a, k do
 
-      s = Basic_.lib_.human::Levenshtein.with(
+      s = Home_.lib_.human::Levenshtein.with(
         :item, k,
         :items, a,
         :closest_N_items, d,
@@ -14,7 +14,7 @@ module Skylab::Basic
         _did_you_mean = " - did you mean #{ s }?"
       end
 
-      "#{ Basic_::String.via_mixed k } not found#{ _did_you_mean }"
+      "#{ Home_::String.via_mixed k } not found#{ _did_you_mean }"
     end
 
     _A_HANDFUL___ = 5  # expose whenever

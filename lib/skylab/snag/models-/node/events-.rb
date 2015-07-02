@@ -4,7 +4,7 @@ module Skylab::Snag
 
     module Events
 
-      Failure = Snag_::Model_::Event.new :expecting, :near, :line,
+      Failure = Home_::Model_::Event.new :expecting, :near, :line,
                                           :line_number, :pathname  do
 
         message_proc do |y, o|

@@ -51,12 +51,12 @@ module Skylab::Brazen::TestSupport::CLI
     end
 
     def _subject_module
-      Brazen_::CLI::Expression_Frames::Lipstick
+      Home_::CLI::Expression_Frames::Lipstick
     end
 
     def _unstyle_styled s
 
-      s_ = Brazen_::CLI::Styling.unstyle_styled s
+      s_ = Home_::CLI::Styling.unstyle_styled s
       if s_
         s_
       else

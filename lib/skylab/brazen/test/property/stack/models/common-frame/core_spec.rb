@@ -8,7 +8,7 @@ module Skylab::Brazen::TestSupport::Pstack_Cframe
 
       before :all do
         class Foo
-          Brazen_::Property::Stack.common_frame self,
+          Home_::Property::Stack.common_frame self,
             :proc, :foo, -> do
                d = 0
                -> { d += 1 }
@@ -50,7 +50,7 @@ module Skylab::Brazen::TestSupport::Pstack_Cframe
 
       before :all do
         class Bar
-          Brazen_::Property::Stack.common_frame self,
+          Home_::Property::Stack.common_frame self,
             :globbing, :processor, :initialize,
             :required, :readable, :field, :foo,
             :readable, :field, :bar

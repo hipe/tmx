@@ -15,7 +15,7 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
   extend TestSupport_::Quickie
 
   module Constants
-    Callback_ = Brazen_::Callback_
+    Callback_ = Home_::Callback_
   end
 
   Callback_ = Callback_
@@ -149,6 +149,6 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
   end
 
   Subject_ = -> do
-    Brazen_::Collection_Adapters::Git_Config
+    Home_::Collection_Adapters::Git_Config
   end
 end

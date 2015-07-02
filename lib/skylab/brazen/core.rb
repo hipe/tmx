@@ -9,27 +9,27 @@ module Skylab::Brazen
   class << self
 
     define_method :application_kernel_, ( Callback_.memoize do
-      Brazen_::Kernel.new Brazen_
+      Home_::Kernel.new Home_
     end )
 
     def byte_downstream_identifier
-      Brazen_::Collection::Byte_Downstream_Identifier
+      Home_::Collection::Byte_Downstream_Identifier
     end
 
     def byte_upstream_identifier
-      Brazen_::Collection::Byte_Upstream_Identifier
+      Home_::Collection::Byte_Upstream_Identifier
     end
 
     def cfg
-      Brazen_::Collection_Adapters::Git_Config
+      Home_::Collection_Adapters::Git_Config
     end
 
     def collections
-      Brazen_::Collection_Adapters
+      Home_::Collection_Adapters
     end
 
     def expression_agent_library
-      Brazen_::API::Expression_Agent__::LIB
+      Home_::API::Expression_Agent__::LIB
     end
 
     def lib_
@@ -54,7 +54,7 @@ module Skylab::Brazen
 
     def test_support
       require_relative 'test/test-support'
-      Brazen_::TestSupport
+      Home_::TestSupport
     end
   end  # >>
 
@@ -288,7 +288,7 @@ module Skylab::Brazen
 
         _what = entity_enhancement_module
 
-        o = Brazen_::Entity::Session.new
+        o = Home_::Entity::Session.new
         o.arglist = x_a
         o.client = self
         o.extmod = _what
@@ -366,7 +366,7 @@ module Skylab::Brazen
     end
 
     Mutable_iambic_scanner = -> do
-      Brazen_::Entity.mutable_polymorphic_stream
+      Home_::Entity.mutable_polymorphic_stream
     end
 
     N_lines = -> do
@@ -424,7 +424,7 @@ module Skylab::Brazen
 
   ACHIEVED_ = true
   ACTIONS_CONST_ = :Actions
-  Brazen_ = self
+  Home_ = self
   Box_ = Callback_::Box
   Autoloader_[ Concerns_ = ::Module.new ]
   CONTINUE_ = nil

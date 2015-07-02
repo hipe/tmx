@@ -138,9 +138,9 @@ module Skylab::Basic::TestSupport::Tree_TS
       _line_a = if heredoc_string
         heredoc_string.split line_split_regex
       else
-        Basic_::EMPTY_A_
+        Home_::EMPTY_A_
       end
-      @lines = Basic_::Callback_::Stream.via_nonsparse_array _line_a
+      @lines = Home_::Callback_::Stream.via_nonsparse_array _line_a
 
       build_tree
       NIL_
@@ -163,7 +163,7 @@ module Skylab::Basic::TestSupport::Tree_TS
 
     def _to_normal_string
 
-      io = Basic_.lib_.string_IO
+      io = Home_.lib_.string_IO
       @tree.children_depth_first_via_args_hook io, nil do |node, io_, indent, p|
         io_.write "#{ indent }+ #{ node.value_x }"
         p[ -> do
@@ -174,7 +174,7 @@ module Skylab::Basic::TestSupport::Tree_TS
     end
 
     def _dedent s
-      s.gsub! dedent_regex, Basic_::EMPTY_S_
+      s.gsub! dedent_regex, Home_::EMPTY_S_
       s
     end
 

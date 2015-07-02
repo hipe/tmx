@@ -276,7 +276,7 @@ module Skylab::Snag
             y = @y
           end
 
-          Snag_.lib_.basic::String.word_wrappers::Calm.new_with(
+          Home_.lib_.basic::String.word_wrappers::Calm.new_with(
             :downstream_yielder, y,
             :margin, margin,
             :width, @expag.width,

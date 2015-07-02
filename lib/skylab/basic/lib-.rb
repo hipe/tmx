@@ -67,7 +67,7 @@ module Skylab::Basic
     end
 
     Strange = -> x do  # looks better in expressions for this to be here
-      Basic_::String.via_mixed x
+      Home_::String.via_mixed x
     end
 
     String_IO = -> do

@@ -23,7 +23,7 @@ module Skylab::Brazen
           #   property against a metaproperty is not hookable: it is supposed
           #   to fail loudly and early always.
 
-          Brazen_::Concerns_::Normalization::Against_model_stream[
+          Home_::Concerns_::Normalization::Against_model_stream[
 
             prp, Callback_::Stream.via_nonsparse_array( @_mprp_a ) ]
 

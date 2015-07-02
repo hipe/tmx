@@ -11,7 +11,7 @@ module Skylab::Brazen
           module Face
             module Of
               Hot = -> x, x_ do
-                Client.fml Brazen_, x, x_
+                Client.fml Home_, x, x_
               end
             end
           end

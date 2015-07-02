@@ -33,7 +33,7 @@ module Skylab::Basic::TestSupport::String
     end
 
     def subject s
-      Basic_::String.via_mixed s
+      Home_::String.via_mixed s
     end
   end
 end

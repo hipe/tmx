@@ -10,7 +10,7 @@ module Skylab::Basic
         mod.module_exec :register, & Enhance__ ; nil
       end
 
-      Enhance__ = Basic_::Module.mutex( -> method_name_i do
+      Enhance__ = Home_::Module.mutex( -> method_name_i do
 
         _ME = self
         _REGISTRY_H = {}

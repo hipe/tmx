@@ -119,7 +119,7 @@ module Skylab::Snag
         body_begin, body_end = md.offset d
         header_begin, header_end = md.offset( d - 1 )
 
-        Snag_::Models_::To_Do.new do | o |
+        Home_::Models_::To_Do.new do | o |
 
           o.accept_matching_line my_line_o
           o.accept_header_range header_begin, header_end
@@ -145,7 +145,7 @@ module Skylab::Snag
         d
       end
 
-      Rx_Lib__ = Snag_.lib_.basic::Regexp
+      Rx_Lib__ = Home_.lib_.basic::Regexp
     end
   end
 end

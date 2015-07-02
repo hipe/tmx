@@ -9,7 +9,7 @@ module Skylab::Brazen::TestSupport::CLI
     class << self
 
       def tree_via_string s
-        tree_via_line_stream Brazen_.lib_.basic::String.line_stream s
+        tree_via_line_stream Home_.lib_.basic::String.line_stream s
       end
 
       def tree_via_line_stream st
@@ -139,7 +139,7 @@ module Skylab::Brazen::TestSupport::CLI
       end
 
       def unstyled_content
-        @__UC__ ||= Brazen_::CLI::Styling.unstyle line_content
+        @__UC__ ||= Home_::CLI::Styling.unstyle line_content
       end
 
       def line_content

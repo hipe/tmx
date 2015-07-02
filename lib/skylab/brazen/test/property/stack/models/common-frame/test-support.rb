@@ -12,13 +12,13 @@ module Skylab::Brazen::TestSupport::Pstack_Cframe
 
     Subject_ = -> * a do
       if a.length.zero?
-        Brazen_::Property::Stack.common_frame
+        Home_::Property::Stack.common_frame
       else
-        Brazen_::Property::Stack.common_frame.call_via_arglist a
+        Home_::Property::Stack.common_frame.call_via_arglist a
       end
     end
   end
 
-  Brazen_ = Brazen_
+  Home_ = Home_
   Subject_ = Subject_
 end

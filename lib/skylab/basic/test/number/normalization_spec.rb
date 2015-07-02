@@ -21,7 +21,7 @@ module Skylab::Basic::TestSupport::Numeric
     context "the normalizer with no args" do
 
       before :all do
-        With_Nothing = Subject_[].new_via_arglist Basic_::EMPTY_A_
+        With_Nothing = Subject_[].new_via_arglist Home_::EMPTY_A_
       end
 
       it "builds" do
@@ -114,7 +114,7 @@ module Skylab::Basic::TestSupport::Numeric
     end
 
     Subject_ = -> do
-      Basic_::Number.normalization
+      Home_::Number.normalization
     end
   end
 end

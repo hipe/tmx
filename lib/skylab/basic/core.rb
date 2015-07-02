@@ -142,9 +142,9 @@ module Skylab::Basic  # introduction at [#020]
         _CONST = Callback_::Name.via_variegated_symbol( i ).as_const
         define_method i do | * a |
           if a.length.zero?
-            Basic_.const_get( _CONST, false ).normalization
+            Home_.const_get( _CONST, false ).normalization
           else
-            Basic_.const_get( _CONST, false ).normalization.new_via_arglist a
+            Home_.const_get( _CONST, false ).normalization.new_via_arglist a
           end
         end
       end
@@ -183,7 +183,7 @@ module Skylab::Basic  # introduction at [#020]
 
   ACHIEVED_ = true
   Autoloader_ = Callback_::Autoloader
-  Basic_ = self
+  Home_ = self
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze

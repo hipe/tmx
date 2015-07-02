@@ -19,7 +19,7 @@ module Skylab::Basic::TestSupport::String
     end
 
     def _subject
-      Basic_::String.word_wrappers.crazy
+      Home_::String.word_wrappers.crazy
     end
   end
 end

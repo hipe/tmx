@@ -47,7 +47,7 @@ module Skylab::Brazen
 
       def to_lower_unbound_action_stream
 
-        _acr = Brazen_::Model::Child_Node_Index.new(
+        _acr = Home_::Model::Child_Node_Index.new(
           @cls_pxy,
           @cls_pxy.__mod.const_get( ACTIONS_CONST_, false ) )
 

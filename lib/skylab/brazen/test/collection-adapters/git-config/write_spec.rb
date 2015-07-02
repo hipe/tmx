@@ -19,7 +19,7 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
       io.rewind
       s = io.read
       io.close
-      s.should eql <<-O.gsub %r(^[ ]+), Brazen_::EMPTY_S_
+      s.should eql <<-O.gsub %r(^[ ]+), Home_::EMPTY_S_
         [se-cto "sub sec.to"]
         Foo = x x
         zappo = true
@@ -29,11 +29,11 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
     it "don't fall over on backslashes" do
       _a = [ Callback_::Pair[ '\b', :'two-characters' ] ]
       _scan = Callback_::Stream.via_nonsparse_array _a
-      io = Brazen_::LIB_.string_IO.new
+      io = Home_::LIB_.string_IO.new
       x = subject.write io, _scan, 'sub.sect', 'se-ct'
       x.should eql true
       s = io.string
-      lines = s.split Brazen_::NEWLINE_
+      lines = s.split Home_::NEWLINE_
       lines.last.should eql 'two-characters = \\\\b'  # the value that was
       # input as two characters (the backslash character then the 'b' character)
       # became three: a backslash, a backslash, 'b'
@@ -41,7 +41,7 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
 
     it "gets back up with backslashes" do
 
-      _cfg_path = Brazen_::TestSupport::Fixtures.dir_pathname.join( '00-escape.cfg' ).to_path
+      _cfg_path = Home_::TestSupport::Fixtures.dir_pathname.join( '00-escape.cfg' ).to_path
 
       doc = Subject_[].parse_path _cfg_path
       sect = doc.sections.first
@@ -51,7 +51,7 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
     end
 
     def subject
-      Brazen_.cfg
+      Home_.cfg
     end
   end
 end

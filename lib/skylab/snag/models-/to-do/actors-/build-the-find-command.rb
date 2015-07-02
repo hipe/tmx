@@ -31,7 +31,7 @@ module Skylab::Snag
 
       def __build
 
-        Snag_.lib_.system.filesystem.find.new_with(
+        Home_.lib_.system.filesystem.find.new_with(
 
           :filenames, @filename_pattern_s_a,
 

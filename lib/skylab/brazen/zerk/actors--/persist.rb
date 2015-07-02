@@ -84,7 +84,7 @@ module Skylab::Brazen
       end
 
       def line_scan_for_event ev
-        ev.to_stream_of_lines_rendered_under Brazen_::API.expression_agent_instance
+        ev.to_stream_of_lines_rendered_under Home_::API.expression_agent_instance
       end
 
       def via_down_IO_write
@@ -92,7 +92,7 @@ module Skylab::Brazen
           @down_IO.truncate 0
         end
         _scan = Callback_::Stream.via_nonsparse_array @pair_a
-        ok = Brazen_.cfg.write @down_IO,
+        ok = Home_.cfg.write @down_IO,
           _scan, 'current', 'curried-search-and-replace-agent'
         if ok
           @down_IO.close

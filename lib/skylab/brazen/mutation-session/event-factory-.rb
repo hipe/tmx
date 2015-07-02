@@ -55,7 +55,7 @@ module Skylab::Brazen
 
       ) do | y, o |
 
-        _s = Brazen_.lib_.NLP::EN::POS::Verb[ o.verb_symbol.to_s ].preterite
+        _s = Home_.lib_.NLP::EN::POS::Verb[ o.verb_symbol.to_s ].preterite
 
         a = [ _s ]
 

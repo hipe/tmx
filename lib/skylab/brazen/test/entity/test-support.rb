@@ -22,10 +22,10 @@ module Skylab::Brazen::TestSupport::Entity
   end
 
   Subject_ = -> do
-    Brazen_::Entity
+    Home_::Entity
   end
 
-  Brazen_ = Brazen_
+  Home_ = Home_
   Callback_ = Callback_
   Enhance_for_test_ = Parent_::Enhance_for_test_
   KEEP_PARSING_ = true

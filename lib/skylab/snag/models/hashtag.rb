@@ -25,7 +25,7 @@ module Skylab::Snag
 
       def initialize_string_scanner_ * begin_and_end, s
 
-        @string_scanner = Snag_::Library_::StringScanner.new s
+        @string_scanner = Home_::Library_::StringScanner.new s
 
         _reinit_begin_and_end begin_and_end
 

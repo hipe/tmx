@@ -12,12 +12,12 @@ module Skylab::Basic::TestSupport
 
       it "loads" do
 
-        Basic_::Module
+        Home_::Module
       end
 
       it "ok" do
 
-        _subject( Basic_::Module, '..' ).should eql Basic_
+        _subject( Home_::Module, '..' ).should eql Home_
       end
 
       it "when you dotdot above a toplevel path - nil" do
@@ -27,7 +27,7 @@ module Skylab::Basic::TestSupport
 
       def _subject mod, path
 
-        Basic_::Module.value_via_relative_path mod, path
+        Home_::Module.value_via_relative_path mod, path
       end
     end
 
@@ -41,7 +41,7 @@ module Skylab::Basic::TestSupport
           attr_reader :a
         end
 
-        define_singleton_method :push, Basic_::Module.mutex( -> x do
+        define_singleton_method :push, Home_::Module.mutex( -> x do
           @a <<  :"_#{ x }_"
         end )
 

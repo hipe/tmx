@@ -33,7 +33,7 @@ module Skylab::Basic
         end
       end
 
-      Shell__ = Basic_.lib_.enhancement_shell %i( with )
+      Shell__ = Home_.lib_.enhancement_shell %i( with )
 
   Kernel__ = Callback_::Session::Ivars_with_Procs_as_Methods.new :flush do
 

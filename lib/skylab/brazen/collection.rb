@@ -2,13 +2,13 @@ module Skylab::Brazen
 
   module Collection
 
-    class Model_ < Brazen_::Model
+    class Model_ < Home_::Model
 
       NAME_STOP_INDEX = 1  # sl brzn dratastore actions couch add
 
     end
 
-    class Action < Brazen_::Action
+    class Action < Home_::Action
 
       NAME_STOP_INDEX = 1
 
@@ -35,19 +35,19 @@ module Skylab::Brazen
       class << self
 
         def via_path s
-          Brazen_.lib_.system.filesystem.class::Byte_Upstream_Identifier.new s
+          Home_.lib_.system.filesystem.class::Byte_Upstream_Identifier.new s
         end
 
         def via_stream io
-          Brazen_.lib_.IO_lib::Byte_Upstream_Identifier.new io
+          Home_.lib_.IO_lib::Byte_Upstream_Identifier.new io
         end
 
         def via_line_array s_a
-          Brazen_.lib_.basic::List::Byte_Upstream_Identifier.new s_a
+          Home_.lib_.basic::List::Byte_Upstream_Identifier.new s_a
         end
 
         def via_string s
-          Brazen_.lib_.basic::String::Byte_Upstream_Identifier.new s
+          Home_.lib_.basic::String::Byte_Upstream_Identifier.new s
         end
 
         def via_trios trio_a, & oes_p
@@ -91,19 +91,19 @@ module Skylab::Brazen
         end
 
         def via_path s
-          Brazen_.lib_.system.filesystem.class::Byte_Downstream_Identifier.new s
+          Home_.lib_.system.filesystem.class::Byte_Downstream_Identifier.new s
         end
 
         def via_stream io
-          Brazen_.lib_.IO_lib::Byte_Downstream_Identifier.new io
+          Home_.lib_.IO_lib::Byte_Downstream_Identifier.new io
         end
 
         def via_line_array s_a
-          Brazen_.lib_.basic::List::Byte_Downstream_Identifier.new s_a
+          Home_.lib_.basic::List::Byte_Downstream_Identifier.new s_a
         end
 
         def via_string s
-          Brazen_.lib_.basic::String::Byte_Downstream_Identifier.new s
+          Home_.lib_.basic::String::Byte_Downstream_Identifier.new s
         end
 
         def via_trios trio_a, & oes_p
@@ -112,7 +112,7 @@ module Skylab::Brazen
         end
 
         def via_yielder yld
-          Brazen_.lib_.basic::Yielder::Byte_Downstream_Identifier.new yld
+          Home_.lib_.basic::Yielder::Byte_Downstream_Identifier.new yld
         end
       end  # >>
 
@@ -182,7 +182,7 @@ module Skylab::Brazen
         else
 
           _st = col.to_entity_stream
-          _lib = Brazen_.lib_.basic::Fuzzy
+          _lib = Home_.lib_.basic::Fuzzy
 
           o_a = _lib.reduce_to_array_stream_against_string(
             _st,
@@ -216,7 +216,7 @@ module Skylab::Brazen
       def __ambiguous o_a, trio, & oes_p
 
         oes_p.call :error, :ambiguous_property do
-          Brazen_::Property.build_ambiguous_property_event(
+          Home_::Property.build_ambiguous_property_event(
             o_a,
             trio.value_x,
             trio.name )
@@ -231,7 +231,7 @@ module Skylab::Brazen
             ent.name.as_slug
           end.to_a
 
-          Brazen_::Property.build_extra_values_event(
+          Home_::Property.build_extra_values_event(
             [ trio.value_x ],
             _did_you_mean_s_a,
             trio.name.as_human )

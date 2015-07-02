@@ -87,7 +87,7 @@ module Skylab::Brazen
       end
 
       def _inflection
-        @___inflecion ||= Brazen_::Concerns_::Inflection.for_action self
+        @___inflecion ||= Home_::Concerns_::Inflection.for_action self
       end
     end
 
@@ -279,7 +279,7 @@ module Skylab::Brazen
 
       oes_p = handle_event_selectively
 
-      bx = Brazen_::Concerns_::Preconditions::Produce_Box.new(
+      bx = Home_::Concerns_::Preconditions::Produce_Box.new(
         a,  # the identifiers for silos i depend on
         @preconditions,  # any starting box
         model_class.node_identifier,  # my identifier

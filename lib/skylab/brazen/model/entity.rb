@@ -4,7 +4,7 @@ module Skylab::Brazen
 
     Entity = ::Module.new
 
-    Brazen_::Entity.call( Entity,  # see [#047]
+    Home_::Entity.call( Entity,  # see [#047]
 
       # ~ ad-hoc processors
 
@@ -126,7 +126,7 @@ module Skylab::Brazen
       if const_defined? :Property
         # ok. it means we defined meta-properties above
       else
-        const_set :Property, ::Class.new( Brazen_::Entity::Property )
+        const_set :Property, ::Class.new( Home_::Entity::Property )
       end
 
       # ---- ( Property must be set as an *owned* constant by this point ) ---
@@ -260,7 +260,7 @@ module Skylab::Brazen
 
           def add_normalizer_for_greater_than_or_equal_to_integer d  # :+#public-API
 
-            _NORMER = Brazen_.lib_.basic.normalizers.number(
+            _NORMER = Home_.lib_.basic.normalizers.number(
               :number_set, :integer,
               :minimum, d )
 
@@ -276,7 +276,7 @@ module Skylab::Brazen
 
           def non_negative_integer=
 
-            _NORMER = Brazen_.lib_.basic.normalizers.number(
+            _NORMER = Home_.lib_.basic.normalizers.number(
               :number_set, :integer,
               :minimum, 0 )
 
@@ -304,7 +304,7 @@ module Skylab::Brazen
 
         public def receive_missing_required_properties_array miss_prp_a  # :+#public-API #hook-in #universal
 
-          ev = Brazen_::Property.
+          ev = Home_::Property.
             build_missing_required_properties_event miss_prp_a
 
           if respond_to? :receive_missing_required_properties_event
@@ -347,7 +347,7 @@ module Skylab::Brazen
       formals = self.formal_properties
 
       scn = formals.to_value_stream
-      stack = Brazen_::Property::Stack.new formals.get_names  # could pass oes
+      stack = Home_::Property::Stack.new formals.get_names  # could pass oes
 
       bx = any_secondary_box__
       bx and stack.push_frame_via_box bx
@@ -378,7 +378,7 @@ module Skylab::Brazen
     end
 
     def __say_wont_clobber_ivar x_, x, ivar
-      p = Brazen_::Lib_::Strange
+      p = Home_::Lib_::Strange
       "sanity - won't clobber existing #{ ivar } #{
         }(#{ p[ x ] }) with new value (#{ p[ x_ ] })"
     end

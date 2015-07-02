@@ -10,7 +10,7 @@ module Skylab::Brazen::TestSupport
     end  # >>
 
     def subject_
-      Brazen_::CLI::Expression_Frames::Table::Actor
+      Home_::CLI::Expression_Frames::Table::Actor
     end
 
     def common_args_

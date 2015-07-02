@@ -98,7 +98,7 @@ module Skylab::Snag
 
         def _produce_one_model_reflection_by in_st, oes_p, & rfx_p
 
-          _f = Snag_.lib_.parse_lib.function(
+          _f = Home_.lib_.parse_lib.function(
 
             :item_from_matrix
 
@@ -158,7 +158,7 @@ module Skylab::Snag
 
             s_a = _human_s_a
             s_a_ = s_a.dup
-            s_a_[ -1 ] = Snag_.lib_.NLP::EN::POS::Noun[ s_a.fetch( -1 ) ].plural
+            s_a_[ -1 ] = Home_.lib_.NLP::EN::POS::Noun[ s_a.fetch( -1 ) ].plural
             Callback_::Pair.new self, s_a_
           end
 

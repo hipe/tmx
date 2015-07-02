@@ -51,7 +51,7 @@ module Skylab::Basic
         MODI_OPERANDI_A__ = -> do
 
           an = -> x do
-            "#{ Basic_.lib_.NLP_EN.an x }#{ x }"
+            "#{ Home_.lib_.NLP_EN.an x }#{ x }"
           end
 
           say_merge_conflict = -> xx, yx do

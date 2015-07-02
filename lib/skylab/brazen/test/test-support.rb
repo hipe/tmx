@@ -71,20 +71,19 @@ module Skylab::Brazen::TestSupport
 
     def black_and_white_expression_agent_for_expect_event
       @eea ||= begin
-        Brazen_::API.expression_agent_class.new Brazen_.application_kernel_
+        Home_::API.expression_agent_class.new Home_.application_kernel_
       end
     end
 
     def cfg_filename
-      Brazen_::Models_::Workspace.default_config_filename
+      Home_::Models_::Workspace.default_config_filename
     end
 
     def subject_API
-      Brazen_::API
+      Home_::API
     end
   end
 
-  Brazen_ = ::Skylab::Brazen
   Callback_ = ::Skylab::Callback
 
   module TestLib_
@@ -101,7 +100,7 @@ module Skylab::Brazen::TestSupport
     end
 
     Tmpdir = memoize.call do
-      sys = Brazen_::LIB_.system
+      sys = Home_::LIB_.system
       _path = sys.defaults.dev_tmpdir_pathname.join( 'brzn' ).to_path
       sys.filesystem.tmpdir :path, _path
     end
@@ -147,7 +146,7 @@ module Skylab::Brazen::TestSupport
     end
 
     def as_entity_actual_property_box_
-      @bx ||= Brazen_::Box_.new
+      @bx ||= Home_::Box_.new
     end
 
     def handle_event_selectively
@@ -181,12 +180,12 @@ module Skylab::Brazen::TestSupport
   end
 
   EMPTY_S_ = ''.freeze
-  Home_ = Brazen_
+  Home_ = ::Skylab::Brazen
   NIL_ = nil
   SPACE_ = ' '.freeze
 
   module Constants
-    Brazen_ = Brazen_
+    Home_ = Home_
     Callback_ = Callback_
     EMPTY_S_ = EMPTY_S_
     SPACE_ = SPACE_

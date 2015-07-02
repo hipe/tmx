@@ -39,7 +39,7 @@ module Skylab::Brazen
         x_a.push :on_event_selectively, oes_p
       end
 
-      Brazen_::API::Produce_bound_call__[ x_a, self, @module ]
+      Home_::API::Produce_bound_call__[ x_a, self, @module ]
     end
 
     def call_via_mutable_box * i_a, bx, & x_p  # [sg]
@@ -51,7 +51,7 @@ module Skylab::Brazen
 
     def bound_call_via_mutable_box i_a, bx, & x_p  # [bs] only so far
 
-      Brazen_::API::Produce_bound_call__.start_via_iambic_and_mutable_box(
+      Home_::API::Produce_bound_call__.start_via_iambic_and_mutable_box(
         i_a,
         bx,
         self,

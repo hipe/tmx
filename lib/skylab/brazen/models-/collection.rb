@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Models_::Collection < Brazen_::Model
+  class Models_::Collection < Home_::Model
 
     edit_entity_class(
 
@@ -17,7 +17,7 @@ module Skylab::Brazen
       end
 
       def init_action_class_reflection_
-        @acr = Brazen_::Model::Child_Node_Index.new self, Brazen_::Collection_Adapters
+        @acr = Home_::Model::Child_Node_Index.new self, Home_::Collection_Adapters
         true
       end
     end  # >>

@@ -64,7 +64,7 @@ module Skylab::Basic
 
     def normalize & oes_p
       @a.sort!
-      st = Basic_::List.line_stream @a
+      st = Home_::List.line_stream @a
       prev = st.gets
       elim = nil
       if prev
@@ -128,7 +128,7 @@ module Skylab::Basic
       arr = @a
       -> do
 
-        agg = Basic_::Lib_::Scn_lib[].articulators.aggregating(
+        agg = Home_::Lib_::Scn_lib[].articulators.aggregating(
 
           :template, "{{ longer }} covered by {{ shorter }}",
 

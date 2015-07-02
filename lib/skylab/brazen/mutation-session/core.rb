@@ -335,7 +335,7 @@ module Skylab::Brazen
 
         _ctxt = if @arg_st.unparsed_exists
           _x = @arg_st.current_token
-          " (had: #{ Brazen_.lib_.basic::String.via_mixed _x })"
+          " (had: #{ Home_.lib_.basic::String.via_mixed _x })"
         else
           " at end of input"
         end

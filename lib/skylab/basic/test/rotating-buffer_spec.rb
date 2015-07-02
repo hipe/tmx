@@ -8,13 +8,13 @@ module Skylab::Basic::TestSupport::Rotating_Buffer
 
   extend TestSupport_::Quickie
 
-  Basic_ = Basic_
+  Home_ = Home_
 
   Subject_ = -> * x_a, & p do
     if x_a.length.nonzero? || p
-      Basic_::Rotating_Buffer[ * x_a, & p ]
+      Home_::Rotating_Buffer[ * x_a, & p ]
     else
-      Basic_::Rotating_Buffer
+      Home_::Rotating_Buffer
     end
   end
 

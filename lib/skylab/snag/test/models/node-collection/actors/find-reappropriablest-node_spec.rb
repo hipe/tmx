@@ -49,14 +49,14 @@ module Skylab::Snag::TestSupport
 
     def _against_path path
 
-      @col = Snag_::Models_::Node_Collection.new_via_path path
+      @col = Home_::Models_::Node_Collection.new_via_path path
       NIL_
     end
 
     def _against s
 
-      _BU_ID = Snag_.lib_.basic::String::Byte_Upstream_Identifier.new s
-      @col = Snag_::Models_::Node_Collection.new_via_upstream_identifier _BU_ID
+      _BU_ID = Home_.lib_.basic::String::Byte_Upstream_Identifier.new s
+      @col = Home_::Models_::Node_Collection.new_via_upstream_identifier _BU_ID
       NIL_
     end
 
@@ -65,7 +65,7 @@ module Skylab::Snag::TestSupport
     end
 
     def _subject
-      Snag_::Models_::Node_Collection::Actors_::Find_reappropriablest_node
+      Home_::Models_::Node_Collection::Actors_::Find_reappropriablest_node
     end
   end
 end

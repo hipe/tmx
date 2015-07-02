@@ -4,7 +4,7 @@ module Skylab::Basic
 
     # make a basic struct class with a list of member names (like ::Struct)
     #
-    #     Foo = Basic_::Struct.new :nerp
+    #     Foo = Home_::Struct.new :nerp
     #
     #
     # build an instance with `new`, by default the member is nil (like ::Struct)

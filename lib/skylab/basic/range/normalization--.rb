@@ -33,7 +33,7 @@ module Skylab::Basic
 
         def x=
           set_arg Callback_::Qualified_Knownness.via_value_and_model(
-            gets_one_polymorphic_value, Basic_.default_property )
+            gets_one_polymorphic_value, Home_.default_property )
         end
 
         def arg=

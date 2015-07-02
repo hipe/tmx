@@ -4,7 +4,7 @@ module Skylab::Basic
 
     Models_ = ::Module.new
 
-    class Models_::Plan < Basic_::Module::Models_::Plan
+    class Models_::Plan < Home_::Module::Models_::Plan
 
       # <-
 
@@ -123,8 +123,8 @@ module Skylab::Basic
         }#{ extends || 'nothing' } then #{ mixed || 'nothing' })"
     end
 
-    define_method :memoized_, Basic_.lib_.test_support::Let::MEMOIZED_METHOD
-    define_method :__memoized, Basic_.lib_.test_support::Let::MEMOIZED_METHOD
+    define_method :memoized_, Home_.lib_.test_support::Let::MEMOIZED_METHOD
+    define_method :__memoized, Home_.lib_.test_support::Let::MEMOIZED_METHOD
 
   # ->
 

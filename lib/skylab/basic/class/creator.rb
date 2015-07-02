@@ -24,13 +24,13 @@ module Skylab::Basic
         end
       end  # >>
 
-      Let__ = Basic_.lib_.test_support::Let
+      Let__ = Home_.lib_.test_support::Let
 
       # <- 2
 
   module ModuleMethods
 
-    include Basic_::Module::Creator::ModuleMethods  # `metahell_known_graph_`
+    include Home_::Module::Creator::ModuleMethods  # `metahell_known_graph_`
 
     o = { }
 
@@ -67,7 +67,7 @@ module Skylab::Basic
       [create, update]
     end
 
-    K = Basic_::Struct.via_hash o
+    K = Home_::Struct.via_hash o
 
     def klass full_name, *a, &class_body # `a` is extra args, e.g. extends:
                                   # see extensive comments at klass! for now.
@@ -108,7 +108,7 @@ module Skylab::Basic
     define_singleton_method :let, Let__::LET_METHOD
 
     K = ModuleMethods::K # hey can *i* borrow *this*
-    mc = Basic_::Module::Creator
+    mc = Home_::Module::Creator
     mm = mc::ModuleMethods
     im = mc::InstanceMethods
 

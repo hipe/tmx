@@ -30,7 +30,7 @@ describe "[ba] number en" do
 
   def _common s, d, m
 
-    Basic_::Number::EN.send( m, d ).should eql s
+    Home_::Number::EN.send( m, d ).should eql s
   end
 end
 # ->

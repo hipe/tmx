@@ -16,7 +16,7 @@ module Skylab::Snag
 
       Models_ = ::Module.new
 
-      class Models_::Tag < Snag_::Models_::Tag
+      class Models_::Tag < Home_::Models_::Tag
 
         # so we can have fast scanning of hashtags but still leverage
         # the arbitrary business methods of our parent (all from the
@@ -65,7 +65,7 @@ module Skylab::Snag
 
         attr_accessor :_begin, :_length, :_string
 
-        include Snag_::Models::Hashtag::Possibly_with_Value_Methods
+        include Home_::Models::Hashtag::Possibly_with_Value_Methods
       end
 
       BS_ = self

@@ -32,7 +32,7 @@ module Skylab::Basic
           x = if TS_.const_defined? const, false
             TS_.const_get const, false
           else
-            Basic_.lib_.plugin::Bundle::Fancy_lookup[ sym, TS_ ]
+            Home_.lib_.plugin::Bundle::Fancy_lookup[ sym, TS_ ]
           end
 
           cache_h[ sym ] = x
@@ -55,23 +55,23 @@ module Skylab::Basic
       end
 
       def black_and_white_expression_agent_for_expect_event
-        Basic_.lib_.brazen::API.expression_agent_instance
+        Home_.lib_.brazen::API.expression_agent_instance
       end
     end
 
     Expect_Event = -> test_context_class do
 
-      Basic_::Callback_.test_support::Expect_Event[ test_context_class ]
+      Home_::Callback_.test_support::Expect_Event[ test_context_class ]
     end
 
-    Basic_ = ::Skylab::Basic
-    Callback_ = Basic_::Callback_
-    EMPTY_A_ = Basic_::EMPTY_A_
-    EMPTY_S_ = Basic_::EMPTY_S_
+    Home_ = ::Skylab::Basic
+    Callback_ = Home_::Callback_
+    EMPTY_A_ = Home_::EMPTY_A_
+    EMPTY_S_ = Home_::EMPTY_S_
     NIL_ = nil
 
     module Constants
-      Basic_ = Basic_
+      Home_ = Home_
       Callback_ = Callback_
       TestSupport_ = TestSupport_
     end

@@ -63,7 +63,7 @@ module Skylab::Snag
       Try_to_reappropriate = -> node_, sess, & x_p do
 
         node =
-        Snag_::Models_::Node_Collection::Actors_::Find_reappropriablest_node[
+        Home_::Models_::Node_Collection::Actors_::Find_reappropriablest_node[
           sess.entity_upstream,
           & x_p
         ]

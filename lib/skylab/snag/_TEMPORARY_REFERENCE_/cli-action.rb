@@ -6,9 +6,9 @@ module Skylab::Snag
 
       ACTIONS_ANCHOR_MODULE = -> { CLI::Actions }
 
-      Snag_.lib_.CLI_lib.action self, :DSL
+      Home_.lib_.CLI_lib.action self, :DSL
 
-      extend Snag_.lib_.NLP::EN::API_Action_Inflection_Hack
+      extend Home_.lib_.NLP::EN::API_Action_Inflection_Hack
 
       inflection.inflect.noun :singular
 
@@ -41,10 +41,10 @@ module Skylab::Snag
 
       def retrieve_param_for_expression_agent i
         if @option_parser.top.long.key?( i.to_s  )
-          Snag_.lib_.CLI::Option.on "--#{ i }"
+          Home_.lib_.CLI::Option.on "--#{ i }"
         else
           _fp = Fake_Formal_Parameter__.new Callback_::Name.via_variegated_symbol i
-          Snag_.lib_.CLI_lib.argument _fp, :req
+          Home_.lib_.CLI_lib.argument _fp, :req
         end
       end
       Fake_Formal_Parameter__ = ::Struct.new :name
@@ -86,7 +86,7 @@ module Skylab::Snag
       end
 
       def receive_inside_info_string s
-        ev = Snag_::Model_::Event.inflectable_via_string s
+        ev = Home_::Model_::Event.inflectable_via_string s
         inflect_inflectable_event ev
         receive_info_event ev
       end
@@ -121,7 +121,7 @@ module Skylab::Snag
       end
 
       def receive_error_string s
-        ev = Snag_::Model_::Event.inflectable_via_string s
+        ev = Home_::Model_::Event.inflectable_via_string s
         inflect_inflectable_event ev
         delegate.receive_error_event ev
       end
@@ -202,7 +202,7 @@ module Skylab::Snag
 
       class Box < self
 
-        Snag_.lib_.CLI_lib::Box[ self, :DSL,
+        Home_.lib_.CLI_lib::Box[ self, :DSL,
           :leaf_action_base_class, -> { Leaf_Action__ } ]
 
         def self.inflection
@@ -225,7 +225,7 @@ module Skylab::Snag
           [ nil, method( :invoke ), [ argv ] ]  # compat legacy
         end
 
-        Adapter = Snag_::Lib_::Porcelain__[]::Legacy::Adapter
+        Adapter = Home_::Lib_::Porcelain__[]::Legacy::Adapter
       end
 
       include Invocation_Methods_  # after box above

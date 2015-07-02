@@ -6,7 +6,7 @@ module Skylab::Brazen
       # you can define [non-]memoized { proc | inline } methods
       #
       #     class Foo
-      #       Brazen_::Property::Stack.common_frame self,
+      #       Home_::Property::Stack.common_frame self,
       #         :proc, :foo, -> do
       #            d = 0
       #            -> { d += 1 }
@@ -50,7 +50,7 @@ module Skylab::Brazen
       #     foo.baz  # => "<5>"
       #     foo.baz.object_id  # => foo.baz.object_id
 
-      Models_::Common_Frame = Brazen_::Entity.call do
+      Models_::Common_Frame = Home_::Entity.call do
 
         # (really we want the below thing to be its own nonterminal mixed
         # in with the other nonterminals of the session, but we don't have
@@ -96,7 +96,7 @@ module Skylab::Brazen
           end
         end  # >>
 
-        self::Property = ::Class.new Brazen_::Entity::Property
+        self::Property = ::Class.new Home_::Entity::Property
 
         RP_METH___ = -> prp do
 
@@ -299,7 +299,7 @@ module Skylab::Brazen
     # [ `required` ] `field`s -
     #
     #     class Bar
-    #       Brazen_:Property::Stack.common_frame self,
+    #       Home_:Property::Stack.common_frame self,
     #         :globbing, :processor, :initialize,
     #         :required, :readable, :field, :foo,
     #         :readable, :field, :bar

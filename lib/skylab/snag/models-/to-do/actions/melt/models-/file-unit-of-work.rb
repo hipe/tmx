@@ -39,7 +39,7 @@ module Skylab::Snag
 
         def OMG_try  # #note-40
 
-          @_patch = Snag_.lib_.system.patch.new_via_file_content_before(
+          @_patch = Home_.lib_.system.patch.new_via_file_content_before(
             @filesystem_conduit.open @_path )
 
           ok = true
@@ -69,7 +69,7 @@ module Skylab::Snag
 
           @_node_message = s
 
-          node = Snag_::Models_::Node.edit_entity(
+          node = Home_::Models_::Node.edit_entity(
             # note an identifier is not set
             :append, :string, @_node_message
           )
@@ -113,7 +113,7 @@ module Skylab::Snag
 
           if 0 < d
 
-            _ = Snag_.lib_.basic::String.ellipsify @_node_message, d
+            _ = Home_.lib_.basic::String.ellipsify @_node_message, d
             _tail_s = "#{ SPACE_ }#{ _ }"
           end
 

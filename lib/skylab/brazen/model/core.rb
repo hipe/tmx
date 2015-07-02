@@ -7,7 +7,7 @@ module Skylab::Brazen
     class << self
 
       def common_action_class
-        Brazen_::Action
+        Home_::Action
       end
 
       def common_entity * a, & edit_p
@@ -57,7 +57,7 @@ module Skylab::Brazen
 
         # make & enhance an entity node
 
-        o = Brazen_::Entity::Session.new
+        o = Home_::Entity::Session.new
         o.arglist = a
         o.block = edit_p
         o.extmod = mod
@@ -85,7 +85,7 @@ module Skylab::Brazen
     class << self
 
       def action_base_class
-        Brazen_::Action
+        Home_::Action
       end
 
       def entity_enhancement_module
@@ -719,7 +719,7 @@ module Skylab::Brazen
         @_p = -> x_a, & edit_p do
           @_p = nil
 
-          sess = Brazen_::Entity::Session.new
+          sess = Home_::Entity::Session.new
           sess.arglist = x_a
           sess.block = edit_p
           sess.client = empty_module

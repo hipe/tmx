@@ -168,7 +168,7 @@ module Skylab::Snag
 
         def __mutate_collection_and_subject_entity_by_reappropriation__
 
-          _ = Snag_::Models_::Node::Actions::Open::Try_to_reappropriate
+          _ = Home_::Models_::Node::Actions::Open::Try_to_reappropriate
 
           x = _[ @subject_entity, @_self, & @on_event_selectively ]
           if x

@@ -13,7 +13,7 @@ module Skylab::Snag
           def initialize s_a, domain, & oes_p
 
             @domain = domain
-            @in_st = Snag_.lib_.parse_lib::Input_Streams_::Array.new s_a
+            @in_st = Home_.lib_.parse_lib::Input_Streams_::Array.new s_a
             @on_event_selectively = oes_p
           end
 

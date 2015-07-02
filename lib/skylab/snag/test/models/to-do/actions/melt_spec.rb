@@ -134,7 +134,7 @@ module Skylab::Snag::TestSupport
 
     def _manifest_file
 
-      Snag_::Models_::Node_Collection::COMMON_MANIFEST_FILENAME_
+      Home_::Models_::Node_Collection::COMMON_MANIFEST_FILENAME_
     end
   end
 end

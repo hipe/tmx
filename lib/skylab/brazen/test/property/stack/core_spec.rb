@@ -70,7 +70,7 @@ module Skylab::Brazen::TestSupport::Pstack
     end
 
     Subject_ = -> do
-      Brazen_::Property::Stack
+      Home_::Property::Stack
     end
   end
 end

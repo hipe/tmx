@@ -84,7 +84,7 @@ module Skylab::Basic::TestSupport::String
     end
 
     def _subject
-      Basic_::String.word_wrappers.calm
+      Home_::String.word_wrappers.calm
     end
   end
 end

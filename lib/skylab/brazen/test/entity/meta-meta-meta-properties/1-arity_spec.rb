@@ -9,7 +9,7 @@ module Skylab::Brazen::TestSupport::Entity
     context "an arity space when sent .." do
 
       before :all do
-        S = Brazen_::Entity::Meta_Meta_Meta_Properties::Arity::Space.create do
+        S = Home_::Entity::Meta_Meta_Meta_Properties::Arity::Space.create do
           self::ZERO_OR_ONE = new 0, 1
           self::ONE_OR_MORE = new 1, nil
         end

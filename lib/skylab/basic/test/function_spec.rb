@@ -27,7 +27,7 @@ module Skylab::Basic::TestSupport
             end
           end ]
 
-        _FUNC = Basic_::Function.chain _p_a
+        _FUNC = Home_::Function.chain _p_a
       end
 
       it "this short circuits at [..[" do

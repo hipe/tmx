@@ -1,14 +1,14 @@
 module Skylab::Snag
 
-  class CLI < Snag_.lib_.brazen::CLI
+  class CLI < Home_.lib_.brazen::CLI
 
-    Brazen_ = Snag_.lib_.brazen
+    Brazen_ = Home_.lib_.brazen
 
     class << self
 
       def new * a
 
-        new_top_invocation a, Snag_.application_kernel_
+        new_top_invocation a, Home_.application_kernel_
       end
     end  # >>
 
@@ -69,7 +69,7 @@ module Skylab::Snag
 
       def prepare_backstream_call x_a
 
-        @_filesystem = Snag_.lib_.system.filesystem
+        @_filesystem = Home_.lib_.system.filesystem
         @_oes_p = handle_event_selectively
 
         @_hy = @bound.hybrid
@@ -90,7 +90,7 @@ module Skylab::Snag
         # ( not here, but where?
 
         path = bx.fetch :upstream_identifier
-        path = Snag_::Models_::Node_Collection.nearest_path(
+        path = Home_::Models_::Node_Collection.nearest_path(
           path, @_filesystem, & @_oes_p )
 
         # )
@@ -172,7 +172,7 @@ module Skylab::Snag
 
       def __prepare_backstream_for_report bx
 
-        o = Snag_::Models_::Node_Collection::Sessions::Report_of_Open_Nodes.
+        o = Home_::Models_::Node_Collection::Sessions::Report_of_Open_Nodes.
           new( & @_oes_p )
 
         o.filesystem = @_filesystem
@@ -188,7 +188,7 @@ module Skylab::Snag
 
       def __prepare_backstream_for_opening bx
 
-        o = Snag_::Models_::Node::Actions::Open.new( _top_kernel, & @_oes_p )
+        o = Home_::Models_::Node::Actions::Open.new( _top_kernel, & @_oes_p )
 
         o.argument_box = bx
 
@@ -247,10 +247,10 @@ module Skylab::Snag
         hy = Hybrid___.new
 
         hy.left_unbound =
-          Snag_::Models_::Node::Actions::To_Stream
+          Home_::Models_::Node::Actions::To_Stream
 
         hy.right_unbound =
-          Snag_::Models_::Node::Actions::Open
+          Home_::Models_::Node::Actions::Open
 
         hy.init_formal_properties_box
 
@@ -421,7 +421,7 @@ module Skylab::Snag
         module Face
           module Of
             Hot = -> x, x_ do
-              Brazen_::CLI::Client.fml Snag_, x, x_
+              Brazen_::CLI::Client.fml Home_, x, x_
             end
           end
         end

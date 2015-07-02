@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::Tag
 
-    Tag_Action__ = Snag_::Models_::Node::Common_Action  # stowaway
+    Tag_Action__ = Home_::Models_::Node::Common_Action  # stowaway
 
     Actions = ::Module.new
 

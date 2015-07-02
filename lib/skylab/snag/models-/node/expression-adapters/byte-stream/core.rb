@@ -38,12 +38,12 @@ module Skylab::Snag
 
         p = -> sstr, row_st do  # the first time it its called ..
 
-          fly = Snag_::Models::Hashtag::Stream.new
+          fly = Home_::Models::Hashtag::Stream.new
 
           fly.initialize_string_scanner_ sstr.begin, sstr.end, sstr.s
 
           fly.receive_hashtag_class_(
-            Snag_::Models_::Tag::Expression_Adapters::Byte_Stream::Models_::Tag
+            Home_::Models_::Tag::Expression_Adapters::Byte_Stream::Models_::Tag
           )
 
           fly.init

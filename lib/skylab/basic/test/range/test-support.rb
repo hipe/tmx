@@ -9,6 +9,6 @@ module Skylab::Basic::TestSupport::Range
   extend TestSupport_::Quickie
 
   Subject_ = -> do
-    Basic_::Range
+    Home_::Range
   end
 end

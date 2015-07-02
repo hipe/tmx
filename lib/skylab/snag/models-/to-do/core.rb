@@ -124,7 +124,7 @@ module Skylab::Snag
     end
 
     Autoloader_[ Actors_ = ::Module.new ]
-    Brazen_ = Snag_.lib_.brazen
+    Brazen_ = Home_.lib_.brazen
     PIPE_ = '|'.freeze
     To_Do_ = self
 

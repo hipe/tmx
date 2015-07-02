@@ -35,7 +35,7 @@ module Skylab::Basic
 
       def execute
 
-        scn = Basic_.lib_.string_scanner @pattern_s
+        scn = Home_.lib_.string_scanner @pattern_s
 
         @has_open_boundary = scn.skip BEGINNING_WORD_BOUNDARY__
 

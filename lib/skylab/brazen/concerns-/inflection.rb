@@ -104,7 +104,7 @@ module Skylab::Brazen
         end
 
         etc = -> do
-          x_a = Brazen_.lib_.basic::Module.chain_via_module mod
+          x_a = Home_.lib_.basic::Module.chain_via_module mod
           stru = x_a[ -3 ]
           x = mod
           mod = if stru

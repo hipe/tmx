@@ -8,7 +8,7 @@ module Skylab::Basic
 
   class Models_::Plan
 
-    Basic_.lib_.test_support::Let[ self ]
+    Home_.lib_.test_support::Let[ self ]
 
     NAME_SEP__ = Module::Creator::NAME_SEPARATOR
 

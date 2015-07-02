@@ -16,7 +16,7 @@ module Skylab::Snag
         @e = e ; @o = o
 
         expag = -> do
-          x = Snag_::CLI::Expression_Agent_.new
+          x = Home_::CLI::Expression_Agent_.new
           expag = -> { x }
           x
         end

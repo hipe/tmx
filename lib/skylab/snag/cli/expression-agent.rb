@@ -4,13 +4,13 @@ module Skylab::Snag
 
     class Expression_Agent
 
-      # subclass Snag_.lib_.CLI_lib::Pen::Minimal for less DIY
+      # subclass Home_.lib_.CLI_lib::Pen::Minimal for less DIY
 
       def initialize prp_index
         @_prp_index = prp_index
 
         @_up =
-          Snag_::Models_::Node_Collection::Expression_Adapters::Byte_Stream.
+          Home_::Models_::Node_Collection::Expression_Adapters::Byte_Stream.
             build_default_expression_agent
       end
 
@@ -38,7 +38,7 @@ module Skylab::Snag
 
       define_method :ick, -> do
         p = -> x do
-          p = Snag_.lib_.strange.to_proc.curry[ LIB_.a_short_length ]
+          p = Home_.lib_.strange.to_proc.curry[ LIB_.a_short_length ]
           p[ x ]
         end
         -> x { p[ x ] }
@@ -73,7 +73,7 @@ module Skylab::Snag
         if x.respond_to? :to_path
           x = x.to_path
         end
-        Snag_.lib_.pretty_path x
+        Home_.lib_.pretty_path x
       end
 
       def val x

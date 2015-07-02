@@ -8,7 +8,7 @@ module Skylab::Snag
 
     THROWING_INFO_ERROR_delegate = Info_Error_Delegate.new nil, -> ev do
       y = []
-      ev.express_into_under y, Snag_::API::EXPRESSION_AGENT
+      ev.express_into_under y, Home_::API::EXPRESSION_AGENT
       raise y * SPACE_
     end
 
@@ -86,9 +86,9 @@ module Skylab::Snag
 
     class Event < ::Struct
 
-      Snag_.lib_.model_event self
+      Home_.lib_.model_event self
 
-      EVENTS_ANCHOR_MODULE = Snag_::Models
+      EVENTS_ANCHOR_MODULE = Home_::Models
 
       class << self
         def message_proc & p
@@ -107,7 +107,7 @@ module Skylab::Snag
         attr_reader :message_proc
 
         def to_exception  # ick this inspired #open [#066]
-          _expag = Snag_.lib_.brazen::API.expression_agent_instance
+          _expag = Home_.lib_.brazen::API.expression_agent_instance
           _a = express_into_under [], _expag
           ::RuntimeError.new _a * SPACE_
         end
@@ -127,7 +127,7 @@ module Skylab::Snag
           y << o.message_s
         end
         def verb_lexeme
-          @verb_lexeme ||= Snag_.lib_.NLP::EN::POS::Verb[ inflected_verb ]
+          @verb_lexeme ||= Home_.lib_.NLP::EN::POS::Verb[ inflected_verb ]
         end
         attr_writer :verb_lexeme
       end
@@ -170,7 +170,7 @@ module Skylab::Snag
         attr_reader :ev
         attr_accessor :inflected_verb, :inflected_noun
         def verb_lexeme
-          @verb_lexeme ||= Snag_.lib_.NLP::EN::POS::Verb[ @inflected_verb ]
+          @verb_lexeme ||= Home_.lib_.NLP::EN::POS::Verb[ @inflected_verb ]
         end
         attr_writer :verb_lexeme
         def message_proc

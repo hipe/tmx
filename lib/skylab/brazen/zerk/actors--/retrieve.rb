@@ -33,7 +33,7 @@ module Skylab::Brazen
       end
 
       def via_IO
-        doc = Brazen_.cfg.read @up_IO do |ev|
+        doc = Home_.cfg.read @up_IO do |ev|
           @on_event_selectively.call :error do
             ev
           end

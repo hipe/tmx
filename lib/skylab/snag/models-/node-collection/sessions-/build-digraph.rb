@@ -77,14 +77,14 @@ module Skylab::Snag
 
       def __prepare_to_iterate  # take this and the other and abstract it one day ..
 
-        nid = Snag_::Models_::Node_Identifier.new_empty
+        nid = Home_::Models_::Node_Identifier.new_empty
         @_nid_fly = nid
 
         @__scan_for_nid = -> str do
 
-          strscn = Snag_::Library_::StringScanner.new str
+          strscn = Home_::Library_::StringScanner.new str
 
-          p = Snag_::Models_::Node_Identifier::Expression_Adapters::Byte_Stream.
+          p = Home_::Models_::Node_Identifier::Expression_Adapters::Byte_Stream.
             build_reinterpreter strscn
 
           @__scan_for_nid = -> str_ do

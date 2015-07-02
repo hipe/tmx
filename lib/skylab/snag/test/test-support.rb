@@ -69,14 +69,14 @@ module Skylab::Snag::TestSupport
 
     def upstream_identifier_via_string_ s
 
-      Snag_.lib_.basic::String::Byte_Upstream_Identifier.new s
+      Home_.lib_.basic::String::Byte_Upstream_Identifier.new s
     end
 
     # ~ near downstream
 
     def build_byte_stream_expag_ d, d_, d__
 
-      Snag_::Models_::Node_Collection::Expression_Adapters::
+      Home_::Models_::Node_Collection::Expression_Adapters::
         Byte_Stream::Expression_Agent_.new d, d_, d__
     end
 
@@ -89,12 +89,12 @@ module Skylab::Snag::TestSupport
 
     def downstream_ID_via_string_ s
 
-      Snag_.lib_.basic::String::Byte_Downstream_Identifier.new s
+      Home_.lib_.basic::String::Byte_Downstream_Identifier.new s
     end
 
     def downstream_ID_via_array_ a
 
-      Snag_.lib_.basic::List::Byte_Downstream_Identifier.new a
+      Home_.lib_.basic::List::Byte_Downstream_Identifier.new a
     end
 
     # ~ near verification
@@ -113,7 +113,7 @@ module Skylab::Snag::TestSupport
     def self.[] mod
       mod.include self
       def mod.subject_module_
-        Snag_::Models_::Criteria::Library_
+        Home_::Models_::Criteria::Library_
       end
     end
 
@@ -142,7 +142,7 @@ module Skylab::Snag::TestSupport
     end
 
     def input_stream_via_array s_a
-      Snag_.lib_.parse_lib::Input_Streams_::Array.new s_a
+      Home_.lib_.parse_lib::Input_Streams_::Array.new s_a
     end
 
     def visual_tree_against_ st
@@ -162,10 +162,10 @@ module Skylab::Snag::TestSupport
       require TS_.dir_pathname.join( 'modality-integrations/expect-cli' ).to_path
 
       p = TS_::Expect_CLI.new_with(
-        :subject_CLI, -> { Snag_::CLI },
+        :subject_CLI, -> { Home_::CLI },
         :program_name, 'sn0g',
         :generic_error_exitstatus,
-          -> { Snag_.lib_.brazen::CLI::GENERIC_ERROR_ } )
+          -> { Home_.lib_.brazen::CLI::GENERIC_ERROR_ } )
 
       p[ tcm ]
     end
@@ -185,11 +185,11 @@ module Skylab::Snag::TestSupport
     end  # >>
 
     def subject_API
-      Snag_::API
+      Home_::API
     end
 
     def black_and_white_expression_agent_for_expect_event
-      Snag_.lib_.brazen::API.expression_agent_instance
+      Home_.lib_.brazen::API.expression_agent_instance
     end
   end
 
@@ -259,9 +259,9 @@ module Skylab::Snag::TestSupport
     end
   end.call
 
-  Snag_ = ::Skylab::Snag
+  Home_ = ::Skylab::Snag
 
-  Callback_ = Snag_::Callback_
+  Callback_ = Home_::Callback_
 
   Fixture_tree_dir___ = Callback_.memoize do
 
@@ -287,7 +287,7 @@ module Skylab::Snag::TestSupport
         else
           o = TestSupport_.tmpdir.new_with(
             :path, ::File.join(
-               Snag_.lib_.system.defaults.dev_tmpdir_path,
+               Home_.lib_.system.defaults.dev_tmpdir_path,
                'snaggle' ),
             :be_verbose, do_debug,
             :debug_IO, debug_IO )
@@ -318,11 +318,11 @@ module Skylab::Snag::TestSupport
   end
 
   ACHIEVED_ = true
-  EMPTY_P_ = Snag_::EMPTY_P_
-  EMPTY_S_ = Snag_::EMPTY_S_
+  EMPTY_P_ = Home_::EMPTY_P_
+  EMPTY_S_ = Home_::EMPTY_S_
   NIL_ = nil
   NEWLINE_ = "\n"
-  SPACE_ = Snag_::SPACE_
-  UNDERSCORE_ = Snag_::UNDERSCORE_
+  SPACE_ = Home_::SPACE_
+  UNDERSCORE_ = Home_::UNDERSCORE_
 
 end

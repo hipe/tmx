@@ -8,7 +8,7 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
 
   extend TestSupport_::Quickie
 
-  Brazen_ = Brazen_
+  Home_ = Home_
 
   module ModuleMethods
     def with_class & blk
@@ -24,7 +24,7 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
   module InstanceMethods
 
     def with * x_a
-      _n11n = Brazen_::CLI::Action_Adapter_::Arguments.normalization arg_a
+      _n11n = Home_::CLI::Action_Adapter_::Arguments.normalization arg_a
       @normalization = _n11n.new_via_argv x_a
       @result = @normalization.execute
     end
@@ -52,7 +52,7 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
 
     p = -> do
 
-      Entete_ = Brazen_::Entity.call do
+      Entete_ = Home_::Entity.call do
 
         o :enum, [ :zero, :one ],
           :default, :one,

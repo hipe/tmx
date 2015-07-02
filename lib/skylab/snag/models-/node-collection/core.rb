@@ -38,7 +38,7 @@ module Skylab::Snag
 
       def new_via_path path, & oes_p
 
-        _id = Snag_.lib_.
+        _id = Home_.lib_.
           system.filesystem.class::Byte_Upstream_Identifier.new path
 
         _new_via_upstream_identifier _id, & oes_p
@@ -64,7 +64,7 @@ module Skylab::Snag
 
     def edit * x_a, & x_p
 
-      Snag_.lib_.brazen::Mutation_Session.edit x_a, self, & x_p
+      Home_.lib_.brazen::Mutation_Session.edit x_a, self, & x_p
     end
 
     module Expression_Adapters
@@ -79,7 +79,7 @@ module Skylab::Snag
       end
 
       def FS_adapter_
-        @___fsa ||= Filesystem_Adapter___.new Snag_.lib_.system.filesystem
+        @___fsa ||= Filesystem_Adapter___.new Home_.lib_.system.filesystem
       end
     end
 
@@ -97,10 +97,10 @@ module Skylab::Snag
 
       def __build_tmpfile_sessioner
 
-        o = Snag_.lib_.system.filesystem.tmpfile_sessioner.new
+        o = Home_.lib_.system.filesystem.tmpfile_sessioner.new
 
         o.tmpdir_path ::File.join(
-          Snag_.lib_.system.defaults.dev_tmpdir_path,
+          Home_.lib_.system.defaults.dev_tmpdir_path,
           'sn0g' )
 
         o.create_at_most_N_directories 2  # etc
@@ -121,7 +121,7 @@ module Skylab::Snag
 
     Walk_upwards_to_find_nearest_surrounding_path_ = -> s, fn, fs, * x_a, & x_p do
 
-      Snag_.lib_.system.filesystem.walk.new_with(
+      Home_.lib_.system.filesystem.walk.new_with(
 
         :filename, fn,
         :max_num_dirs_to_look, 10,  # whatever

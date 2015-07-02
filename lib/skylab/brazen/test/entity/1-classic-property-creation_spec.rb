@@ -39,7 +39,7 @@ module Skylab::Brazen::TestSupport::Entity
         end
 
         it "description 2" do
-          _subject.description_under( Brazen_::API.expression_agent_instance ).
+          _subject.description_under( Home_::API.expression_agent_instance ).
             should eql "'foo'"
         end
 

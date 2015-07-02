@@ -30,7 +30,7 @@ module Skylab::Brazen
 
       def receive__write_lines_to__argument x
 
-        id_o = Brazen_::Collection::Byte_downstream_identifier_via_mixed[ x ]
+        id_o = Home_::Collection::Byte_downstream_identifier_via_mixed[ x ]
 
         if id_o
 
@@ -63,9 +63,9 @@ module Skylab::Brazen
 
       def __establish_default_downstream_context
 
-        io = Brazen_.lib_.string_IO.new
+        io = Home_.lib_.string_IO.new
 
-        _id = Brazen_::Collection::Byte_Downstream_Identifier.via_stream io
+        _id = Home_::Collection::Byte_Downstream_Identifier.via_stream io
 
         _accept_BDI _id
 

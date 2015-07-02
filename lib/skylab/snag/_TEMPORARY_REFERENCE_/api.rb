@@ -40,7 +40,7 @@ module Skylab::Snag
     class Produce_bound_call__
 
       def initialize st, & wire_p
-        @application_module = Snag_
+        @application_module = Home_
         @upstream = st
         @wire_p = wire_p
       end
@@ -92,9 +92,9 @@ module Skylab::Snag
 
       def via_action_produce_bound_call
         if @par_h
-          Snag_.lib_.bound_call [ @par_h ], @action, :invoke
+          Home_.lib_.bound_call [ @par_h ], @action, :invoke
         else
-          Snag_.lib_.bound_call [ @upstream ], @action, :invoke_via_argument_stream
+          Home_.lib_.bound_call [ @upstream ], @action, :invoke_via_argument_stream
         end
       end
     end

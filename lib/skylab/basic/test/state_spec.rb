@@ -28,7 +28,7 @@ module Skylab::Basic::TestSupport
         Callback_::Pair.new v_x, n_x
       end
 
-      o = Basic_::State::Machine::Edit_Session.new
+      o = Home_::State::Machine::Edit_Session.new
 
       o.add_state :beginning,
         :can_transition_to, [ :long_switch ]

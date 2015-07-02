@@ -32,7 +32,7 @@ module Skylab::Basic::TestSupport
 
             TestSupport_::Let[ self ]  # EEK and the instance
 
-            Basic_::Module::Creator[ self ]
+            Home_::Module::Creator[ self ]
 
             if eval_p
               class_exec( & eval_p )

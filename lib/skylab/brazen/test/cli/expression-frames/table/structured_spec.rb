@@ -127,7 +127,7 @@ module Skylab::Brazen::TestSupport
 
     define_method :_common_tree, ( Callback_.memoize do
 
-      _FM = Brazen_::Autoloader_.require_sidesystem :FileMetrics  # #todo - mock this?
+      _FM = Home_::Autoloader_.require_sidesystem :FileMetrics  # #todo - mock this?
 
       _T = _FM::Models_::Report::Actions::Line_Count::Totaller_class___[]
 
@@ -154,7 +154,7 @@ module Skylab::Brazen::TestSupport
     end
 
     def _begin_table
-      Brazen_::CLI::Expression_Frames::Table::Structured.new
+      Home_::CLI::Expression_Frames::Table::Structured.new
     end
 
     def _line_expector_via_array y

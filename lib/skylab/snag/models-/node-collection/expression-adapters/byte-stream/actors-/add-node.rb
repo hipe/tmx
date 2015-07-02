@@ -37,7 +37,7 @@ module Skylab::Snag
 
         def __build_tree_of_all_identifiers node_st
 
-          _Tree = Snag_.lib_.basic::Tree
+          _Tree = Home_.lib_.basic::Tree
 
           _Big_Tree = _Tree.mutable_node
           _Frugal_Tree = _Tree.frugal_node
@@ -93,7 +93,7 @@ module Skylab::Snag
             break
           end while nil
 
-          Snag_::Models_::Node_Identifier.new_via_integer int
+          Home_::Models_::Node_Identifier.new_via_integer int
         end
       end # >>
     end

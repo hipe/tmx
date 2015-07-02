@@ -44,7 +44,7 @@ module Skylab::Snag
 
       da.source_and_target_models_are_associated :Node, :ID_Int
 
-      rx = /\A#{ Snag_::Models::Hashtag::RX_STRING }\z/
+      rx = /\A#{ Home_::Models::Hashtag::RX_STRING }\z/
 
       # ~ begin at the crux of [#005]: to meet the spec, below we currently
       #     require two assoc adapters, and would rather model only one

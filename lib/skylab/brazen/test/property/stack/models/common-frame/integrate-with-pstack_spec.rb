@@ -41,7 +41,7 @@ module Skylab::Brazen::TestSupport::Pstack_Cframe
 
     it "ok" do
       frame = IWP_Base_Frame.new {}
-      stack = Brazen_::Property::Stack.new
+      stack = Home_::Property::Stack.new
       stack.push_frame frame
       stack.push_frame_with :foo, :FOO
       stack.property_value_via_symbol( :foo ).should eql :FOO

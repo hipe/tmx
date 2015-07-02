@@ -11,7 +11,7 @@ module Skylab::Basic::TestSupport::Field::Reflection
 
   extend TestSupport_::Quickie
 
-  Basic_ = Basic_
+  Home_ = Home_
   Sandbox = Sandbox
 
   describe "[ba] field reflection enhancement" do
@@ -23,14 +23,14 @@ module Skylab::Basic::TestSupport::Field::Reflection
       define_sandbox_constant :Kls_0 do
 
         module Sandbox::Mod_0_
-          Basic_::Field.box self do
+          Home_::Field.box self do
             meta_fields [ :required, :reflective ], :list, [ :rx, :property ]
             fields [ :email, :required, :rx, /x/], :name
           end
         end
 
         class Sandbox::Kls_0
-          Basic_::Field.reflection.enhance( self ).with Sandbox::Mod_0_
+          Home_::Field.reflection.enhance( self ).with Sandbox::Mod_0_
         end
       end
 

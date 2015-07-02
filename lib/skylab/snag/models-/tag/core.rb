@@ -84,7 +84,7 @@ module Skylab::Snag
       Autoloader_[ self ]
     end
 
-    Brazen_ = Snag_.lib_.brazen
+    Brazen_ = Home_.lib_.brazen
     Tag_ = self
   end
 end

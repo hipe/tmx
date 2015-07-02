@@ -5,7 +5,7 @@ module Skylab::Basic::TestSupport::String
   describe "[ba] string unparenthesize (and core)" do
 
     it "loads" do
-      Basic_::String
+      Home_::String
     end
 
     it 'empty string - no match' do
@@ -34,7 +34,7 @@ module Skylab::Basic::TestSupport::String
     end
 
     def subject s
-      md = Basic_::String.unparenthesize_message_string::UNPARENTHESIZE_RX__.match s
+      md = Home_::String.unparenthesize_message_string::UNPARENTHESIZE_RX__.match s
       if md
         [ md[ :open ], md[ :body ], md[ :close ] ]  # not 'captures'
       end

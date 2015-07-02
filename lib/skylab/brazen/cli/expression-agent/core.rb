@@ -125,7 +125,7 @@ module Skylab::Brazen
       end
 
       public def stylize s, * i_a
-        Brazen_::CLI::Styling.stylify i_a, s
+        Home_::CLI::Styling.stylify i_a, s
       end
 
       def val s
@@ -139,7 +139,7 @@ module Skylab::Brazen
       end
 
       def _NLP_agent
-        @NLP_agent ||= Brazen_::API.expression_agent_class.NLP_agent.new
+        @NLP_agent ||= Home_::API.expression_agent_class.NLP_agent.new
       end
 
       # ~ begin :+#experiment

@@ -170,7 +170,7 @@ module Skylab::Brazen
       end
 
       def build_extra_values_event stream
-        Brazen_::Property.
+        Home_::Property.
           build_extra_values_event [ stream.current_token ], nil, 'iambic token'
       end
 
@@ -267,7 +267,7 @@ module Skylab::Brazen
 
       def receive_mutable_input_line s
         s.strip!
-        rx = Brazen_.lib_.basic::Fuzzy.case_sensitive_regex_via_string s
+        rx = Home_.lib_.basic::Fuzzy.case_sensitive_regex_via_string s
         cx_a = []
         @children.each do |cx|  # :~+[#ba-015] the simple fuzzy algorithm
           cx.can_receive_focus or next

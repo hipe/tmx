@@ -18,7 +18,7 @@ module Skylab::Brazen
 
       alias_method :new_top_invocation, :new
       def new * a
-        new_top_invocation a, Brazen_.application_kernel_
+        new_top_invocation a, Home_.application_kernel_
       end
 
       def pretty_path x
@@ -353,7 +353,7 @@ module Skylab::Brazen
 
       def __array_of_matching_unbounds_against_token tok
 
-        Brazen_.lib_.basic::Fuzzy.reduce_to_array_stream_against_string(
+        Home_.lib_.basic::Fuzzy.reduce_to_array_stream_against_string(
           to_child_unbound_action_stream,
           tok,
           -> unbound do
@@ -1133,7 +1133,7 @@ module Skylab::Brazen
       end
 
       def any_ext_status_for_chan_i i
-        Brazen_::API.exit_statii[ i ]
+        Home_::API.exit_statii[ i ]
       end
 
       def some_err_code_for_event ev

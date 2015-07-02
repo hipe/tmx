@@ -119,7 +119,7 @@ module Skylab::Snag::TestSupport
         _expag = build_byte_stream_expag_ @_width_x, @_sub_margin_x ,
           _identifier_width_x || 50
 
-        node = Snag_::Models_::Node.edit_entity(
+        node = Home_::Models_::Node.edit_entity(
 
           # ( obliquely (and unintentionally) covers [#br-089]:#note-89 )
 

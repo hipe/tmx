@@ -21,7 +21,7 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config::Mutable
       it "add a section with an invalid name" do
         _secs = document.sections
         ok = _secs.touch_section 'foo_bar'
-        ok.should eql Brazen_::UNABLE_
+        ok.should eql Home_::UNABLE_
         expect_one_event :invalid_section_name do |ev|
           ev.invalid_section_name.should eql 'foo_bar'
         end
@@ -38,7 +38,7 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config::Mutable
         expect_event :invalid_subsection_name,
           /\Asubsection names can contain any characters except newline #{
            }\(\(ick "bar\\n"\)\)\z/
-        ok.should eql Brazen_::UNABLE_
+        ok.should eql Home_::UNABLE_
       end
     end
 

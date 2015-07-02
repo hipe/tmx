@@ -30,7 +30,7 @@ module Skylab::Basic
 
         def initialize s
 
-          scn = Basic_.lib_.string_scanner s
+          scn = Home_.lib_.string_scanner s
 
           rx_s_a = [ '\\A' ]
 

@@ -30,7 +30,7 @@ module Skylab::Basic
       #     end
       #
       #     foo = Foo.new
-      #     mc = Basic_::Method.curry.new foo.method(:bar), [ 'yes', 'sir' ]
+      #     mc = Home_::Method.curry.new foo.method(:bar), [ 'yes', 'sir' ]
       #     x = mc.receiver.send mc.method_name, * mc.arguments
       #     x  # => "ok:yessir"
       #
@@ -61,7 +61,7 @@ module Skylab::Basic
       #     foo = Bar.new
       #
       #     p = -> *a do
-      #       mc = Basic_::Method.curry.new foo.method(:bar), a
+      #       mc = Home_::Method.curry.new foo.method(:bar), a
       #       errmsg = nil
       #       mc.validate_arity do |o|
       #         errmsg = "no: #{ o.actual } for #{ o.expected }"

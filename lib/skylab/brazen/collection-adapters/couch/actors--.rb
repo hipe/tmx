@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Collection_Adapters::Couch
 
-    Couch_Actor_ = ::Class.new Brazen_::Collection::Actor
+    Couch_Actor_ = ::Class.new Home_::Collection::Actor
 
     module Actors__
 

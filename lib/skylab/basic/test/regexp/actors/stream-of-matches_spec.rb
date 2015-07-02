@@ -25,7 +25,7 @@ module Skylab::Basic::TestSupport
     end
 
     def subject s, rx
-      Basic_::Regexp.stream_of_matches s, rx
+      Home_::Regexp.stream_of_matches s, rx
     end
   end
 end

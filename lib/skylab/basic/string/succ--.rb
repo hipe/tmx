@@ -120,7 +120,7 @@ module Skylab::Basic
         tvp = Values__.new
         @template_values_prototype = tvp
 
-        o = Basic_::String.template.new_with(
+        o = Home_::String.template.new_with(
           :string, s,
           :surface_pair_mapper, -> pair do
             s = pair.unparsed_surface_content_s

@@ -93,7 +93,7 @@ module Skylab::Basic::TestSupport::String
     end
 
     def subject
-      Basic_::String
+      Home_::String
     end
   end
 end

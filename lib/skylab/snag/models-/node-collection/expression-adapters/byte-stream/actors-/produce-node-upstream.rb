@@ -84,9 +84,9 @@ module Skylab::Snag
         def __init_memoized_assets s
 
           _BODY = []
-          _STRING_SCANNER = Snag_::Library_::StringScanner.new s
+          _STRING_SCANNER = Home_::Library_::StringScanner.new s
 
-          _Models = Snag_::Models_
+          _Models = Home_::Models_
           _Models_ = _Models::Node::Expression_Adapters::Byte_Stream::Models_
           @Substring = _Models_::Substring
 

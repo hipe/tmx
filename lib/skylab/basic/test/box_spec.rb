@@ -13,13 +13,13 @@ module Skylab::Basic::TestSupport::Box
     context "scanner" do
 
       it "0" do
-        scn = Basic_::Box.new.get_value_stream
+        scn = Home_::Box.new.get_value_stream
         scn.gets.should be_nil
         scn.gets.should be_nil
       end
 
       it "1" do
-        box = Basic_::Box.new
+        box = Home_::Box.new
         box.add :foo, :bar
         scn = box.get_value_stream
         scn.gets.should eql :bar
@@ -28,7 +28,7 @@ module Skylab::Basic::TestSupport::Box
       end
 
       it "2" do
-        box = Basic_::Box.new
+        box = Home_::Box.new
         box.add_iambic %i( a A b B )
         scn = box.get_value_stream
         scn.gets.should eql :A
@@ -38,7 +38,7 @@ module Skylab::Basic::TestSupport::Box
       end
 
       it "x" do
-        box = Basic_::Box.new
+        box = Home_::Box.new
         box.add_iambic [ :x, :foo, :y, nil, :z, :bar ]
         scn = box.get_value_stream
         scn.gets.should eql :foo

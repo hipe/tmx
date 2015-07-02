@@ -124,7 +124,7 @@ module Skylab::Brazen::TestSupport::CLI
 
       a = [] ; a_ = []
 
-      es = Brazen_::API.exit_statii
+      es = Home_::API.exit_statii
 
       a.push :generic_error ; a_.push es.fetch( :generic_error )
 

@@ -6,25 +6,25 @@ module Skylab::Basic::TestSupport
 
   module PersonName_01
 
-    class Node < Basic_.lib_.treetop::Runtime::SyntaxNode
+    class Node < Home_.lib_.treetop::Runtime::SyntaxNode
 
-      Basic_::Sexp::Auto[ self ]
+      Home_::Sexp::Auto[ self ]
     end
   end
 
   module PersonName_02
 
-    class Node < Basic_.lib_.treetop::Runtime::SyntaxNode
+    class Node < Home_.lib_.treetop::Runtime::SyntaxNode
 
-      Basic_::Sexp::Auto[ self ]
+      Home_::Sexp::Auto[ self ]
     end
   end
 
   module PersonName_03
 
-    class Node < Basic_.lib_.treetop::Runtime::SyntaxNode
+    class Node < Home_.lib_.treetop::Runtime::SyntaxNode
 
-      Basic_::Sexp::Auto[ self ]
+      Home_::Sexp::Auto[ self ]
     end
   end
 end

@@ -4,10 +4,10 @@ module Skylab::Snag
 
     ACTIONS_ANCHOR_MODULE = -> { API::Actions }
 
-    extend Snag_.lib_.NLP::EN::API_Action_Inflection_Hack
+    extend Home_.lib_.NLP::EN::API_Action_Inflection_Hack
     inflection.inflect.noun :singular
 
-    Snag_.lib_.formal_attribute::DSL[ self ]
+    Home_.lib_.formal_attribute::DSL[ self ]
     meta_attribute :default
     meta_attribute :required, default: false
 
@@ -19,7 +19,7 @@ module Skylab::Snag
         if const_defined? :PARAMS, false
           a = const_get :PARAMS, false
           _o_a = a.map { |i| [ i, { required: true } ] }
-          Snag_.lib_.formal_attribute::Box[ _o_a ]
+          Home_.lib_.formal_attribute::Box[ _o_a ]
         else
           attributes     # (for clearer error msgs)
         end

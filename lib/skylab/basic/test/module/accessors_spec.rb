@@ -29,7 +29,7 @@ module Skylab::Basic::TestSupport
 
         module MyApp
           class CLI::Client
-            Basic_::Module::Accessors.enhance self do
+            Home_::Module::Accessors.enhance self do
               public_methods do
                 module_reader :API_client_module, '../../API/Client'
               end
@@ -48,7 +48,7 @@ module Skylab::Basic::TestSupport
 
         class Foo
 
-          Basic_::Module::Accessors.enhance self do
+          Home_::Module::Accessors.enhance self do
 
             private_module_autovivifier_reader :zapper, 'Ohai_',
               -> do  # when didn't exist

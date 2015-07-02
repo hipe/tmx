@@ -71,7 +71,7 @@ module Skylab::Brazen::TestSupport
     end
 
     _Subject_callable = -> do
-      Brazen_::CLI::Expression_Frames::Table::Actor
+      Home_::CLI::Expression_Frames::Table::Actor
     end
 
     context "you can curry properties and behavior for table in one place .." do

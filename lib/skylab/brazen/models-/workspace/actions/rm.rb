@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Models_::Workspace
 
-    class Actions::Rm < Brazen_::Action
+    class Actions::Rm < Home_::Action
 
       edit_entity_class(
         :desc, -> y do

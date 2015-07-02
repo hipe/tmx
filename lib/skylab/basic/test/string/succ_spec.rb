@@ -75,7 +75,7 @@ module Skylab::Basic::TestSupport::String
     end
 
     def subject * x_a
-      Basic_::String::Succ__.call_via_iambic x_a
+      Home_::String::Succ__.call_via_iambic x_a
     end
   end
 end

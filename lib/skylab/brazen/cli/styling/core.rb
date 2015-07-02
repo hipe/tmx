@@ -58,7 +58,7 @@ module Skylab::Brazen
 
         -> s do
 
-          sexp ||= Brazen_.lib_.basic::Sexp
+          sexp ||= Home_.lib_.basic::Sexp
 
           y = []
           begin

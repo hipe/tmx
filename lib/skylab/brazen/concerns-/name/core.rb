@@ -105,7 +105,7 @@ module Skylab::Brazen
     end
 
     def _inflection
-      @___inflection ||= Brazen_::Concerns_::Inflection.for_model self
+      @___inflection ||= Home_::Concerns_::Inflection.for_model self
     end
 
     Name_with_Parent__ = superclass

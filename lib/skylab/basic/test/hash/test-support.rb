@@ -8,11 +8,11 @@ module Skylab::Basic::TestSupport::Hash
 
   extend TestSupport_::Quickie
 
-  Basic_ = Basic_
+  Home_ = Home_
 
   Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   Subject_ = -> do
-    Basic_::Hash
+    Home_::Hash
   end
 end

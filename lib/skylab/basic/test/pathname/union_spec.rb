@@ -8,13 +8,13 @@ module Skylab::Basic::TestSupport::Pathname::Union
 
   extend TestSupport_::Quickie
 
-  Basic_ = Basic_
+  Home_ = Home_
 
   Subject_ = -> * x_a, & p do
     if x_a.length.nonzero? || p
-      Basic_::Pathname::Union[ * x_a, & p ]
+      Home_::Pathname::Union[ * x_a, & p ]
     else
-      Basic_::Pathname::Union
+      Home_::Pathname::Union
     end
   end
 

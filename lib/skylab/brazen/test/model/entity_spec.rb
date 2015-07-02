@@ -165,13 +165,13 @@ module Skylab::Brazen::TestSupport::Mo_Ent
     Subject_ = -> * a, & p do
 
       if a.length.nonzero? || p
-        Brazen_::Model.common_entity( * a, & p )
+        Home_::Model.common_entity( * a, & p )
       else
-        Brazen_::Model.common_entity_module
+        Home_::Model.common_entity_module
       end
     end
 
-    Brazen_ = Brazen_
+    Home_ = Home_
     Enhance_for_test_ = o::Enhance_for_test_
     NIL_ = nil
     WITH_MODULE_METHOD_ = o::WITH_MODULE_METHOD_

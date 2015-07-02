@@ -117,7 +117,7 @@ module Skylab::Basic
         else
           @starting_module.name.split CONST_SEP_
         end
-        Basic_::Pathname.expand_real_parts_by_relative_parts real_parts, @relative_path_parts, CONST_SEP_
+        Home_::Pathname.expand_real_parts_by_relative_parts real_parts, @relative_path_parts, CONST_SEP_
       end
 
       def via_normal_path_parts_execute

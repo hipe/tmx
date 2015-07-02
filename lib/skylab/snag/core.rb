@@ -9,7 +9,7 @@ module Skylab::Snag
 
       def call * x_a, & oes_p
 
-        bc = Snag_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
+        bc = Home_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
         bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
       end
     end  # >>
@@ -25,11 +25,11 @@ module Skylab::Snag
     end
 
     define_method :application_kernel_, ( Callback_.memoize do
-      Snag_.lib_.brazen::Kernel.new Snag_
+      Home_.lib_.brazen::Kernel.new Home_
     end )
 
     def lib_
-      @lib ||= Snag_::Lib_.instance
+      @lib ||= Home_::Lib_.instance
     end
 
   end  # >>
@@ -130,7 +130,7 @@ module Skylab::Snag
 
     p = -> do
 
-      class Actn_Ldr____ < Snag_.lib_.brazen::Action
+      class Actn_Ldr____ < Home_.lib_.brazen::Action
 
         class << self
 
@@ -157,7 +157,7 @@ module Skylab::Snag
 
           def __load
 
-            mod = Snag_.lib_.basic::Module
+            mod = Home_.lib_.basic::Module
 
             chain = mod.chain_via_module self
             first = chain.pop
@@ -210,7 +210,7 @@ module Skylab::Snag
   MONADIC_EMPTINESS_ = -> _ { }
   NEUTRAL_ = nil
   NEWLINE_ = "\n"
-  Snag_ = self
+  Home_ = self
   SPACE_ = ' '
   THE_EMPTY_MODULE_ = nil
   UNABLE_ = false

@@ -12,7 +12,7 @@ module Skylab::Basic::TestSupport
 
       module Dingle
 
-        Basic_::Class::Creator[ self ]
+        Home_::Class::Creator[ self ]
 
         klass :Alpha do
           def wrong ; end
@@ -24,7 +24,7 @@ module Skylab::Basic::TestSupport
 
       module Fingle
 
-        Basic_::Class::Creator[ self ]
+        Home_::Class::Creator[ self ]
 
         klass :Alpha do
           def right ; end
@@ -33,7 +33,7 @@ module Skylab::Basic::TestSupport
 
       class Weiner
 
-        include Basic_::Class::Creator::InstanceMethods
+        include Home_::Class::Creator::InstanceMethods
 
         include Dingle
 

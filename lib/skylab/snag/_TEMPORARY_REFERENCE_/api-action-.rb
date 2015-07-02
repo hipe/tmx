@@ -6,7 +6,7 @@ module Skylab::Snag
 
       include API::Action::Business_Methods___
 
-      Entity_ = Snag_.lib_.entity.call do
+      Entity_ = Home_.lib_.entity.call do
 
         o :ad_hoc_processor, :make_delegate_properties, -> x do
           Make_Delegate_Properties__.new( x ).go
@@ -89,14 +89,14 @@ module Skylab::Snag
 
       def sign_string s
         s.respond_to? :ascii_only? or self._FIXME
-        ev = Snag_::Model_::Event.inflectable_via_string s
+        ev = Home_::Model_::Event.inflectable_via_string s
         inflect_inflectable_event ev
         ev
       end
 
       def sign_event ev
         ev.respond_to? :ascii_only? and self._FIXME
-        ev_ = Snag_::Model_::Event.inflectable_via_event ev
+        ev_ = Home_::Model_::Event.inflectable_via_event ev
         inflect_inflectable_event ev_
         ev_
       end

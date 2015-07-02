@@ -80,10 +80,10 @@ describe "[ba] sexp - auto" do
       pa = parser
 
       _ = pa.parse 'mary'
-      _.should be_kind_of Basic_::TestSupport::PersonName_02::Node
+      _.should be_kind_of Home_::TestSupport::PersonName_02::Node
 
       _ = pa.parse 'joe bob'
-      _.should be_kind_of Basic_::TestSupport::PersonName_02::Node
+      _.should be_kind_of Home_::TestSupport::PersonName_02::Node
 
       _ = pa.parse 'joe bobo briggs'
       _.should be_nil
@@ -106,7 +106,7 @@ describe "[ba] sexp - auto" do
         end
 
         specify do
-          should be_kind_of Basic_::Sexp
+          should be_kind_of Home_::Sexp
         end
       end
 
@@ -203,8 +203,8 @@ describe "[ba] sexp - auto" do
 
     module ::Skylab::Basic::TestSupport
 
-      class MySexp < Basic_::Sexp
-        Basic_::Sexp::Registrar[ self ]
+      class MySexp < Home_::Sexp
+        Home_::Sexp::Registrar[ self ]
       end
 
       class Bread < MySexp
@@ -219,9 +219,9 @@ describe "[ba] sexp - auto" do
 
       module Sandwich
 
-        class MyNode < Basic_.lib_.treetop::Runtime::SyntaxNode
+        class MyNode < Home_.lib_.treetop::Runtime::SyntaxNode
 
-          Basic_::Sexp::Auto.enhance( self ).with_sexp_auto_class MySexp
+          Home_::Sexp::Auto.enhance( self ).with_sexp_auto_class MySexp
 
         end
       end
@@ -293,7 +293,7 @@ describe "[ba] sexp - auto" do
         _sexp = _raw_tree.sexp
 
         _ts = _sexp.child :top_slice
-        _ts.class.should eql Basic_::TestSupport::Bread
+        _ts.class.should eql Home_::TestSupport::Bread
       end
 
       context 'calling the custom method ("calories") on your custom sexp class' do
@@ -332,14 +332,14 @@ describe "[ba] sexp - auto" do
 
     cache_h.fetch grammar do | s |
 
-      g = Basic_.lib_.treetop.load_from_string s
+      g = Home_.lib_.treetop.load_from_string s
       cache_h[ s ] = g
       g
     end
   end
 
   def _Treetop
-    Basic_.lib_.treetop
+    Home_.lib_.treetop
   end
 end
 

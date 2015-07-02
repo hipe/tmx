@@ -33,7 +33,7 @@ module Skylab::Basic::TestSupport::Enumerator
     end
 
     def subject & p
-      Basic_::Enumerator.line_stream( & p )
+      Home_::Enumerator.line_stream( & p )
     end
   end
 end

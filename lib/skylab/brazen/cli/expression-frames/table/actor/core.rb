@@ -216,7 +216,7 @@ module Skylab::Brazen
       p = nil
       Has_arguments = -> cls do
         if ! p
-          p = Brazen_.lib_.plugin::Dependencies::Argument::Has_arguments
+          p = Home_.lib_.plugin::Dependencies::Argument::Has_arguments
         end
 
         p[ cls ]
