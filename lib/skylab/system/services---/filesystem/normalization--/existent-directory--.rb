@@ -8,6 +8,11 @@ module Skylab::System
 
         extend Common_Module_Methods_
 
+        def self.mutate_when_iambic_is_one_item_ x_a
+          x_a[ 0, 0 ] = [ :path ]
+          NIL_
+        end
+
         Callback_::Actor.methodic self, :properties,
           :is_dry_run,
           :max_mkdirs

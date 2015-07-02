@@ -1,24 +1,28 @@
-require_relative '../../test-support'
+module Skylab::Git::TestSupport
 
-module Skylab::Git::TestSupport::CLI::SU
+  module Models::Stow::Support
 
-  ::Skylab::Git::TestSupport::CLI[ TS_ = self ]
+    def self.[] tcc
 
-  include Constants
+      Callback_.test_support::Expect_event[ tcc ]
+      tcc.include Instance_Methods___
+    end
 
-  extend TestSupport_::Quickie
+    module Instance_Methods___
 
-  module InstanceMethods
+      define_method :stashiz_path_, ( Callback_.memoize do
+
+        ::File.join Fixture_trees_[], 'stashiz'
+      end )
+
+      def subject_API
+        Home_::API
+      end
+    end
 
     # ~ hook-ins
 
-    def do_debug= yes
-      yes and @debug_IO ||= TestLib_::Stderr[]
-      super
-    end
-
-    attr_reader :debug_IO
-
+    if false
     let :_CLI_client do
       _i, _o, _e = [ nil, * two_spy_group.to_a ]
       cli = Home_::CLI::Actions::Stash_Untracked::CLI.new _i, _o, _e
@@ -89,20 +93,13 @@ module Skylab::Git::TestSupport::CLI::SU
 
     end.call
 
-
     def expect_succeeded
       expect_no_more_lines
       @result.should eql GSU[]::CLI::SUCCESS_EXITSTATUS
     end
+    end
+
+    # WAZZLE = 'wazzle'.freeze
+
   end
-
-  Home_ = Home_
-
-  GSU = -> do
-    Home_::CLI::Actions::Stash_Untracked
-  end
-
-  TestLib_ = TestLib_
-
-  WAZZLE = 'wazzle'.freeze
 end

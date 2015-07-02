@@ -1,8 +1,190 @@
 # workflow patterns :[#137]
 
 
+## introduction
 
-## branch and divide :[#143]
+some of these are ancient and some of them may be brand spanking new. we
+add the most recent ones at the top and give them the lexically greatest
+letter of the alphabet.
+
+one day we might break them into their own taxonomy because there are
+some clear axes; like structurally higher-level vs. lower level, or what
+kinds of development the workflows pertain to.
+
+
+
+
+## a practical development order for CRUD [#.H]
+
+this is a fun one because it flies in the face of intuition. and like
+[#.G] below, this one is *maybe* better documented in rough draft form
+in commit messages (but we couldn't find any just yet).
+
+first, let's consider an intuitive order before we present our argument
+for the counter-intuitive order:
+
+
+### the intuitive order (that's actually sub-optimal)
+
+a "narrative" order for "CRUD" is suggested by the letters of the
+acronym itself: you have to _C_reate something before you can do
+anything with it, so it makes sense to do that first.
+
+once you have created it you can _R_retrieve it. neck-and-neck in the
+narrative ordering race is with retrieving it is _U_pdating the thing.
+
+and finally, you should _D_elete it, but don't do anything after this
+step because after you delete something you have nothing again.
+
+this narrative justification is both cute and may have some practical
+value. indeed we have written as much *maybe* in the commit messages
+long ago.
+
+HOWEVER we now have a stronger rational for a different suggested order:
+
+
+### the counter-intuitive order (that's actually pro-optimal) is:
+
+  1. list FIRST
+  2. THEN retrieve
+  2. THEN delete
+  4. THEN create
+  5. THEN update
+
+the particular order is not as important as the rationale, and the
+rationale is built on top of an axiom:
+
+    the work progresses most optimally when the units of work are more
+    or less of equal size.
+
+we will offer no formal proof here of the above, but hopefully to some
+extent it seems self-evident:
+
+on the one extreme, if you have lots of units of work that are very
+small, you "waste time" with the essential but perhaps tedius red-tape
+of for example writing commit messages and running the test suite. no
+matter how fast these processes are for you, you can probably imagine
+a unit of work so small that it does not seem to justify cost (however
+low) of this "red tape".
+
+on the other extreme, a unit of work that is too big can make a project
+come to an absolute standstill and/or cause integration headaches (or
+even showstoppers) further down the pipeline.
+
+it is the sweetspot between these two extremes that we are after, one
+that (for appropriate use-cases) we try to formalize somewhat here.
+
+
+### justifying our weird order
+
+our order is based around introducing as little as possible new work in
+each step, in a manner where that work that will be useful to have done
+in one or more subsequent steps.
+
+our order is based on a couple of general assumptions which you should
+take into account as you consider the applicability of this order to
+your silo-esque:
+
+  • actions that mutate generally have more moving parts than actions
+    that to not mutate.
+
+  • generally, the more arguments an action takes, the more work it will
+    be to implement that action. this can be mitigated if you can re-use
+    existing work that handles the arguments.
+
+let's look at the order again, and we'll also add notation from the
+perspective of mutability:
+
+    1. list FIRST     - does not mutate
+    2. THEN retrieve  - does not mutate
+    2. THEN delete    - mutates the collection
+    4. THEN create    - mutates an entity and collection
+    5. THEN update    - mutates an entity
+
+let's also look at the order in terms of the kinds of "arguments" that
+are typically necessary for such "actions"
+
+    1. list FIRST     - no arguments (or some sort of collection identifier)
+    2. THEN retrieve  - same args as above plus an entity identifier
+    2. THEN delete    - exact same args as above
+    4. THEN create    - same args as 1. plus ALL required fields and etc
+    5. THEN update    - typically similar to 4. AND args from 2.
+
+in step 1. you get your head (and code) around the basics of working
+with your datastore. also you have to get your entity class-ish working,
+but only enough to list often only a single field from it (the
+natural-key type field). and you're not mutating anything, so there
+aren't as many "moving parts" (and points of failure) as there would
+otherwise be.
+
+in step 2. you implement the resolution of a single entity from an
+identifier. you have at least two branches to cover here; the entity
+may not be found. and you may get into working with particular fields
+of your entity and displaying them in some read-only way. but again there
+is no mutation yet; you have staved that off until..
+
+step 3. deleting (to whatever extent you actually do this) is a step
+that in practice is intuitively (or ostensibly pragmatically) saved
+either for the end or for never. we think it makes the most sense to
+implement the delete as the first mutating action because:
+
+  • unlike the other mutating actions, the input argument to a delete
+    action is typically a single "atom" of data - the entity identifier.
+    less input data is less data to validate and less branches to cover.
+
+  • for trivial cases the branches are binary-discrete: either the
+    entity is or is not found. to cover and implement these two cases
+    is less work than to cover all the typical branches in the other
+    mutating actions.
+
+step 4 is the first step where we may have to validate and normalize
+the incoming data for perhaps many fields. it may be able to use aspects
+of step 2, but this time the fields are editable as opposed to read-only
+(as applicable).
+
+as step 5 we put `update` after `create` only because this step 5 can
+re-use a greater portion of the elements of step 3 and 4 than if we
+changed the order: the `update` can re-use the entity resolution logic
+of step 3 (for e.g the "entity not found" case), and as well it and 4
+have obvious logic they will typically share.
+
+yay!
+
+
+
+
+## the 5-phase action implementation sequence :[#.G]
+
+(this is better documented in commit messages currently..)
+
+this is our favorite means of implementing a [br]-style model action for
+any action that is at all non-trivial.
+
+1. produce and write out the planned algorithm for the action's
+   implementation in pseudocode (in a commited document). it is OK if
+   this changes somewhat throughout the development, but typically a
+   detailed enough pseudocode document will be protected from too much
+   such violence.
+
+2. decide how the pseudocode will be partitioned into roles and
+   behaviors for actors, models and sessions.
+
+3. one by one (at least one commit for each), implement each of the
+   above. hopefully order won't be too important because hopefully there
+   will be no dependency arcs.
+
+4. synthesize the model action from these components.
+
+5. do any integration with the action to the rest of the system and/or
+   other modalities.
+
+steps 3, 4 and 5 MUST have their own tests driving the development,
+ideally in a three laws compliant way.
+
+
+
+
+## branch and divide :[#143]  :+[#.A-F]
 
 (edit: this may duplicate somewhat something of below. we don't have time
  to read it just now)
@@ -21,7 +203,7 @@ get the first branch green, then rebase the second branch over the first
 
 
 
-## the golden two-step :[#136]
+## the golden two-step :[#136]  :+[#.A-F]
 
 this is an at-the-time-of-this-writing an imaginary maneuver consisiting of
 this: in one pass you muscle through your topic, laying down a trail of
@@ -55,7 +237,8 @@ this will become a quagmire unless the scope of your step is relatively small.
 
 
 
-## the golden plow :[#137]
+
+## the golden plow  :+[#.A-F]
 
 in real life a plow made of gold probably would not be very good, because gold
 is a soft metal. but now that we have created this idiom we must run with it.
@@ -110,7 +293,8 @@ hm, not sure that was worth it. but mind you I haven't tried this yet!
 
 
 
-## :#slow-step
+
+## :#slow-step  :+[#.A-F]
 
 step-debugging wherin you loop through the following steps:
 
@@ -124,7 +308,7 @@ step-debugging wherin you loop through the following steps:
 
 
 
-## :#quarrantining-an-autoload-failure
+## :#quarrantining-an-autoload-failure  :+[#.A-F]
 
 ### a case study
 
@@ -152,7 +336,7 @@ step-debugging wherin you loop through the following steps:
 
 
 
-## :#focus-not-focus
+## :#focus-not-focus  :+[#A-F]
 
 you have a test suite for a node (let's just assume it is one spec file)
 and you have written one test that fails (because either it's triggering
@@ -167,7 +351,7 @@ as appropriate), flip back and forth between the "focus" and the "not focus"
 tests to make sure you don't regress.
 
 for an aggressive refactor of a featurepoint that has code that is somewhat
-#three-laws-compliant below it, it may be useful to use the experimental
+`#three-laws-compliant` below it, it may be useful to use the experimental
 '--too' option of quickie to run all tests the topic spec file up to and
 including the test on a certain line: in this case let that line be the
 line of the last test before the topic test that you presumably broke by

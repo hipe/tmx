@@ -1,9 +1,5 @@
 #!/usr/bin/env ruby -w
 
-# this may be a placeholder for future integration with tmx
-
 require_relative '../lib/skylab/git/core'
 
-module Skylab::Git
-  Git::CLI.new( Stdin_[], Stdout_[], Stderr_[] ).invoke ::ARGV
-end
+Skylab::Git::CLI.new( $stdin, $stdout, $stderr ).invoke ARGV

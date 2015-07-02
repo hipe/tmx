@@ -115,6 +115,11 @@ module Skylab::System
 
           def mixed_via_iambic_ x_a, & oes_p
             if x_a.length.nonzero?
+
+              if 1 == x_a.length
+                mutate_when_iambic_is_one_item_ x_a
+              end
+
               ok = nil
               x = new do
                 accept_selective_listener_proc oes_p
@@ -124,6 +129,10 @@ module Skylab::System
             else
               self
             end
+          end
+
+          def mutate_when_iambic_is_one_item_ _
+            NIL_
           end
         end
 

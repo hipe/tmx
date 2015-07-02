@@ -24,7 +24,8 @@ module Skylab::Brazen
       :directory_path,
       :filesystem,
       :filename_pattern,  # respond to `=~`
-      :flyweight_class
+      :flyweight_class,
+      :on_event_selectively,
     )
 
     def to_entity_stream_via_model _cls_, & x_p  # #UAO
@@ -169,23 +170,45 @@ module Skylab::Brazen
 
       path = @directory_path
       if path  # otherwise nasty
-
-        glob = -> do
-          @filesystem.glob ::File.join( path, '*' )
-        end
-
-        if @directory_is_assumed_to_exist
-          glob[]
-        else
-          if @filesystem.directory? path
-            glob[]
-          else
-            EMPTY_A_
-          end
-        end
+        __produce_path_a_via_trueish_path path
       else
         UNABLE_
       end
+    end
+
+    def __produce_path_a_via_trueish_path path
+
+      glob = -> do
+        @filesystem.glob ::File.join( path, '*' )
+      end
+
+      if @directory_is_assumed_to_exist
+
+        a = glob[]
+
+        if a.length.zero? && ! @filesystem.directory?( path )
+          __whine_about_missing_directory path
+        end
+
+        a
+      else
+
+        # (hi.)
+
+        if @filesystem.directory? path
+          glob[]
+        else
+          EMPTY_A_
+        end
+      end
+    end
+
+    def __whine_about_missing_directory path
+
+      _ = Home_.lib_.system.filesystem.normalization
+      _.existent_directory path, & @on_event_selectively  # result is UNABLE_
+
+      NIL_
     end
 
     def __proc_via_path_a path_a, & x_p

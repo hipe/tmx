@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../../test-support'
 
-module Skylab::Git::TestSupport::CLI::SU
+module Skylab::Git::TestSupport
 
-  describe "[gi] CLI actions gsu actions" do
+  describe "[gi] models - stow - actions - mutators", wip: true do
 
     extend TS_
+    use :models_stow_support
 
     describe "status" do
 

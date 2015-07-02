@@ -1,11 +1,14 @@
-module Skylab::Git::CLI::Actions::Stash_Untracked
+module Skylab::Git
+
+  class Models_::Stow
+
+    # (old code has indention that is typically one tab stop too little.)
 
   # read [#010] #storypoint-1 "introduction..", #storypoint-2 "local idioms"
 
   # ( was #storypoint-3 "these constant ass.." #posterity )
 
-  Home_ = ::Skylab::Git
-
+  if false  # (( BEGIN OFF
   module Sub_client__  # #storypoint-4 "the way sub-clients are used in t.."
 
     def self.[] mod, * x_a  # #idempotent
@@ -89,18 +92,18 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
     Verb_lemma_hack = -> _ do
       def self.verb_lemma_s
-        Verb_lemma_hack_[ self ]
+        Verb_lemma_hack__[ self ]
       end ; nil
     end
 
     Home_.lib_.bundle::Multiset[ self ]
   end
 
-  Verb_lemma_hack_ = -> mod do
-    s = mod.name ; base_s = s[ s.rindex( COLON__ ) + 1 .. -1 ]
+  Verb_lemma_hack__ = -> mod do
+    s = mod.name ; base_s = s[ s.rindex( COLON___ ) + 1 .. -1 ]
     base_s.downcase
   end
-  COLON__ = ':'.freeze
+  COLON___ = ':'.freeze
 
   module Sub_client_universal_IMs__
   private
@@ -247,7 +250,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
 
     def last_hot_prgm_name
-      "#{ program_name } #{ Verb_lemma_hack_[ @bound_downtree_action.class ] }"
+      "#{ program_name } #{ Verb_lemma_hack__[ @bound_downtree_action.class ] }"
     end
 
     def build_option_parser
@@ -565,27 +568,9 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
     # ~ API action business support
 
-    def collection
-      (( @collection_h ||= { } )).fetch @hub do |hub|
-        # (`hub` struct generates keys as expected)
-        @collection_h[ hub ] = build_collection
-      end
-    end
+
     # :+[#hl-027] smell: it could use model/view split. but only matters if we
     # ever have more than one API request processed in the same process
-
-    def build_collection
-      Stash__::Collection.new client_services,
-        :stashes_pathname, @hub.stashes_pathname,
-        :hub_pathname, @hub.hub_pathname,
-        :channel_string_listener_p, -> i, str do
-          fail self.do_me
-          # define call_digraph_listeners to sanitize paths from strings
-          call_digraph_listeners i, str.gsub( RX__ ) { escape_path $~[ 0 ] }
-        end
-    end
-    RX__ = Home_.lib_.path_tools.absolute_path_hack_rx
-
   end
 
   # ~ :#storypoint-9 - experiments with extensions ..
@@ -635,28 +620,53 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     Home_::Autoloader_[ self, :boxxy ]  # :#storypoint-10 placeholder (was)
   end
 
-  class API::Actions::Ping < API::Action
+  end  # END OFF ))
 
-    Sub_client__[ self, :say ]
+    Bz__ = Home_.lib_.brazen
 
-    PARAMS = %i( zip zap )
+    class Action_ < Bz__::Action
 
-    def execute
-      if @zap
-        emit_inner_info_string "(#{ @zip })"
-        zap = @zap
-        _s = say { em zap }
-        emit_inner_error_string "(pretending this was wrong: #{ _s })"
-      else
-        emit_payload_line "(out:#{ @zip })"
-      end
-      :pingback_from_API
+      Bz__::Model::Entity.call self
+
     end
-  end
 
-  class Collecty__ < API::Action
-    Sub_client__[ self, :popener3 ]
+    Actions = ::Module.new
+
+    class Actions::Ping < Action_
+
+      @is_promoted = true
+
+      edit_entity_class(
+        :property, :zip,
+        :property, :zap,
+      )
+
+      def produce_result
+
+        h = @argument_box.h_
+        if h[ :zap ]
+          emit_inner_info_string "(#{ @zip })"
+          zap = @zap
+          _s = say { em zap }
+          emit_inner_error_string "(pretending this was wrong: #{ _s })"
+
+        else
+
+          @on_event_selectively.call :payload, :expression, :ping do | y |
+            y << "(out: #{ h[ :zip ] })"
+          end
+        end
+
+        :pingback_from_API
+      end
+    end
+
+  class Collection_Action__ < Action_
+
+    # Sub_client__[ self, :popener3 ]
+
   private
+
     def normalized_relative_others
       cmd_s = CMD__
       ::Enumerator.new do |y|
@@ -672,19 +682,22 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
         end
       end
     end
+
     CMD__ = 'git ls-files --others --exclude-standard'
   end
 
-  class API::Actions::Status < Collecty__
+  class Actions::Status < Collection_Action__
 
-    Sub_client__[ self, :say ]
+    # Sub_client__[ self, :say ]
 
     PARAMS = %i( be_verbose stashes_path )
 
   private
 
-    def execute
+    def ___WAS_execute
+
       @be_verbose and render_hub_info
+
       num = 0
       normalized_relative_others.each do |file_s|
         num += 1
@@ -695,15 +708,13 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
   end
 
-  class API::Actions::Save < Collecty__
+  class Actions::Save < Collection_Action__
 
-    Sub_client__[ self, :popener3 ]
+    # Sub_client__[ self, :popener3 ]
 
     PARAMS = %i( be_verbose dry_run stash_name stashes_path )
 
-  private
-
-    def execute
+    def ___WAS_execute
       @be_verbose and render_hub_info
       begin
         stash = collection.touch_stash_expected_to_be_writable @stash_name
@@ -735,21 +746,24 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
         end
       end
     end
+
     CMD__ = 'git ls-files --others --exclude-standard'
   end
 
-  class API::Actions::Show < API::Action
+  class Actions::Show < Action_
 
     PARAMS = %i( be_verbose is_in_color do_show_patch do_show_stat
       stash_name stashes_path )
 
-  private
+    def ___WAS_execute
 
-    def execute
       stash = collection.touch_stash @stash_name
+
       @be_verbose and emit_inner_info_string "#{
         }(had stash path: #{ stash.pathname })"
+
       stash = stash.stash_expected_to_exist
+
       stash and with_extant_stash stash
     end
 
@@ -764,18 +778,35 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
   end
 
-  class API::Actions::List < API::Action
+    class Actions::List < Action_
 
-    Sub_client__[ self, :say ]
+    # Sub_client__[ self, :say ]
 
-    PARAMS = %i( be_verbose stashes_path )
+      edit_entity_class(
+        :required, :property, :stashes_path,
+      )
 
-    def execute
+      def produce_result
+
+        _silo = @kernel.silo( :stow )
+
+        _col = _silo.stows_collection_via_path(
+          @argument_box.fetch( :stashes_path ),
+          & @on_event_selectively )
+
+        _col.to_any_entity_stream
+      end
+
+    # TODO - away `render_hub_info`, `collection`
+
+    def ___WAS_execute
       @be_verbose and render_hub_info
       @col = collection
       @col.expect_collection_exists and with_extant_collection
     end
+
   private
+
     def with_extant_collection
       @count = 0
       @col.stashes( @be_verbose ).each do |stash|
@@ -784,42 +815,123 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       end
       @count.zero? ? none : some
     end
+
     def none
       pn = @stashes_path
       emit_inner_info_string say {
         "(no stashes found in #{ escape_path pn })"
       } ; nil
     end
+
     def some
       true
     end
-  end
+    end
 
-  class API::Actions::Pop < API::Action
+  class Actions::Pop < Action_
 
     PARAMS = %i( be_verbose dry_run stash_name stashes_path )
 
-    def execute
+    def __WAS_execute
       @stash = collection.touch_stash( @stash_name ).stash_expected_to_exist
       @stash and with_stash
     end
+
   private
+
     def with_stash
       @stash.pop_stash @be_verbose, @dry_run
     end
   end
 
-  #  ~ models / agents ~
+    #  ~ models / agents ~
 
-  class Stash__
+    class Silo_Daemon
 
+      def initialize k, _model_class
+        @kernel = k
+      end
+
+      def stows_collection_via_path path, & oes_p  # like `entity_via_intrinsic_key`
+
+        # (we could cache each collection per path, but instead we bind the
+        # collection to the event handler, making it a "collection controller")
+
+        Models__::C8n___.new path, @kernel, & oes_p
+      end
+    end
+
+    Models__ = ::Module.new
+
+    class Models__::C8n___
+
+      def initialize path, k, & p
+
+        @kernel = k
+        @path = path
+        @on_event_selectively = p
+      end
+
+      def to_any_entity_stream
+
+        _dac =
+        Bz__::Collection_Adapters::Directory_as_Collection.new( @kernel ) do | o |
+
+          o.directory_path = @path
+          o.directory_is_assumed_to_exist = true  # so it whines
+
+          o.filesystem = Home_.lib_.system.filesystem
+          o.flyweight_class = Stow_
+
+          o.on_event_selectively = @on_event_selectively
+        end
+
+        _dac.to_entity_stream_via_model( Stow_, & @on_event_selectively )
+      end
+    end
+
+    Stow_ = self
+
+    class Stow_
+
+      attr_reader(
+        :path,
+      )
+
+      class << self
+
+        def new_flyweight k, & oes_p
+          o = new k, & oes_p
+          o.__init_as_flyweight
+          o
+        end
+      end
+
+      def initialize k, & oes_p
+
+        # NOTE might be a an entity, might be a UI node!
+        @kernel = k
+        @on_event_selectively = oes_p
+      end
+
+      def __init_as_flyweight
+        NIL_
+      end
+
+      def reinitialize_via_path_for_directory_as_collection path
+        @path = path
+        NIL_
+      end
+    end
+
+    if false
     Sub_client__[ self,
       :as_basic_set,
         :with_members, %i( hub_pathname stash_name stash_pathname ).freeze,
         :initialize_basic_set_with_iambic,
       :color_inquisitor ]
 
-    def initialize client, * x_a
+    def ___WAS_initialize client, * x_a
       initialize_basic_set_with_iambic x_a
       @quiet_h = { }
       client_notify client
@@ -864,7 +976,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
         _p = -> line do
           y << line
         end
-        Make_stat__[ @client, :stash_pn, @stash_pathname, :listener_p, _p ]
+        Actors__::Make_stat[ @client, :stash_pn, @stash_pathname, :listener_p, _p ]
       end
     end
 
@@ -874,23 +986,38 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
           y << line
         end
         is_in_color and _p = Add_colorizer__[ _p ]
-        Make_patch__[ @client, @stash_pathname, _p ]
+        Actors_::Make_patch[ @client, @stash_pathname, _p ]
       end
     end
 
     def stash_file normalized_relative_file_name, is_dry_run
-      Stash_file__[ @client, :filename_s, normalized_relative_file_name,
-        :is_dry, is_dry_run, :quiet_h, @quiet_h, :stash_pn, @stash_pathname ]
+
+      Actors__::Stash_file.with(
+        :client, @client,
+        :filename_s, normalized_relative_file_name,
+        :is_dry, is_dry_run,
+        :quiet_h, @quiet_h,
+        :stash_pn, @stash_pathname,
+      )
     end
 
     def pop_stash be_verbose, dry_run
-      Pop_stash__[ @client, :be_verbose, be_verbose, :dry_run, dry_run,
-        :hub_pathname, @hub_pathname, :stash_pathname, @stash_pathname ]
+
+      Actors__::Pop_stash.with(
+        :client, @client,
+        :be_verbose, be_verbose,
+        :dry_run, dry_run,
+        :hub_pathname, @hub_pathname,
+        :stash_pathname, @stash_pathname,
+      )
     end
-  end
+    end
 
-  class Stash_file__
+    Actors__ = ::Module.new
 
+  class Actors__::Stash_file
+
+    if false
     Sub_client__[ self,
       :as_basic_set,
         :initialize_basic_set_with_iambic,
@@ -899,6 +1026,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       :globless_actor,
       :file_utils, :mkdir_p, :move
     ]
+    end
 
     def initialize x_a
       client = x_a.shift
@@ -935,8 +1063,9 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
   end
 
-  class Pop_stash__
+  class Actors__::Pop_stash
 
+    if false
     Sub_client__[ self,
       :as_basic_set,
         :with_members, %i( be_verbose dry_run
@@ -945,6 +1074,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       :file_utils,
         :mkdir_p, :move, :rmdir,
       :globless_actor, :popener3, :shellesc ]
+    end
 
     def initialize x_a
       client = x_a.shift
@@ -1033,14 +1163,16 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
   end
 
-  class Stash__::Collection
+  class Models__::Collection
 
+    if false
     Sub_client__[ self,
       :as_basic_set,
         :initialize_basic_set_with_iambic,
         :with_members, %i(
           channel_string_listener_p hub_pathname stashes_pathname
         ).freeze ]
+    end
 
     def initialize client, * x_a
       initialize_basic_set_with_iambic x_a
@@ -1066,7 +1198,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       @cache_h[ name_x ] ||= build_stash name_x
     end
     def build_stash name_x
-      Stash__.new( @client,
+      Stow_.new( @client,
         :hub_pathname, @hub_pathname,
         :stash_name, name_x,
         :stash_pathname, @stashes_pathname.join( name_x ) )
@@ -1086,16 +1218,18 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
   end
 
-  class Make_patch__
+  class Actors__::Make_patch
 
+    if false
     Sub_client__[ self,
       :file_utils, :cd,
       :globful_actor,
       :popener3 ]
-
-    class << self
-      alias_method :call, :[]
     end
+
+    # class << self
+      # alias_method :call, :[]
+    # end
 
     def initialize client, stash_pn, listener_p
       @listener_p = listener_p ; @stash_pn = stash_pn
@@ -1120,13 +1254,15 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
   private
     def emit_patch file_s
-      Make_patch_for_file__[ @client, file_s, @listener_p ]
+      Actors__::Make_patch_for_file[ @client, file_s, @listener_p ]
     end
   end
 
-  class Make_patch_for_file__
+  class Actors__::Make_patch_for_file
 
+    if false
     Sub_client__[ self, :emit_payload_line_to_listener, :globful_actor, :popener3 ]
+    end
 
     def initialize client, file_s, listener_p
       @file_s = file_s ; @listener_p = listener_p
@@ -1193,8 +1329,9 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
   end
 
-  class Make_stat__
+  class Actors__::Make_stat
 
+    if false
     Sub_client__[ self,
       :as_basic_set,
         :with_members, %i( listener_p stash_pn ).freeze,
@@ -1203,6 +1340,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       :emit_payload_line_to_listener,
       :globful_actor,
       :say ]
+    end
 
     def initialize client, * x_a
       initialize_basic_set_with_iambic x_a
@@ -1218,7 +1356,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
     def build_file_a
       files = []
-      Make_patch__.call @client, @stash_pn, -> line do
+      Actors__::Make_patch.call @client, @stash_pn, -> line do
         md = PATCH_LINE_RX__.match line
         type_i = PATCH_LINE_TYPE_I_A__[md.captures.each_with_index.detect{ |s, | ! s.nil? }[1]]
         case type_i
@@ -1273,6 +1411,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       emit_payload_line "%s files changed, %d insertions(+), %d deletions(-)" %
         [ files.count, total_inserts, total_deletes ]
     end
+  end
   end
 end
 

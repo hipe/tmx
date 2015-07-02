@@ -13,6 +13,8 @@ its "API scope". here is a summary of the N tiers of scope:
 
     __we_call_this_one_off_scope  # #tier-3: two leading underscores
 
+    ___SHOUTWORD_this_method_is_never_called  # (only used during develoment!)
+
 
 
 

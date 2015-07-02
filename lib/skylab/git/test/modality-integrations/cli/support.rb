@@ -1,22 +1,18 @@
-require_relative '../test-support'
+module Skylab::Git::TestSupport
 
-module Skylab::Git::TestSupport::CLI
+  # ERR_I__ = :errstream
+  # OUT_I__ = :outstream
 
-  ::Skylab::Git::TestSupport[ self ]
+  module Modality_Integrations::CLI::Support
 
-  include Constants
+    def self.[] tcc
+      tcc.extend Instance_Methods___
+      NIL_
+    end
 
-  ERR_I__ = :errstream
-  Home_ = Home_
-  OUT_I__ = :outstream
-  TestLib_ = TestLib_
+    # <-
 
-  module Constants
-    ERR_I = ERR_I__
-    OUT_I = OUT_I__
-  end
-
-  module InstanceMethods
+  module Instance_Methods___
 
     # ~ test-time support
 
@@ -40,11 +36,13 @@ module Skylab::Git::TestSupport::CLI
 
     # ~ ~ ~ two stream spying
 
+    if false
     let :two_spy_group do
       spy = TestLib_::IO_spy_group[].new
       spy.do_debug_proc = -> { do_debug }
       spy.add_stream OUT_I__ ; spy.add_stream ERR_I__
       spy
+    end
     end
 
     # ~ assertion-time support
@@ -115,6 +113,8 @@ module Skylab::Git::TestSupport::CLI
       two_spy_group.release_lines
     end
 
-    Baked__ = ::Struct.new OUT_I__, ERR_I__
+    # Baked__ = ::Struct.new OUT_I__, ERR_I__
+  end
+# ->
   end
 end

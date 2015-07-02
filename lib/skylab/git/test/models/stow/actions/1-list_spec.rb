@@ -1,72 +1,71 @@
-require_relative 'test-support'
+require_relative '../../../test-support'
 
-module Skylab::Git::TestSupport::CLI::SU
+module Skylab::Git::TestSupport
 
-  describe "[gi] CLI actions gsu list" do  # :+#no-quickie because: `.stub`-ing
+  describe "[gi] models - stow - actions - list" do
 
     extend TS_
+    use :models_stow_support
 
-    context "two files" do
+    it "ping" do
 
-      def prepare
-        gsu_tmpdir.clear.touch_r %w(
-          stashiz/alpha/herpus/derpus.txt
-          stashiz/beta/whatever.txt ) ; nil
-      end
+      call_API :ping, :zip, 'hi'
 
-      it "list the known stashes (API)" do
-        prepare
-        td = gsu_tmpdir
-        o = GSU[]::API::Actions::List.new mock_client
-        r = o.invoke stashes_path: td.join( 'stashiz' ), be_verbose: nil
-        _act_s = contiguous_string_from_lines_on OUT_I
-        expect_no_more_lines
-        r.should eql true
-      end
+      _ev = expect_OK_event :ping
 
-      let :mock_client do
-        m = Mock_Client__.new
-        m.stub :emit_payload_line do |line|
-          two_spy_group[ OUT_I ].puts line
-        end
-        m
-      end
-      Mock_Client__ = ::Class.new
+      black_and_white( _ev ).should eql "(out: hi)"
 
-      -> do
-        s = nil
-        define_method :exp_s do
-          s ||= <<-HERE.unindent
-            alpha
-            beta
-          HERE
-        end
-      end.call
+      expect_no_more_events
 
-      def get_common_argv
-        [ 'list', '-s', "#{ gsu_tmpdir }/stashiz" ]
-      end
+      @result.should eql :pingback_from_API
+    end
 
-      context "when none" do
-        def prepare
-          gsu_tmpdir.clear.touch_r 'stashiz/'
-        end
+    it "list stows against bad directory (no event until unwind)" do
 
-        it "yerp" do
-          prepare
-          invoke get_common_argv
-          expect ERR_I, /\A\(while listing stash.+no stashes found in /
-          expect_succeeded
-        end
-      end
+      call_API :stow, :list, :stashes_path,
+        TestSupport_::Data::Universal_Fixtures[ :not_here ]
 
-      it "list the known stashes (CLI)" do
-        prepare
-        invoke get_common_argv
-        _act_s = contiguous_string_from_lines_on OUT_I
-        _act_s.should eql exp_s
-        expect_succeeded
-      end
+      _st = @result
+
+      _x = _st.gets
+      _x.should be_nil
+
+      ev = expect_not_OK_event :errno_enoent
+      ev = ev.to_event
+      ev.message_head.should eql "No such file or directory"
+
+      expect_no_more_events
+    end
+
+    it "list no stows (empty directory) - vanilla plain (no events)" do
+
+      call_API :stow, :list, :stashes_path,
+        TestSupport_::Data::Universal_Fixtures[ :empty_esque_directory ]
+
+      _st = @result
+      _x = _st.gets
+      _x.should be_nil
+
+      expect_no_events
+    end
+
+    it "list 2 stows" do
+
+      call_API :stow, :list, :stashes_path, stashiz_path_
+
+      st = @result
+      stow = st.gets
+      oid = stow.object_id
+
+      ::File.basename( stow.path ).should eql 'alpha'
+
+      stow = st.gets
+
+      ::File.basename( stow.path ).should eql 'beta'
+      stow.object_id.should eql oid
+
+      st.gets.should be_nil
+      expect_no_events
     end
   end
 end

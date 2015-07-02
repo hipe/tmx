@@ -1,6 +1,12 @@
 module Skylab::Git
 
-  class CLI::Actions::Spread
+  module Models_::Branches  # create
+
+    Actions = ::Module.new
+
+    # <-
+
+  class Actions::Spread
 
     def initialize i, o, e
       @y = ::Enumerator::Yielder.new( & e.method( :puts ) )
@@ -530,5 +536,7 @@ module Skylab::Git
         end
       end
     end
+  end
+# ->
   end
 end

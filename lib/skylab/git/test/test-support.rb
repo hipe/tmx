@@ -3,17 +3,26 @@ require 'skylab/test-support/core'
 
 module Skylab::Git::TestSupport
 
-  Home_ = ::Skylab::Git
-    Autoloader_ = Home_::Autoloader_
-  TestLib_ = ::Module.new
+  Callback_ = ::Skylab::Callback
+
   TestSupport_ = ::Skylab::TestSupport
 
-  TestSupport_::Regret[ self ]
+  TestSupport_::Regret[ TS_ = self ]
 
-  module Constants
-    Home_ = Home_
-    TestSupport_ = TestSupport_
-    TestLib_ = TestLib_
+  extend TestSupport_::Quickie
+
+  module ModuleMethods
+
+    define_method :use, -> do
+      cache = {}
+      -> sym do
+        ( cache.fetch sym do
+          x = Home_.lib_.plugin::Bundle::Fancy_lookup[ sym, TS_ ]
+          cache[ sym ] = x
+          x
+        end )[ self  ]
+      end
+    end.call
   end
 
   module InstanceMethods
@@ -27,6 +36,16 @@ module Skylab::Git::TestSupport
     def debug!
       self.do_debug = true  # here we don't trigger anything but elsewhere ..
     end
+
+    def debug_IO
+      TestSupport_.debug_IO
+    end
+
+    def black_and_white_expression_agent_for_expect_event
+      Home_.lib_.brazen::API.expression_agent_instance
+    end
+
+    if false
 
     # ~ ~ support for building clients
 
@@ -71,32 +90,31 @@ module Skylab::Git::TestSupport
       expect str
       @out_a.length.should eql( 0 )
     end
+    end
   end
 
-  module Constants::TestLib_
+  Fixture_trees_ = Callback_.memoize do
 
-    HL__ = Home_::Lib_::HL__
+    TS_.dir_pathname.join( 'fixture-trees' ).to_path
+  end
 
+  module TestLib_
+
+    if false
     IO_spy_group = -> do
       TestSupport_::IO.spy.group
     end
-
-    Stderr = -> do
-      TestSupport_::System.stderr
-    end
-
-    System = -> do
-      System_lib___[].services
-    end
-
-    System_lib___ = Home_::Lib_::System_lib__
 
     Tmpdir = -> do
       TestSupport_.tmpdir
     end
 
-    Tmpdir_pathname = -> do
-      System[].filesystem.tmpdir_pathname.join 'gsu-xyzzy'
+    Tmpdir_pathname = Callback_.memoize do
+      Home_.lib.system.filesystem.tmpdir_pathname.join 'gsu-xyzzy'
+    end
     end
   end
+
+  Home_ = ::Skylab::Git
+  NIL_ = nil
 end

@@ -1,6 +1,10 @@
 module Skylab::Git
 
-  module CLI::Actions::Scoot
+  module Models_::Branches
+
+    # <-
+
+  module Actions::Scoot
 
     def self.new i, o, e
       Client_.new i, o, e
@@ -1191,11 +1195,16 @@ module Skylab::Git
       Home_.lib_.word_wrap.curry ind_s, col_d, y
     end
 
+    if false  # NOTE we can review all of these
     CEASE_ = false
     GIT_EXE_ = 'git'.freeze
     EMPTY_S_ = ''.freeze
     ERROR_CODE_ = 4
     PROCEDE_ = true
     SILENT_ = nil
+    end
+  end
+# ->
   end
 end
+

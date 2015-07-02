@@ -1,20 +1,8 @@
-require_relative '../../test-support'
+require_relative '../../../test-support'
 
-module Skylab::Git::TestSupport::API
-  Actions = ::Module.new
-end
+module Skylab::Git::TestSupport
 
-module Skylab::Git::TestSupport::API::Actions::Spread
-
-  ::Skylab::Git::TestSupport[ TS_ = self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  Spread = Home_::CLI::Actions::Spread
-
-  describe "[gi] API actions spread" do
+  describe "[gi] API actions spread", wip: true do
 
     extend TS_
 

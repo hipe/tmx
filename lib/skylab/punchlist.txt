@@ -1,42 +1,10 @@
-slicer              q [ done ]
-file-metrics        q [ done ]
+slicer              q [ done ]  (1/6)
+file-metrics        q [ done ]  (2/6)
+"sub-tree"          q [ done ]  (3/6)
 
 
 
-"sub-tree"          q [ TODO ]
-
-  • subject only depended on [fa] for "table",
-  • so we were like "let's get [fa] table out of [fa]"
-  • which blew up into pre-unifying table
-  • which blew up into sunsetting [mh]
-  • also, one table wanted plugin, so pre-unify plugin ..
-
-
-  SO:
-
-    • p.u plugin (1/N): [hl] (1 & 2)
-    • p.u plugin (2/N): [fa]
-
-    • p.u table (1/4): minimal (1 & 2)
-    • p.u table (2/4): inferential (1 & 2)
-    • p.u table (3/4): structured (1 & 2 )
-
-
-
-
-
-  all tables now live under [#ba-096]:
-
-    fa-048 (simple) => A
-    fa-036 (actor)  => B
-    hl-005 (inferential) => C
-    fa-011 (structured) => D
-    _
-
-
-
-
-beauty-salon        q [ TODO ]
+beauty-salon        q [ TODO ]  (5/6)
 
   • directories are already in [br]-ish place
   • CLI needs to be melted in the common way
@@ -47,26 +15,30 @@ beauty-salon        q [ TODO ]
     * S & R: covered (CLI int.)
 
 
+git                 Q [ NOW IN PROGRESS ]  (4/6)
+
+  we follow [#137.H] the practical CRUD order:
+
+  • punch 1 - move everything
+
+  • punch 2 - ping
+              list entities
+
+  • punch 3 - status & show
+
+  • punch 4 - pop a stow (akin to deleting but not really)
+
+  • punch 5 - save a stow (compare to 'create')
+
+  • punch 6 - mode integrate
+
+  • punch 7 - spread (or swap order with next)
+
+  • punch 8 - scoot
 
 
-git                 Q [ TODO ]
 
-  • needs a full restructuring
-  • it would be good to detach it from r.s
-  • Actions:
-    * spread
-    * scoot
-    * gsu ping
-    * gsu status
-    * gsu save
-    * gsu show
-    * gsu list
-    * gsu pop
-
-
-
-
-tmx                 q [ TODO ]
+tmx                 q [ TODO ]  (6/6)
 
   • oh my god how great will it be
 _

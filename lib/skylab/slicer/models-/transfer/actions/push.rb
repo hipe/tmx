@@ -1,3 +1,19 @@
+module Skylab::Slicer
+
+  module Models_::Transfer
+
+    class Actions::Push < Action_
+
+      @is_promoted = true
+
+      edit_entity_class :desc, -> y do
+        y << '(no where close to integrated)'
+      end
+
+      if false
+
+        # <- 4
+
 # EDIT: this is super ancient and just here for amusement #todo
 require 'fileutils'
 require 'optparse'
@@ -695,6 +711,12 @@ module TmxGit
       end
       def _invalid msg
         raise Push::InvalidRequestError.new("#{self.class}: #{msg}")
+      end
+    end
+  end
+end
+
+# -> 4
       end
     end
   end

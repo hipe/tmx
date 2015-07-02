@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Git::TestSupport::CLI::SU
+module Skylab::Git::TestSupport
 
-  describe "[gi] CLI gsu core" do
+  describe "[gi] CLI gsu core", wip: true do
 
     extend TS_
+    use :modality_integrations_CLI_support
 
     it "CLI client loads" do  # can be moved up when appropriate
       Home_::CLI::Client

@@ -2,26 +2,7 @@ module Skylab::Slicer
 
   module Models_::Transfer
 
-    Actions = ::Module.new
-
-    class Action__ < Brazen_::Action
-      Brazen_::Model::Entity.call self
-    end
-
-    class Actions::Ping < Action__
-
-      @is_promoted = true
-
-      def produce_result
-
-        @on_event_selectively.call :info, :expression do | y |
-          y << "hello from slicer."
-        end
-        :hello_from_slicer
-      end
-    end
-
-    class Actions::Verify_Greenlist < Action__
+    class Actions::Verify_Greenlist < Action_
 
       @is_promoted = true
 
