@@ -32,7 +32,7 @@ module Skylab::SubTree::TestSupport::Models_Files
 
     end
 
-    it "a multi-buffer extension - `line count`", wip: true do
+    it "a multi-buffer extension - `line count`" do
 
       io = build_string_IO
 
@@ -55,7 +55,7 @@ module Skylab::SubTree::TestSupport::Models_Files
       expect_succeeded
     end
 
-    it "a in-notify extension and a multi-buffer extension", wip: true do
+    it "a in-notify extension and a multi-buffer extension" do
 
       io = build_string_IO
 

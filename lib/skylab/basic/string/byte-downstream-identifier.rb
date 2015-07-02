@@ -4,7 +4,7 @@ module Skylab::Basic
 
     class Byte_Downstream_Identifier < String::Byte_Upstream_Identifier::Superclass
 
-      #  near :+[#br-019]: unified interface for writing bytes to a string
+      #  conform to :+[#br-019.D] a semi-unified interface for writing bytes to a string
 
       # ~ reflection
 

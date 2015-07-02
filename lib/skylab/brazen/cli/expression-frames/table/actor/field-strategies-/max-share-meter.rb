@@ -37,7 +37,8 @@ module Skylab::Brazen
           end
         end )
 
-        fld.stringifier = nil  # pass the above value thru to the celifier
+        fld.receive_stringifier nil
+          # pass the above value thru as an argument
 
         fld.celifier_builder = Celifier_builder___
 

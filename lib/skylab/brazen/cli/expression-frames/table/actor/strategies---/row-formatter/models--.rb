@@ -109,7 +109,7 @@ module Skylab::Brazen
         end
 
         def receive__stringifier__argument x
-          @parent.current_field.stringifier = x
+          @parent.current_field.receive_stringifier x
           KEEP_PARSING_
         end
 
@@ -123,21 +123,30 @@ module Skylab::Brazen
 
       class Field_  # self as class
 
+        attr_reader(
+          :stringifier,
+          :stringifier_was_specified,
+        )
+
         attr_accessor(
           :celifier_builder,
           :is_right,
           :label,
-          :stringifier,
         )
 
         def initialize
           @_component_box = nil
-          @stringifier = DEFAULT_STRINGIFIER_  # might get false-ish-ified
           yield self
           freeze
           if @_component_box
             @_component_box.freeze
           end
+        end
+
+        def receive_stringifier x
+          @stringifier = x
+          @stringifier_was_specified = true
+          NIL_
         end
 
         # ~ "components"

@@ -37,7 +37,7 @@ module Skylab::Brazen
 
       class Dynamic_Dependency
 
-        # if you are tempted to simplify this out, read [#096.I]. because
+        # if you are tempted to simplify this out, read [#096.I]: because
         # fields are re-used and inheritable, we must do this all at once,
         # discretely.
 
@@ -51,10 +51,15 @@ module Skylab::Brazen
         end
 
         def subscriptions
-          [ :receive_complete_field_list ]
+          [
+            :receive_complete_field_list,
+            :before_first_row,
+          ]
         end
 
         def receive_complete_field_list fld_a
+
+          @_gather_d_a = nil
 
           fld_a.each_with_index do | fld, d |
 
@@ -64,6 +69,7 @@ module Skylab::Brazen
             # the two used to be mutually excluse ..
 
             if do_gather
+              ( @_gather_d_a ||= [] ).push d
               __process_gatherer_field d, fld
             end
 
@@ -77,37 +83,35 @@ module Skylab::Brazen
 
         def __process_gatherer_field d, fld
 
-          mdl = Statistics_Model___.new
+          mdl = Stats_::Models__::Seer.new
 
-          @parent.add_column_element mdl, :stats, d
+          @parent.add_column_element mdl.survey, :stats, d
 
-          @parent.add_user_datapoint_observer d do | x |
-            mdl.see x
-            NIL_
-          end
+          @parent.add_column_data_observer mdl, d
+
           NIL_
         end
-      end
 
-      class Statistics_Model___
+        def before_first_row
 
-        def numeric_max
-          @numeric_max
-        end
+          # every field that gathered statistics will get its stringifiers
+          # rewritten to take into account the type profile for the column
+          # unless someone else set the stringifier explicitly already
 
-        def initialize
-          @numeric_max = 0
-        end
-
-        def see x
-          if ::Numeric === x
-            if @numeric_max < x
-              @numeric_max = x
+          d_a = @_gather_d_a
+          if d_a
+            d_a.each do | d |
+              @parent.touch_stringifier d do
+                _col = @parent.column_at d
+                _col[ :stats ].appropriate_stringifier
+              end
             end
           end
-          NIL_
+          KEEP_PARSING_
         end
       end
+
+      Stats_ = self
     end
   end
 end

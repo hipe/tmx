@@ -43,7 +43,13 @@ module Skylab::Brazen
 
           _accept_BDI id_o
           KEEP_PARSING_
+        else
+          raise ::ArgumentError, __say_write_lines_to( x )
         end
+      end
+
+      def __say_write_lines_to x
+        "write lines to? #{ x.class }"
       end
 
       def produce_downstream_context

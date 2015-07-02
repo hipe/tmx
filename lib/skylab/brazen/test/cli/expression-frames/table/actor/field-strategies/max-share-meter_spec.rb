@@ -53,7 +53,7 @@ module Skylab::Brazen::TestSupport
 
       gets_.should eql 'Subproduct  num test files  '
       gets_.should eql '      face  121             +++++++++++++++'
-      gets_.should eql '  headless  44.0            +++++          '  # will change ..
+      gets_.should eql '  headless   44.0           +++++          '
       done_
     end
 

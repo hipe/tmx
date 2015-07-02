@@ -10,7 +10,7 @@ module Skylab::SubTree
 
       EXPRESSION_AGENT = class Expression_Agent___ < SubTree_::CLI::Expression_Agent
 
-        # see [#hl-052]:#case-study-st-2 ("when to subclass expression agents")
+        # see [#br-093]:#case-study-st-2 ("when to subclass expression agents")
 
         def express_into_yielder_line_items__ y, item_a
           Express_line_items___[ y, item_a ]
@@ -21,7 +21,7 @@ module Skylab::SubTree
         SubTree_.lib_.EN_add_methods self, :private, %i( and_ both )
 
         self
-      end.new nil  # [#hl-052]:#point-10 is relevant here (expag state)
+      end.new nil  # [#br-093]:#point-10 is relevant here (expag state)
 
       class Express_line_items___
 
@@ -70,15 +70,22 @@ module Skylab::SubTree
 
         def __render_table_via_row_string_array row_s_a
 
-          SubTree_::Lib_::CLI_table[
-            :field, :id, :glyphs_and_slug, :left,
-            :field, :id, :xtra, :left,
-            :show_header, false,
-            :left, EMPTY_S_, :sep, EMPTY_S_, :right, "\n",
-            :read_rows_from, row_s_a,
-            :write_lines_to, @downstream_yielder ]
+          _ = SubTree_.lib_.brazen::CLI::Expression_Frames::Table::Actor
 
-          ACHIEVED_
+          _x = _[
+
+            :left, EMPTY_S_, :sep, EMPTY_S_, :right, NIL_,
+
+            :header, :none,
+            :field, :left,
+            :field, :left,
+
+            :read_rows_from, row_s_a,
+
+            :write_lines_to, @downstream_yielder,
+          ]
+
+          _x && ACHIEVED_  # result should be downstream yielder argument
         end
       end
     end

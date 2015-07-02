@@ -2,9 +2,7 @@ module Skylab::System
 
   class Services___::Filesystem
 
-    class Byte_Downstream_Identifier
-
-      # :+(near [#br-019])
+    class Byte_Downstream_Identifier  # :+[#br-019.D]
 
       def initialize path, & oes_p
         @path = path

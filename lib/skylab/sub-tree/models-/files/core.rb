@@ -302,7 +302,13 @@ module Skylab::SubTree
 
             ) do | y, o |
 
-              express_into_yielder_line_items__ y, o.line_item_array  # experiment
+              # (we would like to call the below as an instance method
+              # on `self` here, but which action adapter you have (the
+              # top node or the 'files' node) is unreliable here.)
+
+              _self = SubTree_::Models_::Files::Modalities::CLI::EXPRESSION_AGENT
+
+              _self.express_into_yielder_line_items__ y, o.line_item_array
             end
           end
 

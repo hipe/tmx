@@ -2,9 +2,9 @@ module Skylab::Basic
 
   module Yielder
 
-  end
+    # <-
 
-  class Yielder::Counting < ::Enumerator::Yielder
+  class Counting < ::Enumerator::Yielder
 
     # do what ::Enumerator::Yielder does but maintain an internal count of
     # how many times either `<<` or `yield` was called.
@@ -33,6 +33,27 @@ module Skylab::Basic
     def <<( * )
       @count += 1
       super
+    end
+  end
+
+  # ->
+
+    class Byte_Downstream_Identifier  # :+[#br-019.D]
+
+      def initialize yld
+
+        @_yielder = yld
+      end
+
+      def to_minimal_yielder
+
+        @_yielder
+      end
+
+      def shape_symbol
+
+        :yielder
+      end
     end
   end
 end

@@ -318,9 +318,18 @@ module Skylab::Plugin
 
         g.a.each do | bid |
           kp = bid.implementation.receive_term term, bid
-          kp or raise ::ArgumentError  # make these easier to trace for now
+          if ! kp
+            # make these easier to trace for now
+            raise ::ArgumentError, Say_disp___[ kp, term, bid ]
+          end
         end
         kp
+      end
+
+      Say_disp___ = -> kp, term, bid do
+
+        "received a \"keep parsing\" value of #{ kp.inspect } - #{
+          }#{ bid.implementation.class }##{ term.method_name }"
       end
 
       class Arity__  # re-opening

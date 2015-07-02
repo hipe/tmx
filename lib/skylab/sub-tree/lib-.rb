@@ -28,10 +28,6 @@ module Skylab::SubTree
       HL__[]::CLI
     end
 
-    CLI_table = -> * x_a do
-      FA___[]::CLI::Table.call_via_iambic x_a
-    end
-
     EN_add_methods = -> * i_a do
       HL__[].expression_agent.NLP_EN_methods.call_via_arglist i_a
     end

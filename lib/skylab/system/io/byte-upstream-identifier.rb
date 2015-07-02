@@ -2,9 +2,9 @@ module Skylab::System
 
   module IO
 
-    class Byte_Upstream_Identifier < Byte_Identifer_
+    class Byte_Upstream_Identifier < Byte_Identifer_   # :+[#br-019.D]
 
-      # a :+[#br-019] unified interface for accessing the bytes in a stream.
+      # comport to a semi-unified interface for accessing the bytes in a stream.
       #
       # unlike the other (current) implementations, this one is itself
       # stateful: there is only ever one input stream to read from.

@@ -23,9 +23,7 @@ module Skylab::System
 
     Byte_Identifer_ = ::Class.new
 
-    class Byte_Downstream_Identifier < Byte_Identifer_
-
-      # :+( near [#br-019] )
+    class Byte_Downstream_Identifier < Byte_Identifer_   # :+[#br-019.D]
 
       # ~ reflection
 

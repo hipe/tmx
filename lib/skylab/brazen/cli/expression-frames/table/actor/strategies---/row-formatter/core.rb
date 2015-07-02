@@ -134,15 +134,24 @@ module Skylab::Brazen
 
       def receive_normalize_fields  # assume post-dup & field list complete
 
+        fld_a = @_fld_a
+
         # see [#096.J] the cel pipeline
 
         # converts user datapoints into the arguments passed to celifiers:
 
-        @_stringifier = __build_stringifier_hash
+        hsh = {}
+        if fld_a
+          fld_a.each_with_index do | fld, d |
+            fld.stringifier_was_specified or next
+            hsh[ d ] = fld.stringifier
+          end
+        end
+        @_stringifiers = hsh
 
         # observes the results of above:
 
-        @_string_observers = ::Hash.new do | h, d |
+        @__string_observers = ::Hash.new do | h, d |
           h[ d ] = -> s do
             if s
               if @_widths[ d ] < s.length
@@ -162,35 +171,12 @@ module Skylab::Brazen
         @_column_p = __build_proc_for_column_for
         @_celifiers = __build_celifiers_hash @_column_p
 
-        fld_a = @_fld_a
         @_deps.accept_by :receive_complete_field_list do | pl |
           pl.receive_complete_field_list fld_a
           KEEP_PARSING_
         end
 
         KEEP_PARSING_
-      end
-
-      def __build_stringifier_hash
-
-        fld_a = @_fld_a  # any
-
-        ::Hash.new do | h, d |
-
-          if fld_a
-            fld = fld_a[ d ]
-          end
-
-          h[ d ] = if fld
-
-            # if there's a field, use whatever the field
-            # says to use even if it's false-ish
-
-            fld.stringifier
-          else
-            DEFAULT_STRINGIFIER_
-          end
-        end
       end
 
       def __build_celifiers_hash column_for
@@ -273,32 +259,67 @@ module Skylab::Brazen
 
         mutable = @_up_st.flush_remaining_to_array
 
+        __calculation_pass_one mutable
+
+        if @_formulas
+          __calculation_pass_two mutable
+        end
+
+        _do_rendering_passes Callback_::Polymorphic_Stream.via_array mutable
+      end
+
+      def __calculation_pass_one mutable
+
         # pass 1 - send all user datapoints to all user datapoint observers
 
         known_columns_count.times do | d |
 
-          p_a = @_datapoint_observers[ d ]
-          p_a or next
-          p_a.each do | p |
-            mutable.length.times do | row_d |
-              p[ mutable.fetch( row_d ).fetch( d ) ]
-            end
+          obs_a = @_column_data_observers[ d ]
+          obs_a or next
+          obs_a.each do | obs |
+            _show_observer_the_money d, mutable, obs
           end
+          NIL_
         end
+      end
+
+      def __calculation_pass_two mutable
 
         # pass 2 - for each column with a formula, run the formula on each row
 
         @_formulas.each_with_index do | p, d |
-          p or next
+
+          p or next  # skip this column if it has no formula
 
           col = @_column_p[ d ]
-          # run the formula for the particular cel in each row
+          obs_a = @_column_data_observers[ d ]
+
+          # for each row, replace the cel with the formula's result
+
           mutable.each do | mutable_row |
+
             mutable_row[ d ] = p[ mutable_row.dup.freeze, col ]
           end
-        end
 
-        _do_rendering_passes Callback_::Polymorphic_Stream.via_array mutable
+          # because each cel down this *column* will be re-evaluated,
+          # let any observers know that that's is what's happening
+
+          if obs_a
+            obs_a.each do | obs |
+              obs.receive_column_was_re_evaluated
+              _show_observer_the_money d, mutable, obs
+            end
+          end
+        end
+        NIL_
+      end
+
+      def _show_observer_the_money d, mutable, obs
+
+        mutable.length.times do | row_d |
+          obs.see_cel_argument mutable.fetch( row_d ).fetch( d )
+        end
+        NIL_
       end
 
       def _do_rendering_passes up_st
@@ -314,7 +335,13 @@ module Skylab::Brazen
           _x_a = up_st.gets_one
           _x_a.each_with_index do | datapoint_x, d |
 
-            p = @_stringifier[ d ]
+            had = true
+            p = @_stringifiers.fetch d do
+              had = false
+            end
+            if ! had
+              p = DEFAULT_STRINGIFIER_
+            end
             if p
               s = p[ datapoint_x ]
               s or self._SANITY
@@ -383,16 +410,17 @@ module Skylab::Brazen
 
       ## ~~ user datapoint observation API
 
-      def add_user_datapoint_observer d, & p  # assume post-dup
+      def add_column_data_observer obs, d  # assume post-dup
 
         @_do_calculation_pass = true
-        @_datapoint_observers ||= []
-        a = @_datapoint_observers[ d ]
+        @_formulas ||= nil
+        @_column_data_observers ||= []
+        a = @_column_data_observers[ d ]
         if ! a
           a = []
-          @_datapoint_observers[ d ] = a
+          @_column_data_observers[ d ] = a
         end
-        a.push p
+        a.push obs
         NIL_
       end
 
@@ -413,6 +441,10 @@ module Skylab::Brazen
 
       def __say_formula d
         "formula can only be set once for column at offset #{ d }"
+      end
+
+      def column_at d
+        @_column_p[ d ]
       end
 
       def __build_proc_for_column_for  # assume post-dup
@@ -467,7 +499,7 @@ module Skylab::Brazen
 
         s or self._SANITY
 
-        @_string_observers[ d ][ s ]
+        @__string_observers[ d ][ s ]
         @_am.accept_argument s, d
         NIL_
       end
@@ -481,6 +513,24 @@ module Skylab::Brazen
       def finish_argument_row
 
         @_am.finish_row
+        NIL_
+      end
+
+      ## ~~ stringifier API
+
+      def touch_stringifier d, & p_p
+
+        h = @_stringifiers
+        none = false
+        h.fetch d do
+          none = true
+        end
+        if none
+          p = p_p[]
+          if p
+            h[ d ] = p
+          end
+        end
         NIL_
       end
 

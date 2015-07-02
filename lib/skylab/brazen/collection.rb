@@ -73,7 +73,11 @@ module Skylab::Brazen
 
       elsif x.respond_to? :ascii_only?
 
-        Byte_Downstream_Identifier.via_string s
+        Byte_Downstream_Identifier.via_string x
+
+      elsif x.respond_to? :yield
+
+        Byte_Downstream_Identifier.via_yielder x
       end
     end
 
@@ -105,6 +109,10 @@ module Skylab::Brazen
         def via_trios trio_a, & oes_p
           o = __method_call_via_shape trio_a, & oes_p
           o and send o.method_name, * o.args
+        end
+
+        def via_yielder yld
+          Brazen_.lib_.basic::Yielder::Byte_Downstream_Identifier.new yld
         end
       end  # >>
 
