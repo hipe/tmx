@@ -43,7 +43,7 @@ module Skylab::Callback
 
     class Shell__
 
-      Callback_::Session::Ivars_with_Procs_as_Methods.call self,
+      Home_::Session::Ivars_with_Procs_as_Methods.call self,
         :instances_can_only_be_accessed_through_instance_sessions,
         :instances_can_be_accessed_through_instance_sessions,
         :lease_by
@@ -97,7 +97,7 @@ module Skylab::Callback
         _ok and execute
       end
 
-      include Callback_::Actor::Methodic.polymorphic_processing_instance_methods
+      include Home_::Actor::Methodic.polymorphic_processing_instance_methods
 
     private
 

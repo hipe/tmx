@@ -12,7 +12,7 @@ module Skylab::Callback
         end
       end  # >>
 
-      Callback_::Actor.call self, :properties,
+      Home_::Actor.call self, :properties,
         :init,
         :gets
 

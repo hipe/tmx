@@ -26,7 +26,7 @@ module Skylab::Callback
 
     class Articulators::Aggregating < ::Module  # see [#050]
 
-      Callback_::Actor.methodic self
+      Home_::Actor.methodic self
 
       # Entity_.event.selective_builder_sender_receiver self
 
@@ -54,7 +54,7 @@ module Skylab::Callback
 
       def template=
 
-        @nucleus.template = Callback_.lib_.basic::String.template.via_string(
+        @nucleus.template = Home_.lib_.basic::String.template.via_string(
           gets_one_polymorphic_value )
 
         via_template_parse_remainder_of_polymorphic_stream polymorphic_upstream
@@ -139,7 +139,7 @@ module Skylab::Callback
           nil
         end
 
-        include Callback_::Actor::Methodic.polymorphic_processing_instance_methods
+        include Home_::Actor::Methodic.polymorphic_processing_instance_methods
 
       private
 
@@ -219,7 +219,7 @@ module Skylab::Callback
             aggregator.flush
           end
         end
-        Callback_::Scn.new do
+        Home_::Scn.new do
           p[]
         end
       end

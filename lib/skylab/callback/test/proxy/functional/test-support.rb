@@ -11,10 +11,10 @@ module Skylab::Callback::TestSupport::Proxy::Functional
 
   extend TestSupport_::Quickie
 
-  Callback_ = Callback_
+  Home_ = Home_
 
   Subject_ = -> do
-    Callback_::Proxy
+    Home_::Proxy
   end
 
 end

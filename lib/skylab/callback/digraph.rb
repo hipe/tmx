@@ -11,7 +11,7 @@ module Skylab::Callback
   private
 
     def build_event_stream_graph  # #storypoint-2
-      scn = Callback_::Scn.try_convert ancestors
+      scn = Home_::Scn.try_convert ancestors
       cur = found_a = nil
       nil while ( cur = scn.rgets ) && ::Object != cur
       chk = -> do
@@ -80,7 +80,7 @@ module Skylab::Callback
     end
   end  # module methods
 
-  _Digraph = Callback_.lib_.basic::Digraph
+  _Digraph = Home_.lib_.basic::Digraph
 
   Digraph::Stream__ = ::Class.new _Digraph.node_class
 
@@ -404,7 +404,7 @@ module Skylab::Callback
 
         ::Class.new( Emitter___ ).class_exec do
 
-          Callback_[ self, :employ_DSL_for_digraph_emitter ]
+          Home_[ self, :employ_DSL_for_digraph_emitter ]
 
             public :with_specificity, :call_digraph_listeners  # [#002]
               # objects of this class are not controller-like they are
@@ -431,7 +431,7 @@ module Skylab::Callback
       end
 
       def to_listener
-        Callback_::Selective_Listener.via_digraph_emitter self
+        Home_::Selective_Listener.via_digraph_emitter self
       end
 
       private def build_digraph_event * x_a, i, esg

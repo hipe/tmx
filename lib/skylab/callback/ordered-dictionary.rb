@@ -202,6 +202,6 @@ module Skylab::Callback
           @ordered_dictionary = box ; nil
         end
       end
-      Box__ = Callback_::Box
+      Box__ = Home_::Box
     end
 end

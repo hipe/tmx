@@ -4,7 +4,7 @@ module Skylab::Callback
 
     class Methodic__  # :[#013]. quite similar to [#006]
 
-      Callback_::Actor.methodic self, :simple, :properties, :properties,
+      Home_::Actor.methodic self, :simple, :properties, :properties,
         :delegate,
         :prefix
 

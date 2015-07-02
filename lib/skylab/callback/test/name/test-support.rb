@@ -8,6 +8,6 @@ module Skylab::Callback::TestSupport::Name
 
   extend TestSupport_::Quickie
 
-  Callback_ = Callback_
+  Home_ = Home_
 
 end

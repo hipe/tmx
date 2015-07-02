@@ -261,7 +261,7 @@ module Skylab::Callback::TestSupport::Digraph
       alias_method :normal_class, :klass
 
       let :shorthand_class do
-        Callback_::Digraph.new :all, error: :all
+        Home_::Digraph.new :all, error: :all
       end
 
       it "which works" do

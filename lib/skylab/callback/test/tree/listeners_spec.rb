@@ -28,7 +28,7 @@ module Skylab::Callback::TestSupport::Tree
       end
 
       let :callbacks do
-        Callback_::Tree.new za_zang: :listeners
+        Home_::Tree.new za_zang: :listeners
       end
     end
 
@@ -73,7 +73,7 @@ module Skylab::Callback::TestSupport::Tree
       end
 
       let :callbacks do
-        Callback_::Tree.new error: { purple: { durple_error: :listeners } }
+        Home_::Tree.new error: { purple: { durple_error: :listeners } }
       end
     end
   end

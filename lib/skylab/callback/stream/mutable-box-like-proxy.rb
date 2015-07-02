@@ -95,7 +95,7 @@ module Skylab::Callback
       # ~ )
 
       def to_value_stream
-        Callback_::Stream.via_times @a.length do | d |  # we could make this accomodate growable boxes during iteration if we needed to
+        Home_::Stream.via_times @a.length do | d |  # we could make this accomodate growable boxes during iteration if we needed to
           @h.fetch @a.fetch d
         end
       end

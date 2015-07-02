@@ -8,7 +8,7 @@ module Skylab::Callback::TestSupport
 
       lib = LIB_.basic::List
 
-      scn = Callback_::Scn.aggregate(
+      scn = Home_::Scn.aggregate(
         lib.line_stream( [ :a, :b ] ),
         lib.line_stream( [] ),
         lib.line_stream( [ :c ] ) )

@@ -142,7 +142,7 @@ module Skylab::Callback
       end
 
       def bld_wrong_const_name_event
-        Callback_::Event.inline_not_OK_with :wrong_const_name,
+        Home_::Event.inline_not_OK_with :wrong_const_name,
             :name, @name.as_variegated_symbol,
             :error_category, :name_error do |y, o|
 
@@ -331,7 +331,7 @@ module Skylab::Callback
       end
 
       def bld_name_error_event
-        Callback_::Event.inline_not_OK_with(
+        Home_::Event.inline_not_OK_with(
             :uninitialized_constant, :name, @name.as_variegated_symbol,
               :mod, @mod ) do |y, o|
           y << "uninitialized constant #{ o.mod }::( ~ #{ o.name } )"

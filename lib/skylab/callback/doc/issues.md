@@ -1,5 +1,5 @@
 [#063]       #tracking in-situ, also, wishlist: "struct-like". imagine:
-               Args = Callback_::Actor.struct :foo, :bar
+               Args = Home_::Actor.struct :foo, :bar
                this would replace whatever all that other stuff is.
 [#062]       the box struct proxy narrative ..
 [#061]       the box narrative ..

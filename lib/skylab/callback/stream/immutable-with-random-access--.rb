@@ -73,7 +73,7 @@ module Skylab::Callback
         nil
       end
 
-      include Callback_::Actor::Methodic.polymorphic_processing_instance_methods
+      include Home_::Actor::Methodic.polymorphic_processing_instance_methods
 
     private
 
@@ -122,7 +122,7 @@ module Skylab::Callback
 
       def to_new_mutable_box_like_proxy
         @done or flush
-        Callback_::Stream::Mutable_Box_Like_Proxy.new @a.dup, @h.dup
+        Home_::Stream::Mutable_Box_Like_Proxy.new @a.dup, @h.dup
       end
 
       def length
@@ -352,9 +352,9 @@ module Skylab::Callback
 
       def to_value_stream
         if @done
-          to_stream_when_done Callback_::Stream
+          to_stream_when_done Home_::Stream
         else
-          to_stream_when_not_done Callback_::Stream
+          to_stream_when_not_done Home_::Stream
         end
       end
 

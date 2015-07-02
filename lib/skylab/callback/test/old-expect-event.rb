@@ -197,7 +197,7 @@ module Skylab::Callback::TestSupport
       def __resolve_description_string h
 
         TEMPLATE_S__.gsub(
-          Callback_.lib_.basic::String.mustache_regexp
+          Home_.lib_.basic::String.mustache_regexp
         ) do
           did_have = true
           x = h.fetch $1.intern do did_have = nil end
@@ -209,7 +209,7 @@ module Skylab::Callback::TestSupport
 
       def get_element_stream
         d = -1 ; last = @exp_a.length - 1
-        Callback_::Scn.new do
+        Home_::Scn.new do
           if d < last
             @exp_a[ d += 1 ]
           end
@@ -260,7 +260,7 @@ module Skylab::Callback::TestSupport
             up.change_actual_index_to d
             @d = d ; @idx = idx
             _ord_s = if -1 == d then LAST_S_ else
-              Callback_.lib_.basic::Number::EN.num2ord( d + 1 )
+              Home_.lib_.basic::Number::EN.num2ord( d + 1 )
             end
             @description_x = '%-6s' % _ord_s
             super()
@@ -318,7 +318,7 @@ module Skylab::Callback::TestSupport
               Channel_Assertion__.new i
             else
               :styled == i or raise ::ArgumentError, "expected 'styled' #{
-                }had #{ Callback_.lib_.strange x }"
+                }had #{ Home_.lib_.strange x }"
               STYLED_ASSERTION__
             end
           end
@@ -347,7 +347,7 @@ module Skylab::Callback::TestSupport
         STYLED__ = 'styled'.freeze
         def see_when_event act
           s = act.matchable_string
-          s_ = Callback_.lib_.brazen::CLI::Styling.unstyle_styled s
+          s_ = Home_.lib_.brazen::CLI::Styling.unstyle_styled s
           if s_
             act.change_matchable_string! s_
           else
@@ -376,7 +376,7 @@ module Skylab::Callback::TestSupport
       end
       def unstyle_all_styled!
         @ass.set_legacy_string_map_proc -> s, &p do
-          s_ = Callback_.lib_.brazen::CLI::Styling.unstyle_styled s
+          s_ = Home_.lib_.brazen::CLI::Styling.unstyle_styled s
           s_ and p[ s_ ] ; nil
         end ; nil
       end

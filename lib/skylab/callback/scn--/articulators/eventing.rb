@@ -4,7 +4,7 @@ module Skylab::Callback
 
     class Articulators::Eventing  # :[#047].
 
-      Callback_::Actor.call self, :properties,
+      Home_::Actor.call self, :properties,
         :gets_under,
         :always_at_the_beginning,
         :iff_zero_items,

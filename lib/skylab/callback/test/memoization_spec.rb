@@ -18,7 +18,7 @@ module Skylab::Callback::TestSupport
 
           class Wat
 
-            Callback_::Memoization::Pool[ self ].
+            Home_::Memoization::Pool[ self ].
               instances_can_only_be_accessed_through_instance_sessions
 
             count = 0
@@ -81,7 +81,7 @@ module Skylab::Callback::TestSupport
 
           count = 0
 
-          Callback_::Memoization::Pool[ self ].lease_by do
+          Home_::Memoization::Pool[ self ].lease_by do
 
             o = new( count += 1 )
             o.message = "i am the #{ count }th nerk"

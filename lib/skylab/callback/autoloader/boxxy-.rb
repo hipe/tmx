@@ -81,9 +81,9 @@ module Skylab::Callback
 
       module Names__
 
-        Get_fly = Callback_.memoize do
+        Get_fly = Home_.memoize do
 
-          class Fly_ < Callback_::Name
+          class Fly_ < Home_::Name
 
             class << self
               def __new_flyweight

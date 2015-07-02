@@ -8,8 +8,8 @@ module Skylab::Callback::TestSupport::Scn
 
   extend TestSupport_::Quickie
 
-  Basic_ = Callback_::Autoloader.require_sidesystem :Basic
+  Basic_ = Home_::Autoloader.require_sidesystem :Basic
 
-  Callback_ = Callback_
+  Home_ = Home_
 
 end

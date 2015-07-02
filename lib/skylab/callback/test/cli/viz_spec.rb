@@ -9,7 +9,7 @@ module Skylab::Callback::TestSupport
     it "with the ideal case - works" do
       g = TestSupport_::IO.spy.triad nil
       # g.debug!
-      c = Callback_::CLI.new( * g.values )
+      c = Home_::CLI.new( * g.values )
       c.send :program_name=, 'pzb'
       argv = [ 'viz', fixtures_dir_pn.join( 'who-hah' ).to_s ]
       r = c.invoke argv

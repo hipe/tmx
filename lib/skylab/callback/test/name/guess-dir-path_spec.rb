@@ -14,7 +14,7 @@ module Skylab::Callback::TestSupport::Name::Guess_dir_path
     end
   end
 
-  Guess_dir_ = Callback_::Name.lib.guess_dir
+  Guess_dir_ = Home_::Name.lib.guess_dir
 
   # ( [#054] explains why we have fully qualified names below )
 

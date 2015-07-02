@@ -9,9 +9,9 @@ module Skylab::Callback::TestSupport
     it "with the ideal case - works" do
       g = TestSupport_::IO.spy.triad nil
       # g.debug!
-      c = Callback_::CLI.new( * g.values )
+      c = Home_::CLI.new( * g.values )
       argv = [ 'fire',
-        Callback_.dir_pathname.join( 'core.rb' ),
+        Home_.dir_pathname.join( 'core.rb' ),
         'Skylab::Callback::TestSupport::Fixtures::ZigZag',
         'hacking' ]
       rs = c.invoke argv

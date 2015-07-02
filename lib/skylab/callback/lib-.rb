@@ -11,7 +11,7 @@ module Skylab::Callback
     end
 
     Boxlike_as_proxy_to_hash = -> h do
-      Callback_::Box.allocate.instance_exec do
+      Home_::Box.allocate.instance_exec do
         @a = h.keys ; @h = h
         self
       end

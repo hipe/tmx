@@ -39,7 +39,7 @@ module Skylab::Callback
 
     -> do  # `resolve_root_const`
 
-      constantize, pathify = Callback_::Name.lib.at :constantize, :pathify
+      constantize, pathify = Home_::Name.lib.at :constantize, :pathify
 
       define_method :resolve_root_const do
         @mod_a = nil
@@ -238,7 +238,7 @@ module Skylab::Callback
       raw = job.event_stream_graph.describe_digraph
         # (expected never to fail but meh. we don't stream it because:)
       if raw && pay
-        scn = Callback_.lib_.stringScanner.new raw
+        scn = Home_.lib_.stringScanner.new raw
         num = 0 ; line = nil
         gets = -> do
           s = scn.scan( /[^\r\n]*\r?\n|[^\r\n]+/ )

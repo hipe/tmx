@@ -263,7 +263,7 @@ module Skylab::Callback
         end
 
         def build_not_OK_event_with * i_a, & msg_p
-          Callback_::Event.inline_not_OK_via_mutable_iambic_and_message_proc i_a, msg_p
+          Home_::Event.inline_not_OK_via_mutable_iambic_and_message_proc i_a, msg_p
         end
 
         def receive_extra_values_event ev  # :+#public-API (name) :+#hook-in
@@ -492,7 +492,7 @@ module Skylab::Callback
         end
 
         def property=
-          @name = Callback_::Name.via_variegated_symbol gets_one_polymorphic_value
+          @name = Home_::Name.via_variegated_symbol gets_one_polymorphic_value
           STOP_PARSING_
         end
 
@@ -620,7 +620,7 @@ module Skylab::Callback
           ok = true
           begin
             prop = @property_class.new do
-              @name = Callback_::Name.via_variegated_symbol stream.gets_one
+              @name = Home_::Name.via_variegated_symbol stream.gets_one
               ACHIEVED_
             end
             ok = accept_prop prop
@@ -643,7 +643,7 @@ module Skylab::Callback
             @box = if @cls.const_defined? BX_
               @cls.const_get( BX_ ).dup
             else
-              Callback_::Box.new
+              Home_::Box.new
             end
             @cls.const_set BX_, @box
           end ; nil
@@ -675,7 +675,7 @@ module Skylab::Callback
 
             bx = const_get BX_
 
-            _st = Callback_::Stream.via_nonsparse_array bx.a_ do | sym |
+            _st = Home_::Stream.via_nonsparse_array bx.a_ do | sym |
               send bx.fetch sym
             end
 
@@ -689,14 +689,14 @@ module Skylab::Callback
         if 1 == name_i_a.length
           Stranger_[ name_i_a.first, did_you_mean_i_a ]
         else
-          Callback_.lib_.brazen::Property.
+          Home_.lib_.brazen::Property.
             build_extra_values_event name_i_a, did_you_mean_i_a
         end
       end
 
       class Stranger_
 
-        Callback_::Actor.call self, :properties,
+        Home_::Actor.call self, :properties,
           :strange_x, :exp_i_a
 
         def initialize
@@ -728,19 +728,19 @@ module Skylab::Callback
             _exp_s_a = @exp_i_a.map( & :id2name )
             @exp_x_a = Levenshtein_reduce_[ @length_limit, _exp_s_a, @strange_x_ ]
           else
-            @strange_x_ = Callback_.lib_.strange @strange_x
+            @strange_x_ = Home_.lib_.strange @strange_x
             @exp_x_a = exp_i_a[ 0, @length_limit ]
           end
         end
 
         def flush
-          Callback_.lib_.brazen::Property.
+          Home_.lib_.brazen::Property.
             build_extra_values_event [ @strange_x_ ], @exp_x_a
         end
       end
 
       Levenshtein_reduce_ = -> closest_d, good_x_a, strange_x do  # :+#curry-friendly
-        Callback_.lib_.levenshtein.with(
+        Home_.lib_.levenshtein.with(
           :item, strange_x,
           :closest_N_items, closest_d,
           :items, good_x_a,
@@ -901,7 +901,7 @@ module Skylab::Callback
           end
 
           def build_missing_required_properties_event miss_prp_a
-            Callback_.lib_.brazen::Property.
+            Home_.lib_.brazen::Property.
               build_missing_required_properties_event( miss_prp_a )
           end
 

@@ -8,13 +8,13 @@ module Skylab::Callback::TestSupport::Box
 
   extend TestSupport_::Quickie
 
-  Callback_ = Callback_
+  Home_ = Home_
 
   module ModuleMethods
 
     def memoize_subject & p
 
-      define_method :subject, Callback_.memoize( & p )
+      define_method :subject, Home_.memoize( & p )
 
     end
   end
@@ -32,6 +32,6 @@ module Skylab::Callback::TestSupport::Box
   end
 
   Subject_ = -> do
-    Callback_::Box
+    Home_::Box
   end
 end

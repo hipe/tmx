@@ -35,7 +35,7 @@ module Skylab::Callback
 
       opt_rx, long_rx =
 
-        Callback_.lib_.CLI_lib.option.values_at :opt_rx, :long_rx
+        Home_.lib_.CLI_lib.option.values_at :opt_rx, :long_rx
 
       [ [ :long, -> do
             md = long_rx.match current
@@ -83,7 +83,7 @@ module Skylab::Callback
       @argv = argv
       @last = argv.length - 1
       @err = err
-      @opt = Callback_.lib_.CLI_lib.option.new_flyweight
+      @opt = Home_.lib_.CLI_lib.option.new_flyweight
     end
 
         end

@@ -62,7 +62,7 @@ module Skylab::Callback
       o.send :alias_method, :[]=, :call
       Proc_for_DSL__ = o  # or not
 
-      _AT_BOX = Callback_::Box.new
+      _AT_BOX = Home_::Box.new
 
       at = o.new do |i, p|
         _AT_BOX.add i, p

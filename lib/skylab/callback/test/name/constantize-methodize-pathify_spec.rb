@@ -11,19 +11,19 @@ module Skylab::Callback::Test::Name::CMP_
   name_mod = ::Object.new
 
   def name_mod.constantize
-    Callback_::Name.lib.constantize
+    Home_::Name.lib.constantize
   end
 
   def name_mod.methodize
-    Callback_::Name.lib.methodize
+    Home_::Name.lib.methodize
   end
 
   def name_mod.pathify
-    Callback_::Name.lib.pathify
+    Home_::Name.lib.pathify
   end
 
   def name_mod.pathify_name
-    Callback_::Name.lib.pathify_name
+    Home_::Name.lib.pathify_name
   end
 
   describe "[ca] name (multiple methods)" do

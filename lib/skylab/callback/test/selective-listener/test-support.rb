@@ -6,7 +6,7 @@ module Skylab::Callback::TestSupport::Selective_Listener
 
   include Constants
 
-  Callback_ = Callback_
+  Home_ = Home_
 
   extend TestSupport_::Quickie
 
@@ -27,9 +27,9 @@ module Skylab::Callback::TestSupport::Selective_Listener
 
   Subject_ = -> * x_a do
     if x_a.length.zero?
-      Callback_::Selective_Listener
+      Home_::Selective_Listener
     else
-      Callback_::Selective_Listener[ * x_a ]
+      Home_::Selective_Listener[ * x_a ]
     end
   end
 end

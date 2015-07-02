@@ -123,7 +123,7 @@ module Skylab::Callback
     private
 
       def __init_via_iambic x_a, & msg_p
-        st = Callback_::Polymorphic_Stream.via_array x_a
+        st = Home_::Polymorphic_Stream.via_array x_a
         @terminal_channel_i = st.gets_one
         _process_pairs st.flush_to_each_pairer, & msg_p
         NIL_
@@ -135,7 +135,7 @@ module Skylab::Callback
       end
 
       def _process_pairs pairs, & msg_p
-        bx = Callback_::Box.new
+        bx = Home_::Box.new
         sc = singleton_class
 
         pairs.each_pair do | k, x |
@@ -205,7 +205,7 @@ module Skylab::Callback
       end
 
       def __to_mutable_box  # just "tags", no terminal channel
-        bx = Callback_::Box.new
+        bx = Home_::Box.new
         ivar_box.each_pair do | k, ivar |
           bx.add k, instance_variable_get( ivar )
         end
@@ -300,7 +300,7 @@ module Skylab::Callback
           s_a.push s
         end
         expag.calculate y, self, & message_proc
-        Callback_::Stream.via_nonsparse_array s_a
+        Home_::Stream.via_nonsparse_array s_a
       end
 
       class N_Lines < ::Enumerator::Yielder
@@ -378,7 +378,7 @@ module Skylab::Callback
           end
         end
 
-        Callback_::Actor[ self, :properties,
+        Home_::Actor[ self, :properties,
           :y,
           :expression_agent,
           :o ]

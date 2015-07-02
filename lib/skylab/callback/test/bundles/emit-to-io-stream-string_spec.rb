@@ -10,7 +10,7 @@ module Skylab::Callback::TestSupport::Bundles
 
       before :all do
         class Foo_EVSIM
-          Callback_[ self, :emit_to_IO_stream_string ]
+          Home_[ self, :emit_to_IO_stream_string ]
           def initialize dbg_IO
             @fun_IO = TestSupport_::IO.spy(
               :do_debug, ( dbg_IO ? true : false ),

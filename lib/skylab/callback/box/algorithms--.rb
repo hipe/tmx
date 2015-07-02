@@ -101,7 +101,7 @@ module Skylab::Callback
       end
 
       def new_box_and_mutate_by_partition_at * sym_a
-        bx = Callback_::Box.new
+        bx = Home_::Box.new
         sym_a.each do | sym |
           bx.add(
             sym,

@@ -9,7 +9,7 @@ module Skylab::Callback::TestSupport
   TS_.describe "[ca] events - class factories - data event" do
 
     subject = -> do
-      Callback_::Event.data_event_class_factory
+      Home_::Event.data_event_class_factory
     end
 
     before :all do

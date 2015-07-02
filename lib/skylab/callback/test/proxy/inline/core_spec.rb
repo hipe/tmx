@@ -8,13 +8,13 @@ module Skylab::Callback::TestSupport::Proxy::Inline
 
   extend TestSupport_::Quickie
 
-  Callback_ = Callback_
+  Home_ = Home_
 
   Subject_ = -> * x_a, & p do
     if x_a.length.nonzero? || p
-      Callback_::Proxy::Inline__[ * x_a, & p ]
+      Home_::Proxy::Inline__[ * x_a, & p ]
     else
-      Callback_::Proxy::Inline__
+      Home_::Proxy::Inline__
     end
   end
 

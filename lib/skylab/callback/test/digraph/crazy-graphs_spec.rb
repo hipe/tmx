@@ -4,16 +4,16 @@ module Skylab::Callback::TestSupport::Digraph
 
   describe "[ca] digraph crazy graphs" do
 
-    extend Callback_::TestSupport::Digraph
+    extend Home_::TestSupport::Digraph
 
     context "class Gamma extends mod Alpha which defines a graph" do  # #todo below could be etc
       modul :Alpha do
-        Callback_[ self, :employ_DSL_for_digraph_emitter ]
+        Home_[ self, :employ_DSL_for_digraph_emitter ]
         listeners_digraph :alpha
         public :call_digraph_listeners # [#002] public for testing
       end
       klass :Gamma do |o|
-        Callback_[ self, :extend_digraph_emitter_module_methods ]
+        Home_[ self, :extend_digraph_emitter_module_methods ]
         include o.Alpha
       end
 
@@ -27,7 +27,7 @@ module Skylab::Callback::TestSupport::Digraph
 
     context "class D extends G which includes B which includes A which etc" do
       modul :Alpha do
-        Callback_[ self, :employ_DSL_for_digraph_emitter ]
+        Home_[ self, :employ_DSL_for_digraph_emitter ]
         listeners_digraph :alpha
         public :call_digraph_listeners # [#002] public for testing
       end
@@ -35,7 +35,7 @@ module Skylab::Callback::TestSupport::Digraph
         include o.Alpha
       end
       klass :Gamma do |o|
-        Callback_[ self, :extend_digraph_emitter_module_methods ]
+        Home_[ self, :extend_digraph_emitter_module_methods ]
         include o.Beta
       end
       klass :Delta, extends: :Gamma

@@ -7,16 +7,16 @@ module Skylab::Callback
       def try_convert x  # :+[#056]
 
         if x.respond_to? :each_index
-          Callback_.lib_.list_lib.line_stream x
+          Home_.lib_.list_lib.line_stream x
 
         elsif x.respond_to? :read
-          Callback_.lib_.IO_lib.line_stream x
+          Home_.lib_.IO_lib.line_stream x
 
         elsif x.respond_to? :each
-          Callback_.lib_.basic::Enumerator.line_stream x
+          Home_.lib_.basic::Enumerator.line_stream x
 
         elsif x.respond_to? :ascii_only?
-          Callback_.lib_.basic::String.line_stream x
+          Home_.lib_.basic::String.line_stream x
 
         else
           false
@@ -29,7 +29,7 @@ module Skylab::Callback
     # aggregates other scanners, makes them behave as one sequence of scanners
     #
     #     self._TODO  # etc
-    #     scn = Callback_::Scn.aggregate(
+    #     scn = Home_::Scn.aggregate(
     #         LIB_.list_lib.line_stream( [ :a, :b ] ),
     #         LIB_.list_lib.line_stream( [] ),
     #         LIB_.list_lib.line_stream( [ :c ] ) )

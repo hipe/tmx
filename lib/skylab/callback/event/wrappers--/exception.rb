@@ -4,7 +4,7 @@ module Skylab::Callback
 
       class Wrappers__::Exception
 
-        Callback_::Actor.methodic self, :properties,
+        Home_::Actor.methodic self, :properties,
           :exception,
           :terminal_channel_i
 
@@ -110,7 +110,7 @@ module Skylab::Callback
           #
           #     ::Foo::Bar_::Baz_Exception__ => :bar_baz_exception
 
-          s_a = @exception.class.name.split Callback_.const_sep
+          s_a = @exception.class.name.split Home_.const_sep
 
           sub_slice = s_a[ -2, 2 ]
 
@@ -161,7 +161,7 @@ module Skylab::Callback
 
           _x_a, _p = @_sess.flush
 
-          Callback_::Event.
+          Home_::Event.
             inline_via_iambic_and_any_message_proc_to_be_defaulted _x_a, _p
         end
 

@@ -9,7 +9,7 @@ module Skylab::Callback::TestSupport::Tree
       before :all do
 
         class Mazlo
-          Callback_::Tree::Host[ self ]
+          Home_::Tree::Host[ self ]
           spec = build_mutable_callback_tree_specification
           spec.default_pattern :listeners
           spec << :pow

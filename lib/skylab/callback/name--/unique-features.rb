@@ -52,7 +52,7 @@ module Skylab::Callback
           s_a[ - num_parts .. -1 ]  # whether positive or negative
         end
         _s_a_.map do |s|
-          Callback_::Name.via_const( s.intern ).as_human
+          Home_::Name.via_const( s.intern ).as_human
         end * TERM_SEPARATOR_STRING_
       end
 
@@ -68,7 +68,7 @@ module Skylab::Callback
               EMPTY_A_
             else
               s_[ s.length + 2 .. -1 ].split( CONST_SEP_ ).reduce [] do | m, c |
-                m.push Callback_::Name.via_const c.intern
+                m.push Home_::Name.via_const c.intern
                   # freeze each name because we expose them individually
               end
             end )
@@ -81,7 +81,7 @@ module Skylab::Callback
 
           def via_symbol_list name_i_a
             new( name_i_a.map do | sym |
-              Callback_::Name.via_variegated_symbol sym
+              Home_::Name.via_variegated_symbol sym
             end )
           end
         end

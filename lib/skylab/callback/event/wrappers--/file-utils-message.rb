@@ -4,7 +4,7 @@ module Skylab::Callback
 
       class Wrappers__::File_utils_message
 
-        Callback_::Actor.call self, :properties,
+        Home_::Actor.call self, :properties,
           :msg
 
         # WARNING - major hack alert

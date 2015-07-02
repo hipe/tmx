@@ -4,7 +4,7 @@ module Skylab::Callback
 
       class Unwrappers__::Exception
 
-        Callback_::Actor.call self, :properties,
+        Home_::Actor.call self, :properties,
           :event
 
         def execute
@@ -25,7 +25,7 @@ module Skylab::Callback
 
         def exception_class_via_error_catgory sym
 
-          first_guess_sym = Callback_::Name.via_variegated_symbol( sym ).
+          first_guess_sym = Home_::Name.via_variegated_symbol( sym ).
             as_camelcase_const
 
           if ::Object.const_defined? first_guess_sym
@@ -34,13 +34,13 @@ module Skylab::Callback
           else
             _s_a = sym.id2name.split UNDERSCORE_  # e.g `errno_enoent`
 
-            Callback_::Autoloader.const_reduce _s_a, ::Object
+            Home_::Autoloader.const_reduce _s_a, ::Object
           end
         end
 
         def resolve_message_string
           resolve_message_lines
-          @message_s = Callback_.lib_.basic::String.
+          @message_s = Home_.lib_.basic::String.
             paragraph_string_via_message_lines @message_s_a ; nil
         end
 
@@ -50,7 +50,7 @@ module Skylab::Callback
         end
 
         def expression_agent
-          Callback_.lib_.brazen::API.expression_agent_instance  # hard-coded "black and white" for now
+          Home_.lib_.brazen::API.expression_agent_instance  # hard-coded "black and white" for now
         end
       end
     end

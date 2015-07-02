@@ -16,7 +16,7 @@ module Skylab::Callback
       end
     private
       def bld_name_function
-        Callback_::Name.via_module self
+        Home_::Name.via_module self
       end
     end
 
@@ -141,7 +141,7 @@ module Skylab::Callback
 
     def load_module const_a
       ok = true
-      cls = Callback_.lib_.module_lib.value_via_parts const_a do |const, mod|
+      cls = Home_.lib_.module_lib.value_via_parts const_a do |const, mod|
         send_info_string "(tries to load #{ mod }::#{ const } with `const_get`..)"
         if @do_show_backtrace
           mod.const_get const, false

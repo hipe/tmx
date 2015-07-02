@@ -75,7 +75,7 @@ module Skylab::Callback::TestSupport::Proxy::Tee
     end
 
     Subject_ = -> do
-      Callback_::Proxy.tee
+      Home_::Proxy.tee
     end
   end
 end

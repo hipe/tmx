@@ -281,7 +281,7 @@ module Skylab::Callback
 
     def flush_to_box_keyed_to_method sym
 
-      bx = Callback_::Box.new
+      bx = Home_::Box.new
       begin
         x = gets
         x or break

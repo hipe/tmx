@@ -8,9 +8,9 @@ module Skylab::Callback::TestSupport::Actor
 
   extend TestSupport_::Quickie
 
-  Callback = Callback_
+  Callback = Home_
 
   Subject_ = -> do
-    Callback_::Actor
+    Home_::Actor
   end
 end

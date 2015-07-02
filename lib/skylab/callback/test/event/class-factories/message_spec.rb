@@ -9,7 +9,7 @@ module Skylab::Callback::TestSupport
   TS_.describe "[ca] event - class factories - message" do
 
     subject = -> do
-      Callback_::Event.message_class_factory
+      Home_::Event.message_class_factory
     end
 
     before :all do
@@ -31,7 +31,7 @@ module Skylab::Callback::TestSupport
       _ev = msg.to_event
 
       _ev.express_into_under y=[],
-        Callback_.lib_.brazen::API.expression_agent_instance
+        Home_.lib_.brazen::API.expression_agent_instance
 
       y.should eql ["ermegerd '_Foo_' (:_Bar_)"]
     end

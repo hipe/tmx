@@ -11,7 +11,7 @@ module Skylab::Callback
       end
     end
 
-    Callback_.lib_.CLI_lib::CLient[ self,
+    Home_.lib_.CLI_lib::CLient[ self,
       :three_streams_notify,
       :DSL ]  # don't add DSL till end b.c of it's method_added hook
 
@@ -95,7 +95,7 @@ module Skylab::Callback
       end
       additional_file.unshift file
       _, o, e = three_streams
-      gv = Callback_::API::Actions::GraphViz.new program_name, o, e
+      gv = Home_::API::Actions::GraphViz.new program_name, o, e
       gv.absorb_param_h_fully @param_h.merge!(
         files: additional_file, modul: modul,
         do_guess_mod: do_guess_mod )
@@ -127,7 +127,7 @@ module Skylab::Callback
 
     def fire file, klass, stream_symbol
       _, o, e = three_streams
-      fi = Callback_::API::Actions::Fire.new program_name, o, e
+      fi = Home_::API::Actions::Fire.new program_name, o, e
       fi.absorb_param_h_fully @param_h.merge!( files: [ file ], modul: klass,
         opendata: ( @opendata || false ), stream_symbol: stream_symbol.intern )
       x = fi.execute

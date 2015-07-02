@@ -8,7 +8,7 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
 
   extend TestSupport_::Quickie
 
-  Callback_ = Callback_
+  Home_ = Home_
 
   module InstanceMethods
 
@@ -56,7 +56,7 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
 
     def bld_input_scn
       @a_a = []
-      Callback_::Scn.new do
+      Home_::Scn.new do
         @a_a.shift
       end
     end
@@ -76,7 +76,7 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
 
   Subject_ = -> * x_a do
 
-    Callback_::Scn.articulators.aggregating.new_via_iambic x_a
+    Home_::Scn.articulators.aggregating.new_via_iambic x_a
 
   end
 end

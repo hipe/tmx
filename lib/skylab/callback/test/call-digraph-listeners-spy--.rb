@@ -6,7 +6,7 @@ module Skylab::Callback::TestSupport
       private :new
     end
 
-    Callback_::Actor.methodic self, :properties,
+    Home_::Actor.methodic self, :properties,
       :debug_IO,
       :do_debug_proc
 
@@ -20,13 +20,13 @@ module Skylab::Callback::TestSupport
   private
 
     def debug=
-      @do_debug_proc = Callback_::NILADIC_TRUTH_
+      @do_debug_proc = Home_::NILADIC_TRUTH_
       KEEP_PARSING_
     end
 
   public
 
-    EMPTY_P_ = Callback_::EMPTY_P_
+    EMPTY_P_ = Home_::EMPTY_P_
 
     attr_reader :emission_a
 

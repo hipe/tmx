@@ -9,7 +9,7 @@ module Skylab::Callback::TestSupport::Scn::Articulators
     NEWLINE_ = ::Skylab::Callback::TestSupport::NEWLINE_
 
     Subject_ = -> do
-      Callback_::Scn.articulators
+      Home_::Scn.articulators
     end
   end
 end

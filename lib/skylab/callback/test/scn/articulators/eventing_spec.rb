@@ -37,7 +37,7 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Eventing
       end
 
       it "\"pull\"-style: use `with` to get a dup, set `gets_under`, call `gets`" do
-        scn = EX1.new_with :gets_under, Callback_::Stream.via_nonsparse_array( [ :A ] )
+        scn = EX1.new_with :gets_under, Home_::Stream.via_nonsparse_array( [ :A ] )
         x = scn.gets
         x.should eql "[#{ NEWLINE_ } A"
         x = scn.gets
@@ -46,7 +46,7 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Eventing
       end
 
       it "when zero input items" do
-        scn = EX1.new_with :gets_under, Callback_::Stream.the_empty_stream
+        scn = EX1.new_with :gets_under, Home_::Stream.the_empty_stream
         x = scn.gets
         x.should eql '[ ]'
         scn.gets.should be_nil

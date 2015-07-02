@@ -8,7 +8,7 @@ module Skylab::Callback::TestSupport::OD__
 
   extend TestSupport_::Quickie
 
-  Subject_ = -> { Callback_::Ordered_Dictionary }
+  Subject_ = -> { Home_::Ordered_Dictionary }
 
   describe "[ca] ordered dictionary" do
 

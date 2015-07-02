@@ -64,7 +64,7 @@ module Skylab::Callback::TestSupport
                   "ignoring: ", ev_p[] )
             end
 
-            Callback_::UNABLE_  # err on the side of us having swallowed
+            Home_::UNABLE_  # err on the side of us having swallowed
               # a failure, if anybody's asking
           else
 
@@ -188,7 +188,7 @@ module Skylab::Callback::TestSupport
         end
 
         def flush_to_event_stream
-          st = Callback_::Stream.via_nonsparse_array @ev_a
+          st = Home_::Stream.via_nonsparse_array @ev_a
           @ev_a = EMPTY_A_
           st
         end
@@ -261,7 +261,7 @@ module Skylab::Callback::TestSupport
         end
 
         def expression_agent_for_expect_event
-          Callback_::Event.codifying_expression_agent
+          Home_::Event.codifying_expression_agent
         end
 
         def black_and_white ev
@@ -358,7 +358,7 @@ module Skylab::Callback::TestSupport
               if x_p
                 x_p[]
               else
-                Callback_::Event.inline_via_normal_extended_mutable_channel i_a
+                Home_::Event.inline_via_normal_extended_mutable_channel i_a
               end )
           end
         end
@@ -371,7 +371,7 @@ module Skylab::Callback::TestSupport
 
           same_sym = i_a.fetch 2
 
-          _ev = Callback_::Event.inline_with(
+          _ev = Home_::Event.inline_with(
             same_sym,
             same_sym, _x,
             :ok, _ok )
@@ -383,7 +383,7 @@ module Skylab::Callback::TestSupport
 
           _ok = _ok_value_via_first_channel i_a.first
 
-          _ev = Callback_::Event.inline_with(
+          _ev = Home_::Event.inline_with(
 
               i_a.fetch( 2 ), :ok, _ok ) do | y, _ |
 
@@ -459,7 +459,7 @@ module Skylab::Callback::TestSupport
             comment,
             @test_context.expression_agent_for_expect_event
 
-          Callback_.stream do
+          Home_.stream do
             desc.gets
           end
         end
@@ -475,7 +475,7 @@ module Skylab::Callback::TestSupport
 
       def initialize x_a, p
         @call_a = [ [ :resolve_ev_by_expect_one_event ] ]
-        @scn = Callback_::Polymorphic_Stream.via_array x_a
+        @scn = Home_::Polymorphic_Stream.via_array x_a
         while @scn.unparsed_exists
           send @scn.gets_one
         end
@@ -489,7 +489,7 @@ module Skylab::Callback::TestSupport
       end
 
       def shorthand
-        scn = Callback_::Polymorphic_Stream.via_array @scn.gets_one
+        scn = Home_::Polymorphic_Stream.via_array @scn.gets_one
         scn.unparsed_exists and parse_shorthand scn
       end
 
@@ -597,7 +597,7 @@ module Skylab::Callback::TestSupport
 
       def __gets_via_second_line
 
-        @blank_s = Callback_::SPACE_ * @first_line_header.length
+        @blank_s = Home_::SPACE_ * @first_line_header.length
         @meth = :_via_line_flush_subsequent_line
         _via_line_flush_subsequent_line
       end

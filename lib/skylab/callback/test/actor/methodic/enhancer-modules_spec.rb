@@ -77,7 +77,7 @@ module Skylab::Callback::TestSupport::Actor::Methodic::MP
         end
       end
 
-      define_method :require_C_1, ( Callback_.memoize do
+      define_method :require_C_1, ( Home_.memoize do
 
         class C_1
 

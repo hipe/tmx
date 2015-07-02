@@ -1,10 +1,10 @@
-module Skylab::Brazen
+module Skylab::Callback
 
-  module Callback_
+  # ->
 
     class Stream::Ordered__
 
-      Actor_.call self, :properties,
+      Home_::Actor.call self, :properties,
         :upstream
 
       def initialize
@@ -18,7 +18,7 @@ module Skylab::Brazen
 
       def execute
         @p = @main_loop
-        Callback_.stream do
+        Home_.stream do
           @p[]
         end
       end
@@ -89,7 +89,7 @@ module Skylab::Brazen
         @went_h[ my_name_x ] = true
         items_waiting_for_me = @waiting_h.delete my_name_x
         if items_waiting_for_me
-          @ready_buffer_queue.push Callback_::Stream.via_nonsparse_array items_waiting_for_me
+          @ready_buffer_queue.push Home_::Stream.via_nonsparse_array items_waiting_for_me
           @p = @gets_from_buffer
         end
         nil
@@ -112,5 +112,5 @@ module Skylab::Brazen
         raise _msg
       end
     end
-  end
+    # <-
 end

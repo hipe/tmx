@@ -26,6 +26,6 @@ module Skylab::Callback::TestSupport::Proxy
   end
 
   Subject_ = -> do
-    Callback_::Proxy
+    Home_::Proxy
   end
 end

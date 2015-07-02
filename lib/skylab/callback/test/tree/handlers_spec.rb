@@ -57,7 +57,7 @@ module Skylab::Callback::TestSupport::Tree
     end
 
     let :hndlrs do
-      Callback_::Tree.new( { error: { frobulation:
+      Home_::Tree.new( { error: { frobulation:
         { trans_dermal: :handler, sub_cutaneous: :handler } } }, :wazlo )
     end
 

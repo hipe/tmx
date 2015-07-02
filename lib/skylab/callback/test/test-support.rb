@@ -14,8 +14,8 @@ module Skylab::Callback::TestSupport
     end
   end  # >>
 
-  Callback_ = ::Skylab::Callback
-    Autoloader_ = Callback_::Autoloader
+  Home_ = ::Skylab::Callback
+    Autoloader_ = Home_::Autoloader
 
   TestSupport_ = Autoloader_.require_sidesystem :TestSupport
 
@@ -34,8 +34,8 @@ module Skylab::Callback::TestSupport
       TestSupport_.debug_IO
     end
 
-    define_method :fixtures_dir_pn, ( Callback_.memoize do
-      Callback_::TestSupport.dir_pathname.join 'fixtures'
+    define_method :fixtures_dir_pn, ( Home_.memoize do
+      Home_::TestSupport.dir_pathname.join 'fixtures'
     end )
   end
 
@@ -43,7 +43,7 @@ module Skylab::Callback::TestSupport
   class << LIB_
 
     def basic
-      Callback_.lib_.basic
+      Home_.lib_.basic
     end
 
     def list_lib
@@ -53,7 +53,7 @@ module Skylab::Callback::TestSupport
 
   # ~ singles
 
-  EMPTY_A_ = Callback_::EMPTY_A_
+  EMPTY_A_ = Home_::EMPTY_A_
   KEEP_PARSING_ = true
   NEWLINE_ = "\n".freeze
   NIL_ = nil
@@ -61,11 +61,11 @@ module Skylab::Callback::TestSupport
   # ~ give these to the children
 
   module Constants
-    Callback_ = Callback_
+    Home_ = Home_
     EMPTY_A_ = EMPTY_A_
     KEEP_PARSING_ = KEEP_PARSING_
     TestSupport_ = TestSupport_
   end
 
-  Autoloader_[ self, Callback_.dir_pathname.join( 'test' ).to_path ]
+  Autoloader_[ self, Home_.dir_pathname.join( 'test' ).to_path ]
 end

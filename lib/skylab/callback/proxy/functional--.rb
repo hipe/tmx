@@ -28,7 +28,7 @@ module Skylab::Callback
 
       class Actor__
 
-        Callback_::Actor.call self, :properties,
+        Home_::Actor.call self, :properties,
           :i_a, :p, :base_class
 
         def execute
@@ -47,7 +47,7 @@ module Skylab::Callback
 
         def resolve_box
           resolve_members
-          @box = Callback_::Box.new
+          @box = Home_::Box.new
           @member_i_a.each do |i|
             @box.add i, i
           end
@@ -76,7 +76,7 @@ module Skylab::Callback
 
       CONST_ = :FUNCTIONAL_PROXY_PROPERTY_BOX__
 
-      const_set CONST_, Callback_::Box.the_empty_box
+      const_set CONST_, Home_::Box.the_empty_box
 
       def initialize * x_a
         @__proxy_kernel__ = Kernel_.new __functional_proxy_property_box__
@@ -117,7 +117,7 @@ module Skylab::Callback
         end
 
         def resolve_pairs_scan_via_arglist p_a
-          @pairs_scan = Callback_::Stream.via_times( p_a.length ) do |d|
+          @pairs_scan = Home_::Stream.via_times( p_a.length ) do |d|
             [ @box.at_position( d ), p_a.fetch( d ) ]
           end ; nil
         end

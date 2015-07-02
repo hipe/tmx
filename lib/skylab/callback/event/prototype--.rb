@@ -12,7 +12,7 @@ module Skylab::Callback
 
         class Make___
 
-          Callback_::Actor.call self, :properties,
+          Home_::Actor.call self, :properties,
             :deflist_a,
             :message_proc
 
@@ -35,14 +35,14 @@ module Skylab::Callback
           end
 
           def work
-            scn = Callback_::Polymorphic_Stream.via_array @deflist_a
+            scn = Home_::Polymorphic_Stream.via_array @deflist_a
             cls = ::Class.new Prototype__
             _MESSAGE_PROC_ = @message_proc
             cls.class_exec do
               extend Module_Methods__
               const_set :TERMINAL_CHANNEL_SYMBOL___, scn.gets_one
               define_method :message_proc do _MESSAGE_PROC_ end
-              _BOX_ = Callback_::Box.new
+              _BOX_ = Home_::Box.new
               while scn.unparsed_exists
                 prp = Prop__.new scn.gets_one, scn.gets_one
                 _BOX_.add prp.name_symbol, prp
@@ -135,7 +135,7 @@ module Skylab::Callback
 
           bx = formal_properties
           ok = true
-          st = Callback_::Polymorphic_Stream.new 0, x_a
+          st = Home_::Polymorphic_Stream.new 0, x_a
 
           at_end = EMPTY_P_
           once = -> do
@@ -232,7 +232,7 @@ module Skylab::Callback
           end
         private
           def bld_ivar_bx
-            bx = Callback_::Box.new
+            bx = Home_::Box.new
             prop_bx.each_pair do |i, prop|
               bx.add i, prop.name_as_ivar
             end

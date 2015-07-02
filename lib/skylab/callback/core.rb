@@ -27,15 +27,15 @@ module Skylab::Callback
     # memoize defined below
 
     def produce_library_shell_via_library_and_app_modules lib_mod, app_mod
-      Callback_::Librication__[ lib_mod, app_mod ]
+      Home_::Librication__[ lib_mod, app_mod ]
     end
 
     def stream( & p )
-      Callback_::Stream.new( & p )
+      Home_::Stream.new( & p )
     end
 
     def test_support
-      Callback_::Test
+      Home_::Test
     end
   end  # >>
 
@@ -244,7 +244,7 @@ module Skylab::Callback
     end
   end
 
-  Callback_ = self
+  Home_ = self
 
   class Box  # :[#061]
 
@@ -319,7 +319,7 @@ module Skylab::Callback
     end
 
     def to_name_stream
-      Callback_::Stream.via_nonsparse_array @a
+      Home_::Stream.via_nonsparse_array @a
     end
 
     def to_value_minimal_stream
@@ -333,7 +333,7 @@ module Skylab::Callback
 
     def to_value_stream
       d = -1 ; last = @a.length - 1
-      Callback_.stream do
+      Home_.stream do
         if d < last
           @h.fetch @a.fetch d += 1
         end
@@ -342,7 +342,7 @@ module Skylab::Callback
 
     def to_pair_stream
       d = -1 ; last = @a.length - 1
-      Callback_.stream do
+      Home_.stream do
         if d < last
           i = @a.fetch d += 1
           Pair_.new @h.fetch( i ), i
@@ -626,15 +626,15 @@ module Skylab::Callback
 
         elsif x.respond_to? :read
 
-          Callback_.lib_.system.IO.polymorphic_stream_via_readable x
+          Home_.lib_.system.IO.polymorphic_stream_via_readable x
 
         elsif x.respond_to? :each
 
-          Callback_.lib_.basic::Enumerator.polymorphic_stream_via_eachable x
+          Home_.lib_.basic::Enumerator.polymorphic_stream_via_eachable x
 
         elsif x.respond_to? :ascii_only?
 
-          Callback_.lib_.basic::String.polymorphic_stream_via_string x
+          Home_.lib_.basic::String.polymorphic_stream_via_string x
         else
           UNABLE_
         end
@@ -718,7 +718,7 @@ module Skylab::Callback
 
       def via_value_and_variegated_symbol x, sym
         new x, true,
-          Callback_.lib_.basic::Minimal_Property.via_variegated_symbol( sym )
+          Home_.lib_.basic::Minimal_Property.via_variegated_symbol( sym )
       end
 
       alias_method :via_x_and_i, :via_value_and_variegated_symbol
@@ -1018,7 +1018,7 @@ module Skylab::Callback
       def __isomoprh_filesystem_entry_name
 
         s = name  # `::Module#name`
-        Callback_::Name.via_const s[ s.rindex( CONST_SEP_ ) + 2 .. -1 ]
+        Home_::Name.via_const s[ s.rindex( CONST_SEP_ ) + 2 .. -1 ]
       end
     end
 
@@ -1249,7 +1249,7 @@ module Skylab::Callback
       def to_stream  # :+#public-API, #the-fuzzily-unique-entry-scanner, #fuzzy-sibling-pairs
         @_did_index_all ||= _index_all
         a = @stem_i_a ; d = -1 ; last = a.length - 1
-        Callback_.stream do
+        Home_.stream do
           if d < last
             @normpath_lookup_p[ a.fetch d += 1 ]
           end
@@ -1960,7 +1960,7 @@ module Skylab::Callback
       define_method :require_sidesystem, -> do
 
         sl_path = -> do
-          x = Callback_.dir_pathname.dirname.to_path ; sl_path = -> { x } ; x
+          x = Home_.dir_pathname.dirname.to_path ; sl_path = -> { x } ; x
         end
 
         require_via_const = -> const_i do
@@ -2000,31 +2000,31 @@ module Skylab::Callback
 
       def labelize * a
         if a.length.zero?
-          Callback_::Name__::Unique_Features::Labelize
+          Home_::Name__::Unique_Features::Labelize
         else
-          Callback_::Name__::Unique_Features::Labelize[ * a ]
+          Home_::Name__::Unique_Features::Labelize[ * a ]
         end
       end
 
       def lib
-        Callback_::Name__
+        Home_::Name__
       end
 
       def module_moniker * a
         if a.length.zero?
-          Callback_::Name__::Unique_Features::Module_moniker
+          Home_::Name__::Unique_Features::Module_moniker
         else
-          Callback_::Name__::Unique_Features::Module_moniker[ * a ]
+          Home_::Name__::Unique_Features::Module_moniker[ * a ]
         end
       end
 
       def simple_chain
-        Callback_::Name__::Unique_Features::Simple_Chain
+        Home_::Name__::Unique_Features::Simple_Chain
       end
 
       def variegated_human_symbol_via_variable_name_symbol sym
         s = sym.id2name
-        Callback_::Name__::Unique_Features::
+        Home_::Name__::Unique_Features::
           Mutate_string_by_chomping_any_trailing_name_convention_suffixes[ s ]
         s.downcase.intern
       end
@@ -2064,7 +2064,7 @@ module Skylab::Callback
       end
 
       def via_module_name_anchored_in_module_name s, s_
-        Callback_::Name__::Unique_Features::
+        Home_::Name__::Unique_Features::
           Via_anchored_in_module_name_module_name[ s_, s ]
       end
 
@@ -2333,11 +2333,11 @@ module Skylab::Callback
     class << self
 
       def aggregate * scn_a
-        Callback_::Scn__::Aggregate.new scn_a
+        Home_::Scn__::Aggregate.new scn_a
       end
 
       def articulators
-        Callback_::Scn__::Articulators
+        Home_::Scn__::Articulators
       end
 
       def the_empty_stream
@@ -2346,20 +2346,20 @@ module Skylab::Callback
 
       def multi_step * x_a
         if x_a.length.zero?
-          Callback_::Scn__::Multi_Step__
+          Home_::Scn__::Multi_Step__
         else
-          Callback_::Scn__::Multi_Step__.new do
+          Home_::Scn__::Multi_Step__.new do
             process_iambic_fully x_a
           end
         end
       end
 
       def peek
-        Callback_::Scn__::Peek__
+        Home_::Scn__::Peek__
       end
 
       def try_convert x
-        Callback_::Scn__.try_convert x
+        Home_::Scn__.try_convert x
       end
     end
 

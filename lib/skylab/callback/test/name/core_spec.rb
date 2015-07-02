@@ -40,7 +40,7 @@ module Skylab::Callback::TestSupport::Name
     end
 
     def subject
-      Callback_::Name
+      Home_::Name
     end
   end
 end

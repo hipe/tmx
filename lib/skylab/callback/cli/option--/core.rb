@@ -23,7 +23,7 @@ module Skylab::Callback
           end
         end
 
-        class Fire__ < Callback_.lib_.stdlib_option_parser
+        class Fire__ < Home_.lib_.stdlib_option_parser
 
     # do our hacky custom parse yay
     def parse! argv, &setback
@@ -54,7 +54,7 @@ module Skylab::Callback
       elsif scn.last? and scn.looks_like_arg?
         [ :string, scn.current ]
       else
-        box = Callback_::Box.new
+        box = Home_::Box.new
         valid = nil
         begin
           valid = false

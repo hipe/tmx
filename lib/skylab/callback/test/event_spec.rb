@@ -6,7 +6,7 @@ module Skylab::Callback::TestSupport::Event_Tests__
 
   include Constants
 
-  Callback_ = Callback_
+  Home_ = Home_
 
   extend TestSupport_::Quickie
 
@@ -288,7 +288,7 @@ module Skylab::Callback::TestSupport::Event_Tests__
     end
 
     def subject_class
-      Callback_::TestSupport::Old_Expect_Event::Assertion
+      Home_::TestSupport::Old_Expect_Event::Assertion
     end
 
     def match x

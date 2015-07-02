@@ -6,7 +6,7 @@ module Skylab::Callback::TestSupport::Bundles
 
   include Constants
 
-  Callback_ = Callback_
+  Home_ = Home_
 
   extend TestSupport_::Quickie
 
