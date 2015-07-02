@@ -2,13 +2,13 @@ require_relative '../test-support'
 
 module Skylab::TestSupport::TestSupport::Models
 
-  TestSupport_ = ::Skylab::TestSupport
+  Home_ = ::Skylab::TestSupport
 
-  TestSupport_::TestSupport[ TS__ = self ]
+  Home_::TestSupport[ TS__ = self ]
 
-  extend TestSupport_::Quickie
+  extend Home_::Quickie
 
-  Top_TS_ = TestSupport_::TestSupport
+  Top_TS_ = Home_::TestSupport
 
 end
 

@@ -26,7 +26,7 @@ module Skylab::Headless
 
       Actions_anchor_module = -> x_a do
         module_exec x_a, &
-          Headless_::Action::Bundles::Actions_anchor_module.to_proc
+          Home_::Action::Bundles::Actions_anchor_module.to_proc
       end
 
       Client_instance_methods = -> _ do
@@ -34,7 +34,7 @@ module Skylab::Headless
       end
 
       Client_services = -> x_a do
-        module_exec x_a, & Headless_::Client::Bundles::Client_services.to_proc
+        module_exec x_a, & Home_::Client::Bundles::Client_services.to_proc
       end
 
       DSL = -> _ do
@@ -49,7 +49,7 @@ module Skylab::Headless
         module_exec( & Three_streams_notify_methods__ ) ; nil
       end
 
-      Headless_.lib_.bundle::Multiset[ self ]
+      Home_.lib_.bundle::Multiset[ self ]
     end
 
       Three_streams_notify_methods__ = -> do
@@ -68,7 +68,7 @@ module Skylab::Headless
 
     module IMs__
 
-      include Headless_::Client::InstanceMethods, CLI::Action_::IMs
+      include Home_::Client::InstanceMethods, CLI::Action_::IMs
 
       def initialize *a
         @program_name = nil
@@ -91,16 +91,16 @@ module Skylab::Headless
         _IO_adapter_class.new i, o, e, pen
       end
 
-      def dflt_sin ; Headless_::CLI::IO.instream end
-      def dflt_sout ; Headless_::CLI::IO.outstream end
-      def dflt_serr ; Headless_::CLI::IO.errstream end
+      def dflt_sin ; Home_::CLI::IO.instream end
+      def dflt_sout ; Home_::CLI::IO.outstream end
+      def dflt_serr ; Home_::CLI::IO.errstream end
 
       def pen_class  # #hook-out
         CLI.pen.minimal_class
       end
 
       def _IO_adapter_class
-        Headless_::CLI::IO::Adapter::Minimal
+        Home_::CLI::IO::Adapter::Minimal
       end
 
       # ~ :#hook-in's #topper-stopper's #buck-stop whatever
@@ -188,7 +188,7 @@ module Skylab::Headless
       module IMs__
       private
         def build_option_parser  # #storypoint-925
-          op = Headless_::Library_::OptionParser.new
+          op = Home_::Library_::OptionParser.new
           p_a = self.class.any_option_parser_p_a
           p_a and apply_p_a_on_op p_a, op
           _yes = op_looks_like_it_defines_its_own_help op

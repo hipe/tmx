@@ -9,7 +9,7 @@ module Skylab::TestSupport
         edit_entity_class :promote_action,
 
           :desc, -> y do
-            y << "generate #{ val TestSupport_::Init.test_support_filenames.first } files"
+            y << "generate #{ val Home_::Init.test_support_filenames.first } files"
           end,
 
           :after, :recursive,
@@ -33,7 +33,7 @@ module Skylab::TestSupport
           :ad_hoc_normalizer, -> arg, & oes_p do
 
             if arg.is_known && arg.value_x
-              TestSupport_.lib_.basic::Pathname.normalization.new_with(
+              Home_.lib_.basic::Pathname.normalization.new_with(
                 :absolute, :downward_only,
                 :no_single_dots,
                 :no_dotfiles ).normalize_argument arg, & oes_p
@@ -203,7 +203,7 @@ module Skylab::TestSupport
             @existent_path = ::File.join @current, @FS.test_support_file
             @desired_path = ::File.join @current, @dir, @FS.test_support_file
 
-            @tree = TestSupport_.lib_.system.filesystem.hack_guess_module_tree(
+            @tree = Home_.lib_.system.filesystem.hack_guess_module_tree(
               :path, @existent_path,
               :on_event_selectively, @on_event_selectively )
 
@@ -261,7 +261,7 @@ module Skylab::TestSupport
               end
 
               if @is_dry
-                TestSupport_.lib_.IO.dry_stub_instance
+                Home_.lib_.IO.dry_stub_instance
               else
                 @did_open = true
                 ::File.open @desired_path, 'w'

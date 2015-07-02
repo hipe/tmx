@@ -36,7 +36,7 @@ module Skylab::TestSupport
 
       def money_for_single_path
         @last_s = @lcbp_a.fetch( -1 )
-        @tail_s = TestSupport_.spec_rb
+        @tail_s = Home_.spec_rb
         @rx = /#{ ::Regexp.escape @tail_s }\z/
         if @rx !~ @tail_s
           when_tail_part_did_not_match
@@ -122,7 +122,7 @@ module Skylab::TestSupport
 
       def start_service_with_path_prefix path_prefix
         _io = resolve_stderr_IO
-        TestSupport_::Coverage_::Service.start _io, -> { path_prefix }
+        Home_::Coverage_::Service.start _io, -> { path_prefix }
       end
 
       def resolve_stderr_IO

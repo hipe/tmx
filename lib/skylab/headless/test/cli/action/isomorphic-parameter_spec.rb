@@ -6,7 +6,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
 
   include Constants
 
-  Headless_ = Headless_
+  Home_ = Home_
 
   extend TestSupport_::Quickie
 

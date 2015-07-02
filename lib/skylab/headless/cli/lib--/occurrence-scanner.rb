@@ -32,7 +32,7 @@ module Skylab::Headless
         line = fh.gets
         line && line.length.nonzero? or break done[]
         lineno = colno = 1 ; byte = 0
-        scn = Headless_::Library_::StringScanner.new line
+        scn = Home_::Library_::StringScanner.new line
         (( p = scan ))[]
       end
       super -> { p[] }

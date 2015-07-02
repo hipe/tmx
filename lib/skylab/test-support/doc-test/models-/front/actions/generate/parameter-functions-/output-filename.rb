@@ -36,7 +36,7 @@ module Skylab::TestSupport
 
             _rel_a = val_x.split FILE_SEP_
 
-            result_a = TestSupport_.lib_.basic::Pathname.
+            result_a = Home_.lib_.basic::Pathname.
               expand_real_parts_by_relative_parts( _real_a, _rel_a, & oes_p )
 
             result_a and begin

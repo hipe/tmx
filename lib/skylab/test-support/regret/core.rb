@@ -100,7 +100,7 @@ module Skylab::TestSupport
 
               # some define it early to use it inline
 
-            define_singleton_method :let, TestSupport_::Let::LET_METHOD
+            define_singleton_method :let, Home_::Let::LET_METHOD
           end
 
           pam and include pam.instance_methods_module

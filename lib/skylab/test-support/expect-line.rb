@@ -54,9 +54,9 @@ module Skylab::TestSupport
 
       def excrpt_lines_from_beginning beg_d, end_d, s
 
-        _RX = TestSupport_.lib_.basic::String.regex_for_line_scanning
+        _RX = Home_.lib_.basic::String.regex_for_line_scanning
 
-        scn = TestSupport_::Library_::StringScanner.new s
+        scn = Home_::Library_::StringScanner.new s
 
         y = []
         current_line_index = 0
@@ -195,7 +195,7 @@ module Skylab::TestSupport
         end
 
         def via_string string
-          new TestSupport_.lib_.basic::String.line_stream string
+          new Home_.lib_.basic::String.line_stream string
         end
 
         def via_stream st
@@ -226,7 +226,7 @@ module Skylab::TestSupport
 
       def skip_until_before_Nth_last_line d
 
-        buff = TestSupport_.lib_.basic::Rotating_Buffer[ d + 1 ]
+        buff = Home_.lib_.basic::Rotating_Buffer[ d + 1 ]
 
         count = -1  # because our buffer runs for one more than the amt requested
         begin
@@ -285,7 +285,7 @@ module Skylab::TestSupport
         @line = @up.gets
         if @line
 
-          line = TestSupport_.lib_.brazen::CLI::Styling.unstyle_styled @line
+          line = Home_.lib_.brazen::CLI::Styling.unstyle_styled @line
 
           if line
             @line = line

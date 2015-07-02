@@ -64,7 +64,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
         _mns = mock_node_stream desc_line, code_line_a
 
-        down_IO = TestSupport_::Library_::StringIO.new
+        down_IO = Home_::Library_::StringIO.new
 
         @result = _oa.against :business_module_name, business_module_name,
           :node_upstream, _mns,

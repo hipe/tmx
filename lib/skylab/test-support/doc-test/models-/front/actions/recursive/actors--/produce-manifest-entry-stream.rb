@@ -15,7 +15,7 @@ module Skylab::TestSupport
             :path_prop,
 
           def initialize
-            @filesystem = TestSupport_.lib_.system.filesystem
+            @filesystem = Home_.lib_.system.filesystem
             super
           end
 

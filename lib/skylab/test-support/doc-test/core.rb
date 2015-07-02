@@ -8,7 +8,7 @@ module Skylab::TestSupport
     # they will not appear in the generated spec file. the last line however,
     # will appear as the description string of your context or example.
     #
-    #     THIS_FILE_ = TestSupport_::Expect_Line::File_Shell[ __FILE__ ]
+    #     THIS_FILE_ = Home_::Expect_Line::File_Shell[ __FILE__ ]
     #
     #     # this comment gets included in the output because it is indented
     #     # with four or more spaces and is part of a code span that goes out.
@@ -230,7 +230,7 @@ module Skylab::TestSupport
     private
 
       def build_unrecognized_param_arg ok_x_a
-        TestSupport_.lib_.brazen::Property::
+        Home_.lib_.brazen::Property::
           build_extra_values_event(
             [ @value_x ],
             ok_x_a,
@@ -312,7 +312,7 @@ module Skylab::TestSupport
       end
     end
 
-    Brazen_ = TestSupport_.lib_.brazen
+    Brazen_ = Home_.lib_.brazen
     BLANK_RX_ = /\A[[:space:]]*\z/
     DocTest_ = self
     IDENTITY_ = -> x { x }

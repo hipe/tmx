@@ -6,7 +6,7 @@ module Skylab::Headless::TestSupport::CLI::Client
 
   include Constants
 
-  Headless_ = Headless_
+  Home_ = Home_
 
   extend TestSupport_::Quickie
 
@@ -71,11 +71,11 @@ module Skylab::Headless::TestSupport::CLI::Client
       t = three_streams_triad
       @three_streams_triad = :_spent_
       t.outstream.string.length.zero? or fail say_output( t )
-      t.errstream.string.split Headless_::LINE_SEPARATOR_STRING_
+      t.errstream.string.split Home_::LINE_SEPARATOR_STRING_
     end
 
     def say_output t
-      _s = Headless_.lib_.basic::String.ellipsify t.outstream.string
+      _s = Home_.lib_.basic::String.ellipsify t.outstream.string
       "there was output to stderr? \"#{ _s }\")"
     end
   end

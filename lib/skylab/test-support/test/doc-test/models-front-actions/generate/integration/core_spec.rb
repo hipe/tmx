@@ -7,7 +7,7 @@ module Skylab::TestSupport::TestSupport::DocTest::Models::Front::Actions::Genera
     context "the `API` module is application programmer's interface to the API" do
 
       before :all do
-        API = TestSupport_::DocTest::API
+        API = Home_::DocTest::API
       end
       it "the minimal action that we can send to our API is the `ping` action" do
         API.call( :ping ).should eql :_hello_from_doc_test_
@@ -16,7 +16,7 @@ module Skylab::TestSupport::TestSupport::DocTest::Models::Front::Actions::Genera
         here = DocTest_::Models_::Front::Actions::Generate.
           dir_pathname.join( 'core.rb' ).to_path
 
-        output_pn = TestSupport_.dir_pathname.
+        output_pn = Home_.dir_pathname.
           join( 'test/doc-test/models-front-actions/generate/integration/core_spec.rb' )
 
         stat = output_pn.stat

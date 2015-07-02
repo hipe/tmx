@@ -268,7 +268,7 @@ module Skylab
       # ~ style-related classifications
 
       def _curry x
-        TestSupport_.lib_.brazen::CLI::Styling::Stylify.curry[ [ * x ] ]
+        Home_.lib_.brazen::CLI::Styling::Stylify.curry[ [ * x ] ]
       end
 
       def ick msg  # e.g divide

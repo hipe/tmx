@@ -21,7 +21,7 @@ module Skylab::TestSupport
       define_method :_service_instance, -> do  # #storypoint-25
 
         p = -> do
-          lib = TestSupport_.lib_
+          lib = Home_.lib_
           x = Service__.new nil, lib.stdout, lib.stderr
           x.listen
           p = -> { x }
@@ -192,7 +192,7 @@ module Skylab::TestSupport
         @__quickie_runtime.failed
       end
 
-      TestSupport_::Let[ self ]
+      Home_::Let[ self ]
 
     end  # will re-open below
 

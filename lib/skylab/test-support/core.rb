@@ -24,11 +24,11 @@ module Skylab::TestSupport  # :[#021].
     end
 
     def lib_
-      @lib ||= TestSupport_::Lib_::INSTANCE
+      @lib ||= Home_::Lib_::INSTANCE
     end
 
     def spec_rb
-      TestSupport_::Init.spec_rb
+      Home_::Init.spec_rb
     end
 
     def tmpdir
@@ -57,7 +57,7 @@ module Skylab::TestSupport  # :[#021].
   NIL_ = nil
   SPACE_ = ' '.freeze
   TEST_DIR_FILENAME_ = 'test'.freeze
-  TestSupport_ = self  # there is another module called ::SL::TS::TS
+  Home_ = self  # there is another module called ::SL::TS::TS
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
 

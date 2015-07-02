@@ -5,7 +5,7 @@ module Skylab::Headless::TestSupport::Parameter
   ::Skylab::Headless::TestSupport[ self ]
 
   module Constants
-    Parameter = Headless_::Parameter
+    Parameter = Home_::Parameter
   end
 
   Constants::TestSupport_::Quickie.enable_kernel_describe
@@ -16,7 +16,7 @@ module Skylab::Headless::TestSupport::Parameter
 
     def with &b                   # define the class body you will use in
       @klass = ::Class.new.class_exec do      # the frame
-        include Headless_::SubClient::InstanceMethods
+        include Home_::SubClient::InstanceMethods
         Parameter::Definer[ self ]
         class_exec(&b)
       private
@@ -37,7 +37,7 @@ module Skylab::Headless::TestSupport::Parameter
     def frame &b
       klass = @klass
       let :_frame do
-        client = Headless_::TestSupport::Client_Spy.new
+        client = Home_::TestSupport::Client_Spy.new
         client.do_debug_proc = -> { do_debug }
         object = klass.new client
         emit_lines = -> do

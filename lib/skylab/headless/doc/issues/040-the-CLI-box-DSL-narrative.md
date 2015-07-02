@@ -31,7 +31,7 @@ to get pseudo-formal for a second, the grammar ends up looking something like:
 
     class Foo
 
-      Headless_::CLI::Box[ self, :DSL ]  # EXAMPLE - not yet implemetned #todo:during-merge
+      Home_::CLI::Box[ self, :DSL ]  # EXAMPLE - not yet implemetned #todo:during-merge
 
       NODE_DEFINITION *
 

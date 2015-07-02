@@ -6,7 +6,7 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
 
   include Constants
 
-  Headless_ = Headless_ ; QUEUE_IVAR__ = QUEUE_IVAR
+  Home_ = Home_ ; QUEUE_IVAR__ = QUEUE_IVAR
 
   extend TestSupport_::Quickie
 
@@ -14,10 +14,10 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
 
     def box_DSL_class cls_i, & cls_p
 
-      define_method :box_DSL_class,Headless_::Library_::Memoize[ -> do
+      define_method :box_DSL_class,Home_::Library_::Memoize[ -> do
         _cls = sandbox_module.const_set cls_i, ::Class.new
         _cls.class_exec do
-          Headless_::CLI::Box[ self, :DSL ]
+          Home_::CLI::Box[ self, :DSL ]
           module_exec( & cls_p )
           self
         end
@@ -43,6 +43,6 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
   end
 
   CLI_ = -> do
-    Headless_::CLI
+    Home_::CLI
   end
 end

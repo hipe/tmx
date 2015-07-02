@@ -37,7 +37,7 @@ module Skylab::Headless
       end
 
       Client_services = -> x_a do
-        module_exec x_a, & Headless_::Client_Services.to_proc
+        module_exec x_a, & Home_::Client_Services.to_proc
       end
 
       Core_instance_methods = -> _ do
@@ -45,20 +45,20 @@ module Skylab::Headless
       end
 
       Expressive_agent = -> _ do
-        module_exec _, & Headless_::Pen::Bundles::Expressive_agent.to_proc
+        module_exec _, & Home_::Pen::Bundles::Expressive_agent.to_proc
       end
 
       Inflection = -> _ do
-        extend Headless_.lib_.human::NLP::EN::API_Action_Inflection_Hack ; nil
+        extend Home_.lib_.human::NLP::EN::API_Action_Inflection_Hack ; nil
       end
 
-      Headless_.lib_.bundle::Multiset[ self ]
+      Home_.lib_.bundle::Multiset[ self ]
 
     end
 
     Keyword_required__ = -> i, x_a do
       i == x_a.first or raise ::ArgumentError, "expected '#{ i }' had #{
-        }#{ Headless_.lib_.strange x_a.first }"
+        }#{ Home_.lib_.strange x_a.first }"
       x_a.shift ; nil
     end
 
@@ -88,7 +88,7 @@ module Skylab::Headless
 
     module IMs
 
-      include Headless_::SubClient::InstanceMethods
+      include Home_::SubClient::InstanceMethods
 
       # read [#138] the action narrative #storypoint-1
 

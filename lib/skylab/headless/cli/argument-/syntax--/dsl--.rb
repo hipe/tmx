@@ -32,7 +32,7 @@ module Skylab::Headless
 
         def process_args a, &p
           p[ hooks = Hooks__.new ]
-          bx = Headless_.lib_.meso_box_lib.new
+          bx = Home_.lib_.meso_box_lib.new
           parse = Parse__.new( hooks, bx, a )
           r = @series.parse_notify parse
           if r
@@ -53,7 +53,7 @@ module Skylab::Headless
           end
         end
         def init_result_struct_class
-          bx = Headless_.lib_.meso_box_lib.new
+          bx = Home_.lib_.meso_box_lib.new
           y = ::Enumerator::Yielder.new do |i|
             bx.has?( i ) or bx.add i, nil
           end
@@ -179,7 +179,7 @@ module Skylab::Headless
             true
           else
             # #storypoint-105
-            any_tok and _any_at_token_set = Headless_::Library_::Set[ any_tok ]
+            any_tok and _any_at_token_set = Home_::Library_::Set[ any_tok ]
             _stx = CLI.argument.syntax [ self ]
             _ev = CLI.argument.missing :vertical, _stx, _any_at_token_set
             parse.trigger_missing _ev
@@ -331,7 +331,7 @@ module Skylab::Headless
         end
 
         def perform_failure_a_into_parse fail_a, parse
-          big_a = [ ] ; tok_set = Headless_::Library_::Set.new
+          big_a = [ ] ; tok_set = Home_::Library_::Set.new
           fail_a.each do |prs_rec|
             emit_a = prs_rec.emitted_a
             1 == emit_a.length or fail 'test me'
@@ -400,7 +400,7 @@ module Skylab::Headless
       end
 
       on_rx = /(?<=\Aon_)/
-      Hooks__ = Headless_::Event::Hooks.new( *
+      Hooks__ = Home_::Event::Hooks.new( *
         CLI.argument.syntax.validate.parameters.each_name.map do |i|
           on_rx.match( i ).post_match.intern
         end )
@@ -408,7 +408,7 @@ module Skylab::Headless
       class Parse_Recorder__ < Parse__
         def initialize upstream
           @a = upstream.duplicate_a
-          @box = Headless_.lib_.meso_box_lib.new
+          @box = Home_.lib_.meso_box_lib.new
           @emitted_a = []
         end
 

@@ -51,7 +51,7 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
 
     def __build_spy_group
-      grp = TestSupport_::IO.spy.group.new
+      grp = Home_::IO.spy.group.new
       grp.debug_IO = debug_IO
       grp.do_debug_proc = -> { do_debug }
       grp.add_stream :o

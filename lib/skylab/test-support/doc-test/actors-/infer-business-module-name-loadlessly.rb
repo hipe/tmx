@@ -36,7 +36,7 @@ module Skylab::TestSupport
 
       def execute
 
-        _fs = TestSupport_.lib_.system.filesystem
+        _fs = Home_.lib_.system.filesystem
 
         @tree = _fs.hack_guess_module_tree :path, @path,
           :line_upstream, @line_upstream, & @on_event_selectively

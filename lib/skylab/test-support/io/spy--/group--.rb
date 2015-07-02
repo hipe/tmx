@@ -101,7 +101,7 @@ module Skylab::TestSupport
 
     def build_spy_for name_x, & init_p
 
-      downstream_IO = TestSupport_::Library_::StringIO.new
+      downstream_IO = Home_::Library_::StringIO.new
 
       _line_end_proc = -> do
 
@@ -127,7 +127,7 @@ module Skylab::TestSupport
         NIL_
       end
 
-      _filter = TestSupport_.lib_.IO::Mappers::Filter.new_with(
+      _filter = Home_.lib_.IO::Mappers::Filter.new_with(
         :downstream_IO, downstream_IO,
         :line_end_proc, _line_end_proc,
       )
@@ -173,7 +173,7 @@ module Skylab::TestSupport
     end
 
     def some_debug_IO
-      @debug_IO || TestSupport_.lib_.stderr
+      @debug_IO || Home_.lib_.stderr
     end
 
     def debug! stderr  # each time a line is parsed out of any stream we will

@@ -67,7 +67,7 @@ module Skylab::Headless
 
       class NLP_Agent__
 
-        Headless_.expression_agent.NLP_EN_methods self, :public,
+        Home_.expression_agent.NLP_EN_methods self, :public,
           [ :and_, :indefinite_noun, :or_, :plural_noun, :s ]
 
         self

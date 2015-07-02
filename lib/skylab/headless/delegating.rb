@@ -12,13 +12,13 @@ module Skylab::Headless
       end
     private
       def say_unexpected x
-        "unexpected #{ Headless_.lib_.strange x_a[ 0 ] }"
+        "unexpected #{ Home_.lib_.strange x_a[ 0 ] }"
       end
     end
 
     to_proc = -> x_a=nil do
       if x_a and x_a.length.nonzero?
-        Headless_::Bundles__::Delegating::Absorb_Passivley[ x_a, self ]
+        Home_::Bundles__::Delegating::Absorb_Passivley[ x_a, self ]
       else
         module_exec( & Init_as_reflective_delegating_client__ )
       end ; nil
@@ -122,7 +122,7 @@ module Skylab::Headless
       end
     private
       def rslv_some_builder_with_if
-        Headless_::Bundles__::Delegating::
+        Home_::Bundles__::Delegating::
           Builder_with_if[ @if_p, rslv_some_builder_without_if ]
       end
       def rslv_some_builder_without_if
@@ -148,7 +148,7 @@ module Skylab::Headless
       end
       def say_cant_resolve_method_names
         "can't resolve delegator method name or names from #{
-           Headless_.lib_.strange @x_a.first }"
+           Home_.lib_.strange @x_a.first }"
       end
       def if=
         @if_p = @x_a.shift
@@ -182,7 +182,7 @@ module Skylab::Headless
       def say_single
         "'to_method' is for single methods only. cannot delegate these #{
           }to the same method: #{ @method_name_a.map do |i|
-            Headless_.lib_.strange i end * ', ' }"
+            Home_.lib_.strange i end * ', ' }"
       end
     end
 

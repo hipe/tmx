@@ -13,7 +13,7 @@ module Skylab::TestSupport
     end
   end
 
-  class IO::Spy__ < TestSupport_::Lib_::IO[]::Mappers::Tee  # :[#023] ..
+  class IO::Spy__ < Home_::Lib_::IO[]::Mappers::Tee  # :[#023] ..
 
     class << self
 
@@ -81,7 +81,7 @@ module Skylab::TestSupport
       tty!
 
       if o.is_standard
-        @muxer.add BUFFER_I__, TestSupport_::Library_::StringIO.new
+        @muxer.add BUFFER_I__, Home_::Library_::StringIO.new
       end
 
       if @do_debug_p  # #note-030
@@ -106,7 +106,7 @@ module Skylab::TestSupport
 
     def add_debugging_downstream
 
-      _downstream_IO = @debug_IO || TestSupport_.lib_.stderr
+      _downstream_IO = @debug_IO || Home_.lib_.stderr
 
       @debug_IO = nil
 
@@ -121,7 +121,7 @@ module Skylab::TestSupport
 
       _niladic_pass_filter_proc = @do_debug_p
 
-      _io = TestSupport_.lib_.IO::Mappers::Filter.new_with(
+      _io = Home_.lib_.IO::Mappers::Filter.new_with(
         :downstream_IO, _downstream_IO,
         :line_begin_string, _line_begin_string,
         :niladic_pass_filter_proc, _niladic_pass_filter_proc,

@@ -10,7 +10,7 @@ module Skylab::Headless::TestSupport::CLI::Client
 
       with_client_class do
         class Foo_UR
-          Headless_::CLI::Client[ self ]
+          Home_::CLI::Client[ self ]
         private
           def default_action_i ; :hi end
           def hi flerp
@@ -45,7 +45,7 @@ module Skylab::Headless::TestSupport::CLI::Client
     context "two - wired for upstream resolvement" do
       with_client_class do
         class Bar_UR
-          Headless_::CLI::Client[ self ]
+          Home_::CLI::Client[ self ]
           def default_action_i ; :gerp end
           def gerp input_file_nombre=nil
             io = @IO_adapter.instream  ; m = []

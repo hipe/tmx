@@ -42,7 +42,7 @@ module Skylab::Headless
 
         _path_arg = build_path_arg
 
-        io = Headless_.lib_.system.filesystem.normalization.upstream_IO(
+        io = Home_.lib_.system.filesystem.normalization.upstream_IO(
           :instream, @IO_adapter.instream,
           :path_arg, _path_arg ) do | *, & ev_p |
             @evr.receive_event ev_p[]
@@ -73,7 +73,7 @@ module Skylab::Headless
         if _CLI_argument
           _CLI_argument
         else
-          Headless_.lib_.basic.property_via_name Callback_::Name.via_slug 'input-file'  # #todo
+          Home_.lib_.basic.property_via_name Callback_::Name.via_slug 'input-file'  # #todo
         end
       end
     end

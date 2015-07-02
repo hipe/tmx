@@ -8,11 +8,11 @@ module Skylab::Headless::TestSupport::CLI::Option
 
   extend TestSupport_::Quickie
 
-  Headless_ = Headless_
+  Home_ = Home_
 
   Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   Subject_ = -> do
-    Headless_::CLI.option
+    Home_::CLI.option
   end
 end

@@ -8,19 +8,19 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
 
   include Constants
 
-  extend TestSupport_::Quickie
+  extend Home_::Quickie
 
-  TestSupport_ = TestSupport_
+  Home_ = Home_
 
   module InstanceMethods
 
-    include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
+    include Home_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
 
     define_method :expect, instance_method( :expect )  # because rspec
 
     def invoke * s_a
 
-      g = TestSupport_::IO.spy.group.new
+      g = Home_::IO.spy.group.new
       g.debug_IO = debug_IO
       g.do_debug_proc = -> do
         do_debug
@@ -44,7 +44,7 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
     end
 
     def the_main_real_file_doctestable_file_path
-      TestSupport_::DocTest.dir_pathname.join( 'core.rb' ).to_path
+      Home_::DocTest.dir_pathname.join( 'core.rb' ).to_path
     end
 
     def expect_failed
@@ -57,19 +57,19 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
     end
 
     def count_occurrences_of_newlines_in_string string
-      count_occurrences_in_string_of_string string, TestSupport_::NEWLINE_
+      count_occurrences_in_string_of_string string, Home_::NEWLINE_
     end
 
     def count_occurrences_in_string_of_string haystack_s, needle_s
-      TestSupport_.lib_.basic::String.
+      Home_.lib_.basic::String.
         count_occurrences_in_string_of_string haystack_s, needle_s
     end
   end
 
   FAKE_PROGNAME_ = 'ts-dt'
 
-  Generic_error__ = TestSupport_::Callback_.memoize do
-    TestSupport_.lib_.brazen::API.exit_statii.fetch :generic_error
+  Generic_error__ = Home_::Callback_.memoize do
+    Home_.lib_.brazen::API.exit_statii.fetch :generic_error
   end
 
   Subject_ = Parent_::Subject_

@@ -40,7 +40,7 @@ module Skylab::TestSupport
 
       def init_invocation_for_expect_stdout_stderr
 
-        g = TestSupport_::IO.spy.group.new
+        g = Home_::IO.spy.group.new
 
         g.do_debug_proc = -> do
           do_debug  # :+#hook-out
@@ -205,7 +205,7 @@ module Skylab::TestSupport
 
         @__sout_serr_is_baked__ ||= _bake_sout_serr
 
-        io = TestSupport_::Library_::StringIO.new
+        io = Home_::Library_::StringIO.new
         st = _sout_serr_stream_for_contiguous_lines_on_stream sym
         em = st.gets
         while em
@@ -248,7 +248,7 @@ module Skylab::TestSupport
         _st = sout_serr_line_stream_for_contiguous_lines_on_stream(
           @__sout_serr_default_stream_symbol__ )
 
-        TestSupport_::Expect_Line::Scanner.via_line_stream _st
+        Home_::Expect_Line::Scanner.via_line_stream _st
       end
 
       def sout_serr_line_stream_for_contiguous_lines_on_stream sym
@@ -374,7 +374,7 @@ module Skylab::TestSupport
 
     Callback_ = ::Skylab::Callback
 
-    SIMPLE_STYLE_RX__ = TestSupport_.lib_.brazen::CLI::Styling::SIMPLE_STYLE_RX
+    SIMPLE_STYLE_RX__ = Home_.lib_.brazen::CLI::Styling::SIMPLE_STYLE_RX
 
     METHODIC_ = Callback_::Actor::Methodic
 

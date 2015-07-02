@@ -11,9 +11,9 @@ module Skylab::TestSupport::TestSupport::DocTest
 
   include Constants
 
-  extend TestSupport_::Quickie
+  extend Home_::Quickie
 
-  TestSupport_ = TestSupport_
+  Home_ = Home_
 
   DocTest_ = DocTest_  # custom addition to old template
 

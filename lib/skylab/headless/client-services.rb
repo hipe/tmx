@@ -2,7 +2,7 @@ module Skylab::Headless
 
   class Client_Services  # :[#067] client services.
 
-    Headless_::Delegating[ self ]
+    Home_::Delegating[ self ]
 
     to_proc = -> a do
       extend MM__ ; include IM__

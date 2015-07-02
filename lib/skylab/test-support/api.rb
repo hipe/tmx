@@ -4,7 +4,7 @@ module Skylab::TestSupport
 
     Brazen_ = Autoloader_.require_sidesystem :Brazen
 
-    class << TestSupport_
+    class << Home_
 
       # sketchy #stowaway: only when the [ts] interactive API is being called
       # do we need the below, for support of procs as actions:
@@ -17,7 +17,7 @@ module Skylab::TestSupport
     class << self
 
       define_method :krnl, ( Callback_.memoize do
-        TestSupport_.lib_.brazen::Kernel.new TestSupport_
+        Home_.lib_.brazen::Kernel.new Home_
       end )
 
       def lib_
@@ -25,7 +25,7 @@ module Skylab::TestSupport
       end
     end  # >>
 
-    module TestSupport_::Models_
+    module Home_::Models_
 
       Ping = -> * rest, mock_bound_action, & oes_p do
 

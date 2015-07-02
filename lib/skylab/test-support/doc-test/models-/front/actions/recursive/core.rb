@@ -96,7 +96,7 @@ module Skylab::TestSupport
 
           via_properties_init_ivars
 
-          o = TestSupport_.lib_.system.defaults
+          o = Home_.lib_.system.defaults
           @doc_test_files_file = o.doc_test_manifest_file
 
           pn = ::Pathname.new @path
@@ -108,7 +108,7 @@ module Skylab::TestSupport
 
           if :preview == @sub_action && ! @downstream
             maybe_send_event :error, :missing_required_properties do
-              TestSupport_.lib_.brazen::Property.
+              Home_.lib_.brazen::Property.
                 build_missing_required_properties_event(
                   [ self.class.properties.fetch( :downstream ) ] )
             end

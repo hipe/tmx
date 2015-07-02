@@ -10,7 +10,7 @@ if __FILE__ == $PROGRAM_NAME
   module Skylab
     module TestSupport
       Models_ = ::Module.new
-      TestSupport_ = self
+      Home_ = self
       module API
         Brazen_ = ::Object.new
         def Brazen_::Model
@@ -38,7 +38,7 @@ module Skylab::TestSupport
     # for typical coverage measurement of a test or test suite. for such
     # standard use, please see the simplecov gem's README.md
 
-    class TestSupport_::Models_::Simplecov
+    class Home_::Models_::Simplecov
 
       Actions = ::Module.new
 
@@ -55,7 +55,7 @@ module Skylab::TestSupport
           end
 
           def model_class
-            TestSupport_::Models_::Simplecov
+            Home_::Models_::Simplecov
           end
 
           def name_function

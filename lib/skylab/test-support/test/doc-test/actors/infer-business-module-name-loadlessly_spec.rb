@@ -27,7 +27,7 @@ module Skylab::TestSupport::TestSupport::DocTest
         end
       HERE
 
-      _line_ups = TestSupport_.lib_.basic::String.line_stream _whole_string
+      _line_ups = Home_.lib_.basic::String.line_stream _whole_string
 
       _name = subject(
         :path, '/var/xkcd/skorlorb/morta-horl/porse/voa-ordered-set--.rb',
@@ -43,7 +43,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       it "CHECK ALL (visual test for now)" do
         @oes_p = handle_event_selectively
-        dflts = TestSupport_.lib_.system.defaults
+        dflts = Home_.lib_.system.defaults
         _mani_path = dflts.doc_test_manifest_path
         lines = ::File.open _mani_path, 'r'
         pn = dflts.top_of_the_universe_pathname

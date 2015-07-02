@@ -11,7 +11,7 @@ module Skylab::TestSupport
       # passed throughout the application and is the central conduit though
       # which all expression is received and then articulated.
 
-      LIB_ = TestSupport_::API.lib_
+      LIB_ = Home_::API.lib_
 
       LIB_.EN_add_methods self, :private, [ :and_, :or_, :s ]
 

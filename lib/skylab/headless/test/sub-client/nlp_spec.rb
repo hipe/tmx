@@ -10,9 +10,9 @@ module Skylab::Headless::TestSupport::SubClient
       self.class.sc
     end
 
-    define_singleton_method :sc, & Headless_::Library_::Memoize[ -> do
+    define_singleton_method :sc, & Home_::Library_::Memoize[ -> do
       o = ::Object.new
-      o.extend Headless_::SubClient::InstanceMethods
+      o.extend Home_::SubClient::InstanceMethods
       o
     end ]
 

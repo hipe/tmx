@@ -17,8 +17,8 @@ module Skylab::Headless::TestSupport::CLI::Desc__
     end
 
     def parse s
-      _scn = Headless_.lib_.string_lib.line_stream s
-      Headless_::CLI.action.desc.parse_sections @sections=[], _scn ; nil
+      _scn = Home_.lib_.string_lib.line_stream s
+      Home_::CLI.action.desc.parse_sections @sections=[], _scn ; nil
     end
 
     it "one normal line" do

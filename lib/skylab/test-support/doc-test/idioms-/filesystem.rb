@@ -18,7 +18,7 @@ module Skylab::TestSupport
         @oes_p = oes_p
 
         @test_support_file_p = -> do
-          a = TestSupport_::Init.test_support_filenames
+          a = Home_::Init.test_support_filenames
           x = a.fetch( a.length - 1 << 2 )
           @test_support_file_p = -> { x }
           x
@@ -31,7 +31,7 @@ module Skylab::TestSupport
 
       def find_testsupport_file_upwards dirname, * rest, & oes_p
 
-        path = TestSupport_.lib_.system.filesystem.walk(
+        path = Home_.lib_.system.filesystem.walk(
           :start_path, dirname,
           :filename, test_support_file,
           :max_num_dirs_to_look, -1,
@@ -49,7 +49,7 @@ module Skylab::TestSupport
 
       def file_must_exist x, & oes_p
 
-        fs = TestSupport_.lib_.system.filesystem
+        fs = Home_.lib_.system.filesystem
         fs.normalization.upstream_IO(
           :path, x,
           :only_apply_expectation_that_path_is_ftype_of,

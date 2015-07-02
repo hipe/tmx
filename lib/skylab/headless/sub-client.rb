@@ -1,8 +1,8 @@
 module Skylab::Headless::SubClient
 
-  Headless_ = ::Skylab::Headless
+  Home_ = ::Skylab::Headless
 
-  include Headless_
+  include Home_
 
   class << self
 
@@ -92,7 +92,7 @@ end
         }do you need to implement it for that class)?"
     end
 
-    module Headless_::SubClient    # we can't define constants here
+    module Home_::SubClient    # we can't define constants here
       BLOCK_ = 'block '.freeze    # it might be a box module.
       BLK_R_ = 0 ... BLOCK_.length
     end
@@ -279,7 +279,7 @@ end
       end
 
       o[ :s ] = -> * args do  # [length] [lexeme_i]
-        len_x, lexeme_i = Headless_.lib_.parse_lib.parse_serial_optionals args,
+        len_x, lexeme_i = Home_.lib_.parse_lib.parse_serial_optionals args,
           -> x { ! x.respond_to? :id2name }, # defer it
           -> x { x.respond_to? :id2name }
         lexeme_i ||= :s  # when `len_x` is nil it means "use memoized"
@@ -339,13 +339,13 @@ end
 
       o[ :indefinite_noun ] = -> lemma_s do
 
-        Headless_.lib_.human::NLP::EN::POS.indefinite_noun lemma_s
+        Home_.lib_.human::NLP::EN::POS.indefinite_noun lemma_s
       end
 
       o[ :noun_phrase ] = -> * x_a do
 
         x_a.push :syntactic_category, :noun_phrase
-        _fr = Headless_.lib_.human::NLP::EN.expression_frame_via_iambic x_a
+        _fr = Home_.lib_.human::NLP::EN.expression_frame_via_iambic x_a
         _fr.express_into ""
       end
 
@@ -354,21 +354,21 @@ end
       end ]
 
       o[ :plural_noun ] = -> count_d=nil, lemma_s do
-        Headless_.lib_.human::NLP::EN::POS.plural_noun count_d, lemma_s
+        Home_.lib_.human::NLP::EN::POS.plural_noun count_d, lemma_s
       end
 
       o[ :preterite_verb ] = -> lemma_s do
-        Headless_.lib_.human::NLP::EN::POS.preterite_verb lemma_s
+        Home_.lib_.human::NLP::EN::POS.preterite_verb lemma_s
       end
 
       o[ :progressive_verb ] = -> lemma_s do
-        Headless_.lib_.human::NLP::EN::POS.progressive_verb lemma_s
+        Home_.lib_.human::NLP::EN::POS.progressive_verb lemma_s
       end
 
       o[ :sentence_phrase_via_mutable_iambic ] = -> x_a do
 
         x_a.push :syntactic_category, :sentence_phrase
-        _fr = Headless_.lib_.human::NLP::EN.expression_frame_via_iambic x_a
+        _fr = Home_.lib_.human::NLP::EN.expression_frame_via_iambic x_a
         _fr.express_into ""
       end
 
@@ -385,8 +385,8 @@ end
       And__ = bld_oxford_comma[ ' and ' ]
       Or__ = bld_oxford_comma[ ' or ' ]
 
-      _EN = Headless_::Callback_.memoize do  # necessary because circular dependency
-        Headless_.lib_.human::NLP::EN
+      _EN = Home_::Callback_.memoize do  # necessary because circular dependency
+        Home_.lib_.human::NLP::EN
       end
 
       @struct = ::Struct.new( * @i_a ).new( * @p_a )

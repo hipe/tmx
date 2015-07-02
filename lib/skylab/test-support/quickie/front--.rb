@@ -253,7 +253,7 @@ module Skylab::TestSupport
 
     module QuicLib_
 
-      parent = TestSupport_::Lib_
+      parent = Home_::Lib_
 
       Basic = parent::Basic
 
@@ -270,7 +270,7 @@ module Skylab::TestSupport
       Hu___ = parent::Hu___
 
       Match_test_dir_proc = -> do
-        TestSupport_.constant( :TEST_DIR_NAME_A ).method :include?
+        Home_.constant( :TEST_DIR_NAME_A ).method :include?
       end
 
       NLP__ = -> do

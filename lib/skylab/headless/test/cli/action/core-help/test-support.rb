@@ -8,7 +8,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Hlp__
 
   include Constants
 
-  Headless_ = Headless_
+  Home_ = Home_
 
   extend TestSupport_::Quickie
 
@@ -22,7 +22,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Hlp__
         cls.class_exec do
           Parent_Subject_[ self, :core_instance_methods ]
           define_method :build_option_parser, -> do
-            op = Headless_::Library_::OptionParser.new
+            op = Home_::Library_::OptionParser.new
             instance_exec op, & op_p
             op
           end

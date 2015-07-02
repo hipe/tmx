@@ -15,7 +15,7 @@ module Skylab::TestSupport
     #
     # So, the `API` module is application programmer's interface to the API:
     #
-    #     API = TestSupport_::DocTest::API
+    #     API = Home_::DocTest::API
     #
     #
     # the minimal action that we can send to our API is the `ping` action:
@@ -44,7 +44,7 @@ module Skylab::TestSupport
     #     here = DocTest_::Models_::Front::Actions::Generate.
     #       dir_pathname.join( 'core.rb' ).to_path
     #
-    #     output_pn = TestSupport_.dir_pathname.
+    #     output_pn = Home_.dir_pathname.
     #       join( 'test/doc-test/models-front-actions/generate/integration/core_spec.rb' )
     #
     #     stat = output_pn.stat
@@ -520,7 +520,7 @@ module Skylab::TestSupport
             @force,
             self.class.properties.fetch( :force ) )
 
-          io = TestSupport_.lib_.system.filesystem.normalization.downstream_IO(
+          io = Home_.lib_.system.filesystem.normalization.downstream_IO(
             :path, @output_path,
             :is_dry_run, @dry_run,
             :force_arg, _force_arg,
@@ -559,7 +559,7 @@ module Skylab::TestSupport
 
         def via_upstream_path_rslv_line_upstream
 
-          io = TestSupport_.lib_.system.filesystem.normalization.upstream_IO(
+          io = Home_.lib_.system.filesystem.normalization.upstream_IO(
 
               :path, @upstream_path ) do | * i_a, & ev_p |
 

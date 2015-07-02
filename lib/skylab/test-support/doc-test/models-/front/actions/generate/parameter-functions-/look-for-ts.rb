@@ -78,7 +78,7 @@ module Skylab::TestSupport
 
               _difference = @test_path[ _dirname.length + 1 .. -1 ]
 
-              _d = TestSupport_.lib_.basic::String.count_occurrences_in_string_of_string _difference, FILE_SEP_
+              _d = Home_.lib_.basic::String.count_occurrences_in_string_of_string _difference, FILE_SEP_
 
               s_a = _d.times.map { DOT_DOT_ }
               s_a.push _basename_no_ext

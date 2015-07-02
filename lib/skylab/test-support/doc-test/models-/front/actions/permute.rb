@@ -40,7 +40,7 @@ module Skylab::TestSupport
         def __resolve_upstream_IO
 
           io =
-          TestSupport_.lib_.system.filesystem.normalization.upstream_IO.with(
+          Home_.lib_.system.filesystem.normalization.upstream_IO.with(
             :path_arg, knownness( :test_file ),
             & handle_event_selectively )
 

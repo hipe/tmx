@@ -17,7 +17,7 @@ module Skylab::Headless
 
           def [] op_x
 
-            _st = Headless_.lib_.brazen::CLI::Option_Parser::Option_stream[ op_x ]
+            _st = Home_.lib_.brazen::CLI::Option_Parser::Option_stream[ op_x ]
 
             _st_ = _st.map_by do | sw |
               Option_.build_via_switch sw
@@ -40,7 +40,7 @@ module Skylab::Headless
         end
 
         def say_not_symbol x
-          "no implicit convertion of #{ Headless_.lib_.strange x } to symbol"
+          "no implicit convertion of #{ Home_.lib_.strange x } to symbol"
         end
 
         Weak_identifier_for_switch__ = -> do

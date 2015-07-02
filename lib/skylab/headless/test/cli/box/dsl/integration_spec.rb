@@ -11,7 +11,7 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
       box_DSL_class :Tricknata_INTGR do
 
         build_option_parser do
-          o = Headless_::Library_::OptionParser.new
+          o = Home_::Library_::OptionParser.new
           o.on '-x', '--xylophone <foo>' do |x|
             @xylo = x
           end

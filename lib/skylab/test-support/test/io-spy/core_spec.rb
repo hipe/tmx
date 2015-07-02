@@ -6,7 +6,7 @@ module Skylab::TestSupport::TestSupport::IO_Spy::Core
 
   include Constants
 
-  extend TestSupport_::Quickie
+  extend Home_::Quickie
 
   describe "[ts] IO spy" do
 
@@ -24,7 +24,7 @@ module Skylab::TestSupport::TestSupport::IO_Spy::Core
 
     it "a bunch of debugging options" do
 
-      string_IO = TestSupport_::Library_::StringIO.new
+      string_IO = Home_::Library_::StringIO.new
       d = -1
       io = Subject_[].new :do_debug_proc, -> { ( ( d += 1 ) % 2 ).zero? },
         :debug_IO, string_IO,
@@ -40,7 +40,7 @@ module Skylab::TestSupport::TestSupport::IO_Spy::Core
 
     end
 
-    Subject_ = -> { TestSupport_::IO.spy }
+    Subject_ = -> { Home_::IO.spy }
 
   end
 end

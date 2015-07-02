@@ -31,7 +31,7 @@ module Skylab::TestSupport
 
           def begin_option_parser
 
-            @_lib = TestSupport_.lib_.permute
+            @_lib = Home_.lib_.permute
 
             o = @_lib::CLI::Sessions_::Custom_Option_Parser.new( & __me )
 

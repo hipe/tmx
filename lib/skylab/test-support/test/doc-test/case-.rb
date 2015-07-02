@@ -142,7 +142,7 @@ module Skylab::TestSupport
 
       def predicate_tree
 
-        TestSupport_::Lib_::Basic[]::Tree.via(
+        Home_::Lib_::Basic[]::Tree.via(
           :indented_line_stream, @predicate_ff.fake_open,
           :glyph, '+ ',
           :build_using, method( :bld_node ) )

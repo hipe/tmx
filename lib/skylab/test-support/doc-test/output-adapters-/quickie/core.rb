@@ -395,11 +395,11 @@ module Skylab::TestSupport
         x || DEFAULT_TEST_SUPPORT_RELPATH__
       end
 
-      DEFAULT_TEST_SUPPORT_RELPATH__ = TestSupport_::Init.test_support_filestem
+      DEFAULT_TEST_SUPPORT_RELPATH__ = Home_::Init.test_support_filestem
 
       def _any_result_for_write_to_line_downstream_whole_string whole_string
 
-        o = TestSupport_::Lib_::Basic[]::String.line_stream whole_string
+        o = Home_::Lib_::Basic[]::String.line_stream whole_string
 
         bytes = 0 ; lines = 0
         while line = o.gets

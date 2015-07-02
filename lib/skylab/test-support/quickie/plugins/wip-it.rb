@@ -83,7 +83,7 @@ module Skylab::TestSupport
 
       def __work path
 
-        expag = TestSupport_.lib_.brazen::API.expression_agent_instance
+        expag = Home_.lib_.brazen::API.expression_agent_instance
         ok = true
 
         st = @BS.search_and_replace::API.call(
@@ -143,7 +143,7 @@ module Skylab::TestSupport
         DOT_GIT___ = '.git'
 
         def initialize pn
-          @system_conduit = TestSupport_::Library_::Open3
+          @system_conduit = Home_::Library_::Open3
           @path = pn.to_path
         end
 

@@ -6,7 +6,7 @@ module Skylab::Headless::TestSupport::CLI::Option
 
     context "for now an option will derive things from long opt (..)" do
 
-      define_method :memoized_option, &Headless_::Library_::Memoize[ -> do
+      define_method :memoized_option, &Home_::Library_::Memoize[ -> do
         Subject_[].new_flyweight
       end ]   # (it's generally bad and wrong to test this way but we are
       # forcing ourself to use the flyweight to see if we can trigger any

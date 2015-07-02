@@ -6,7 +6,7 @@ module Skylab::TestSupport::TestSupport::DocTest::Input
 
   include Constants
 
-  extend TestSupport_::Quickie
+  extend Home_::Quickie
 
   module InstanceMethods
 

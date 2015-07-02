@@ -7,7 +7,7 @@ module Skylab::Headless::TestSupport::CLI::Box
   include Constants
 
   Autoloader_ = Autoloader_
-  Headless_ = Headless_
+  Home_ = Home_
 
   extend TestSupport_::Quickie
 

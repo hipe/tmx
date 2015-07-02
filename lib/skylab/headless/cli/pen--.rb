@@ -21,7 +21,7 @@ module Skylab::Headless
 
     module Instance_Methods__
 
-      include Headless_::Pen::InstanceMethods   # (see)
+      include Home_::Pen::InstanceMethods   # (see)
 
       # the below methods follow [#br-093]-#the-semantic-markup-guidelines
 
@@ -67,7 +67,7 @@ module Skylab::Headless
 
       # def `val` - how may votes? (1: sg) [#051]
 
-      Headless_.lib_.brazen::CLI::Styling.each_pair_at(
+      Home_.lib_.brazen::CLI::Styling.each_pair_at(
         :stylize,
         & method( :define_method ) )
     end

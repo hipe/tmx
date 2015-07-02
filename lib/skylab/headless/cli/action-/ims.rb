@@ -6,7 +6,7 @@ module Skylab::Headless
 
       module IMs  # see [#064] the CLI action core instance m.. #storypoint-5
 
-        include Headless_::Action::IMs
+        include Home_::Action::IMs
 
         def initialize * _
           @has_od = @option_parser = @param_queue_a = nil
@@ -71,13 +71,13 @@ module Skylab::Headless
           op
         end ; protected :begin_option_parser
         def option_parser_cls
-          Headless_::Library_::OptionParser
+          Home_::Library_::OptionParser
         end
         def prs_opts_from_nonzero_length_argv_when_op a
           @option_parser.parse! a do |p|
             instance_exec( & p )  # :#hook-in for custom o.p
           end ; OK_
-        rescue Headless_::Library_::OptionParser::ParseError => e
+        rescue Home_::Library_::OptionParser::ParseError => e
           prs_opts_when_parse_error e
         end
         def prs_opts_when_parse_error e
@@ -200,7 +200,7 @@ module Skylab::Headless
 
         Action_::LEXICON__ = class Action_::Lexicon__  # #storypoint-20, #storypoint-155
           def initialize
-            @bx = Headless_.lib_.meso_box_lib.new
+            @bx = Home_.lib_.meso_box_lib.new
             @is_collapsed = false ; @p_a = [] ; nil
           end
           def fetch_default_values_at_i_a i_a
@@ -286,7 +286,7 @@ module Skylab::Headless
 
             p = swtch_wth_obj_id_is_visible_p
 
-            _st = Headless_.lib_.brazen::CLI::Option_Parser::Option_stream[
+            _st = Home_.lib_.brazen::CLI::Option_Parser::Option_stream[
               option_documenter ]
 
             _st.each do | sw |
@@ -522,7 +522,7 @@ module Skylab::Headless
           @q_x_a.fetch 0
         end
 
-        class Action_::Bound_Task__ < Headless_.lib_.method_lib.curry
+        class Action_::Bound_Task__ < Home_.lib_.method_lib.curry
           alias_method :replace, :initialize ; public :replace
           def initialize bm, arg_a, p
             super bm, arg_a ; @p = p ; nil
@@ -896,11 +896,11 @@ module Skylab::Headless
           s = ::String.try_convert od.top.list.first
 
           if s
-            s_ = Headless_.lib_.brazen::CLI::Styling.unstyle s
+            s_ = Home_.lib_.brazen::CLI::Styling.unstyle s
             s_.gsub! STRIP_DESCRIPTION_LABEL_RX__, EMPTY_S_
             s_
           else
-            Headless_.lib_.brazen::CLI::Styling.unstyle usage_line
+            Home_.lib_.brazen::CLI::Styling.unstyle usage_line
           end
         end
 

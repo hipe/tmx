@@ -9,21 +9,21 @@ module Skylab::Headless::TestSupport
   TestLib_ = ::Module.new
 
   module Constants
-    Headless_ = ::Skylab::Headless
-      Autoloader_ = Headless_::Autoloader_
+    Home_ = ::Skylab::Headless
+      Autoloader_ = Home_::Autoloader_
     TestLib_ = TestLib_
     TestSupport_ = ::Skylab::TestSupport
   end
 
   include Constants
-  Headless_ = Headless_
-  EMPTY_A_ = Headless_::EMPTY_A_
-  NILADIC_TRUTH_ = Headless_::NILADIC_TRUTH_
+  Home_ = Home_
+  EMPTY_A_ = Home_::EMPTY_A_
+  NILADIC_TRUTH_ = Home_::NILADIC_TRUTH_
   TestSupport_ = TestSupport_
 
   set_tmpdir_pathname do
 
-    Headless_.lib_.system.defaults.dev_tmpdir_pathname.join 'hl'
+    Home_.lib_.system.defaults.dev_tmpdir_pathname.join 'hl'
 
     #todo - when you take out the `dev_` above it fails
   end
@@ -49,11 +49,11 @@ module Skylab::Headless::TestSupport
   module TestLib_
 
     Callback_test_support = -> do
-      Headless_::Callback_.test_support
+      Home_::Callback_.test_support
     end
 
     Expect_event = -> test_context_class do
-      Headless_::Callback_.test_support::Expect_Event[ test_context_class ]
+      Home_::Callback_.test_support::Expect_Event[ test_context_class ]
     end
   end
 end

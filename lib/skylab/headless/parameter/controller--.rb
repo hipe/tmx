@@ -10,7 +10,7 @@ module Skylab::Headless
           :headless_sub_client == a[ 1 ] or fail "no - #{ a[ 1 ] }"
           a[ 0, 2 ] = EMPTY_A_
         else
-          include Headless_::SubClient::InstanceMethods
+          include Home_::SubClient::InstanceMethods
         end ; nil
       end ; define_singleton_method :to_proc do to_proc end
 
@@ -36,7 +36,7 @@ module Skylab::Headless
       end
 
       Ev__ = ::Module.new
-      Event__ = Headless_::Event
+      Event__ = Home_::Event
 
       module IM__  # (changed event model at [#087])
 
@@ -100,7 +100,7 @@ module Skylab::Headless
         end
 
         #
-        Ev__::Internal__ = Headless_::Event.new do |param_a|
+        Ev__::Internal__ = Home_::Event.new do |param_a|
           _s_a = param_a.map( & method( :parameter_label ) )
           "#{ and_ _s_a } #{ s :is } #{ s :an }internal parameter#{ s }"
         end

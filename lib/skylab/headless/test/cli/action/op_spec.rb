@@ -8,7 +8,7 @@ module Skylab::Headless::TestSupport::CLI::Action::OP__
 
   include Constants
 
-  Headless_ = Headless_
+  Home_ = Home_
 
   Parent_Subject_ = Parent_TS_::Subject_
 
@@ -75,7 +75,7 @@ module Skylab::Headless::TestSupport::CLI::Action::OP__
           attr_reader :param_x_a
 
           def build_option_parser
-            op = Headless_::Library_::OptionParser.new
+            op = Home_::Library_::OptionParser.new
             op.on '-y', '--yes <hi>' do |x|
               @param_x_a.push :yes, x
             end

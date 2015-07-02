@@ -61,7 +61,7 @@ module Skylab::TestSupport
 
           def via_both path, post_path_content
 
-            _ = TestSupport_.lib_.hashtag
+            _ = Home_.lib_.hashtag
             st = _::Stream[ post_path_content ]
             st.become_name_value_scanner
 

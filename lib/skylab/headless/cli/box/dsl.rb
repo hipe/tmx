@@ -99,7 +99,7 @@ module Skylab::Headless
 
           include CLI::Action_::DSL_Meths
 
-          include Headless_::Action::Anchored_Name_MMs
+          include Home_::Action::Anchored_Name_MMs
         end
 
         module IMs__
@@ -265,7 +265,7 @@ module Skylab::Headless
           end
           def help_screen_for_chld y, chld_x  # #storypoint-200
             if @is_engaged
-              x = chld_x[] and fail "sanity - #{ Headless_.lib_.strange x }"
+              x = chld_x[] and fail "sanity - #{ Home_.lib_.strange x }"
               hlp_screen_as_engaged_box y
             else
               bound = rslv_bound_action_for_help chld_x

@@ -15,7 +15,7 @@ module Skylab::Headless
         md = full_basic_switch_match[ sw ]
         short = "-#{ md[1] }".freeze
 
-        long = Headless_.lib_.string_lib.
+        long = Home_.lib_.string_lib.
           build_proc_for_string_begins_with_string sw
 
         -> tok do

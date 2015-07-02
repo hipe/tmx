@@ -6,7 +6,7 @@ module Skylab::Headless::TestSupport::CLI::Action
 
   include Constants
 
-  Headless_ = Headless_ ; TestSupport_ = TestSupport_
+  Home_ = Home_ ; TestSupport_ = TestSupport_
 
   module ModuleMethods
 
@@ -23,7 +23,7 @@ module Skylab::Headless::TestSupport::CLI::Action
     end
 
     def dfn_actncls_with_i_and_p cls_i, cls_p
-      define_method :action_class, Headless_::Library_::Memoize[ -> do
+      define_method :action_class, Home_::Library_::Memoize[ -> do
         cls = start_class cls_i
         Subject_[ cls, :core_instance_methods ]
         cls.class_exec( & cls_p ) ; cls
@@ -31,7 +31,7 @@ module Skylab::Headless::TestSupport::CLI::Action
     end
 
     def action_class_with_DSL cls_i, & cls_p
-      define_method :action_class, Headless_::Library_::Memoize[ -> do
+      define_method :action_class, Home_::Library_::Memoize[ -> do
         cls = start_class cls_i
         cls.instance_variable_set :@dir_pathname, false
         Subject_[ cls, :DSL, :core_instance_methods ]
@@ -69,9 +69,9 @@ module Skylab::Headless::TestSupport::CLI::Action
 
   Subject_ = -> *a do
     if a.length.zero?
-      Headless_::CLI.action
+      Home_::CLI.action
     else
-      Headless_::CLI.action( * a )
+      Home_::CLI.action( * a )
     end
   end
 end

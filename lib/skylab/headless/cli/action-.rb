@@ -53,7 +53,7 @@ module Skylab::Headless
       def summary_width op, max=0  # hack a peek into the o.p to
         # decide how wide to make column A (one space comes from the o.p)
 
-        _max_d = Headless_.lib_.brazen::CLI::Option_Parser.summary_width op, max
+        _max_d = Home_.lib_.brazen::CLI::Option_Parser.summary_width op, max
         _max_d + op.summary_indent.length - 1
       end
 
@@ -68,13 +68,13 @@ module Skylab::Headless
 
     module Bundles__
       Actions_anchor_module = -> x_a do
-        module_exec x_a, & Headless_::Action::Bundles::Actions_anchor_module
+        module_exec x_a, & Home_::Action::Bundles::Actions_anchor_module
       end
       Anchored_names = -> x_a do
-        module_exec x_a, & Headless_::Action::Bundles::Anchored_names
+        module_exec x_a, & Home_::Action::Bundles::Anchored_names
       end
       Client_services = -> x_a do
-        module_exec x_a, & Headless_::Action::Bundles::Client_services
+        module_exec x_a, & Home_::Action::Bundles::Client_services
       end
       Core_instance_methods = -> _ do
         include CLI::Action_::IMs ; nil
@@ -89,12 +89,12 @@ module Skylab::Headless
         include DSL_Meths ; nil
       end
       Expressive_agent = -> x_a do
-        module_exec x_a, & Headless_::Action::Bundles::Expressive_agent
+        module_exec x_a, & Home_::Action::Bundles::Expressive_agent
       end
       Inflection = -> x_a do
-        module_exec x_a, & Headless_::Action::Bundles::Inflection
+        module_exec x_a, & Home_::Action::Bundles::Inflection
       end
-      Headless_.lib_.bundle::Multiset[ self ]
+      Home_.lib_.bundle::Multiset[ self ]
     end
 
     module DSL_Meths  # #storypoint-10

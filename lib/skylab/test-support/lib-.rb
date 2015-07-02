@@ -153,7 +153,7 @@ module Skylab::TestSupport
     end
 
     INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(
-      self, TestSupport_ )
+      self, Home_ )
   end
 
   LIB_ = Lib_::INSTANCE

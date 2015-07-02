@@ -10,13 +10,13 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible
 
   ::Skylab::TestSupport::TestSupport::Quickie[ Possible_TS_ = self ]
 
-  TestSupport_ = ::Skylab::TestSupport
-  Quickie = TestSupport_::Quickie
+  Home_ = ::Skylab::TestSupport
+  Quickie = Home_::Quickie
     Possible_ = Quickie::Possible_
 
   extend Quickie
 
-  LIB_ = TestSupport_.lib_
+  LIB_ = Home_.lib_
 
   module InstanceMethods
 

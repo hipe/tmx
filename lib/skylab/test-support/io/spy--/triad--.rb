@@ -25,7 +25,7 @@ module Skylab::TestSupport
       three.length > 3 and raise ::ArgumentError, "it's three bro"
       1.upto( 3 ) do |len|  # (allow caller to pass intentional nils..)
         if three.length < len
-          three[ len - 1 ] = TestSupport_::IO.spy.new
+          three[ len - 1 ] = Home_::IO.spy.new
         end
       end
       super
@@ -41,7 +41,7 @@ module Skylab::TestSupport
         if x.respond_to? :debug!
           x.debug! prepnd
         else  # assume it is an [#sy-014] IO tee. ignoring `prepnd` for now
-          x[ :debug ] = Prefixed_debugging_IO__[ i, TestSupport_.debug_IO ]
+          x[ :debug ] = Prefixed_debugging_IO__[ i, Home_.debug_IO ]
         end
       end
       nil
@@ -49,7 +49,7 @@ module Skylab::TestSupport
 
     Prefixed_debugging_IO__ = -> do
       p = -> i, io do
-        Prefixed_Debugging_IO__ = TestSupport_.lib_.proxy_lib.nice :puts, :write, :<<, :rewind, :truncate
+        Prefixed_Debugging_IO__ = Home_.lib_.proxy_lib.nice :puts, :write, :<<, :rewind, :truncate
         p = -> i_, io_ do
           fmt = -> x do
             "(#{ i_ }: #{ x.inspect })"

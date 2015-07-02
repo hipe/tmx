@@ -2,10 +2,10 @@ require_relative 'test-support'
 
 module Skylab::TestSupport::TestSupport::Quickie
 
-  TestSupport_ = ::Skylab::TestSupport
-  TestSupport_::TestSupport[ Quickie_TestSupport = self ]
-  Quickie = TestSupport_::Quickie
-  LIB_ = TestSupport_.lib_
+  Home_ = ::Skylab::TestSupport
+  Home_::TestSupport[ Quickie_TestSupport = self ]
+  Quickie = Home_::Quickie
+  LIB_ = Home_.lib_
 
   extend Quickie  # NOTE the *second* this gives you any grief,
   # just use rspec! Gödel would have something to say about this..

@@ -6,7 +6,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
   include Constants
 
-  extend TestSupport_::Quickie
+  extend Home_::Quickie
 
   module ModuleMethods
 
@@ -40,7 +40,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
     def build_IO_spy_downstream_for_doctest
 
-      TestSupport_::IO.spy :do_debug_proc, -> do
+      Home_::IO.spy :do_debug_proc, -> do
         do_debug
       end, :debug_IO, debug_IO, :puts_map_proc, -> s do
         s_ = s.chomp
@@ -55,7 +55,7 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
 
     def a_path_for_a_file_that_does_not_exist
-      TestSupport_.dir_pathname.join( 'this-file-does-not-exist.somefile' ).to_path
+      Home_.dir_pathname.join( 'this-file-does-not-exist.somefile' ).to_path
     end
 
     def with_comment_block_in_ad_hoc_fake_file symbol
@@ -103,14 +103,14 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
 
     def black_and_white_expression_agent_for_expect_event
-      TestSupport_.lib_.brazen::API.expression_agent_instance
+      Home_.lib_.brazen::API.expression_agent_instance
     end
 
     define_method :next_interesting_line_dedented, -> do
       rx = /\A[[:space:]]*/
       -> do
         ln = next_interesting_line
-        ln and ln.gsub( rx, TestSupport_::EMPTY_S_ )
+        ln and ln.gsub( rx, Home_::EMPTY_S_ )
       end
     end.call
 
@@ -202,7 +202,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
     def build
       fh = ::File.open @path, 'r'  # READ_MODE_
-      @expect_line_scanner = TestSupport_::Expect_Line::Scanner.via_line_stream fh
+      @expect_line_scanner = Home_::Expect_Line::Scanner.via_line_stream fh
       work
       fh.close
       flush
@@ -317,22 +317,22 @@ module Skylab::TestSupport::TestSupport::DocTest
   module Bundles___
 
     Expect_Event = -> tcc do
-      TestSupport_::Callback_.test_support::Expect_Event[ tcc ]
+      Home_::Callback_.test_support::Expect_Event[ tcc ]
     end
 
     Expect_Line = -> tcc do
-      TestSupport_::Expect_line[ tcc ]
+      Home_::Expect_line[ tcc ]
     end
   end
 
   Subject_ = -> do
-    TestSupport_::DocTest
+    Home_::DocTest
   end
 
-  TestSupport_ = TestSupport_
+  Home_ = Home_
 
   CACHE___ = {}
-  Callback_ = TestSupport_::Callback_
-  DocTest_ = TestSupport_::DocTest
+  Callback_ = Home_::Callback_
+  DocTest_ = Home_::DocTest
 
 end

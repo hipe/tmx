@@ -6,7 +6,7 @@ module Skylab::Headless::TestSupport
     # in a *generic* (modality agnostic) way
 
     include Constants
-    include Headless_::Client::InstanceMethods
+    include Home_::Client::InstanceMethods
 
     USE_THIS_PEN = nil
 
@@ -52,7 +52,7 @@ module Skylab::Headless::TestSupport
 
       _pen = resolve_pen
 
-      Headless_::TestSupport::IO_Adapter_Spy.new_with(
+      Home_::TestSupport::IO_Adapter_Spy.new_with(
         :pen, _pen,
         :do_debug_proc, -> { @debug.call }
       )
@@ -76,7 +76,7 @@ module Skylab::Headless::TestSupport
     attr_accessor :normalized_invocation_string
 
     USE_THIS_PEN = -> do
-      Headless_::CLI.pen.minimal_instance
+      Home_::CLI.pen.minimal_instance
     end
 
     def initialize pen=nil

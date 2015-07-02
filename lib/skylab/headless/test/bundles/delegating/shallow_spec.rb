@@ -12,7 +12,7 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
         end
 
         class Client_simple_Surface
-          Headless_::Delegating[ self ]
+          Home_::Delegating[ self ]
           delegate :foo, :bar
           def initialize x
             super
@@ -32,7 +32,7 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
         end
 
         class Client_if_Surface
-          Headless_::Delegating[ self ]
+          Home_::Delegating[ self ]
           delegating :if, -> { is_ready }, :foo,
             :if, -> { is_ready }, :bizzle
 
@@ -54,7 +54,7 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
         end
 
         class Client_to_method_Surface
-          Headless_::Delegating[ self ]
+          Home_::Delegating[ self ]
           delegating :to_method, :bar, :foo
         end
 
@@ -68,7 +68,7 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
 
       begin
         class Client_Not_Multiple_to_method_Surface
-          Headless_::Delegating[ self ]
+          Home_::Delegating[ self ]
           delegating :to_method, :bar, %i( frik frak )
         end
       rescue ::ArgumentError => e
@@ -85,7 +85,7 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
           def bar ; :BAR end
         end
         class Client_to_meth_Surface
-          Headless_::Delegating[ self ]
+          Home_::Delegating[ self ]
           delegating :to, :purple, %i( foo ),
             :to, :green, %i( bar )
           def initialize
@@ -112,7 +112,7 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
           def bar ; :BAR end
         end
         class Client_to_ivar_Surface
-          Headless_::Delegating[ self ]
+          Home_::Delegating[ self ]
           delegating :to, :@purple, %i( foo ),
             :to, :@green, %i( bar )
 
@@ -135,7 +135,7 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
           def resolve_some_bar_for_client ; :BAR end
         end
         class Client_with_infix_Surface
-          Headless_::Delegating[ self ]
+          Home_::Delegating[ self ]
           delegating :with_infix, :resolve_some_, :_for_client,
             %i( foo bar )
         end
@@ -152,7 +152,7 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
           def bar_from_client ; :BAR end
         end
         class Client_with_suffix_Surface
-          Headless_::Delegating[ self ]
+          Home_::Delegating[ self ]
           delegating :with_suffix, :_from_client, %i( foo bar )
         end
 

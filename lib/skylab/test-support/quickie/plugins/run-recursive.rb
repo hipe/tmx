@@ -140,7 +140,7 @@ module Skylab::TestSupport
       end
 
       def _spec_rb
-        TestSupport_.spec_rb
+        Home_.spec_rb
       end
 
       def files_not_found path

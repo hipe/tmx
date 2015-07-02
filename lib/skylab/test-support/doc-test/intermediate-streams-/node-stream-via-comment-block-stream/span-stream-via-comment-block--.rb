@@ -121,7 +121,7 @@ module Skylab::TestSupport
       # ~ text
 
       def begin_text_span
-        @text_rotbuf = TestSupport_::Lib_::Basic[]::RotatingBuffer.new TWO__
+        @text_rotbuf = Home_::Lib_::Basic[]::RotatingBuffer.new TWO__
         @next_flush_method_name = :flush_active_text_span
         accept_line_into_current_text_span
         @state = STATE_MACHINE__.fetch :text_span_state

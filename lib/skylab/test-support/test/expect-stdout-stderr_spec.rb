@@ -11,7 +11,7 @@ module Skylab::TestSupport::TestSupport
     end
 
     _Subject = -> do
-      TestSupport_::Expect_Stdout_Stderr
+      Home_::Expect_Stdout_Stderr
     end
 
     define_method :subject, _Subject
@@ -193,7 +193,7 @@ module Skylab::TestSupport::TestSupport
 
           attr_reader :_baked_em_a
 
-          include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
+          include Home_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
 
           public :expect, :expect_no_more_lines
 

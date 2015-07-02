@@ -13,7 +13,7 @@ module Skylab::Headless  # ([#013] is reserved for a core node narrative - no st
   class << self
 
     def expression_agent
-      Headless_::SubClient.expression_agent
+      Home_::SubClient.expression_agent
     end
 
     def lib_
@@ -35,7 +35,7 @@ module Skylab::Headless  # ([#013] is reserved for a core node narrative - no st
   DASH_BYTE_ = DASH_.getbyte 0
   EMPTY_A_ = [].freeze
   EMPTY_S_ = ''.freeze
-  Headless_ = self
+  Home_ = self
   IDENTITY_ = -> x { x }
   stowaway :Library_, 'lib-'
   LINE_SEPARATOR_STRING_ = "\n".freeze

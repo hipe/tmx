@@ -7,7 +7,7 @@ module Skylab::TestSupport::TestSupport::DocTest
     extend TS_
 
     with_big_file_path do
-      TestSupport_.dir_pathname.join( 'doc/issues/015-the-doc-test-narrative.md' ).to_path
+      Home_.dir_pathname.join( 'doc/issues/015-the-doc-test-narrative.md' ).to_path
     end
 
     it "loads" do
@@ -23,7 +23,7 @@ module Skylab::TestSupport::TestSupport::DocTest
       text_line_a.last.should match %r(still text because it's 3 deeper)
 
       code_span_line_a = o.gets.a
-      code_span_line_a[ -2 ].should eql TestSupport_::NEWLINE_
+      code_span_line_a[ -2 ].should eql Home_::NEWLINE_
       code_span_line_a.last.should match %r(\bbecause code span\b)
 
       text_line_a = o.gets.a

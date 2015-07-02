@@ -10,11 +10,11 @@ module Skylab::TestSupport::TestSupport::Models
 
       _exe = ::File.join Top_TS_.universal_skylab_bin_path, 'tmx-test-support'
 
-      _exe_ = TestSupport_.dir_pathname.join(
+      _exe_ = Home_.dir_pathname.join(
         'test/fixture-executables/for-simplecov.rb'
       ).to_path
 
-      sys = TestSupport_.lib_.system
+      sys = Home_.lib_.system
 
       _path = sys.defaults.dev_tmpdir_pathname.join( '[ts]' ).to_path
 
@@ -29,7 +29,7 @@ module Skylab::TestSupport::TestSupport::Models
       command_h = {
         chdir: tmpdir.path }
 
-      _i, o, e, w = TestSupport_::Library_::Open3.popen3(
+      _i, o, e, w = Home_::Library_::Open3.popen3(
         * command_a, command_h )
 
       s = o.gets

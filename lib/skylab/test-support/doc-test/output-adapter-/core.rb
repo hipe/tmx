@@ -182,7 +182,7 @@ module Skylab::TestSupport
 
         def write_to_stream_string_line_by_line line_downstream, string
 
-          o = TestSupport_::Lib_::Basic[]::String.line_stream string
+          o = Home_::Lib_::Basic[]::String.line_stream string
 
           while s = o.gets
             s.chomp!
@@ -222,7 +222,7 @@ module Skylab::TestSupport
           opt.summarize_p[ build_section_yielder[ y, opt.name_symbol ] ]
         end
       end
-      TestSupport_.lib_.CLI_table(
+      Home_.lib_.CLI_table(
         :field, :id, :name,
         :field, :id, :desc, :left,
         :show_header, false,

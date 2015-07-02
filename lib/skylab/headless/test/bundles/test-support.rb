@@ -12,6 +12,6 @@ module Skylab::Headless::TestSupport::Bundles
 
     extend TestSupport_::Quickie
 
-    Headless_ = Headless_
+    Home_ = Home_
   end
 end

@@ -102,7 +102,7 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
 
     def common_real_life_output_path
-      TestSupport_.dir_pathname.join(
+      Home_.dir_pathname.join(
         'test/doc-test/models-front-actions/generate/integration/core_spec.rb'
       ).to_path
     end
@@ -113,7 +113,7 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
 
     def call_API_against_path x
-      @down_IO ||= TestSupport_::Library_::StringIO.new
+      @down_IO ||= Home_::Library_::StringIO.new
       x_a = [
         :generate,
         :output_adapter, :quickie,

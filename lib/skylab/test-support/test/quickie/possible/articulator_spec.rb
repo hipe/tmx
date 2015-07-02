@@ -6,14 +6,14 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible::Articulator
 
   include Constants
 
-  extend TestSupport_::Quickie
+  extend Home_::Quickie
 
-  TestSupport_ = TestSupport_
+  Home_ = Home_
 
   describe "[ts] Quickie::Possible_::Articulator_" do
 
     before :all do
-      Articulator_ = TestSupport_::Quickie::Possible_::Articulator_
+      Articulator_ = Home_::Quickie::Possible_::Articulator_
     end
 
     it "this generates a simple articulator class." do

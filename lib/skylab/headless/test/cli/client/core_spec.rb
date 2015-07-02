@@ -12,7 +12,7 @@ module Skylab::Headless::TestSupport::CLI::Client
 
         class Foo
 
-          Headless_::CLI::Client[ self, :DSL, :three_streams_notify ]
+          Home_::CLI::Client[ self, :DSL, :three_streams_notify ]
 
           def initialize i, o, e
             three_streams_notify i, o, e
@@ -68,7 +68,7 @@ module Skylab::Headless::TestSupport::CLI::Client
 
       before :all do
         class Bezzer
-          Headless_::CLI::Client[ self ]
+          Home_::CLI::Client[ self ]
         end
       end
 

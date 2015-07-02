@@ -21,7 +21,7 @@ module Skylab::Headless
     def two_sets opt
       A_.map do |i|
         ea = opt.send i
-        Headless_::Library_::Set[ * (
+        Home_::Library_::Set[ * (
           ea ? ea.to_a : [ ]
         ) ]
       end

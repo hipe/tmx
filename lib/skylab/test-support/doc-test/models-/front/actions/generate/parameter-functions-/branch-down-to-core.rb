@@ -28,14 +28,14 @@ module Skylab::TestSupport
 
                 Mutate_string_by_removing_trailing_dashes_[ stem ]
 
-                _path = ::File.join( dirname, stem, "core#{ TestSupport_::Init.spec_rb }" )
+                _path = ::File.join( dirname, stem, "core#{ Home_::Init.spec_rb }" )
                 @generation.receive_output_path _path
               end
             end
           end
 
           GET_RID_OF_THIS_ENDING_RX__ = /#{
-            ::Regexp.escape TestSupport_::Init.spec_rb }\z/
+            ::Regexp.escape Home_::Init.spec_rb }\z/
 
       end
     end

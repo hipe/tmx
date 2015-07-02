@@ -21,7 +21,7 @@ module Skylab::TestSupport
 
           def via_manifest_entry_absolute_path_resolve_test_dir_pathname
 
-            fs = TestSupport_.lib_.system.filesystem
+            fs = Home_.lib_.system.filesystem
 
             surrounding_path = fs.walk(
               :start_path, ::File.dirname( @input_path ),
@@ -90,7 +90,7 @@ module Skylab::TestSupport
             ext  = pn.extname
             stem = pn.sub_ext( EMPTY_S_ ).to_path
             Mutate_string_by_removing_trailing_dashes_[ stem ]
-            "#{ stem }#{ TestSupport_::Init.test_file_basename_suffix_stem }#{ ext }"
+            "#{ stem }#{ Home_::Init.test_file_basename_suffix_stem }#{ ext }"
           end
         end
       end
