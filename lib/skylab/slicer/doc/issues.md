@@ -1,3 +1,4 @@
+[#151]       heavy models .. wired models [..]
 [#150]       whining about ruby implementation of struct ..
 [#149]       method cherry-picking ..
 [#148]       the touch method function ..

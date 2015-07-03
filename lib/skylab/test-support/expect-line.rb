@@ -400,6 +400,17 @@ module Skylab::TestSupport
         count
       end
 
+      def flush
+        s = ""
+        begin
+          line = @up.gets
+          line or break
+          s.concat line
+          redo
+        end while nil
+        s
+      end
+
       def expect_no_more_lines
         @line = @up.gets
         if @line

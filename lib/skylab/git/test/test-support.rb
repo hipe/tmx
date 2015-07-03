@@ -93,6 +93,11 @@ module Skylab::Git::TestSupport
     end
   end
 
+  Fixture_tree_ = -> sym do
+
+    ::File.join Fixture_trees_[], sym.to_s.gsub( UNDERSCORE_, DASH_ )
+  end
+
   Fixture_trees_ = Callback_.memoize do
 
     TS_.dir_pathname.join( 'fixture-trees' ).to_path
@@ -115,6 +120,8 @@ module Skylab::Git::TestSupport
     end
   end
 
+  DASH_ = '-'
   Home_ = ::Skylab::Git
   NIL_ = nil
+  UNDERSCORE_ = '_'
 end

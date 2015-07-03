@@ -60,7 +60,7 @@ module Skylab::TMX::TestSupport::CLI::L2P
       go :flex2treetop
     end
 
-    it "git" do
+    it "git", wip: true do
       go :git
     end
 

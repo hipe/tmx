@@ -1,198 +1,12 @@
 module Skylab::Git
 
-  class Models_::Stow
+  class Models_::Stow  # see [#010]
 
     # (old code has indention that is typically one tab stop too little.)
 
-  # read [#010] #storypoint-1 "introduction..", #storypoint-2 "local idioms"
-
-  # ( was #storypoint-3 "these constant ass.." #posterity )
-
   if false  # (( BEGIN OFF
-  module Sub_client__  # #storypoint-4 "the way sub-clients are used in t.."
-
-    def self.[] mod, * x_a  # #idempotent
-      mod.send :include, Sub_client_universal_IMs__
-      x_a.length.zero? and raise ::ArgumentError, "cherry-pick only."
-      apply_iambic_on_client x_a, mod ; nil
-    end
-
-    As_basic_set = -> x_a do
-      module_exec x_a, & Home_.lib_.set.to_proc
-    end
-
-    As_basic_set_via_params_const = -> x_a do
-      x_a.unshift :with_members, -> do
-        self.class::PARAMS
-      end
-      module_exec x_a, & Home_.lib_.set.to_proc
-    end
-
-    Color_inquisitor = -> _ do
-    private
-      def is_in_color
-        resolve_service( :color_inquisition ).invoke nil, nil
-      end
-    end
-
-    Globful_actor = -> _ do
-
-      Home_.lib_.basic::Function.globful_actor self
-      nil
-    end
-
-    Globless_actor = -> _ do
-
-      Home_.lib_.basic::Function.globless_actor self
-      nil
-    end
-
-    Emit_payload_line_to_listener = -> _ do
-    private
-      def emit_payload_line s
-        @listener_p[ s ]
-      end
-    end
-
-    Emitters = -> _ do  # #storypoint-5 the sub-client implementation of..
-      include Sub_client_emitters_IMs__
-    end
-
-    File_utils = -> x_a do
-      module_exec x_a, & FU_Bundle_and_IMs__.to_proc
-    end
-
-    Popener3 = -> x_a do
-    private
-      def popen3 *a, &p
-        _svc = @client.resolve_service :popen3
-        _svc.invoke a, p
-      end
-    end
-
-    Say = -> _ do
-      # ~ :storypoint-6 - the default way that s.c interface with the exag.
-    private
-      def say & p
-        _exag = resolve_service( :some_expression_agent ).invoke nil, nil
-        _exag.calculate( & p )
-      end
-    end
-
-    Service_terminal = -> x_a do
-      module_exec x_a, & Home_.lib_.service_terminal.to_proc
-    end
-
-    Shellesc = -> _ do
-    private
-      def shellesc x
-        Home_::Library_::Shellwords.shellescape x
-      end
-    end
-
-    Verb_lemma_hack = -> _ do
-      def self.verb_lemma_s
-        Verb_lemma_hack__[ self ]
-      end ; nil
-    end
-
-    Home_.lib_.bundle::Multiset[ self ]
-  end
-
-  Verb_lemma_hack__ = -> mod do
-    s = mod.name ; base_s = s[ s.rindex( COLON___ ) + 1 .. -1 ]
-    base_s.downcase
-  end
-  COLON___ = ':'.freeze
-
-  module Sub_client_universal_IMs__
-  private
-    def client_notify x
-      @client = x
-    end
-    def resolve_service i
-      @client.resolve_service i
-    end
-  end
-
-  module Sub_client_emitters_IMs__  # :#storypoint-5 the sub-client imple..
-  private
-
-    def emit_payload_line s
-      @client.emit_payload_line s
-    end
-
-    def emit_inner_error_string s
-      @client.emit_inner_error_string s
-    end
-
-    def emit_error_line s
-      @client.emit_error_line s
-    end
-
-    def emit_inner_info_string s
-      @client.emit_inner_info_string s
-    end
-
-    def emit_info_line s
-      @client.emit_info_line s
-    end
-  end
-
-  CLI_lib_ = Home_.lib_.CLI_lib
 
   class CLI
-
-    Sub_client__[ self,
-      :service_terminal, :service_module, -> { Services__ } ]
-
-    CLI_lib_::Client[ self, :client_services,
-                           :three_streams_notify, :client_instance_methods ]
-
-    def initialize i, o, e
-      @param_h = { }
-      three_streams_notify i, o, e
-      super
-    end
-
-  private
-    def pen_class
-      Expression_Agent__
-    end
-    class Expression_Agent__ < CLI_lib_.pen.minimal_class
-      def escape_path x
-        Home_.lib_.path_tools.pretty_path x.to_s
-      end
-    end
-  public
-
-    client_services_class
-    class Client_Services
-      delegating :with_suffix, :_notify, %i( emit_info_line
-        emit_error_line emit_payload_line
-        is_in_color popen3 some_expression_agent )
-    end
-    # top-client #storypoint-5 is just straightforward pass-in here
-    def emit_error_line_notify s
-      emit_error_line s
-    end
-    def emit_info_line_notify s
-      emit_info_line s
-    end
-    def emit_payload_line_notify s
-      emit_payload_line s
-    end
-    # (#storypoint-6 again - buckstopper)
-    def some_expression_agent_notify
-      @IO_adapter.pen
-    end
-
-    define_method :popen3_notify, & Home_::Library_::Open3.method( :popen3 )
-    # gets stubed by tests, hence at top # :#storypoint-7: this?
-
-  private
-
-    # ~ CLI action support - options
 
     def stashes_option o
       @param_h[ :stashes_path ] = nil
@@ -225,33 +39,11 @@ module Skylab::Git
       nil
     end
 
-    # ~ support for interfacing with API
-
-    def invoke_API action_locator_i, par_h
-      cls = Home_::Autoloader_.const_reduce [ action_locator_i ], API::Actions
-      hot = cls.new client_services
-      r = hot.invoke par_h
-      case r
-      when true ; r = nil
-      when false ; r = invt
-      end
-      EXITCODE_H__.fetch r do r end
-    end
     SUCCESS_EXITSTATUS = 0
     GENERAL_FAILURE_EXITSTATUS = 8
     EXITCODE_H__ = {
       false => GENERAL_FAILURE_EXITSTATUS,
       nil => SUCCESS_EXITSTATUS }
-
-    def invt
-      progname = last_hot_prgm_name
-      emit_info_line say { "try #{ kbd "#{ progname } -h" } for help" }
-      false
-    end
-
-    def last_hot_prgm_name
-      "#{ program_name } #{ Verb_lemma_hack__[ @bound_downtree_action.class ] }"
-    end
 
     def build_option_parser
       o = begin_option_parser
@@ -263,74 +55,6 @@ module Skylab::Git
       o.summary_indent = '  '     # two spaces, down from four
       o
     end
-    def begin_option_parser
-      Home_::Library_::OptionParser.new
-    end
-    def begin_option_parser_for_child
-      begin_option_parser
-    end
-
-    # ~ CLI "the buck stops here" topper-stoppers
-
-    # top-client #storypoint-5 is :#storypoint-8:
-    # emitters at the top-client level merely write..
-
-    def emit_payload_line s
-      call_digraph_listeners :payload, s
-    end
-
-    def emit_error_line s
-      call_digraph_listeners :_other_, s ; false
-    end
-
-    def emit_info_line s
-      call_digraph_listeners :_other_, s
-    end
-
-    # --*--
-
-  public
-
-    #                 ~ DSL line of demarcation ~
-
-    CLI_lib_::Client[ self, :DSL ]
-
-    option_parser do |o|
-      o.separator " description: ping."
-      o.on '--API' do
-        @param_h[ :do_API ] = true
-      end
-      stashes_option o
-      help_option o
-    end
-
-    def ping a, b=nil
-      @param_h[ :_a ] = a ; @param_h[ :_b ] = b
-      if @param_h[ :do_API ]
-        ping_API
-      else
-        ping_CLI
-      end
-    end
-  private
-    def ping_CLI
-      a, b = @param_h.values_at :_a, :_b
-      if b
-        emit_info_line "(#{ a }, #{ b })"
-      elsif 'wrong' == a
-        emit_error_line "this was wrong: #{ a.inspect }"
-      else
-        emit_payload_line "(#{ a })"
-      end
-      :ping_from_GSU
-    end
-    def ping_API
-      @param_h.delete :do_API
-      @param_h[ :zip ] = @param_h.delete :_a
-      @param_h[ :zap ] = ( @param_h.delete :_b ) || false
-      invoke_API :ping, @param_h
-    end
-  public
 
     option_parser do |o|
       o.separator " description: Shows the files that would be stashed."
@@ -352,10 +76,6 @@ module Skylab::Git
       stashes_option o
       verbose_option o
       o
-    end
-
-    def save stash_name
-      invoke_API :save, @param_h.merge( stash_name: stash_name )
     end
 
     option_parser do |o|
@@ -446,180 +166,6 @@ module Skylab::Git
   end
   Hub_ = ::Struct.new :hub_pathname, :stashes_pathname
 
-  API = ::Module.new
-
-  class API::Action
-
-    Sub_client__[ self,
-      :as_basic_set_via_params_const,
-        :initialize_basic_set_with_hash,
-        :basic_set_bork_event_listener_p, -> ev do
-          emit_inner_error_string ev.string
-        end,
-      :emitters,
-      :service_terminal, :intermediate,
-      :verb_lemma_hack ]
-
-    Home_.lib_.client self, :client_services
-
-    def initialize client
-      @be_verbose = false ; @error_count = 0 ; @hub = nil
-      client_notify client
-      super()
-    end
-
-    client_services_class
-    class Client_Services
-      delegating :with_suffix, :_notify, %i(
-        emit_inner_error_string emit_payload_line color_inquisition )
-    end
-    def emit_inner_error_string_notify s  # extreme emergencies
-      emit_inner_error_string s
-    end
-    def emit_payload_line_notify s
-      @client.emit_payload_line s
-    end
-    def color_inquisition_notify
-      @is_in_color
-    end
-
-    def invoke par_h
-      Home_.lib_.path_tools.clear  # #storypoint-8.5
-      r = resolve_hub par_h
-      r &&= initialize_basic_set_with_hash par_h
-      r && execute
-    end
-
-  private
-
-    def resolve_hub par_h
-      @hub and fail "sanity - hub is write once"
-      stashes_s = par_h.fetch :stashes_path ; par_h.delete :stashes_path
-      r = if stashes_s  # the old way - hub is pwd, both paths might be relative
-        Hub_.new ::Pathname.new( '.' ), ::Pathname.new( stashes_s )
-      else
-        resolve_service( :find_nearest_hub ).call( & method( :nrst_hb_nt_fnd ) )
-
-      end  # first, then derive hub abspath from it
-      r and accept_normalized_hub r
-    end
-
-    def accept_normalized_hub hub
-      @hub = hub
-      @stashes_path = @hub.stashes_pathname.to_s
-      true
-    end
-
-    def nrst_hb_nt_fnd ev
-      relpath, pwd, d = ev.to_a
-      reason_s = case 1 <=> d
-      when -1 ; " and the #{ d - 1 } dirs above it"
-      when  0 ; nil
-      when  1 ; " (num dirs looked was #{ d }?)"  # (strange)
-      end
-      emit_inner_error_string say {
-        "couldn't find #{ relpath } in #{ escape_path pwd }#{ reason_s }" }
-    end
-
-  public
-
-  private
-
-    # API action customizations of #storypoint-5
-
-    def emit_inner_error_string s
-      _l_s = self.class.verb_lemma_s
-      a, s_, b = unparenthesize s
-      emit_error_line "#{ a }failed to #{ _l_s } stash(es) - #{ s_ }#{ b }"
-    end
-
-    def emit_error_line s
-      @error_count += 1
-      super
-    end
-
-    def emit_inner_info_string s
-      a, s_, b = unparenthesize s
-      _l_s = self.class.verb_lemma_s
-      emit_info_line "#{ a }while #{ _l_s }ing stash(es), #{ s_ }#{ b }"
-    end
-
-    def unparenthesize s
-      md = PARENTHESES_RX__.match s
-      if md
-        [ md[ :a ], md[ :s ], md[ :b ] ]
-      else
-        [ nil, s, nil ]
-      end
-    end
-    PARENTHESES_RX__ = %r{\A(?:
-      (?<a>\() (?<s>.+) (?<b>\))  |
-      (?<a>[#][ ]*) (?<s>.+) (?<b>)
-    )\n?\z}x
-
-    Home_.lib_.action self,
-      :anchored_names, :with, :name_waypoint_module, -> { API::Actions }
-
-    def render_hub_info
-      @hub.members.each do | i |
-        emit_info_line "#{ i }: #{ @hub[ i ] }"
-      end ; nil
-    end
-
-    # ~ API action business support
-
-
-    # :+[#hl-027] smell: it could use model/view split. but only matters if we
-    # ever have more than one API request processed in the same process
-  end
-
-  # ~ :#storypoint-9 - experiments with extensions ..
-
-  module FU_Bundle_and_IMs__
-    Cd = -> _ do
-      include Home_::Library_::FileUtils
-    end
-    Move = -> _ do
-      include FU_Bundle_and_IMs__
-    end
-    Mkdir_p = Move
-    Rmdir = Move
-  private
-    def move x1, x2, h
-      _FU_agent.move x1, x2, h
-    end
-    def mkdir_p path_s, h
-      _FU_agent.mkdir_p path_s, h
-    end
-    def rmdir path_s, h
-      _FU_agent.rmdir path_s, h
-    end
-    def _FU_agent
-      resolve_service( :FU_agent ).invoke nil, nil
-    end
-    Home_.lib_.bundle::Multiset[ self ]
-  end
-  class API::Action
-    class Client_Services
-      delegating :to_method, :FU_agent_notify, :FU_agent
-    end
-    def FU_agent_notify
-      @FU_agent ||= build_FU_agent
-    end
-  private
-    def build_FU_agent
-      Home_.lib_.FUC.new -> msg do
-        emit_info_line "# #{ msg }"
-      end
-    end
-  end
-
-  #                               --*--
-
-  module API::Actions
-    Home_::Autoloader_[ self, :boxxy ]  # :#storypoint-10 placeholder (was)
-  end
-
   end  # END OFF ))
 
     Bz__ = Home_.lib_.brazen
@@ -661,54 +207,7 @@ module Skylab::Git
       end
     end
 
-  class Collection_Action__ < Action_
-
-    # Sub_client__[ self, :popener3 ]
-
-  private
-
-    def normalized_relative_others
-      cmd_s = CMD__
-      ::Enumerator.new do |y|
-        @be_verbose and emit_info_line cmd_s
-        popen3 cmd_s do |_, sout, serr|
-          loop do
-            e = serr.read
-            '' == e or break emit_error_string( "unexpected errput: #{ s }" )
-            s = sout.gets
-            s or break
-            y << s.strip
-          end
-        end
-      end
-    end
-
-    CMD__ = 'git ls-files --others --exclude-standard'
-  end
-
-  class Actions::Status < Collection_Action__
-
-    # Sub_client__[ self, :say ]
-
-    PARAMS = %i( be_verbose stashes_path )
-
-  private
-
-    def ___WAS_execute
-
-      @be_verbose and render_hub_info
-
-      num = 0
-      normalized_relative_others.each do |file_s|
-        num += 1
-        emit_payload_line file_s
-      end
-      num.zero? and emit_inner_info_string "(found no untracked files)"
-      true
-    end
-  end
-
-  class Actions::Save < Collection_Action__
+  class Actions::Save < Action_
 
     # Sub_client__[ self, :popener3 ]
 
@@ -750,83 +249,96 @@ module Skylab::Git
     CMD__ = 'git ls-files --others --exclude-standard'
   end
 
-  class Actions::Show < Action_
-
-    PARAMS = %i( be_verbose is_in_color do_show_patch do_show_stat
-      stash_name stashes_path )
-
-    def ___WAS_execute
-
-      stash = collection.touch_stash @stash_name
-
-      @be_verbose and emit_inner_info_string "#{
-        }(had stash path: #{ stash.pathname })"
-
-      stash = stash.stash_expected_to_exist
-
-      stash and with_extant_stash stash
-    end
-
-    def with_extant_stash stash
-      ( @do_show_stat || @do_show_patch ) or @do_show_stat = true
-      p = -> s do
-        emit_payload_line s
-      end
-      @do_show_stat and stash.stat_lines.each( & p )
-      @do_show_patch and stash.patch_lines.each( & p )
-      true
-    end
-  end
-
-    class Actions::List < Action_
-
-    # Sub_client__[ self, :say ]
+    class Actions::Show < Action_
 
       edit_entity_class(
-        :required, :property, :stashes_path,
+        :required, :property, :filesystem,
+        :required, :property, :system_conduit,
+        :required, :property, :stows_path,
+        :required, :property, :stow_name,
       )
 
       def produce_result
 
-        _silo = @kernel.silo( :stow )
+        h = @argument_box.h_
 
-        _col = _silo.stows_collection_via_path(
-          @argument_box.fetch( :stashes_path ),
+        _col = @kernel.silo( :stow ).stows_collection_via_path(
+          h.fetch( :stows_path ),
           & @on_event_selectively )
 
-        _col.to_any_entity_stream
+        stow = _col.entity_via_intrinsic_key h.fetch :stow_name
+        if stow
+          Stow_::Models_::Expressive_Stow.new(
+            :yes_color,
+            stow,
+            h.fetch( :system_conduit ),
+            h.fetch( :filesystem ),
+            & @on_event_selectively )
+        else
+          stow
+        end
+      end
+    end
+
+    class Actions::Status < Action_
+
+      edit_entity_class(
+        :required, :property, :system_conduit,
+        :required, :property, :stows_path,
+        :required, :property, :directory,
+      )
+
+      def produce_result
+
+        were_events = false
+        oes_p = -> * i_a, & ev_p do
+          were_events = true
+          @on_event_selectively.call( * i_a, & ev_p )
+        end
+
+        st = @kernel.silo( :stow ).stows_collection_via_path(
+          @argument_box.fetch( :stows_path ),
+          & oes_p ).to_entity_stream
+
+        st.gets  # doesn't matter if there are no entities
+
+        if were_events
+          UNABLE_
+        else
+          __hit_the_system
+        end
       end
 
-    # TODO - away `render_hub_info`, `collection`
+      def __hit_the_system
 
-    def ___WAS_execute
-      @be_verbose and render_hub_info
-      @col = collection
-      @col.expect_collection_exists and with_extant_collection
-    end
+        h = @argument_box.h_
 
-  private
+        _vd = @kernel.silo( :stow ).versioned_directory_via(
+          h.fetch( :directory ),
+          h.fetch( :system_conduit ),
+          & @on_event_selectively )
 
-    def with_extant_collection
-      @count = 0
-      @col.stashes( @be_verbose ).each do |stash|
-        @count += 1
-        emit_payload_line stash.stash_name
+        _vd.to_entity_stream
       end
-      @count.zero? ? none : some
     end
 
-    def none
-      pn = @stashes_path
-      emit_inner_info_string say {
-        "(no stashes found in #{ escape_path pn })"
-      } ; nil
-    end
+    class Actions::List < Action_
 
-    def some
-      true
+      edit_entity_class(
+        :required, :property, :stows_path,
+      )
+
+    def produce_result
+
+      _silo = @kernel.silo( :stow )
+
+      _col = _silo.stows_collection_via_path(
+        @argument_box.fetch( :stows_path ),
+        & @on_event_selectively )
+
+      _col.to_entity_stream
     end
-    end
+  end
 
   class Actions::Pop < Action_
 
@@ -844,8 +356,6 @@ module Skylab::Git
     end
   end
 
-    #  ~ models / agents ~
-
     class Silo_Daemon
 
       def initialize k, _model_class
@@ -857,38 +367,16 @@ module Skylab::Git
         # (we could cache each collection per path, but instead we bind the
         # collection to the event handler, making it a "collection controller")
 
-        Models__::C8n___.new path, @kernel, & oes_p
+        Stow_::Models_::Collection.new path, @kernel, & oes_p
+      end
+
+      def versioned_directory_via d, sc, & oes_p
+
+        Stow_::Models_::Versioned_Directory.__new d, sc, @kernel, & oes_p
       end
     end
 
-    Models__ = ::Module.new
-
-    class Models__::C8n___
-
-      def initialize path, k, & p
-
-        @kernel = k
-        @path = path
-        @on_event_selectively = p
-      end
-
-      def to_any_entity_stream
-
-        _dac =
-        Bz__::Collection_Adapters::Directory_as_Collection.new( @kernel ) do | o |
-
-          o.directory_path = @path
-          o.directory_is_assumed_to_exist = true  # so it whines
-
-          o.filesystem = Home_.lib_.system.filesystem
-          o.flyweight_class = Stow_
-
-          o.on_event_selectively = @on_event_selectively
-        end
-
-        _dac.to_entity_stream_via_model( Stow_, & @on_event_selectively )
-      end
-    end
+    Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
 
     Stow_ = self
 
@@ -922,39 +410,14 @@ module Skylab::Git
         @path = path
         NIL_
       end
-    end
 
-    if false
-    Sub_client__[ self,
-      :as_basic_set,
-        :with_members, %i( hub_pathname stash_name stash_pathname ).freeze,
-        :initialize_basic_set_with_iambic,
-      :color_inquisitor ]
-
-    def ___WAS_initialize client, * x_a
-      initialize_basic_set_with_iambic x_a
-      @quiet_h = { }
-      client_notify client
-      super()
-      freeze
-    end
-
-    attr_reader :stash_name
-
-    def pathname
-      @stash_pathname
-    end
-
-    def stash_expected_to_exist
-      if @stash_pathname.exist? then self else
-        emit_error_string "Stash does not exist: #{ @stash_name }"
+      def get_stow_name
+        ::File.basename @path
       end
     end
 
-    def stash_expected_to_be_writable
-      calculate_writing_validity ? self : false
-    end
-  private
+  class WAS_Stow
+
     def calculate_writing_validity
       if @stash_pathname.exist?
         if (( dir_a = ::Dir[ "#{ @stash_pathname }/*" ] )).length.nonzero?
@@ -971,22 +434,13 @@ module Skylab::Git
     end
   public
 
-    def stat_lines
-      ::Enumerator.new do |y|
-        _p = -> line do
-          y << line
-        end
-        Actors__::Make_stat[ @client, :stash_pn, @stash_pathname, :listener_p, _p ]
-      end
-    end
-
     def patch_lines
       ::Enumerator.new do |y|
         _p = -> line do
           y << line
         end
         is_in_color and _p = Add_colorizer__[ _p ]
-        Actors_::Make_patch[ @client, @stash_pathname, _p ]
+        Actors_::Build_patch[ @client, @stash_pathname, _p ]
       end
     end
 
@@ -1011,7 +465,7 @@ module Skylab::Git
         :stash_pathname, @stash_pathname,
       )
     end
-    end
+  end
 
     Actors__ = ::Module.new
 
@@ -1162,257 +616,9 @@ module Skylab::Git
       stack_a
     end
   end
-
-  class Models__::Collection
-
-    if false
-    Sub_client__[ self,
-      :as_basic_set,
-        :initialize_basic_set_with_iambic,
-        :with_members, %i(
-          channel_string_listener_p hub_pathname stashes_pathname
-        ).freeze ]
-    end
-
-    def initialize client, * x_a
-      initialize_basic_set_with_iambic x_a
-      @cache_h = { }
-      client_notify client
-      super()
-      freeze
-    end
-
-    def expect_collection_exists
-      if (( pn = @stashes_pathname )).exist? then true else
-        emit_inner_error_string say {
-          "stashes directory does not exist: #{ escape_path pn }" }
-        false
-      end
-    end
-
-    def touch_stash_expected_to_be_writable stash_name
-      touch_stash( stash_name ).stash_expected_to_be_writable
-    end
-
-    def touch_stash name_x
-      @cache_h[ name_x ] ||= build_stash name_x
-    end
-    def build_stash name_x
-      Stow_.new( @client,
-        :hub_pathname, @hub_pathname,
-        :stash_name, name_x,
-        :stash_pathname, @stashes_pathname.join( name_x ) )
-    end
-
-    def stashes be_verbose
-      ::Enumerator.new do |y|
-        @stashes_pathname.children( true ).each do |pn|  # or e.g. Errno::ENOENT
-          if pn.directory?
-            y << touch_stash( pn.basename.to_s )
-          elsif be_verbose
-            emit_inner_info_string say {
-              "(not a directory: #{ escape_path pn })" }
-          end ; nil
-        end
-      end
-    end
-  end
-
-  class Actors__::Make_patch
-
-    if false
-    Sub_client__[ self,
-      :file_utils, :cd,
-      :globful_actor,
-      :popener3 ]
-    end
-
-    # class << self
-      # alias_method :call, :[]
-    # end
-
-    def initialize client, stash_pn, listener_p
-      @listener_p = listener_p ; @stash_pn = stash_pn
-      client_notify client
-      super()
-    end
-
-    def execute
-      pn = @stash_pn
-      ::File.directory? pn or raise "not a directory: #{ pn }"
-      i, o, e, w = nil
-      cd pn do
-        i, o, e, w = popen3 'find . -type f'
-        s = e.gets and raise "nope: #{ s }"
-        while (( s = o.gets ))
-          s.chomp!
-          emit_patch s
-        end
-        w.value.exitstatus.zero? or fail "uh-oh: #{ w.value.exitstatus }"
-      end
-      nil
-    end
-  private
-    def emit_patch file_s
-      Actors__::Make_patch_for_file[ @client, file_s, @listener_p ]
-    end
-  end
-
-  class Actors__::Make_patch_for_file
-
-    if false
-    Sub_client__[ self, :emit_payload_line_to_listener, :globful_actor, :popener3 ]
-    end
-
-    def initialize client, file_s, listener_p
-      @file_s = file_s ; @listener_p = listener_p
-      client_notify client
-      super()
-    end
-
-    def execute
-      _i, o, e, _w = popen3 'file', '--brief', @file_s
-      s = e.gets and fail "no: #{ s.inspect }"
-      @s = o.gets ; @s.chop!
-      s_ = o.gets and fail "no: #{ s_.inspect }"
-      if ASCII_RX__ =~ @s
-        money
-      else
-        no
-      end
-    end
-    ASCII_RX__ = /\AASCII\b/
-  private
-    def no
-      @client.emit_inner_error_string "# skipping #{ @file_s }: #{ @s }"
-    end
-    def money
-      line_a = File.read( @file_s ).split "\n", -1
-      emit_payload_line '--- /dev/null'
-      emit_payload_line "+++ #{ @file_s.sub %r(^\.), 'b' }"
-      if '' == line_a.last
-        line_a.pop
-      else
-        # ...
-      end
-      emit_payload_line "@@ -0,0 +1,#{ line_a.length } @@"
-      line_a.each do |line|
-        emit_payload_line "+#{ line }"
-      end ; nil
-    end
-  end
-
-  define_singleton_method :stylize, Home_.lib_.brazen::CLI::Styling::Stylize
-    # ( #posterity for the below ancient lines )
-
-  PATCH_STYLE_P_A__ = [
-    ->(s) { stylize(s, :strong, :red) },
-    ->(s) { s.sub(/(@@[^@]+@@)/) { stylize($1, :cyan) } },
-    ->(s) { stylize(s, :green) },
-    ->(s) { stylize(s, :red) },
-    ->(s) { s }
-  ]
-
-  PATCH_LINE_RX__ = %r{\A
-    (--|\+\+|[^- @+]) |
-    (@)               |
-    (\+)              |
-    (-)               |
-    ( )
-  }x
-
-  PATCH_LINE_TYPE_I_A__ = %i( file_info chunk_numbers add remove context )
-
-  Add_colorizer__ = -> lamb do  # stay ugly for [#bs-010] for now, also at this commit we removed another similar ugly
-    -> line do
-      lamb[ PATCH_STYLE_P_A__[ PATCH_LINE_RX__.match(line).captures.each_with_index.detect{ |s, i| ! s.nil? }[1]][line]]
-    end
-  end
-
-  class Actors__::Make_stat
-
-    if false
-    Sub_client__[ self,
-      :as_basic_set,
-        :with_members, %i( listener_p stash_pn ).freeze,
-        :initialize_basic_set_with_iambic,
-      :color_inquisitor,
-      :emit_payload_line_to_listener,
-      :globful_actor,
-      :say ]
-    end
-
-    def initialize client, * x_a
-      initialize_basic_set_with_iambic x_a
-      client_notify client
-      super()
-    end
-
-    def execute
-      render_file_a build_file_a
-    end
-
-  private
-
-    def build_file_a
-      files = []
-      Actors__::Make_patch.call @client, @stash_pn, -> line do
-        md = PATCH_LINE_RX__.match line
-        type_i = PATCH_LINE_TYPE_I_A__[md.captures.each_with_index.detect{ |s, | ! s.nil? }[1]]
-        case type_i
-        when :file_info
-          if md = /^(?:(---)|(\+\+\+)) (.+)/.match(line)
-            if md[1]
-              '/dev/null' == md[3] or fail("hack failed: #{md[3].inspect}")
-            else
-              md2 = /^b\/(.+)$/.match(md[3]) or fail("hack failed: #{md[3].inspect}")
-              files.push Filecount__.new( md2[1], 0, 0, 0 )
-            end
-          end # else ignored some kinds of fileinfo
-        when :chunk_numbers
-          md = /^@@ -\d+,(\d+) \+\d+,(\d+) @@$/.match(line) or fail("failed to match chunk: #{line.inspect}")
-          files.last.deletions += md[1].to_i
-          files.last.insertions += md[2].to_i
-        when :add, :remove, :context # ignored
-        else fail("unhandled line pattern or type (line type: #{type_i.inspect})")
-        end
-      end
-      files
-    end
-    Filecount__ = Struct.new :name, :insertions, :deletions, :combined
-
-    def render_file_a files
-      name_max = combined_max = 0
-      plusminus_width = 40
-      total_inserts = total_deletes = 0
-      files.each do |f|
-        total_inserts += f.insertions
-        total_deletes += f.deletions
-        f.combined = f.insertions + f.deletions
-        f.name.length > name_max and name_max = f.name.length
-        f.combined > combined_max and combined_max = f.combined
-      end
-      plusminus_width > combined_max and plusminus_width = combined_max # do not scale down with small numbers
-      col2width = combined_max.to_s.length
-      format = "%-#{name_max}s | %#{col2width}s %s"
-      combined_max == 0  and combined_max = 1 # avoid divide by zero, won't matter at this point to change it
-      files.each do |f|
-        num_pluses = (f.insertions.to_f / combined_max * plusminus_width).ceil # have at least 1 plus if nonzero
-        num_minuses = (f.deletions.to_f / combined_max * plusminus_width).ceil
-        pluses =  '+' * num_pluses
-        minuses = '-' * num_minuses
-        if is_in_color
-          pluses = say{ stylize pluses, :green }
-          minuses = say{ stylize minuses, :green }
-        end
-        emit_payload_line format %
-          [ f.name, f.combined, "#{ pluses }#{ minuses }" ]
-      end
-      emit_payload_line "%s files changed, %d insertions(+), %d deletions(-)" %
-        [ files.count, total_inserts, total_deletes ]
-    end
-  end
+# ->
   end
 end
 
-# [#bs-001] 'reaction-to-assembly-language-phase' phase
+# [#bs-001] 'reaction-to-assembly-language-phase' phase :+#tombstone:
+# :+#tombstone: #storypoint-3

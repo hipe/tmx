@@ -8,6 +8,7 @@ module Skylab::Git
 
   class Actions::Spread
 
+    if false  # BEGIN
     def initialize i, o, e
       @y = ::Enumerator::Yielder.new( & e.method( :puts ) )
       @snitch = Support__::Snitch.new @y, self
@@ -536,6 +537,7 @@ module Skylab::Git
         end
       end
     end
+    end  # END
   end
 # ->
   end

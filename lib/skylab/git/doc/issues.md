@@ -1,5 +1,5 @@
 [#011]       #doc-node the git head narrative ..
-[#010]       #doc-point storypoints ..
+[#010]       #doc-point the stow narrative ..
 [#009] #open we have our own s-tylize #in-situ
 [#008]       #done stashe names with spaces duh
 [#007]       #done when you fix DSL, do *not* make it instance exec'y b/c of these

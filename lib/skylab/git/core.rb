@@ -47,8 +47,11 @@ module Skylab::Git
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   DASH_ = '-'.freeze
-  NIL_ = nil
+  EMPTY_P_ = -> { NIL_ }
   Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
+  NIL_ = nil
+  SPACE_ = ' '
+  UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
 
 end

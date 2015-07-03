@@ -15,54 +15,92 @@ module Skylab::Git::TestSupport
         ::File.join Fixture_trees_[], 'stashiz'
       end )
 
+      def no_ent_path_
+        TestSupport_::Data::Universal_Fixtures[ :not_here ]
+      end
+
+      def empty_dir_
+        TestSupport_::Data::Universal_Fixtures[ :empty_esque_directory ]
+      end
+
       def subject_API
         Home_::API
       end
+
+      def mock_system_conduit_where_ chdir, cmd, & three_p
+
+        sy = Mock_System___.new
+        sy._add_entry chdir, cmd, & three_p
+        sy
+      end
     end
+
+    class Mock_System___  # stay close to [#gv-007]
+
+      def initialize
+
+        @_h = {}
+      end
+
+      def popen3 * cmd_s_a, h
+
+        block_given? and raise ::ArgumentError  # no
+
+        _bx = @_h.fetch h.fetch :chdir
+
+        _rslt = _bx.fetch cmd_s_a
+
+        _rslt.produce
+      end
+
+      def _add_entry chdir, cmd_s_a, & three_p
+
+        _bx = @_h.fetch chdir do
+          @_h[ chdir ] = Callback_::Box.new
+        end
+
+        _bx.add cmd_s_a, Mock_Sys_Result___.new( & three_p )
+
+        NIL_
+      end
+    end
+
+    class Mock_Sys_Result___
+
+      def initialize & three_p
+        @_three_p = three_p
+      end
+
+      def produce
+
+        sout_a = [] ; serr_a = []
+        d = @_three_p[ :_nothing_, sout_a, serr_a ]
+
+        sout_st = Callback_::Stream.via_nonsparse_array sout_a
+        serr_st = Callback_::Stream.via_nonsparse_array serr_a
+        thread = Mock_Thread___.new d
+
+        [ :_dont_, sout_st, serr_st, thread ]
+      end
+    end
+
+    class Mock_Thread___
+
+      attr_reader :value
+
+      def initialize d
+        @value = Mock_Thread_Value___.new d
+      end
+    end
+
+    Mock_Thread_Value___ = ::Struct.new :exitstatus
 
     # ~ hook-ins
 
     if false
-    let :_CLI_client do
-      _i, _o, _e = [ nil, * two_spy_group.to_a ]
-      cli = Home_::CLI::Actions::Stash_Untracked::CLI.new _i, _o, _e
-      cli.program_name = WAZZLE
-      cli
-    end
-
-    # ~ test-time environment configuration
-
-    def with_popen3_out_as str  # we used to stub Open3 but it broke and sucked
-      ctx = self
-      _CLI_client.define_singleton_method :popen3_notify do |cmd_s, &p|
-        ctx.last_popen3_command_string = cmd_s
-        p[ nil, Home_::Library_::StringIO.new( str ), ::StringIO.new( '' ) ]
-      end
-    end
-    #
-    attr_accessor :last_popen3_command_string
 
 
     # ~ test-time support
-
-    def cd path, & p
-      Home_::Library_::FileUtils.cd path.to_s, & p
-    end
-
-    def workdir_pn  # #hookout
-      Workdir_pn__[ -> do
-        td = gsu_tmpdir
-        td.exist? or td.prepare
-        td.touch_r 'my-workdir/'
-      end ]
-    end
-
-    Workdir_pn__ = -> do
-      p = -> p_ do
-        x = p_[] ; p = -> _ { x } ; x
-      end
-      -> p_ { p[ p_ ] }
-    end.call
 
     def gsu_tmpdir
       GSU_Tmpdir__[ do_debug ]
@@ -92,14 +130,7 @@ module Skylab::Git::TestSupport
       end
 
     end.call
-
-    def expect_succeeded
-      expect_no_more_lines
-      @result.should eql GSU[]::CLI::SUCCESS_EXITSTATUS
     end
-    end
-
-    # WAZZLE = 'wazzle'.freeze
 
   end
 end

@@ -22,8 +22,7 @@ module Skylab::Git::TestSupport
 
     it "list stows against bad directory (no event until unwind)" do
 
-      call_API :stow, :list, :stashes_path,
-        TestSupport_::Data::Universal_Fixtures[ :not_here ]
+      call_API :stow, :list, :stows_path, no_ent_path_
 
       _st = @result
 
@@ -39,8 +38,7 @@ module Skylab::Git::TestSupport
 
     it "list no stows (empty directory) - vanilla plain (no events)" do
 
-      call_API :stow, :list, :stashes_path,
-        TestSupport_::Data::Universal_Fixtures[ :empty_esque_directory ]
+      call_API :stow, :list, :stows_path, empty_dir_
 
       _st = @result
       _x = _st.gets
@@ -51,7 +49,7 @@ module Skylab::Git::TestSupport
 
     it "list 2 stows" do
 
-      call_API :stow, :list, :stashes_path, stashiz_path_
+      call_API :stow, :list, :stows_path, stashiz_path_
 
       st = @result
       stow = st.gets
