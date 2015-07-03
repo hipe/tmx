@@ -103,23 +103,6 @@ module Skylab::Git::TestSupport
     TS_.dir_pathname.join( 'fixture-trees' ).to_path
   end
 
-  module TestLib_
-
-    if false
-    IO_spy_group = -> do
-      TestSupport_::IO.spy.group
-    end
-
-    Tmpdir = -> do
-      TestSupport_.tmpdir
-    end
-
-    Tmpdir_pathname = Callback_.memoize do
-      Home_.lib.system.filesystem.tmpdir_pathname.join 'gsu-xyzzy'
-    end
-    end
-  end
-
   DASH_ = '-'
   Home_ = ::Skylab::Git
   NIL_ = nil

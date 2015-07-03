@@ -120,6 +120,10 @@ module Skylab::Git
         end
       end
 
+      def to_item_stream
+        _to_item_stream
+      end
+
       def _to_item_stream
 
         item_p = Models_::Item.curry(

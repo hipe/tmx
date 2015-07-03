@@ -2,8 +2,6 @@ module Skylab::Basic
 
   module Tree
 
-    Expression_Adapters__ = ::Module.new
-
     module Expression_Adapters__::Text
 
       Actors = ::Module.new

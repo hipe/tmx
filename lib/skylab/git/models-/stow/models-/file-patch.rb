@@ -191,7 +191,7 @@ module Skylab::Git
 
         def common_init_ path
 
-          @path, s = Path_divmod__[ path ]
+          @path, s = Path_divmod_[ path ]
 
           if s
             ::File.join self.class::LETTER, @path
@@ -221,31 +221,6 @@ module Skylab::Git
           0
         end
       end
-
-      Path_divmod__ = -> do
-
-        # if the path *looks* relative, split it up into a stem and some string
-
-        sep = ::File::SEPARATOR
-        sep_d = sep.getbyte 0
-
-        -> path do
-
-          if sep_d == path.getbyte( 0 )
-
-            [ path ]
-
-          else
-            d = path.index sep
-            if d
-              d_ = d + 1
-              [ path[ d_ .. -1 ], path[ 0, d_ ] ]
-            else
-              [ path, EMPTY_S_ ]
-            end
-          end
-        end
-      end.call
 
       DEV_NULL_ITEM___ = Before___.new '/dev/null'
 

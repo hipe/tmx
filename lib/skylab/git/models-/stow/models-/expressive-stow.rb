@@ -10,6 +10,10 @@ module Skylab::Git
       # delegating to this node the need to carry all the resorces and
       # modality-specific rendering knowledge.
 
+      attr_reader(
+        :resources,
+      )
+
       def initialize * a, & oes_p
 
         @style_x, @stow, system_conduit, filesystem = a
@@ -35,6 +39,10 @@ module Skylab::Git
         to_tree_stat.to_styled_patch_line_stream
       end
 
+      def to_item_stream
+        to_tree_stat.to_item_stream
+      end
+
       def to_tree_stat
 
         Models_::Tree_Stat.new(
@@ -42,6 +50,10 @@ module Skylab::Git
           @resources,
           & @on_event_selectively
         )
+      end
+
+      def path
+        @stow.path
       end
     end
   end

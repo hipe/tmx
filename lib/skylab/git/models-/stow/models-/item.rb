@@ -18,6 +18,10 @@ module Skylab::Git
         private :new
       end  # >>
 
+      attr_reader(
+        :file_relpath,
+      )
+
       def __curry s, o, & oes_p
 
         @on_event_selectively = oes_p
@@ -78,6 +82,10 @@ module Skylab::Git
         if fp
           fp.to_patch_item_stream
         end
+      end
+
+      def get_path
+        ::File.expand_path @file_relpath, @stow_path
       end
     end
   end

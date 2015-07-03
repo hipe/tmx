@@ -321,6 +321,8 @@ module Skylab::Basic
       end
     end
 
+    Autoloader_[ Expression_Adapters__ = ::Module.new ]
+
     Tree_ = self
   end
 end

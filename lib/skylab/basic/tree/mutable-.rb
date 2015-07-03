@@ -19,7 +19,17 @@ module Skylab::Basic
 
       # ~ readers as parent
 
-      def to_classified_stream_for modality_symbol, * x_a
+      def to_classified_stream_for i, * x_a
+
+        _expad( x_a, i )::Actors::Build_classified_stream.call_via_iambic x_a
+      end
+
+      def to_stream_of moda_sym, * x_a
+
+        _expad( x_a, moda_sym )::Actors::Build_stream.call_via_iambic x_a
+      end
+
+      def _expad x_a, modality_symbol  # mutates arg
 
         x_a.push :node, self
 
@@ -28,8 +38,7 @@ module Skylab::Basic
         Tree_::Expression_Adapters__.const_get(
 
           :"#{ s[ 0 ].upcase }#{ s[ 1 .. -1 ] }", false
-
-        )::Actors::Build_classified_stream.call_via_iambic x_a
+        )
       end
 
       def to_classified_stream

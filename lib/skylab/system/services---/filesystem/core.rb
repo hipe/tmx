@@ -71,6 +71,10 @@ module Skylab::System
         ::Dir.mkdir path, * int
       end
 
+      def rmdir path
+        ::Dir.rmdir path
+      end
+
       def mv src, dst, h=nil, & x_p
 
         if x_p

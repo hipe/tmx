@@ -45,7 +45,8 @@ module Skylab::Basic::TestSupport::Tree_TS
       NIL_
     end
 
-    define_method :_paths_via_tree, TS_::Paths_via_tree.to_proc
-
+    def _paths_via_tree tree
+      tree.to_stream_of( :paths ).to_a
+    end
   end
 end

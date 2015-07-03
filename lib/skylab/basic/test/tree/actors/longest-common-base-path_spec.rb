@@ -84,7 +84,9 @@ module Skylab::Basic::TestSupport::Tree_TS
           longest_common_base_path.should eql s_a
       end
 
-      define_method :__paths_via_tree, TS_::Paths_via_tree.to_proc
+      def __paths_via_tree t
+        t.to_stream_of( :paths ).to_a
+      end
 
     end
 

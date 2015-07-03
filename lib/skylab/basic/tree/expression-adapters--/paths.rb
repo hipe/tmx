@@ -1,16 +1,24 @@
-module Skylab::Basic::TestSupport::Tree_TS
+module Skylab::Basic
 
-  # ->
+  module Tree
 
-    module Paths_via_tree
+    module Expression_Adapters__::Paths
 
-      class << self
-        def to_proc
-          PROC___
+      module Actors
+
+        class Build_stream
+
+          Callback_::Actor.call self, :properties,
+            :node
+
+          def execute
+
+            To_path_stream___[ @node ]
+          end
         end
-      end  # >>
+      end
 
-      PROC___ = -> root_node do
+      To_path_stream___ = -> root_node do
 
         sep = root_node.path_separator
 
@@ -78,9 +86,8 @@ module Skylab::Basic::TestSupport::Tree_TS
 
         Callback_.stream do
           p[]
-        end.to_a
+        end
       end
     end
-
-    # <-
+  end
 end

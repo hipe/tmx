@@ -128,10 +128,6 @@ module Skylab::Git
       o
     end
 
-    def pop stash_name
-      invoke_API :pop, @param_h.merge( stash_name: stash_name )
-    end
-
     module Services__
       class Find_Nearest_Hub  # :+[#sy-018] this precededs "tree walker"
         def initialize _
@@ -249,6 +245,45 @@ module Skylab::Git
     CMD__ = 'git ls-files --others --exclude-standard'
   end
 
+    class Actions::Pop < Action_
+
+      edit_entity_class(
+        :required, :property, :filesystem,
+        :required, :property, :system_conduit,
+        :required, :property, :stows_path,
+        :required, :property, :directory,
+        :required, :property, :stow_name,
+      )
+
+      def produce_result
+
+        h = @argument_box.h_
+
+        _col = @kernel.silo( :stow ).stows_collection_via_path(
+          h.fetch( :stows_path ),
+          & @on_event_selectively )
+
+        stow = _col.entity_via_intrinsic_key h.fetch :stow_name
+        if stow
+
+          o = Stow_::Sessions_::Pop.new( & @on_event_selectively )
+
+          _es = Stow_::Models_::Expressive_Stow.new(
+            :no_color,
+            stow,
+            h.fetch( :system_conduit ),
+            h.fetch( :filesystem ),
+            & @on_event_selectively )
+
+          o.expressive_stow = _es
+          o.target_directory = h.fetch :directory
+          o.execute
+        else
+          stow
+        end
+      end
+    end
+
     class Actions::Show < Action_
 
       edit_entity_class(
@@ -328,33 +363,17 @@ module Skylab::Git
         :required, :property, :stows_path,
       )
 
-    def produce_result
+      def produce_result
 
-      _silo = @kernel.silo( :stow )
+        _silo = @kernel.silo( :stow )
 
-      _col = _silo.stows_collection_via_path(
-        @argument_box.fetch( :stows_path ),
-        & @on_event_selectively )
+        _col = _silo.stows_collection_via_path(
+          @argument_box.fetch( :stows_path ),
+          & @on_event_selectively )
 
-      _col.to_entity_stream
+        _col.to_entity_stream
+      end
     end
-  end
-
-  class Actions::Pop < Action_
-
-    PARAMS = %i( be_verbose dry_run stash_name stashes_path )
-
-    def __WAS_execute
-      @stash = collection.touch_stash( @stash_name ).stash_expected_to_exist
-      @stash and with_stash
-    end
-
-  private
-
-    def with_stash
-      @stash.pop_stash @be_verbose, @dry_run
-    end
-  end
 
     class Silo_Daemon
 
@@ -377,6 +396,7 @@ module Skylab::Git
     end
 
     Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
+    Autoloader_[ ( Sessions_ = ::Module.new ), :boxxy ]
 
     Stow_ = self
 
@@ -434,16 +454,6 @@ module Skylab::Git
     end
   public
 
-    def patch_lines
-      ::Enumerator.new do |y|
-        _p = -> line do
-          y << line
-        end
-        is_in_color and _p = Add_colorizer__[ _p ]
-        Actors_::Build_patch[ @client, @stash_pathname, _p ]
-      end
-    end
-
     def stash_file normalized_relative_file_name, is_dry_run
 
       Actors__::Stash_file.with(
@@ -452,17 +462,6 @@ module Skylab::Git
         :is_dry, is_dry_run,
         :quiet_h, @quiet_h,
         :stash_pn, @stash_pathname,
-      )
-    end
-
-    def pop_stash be_verbose, dry_run
-
-      Actors__::Pop_stash.with(
-        :client, @client,
-        :be_verbose, be_verbose,
-        :dry_run, dry_run,
-        :hub_pathname, @hub_pathname,
-        :stash_pathname, @stash_pathname,
       )
     end
   end
@@ -517,106 +516,32 @@ module Skylab::Git
     end
   end
 
-  class Actors__::Pop_stash
+  # ->
 
-    if false
-    Sub_client__[ self,
-      :as_basic_set,
-        :with_members, %i( be_verbose dry_run
-          stash_pathname hub_pathname ).freeze,
-        :initialize_basic_set_with_iambic,
-      :file_utils,
-        :mkdir_p, :move, :rmdir,
-      :globless_actor, :popener3, :shellesc ]
-    end
+    Path_divmod_ = -> do
 
-    def initialize x_a
-      client = x_a.shift
-      initialize_basic_set_with_iambic x_a
-      client_notify client
-      super()
-    end
+      # if the path *looks* relative, split it up into a stem and some string
 
-    def execute
-      @existed_pn_a = nil
-      @move_a = build_move_a
-      if @existed_pn_a
-        files_existed
-      else
-        target_paths_are_available
-      end
-    end
+      sep = ::File::SEPARATOR
+      sep_d = sep.getbyte 0
 
-  private
+      -> path do
 
-    def build_move_a
-      stashed_filenames.map do |fn_s|
-        mov = Move__.new
-        mov.source_pathname = @stash_pathname.join fn_s
-        mov.dest_pathname = @hub_pathname.join fn_s
-        mov.dest_pathname.exist? and
-          (( @existed_pn_a ||= [] )) << mov.dest_pathname
-        mov
-      end
-    end
-    Move__ = ::Struct.new :source_pathname, :dest_pathname
+        if sep_d == path.getbyte( 0 )
 
-    def stashed_filenames
-      ::Enumerator.new do |y|
-        cmd_s = "cd #{ shellesc @stash_pathname }; find . -type f"
-        @be_verbose and emit_info_line "# #{ cmd_s }"
-        _i, o, e, w = popen3 cmd_s
-        s = e.gets and fail "wat: #{ s.inspect }"
-        while (( s = o.gets ))
-          y << DOT_SLASH_RX__.match( s )[ 0 ]
+          [ path ]
+
+        else
+          d = path.index sep
+          if d
+            d_ = d + 1
+            [ path[ d_ .. -1 ], path[ 0, d_ ] ]
+          else
+            [ path, EMPTY_S_ ]
+          end
         end
-       (( es = w.value.exitstatus )).zero? or fail "wat: #{ es }" ; nil
       end
-    end
-    DOT_SLASH_RX__ = %r{ (?<= \A \. / ) .* (?= \n\z ) }x
-
-    def files_existed
-      emit_inner_error_string "destination file(s) exist:"
-      @existed_pn_a.each do |pn|
-        emit_error_line "  #{ pn }"
-      end
-      false
-    end
-
-    def target_paths_are_available
-      opt_h = { noop: @dry_run, verbose: true } # pop is always verbose
-      @move_a.each do |mov|
-        mov.dest_pathname.dirname.directory? or  # (always verbose when pop)
-          mkdir_p mov.dest_pathname.dirname, opt_h
-        move mov.source_pathname, mov.dest_pathname, opt_h
-          # might fail during a dry run (if a dry mkdir_p above)
-      end
-      prune_directories
-    end
-
-    def prune_directories  # depth-first in reverse so we remove child dirs
-      # before the parent dir that contains them
-      stack_a = build_dirs_to_remove_s_stack_a
-      opt_h = { noop: @dry_run, verbose: @be_verbose }
-      while (( s = stack_a.pop ))
-        rmdir s, opt_h
-      end
-      true
-    end
-
-    def build_dirs_to_remove_s_stack_a
-      stack_a = [] ; cmd_s = "find #{ shellesc @stash_pathname } -type d"
-      @be_verbose and emit_info_line "# #{ cmd_s }"
-      _i, o, e, w = popen3 cmd_s
-      s = e.gets and fail "wat: #{ s.inspect }"
-      while (( s = o.gets ))  # depth-first
-        stack_a << s.strip!
-      end
-      (( es = w.value.exitstatus )).zero? or raise "no: #{ es.inspect }"
-      stack_a
-    end
-  end
-# ->
+    end.call
   end
 end
 

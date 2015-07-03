@@ -33,6 +33,38 @@ module Skylab::Git::TestSupport
         sy._add_entry chdir, cmd, & three_p
         sy
       end
+
+      define_method :memoized_tmpdir_, -> do
+
+        td = nil  # :+#nasty_OCD_memoize
+
+        -> do
+
+          if td
+
+            yes = do_debug
+            yes_ = td.be_verbose
+
+            if yes
+              if ! yes_
+                td = td.new_with :debug_IO, debug_IO, :be_verbose, true
+              end
+            elsif yes_ && ! yes
+              td = td.new_with :be_verbose, false
+            end
+          else
+
+            _path = Home_.lib_.system.filesystem.tmpdir_pathname.join 'gi-xyzzy'
+
+            td = TestSupport_.tmpdir.new_with(
+              :path, _path,
+              :be_verbose, do_debug,
+              :debug_IO, debug_IO )
+          end
+
+          td
+        end
+      end.call
     end
 
     class Mock_System___  # stay close to [#gv-007]
