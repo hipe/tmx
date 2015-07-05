@@ -6,17 +6,23 @@ module Skylab::Git
 
       # model any one directory within a versioned project
 
-      class << self
-        alias_method :__new, :new
-        private :new
-      end
+      attr_reader(
+        :current_relpath,
+        :project_path,
+      )
 
-      def initialize dir, sc, k, & oes_p
+      def initialize current_relpath, project_dir, sc, & oes_p
 
-        @directory = dir
-        @_sc = sc
-        @_k = k
+        if DOT_ == current_relpath
+          @current_relpath = nil
+        else
+          current_relpath.length.nonzero? or raise ::ArgumentError
+          @current_relpath = current_relpath
+        end
+
         @on_event_selectively = oes_p
+        @project_path = project_dir
+        @_sc = sc
       end
 
       def to_entity_stream
@@ -25,7 +31,7 @@ module Skylab::Git
 
         __maybe_say_command cmd
 
-        _, o, e, w = @_sc.popen3( * cmd, chdir: @directory )
+        _, o, e, w = @_sc.popen3( * cmd, chdir: __chdir_directory )
 
         p = -> do
 
@@ -57,12 +63,31 @@ module Skylab::Git
           end
         end
 
-        Callback_.stream do
+        st = Callback_.stream do
           p[]
         end
+
+        if @current_relpath
+
+          path = @current_relpath
+          st = st.map_by do | entry_s |
+            ::File.join path, entry_s
+          end
+        end
+
+        st
       end
 
       COMMAND___ = %w( git ls-files --others --exclude-standard ).freeze
+
+      def __chdir_directory
+
+        if @current_relpath
+          ::File.join @project_path, @current_relpath
+        else
+          @project_path
+        end
+      end
 
       def __maybe_say_command cmd
 
@@ -73,7 +98,6 @@ module Skylab::Git
         end
         NIL_
       end
-
     end
   end
 end

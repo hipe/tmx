@@ -128,40 +128,7 @@ module Skylab::Git
       o
     end
 
-    module Services__
-      class Find_Nearest_Hub  # :+[#sy-018] this precededs "tree walker"
-        def initialize _
-        end
-        def call
-          max_dirs = HARDCODED_MAX_DIRS__
-          num_dirs_looked = 0
-          pn = pwd_pn = ::Pathname.pwd
-          while true
-            max_dirs && num_dirs_looked >= max_dirs and break
-            num_dirs_looked += 1
-            (( pn_ = pn.join RELPATH__ )).exist? and break(( found_pn = pn ))
-            parent_pn = pn.parent
-            parent_pn == pn and break
-            pn = parent_pn
-          end
-          if found_pn
-            _relpath = pn_.relative_path_from pwd_pn
-            hub = Hub_.new
-            hub.hub_pathname = found_pn
-            hub.stashes_pathname = _relpath
-            hub
-          else
-            yield Not_Found__[ RELPATH__, pwd_pn, num_dirs_looked ]
-          end
-        end
-        HARDCODED_MAX_DIRS__ = 5
-        RELPATH__ = '../Stashes'.freeze
-        Not_Found__ = ::Struct.new :relpath, :pwd, :d
-      end
-    end
   end
-  Hub_ = ::Struct.new :hub_pathname, :stashes_pathname
-
   end  # END OFF ))
 
     Bz__ = Home_.lib_.brazen
@@ -170,6 +137,7 @@ module Skylab::Git
 
       Bz__::Model::Entity.call self
 
+      # will re-open!
     end
 
     Actions = ::Module.new
@@ -203,47 +171,37 @@ module Skylab::Git
       end
     end
 
-  class Actions::Save < Action_
+    class Actions::Save < Action_
 
-    # Sub_client__[ self, :popener3 ]
+      edit_entity_class(
+        :required, :property, :filesystem,
+        :required, :property, :system_conduit,
+        :required, :property, :stows_path,
+        :required, :property, :project_path,
+        :required, :property, :current_relpath,
+        :required, :property, :stow_name,
+      )
 
-    PARAMS = %i( be_verbose dry_run stash_name stashes_path )
+      def produce_result
 
-    def ___WAS_execute
-      @be_verbose and render_hub_info
-      begin
-        stash = collection.touch_stash_expected_to_be_writable @stash_name
-        stash or break( r = stash )
-        yes = false
-        normalized_relative_others.each do |file_name|
-          stash.stash_file file_name, @dry_run
-          yes = true
-        end
-        yes or emit_inner_info_string "found no files to stash."
-        r = true
-      end while nil
-      r
-    end
+        _init_stows_collection
+        _ok = _resolve_versioned_directory
+        _ok && __money
+      end
 
-    def normalized_relative_others
-      cmd_s = CMD__
-      ::Enumerator.new do |y|
-        emit_info_line "# #{ cmd_s }"
-        popen3 cmd_s do |_, sout, serr|
-          loop do
-            s = serr.read
-            s.length.zero? or
-              break emit_inner_error_string "unexpected errput: #{ s }"
-            s = sout.gets
-            s or break
-            y << s.strip
-          end
-        end
+      def __money
+
+        h = @argument_box.h_
+
+        o = Stow_::Sessions_::Save.new( & @on_event_selectively )
+        o.versioned_directory = @_versioned_directory
+        o.stow_name = h.fetch :stow_name
+        o.stows_collection = @_stows_collection
+        o.system_conduit = h.fetch :system_conduit
+        o.filesystem = h.fetch :filesystem
+        o.execute
       end
     end
-
-    CMD__ = 'git ls-files --others --exclude-standard'
-  end
 
     class Actions::Pop < Action_
 
@@ -251,36 +209,25 @@ module Skylab::Git
         :required, :property, :filesystem,
         :required, :property, :system_conduit,
         :required, :property, :stows_path,
-        :required, :property, :directory,
+        :required, :property, :project_path,
+        :required, :property, :current_relpath,
         :required, :property, :stow_name,
       )
 
       def produce_result
 
-        h = @argument_box.h_
+        ok = __resolve_expressive_stow :no_color
+        ok &&= _resolve_versioned_directory
+        ok && __money
+      end
 
-        _col = @kernel.silo( :stow ).stows_collection_via_path(
-          h.fetch( :stows_path ),
-          & @on_event_selectively )
+      def __money
 
-        stow = _col.entity_via_intrinsic_key h.fetch :stow_name
-        if stow
-
-          o = Stow_::Sessions_::Pop.new( & @on_event_selectively )
-
-          _es = Stow_::Models_::Expressive_Stow.new(
-            :no_color,
-            stow,
-            h.fetch( :system_conduit ),
-            h.fetch( :filesystem ),
-            & @on_event_selectively )
-
-          o.expressive_stow = _es
-          o.target_directory = h.fetch :directory
-          o.execute
-        else
-          stow
-        end
+        o = Stow_::Sessions_::Pop.new( & @on_event_selectively )
+        o.expressive_stow = @_expressive_stow
+        o.filesystem = @argument_box.h_.fetch :filesystem
+        o.project_path = @_versioned_directory.project_path
+        o.execute
       end
     end
 
@@ -295,23 +242,7 @@ module Skylab::Git
 
       def produce_result
 
-        h = @argument_box.h_
-
-        _col = @kernel.silo( :stow ).stows_collection_via_path(
-          h.fetch( :stows_path ),
-          & @on_event_selectively )
-
-        stow = _col.entity_via_intrinsic_key h.fetch :stow_name
-        if stow
-          Stow_::Models_::Expressive_Stow.new(
-            :yes_color,
-            stow,
-            h.fetch( :system_conduit ),
-            h.fetch( :filesystem ),
-            & @on_event_selectively )
-        else
-          stow
-        end
+        _build_expressive_stow :yes_colo
       end
     end
 
@@ -319,59 +250,116 @@ module Skylab::Git
 
       edit_entity_class(
         :required, :property, :system_conduit,
-        :required, :property, :stows_path,
-        :required, :property, :directory,
+        :required, :property, :project_path,
+        :required, :property, :current_relpath,
       )
 
       def produce_result
 
-        were_events = false
-        oes_p = -> * i_a, & ev_p do
-          were_events = true
-          @on_event_selectively.call( * i_a, & ev_p )
-        end
-
-        st = @kernel.silo( :stow ).stows_collection_via_path(
-          @argument_box.fetch( :stows_path ),
-          & oes_p ).to_entity_stream
-
-        st.gets  # doesn't matter if there are no entities
-
-        if were_events
-          UNABLE_
-        else
-          __hit_the_system
-        end
-      end
-
-      def __hit_the_system
-
-        h = @argument_box.h_
-
-        _vd = @kernel.silo( :stow ).versioned_directory_via(
-          h.fetch( :directory ),
-          h.fetch( :system_conduit ),
-          & @on_event_selectively )
-
-        _vd.to_entity_stream
+        ok = _resolve_versioned_directory
+        ok && @_versioned_directory.to_entity_stream
       end
     end
 
     class Actions::List < Action_
 
       edit_entity_class(
+        :required, :property, :filesystem,
         :required, :property, :stows_path,
       )
 
       def produce_result
 
-        _silo = @kernel.silo( :stow )
+        _new_stows_collection.to_entity_stream
+      end
+    end
 
-        _col = _silo.stows_collection_via_path(
-          @argument_box.fetch( :stows_path ),
+    class Action_  # re-open
+
+      def __resolve_expressive_stow style_x
+
+        es = _build_expressive_stow style_x
+        if es
+          @_expressive_stow = es
+          ACHIEVED_
+        else
+          es
+        end
+      end
+
+      def _build_expressive_stow style_x
+
+        _ok = _resolve_stow
+        _ok and __via_etc_build_ES style_x
+      end
+
+      def __via_etc_build_ES yes_or_no_color
+
+        h = @argument_box.h_
+
+        _rsc = Resources___.new(
+          h.fetch( :system_conduit ),
+          h.fetch( :filesystem ),
+        )
+
+        Stow_::Models_::Expressive_Stow.new(
+          :yes_or_no_color,
+          @_stow,
+          _rsc,
           & @on_event_selectively )
+      end
 
-        _col.to_entity_stream
+      Resources___ = ::Struct.new :system_conduit, :filesystem
+
+      def _resolve_stow
+
+        stow = _produce_stow
+        if stow
+          @_stow = stow
+          ACHIEVED_
+        else
+          stow
+        end
+      end
+
+      def _produce_stow
+
+        @_stows_collection ||= _new_stows_collection
+
+        @_stows_collection.entity_via_intrinsic_key(
+          @argument_box.h_.fetch :stow_name )
+      end
+
+      def _init_stows_collection & oes_p
+
+        @_stows_collection = _new_stows_collection( & oes_p )
+        NIL_
+      end
+
+      def _new_stows_collection & oes_p
+
+        oes_p ||= @on_event_selectively
+
+        h = @argument_box.h_
+        @kernel.silo( :stow ).stows_collection_via(
+          h.fetch( :stows_path ),
+          h.fetch( :filesystem ),
+          & oes_p )
+      end
+
+      def _resolve_versioned_directory
+
+        h = @argument_box.h_
+
+        @_versioned_directory = Stow_::Models_::Versioned_Directory.new(
+
+          h.fetch( :current_relpath ),
+          h.fetch( :project_path ),
+          h.fetch( :system_conduit ),
+          & @on_event_selectively
+        )
+
+        ACHIEVED_
       end
     end
 
@@ -381,17 +369,12 @@ module Skylab::Git
         @kernel = k
       end
 
-      def stows_collection_via_path path, & oes_p  # like `entity_via_intrinsic_key`
+      def stows_collection_via path, fs, & oes_p  # like `entity_via_intrinsic_key`
 
         # (we could cache each collection per path, but instead we bind the
         # collection to the event handler, making it a "collection controller")
 
-        Stow_::Models_::Collection.new path, @kernel, & oes_p
-      end
-
-      def versioned_directory_via d, sc, & oes_p
-
-        Stow_::Models_::Versioned_Directory.__new d, sc, @kernel, & oes_p
+        Stow_::Models_::Collection.new path, fs, @kernel, & oes_p
       end
     end
 
@@ -413,11 +396,17 @@ module Skylab::Git
           o.__init_as_flyweight
           o
         end
+
+        def new_via_path path
+          o = new :_no_kernel_
+          o.reinitialize_via_path_for_directory_as_collection path
+          o
+        end
       end
 
       def initialize k, & oes_p
 
-        # NOTE might be a an entity, might be a UI node!
+        # NOTE might be an entity, might be a UI node!
         @kernel = k
         @on_event_selectively = oes_p
       end
@@ -431,117 +420,20 @@ module Skylab::Git
         NIL_
       end
 
+      def description_under expag
+
+        path = @path
+
+        expag.calculate do
+
+          "stow #{ val ::File.basename path }"
+        end
+      end
+
       def get_stow_name
         ::File.basename @path
       end
     end
-
-  class WAS_Stow
-
-    def calculate_writing_validity
-      if @stash_pathname.exist?
-        if (( dir_a = ::Dir[ "#{ @stash_pathname }/*" ] )).length.nonzero?
-          emit_inner_error_string "destination dir must be empty #{
-            }(\"stash\" already exists?). found files:\n#{ dir_a * "\n" }"
-        else
-          true  # empty dirs are valid for writing
-        end
-      elsif (( dir_pn = @stash_pathname.dirname )).exist?  # parent path must
-        true  # exist. the child dir needs to be made, but not yet
-      else
-        emit_inner_error_string "stashes directory must exist: #{ dir_pn }"
-      end
-    end
-  public
-
-    def stash_file normalized_relative_file_name, is_dry_run
-
-      Actors__::Stash_file.with(
-        :client, @client,
-        :filename_s, normalized_relative_file_name,
-        :is_dry, is_dry_run,
-        :quiet_h, @quiet_h,
-        :stash_pn, @stash_pathname,
-      )
-    end
-  end
-
-    Actors__ = ::Module.new
-
-  class Actors__::Stash_file
-
-    if false
-    Sub_client__[ self,
-      :as_basic_set,
-        :initialize_basic_set_with_iambic,
-        :with_members, %i( filename_s is_dry quiet_h stash_pn ).freeze,
-      :emitters,
-      :globless_actor,
-      :file_utils, :mkdir_p, :move
-    ]
-    end
-
-    def initialize x_a
-      client = x_a.shift
-      initialize_basic_set_with_iambic x_a
-      client_notify client
-      super()
-    end
-
-    def execute
-      @dest_pn = @stash_pn.join @filename_s
-      if @dest_pn.exist?
-        when_exist
-      else
-        when_not_exist
-      end
-    end
-  private
-    def when_exist
-      emit_inner_error_string "destination file already existed in stash #{
-        }location - #{ dest_pn }"
-    end
-    def when_not_exist
-      @dn_pn = @dest_pn.dirname
-      @dn_pn.exist? or quietly_mkdir_p
-      r = move @filename_s, @dest_pn.to_s, verbose: true, noop: @is_dry
-      r
-    end
-    def quietly_mkdir_p
-      key_s = @dn_pn.to_s
-      @quiet_h.fetch key_s do
-        mkdir_p key_s, verbose: true, noop: @is_dry
-        @quiet_h[ key_s ] = true
-      end  ; nil
-    end
-  end
-
-  # ->
-
-    Path_divmod_ = -> do
-
-      # if the path *looks* relative, split it up into a stem and some string
-
-      sep = ::File::SEPARATOR
-      sep_d = sep.getbyte 0
-
-      -> path do
-
-        if sep_d == path.getbyte( 0 )
-
-          [ path ]
-
-        else
-          d = path.index sep
-          if d
-            d_ = d + 1
-            [ path[ d_ .. -1 ], path[ 0, d_ ] ]
-          else
-            [ path, EMPTY_S_ ]
-          end
-        end
-      end
-    end.call
   end
 end
 

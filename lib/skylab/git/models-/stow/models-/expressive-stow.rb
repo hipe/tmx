@@ -10,16 +10,12 @@ module Skylab::Git
       # delegating to this node the need to carry all the resorces and
       # modality-specific rendering knowledge.
 
-      attr_reader(
-        :resources,
-      )
+      def initialize style_x, stow, rsc, & oes_p
 
-      def initialize * a, & oes_p
-
-        @style_x, @stow, system_conduit, filesystem = a
-
-        @resources = Resources___.new system_conduit, filesystem
         @on_event_selectively = oes_p
+        @resources = rsc
+        @style_x = style_x
+        @stow = stow
       end
 
       Resources___ = ::Struct.new :system_conduit, :filesystem

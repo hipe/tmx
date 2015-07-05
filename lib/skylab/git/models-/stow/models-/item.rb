@@ -83,10 +83,6 @@ module Skylab::Git
           fp.to_patch_item_stream
         end
       end
-
-      def get_path
-        ::File.expand_path @file_relpath, @stow_path
-      end
     end
   end
 end

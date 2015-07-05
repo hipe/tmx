@@ -8,9 +8,9 @@ module Skylab::Git
       # like a commit in a project, one that can be displayed in a manner
       # similar to the output of `git show --stat`
 
-      def initialize s, o, & oes_p
+      def initialize s, rsc, & oes_p
 
-        @resources = o
+        @resources = rsc
         @stow_path = s
         @on_event_selectively = oes_p
       end

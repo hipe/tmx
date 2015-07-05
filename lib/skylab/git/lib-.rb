@@ -31,6 +31,8 @@ module Skylab::Git
       System[].filesystem.file_utils_controller
     end
 
+    Git_viz = sidesys[ :GitViz ]
+
     Open_3 = stdlib[ :Open3 ]
 
     Plugin = sidesys[ :Plugin ]

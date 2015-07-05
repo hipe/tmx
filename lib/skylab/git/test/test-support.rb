@@ -104,7 +104,9 @@ module Skylab::Git::TestSupport
   end
 
   DASH_ = '-'
+  DOT_ = '.'
   Home_ = ::Skylab::Git
+  NEWLINE_ = "\n"
   NIL_ = nil
   UNDERSCORE_ = '_'
 end

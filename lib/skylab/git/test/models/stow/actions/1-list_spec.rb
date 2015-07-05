@@ -20,9 +20,9 @@ module Skylab::Git::TestSupport
       @result.should eql :pingback_from_API
     end
 
-    it "list stows against bad directory (no event until unwind)" do
+    it "list stows against bad directory" do
 
-      call_API :stow, :list, :stows_path, no_ent_path_
+      _against no_ent_path_
 
       _st = @result
 
@@ -38,7 +38,7 @@ module Skylab::Git::TestSupport
 
     it "list no stows (empty directory) - vanilla plain (no events)" do
 
-      call_API :stow, :list, :stows_path, empty_dir_
+      _against empty_dir_
 
       _st = @result
       _x = _st.gets
@@ -49,7 +49,7 @@ module Skylab::Git::TestSupport
 
     it "list 2 stows" do
 
-      call_API :stow, :list, :stows_path, stashiz_path_
+      _against stashiz_path_
 
       st = @result
       stow = st.gets
@@ -64,6 +64,15 @@ module Skylab::Git::TestSupport
 
       st.gets.should be_nil
       expect_no_events
+    end
+
+    def _against path
+
+      call_API( :stow, :list,
+        :stows_path, path,
+        :filesystem, real_filesystem_,  # glob, directory?
+      )
+      NIL_
     end
   end
 end

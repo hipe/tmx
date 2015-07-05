@@ -10,6 +10,13 @@ module Skylab::Git::TestSupport
 
     module Instance_Methods___
 
+      define_method :git_ls_files_others_, ( -> do
+        a = %w( git ls-files --others --exclude-standard )
+        -> do
+          a
+        end
+      end ).call
+
       define_method :stashiz_path_, ( Callback_.memoize do
 
         ::File.join Fixture_trees_[], 'stashiz'
@@ -54,7 +61,7 @@ module Skylab::Git::TestSupport
             end
           else
 
-            _path = Home_.lib_.system.filesystem.tmpdir_pathname.join 'gi-xyzzy'
+            _path = real_filesystem_.tmpdir_pathname.join 'gi-xyzzy'
 
             td = TestSupport_.tmpdir.new_with(
               :path, _path,
@@ -65,6 +72,24 @@ module Skylab::Git::TestSupport
           td
         end
       end.call
+
+      def real_filesystem_
+        Home_.lib_.system.filesystem
+      end
+
+      def real_system_conduit_
+        Home_.lib_.open_3
+      end
+
+      def dirs_in_ path
+        Callback_::Stream.via_nonsparse_array(
+          `cd #{ path } && find . -type d -mindepth 1`.split NEWLINE_ )
+      end
+
+      def files_in_ path
+        Callback_::Stream.via_nonsparse_array(
+          `cd #{ path } && find . -type f`.split NEWLINE_ )
+      end
     end
 
     class Mock_System___  # stay close to [#gv-007]

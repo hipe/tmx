@@ -9,44 +9,51 @@ module Skylab::Git::TestSupport
 
     it "status - dir not found" do
 
-      _status_against no_ent_path_
-      expect_not_OK_event :errno_enoent  #  same as in suite 1
-      expect_failed
+      _path = no_ent_path_
+      _sc = real_system_conduit_
+
+      begin
+        call_API( :stow, :status,
+          :current_relpath, 'xyz1',
+          :project_path, _path,
+          :system_conduit, _sc,
+        )
+      rescue ::Errno::ENOENT => e
+      end
+
+      e.message.should match %r(\ANo such file or dir)
     end
 
     it "status - dir not dir" do
 
-      _status_against TestSupport_::Data::Universal_Fixtures[ :one_line ]
-      _ev =  expect_not_OK_event :wrong_ftype
+      _path = TestSupport_::Data::Universal_Fixtures[ :one_line ]
+      _sc = real_system_conduit_
 
-      black_and_white( _ev ).should match(
-        /\A«[^»]+» exists but is not a directory, it is a file\z/ )
+      begin
+        call_API( :stow, :status,
+          :current_relpath, 'xyz2',
+          :project_path, _path,
+          :system_conduit, _sc,
+        )
+      rescue ::Errno::ENOTDIR => e
+      end
 
-      expect_failed
-    end
-
-    def _status_against path
-
-      call_API :stow, :status,
-        :directory, :_trueish_,
-        :stows_path, path,
-        :system_conduit, :_trueish_
-
-      NIL_
+      e.message.should match %r(\ANot a directory )
     end
 
     it "status - OK - OK" do
 
-      call_API :stow, :status,
-        :directory, :_papadopoulis_,
-        :stows_path, stashiz_path_,
-        :system_conduit, __this_mock_system_conduit
+      call_API( :stow, :status,
+        :current_relpath, 'diffy',
+        :project_path, '/wiffy',
+        :system_conduit, __this_mock_system_conduit,
+      )
 
       expect_neutral_event :command, /\Acommand: git ls-files /
 
       st = @result
-      st.gets.should eql "derpus"
-      st.gets.should eql "nerpus/herpus"
+      st.gets.should eql "diffy/derpus"
+      st.gets.should eql "diffy/nerpus/herpus"
       st.gets.should be_nil
 
       expect_no_more_events
@@ -55,9 +62,12 @@ module Skylab::Git::TestSupport
     def __this_mock_system_conduit
 
       mock_system_conduit_where_(
-        :_papadopoulis_,
-        %w(  git ls-files --others --exclude-standard ),
+
+        '/wiffy/diffy',
+        git_ls_files_others_,
+
       ) do | i, o, e |
+
         o << "derpus\n"
         o << "nerpus/herpus\n"
         0
@@ -115,7 +125,7 @@ module Skylab::Git::TestSupport
     def _same_API_call
 
       call_API :stow, :show,
-        :filesystem, ::File,
+        :filesystem, real_filesystem_,  # glob
         :system_conduit, Home_.lib_.open_3,  # using the real one is OK here:
           # we do a `find` command inside a fixture tree, and ..
 

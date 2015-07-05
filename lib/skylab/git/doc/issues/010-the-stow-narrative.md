@@ -1,48 +1,49 @@
 # the stow narative :[#010]
 
-## contemporary purpose
+## introduction & intended value
 
-the original use case of this application (node) has been obviated, however
-it has not outlived its utility:
+when we first wrote this utilty, `git-stash` didn't have the
+`--include-untracked` option. from a purely funtional standpoint, the
+use of that option is similar enough to the "value proposition" of this
+whole utility to such an extent that it makes this whole utility seem
+entirely obviated.
 
-we developed this before we had a sufficiently deep appreciation for git's
-usefulness to manage works in progress with branches. back then, a common
-experience was to end up with multiple files that were not yet versioned.
+however, A) over time, the deeper value to this utility would emerge as
+a well-rounded canary application; big enough to do lots of differnt
+important kinds of stuff, but not so big that it is heavy. (we explore
+this in the next section).
 
-the original problem this tried to solve was that we didn't like the feeling
-of adding to our SCM "history" certain kinds of files: files in a half-
-finished state, scratch-type files, one-off files, data files that only had
-development utility for e.g.
+and B), we still can't shake the OCD feeling that when faced with a
+bunch of unversioned files (perhaps in a structure that is itself not
+yet versioend); there are or will be times when we would rather just
+move the files over (structure intact) to a directory outside of the
+project, and later just move them back, without having to worry about
+our history graph and any merge conflicts.
 
-to ameliorate this perceived problem we conceived that it would be useful to
-have a 'git-stash'-like utility for unversioned files that operated simply by
-moving the files over to a sister directory tree with the same structure (that
-is, the "stash" directory tree would have a subset of the structure of your
-project tree).
 
-however the current thinking has become that the advantages of using git
-branches for this outweighs any disadvantges when compared to using something
-like the subject.
+## actual value
 
-to the main point here, the reason we keep this 'stash-untracked' node around
-rather than relegating it to SCM history is because it has a new
-"value proposition" now:
+what this utility has is a set of skills that makes it a dream for
+testing frameworks and testing facilities (i.e meta-testing): it
+implementation surface area is near perfect in that it touches a lot of
+different kinds of mechanisms used by bigger applications without being
+a bigger application itself:
 
-this application node has a set of behaviors and "skills" that make it
-attractive to stand as a model medium-sized general purpose utility:
+  • it does or will integrate with a [#hl-069] "tall stack of turtles".
 
- • it integrates with a tall stack of [#hl-069] "turtles".
+  • it does or will have a non-trivial modality-specific implementation
+    ("client") that talks to a modality-non-specific "reactive model"
+    backend ("server"). indeed, at writing there are still some
+    outstanding design issues in regards to this (near colorization
+    of tree-stats, etc).
 
- • it has multiple client layers that interface with each other (CLI and API).
+   • it implements a trivial but custom collection (grafted on top of the
+     filesystem).
 
- • it has a mostly standalone implementation for CRUD, for its "business
-   entities": list, add, remove etc.
+   • what it does along CRUD is representative of most of our applications.
 
- • it implements a trivial but custom collection (grafted on top of the
-   filesystem).
-
- • it interfaces with an external service (namely 'git') - one that relies
-   on underlying system interaction - to a somewhat non-trivial degree.
+   • it interfaces with an external service (git), for which we must
+     interact with a system in a somewhat non-trivial manner.
 
 the above points cover a broad scope of the domain responsibilities of the
 libraries, yet this application covers all of them without incurring a large

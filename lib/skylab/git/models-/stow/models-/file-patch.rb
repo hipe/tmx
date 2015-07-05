@@ -191,7 +191,7 @@ module Skylab::Git
 
         def common_init_ path
 
-          @path, s = Path_divmod_[ path ]
+          @path, s = Path_divmod___[ path ]
 
           if s
             ::File.join self.class::LETTER, @path
@@ -200,6 +200,31 @@ module Skylab::Git
           end
         end
       end
+
+      Path_divmod___ = -> do
+
+        # if the path *looks* relative, split it up into a stem and some string
+
+        sep = ::File::SEPARATOR
+        sep_d = sep.getbyte 0
+
+        -> path do
+
+          if sep_d == path.getbyte( 0 )
+
+            [ path ]
+
+          else
+            d = path.index sep
+            if d
+              d_ = d + 1
+              [ path[ d_ .. -1 ], path[ 0, d_ ] ]
+            else
+              [ path, EMPTY_S_ ]
+            end
+          end
+        end
+      end.call
 
       class Chunk_Header___ < Item__
 
