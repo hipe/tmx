@@ -39,7 +39,7 @@ module Skylab::Brazen
         @app_kernel = ak
         @_env = nil
         @mod = ak.module
-        @resources = Resources__.new a, @mod
+        @resources ||= Resources.new a, @mod
         # (abstract base class "invocation" has no initialize method)
       end
 
@@ -1813,7 +1813,7 @@ module Skylab::Brazen
       def prop ; @prop_p[] end
     end
 
-    class Resources__
+    class Resources
 
       def initialize a, mod
 
@@ -2005,13 +2005,8 @@ module Skylab::Brazen
 
           # exclude this formal property from the front. default the back to CWD
 
-          mutable_front_properties.remove :workspace_path
-
-          mutable_back_properties.replace_by :workspace_path do | prp |
-
-            prp.new_with_default do
-              present_working_directory
-            end.freeze
+          substitute_value_for_argument :workspace_path do
+            present_working_directory
           end
           NIL_
         end
@@ -2057,32 +2052,45 @@ module Skylab::Brazen
 
         if @back_properties
 
-          cls = self.class
-          if cls.const_defined? :MUTATE_THESE_PROPERTIES
-            sym_a = cls::MUTATE_THESE_PROPERTIES
-          else
-            raise __say_no_const( cls, :MUTATE_THESE_PROPERTIES )
-          end
-
           @_env = nil
-          if sym_a
-
-            bp = @back_properties
-            sym_a.each do | sym |
-              if bp.has_name sym
-                send :"mutate__#{ sym }__properties"
-              end
-            end
-          end
+          mutate_properties  # if ever is needed, this might become unconditional
         end
 
         @front_properties ||= @back_properties
 
-        nil
+        NIL_
       end
 
-      def __say_no_const mod, const
-        "what you have here is an uninitialized constant: #{ mod }::#{ const }"
+      def mutate_properties
+
+        sym_a = self.class::MUTATE_THESE_PROPERTIES
+        if sym_a
+          mutate_these_properties sym_a
+        end
+        NIL_
+      end
+
+      def mutate_these_properties sym_a
+
+        bp = @back_properties
+
+        sym_a.each do | sym |
+          if bp.has_name sym
+            send :"mutate__#{ sym }__properties"
+          end
+        end
+        NIL_
+      end
+
+      def substitute_value_for_argument sym, & p
+
+        mutable_front_properties.remove sym
+
+        mutable_back_properties.replace_by sym do | prp |
+
+          prp.new_with_default( & p ).freeze
+        end
+        NIL_
       end
 
       def mutable_front_properties

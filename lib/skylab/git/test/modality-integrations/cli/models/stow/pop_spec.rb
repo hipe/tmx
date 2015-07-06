@@ -1,0 +1,90 @@
+require_relative '../../../../test-support'
+
+module Skylab::Git::TestSupport
+
+  describe "[gi] mode integrations - CLI - models - stow - pop" do
+
+    extend TS_
+    use :modality_integrations_CLI_support
+
+    # expect ERR_I, /\A\(while listing stash.+no stashes found in /
+
+    it "try to pop from within unversioned directory (SEE HERE ON FAILURE)" do
+
+      # NOTE this tests relies on there appearing to be a filesystem with
+      # an *existent* directory from which between it and the filesystem
+      # root (it included) there is never a `.git` directory found.
+      #
+      # if we were after rotund robustness we would mock the filesystem but
+      # we are not yet. in lieu of this:
+      #
+      # currently,  we *assume* that whatever tmpdir we are using, it will
+      # NOT itself "look" versioned, NOR exist under a versioned directory.
+      # although this assumption seems reasonable, it is by no means
+      # guaranteed to be valid assumption on all systems.
+
+      _path = memoized_tmpdir_.path
+
+      cd_ _path do
+        invoke 'stow', 'pop', 'no-see-stow'
+      end
+
+      expect :e, /\Adidn't find '.git' entry in this or any parent\b/
+
+      _expect_common_failure
+    end
+
+    it "for a project SUB-dir, pop a strange stow" do
+
+      _path = ::File.join Fixture_tree_[ :filesystem_1 ], 'proggie'
+
+      cd_ _path do
+
+        invoke 'stow', 'pop', 'wazoozle'
+      end
+
+      expect :e, %r(\Acouldn't pop git stow because #{
+        }stows collection at \.\./Stows does not have stow "wazoozle"\z)
+
+      _expect_common_failure
+    end
+
+    it "succeed in poppping a stow (verbose when option)" do
+
+      tmpdir_path = __setup
+
+      _path = ::File.join tmpdir_path, 'projo'
+
+      cd_ _path do
+        invoke 'stow', 'pop', 'stow-1'
+      end
+
+      expect :e, %r(\Amkdir [^ ]+/zerf\b)
+      expect :e, "mv ../Stows/stow-1/zerf/ziff.txt ./zerf/ziff.txt"
+      expect_succeeded
+
+      st = files_in_ tmpdir_path
+      st.gets.should eql './projo/zerf/ziff.txt'
+      st.gets.should be_nil
+    end
+
+    def __setup
+
+      td = memoized_tmpdir_
+      td.prepare
+
+      td.touch_r %w(
+        Stows/stow-1/zerf/ziff.txt
+        projo/.git/
+        projo/wonger/donger/
+      )
+
+      td.path
+    end
+
+    def _expect_common_failure
+      expect_specific_invite_line_to :stow, :pop
+      expect_failed
+    end
+  end
+end

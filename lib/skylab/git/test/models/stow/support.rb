@@ -41,54 +41,8 @@ module Skylab::Git::TestSupport
         sy
       end
 
-      define_method :memoized_tmpdir_, -> do
-
-        td = nil  # :+#nasty_OCD_memoize
-
-        -> do
-
-          if td
-
-            yes = do_debug
-            yes_ = td.be_verbose
-
-            if yes
-              if ! yes_
-                td = td.new_with :debug_IO, debug_IO, :be_verbose, true
-              end
-            elsif yes_ && ! yes
-              td = td.new_with :be_verbose, false
-            end
-          else
-
-            _path = real_filesystem_.tmpdir_pathname.join 'gi-xyzzy'
-
-            td = TestSupport_.tmpdir.new_with(
-              :path, _path,
-              :be_verbose, do_debug,
-              :debug_IO, debug_IO )
-          end
-
-          td
-        end
-      end.call
-
-      def real_filesystem_
-        Home_.lib_.system.filesystem
-      end
-
       def real_system_conduit_
         Home_.lib_.open_3
-      end
-
-      def dirs_in_ path
-        Callback_::Stream.via_nonsparse_array(
-          `cd #{ path } && find . -type d -mindepth 1`.split NEWLINE_ )
-      end
-
-      def files_in_ path
-        Callback_::Stream.via_nonsparse_array(
-          `cd #{ path } && find . -type f`.split NEWLINE_ )
       end
     end
 

@@ -147,27 +147,51 @@ module Skylab::Git
       @is_promoted = true
 
       edit_entity_class(
-        :property, :zip,
-        :property, :zap,
+        :property, :channel,
+        :property, :zerp,
       )
 
       def produce_result
 
         h = @argument_box.h_
-        if h[ :zap ]
-          emit_inner_info_string "(#{ @zip })"
-          zap = @zap
-          _s = say { em zap }
-          emit_inner_error_string "(pretending this was wrong: #{ _s })"
 
+        ch = h[ :channel ]
+        oes_p = @on_event_selectively
+
+        if ch
+          case ch
+          when 'ero'
+
+            oes_p.call :error, :expression, :fake_error do | y |
+
+              y << "(pretending this was wrong: #{ ick h[ :zerp ] })"
+            end
+            UNABLE_
+
+          when 'inf'
+
+            oes_p.call :info, :expression, :for_ping do | y |
+              y << "(inf: #{ h[ :zerp ] })"
+            end
+            ACHIEVED_
+          end
         else
 
-          @on_event_selectively.call :payload, :expression, :ping do | y |
-            y << "(out: #{ h[ :zip ] })"
+          s = h[ :zerp ]
+
+          if s
+            oes_p.call :payload, :expression, :ping do | y |
+
+              y << "(out: #{ h[ :zerp ] })"
+            end
+            :pingback_from_API
+          else
+            oes_p.call :info, :expression, :ping do | y |
+              y << "hello from git."
+            end
+            :hello_from_git
           end
         end
-
-        :pingback_from_API
       end
     end
 
@@ -420,14 +444,29 @@ module Skylab::Git
         NIL_
       end
 
+      def express_into_under y, expag
+        self._NOT_USED  # but it is necessary that we define the method
+      end
+
+      def express_of_via_into_under y, expag
+        -> me do
+          expag.calculate do
+            y << me._item_name
+          end
+        end
+      end
+
       def description_under expag
 
-        path = @path
-
+        me = self
         expag.calculate do
-
-          "stow #{ val ::File.basename path }"
+          "stow #{ val me._item_name }"
         end
+      end
+
+      def _item_name
+
+        ::File.basename @path
       end
 
       def get_stow_name

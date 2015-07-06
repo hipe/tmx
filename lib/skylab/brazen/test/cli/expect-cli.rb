@@ -96,9 +96,9 @@ module Skylab::Brazen::TestSupport::CLI
       _expect_styled_invite_to program_name_for_expect_CLI
     end
 
-    def expect_specific_invite_line_to sym
+    def expect_specific_invite_line_to * sym_a
 
-      _expect_styled_invite_to program_name_for_expect_CLI, sym
+      _expect_styled_invite_to program_name_for_expect_CLI, * sym_a
     end
 
     def _expect_styled_invite_to * parts

@@ -921,6 +921,10 @@ module Skylab::Brazen
         @_a.dup
       end
 
+      def a_
+        @_a
+      end
+
       def each_name( & x_p )
         @_a.each( & x_p )
       end

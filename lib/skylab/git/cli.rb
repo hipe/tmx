@@ -1,132 +1,261 @@
 module Skylab::Git
 
-  module CLI
+  class CLI < Home_.lib_.brazen::CLI
 
-    def self.new sin, sout, serr
-      CLI::Client.new sin, sout, serr
+    Brazen_ = ::Skylab::Brazen
+
+    def self.new * a
+      new_top_invocation a, Home_::API.application_kernel_
     end
 
-    module Actions  # #stowaway, because of legacy 'push.rb' artifact
-      Autoloader_[ self ]
-    end
-  end
-
-  class CLI::Client
-
-    # we built a custom client so that `face` wouldn't intercept the '-h'
-    # and it was fun.
-
-    def initialize *ioe
-      @sin, @out, @err = ioe
-      @program_name = nil
+    def expression_agent_class
+      Brazen_::CLI.expression_agent_class
     end
 
-    attr_writer :program_name
+    def initialize a, ak
 
-    def invoke argv
-      if argv.length.nonzero? and (( m = self.class::H_[ argv[ 0 ] ] ))
-        argv.shift
-        send m, argv
-      else
-        @err.puts "#{ hi 'usage: ' }#{ program_name } #{
-          }[ #{ self.class::A_ * ' | ' } ] [..]"
-        @err.puts "see #{ hi "#{ program_name } <cmd> -h" } for help on #{
-          }that command"
-        nil
+      @resources = Resources___.new a, ak.module
+      super
+    end
+
+    class Resources___ < Resources
+
+      # (this subclassing is questionable - would be better if ..)
+
+      def initialize( * )
+        @_cache = {}
+        super
+      end
+
+      def knownness_for sym
+
+        Callback_::Known.new_known send :"__#{ sym }__"
+      end
+
+      def __filesystem__
+
+        @_cache[ :fs ] ||= Home_.lib_.system.filesystem
+        # (directory? exist? mkdir mv open rmdir)
+      end
+
+      def __system_conduit__
+
+        @_cache[ :sc ] ||= Home_.lib_.open_3
+      end
+
+      alias_method :_system_conduit, :__system_conduit__
+    end
+
+    class Action_Adapter < Action_Adapter
+
+      # this mode client adaptation is an interesting case - *all* props
+      # of all model actions are required. as well, almost all of them
+      # go through special transformation before they express (or don't
+      # express) in the front. a such, mutating a formal property is rule
+      # rather than the exception:
+
+      def mutate_properties
+
+        mutate_these_properties @back_properties.a_
+      end
+
+      def mutate__channel__properties
+        NIL_
+      end
+
+      def mutate__current_relpath__properties
+
+        _substitute_knownness_for_argument :current_relpath do
+
+          _orientation_knownness.knownness_for :current_relpath
+        end
+      end
+
+      def mutate__filesystem__properties
+
+        _substitute_knownness_for_argument :filesystem do
+
+          _filesystem_knownness
+        end
+      end
+
+      def mutate__project_path__properties
+
+        _substitute_knownness_for_argument :project_path do
+
+          _orientation_knownness.knownness_for :project_path
+        end
+      end
+
+      def mutate__stow_name__properties
+        NIL_  # an exception to the rule
+      end
+
+      def mutate__stows_path__properties
+
+        _substitute_knownness_for_argument :stows_path do
+
+          _orientation_knownness.knownness_for :stows_path
+        end
+      end
+
+      def mutate__system_conduit__properties
+
+        _substitute_knownness_for_argument :system_conduit do
+
+          _system_conduit_knownness
+        end
+      end
+
+      def mutate__zerp__properties
+        NIL_
+      end
+
+      def _substitute_knownness_for_argument sym, & arg_p
+
+        mutable_front_properties.remove sym
+
+        mutable_back_properties.replace_by sym do | prp |
+
+          otr = prp.dup
+          otr.append_ad_hoc_normalizer( & arg_p )
+          otr
+        end
+      end
+
+      # a policy decision that is made by the front (not the back),
+      # derive all of "stows path", "project path" and "current relpath"
+      # from the same one operation:
+      #
+      #   1) find any project path by looking upwards from the
+      #      current working directory for this process.
+      #      (if not found, unable.)
+      #
+      #   2) if above was found, the "stows path" (whether existent
+      #      or not) is [ some const entry ] *sibling to* the project
+      #      path.
+      #
+      #   3) likewise the current relpath is the difference between
+      #      the project path and the CWD from (1).
+
+      def _orientation_knownness
+        @___orientation_knownness ||= __build_orientation_knownness
+      end
+
+      def __build_orientation_knownness
+
+        oes_p = handle_event_selectively
+        sc = @resources._system_conduit
+
+        repo = Home_.lib_.git_viz.repository.new_via_path(
+          ::Dir.pwd,
+          sc,
+          & oes_p )
+
+        if repo
+
+          Orientation_Knownness___.new(
+            repo.relative_path_of_interest,
+            repo.path,
+            sc,
+            & oes_p
+          )
+        else
+          UNKNOWN_ORIENTATION___
+        end
+      end
+
+      def _system_conduit_knownness
+
+        @resources.knownness_for :system_conduit
+      end
+
+      def _filesystem_knownness
+
+        @resources.knownness_for :filesystem
       end
     end
 
-  private
+    module UNKNOWN_ORIENTATION___ ; class << self
 
-    def build_bound i
-      unbound = Home_::CLI::Actions.const_get i, false
-      if unbound.const_defined? :CLI, false
-        unbound = unbound::CLI
+      def knownness_for _
+
+        # giving just unable here as opposed the below singleton
+        # short-circuits further normalization appropriately early
+
+        # Callback_::Known::UNKNOWN
+
+        UNABLE_
       end
-      bound = unbound.new @sin, @out, @err
-      _slug = i.id2name.gsub( UNDERSCORE_, DASH_ ).downcase
-      bound.program_name = progname_for _slug
-      block_given? and yield bound
-      bound
+    end ; end
+
+    class Orientation_Knownness___
+
+      def initialize curr_relpath, proj_path, sc, & oes_p
+
+        @__current_relpath__ = curr_relpath
+        @__project_path__ = proj_path
+        @__stows_path__ = ::File.expand_path '../Stows', proj_path  # etc
+      end
+
+      def knownness_for sym
+
+        Callback_::Known.new_known instance_variable_get :"@__#{ sym }__"
+      end
     end
 
-    def progname_for str
-      "#{ program_name } #{ str }"
+    Actions = ::Module.new
+    class Actions::Stow < self::Branch_Adapter
+
+      module Actions
+        class Save < Action_Adapter
+
+          def __bound_call_via_bound_action_and_mutated_backbound_iambic
+            # hi
+            super
+          end
+        end
+      end
     end
 
-    def program_name
-      @program_name || Home_.lib_.CLI_program_basename
-    end
-
-    def hi msg
-      @hi ||= Home_.lib_.CLI_lib.pen.stylify.curry[ [ :green ] ]
-      @hi[ msg ]
-    end
-
-    def get_y
-      ::Enumerator::Yielder.new( & @err.method( :puts ) )
-    end
-
-    a = []
-
-    define_singleton_method :method_added do |i|
-      a and ( a << i ) ; nil
-    end
-
-    def head argv
-      load Home_.lib_.bin_pathname.join 'tmx-git-head'
-      _progname = "#{ program_name } head"
-      Home_::CLI::Actions::Head[ get_y, _progname, argv ]
-    end
-
-    def scoot argv
-      build_bound( :Scoot ).invoke argv
-    end
-
-    def spread argv
-      build_bound( :Spread ).invoke argv
-    end
-
-    def stash_untracked argv
-      build_bound( :Stash_Untracked ).invoke argv
-    end
-
-    def push argv
-      require_relative 'actions/push'
-      ::TmxGit::Push::CLI.new.run argv
-      nil
-    end
-
-    def ping argv
-      @err.puts "hello from git."
-      :hello_from_git
-    end
-
-    const_set :A_, [] ; const_set :H_, { }
-    a.each do |i|
-      moniker = i.to_s.gsub UNDERSCORE_, DASH_
-      A_ << moniker
-      H_[ moniker ] = i
-    end
-    a = nil ; A_.freeze ; H_.freeze
-
+    # (( BEGIN
+    Client = self
     module Adapter
       module For
         module Face
           module Of
             Hot = -> ns_sheet, my_client_class do
-              -> mechanics, _slug do
-                Adapter_.new( ns_sheet, my_client_class, mechanics )
-              end
-            end
-            class Adapter_ < Home_::Lib_::Face__[]::CLI::Client::Adapter::For::Face::Of::Hot
-              def get_summary_a_from_sheet _
-                [ "assorted git-focused one-offs." ]
+
+              -> mechanics, slug do
+
+                annoy = mechanics.instance_variable_get( :@surface )[]
+                Tmp___.new annoy, [ slug ]  # wrong, meht
               end
             end
           end
         end
       end
     end
+
+    class Tmp___
+
+      def initialize annoy, s_a
+
+        _sin = annoy.instance_variable_get :@sin
+        _sout = annoy.instance_variable_get :@out
+        _serr = annoy.instance_variable_get :@err
+
+        @_bridge = CLI.new _sin, _sout, _serr, s_a
+      end
+
+      def pre_execute
+        ACHIEVED_
+      end
+
+      def invokee
+        @_bridge
+      end
+    end
+    # END ))
   end
 end

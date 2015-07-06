@@ -9,7 +9,7 @@ module Skylab::Git::TestSupport
 
     it "ping" do
 
-      call_API :ping, :zip, 'hi'
+      call_API :ping, :zerp, 'hi'
 
       _ev = expect_OK_event :ping
 

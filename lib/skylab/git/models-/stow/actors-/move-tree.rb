@@ -102,12 +102,23 @@ module Skylab::Git
       def __to_forward_directory_stream
 
         path = @tree_move.destination_path
-        p = -> do
+
+        _stows_path = ::File.dirname path
+
+        p = nil
+
+        p_ = -> do
           p = Callback_::Stream.via_nonsparse_array( @_dirs_fwd ).map_by do |s|
             ::File.join path, s
           end
           path
         end
+
+        p = -> do
+          p = p_
+          _stows_path
+        end
+
         Callback_.stream do
           p[]
         end
