@@ -1,3 +1,4 @@
+[#012]       [ re-number ]
 [#011]       #doc-node the git head narrative ..
 [#010]       #doc-point the stow narrative ..
 [#009] #open we have our own s-tylize #in-situ

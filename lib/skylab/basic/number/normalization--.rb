@@ -25,20 +25,36 @@ module Skylab::Basic
           include Simple_Selective_Sender_Methods_  # ick/meh
         end  # >>
 
-        Callback_::Actor.call self, :properties,
+        Callback_::Actor.methodic self, :properties,
           :argument,
           :number_set,  # symbol
           :minimum
 
-        def initialize
+        def initialize & edit_p
+
           @argument = nil
+          @_do_recognize_positive_sign = false
           @minimum = nil
-          super
-          normalize_self
+          instance_exec( & edit_p )
+          _normalize_self
           if ! @argument
             freeze
           end
         end
+
+        def accept_selective_listener_proc p
+          @on_event_selectively = p
+        end
+
+      private
+
+        def recognize_positive_sign=
+
+          @_do_recognize_positive_sign = true
+          KEEP_PARSING_
+        end
+
+      public
 
         def to_parser_proc
 
@@ -66,27 +82,31 @@ module Skylab::Basic
 
         def normalize_argument arg, & oes_p
           otr = dup
-          otr.init_copy_with :argument, arg, & oes_p
+          otr.__init_copy_with :argument, arg, & oes_p
           otr.execute
         end
 
-        protected def init_copy_with * x_a, & oes_p
+        protected def __init_copy_with * x_a, & oes_p
           oes_p and @on_event_selectively = oes_p
           process_iambic_fully x_a
-          normalize_self
+          _normalize_self
         end
 
-        private def normalize_self
+        private def _normalize_self
           @number_set ||= :integer
-          nil
+          NIL_
         end
 
         def execute
+
           @x = @argument.value_x  # might not have been provided. we don't care
-          ok = send @number_set
+
+          ok = send :"__when_set_is__#{ @number_set }__"
+
           if ok and @minimum
-            ok = via_number_and_minimum_validate
+            ok = __via_number_and_minimum_validate
           end
+
           if ok
             Callback_::Known.new_known @number
           else
@@ -94,7 +114,8 @@ module Skylab::Basic
           end
         end
 
-        def integer  # resolve number when number set is integer
+        def __when_set_is__integer__
+
           if @x.respond_to? :bit_length
             @number = @x
             PROCEDE_
@@ -103,22 +124,33 @@ module Skylab::Basic
               @x = "#{ @x }"  # hackish but less moving parts
               # if we convert floats to ints in this way
             end
-            via_x_resolve_integer_for_number
+            __via_x_resolve_integer_for_number
           end
         end
 
-        def via_x_resolve_integer_for_number
+        def __via_x_resolve_integer_for_number
+
           @md = INTEGER_RX__.match @x
           if @md
-            via_matchdata_resolve_integer_for_number
+            __via_matchdata_resolve_integer_for_number
           else
-            @result = result_when_did_not_match
+            @result = _result_when_did_not_match
             UNABLE_
           end
         end
-        INTEGER_RX__ = /\A-?\d+\z/
 
-        def result_when_did_not_match
+        INTEGER_RX__ = /\A
+
+          (?<sign>
+            (?<plus> \+ ) |
+            (?<minus> - )
+          )?
+          (?<digits> \d + )
+
+        \z/x
+
+        def _result_when_did_not_match
+
           maybe_send_event :error, :invalid_property_value do
 
             _new_invalid_event.did_not_match @x, @argument.model, @number_set
@@ -127,21 +159,38 @@ module Skylab::Basic
 
         include Simple_Selective_Sender_Methods_
 
-        def via_matchdata_resolve_integer_for_number
-          @number = @md[ 0 ].to_i
-          ACHIEVED_
+        def __via_matchdata_resolve_integer_for_number
+
+          md = @md
+          d = md[ :digits ].to_i
+          if md[ :sign ]
+            if md[ :plus ]
+              if @_do_recognize_positive_sign
+                @number = d ; ACHIEVED_
+              else
+                @result = _result_when_did_not_match
+                UNABLE_
+              end
+            else
+              d *= -1  # yes `to_i` would have done this too
+              @number = d ; ACHIEVED_
+            end
+          else
+            @number = d ; ACHIEVED_
+          end
         end
 
-        def via_number_and_minimum_validate
+        def __via_number_and_minimum_validate
+
           if @minimum <= @number
             PROCEDE_
           else
-            @result = result_when_number_is_too_small
+            @result = __result_when_number_is_too_small
             UNABLE_
           end
         end
 
-        def result_when_number_is_too_small
+        def __result_when_number_is_too_small
 
           maybe_send_event :error, :invalid_property_value do
 

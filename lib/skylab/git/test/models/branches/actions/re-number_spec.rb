@@ -2,87 +2,90 @@ require_relative '../../../test-support'
 
 module Skylab::Git::TestSupport
 
-  describe "[gi] API actions spread", wip: true do
+  describe "[gi] models - branches - re-number" do
 
     extend TS_
+    use :expect_event
 
-    def snitch
-      @snitch ||= begin
-        @do_debug ||= do_debug
-        @err_a ||= [ ]
-        Spread::Support__::Snitch.new( ::Enumerator::Yielder.new do |msg|
-          @do_debug and TestSupport_::System.stderr.puts msg
-          @err_a << msg
-        end, :no_context )
+    it "\"to\" and \"from\" must be in the collection" do
+
+      _against [ 1, 3, 5 ], [ 2, 4, 999 ]
+
+      _ev = expect_not_OK_event :strange_items
+      black_and_white( _ev ).should eql "'2' and '4' must be in the collection"
+      expect_failed
+    end
+
+    it "expand - results are in descending order" do
+
+      _against [ 5,10,15,16,20,22,23 ], [ 15, 16, 4 ]
+
+      _gets.should eql %w( 23 27 )
+      _gets.should eql %w( 22 26 )
+      _gets.should eql %w( 20 24 )
+      _gets.should eql %w( 16 20 )
+      _done
+    end
+
+    it "contract" do
+
+      _against [ 1,2,3,9,10,12 ], [ 3, 9, -5 ]
+
+      _gets.should eql %w( 9 4 )
+      _gets.should eql %w( 10 05 )
+      _gets.should eql %w( 12 07 )
+      _done
+    end
+
+    it "contract too crowded" do
+
+      _against [ 1, 3, 5, 7, 9, 11 ], [ 3, 9, -4 ]
+
+      _ev = expect_not_OK_event :too_much_squeeze
+
+      black_and_white( _ev ).should eql(
+       "between 3 and 9 there are 4 items.\n#{
+        }desired contraction of -4 would bring distance down to 2, #{
+         }but distance cannot go below 3 for 4 items." )
+
+      expect_failed
+    end
+
+    def _against d_a, trip
+
+      call_API( :branches, :re_number,
+        :branch_name_stream,
+        _d_a_to_st( d_a ),
+
+        :from, trip.fetch( 0 ),
+        :to, trip.fetch( 1 ),
+        :plus_or_minus, trip.fetch( 2 ),
+      )
+
+      if @result
+        @_st = remove_instance_variable :@result
+      end
+      NIL_
+    end
+
+    def _d_a_to_st d_a
+
+      Callback_::Stream.via_nonsparse_array d_a do | d |
+        d.to_s
       end
     end
 
-    def self.branches a
-      let :branches do
-        Spread::API_Model::Branches.from_line_scanner(
-          Home_.lib_.scanner( a ), snitch )
+    def _gets
+      rn = @_st.gets
+      if rn
+        [ rn.from_name, rn.to_name ]
       end
     end
 
-    def cut line  # #hack-alert
-      NUM_RX_ =~ (( s = line[ 19, 2 ] )) or fail "output line didn't #{
-        }match up with expected output alignment - #{ line } (near #{
-        }#{ s.inspect })"
-      s.to_i
-    end
-
-    NUM_RX_ = /\A\d+\z/
-
-    context "spread" do
-
-      def move from_d, to_d
-        Spread::Move_Request_[ from_d, to_d ]
-      end
-
-      context "basic spread" do
-
-        branches %w( 02-A 07-B 09-C )
-
-        it "spread" do
-          branches.invoke :spread, :move_request_a, [ move( 7, 4 ) ],
-            :outstream, outstream
-          expect 'git branch -m 02-A 01-A'
-          expect 'git branch -m 07-B 04-B'
-          expect_final  'git branch -m 09-C 06-C'
-        end
-
-        it "source not found" do
-          branches.invoke :spread, :move_request_a, [ move( 6, 6 ) ]
-          expect_err "error - no such starting number: 6"
-        end
-      end
-
-      context "other spread" do
-
-        branches %w( 01-a 03-a 05-a 10-a 12-a )
-
-        it "ok" do
-          branches.invoke :spread, :move_request_a, [ move( 5, 8 ) ],
-            :outstream, outstream
-          @out_a.map( & method( :cut ) ).to_a.
-            should eql( [ 1, 4, 8, 13, 15 ] )
-        end
-
-        it "duplicates (too crowded)" do
-          branches.invoke :spread, :move_request_a, [ move( 12, 2 ) ]
-          expect_err( /number collision.+3 times/ )
-        end
-      end
-    end
-
-    context "spread - evenulate" do
-
-      branches %w( 01-a 03-b 04-c 05-d )
-
-      it "go" do
-        branches.invoke :evenulate, :outstream, outstream
-        a = @out_a.map( & method( :cut ) )
-        a.should eql( [ 2, 4, 6, 8 ] )
+    def _done
+      x = @_st.gets
+      if x
+        fail "done? #{ x.class }"
       end
     end
   end

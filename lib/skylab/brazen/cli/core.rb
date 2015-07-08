@@ -609,7 +609,9 @@ module Skylab::Brazen
           bc = __process_environment
         end
 
-        bc or begin
+        if bc
+          bc
+        else
           __bound_call_via_mutable_backbound_iambic
         end
       end
@@ -1137,7 +1139,7 @@ module Skylab::Brazen
       end
 
       def some_err_code_for_event ev
-        any_err_code_for_event( ev ) || GENERIC_ERROR_
+        any_err_code_for_event( ev ) || GENERIC_ERROR
       end
 
     public
@@ -1947,7 +1949,7 @@ module Skylab::Brazen
 
     CLI_ = self
     DASH_BYTE_ = '-'.getbyte 0
-    GENERIC_ERROR_ = 5
+    GENERIC_ERROR = 5
     NOTHING_ = nil
     SUCCESS_ = 0
 
@@ -2080,6 +2082,23 @@ module Skylab::Brazen
           end
         end
         NIL_
+      end
+
+      def substitute_knownness_for_argument sym, & arg_p
+
+        mutable_front_properties.remove sym
+
+        substitute_back_property_with_knownness_for_argument sym, & arg_p
+      end
+
+      def substitute_back_property_with_knownness_for_argument sym, & arg_p
+
+        mutable_back_properties.replace_by sym do | prp |
+
+          otr = prp.dup
+          otr.append_ad_hoc_normalizer( & arg_p )
+          otr
+        end
       end
 
       def substitute_value_for_argument sym, & p

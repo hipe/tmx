@@ -4,7 +4,7 @@ module Skylab::Git::TestSupport
 
     def self.[] tcc
 
-      Callback_.test_support::Expect_event[ tcc ]
+      TS_::Expect_Event[ tcc ]
       tcc.include Instance_Methods___
     end
 
@@ -28,10 +28,6 @@ module Skylab::Git::TestSupport
 
       def empty_dir_
         TestSupport_::Data::Universal_Fixtures[ :empty_esque_directory ]
-      end
-
-      def subject_API
-        Home_::API
       end
 
       def mock_system_conduit_where_ chdir, cmd, & three_p
@@ -105,43 +101,5 @@ module Skylab::Git::TestSupport
     end
 
     Mock_Thread_Value___ = ::Struct.new :exitstatus
-
-    # ~ hook-ins
-
-    if false
-
-
-    # ~ test-time support
-
-    def gsu_tmpdir
-      GSU_Tmpdir__[ do_debug ]
-    end
-    #
-    GSU_Tmpdir__ = -> do
-
-      p = -> do_dbg do
-
-        _tdpn = TestLib_::Tmpdir_pathname[].join 'gsu-xyzzy'
-
-        _GSU_tmpdir = TestLib_::Tmpdir[].new_with(
-          :path, _tdpn.to_s,
-          :max_mkdirs, 2
-        )
-
-        if do_dbg
-          _GSU_tmpdir.debug!
-        end
-
-        p = -> _ { _GSU_tmpdir } ; _GSU_tmpdir
-
-      end
-
-      -> do_dbg do
-        p[ do_dbg ]
-      end
-
-    end.call
-    end
-
   end
 end

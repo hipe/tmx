@@ -16,7 +16,7 @@ module Skylab::Brazen
         end
         o.output_primary_usage_line
         o.output_invite_to_general_help
-        GENERIC_ERROR_
+        GENERIC_ERROR
       end
     end
   end

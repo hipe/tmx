@@ -124,11 +124,21 @@ module Skylab::Brazen
       end  # >>
 
       NLP_agent__ = Callback_.memoize do
-        NLP_Agent__ = LIB.make_NLP_agent :public,
-          [ :and_, :indefinite_noun,
-            :noun_phrase, :or_, :plural_noun,
-            :preterite_verb, :progressive_verb,
-            :s, :sentence_phrase_via_mutable_iambic ]
+
+        NLP_Agent__ = LIB.make_NLP_agent(
+          :public, [
+            :and_,
+            :both,
+            :indefinite_noun,
+            :noun_phrase,
+            :or_,
+            :plural_noun,
+            :preterite_verb,
+            :progressive_verb,
+            :s,
+            :sentence_phrase_via_mutable_iambic,
+          ]
+        )
       end
 
       module LIB

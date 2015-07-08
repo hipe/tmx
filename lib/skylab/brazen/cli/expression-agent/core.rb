@@ -31,8 +31,8 @@ module Skylab::Brazen
         @categorized_properties.adapter.bound_.to_kernel.app_name  # ick/meh
       end
 
-      def s * x_a
-        _NLP_agent.s( * x_a )
+      def both x
+        _NLP_agent.both x
       end
 
       GREEN__ = 32
@@ -122,6 +122,14 @@ module Skylab::Brazen
 
       def render_prop_as_unknown prop
         "« #{ prop.name.as_human } »"  # :+#guillemets
+      end
+
+      def s * x_a
+        _NLP_agent.s( * x_a )
+      end
+
+      def sp_ * x_a
+        _NLP_agent.sentence_phrase_via_mutable_iambic x_a
       end
 
       public def stylize s, * i_a

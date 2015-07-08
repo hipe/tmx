@@ -2,9 +2,16 @@ module Skylab::Git
 
   module Models_::Branches
 
-    # <-
+    class Actions::Scoot < ::Skylab::Brazen::Action
 
-  module Actions::Scoot
+      @description_block = -> y do
+        y << 'furloughed (used sunsetted plugins arch; no coverage at all)'
+        y << "(probably just merge any outstanding work here into re-number)"
+      end
+
+    # <- 2
+
+  class Impl___
 
     def self.new i, o, e
       Client_.new i, o, e
@@ -696,9 +703,14 @@ module Skylab::Git
         filter = -> s do
           PORCELAIN_HACK_TRIM_RX__.match( s )[ 0 ]
         end
-        Scn_.new do
-          s = p[] and filter[ s ]
+
+        Callback_::Scn.new do
+          s = p[]
+          if s
+            filter[ s ]
+          end
         end
+
       end ; PORCELAIN_HACK_TRIM_RX__ = /(?<=\A[ *] ).+\z/
     end
 
@@ -1081,12 +1093,17 @@ module Skylab::Git
       end
     end
 
-    Scn_ = Home_.lib_.scn
-
     class Dry_Run_Sys_Cond_Mock_
+
       def popen3 * a
-        [ nil,  ES__, ES__, WAIT__ ]
-      end ;  ES__ = Scn_.new do end
+        [
+          nil,
+          Callback_::Scn.the_emtpy_stream,
+          Callback_::Scn.the_empty_stream,
+          WAIT__,
+        ]
+      end
+
       class Wait__
         def initialize es
           @value = Value__.new es
@@ -1094,6 +1111,7 @@ module Skylab::Git
         attr_reader :value
         Value__ = ::Struct.new :exitstatus
       end
+
       WAIT__ = Wait__.new 0
     end
 
@@ -1115,7 +1133,10 @@ module Skylab::Git
     # ~ plugins setup
 
     class Client_
+
+      if false
       Home_.lib_.plugin::Host[ self ]
+
       o = build_mutable_callback_tree_specification
       o.default_pattern :listeners
       o << :on_build_option_parser
@@ -1137,6 +1158,7 @@ module Skylab::Git
       end
       def stderr_IO
         @stderr_IO
+      end
       end
     end
 
@@ -1204,7 +1226,7 @@ module Skylab::Git
     SILENT_ = nil
     end
   end
-# ->
+# -> 2
+    end
   end
 end
-

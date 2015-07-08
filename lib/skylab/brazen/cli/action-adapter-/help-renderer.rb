@@ -220,8 +220,8 @@ module Skylab::Brazen
           "unepxected shape: #{ arity_i }"
         end
 
-        def some_arg_moniker_for_switch  sw
-          'X'
+        def some_arg_moniker_for_switch sw
+          'X'  # eventually we will do etc. that one hack
         end
 
         def argument_arity_from_native_optparse_switch arg
@@ -298,7 +298,8 @@ module Skylab::Brazen
           @expression_agent.calculate do
             y << hdr( label_s )
           end
-          p[ self ] ; nil
+          p[ self ]
+          NIL_
         end
 
         def item_section label_s, item_a, & p

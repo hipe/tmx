@@ -36,7 +36,7 @@ module Skylab::Brazen
 
         o.output_invite_to_general_help
 
-        GENERIC_ERROR_
+        GENERIC_ERROR
       end
     end
   end

@@ -49,8 +49,12 @@ module Skylab::Git
   ACHIEVED_ = true
   DASH_ = '-'.freeze
   DOT_ = '.'
+  EMPTY_A_ = []
   EMPTY_P_ = -> { NIL_ }
+  GIT_EXE_ = 'git'
+  KEEP_PARSING_ = true
   Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
+  Autoloader_[ Models = ::Module.new ]
   NIL_ = nil
   SPACE_ = ' '
   UNABLE_ = false

@@ -17,7 +17,14 @@ module Skylab::Git::TestSupport
       cache = {}
       -> sym do
         ( cache.fetch sym do
-          x = Home_.lib_.plugin::Bundle::Fancy_lookup[ sym, TS_ ]
+
+          const = Callback_::Name.via_variegated_symbol( sym ).as_const
+
+          x = if TS_.const_defined? const
+            TS_.const_get const
+          else
+            Home_.lib_.plugin::Bundle::Fancy_lookup[ sym, TS_ ]
+          end
           cache[ sym ] = x
           x
         end )[ self  ]
@@ -90,6 +97,15 @@ module Skylab::Git::TestSupport
       Callback_::Stream.via_nonsparse_array(
         `cd #{ path } && find . -type f`.split NEWLINE_ )
     end
+
+    def subject_API
+      Home_::API
+    end
+  end
+
+  Expect_Event = -> tcc do
+
+    Callback_.test_support::Expect_event[ tcc ]
   end
 
   Fixture_tree_ = -> sym do

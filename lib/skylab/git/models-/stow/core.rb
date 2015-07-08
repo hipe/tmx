@@ -2,135 +2,6 @@ module Skylab::Git
 
   class Models_::Stow  # see [#010]
 
-    # (old code has indention that is typically one tab stop too little.)
-
-  if false  # (( BEGIN OFF
-
-  class CLI
-
-    def stashes_option o
-      @param_h[ :stashes_path ] = nil
-      o.on '-s', '--stashes <path>',
-          "use <path> as stashes path and pwd as hub dir" do |s|
-        @param_h[ :stashes_path ] = s
-      end
-    end
-
-    def dry_run_option o
-      @param_h[ :dry_run ] = false
-      o.on '-n', '--dry-run', "Dry run." do
-        @param_h[ :dry_run ] = true
-      end
-      nil
-    end
-
-    def verbose_option o
-      @param_h[:be_verbose] = false
-      o.on '-v', '--verbose', 'verbose output' do
-        @param_h[:be_verbose] = true
-      end
-      nil
-    end
-
-    def help_option o
-      o.on '-h', '--help', 'this screen' do
-        enqueue_help
-      end
-      nil
-    end
-
-    SUCCESS_EXITSTATUS = 0
-    GENERAL_FAILURE_EXITSTATUS = 8
-    EXITCODE_H__ = {
-      false => GENERAL_FAILURE_EXITSTATUS,
-      nil => SUCCESS_EXITSTATUS }
-
-    def build_option_parser
-      o = begin_option_parser
-      o.version = '0.0.1'         # avoid warnings from calling the builtin '-v'
-      o.release = 'blood'         # idem
-      o.on '-h', '--help', 'this screen, or help for particular action' do
-        enqueue_help_as_box
-      end
-      o.summary_indent = '  '     # two spaces, down from four
-      o
-    end
-
-    option_parser do |o|
-      o.separator " description: Shows the files that would be stashed."
-      help_option o
-      stashes_option o
-      verbose_option o
-      o
-    end
-
-    def status
-      invoke_API :status, @param_h
-    end
-
-    option_parser do |o|
-      o.separator " description: move all untracked files to #{
-        }another folder (usu. outside of the project.)"
-      dry_run_option o
-      help_option o
-      stashes_option o
-      verbose_option o
-      o
-    end
-
-    option_parser do |o|
-
-      o.separator " description: In the spirit of `git stash show`, #{
-        }reports on contents of stashes."
-
-      @param_h[ :is_in_color ] = true
-      o.on( '--no-color', "No color." ) { @param_h[ :is_in_color ] = false }
-
-      help_option o
-
-      @param_h[ :do_show_patch ] = false
-      o.on( '-p', '-u', '--patch', "Generate patch (can be used with --stat)."
-        ) { @param_h[ :do_show_patch ] = true }
-
-      stashes_option o
-
-      @param_h[ :do_show_stat ] = false
-      o.on( '--stat', "Show diffstat format (default) #{
-        }(can be used with --patch)." ) { @param_h[ :do_show_stat ] = true }
-
-      verbose_option o
-
-      o
-    end
-
-    def show stash_name
-      invoke_API :show, @param_h.merge( stash_name: stash_name )
-    end
-
-    option_parser do |o|
-      o.separator " description: lists the \"stashes\" #{
-        }(a glorified dir listing)."
-      stashes_option o
-      verbose_option o
-      o
-    end
-
-    def list
-      invoke_API :list, @param_h
-    end
-
-    option_parser do |o|
-      o.separator  " description: Attempts to put the files back #{
-        }if there are no collisions."
-      dry_run_option o
-      stashes_option o
-      verbose_option o
-      o
-    end
-
-  end
-  end  # END OFF ))
-
     Bz__ = Home_.lib_.brazen
 
     class Action_ < Bz__::Action
@@ -198,6 +69,10 @@ module Skylab::Git
     class Actions::Save < Action_
 
       edit_entity_class(
+        :desc, -> y do
+          "move all untracked files in the current path to #{
+            }a \"stow\" directory"
+        end,
         :required, :property, :filesystem,
         :required, :property, :system_conduit,
         :required, :property, :stows_path,
@@ -230,6 +105,9 @@ module Skylab::Git
     class Actions::Pop < Action_
 
       edit_entity_class(
+        :desc, -> y do
+          y << "attempts to put the files back if there are no collisions."
+        end,
         :required, :property, :filesystem,
         :required, :property, :system_conduit,
         :required, :property, :stows_path,
@@ -258,6 +136,9 @@ module Skylab::Git
     class Actions::Show < Action_
 
       edit_entity_class(
+        :desc, -> y do
+          y << "in the spirit of `git stash show`, show contents of stash"
+        end,
         :required, :property, :filesystem,
         :required, :property, :system_conduit,
         :required, :property, :stows_path,
@@ -273,6 +154,9 @@ module Skylab::Git
     class Actions::Status < Action_
 
       edit_entity_class(
+        :desc, -> y do
+          y << "shows the files that would be stashed."
+        end,
         :required, :property, :system_conduit,
         :required, :property, :project_path,
         :required, :property, :current_relpath,
@@ -288,6 +172,9 @@ module Skylab::Git
     class Actions::List < Action_
 
       edit_entity_class(
+        :desc, -> y do
+          y << "list the stows"
+        end,
         :required, :property, :filesystem,
         :required, :property, :stows_path,
       )

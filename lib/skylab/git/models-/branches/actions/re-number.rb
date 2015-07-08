@@ -2,543 +2,544 @@ module Skylab::Git
 
   module Models_::Branches  # create
 
-    Actions = ::Module.new
+    Brazen_ = ::Skylab::Brazen
 
-    # <-
+    Autoloader_[ ( Actions = ::Module.new ), :boxxy ]
 
-  class Actions::Spread
+    class Actions::ReNumber < Brazen_::Action  # :[#012].
 
-    if false  # BEGIN
-    def initialize i, o, e
-      @y = ::Enumerator::Yielder.new( & e.method( :puts ) )
-      @snitch = Support__::Snitch.new @y, self
-      @o = o  # the output stream
-      @program_name = @is_finished = nil
-    end
+      Brazen_::Model::Entity.call( self,
 
-    attr_writer :program_name
+        :desc, -> y do
 
-    def invoke argv
-      @do_evenulate = nil
-      begin
-        r = parse_args( argv ) or break
-        r = normalize or break
-        r = work
-      end while nil
-      false == r and invite
-      nil
-    end
+     # until we re-integrate w/ n.curses and/or word-wrap (if ever):
+     #12345_(10)12345_(20)12345_(30)12345_(40)12345_(50)12345_(60)12345_(70)12345_(80)
 
-  private
+y << nil  # eek
+y << "an experimental tool for an esoteric (and now arcane) branch-based workflow:"
+y << "for those of your branches whose name starts with an integer, this tool"
+y << "produces the rename commands (as strings) necessary to mutate the series,"
+y << "by either \"closing gaps\" or expanding ranges as you like:"
+y << nil
+y << "if you have branches (1,2,3,9,10) and you are OCD about that gap in the middle"
+y << "(between 3 and 9), you can close the gap by saying to yourself: \"self, that"
+y << "current distance between 3 and 9 is 6. I want that distance to be 1. ergo I"
+y << "want that distance to go down by 5.\" so to close this gap between these items"
+y << "by this much, use the arguments (3, 9, -5) (which can be read as \"shrink the"
+y << "distance bewteen 3 and 9 by 5.\"). this transformation produces the series"
+y << "(1,2,3,4,5)."
+y << nil
+y << "in this same vein but the other direction, you can expand any sub-range of the"
+y << "series by using a positive instead of negative integer for the change term:"
+y << "against (5,10,15,16,20), (15, 16, +4) should give you (5,10,15,20,24)."
+y << nil
+y << "some details:"
+y << nil
+y << "unless otherwise stated, if the argument data does not meet the below criteria"
+y << "then the utility will explain why it cannot be used as a request."
+y << nil
+y << "the \"from\" integer must be less than the \"to\" integer. both must refer to"
+y << "actual items in the series, not just points with the series' range."
+y << nil
+y << "the operation categorizes the items of your series into a sparse series of"
+y << "three categories: the span under your range, the span in your range and the"
+y << "span above your range. any items in the first category are never moved. any"
+y << "in the third category are always shifted upwards or downwards by the argument"
+y << "amount."
+y << nil
+y << "as corollary to 2 points back, the first and last categories may be empty but"
+y << "the middle category will always have at least two items. as for this \"segment\","
+y << "the transformation involves breaking the target range up into more or less"
+y << "equal parts, one part allocated for each item that was in the argument range."
+y << "the first item is never moved."
+y << nil
+y << "because this scaling operation involves the imprecision of floating-point math,"
+y << "we employ a \"spillover\" algorithm whereby each particular item ends up"
+y << "\"snapping\" into a discrete integer-sized bucket in a manner that distributes"
+y << "the items more or less proportionally across the target range."
+y << nil
+y << "we assume but to not prove here that this \"spillover\" approach produces"
+y << "results that are more attractive (both algorithmically and in terms of results)"
+y << "than would be achieved by simple rounding down or up."
+y << nil
+y << "also for this middle category, for all contractions that touch N items, the"
+y << "target distance must be at a minimum N-1."
+        end,
 
-    def invite
-      @y << "see '#{ program_name } -h' for help"
-      nil
-    end
+        :required, :property, :branch_name_stream,
 
-    def program_name
-      @program_name || Home_.lib_.CLI_program_basename
-    end
+        :required,
+        :non_negative_integer,
+        :property, :from,
 
-    def build_option_parser
-      @is_dry_run = false ; @from_file = nil
-      @op = Home_::Library_::OptionParser.new do |op|
-        op.on '-n', '--dry-run', 'dry run.' do
-          @is_dry_run = true
-        end
-        op.on '-F', '--file <file>',
-          'get list of branch names from <file>' do |file|
-            @from_file = file
-        end
-        op.on '-h', '--help', 'help' do
-          help
-        end
-      end
-    end
+        :required,
+        :non_negative_integer,
+        :property, :to,
 
-    def help
+        :required,
+        :ad_hoc_normalizer, -> arg, & x_p do
 
-      @y << "#{ hi 'usage:' } #{ program_name } [opts] #{ NUM_NUM_ }#{ DBL_ }"
+          _normer = Brazen_.lib_.basic.normalizers.number(
+            :number_set, :integer,
+            :recognize_positive_sign,
+          )
 
-      @y << "#{ hi 'description:' }#{ <<-HERE.gsub( /^[ ]+/, ' ' )
-        if you have git branches numbered like
-        "01-foo-bar", "02-fiz-baz", "03-frank-banger" etc - and you say
-        `spread 3 7` then 03 becomes 07, 01 becomes 02, and 02 becomes
-        04. it's obvious what's happening here.
-
-        (experimental: '#{ EL_ }' will kick every number that is
-        not already even up to the next number, and so on.)\n
-
-        HERE
-      }"
-      @y << "#{ hi 'options:' }"
-      @op.summarize @y
-      @is_finished = true
-    end
-
-    DBL_ = "\n\n".freeze
-    EL_ = 'evenulate'.freeze
-    NUM_NUM_ = "( <num> <num> | #{ EL_ } )"
-
-    Hi_ = -> msg do
-
-      @hi ||= Home_.lib_.brazen::CLI::Styling::Stylify.curry[ [ :green ] ]
-
-      @hi[ msg ]
-    end
-
-    define_method :hi, & Hi_
-
-    def whine msg
-      @y << msg
-      false
-    end
-
-    def bork msg
-      whine msg
-      invite
-      nil
-    end
-
-    def parse_args argv
-      -> do  # #result-block
-        begin
-          build_option_parser.permute! argv
-        rescue ::OptionParser::ParseError => e  # i tried to avoid this
-          bork e.message
-          break
-        end
-        @is_finished and break nil
-        resolve_something_from_argv argv
-      end.call
-    end
-
-    def resolve_something_from_argv argv
-      if argv.length.nonzero? and Match___[ argv[ 0 ] ]
-        argv.shift
-        @do_evenulate = true
-      else
-        d_a = get_parsed_contiguous_integers argv
-      end
-      if argv.length.nonzero?
-        bork "unexpected argument(s) #{ argv.inspect }"
-      elsif @do_evenulate
-        true
-      else
-        resolve_move_request_from_integers d_a
-      end
-    end
-
-    Match___ = Home_.lib_.parse_lib.fuzzy_matcher EL_,
-      :minimum_number_of_characters, 1
-
-    def get_parsed_contiguous_integers argv
-      a = [ ]
-      while argv.length.nonzero? && (( NUM_RX_ =~ argv[ 0 ] ))
-        a << argv.shift.to_i
-      end
-      a
-    end
-
-    NUM_RX_ = /\A\d+\z/
-
-    def resolve_move_request_from_integers d_a
-      -> do
-        d_a.length.zero? and break bork( "expecting #{ NUM_NUM_ }" )
-        2 == (( len = d_a.length )) or break bork( "for now, need 2, had #{
-          }#{ len } numbers" )
-        @move_request_a = d_a.each_slice( 2 ).map do |from, to|
-          Move_Request_[ from.to_i, to.to_i ]
-        end
-        true
-      end.call
-    end
-
-    Move_Request_ = Home_.lib_.struct :from_d, :to_d
-    class Move_Request_
-
-      def factor
-        @factor ||= ( 1.0 * @to_d / @from_d )
-      end
-
-      def get_invalid_factor_reason
-        if @from_d.zero?
-          "won't divide by zero."
-        elsif @to_d < 0 || @from_d < 0
-          "negative numbers?"
-        end
-      end
-    end
-
-    def normalize
-      r = false
-      begin
-        r = get_branches_stream_line_stream or break
-        r = API_Model::Branches.from_line_scanner( r, @snitch ) or break
-        @branches = r
-        true
-      end while nil
-      false == r and @y << "could not complete request because of above."
-      r
-    end
-
-    def get_branches_stream_line_stream
-      r = get_branches_stream
-      r and Home_.lib_.scanner r
-    end
-
-    def get_branches_stream
-      if @from_file
-        get_branches_stream_from_file
-      else
-        get_branches_stream_from_git
-      end
-    end
-
-    def get_branches_stream_from_file
-      ::File.open @from_file, 'r'
-    end
-
-    def get_branches_stream_from_git # #hack-alert
-      _i, o, _e = Home_::Library_::Open3.popen3 "git branch | cut -c 3-"
-      _i.close
-      if '' != (( s = _e.read ))
-        bork "huh? - #{ s }"
-      else
-        o
-      end
-    end
-
-    def work
-      if @do_evenulate
-        @branches.invoke :evenulate, :snitch, @snitch, :outstream, @o
-      else
-        @branches.invoke :spread, :snitch, @snitch, :outstream, @o,
-          :move_request_a, @move_request_a
-      end
-    end
-
-    module Support__
-
-      class Snitch  # snitches are tracked by [#fa-051]
-
-        def initialize y, expression_agent
-          @y = y
-          @expression_agent = expression_agent
-        end
-
-        attr_reader :y
-
-        def receive_error_string & blk
-          @y  << "error - #{ render_line blk }"
-          false  # important
-        end
-
-        def multiline_note &blk
-          @expression_agent.instance_exec @y, &blk
-          nil
-        end
-
-      private
-
-        def render_line blk
-          @expression_agent.instance_exec( & blk )  # see snitches elsewhere
-        end
-      end
-    end
-
-    module API_Model
-
-      Branches = Home_.lib_.struct :branch_a
-      class Branches
-
-        class << self
-          private :new
-        end
-
-        def self.from_line_scanner scn, snitch
-          -> do  # #result-block
-            # we use the first line to determine whether the input list has
-            # the margin that git puts there #hack-alert or is some (e.g
-            # hand-written) list
-            line = scn.gets
-            if ! line
-              x = snitch.receive_error_string do
-                "there were no input lines"
-              end
-              break x
-            end
-            parse = Line_parser_[ line ]
-            branch_a = [ ]
-            begin
-              a = parse[ line ] and branch_a << Branch_[ * a ]
-            end while (( line = scn.gets ))
-            if branch_a.length.zero?
-              x = snitch.receive_error_string do
-                "no lines matched"
-              end
-              break x
-            end
-            allocate.instance_exec do
-              initialize snitch
-              init_from_branch_a branch_a
-            end
-          end.call
-        end
-        Line_parser_ = -> do
-          margin = '\A[* ] ' ; sep = '-'
-          rest = "(?<num>[0-9]+)(?<body>#{ sep }[^\\n]+)\n?\\z"
-          hack_rx = /#{ margin }/
-          raw_rx = /#{ margin }#{ rest }/
-          cut_rx = /\A#{ rest }/
-          -> first_line do
-            match = ( hack_rx =~ first_line ? raw_rx : cut_rx ).method :match
-            -> line { md = match[ line ] and md.captures }
+          if arg.is_known
+            _normer.normalize_argument arg, & x_p
+          else
+            arg
           end
-        end.call
+        end,
+        :property, :plus_or_minus
+      )
 
-        def invoke i, * x_a
-          cls = API_Model::Actions.fuzzy_const_get i
-          x_a << :branches << self << :snitch << @snitch
-          cls.new( x_a ).execute
-        end
+      def produce_result
 
-        def fetch_item_by_number num_d
-          idx = @number_to_idx_h.fetch num_d
-          @branch_a.fetch idx
-        end
-
-        def _number_to_idx_h
-          @number_to_idx_h
-        end
-
-        def _sorted_number_a
-          @sorted_number_a
-        end
-
-      private
-
-        def init_from_branch_a branch_a
-          -> do  # #result-block
-            a = [ ] ; num_to_idx_h = { }
-            ok = true
-            branch_a.each_with_index do |item, idx|
-              did = false
-              found_idx = num_to_idx_h.fetch( item.num_d ) do |d|
-                did = true ; a << d
-                num_to_idx_h[ d ] = idx
-              end
-              if ! did
-                ok = false
-                @snitch.multiline_note do |y|
-                  y << "#{ hi 'duplicates:' }"
-                  y << "  #{ branch_a[ found_idx ].render }"
-                  y << "  #{ item.render }"
-                end
-              end
-            end
-            if ! ok then false else
-              @branch_a = branch_a
-              @number_to_idx_h = num_to_idx_h.freeze
-              a.sort!
-              @sorted_number_a = a.freeze
-              self
-            end
-          end.call
-        end
-
-        def initialize snitch
-          @snitch = snitch  # not used here but used as a parameter
-          @y = snitch.y
-        end
+        ok = __validate_terms
+        ok &&= __resolve_branch_collection
+        ok &&= __resolve_sorted_item_box_of_valid_length
+        ok &&= __validate_item_constituency
+        ok &&= __resolve_renames
+        ok && __deliver_renames
       end
 
-      Branch_ = Home_.lib_.struct :num_s, :body, :num_d
-      class Branch_
-        def initialize num_s, body
-          @num_s = num_s ; @body = body
-          @num_d = num_s.to_i
-          nil
+      def __resolve_branch_collection
+
+        _st = @argument_box.fetch( :branch_name_stream ).map_by do | line_x |
+
+          line_x.chomp!
+          line_x
         end
 
-        def render
-          self.class.render @num_s, @body
-        end
+        bc = Home_::Models::Branch_Collection.via_name_stream _st
 
-        def self.render num_s, body
-          "#{ num_s }#{ body }"
-        end
-
-        def get_new_name_using_number num_d
-          num_s = "%0#{ @num_s.length }d" % num_d
-          self.class.render num_s, @body
-        end
-      end
-
-      late = { }
-      define_singleton_method :const_missing do |c|
-        if (( p = late[ c ] ))
-          p[]
-          const_defined?( c, false ) or fail "sanity - #{ c }"
-          const_get c
+        if bc
+          @_branch_collection = bc ; ACHIEVED_
         else
-          super c
+          bc
         end
       end
-      define_singleton_method :[]=, & late.method( :[]= )
-    end
 
-    module API_Model
+      def __validate_terms
 
-      self[ :Actions ] = -> do
+        h = @argument_box.h_
+        @_from = h[ :from ]
+        @_to = h[ :to ]
+        @_plus_or_minus = h[ :plus_or_minus ]
+        @_is_contraction = 0 > @_plus_or_minus
 
-        module Actions
-          def self.fuzzy_const_get i
-            Autoloader_.const_reduce [ i ], self
+        if @_to <= @_from
+          self._COVER_ME_bad_range
+        else
+          ACHIEVED_
+        end
+      end
+
+      def __resolve_sorted_item_box_of_valid_length
+
+        st = @_branch_collection.to_stream.map_reduce_by do | br |
+
+          md = NUMBERED_BRANCH_RX__.match br.name_string
+          if md
+            Models_::Item.new md, br
           end
         end
 
-        Entity_ = -> client, _fields_, * field_i_a do
-          :fields == _fields_ or raise ::ArgumentError
-          Home_.lib_.fields::Basic.with :client, client,
-            :absorber, :initialize,
-            :field_i_a, field_i_a
+        bx = Callback_::Box.new
+        begin
+          item = st.gets
+          item or break
+
+          bx.touch item.to_i do
+            []
+          end.push item
+          redo
+        end while nil
+
+        case bx.length
+        when 0, 1
+          __when_zero_or_one bx.length
+        else
+          bx.a_.sort!
+          @_item_box = bx ; ACHIEVED_
         end
+      end
 
-        class Branch_Mungulator_
+      def __when_zero_or_one d
 
-        private
+        bc = @_branch_collection
 
-          def bork msg
-            @snitch.receive_error_string do
-              msg
-            end
-            false
-          end
+        @on_event_selectively.call :error, :expression, :too_few_branches do | y |
 
-          def flush_work
-            r = false
-            @work_a.each do |unit|
-              r ||= true
-              item = @branches.fetch_item_by_number unit.from_d
-              name = item.get_new_name_using_number unit.to_d
-              @outstream.puts "git branch -m #{ item.render } #{ name }"
-            end
-            r
-          end
-        end
-
-        Work_Unit_ = Home_.lib_.struct :from_d, :to_d
-
-        class Actions::Evenulate < Branch_Mungulator_
-
-          Home_.lib_.basic::Function.globless_actor self
-
-          Entity_[ self, :fields, :branches, :outstream, :snitch ]
-
-          def execute
-            @work_a = determine_work_a
-            flush_work
-          end
-
-          def determine_work_a
-            bubble = Home_::Library_::Set.new ; work_a = [ ]
-            do_number = -> d do
-              is_even = ( d % 2 ).zero?
-              d_ = is_even ? d : d + 1
-              d_ += 2 while bubble.include?( d_ )
-              bubble.add d_  # d_ is the either the new number it should have
-              # or the good number it has and will continue to have,
-              d_ == d or work_a << Work_Unit_[ d, d_ ]
-              # but obv we only have to do work if the number chnaged.
-            end
-            @branches._sorted_number_a.each( & do_number )
-            # failure is impossible because the set of integers is unbounded
-            work_a
-          end
-        end
-
-        class Actions::Spread < Branch_Mungulator_
-
-          Home_.lib_.basic::Function.globless_actor self
-
-          Entity_[ self, :fields, :branches, :move_request_a,
-            :outstream, :snitch ]
-
-          def execute
-            r = false
-            begin
-              r = determine_work or break
-              r = flush_work
-            end while nil
-            r
-          end
-
-        private
-
-          def determine_work
-            @branch_number_to_idx_h = @branches._number_to_idx_h
-            @work_a = @branches._sorted_number_a.
-              map( & Work_Unit_.method( :new ) ).freeze
-            scn = Home_.lib_.scanner @move_request_a
-            r = true
-            while (( move_request = scn.gets ))
-              r = process_single_move_request( move_request ) or break
-            end
-            r
-          end
-
-          def process_single_move_request move
-            -> do  # #result-block
-              from_d = move.from_d
-              @branch_number_to_idx_h.key? from_d or
-                break bork( "no such starting number: #{ from_d }" )
-              s = move.get_invalid_factor_reason and break bork s
-              idx = @work_a.index{ |p| from_d == p.from_d }
-              r = prepare_low( move, idx ) or break r
-              r = prepare_hi( move, idx ) or break r
-              true
-            end.call
-          end
-
-          def prepare_low move, idx1
-            d1_h = { } ; r = true ; col = nil
-            ( 0 .. idx1 ).each do |idx|
-              pair = @work_a.fetch idx
-              d1 = ( pair.from_d * move.factor ).to_i
-              if d1_h[ d1 ]
-                # when a collision is detected, the number has occurred 2 times.
-                ( col ||= Home_.lib_.box.new ).
-                  add_or_modify d1, -> { 2 }, -> i { i + 1 }
+          st = bc.to_stream
+          one = st.gets
+          _s = if one
+            _ = one.name_string
+            two = st.gets
+            if two
+              three = st.gets
+              same = "began with an integer"
+              __ = two.name_string
+              if three
+                "of #{ val _ }, #{ val __ } etc; none #{ same }"
               else
-                d1_h[ d1 ] = true
-                pair.to_d = d1
+                "of #{ val _ } and #{ val __ }, neither #{ same }"
               end
+            else
+              "cannot do name transformations to only one branch: #{ val _ }"
             end
-            col and r = bork( "number collision - after transision, the #{
-              }number(s) occur more than once - (#{ col.to_a.map do |i, d|
-                if 2 == d then "#{ i }" else "#{ i } (#{ d } times)" end
-              end * ', ' })" )
-            r
+          else
+            "no branches in input!"
           end
+          y << _s
+        end
+        UNABLE_
+      end
 
-          def prepare_hi move, idx1
-            -> do
-              handle = @work_a.fetch idx1
-              ( dx = handle.to_d - handle.from_d ).zero? and
-                break bork( "there was no change in the \"handle\" element" )
-              ( @work_a.length - 1 ).downto( idx1 + 1 ).each do |idx|
-                pair = @work_a.fetch idx
-                pair.to_d = pair.from_d + dx  # negative dx ok , but expect it to ..
-              end
-              true
-            end.call
+      def __validate_item_constituency
+
+        bx = @_item_box
+
+        h = @argument_box.h_
+        miss_a = nil
+
+        [ :from, :to ].each do | sym |
+
+          d = h.fetch sym
+
+          if ! bx.has_name d
+            ( miss_a ||= [] ).push d
+          end
+        end
+
+        if miss_a
+          __when_failed_constituency miss_a
+        else
+          ACHIEVED_
+        end
+      end
+
+      def __when_failed_constituency miss_a
+
+        @on_event_selectively.call :error, :expression, :strange_items do | y |
+
+          # #open [#hu-034] `sp_` was borky for this..
+
+          _s_a = miss_a.map( & method( :ick ) )
+
+          y << "#{ and_ _s_a } must be in the collection"
+
+        end
+        UNABLE_
+      end
+
+      def __resolve_renames
+
+        o = if @_is_contraction
+          Sessions_::Contraction.new( & @on_event_selectively )
+        else
+          Sessions_::Expansion.new( & @on_event_selectively )
+        end
+
+        o.from = @_from
+        o.to = @_to
+        o.item_box = @_item_box
+
+        if @_is_contraction
+          o.minus = @_plus_or_minus
+        else
+          o.plus = @_plus_or_minus
+        end
+
+        rn = o.execute
+
+        if rn
+          @_central_renames = rn
+        else
+          rn
+        end
+      end
+
+      def __deliver_renames
+
+        a = @_central_renames.dup
+
+        # (we could be clever and make this a concatenation of two streams,
+        # one of a static array and one of a functionally defined stream;
+        # but currently we deem that more difficult to work with.)
+
+        # find the index of the last item in "the range". from that item
+        # up to the final item in the series, move the item arithmetically.
+
+        d_a = @_item_box.a_
+
+        ( d_a.index( @_to ) + 1 ).upto( d_a.length - 1 ) do | d |
+
+          item_d = d_a.fetch d
+          a.push [ item_d, ( item_d + @_plus_or_minus ) ]
+        end
+
+        # assume that the renames are in ascending order of first term.
+        #
+        # for expansions, you *always* avoid collisions by performing the
+        # moves in reverse order:
+        #
+        # imagine moving items (1,2,3) to (1,3,5). when you rename 2 to 3,
+        # you don't want the existing 3 to get clobbered. renaming 3 to 5
+        # first avoids this.
+        #
+        # by similar inference, for contractions we *must* alwyas perform
+        # the moves in order:
+        #
+        # imagine moving items (1,3,5) to (1,2,3). etc.
+
+        if ! @_is_contraction
+          a.reverse!
+        end
+
+        Callback_::Stream.via_nonsparse_array( a ).expand_by do | (d, d_) |
+
+          _item_o_a = @_item_box.fetch d
+
+          Callback_::Stream.via_nonsparse_array _item_o_a do | item_o |
+
+            Models_::Rename.new d_, item_o
           end
         end
       end
+
+      # ~
+
+      Models_ = ::Module.new
+
+      class Models_::Rename
+
+        def initialize new_d, item_o
+
+          @_item_o = item_o
+          @_new_d = new_d
+        end
+
+        def express_into_under y, _expag
+
+          y << "#{ GIT_EXE_ } branch -m #{ from_name } #{ to_name }"
+        end
+
+        def from_name
+
+          @_item_o.x.name_string
+        end
+
+        def to_name
+
+          # make the new number string be a zero-padded string of the same
+          # width as the old number string unless the new number needs more
+          # width than this, in which case add width as necessary.
+          #
+          # when there is would-be loss in width (e.g from "10" to "9")
+          # the new number string will use the width of the old.
+          #
+          # so note that overall, width may be added but is never removed.
+
+          item = @_item_o
+
+          rest = item.rest  # any
+
+          name_s = item.x.name_string
+
+          number_width = name_s.length
+          if rest
+            number_width -= rest.length
+          end
+
+          _fmt = "%0#{ number_width }d"
+
+          _number_s_ = _fmt % @_new_d
+
+          "#{ _number_s_ }#{ rest }"
+        end
+      end
+
+      class Models_::Item
+
+        attr_reader( :to_i, :rest, :x )
+
+        def initialize md, x
+
+          @rest = md[ :rest ]
+
+          @to_i = md[ :number_string ].to_i
+
+          @x = x
+        end
+      end
+
+      NUMBERED_BRANCH_RX__ = /\A(?<number_string>\d+)(?<rest>.+)?\z/
+
+      # ~
+
+      Sessions_ = ::Module.new
+
+      Same__ = ::Class.new
+
+      class Sessions_::Expansion < Same__
+
+        attr_writer :plus
+
+        def execute
+
+          init_categories_
+          init_derived_ivars_
+          @_target_distance = @_current_distance + @plus
+          produce_moves_ @plus
+        end
+      end
+
+      class Sessions_::Contraction < Same__
+
+        attr_writer :minus
+
+        def execute
+
+          # classify the series into three categories, ignoring the first
+
+          init_categories_
+          init_derived_ivars_
+          @_target_distance = @_current_distance + @minus
+
+          _ok = __validate_contraction_terms
+          _ok and produce_moves_ @minus
+        end
+
+        def __validate_contraction_terms
+
+          # axiom: the minium target distance is the number of items minus one.
+
+          if @_target_distance < @_min_distance
+
+            __when_too_much_squeeze
+          else
+            ACHIEVED_
+          end
+        end
+
+        def __when_too_much_squeeze
+
+          from = @from ; to = @to ; num = @_num_scale_items
+          dc = @minus ; td = @_target_distance ; md = @_min_distance
+
+          @on_event_selectively.call :error, :expression, :too_much_squeeze do | y |
+
+            y << "between #{ from } and #{ to } there are #{ num } items."
+
+            y << "desired contraction of #{ dc } #{
+              }would bring distance down to #{ td }, but distance cannot #{
+               }go below #{ md } for #{ num } items."
+          end
+
+          UNABLE_
+        end
+      end
+
+      class Same__
+
+        attr_writer :from, :item_box, :to
+
+        def initialize & p
+          @on_event_selectively = p
+        end
+
+        def init_derived_ivars_
+
+          @_current_distance = @to - @from
+          @_num_scale_items = @scale_these_.length
+          @_min_distance = @_num_scale_items - 1
+          NIL_
+        end
+
+        def init_categories_
+
+          st = @item_box.to_name_stream
+          begin
+            d = st.gets
+            d or break
+            if @from > d
+              redo
+            end
+            break
+          end while nil
+
+          if d && @to >= d
+
+            scale_these = [ d ]
+            begin
+              d = st.gets
+              d or break
+              if @to >= d
+                scale_these.push d
+                redo
+              end
+              break
+            end while nil
+          end
+
+          if d
+            shift_these = [ d ]
+            begin
+              d = st.gets
+              d or break
+              shift_these.push d
+              redo
+            end while nil
+          end
+
+          @scale_these_ = scale_these
+          @shift_these_ = shift_these
+          NIL_
+        end
+
+        def produce_moves_ plus_or_minus
+
+          # the first item is just a boundary marker; it doesn't actually
+          # move. the last items's move distance is defined as being equal
+          # to the argument amount of change. that leaves the remaining
+          # zero or more items as needing some kind of "scale down". we
+          # attempt something like [#br-073.B] the spillover algorithm.
+
+          moves = []
+
+          add_this_amount_per_item_f =
+            1.0 * @_target_distance / ( @_num_scale_items - 1 )
+
+          current_remainder_f = 0.0
+          current_item = @scale_these_.first
+
+          ( 1 ... ( @_num_scale_items - 1 ) ).each do | d |
+
+            _before_d = @scale_these_.fetch d
+
+            _f = current_item + add_this_amount_per_item_f
+
+            after_d, f_ = _f.divmod 1
+
+            current_remainder_f += f_
+
+            if 1.0 <= current_remainder_f
+              current_remainder_f -= 1.0
+              after_d += 1
+            end
+
+            current_item = after_d
+
+            moves << [ _before_d, after_d ]
+          end
+
+          item = @scale_these_.last
+
+          moves << [ item, item + plus_or_minus ]
+        end
+      end
     end
-    end  # END
-  end
-# ->
   end
 end
+#  :+#tombstone: [#fa-051] a snitch

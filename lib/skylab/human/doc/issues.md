@@ -6,7 +6,8 @@
 [#037]       [ POS ]
 [#036]       track different way we do the same list expression
 [#035] #open let's get rid of API action inflection hack ?
-[#034]       expression frames
+[#034] #open we are tracking production failures with this one
+             expression frames
 [#033]       understanding the EN module graph .. #parent-node:[#002]
 [#032]       the NLP en methods ..
 [#031]       being "optimally concise" may be one of the essential

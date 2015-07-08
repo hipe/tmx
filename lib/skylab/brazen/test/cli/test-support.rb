@@ -200,7 +200,7 @@ module Skylab::Brazen::TestSupport::CLI
     end
 
     def expect_generic_error_exitstatus
-      @exitstatus.should eql Home_::CLI::GENERIC_ERROR_
+      @exitstatus.should eql Home_::CLI::GENERIC_ERROR
     end
 
     def expect_succeeded

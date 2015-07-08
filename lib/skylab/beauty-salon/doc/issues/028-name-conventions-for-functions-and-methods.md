@@ -71,7 +71,7 @@ meanings:
 ## :#tier-2 and :#tier-3
 
 "cozy scope" means the method is not called outside of the file it is
-defined in.  "one-off scope" is cozy scope but furthermore the method is
+defined in. "one-off scope" is cozy scope but furthermore the method is
 only ever called from one place. the significance of these tiers
 corresponds exactly to the same tiers described in [#029].
 

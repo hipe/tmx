@@ -66,7 +66,7 @@ module Skylab::Permute
         # hr.output_primary_usage_line
         hr.output_invite_to_general_help
         @_a = false
-        maybe_use_exit_status CLI::GENERIC_ERROR_
+        maybe_use_exit_status CLI::GENERIC_ERROR
         UNABLE_
       end
 
