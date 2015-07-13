@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../../../../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] services - patch" do
+  describe "[sy] services - filesystem - bridges - patch" do
 
     extend TS_
     use :expect_event
@@ -86,8 +86,10 @@ module Skylab::System::TestSupport
 
       fs = services_.filesystem
 
+      _path = ::File.join fs.tmpdir_path, 'hl-xyzzy-patch'
+
       fs.tmpdir(
-        :path, fs.tmpdir_pathname.join( 'hl-xyzzy-patch' ).to_path,
+        :path, _path,
         :be_verbose, do_debug,
         :debug_IO, debug_IO ).clear
     end
@@ -103,14 +105,14 @@ module Skylab::System::TestSupport
     end
 
     def _my_fixtures_dirname
-      TS_.dir_pathname.join 'services/patch/fixtures'
+      TS_.dir_pathname.join 'services/filesystem/bridges/patch/fixtures'
     end
 
     # ~ execution
 
     def _against * x_a
 
-      @result = services_.patch( * x_a, & handle_event_selectively )
+      @result = services_.filesystem.patch( * x_a, & handle_event_selectively )
       nil
     end
 

@@ -1,7 +1,8 @@
 module Skylab::System
 
+  class Services___::Filesystem
 
-    class Services___::Patch
+    class Bridges_::Patch
 
       # using the host system's `patch` utility (whatever it is (if any)),
       # apply a patch specified in a string or via a path to the specified
@@ -191,7 +192,7 @@ module Skylab::System
 
         def _maybe_emit_failure_event s_a=nil, w
 
-          d = e.value.exitstatus
+          d = w.value.exitstatus
 
           if @on_event_selectively
 
@@ -207,7 +208,7 @@ module Skylab::System
           end
         end
 
-        def __build_nonzero_event s_a, d
+        def __build_nonzero_event d, s_a
 
           Callback_::Event.inline_not_OK_with(
 
@@ -287,4 +288,5 @@ module Skylab::System
 
       Patch_ = self
     end
+  end
 end

@@ -2,7 +2,7 @@ module Skylab::System
 
   class Services___::Filesystem
 
-    class Find__
+    class Bridges_::Find
 
       Expression_Adapters::Event = Callback_::Event.prototype_with(
 

@@ -1,6 +1,6 @@
 module Skylab::System::TestSupport
 
-  module Services::Filesystem::Path_Tools::Pretty_Path::Test_Support
+  module Services::Filesystem::Bridges::Path_Tools::Pretty_Path::Support
 
     class << self
       def [] tcm
@@ -44,7 +44,7 @@ module Skylab::System::TestSupport
         _home_p = -> { home_x }
         _pwd_p = -> { pwd_x }
 
-        Home_::Services___::Filesystem::Path_Tools__::Clear__[ _home_p, _pwd_p ]
+        Home_::Services___::Filesystem::Bridges_::Path_Tools::Clear__[ _home_p, _pwd_p ]
 
         setup_frame_p = empty_p
       end

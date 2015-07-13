@@ -1,37 +1,80 @@
 module Skylab::System
 
-  module IO
+  module TestSupport::MOCKS  # :[#024].
 
-    Mappers::Tee = Callback_::Proxy.tee.call_via_arglist IO_::METHOD_I_A_  # :[#169].
+    class << self
 
-    # Inspired by (but probably not that similar to) Perl's IO::Tee,
-    # an IO::Mappers::Tee is a simple multiplexer that intercepts
-    # and multiplexes out a subset of the messages that an ::IO stream
-    # receives.
-    #
-    # Tee represents its downstream listeners as (effectively) elements
-    # of an ordered hash; that is, the order in which they were added is
-    # remembered and they are retrieved by their key, usually a symbol.
-    # (we refer to this structure as a "box".)
+      def noninteractive_STDIN_class
 
-    class Mappers::Tee
+        Nonteractive_Stdin___
+      end
 
-      include(
-      module Is_TTY_Instance_Methods
+      def interactive_STDIN_instance
 
-        # Mock whether or not this stream is an interactive terminal (see `IO#tty?`)
+        @__IS ||= Stdin__.new true
+      end
 
-        def tty!
-          @is_tty = true
-          self
+      def noninteractive_IO_instance
+
+        @__NI ||= IO__.new false
+      end
+
+      def noninteractive_STDIN_instance
+
+        @__NS ||= Stdin__.new false
+      end
+    end  # >>
+
+
+    class IO__
+
+      def initialize yes
+        @_is_tty = yes
+      end
+
+      def tty?
+        @_is_tty
+      end
+    end
+
+    class Stdin__ < IO__
+
+      def closed?
+        false  # a.l.a.i.w
+      end
+    end
+
+    class Nonteractive_Stdin___
+
+      class << self
+
+        def new_via_lines s_a
+          new s_a
         end
 
-        attr_accessor :is_tty
+        private :new
+      end  # >>
 
-        alias_method :tty?, :is_tty
+      def initialize s_a
 
-        self
-      end )
+        @_is_closed = false
+
+        if s_a
+          @_st = Callback_::Stream.via_nonsparse_array s_a
+        end
+      end
+
+      def closed?
+        @_is_closed
+      end
+
+      def gets
+        @_st.gets
+      end
+
+      def tty?
+        false
+      end
     end
   end
 end

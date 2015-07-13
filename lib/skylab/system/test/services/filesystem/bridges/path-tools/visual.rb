@@ -2,7 +2,7 @@ module Skylab::System
 
   module TestSupport_Visual
 
-    class Services::Filesystem::Path_Tools < Client_
+    class Services::Filesystem::Bridges::Path_Tools < Client_
 
       def usage_line
         "#{ super } (will run test)"

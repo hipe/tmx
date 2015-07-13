@@ -1,9 +1,10 @@
 module Skylab::System
 
+  class Services___::Filesystem
 
-    class Services___::Filesystem
+    class Sessions_::Tmpfile_Sessioner
 
-      class Tmpfile_Sessioner___
+      # ->
 
         # produce an empty tmpfile open for reading and writing that (through
         # nonblocking calls to `flock`) "belongs to" this process and no
@@ -209,6 +210,7 @@ module Skylab::System
              }(there appear to be #{ @_max_number_of_simulatenous_files } #{
               }open nearly simultaneously)"
         end
-      end
+        # <-
     end
+  end
 end

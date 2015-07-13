@@ -1,4 +1,4 @@
-require_relative '../../test-support'
+require_relative '../../../test-support'
 
 module Skylab::System::TestSupport
 
@@ -53,9 +53,9 @@ module Skylab::System::TestSupport
 
     # (currently this gets more coverage in [#ts-015] doc-test)
 
-    def __subject * x_a, & p
+    def __subject * x_a, & x_p
 
-      services_.filesystem.hack_guess_module_tree( * x_a, & p )
+      services_.filesystem.hack_guess_module_tree( * x_a, & x_p )
     end
   end
 end

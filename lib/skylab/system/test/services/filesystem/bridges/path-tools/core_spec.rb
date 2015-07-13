@@ -1,8 +1,8 @@
-require_relative '../../../test-support'
+require_relative '../../../../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] - services - filesystem - path-tools" do
+  describe "[sy] - services - filesystem - bridges - path-tools" do
 
     extend TS_
 

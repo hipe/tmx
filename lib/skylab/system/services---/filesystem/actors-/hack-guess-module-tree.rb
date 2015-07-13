@@ -1,9 +1,10 @@
 module Skylab::System
 
+  class Services___::Filesystem
 
-    class Services___::Filesystem
+    class Actors_::Hack_guess_module_tree  # :[#107].
 
-      class Hack_guess_module_tree__  # :[#107].
+      # ->
 
         # the darkest of all hacks in this universe - we brought this file
         # back from four months in oblivion (where it belonged) and re-wrote
@@ -29,21 +30,28 @@ module Skylab::System
 
         class << self
 
-          def new_via_arglist a, & oes_p
-            if 1 == a.length
+          def for_mutable_args_ a, & oes_p
+
+            case 1 <=> a.length
+
+            when -1
+              new_via_iambic( a, & oes_p ).execute
+
+            when 0
               a.unshift :path
+              new_via_iambic( a, & oes_p ).execute
+
+            when 1
+              self._COVER_ME_easy
             end
-            new_via_iambic a, & oes_p
           end
-        end
+        end  # >>
 
         Callback_::Actor.methodic self, :simple, :properties,
 
           :polymorphic_writer_method_to_be_provided, :property, :line_upstream,
 
-          :polymorphic_writer_method_to_be_provided, :property, :path,
-
-          :property, :on_event_selectively
+          :polymorphic_writer_method_to_be_provided, :property, :path
 
         Callback_::Event.selective_builder_sender_receiver self
 
@@ -214,7 +222,7 @@ module Skylab::System
 
         def advance_line
           @line = @line_upstream.gets
-          @line and PROCEDE_
+          @line and ACHIEVED_
         end
 
         def finish
@@ -301,6 +309,7 @@ module Skylab::System
             @cx_a.push x ; nil
           end
         end
-      end
+
     end
+  end
 end

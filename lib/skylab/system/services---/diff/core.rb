@@ -2,6 +2,8 @@ module Skylab::TanMan
 
   class Services::Diff::Diff
 
+    self._K
+
     def initialize _svx
     end
 

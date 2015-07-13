@@ -1,22 +1,33 @@
 module Skylab::System
 
+  class Services___::Filesystem
 
-    class Services___::Filesystem
+    class Sessions_::Walk  # :[#176]
 
-      class Walk__  # :[#176] (was [#ts-019], then [#st-007]. was once tagged [#cu-003])
+      # was [#ts-019], then [#st-007]. was once tagged [#cu-003]
+      # ->
 
         class << self
+
+          def for_mutable_args_ x_a, & x_p
+
+            case 1 <=> x_a.length
+            when -1
+
+              _st = polymorphic_stream_via_iambic x_a
+              _o = new_via_polymorphic_stream _st, & x_p
+              _o.execute
+
+            when 1
+              self
+            else
+              raise ::ArgumentError
+            end
+          end
 
           def build_resource_not_found_event start_path, file_pattern_x, num_dirs_looked
 
             Build_resource_not_found_event__[ start_path, file_pattern_x, num_dirs_looked ]
-          end
-
-          def new_with * x_a, & oes_p  # :+[#cb-063]
-            new do
-              oes_p and @on_event_selectively = oes_p
-              process_iambic_fully x_a
-            end
           end
         end  # >>
 
@@ -170,11 +181,15 @@ module Skylab::System
 
         def __found found_path, surrounding_path
 
-          _ok = Home_.services.filesystem.normalization.upstream_IO(
-              :only_apply_expectation_that_path_is_ftype_of, ( @ftype || FILE_FTYPE ),
-              :path, found_path, & @on_event_selectively )
+          _ftype = @ftype || FILE_FTYPE
 
-          _ok && surrounding_path
+          _yes = Home_.services.filesystem( :Upstream_IO ).with(
+
+            :only_apply_expectation_that_path_is_ftype_of, _ftype,
+            :path, found_path,
+            & @on_event_selectively )
+
+          _yes && surrounding_path
         end
 
         def __when_resource_not_found count
@@ -223,7 +238,9 @@ module Skylab::System
           end
         end
 
-        Walk_ = self
-      end
+        # <-
+
+      Walk_ = self
     end
+  end
 end

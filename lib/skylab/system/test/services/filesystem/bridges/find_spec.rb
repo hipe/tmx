@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../../../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] - services - filesystem - find" do
+  describe "[sy] - services - filesystem - bridges - find" do
 
     extend TS_
 
@@ -10,7 +10,7 @@ module Skylab::System::TestSupport
 
       args = _parent_subject.find :path, TS_.dir_pathname.to_path,
         :filename, 'find_spec.*',
-        :as_normal_value, -> command do
+        :when_command, -> command do
           command.args
         end
 
@@ -25,7 +25,7 @@ module Skylab::System::TestSupport
       _cmd_o = _parent_subject.find(
         :path, 'doozie',
         :filename, '&![]',
-        :as_normal_value, -> cmd_o do
+        :when_command, -> cmd_o do
           cmd_o
         end ) do | i, *_, & ev_p |
           if :info == i
@@ -66,7 +66,7 @@ module Skylab::System::TestSupport
       _parent_subject.find(
         :paths, [ 'x', 'y' ],
         :filename, '*.code',
-        :as_normal_value, _subject_module::IDENTITY_ )
+        :when_command, _subject_module::IDENTITY_ )
     end
 
     def _subject_module

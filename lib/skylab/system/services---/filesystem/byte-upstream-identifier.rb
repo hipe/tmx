@@ -62,11 +62,11 @@ module Skylab::System
         to_rewindable_line_stream( & x_p )
       end
 
-      def to_rewindable_line_stream & oes_p
+      def to_rewindable_line_stream & x_p
 
         if block_given?  # experimental convenience exposure
 
-          Home_.services.filesystem.normalization.upstream_IO @path, & oes_p
+          Home_.services.filesystem( :Upstream_IO ).against_path @path, & x_p
         else
           ::File.open @path, ::File::RDONLY
         end
@@ -75,7 +75,7 @@ module Skylab::System
       # ~ fun etc.
 
       def to_byte_downstream_identifier
-        Filesystem_::Byte_Downstream_Identifier.new @path, & @on_event_selectively
+        FS_::Byte_Downstream_Identifier.new @path, & @on_event_selectively
       end
     end
   end

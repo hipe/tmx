@@ -1,9 +1,8 @@
 module Skylab::System
 
+  class Services___::Filesystem
 
-    class Services___::Filesystem
-
-      class Find__  # see [#171].
+    class Bridges_::Find  # see [#171].
 
         # synopsis:
         #
@@ -19,24 +18,30 @@ module Skylab::System
         #     the latter is the default behavior for some forms of call.
         #     as well there exists (recommended) progressive streaming.
 
-        class << self
+      class << self
 
-          def mixed_via_iambic_ x_a, & oes_p
+        def for_mutable_args_ x_a, & oes_p
+
+          if x_a.length.zero?
+            self
+          else
             new do
               @on_event_selectively = oes_p
               process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
             end.__mixed_result
           end
+        end
 
-          private :new
-        end  # >>
+        private :new
+      end  # >>
 
-        Callback_::Actor.methodic self, :properties, :as_normal_value
+      # ->
+
+        Callback_::Actor.methodic self, :properties, :when_command
           # (and see many iambic writers below)
 
         def initialize & edit_p
 
-          @as_normal_value = DEFAULT_AS_NORMAL_VALUE_PROC___
           @on_event_selectively = DEFAULT_ON_EVENT_SELECTIVELY___
 
           @sanitized_freeform_query_infix_words = nil
@@ -45,13 +50,14 @@ module Skylab::System
           @unescaped_filename_a = []
           @unescaped_ignore_dir_a = []
           @unescaped_path_a = []
+          @when_command = WHEN_COMMAND___
 
           instance_exec( & edit_p )
           _decide_if_curry_and_resolve_command_args
           freeze
         end
 
-        DEFAULT_AS_NORMAL_VALUE_PROC___ = -> cmd do
+        WHEN_COMMAND___ = -> cmd do
           cmd.to_path_stream.to_a
         end
 
@@ -236,7 +242,7 @@ module Skylab::System
           if @is_curry
             self
           elsif @args
-            @as_normal_value[ self ]
+            @when_command[ self ]
           else
             @last_error_result  # #todo
           end
@@ -249,7 +255,7 @@ module Skylab::System
 
         def to_path_stream
           @args and begin
-            Find__::Actors_::Build_path_stream[ @args, & @on_event_selectively ]
+            Find_::Actors_::Build_path_stream[ @args, & @on_event_selectively ]
           end
         end
 
@@ -380,8 +386,10 @@ module Skylab::System
         Autoloader_[ Expression_Adapters = ::Module.new ]
 
         Find_ = self
-      end
+
+        # <-
     end
+  end
 end
 # :+#posterity :+#tombstone `collapse` was an early ancestor of the n11n pattern
 # :+#posterity :+#tombstone the find node that used to be in [st] deleted

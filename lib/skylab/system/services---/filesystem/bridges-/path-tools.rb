@@ -1,9 +1,8 @@
 module Skylab::System
 
+  class Services___::Filesystem
 
-    class Services___::Filesystem
-
-    module Path_Tools__  # #open [#031] new will move here, clobber this  read [#031] the path tools narrative
+    class Bridges_::Path_Tools  # #open [#031] new will move here, clobber this  read [#031] the path tools narrative
 
       class << self
 
@@ -168,7 +167,6 @@ module Skylab::System
         define_method :escape_path, Escape_path__
         define_method :pretty_path, Pretty_path__
       end
-
     end
-    end
+  end
 end

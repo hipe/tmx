@@ -1,21 +1,28 @@
 module Skylab::System
 
+  class Services___::Filesystem
 
-    class Services___::Filesystem
+    class Bridges_::Grep  # see [#173]. this particular node models the command itself
 
-      class Grep__  # see [#173]. this particular node models the command itself
+      # ->
 
         class << self
 
-          def mixed_via_iambic_ x_a, & oes_p
+          def for_mutable_args_ x_a, & oes_p
 
             new do
-              process_polymorphic_stream_fully polymorphic_stream_via_iambic( x_a ), & oes_p
+
+              if oes_p
+                accept_selective_listener_proc oes_p
+              end
+
+              process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
+
             end.mixed_result
           end
-        end
+        end  # >>
 
-        Callback_::Actor.methodic self, :simple, :properties,
+        Callback_::Actor.methodic( self, :simple, :properties,
 
           :polymorphic_writer_method_to_be_provided, :property, :ignore_case,
 
@@ -25,8 +32,11 @@ module Skylab::System
 
           :polymorphic_writer_method_to_be_provided, :property, :paths,
 
-          :properties, :grep_extended_regexp_string, :ruby_regexp,
-            :on_event_selectively, :as_normal_value
+          :properties,
+            :grep_extended_regexp_string,
+            :ruby_regexp,
+            :when_curry,
+        )
 
         def initialize
           @grep_extended_regexp_string = nil
@@ -34,7 +44,12 @@ module Skylab::System
           @unescaped_path_s_a = nil
           super
           @on_event_selectively ||= EVENTLESS_LISTENER__
-          @as_normal_value ||= IDENTITY_
+          @when_curry ||= IDENTITY_
+        end
+
+        def accept_selective_listener_proc x
+          @on_event_selectively = x
+          NIL_
         end
 
       private
@@ -125,7 +140,7 @@ module Skylab::System
 
           @command_string = y * SPACE_
 
-          @as_normal_value[ self ]
+          @when_curry[ self ]
         end
 
       public
@@ -198,7 +213,7 @@ module Skylab::System
             UNABLE_
           end
         end
-
-      end
+        # <-
     end
+  end
 end

@@ -4,9 +4,24 @@ module Skylab::System
 
   class Services___::Filesystem
 
-    class Tmpdir__ < ::Pathname  # (implementd as a frozen, dupable session)
+    Models_ = ::Module.new
+
+    class Models_::Tmpdir < ::Pathname  # (implementd as a frozen, dupable session)
 
       class << self
+
+        def memoizer_for td, slug
+          Memoizer___.new td, slug
+        end
+
+        def for_mutable_args_ x_a, & x_p
+          if x_a.length.zero?
+            self
+          else
+            new_via_iambic x_a, & x_p
+          end
+        end
+
         private :new
       end  # >>
 
@@ -77,6 +92,20 @@ module Skylab::System
 
     public
 
+      def rebuilt_for tc
+
+        yes = do_debug
+        yes_ = td.be_verbose
+
+        if yes
+          if ! yes_
+            new_with :debug_IO, debug_IO, :be_verbose, true
+          end
+        elsif yes_ && ! yes
+          td.new_with :be_verbose, false
+        end
+      end
+
       def tmpdir_via_join path_tail, * x_a
         otr = dup
         x_a.push :path, ::File.join( @_path_s, path_tail )
@@ -142,7 +171,7 @@ module Skylab::System
 
         if SAFETY_RX__ =~ @_path_s
           remove_entry_secure @_path_s  # TERRIFYING (result is nil)
-          PROCEDE_
+          ACHIEVED_
         else
           Raise__[ __ask_if_there_is_a_god ]
         end
@@ -277,11 +306,11 @@ module Skylab::System
       Sanity_check_pathname__ = -> pn do
 
         if SAFETY_RX__ =~ pn.to_path
-          true  # as in PROCEDE_
+          ACHIEVED_
 
         else
           Raise__[ ::SecurityError, "unsafe tmpdir name - #{ pn }" ]
-          false  # as in UNABLE_
+          UNABLE_
         end
       end
 
@@ -368,7 +397,7 @@ module Skylab::System
 
       def _patch * x_a
 
-        Home_.services.patch(
+        Home_.services.filesystem.patch(
           :target_directory, to_path,
           :is_dry_run, @is_noop,
           * x_a
@@ -493,6 +522,43 @@ module Skylab::System
         @debug_IO.puts msg
         NIL_
       end
+
+      class Memoizer___
+
+        attr_reader :instance
+
+        def initialize tc, slug
+
+          _path = ::File.join tc.real_filesystem.tmpdir_path, slug
+
+          @instance = Tmpdir_.new_with(
+            :path, _path,
+            :be_verbose, tc.do_debug,
+            :debug_IO, tc.debug_IO )
+        end
+
+        def for tc
+
+          yes = @instance.be_verbose
+          yes_ = tc.do_debug
+
+          if yes
+            if ! yes_
+              o = @instance.new_with :be_verbose, false
+            end
+          elsif yes_
+            o = @instance.new_with :debug_IO, tc.debug_IO, :be_verbose, true
+          end
+          if o
+            @instance = o
+            o
+          else
+            @instance
+          end
+        end
+      end
+
+      Tmpdir_ = self
     end
   end
 end

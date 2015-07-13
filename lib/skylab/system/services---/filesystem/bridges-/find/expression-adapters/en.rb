@@ -2,7 +2,7 @@ module Skylab::System
 
   class Services___::Filesystem
 
-    class Find__
+    class Bridges_::Find
 
       module Expression_Adapters::EN
 

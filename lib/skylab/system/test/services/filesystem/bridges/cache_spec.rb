@@ -1,4 +1,4 @@
-require_relative '../../test-support'
+require_relative '../../../test-support'
 
 module Skylab::System::TestSupport
 
@@ -23,7 +23,7 @@ module Skylab::System::TestSupport
 
     # <-
 
-  TS_.describe "[sy] - services - filesystem - cache (manual)" do
+  TS_.describe "[sy] - services - filesystem - bridges - cache (manual)" do
 
     extend TS_
 

@@ -1,9 +1,8 @@
 module Skylab::System
 
+  class Services___::Filesystem
 
-    class Services___::Filesystem
-
-      module Cache__
+    class Bridges_::Cache
 
     # `cache_pathname_proc_via_module` -
     #
@@ -97,13 +96,15 @@ module Skylab::System
     #
     # happy hacking!
 
-        class << self
+      class << self
 
-          def cache_pathname_proc_via_module mod, * x_a
-            x_a.push :mod, mod
-            Actor__.call_via_iambic x_a
-          end
+        def cache_pathname_proc_via_module mod, * x_a
+          x_a.push :mod, mod
+          Actor__.call_via_iambic x_a
         end
+      end  # >>
+
+      # ->
 
         class Actor__
 
@@ -130,7 +131,7 @@ module Skylab::System
             if 1 == @const_a.length
               when_too_few_name_parts
             else
-              PROCEDE_
+              ACHIEVED_
             end
           end
 
@@ -186,7 +187,7 @@ module Skylab::System
             end
             if found
               @parent_cache_pathname_proprietor = found
-              PROCEDE_
+              ACHIEVED_
             else
               @mod_a = mod_a
               when_parent_not_found
@@ -205,7 +206,7 @@ module Skylab::System
 
           def via_parent_cache_pathname_proprietor_resolve_parent_pathname
             @parent_pn = @parent_cache_pathname_proprietor.cache_pathname
-            @parent_pn && PROCEDE_
+            @parent_pn && ACHIEVED_
           end
 
           def resolve_filename
@@ -219,7 +220,7 @@ module Skylab::System
 
           def via_filename_validate
             if FILENAME_RX__ =~ @filename
-              PROCEDE_
+              ACHIEVED_
             else
               when_bad_filename
             end
@@ -232,7 +233,7 @@ module Skylab::System
             finish_with_error_event _ev
           end
 
-          def via_everything_build_existant_pathname  # :+[#022]
+          def via_everything_build_existant_pathname  # :+![#022]
             pn = @parent_pn.join @filename
             if ! pn.exist?
               _mode = @parent_pn.stat.mode
@@ -251,8 +252,8 @@ module Skylab::System
           end
 
           FILENAME_RX__ = /\A[-_a-z0-9]+\z/i
-
         end
-      end
+        # <-
     end
+  end
 end

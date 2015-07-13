@@ -1,11 +1,10 @@
-require_relative '../../test-support'
+require_relative '../../../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] - services - filesystem - tmpdir" do
+  describe "[sy] - services - filesystem - models - tmpdir" do
 
     extend TS_
-    use :services_filesystem_tmpdir
 
     it "with no pathname - you get ::Dir.tmpdir for your system" do
       tmpdir = _subject.new_with
@@ -139,6 +138,10 @@ module Skylab::System::TestSupport
       else
         services_.filesystem.tmpdir( * x_a )
       end
+    end
+
+    def anchor_
+      services_.defaults.dev_tmpdir_pathname
     end
   end
 end

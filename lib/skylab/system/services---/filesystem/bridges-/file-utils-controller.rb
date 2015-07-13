@@ -2,8 +2,12 @@ module Skylab::System
 
   class Services___::Filesystem
 
-    class File_Utils_Controller__  # :[#157] FileUtils reconceived as a..
+    class Bridges_::File_Utils_Controller  # :[#011]
 
+      # NOTE nowadays we want to deprecate this for the sorts of reasons
+      # explained in [#009.A]. but nonetheless:
+
+        # this is FileUtils reconceived as a
         # controller-like "agent" that is by default verbose whose output
         # is bound to the argument proc used in its construction. send the
         # familiar FU messages to the controller (mkdir etc). the argument
@@ -14,6 +18,21 @@ module Skylab::System
         # method namespace and ancestor chain with fileutils; freeing your
         # objects of these side-effects by allowing them to focus the event
         # wiring into fileutils into one place.
+
+      class << self
+
+        def for_any_proc_ & x_p
+
+          if x_p
+            new_via( & x_p )
+          else
+            self
+          end
+        end
+
+        alias_method :new_via, :new
+        private :new
+      end  # >>
 
       # <-
 

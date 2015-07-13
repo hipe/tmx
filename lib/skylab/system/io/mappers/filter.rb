@@ -2,7 +2,30 @@ module Skylab::System
 
   module IO
 
-    class Mappers::Filter  # :[#159]
+    Mappers = ::Module.new  # :+#stowaway
+    Autoloader_[ Mappers ]
+
+    def Mappers.const_missing const
+
+      if :Tee == const
+
+        cls = Callback_::Proxy.tee.call_via_arglist IO_::METHOD_I_A_  # see [#014]
+        Mappers.const_set :Tee, cls
+
+        cls.class_exec do
+
+          def tty?
+            @this_system_IO_tee_is_a_tty
+          end
+        end
+        cls
+
+      else
+        super
+      end
+    end
+
+    class Mappers::Filter  # :[#012]
 
       # intercept write-like messages intended for an ::IO, but do something
       # magical with the content. Don't forget to call `flush!` at the end.
@@ -102,7 +125,9 @@ module Skylab::System
 
       # -- Readers & delegators
 
-      include Mappers::Tee::Is_TTY_Instance_Methods
+      def tty?  # (more in history)
+        false
+      end
 
       def downstream_IO
         @downstream_IO

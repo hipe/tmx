@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../../../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] - services - FS - grep (a HACK)" do
+  describe "[sy] - services - FS - bridges - grep (a HACK)" do
 
     extend TS_
 
@@ -18,12 +18,16 @@ module Skylab::System::TestSupport
 
       a = []
 
-      _x = _parent_subject.grep( :ruby_regexp, /foo/imx,
-        :on_event_selectively, -> * i_a, & ev_p do
+      _x = _parent_subject.grep(
+
+        :ruby_regexp, /foo/imx,
+
+      ) do | * i_a, & ev_p |
+
         a.push ev_p[]
         a.push i_a
         :_nerp_
-      end )
+      end
 
       _x.should eql :_nerp_
 
@@ -56,14 +60,21 @@ module Skylab::System::TestSupport
 
     it "scan" do
       a = []
-      scan = _parent_subject.grep :ruby_regexp, /foo[b]ie/i,
-        :path, _here_path, :as_normal_value, -> cmd do
-            cmd.to_stream
-          end,
-        :on_event_selectively, -> * i_a, & ev_p do
-            a.push i_a
-            a.push ev_p.[]
-          end
+
+      scan = _parent_subject.grep(
+
+        :ruby_regexp, /foo[b]ie/i,
+
+        :path, _here_path,
+
+        :when_curry, -> cmd do
+          cmd.to_stream
+        end,
+
+      ) do | * i_a, & ev_p |
+        a.push i_a
+        a.push ev_p.[]
+      end
 
       a.length.should be_zero
       scan.gets.should be_include 'foobie'
@@ -72,7 +83,7 @@ module Skylab::System::TestSupport
     end
 
     define_method :_here_path, ( Callback_.memoize do  # `memoize_`
-      TS_.dir_pathname.join( 'services/filesystem/grep_spec.rb' ).to_path
+      TS_.dir_pathname.join( 'services/filesystem/bridges/grep_spec.rb' ).to_path
     end )
 
     def _parent_subject

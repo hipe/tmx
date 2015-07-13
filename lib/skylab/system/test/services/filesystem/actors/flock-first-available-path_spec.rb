@@ -1,4 +1,4 @@
-require_relative '../../test-support'
+require_relative '../../../test-support'
 
 module Skylab::System::TestSupport
 
@@ -26,8 +26,10 @@ module Skylab::System::TestSupport
 
       fs = services_.filesystem
 
+      _path = ::File.join fs.tmpdir_path, 'hl-flock-etc'
+
       @td = fs.tmpdir(
-        :path, fs.tmpdir_pathname.join( 'hl-flock-etc' ).to_path,
+        :path, _path,
         :be_verbose, do_debug,
         :debug_IO, debug_IO )
 

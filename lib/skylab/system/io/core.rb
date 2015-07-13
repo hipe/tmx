@@ -44,6 +44,11 @@ module Skylab::System
 
     class Byte_Identifer_
 
+      class << self
+        alias_method :new_via_open_IO, :new
+        private :new
+      end  # >>
+
       # (see subclasses)
 
       def initialize io

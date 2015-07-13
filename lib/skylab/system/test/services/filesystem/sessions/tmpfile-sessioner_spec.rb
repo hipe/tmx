@@ -1,11 +1,10 @@
-require_relative '../../test-support'
+require_relative '../../../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] - filesystem - tmpfile sessioner" do
+  describe "[sy] - filesystem - sessions - tmpfile sessioner" do
 
     extend TS_
-    use :services_filesystem_tmpdir
 
     it "won't create more directories than it is allowed to" do
 
@@ -89,7 +88,7 @@ module Skylab::System::TestSupport
 
     def _common_setup_two
 
-      td = my_tmpdir_.clear
+      td = memoized_tmpdir_.clear
       o = _subject.new
 
       o.tmpdir_path ::File.join( td.path, 'one/two' )
@@ -116,7 +115,7 @@ module Skylab::System::TestSupport
     end
 
     def _subject
-      Home_::Services___::Filesystem::Tmpfile_Sessioner___
+      Home_::Services___::Filesystem::Sessions_::Tmpfile_Sessioner
     end
   end
 end
