@@ -29,7 +29,7 @@ module Skylab::Cull::TestSupport
     end
 
     it "create on a directory with the thing already" do
-      call_API :create, :path, freshly_initted_path
+      call_API :create, :path, freshly_initted_path_
       expect_not_OK_event :directory_exists
       expect_failed
     end

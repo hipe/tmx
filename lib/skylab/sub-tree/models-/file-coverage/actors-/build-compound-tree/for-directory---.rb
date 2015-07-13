@@ -26,7 +26,7 @@ module Skylab::SubTree
           _st = Home_.lib_.system.filesystem.find( :path, @business_hub_dir_,
               :filename, "*#{ Autoloader_::EXTNAME }",  # here we :+[#008] assume all relevant files have one same extension
               :freeform_query_infix_words, TYPE_FILE___,
-              :as_normal_value, -> cmd do
+              :when_command, -> cmd do
                 cmd.to_path_stream
               end )
 

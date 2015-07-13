@@ -167,7 +167,7 @@ now.)
 well here's the exact reason:
 
 with this number of metafields we can model "isomorphically" and
-losslessly all of the formal propertie of an entity's model as well as
+losslessly all of the formal properties of an entity's model as well as
 the actual values of the entity. we can do this just as easily if the
 entity is represented by an object (i.e instance of the model class) or
 in some other collection of values, like a hash, "iambic" array or

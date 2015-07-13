@@ -1,5 +1,5 @@
 [#045]       permute (as a doctest action)
-[#044]       "the new test architecture convention" (with fewer t.s nodes)
+[#044] #hole
 [#043] #open modernize doc-test templates
 [#042]       "nasty OCD memoize" caveat (for [sg])..
 [#041]       [ sidesystem ]  (variants exist universally. this is #hub)
@@ -8,7 +8,7 @@
 [#038]       expect line
 [#037]       #tracking tag warnings wishlist (#parent-node: [#014])
 [#036]       make lexical scope deeper in quickie main document.
-[#035]       #parent-node:[#021] the system narrative ..
+[#035]       track the ways in which sidesystems expose test insturments
 [#034] #open #parent-node: [015] "re-architect.."
 [#033]       #historical #done fix test globbing .. [#xx-009]
              ( #was: #done if you un-orphanize core.rb it presents an issue with autoloader) )
@@ -44,15 +44,14 @@
 [#009]       #subscription - will Quickie ever short-circuit (throw
                exceptions) on individual test-failures like ::Rspec?
 [#008]       #tracking-tag quickie root invocation (runtime/context)
-[#007]       #tracking tag of simlar places with line / `call_digraph_listeners` structs
+[#007]       #tracking tag of similar places with line / `call_digraph_listeners` structs
 [#006] #open test/all: redundancy points, maybe waits for [#tm-056]
 [#005] #open #quickie #redundant s-tylize
-[#004] #open quickie: module names into fashion (and now narrative)
-[#005]       #doc-point confessions of an ambiguous grammar .. (was [#xx-005]
-             ( #was: #done test/all should (whitelist) run the tests in the proivded order,
-             and not the lexical order? )
+             ( #was: confessions of an ambiguous grammar .. )
+             ( #was: #done test/all should (whitelist) run the tests in the
+               proivded order, and not the lexical order? (see [#xxx].))
              ( #was: #done rename `all_specs.rb` -> all )
+[#004] #open quickie: module names into fashion (and now narrative)
 [#002]       coverage is a no fun zone ..
              ( #was: #done Constants too )
-[#001]       [ tree runner ]
-             ( #was: #done regret )
+[#001]       test-suite architecture and conventions..

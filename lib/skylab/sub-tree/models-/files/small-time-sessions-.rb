@@ -35,7 +35,7 @@ module Skylab::SubTree
             :paths, @paths,
             * _pattern_part,
             :freeform_query_infix_words, %w'-type file',
-            :as_normal_value, IDENTITY_, & @on_event_selectively )
+            :when_command, IDENTITY_, & @on_event_selectively )
 
           @cmd_o && ACHIEVED_
         end

@@ -11,6 +11,9 @@ one day we might break them into their own taxonomy because there are
 some clear axes; like structurally higher-level vs. lower level, or what
 kinds of development the workflows pertain to.
 
+also it would behoove us to cull-out any workflows we don't use anymore,
+with perhaps a retrospective analysis.
+
 
 
 
@@ -47,7 +50,7 @@ HOWEVER we now have a stronger rational for a different suggested order:
 
   1. list FIRST
   2. THEN retrieve
-  2. THEN delete
+  3. THEN delete
   4. THEN create
   5. THEN update
 
@@ -89,41 +92,41 @@ your silo-esque:
     that to not mutate.
 
   • generally, the more arguments an action takes, the more work it will
-    be to implement that action. this can be mitigated if you can re-use
-    existing work that handles the arguments.
+    be to implement that action. the more arguments you can process by
+    re-using existing work, the more this factor is mitigated.
 
 let's look at the order again, and we'll also add notation from the
 perspective of mutability:
 
     1. list FIRST     - does not mutate
     2. THEN retrieve  - does not mutate
-    2. THEN delete    - mutates the collection
+    3. THEN delete    - mutates the collection
     4. THEN create    - mutates an entity and collection
     5. THEN update    - mutates an entity
 
 let's also look at the order in terms of the kinds of "arguments" that
 are typically necessary for such "actions"
 
-    1. list FIRST     - no arguments (or some sort of collection identifier)
-    2. THEN retrieve  - same args as above plus an entity identifier
-    2. THEN delete    - exact same args as above
-    4. THEN create    - same args as 1. plus ALL required fields and etc
-    5. THEN update    - typically similar to 4. AND args from 2.
+    1. list FIRST     - ~0 arguments (or some sort of collection identifier)
+    2. THEN retrieve  - ~1: same args as above plus an entity identifier
+    3. THEN delete    - ~1: exact same args as above
+    4. THEN create    - ~many: same as (1) plus ALL required fields and etc
+    5. THEN update    - ~many: typically the args from (4) plus (2).
 
-in step 1. you get your head (and code) around the basics of working
+in step 1 you get your head (and code) around the basics of working
 with your datastore. also you have to get your entity class-ish working,
 but only enough to list often only a single field from it (the
 natural-key type field). and you're not mutating anything, so there
 aren't as many "moving parts" (and points of failure) as there would
 otherwise be.
 
-in step 2. you implement the resolution of a single entity from an
+in step 2 you implement the resolution of a single entity from an
 identifier. you have at least two branches to cover here; the entity
 may not be found. and you may get into working with particular fields
 of your entity and displaying them in some read-only way. but again there
 is no mutation yet; you have staved that off until..
 
-step 3. deleting (to whatever extent you actually do this) is a step
+step 3: deleting (to whatever extent you actually do this) is a step
 that in practice is intuitively (or ostensibly pragmatically) saved
 either for the end or for never. we think it makes the most sense to
 implement the delete as the first mutating action because:

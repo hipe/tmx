@@ -18,12 +18,17 @@ module Skylab::Git::TestSupport
       # if we were after rotund robustness we would mock the filesystem but
       # we are not yet. in lieu of this:
       #
-      # currently,  we *assume* that whatever tmpdir we are using, it will
-      # NOT itself "look" versioned, NOR exist under a versioned directory.
-      # although this assumption seems reasonable, it is by no means
-      # guaranteed to be valid assumption on all systems.
+      # currently,  we *assume* that whatever the topmost tmpdir is that
+      # is handed to us by the host system (via the host platform), that
+      # that directory will NOT itself "look" versioned, NOR exist under
+      # any versioned directory (all the way up to the root of the
+      # filesystem).
+      #
+      # although this assumption may fly in some environment by (almost)
+      # pure happenstance, it is by no means guaranteed to be a valid
+      # assumption on all systems.
 
-      _path = memoized_tmpdir_.path
+      _path = real_filesystem.tmpdir_path
 
       cd_ _path do
         invoke 'stow', 'pop', 'no-see-stow'

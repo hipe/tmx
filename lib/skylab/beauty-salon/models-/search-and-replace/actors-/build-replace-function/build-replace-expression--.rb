@@ -6,13 +6,13 @@ module Skylab::BeautySalon
 
       class Build_replace_expression__
 
-        Callback_::Actor.call self, :properties,
+        Callback_::Actor.call( self, :properties,
 
           :capture_identifier,
           :method_call_chain,
+          :when_replace_expression,
           :work_dir,
-          :as_normal_value,
-          :on_event_selectively
+        )
 
         def execute
           @method_call_chain = @method_call_chain.map( & :intern )
@@ -26,7 +26,7 @@ module Skylab::BeautySalon
         end
 
         def via_fulfiller
-          @as_normal_value[
+          @when_replace_expression[
             Replace_Expression__.new @method_call_chain,
               @capture_identifier, @fulfiller ]
         end
@@ -168,8 +168,17 @@ module Skylab::BeautySalon
           end
 
           def resolve_tree_guess_via_path
-            @tree = Home_.lib_.system.filesystem.hack_guess_module_tree @path, & @oes
-            @tree ? ACHIEVED_ : UNABLE_
+
+            tree = Home_.lib_.system.filesystem.hack_guess_module_tree(
+              @path,
+              & @oes )
+
+            if tree
+              @tree = tree
+              ACHIEVED_
+            else
+              tree
+            end
           end
 
           def via_tree_guess_and_loaded_path_resolve_function

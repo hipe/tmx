@@ -32,10 +32,11 @@ module Skylab::Brazen
       UNDERSCORE_RX__ = /_/
 
       def when_no_fields
-        LIB_.system.filesystem.normalization.unlink_file(
+
+        LIB_.system.filesystem( :Unlink_File ).with(
           :path, @path,
           :if_exists,
-          :on_event_selectively, @on_event_selectively )
+          & @on_event_selectively )
       end
 
       def when_some_fields
@@ -55,28 +56,41 @@ module Skylab::Brazen
 
         _dirname = ::File.dirname @path
 
-        _valid_arg = LIB_.system.filesystem.normalization.existent_directory(
+        kn = LIB_.system.filesystem( :Existent_Directory ).with(
           :path, _dirname,
           :create_if_not_exist,
-          :max_mkdirs, 1 ) do | * i_a, & ev_p |
-            @on_event_selectively.call( * i_a, & ev_p )
-            UNABLE_
-          end
+          :max_mkdirs, 1,
 
-        _valid_arg ? ACHIEVED_ : UNABLE_
+        ) do | * i_a, & ev_p |
+          # hi.
+          @on_event_selectively.call( * i_a, & ev_p )
+          UNABLE_
+        end
+
+        if kn
+          ACHIEVED_
+        else
+          kn
+        end
       end
 
       def write  # assume any dirname of path exists and is a directory
-        @down_IO = LIB_.system.filesystem.normalization.downstream_IO(
-          :path, @path,
-          :on_event, -> ev do
-            scan = line_scan_for_event ev
-            while line = scan.gets
-              @serr.write "#{ line } .."
-            end
-            ev.ok
-          end )
-        if @down_IO
+
+        io = LIB_.system.filesystem( :Downstream_IO ).against_path(
+          @path
+
+        ) do | * i_a, & ev_p |
+
+          ev = ev_p[]
+          scan = line_scan_for_event ev
+          while line = scan.gets
+            @serr.write "#{ line } .."
+          end
+          ev.ok
+        end
+
+        if io
+          @down_IO = io
           via_down_IO_write
         else
           UNABLE_

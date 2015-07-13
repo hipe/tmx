@@ -17,39 +17,43 @@ module Skylab::Dependency
 
       valid? or fail(invalid_reason)
 
-      _n11n = Home_.lib_.system.filesystem.normalization
-
       did_send_event = nil
 
-      valid_arg = _n11n.existent_directory(
+      kn = Home_.lib_.system.filesystem( :Existent_Directory ).with(
         :path, mkdir_p,
         :is_dry_run, dry_run?,
         :max_mkdirs, max_depth,
         :create_if_not_exist
+
       ) do | * i_a, & ev_p |
           did_send_event = true
           send :"receive_#{ i_a.last }", ev_p[]
           UNABLE_
         end
 
-      if valid_arg
-        valid_arg.value_x
+      if kn
+        kn.value_x
       elsif ! did_send_event
         call_digraph_listeners :info, "directory exists: #{ mkdir_p }"
-        valid_arg
+        kn
       end
     end
 
     def receive_path_too_deep o
+
       _msg = "won't mkdir more than #{ o.max_mkdirs } levels deep #{
         }(#{ pretty_path o.path } requires at least #{ o.necessary_mkdirs } levels)"
+
       call_digraph_listeners :info, _msg
-      false
+
+      UNABLE_
     end
 
-    def receive_file_utils_event o
-      call_digraph_listeners :info, "#{ o.message_head }#{ o.path }"
-      nil
+    def receive_creating_directory o
+
+      call_digraph_listeners :info, "mkdir #{ o.path }"
+
+      NIL_
     end
   end
 end

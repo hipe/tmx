@@ -130,14 +130,15 @@ module Skylab::CodeMolester
       Basic[]::String
     end
 
+    _System_lib = sidesys[ :System ]
+
     System = -> do
-      System_lib__[].services
+      _System_lib[].services
     end
 
-    System_lib__ = sidesys[ :System ]
+    System_default_tmpdir_path = _memoize do
 
-    System_default_tmpdir_pathname = _memoize do
-      System[].filesystem.tmpdir_pathname.join 'co-mo'
+      ::File.join System[].filesystem.tmpdir_path, 'co-mo'
     end
 
     INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(

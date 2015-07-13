@@ -6,7 +6,7 @@ module Skylab::Basic
 
       Callback_::Actor.methodic self, :properties,
         :on_event,
-        :as_normal_value
+        :when_normal_value
 
       private
 
@@ -44,7 +44,7 @@ module Skylab::Basic
 
       def initialize & p
         @arg_was_provided = false
-        @as_normal_value = @on_event = @rng = nil
+        @when_normal_value = @on_event = @rng = nil
         instance_exec( & p )
       end
 
@@ -70,7 +70,7 @@ module Skylab::Basic
       def execute
         @rng and flush_some_current_mutable_range_to_or_list
         if @arg_was_provided
-          if @as_normal_value
+          if @when_normal_value
             via_three_normalize
           elsif @on_event
             via_two_normalize
@@ -102,20 +102,20 @@ module Skylab::Basic
 
       def execute_is_valid
         @on_event = NILADIC_FALSEHOOD_
-        @as_normal_value = MONADIC_TRUTH_
+        @when_normal_value = MONADIC_TRUTH_
         via_three_normalize
       end
 
       def via_one_normalize
         @on_event = IDENTITY_
-        @as_normal_value = MONADIC_EMPTINESS_
+        @when_normal_value = MONADIC_EMPTINESS_
         via_three_normalize
       end
 
     private
 
       def via_two_normalize
-        @as_normal_value = IDENTITY_
+        @when_normal_value = IDENTITY_
         via_three_normalize
       end
 
@@ -130,7 +130,7 @@ module Skylab::Basic
           end
         end
         if ok
-          @as_normal_value[ x ]
+          @when_normal_value[ x ]
         elsif @on_event.arity.zero?
           @on_event[]
         else

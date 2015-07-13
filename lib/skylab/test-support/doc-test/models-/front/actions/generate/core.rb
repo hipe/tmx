@@ -210,6 +210,7 @@ module Skylab::TestSupport
         end
 
         def initialize boundish  # and oes_p
+
           @_arbitrary_proc_a = nil
           @arbitrary_O_A_proc_array = nil
           @business_module_name = nil
@@ -223,9 +224,6 @@ module Skylab::TestSupport
           @upstream_path = nil
           super
         end
-
-
-
 
         # ~ begin frontier experiment with curried actions
 
@@ -275,6 +273,7 @@ module Skylab::TestSupport
         end
 
         def execute  # no, this wasn't already implemented by the f.w!
+
           @argument_box ||= Callback_::Box.the_empty_box # ick/meh
           bc = via_arguments_produce_bound_call  # will call normalize
           bc and begin
@@ -283,8 +282,6 @@ module Skylab::TestSupport
         end
 
         # ~ end frontier experiment with curried actions
-
-
 
         # ~ begin experiment with dynamic syntax e.t al
 
@@ -446,8 +443,6 @@ module Skylab::TestSupport
 
         # ~ end experiment with dynamic syntax
 
-
-
         def produce_result
 
           # order is somewhat arbitrary: what is covered is to resolve
@@ -520,13 +515,14 @@ module Skylab::TestSupport
             @force,
             self.class.properties.fetch( :force ) )
 
-          io = Home_.lib_.system.filesystem.normalization.downstream_IO(
+          kn = Home_.lib_.system.filesystem( :Downstream_IO ).with(
             :path, @output_path,
             :is_dry_run, @dry_run,
             :force_arg, _force_arg,
             & handle_event_selectively )
 
-          if io
+          if kn
+            io = kn.value_x
             io.truncate 0
             @do_close_downstream = true
             @line_downstream = io
@@ -559,18 +555,21 @@ module Skylab::TestSupport
 
         def via_upstream_path_rslv_line_upstream
 
-          io = Home_.lib_.system.filesystem.normalization.upstream_IO(
+          io = Home_.lib_.system.filesystem( :Upstream_IO ).against_path(
 
-              :path, @upstream_path ) do | * i_a, & ev_p |
+            @upstream_path,
+
+          ) do | * i_a, & ev_p |
 
             @result = maybe_send_event_via_channel i_a, & ev_p
             :error != i_a.first
           end
 
           if io
-            @line_upstream = io ; ACHIEVED_
+            @line_upstream = io
+            ACHIEVED_
           else
-            UNABLE_
+            io
           end
         end
 
@@ -615,9 +614,6 @@ module Skylab::TestSupport
           ok
         end
 
-
-
-
       public  # ~ the public API for parameter functions (alphabetical by stem)
 
         # ~~ filesys idioms
@@ -657,7 +653,6 @@ module Skylab::TestSupport
             x
           end
         end
-
 
         # ~ synthesize
 

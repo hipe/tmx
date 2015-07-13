@@ -106,8 +106,6 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         call_API :translate, :force, :flexfile, _in_path, * _etc( _out_path )
 
-        expect_neutral_event :before_editing_existing_file
-
         ev = expect_not_OK_event :errno_eisdir
 
         black_and_white( ev ).should match %r(\AIs a directory - «.+/fixture-files)

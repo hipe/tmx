@@ -103,16 +103,19 @@ module Skylab::Brazen
       end
 
       def create_directories
+
         ok = true
+
         @make_these_directories.each do | dir |
 
-          same_dir = LIB_.system.filesystem.normalization.downstream_IO(
-            :ftype, 'directory', :path, dir,
+          kn = LIB_.system.filesystem( :Downstream_IO ).with(
+            :path, dir,
+            :ftype, 'directory',
             :is_dry_run, @is_dry,
-            :on_event_selectively, @on_event_selectively )  # (because entity)
+            & @on_event_selectively )
 
-          if ! same_dir
-            ok = same_dir
+          if ! kn
+            ok = kn
             break
           end
         end

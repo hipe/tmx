@@ -284,14 +284,16 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
             path_arg = path_arg.to_unknown
           end
 
-          io = LIB_.system.filesystem.normalization.upstream_IO.with(
+          kn = LIB_.system.filesystem( :Upstream_IO ).with(
             :path_arg, path_arg,
-            :instream, @resources.sin,
+            :stdin, @resources.sin,
             & handle_event_selectively )
 
-          io and begin
-            @upstream_ID = Home_.lib_.basic::Pathname.identifier io, path
+          if kn
+            @upstream_ID = Home_.lib_.basic::Pathname.identifier kn.value_x, path
             ACHIEVED_
+          else
+            kn
           end
         end
 
@@ -317,10 +319,10 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
             path_arg = path_arg.to_unknown
           end
 
-          io = LIB_.system.filesystem.normalization.downstream_IO.with(
+          kn = LIB_.system.filesystem( :Downstream_IO ).with(
 
             :path_arg, path_arg,
-            :outstream, @resources.sout,
+            :stdout, @resources.sout,
             :force_arg, qualified_knownness( :force )
 
           ) do | * i_a, & ev_p |
@@ -332,10 +334,12 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
             handle_event_selectively[ * i_a, & ev_p ]
           end
 
-          io and begin
+          if kn
             @verb_s ||= 'output'
-            @downstream_ID = Home_.lib_.basic::Pathname.identifier io, path
+            @downstream_ID = Home_.lib_.basic::Pathname.identifier kn.value_x, path
             ACHIEVED_
+          else
+            kn
           end
         end
 

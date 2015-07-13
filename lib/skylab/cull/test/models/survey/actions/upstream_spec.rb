@@ -32,7 +32,7 @@ module Skylab::Cull::TestSupport
 
       call_API :survey, :edit,
         :upstream, s,
-        :path, freshly_initted_path
+        :path, freshly_initted_path_
 
     end
 
@@ -109,7 +109,7 @@ module Skylab::Cull::TestSupport
     it "unset - no" do
       call_API :survey, :edit,
         :upstream, Home_::EMPTY_S_,
-        :path, freshly_initted_path
+        :path, freshly_initted_path_
 
       expect_not_OK_event :no_upstream_set
       expect_failed

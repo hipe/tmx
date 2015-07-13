@@ -26,13 +26,30 @@ scope we adhere to when naming our instance variables:
 
     @public_instance_variable   # :#tier-0 - public API-ish
 
-    @_cozy_scope  # :#tier-1: used only in this file
+    @library_scope_  # #tier-1 - see
 
-    @__singleton_scope  # :#tier-2: only ever used for true-ish memoized ivars?
+    @_cozy_scope  # :#tier-2: used only in this file
+
+    @__singleton_scope  # :#tier-3: only ever used for true-ish memoized ivars?
 
     @___alternate_for_above  # is there a difference with above?
 
 the descriptions in the first mentioned source apply here.
+
+
+for :#tier-1:, first see the same tier over in [#028] the method name
+conventions. when used for an ivar, this convention has a related but
+very particular meaning: it means *either*:
+
+  • that that this ivar is recognized and used by a dependency
+    module (e.g a parent class), -OR-
+
+  • that this ivar is expected to be used by a client module
+    (e.g a child class), -OR-
+
+  • that nodes "nearby" use this same ivar name with these same
+    semantics, and as such this ivar is an abstraction candidate that
+    may move into one of the above two categories.
 
 
 

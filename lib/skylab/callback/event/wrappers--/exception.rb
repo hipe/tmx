@@ -9,8 +9,8 @@ module Skylab::Callback
           :terminal_channel_i
 
         def initialize & p
+          @_event_property_pairs = nil
           @_mutator_p_a = nil
-          @_xtra_prop_x_a = nil
           instance_exec( & p )
         end
 
@@ -39,11 +39,14 @@ module Skylab::Callback
 
         PATH_HACK_RX___ = / @ rb_(?<rb_function_name>[_a-z]+) - /
 
-        def properties=
+        def event_property=
 
-          @_xtra_prop_x_a = polymorphic_upstream.flush_remaining_to_array
-
-          KEEP_PARSING_  # altho we should stop now, it looks like error otherwise
+          st = polymorphic_upstream
+          _sym = st.gets_one
+          _x = st.gets_one
+          a = ( @_event_property_pairs ||= [] )
+          a.push _sym, _x
+          KEEP_PARSING_
         end
 
         def search_and_replace_hack=
@@ -88,9 +91,9 @@ module Skylab::Callback
             __via_exception_add_members_to_edit
           end
 
-          if @_xtra_prop_x_a
-            @_sess.concat @_xtra_prop_x_a
-            @_xtra_prop_x_a = nil
+          if @_event_property_pairs
+            @_sess.concat @_event_property_pairs
+            @_event_property_pairs = nil
           end
 
           if @_mutator_p_a

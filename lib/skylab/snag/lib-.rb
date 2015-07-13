@@ -83,7 +83,7 @@ module Skylab::Snag
     Parse_lib = sidesys[ :Parse ]
 
     Patch_lib = -> do
-      System[].patch
+      System[].filesystem.patch
     end
 
     Path_tools = -> do

@@ -94,7 +94,7 @@ module Skylab::BeautySalon
 
         @line_range_union = h.fetch :lines
 
-        @line_range_union ||= 
+        @line_range_union ||= self._DESIGN_ME
 
 
         @line_no_fmt = '%4d'
@@ -135,7 +135,10 @@ module Skylab::BeautySalon
       end
 
       def __produce_open_file_IO
-        Home_.lib_.system.filesystem.normalization.upstream_IO @upstream_path, & @on_event_selectively
+
+        Home_.lib_.system.filesystem( :Upstream_IO ).against_path(
+          @upstream_path,
+          & @on_event_selectively )
       end
 
       def __process_upstream_lines

@@ -1,8 +1,5 @@
 module Skylab::Git::TestSupport
 
-  # ERR_I__ = :errstream
-  # OUT_I__ = :outstream
-
   module Modality_Integrations::CLI::Support
 
     def self.[] tcc

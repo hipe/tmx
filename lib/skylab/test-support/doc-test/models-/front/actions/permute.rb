@@ -39,22 +39,21 @@ module Skylab::TestSupport
 
         def __resolve_upstream_IO
 
-          io =
-          Home_.lib_.system.filesystem.normalization.upstream_IO.with(
+          kn = Home_.lib_.system.filesystem( :Upstream_IO ).with(
             :path_arg, knownness( :test_file ),
             & handle_event_selectively )
 
-          if io
+          if kn
 
             h = @argument_box.h_
 
             @_down = h.fetch :stdout
             @_thru = h.fetch :stderr
-            @_up = io
+            @_up = kn.value_x
 
             ACHIEVED_
           else
-            io
+            kn
           end
         end
 

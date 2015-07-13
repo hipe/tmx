@@ -174,7 +174,7 @@ module Skylab::FileMetrics
           :ignore_dirs, h.fetch( :exclude_dir ),
           :filenames, h[ :include_name ],
           :freeform_query_infix_words, %w'-a -maxdepth 1 -type d',
-          :as_normal_value, IDENTITY_ )
+          :when_command, IDENTITY_ )
 
         if cmd
 

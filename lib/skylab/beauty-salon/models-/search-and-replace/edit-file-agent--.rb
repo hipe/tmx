@@ -316,21 +316,25 @@ module Skylab::BeautySalon
       end
 
       def write_any_changed_file
+
         S_and_R_::Actors_::Write_any_changed_file.with(
+
           :edit_session, @es,
           :work_dir_path, work_dir,
           :is_dry_run, false,  # etc.
-          :on_event_selectively, -> * i_a, & ev_p do
-            ev = ev_p[]
-            maybe_send_event_via_channel i_a do
-              ev
-            end
-            if ev.ok || ev.ok.nil?  # result matters: report 'OK'
-              ACHIEVED_  # even if no write occured.
-            else
-              ev.ok
-            end
-        end )
+
+        ) do | * i_a, & ev_p |
+
+          ev = ev_p[]
+          maybe_send_event_via_channel i_a do
+            ev
+          end
+          if ev.ok || ev.ok.nil?  # result matters: report 'OK'
+            ACHIEVED_  # even if no write occured.
+          else
+            ev.ok
+          end
+        end
       end
 
       class Button_ < Field_

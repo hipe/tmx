@@ -10,6 +10,8 @@ module Skylab::Git
 
         MUTATE_THESE_PROPERTIES =  [ :branch_name_stream ]
 
+        # ~ converge three inputs into one backbound argument
+
         def mutate__branch_name_stream__properties
 
           # the back only cares about having a stream of branch names.
@@ -21,8 +23,8 @@ module Skylab::Git
           #      use case, but is decidedly *not* something the back should
           #      concern itself with.
           #
-          #   2) read the branch names from STDIN. this argument interface
-          #      is script-friendly, and is an appropriate idiom to support
+          #   2) read the branch names from STDIN. this script-friendly
+          #      argument interface is the idiomatic choice-of-least-surprise
           #      for this modality.
           #
           #   3) read the branch names as lines of a file. this is an
@@ -39,84 +41,9 @@ module Skylab::Git
             # below we must still operate knowing it is there and required.
 
           mfp.add :file, __build_file_property  # add this to the UI, and
-            # we will reconcile it belwo
+            # we will reconcile it below
 
           NIL_
-        end
-
-        def prepare_backstream_call x_a
-
-          # as for implementation of the numbered points in the previous
-          # comment section (especially as it pertains to our UI policy):
-          #
-          #   • we added a `file` property. we must now nastily process it.
-          #
-          #   • we must manually process the presence of any
-          #     non-interactive STDIN.
-          #
-          #   • we must UI validate mutex against the above two.
-          #
-          #   • in absence of either of the above 2, we default to (1)
-          #
-          #   • if (1) fails we need to issue an "unable" thru the UI
-
-          if ! @resources.sin.tty?
-            sin = @resources.sin
-          end
-
-          seen = @seen[ :file ]
-          if seen
-            d = seen.last_seen_index
-            file = x_a[ d + 1 ]
-            x_a[ d, 2 ] = EMPTY_A_  # eew
-          end
-
-          if sin
-            if file
-              __when_both
-            else
-              __prepare_etc_when_sin sin, x_a
-            end
-          elsif file
-            __prepare_etc_when_file file, x_a
-          else
-            __prepare_etc_via_VCS x_a
-          end
-        end
-
-        def __when_both
-
-          prp = @front_properties.fetch :file
-          io = stderr
-          expression_agent.calculate do
-            io.puts "STDIN and #{ par prp } are mutually exclusive."
-          end
-          output_invite_to_general_help
-          maybe_use_exit_status Brazen_::CLI::GENERIC_ERROR
-          UNABLE_
-        end
-
-        def __prepare_etc_when_sin sin, x_a
-
-          x_a.push :branch_name_stream, _wrap_IO( sin )
-          ACHIEVED_
-        end
-
-        # ~~ for file
-
-        def __prepare_etc_when_file file, x_a
-
-          _io = ::File.open file  # or etc
-          _st = _wrap_IO _io
-          x_a.push :branch_name_stream, _st
-          ACHIEVED_
-        end
-
-        def _wrap_IO io
-
-          Callback_.stream do
-            io.gets
-          end
         end
 
         def __build_file_property
@@ -131,11 +58,55 @@ module Skylab::Git
           end
         end
 
-        # ~~ for vcs
+        def prepare_backstream_call x_a
 
-        def __prepare_etc_via_VCS x_a
+          # as for implementation of the numbered points in the previous
+          # comment section (especially as it pertains to our UI policy):
+          #
+          #   • do [#sy-022.A] the common normalization for stdin and file.
+          #
+          #   • if we get a valid neither from the above, we default to (1)
+          #
+          #   • if (1) fails we need to issue an "unable" thru the UI
 
-          _path = ::Dir.pwd
+          st = __produce_name_stream
+          if st
+            x_a.push :branch_name_stream, st
+            ACHIEVED_
+          else
+            st
+          end
+        end
+
+        def __produce_name_stream
+
+          _path_arg = remove_backstream_argument :file
+
+          kn = Home_.lib_.system.filesystem( :Upstream_IO ).with(
+            :instream, @resources.sin,
+            :path_arg, _path_arg,
+            :neither_is_OK,
+            & handle_event_selectively
+          )
+
+          if kn
+            if kn.is_known
+              kn.value_x.to_simple_line_stream
+            else
+
+              # the argument value is a known unknown, that is, the user
+              # wants us to use neither STDIN nor a file, so:
+
+              __produce_name_stream_via_VCS
+            end
+          else
+            kn  # e.g mutex failure on STDIN & file
+          end
+        end
+
+        def __produce_name_stream_via_VCS
+
+          _path = ::Dir.pwd  # OK to access this from current modality ONLY
           _sc = @resources.system_conduit_
 
           bc = Home_::Models::Branch_Collection.via_project_path_and_cetera(
@@ -149,17 +120,15 @@ module Skylab::Git
             # so yea, from front to back back to front we effectively
             # serialize and then un-serialze the same structure, but meh.
 
-            _st = bc.to_stream.map_by do | branch_o |
+            bc.to_stream.map_by do | branch_o |
               branch_o.name_string
             end
-            x_a.push :branch_name_stream, _st
-            ACHIEVED_
           else
-            UNABLE_
+            bc
           end
         end
 
-        # ~
+        # ~ hack o.p
 
         def bound_call_from_parse_options
 

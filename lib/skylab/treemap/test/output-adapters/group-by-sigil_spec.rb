@@ -15,7 +15,7 @@ module Skylab::Treemap::TestSupport
 
       call_API :session,
         :upstream_identifier, _path,
-        :stdin, :_no_stdin_,
+        :stdin, Home_.lib_.system.test_support.mocks.interactive_STDIN_instance,
         :stdout, io,
         :stderr, :_no_stderr_,
         :output_adapter, 'group-by-sigi'

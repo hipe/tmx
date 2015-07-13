@@ -5,21 +5,6 @@ module Skylab::TestSupport
     # [#031] WILL SUNSET. use "io spy group" for all new work
     # see [#020] a comparison of different IO spy aggregations
 
-    class << self
-
-      def mock_noninteractive_STDIN_class
-        Mock_Noninteractive_STDIN__
-      end
-
-      def mock_noninteractive_STDIN_instance
-        MOCK_NONINTERACTIVE_STDIN__
-      end
-
-      def mock_interactive_STDIN_instance
-        MOCK_INTERACTIVE_STDIN__
-      end
-    end
-
     def initialize *three
       @do_debug = nil
       three.length > 3 and raise ::ArgumentError, "it's three bro"
@@ -87,36 +72,6 @@ module Skylab::TestSupport
     def clear_buffers
       values.each( & :clear_buffer )
       nil
-    end
-
-    MOCK_INTERACTIVE_STDIN__ =
-    class Stub_Interactive_STDIN__
-      def closed?
-        false
-      end
-      def tty?
-        true
-      end
-      def debug! _=nil
-      end
-      self
-    end.new
-
-    MOCK_NONINTERACTIVE_STDIN__ =
-    class Stub_Noninteractive_STDIN__ < Stub_Interactive_STDIN__
-      def tty?
-        false
-      end
-      self
-    end.new
-
-    class Mock_Noninteractive_STDIN__ < Stub_Noninteractive_STDIN__
-      def initialize a  # mutates a
-        @a = a ; nil
-      end
-      def gets
-        @a.shift
-      end
     end
   end
 end

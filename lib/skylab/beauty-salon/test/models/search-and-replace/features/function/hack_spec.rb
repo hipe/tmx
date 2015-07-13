@@ -37,8 +37,8 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
         s_a.length.should eql 5
       end
 
-      def subject * x_a, & p
-        Home_::Lib_::System[].filesystem.hack_guess_module_tree( * x_a, & p )
+      def subject * x_a, & x_p
+        Home_::Lib_::System[].filesystem.hack_guess_module_tree( * x_a, & x_p )
       end
 
   end

@@ -216,6 +216,13 @@ tranformation functions that you write, etc.
 
 
 
+## something about currying..
+
+should go here (EDIT)
+
+
+
+
 ## a plastic distinction between normalizer class and object thru currying
 
 the paradigm behind a "prototype-based" object-oriented language like

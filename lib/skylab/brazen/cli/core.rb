@@ -632,6 +632,26 @@ module Skylab::Brazen
         ACHIEVED_
       end
 
+      def remove_backstream_argument sym
+
+        seen = @seen[ sym ]
+        if seen
+
+          d = seen.last_seen_index
+          had = true
+
+          x_a = @mutable_backbound_iambic
+          x = x_a[ d + 1 ]
+          x_a[ d, 2 ] = EMPTY_A_  # eew
+        end
+
+        Callback_::Qualified_Knownness.via_value_and_had_and_model(
+          x,
+          had,
+          @front_properties.fetch( sym ),
+        )
+      end
+
       def __bound_call_via_bound_action_and_mutated_backbound_iambic
 
         bc = @bound.bound_call_against_polymorphic_stream(

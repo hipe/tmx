@@ -19,14 +19,13 @@ module Skylab::BeautySalon
 
         class Producer__
 
-          Callback_::Actor.methodic self, :simple, :properties,
+          Callback_::Actor.methodic( self, :simple, :properties,
 
             :property, :ruby_regexp,
             :ignore, :property, :grep_extended_regexp_string,
             :property, :do_highlight,
             :ignore, :property, :max_file_size_for_multiline_mode,
-            :property, :on_event_selectively
-
+          )
 
           def initialize
             @do_highlight = nil

@@ -1,6 +1,6 @@
 module Skylab::TestSupport
 
-  # (was [#035]:the-system-node)
+  # (was [#001]:the-system-node)
 
   module Library_
 
@@ -130,8 +130,8 @@ module Skylab::TestSupport
       ::Skylab
     end
 
-    Stderr = -> { ::STDERR }
-      # [#035]:the-reasons-to-access-system-resources-this-way
+    Stderr = -> { ::STDERR }  # [#001.E]: why access system resources this way
+
     Stdout = -> { ::STDOUT }
 
     Stream = -> x do

@@ -205,7 +205,7 @@ module Skylab::TestSupport
 
             @tree = Home_.lib_.system.filesystem.hack_guess_module_tree(
               :path, @existent_path,
-              :on_event_selectively, @on_event_selectively )
+              & @on_event_selectively )
 
             @tree and via_tree
           end

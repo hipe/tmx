@@ -24,7 +24,7 @@ module Skylab::CodeMolester::TestSupport
   Constants::Tmpdir_instance_ = Home_::Callback_.memoize do
     TestSupport_.tmpdir.new_with(
       :max_mkdirs, 2,
-      :path, Home_.lib_.system_default_tmpdir_pathname.join( 'co-mo' ),
+      :path, ::File.join( Home_.lib_.system_default_tmpdir_path, 'co-mo' ),
       :be_verbose, false )
   end
 

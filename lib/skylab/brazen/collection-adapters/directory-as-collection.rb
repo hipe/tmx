@@ -205,9 +205,12 @@ module Skylab::Brazen
 
     def __whine_about_missing_directory path
 
-      _ = Home_.lib_.system.filesystem.normalization
-      _.existent_directory path, & @on_event_selectively  # result is UNABLE_
+      _x = Home_.lib_.system.filesystem( :Existent_Directory ).against_path(
+        path,
+        & @on_event_selectively
+      )
 
+      UNABLE_ == _x or self._SANITY
       NIL_
     end
 

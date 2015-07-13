@@ -4,11 +4,11 @@ module Skylab::BeautySalon
 
     class Actors_::Write_any_changed_file
 
-      Callback_::Actor.call self, :properties,
+      Callback_::Actor.call( self, :properties,
         :edit_session,
         :work_dir_path,
         :is_dry_run,
-        :on_event_selectively
+      )
 
       Callback_::Event.selective_builder_sender_receiver self
 
@@ -68,11 +68,15 @@ module Skylab::BeautySalon
       end
 
       def flush
-        _fuc = Home_.lib_.system.filesystem.file_utils_controller.new -> msg do
+
+        _cls = Home_.lib_.system.filesystem.file_utils_controller
+
+        _fuc = _cls.new_via -> msg do
           @result = @on_event_selectively.call :info do
             Changed_[ @edit_session.path, @is_dry_run ]
           end
         end
+
         _fuc.mv @tmpfile, @edit_session.path, noop: @is_dry_run  # result is nil
         nil
       end

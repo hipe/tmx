@@ -11,7 +11,7 @@ module Skylab::SubTree::TestSupport::Models_Files
 
       call_API :files,
         :file_of_input_paths, :x,
-        :input_stream, MOCK_NONINTERACTIVE_IO_,
+        :input_stream, Mock_noninteractive_IO_[],
         :output_stream, :x
 
       _ev = expect_not_OK_event
@@ -45,7 +45,7 @@ module Skylab::SubTree::TestSupport::Models_Files
 
       call_API :files, :path, [ 'a' ],
         :file_of_input_paths, :x,
-        :input_stream, MOCK_NONINTERACTIVE_IO_,
+        :input_stream, Mock_noninteractive_IO_[],
         :output_stream, :x
 
       _ev = expect_not_OK_event

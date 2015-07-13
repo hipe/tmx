@@ -47,11 +47,14 @@ module Skylab::BeautySalon
       end
 
       def via_fresh_values_build_command & oes_p
+
         Home_.lib_.system.filesystem.find(
+
           :filenames, @glob_list,
           :paths, @path_list,
           :freeform_query_infix_words, %w'-type f',
-          :as_normal_value, IDENTITY_, & oes_p )
+          :when_command, IDENTITY_,
+          & oes_p )
       end
 
       def via_command_execute
@@ -228,11 +231,12 @@ module Skylab::BeautySalon
         end
 
         def via_ivars_build_path_stream_for mode_i
+
           S_and_R_::Actors_::Build_grep_path_stream.with(
             :upstream_path_stream, @upstream_path_stream,
             * @regexp_pair_a,
             :mode, mode_i,
-            :on_event_selectively, method( :maybe_receive_grep_event ) )
+            & method( :maybe_receive_grep_event ) )
         end
 
         def maybe_receive_grep_event * i_a, & ev_p
@@ -441,7 +445,7 @@ module Skylab::BeautySalon
         def via_file_stream_ivars_resolve_file_stream
 
           _do_highlight = @is_interactive && @serr.tty?
-          _oes = handle_unsigned_event_selectively
+          _oes_p = handle_unsigned_event_selectively
 
           @file_stream = S_and_R_::Actors_::Build_file_stream.with(
             :upstream_path_stream, @path_stream,
@@ -449,7 +453,7 @@ module Skylab::BeautySalon
             :grep_extended_regexp_string, @gers,
             :do_highlight, _do_highlight,
             for_interactive_search_and_replace_or_read_only,
-            :on_event_selectively, _oes )
+            & _oes_p )
 
           @file_stream && ACHIEVED_
         end
@@ -722,13 +726,15 @@ module Skylab::BeautySalon
           end
         end
 
-        def curry_file_writer tmpdir_path, oes=nil
-          -> edit_session, oes_=oes do
+        def curry_file_writer tmpdir_path, oes_p=nil
+
+          -> edit_session, oes_p_=oes_p do
+
             S_and_R_::Actors_::Write_any_changed_file.with(
               :edit_session, edit_session,
               :work_dir_path, tmpdir_path,
               :is_dry_run, false,
-              :on_event_selectively, oes_ )
+              & oes_p_ )
           end
         end
 

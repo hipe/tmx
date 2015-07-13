@@ -128,18 +128,21 @@ module Skylab::BeautySalon
       METHOD_NAME_RX__ = /[a-z_]+/
 
       def accept_thing d, s_a
+
         Self_::Build_replace_expression__.with(
+
           :capture_identifier, d,
           :method_call_chain, s_a,
           :work_dir, @work_dir,
-          :as_normal_value, -> x do
+          :when_replace_expression, -> x do
             @a.push x
             ACHIEVED_
-          end,
-          :on_event_selectively, -> * i_a, & ev_p do
-            @result = @on_event_selectively[ * i_a, & ev_p ]
-            @ok = UNABLE_
-          end )
+          end
+
+        ) do | * i_a, & ev_p |
+          @result = @on_event_selectively[ * i_a, & ev_p ]
+          @ok = UNABLE_
+        end
       end
 
       def expected * x_a

@@ -203,12 +203,13 @@ module Skylab::CodeMolester
       p and p[ read ]
       error_x = nil
 
-      io = ( Home_.lib_.system.filesystem.normalization.upstream_IO(
+      io = ( Home_.lib_.system.filesystem( :Upstream_IO ).against_path(
+        @pathname.to_path
 
-          :path, @pathname.to_path ) do | *, & ev_p |
+      ) do | *, & ev_p |
 
         error_x = read.receive_event ev_p[]
-        false
+        UNABLE_
       end )
 
       if io
@@ -312,21 +313,28 @@ module Skylab::CodeMolester
     end
 
     def wrt_when_valid w
+
       @write_verb_i = nil
+
       not_OK_ev = nil
-      io = Home_.lib_.system.filesystem.normalization.downstream_IO(
+
+      kn = Home_.lib_.system.filesystem( :Downstream_IO ).with(
         :is_dry_run, w.is_dry,
         :path, @pathname.to_path,
-        :on_event, -> ev do
-          if ev.ok || ev.ok.nil?
-            send :"wrt_when_#{ ev.terminal_channel_i }", ev, w
-          else
-            not_OK_ev = ev
-            UNABLE_
-          end
-        end )
-      if io
-        send :"wrt_when_#{ @write_verb_i }", io, w
+
+      ) do | * i_a, & ev_p |
+
+        ev = ev_p[]
+        if ev.ok || ev.ok.nil?
+          send :"wrt_when_#{ ev.terminal_channel_i }", ev, w
+        else
+          not_OK_ev = ev
+          UNABLE_
+        end
+      end
+
+      if kn
+        send :"wrt_when_#{ @write_verb_i }", kn.value_x, w
       else
         wrt_when_not_OK not_OK_ev, w
       end

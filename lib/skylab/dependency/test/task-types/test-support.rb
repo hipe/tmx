@@ -26,7 +26,7 @@ module Skylab::Dependency::TestSupport::Tasks
 
     def debug_event e
       dputs [ e.stream_symbol, e.text ].inspect
-      nil
+      NIL_
     end
   end
 end

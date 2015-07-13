@@ -78,7 +78,8 @@ module Skylab::TestSupport
       end
 
       super()
-      tty!
+
+      @this_system_IO_tee_is_a_tty = true
 
       if o.is_standard
         @muxer.add BUFFER_I__, Home_::Library_::StringIO.new

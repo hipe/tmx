@@ -48,20 +48,9 @@ module Skylab::SubTree::TestSupport::Models_Files
     end  # >>
   end
 
-  MOCK_NONINTERACTIVE_IO_ = class Mock_Noninteractive_IO___
-
-    def closed?
-      false
-    end
-
-    def close
-    end
-
-    def tty?
-      false
-    end
-    self
-  end.new
+  Mock_noninteractive_IO_ = -> do
+    Home_.lib_.system.test_support.mocks.noninteractive_IO_instance
+  end
 
   PRETTY_ = <<-HERE.unindent
     one

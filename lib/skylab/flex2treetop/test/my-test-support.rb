@@ -96,8 +96,10 @@ module Skylab::Flex2Treetop::MyTestSupport
 
     Tmpdir___ = -> do
       p = -> dbg_IO_p do
-        _pn = Home_::LIB_.system.filesystem.tmpdir_pathname.join 'f2tt'
-        x_a = [ :path, _pn ]
+
+        _path = ::File.join Home_::LIB_.system.filesystem.tmpdir_path, 'f2tt'
+        x_a = [ :path, _path ]
+
         dbg_IO = dbg_IO_p[]
         if dbg_IO
           x_a.push :be_verbose, true, :debug_IO, dbg_IO
@@ -147,15 +149,8 @@ module Skylab::Flex2Treetop::MyTestSupport
   Mock_Resources_ = ::Struct.new :sin, :sout, :serr
 
   Mock_interactive_stdin_ = Callback_.memoize do
-    Mock_Interactive_Stderr___.new
+    Home_.lib_.system.test_support.mocks.interactive_STDIN_instance
   end
-
-  class Mock_Interactive_Stderr___
-    def tty?
-      true
-    end
-  end
-
 
   Home_ = ::Skylab::Flex2Treetop
   FIXTURE_FILES_DIR_ = Home_.dir_pathname.join( 'test/fixture-files' ).to_path

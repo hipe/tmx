@@ -104,14 +104,17 @@ module Skylab::TanMan
 
         def __path_is_file
 
-          fs = _fs
+          sys = _sys
 
-          fs.normalization.upstream_IO.new_with(
+          _ftype = sys.filesystem.constants::FILE_FTYPE
+
+          _o = sys.filesystem( :Upstream_IO ).edit_with(
             :stat, @stat,
             :path_arg, @arg,
-            :only_apply_expectation_that_path_is_ftype_of, @fs.constants::FILE_FTYPE,
-            & @on_event_selectively ).via_stat_execute
+            :only_apply_expectation_that_path_is_ftype_of, _ftype,
+            & @on_event_selectively )
 
+          _o.via_stat_execute
         end
 
         def __path_has_extension
@@ -159,14 +162,20 @@ module Skylab::TanMan
 
         def __resolve_downstream_file
 
-          @f = _fs.normalization.downstream_IO.with(
-            :path_arg, @arg, & @on_event_selectively )
+          kn = _sys.filesystem( :Downstream_IO ).with(
+            :path_arg, @arg,
+            & @on_event_selectively )
 
-          @f && ACHIEVED_
+          if kn
+            @f = kn.value_x
+            ACHIEVED_
+          else
+            kn
+          end
         end
 
-        def _fs
-          @fs ||= Home_.lib_.system.filesystem
+        def _sys
+          @__sys ||= Home_.lib_.system
         end
 
         include Callback_::Event::Selective_Builder_Receiver_Sender_Methods

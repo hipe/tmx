@@ -13,7 +13,7 @@ module Skylab::Cull::TestSupport
       call_API :survey, :edit,
 
         :add_mutator, 'zoink',
-        :path, freshly_initted_path
+        :path, freshly_initted_path_
 
       expect_not_OK_event :uninitialized_constant
       expect_failed

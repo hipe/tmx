@@ -86,16 +86,8 @@ module Skylab::Treemap
 
         def __resolve_waypoints
 
-          h = @argument_box.h_
-
-          _ = Home_.lib_.system.filesystem.normalization
-
-          @_no = _.new_with(
-            :stdin, h.fetch( :stdin ),
-            :stdout, h.fetch( :stdout ),
-            :stderr, h.fetch( :stderr ),
+          @_n11n = Home_.lib_.system.filesystem( :Path_Based ).new_with(
             :recognize_common_string_patterns,
-            :result_in_IO_stream_identifier_trio,
             & handle_event_selectively )
 
           ok = __resolve_up
@@ -137,16 +129,34 @@ module Skylab::Treemap
 
         def _resolve_waypoint destination_ivar, trio, up_down, dash_means_sym
 
-          pair = @_no.call(
-            :up_or_down, up_down,
-            :path_arg, trio,
-            :dash_means, dash_means_sym )
+          h = @argument_box.h_
 
-          if pair
-            instance_variable_set destination_ivar, pair.value_x
+          _standards = case up_down
+
+          when :down
+            [ :stderr, h.fetch( :stderr ),
+              :stdout, h.fetch( :stdout ) ]
+
+          when :up
+            [ :stdin, h.fetch( :stdin ) ]
+          end
+
+          kn = @_n11n.with(
+            :up_or_down, up_down,
+            * _standards,
+            :path_arg, trio,
+            :dash_means, dash_means_sym,
+          )
+
+          if kn
+
+            _ID = @_n11n.byte_whichstream_identifier_for kn.value_x, up_down
+
+            instance_variable_set destination_ivar, _ID
+
             ACHIEVED_
           else
-            pair
+            kn
           end
         end
 

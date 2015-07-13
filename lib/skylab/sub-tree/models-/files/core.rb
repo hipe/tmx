@@ -223,13 +223,16 @@ module Skylab::SubTree
             _when_pattern
           else
 
-            io = Home_.lib_.system.filesystem.normalization.upstream_IO(
-              :path_arg, @upstream_arg, & handle_event_selectively )
+            kn = Home_.lib_.system.filesystem( :Upstream_IO ).with(
+              :path_arg, @upstream_arg,
+              & handle_event_selectively )
 
-            io and begin
+            if kn
 
-              @upstream_IO = io
+              @upstream_IO = kn.value_x
               ACHIEVED_
+            else
+              kn
             end
           end
         end

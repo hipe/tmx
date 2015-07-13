@@ -101,7 +101,7 @@ module Skylab::Headless::TestSupport::CLI::Client
       context "with STDIN and filename" do
 
         def stdin_spy
-          TestSupport_::IO.spy.triad.mock_noninteractive_STDIN_instance
+          Home_.lib_.system.test_support.mocks.noninteractive_STDIN_instance
         end
 
         it "complains of ambiguity before checking for file existence - x" do
@@ -118,8 +118,9 @@ module Skylab::Headless::TestSupport::CLI::Client
       context "with STDIN only" do
 
         let :stdin_spy do
-          TestSupport_::IO.spy.triad.mock_noninteractive_STDIN_class.
-            new [ "fiz\n", "faz\n" ]
+
+          Home_.lib_.system.test_support.mocks.noninteractive_STDIN_class.
+            new_via_lines [ "fiz\n", "faz\n" ]
         end
 
         it "money - o" do

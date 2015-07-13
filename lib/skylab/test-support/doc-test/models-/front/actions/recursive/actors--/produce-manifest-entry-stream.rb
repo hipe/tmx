@@ -52,8 +52,9 @@ module Skylab::TestSupport
 
           def __via_manifest_path_resolve_open_file
 
-            @open_file_IO = @filesystem.normalization.upstream_IO(
-              @manifest_path, & @on_event_selectively )
+            @open_file_IO = @filesystem[ :Upstream_IO ].via_path(
+              @manifest_path,
+              & @on_event_selectively )
 
             @open_file_IO && ACHIEVED_
           end

@@ -93,10 +93,11 @@ module Skylab::TanMan
 
         _app_tmpdir_path = app_tmpdir_path
 
-        valid_arg = Home_.lib_.system.filesystem.normalization.existent_directory(
+        kn = Home_.lib_.system.filesystem( :Existent_Directory ).with(
           :path, _app_tmpdir_path,
           :create_if_not_exist,
           :max_mkdirs, 1  # you may make the [tm] directory only.
+
         ) do | * i_a, & ev_p |
 
           if @on_event_selectively
@@ -115,8 +116,11 @@ module Skylab::TanMan
           end
         end
 
-        valid_arg and valid_arg.value_x
-
+        if kn
+          kn.value_x
+        else
+          kn
+        end
       end
 
       MSG_MAP__ = -> s, line_index, * do

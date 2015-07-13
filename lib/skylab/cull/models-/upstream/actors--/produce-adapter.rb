@@ -101,14 +101,19 @@ module Skylab::Cull
 
       def process_as_file_absolute_path path
 
-        fs = Home_.lib_.filesystem
+        sys = Home_.lib_.system
+        _file_ftype = sys.filesystem.constants::FILE_FTYPE
 
-        _ok = fs.normalization.upstream_IO(
+        yes = sys.filesystem( :Upstream_IO ).with(
           :path, path,
-          :only_apply_expectation_that_path_is_ftype_of, fs.constants::FILE_FTYPE,
+          :only_apply_expectation_that_path_is_ftype_of, _file_ftype,
           & @on_event_selectively )
 
-        _ok and when_path_resolved_as_valid_one_time path
+        if yes
+          when_path_resolved_as_valid_one_time path
+        else
+          yes
+        end
       end
 
       def when_path_resolved_as_valid_one_time path

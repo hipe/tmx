@@ -80,10 +80,10 @@ module Skylab::Headless
       Basic[]::String
     end
 
-    System = -> do
-      System_lib___[].services
-    end
+    _System_lib = sidesys[ :System ]
 
-    System_lib___ = sidesys[ :System ]
+    System = -> do
+      _System_lib[].services
+    end
   end
 end

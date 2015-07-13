@@ -13,7 +13,6 @@ module Skylab::BeautySalon
         :ruby_regexp,
         :mode,
         :chunk_size,
-        :on_event_selectively
 
       def initialize
         @grep_extended_regexp_string = @ruby_regexp = nil
@@ -23,13 +22,17 @@ module Skylab::BeautySalon
       end
 
       def execute
+
         @command = Home_.lib_.system.filesystem.grep(
           :grep_extended_regexp_string, @grep_extended_regexp_string,
           :ruby_regexp, @ruby_regexp,
-          :on_event_selectively, -> * i_a, & ev_p do
-            @on_event_selectively[ * i_a, & ev_p ]
-            UNABLE_
-          end )
+
+        ) do | * i_a, & ev_p |
+          # hi.
+          @on_event_selectively[ * i_a, & ev_p ]
+          UNABLE_
+        end
+
         @command and via_command
       end
 

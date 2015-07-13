@@ -29,26 +29,44 @@ module Skylab::Basic::TestSupport::Range::N11n
       end
 
       it "inline normative - inside" do
+
         x = nil
-        r = subject :begin, -1, :end, 2, :x, -1,
-          :as_normal_value, -> x_ { x = x_ ; :_seen_ },
+
+        r = subject(
+          :begin, -1,
+          :end, 2,
+          :x, -1,
+          :when_normal_value, -> x_ do
+            x = x_
+            :_seen_
+          end,
           :on_event, -> ev do
             fail "should not receive '#{ ev.terminal_channel_i }' here"
-          end
+          end,
+        )
 
         r.should eql :_seen_
         x.should eql( -1 )
       end
 
       def common_inline_against x
+
         @ev = @no_touch = nil
-        @r = subject :begin, -1, :end, 2, :x, x,
-          :as_normal_value, -> _x { @no_touch = true ; :_never_see_ },
+
+        @r = subject(
+          :begin, -1,
+          :end, 2,
+          :x, x,
+          :when_normal_value, -> _x do
+            @no_touch = true
+            :_never_see_
+          end,
           :on_event, -> ev_ do
             @ev = ev_
             :_saw_event_
           end
-        nil
+        )
+        NIL_
       end
 
       def expect_common_failure_with_message x
@@ -126,4 +144,5 @@ module Skylab::Basic::TestSupport::Range::N11n
       Parent_::Subject_[].normalization.call_via_iambic x_a
     end
   end
+  NIL_ = nil
 end

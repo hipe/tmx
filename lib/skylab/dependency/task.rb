@@ -27,7 +27,7 @@ module Skylab::Dependency
     def initialize(* a )
       super
       if_unhandled_streams :fail
-      nil
+      NIL_
     end
 
     def valid? # [#hl-047]

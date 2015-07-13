@@ -19,6 +19,7 @@ module Skylab::Dependency
 
   Home_ = self
   stowaway :Library_, 'lib-'
+  NIL_ = nil
   Autoloader_[ TaskTypes = ::Module.new ]
   Textual_Old_Event_ = ::Struct.new :text, :stream_symbol
   UNABLE_ = false

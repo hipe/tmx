@@ -33,7 +33,7 @@ module Skylab::Cull::TestSupport
 
     # ~ paths for READ ONLY:
 
-    def freshly_initted_path
+    def freshly_initted_path_
       dir :freshly_initted
     end
 
@@ -64,7 +64,8 @@ module Skylab::Cull::TestSupport
     end
 
     def tmpdir_path
-      Home_.lib_.filesystem.tmpdir_pathname.join( 'culio' ).to_path
+
+      ::File.join Home_.lib_.filesystem.tmpdir_path, 'culio'
     end
 
     # ~ assertion support

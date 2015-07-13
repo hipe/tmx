@@ -33,7 +33,7 @@ module Skylab::Dependency::TestSupport::Tasks
 
       def fu_output_message str
         dputs "FOR TESTING: #{ str }" if do_debug
-        nil
+        NIL_
       end
 
       before :each do

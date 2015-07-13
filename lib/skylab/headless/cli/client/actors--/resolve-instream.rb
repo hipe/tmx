@@ -42,16 +42,21 @@ module Skylab::Headless
 
         _path_arg = build_path_arg
 
-        io = Home_.lib_.system.filesystem.normalization.upstream_IO(
-          :instream, @IO_adapter.instream,
-          :path_arg, _path_arg ) do | *, & ev_p |
-            @evr.receive_event ev_p[]
-            UNABLE_
-          end
+        kn = Home_.lib_.system.filesystem( :Upstream_IO ).with(
+          :stdin, @IO_adapter.instream,
+          :path_arg, _path_arg,
 
-        io and begin
-          @IO_adapter.instream = io  # may be the same one -- stdin
+        ) do | *, & ev_p |
+
+          @evr.receive_event ev_p[]
+          UNABLE_
+        end
+
+        if kn
+          @IO_adapter.instream = kn.value_x  # may be the same one -- stdin
           ACHIEVED_
+        else
+          kn
         end
       end
 

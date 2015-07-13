@@ -13,21 +13,34 @@ module Skylab::Cull
 
       def execute
 
-        # using dry run, check to see that we could create the directory
-        # if we wanted to -- that is, that it does not already exist.
+        # using an outside facility and in a :+#non-atomic manner, check to
+        # see that we will probably be able to create the directory;
+        # that is, that the directory itself does not exist but that its
+        # dirname exists and is a directory.
 
-        fs = Home_.lib_.filesystem
+        kn = Home_.lib_.system.filesystem( :Existent_Directory ).with(
 
-        fs.normalization.downstream_IO(
           :path, @survey.workspace_path_,
-          :is_dry_run, true,  # always true, we are checking only
-          :ftype, fs.constants::DIRECTORY_FTYPE,
-          & @on_event_selectively ) and
 
-        when_dir
+          :is_dry_run, true,  # always true, we are checking only
+
+          :create,
+
+          & @on_event_selectively )
+
+        if kn
+
+          # the value of the known is a mock directory. for sanity:
+
+          kn.value_x.to_path or fail
+
+          __money
+        else
+          kn
+        end
       end
 
-      def when_dir
+      def __money
 
         # (we used to patch here)
 

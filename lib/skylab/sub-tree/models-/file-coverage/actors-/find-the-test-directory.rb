@@ -76,9 +76,9 @@ module Skylab::SubTree
 
         @find_was_OK = true
 
-        _fs = Home_.lib_.system.filesystem
+        _ = Home_.lib_.system.filesystem.find
 
-        @find = _fs.find.new_with(
+        @__find = _.new_with(
           :filenames, @filenames,  # "always safe"
           :freeform_query_infix_words, %w( -type dir -maxdepth 1 )
         ) do | * i_a, & ev_p |
@@ -103,7 +103,7 @@ module Skylab::SubTree
 
         @did_find = false
 
-        st = @find.new_with( :path, current_path ).to_path_stream
+        st = @__find.new_with( :path, current_path ).to_path_stream
 
         if st
           one = st.gets

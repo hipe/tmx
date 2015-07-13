@@ -1,11 +1,14 @@
 # an introduction to regret :[#017]
 
+(ideas here are finally beginning to age somewhat: [#001.A]
+contextualizes this whole node.)
+
 as the name suggests, you might really regret this. (this was [#tm-019].)
 
 the Regret module is an alternate way to do something like rspec's
-shared_contexts but with an implementation that is in some ways more
+"shared contexts" but with an implementation that is in some ways more
 straightforward, orthogonal, transparent and opaque; while in other ways
-possibly beign too opaque, unless you really study this document.
+possibly being too opaque, unless you really study this document.
 
 Regret represents a distillation of patterns and conventions that was
 developed and refined while making the thousands of sprawling tests for this
@@ -21,7 +24,7 @@ modules have the following in common. every TestSupport module:
   • has the usual implementation of `extended` which is to include one and
     extend the other of the above on the extending module.
 
-  • the M_M and I_M modules *always* include their "silhouettes" if any:
+  • the `M_M` and `I_M` modules *always* include their "silhouettes" if any:
     if there are anchor modules Foo and Foo::Bar, and each of these have an
     M_M and an I_M, then the deeper M_M and I_M *always* have the
     corresponding shallower ones in their ancestor chain, recursively

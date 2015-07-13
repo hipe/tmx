@@ -199,13 +199,16 @@ module Skylab::Callback
         end
 
         def process_polymorphic_stream_fully stream  # :+#public-API :+#hook-in
-          _keep_parsing = process_polymorphic_stream_passively stream
-          _keep_parsing and begin
+
+          kp = process_polymorphic_stream_passively stream
+          if kp
             if stream.no_unparsed_exists
               ACHIEVED_
             else
               when_after_process_iambic_fully_stream_has_content stream
             end
+          else
+            kp
           end
         end
 

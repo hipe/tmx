@@ -11,9 +11,10 @@ module Skylab::Brazen
 
       def execute
 
-        @up_IO = LIB_.system.filesystem.normalization.upstream_IO(
+        @up_IO = LIB_.system.filesystem( :Upstream_IO ).against_path(
+          @path
 
-            :path, @path ) do | *, & ev_p |
+        ) do | *, & ev_p |
 
           ev = ev_p[]
 

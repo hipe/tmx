@@ -8,9 +8,17 @@ module Skylab::BeautySalon
 
         class << self
 
-          def producer_via_iambic x_a
+          def producer_via_iambic x_a, & oes_p
+
+            oes_p or raise ::ArgumentError
+
             ok = nil
             x = Producer__.new do
+
+              if oes_p
+                @on_event_selectively = oes_p
+              end
+
               ok = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
             end
             ok && x
@@ -19,13 +27,13 @@ module Skylab::BeautySalon
 
         class Producer__
 
-          Callback_::Actor.methodic self, :simple, :properties,
+          Callback_::Actor.methodic( self, :simple, :properties,
 
             :property, :ruby_regexp,
             :ignore, :property, :grep_extended_regexp_string,
             :ignore, :property, :do_highlight,
             :property, :max_file_size_for_multiline_mode,
-            :property, :on_event_selectively
+          )
 
           def initialize
             super
@@ -42,7 +50,6 @@ module Skylab::BeautySalon
           # really of interest to us here, which is why we take this field
           # a parameter and provide this just as a last-line catchall.
 
-
           def produce_file_session_via_ordinal_and_path d, path
             stat = ::File.stat path  # noent meh
             if stat.size <= @max_file_size_for_multiline_mode
@@ -55,6 +62,7 @@ module Skylab::BeautySalon
           end
 
           def when_multiline_OK d, path
+
             es = Self_::String_Edit_Session_.new(
               ::File.open( path, ::File::CREAT | ::File::RDONLY ).read,  # noent meh
               @ruby_regexp,

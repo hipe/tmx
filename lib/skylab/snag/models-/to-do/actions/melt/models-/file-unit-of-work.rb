@@ -39,7 +39,7 @@ module Skylab::Snag
 
         def OMG_try  # #note-40
 
-          @_patch = Home_.lib_.system.patch.new_via_file_content_before(
+          @_patch = Home_.lib_.system.filesystem.patch.new_via_file_content_before(
             @filesystem_conduit.open @_path )
 
           ok = true

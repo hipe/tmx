@@ -97,9 +97,9 @@ module Skylab::Dependency::TestSupport::Tasks
                   TaskTypes::MkdirP.new(:mkdir_p => dir_arg, :max_depth => 2, &all)
                 end
 
-                it "will go becuase it is equal to max depth" do
+                it "will go because it is equal to max depth" do
                   subject.invoke
-                  stderr.should match(%r{mkdir -p .*foo/bar})
+                  stderr.should match(%r{mkdir .*foo/bar})
                 end
               end
             end
