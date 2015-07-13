@@ -1,16 +1,69 @@
-# the CLI upstream resolution narrative :[#004]
+# the normalizers :[#004]
+
+## T.O.C and our general ordering rational :[#.A]
+
+the test files are numbered in general because [#ts-001.C].
+
+there are holes in the sequence because [#sl-137.H].
+
+we make the lettered sections here correspond to the numbers there
+because hey why not (note we use the holes for our own nodes):
+
+  • [#.A]: (here)
+  • [#.B]: upstream IO
+  • [#.C]: unlink file
+  • [#.D]: downstream IO
+  • [#.E]: (this common algorithm)
+  • [#.F]: existent directory
+  • [#.G]: path-based normalizations
+  • [#.H]: (below)
+  • [#.I]: (started inside of [#.D])
+
+[#.G] has a general introduction to why these are "normalizers" and what
+that means.
 
 
-## synopsis
-
-given one [#ca-004] "arg" for a path (whose actual value is possibly
-false-ish), and zero or one actual value for an "instream", resolve one
-stream open for reading.
 
 
+## the upstream IO normalization  :[#.B]
+
+at essence this node can be summarized as "open an existing file for
+reading". its primary reason for existence, however, is:
 
 
-## interface theory
+### the commmon upstream resolution algorithm :[#.E]
+
+
+#### synopsis
+
+given one [#ca-004] "arg" for a path (which may represent a known
+unknown), and zero or one actual value for an "instream" (typically
+something like a STDIN), resolve one stream open for reading.
+
+
+
+
+#### synopsis in pseudocode
+
+if an actual value is know for a `path` property, this is a thing.
+
+if an "instream" was passed and is non-interactive, this is also a thing.
+
+the above two are mutex: they can't both be things.
+
+however, if only the first thing was a thing, process it as a path
+argument as normal.
+
+otherwise, if the second thing was a thing, this is the value of the
+result argument and we are done.
+
+in the absence of both of these things, this case is outside
+of this scope.
+
+
+
+
+#### interface theory (EDIT: this is like rings of an ooolllddd tree..)
 
 there is what the user passes to your action and then there is what
 your action passes to this actor, which is [#fi-002] different:
@@ -42,13 +95,6 @@ if in the actual arguments both "look" is if they are supposed to be used,
 this is classified as ambiguous input and the result is an event emission
 modelling the same.
 
-if the argument instream is resolved unambiguousy as the one that is to be
-used, the result is a call to the "success callback" (`as_normal_value`)
-being passed this selfsame IO object that was passed in as an argument.
-since the success callback defaults to the identity function, if a success
-callback was not provided the final result of the actor in this case
-is this IO object itself.
-
 if the path is resolved unabiguously as the one that is to be used,
 from this path the actor will attempt to produce a filehandle open for
 reading. what are considered to be the commonest IO exceptions (file not
@@ -58,10 +104,6 @@ result is the emission of this exception turned somehow into an error event.
 whether or not other system call exceptions related to this IO operation
 will be corralled and turned into event emissions is formally undefined
 (but they probably will be).
-
-if the system call succeeds and the path is successfully opened for
-reading, the final result of the actor will likewise be a call to the
-success callback with this new IO object, open for reading.
 
 
 
@@ -121,12 +163,18 @@ model.
 so this would serve as a good prototyping ground for that.
 
 
+#### the converse of the above but for the downstream will be [#.H]
 
-## write
+(that is, either write you output to a file (named as an argument) or to
+stdout.
 
-(this is for this other normalization, stowed away into here for now.)
 
-### :#note-076
+
+
+## the downstream IO normalization :[#.D]
+
+
+### the non-atomicity of all things :[#.I]
 
 it is certainly possible that between the time when we take the "stat"
 "snapshot" of the file and when we try to open the file that the file
@@ -143,5 +191,61 @@ have it corralled into one place where it "should" be, and we have it
 bookmarked for the future here, and it is hopefully abstracted away enough
 not to affect the sorroundiing system too much.
 
-code with filesystem locks always reads terribly and looks tangled and
-bound so we are avoiding it if we can..
+(EDIT: we use locks more often now..)
+
+
+
+
+## the path-based normalizations :[#.G]
+
+the most commonly used features of this sidesystem (to read and write
+files) is implemented by what is also the most fun and weird "game mechanic"
+it exhibits:
+
+these commonest filesystem operations are implemented as [#ba-027] normal
+normalizers.
+
+this means that in the same way we might normalize a string to make sure
+that it is a valid email address, we will also try to produce an open
+filehandle from a string representing its path.
+
+near the curriability of normalizations, this becomes a useful mechanic
+to have. but in general, too, it is a design decision that just works.
+
+
+
+
+### the criteria
+
+the commonest thing that all path-based normalizations have is that they
+all operate on a single path argument when executing. they may recognize
+other arguments as well, but always this one (and probably only this one)
+is common to all of them.
+
+
+
+
+### our states
+
+experimentally we model these normalizations as having three states:
+
+  1) being constructed/edited
+  2) frozen as curry
+  3) being applied
+
+all actors in the subject category will assume states (1) and (3),
+but not all will necessarily hit (2).
+
+during (1) and (3), the implementing actor object is necessarily
+mutable. when (2) it is necessarily frozen.
+
+
+
+
+
+## :#note-01
+
+we opt to have this feature ivar (which is used in perhaps only two
+sub-classes) defined in this base class rather than the other
+alternatives but note that it is not used by all child classes.
+_

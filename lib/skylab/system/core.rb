@@ -25,37 +25,47 @@ module Skylab::System
 
     class Front___ < ::BasicObject
 
-      box_mod = Services___
+      def initialize
+        @_h = {}
+      end
 
-      box_mod.entry_tree.to_stream.each do | entry |
+      def defaults
+        _common :Defaults
+      end
 
-        h = {}
-        name = entry.name
-        k = name.as_variegated_symbol
+      def diff
+        _common :Diff
+      end
 
-        define_method name.as_variegated_symbol do
-          h.fetch k do
-            x = box_mod.const_get( name.as_const, false ).new self
-            h[ k ] = x
-            x
-          end
+      def environment
+        _common :Environment
+      end
+
+      def filesystem * x_a, & x_p
+
+        _common( :Filesystem ).for_mutable_args_ x_a, & x_p
+      end
+
+      def IO
+        _common( :IO )
+      end
+
+      def which s
+        _common( :Which ).call s
+      end
+
+      def _common sym
+
+        @_h.fetch sym do
+          @_h[ sym ] = Services___.const_get( sym, false ).new self
         end
       end
 
-      alias_method :IO, :io  # the isomorphicism in this direction is lossy
+      def test_support  # :+[#ts-035]
 
-      # ~ rather then globbing all calls or loading all nodes, do it manually:
+        ::Kernel.require_relative 'test/test-support'
 
-      alias_method :___patch, :patch
-
-      def patch * x_a, & x_p
-        ___patch.call_via_arglist x_a, & x_p
-      end
-
-      alias_method :___which, :which
-
-      def which s
-        ___which.call s
+        Home_::TestSupport
       end
 
       self
@@ -69,14 +79,15 @@ module Skylab::System
   Autoloader_[ Services___ = ::Module.new, :boxxy ]
 
   ACHIEVED_ = true
-  KEEP_PARSING_ = true
   EMPTY_S_ = ''.freeze
+  Home_ = self
+  KEEP_PARSING_ = true
   NEWLINE_ = "\n"
   NIL_ = nil
   NILADIC_TRUTH_ = -> { true }
   SPACE_ = ' '.freeze
-  Home_ = self
 
 end
 
 # :#tombstone: failed to start service
+# :#tombstone: we used to build getters dynamically for the toplevel services

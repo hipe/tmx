@@ -1,17 +1,116 @@
 module Skylab::System
 
+  class Services___::Filesystem  # see [#009]
 
-    class Services___::Filesystem  # :[#130].
+    def initialize _svx
+    end
 
-      def initialize _svx
+    # ~ actor exposures
+
+    def flock_first_available_path * x_a, & x_p
+
+      FS_::Actors_::Flock_first_available_path.for_mutable_args_ x_a, & x_p
+    end
+
+    def hack_guess_module_tree * x_a, & x_p
+
+      FS_::Actors_::Hack_guess_module_tree.for_mutable_args_ x_a, & x_p
+    end
+
+    # ~ bridge exposures
+
+    def cache
+
+      FS_::Bridges_::Cache
+    end
+
+    def file_utils_controller & x_p
+
+      FS_::Bridges_::File_Utils_Controller.for_any_proc_( & x_p )
+    end
+
+    def find * x_a, & x_p
+
+      FS_::Bridges_::Find.for_mutable_args_ x_a, & x_p
+    end
+
+    def grep * x_a, & x_p
+
+      FS_::Bridges_::Grep.for_mutable_args_ x_a, & x_p
+    end
+
+    def patch * x_a, & x_p
+
+      @__cache ||= {}  # we haven't needed to memoize any other daemon yet
+
+      _service_controller = @__cache.fetch :patch do
+        @__cache[ :patch ] = FS_::Bridges_::Patch.new :_no_svx
       end
 
-      def cache
-        Filesystem_::Cache__
-      end
+      _service_controller.call_via_arglist x_a, & x_p
+    end
 
-      def constants
-        Filesystem_
+    def path_tools
+      FS_::Bridges_::Path_Tools
+    end
+
+    # ~ model exposures ; ## ~~ tmpdir
+
+    def tmpdir_path
+      @__tmpdir_path ||= Home_.lib_.tmpdir
+    end
+
+    def tmpdir * x_a, & x_p
+
+      FS_::Models_::Tmpdir.for_mutable_args_ x_a, & x_p
+    end
+
+    # ~ normalization exposures
+
+    def for_mutable_args_ x_a
+
+      if x_a.length.zero?
+        self
+      else  # see [#.C]
+        _cls = Normalizations_.const_get( * x_a, false )
+        _cls.begin_ self
+      end
+    end
+
+    # ~ session exposures
+
+    def tmpfile_sessioner
+      FS_::Sessions_::Tmpfile_Sessioner
+    end
+
+    def walk * x_a, & oes_p
+
+      FS_::Sessions_::Walk.for_mutable_args_ x_a, & oes_p
+    end
+
+    # ~ hook-outs / internal / low-level
+
+    def constants
+      FS_
+    end
+
+    def members
+      self.class.instance_methods false  # neat
+    end
+
+    def modality_const
+      :Filesystem
+    end
+
+    # ->
+
+      # ~ peripheral but nearby
+
+      def line_stream_via_path path, num_bytes=nil
+
+        _io = open path, ::File::RDONLY  # *NOT* the kernel method, ours
+
+        Home_::IO.line_stream _io, num_bytes
       end
 
       # ~ read :+#core-services
@@ -101,108 +200,28 @@ module Skylab::System
         ::File.open filename, * rest, & p
       end
 
-      # ~
-
-      def file_utils_controller & p
-        if p
-          Filesystem_::File_Utils_Controller__.new p
-        else
-          Filesystem_::File_Utils_Controller__
-        end
+      def unlink path
+        ::File.unlink path
       end
 
-      def find * x_a, & oes_p
-        if x_a.length.zero?
-          Filesystem_::Find__
-        else
-          Filesystem_::Find__.mixed_via_iambic_ x_a, & oes_p
-        end
-      end
+      # <-
 
-      def flock_first_available_path * x_a
-        if x_a.length.zero?
-          Filesystem_::Flock_first_available_path__
-        else
-          Filesystem_::Flock_first_available_path__.call_via_iambic x_a
-        end
-      end
+    Autoloader_[ Actors_ = ::Module.new ]
+    Autoloader_[ Bridges_ = ::Module.new ]
+    Autoloader_[ Normalizations_ = ::Module.new ]
+    Autoloader_[ Sessions_ = ::Module.new ]
 
-      def grep * x_a
-        Filesystem_::Grep__.mixed_via_iambic_ x_a
-      end
+    ACHIEVED_ = true
+    CONST_SEP_ = '::'
+    DIRECTORY_FTYPE = 'directory'.freeze
+    DOT_ = '.'.freeze
+    DOT_DOT__ = '..'
+    FILE_FTYPE = 'file'
+    FILE_SEPARATOR_BYTE = ::File::SEPARATOR.getbyte 0
+    FS_ = self
+    IDENTITY_ = -> x { x }
+    NIL_ = nil
+    UNABLE_ = false
 
-      def hack_guess_module_tree * x_a, & oes_p
-        Filesystem_::Hack_guess_module_tree__.call_via_arglist x_a, & oes_p
-      end
-
-      def line_stream_via_path path, num_bytes=nil
-        Home_::IO.line_stream ::File.open( path, ::File::RDONLY ), num_bytes
-      end
-
-      def line_stream_via_pathname pn, num_bytes=nil
-        Home_::IO.line_stream pn.open( ::File::RDONLY ), num_bytes
-      end
-
-      def members
-        self.class.instance_methods false  # neat
-      end
-
-      def normalization
-        Filesystem_::Normalization__
-      end
-
-      def path_tools
-        Filesystem_::Path_Tools__
-      end
-
-      def tmpdir * x_a, & x_p
-
-        case 1 <=> x_a.length
-        when -1
-          Filesystem_::Tmpdir__.new_via_iambic x_a, & x_p
-        when  0
-          x_a.unshift :path
-          Filesystem_::Tmpdir__.new_via_iambic x_a, & x_p
-        when  1
-          Filesystem_::Tmpdir__
-        end
-      end
-
-      def tmpdir_path
-        @tmpdir_path ||= tmpdir_pathname.to_path
-      end
-
-      def tmpdir_pathname
-        @tmpdir_pathname ||= ::Pathname.new Home_.lib_.tmpdir
-      end
-
-      def tmpfile_sessioner
-        Filesystem_::Tmpfile_Sessioner___
-      end
-
-      def walk * x_a, & oes_p
-        if x_a.length.nonzero? || block_given?
-          Filesystem_::Walk__.call_via_iambic x_a, & oes_p
-        else
-          Filesystem_::Walk__
-        end
-      end
-
-      def modality_const
-        :Filesystem
-      end
-
-      CONST_SEP_ = '::'
-      DIRECTORY_FTYPE = 'directory'.freeze
-      DOT_ = '.'.freeze
-      DOT_DOT__ = '..'
-      FILE_FTYPE = 'file'
-      FILE_SEPARATOR_BYTE = ::File::SEPARATOR.getbyte 0
-      Filesystem_ = self
-      IDENTITY_ = -> x { x }
-      NIL_ = nil
-      PROCEDE_ = true
-      UNABLE_ = false
-
-    end
+  end
 end

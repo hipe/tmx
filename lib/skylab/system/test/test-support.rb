@@ -9,6 +9,13 @@ module Skylab::System::TestSupport
 
   extend TestSupport_::Quickie
 
+  class << self
+
+    def mocks
+      TS_::MOCKS
+    end
+  end
+
   module ModuleMethods
 
     define_method :use, -> do
@@ -21,8 +28,8 @@ module Skylab::System::TestSupport
 
           const = Callback_::Name.via_variegated_symbol( sym ).as_const
 
-          x = if Test_Support_Bundles___.const_defined? const, false
-            Test_Support_Bundles___.const_get const, false
+          x = if Test_Support_Bundles_.const_defined? const, false
+            Test_Support_Bundles_.const_get const, false
           else
             Home_.lib_.plugin::Bundle::Fancy_lookup[ sym, TS_ ]
           end
@@ -36,25 +43,52 @@ module Skylab::System::TestSupport
 
   module InstanceMethods
 
-    def services_
-      Home_.services
-    end
-
-    attr_reader :do_debug
-
     def debug!
       @do_debug = true
     end
 
+    attr_reader :do_debug
+
     def debug_IO
       TestSupport_.debug_IO
     end
+
+    define_method :memoized_tmpdir_, ( -> do
+      o = nil
+      -> do
+        if o
+          o.for self
+        else
+          o = TestSupport_.tmpdir.memoizer_for self, 'sy-xyzzy'
+          o.instance
+        end
+      end
+    end ).call
+
+    def fu_
+      Home_.lib_.file_utils
+    end
+
+    def real_filesystem
+      services_.filesystem
+    end
+
+    def services_
+      Home_.services
+    end
   end
 
-  module Test_Support_Bundles___
+  module Test_Support_Bundles_
 
-    Expect_Event = -> test_context_class do
-      Callback_.test_support::Expect_Event[ test_context_class ]
+    Expect_Event = -> tcc do
+
+      Callback_.test_support::Expect_Event[ tcc ]
+
+      tcc.send :define_method,
+          :black_and_white_expression_agent_for_expect_event do
+
+        Home_.lib_.brazen::API.expression_agent_instance
+      end
     end
   end
 
