@@ -1,11 +1,11 @@
-require_relative '../../../../test-support'
+require_relative '../../../../../test-support'
 
-module Skylab::GitViz::TestSupport::Models
+module Skylab::GitViz::TestSupport
 
   describe "[gv] VCS adapters - git - models - hist-tree - CLI - models - sparse matrix of content" do
 
     extend TS_
-    use :bundle_support
+    use :VCS_adapters_git_support_bundle_support
 
     it "loads" do
       _subject
@@ -48,11 +48,11 @@ module Skylab::GitViz::TestSupport::Models
     end
 
     def manifest_path_for_mock_FS
-      GIT_STORY_04_PATHS_
+      at_ :STORY_04_PATHS_
     end
 
     def manifest_path_for_mock_system
-      GIT_STORY_04_COMMANDS_
+      at_ :STORY_04_COMMANDS_
     end
   end
 end

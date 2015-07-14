@@ -10,7 +10,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
 
       class MS_05_Fake_Test_Context
 
-        Home_::Test_Lib_::Mock_System[ self ]
+        Subject_module_[]::Mock_System.enhance_client_class self
 
         define_method :cache_hash_for_mock_system, ( Callback_.memoize do
           {}

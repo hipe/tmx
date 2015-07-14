@@ -1,53 +1,54 @@
 require_relative '../core'
+require 'skylab/test-support/core'
 
 module Skylab::GitViz::TestSupport
 
-  Home_ = ::Skylab::GitViz
-
-  Callback_ = Home_::Callback_
-
   class << self
+
+    def at_ sym
+      CONSTANTS___.lookup sym
+    end
 
     def lib_
       @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
         Lib_module___[], TS_ )
     end
-
-    define_method :universal_cache_hash_, ( Callback_.memoize do
-      {}
-    end )
   end  # >>
 
-  TestSupport_ = Home_.lib_.test_support
+  TestSupport_ = ::Skylab::TestSupport
 
   TestSupport_::Regret[ TS_ = self ]
 
   extend TestSupport_::Quickie
 
+  DANGEROUS_MEMOIZE_ = -> sym, & once_p do  # :+[#ts-042] nasty OCD memoize
+
+    first = true
+    x = nil
+
+    define_method sym do
+
+      if first
+        first = false
+        x = instance_exec( & once_p )
+      end
+      x
+    end
+  end
+
   module ModuleMethods
 
-    def use sym
+    define_method :use, -> do
+      h = {}
+      -> sym do
+        ( h.fetch sym do
+          x = TestSupport_.fancy_lookup sym, TS_
+          h[ sym ] = x
+        end )[ self ]
+      end
+    end.call
 
-      const_i = Callback_::Name.via_variegated_symbol( sym ).as_const
-      mod = nearest_test_node
-
-      begin
-        if mod.const_defined? const_i, false
-          found_callable = mod.const_get const_i
-          break
-        end
-        mod_ = mod.parent_anchor_module
-        if ! mod_
-          found_callable = Home_::Test_Lib_.const_get const_i, false
-          break
-        end
-        mod = mod_
-        redo
-      end while nil
-
-      found_callable[ self ]
-      NIL_
-    end
+    define_method :dangerous_memoize_, DANGEROUS_MEMOIZE_
   end
 
   module InstanceMethods
@@ -63,36 +64,40 @@ module Skylab::GitViz::TestSupport
     end
 
     def cache_hash_for_mock_FS
-      TS_.universal_cache_hash_
+      Universal_cache___[]
     end
 
     def cache_hash_for_mock_system
-      TS_.universal_cache_hash_
-    end
-
-    def listener_x  # assume "expect event" ..
-
-      # the event receiver in whatever form is current
-
-      handle_event_selectively
+      Universal_cache___[]
     end
   end
 
-  # ~ longer short constants (the longest of which we might call "stowaways")
+  Callback_ = ::Skylab::Callback
 
-  # ~ lib
-
-  Lib_module___ = Callback_.memoize do
-
-    module Lib____
-
-      stdlib = Callback_::Autoloader.build_require_stdlib_proc
-
-      String_IO = stdlib[ :StringIO ]
-
-      self
-    end
+  Universal_cache___ = Callback_.memoize do
+    {}
   end
+
+  # ~ bundles (used with `use`)
+
+  Double_Decker_Memoize = -> do
+
+    memoize = -> sym, & p do
+
+      define_singleton_method sym, & Callback_.memoize( & p )
+
+      define_method sym do
+
+        self.class.send sym
+      end
+
+      NIL_
+    end
+
+    -> tcc do
+      tcc.send :define_singleton_method, :memoize_, memoize
+    end
+  end.call
 
   module Expect_CLI
 
@@ -100,7 +105,7 @@ module Skylab::GitViz::TestSupport
 
       def [] test_cls
 
-        Expect_CLI_lib[][ test_cls ]
+        Expect_CLI_lib_[][ test_cls ]
 
         test_cls.include self
 
@@ -120,93 +125,130 @@ module Skylab::GitViz::TestSupport
     end
   end
 
-  Expect_CLI_lib = -> do
-    Home_.lib_.brazen.test_support.CLI::Expect_CLI
-  end
+  Expect_Event = -> tcc do  # `tcc` = test context class
 
-  Expect_Event = -> test_mod do  # generated from `expect_event`
-
-    test_mod.include(
+    tcc.include(
       Home_::Callback_.test_support::Expect_event::Test_Context_Instance_Methods )
 
-    nil
+    NIL_
   end
 
-  Expect_Line = -> test_mod do
+  Expect_Line = -> tcc do
 
-    TestSupport_::Expect_line[ test_mod ]
+    TestSupport_::Expect_line[ tcc ]
   end
 
-  module Messages
-    PATH_IS_FILE = "path is file, must have directory".freeze
+  Mock_Filesystem = -> tcc do
+
+    Home_.lib_.mock_system_lib::Mock_Filesystem.enhance_client_class tcc
   end
 
-  GIT_FIXTURE_STORIES_ = ::File.join TS_.dir_pathname.to_path,
-    'vcs-adapters/git/fixture-stories'
+  Mock_System = -> tcc do
 
-  GIT_STORY_03_PATHS_ = ::File.join GIT_FIXTURE_STORIES_,
-    '03-funky/paths.list'
+    Home_.lib_.mock_system_lib::Mock_System.enhance_client_class tcc
+  end
 
-  GIT_STORY_03_COMMANDS_ = ::File.join GIT_FIXTURE_STORIES_,
-    '03-funky/commands.ogdl'
+  module Reactive_Model_Support
 
-  GIT_STORY_04_PATHS_ = ::File.join GIT_FIXTURE_STORIES_,
-    '04-jaunty-experiment/paths.list'
-
-  GIT_STORY_04_COMMANDS_ = ::File.join GIT_FIXTURE_STORIES_,
-    '04-jaunty-experiment/commands.ogdl'
-
-
-  module Testable_Client  # read [#015] the testable client narrative intro.
-
-    DSL = -> mod do
-      mod.extend Test_Node_Module_Methods_ ; nil
+    def self.[] tcc
+      Expect_Event[ tcc ]
+      tcc.include self
     end
 
-    module Test_Node_Module_Methods_
-    private
-      def testable_client_class i, & p
-        p_ = -> do  # #storypoint-20
-          r = p[] ; p_ = -> { r } ; r
-        end
-        instance_methods_module.module_exec do
-          define_method i do
-            p_[]
-          end
-        end ; nil
+    def subject_API  # #hook-out for "expect event"
+      Home_::API
+    end
+
+    def black_and_white_expression_agent_for_expect_event
+      Home_.lib_.brazen::API.expression_agent_instance
+    end
+
+    def at_ sym
+      TS_.at_ sym
+    end
+  end
+
+  # ~ model-like & abstraction candidates
+
+  class Lazy_Constants_
+
+    class << self
+      def lookup sym
+        ( @___instance ||= new ).lookup sym
+      end
+      private :new
+    end
+
+    def initialize
+      @_entries = {}
+    end
+
+    def lookup sym
+      @_entries.fetch sym do
+        @_entries[ sym ] = send sym
       end
     end
   end
 
-  Autoloader_ = Home_::Autoloader_
+  # ~ non-contant-ish support
 
-  module VCS_Adapters
-    module Git
-      Autoloader_[ Fixtures = ::Module.new ]
+  Expect_CLI_lib_ = -> do
 
-      Autoloader_[ self ]
+    Home_.lib_.brazen.test_support.CLI::Expect_CLI
+  end
+
+  # ~ constant-ishes
+
+  Lib_module___ = Callback_.memoize do
+
+    module Lib____
+
+      stdlib = Callback_::Autoloader.build_require_stdlib_proc
+
+      String_IO = stdlib[ :StringIO ]
+
+      self
     end
-    Autoloader_[ self ]
   end
 
-  # ~ short constants
+  class CONSTANTS___ < Lazy_Constants_
 
+    define_method :GIT_STORY_03_PATHS_ do
+
+      ::File.join(
+        lookup( :GIT_FIXTURE_STORIES_ ),
+        '03-funky/paths.list' )
+    end
+
+    define_method :GIT_STORY_03_COMMANDS_ do
+
+      ::File.join(
+         lookup( :GIT_FIXTURE_STORIES_ ),
+        '03-funky/commands.ogdl' )
+    end
+
+    define_method :GIT_STORY_04_PATHS_ do
+
+      ::File.join(
+        lookup( :GIT_FIXTURE_STORIES_ ),
+        '04-jaunty-experiment/paths.list' )
+    end
+
+    define_method :GIT_STORY_04_COMMANDS_ do
+
+      ::File.join(
+        lookup( :GIT_FIXTURE_STORIES_ ),
+        '04-jaunty-experiment/commands.ogdl' )
+    end
+
+    define_method :GIT_FIXTURE_STORIES_ do
+
+      ::File.join(
+        TS_.dir_pathname.to_path,
+        'vcs-adapters/git/fixture-stories' )
+    end
+  end
+
+  Home_ = ::Skylab::GitViz
   NIL_ = nil
-
-  # ~ any re-assignments of above to propagate to child test nodes
-
-  module Constants
-    Callback_ = Callback_
-    Home_ = Home_
-    GIT_FIXTURE_STORIES_ = GIT_FIXTURE_STORIES_
-    GIT_STORY_03_COMMANDS_ = GIT_STORY_03_COMMANDS_
-    GIT_STORY_03_PATHS_ = GIT_STORY_03_PATHS_
-    GIT_STORY_04_COMMANDS_ = GIT_STORY_04_COMMANDS_
-    GIT_STORY_04_PATHS_ = GIT_STORY_04_PATHS_
-    NIL_ = NIL_
-    TestSupport_ = TestSupport_
-    Top_TS_ = TS_
-  end
-
-  Autoloader_[ self, :boxxy ]  # ..
 end

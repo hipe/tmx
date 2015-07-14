@@ -1,7 +1,7 @@
 [#033]       explaining the enhance method ..
+[#024]       the bundle fancy lookup exegesis ..
 [#007]       the dependencies narrative ..
 [#006]       #track pub-sub hacks (mutations) #universal
-[#024]       the bundle fancy lookup exegesis ..
 [#005]       [ pub-sub ]  (currently implemented by [#007])
 [#004]       digraphic ..
 [#003]       there is a possible new parse function we might subsume in [sg]

@@ -1,11 +1,11 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::GitViz::TestSupport::Models
+module Skylab::GitViz::TestSupport
 
   describe "[gv] models" do
 
     extend TS_
-    use :expect_event
+    use :reactive_model_support
 
     it "loads" do
       Home_::API

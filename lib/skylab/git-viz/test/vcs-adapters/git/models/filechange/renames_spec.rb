@@ -1,6 +1,6 @@
-require_relative '../../test-support'
+require_relative '../../../../test-support'
 
-module Skylab::GitViz::TestSupport::VCS_Adapters::Git
+module Skylab::GitViz::TestSupport
 
   describe "[gv] VCS adapters - git - models - filechange - renames" do
 
@@ -45,10 +45,13 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
       h = {}
 
-      Home_.repository.new_via_pathname(
-        mock_pathname( '/the/repo' ), mock_system_conduit ).
+      _repo = Home_.repository.new_via(
+        '/the/repo',
+        mock_system_conduit,
+        mock_filesystem,
+      )
 
-      fetch_commit_via_identifier( 'head' ).filechanges.each do | fc |
+      _repo.fetch_commit_via_identifier( 'head' ).filechanges.each do | fc |
         h[ ::File.basename fc.destination_path ] = fc
       end
 

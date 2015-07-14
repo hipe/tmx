@@ -102,21 +102,19 @@ module Skylab::Git
 
         def __build_orientation_knownness
 
-          oes_p = handle_event_selectively
-          sc = @resources.system_conduit_
+          rsx = @resources
 
-          repo = Home_.lib_.git_viz.repository.new_via_path(
+          repo = Home_.lib_.git_viz.repository.new_via(
             ::Dir.pwd,
-            sc,
-            & oes_p )
+            rsx.bridge_for( :system_conduit ),
+            rsx.bridge_for( :filesystem ),
+            & handle_event_selectively )
 
           if repo
 
             Orientation_Knownness___.new(
               repo.relative_path_of_interest,
               repo.path,
-              sc,
-              & oes_p
             )
           else
             UNKNOWN_ORIENTATION___
@@ -149,7 +147,7 @@ module Skylab::Git
 
       class Orientation_Knownness___
 
-        def initialize curr_relpath, proj_path, sc, & oes_p
+        def initialize curr_relpath, proj_path
 
           @__current_relpath__ = curr_relpath
           @__project_path__ = proj_path

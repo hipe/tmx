@@ -34,9 +34,11 @@ module Skylab::Git::TestSupport
         invoke 'stow', 'pop', 'no-see-stow'
       end
 
-      expect :e, /\Adidn't find '.git' entry in this or any parent\b/
+      expect :styled, :e, /\A'\.git' not found in \. or \d+ dirs up\b/
 
-      _expect_common_failure
+      _expect_common_invite_line
+      expect_no_more_lines
+      @exitstatus.zero? and fail  # `resource_not_found` (11)
     end
 
     it "for a project SUB-dir, pop a strange stow" do
@@ -88,8 +90,12 @@ module Skylab::Git::TestSupport
     end
 
     def _expect_common_failure
-      expect_specific_invite_line_to :stow, :pop
+      _expect_common_invite_line
       expect_failed
+    end
+
+    def _expect_common_invite_line
+      expect_specific_invite_line_to :stow, :pop
     end
   end
 end

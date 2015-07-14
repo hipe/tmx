@@ -6,7 +6,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
 
     it "reads one command" do
 
-      against <<-HERE.unindent
+      _against <<-HERE.unindent
         command
           argv
             echo, "it's", "\\"fun\\""
@@ -26,7 +26,8 @@ module Skylab::GitViz::TestSupport::Test_Lib
     end
 
     it "reads two commands" do
-      against <<-HERE.unindent
+
+      _against <<-HERE.unindent
         command
           argv
             one, two
@@ -52,14 +53,14 @@ module Skylab::GitViz::TestSupport::Test_Lib
       @st.gets.should be_nil
     end
 
-    def against s
-      _st = Home_.lib_.basic::String.line_stream s
-      @st = subject::Models_::Command.unmarshalling_stream _st, :OGDL
-      NIL_
-    end
+    def _against s
 
-    def subject
-      Home_::Test_Lib_::Mock_System
+      _st = LIB_.basic::String.line_stream s
+
+      @st = Subject_module_[]::Mock_System::Models_::Command.
+        unmarshalling_stream _st, :OGDL
+
+      NIL_
     end
   end
 end

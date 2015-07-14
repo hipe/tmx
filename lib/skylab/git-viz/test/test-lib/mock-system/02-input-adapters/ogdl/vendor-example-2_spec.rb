@@ -1,14 +1,15 @@
-require_relative 'test-support'
+require_relative '../../../test-support'
 
-module Skylab::GitViz::TestSupport::Test_Lib::IA_OGDL
+module Skylab::GitViz::TestSupport::Test_Lib
 
   describe "[gv] test-lib - mock-sys - input-adapters - OGDL - e.g's 2" do
 
     extend TS_
+    use :mock_system_support_OGDL
 
     it "vendor example 2 (1 of 5)" do
 
-      against <<-HERE.unindent
+      against_ <<-HERE.unindent
         libraries
             foo.so
                 version 1.2
@@ -21,7 +22,7 @@ module Skylab::GitViz::TestSupport::Test_Lib::IA_OGDL
 
     it "vendor example 2 (2 of 5)" do
 
-      against <<-HERE.unindent
+      against_ <<-HERE.unindent
         libraries
           foo.so version 1.2
           bar.so version 2.3
@@ -32,7 +33,7 @@ module Skylab::GitViz::TestSupport::Test_Lib::IA_OGDL
 
     it "vendor example 2 (4 of 5)" do
 
-      against <<-HERE.unindent
+      against_ <<-HERE.unindent
         libraries
             foo.so
                 version

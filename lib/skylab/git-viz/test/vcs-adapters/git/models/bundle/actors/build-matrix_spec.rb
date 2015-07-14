@@ -1,17 +1,17 @@
-require_relative '../../../test-support'
+require_relative '../../../../../test-support'
 
-module Skylab::GitViz::TestSupport::VCS_Adapters::Git
+module Skylab::GitViz::TestSupport
 
   describe "[gv] VCS adapters - git - models - bundle - actors - build matrix" do
 
     extend TS_
-    use :bundle_support
+    use :VCS_adapters_git_support_bundle_support
 
     it "the matrix box's keys are in order" do
 
       _matrix.order_box.a_.map do | long_SHA |
 
-        long_SHA[ 0, SHORT_SHA_LENGTH_ ]
+        long_SHA[ 0, at_( :SHORT_SHA_LENGTH_ ) ]
 
       end.should eql %w(
         fafa001
@@ -40,35 +40,21 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
     end
 
-    define_method :_matrix, -> do
-      p = nil
-      -> do
-        if p
-          p[]
-        else
-          x = __produce_value
-          p = -> do
-            x
-          end
-          x
-        end
-      end
-    end.call
-
-    def __produce_value
+    dangerous_memoize_ :_matrix do
 
       bundle_against_ '/m04/repo'
+
       expect_no_events
 
       @bundle.build_matrix_via_repository @repository
     end
 
     def manifest_path_for_mock_FS
-      GIT_STORY_04_PATHS_
+      at_ :STORY_04_PATHS_
     end
 
     def manifest_path_for_mock_system
-      GIT_STORY_04_COMMANDS_
+      at_ :STORY_04_COMMANDS_
     end
   end
 end

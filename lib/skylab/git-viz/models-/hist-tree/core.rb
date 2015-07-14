@@ -48,26 +48,18 @@ module Skylab::GitViz
 
       @is_promoted = true
 
-      Home_.lib_.brazen::Model.common_entity self,
+      Home_.lib_.brazen::Model.common_entity( self,
 
-        :required, :property, :VCS_adapter_name,
+        :property, :stderr,  # progressive output of building large hist-trees
+
+        :required, :property, :filesystem,
 
         :required, :property, :system_conduit,
 
-        :required, :property, :path
+        :required, :property, :VCS_adapter_name,
 
-
-      def initialize( * )
-
-        @_stderr_as_received = nil
-        super
-      end
-
-      def receive_stderr_ x
-
-        @_stderr_as_received = x
-        NIL_
-      end
+        :required, :property, :path,
+      )
 
       def produce_result
 
@@ -96,26 +88,33 @@ module Skylab::GitViz
 
       def __via_VCS_adapter_resolve_repo
 
-        pn = @argument_box.fetch :path
+        h = @argument_box.h_
 
-        if ! pn.respond_to? :to_path and pn  # while [#004], let the magic happen
-          pn = ::Pathname.new pn
-        end
+        _fs = h.fetch :filesystem
+        path = h.fetch :path
+        _sys = h.fetch :system_conduit
 
-        @pathname = pn
+        path.respond_to? :ascii_only? or self._FIXME  # towards closing [#004]
+        @__path = path
 
-        @repo = @VCS_adapter.new_repository_via_pathname pn
+        @repo = @VCS_adapter.new_repository_via( path, _sys, _fs )
         @repo && ACHIEVED_
       end
 
       def __via_repo_resolve_mutable_VCS_bundle
 
-        _rsx = Resources___.new @_stderr_as_received || NULL_STDERR___
+        h = @argument_box.h_
 
-        _short_path = @pathname.relative_path_from( @repo.pn_ ).to_path
+        _rsx = Ad_Hoc_Resources___.new h[ :stderr ] || NULL_STDERR___
 
-        @mutable_VCS_bundle = @VCS_adapter.models::Bundle.build_via_path_and_repo(
-          _short_path, @repo, _rsx, & @on_event_selectively )
+        _relpath = Home_::Actors_::Relpath[ @__path, @repo.path ]
+
+        @mutable_VCS_bundle = @VCS_adapter.models::Bundle.build_bundle_via(
+          _relpath,
+          @repo,
+          _rsx,
+          h.fetch( :filesystem ),
+          & @on_event_selectively )
 
         @mutable_VCS_bundle && ACHIEVED_
       end
@@ -127,7 +126,7 @@ module Skylab::GitViz
         self
       end.new
 
-      Resources___ = ::Struct.new :stderr  # for now
+      Ad_Hoc_Resources___ = ::Struct.new :stderr  # for now
     end
 
     Hist_Tree_ = self

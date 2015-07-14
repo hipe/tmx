@@ -1,14 +1,11 @@
-require_relative '../test-support'
+require_relative '../../../test-support'
 
-module Skylab::GitViz::TestSupport::VCS_Adapters::Git
+module Skylab::GitViz::TestSupport
 
   describe "[gv] VCS adapters - git - models - commit" do
 
     extend TS_
-    use :expect_event
-    use :mock_FS
-    use :mock_system
-    use :commit_support
+    use :VCS_adapters_git_support_commit_support
 
     it "try to build a commit from a noent commit - there is a custom error event" do
 
@@ -25,8 +22,6 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
       __using_story_03
 
-      debug!
-
       _against_string 'fafa003'
 
       expect_next_system_command_emission_
@@ -41,7 +36,11 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
     def _against_string s
 
-      _repo = front_.new_repository_via_pathname mock_pathname @path
+      _repo = front_.new_repository_via(
+        @path,
+        mock_system_conduit,
+        mock_filesystem,
+      )
 
       @ci = _repo.fetch_commit_via_identifier s
 
@@ -58,15 +57,15 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
     def __using_story_02
 
-      @mock_FS = STORY_02_PATHS_
-      @mock_SYS = STORY_02_COMMANDS_
+      @mock_FS = at_ :STORY_02_PATHS_
+      @mock_SYS = at_ :STORY_02_COMMANDS_
       @path = '/m02/repo'
     end
 
     def __using_story_03
 
-      @mock_FS = STORY_03_PATHS_
-      @mock_SYS = STORY_03_COMMANDS_
+      @mock_FS = at_ :STORY_03_PATHS_
+      @mock_SYS = at_ :STORY_03_COMMANDS_
       @path = '/m03/repo'
     end
   end

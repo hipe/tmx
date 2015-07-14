@@ -51,7 +51,15 @@ module Skylab::TestSupport
         end
       end
 
-      Dash_ = QuicLib_::CLI_lib[].option.starts_with_dash
+      Dash_ = -> do
+        load = -> do
+          Home_.lib_.SUNSETTING_CLI_lib.option.starts_with_dash
+        end
+        -> x do
+          p ||= load[]
+          p[ x ]
+        end
+      end.call
 
       def beginning_eventpoint_notify
         # at our notification of the beginning, we do the work that needs

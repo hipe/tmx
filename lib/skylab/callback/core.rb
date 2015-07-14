@@ -1853,12 +1853,21 @@ module Skylab::Callback
     end
 
     class Entry_Tree_
+
       def get_require_file_path
-        @h.key? CORE_FILE_ or raise ::LoadError, "cannot determine a path #{
+
+        if @h.key? CORE_FILE_
+          "#{ @parent_pn.to_path }/#{ @dir_entry.corename }/#{ CORE_ }"
+        else
+          raise ::LoadError, __say_get_require_file_path
+        end
+      end
+
+      def __say_get_require_file_path
+        "cannot determine a path #{
          }to require: #{ @dir_entry.corename }/#{ CORE_FILE_ } does not #{
           }exist. did #{ @dir_entry.corename }#{ EXTNAME_ } fail to load? (#{
            }in #{ @parent_pn })"
-        "#{ @parent_pn.to_path }/#{ @dir_entry.corename }/#{ CORE_ }"
       end
     end
 

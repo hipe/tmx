@@ -33,12 +33,14 @@ module Skylab::TestSupport
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
+    _Face = sidesys[ :Face ]
+
     API = -> do
-      Face__[]::API
+      _Face[]::API
     end
 
     API_normalizer_lib = -> do
-      Face__[]::API::Normalizer_
+      _Face[]::API::Normalizer_
     end
 
     API_normalizer = API_normalizer_lib
@@ -52,16 +54,21 @@ module Skylab::TestSupport
     end
 
     CLI_client_base_class = -> do
-      Face__[]::CLI::Client
+      _Face[]::CLI::Client
     end
 
     CLI_table = -> * x_a do
-      Face__[]::CLI::Table.call_via_iambic x_a
+      _Face[]::CLI::Table.call_via_iambic x_a
     end
 
     Default_core_file = -> do
       Autoloader_.default_core_file
     end
+
+    _HL = sidesys[ :Headless ]
+    EN_add_methods = -> mod, * x_a do
+      _HL[].expression_agent.NLP_EN_methods.on_mod_via_iambic mod, x_a
+     end
 
     Enhancement_shell = -> * i_a do
       Plugin[]::Bundle::Enhance::Shell.new i_a
@@ -75,21 +82,17 @@ module Skylab::TestSupport
       Brazen[]::Property::Stack.common_frame.call_via_arglist a
     end
 
-    Face__ = sidesys[ :Face ]
-
-    HL__ = sidesys[ :Headless ]
+    _Snag = sidesys[ :Snag ]
 
     Hashtag = -> do
-      Snag__[]::Models::Hashtag
+      _Snag[]::Models::Hashtag
     end
 
     Heavy_plugin_lib = -> do
-      Face__[]::Plugin
+      _Face[]::Plugin
     end
 
     Heavy_plugin = Heavy_plugin_lib
-
-    Hu___ = sidesys[ :Human ]  # ..
 
     Iambic_scanner = -> do
       Callback_::Polymorphic_Stream
@@ -99,8 +102,10 @@ module Skylab::TestSupport
       System_lib[]::IO
     end
 
+    _Hu = sidesys[ :Human ]
+
     Levenshtein = -> * x_a do
-      Hu___[]::Levenshtein.call_via_iambic x_a
+      _Hu[]::Levenshtein.call_via_iambic x_a
     end
 
     Name_from_const_to_method = -> i do
@@ -123,8 +128,6 @@ module Skylab::TestSupport
       Callback_::Proxy
     end
 
-    Snag__ = sidesys[ :Snag ]
-
     Skylab__ = Callback_.memoize do
       require_relative DOT_DOT_
       ::Skylab
@@ -140,6 +143,12 @@ module Skylab::TestSupport
 
     Struct = -> * i_a do
       Basic[]::Struct.make_via_arglist i_a
+    end
+
+    _HL = sidesys[ :Headless ]
+
+    SUNSETTING_CLI_lib = -> do
+      _HL[]::CLI
     end
 
     System = -> do

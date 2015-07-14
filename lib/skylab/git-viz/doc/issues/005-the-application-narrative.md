@@ -2,7 +2,7 @@
 
 (EDIT: this no longer belongs in [gv])
 
-## :#this-node-looks-funny-because-it-is-multi-domain
+## :#this-node-looks-funny-because-it-is-multi-domain (SUNSETTED)
 
 this application-top file looks a lot different than its cousin files
 in other subsystems because of how much new and strange infrastructure

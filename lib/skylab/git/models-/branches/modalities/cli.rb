@@ -107,7 +107,7 @@ module Skylab::Git
         def __produce_name_stream_via_VCS
 
           _path = ::Dir.pwd  # OK to access this from current modality ONLY
-          _sc = @resources.system_conduit_
+          _sc = @resources.bridge_for :system_conduit
 
           bc = Home_::Models::Branch_Collection.via_project_path_and_cetera(
             _path,

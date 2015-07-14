@@ -23,71 +23,51 @@ module Skylab::GitViz
 
           def resolve_properties  # #nascent-operation :+[#br-042]
 
-            bp = @bound.formal_properties.to_mutable_box_like_proxy
+            super
 
-            bp.replace_by :path do | prp |
+            fp = mutable_front_properties
+            rsx = @resources
 
-              prp.dup.append_ad_hoc_normalizer do | arg, & oes_p |
+            # ~ f
 
-                # hackd for now
-
-                path = arg.value_x
-
-                if ! path.respond_to?( :relative_path_from ) && ::File::SEPARATOR != path[ 0 ]
-                  arg = arg.new_with_value ::File.expand_path path
-                end
-                arg
-              end
+            fs = rsx.bridge_for :filesystem
+            substitute_value_for_argument :filesystem do
+              fs
             end
 
-            # ~
+            # ~ p
 
-            fp = bp.dup
-            @bound.change_formal_properties bp
+            edit_path_properties :path, :absolutize_relative_path
 
-            # ~
+            # ~ s
 
-            fp.remove :VCS_adapter_name
-
-            bp.replace_by :VCS_adapter_name do | prp |
-              prp.new_with_default do
-                :git
-              end
+            io = rsx.serr
+            substitute_value_for_argument :stderr do
+              io
             end
 
-            # ~
-
-            fp.remove :system_conduit
-
-            sys_cond = @parent.top_invocation_environment_x[ :__system_conduit__ ]
-              # (let hacks in - the way this is written is nasty #todo)
-
-            sys_cond ||= Home_.lib_.open3
-
-            bp.replace_by :system_conduit do | prp |
-              prp.new_with_default do
-                sys_cond
-              end
+            sys = rsx.bridge_for :system_conduit
+            substitute_value_for_argument :system_conduit do
+              sys
             end
 
-            # ~
+            # ~ v
 
-            fp.add_to_front :width, ( fp.at_position( 0 ).class.new do
+            substitute_value_for_argument :VCS_adapter_name do
+              :git
+            end
+
+            # ~ w
+
+            _any_prp_class = fp.at_position( 0 ).class
+
+            fp.add_to_front :width, ( _any_prp_class.new do
 
               @name = Callback_::Name.via_variegated_symbol( :width )
               @parameter_arity = :one
 
               add_normalizer_for_greater_than_or_equal_to_integer 1
             end )
-
-            # ~
-
-            @back_properties = bp
-            @front_properties = fp
-
-            # ~
-
-            @bound.receive_stderr_ @resources.serr
 
             NIL_
           end
@@ -158,8 +138,11 @@ module Skylab::GitViz
 
           def __via_sparse_matrix_of_content_resolve_column_A
 
-            st = Home_.lib_.tree.via( :node_identifiers,
-              @matrix.rows ).to_classified_stream_for :text
+            st = Home_.lib_.basic::Tree.via(
+              :node_identifiers,
+              @matrix.rows,
+
+            ).to_classified_stream_for :text
 
             st.gets  # the first node is always the root node,
               # which never has any visual representation
@@ -167,6 +150,7 @@ module Skylab::GitViz
             max = 0
             column_A_content = []
             column_B_rows = []
+
             begin
               o = st.gets
               o or break
@@ -218,4 +202,4 @@ end
 
 # :+#tombstone:  o.base.long[ 'use-mocks' ] = ::OptionParser::Switch::NoArgument.new do  # :+#hidden-option
 # (keep this line for posterity - there was some AMAZING foolishness going
-# on circa early '12 that is a good use case for why autoloader #todo)
+# on circa early '12 that is a good use case for why autoloader (for [#ca-024])

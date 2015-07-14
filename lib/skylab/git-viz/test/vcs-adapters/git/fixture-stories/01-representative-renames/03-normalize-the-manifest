@@ -25,7 +25,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
       def work
 
-        st = Home_::Test_Lib_::Mock_System::Conduit.new(
+        st = Home_.lib_.mock_system_lib::Mock_System::Conduit.new(
           @raw_manifest_path ).to_command_stream
 
         norm = Actors_::Normalize_command.new(

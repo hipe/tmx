@@ -159,7 +159,7 @@ module Skylab::Brazen
         attr_reader :err
 
         def start
-          @in, @out, @err, @thread = Home_::LIB_.open3.popen3 @bin_path,
+          @in, @out, @err, @thread = Home_::LIB_.open_3.popen3 @bin_path,
             chdir: @chdir_path
           self
         end

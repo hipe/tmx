@@ -7,12 +7,12 @@ module Skylab::GitViz::TestSupport::Test_Lib
     extend TS_
 
     it "loads" do
-      subject
+      _subject
     end
 
     it "writes one command" do
 
-      co = subject::Models_::Command.new
+      co = _subject::Models_::Command.new
       co.receive_args [ "echo", "it's", '"fun"' ]
       co.stdout_string = "it's \"fun\"\n"
       co.exitstatus = 0
@@ -20,7 +20,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
       io = new_string_IO_
       co.write_to io
 
-      st = Home_.lib_.basic::String.line_stream io.string
+      st = LIB_.basic::String.line_stream io.string
 
       st.gets.should eql "command\n"
       st.gets.should eql "  argv\n"
@@ -34,7 +34,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
 
     it "if options are provided, they get special treatment" do
 
-      co = subject::Models_::Command.new
+      co = _subject::Models_::Command.new
       co.receive_args [ 'hi', chdir: 'etc' ]
 
       io = new_string_IO_
@@ -47,8 +47,8 @@ module Skylab::GitViz::TestSupport::Test_Lib
       HERE
     end
 
-    def subject
-      Home_::Test_Lib_::Mock_System
+    def _subject
+      Subject_module_[]::Mock_System
     end
   end
 end

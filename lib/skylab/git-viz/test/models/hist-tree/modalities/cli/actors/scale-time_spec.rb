@@ -1,10 +1,12 @@
-require_relative '../../../../test-support'
+require_relative '../../../../../test-support'
 
-module Skylab::GitViz::TestSupport::Models
+module Skylab::GitViz::TestSupport
 
   describe "[gv] VCS adapters - git - models - hist-tree - CLI - actors - scale time - scale adapters" do
 
     extend TS_
+    use :models_support_mocks
+    use :double_decker_memoize
 
     it "annual - near minimal - one event" do
 
@@ -323,18 +325,21 @@ module Skylab::GitViz::TestSupport::Models
 
     def __build_column_B_rows
 
+      _Mock_Row = _Mock_Row_
+      _Mock_Filechange = _Mock_Filechange_
+
       @sparse_matrix_inputs.map do | a |
         if a
           _a = a.each_with_index.map do | d, idx |
             if d
 
-              Mock_Filechange_.new(
+              _Mock_Filechange_.new(
                 @datetimes.fetch( idx ),
                 d )
             end
           end
 
-          Mock_Row_.new _a
+          _Mock_Row_.new _a
         end
       end
     end

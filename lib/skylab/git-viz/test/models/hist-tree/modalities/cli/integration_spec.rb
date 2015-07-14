@@ -1,11 +1,11 @@
-require_relative '../../../test-support'
+require_relative '../../../../test-support'
 
-module Skylab::GitViz::TestSupport::Models
+module Skylab::GitViz::TestSupport
 
   describe "[gv] VCS adapters - git - models - hist-tree - CLI - integration" do
 
     extend TS_
-    use :bundle_support
+    use :VCS_adapters_git_support_bundle_support
     use :expect_CLI  # order matters
 
     it "help screen - expect [#br-042] back-to-front property mutation" do
@@ -47,7 +47,7 @@ module Skylab::GitViz::TestSupport::Models
 
       _common_prepare
 
-      invoke 'hi', '--', '46', _the_pathname
+      invoke 'hi', '--', '46', _the_path
 
        __expect_day_view_dots
     end
@@ -56,7 +56,7 @@ module Skylab::GitViz::TestSupport::Models
 
       _common_prepare
 
-      invoke 'hi', '--', '47', _the_pathname
+      invoke 'hi', '--', '47', _the_path
 
       __expect_shift_view_dots
     end
@@ -68,13 +68,20 @@ module Skylab::GitViz::TestSupport::Models
     end
 
     def __prepare_invo invo
-      invo.receive_environment( { __system_conduit__: mock_system_conduit } )
+
+      invo.receive_system_conduit mock_system_conduit
+
+      invo.receive_filesystem mock_filesystem
+
       NIL_
     end
 
-    def _the_pathname
-      mock_pathname '/m03/repo/dirzo'
-    end
+    define_method :_the_path, -> do
+      s = '/m03/repo/dirzo'
+      -> do
+        s
+      end
+    end.call
 
     # ~ expects
 
@@ -123,11 +130,13 @@ module Skylab::GitViz::TestSupport::Models
     end
 
     def manifest_path_for_mock_FS
-      GIT_STORY_03_PATHS_
+
+      at_ :STORY_03_PATHS_
     end
 
     def manifest_path_for_mock_system
-      GIT_STORY_03_COMMANDS_
+
+      at_ :STORY_03_COMMANDS_
     end
   end
 end

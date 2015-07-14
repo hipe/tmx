@@ -121,7 +121,7 @@ module Skylab::GitViz
 
       def when_failed_to_terminate_context
         emit_error_string "failed to terminate context. (error code #{ d })"
-        d  # #todo - the above has never been triggered or "tested" (reporting?)
+        d  # #!todo - the above has never been triggered or "tested" (reporting?)
       end
 
       def when_ZMQ_error

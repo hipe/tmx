@@ -6,7 +6,12 @@ module Skylab::GitViz
 
       class Actors_::Build
 
-        Callback_::Actor.call self, :properties, :path, :repo, :rsx
+        Callback_::Actor.call( self, :properties,
+          :path,
+          :repo,
+          :rsx,
+          :filesystem,
+        )
 
         def execute
 
@@ -43,15 +48,23 @@ module Skylab::GitViz
 
         def __normalize_path_on_filesystem
 
-          _pn_of_interest = @repo.pn_.join @path
+          _path = if DOT_ == @path
+            @repo.path
+          else
+           ::File.join @repo.path, @path
+          end
 
-          fs = Home_.lib_.system.filesystem
-
-          fs.normalization.upstream_IO(
-            :pathname, _pn_of_interest,
-            :only_apply_expectation_that_path_is_ftype_of,
-              fs.class::DIRECTORY_FTYPE,
+          kn = Home_.lib_.system.filesystem( :Existent_Directory ).with(
+            :path, _path,
+            :filesystem, @filesystem,
             & @on_event_selectively )
+
+          if kn
+            kn.value_x.to_path  # sanity check that result is a dir object
+            ACHIEVED_
+          else
+            kn
+          end
         end
 
         def __via_path_resolve_line_stream

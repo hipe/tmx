@@ -25,10 +25,13 @@ module Skylab::GitViz
         @system_conduit = sc
       end
 
-      def new_repository_via_pathname pn
+      def new_repository_via path, system, filesystem
 
-        models::Repository.new_via_pathname(
-          pn, @system_conduit, & @on_event_selectively )
+        models::Repository.new_via(
+          path,
+          system,
+          filesystem,
+          & @on_event_selectively )
       end
 
       def models

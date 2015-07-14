@@ -159,6 +159,12 @@ module Skylab::System
 
     private
 
+      def filesystem=
+        # all path-based n11ns support providing your own filesystem
+        @filesystem = gets_one_polymorphic_value
+        KEEP_PARSING_
+      end
+
       def path=
         _accept_path gets_one_polymorphic_value
       end

@@ -37,7 +37,7 @@ module Skylab::Brazen
       def initialize a, ak
 
         @app_kernel = ak
-        @_env = nil
+        @_resource_components = nil
         @mod = ak.module
         @resources ||= Resources.new a, @mod
         # (abstract base class "invocation" has no initialize method)
@@ -49,12 +49,11 @@ module Skylab::Brazen
 
       def invoke argv
 
-        if @resources.frozen?  # :+#experimental: subsequent invocation
-
-          @resources = @resources.new argv
+        rsx = @resources
+        if rsx.is_finished  # :+#experimental: subsequent invocation
+          @resources = rsx.new argv
         else
-
-          @resources.complete @_env || ::ENV, argv
+          rsx.finish argv, remove_instance_variable( :@_resource_components )
         end
 
         resolve_properties
@@ -1837,12 +1836,31 @@ module Skylab::Brazen
 
     class Resources
 
+      attr_reader(
+        :argv,
+        :is_finished,
+        :mod,
+        :serr,
+        :sin,
+        :sout,
+      )
+
       def initialize a, mod
 
+        @_bridges = nil
+        @sin, @sout, @serr, @_s_a = a
         @mod = mod
-        @sin, @sout, @serr, s_a = a
+      end
 
-        @_s_a = if s_a
+      def invocation_string_array
+        @__ISR ||= __build_invocation_string_array
+      end
+
+      def __build_invocation_string_array
+
+        s_a = remove_instance_variable :@_s_a
+
+        if s_a
           if s_a.last.nil?
             s_a[ -1 ] = Callback_::Name.via_module( @mod ).as_slug
           end
@@ -1852,30 +1870,54 @@ module Skylab::Brazen
         end
       end
 
-      def members
-        [ :argv, :env, :invocation_string_array, :mod, :sin, :sout, :serr ]
-      end
+      def finish argv, a
 
-      attr_reader :argv, :env, :sin, :sout, :serr, :mod
-
-      def invocation_string_array
-        @_s_a
-      end
-
-      def complete env, argv
         @argv = argv
-        @env = env
-        freeze
+        if a
+          h = {}
+          a.each_slice 2 do | k, x |
+            h[ k ] = x
+          end
+          @_bridges = h
+        end
+        @is_finished = true
+        NIL_
       end
 
       def new argv
-        dup.__new argv
+        otr = dup
+        otr.reinit argv
+        otr  # (used to freeze)
       end
 
-      protected def __new  argv
+      protected def reinit a
+        @argv = a
+        @is_finished = true
+        NIL_
+      end
 
-        @argv = argv
-        freeze
+      # ~
+
+      def knownness_for sym  # [gi]
+
+        Callback_::Known.new_known bridge_for sym
+      end
+
+      def bridge_for sym
+
+        ( @_bridges ||= {} ).fetch sym do
+          @_bridges[ sym ] = send :"__default__#{ sym }__"
+        end
+      end
+
+      def __default__filesystem__
+
+        Home_.lib_.system.filesystem  # directory? exist? mkdir mv open rmdir
+      end
+
+      def __default__system_conduit__
+
+        Home_.lib_.open_3
       end
     end
 
@@ -1927,12 +1969,21 @@ module Skylab::Brazen
 
     class Top_Invocation__
 
-      def top_invocation_environment_x
-        @_env
+      def receive_environment x
+        _receive_resource :environment, x
       end
 
-      def receive_environment x
-        @_env = x
+      def receive_filesystem x
+        _receive_resource :filesystem, x
+      end
+
+      def receive_system_conduit x
+        _receive_resource :system_conduit, x
+      end
+
+      def _receive_resource sym, x
+
+        ( @_resource_components ||= [] ).push sym, x
         NIL_
       end
     end
@@ -1941,7 +1992,7 @@ module Skylab::Brazen
 
       def __process_environment
 
-        env = @resources.env
+        env = @resources.bridge_for :environment
 
         @categorized_properties.env_a.each do | prp |
 
@@ -2020,7 +2071,7 @@ module Skylab::Brazen
 
         def mutate__path__properties
 
-          _mutate_path_property_to_default_to_PWD :path
+          edit_path_properties :path, :default_to_PWD
         end
 
         def mutate__workspace_path__properties
@@ -2073,8 +2124,6 @@ module Skylab::Brazen
         @back_properties = @bound.formal_properties  # nil ok
 
         if @back_properties
-
-          @_env = nil
           mutate_properties  # if ever is needed, this might become unconditional
         end
 
@@ -2153,39 +2202,98 @@ module Skylab::Brazen
         end
       end
 
-      def _mutate_path_property_to_default_to_PWD sym
+      # ~ experimenal domain-specific property mutation API & support
 
-        # make this property not required in the eyes of the front.
-        # in the back, default it to the pwd.
+      ## ~~ near filesystem
 
-        mutable_front_properties.replace_by sym do | prp |
-          prp.dup.set_is_not_required.freeze
+      def edit_path_properties sym, * sym_a
+
+        absolutize_rel_paths = false
+        become_not_required = false
+        default_to_pwd = false
+        do_this = false
+
+        h = {
+          absolutize_relative_path: -> do
+            absolutize_rel_paths = true
+            do_this = true
+          end,
+          default_to_PWD: -> do
+            become_not_required = true
+            default_to_pwd = true
+            do_this = true
+          end,
+        }
+
+        sym_a.each do | op_sym |
+          h.fetch( op_sym ).call
         end
 
-        mutable_back_properties.replace_by sym do | prp |
+        if become_not_required
 
-          prp.dup.set_default_proc do
+          # make this property not required in the eyes of the front.
 
-            present_working_directory
+          mutable_front_properties.replace_by sym do | prp |
+            prp.dup.set_is_not_required.freeze
+          end
+        end
 
-          end.freeze
+        if do_this
+
+          mutable_back_properties.replace_by sym do | prp |
+
+            otr = prp.dup
+
+            if default_to_pwd
+              otr.set_default_proc do
+                present_working_directory
+              end
+            end
+
+            if absolutize_rel_paths
+
+              otr.append_ad_hoc_normalizer do | arg, & x_p |
+                __derelativize_path arg, & x_p
+              end
+            end
+            otr.freeze
+          end
         end
         NIL_
       end
 
-      # ~ property mutation API & support (#experimental)
+      def __derelativize_path arg, & oes_p
+
+        if arg.is_known
+          path = arg.value_x
+          if path
+            if FILE_SEPARATOR_BYTE_ != path.getbyte( 0 )  # ick/meh
+
+              _path_ = _filesystem.expand_path path, present_working_directory
+              arg = arg.new_with_value _path_
+            end
+          end
+        end
+        arg
+      end
 
       def present_working_directory
-        ::Dir.pwd
+        _filesystem.pwd
       end
+
+      def _filesystem
+        # for now .. (but one day etc)
+         Home_.lib_.system.filesystem
+      end
+
+      # ~ property mutation API & support (#experimental)
 
       def remove_property_from_front sym  # :+#by:ts
         mutable_front_properties.remove sym
         NIL_
       end
-
-      # ~
-
     end
+
+    FILE_SEPARATOR_BYTE_ = ::File::SEPARATOR.getbyte 0
   end
 end

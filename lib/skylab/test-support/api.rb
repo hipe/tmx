@@ -19,10 +19,6 @@ module Skylab::TestSupport
       define_method :krnl, ( Callback_.memoize do
         Home_.lib_.brazen::Kernel.new Home_
       end )
-
-      def lib_
-        @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib___, self
-      end
     end  # >>
 
     module Home_::Models_
@@ -49,34 +45,6 @@ module Skylab::TestSupport
       end
 
       Autoloader_[ self, :boxxy ]
-    end
-
-    module Lib___
-
-      sidesys = Autoloader_.build_require_sidesystem_proc
-
-      CLI_lib = -> do
-        HL__[]::CLI
-      end
-
-      EN_add_methods = -> mod, * x_a do
-        HL__[].expression_agent.NLP_EN_methods.on_mod_via_iambic mod, x_a
-      end
-
-      HL__ = sidesys[ :Headless ]
-
-      Ick = -> x do
-        Basic[]::String.via_mixed x
-      end
-
-      Name_symbol_to_label = -> i do
-        self._HELLO
-        HL__[]::Name.labelize( i ).downcase
-      end
-
-      Pretty_path_proc = -> do
-        Sys__[].filesystem.path_tools.pretty_path
-      end
     end
   end
 end

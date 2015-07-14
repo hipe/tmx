@@ -1,10 +1,11 @@
-require_relative '../../../../test-support'
+require_relative '../../../../../test-support'
 
-module Skylab::GitViz::TestSupport::Models
+module Skylab::GitViz::TestSupport
 
   describe "[gv] VCS adapters - git - models - hist-tree - CLI - sessions - glyph mapper:[#026]" do
 
     extend TS_
+    use :double_decker_memoize
 
     it "outside range (low end) is nil" do
 

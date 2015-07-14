@@ -45,8 +45,11 @@ module Skylab::System
 
         def initialize & edit_p
 
-          @argument_path_might_be_target_path = @ftype =
-            @prop = @property_symbol = nil
+          @argument_path_might_be_target_path = nil
+          @ftype = nil
+          @on_event_selectively = nil
+          @prop = nil
+          @property_symbol = nil
 
           instance_exec( & edit_p )
 
@@ -183,13 +186,18 @@ module Skylab::System
 
           _ftype = @ftype || FILE_FTYPE
 
-          _yes = Home_.services.filesystem( :Upstream_IO ).with(
+          yes = Home_.services.filesystem( :Upstream_IO ).with(
 
             :only_apply_expectation_that_path_is_ftype_of, _ftype,
             :path, found_path,
+            :filesystem, @filesystem,
             & @on_event_selectively )
 
-          _yes && surrounding_path
+          if yes
+            surrounding_path
+          else
+            yes
+          end
         end
 
         def __when_resource_not_found count
@@ -217,11 +225,11 @@ module Skylab::System
 
         Build_resource_not_found_event__ = -> start_path, file_pattern_x, num_dirs_looked do
 
-          Callback_::Event.inline_not_OK_with( :resource_not_found,
-
-              :start_path, start_path,
-              :file_pattern_x, file_pattern_x,
-              :num_dirs_looked, num_dirs_looked,
+          Callback_::Event.inline_not_OK_with(
+            :resource_not_found,
+            :start_path, start_path,
+            :file_pattern_x, file_pattern_x,
+            :num_dirs_looked, num_dirs_looked,
 
           ) do | y, o |
 

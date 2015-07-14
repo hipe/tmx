@@ -257,24 +257,12 @@ module Skylab::TestSupport
 
       Basic = parent::Basic
 
-      CLI_lib = -> do
-        HL___[]::CLI
-      end
-
       Function_chain = -> * p_a do
         Basic[]::Function.chain p_a
       end
 
-      HL___ = parent::HL__
-
-      Hu___ = parent::Hu___
-
       Match_test_dir_proc = -> do
         Home_.constant( :TEST_DIR_NAME_A ).method :include?
-      end
-
-      NLP__ = -> do
-        Hu___[]::NLP
       end
 
       Oxford_and = Callback_::Oxford_and

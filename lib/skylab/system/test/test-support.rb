@@ -31,7 +31,7 @@ module Skylab::System::TestSupport
           x = if Test_Support_Bundles_.const_defined? const, false
             Test_Support_Bundles_.const_get const, false
           else
-            Home_.lib_.plugin::Bundle::Fancy_lookup[ sym, TS_ ]
+            TestSupport_.fancy_lookup sym, TS_
           end
           cache_h[ sym ] = x
           x

@@ -16,10 +16,6 @@ module Skylab::TestSupport
 
       Basic = sidesys[ :Basic ]
 
-      CLI_lib = -> do
-        HL__[]::CLI
-      end
-
       CLI_table = -> * x_a do
         if x_a.length.zero?
           Face__[]::CLI::Table

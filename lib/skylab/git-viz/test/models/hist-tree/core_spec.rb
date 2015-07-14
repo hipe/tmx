@@ -1,40 +1,33 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::GitViz::TestSupport::Models
+module Skylab::GitViz::TestSupport
 
   describe "[gv] models - hist-tree" do
 
     extend TS_
-    use :hist_tree_model_support
+    use :models_support_hist_tree_model_support
 
     it "absolute path no ent (mocked) - x" do
 
       _call_API_against_path '/this-path-is-not-even-mocked/zang'
-
-      __expect_no_repo
-    end
-
-    def __expect_no_repo
-
-      ev = expect_not_OK_event( :repo_root_not_found ).to_event
-
-      ev.num_times_looked.should eql 3
-      ev.path.should eql '/this-path-is-not-even-mocked/zang'
-
-      expect_failed
+      _same
     end
 
     it "abspath no ent, but inside a repo (mocked) - x" do
 
       _call_API_against_path '/m03/repo/nazoozle/fazoozle'
+      _same
+    end
 
-      expect_failed_by :errno_enoent
+    def _same
+
+      expect_not_OK_event :start_directory_does_not_exist
+      expect_failed
     end
 
     it "path is file (mocked) - x" do
 
       _call_API_against_path "/m03/repo/dirzo/it's just/funky like that"
-
       expect_failed_by :wrong_ftype
     end
 
@@ -55,16 +48,18 @@ module Skylab::GitViz::TestSupport::Models
     def _call_API_against_path path
 
       call_API( * hist_tree_head_iambic_,
+        :path, path,
         :system_conduit, :_s_c_,
-        :path, mock_pathname( path ) )
+        :filesystem, mock_filesystem,
+      )
     end
 
     def manifest_path_for_mock_FS
-      GIT_STORY_03_PATHS_
+      at_ :GIT_STORY_03_PATHS_
     end
 
     def manifest_path_for_mock_system
-      GIT_STORY_03_COMMANDS_
+      at_ :GIT_STORY_03_COMMANDS_
     end
   end
 end

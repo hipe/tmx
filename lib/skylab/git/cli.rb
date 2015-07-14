@@ -12,40 +12,6 @@ module Skylab::Git
       Brazen_::CLI.expression_agent_class
     end
 
-    def initialize a, ak
-
-      @resources = Resources___.new a, ak.module
-      super
-    end
-
-    class Resources___ < Resources
-
-      # (this subclassing is questionable - would be better if ..)
-
-      def initialize( * )
-        @_cache = {}
-        super
-      end
-
-      def knownness_for sym
-
-        Callback_::Known.new_known send :"__#{ sym }__"
-      end
-
-      def __filesystem__
-
-        @_cache[ :fs ] ||= Home_.lib_.system.filesystem
-        # (directory? exist? mkdir mv open rmdir)
-      end
-
-      def __system_conduit__
-
-        @_cache[ :sc ] ||= Home_.lib_.open_3
-      end
-
-      alias_method :system_conduit_, :__system_conduit__  # expose to this subsystem
-    end
-
     # (( BEGIN
     Client = self
     module Adapter

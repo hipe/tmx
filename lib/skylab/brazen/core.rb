@@ -386,7 +386,7 @@ module Skylab::Brazen
       HL__[]::CLI
     end
 
-    Open3 = stdlib[ :Open3 ]
+    Open_3 = stdlib[ :Open3 ]
 
     Parse = sidesys[ :Parse ]
 

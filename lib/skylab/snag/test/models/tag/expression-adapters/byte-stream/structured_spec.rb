@@ -50,7 +50,7 @@ module Skylab::Snag::TestSupport
         expect_no_more_pieces_
       end
 
-      nasty_OCD_memoize_ :_nasty do
+      dangerous_memoize_ :_nasty do
 
         _init_piece_stream
         st = @piece_st

@@ -11,7 +11,8 @@ module Skylab::GitViz
           class << self
 
             def next
-              :Singularity  # #todo
+              self._COVER_AND_DESIGN_ME
+              :Singularity
             end
 
             def within_ sumzn

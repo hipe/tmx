@@ -23,6 +23,23 @@ module Skylab::TestSupport  # :[#021].
       self::Lib_::Stderr[]
     end
 
+    define_method :fancy_lookup, -> do
+
+      build_curry = -> do
+        Home_.lib_.plugin::Bundle::Fancy_lookup.new_with(
+          :stemname_filter, /_spec\z/,
+        ).freeze
+      end
+      curry = nil
+
+      -> sym, ts_mod do
+
+        curry ||= build_curry[]
+        curry.against sym, ts_mod
+      end
+
+    end.call
+
     def lib_
       @lib ||= Home_::Lib_::INSTANCE
     end
@@ -50,6 +67,7 @@ module Skylab::TestSupport  # :[#021].
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
   FILE_SEP_ = ::File::SEPARATOR
+  Home_ = self
   KEEP_PARSING_ = true
   stowaway :Library_, 'lib-'
   MONADIC_TRUTH_ = -> _ { true }
@@ -57,7 +75,6 @@ module Skylab::TestSupport  # :[#021].
   NIL_ = nil
   SPACE_ = ' '.freeze
   TEST_DIR_FILENAME_ = 'test'.freeze
-  Home_ = self  # there is another module called ::SL::TS::TS
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
 

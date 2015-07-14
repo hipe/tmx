@@ -1,7 +1,5 @@
-
-# read [#005]:#this-node-looks-funny-because-it-is-multi-domain
-
-require_relative '../callback/core'
+require_relative '..'
+require 'skylab/callback/core'
 
 module Skylab::GitViz
 
@@ -61,13 +59,27 @@ module Skylab::GitViz
     end
 
     def mock_FS
-      Home_::Test_Lib_::Mock_FS
+      Home_.lib_.mock_system_lib::Mock_FS
     end
 
     def repository
       Home_::VCS_Adapters_::Git.repository
     end
   end  # >>
+
+  Actors_ = ::Module.new
+  Actors_::Relpath = -> long, short do
+
+    d = short.length
+    short == long[ 0, d ] or raise ::ArgumentError
+    FILE_SEPARATOR_BYTE_ == long.getbyte( d ) or raise ::ArgumentError
+
+    if short.length + 1 == d
+      NIL_  # long path was just short path with trailing slash
+    else
+      long[ d + 1 .. -1 ]
+    end
+  end
 
   Autoloader_ = ::Skylab::Callback::Autoloader
   ACHIEVED_ = true
@@ -78,6 +90,7 @@ module Skylab::GitViz
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
+  FILE_SEPARATOR_BYTE_ = ::File::SEPARATOR.getbyte 0
   Home_ = self
   Name_ = Callback_::Name
   NEWLINE_ = "\n"
@@ -91,3 +104,5 @@ module Skylab::GitViz
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
 end
+
+# :#tombstone: [#005]:#this-node-looks-funny-because-it-is-multi-domain

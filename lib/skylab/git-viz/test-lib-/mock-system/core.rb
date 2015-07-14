@@ -6,7 +6,7 @@ module Skylab::GitViz
 
       class << self
 
-        def [] test_context
+        def enhance_client_class test_context
           test_context.include Instance_Methods___
           NIL_
         end

@@ -1,25 +1,16 @@
-require_relative '../../../test-support'
+module Skylab::GitViz::TestSupport::Test_Lib
 
-module Skylab::GitViz::TestSupport::Test_Lib::IA_OGDL
+  module Mock_System::Support
 
-  ::Skylab::GitViz::TestSupport::Test_Lib[ TS_ = self ]
+    OGDL = -> tcm do
 
-  include Constants
+      tcm.send :define_method, :against_ do | s |
 
-  extend TestSupport_::Quickie
+        @st = Subject_module_[]::Mock_System::Input_Adapters_::
+          OGDL.tree_stream_from_lines( LIB_.basic::String.line_stream s )
 
-  module InstanceMethods
-
-    def against s
-
-      @st = Home_::Test_Lib_::Mock_System::Input_Adapters_::
-        OGDL.tree_stream_from_lines( Home_.lib_.basic::String.line_stream s )
-
-      NIL_
+        NIL_
+      end
     end
-
   end
-
-  Home_ = Home_
-  NIL_ = NIL_
 end

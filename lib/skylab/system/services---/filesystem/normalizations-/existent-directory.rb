@@ -246,7 +246,7 @@ module Skylab::System
           if @_is_dry_run
             Mock_Dir__.new path_
           else
-            ::Dir.new path_
+            @filesystem.build_directory_object path_
           end
         )
       end

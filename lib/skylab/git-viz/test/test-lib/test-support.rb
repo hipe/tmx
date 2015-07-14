@@ -2,21 +2,82 @@ require_relative '../test-support'
 
 module Skylab::GitViz::TestSupport::Test_Lib
 
-  ::Skylab::GitViz::TestSupport[ TS_ = self ]
+  Parent__ = ::Skylab::GitViz::TestSupport  # except for when we use <- this..
 
-  include Constants
+  # ~
+  # we are a child node by position only - we don't want to pull in
+  # assets from the parent node. to this end, we do a lot manually:
+
+  Callback_ = ::Skylab::Callback
+
+  Autoloader_ = Callback_::Autoloader
+
+  _ = ::File.join ::Skylab::GitViz::TestSupport.dir_pathname.to_path, 'test-lib'
+
+  Autoloader_[ self, _ ]
+
+  # ~
+
+  TestSupport_ = ::Skylab::TestSupport
+
+  TestSupport_::Regret[ TS_ = self ]
 
   extend TestSupport_::Quickie
+
+  DANGEROUS_MEMOIZE_ = Parent__::DANGEROUS_MEMOIZE_
+
+  module ModuleMethods
+
+    define_method :use, -> do
+      h = {}
+      -> sym do
+        ( h.fetch sym do
+
+          x = TestSupport_.fancy_lookup sym, TS_
+
+          h[ sym ] = x
+        end )[ self ]
+      end
+    end.call
+
+    define_method :dangerous_memoize, DANGEROUS_MEMOIZE_
+  end
 
   module InstanceMethods
 
     def new_string_IO_
-      Top_TS_.lib_.string_IO.new
+      LIB_.string_IO.new
     end
   end
 
-  Callback_ = Callback_
-  Home_ = Home_
-  Top_TS_ = Top_TS_
+  Expect_Line = -> tcc do
 
+    TestSupport_::Expect_line[ tcc ]
+  end
+
+  module LIB_ ; class << self
+
+    def basic
+      @__basic ||= Autoloader_.require_sidesystem( :Basic )
+    end
+
+    def plugin
+      Autoloader_.require_sidesystem :Plugin
+    end
+
+    def string_IO
+      @__string_IO ||= Autoloader_.require_stdlib( :StringIO )
+    end
+
+  end ; end
+
+  # ~ shorties
+
+  Lazy_Constants_ = Parent__::Lazy_Constants_
+
+  NIL_ = nil
+
+  Subject_module_ = -> do
+    ::Skylab::GitViz::Test_Lib_
+  end
 end

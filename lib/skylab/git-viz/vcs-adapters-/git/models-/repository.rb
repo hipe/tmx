@@ -2,41 +2,50 @@ module Skylab::GitViz
 
   module VCS_Adapters_::Git
 
-    class Models_::Repository  # [#016]..
+    class Models_::Repository  # see [#016]
 
       class << self
 
-        def new_via_path path, sys_cond=Home_.lib_.open3, & oes_p
-          new_via_pathname ::Pathname.new( path ), sys_cond, & oes_p
-        end
+        def new_via path, system, filesystem, & oes_p
 
-        def new_via_pathname interest_pn, sys_cond, & oes_p  # while #open [#004]
+          dir = Find_repository_path___[ path, filesystem, & oes_p ]
 
-          repo_pn = Find_repository_pathname___[ self, interest_pn, & oes_p ]
-          repo_pn and begin
-            new interest_pn, repo_pn, sys_cond, & oes_p
+          if dir
+
+            new path, dir, system, & oes_p
+          else
+            dir
           end
         end
+
+        private :new
       end  # >>
 
-      def initialize interest_pn, repo_pn, sys_cond, & oes_p
+      attr_reader(
+        :path,
+        :relative_path_of_interest,
+      )
+
+      def initialize arg_path, project_path, system, & oes_p
 
         @on_event_selectively = oes_p
 
-        @path = repo_pn.to_path
+        @path = project_path
 
-        @pn_ = repo_pn
+        _rpoi = if project_path == arg_path
+          NIL_
+        else
 
-        @relative_path_of_interest =
-          interest_pn.relative_path_from( repo_pn ).to_path
+          Home_::Actors_::Relpath[ arg_path, project_path ]
+        end
 
-        @system_conduit = sys_cond
+        @relative_path_of_interest = _rpoi || DOT_
+
+        @system_conduit = system
 
         # M-etaHell::F-UN.without_warning { Home_.lib_.grit }  # see [#016]:#as-for-grit
         # @inner = ::Grit::Repo.new absolute_pn.to_path ; nil
       end
-
-      attr_reader :pn_, :path, :relative_path_of_interest
 
       def fetch_commit_via_identifier id_s, & oes_p
 
@@ -60,52 +69,54 @@ module Skylab::GitViz
         GIT_EXE_
       end
 
-      Find_repository_pathname___ = -> repo_cls, pathname, & oes_p do
+      class Find_repository_path___
 
-        # we gotta use this and not :+[#sy-018] (tree walk) while #open [#004]
+        class << self
+          def [] path, fs, & oes_p
+            new( path, fs, & oes_p ).execute
+          end
+          private :new
+        end  # >>
 
-        if SEP_BYTE___ != pathname.instance_variable_get( :@path ).getbyte( 0 )
-          # use of pathname is "temporary"
-
-          raise ::ArgumentError, "relative paths are not honored here - #{ pathname.to_path }"
+        def initialize path, fs, & oes_p
+          @path = path ; @fs = fs ; @on_event_selectively = oes_p
         end
 
-        filename = VENDOR_DIR_
-        num_times_looked = 1
-        pn = pathname
-        begin
-          if pn.join( filename ).exist?
-            found = pn
-            break
-          end
-          pn_ = pn.dirname
-          if pn_ == pn
-            break
-          end
-          num_times_looked += 1
-          pn = pn_
-          redo
-        end while nil
+        def execute
 
-        found or begin
+          if @fs.path_is_absolute @path
 
-          oes_p.call :error, :repo_root_not_found do
+            _is_file = @fs.file? @path
 
-            Callback_::Event.inline_not_OK_with :repo_root_not_found,
-                :filename, filename, :num_times_looked, num_times_looked,
-                :path, pathname.to_path do | y, o |
-
-              y << "Didn't find '#{ o.filename }' #{
-               }entry in this or any parent directory #{
-                }(looked in #{ o.num_times_looked } dirs): #{ pth o.path }"
+            if _is_file
+              @_start_path = ::File.dirname @path
+            else
+              @_start_path = @path
             end
+
+            __money
+          else
+            raise ::ArgumentError, __say
           end
-          UNABLE_
+        end
+
+        def __say
+          "relative paths are not honored here - #{ @path }"
+        end
+
+        def __money
+
+          fs = Home_.lib_.system.filesystem
+
+          fs.walk(
+            :start_path, @_start_path,
+            :filesystem, @fs,
+            :filename, VENDOR_DIR_,
+            :max_num_dirs_to_look, -1,
+            :ftype, fs.constants.const_get( :DIRECTORY_FTYPE, false ),
+            & @on_event_selectively )
         end
       end
-
-      SEP_BYTE___ = ::File::SEPARATOR.getbyte 0
-
     end
   end
 end

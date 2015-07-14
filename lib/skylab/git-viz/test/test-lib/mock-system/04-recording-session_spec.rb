@@ -11,7 +11,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
 
       io = new_string_IO_
 
-      x = subject.recording_session io do | sess |
+      x = _subject.recording_session io do | sess |
 
         i, o, e, t = sess.popen3 'echo', "it's", '"fun"'
 
@@ -50,8 +50,8 @@ module Skylab::GitViz::TestSupport::Test_Lib
       excerpt_lines( 10..10 ).first.should eql "  argv date\n"
     end
 
-    def subject
-      Home_::Test_Lib_::Mock_System
+    def _subject
+      Subject_module_[]::Mock_System
     end
   end
 end

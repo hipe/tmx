@@ -4,9 +4,9 @@
 ## the new introduction
 
 a mock filesystem is defined by an absolute (real filesystem) path to a
-manifest file. the manifest file is simply a list of absolute paths that
-constitute the imaginary files and directories of the mock fileystem.
-(directories are the paths that end in "/".)
+manifest file. the manifest file is simply a list of paths (absolute or
+relative) that constitute the imaginary files and directories of the mock
+fileystem. (directories are the paths that end in "/".)
 
 the function of the mock filesystem is to act like a real filesystem
 that has these nodes and these nodes only (unless otherwise noted); but

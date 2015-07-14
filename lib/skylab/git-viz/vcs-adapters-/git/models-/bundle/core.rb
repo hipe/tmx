@@ -6,9 +6,15 @@ module Skylab::GitViz
 
       class << self
 
-        def build_via_path_and_repo path, repo, rsx, & oes_p
+        def build_bundle_via relpath, repo, rsx, filesystem, & oes_p
 
-          Actors_::Build[ path, repo, rsx, & ( oes_p || repo.handle_event_selectively ) ]
+          Actors_::Build.call(
+            relpath,
+            repo,
+            rsx,
+            filesystem,
+            & ( oes_p || repo.handle_event_selectively )
+          )
         end
 
         def log_command_

@@ -1,16 +1,16 @@
-require_relative '../../test-support'
+require_relative '../../../../test-support'
 
-module Skylab::GitViz::TestSupport::VCS_Adapters::Git
+module Skylab::GitViz::TestSupport
 
   describe "[gv] VCS adapters - git - models - bundle" do
 
     extend TS_
-    use :bundle_support
+    use :VCS_adapters_git_support_bundle_support
 
     it "noent - soft error" do
 
       bundle_against_ '/m03/repo/xx/not-there'
-      expect_failed_by :errno_enoent
+      expect_failed_by :start_directory_does_not_exist
     end
 
     it "file - soft error" do
@@ -56,11 +56,11 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
     end
 
     def manifest_path_for_mock_FS
-      STORY_03_PATHS_
+      at_ :STORY_03_PATHS_
     end
 
     def manifest_path_for_mock_system
-      STORY_03_COMMANDS_
+      at_ :STORY_03_COMMANDS_
     end
   end
 end

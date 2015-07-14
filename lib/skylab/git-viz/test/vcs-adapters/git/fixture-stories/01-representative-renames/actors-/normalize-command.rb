@@ -50,7 +50,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
       short_sha = '[0-9a-z]{7}'
 
-      sha = '[0-9a-z]{38,42}'  #todo
+      sha = '[0-9a-z]{38,42}'
 
       RANGE_RX___ = /\A(#{ short_sha })\.\.(#{ short_sha })\z/
 
@@ -137,7 +137,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
         NIL_
       end
 
-      SHA_LIKE_FIRST_LINE_RX__ = /\A#{ sha }\n(#{ sha }[[:space:]]$)?/  # #todo
+      SHA_LIKE_FIRST_LINE_RX__ = /\A#{ sha }\n(#{ sha }[[:space:]]$)?/
 
       def __do_the_datetime_line
 

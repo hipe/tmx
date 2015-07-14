@@ -6,13 +6,13 @@ module Skylab::GitViz::TestSupport::Test_Lib
 
     it "a mock system conduit is built with a pathname (any string)" do
 
-      subject::Conduit.new _no_ent_path
+      _subject::Conduit.new _no_ent_path
 
     end
 
     it "doesn't read the FS until it is used" do
 
-      _cond = subject::Conduit.new( _no_ent_path )
+      _cond = _subject::Conduit.new( _no_ent_path )
       begin
         _cond.popen3 'no'
       rescue ::Errno::ENOENT => e
@@ -23,7 +23,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
 
     it "OK (note STDIN mock is never created, other are IFF present)" do
 
-      cond = subject::Conduit.new( _manifest_A )
+      cond = _subject::Conduit.new( _manifest_A )
       i, o, e, w = cond.popen3 'echo', "it's", '"fun"'
 
       i.should be_nil
@@ -44,8 +44,8 @@ module Skylab::GitViz::TestSupport::Test_Lib
       TS_.dir_pathname.join( 'mock-system/03-playback/fixtures/story-A.ogdl' ).to_path
     end )
 
-    def subject
-      Home_::Test_Lib_::Mock_System
+    def _subject
+      Subject_module_[]::Mock_System
     end
   end
 end

@@ -135,7 +135,7 @@ module Skylab::GitViz
         # they contain any of the special characters used below, there is
         # a chance that our string math will save us (or at least bork
         # louder instead of failing silently )where regex would not but
-        # this is unverified :[#019]
+        # this is unverified #open :[#019]
 
         close_d = s.index CLOSE_CURLY___
         if close_d

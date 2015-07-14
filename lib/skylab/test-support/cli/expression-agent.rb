@@ -11,8 +11,6 @@ module Skylab::TestSupport
       # passed throughout the application and is the central conduit though
       # which all expression is received and then articulated.
 
-      LIB_ = Home_::API.lib_
-
       LIB_.EN_add_methods self, :private, [ :and_, :or_, :s ]
 
       def initialize _CLI_partitions
@@ -32,8 +30,8 @@ module Skylab::TestSupport
         Home_.lib_.brazen::CLI::Styling.stylize x, :green
       end
 
-      def escape_path pn
-        LIB_.pretty_path_proc[ pn ]
+      def escape_path path_x
+        Home_.lib_.system.filesystem.path_tools.pretty_path path_x
       end
 
       def highlight s # [br]
@@ -45,7 +43,7 @@ module Skylab::TestSupport
       end
 
       def ick x
-        LIB_.ick x
+        LIB_.basic::String.via_mixed x
       end
 
       def lbl x

@@ -115,6 +115,10 @@ module Skylab::System
 
       # ~ read :+#core-services
 
+      def build_directory_object path
+        ::Dir.new path
+      end
+
       def directory? s
         ::File.directory? s
       end
@@ -160,6 +164,10 @@ module Skylab::System
         ::Dir.glob( * a )
       end
 
+      def pwd
+        ::Dir.pwd
+      end
+
       def stat path
         ::File::Stat.new path
       end
@@ -202,6 +210,15 @@ module Skylab::System
 
       def unlink path
         ::File.unlink path
+      end
+
+      # ~ etc :+#core-services
+
+      def path_is_absolute path
+
+        # (this is a placeholder for the idea)
+
+        FILE_SEPARATOR_BYTE == path.getbyte( 0 )
       end
 
       # <-

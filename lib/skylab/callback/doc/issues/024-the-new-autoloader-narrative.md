@@ -51,7 +51,7 @@ stories are exercized.
 • because isomorphic simplicity. for some applications it can be useful to
   define a collection of constants each in their own file that represent
   business entities (typically something like "actions" or "plugins").
-  by a process we refer to as :#isomorphic-inference, we may indicate
+  by a process we refer to as :#isomorphic-inference :[#.A], we may indicate
   to the autoloader that certain particular modules leverage this
   relationship with the filesystem, such that a directory listing from the
   filsystem can give us hints about the constants that would be defined
@@ -531,7 +531,7 @@ so the working experiment is this:
 
 
 
-## :#stowaways (:#the-weird-thing-about-stowaways)
+## :#stowaways (:#the-weird-thing-about-stowaways) :[#.B]
 
 ### the stowaway can be a means to avoid creating an orphan
 

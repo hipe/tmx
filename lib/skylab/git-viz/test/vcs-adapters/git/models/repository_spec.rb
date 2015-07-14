@@ -1,11 +1,11 @@
-require_relative '../test-support'
+require_relative '../../../test-support'
 
-module Skylab::GitViz::TestSupport::VCS_Adapters::Git
+module Skylab::GitViz::TestSupport
 
   describe "[gv] VCS adapters - git - models - repository" do
 
     extend TS_
-    use :repository_support
+    use :VCS_adapters_git_support_repository_support
 
     it "builds" do
       front_
@@ -19,8 +19,10 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
     end
 
     it "just go ahead and TRY to give this low-level nerk a relpath" do
+
       __expect_relative_paths_are_not_honored_here do
-        init_respository_via_pathname_ 'anything'
+
+        init_respository_via_path_ 'anything'
       end
     end
 
@@ -33,31 +35,32 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
     end
 
     it "resolve when provide a path that totally doesn't exist - x" do
-      init_respository_via_pathname_ '/totally/doesn-t-exist'
+
+      init_respository_via_path_ '/totally/doesn-t-exist'
       __expect_totally_doesnt_exist
     end
 
     def __expect_totally_doesnt_exist
 
-      expect_not_OK_event :repo_root_not_found do | ev |
-
-        ev.filename.should eql '.git'
-        ev.num_times_looked.should eql 3
-        ev.path.should eql "/totally/doesn-t-exist"
-      end
+      ev = expect_not_OK_event :start_directory_does_not_exist
+      ev.exception or fail
+      ev.prop or fail
+      ev.start_path.should eql '/totally/doesn-t-exist'
 
       expect_failed
     end
 
     it "give it a FILE in a dir that is a repo - WORKS" do
 
-      init_respository_via_pathname_ '/m02/repo/core.py'
+      init_respository_via_path_ '/m02/repo/core.py'
+
       expect_no_more_events
+
       @repository.should be_respond_to :fetch_commit_via_identifier
     end
 
     def manifest_path_for_mock_FS
-      STORY_02_PATHS_
+      at_ :STORY_02_PATHS_
     end
 
     def mock_system_conduit

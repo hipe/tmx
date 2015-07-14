@@ -4,12 +4,12 @@ module Skylab::GitViz::TestSupport
 
     class << self
 
-      def [] ctx
+      def [] tcc
 
-        Home_::Test_Lib_::Mock_FS[ ctx ]
-        Home_::Test_Lib_::Mock_System[ ctx ]
+        TS_::Mock_Filesystem[ tcc ]
+        TS_::Mock_System[ tcc ]
 
-        ctx.include Instance_Methods___
+        tcc.include Instance_Methods___
       end
     end  # >>
 

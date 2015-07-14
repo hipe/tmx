@@ -231,7 +231,7 @@ module Skylab::GitViz
         if ! @do_engage
           @do_info and @y << "(was never active. nothing to do)"
         elsif @timer_thread
-          @stderr.write "joining current timer thread .."  # #todo:now
+          @stderr.write "joining current timer thread .."  # #!todo:now
           @timer_thread.join
           @yy << " done."
         else

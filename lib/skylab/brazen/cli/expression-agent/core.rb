@@ -100,13 +100,12 @@ module Skylab::Brazen
         if s.respond_to? :to_path
           s = s.to_path
         end
-        if DIR_SEP___ == s.getbyte( 0 )
+        if FILE_SEPARATOR_BYTE_ == s.getbyte( 0 )
           self.class::Pretty_Path__[ s ]
         else
           s
         end
       end
-      DIR_SEP___ = ::File::SEPARATOR.getbyte 0
 
       def render_property_as__option__ prop
         "--#{ prop.name.as_slug }"

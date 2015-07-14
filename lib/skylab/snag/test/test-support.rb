@@ -28,7 +28,7 @@ module Skylab::Snag::TestSupport
       define_method sym, Callback_.memoize( & p )
     end
 
-    def nasty_OCD_memoize_ sym, & p  # read caveat in [#ts-042]
+    def dangerous_memoize_ sym, & p  # read caveat in :+[#ts-042]
 
       did = false
       x = nil
@@ -270,7 +270,7 @@ module Skylab::Snag::TestSupport
 
   My_Tmpdir_ = -> do
 
-    o = nil  # :+#nasty_OCD_memoize_ (see)
+    o = nil  # :+[#ts-042] nasty OCD memoize
 
     -> tcm do
 

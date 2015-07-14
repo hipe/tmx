@@ -10,41 +10,20 @@ module Skylab::GitViz
 
     gem = stdlib
 
-    wall = -> do
-
-      skylab_top = _memoize do
-        require_relative '..'
-        NIL_
-      end
-
-      -> sym do
-
-        _memoize do
-
-          /\Arbx\b/i =~ ::RUBY_ENGINE and raise "cannot load '#{ sym }' in rbx!"
-
-          skylab_top[]
-
-          require "skylab/#{ Callback_::Name.via_const( sym ).as_slug }/core"
-
-          ::Skylab.const_get sym, false
-
-        end
-      end
-    end.call
-
     # ~ universe modules, sidesystem facilities and short procs all as procs
 
     Brazen = sidesys[ :Brazen ]
 
-    Basic = wall[ :Basic ]
+    Basic = sidesys[ :Basic ]  # was wall
 
     Basic_Set = -> * a do
       Basic[]::Set[ * a ]
     end
 
+    _HL = sidesys[ :Headless ]
+
     CLI_lib = -> do
-      HL__[]::CLI
+      _HL[]::CLI
     end
 
     Date_time = _memoize do
@@ -55,14 +34,6 @@ module Skylab::GitViz
     Grit = _memoize do
       require 'grit'
       ::Grit
-    end
-
-    HL__ = sidesys[ :Headless ]
-
-    Hu___ = sidesys[ :Human ]
-
-    Ick = -> x do  # this one is not behind a wall, but #todo:when-ba-purifies
-      x.inspect  # placeholder for the future from the past
     end
 
     JSON = stdlib[ :JSON ]
@@ -78,8 +49,14 @@ module Skylab::GitViz
       ::Digest::MD5
     end
 
+    _Hu = sidesys[ :Human ]
+
     NLP = -> do
-      Hu___[]::NLP
+      _Hu[]::NLP
+    end
+
+    Mock_system_lib = -> do
+      Home_::Test_Lib_
     end
 
     Open3 = stdlib[ :Open3 ]
@@ -95,7 +72,7 @@ module Skylab::GitViz
 
     Oxford_and = oxford.curry[ ', ', '[none]', ' and ' ]
 
-    Plugin = -> { HL__[]::Plugin }
+    Plugin = sidesys[ :Plugin ]
 
     Power_scanner = -> * x_a do
       Callback_::Scn.multi_step.new_via_iambic x_a
@@ -118,19 +95,13 @@ module Skylab::GitViz
       ::StringScanner
     end
 
+    _System_lib  = sidesys[ :System ]
 
     System = -> do
-      System_lib__[].services
-    end
-
-    System_lib__ = sidesys[ :System ]
-
-    Test_support = wall[ :TestSupport ]
-
-    Tree = -> do
-      Basic[]::Tree
+      _System_lib[].services
     end
 
     # ZMQ = memo[ -> do require 'ffi-rzmq' ; ::ZMQ end ]
   end
 end
+# :#tombstone: "wall" (for rbx)

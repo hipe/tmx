@@ -16,7 +16,15 @@ module Skylab::TestSupport
 
       SWITCH__ = '--help'.freeze
 
-      Match__ = QuicLib_::CLI_lib[].option.basic_switch_index_curry SWITCH__
+      Match__ = -> do
+        load = -> do
+          Home_.lib_.SUNSETTING_CLI_lib.option.basic_switch_index_curry SWITCH__
+        end
+        -> x do
+          p ||= load[]
+          p[ x ]
+        end
+      end.call
 
       def args_moniker
       end
