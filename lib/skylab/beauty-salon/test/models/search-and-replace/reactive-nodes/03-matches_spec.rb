@@ -1,12 +1,11 @@
-require_relative 'test-support'
+require_relative '../../../test-support'
 
-module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
+module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] S & R - the non-interactive API" do
-
-    TestLib_::Expect_event[ self ]
+  describe "[bs] S & R - the non-interactive API", wip: true do
 
     extend TS_
+    # use :expect_event
 
     it "ping-esque" do
       call_API :ziffo

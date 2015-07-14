@@ -6,38 +6,14 @@ file-metrics        q [ done ]  (2/6)
 
 beauty-salon        q [ TODO ]  (5/6)
 
-  • directories are already in [br]-ish place
-  • CLI needs to be melted in the common way
-  • Actions:
-    * ping
-    * wrap: covered (CLI int.)
-    * deliterate: not covered. has a "model" node.
-    * S & R: covered (CLI int.)
-
-
-git                 Q [ NOW IN PROGRESS ]  (4/6)
-
-  we follow [#137.H] the practical CRUD order:
-
-  • punch 1 - move everything
-
-  • punch 2 - ping
-              list entities
-
-  • punch 3 - status & show
-
-  • punch 4 - pop a stow (akin to deleting but not really)
-
-  • punch 5 - save a stow (compare to 'create')
-
-  • punch 6 - mode integrate
-
-  • punch 7 - spread (or swap order with next)
-
-  • punch 8 - scoot
+  • ping, deliterate back/front
+  • wrap back/front
+  • s&r back/front
 
 
 
+
+git                 q [ done ]  (4/6)
 tmx                 q [ TODO ]  (6/6)
 
   • oh my god how great will it be

@@ -1,18 +1,55 @@
 module Skylab::BeautySalon
 
-  class Models_::Deliterate < Home_.lib_.brazen::Model.common_action_class
+  class Models_::Deliterate < Brazen_::Model
 
-    Actions = THE_EMPTY_MODULE_
+    Actions = ::Module.new
 
-    Brazen_ = Home_.lib_.brazen
+    class Actions::Ping < Brazen_::Action  # :+#stowaway (while it works)
 
-    def write_options o
+      @is_promoted = true
 
-      o.separator EMPTY_S_
+      def produce_result
+        @on_event_selectively.call :info, :expression, :ping do | y |
+          y << "hello from beauty salon."
+        end
+        :hello_from_beauty_salon
+      end
+    end
 
-      o.separator 'description:'
+    class Actions::Deliterate < Brazen_::Action
 
-      o.separator <<-O.gsub %r(^ {8}), EMPTY_S_
+      @is_promoted = true
+
+      Brazen_::Model::Entity.call self
+
+      edit_entity_class(
+
+        :required, :property, :comment_line_downstream,
+        :required, :property, :code_line_downstream,
+
+        :required, :property, :line_upstream,
+
+        :required,
+        :integer_greater_than_or_equal_to, 1,
+        :property, :from_line,
+
+        :required,
+        :integer,
+        :ad_hoc_normalizer, -> arg, & oes_p do
+
+          _prp = self.properties.fetch :to_line
+          _qkn = arg.to_qualified_known_around _prp
+
+          Home_.lib_.basic::Range.normalize_argument(
+            _qkn, :is, -1, :or, :begin, 1,
+            & oes_p )
+        end,
+
+        :property, :to_line,
+
+        :desc, -> y do
+          # <- 2
+      _big_string =  <<-O.gsub %r(^ {8}), EMPTY_S_
 
         from line <from-line> to line <to-line> of file <file>, use a
         simple character-scanning ** HACK ** to partition each line of
@@ -40,136 +77,78 @@ module Skylab::BeautySalon
         there to begin with. however, your SLOC will reduce for those lines
         of code that have nothing but comments in them.
 
-        if <file> is not provided <stdin> is used, regarless of whether or
-        not it is interactive.
-
         this has no language-aware facilities at all, so false
         interpretations can occur. the algorithm is the simplest
         it could possibly be: it matches the first '#' it sees in the line
         and interprets that to be the beginning of a comment, with no
         regard for its "context".
-
       O
-    end
 
-    Brazen_::Model.common_entity self, :properties,
-          :input_path,
-          :input_stream,
-          :from_line,
-          :to_line,
-          :comment_line_yieldee,
-          :code_line_yieldee
-
-    Callback_::Event.selective_builder_sender_receiver self
+      scn = Home_.lib_.basic::String.line_stream _big_string
+      while (( s = scn.gets ))
+        y << s
+      end
+      NIL_
+    # -> 2
+        end,
+      )
+      # <- 2
 
     def produce_result
+
       via_properties_init_ivars
-      ok = normalize_line_ranges
-      ok &&= resolve_input_stream
-      ok and work
-    end
-
-  private
-
-    def normalize_line_ranges
-      @range = bound_properties.at :from_line, :to_line
-      @range.length.times do |d|
-        bp = @range.fetch( d ).dup  # we will mutate it
-        @range[ d ] = bp
-        instance_variable_set bp.name.as_ivar, bp  # overwrite original x
-      end
-      ok = normalize_as_integers
-      ok && normalize_range
-    end
-
-    def normalize_as_integers
-      ok = true
-      integer = Brazen_::Model.common_entity.normalizers.number.instance
-
-      @range.each do | arg |
-
-        ok_arg = integer.normalize_argument arg, & handle_event_selectively
-        if ok_arg
-          bp.value_x = ok_arg.value_x
-        else
-          ok = ok_arg
-        end
-      end
-
-      ok
+      ok = normalize_range
+      ok && prepare
+      ok && __work
     end
 
     def normalize_range           # for example,
-      okay = true                 # you could deliterate
-      o = Home_.lib_.basic::Range   # just these three lines
-      ok = o.normalize_argument @from_line, :begin, 1, & handle_event_selectively
-      ok or okay = false
-      ok = o.normalize_argument @to_line, :is, -1, :or, :begin, 1, & handle_event_selectively
-      ok or okay = false
-      okay
-    end
+                                  # you could deliterate
+      if @to_line < @from_line    # these lines.
 
-    def resolve_input_stream
-      if @input_stream
+        __maybe_express_upside_down_range
+
+        UNABLE_
+      else
         ACHIEVED_
-      else
-        via_input_path_resolve_input_stream
       end
     end
 
-    def via_input_path_resolve_input_stream
-      @input_stream = ::File.open @input_path, ::File::CREAT | ::File::RDONLY
-      @input_stream && ACHIEVED_
-    rescue ::Errno::ENOENT => e
-      maybe_send_event :error, :IO_error do
-        Callback_::Event.wrap.exception e,
-          :path_hack, :terminal_channel_i, :resource_not_found
-      end
-      UNABLE_
-    end
+    def __maybe_express_upside_down_range
 
-    def work
-      prepare
-      if @input_stream.tty?
-        work_when_interactive
-      else
-        work_when_non_interactive
+      foz = formal_properties
+      fl = foz.fetch :from_line
+      tl = foz.fetch :to_line
+      d = @from_line
+      d_ = @to_line
+
+      maybe_send_event :error, :expression, :upside_down_range do | y |
+
+        y << "#{ par tl } (#{ val d_ }) #{
+          }cannot be less than #{ par fl } (#{ val d })"
       end
     end
 
     def prepare
       @blank_count = 0
-      @from_line = @from_line.value_x
       @line_count = 0
       @paragraph = nil
-      to_line_d = @to_line.value_x
-      @to_line = nil
+      to_line_d = remove_instance_variable :@to_line
       @do_process_next_line_p = if -1 == to_line_d
         NILADIC_TRUTH_
       else
         -> do
           @line_count < to_line_d
         end
-      end ; nil
+      end
+      NIL_
     end
 
     NILADIC_TRUTH_ = -> { true }
 
-    def work_when_interactive
-      @is_interactive = true
-      @y = @comment_line_yieldee
-      @y << "interactive mode started. enter lines. ^C to interrupt, ^D when done"
-      process_lines
-    end
-
-    def work_when_non_interactive
-      @is_interactive = false
-      process_lines
-    end
-
-    def process_lines
+    def __work
       skip_lines
-      while @line = @input_stream.gets
+      while @line = @line_upstream.gets
         ok = @do_process_next_line_p[]
         if ok
           @line_count += 1
@@ -179,22 +158,20 @@ module Skylab::BeautySalon
         end
       end
       @paragraph and flush
-      nil
+      ACHIEVED_
     end
 
     def skip_lines
       if 1 < @from_line
         stop_at = @from_line - 1
-        while skipped = @input_stream.gets
-          if @is_interactive
-            @y << "#{ SKIP_LINE_PREFIX__ }#{ skipped }"
-          end
+        while @line_upstream.gets
           @line_count += 1
           if stop_at == @line_count
             break
           end
         end
-      end ; nil
+      end
+      NIL_
     end
 
     def process_line
@@ -227,7 +204,8 @@ module Skylab::BeautySalon
       else
         @blank_count = 0
         send_code_line_via_string code_string
-      end ; nil
+      end
+      NIL_
     end
 
     TRAILING_WS_RX__ = /[\t ]+\z/
@@ -237,34 +215,33 @@ module Skylab::BeautySalon
     end
 
     def send_code_line line
-      if @is_interactive
-        @code_line_yieldee << "#{ CODE_LINE_PREFIX__ }#{ line }"
-      else
-        @code_line_yieldee << line
-      end ; nil
+      @code_line_downstream << line
+      NIL_
     end
 
     def receive_comment_string string
-      cs = Comment_String__.new string, @pos
+      cs = Models_::Comment_String.new string, @pos
       if cs.is_effectively_empty
         @paragraph and flush
       else
-        @paragraph ||= Paragraph__.new
+        @paragraph ||= Models_::Paragraph.new
         @paragraph.add_comment_string cs
-      end ; nil
+      end
+      NIL_
     end
 
     def flush
+
       line = @paragraph.produce_line
-      if @is_interactive
-        @comment_line_yieldee << "#{ COMMENT_LINE_PREFIX__ }#{ line }"
-      else
-        @comment_line_yieldee << line
+      if line
+        @comment_line_downstream << line  # client can add newlines herself.
       end
       @paragraph = nil
     end
 
-    class Comment_String__
+    Models_ = ::Module.new
+
+    class Models_::Comment_String
 
       def initialize str, pos
         md = TRIM_RX__.match str
@@ -282,7 +259,7 @@ module Skylab::BeautySalon
       end
     end
 
-    class Paragraph__
+    class Models_::Paragraph
 
       def initialize
         @a = []
@@ -312,13 +289,15 @@ module Skylab::BeautySalon
           ( a * EMPTY_S_ )
         end
       end
-
-      CONNECTOR_RX__ = /-\z/
     end
 
-       CODE_LINE_PREFIX__ = 'code line:     '
-    COMMENT_LINE_PREFIX__ = 'comment line:  '
-       SKIP_LINE_PREFIX__ = 'skipping line: '
+      CONNECTOR_RX__ = /-\z/
 
+      CODE_LINE_PREFIX__ = 'code line:     '
+      COMMENT_LINE_PREFIX__ = 'comment line:  '
+      SKIP_LINE_PREFIX__ = 'skipping line: '
+
+    end
   end
 end
+# :+#tombstone: interactive mode

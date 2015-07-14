@@ -40,22 +40,14 @@ module Skylab::Git
           mfp.remove :branch_name_stream  # hide this from the UI, although
             # below we must still operate knowing it is there and required.
 
-          mfp.add :file, __build_file_property  # add this to the UI, and
+          _prp = build_property :file, :description, -> y do
+            y << "each line in file is a branch name (or use STDIN)"
+          end
+
+          mfp.add :file, _prp  # add this to the UI, and
             # we will reconcile it below
 
           NIL_
-        end
-
-        def __build_file_property
-
-          Brazen_::Model::Entity::Property.new do
-
-            @name = Callback_::Name.via_variegated_symbol :file
-
-            accept_description_proc -> y do
-              y << "each line in file is a branch name (or use STDIN)"
-            end
-          end
         end
 
         def prepare_backstream_call x_a
@@ -80,7 +72,7 @@ module Skylab::Git
 
         def __produce_name_stream
 
-          _path_arg = remove_backstream_argument :file
+          _path_arg = remove_backstream_argument_argument :file
 
           kn = Home_.lib_.system.filesystem( :Upstream_IO ).with(
             :instream, @resources.sin,
@@ -106,7 +98,9 @@ module Skylab::Git
 
         def __produce_name_stream_via_VCS
 
-          _path = ::Dir.pwd  # OK to access this from current modality ONLY
+          _path = @resources.bridge_for( :filesystem ).pwd
+            # we can work with the pwd from the current modality ONLY
+
           _sc = @resources.bridge_for :system_conduit
 
           bc = Home_::Models::Branch_Collection.via_project_path_and_cetera(

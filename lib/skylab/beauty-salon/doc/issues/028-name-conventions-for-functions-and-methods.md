@@ -9,6 +9,8 @@ its "API scope". here is a summary of the N tiers of scope:
 
     this_method_has_library_scope_  # #tier-1: one trailing underscore
 
+    this_method_is_called_only_once_outside_this_file__  # #tier-1.5
+
     _we_call_this_cozy_scope  # #tier-2: one leading underscore
 
     __we_call_this_one_off_scope  # #tier-3: two leading underscores
@@ -64,6 +66,18 @@ meanings:
     crossing library (i.e sidesystem) lines, this means you are
     knowingly circumventing the public API of the object, and you run
     the risk of getting broken if its implementation changes.
+
+
+
+
+### :#tier-1.5:
+
+a method name with two trailing dashes (that is not employing the
+convention for methods with generated names) is used to indicate that
+although this method is used by this library only (like in tier 1),
+it is only called from one location outside of this file. so it
+indicates that the cost of changing this method is lower than if it were
+tier-1.
 
 
 

@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../../../../../../test-support'
 
-module Skylab::BeautySalon::TestSupport::Models::S_and_R::Actors_BFS
+module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] models - S & R - models - multi-line edit file session" do
+  describe "[bs] models - S & R - models - multi-line edit file session", wip: true do
 
     extend TS_
 

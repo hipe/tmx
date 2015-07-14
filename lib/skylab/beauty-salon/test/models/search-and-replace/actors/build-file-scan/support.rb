@@ -1,3 +1,4 @@
+self._REGEL
 require_relative '../../test-support'
 
 module Skylab::BeautySalon::TestSupport::Models::S_and_R::Actors_BFS

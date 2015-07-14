@@ -3,27 +3,40 @@ require 'skylab/test-support/core'
 
 module Skylab::BeautySalon::TestSupport
 
-  ::Skylab::TestSupport::Regret[ self ]
+  TestSupport_ = ::Skylab::TestSupport
 
-  TestLib_ = ::Module.new
+  TestSupport_::Regret[ TS_ = self ]
 
-  module Constants
-    Home_ = ::Skylab::BeautySalon
-    Callback_ = Home_::Callback_
-    TestLib_ = TestLib_
-    TestSupport_ = ::Skylab::TestSupport
+  extend TestSupport_::Quickie
+
+  module ModuleMethods
+
+    define_method :use, -> do
+      h = {}
+      -> sym do
+        ( h.fetch sym do
+          x = TestSupport_.fancy_lookup sym, TS_
+          h[ sym ] = x
+          x
+        end )[ self ]
+      end
+    end.call
   end
-
-  include Constants
-
-  TestSupport_ = TestSupport_
-
-  Home_ = Home_
 
   module InstanceMethods
 
+    attr_reader :do_debug
+
+    def debug!
+      @do_debug = true
+    end
+
+    def debug_IO
+      TestSupport_.debug_IO
+    end
+
     def existent_empty_tmpdir_path
-      td = existent_tmpdir.tmpdir_via_join 'started-out-empty'
+      td = memoized_tmpdir_.tmpdir_via_join 'started-out-empty'
       if ! do_debug != ! td.be_verbose
         td = td.with :be_verbose, do_debug, :debug_IO, debug_IO
       end
@@ -31,56 +44,62 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def existent_tmpdir_path
-      existent_tmpdir.to_path
+      memoized_tmpdir_.to_path
     end
 
-    def existent_tmpdir
-      Memoized_tmpdir__[] || Memoize_tmpdir__[ do_debug, debug_IO ]
+    define_method :memoized_tmpdir_, -> do
+
+      o = nil
+      -> do
+        if o
+          o.for self
+        else
+          o = TestSupport_.tmpdir.memoizer_for self, 'bertie-serern'
+          o.instance
+        end
+      end
+    end.call
+
+    def subject_CLI
+      Home_::CLI
     end
 
-    def debug!
-      @do_debug = true
+    define_method :get_invocation_strings_for_expect_stdout_stderr, -> do
+
+      a = %w( zippo ).freeze
+      -> do
+        a
+      end
+    end.call
+
+    def subject_API
+      Home_::API
     end
 
-    attr_reader :do_debug
-
-    def debug_IO
-      TestSupport_.debug_IO
+    def black_and_white_expression_agent_for_expect_event
+      Brazen_::API.expression_agent_instance
     end
   end
 
-  -> do
+  # ~ bundles
 
-    _TMPDIR = nil
-
-    Memoized_tmpdir__ = -> do
-      _TMPDIR
-    end
-
-    Memoize_tmpdir__ = -> do_debug, debug_IO do
-
-      _pn = Home_.lib_.system.defaults.dev_tmpdir_pathname.join 'bertie-serern'
-
-      _TMPDIR = Home_.lib_.system.filesystem.tmpdir :path, _pn.to_path,
-        :be_verbose, do_debug,
-        :debug_IO, debug_IO,
-        :max_mkdirs, 1
-
-      _TMPDIR.exist? or _TMPDIR.prepare
-      _TMPDIR
-
-    end
-  end.call
-
-  module TestLib_
-
-    Expect_event = -> test_context_cls do
-      Constants::Callback_.test_support::Expect_Event[ test_context_cls ]
-    end
-
-    Expect_interactive = -> x do
-      Home_.lib_.brazen.test_support.expect_interactive x
-    end
-
+  Expect_Event = -> tcc do
+    Callback_.test_support::Expect_Event[ tcc ]
   end
+
+  Expect_Interactive = -> tcc do
+    Home_.lib_.brazen.test_support.expect_interactive tcc
+  end
+
+  Modality_Integrations_CLI_Support = -> tcc do
+    Home_.lib_.brazen.test_support.CLI::Expect_CLI[ tcc ]
+  end
+
+  # ~
+
+  Home_ = ::Skylab::BeautySalon
+
+  Brazen_ = ::Skylab::Brazen
+  Callback_ = ::Skylab::Callback
+  EMPTY_S_ = Home_::EMPTY_S_
 end

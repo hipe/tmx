@@ -1,0 +1,7 @@
+# not this one
+
+    def normalize_range           # for example,
+                                  # you could deliterate
+      if @to_line < @from_line    # these lines.
+
+# but not this one

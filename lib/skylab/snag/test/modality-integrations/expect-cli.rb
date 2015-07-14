@@ -111,6 +111,13 @@ module Skylab::Snag::TestSupport
       using_expect_stdout_stderr_invoke_via_argv argv
     end
 
+    def flush_help_screen_to_tree  # COPY PASTE NASTY  # todo
+
+      _st = sout_serr_line_stream_for_contiguous_lines_on_stream :e
+
+      Home_.lib_.brazen.test_support.CLI::Expect_Section.tree_via_line_stream__ _st
+    end
+
     def o * x_a, & p  # legacy
 
       if x_a.length.nonzero? || p

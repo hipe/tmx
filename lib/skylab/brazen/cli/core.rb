@@ -50,10 +50,10 @@ module Skylab::Brazen
       def invoke argv
 
         rsx = @resources
-        if rsx.is_finished  # :+#experimental: subsequent invocation
+        if rsx._is_finished  # :+#experimental: subsequent invocation
           @resources = rsx.new argv
         else
-          rsx.finish argv, remove_instance_variable( :@_resource_components )
+          rsx._finish argv, remove_instance_variable( :@_resource_components )
         end
 
         resolve_properties
@@ -631,14 +631,40 @@ module Skylab::Brazen
         ACHIEVED_
       end
 
-      def remove_backstream_argument sym
+      def remove_backstream_option_argument sym
 
         seen = @seen[ sym ]
         if seen
+          _d = seen.last_seen_index
+        end
+        _sketchily_remove_argument _d, sym
+      end
 
-          d = seen.last_seen_index
+      def remove_backstream_argument_argument sym
+
+        # until random access - go backwards from the end looking for it
+
+        x_a = @mutable_backbound_iambic
+        d = x_a.length - 2
+        begin
+          if sym == x_a.fetch( d )
+            break
+          end
+          if 1 < d
+            d -= 2
+            redo
+          end
+          d = nil
+          break
+        end while nil
+        d or raise ::NameError
+        _sketchily_remove_argument d, sym
+      end
+
+      def _sketchily_remove_argument d, sym
+
+        if d
           had = true
-
           x_a = @mutable_backbound_iambic
           x = x_a[ d + 1 ]
           x_a[ d, 2 ] = EMPTY_A_  # eew
@@ -1838,7 +1864,7 @@ module Skylab::Brazen
 
       attr_reader(
         :argv,
-        :is_finished,
+        :_is_finished,
         :mod,
         :serr,
         :sin,
@@ -1870,7 +1896,7 @@ module Skylab::Brazen
         end
       end
 
-      def finish argv, a
+      def _finish argv, a
 
         @argv = argv
         if a
@@ -1880,7 +1906,7 @@ module Skylab::Brazen
           end
           @_bridges = h
         end
-        @is_finished = true
+        @_is_finished = true
         NIL_
       end
 
@@ -1892,7 +1918,7 @@ module Skylab::Brazen
 
       protected def reinit a
         @argv = a
-        @is_finished = true
+        @_is_finished = true
         NIL_
       end
 
@@ -2179,6 +2205,18 @@ module Skylab::Brazen
           prp.new_with_default( & p ).freeze
         end
         NIL_
+      end
+
+      def build_property sym, * x_a  # convenience
+
+        ok = true
+        prp = Home_::Model::Entity::Property.new do
+
+          @name = Callback_::Name.via_variegated_symbol sym
+          ok = process_iambic_fully x_a
+        end
+        ok or raise ::ArgumentError
+        prp
       end
 
       def mutable_front_properties

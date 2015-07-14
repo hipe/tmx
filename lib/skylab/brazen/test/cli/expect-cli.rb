@@ -41,6 +41,17 @@ module Skylab::Brazen::TestSupport::CLI
 
     # ~ assertion phase (ad-hocs)
 
+    ## ~~ exposures to other facilities
+
+    def flush_help_screen_to_tree
+
+      _st = sout_serr_line_stream_for_contiguous_lines_on_stream :e
+
+      Home_::TestSupport::CLI::Expect_Section.tree_via_line_stream__ _st
+    end
+
+    ## ~~ our own
+
     def expect_whine_about_unrecognized_action x
       expect :styled,
         %r(\Aunrecognized action:? ['"]?#{ ::Regexp.escape x }['"]?\z)i

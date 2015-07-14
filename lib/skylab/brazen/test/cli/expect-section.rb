@@ -9,10 +9,10 @@ module Skylab::Brazen::TestSupport::CLI
     class << self
 
       def tree_via_string s
-        tree_via_line_stream Home_.lib_.basic::String.line_stream s
+        tree_via_line_stream__ Home_.lib_.basic::String.line_stream s
       end
 
-      def tree_via_line_stream st
+      def tree_via_line_stream__ st
         Build___.new( st ).execute
       end
     end  # >>
@@ -123,6 +123,12 @@ module Skylab::Brazen::TestSupport::CLI
       end
 
       attr_reader :children, :has_no_content, :line, :margin_length
+
+      def get_column_A_content
+        COL_A_RX___.match( unstyled_header_content )[ 0 ]
+      end
+
+      COL_A_RX___ = /\A[^[:space:]]+ (?: [[:space:]] [^[:space:]]+ )* /x
 
       def unstyled_header_content
         @__UHC__ ||= __unstyle_header_content

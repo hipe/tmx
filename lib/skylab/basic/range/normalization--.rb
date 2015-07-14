@@ -4,124 +4,115 @@ module Skylab::Basic
 
     class Normalization__  # :+[#027]
 
-      Callback_::Actor.methodic self, :properties,
-        :on_event,
-        :when_normal_value
+      Callback_::Actor.methodic self
 
-      private
-
-        def begin=
-          touch_current_mutable_range.set_begin gets_one_polymorphic_value
+      class << self
+        def new_with * x_a, & x_p
+          o = super
+          if o
+            o.freeze  # :+[#036]
+          end
+          o
         end
+      end  # >>
 
-        def end=
-          touch_current_mutable_range.set_end gets_one_polymorphic_value
-        end
+      def initialize & edit_p
 
-        def is=
-          x = gets_one_polymorphic_value
-          rng = touch_current_mutable_range
-          rng.set_begin x
-          rng.set_end x
-        end
-
-        def or=
-          flush_some_current_mutable_range_to_or_list
-        end
-
-        # ~ for a particular act of normalization:
-
-        def x=
-          set_arg Callback_::Qualified_Knownness.via_value_and_model(
-            gets_one_polymorphic_value, Home_.default_property )
-        end
-
-        def arg=
-          set_arg gets_one_polymorphic_value
-        end
-
-      # Callback_::Event.selective_builder_sender_receiver self
-
-      def initialize & p
-        @arg_was_provided = false
-        @when_normal_value = @on_event = @rng = nil
-        instance_exec( & p )
+        @on_event_selectively = nil  # none will be supported
+        @arg = nil
+        instance_exec( & edit_p )
       end
 
-      def touch_current_mutable_range
-        @rng ||= Mutable_Range__.new
+      def accept_selective_listener_proc p
+        @on_event_selectively = p
       end
 
-      def flush_some_current_mutable_range_to_or_list
+    private
+
+      def arg=
+        _receive_arg gets_one_polymorphic_value
+      end
+
+      def begin=
+        _touch_current_mutable_range.set_begin gets_one_polymorphic_value
+      end
+
+      def end=
+        _touch_current_mutable_range.set_end gets_one_polymorphic_value
+      end
+
+      def is=
+        x = gets_one_polymorphic_value
+        rng = _touch_current_mutable_range
+        rng.set_begin x
+        rng.set_end x
+      end
+
+      def or=
+        _flush_some_current_mutable_range_to_or_list
+      end
+
+      def x=
+
+        _x = gets_one_polymorphic_value
+        _receive_value _x
+      end
+
+      def _touch_current_mutable_range
+        @rng ||= Mutable_Range___.new
+      end
+
+    public
+
+      def against_value x, & x_p
+
+        otr = dup
+        otr._receive_value x
+        if x_p
+          otr.accept_selective_listener_proc x_p
+        end
+        otr.execute
+      end
+
+      def execute
+
+        if ! @arg
+          self._MODERNIZE_THIS_CALL
+        end
+
+        @rng and _flush_some_current_mutable_range_to_or_list
+
+        __normal_normalize
+      end
+
+    private
+
+      protected def _receive_value x
+
+        _kn = Callback_::Qualified_Knownness.via_value_and_model(
+          x, Home_.default_property )
+
+        _receive_arg _kn
+      end
+
+      def _receive_arg arg
+        @arg = arg
+        KEEP_PARSING_
+      end
+
+
+      def _flush_some_current_mutable_range_to_or_list
         @or_a ||= []
         @or_a.push @rng
         @rng = nil
         KEEP_PARSING_
       end
 
-      def set_arg arg
-        @arg_was_provided = true
-        @arg = arg
-        KEEP_PARSING_
-      end
+      def __normal_normalize
 
-    public
-
-      def execute
-        @rng and flush_some_current_mutable_range_to_or_list
-        if @arg_was_provided
-          if @when_normal_value
-            via_three_normalize
-          elsif @on_event
-            via_two_normalize
-          else
-            via_one_normalize
-          end
-        else
-          self  # :+[#036]
-        end
-      end
-
-      def is_valid x
-        otr = dup
-        otr.init_copy_with :x, x
-        otr.execute_is_valid
-      end
-
-      def any_error_event_via_validate_x x
-        otr = dup
-        otr.init_copy_with :x, x
-        otr.via_one_normalize
-      end
-
-    protected
-
-      def init_copy_with * x_a
-        process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a ; nil
-      end
-
-      def execute_is_valid
-        @on_event = NILADIC_FALSEHOOD_
-        @when_normal_value = MONADIC_TRUTH_
-        via_three_normalize
-      end
-
-      def via_one_normalize
-        @on_event = IDENTITY_
-        @when_normal_value = MONADIC_EMPTINESS_
-        via_three_normalize
-      end
-
-    private
-
-      def via_two_normalize
-        @when_normal_value = IDENTITY_
-        via_three_normalize
-      end
-
-      def via_three_normalize
         ok = false
         x = @arg.value_x
+
         @or_a.each do |range|
           d = range.compare x
           if d and d.zero?
@@ -129,36 +120,40 @@ module Skylab::Basic
             break
           end
         end
+
         if ok
-          @when_normal_value[ x ]
-        elsif @on_event.arity.zero?
-          @on_event[]
+          @arg
+
+        elsif @on_event_selectively
+          @on_event_selectively.call :error, :not_in_range do
+            Explanation__.new_with :bp, @arg, :or_a, @or_a
+          end
         else
-          @on_event[ build_explanation ]
+
+          UNABLE_
         end
       end
 
-    private
-
-      def build_explanation
-        Explanation__.new_with :bp, @arg, :or_a, @or_a
-      end
-
       Explanation__ = Callback_::Event.prototype_with(
+
         :actual_property_is_outside_of_formal_property_set,
-          :bp, nil, :or_a, nil ) do |y, o|
+        :bp, nil,
+        :or_a, nil,
+        :error_category, :argument_error,
+        :ok, false,
+
+      ) do | y, o |
 
         adj_p_s_a = []
-        o.or_a.each do |range|
+        o.or_a.each do | range |
           adj_p_s_a.push range.phrase_under self
         end
 
         y << "#{ par o.bp.model } must be #{ or_ adj_p_s_a }. #{
           }had #{ ick o.bp.value_x }"
-
       end
 
-      class Mutable_Range__
+      class Mutable_Range___
 
         def initialize
           @begin_is_set = false

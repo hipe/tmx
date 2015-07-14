@@ -1,12 +1,11 @@
-require_relative 'test-support'
+require_relative '../../../test-support'
 
-module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
+module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] search and replace - interactive" do
-
-    TestLib_::Expect_interactive[ self ]
+  describe "[bs] search and replace - interactive", wip: true do
 
     extend TS_
+    # use :expect_interactive
 
     context "counts" do
 

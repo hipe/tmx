@@ -1,3 +1,4 @@
+self._REGEL
 require_relative '../../test-support'
 
 module Skylab::BeautySalon::TestSupport::Models
@@ -23,7 +24,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
     # ~ setup
 
     def start_tmpdir
-      td = existent_tmpdir
+      td = memoized_tmpdir_
       @tmpdir = td.new_with(
         :path, td.join( 'haha-dir' ).to_path,
         :be_verbose, do_debug,
@@ -39,7 +40,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
     end
 
     def start_tmpdir_SKIP
-      @tmpdir = existent_tmpdir.join 'haha-dir'
+      @tmpdir = memoized_tmpdir_.join 'haha-dir'
       nil
     end
 

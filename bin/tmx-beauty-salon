@@ -2,5 +2,6 @@
 
 require_relative '../lib/skylab/beauty-salon/core'
 
-x = Skylab::BeautySalon::CLI.new( $stdin, $stdout, $stderr ).invoke ARGV
-$stderr.puts "(exitstatus: #{ x })"
+_x = Skylab::BeautySalon::CLI.new( $stdin, $stdout, $stderr ).invoke ARGV
+
+$stderr.puts "(exitstatus: #{ _x })"

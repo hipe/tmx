@@ -259,16 +259,27 @@ module Skylab::Brazen
           end
 
           def add_normalizer_for_greater_than_or_equal_to_integer d  # :+#public-API
+            _add_number_normalization :number_set, :integer, :minimum, d
+          end
 
-            _NORMER = Home_.lib_.basic.normalizers.number(
-              :number_set, :integer,
-              :minimum, d )
+          def integer=
+            _add_number_normalization :number_set, :integer
+          end
+
+          def _add_number_normalization * x_a
+
+            _n11n = Home_.lib_.basic.normalizers.number.new_via_iambic x_a
+
+            __add_ad_hoc_normalization _n11n
+          end
+
+          def __add_ad_hoc_normalization n11n
 
             append_ad_hoc_normalizer_ do | arg, & oes_p |
               if ( arg.value_x if arg.is_known ).nil?
                 arg
               else
-                _NORMER.normalize_argument arg, & oes_p
+                n11n.normalize_argument arg, & oes_p
               end
             end
             KEEP_PARSING_
@@ -346,34 +357,45 @@ module Skylab::Brazen
 
       formals = self.formal_properties
 
-      scn = formals.to_value_stream
+      st = formals.to_value_stream
       stack = Home_::Property::Stack.new formals.get_names  # could pass oes
 
       bx = any_secondary_box__
       bx and stack.push_frame_via_box bx
       stack.push_frame_via_box primary_box__
 
-      while prop = scn.gets
-        i = prop.name_symbol
-        pptr = stack.any_proprietor_of i
+      begin
+        prp = st.gets
+        prp or break
+        sym = prp.name_symbol
+        pptr = stack.any_proprietor_of sym
+
         if pptr
           had_value = true
-          x = pptr.property_value_via_symbol i
+          x_ = pptr.property_value_via_symbol sym
         else
           had_value = false
-          x = nil
+          x_ = nil
         end
-        ivar = prop.as_ivar
-        is_defined = instance_variable_defined? ivar
-        is_defined and x_ = instance_variable_get( ivar )
-        if is_defined && ! x_.nil?
+
+        ivar = prp.as_ivar
+
+        _is_defined_and_not_nil = if instance_variable_defined? ivar
+          x = instance_variable_get ivar
+          ! x.nil?
+        end
+
+        if _is_defined_and_not_nil
+
           if had_value
-            raise __say_wont_clobber_ivar( x, x_, ivar )
+            raise __say_wont_clobber_ivar( x_, x, ivar )
           end
-        else
-          instance_variable_set ivar, x
+
+          redo
         end
-      end
+        instance_variable_set ivar, x_
+        redo
+      end while nil
       NIL_
     end
 

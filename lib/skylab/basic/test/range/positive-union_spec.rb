@@ -1,6 +1,6 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Basic::TestSupport::Range
+module Skylab::Basic::TestSupport
 
   describe "[ba] range - positive union" do
 
@@ -134,7 +134,7 @@ module Skylab::Basic::TestSupport::Range
     end
 
     def with str
-      @unio = Subject_[]::Positive::Union.new
+      @unio = Home_::Range::Positive::Union.new
       str.split( ',' ).each do |s|
         bg, ed = s.split '-'
         @unio.add ::Range.new( bg.to_i, ed.to_i )

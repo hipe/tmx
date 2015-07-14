@@ -1,9 +1,8 @@
-require_relative '../../test-support'
+require_relative '../../../../test-support'
 
-module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
+module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] features - function - hack" do
-
+  describe "[bs] features - function - hack", wip: true do
 
       it "it tries to infer the module tree from a file - FALLIBLE" do
 

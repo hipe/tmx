@@ -68,10 +68,7 @@ module Skylab::Snag::TestSupport
 
         invoke 'to-do', '-h'
 
-        _st = sout_serr_line_stream_for_contiguous_lines_on_stream :e
-
-        tree = Home_.lib_.brazen.test_support.CLI::Expect_Section.
-          tree_via_line_stream _st
+        tree = flush_help_screen_to_tree
 
         cx = tree.children
 

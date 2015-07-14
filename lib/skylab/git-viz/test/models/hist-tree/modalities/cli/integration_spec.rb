@@ -12,9 +12,7 @@ module Skylab::GitViz::TestSupport
 
       invoke 'hi', '-h'
 
-      screen = Home_.lib_.brazen.test_support.CLI::Expect_Section.
-        tree_via_line_stream(
-          sout_serr_line_stream_for_contiguous_lines_on_stream :e )
+      screen = flush_help_screen_to_tree
 
       screen.children.map { |cx| cx.x.unstyled_header_content }.should eql(
         [ 'usage', 'options', 'arguments' ] )

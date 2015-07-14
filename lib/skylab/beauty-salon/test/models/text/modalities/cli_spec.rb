@@ -1,18 +1,10 @@
-require_relative '../../test-support'
+require_relative '../../../test-support'
 
-module Skylab::BeautySalon::TestSupport::Integrate_with_CLI
+module Skylab::BeautySalon::TestSupport
 
-  ::Skylab::BeautySalon::TestSupport[ TS___ = self ]
+  # Home_::Lib_::Face__[]::TestSupport::CLI::Client[ self ]
 
-  include Constants
-
-  Home_::Lib_::Face__[]::TestSupport::CLI::Client[ self ]
-
-  extend TestSupport_::Quickie
-
-  describe "[bs] CLI wrap" do
-
-    extend TS___
+  describe "[bs] CLI wrap", wip: true do
 
     def self.client_class
       Home_::CLI::Client

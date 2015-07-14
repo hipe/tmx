@@ -1,12 +1,11 @@
-require_relative '../test-support'
+require_relative '../../../test-support'
 
-module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
+module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] S & R - features - functions" do
-
-    TestLib_::Expect_event[ self ]
+  describe "[bs] S & R - features - functions", wip: true do
 
     extend TS_
+    # use :expect_event
 
     it "when you use a strange function name (but have a function folder)" do
 
