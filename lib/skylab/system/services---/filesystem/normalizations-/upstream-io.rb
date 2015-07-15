@@ -51,37 +51,52 @@ module Skylab::System
 
         # implement [#.A] the common algorithm (see)
 
-        io = @_stdin
         pa = @path_arg
 
-        if io && ! ( io.tty? || io.closed? )
-          applicable_instream_is_present = true
-        end
-
         if pa && pa.is_known
-          applicable_path_is_present = true
-        end
 
-        if applicable_instream_is_present
-          if applicable_path_is_present
-            __when_both
-          else
-            produce_result_via_open_IO_ io
+          if @do_recognize_common_string_patterns_
+            md_x = via_path_arg_match_common_pattern_
           end
 
-        elsif applicable_path_is_present
-          via_applicable_path_arg_
+          path_arg_represents_file = ! md_x
+        end
 
-        elsif @_neither_is_OK
-
-          Callback_::Known::UNKNOWN
+        if md_x
+          via_common_pattern_match_ md_x
         else
-          maybe_emit_missing_required_properties_event_
+          io = @_stdin
+          if io && ! ( io.tty? || io.closed? )
+
+            if path_arg_represents_file
+              __when_both
+            else
+              produce_result_via_open_IO_ io
+            end
+          elsif path_arg_represents_file
+
+            via_path_arg_that_represents_file_
+
+          elsif @_neither_is_OK
+
+            Callback_::Known::UNKNOWN
+          else
+            maybe_emit_missing_required_properties_event_
+          end
         end
       end
 
       def when__stdin__by_way_of_dash
-        produce_result_via_open_IO_ @_stdin
+
+        io = @_stdin
+        if io.tty?  # for now ..
+          @on_event_selectively.call :error, :expression, :interactive_stdin do | y |
+            y << "STDIN is interactive. must be non-interactive"
+          end
+          UNABLE_
+        else
+          produce_result_via_open_IO_ @_stdin
+        end
       end
 
       def __when_both
@@ -125,24 +140,15 @@ module Skylab::System
         end
       end
 
-      def via_applicable_path_arg_
+      def via_path_arg_that_represents_file_
 
-        if @do_recognize_common_string_patterns_
-          md_x = via_path_arg_match_common_pattern_
-        end
+        init_exception_and_stat_ path_
 
-        if md_x
-          via_common_pattern_match_ md_x
+        if @stat_
+          via_stat_execute
         else
-
-          init_exception_and_stat_ path_
-
-          if @stat_
-            via_stat_execute
-          else
-            maybe_send_event :error, :stat_error do
-              wrap_exception_ @exception_
-            end
+          maybe_send_event :error, :stat_error do
+            wrap_exception_ @exception_
           end
         end
       end

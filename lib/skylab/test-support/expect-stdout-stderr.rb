@@ -171,7 +171,7 @@ module Skylab::TestSupport
 
       def expect_maybe_a_blank_line
 
-        st = _actual_stream_from_expect_stdout_stderr
+        st = stream_for_expect_stdout_stderr
 
         if st.unparsed_exists and NEWLINE_ == st.current_token.string
           st.advance_one
@@ -181,7 +181,7 @@ module Skylab::TestSupport
 
       def expect_no_more_lines
 
-        st = _actual_stream_from_expect_stdout_stderr
+        st = stream_for_expect_stdout_stderr
 
         if st.unparsed_exists
           _x = st.current_token
@@ -219,7 +219,7 @@ module Skylab::TestSupport
 
         # (it would be nice to use Enumerable.chunk by we have a reduce too)
 
-        st = _actual_stream_from_expect_stdout_stderr
+        st = stream_for_expect_stdout_stderr
         y = []
 
         sym = nil
@@ -347,7 +347,7 @@ module Skylab::TestSupport
         end
       end
 
-      def _actual_stream_from_expect_stdout_stderr
+      def stream_for_expect_stdout_stderr
 
         @__sout_serr_is_baked__ ||= _bake_sout_serr
 

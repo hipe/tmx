@@ -53,7 +53,15 @@ module Skylab::System
 
         if pa && pa.is_known && pa.value_x
 
-          via_applicable_path_arg_
+          if @do_recognize_common_string_patterns_
+            md_x = via_path_arg_match_common_pattern_
+          end
+
+          if md_x
+            via_common_pattern_match_ md_x
+          else
+            via_path_arg_that_represents_file_
+          end
 
         elsif io
 
@@ -85,19 +93,6 @@ module Skylab::System
         end
       end
 
-      def via_applicable_path_arg_
-
-        if @do_recognize_common_string_patterns_
-          md_x = via_path_arg_match_common_pattern_
-        end
-
-        if md_x
-          via_common_pattern_match_ md_x
-        else
-          __create_or_overwrite
-        end
-      end
-
       def via_system_resource_identifier_ d
 
         case d
@@ -110,7 +105,7 @@ module Skylab::System
         end
       end
 
-      def __create_or_overwrite
+      def via_path_arg_that_represents_file_
 
         init_exception_and_open_IO_ ::File::RDWR | ::File::CREAT
 

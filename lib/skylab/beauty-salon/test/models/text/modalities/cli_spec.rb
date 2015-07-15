@@ -2,27 +2,65 @@ require_relative '../../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  # Home_::Lib_::Face__[]::TestSupport::CLI::Client[ self ]
+  describe "[bs] CLI wrap" do
 
-  describe "[bs] CLI wrap", wip: true do
+    extend TS_
+    use :modality_integrations_CLI_support
 
-    def self.client_class
-      Home_::CLI::Client
+    it "help screen has some customizations (fragile..)" do
+
+      @_stdin = :_not_used_by_help_screen_
+
+      invoke 'wrap', '-h'
+
+      a = flush_baked_emission_array
+
+      a.fetch( -11 ).string.should be_include '(default: 80)'  # ..
+      a.last.string.should be_include 'non-interactive'
     end
 
-    it "win" do
+    it "via a file" do
 
-      path = TestSupport_::Data::Universal_Fixtures.dir_pathname.
-        join "one-line.txt"
+      @_stdin = _stdin_mocks.interactive_STDIN_instance
 
-      invoke 'wrap', '-c14', '-v', path
+      _path = TestSupport_::Data::Universal_Fixtures[ :one_line ]
 
-      lines[ :err ].first.should match %r(\bline range union: 1-infinity\b)i
+      invoke 'wrap', '-n14', '-v', _path
 
-      output_lines = lines[ :out ]
-      output_lines.length.should eql 5
-      output_lines.first.should eql "a file with"
+      expect :e, "(line range union: 1-INFINITY)"
 
+      stream_for_expect_stdout_stderr.unparsed_count.should eql 5
+
+      expect :o, "a file with"
+    end
+
+    it "via STDIN" do
+
+      @_stdin = _stdin_mocks.noninteractive_STDIN_class.new_via_lines(
+        [ "one two\n", "three four\n" ] )
+
+      invoke 'wrap', '-n5', '-'
+      expect :o, "one"
+      expect :o, "two"
+    end
+
+    it "not both" do
+
+      @_stdin = _stdin_mocks.noninteractive_STDIN_instance
+      invoke 'wrap', '-n1', 'xx'
+
+      expect :e, %r(\Acouldn't wrap beauty salon text because ambiguous upstr)
+      expect :e
+
+      expect_failed
+    end
+
+    def _stdin_mocks
+      Home_.lib_.system.test_support::Mocks
+    end
+
+    def stdin_for_expect_stdout_stderr
+      @_stdin
     end
   end
 end

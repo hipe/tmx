@@ -194,6 +194,13 @@ module Skylab::Brazen
 
           attr_reader :has_primitive_default, :primitive_default_value
 
+          private def default=
+            # when the default is expressed as a simple primitive-ish
+            # value, we want to be able to just have it back
+            set_primitive_default gets_one_polymorphic_value
+            KEEP_PARSING_
+          end
+
           def set_primitive_default x
             @has_default = true
             @has_primitive_default = true
@@ -224,6 +231,11 @@ module Skylab::Brazen
           def under_expression_agent_get_N_desc_lines expag, n=nil
 
             LIB_.N_lines[ [], n, @desc_p_a, expag ]
+          end
+
+          def describe_by & p
+            accept_description_proc p
+            self
           end
 
         private

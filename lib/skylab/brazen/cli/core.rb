@@ -1073,7 +1073,7 @@ module Skylab::Brazen
 
         open, inside, close = unparenthesize s
 
-        downcase_first inside
+        _mutate_by_maybe_downcasing_first inside
 
         n_s = ev.inflected_noun
         v_s = ev.verb_lexeme.progressive
@@ -1090,7 +1090,7 @@ module Skylab::Brazen
 
       def maybe_inflect_line_for_negativity_via_event s, ev
         open, inside, close = unparenthesize s
-        downcase_first inside
+        _mutate_by_maybe_downcasing_first inside
         if ev.respond_to? :inflected_verb
           v_s = ev.inflected_verb
           lex = ev.noun_lexeme and n_s = lex.lemma
@@ -1110,7 +1110,7 @@ module Skylab::Brazen
       def __milfc s, ev
 
         open, inside, close = unparenthesize s
-        downcase_first inside
+        _mutate_by_maybe_downcasing_first inside
 
         if LOOKS_LIKE_ONE_WORD_RX__ =~ inside
 
@@ -1137,10 +1137,18 @@ module Skylab::Brazen
         LIB_.basic::String.unparenthesize_message_string s
       end
 
-      def downcase_first s
-        s and UCASE__.include? s.getbyte( 0 ) and s[ 0 ] = s[ 0 ].downcase
-      end
-      UCASE__ = 'A'.getbyte( 0 ) .. 'Z'.getbyte( 0 )
+      define_method :_mutate_by_maybe_downcasing_first, -> do
+        rx = nil
+        -> s do
+          if s
+            rx ||= /\A[A-Z](?![A-Z])/
+            s.sub! rx do | s_ |
+              s_.downcase!
+            end
+            NIL_
+          end
+        end
+      end.call
 
       def render_event_lines ev
         ev.express_into_under y=[], expression_agent
@@ -1687,6 +1695,10 @@ module Skylab::Brazen
 
       def rendering_method_name_for_property_category_name_symbol sym
         :"render_property_as__#{ sym }__"
+      end
+
+      def lookup sym
+        category_symbol_and_property_via_name_symbol( sym ).fetch 1
       end
 
       def category_symbol_and_property_via_name_symbol sym

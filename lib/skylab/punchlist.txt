@@ -1,19 +1,19 @@
 slicer              q [ done ]  (1/6)
 file-metrics        q [ done ]  (2/6)
 "sub-tree"          q [ done ]  (3/6)
+git                 q [ done ]  (4/6)
+
 
 
 
 beauty-salon        q [ TODO ]  (5/6)
 
-  • ping, deliterate back/front
-  • wrap back/front
-  • s&r back/front
+  3) wrap back/front
+  4) s&r back/front
 
 
 
 
-git                 q [ done ]  (4/6)
 tmx                 q [ TODO ]  (6/6)
 
   • oh my god how great will it be

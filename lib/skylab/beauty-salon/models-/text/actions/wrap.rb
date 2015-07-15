@@ -1,75 +1,110 @@
 module Skylab::BeautySalon
 
-  class Models_::Text
+  module Models_::Text
 
     Actions = ::Module.new
 
-    class Actions::Wrap < Brazen_::Model.common_action_class  # :[#033]., :+[#ba-033]
+    class Actions::Wrap < Brazen_::Action  # :[#033]., :+[#ba-033]
 
       @is_promoted = true
 
-      Brazen_::Model.common_entity self,
+      Brazen_::Model.common_entity( self,
 
+        :desc, -> y do
+
+          _block = <<-HERE.gsub( /^ {6}/, EMPTY_S_ )
+            outputs to stdout (unless stated otherwise) the selected lines
+            after having applied the hacky wrap filter to it (effectively re-
+            breaking the lines so they are flush-left ragged right, and all
+            with a width less than or equal to some indicated positive non-zero
+            integer.
+
+            NOTE a) this is just an exploratory hack, "we are doing it wrong",
+            and b) this is NOT intended for code, only comments or very simple
+            markdown-ish.
+          HERE
+
+          Home_.lib_.basic::String.line_stream( _block ).each do | s |
+            y << s
+          end
+        end,
+
+        :required,
+        :property, :output_bytestream,
+
+        :required,
+        :property, :informational_downstream,
+
+        :description, -> y do
+          y << 'apply the filter only to this range of lines (e.g "-l 1-16,26-38").'
+          y << "a range can be a single number. multiple ranges can be specified"
+          y << "using the comma, also the `--lines` option may be employed multiple"
+          y << "times. ranges that do not \"make sense\" will lead to an alternate"
+          y << "early ending (error); but out of bounds ranges are silently"
+          y << "ignored. see how overlapping ranges are processed by turning"
+          y << "on `--verbose`."
+        end,
         :ad_hoc_normalizer, -> arg, & oes_p do
-          Normalize_line_ranges___.new( arg, & oes_p ).execute
+          Actors_::Normalize_line_ranges.new( arg, & oes_p ).execute
         end,
         :default, '1-',
         :property, :lines,
 
+        :description, -> y do
+
+          prp = @categorized_properties.lookup :num_chars_wide
+          prp.has_primitive_default or fail
+          _x = prp.primitive_default_value
+
+          y << "how wide can the longest line be? (default: #{ val _x })"
+        end,
+        :default, 80,
         :ad_hoc_normalizer, -> arg, & oes_p do
 
           # ( was :+[#ba-027] with [#fa-019] shape )
 
-          Home_.lib_.basic::Number.normalization.with(
-            :number_set, :integer,
-            :minimum, 1,
-            :argument, arg, & oes_p )
-        end,
-
-        :required, :property, :num_chars_wide,
-
-        :flag, :property, :preview,
-
-        :flag, :property, :verbose,
-
-        :flag, :property, :number_the_lines,
-
-        :required, :property, :input_path
-
-      def accept_selective_listener_proc oes_p
-
-        # #experimentally we retro-fit this to accomodate our hacky new
-        # way to get arbitrary resources from parent. might go up.
-
-        hesvc_p = -> i_a, & ev_p do
-
-          if :for_action == i_a.first  # then there is probably no ev_p
-            oes_p[ * i_a, & ev_p ]
-
-          elsif :expression == i_a[ 1 ]  # same idea, different thing  (:+[#br-023])
-            oes_p[ * i_a, & ev_p ]
-
+          if arg.is_known
+            Home_.lib_.basic::Number.normalization.with(
+              :number_set, :integer,
+              :minimum, 1,
+              :argument, arg, & oes_p )
           else
-
-            maybe_emit_wrapped_or_autovivified_event oes_p, i_a, & ev_p
+            arg  # required-ness is out of our scope
           end
-        end
+        end,
+        :required,
+        :property, :num_chars_wide,
 
-        @on_event_selectively = -> * i_a, & ev_p do
-          hesvc_p[ i_a, & ev_p ]
-        end
+        :flag,
+        :description, -> y do
+          y << 'output only those output lines that are the'
+          y << 'result of the input lines indicated by `--lines`.'
+          y << 'all output goes to stderr.'
+        end,
+        :property, :preview,
 
-        @__HESVC_p__ = hesvc_p
-        nil
-      end
+        :flag,
+        :description, -> y do
+          y << 'verbose output'
+        end,
+        :property, :verbose,
+
+        :flag,
+        :description, -> y do
+          y << 'Number the output lines, starting at 1.'
+          y << "(only honored in verbose preview mode for now..)"
+        end,
+        :property, :number_the_lines,
+
+        :required,
+        :property, :upstream,
+      )
 
       def produce_result
 
         __init_ivars
         __inspect_union
-
-        _ok = __resolve_line_upstream
-        _ok && __process_upstream_lines
+        __process_upstream_lines
       end
 
       def __init_ivars
@@ -79,39 +114,37 @@ module Skylab::BeautySalon
         @do_number_the_lines = h[ :number_the_lines ]
         @do_preview = h[ :preview ]
 
-        @informational_downstream =
-          @on_event_selectively.call :for_action, :informational_bytestream
+        @informational_downstream = h.fetch :informational_downstream
 
-        __HEADER = if @do_preview && @be_verbose &&  @do_number_the_lines
+        __HEADER = if @do_preview && @be_verbose && @do_number_the_lines
           "     + "
         end
 
         @line_buffer = Text_::Sessions_::Wrapping_Buffer.new(
           h.fetch( :num_chars_wide ),
           -> line do
-            @downstream.write "#{ __HEADER }#{ line }"
+            @downstream << "#{ __HEADER }#{ line }"
           end )
 
         @line_range_union = h.fetch :lines
 
         @line_range_union ||= self._DESIGN_ME
 
-
         @line_no_fmt = '%4d'
 
         @token_buffer = Home_.lib_.token_buffer %r([[:space:]]*), %r([^[:space:]]+)
 
-        @upstream_path = h.fetch :input_path
+        @upstream = h.fetch :upstream
 
         # ~
 
         @downstream = if @do_preview
           @informational_downstream
         else
-          @on_event_selectively.call :for_action, :output_bytestream
+          h.fetch :output_bytestream
         end
 
-        nil
+        NIL_
       end
 
       def __inspect_union
@@ -126,24 +159,9 @@ module Skylab::BeautySalon
         end
       end
 
-      def __resolve_line_upstream
-        io = __produce_open_file_IO
-        io and begin
-          @line_upstream = Home_.lib_.list_scanner io
-          ACHIEVED_
-        end
-      end
-
-      def __produce_open_file_IO
-
-        Home_.lib_.system.filesystem( :Upstream_IO ).against_path(
-          @upstream_path,
-          & @on_event_selectively )
-      end
-
       def __process_upstream_lines
 
-        line = @line_upstream.gets
+        line = @upstream.gets
         if line
           __process_nonzero_upstream_lines line
 
@@ -182,7 +200,7 @@ module Skylab::BeautySalon
         cold_line = if @do_preview
           if @do_number_the_lines
             -> do
-              info_down.puts " #{ @line_no_fmt % @line_upstream.line_number }#{
+              info_down.puts " #{ @line_no_fmt % @upstream.lineno }#{
                 }: #{ line }"
               NIL_
             end
@@ -194,20 +212,20 @@ module Skylab::BeautySalon
           end
         else
           -> do
-            downstream.write line
+            downstream << line
             NIL_
           end
         end
 
         ok = true
         begin
-          if @line_range_union.include? @line_upstream.line_number
+          if @line_range_union.include? @upstream.lineno
             ok = hot_line[]
             ok or break
           else
             cold_line[]
           end
-          line = @line_upstream.gets
+          line = @upstream.gets
           line or break
           redo
         end while nil
@@ -223,7 +241,7 @@ module Skylab::BeautySalon
 
       def __when_no_lines_were_in_range
 
-        d = @line_upstream.count
+        d = @upstream.lineno
         lru = @line_range_union
 
         @on_event_selectively.call :info, :expression do | y |
@@ -244,8 +262,8 @@ module Skylab::BeautySalon
         @token_buffer.gets_proc = -> do
 
           @token_buffer.gets_proc = -> do
-            if @line_range_union.include?( @line_upstream.count + 1 )
-              @line_upstream.gets
+            if @line_range_union.include?( @upstream.lineno + 1 )
+              @upstream.gets
             end
           end
 
@@ -266,7 +284,8 @@ module Skylab::BeautySalon
 
       # ~
 
-      class Normalize_line_ranges___
+      Actors_ = ::Module.new
+      class Actors_::Normalize_line_ranges
 
         # :+[#fa-019] (still?) assume that x is nil or an array.
 
