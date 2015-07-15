@@ -1,8 +1,8 @@
 module Skylab::BeautySalon
 
-  class Models_::Search_and_Replace
+  module Models_::Search_and_Replace
 
-    class Edit_File_Agent__ < Branch_  # notes are stowed away in [#016]
+    class Reactive_Nodes_::Edit_File_Node < Branch_  # notes are stowed away in [#016]
 
       def initialize edit_session, has_next_file, x
         super x

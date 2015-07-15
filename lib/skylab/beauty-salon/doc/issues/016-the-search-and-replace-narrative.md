@@ -4,7 +4,8 @@
 
 ostensibly this started as a one-off to assist us in the process of
 [#017] doing a regular tranformation universe-wide across hundreds of
-files. it very quickly grew in scope to something more.
+files. it very quickly grew in scope to become an attempt at a reusable
+utility towards this.
 
 below we will justify why we didn't use a tool like vi's `s///gc` or
 `ack` among other points.

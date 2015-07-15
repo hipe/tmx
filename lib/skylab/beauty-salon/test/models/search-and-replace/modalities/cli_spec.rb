@@ -2,10 +2,11 @@ require_relative '../../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] search and replace - interactive", wip: true do
+  describe "[bs] search and replace - interactive" do
 
     extend TS_
-    # use :expect_interactive
+    use :expect_interactive  # [br]
+    use :models_search_and_replace  # defines hook-outs for above
 
     context "counts" do
 
@@ -16,46 +17,60 @@ module Skylab::BeautySalon::TestSupport
       # hinkenlooper
       # hinkenlooper
 
-      it "testing interactivity is possble but cumbersome" do
+      it "testing interactivity is possble but cumbersome .." do
+
+        # NOTE the directory from which we execute this is not the same
+        # as the directory against which we are searching. the former is
+        # a volatile, mutable directory that needs to be able to hold the
+        # persisted session data. the latter is a parent directory of this
+        # file!
+
+        td = memoized_tmpdir_.tmpdir_via_join 'started-out-empty'
+        td.prepare
+        _path = td.to_path
+        td = nil
+        _near_here = TS_::Models::Search_And_Replace.dir_pathname.to_path
+
         t = ::Time.now
 
-        start_interactive_session existent_empty_tmpdir_path
+        start_interactive_session _path
 
         expect_screen_ending_with _COMMON_BRANCH_PROMPT_ENDING
 
-        enter_field_selector 'search'
+        _enter_field_selector 'search'
 
-        @session.puts '\bhinkenlooper\b'  # hackishly we assert that the file is written
-        in_lines do |lines|
+        @interactive_session.puts '\bhinkenlooper\b'  # hackishly we assert that the file is written
+
+        _in_lines do | lines |
+
           lines.advance_one
           string = lines.gets_one
-          rx = %r(\Acreating 束[^損]+損 \.\. done\.$)  # how do we match « » :+#guillemets ?
-          require 'kconv'
-          string.toutf8.should match rx
+          string.encode! ::Encoding::UTF_8, ::Encoding::UTF_8
+          string.should match %r(\Acreating «[^»]+» \.\. done\.$)
         end
 
-        enter_field 'dirs', TS_.dir_pathname.to_path
+        _enter_field 'dirs', _near_here
 
-        enter_field 'files', '*.rb'
+        _enter_field 'files', '*.rb'
 
-        enter_navigation_step 'preview'
-        in_screen do
+        _enter_navigation_step 'preview'
+        _in_screen do
           expect_string %r(^[ ]+matches[ ])
         end
 
-        enter_navigation_step 'matches'
-        in_screen do
+        _enter_navigation_step 'matches'
+        _in_screen do
           expect_string %r(^[ ]+ruby[ ])
         end
 
-        push_button 'grep'
-        in_screen do
+        _push_button 'grep'
+        _in_screen do
           expect_string %r(^[ ]+grep[ ]+ON\b)
         end
 
-        push_button 'counts'
+        _push_button 'counts'
         flush_to_lines_screen_ending_with _COMMON_BRANCH_PROMPT_ENDING
-        @session.close
+        @interactive_session.close
 
         after_any_blanks_expect_line %r(\A\(grep command head: grep -E )
         after_any_blanks_expect_line "#{ ::File.expand_path( __FILE__ ) }:2\n"
@@ -68,36 +83,36 @@ module Skylab::BeautySalon::TestSupport
         $stderr.puts "(that cumbersome single test took #{ t } seconds.)"
       end
 
-      def enter_navigation_step s
-        @session.puts s
+      def _enter_navigation_step s
+        @interactive_session.puts s
       end
 
-      def push_button s
-        @session.puts s
+      def _push_button s
+        @interactive_session.puts s
       end
 
-      define_method :in_lines do | & p |
+      define_method :_in_lines do | & p |
         in_lines_of_screen_ending_with _COMMON_BRANCH_PROMPT_ENDING, & p
       end
 
-      define_method :in_screen do | & p |
+      define_method :_in_screen do | & p |
         in_screen_ending_with _COMMON_BRANCH_PROMPT_ENDING, & p
       end
 
-      def enter_field name, value
-        enter_field_selector name
-        enter_field_value value
+      def _enter_field name, value
+        _enter_field_selector name
+        _enter_field_value value
         nil
       end
 
-      define_method :enter_field_selector do |name|
-        @session.puts name
+      define_method :_enter_field_selector do |name|
+        @interactive_session.puts name
         expect_screen_ending_with _COMMON_FIELD_PROMPT_ENDING
         nil
       end
 
-      define_method :enter_field_value do |value|
-        @session.puts value
+      define_method :_enter_field_value do |value|
+        @interactive_session.puts value
         expect_screen_ending_with _COMMON_BRANCH_PROMPT_ENDING
         nil
       end

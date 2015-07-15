@@ -50,7 +50,6 @@ module Skylab::BeautySalon
         :desc, -> y do
           # <- 2
       _big_string =  <<-O.gsub %r(^ {8}), EMPTY_S_
-
         from line <from-line> to line <to-line> of file <file>, use a
         simple character-scanning ** HACK ** to partition each line of
         code into comment and not-comment.

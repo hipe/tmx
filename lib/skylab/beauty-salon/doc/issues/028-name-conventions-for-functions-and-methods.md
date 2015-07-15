@@ -194,8 +194,7 @@ better this time.
 
 + `resolve_` - has a dedicated [#031] document that needs a rewrite.
 
-+ `run_` - this is reserved for starting a long-running process, so in
-  practice it is rarely used on this platform :+[#.E]
++ `run`, `run_` - reserved for starting a long-running process :+[#.E]
 
 + `via_` will one day have its own section #todo
 

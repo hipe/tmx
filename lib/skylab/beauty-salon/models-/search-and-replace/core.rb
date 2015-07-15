@@ -1,41 +1,18 @@
 module Skylab::BeautySalon
 
-  class Models_::Search_and_Replace  # see [#016]
+  module Models_::Search_and_Replace  # see [#016]
 
-    Actions = THE_EMPTY_MODULE_
+    Actions = ::Module.new
 
-    class << self
+    class Actions::Search_and_Replace < Brazen_::Action  # sorry
 
-      def client_for_three * a
-        Interactive_CLI__.new a
-      end
-    end
+      # this is :[#br-043] the frontier example of a back-less front..
 
-    class Interactive_CLI__
+      @is_promoted = true
 
-      def initialize three
+      @description_block = -> y do
 
-        @handle_event_selectively_via_channel = -> _, & ev_p do
-          ev = ev_p[]
-          ev.express_into_under @primary_UI_yielder, expression_agent
-          ev.ok  # always propagate this - some logic relies on the false-ish-ness
-        end
-
-        @primary_UI_yielder = ::Enumerator::Yielder.new do |s|
-          @serr.puts s
-        end
-
-        @sin, _, @serr = three
-      end
-
-      def write_options o
-
-        o.separator EMPTY_S_
-
-        o.separator 'description:'
-
-        o.separator <<-O.gsub %r(^ {8}), EMPTY_S_
-
+        s = <<-HERE
           ridiculous interactive search and replace: in a simple interactive
           terminal session, build your transformation progressively.
           then execute the tranformation, which can apply the edit-in-place
@@ -56,50 +33,11 @@ module Skylab::BeautySalon
           categorization yet!
 
           there is a known issue with files with multibyte characters.
+        HERE
 
-        O
-
-      end
-
-      def run
-        @node_with_focus = Search_and_Replace_Node__.new self
-        begin
-          @node_with_focus.before_focus
-          ok = @node_with_focus.receive_focus
-        end while ok
-        @node_with_focus.exitstatus
-      end
-
-      # ~ messages received as zerk parent from zerk child (#hook-outs)
-
-      # ~~ reflectors
-
-      def is_agent
-        false
-      end
-
-      def is_interactive
-        true
-      end
-
-      # ~~ program flow
-
-      def change_focus_to cx
-        @node_with_focus = cx
-        nil
-      end
-
-      # ~~ resources in support of events & UI
-
-      attr_reader(
-        :handle_event_selectively_via_channel,
-        :primary_UI_yielder,
-        :serr,
-        :sin )
-
-      def expression_agent
-        Home_.lib_.brazen::API.expression_agent_instance
-      end
+        st = Home_.lib_.basic::String[ :line_stream, :mutate_by_unindenting, s ]
+        y << s while s = st.gets
+       end
     end
 
     class API
@@ -124,8 +62,10 @@ module Skylab::BeautySalon
       end
 
       def resolve_bound_call
-        Zerk_::API.produce_bound_call @x_a, (
-          Search_and_Replace_Node__.new Top__.new produce_event_handler )
+
+        _S_R_node = Zerk_Tree.new Top__.new produce_event_handler
+
+        Zerk_::API.produce_bound_call @x_a, _S_R_node
       end
 
       def produce_event_handler
@@ -230,7 +170,14 @@ module Skylab::BeautySalon
 
     Quit_Button_ = Zerk_::Quit_Button
 
-    class Search_and_Replace_Node__ < Branch_
+    class Zerk_Tree < Branch_
+
+      class << self
+
+        def name_function
+          @___nf ||= Callback_::Name.via_variegated_symbol :'search_&_replace'
+        end
+      end
 
       def initialize x
         super
@@ -650,7 +597,7 @@ module Skylab::BeautySalon
 
       def orient_self
 
-        @mod = S_and_R_::Preview_Agent_Children__
+        @mod = S_and_R_::Reactive_Nodes_
 
         @parent_files_field = @parent.files_field
         @parent_dirs_field = @parent.dirs_field

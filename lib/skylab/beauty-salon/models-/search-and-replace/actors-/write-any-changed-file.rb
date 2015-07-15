@@ -1,6 +1,6 @@
 module Skylab::BeautySalon
 
-  class Models_::Search_and_Replace
+  module Models_::Search_and_Replace
 
     class Actors_::Write_any_changed_file
 

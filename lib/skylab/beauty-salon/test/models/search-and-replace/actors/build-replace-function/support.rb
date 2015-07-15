@@ -1,20 +1,14 @@
-self._REGEL
-require_relative '../../test-support'
+module Skylab::BeautySalon::TestSupport
 
-module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace::Repl
+  module Models::Search_And_Replace::Actors::Build_Replace_Function::Support
 
-  Parent_TS_ = ::Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
+    def self.[] tcc
+      TS_::Expect_Event[ tcc ]
+      tcc.include self
+    end
 
-  Parent_TS_[ TS_ = self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  module InstanceMethods
-
-    def rf replace_function_string
-      @replace_function = Parent_TS_::Subject_[]::Actors_::Build_replace_function[
+    def rf_ replace_function_string
+      @replace_function = __subject_module::Actors_::Build_replace_function[
         replace_function_string,
         :_no_work_dir_,
         -> *, & ev_p do
@@ -25,18 +19,25 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace::Repl
       nil
     end
 
-    def rx rx
+    def rx_ rx
       @ruby_regexp = rx ; nil
     end
 
-    def against input_string
+    def against_ input_string
       @output_string = input_string.gsub @ruby_regexp do
         @replace_function.call $~
-      end ; nil
+      end
+      NIL_
     end
 
-    def expect expect_string
+    def expect_ expect_string
       @output_string.should eql expect_string
+    end
+
+    define_method :unindent_, Models::Search_And_Replace::UNINDENT_
+
+    def __subject_module
+      Models::Search_And_Replace::Subject_module_[]
     end
   end
 end

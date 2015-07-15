@@ -1,30 +1,20 @@
-self._REGEL
-require_relative '../../test-support'
+module Skylab::BeautySalon::TestSupport
 
-module Skylab::BeautySalon::TestSupport::Models
+  module Models::Search_And_Replace
 
-  ::Skylab::BeautySalon::TestSupport[ self ]
-
-end
-
-module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
-
-  ::Skylab::BeautySalon::TestSupport::Models[ TS_ = self ]
-
-  include Constants
-
-  Home_ = Home_
-
-  Callback_ = Home_::Callback_
-
-  extend TestSupport_::Quickie
-
-  module InstanceMethods
+    def self.[] tcc
+      TS_::Expect_Event[ tcc ]
+      tcc.include self
+    end
 
     # ~ setup
 
-    def start_tmpdir
+    def start_tmpdir_
+
       td = memoized_tmpdir_
+
+      td.prepare
+
       @tmpdir = td.new_with(
         :path, td.join( 'haha-dir' ).to_path,
         :be_verbose, do_debug,
@@ -32,72 +22,61 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
       nil
     end
 
-    def to_tmpdir_add_wazoozle_file
-      @tmpdir.write 'ok-whatever-wazoozle.txt', unindent( <<-O )
+    def to_tmpdir_add_wazoozle_file_
+
+      @tmpdir.write 'ok-whatever-wazoozle.txt', unindent_( <<-O )
         ok oh my geez --> HAHA <--
       O
-      nil
+
+      NIL_
     end
 
-    def start_tmpdir_SKIP
-      @tmpdir = memoized_tmpdir_.join 'haha-dir'
-      nil
+    def my_fixture_file_ entry_s
+      my_fixture_files_[ entry_s ]
     end
 
-    # ~ hook-out's for [br] "expect interactive"
-
-    def interactive_bin_path
-      Bin_path_[]
+    def my_fixture_files_
+      Models::Search_And_Replace::Fixture_Trees
     end
 
-    # ~ non-interactive run
+    # ~ hook-ins/outs
 
-    def call_API * x_a
-      evr = event_receiver_for_expect_event
-      x_a.push :on_event_selectively, -> * i_a , & ev_p do
-        evr.maybe_receive_on_channel_event i_a, & ev_p
+    ## ~~ [ca] "expect event"
+
+    def subject_API  # CHANGE IT from top
+
+      TS_::Models::Search_And_Replace::Subject_module_[]::API
+    end
+
+    ## ~~ [br] "expect interactive"
+
+    define_method :interactive_bin_path, -> do
+      p = -> do
+        ::File.join(
+          Home_.lib_.system.defaults.bin_path,
+          'tmx-beauty-salon search-and-r' )
       end
-      @result = _API.call( * x_a )
-      nil
+      x = nil
+      -> do
+        x ||= p[]
+      end
+    end.call
+
+    # ~ support for support
+
+    Subject_module_ = -> do
+      Home_::Models_::Search_and_Replace
     end
 
-    def _API
-      Subject_[]::API
-    end
+    UNINDENT_ = -> do
+      rx = %r(^[ ]+)
+      -> s do
+        s.gsub! rx, EMPTY_S_
+        s
+      end
+    end.call
 
-    def black_and_white_expression_agent_for_expect_event
-      Home_.lib_.brazen::API.expression_agent_instance
-    end
-
-    # ~ assertion support
-
-    def unindent s
-      s.gsub! UNINDENT_RX__, Home_::EMPTY_S_
-      s
-    end
-    UNINDENT_RX__ = %r(^[ ]+)
+    define_method :unindent_, UNINDENT_
 
   end
-
-  Bin_path_ = Callback_.memoize do
-    Home_.lib_.system.defaults.bin_pathname.
-      join( 'tmx-beauty-salon search-and-r' ).to_path
-  end
-
-  NEWLINE_ = Home_::NEWLINE_
-
-  Subject_ = -> do
-    Home_::Models_::Search_and_Replace
-  end
-
-  SLASH_ = '/'.freeze
-
-  THREE_LINES_FILE_ = 'three-lines.txt'.freeze
-
-end
-
-module Skylab::BeautySalon::TestSupport::Models
-
-  S_and_R = Search_and_Replace
-
 end

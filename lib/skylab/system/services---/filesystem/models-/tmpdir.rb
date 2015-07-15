@@ -529,7 +529,7 @@ module Skylab::System
 
         def initialize tc, slug
 
-          _path = ::File.join tc.real_filesystem.tmpdir_path, slug
+          _path = ::File.join tc.tmpdir_path_for_memoized_tmpdir, slug
 
           @instance = Tmpdir_.new_with(
             :path, _path,

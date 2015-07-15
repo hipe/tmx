@@ -28,8 +28,11 @@ module Skylab::Brazen
         end
 
         def bld_inferred_name_function
+
           _const = Callback_::Name.via_module( self ).as_const
+
           _cnst = RX__.match( _const )[ 0 ]
+
           Callback_::Name.via_const _cnst
         end
         RX__ = /\A.+(?=_(?:Agent|Branch|Boolean|Button|Field|Node)_*\z)/  # :+#experimental

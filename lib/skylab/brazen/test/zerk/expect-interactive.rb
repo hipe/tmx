@@ -11,11 +11,20 @@ module Skylab::Brazen
         def [] test_context_class
           test_context_class.include self
         end
-      end
+      end  # >>
 
       def start_interactive_session chdir_path
-        @session = Session__.new( self, chdir_path, interactive_bin_path ).start
-        nil
+
+        sess = Sessions_::Main.new(
+          self,
+          chdir_path,
+          self.interactive_bin_path
+        )
+
+        @interactive_session = sess  # name is :+#public-API
+        sess.start
+
+        NIL_
       end
 
       def expect_screen_ending_with x
@@ -104,31 +113,20 @@ module Skylab::Brazen
         ok and chunks.join EMPTY_S_
       end
 
-      def each_chunk_until stop_string
+      def each_chunk_until stop_string, & when_chunk
 
-        tail_range = - stop_string.length.nonzero? .. -1
-        timeout = READ_TIMEOUT_SECONDS__
+        o = Sessions_::Nonblock.new
 
-        begin
-          r, w, e = ::IO.select [ @session.err ], nil, nil, timeout
-          r or break
-          w.length.zero? && e.length.zero? or self._LOOK
-          chunk = r.first.read_nonblock READ_BYTES__
-
-          yield chunk if block_given?
-
-          if stop_string == chunk[ tail_range ]
-            did_find = true
-            break
+        if self.do_debug
+          o.debug_chunk_by do | chunk |
+            debug_IO.puts "(chunk: #{ chunk.inspect })"
           end
-        end while true
-
-        if did_find
-          ACHIEVED_
-        else
-          fail "in #{ timeout } seconds did not find `stop_string` #{
-            }#{ stop_string.inspect } (had: #{ chunk.inspect })"
         end
+
+        o.io = @interactive_session.err
+        o.stop_string = stop_string
+        o.when_chunk = when_chunk
+        o.execute
       end
 
       def expect_string_ends_with_matcher screen, matcher_x
@@ -147,9 +145,11 @@ module Skylab::Brazen
         nil
       end
 
-      class Session__
+      Sessions_ = ::Module
+      class Sessions_::Main
 
         def initialize test_context, chdir_path, bin_path
+
           @bin_path = bin_path
           @chdir_path = chdir_path
           @ok = true
@@ -205,11 +205,99 @@ module Skylab::Brazen
         end
       end
 
+      class Sessions_::Nonblock
+
+        # read from the IO until some expected string is encountered,
+        # anticipating that the IO may have no more bytes to be read before
+        # that string is encountered. (select(2) is used).
+
+        def initialize
+
+          @timeout = READ_TIMEOUT_SECONDS__
+        end
+
+        attr_writer(
+          :io,
+          :stop_string,
+          :when_chunk,
+        )
+
+        def debug_chunk_by & p
+          @debug_chunk = p
+        end
+
+        def execute
+
+          @when_chunk ||= MONADIC_EMPTINESS_
+          @debug_chunk ||= MONADIC_EMPTINESS_
+
+          tail_range = - @stop_string.length.nonzero? .. -1
+
+          begin
+
+            r, w, e = ::IO.select [ @io ], nil, nil, @timeout
+
+            r or break
+
+            w.length.zero? or self._COVER_ME
+            e.length.zero? or self._COVER_ME
+            io = r.fetch 0
+            io.object_id == @io.object_id or self._SANITY
+
+            chunk = begin
+              io.read_nonblock READ_BYTES___
+            rescue ::EOFError => _EOF_error
+              break
+            end
+
+            @_first_chunk ||= chunk
+
+            @debug_chunk[ chunk ]
+            @when_chunk[ chunk ]
+
+            if @stop_string == chunk[ tail_range ]
+              did_find = true
+              break
+            end
+
+            redo
+          end while nil
+
+          if did_find
+            ACHIEVED_
+
+          elsif _EOF_error
+            fail __say_EOF _EOF_error
+          else
+            fail __say_not_found chunk
+          end
+        end
+
+        def __say_EOF _EOF_error
+
+          "#{ _EOF_error.message } #{
+            }#{ _say_before_encountering :first, @_first_chunk }"
+        end
+
+        def __say_not_found chunk
+
+          "timeout of #{ @timeout } seconds expired #{
+           }#{ _say_before_encountering :last, chunk }"
+        end
+
+        def _say_before_encountering sym, chunk
+
+          "before encountering #{
+           }stop string: #{ @stop_string.inspect } } #{
+            }(#{ sym } chunk: #{ chunk.inspect })"
+        end
+      end
+
       BLANK_RX_ = Home_::Zerk::BLANK_RX_
 
       LINE_DELIM_RX__ = /(?<=\n)/
 
-      READ_BYTES__ = 8000  # like 100-ish lines - enough for now
+      READ_BYTES___ = 8000  # like 100-ish lines - enough for now
 
       READ_TIMEOUT_SECONDS__ = 1.0
 

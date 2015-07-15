@@ -1,6 +1,6 @@
 module Skylab::BeautySalon
 
-  class Models_::Search_and_Replace
+  module Models_::Search_and_Replace
 
     Actors_::Build_grep_path_scan = nil
 

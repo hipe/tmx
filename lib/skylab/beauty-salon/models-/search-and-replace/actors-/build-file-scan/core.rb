@@ -1,6 +1,6 @@
 module Skylab::BeautySalon
 
-  class Models_::Search_and_Replace
+  module Models_::Search_and_Replace
 
     Autoloader_[ Actors_::Build_file_scan = ::Module.new ]
 

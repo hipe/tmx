@@ -69,7 +69,11 @@ module Skylab::System::TestSupport
       Home_.lib_.file_utils
     end
 
-    def real_filesystem
+    def tmpdir_path_for_memoized_tmpdir
+      real_filesystem_.tmpdir_path
+    end
+
+    def real_filesystem_
       services_.filesystem
     end
 

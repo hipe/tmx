@@ -4,6 +4,13 @@ module Skylab::Basic
 
     class << self
 
+      def [] last_op_sym, * op_sym_a, s  # silly fun
+        op_sym_a.each do | op_sym |
+          send op_sym, s
+        end
+        send last_op_sym, s
+      end
+
       def build_proc_for_string_begins_with_string * a
         if a.length.zero?
           String_::Small_Procs__::Build_proc_for_string_begins_with_string
@@ -66,6 +73,20 @@ module Skylab::Basic
         MUSTACHE_RX__
       end
       MUSTACHE_RX__ = / {{ ( (?: (?!}}) [^{] )+ ) }} /x
+
+      define_method :mutate_by_unindenting, -> do
+
+        # use the leading whitespace in the first line as the
+        # amount by which to "deindent" the whole string
+
+        rx = nil
+        -> s do
+          rx ||= /\A[[:space:]]+/
+          _rx = /^#{ ::Regexp.escape rx.match( s )[ 0 ] }/
+          s.gsub! _rx, EMPTY_S_
+          NIL_  # don't result a mutant
+        end
+      end.call
 
       def paragraph_string_via_message_lines * a
         if a.length.zero?

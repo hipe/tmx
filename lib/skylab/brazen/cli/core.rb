@@ -620,7 +620,7 @@ module Skylab::Brazen
         ok = prepare_backstream_call @mutable_backbound_iambic
 
         if ok
-          __bound_call_via_bound_action_and_mutated_backbound_iambic
+          bound_call_via_bound_action_and_mutated_backbound_iambic
         else
           Callback_::Bound_Call.via_value ok  # failure is not an option
         end
@@ -677,7 +677,10 @@ module Skylab::Brazen
         )
       end
 
-      def __bound_call_via_bound_action_and_mutated_backbound_iambic
+      def bound_call_via_bound_action_and_mutated_backbound_iambic
+
+        # client may want to override this method if for example she is
+        # [#043] backless and implements a custom front client.
 
         bc = @bound.bound_call_against_polymorphic_stream(
 

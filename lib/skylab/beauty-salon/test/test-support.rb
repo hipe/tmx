@@ -35,14 +35,6 @@ module Skylab::BeautySalon::TestSupport
       TestSupport_.debug_IO
     end
 
-    def existent_empty_tmpdir_path
-      td = memoized_tmpdir_.tmpdir_via_join 'started-out-empty'
-      if ! do_debug != ! td.be_verbose
-        td = td.with :be_verbose, do_debug, :debug_IO, debug_IO
-      end
-      td.clear.to_path
-    end
-
     def existent_tmpdir_path
       memoized_tmpdir_.to_path
     end
@@ -59,6 +51,10 @@ module Skylab::BeautySalon::TestSupport
         end
       end
     end.call
+
+    def tmpdir_path_for_memoized_tmpdir
+      Home_.lib_.system.filesystem.tmpdir_path
+    end
 
     def subject_CLI
       Home_::CLI
@@ -98,8 +94,13 @@ module Skylab::BeautySalon::TestSupport
   # ~
 
   Home_ = ::Skylab::BeautySalon
+  Callback_ = ::Skylab::Callback
+  Autoloader_ = Callback_::Autoloader
 
   Brazen_ = ::Skylab::Brazen
-  Callback_ = ::Skylab::Callback
+  DELIMITER_ = Home_::NEWLINE_
   EMPTY_S_ = Home_::EMPTY_S_
+  Autoloader_[ Models = ::Module.new ]  # some tests drill into this directly
+  NIL_ = nil
+
 end

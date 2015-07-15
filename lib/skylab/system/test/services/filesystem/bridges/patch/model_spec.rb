@@ -129,7 +129,7 @@ module Skylab::System::TestSupport
 
     def _new_patch_via_file_content_before whole_file_s
 
-      real_filesystem.patch.new_via_file_content_before whole_file_s
+      real_filesystem_.patch.new_via_file_content_before whole_file_s
     end
 
     def _to_s pa

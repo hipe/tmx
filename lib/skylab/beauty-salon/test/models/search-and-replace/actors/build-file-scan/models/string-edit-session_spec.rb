@@ -2,14 +2,15 @@ require_relative '../../../../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] models - S & R - models - string edit session", wip: true do
+  describe "[bs] models - S & R - models - string edit session" do
 
     extend TS_
+    use :models_search_and_replace_actors_build_file_scan_support
 
     context "modeled as a list of string segments separated by match segments" do
 
       it "the match segements are determined lazily" do
-        es = subject '__XX__XX__', /XX/
+        es = _subject '__XX__XX__', /XX/
         m1 = es.gets_match
         m2 = es.gets_match
         es.gets_match.should be_nil
@@ -21,7 +22,7 @@ module Skylab::BeautySalon::TestSupport
 
       it "a match segment can retrieve its previous, its next" do
 
-        es = subject 'Fibble..XX..and faBBle, and Fopple and falafel fubbel',
+        es = _subject 'Fibble..XX..and faBBle, and Fopple and falafel fubbel',
           /\bf[a-z][bp]{2}(?:el|le)\b/i
 
         ma = es.match_at_index 1
@@ -40,12 +41,12 @@ module Skylab::BeautySalon::TestSupport
       end
 
       it "no matches is OK" do
-        es = subject 'one', /two/
+        es = _subject 'one', /two/
         es.match_at_index( 3 ).should be_nil
       end
 
       it "empty string is OK (but don't bother trying to match it)" do
-        es = subject '', //
+        es = _subject '', //
         es.gets_match.should be_nil
       end
     end
@@ -54,12 +55,12 @@ module Skylab::BeautySalon::TestSupport
 
       it "in repl string you can add lines that weren't there and opposite" do
 
-        _input = unindent( <<-O )
+        _input = unindent_( <<-O )
           one
           two
           three
         O
-        es = subject _input, /(?:thre)?e\n/
+        es = _subject _input, /(?:thre)?e\n/
 
         m1 = es.gets_match
         m2 = es.gets_match
@@ -77,14 +78,14 @@ module Skylab::BeautySalon::TestSupport
 
       it "viewing context - minimal normal (note \"segmented line\" class)" do
 
-        _input = unindent( <<-O )
+        _input = unindent_( <<-O )
           line 1
           line 2
           ohai
           line 4
           line 5
         O
-        es = subject _input, /^ohai$/
+        es = _subject _input, /^ohai$/
         es.gets_match.set_replacement_string 'yerp'
 
         bf, m, af = es.context_streams 1, 0, 1
@@ -107,7 +108,7 @@ module Skylab::BeautySalon::TestSupport
         line.first.to_sexp.should eql [ :normal, 19, "line 4\n" ]
         af.gets.should be_nil
 
-        expect_output es, unindent( <<-O )
+        _expect_output es, unindent_( <<-O )
           line 1
           line 2
           yerp
@@ -118,7 +119,7 @@ module Skylab::BeautySalon::TestSupport
 
       it "viewing context - many matches, many replacements, delimitation changed" do
 
-        _input = unindent( <<-O )
+        _input = unindent_( <<-O )
           zero_then
           one_and
           two_and
@@ -126,7 +127,7 @@ module Skylab::BeautySalon::TestSupport
           four
         O
 
-        es = subject _input, /_and$/
+        es = _subject _input, /_and$/
         es.match_at_index( 0 ).set_replacement_string "\nAND"
         es.match_at_index( 1 ).set_replacement_string "_2_and"
         es.match_at_index( 2 ).set_replacement_string "\nAND"
@@ -154,7 +155,7 @@ module Skylab::BeautySalon::TestSupport
 
         af.gets.should be_nil
 
-        expect_output es, unindent( <<-O )
+        _expect_output es, unindent_( <<-O )
           zero_then
           one
           AND
@@ -167,11 +168,11 @@ module Skylab::BeautySalon::TestSupport
 
       it "repl has a repl before it, does not start at column 1, adds lines" do
 
-        _input = unindent( <<-O )
+        _input = unindent_( <<-O )
           zip zonk zip
           zap zank zap
         O
-        es = subject _input, /\bz[aeiou]nk\b/i
+        es = _subject _input, /\bz[aeiou]nk\b/i
 
         es.gets_match.set_replacement_string "nourk 1\nnourk 2\nnourk 3"
         es.gets_match.set_replacement_string "nelf 1\nnelf 2\nnelf 3"
@@ -198,7 +199,7 @@ module Skylab::BeautySalon::TestSupport
 
         af.gets.should be_nil
 
-        expect_output es, unindent( <<-O )
+        _expect_output es, unindent_( <<-O )
           zip nourk 1
           nourk 2
           nourk 3 zip
@@ -210,11 +211,11 @@ module Skylab::BeautySalon::TestSupport
 
       it "(regression)" do
 
-        _input = unindent( <<-O )
+        _input = unindent_( <<-O )
           ZE zoo
           ZIM
         O
-        es = subject _input, /\bZ[A-Z]+\b/
+        es = _subject _input, /\bZ[A-Z]+\b/
 
         es.gets_match.set_replacement_string 'JE'
         es.gets_match.set_replacement_string 'JIM'
@@ -226,7 +227,7 @@ module Skylab::BeautySalon::TestSupport
         m.gets.should be_nil
         af.gets.should be_nil
 
-        expect_output es, unindent( <<-O )
+        _expect_output es, unindent_( <<-O )
           JE zoo
           JIM
         O
@@ -234,12 +235,12 @@ module Skylab::BeautySalon::TestSupport
 
       it "viewing context - when many matches on 1 line & actual ctx is low" do
 
-        _input = unindent( <<-O )
+        _input = unindent_( <<-O )
           zo ZE zoo
           ZIM zam ZOM
           ziff ZUP zaff
         O
-        es = subject _input, /\bZ[A-Z]+\b/
+        es = _subject _input, /\bZ[A-Z]+\b/
 
         es.gets_match.set_replacement_string 'JE'
         es.gets_match.set_replacement_string 'JIM'
@@ -268,7 +269,7 @@ module Skylab::BeautySalon::TestSupport
 
         af.gets.should be_nil
 
-        expect_output es, unindent( <<-O )
+        _expect_output es, unindent_( <<-O )
           zo JE zoo
           JIM zam JOM
           ziff JUP zaff
@@ -276,11 +277,11 @@ module Skylab::BeautySalon::TestSupport
       end
     end
 
-    def subject * a
-      Actors_[]::Build_file_scan::Models__::Interactive_File_Session::String_Edit_Session_.new( * a )
+    def _subject * a
+      actors_::Build_file_scan::Models__::Interactive_File_Session::String_Edit_Session_.new( * a )
     end
 
-    def expect_output es, string
+    def _expect_output es, string
       queue = string.split %r((?<=\n))
       stream = es.to_line_stream
       while line = stream.gets

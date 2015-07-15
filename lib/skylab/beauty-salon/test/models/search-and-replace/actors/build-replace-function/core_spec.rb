@@ -2,28 +2,28 @@ require_relative '../../../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] S & R - actors - build replace function", wip: true do
+  describe "[bs] S & R - actors - build replace function" do
 
     extend TS_
-    # use :expect_event
+    use :models_search_and_replace_actors_build_replace_function_support
 
     it "a replace function can be used for oridnary string substitution" do
 
-      rf 'foo'
+      rf_ 'foo'
 
-      rx %r( Jimbo )x
+      rx_ %r( Jimbo )x
 
-      against "durfie Jimbo wahootey"
+      against_ "durfie Jimbo wahootey"
 
-      expect "durfie foo wahootey"
+      expect_ "durfie foo wahootey"
 
     end
 
     it "but if you use the mustache open curlies, watch out:" do
 
-      rf "{{"
+      rf_ "{{"
 
-      expect_event :replace_function_parse_error, unindent(
+      expect_event :replace_function_parse_error, unindent_(
         "expecting <capture reference> or \"{{\":\n#{
         }\n#{
         }^" )
@@ -32,37 +32,37 @@ module Skylab::BeautySalon::TestSupport
 
     it "reference captures with $1, $2 etc" do
 
-      rf "_{{ $1 }}_"
+      rf_ "_{{ $1 }}_"
 
-      rx %r(\*  ( [^*]+ )  \*)x
+      rx_ %r(\*  ( [^*]+ )  \*)x
 
-      against "it's *neat*"
+      against_ "it's *neat*"
 
-      expect "it's _neat_"
+      expect_ "it's _neat_"
 
     end
 
     it "if you want to have a literal \"{{\" in your expression:" do
 
-      rf "foo {{ \"{{\" }} "
+      rf_ "foo {{ \"{{\" }} "
 
-      rx %r(.)
+      rx_ %r(.)
 
-      against "XY"
+      against_ "XY"
 
-      expect 'foo {{ foo {{ '
+      expect_ 'foo {{ foo {{ '
 
     end
 
     it "a limited subset of string methods is supported" do
 
-      rx %r(\b([A-Z][a-z]+\b))
+      rx_ %r(\b([A-Z][a-z]+\b))
 
-      rf "HI {{ $1.downcase }}."
+      rf_ "HI {{ $1.downcase }}."
 
-      against "well Susan"
+      against_ "well Susan"
 
-      expect "well HI susan."
+      expect_ "well HI susan."
 
     end
 

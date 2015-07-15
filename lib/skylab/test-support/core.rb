@@ -1,10 +1,9 @@
 
 class ::String  # :1:[#sl-131] [#022] "to extlib or not to extlib.."
 
-  def unindent  # (formerly 'deindent')
-    gsub!(
-      %r<^#{ ::Regexp.escape match( /\A[[:space:]]+/ )[ 0 ] }>,
-      ::Skylab::TestSupport::EMPTY_S_ )
+  def unindent
+
+    ::Skylab::TestSupport.lib_.basic::String.mutate_by_unindenting self
     self
   end
 end

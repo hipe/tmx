@@ -2,18 +2,19 @@ require_relative '../../../../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] models - S & R - models - read only file session ", wip: true do
+  describe "[bs] models - S & R - models - read only file session" do
 
     extend TS_
+    use :models_search_and_replace_actors_build_file_scan_support
 
     it "BFS loads" do
-      Actors_[]::Build_file_stream
+      actors_::Build_file_stream
     end
 
     it "normal - (unlike grep we get one entry per match not per line)" do
 
-      file_session_stream = Actors_[]::Build_file_stream.with :upstream_path_stream,
-        build_stream_for_single_path_to_file_with_three_lines,
+      file_session_stream = actors_::Build_file_stream.with :upstream_path_stream,
+        build_stream_for_single_path_to_file_with_three_lines_,
         :ruby_regexp, /\bwazoozle\b/i,
         :read_only
 
@@ -42,7 +43,7 @@ module Skylab::BeautySalon::TestSupport
       mid_match_line = ls.gets
       ls.gets.should be_nil
 
-      last_match_line = last_match.to_line_stream.to_a.join Home_::EMPTY_S_
+      last_match_line = last_match.to_line_stream.to_a.join EMPTY_S_
 
       p = Home_.lib_.brazen::CLI::Styling::Parse_styles
 

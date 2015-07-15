@@ -58,16 +58,10 @@ module Skylab::BeautySalon
       ::FileUtils
     end
 
-    Face__ = sidesys[ :Face ]
-
     HL___ = sidesys[ :Headless ]
 
     List_scanner = -> x do
       Callback_::Scn.try_convert x
-    end
-
-    Old_CLI_lib = -> do
-      Face__[]::CLI
     end
 
     Proxy_lib = -> do

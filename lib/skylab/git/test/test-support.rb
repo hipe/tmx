@@ -65,10 +65,13 @@ module Skylab::Git::TestSupport
       end
     end.call
 
-    def real_filesystem
+    def tmpdir_path_for_memoized_tmpdir
+      real_filesystem_.tmpdir_path
+    end
+
+    def real_filesystem_
       Home_.lib_.system.filesystem
     end
-    alias_method :real_filesystem_, :real_filesystem
 
     def dirs_in_ path
       Callback_::Stream.via_nonsparse_array(

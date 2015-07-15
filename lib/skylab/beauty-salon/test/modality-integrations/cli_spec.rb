@@ -23,7 +23,7 @@ module Skylab::BeautySalon::TestSupport
 
       sect = _guy.children[ 1 ]
 
-      s = sect.x.line.gsub Brazen_::CLI::Styling::SIMPLE_STYLE_RX, ''  # EMPTY_S_
+      s = sect.x.line.gsub Brazen_::CLI::Styling::SIMPLE_STYLE_RX, EMPTY_S_
       s or fail
 
       4 <= sect.children.length or fail

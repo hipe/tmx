@@ -1,6 +1,6 @@
 module Skylab::BeautySalon
 
-  class Models_::Search_and_Replace
+  module Models_::Search_and_Replace
 
     module Actors_::Build_file_scan
 
@@ -29,6 +29,7 @@ module Skylab::BeautySalon
 
           def initialize
             @do_highlight = nil
+            @on_event_selectively = nil
             super
             @prototype = Self_.new @ruby_regexp, @do_highlight, @on_event_selectively
           end

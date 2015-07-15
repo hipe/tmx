@@ -1,25 +1,40 @@
-module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
+module Skylab::BeautySalon::TestSupport
 
-  module Fixtures
+  module Models::Search_And_Replace::Fixture_Trees
 
     class << self
 
-      def stfu_omg_function_file_path
-        @soffp ||= stfu_omg_workspace_pathname.join( "#{ S_and_R_DOTFILE_ }/#{ FUNCTIONS_ }/stfu-omg.rb" ).to_path
+      def [] entry_s
+
+        ::File.join _dir_path, entry_s
       end
 
-      def stfu_omg_workspace_path
-        stfu_omg_workspace_pathname.to_path
+      define_method :STFU_OMG_FUNCTION_FILE_PATH, ( Callback_.memoize do
+
+        _FUNCTIONS = 'functions'
+        _DOTFILE = '.search-and-replace'
+
+        ::File.join(
+          Self__.STFU_OMG_WORKSPACE_PATH,
+          _DOTFILE,
+          _FUNCTIONS,
+          'stfu-omg.rb' )
+      end )
+
+      define_method :STFU_OMG_WORKSPACE_PATH, ( Callback_.memoize do
+
+        ::File.join(
+          Self__.dir_pathname.to_path,
+          '00-has-hidden-workspace-with-stfu-omg-function' )
+      end )
+
+
+      def _dir_path
+        @___ ||= dir_pathname.to_path
       end
 
-      def stfu_omg_workspace_pathname
-        @sowp ||= Fixtures.dir_pathname.join( '00-has-hidden-workspace-with-stfu-omg-function' )
-      end
-    end
+    end  # >>
 
-    FUNCTIONS_ = 'functions'.freeze
-
-    S_and_R_DOTFILE_ = '.search-and-replace'.freeze
-
+    Self__ = self
   end
 end

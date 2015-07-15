@@ -12,7 +12,7 @@ module Skylab::BeautySalon
 
         :desc, -> y do
 
-          _block = <<-HERE.gsub( /^ {6}/, EMPTY_S_ )
+          s = <<-HERE
             outputs to stdout (unless stated otherwise) the selected lines
             after having applied the hacky wrap filter to it (effectively re-
             breaking the lines so they are flush-left ragged right, and all
@@ -24,9 +24,8 @@ module Skylab::BeautySalon
             markdown-ish.
           HERE
 
-          Home_.lib_.basic::String.line_stream( _block ).each do | s |
-            y << s
-          end
+          st = Home_.lib_.basic::String[ :line_stream, :mutate_by_unindenting, s ]
+          y << s while s = st.gets
         end,
 
         :required,

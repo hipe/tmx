@@ -28,7 +28,7 @@ module Skylab::Git::TestSupport
       # pure happenstance, it is by no means guaranteed to be a valid
       # assumption on all systems.
 
-      _path = real_filesystem.tmpdir_path
+      _path = real_filesystem_.tmpdir_path
 
       cd_ _path do
         invoke 'stow', 'pop', 'no-see-stow'

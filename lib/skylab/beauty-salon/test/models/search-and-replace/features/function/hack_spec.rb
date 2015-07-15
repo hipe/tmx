@@ -2,13 +2,16 @@ require_relative '../../../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] features - function - hack", wip: true do
+  describe "[bs] features - function - hack" do
+
+    extend TS_
+    use :models_search_and_replace
 
       it "it tries to infer the module tree from a file - FALLIBLE" do
 
-        _path = TS_::Fixtures.stfu_omg_function_file_path
+        _path = my_fixture_files_.STFU_OMG_FUNCTION_FILE_PATH
 
-        tree = subject :path, _path
+        tree = __subject :path, _path
 
         s_a = []
 
@@ -36,7 +39,7 @@ module Skylab::BeautySalon::TestSupport
         s_a.length.should eql 5
       end
 
-      def subject * x_a, & x_p
+      def __subject * x_a, & x_p
         Home_::Lib_::System[].filesystem.hack_guess_module_tree( * x_a, & x_p )
       end
 

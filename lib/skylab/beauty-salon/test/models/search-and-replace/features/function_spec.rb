@@ -2,14 +2,14 @@ require_relative '../../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] S & R - features - functions", wip: true do
+  describe "[bs] S & R - features - functions" do
 
     extend TS_
-    # use :expect_event
+    use :models_search_and_replace
 
     it "when you use a strange function name (but have a function folder)" do
 
-      cd first_workspace
+      _cd _first_workspace
 
       call_API :search, /wazoo/i,
         :replace, '{{ $0.downcase.well_well_well.nope }}',
@@ -30,12 +30,12 @@ module Skylab::BeautySalon::TestSupport
       expect_failed
     end
 
-    it "OMG HOLY RIDICULOUS S & R API WITH FUNCTION" do
+    it "**non-interactive** search and replace thru API call" do
 
-      start_tmpdir
-      to_tmpdir_add_wazoozle_file
+      start_tmpdir_
+      to_tmpdir_add_wazoozle_file_
 
-      cd first_workspace
+      _cd _first_workspace
 
       call_API :search, /\bHAHA\b/,
         :replace, 'ORLY-->{{ $0.stfu_omg.downcase }}<--YARLY',
@@ -57,12 +57,12 @@ module Skylab::BeautySalon::TestSupport
 
     end
 
-    def cd path
+    def _cd path
       Home_.lib_.file_utils.cd path
     end
 
-    def first_workspace
-      TS_::Fixtures.stfu_omg_workspace_path
+    def _first_workspace
+      my_fixture_files_.STFU_OMG_WORKSPACE_PATH
     end
   end
 end

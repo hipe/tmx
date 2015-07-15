@@ -1,10 +1,14 @@
 module Skylab::BeautySalon
 
-  class Models_::Search_and_Replace
+  module Models_::Search_and_Replace
 
-    Preview_Agent_Children__ = ::Module.new  # notes stowed away in [#016] (as 2)
+     # notes stowed away in [#016] (as 2)
 
-    class Preview_Agent_Children__::Files_Node < Field_
+    here = ::Module.new
+
+    Reactive_Nodes_ = here
+
+    class here::Files_Node < Field_
 
       def is_terminal_node
         true
@@ -81,7 +85,7 @@ module Skylab::BeautySalon
       end
     end
 
-    class Preview_Agent_Children__::Matches_Node < Branch_
+    class here::Matches_Node < Branch_
 
       def initialize( * )
         @has_path = false
@@ -759,7 +763,7 @@ module Skylab::BeautySalon
         end
 
         def build_edit_file_agent
-          S_and_R_::Edit_File_Agent__.new @current_file_ES,
+          S_and_R_::Reactive_Nodes_::Edit_File_Node.new @current_file_ES,
             @next_file_ES ? true : false,
             self
         end

@@ -1,6 +1,6 @@
 module Skylab::BeautySalon
 
-  class Models_::Search_and_Replace
+  module Models_::Search_and_Replace
 
     class Actors_::Build_replace_function
 
