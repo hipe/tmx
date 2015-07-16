@@ -65,6 +65,7 @@ module Skylab::TMX
   end
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
-
   Home_ = self
+  NIL_ = nil
+  UNABLE_ = false
 end

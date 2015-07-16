@@ -85,7 +85,7 @@ module Skylab::BeautySalon
 
         lib = Home_.lib_.brazen::API
 
-        evr = lib.two_stream_event_expresser.new(
+        evr = lib::Two_Stream_Event_Expresser.new(
           sout, serr, lib.expression_agent_instance )
 
         -> * i_a, & ev_p do

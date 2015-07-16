@@ -1,114 +1,69 @@
 module Skylab::Brazen
 
-  module API
+  # ->
 
-    class Produce_bound_call__
+    Sessions_ = ::Module.new
+    class Sessions_::Produce_Bound_Call
 
-      # called as an actor in one place and used as a session in another
+      attr_reader(
+        :bound,
+        :poly_stream,
+      )
 
-      Callback_::Actor.call self, :properties,
-        :x_a,
-        :kernel,
-        :mod,
-        :box
+      attr_writer(
+        :module,
+        :poly_stream,
+      )
 
-      class << self
-
-        def start_via_iambic x_a, k, & oes_p
-          new do
-            _common_pre_init x_a, k, & oes_p
-            @mutable_box = nil
-            _common_post_init
-          end
-        end
-
-        def start_via_iambic_and_mutable_box x_a, bx, k, & oes_p
-          new do
-            _common_pre_init x_a, k, & oes_p
-            @mutable_box = bx
-            _common_post_init
-          end
-        end
-
-      end  # >>
-
-      def initialize
-        @mutable_box = nil
-        super
-      end
-
-      def _common_pre_init x_a, k, & oes_p
-        @on_event_selectively = oes_p
+      def initialize k, & oes_p
+        @bound = nil
         @kernel = k
-        @mod = k.module
-        @x_a = x_a
+        @on_event_selectively = oes_p
+        @mutable_box = nil
       end
 
-      def execute
-        _common_post_init
-        produce_bound_call
+      def iambic= x_a
+
+        if :on_event_selectively == x_a[ -2 ]  # :+[#049] case study: ordering hacks
+          oes_p = x_a[ -1 ]
+          x_a[ -2, 2 ] = EMPTY_A_
+        end
+
+        if oes_p
+          @on_event_selectively = oes_p
+        end
+
+        @poly_stream = Callback_::Polymorphic_Stream.via_array x_a
+        NIL_
       end
 
-      def produce_bound_call
-        _ok = __resolve_bound_action
-        _ok && __via_bound_action_produce_bound_call
+      def mutable_box= bx
+
+        oes_p = bx.remove :on_event_selectively do end
+        if oes_p
+          @on_event_selectively = oes_p
+        end
+        @mutable_box = bx
+        NIL_
       end
 
       def receive_top_bound_node x
         @bound = x
         @current_unbound_action_stream = @bound.to_unbound_action_stream
-        nil
+        NIL_
       end
 
-      attr_reader :bound, :bound_call
+      def execute  # `prouduce_bound_call` was subsumed by here
 
-      def polymorphic_stream
-        @st
-      end
+        @on_event_selectively ||= __produce_some_handle_event_selectively
 
-      def _common_post_init
-
-        @bound = nil  # there is no parent bound action to start
-
-        if @mutable_box
-          __init_when_iambic_and_box
-        else
-          __init_when_iambic
-        end
-      end
-
-      def __init_when_iambic_and_box
-
-        @on_event_selectively ||= begin
-          _oes_p = @mutable_box.remove :on_event_selectively do end
-          _oes_p || _produce_some_handle_event_selectively
-        end
-
-        @st = Callback_::Polymorphic_Stream.via_array @x_a
-
-        ACHIEVED_
-      end
-
-      def __init_when_iambic
-
-        st = Callback_::Polymorphic_Stream.via_array @x_a
-
-        @on_event_selectively ||= begin
-          if :on_event_selectively == st.random_access_( -2 )  # :+[#049] case study: ordering hacks
-            x = st.pop_
-            st.reverse_advance_one_
-            x
-          else
-            _produce_some_handle_event_selectively
-          end
-        end
-
-        @st = st
-        nil
+        _ok = __resolve_bound_action
+        _ok && __via_bound_action_produce_bound_call
       end
 
       def __resolve_bound_action
-        if @st.unparsed_exists
+
+        if @poly_stream.unparsed_exists
           __via_current_tokens_resolve_action
         else
           __whine_about_how_there_is_an_empty_iambic_arglist
@@ -132,7 +87,7 @@ module Skylab::Brazen
             break
           end
 
-          if @st.no_unparsed_exists
+          if @poly_stream.no_unparsed_exists
             __when_name_is_too_short
             ok = false
             break
@@ -155,7 +110,7 @@ module Skylab::Brazen
 
       def _resolve_action_via_unbound_stream st
 
-        sym = @st.current_token
+        sym = @poly_stream.current_token
 
         begin
 
@@ -163,7 +118,7 @@ module Skylab::Brazen
           unb or break
 
           if sym == unb.name_function.as_lowercase_with_underscores_symbol
-            @st.advance_one
+            @poly_stream.advance_one
             break
           end
 
@@ -176,14 +131,14 @@ module Skylab::Brazen
           if bnd
             @bound.accept_parent_node_ bnd
           end
-          OK_
+          ACHIEVED_
         else
           __when_no_action_at_this_step
         end
       end
 
       def __when_no_action_at_this_step
-        _end_in_error_with :no_such_action, :action_name, @st.current_token
+        _end_in_error_with :no_such_action, :action_name, @poly_stream.current_token
       end
 
       def __when_name_is_too_short
@@ -195,16 +150,16 @@ module Skylab::Brazen
 
         if @mutable_box
 
-          if @st.unparsed_exists
+          if @poly_stream.unparsed_exists
 
             @bound.bound_call_against_polymorphic_stream_and_mutable_box(
-              @st, @mutable_box )
+              @poly_stream, @mutable_box )
 
           else
             @bound.bound_call_against_box @mutable_box
           end
         else
-          @bound.bound_call_against_polymorphic_stream @st
+          @bound.bound_call_against_polymorphic_stream @poly_stream
         end
       end
 
@@ -219,13 +174,13 @@ module Skylab::Brazen
         UNABLE_
       end
 
-      def _produce_some_handle_event_selectively
+      def __produce_some_handle_event_selectively
 
         _two_streams = LIB_.two_streams
 
-        _expag = @mod::API.expression_agent_instance
+        _expag = @module.const_get( :API, false ).expression_agent_instance
 
-        event_expresser = Produce_bound_call__::Two_Stream_Event_Expresser.
+        event_expresser = Home_::API::Two_Stream_Event_Expresser.
           new( * _two_streams, _expag )
 
         -> * i_a, & ev_p do
@@ -240,5 +195,5 @@ module Skylab::Brazen
         end
       end
     end
-  end
+    # <-
 end

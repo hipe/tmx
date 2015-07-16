@@ -2,8 +2,6 @@ module Skylab::Brazen
 
   module API
 
-    class Produce_bound_call__
-
     class Two_Stream_Event_Expresser
 
       def initialize * a
@@ -37,7 +35,7 @@ module Skylab::Brazen
           @out.puts "OK: #{ s }"
         end
         ev.express_into_under y, @expag
-        OK_
+        ACHIEVED_
       end
 
       def recv_error_event ev
@@ -71,9 +69,6 @@ module Skylab::Brazen
         ev.express_into_under y, @expag
         nil
       end
-
     end
-    end
-
   end
 end

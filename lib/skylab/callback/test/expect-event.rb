@@ -285,10 +285,11 @@ module Skylab::Callback::TestSupport
 
         def expect_failed_by * x_a, & x_p
 
-          expect_event_via_iambic_and_proc(
+          x = expect_event_via_iambic_and_proc(
             [ :is_ok, false, :shorthand, x_a ], x_p )
 
           expect_failed
+          x
         end
 
         def expect_failed

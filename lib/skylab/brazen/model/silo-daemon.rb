@@ -36,11 +36,12 @@ module Skylab::Brazen
 
       def _bound_call_via x_a, & oes_p
 
-        sess = Home_::API.bound_call_session.start_via_iambic x_a, @kernel, & oes_p
+        sess = Home_::Sessions_::Produce_Bound_Call.new @kernel, & oes_p
+        sess.iambic = x_a
         sess.receive_top_bound_node @model_class.new( @kernel, & oes_p )
 
         if sess.via_current_branch_resolve_action_promotion_insensitive
-          st = sess.polymorphic_stream
+          st = sess.poly_stream
           h = { trio_box: nil, preconditions: nil }
           while st.unparsed_exists
             if :with == st.current_token

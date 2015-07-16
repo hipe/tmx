@@ -26,7 +26,7 @@ module Skylab::Brazen
 
     # ~ call exposures
 
-    def call * x_a, & x_p  # #note-25
+    def call * x_a, & x_p
 
       bc = bound_call_via_mutable_iambic x_a, & x_p
 
@@ -35,11 +35,10 @@ module Skylab::Brazen
 
     def bound_call_via_mutable_iambic x_a, & oes_p
 
-      if oes_p
-        x_a.push :on_event_selectively, oes_p
-      end
-
-      Home_::API::Produce_bound_call__[ x_a, self, @module ]
+      o = Home_::Sessions_::Produce_Bound_Call.new self, & oes_p
+      o.iambic = x_a
+      o.module = @module
+      o.execute
     end
 
     def call_via_mutable_box * i_a, bx, & x_p  # [sg]
@@ -51,11 +50,17 @@ module Skylab::Brazen
 
     def bound_call_via_mutable_box i_a, bx, & x_p  # [bs] only so far
 
-      Home_::API::Produce_bound_call__.start_via_iambic_and_mutable_box(
-        i_a,
-        bx,
-        self,
-        & x_p ).produce_bound_call
+      o = Home_::Sessions_::Produce_Bound_Call.new self, & x_p
+      o.iambic = i_a
+      o.mutable_box = bx
+      o.execute
+    end
+
+    def bound_call_via_polymorphic_stream st, & x_p
+
+      o = Home_::Sessions_::Produce_Bound_Call.new self, & x_p
+      o.poly_stream = st
+      o.execute
     end
 
     # ~ client exposures

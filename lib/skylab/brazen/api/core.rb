@@ -28,10 +28,6 @@ module Skylab::Brazen
       def members
         singleton_class.instance_methods( false ) - [ :members ]
       end
-
-      def two_stream_event_expresser
-        API::Produce_bound_call__::Two_Stream_Event_Expresser
-      end
     end  # >>
 
     Exit_statii__ = Callback_.memoize do
@@ -57,7 +53,5 @@ module Skylab::Brazen
         self
       end.new
     end
-
-    OK_ = true
   end
 end
