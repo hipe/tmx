@@ -110,6 +110,10 @@ module Skylab::Brazen
       @preconditions.fetch self.class.persist_to.full_name_symbol
     end
 
+    def fast_lookup
+      NIL_  # not implemented here (yet). promotions ick
+    end
+
     def to_unbound_action_stream
       self.class.to_lower_unbound_action_stream
     end

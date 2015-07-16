@@ -81,9 +81,9 @@ module Skylab::Basic  # introduction at [#020]
         candidate_mapper ||= IDENTITY_
         result_mapper ||= IDENTITY_
 
-        x = st.gets
-
-        while x
+        begin
+          x = st.gets
+          x or break
           s_ = candidate_mapper[ x ]
           if rx =~ s_
             if s == s_
@@ -92,8 +92,8 @@ module Skylab::Basic  # introduction at [#020]
             end
             a.push result_mapper[ x ]
           end
-          x = st.gets
-        end
+          redo
+        end while nil
 
         a
       end

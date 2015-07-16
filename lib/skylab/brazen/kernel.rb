@@ -89,6 +89,10 @@ module Skylab::Brazen
 
     # ~ "unbound" ( e.g model class ) production
 
+    def fast_lookup
+      NIL_  # not implemented here because with promotions it's not worth it
+    end
+
     def unbound_via_normal_identifier const_a
 
       unbound_via_normal_stream Callback_::Polymorphic_Stream.new( 0, const_a )

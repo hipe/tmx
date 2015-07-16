@@ -2,8 +2,16 @@ module Skylab::TMX::TestSupport
 
   module Models
 
-    def self.[] tcc
+    Reactions = -> tcc do
       Callback_.test_support::Expect_Event[ tcc ]
+      Building[ tcc ]
+    end
+
+    # <-
+
+  module Building
+
+    def self.[] tcc
       tcc.include self
     end
 
@@ -11,7 +19,7 @@ module Skylab::TMX::TestSupport
 
       block_given? and self._NOT_YET
 
-      _o = build_front_
+      _o = front_
       @result = _o.call( * x_a, & handle_event_selectively )
       NIL_
     end
@@ -55,5 +63,19 @@ module Skylab::TMX::TestSupport
     def subject_module_
       Home_::Models::Front
     end
+
+    def init_front_with_box_ fr, bx
+
+      fr.fast_lookup = -> sym do
+        bx[ sym ]
+      end
+
+      fr.unbound_stream_builder = -> do
+        bx.to_value_stream
+      end
+      NIL_
+    end
+  end
+# ->
   end
 end

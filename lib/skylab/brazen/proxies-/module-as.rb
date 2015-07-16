@@ -41,6 +41,10 @@ module Skylab::Brazen
         @on_event_selectively = oes_p
       end
 
+      def fast_lookup
+        NIL_
+      end
+
       def to_unbound_action_stream
         to_lower_unbound_action_stream
       end

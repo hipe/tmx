@@ -5,7 +5,7 @@ module Skylab::TMX::TestSupport
   describe "[tmx] models - front - 2" do
 
     extend TS_
-    use :models
+    use :models_reactions
 
     context "with two nodes" do
 
@@ -16,19 +16,14 @@ module Skylab::TMX::TestSupport
         :xxXXxx == @result or fail
       end
 
-      dangerous_memoize_ :build_front_ do
+      dangerous_memoize_ :front_ do
 
         box = Callback_::Box.new
         box.add :wiznizzie, _unbound_W
 
         o = subject_module_.new( & method( :fail ) )
 
-        o.fast_lookup = -> sym do
-          box[ sym ]
-        end
-        o.unbound_stream_builder = -> do
-          box.to_value_stream
-        end
+        init_front_with_box_ o, box
 
         o
       end

@@ -1,5 +1,6 @@
 [#100]       [ "reactive nodes" etc ]
 [#099]       [ branch node for historical documents ]
+[#097] #open get this ellipsis hack out
 [#096] #open the (CLI) table narrative ..
 [#095]       features that [fa] has that you don't #universal
 [#094]       expression agents adjunct notes ..

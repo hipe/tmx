@@ -5,7 +5,7 @@ module Skylab::TMX::TestSupport
   describe "[tmx] models - front" do
 
     extend TS_
-    use :models
+    use :models_reactions
 
     # three laws all the way.
 
@@ -35,7 +35,7 @@ module Skylab::TMX::TestSupport
           _there_are_none ] )
       end
 
-      dangerous_memoize_ :build_front_ do
+      dangerous_memoize_ :front_ do
 
         o = subject_module_.new( & method( :fail ) )
         o.fast_lookup = -> _ do end  # MONADIC_EMPTINESS_
@@ -65,7 +65,7 @@ module Skylab::TMX::TestSupport
           'expecting "AAzzAA" or "BBzzBB"' ] )
       end
 
-      dangerous_memoize_ :build_front_ do
+      dangerous_memoize_ :front_ do
 
         box = Callback_::Box.new
         box.add :finkle_A, _unbound_A

@@ -231,7 +231,7 @@ module Skylab::Brazen
       def _to_full_inferred_property_stream
 
         _st = @front_properties.to_value_stream
-        _st.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :ellipsis
+        _st.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :ellipsis  # #open [#097]
       end
 
     public
@@ -351,6 +351,26 @@ module Skylab::Brazen
       end
 
       def __array_of_matching_unbounds_against_token tok
+
+        p = bound_action.fast_lookup
+
+        # the client can implement & expose this "fast lookup" to circumvent
+        # needing to load (perhaps) all constituents to resolve a name. this
+        # proc is modality agnostic. towards this for now we pass a symbol
+
+        if p
+          _sym = Callback_::Name.via_slug( tok ).as_variegated_symbol
+          cls = p[ _sym ]
+        end
+
+        if cls
+          [ cls ]
+        else
+          __array_of_matching_unbounds_against_token_slow tok
+        end
+      end
+
+      def __array_of_matching_unbounds_against_token_slow tok
 
         Home_.lib_.basic::Fuzzy.reduce_to_array_stream_against_string(
           to_child_unbound_action_stream,

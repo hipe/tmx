@@ -6,6 +6,15 @@ module Skylab::TMX
       @on_event_selectively = oes_p
     end
 
+    # ~ modality adaptation
+
+    def to_kernel_adapter
+
+      Me_::Models_::As_Kernel.new self
+    end
+
+    # ~ direct call & support
+
     def call * x_a, & oes_p
 
       otr = dup
