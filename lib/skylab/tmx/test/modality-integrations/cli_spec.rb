@@ -1,14 +1,8 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TMX::TestSupport::CLI::L2P
+module Skylab::TMX::TestSupport
 
-  ::Skylab::TMX::TestSupport::CLI[ TS_ = self ]
-
-  include Constants
-
-  extend TestSupport::Quickie
-
-  describe "[tmx] CLI level 2 pings" do
+  describe "[tmx] modality integrations - CLI", wip: true do
 
     extend TS_
 

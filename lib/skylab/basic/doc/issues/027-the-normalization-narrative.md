@@ -243,7 +243,7 @@ of normalization.
 
 
 
-# the field-level custom normalization API :[#fa-019]
+# the field-level custom normalization API (was [fa] 019)
 
 This is the field-level normalization API.
 

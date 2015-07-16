@@ -2,16 +2,19 @@ module Skylab::Dependency
 
   class TaskTypes::Executable < Home_::Task
 
-    Home_.lib_.open_2 self
-
     attribute :executable, :required => true
 
     listeners_digraph  :all, :info => :all
 
     def execute context
+
       @context ||= (context[:args] || {})
+
       valid? or fail invalid_reason
-      if '' == (path = open2("which #{executable}").strip)
+
+      path = Home_.lib_.system.open2 [ 'which', executable ]
+      path.strip!
+      if path.length.zero?
         call_digraph_listeners(:info, "#{no 'not in PATH:'} #{executable}")
         false
       else

@@ -16,7 +16,7 @@ high-level behavior have remained largely the same.
 ## brief history and cultural context
 
 the subject node was imported from [tm]. other notable attempts at
-reusable API facilities have occured variously [#fa-007] and then
+reusable API facilities have occured variously [ sunsetted face API lib ] and then
 [#hl-017] off of that.
 
 the birthday of the latter code-node is a week or two after that of the

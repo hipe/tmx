@@ -31,7 +31,7 @@ only function in this case is to present the data to the human's eyes,
 given perhaps some parameters defining fields of focus for the report.
 but keep reading for thoughts on the utility of this.
 
-currently our only [#fa-040] "output modality" is intrinsically *linear*
+currently our only [#bs-040] "output modality" is intrinsically *linear*
 and *static*; however we should consider both of these classifications
 as temporary: for those (internally) "function chains" that are
 qualitative in nature, the particular order in which entites are

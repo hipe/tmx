@@ -56,7 +56,7 @@ module Skylab::CodeMolester
 
     # `find_nearest_config_file_path`
     #
-    # signature is the "sacred four" [#fa-012]:
+    # signature is the "sacred four" [ sunsetted ]
     #
     #   + `_fh` - (ignored. future-proofing placeholder for future parameters.)
     #   + `_oh` - (ignored. future-proofing placeholder for future options.)

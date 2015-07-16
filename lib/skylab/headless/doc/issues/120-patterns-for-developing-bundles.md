@@ -61,4 +61,4 @@ to this point, and the bundle has now matured into its next phase.
 ### history
 
 an early and possibly first occurrence of this pattern in the skylab universe
-corresponds with [#fa-055]:#the-invocation-method-added-via-proc.
+corresponds with [ [fa] sunsetted the API client narrative )

@@ -3,7 +3,7 @@
 (TODO: this doesn't belong in [gv])
 
 this node here intends for itself to be a small but powerful re-imagining
-of a now ancient effort started at [#fa-006] (currently undocumented) that
+of a now ancient effort started at [ sunsetted cli revelation ] that
 was never fully realized.
 
 a compliment to that effort (in all of its incarnations) is a parameter

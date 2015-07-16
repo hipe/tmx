@@ -12,7 +12,7 @@ the approach of grouping objects based on their similar properties." [2][3]
 
 with or without Plato and Aristotle we - in our software and in our minds -
 are developing a system for representing and transforming information. while
-we have no doubt that our effort to document "The API API" [#fa-022] would be
+we have no doubt that our effort to document "The API API" would be
 bolstered significantly by putting it into a context within the state of
 the discipline of categorization as it pertains to machine learning, this
 document's primary purpose is to stand as a centralized manifest of

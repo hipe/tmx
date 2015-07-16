@@ -3,12 +3,10 @@ require 'skylab/test-support/core'
 
 module Skylab::TMX::TestSupport
 
-  ::Skylab::TestSupport::Regret[ self ]
+  TestSupport_ = ::Skylab::TestSupport
 
-  module Constants
-    TMX_ = ::Skylab::TMX
-    Face_ = TMX_::Lib_::Face__[]
-    TestSupport = ::Skylab::TestSupport
-    TMX = ::Skylab::TMX
-  end
+  TestSupport_::Regret[ TS_ = self ]
+
+  extend TestSupport_::Quickie
+
 end

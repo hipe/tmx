@@ -198,7 +198,7 @@ module Skylab::Basic
         begin
           depth = @stack.length
           fields_a, box_cb, field_cb = @stack.pop ; count += 1
-          fields_a or break  # [#fa-049]
+          fields_a or break
           box = up_x.make_field_box fields_a, depth
           box_cb and box_cb[ box ]
           @stack.length.zero? and break

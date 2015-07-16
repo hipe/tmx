@@ -6,7 +6,7 @@ welcome to the CLI box DSL. familiarity will be assumed with any concepts
 presented in any [#137] CLI box narrative.
 
 if you use this, it will not be future-proof oweing to the concerns of
-[#fa-037], but you should use it anyway.
+[ sunsetted ], but you should use it anyway.
 
 
 ### understanding the behavioral domain of the DSL box

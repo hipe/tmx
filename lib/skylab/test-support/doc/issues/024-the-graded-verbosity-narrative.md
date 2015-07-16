@@ -7,7 +7,7 @@ the verbosity object created by this node is itself a module - it is intended
 to be an immutable constant that is shared accross your application. (it is a
 module because it is generally associated with another constant: something
 like a static Conf module for your application, and it generates one or more
-modules, and as such it is useful to store these modules under it. :[#fa-032])
+modules, and as such it is useful to store these modules under it. :[#br-069]
 
 
 
@@ -26,7 +26,7 @@ one day revealing the below articulation.
 quick and dirty proof of concept, will almost certainly change. the idea is a
 simpler alternative to [cb] digraph. what if you could throw one listener around
 throughout your graph? the listener is like a golden snitch. no it isn't.
-:~[#fa-051]
+:~[#br-069]
 
 
 

@@ -196,7 +196,7 @@ module Skylab::TestSupport
     end
   end
 
-  class Sn_  # #storypoint-200, part of the :+[#fa-051] snitch family
+  class Sn_  # #storypoint-200, part of the :+[#br-069] snitch family
 
     class << self ; alias_method :orig_new, :new end
 

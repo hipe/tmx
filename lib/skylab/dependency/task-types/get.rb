@@ -4,8 +4,6 @@ module Skylab::Dependency
 
   class TaskTypes::Get < Home_::Task
 
-    Home_.lib_.open_2 self
-
     include Home_.lib_.path_tools.instance_methods_module
 
     attribute :from

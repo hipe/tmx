@@ -220,8 +220,8 @@ module Skylab::Brazen
       end
     end
 
-    def normalize
-      ACHIEVED_  # OK is the default. override or use entity lib to go nuts
+    def normalize  # :[#.C].
+      ACHIEVED_  # OK is the default. override or use entity lib to go nuts..
     end
 
     # ~ preconditions

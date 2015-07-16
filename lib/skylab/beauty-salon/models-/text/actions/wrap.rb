@@ -60,7 +60,7 @@ module Skylab::BeautySalon
         :default, 80,
         :ad_hoc_normalizer, -> arg, & oes_p do
 
-          # ( was :+[#ba-027] with [#fa-019] shape )
+          # ( was :+[#ba-027], used to have what is now [#br.024.C] shape )
 
           if arg.is_known
             Home_.lib_.basic::Number.normalization.with(
@@ -286,7 +286,7 @@ module Skylab::BeautySalon
       Actors_ = ::Module.new
       class Actors_::Normalize_line_ranges
 
-        # :+[#fa-019] (still?) assume that x is nil or an array.
+        # :+[#br-024.C] (still?) assume that x is nil or an array.
 
         def initialize arg, & oes_p
           @arg = arg ; @on_event_selectively = oes_p

@@ -11,7 +11,7 @@ we try to blur all kinds of lines in terms of what it means to be a root node.
 vs. a branch node vs. a leaf node; so tht we can build trees of trees, and
 so on.
 
-if nothing else, look at fig.2 of [#fa-044], which is an ASCII drawing
+if nothing else, look at fig.2 of [#bs-044], which is an ASCII drawing
 of a client tree.
 
 
@@ -36,20 +36,20 @@ some comments at the end (one day this will be arranged appropriately enough
 into a grand tree of its own):
 
 • really the perfect illustration for the client tree model is in fig.2 of
-  [#fa-044] "ouroboros and strange modules".
+  [#bs-044] "ouroboros and strange modules".
 
-• [#fa-040] the matryoshka doll UI pattern is its own detailed spin on the
+• [#bs-040] the matryoshka doll UI pattern is its own detailed spin on the
   tree model (all of which is relevant to here, because it has the exact
   some functional objective); and lays down some good general groundwork.
 
 
 related articles:
 
-• in [#fa-042] "this fun problem" we learn of way you can lock yourself
+• in [#bs-042] "this fun problem" we learn of way you can lock yourself
   out of extensibility with inheritence when implementing something like
   the tree model.
 
-• in [#fa-030] trending away from sub-clients, we whine about them there.
+• in [#br-099.A] trending away from sub-clients, we whine about them there.
 
 • [#br-093] "what is the deal with expression agents" discovers the big
   problem with sub-clients (as they were implemented) and tries to fix them

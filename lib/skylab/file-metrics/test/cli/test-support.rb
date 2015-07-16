@@ -1,5 +1,4 @@
 require_relative '../test-support'
-require 'skylab/face/test/cli/test-support'
 
 module Skylab::FileMetrics::TestSupport::CLI
 

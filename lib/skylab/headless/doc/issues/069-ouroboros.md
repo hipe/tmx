@@ -1,6 +1,6 @@
 ## ouroboros - a snake eating its own tail is a thing in cultures :[#069]
 
-([#fa-044] is the official home for description of the ouroboros pattern.
+([#bs-044] is the official home for description of the ouroboros pattern.
 it is what facilates our oft-cited but never fully explained "turtles"
 analogy.)
 

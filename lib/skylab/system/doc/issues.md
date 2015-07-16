@@ -1,3 +1,4 @@
+[#025] #open "open2" (ancient) reconcile with IO-select (hl?)
 [#024]       [ mocks ]
 [#023] #open real bridges (diff, patch) shouldn't have "static" methods
              to access them but rather etc

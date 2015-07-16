@@ -39,7 +39,7 @@ not resolve a request client because request client is human"). yes, we were
 very pleased with ourselves.
 
 this was fine for the short term but like many brilliant ideaa, it did not
-scale. we then found ourselves [#fa-030] trending away from the sub-client
+scale. we then found ourselves [#br-099.A] trending away from the sub-client
 pattern.
 
 

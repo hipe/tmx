@@ -2,8 +2,6 @@ module Skylab::Dependency
 
   class TaskTypes::UnzipTarball < Home_::Task
 
-    Home_.lib_.open_2 self
-
     include Home_.lib_.path_tools.instance_methods_module
 
     include Home_::TaskTypes::TarballTo::Constants
@@ -37,13 +35,16 @@ module Skylab::Dependency
       _execute
     end
     def _execute
+
       cmd = "cd #{escape_path build_dir}; tar -xzvf #{escape_path @unzip_tarball.basename}"
       call_digraph_listeners(:shell, cmd)
       err = Home_::Library_::StringIO.new
-      bytes, seconds =  open2(cmd) do |on|
+
+      bytes, seconds = Home_.lib_.system.open2 cmd do | on |
         on.out { |s| call_digraph_listeners(:out, s) }
         on.err { |s| call_digraph_listeners(:err, s) ; err.write(s) }
       end
+
       if no = err.string.split("\n").grep(/unrecognized archive format/i).first
         call_digraph_listeners(:error, "Failed to unzip: #{no}")
         return false

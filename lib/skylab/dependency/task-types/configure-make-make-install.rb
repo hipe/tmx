@@ -2,8 +2,6 @@ module Skylab::Dependency
 
   class TaskTypes::ConfigureMakeMakeInstall < Home_::Task
 
-    Home_.lib_.open_2 self
-
     include Home_.lib_.system.filesystem.path_tools.instance_methods_module
     include Home_::TaskTypes::TarballTo::Constants
     attribute :configure_make_make_install
@@ -114,7 +112,9 @@ module Skylab::Dependency
       Home_::Library_.kick :StringIO
       out = Home_.lib_.proxy::Tee.new out: ui.out, buffer: ::StringIO.new
       err = Home_.lib_.proxy::Tee.new out: ui.err, buffer: ::StringIO.new
-      open2(cmd, out, err)
+
+      Home_.lib_.system.open2 cmd, out, err
+
       err[:buffer].rewind ; s = err[:buffer].read
       if "" != (s)
         _info "#{ohno 'nope:'} expecting empty string from stderr output, assuming build failed. had:"

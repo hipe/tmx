@@ -27,7 +27,7 @@ to say is more interesting to us..
 
 what happened was, we started exploring the ideas therein while writing that
 essay, and then realized how bad sub-client was in its current implementation
-(and at some point wrote about how we are [#fa-030] trending away from
+(and at some point wrote about how we are [#br-099.A] trending away from
 sub-client), and once we were convinced of how awful it was then we began to
 rip it out of headless, wanting instead to propagate this bold new mechanism
 of expression agents far and wide, replacing all this sub-client smell

@@ -59,3 +59,10 @@ context in the block when called.
 `data` as similar to above, but what is assumed of the block is that it
 produces some arbitrary `x` that the client must do something with
 (typically "manually").
+
+
+
+
+#### :[#.C]
+
+(this normalization point, does nothing out of the box)

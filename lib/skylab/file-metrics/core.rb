@@ -37,7 +37,7 @@ module Skylab::FileMetrics
       HL__[].expression_agent.NLP_EN_agent
     end
 
-    Face_top = Face__ = sidesys[ :Face ]
+    Face__ = sidesys[ :Face ]
 
     HL__ = sidesys[ :Headless ]
 
@@ -75,10 +75,6 @@ module Skylab::FileMetrics
     end
 
     System_lib__ = sidesys[ :System ]
-
-    System_open2 = -> mod do
-      mod.include Face__[]::Open2
-    end
 
     Test_support = sidesys[ :TestSupport ]
   end

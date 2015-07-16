@@ -19,7 +19,7 @@ going to restructure the hierarchy - restructuring the document hierarchy
 should not require changes to code that references those doc-nodes.
 
 for example, we actually had a doc-point reference that looked like this:
-"[#fa-api-api-fa-003]". if you know what the initials stand for (and they
+"[#ss-api-api-ss-003]". if you know what the initials stand for (and they
 are each local to that node they are in) then you might be able to induce
 that it reads: "face / API / API API / facets / issue 003". "what's wrong
 with that?" you might ask. well for one thing:
@@ -89,7 +89,7 @@ the structure from the #parent tag, and then will look for the files in the
 appropriate places.
 
 3) now that we are back to a flat numberspace, we can again refer simply
-to [#fa-007] and not need to say [#sp-foo-bar-baz], which is neither good
+to e.g [#ss-123] and not need to say [#sp-foo-bar-baz], which is neither good
 nor bad in itself. (also the space therebetween on this spectrum of good
 and bad sort of became the unintended focus of this whole dalliance.)
 

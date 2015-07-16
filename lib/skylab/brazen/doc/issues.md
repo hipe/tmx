@@ -1,3 +1,4 @@
+[#099]       [ branch node for historical documents ]
 [#096] #open the (CLI) table narrative ..
 [#095]       features that [fa] has that you don't #universal
 [#094]       expression agents adjunct notes ..
@@ -56,7 +57,7 @@
              the syntax smarter without bloating it.
              ( #was: #done marshal issue near regexps with escape-looking sequences )
 [#063]       [ isomorphicisms and emergent interfaces ]
-               [fa] near [#fa-006], [#gv-030] sets the stage nicely)
+               [fa] near [ CLI revelation gone ], [#gv-030] sets the stage nicely)
 [#062]       #doc-node the zerk narrative ..
 [#061]       #tracking-tag `members` as a universal thing
 [#060]       #tracking ways we customize CLI action adapter rendering customization

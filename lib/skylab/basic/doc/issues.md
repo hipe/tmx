@@ -12,7 +12,6 @@
 [#038]       [ the visual testing CLI client ]
              ( #was: [ trio ] )
 [#037] #open make digraph a box
-             ( was: #doc-node the new normal ( #IN: [#fa-019] woah! ) )
 [#036]       #parent-node: [#027] #tracking-tag the idea of a curried normalizer
 [#035]       #doc-node the range narrative ..
 [#034]       #doc-node the module narrative .. #tracking-tag module math

@@ -1,4 +1,8 @@
-# all about 'arity' as it pertains to metafields :[#024]
+# the arity exegesis :[#090]
+
+
+(EDIT: moved here from [fa] before it sunsetted. some parts are
+likely stale but overall is hopefully still legit.)
 
 
 ## introduction to `arity` thru the case study of "parameter arity"

@@ -8,11 +8,7 @@ module Skylab::TMX
   -> o, h do
 
     o[ :bin_path ] = Callback_.memoize do
-      Autoloader_.require_sidesystem( :System ).services.defaults.bin_path
-    end
-
-    o[ :bin_pathname ] = Callback_.memoize do
-      Autoloader_.require_sidesystem( :System ).services.defaults.bin_pathname
+      Home_.lib_.services.defaults.bin_path
     end
 
     o[ :binfile_prefix ] = Callback_.memoize do
@@ -27,8 +23,9 @@ module Skylab::TMX
   end.call( * -> do
 
     h = {}
+    sc = singleton_class
     o = -> i, p do
-      singleton_class.send :define_method, i, p
+      sc.send :define_method, i, p
       h[ i ] = p
     end
     o.singleton_class.send :alias_method, :[]=, :call
@@ -43,39 +40,31 @@ module Skylab::TMX
     end
   end
 
+  class << self
+
+    define_method :application_kernel_, ( Callback_.memoize do
+      Home_.lib_.brazen::Kernel.new Home_
+    end )
+
+    def lib_
+      @___lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+        self::Lib_, self )
+    end
+
+  end  # >>
+
   Autoloader_ = Callback_::Autoloader
 
-  module CLI  # #stowaway
-    def self.new *a
-      self::Client.new( *a )
-    end
-    Autoloader_[ self ]
-  end
-
-  CLI_Client_ = -> do
-    Lib_::Face__[]::CLI::Client
-  end
-
   module Lib_
-    sidesys = Autoloader_.build_require_sidesystem_proc
-    Constantize = -> i do
-      Callback_::Name.lib.constantize i
-    end
-    Distill = -> i do
-      Callback_::Distill_[ i ]
-    end
-    Face__ = sidesys[ :Face ]
-    Proxy_lib = -> do
-      Callback_::Proxy
-    end
-    Pathnames = -> do
-      Subsystem__[]::PATHNAMES
-    end
-  end
 
-  DASH_ = '-'.freeze
-  EMPTY_S_ = ''.freeze
-  TMX = self  # not 'TMX_', just for aesthetics
+    sidesys, _stdlib = Autoloader_.at(
+      :build_require_sidesystem_proc,
+      :build_require_stdlib_proc )
+
+    Brazen = sidesys[ :Brazen ]
+  end
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
+  Home_ = self
 end

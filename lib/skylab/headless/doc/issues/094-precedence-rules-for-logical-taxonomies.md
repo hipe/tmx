@@ -77,7 +77,7 @@ loaded all at once & lazily (on-demand). we may now see individual "facets"
 (as a logical unit) that are comprised of multiple bundles. anyway, "facet"
 is itself an "axis".
 
-(as well there are (perhaps unrelated) [#080], [#fa-025] other treatments
+(as well there are (perhaps unrelated) [#080] other treatments
 of this term "facet".)
 
 

@@ -2,8 +2,6 @@ module Skylab::Dependency
 
   class TaskTypes::VersionFrom < Home_::Task
 
-    Home_.lib_.open_2 self
-
     attribute :must_be_in_range
     attribute :parse_with
     attribute :show_version, :from_context => true, :boolean => true
@@ -60,10 +58,16 @@ module Skylab::Dependency
     end
 
     def parse_version_string
+
       @parse_with and @regex = build_regex(@parse_with)
       buffer = Home_::Library_::StringIO.new
       read = lambda { |s| buffer.write(s) }
-      open2(version_from) { |on| on.out(&read); on.err(&read) }
+
+      Home_.lib_.system.open2 version_from do | o |
+        o.out( & read )
+        o.err( & read )
+      end
+
       str = buffer.rewind && buffer.read
       if @regex and @regex =~ str
         [$1, true]

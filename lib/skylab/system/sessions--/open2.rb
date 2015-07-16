@@ -1,16 +1,18 @@
 require 'open3'
 
-module Skylab::Face  # :[#003]
+module Skylab::System
+
+  class Sessions__::Open2  # :[#025].
+
+    # ancient thing that's too simple to throw out, but not yet reconciled
 
   # read both stdout and stderr of a system command without blocking
   # (this is superseded by [#sy-006] IO select,
   # and was probably its inspiration without knowing it)
   #
 
-  module Open2
-    extend self
-
-    class Handler
+    Models_ = ::Module.new
+    class Models_::Handler
       [:out, :err].each do |out|
         define_method(out) { |&b| instance_variable_set("@_#{out}", b) }
         attr_accessor "_#{out}"
@@ -19,19 +21,31 @@ module Skylab::Face  # :[#003]
 
     NUM_BYTES = 4096
 
-    def open2 cmd, sout=nil, serr=nil, &b
+    def initialize cmd_s_a, any_sout, any_serr, & x_p
+
+      @cmd_s_a = cmd_s_a
+      @serr = any_serr
+      @sout = any_sout
+      @x_p = x_p
+    end
+
+    def execute
+
       _STDOUT = ::STDOUT ; _STDERR = ::STDERR
-      on = Handler.new
-      sout and on.out { |s| sout.write(s) }
-      serr and on.err { |s| serr.write(s) }
-      if block_given?
-        if b.arity == 1
-          b.call on
+      on = Models_::Handler.new
+      @sout and on.out { |s| @sout.write(s) }
+      @serr and on.err { |s| @serr.write(s) }
+
+      p = @x_p
+      if p
+        if 1 == p.arity
+          p[ on ]
         else
-          on.instance_eval(&b)
+          on.instance_exec( & p )
         end
       end
-      if sout.nil? and serr.nil? and b.nil?
+
+      if @sout.nil? and @serr.nil? and p.nil?
         require 'stringio'
         omnibuffer = ::StringIO.new
         on.out { |s| omnibuffer.write(s) }
@@ -40,9 +54,10 @@ module Skylab::Face  # :[#003]
         on._out.nil? and on.out { |s| _STDOUT.write(s) ; _STDERR.flush }
         on._err.nil? and on.err { |s| _STDERR.write(s) ; _STDERR.flush }
       end
+
       bytes = 0
-      time = Time.now
-      ::Open3.popen3(cmd) do |sin, _sout, _serr|
+      time = ::Time.now
+      ::Open3.popen3( * @cmd_s_a ) do |sin, _sout, _serr|
         open = [ { :in => _serr, :out => :_err }, { :in => _sout, :out => :_out } ]
         loop do
           open.each_with_index do |s, idx|
@@ -69,7 +84,7 @@ module Skylab::Face  # :[#003]
         end
       end
       omnibuffer and omnibuffer.rewind and return omnibuffer.read
-      [bytes, Time.now - time]
+      [bytes, ::Time.now - time]
     end
   end
 end

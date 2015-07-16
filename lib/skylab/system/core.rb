@@ -50,6 +50,10 @@ module Skylab::System
         _common( :IO )
       end
 
+      def open2 cmd_s_a, sout=nil, serr=nil, & x_p
+        Home_::Sessions__::Open2.new( cmd_s_a, sout, serr, & x_p ).execute
+      end
+
       def which s
         _common( :Which ).call s
       end
