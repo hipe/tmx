@@ -16,9 +16,9 @@ module Skylab::BNF_2_Treetop
     module Client
       ::Skylab::TMX::Front_Loader::One_shot_adapter_[ self,
         -> program_name, i, o, e, argv do
-          cli = ::Skylab::Bnf2Treetop::CLI.new o, e
-          cli.program_name = program_name
-          cli.invoke argv
+
+          _cli = ::Skylab::Bnf2Treetop::CLI.new i, o, e, program_name
+          _cli.invoke argv
         end ]
     end
   end

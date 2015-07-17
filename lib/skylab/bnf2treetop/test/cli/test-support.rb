@@ -28,16 +28,38 @@ module Skylab::Bnf2Treetop::TestSupport
       end
     end
   end
+
   module CLI::ModuleMethods
+
+    MOCK_INTERACTIVE_STDIN___ = -> do
+      o = ::Module.new
+      Mock_Interactive_STDIN___ =  o
+      def o.tty?
+        false
+      end
+      o
+    end.call
+
     def invoke *argv, &output_p
+
       ::Hash === argv.last and tags = argv.pop # BE CAREFUL!!!!
-      let(:_frame) do
+
+      let :_frame do
+
         errstream = TestSupport_::IO.spy.new
         outstream = TestSupport_::IO.spy.new
-        cli = Home_::CLI.new(outstream, errstream)
-        cli.program_name = 'bnf2treetop'
+
+        cli = Home_::CLI.new(
+          MOCK_INTERACTIVE_STDIN___,
+          outstream,
+          errstream,
+          '/no-see/bnf2treetop'
+        )
+
         o = ::Struct.new(:debug_p, :err_p, :out_p).new  # :+[#hl-078] "shell"
+
         o.debug_p = ->{ outstream.debug!; errstream.debug! }
+
         collapsed_p = -> do
           oo = ::Struct.new(:err, :out, :result).new
           oo.result = cli.invoke argv
@@ -45,12 +67,17 @@ module Skylab::Bnf2Treetop::TestSupport
           oo.err = errstream.string.split("\n")
           (collapsed_p = ->{ oo }).call
         end
+
         o.err_p = ->{ collapsed_p.call.err }
         o.out_p = ->{ collapsed_p.call.out }
         o
       end
-      output_p and make_an_example_out_of(output_p, * [tags].compact)
+
+      if output_p
+        make_an_example_out_of output_p, * tags
+      end
     end
+
     def make_an_example_out_of output_p, *a
       o = ::BasicObject.new
       labels = []
