@@ -1,5 +1,0 @@
-#!/usr/bin/env ruby -w
-
-require_relative '../lib/skylab/git/core'
-
-Skylab::Git::CLI::Actions::Spread.new( $stdin, $stdout, $stderr ).invoke ARGV
