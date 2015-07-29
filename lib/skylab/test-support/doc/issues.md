@@ -7,7 +7,7 @@
 [#039]       #parent-node: [#030] #tracking a `Subject_` parameter function
 [#038]       expect line
 [#037]       #tracking tag warnings wishlist (#parent-node: [#014])
-[#036]       make lexical scope deeper in quickie main document.
+[#036] #ongoing   indentation in quickie
 [#035]       track the ways in which sidesystems expose test insturments
 [#034] #open #parent-node: [015] "re-architect.."
 [#033]       #historical #done fix test globbing .. [#xx-009]
@@ -20,7 +20,8 @@
              ( #was: #done #universal while regret no longer wires test nodes for autoloading  )
 [#030] #open #parent-node:[#015] the doc-test recursive spec needs mock fs
 [#029]       #tracking-tag the 'expect' omnibus and narrative ..
-[#028] #open #instances-tagged autoloading related ..
+[#028]       [ "possible" ]
+             ( #was: #done borked quickie architecture near constants )k
 [#027]       #parent-node: [#015] peek hack explained .. (was templo)
 [#026]       #parent-node: [#015] the view-controller narrative ..
 [#025]       #parent-node: [#015] output adapters.
@@ -35,9 +36,11 @@
 [#016]       #parent-node:[#017] why we do not include parent anchor module..
 [#015]       #doc-node the doc-test narrative ..
 [#014]       #parent-node: [#015] how nodes are generated ..
-[#013]       #historical #done #inquiry-point choke point etc (#relates-to [#ts-013]) ([#xx-004]))
+[#013]       #historical #done #inquiry-point choke point etc
+               (#relates-to [#ts-013]) ([#xx-004]))
              #done 351 extra tests (but this issue 2 states ago .. oh boy)
-[#012]       #doc-point #in-situ (the particular importance of result values) (was: [#xx-006])
+[#012]       #doc-point #in-situ (the particular importance of result values)
+             ( #was: [#xx-006] )
              ( #was: #done #parent-node: [#015] setup vs example? )
 [#011]       #tracking-tag fix 'test/' - 'TestSupport' for autoloading?
 [#010]       #tracking-tag "dark hack" this one weird old trick makes ..

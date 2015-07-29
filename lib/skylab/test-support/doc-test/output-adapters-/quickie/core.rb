@@ -399,7 +399,7 @@ module Skylab::TestSupport
 
       def _any_result_for_write_to_line_downstream_whole_string whole_string
 
-        o = Home_::Lib_::Basic[]::String.line_stream whole_string
+        o = Home_.lib_.basic::String.line_stream whole_string
 
         bytes = 0 ; lines = 0
         while line = o.gets

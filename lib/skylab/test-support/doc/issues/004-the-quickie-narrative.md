@@ -132,15 +132,6 @@ once ever for the life of the platform runtime.
 
 
 
-## :#storypoint-285
-
-the client is created one per test run. it manages
-UI, parsing the request to run the tests, creating a test runtime,
-and initiating the test run on the object graph.
-
-
-
-
 ## :#storypoint-465 (method)
 
 this is kind of derky mostly because we jump through hoops to accomplish two

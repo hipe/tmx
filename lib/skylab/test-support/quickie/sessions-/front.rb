@@ -2,9 +2,13 @@ module Skylab::TestSupport
 
   module Quickie
 
-    module Possibilities__
+    class Sessions_::Front
 
-      Quickie::Possible_::Graph[ self ]
+      # <-
+
+    module Possibilities___
+
+      Here_::Possible_::Graph[ self ]
 
       BEGINNING = eventpoint
 
@@ -31,19 +35,25 @@ module Skylab::TestSupport
       end
     end
 
-    POSSIBLE_GRAPH_ = Possibilities__.possible_graph  # protected-not-private
+    # ->
 
-    class Front__
+      POSSIBLE_GRAPH = Possibilities___.possible_graph
 
-      def initialize svc
-        @paystream = @infostream = @y = nil
-        svc.attach_client_notify self
-        @svc = svc
+      def initialize dae
+
+        dae.receive_mixed_client_ self
+
+        @_daemon = dae
+        @infostream = nil
+        @paystream = nil
+        @plugins = nil
         @program_moniker = nil
+        @x_a_a = nil
+        @y = nil
       end
 
       def _svc
-        @svc  # #hacks-only
+        @_daemon  # #hacks-only
       end
 
       attr_writer :do_recursive, :program_moniker
@@ -56,10 +66,10 @@ module Skylab::TestSupport
 
       def invoke argv
 
-        _p = QuicLib_::Function_chain[
+        _p = Home_.lib_.function_chain(
 
           -> do
-            ready_plugins
+            load_plugins
           end,
 
           -> do
@@ -69,7 +79,8 @@ module Skylab::TestSupport
           -> sig_a do
 
             produce_bound_call_via_sig_a sig_a
-          end ]
+          end,
+        )
 
         bc = _p[]
         if bc
@@ -79,16 +90,16 @@ module Skylab::TestSupport
 
       #  ~ services that plugins want ~
 
-      def paystream
-        @paystream || @svc.paystream  # may be mounted under a supernode
+      def paystream_
+        @paystream || @_daemon.paystream_  # may be mounted under a supernode
       end
 
       def y
-        @y ||= ::Enumerator::Yielder.new( & infostream.method( :puts ) )
+        @y ||= ::Enumerator::Yielder.new( & infostream_.method( :puts ) )
       end
 
-      def infostream
-        @infostream || @svc.infostream
+      def infostream_
+        @infostream || @_daemon.infostream_
       end
 
       def program_moniker
@@ -103,20 +114,20 @@ module Skylab::TestSupport
       attr_reader :x_a_a
 
       def get_test_path_a  # #reach-down
-        @plugins[ :run_recursive ].client.get_any_test_path_a
+        @plugins[ :run_recursive ].dependency_.get_any_test_path_a
       end
 
       def to_test_path_stream
-        @plugins[ :run_recursive ].client.to_test_path_stream
+        @plugins[ :run_recursive ].dependency_.to_test_path_stream
       end
 
       def replace_test_path_s_a path_s_a
-        @plugins[ :run_recursive ].client.replace_test_path_s_a path_s_a
+        @plugins[ :run_recursive ].dependency_.replace_test_path_s_a path_s_a
       end
 
-      def add_context_class_and_resolve ctx
+      def receive_context_class__ ctx
         # when the files start loading, this is the hookback
-        @executor.add_context_class_and_resolve_notify ctx
+        @executor.receive_context_class___ ctx
       end
 
       def moniker_
@@ -140,24 +151,52 @@ module Skylab::TestSupport
       end
 
       def usage
-        @plugins[ :help ].client.usage
+        @plugins[ :help ].dependency_.usage
         nil
       end
 
       #  ~ plugin mechanics ~
 
-      def ready_plugins
-        ( @plugins ||= Quickie::Plugin__::Box.new self, Quickie::Plugins ).
-          ready
+      def load_plugins
+
+        if @plugins
+          self._STATE_FAILURE
+        else
+          col = __build_plugins_collection
+          if col
+            @plugins = col
+            ACHIEVED_
+          else
+            UNABLE_
+          end
+        end
+      end
+
+      def __build_plugins_collection
+
+        mod = ::Module.new
+        Here_.const_set :Plugins, mod  # :+#stowaway
+        Autoloader_[ mod, :boxxy ]
+        col = Here_::Plugin_::Collection.new self, mod
+        ok = col.load_all__
+        if ok
+          col
+        else
+          ok
+        end
       end
 
       def parse_argv argv
 
-        _p = QuicLib_::Function_chain[  # #todo - this thing is .. bad
+        _p = Home_.lib_.function_chain(
+
           -> { collect_signatures argv },
-          -> sig_a { check_if_argv_is_completely_parsed sig_a } ]
+
+          -> sig_a { check_if_argv_is_completely_parsed sig_a },
+        )
 
         _array_of_one_element = _p[]
+
         if _array_of_one_element
           [ true, _array_of_one_element ]
         end
@@ -165,7 +204,7 @@ module Skylab::TestSupport
 
       def collect_signatures argv
         argv_ = argv.dup.freeze
-        a = @plugins._a.map { |pi| pi.prepare argv_ }
+        a = @plugins.a_.map { |pi| pi.prepare argv_ }
         if a.any?
           [ true, a ]
         elsif argv.any?
@@ -178,7 +217,9 @@ module Skylab::TestSupport
       end
 
       def check_if_argv_is_completely_parsed sig_a  # assume any
-        scn = QuicLib_::Stream[ sig_a ] ; g = nil
+
+        g = nil
+        scn = Callback_::Scn.try_convert sig_a
         until (( g = scn.gets )) ; end
         xtra_a = ::Array.new g.input.length, true
         begin  # ( bitwise OR )
@@ -203,7 +244,7 @@ module Skylab::TestSupport
 
       def produce_bound_call_via_sig_a sig_a
         begin
-          r, path = POSSIBLE_GRAPH_.reconcile_with_path_or_failure @y,
+          r, path = POSSIBLE_GRAPH.reconcile_with_path_or_failure @y,
             :BEGINNING, :FINISHED, sig_a
           r or break
           path_a = path.get_a
@@ -223,10 +264,19 @@ module Skylab::TestSupport
       end
 
       def via_executor_produce_bound_call
-        e = Quickie::Execute__.new @y, get_test_path_a do |q|
-          x_a_a and set_quickie_options q
+
+        e = Here_::Sessions_::Execute.new(
+
+          @y, get_test_path_a, @_daemon.program_name_string_array_
+
+        ) do | q |
+
+          if @x_a_a
+            set_quickie_options q
+          end
         end
-        e.be_verbose = @plugins[ :run_recursive ].client.be_verbose
+
+        e.be_verbose = @plugins[ :run_recursive ].dependency_.be_verbose
         @executor = e
         e.produce_bound_call
       end
@@ -239,8 +289,8 @@ module Skylab::TestSupport
 
       def emit_eventpoint eventpoint_i
         ok = true
-        ep = POSSIBLE_GRAPH_.fetch_eventpoint eventpoint_i
-        @plugins._a.each do |pi|
+        ep = POSSIBLE_GRAPH.fetch_eventpoint eventpoint_i
+        @plugins.a_.each do |pi|
           (( sig = pi.signature )) or next
           if sig.subscribed_to? ep
             r = pi.eventpoint_notify ep
@@ -250,34 +300,5 @@ module Skylab::TestSupport
         ok
       end
     end
-
-    module QuicLib_
-
-      parent = Home_::Lib_
-
-      Basic = parent::Basic
-
-      Function_chain = -> * p_a do
-        Basic[]::Function.chain p_a
-      end
-
-      Match_test_dir_proc = -> do
-        Home_.constant( :TEST_DIR_NAME_A ).method :include?
-      end
-
-      Oxford_and = Callback_::Oxford_and
-
-      Oxford_or = Callback_::Oxford_or
-
-      Stream = Lib_::Stream
-
-      Tree = -> do
-        Basic[]::Tree
-      end
-    end
-
-    CEASE_ = false
-    CONTINUE_ = nil
-    SEP_ = '/'.freeze
   end
 end

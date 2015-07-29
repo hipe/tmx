@@ -2,7 +2,7 @@ module Skylab::TestSupport
 
   module Quickie
 
-    module Possible_
+    module Possible_  # :[#028].
 
       class Graph
 

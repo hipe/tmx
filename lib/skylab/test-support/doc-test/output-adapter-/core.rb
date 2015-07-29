@@ -182,7 +182,7 @@ module Skylab::TestSupport
 
         def write_to_stream_string_line_by_line line_downstream, string
 
-          o = Home_::Lib_::Basic[]::String.line_stream string
+          o = Home_.lib_.basic::String.line_stream string
 
           while s = o.gets
             s.chomp!

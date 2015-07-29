@@ -2,8 +2,6 @@ module Skylab::TestSupport
 
   module Quickie
 
-    self::Front__.class  # #open :+[#028]
-
     module Possible_
 
       module Articulators__
@@ -17,14 +15,14 @@ module Skylab::TestSupport
               when 0 ; 'no'
               when 1 ; 'the only'
               when 2 ; 'both of the'
-              else   ; "all #{ QuicLib_::Basic[]::Number::EN.number n } of"
+              else   ; "all #{ Home_.lib_.basic::Number::EN.number n } of"
               end
             end,
             exclusive: -> n do
               case n
               when 0 ; 'no'
               when 1 ; 'the only'
-              else   ; "none of the #{ QuicLib_::Basic[]::Number::EN.number n }"
+              else   ; "none of the #{ Home_.lib_.basic::Number::EN.number n }"
               end
             end
           }.freeze
@@ -40,10 +38,6 @@ module Skylab::TestSupport
           "express transitions of the same strength from #{
             }#{ The_state_[ ep ] }"
         end ]
-
-        And_ = QuicLib_::Oxford_and
-
-        Or_ = QuicLib_::Oxford_or
 
         Bring_ = o[ -> ep, a, inclusion_i do
           excl = :exclusive == inclusion_i
@@ -83,10 +77,11 @@ module Skylab::TestSupport
         end ]
 
         Had_no_effect_ = o[ -> ep_a do
-          "will have no effect because the system does not reach #{
-            Or_[ ep_a.map( & The_state_ ) ] }"
-        end ]
 
+          _ = Callback_::Oxford_or[ ep_a.map( & The_state_ ) ]
+
+          "will have no effect because the system does not reach #{ _ }"
+        end ]
 
         Reach_ = o[ -> ep do
           "cannot reach #{ The_state_[ ep ] }"
@@ -105,11 +100,17 @@ module Skylab::TestSupport
         end
 
         Transition_ = o[ -> fep, tep do
-          x = if (( a = fep.to_a ))
-            " (#{ Ep_[ fep ] } goes to #{ And_[ a.map( & :node_i ) ] })"
+
+          a = fep.to_a
+          x = if a
+
+            _ = Callback_::Oxford_and[ a.map( & :node_i ) ]
+
+            " (#{ Ep_[ fep ] } goes to #{ _ })"
               else
             " (#{ Ep_[ fep ] } does not transition to any other nodes)"
               end
+
           "expresses an invalid transition from #{ Ep_[ fep ] } to #{
             }#{ Ep_[ tep ] }#{ x }"
         end ]

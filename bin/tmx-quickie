@@ -3,6 +3,23 @@
 require_relative '../lib/skylab'
 require 'skylab/test-support/core'
 
-run = Skylab::TestSupport::Quickie.active_session
-run.do_recursive = true
-run.invoke ::ARGV
+program = -> i, o, e, pn_a, argv, & p do
+
+  dae = Skylab::TestSupport::Quickie.start_daemon_using(
+    i, o, e, pn_a )
+
+  p[ dae ]
+
+  dae.receive_argv argv
+
+end
+
+if __FILE__ == $PROGRAM_NAME
+
+  program.call $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV do | dae |
+    dae.listen
+  end
+
+else
+  Skylab::Quickie = program
+end

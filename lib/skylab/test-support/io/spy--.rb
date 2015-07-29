@@ -13,7 +13,7 @@ module Skylab::TestSupport
     end
   end
 
-  class IO::Spy__ < Home_::Lib_::IO[]::Mappers::Tee  # :[#023] ..
+  class IO::Spy__ < Home_.lib_.IO::Mappers::Tee  # :[#023] ..
 
     class << self
 

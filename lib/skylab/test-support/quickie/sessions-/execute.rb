@@ -2,11 +2,14 @@ module Skylab::TestSupport
 
   module Quickie
 
-    class Execute__
+    Sessions_ = ::Module.new
 
-      def initialize y, test_file_path_a
+    class Sessions_::Execute
+
+      def initialize y, test_file_path_a, pn_s_a
         @ctx_class_a = []
         @ok = true
+        @_pn_s_a = pn_s_a
         @tag_shell = nil
         @tag_filter_p = MONADIC_TRUTH_
         @test_file_path_a = test_file_path_a
@@ -31,7 +34,7 @@ module Skylab::TestSupport
         ok && via_client_produce_bound_call
       end
 
-      def add_context_class_and_resolve_notify ctx_class
+      def receive_context_class___ ctx_class
         @ctx_class_a << ctx_class
         nil
       end
@@ -132,13 +135,16 @@ module Skylab::TestSupport
       end
 
       def via_client_produce_bound_call
-        Bound_Call__.new @client, :execute
+        Bound_Call__.new @client, :execute_
       end
       Bound_Call__ = ::Struct.new :receiver, :method_name, :args
 
       def build_client
+
         a = @ctx_class_a ; @ctx_class_a = nil
-        cli = Client_.new @y, :no_root_context
+
+        cli = Run_.new @y, :no_root_context, @_pn_s_a
+
         cli.tag_filter_p = @tag_filter_p
         cli.example_producer_p = -> branch, leaf do
           p = nil
@@ -146,7 +152,7 @@ module Skylab::TestSupport
             if p
               true
             elsif a.length.nonzero?
-              p = Example_producer_[ a.shift, branch, leaf ]
+              p = Build_example_producer_function_[ a.shift, branch, leaf ]
               true
             end
           end

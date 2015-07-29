@@ -45,11 +45,14 @@ module Skylab::TestSupport
       def beginning_eventpoint_notify
         usage
         @y << "options:"
-        Home_.lib_.CLI_table(
-          :field, :field, :left, :show_header, false,
+        Home_.lib_.brazen::CLI::Expression_Frames::Table::Actor.call(
+
+          :field,
+          :field, :left,
+          :header, :none,
           :left, '  ', :sep, '     ', :right, EMPTY_S_,
           :write_lines_to, @y,
-          :read_rows_from, @svc.plugins._a.reduce( [] ) do |row_a, p|
+          :read_rows_from, @svc.plugins.a_.reduce( [] ) do |row_a, p|
             Multiline_column_B__[ row_a, p.syntax_moniker, p.some_desc_a ]
             row_a
           end )
@@ -77,10 +80,14 @@ module Skylab::TestSupport
     private
 
       def get_syntax_string
+
         s_a = [ ] ; a_a = [ ]
-        @svc.plugins._a.each do |p|
-          s = p.client.opts_moniker and s_a << s
-          s = p.client.args_moniker and a_a << s
+
+        @svc.plugins.a_.each do | pu |
+          s = pu.dependency_.opts_moniker and s_a << s
+          s and s_a.push s
+          s = pu.dependency_.args_moniker
+          s and a_a.push s
         end
         [
           ( "[#{ s_a * '] [' }]" if s_a.length.nonzero? ),

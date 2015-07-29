@@ -16,16 +16,6 @@ module Skylab::TestSupport
 
       Basic = sidesys[ :Basic ]
 
-      CLI_table = -> * x_a do
-        if x_a.length.zero?
-          Face__[]::CLI::Table
-        else
-          Face__[]::CLI::Table[ * x_a ]
-        end
-      end
-
-      Face__ = sidesys[ :Face ]
-
       Human  = sidesys[ :Human ]
 
       HL__ = sidesys[ :Headless ]
@@ -40,7 +30,7 @@ module Skylab::TestSupport
         ::OptionParser
       end
 
-      Plugin___ = sidesys[ :Plugin ]
+      Tree_Runner::Plugin___ = sidesys[ :Plugin ]
 
       System = -> do
         System_lib__[].services
@@ -52,7 +42,7 @@ module Skylab::TestSupport
 
     # ~
 
-    Plugin_ = Lib_::Plugin___[]::Digraphic
+    Plugin_ = Plugin___[]::Digraphic
 
     class Plugins__::Express_Help < Plugin_
 

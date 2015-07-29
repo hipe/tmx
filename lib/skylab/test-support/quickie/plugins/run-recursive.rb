@@ -2,8 +2,6 @@ module Skylab::TestSupport
 
   module Quickie
 
-    self::Front__.class  # #open :+[#028]
-
     class Plugins::RunRecursive
 
       def initialize svc
@@ -85,7 +83,12 @@ module Skylab::TestSupport
 
       def get_any_test_path_a
         # assume that pathfinder worked and the eventpoint path is working..
-        (( a = @test_path_a )) ? a.dup : a
+        a = @test_path_a
+        if a
+          a.dup
+        else
+          a
+        end
       end
 
       def to_test_path_stream
@@ -94,7 +97,7 @@ module Skylab::TestSupport
 
       def replace_test_path_s_a path_s_a
         @test_path_a = path_s_a
-        CONTINUE_
+        ACHIEVED_
       end
 
       def before_execution_eventpoint_notify
@@ -104,18 +107,33 @@ module Skylab::TestSupport
     private
 
       def find_contiguous_range_of_paths argv
-        scn = QuicLib_::Stream[ argv ]
-        while (( tok = scn.gets ))
-          Dash_[ tok ] or break( a = scn.index )
-        end
-        if a
-          b = 1
-          while (( tok = scn.gets ))
-            Dash_[ tok ] and break
-            b += 1
+
+        scn = Callback_::Scn.try_convert argv
+
+        begin
+          tok = scn.gets
+          tok or break
+          _yes = Dash_[ tok ]
+          if ! _yes
+            d = scn.index
+            break
           end
+          redo
+        end while nil
+
+        if d
+          d_ = 1
+          begin
+            tok = scn.gets
+            tok or break
+            _ok = Dash_[ tok ]
+            _ok and break
+            d_ += 1
+            redo
+          end while nil
         end
-        [ a, b ]
+
+        [ d, d_ ]
       end
 
       def ready_test_path_a
@@ -124,8 +142,13 @@ module Skylab::TestSupport
       end
 
       def my_get_any_test_path_a
-        found_all = true ; lg = local_glob
-        p = QuicLib_::Basic[]::String.build_proc_for_string_ends_with_string _spec_rb
+
+        found_all = true
+        lg = local_glob
+
+        p = Home_.lib_.basic::String.build_proc_for_string_ends_with_string(
+          _spec_rb )
+
         path_a = @input_path_a.reduce [] do |m, path|
           if p[ path ]
             m << path
@@ -152,10 +175,11 @@ module Skylab::TestSupport
       end
 
       def files_not_found path
-        _mkr = @svc._svc._host.moniker_
-        @y << "#{ _mkr }found no #{ @local_glob } files #{
+
+        @y << "#{ @svc.client_moniker }found no #{ @local_glob } files #{
           }under \"#{ path }\""
-        nil
+
+        NIL_
       end
     end
   end

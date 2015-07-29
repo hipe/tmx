@@ -151,7 +151,7 @@ module Skylab::TestSupport
         end
 
         def produce_matchdata
-          @scn = Home_::Lib_::Basic[]::List.line_stream @span.a
+          @scn = Home_.lib_.basic::List.line_stream @span.a
           @line = @scn.rgets
           when_first_line
           matchdata_via_looking_at_every_remaining_line

@@ -68,7 +68,7 @@ module Skylab::TMX::TestSupport::CLI::L2P
       go :permute
     end
 
-    it "quickie" do
+    it "quickie", wip: true do
       go :'quickie', FLAG_
     end
 

@@ -40,7 +40,7 @@ module Skylab::TestSupport  # :[#021].
     end.call
 
     def lib_
-      @lib ||= Home_::Lib_::INSTANCE
+      @___lib ||= Home_::Lib_::INSTANCE
     end
 
     def spec_rb

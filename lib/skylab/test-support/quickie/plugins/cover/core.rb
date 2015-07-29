@@ -32,7 +32,7 @@ module Skylab::TestSupport
       end
 
       def before_execution_eventpoint_notify
-        Quickie::Plugins::Cover::Worker__.new( @svc ).execute
+        Here_::Plugins::Cover::Worker__.new( @svc ).execute
       end
     end
   end

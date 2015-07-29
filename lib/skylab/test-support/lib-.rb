@@ -33,32 +33,12 @@ module Skylab::TestSupport
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
-    _Face = sidesys[ :Face ]
-
-    API = -> do
-      _Face[]::API
-    end
-
-    API_normalizer_lib = -> do
-      _Face[]::API::Normalizer_
-    end
-
-    API_normalizer = API_normalizer_lib
-
     Basic = sidesys[ :Basic ]
 
     Brazen = sidesys[ :Brazen ]
 
     Box = -> do
       Basic[]::Box.new
-    end
-
-    CLI_client_base_class = -> do
-      _Face[]::CLI::Client
-    end
-
-    CLI_table = -> * x_a do
-      _Face[]::CLI::Table.call_via_iambic x_a
     end
 
     Default_core_file = -> do
@@ -72,6 +52,10 @@ module Skylab::TestSupport
 
     Enhancement_shell = -> * i_a do
       Plugin[]::Bundle::Enhance::Shell.new i_a
+    end
+
+    Function_chain = -> * p_a do
+      Basic[]::Function.chain p_a
     end
 
     Permute = sidesys[ :Permute ]
@@ -88,12 +72,6 @@ module Skylab::TestSupport
       _Snag[]::Models::Hashtag
     end
 
-    Heavy_plugin_lib = -> do
-      _Face[]::Plugin
-    end
-
-    Heavy_plugin = Heavy_plugin_lib
-
     Iambic_scanner = -> do
       Callback_::Polymorphic_Stream
     end
@@ -107,6 +85,13 @@ module Skylab::TestSupport
     Levenshtein = -> * x_a do
       _Hu[]::Levenshtein.call_via_iambic x_a
     end
+
+    Match_test_dir_proc = -> do
+      mtdp = nil
+      -> do
+        mtdp ||= Home_.constant( :TEST_DIR_NAME_A ).method( :include? )
+      end
+    end.call
 
     Name_from_const_to_method = -> i do
       Callback_::Name.lib.methodize i
@@ -136,10 +121,6 @@ module Skylab::TestSupport
     Stderr = -> { ::STDERR }  # [#001.E]: why access system resources this way
 
     Stdout = -> { ::STDOUT }
-
-    Stream = -> x do
-      Callback_::Scn.try_convert x
-    end
 
     Struct = -> * i_a do
       Basic[]::Struct.make_via_arglist i_a

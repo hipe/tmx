@@ -2,8 +2,6 @@ module Skylab::TestSupport
 
   module Quickie
 
-    self::Front__.class  # #open :+[#028]
-
     class Plugins::Cover::Worker__
 
       def initialize svc
@@ -24,9 +22,10 @@ module Skylab::TestSupport
     private
 
       def when_there_is_one_path
-        @path_s = @path_a.fetch 0 ; @path_a = nil
-        @lcbp_a = @path_s.split( SEP_ )
-        @test_dir_idx = @lcbp_a.index( & QuicLib_::Match_test_dir_proc[] )
+        @path_s = @path_a.fetch 0
+        @path_a = nil
+        @lcbp_a = @path_s.split ::File::SEPARATOR
+        @test_dir_idx = @lcbp_a.index( & Home_.lib_.match_test_dir_proc[] )
         if @test_dir_idx
           money_for_single_path
         else
@@ -51,6 +50,7 @@ module Skylab::TestSupport
           }can't generate coverage for path - #{ @path_s })"
         UNABLE_
       end
+
       UNABLE_ = false
 
       def when_there_are_multiple_paths
@@ -70,7 +70,12 @@ module Skylab::TestSupport
       end
 
       def when_lcbp_is_nonzero_in_length
-        if ( @test_dir_idx = @lcbp_a.index( & QuicLib_::Match_test_dir_proc[] ))
+
+        _p = Home_.lib_.match_test_dir_proc
+
+        @test_dir_idx = @lcbp_a.index( & _p )
+
+        if @test_dir_idx
           when_found_test_directory
         else
           when_failed_to_find_test_directory
@@ -78,31 +83,65 @@ module Skylab::TestSupport
       end
 
       def when_failed_to_find_test_directory
-        @y << "(failed to find test directory - #{ @lcbp_a * SEP_ })"
+        @y << __say_failed_to_find
         UNABLE_
+      end
+
+      def __say_failed_to_find
+        "(failed to find test directory - #{ @lcbp_a * ::File::SEPARATOR })"
       end
 
       def when_found_test_directory
         @lcbp_a[ @test_dir_idx, 1 ] = EMPTY_A_
-        path_prefix = procure_any_pth_prefix_from_LCBP @lcbp_a * SEP_
+        path_prefix = procure_any_pth_prefix_from_LCBP @lcbp_a * ::File::SEPARATOR
         path_prefix and start_service_with_path_prefix path_prefix
       end
 
       def procure_any_pth_prefix_from_LCBP longest_common_base_path
-        pn = ::Pathname.new( longest_common_base_path ).expand_path
+
+        path = ::File.expand_path longest_common_base_path
         tried_a = nil
+
         begin
-          SEP_ == pn.instance_variable_get( :@path ) and break( did_fail = true )
-          pn.directory? and break
-          (( pn_ = pn.sub_ext Autoloader_::EXTNAME )).exist? and break
-          (( tried_a ||= [] )) << pn_
-          pn = pn.dirname
+
+          if ::File::SEPARATOR == path
+            did_fail = true
+            break
+          end
+
+          if ::File.directory? path
+            break
+          end
+
+          if ::File.extname( path ).length.zero?
+
+            corefile_as_nipple = "#{ path }#{ Autoloader_::EXTNAME }"
+
+            if ::File.exist? corefile_as_nipple
+              break
+            end
+
+            ( tried_a ||= [] ).push corefile_as_nipple
+
+            corefile_as_corefile = ::File.join(
+              path, Home_.lib_.default_core_file )
+
+            if ::File.exist? corefile_as_corefile
+              break
+            end
+
+            tried_a.push corefile_as_corefile
+          end
+
+          path = ::File.dirname path
+
           redo
-        end while true
+        end while nil
+
         if did_fail
           reprt_failure_to_find_business_path longest_common_base_path, tried_a
         else
-          pn.to_s
+          path
         end
       end
 
@@ -114,9 +153,13 @@ module Skylab::TestSupport
       end
 
       def reprt_tried_these_paths tried_a
-        _a = tried_a.reduce [] do |m, x|
-          m << QuicLib_::Pretty_path[ x ]
+
+        p = Home_.lib_.system.filesystem.path_tools.pretty_path
+
+        _a = tried_a.reduce [] do | m, x |
+          m.push p[ x ]
         end
+
         @y << "(there is no #{ _a * ', ' })" ; nil
       end
 
@@ -126,7 +169,7 @@ module Skylab::TestSupport
       end
 
       def resolve_stderr_IO
-        @svc._svc._host._svc.infostream  # #todo
+        @svc.infostream
       end
 
       Longest_common_base_path__ = -> do  # becase we are covering that
@@ -154,7 +197,7 @@ module Skylab::TestSupport
         end
 
         nonzero = -> path_a do
-          res_a = [] ; path_a_a = path_a.map { |x| x.split SEP_ }
+          res_a = [] ; path_a_a = path_a.map { |x| x.split ::File::SEPARATOR }
           visit = visitor_p[ path_a_a, res_a ]
           nil while visit[]
           res_a

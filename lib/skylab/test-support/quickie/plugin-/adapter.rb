@@ -2,93 +2,142 @@ module Skylab::TestSupport
 
   module Quickie
 
-    class Plugin__::Adapter_
+    Plugin_ = ::Module.new
 
-      def initialize const_i, kls, svc
-        @const_i = const_i ; @kls = kls ; @svc = svc
-        @client = kls.new self
+    class Plugin_::Adapter
+
+      # this two-way adapter provides a consistent interface for both
+      # the plugin dependency to its client and the client to the plugin.
+
+      def initialize cool_pool, col, client, box_mod
+
+        @_box_mod = box_mod
+        @_collection = col
+        @_client = client
+        @_cool_pool = cool_pool
       end
 
-      #  ~ mechanics, reflection & services ~
-
-      def plugin_i
-        @plugin_i ||= LIB_.name_from_const_to_method @const_i
+      def new const
+        otr = dup
+        otr.__init const
+        otr
       end
 
-      def intern  # #comport with the `client_x` articulation API of possible-
-        plugin_i
+      def __init const
+
+        @_const = const
+        @_dependency = @_box_mod.const_get( const, false ).new self
+        @_signature = nil
+        NIL_
       end
 
-      attr_reader :client, :signature
+      # ~ comport with [#028]
 
-      def syntax_moniker
-        a = [ ] ; c = @client
-        o = c.opts_moniker
-        r = c.args_moniker
-        if o
-          r and o = "[#{ o }]"
-          a << o
-        end
-        r and a << r
-        a.length.zero? and a << plugin_i.to_s
-        a * SPACE_
+      def intern
+        plugin_symbol
       end
 
-      def some_desc_a
-        a = [ ]
-        @client.desc a
-        a
+      # ~ for client to query / mutate state of dependency
+
+      def eventpoint_notify ep
+        @_dependency.send ep.eventpoint_notify_method_name
       end
 
-      def add_iambic x_a
-        @svc.add_iambic x_a ; nil
+      def signature
+        @_signature
       end
-
-      def _svc  # #hacks-only
-        @svc
-      end
-
-      #  ~ eventpoint-ish-es the plugin gets ~
 
       def prepare input_x
-        sig = POSSIBLE_GRAPH_.new_graph_signature self, input_x.dup
-        x = @client.prepare sig
+
+        sig = Here_::Sessions_::Front::POSSIBLE_GRAPH.
+          new_graph_signature self, input_x.dup
+
+        x = @_dependency.prepare sig
         if x
-          @signature = sig
+          @_signature = sig
         end
         x
       end
 
-      def eventpoint_notify ep
-        @client.send ep.eventpoint_notify_method_name
+      def dependency_
+        @_dependency
       end
 
-      # ~
+      def syntax_moniker
 
-      SERVICES_THAT_PLUGINS_WANT__ = %i(
-        get_test_path_a
-        paystream
-        plugins
-        program_moniker
-        to_test_path_stream
-        y ).freeze
-
-      SERVICES_THAT_PLUGINS_WANT__.each do |i|
-        define_method i do
-          @svc.send i
+        a = []
+        dep = @_dependency
+        om = dep.opts_moniker
+        am = dep.args_moniker
+        if om
+          if am
+            om = "[#{ om }]"
+          end
+          a.push om
         end
+        if am
+          a.push am
+        end
+        if a.length.zero?
+          a.push plugin_symbol.id2name
+        end
+        a * SPACE_
+      end
+
+      def plugin_symbol
+        @___plugin_symbol ||= LIB_.name_from_const_to_method @_const
+      end
+
+      # ~ for the dependency (alphab.)
+
+      def add_iambic x_a
+        @_client.add_iambic x_a
+      end
+
+      def client_moniker
+        @_client.moniker_
       end
 
       def build_fuzzy_flag a
-        @svc.build_fuzzy_flag a
+        @_cool_pool.build_fuzzy_flag a
       end
 
       def build_required_arg_switch a
-        @svc.build_required_arg_switch a
+        @_cool_pool.build_required_arg_switch a
       end
 
-      def replace_test_path_s_a path_s_a
-        @svc.replace_test_path_s_a path_s_a
+      def get_test_path_a
+        @_client.get_test_path_a
+      end
+
+      def infostream
+        @_client.infostream_
+      end
+
+      def paystream
+        @_client.paystream_
+      end
+
+      def plugins
+        @_collection
+      end
+
+      def program_moniker
+        @_client.program_moniker
+      end
+
+      def replace_test_path_s_a s_a
+        @_client.replace_test_path_s_a s_a
+      end
+
+      def some_desc_a
+        a = []
+        @_dependency.desc a
+        a
+      end
+
+      def y
+        @_client.y
       end
     end
   end

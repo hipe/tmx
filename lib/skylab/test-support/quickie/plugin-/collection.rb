@@ -2,88 +2,73 @@ module Skylab::TestSupport
 
   module Quickie
 
-    class Plugin__::Box
+    class Plugin_::Collection
 
       def initialize host, mod
-        @a =  nil
-        @cool_pool = Cool_Pool__.new host.y
+        @a = nil
+        @__cool_pool = Cool_Pool__.new host.y
         @h = nil
-        @host = host ; @mod = mod
+        @host = host
+        @mod = mod
       end
 
       def _host  # #hacks-only
         @host
       end
 
-      def ready
-        @a ||= Get_const_i_a_[ @mod ].map do |const_i|
-          Plugin__::Adapter_.
-            new( const_i, @mod.const_get( const_i, false ), self )
-        end
-        true
-      end
-
-      Get_const_i_a_ = -> mod do
-        ::Dir[ "#{ mod.dir_pathname }/*#{ Autoloader_::EXTNAME }" ].
-            reduce [] do |m, path|
-          m << LIB_.name_from_path_to_const(
-            ::Pathname.new( path ).basename.sub_ext EMPTY_S_ )
-        end
-      end
-
-      def _a
+      def a_
         @a
       end
 
+      def _init_hash  # assume @h is nil
+
+        ok = if @a
+          ACHIEVED_
+        else
+          load_all__
+        end
+
+        if ok
+          h = {}
+          @a.each_with_index do | pu, d |
+            h[ pu.plugin_symbol ] = d
+          end
+          @h = h
+        else
+          @h = ok
+        end
+        NIL_
+      end
+
+      def load_all__
+        a = __build_array
+        if a
+          @a = a
+          ACHIEVED_
+        else
+          a
+        end
+      end
+
+      def __build_array
+
+        mod = @mod
+
+        proto = Plugin_::Adapter.new @__cool_pool, self, @host, @mod
+
+        mod.constants.map do | const |
+          proto.new const
+        end
+      end
+
       def keys
-        @h.nil? and ready_h
+        @h.nil? && _init_hash
         @h.keys
       end
 
       def [] i
-        @h.nil? and ready_h
+        @h.nil? && _init_hash
         @a.fetch( @h.fetch i )
-      end
-
-      # ~
-
-      SERVICES_THAT_PLUGINS_WANT__ = %i(
-        get_test_path_a
-        paystream
-        program_moniker
-        to_test_path_stream
-        y )
-
-      SERVICES_THAT_PLUGINS_WANT__.each do |i|
-        define_method i do @host.send i end
-      end
-
-      def build_fuzzy_flag a
-        @cool_pool.build_fuzzy_flag a
-      end
-
-      def build_required_arg_switch a
-        @cool_pool.build_required_arg_switch a
-      end
-
-      def plugins
-        self
-      end
-
-      def replace_test_path_s_a path_s_a
-        @host.replace_test_path_s_a path_s_a
-      end
-
-      def add_iambic x_a
-        @host.add_iambic x_a ; nil
-      end
-
-    private
-
-      def ready_h  # assume @h is nil
-        @h = if ready then
-          ::Hash[ @a.each_with_index.map { |x, idx| [ x.plugin_i, idx ] } ]
-        else false end
       end
 
       # ~
