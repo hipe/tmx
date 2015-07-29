@@ -1,9 +1,53 @@
-slicer              q [ done ]  (1/6)
-file-metrics        q [ done ]  (2/6)
-"sub-tree"          q [ done ]  (3/6)
-git                 q [ done ]  (4/6)
-beauty-salon        q [ done ]  (5/6)
-tmx                 q [ TODO ]  (6/6)
+./assess              -
+./autobleed           -
+./basic               -
+./beauty-salon        -
+./bnf2treetop         -
+./brazen              -
+./callback            -
+./code-molester       -
+./css-convert         -
+./cull                -
+./dependency          -
+./fields              -
+./file-metrics        -
+./flex2treetop        -
+./git                 -
+./git-viz             -
+./headless            -
+./human               -
+./kurse               -
+./parse               -
+./permute             -
+./plugin              -
+./script              -
+./slake               -
+./slicer              -
+./snag                -
+./sub-tree            -
+./system              -
+./tan-man             -
+./test-support        -
+./tmx                 -
+./treemap             -
+./yacc2treetop        -
 
-  • oh my god how great will it be
-_
+breakout              -
+breakup               -
+citxt                 -
+doc-test              ..
+git-head              -
+git-unrename          -
+grh                   -
+onoff                 -
+partition             -
+quickie               TODO
+resequence-numbers    -
+sg-doc-normalize      -
+shallowify            -
+slide-numbers         -
+test-stash-untracked  GONE
+uncommit              -
+ungood                -
+unsplit               GONE
+xargs-ish-i           -

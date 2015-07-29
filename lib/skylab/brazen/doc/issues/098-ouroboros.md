@@ -1,36 +1,102 @@
-module Skylab::Face
+# ouroboros - a snake eating its own tail is a thing in cultures :[#098]
 
-  module Home_::CLI::Client::Adapter::For::Face
 
-    Hotmm_ = -> slug, lo_class, arg_sht_p do  # hot maker maker
-      -> hi_svcs, _slug_used_str=nil do
-        pna = hi_svcs.get_normal_invocation_string_parts
-        pna << slug
-        h = {
-          out: ( hi_svcs.ostream or fail "sanity - out?" ),
-          err: ( hi_svcs.estream or fail "sanity - err?" ),
-          program_name: ( pna * ' ' ),
-          sheet: arg_sht_p[]
-        }
-        lo_class.new( h ).instance_variable_get :@mechanics
-      end
-    end
+## introduction
 
-    module Of
+the whole idea of everything is that we can assemble "reactive units"
+together like legos to make "macro" applications from modular pieces.
 
-      Sheet = -> hi_sheet, lo_sheet do
-        Home_::CLI::Client::Namespace_::Adapter::For::Face::Ouroboros_Sheet[
-          hi_sheet, lo_sheet ]
-      end
+for this to work, we want these units to behave equally well
+whether they are the root or a child node of a tree.
 
-      class Hot
-      end
-      def Hot.[] hi_sheet, lo_cli_class
-        Hotmm_[ hi_sheet.name.as_slug, lo_cli_class,
-                 -> { Sheet[ hi_sheet, lo_cli_class.story ] } ]
-      end
-      Hot.singleton_class.send :alias_method, :call, :[]
-    end
+
+
+
+## about this document
+
+this document bridges together content whose sources are years apart. as
+it stands now, it is not yet fully integrated into one seemless
+narrative. not all the dots below are connected as they should be..
+
+
+
+
+## some history
+
+the "classic" model of our applications is something like this: a
+top-level "invocation" (or just "client") is something like a branch
+node, made up of nothing but child nodes.
+
+each child node at this level, in turn, is (typically) yet another
+branch node. finally, *its* children are each (terminal, "leaf" node)
+actions or other branch nodes.
+
+at a concpetual level at least, each one of the would-be classes for
+these nodes descends from and/or is composited from each other:
+an application is one big giant action; an action is one little tiny
+appication, and so on:
+
+                 +-----+    +---------+    +--------+
+                 | app |--<>|  model  |--<>| action |
+                 +-----+    +---------+    +--------+
+                                |              ^
+                                +--------------+
+
+
+    fig. 1 - in the classical (er) model, an app has many "model" nodes.
+    each model node has mnay actions. the model and app (not pictured)
+    are themselves like actions.
+
+classically, exceptions could be made to these truisms: it is possible
+to make an application (call it a utilit) that consists of nothing more
+than one action, etc.
+
+(historical interjection: what we now call "model" we used to call
+"namespace". we let the old name remain in the historical text below
+because there is still some semantic merit to it as a name.)
+
+let's say you have an application with a total of five terminal commands,
+and four of them are nested accross two namespaces. your graph might be:
+
+
+
+                                 +-[ act1 ]
+                                 |
+                       +-[ ns1 ]-+-[ act2 ]
+                       |
+               [ app ]-+-[ ns1 ]-+-[ act3 ]
+                       |         |
+                       |         +-[ act4 ]
+                       |
+                       +-----------[ act5 ]
+
+    fig. 2 - a typical small-sized application topology
+
+
+
+
+
+## boundaries :[#.A]
+
+in a "reactive tree", typically these sorts of resources are shared:
+
+  • a filesystem
+  • stdin, stdout, stderr
+  • an environment (as in variables)
+  • ARGV (provided your pipeline plays along)
+
+and typically these sorts of components are not:
+
+  • the invocation array of slugs
+  • event handling logic
+
+
+
+
+
+## for posterity, the original comment -
+
+( This grain of sand is all that remains of the once vast [fa] empire: )
 
     # here we have "ouroboros" - a particular hot action's particular sheet
     # is a very important thing - it determines all of the below properties
@@ -51,54 +117,3 @@ module Skylab::Face
     # the two sides of the duality:
     #   tail = surface   = extrinsic = outer = higher = upper = hi
     #   head = intrinsic = intrinsic = inner = lower  = lower = lo )
-
-    class Of::Hot  # this is a generic base class used elsewhere
-
-      # def `get_summary_a_from_sheet` - you do this one
-
-      def initialize ns_sheet, my_client_class, mechanics
-        @ns_sheet, @my_client_class, @mechanics =
-          ns_sheet, my_client_class, mechanics
-      end
-
-      def pre_execute
-        did = false
-        @actual ||= begin
-          did = true
-          cli = @my_client_class.new( * @mechanics.three_streams )
-          cli.program_name = get_anchored_program_name
-          cli
-        end
-        did or fail "sanity - pre-execute should not be called > once"
-        true
-      end
-
-      def is_visible  # when would you want an invisible ouroboros agent
-        true
-      end
-
-      def invokee  # short-circuit the face CLI API early
-        @actual
-      end
-
-      def help
-        @actual.invoke [ '--help' ]
-      end
-
-      def name
-        @ns_sheet.name
-      end
-
-    private
-
-      def get_anchored_program_name
-        get_anchored_program_name_separated_by ' '
-      end
-
-      def get_anchored_program_name_separated_by sep
-        [ * @mechanics.get_normal_invocation_string_parts,
-          @ns_sheet.name.as_variegated_symbol ] * sep
-      end
-    end
-  end
-end
