@@ -1,0 +1,71 @@
+#!/usr/bin/env ruby -w
+
+      work = nil
+      program = -> i, o, e, pn_a, argv do
+
+        if argv.length.zero?
+
+          work[ i, o ]
+
+        else
+
+          o = ::Enumerator::Yielder.new do | s |
+            e.puts s
+          end
+
+          if 1 == argv.length && %w( -h --help ).include?( argv.first )
+
+o << "synopsis: filter the upstream such that rather than using newlines, the"
+o << "          items are separated with spaces, while still streaming."
+o << nil
+o << "          (there is some clever shell way of doing this - this work is"
+o << "          an :+#idea-kitestring on finding that.)"
+o << nil
+
+            es = 0
+          else
+            es << "unexpected: #{ argv.first.inspect }"
+            es = 5
+          end
+
+          _pn = [ ::File.basename( pn_a.first ), * pn_a[ 1 .. -1 ] ].join ' '
+
+          o << "usage: #{ _pn }"
+
+          es
+        end
+      end
+
+      work = -> up, down do
+
+        _SP = ' '
+
+        p = -> s do
+
+          down.write s
+          p = -> s_ do
+            down.write "#{ _SP }#{ s_ }"
+          end
+        end
+
+        begin
+          s = up.gets
+          s or break
+          s.chomp!
+          p[ s ]
+          redo
+        end while nil
+
+        down.write "\n"
+
+        0
+      end
+
+if __FILE__ == $PROGRAM_NAME
+
+  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+
+else
+
+  Skylab::No_line_breaks = program
+end
