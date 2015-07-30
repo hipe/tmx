@@ -1,61 +1,103 @@
-module Skylab::Headless
+module Skylab::Plugin
 
-  module Bundles__::Delegating  # read [#060] #storypoint-505 introduction
+  module Delegation
 
-    Absorb_Passivley = -> x_a, mod do
-      pi = PI__.new x_a, mod
+    Actors_ = ::Module.new  # see [#010] #storypoint-505
+
+    Actors_::Edit = -> mod, st do
+
+      pi = Phrase_Interpreter__.new st, mod
+
       begin
+
+        if st.no_unparsed_exists
+          break
+        end
+
         if pi
-          _did = pi.absorb_any_sub_phrases
-          _did and next
-        end
-        dpi = Delegating::Delegating_Phrase_Interpreter.new x_a
-        _did = dpi.interpret_any_delegating_phrase
-        _did or break
-        pi &&= nil
-        bldr = dpi.resolve_some_builder
-        dpi.resolve_some_method_name_a.each do |i|
-          mod.send :define_method, i, bldr.build_method( i )
-        end
-      end while x_a.length.nonzero?
-    end
-
-    class PI__ < Delegating::Phrase_Interpreter
-      def initialize x_a, mod
-        @mod = mod
-        super x_a
-      end
-    private
-      def employ_the_DSL_method_called_delegates_to=
-        @mod.singleton_class.module_exec( & Define_delegates_to_method__ ) ; nil
-      end
-    end
-
-    Define_delegates_to_method__ = -> do
-    private
-      def delegates_to delegatee_i, * method_i_a
-        method_i_a.each do |m_i|
-          define_method m_i do | * a, & p |
-            send( delegatee_i ).send m_i, * a, & p
+          _did = pi.absorb_any_sub_phrases_
+          if _did && st.no_unparsed_exists
+            break
           end
         end
+
+        pi_ = Delegating_Phrase_Interpreter_.new st
+
+        _did = pi_.interpret_any_delegating_phrase
+        _did or break
+
+        pi = nil
+
+        bu = pi_.resolve_some_builder
+
+        pi_.some_method_name_array.each do | sym |
+
+          mod.send :define_method, sym, bu.build_method( sym )
+        end
+
+        redo
+      end while nil
+
+      if st.unparsed_exists
+        raise ::ArgumentError, "unrecognized: #{ Strange_[ st ] }"
       end
     end
 
-    class Builder_with_if
-      def self.[] if_p, builder
-        new( if_p, builder )
+    class Phrase_Interpreter__ < Phrase_Interpreter_
+
+      def initialize st, mod
+        @mod = mod
+        super st
       end
-      def initialize if_p, blder
-        @if_p = if_p ; @bldr = blder
+
+    private
+
+      def employ_the_DSL_method_called_delegates_to=
+
+        @mod.module_exec do
+          define_singleton_method :delegates_to, DELEGATES_TO_METHOD___
+          class << self
+            private :delegates_to
+          end
+        end
+        KEEP_PARSING_
       end
-      def build_method i
-        norm_p = @bldr.build_normalized_proc i
-        if_p = @if_p
-        -> *a, &p do
+    end
+
+    DELEGATES_TO_METHOD___ = -> dependency_method_name, * method_i_a do
+
+      method_i_a.each do | m |
+
+        define_method m do | * a, & p |
+
+          send( dependency_method_name ).send m, * a, & p
+        end
+      end
+    end
+
+    class Actors_::Build_builder_with_if
+
+      class << self
+        alias_method :[], :new
+      end
+
+      def initialize if_p, up
+
+        @_up = up
+        @_p = if_p
+      end
+
+      def build_method m
+
+        p = @_up.build_normal_proc m
+        if_p = @_p
+
+        -> *a, & x_p do
+
           _yes = instance_exec( & if_p )
+
           if _yes
-            instance_exec a, p, & norm_p
+            instance_exec a, x_p, & p
           end
         end
       end

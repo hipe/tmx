@@ -1,28 +1,8 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::Headless::TestSupport::Bundles::Delegating
+module Skylab::Plugin::TestSupport::Delegation_TS
 
-  describe "[hl] bundle: delegating - shallow" do
-
-    it "'delegate' lets you delegate simply" do
-
-        class Base_simple_Surface
-          def foo ; :FOO end
-          def bar ; :BAR end
-        end
-
-        class Client_simple_Surface
-          Home_::Delegating[ self ]
-          delegate :foo, :bar
-          def initialize x
-            super
-          end
-        end
-
-        cli = Client_simple_Surface.new Base_simple_Surface.new
-        cli.foo.should eql :FOO
-        cli.bar.should eql :BAR
-    end
+  describe "[pl] delegation - 03: central features" do
 
     it "'if' adds a conditional to the delegation (nil when falseish)" do
 
@@ -32,8 +12,8 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
         end
 
         class Client_if_Surface
-          Home_::Delegating[ self ]
-          delegating :if, -> { is_ready }, :foo,
+          Subject_[ self ]
+          delegate :if, -> { is_ready }, :foo,
             :if, -> { is_ready }, :bizzle
 
           attr_accessor :is_ready
@@ -54,8 +34,8 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
         end
 
         class Client_to_method_Surface
-          Home_::Delegating[ self ]
-          delegating :to_method, :bar, :foo
+          Subject_[ self ]
+          delegate :to_method, :bar, :foo
         end
 
         _cli = Client_to_method_Surface.new Base_to_method_Surface.new
@@ -68,8 +48,8 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
 
       begin
         class Client_Not_Multiple_to_method_Surface
-          Home_::Delegating[ self ]
-          delegating :to_method, :bar, %i( frik frak )
+          Subject_[ self ]
+          delegate :to_method, :bar, %i( frik frak )
         end
       rescue ::ArgumentError => e
       end
@@ -81,20 +61,28 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
         class Base_Purple_to_meth_Suface
           def foo ; :FOO end
         end
+
         class Base_Green_to_meth_Surface
           def bar ; :BAR end
         end
+
         class Client_to_meth_Surface
-          Home_::Delegating[ self ]
-          delegating :to, :purple, %i( foo ),
+
+          Subject_[ self ]
+
+          delegate :to, :purple, %i( foo ),
             :to, :green, %i( bar )
+
           def initialize
             @ppl = Base_Purple_to_meth_Suface.new
             @grn = Base_Green_to_meth_Surface.new
             super()
           end
+
         private
+
           def purple ; @ppl end
+
           def green ; @grn end
         end
 
@@ -112,8 +100,8 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
           def bar ; :BAR end
         end
         class Client_to_ivar_Surface
-          Home_::Delegating[ self ]
-          delegating :to, :@purple, %i( foo ),
+          Subject_[ self ]
+          delegate :to, :@purple, %i( foo ),
             :to, :@green, %i( bar )
 
           def initialize
@@ -135,8 +123,8 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
           def resolve_some_bar_for_client ; :BAR end
         end
         class Client_with_infix_Surface
-          Home_::Delegating[ self ]
-          delegating :with_infix, :resolve_some_, :_for_client,
+          Subject_[ self ]
+          delegate :with_infix, :resolve_some_, :_for_client,
             %i( foo bar )
         end
 
@@ -152,8 +140,8 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
           def bar_from_client ; :BAR end
         end
         class Client_with_suffix_Surface
-          Home_::Delegating[ self ]
-          delegating :with_suffix, :_from_client, %i( foo bar )
+          Subject_[ self ]
+          delegate :with_suffix, :_from_client, %i( foo bar )
         end
 
         cli = Client_with_suffix_Surface.new Base_with_suffix_Surface.new
