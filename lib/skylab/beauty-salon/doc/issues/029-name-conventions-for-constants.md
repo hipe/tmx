@@ -46,10 +46,10 @@ for public consumption. i.e if you don't like the way a name looks it
 probably doesn't like you either.
 
 names like these are optimized for refactorability and comprehensivenes
-though what they self-document. by seeing a const we immediately know
+through what they self-document. by seeing a const we immediately know
 two things from which we can infer many others:
 
-  1) through its shape we know rougly what it is and how we are
+  1) through its "shape" we know roughly what it is and how we are
      expected to interact with it.
 
   2) to be able to know its scope at a glance has two important

@@ -2,15 +2,18 @@
 
 # do a 'git rest HEAD~1' IFF the top commit has the string "wip" in it
 
-require 'open3'
+# (incidentally we now use a single-line shell macro for this)
 
-y = ::Enumerator::Yielder.new( & $stderr.method( :puts ) )
-
-_OK = 0
 _INPUT_ISSUE = 1
+_OK = 0
 _SCRIPT_ISSUE = 2
+y = nil  # EEK
 
-exitstatus = -> do
+_core_program = -> _, _, stderr, pn_s_a, argv do
+
+  require 'open3'
+
+  y = ::Enumerator::Yielder.new( & stderr.method( :puts ) )
 
   _exitstatus = nil ; did_bork = false
   say_bork = -> msg do
@@ -24,10 +27,20 @@ exitstatus = -> do
     did_bork = true ; _exitstatus = issue_d ; false
   end
 
-  if ::ARGV.length.nonzero?
-    y << "usage: #{ ::File.basename $PROGRAM_NAME }"
+  program_name = -> do
+    x = nil
+    p = -> do
+      x = [ ::File.basename( pn_s_a.first ), * pn_s_a[ 1 .. -1 ] ] * ' '
+    end
+    -> do
+      x || p[]
+    end
+  end.call
+
+  if argv.length.nonzero?
+    y << "usage: #{ program_name[] }"
     y << "description: does 'git reset HEAD~1' IFF \"wip\" appears in HEAD commit"
-    break bork[ _INPUT_ISSUE, "unexpected argument #{ ::ARGV[ 0 ].inspect }" ]
+    break bork[ _INPUT_ISSUE, "unexpected argument #{ argv[ 0 ].inspect }" ]
   end
 
   process3 = -> o, e, w, p do
@@ -100,13 +113,24 @@ exitstatus = -> do
   did_bork and break _exitstatus
   y << "stepped HEAD backwards by one commit. done."
   _OK
-end.call
-
-case exitstatus
-when _OK ; # nothing
-when _SCRIPT_ISSUE ; y << "please fix this script and try again."
-when _INPUT_ISSUE ; y << "please try again with correct input."
-else y << "sorry about the error (exitstatus #{ exitstatus })."
 end
 
-exit exitstatus
+program = -> i, o, e, pn_s_a, argv do
+
+  d = _core_program[ i, o, e, pn_s_a, argv ]
+
+  case d
+  when _OK ; # nothing
+  when _SCRIPT_ISSUE ; y << "please fix this script and try again."
+  when _INPUT_ISSUE ; y << "please try again with correct input."
+  else y << "sorry about the error (exitstatus #{ d })."
+  end
+
+  d
+end
+
+if __FILE__ == $PROGRAM_NAME
+  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+else
+  Skylab::Grh = program
+end

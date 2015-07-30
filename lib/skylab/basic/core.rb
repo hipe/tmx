@@ -182,6 +182,7 @@ module Skylab::Basic  # introduction at [#020]
   end
 
   ACHIEVED_ = true
+  CLI = nil  # for host
   Autoloader_ = Callback_::Autoloader
   Home_ = self
   EMPTY_A_ = [].freeze

@@ -26,7 +26,13 @@ module Skylab::Basic
         " at end of input"
       end
 
-      y << "expecting #{ or_ s_a }#{ _context }"
+      _expecting = if s_a.length.zero?
+        "no more input"
+      else
+        or_ s_a
+      end
+
+      y << "expecting #{ _expecting }#{ _context }"
     end
   end
 end

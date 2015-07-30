@@ -84,7 +84,7 @@ module Skylab::TestSupport
         s_a = [ ] ; a_a = [ ]
 
         @svc.plugins.a_.each do | pu |
-          s = pu.dependency_.opts_moniker and s_a << s
+          s = pu.dependency_.opts_moniker
           s and s_a.push s
           s = pu.dependency_.args_moniker
           s and a_a.push s

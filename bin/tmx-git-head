@@ -1,37 +1,38 @@
 #!/usr/bin/env ruby -w
 
 module Skylab
-  module Git
-    module CLI
-      module Actions
-      end
-    end
-    module API
-      module Actions
-      end
-    end
-  end
+  # this either is or isn't necessary based on whether there is a host
 end
-class Skylab::Git::CLI::Actions::Head  # read [#gi-011] the git.. narrative
 
-  def self.[] y, progname, argv
-    new( y, progname, argv ).execute
+module Skylab::Git_head
+
+  # read [#gi-011] the git.. narrative
+
+  def self.call i, o, e, pn_s_a, argv
+
+    CLI___.new( i, o, e, pn_s_a ).invoke argv
   end
-  The_CLI_Action_Class__ = self
-  class The_CLI_Action_Class__
-    def initialize y, progname, argv
-      @argv = argv ; @program_name = progname ; @y = y
-      # ~
+
+  class CLI___
+
+    def initialize i, o, e, pn_s_a
+
       @branch_name = nil
+      @pn_s_a = pn_s_a
+      @y = ::Enumerator::Yielder.new( & e.method( :puts ) )
     end
-    def execute
+
+    def invoke argv
+      @argv = argv
       _es = parse_opts_and_args
       _es || procede
     end
+
   private
+
     def parse_opts_and_args
       exitstatus = nil ; argv = @argv ; y = @y
-      usage_string = -> { "#{ @program_name } [opts] <file>" }
+      usage_string = -> { "#{ _program_name } [opts] <file>" }
       rr = nil
       op = Library_::OptionParser[].new do |o|
         help = -> _ do
@@ -57,7 +58,7 @@ class Skylab::Git::CLI::Actions::Head  # read [#gi-011] the git.. narrative
       end
       invite = -> msg=nil do
         y << msg if msg
-        y << "see #{ hi "#{ @program_name } -h" }"
+        y << "see #{ hi "#{ _program_name } -h" }"
         exitstatus = FAILED__
       end
       begin
@@ -76,13 +77,23 @@ class Skylab::Git::CLI::Actions::Head  # read [#gi-011] the git.. narrative
       end
       exitstatus
     end
+
     def hi s
       "\e[32m#{ s }\e[0m"
     end
+
+    def _program_name
+      @__pn ||= __build_program_name
+    end
+
+    def __build_program_name
+      [ ::File.basename( @pn_s_a.first ), * @pn_s_a[ 1 .. -1 ] ] * SPACE_
+    end
+
     def procede
-      Git::API::Actions::Head[ :y, @y,
+      ::Skylab::Git_head::Back[ :y, @y,
         :any_branch_name, @branch_name,
-        :path, @path_s, :progname, @program_name ]
+        :path, @path_s, :progname, _program_name ]
     end
 
     class RX_Replacer__
@@ -114,14 +125,17 @@ class Skylab::Git::CLI::Actions::Head  # read [#gi-011] the git.. narrative
     module Library_
       OptionParser = -> do require 'optparse' ; ::OptionParser end
     end
-    Git = ::Skylab::Git
+
     SUCCEEDED__ = 0 ; FAILED__ = 1
   end
-end
-class Skylab::Git::API::Actions::Head
+
+  class Back
+    # <-
+
   def self.[] * x_a
     new( x_a ).execute
   end
+
   The_API_Action_Class__ = self
   class The_API_Action_Class__
     def initialize x_a
@@ -368,7 +382,7 @@ class Skylab::Git::API::Actions::Head
         PROCEDE__
       end
       def exec_command
-        emit_info_string "executing: #{ @cmd_a * ' ' }"
+        emit_info_string "executing: #{ @cmd_a * SPACE_ }"
         execute_command_a_and_flsh_all
         @exitstatus.nonzero? ? @exitstatus : when_output_or_no_output
       end
@@ -453,7 +467,7 @@ class Skylab::Git::API::Actions::Head
         FAILED__
       end
       def exec_when_outpath_is_clear
-        emit_detail_string( @cmd_a * ' ' )
+        emit_detail_string( @cmd_a * SPACE_ )
         execute_command_a_and_flsh_all
         @exitstatus.nonzero? ? @exitstatus : when_output_or_no_output
       end
@@ -488,12 +502,19 @@ class Skylab::Git::API::Actions::Head
     DEFAULT_BRANCH_NAME__ = 'head'.freeze
     DEFAULT_BRANCH_NAME_PRETTY__ = DEFAULT_BRANCH_NAME__.upcase.freeze
 
-    FAILED__ = 1 ; PROCEDE__ = nil ; SUCCEEDED__ = 0
+    FAILED__ = 1
+    PROCEDE__ = nil
+    SUCCEEDED__ = 0
   end
+# ->
+  end
+
+  SPACE_ = ' '
 end
 
-if ::File.basename( __FILE__ ) == (( pn = ::File.basename( $PROGRAM_NAME ) ))
-  _y = ::Enumerator::Yielder.new( & $stderr.method( :puts ) )
-  _es = ::Skylab::Git::CLI::Actions::Head[ _y, pn, ::ARGV ]
-  exit _es
+if __FILE__ == $PROGRAM_NAME
+
+  Skylab::Git_head.call(
+
+    $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV )
 end

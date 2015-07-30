@@ -3,6 +3,21 @@ require 'skylab/callback/core'
 
 module Skylab::GitViz
 
+  class << self
+
+    def describe_into_under y, _
+      y << "awesome, simple tabular visualiztion of a repository over time"
+    end
+
+    def mock_FS
+      Home_.lib_.mock_system_lib::Mock_FS
+    end
+
+    def repository
+      Home_::VCS_Adapters_::Git.repository
+    end
+  end  # >>
+
   module CLI  # :+#stowaway
 
     class << self
@@ -17,21 +32,6 @@ module Skylab::GitViz
         client
       end
     end  # >>
-
-    # ~ begin :+#hook-out for tmx
-    Client = self
-    module Adapter
-      module For
-        module Face
-          module Of
-            Hot = -> x, x_ do
-              Home_.lib_.brazen::CLI::Client.fml Home_, x, x_
-            end
-          end
-        end
-      end
-    end
-    # ~ end
   end
 
   module API
@@ -56,14 +56,6 @@ module Skylab::GitViz
     def lib_
       @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
         self::Lib_, self )
-    end
-
-    def mock_FS
-      Home_.lib_.mock_system_lib::Mock_FS
-    end
-
-    def repository
-      Home_::VCS_Adapters_::Git.repository
     end
   end  # >>
 

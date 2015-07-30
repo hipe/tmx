@@ -11,16 +11,14 @@ we try to blur all kinds of lines in terms of what it means to be a root node.
 vs. a branch node vs. a leaf node; so tht we can build trees of trees, and
 so on.
 
-if nothing else, look at fig.2 of [#bs-044], which is an ASCII drawing
+if nothing else, look at fig.2 of [#br-098], which is an ASCII drawing
 of a client tree.
 
 
 
 ## ground already covered here
 
-reading our [#069] piece on ouroboros will set you off chasing a rabbit
-(but you might catch a snake (and if you are the snake, you might catch
-yourself)).
+([#br-098] ouroboros ..)
 
 
 
@@ -36,7 +34,7 @@ some comments at the end (one day this will be arranged appropriately enough
 into a grand tree of its own):
 
 • really the perfect illustration for the client tree model is in fig.2 of
-  [#bs-044] "ouroboros and strange modules".
+  [#br-098] "ouroboros and strange modules".
 
 • [#bs-040] the matryoshka doll UI pattern is its own detailed spin on the
   tree model (all of which is relevant to here, because it has the exact

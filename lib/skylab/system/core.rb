@@ -83,6 +83,7 @@ module Skylab::System
   Autoloader_[ Services___ = ::Module.new, :boxxy ]
 
   ACHIEVED_ = true
+  CLI = nil  # for host
   EMPTY_S_ = ''.freeze
   Home_ = self
   KEEP_PARSING_ = true

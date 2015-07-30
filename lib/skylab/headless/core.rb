@@ -12,6 +12,10 @@ module Skylab::Headless  # ([#013] is reserved for a core node narrative - no st
 
   class << self
 
+    def describe_into_under y, _
+      y << "SUNSETTING. it is an architectural flaw that you are seeing this"
+    end
+
     def expression_agent
       Home_::SubClient.expression_agent
     end

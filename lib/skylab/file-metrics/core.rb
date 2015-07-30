@@ -9,6 +9,10 @@ module Skylab::FileMetrics
       @___kr ||= Home_.lib_.brazen::Kernel.new Home_
     end
 
+    def describe_into_under y, _expag
+      y << "gathers and presents statistics about source lines of code & more"
+    end
+
     def lib_
       @___lib ||= Callback_.
         produce_library_shell_via_library_and_app_modules Lib_, self
@@ -33,13 +37,11 @@ module Skylab::FileMetrics
       Parse[]::DSL_DSL.enhance_module x, & p
     end
 
+    _HL = sidesys[ :Headless ]
+
     EN_agent = -> do
-      HL__[].expression_agent.NLP_EN_agent
+      _HL[].expression_agent.NLP_EN_agent
     end
-
-    Face__ = sidesys[ :Face ]
-
-    HL__ = sidesys[ :Headless ]
 
     Human = sidesys[ :Human ]
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w
 
-exit( -> sin, sout, serr, argv, program_name do
+program = -> sin, sout, serr, pn_s_a, argv do
 
   es = nil ; _OK = 0 ; _NOPE = 1
 
@@ -42,15 +42,23 @@ exit( -> sin, sout, serr, argv, program_name do
     pen = -> { pen_ } ; pen_
   end
 
+  _SPACE = ' '
+
   prog_name = -> do
-    ::File.basename program_name
-  end
+    x = nil
+    p = -> do
+      x = [ ::File.basename( pn_s_a.first ), * pn_s_a[ 1 .. -1 ] ] * _SPACE
+    end
+    -> do
+      x || p[]
+    end
+  end.call
 
   _ARGS = %w( replstr file-1 file-2 ).freeze
 
   usage_syntax = -> do
     pen[].calculate do
-      "[#{ o '-n'}] #{ _ARGS.map( & method( :ph ) ) * ' ' } #{ ph '[..]' }"
+      "[#{ o '-n'}] #{ _ARGS.map( & method( :ph ) ) * _SPACE } #{ ph '[..]' }"
     end
   end
 
@@ -71,18 +79,19 @@ exit( -> sin, sout, serr, argv, program_name do
     op_.on '-h', '--help', 'this screen.' do
       pen[].calculate do
         _USAGE = 'usage: '
-        _INDENT = ' ' * _USAGE.length
+        _INDENT = _SPACE * _USAGE.length
         y << "#{ lbl _USAGE }#{ prog_name[] } #{ usage_syntax[] }"
         y << nil
 
         _String_lib = subsystem[ :Basic ]::String
 
         _a = []
-        _a.push _CLI_lib[].cols -> { _DEFAULT_COLS }
+        # _a.push _CLI_lib[].cols -> { _DEFAULT_COLS }
+        _a.push _DEFAULT_COLS
         _a.push _MAX_COLS
         _cols = _a.min
 
-        yy = _String_lib.math.word_wrappers.crazy.curry '', _cols, y
+        yy = _String_lib.word_wrappers.crazy.curry '', _cols, y
 
         y << "#{ lbl 'description:' }"
         yy.indent = _INDENT
@@ -337,7 +346,7 @@ exit( -> sin, sout, serr, argv, program_name do
     def report_line_change lineno, prev, new
       hdr = "(line #{ lineno })"
       @y << "#{ hdr } < #{ prev }"
-      @y << "#{ ' ' * hdr.length } > #{ new }" ; nil
+      @y << "#{ _SPACE * hdr.length } > #{ new }" ; nil
     end
     self
   end
@@ -398,4 +407,10 @@ exit( -> sin, sout, serr, argv, program_name do
   y << "done changing #{ file_a.length } files#{ ' (dry)' if is_dry }."
 
   _OK
-end.call $stdin, $stdout, $stderr, ::ARGV, $PROGRAM_NAME )
+end
+
+if __FILE__ == $PROGRAM_NAME
+  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+else
+  Skylab::Resequence_numbers = program
+end

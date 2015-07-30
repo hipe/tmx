@@ -4,6 +4,10 @@ require 'skylab/brazen/core'
 
 module Skylab::Flex2Treetop  # see [#008] the narrative
 
+  def self.describe_into_under y, _
+    y << "attepts to convert a FLEX grammar into a treetop grammar"
+  end
+
   module CLI
 
     class << self
@@ -12,21 +16,6 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
         Brazen_::CLI.new_top_invocation a, Home_.application_kernel_
       end
     end  # >>
-
-    # ~ begin
-    Client = self
-    module Adapter
-      module For
-        module Face
-          module Of
-            Hot = -> x, x_ do
-              Brazen_::CLI::Client.fml Home_, x, x_
-            end
-          end
-        end
-      end
-    end
-    # ~ end
   end
 
   module API

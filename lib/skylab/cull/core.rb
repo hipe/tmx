@@ -2,6 +2,10 @@ require_relative '../callback/core'
 
 module Skylab::Cull
 
+  def self.describe_into_under y, _expag
+    y << "reduce a search space by a criteria - i.e helps make decisions"
+  end
+
   module API
 
     class << self

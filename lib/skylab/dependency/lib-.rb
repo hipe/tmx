@@ -8,26 +8,20 @@ module Skylab::Dependency
 
     Brazen = sidesys[ :Brazen ]
 
+    _HL = sidesys[ :Headless ]
+
     CLI_lib = -> do
-      HL___[]::CLI
+      _HL[]::CLI
     end
 
     CodeMolester__ = sidesys[ :CodeMolester ]
-
-    Face__ = sidesys[ :Face ]
 
     Home_dir_pn = -> do
       System_lib___[].services.environment.any_home_directory_pathname
     end
 
-    HL___ = sidesys[ :Headless ]
-
     Methodize = -> i do
       Callback_::Name.lib.methodize i
-    end
-
-    Open_2 = -> mod do
-      mod.send :include, Face__[]::Open2
     end
 
     Path_tools = -> do
@@ -40,11 +34,11 @@ module Skylab::Dependency
 
     Slake = sidesys[ :Slake ]
 
-    System = -> do
-      System_lib___[].services
-    end
+    _System = sidesys[ :System ]
 
-    System_lib___ = sidesys[ :System ]
+    System = -> do
+      _System[].services
+    end
   end
 
   module Library_  # :+[#su-001]

@@ -76,12 +76,6 @@ module Skylab::Plugin
       require 'optparse'
       ::OptionParser
     end
-
-    IN_MOTION_table_actor = -> * x_a do
-
-      _Face = Autoloader_.require_sidesystem :Face
-      _Face::CLI::Table.call_via_iambic x_a
-    end
   end
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
@@ -89,6 +83,7 @@ module Skylab::Plugin
   Autoloader_[ Bundle = ::Module.new ]
 
   ACHIEVED_ = true
+  CLI = nil  # for host
   DASH_ = '-'
   EMPTY_A_ = [].freeze
   Home_ = self

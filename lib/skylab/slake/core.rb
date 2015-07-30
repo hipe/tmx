@@ -25,7 +25,9 @@ module Skylab::Slake
     end
   end
 
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
+  CLI = nil  # for host
   Home_ = self
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 end

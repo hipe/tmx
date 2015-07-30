@@ -1,10 +1,8 @@
 #!/usr/bin/env ruby -w
 
-exit -> argv, stdin, stdout, stderr, program_name do
+program = -> stdin, stdout, stderr, pn_s_a, argv do
 
   y = ::Enumerator::Yielder.new( & stderr.method( :puts ) )
-
-  progname = -> { ::File.basename program_name }
 
   es = nil ; _OK = 0 ; _NO = 1  # exit statii
 
@@ -30,6 +28,18 @@ exit -> argv, stdin, stdout, stderr, program_name do
   be_verbose = is_dry = false
   match_whole_words = true
 
+  _SPACE = ' '
+
+  progname = -> do
+    x = nil
+    p = -> do
+      x = [ ::File.basename( pn_s_a.first ), * pn_s_a[ 1 .. -1 ] ] * _SPACE
+    end
+    -> do
+      x || p[]
+    end
+  end.call
+
   op = ::OptionParser.new do |o|
 
     o.on '-J str', "will use <str> as the digit placeholder in",
@@ -49,17 +59,18 @@ exit -> argv, stdin, stdout, stderr, program_name do
       argv.length.nonzero? and ignoring[]
       pen[].instance_exec do
         _USAGE = 'usage: '
-        _IND = ' ' * _USAGE.length
+        _IND = _SPACE * _USAGE.length
         y << "#{ lbl _USAGE } #{ progname[] } #{ syntax[] }"
         y << nil
 
         _CLI_lib = subsystem[ :Headless ]::CLI
         _String_lib = subsystem[ :Basic ]::String
 
-        _cols_ = _CLI_lib.cols -> { _DEFAULT_COLS }
+        # _cols_ = _CLI_lib.cols -> { _DEFAULT_COLS }
+        _cols_ = _DEFAULT_COLS
         _cols = [ _cols_, _MAX_COLS ].min
 
-        yy = _String_lib.math.word_wrappers.crazy.curry '', _cols, y
+        yy = _String_lib.word_wrappers.crazy.curry '', _cols, y
 
         yy << "#{ lbl 'description:' } #{ kw 'search' } is any string that #{
           }contains exactly one occurrence of #{ kw 'replstr' }."
@@ -127,7 +138,7 @@ exit -> argv, stdin, stdout, stderr, program_name do
   end
 
   ignoring = -> do
-    y << "(ignoring: \"#{ argv.shift( argv.length ) * ' ' }\")" ; nil
+    y << "(ignoring: \"#{ argv.shift( argv.length ) * _SPACE }\")" ; nil
   end
 
   invite_string = -> do
@@ -254,7 +265,7 @@ exit -> argv, stdin, stdout, stderr, program_name do
   report_change = -> occ, new_str do
     hdr = "(line %d)" % occ.lineno
     stderr.puts "#{ hdr } < #{ occ.match }"
-    stderr.puts "#{ ' ' * hdr.length } > #{ new_str }" ; nil
+    stderr.puts "#{ _SPACE * hdr.length } > #{ new_str }" ; nil
   end
 
   process_stream_pair = -> input_lines, output_stream, final_p do
@@ -312,4 +323,10 @@ exit -> argv, stdin, stdout, stderr, program_name do
   y << 'done.'
   _OK
 
-end[ ::ARGV, $stdin, $stdout, $stderr, $PROGRAM_NAME ]
+end
+
+if __FILE__ == $PROGRAM_NAME
+  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+else
+  Skylab::Slide_numbers = program
+end

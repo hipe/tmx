@@ -5,6 +5,10 @@ module Skylab::Permute
 
   class << self
 
+    def describe_into_under y, _
+      y << "display permutations. sort of a stalking horse frontier prorotype"
+    end
+
     def application_kernel_
 
       @___kr ||= Home_.lib_.brazen::Kernel.new Home_

@@ -6,6 +6,10 @@ module Skylab::CSS_Convert
 
   class << self
 
+    def describe_into_under y, _
+      y << "(ancient thing that drove the development of [hl])"
+    end
+
     def lib_
       @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
     end
@@ -117,8 +121,10 @@ module Skylab::CSS_Convert
   end
 
   module CLI
-    def self.new sin, sout, serr
-      CLI::Client.new sin, sout, serr
+
+    def self.new sin, sout, serr, pn_s_a
+
+      CLI::Client.new sin, sout, serr, pn_s_a
     end
   end
 
@@ -128,9 +134,10 @@ module Skylab::CSS_Convert
 
     include Core::Client::InstanceMethods
 
-    def initialize sin, sout, serr
+    def initialize sin, sout, serr, pn_s_a
       @default_action_i = nil
       @IO_adapter = build_IO_adapter sin, sout, serr
+      @_pn_s_a = pn_s_a
       super( )
     end
 
@@ -262,6 +269,15 @@ module Skylab::CSS_Convert
 
     def build_pen
       CLI::Pen.new method( :escape_path )
+    end
+
+    def program_name
+      @___pn ||= __build_program_name
+    end
+
+    def __build_program_name
+      a = @_pn_s_a
+      [ ::File.basename( a.first ), * a[ 1 .. -1 ] ].join SPACE_
     end
 
   public

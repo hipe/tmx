@@ -286,7 +286,7 @@ module Skylab::Brazen
         when  0
           @adapter = @adapter_a.fetch 0
           @adapter_a = nil
-          __bound_call_via_adapter
+          @adapter.bound_call_via_receive_frame self
 
         when  1
           _bound_call_for_unrecognized_via token
@@ -334,7 +334,7 @@ module Skylab::Brazen
 
         to_child_unbound_action_stream.map_by do | unbound |
 
-          _adapter_via_unbound unbound
+          adapter_via_unbound unbound
 
         end
       end
@@ -345,7 +345,7 @@ module Skylab::Brazen
 
         _unbound_a.map do | unbound |
 
-          _adapter_via_unbound unbound
+          adapter_via_unbound unbound
 
         end
       end
@@ -390,7 +390,7 @@ module Skylab::Brazen
         bound_action.to_unbound_action_stream
       end
 
-      def _adapter_via_unbound unbound
+      def adapter_via_unbound unbound  # :+#public-API
 
         if unbound.is_branch
           __branch_class_for_unbound_action( unbound ).new unbound, bound_action
@@ -513,11 +513,6 @@ module Skylab::Brazen
 
         CLI_::When_::Multiple_Matching_Actions.
           new adapter_a, token, help_renderer
-      end
-
-      def __bound_call_via_adapter
-
-        @adapter.__bound_call_via_receive_frame self
       end
     end
 
@@ -867,7 +862,7 @@ module Skylab::Brazen
         @bound.under_expression_agent_get_N_desc_lines exp, d
       end
 
-      def __bound_call_via_receive_frame otr
+      def bound_call_via_receive_frame otr  # :+#public-API
         receive_frame otr
         _some_bound_call
       end
@@ -1782,7 +1777,7 @@ module Skylab::Brazen
       h
     end
 
-    class Property__
+    class Property__  # #todo
 
       def initialize name_i, * x_a
         @argument_arity = :one
@@ -1793,6 +1788,12 @@ module Skylab::Brazen
           instance_variable_set :"@#{ i }", x
         end
         freeze
+      end
+
+      def dup_by & edit_p
+        otr = dup
+        otr.instance_exec( & edit_p )
+        otr
       end
 
       attr_reader :desc, :name,
@@ -1899,6 +1900,7 @@ module Skylab::Brazen
 
       attr_reader(
         :argv,
+        :has_bridges,
         :_is_finished,
         :mod,
         :serr,
@@ -1935,13 +1937,24 @@ module Skylab::Brazen
 
         @argv = argv
         if a
-          h = {}
-          a.each_slice 2 do | k, x |
-            h[ k ] = x
-          end
-          @_bridges = h
+          __receive_bridges a
         end
         @_is_finished = true
+        NIL_
+      end
+
+      def __receive_bridges a
+
+        h = @_bridges
+        if ! h
+          h = {}
+          @has_bridges = true
+          @_bridges = h
+        end
+
+        a.each_slice 2 do | k, x |
+          h[ k ] = x
+        end
         NIL_
       end
 

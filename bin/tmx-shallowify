@@ -1,13 +1,23 @@
 #!/usr/bin/env ruby -w
 
-exit -> argv, stdin, stdout, stderr, program_name do
+program = -> stdin, stdout, stderr, pn_s_a, argv do
 
   y = ::Enumerator::Yielder.new( & stderr.method( :puts ) )
   _OK = 0 ; _NO = 1 ; done = nil
 
   lbl = -> s { "\e[32m#{ s }\e[0m" }
 
-  progname = -> { ::File.basename program_name }
+  _SPACE = ' '
+
+  progname = -> do
+    x = nil
+    p = -> do
+      x = [ ::File.basename( pn_s_a.first ), * pn_s_a[ 1 .. -1 ] ] * _SPACE
+    end
+    -> do
+      x || p[]
+    end
+  end.call
 
   syntax_for_stdin_mode = -> do
     " [-]"
@@ -79,7 +89,7 @@ exit -> argv, stdin, stdout, stderr, program_name do
       _USAGE = 'usage:'
       y << "#{ lbl[ _USAGE ] } #{
         }#{ progname[] }#{ syntax_for_interactive_mode[] }"
-      y << "#{ ' ' * _USAGE.length } #{
+      y << "#{ _SPACE * _USAGE.length } #{
         }#{ progname[] }#{ syntax_for_stdin_mode[] } #{
          }(stdin mode - outputs dashified versions of input only)"
       y << nil
@@ -187,7 +197,7 @@ exit -> argv, stdin, stdout, stderr, program_name do
 
     cmd_a = [ 'mv', '-n', arg, tgt_s ]
 
-    y << "#{ cmd_a * ' ' }"
+    y << "#{ cmd_a * _SPACE }"
 
     if ! is_dry
       open_3[ cmd_a ]
@@ -294,4 +304,10 @@ exit -> argv, stdin, stdout, stderr, program_name do
   y << "done."
 
   _OK
-end[ ::ARGV, $stdin, $stdout, $stderr, $PROGRAM_NAME ]
+end
+
+if __FILE__ == $PROGRAM_NAME
+  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+else
+  Skylab::Shallowify = program
+end

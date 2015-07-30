@@ -94,6 +94,7 @@ module Skylab::Parse  # see [#001]
 
     Autoloader_[ self ]
 
+    CLI = nil  # for host
     EMPTY_A_ = [].freeze
     KEEP_PARSING_ = true
     NIL_ = nil

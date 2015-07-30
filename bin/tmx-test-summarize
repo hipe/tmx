@@ -7,11 +7,41 @@
 # the output that is generated forms the basis for the informational summaries
 # found in many of our commit messages.
 
+execute = nil
+
+program = -> in_io, out_io, err_io, pn_s_a, argv do
+
+  if argv.length.zero?
+
+    execute[ in_io, out_io ]
+
+  else
+
+    progname = -> do
+      [ ::File.basename( pn_s_a.first ), * pn_s_a[ 1 .. -1 ] ] * ' '
+    end
+
+    if /\A--?h(?:elp)?\z/ =~ argv.fetch( 0 )
+
+      err_io.puts "usage: #{ progname[] }"
+      err_io.puts
+      err_io.puts "synopsis: reads an ad-hoc undocumented format from STDIN"
+      err_io.puts "          at ouputs summary info used in our commit mesages"
+
+      nil
+    else
+
+      err_io.puts "unexpected argument: #{ argv[ 0 ].inspect }"
+      err_io.puts "try '#{ progname[] } -h' for help"
+      nil
+    end
+  end
+end
+
+execute = -> in_io, out_io do
 
 _RX1 = /\AFinished in (\d+(?:\.\d+)?) seconds?\z/
 _RX2 = /\A(?<e>\d+) examples?, (?<f>\d+) failures?(?:, \d+ pending)?\z/
-
-in_io = $stdin ; out_io = $stdout
 
 num_examples = 0 ; seconds = 0.0 ; num_chunks = 0
 
@@ -36,3 +66,15 @@ end
 
 out_io.puts "(#{ '.' * num_chunks } #{ num_examples })"
 out_io.puts "(#{ num_chunks } in #{ seconds })"
+
+0
+
+end
+
+if __FILE__ == $PROGRAM_NAME
+
+  program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+
+else
+  Skylab::Test_summarize = program
+end

@@ -27,6 +27,7 @@ module Skylab::CodeMolester
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   Home_ = self
+  CLI = nil  # for host
   DID_ = true
   EMPTY_A_ = [].freeze
   EMPTY_S_ = ''.freeze

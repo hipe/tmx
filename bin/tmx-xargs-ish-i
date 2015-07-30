@@ -8,20 +8,19 @@
   # (the bulk of this "one-off" turned into a goof-off exercise in functional
   # text formatting, the frontier that it is. no ivars, no classes.)
 
-exit_code = -> do
+program = -> _, stdout_, stderr_, pn_s_a, argv do
 
   #         ~ some pseudo-constants ~
 
   do_stay = true ; do_not_stay = false
   ok = 0 ; not_ok = 1
   moniker = 'xargs-ish-i'
+  _SPACE = ' '
 
   #         ~ asssign global-ishes to locals ~
 
-  argv = ::ARGV
-
   y = -> do
-    stderr = $stderr
+    stderr = stderr_
     ::Enumerator::Yielder.new { |line| stderr.puts line }
   end.call
 
@@ -44,16 +43,13 @@ exit_code = -> do
     undr = styl[ 4 ]
 
     program_name = -> do
-      pn = nil
-      get = -> do
-        me = ::File.basename __FILE__
-        pg = ::File.basename $PROGRAM_NAME
-        if me == pg then me else
-          "#{ pg } #{ moniker }"
-        end
+
+      x = nil
+      p = -> do
+        x = [ ::File.basename( pn_s_a.first ), * pn_s_a[ 1 .. -1 ] ] * _SPACE
       end
       -> do
-        pn ||= get[]
+        x || p[]
       end
     end.call
 
@@ -73,7 +69,7 @@ exit_code = -> do
       o << arg[ 'replstr' ]
       o << arg[ 'utility' ]
       o << plus[ 'argument' ]
-      o * ' '
+      o * _SPACE
     end
 
     usage = -> do
@@ -245,8 +241,8 @@ exit_code = -> do
 
         prototype = ::Struct.new( *o.keys ).new( *o.values ).freeze
 
-        indent_1 = ' ' * left_margin
-        indent_2 = ' ' * ( left_margin + left_margin_2 )
+        indent_1 = _SPACE * left_margin
+        indent_2 = _SPACE * ( left_margin + left_margin_2 )
 
         columns = -> do
           f = -> do
@@ -274,7 +270,7 @@ exit_code = -> do
             -> downstream, styled, (para) do
               downstream << nil
               x = [ 1, left_margin_2 - without_style[ styled ].length ].max
-              scn = word_scanner[ "#{ styled }#{ ' ' * x }#{ para }" ]
+              scn = word_scanner[ "#{ styled }#{ _SPACE * x }#{ para }" ]
               more =
                 wrap[ downstream, scn, indent_1, columns[], 1 ]
               if more
@@ -308,9 +304,9 @@ exit_code = -> do
             "[#{ ctx.undr[ x ] } #{ ctx.undr[ '...' ] }]"
           end
           ctx.opt = -> syn_str, paragraphs do
-            styled = syn_str.split( ' ', 2 ).each.with_index.map do |x, i|
+            styled = syn_str.split( _SPACE, 2 ).each.with_index.map do |x, i|
               style_a.fetch( i )[ x ]
-            end.join ' '
+            end.join _SPACE
             fltr = if syn_str.length < left_margin_2
               less_lines_filter[ downstream, styled ]
             else
@@ -438,7 +434,7 @@ exit_code = -> do
       wrapper_maker = -> do
         f = -> leftm, rightm do
           f = if cols[]
-            indent = ' ' * left_margin
+            indent = _SPACE * left_margin
             columns = cols[]
             -> lm, rm do
               use_cols = columns - rm
@@ -567,7 +563,7 @@ exit_code = -> do
   repl_idx = cmd_a.index replstr
 
   repl_idx or break bork[ "expected #{ kbd[ "#{ ltgt[ 'utility' ] } [..]" ] }#{
-    } to include #{ undr[ 'replstr' ] } \"#{ replstr }\" - #{ cmd_a * ' ' }" ]
+    } to include #{ undr[ 'replstr' ] } \"#{ replstr }\" - #{ cmd_a * _SPACE }" ]
 
   $stdin.tty? or break bork[ "must be run from an interactive terminal. #{
     }cannot pipe data in." ]
@@ -647,7 +643,7 @@ exit_code = -> do
     op_h = {
       stdout: -> line do
         line.chomp!
-        $stdout.puts "STDOUT: -->#{ line }<--"
+        stdout_.puts "STDOUT: -->#{ line }<--"
       end,
       stderr: -> line do
         line.chomp!
@@ -678,7 +674,7 @@ exit_code = -> do
       do_prompt = true
       while do_prompt
         do_prompt = false
-        y << ">> #{ ( cmd_a * ' ' ) }"
+        y << ">> #{ ( cmd_a * _SPACE ) }"
         y << "run the above? y/n"
         y_or_n[
           -> do
@@ -699,6 +695,10 @@ exit_code = -> do
   end
 
   ok
-end.call
+end
 
-exit exit_code
+if __FILE__ == $PROGRAM_NAME
+  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+else
+  Skylab::Xargs_ish_i = program
+end

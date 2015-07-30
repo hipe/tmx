@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w
 
-argv = ARGV
+program = -> _, _, stderr, pn_s_a, argv do
 
 if (( idx = argv.index '-n' ))
   argv[ idx, 1 ] = [ ]
@@ -9,18 +9,27 @@ end
 
 dir, file = argv[ 0, 2 ]
 
-y = ::Enumerator::Yielder.new( & $stderr.method( :puts ) )
+y = ::Enumerator::Yielder.new( & stderr.method( :puts ) )
 
 progname = -> do
-  ::File.basename $PROGRAM_NAME
-end
+  x = nil
+  p = -> do
+    x = [ ::File.basename( pn_s_a.first ), * pn_s_a[ 1 .. -1 ] ] * ' '
+  end
+  -> do
+    x || p[]
+  end
+end.call
 
 bork = -> msg do
   y << msg
   exit 0
 end
 
-file or bork[ "usage: #{ progname[] } <dir> <file>" ]
+if ! file
+  y << "usage: #{ progname[] } <dir> <file>"
+  return 0
+end
 
 require 'pathname'
 
@@ -87,3 +96,11 @@ if from_dir_pn.children.empty?
 end
 
 y << "turned #{ stem } #{ say_did }."
+end
+
+if __FILE__ == $PROGRAM_NAME
+
+  program[ nil, nil, $stderr, [ $PROGRAM_NAME ], ARGV ]
+else
+  Skylab::Onoff = program
+end

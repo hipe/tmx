@@ -149,6 +149,6 @@
 [#005] 2011-08-27 @closed death to old filemetrics
 [#004] 2011-08-24 @closed the birth of dependency graph, Open2 wrapper for face
 [#003] 2011-08-23 @closed filemetrics ignores blank lines, comments
-[#002] 2011-08-20 @closed Face craps near namespaces
+[#002] 2011-08-20 @closed F-ace craps near namespaces
 [#001] 2011-08-17 @closed filemetrics rearchitecting
 [#000] 2011-08-13 @closed filemetrics refactor near linecount feature

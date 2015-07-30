@@ -8,17 +8,28 @@ program = -> i, o, e, pn_a, argv, & p do
   dae = Skylab::TestSupport::Quickie.start_daemon_using(
     i, o, e, pn_a )
 
-  p[ dae ]
+  _ok = if p
+    p[ dae ]
+  else
+    true
+  end
 
-  dae.receive_argv argv
+  if _ok
 
+    x = dae.receive_argv argv
+    if x.nil?
+      0
+    else
+      x
+    end
+  end
 end
 
 if __FILE__ == $PROGRAM_NAME
 
-  program.call $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV do | dae |
+  exit( program.call( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ) do | dae |
     dae.listen
-  end
+  end )
 
 else
   Skylab::Quickie = program

@@ -13,7 +13,7 @@ module Skylab::TestSupport
 
         dae = _any_daemon
         if ! dae
-          dae = __start_daemon_autonomously
+          dae = _start_daemon_autonomously
           dae.listen  # assume we are being invoked in the single file manner
         end
 
@@ -49,7 +49,7 @@ module Skylab::TestSupport
         end
       end.call
 
-      def __start_daemon_autonomously  # [#bs-029] name conventions are used
+      def _start_daemon_autonomously  # [#bs-029] name conventions are used
 
         lib = Home_.lib_
 
@@ -82,22 +82,45 @@ module Skylab::TestSupport
     # the interesting activity begins with a message of `describe` sent to
     # for e.g a quickie-empowered module made from above.
 
-    DESCRIBE_METHOD__ = -> * desc_s_a, & p do
+    PASSIVE_DESC_METHOD___ = -> * desc_s_a, & p do
 
-      Here_._any_daemon.__receive_describe desc_s_a, & p
+      Here_._any_daemon._receive_describe desc_s_a, & p
+    end
+
+    ACTIVE_DESC_METHOD___ = -> * desc_s_a, & p do
+
+      dae = Here_._any_daemon
+
+      if ! dae
+        dae = Here_._start_daemon_autonomously
+        dae.listen
+      end
+
+      dae._receive_describe desc_s_a, & p
     end
 
     module Module_with_Descirbe_Method__
-      define_method :describe, DESCRIBE_METHOD__
+      define_method :describe, PASSIVE_DESC_METHOD___
     end
 
     # (..or you can use `describe` from almost
     #  anywhere with this experimental hack:)
 
     class << Here_
+
       def enable_kernel_describe
-        _any_daemon.__enable_kernel_describe
+
+        if ! _do_EKD
+          @_do_EKD = true
+
+          if ! ::Kernel.method_defined? :describe  # else just don't mess
+            ::Kernel.send :define_method, :describe, ACTIVE_DESC_METHOD___
+          end
+        end
+        NIL_
       end
+
+      attr_reader :_do_EKD
     end
 
     class Daemon___
@@ -134,6 +157,7 @@ module Skylab::TestSupport
         if @_is_listening
           raise __say_already_listening
         end
+        @_is_listening = true
 
         yes = defined? ::RSpec  # storypoint-10
         if yes
@@ -147,30 +171,14 @@ module Skylab::TestSupport
             end
           end
         end
-        NIL_
+        ACHIEVED_
       end
 
       def __say_already_listening
         "daemon is already listening."
       end
 
-      def __enable_kernel_describe
-
-        if ! @_kernel_describe_is_enabled
-          __do_enable_kernel_describe
-        end
-      end
-
-      def __do_enable_kernel_describe
-
-        @_kernel_describe_is_enabled = true
-        if ! ::Kernel.method_defined? :describe  # else just don't mess
-          ::Kernel.send :define_method, :describe, DESCRIBE_METHOD__ ; nil
-        end
-        NIL_
-      end
-
-      def __receive_describe desc_s_a, & x_p
+      def _receive_describe desc_s_a, & x_p
 
         tcc = ::Class.new Context__  # 1 desc always == 1 test context class
 

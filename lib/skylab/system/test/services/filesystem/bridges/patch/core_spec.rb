@@ -128,11 +128,6 @@ module Skylab::System::TestSupport
       expect_succeeded
     end
 
-    def black_and_white_expression_agent_for_expect_event
-
-      Home_.lib_.brazen::API.expression_agent_instance
-    end
-
     # ~ expected files
 
     def _expected_path_that_will_be_created

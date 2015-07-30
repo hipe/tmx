@@ -34,6 +34,7 @@ module Skylab::Fields
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
+  CLI = nil  # for host
   EMPTY_A_ = []
   Home_ = self
   NIL_ = nil

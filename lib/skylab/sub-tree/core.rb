@@ -4,6 +4,10 @@ module Skylab::SubTree
 
   Callback_ = ::Skylab::Callback
 
+  def self.describe_into_under y, _
+    y << "an umbrella node for varous operations on a filesystem tree.."
+  end
+
   module API
 
     class << self

@@ -73,7 +73,7 @@
 [#120]       #parent-node: [#090] patterns for developing bundles ..
 [#119]       ( #moved-to: [#bs-028.B] )
 [#118]       #parent-node: [#092] "memberhood" defined
-[#117]       #parent-node: [#069] what does "application" even mean?
+[#117]       #parent-node: [#br-098] what does "application" even mean?
 [#116]       ( #moved-to: [#bs-029.E] )
 [#115]       #biliographic-reference: the Wikipedia page on _Idiom_
               (the text cited is from user Glane23 from 2010-03-11)
@@ -130,8 +130,7 @@
 [#072]       #tracking-tag #parent:070 chained proxy hosts, chaining in gen.
 [#071] #open the possibility of stateless #plugin hosts
 [#070] #hole ( #is [#pl-001] )
-[#069]       #doc-point (sorry to jump ahead) "ouroboros"
-[#068] #hole ( #was: track this redundancy during a hack )
+[#069] #hole ( #moved-to: [#br-098] ) [#068] #hole ( #was: track this redundancy during a hack )
 [#067]       #node-tracker "client-services" #in-situ
              #repurposed:once (was: move scanners to [ba])
 [#066] #hole ( #was: track this combinatorial dichototmy )

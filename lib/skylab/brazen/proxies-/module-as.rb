@@ -34,6 +34,8 @@ module Skylab::Brazen
 
     class As_Bound_Model___
 
+      # :+[#br-098] things that should probably subclass interface node base
+
       def initialize cls_pxy, kr, & oes_p
 
         @cls_pxy = cls_pxy

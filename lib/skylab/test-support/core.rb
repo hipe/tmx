@@ -14,6 +14,10 @@ module Skylab::TestSupport  # :[#021].
 
   class << self
 
+    def describe_into_under y, _
+      y << "simplecov (and?..)"
+    end
+
     def constant i
       self::Constants__.const_get i, false
     end

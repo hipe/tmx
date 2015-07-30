@@ -1,4 +1,6 @@
 digraph {
+  as [ label="Assess" ]
+  au [ label="Autobleed" ]
   ba [ label="Basic" ]
   bs [ label="BeautySalon" ]
   b2 [ label="Bnf2Treetop" ]
@@ -8,7 +10,6 @@ digraph {
   cs [ label="CSS_Convert" ]
   cu [ label="Cull" ]
   de [ label="Dependency" ]
-  fa [ label="Face" ]
   fi [ label="Fields" ]
   fm [ label="FileMetrics" ]
   f2 [ label="Flex2Treetop" ]
@@ -16,9 +17,11 @@ digraph {
   gv [ label="GitViz" ]
   he [ label="Headless" ]
   hu [ label="Human" ]
+  ku [ label="Kurse" ]
   pa [ label="Parse" ]
   pe [ label="Permute" ]
   pl [ label="Plugin" ]
+  sc [ label="Script" ]
   sla [ label="Slake" ]
   sli [ label="Slicer" ]
   sn [ label="Snag" ]
@@ -27,7 +30,6 @@ digraph {
   tan [ label="TanMan" ]
   tmx [ label="TMX" ]
   ts [ label="TestSupport" ]
-  to [ label="Tolerance" ]
   tr [ label="Treemap" ]
   y2 [ label="Yacc2Treetop" ]
   ba -> br
@@ -38,14 +40,15 @@ digraph {
   ba -> sy
   ba -> ts
   bs -> ba
-  bs -> fa
   bs -> he
   bs -> st
   bs -> sy
   br -> ba
+  br -> fi
   br -> he
   br -> hu
   br -> pa
+  br -> pl
   br -> sn
   br -> sy
   ca -> ba
@@ -58,10 +61,9 @@ digraph {
   ca -> ts
   cm -> ba
   cm -> br
-  cm -> fa
   cm -> he
-  cm -> hu
   cm -> pa
+  cm -> hu
   cm -> sy
   cs -> br
   cs -> he
@@ -71,25 +73,16 @@ digraph {
   cu -> sy
   de -> ba
   de -> br
-  de -> cm
-  de -> fa
   de -> he
+  de -> cm
   de -> sla
   de -> sy
-  fa -> br
-  fa -> ba
-  fa -> fi
-  fa -> he
-  fa -> pa
-  fa -> sy
-  fa -> ts
   fi -> ba
   fi -> br
   fi -> hu
   fi -> pl
   fm -> br
   fm -> ba
-  fm -> fa
   fm -> he
   fm -> hu
   fm -> pa
@@ -100,20 +93,19 @@ digraph {
   f2 -> sy
   gi -> ba
   gi -> br
-  gi -> fa
   gi -> fi
-  gi -> he
-  gi -> pa
+  gi -> gv
   gi -> pl
   gi -> sy
   gv -> br
+  gv -> ba
   gv -> he
   gv -> hu
+  gv -> pl
   gv -> sy
   he -> ba
   he -> br
   he -> cm
-  he -> fa
   he -> hu
   he -> pa
   he -> pl
@@ -136,9 +128,8 @@ digraph {
   sn -> sy
   st -> ba
   st -> br
-  st -> fa
-  st -> hu
   st -> he
+  st -> hu
   st -> sy
   st -> ts
   sy -> ba
@@ -153,13 +144,17 @@ digraph {
   tan -> sy
   ts -> ba
   ts -> br
+  ts -> he
   ts -> pe
   ts -> pl
-  ts -> fa
-  ts -> he
-  ts -> hu
   ts -> sn
+  ts -> hu
+  ts -> he
   ts -> sy
+  tmx -> ba
+  tmx -> br
+  tmx -> sli
+  tmx -> sy
   tr -> ba
   tr -> br
   tr -> sy

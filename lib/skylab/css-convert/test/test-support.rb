@@ -37,8 +37,7 @@ module Skylab::CSS_Convert::TestSupport
       @cli_instance ||= begin
         streams = TestSupport_::IO.spy.triad.new
         _a = streams.values
-        app = Home_::CLI.new( * _a )
-        app.send :program_name=, 'nerk'
+        app = Home_::CLI.new( * _a, [ 'nerk' ] )
         do_debug and streams.debug!
         app
       end

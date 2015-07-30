@@ -172,24 +172,5 @@ module Skylab::TanMan
         @NLP_agent ||= Home_::API.expression_agent_class.NLP_agent_class.new
       end
     end
-
-    # ~ begin #hook-out for [tmx] integration
-
-    Client = self
-    module Adapter
-      module For
-        module Face
-          module Of
-            Hot = -> x, x_ do
-
-              Brazen_::CLI::Client.fml Home_, x, x_
-            end
-          end
-        end
-      end
-    end
-
-    # ~ end
-
   end
 end

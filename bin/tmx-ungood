@@ -1,14 +1,23 @@
 #!/usr/bin/env ruby -w
 
-exit -> program_name, stderr, argv do
+program = -> _, _, stderr, pn_s_a, argv do
 
   y = ::Enumerator::Yielder.new( & stderr.method( :puts ) )
 
   r = nil ; _OK = 0 ; _NOPE = 1
 
   _DEFAULT_SUFFIX = '_GOOD.rb'
+  _SPACE = ' '
 
-  pn = -> { ::File.basename program_name }
+  pn = -> do
+    x = nil
+    p = -> do
+      x = [ ::File.basename( pn_s_a.first ), * pn_s_a[ 1 .. -1 ] ] * _SPACE
+    end
+    -> do
+      x || p[]
+    end
+  end.call
 
   invite_line = -> do
     "see #{ pn[] } -h"
@@ -36,7 +45,7 @@ exit -> program_name, stderr, argv do
         verbose = true
       end
       title = 'description: '
-      mgn = ' ' * title.length
+      mgn = _SPACE * title.length
       o.on '-h', '--help', 'this screen' do
         y << "usage: #{ pn[] } [options] [.]"
         y << "#{ title }in the current directory tree, move every file #{
@@ -202,4 +211,10 @@ exit -> program_name, stderr, argv do
 
   _OK
 
-end.call $PROGRAM_NAME, $stderr, ::ARGV
+end
+
+if __FILE__ == $PROGRAM_NAME
+  program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+else
+  Skylab::Ungood = program
+end

@@ -71,10 +71,11 @@ module Skylab::Brazen
         # ~ invite to more help
 
         o.section_boundary
-        prop = aa.properties.fetch :action
+
+        prp = aa.properties.fetch :action
         o.express do
           "use #{ code "#{ aa.invocation_string } -h #{
-            }#{ par prop }" } for help on that action."
+            }#{ par prp }" } for help on that action."
         end
 
         SUCCESS_

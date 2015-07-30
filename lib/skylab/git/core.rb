@@ -3,6 +3,10 @@ require 'skylab/callback/core'
 
 module Skylab::Git
 
+  def self.describe_into_under y, _
+    y << "assorted novelties for manipulating reository content (versioned or not)"
+  end
+
   Callback_ = ::Skylab::Callback
 
   API = ::Module.new

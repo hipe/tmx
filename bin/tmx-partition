@@ -4,12 +4,12 @@
 #   model Models_::Some_Model
 #    class Sessions_::This_File
 
-    class Skylab__Some_App_Some_Model__Partition____
+    cls = class Skylab__Some_App_Some_Model__Partition____
 
-      def initialize i, o, e, a, pn
+      def initialize i, o, e, pn_s_a, a
 
         @argv = a
-        @program_name = ::File.basename pn
+        @pn_s_a = pn_s_a
         @serr = e
         @sin = i
         @sout = o
@@ -20,8 +20,14 @@
         require_relative '../lib/skylab/callback/core'
         Me_.const_set :Callback_, ::Skylab::Callback  # etc
 
-        _ok = __parse_argv
-        _ok && __work
+        ok = __parse_argv
+        if ok
+          __work
+        elsif @_did_show_help
+          0
+        else
+          ok
+        end
       end
 
       # ~ phase 1 - parsing ARGV
@@ -40,6 +46,8 @@
         x = ACHIEVED_
         op.on '--help', 'this screen' do
 
+          @_did_show_help = true
+
           io = @serr
 
           y = ::Enumerator::Yielder.new do | s |
@@ -50,7 +58,7 @@
             end
           end
 
-          io.puts "synopsis: #{ @program_name } <file>"
+          io.puts "usage: #{ _program_name } <file>"
           io.puts
 
         #12345_(10)12345_(20)12345_(30)12345_(40)12345_(50)12345_(60)12345_(70)12345_(80)
@@ -79,7 +87,7 @@ y << 'lock *any* files or check permissions, so integrity is not "guaranteed".'
 
           io.puts 'argument:'
 
-          _ = SPACE_ * 27
+          _ = ' ' * 27  # SPACE_
 
           io.puts "    <file>#{ _ }(as described in the description)"
 
@@ -170,8 +178,16 @@ y << 'lock *any* files or check permissions, so integrity is not "guaranteed".'
       # ~ support
 
       def _invite
-        @serr.puts "see '#{ @program_name } --help'"
+        @serr.puts "see '#{ _program_name } --help'"
         NIL_
+      end
+
+      def _program_name
+        @___pn ||= __build_program_name
+      end
+
+      def __build_program_name
+        [ ::File.basename( @pn_s_a.first ), * @pn_s_a[ 1 .. -1 ] ] * ' '
       end
 
       class Worker___
@@ -366,5 +382,15 @@ y << 'lock *any* files or check permissions, so integrity is not "guaranteed".'
       STOP_PARSING_ = false
       UNABLE_ = false
 
-    self
-    end.new( $stdin, $stdout, $stderr, ::ARGV, $PROGRAM_NAME ).execute
+      self
+    end
+
+program = -> i, o, e, pn_s_a, argv do
+  cls.new( i, o, e, pn_s_a, argv ).execute
+end
+
+if __FILE__ == $PROGRAM_NAME
+  program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+else
+  Skylab::Partition = program
+end

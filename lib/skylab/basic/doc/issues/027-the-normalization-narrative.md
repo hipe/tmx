@@ -249,7 +249,7 @@ This is the field-level normalization API.
 
 experimentally:
 
-    class Foo < Face::API::Action
+    class Foo < F-ace::API::Action
 
       params [ :email, :normalizer, true ]     # the `true` means we'll do
                                                # it with an instance method..
@@ -291,7 +291,7 @@ to make flexible, reusable normalizers. but there are lots of details:
 
 ## using the `normalizer` metafield
 
-there exists in the Face API API recognition of a metafield called
+there exists in the F-ace API API recognition of a metafield called
 `normalizer`. this metafield is associated with a (mandatory) value
 which you must provide after the `normalizer` keyword in your field
 specification. (in fact the meta-field `normalizer` has the value `true`
@@ -450,7 +450,7 @@ also we frame it this way because sadly we know that this interface, no
 matter how perfect it seems now, must one day change.
 
 covering each of these control points effectively documents the entirety of
-the Face API API field-level normalization API. we present them here in a
+the F-ace API API field-level normalization API. we present them here in a
 fuzzily-narrative chronological order corresponding roughly to the sequence
 in which they become significant:
 

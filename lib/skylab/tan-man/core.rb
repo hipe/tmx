@@ -3,6 +3,10 @@ require 'skylab/brazen/core'
 
 module Skylab::TanMan
 
+  def self.describe_into_under y, _
+    y << "manage your tangents visually"
+  end
+
   Callback_ = ::Skylab::Callback
 
   class << self

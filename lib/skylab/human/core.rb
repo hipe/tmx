@@ -22,6 +22,7 @@ module Skylab::Human  # :[#001].
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   ACHIEVED_ = true
+  CLI = nil  # for host
   EMPTY_S_ = ''
   Home_ = self
   IDENTITY_ = -> x { x }

@@ -5,7 +5,7 @@
 (this documents relatively old ideas. we have edited it for maintenence and
  to aide in refactoring legacy apps etc. but note that these ideas pre-date
  whatever we came up with during the big rewrite of "legacy" (né "all.rb"),
- the "matryoshka" phase of Face, and this most recent re-write to "bleeding";
+ the "matryoshka" phase of F-ace, and this most recent re-write to "bleeding";
  all of which will certainly be legacy themselves by the time you read this.)
 
 ## understanding the hybrid architecture

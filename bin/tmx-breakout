@@ -1,10 +1,8 @@
 #!/usr/bin/env ruby -w
 
-exit -> argv, stdin, stdout, stderr, program_name do
+program = -> stdin, stdout, stderr, pn_s_a, argv do
 
   y = ::Enumerator::Yielder.new( & stderr.method( :puts ) )
-
-  progname = -> { ::File.basename program_name }
 
   es = nil ; _OK = 0 ; _NO = 1  # exit statii
 
@@ -36,32 +34,55 @@ exit -> argv, stdin, stdout, stderr, program_name do
 
   # ~
 
+  _SPACE = ' '
+
+  progname = -> do
+    x = nil
+    p = -> do
+      x = [ ::File.basename( pn_s_a.first ), * pn_s_a[ 1 .. -1 ] ] * _SPACE
+    end
+    -> do
+      x || p[]
+    end
+  end.call
+
   require 'optparse'
   build_indenter = ignoring = nil
   be_verbose = false
   do_color_indicated_explicitly = false ; do_color = nil ; is_dry = false
+
   op = ::OptionParser.new do |o|
+
     o.on '-n', '--dry-run', 'dry run.' do
       is_dry = true
     end
+
     o.on '--[no-]color', "the default is for color to be on when interactive,",
         "off when not. this will override that" do |x|
       do_color_indicated_explicitly = true
       do_color = x
     end
+
     o.on '-v', '--verbose', 'verbose output' do
       be_verbose = true
     end
+
     o.on '-h', '--help', 'this screen.' do ||
+
       argv.length.nonzero? and ignoring[]
       p_a = syntaces[] ; p = p_a.shift
       y << "#{ lbl[ 'usage:' ] } #{ progname[] } #{ p[] }"
-      while (( p = p_a.shift ))
+
+      begin
+        p = p_a.shift
+        p or break
         y << "       #{ progname[] } #{ p[] }"
-      end
+        redo
+      end while nil
+
       y << nil
       y << "#{ lbl[ 'description:' ] } 'add' files progressively. they are then"
-      yy = build_indenter[ ' ' * 7, y ]
+      yy = build_indenter[ _SPACE * 7, y ]
       yy << "(breakout) staged. check your status with (breakout) 'status'"
       yy << "if you like. (breakout) 'commit'ting this will add a git commit"
       yy << "thta UNDOES whatever changes occurred to those files in the"
@@ -87,7 +108,7 @@ exit -> argv, stdin, stdout, stderr, program_name do
   end
 
   ignoring = -> do
-    y << "(ignoring: \"#{ argv.shift( argv.length ) * ' ' }\")" ; nil
+    y << "(ignoring: \"#{ argv.shift( argv.length ) * _SPACE }\")" ; nil
   end
 
   invite_string = -> do
@@ -115,6 +136,7 @@ exit -> argv, stdin, stdout, stderr, program_name do
   if ! do_color_indicated_explicitly
     do_color = stdin.tty?
   end
+
   do_color or uncolorize[]
 
   e and break usage[ e.message ]
@@ -138,7 +160,7 @@ exit -> argv, stdin, stdout, stderr, program_name do
     end, false ]
     es and break es
     y_a.length.zero? and break nothing_to_do[ "not under version control: #{
-      }#{ args * ' ' }" ]
+      }#{ args * _SPACE }" ]
     box.merge y_a
     _OK
   end
@@ -260,7 +282,7 @@ exit -> argv, stdin, stdout, stderr, program_name do
   aborting = system_exitstatus = nil
   require 'open3'
   system = -> cmd_a, out_p=nil, err_p=nil do
-    be_verbose and y << "(command: #{ cmd_a * ' ' })"
+    be_verbose and y << "(command: #{ cmd_a * _SPACE })"
     _, o, e, w = ::Open3.popen3( * cmd_a )
 
     did_stderr = false
@@ -304,7 +326,7 @@ exit -> argv, stdin, stdout, stderr, program_name do
   end
   #
   system_exitstatus = -> es_, cmd_a do
-    y << "got nonzero exit status (#{ es_ }) from: #{ cmd_a * ' ' }"
+    y << "got nonzero exit status (#{ es_ }) from: #{ cmd_a * _SPACE }"
     aborting[] ; es_
   end
   #
@@ -351,10 +373,10 @@ exit -> argv, stdin, stdout, stderr, program_name do
     a.length.zero? and break nothing_to_do[ no_files_added_string[] ]
     es = check_for_clean_status[] and break es
     a.map!( & :shellescape )
-    es = system[ [ "git diff -R HEAD~1 -- #{ a * ' ' } > #{ _REV }" ] ]
+    es = system[ [ "git diff -R HEAD~1 -- #{ a * _SPACE } > #{ _REV }" ] ]
     es and break
     es = check_for_empty_patch[ _REV ] and break es
-    es = system[ [ "git diff    HEAD~1 -- #{ a * ' ' } > #{ _FWD }" ] ]
+    es = system[ [ "git diff    HEAD~1 -- #{ a * _SPACE } > #{ _FWD }" ] ]
     es and break
     patch_this_mother[]
   end
@@ -511,11 +533,11 @@ exit -> argv, stdin, stdout, stderr, program_name do
       count = 0
       if add_a
         count += add_a.length
-        fh.puts "(undid changes to #{ add_a * ' ' })"
+        fh.puts "(undid changes to #{ add_a * _SPACE })"
       end
       if rm_a
         count += rm_a.length
-        fh.puts "(removed previously addef file(s) #{ rm_a * ' ' })"
+        fh.puts "(removed previously addef file(s) #{ rm_a * _SPACE })"
       end
       fh.puts "(#{ count } file(s) in total affected.)"
     end
@@ -605,4 +627,12 @@ exit -> argv, stdin, stdout, stderr, program_name do
   argv.shift
   p.call
 
-end[ ::ARGV, $stdin, $stdout, $stderr, $PROGRAM_NAME ]
+end
+
+if __FILE__ == $PROGRAM_NAME   # (or broader)
+
+  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+else
+
+  Skylab::Breakout = program
+end

@@ -9,7 +9,7 @@ module Skylab::Git::TestSupport
 
     it "CLI client loads" do  # can be moved up when appropriate
 
-      Home_::CLI::Client
+      Home_::CLI
     end
 
     it "ping payload channel (expect STDOUT)" do

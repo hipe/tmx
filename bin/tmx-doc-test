@@ -2,4 +2,11 @@
 
 require_relative '../lib/skylab/test-support/core'
 
-Skylab::TestSupport::DocTest::CLI.new( nil, $stdout, $stderr ).invoke ARGV
+Skylab::Doc_test = -> i, o, e, pn_s_a, argv do
+  Skylab::TestSupport::DocTest::CLI.new( i, o, e, pn_s_a ).invoke argv
+end
+
+if __FILE__ == $PROGRAM_NAME
+
+  Skylab::Doc_test[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+end

@@ -1,6 +1,6 @@
 # what does appilcation even mean? :[#117]
 
-this is part of the [#069] disussion of ouroboros, which in turn is really
+this is part of the [#br-098] disussion of ouroboros, which in turn is really
 about trees of turtles.
 
 disjoint thoughts for now, maybe this will be developed further later:

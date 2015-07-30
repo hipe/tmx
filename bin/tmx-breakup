@@ -11,11 +11,9 @@
   # EDIT: just use Gitx on a file with uncommitted changes. you can
   # selectively chose hunks to add to the commit.
 
+program = -> _, _, stderr, pn_s_a, argv do
 
-exit_status = 0
-
--> do  # meh
-
+  exit_status = 0
   writemode = 'w'.freeze
 
   stay = true
@@ -24,15 +22,21 @@ exit_status = 0
 
   src_pn = -> do  # resolve the source pathname (some e.g source file)
 
-    fn = ARGV[0]
-
-    stderr = $stderr
+    fn = argv[ 0 ]
 
     y = ::Enumerator::Yielder.new { |line| stderr.puts line }
 
+    _SPACE = ' '
+
     program_name = -> do
-      ::File.basename $PROGRAM_NAME
-    end
+      x = nil
+      p = -> do
+        x = [ ::File.basename( pn_s_a.first ), * pn_s_a[ 1 .. -1 ] ] * _SPACE
+      end
+      -> do
+        x || p[]
+      end
+    end.call
 
     hdr = kbd = -> str do
       "\e[32m#{ str }\e[0m"
@@ -42,6 +46,7 @@ exit_status = 0
       y << "#{ hdr[ 'usage:' ] } #{ program_name[] } path/to/file.rb"
       y << "#{ hdr[ 'description:' ] } #{
         }break a commit into 2 smaller steps with opendiff"
+
       break
     end
 
@@ -65,7 +70,7 @@ exit_status = 0
     end
 
     s_pn
-  end.call or break
+  end.call or break( exit_status )
 
   bork = showcmd = nil
 
@@ -81,7 +86,7 @@ exit_status = 0
     end
 
     showcmd = -> cmd do
-      y << "(running #{ kbd[ cmd * ' ' ] })"
+      y << "(running #{ kbd[ cmd * _SPACE ] })"
     end
 
     showcmd[ cmd = [ 'git', 'ls-files', '-m', '--', src_pn.to_s ] ]
@@ -113,7 +118,7 @@ exit_status = 0
       line = sout.gets
       if '' == line or ! line
         y << "no delta in last commit for this file? - #{ src_pn }"
-        y << "(see for yourself with #{ kbd[ cmd * ' ' ] })"
+        y << "(see for yourself with #{ kbd[ cmd * _SPACE ] })"
         break bork[]
       end
 
@@ -238,6 +243,11 @@ exit_status = 0
     end
   end.call
 
-end.call
+  exit_status
+end
 
-exit exit_status
+if __FILE__ == $PROGRAM_NAME
+  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+else
+  Skylab::Breakup = program
+end

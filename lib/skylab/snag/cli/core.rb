@@ -413,20 +413,5 @@ module Skylab::Snag
         NIL_
       end
     end
-
-    # ~ begin :+#hook-out for tmx
-    Client = self
-    module Adapter
-      module For
-        module Face
-          module Of
-            Hot = -> x, x_ do
-              Brazen_::CLI::Client.fml Home_, x, x_
-            end
-          end
-        end
-      end
-    end
-    # ~ end
   end
 end

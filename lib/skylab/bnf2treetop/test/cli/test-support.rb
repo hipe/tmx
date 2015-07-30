@@ -53,7 +53,7 @@ module Skylab::Bnf2Treetop::TestSupport
           MOCK_INTERACTIVE_STDIN___,
           outstream,
           errstream,
-          '/no-see/bnf2treetop'
+          [ '/no-see/bnf2treetop' ]
         )
 
         o = ::Struct.new(:debug_p, :err_p, :out_p).new  # :+[#hl-078] "shell"

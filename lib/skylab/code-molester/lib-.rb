@@ -33,8 +33,6 @@ module Skylab::CodeMolester
 
     Basic = sidesys[ :Basic ]
 
-    Bsc_ = Basic
-
     Brazen = sidesys[ :Brazen ]
 
     Cache_pathname = _memoize do
@@ -54,23 +52,25 @@ module Skylab::CodeMolester
       System[].filesystem.cache
     end
 
+    _HL = sidesys[ :Headless ]
+
     CLI_errstream_IO = -> do
-      HL__[]::CLI::IO.some_errstream_IO
+      _HL[]::CLI::IO.some_errstream_IO
     end
 
+    _Parse_lib = sidesys[ :Parse ]
+
     Constant_trouble = -> do
-      Parse_lib___[]::DSL_DSL::Constant_Trouble
+      _Parse_lib[]::DSL_DSL::Constant_Trouble
     end
 
     Delegating = -> mod, *a  do
-      HL__[]::Delegating.apply_iambic_on_client a, mod
+      _HL[]::Delegating.apply_iambic_on_client a, mod
     end
 
     Entity_inflection = -> mod_name do
-      HL__[]::Entity::Inflection.new mod_name
+      _HL[]::Entity::Inflection.new mod_name
     end
-
-    Face__ = sidesys[ :Face ]
 
     Field_box_enhance = -> x, p do
       Basic[]::Field.box.via_client_and_proc x, p
@@ -88,35 +88,23 @@ module Skylab::CodeMolester
       System[].filesystem.file_utils_controller
     end
 
-    HL__ = sidesys[ :Headless ]
-
-    Hu___ = sidesys[ :Human ]
-
     Hash_lib = -> do
       Basic[]::Hash
     end
 
     IO_chunker_yielder = -> p do
-      HL__[]::IO::Mappers::Chunkers::Functional.new p
-    end
-
-    Model_enhance = -> x, p do
-      Face__[]::Model.enhance x, & p
+      _HL[]::IO::Mappers::Chunkers::Functional.new p
     end
 
     Module_lib = -> do
       Basic[]::Module
     end
 
+    _Hu = sidesys[ :Human ]
+
     NLP_EN_methods = -> mod do
-      Hu___[]::NLP::EN::Methods[ mod ]
+      _Hu[]::NLP::EN::Methods[ mod ]
     end
-
-    Old_event_lib = -> do
-      Face__[]::Model::Event
-    end
-
-    Parse_lib___ = sidesys[ :Parse ]
 
     Strange = -> x do
       Basic[]::String.via_mixed x

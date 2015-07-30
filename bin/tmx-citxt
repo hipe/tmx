@@ -5,53 +5,80 @@
 module Skylab
 end
 
-module Skylab::CI_Txt
+module Skylab::Citxt
 
-  WRITEMODE_ = 'w'.freeze
+  def self.call i, o, e, pn_s_a, argv
 
-  module CLI
+    CLI.new( i, o, e, pn_s_a ).invoke argv
   end
 
-  class CLI::Client
+  CLI = ::Class.new ::Class.new
+  class CLI
 
-    def initialize *a
+    def initialize i, o, e, pn_s_a
       super
       @is_finished = @pwd = @git_dir_pathname = @dir_pathname_raw = nil
       @is_dry_run = @be_verbose = nil
     end
 
     def invoke argv
-      res = nil
-      begin
-        ok = nil
+      # we can't do this simply because o.p exits after help
+
+      @do_show_help = false
+      if argv.length.nonzero?
+        op = option_parser
         begin
-          begin
-            option_parser.parse! argv
-            @is_finished and break( ok = true )
-            if argv.any?
-              self.dir_path = argv.shift
-            end
-            if argv.any?
-              emit :help, "unexpected arg(s): #{ argv.inspect }"
-              break
-            end
-            ok = true
-          rescue ::OptionParser::ParseError => e
-            call_digraph_listeners :help, e.message
-          end
-        end while nil
-        if ! ok
-          emit :help, usage_line
-          emit :help, invite_line
-          break
+          op.parse! argv
+        rescue ::OptionParser::ParseError => pe
         end
-        res = execute unless @is_finished
-        if false == res
-          emit :help, invite_line
-        end
-      end while nil
-      res
+      end
+
+      if pe
+        @infostream.puts pe.message
+        @infostream.puts invite_line
+        ERROR_
+      else
+        __maybe_execute op, argv
+      end
     end
+
+    def __maybe_execute op, argv
+
+      if @is_finished
+        es = 0
+      elsif @do_show_help
+        __show_help op
+        es = 0
+      end
+
+      if es
+        es
+      else
+        if argv.length.nonzero?
+          self.dir_path = argv.shift
+        end
+        if argv.length.nonzero?
+          @infostream.puts "unexpected arg(s): #{ argv.inspect }"
+          ERROR_
+        else
+          execute
+        end
+      end
+    end
+
+    def __show_help op
+
+      io = @infostream
+      io.puts usage_line
+      io.puts
+      io.puts "#{ em 'synopsis:' } old script to help create a commit message"
+      io.puts
+      io.puts "#{ em 'options:' }"
+      op.summarize io
+      NIL_
+    end
+
+    # execute
 
   private
 
@@ -73,7 +100,7 @@ module Skylab::CI_Txt
       res
     end
 
-    filename = 'ci.txt'
+    filename = 'next-ci'
 
     define_method :build_option_parser do
       require 'optparse'
@@ -81,6 +108,10 @@ module Skylab::CI_Txt
 
       o.base.long[ 'ping' ] = ::OptionParser::Switch::NoArgument.
         new( & method( :ping ) )
+
+      o.on '-h', '--help', 'this screen.' do
+        @do_show_help = true
+      end
 
       o.on '-n', '--dry-run', 'dry run.' do
         @is_dry_run = true
@@ -129,15 +160,17 @@ module Skylab::CI_Txt
         if pathname.exist?
           fail 'sanity'
         end
-        branch_name = self.branch_name or break
-        first_line = "[##{ branch_name }]"
+
+        s = branch_name
+        s or break
+        first_line = "[##{ s }]"
         send_info_string( first_line ) if @be_verbose
         bytes = nil
         if @is_dry_run
           bytes = 0
         else
-          pathname.open( WRITEMODE_ ) do |fh|
-            bytes = fh.write "#{ first_line }\n\n  + " # etc
+          pathname.open( ::File::WRONLY | ::File::CREAT ) do |fh|
+            bytes = fh.write "#{ first_line }\n\n  • xx"  # etc
           end
         end
         send_info_string "created #{ escape_path pathname } (#{ bytes } bytes)"
@@ -255,21 +288,14 @@ module Skylab::CI_Txt
     end
   end
 
-
-  module CLI
-    def self.new *a
-      CLI::Client.new(* a)
-    end
-  end
-
-
-  module CLI::Client::InstanceMethods
-
+  CLI::Client = CLI.superclass
+  class CLI::Client
   private
 
-    def initialize _, paystream, infostream
-      @infostream = infostream
-      @paystream = paystream
+    def initialize _i, o, e, pn_s_a
+      @infostream = e
+      @paystream = o
+      @pn_s_a = pn_s_a
     end
 
     def em str
@@ -279,7 +305,7 @@ module Skylab::CI_Txt
     def emit type=:info, str
       instance_variable_get( :payload == type ? :@paystream : :@infostream ).
         puts str
-      nil
+      NIL_
     end
 
     def send_error_string msg
@@ -305,13 +331,18 @@ module Skylab::CI_Txt
     end
 
     def program_name
-      ::File.basename $PROGRAM_NAME
+      @___pn ||= __build_program_name
+    end
+
+    def __build_program_name
+      [ ::File.basename( @pn_s_a.first ), * @pn_s_a[ 1 .. -1 ] ] * ' '
     end
   end
-
-  class CLI::Client
-    include CLI::Client::InstanceMethods
-  end
+  ERROR_ = 5
+  NIL_ = nil
 end
 
-Skylab::CI_Txt::CLI.new( $stdin, $stdout, $stderr ).invoke ARGV
+if __FILE__ == $PROGRAM_NAME
+
+  Skylab::Citxt.call $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV
+end

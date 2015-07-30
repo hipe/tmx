@@ -33,7 +33,7 @@ module Skylab::Headless
 
     def initialize
       super  # "top-clients" (albeit "local" ones per
-        # [#069] "turtles) never "see" any superclient they may have
+        # [#br-098] "turtles) never "see" any superclient they may have
     end
 
     def actual_parameters         # not all stacks use this. #sc-bound

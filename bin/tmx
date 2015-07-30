@@ -2,4 +2,4 @@
 
 require_relative '../lib/skylab/tmx/core'
 
-Skylab::TMX::CLI.new( sin: $stdin, out: $stdout, err: $stderr ).invoke ARGV
+Skylab::TMX::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).invoke ARGV

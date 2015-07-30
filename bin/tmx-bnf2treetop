@@ -18,6 +18,14 @@ end
 
 module Skylab::Bnf2Treetop
 
+  class << self
+
+    def describe_into_under y, expag
+
+      y << "attempts to convert a BNF grammar to a treetop grammar"
+    end
+  end  # >>
+
   Param = ::Struct.new :name_symbol, :arg_stem, :bool, :default, :list, :desc
 
   class Param
@@ -133,12 +141,12 @@ module Skylab::Bnf2Treetop
 
     include Headless::Client_InstanceMethods
 
-    def initialize sin, sout, serr, _PROGRAM_NAME
+    def initialize sin, sout, serr, pn_s_a
 
       @infostream = serr
       @paystream = sout
       @upstream = sin
-      @PROGRAM_NAME = _PROGRAM_NAME
+      @pn_s_a = pn_s_a
       @result = UNABLE_
     end
 
@@ -198,7 +206,10 @@ module Skylab::Bnf2Treetop
     end
 
     def help
-      @infostream.puts option_parser.help
+      @result = 0
+      @infostream.puts usage_line
+      option_parser.summarize @infostream
+      NIL_
     end
 
     def option_parser
@@ -307,7 +318,11 @@ module Skylab::Bnf2Treetop
     end
 
     def program_name
-      @___program_name ||= ::File.basename @PROGRAM_NAME
+
+      @___program_name ||= (
+
+        [ ::File.basename( @pn_s_a.first ), * @pn_s_a[ 1 .. -1 ] ].
+          join( SPACE_ ) )
     end
 
     _codes = { bold: 1, green: 32 }
@@ -333,7 +348,7 @@ module Skylab::Bnf2Treetop
 
   class CLI
 
-    def initialize sin, sout, serr, _PROGRAM_NAME
+    def initialize sin, sout, serr, pn_s_a
 
       super
       @headless_client = Headless::Client.new self
@@ -1028,6 +1043,7 @@ module Skylab::Bnf2Treetop
 end
 
 if $PROGRAM_NAME == __FILE__
-  Skylab::Bnf2Treetop::CLI.new( $stdin, $stdout, $stderr, $PROGRAM_NAME ).
+
+  Skylab::Bnf2Treetop::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
     invoke ARGV
 end

@@ -114,7 +114,7 @@ that is, the modality client is a special kind of namespace. a namespace is a
 special kind of action. a namespace has many actions. (since a namespace is an
 action, a namespace can have other namespaces inside of it.)
 
-the above design was OK and served us well as the first rewrite of Face.
+the above design was OK and served us well as the first rewrite of F-ace.
 however it was not quite perfect given that we wanted to do the
 "public methods as DSL" hack. all kinds of smells cropped up as we tried to
 avoid having our implementation methods bump into our business action methods.

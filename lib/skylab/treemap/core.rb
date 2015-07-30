@@ -7,6 +7,10 @@ module Skylab::Treemap
 
   class << self
 
+    def describe_into_under y, _
+      y << "solid but impcomplete experiment with test coverage visualization"
+    end
+
     define_method :application_kernel_, ( Callback_.memoize do
 
       Home_.lib_.brazen::Kernel.new Home_

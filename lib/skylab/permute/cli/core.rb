@@ -96,32 +96,6 @@ module Skylab::Permute
       end
     end
 
-    Client = self
-
-    module Adapter
-      module For
-        module Face
-          module Of
-            Hot = -> namespace_sheet, my_CLI_class do
-              -> k, _ do
-
-                s_a = k.get_normal_invocation_string_parts
-                s_a.push namespace_sheet.name.as_slug
-
-                my_CLI_class.new( k.istream, k.ostream, k.estream, s_a )
-              end
-            end
-          end
-        end
-      end
-    end
-    def pre_execute
-      ACHIEVED_
-    end
-    def invokee
-      self
-    end
-
     Autoloader_[ Actors_ = ::Module.new ]
     EMPTY_A_ = [].freeze
     Autoloader_[ Sessions_ = ::Module.new ]

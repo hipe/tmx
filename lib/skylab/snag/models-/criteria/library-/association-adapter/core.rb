@@ -236,67 +236,6 @@ module Skylab::Snag
         Parse__ = LIB_.parse_lib
 
       end
-
-# ~
-if false
-
-    class Has_Tag < Tag_Related_
-
-      def phrase
-        "tag ##{ @valid_tag_stem_i }"
-      end
-
-      def match? node
-        if node.is_valid
-          @tag_rx =~ node.first_line_body or
-          if node.extra_lines_count > 0
-            node.extra_line_a.index { |x| @tag_rx =~ x }
-          end
-        end
-      end
-    end
-
-    class Does_Not_Have_Tag < Has_Tag
-
-      def phrase
-        "without #{ super }"
-      end
-
-      def match? node
-        ! super node
-      end
-    end
-
-    class IdentifierRef
-
-      class << self
-
-        def normal sexp, delegate
-          identifier_body = sexp[ 1 ]  # prefixes might bite [#019]
-          normal = Models::Identifier.normal identifier_body, delegate
-          normal and new normal
-        end
-      end
-
-      def initialize identifier_o
-        @identifier = identifier_o
-        @identifier_rx = /\A#{ ::Regexp.escape @identifier.body_s }/  # [#019], :~+[#ba-015]
-      end
-
-      def phrase
-        "identifier starting with \"#{ @identifier.body_s }\""
-      end
-
-      def match? node
-        if node.is_valid
-          @identifier_rx =~ node.identifier_body
-        end
-      end
-    end
-end
-# ~
-
-
     end
   end
 end

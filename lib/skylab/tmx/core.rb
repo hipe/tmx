@@ -3,12 +3,16 @@ require 'skylab/callback/core'
 
 module Skylab::TMX
 
+  def self.describe_into_under y, _
+    y << "uh.."
+  end
+
   Callback_ = ::Skylab::Callback
 
   -> o, h do
 
     o[ :bin_path ] = Callback_.memoize do
-      Home_.lib_.services.defaults.bin_path
+      Home_.lib_.system.defaults.bin_path
     end
 
     o[ :binfile_prefix ] = Callback_.memoize do
@@ -61,7 +65,14 @@ module Skylab::TMX
       :build_require_sidesystem_proc,
       :build_require_stdlib_proc )
 
+    Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
+    Slicer = sidesys[ :Slicer ]
+
+    _System_lib = sidesys[ :System ]
+    System = -> do
+      _System_lib[].services
+    end
   end
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]

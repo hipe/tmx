@@ -2,183 +2,141 @@ require_relative '../test-support'
 
 module Skylab::TMX::TestSupport
 
-  describe "[tmx] modality integrations - CLI", wip: true do
+  describe "[tmx] modality integrations - CLI" do
+
+    # (somewhat at odds with other nearby test nodes,
+    #  this is testing *our* tmx, and not *the* tmx)
 
     extend TS_
+    use :modalities_CLI
 
-    def self.client_class
-      TMX::CLI
-    end
-
-    def self.with i
-      define_singleton_method :with_value do i end
-    end
-
-    FLAG_ = '--ping'.freeze
-    PING_ARG_ = 'ping'.freeze
+    _FLAG = '--ping'.freeze
+    _PING_ARG = 'ping'.freeze
 
     it "beauty salon" do
-      go :beauty_salon
+      go :beauty_salon, _PING_ARG
     end
 
     it "bnf2treetop" do
-      go :bnf2treetop, FLAG_
+      go :bnf2treetop, _FLAG
     end
 
     it "breakup - capture3" do
-      capture3 :breakup, FLAG_, 0
+      go_ :breakup, _FLAG
     end
 
-    it "callback" do
+    it "callback", wip: true do  # #until:[hl]
       go :'callback'
     end
 
-    it "citxt - capture3" do
-      capture3 :citxt, FLAG_, 0
+    it "citxt" do
+      go_ :citxt, _FLAG
     end
 
     it "css-convert" do
-      go :'css-convert', FLAG_
+      go :'css-convert', _FLAG
     end
 
     it "cull" do
-      go :cull
+      go :cull, _PING_ARG
     end
 
     it "file metrics" do
-      $stderr.puts "\n\n\n\nSKIPPING FM CLI INTEG TEST FOR NOW\n\n\n\n"
-      # go :file_metrics
+      go :file_metrics, _PING_ARG
     end
 
     it "flex2treetop" do
-      go :flex2treetop
+      go :flex2treetop, _PING_ARG
     end
 
     it "git" do
-      go :git
+      go :git, _PING_ARG
     end
 
     it "permute" do
-      go :permute
+      go :permute, _PING_ARG
     end
 
     it "quickie", wip: true do
-      go :'quickie', FLAG_
+      go :'quickie', _FLAG
     end
 
     it "slicer" do
-      go :slicer
+      go :slicer, _PING_ARG
     end
 
     it "snag" do
-      go :snag
+      go :snag, _PING_ARG
     end
 
     it "sub tree" do
-      go :sub_tree
+
+      _go :styled, true, [ :sub_tree, _PING_ARG ]
     end
 
     it "test support" do
-      go :"test-support"
+      go :"test-support", _PING_ARG
     end
 
     it "tan man" do
-      go :tan_man
+      go :tan_man, _PING_ARG
     end
 
     it "treemap" do
-      go :treemap
+      go :treemap, _PING_ARG
     end
 
-    it "uncommit - capture3" do
-      capture3 :uncommit, FLAG_, 0
-    end
-
-    it "unsplit - capture3 - FROM BASH" do
-      capture3 :unsplit, FLAG_, 0
+    it "uncommit" do
+      go_ :uncommit, _FLAG
     end
 
     it "xargs-ish-i" do
-      capture3 :'xargs-ish-i', FLAG_, 0
+      go_ :'xargs-ish-i', _FLAG
     end
 
     it "yacc2treetop" do
-      go :'yacc2treetop', FLAG_
+      go :'yacc2treetop', _FLAG
     end
 
-    def go sym, *a
-      if a.length.zero?
-        _hack_write sym
-      end
-      _go sym, *a
+    def go * argv
+      _go true, argv
     end
 
-    def _go sym, *a
-      _x = _confirm_out_and_err_streams sym, *a
-      _x.should eql :"hello_from_#{ sym }"
-      nil
+    def go_ * argv
+      _go false, argv
     end
 
-    def capture3 i, ping_arg, exitstatus
+    define_method :_go, -> do
 
-      argv = [
-        TMX.bin_pathname.join( TMX.supernode_binfile ).to_path,
-        i.id2name, ping_arg ]
+      _DASH = '-'
+      _SPACE = ' '
+      _UNDERSCORE = '_'
 
-      o, e, st = TestSupport::Library_::Open3.capture3( * argv )
-      o.should eql EMPTY_S_
-      e.should eql "#{ hellomsg i }\n"
+      -> * x_a, yes, argv do
 
-      st.exitstatus.should eql exitstatus
-      nil
-    end
+        a = argv.first.id2name.split _UNDERSCORE
 
-    def _confirm_out_and_err_streams i, arg=PING_ARG_
-      x = invoke "#{ i.to_s.gsub UNDERSCORE_, DASH_ }", arg
-      iog = __memoized.fetch :io_spy_triad  # dear future - i am sorry:
-      # calling `lines` does hackery that won't work with our hackery, maybe.
+        argv[ 0 ] = a.join _DASH
 
-      oa, ea = [ :outstream, :errstream ].map do |ii|
-        io = iog[ ii ]
-        str = io.string
-        a = str.split NEWLINE_  # then:
-        io.rewind
-        io.truncate 0
-        a
-      end
+        invoke( * argv )
 
-      s = ea.fetch 0
-      s.gsub! SIMPLER_STYLE_RX_, EMPTY_S_
-      s.should eql hellomsg( i )
+        expect( * x_a, :e, "hello from #{ a.join _SPACE }." )
 
-      ea.length.should eql( 1 )
-      oa.length.should eql( 0 )
-      x
-    end
+        expect_no_more_lines
 
-    def hellomsg i
-      "hello from #{ i.to_s.gsub( UNDERSCORE_, SPACE_ ) }."
-    end
+        x = @exitstatus
+        if yes
 
-    -> do  # hacklund..
-      a = []
-      define_method :_hack_write do |i|
-        a << i
-        nil
-      end
-      define_method :_hack_read do a end
-    end.call
-
-    # # THIS IS A BAD TEST. ok to erase or whatever if you don't like it.
-    # the point is to shake the client up a bit with more than one request.
-
-    it "ridiculous hack to test long-running capabilities" do
-      a = _hack_read
-      a.each do |i|
-        2.times do |x_|
-          _go i
+          _sym = :"hello_from_#{ a.join _UNDERSCORE }"
+          x.should eql _sym
+        else
+          x.should eql 0
         end
       end
+    end.call
+
+    def subject_CLI
+      Home_::CLI
     end
   end
 end

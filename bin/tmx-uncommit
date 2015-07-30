@@ -7,24 +7,27 @@
 
 exit_status = 0
 
--> do
+program = -> _, stdout_, stderr_, pn_s_a, _ARGV do
+
   stay = true
 
   y = -> do
-    stderr = $stderr
+    stderr = stderr_
     ::Enumerator::Yielder.new { |msg| stderr.puts msg }
   end.call
 
-  moniker = 'uncommit'.freeze
-  writemode = 'w'.freeze
+  _MONIKER = 'uncommit'
+  _SPACE = ' '
 
   program_name = -> do
-    pn = ::File.basename $PROGRAM_NAME
-    me = ::File.basename __FILE__
-    if me == pn then me else
-      "#{ pn } #{ moniker }"
+    x = nil
+    p = -> do
+      x = [ ::File.basename( pn_s_a.first ), * pn_s_a[ 1 .. -1 ] ] * _SPACE
     end
-  end
+    -> do
+      x || p[]
+    end
+  end.call
 
   usage = -> do
     y << "usage: #{ program_name[] } some/file.rb"
@@ -32,7 +35,7 @@ exit_status = 0
     stay = false
   end
 
-  if 1 != (( argv = ::ARGV )).length
+  if 1 != (( argv = _ARGV )).length
     break usage[]
   end
 
@@ -40,10 +43,11 @@ exit_status = 0
 
   if '-' == tok[ 0, 1 ]
     if '--ping' == tok
-      y << "hello from #{ moniker }."
-      break( stay = false )
+      y << "hello from #{ _MONIKER }."
+      break 0
     end
-    break usage[]
+    usage[]
+    break 5
   end
 
   require 'pathname'
@@ -127,7 +131,7 @@ exit_status = 0
     chunk = sout.read page_size
 
     if chunk
-      o_fh = o_pn.open writemode
+      o_fh = o_pn.open ::File::WONLY
     else
       break bork[ "had no changes in most recent commit - #{ i_pn }" ]
     end
@@ -157,7 +161,7 @@ exit_status = 0
     i_pn.to_s
   ]
 
-  y << "(running: #{ kbd[ cmd * ' ' ] })"
+  y << "(running: #{ kbd[ cmd * _SPACE ] })"
 
   _exitstatus = ::Open3.popen3( * cmd ) do |sin, sout, serr, wait_thrd|
     saw = nil
@@ -223,6 +227,10 @@ exit_status = 0
 
   y << "uncommitted!"
 
-end.call
+end
 
-exit exit_status
+if __FILE__ == $PROGRAM_NAME
+  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+else
+  Skylab::Uncommit = program
+end

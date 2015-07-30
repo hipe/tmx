@@ -55,6 +55,7 @@ module Skylab::TMX
     def __build_second_level_stream
 
       _all = @filesystem.glob ::File.join( @bin_path, '*' )
+
       proto = Models_::Script_Adapter.new(
         @program_name_string_array,
         __build_helpscreen_reducer_for_script,
@@ -112,7 +113,7 @@ module Skylab::TMX
       o
     end
 
-    class Same__
+    class Reactive_Node__
 
       def initialize pn_s_a, reducer
         @program_name_string_array = pn_s_a
@@ -121,6 +122,10 @@ module Skylab::TMX
 
       def name_value_for_order
         @name_.as_lowercase_with_underscores_symbol
+      end
+
+      def name_function
+        @name_
       end
 
       def after_name_value_for_order
@@ -134,10 +139,17 @@ module Skylab::TMX
       def has_description
         true
       end
+
+      # ~
+
+      def _init_pn_s_a
+
+        @_pn_s_a = [ * @program_name_string_array, @name_.as_slug ]
+      end
     end
 
     Models_ = ::Module.new
-    class Models_::Sidesystem_Module_Adapter < Same__  # akin to "action adapter", etc
+    class Models_::Sidesystem_Module_Adapter < Reactive_Node__ # akin to "action adapter", etc
 
       def new nm, mod
         otr = dup
@@ -163,9 +175,23 @@ module Skylab::TMX
       def name
         @name_
       end
+
+      def bound_call_via_receive_frame fr
+
+        _init_pn_s_a
+
+        o = fr.resources
+
+        _cli = @mod::CLI.new o.sin, o.sout, o.serr, @_pn_s_a
+
+        Callback_::Bound_Call.new(
+          [ o.argv ],
+          _cli,
+          :invoke )
+      end
     end
 
-    class Models_::Script_Adapter < Same__  # algorithm at [#.B]
+    class Models_::Script_Adapter < Reactive_Node__  # algorithm at [#.B]
 
       def new md, entry
         otr = dup
@@ -188,27 +214,18 @@ module Skylab::TMX
         # if description is being requested, we assume that execution
         # will not be requested for this same node (eew)
 
-        # load the file. (note we assume it's never been loaded)
-
-        ::Kernel.load @entry  # result is 'true'
-
-        _pn_s_a = [ * @program_name_string_array, @name_.as_slug ]
-
-        s = @name_.as_lowercase_with_underscores_symbol.id2name
-        s[ 0 ] = s[ 0 ].upcase
-
-        _univeral_proc = ::Skylab.const_get s.intern, false
+        _load_script
 
         number_of_lines == @reducer_.number_of_lines or self._SANITY
 
         @reducer_.lines_by do | out_IO_proxy |
 
-          _univeral_proc.call(
+          @_univeral_proc.call(
 
             NOT_TTY___,
             :_no_stdout_for_help_display_,
             out_IO_proxy,
-            _pn_s_a,
+            @_pn_s_a,
             [ HELP_ARG___ ],  # must be mutable
           )
         end
@@ -222,6 +239,36 @@ module Skylab::TMX
         end
       end
       NOT_TTY___ = Not_TTY___.new
+
+      def bound_call_via_receive_frame frm  # assume script is not loaded
+
+        _load_script
+
+        _argv = __argv_via_resources frm.resources
+
+        Callback_::Bound_Call.new(
+          _argv,
+          @_univeral_proc,
+          :call )
+      end
+
+      def __argv_via_resources rsx
+
+        [ rsx.sin, rsx.sout, rsx.serr, @_pn_s_a, rsx.argv ]
+      end
+
+      def _load_script  # assume it's never been loaded
+
+        ::Kernel.load @entry  # result is 'true'
+
+        _init_pn_s_a
+
+        s = @name_.as_lowercase_with_underscores_symbol.id2name
+        s[ 0 ] = s[ 0 ].upcase
+
+        @_univeral_proc = ::Skylab.const_get s.intern, false
+        NIL_
+      end
     end
 
     class Proxy__

@@ -12,6 +12,10 @@ module Skylab::Callback
       CONST_SEP_
     end
 
+    def describe_into_under y, expag
+      y << "(as a reactive node, [ca] is some ancient artifact..)"
+    end
+
     def distill * a
       if a.length.zero?
         Distill_

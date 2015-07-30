@@ -3,25 +3,15 @@ require 'skylab/callback/core'
 
 module Skylab::BeautySalon
 
-  module API
-
-    class << self
-
-      def call * x_a, & oes_p
-        bc = Home_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
-        bc and bc.receiver.send bc.method_name, * bc.args
-      end
-
-      def call_via_mutable_box__ * i_a, bx, & x_p
-        bc = Home_.application_kernel_.bound_call_via_mutable_box i_a, bx, & x_p
-        bc and bc.receiver.send bc.method_name, * bc.args
-      end
-    end  # >>
-  end
-
   Callback_ = ::Skylab::Callback
 
   class << self
+
+    def describe_into_under y, _
+
+      y << "an umbrella node for text-processing utilities -"
+      y << "word wrap, search & replace, and comment processing functions"
+    end
 
     define_method :application_kernel_, ( Callback_.memoize do
       Brazen_::Kernel.new Home_
@@ -37,6 +27,21 @@ module Skylab::BeautySalon
     end
   end  # >>
 
+  module API
+
+    class << self
+
+      def call * x_a, & oes_p
+        bc = Home_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
+        bc and bc.receiver.send bc.method_name, * bc.args
+      end
+
+      def call_via_mutable_box__ * i_a, bx, & x_p
+        bc = Home_.application_kernel_.bound_call_via_mutable_box i_a, bx, & x_p
+        bc and bc.receiver.send bc.method_name, * bc.args
+      end
+    end  # >>
+  end
   Autoloader_ = Callback_::Autoloader
 
   module Lib_

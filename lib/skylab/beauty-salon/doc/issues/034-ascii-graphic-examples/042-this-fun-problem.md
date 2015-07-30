@@ -17,7 +17,7 @@ simplicity of design:
 you subclasses classes, use DSL's, and that's it. no pesky instance methods
 modules or module methods modules to remember, no complex inheritence graphs
 to create. its goal is that you can write simple, usable interfaces with it
-that themselves use a simple usable interface to interact with the Face
+that themselves use a simple usable interface to interact with the F-ace
 library.
 
 A challenger appears when it comes time to customize or DRY things up:

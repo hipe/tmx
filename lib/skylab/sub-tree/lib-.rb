@@ -24,26 +24,24 @@ module Skylab::SubTree
 
     Brazen = sidesys[ :Brazen ]
 
+    _HL = sidesys[ :Headless ]
+
     CLI_lib = -> do
-      HL__[]::CLI
+      _HL[]::CLI
     end
 
     EN_add_methods = -> * i_a do
-      HL__[].expression_agent.NLP_EN_methods.call_via_arglist i_a
+      _HL[].expression_agent.NLP_EN_methods.call_via_arglist i_a
     end
-
-    FA___ = sidesys[ :Face ]
-
-    Hu___ = sidesys[ :Human ]
-
-    HL__ = sidesys[ :Headless ]
 
     Strange_proc = -> do
       Basic[]::String.via_mixed.to_proc
     end
 
+    _Hu = sidesys[ :Human ]
+
     Summarize_time = -> x do
-      Hu___[]::Summarize::Time[ x ]
+      _Hu[]::Summarize::Time[ x ]
     end
 
     _System_lib = sidesys[ :System ]
@@ -52,19 +50,19 @@ module Skylab::SubTree
       _System_lib[].services
     end
 
+    _TS = sidesys[ :TestSupport ]
+
     Test_file_suffix_a = -> do
-      [ TS___[].spec_rb ]
+      [ _TS[].spec_rb ]
     end
 
     Test_dir_name_a = -> do
-      TS___[].constant :TEST_DIR_NAME_A
+      _TS[].constant :TEST_DIR_NAME_A
     end
 
     Tree = -> do
       Basic[]::Tree
     end
-
-    TS___ = sidesys[ :TestSupport ]
 
     INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(
       self, Home_ )  # at the end

@@ -3,6 +3,10 @@ require 'skylab/callback/core'
 
 module Skylab::Snag
 
+  def self.describe_into_under y, _
+    y << "exciting experiments in issue tracking simplification"
+  end
+
   module API
 
     class << self

@@ -103,17 +103,6 @@ module Skylab::Snag
       end  # >>
     end
 
-    if false
-    def bld_terse_node_yieldee
-      m = @lines.method( :<< )
-      ::Enumerator::Yielder.new do |n|
-        @lines << n.first_line
-        n.extra_line_a.each(& m ) if n.extra_lines_count.nonzero?
-        nil
-      end
-    end
-    end
-
     NILADIC_TRUTH_ = -> { true }
   end
 end

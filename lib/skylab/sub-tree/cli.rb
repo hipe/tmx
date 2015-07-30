@@ -6,24 +6,6 @@ module Skylab::SubTree
 
     Brazen_ = Home_.lib_.brazen
 
-    # ~ begin #hook-out for [tmx] integration
-
-    Client = self
-    module Adapter
-      module For
-        module Face
-          module Of
-            Hot = -> x, x_ do
-
-              Brazen_::CLI::Client.fml Home_, x, x_
-            end
-          end
-        end
-      end
-    end
-
-    # ~ end
-
     class << self
 
       def new * a

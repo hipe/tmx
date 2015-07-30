@@ -315,7 +315,7 @@ module Skylab::Callback
             _call_via_arglist a
           end
 
-          def _call_via_arglist  a
+          def _call_via_arglist a
             new( * a ).execute
           end
 

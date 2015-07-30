@@ -5,6 +5,14 @@ module Skylab::Slicer
 
   class << self
 
+    def describe_into_under y, _
+      y << "more library than app currently, list comprehension on sidesystems"
+    end
+
+    def new_traversal
+      Home_::Sessions_::Traversal.new
+    end
+
     def application_kernel_
 
       @___ak ||= Brazen_::Kernel.new Home_

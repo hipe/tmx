@@ -17,6 +17,7 @@ module Skylab::Dependency
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
+  CLI = nil  # for host
   Home_ = self
   stowaway :Library_, 'lib-'
   NIL_ = nil

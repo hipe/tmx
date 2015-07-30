@@ -28,6 +28,11 @@ module Skylab::Brazen
       Home_::Collection_Adapters
     end
 
+    def describe_into_under y, expag
+
+      y << "the prototype [br] app (sidelined for now as a real app)"
+    end
+
     def expression_agent_library
       Home_::API::Expression_Agent__::LIB
     end
@@ -129,7 +134,7 @@ module Skylab::Brazen
     kp
   end
 
-  class Interface_Tree_Node_
+  class Interface_Tree_Node_  # ([#098] tracks client candidates)
 
     # base class for nodes in the inteface tree (currently model, action).
     # (the categories are pursuant to [#024] top)
@@ -282,9 +287,7 @@ module Skylab::Brazen
 
       def edit_entity_class * x_a, & edit_p
 
-        if edit_p
-          $stderr.puts "\n\n\n  #{ '>' * 30 }\n   USING CLASSIC STYLE ON A NEW THING: #{ self }\n\n\n"
-        end
+        # (block is used in one place in [ts] at writing)
 
         _what = entity_enhancement_module
 

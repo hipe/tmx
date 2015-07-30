@@ -70,6 +70,12 @@ module Skylab::Basic
         instance_exec( & edit_p )
       end
 
+      def description
+        _yn1 = has_proc_for_determining_entry ? 'yes' : 'no'
+        _yn2 = has_proc_for_on_entry ? 'yes' : 'no'
+        "(#{ @name_symbol }: #{ _yn1 } #{ _yn2 })"
+      end
+
       def description_under _expag
 
         Callback_::Name.via_variegated_symbol( @name_symbol ).as_human
@@ -113,9 +119,10 @@ module Skylab::Basic
     public
 
       attr_reader(
-        :has_proc_for_entry,
-        :handle_possible_entry,
+        :has_proc_for_determining_entry,
+        :has_proc_for_on_entry,
         :handle_entry,
+        :handle_possible_entry,
       )
 
     private
@@ -142,12 +149,13 @@ module Skylab::Basic
       end
 
       def _accept_entered_by & p
-        @has_proc_for_entry = true
+        @has_proc_for_determining_entry = true
         @handle_possible_entry = p
         NIL_
       end
 
       def on_entry=
+        @has_proc_for_on_entry = true
         @handle_entry = gets_one_polymorphic_value
         KEEP_PARSING_
       end
@@ -159,33 +167,41 @@ module Skylab::Basic
         @_bx = bx
       end
 
-      def against upstream_x, & x_p
-        sess = Session___.new( & x_p )
+      def against upstream_x, * x_a, & x_p
+        sess = Active_Session__.new( * x_a, & x_p )
         sess.box = @_bx
         sess.upstream = upstream_x
         sess.execute
       end
+
+      def begin * x_a, & x_p
+        sess = Passive_Session___.new( * x_a, & x_p )
+        sess.box = @_bx
+        sess._receive_begin
+        sess
+      end
     end
 
-    class Session___
+    Session__ = ::Class.new
 
-      def initialize & x_p
+    class Active_Session__ < Session__
 
-        @_downstream = []  # for now
-        @_oes_p = x_p
-      end
+      attr_writer :upstream
 
-      attr_writer :box, :upstream
+      def _receive_begin
+        super
 
-      def execute
-
-        @_state = @box.fetch :beginning
-
-        @_step_via_find_next_state = method :_step_via_find_next_state
+        @_step_via_find_entry = method :_step_via_find_entry
         @_step_via_matched_state = method :_step_via_matched_state
         @__step_via_not_yet_matched_state = method :__step_via_not_yet_matched_state
 
-        @_step_p = @_step_via_find_next_state
+        @_step_p = @_step_via_find_entry
+        NIL_
+      end
+
+      def execute
+
+        _receive_begin
 
         st = Callback_.stream do
           @_step_p[]
@@ -200,7 +216,127 @@ module Skylab::Basic
         @_user_x
       end
 
-      def _step_via_find_next_state
+      def _via_found_state_for_transition yes_x, sta
+        @_step_p = @_step_via_matched_state
+        super
+      end
+
+      def _receive_next_state sta
+
+        @_step_p = if sta.has_proc_for_determining_entry
+
+          @__step_via_not_yet_matched_state
+        else
+          @_step_via_find_entry
+        end
+        super
+      end
+
+      def _receive_ending_state sta
+
+        @_step_p = EMPTY_P_
+        super
+      end
+    end
+
+    class Passive_Session___ < Session__
+
+      def _receive_begin
+        @upstream = Passive_Upstream_Proxy___.new
+        super
+      end
+
+      def puts line
+
+        @upstream.replace line
+
+        _ok = _step_via_find_entry
+        if _ok
+          __passive_loop
+        else
+          raise __build_common_exception
+        end
+      end
+
+      def __build_common_exception
+        _build_exception_around _to_possible_next_state_stream.to_a
+      end
+
+      def __passive_loop
+
+        begin
+
+          _ok = _step_via_matched_state
+          if _ok
+
+            if @_state.has_proc_for_on_entry
+
+              _x = @_state.handle_entry[]
+              self._COVER_ME
+            end
+
+            break
+          end
+          self._FUU
+        end while nil
+        NIL_
+      end
+
+      def __step_via_matched_state_that_has_no_on_entry_proc
+
+        # exerimentally we stay..
+        @_state.name_symbol
+      end
+    end
+
+    class Session__
+
+      def initialize ds=[], & x_p
+
+        @_downstream = ds
+        @_oes_p = x_p
+      end
+
+      attr_writer :box
+
+      def _receive_begin
+        @_state = @box.fetch :beginning
+        NIL_
+      end
+
+      def _step_via_matched_state  # must change state
+
+        sta = @_state
+
+        if sta.has_proc_for_on_entry
+
+          had_proc_for_on_entry = true
+          sym = sta.handle_entry[ @_downstream, @_yes_x ]
+
+        end
+
+        if :ending == sta.name_symbol
+
+          sym and self._SANITY
+
+          _receive_ending_state sta
+
+          NIL_  # will break out of the loop
+
+        elsif had_proc_for_on_entry
+
+          if sym
+            _receive_next_state @box.fetch sym
+            sym
+          else
+            self._MISBEHAVED_STATE_MACHINE
+          end
+        else
+          __step_via_matched_state_that_has_no_on_entry_proc  # ..
+        end
+      end
+
+      def _step_via_find_entry
 
         st = _to_possible_next_state_stream
 
@@ -217,22 +353,16 @@ module Skylab::Basic
           redo
         end while nil
 
-        __via_any_found_state_for_transistion yes_x, sta
-      end
-
-      def __via_any_found_state_for_transistion yes_x, sta
-
         if sta
-          __via_found_state_for_transition yes_x, sta
+          _via_found_state_for_transition yes_x, sta
         else
           __when_no_available_transition
         end
       end
 
-      def __via_found_state_for_transition yes_x, sta
+      def _via_found_state_for_transition yes_x, sta
 
-        @_state = sta
-        @_step_p = @_step_via_matched_state
+        _accept_state sta
         @_yes_x = yes_x
 
         sta.name_symbol
@@ -252,43 +382,24 @@ module Skylab::Basic
         end
       end
 
-      def _step_via_matched_state  # must change step
+      def _receive_ending_state sta
 
-        sta = @_state
+        _receive_next_state = sta
 
-        if sta.has_proc_for_entry
+        @_user_x = @_downstream
+        @_downstream = nil
+        NIL_
+      end
 
-          sym = sta.handle_entry[ @_downstream, @_yes_x ]
+      def _receive_next_state sta
 
-        end
+        _accept_state sta
+        NIL_
+      end
 
-        if :ending == sta.name_symbol
-
-          sym and self._SANITY
-
-          @_step_p = EMPTY_P_
-
-          @_user_x = @_downstream
-          @_downstream = nil
-
-          NIL_  # will break out of the loop
-        else
-
-          sym or self._SANTIY
-
-          sta_ = @box.fetch sym
-
-          @_state = sta_
-
-          @_step_p = if sta_.has_proc_for_entry
-
-            @__step_via_not_yet_matched_state
-          else
-            @_step_via_find_next_state
-          end
-
-          sym
-        end
+      def _accept_state sta
+        @_state = sta
+        NIL_
       end
 
       def _via_state_reinit_proc
@@ -316,6 +427,24 @@ module Skylab::Basic
 
       def _maybe_send_no_available_transition_among sta_a  # must result in nil
 
+        if @_oes_p
+          @_user_x = @_oes_p.call :error, :case, :no_available_state_transition do
+            _build_no_available_transition sta_a
+          end
+          NIL_
+        else
+          raise _build_exception_around sta_a
+        end
+        NIL_
+      end
+
+      def _build_exception_around sta_a
+
+        _build_no_available_transition( sta_a ).to_exception
+      end
+
+      def _build_no_available_transition sta_a
+
         if @upstream.unparsed_exists
           had_more = true
           x = @upstream.current_token
@@ -323,13 +452,11 @@ module Skylab::Basic
           had_more = false
         end
 
-        @_user_x = @_oes_p.call :error, :case, :no_available_state_transition do
-
-          State_::Events_::No_Available_State_Transition.new_with(
-            :x, x, :had_more, had_more, :possible_state_array, sta_a )
-        end
-
-        NIL_
+        State_::Events_::No_Available_State_Transition.new_with(
+          :x, x,
+          :had_more, had_more,
+          :possible_state_array, sta_a,
+        )
       end
 
       def _to_possible_next_state_stream
@@ -352,6 +479,30 @@ module Skylab::Basic
         else
 
           Callback_::Stream.the_empty_stream
+        end
+      end
+    end
+
+    class Passive_Upstream_Proxy___  # (mentors something in [pa])
+
+      def current_token
+        @current_token
+      end
+
+      def replace line
+        @current_token = line
+        NIL_
+      end
+
+      def unparsed_exists
+        true
+      end
+
+      def advance_one
+        if @current_token
+          @current_token = nil
+        else
+          self._COVER_ME
         end
       end
     end

@@ -54,7 +54,7 @@ module Skylab::TanMan
         y = [ ] ; first.members.each do |i|
           y << :field << i.to_s.gsub( /\A[a-z]/, & :upcase ).gsub( '_', ' ' )
         end
-        r = TanMan::Services::Face::CLI::Table[ * y,
+        r = TanMan::Services::F_ace::CLI::Table[ * y,
           :left, '| ', :sep, ' | ', :right, ' |',
           :read_rows_from, _ea,
           :write_lines_to, method( :payload ) ]

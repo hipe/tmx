@@ -38,25 +38,5 @@ module Skylab::TestSupport
     def expression_agent_class
       Home_::CLI::Expression_Agent
     end
-
-    # ~ for tmx integration
-
-    Client = self
-
-    module Adapter  # #hook-out for [tmx] integration
-      module For
-        module Face
-          module Of
-            module Hot
-
-              def self.[] kr, tok
-
-                Home_.lib_.brazen::CLI::Client.fml Home_, kr, tok
-              end
-            end
-          end
-        end
-      end
-    end
   end
 end

@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w
 
-exit( -> sin, sout, serr, argv, program_name do
+program = -> sin, sout, serr, pn_s_a, argv do
 
   y = ::Enumerator::Yielder.new( & serr.method( :puts ) )
   _OK = 0 ; _NOPE = 1
@@ -17,8 +17,14 @@ exit( -> sin, sout, serr, argv, program_name do
   kw = -> s { "\e[32m<#{ s }>\e[0m" }
 
   prgnm = -> do
-    ::File.basename $PROGRAM_NAME
-  end
+    x = nil
+    p = -> do
+      x = [ ::File.basename( pn_s_a.first ), * pn_s_a[ 1 .. -1 ] ] * ' '
+    end
+    -> do
+      x || p[]
+    end
+  end.call
 
   require 'highline/import' ; require 'set'
 
@@ -346,4 +352,10 @@ exit( -> sin, sout, serr, argv, program_name do
 
   _OK
 
-end.call $stdin, $stdout, $stderr, ::ARGV, $PROGRAM_NAME )
+end
+
+if __FILE__ == $PROGRAM_NAME
+  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+else
+  Skylab::Sg_doc_normalize = program
+end
