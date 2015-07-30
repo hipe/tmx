@@ -18,7 +18,7 @@ module Skylab::SubTree
 
         # ~ supplemental EN NLP
 
-        Home_.lib_.EN_add_methods self, :private, %i( and_ both )
+        Home_.lib_.human::NLP::EN::Methods[ self, :private, %i( and_ both ) ]
 
         self
       end.new nil  # [#br-093]:#point-10 is relevant here (expag state)

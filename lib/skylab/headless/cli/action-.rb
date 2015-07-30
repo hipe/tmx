@@ -31,10 +31,6 @@ module Skylab::Headless
       def pen
         CLI::Pen__
       end
-
-      def tree
-        CLI::Tree__
-      end
     end  # >>
   end
 
@@ -43,7 +39,7 @@ module Skylab::Headless
     class << self
 
       def [] mod, * x_a
-        via_client_and_iambic mod, x_a
+        edit_module_via_mutable_iambic mod, x_a
       end
 
       def desc
@@ -57,12 +53,12 @@ module Skylab::Headless
         _max_d + op.summary_indent.length - 1
       end
 
-      def call_via_arglist a
-        via_client_and_iambic a.shift, a
+      def call_via_arglist a  # mutates
+        edit_module_via_mutable_iambic a.shift, a
       end
 
-      def via_client_and_iambic mod, x_a
-        Bundles__.apply_iambic_on_client x_a, mod
+      def edit_module_via_mutable_iambic mod, x_a
+        Bundles__.edit_module_via_mutable_iambic mod, x_a
       end
     end
 

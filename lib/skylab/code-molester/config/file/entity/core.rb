@@ -92,7 +92,7 @@ module Skylab::CodeMolester
 
 
 
-  Shell_ = LIB_.simple_shell %i( fields )
+  Shell_ = LIB_.plugin::Bundle::Enhance::Shell.new %i( fields )
 
   class Kernel_
 
@@ -115,7 +115,7 @@ module Skylab::CodeMolester
 
         mutex_h[ target ].call
 
-        LIB_.field_box_enhance target, -> do
+        LIB_.basic::Field.box.via_client_and_proc target, -> do
 
           meta_fields( * METAFIELDS_BASE_ )
 

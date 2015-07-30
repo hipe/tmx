@@ -141,7 +141,7 @@ module Skylab::SubTree
 
       # ~ EN NLP
 
-      lib.EN_add_methods self, :private, %i( or_ s )
+      lib.human::NLP::EN::Methods[ self, :private, %i( or_ s ) ]
 
     end
 

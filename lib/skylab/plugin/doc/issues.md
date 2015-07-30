@@ -1,5 +1,6 @@
 [#033]       explaining the enhance method ..
 [#024]       the bundle fancy lookup exegesis ..
+[#008]       delegation ..
 [#007]       the dependencies narrative ..
 [#006]       #track pub-sub hacks (mutations) #universal
 [#005]       [ pub-sub ]  (currently implemented by [#007])

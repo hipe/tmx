@@ -2,7 +2,9 @@ module Skylab::TestSupport
 
   class Tree_Runner
 
-    sl_lib = ::File.expand_path '../..', HERE_  # [#002] #at-this-exact-point
+    # ~ [#002] #at-this-exact-point: manual loading is necessary..
+
+    sl_lib = ::File.expand_path '../..', HERE_
 
     require "#{ sl_lib }/test-support/core"
 
@@ -10,39 +12,9 @@ module Skylab::TestSupport
 
     Autoloader_[ Plugins__, :boxxy ]
 
-    module Lib_  # :+[#ss-001]
-
-      sidesys = Autoloader_.build_require_sidesystem_proc
-
-      Basic = sidesys[ :Basic ]
-
-      Human  = sidesys[ :Human ]
-
-      HL__ = sidesys[ :Headless ]
-
-      Open3 = -> do
-        require 'open3'
-        ::Open3
-      end
-
-      Option_parser = -> do
-        require 'optparse'
-        ::OptionParser
-      end
-
-      Tree_Runner::Plugin___ = sidesys[ :Plugin ]
-
-      System = -> do
-        System_lib__[].services
-      end
-
-      System_lib__ = sidesys[ :System ]
-
-    end  # Lib_
-
     # ~
 
-    Plugin_ = Plugin___[]::Digraphic
+    Plugin_ = Home_.lib_.plugin::Digraphic
 
     class Plugins__::Express_Help < Plugin_
 

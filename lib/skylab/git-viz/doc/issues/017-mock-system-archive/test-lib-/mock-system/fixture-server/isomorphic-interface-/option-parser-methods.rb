@@ -8,7 +8,7 @@ module Skylab::GitViz
 
       module Option_Parser_Methods
 
-        def self.apply_iambic_on_client _, mod
+        def self.edit_module_via_iambic mod, _
           mod.include Option_Parser_Methods
         end
 

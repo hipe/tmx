@@ -88,7 +88,7 @@ module Skylab::Brazen
           s = @slug_a.fetch( -1 )
           s.respond_to?( :ascii_only? ) or self._DO_ME
 
-          Home_.lib_.NLP::EN::POS::Verb[ s ]
+          Home_.lib_.human::NLP::EN::POS::Verb[ s ]
         end
       end
 
@@ -102,7 +102,7 @@ module Skylab::Brazen
 
           s = @slug_a.fetch( -2 )
           s.respond_to?( :ascii_only? ) or raise self._DO_ME
-          Home_.lib_.NLP::EN::POS::Noun[ s ] << :_do_not_use_article_
+          Home_.lib_.human::NLP::EN::POS::Noun[ s ] << :_do_not_use_article_
         end
       end
     end

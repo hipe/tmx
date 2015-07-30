@@ -46,10 +46,6 @@ module Skylab::TanMan
       Basic[]::Module
     end
 
-    NLP_EN_methods = -> do
-      HL__[].expression_agent.NLP_EN_methods
-    end
-
     Parameter = -> do
       HL__[]::Parameter
     end

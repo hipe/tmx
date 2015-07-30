@@ -134,7 +134,7 @@ module Skylab::Snag
                   crook: ' •- ',
                    pipe: ' |  ',
                     tee: ' |- '
-            }  # (intentionally typeable versions of [#hl-172] the tree glyphs)
+            }  # (intentionally typeable versions of [#ba-049] the tree glyphs)
           end
 
           def to_tree_

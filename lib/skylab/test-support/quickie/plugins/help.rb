@@ -17,9 +17,12 @@ module Skylab::TestSupport
       SWITCH__ = '--help'.freeze
 
       Match__ = -> do
+
         load = -> do
-          Home_.lib_.SUNSETTING_CLI_lib.option.basic_switch_index_curry SWITCH__
+          Home_.lib_.brazen::CLI::Actors::Build_basic_switch_proc[ SWITCH__ ]
         end
+        p = nil
+
         -> x do
           p ||= load[]
           p[ x ]

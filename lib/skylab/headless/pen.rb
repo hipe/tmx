@@ -60,15 +60,15 @@ module Skylab::Headless
     end
 
     def _NLP_agent
-      @NLP_agnt ||= NLP_agent_class__[].new
+      @NLP_agnt ||= NLP_agent_class___[].new
     end
 
-    NLP_agent_class__ = Callback_.memoize do
+    NLP_agent_class___ = Callback_.memoize do
 
-      class NLP_Agent__
+      class NLP_Agent___
 
-        Home_.expression_agent.NLP_EN_methods self, :public,
-          [ :and_, :indefinite_noun, :or_, :plural_noun, :s ]
+        Home_.lib_.human::NLP::EN::Methods[ self, :public,
+          [ :and_, :indefinite_noun, :or_, :plural_noun, :s ] ]
 
         self
       end

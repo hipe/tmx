@@ -8,10 +8,6 @@ module Skylab::Headless
         Option_::Aggregation__
       end
 
-      def basic_switch_index_curry switch_s
-        Option_::Basic__::Switch_index_curry[ switch_s ]
-      end
-
       def build_via_switch sw
         Option_::Model__.build_via_switch sw
       end
@@ -56,14 +52,6 @@ module Skylab::Headless
         SIMPLE_SHORT_RX__
       end
 
-      def starts_with_dash * a
-        if a.length.zero?
-          Starts_with_dash__
-        else
-          Starts_with_dash__[ * a ]
-        end
-      end
-
       def values_at * i_a
         o = @value_struct
         i_a.map do |i|
@@ -97,10 +85,6 @@ module Skylab::Headless
 
     SIMPLE_SHORT_RX__ = /\A-[^-]/
 
-    Starts_with_dash__ = -> s do
-      DASH_BYTE_ == s.getbyte( 0 )
-    end
-
     @value_struct = -> do  # :+[#165]
       i_a = [] ; i_a_ = []
       o = -> i, i_ do
@@ -114,14 +98,5 @@ module Skylab::Headless
 
       ::Struct.new( * i_a ).new( * i_a_ )
     end.call
-
-    # `basic_switch_index_curry` is a hack to see if a basic switch is present
-    #
-    #     p = Subject_[].basic_switch_index_curry '--foom'
-    #     p[ [ 'abc' ] ]  # => nil
-    #     p[ [ 'abc', '--fo', 'def' ] ]  # => 1
-    #     p[ [ '--foomer', '-fap', '-f', '--foom' ] ]  # => 2
-
-
   end
 end

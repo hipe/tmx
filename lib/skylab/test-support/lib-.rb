@@ -45,11 +45,6 @@ module Skylab::TestSupport
       Autoloader_.default_core_file
     end
 
-    _HL = sidesys[ :Headless ]
-    EN_add_methods = -> mod, * x_a do
-      _HL[].expression_agent.NLP_EN_methods.on_mod_via_iambic mod, x_a
-     end
-
     Enhancement_shell = -> * i_a do
       Plugin[]::Bundle::Enhance::Shell.new i_a
     end
@@ -72,6 +67,8 @@ module Skylab::TestSupport
       _Snag[]::Models::Hashtag
     end
 
+    Human = sidesys[ :Human ]
+
     Iambic_scanner = -> do
       Callback_::Polymorphic_Stream
     end
@@ -80,10 +77,8 @@ module Skylab::TestSupport
       System_lib[]::IO
     end
 
-    _Hu = sidesys[ :Human ]
-
     Levenshtein = -> * x_a do
-      _Hu[]::Levenshtein.call_via_iambic x_a
+      Human[]::Levenshtein.call_via_iambic x_a
     end
 
     Match_test_dir_proc = -> do

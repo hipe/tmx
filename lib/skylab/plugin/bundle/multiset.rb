@@ -8,7 +8,7 @@ module Skylab::Plugin
         mod.extend self
       end
 
-      def apply_iambic_on_client x_a, client
+      def edit_module_via_mutable_iambic client, x_a
         h = _hard_bundle_fetcher
         begin
           client.module_exec x_a, & h[ x_a.shift ].to_proc

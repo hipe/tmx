@@ -7,24 +7,16 @@ module Skylab::Headless::SubClient
   class << self
 
     def expression_agent
-      Expression_Agent__
+      Expression_Agent___
     end
   end
 
-  module Expression_Agent__
+  module Expression_Agent___
 
     class << self
 
       def NLP_EN_agent
         NLP_EN_expression_agent_instance__[]
-      end
-
-      def NLP_EN_methods * x_a
-        if x_a.length.zero?
-          NLP_EN_Methods__
-        else
-          NLP_EN_Methods__.call_via_arglist x_a
-        end
       end
     end
   end
@@ -192,213 +184,13 @@ end
 
   NLP_EN_expression_agent_instance__ = Callback_.memoize do
 
-    class NLP_EN_Expression_Agent_Instance__
+    class NLP_EN_Expression_Agent____
 
       alias_method :calculate, :instance_exec
 
-      methods = NLP_EN_Methods__.struct
-
-    private
-
-      [ :and_, :or_, :s, :nlp_last_length, :set_nlp_last_length ].each do | i |
-        define_method i, methods[ i ]
-      end
+      Home_.lib_.human::NLP::EN::Methods[ self, :private, [ :and_, :or_, :s ] ]
 
       self
     end.new
-  end
-
-  module NLP_EN_Methods__  # see [#086]
-
-    class << self
-
-      def [] mod, * x_a
-        on_mod_via_iambic mod, x_a
-      end
-
-      def call_via_arglist a
-        on_mod_via_iambic a.shift, a
-      end
-
-      def each_pair & p
-        @struct.each_pair( & p )
-      end
-
-      def on_mod_via_iambic mod, x_a
-
-        case x_a.first
-        when :private ; do_private = true
-        when :public ; nil
-        else ; raise ::ArgumentError, "public or private, not: '#{ x_a.first }'"
-        end
-
-        2 == x_a.length or raise ::ArgumentError, "#{ x_a.length } for 2"
-
-        meth_i_a = [ * x_a.last, :nlp_last_length, :set_nlp_last_length ]
-
-        o = @struct
-
-        mod.module_exec do
-          meth_i_a.each do |meth_i|
-            define_method meth_i, o[ meth_i ]
-          end
-          do_private and private( * meth_i_a )
-        end ; nil
-      end
-
-      attr_reader :struct
-    end
-
-    -> do
-
-      o = -> do
-        @i_a = [] ; @p_a = []
-        o_ = -> i, p do
-          @i_a.push i ; @p_a.push p ; nil
-        end
-        class << o_
-          alias_method :[]=, :call
-        end
-        o_
-      end.call
-
-      bump_numerish = _EN = nil
-
-      %i| an an_ |.each do |i|
-        o[ i ] = -> lemma, numerish=false do
-          instance_exec numerish, -> nmrsh do
-            _EN[][ i ][ lemma, nmrsh ]
-          end, & bump_numerish
-        end
-      end
-
-      o[ :_non_one ] = -> numerish=nil do  # for nlp hacks, leading space iff not 1
-        instance_exec numerish, -> nmrsh do
-          " #{ nmrsh }" if 1 != nmrsh
-        end, & bump_numerish
-      end
-
-      o[ :s ] = -> * args do  # [length] [lexeme_i]
-        len_x, lexeme_i = Home_.lib_.parse_lib.parse_serial_optionals args,
-          -> x { ! x.respond_to? :id2name }, # defer it
-          -> x { x.respond_to? :id2name }
-        lexeme_i ||= :s  # when `len_x` is nil it means "use memoized"
-        p = if :identity == lexeme_i
-          IDENTITY_
-        else
-          -> len_x_ do
-            _EN[].s len_x_, lexeme_i
-          end
-        end
-        instance_exec len_x, p, & bump_numerish
-      end
-
-      bump_numerish = -> numerish_x, p do
-        if numerish_x
-          if numerish_x.respond_to? :length
-            numerish = numerish_x.length
-          else
-            numerish = numerish_x
-          end
-          set_nlp_last_length numerish
-        elsif false == numerish_x
-          numerish = false
-        else
-          numerish = nlp_last_length
-        end
-        instance_exec numerish, & p
-      end
-
-      memoize_length = -> p do
-        -> a do
-          set_nlp_last_length a.length
-          instance_exec a, &p
-        end
-      end
-
-      o[ :nlp_last_length ] = -> do
-        @nlp_last_length
-      end
-
-      o[ :set_nlp_last_length ] = -> x do   # (because to_struct creates getters
-        @nlp_last_length = x              # and setters for each of its methods
-      end                                 # you can't have your nerk end with '=')
-
-      o[ :_and ] = -> a do  # (when you want the leading space conditionally on etc)
-        x = and_ a
-        x and " #{ x }"
-      end
-
-      o[ :and_ ] = memoize_length[ -> a do
-        And__[ a ]
-      end ]
-
-      o[ :both ] = memoize_length[ -> a do
-        _EN[].both a
-      end ]
-
-      o[ :indefinite_noun ] = -> lemma_s do
-
-        Home_.lib_.human::NLP::EN::POS.indefinite_noun lemma_s
-      end
-
-      o[ :noun_phrase ] = -> * x_a do
-
-        x_a.push :syntactic_category, :noun_phrase
-        _fr = Home_.lib_.human::NLP::EN.expression_frame_via_iambic x_a
-        _fr.express_into ""
-      end
-
-      o[ :or_ ] = memoize_length[ -> a do
-        Or__[ a ]
-      end ]
-
-      o[ :plural_noun ] = -> count_d=nil, lemma_s do
-        Home_.lib_.human::NLP::EN::POS.plural_noun count_d, lemma_s
-      end
-
-      o[ :preterite_verb ] = -> lemma_s do
-        Home_.lib_.human::NLP::EN::POS.preterite_verb lemma_s
-      end
-
-      o[ :progressive_verb ] = -> lemma_s do
-        Home_.lib_.human::NLP::EN::POS.progressive_verb lemma_s
-      end
-
-      o[ :sentence_phrase_via_mutable_iambic ] = -> x_a do
-
-        x_a.push :syntactic_category, :sentence_phrase
-        _fr = Home_.lib_.human::NLP::EN.expression_frame_via_iambic x_a
-        _fr.express_into ""
-      end
-
-      bld_oxford_comma = -> sep do
-        p = -> a do
-          p = _EN[].oxford_comma.curry[ ', ', sep ]
-          p[ a ]
-        end
-        -> a do
-          p[ a ]
-        end
-      end
-
-      And__ = bld_oxford_comma[ ' and ' ]
-      Or__ = bld_oxford_comma[ ' or ' ]
-
-      _EN = Home_::Callback_.memoize do  # necessary because circular dependency
-        Home_.lib_.human::NLP::EN
-      end
-
-      @struct = ::Struct.new( * @i_a ).new( * @p_a )
-      @i_a = @p_a = nil
-
-    end.call
-  end
-
-  module InstanceMethods
-    NLP_EN_Methods__.each_pair do | method_name, body |
-      define_method method_name, &body
-      protected method_name  # #protected-not-private
-    end
   end
 end

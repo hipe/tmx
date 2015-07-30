@@ -1,5 +1,4 @@
-./assess              -
-./autobleed           -
+
 ./basic               -
 ./beauty-salon        -
 ./bnf2treetop         -
@@ -16,11 +15,9 @@
 ./git-viz             -
 ./headless            -
 ./human               -
-./kurse               -
 ./parse               -
 ./permute             -
 ./plugin              -
-./script              -
 ./slake               -
 ./slicer              -
 ./snag                -
@@ -32,22 +29,25 @@
 ./treemap             -
 ./yacc2treetop        -
 
+./assess              na
+./autobleed           na
+./kurse               na
+./script              na
+
 breakout              -
 breakup               -
 citxt                 -
-doc-test              ..
+doc-test              -
 git-head              -
 git-unrename          -
 grh                   -
 onoff                 -
 partition             -
-quickie               TODO
+quickie               -
 resequence-numbers    -
 sg-doc-normalize      -
 shallowify            -
 slide-numbers         -
-test-stash-untracked  GONE
 uncommit              -
 ungood                -
-unsplit               GONE
 xargs-ish-i           -

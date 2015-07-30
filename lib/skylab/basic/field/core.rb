@@ -22,8 +22,12 @@ module Skylab::Basic
         N_Meta_Resolver__
       end
 
-      def reflection
-        Field_::Reflection__
+      def reflection * a
+        if a.length.zero?
+          Field_::Reflection__
+        else
+          Field_::Reflection__[ * a ]
+        end
       end
     end
 

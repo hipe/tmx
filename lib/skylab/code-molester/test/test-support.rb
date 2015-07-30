@@ -22,10 +22,14 @@ module Skylab::CodeMolester::TestSupport
   Home_ = Home_
 
   Constants::Tmpdir_instance_ = Home_::Callback_.memoize do
+
+    _path = ::File.join Home_.lib_.system.filesystem.tmpdir_path, 'co-mo'
+
     TestSupport_.tmpdir.new_with(
       :max_mkdirs, 2,
-      :path, ::File.join( Home_.lib_.system_default_tmpdir_path, 'co-mo' ),
-      :be_verbose, false )
+      :path, _path,
+      :be_verbose, false,
+    )
   end
 
   module InstanceMethods

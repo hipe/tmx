@@ -5,7 +5,7 @@ module Skylab::Callback
   class << self
 
     def [] mod, * x_a
-      self::Bundles.apply_iambic_on_client x_a, mod
+      self::Bundles.edit_module_via_mutable_iambic mod, x_a
     end
 
     def const_sep
@@ -48,18 +48,18 @@ module Skylab::Callback
     class << self
 
       def [] cls, * i_a
-        via_client_and_iambic cls, i_a
+        edit_module_via_mutable_iambic cls, i_a
       end
 
       def call cls, * i_a
-        via_client_and_iambic cls, i_a
+        edit_module_via_mutable_iambic cls, i_a
       end
 
       def methodic cls, * i_a
-        Actor::Methodic.via_client_and_iambic cls, i_a
+        Actor::Methodic.edit_module_via_iambic cls, i_a
       end
 
-      def via_client_and_iambic cls, i_a
+      def edit_module_via_mutable_iambic cls, i_a
 
         cls.extend MM___
         cls.include self
@@ -625,7 +625,11 @@ module Skylab::Callback
 
       def try_convert x  # :+[#056]
 
-        if x.respond_to? :each_index
+        if x.respond_to? :gets
+
+          x.flush_to_polymorphic_stream  # while it works..
+
+        elsif x.respond_to? :each_index
           via_array x
 
         elsif x.respond_to? :read

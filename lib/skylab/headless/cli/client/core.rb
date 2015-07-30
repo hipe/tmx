@@ -5,18 +5,22 @@ module Skylab::Headless
     class << self
 
       def [] mod, * x_a
-        via_client_and_iambic mod, x_a
+
+        edit_module_via_mutable_iambic mod, x_a
       end
 
-      def call_via_arglist a
-        via_client_and_iambic a.shift, a
+      def call_via_arglist x_a
+
+        edit_module_via_mutable_iambic x_a.shift, x_a
       end
 
-      def via_client_and_iambic mod, x_a
+      def edit_module_via_mutable_iambic mod, x_a
+
         if x_a.length.zero?
           x_a.concat DEFAULT_BUNDLES_X_A__
         end
-        Bundles_.apply_iambic_on_client x_a, mod
+
+        Bundles_.edit_module_via_mutable_iambic mod, x_a
       end
     end
 
@@ -54,12 +58,15 @@ module Skylab::Headless
 
       Three_streams_notify_methods__ = -> do
       private
+
         def errstream  # let this be the only one in the universe
           @IO_adapter.errstream
         end
+
         def three_streams
           @IO_adapter.to_three
         end
+
         def three_streams_notify i, o, e
           instance_variable_defined? :@IO_adapter and raise "write once"
           @IO_adapter = build_IO_adapter i, o, e, build_pen ; nil

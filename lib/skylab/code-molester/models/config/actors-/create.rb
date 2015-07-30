@@ -82,7 +82,7 @@ module Skylab::CodeMolester
             }won't clobber - #{ ent.natural_key }"
         end
 
-        LIB_.hash_lib.pairs_at(
+        LIB_.basic::Hash.pairs_at(
           :repack_difference,
           :unpack_subset,
           & method( :define_method ) )

@@ -52,10 +52,6 @@ module Skylab::Snag
       NLP[]::EN
     end
 
-    NLP_EN_methods = -> mod, * x_a do
-      HL__[].expression_agent.NLP_EN_methods.on_mod_via_iambic mod, x_a
-    end
-
     Entity = -> do
       Brazen[]::Entity
     end

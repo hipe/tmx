@@ -31,7 +31,7 @@ describe "[hu] NLP EN minitesimal" do
 
   context "s" do
 
-    # ( has a complimentary test in `nlp_spec.rb` )
+    # ( has a counterpart test in sibling `methods_spec.rb` )
 
     o = -> a, n, so, *t do
       it "#{ so }", *t do

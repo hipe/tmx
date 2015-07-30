@@ -25,8 +25,8 @@ module Skylab::Headless::TestSupport::CS__
 
       before :all do
         Client_Svcs = Home_::Client_Services.new :red, :blue do
-          delegating :to, :@red, %i( r1 r2 )
-          delegating :to, :@blue, :with_suffix, :_from_guy, %i( b1 )
+          delegate :to, :@red, %i( r1 r2 )
+          delegate :to, :@blue, :with_suffix, :_from_guy, %i( b1 )
         end
       end
 

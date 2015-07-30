@@ -1,6 +1,15 @@
-# the delegating bundle narrative :[#060]
+# the delegation narrative :[#008]
 
-## :#storypoint-005 introduction
+
+## (most recent history)
+
+(this moved from [hl] and is very old. it has been maintained to support
+legacy apps that use it but it not generally used for new work.)
+
+
+
+
+## introduction
 
 ### an aversion to delegation
 
@@ -30,13 +39,15 @@ for now as we continue glibly with the world's perfect delegation DSL.
 
 
 
+
 ### what it's good for & why it's here
 
 we do however feel that the façade pattern when used alone can be a good
 thing. maybe that is the point. this DSL is a crucial underpinning to our
-all important [#067] client services facility, which in turn is a crucial
+all important [#hl-067] client services facility, which in turn is a crucial
 underpinning to the [#010] client tree model, which is basically what
 headless's entire existence consists of.
+
 
 
 
@@ -52,18 +63,23 @@ kingdom of complexity you see before you.
 
 
 
+
 ### :#storypoint-025 an introduction to the shallow node
 
-the "shallow node" (`[hl] delegating`) constitutes the implementation of
+the "shallow node" (the toplevel subject) constitutes the implementation of
 the 90% use-case for delegation in contemporary new code. primarily we see
 (and should see) this distribution limited to the short implementations of
 "client services" nodes and the like for reasons explained in the into.
 
 specifically when you enhance a class with the "employment brackets" of
-`Delegating[]` with no arguments (except the mandatory first arg, the client)
+`Delegation[]` with no arguments (except the mandatory first arg, the client)
 what you get is an enhancement of the client itself to declare its own
 delegations. this comes in the form of two private-but-API-public methods:
-`delegate` and `delegating`. the former is for simple delegations (and imagine
+
+    `delegate_to_dependency`  # and
+    `delegate`
+
+the former is for simple delegations (and imagine
 it has the same syntactics as the `attr_reader` stdlib method). the latter
 is for non-simple delegations.
 
@@ -83,6 +99,7 @@ delegation; but for a sneak peek, these are probably things like:
   • specify a different method name to send to the delegatee with `to_method`
   • specify a simple additive, pattern-based method name transformation that
      determines the delegatee send-method name with `with_infix`, `with_suffix`
+
 
 
 
@@ -121,12 +138,13 @@ we put under composition insomuch as all bundles have mutable syntax.
 
 
 
+
 ## :#storypoint-505 an introduction to the deep node
 
 this node specifically implements all of the 'delegating'-related needs not
-covered in the headles core node. the sub-facilities not covered there are
+covered in the top subject node. the sub-facilities not covered there are
 specifically any of the facilities that are reached by providing iambic
-arguments to the brackets ("employement") method ([hl]  delegating).
+arguments to the brackets ("employement") method.
 
 we typically leverage the 'delegating' facility through the DSL methods
 `delegate` and `delegating` because by and large we use delegation when

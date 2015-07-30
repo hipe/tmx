@@ -76,16 +76,20 @@ module Skylab::Callback
 
       def new * i_a, & p
         cls = ::Class.new Base__
-        via_client_and_iambic cls, i_a
+        edit_module_via_iambic cls, i_a
         p and cls.class_exec( & p )
         cls
       end
 
       def call_via_arglist a
+
         case 1 <=> a.length
-        when -1 ; via_client_and_iambic a.shift, a
-        when  0 ; shell_for a.first
-        else    Session::Ivars_with_Procs_as_Methods
+        when -1
+          edit_module_via_iambic a.shift, a
+        when 0
+          shell_for a.first
+        else
+          Session::Ivars_with_Procs_as_Methods
         end
       end
 
@@ -97,7 +101,7 @@ module Skylab::Callback
         end
       end
 
-      def via_client_and_iambic mod, i_a
+      def edit_module_via_iambic mod, i_a
         define_methods mod, :public, :method, i_a
       end
     end

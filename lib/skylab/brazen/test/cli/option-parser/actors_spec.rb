@@ -1,11 +1,12 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Headless::TestSupport::CLI::Option
+module Skylab::Brazen::TestSupport
 
-  describe "[hl] CLI::Option__" do
+  describe "[br] CLI - option parser - actors" do
 
-    it "`basic_switch_index_curry` is a hack to see if a basic switch is present" do
-      p = Subject_[].basic_switch_index_curry '--foom'
+    it "a hack to see if a basic switch looks to be present in an array" do
+
+      p = Home_::CLI::Option_Parser::Actors::Build_basic_switch_proc[ '--foom' ]
       p[ [ 'abc' ] ].should eql nil
       p[ [ 'abc', '--fo', 'def' ] ].should eql 1
       p[ [ '--foomer', '-fap', '-f', '--foom' ] ].should eql 2

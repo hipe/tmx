@@ -1,14 +1,14 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::Headless::TestSupport::Bundles::Delegating
+module Skylab::Plugin::TestSupport::Delegation_TS
 
-  describe "[hl] bundle: delegating - the oldschool way" do
+  describe "[pl] delegation - the oldschool way" do
 
     it "'employ_the_DSL_method_called_delegates_to'" do
 
       class Client_Oldschool
 
-        Home_::Delegating[ self, :employ_the_DSL_method_called_delegates_to ]
+        Subject_[ self, :employ_the_DSL_method_called_delegates_to ]
 
         delegates_to :morple, :downcase, :id2name
 

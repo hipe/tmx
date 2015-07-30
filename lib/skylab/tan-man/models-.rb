@@ -185,7 +185,9 @@ module Skylab::TanMan
   end
 
   Actor_ = -> cls, * a do
-    Callback_::Actor.via_client_and_iambic cls, a
+
+    Callback_::Actor.edit_module_via_mutable_iambic cls, a
+
     Callback_::Event.selective_builder_sender_receiver cls ; nil
   end
 

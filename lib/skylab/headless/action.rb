@@ -3,11 +3,13 @@ module Skylab::Headless
   module Action
 
     class << self
+
       def [] mod, * x_a
-        Bundles.apply_iambic_on_client x_a, mod
+        Bundles.edit_module_via_iambic mod, x_a
       end
-      def apply_iambic_on_client x_a, mod
-        Bundles.apply_iambic_on_client x_a, mod
+
+      def edit_module_via_iambic mod, x_a
+        Bundles.edit_module_via_iambic mod, x_a
       end
     end
 

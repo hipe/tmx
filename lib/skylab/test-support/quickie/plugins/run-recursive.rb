@@ -49,16 +49,6 @@ module Skylab::TestSupport
         end
       end
 
-      Dash_ = -> do
-        load = -> do
-          Home_.lib_.SUNSETTING_CLI_lib.option.starts_with_dash
-        end
-        -> x do
-          p ||= load[]
-          p[ x ]
-        end
-      end.call
-
       def beginning_eventpoint_notify
         # at our notification of the beginning, we do the work that needs
         # to be available for the next eventpoint. if we fail to resolve the
@@ -113,7 +103,7 @@ module Skylab::TestSupport
         begin
           tok = scn.gets
           tok or break
-          _yes = Dash_[ tok ]
+          _yes = DASH_BYTE_ == tok.getbyte( 0 )
           if ! _yes
             d = scn.index
             break
@@ -126,7 +116,7 @@ module Skylab::TestSupport
           begin
             tok = scn.gets
             tok or break
-            _ok = Dash_[ tok ]
+            _ok = DASH_BYTE_ == tok.getbyte( 0 )
             _ok and break
             d_ += 1
             redo
@@ -135,6 +125,8 @@ module Skylab::TestSupport
 
         [ d, d_ ]
       end
+
+      DASH_BYTE_ = DASH_.getbyte 0
 
       def ready_test_path_a
         @test_path_a.nil? and @test_path_a = my_get_any_test_path_a

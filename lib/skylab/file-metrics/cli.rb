@@ -63,7 +63,5 @@ module Skylab::FileMetrics
         :glyph,'+',
         :color, :green,
       :expression_width_proc, -> { 160 } )
-
-    Client = self  # #tmx-compat
   end
 end

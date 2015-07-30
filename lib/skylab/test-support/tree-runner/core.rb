@@ -71,9 +71,9 @@ module Skylab
 
       def __build_dispatcher
 
-        require "#{ HERE_ }/lib-"
+        require_relative 'plugin-'  # no a.l for now..
 
-        disp = Plugin_::Dispatcher.new @resources, & @on_event_selectively
+        disp = Tree_Runner_::Plugin_::Dispatcher.new @resources, & @on_event_selectively
 
         disp.state_machine(
 
@@ -293,8 +293,11 @@ module Skylab
       # ~ linguistic- (and EN-) related classifications of string
 
       def sp_ * x_a
+
         x_a.push :syntactic_category, :sentence_phrase
-        _fr = Tree_Runner_::Lib_::Human[]::NLP::EN.expression_frame_via_iambic x_a
+
+        _fr = Home_.lib_.human::NLP::EN.expression_frame_via_iambic x_a
+
         _fr.express_into ""
       end
 
@@ -305,7 +308,7 @@ module Skylab
 
       def both x
         # #covered-by: same as above
-        Tree_Runner_::Lib_::Human[]::NLP::EN.both x
+        Home_.lib_.human::NLP::EN.both x
       end
 
       def indefinite_noun s
@@ -322,8 +325,7 @@ module Skylab
       end
 
       def s * x_a
-        self._WHERE
-        Tree_Runner_::Lib_::Human[]::NLP::EN::s( * x_a )
+        Home_.lib_.human::NP::EN.s( * x_a )
       end
 
       def third_person s
@@ -339,7 +341,7 @@ module Skylab
       end
 
       def _NLP_agent
-        Tree_Runner_::Lib_::Human[]::NLP::EN::POS
+        Home_.lib_.human::NLP::EN::POS
       end
     end
 

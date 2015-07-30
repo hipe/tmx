@@ -49,7 +49,7 @@ module Skylab::CodeMolester
 
   private
 
-    LIB_.hash_lib.pairs_at :unpack_equal, :unpack_superset,
+    LIB_.basic::Hash.pairs_at :unpack_equal, :unpack_superset,
       & method( :define_method )
 
   public

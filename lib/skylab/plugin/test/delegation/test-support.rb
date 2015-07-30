@@ -1,17 +1,15 @@
 require_relative '../test-support'
 
-module Skylab::Headless::TestSupport::Bundles
+module Skylab::Plugin::TestSupport::Delegation_TS
 
-  ::Skylab::Headless::TestSupport[ self ]
+  parent = ::Skylab::Plugin::TestSupport
 
-  module Delegating
+  parent[ TS_ = self ]
 
-    ::Skylab::Headless::TestSupport::Bundles[ self ]
+  extend parent::TestSupport_::Quickie
 
-    include Constants
+  Home_ = parent::Home_
 
-    extend TestSupport_::Quickie
+  Subject_ = Home_::Delegation
 
-    Home_ = Home_
-  end
 end

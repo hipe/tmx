@@ -68,12 +68,18 @@ module Skylab::TestSupport
           end
         end
 
-        Tree_Runner_::Lib_::CLI_table[
+        _st = Callback_.stream do
+          p[]
+        end
+
+        Home_.lib_.brazen::CLI::Expression_Frames::Table::Actor.call(
+
           :field, 'subproduct',
           :field, 'num test files',
           * field_extra,
           :write_lines_to, @resources.sout,
-          :read_rows_from, -> { p[] } ]
+          :read_rows_from, _st,
+        )
 
         if 1 == @verbosity_level
           @resources.serr.puts '("-v" for visualization, "-V" hides this message)'
@@ -84,7 +90,7 @@ module Skylab::TestSupport
 
       def __build_max_share_meter_args
 
-        _width = Tree_Runner_::Lib_::CLI_table[].some_screen_width
+        _width = Home_.lib_.brazen::CLI.some_screen_width
 
         [ :target_width, _width, :field, :fill,
           :cel_renderer_builder, :max_share_meter ]

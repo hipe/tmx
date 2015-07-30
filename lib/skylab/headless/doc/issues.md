@@ -4,7 +4,8 @@
 [#174]       #done waiting for [#cb-060] property parsing issue
 [#173] #hole ( #moved-to: [#sy-017] )
              ( #was: #parent-node: [#14] the grep narrative .. )
-[#172]       #parent-node: [#126]  [ CLI tree glyphs ]
+[#172]       ( #moved-to: [#ba-049] )
+             ( #was: #parent-node: [#126]  [ CLI tree glyphs ] )
 [#171]       ( #moved-to: [#sy-016] )
              ( #was: #parent-node: [#140] the find narrative .. )
 [#170] #hole ( #moved-to: [#sy-015] )
@@ -139,7 +140,7 @@
 [#063] #open track the smells because of CLI action hybridization
 [#062] #open the sweeping architecture change to accomodate homonyms
 [#061]       flyweight the architecture of language production
-[#060]       #doc-node: bundles
+[#060]       ( #moved-to: [#pl-008] )
              #repurposed:once (was: norm'd line consumer, now "reverse scanner")
 [#059]       #tracking places where we nerk with detecting o.p dflt --help -h
 [#058]       (#moved-to [#bs-027])
@@ -162,7 +163,7 @@
              well - i mean this is a placeholder for [#sl-116] that one thing
 [#046]       #tracking-tag for CLI facilities that facilitate rendering trees
 [#045] #open #tracking-tag ellipsify - take into acct word producers
-[#044]       #parent-node: [#060] the delegating bundle narrative ..
+[#044]       ( see [#pl-008] )
              (#repurposed:once) (was file IO scanner, moved to [#ba-004])
 [#043]       #tracking-tag newlines (DOS line endings) be damned!
 [#042]       #done spec for CLI box DSL

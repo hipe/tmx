@@ -15,7 +15,5 @@ module Skylab::Slicer
     def self.unbound_for_face _
       self
     end
-
-    Client = self
   end
 end

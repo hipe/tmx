@@ -20,7 +20,7 @@ module Skylab::CodeMolester
 
     end
 
-    Shell__ = LIB_.simple_shell %i( with add )
+    Shell__ = LIB_.plugin::Bundle::Enhance::Shell.new %i( with add )
 
     class Kernel__
 
@@ -43,7 +43,7 @@ module Skylab::CodeMolester
     private
 
       def fields
-        LIB_.field_reflection_enhance( @target ).with @field_mod
+        LIB_.basic::Field.reflection.enhance( @target ).with @field_mod
       end
 
       def module_accessors
@@ -157,7 +157,7 @@ module Skylab::CodeMolester
       end
     end
 
-    LIB_.hash_lib.pairs_at :repack_difference, & method( :define_method )
+    LIB_.basic::Hash.pairs_at :repack_difference, & method( :define_method )
 
     join = -> a do
       a.map { |x| "\"#{ x }\"" } * ', '
@@ -306,7 +306,7 @@ module Skylab::CodeMolester
         ick: -> { "\"#{ x }\"" }
       }
 
-      tmpl_str.gsub LIB_.string_lib.mustache_regexp do
+      tmpl_str.gsub LIB_.basic::String.mustache_regexp do
         h.fetch( $~[1].intern ).call
       end
     end

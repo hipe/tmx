@@ -24,6 +24,10 @@ module Skylab::Basic
         Tree_::Mutable_
       end
 
+      def unicode
+        Tree_::Expression_Adapters__::Text::Glyph
+      end
+
       def via sym, x, * x_a, & x_p
 
         p_x = Tree_::Input_Adapters__.const_get(

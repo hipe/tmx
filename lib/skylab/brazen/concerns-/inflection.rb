@@ -40,7 +40,7 @@ module Skylab::Brazen
         else
           __infer_noun_stem
         end
-        s and LIB_.NLP::EN::POS::Noun[ s ]
+        s and LIB_.human::NLP::EN::POS::Noun[ s ]
       end
 
       def __infer_noun_stem  # #to-determine-a-noun
@@ -217,7 +217,7 @@ module Skylab::Brazen
 
         s ||= @_name_function.as_human
 
-        LIB_.NLP::EN::POS::Verb[ s ]
+        LIB_.human::NLP::EN::POS::Verb[ s ]
       end
 
       def __rslv_VAN_lexeme
@@ -226,7 +226,7 @@ module Skylab::Brazen
 
         if ci
           if ci.has_verb_as_noun_lemma
-            x = LIB_.NLP::EN::POS::Noun[ ci.verb_as_noun_lemma ]
+            x = LIB_.human::NLP::EN::POS::Noun[ ci.verb_as_noun_lemma ]
           end
         end
 

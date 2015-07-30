@@ -5,7 +5,8 @@ module Skylab::Callback
     class << self
 
       def call mod, * x_a
-        Bundles__.apply_iambic_on_client x_a, mod ; nil
+        Bundles__.edit_module_via_mutable_iambic mod, x_a
+        NIL_
       end
 
       alias_method :[], :call

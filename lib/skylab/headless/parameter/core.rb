@@ -2,9 +2,8 @@ module Skylab::Headless
 
   class Parameter  # read [#009] the paramter narrative #storypoint-5
 
-
     def self.[] mod, * x_a
-      Bundles__.apply_iambic_on_client x_a, mod
+      Bundles__.edit_module_via_mutable_iambic mod, x_a
     end
 
     module Bundles__

@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::Headless::TestSupport::Bundles::Delegating
+module Skylab::Plugin::TestSupport::Delegation_TS
 
-  describe "[hl] bundle: delegating - deep" do
+  describe "[pl] delegation - 04: actors" do
 
     it "delegate simply by passing an array of symbols as the second arg" do
 
@@ -12,9 +12,11 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
         end
 
         class Client_Simple_Deep
-          Home_::Delegating[ self, %i( foo bar ) ]
+
+          Subject_[ self, %i( foo bar ) ]
+
           def initialize x
-            @up_p = -> { x }  # do this yourself
+            @plugin_dependency_p = -> { x }
           end
         end
 
@@ -31,12 +33,13 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
         end
 
         class Client_As_Deep
-          Home_::Delegating[ self,
+          Subject_[ self,
                                 :to_method, :braff, :zack,
                                 :with_infix, :x_, :_y, :foo ]
 
           def initialize x
-            @up_p = -> { x }
+
+            @plugin_dependency_p = -> { x }
           end
         end
 

@@ -15,9 +15,15 @@ module Skylab::Callback
       :three_streams_notify,
       :DSL ]  # don't add DSL till end b.c of it's method_added hook
 
-    def initialize *a
-      @opendata = nil ; @param_h = { }
-      three_streams_notify( * a )
+    def initialize i, o, e, pn_a=nil
+
+      @opendata = nil
+      @param_h = { }
+
+      three_streams_notify i, o, e
+
+      @_pn_a = pn_a
+
       super()
     end
 
@@ -135,7 +141,16 @@ module Skylab::Callback
       x ? x : ( false == x ? 1 : 0 )
     end
 
-    Client = self  # #hook-out: tmx
+    def program_name
+      if @_pn_a
+        @__program_name ||= __build_program_name
+      else
+        super
+      end
+    end
 
+    def __build_program_name
+      [ ::File.basename( @_pn_a.first ), * @_pn_a[ 1 .. -1 ] ].join SPACE_
+    end
   end
 end

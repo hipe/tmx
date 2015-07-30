@@ -1,22 +1,15 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Headless::TestSupport::SubClient
+module Skylab::Human::TestSupport
 
-  describe "[hl] sub-client NLP" do
+  describe "[hu] NLP - EN - methods" do
 
     extend TS_
 
-    def sc
-      self.class.sc
-    end
-
-    define_singleton_method :sc, & Home_::Library_::Memoize[ -> do
-      o = ::Object.new
-      o.extend Home_::SubClient::InstanceMethods
-      o
-    end ]
-
     it "an - matches a/an, case" do
+
+      sc = _soliloquizing_client_for :an
+
       sc.instance_exec{ an 'apple' }.should eql( 'an apple' )
       sc.instance_exec{ an 'PEAR' }.should eql( 'A PEAR' )
       sc.instance_exec{ an 'beef', 0 }.should eql( 'no beef' )
@@ -24,6 +17,9 @@ module Skylab::Headless::TestSupport::SubClient
     end
 
     it "`s` - memoizes last numeric" do
+
+      sc = _soliloquizing_client_for :s
+
      sc.instance_exec{ s 2 }.should eql( 's' )
      sc.instance_exec{ s }.should eql( 's' )
      sc.instance_exec{ s 1 }.should eql( nil )
@@ -31,42 +27,88 @@ module Skylab::Headless::TestSupport::SubClient
     end
 
     it "`and_` - memoizes last numeric" do
+
+      sc = _soliloquizing_client_for :and_, :s, :or_
+
       x = sc.instance_exec do
         "#{ and_ ['foo', 'bar'] } #{ s :is } ready"
       end
+
       x.should eql( "foo and bar are ready" )
+
       x = sc.instance_exec do
         "#{ or_ ['foo'] } #{ s :is } ready"
       end
+
       x.should eql( 'foo is ready' )
+
       x = sc.instance_exec do
         "#{ and_( [] ) || 'none' } #{ s :is } ready"
       end
+
       x.should eql( 'none are ready' )
     end
 
-    # ( has a complimentary test in `minitesimal_spec.rb` )
-    # ( note the example is somewhat un-realistic because we are using the
-    # same count-variable referrant for two different noun phrases. )
+    it "integration 0" do
 
-    context "integration" do
+      _against
+      _expect "no known persons exist in these 0 locations."
+    end
 
-      def self.expect arr, str, *tags
-        it str, *tags do
-          x = sc.instance_exec do
-            "#{ s arr, :no }known person#{ s } #{ s :exist }#{ _and arr }#{
-              } in #{ s :this }#{ _non_one } location#{ s }."
-          end
-          x.should eql( str )
-        end
+    it "integration 1" do
+
+      _against 'A'
+      _expect "the only known person is A in this location."
+    end
+
+    it "integration 2" do
+
+      _against 'A', 'B'
+      _expect "known persons are A and B in these 2 locations."
+    end
+
+    def _against * s_a
+      @_s_a = s_a
+    end
+
+    define_method :_expect, -> do
+
+      # ( has a counterpart test in sibling `minitesimal_spec.rb` )
+      # ( note the example is somewhat un-realistic because we are using the
+      # same count-variable referrant for two different noun phrases. )
+
+      o = nil
+      -> exp_s do
+
+        o ||= __dangerous_build
+        s_a = @_s_a
+
+        _s_ = ( o.instance_exec do
+         "#{ s s_a, :no }known person#{ s } #{ s :exist }#{ _and s_a }#{
+           } in #{ s :this }#{ _non_one } location#{ s }."
+        end )
+
+        _s_.should eql exp_s
       end
+    end.call
 
-      expect %w(), "no known persons exist in these 0 locations."
+    def __dangerous_build
 
-      expect %w(A), "the only known person is A in this location."
-
-      expect %w(A B), "known persons are A and B in these 2 locations."
+      _soliloquizing_client_for :and_, :_and, :_non_one, :s
 
     end
+
+    define_method :_soliloquizing_client_for, -> do
+
+      d = 0
+      prefix = "NLP_EN_Method_User_"
+      -> * i_a do
+
+        cls = ::Class.new
+        TS_.const_set "#{ prefix }#{ d += 1 }", cls
+        Home_::NLP::EN::Methods.edit_module_via_iambic cls, [ :public, i_a ]
+        cls.new
+      end
+    end.call
   end
 end

@@ -67,17 +67,26 @@ module Skylab::Headless
             @_DSL_is_off = false ; nil
           end
           attr_reader :crrnt_open_action_cls
+
         private
-          def fnsh_active_action i
-            unbound_action_box.const_set(
-              Callback_::Name.via_variegated_symbol( i ).as_const,
-              rls_some_open_action_class )
+
+          def fnsh_active_action sym
+
+            if OK_RX___ =~ sym
+              unbound_action_box.const_set(
+                Callback_::Name.via_variegated_symbol( sym ).as_const,
+                rls_some_open_action_class )
+            end
           end
+
+          OK_RX___ = /\A(?!_)/
+
           def rls_some_open_action_class
             cls = some_crrnt_open_action_class
             @crrnt_open_action_cls = nil
             cls
           end
+
           def some_crrnt_open_action_class
             @crrnt_open_action_cls ||= bld_open_action_class
           end

@@ -11,6 +11,10 @@ module Skylab::Callback
         @up = up
       end
 
+      def no_unparsed_exists
+        ! @x
+      end
+
       def unparsed_exists
         @x
       end

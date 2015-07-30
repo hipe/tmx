@@ -14,7 +14,7 @@ module Skylab::Snag
         ::Pathname.new( "#{ x }" ).basename.to_path
       end
 
-      Home_.lib_.NLP_EN_methods self, :private, [ :s ]
+      Home_.lib_.human::NLP::EN::Methods.add_to self, :private, [ :s ]
 
       self
     end.new

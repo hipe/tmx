@@ -65,7 +65,7 @@ module Skylab::CodeMolester
 
     attr_reader :entity_noun_stem, :pathname
 
-    Home_.lib_.delegating self,
+    Home_.lib_.plugin::Delegation.call self,
 
       :to, :sexp, :if, -> { valid? },
 

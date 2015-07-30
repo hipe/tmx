@@ -40,8 +40,10 @@ module Skylab::Basic
 
         def __resolve_glyphset_via_ID id_x
 
-          @glyphset = Autoloader_.const_reduce( [ id_x ],
-            Home_.lib_.CLI_lib.tree.glyph_sets_module )
+          @glyphset = Autoloader_.const_reduce(
+            [ id_x ],
+            Home_::Tree.unicode::GlyphSets,
+          )
 
           @glyphset && ACHIEVED_
         end

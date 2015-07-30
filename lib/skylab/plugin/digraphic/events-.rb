@@ -212,7 +212,7 @@ module Skylab
               __write_to_matrix_formal_group_under fo_a
             end
 
-            Home_.lib_.IN_MOTION_table_actor(
+            Home_.lib_.brazen::CLI::Expression_Frames::Table::Actor.call(
 
               :left, '  ',
               :right, EMPTY_S_,
@@ -222,7 +222,8 @@ module Skylab
               :header, :none,
 
               :read_rows_from, @mat_a,
-              :write_lines_to, y )
+              :write_lines_to, y,
+            )
 
             ACHIEVED_
           end

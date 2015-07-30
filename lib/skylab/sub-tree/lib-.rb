@@ -24,25 +24,11 @@ module Skylab::SubTree
 
     Brazen = sidesys[ :Brazen ]
 
-    _HL = sidesys[ :Headless ]
-
-    CLI_lib = -> do
-      _HL[]::CLI
-    end
-
-    EN_add_methods = -> * i_a do
-      _HL[].expression_agent.NLP_EN_methods.call_via_arglist i_a
-    end
-
     Strange_proc = -> do
       Basic[]::String.via_mixed.to_proc
     end
 
-    _Hu = sidesys[ :Human ]
-
-    Summarize_time = -> x do
-      _Hu[]::Summarize::Time[ x ]
-    end
+    Human = sidesys[ :Human ]
 
     _System_lib = sidesys[ :System ]
 

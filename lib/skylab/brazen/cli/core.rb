@@ -24,6 +24,10 @@ module Skylab::Brazen
       def pretty_path x
         expression_agent_class.pretty_path x
       end
+
+      def some_screen_width
+        79  # :+#idea-kitestring for ncurses maybe
+      end
     end  # >>
 
     Top_Invocation__ = self
@@ -2093,7 +2097,7 @@ module Skylab::Brazen
     end
 
     CLI_ = self
-    DASH_BYTE_ = '-'.getbyte 0
+    DASH_BYTE_ = DASH_.getbyte 0
     GENERIC_ERROR = 5
     NOTHING_ = nil
     SUCCESS_ = 0

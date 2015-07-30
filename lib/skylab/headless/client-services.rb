@@ -2,7 +2,7 @@ module Skylab::Headless
 
   class Client_Services  # :[#067] client services.
 
-    Home_::Delegating[ self ]
+    Home_.lib_.plugin::Delegation[ self ]
 
     to_proc = -> a do
       extend MM__ ; include IM__
@@ -102,10 +102,11 @@ module Skylab::Headless
     # ~ experiment
 
     def resolve_service i
+
       if self.class.has_delegated_member? i
         Service_Resolved_As_Bound_Method.new method i
       else
-        @up_p[].resolve_service_notify i
+        @plugin_dependency_p[].resolve_service_notify i
       end
     end
 

@@ -20,7 +20,7 @@ module Skylab::CodeMolester
 
         define_method :entity_story do _STORY end
 
-        LIB_.field_reflection_enhance( self ).with _STORY.host_module
+        LIB_.basic::Field.reflection.enhance( self ).with _STORY.host_module
 
         Callback_::Memoization::Pool[ self ].
           instances_can_be_accessed_through_instance_sessions

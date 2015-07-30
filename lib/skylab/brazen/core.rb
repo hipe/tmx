@@ -67,7 +67,7 @@ module Skylab::Brazen
 
     # buffer ourselves from our past and our future
 
-    Callback_::Actor.via_client_and_iambic cls, i_a, & x_p
+    Callback_::Actor.edit_module_via_mutable_iambic cls, i_a, & x_p
   end
 
   PPSF_METHOD_ = -> st, & x_p do  # "process polymorphic stream fully"
@@ -349,14 +349,7 @@ module Skylab::Brazen
 
     Basic = sidesys[ :Basic ]
     Fields = sidesys[ :Fields ]
-
-    NLP_EN_methods = -> do
-      HL__[].expression_agent.NLP_EN_methods
-    end
-
-    HL__ = sidesys[ :Headless ]
-
-    Hu___ = sidesys[ :Human ]
+    Human = sidesys[ :Human ]
 
     IO_lib = -> do
       System_lib__[]::IO
@@ -381,12 +374,8 @@ module Skylab::Brazen
       ::Net::HTTP
     end
 
-    NLP = -> do
-      Hu___[]::NLP
-    end
-
     Old_CLI_lib = -> do
-      HL__[]::CLI
+      self._WHERE
     end
 
     Open_3 = stdlib[ :Open3 ]

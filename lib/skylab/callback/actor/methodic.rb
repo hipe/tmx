@@ -15,10 +15,10 @@ module Skylab::Callback
         end
 
         def call cls, * i_a
-          via_client_and_iambic cls, i_a
+          edit_module_via_iambic cls, i_a
         end
 
-        def via_client_and_iambic cls, i_a
+        def edit_module_via_iambic cls, i_a
           cls.extend Module_Methods__
           cls.include Polymorphic_Processing_Instance_Methods__
           if i_a.length.zero?
@@ -772,7 +772,7 @@ module Skylab::Callback
           end
 
           def o * x_a
-            Methodic.via_client_and_iambic self, x_a
+            Methodic.edit_module_via_iambic self, x_a
           end
 
         private
@@ -821,7 +821,7 @@ module Skylab::Callback
             end
             @client.include @mod  # this adds 4 modules to the chain!
             @mod.properties.length.nonzero? and self._DO_ME
-            Methodic.via_client_and_iambic @client, @x_a
+            Methodic.edit_module_via_iambic @client, @x_a
           end
         end
       end  # Apply_simple_enhancement__
