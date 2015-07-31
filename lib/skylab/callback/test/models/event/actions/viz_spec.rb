@@ -1,21 +1,38 @@
-require_relative '../test-support'
+require_relative '../../../test-support'
 
 module Skylab::Callback::TestSupport
 
-  describe "[ca] CLI - viz" do
+  describe "[ca] [..] viz" do
 
     extend TS_
+    TS_::Expect_Event[ self ]
 
     it "with the ideal case - works" do
-      g = TestSupport_::IO.spy.triad nil
-      # g.debug!
-      c = Home_::CLI.new( * g.values )
-      c.send :program_name=, 'pzb'
-      argv = [ 'viz', fixtures_dir_pn.join( 'who-hah' ).to_s ]
-      r = c.invoke argv
-      g.errstream.string.should match( /\A\(pzb graph-viz got 2 / )
-      g.outstream.string.should eql( "hacking->business\nhacking->pleasure\n" )
-      r.should eql( true )
+
+      io =  TestSupport_::Library_::StringIO.new
+      _path = ::File.join( Home_.dir_pathname.to_path, 'core.rb' )
+
+      call_API(
+        :viz,
+        :stdout, io,
+        :file, _path,
+        :const, "#{ TS_.name }::Fixtures::WhoHah",
+      )
+
+      io.string.should eql <<-HERE.unindent
+        digraph {
+          node [shape="Mrecord"]
+          label="event stream graph for ::Skylab::Callback::TestSupport::Fixtures::WhoHah"
+          hacking -> business
+          hacking -> pleasure
+        }
+      HERE
+
+      expect_succeeded
+    end
+
+    def subject_API
+      Home_::CLI._application_kernel
     end
   end
 end

@@ -1,55 +1,114 @@
 module Skylab::Callback
 
-  class API::Actions::Fire < API::Action
+  Models_ = ::Module.new
 
-    PARAMS = [ :do_show_backtrace,
-               :files,
-               :opendata,
-               :modul,
-               :stream_symbol
-    ].each { |k| attr_writer k }
+  Models_::Ping = -> pxy do
 
-    def execute
-      ok = resolve_params
-      ok &&= resolve_infiles
-      ok &&= resolve_mod
-      ok && work
+    pxy.on_event_selectively.call :info, :expression, :ping do | y |
+      y << "hello from callback."
     end
+    :hello_from_callback
+  end
 
-  private
+  module Models_::Event
 
-    def work
-      _pay_x = produce_payload_x
-        n = @mod.instance_method(:initialize).parameters.count{|a, _| :req == a}
-        obj = @mod.new(* n.times.map { } )
-        did_fire = false
-        obj.send :"on_#{ @stream_symbol }" do |x|
-          did_fire = true
-          if x.instance_variable_defined? :@event_stream_graph
-            x.instance_variable_set :@event_stream_graph, '[..]'  # pray
-          end
-          @infostream.puts "OK: #{ x.inspect }"
+    module Common_Action_Methods_
+
+      def resolve_module_
+
+        h = @argument_box.h_
+
+        o = Home_::Sessions_::Resolve_Module.new( & handle_event_selectively )
+        o.path = h.fetch :file
+        o.qualified_const_string = h.fetch :const
+
+        mod = o.execute
+        if mod
+          @module_ = mod
+          ACHIEVED_
+        else
+          mod
         end
-        obj.send :call_digraph_listeners, @stream_symbol, _pay_x
-        if ! did_fire
-          @infostream.puts "(#{ prefix }did not see a #{ @stream_symbol } #{
-            }event fire.)"
-        end
-        true
-    end
-
-    def produce_payload_x
-      if @opendata
-        OPENDATA_H__.fetch( @opendata.first )[ @opendata ]
-      else
-        'wizzle pazzle whatever'
       end
     end
 
-    OPENDATA_H__ = {
-      string: -> od { od[ 1 ] },
-      box:    -> od { od[ 1 ].to_hash }
-    }.freeze
+    Actions = ::Module.new
 
+    Autoloader[ Actions, :boxxy ]  # eew
+
+    class Actions::Fire < Brazen_::Action
+
+      include Common_Action_Methods_
+
+      @is_promoted = true
+
+      Brazen_::Model::Entity[ self ]
+
+      edit_entity_class(
+
+        :required, :property, :file,
+
+        :required, :property, :const,
+
+        :required, :property, :channel
+
+      )
+
+      def produce_result
+
+        _ok = resolve_module_
+        _ok && __via_module
+      end
+
+      def __via_module
+
+        cls = @module_
+        pay = 'wizzle pazzle whatever'
+        sym = @argument_box.fetch( :channel ).intern
+
+        _d = cls.instance_method( :initialize ).arity.abs
+
+        o = cls.new( * _d.times.map { } )
+
+        did = false
+        ev = nil
+        o.send :"on_#{ sym }" do | ev_x |
+          did = true
+          ev = ev_x
+        end
+
+        x = o.send :call_digraph_listeners, sym, pay
+        if did
+          __when_did x, ev
+        else
+          self._COVER_ME
+        end
+      end
+
+      def __when_did x, ev
+
+        if ! x.nil?
+          maybe_send_event :payload, :expression, :strange_result do | y |
+            y << "strange result: #{ ick x }"
+          end
+        end
+
+        maybe_send_event :payload, :expression, :event_event do | y |
+
+          a = []
+          p = Home_.lib_.basic::String.via_mixed.to_proc.curry[ 40 ]
+
+          ev.instance_variables.each do | ivar |
+
+            _x = ev.instance_variable_get ivar
+            a.push "#{ ivar }=#{ p[ _x ] }"
+          end
+
+          y << "event: #<#{ ev.class } #{ a * ', ' }>"
+        end
+
+        ACHIEVED_
+      end
+    end
   end
 end

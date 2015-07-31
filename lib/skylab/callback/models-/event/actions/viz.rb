@@ -1,283 +1,197 @@
 module Skylab::Callback
 
-  class API::Actions::GraphViz < API::Action
+  module Models_::Event
 
-    PARAMS = [ :default_outfile_name,
-               :do_digraph,
-               :do_guess_mod,
-               :do_open,
-               :do_show_backtrace,
-               :do_write_files,
-               :files,
-               :modul,
-               :outfile_name,
-               :root_constant,
-               :use_force
-    ].each { |k| attr_writer k }
+    class Actions::Viz < Brazen_::Action
 
-    def execute
-      res = nil
-      begin
-        res = resolve_params or break
-        res = resolve_infiles or break
-        res = resolve_root_const or break
-        res = resolve_mods or break
-        res = resolve_jobs or break
-        res = execute_jobs or break
-        res = conclude_jobs
-      end while nil
-      res
-    end
+      include Common_Action_Methods_
 
-  private
+      @is_promoted = true
 
-    #         ~ implementation in order ~
+      Brazen_::Model::Entity[ self ]
 
-    def resolve_infiles
-      @do_guess_mod ? true : super
-    end
+      edit_entity_class(
 
-    -> do  # `resolve_root_const`
+        :desc, -> y do
+          y << "visualize an event graph for a particular module"
+        end,
 
-      constantize, pathify = Home_::Name.lib.at :constantize, :pathify
+        :description, -> y do
+          y << "write output to file"
+        end,
+        :property, :output_file,
 
-      define_method :resolve_root_const do
-        @mod_a = nil
-        res = false
+        :property, :stdout,
 
-        early_ok = -> do
-          res = true
-          nil
-        end
+        :description, -> y do
+          y << "necessary to overwrite the file."
+        end,
+        :flag, :property, :force,
 
-        idx = part_a = path = nil
-        resolve_idx = -> do
-          @root_constant or break early_ok[ ]
-          filename = pathify[ @root_constant ]
-          path = @files.fetch 0
-          part_a = path.split '/'
-          idx = part_a.index filename
-          idx or break send_error_string "expected #{ filename.inspect } to occur in #{
-            }path but it did not - #{ path }"
-          true
-        end
+        :description, -> y do
+          y << "use the `open` command on your OS to open the file"
+        end,
+        :flag, :property, :do_open,
 
-        toplevel_const = -> do
-          pn = ::Pathname.new(
-            "#{ part_a[ 0 .. idx ] * '/' }#{ Autoloader::EXTNAME }" )
-          pn.exist? or break send_error_string( "expected to exist but did not - #{
-            }#{ pn }" )
-          if ! ::Object.const_defined? @root_constant
-            load pn
-          end
-          if ! ::Object.const_defined? @root_constant
-            break send_error_string( "toplevel constants #{ @root_constant.inspect } #{
-             }not defined after loading file - #{ pn }" )
-          end
-          true
-        end
+        :description, -> y do
+          y << "file to #{ code 'require' }"
+        end,
+        :required, :property, :file,
 
-        load_each_const = -> do
-          rc = ::Object.const_get @root_constant
-          const = part_a[ idx + 1 .. -1 ].reduce rc do |cnst, x|
-            cnst.const_get constantize[ x ], false
-          end
-          @files.length > 1 and fail "test me - multiple files"  # todo
-          @do_guess_mod = nil
-          @mod_a = [ const ]
-          true
-        end
+        :description, -> y do
+          y << "xx"
+        end,
+        :required, :property, :const,
+      )
 
-        -> do
-          resolve_idx[ ] or break
-          toplevel_const[ ] or break
-          load_each_const[ ] or break
-          res = true
-        end.call
-        res
+      def produce_result
+
+        ok = resolve_module_
+        ok &&= __resolve_downstream_IO
+        ok &&= __via_module
+        ok && __maybe_open
       end
-    end.call
 
-    def resolve_mods
-      if @mod_a  # then nothing
-      elsif @do_guess_mod
-        o = API::Tricks::Guess.new prefix, @paystream, @infostream, @files.first
-        a = o.guess
-        a and mod_a = a
-      else
-        if resolve_mod
-          mod_a = [ @mod ]
-        end
-      end
-      if @mod_a then true
-      elsif ! mod_a then false else
-        @mod_a = mod_a
-        true
-      end
-    end
+      def __resolve_downstream_IO
 
-    def resolve_jobs  # assumes @mod
-      # map / partition - turn each mod into a job, and break the jobs
-      # into good jobs and bad jobs.
-      job_a = [] ; bad_a = nil
-      @mod_a.each do |mod|
-        job = Job.new mod
-        if mod.respond_to? meth
-          job.event_stream_graph = mod.send meth
-          job_a << job
+        io = __produce_downstream_IO
+        if io
+          @__downstream_IO = io
+          ACHIEVED_
         else
-          (job.invalid_reasons ||= []) << "was expected to respond_to? #{meth}"
-          ( bad_a ||= [] ) << job
+          io
         end
       end
-      if job_a.length.nonzero?
-        if bad_a
-          bad_a.each do |j|
-            send_info_string "#{ j.mod } #{ j.invalid_reasons.join ' and ' } - skipping"
+
+      def __produce_downstream_IO
+
+        h = @argument_box.h_
+        @_do_open = h[ :do_open ]
+
+        pa = trio :output_file
+
+        if pa.is_known && pa.value_x
+
+          fa = trio :force
+
+          kn = Home_.lib_.system.filesystem( :Downstream_IO ).with(
+            :path_arg, pa,
+            :force_arg, fa,
+            & handle_event_selectively )
+
+          if kn
+            @_path_to_open = pa.value_x
+            @_do_close = true
+            kn.value_x
+          else
+            kn
           end
-        end
-        @job_a = job_a
-        true
-      else
-        bad_a.each do |j|  # this implicitly expects @mod_a to be nonzero length
-          send_error_string "#{ j.mod } #{ j.invalid_reasons.join ' and ' }"
-        end
-        false
-      end
-    end
-
-    -> do
-
-      meth = :event_stream_graph
-
-      define_method :meth do meth end
-
-    end.call
-
-    Job = ::Struct.new :mod, :event_stream_graph, :outpathname, :_paystream,
-      :invalid_reasons
-
-    def execute_jobs
-      if @do_write_files
-        resolve_outpathnames
-        resolve_outpaths
-      end
-      if @error_count.zero?
-        @job_a.each do |job|
-          render_graph job
+        elsif @_do_open
+          self._COVER_ME
+        else
+          @_do_close = false
+          h.fetch :stdout
         end
       end
-      @error_count.zero?
-    end
 
-    def resolve_outpathnames
-      @outfile_name or fail 'sanity'
-      if am_doing_one_job
-        @job_a[0].outpathname = ::Pathname.new @outfile_name
-      else
-        outpathname = build_outpathname_proc
-        @job_a.each_with_index do |job, index|
-          job.outpathname = outpathname[ index ]
+      def __via_module
+
+        cls = @module_
+        _esg = cls.event_stream_graph
+
+        io = @__downstream_IO
+
+        y = ::Enumerator::Yielder.new do | line |
+          io.puts line
         end
-      end
-      nil
-    end
 
-    def am_doing_one_job
-      1 == @job_a.length
-    end
+        __express_header y
 
-    def build_outpathname_proc
-      num_digits = 1
-      current_figure = @job_a.length
-      loop do
-        current_figure /= 10
-        current_figure == 0 and break
-        num_digits += 1
-      end
-      fmt = "%0#{ num_digits }d"
-      path_head, extname = splitpath @outfile_name
-      -> job_index do
-        ::Pathname.new "#{ path_head }-#{ fmt % [ job_index + 1 ] }#{ extname }"
-      end  # <- the result
-    end
+        _IO_pxy = IO_Proxy___.new do | o |
 
-    def splitpath path
-      path && path.to_s.length.nonzero? or raise ::ArgumentError, path.inspect
-      base_pn = ::Pathname.new path
-      [ base_pn.sub_ext( '' ).to_s, base_pn.extname ]
-    end
+          o[ :receive_string ] = -> str do
 
-    def resolve_outpaths
-      ok_to_clobber_rx = if am_doing_one_job
-        /\A#{ ::Regexp.escape @default_outfile_name }\z/
-      else
-        head, extname = splitpath @default_outfile_name
-        /\A#{ ::Regexp.escape head }-\d+#{ ::Regexp.escape extname }\z/
-      end
-      @job_a.each do |job|
-        pn = job.outpathname
-        if pn.exist?
-          if ok_to_clobber_rx !~ pn.to_s
-            if ! @use_force
-              send_error_string "#{ prefix }won't overwrite without force - #{ pn }"
+            s_a = str.split NEWLINE_, -1
+
+            s_a.each do | s |
+              if s.length.nonzero?
+                io.puts "#{ SPACE_ }#{ SPACE_ }#{ s }"
+              end
             end
           end
         end
-      end
-      nil
-    end
 
-    def render_graph job
-      pay = if @do_write_files
-        @infostream.write "(#{ prefix }writing #{ job.outpathname } .."
-        job.outpathname.open ::File::CREAT | ::FILE::WRONLY
-      else
-        @paystream
+        _esg.describe_digraph(
+          :IO, _IO_pxy,
+          :with_spaces, )
+
+        __express_footer y
+
+        if @_do_close
+          io.close
+        end
+
+        ACHIEVED_
       end
-      raw = job.event_stream_graph.describe_digraph
-        # (expected never to fail but meh. we don't stream it because:)
-      if raw && pay
-        scn = Home_.lib_.stringScanner.new raw
-        num = 0 ; line = nil
-        gets = -> do
-          s = scn.scan( /[^\r\n]*\r?\n|[^\r\n]+/ )
-          s and num += 1
-          s
-        end
-        if @do_digraph
-          pay.puts "digraph {"
-          pay.puts "  node [shape=\"Mrecord\"]"
-          pay.puts "  label=\"event stream graph for ::#{ job.mod }\""
-          _gets = gets
-          gets = -> { x = _gets[] and "  #{ x }" }
-        end
-        pay.puts( line ) while line = gets[]
-        pay.write "}" if @do_digraph
-        if pay.tty?
-          @infostream.write "\n" if @do_digraph  # eew - digraph wo trailing nl
+
+      def __express_header y
+        y << "digraph {"
+        y << "  node [shape=\"Mrecord\"]"
+        y << "  label=\"event stream graph for ::#{ @module_ }\""
+      end
+
+      def __express_footer y
+        y << "}"
+      end
+
+      def __maybe_open
+
+        if @_do_open
+
+          ::Kernel.exec 'open', @_path_to_open
+          self._NEVER_SEE
         else
-          pay.close
-          @infostream.puts "done.)"
+          ACHIEVED_
         end
-        send_info_string "(got #{ num } lines from #{ job.mod }##{ meth }#describe)"
-      else
-        send_error_string "`#{ @event_stream_graph.class }#describe` was falseish"
       end
-      nil
-    end
 
-    def conclude_jobs
-      if @error_count.zero?  # just to be sure
-        if ! ( @do_write_files && @do_open ) then true else
-          path_a = @job_a.reduce [] do |m, x|
-            m << x.outpathname.to_s
+      class IO_Proxy___  # :+[#sy-026]
+
+        def initialize
+          yield self
+          freeze
+        end
+
+        define_method :[]=, -> do
+
+          h = {
+            :receive_line_args => :"@__receive_line_args",
+            :receive_string => :"@_receive_string",
+          }
+
+          -> k, p do
+            instance_variable_set h.fetch( k ), p
           end
-          if path_a.length.nonzero?  # jsut to be sure
-            exec 'open', * path_a  # goodbye self
-          end
+        end.call
+
+        def << s
+          @_receive_string[ s ]
+          self
+        end
+
+        def puts * line_a
+          @__receive_line_args[ line_a ]
+          NIL_
+        end
+
+        def write s
+          @_receive_string[ s ]
+          s.length
         end
       end
+
+      NEWLINE_ = "\n"
     end
   end
 end
+# :+#tombstone: UI for edge cases
