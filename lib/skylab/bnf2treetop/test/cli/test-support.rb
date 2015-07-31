@@ -10,13 +10,7 @@ module Skylab::Bnf2Treetop::TestSupport
 
     sidesys = Callback_::Autoloader.build_require_sidesystem_proc
 
-    CLI_lib = -> do
-      HL__[]::CLI
-    end
-
     Brazen = sidesys[ :Brazen ]
-
-    HL__ = sidesys[ :Headless ]
 
   end
 

@@ -174,11 +174,21 @@ module Skylab::TestSupport
 
       def __build_plugins_collection
 
-        mod = ::Module.new
-        Here_.const_set :Plugins, mod  # :+#stowaway
-        Autoloader_[ mod, :boxxy ]
+        if Here_.const_defined? :Plugins, false
+
+          mod = Here_.const_get :Plugins
+
+        else
+
+          mod = ::Module.new
+          Here_.const_set :Plugins, mod  # :+#stowaway
+          Autoloader_[ mod, :boxxy ]
+        end
+
         col = Here_::Plugin_::Collection.new self, mod
-        ok = col.load_all__
+
+        ok = col.initialize_all__
+
         if ok
           col
         else

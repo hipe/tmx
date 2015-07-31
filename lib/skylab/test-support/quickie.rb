@@ -53,7 +53,7 @@ module Skylab::TestSupport
 
         lib = Home_.lib_
 
-        start_daemon_using(
+        start_daemon_around(
           nil,  # stdin is never used by this app,
           lib.stdout,
           lib.stderr,
@@ -62,20 +62,33 @@ module Skylab::TestSupport
       end
     end  # >>
 
+    def self.build_instance_around__ i, o, e, pn_s_a
+
+      Top_Front__.new i, o, e, pn_s_a
+    end
+
     -> do  # #storypoint-25
 
       dae = nil
 
-      define_singleton_method :_any_daemon do
-        dae
+      define_singleton_method :start_daemon_around do | i, o, e, pn_s_a |
+        if dae
+          fail __say_daemon_already_started
+        else
+          dae = Top_Front__.new i, o, e, pn_s_a  # result
+        end
       end
 
-      define_singleton_method :start_daemon_using do | i, o, e, pn_s_a |
-        if dae
-          fail
-        else
-          dae = Daemon___.new i, o, e, pn_s_a  # result
-        end
+      def self.__say_daemon_already_started
+        "cannot start daemon - already running."
+      end
+
+      define_singleton_method :daemon_is_running__ do
+        dae ? true : false
+      end
+
+      define_singleton_method :_any_daemon do
+        dae
       end
     end.call
 
@@ -123,7 +136,7 @@ module Skylab::TestSupport
       attr_reader :_do_EKD
     end
 
-    class Daemon___
+    class Top_Front__
 
       def initialize i, o, e, pn_s_a
 
@@ -1190,7 +1203,7 @@ module Skylab::TestSupport
       end
     end
 
-    class Daemon___  # #re-open
+    class Top_Front__ # #re-open
 
       def do_not_invoke!
 

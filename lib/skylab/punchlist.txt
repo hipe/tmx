@@ -1,10 +1,10 @@
-./bnf2treetop         !
 ./css-convert         !
 ./tan-man             !
 ./tmx                 !
 
 ./basic               -
 ./beauty-salon        -
+./bnf2treetop         -
 ./brazen              -
 ./callback            -
 ./code-molester       -

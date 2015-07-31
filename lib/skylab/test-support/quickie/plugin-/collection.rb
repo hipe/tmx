@@ -25,7 +25,7 @@ module Skylab::TestSupport
         ok = if @a
           ACHIEVED_
         else
-          load_all__
+          initialize_all__
         end
 
         if ok
@@ -40,7 +40,7 @@ module Skylab::TestSupport
         NIL_
       end
 
-      def load_all__
+      def initialize_all__
         a = __build_array
         if a
           @a = a

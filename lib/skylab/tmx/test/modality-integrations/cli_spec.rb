@@ -25,8 +25,8 @@ module Skylab::TMX::TestSupport
       go_ :breakup, _FLAG
     end
 
-    it "callback", wip: true do  # #until:[hl]
-      go :'callback'
+    it "callback" do
+      go :'callback', _PING_ARG
     end
 
     it "citxt" do
@@ -57,8 +57,14 @@ module Skylab::TMX::TestSupport
       go :permute, _PING_ARG
     end
 
-    it "quickie", wip: true do
-      go :'quickie', _FLAG
+    it "quickie" do
+
+      invoke "quickie", "-ping"
+
+      expect :e, /\bquickie daemon is already running\b/
+      expect "hello from quickie."
+      expect_no_more_lines
+      @exitstatus.should eql 0
     end
 
     it "slicer" do

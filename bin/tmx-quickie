@@ -5,18 +5,27 @@ require 'skylab/test-support/core'
 
 program = -> i, o, e, pn_a, argv, & p do
 
-  dae = Skylab::TestSupport::Quickie.start_daemon_using(
-    i, o, e, pn_a )
+  _Q = Skylab::TestSupport::Quickie
+
+  inst = if _Q.daemon_is_running__
+
+    e.puts "(notice - a quickie daemon is already running. #{
+      }creating non-daemonized instance.)"
+
+    _Q.build_instance_around__ i, o, e, pn_a
+  else
+    _Q.start_daemon_around i, o, e, pn_a
+  end
 
   _ok = if p
-    p[ dae ]
+    p[ inst ]
   else
     true
   end
 
   if _ok
 
-    x = dae.receive_argv argv
+    x = inst.receive_argv argv
     if x.nil?
       0
     else
@@ -25,12 +34,24 @@ program = -> i, o, e, pn_a, argv, & p do
   end
 end
 
-if __FILE__ == $PROGRAM_NAME
+# without always assigning the below const, when quickie is used to test
+# its own integration under tmx, the tmx "front loader" will load this file
+# a second time. on any such subsequent time the file is loaded, the below
+# boolean test will again result in "true" (as it was when we invoked this
+# whole test run the first time).
+#
+# the front loader needs a way to know that it is not necessary to load this
+# file. we accomplish that by assigning the const.
+# this is a hacky fix to a deeper design problem.
+#
+# perhaps a better solution would be to get the above logic out of this
+# runner but that is contray to the fundamental axiom of tmx.
+
+Skylab::Quickie = program
+
+if __FILE__ === $PROGRAM_NAME
 
   exit( program.call( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ) do | dae |
     dae.listen
   end )
-
-else
-  Skylab::Quickie = program
 end

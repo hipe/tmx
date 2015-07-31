@@ -214,7 +214,7 @@ module Skylab::TMX
         # if description is being requested, we assume that execution
         # will not be requested for this same node (eew)
 
-        _load_script
+        _load_script_if_necessary
 
         number_of_lines == @reducer_.number_of_lines or self._SANITY
 
@@ -242,7 +242,7 @@ module Skylab::TMX
 
       def bound_call_via_receive_frame frm  # assume script is not loaded
 
-        _load_script
+        _load_script_if_necessary
 
         _argv = __argv_via_resources frm.resources
 
@@ -257,17 +257,25 @@ module Skylab::TMX
         [ rsx.sin, rsx.sout, rsx.serr, @_pn_s_a, rsx.argv ]
       end
 
-      def _load_script  # assume it's never been loaded
+      def _load_script_if_necessary
 
-        ::Kernel.load @entry  # result is 'true'
+        @_const ||= __build_const
+        if ! ::Skylab.const_defined? @_const
 
+          ::Kernel.load @entry  # result is 'true'
+        end
         _init_pn_s_a
+
+        @_univeral_proc = ::Skylab.const_get @_const, false
+
+        NIL_
+      end
+
+      def __build_const
 
         s = @name_.as_lowercase_with_underscores_symbol.id2name
         s[ 0 ] = s[ 0 ].upcase
-
-        @_univeral_proc = ::Skylab.const_get s.intern, false
-        NIL_
+        s.intern
       end
     end
 

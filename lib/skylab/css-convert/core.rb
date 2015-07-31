@@ -25,12 +25,6 @@ module Skylab::CSS_Convert
 
     Brazen = sidesys[ :Brazen ]
 
-    CLI_lib = -> do
-      HL___[]::CLI
-    end
-
-    HL___ = sidesys[ :Headless ]
-
     Path_tools = -> do
       System[].filesystem.path_tools
     end
@@ -268,7 +262,7 @@ module Skylab::CSS_Convert
     end
 
     def build_pen
-      CLI::Pen.new method( :escape_path )
+      CLI::Expression_Agent.new method( :escape_path )
     end
 
     def program_name
@@ -293,9 +287,7 @@ module Skylab::CSS_Convert
 
   CLI::IO = ::Module.new
 
-  class CLI::Pen
-
-    include LIB_.CLI_lib.pen.instance_methods_module
+  class CLI::Expression_Agent < LIB_.brazen::CLI::Expression_Agent
 
     def initialize escape_path_p
       @p = escape_path_p
@@ -307,6 +299,19 @@ module Skylab::CSS_Convert
 
     def kbd s
       stylize s, :cyan
+    end
+
+    def ick x
+      %|"#{ x }"|
+    end
+
+    def par x
+      _slug = if x.respond_to? :name
+        x.name.as_slug
+      else
+        x.id2name.gsub UNDERSCORE_, DASH_
+      end
+      kbd "<#{ _slug }>"
     end
 
     def pth x
