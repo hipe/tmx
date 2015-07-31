@@ -55,7 +55,5 @@ module Skylab::Brazen
 
       y
     end
-
-    EMPTY_H_ = {}.freeze
   end
 end

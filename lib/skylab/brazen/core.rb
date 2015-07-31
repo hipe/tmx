@@ -166,7 +166,7 @@ module Skylab::Brazen
 
       def name_function
         @name_function ||= Concerns_::Name::Build_name_function[ self ]
-          # (ivar name is :+#public-API )
+          # ivar name is :+#public-API
       end
 
       def name_function_class
@@ -423,7 +423,9 @@ module Skylab::Brazen
   CONST_SEP_ = Callback_.const_sep
   DASH_ = '-'.freeze
   DONE_ = true
+  DOT_DOT_ = '..'
   EMPTY_A_ = [].freeze
+  EMPTY_H_ = {}.freeze
   EMPTY_P_ = -> { NIL_ }
   EMPTY_S_ = ''.freeze
   Autoloader_[ Models_ = ::Module.new, :boxxy ]

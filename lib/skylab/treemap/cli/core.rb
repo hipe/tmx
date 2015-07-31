@@ -4,19 +4,6 @@ module Skylab::Treemap
 
     # desc "experiments with R."
 
-    class << self
-
-      def new * a
-
-        new_top_invocation a, Home_.application_kernel_
-      end
-    end  # >>
-
-    def expression_agent_class
-
-      Home_.lib_.brazen::CLI.expression_agent_class
-    end
-
     class Action_Adapter < Action_Adapter
 
       MUTATE_THESE_PROPERTIES = %i(

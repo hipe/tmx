@@ -12,7 +12,9 @@
 [#034] #open #parent-node: [015] "re-architect.."
 [#033]       #historical #done fix test globbing .. [#xx-009]
              ( #was: #done if you un-orphanize core.rb it presents an issue with autoloader) )
-[#032] #open white plugin whines weirdly when strange files are in lib/skylab ([#xx-007])
+[#032] #open the "counts" report is not covered, verbose mode is borked
+             ( #was: white plugin whines weirdly when strange files are in
+               lib/skylab ([#xx-007] )
              ( #was: #done folderize plugins ([#xx-008]) )
              ( #was: #done #parent-node: [#015] change syntax to work with contiguous nonblank lines )
 

@@ -18,20 +18,25 @@ module Skylab::GitViz
     end
   end  # >>
 
-  module CLI  # :+#stowaway
+  Callback_ = ::Skylab::Callback
 
-    class << self
+  Autoloader_ = Callback_::Autoloader
 
-      def new * a
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
-        client = Home_.lib_.brazen::CLI.new_top_invocation(
-          a, Home_.application_kernel_ )
+  stowaway :CLI do
 
-        client.receive_environment MONADIC_EMPTINESS_
+    class CLI < Home_.lib_.brazen::CLI
 
-        client
+      def initialize * a
+
+        super
+        receive_environment MONADIC_EMPTINESS_
+          # (we don't remember why we wanted the above, but now it's exercize)
       end
-    end  # >>
+
+      self
+    end
   end
 
   module API
@@ -44,8 +49,6 @@ module Skylab::GitViz
       end
     end  # >>
   end
-
-  Callback_ = ::Skylab::Callback
 
   class << self
 
@@ -73,7 +76,6 @@ module Skylab::GitViz
     end
   end
 
-  Autoloader_ = ::Skylab::Callback::Autoloader
   ACHIEVED_ = true
   Callback_Tree_ = Callback_::Tree
   CONTINUE_ = nil
@@ -92,8 +94,6 @@ module Skylab::GitViz
   SPACE_ = ' '.freeze
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
-
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
 end
 

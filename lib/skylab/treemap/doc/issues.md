@@ -1,5 +1,5 @@
 [#056]       #doc-point towards an event wiring pattern..
-[#055] #open #hookback - let [cb] know when ridiculous is ready
+[#055] #hole ( #was: #hookback - let [cb] know when ridiculous is ready )
 [#054]       #tracking-tag slug
 [#053] #open (or #tracking-tag) load file when desc lines are necessary, maybe
 [#052]       #done invert is broken so stops are broken

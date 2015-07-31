@@ -69,7 +69,7 @@
 [#007] #open #tracking-tag this new way to do boxxy event factories
 [#006]       #parent-node: [#003] selective event listeners via methods
              ( was: #event-marker: asssuming event shape/utility is a smell )
-[#005] #open (#waiting) cross reference to [#tr-055], can use nifty ridiculous
+[#005] #hole ( #was: use nifty ridiculous of treemap )
 [#004] #open [ the "knowness" structure ] and "the states of knowness" ..
              ( #was: rename `name_i` => `name_symbol` universe-wide )
              (was: #done rename `event_cloud` -> `event_graph`)

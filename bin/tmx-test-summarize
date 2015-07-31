@@ -41,28 +41,49 @@ end
 execute = -> in_io, out_io do
 
 _RX1 = /\AFinished in (\d+(?:\.\d+)?) seconds?\z/
+
 _RX2 = /\A(?<e>\d+) examples?, (?<f>\d+) failures?(?:, \d+ pending)?\z/
+
+_PARENS_RX = /\A\(.+\)\z/
 
 num_examples = 0 ; seconds = 0.0 ; num_chunks = 0
 
+begin
 
-while (( line = in_io.gets ))
+  line = in_io.gets
+  line or break
   line.strip!
-  line.empty? and next
+
+  if line.empty?
+    redo
+  end
+
+  if _PARENS_RX =~ line
+    redo
+  end
+
   num_chunks += 1
+
   md = _RX1.match line
   md or fail "does not match first line pattern: -->#{ line }<--"
+
   line = in_io.gets
   line or fail "no."
+
   line.strip!
+
   md_ = _RX2.match line
   md_ or fail "does not match second line pattern: -->#{ line }<--"
-  e = md_[:e].to_i ; f = md_[:f].to_i
-  f.zero? or fail "won't tally with nonzero number of failures"
-  seconds += md[1].to_f
-  num_examples += e
-end
 
+  if md_[ :f ].to_i.nonzero?
+    fail "won't tally with nonzero number of failures"
+  end
+
+  seconds += md[ 1 ].to_f
+  num_examples += md_[ :e ].to_i
+  redo
+
+end while nil
 
 out_io.puts "(#{ '.' * num_chunks } #{ num_examples })"
 out_io.puts "(#{ num_chunks } in #{ seconds })"

@@ -3,7 +3,10 @@
 
 ## introduction
 
-this node is not related to pub-sub's capacity as a subsystem. this is an
-experimental one-off-esque utility for generating visualiztions of event
-stream graphs *from* participating clients of pub-sub. for typical day-to-day
-users of pub-sub this node can be ignored.
+this node is not related to the host sidesystem in its capacity as a
+sidesystem.
+
+this is an experimental utility for generating visualizations of event
+stream graphs *from* participating clients of the pub-sub event model.
+
+for typical day-to-day users of the host sidesystem this node can be ignored.

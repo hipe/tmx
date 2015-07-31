@@ -6,12 +6,9 @@ module Skylab::SubTree
 
     Brazen_ = Home_.lib_.brazen
 
-    class << self
-
-      def new * a
-        new_top_invocation a, API.application_kernel_
-      end
-    end  # >>
+    def back_kernel
+      API.application_kernel_
+    end
 
     module Actions
 

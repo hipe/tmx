@@ -60,59 +60,6 @@ module Skylab::Brazen
 
           As_Bound_Action___.new @cx, k, self, & oes_p
         end
-
-        def some_name_stop_index
-          @did_search_for_name_stop_index ||= search_for_name_stop_index
-          @name_stop_index
-        end
-
-      private
-
-        def search_for_name_stop_index
-
-          # assume the convention that somewhere there is an `Action_`
-          # node "reference class" (probably base class) that has the
-          # name stop index const.
-
-          scn = LIB_.basic::List.line_stream(
-            LIB_.module_lib.chain_via_module @box_module )
-
-          # assume the convention that the current leaf of the chain is some
-          # box module (either 'Actions' or 'Models_`), and the one above
-          # that is either a model node or the application node.
-
-          begin
-
-            box_node = scn.rgets
-            focus_node = scn.rgets
-
-            focus_mod = focus_node.value_x
-
-            if focus_mod.const_defined? :Action_
-              reference_class = focus_mod::Action_
-              break
-            end
-
-            if :Models_ == box_node.name_symbol
-              break  # we always stop at this (perhaps local) top
-            end
-
-            redo
-          end while nil
-
-          if ! reference_class
-
-            # if it wasn't found by there being an 'Action_' base class
-            # defined somewhere, assume we are at the top and the focus
-            # mod is the application class. to use procs in this way you
-            # must define the following method.
-
-            reference_class = focus_mod.action_base_class
-          end
-
-          @name_stop_index = reference_class::NAME_STOP_INDEX
-          true
-        end
       end
 
       class Signature_Classifications___
@@ -163,11 +110,7 @@ module Skylab::Brazen
           @signature_classifications = cx
         end
 
-        attr_reader :action_class_like, :kernel
-
-        def members
-          [ :action_class_like, :kernel, :maybe_receive_event ]
-        end
+        attr_reader :action_class_like, :kernel, :on_event_selectively
 
         def accept_parent_node_ _
         end

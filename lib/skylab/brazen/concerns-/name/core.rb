@@ -2,16 +2,12 @@ module Skylab::Brazen
 
   Concerns_::Name = ::Class.new ::Class.new Callback_::Name
 
-  class Concerns_::Name  # :[#005]
+  class Concerns_::Name  # notes in [#005]
 
     class << self
 
       def name_with_parent_class
         Name_with_Parent__
-      end
-
-      def surrounding_module mod
-        LIB_.module_lib.value_via_relative_path mod, DOT_DOT_
       end
     end  # >>
 
@@ -30,61 +26,94 @@ module Skylab::Brazen
       y.freeze
     end
 
-    NAME_FUNCTION_METHOD___ = -> do
-      @name_function ||= Build_name_function[ self ]  # :+#public-API (ivar name)
-    end
+    module Build_name_function  # see [#.A]
 
-    module Build_name_function ; class << self  # infects upwards
+      _NFM = -> do
+        @name_function ||= Build_name_function[ self ]  # :+#public-API (ivar name)
+      end
 
-      def [] mod
+      split = -> s do
+        d = s.rindex CONST_SEP_
+        [ s[ 0, d ], s[ ( d + 2 ) .. -1 ] ]
+      end
 
-        stop_index = __some_name_stop_index mod
+      cache = {}
 
-        s_a = mod.name.split CONST_SEP_
-        sym = s_a.pop.intern
+      cached_dereference = -> s do
 
-        chain = LIB_.module_lib.chain_via_parts s_a
-        d = chain.length
+        cache.fetch s do
 
-        while stop_index < ( d -= 1 )  # find nearest relevant parent
+          cache[ s ] = s.split( CONST_SEP_ ).reduce ::Object do | m, c |
+            m.const_get c, false
+          end
+        end
+      end
 
-          pair = chain.fetch d
-          mod_ = pair.value_x
+      entry_for = nil
+      norm_rx = /\AActions_*\z/
+      top_rx = /::Models_\z/
 
-          if ! mod_.respond_to? :name_function
+      build_entry = -> str do
 
-            if TAXONOMIC_MODULE_RX___ =~ pair.name_symbol
-              next
+        x_s, base_s = split[ str ]
+        sym = base_s.intern
+
+        if top_rx =~ x_s
+
+          _parent_parent = cached_dereference[ x_s ]
+
+          me = _parent_parent.const_get sym, false
+        else
+
+          x_s_, box_base_s = split[ x_s ]
+
+          if norm_rx =~ box_base_s
+
+            ent = entry_for[ x_s_ ]
+            parent = ent.x
+
+            if ! parent.respond_to? :name_function
+              parent.send :define_singleton_method, :name_function, _NFM
             end
 
-            mod.send :define_singleton_method, :name_function, NAME_FUNCTION_METHOD___
+            _box_module = parent.const_get box_base_s, false
+
+            me = _box_module.const_get sym, false
+          else
+
+            # for nonstandard trees (transplanting nodes ([br] only?))
+
+            parent = cached_dereference[ x_s ]
+
+            me = parent.const_get sym, false
+
           end
-
-          parent = mod_
-          break
         end
 
-        mod.name_function_class.new_via mod, parent, sym
+        Entry___.new me, sym, parent
       end
 
-      def __some_name_stop_index mod
+      entry_for = -> s do
+        cache.fetch s do
+          cache[ s ] = build_entry[ s ]
+        end
+      end
 
-        if mod.respond_to? :some_name_stop_index
+      define_singleton_method :[] do | mod |
 
-          mod.some_name_stop_index
+        entry = entry_for[ mod.name ]
 
-        elsif mod.const_defined? :NAME_STOP_INDEX
-
-          mod::NAME_STOP_INDEX
+        _cls = if mod.respond_to? :name_function_class
+          mod.name_function_class
         else
-          DEFAULT_STOP_INDEX___
+          Concerns_::Name
         end
+
+        _cls.new_via mod, entry.parent_module, entry.intern
       end
-    end ; end
+    end
 
-    DEFAULT_STOP_INDEX___ = 3  # skylab snag cli actions foo actions bar
-
-    TAXONOMIC_MODULE_RX___ = /\AActions_{0,2}\z/  # meh / wee
+    Entry___ = ::Struct.new :x, :intern, :parent_module
 
     # ~ as class
 

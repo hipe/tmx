@@ -8,21 +8,12 @@ module Skylab::Brazen
         CLI_::Action_Adapter::Arguments
       end
 
-      def expression_agent_class
-        CLI_::Expression_Agent
-      end
-
       def expression_agent_instance
         CLI_::Expression_Agent.instance
       end
 
-      alias_method :new_top_invocation, :new
-      def new * a
-        new_top_invocation a, Home_.application_kernel_
-      end
-
       def pretty_path x
-        expression_agent_class.pretty_path x
+        CLI::Expression_Agent.pretty_path x
       end
 
       def some_screen_width
@@ -38,12 +29,36 @@ module Skylab::Brazen
 
     class Top_Invocation__
 
-      def initialize a, ak
+      def initialize i, o, e, pn_s_a, * x_a  # pn_s_a = program name string array
+
+        if x_a.length.zero?
+          h = EMPTY_H_
+        else
+          h = {}
+          x_a.each_slice 2 do | k, x |
+            h[ k ] = x
+          end
+        end
+
+        ak = if h.key? :back_kernel
+          h.delete :back_kernel
+        else
+          back_kernel
+        end
+
+        if h.length.nonzero?
+          self._COVER_ME
+        end
 
         @app_kernel = ak
-        @_resource_components = nil
+
         @mod = ak.module
-        @resources ||= Resources.new a, @mod
+
+        @_resource_components = nil
+
+        @resources ||= Resources.new i, o, e, pn_s_a, @mod
+
+
         # (abstract base class "invocation" has no initialize method)
       end
 
@@ -149,6 +164,15 @@ module Skylab::Brazen
         @app_kernel
       end
 
+      def back_kernel
+
+        # client #hook-in for nonstandard kernel exposure
+
+        Home_.lib_.basic::Module.value_via_relative_path(
+          self.class, DOT_DOT_
+        ).application_kernel_
+      end
+
       def bound_
         @app_kernel
       end
@@ -207,9 +231,40 @@ module Skylab::Brazen
         @poly ||= ::Enumerator::Yielder.new( & @resources.sout.method( :puts ) )
       end
 
+      # ~ towards investigation :+[#101]:
+
       def expression_agent_class
-        self.class.const_get :Expression_Agent, false
+
+        self.class._instance_expression_agent_class
       end
+
+      class << self
+
+        def _instance_expression_agent_class
+
+          if const_defined? :Expression_Agent, false
+
+            # do NOT inherit in the above const resolution - see [#101.A]
+
+            const_get :Expression_Agent, false
+
+          else
+            _cls = __any_custom_expag_class_via_filesystem
+            _cls || superclass._instance_expression_agent_class
+          end
+        end
+
+        define_method :__any_custom_expag_class_via_filesystem, -> do
+
+          _SLUG = 'expression-agent'
+          -> do
+            et = entry_tree
+            if et.has_directory && et.has_entry_for_slug( _SLUG )
+              const_get :Expression_Agent, false
+            end
+          end
+        end.call
+      end  # >>
     end
 
     # ~
@@ -1242,7 +1297,7 @@ module Skylab::Brazen
 
     class Invocation__
 
-      MUTATE_THESE_PROPERTIES = nil
+      MUTATE_THESE_PROPERTIES = [ :stdin, :stdout ]
 
       def members
         EMPTY_A_
@@ -1853,7 +1908,7 @@ module Skylab::Brazen
       box.add :ellipsis, Property__.new( :ellipsis,
         # :argument_arity, :zero_or_more,
         :argument_arity, :zero_or_one,
-        :custom_moniker, '..' )
+        :custom_moniker, DOT_DOT_ )
 
       box.freeze
     end.call
@@ -1912,11 +1967,14 @@ module Skylab::Brazen
         :sout,
       )
 
-      def initialize a, mod
+      def initialize i, o, e, pn_s_a, mod
 
         @_bridges = nil
-        @sin, @sout, @serr, @_s_a = a
         @mod = mod
+        @sin = i
+        @serr = e
+        @sout = o
+        @_s_a = pn_s_a
       end
 
       def invocation_string_array
@@ -2108,6 +2166,10 @@ module Skylab::Brazen
 
       # (normally you would call your subclass `CLI`, but we can't here)
 
+      def back_kernel
+        Home_.application_kernel_
+      end
+
       class Action_Adapter < Action_Adapter  # #pedgogy-1875
 
         MUTATE_THESE_PROPERTIES = [
@@ -2161,15 +2223,6 @@ module Skylab::Brazen
           end
           NIL_
         end
-      end
-
-      def expression_agent_class
-
-        # normal client clients will implement their own expag class, and
-        # the parent implementation of this (which effectivey uses auto-
-        # loading) will "just work". but this client client is not normal.
-
-        self.class.superclass.const_get :Expression_Agent, false
       end
 
       Actions = ::Module.new  # #pedagogy-1975
@@ -2227,6 +2280,14 @@ module Skylab::Brazen
           if bp.has_name sym
             send :"mutate__#{ sym }__properties"
           end
+        end
+        NIL_
+      end
+
+      def mutate__stdout__properties  # an example
+
+        substitute_value_for_argument :stdout do
+          @resources.sout
         end
         NIL_
       end

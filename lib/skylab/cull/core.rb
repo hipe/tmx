@@ -6,6 +6,18 @@ module Skylab::Cull
     y << "reduce a search space by a criteria - i.e helps make decisions"
   end
 
+  Callback_ = ::Skylab::Callback
+
+  Autoloader_ = Callback_::Autoloader
+
+  Autoloader_[ Models_ = ::Module.new, :boxxy ]
+
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
+  stowaway :CLI do
+    CLI = ::Class.new Brazen_::CLI
+  end
+
   module API
 
     class << self
@@ -14,18 +26,8 @@ module Skylab::Cull
         bc = Home_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
         bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
       end
-
-      def expression_agent_class
-        Brazen_::API.expression_agent_class
-      end
     end  # >>
   end
-
-  Callback_ = ::Skylab::Callback
-
-  Autoloader_ = Callback_::Autoloader
-
-  Autoloader_[ Models_ = ::Module.new, :boxxy ]
 
   Models_::Ping = -> act_pxy, & oes_p do
 
@@ -149,9 +151,8 @@ module Skylab::Cull
     System_lib___ = sidesys[ :System ]
   end
 
-  Brazen_ = Autoloader_.require_sidesystem :Brazen
-
   ACHIEVED_ = true
+  Brazen_ = Autoloader_.require_sidesystem :Brazen
   Action_ = Brazen_::Model.common_action_class  # for name stop index we need this const
   Home_ = self
   EMPTY_P_ = -> {}
@@ -161,6 +162,5 @@ module Skylab::Cull
   NIL_ = nil
   UNABLE_ = false
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
 end

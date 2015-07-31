@@ -13,12 +13,14 @@ module Skylab::Callback::TestSupport
     end
 
     class Mock_Old_Event___
+
       def initialize _x_a
+        @_argies_ = _x_a
       end
+
       def is_event
         true
       end
     end
-
   end
 end

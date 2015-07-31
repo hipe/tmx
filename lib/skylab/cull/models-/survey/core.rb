@@ -383,7 +383,8 @@ module Skylab::Cull
 
       Autoloader_[ self, :boxxy ]
 
-      stowaway :Map, ( same = 'function--' )
+      same = 'function--'
+      stowaway :Map, same
       stowaway :Mutator, same
       stowaway :Aggregator, same
     end

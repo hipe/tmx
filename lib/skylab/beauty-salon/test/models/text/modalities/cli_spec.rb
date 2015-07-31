@@ -49,7 +49,7 @@ module Skylab::BeautySalon::TestSupport
       @_stdin = _stdin_mocks.noninteractive_STDIN_instance
       invoke 'wrap', '-n1', 'xx'
 
-      expect :e, %r(\Acouldn't wrap beauty salon text because ambiguous upstr)
+      expect :e, %r(\Acouldn't wrap text because ambiguous upstr)
       expect :e
 
       expect_failed

@@ -2,16 +2,6 @@ module Skylab::Permute
 
   class CLI < Home_.lib_.brazen::CLI
 
-    class << self
-      def new * a
-        new_top_invocation a, Home_.application_kernel_
-      end
-    end  # >>
-
-    def expression_agent_class
-      Home_.lib_.brazen::CLI.expression_agent_class
-    end
-
     Actions = ::Module.new
     class Actions::Generate < Action_Adapter
 

@@ -2,4 +2,7 @@
 
 require_relative '../lib/skylab/git-viz/core'
 
-Skylab::GitViz::CLI::Client.new( $stdin, $stdout, $stderr ).invoke ARGV
+_x = Skylab::GitViz::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
+  invoke ARGV
+
+$stderr.puts "(exitstatus: #{ _x })"

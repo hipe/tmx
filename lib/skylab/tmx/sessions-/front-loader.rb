@@ -271,7 +271,7 @@ module Skylab::TMX
       end
     end
 
-    class Proxy__
+    class Proxy__   # :+[#sy-026]
 
       def initialize
         yield self

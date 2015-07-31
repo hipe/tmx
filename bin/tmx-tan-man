@@ -2,6 +2,7 @@
 
 require_relative '../lib/skylab/tan-man/core'
 
-x = Skylab::TanMan::CLI.new( $stdin, $stdout, $stderr ).invoke ARGV
+_x = Skylab::TanMan::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
+  invoke ARGV
 
-$stderr.puts "(exitstatus: #{ x })"
+$stderr.puts "(exitstatus: #{ _x })"

@@ -9,6 +9,22 @@ module Skylab::Git
 
   Callback_ = ::Skylab::Callback
 
+  Autoloader_ = Callback_::Autoloader
+
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
+  stowaway :CLI do
+
+    class CLI < Home_.lib_.brazen::CLI
+
+      def back_kernel
+        Home_::API.application_kernel_
+      end
+
+      self
+    end
+  end
+
   API = ::Module.new
 
   class << API
@@ -45,10 +61,6 @@ module Skylab::Git
         self::Lib_, self )
     end
   end  # >>
-
-  Autoloader_ = Callback_::Autoloader
-
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   ACHIEVED_ = true
   DASH_ = '-'.freeze

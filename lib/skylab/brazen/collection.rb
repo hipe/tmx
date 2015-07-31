@@ -2,17 +2,9 @@ module Skylab::Brazen
 
   module Collection
 
-    class Model_ < Home_::Model
+    Model_ = Home_::Model
 
-      NAME_STOP_INDEX = 1  # sl brzn dratastore actions couch add
-
-    end
-
-    class Action < Home_::Action
-
-      NAME_STOP_INDEX = 1
-
-    end
+    Action = Home_::Action
 
     class Actor
     private

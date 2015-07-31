@@ -9,7 +9,7 @@ module Skylab::TMX
     #
     #   • there must be *no* sidesystem-specific knowledge *anywhere* here.
 
-    def self.new i, o, e, pn_s_a
+    def initialize i, o, e, pn_s_a
 
       tmx_host_mod = ::Skylab
 
@@ -32,11 +32,9 @@ module Skylab::TMX
         o.execute
       end
 
-      new_top_invocation [ i, o, e ], front.to_kernel_adapter
-    end
+      _kr = front.to_kernel_adapter
 
-    def expression_agent_class
-      self.class.superclass.expression_agent_class
+      super i, o, e, pn_s_a, :back_kernel, _kr
     end
 
     def adapter_via_unbound ada

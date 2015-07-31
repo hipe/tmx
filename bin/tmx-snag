@@ -2,6 +2,7 @@
 
 require_relative '../lib/skylab/snag/core'
 
-_x = Skylab::Snag::CLI.new( nil, $stdout, $stderr ).invoke ARGV
+_x = Skylab::Snag::CLI.new( nil, $stdout, $stderr, [ $PROGRAM_NAME ] ).
+  invoke ARGV
 
 $stderr.puts "(existatus: #{ _x.inspect })"

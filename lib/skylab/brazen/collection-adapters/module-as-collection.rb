@@ -26,7 +26,15 @@ module Skylab::Brazen
       end
     end
 
+    def name_function
+
+      self._REDO
+
+    end
+
     class Name_and_Module___
+
+      attr_reader :module, :name
 
       def reinitialize mod
         @module = mod
@@ -37,8 +45,6 @@ module Skylab::Brazen
       def initialize_copy _
         NIL_  # hello
       end
-
-      attr_reader :module, :name
     end
   end
 end

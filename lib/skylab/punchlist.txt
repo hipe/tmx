@@ -1,11 +1,13 @@
+./bnf2treetop         !
+./css-convert         !
+./tan-man             !
+./tmx                 !
 
 ./basic               -
 ./beauty-salon        -
-./bnf2treetop         -
 ./brazen              -
 ./callback            -
 ./code-molester       -
-./css-convert         -
 ./cull                -
 ./dependency          -
 ./fields              -
@@ -13,7 +15,7 @@
 ./flex2treetop        -
 ./git                 -
 ./git-viz             -
-./headless            -
+./headless            [ topic ]
 ./human               -
 ./parse               -
 ./permute             -
@@ -23,9 +25,7 @@
 ./snag                -
 ./sub-tree            -
 ./system              -
-./tan-man             -
 ./test-support        -
-./tmx                 -
 ./treemap             -
 ./yacc2treetop        -
 

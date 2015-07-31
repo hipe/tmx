@@ -6,22 +6,9 @@ module Skylab::TestSupport
 
     class CLI < Brazen_::CLI
 
-      class << self
-
-        def new * a
-          new_top_invocation a, DocTest_.application_kernel_
-        end
-      end
-
-      def expression_agent_class
-        CLI_LIB_.expression_agent_class
-      end
-
-      CLI_LIB_ = superclass
-
       # ~ universal action adapter customization
 
-      class Action_Adapter < CLI_LIB_::Action_Adapter
+      class Action_Adapter < self::Action_Adapter
 
         MUTATE_THESE_PROPERTIES = [ :downstream ]
 

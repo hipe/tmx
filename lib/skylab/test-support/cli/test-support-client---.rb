@@ -2,14 +2,9 @@ module Skylab::TestSupport
 
   class CLI::Test_Support_Client___ < Home_.lib_.brazen::CLI
 
-    # ~ we want this to go away eventually
-
-    class << self
-
-      def new_via_arglist a
-        new_top_invocation a, Home_::API.krnl
-      end
-    end  # >>
+    def back_kernel
+      Home_::API.krnl
+    end
 
     # ~ the currently cludgy way we get resources directly to the model action
 
@@ -33,10 +28,6 @@ module Skylab::TestSupport
           nil
         end
       end
-    end
-
-    def expression_agent_class
-      Home_::CLI::Expression_Agent
     end
   end
 end

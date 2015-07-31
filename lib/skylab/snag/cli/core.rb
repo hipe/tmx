@@ -2,16 +2,6 @@ module Skylab::Snag
 
   class CLI < Home_.lib_.brazen::CLI
 
-    Brazen_ = Home_.lib_.brazen
-
-    class << self
-
-      def new * a
-
-        new_top_invocation a, Home_.application_kernel_
-      end
-    end  # >>
-
     # ~ the bulk of this file is the implementation of the hybrid "open"
     # action adapter, an exposure that calls one of two distinct model
     # actions depending on its arguments.
@@ -413,5 +403,7 @@ module Skylab::Snag
         NIL_
       end
     end
+
+    Brazen_ = Home_.lib_.brazen
   end
 end

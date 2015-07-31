@@ -68,8 +68,6 @@ module Skylab::Brazen
       end
     end
 
-    NAME_STOP_INDEX = 2  # sl br models
-
     Autoloader_[ Concerns__ = ::Module.new, :boxxy ]
 
     class Concerns__::Name < Concerns_::Name
@@ -358,6 +356,15 @@ module Skylab::Brazen
       end
     end
 
+    def trio sym
+      had = true
+      x = @argument_box.fetch sym do
+        had = false
+      end
+      Callback_::Qualified_Knownness.via_value_and_had_and_model(
+        x, had, formal_properties.fetch( sym ) )
+    end
+
     def argument_value sym
       @argument_box.fetch sym
     end
@@ -418,19 +425,25 @@ module Skylab::Brazen
       NIL_
     end
 
-    def init_formal_properties_ x
+    def init_formal_properties_ pbx
 
       a = _formal_preconditions
 
       if a and a.length.nonzero?
+
         a.each do | precon_id |
-          otr = @kernel.silo_via_identifier( precon_id ).
-            any_mutated_formals_for_depender_action_formals x
-          otr and x = otr
+
+          _silo = @kernel.silo_via_identifier precon_id
+
+          otr = _silo.any_mutated_formals_for_depender_action_formals pbx
+
+          if otr
+            pbx = otr
+          end
         end
       end
 
-      @formal_properties = x  # result
+      @formal_properties = pbx  # result
     end
 
     ## ~~ related #hook-outs/in's

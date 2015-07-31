@@ -28,13 +28,18 @@ module Skylab::Slicer
 
   Autoloader_ = Callback_::Autoloader
 
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
+  stowaway :CLI do
+
+    CLI = ::Class.new Brazen_::CLI
+  end
+
   module Lib_
 
     # sidesys, = Autoloader_.at :build_require_sidesystem_proc
 
   end
-
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   ACHIEVED_ = true
   Brazen_ = Autoloader_.require_sidesystem :Brazen

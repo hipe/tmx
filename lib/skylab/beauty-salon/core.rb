@@ -27,6 +27,15 @@ module Skylab::BeautySalon
     end
   end  # >>
 
+  Autoloader_ = Callback_::Autoloader
+
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
+  stowaway :CLI do
+
+    CLI = ::Class.new Home_.lib_.brazen::CLI
+  end
+
   module API
 
     class << self
@@ -42,7 +51,6 @@ module Skylab::BeautySalon
       end
     end  # >>
   end
-  Autoloader_ = Callback_::Autoloader
 
   module Lib_
 
@@ -116,7 +124,5 @@ module Skylab::BeautySalon
   THE_EMPTY_MODULE_ = ::Module.new.freeze
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
-
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
 end

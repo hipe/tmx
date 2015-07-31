@@ -57,6 +57,8 @@ module Skylab::TestSupport::TestSupport::Models
 
       e.gets.should be_include '{ orange | blue }'
 
+      e.gets.should eql "(exitstatus: 0)\n"
+
       e.gets.should be_nil
 
       w.value.exitstatus.should be_zero

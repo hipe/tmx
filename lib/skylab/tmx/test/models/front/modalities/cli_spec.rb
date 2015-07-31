@@ -62,16 +62,11 @@ module Skylab::TMX::TestSupport
 
       front = _front
 
-      cls.send :define_method, :expression_agent_class do
-
-        Home_.lib_.brazen::CLI::Expression_Agent
-      end
-
-      cls.send :define_singleton_method, :new do | * a |
+      cls.send :define_method, :initialize do | i, o, e, pn_s_a |
 
         _k = front.to_kernel_adapter
 
-        new_top_invocation a, _k
+        super i, o, e, pn_s_a, :back_kernel, _k
       end
 
       cls

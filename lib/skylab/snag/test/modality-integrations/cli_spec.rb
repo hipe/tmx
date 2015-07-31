@@ -143,7 +143,7 @@ module Skylab::Snag::TestSupport
       invoke 'open', 'wazeezle', '--try-to-reappropriate',
         '--upstream-identifier', td.to_path
 
-      expect :e, %r(\Aopened a snag node: updated [^ ]+ \(131 bytes\)\z)
+      expect :e, %r(\Aopened a node: updated [^ ]+ \(131 bytes\)\z)
 
       on_stream :o
       _expect_separator

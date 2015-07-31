@@ -8,14 +8,14 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
     y << "attepts to convert a FLEX grammar into a treetop grammar"
   end
 
-  module CLI
+  Callback_ = ::Skylab::Callback
 
-    class << self
+  Autoloader_ = Callback_::Autoloader
 
-      def new * a
-        Brazen_::CLI.new_top_invocation a, Home_.application_kernel_
-      end
-    end  # >>
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
+  stowaway :CLI do
+    CLI = ::Class.new Brazen_::CLI
   end
 
   module API
@@ -28,8 +28,6 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
       end
     end  # >>
   end
-
-  Callback_ = ::Skylab::Callback
 
   class << self
 
@@ -364,8 +362,6 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
       end
     end
   end
-
-  Autoloader_ = Callback_::Autoloader
 
   module Lib_
 
@@ -1507,8 +1503,6 @@ Translate___ = Deferred_actor__[ -> do class Translate____
   UNABLE_ = false
   VERSION = '0.0.3'
   WRITE_MODE_ = ::File::WRONLY | ::File::CREAT
-
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   TREETOP_GRAMMAR__ = <<'GRAMMAR'
 # The 'pattern' rule below is a subset of the grammar grammar described at

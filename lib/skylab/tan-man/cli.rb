@@ -2,12 +2,6 @@ module Skylab::TanMan
 
   class CLI < Brazen_::CLI
 
-    class << self
-      def new * a
-        new_top_invocation a, Home_.application_kernel_
-      end
-    end  # >>
-
     # ~ experimental front client customizations:
 
     Branch_Adapter = Branch_Adapter

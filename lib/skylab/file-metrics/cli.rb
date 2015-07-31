@@ -2,16 +2,6 @@ module Skylab::FileMetrics
 
   class CLI < lib_.brazen::CLI
 
-    class << self
-      def new * a
-        new_top_invocation a, Home_.application_kernel_
-      end
-    end  # >>
-
-    def expression_agent_class
-      self.class.superclass.expression_agent_class
-    end
-
     Build_custom_lipstick_field = -> o do
 
       o.edit_table_field(

@@ -1250,6 +1250,15 @@ module Skylab::Callback
 
     class Entry_Tree_ < Normpath_  # read [#024]:introduction-to-the-entry-tree
 
+      def has_entry_for_slug s
+
+        if @h.key? s
+          true
+        else
+          @h.key? "#{ s }#{ EXTNAME_ }"
+        end
+      end
+
       def has_entry s
         @h.key? s
       end
@@ -1627,10 +1636,26 @@ module Skylab::Callback
     # ~ the stowaway story [#031]
 
     module Methods__
+
       attr_reader :stowaway_h
+
     private
-      def stowaway i, relpath
-        ( @stowaway_h ||= {} )[ i ] = relpath ; nil
+
+      def stowaway sym, * a, & p
+
+        if block_given?
+          __stowaway_when_block sym, * a, & p
+        else
+          __stowaway_when_relpath sym, * a
+        end
+      end
+
+      def __stowaway_when_relpath sym, relpath
+        ( @stowaway_h ||= {} )[ sym ] = relpath ; nil
+      end
+
+      def __stowaway_when_block sym, & p
+        ( @stowaway_h ||= {} )[ sym ] = p ; nil
       end
     end
 

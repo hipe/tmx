@@ -50,7 +50,7 @@ module Skylab::Git::TestSupport
         invoke 'stow', 'pop', 'wazoozle'
       end
 
-      expect :e, %r(\Acouldn't pop git stow because #{
+      expect :e, %r(\Acouldn't pop stow because #{
         }stows collection at \.\./Stows does not have stow "wazoozle"\z)
 
       _expect_common_failure

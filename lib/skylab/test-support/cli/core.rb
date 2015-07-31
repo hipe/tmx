@@ -4,8 +4,8 @@ module Skylab::TestSupport
 
     class << self
 
-      def new * a
-        CLI::Test_Support_Client___.new_via_arglist a
+      def new i, o, e, pn_a
+        CLI::Test_Support_Client___.new i, o, e, pn_a
       end
 
       def visual_client
