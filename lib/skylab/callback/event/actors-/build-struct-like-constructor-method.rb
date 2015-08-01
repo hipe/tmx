@@ -1,98 +1,75 @@
-module Skylab::Headless
+module Skylab::Callback
 
-  class Event  # :[#132] the magical, multipurpose Event base class
+  class Event
 
-    module New_method_produces_subclasses_with_members__
-      def self.[] client, * x_a
-        st = Params__.new ; st[ x_a.shift ] = x_a.shift while x_a.length.nonzero?
-        new_class_notify_p, args_notify_p = st.to_a
-        client.class_exec do
-          class << self ; alias_method :orig_new, :new end
-          define_singleton_method :new do | * i_a, & p |
-            args_notify_p and args_notify_p[ i_a, p ]
-            ::Class.new( self ).class_exec do
-              class << self ; alias_method :new, :orig_new end
-              Members__[ self, i_a ]
-              module_exec( * p, & new_class_notify_p )
-              self
-            end
-          end
-        end
-        nil
-      end
+    module Actors_::Build_struct_like_constructor_method
+
+      # :[#005.B] NOTE client must do its own alias of `orig_new` !
       #
-      Params__ = ::Struct.new :with_new_class, :with_args
-    end
+      # currently this gets its coverage by [#005.D].
 
-    module Members__
-      def self.[] mod, i_a=nil
-        mod.module_exec do
-          extend MM__ ; include IM__
-          i_a and const_set :MEMBER_I_A__, i_a.freeze
-        end ; nil
-      end
-      module MM__
-        def members ; self::MEMBER_I_A__ end
-      end
-      module IM__
-        def members ; self.class.members end
-        def to_a ; members.map( & method( :send ) ) end
-      end
-    end
+      _Params = ::Struct.new :edit_class, :on_args_to_method_called_new
 
-    New_method_produces_subclasses_with_members__[ self,
-      :with_args, -> x_a, p do
-        x_a.length.zero? && p &&
-          (( i_a = p.parameters.map( & :last ) )).length.nonzero? and
-            x_a.concat i_a
-        nil
-      end,
-      :with_new_class, -> p=nil do
-        const_set :IVAR_A__, members.map { |i| :"@#{ i }" }
-        attr_reader( * members )
-        if p
-          if p.arity.zero?
-            class_exec( & p )
-          else
-            const_set :MESSAGE_P__, p
+      _TAM = -> do
+        members.map( & method( :send ) )
+      end
+
+      _MIM = -> do
+        self.class.members
+      end
+
+      _MMM = -> do
+
+        self::MEMBER_I_A__
+      end
+
+      define_singleton_method :_same do | * x_a |
+
+        o = _Params.new
+        x_a.each_slice 2 do | k, x |
+          o[ k ] = x
+        end
+        edit_class_p, args_notify_p = o.to_a
+
+        -> * members, & user_edit_p do
+
+          if args_notify_p
+            args_notify_p[ members, & user_edit_p ]
+          end
+
+          members.freeze
+
+          ::Class.new( self ).class_exec do
+
+            class << self
+              alias_method :new, :orig_new
+              alias_method :[], :orig_new
+            end
+
+            define_method :to_a, _TAM
+
+            define_method :members, _MIM
+
+            define_singleton_method :members, _MMM
+
+            const_set :MEMBER_I_A__, members  # before next line
+
+            if edit_class_p
+
+              module_exec( * user_edit_p, & edit_class_p )
+
+            end
+
+            self
           end
         end
-        nil
-      end ]
+      end
 
-    def self.[] * x_a
-      new( * x_a )
-    end
-    def initialize * x_a
-      x_a.length > self.class::IVAR_A__.length and raise ::ArgumentError, "no"
-      self.class::IVAR_A__.each_with_index do |ivar, idx|
-        instance_variable_set ivar, x_a[ idx ]  # defaults to nil
-      end ; nil
-    end
-    def any_message_proc
-      self.class.const_defined?( :MESSAGE_P__ ) and self.class::MESSAGE_P__
-    end
-    def message_proc
-      self.class::MESSAGE_P__
-    end
-    def some_message_proc
-      any_message_proc or fail "no message proc defined for #{ self.class }"
-    end
+      class << self
 
-    class Hooks  # not related to events except w/ this shared implementation
-      New_method_produces_subclasses_with_members__[ self,
-        :with_new_class, -> cls_p=nil do
-          members.each do |i|
-            _p = :"#{ i }_p"
-            define_method(( m = :"on_#{ i }")) do |*a, &p|
-              instance_variable_set :"@#{ _p }",
-                ( p ? a << p : a ).fetch( a.length - 1 << 2 )
-            end
-            alias_method i, m
-            attr_reader _p
-          end
-          cls_p and class_exec( & cls_p )
-      end ]
+        alias_method :[], :_same
+        alias_method :call, :_same
+      end
     end
   end
 end

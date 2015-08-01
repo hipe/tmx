@@ -281,7 +281,7 @@ module Skylab::System
           Home_.lib_.shellwords.shellescape s
         end
 
-        Process_Line_ = Callback_::Event.message_class_factory.new :ok, nil do | line |
+        Process_Line_ = Callback_::Event.message_class_maker.new :ok, nil do | line |
           line
         end
       end

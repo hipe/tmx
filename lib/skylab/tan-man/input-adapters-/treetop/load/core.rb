@@ -9,7 +9,7 @@ module Skylab::TanMan
     # Define the DSL that will be used to load grammars.
 
     def self.formal_parameter_class            # [#sl-119] one day DSL
-      Parameter___ # has extra nonsense for dirs [#hl-009] HL::P strain?
+      Parameter___ # has extra nonsense for dirs [#fi-009] HL::P strain?
     end
 
     class Parameter___ < LIB_.parameter
@@ -41,7 +41,7 @@ module Skylab::TanMan
   end
 
 
-    include LIB_.parameter::Bound::InstanceMethods  # bound_parameters
+    LIB_.parameter::Bound::Definer_instance_methods[ self ]  # `bound_parameters`
 
     attr_reader( * Shell__.parameters.get_names )
 
@@ -50,7 +50,7 @@ module Skylab::TanMan
 
     Callback_::Event.selective_builder_sender_receiver self
 
-    def invoke
+    def execute
       ok = call_body_and_absorb!
       ok && init_ivars
       ok &&= normalize_and_validate_paths
@@ -67,7 +67,7 @@ module Skylab::TanMan
 
     def normalize_and_validate_paths
       _relpath_root = bound_parameters[ :root_for_relative_paths ]
-      Load_::Normalize_and_validate_paths__[ _relpath_root, self ]
+      Load_::Actors_::Normalize_and_validate_paths[ _relpath_root, self ]
     end
 
     def start_loads
@@ -87,7 +87,7 @@ module Skylab::TanMan
         @generated_grammar_dir.join tail_pn
       end
       g.out_path = "#{ _base_pn }#{ Autoloader_::EXTNAME }"  # [..]/g1.treetop.rb
-      g.module_name_i_a = Load_::Hack_peek_module_name__[ g.in_pn.to_path ]
+      g.module_name_i_a = Load_::Actors_::Hack_peek_module_name[ g.in_pn.to_path ]
       g
     end
 
@@ -413,6 +413,7 @@ module Skylab::TanMan
       call_digraph_listeners :error, ev
     end
 
+    Autoloader_[ Actors_ = ::Module.new ]
     Load_ = self
   end
   end

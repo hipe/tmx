@@ -2,9 +2,7 @@ module Skylab::Callback
 
   class Event
 
-    Class_Factories__ = ::Module.new
-
-    module Class_Factories__::Data_Event
+    module Makers_::Data_Event  # :[#005.E].
 
       class << self
         def new * i_a
@@ -52,7 +50,7 @@ module Skylab::Callback
       end
     end
 
-    module Class_Factories__::Message
+    module Makers_::Message  # :[#005.E] (see)
 
       class << self
 

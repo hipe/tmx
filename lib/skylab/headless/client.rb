@@ -19,12 +19,11 @@ module Skylab::Headless
     end
 
     module Bundles
+
       Client_services = -> x_a do
         module_exec x_a, & Home_::Client_Services.to_proc ; nil
       end
-      Parameter_controller = -> _ do
-        Home_::Parameter[ self, :parameter_controller ]
-      end
+
       Home_.lib_.bundle::Multiset[ self ]
     end
   end

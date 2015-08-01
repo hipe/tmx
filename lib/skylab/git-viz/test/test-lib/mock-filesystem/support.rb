@@ -4,7 +4,10 @@ module Skylab::GitViz::TestSupport::Test_Lib
 
     def self.[] tcc
 
-      tcc.send :define_singleton_method, :dangerous_memoize_, DANGEROUS_MEMOIZE_
+      tcc.send :define_singleton_method,
+        :dangerous_memoize_,
+        TestSupport_::DANGEROUS_MEMOIZE
+
       tcc.include Instance_Methods___
     end
 

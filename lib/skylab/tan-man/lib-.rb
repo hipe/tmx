@@ -18,10 +18,6 @@ module Skylab::TanMan
       System[].defaults.dev_tmpdir_pathname
     end
 
-    Dry_stub = -> do
-      HL__[]::IO.dry_stub_instance
-    end
-
     Ellipsify = -> s do
       Basic[]::String.ellipsify s
     end
@@ -36,8 +32,6 @@ module Skylab::TanMan
       System[].environment.any_home_directory_pathname
     end
 
-    HL__ = sidesys[ :Headless ]
-
     List_scanner = -> x do
       Callback_::Scn.try_convert x
     end
@@ -46,8 +40,10 @@ module Skylab::TanMan
       Basic[]::Module
     end
 
-    Parameter = -> do
-      HL__[]::Parameter
+    ___Fields = sidesys[ :Fields ]
+
+    Parameter = -> do  # this is used in so many places, we defy convention
+      ___Fields[]::Parameter
     end
 
     Parse_lib = sidesys[ :Parse ]

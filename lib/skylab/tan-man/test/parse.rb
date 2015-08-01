@@ -56,12 +56,16 @@ module Skylab::TanMan::TestSupport
 
       def produce_parser_class_  # override the parent's version of this :#hook-out for [ttt]
 
-        Home_::Input_Adapters_::Treetop::Load.new( :_xxx_,
+        # create a load session that produces (hopefully) a parser class
+
+        _load = Home_::Input_Adapters_::Treetop::Load.new(
+
           -> o do
             o.generated_grammar_dir @_h.fetch :generated_grammar_dir_path
             o.root_for_relative_paths @_h.fetch :root_for_relative_paths_for_load
             o.treetop_grammar @_h.fetch :grammar_path
           end,
+
           -> o do
 
             # for clarity, we may below duplicate some of parent's wiring logic
@@ -76,8 +80,10 @@ module Skylab::TanMan::TestSupport
                 ev
               end
             end
-          end ).invoke  # a transient load session is created that produces (hopefully) a parser class
+          end,
+        )
 
+        _load.execute
       end
     end
   end

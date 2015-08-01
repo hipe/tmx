@@ -1,18 +1,19 @@
-module Skylab::Headless
+module Skylab::Fields
 
   class Parameter
 
     module Controller__  # assumes `parameter_error_structure`
 
       to_proc = -> a do
+
         include IM__
-        if :without == a[ 0 ]
-          :headless_sub_client == a[ 1 ] or fail "no - #{ a[ 1 ] }"
-          a[ 0, 2 ] = EMPTY_A_
-        else
-          include Home_::SubClient::InstanceMethods
-        end ; nil
-      end ; define_singleton_method :to_proc do to_proc end
+
+        NIL_
+      end
+
+      define_singleton_method :to_proc do
+        to_proc
+      end
 
       Struct_Adapter = -> a do
 
@@ -35,8 +36,7 @@ module Skylab::Headless
         end
       end
 
-      Ev__ = ::Module.new
-      Event__ = Home_::Event
+      Expression__ = Callback_::Event.structured_expressive.method :new
 
       module IM__  # (changed event model at [#087])
 
@@ -55,8 +55,11 @@ module Skylab::Headless
           write_p = -> par, x do
             m_i = par.writer_method_name
             ok = actual.respond_to? m_i
-            ok or break parameter_error_structure Ev__::Not_Writable__[ par ]  # todo go this away
-            actual.send m_i, x
+            if ok
+              actual.send m_i, x
+            else
+              parameter_error_structure Not_Writable_Event__[ par ]
+            end
           end
           actual_h and write_valid_actual_to_p actual_h, write_p
           write_defaults_against_actual_to_p actual, write_p
@@ -64,8 +67,8 @@ module Skylab::Headless
           befor == error_count
         end
 
-        Ev__::Not_Writable__ = Event__.new do | par_ |
-          "not writable: #{ par par_.normalized_parameter_name }"
+        Not_Writable_Event__ = Expression__.call do | parameter |
+          "not writable: #{ par parameter.normalized_parameter_name }"
         end
 
       private
@@ -77,8 +80,8 @@ module Skylab::Headless
             par.internal? and next( ( intern_o_a ||= [ ] ) << par )
             write_p[ par, x ]
           end
-          extra_i_a and parameter_error_structure Ev__::Not_Param__[ extra_i_a ]
-          intern_o_a and parameter_error_structure Ev__::Internal__[ intern_o_a ]
+          extra_i_a and parameter_error_structure Not_Param_Event__[ extra_i_a ]
+          intern_o_a and parameter_error_structure Internal_Event__[ intern_o_a ]
           nil
         end
 
@@ -90,18 +93,24 @@ module Skylab::Headless
             write_p[ par, par.default_value ]
           end
         end
-        #
-        Ev__::Not_Param__ = Event__.new do |param_i_a|
+
+        Not_Param_Event__ = Expression__.call do | param_i_a |
+
           _s_a = param_i_a.map( & method( :em ) )
+
           "#{ and_ _s_a } #{ s :is } not #{ s :a }parameter#{ s }"
         end
-        class Ev__::Not_Param__  # #todo - remove this once h.l events are modernized, ibid below
-          def self.local_normal_name ; :not_param end
+
+        class Not_Param_Event__
+
+          # def self.local_normal_name ; :not_param end
+
         end
 
-        #
-        Ev__::Internal__ = Home_::Event.new do |param_a|
+        Internal_Event__ = Expression__.call do | param_a |
+
           _s_a = param_a.map( & method( :parameter_label ) )
+
           "#{ and_ _s_a } #{ s :is } #{ s :an }internal parameter#{ s }"
         end
 
@@ -113,19 +122,27 @@ module Skylab::Headless
           end
           miss_a.length.zero? or missing_required_failure miss_a ; nil
         end
-        #
+
         def missing_required_failure param_o_a
-          _ev = Ev__::Missing__[ agent_string, param_o_a ]
-          parameter_error_structure _ev ; nil
+
+          _ev = Missing_Event__[ agent_string, param_o_a ]
+
+          parameter_error_structure _ev
+
+          NIL_
         end
-        #
-        Ev__::Missing__ = Event__.new do |any_agent_string, param_o_a|
+
+        Missing_Event__ = Expression__.call do | any_agent_string, param_o_a |
+
           a = param_o_a.map( & method( :parameter_label ) )
+
           any_agent_string and as = "#{ any_agent_string } "
+
           "#{ as }missing the required parameter#{ s a } #{ and_ a }"
         end
-        class Ev__::Missing__  # #todo - ibid above
-          def self.local_normal_name ; :missing end
+
+        class Missing_Event__
+          # def self.local_normal_name ; :missing end
         end
 
         def agent_string

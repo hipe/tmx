@@ -24,8 +24,6 @@ module Skylab::GitViz::TestSupport::Test_Lib
 
   extend TestSupport_::Quickie
 
-  DANGEROUS_MEMOIZE_ = Parent__::DANGEROUS_MEMOIZE_
-
   module ModuleMethods
 
     define_method :use, -> do
@@ -40,7 +38,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
       end
     end.call
 
-    define_method :dangerous_memoize, DANGEROUS_MEMOIZE_
+    define_method :dangerous_memoize, TestSupport_::DANGEROUS_MEMOIZE
   end
 
   module InstanceMethods

@@ -182,11 +182,23 @@ module Skylab::Headless
       class Isomorphic__ < self  # in Syntax__
 
         def initialize ruby_param_a, formal_p=nil
+
           _farg_a = ruby_param_a.reduce [] do |m, (opt_req_rest_i, name_i)|
-            formal_p and fp = formal_p[ name_i ]
-            fp ||= Home_::Parameter.new nil, name_i
+
+            if formal_p
+              fp = formal_p[ name_i ]
+            end
+
+            if ! fp
+
+              _ = Home_.lib_.fields::Parameter
+
+              fp = _.new nil, name_i  # first arg is 'host'
+            end
+
             m.push CLI.argument( fp, opt_req_rest_i )
           end
+
           super _farg_a
         end
 
@@ -195,7 +207,9 @@ module Skylab::Headless
         end
       end
 
-      Validate__ = Home_::Parameter::Definer.new do
+      _Parameter = Home_.lib_.fields::Parameter
+
+      Validate__ = _Parameter::Definer.new do
         param :on_missing, hook: true
         param :on_extra, hook: true
         param :on_result_struct, hook: true  # we won't use it but others might
@@ -244,10 +258,17 @@ module Skylab::Headless
         end
       end  # in Syntax__
     end # in Argument
-    Missing_ = Home_::Event.
-      new :orientation_i, :syntax_slice, :any_at_token_set, :any_full_syntax
 
-    Extra_ = Home_::Event.new :s_a  # :#API-private (and above)
+    _Stru = Callback_::Event.structured_expressive.method :new
+
+    Missing_ = _Stru.call(
+      :orientation_i,
+      :syntax_slice,
+      :any_at_token_set,
+      :any_full_syntax,
+    )
+
+    Extra_ = _Stru.call :s_a  # :#API-private (and above)
 
     class CLI::Argument_
 

@@ -21,21 +21,6 @@ module Skylab::GitViz::TestSupport
 
   extend TestSupport_::Quickie
 
-  DANGEROUS_MEMOIZE_ = -> sym, & once_p do  # :+[#ts-042] nasty OCD memoize
-
-    first = true
-    x = nil
-
-    define_method sym do
-
-      if first
-        first = false
-        x = instance_exec( & once_p )
-      end
-      x
-    end
-  end
-
   module ModuleMethods
 
     define_method :use, -> do
@@ -48,7 +33,7 @@ module Skylab::GitViz::TestSupport
       end
     end.call
 
-    define_method :dangerous_memoize_, DANGEROUS_MEMOIZE_
+    define_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
   end
 
   module InstanceMethods

@@ -1,27 +1,38 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-describe "[hl] parameter - bound" do
+describe "[fi] P - bound" do
 
-  # (no Q-uickie because `before` blocks are used!)
+  extend Skylab::Fields::TestSupport
+  use :parameter
 
-  extend ::Skylab::Headless::TestSupport::Parameter
+  it "loads" do
+    Skylab::Fields::Parameter::Bound
+  end
 
-  def self.bound_with &b
+  def self._bound_with & edit_p
+
     with do
-      include ::Skylab::Headless::Parameter::Bound::InstanceMethods
-      instance_exec(&b)
+
+      Skylab::Fields::Parameter::Bound::Definer_instance_methods[ self ]
+
+      class_exec( & edit_p )
+
+      def formal_parameters  # ..
+        self.class.parameters
+      end
     end
   end
 
   context "lets you do questionable parameter reflection and manipulation" do
 
-    bound_with do
+    _bound_with do
       param :age, dsl: [:value, :reader]
       param :pet, dsl: [:list, :reader]
       param :hobby, accessor: true
     end
 
     frame do
+
       before :each do
         object.age 'fifty one'
         object.hobby = 'spelunk-fishing'
@@ -30,23 +41,33 @@ describe "[hl] parameter - bound" do
       end
 
       it "like iterate over each value in a flat, indifferent manner" do
+
         names = [] ; values = [] ; labels = []
+
         object.bound_parameters.each do |p|
           names.push p.normalized_parameter_name
           values.push p.value
           labels.push p.label
         end
+
         names.should eql([:age, :pet, :pet, :hobby])
+
         values.should eql(['fifty one', 'goldfish', 'llama', 'spelunk-fishing'])
-        labels.join(' ').should eql("age pet[0] pet[1] hobby")
+
+        labels.should eql(
+          %w( <age> <pet[0]> <pet[1]> <hobby> ) )
       end
 
       it "search through all values and change values procedurally" do
+
+        object = send :object
+
         object.bound_parameters.each do |p|
           if /fish/ =~ p.value
             p.value = p.value.gsub(/fish/, 'POTATO')
           end
         end
+
         o = object.instance_variable_get('@pet')
         o.should be_kind_of(::Array)
         o.join.should eql('goldPOTATOllama')
@@ -56,7 +77,9 @@ describe "[hl] parameter - bound" do
   end
 
   context 'where clauses!' do
-    bound_with do
+
+    _bound_with do
+
       meta_param :this_one, boolean: true, accessor: true
       param :noun, dsl: [:list, :reader], enum: [:run, :walk], this_one: 1
       param :path, accessor: true, pathname: true, this_one: true
@@ -65,14 +88,21 @@ describe "[hl] parameter - bound" do
     end
 
     frame do
+
       before :each do
+
+        object = send :object
         object.noun :walk, :walk, :run
         object.path = 'pathos'
         object.herkemer = 'the herkemer'
       end
 
+      capture_emit_lines_
+
       it '"object.bound_parameters reduce { |p| p.this_one? }" works!' do
-        emit_lines.should be_empty
+
+        @emit_lines_.should be_empty
+        object = send :object
         object.noun.should eql([:walk, :walk, :run])
         object.path.should be_kind_of(::Pathname)
         object.path.to_s.should eql('pathos')

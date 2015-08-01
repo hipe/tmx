@@ -77,3 +77,5 @@ module Skylab::Fields::TestSupport
   Callback_ = Home_::Callback_
   NIL_ = nil
 end
+
+Skylab::TestSupport::Quickie.enable_kernel_describe  # for > 10 legacy files

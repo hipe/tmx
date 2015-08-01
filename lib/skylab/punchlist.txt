@@ -1,5 +1,4 @@
 ./css-convert         !
-./tan-man             !
 ./tmx                 !
 
 ./basic               -
@@ -25,6 +24,7 @@
 ./snag                -
 ./sub-tree            -
 ./system              -
+./tan-man             -
 ./test-support        -
 ./treemap             -
 ./yacc2treetop        -

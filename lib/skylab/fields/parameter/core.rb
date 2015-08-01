@@ -1,12 +1,19 @@
-module Skylab::Headless
+module Skylab::Fields
 
-  class Parameter  # read [#009] the paramter narrative #storypoint-5
+  class Parameter  # *read* [#009]
 
-    def self.[] mod, * x_a
-      Bundles__.edit_module_via_mutable_iambic mod, x_a
-    end
+    class << self
+
+      def _same mod, * x_a
+        Bundles__.edit_module_via_mutable_iambic mod, x_a
+      end
+
+      alias_method :[], :_same
+      alias_method :call, :_same
+    end  # >>
 
     module Bundles__
+
       Oldschool_parameter_error_structure_handler = -> _ do
         private
         def parameter_error_structure ev
@@ -14,39 +21,42 @@ module Skylab::Headless
           send_error_string _msg
         end
       end
+
       Parameter_controller = -> a do
-        module_exec a, & Parameter::Controller__.to_proc
+        module_exec a, & Here_::Controller__.to_proc
       end
+
       Parameter_controller_struct_adapter = -> a do
-        module_exec a, & Parameter::Controller__::Struct_Adapter.to_proc
+        module_exec a, & Here_::Controller__::Struct_Adapter.to_proc
       end
 
-      Home_.lib_.bundle::Multiset[ self ]
+      Home_.lib_.plugin::Bundle::Multiset[ self ]
     end
-  end
 
-  module Parameter::Definer  # this is an abuse
+    Definer = -> mod do
 
-    class << self
+      mod.extend Definer_Module_Methods
 
-      def [] mod
-        mod.extend ModuleMethods
-        mod.send :include, ( if mod.method_defined? :keys
-          InstanceMethods::HashAdapter
-        elsif mod.method_defined? :members
-          InstanceMethods::StructAdapter
-        else
-          InstanceMethods::IvarsAdapter
-        end ) ; nil
+      _mod_ = if mod.method_defined? :keys
+        Hash_Adapter_Methods___
+
+      elsif mod.method_defined? :members
+        Struct_Adapter_Methods
+
+      else
+        Ivars_Adapter_Methods
       end
 
-      def extended mod
-        fail "'extend' is deprecated NOW - use '[]' which has identical behavior"  # :+#deprecation:during-universal-integration
-      end
+      mod.include _mod_
+
+      NIL_
     end
-  end
 
-  module Parameter::Definer::ModuleMethods
+    # <-
+
+    module Definer_Module_Methods  # :+#public-API ([tm])
+
+      attr_reader :parameters_p
 
     def meta_param name, props=nil, &b
       parameters.meta_param! name, props, &b
@@ -56,16 +66,15 @@ module Skylab::Headless
       parameters.fetch!( name ).merge! props, &b
     end
 
-    attr_reader :parameters ; alias_method :any_parameters, :parameters
+      attr_reader :parameters
+      alias_method :any_parameters, :parameters
 
-    def parameters &block
-      if block_given? # this "feature" may be removed after benchmarking (@todo)
-        fail 'sanity' if parameters_p or parameters_ivar
-        @parameters_p = block
-        return
+      def parameters
+        @parameters ||= __build_parameters
       end
-      @parameters ||= begin
-        p = Parameter::Set.new(self)
+
+      def __build_parameters
+        p = Set___.new self
         a = ancestors
         nil until ::Object == a.pop
         self == a[0] and a.shift
@@ -93,25 +102,19 @@ module Skylab::Headless
       end
     end
 
-    attr_reader :parameters_p
-  end
-
-  module Parameter::Definer::InstanceMethods
-  end
-
-  module Parameter::Definer::InstanceMethods::HashAdapter
+  module Hash_Adapter_Methods___
     def known? k
       key? k
     end                           # useless for reflection unless made public
   end
 
-  module Parameter::Definer::InstanceMethods::StructAdapter
+  module Struct_Adapter_Methods  # :+#public-API [tm]
     def known? k
       ! self[k].nil?              # caution meet wind
     end
   end
 
-  module Parameter::Definer::InstanceMethods::IvarsAdapter
+  module Ivars_Adapter_Methods  # :+#public-API [tm]
   protected  # #protected-not-private
 
     def [] k
@@ -131,34 +134,31 @@ module Skylab::Headless
     end
   end
 
-  module Parameter::Definer::InstanceMethods::ActualParametersIvar
-    private
-    def []  (k)     ; @actual_parameters[k]        end
-    def []= (k, v)  ; @actual_parameters[k] = v    end
-    def known?(k)   ; @actual_parameters.known?(k) end
-  end
+    # ~ conveninence maker for hash-based parameters structure [hl]
 
-  class Parameter::Definer::Dynamic < ::Hash
-    extend Parameter::Definer::ModuleMethods
-    def initialize
-      yield self
+    def Definer.new & edit_p
+      cls = ::Class.new Dynamic_Definer___
+      cls.class_exec( & edit_p )
+      cls
     end
-  end
 
-  module Parameter::Definer
-    def self.new &block
-      k = Class.new Parameter::Definer::Dynamic
-      k.class_eval(&block)
-      k
+    class Dynamic_Definer___ < ::Hash
+
+      extend Definer_Module_Methods
+
+      def initialize
+        yield self
+      end
     end
-  end
 
-  class Parameter::Set
+    # ~ internal support (models)
+
+  class Set___
 
     def initialize host
       host.respond_to? :formal_parameter_class or
         def host.formal_parameter_class
-          Parameter::DEFAULT_DEFINITION_CLASS
+          DEFAULT_DEFINITION_CLASS___
         end
       @meta_set = nil ; @host = host
       @bx = Callback_::Box.new
@@ -240,17 +240,21 @@ module Skylab::Headless
       meta_host.parameters
     end
   end
+  # ->
+  end
+
+  # ~ as class
 
   class Parameter  # re-opened, #storypoint-230
 
-    Parameter::DEFAULT_DEFINITION_CLASS = self # when the host module doesn't
-                            # specify explicitly a formal_parameter_class
-
     # -- * -- stuff you need because you're not a hash
-    include Parameter::Definer::InstanceMethods::IvarsAdapter
+
+    include Ivars_Adapter_Methods
+
     def each &y
       @property_keys.each { |k| y.call(k, self[k]) }
     end
+
     # -- * --
 
     def merge! mixed, &b # might be a Hash, might be a self-class, can be nil ..
@@ -408,25 +412,44 @@ module Skylab::Headless
       end
       @normalized_parameter_name = name ; @host = host
     end
+
+    DEFAULT_DEFINITION_CLASS___ = self
+      # when the host module doesn't specify explicitly a formal_parameter_class
+
+    EMPTY_S_ = ' '
+
+    Here_ = self
+
+
     # -- * --
     # now we use our own hands to hit ourself with our own dogfood
-    extend Parameter::Definer::ModuleMethods
+
+    extend Definer_Module_Methods
+
     def self.formal_parameter_class ; self end # during transition
 
     param :has_default, boolean: 'does_not_have_default'
+
     def default= anything
       has_default!  # defining default_value here is important, and protects us
       def!(:default_value) { anything } # defining it like so is just because
     end
+
     param :list, boolean: true, writer: true # define this before below line
+
     param :desc, dsl: [:list, :reader]       # define this after above line
-    param :internal, boolean: :external, writer: true # @todo
+
+    param :internal, boolean: :external, writer: true
+
     def pathname= _
       (host = @host).respond_to?(:pathname_class) or
         def host.pathname_class ; ::Pathname end
       on_tail { assert_writer("can't use 'pathname' without a writer") } #sanity
       upstream_passthru_filter { |v| v ? host.pathname_class.new(v.to_s) : v }
     end
-    param :required, boolean: true, writer: true # @todo
+
+    param :required, boolean: true, writer: true
   end
 end
+
+# :+#tombstone: [#009.D] 'Actual_Parameters_Ivar_Instance_Methods' un-abstacted

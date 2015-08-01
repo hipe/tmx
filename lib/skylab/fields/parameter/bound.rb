@@ -1,23 +1,53 @@
 # encoding: UTF-8
 
-module Skylab::Headless
+module Skylab::Fields
 
-  class Parameter::Bound < Struct.new(:parameter, :read_p, :write_p, :label_p)
-    def normalized_parameter_name ; parameter.normalized_parameter_name end
-    def label ; label_p.call(parameter) end
-    def value ; read_p.call end
-    def value=(x) ; write_p.call(x) end
-  end
+  class Parameter
 
-  class Parameter::Bound::Enumerator < ::Enumerator
-    Parameter::Definer[ self ]
-    def self.[](param) ; Parameter::Bound::Enumerator::Proxy.new(param) end
+    class Bound
+
+      attr_reader(
+        :parameter,
+      )
+
+      def initialize p, r, w, l
+        @label_p = l
+        @parameter = p
+        @read_p = r
+        @write_p = w
+      end
+
+      def value
+        @read_p.call
+      end
+
+      def value= x
+        @write_p[ x ]
+      end
+
+      def label
+        @label_p.call @parameter
+      end
+
+      def normalized_parameter_name
+        @parameter.normalized_parameter_name
+      end
+
+    # <- 2
+
+  class Enumerator___ < ::Enumerator
+
+    Here_::Definer[ self ]
+
+    def self.[](param) ; Enumerator___::Proxy.new(param) end
+
     def initialize host_instance
       super() { |y| init ; visit(y) }
       @mixed = host_instance
       block_given? and raise ArgumentError.new(
         "i'm not that kind of enumerator (╯°□°）╯︵ ┻━┻")
     end
+
     def at *parameter_names
       reduce_with_changes(
         params_p: ->() do          # Override the default to be more map-like,
@@ -30,6 +60,7 @@ module Skylab::Headless
         visit_p: ->(y, param) { y << bound(param) } # Do not flatten it.
       )                            # Don't do that to anyone.
     end
+
     def fetch parameter_name
       init
       bound set_p.call.fetch(parameter_name)
@@ -71,6 +102,7 @@ module Skylab::Headless
     param :upstream_p, accessor: true, inherit: true
     param :visit_p, writer: true, inherit: true
     param :write_p, accessor: true, inherit: true
+
     def init
       @mixed &&= begin
         if ::Hash === @mixed then @mixed.each { |k, v| send("#{k}=", v) }
@@ -79,11 +111,13 @@ module Skylab::Headless
         nil
       end
     end
+
     def bound parameter
-      Parameter::Bound.new(parameter,
+      Bound.new(parameter,
         ->{ read_p.call(parameter) if known_p.call(parameter) },
         ->(val) { write_p.call(parameter, val) }, label_p)
     end
+
     def reduce_with_changes changes
       init # should be ok to call multiple times
       self.class.new(Hash[
@@ -91,6 +125,7 @@ module Skylab::Headless
           [param.normalized_parameter_name, send(param.normalized_parameter_name)]
         end].merge(changes) )
     end
+
     def process_host_instance host_instance
       f = {}
       host_instance.instance_exec do
@@ -98,12 +133,9 @@ module Skylab::Headless
         f[:params_p] = -> { formal_parameters.to_a }
         f[:known_p] = ->(param) { known? param.normalized_parameter_name }
 
-        f[:label_p] = -> param, i=nil do
-          if request_client
-            parameter_label param, i
-          else
-            "#{ param }#{ "[#{ i }]" if i }" # #todo
-          end
+        f[ :label_p ] = -> param, d=nil do
+
+          parameter_label param, d
         end
 
         f[:read_p] = ->(param) do
@@ -120,11 +152,14 @@ module Skylab::Headless
       end
       f.each { |k, v| send("#{k}=", v) }
     end
+
     def visit y
       params_p.call.each { |p| visit_p.call(y, p) }
     end
+
     # The builtin implementation for visit_p flattens list-like parameters
     # into each their own bound parameter.
+
     def visit_p
       @visit_p ||= (->(y, param) do
         # Note that the below implementation for processing list-likes relies
@@ -132,7 +167,7 @@ module Skylab::Headless
         # it might fail variously if there are not readers / writers in place.
         if param.list?
           a = read_p.call(param) and a.length.times do |i| # nil iff zero items
-            y << Parameter::Bound.new(param,
+            y << Bound.new(param,
               ->{ a[i] }, # ok iff there is no lazy evaluation
               ->(val) { upstream_p.call(param, val) { |_val| a[i] = _val } },
               ->(_) { label_p.call(param, i) })
@@ -144,25 +179,36 @@ module Skylab::Headless
     end
   end
 
-  module Parameter::Bound::InstanceMethods
-    def bound_parameters
-      Parameter::Bound::Enumerator::Proxy.new self
-    end
+  _BP = -> do
+    Bound_Parameter_Collection___.new self
   end
 
-  class Parameter::Bound::Enumerator::Proxy
+  Definer_instance_methods = -> mod do
+
+    mod.send :define_method, :bound_parameters, _BP
+  end
+
+  class Bound_Parameter_Collection___
+
     # This may be a design smell, but see the commit where this thing first
     # appeared.  it is kind of a deep problem, and after some thought this
     # was considered the optimal solution.  suggestions welcome.
+
     def initialize host_instance
-      @bridge = Parameter::Bound::Enumerator.new(host_instance)
+      @bridge = Enumerator___.new(host_instance)
     end
+
     def [](k) ; @bridge.fetch(k) end # !
+
     def at *a, &b ; @bridge.at(*a, &b) end
+
     def each *a, &b ; @bridge.each(*a, &b) end
 
     def reduce_by * a, & p
       @bridge.reduce_by_( * a, & p )
+    end
+  end
+# 2 ->
     end
   end
 end

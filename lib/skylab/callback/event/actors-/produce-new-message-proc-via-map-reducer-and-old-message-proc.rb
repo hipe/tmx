@@ -1,12 +1,10 @@
 module Skylab::Callback
 
-    class Event
+  class Event
 
-      module Small_Time_Actors__
+    Actors_::Produce_new_message_proc_via_map_reducer_and_old_message_proc =
 
-        Produce_new_message_proc_from_map_reducer_and_old_message_proc =
-
-            -> map_reduce_p, old_message_proc do
+    ( -> map_reduce_p, old_message_proc do
 
           -> y, o do
 
@@ -21,9 +19,9 @@ module Skylab::Callback
             end
 
             instance_exec y_, o, & old_message_proc
-            nil
+            NIL_
           end
-        end
-      end
-    end
+
+    end )
+  end
 end

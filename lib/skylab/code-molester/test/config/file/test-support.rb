@@ -81,7 +81,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
 
     def render_as_codified ev
 
-      _expag = ::Skylab::Callback::Event.codifying_expression_agent
+      _expag = ::Skylab::Callback::Event.codifying_expression_agent_instance
       join_with_newlines_under ev, _expag
     end
 

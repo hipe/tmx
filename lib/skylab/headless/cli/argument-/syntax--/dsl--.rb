@@ -400,7 +400,8 @@ module Skylab::Headless
       end
 
       on_rx = /(?<=\Aon_)/
-      Hooks__ = Home_::Event::Hooks.new( *
+
+      Hooks__ = Callback_::Event.hooks.new( *
         CLI.argument.syntax.validate.parameters.each_name.map do |i|
           on_rx.match( i ).post_match.intern
         end )

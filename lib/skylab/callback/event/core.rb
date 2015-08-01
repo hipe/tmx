@@ -6,12 +6,16 @@ module Skylab::Callback
 
         alias_method :construct, :new
 
-        def codifying_expression_agent
-          Event_::EXPRESSION_AGENT__
+        def codifying_expression_agent_instance
+          Event_::Models_::Expression_Agent::INSTANCE
         end
 
-        def data_event_class_factory
-          Event_::Class_Factories__::Data_Event
+        def data_event_class_maker
+          Event_::Makers_::Data_Event
+        end
+
+        def hooks
+          Event_::Makers_::Hooks
         end
 
         def inline_via_mutable_box_and_terminal_channel_symbol bx, sym, & msg_p
@@ -87,8 +91,10 @@ module Skylab::Callback
           end
         end
 
-        def message_class_factory
-          Event_::Class_Factories__::Message
+        def message_class_maker
+          # (hand-written stowaway:)
+          Event_::Makers_.const_get :Data_Event
+          Event_::Makers_::Message
         end
 
         def produce_handle_event_selectively_through_methods
@@ -97,15 +103,19 @@ module Skylab::Callback
 
         def prototype_with * x_a, & p
           p ||= Inferred_Message.to_proc
-          Event_::Prototype__.via_deflist_and_message_proc x_a, p
+          Event_::Makers_::Prototype.via_deflist_and_message_proc x_a, p
         end
 
         def prototype
-          Event_::Prototype__
+          Event_::Makers_::Prototype
         end
 
         def selective_builder_sender_receiver x
           x.include Selective_Builder_Receiver_Sender_Methods ; nil
+        end
+
+        def structured_expressive
+          Event_::Makers_::Structured_Expressive
         end
 
         def wrap
@@ -163,9 +173,12 @@ module Skylab::Callback
       end
 
       def with_message_string_mapper p
-        new_with( & Event_::Small_Time_Actors__::
-          Produce_new_message_proc_from_map_reducer_and_old_message_proc[
-            p, message_proc ] )
+
+        _p = Event_::Actors_::
+          Produce_new_message_proc_via_map_reducer_and_old_message_proc.call(
+            p, message_proc )
+
+        new_with( & _p )
       end
 
       def new_with * x_a, & msg_p  # #note-25
@@ -270,7 +283,7 @@ module Skylab::Callback
         _y = ::Enumerator::Yielder.new do |s|
           s_a.push "(#{ s })"
         end
-        express_into_under _y, Event_::EXPRESSION_AGENT__
+        express_into_under _y, Event_.codifying_expression_agent_instance
         "(#{ s_a * ', ' })"
       end
 

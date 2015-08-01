@@ -15,7 +15,7 @@ module Skylab::Plugin
 
         def dangerous_let_ m, & p
 
-          define_method m, TS_::Dangerous_memoize_.call( & p )
+          define_method m, TestSupport_::Build_dangerous_memoizer_method[ & p ]
           NIL_
         end
       end

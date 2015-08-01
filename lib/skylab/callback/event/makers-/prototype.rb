@@ -2,7 +2,7 @@ module Skylab::Callback
 
     class Event
 
-      class Prototype__ < self  # :[#012].
+      class Makers_::Prototype < self  # :[#012].
 
         class << self
           def via_deflist_and_message_proc i_a, p
@@ -36,7 +36,7 @@ module Skylab::Callback
 
           def work
             scn = Home_::Polymorphic_Stream.via_array @deflist_a
-            cls = ::Class.new Prototype__
+            cls = ::Class.new Here__
             _MESSAGE_PROC_ = @message_proc
             cls.class_exec do
               extend Module_Methods__
@@ -239,6 +239,8 @@ module Skylab::Callback
             bx.freeze
           end
         end
+
+        Here__ = self
       end
     end
 end

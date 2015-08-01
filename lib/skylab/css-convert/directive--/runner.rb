@@ -9,7 +9,8 @@ module Skylab::CSS_Convert
       _const = self._WAS_constantize directive_sexp.node_name
 
       _klass = Home_::Directives.const_get _const
-      _klass.new( request_client, directive_sexp ).invoke
+      _stmt = _klass.new request_client, directive_sexp
+      _stmt.execute
     end
   end
 end

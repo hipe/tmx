@@ -4,7 +4,7 @@ module Skylab::TanMan
 
   class Load
 
-  class Hack_peek_module_name__  # READ [#011]
+  class Actors_::Hack_peek_module_name  # READ [#011]
 
     Callback_::Actor[ self, :properties, :path ]
 

@@ -101,7 +101,7 @@ module Skylab::Headless
       end
 
       def formal_parameters
-        # a #hook-out/:#hook-in for [#049] the formal params experiment
+        # a #hook-out/:#hook-in for [#fi-009.B] the formal params experiment
       end
 
     protected  # #protected-not-private

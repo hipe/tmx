@@ -11,7 +11,7 @@ module Skylab::CSS_Convert
 
     attr_reader :sexp
 
-    def invoke
+    def execute
       left, right = @sexp[:styles_in_files].children(:left, :right)
       if @sexp[:in_the_folder]
         p = @sexp[:in_the_folder][:path]

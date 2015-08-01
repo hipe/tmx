@@ -23,6 +23,8 @@ module Skylab::Callback::TestSupport
 
   TestSupport_::Regret[ TS_ = self ]
 
+  define_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
+
   module InstanceMethods
 
     def debug!

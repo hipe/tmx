@@ -6,10 +6,10 @@ module Skylab::Callback::TestSupport
 
     # <-
 
-  TS_.describe "[ca] event - class factories - message" do
+  TS_.describe "[ca] event - makers - message" do
 
     subject = -> do
-      Home_::Event.message_class_factory
+      Home_::Event.message_class_maker
     end
 
     before :all do

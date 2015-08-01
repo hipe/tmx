@@ -52,7 +52,8 @@
 [#135]       #parent-node: [#126] the CLI argument node narrative (#syntax) ..
 [#134]       #parent-node: [#133]  (#canon) "the canonical numbers for.."
 [#133]       #parent-node: [#125] headless testing conventions ..
-[#132]       #in-situ the magical, multipurpose Event base class and variants
+[#132]       #moved-to: [#ca-005]
+             ( #was: #in-situ the magical, multipurpose Event base class and variants )
 [#131]       #parent-node: [#125] the notificate narrative ..
 [#130]       ( #moved-to: [#sy-009] )
              ( #was: #parent-node: [#140]  [ filesystem ] )
@@ -155,8 +156,9 @@
 [#052]       module i.m init experiment - "init hooks"
 [#051]       #subscription `val` as a canonical decorator
 [#050]       (#moved-to: [#bs-030])
-[#049]       #later formal parameters deep audit and refactor, [#009]
-             [#049.1] - set becomes box
+[#049]       ( #moved-to: [#fi-009.B] )
+             #later formal parameters deep audit and refactor, [#009]
+             ( #moved-to: [#fi-009.A] was: [#049.1] - set becomes box )
 [#048]       ( #moved-to: [#sy-006] )
              ( #was: #tracking-tag for select / Select in this library )
 [#047]       #tracking-tag for cool short algos that illustrate simple things
@@ -209,12 +211,12 @@
 [#015]       #doc-node the CLI IO narrative #retrofitted
 [#014]       yacc2treetop
 [#013]       (#repurposed:once) the core node narrative ..
-[#012] #open redesign this `with_client` nonsense
+[#012] #hole ( #moved-to: [fi] as same number )
 [#011] #hole ( #moved-to: [#sy-003] )
              [ the filesystem byte upstream identifier ]
              ( #was: #done regrettify all tests in this subproduct )
 [#010]       #repurposed:once the client tree model ..
-[#009]       #tracking-tag places where HL::Parameters show signs of strain; also general tracking of the node
+[#009]       ( #moved-to: [fi]  (same number) ]
 [#008]       `P::C::I_M` --> `SC::I_M` THIS WAS BAD see [#004], [#027]
 [#007]       #change-vector: less pathname, *no* direct interaction with filesystem
              ( #was: #done use of Parameter::Set#list, unify with B-oxxy interface )

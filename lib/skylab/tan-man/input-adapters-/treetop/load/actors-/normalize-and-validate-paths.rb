@@ -4,7 +4,7 @@ module Skylab::TanMan
 
   class Load
 
-    class Normalize_and_validate_paths__  # this looks like :+[#sy-004] but may not be
+    class Actors_::Normalize_and_validate_paths  # this looks like :+[#sy-004] but may not be
 
       Callback_::Actor.call self, :properties,
         :root_bp,

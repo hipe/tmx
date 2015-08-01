@@ -28,20 +28,8 @@ module Skylab::Snag::TestSupport
       define_method sym, Callback_.memoize( & p )
     end
 
-    def dangerous_memoize_ sym, & p  # read caveat in :+[#ts-042]
+    define_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
 
-      did = false
-      x = nil
-
-      define_method sym do
-        if did
-          x
-        else
-          did = true
-          x = instance_exec( & p )
-        end
-      end
-    end
   end
 
   module InstanceMethods

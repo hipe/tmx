@@ -179,6 +179,14 @@ better this time.
   deprecated because it expresses neither what it accepts or what shape
   its result is. :+[#.E]
 
++ `[_]make[_]` - this verb used in perhaps *any* method name should
+  confer this one meaning only: this method results in a generated
+  class. as well, all methods (and function-likes) that produce a class
+  should use this verb unless there is a good reason not to.
+
+  if you were going to use this verb the semantics described here to not
+  fit your method, consider (see) `build`.
+
 + `new_with` - see the #iambic family of method name conventions below.
 
 + `on_` see [#.C] method naming conventions around events below.
@@ -281,6 +289,7 @@ here but there are some that are not.
   these methods will often constitute a "getter" to provide a proc that
   will be consumed by a "setter" or named iambic term whose name starts
   with (see below) `on_`.
+
 
 
 

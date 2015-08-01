@@ -46,13 +46,6 @@ module Skylab::Plugin::TestSupport
     end
   end
 
-  Dangerous_memoize_ = -> & meth_p do
-    x = nil
-    -> do
-      x ||= instance_exec( & meth_p )
-    end
-  end
-
   Expect_Event = -> tcm do
 
     Callback_.test_support::Expect_Event[ tcm ]

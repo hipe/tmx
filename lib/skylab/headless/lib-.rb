@@ -48,6 +48,8 @@ module Skylab::Headless
       Basic[]::Enumerator
     end
 
+    Fields = sidesys[ :Fields ]
+
     Human = sidesys[ :Human ]
 
     List_lib = -> do

@@ -52,7 +52,7 @@ module Skylab::TanMan
 
       def __build_parser_class
 
-        Home_::Input_Adapters_::Treetop::Load.new( self,
+        Home_::Input_Adapters_::Treetop::Load.new(
 
           -> o do
 
@@ -83,7 +83,7 @@ module Skylab::TanMan
               end
             end
 
-          end ).invoke
+          end ).execute
       end
 
       def build_parse_failure_event  # #hook-out for [ttt]

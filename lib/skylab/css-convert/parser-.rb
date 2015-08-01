@@ -53,10 +53,12 @@ module Skylab::CSS_Convert
     end
 
     def load_parser_class_with__ & _DSL
-      ( LIB_.treetop_tools::Load.new self, _DSL do | o |
+
+      _load = LIB_.treetop_tools::Load.new _DSL do | o |
         o.on_info __handle_info
         o.on_error __handle_error
-      end ).invoke
+      end
+      _load.execute
     end
 
     def __handle_info

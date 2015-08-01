@@ -29,17 +29,7 @@ module Skylab::TMX::TestSupport
       end
     end.call
 
-    def dangerous_memoize_ sym, & p
-      first = true
-      x = nil
-      define_method sym do
-        if first
-          first = false
-          x = instance_exec( & p )
-        end
-        x
-      end
-    end
+    define_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
 
     def memoize_ sym, & p
       define_method sym, Callback_.memoize( & p )

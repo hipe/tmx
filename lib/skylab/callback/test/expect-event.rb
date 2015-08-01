@@ -261,7 +261,7 @@ module Skylab::Callback::TestSupport
         end
 
         def expression_agent_for_expect_event
-          Home_::Event.codifying_expression_agent
+          Home_::Event.codifying_expression_agent_instance
         end
 
         def black_and_white ev

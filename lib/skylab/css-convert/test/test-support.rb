@@ -7,7 +7,6 @@ module Skylab::CSS_Convert::TestSupport
 
   module Constants
     Home_ = ::Skylab::CSS_Convert
-    Headless_ = Home_::Headless_
     TestSupport_ = ::Skylab::TestSupport
   end
 

@@ -1,13 +1,17 @@
 # the parameter narrative :[#009]
 
-## #storypoint-5 introduction
+## introduction
 
-this is legacy. included in this node is the "worst thing i've ever done",
+this is an ancient legacy library, transplanted at least once (from [hl]
+to [fi]). this is one of the eariest parameter libraries.
+
+included in this node is the "worst thing i've ever done",
 at #storypoint-280. we intend to kill this with fire.
 
-the fate of this node is discussed at [#fi-001] "discussion of the [..]". be
+the fate of this node is discussed at [#001] "discussion of the [..]". be
 sure to read that before investing in this at all. and then no matter what,
 don't invest in this at all.
+
 
 
 
@@ -17,6 +21,7 @@ We must make our own procedurally-generated parameter definition class
 no matter what lest we create unintentional mutations out of our
 scope. If a formal_parameter_class has been indicated explicitly
 otherwise, that's fine, use it as a base class here.
+
 
 
 
@@ -32,6 +37,7 @@ example a child class of a parent class that has parameter definitions.
 
 
 
+
 ## :#storypoint-280
 
 EDIT: this is the worst thing i've ever done.
@@ -41,3 +47,6 @@ need the same variables to be in scope that it is tighter to define
 them all here in this way.  Also it looks really really weird.
 [#049] we're gonna shut this whole thing down and merge this in with
 the way formal attributes does it.
+
+
+## :[#.D]  (in situ)

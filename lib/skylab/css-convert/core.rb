@@ -25,6 +25,8 @@ module Skylab::CSS_Convert
 
     Brazen = sidesys[ :Brazen ]
 
+    Fields = sidesys[ :Fields ]
+
     Path_tools = -> do
       System[].filesystem.path_tools
     end
@@ -66,9 +68,11 @@ module Skylab::CSS_Convert
     end
   end
 
+  Param_Lib__ = LIB_.fields::Parameter
+
   class Core::Params < ::Hash
 
-    Headless_::Parameter::Definer[ self ]
+    Param_Lib__::Definer[ self ]
 
     param :directives_file, pathname: true, writer: true do
       desc 'A file with directives in it.' # (not used yet)
@@ -91,7 +95,10 @@ module Skylab::CSS_Convert
 
     include Core::SubClient::InstanceMethods
 
-    Headless_::Parameter[ self, :parameter_controller, :oldschool_parameter_error_structure_handler ]
+    Param_Lib__.call( self,
+      :parameter_controller,
+      :oldschool_parameter_error_structure_handler,
+    )
 
     def receive_event ev
       scn = ev.to_stream_of_lines_rendered_under expression_agent

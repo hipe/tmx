@@ -37,13 +37,13 @@ first, a quick history (most recent at top):
 
     [#ba-030] the basic struct                                2013-07-21
 
-    [#br-058] Home_ DSL --> "contoured fields" --> [br]     2013-07-18
+    [#br-058] Home_ DSL --> "contoured fields" --> [br]       2013-07-18
 
        [#004] basic fields                                    2013-07-05
 
     [#ba-003] the basic field                                 2013-04-11
 
-    [#hl-009] the headless parameter                          2012-08-29
+    [#009] the headless parameter                             2012-08-29
 
        [#002] the metahell formal attributes                  2011-09-11
 
@@ -55,7 +55,7 @@ annotation (most recent at top, start at bottom for a narrative):
   • borrowing from that but as a small standalone rewrite was [hl] API params
   • then, during the "headless earthquake" of late 2013.. (well, read below)
   • then there was the basic "field" [#ba-003]
-  • then there was the headless "parameter" [#hl-009]
+  • then there was the headless "parameter" [#009]
   • first, there was the metahell "formal attributes" [#002]
 
 

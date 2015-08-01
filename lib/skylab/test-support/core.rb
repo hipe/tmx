@@ -56,6 +56,25 @@ module Skylab::TestSupport  # :[#021].
     end
   end  # >>
 
+  DANGEROUS_MEMOIZE = -> sym, & once_p do  # read [#042]
+
+    define_method sym, & Build_dangerous_memoizer_method[ & once_p ]
+  end
+
+  Build_dangerous_memoizer_method = -> & once_p do
+
+    first = true
+    x = nil
+
+    -> do
+      if first
+        first = false
+        x = instance_exec( & once_p )
+      end
+      x
+    end
+  end
+
   Callback_ = ::Skylab::Callback
 
   Autoloader_ = Callback_::Autoloader

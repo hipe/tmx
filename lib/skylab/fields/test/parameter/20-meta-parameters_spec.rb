@@ -1,8 +1,9 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-describe "[hl] parameters - meta-parameters" do
+describe "[fi] P - meta-parameters" do
 
-  extend ::Skylab::Headless::TestSupport::Parameter
+  extend Skylab::Fields::TestSupport
+  use :parameter
 
   context 'can be defined inline alongside parameters with "meta_param"' do
 
