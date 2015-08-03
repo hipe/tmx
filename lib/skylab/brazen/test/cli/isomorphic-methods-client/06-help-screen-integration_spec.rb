@@ -1,10 +1,11 @@
-require_relative 'core-help/test-support'
+require_relative '../../test-support'
 
-module Skylab::Headless::TestSupport::CLI::Action::Hlp__
+module Skylab::Brazen::TestSupport
 
-  describe "[hl] CLI action OP integration" do
+  describe "[br] CLI - iso. - help screen integration", wip: true do
 
-    extend TS__
+    extend TS_
+    use :CLI_isomorphic_methods_client
 
     context "mingle" do
 

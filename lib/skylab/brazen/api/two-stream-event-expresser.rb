@@ -11,7 +11,7 @@ module Skylab::Brazen
       def maybe_receive_on_channel_event i_a, & ev_p
         ev = ev_p[]
         ev_ = ev.to_event
-        if ev_.has_tag :ok
+        if ev_.has_member :ok
           if ev_.ok
             recv_success_event ev
           elsif ev_.ok.nil?

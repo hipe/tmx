@@ -1,0 +1,23 @@
+# created by tan-man on 2015-08-03 15:37:05 UTC
+
+digraph {
+
+1 [label="wip css and hl"]
+
+2 [label="get every non-wip working"]
+
+3 [label="one by one, add in each component from [hl]"]
+
+/* renames is commit 1. above with a lot of work is commit 2. */
+
+4 [label="eulogize every hl\n  • assets\n  • specs\n  • doc-nodes"]
+
+5 [label="rewrite css to have no hl"]
+
+
+5->4
+4->3
+3->2
+2->1
+
+}

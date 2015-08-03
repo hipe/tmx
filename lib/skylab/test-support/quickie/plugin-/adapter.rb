@@ -136,6 +136,10 @@ module Skylab::TestSupport
         a
       end
 
+      def to_test_path_stream
+        @_client.to_test_path_stream
+      end
+
       def y
         @_client.y
       end

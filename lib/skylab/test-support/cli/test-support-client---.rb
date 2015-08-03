@@ -14,7 +14,7 @@ module Skylab::TestSupport
 
       class Cover < CLI_Client_::Action_Adapter
 
-        def receive_frame x
+        def accept_frame x
           super
           @bound.sout = @resources.sout
           @bound.serr = @resources.serr

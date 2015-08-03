@@ -240,7 +240,7 @@ module Skylab::CodeMolester
     private
       def dflt
         -> ev do
-          if ev.has_tag :exception
+          if ev.has_member :exception
             raise ev.exception
           else
             raise ev.to_exception

@@ -28,11 +28,6 @@ module Skylab::System
         KEEP_PARSING_
       end
 
-      def ftype=
-        @_ftype = gets_one_polymorphic_value
-        KEEP_PARSING_
-      end
-
       def stderr=
         @_stderr = gets_one_polymorphic_value
         KEEP_PARSING_

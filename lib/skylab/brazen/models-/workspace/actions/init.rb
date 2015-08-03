@@ -98,6 +98,11 @@ module Skylab::Brazen
       nil
     end
 
+    def on_init_before_probably_creating_new_file_via_channel i_a, & ev_p
+      maybe_send_event_via_channel i_a, & ev_p
+      NIL_
+    end
+
     def on_init_success_via_channel i_a, & ev_p
       maybe_send_event_via_channel i_a, & ev_p
       UNABLE_

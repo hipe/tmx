@@ -20,7 +20,7 @@ module Skylab::Brazen
 
         _ev.express_into_under hr.y, hr.expression_agent
 
-        hr.output_invite_to_general_help
+        hr.express_invite_to_general_help
 
         GENERIC_ERROR
       end

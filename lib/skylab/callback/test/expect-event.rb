@@ -202,14 +202,14 @@ module Skylab::Callback::TestSupport
         def via_ev_expect_OK_value_of bool
           ev = @ev.to_event
           if bool.nil?
-            if ev.has_tag :ok
+            if ev.has_member :ok
               if ! ev.ok.nil?
                 when_ev_OK_value_is_not_nil ev.ok
               end
             else
               when_neutral_expected_and_ev_does_not_have_OK_tag
             end
-          elsif ev.has_tag :ok
+          elsif ev.has_member :ok
             x = ev.ok
             if bool
               x or when_ev_is_not_OK
@@ -425,7 +425,7 @@ module Skylab::Callback::TestSupport
         def _receive_passed_event ev
           @do_debug and __express_event_into ev, @debug_IO
           ev_ = ev.to_event
-          if ev_.has_tag :flyweighted_entity
+          if ev_.has_member :flyweighted_entity
             was_wrapped = ev.object_id != ev_.object_id
             _ent = ev_.flyweighted_entity.dup
             ev_ = ev_.with :flyweighted_entity, _ent
@@ -435,7 +435,7 @@ module Skylab::Callback::TestSupport
             end
           end
           @recv_ev_p[ ev ]
-          if ev_.has_tag :ok
+          if ev_.has_member :ok
             ev_.ok
           end
         end
@@ -584,7 +584,7 @@ module Skylab::Callback::TestSupport
 
       def __OK_s
         ev = @ev.to_event
-        if ev.has_tag :ok
+        if ev.has_member :ok
           x = ev.ok
           if x.nil?
             '(neutral)'

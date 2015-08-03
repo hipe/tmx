@@ -49,7 +49,7 @@ module Skylab::Snag
 
         # ~ we divide and mutate the formal properties, adding our own
 
-        def resolve_properties
+        def init_properties
 
           bp = @bound.formal_properties
           fp = bp.to_mutable_box_like_proxy

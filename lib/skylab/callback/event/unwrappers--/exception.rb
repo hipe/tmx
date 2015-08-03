@@ -16,7 +16,7 @@ module Skylab::Callback
       private
 
         def resolve_exception_class
-          @exception_class = if @event.has_tag :error_category
+          @exception_class = if @event.has_member :error_category
             exception_class_via_error_catgory @event.error_category
           else
             ::RuntimeError

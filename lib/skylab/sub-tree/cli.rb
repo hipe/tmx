@@ -14,7 +14,7 @@ module Skylab::SubTree
 
       class Files < CLI::Action_Adapter
 
-        def resolve_properties
+        def init_properties
 
           # :+[#br-021]:#the-first-case-study, #note-st-1 #BUMF
 

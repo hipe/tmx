@@ -14,10 +14,11 @@ module Skylab::Brazen
         :app_name
 
       def execute
+
         init_max_number_of_directories_to_make
         ok = resolve_document
         ok && partition
-        ok &&= ensure_directory
+        ok &&= __validate_depth_of_directories_to_create
         ok &&= create_any_directories
         ok && maybe_write_document
       end
@@ -27,7 +28,7 @@ module Skylab::Brazen
           count_occurrences_in_string_of_regex(
             @config_filename,
             RX___ )
-        nil
+        NIL_
       end
 
       s = ::Regexp.escape ::File::SEPARATOR
@@ -72,12 +73,18 @@ module Skylab::Brazen
         nil
       end
 
-      def ensure_directory
+      def __validate_depth_of_directories_to_create
+
         a = @make_these_directories
-        max = @maximum_number_of_directories_to_make
+
         if a
-          if 0 <= max  # sanity
-            if max < a.length
+
+          max = @maximum_number_of_directories_to_make
+
+          if 0 <= max  # (sanity: if max is a sane number..)
+
+            if max < a.length  # if the value exceeds max..
+
               when_must_exist a[ - ( max + 1 ) ]
             else
               ACHIEVED_
@@ -86,7 +93,8 @@ module Skylab::Brazen
             UNABLE_
           end
         else
-          ACHIEVED_
+
+          ACHIEVED_  # no directories to create. valid.
         end
       end
 
@@ -95,6 +103,7 @@ module Skylab::Brazen
       end
 
       def create_any_directories
+
         if @make_these_directories
           create_directories
         else
@@ -108,9 +117,10 @@ module Skylab::Brazen
 
         @make_these_directories.each do | dir |
 
-          kn = LIB_.system.filesystem( :Downstream_IO ).with(
+          kn = LIB_.system.filesystem( :Existent_Directory ).with(
+
             :path, dir,
-            :ftype, 'directory',
+            :create,
             :is_dry_run, @is_dry,
             & @on_event_selectively )
 

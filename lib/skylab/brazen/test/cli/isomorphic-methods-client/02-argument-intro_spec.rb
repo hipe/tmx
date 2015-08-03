@@ -1,20 +1,13 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
-
-  ::Skylab::Headless::TestSupport::CLI::Action[ TS__ = self ]
-
-  include Constants
-
-  Home_ = Home_
-
-  extend TestSupport_::Quickie
+module Skylab::Brazen::TestSupport
 
   # :[#136] also covers arg syntax
 
-  describe "[hl] CLI action isomorphic params spec" do
+  describe "[br] CLI - iso. - argument intro", wip: true do
 
-    extend TS__
+    extend TS_
+    use :CLI_isomorphic_methods_client
 
     context "the zero arg syntax ()" do
 

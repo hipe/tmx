@@ -34,7 +34,7 @@ module Skylab::Brazen
 
         o.y << "known actions are (#{ s_a * ', ' })"
 
-        o.output_invite_to_general_help
+        o.express_invite_to_general_help
 
         GENERIC_ERROR
       end

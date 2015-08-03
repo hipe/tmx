@@ -8,7 +8,7 @@ module Skylab::TanMan
 
     class Action_Adapter < Action_Adapter
 
-      def receive_frame adapter
+      def accept_frame adapter
         if @bound.respond_to? :receive_stdin_
           o = adapter.resources
           @bound.receive_stdin_ o.sin
@@ -24,7 +24,7 @@ module Skylab::TanMan
 
       class Status < Action_Adapter
 
-        def resolve_properties  # :+[#br-042] #nascent-operation
+        def init_properties  # :+[#br-042] #nascent-operation
 
           super
 
@@ -43,7 +43,7 @@ module Skylab::TanMan
       class Graph < Branch_Adapter
         module Actions
           class Use < Action_Adapter
-            def resolve_properties  # :+[#br-042] #nascent-operation
+            def init_properties  # :+[#br-042] #nascent-operation
               super
               mutable_back_properties.replace_by :digraph_path do | prp |
                 prp.dup.append_ad_hoc_normalizer do | arg |
@@ -143,7 +143,7 @@ module Skylab::TanMan
           s = s.to_path
         end
         if DIR_SEP___ == s.getbyte( 0 )
-          Brazen_::CLI.expression_agent_class.pretty_path s
+          Brazen_::CLI::Expression_Agent.pretty_path s
         else
           s
         end

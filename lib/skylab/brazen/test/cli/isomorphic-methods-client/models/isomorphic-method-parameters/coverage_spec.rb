@@ -1,12 +1,11 @@
-require_relative 'test-support'
+require_relative '../../../test-support'
 
-module Skylab::Headless::TestSupport::CLI::Argument::Syntax
+module Skylab::Brazen::TestSupport
 
-  # (before we had this test, we got coverage from [#136] test node)
+  describe "[br] CLI - iso. - arg coverage", wip: true do
 
-  describe "[hl] CLI argument synatax goofy" do
-
-    extend TS__
+    extend TS_
+    use :CLI_isomorphic_methods_client_models_isomorphic_method_parameters
 
     context "the zero syntax ()" do
       with -> { }

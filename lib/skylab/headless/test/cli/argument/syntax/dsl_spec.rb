@@ -1,10 +1,10 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Headless::TestSupport::CLI::Argument::Syntax
+module Skylab::Headless::TestSupport::CLI
 
-  describe "[hl] CLI argument syntax DSL" do
+  describe "[hl] CLI argument syntax DSL", wip: true do
 
-    extend TS__
+    extend TS_
 
     context "syntax 1" do
 

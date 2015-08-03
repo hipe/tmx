@@ -1,22 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Headless::TestSupport::CLI::Action::OP__
+module Skylab::Brazen::TestSupport
 
-  Parent_TS_ = ::Skylab::Headless::TestSupport::CLI::Action
+  describe "[br] CLI - iso. - o.p coverage", wip: true do
 
-  Parent_TS_[ TS__ = self ]
-
-  include Constants
-
-  Home_ = Home_
-
-  Parent_Subject_ = Parent_TS_::Subject_
-
-  extend TestSupport_::Quickie
-
-  describe "[hl] CLI action OP integration" do
-
-    extend TS__
+    extend TS_
+    use :CLI_isomorphic_methods_client
 
     context "action class with nothing" do
 

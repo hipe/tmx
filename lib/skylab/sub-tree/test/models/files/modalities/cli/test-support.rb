@@ -32,7 +32,7 @@ module Skylab::SubTree::TestSupport::Models_Files::The_CLI_Modality
       local_invoke
 
       _unindent expect_str
-      get_string_for_contiguous_lines_on_stream( :o ).should eql expect_str
+      flush_to_string_contiguous_lines_on_stream( :o ).should eql expect_str
 
       expect_succeeded
     end

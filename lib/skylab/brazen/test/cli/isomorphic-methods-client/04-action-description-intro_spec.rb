@@ -1,16 +1,11 @@
-require_relative 'core-help/test-support'
+require_relative '../../test-support'
 
-module Skylab::Headless::TestSupport::CLI::Action::Dsc_Intgrtd__
+module Skylab::Brazen::TestSupport
 
-  ::Skylab::Headless::TestSupport::CLI::Action[ TS__ = self ]
+  describe "[br] CLI - iso. - desc intro", wip: true do
 
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  describe "[hl] CLI action desc integration" do
-
-    extend TS__
+    extend TS_
+    use :CLI_isomorphic_methods_client
 
     context "a description if desired may be as simple as" do
 

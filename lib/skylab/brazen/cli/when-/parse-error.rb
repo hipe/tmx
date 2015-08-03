@@ -12,7 +12,7 @@ module Skylab::Brazen
       def produce_result
         o = @render
         o.y << @exception.message
-        o.output_invite_to_general_help
+        o.express_invite_to_general_help
         GENERIC_ERROR
       end
     end

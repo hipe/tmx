@@ -182,12 +182,20 @@ cls = class Skylab_Git_Models_Whatever_Unrename
 
         def __resolve_filechange_stream
 
+          self._SEE_ME  # #open [#sc-001]: the below worked as-is at writing
+          # but we really must cover this if we want it to stop being broken
+          # whenever we come around to needing it
+
           require_relative '../lib/skylab'
           require 'skylab/git-viz/core'
+          require 'skylab/system/core'
 
-          @_lib = ::Skylab::GitViz
-          self._NEEDS_TRIVIAL_CLEANUP
-          @repo = @_lib.repository.new_via_path( ::Dir.pwd )
+          o = ::Skylab
+          system = o::System.services
+          _open3 = o::System.lib_.open3
+
+          @_lib = o::GitViz
+          @repo = @_lib.repository.new_via ::Dir.pwd, _open3, system.filesystem
 
           send @_resolve_filechange_stream_by
         end

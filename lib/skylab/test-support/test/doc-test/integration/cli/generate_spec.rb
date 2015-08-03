@@ -18,7 +18,7 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
       invoke 'gen', '-h'
       on_stream :errput
       expect :styled, %r(\Ausage: ts-dt generate \[)i
-      string = get_string_for_contiguous_lines_on_stream :errput
+      string = flush_to_string_contiguous_lines_on_stream :errput
       string.should be_include '-o, --output-adapter ADAPTER'
       _d = count_occurrences_of_newlines_in_string string
       ( 21 .. 25 ).should be_include _d

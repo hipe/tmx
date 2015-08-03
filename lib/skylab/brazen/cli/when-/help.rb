@@ -45,27 +45,27 @@ module Skylab::Brazen
 
         # ~ usage line
 
-        o.output_usage
+        o.express_usage_
 
 
         # ~ description section
 
         if aa.has_description
-          o.output_description
+          o.express_description_
         end
 
 
         # ~ actions section
 
         o.section_boundary
-        o.output_header 'actions'
-        o.output_option_parser_summary  # sic
+        o.express_header_ 'actions'
+        o.express_option_parser_summary_  # sic
 
         _visible_st = aa.to_adapter_stream.reduce_by( & :is_visible )
 
         _ordered_st = aa.wrap_adapter_stream_with_ordering_buffer_ _visible_st
 
-        o.output_items_with_descriptions nil, _ordered_st.to_a, 2
+        o.express_items_with_descriptions_ nil, _ordered_st.to_a, 2
 
 
         # ~ invite to more help
@@ -78,7 +78,7 @@ module Skylab::Brazen
             }#{ par prp }" } for help on that action."
         end
 
-        SUCCESS_
+        SUCCESS_EXITSTATUS_
       end
     end
   end

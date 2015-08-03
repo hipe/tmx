@@ -205,7 +205,7 @@ module Skylab::Brazen::TestSupport::CLI
 
     def expect_succeeded
       expect_no_more_lines
-      @exitstatus.should eql Home_::CLI::SUCCESS_
+      @exitstatus.should eql Home_::CLI::SUCCESS_EXITSTATUS_
     end
 
     def expect_option i, rx=nil

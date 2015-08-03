@@ -1,4 +1,4 @@
-# the help sceeen narrative :[#003]
+# the help screen narrative :[#003]
 
 ## intro
 
@@ -10,7 +10,8 @@ lines of this help screen.
 
 these are some disparate algorithmic axiomatic and other points:
 
-  • somewhere something like this already exists, but it doesn't use
+  • something very similar to this was done at the ancient [#br-106],
+    (originally from [hl]), but it doesn't use
     [#ba-044] our preferred state machine lib so we have rewritten it.
 
   • you know what "sections" are. we don't formally define them here,

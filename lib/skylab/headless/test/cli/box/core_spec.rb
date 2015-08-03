@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::CLI::Box
 
-  describe "[hl] CLI box core" do
+  describe "[hl] CLI box core", wip: true do
 
     extend TS__
 

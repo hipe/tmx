@@ -201,17 +201,32 @@ module Skylab::TestSupport
         count
       end
 
-      def get_string_for_contiguous_lines_on_stream sym
+      def flush_to_unstyled_string_contiguous_lines_on_stream sym
+
+        _p = Home_.lib_.brazen::CLI::Styling::Unstyle
+
+        _flush_to_string_on_stream_by sym, & _p
+      end
+
+      def flush_to_string_contiguous_lines_on_stream sym
+
+        _flush_to_string_on_stream_by sym, & IDENTITY_
+      end
+
+      def _flush_to_string_on_stream_by sym
 
         @__sout_serr_is_baked__ ||= _bake_sout_serr
 
         io = Home_::Library_::StringIO.new
         st = _sout_serr_stream_for_contiguous_lines_on_stream sym
-        em = st.gets
-        while em
-          io.write em.string
+
+        begin
           em = st.gets
-        end
+          em or break
+          io.write yield em.string
+          redo
+        end while nil
+
         io.string
       end
 

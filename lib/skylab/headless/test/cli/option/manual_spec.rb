@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::CLI::Option
 
-  describe "[hl] CLI option (manual)" do
+  describe "[hl] CLI option (manual)", wip: true do
 
     context "for now an option will derive things from long opt (..)" do
 

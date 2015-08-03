@@ -9,10 +9,10 @@ module Skylab::Brazen::TestSupport::CLI
     class << self
 
       def tree_via_string s
-        tree_via_line_stream__ Home_.lib_.basic::String.line_stream s
+        tree_via_line_stream_ Home_.lib_.basic::String.line_stream s
       end
 
-      def tree_via_line_stream__ st
+      def tree_via_line_stream_ st
         Build___.new( st ).execute
       end
     end  # >>

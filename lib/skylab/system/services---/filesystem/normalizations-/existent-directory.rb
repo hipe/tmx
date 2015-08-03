@@ -204,7 +204,7 @@ module Skylab::System
         d = if @_is_dry_run
           0
         else
-          @filesystem.mkdir path_  # result is
+          @filesystem.mkdir path_  # result is exitstatus
         end
 
         d.zero? or self._COVER_ME  # probably never gets here

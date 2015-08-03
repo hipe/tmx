@@ -248,8 +248,8 @@ module Skylab::Callback
 
     public
 
-      def has_tag i
-        formal_properties.has_name i
+      def has_member sym
+        formal_properties.has_name sym
       end
 
       def first_tag_name
@@ -420,7 +420,7 @@ module Skylab::Callback
       private
 
         def maybe_replace_noun_phrase_with_prop
-          if @o.has_tag( :prop ) and find_verb_index
+          if @o.has_member( :prop ) and find_verb_index
             o = @o
             _pretty = @expression_agent.calculate do
               par o.prop

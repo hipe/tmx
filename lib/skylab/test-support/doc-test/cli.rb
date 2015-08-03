@@ -85,7 +85,7 @@ module Skylab::TestSupport
 
               if _ok
                 @properties = @bound.formal_properties
-                resolve_categorized_properties  # just does it all again!
+                init_categorized_properties  # just does it all again!
                 super
               else
 

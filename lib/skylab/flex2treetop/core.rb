@@ -161,7 +161,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
         Actions = ::Module.new
         class Actions::Translate < Brazen_::CLI::Action_Adapter
 
-          def resolve_properties  # :+[#br-042] will change
+          def init_properties  # :+[#br-042] will change
 
             bp = @bound.formal_properties
             fp = bp.to_mutable_box_like_proxy

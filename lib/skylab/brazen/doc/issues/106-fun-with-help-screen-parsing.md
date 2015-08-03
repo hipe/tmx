@@ -1,5 +1,28 @@
 # the desc parsing narrative :[#106]
 
+## intro
+
+this tag now tracks similar implementations elsewhere in this
+universe of nodes that do something like parsing help screens (there
+are at least two others - one for testing help screens and one custom
+one in [tmx]  (at writing)).
+
+despite this, this node was preserved during the sunsetting [hl] largely
+because its state-machine-based implementation -- while being redundant
+with both the aforementioned work *and* the [ba] state machine --
+is small, lightweight, and relatively easy to undestand even after all
+this time. so we are carrying it with us as a memento of [hl] and
+perhaps as a reference for future work.
+
+note that our "syntax" may have changed - nowadays maybe we don't
+require the use of colons to indicate all headers; a change in indent is
+perhaps enough.
+
+
+
+
+## (original, legacy but still relevant content)
+
 `parse_sections` - the rules are simple: a line that consists of one
 or more non-colons, and then terminated by a colon, that is a section
 header. That may be followed by an item line which is a line that:

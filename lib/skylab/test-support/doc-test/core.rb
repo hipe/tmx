@@ -315,6 +315,5 @@ module Skylab::TestSupport
     Brazen_ = Home_.lib_.brazen
     BLANK_RX_ = /\A[[:space:]]*\z/
     DocTest_ = self
-    IDENTITY_ = -> x { x }
   end
 end

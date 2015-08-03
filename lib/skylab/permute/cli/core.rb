@@ -53,8 +53,8 @@ module Skylab::Permute
         io = @resources.serr
         io.puts 'please provide one or more name-value pairs'
         hr = help_renderer
-        # hr.output_primary_usage_line
-        hr.output_invite_to_general_help
+        # hr.express_primary_usage_line_
+        hr.express_invite_to_general_help
         @_a = false
         maybe_use_exit_status CLI::GENERIC_ERROR
         UNABLE_

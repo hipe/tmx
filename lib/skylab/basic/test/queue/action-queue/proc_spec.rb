@@ -1,16 +1,13 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::Headless::TestSupport::CLI::Action::Queue_Procs__
+module Skylab::Basic::TestSupport
 
-  ::Skylab::Headless::TestSupport::CLI::Action[ TS__ = self ]
+  describe "[hl] CLI action queue - procs", wip: true do
 
-  include Constants
+    def self.with_action_class _
+    end
 
-  extend TestSupport_::Quickie
-
-  describe "[hl] CLI action queue - procs" do
-
-    extend TS__
+    extend TS_
 
     with_action_class :Fippel do
       def default_action_i

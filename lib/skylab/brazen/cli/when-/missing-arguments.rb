@@ -13,8 +13,8 @@ module Skylab::Brazen
         o.express do
           "expecting #{ par prop }"
         end
-        o.output_primary_usage_line
-        o.output_invite_to_general_help
+        o.express_primary_usage_line_
+        o.express_invite_to_general_help
         GENERIC_ERROR
       end
     end

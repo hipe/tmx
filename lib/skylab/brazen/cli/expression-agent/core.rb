@@ -115,6 +115,8 @@ module Skylab::Brazen
         "<#{ prop.name.as_slug }>"
       end
 
+      alias_method :render_property_as_argument_, :render_property_as__argument__
+
       def render_property_as__environment_variable__ prp
         @categorized_properties.adapter.environment_variable_name_string_via_property prp
       end

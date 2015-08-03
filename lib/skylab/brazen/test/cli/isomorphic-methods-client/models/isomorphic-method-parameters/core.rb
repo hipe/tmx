@@ -1,18 +1,15 @@
-require_relative '../test-support'
+module Skylab::Brazen::TestSupport
 
-module Skylab::Headless::TestSupport::CLI::Argument::Syntax
+  module CLI::Isomorphic_Methods_Client::Models::Isomorphic_Method_Parameters
 
-  ::Skylab::Headless::TestSupport::CLI::Argument[ TS__ = self ]
-
-  include Constants
-
-  Home_ = Home_
-
-  extend TestSupport_::Quickie
+    def self.[] tcc
+      tcc.extend ModuleMethods
+    end
 
   module ModuleMethods
 
     def with p
+      true && return
       parameters = p.parameters
       define_method :ruby_para_a do parameters end
     end
@@ -63,5 +60,6 @@ module Skylab::Headless::TestSupport::CLI::Argument::Syntax
         end
       end
     end
+  end
   end
 end

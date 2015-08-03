@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Headless::TestSupport::CLI::Client
+module Skylab::Brazen::TestSupport
 
-  describe "[hl] CLI client" do
+  describe "[br] CLI - iso. - o.p intro", wip: true do
 
-    extend TS__
+    extend TS_
+    use :CLI_isomorphic_methods_client
 
     context "with a minimal, monadic app" do
 

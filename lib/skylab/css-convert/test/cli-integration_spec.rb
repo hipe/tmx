@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::CSS_Convert::TestSupport
 
-  describe "[cssc] CLI integration" do
+  describe "[cssc] CLI integration", wip: true do
 
     extend TS_
 

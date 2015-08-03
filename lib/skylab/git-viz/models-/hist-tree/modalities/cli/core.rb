@@ -21,7 +21,7 @@ module Skylab::GitViz
             "\u2022",  # Bullet - ●
             "\u2b24"   # Blank Large Circle - ⬤
 
-          def resolve_properties  # #nascent-operation :+[#br-042]
+          def init_properties  # #nascent-operation :+[#br-042]
 
             super
 

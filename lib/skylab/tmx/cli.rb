@@ -45,7 +45,7 @@ module Skylab::TMX
       ada
     end
 
-    def resolve_properties
+    def init_properties
       super
       # (typically, is a frozen const-like thing so..)
 

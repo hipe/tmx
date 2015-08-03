@@ -20,7 +20,7 @@ module Skylab::FileMetrics
           end
         end  # >>
 
-        def resolve_properties
+        def init_properties
           super
           p = self.class::MUTATE_PRPS__
           if p

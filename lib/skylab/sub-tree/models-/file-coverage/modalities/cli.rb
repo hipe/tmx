@@ -16,7 +16,7 @@ module Skylab::SubTree
 
       class Actions::File_Coverage < Home_::CLI::Action_Adapter
 
-        def resolve_properties  # #nascent-operation :+[#br-042]
+        def init_properties  # #nascent-operation :+[#br-042]
 
           bp = @bound.formal_properties
           fp = bp.to_mutable_box_like_proxy

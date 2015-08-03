@@ -10,6 +10,10 @@ module Skylab::Callback
 
       _Params = ::Struct.new :edit_class, :on_args_to_method_called_new
 
+      _HM = -> sym do
+        members.inlude? sym
+      end
+
       _TAM = -> do
         members.map( & method( :send ) )
       end
@@ -45,6 +49,8 @@ module Skylab::Callback
               alias_method :new, :orig_new
               alias_method :[], :orig_new
             end
+
+            define_method :has_member, _HM
 
             define_method :to_a, _TAM
 

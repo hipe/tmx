@@ -90,7 +90,7 @@ module Skylab::TanMan
         a = __build_parse_failure_iambic
         build_not_OK_event_via_mutable_iambic_and_message_proc( a, -> y, o do
           line_col = "#{ o.line_no }:#{ o.line_col }"
-          y << if o.has_tag :pn
+          y << if o.has_member :pn
             "In #{ pth o.pn }:#{ line_col }"
           else
             "In #{ o.ens }:#{ line_col }"

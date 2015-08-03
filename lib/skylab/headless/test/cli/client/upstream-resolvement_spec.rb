@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::CLI::Client
 
-  describe "[hl] CLI client upstream resolvement" do
+  describe "[hl] CLI client upstream resolvement", wip: true do
 
     extend TS__
 

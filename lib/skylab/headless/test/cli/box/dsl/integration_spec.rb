@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::CLI::Box::DSL
 
-  describe "[hl] CLI box DSL integration" do
+  describe "[hl] CLI box DSL integration", wip: true do
 
     extend TS__
 

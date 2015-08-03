@@ -1,14 +1,8 @@
-require_relative 'test-support'
+require_relative '../../../test-support'
 
-module Skylab::Headless::TestSupport::CLI::Desc__
+module Skylab::Brazen::TestSupport
 
-  ::Skylab::Headless::TestSupport::CLI::Action[ self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  describe "[hl] CLI action desc string formatting" do
+  describe "[br] CLI - iso. - models - help screen (parsing)", wip: true do
 
     it "no lines" do
       parse <<-O

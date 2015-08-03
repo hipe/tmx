@@ -55,11 +55,9 @@ module Skylab::CSS_Convert
     end
   end
 
-  Headless_ = ::Skylab::Headless
-
   module Core::SubClient::InstanceMethods
 
-    include Headless_::SubClient::InstanceMethods
+    # include Headless_::SubClient::InstanceMethods
 
   private
 
@@ -131,7 +129,7 @@ module Skylab::CSS_Convert
 
   class CLI::Client
 
-    Headless_::CLI::Client[ self ]
+    # Headless_::CLI::Client[ self ]
 
     include Core::Client::InstanceMethods
 

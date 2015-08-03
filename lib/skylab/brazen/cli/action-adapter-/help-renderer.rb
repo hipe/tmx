@@ -16,7 +16,7 @@ module Skylab::Brazen
           @section_a = []
           @section_separator_p = -> { @y << nil }
           @y = ::Enumerator::Yielder.new( & ad.stderr.method( :puts ) )
-          ad.categorized_properties.receive_help_renderer self
+          ad.categorized_properties.mutate_help_renderer_ self
           screen_boundary
         end
 
@@ -41,45 +41,43 @@ module Skylab::Brazen
           NIL_
         end
 
-        def output_help_screen
+        def express_help_screen_
 
-          output_usage
+          express_usage_
 
           if @action.has_description
-            output_description
+            express_description_
           end
 
-          @section_a.each( & method( :output_section ) )
+          @section_a.each( & method( :__express_section ) )
           NIL_
         end
 
         # ~ usage lines
 
-        def output_primary_usage_line
+        def express_primary_usage_line_
 
           a = []
           subject.write_any_primary_syntax_string a
-          output_single_line_section 'usage', a[ 0 ]
+          _express_single_line_section 'usage', a[ 0 ]
           @action
         end
 
-        def output_usage
+        def express_usage_
 
           section_boundary
-          output_usage_section_via_full_syntax_strings get_full_syntax_strings
+          __express_usage_section_via_full_syntax_strings get_full_syntax_strings
           NIL_
         end
 
-        def output_usage_section_via_full_syntax_strings a
+        def __express_usage_section_via_full_syntax_strings a
 
-          output_multiline_section_tight 'usage', a
+          __express_multiline_section_tight 'usage', a
           NIL_
         end
 
         def get_full_syntax_strings
-          a = []
-          subject.write_full_syntax_strings__ a
-          a
+          subject.write_full_syntax_strings__ []
         end
 
         def produce_full_main_syntax_string
@@ -102,25 +100,28 @@ module Skylab::Brazen
 
         def any_main_syntax_string_parts
 
-          @___custom_SSP_is_known_is_known ||= begin
-
-            # :+#experimental: :+#public-API-for-custom-option-parsers
-
-            if @op.respond_to? :main_syntax_string_parts
-
-              @_custom_SSP_is_known = true
-              @_custom_SSP = @op.main_syntax_string_parts  # nil OK
-            else
-              @_custom_SSP_is_known = false
-            end
-            ACHIEVED_
-          end
+          @___custom_SSP_is_known_is_known ||= __know_custom_syntax_str_parts
 
           if @_custom_SSP_is_known
             @_custom_SSP
           else
             __via_optparse_components_any_main_syntax_string_parts
           end
+        end
+
+        def __know_custom_syntax_str_parts
+
+          # :+#experimental: :+#public-API-for-custom-option-parsers
+
+          if @op.respond_to? :main_syntax_string_parts
+
+            @_custom_SSP_is_known = true
+            @_custom_SSP = @op.main_syntax_string_parts  # nil OK
+          else
+            @_custom_SSP_is_known = false
+          end
+
+          ACHIEVED_
         end
 
         def __via_optparse_components_any_main_syntax_string_parts
@@ -241,21 +242,21 @@ module Skylab::Brazen
 
         def arg_glyphs
 
-          a = @arg_a.reduce [] do |m, prop|
+          a = @arg_a.reduce [] do | m, prp |
 
-            s = if prop.has_custom_moniker
-              prop.custom_moniker
+            s = if prp.has_custom_moniker
+              prp.custom_moniker
             else
-              "<#{ prop.name.as_slug }>"
+              "<#{ prp.name.as_slug }>"
             end
 
-            _is_effectively_optional = prop.has_default || ! prop.is_required
+            _is_effectively_optional = prp.has_default || ! prp.is_required
 
             if _is_effectively_optional  # near [#006]
               open = '[' ; close = ']'
             end
 
-            if prop.takes_many_arguments
+            if prp.takes_many_arguments
               addendum = " [#{ s } [..]]"
             end
 
@@ -267,11 +268,11 @@ module Skylab::Brazen
 
         # ~ section rendering (description, options, arguments, child actions)
 
-        def output_description
+        def express_description_
 
           section_boundary
 
-          output_multiline_section(
+          __express_multiline_section(
             'description',
             @action.under_expression_agent_get_N_desc_lines(
               @expression_agent ) )
@@ -279,7 +280,7 @@ module Skylab::Brazen
           NIL_
         end
 
-        def output_option_parser_summary
+        def express_option_parser_summary_
           @op.summarize @y ; nil
         end
 
@@ -288,7 +289,7 @@ module Skylab::Brazen
         end
         Section__ = ::Struct.new :rendering_method_i, :arguments, :p
 
-        def output_section section
+        def __express_section section
           send section.rendering_method_i, * section.arguments, & section.p
         end
 
@@ -304,19 +305,19 @@ module Skylab::Brazen
 
         def item_section label_s, item_a, & p
           section_boundary
-          output_items_with_descriptions label_s, item_a, & p ; nil
+          express_items_with_descriptions_ label_s, item_a, & p ; nil
         end
 
         # ~ "interjections"
 
-        def output_invite_to_general_help
+        def express_invite_to_general_help
           s = subject_invocation_string
           express do
             "use #{ code "#{ s } -h" } for help"
           end
         end
 
-        def output_invite_to_particular_action i_a
+        def express_invite_to_particular_action__ i_a
           o = @action_adapter.retrieve_bound_action_via_nrml_nm i_a
           s = o.primary_syntax_string
           express do
@@ -350,8 +351,8 @@ module Skylab::Brazen
 
         # ~ two-column item renderers
 
-        def output_items_with_descriptions hdr_s, x_a, d=nil, & labelize_p
-          hdr_s and output_header "#{ hdr_s }#{ 's' if 1 != x_a.length }"
+        def express_items_with_descriptions_ hdr_s, x_a, d=nil, & labelize_p
+          hdr_s and express_header_ "#{ hdr_s }#{ 's' if 1 != x_a.length }"
           p = bld_item_outputter d, labelize_p, @y
           x_a.each( & p ) ; nil
         end
@@ -405,44 +406,52 @@ module Skylab::Brazen
 
         # ~ multiline section renderers and their headers
 
-        def output_multiline_section hdr_s, line_a
+        def __express_multiline_section hdr_s, line_a
+
           case 1 <=> line_a.length
-          when  0 ; output_single_line_section hdr_s, line_a.fetch( 0 )
-          when -1 ; output_multi_line_section hdr_s, line_a
-          end ; nil
+          when  0 ; _express_single_line_section hdr_s, line_a.fetch( 0 )
+          when -1 ; __do_express_multiline_section hdr_s, line_a
+          end
+          NIL_
         end
 
-        def output_multiline_section_tight hdr_s, line_a
+        def __express_multiline_section_tight hdr_s, line_a
+
           case 1 <=> line_a.length
-          when  0 ; output_single_line_section hdr_s, line_a.fetch( 0 )
-          when -1 ; output_multi_line_section_tight hdr_s, line_a
-          end ; nil
+          when  0 ; _express_single_line_section hdr_s, line_a.fetch( 0 )
+          when -1 ; __do_express_multi_line_section_tight hdr_s, line_a
+          end
+          NIL_
         end
 
-        def output_multi_line_section hdr_s, line_a
-          output_header hdr_s
+        def __do_express_multiline_section hdr_s, line_a
+
+          express_header_ hdr_s
           line_a.each do |line|
             @y << line
-          end ; nil
+          end
+          NIL_
         end
 
-        def output_multi_line_section_tight hdr_s, line_a
-          output_single_line_section hdr_s, line_a.fetch( 0 )
+        def __do_express_multi_line_section_tight hdr_s, line_a
+
+          _express_single_line_section hdr_s, line_a.fetch( 0 )
           margin = SPACE_ * ( hdr_s.length + 2 )  # ": " is 2 chars wide
           line_a[ 1 .. -1 ].each do |line|
             @y << "#{ margin }#{ line }"
-          end ; nil
+          end
+          NIL_
         end
 
-        def output_single_line_section hdr_s, line
+        def _express_single_line_section hdr_s, line
           y = @y
           @expression_agent.calculate do
             y << "#{ hdr hdr_s }: #{ line }"  # :[#072].
           end
-          nil
+          NIL_
         end
 
-        def output_header hdr_s
+        def express_header_ hdr_s  # 16
           y = @y
           @expression_agent.calculate do
             y << hdr( hdr_s )

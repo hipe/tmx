@@ -1,20 +1,23 @@
-require_relative '../test-support'
+module Skylab::Brazen::TestSupport
 
-module Skylab::Headless::TestSupport::CLI::Action
+  module CLI::Isomorphic_Methods_Client
 
-  ::Skylab::Headless::TestSupport::CLI[ self ]
-
-  include Constants
-
-  Home_ = Home_ ; TestSupport_ = TestSupport_
+    def self.[] tcc
+      tcc.extend ModuleMethods
+    end
 
   module ModuleMethods
 
+    def client_cls_with_op _
+    end
+
     def with_action_class i=nil, &p
+      true && return
       i ? dfn_actncls_with_i_and_p( i, p ) : dfn_actn_cls_with_p( p )
     end
 
     def dfn_actn_cls_with_p cls_p
+      true && return
       test_ctx = self
       before :all do
         cls = cls_p.call
@@ -23,6 +26,7 @@ module Skylab::Headless::TestSupport::CLI::Action
     end
 
     def dfn_actncls_with_i_and_p cls_i, cls_p
+      true && return
       define_method :action_class, Home_::Library_::Memoize[ -> do
         cls = start_class cls_i
         Subject_[ cls, :core_instance_methods ]
@@ -31,6 +35,7 @@ module Skylab::Headless::TestSupport::CLI::Action
     end
 
     def action_class_with_DSL cls_i, & cls_p
+      true && return
       define_method :action_class, Home_::Library_::Memoize[ -> do
         cls = start_class cls_i
         cls.instance_variable_set :@dir_pathname, false
@@ -40,6 +45,7 @@ module Skylab::Headless::TestSupport::CLI::Action
     end
 
     def start_class cls_i
+      true && return
       sandbox_module.const_set cls_i, ::Class.new
     end
   end
@@ -73,5 +79,6 @@ module Skylab::Headless::TestSupport::CLI::Action
     else
       Home_::CLI.action( * a )
     end
+  end
   end
 end

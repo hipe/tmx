@@ -90,6 +90,12 @@ module Skylab::Brazen::TestSupport
 
     memoize = Callback_::Memoize
 
+    Danger_memo = -> tcc do
+      tcc.send :define_singleton_method,
+        :dangerous_memoize_,
+        TestSupport_::DANGEROUS_MEMOIZE
+    end
+
     Expect_event = -> test_context_cls do
       Callback_.test_support::Expect_Event[ test_context_cls ]
     end

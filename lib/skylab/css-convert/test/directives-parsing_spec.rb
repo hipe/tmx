@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-describe "[cssc] when parsing directives" do
+describe "[cssc] when parsing directives", wip: true do
 
   extend ::Skylab::CSS_Convert::TestSupport
 

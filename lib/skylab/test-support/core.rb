@@ -90,6 +90,7 @@ module Skylab::TestSupport  # :[#021].
   EMPTY_S_ = ''.freeze
   FILE_SEP_ = ::File::SEPARATOR
   Home_ = self
+  IDENTITY_ = -> x { x }
   KEEP_PARSING_ = true
   stowaway :Library_, 'lib-'
   MONADIC_TRUTH_ = -> _ { true }

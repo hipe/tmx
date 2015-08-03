@@ -1,3 +1,5 @@
+require_relative 'test-support'  # some clients come in from the top
+
 module Skylab::Brazen::TestSupport::CLI
 
   module Expect_CLI
@@ -47,7 +49,7 @@ module Skylab::Brazen::TestSupport::CLI
 
       _st = sout_serr_line_stream_for_contiguous_lines_on_stream :e
 
-      Home_::TestSupport::CLI::Expect_Section.tree_via_line_stream__ _st
+      Home_::TestSupport::CLI::Expect_Section.tree_via_line_stream_ _st
     end
 
     ## ~~ our own

@@ -23,7 +23,7 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
       _invoke '-h', _ACTION
 
-      s = get_string_for_contiguous_lines_on_stream :e
+      s = flush_to_string_contiguous_lines_on_stream :e
       expect_succeeded
 
       s.should be_include(
