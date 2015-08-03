@@ -3,82 +3,86 @@ module Skylab::Brazen::TestSupport
   module CLI::Isomorphic_Methods_Client
 
     def self.[] tcc
-      tcc.extend ModuleMethods
+
+      TS_::CLI::Expect_CLI[ tcc ]
+      TS_::TestLib_::Danger_memo[ tcc ]
+
+      tcc.extend VERY_TEMPORARY_LEGACIES
+      tcc.include self
+
+      tcc.send :define_singleton_method, :invoke_appropriate_action, IIA__
     end
 
-  module ModuleMethods
+    module VERY_TEMPORARY_LEGACIES
 
-    def client_cls_with_op _
-    end
-
-    def with_action_class i=nil, &p
-      true && return
-      i ? dfn_actncls_with_i_and_p( i, p ) : dfn_actn_cls_with_p( p )
-    end
-
-    def dfn_actn_cls_with_p cls_p
-      true && return
-      test_ctx = self
-      before :all do
-        cls = cls_p.call
-        test_ctx.send :define_method, :action_class do cls end
+      def client_cls_with_op _
+      end
+      def with_action_class
+      end
+      def action_class_with_DSL _
       end
     end
 
-    def dfn_actncls_with_i_and_p cls_i, cls_p
-      true && return
-      define_method :action_class, Home_::Library_::Memoize[ -> do
-        cls = start_class cls_i
-        Subject_[ cls, :core_instance_methods ]
-        cls.class_exec( & cls_p ) ; cls
-      end ]
+    # ~ infer appropriate action
+
+    IIA__ = -> do
+
+      define_method :invoke do | * argv |
+        s = __appropriate_action_slug
+        @appropriate_action_slug_ = s
+        argv.unshift s
+        using_expect_stdout_stderr_invoke_via_argv argv
+      end
     end
 
-    def action_class_with_DSL cls_i, & cls_p
-      true && return
-      define_method :action_class, Home_::Library_::Memoize[ -> do
-        cls = start_class cls_i
-        cls.instance_variable_set :@dir_pathname, false
-        Subject_[ cls, :DSL, :core_instance_methods ]
-        cls.class_exec( & cls_p ) ; cls
-      end ]
+    define_method :__appropriate_action_slug, -> do
+
+      cache = {}
+      _DASH = '-' ; _UNDERSCORE = '_'
+
+      -> do
+        cls = client_class_
+        cache.fetch cls do
+          i_a = cls.instance_methods( false )
+          1 == i_a.length or fail
+          cache[ cls ] = i_a.fetch( 0 ).id2name.gsub _UNDERSCORE, _DASH
+        end
+      end
+    end.call
+
+    # ~ end
+
+    def expect_common_failure_
+
+      expect_this_usage_
+      expect_specific_invite_line_
+      expect_failed
     end
 
-    def start_class cls_i
-      true && return
-      sandbox_module.const_set cls_i, ::Class.new
-    end
-  end
+    def expect_specific_invite_line_
 
-  module InstanceMethods
-
-    def invoke * x_a
-      _a = Constants::Normalize_argv[ x_a ]
-      _ag = action
-      @result = _ag.invoke _a
+      expect :styled, :e, /\Ause 'zeepo #{ @appropriate_action_slug_ } -h'#{
+        } for help\z/
     end
 
-    def action
-      @action ||= build_hot_action
+    def expect_succeeded_with_ s
+      expect :o, s
+      expect_succeeded
     end
 
-    def build_hot_action
-      _mock_client = mock_client
-      _cls = action_class
-      _cls.new _mock_client
+    def subject_class_
+      Home_::CLI::Isomorphic_Methods_Client
     end
 
-    def serr_a_bake_notify
-      @mock_client.release
+    def subject_CLI  # for one or more of our bundles
+      client_class_
     end
-  end
 
-  Subject_ = -> *a do
-    if a.length.zero?
-      Home_::CLI.action
-    else
-      Home_::CLI.action( * a )
-    end
-  end
+    define_method :get_invocation_strings_for_expect_stdout_stderr, -> do
+      a = %w( zeepo )
+      -> do
+        a
+      end
+    end.call
   end
 end

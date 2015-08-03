@@ -2,80 +2,113 @@ require_relative '../../test-support'
 
 module Skylab::Brazen::TestSupport
 
-  describe "[br] CLI - iso. - o.p intro", wip: true do
+  describe "[br] CLI - iso. - o.p intro" do
 
     extend TS_
     use :CLI_isomorphic_methods_client
 
-    context "with a minimal, monadic app" do
+    context "a client with one action with an option parser" do
 
-      before :all do
+      it "reflect (ok to remove)" do
 
-        class Foo
+        _cls = client_class_
+        _cls::Modalities::CLI::Actions.constants.should eql [ :Wen_Kel ]
+      end
 
-          Home_::CLI::Client[ self, :DSL, :three_streams_notify ]
+      # here we use [#108] the canonical numbers for CLI input permutations
 
-          def initialize i, o, e
-            three_streams_notify i, o, e
-            @parm_h = { }
-            super()
+      it "2.3. invoke (just the arg)" do
+
+        invoke 'wen-kel', 'biz'
+        expect :e, "«biz with {}»"
+        expect_no_more_lines
+        @exitstatus.should eql :yerp
+      end
+
+      it "3.4 invoke (good opt)" do
+
+        invoke 'wen-kel', 'biz', '--ex', 'yuss'
+        _expect_same_yuss
+      end
+
+      it "3.4 invoke (same but infix)" do
+
+        invoke 'wen-kel', '--ex', 'yuss', 'biz'
+        _expect_same_yuss
+      end
+
+      def _expect_same_yuss
+        expect :e, '«biz with {:ex=>"yuss"}»'
+        expect_no_more_lines
+        @exitstatus.should eql :yerp
+      end
+
+      it "3.2 invoke (bad opt)" do
+
+        invoke 'wen-kel', 'x', '--ziz'
+        expect :e, "invalid option: --ziz"
+        expect_specifically_invited_to 'wen-kel'
+      end
+
+      it "2.4 help (postfix)" do
+
+        invoke 'wen-kel', '-h'
+        _expect_same_help_screen
+      end
+
+      it "2.4 help (prefix)" do
+
+        invoke '-h', 'wen-kel'
+        _expect_same_help_screen
+      end
+
+      dangerous_memoize_ :client_class_ do
+
+        class TS_::CLI_IMC_03 < subject_class_
+
+          def initialize( * )
+            @_parm_h = {}
+            super
           end
 
-          option_parser do |o|
+          option_parser do | o |
             o.on '-x', '--ex <wat-fun>', 'ohai' do |x|
-              @parm_h[ :ex ] = x
+              @_parm_h[ :ex ] = x
             end
           end
 
           def wen_kel bar
-            errstream.puts "«#{ bar } with #{ @parm_h.inspect }»"
+            @resources.serr.puts "«#{ bar } with #{ @_parm_h.inspect }»"
             :yerp
           end
+
+          self
         end
       end
 
-      def client_class
-        Foo
-      end
+      define_method :_expect_same_help_screen, -> do
 
-      it "builds" do
-        client
-      end
+        _HELP_SCREEN_UNSTYLED = <<-HERE.unindent
+          usage: zeepo wen-kel [-x X] <bar>
+                 zeepo wen-kel -h
 
-      it "ohai" do
-        client
-        @result = @client.invoke %w( wenkel biz )
-        errstring.should eql "«biz with {}»\n"
-        @result.should eql :yerp
-      end
+          options
+              -x, --ex <wat-fun>               ohai
+              -h, --help                       this screen
 
-      it "infix (not trailing) option" do
-        invoke %w( wen-kel -x bix biz )
-        expect_same
-      end
+          argument
+              bar
+        HERE
 
-      it "trailing (not infix) option" do
-        invoke %w( wen-kel biz -x bix )
-        expect_same
-      end
+        -> do
 
-      def expect_same
-        errstr.should eql '«biz with {:ex=>"bix"}»'
-        @result.should eql :yerp
-      end
-    end
+          _str = flush_to_unstyled_string_contiguous_lines_on_stream :e
 
-    context "small facets" do
+          _str.should eql _HELP_SCREEN_UNSTYLED  # or more regressible
 
-      before :all do
-        class Bezzer
-          Home_::CLI::Client[ self ]
+          expect_succeeded
         end
-      end
-
-      it "for ouroborous support, 'Adapter' constant must be included" do
-        Bezzer.should be_const_defined :Adapter
-      end
+      end.call
     end
   end
 end
