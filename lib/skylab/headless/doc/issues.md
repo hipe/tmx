@@ -34,25 +34,33 @@
 [#152] #hole ( was: `Name` node, assimilated into [#cb-060] )
 [#151]       #doc-point #in-situ explains a certain #API-private meth. sig.
 [#150]       #node-tracker this whole `expecting` pattern
-[#149]       #parent-node: [#146] the argument syntax isomorphicism
-[#148]       #parent-node: [#146] module-as-business-collection #isomorphicism
-[#147]       #parent-node: [#146] the public method #isomorphicism
-[#146]       #parent-node: [#126] isomorphicisms exploited by CLI ..
-[#145]       #parent-node: [#146] the method parameter name #isomophicism
+
+[#149] #hole ( #merged-with: [#br-106] )
+             ( #was: #parent-node: [#146] the argument syntax isomorphicism )
+[#148] #hole ( ..  #parent-node: [#146] module-as-business-collection #isomorphicism )
+[#147] #hole ( #merged-with: [br] )
+             ( #was: #parent-node: [#146] the public method #isomorphicism )
+[#146] #hole ( #moved-to: [#br-107] )
+             ( #was: #parent-node: [#126] isomorphicisms exploited by CLI .. )
+[#145] #hole ( #merged-with: [#106] )j
+             ( #was: #parent-node: [#146] the method parameter name #isomophicism )
+
 [#144]       #node-tracker go away the client spy? #testing
 [#143]       #parent-node: [#064] "understanding the queue - the narrative ..
-[#142]       #stub #parent-node: [#135] the CLI argument syntax DSL ..
+[#142] #hole ( #moved-to: [br] )
+             ( #was: #stub #parent-node: [#135] the CLI argument syntax DSL .. )
 [#141]       ( #moved-to: [#br-094] )
 [#140] #hole ( #moved-to: [#sy-010] )
              ( #was: #parent-node: [#125] the System narrative .. )
 [#139]       #doc-node the perfect agent interaction model ..
 [#138]       #parent-node: [#125] the Action narrative ..
 [#137]       #parent-node: [#126] the CLI box narrative ..
-[#136]       #test-node #in-situ
-[#135]       #parent-node: [#126] the CLI argument node narrative (#syntax) ..
-[#134]       #parent-node: [#133]  (#canon) "the canonical numbers for.."
-[#133]       #parent-node: [#125] headless testing conventions ..
-[#132]       #moved-to: [#ca-005]
+[#136] #hole ( #moved to "argument intro" spec in [br] )
+[#135] #hole ( #moved to [#br-106] )
+             ( #was: #parent-node: [#126] the CLI argument node narrative (#syntax) .. )
+[#134] #gone #parent-node: [#133]  (#canon) "the canonical numbers for.."
+[#133] #hole ( #moved to [#br-108] was:  #parent-node: [#125] headless testing conventions .. )
+[#132] #hole #moved-to: [#ca-005]
              ( #was: #in-situ the magical, multipurpose Event base class and variants )
 [#131]       #parent-node: [#125] the notificate narrative ..
 [#130]       ( #moved-to: [#sy-009] )
@@ -169,7 +177,7 @@
              (#repurposed:once) (was file IO scanner, moved to [#ba-004])
 [#043]       #tracking-tag newlines (DOS line endings) be damned!
 [#042]       #done spec for CLI box DSL
-[#040]       #parent-node: [#126] the CLI box DSL narrative ..
+[#040] #hole ( #moved-to: [br] #parent-node: [#126] the CLI box DSL narrative .. )
 [#039]       #parent-node: [#126] the CLI action top narrative (#repurposed)
 [#038]       #parent-node: [#040] the box DSL collapse hack ..
 [#037]       #tracking-tag box classes that build their own option parsers
@@ -178,7 +186,8 @@
 [#035]       #doc-point : the #boxxy cluttered namespace problem (Actions)
 [#034]       #tracking-tag for #function-point `program_name` -
               `normalized_invocation_string`
-[#033]       #function-point #tracking-tag #node-tracker `desc` (and docs)
+[#033] #hole ( #moved-to: [br] )
+             ( #was: #function-point #tracking-tag #node-tracker `desc` (and docs) )
 [#032]       #done #low-priority do we care about our call-stack height for CLI?
 [#031] #hole ( #moved-to: [#sy-005] )
              ( #was: #open new path-tools will move here and clobber old )
@@ -215,7 +224,7 @@
 [#011] #hole ( #moved-to: [#sy-003] )
              [ the filesystem byte upstream identifier ]
              ( #was: #done regrettify all tests in this subproduct )
-[#010]       #repurposed:once the client tree model ..
+[#010] #hole ( #moved-to: [#br-100] #repurposed:once the client tree model .. )
 [#009]       ( #moved-to: [fi]  (same number) ]
 [#008]       `P::C::I_M` --> `SC::I_M` THIS WAS BAD see [#004], [#027]
 [#007]       #change-vector: less pathname, *no* direct interaction with filesystem

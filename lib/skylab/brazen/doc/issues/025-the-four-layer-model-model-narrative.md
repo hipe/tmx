@@ -4,6 +4,8 @@ EDIT: we are keeping this because we love it, but [br] no longer has
 these four specific tiers built into it. now, [br] knows only that
 there is a model class and a silo daemon.
 
+see also [#100] a description of a "reactive model".
+
 
 
 ## introduction

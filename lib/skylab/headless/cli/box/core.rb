@@ -34,7 +34,7 @@ module Skylab::Headless
 
       # #storypoint-30 [#bs-028.D] intentionally ugly names are used here
 
-      def dsptch action=nil, *args  # #storypoint-20, NOTE [#145] params
+      def dsptch action=nil, *args  # #storypoint-20, NOTE [#br-106] params
         disp = disptch_p[ self, action, args ]
         disp and begin
           r = disp.bound_receiver.send disp.dispatchee_method_i, * disp.args
@@ -160,7 +160,7 @@ module Skylab::Headless
         Autoloader_.const_reduce [ action_i ], unbound_action_box
       end
 
-      def help *action  #hook-in # #storypoint-80 NOTE parameter name [#145]
+      def help *action  #hook-in # #storypoint-80 NOTE parameter name [#br-106]
         help_screen help_yielder, *action
       end
 

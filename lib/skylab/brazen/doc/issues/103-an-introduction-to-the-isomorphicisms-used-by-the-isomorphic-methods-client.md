@@ -1,16 +1,26 @@
-# isomorphicisms exploited by headless CLI :[#146] :[#hl-146]
+# isomorphicisms exploited by the isomorphic methods client :[#103]
 
-(this article was imported as a stub from [fa]. the same behavior (parts of
-it) are implemented there, so it will be fun to compare one day. IIRC [fa]
-calls out to [hl] libraries for some of it)
+## introduction & caveat
 
-can't believe we haven't documented these until now - they were the driving
-inspiration behind the humble beginnings of this library. we go from little
-to big, for no reason (but also they get less absurb as we go on)..
+this article (and the ideas in it) started as a stub in [fa]. when that
+sunsetted the node moved to [hl]. then [hl] was sunsetted too and [br]
+has taken on these still alive-and-kicking ideas like the magnanimous
+foster parent that it is.
+
+however, the "isomorphicisms" that we play with in these node are for
+now a bit contrary to the part of the spirit of [br]:
+
+[br] is about defining a reactive tree with our broadly applicable
+generic structures and then generating front clients from that. the
+topic node (and children) are about inferring such things from platform
+structures (modules, methods, arguments). hypothetically we could bridge
+the two by generating something like a reactive tree from platform
+structures but that is not for today.
 
 
 
-## the method parameter name isomoprhicism :[#145]
+
+## the method parameter name isomoprhicism ( more at [#105] )
 
 because of the remarkably fun `Method#parameters` reflection method that ruby
 exposes, we experimentally exploit that method method both to determine
@@ -25,9 +35,9 @@ not invited to our party. just kidding, everyone is.
 
 
 
-## the argument syntax isomorphicism :[#149]
+## the argument syntax isomorphicism ( more at [#105] )
 
-implemented by [#135] the argument node, this is even crazier and more fun.
+implemented by [#106] the argument node, this is even crazier and more fun.
 it is what it sounds like. every single category of parameter that ruby
 supports (except 'block') have analogs in the world of the command line:
 
@@ -48,7 +58,7 @@ first missing one.
 
 
 
-## the public method isomorphicism :[#147]
+## the public method isomorphicism ( more at [#104] )
 
 this one has caused us the most pain, yet still we deem it to be a strong
 enough isomorphicism that we continue to re-work it over and over again.
@@ -61,7 +71,7 @@ we haven't explained what this is yet..
 
 
 
-## the module as business collection isomorphicism :[#148]
+## the module as business collection isomorphicism :[#A]
 
 this is basically the same thing as the idea behind [#cb-030] "boxxy":
 that a ruby module's full extent of constants defined within in (and

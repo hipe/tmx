@@ -1,4 +1,4 @@
-# the desc parsing narrative :[#033]
+# the desc parsing narrative :[#106]
 
 `parse_sections` - the rules are simple: a line that consists of one
 or more non-colons, and then terminated by a colon, that is a section

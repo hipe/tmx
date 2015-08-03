@@ -4,7 +4,7 @@
 
 ### the reactive tree is a sparse subtree of the constant namespace
 
-in a reactive tree, each node must be able to know its "full name"
+in a [#100] reactive tree, each node must be able to know its "full name"
 in the context of that tree. it takes work to derive this tree from
 the constant namespace because the reactive tree is a *sparse sub-
 tree* of the constant namespace tree in several regards:

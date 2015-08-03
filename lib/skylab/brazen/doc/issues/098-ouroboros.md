@@ -48,7 +48,7 @@ appication, and so on:
     are themselves like actions.
 
 classically, exceptions could be made to these truisms: it is possible
-to make an application (call it a utilit) that consists of nothing more
+to make an application (call it a utility) that consists of nothing more
 than one action, etc.
 
 (historical interjection: what we now call "model" we used to call

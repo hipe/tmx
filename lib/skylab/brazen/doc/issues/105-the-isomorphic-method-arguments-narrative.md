@@ -1,9 +1,26 @@
-# the CLI argument node narrative :[#135]
+# the isomorphic method arguments narrative :[#105]
 
-:#storypoint-1
+## intro
+
+see [#103] for important caveats and historical context.
+
+
+
+
+## explaining this formal arg structure; introducing reqity :[#.A]
+
+this is a vestige of what used to be an important top node in [hl]
+("argument", that is, formal argument of argv and a counterpart to
+"option" as a formal option of an o.p). currently we make it quack like
+a modern property of [br], but we do not subclass the same. however this
+is an avenue worth keeping in mind IFF there is too much redundancy of
+method implementations here. ( but note that when we call these "hook
+outs" it makes them OK. :P )
+
+what follows is from the original work:
 
 this node is little more than a struct that wraps together one formal
-parameter and one "reqity" value.
+parameter and one symbolic "reqity" value.
 
 "reqity" is a term we straight up invented to refer to that property that is
 either :req, :opt or :rest, as seen in the result structure of ruby's
@@ -14,13 +31,16 @@ the #parameter-reflection-API.
 
 the children nodes of this node (in this same file) is where it gets more
 interesting: the 'Syntax' child has an 'Isomorphic' subclass that implements
-the [#149] "argument syntax isomorphicism".
+the "argument syntax isomorphicism".
 
 this node's original (original) inspiration was is getting ruby to generate
 ::ArgumentError exceptions that would contain useful messages in them
 "(wrong number of arguments (2 for 3)" but this isomorphicism soon leaked
 (it was mechanically stupid to do it this way, however fun). what it turned
 into is much, much more stupid and much more fun..
+
+
+
 
 
 :#storypoint-2
@@ -33,12 +53,16 @@ parameter has no isomorph (nor should we try to make it have one!) with
 CLI command signatures.
 
 
+
+
 :#storypoint-3
 
 for error reporting it is useful to speak in terms of sub-slices of argument
 syntaxes (used at least 2x here). (in fact, this class was originally
 sub-class of ::Array (eek!)). so we still see necessary remanants of that
 shape paradigm here.
+
+
 
 
 :#storypoint-4

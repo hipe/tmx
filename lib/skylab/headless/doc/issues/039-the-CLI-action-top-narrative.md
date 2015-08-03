@@ -153,7 +153,7 @@ its #field's #state-profile exhibits #semantic-booleanism.
 ## :#storypoint-25 the desc facility
 
 this method is part of the #desc-facility of headless CLI, which is tracked
-generally and universe-wide with :[#033], such that we can one day unify the
+generally and universe-wide with [#br-106], such that we can one day unify the
 diaspora of implementations. as the name would suggest but perhaps not
 clearly, this facility is concerned with storing and rendering description
 text for actions.

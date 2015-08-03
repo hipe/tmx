@@ -34,7 +34,7 @@ in the call to the option parsing method we pass the 'argv' as an argument
 so that clients can play dumb and not use the ivar (it may be more readable
 for small applications to use params rather than the ivars).
 
-we check for 'OK__' a lot per [#019] the common triad of result values,
+we check for `OK__` a lot per [#019] the common triad of result values,
 and later we will hook-out to support [#023] proper exit statii (this gets
 hit in #storypoint-705 below).
 
@@ -225,7 +225,7 @@ Martin might take issue with).
 
 this way, the rendering agent need not hold state information about the
 output context, which makes this more efficient and less ugly when we
-accumulatin output from many children objects in a [#010] tree traversal,
+accumulatin output from many children objects in a [#br-100] tree traversal,
 for example.
 
 (note though that if a method is guaranted to result in one line (and
@@ -323,7 +323,7 @@ API, and we reserve the right to change or eliminate them.
 ## :#storypoint-105 (method) and expresssion agents
 
 `say` is arguably the most important method of this node. perhaps it is the
-most important mechanism in the [#010] client tree model. this private method
+most important mechanism in the [#br-100] client tree model. this private method
 is part of our :#public-API. we pick this dialog up in [#br-094] the expression
 agents story, because it could get lengthy. (it does, and it has an ASCII
 graphic!)

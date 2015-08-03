@@ -1,4 +1,4 @@
-# the CLI box DSL narrative :[#040]
+# the CLI box DSL narrative :[#104]
 
 ## :#storypoint-05
 
@@ -11,7 +11,7 @@ if you use this, it will not be future-proof oweing to the concerns of
 
 ### understanding the behavioral domain of the DSL box
 
-fitting into our [#010] "client tree" model, a component called "box" is
+fitting into our [#100] "client tree" model, a component called "box" is
 concerned with managing children nodes in terms of operations like rendering
 the collection to screen, dispatching requests by resolving a particular one,
 and handling the case that a child cannot be resolved from the request (in
@@ -22,16 +22,14 @@ we will expose an API of private "class methods" that are used to define
 properties of each particular child node at this level.
 
 two (and most essentially), the central thesis statement of this experiment
-is: [#147] "can a clean isomorphicism be drawn between the public methods of
+is: [#104] "can a clean isomorphicism be drawn between the public methods of
 a particular class and its collection of supported "commands"?". this remains
 the space of active inquiry and we embark on our seventh or so rewrite of an
 implementation of this idea.
 
 to get pseudo-formal for a second, the grammar ends up looking something like:
 
-    class Foo
-
-      Home_::CLI::Box[ self, :DSL ]  # EXAMPLE - not yet implemetned #todo:during-merge
+    class Foo < [ subject ]
 
       NODE_DEFINITION *
 
@@ -92,7 +90,7 @@ this brings us to the central hack of this node which is allued to at
 #storypoint-155 below. this is where we mutate ourselves to "engage" with
 the downtree action.
 
-if the act of parsing added something to the [#143] queue, we take no further
+if the act of parsing added something to the [#hl-143] queue, we take no further
 action. we return from this call and bubble back out to the main invocation
 loop, which will have that one more item to process. otherwise.. (jump to
 method)

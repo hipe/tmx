@@ -1,6 +1,12 @@
+[#108]       ..
+[#107]       ..
+[#106]       ..
+[#105]       ..
+[#104]       ..
+[#103]       the CLI isomorphic methods client narrative ..
 [#102]       :+#tombstone: removed old & complex o.p that parsed '--'
 [#101]       #investigation - how to architect.
-[#100]       [ "reactive nodes" etc ]
+[#100]       an introduction to a reactive model ..
 [#099]       [ branch node for historical documents ]
 [#098]       things that should probably subclass interface tree node
 [#097] #open get this ellipsis hack out

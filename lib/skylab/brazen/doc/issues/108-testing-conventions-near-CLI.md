@@ -1,4 +1,6 @@
-# headless testing conventions :[#133]
+# brazen CLI testing conventions :[#108]
+
+(EDIT: transplat from [hl]. parts are old. most is still legit.)
 
 ## we don't say "should" in tests, we use noun phrases or sentence phrases
 

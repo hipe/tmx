@@ -58,7 +58,7 @@ of the old.
 a name "function" may be a bit of a misnomer, it is really several functions
 in one, bound around (or curried to) an inner "normalized" name. abstracted
 from existing application here, it comes in handy for doing name "inflection"
-for the [#hl-146] isomorphicisms, if it happens to work out that the name
+for the [#br-107] isomorphicisms, if it happens to work out that the name
 function(s) you want are here.
 
 
