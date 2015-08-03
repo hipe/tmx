@@ -117,3 +117,5 @@ and typically these sorts of components are not:
     # the two sides of the duality:
     #   tail = surface   = extrinsic = outer = higher = upper = hi
     #   head = intrinsic = intrinsic = inner = lower  = lower = lo )
+
+# :#tombstone: we ate the soul of document [#!hl-069] to obtain its power
