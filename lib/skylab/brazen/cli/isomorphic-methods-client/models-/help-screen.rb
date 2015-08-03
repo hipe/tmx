@@ -12,7 +12,68 @@ module Skylab::Brazen
         end
       end  # >>
 
+      Models = ::Module.new
       Models_ = ::Module.new
+
+      class Models::Description
+
+        class << self
+
+          def of_instance inst
+
+            if inst.class.const_defined? :DESCRIPTION_BLOCK_
+              new inst
+            else
+              THE_EMPTY_DESCRIPTION___
+            end
+          end
+          private :new
+        end  # >>
+
+        def initialize inst
+          @_p = inst.class.const_get :DESCRIPTION_BLOCK_
+        end
+
+        def under_expag_get_N_desc_lines_ expag, d
+
+          if d && d.zero?
+            EMPTY_A_
+          else
+
+            a = []
+            counter = 0
+
+            _yielder = ::Enumerator::Yielder.new do | line |
+
+              a.push line
+              counter += 1
+
+              if d == counter
+                self._COVER_ME_YAY
+                throw :done
+              end
+            end
+
+            catch :done do
+              expag.calculate _yielder, & @_p
+            end
+
+            a
+          end
+        end
+
+        def has_content
+          true
+        end
+      end
+
+      THE_EMPTY_DESCRIPTION___ =
+      class Models_::The_Empty_Description___
+        def has_content
+          false
+        end
+        self
+      end.new
 
       class Models_::Section
 
@@ -42,7 +103,7 @@ module Skylab::Brazen
 
     # ~ begin legacy
 
-    if false  # the below will mentor the above, may be brought back but #todo
+    if false  # the below mentors the above, may be brought back but #todo
     class Story__
 
       class << self

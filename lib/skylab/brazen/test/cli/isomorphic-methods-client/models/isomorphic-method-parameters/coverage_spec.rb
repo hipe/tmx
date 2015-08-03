@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Brazen::TestSupport
 
-  describe "[br] CLI - iso. - arg coverage", wip: true do
+  describe "[br] CLI - iso. - arg coverage" do
 
     extend TS_
     use :CLI_isomorphic_methods_client_models_isomorphic_method_parameters

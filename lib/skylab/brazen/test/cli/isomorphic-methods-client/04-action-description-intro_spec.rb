@@ -2,113 +2,58 @@ require_relative '../../test-support'
 
 module Skylab::Brazen::TestSupport
 
-  describe "[br] CLI - iso. - desc intro", wip: true do
+  describe "[br] CLI - iso. - desc intro" do
 
     extend TS_
     use :CLI_isomorphic_methods_client
 
-    context "a description if desired may be as simple as" do
+    context "`description` (for an action)" do
 
-      action_class_with_DSL :Desc_One_String do
-
-        desc "i am one string"
-
-        def default_action_i ; :run_land end
-        def run_land
-          enqueue :help ; true
-        end
+      it "makes" do
+        client_class_
       end
 
-      it "..one string" do
-        invoke
-        expect_the_lines_before_the_description
-        _x = crunchify
-        _x.should eql [[:strong_green, 'description:'], ' i am one string']
-        expect_succeeded
-      end
-    end
+      it "shows" do
 
-    def expect_the_lines_before_the_description
-      x = crunchify
-      x.shift.should eql [ :strong_green, 'usage:' ]
-      x.shift.should match %r(\A yerp [-a-z]+\z)
-      x.length.zero? or fail "expected no more: #{ x.first.inspect }"
-      expect_blank
-    end
+        invoke 'wingzors', '-h'
 
+        tr = Home_::TestSupport.CLI::Expect_Section.tree_via_line_stream_(
+          sout_serr_line_stream_for_contiguous_lines_on_stream :e )
 
-    context "an arbitrary number of description lines may be defined in .." do
+        unstyle_styled = Home_::CLI::Styling::Unstyle_styled
 
-      action_class_with_DSL :Zweibert do
-
-        desc do |y|
-          y << "it's like #{ say { em 'that' } } y'all"
-          y << "it's like that." ; nil
+        styled = -> line do
+          line.chomp!  # meh
+          unstyle_styled[ line ]
         end
 
-        option_parser do |op|
-          op.on '-g',  '--gelp' do
-            enqueue :help
+        desc = tr.children.fetch 1
+
+        styled[ desc.x.line ].should eql 'description'
+
+        cx = desc.children
+        cx.length.should eql 3
+        cx.first.x.line.should eql "  line 1.\n"
+        styled[ cx[ 1 ].x.line ].should eql "  line two."
+        cx.last.x.line.should eql "\n"
+      end
+
+      dangerous_memoize_ :client_class_ do
+
+        class TS_::CLI_IMC_04 < subject_class_
+
+          description do | y |
+            y << "  line 1."
+            y << "  line #{ highlight 'two' }."
           end
+
+          def wingzors a
+          end
+
+          self
         end
-
-        def default_action_i ; :zwiggy end
-        def zwiggy flim, flam=nil
-          self._wat_
-          :_ok_
-        end
-      end
-
-      it ".. a yielder block executed in the context of the view controller" do
-        invoke '-g'
-        expect :styled, 'usage: yerp zweibert [-g] <flim> [<flam>]'
-        expect_blank
-        expect_header :description
-        expect :styled, /\A {2,}it's like that y'all\z/
-        expect %r(\A {2,}it's like that\.\z)
-        expect_blank
-        expect_header :options
-        expect %r(\A {2,}-g, --gelp\z)
-        expect_succeeded
-      end
-    end
-
-    context "multiple description blocks are the same as one and.." do
-
-      action_class_with_DSL :Cryburger do
-
-        desc do |y|
-          y << 'normal line single'
-          y << "additionally this:"
-          y << "  this is  interesting"
-        end
-
-        desc do |y|
-          y << "  why  hello there"
-          y << "    i don't even"
-        end
-
-        def default_action_i ; :funki end
-        def funki
-          enqueue :help
-          true
-        end
-      end
-
-      it "..an an INSANE 'markdown'-like list formatting is supported" do
-        invoke
-        expect :styled, / yerp cryburger\z/
-        expect_blank
-        expect :styled, 'description: normal line single'
-        expect_blank
-        expect_header 'additionally this'
-        _x = crunchify
-        _x.should eql [ '  ', [ :green, 'this is'], 'interesting' ]
-        _x = crunchify
-        _x.should eql [ '  ', [ :green, 'why '], 'hello there' ]
-        expect %r( {2,}i don't even\z)
-        expect_succeeded
       end
     end
   end
 end
+# :+#tombstone: markdown-like lists in descs get special formatting

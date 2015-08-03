@@ -4,12 +4,13 @@ module Skylab::Brazen::TestSupport
 
     def self.[] tcc
       tcc.extend ModuleMethods
+      tcc.include InstanceMethods
     end
+    # <-
 
   module ModuleMethods
 
     def with p
-      true && return
       parameters = p.parameters
       define_method :ruby_para_a do parameters end
     end
@@ -35,7 +36,7 @@ module Skylab::Brazen::TestSupport
       @m.syntax_slice.each_argument.with_index do |farg, count|
         exp_i = exp_i_a.fetch count
         _act_i = farg.name.as_variegated_symbol
-        _fdata_i = formal_data_a.fetch( farg.syntax_index_d ).fetch( 1 )
+        _fdata_i = formal_data_a.fetch( farg.syntax_index ).fetch( 1 )
         _act_i.should eql exp_i
         _fdata_i.should eql exp_i
       end
@@ -49,17 +50,25 @@ module Skylab::Brazen::TestSupport
     end
 
     def execute
+
       @m = @x = nil  # miss / xtra
-      stx = Home_::CLI.argument.syntax.isomorphic.new ruby_para_a
-      stx.process_args @actual_i_a do |o|
+
+      _stx = Home_::CLI::Isomorphic_Methods_Client::Models_::
+        Isomorphic_Method_Parameters.new ruby_para_a
+
+      _stx.validate_against_args @actual_i_a do |o|
+
         o.on_missing do |ev|
           @m = ev ; false
         end
+
         o.on_extra do |ev|
           @x = ev ; false
         end
       end
+      NIL_
     end
   end
+# ->
   end
 end
