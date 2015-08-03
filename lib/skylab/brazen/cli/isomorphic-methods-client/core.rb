@@ -1,6 +1,8 @@
-module Skylab::Headless
+module Skylab::Brazen
 
-  module CLI
+  class CLI::Isomorphic_Methods_Client < ::Class.new
+
+    if false
 
     module Box
 
@@ -471,5 +473,9 @@ module Skylab::Headless
         end
       end  # DSL
     end  # Box
-  end  # CLI
+    end
+
+    Here_ = self
+    Autoloader_[ Models_ = ::Module.new ]
+  end
 end

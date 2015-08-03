@@ -2,21 +2,16 @@ require_relative '../../../test-support'
 
 module Skylab::Brazen::TestSupport
 
-  describe "[br] CLI - iso. - models - help screen (parsing)", wip: true do
+  describe "[br] CLI - iso. - models - help screen (parsing)" do
 
     it "no lines" do
-      parse <<-O
+      _parse <<-O
       O
       @sections.length.should be_zero
     end
 
-    def parse s
-      _scn = Home_.lib_.string_lib.line_stream s
-      Home_::CLI.action.desc.parse_sections @sections=[], _scn ; nil
-    end
-
     it "one normal line" do
-      parse <<-O  # note we leave the indent just for giggles
+      _parse <<-O  # note we leave the indent just for giggles
         one line to rule them all
       O
       @sections.length.should eql( 1 )
@@ -27,7 +22,7 @@ module Skylab::Brazen::TestSupport
     end
 
     it "two normal lines" do
-      parse <<-O.unindent
+      _parse <<-O.unindent
         one  two
          three  four  five
       O
@@ -39,7 +34,7 @@ module Skylab::Brazen::TestSupport
     end
 
     it "normal / sect" do
-      parse <<-O.unindent
+      _parse <<-O.unindent
         beefus boqueefus
         nothing:
       O
@@ -54,7 +49,7 @@ module Skylab::Brazen::TestSupport
     end
 
     it "sect / normal" do
-      parse <<-O.unindent
+      _parse <<-O.unindent
         some thing:
         bojangles in shangles
       O
@@ -66,7 +61,7 @@ module Skylab::Brazen::TestSupport
     end
 
     it "sect / normal / normal / sect" do
-      parse <<-O.unindent
+      _parse <<-O.unindent
         s1:
         one
         two
@@ -80,7 +75,7 @@ module Skylab::Brazen::TestSupport
 
     context "items" do
       it "sect / item" do
-        parse <<-O.unindent
+        _parse <<-O.unindent
           bliple:
            meep  beep
         O
@@ -93,7 +88,7 @@ module Skylab::Brazen::TestSupport
 
     context "subitems" do
       it "sect / item / subitem / subitem / item / normal / sect" do
-        parse <<-O.unindent
+        _parse <<-O.unindent
           blearg:
            nargle
              mingus
@@ -115,6 +110,20 @@ module Skylab::Brazen::TestSupport
         O
         act.should eql( exp )
       end
+    end
+
+    def _parse s
+
+      _scn = Home_.lib_.basic::String.line_stream s
+
+      a = []
+
+      @sections = a
+
+      Home_::CLI::Isomorphic_Methods_Client::Models_::Help_Screen.
+        write_to_array_sections_from_line_stream a, _scn
+
+      NIL_
     end
   end
 end

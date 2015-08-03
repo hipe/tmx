@@ -1,28 +1,48 @@
-module Skylab::Headless
+module Skylab::Brazen
 
-  module CLI::Action_::Desc__  #  read [#033] the section par..
+  class CLI::Isomorphic_Methods_Client
 
-    class << self
+    class Models_::Help_Screen  # see [#106]
 
-      def parse_sections sec_a, line_a
-        Parse_sections__[ sec_a, line_a ]
+      class << self
+
+        def write_to_array_sections_from_line_stream a, st
+
+          Parse_sections___[ a, st ]
+        end
+      end  # >>
+
+      Models_ = ::Module.new
+
+      class Models_::Section
+
+        attr_reader(
+          :header,
+          :lines,
+        )
+
+        attr_writer(
+          :header,
+        )
+
+        def initialize header, lines
+
+          @header = header
+          @lines = lines
+        end
+
+        def any_nonzero_length_line_a
+          if @lines.length.nonzero?
+            @lines
+          end
+        end
       end
 
-      def section * a
-        Section__.new( * a )
-      end
+      # <-
 
-      def story x
-        Story__[ x ]
-      end
-    end
+    # ~ begin legacy
 
-    Section__ = ::Struct.new( :header, :lines ) do
-      def any_nonzero_length_line_a
-        (( a = lines )).length.nonzero? and a
-      end
-    end
-
+    if false  # the below will mentor the above, may be brought back but #todo
     class Story__
 
       class << self
@@ -101,6 +121,7 @@ module Skylab::Headless
         @writable_sect_a = nil
       end
     end
+    end
 
     state_h = { }  # das state machine
 
@@ -120,10 +141,10 @@ module Skylab::Headless
 
     item_rx_h = ::Hash.new { |h, k| h[k] = /\A {#{ k },}(.+)\z/ }  # cache rx
 
-    Parse_sections__ = -> sections, lines do
+    Parse_sections___ = -> sections, lines do
       stat = state_h[ :initial ]  # (var meaning change!!)
       section = line = nil
-      push = -> { sections << ( section = Section__.new nil, [] )  }
+      push = -> { sections << ( section = Models_::Section.new nil, [] )  }
       trigger_h = {
         desc:    -> { push[] ; section.lines << [ :line, line ] },
         section: -> { push[] ; section.header = line },
@@ -141,6 +162,11 @@ module Skylab::Headless
         trigger_h.fetch( name_i ).call
         stat = state_h.fetch name_i
       end ; nil
+    end
+
+    # ~ end legacy
+
+  # ->
     end
   end
 end
