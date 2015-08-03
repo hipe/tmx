@@ -145,7 +145,8 @@
              #repurposed:once (was: move scanners to [ba])
 [#066] #hole ( #was: track this combinatorial dichototmy )
 [#065] #hole ( #was: how / when are things added to the lexicon )
-[#064]       #parent-node: [#126] the CLI action core instance methods narr ..
+[#064] #hole chopped down to [br-109]
+             ( #parent-node: [#126] the CLI action core instance methods narr .. )
 [#063] #open track the smells because of CLI action hybridization
 [#062] #open the sweeping architecture change to accomodate homonyms
 [#061]       flyweight the architecture of language production
