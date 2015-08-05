@@ -1,3 +1,7 @@
+[#037]       n.c for filenames ..
+[#036]       historic ascii graph (in directory [#034])
+[#035]       #historic the shell and kernel name convetions ..
+[#034]       ascii graphic examples
 [#033]       [ word wrap (here) ]
 [#032]       name conventions for variables .. #parent-node:[#030]
 [#031]       name conventions for methods (adjunct) ..  #parent-node:[#030]

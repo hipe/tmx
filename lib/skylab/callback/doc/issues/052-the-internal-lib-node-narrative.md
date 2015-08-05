@@ -93,7 +93,7 @@ of its implementation.
 
 ## "Lib_" and "Library_" end in underscores
 
-per our [#hl-079] name conventions, such a name indicates that the node is
+per our [#bs-029.G] name conventions, such a name indicates that the node is
 protected by the node that contains it. we employ this convention here because
 "library" nodes are not for the outisde world to know about: they are an
 implementation detail of that subsystem.

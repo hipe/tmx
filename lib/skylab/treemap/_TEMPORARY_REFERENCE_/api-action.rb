@@ -91,7 +91,7 @@ module Skylab::Treemap
                                   # mutates param_h (experimental
                                   # future-proofing for possible chaining or
                                   # action aggregtation, etc.) [#021]
-    def invoke param_h            # this was the original [#hl-047]
+    def invoke param_h            # this was the original [#sl-116]
       res = false ; formal = formal_attributes
       begin
         forml, actul = formal.names, param_h.keys

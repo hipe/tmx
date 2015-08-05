@@ -19,6 +19,7 @@
 [#032]       [ ellipsify ]
 [#031] #open domain partitioning of scanners
 [#030]       #code-node the basic struct
+             [#.A]  (ancient) "memberhood" means an instance of a member
 [#029]       #doc-node the string node
 [#028]       #parent-node: [#029] the string template narrative ..
 [#027]       the normalization narrative ..

@@ -6,7 +6,7 @@ module Skylab::BeautySalon
 
       Actions = ::Module.new
 
-      class Actions::Search_and_Replace < Brazen_::CLI::Action_Adapter
+      class Actions::Search_and_Replace < ::Skylab::Brazen::CLI::Action_Adapter
 
         def bound_call_via_bound_action_and_mutated_backbound_iambic
 

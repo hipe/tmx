@@ -470,7 +470,7 @@ initial pass at autovivification was still fundamentally flawed. the crux
 of the whole thing is "vivification" is always problematic (depending):
 
 • const names and file names are not perfectly isomorphic. specifically, in
-  our name convention [#hl-156] (maybe?) it is one-way lossy: you can always
+  our name convention [#bs-034]  (maybe?) it is one-way lossy: you can always
   infer the filename from the const name, but there are exponentially many
   possible const names for one filename:
 

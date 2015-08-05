@@ -1,8 +1,10 @@
 module Skylab::BeautySalon
 
-  class Models_::Deliterate < Brazen_::Model
+  class Models_::Deliterate < Home_.lib_.brazen::Model
 
     Actions = ::Module.new
+
+    Brazen_ = Home_.lib_.brazen
 
     class Actions::Ping < Brazen_::Action  # :+#stowaway (while it works)
 

@@ -16,7 +16,7 @@ module Skylab::Callback
 
           end
 
-          # use [#hl-175] name conventions
+          # use [#ca-028] name conventions
 
           const_set :CHANNEL_A__, ( i_a.map do |i|
 

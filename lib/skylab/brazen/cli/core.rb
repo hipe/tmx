@@ -1978,7 +1978,7 @@ module Skylab::Brazen
       def prop ; @prop_p[] end
     end
 
-    class Resources
+    class Resources  # see [#110]
 
       attr_reader(
         :argv,

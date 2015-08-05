@@ -370,7 +370,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
     Basic = sidesys[ :Basic ]
 
-    HL__ = sidesys[ :Headless ]
+    # = sidesys[ :Brazen ]  # for [sl]
 
     IO = -> do
       System[]::IO

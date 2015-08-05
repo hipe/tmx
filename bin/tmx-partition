@@ -69,8 +69,8 @@ y << "is taken to represent a path to a file (typically in the current directory
 y << "into which the remainder of the line after this word (and whitespace(s)) is"
 y << "to be concatted."
 y << nil
-y << "since this doesn't sound immediately useful, consider that it is an attempt"
-y << "to emulate the workflow of an interactive `git` rebase but for general use."
+y << "if this doesn't sound immediately useful, think of it as a general-"
+y << "purpose abstraction of the interface of an interactive a `git` rebase."
 y << "if this still doesn't sound useful then it probably is not. :P"
 y << nil
 y << "this is done in a SEMI-atomic way whereby each file is confirmed to *exist*"

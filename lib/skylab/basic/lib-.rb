@@ -16,10 +16,6 @@ module Skylab::Basic
       Plugin[]::Bundle::Multiset[ mod ]
     end
 
-    CLI_lib = -> do
-      HL__[]::CLI
-    end
-
     Empty_string_scanner = -> do
       StringScanner__[].new ''
     end
@@ -27,8 +23,6 @@ module Skylab::Basic
     Enhancement_shell = -> a do
       Plugin[]::Bundle::Enhance::Shell.new a
     end
-
-    HL__ = sidesys[ :Headless ]
 
     Human = sidesys[ :Human ]
 
@@ -38,10 +32,6 @@ module Skylab::Basic
 
     NLP_EN = -> do
       Human[]::NLP::EN
-    end
-
-    NLP_EN_agent = -> do
-      HL__[].expression_agent.NLP_EN_agent
     end
 
     Oxford_or = -> a do

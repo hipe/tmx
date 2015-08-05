@@ -1,3 +1,10 @@
+[#116]       :+#tombstone: "client services" is no longer a thing
+[#115]       the `par` method of expags ..
+[#114]       (posterity) ..
+[#113]       exit statii ..
+[#112]       ..
+[#111]       what does application even mean ..
+[#110]       ..
 [#109]       when missing arguments fancy ..
 [#108]       ..
 [#107]       ..
@@ -31,7 +38,7 @@
 [#082]       #track meta-meta-property candidates (list, enum etc)
 [#081]       #track experimental extensions to Actor
 [#080]       #parent-node:[#013] actors, agents and models ..
-[#079]       #parent-node:[#050] the API API components narrative (#re-purposed [#hl-017])
+[#079]       #parent-node:[#050] the API API components narrative
              ( #was: #done rather than the model action ever having to know about the
              modality adapter, the modality action should make a custom
              adapter class and in that class set the default iambic starter.

@@ -4,6 +4,8 @@ module Skylab::BeautySalon
 
     Actions = ::Module.new
 
+    Brazen_ = Home_.lib_.brazen
+
     class Actions::Wrap < Brazen_::Action  # :[#033]., :+[#ba-033]
 
       @is_promoted = true

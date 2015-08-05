@@ -16,7 +16,7 @@ we consider this DSL node an :+#abstraction-candidate.
 ## :#the-shell-narrative
 
 this class was originally called "Joystick" and later evolved into
-[#hl-078] what we now know as the popular Shell/Kernel pattern. what
+what we now call the [#bs-035] Shell/Kernel pattern. what
 follows is the original text back from when it was called "Joystick" but
 with the term search-and-replace'd.
 

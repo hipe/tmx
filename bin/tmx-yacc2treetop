@@ -917,6 +917,7 @@ module Skylab::Yacc2Treetop
     a.detect { |mod| ::Module == mod.class } or self._WAT
   end
 
+  Lib_ = nil  # for [sl]
   SPACE_ = ' '
 end
 

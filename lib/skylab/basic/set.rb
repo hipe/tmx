@@ -107,7 +107,7 @@ module Skylab::Basic
       end
     end
 
-    class Bork__ < ::Struct  # :+[#hl-132] variant of the magical Event cl..
+    class Bork__ < ::Struct  # :+[#ca-005] variant of the magical Event cl..
       def self.new &p
         super( * p.parameters.map( & :last ) ) do
           define_method :message_proc do p end
@@ -285,7 +285,9 @@ module Skylab::Basic
       end
 
       class Memberhood_Unit_of_Work__
-        # "memberhood" the made-up term is defined at [#hl-118]
+
+        # "memberhood" the made-up term is tracke by [#ba-030.A]
+
         def replace k, x=nil
           @ivar = nil ; @k = k ; @writer_i = :"#{ k }=" ; @x = x ; nil
         end

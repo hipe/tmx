@@ -4,7 +4,7 @@ module Skylab::Brazen
 
     Sessions_ = ::Module.new
 
-    class Sessions_::Deep_Action_Isomorphicism_for_EN  # compare [#hl-018]
+    class Sessions_::Deep_Action_Isomorphicism_for_EN  # compare [#hu-043]
 
       # :+[#sl-134] this is a feature island - this is covered ONLY by a
       # spec but  it is not currently used anywhere in production. however

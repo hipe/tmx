@@ -7,7 +7,7 @@ the same intent.
 
 ## upgrade path and obviation roadmap for old / new name
 
-the below is for use with the obviation of [#hl-152] for [#cb-060],
+the below is for use with the obviation of [#ca-060] for [#ca-060],
 and the cull survey that can be found there. running [cu]`s
 "survey reduce" action against the survey there (which points to this
 file here) will produce interesting information from the below table.

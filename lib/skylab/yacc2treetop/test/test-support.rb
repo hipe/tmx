@@ -26,7 +26,7 @@ module Skylab::Yacc2Treetop::TestSupport
 
         cli = Home_::CLI.new :_no_sin_, outstream, errstream, [ 'yacc2treetop' ]
 
-        o = ::Struct.new(:debug_p, :err_p, :out_p).new  # :+[#hl-078] "shell"
+        o = ::Struct.new(:debug_p, :err_p, :out_p).new  # :+[#bs-035] "shell"
         o.debug_p = ->{ outstream.debug!; errstream.debug! }
         collapsed_p = -> do
           oo = ::Struct.new(:err, :out, :result).new

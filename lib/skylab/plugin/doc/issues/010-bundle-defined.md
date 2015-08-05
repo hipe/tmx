@@ -1,4 +1,6 @@
-# what is the deal with bundles? :[#092]
+# what is the deal with bundles? :[#010]
+
+(EDIT: etc.)
 
 a bundle is a means of enhancing a module with a "bundle" of functionality in
 a manner that is less complicated, as complicated, or more complicated as

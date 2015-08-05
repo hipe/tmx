@@ -70,7 +70,7 @@ module Skylab::TanMan::TestSupport::Sexp
       res = super
       if false == res
         usage_and_invite          # or alternately just emit :help, invite_line
-        res = nil                 # for now we do this ourselves, it's [#hl-019]
+        res = nil                 # for now we do this ourselves, it's [#br-114]
       end
       res
     end

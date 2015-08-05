@@ -14,7 +14,7 @@ module Skylab::BeautySalon
     end
 
     define_method :application_kernel_, ( Callback_.memoize do
-      Brazen_::Kernel.new Home_
+      Home_.lib_.brazen::Kernel.new Home_
     end )
 
     def lib_
@@ -58,20 +58,12 @@ module Skylab::BeautySalon
 
     Basic = sidesys[ :Basic ]
 
-    Brazen = -> do  # not until we're sure
-      Brazen_
-    end
-
-    CLI_lib = -> do
-      HL___[]::CLI
-    end
+    Brazen = sidesys[ :Brazen ]
 
     File_utils = Callback_.memoize do
       require 'fileutils'
       ::FileUtils
     end
-
-    HL___ = sidesys[ :Headless ]
 
     List_scanner = -> x do
       Callback_::Scn.try_convert x
@@ -109,7 +101,6 @@ module Skylab::BeautySalon
   end
 
   ACHIEVED_ = true
-  Brazen_ = Autoloader_.require_sidesystem :Brazen
   Home_ = self
   CONST_SEP_ = '::'.freeze
   EMPTY_P_ = -> {}

@@ -80,4 +80,4 @@ invalid name, and also this exists to be leveraged intentionally for reasons:
 
 • it is undefined whether filenames with capitol letters would pass, but the
   file we are looking for must not have capitol letters pursuant to our
-  [#hl-156] name conventions on filenames.
+  [#bs-037] name conventions on filenames.

@@ -1,6 +1,5 @@
 require_relative '..'
 require 'skylab/callback/core'
-require 'skylab/headless/core'
 
 module Skylab::CSS_Convert
 

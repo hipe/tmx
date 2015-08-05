@@ -1,4 +1,8 @@
-# the CLI IO narrative :[#015]
+# the CLI resources justification :[#110]
+
+(EDIT: the is a transplant from [hl] with *no* updates yet!)
+
+
 
 
 ## :#storypoint-5 introduction
@@ -7,7 +11,7 @@ this node serves three uses:
 
 1. its historical first function, it houses the CLI IO adpater whose purpose
    is (from one end) to be a simple structure to encapsulate the holy 3
-   streams, (see wikipedia's _Stanadard_streams_ article).
+   streams, (see wikipedia's article on `_Stanadard_streams_`).
    (at one point we used to pass these three streams around as a unit and
    we may do so one day again, but hopefully not.)
 

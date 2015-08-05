@@ -388,8 +388,6 @@ module Skylab::Brazen
       Callback_::Proxy
     end
 
-    Snag_ = sidesys[ :Snag ]
-
     Strange = -> x do
       Basic[]::String.via_mixed x
     end

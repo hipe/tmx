@@ -830,7 +830,7 @@ module Skylab::GitViz
         end
       end
 
-      module Socket_Agent_Constants_  # first utilisant of [#hl-155] name conv.
+      module Socket_Agent_Constants_  # first utilisant of [#bs-029] name conv.
         # (e->3 g->6)
         EARLY_EXIT_ = 33 ; GENERAL_ERROR_ = 63
         IO_THREADS_COUNT__ = 1

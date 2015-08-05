@@ -8,7 +8,7 @@ strings are evaluated to be rendered for your particular modality.
 it is also a placeholder for a much bigger idea that we don't fully
 develop here (yet).
 
-the expression agent as a concept is an improvement on [#hl-984] the
+the expression agent as a concept is an improvement on [#092] the
 headless pen. in fact, although under a different name it has the exact same
 mission statement:
 
@@ -91,7 +91,7 @@ for your business concerns.
           rendering command line parameters either as options or as
           arguments (or as environment variables!) appropriately.
           this tag will probably subsume `lbl`.
-          the (somewhat demanding) logic for this is tracked by [#hl-036].
+          the (somewhat demanding) logic for this is tracked by [#br-115].
 
 + `pth` - for security-ish reasons as well as aesthetics: when rendering
           to many more porcelain-y contexts it looks too detailed to

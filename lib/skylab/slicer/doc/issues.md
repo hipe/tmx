@@ -1,3 +1,4 @@
+[#152]       ([sl] code wormhole #in-situ)
 [#151]       heavy models .. wired models [..]
 [#150]       whining about ruby implementation of struct ..
 [#149]       method cherry-picking ..
@@ -34,15 +35,22 @@
 [#125]       #doc-point #workflow -- when you make overzelous, premature chage..
 [#124]       (available)
 [#123]       #convention #pattern sub-product module 2-level pattern
-[#122]       #done #low-priority phase out ROOT_PATHNAME for Skylab.dir_pathname
+[#122]       oh boy. "tracking tag for everything not thread safe."
+             ( #was: #done #low-priority phase out ROOT_PATHNAME for Skylab.dir_pathname )
 [#121]       #pattern of CLI.new, API.invoke as facades hehe inv. of [#109]
 [#120]       #tracking-tag backticks that could be robustified
 [#119] #open #tracking-tag #pattern of def.self some_thing instead of DSL
 [#118]       #track everywhere that you determine sidesystem composition
              ( #was: unify find command in multiple places (moved to [#sy-016]))
-[#117]       #pattern of defaults (if not nil, etc)
-[#116]       #pattern of set!, update_attributes! etc (w/ error_count)
-               #normalization #algorithm
+[#117]       #pattern of defaults (if not nil, etc) (near [#116])
+[#116]       this tag tracks code instances of the general algorithm
+             (and variant algorithms towards the same end) of
+             implementing behavior that implements the validation &
+             normalization of actual
+             { arguments | attributes | parameters | properties };
+             at various ancient times called `set!`, `update_attributes!`,
+             and at one time setting an `@error_count`)
+             #normalization #algorithm
 [#115]       #pattern of functionalizing things
 [#114]       #pattern of "stdin, stdout, stderr" as constructor to CLI clients
 [#113]       #pattern of PIE standard
@@ -149,6 +157,8 @@
 [#005] 2011-08-27 @closed death to old filemetrics
 [#004] 2011-08-24 @closed the birth of dependency graph, Open2 wrapper for face
 [#003] 2011-08-23 @closed filemetrics ignores blank lines, comments
-[#002] 2011-08-20 @closed F-ace craps near namespaces
-[#001] 2011-08-17 @closed filemetrics rearchitecting
+[#002]        "now.dot" (salvaged from [hl])
+              ( #was: 2011-08-20 @closed F-ace craps near namespaces )
+[#001]        universe dependency visualizations
+              ( #was: 2011-08-17 @closed filemetrics rearchitecting )
 [#000] 2011-08-13 @closed filemetrics refactor near linecount feature

@@ -1,5 +1,6 @@
 [#033]       explaining the enhance method ..
 [#024]       the bundle fancy lookup exegesis ..
+[#009]       pros and const of the add method pattern
 [#008]       delegation ..
 [#007]       the dependencies narrative ..
 [#006]       #track pub-sub hacks (mutations) #universal

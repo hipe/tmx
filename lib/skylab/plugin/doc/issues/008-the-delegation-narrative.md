@@ -44,7 +44,7 @@ for now as we continue glibly with the world's perfect delegation DSL.
 
 we do however feel that the façade pattern when used alone can be a good
 thing. maybe that is the point. this DSL is a crucial underpinning to our
-all important [#hl-067] client services facility, which in turn is a crucial
+all important [#br-116] client services facility, which in turn is a crucial
 underpinning to the [#010] client tree model, which is basically what
 headless's entire existence consists of.
 

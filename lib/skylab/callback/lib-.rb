@@ -27,10 +27,6 @@ module Skylab::Callback
       Basic[]::Class
     end
 
-    CLI_lib = -> do
-      HL__[]::CLI
-    end
-
     Enhancement_shell = -> a do
       Plugin[]::Bundle::Enhance::Shell.new a
     end
@@ -50,8 +46,6 @@ module Skylab::Callback
     Hash_lib = -> do
       Basic[]::Hash
     end
-
-    HL__ = sidesys[ :Headless ]
 
     Hu__ = sidesys[ :Human ]
 

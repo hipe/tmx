@@ -1,9 +1,13 @@
-# what does appilcation even mean? :[#117]
+# what does appilcation even mean? :[#111]
 
-this is part of the [#br-098] disussion of ouroboros, which in turn is really
+(EDIT: etc.)
+
+this is part of the [#098] disussion of ouroboros, which in turn is really
 about trees of turtles.
 
 disjoint thoughts for now, maybe this will be developed further later:
+
+
 
 
 ## scope of this node (statement of purpose)
@@ -20,6 +24,8 @@ coherent unit that provides a user interface (or interfaces) to access its
 set of actions that it provides access to and interaction with.
 
 
+
+
 ## one factor is whether it is "distributable" as a standalone unit
 
 from the perspective of the user, an application is something that appear
@@ -31,6 +37,8 @@ as we have seen and will continue to see, what constitutes a collection of
 software suitable for "distribution" as a standalone unit is arbitrary in
 the most formal sense. that it, it is a huge design decision, and one that
 does not get made on its own.
+
+
 
 
 ## whether a node is an application may be very plastic and mutable
@@ -47,6 +55,8 @@ application and a word processor gets re-conceived as a coherent unit.
 presumably this reconception can go in the other direction, too. one of the
 great skylab experiments is to see if we can make the mobility along this
 axis more fluid.
+
+
 
 
 ## what determines whether an action node is an application is its sovereignty.
@@ -75,10 +85,14 @@ that is, it can (given its dependencies) it can be run alone (presumably,
 dependencies, whatever they are, which again brings us back to the microscope.)
 
 
+
+
 ## what about modalities?
 
 we have intentionally side-stepped discussion of modality here, in the hopes
 that this definition can hold across modalities.
+
+
 
 
 ## ideas for the future

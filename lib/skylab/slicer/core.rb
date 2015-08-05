@@ -38,6 +38,7 @@ module Skylab::Slicer
   module Lib_
 
     # sidesys, = Autoloader_.at :build_require_sidesystem_proc
+    # = sidesys[ :Brazen ]  # for [sl]
 
   end
 

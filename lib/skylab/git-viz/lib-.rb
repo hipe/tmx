@@ -20,12 +20,6 @@ module Skylab::GitViz
       Basic[]::Set[ * a ]
     end
 
-    _HL = sidesys[ :Headless ]
-
-    CLI_lib = -> do
-      _HL[]::CLI
-    end
-
     Date_time = _memoize do
       require 'date'
       ::DateTime

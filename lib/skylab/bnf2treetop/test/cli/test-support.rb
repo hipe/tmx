@@ -50,7 +50,7 @@ module Skylab::Bnf2Treetop::TestSupport
           [ '/no-see/bnf2treetop' ]
         )
 
-        o = ::Struct.new(:debug_p, :err_p, :out_p).new  # :+[#hl-078] "shell"
+        o = ::Struct.new(:debug_p, :err_p, :out_p).new  # :+[#bs-037] "shell"
 
         o.debug_p = ->{ outstream.debug!; errstream.debug! }
 

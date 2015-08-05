@@ -505,7 +505,7 @@ module Skylab::TestSupport
 
   private
 
-    Stylize__ = -> do  # #open :[#005]. :+[#hl-029] the stylize diaspora
+    Stylize__ = -> do  # #open :[#005]. :+[#br-092] the stylize diaspora
       h = ::Hash[ %i| red green yellow blue magenta cyan white |.
         each_with_index.map do |i, d| [ i, 31 + d ] end ]
       h[ :strong ] = 1 ; p = h.method :fetch

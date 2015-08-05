@@ -23,7 +23,7 @@ an API action that emits just plaintext strings can be silly because the
 sexier of the types of clients we want to create can't really do
 anything interesting with plain old strings.
 
-this slippery slope lead us down to the +:[#hl-027] misfeature of the
+this slippery slope lead us down to the +:[#!gone:hl-027] misfeature of the
 "sub-client": each action had an entire suite of string rendering methods,
 each suite tailored to the modality the agent was for.
 

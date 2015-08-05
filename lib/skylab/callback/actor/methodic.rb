@@ -397,7 +397,7 @@ module Skylab::Callback
         end
       end
 
-      class Property  # :+[#fi-001] (was [#hl-030])
+      class Property  # :+[#fi-001]
 
         Actor.methodic self, :properties,
           :ivar,

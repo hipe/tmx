@@ -1,4 +1,6 @@
-# the API action inflection hack :[#018]
+# the API action inflection hack :[#043]
+
+(EDIT: etc)
 
 
 ## introduction

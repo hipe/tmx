@@ -1,4 +1,8 @@
-# patterns for developing bundles :[#120]
+# pros and cons of the method definition bundle pattern :[#009]
+
+(EDIT: etc.)
+
+# patterns for developing bundles
 
 (the content here may get merged into the parent node after a futre branch merge)
 

@@ -17,7 +17,7 @@ high-level behavior have remained largely the same.
 
 the subject node was imported from [tm]. other notable attempts at
 reusable API facilities have occured variously [ sunsetted face API lib ] and then
-[#hl-017] off of that.
+[#!hl-017] off of that.
 
 the birthday of the latter code-node is a week or two after that of the
 subject code-node, so they share DNA:
@@ -29,7 +29,7 @@ for each request a dedicated "invocation" instance has a short-ish lifespan.
 [#cb-046] "iambics" were quite formalized by then too, and used then as
 they are now as the lingua franca for API actions.
 
-in fact, we re-purposed descriptions from the now sunsetted [#hl-017]
+in fact, we re-purposed descriptions from the now sunsetted [#!hl-017]
 to here as supplemental [#079] the API API components narrative.
 
 

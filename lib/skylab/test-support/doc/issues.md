@@ -32,7 +32,7 @@
 [#022]       #parent-node:[#021] "when to extlib and not to extlib.."
 [#021]       #doc-node the core node narrative ..
 [#020]       #doc-node the IO spy composite types narrative ..
-[#019]       #node-point "tree walker" (became [#hl-176] then [#sy-018])
+[#019]       #node-point "tree walker" (became [#!gone:hl-176] then [#sy-018])
 [#018]       #quickie #in-situ
 [#017]       #doc-node #regret narrative
 [#016]       #parent-node:[#017] why we do not include parent anchor module..

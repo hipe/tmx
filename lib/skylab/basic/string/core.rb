@@ -45,7 +45,7 @@ module Skylab::Basic
           needle_rx, haystack ]
       end
 
-      def ellipsify * a
+      def ellipsify * a  # [#032].
         String_::Small_Time_Actors__::Ellipsify.call_via_arglist a
       end
 

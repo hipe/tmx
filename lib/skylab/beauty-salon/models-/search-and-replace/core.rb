@@ -4,7 +4,9 @@ module Skylab::BeautySalon
 
     Actions = ::Module.new
 
-    class Actions::Search_and_Replace < Brazen_::Action  # sorry
+    class Actions::Search_and_Replace < Home_.lib_.brazen::Action  # sorry
+
+      Brazen_ = Home_.lib_.brazen
 
       # this is :[#br-043] the frontier example of a back-less front..
 

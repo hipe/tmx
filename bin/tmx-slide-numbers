@@ -63,7 +63,6 @@ program = -> stdin, stdout, stderr, pn_s_a, argv do
         y << "#{ lbl _USAGE } #{ progname[] } #{ syntax[] }"
         y << nil
 
-        _CLI_lib = subsystem[ :Headless ]::CLI
         _String_lib = subsystem[ :Basic ]::String
 
         # _cols_ = _CLI_lib.cols -> { _DEFAULT_COLS }

@@ -65,7 +65,7 @@ unreadable node identifiers, we will fill the remaining available
 space with an excerpt from the original message, ellipsified to fit
 within whatever space remain in the line.
 
-(parts might get pushed up one day, tracked by [#hl-045])
+(parts might get pushed up one day, tracked by [#ba-032])
 
 
 specifically the algorithm is something like this: add words to the

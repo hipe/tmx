@@ -4,7 +4,7 @@ module Skylab::GitViz
 
     class Fixture_Server
 
-      class Isomorphic_Interface_  # [#hl-004]:#what-is-meant-by-isomorphic-interface
+      class Isomorphic_Interface_  # [#!gone:hl-004] (some junk about sub-clients)
 
         def self.[] mod, * x_a
           new( mod, x_a ).execute ; nil

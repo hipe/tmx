@@ -75,7 +75,7 @@ module Skylab::Brazen
         _NLP_agent.or_ x
       end
 
-      def par prop
+      def par prop  # referenced by :[#115].
         _unstyled = send @categorized_properties.rendering_method_name_for_property( prop ), prop
         highlight _unstyled
       end

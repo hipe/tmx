@@ -121,12 +121,6 @@ module Skylab::TestSupport
       Basic[]::Struct.make_via_arglist i_a
     end
 
-    _HL = sidesys[ :Headless ]
-
-    SUNSETTING_CLI_lib = -> do
-      _HL[]::CLI
-    end
-
     System = -> do
       System_lib[].services
     end

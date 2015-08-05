@@ -102,7 +102,7 @@ module Skylab::Fields::TestSupport
         instance_exec( &b )
       end
 
-      def parameter_label x, idx=nil  # [#hl-036] explains it all, somewhat
+      def parameter_label x, idx=nil  # [#br-115] explains it all, somewhat
 
         if idx
           _idx_s = "[#{ idx }]"

@@ -5,7 +5,7 @@
 
 ## introduction
 
-this is along the lines of both the spirit and form of [#hl-019] the
+this is along the lines of both the spirit and form of [#br-114] the
 common triad of result value meanings, but is concerned especially with
 result values as they pertain to the result values of callbacks.
 
@@ -37,7 +37,7 @@ result in false-ish we result in false. so:
                             false |         false
                   [anything else] |         false
 
-this is because per [#hl-019] we may sometimes use false-vs.-nil to
+this is because per [#br-114] we may sometimes use false-vs.-nil to
 determine whether or not an "apology" for the error (or invite or the
 like) has yet to be issued. (typically, when it is false it means that
 the UI has not yet emitted anything acknoweldging this as having been a
@@ -82,7 +82,7 @@ be kept for internal caller logic to stay intact.
 
 in places marked with this tag, if ever it is desired to employ a
 different pattern, it is strongly encouraged that you write tests to
-cover error callbacks with results in all three [#hl-019] categories to
+cover error callbacks with results in all three [#br-114] categories to
 be sure that our logic isn't exposed to getting broken by the callbacks.
 
 

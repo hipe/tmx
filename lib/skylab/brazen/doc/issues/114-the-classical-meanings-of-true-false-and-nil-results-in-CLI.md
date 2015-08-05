@@ -1,4 +1,6 @@
-## The common triad :[#019]
+## The common triad :[#114]
+
+(EDIT: etc)
 
 .. refers to the convention of meanings assigned to a result from a
 function in the context of a headless application, specificly in the

@@ -72,4 +72,3 @@ including ::Skylab all over the place
 
 
 
-(in the fire we lost old [#hl-088], something about wiring)

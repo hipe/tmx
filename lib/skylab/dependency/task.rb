@@ -30,7 +30,7 @@ module Skylab::Dependency
       NIL_
     end
 
-    def valid? # [#hl-047]
+    def valid?   # :+#[#sl-116]
 
       _req_i_a = self.class.attributes.each_pair.reduce [] do | m, (k, atr) |
         if atr[ :required ]

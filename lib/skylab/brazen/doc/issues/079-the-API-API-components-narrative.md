@@ -4,7 +4,7 @@
 # introduction
 
 the [br] API API is a third ground-up rewrite of an API API. taking what
-we learned from the now sunsetted [#hl-017]. that in turn was an
+we learned from the now sunsetted [#!hl-017]. that in turn was an
 experimental reconception of the [fa] API API, one that
 takes what we learned from there and tries to pare it down to have fewer
 moving parts. ( however this one was only distilled out of one small-sized

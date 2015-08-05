@@ -40,14 +40,6 @@ module Skylab::Snag
       Porcelain__[]::Legacy::DSL[ mod ]
     end
 
-    CLI_lib = -> do
-      HL__[]::CLI
-    end
-
-    Dev_null = -> do
-      HL__[]::IO.dry_stub_instance
-    end
-
     EN_mini = -> do
       NLP[]::EN
     end
@@ -64,16 +56,10 @@ module Skylab::Snag
       System[].filesystem.file_utils_controller
     end
 
-    HL__ = sidesys[ :Headless ]
-
     Hu__ = sidesys[ :Human ]
 
     NLP = -> do
       Hu__[]::NLP
-    end
-
-    Model_event = -> mod do
-      HL__[]::Model::Event.apply_on_client mod
     end
 
     Parse_lib = sidesys[ :Parse ]
@@ -84,10 +70,6 @@ module Skylab::Snag
 
     Path_tools = -> do
       System[].filesystem.path_tools
-    end
-
-    Plugin = -> do
-      HL__[]::Plugin
     end
 
     Pretty_path = -> x do

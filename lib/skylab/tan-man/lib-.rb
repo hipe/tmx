@@ -10,6 +10,8 @@ module Skylab::TanMan
       Basic[]::Struct.make_via_arglist i_a, & p
     end
 
+    # = sidesys[ :Brazen ]  # for [sl]
+
     Constantize = -> x do
       Callback_::Name.lib.constantize x
     end
@@ -57,8 +59,6 @@ module Skylab::TanMan
     Proxy_lib = -> do
       Callback_::Proxy
     end
-
-    Sg__ = sidesys[ :Snag ]
 
     Some_stderr = -> do
       System[].IO.some_stderr_IO

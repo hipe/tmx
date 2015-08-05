@@ -15,7 +15,6 @@ digraph {
   f2 [ label="Flex2Treetop" ]
   gi [ label="Git" ]
   gv [ label="GitViz" ]
-  he [ label="Headless" ]
   hu [ label="Human" ]
   ku [ label="Kurse" ]
   pa [ label="Parse" ]
@@ -33,27 +32,23 @@ digraph {
   tr [ label="Treemap" ]
   y2 [ label="Yacc2Treetop" ]
   ba -> br
-  ba -> he
   ba -> hu
   ba -> pa
   ba -> pl
   ba -> sy
   ba -> ts
   bs -> ba
-  bs -> he
+  bs -> br
   bs -> st
   bs -> sy
   br -> ba
   br -> fi
-  br -> he
   br -> hu
   br -> pa
   br -> pl
-  br -> sn
   br -> sy
   ca -> ba
   ca -> br
-  ca -> he
   ca -> hu
   ca -> pa
   ca -> pl
@@ -61,19 +56,19 @@ digraph {
   ca -> ts
   cm -> ba
   cm -> br
-  cm -> he
-  cm -> pa
   cm -> hu
+  cm -> pa
+  cm -> pl
   cm -> sy
   cs -> br
-  cs -> he
+  cs -> fi
   cs -> sy
   cs -> tan
   cu -> ba
+  cu -> br
   cu -> sy
   de -> ba
   de -> br
-  de -> he
   de -> cm
   de -> sla
   de -> sy
@@ -83,13 +78,12 @@ digraph {
   fi -> pl
   fm -> br
   fm -> ba
-  fm -> he
   fm -> hu
   fm -> pa
   fm -> sy
   fm -> ts
   f2 -> ba
-  f2 -> he
+  f2 -> br
   f2 -> sy
   gi -> ba
   gi -> br
@@ -99,17 +93,9 @@ digraph {
   gi -> sy
   gv -> br
   gv -> ba
-  gv -> he
   gv -> hu
   gv -> pl
   gv -> sy
-  he -> ba
-  he -> br
-  he -> cm
-  he -> hu
-  he -> pa
-  he -> pl
-  he -> sy
   hu -> ba
   hu -> br
   hu -> pa
@@ -120,15 +106,14 @@ digraph {
   pl -> br
   pl -> pa
   sla -> fi
+  sli -> br
   sn -> ba
   sn -> br
-  sn -> he
   sn -> hu
   sn -> pa
   sn -> sy
   st -> ba
   st -> br
-  st -> he
   st -> hu
   st -> sy
   st -> ts
@@ -138,18 +123,16 @@ digraph {
   sy -> pa
   sy -> pl
   tan -> ba
-  tan -> he
+  tan -> br
+  tan -> fi
   tan -> pa
-  tan -> sn
   tan -> sy
   ts -> ba
   ts -> br
-  ts -> he
   ts -> pe
   ts -> pl
   ts -> sn
   ts -> hu
-  ts -> he
   ts -> sy
   tmx -> ba
   tmx -> br

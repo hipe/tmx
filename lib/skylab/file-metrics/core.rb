@@ -37,12 +37,6 @@ module Skylab::FileMetrics
       Parse[]::DSL_DSL.enhance_module x, & p
     end
 
-    _HL = sidesys[ :Headless ]
-
-    EN_agent = -> do
-      _HL[].expression_agent.NLP_EN_agent
-    end
-
     Human = sidesys[ :Human ]
 
     Open_3 = stdlib[ :Open3 ]

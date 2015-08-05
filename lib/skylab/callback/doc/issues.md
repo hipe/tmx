@@ -37,9 +37,10 @@
 [#031]       #parent-node:[#024] the stowaway narrative ..
 [#030]       the boxxy narrative ..
 [#029]       #parent-node:[#024] const reduce ..
-[#028]       #done during:regret-integration-with-new-autoloader
+[#028]       #track the idea of name conventions near events
+             ( #was: #done during:regret-integration-with-new-autoloader )
 [#027]       #track effected by platform `constants` order is non-deterministic
-             #done things that exist to comport with old a.l (or fwd with new)
+             ( #was: #done things that exist to comport with old a.l (or fwd with new) )
 [#026]       #doc-point the F-UN narrative ..
 [#025] #open #wishlist: an event duper that lets you add new properties
              ( was: isomorphic event factory is deprecated .. )

@@ -29,8 +29,6 @@ module Skylab::Slicer
 
       _o.to_sidesystem_stream.each do | ss |
 
-        ss.find_library
-
         @h[ ss.const ] = ss
         @a.push ss
       end
@@ -61,7 +59,7 @@ module Skylab::Slicer
 
     def __do_sidesystem ss
 
-      if ss.lib_path
+      if ss.has_library_node
         __do_library_file ss
       end
       NIL_
@@ -72,7 +70,7 @@ module Skylab::Slicer
       if ss.inferred_dependencies
         __go_deps ss
       else
-        @stderr.puts "(no constants found, skipping - #{ ss.lib_path })"
+        @stderr.puts "(library node with no sidesystems?, skipping - #{ ss.norm })"
       end
       NIL_
     end

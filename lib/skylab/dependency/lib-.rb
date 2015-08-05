@@ -8,12 +8,6 @@ module Skylab::Dependency
 
     Brazen = sidesys[ :Brazen ]
 
-    _HL = sidesys[ :Headless ]
-
-    CLI_lib = -> do
-      _HL[]::CLI
-    end
-
     CodeMolester__ = sidesys[ :CodeMolester ]
 
     Home_dir_pn = -> do

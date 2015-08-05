@@ -1033,6 +1033,7 @@ module Skylab::Bnf2Treetop
 
   ACHIEVED_ = true
   DASH_ = '-'
+  Lib_ = nil  # for [sl]
   NEWLINE_ = "\n"
   NIL_ = nil
   SPACE_ = ' '

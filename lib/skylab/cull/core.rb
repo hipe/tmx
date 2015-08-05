@@ -130,6 +130,8 @@ module Skylab::Cull
 
     Basic = sidesys[ :Basic ]
 
+    # = sidesys[ :Brazen ]  # for [sl]
+
     Filesystem = -> do
       System[].filesystem
     end

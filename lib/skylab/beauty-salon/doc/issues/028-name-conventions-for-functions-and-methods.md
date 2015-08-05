@@ -248,7 +248,7 @@ better this time.
 
 ### the `get_` prefix semantics as a nod to an ObjC convention :[#.B]
 
-(NOTE: there is some spurious confusion btwn this node and [#hl-094] )
+(NOTE: there is some spurious confusion btwn this node and [#bs-031.B] )
 
 it is perhaps a misunderstanding of the convention, but we base these
 semantics off of something we read in the [#sl-142] hilleglas book: "In the common
@@ -260,6 +260,10 @@ the said copying, we use the `get_` prefix to apply more broadly to all
 of those methods that allocate memory towards their result
 object and are not already covered by `build_` (that is, this convention
 is for the simpler operations, `build_` is for the more complex ones.)
+
+typically we use this prefix for methods that result in a new string or
+a new array, implying that the resulting string or array is a deep copy
+made specifically for the caller, implying in turn that it is mutable.
 
 
 

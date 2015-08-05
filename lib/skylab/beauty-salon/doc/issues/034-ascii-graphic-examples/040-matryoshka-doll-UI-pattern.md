@@ -62,7 +62,7 @@ is either ignore the incoming event, respond to to the incoming event, or
 dispatch it downwards (and the the the response is typically bubbled back
 upwards in a similar manner).
 
-this is illustrated in [#hl-028] "the stratified event production model".
+this is illustrated in [#bs-035] "the stratified event production model".
 
 
 

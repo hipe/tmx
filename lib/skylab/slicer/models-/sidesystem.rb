@@ -6,8 +6,6 @@ module Skylab::Slicer
 
     attr_accessor :mod, :const, :deps, :medo, :norm, :stem
 
-    attr_reader :lib_path
-
     def get_core_path
       "#{ @norm }/core.rb"
     end
@@ -26,31 +24,23 @@ module Skylab::Slicer
 
     COLON___ = ':'
 
-    def find_library
-
-      @lib_path = nil
-
-      if @mod.respond_to? :lib_
-        @mod.lib_
-
-        lib_path = "#{ @norm }/lib-#{ Autoloader_::EXTNAME }"
-
-        if ::File.exist? lib_path
-          @lib_path = lib_path
-        else
-          lib_path = "#{ @norm }/library-#{ Autoloader_::EXTNAME }"
-          if ::File.exist? lib_path
-            @lib_path = lib_path
-          else
-            @lib_path = "#{ @norm }/core#{ Autoloader_::EXTNAME }"
-          end
-        end
-      end
-
-      @lib_path && true
+    def has_library_node
+      @___library_known_is_known ||= __know_library
+      @_has_library_node
     end
 
-    def inferred_dependencies  # assume lib_path
+    def __know_library
+
+      # although within the platform runtime we load any library module,
+      # sadly to index each library node for sidesystems it is *better*
+      # to do this via grepping for (codepoint) [#152] because..
+
+      _yes = @mod.const_get :Lib_, false  # to be sure
+      @_has_library_node = _yes ? true : false
+      ACHIEVED_
+    end
+
+    def inferred_dependencies  # assume library node
 
       @___did_infer_deps ||= __infer_deps
       @_dependency_symbols
@@ -75,9 +65,11 @@ module Skylab::Slicer
       ACHIEVED_
     end
 
-    def to_inferred_library_item_symbol_stream
+    def to_inferred_library_item_symbol_stream  # assume has lib node
 
-      fh = ::File.open @lib_path, ::File::RDONLY
+      _lib_path = __whichever_lib_path
+
+      fh = ::File.open _lib_path, ::File::RDONLY
 
       _line_st = Callback_.stream do
         fh.gets
@@ -94,5 +86,20 @@ module Skylab::Slicer
 
     RX__ = / = sidesys\[ :([A-Za-z0-9_]+) \]/
 
+    def __whichever_lib_path  # assume has lib node
+
+      @__lib_path ||= __determine_whichever_lib_path
+    end
+
+    def __determine_whichever_lib_path
+
+      try_deep = "#{ @norm }/lib-#{ Autoloader_::EXTNAME }"
+
+      if ::File.exist? try_deep
+        try_deep
+      else
+        "#{ @norm }/core#{ Autoloader_::EXTNAME }"
+      end
+    end
   end
 end

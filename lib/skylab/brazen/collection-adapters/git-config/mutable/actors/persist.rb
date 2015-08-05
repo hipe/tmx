@@ -126,7 +126,7 @@ module Skylab::Brazen
 
             @__tmpfile__ = ::File.join(
               LIB_.system.filesystem.tmpdir_path,
-              'br-VOLATILE' )  # :+[#hl-100]
+              'br-VOLATILE' )  # :+[#sl-122]
 
             ::File.open @__tmpfile__, WRITE_MODE_
           else
