@@ -2,100 +2,66 @@ require_relative '../../test-support'
 
 module Skylab::Basic::TestSupport
 
-  describe "[hl] CLI action queue - procs", wip: true do
-
-    def self.with_action_class _
-    end
+  describe "[ba] queue [action queue] - proc" do
 
     extend TS_
+    use :queue
 
-    with_action_class :Fippel do
-      def default_action_i
-        :fapple
-      end
+    memoize_ :subject_class_ do
+
+      class Q_AQ_Proc_Cls_01
+
+        include TS_::Queue::Methods_to_Make_a_Client_Class_Testable
+
+        # <-
+
       def fapple
         emit_info_line "yes."
         :_hi_
       end
-      public :enqueue
+
+      self
+
+      # ->
+      end
     end
 
     it "you can enqueue a single proc" do
-      action.enqueue -> { :_hello_there_ }
+      yes = :no
+      action.enqueue -> { yes = :yes ; 0 }
       invoke
       expect_no_more_serr_lines
-      @result.should eql :_hello_there_
+      @result.should be_zero
+      yes.should eql :yes
     end
 
     it "with multiple procs, if first one is not OK, it is result" do
-      action.enqueue -> { :_one_  }
-      action.enqueue -> { :_two_  }
+      action.enqueue -> { 99  }
+      action.enqueue -> { 0  }
       invoke
       expect_no_more_serr_lines
-      @result.should eql :_one_
+      @result.should eql 99
     end
 
     it "but as long as things result in OK they are executed" do
       y = []
-      ok = _OK
+      ok = 0
       action.enqueue -> { y << :_one_ ; ok }
       @action.enqueue -> { y << :_two_ ; ok }
-      @action.enqueue -> { y << :_three_ ; :__OK__ }
+      @action.enqueue -> { y << :_three_ ; 2 }
       @action.enqueue -> { y << :_four__ ; ok }
       invoke
       y.should eql %i( _one_ _two_ _three_ )
       expect_no_more_serr_lines
-      @result.should eql :__OK__
+      @result.should eql 2
     end
 
+    # :+#tombstone: (2x) when the invoke args were passed to the last queue
 
-    it "when queue is only one proc, will take argv args" do
-      y = []
-      action.enqueue -> one, two, three=nil { y << [ one, two, three ] ; :x }
-      invoke 'ONE', 'TWO'
-      y.should eql [ [ 'ONE', 'TWO', nil ] ]
-      expect_no_more_serr_lines
-      @result.should eql :x
+    def expect_no_more_serr_lines
+      NIL_  # ..
     end
 
-    it "when multiple procs, only last one takes argv ags" do
-      y = []
-      ok = _OK
-      action.enqueue -> { y << :hi; ok }
-      action.enqueue -> hey { y << hey ; :_hey_ }
-      debug!
-      invoke 'HEY'
-      y.should eql [ :hi, 'HEY' ]
-      @result.should eql :_hey_
-    end
-
-    def _OK
-      Home_::CLI.action::OK_
-    end
-
-    context "complaining about arguments" do
-
-      before :each do
-        @y = []
-        action.enqueue( -> foo=nil, bar=nil, baz, biff do
-          @y.push foo, bar, baz, biff ; :_yes_
-        end )
-      end
-
-      it "complaining about arguments (just one problem though)" do
-        invoke 'only-one'
-        expect :styled, /\bexpecting: <biff>\z/
-        expect :styled, /\busage: yerp fippel\z/
-        expect :styled, /\Ause\b.+\b for help\b/
-        expect_failed
-      end
-
-      it "when have both" do
-        invoke 'one', 'two'
-        @y.should eql [ nil, nil, 'one', 'two' ]
-        expect_no_more_serr_lines
-        @result.should eql :_yes_
-      end
-    end
+    # :+#tombstone: oldschool isomorphic args
   end
 end

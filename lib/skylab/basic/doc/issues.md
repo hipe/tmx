@@ -1,3 +1,4 @@
+[#049]       queue ..
 [#048]       [ module & class creator ]
 [#047]       f.chain ..
 [#046]       the minimal yielder ..

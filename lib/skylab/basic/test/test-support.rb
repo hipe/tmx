@@ -17,6 +17,14 @@ module Skylab::Basic
       def use sym, * args
         Use___[ args, sym, self ]
       end
+
+      define_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
+
+      def memoize_ sym, & p
+        define_method sym, ( Callback_.memoize do
+          p[]
+        end )
+      end
     end
 
     Use___ = -> do

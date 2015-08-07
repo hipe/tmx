@@ -4,7 +4,8 @@
 [#062]       the box struct proxy narrative ..
 [#061]       the box narrative ..
 [#060]       the name narrative ..
-[#059]       #done #parent-node: [#044] "signal processing scans.." )
+[#059]       [ bound call ]
+             ( #was: #done #parent-node: [#044] "signal processing scans.." ) )
 [#058]       #parent-node: [#042] methodic actor (was: [#sy-009]) :+[#sl-148]..
 [#057]       #parent-node: [#046] "the ideal mixed syntax.."
 [#056]       track similar "try convert" for stream-likes

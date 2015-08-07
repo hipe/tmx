@@ -775,7 +775,7 @@ module Skylab::Callback
     end
   end
 
-  class Bound_Call
+  class Bound_Call  # :[#059].
 
     class << self
 

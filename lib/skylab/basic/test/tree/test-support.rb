@@ -8,15 +8,6 @@ module Skylab::Basic::TestSupport::Tree_TS
 
   extend TestSupport_::Quickie
 
-  module ModuleMethods
-
-    def memoize_ i, & p
-      define_method i, ( Callback_.memoize do
-        p[]
-      end )
-    end
-  end
-
   module InstanceMethods
 
     def via_paths_ * x_a

@@ -1,109 +1,70 @@
-module Skylab::Headless
+module Skylab::Basic
 
-  module CLI::Action_
+  class Queue  # see [#049]
 
-    class Queue_  # part of [#143] (but the main logic is in action base i.m)
+    class << self
 
-      def initialize a
-        a or raise ::ArgumentError, "queue must be build by now"
-        @a = a ; nil
-      end
+      alias_method :build_for, :new
+      private :new
+    end  # >>
 
-      def enqueue_with_args_notify meth_i, arg_a
-        @a << Frame__.new( meth_i, arg_a ) ; nil
-      end
-      Frame__ = ::Struct.new :meth_i, :arg_a
+    def initialize inst
 
-      def peek_some_element_x
-        @a.length.zero? and raise say_empty
-        @a.first or raise say_corrupt
-      end
+      @_queue = []
+      @_client = inst
+    end
 
-      def peek_any_some_element_i  # #storypoint-120
-        pk_some_i_when_nonzero if @a.length.nonzero?
-      end
+    def accept_by & p
 
-      def peek_any_element_i
-        @a.first if @a.length.nonzero? and @a.first.respond_to? :id2name
-      end
+      d = ( a = ( @_receivers ||= [] ) ).length
+      a[ d ] = p
+      @_queue.push Bound_Call___.new( nil, d, :call )
+      NIL_
+    end
 
-      def peek_any_last_element_i
-        @a.last if @a.length.nonzero? and @a.last.respond_to? :id2name
-      end
+    def accept_method_call args, meth, & p
+      @_queue.push Bound_Call___.new( args, nil, meth, & p )
+      NIL_
+    end
 
-      def is_on_last_frame
-        1 == @a.length
-      end
+    def flush_until_nonzero_exitstatus
 
-    private
-
-      def pk_some_i_when_nonzero
-        (( i = @a.first )).respond_to?( :id2name ) or raise say_not_i
-        i
-      end
-
-      def say_corrupt
-        "queue had a false-ish element in the front: #{ @a[ 0 ].inspect }"
-      end
-
-      def say_empty
-        "expected at least one frame, but queue is empty"
-      end
-
-      def say_not_i
-        "expected symbol had #{ Home_.lib_.strange @a[ 0 ] }"
-      end
-
-    public
-
-      def begin_dequeue client  # resolve call tuple
-        Dequeue.new( client, self ).execute
-      end
-
-      class Dequeue
-
-        def initialize client, queue
-          @client = client ; @frame_x = queue.peek_some_element_x
-          @queue = queue
+      es = nil
+      begin
+        if @_queue.length.zero?
+          break
         end
+        bc = @_queue.shift
+        receiver_d = bc.receiver_identifier
+        _rcvr = if receiver_d
+          @_receivers.fetch receiver_d
+        else
+          @_client
+        end
+        es = _rcvr.send bc.method_name, * bc.args, & bc.proc
+        if es.nonzero?
+          break
+        end
+        redo
+      end  while nil
+      es
+    end
 
-        def execute
-          if @frame_x.respond_to? :call
-            resolve_for_proc
-          else
-            resolve_for_frame
-          end
-        end
-      private
-        def resolve_for_proc
-          if @queue.is_on_last_frame
-            resolve_for_proc_when_on_last_frame
-          else
-            resolve_for_proc_when_not_on_last_frame
-          end
-        end
+    class Bound_Call___  # mentored by [#ca-059]
 
-        def resolve_for_proc_when_on_last_frame
-          _argv = @client.release_any_argv || EMPTY_A_
-          use_client_to_validate_proc_syntax_against _argv
-        end
+      attr_reader(
+        :args,
+        :method_name,
+        :proc,
+        :receiver_identifier,
+      )
 
-        def resolve_for_proc_when_not_on_last_frame
-          use_client_to_validate_proc_syntax_against EMPTY_A_
-        end
+      def initialize args, id_x, method_name, & p
 
-        def use_client_to_validate_proc_syntax_against actual_x_a
-          stx = CLI.argument.syntax.isomorphic @frame_x.parameters
-          r = @client.with_arg_stx_prcss_args stx, actual_x_a
-          r and [ OK_, @frame_x.method( :call ), actual_x_a ]
-        end
-
-        def resolve_for_frame
-          arg_a = @frame_x.arg_a ; bound_meth = @client.method @frame_x.meth_i
-          stx = CLI.argument.syntax.isomorphic bound_meth.parameters
-          r = @client.with_arg_stx_prcss_args stx, arg_a
-          r and [ OK_, bound_meth, arg_a ]
-        end
+        @args = args
+        @method_name = method_name
+        @proc = p
+        @receiver_identifier = id_x
       end
     end
   end
