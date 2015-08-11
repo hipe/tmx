@@ -24,7 +24,7 @@ module Skylab::Snag
           @is_hot = true
           @receive_first_line_of_stream = method :__init_memoized_assets
 
-          _pxy = The_Two_Methods_Proxy_for_these_Filehandles___.new self
+          _pxy = As_Rewinder_Releaser___.new self
 
           @p = method :__gets_first_node_ever
 
@@ -288,7 +288,7 @@ module Skylab::Snag
           NIL_
         end
 
-        class The_Two_Methods_Proxy_for_these_Filehandles___
+        class As_Rewinder_Releaser___
 
           def initialize actor
 

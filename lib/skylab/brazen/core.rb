@@ -384,10 +384,6 @@ module Skylab::Brazen
 
     Plugin = sidesys[ :Plugin ]
 
-    Proxy_lib = -> do
-      Callback_::Proxy
-    end
-
     Strange = -> x do
       Basic[]::String.via_mixed x
     end

@@ -175,14 +175,14 @@ module Skylab::Callback
     private
 
       def hack_gets_under
-        @gets_under = Gets_Proxy__.new do
+        @gets_under = Getser___.new do
           x = @x ; @x = nil ; x
         end
         @y or init_ivars_when_in_buffer_mode
         true
       end
 
-      class Gets_Proxy__ < ::Proc
+      class Getser___ < ::Proc
         alias_method :gets, :call
       end
 

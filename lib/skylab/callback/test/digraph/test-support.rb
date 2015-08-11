@@ -12,7 +12,7 @@ module Skylab::Callback::TestSupport::Digraph
 
   module ModuleMethods
     include Constants
-    include Home_.lib_.class_lib::Creator::ModuleMethods
+    include Home_.lib_.basic::Class::Creator::ModuleMethods
 
     def inside &b                 # define the dsl-ish klass body to be somthing
       b or fail 'give a block'    # other than nothing (below)
@@ -61,7 +61,7 @@ module Skylab::Callback::TestSupport::Digraph
 
   module InstanceMethods
 
-    include Home_.lib_.class_lib::Creator::InstanceMethods
+    include Home_.lib_.basic::Class::Creator::InstanceMethods
 
     let :meta_hell_anchor_module do ::Module.new end
 

@@ -169,11 +169,12 @@ module Skylab::Brazen
 
       Singleton_instance__ = Callback_.memoize do
 
-        _categorized_properties = LIB_.proxy_lib.
+        _categorized_properties = LIB_.basic::Proxy::Inline.new(
 
-          inline :rendering_method_name_for_property, -> prp do
+          :rendering_method_name_for_property, -> prp do
             :render_property_as_unknown
-          end
+          end,
+        )
 
         new _categorized_properties
       end

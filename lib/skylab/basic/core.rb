@@ -181,6 +181,14 @@ module Skylab::Basic  # introduction at [#020]
     end
   end
 
+  Try_convert_iambic_to_pairs_scan_ = -> x_a do  # (used only under 'Proxy')
+    if 1 == x_a.length
+      Home_::Hash.pairs_scan x_a.first
+    else
+      Home_::List.pairs_scan_via_even_iambic x_a
+    end
+  end
+
   ACHIEVED_ = true
   CLI = nil  # for host
   Autoloader_ = Callback_::Autoloader

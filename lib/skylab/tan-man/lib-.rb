@@ -56,10 +56,6 @@ module Skylab::TanMan
 
     Pretty_print = stdlib[ :PP ]
 
-    Proxy_lib = -> do
-      Callback_::Proxy
-    end
-
     Some_stderr = -> do
       System[].IO.some_stderr_IO
     end

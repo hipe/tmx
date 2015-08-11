@@ -16,7 +16,7 @@ module Skylab::Brazen
           formals = act.formal_properties
           kp = KEEP_PARSING_
 
-          pxy = Value_As_Stream_Like_Proxy___.new
+          pxy = Value_as_Stream___.new
           act.polymorphic_upstream_ = pxy
 
           bx.each_pair do | k, x |
@@ -59,7 +59,7 @@ module Skylab::Brazen
           kp
         end
 
-        class Value_As_Stream_Like_Proxy___
+        class Value_as_Stream___
 
           def current_token
             @p[]

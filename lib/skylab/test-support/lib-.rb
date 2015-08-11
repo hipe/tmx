@@ -104,10 +104,6 @@ module Skylab::TestSupport
       Callback_::Name.lib.constantize_sanitize_file
     end
 
-    Proxy_lib = -> do
-      Callback_::Proxy
-    end
-
     Skylab__ = Callback_.memoize do
       require_relative DOT_DOT_
       ::Skylab

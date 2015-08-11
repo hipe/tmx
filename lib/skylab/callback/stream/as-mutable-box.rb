@@ -2,7 +2,7 @@ module Skylab::Callback
 
   class Stream
 
-    class Mutable_Box_Like_Proxy
+    class As_Mutable_Box
 
       # we would just subclass box were it not for the fact that box has a
       # subtly different interface than what we want with good reason: for
@@ -39,7 +39,7 @@ module Skylab::Callback
       end
 
       def to_new_mutable_box_like_proxy
-        Mutable_Box_Like_Proxy.new @a.dup, @h.dup
+        Stream_::As_Mutable_Box.new @a.dup, @h.dup
       end
 
       def has_name k

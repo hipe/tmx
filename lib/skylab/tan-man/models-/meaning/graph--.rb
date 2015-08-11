@@ -101,7 +101,8 @@ module Skylab::TanMan
       end
     end
 
-    CircleHash__ = Home_.lib_.proxy_lib.nice :[], :[]=, :fetch
+    CircleHash__ = Home_.lib_.basic::Proxy::Makers::Functional::Nice.new(
+      :[], :[]=, :fetch )
 
     Interminable__ = Callback_::Event.prototype_with :interminable,
         :trail_a, nil, :reason, :interminal, :ok, false do | y, o |

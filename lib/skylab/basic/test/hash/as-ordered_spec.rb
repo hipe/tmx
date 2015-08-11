@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::Basic::TestSupport::Hash::Order_Proxy
+module Skylab::Basic::TestSupport::Hash::As_Ordered
 
   ::Skylab::Basic::TestSupport::Hash[ self ]
 
@@ -10,19 +10,11 @@ module Skylab::Basic::TestSupport::Hash::Order_Proxy
 
   Home_ = Home_
 
-  Subject_ = -> * x_a, & p do
-    if x_a.length.nonzero? || p
-      Home_::Hash::Order_Proxy[ * x_a, & p ]
-    else
-      Home_::Hash::Order_Proxy
-    end
-  end
-
-  describe "[ba] Hash::Order_Proxy" do
+  describe "[ba] hash - as ordered" do
 
     it "acts like a hash, but it memoizes the order of `aset` keys" do
       h = { }
-      op = Subject_[].new h
+      op = Home_::Hash::As_Ordered.new h
 
       op[ :foo ] = :bar
       op[ :bing ] = :baz

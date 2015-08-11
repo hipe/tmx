@@ -73,7 +73,7 @@ module Skylab::Callback
     end
 
     def delegate_to_selectively oes_p
-      @delegate = Delegate_Proxy__.new do |ev|
+      @delegate = Event_Receiver___.new do |ev|
         oes_p.call do
           ev
         end
@@ -153,7 +153,7 @@ module Skylab::Callback
       Home_::Stream.via_nonsparse_array self.class::CHANNEL_A__
     end
 
-    class Delegate_Proxy__ < ::Proc
+    class Event_Receiver___ < ::Proc
       alias_method :receive_event, :call
     end
   end

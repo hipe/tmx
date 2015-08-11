@@ -2,7 +2,7 @@ module Skylab::Callback
 
   class Stream
 
-    class Polymorphic___  # :+[#cb-046]
+    class As_::Polymorphic  # :+[#cb-046]
 
       # etc.
 

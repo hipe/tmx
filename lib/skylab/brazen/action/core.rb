@@ -320,7 +320,7 @@ module Skylab::Brazen
     end
 
     def to_trio_box_proxy
-      Concerns__::Properties::Output::Trio_Box_Proxy.
+      Concerns__::Properties::Output::Actual_Values_as_Box.
         new @argument_box, formal_properties
     end
 

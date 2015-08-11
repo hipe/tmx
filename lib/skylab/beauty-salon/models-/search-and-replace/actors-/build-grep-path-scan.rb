@@ -94,7 +94,7 @@ module Skylab::BeautySalon
 
         o = Callback_::Stream
         o.new(
-          o::Release_Resource_Proxy.new do
+          o::Resource_Releaser.new do
             if st
               st.upstream.release_resource
             else

@@ -33,8 +33,13 @@ module Skylab::TestSupport
     end
 
     Prefixed_debugging_IO__ = -> do
+
       p = -> i, io do
-        Prefixed_Debugging_IO__ = Home_.lib_.proxy_lib.nice :puts, :write, :<<, :rewind, :truncate
+
+        Prefixed_Debugging_IO__ =
+          Home_.lib_.basic::Proxy::Makers::Functional::Nice.new(
+            :puts, :write, :<<, :rewind, :truncate )
+
         p = -> i_, io_ do
           fmt = -> x do
             "(#{ i_ }: #{ x.inspect })"

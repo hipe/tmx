@@ -1,10 +1,12 @@
-module Skylab::Callback
+module Skylab::Basic
 
-  module Proxy
+  # ->
 
-    class Inline__ < ::BasicObject
+    class Proxy::Inline < ::BasicObject
 
       # produce a proxy "inline" from a hash-like whose values are procs:
+      #
+      # self._REDO_DOCTEST
       #
       #     pxy = Subject_.call(
       #       :foo, -> x { "bar: #{ x }" },
@@ -20,20 +22,7 @@ module Skylab::Callback
       # (past names for this include:
       #   `generic`, `plastic`, `dynamic`, `ad_hoc`)
 
-      class << self
-
-        def [] * a, & p
-          new a, p
-        end
-
-        def call_via_arglist a, & p
-          new a, p
-        end
-      end
-
-    private
-
-      def initialize x_a, convenience_p
+      def initialize * x_a, & convenience_p
 
         pairs_scn = Try_convert_iambic_to_pairs_scan_[ x_a ]
 
@@ -76,5 +65,5 @@ module Skylab::Callback
         end
       end
     end
-  end
+  # <-
 end

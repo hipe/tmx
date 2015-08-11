@@ -25,7 +25,7 @@ module Skylab::Callback
       end
 
       def spy_proxy & p
-        Spy_Proxy__.new( & p )
+        As_Listener___.new( & p )
       end
 
       def suffixed o, i
@@ -53,7 +53,8 @@ module Skylab::Callback
           end
         end ; nil
       end
-      Home_.lib_.bundle_multiset self
+
+      Home_.lib_.plugin::Bundle::Multiset[ self ]
     end
 
     Make_via_didactic_matrix__ = -> channel_i_a, shape_i_a do
@@ -67,7 +68,7 @@ module Skylab::Callback
         make_OK_hash = -> moniker_s, i_a do
           h = ::Hash[ i_a.map { |i| [ i, true ] } ]
           h.default_proc =
-            Home_.lib_.hash_lib.loquacious_default_proc.curry[ moniker_s ]
+            Home_.lib_.basic::Hash.loquacious_default_proc.curry[ moniker_s ]
           h
         end
 
@@ -82,12 +83,16 @@ module Skylab::Callback
       end
     end
 
-    class Spy_Proxy__
+    class As_Listener___
 
       def initialize
         yield self
         @do_debug_proc ||= nil
-        @do_debug_proc and @debug_IO ||= Home_.lib_.some_stderr
+
+        if @do_debug_proc
+          @debug_IO ||= Home_.lib_.system_lib::IO.some_stderr_IO
+        end
+
         @emission_a or raise ::ArgumentError, "emission_a must be set in block"
         @inspect_emission_proc ||= method :inspect_emission_channel_and_payload
         freeze

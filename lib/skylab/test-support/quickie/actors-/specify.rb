@@ -35,11 +35,11 @@ module Skylab::TestSupport
 
       Build_describing_proxy_class = -> test_context_class do
         cls = ::Class.new test_context_class
-        cls.include Describing_Proxy_Methods__
+        cls.include Methods_for_Test_Context_as_Predicator___
         cls
       end
 
-      module Describing_Proxy_Methods__
+      module Methods_for_Test_Context_as_Predicator___
 
         def initialize
           @s_a = []

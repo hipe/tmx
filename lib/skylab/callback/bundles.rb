@@ -94,7 +94,7 @@ module Skylab::Callback
       include Home_::Digraph::MMs ; nil
     end
 
-    Home_.lib_.bundle_multiset self
+    Home_.lib_.plugin::Bundle::Multiset[ self ]
   end
 
   module Emit_to_IO_stream_string_
@@ -124,7 +124,7 @@ module Skylab::Callback
     end
 
     Build_init_method__ = -> do
-      default_proc = Home_.lib_.hash_lib.loquacious_default_proc.curry[ 'stream' ]
+      default_proc = Home_.lib_.basic::Hash.loquacious_default_proc.curry[ 'stream' ]
       -> h do
         h.default_proc ||= default_proc
         @simple_IO_manifold_h = h ; nil

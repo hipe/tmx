@@ -743,7 +743,8 @@ module Skylab::Callback
       end
 
       Levenshtein_reduce_ = -> closest_d, good_x_a, strange_x do  # :+#curry-friendly
-        Home_.lib_.levenshtein.with(
+
+        Home_.lib_.human::Levenshtein.with(
           :item, strange_x,
           :closest_N_items, closest_d,
           :items, good_x_a,

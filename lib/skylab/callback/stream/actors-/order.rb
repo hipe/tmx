@@ -2,18 +2,19 @@ module Skylab::Callback
 
   # ->
 
-    class Stream::Ordered__
+    class Stream::Actors_::Order
 
-      Home_::Actor.call self, :properties,
-        :upstream
+      def self.[] upstream
+        new( upstream ).execute
+      end
 
-      def initialize
+      def initialize upstream
         @went_h = {}
         @waiting_h = {}
         @ready_buffer_queue = []
         @gets_from_buffer = method :gets_from_buffer
         @main_loop = method :main_loop
-        super
+        @upstream = upstream
       end
 
       def execute

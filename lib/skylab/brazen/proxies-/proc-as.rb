@@ -129,7 +129,7 @@ module Skylab::Brazen
 
         def __build_parameter_box
 
-          bx = Callback_::Stream::Mutable_Box_Like_Proxy.new [], {}
+          bx = Callback_::Stream::As_Mutable_Box.new [], {}
 
           @signature_classifications.
               business_parameters.each do | opt_req_rest, name_symbol |

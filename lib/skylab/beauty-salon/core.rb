@@ -69,10 +69,6 @@ module Skylab::BeautySalon
       Callback_::Scn.try_convert x
     end
 
-    Proxy_lib = -> do
-      Callback_::Proxy
-    end
-
     Shellwords = -> do
       require 'shellwords'
       ::Shellwords

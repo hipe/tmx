@@ -19,7 +19,7 @@ module Skylab::Cull
 
           o = Callback_::Stream
           o.new(
-            o::Release_Resource_Proxy.new do
+            o::Resource_Releaser.new do
               @fh.close
               ACHIEVED_
             end

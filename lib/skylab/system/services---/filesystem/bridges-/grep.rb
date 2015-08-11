@@ -189,7 +189,7 @@ module Skylab::System
 
           o = Callback_::Stream
           o.new(
-            o::Release_Resource_Proxy.new do
+            o::Resource_Releaser.new do
               if thread && thread.alive?
                 thread.exit
               end

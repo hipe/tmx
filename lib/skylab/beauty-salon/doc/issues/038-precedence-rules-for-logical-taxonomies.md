@@ -1,24 +1,31 @@
-# precedence rules for logical taxonomies :[#094]
+# precedence rules for logical taxonomies :[#038]
 
-(NOTE there is some spurious confusion with this node and [#bs-028.B])
-
-# the purpose and scope of this document..
+## the purpose and scope of this document..
 
 ..is to present the concept of "node" and "taxonomy", and then the concept
 of "axis" on top of them. we then enumerate all known axes and then propose
 an order of precedence for those axes.
 
 
-# understanding the meaning of "node" in this context
+
+
+## understanding the meaning of "node" in this context
 
 the entire skylab universe fits under one toplevel ruby module called
 ::Skylab. all of its applications and in turn their support libraries
-("subsystems") live under this module, usually in a dedicated module directly
-under it. logically it makes one giant tree, a tree that we may refer to
-as the "skylab taxonomy".
+(both collectively referred to under the umbrella term "sidesystems")
+live directly under this module.
+
+(we dervied the term "sidesystem" from the term "subsystem", a term that
+we borrowed from Apple's Cocoa universe. we may occasionally use the two
+interachangeably here, but nowadays we try to use the term "sidesystem"
+exclusively.)
+
+logically this whole thing makes one giant tree, a tree that we may
+refer to as the "skylab taxonomy".
 
 so in the general case, when we speak of a "node" in the context of a skylab
-taxonomy we are spekaing of some ruby object that exists as a constant
+taxonomy we are speaking of some ruby object that exists as a constant
 somewhere in this tree of constants, whose rootmost node is the toplevel
 module Skylab.
 
@@ -37,10 +44,24 @@ graph theory and maybe even trees; and this frame of mind is useful when
 speaking of the skylab taxonomy for reasons we may explore below.
 
 
-# the axes enumerated
+
+
+## case study: how we store and represent "proxies"
+
+what we do with proxies is an interesting case study because we make
+proxies everwhere...
+
+
+
+
+(EDIT: content below the line is historical and has not yet been merged in.)
+
+-----
+
+## the axes enumerated
 
 in the skylab universe we will speak of "axes" (as in the plural of "axis",
-not "axe"). they may be though of as "aspects", probably always aspects for
+not "axe"). they may be thought of as "aspects", probably always aspects for
 nodes.
 
 one important axis that we touched on already above is that of "subsystem."

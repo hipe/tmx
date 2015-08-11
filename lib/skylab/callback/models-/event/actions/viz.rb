@@ -107,7 +107,7 @@ module Skylab::Callback
 
         __express_header y
 
-        _IO_pxy = IO_Proxy___.new do | o |
+        _IO_pxy = As_IO___.new do | o |
 
           o[ :receive_string ] = -> str do
 
@@ -155,7 +155,7 @@ module Skylab::Callback
         end
       end
 
-      class IO_Proxy___  # :+[#sy-026]
+      class As_IO___  # :+[#sy-026]
 
         def initialize
           yield self

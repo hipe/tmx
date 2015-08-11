@@ -7,10 +7,10 @@ module Skylab::Callback
       def try_convert x  # :+[#056]
 
         if x.respond_to? :each_index
-          Home_.lib_.list_lib.line_stream x
+          Home_.lib_.basic::List.line_stream x
 
         elsif x.respond_to? :read
-          Home_.lib_.IO_lib.line_stream x
+          Home_.lib_.system_lib::IO.line_stream x
 
         elsif x.respond_to? :each
           Home_.lib_.basic::Enumerator.line_stream x
@@ -29,10 +29,11 @@ module Skylab::Callback
     # aggregates other scanners, makes them behave as one sequence of scanners
     #
     #     self._TODO  # etc
+    #     lib = LIB_.basic::List
     #     scn = Home_::Scn.aggregate(
-    #         LIB_.list_lib.line_stream( [ :a, :b ] ),
-    #         LIB_.list_lib.line_stream( [] ),
-    #         LIB_.list_lib.line_stream( [ :c ] ) )
+    #         lib.line_stream( [ :a, :b ] ),
+    #         lib.line_stream( [] ),
+    #         lib.line_stream( [ :c ] ) )
     #
     #     scn.count  # => 0
     #     scn.gets  # => :a

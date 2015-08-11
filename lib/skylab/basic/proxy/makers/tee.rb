@@ -1,8 +1,8 @@
-module Skylab::Callback
+module Skylab::Basic
 
-  module Proxy
+  # ->
 
-    class Tee__ < ::BasicObject
+    class Proxy::Makers::Tee < ::BasicObject
 
       class << self
 
@@ -45,7 +45,7 @@ module Skylab::Callback
             end  # basic objects don't respond to `class`, basic objects don't care
 
             define_method :initialize do
-              @muxer = Muxer__.new desc_p
+              @muxer = Muxer___.new desc_p
             end
 
             _H_ = nil
@@ -102,7 +102,7 @@ module Skylab::Callback
         end
       end
 
-      class Muxer__ < Box
+      class Muxer___ < Callback_::Box
 
         def initialize desc_p
           super()
@@ -130,5 +130,5 @@ module Skylab::Callback
         end
       end
     end
-  end
+  # <-
 end

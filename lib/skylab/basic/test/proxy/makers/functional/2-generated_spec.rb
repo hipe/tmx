@@ -1,16 +1,18 @@
-require_relative 'test-support'
+require_relative '../../../test-support'
 
-module Skylab::Callback::TestSupport::Proxy::Functional
+module Skylab::Basic::TestSupport
 
-  describe "[ca] Proxy::Functional__" do
+  describe "[ba] proxy - makers - functional - 2. generated" do
+
+    extend TS_
 
     context "make a 'fuctional' proxy class with a list of member names" do
 
-      before :all do
-        My_Proxy = Subject_[].functional :foo, :baz
-      end
       it "build a proxy instance by passing it procs to implement the fields" do
-        pxy = My_Proxy.new :foo, -> x { "bar: #{ x }" },
+
+        _My_Proxy = Home_::Proxy::Makers::Functional.new :foo, :baz
+
+        pxy = _My_Proxy.new :foo, -> x { "bar: #{ x }" },
           :baz, -> { :BAZ }
 
         pxy.foo( :wee ).should eql "bar: wee"

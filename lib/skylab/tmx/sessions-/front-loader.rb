@@ -85,7 +85,7 @@ module Skylab::TMX
     def __build_helpscreen_reducer_for_sidesystem
 
       o = _begin_reducer
-      o.proxy_class = Enumerator_Yielder_Proxy___
+      o.proxy_class = String_Receiver_as_Enumerator_Yielder___
       o
     end
 
@@ -98,7 +98,7 @@ module Skylab::TMX
       o.use_section_in_descending_order_of_preference(
         :synopsis, :description, :usage )
 
-      o.proxy_class = LTLT_and_Puts_Proxy___
+      o.proxy_class = String_Receiver_as_Downstream_IO___
 
       o
     end
@@ -279,7 +279,7 @@ module Skylab::TMX
       end
     end
 
-    class Proxy__   # :+[#sy-026]
+    class String_Receiver__   # :+[#sy-026]
 
       def initialize
         yield self
@@ -299,7 +299,7 @@ module Skylab::TMX
       end.call
     end
 
-    class LTLT_and_Puts_Proxy___ < Proxy__
+    class String_Receiver_as_Downstream_IO___ < String_Receiver__
 
       def << s
         @__receive_string[ s ]
@@ -310,7 +310,7 @@ module Skylab::TMX
       end
     end
 
-    class Enumerator_Yielder_Proxy___ < Proxy__
+    class String_Receiver_as_Enumerator_Yielder___ < String_Receiver__
 
       def _same x
         @__receive_string[ x ]

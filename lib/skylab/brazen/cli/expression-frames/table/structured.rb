@@ -191,7 +191,7 @@ module Skylab::Brazen
               if edit_proc
 
                 x_a = nil
-                pxy = Pxy___.new do | * x_a_ |
+                pxy = Table_Field_Editor___.new do | * x_a_ |
                   x_a = x_a_
                   NIL_
                 end
@@ -209,7 +209,7 @@ module Skylab::Brazen
             x.to_s  # false OK, nil OK
           end
 
-          class Pxy___ < ::Proc
+          class Table_Field_Editor___ < ::Proc
             alias_method :edit_table_field, :call
           end
 

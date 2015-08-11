@@ -6,7 +6,7 @@ module Skylab::Brazen
 
       Output = ::Module.new
 
-      class Output::Trio_Box_Proxy
+      class Output::Actual_Values_as_Box
 
         def initialize argument_box, formals
           @argument_box = argument_box

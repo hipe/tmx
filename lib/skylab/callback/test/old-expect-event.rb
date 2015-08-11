@@ -74,7 +74,7 @@ module Skylab::Callback::TestSupport
         @event_proxy = @actual_index && bld_event_proxy
       end
       def bld_event_proxy
-        ep = Event_Proxy__.new @actual_index, @actual_a
+        ep = Event_as_Testable___.new @actual_index, @actual_a
         if @legacy_string_map_p
           s = ep.any_matchable_string
           if s
@@ -130,7 +130,7 @@ module Skylab::Callback::TestSupport
       end
     end
 
-    class Event_Proxy__
+    class Event_as_Testable___
       def initialize idx, act_a
         @index = idx ; @len = act_a.length
         @matchable_string_was_mutated = false

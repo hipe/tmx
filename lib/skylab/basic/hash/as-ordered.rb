@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  class Hash::Order_Proxy
+  class Hash::As_Ordered
 
     # it acts sort of like a hash, but one that internally tracks the
     # order of every `aset` call (add or update) for dark hacks

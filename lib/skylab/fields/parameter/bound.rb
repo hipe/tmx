@@ -39,8 +39,6 @@ module Skylab::Fields
 
     Here_::Definer[ self ]
 
-    def self.[](param) ; Enumerator___::Proxy.new(param) end
-
     def initialize host_instance
       super() { |y| init ; visit(y) }
       @mixed = host_instance

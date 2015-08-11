@@ -1,27 +1,14 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Callback::TestSupport::Proxy::Inline
+module Skylab::Basic::TestSupport
 
-  ::Skylab::Callback::TestSupport::Proxy[ self ]
+  describe "[ba] proxy - inline - generated" do
 
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  Home_ = Home_
-
-  Subject_ = -> * x_a, & p do
-    if x_a.length.nonzero? || p
-      Home_::Proxy::Inline__[ * x_a, & p ]
-    else
-      Home_::Proxy::Inline__
-    end
-  end
-
-  describe "[ca] Proxy::Inline__" do
+    extend TS_
 
     it "produce a proxy \"inline\" from a hash-like whose values are procs" do
-      pxy = Subject_.call(
+
+      pxy = Home_::Proxy::Inline.new(
         :foo, -> x { "bar: #{ x }" },
         :biz, -> { :baz } )
 

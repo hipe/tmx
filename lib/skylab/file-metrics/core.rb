@@ -43,10 +43,6 @@ module Skylab::FileMetrics
 
     Parse = sidesys[ :Parse ]
 
-    Proxy_lib = -> do
-      Callback_::Proxy
-    end
-
     Reverse_string_scanner = -> s do
       Basic[]::String.line_stream.reverse s
     end

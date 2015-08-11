@@ -2,7 +2,7 @@ module Skylab::Callback
 
   class Stream
 
-    class Mutable_with_Random_Access__  # abstract base class
+    class As_::Mutable_with_Random_Access  # abstract base class
 
       def initialize upstream_proc, name_method_i
         @name_method_i = name_method_i

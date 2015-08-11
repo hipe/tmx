@@ -47,10 +47,6 @@ module Skylab::Callback::TestSupport
     def basic
       Home_.lib_.basic
     end
-
-    def list_lib
-      basic::List
-    end
   end
 
   # ~ singles

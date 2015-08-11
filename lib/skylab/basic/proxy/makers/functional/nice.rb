@@ -1,10 +1,10 @@
-module Skylab::Callback
+module Skylab::Basic
 
-  module Proxy
+  # ->
 
-    class Functional__
+    class Proxy::Makers::Functional
 
-      class Nice__ < self
+      class Nice < self
 
         # as "functional" but has a ready-made implementations for `class`
         # and `inspect` (which both reveal this to be a proxy and not the
@@ -16,9 +16,9 @@ module Skylab::Callback
 
         class << self
 
-          def call_via_arglist a, & convenience_p
+          def new * a, & convenience_p
 
-            cls = super( a, & nil )
+            cls = make_ a
 
             cls.send :define_singleton_method, :new do | * x_a |
 
@@ -33,7 +33,7 @@ module Skylab::Callback
                 arglist[ bx.index( i ) ] = p
               end
 
-              o = super( * arglist )
+              o = orig_new_( * arglist )  # ick
 
               _CLASS = self
 
@@ -63,5 +63,5 @@ module Skylab::Callback
         end
       end
     end
-  end
+  # <-
 end

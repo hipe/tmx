@@ -2,7 +2,7 @@ module Skylab::Callback
 
   class Stream
 
-    class Immutable_with_Random_Access__
+    class As_::Immutable_with_Random_Access
 
       class << self
 
@@ -122,7 +122,7 @@ module Skylab::Callback
 
       def to_new_mutable_box_like_proxy
         @done or flush
-        Home_::Stream::Mutable_Box_Like_Proxy.new @a.dup, @h.dup
+        Home_::Stream::As_Mutable_Box.new @a.dup, @h.dup
       end
 
       def length

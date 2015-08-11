@@ -1,8 +1,8 @@
-module Skylab::Callback
+module Skylab::Basic
 
-  module Proxy
+  # ->
 
-    class Functional__ < ::BasicObject
+    class Proxy::Makers::Functional < ::BasicObject
 
       # make a 'fuctional' proxy class with a list of member names:
       #
@@ -21,14 +21,23 @@ module Skylab::Callback
       #     pxy.baz  # => :BAZ
 
       class << self
-        def call_via_arglist a, & p
-          Actor__[ a, p, self ]
+
+        alias_method :orig_new_, :new
+
+        def new * a, & p
+          cls = make_ a, & p
+          cls.singleton_class.send :alias_method, :new, :orig_new_
+          cls
         end
-      end
 
-      class Actor__
+        def make_ a, & p
+          Make___[ a, p, self ]
+        end
+      end  # >>
 
-        Home_::Actor.call self, :properties,
+      class Make___
+
+        Callback_::Actor.call self, :properties,
           :i_a, :p, :base_class
 
         def execute
@@ -42,12 +51,13 @@ module Skylab::Callback
       private
 
         def begin_class
-          @class = ::Class.new @base_class ; nil
+          @class = ::Class.new @base_class
+          NIL_
         end
 
         def resolve_box
           resolve_members
-          @box = Home_::Box.new
+          @box = Callback_::Box.new
           @member_i_a.each do |i|
             @box.add i, i
           end
@@ -70,13 +80,13 @@ module Skylab::Callback
               @__proxy_kernel__.method_proc( sym )[ * a, & p ]
             end
           end
-          nil
+          NIL_
         end
       end
 
       CONST_ = :FUNCTIONAL_PROXY_PROPERTY_BOX__
 
-      const_set CONST_, Home_::Box.the_empty_box
+      const_set CONST_, Callback_::Box.the_empty_box
 
       def initialize * x_a
         @__proxy_kernel__ = Kernel_.new __functional_proxy_property_box__
@@ -117,7 +127,7 @@ module Skylab::Callback
         end
 
         def resolve_pairs_scan_via_arglist p_a
-          @pairs_scan = Home_::Stream.via_times( p_a.length ) do |d|
+          @pairs_scan = Callback_::Stream.via_times( p_a.length ) do |d|
             [ @box.at_position( d ), p_a.fetch( d ) ]
           end ; nil
         end
@@ -141,5 +151,5 @@ module Skylab::Callback
         end
       end
     end
-  end
+  # <-
 end

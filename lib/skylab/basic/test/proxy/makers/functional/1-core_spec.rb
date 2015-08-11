@@ -1,21 +1,20 @@
-require_relative 'test-support'
+require_relative '../../../test-support'
 
-module Skylab::Callback::TestSupport::Proxy
+module Skylab::Basic::TestSupport
 
-  describe "[ca] proxy - functional" do
+  describe "[ba] proxy - makers - functional" do
+
+    extend TS_
 
     context "one." do
 
-      before :all do
-        Pxy::One = Subject_[].functional :foo, :bar
-      end
-
       it "makes" do
+        _class
       end
 
       it "build a proxy from proxy class with a hash" do
 
-        pxy = Pxy::One.new foo: -> x { "#{ pee }-#{ x }-#{ dee }" },
+        pxy = _class.new foo: -> x { "#{ pee }-#{ x }-#{ dee }" },
                            bar: -> { @dee_meyers }
         @dee_meyers = 'who'
 
@@ -24,7 +23,7 @@ module Skylab::Callback::TestSupport::Proxy
       end
 
       it "build it from a literal iambic" do
-        pxy = Pxy::One.new :foo, -> { :A }, :bar, -> { @b }
+        pxy = _class.new :foo, -> { :A }, :bar, -> { @b }
         @b = :B
         pxy.foo.should eql :A
         pxy.bar.should eql :B
@@ -38,44 +37,52 @@ module Skylab::Callback::TestSupport::Proxy
         @dee_meyers
       end
 
+      dangerous_memoize_ :_class do
+        Pxy_Fnctnl_01_01 = _subject :foo, :bar
+      end
     end
 
     context "two." do
 
-      before :all do
-        Pxy::Two = Subject_[].functional :zerpie, :derkie, :tata do
-          def hi
-            :"__#{ hello }__"
-          end
-        end
-
-        class Pxy::Two
-          def hello
-            :hej
-          end
-        end
-      end
-
       it "raises key error on extra" do
         _rx = /\Akey not found: :murphy/
         -> do
-          Pxy::Two.new :murphy, :bed
+          _class.new :murphy, :bed
         end.should raise_error ::KeyError, _rx
       end
 
       it "raises argument error on missing" do
         _rx = /\Amissing required proxy function definition\(s\): \(derkie, tata\)\z/
         -> do
-          Pxy::Two.new zerpie: :herpie
+          _class.new zerpie: :herpie
         end.should raise_error ::ArgumentError, _rx
       end
 
       it "you can add more stuff in an arbitrary definition block" do
-        pxy = Pxy::Two.new :zerpie, nil, :derkie, nil, :tata, nil
+        pxy = _class.new :zerpie, nil, :derkie, nil, :tata, nil
         pxy.hi.should eql :__hej__
+      end
+
+      dangerous_memoize_ :_class do
+
+        Pxy_Fnctnl_01_02 = _subject :zerpie, :derkie, :tata do
+          def hi
+            :"__#{ hello }__"
+          end
+        end
+
+        class Pxy_Fnctnl_01_02
+          def hello
+            :hej
+          end
+          self
+        end
       end
     end
 
-    Pxy = ::Module.new
+    def _subject * sym_a, & edit_p
+
+      Home_::Proxy::Makers::Functional.new( * sym_a, & edit_p )
+    end
   end
 end

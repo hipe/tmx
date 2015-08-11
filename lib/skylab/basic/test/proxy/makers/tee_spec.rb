@@ -1,32 +1,16 @@
-require_relative 'test-support.rb'
+require_relative '../../test-support'
 
-module Skylab::Callback::TestSupport::Proxy::Tee
+module Skylab::Basic::TestSupport
 
-  ::Skylab::Callback::TestSupport::Proxy[ TS_ = self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
-
-end
-
-module Skylab::Callback::TestSupport::Proxy::Tee
-
-  describe "[ca] proxy tee" do
+  describe "[ba] proxy - makers - tee" do
 
     extend TS_
 
     context "let's construct a tee for the methods `push` and `shift`" do
 
-      before :all do
-
-        One = Subject_[].new :push, :shift
-
-      end
-
       it "send it a messsage not in the list - raises" do
 
-        tee  = build_tee_instance
+        tee = build_tee_instance
 
         -> do
           tee.class
@@ -70,12 +54,12 @@ module Skylab::Callback::TestSupport::Proxy::Tee
       end
 
       def build_tee_instance
-        One.new
+        __class.new
       end
-    end
 
-    Subject_ = -> do
-      Home_::Proxy.tee
+      dangerous_memoize_ :__class do
+        TS_::Prxy_Makers_Tee_01 = Home_::Proxy::Makers::Tee.new :push, :shift
+      end
     end
   end
 end

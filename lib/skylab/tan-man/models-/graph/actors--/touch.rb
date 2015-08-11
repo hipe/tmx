@@ -233,8 +233,8 @@ module Skylab::TanMan
 
         def execute
 
-          @value_fetcher =
-            Template_Values_Fetch_Proxy___.new( @template_values_provider )
+          @value_fetcher = Template_Value_Provider_as_Fetcher___.
+            new( @template_values_provider )
 
           _x = __via_workspace_expect_lines
           _x || __any_lines
@@ -268,7 +268,7 @@ module Skylab::TanMan
         end
       end
 
-      class Template_Values_Fetch_Proxy___ < ::BasicObject
+      class Template_Value_Provider_as_Fetcher___ < ::BasicObject
 
         def initialize o
           @provider = o

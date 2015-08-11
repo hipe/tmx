@@ -11,15 +11,15 @@ module Skylab::Callback
       end
 
       def immutable_with_random_access
-        Stream_::Immutable_with_Random_Access__
+        Stream_::As_::Immutable_with_Random_Access
       end
 
       def mutable_with_random_access
-        Stream_::Mutable_with_Random_Access__
+        Stream_::As_::Mutable_with_Random_Access
       end
 
       def ordered st
-        Stream_::Ordered__[ st ]
+        Stream_::Actors_::Order[ st ]
       end
 
       def stream_class
@@ -293,17 +293,17 @@ module Skylab::Callback
 
     def flush_to_immutable_with_random_access_keyed_to_method i, * x_a
 
-      Stream_::Immutable_with_Random_Access__.new self, i, x_a
+      Stream_::As_::Immutable_with_Random_Access.new self, i, x_a
     end
 
     def flush_to_mutable_box_like_proxy_keyed_to_method sym
 
-      Stream_::Mutable_Box_Like_Proxy.via_flushable_stream__ self, sym
+      Stream_::As_Mutable_Box.via_flushable_stream__ self, sym
     end
 
     def flush_to_polymorphic_stream
 
-      Stream_::Polymorphic___.new self
+      Stream_::As_::Polymorphic.new self
     end
 
     # ~ result in structures of greater constitency
@@ -400,7 +400,7 @@ module Skylab::Callback
       self.class.new @upstream, & p
     end
 
-    class Release_Resource_Proxy < ::Proc
+    class Resource_Releaser < ::Proc
 
       alias_method :release_resource, :call
     end
