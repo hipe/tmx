@@ -80,3 +80,63 @@ based on whether debugging is on or off at that moment.
 ## advantages that this holds over simpler alternatives ..
 
 .. are discussed in [#020] IO spy aggregations compared ..
+
+
+
+
+## "frame technique" :[#.A]
+
+the "frame technique" is a way to break what would otherwise be a
+too-large test into smaller tests.
+
+this is an older techinque that we have baked in support for because it
+could stand to bring some improvement to tests generally. a "frame" is a
+simple, frozen structure representing all the details of an "invocation"
+you might be interesting in testing against. its shape is specific to the
+mechanism being tested.
+
+by "invocation" we mean something that has various by-products: there
+may be not only the result returned from the invocation method when it
+was called, but also things like events emitted, or resources written to
+during same.
+
+these by-products may have too much detail to be tested reasonably in one
+test. we say such a test suffers from poor "granularity". a frame is a
+frozen grouping of these by-products so that they may each be asserted
+against separately, perhaps in different tests, so that a reasonable
+level of granularity is reached.
+
+
+
+
+### implementation
+
+we typically implement frame technique using group contexts: the testing
+library's facility of grouping tests (implemented as a module in the
+platform, achieved by using the method called `context`).
+
+we say *group* here to distinguish this from the *test* context, which
+is the instance that tests are run againt (one per test).
+
+the frame is defined one-per-group-context and is effectively memoized to
+be shared within that context: whichever test in the group context is run
+first will be *the* test to build the frame (and note there is danger in
+this: you don't want the frame to carry any volatile data that was
+associated with the testing instance context (which is one per test)).
+
+subsequent tests in this same group context will use the *selfsame
+instance* of that frame that the first test used. it is strongly
+recommended that frames be frozen (to a correct depth), to avoid
+accidental mutation of the frame by one test that would affect another.
+
+
+
+
+### alternatives
+
+the alternative to frame techinque is not to use it, while preserving
+the desired level of test granularity: this means to call the same
+invocation with the same arguments multiple times, one for each test in
+a would-be group context. the overhead of doing so must be weighed against
+the overhead (cognitive and othewise) of using frame technique.
+_

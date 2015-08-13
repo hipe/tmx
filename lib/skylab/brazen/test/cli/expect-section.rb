@@ -122,6 +122,10 @@ module Skylab::Brazen::TestSupport::CLI
         @line = s
       end
 
+      def blank?
+        @has_no_content
+      end
+
       attr_reader :children, :has_no_content, :line, :margin_length
 
       def get_column_A_content

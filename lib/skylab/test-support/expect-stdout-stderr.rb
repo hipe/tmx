@@ -376,6 +376,17 @@ module Skylab::TestSupport
         true
       end
 
+      def flush_frozen_frame_from_expect_stdout_stderr  # for [#.A] frame tech.
+
+        gr = remove_instance_variable :@IO_spy_group_for_expect_stdout_stderr
+        gr.freeze
+
+        fr = Frozen_Frame___.new(
+          remove_instance_variable( :@exitstatus ),
+          gr )
+        fr.freeze
+      end
+
       def flush_baked_emission_array  # :+#hook-near #universal
 
         sg = remove_instance_variable :@IO_spy_group_for_expect_stdout_stderr
@@ -386,6 +397,8 @@ module Skylab::TestSupport
 
       attr_reader :__sout_serr_default_stream_symbol__
     end
+
+    Frozen_Frame___ = ::Struct.new :exitstatus, :IO_spy_group
 
     Callback_ = ::Skylab::Callback
 

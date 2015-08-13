@@ -3,9 +3,38 @@ module Skylab::TestSupport
   class IO::Spy__::Group__  # read the related [#023] IO spy composite..narrative
 
     def initialize
+
       @debug = @debug_IO = nil
-      @line_a = [ ] ; @line_map_p_a = nil
-      @k_a = [] ; @stream_h = { } ; nil
+      @line_a = []
+      @line_map_p_a = nil
+      @k_a = []
+      @stream_h = {}
+    end
+
+    def freeze
+      @line_a.freeze
+      a = @line_map_p_a
+      a and a.freeze
+      @k_a.freeze
+      @stream_h = :__DONE__
+      super
+    end
+
+    def dup  # for [#.A] "frame techinque"
+      a = @line_a
+      if ! a.frozen?
+        a = a.dup
+      end
+      Mutable_Dup___.new a
+    end
+
+    class Mutable_Dup___
+      def initialize a
+        @line_a = a
+      end
+      def release_lines
+        remove_instance_variable :@line_a
+      end
     end
 
     attr_reader :debug
