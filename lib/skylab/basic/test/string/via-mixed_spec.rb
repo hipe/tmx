@@ -1,8 +1,11 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Basic::TestSupport::String
+module Skylab::Basic::TestSupport
 
-  describe "[ba] \"strange\" (the summarization-aware `inspect`-ish)" do
+  describe "[ba] string - `via_mixed`" do
+
+    extend TS_
+    use :string
 
     it "a string 9 chars wide gets quoted and becomes 11 wide" do
       expect_quotes 'nine_char'
@@ -33,7 +36,7 @@ module Skylab::Basic::TestSupport::String
     end
 
     def subject s
-      Home_::String.via_mixed s
+      subject_module_.via_mixed s
     end
   end
 end

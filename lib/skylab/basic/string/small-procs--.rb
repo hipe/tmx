@@ -21,6 +21,45 @@ module Skylab::Basic
       end
     end
 
+      Build_reverse_scanner = -> string, byte do
+
+        end_ = string.length
+        if end_.zero?
+          Callback_::Scn.the_empty_stream
+        else
+          Callback_::Scn.new do
+            case 0 <=> end_
+            when -1
+              begin_ = end_ - 1
+              begin
+                _is = byte == string.getbyte( begin_ )
+                if _is
+
+                  x = string[ ( begin_ + 1 ) ... end_ ]
+                  end_ = begin_
+                  break
+                end
+
+                if begin_.zero?  # happens only w/ "relative" looking strings
+                  x = string[ 0 ... end_ ]
+                  end_ = -1
+                  break
+                end
+
+                begin_ -= 1
+                redo
+              end while nil
+              x
+            when 0
+              end_ = -1
+              EMPTY_S_
+            when 1
+              NIL_
+            end
+          end
+        end
+      end
+
       Looks_like_sentence = -> do
 
         _RX = /[.?!]\z/

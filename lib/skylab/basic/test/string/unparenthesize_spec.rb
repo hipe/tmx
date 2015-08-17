@@ -1,11 +1,14 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Basic::TestSupport::String
+module Skylab::Basic::TestSupport
 
-  describe "[ba] string unparenthesize (and core)" do
+  describe "[ba] string - `unparenthesize` (& core) " do
+
+    extend TS_
+    use :string
 
     it "loads" do
-      Home_::String
+      subject_module_
     end
 
     it 'empty string - no match' do
@@ -34,7 +37,7 @@ module Skylab::Basic::TestSupport::String
     end
 
     def subject s
-      md = Home_::String.unparenthesize_message_string::UNPARENTHESIZE_RX__.match s
+      md = subject_module_.unparenthesize_message_string::UNPARENTHESIZE_RX__.match s
       if md
         [ md[ :open ], md[ :body ], md[ :close ] ]  # not 'captures'
       end

@@ -1,8 +1,11 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Basic::TestSupport::String
+module Skylab::Basic::TestSupport
 
-  describe "[ba] string template" do
+  describe "[ba] string - template" do
+
+    extend TS_
+    use :string
 
     it "loads" do
       subject
@@ -86,7 +89,7 @@ module Skylab::Basic::TestSupport::String
     end
 
     def subject
-      Home_::String.template
+      subject_module_.template
     end
   end
 end

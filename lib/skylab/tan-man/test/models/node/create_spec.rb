@@ -48,7 +48,7 @@ module Skylab::TanMan::TestSupport::Models::Node
       add_name_to_string 'menengitis', s
       expect_OK_event :created_node do |ev|
         ev_ = ev.to_event
-        a = ev_.tag_names
+        a = ev_.members
         a.should be_include :ok
         a.should be_include :node_stmt
         ev_.node_stmt.label.should eql 'menengitis'

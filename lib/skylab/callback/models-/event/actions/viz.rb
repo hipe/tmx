@@ -107,7 +107,7 @@ module Skylab::Callback
 
         __express_header y
 
-        _IO_pxy = As_IO___.new do | o |
+        _IO_pxy = Home_.lib_.basic::String::Receiver::As_IO.new do | o |
 
           o[ :receive_string ] = -> str do
 
@@ -152,41 +152,6 @@ module Skylab::Callback
           self._NEVER_SEE
         else
           ACHIEVED_
-        end
-      end
-
-      class As_IO___  # :+[#sy-026]
-
-        def initialize
-          yield self
-          freeze
-        end
-
-        define_method :[]=, -> do
-
-          h = {
-            :receive_line_args => :"@__receive_line_args",
-            :receive_string => :"@_receive_string",
-          }
-
-          -> k, p do
-            instance_variable_set h.fetch( k ), p
-          end
-        end.call
-
-        def << s
-          @_receive_string[ s ]
-          self
-        end
-
-        def puts * line_a
-          @__receive_line_args[ line_a ]
-          NIL_
-        end
-
-        def write s
-          @_receive_string[ s ]
-          s.length
         end
       end
 

@@ -69,6 +69,24 @@ module Skylab::Callback
           }#{ 0 .. self.class::IVAR_A__.length } )"
       end
 
+      # ~ look like a common event
+
+      def to_stream_of_lines_rendered_under expag  # :+[#ca-064] imagine threads
+
+        _y = express_into_under [], expag
+        Home_::Stream.via_nonsparse_array _y
+      end
+
+      def to_event
+        self
+      end
+
+      def terminal_channel_i
+
+        @___tci ||= Home_::Name.via_module_name( self.class.name ).
+          as_lowercase_with_underscores_symbol
+      end
+
       # ~ if you have a message proc:
 
       def express_into_under y, expag
@@ -96,6 +114,8 @@ module Skylab::Callback
       def __say_no_message_proc
         "no message proc defined for #{ self.class }"
       end
+
+
     end
   end
 end

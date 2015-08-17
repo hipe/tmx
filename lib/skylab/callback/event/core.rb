@@ -163,6 +163,10 @@ module Skylab::Callback
 
     public
 
+      def terminal_channel_symbol
+        terminal_channel_i
+      end
+
       attr_reader :message_proc, :terminal_channel_i
 
       def verb_lexeme
@@ -252,19 +256,11 @@ module Skylab::Callback
         formal_properties.has_name sym
       end
 
-      def first_tag_name
+      def first_member
         formal_properties.first_name
       end
 
       def members  # :+[#061]
-        get_tag_names
-      end
-
-      def tag_names
-        get_tag_names
-      end
-
-      def get_tag_names
         formal_properties.get_names
       end
 
@@ -307,7 +303,7 @@ module Skylab::Callback
         N_Lines.new_via_four( y, d, [ message_proc ], expag ).execute self
       end
 
-      def to_stream_of_lines_rendered_under expag  # (imagine threads)
+      def to_stream_of_lines_rendered_under expag  # :+[#064] imagine threads
         s_a = []
         y = ::Enumerator::Yielder.new do |s|
           s_a.push s
@@ -437,7 +433,7 @@ module Skylab::Callback
         VERB_RX__ = /\A(?:already|cannot|does|has|is)\z/  # etc as needed
 
         def rslv_item_x_from_first_tag
-          i = @o.first_tag_name
+          i = @o.first_member
           if i && :ok != i  # ick
             @has_first_tag = true
             @first_tag_i = i

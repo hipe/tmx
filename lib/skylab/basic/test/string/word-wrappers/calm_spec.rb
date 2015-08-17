@@ -1,8 +1,11 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::Basic::TestSupport::String
+module Skylab::Basic::TestSupport
 
   describe "[ba] string - word wrappers - calm" do
+
+    extend TS_
+    use :string
 
     it "loads" do
 
@@ -119,6 +122,8 @@ module Skylab::Basic::TestSupport::String
       )
     end
 
+    _SPACE = ' '  # SPACE_
+
     it "target edge case, the catalyst of the most recent rewrite" do
 
       a = _subject.with(
@@ -127,7 +132,7 @@ module Skylab::Basic::TestSupport::String
         :input_string, '#nepo 0b_ 1___ 1b__ 2___ 2b___',
         :skip_margin_on_first_line,
         :first_line_margin_width, 7,
-        :margin, ( SPACE_ * 13 ),
+        :margin, ( _SPACE * 13 ),
         :width, 30,
         :downstream_yielder, []
       )
@@ -142,7 +147,7 @@ module Skylab::Basic::TestSupport::String
     end
 
     def _subject
-      Home_::String.word_wrappers.calm
+      subject_module_.word_wrappers.calm
     end
   end
 end

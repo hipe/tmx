@@ -3,7 +3,7 @@ module Skylab::System
   module IO
 
     Line_Scanner__ = Callback_::Session::Ivars_with_Procs_as_Methods.new(
-      :count, :gets, :line_number )
+      :count, :gets, :lineno )
 
     class Line_Scanner__  # read [#164]
 
@@ -58,7 +58,7 @@ module Skylab::System
         # ~ auxiliary service methods
         @count = -> { count }
         @fh = fh  # in case you want to close it yourself (if from Path)
-        @line_number = -> do
+        @lineno = -> do
           count.nonzero?
         end
         @pathname = ( ::Pathname.new( fh.path ) if fh.respond_to?( :path ) )

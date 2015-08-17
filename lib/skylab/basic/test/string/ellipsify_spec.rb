@@ -1,8 +1,11 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Basic::TestSupport::String
+module Skylab::Basic::TestSupport
 
-  describe "[ba] string math ellipsify" do
+  describe "[ba] string - math ellipsify" do
+
+    extend TS_
+    use :string
 
     it "loads" do
       subject
@@ -92,8 +95,6 @@ module Skylab::Basic::TestSupport::String
       end
     end
 
-    def subject
-      Home_::String
-    end
+    alias_method :subject, :subject_module_
   end
 end

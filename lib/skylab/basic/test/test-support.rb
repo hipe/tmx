@@ -72,6 +72,12 @@ module Skylab::Basic
       Home_::Callback_.test_support::Expect_Event[ test_context_class ]
     end
 
+    String = -> tcc do  # :+#stowaway
+      tcc.send :define_method, :subject_module_ do
+        Home_::String
+      end
+    end
+
     Home_ = ::Skylab::Basic
     Callback_ = Home_::Callback_
     EMPTY_A_ = Home_::EMPTY_A_

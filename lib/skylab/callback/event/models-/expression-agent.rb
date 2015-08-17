@@ -48,8 +48,24 @@ module Skylab::Callback
         end
 
         def dsc_x x
-          if x.respond_to? :description
-            x.description
+
+          if x
+            if x.respond_to? :description
+              x.description
+
+            elsif x.respond_to? :id2name
+              x.inspect
+
+            elsif x.respond_to? :each_with_index
+              x.inspect
+
+            elsif x.respond_to? :ascii_only?
+              x.inspect
+
+            else
+              # Home_.lib_.basic::String.via_mixed x
+              x.to_s
+            end
           else
             x.inspect
           end

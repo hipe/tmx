@@ -78,7 +78,7 @@ module Skylab::Brazen
             }#{ par prp }" } for help on that action."
         end
 
-        SUCCESS_EXITSTATUS_
+        SUCCESS_EXITSTATUS
       end
     end
   end

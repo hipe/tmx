@@ -98,7 +98,7 @@ module Skylab::TMX
       o.use_section_in_descending_order_of_preference(
         :synopsis, :description, :usage )
 
-      o.proxy_class = String_Receiver_as_Downstream_IO___
+      o.proxy_class = Home_.lib_.basic::String::Receiver::As_IO
 
       o
     end
@@ -279,41 +279,10 @@ module Skylab::TMX
       end
     end
 
-    class String_Receiver__   # :+[#sy-026]
-
-      def initialize
-        yield self
-        freeze
-      end
-
-      define_method :[]=, -> do
-
-        h = {
-          :receive_line_args => :"@__receive_line_args",
-          :receive_string => :"@__receive_string",
-        }
-
-        -> k, p do
-          instance_variable_set h.fetch( k ), p
-        end
-      end.call
-    end
-
-    class String_Receiver_as_Downstream_IO___ < String_Receiver__
-
-      def << s
-        @__receive_string[ s ]
-      end
-
-      def puts * line_a
-        @__receive_line_args[ line_a ]
-      end
-    end
-
-    class String_Receiver_as_Enumerator_Yielder___ < String_Receiver__
+    class String_Receiver_as_Enumerator_Yielder___ < Home_.lib_.basic::String::Receiver
 
       def _same x
-        @__receive_string[ x ]
+        @receive_string[ x ]
         self
       end
 

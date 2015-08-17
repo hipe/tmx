@@ -1,8 +1,11 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Basic::TestSupport::String
+module Skylab::Basic::TestSupport
 
   describe "[ba] string - succ" do
+
+    extend TS_
+    use :string
 
     it "minimal" do
       p = subject
@@ -75,7 +78,7 @@ module Skylab::Basic::TestSupport::String
     end
 
     def subject * x_a
-      Home_::String::Succ__.call_via_iambic x_a
+      subject_module_::Succ__.call_via_iambic x_a
     end
   end
 end

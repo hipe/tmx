@@ -1,8 +1,11 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Basic::TestSupport::String
+module Skylab::Basic::TestSupport
 
   describe "[ba] string - fit to aspect ratio" do
+
+    extend TS_
+    use :string
 
     it "target aspect ratio of 2:3 against 4 pairs" do
 
@@ -84,7 +87,7 @@ module Skylab::Basic::TestSupport::String
     end
 
     def _subject
-      Home_::String.word_wrappers.calm
+      subject_module_.word_wrappers.calm
     end
   end
 end

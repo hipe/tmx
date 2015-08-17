@@ -20,7 +20,7 @@ module Skylab::Git
     class Really_Basic_CLI_Client__
 
       def initialize sin, sout, serr
-        @exit_status = ERROR_CODE_
+        @exitstatus = ERROR_CODE_
         @stderr_IO = serr
         @y = ::Enumerator::Yielder.new( & serr.method( :puts ) )
       end
@@ -34,7 +34,7 @@ module Skylab::Git
         ok &&= parse_opts
         ok &&= parse_args
         ok &&= ( build_API_action.execute or invite )
-        ok ? 0 : @exit_status
+        ok ? 0 : @exitstatus
       end
       def parse_opts
         build_option_parser.parse! @argv
@@ -179,7 +179,7 @@ module Skylab::Git
         w << BREAK__ ; w.flush
         @y << say { "#{ hdr 'options:' }" }
         op.summarize @y
-        @do_procede = false ; @exit_status = 0
+        @do_procede = false ; @exitstatus = 0
       end ; BREAK__ = ''.freeze
 
       def usage_string

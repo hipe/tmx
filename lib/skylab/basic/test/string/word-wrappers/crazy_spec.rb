@@ -1,8 +1,11 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::Basic::TestSupport::String
+module Skylab::Basic::TestSupport
 
   describe "[ba] string - word wrappers - crazy" do
+
+    extend TS_
+    use :string
 
     it "loads" do
 
@@ -19,7 +22,7 @@ module Skylab::Basic::TestSupport::String
     end
 
     def _subject
-      Home_::String.word_wrappers.crazy
+      subject_module_.word_wrappers.crazy
     end
   end
 end

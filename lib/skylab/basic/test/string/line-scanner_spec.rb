@@ -1,8 +1,11 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Basic::TestSupport::String
+module Skylab::Basic::TestSupport
 
   describe "[ba] list scanner for string" do
+
+    extend TS_
+    use :string
 
     it "loads" do
       subject
@@ -85,9 +88,9 @@ module Skylab::Basic::TestSupport::String
 
     def subject( * a )
       if a.length.zero?
-        Home_::String.line_stream
+        subject_module_.line_stream
       else
-        Home_::String.line_stream( * a )
+        subject_module_.line_stream( * a )
       end
     end
 

@@ -1,3 +1,4 @@
+[#038]       precedence rules for logical taxonomies ..
 [#037]       n.c for filenames ..
 [#036]       historic ascii graph (in directory [#034])
 [#035]       #historic the shell and kernel name convetions ..

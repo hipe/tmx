@@ -11,7 +11,7 @@ module Skylab::Callback
       _Params = ::Struct.new :edit_class, :on_args_to_method_called_new
 
       _HM = -> sym do
-        members.inlude? sym
+        members.include? sym
       end
 
       _TAM = -> do

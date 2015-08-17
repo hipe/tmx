@@ -579,7 +579,7 @@ module Skylab::Callback::TestSupport
       def _render_data_head
         "#{ @comment }#{ __OK_s }#{
          } #{ @ev.terminal_channel_i }#{
-          } (#{ @ev.tag_names * ', ' })"
+          } (#{ @ev.members * ', ' })"
       end
 
       def __OK_s

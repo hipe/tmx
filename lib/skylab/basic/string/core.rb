@@ -106,6 +106,10 @@ module Skylab::Basic
       end
       LINE_RX__  = / [^\r\n]* \r? \n  |  [^\r\n]+ \r? \n? /x
 
+      def reverse_scanner string, d
+        String_::Small_Procs__::Build_reverse_scanner[ string, d ]
+      end
+
       def shortest_unique_or_first_headstrings a
         h = nil
         Home_::Hash.determine_hotstrings( a ).each_with_index.map do | hs, d |
@@ -123,7 +127,7 @@ module Skylab::Basic
       end
 
       def template
-        String::Template__
+        String_::Template__
       end
 
       def unparenthesize_message_string * a
@@ -163,10 +167,48 @@ module Skylab::Basic
       Autoloader_[ self ]
     end
 
+    class Receiver
+
+      # (a base class to make proxies that receive strings)
+
+      def initialize
+        yield self
+        freeze
+      end
+
+      define_method :[]=, -> do
+
+        h = {
+          :receive_line_args => :"@receive_line_args",
+          :receive_string => :"@receive_string",
+        }
+
+        -> k, p do
+          instance_variable_set h.fetch( k ), p
+        end
+      end.call
+    end
+
+    class Receiver::As_IO < Receiver
+
+      def << s
+        @receive_string[ s ]
+        self
+      end
+
+      def puts * line_a
+        @receive_line_args[ line_a ]
+        NIL_
+      end
+
+      def write s
+        @receive_string[ s ]
+        s.length
+      end
+    end
+
     EMPTY_S_ = ''.freeze
-
     NEWLINE_ = "\n".freeze
-
     String_ = self
   end
 end

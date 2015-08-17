@@ -14,6 +14,11 @@ module Skylab::Basic
       @_client = inst
     end
 
+    def clear
+      @_queue.clear
+      self
+    end
+
     def accept_by & p
 
       d = ( a = ( @_receivers ||= [] ) ).length

@@ -101,7 +101,7 @@ module Skylab::Brazen
           s = s.to_path
         end
         if FILE_SEPARATOR_BYTE_ == s.getbyte( 0 )
-          self.class::Pretty_Path__[ s ]
+          CLI::Expression_Agent::Pretty_Path__[ s ]
         else
           s
         end

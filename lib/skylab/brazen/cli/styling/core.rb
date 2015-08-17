@@ -161,6 +161,10 @@ module Skylab::Brazen
       end.call bx
       bx = nil
 
+      def self.code_name_symbol_array  # [css], uncovered
+        COLORS__
+      end
+
       # ~ implementation
 
       bx = Callback_::Box.new
@@ -168,10 +172,8 @@ module Skylab::Brazen
       bx.add :reverse, 7
       a = bx.a_ ; h = bx.h_
 
-      [ :red, :green, :yellow, :blue, :purple, :cyan, :white ].
-
-          each_with_index do | sym, d |
-
+      COLORS__ = [ :red, :green, :yellow, :blue, :purple, :cyan, :white ]
+      COLORS__.each_with_index do | sym, d |
         a.push sym
         h[ sym ] = ( d + 31 )  # ASCII escape sequences, red = 31
       end

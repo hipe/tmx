@@ -185,7 +185,7 @@ module Skylab::System
         if path
           @path_arg = Callback_::Qualified_Knownness.via_x_and_i path, :path
         else
-          self._COVER_ME
+          self._COVER_ME_path_argument_was_falseish
           @path_arg = Callback_::Known::UNKNOWN
         end
 

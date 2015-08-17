@@ -82,7 +82,7 @@ module Skylab::Brazen
         if x
           __result_as_top_via_trueish_backstream_result x
         else
-          @exit_status
+          @exitstatus
         end
       end
 
@@ -140,14 +140,14 @@ module Skylab::Brazen
       def __result_as_top_via_trueish_backstream_result x
 
         if ACHIEVED_ == x  # covered
-          SUCCESS_EXITSTATUS_
+          SUCCESS_EXITSTATUS
         elsif x.respond_to? :bit_length  # covered
           x
         elsif x.respond_to? :id2name  # covered by [cu]
           x
         elsif x.respond_to? :ascii_only?  # visually by [tm] paths
           @resources.sout.puts x
-          SUCCESS_EXITSTATUS_
+          SUCCESS_EXITSTATUS
         else
           CLI_::When_Result_::Looks_like_stream.new( @adapter, x ).execute
         end
@@ -221,13 +221,26 @@ module Skylab::Brazen
       ## ~~ event receiving & sending
 
       def maybe_use_exit_status d  # #note-075
-        if ! instance_variable_defined? :@exit_status or @exit_status < d
-          @exit_status = d ; nil
+        if ! instance_variable_defined? :@exitstatus or @exitstatus < d
+          @exitstatus = d
+          NIL_
         end
       end
 
-      def payload_output_line_yielder
-        @poly ||= ::Enumerator::Yielder.new( & @resources.sout.method( :puts ) )
+      def output_line_yielder_for__error__
+        self._COVER_ME
+      end
+
+      def output_line_yielder_for__info__  # [css]
+        @___ioly ||= _build_output_line_yielder_around_IO @resources.serr
+      end
+
+      def output_line_yielder_for__payload__
+        @___poly ||= _build_output_line_yielder_around_IO @resources.sout
+      end
+
+      def _build_output_line_yielder_around_IO io
+        ::Enumerator::Yielder.new( & io.method( :puts ) )
       end
 
       # ~ towards investigation :+[#101]:
@@ -613,7 +626,7 @@ module Skylab::Brazen
       def receive_show_help_ otr
         accept_frame otr
         help_renderer.express_help_screen_
-        SUCCESS_EXITSTATUS_
+        SUCCESS_EXITSTATUS
       end
 
       def _some_bound_call
@@ -878,7 +891,7 @@ module Skylab::Brazen
 
       def produce_result
         @_help_renderer.express_help_screen_
-        SUCCESS_EXITSTATUS_
+        SUCCESS_EXITSTATUS
       end
     end
 
@@ -1091,13 +1104,13 @@ module Skylab::Brazen
         s = maybe_inflect_line_for_completion_via_event a.first, ev
         s and a[ 0 ] = s
         send_non_payload_event_lines a
-        maybe_use_exit_status SUCCESS_EXITSTATUS_ ; nil
+        maybe_use_exit_status SUCCESS_EXITSTATUS ; nil
       end
 
       def receive_neutral_event ev
         a = render_event_lines ev
         send_non_payload_event_lines a
-        maybe_use_exit_status SUCCESS_EXITSTATUS_ ; nil
+        maybe_use_exit_status SUCCESS_EXITSTATUS ; nil
       end
 
       attr_reader :_invite_ev_a
@@ -1124,8 +1137,8 @@ module Skylab::Brazen
         @parent.expression_agent_class
       end
 
-      def payload_output_line_yielder
-        @parent.payload_output_line_yielder
+      def output_line_yielder_for__payload__
+        @parent.output_line_yielder_for__payload__
       end
 
     private
@@ -1250,7 +1263,7 @@ module Skylab::Brazen
       end
 
       def send_payload_event_lines a
-        a.each( & payload_output_line_yielder.method( :<< ) ) ; nil
+        a.each( & output_line_yielder_for__payload__.method( :<< ) ) ; nil
       end
 
       def send_non_payload_event_lines a
@@ -1259,7 +1272,7 @@ module Skylab::Brazen
 
       def maybe_use_exit_status_via_OK_or_not_OK_event ev
         d = any_err_code_for_event ev
-        d or ev.ok && ( d = SUCCESS_EXITSTATUS_ )
+        d or ev.ok && ( d = SUCCESS_EXITSTATUS )
         d ||= some_err_code_for_event ev
         maybe_use_exit_status d ; nil
       end
@@ -2189,7 +2202,7 @@ module Skylab::Brazen
     DASH_BYTE_ = DASH_.getbyte 0
     GENERIC_ERROR = 5
     NOTHING_ = nil
-    SUCCESS_EXITSTATUS_ = 0
+    SUCCESS_EXITSTATUS = 0
 
     # ~ demonstration of modality-specific formal property mutation
 

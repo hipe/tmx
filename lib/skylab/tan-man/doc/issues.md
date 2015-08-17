@@ -6,9 +6,8 @@
 [#089]       #done [br] collection / file-based [ file etc ] <= [ttt]
 [#088]       #done same issue as below with graph use
 [#087]       #done setting a starter doesn't remove the last one
-[#086]       #done on first test run with an empty "[tmx root]/tmp/", the
+[#086] #open on first test run with an empty "[tmx root]/tmp/", the
                event of creating the tmpdir breaks the comprehensive test run
-             this is now #wishlist because the fix is so ugly.
 [#085]       #done #list-API make methods conform to [#bs-029.E]
 [#084]       #parent-node: [#024] of node ..
 [#083]       #doc-node kernel
