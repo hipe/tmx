@@ -2,54 +2,48 @@ require_relative 'test-support'
 
 module Skylab::CSS_Convert::TestSupport
 
-  describe "[cssc] CLI integration", wip: true do
+  describe "[cssc] CLI integration" do
 
     extend TS_
-
-    alias_method :u, :unstyle
-
-    let :client do cli_instance end
-
-    let :stderr do
-      raw = client.send( :io_adapter ).errstream[ :buffer ].string
-      clean = Home_.lib_.brazen::CLI::Styling.unstyle raw
-      clean.split "\n"
-    end
-
-    invite_re = /use nerk -h for help/i
-
-    usage_re = /usage: nerk \[-f\].+\[-v\] <directives-file>\z/
+    use :my_expect_CLI
 
     it "with no args, gives warm, inviting message" do
-      client.invoke([]).should eql(-1)
-      stderr.shift.should match %r(\Aexpecting <directives-file> or STDIN\z)
-      u(stderr.shift).should match(usage_re)
-      u(stderr.shift).should match(invite_re)
-      stderr.length.should eql(0)
+
+      invoke
+      expect :styled, :e, 'expecting <action>'
+      expect_usaged_and_invited
+    end
+
+    it "with no args to action, gives helpful message" do
+
+      invoke 'convert'
+      expect :styled, :e, "expecting: <directives-file>"
+      _expect_specific_usaged_and_invited
     end
 
     it "with too many args, should give friendly, " <<
       "not overbearing emotional support" do
-      client.invoke(['a', 'b']).should eql(-1)
-      stderr.shift.should match(/unexpected arg.*:.*"b"/i)
-      u(stderr.shift).should match(usage_re)
-      u(stderr.shift).should match(invite_re)
-      stderr.length.should eql(0)
+
+      invoke 'convert', 'alpha', 'beta'
+      expect :e, "unexpected argument \"beta\""
+      _expect_specific_usaged_and_invited
     end
 
     it "should whine about file not found" do
-      _argv = [ fixture_path( 'not-there.txt' ).to_s ]
-      _client = client
-      @result = _client.invoke _argv
-      expect_whine_about_directives_file_not_found
-      @result.should eql( -1 )
+
+      _path = fixture_path_ 'not-there.txt'
+      invoke 'convert', _path
+      expect :e, /\ANo such file or directory - .+\/fixtures\/not-there\.txt\z/
+
+      expect_specific_invite_line_to :convert
+      expect_no_more_lines
+      @exitstatus.should eql Home_::Brazen_::API.exit_statii.fetch :resource_not_found
     end
 
-    define_method :expect_whine_about_directives_file_not_found do
-      stderr.shift.should match %r(\ANo such <directives-file> - .+\bnot-there\.txt\b)
-      u(stderr.shift).should match(usage_re)
-      u(stderr.shift).should match(invite_re)
-      stderr.length.should eql(0)
+    def _expect_specific_usaged_and_invited
+
+      expect :styled, :e, /\Ausage: czz convert \[-[a-z]\b.+ <directives-file>\z/
+      expect_specifically_invited_to :convert
     end
   end
 end

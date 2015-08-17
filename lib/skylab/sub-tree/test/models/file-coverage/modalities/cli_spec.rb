@@ -76,7 +76,7 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
     def result_for_failure_for_expect_stdout_stderr
 
-      Home_.lib_.brazen::CLI::GENERIC_ERROR
+      Home_.lib_.brazen::CLI::GENERIC_ERROR_EXITSTATUS
     end
   end
 end

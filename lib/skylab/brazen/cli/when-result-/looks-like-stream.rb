@@ -59,7 +59,7 @@ module Skylab::Brazen
         if @was_a_stream
           finish_when_at_least_one
         else
-          @ok ? SUCCESS_EXITSTATUS : GENERIC_ERROR
+          @ok ? SUCCESS_EXITSTATUS : GENERIC_ERROR_EXITSTATUS
         end
       end
 
@@ -188,7 +188,7 @@ module Skylab::Brazen
           end
         end
 
-        @ok ? SUCCESS_EXITSTATUS : GENERIC_ERROR
+        @ok ? SUCCESS_EXITSTATUS : GENERIC_ERROR_EXITSTATUS
       end
 
       Self_ = self

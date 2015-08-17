@@ -15,7 +15,7 @@ module Skylab::Brazen
         o.express { "expecting #{ par prop }" }
         o.express_primary_usage_line_
         o.express_invite_to_general_help
-        GENERIC_ERROR
+        GENERIC_ERROR_EXITSTATUS
       end
     end
   end

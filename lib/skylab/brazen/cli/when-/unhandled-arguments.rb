@@ -14,7 +14,7 @@ module Skylab::Brazen
         @render.express do
           "(unhandled argument#{ s a }: #{ a * ', ' })"
         end
-        GENERIC_ERROR
+        GENERIC_ERROR_EXITSTATUS
       end
     end
   end

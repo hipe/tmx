@@ -33,8 +33,8 @@ module Skylab::TMX::TestSupport
       go_ :citxt, _FLAG
     end
 
-    it "css-convert", wip: true do
-      go :'css-convert', _FLAG
+    it "css-convert" do
+      go :'css-convert', 'convert', '--ping'
     end
 
     it "cull" do

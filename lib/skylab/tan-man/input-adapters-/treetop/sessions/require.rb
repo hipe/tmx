@@ -127,26 +127,26 @@ module Skylab::TanMan
       end
 
       def __build_creating_event g_a
-        _build_grammar_event :creating, :create_g_a, g_a
+        _build_grammar_event :create_g_a, g_a, :creating
       end
 
       def __build_overwriting_event g_a
-        _build_grammar_event :overwriting, :exist_g_a, g_a
+        _build_grammar_event :exist_g_a, g_a, :overwriting
       end
 
-      def _build_grammar_event which_sym, ing_sym, g_a
+      def _build_grammar_event which_g_a, g_a, ing_sym
 
         Callback_::Event.inline_neutral_with(
-          which_sym,
-          ing_sym, g_a,
+          ing_sym,
+          which_g_a, g_a,
 
         ) do | y, o |
 
-          _s_a = o.send( ing_sym ).map do |g|
+          _s_a = o.send( which_g_a ).map do |g|
             pth g.output_path
           end
 
-          y << "#{ o.ing_sym }: #{ _s_a * ', ' }"
+          y << "#{ ing_sym }: #{ _s_a * ', ' }"
         end
       end
 
@@ -220,7 +220,22 @@ module Skylab::TanMan
         cls = Callback_::Const_value_via_parts[ sym_a ]
 
         if @add_parser_enhancer_module  # an array
-          self._FUN
+
+          d = 0
+          ick = Callback_::Const_value_via_parts[ sym_a[ 0 ... -1 ] ]
+          stem = sym_a.last
+
+          @add_parser_enhancer_module.each do | mod |  # legacy
+
+            cls_ = ::Class.new cls
+            ick.const_set :"#{ stem }_with_Enhacement_#{ d += 1 }", cls_
+
+            cls_.include mod
+            mod.override.each do | m |
+              cls_.send :alias_method, m, :"my_#{ m }"
+            end
+            cls = cls_
+          end
         end
 
         LOADED__.add uow.input_path, cls

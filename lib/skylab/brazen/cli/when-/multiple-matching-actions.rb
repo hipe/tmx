@@ -22,7 +22,7 @@ module Skylab::Brazen
 
         hr.express_invite_to_general_help
 
-        GENERIC_ERROR
+        GENERIC_ERROR_EXITSTATUS
       end
     end
   end

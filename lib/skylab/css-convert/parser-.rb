@@ -2,9 +2,7 @@ module Skylab::CSS_Convert
 
   Parser_ = ::Module.new
 
-  Parser_::Extlib = ::Module.new
-
-  module Parser_::Extlib::InstanceMethods  # #watched for dry at [#ttt-002]
+  module Parser_::Parser_Instance_Methods  # #watched for dry at [#ttt-002]
 
     def self.override
       [ :failure_reason ]
@@ -38,52 +36,82 @@ module Skylab::CSS_Convert
 
   class Parser_::Common_Base
 
-    def initialize mode_client
-      @actuals = mode_client.actual_parameters
-      @delegate = mode_client
-      @expag = mode_client.expression_agent
+    def initialize out_dir_head, resources, & oes_p
+
+      @on_event_selectively = oes_p
+      @out_dir_head = out_dir_head
+      @resources = resources
     end
 
     def parse_path path
 
-      o = LIB_.treetop_tools.new_parse
-      o.receive_upstream_path path
-      o.receive_parser_class produce_parser_class
-      o.flush_to_parse_tree
-    end
-
-    def load_parser_class_with__ & _DSL
-
-      _load = LIB_.treetop_tools::Load.new _DSL do | o |
-        o.on_info __handle_info
-        o.on_error __handle_error
-      end
-      _load.execute
-    end
-
-    def __handle_info
-      -> ev do
-        @delegate.receive_event_on_channel__ ev, :info
+      o = _start_parse_via_path path
+      if o
+        o.flush_to_parse_tree
+      else
+        o
       end
     end
 
-    def __handle_error
-      -> * do
-        self._DO_ME
+    def syntax_node_via_path path
+      o = _start_parse_via_path path
+      if o
+        o.flush_to_syntax_node
+      else
+        o
+      end
+    end
+
+    def _start_parse_via_path path
+      o = _start_parse
+      if o
+        o.accept_upstream_path path
+      end
+      o
+    end
+
+    def _start_parse
+
+      cls = produce_parser_class
+      if cls
+        o = Home_.lib_.treetop_tools::Sessions::Parse.new( & @on_event_selectively )
+        o.accept_parser_class cls
+        o
+      else
+        cls
+      end
+    end
+
+    def start_treetop_require_
+
+      Home_.lib_.treetop_tools::Sessions::Require.new do | * i_a, & ev_p |
+
+        if :error == i_a.first
+          raise ev_p[].to_exception
+        else
+          @on_event_selectively.call( * i_a, & ev_p )
+        end
       end
     end
   end
 
-  class Parser_::Sexpesque < ::Array
+  Parser_::Models = ::Module.new
+
+  class Parser_::Models::Sexpesque < ::Array
 
     alias_method :node_name, :first
 
     class << self
+
       def build name, *childs
-        new([name, *childs])
+        childs.unshift name
+        new childs
       end
+
       alias_method :[], :build
-    end
+
+      private :new
+    end  # >>
 
     alias_method :fetch, :[]
 

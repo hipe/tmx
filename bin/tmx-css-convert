@@ -2,7 +2,7 @@
 
 require_relative '../lib/skylab/css-convert/core'
 
-_x = Skylab::CssConvert::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
+_x = Skylab::CSS_Convert::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
   invoke ARGV
 
 $stderr.puts "(exitstatus: #{ _x })"

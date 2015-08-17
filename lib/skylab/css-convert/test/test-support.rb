@@ -3,22 +3,44 @@ require 'skylab/test-support/core'
 
 module Skylab::CSS_Convert::TestSupport
 
-  ::Skylab::TestSupport::Regret[ TS_ = self ]
+  TestSupport_ = ::Skylab::TestSupport
 
-  module Constants
-    Home_ = ::Skylab::CSS_Convert
-    TestSupport_ = ::Skylab::TestSupport
-  end
-
-  include Constants
+  TestSupport_::Regret[ TS_ = self ]
 
   extend TestSupport_::Quickie
 
   TestSupport_::Quickie.enable_kernel_describe
 
-  module InstanceMethods
+  module ModuleMethods
 
-    include Constants
+    def use sym
+
+      USE___.fetch( sym ).call self
+    end
+  end
+
+  USE___ = {
+
+    expect_event: -> tcc do
+      Home_::Callback_.test_support::Expect_Event[ tcc ]
+    end,
+
+    my_expect_CLI: -> tcc do
+      Home_::Brazen_.test_support.CLI::Expect_CLI[ tcc ]
+      tcc.class_exec do
+
+        def subject_CLI
+          Home_::CLI
+        end
+
+        def get_invocation_strings_for_expect_stdout_stderr
+          [ 'czz' ]
+        end
+      end
+    end,
+  }
+
+  module InstanceMethods
 
     def debug!
       @do_debug = true
@@ -26,35 +48,74 @@ module Skylab::CSS_Convert::TestSupport
 
     attr_reader :do_debug
 
-    def build_parser cls
-      client = cli_instance
-      client.set! or fail "failed to bootstrap client! (defaults etc)" # ick
-      cls.new client
+    def debug_IO
+      TestSupport_.debug_IO
     end
 
-    def cli_instance
-      @cli_instance ||= begin
-        streams = TestSupport_::IO.spy.triad.new
-        _a = streams.values
-        app = Home_::CLI.new( * _a, [ 'nerk' ] )
-        do_debug and streams.debug!
-        app
+    def fixture_path_ tail
+      ::File.join Home_.dir_pathname.to_path, 'test/fixtures', tail
+    end
+
+    def build_CSS_parser__
+
+      _build_parser Home_::CSS_::Parser
+    end
+
+    def parse_directives_in_file_ path
+
+      _parser = _build_parser Home_::Directive__::Parser
+      _parse_path_using_parser path, _parser
+    end
+
+    def _parse_path_using_parser path, parser
+
+      parser.parse_path path
+    end
+
+    def _build_parser cls
+
+      # if the parser emits old-style resource-based events,
+      # we turn them into new-style selective events.
+
+      p = handle_event_selectively  # from `expect_event`
+
+      _rsx = Selective_Listener_as_Resources___.new( & p )
+
+      cls.new Home_.lib_.my_tmpdir, _rsx, & p
+    end
+  end
+
+  class Selective_Listener_as_Resources___
+
+    attr_reader(
+      :serr,
+    )
+
+    def initialize & oes_p
+
+      @serr = Home_.lib_.basic::String::Receiver::As_IO.new do | o |
+
+        o[ :receive_line_args ] = -> a do
+
+          # when we call `puts` on our stderr proxy, turn it into an event:
+
+          oes_p.call :info, :expression, :line do | y |
+            y.send :<<, * a
+          end
+          NIL_
+        end
       end
     end
 
-    def fixture_path tail
-      Home_.dir_pathname.join('test/fixtures', tail)
+    def sin
+      Home_.lib_.system.test_support::MOCKS.interactive_STDIN_instance
     end
 
-    def parse_css_in_file pathname
-      build_parser(Home_::CSS_::Parser).parse_path pathname.to_path
+    def sout
+      :__NO_SOUT__
     end
-
-    def parse_directives_in_file pathname
-      build_parser(Home_::Directive__::Parser).parse_path pathname.to_path
-    end
-
-    define_method :unstyle, Home_.lib_.brazen::CLI::Styling::Unstyle
-
   end
+
+  Home_ = ::Skylab::CSS_Convert
+  NIL_ = nil
 end

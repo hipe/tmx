@@ -1,11 +1,14 @@
 require_relative 'test-support'
 
-describe "[cssc] when parsing directives", wip: true do
+describe "[cssc] when parsing directives" do
 
   extend ::Skylab::CSS_Convert::TestSupport
+  use :expect_event
 
   it "should parse platonic ideal" do
-    tree = parse_directives_in_file(fixture_path('001-platonic-ideal.txt'))
+
+    tree = parse_directives_in_file_ fixture_path_ '001-platonic-ideal.txt'
+
     tree.first.should eql(:merge_statement)
     itf, sif, su, ls = tree.children(
       :in_the_folder, :styles_in_files, :styles_under, :merge_list)
@@ -20,7 +23,9 @@ describe "[cssc] when parsing directives", wip: true do
   end
 
   it "should parse with a minimal set of directives" do
-    tree = parse_directives_in_file(fixture_path('002-minitessimal.txt'))
+
+    tree = parse_directives_in_file_ fixture_path_ '002-minitessimal.txt'
+
     tree[:in_the_folder].should eql(false)
     tree[:styles_under].should eql(false)
     ["red.css", "blue.css"].should eql(

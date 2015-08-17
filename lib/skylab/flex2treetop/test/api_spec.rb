@@ -60,12 +60,12 @@ module Skylab::Flex2Treetop::MyTestSupport
       it "infile not exist" do
 
         call_API :translate,
-          :flexfile, tmpdir.join( 'not-there.flex' ).to_path,
+          :flex_file, tmpdir.join( 'not-there.flex' ).to_path,
           :resources, Mock_resources_[],
           * _outpath_arg( '_no_see_' )
 
         expect_not_OK_event :errno_enoent,
-          %r(\bNo such \(par flexfile\) - \(pth ".+not-there\.flex"\)\z)
+          %r(\bNo such \(par flex_file\) - \(pth ".+not-there\.flex"\)\z)
 
         expect_failed
       end
@@ -73,7 +73,7 @@ module Skylab::Flex2Treetop::MyTestSupport
       it "infile not file" do
 
         call_API :translate,
-          :flexfile, FIXTURE_FILES_DIR_,
+          :flex_file, FIXTURE_FILES_DIR_,
           :resources, Mock_resources_[],
           * _outpath_arg( '_meh_' )
 
@@ -104,7 +104,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         _out_path = FIXTURE_FILES_DIR_
 
-        call_API :translate, :force, :flexfile, _in_path, * _etc( _out_path )
+        call_API :translate, :force, :flex_file, _in_path, * _etc( _out_path )
 
         ev = expect_not_OK_event :errno_eisdir
 
@@ -132,7 +132,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         _skip_blanks_and_comments
 
-        line.should eql "rule escape\n"
+        line.should eql "rule escape__of_lexer__\n"
       end
 
       def __expect_last_few_lines
@@ -140,7 +140,7 @@ module Skylab::Flex2Treetop::MyTestSupport
         scn = @expect_line_scanner
 
         exp_a = <<-'HERE'.unindent.split %r((?<=\n))
-          rule _ignore_comments_
+          rule ignore_comments
             "\/" "\*" [^*]* "\*"+ ([^/*] [^*]* "\*"+)* "\/"
           end
         HERE
@@ -167,9 +167,9 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         _count = @expect_line_scanner.skip_lines_that_match(
 
-          /\A[ ]{2,}[^[:space:]]/ )
+          /\A[ ]{2,}[^[:space:]]|\A\n\z/ )
 
-        _count.should eql 14
+        _count.should eql 20
 
         line.should eql "end\n"
       end
@@ -186,6 +186,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         line.should eql "module Fibble\n"
         next_line.should eql "  grammar Toppel\n"
+        next_line.should eql NEWLINE_
         next_line.should eql "    # from flex name definitions\n"
       end
 
@@ -325,7 +326,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
       def _etc x=@outpath
         [ :resources, ( resources || Mock_resources_[] ),
-          :flexfile, fixture_flex_( :mini ),
+          :flex_file, fixture_flex_( :mini ),
           :output_path, x ]
       end
 

@@ -31,7 +31,7 @@ module Skylab::Brazen
 
         o.express_invite_to_general_help
 
-        GENERIC_ERROR
+        GENERIC_ERROR_EXITSTATUS
       end
 
       def __render_syntax  # #storypoint-920

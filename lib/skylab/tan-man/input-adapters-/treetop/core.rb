@@ -6,6 +6,10 @@ module Skylab::TanMan
 
     class Sessions::Parse
 
+      def initialize & oes_p
+        @on_event_selectively = oes_p
+      end
+
       def accept_upstream_path path
 
         _bu_ID =  Brazen_.byte_upstream_identifier.via_path path
@@ -24,22 +28,56 @@ module Skylab::TanMan
 
       def flush_to_parse_tree
 
-        prs = @_parser_class.new
-
-        #  prs.consume_all_input = false  # e.g
-
-        syntax_node = prs.parse @_upstream_ID.whole_string
-
-        if syntax_node
-          syntax_node.tree
+        sn = flush_to_syntax_node
+        if sn
+          sn.tree
         else
-          @parser_failure_reason = prs.failure_reason
-          UNABLE_
+          sn
         end
       end
 
-      attr_reader :parser_failure_reason
+      def flush_to_syntax_node
 
+        @_parse = @_parser_class.new
+
+        #  prs.consume_all_input = false  # e.g
+
+        s = _produce_whole_string
+        if s
+          x = @_parse.parse @_upstream_ID.whole_string
+          if x
+            x
+          else
+            self._COVER_ME_FUN_emit_this_instead
+            @parser_failure_reason = @_parse.failure_reason
+            UNABLE_
+          end
+        else
+          s
+        end
+      end
+
+      def parser_failure_reason
+        self._JUST_CHECKING
+      end
+
+      # attr_reader :parser_failure_reason
+
+      def _produce_whole_string
+
+        begin
+          @_upstream_ID.whole_string
+
+        rescue ::Errno::ENOENT => e
+
+          ev = Callback_::Event.wrap.exception e, :path_hack
+
+          @on_event_selectively.call :error, ev.terminal_channel_symbol do
+            ev
+          end
+          UNABLE_
+        end
+      end
     end
 
     Models_ = ::Module.new

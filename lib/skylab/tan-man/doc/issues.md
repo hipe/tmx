@@ -85,7 +85,8 @@
 [#027]       overhaul to cli actions base class
 [#026]       #doc-node: the syncing narrative ..
              ( #was: #done API::InvocationMethods away! )
-[#025] #hole #DONE ancient legacy [ttt] mess-lette
+[#025] #open get rid of convoluted parser enhance
+             ( #DONE ancient legacy [ttt] mess-lette )
              ( #was: API::RuntimeExtensions away! #done )
 [#024]       [ model ] and #doc-node: the model experiments narrative ..
              ( #was: #done use -h -- we had to etc use bleeding )

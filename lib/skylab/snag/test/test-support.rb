@@ -153,7 +153,7 @@ module Skylab::Snag::TestSupport
         :subject_CLI, -> { Home_::CLI },
         :program_name, 'sn0g',
         :generic_error_exitstatus,
-          -> { Home_.lib_.brazen::CLI::GENERIC_ERROR } )
+          -> { Home_.lib_.brazen::CLI::GENERIC_ERROR_EXITSTATUS } )
 
       p[ tcm ]
     end

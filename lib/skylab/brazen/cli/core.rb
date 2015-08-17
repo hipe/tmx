@@ -227,15 +227,15 @@ module Skylab::Brazen
         end
       end
 
-      def output_line_yielder_for__error__
-        self._COVER_ME
+      def outbound_line_yielder_for__error__  # [css]
+        outbound_line_yielder_for__info__
       end
 
-      def output_line_yielder_for__info__  # [css]
+      def outbound_line_yielder_for__info__  # [css]
         @___ioly ||= _build_output_line_yielder_around_IO @resources.serr
       end
 
-      def output_line_yielder_for__payload__
+      def outbound_line_yielder_for__payload__
         @___poly ||= _build_output_line_yielder_around_IO @resources.sout
       end
 
@@ -1137,8 +1137,8 @@ module Skylab::Brazen
         @parent.expression_agent_class
       end
 
-      def output_line_yielder_for__payload__
-        @parent.output_line_yielder_for__payload__
+      def outbound_line_yielder_for__payload__
+        @parent.outbound_line_yielder_for__payload__
       end
 
     private
@@ -1263,7 +1263,7 @@ module Skylab::Brazen
       end
 
       def send_payload_event_lines a
-        a.each( & output_line_yielder_for__payload__.method( :<< ) ) ; nil
+        a.each( & outbound_line_yielder_for__payload__.method( :<< ) ) ; nil
       end
 
       def send_non_payload_event_lines a
@@ -1286,7 +1286,7 @@ module Skylab::Brazen
       end
 
       def some_err_code_for_event ev
-        any_err_code_for_event( ev ) || GENERIC_ERROR
+        any_err_code_for_event( ev ) || GENERIC_ERROR_EXITSTATUS
       end
 
     public
@@ -2200,7 +2200,7 @@ module Skylab::Brazen
 
     CLI_ = self
     DASH_BYTE_ = DASH_.getbyte 0
-    GENERIC_ERROR = 5
+    GENERIC_ERROR_EXITSTATUS = 5
     NOTHING_ = nil
     SUCCESS_EXITSTATUS = 0
 

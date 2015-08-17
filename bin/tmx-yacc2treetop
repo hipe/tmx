@@ -17,14 +17,23 @@ module Skylab::Yacc2Treetop
     def translate * x_a, & x_p
 
       o = Translation_Arguments___.new
+
+      inc_g_sym_a = nil
+
       x_a.each_slice 2 do | sym, x |
-        o[ sym ] = x
+
+        if :include_grammar == sym
+          ( inc_g_sym_a ||= [] ).push x
+        else
+          o[ sym ] = x
+        end
       end
 
       tr = Translation__.new( & x_p )
 
       tr.upstream = ::File.open o.yacc_file, ::File::RDONLY
       tr.downstream = o.downstream_IO
+      tr.include_grammar_symbol_array = inc_g_sym_a
       tr.wrap_in_grammar = o.wrap_in_grammar
       tr.execute
     end
@@ -625,6 +634,10 @@ module Skylab::Yacc2Treetop
   # ~
 
   class Translation__
+
+    attr_accessor(
+      :include_grammar_symbol_array,
+    )
 
     attr_writer(
       :downstream,
@@ -1282,7 +1295,19 @@ module Skylab::Yacc2Treetop
           } }.call(mod)
         end
       end
+
       def go_rules
+
+        sym_a = @ctx.include_grammar_symbol_array
+        if sym_a
+          o = @ctx.builder
+          sym_a.each do | sym |
+            o.newline
+            o << "include #{ sym }"
+          end
+          o.newline
+        end
+
         self[1..-1].each{ |sexp| sexp.translate(@ctx) }
       end
     end

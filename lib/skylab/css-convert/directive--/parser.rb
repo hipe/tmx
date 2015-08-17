@@ -3,44 +3,45 @@ module Skylab::CSS_Convert
   module Grammars
 
     module Directive__
-      S = Home_::Parser_::Sexpesque
+      S = Home_::Parser_::Models::Sexpesque
     end
   end
-
 
   class Directive__::Parser < Home_::Parser_::Common_Base
   private
 
     def produce_parser_class
 
-      dir_o = DIR_N11N__.against_path @actuals.tmpdir_absolute do | *, & ev_p |
+      dir_o = DIR_N11N__.against_path @out_dir_head do | *, & ev_p |
         @delegate.receive_event ev_p[]
         UNABLE_
       end
 
       if dir_o
-        produce_parser_class_via_generate_grammar_dir dir_o
+        __produce_parser_class_via_generate_grammar_dir dir_o
       else
         dir_o
       end
     end
 
-    def produce_parser_class_via_generate_grammar_dir ggd
+    def __produce_parser_class_via_generate_grammar_dir ggd
 
       _relpath_root = Directive__::Parser.dir_pathname
 
-      load_parser_class_with__ do |o|
-        o.enhance_parser_with Home_::Parser_::Extlib::InstanceMethods
-        @actuals.force_overwrite? and o.force_overwrite!
-        o.treetop_grammar 'common.treetop'
-        o.treetop_grammar 'directive.treetop'
-        o.root_for_relative_paths _relpath_root
-        o.generated_grammar_dir ggd.to_path
-      end
+      o = start_treetop_require_
 
+      o.add_parser_enhancer_module Home_::Parser_::Parser_Instance_Methods
+
+      # o.force_overwrite!
+
+      o.add_treetop_grammar 'common.treetop'
+      o.add_treetop_grammar 'directive.treetop'
+      o.input_path_head_for_relative_paths = _relpath_root
+      o.output_path_head_for_relative_paths = ggd.to_path
+      o.execute
     end
 
-    _ = LIB_.system.filesystem :Existent_Directory
+    _ = Home_.lib_.system.filesystem :Existent_Directory
 
     DIR_N11N__ = _.new_with(
       :create_if_not_exist,

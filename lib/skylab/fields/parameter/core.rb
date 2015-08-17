@@ -511,16 +511,20 @@ module Skylab::Fields
     attr_reader :has_default
     alias_method :has_default?, :has_default  # #todo
 
-    def default_value
+    def default_value  # the one reader
       @_default_proc.call
     end
 
-    def when__default__
+    def when__default__  # when set by iambic
       x = @polymorphic_upstream_.gets_one
       _accept_default_by do
         x
       end
       KEEP_PARSING_
+    end
+
+    def default & p  # when set by definition block (only way to write proc)
+      _accept_default_by( & p )
     end
 
     def _accept_default_by & p

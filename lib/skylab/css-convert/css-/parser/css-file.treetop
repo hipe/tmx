@@ -1,6 +1,9 @@
-module Hipe
+# NOTE - see sibling README file at section [#.A]
+
+module Skylab
 module CSS_Convert
-module CssParsing
+module CSS_
+module Grammar
 
 # attempt to semi-faithfully implement http://www.w3.org/TR/css3-selectors/
 
@@ -183,6 +186,8 @@ grammar CssFile
       end
     }
   end
+end
+
 end
 end
 end

@@ -1,4 +1,8 @@
-module Skylab::CSS_Convert::CssParsing::CustomTree
+
+self._NOT_USED  # see sibing README file at section [#.A]
+
+module Skylab::CSS_Convert::CSS_::Grammar
+
   class CustomTree < ::Array
     class << self
       def [] (*a)
@@ -9,19 +13,23 @@ module Skylab::CSS_Convert::CssParsing::CustomTree
       super(a)
     end
   end
+
   class Aggregate < CustomTree
     def unparse
       self[1...size].map(&:unparse).join('')
     end
   end
+
   class Whitesque < CustomTree
     def unparse
       self[1]
     end
   end
 end
-module Skylab::CSS_Convert::CssParsing::CssFile
-  class MyNode < Treetop::Runtime::SyntaxNode; end
+
+module Skylab::CSS_Convert::CSS_::Grammar
+
+  class MyNode < ::Treetop::Runtime::SyntaxNode; end
   class CssFile < MyNode; end
   class CStyleComment < MyNode; end
   class StyleBlock < MyNode; end

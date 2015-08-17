@@ -155,6 +155,7 @@ module Skylab::Flex2Treetop::MyTestSupport
   Home_ = ::Skylab::Flex2Treetop
   FIXTURE_FILES_DIR_ = Home_.dir_pathname.join( 'test/fixture-files' ).to_path
   ICK_ = '@ rb_file_s_stat '.freeze  # 2.1.0 added this
+  NEWLINE_ = "\n"
   NIL_ = nil
   REAL_PROGNAME_ = 'flex2treetop'.freeze  # no easy way to mutate this?
   Stderr_Resources_ = ::Struct.new :serr

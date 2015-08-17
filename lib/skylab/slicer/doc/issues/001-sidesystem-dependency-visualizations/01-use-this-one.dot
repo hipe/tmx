@@ -60,10 +60,13 @@ digraph {
   cm -> pa
   cm -> pl
   cm -> sy
+  cs -> ba
   cs -> br
   cs -> fi
+  cs -> f2
   cs -> sy
   cs -> tan
+  cs -> y2
   cu -> ba
   cu -> br
   cu -> sy

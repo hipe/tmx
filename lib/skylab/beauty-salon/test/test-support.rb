@@ -73,7 +73,7 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def black_and_white_expression_agent_for_expect_event
-      Brazen_::API.expression_agent_instance
+      Home_.lib_.brazen::API.expression_agent_instance
     end
   end
 
@@ -97,7 +97,6 @@ module Skylab::BeautySalon::TestSupport
   Callback_ = ::Skylab::Callback
   Autoloader_ = Callback_::Autoloader
 
-  Brazen_ = ::Skylab::Brazen
   DELIMITER_ = Home_::NEWLINE_
   EMPTY_S_ = Home_::EMPTY_S_
   Autoloader_[ Models = ::Module.new ]  # some tests drill into this directly

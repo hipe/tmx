@@ -22,286 +22,410 @@ module Skylab::CSS_Convert
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
-    Brazen = sidesys[ :Brazen ]
+    Basic = sidesys[ :Basic ]
+
+    # Brazen = sidesys[ :Brazen ]  # stay here for [sl]
 
     Fields = sidesys[ :Fields ]
+
+    Flex_to_treetop = sidesys[ :Flex2Treetop ]
+
+    My_tmpdir = Callback_.memoize do
+      ::File.join System[].defaults.dev_tmpdir_path, 'css-cnvrt'
+    end
 
     Path_tools = -> do
       System[].filesystem.path_tools
     end
 
     System = -> do
-      System_lib___[].services
+      System_lib[].services
     end
 
-    System_lib___ = sidesys[ :System ]
+    System_lib = sidesys[ :System ]
 
     Treetop_tools = -> do
       TM__[]::Input_Adapters_::Treetop
     end
 
     TM__ = sidesys[ :TanMan ]
+
+    Yacc_to_treetop = sidesys[ :Yacc2Treetop ]
   end
 
-  LIB_ = lib_
+  Brazen_ = Autoloader_.require_sidesystem :Brazen
+  Home_ = self
 
-  Event_Sender_Methods_ = ::Module.new
+  Param_Lib_ = Home_.lib_.fields::Parameter
 
-  module Core
-    # a namespace to hold modality-agnositc stuff
-    module SubClient
-      include Event_Sender_Methods_
-    end
-  end
+  class Conversion_Parameters___ < ::Hash
 
-  module Core::SubClient::InstanceMethods
+    Param_Lib_::Definer[ self ]
 
-    # include Headless_::SubClient::InstanceMethods
+    meta_param :required, :boolean
 
-  private
-
-    def escape_path x
-      request_client.escape_path x
-    end
-  end
-
-  Param_Lib__ = LIB_.fields::Parameter
-
-  class Core::Params < ::Hash
-
-    Param_Lib__::Definer[ self ]
-
-    if false
-
-    param :directives_file, pathname: true, writer: true do
-      desc 'A file with directives in it.' # (not used yet)
-    end
-    param :dump_css, boolean: true
-    param :dump_css_and_exit, boolean: true
-    param :dump_directives, boolean: true
-    param :dump_directives_and_exit, boolean: true
-    param :force_overwrite, boolean: true
-    param :tmpdir_absolute, accessor: true,
-      default: LIB_.system.defaults.dev_tmpdir_pathname.join( 'css-cnvrt' )
-
-    end
-  end
-
-  module Core::Client
-    # even though there is only one modality for now, we put non-CLI
-    # specific things here just for clarity
-  end
-
-  module Core::Client::InstanceMethods
-
-    include Core::SubClient::InstanceMethods
-
-    if false
-    Param_Lib__.call( self,
-      :parameter_controller,
-      :oldschool_parameter_error_structure_handler,
-    )
+    param :directives_file, :writer do
+      desc 'A file with directives in it.'  # (not used yet)
     end
 
-    def receive_event ev
-      scn = ev.to_stream_of_lines_rendered_under expression_agent
-      ok = ev.ok || ev.ok.nil?
-      while line = scn.gets  # usually one line
-        if ok
-          x = send_info_string line
-        else
-          x = send_error_string line
-        end
+    param :dump_CSS, :boolean
+
+    param :dump_directives, :boolean
+
+    param :dump_then_finish, :boolean
+
+    param :force_overwrite, :boolean
+
+    param :tmpdir_absolute, :accessor do
+
+      default do
+        ::File.join Home_.lib_.system.defaults.dev_tmpdir_path, 'css-cnvrt'
       end
-      x
     end
 
-  private
+    # ~ because parameter controller
+    #   (we are torn as to whether this or a proper client should be it)
 
-    def version
-      send_payload_message "#{ program_name } #{ Home_::VERSION }"
-      SUCCEEDED_
-    end
-  end
+    define_method :normalize, Param_Lib_::Controller::NORMALIZE_METHOD
 
-  module CLI
-
-    def self.new sin, sout, serr, pn_s_a
-
-      CLI::Client.new sin, sout, serr, pn_s_a
+    def initialize & oes_p
+      @on_event_selectively = oes_p
     end
   end
 
-  class CLI::Client
+  class CLI < Brazen_::CLI::Isomorphic_Methods_Client
 
-    # Headless_::CLI::Client[ self ]
-
-    include Core::Client::InstanceMethods
-
-    def initialize sin, sout, serr, pn_s_a
-      @default_action_i = nil
-      @IO_adapter = build_IO_adapter sin, sout, serr
-      @_pn_s_a = pn_s_a
-      super( )
-    end
-
-    def invoke( * )
-      r = super
-      GENERIC_ERROR_EXITSTATUS__ == r and usage_and_invite
-      r
-    end
-  private
-    def exitstatus_for_i i
-      :ok == i ? GENERIC_OK_EXITSTATUS__ : GENERIC_ERROR_EXITSTATUS__
-    end
-    GENERIC_OK_EXITSTATUS__ = 0 ; GENERIC_ERROR_EXITSTATUS__ = -1
-  public
-
-    def convert directives_file
-      result = :error
-      begin
-        set! or break
-        p = Home_::Directive__::Parser.new self
-        d = p.parse_stream( io_adapter.instream ) or break
-        if ! dump_directives d
-          result = :ok
-          break
-        end
-        r = Home_::Directive__::Runner.new self
-        r.invoke d or break
-        result = :ok
-      end while false
-      if :error == result
-        send_help_message usage_line
-        send_help_message invite_line
-      end
-      exitstatus_for_i result
-    end
-
-    def actual_parameters
-      @actual_parameters ||= formal_parameters_class.new
-    end
-
-    def expression_agent
-      @IO_adapter.pen
-    end
-
-  private
-
-    def resolve_IO_adapter_instream
-      common_resolve_IO_adapter_instream
-    end
-
-    def build_option_parser
-      require 'optparse'
-      o = ::OptionParser.new
+    option_parser do | o |
 
       o.base.long[ 'ping' ] = ::OptionParser::Switch::NoArgument.new do |_|
-        enqueue_without_initial_queue :ping ; nil
+
+        __clear_and_enqueue :__ping
       end
 
       o.on('-f', '--force', 'overwrite existing generated grammars') do
+
         actual_parameters.force_overwrite!
       end
+
       o.on('-d', '--dump={d|c}',
         '(debugging) Show sexp of directives (d) or css (c).',
-        'More than once will supress normal output (e.g. "-dd -dd").') do |v|
-        enqueue -> { dump_this v }
+        'More than once will supress normal output (e.g. "-dc -dc").') do |v|
+
+        enqueue do
+          __dump_this v
+        end
       end
+
       o.on('-t', '--test[=name]', 'list available visual tests. (devel)') do |v|
-        enqueue( v ? -> { test v } : :test )
+
+        enqueue v ? -> { _test v } : :_test
       end
+
       o.on('-h', '--help', 'this screen') { enqueue :help } # hehe comment out
+
       o.on('-v', '--version', 'show version') { enqueue :version }
+
       o
     end
 
-    def ping
-      @IO_adapter.errstream.puts "hello from css-convert."
-      :'hello_from_css-convert'
-    end
+    def convert directives_file
 
-    def noop
-      @noop_result
-    end
+      @_directives_path = directives_file
 
-    def default_action_i
-      @default_action_i || :convert
-    end
-
-    DUMPABLE = {
-      'directives' => -> {
-        p.dump_directives? ? p.dump_directives_and_exit! : p.dump_directives!
-      },
-      'css' => -> { p.dump_css? ? p.dump_css_and_exit! : p.dump_css!  }
-    }
-
-    def dump_this str
-      res = nil
-      begin
-        re = /\A#{ ::Regexp.escape str }/
-        found = DUMPABLE.keys.detect { |s| re =~ s }  # :~+[#ba-015]
-        if ! found
-          usage_and_invite "need one of (#{
-            }#{ DUMPABLE.keys.map(&:inspect).join ', ' }) #{
-            }not: #{ str.inspect }"
-          res = nil
-          break
-        end
-        instance_exec(& DUMPABLE[found])
-        equeue!( :convert ) unless :convert == queue.last # etc
-        res = true
-      end while nil
-      res
-    end
-
-    def dump_directives sexp
-      keep_going = true
-      if actual_parameters.dump_directives?
-        require 'pp'     # possible future fun with [#tm-043] svc # #todo
-        ::PP.pp sexp, request_client.io_adapter.errstream
-        keep_going = ! actual_parameters.dump_directives_and_exit?
-      end
-      keep_going
-    end
-
-    define_method :escape_path, LIB_.path_tools.pretty_path
-
-    def formal_parameters_class
-      Core::Params
-    end
-
-    def build_pen
-      CLI::Expression_Agent.new method( :escape_path )
-    end
-
-    def program_name
-      @___pn ||= __build_program_name
-    end
-
-    def __build_program_name
-      a = @_pn_s_a
-      [ ::File.basename( a.first ), * a[ 1 .. -1 ] ].join SPACE_
-    end
-
-  public
-
-    def receive_event_on_channel__ ev, i
-      x = nil
-      ev.render_each_line_under expression_agent do | s |
-        x = call_digraph_listeners i, s
-      end
-      x
+      ok = actual_parameters.normalize
+      ok &&= __resolve_directives
+      ok &&= __via_directives
+      ok || @_result
     end
   end
 
-  CLI::IO = ::Module.new
+  class CLI::Modalities::CLI::Actions::Convert
 
-  class CLI::Expression_Agent < LIB_.brazen::CLI::Expression_Agent
+    # here's the nasty hacking we have to do to circumvent normal processing:
+    # the method(s) below need to be overridden in the child action class,
+    # not the "user utility" class.
 
-    def initialize escape_path_p
-      @p = escape_path_p
+    def bound_call_from_parse_options
+      bc = super
+      if bc
+        bc  # if the o.p failed to parse options normal-style, exit.
+      else
+
+        q = @parent._queue_
+        if q  # if there is a queue, assume assume some non-normal processing
+
+          d = q.flush_until_nonzero_exitstatus
+
+          if d.zero?  # if everthing went well, typically we want to exit..
+            o = @parent
+            if o._can_exit && ! o._must_stay
+
+              es = o.exitstatus
+              es ||= Brazen_::CLI::SUCCESS_EXITSTATUS
+              Callback_::Bound_Call.via_value es
+            else
+              NIL_  # keep going if something said must stay
+            end
+          else
+            express_invite_to_general_help
+            Callback_::Bound_Call.via_value d
+          end
+        else  # if no queue keep going
+          NIL_
+        end
+      end
     end
+  end
+
+  module Transitional___
+
+    attr_reader(
+      :_can_exit,
+      :exitstatus,  # [tmx] - to let our action child read it
+      :_must_stay,
+    )
+
+    def initialize( * )
+
+      @_can_exit = false
+      @exitstatus = nil
+      @_must_stay = false
+
+      @on_event_selectively = -> * i_a, & ev_p do  # while [#br-117]..
+        receive_possible_event_via_channel i_a, & ev_p
+      end
+
+
+      super
+    end
+
+    def receive_possible_event_via_channel i_a, & ev_p
+
+     # while #open [#br-117] event expression
+
+      k = i_a.fetch 0
+
+      _y = send :"outbound_line_yielder_for__#{ k }__"
+
+      ev = ev_p[]
+
+      ev.express_into_under _y, expression_agent
+
+      if :error == k && ! @exitstatus
+        __first_error ev
+      end
+
+      TRADITIONAL_RESULT_TRIAD___.fetch k
+    end
+
+    TRADITIONAL_RESULT_TRIAD___ = {
+      error: false,
+      info: nil,
+      payload: true,
+    }
+
+    def __first_error ev  # eew. assume exitstatus is falseish
+
+      @adapter.express_invite_to_general_help  # eew
+
+      @exitstatus = if :errno_enoent == ev.terminal_channel_symbol
+
+        Brazen_::API.exit_statii.fetch :resource_not_found
+
+      else
+        Brazen_::CLI::GENERIC_ERROR_EXITSTATUS
+      end
+      NIL_
+    end
+
+    # ~ business
+
+    def __ping
+
+      @_can_exit = true
+      @resources.serr.puts "hello from css-convert."
+      @exitstatus = :'hello_from_css-convert'
+      CLI::SUCCESS_EXITSTATUS
+    end
+
+    def version
+
+      @_can_exit = true
+      _ = ::File.basename @resources.invocation_string_array.last
+      @resources.sout.puts "#{ _ } #{ Home_::VERSION }"
+      @exitstatus ||= CLI::SUCCESS_EXITSTATUS  # result
+      CLI::SUCCESS_EXITSTATUS
+    end
+
+    def _test x=nil
+
+      @_can_exit = true
+      CLI_Visual_Test___.new( self ).test x
+    end
+
+    # ~
+
+    def __dump_this letter
+
+      @_must_stay = true
+
+      @_DUMPABLES = [ 'CSS', 'directives' ]
+
+      s_a = Home_.lib_.basic::Fuzzy.reduce_array_against_string(
+        @_DUMPABLES,
+        letter,
+      )
+
+      case 1 <=> s_a.length
+      when 1
+        __when_not_dumpable letter
+      when 0
+        send :"__dump__#{ s_a.fetch 0 }__"
+      end
+    end
+
+    def __dump__CSS__
+
+      o = actual_parameters
+      if o.dump_CSS?
+        o.dump_then_finish!
+      else
+        o.dump_CSS!
+      end
+      CLI::SUCCESS_EXITSTATUS
+    end
+
+    def __dump__directives__
+
+      o = actual_parameters
+      if o.dump_directives?
+        o.dump_then_finish!
+      else
+        o.dump_directives!
+      end
+      CLI::SUCCESS_EXITSTATUS
+    end
+
+    def __when_not_dumpable letter
+
+      @resources.serr.puts "need one of (#{
+
+      }#{ @_DUMPABLES.map( & :inspect ).join ', ' }) #{
+          }not: #{ letter.inspect }"
+
+      CLI::GENERIC_ERROR_EXITSTATUS
+    end
+
+    def __resolve_directives
+
+      _out_dir_base = @_parameters.fetch :tmpdir_absolute
+
+      _directive_parser = Home_::Directive__::Parser.new(
+        _out_dir_base,
+        @resources,
+        & @on_event_selectively )
+
+      dirx = _directive_parser.parse_path @_directives_path
+      if dirx
+        @_directives = dirx
+        __when_directives
+      else
+        @_result = dirx
+        UNABLE_
+      end
+    end
+
+    def __when_directives
+
+      px = @_parameters
+      if px.dump_directives?
+        require 'pp'     # possible future fun with [#tm-043] svc # #todo
+        ::PP.pp sexp, request_client.io_adapter.errstream
+        if px.dump_then_finish?
+          @_result = CLI::SUCCESS_EXITSTATUS
+          EARLY_FINISH_
+        else
+          ACHIEVED_
+        end
+      else
+        ACHIEVED_
+      end
+    end
+
+    def __via_directives
+
+      _dr = Home_::Directive__::Runner.new self
+      _ok = _dr.invoke @_directives
+      require 'byebug' ; send :"bye#{}bug" ; 1==1 && :hibg
+    end
+
+    # ~ params (boilerplate adaptation, legacy names)
+
+    def actual_parameters
+      @_parameters ||= __build_parameters
+    end
+
+    def __build_parameters
+      Conversion_Parameters___.new( & @on_event_selectively )
+    end
+
+    # ~ queue (somewhat boilerplate adaptation to agent)
+
+    def __clear_and_enqueue  * a, & p
+      _queue.clear
+      _enqueue a, & p
+    end
+
+    def enqueue * a, & p
+      if p
+        a.length.zero? or raise ::ArgumentError
+        _enqueue nil, & p
+      elsif 1 == a.length && a.first.respond_to?( :call )
+        _enqueue nil, & a.first
+      else
+        _enqueue a
+      end
+    end
+
+    def _enqueue a, & p
+      if p
+        _queue.accept_by( & p )
+      else
+        _queue.accept_method_call a[ 1..-1 ], a.fetch( 0 )
+      end
+      NIL_
+    end
+
+    attr_reader(
+      :_queue_,
+    )
+
+    def _queue
+      @_queue_ ||= Home_.lib_.basic::Queue.build_for self
+    end
+
+    # ~ services for clients
+
+    def program_name
+      @resources.invocation_string_array.join SPACE_
+    end
+
+    def receive_event_on_channel__ ev, sym
+
+      ev.render_each_line_under expression_agent do | line |
+
+        @resources.serr.puts line
+      end
+      NIL_
+    end
+  end
+
+  CLI.include Transitional___
+
+  class CLI::Expression_Agent < Brazen_::CLI::Expression_Agent
+
+    # (this is a pedagogic example of taking the default expag from the
+    # distribution and customizing it with in this case a specific color)
 
     def em s
       stylize s, :strong, :cyan
@@ -324,11 +448,7 @@ module Skylab::CSS_Convert
       kbd "<#{ _slug }>"
     end
 
-    def pth x
-      @p[ x ]
-    end
-
-    def indefinite_noun s  # meh for now
+    def indefinite_noun s  # meh for now. #todo
       if STARTS_WITH_VOWEL_RX__ =~ s
         "an #{ s }"
       else
@@ -338,27 +458,55 @@ module Skylab::CSS_Convert
 
     STARTS_WITH_VOWEL_RX__ = /\A[aeiouy]/i
 
-    define_method :stylize, LIB_.brazen::CLI::Styling::Stylize
+    define_method :stylize, Brazen_::CLI::Styling::Stylize
   end
 
-  CLI::VisualTest = ::Module.new
+  # ~ visual tests, etc
 
-  module CLI::VisualTest::InstanceMethods
-  private
-    def color_test _
+  Visual_tests__ = Callback_.memoize do
 
-      styling = Home_.lib_.brazen::CLI::Styling
+    Test___ = ::Struct.new :name_s, :desc_s, :method_name
+    a = []
+    o = -> s, s_, i do
+      a.push Test___.new( s, s_, i )
+    end
+    o[ 'color test', 'see what the CLI colors look like.', :color_test ]
+    o[ '001', 'platonic-ideal.txt', :fixture ]
+    o[ '002', 'minitessimal.txt', :fixture ]
+    a
+  end
+
+  class CLI_Visual_Test___
+
+    def initialize client
+
+      @_client = client
+    end
+
+    # ~ "business"
+
+    def color_test _test_o
+
+      modifiers_a = [ nil, :strong, :reverse ]
+      styling = Brazen_::CLI::Styling
+      stylify = styling::Stylify
       width = 50
 
-      code_names = LIB_.brazen::CLI::Styling.code_name_symbol_array
+      _code_names = Brazen_::CLI::Styling.code_name_symbol_array
+      _code_names.each do | c |
 
-      ( code_names - [ :strong ] ).each do |c|
-        [[c], [:strong, c]].each do |a|
+        3.times do | d |
+
+          a = if d.zero?
+            [ c ]
+          else
+            [ modifiers_a.fetch( d ), c ]
+          end
 
           _style_label = a.map( & :to_s ).join SPACE_
 
           s = "would you like some " <<
-            "#{ styling.stylize _style_label, *a } with that?"
+            "#{ stylify[ a, _style_label ] } with that?"
 
           u = styling.unstyle s
 
@@ -366,34 +514,57 @@ module Skylab::CSS_Convert
           send_payload_message "#{ fill }#{ s } - #{ u }"
         end
       end
-      SUCCEEDED_
+
+      CLI::SUCCESS_EXITSTATUS
     end
 
-    def fixture test
-      require 'fileutils' # #[ta-042] as service  # #todo
-      _pwd = ::Pathname.pwd
-      _basename = "#{test.name}-#{test.value}"
-      fixture_path = FIXTURES_DIR.join(_basename).relative_path_from(_pwd)
-      _try = "#{program_name} #{fixture_path}"
-      _msg = expression_agent.calculate do
+    def fixture test_o
+
+      _basename = "#{ test_o.name_s }-#{ test_o.desc_s }"
+
+      path = ::File.join FIXTURES_DIR__, _basename
+
+      pwd = ::Dir.pwd
+      d = pwd.length
+      if pwd == path[ 0, d ] && ::File::SEPARATOR == path[ d ]
+        path = path[ ( d + 1 ) .. -1 ]
+      end
+
+      c = @_client
+
+      _try = "#{ c.program_name } convert #{ path }"  # while #open [#002]
+
+      _msg = c.expression_agent.calculate do
         "#{ em 'try running this:' } #{ _try }"
       end
+
       send_info_message _msg
+
+      CLI::SUCCESS_EXITSTATUS
     end
 
+    # ~ "not business"
+
     def test name=nil
+
       if name
-        r = /\A#{::Regexp.escape(name)}/
-        list = VISUAL_TESTS_[].select { |t| r.match t.name }  # :+[#ba-015]
+
+        list = Home_.lib_.basic::Fuzzy.reduce_array_against_string(
+          Visual_tests__[],
+          name
+        ) do | o |
+          o.name_s
+        end
       end
+
       if ! name or list.length > 1
-        send_list_of_tests list || VISUAL_TESTS_[]
+        send_list_of_tests list || Visual_tests__[]
       elsif list.empty?
         send_error_message "no such test #{ name.inspect }"
-        send_info_message invite_line
+        CLI::GENERIC_ERROR_EXITSTATUS
       else
         test = list.first
-        send test.method, test
+        send test.method_name, test
       end
     end
 
@@ -401,48 +572,31 @@ module Skylab::CSS_Convert
       fmt = '  %16s  -  %s'
       a.each do |o|
         send_payload_message fmt % o.values_at( 0..1 )
-      end ; nil
+      end
+      CLI::SUCCESS_EXITSTATUS
     end
-  end
 
-  class CLI::Client
-    include CLI::VisualTest::InstanceMethods
-  end
+    # ~ experimental legacy adaptation
 
-  module Event_Sender_Methods_
-  private
-
-    def send_info_message s
-      send_string_on_channel s, :info
+    def _same s
+      @_client.resources.serr.puts s
     end
+
+    alias_method :send_error_message, :_same
+    alias_method :send_info_message, :_same
 
     def send_payload_message s
-      send_string_on_channel s, :payload
+      @_client.resources.sout.puts s
     end
-
-    def send_error_message s
-      send_string_on_channel s, :error
-    end
-
-    def send_help_method s
-      send_string_on_channel s, :help
-    end
-  end
-
-  VISUAL_TESTS_ = Callback_.memoize do
-    o = []
-    o.push test.new( 'color test', 'see what the CLI colors look like.', :color_test )
-    o.push test.new( '001', 'platonic-ideal.txt', :fixture )
-    o.push tst.new( '002', 'minitessimal.txt', :fixture )
-    o
   end
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
-  Home_ = self
-  FIXTURES_DIR = Home_.dir_pathname.join 'test/fixtures'
+  ACHIEVED_ = true
+  EARLY_FINISH_ = nil
+  FIXTURES_DIR__ = ::File.join Home_.dir_pathname.to_path, 'test/fixtures'
+  NIL_ = nil
   SPACE_ = ' '.freeze
-  SUCCEEDED_ = true
   UNABLE_ = false
 
 end

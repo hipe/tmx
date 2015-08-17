@@ -56,7 +56,7 @@ module Skylab::Permute
         # hr.express_primary_usage_line_
         hr.express_invite_to_general_help
         @_a = false
-        maybe_use_exit_status CLI::GENERIC_ERROR
+        maybe_use_exit_status CLI::GENERIC_ERROR_EXITSTATUS
         UNABLE_
       end
 

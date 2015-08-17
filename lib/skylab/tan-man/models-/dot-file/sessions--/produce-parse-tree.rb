@@ -26,7 +26,8 @@ module Skylab::TanMan
 
       def execute
 
-        o = Home_::Input_Adapters_::Treetop::Sessions::Parse.new
+        o = Home_::Input_Adapters_::Treetop::Sessions::Parse.new(
+          & @on_event_selectively )
 
         o.receive_byte_upstream_identifier @byte_upstream_identifier
 
@@ -36,7 +37,7 @@ module Skylab::TanMan
         if x
           x
         else
-          self._FUN
+          self._COVER_ME_parse_failed
         end
       end
 
