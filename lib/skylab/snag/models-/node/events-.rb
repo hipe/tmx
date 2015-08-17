@@ -5,10 +5,10 @@ module Skylab::Snag
     module Events
 
       Failure = Home_::Model_::Event.new :expecting, :near, :line,
-                                          :line_number, :pathname  do
+                                          :lineno, :pathname  do
 
         message_proc do |y, o|
-          _ctx = " (#{ pth o.pathname }:#{ o.line_number })"
+          _ctx = " (#{ pth o.pathname }:#{ o.lineno })"
           y << "expecting #{ o.expecting } near #{ o.near }#{ _ctx }"
         end
       end

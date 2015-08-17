@@ -174,7 +174,7 @@ module Skylab::Snag
         st.each do | todo |  # it's a stream but we want the scope
           count += 1
 
-          _path_a = todo.path.split( SEP__ ).push todo.line_number.to_s
+          _path_a = todo.path.split( SEP__ ).push todo.lineno.to_s
 
           tree.touch_node _path_a, :leaf_node_payload_proc, -> do
             todo

@@ -504,7 +504,7 @@ module Skylab::BeautySalon
 
         def display_match match
           stream = match.to_line_stream
-          current_line = match.line_number
+          current_line = match.lineno
           line = stream.gets
           @serr.puts "#{ @match_path }:#{ current_line }:#{ line }"
           while line = stream.gets

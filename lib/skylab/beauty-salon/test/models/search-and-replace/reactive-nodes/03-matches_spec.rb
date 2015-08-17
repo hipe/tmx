@@ -20,9 +20,9 @@ module Skylab::BeautySalon::TestSupport
       m__ = st.gets
       st.gets.should be_nil
 
-      m.line_number.should eql 1
-      m_.line_number.should eql 3
-      m__.line_number.should eql 3
+      m.lineno.should eql 1
+      m_.lineno.should eql 3
+      m__.lineno.should eql 3
 
       all = [ m, m_, m_ ]
 
@@ -68,8 +68,8 @@ module Skylab::BeautySalon::TestSupport
       match_ = st.gets
       st.gets.should be_nil
 
-      match.line_number.should eql 3
-      match_.line_number.should eql 9
+      match.lineno.should eql 3
+      match_.lineno.should eql 9
 
       st = match.to_line_stream  # regression - just get first line
       _line = st.gets

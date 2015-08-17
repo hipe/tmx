@@ -12,19 +12,19 @@ module Skylab::Basic::TestSupport::List
 
       scn = subject.new [ "one B\n", "two B\n" ]
 
-      scn.line_number.should be_nil
+      scn.lineno.should be_nil
 
       scn.gets.should eql "one B\n"
 
-      scn.line_number.should eql 1
+      scn.lineno.should eql 1
 
       scn.gets.should eql "two B\n"
 
-      scn.line_number.should eql 2
+      scn.lineno.should eql 2
 
       scn.gets.should be_nil
 
-      scn.line_number.should eql 2
+      scn.lineno.should eql 2
 
       scn.gets.should be_nil
     end

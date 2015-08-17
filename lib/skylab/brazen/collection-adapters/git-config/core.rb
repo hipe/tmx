@@ -184,7 +184,7 @@ module Skylab::Brazen
 
       def prepare_for_parse
         @column_number = nil
-        @line_number = 0
+        @lineno = 0
         @state_i = initial_state_i
         @lines = @input_id.to_simple_line_stream
         resolve_document
@@ -193,7 +193,7 @@ module Skylab::Brazen
       def execute_parse
         ok = PROCEDE_
         while @line = @lines.gets
-          @line_number += 1
+          @lineno += 1
           BLANK_LINE_OR_COMMENT_RX_ =~ @line and next
           ok = send @state_i
           ok or break
@@ -225,7 +225,7 @@ module Skylab::Brazen
 
         _x_a = [ :config_parse_error,
           :column_number, col_number,
-          :line_number, @line_number,
+          :lineno, @lineno,
           :line, @line,
           :parse_error_category_i, i,
           :reason, i.to_s.split( UNDERSCORE_ ).join( SPACE_ ),
@@ -235,9 +235,9 @@ module Skylab::Brazen
 
           _s = o.input_identifier.description_under self
 
-          y << "#{ o.reason } in #{ _s }:#{ o.line_number }:#{ o.column_number }"
+          y << "#{ o.reason } in #{ _s }:#{ o.lineno }:#{ o.column_number }"
 
-          s = "#{ o.line_number }:"
+          s = "#{ o.lineno }:"
           fmt = "  %#{ s.length }s %s"
 
           y << fmt % [ s, o.line ]

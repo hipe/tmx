@@ -47,7 +47,7 @@ module Skylab::Snag
     def express_into_under y, expag
 
       o = @_matching_line
-      y << "#{ o.path }:#{ o.line_number }:#{ o.full_source_line }"
+      y << "#{ o.path }:#{ o.lineno }:#{ o.full_source_line }"
     end
 
     # ~ begin
@@ -100,8 +100,8 @@ module Skylab::Snag
       @_matching_line.full_source_line
     end
 
-    def line_number
-      @_matching_line.line_number
+    def lineno
+      @_matching_line.lineno
     end
 
     def path

@@ -12,15 +12,15 @@ module Skylab::System::TestSupport
 
       it "when built with pathname - `gets` - works as expected" do  # mirror 2 others
         scn = subject_via_pathname pathname
-        scn.line_number.should be_nil
+        scn.lineno.should be_nil
         _ = scn.gets
         _.should eql "one\n"
-        scn.line_number.should eql 1
+        scn.lineno.should eql 1
         scn.gets.should eql "two\n"
-        scn.line_number.should eql 2
+        scn.lineno.should eql 2
         scn.fh.closed?.should eql false
         scn.gets.should be_nil
-        scn.line_number.should eql 2
+        scn.lineno.should eql 2
         scn.gets.should be_nil
         scn.fh.should be_closed
       end
@@ -39,15 +39,15 @@ module Skylab::System::TestSupport
         fh = pathname.open 'r'
         scn = subject_via_filehandle fh, 5
         scn.gets.should eql "abc\n"
-        scn.line_number.should eql 1
+        scn.lineno.should eql 1
         scn.gets.should eql "def\n"
-        scn.line_number.should eql 2
+        scn.lineno.should eql 2
         scn.gets.should eql "ghi\n"
-        scn.line_number.should eql 3
+        scn.lineno.should eql 3
         scn.gets.should eql nil
-        scn.line_number.should eql 3
+        scn.lineno.should eql 3
         scn.gets.should eql nil
-        scn.line_number.should eql 3
+        scn.lineno.should eql 3
         fh.should be_closed
       end
 
@@ -84,14 +84,14 @@ module Skylab::System::TestSupport
       end
 
       define_method :shared_expectation do |scn|
-        scn.line_number.should be_nil
+        scn.lineno.should be_nil
         scn.count.should be_zero
         _ = scn.gets
         _.should eql _STR
         scn.count.should eql 0  # NOTE
-        scn.line_number.should be_nil
+        scn.lineno.should be_nil
         scn.gets.should be_nil
-        scn.line_number.should be_nil
+        scn.lineno.should be_nil
       end
     end
 

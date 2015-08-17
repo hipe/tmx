@@ -51,7 +51,7 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
       chan_i_a.should eql [ :error, :config_parse_error ]
       ev.terminal_channel_i.should eql :config_parse_error
       ev.parse_error_category_i.should eql :expected_open_square_bracket
-      ev.line_number.should eql 1
+      ev.lineno.should eql 1
       ev.column_number.should eql 1
       ev.line.should eql 'moby'
     end

@@ -219,7 +219,7 @@ module Skylab::TanMan
 
         Callback_::Event.inline_not_OK_with :input_parse_error,
 
-            :line_number, @line_count,
+            :lineno, @line_count,
             :line, @line,
             :tuples, i_a.map { |i| [ i, h.fetch( i ) ] } do | y, o |
 
@@ -229,7 +229,7 @@ module Skylab::TanMan
           end
 
           if o.line
-            _prep_phrase = " near line #{ o.line_number }: #{ o.line.inspect }"
+            _prep_phrase = " near line #{ o.lineno }: #{ o.line.inspect }"
           else
             _prep_phrase = " at end of input"
           end

@@ -27,9 +27,9 @@ module Skylab::BeautySalon::TestSupport
       last = ms.gets
       ms.gets.should be_nil
 
-      first.line_number.should eql 1
-      mid.line_number.should eql 3
-      last.line_number.should eql 3
+      first.lineno.should eql 1
+      mid.lineno.should eql 3
+      last.lineno.should eql 3
 
       # make a mess-test to prove that in the input we have two matches
       # on one line, and in the output we render each match individually,

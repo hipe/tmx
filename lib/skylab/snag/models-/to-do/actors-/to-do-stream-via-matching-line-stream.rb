@@ -67,14 +67,14 @@ module Skylab::Snag
 
         Callback_::Event.inline_neutral_with :did_not_match,
             :line, line_o.full_source_line,
-            :line_number, line_o.line_number,
+            :lineno, line_o.lineno,
             :path, line_o.path,
             :pattern, ( @pattern_s_a * PIPE_ ),  # meh
             :rx, @rx do | y, o |
 
           y << "skipping a line that matched via `grep` but #{
            }did not pass our internal regexp (#{
-            }#{ pth o.path }:#{ o.line_number })"
+            }#{ pth o.path }:#{ o.lineno })"
 
           y << "line: #{ o.line }"
           y << "find pattern: #{ val o.pattern }"

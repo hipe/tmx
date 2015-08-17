@@ -12,12 +12,12 @@ module Skylab::Snag
         if md
           @full_source_line = md[ :full_source_line ]
           @is_valid = true
-          @line_number = md[ :line ].to_i
+          @lineno = md[ :line ].to_i
           @path = md[ :path ]
         else
           @full_source_line = false
           @is_valid = false
-          @line_number = false
+          @lineno = false
           @path = false
         end
         NIL_
@@ -27,7 +27,7 @@ module Skylab::Snag
 
       RX__ = /\A (?<path>[^:]+) : (?<line>\d+) : (?<full_source_line>.*) \z/mx
 
-      attr_reader :full_source_line, :is_valid, :line_number, :path
+      attr_reader :full_source_line, :is_valid, :lineno, :path
 
     end
   end

@@ -82,7 +82,7 @@ module Skylab::Brazen
         def execute_parse
           ok = PROCEDE_
           while @line = @lines.gets
-            @line_number += 1
+            @lineno += 1
             if BLANK_LINE_OR_COMMENT_RX_ =~ @line
               @current_nonterminal_node.accept_blank_line_or_comment_line @line
             else

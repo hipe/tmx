@@ -10,53 +10,53 @@ module Skylab::Basic::TestSupport::String
 
     it "when built with a string, works the same" do  # mirror 2 others
       scn = of "one C\ntwo C\n"
-      scn.line_number.should be_zero  # be like ::File
+      scn.lineno.should be_zero  # be like ::File
       scn.gets.should eql "one C\n"
-      scn.line_number.should eql 1
+      scn.lineno.should eql 1
       scn.gets.should eql "two C\n"
-      scn.line_number.should eql 2
+      scn.lineno.should eql 2
       scn.gets.should be_nil
-      scn.line_number.should eql 2
+      scn.lineno.should eql 2
       scn.gets.should be_nil
     end
 
     it "empty string" do
       scn = of ''
-      scn.line_number.should be_zero
+      scn.lineno.should be_zero
       scn.gets.should be_nil
-      scn.line_number.should be_zero
+      scn.lineno.should be_zero
       scn.gets.should be_nil
     end
 
     it "noneempty string no terminating newline" do
       scn = of 'abc'
-      scn.line_number.should be_zero
+      scn.lineno.should be_zero
       scn.gets.should eql 'abc'
-      scn.line_number.should eql 1
+      scn.lineno.should eql 1
       scn.gets.should be_nil
-      scn.line_number.should eql 1
+      scn.lineno.should eql 1
     end
 
     it "nonempty string terminating newline" do
       scn = of "foo\n"
-      scn.line_number.should be_zero
+      scn.lineno.should be_zero
       scn.gets.should eql "foo\n"
-      scn.line_number.should eql 1
+      scn.lineno.should eql 1
       scn.gets.should be_nil
-      scn.line_number.should eql 1
+      scn.lineno.should eql 1
     end
 
     it "two no term" do
       scn = of "foo\nbar"
-      scn.line_number.should be_zero
+      scn.lineno.should be_zero
       scn.gets.should eql "foo\n"
-      scn.line_number.should eql 1
+      scn.lineno.should eql 1
       scn.gets.should eql "bar"
-      scn.line_number.should eql 2
+      scn.lineno.should eql 2
       scn.gets.should be_nil
-      scn.line_number.should eql 2
+      scn.lineno.should eql 2
       scn.gets.should be_nil
-      scn.line_number.should eql 2
+      scn.lineno.should eql 2
     end
 
     it "two term" do
@@ -70,9 +70,9 @@ module Skylab::Basic::TestSupport::String
       scn = of "foo\n\nbar\n"
       scn.gets.should eql "foo\n"
       scn.gets.should eql "\n"
-      scn.line_number.should eql 2
+      scn.lineno.should eql 2
       scn.gets.should eql "bar\n"
-      scn.line_number.should eql 3
+      scn.lineno.should eql 3
     end
 
     it "reverse" do

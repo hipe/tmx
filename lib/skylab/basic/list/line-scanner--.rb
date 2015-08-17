@@ -67,7 +67,7 @@ module Skylab::Basic
         end
       end
 
-      def line_number
+      def lineno
         @idx.nonzero?
       end
 

@@ -160,7 +160,7 @@ module Skylab::BeautySalon
          protected
 
            def init_copy a
-             @line_number, @before_match, @md, @after_match = a
+             @lineno, @before_match, @md, @after_match = a
              freeze
            end
 
@@ -174,10 +174,10 @@ module Skylab::BeautySalon
          public
 
           def members
-            [ :md, :line_number, :lines, :path ]
+            [ :md, :lineno, :lines, :path ]
           end
 
-          attr_reader :line_number, :md, :path
+          attr_reader :lineno, :md, :path
 
           attr_writer :do_highlight
 

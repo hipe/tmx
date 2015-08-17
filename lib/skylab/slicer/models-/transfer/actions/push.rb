@@ -304,9 +304,9 @@ module TmxGit
           man = new(:ui => ui, :req => req, :path => path)
           repositories = []
           File.open(path, 'r') do |fh|
-           @line_number = 0
+           @lineno = 0
             while line = fh.gets
-              @line_number += 1
+              @lineno += 1
               repo = Repo.new(:manifest => man)
               repo.req = req
               repo.update_attributes _json_parse(line)
@@ -322,7 +322,7 @@ module TmxGit
           rescue JSON::ParserError => e
             raise RuntimeError.new(<<-HERE.gsub(/\n  */, ' ').strip
               Failed to parse manifest.  Each line of manifest must be valid json.
-              Invalid json found on line #{@line_number} of #{@path}.  Edit by hand
+              Invalid json found on line #{@lineno} of #{@path}.  Edit by hand
               to correct this if you can: character #{e.to_s.strip}
               HERE
               )

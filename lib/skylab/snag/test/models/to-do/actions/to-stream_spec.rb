@@ -39,15 +39,15 @@ module Skylab::Snag::TestSupport
 
       o = st.gets
       ::File.basename( o.path ).should eql 'ferbis.code'
-      o.line_number.should eql 2
+      o.lineno.should eql 2
 
       o = st.gets
       ::File.basename( o.path ).should eql 'one.code'
-      o.line_number.should eql 1
+      o.lineno.should eql 1
 
       o = st.gets
       ::File.basename( o.path ).should eql 'one.code'
-      o.line_number.should eql 3
+      o.lineno.should eql 3
 
       st.gets.should be_nil
     end
@@ -75,7 +75,7 @@ module Skylab::Snag::TestSupport
           %r(\Askipping a line that matched via `grep`) )
 
         ev.path[ -6 .. -1 ].should eql '.phase'
-        ev.line_number.should eql 2
+        ev.lineno.should eql 2
         ev.line[ -6 .. -1 ].should eql "a tag\n"
       end
 

@@ -93,7 +93,7 @@ module Skylab::System
 
         d = 0
         if ! line
-          if r.exclude_end? && 1 == ( end_ - up.line_number )
+          if r.exclude_end? && 1 == ( end_ - up.lineno )
             d = 1
           else
             fail __say_three
@@ -112,7 +112,7 @@ module Skylab::System
           line = up.gets
           if line
             chunk.left << line
-          elsif r.exclude_end? && 1 == ( end_ - up.line_number )
+          elsif r.exclude_end? && 1 == ( end_ - up.lineno )
             break
           else
             fail __say_four

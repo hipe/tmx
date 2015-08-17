@@ -92,7 +92,7 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
       end
       chan_i_a.should eql [ :error, :config_parse_error ]
       ev.parse_error_category_i.should eql :section_expected
-      ev.line_number.should eql 1
+      ev.lineno.should eql 1
       ev.column_number.should eql 1
       ev.line.should eql 'moby'
     end

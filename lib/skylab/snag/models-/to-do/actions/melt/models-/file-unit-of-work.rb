@@ -119,7 +119,7 @@ module Skylab::Snag
 
           line[ edit_r ] = "#{ tag_s }#{ id_s }#{ _tail_s }"
 
-          @_patch.change_line match.line_number, line
+          @_patch.change_line match.lineno, line
         end
 
         def __apply_the_patch

@@ -13,9 +13,9 @@ module Skylab::Brazen
         @expag.calculate do
 
           y << "#{ o.reason } in #{ pth o.input_identifier.to_path }:#{
-            }#{ o.line_number }:#{ o.column_number }"
+            }#{ o.lineno }:#{ o.column_number }"
 
-          hdr = "  #{ o.line_number }: "
+          hdr = "  #{ o.lineno }: "
           hdr_ = SPACE_ * hdr.length
 
           y << "#{ hdr }#{ o.line }"

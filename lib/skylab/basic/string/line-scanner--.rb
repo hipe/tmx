@@ -27,14 +27,14 @@ module Skylab::Basic
       end  # >>
 
       def members
-        [ :gets, :line_number ]
+        [ :gets, :lineno ]
       end
 
       def lineno
         @upstream.__lineno
       end
 
-      def line_number
+      def lineno
         @upstream.__lineno
       end
 
