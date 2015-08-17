@@ -8,13 +8,13 @@ describe '[fi] P - default: given "object" with parameter "foo"' do
   context 'and "foo" either does or doesn\'t have "default: \'anything\'"' do
 
     let :foo do
-      the_class_.parameters[ :foo ]
+      the_class_.parameters.fetch :foo
     end
 
     context 'if you gave "foo" the property "default: :wazoo"' do
 
       with do
-        param :foo, default: :wazoo
+        param :foo, :default, :wazoo
       end
 
       frame do
@@ -38,10 +38,15 @@ describe '[fi] P - default: given "object" with parameter "foo"' do
       frame do
 
         it '"foo.has_default?" is false-ish' do
-          foo.has_default?.should eql(false)
+          foo.has_default?.should be_nil
         end
 
         it '"foo.default_value" raises a NoMethodError' do
+
+          foo = send :foo
+          foo.instance_variable_defined? :@_default_proc and fail  # avoid warning
+          foo.instance_variable_set :@_default_proc, nil
+
           -> { foo.default_value }.should raise_error(::NoMethodError)
         end
       end
@@ -50,7 +55,7 @@ describe '[fi] P - default: given "object" with parameter "foo"' do
     context "if you give it a false-ish (nil or false) default value" do
 
       with do
-        param :foo, default: nil
+        param :foo, :default, nil
       end
 
       frame do

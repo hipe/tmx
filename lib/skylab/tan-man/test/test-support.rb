@@ -10,7 +10,7 @@ module Skylab::TanMan::TestSupport
   class << self
 
     def tmpdir_pathname_
-      @tdpn ||= Home_.lib_.dev_tmpdir_pathname.join 'tm-testing'
+      @tdpn ||= Home_.lib_.dev_tmpdir_pathname.join 'tm-testing-cache'
     end
   end
 
@@ -279,7 +279,7 @@ module Skylab::TanMan::TestSupport
       _oes_p = -> * i_a, & ev_p do
 
         case i_a.last
-        when :using_parser_files, :creating
+        when :using_parser_files, :creating, :mkdir_p
           NIL_
         else
           raise ev_p[].to_exception
@@ -290,8 +290,11 @@ module Skylab::TanMan::TestSupport
       # _oes_p = event_receiver_for_expect_event.handle_event_selectively
 
       @parse = TS_::Parse.new _oes_p do | o |
-        o.generated_grammar_dir_path existent_testing_GGD_path
+
         o.root_for_relative_paths_for_load TS_.dir_pathname.to_path
+
+        o.generated_grammar_dir_path existent_testing_GGD_path
+
         o.grammar_path @grammar_class.dir_pathname.relative_path_from( TS_.dir_pathname ).join( ALWAYS_G1__ ).to_path
       end
 

@@ -7,7 +7,9 @@
 [#088]       #done same issue as below with graph use
 [#087]       #done setting a starter doesn't remove the last one
 [#086] #open on first test run with an empty "[tmx root]/tmp/", the
-               event of creating the tmpdir breaks the comprehensive test run
+             event of creating the tmpdir breaks the comprehensive test run
+             (tricky because the test that is the first to build the
+             grammar files varies based on "how" we're running the tests..)
 [#085]       #done #list-API make methods conform to [#bs-029.E]
 [#084]       #parent-node: [#024] of node ..
 [#083]       #doc-node kernel
@@ -69,13 +71,13 @@
 [#039]       #done API::Whatever becomes [m-h] generic
 [#038]       #done `text_styler` away!
 [#037]       #feature stdout as an `output_stream`
-             ( #was: #done reconceive stdout, stderr -> infostream, paystream, errstream
+             ( #was: #done reconceive stdout, s-tderr -> infostream, paystream, errstream
                .. (i.e. "PIE" [#sl-113]) )
 [#036]       #done `format_error` -> `inflect_failure_reason` (and tests!)
 [#035]       #wont `delegates_to` go away as a smell (meh)
 [#034]       #done sort out `root_runtime`, client, `parent_runtime`, etc
 [#033]       #done `full_action_name_parts` becomes `local_normal_name` (`action_name` ..?)
-[#032]       #done rename stdout, stderr
+[#032]       #done rename stdout, s-tderr
 [#031]       #done regretify all tests
 [#030]       #done reconceive api as a service
 [#029]       #done no more api knob (api.invoke -> `api_invoke`)
@@ -83,7 +85,7 @@
 [#027]       overhaul to cli actions base class
 [#026]       #doc-node: the syncing narrative ..
              ( #was: #done API::InvocationMethods away! )
-[#025] #open ancient legacy [ttt] mess-lette
+[#025] #hole #DONE ancient legacy [ttt] mess-lette
              ( #was: API::RuntimeExtensions away! #done )
 [#024]       [ model ] and #doc-node: the model experiments narrative ..
              ( #was: #done use -h -- we had to etc use bleeding )

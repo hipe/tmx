@@ -171,10 +171,14 @@ top. so, yes: to get the full narrative, start from this middle, read to the
 end, then go back to this middle and read up to the top. whew!)
 
 
+
+
 ## formal attributes was the first stab at a meta-properties library
 
 it started on 2011-09-11 with a 40 line DSL extension module. it may prove
 to be the only one still standing when all this dust clears.
+
+
 
 
 ## [hl] parameters was a successful experiment that failed to improve the above
@@ -184,8 +188,10 @@ to cram every meta-attribute that would ever be used into one scope, thinking
 mistakenly that it would somehow make life easier. it did not. a longterm
 goal is to absorb all the good parts of this into the above.
 
-(further discussion of this library is in [#tm-045] - tan-man at the time
-of this writing straddled far into both libraries)
+2015-08-16 just before its 3rd birthday we did a maintenence rewrite of
+it. it now borrows many ideas from its successors, but still maintains
+some of its own idiosyncracies.
+
 
 
 ## then came the N-meta experiment with [ba] field

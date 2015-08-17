@@ -9,62 +9,71 @@ describe "[fi] P - bound" do
     Skylab::Fields::Parameter::Bound
   end
 
-  def self._bound_with & edit_p
+  def self._with & edit_p
 
     with do
 
-      Skylab::Fields::Parameter::Bound::Definer_instance_methods[ self ]
+      define_method :bound_parameters,
+        Skylab::Fields::Parameter::Bound::PARAMETERS_METHOD
 
       class_exec( & edit_p )
-
-      def formal_parameters  # ..
-        self.class.parameters
-      end
     end
   end
 
   context "lets you do questionable parameter reflection and manipulation" do
 
-    _bound_with do
-      param :age, dsl: [:value, :reader]
-      param :pet, dsl: [:list, :reader]
-      param :hobby, accessor: true
+    _with do
+
+      param :age, :DSL, :atom, :reader
+      param :pet, :DSL, :list, :reader
+      param :hobby, :accessor
     end
 
     frame do
 
-      before :each do
+      before :each do  # (is modified in one test, not in another)
+
+        object = object_
         object.age 'fifty one'
         object.hobby = 'spelunk-fishing'
         object.pet 'goldfish'
         object.pet 'llama'
       end
 
-      it "like iterate over each value in a flat, indifferent manner" do
+      it "like iterate over names & values" do
 
-        names = [] ; values = [] ; labels = []
+        names = []
+        values = []
 
-        object.bound_parameters.each do |p|
-          names.push p.normalized_parameter_name
+        object_.bound_parameters.each do |p|
+          names.push p.name.as_variegated_symbol
           values.push p.value
-          labels.push p.label
         end
 
-        names.should eql([:age, :pet, :pet, :hobby])
+        names.should eql [ :age, :pet, :hobby ]
 
-        values.should eql(['fifty one', 'goldfish', 'llama', 'spelunk-fishing'])
-
-        labels.should eql(
-          %w( <age> <pet[0]> <pet[1]> <hobby> ) )
+        values.should eql(
+          [ "fifty one", [ "goldfish", "llama" ], "spelunk-fishing" ] )
       end
 
       it "search through all values and change values procedurally" do
 
-        object = send :object
+        object = object_
 
-        object.bound_parameters.each do |p|
-          if /fish/ =~ p.value
-            p.value = p.value.gsub(/fish/, 'POTATO')
+        _st = object.bound_parameters.to_value_stream.expand_by do | bnd |  # mentor
+
+          if bnd.parameter.is_list
+            bnd.to_stream
+          else
+            Skylab::Callback::Stream.via_item bnd
+          end
+        end
+
+        rx = /fish/
+
+        _st.each do | bnd |
+          if rx =~ bnd.value
+            bnd.value = bnd.value.gsub rx, 'POTATO'
           end
         end
 
@@ -78,58 +87,65 @@ describe "[fi] P - bound" do
 
   context 'where clauses!' do
 
-    _bound_with do
+    _with do
 
-      meta_param :this_one, boolean: true, accessor: true
-      param :noun, dsl: [:list, :reader], enum: [:run, :walk], this_one: 1
-      param :path, accessor: true, pathname: true, this_one: true
-      param :herkemer, accessor: true, this_one: false
-      param :derkemer, reader: true
+      meta_param :this_one, :boolean
+      param :noun, :DSL, :list, :reader, :enum, [ :run, :walk ], :this_one
+      param :path, :accessor, :this_one
+      param :herkemer, :accessor
+      param :derkemer, :reader
     end
 
     frame do
 
-      before :each do
+      it "`to_bound_item_stream`" do
 
-        object = send :object
-        object.noun :walk, :walk, :run
-        object.path = 'pathos'
-        object.herkemer = 'the herkemer'
+        object = _read_only_object
+
+        object.noun_array.should eql [ :walk, :walk, :run ]
+
+        object.path.should eql 'pathos'
+
+        a = object.bound_parameters.to_bound_item_stream.reduce_by do | bp |
+          bp.parameter.this_one?
+        end.to_a
+
+        a.length.should eql 4
+
+        a.map( & :value ).should eql [ :walk, :walk, :run, 'pathos' ]
       end
 
-      capture_emit_lines_
+      it "`at`" do
 
-      it '"object.bound_parameters reduce { |p| p.this_one? }" works!' do
+        d, h = _read_only_bound_parameters.at :derkemer, :herkemer
 
-        @emit_lines_.should be_empty
-        object = send :object
-        object.noun.should eql([:walk, :walk, :run])
-        object.path.should be_kind_of(::Pathname)
-        object.path.to_s.should eql('pathos')
-        bp = object.bound_parameters.reduce_by do | bp_ |
-          bp_.this_one?
-        end
-        (bp = bp.to_a).length.should eql(4)
-        bp.map{ |o| o.value.to_s }.should eql(%w(walk walk run pathos))
-      end
-
-      it '"object.bound_parameters reduce (with hash)' do
-        bp = object.bound_parameters.reduce_by this_one: true
-        (bp = bp.to_a).length.should eql(1) # contrast to above. do you know why
-        bp.first.value.to_s.should eql('pathos')
-      end
-
-      it '"object.bound_parameters.at(:fee, :bar)" works!' do
-        d, h = object.bound_parameters.at(:derkemer, :herkemer).to_a
-        d.normalized_parameter_name.should eql(:derkemer)
+        d.name_symbol.should eql :derkemer
         d.value.should be_nil
-        h.normalized_parameter_name.should eql(:herkemer)
+        h.name_symbol.should eql :herkemer
         h.value.should eql('the herkemer')
       end
 
-      it '"object.beund_parameters[:nerk]" works!' do
-        bp = object.bound_parameters[:noun]
-        bp.value.should eql([:walk, :walk, :run])
+      it "`fetch`" do
+
+        _bp = _read_only_bound_parameters.fetch :noun
+
+        _bp.value.should eql [ :walk, :walk, :run ]
+      end
+
+      dangerous_memoize_ :_read_only_bound_parameters do
+
+        _read_only_object.bound_parameters
+      end
+
+      dangerous_memoize_ :_read_only_object do
+
+        o = object_
+        o.noun :walk
+        o.noun :walk
+        o.noun :run
+        o.path = 'pathos'
+        o.herkemer = 'the herkemer'
+        o
       end
     end
   end

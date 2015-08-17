@@ -6,207 +6,183 @@ module Skylab::Fields
 
     class Bound
 
-      attr_reader(
-        :parameter,
-      )
+      PARAMETERS_METHOD = -> do  # typically `bound_parameters`
 
-      def initialize p, r, w, l
-        @label_p = l
-        @parameter = p
-        @read_p = r
-        @write_p = w
+        @formal_parameters ||= self.class.parameters
+
+        Models_::Collection.new self, @formal_parameters
       end
 
-      def value
-        @read_p.call
-      end
+      Models_ = ::Module.new
 
-      def value= x
-        @write_p[ x ]
-      end
+      class Models_::Collection
 
-      def label
-        @label_p.call @parameter
-      end
+        def initialize ent, foz
 
-      def normalized_parameter_name
-        @parameter.normalized_parameter_name
-      end
+          @_entity = ent
+          @_formal_parameters = foz
+        end
 
-    # <- 2
+        def at * sym_a
 
-  class Enumerator___ < ::Enumerator
+          foz = @_formal_parameters
+          proto = _build_bound_prototype
 
-    Here_::Definer[ self ]
+          sym_a.map do | sym |
 
-    def initialize host_instance
-      super() { |y| init ; visit(y) }
-      @mixed = host_instance
-      block_given? and raise ArgumentError.new(
-        "i'm not that kind of enumerator (╯°□°）╯︵ ┻━┻")
-    end
-
-    def at *parameter_names
-      reduce_with_changes(
-        params_p: ->() do          # Override the default to be more map-like,
-          ::Enumerator.new do |y|  # and use only the desired names.
-            parameter_names.each do |parameter_name| # But still, we lazy eval
-              y << set_p.call.fetch(parameter_name)  # and fail late (for now).
-            end                    # Also override the default visit_p which
-          end                      # flattens list-like parameters.  We do
-        end,                       # not want to flatten it.
-        visit_p: ->(y, param) { y << bound(param) } # Do not flatten it.
-      )                            # Don't do that to anyone.
-    end
-
-    def fetch parameter_name
-      init
-      bound set_p.call.fetch(parameter_name)
-    end
-
-    def reduce_by_ props_h=nil, & select_p
-
-      if props_h
-        props_p = -> prop do
-          ! props_h.detect do |k, v|
-            ! prop.known?(k) || prop[k] != v
+            proto.dup._init foz.fetch sym
           end
         end
-      end
 
-      _filter_p =
-      case [(:props if props_p), (:select if select_p)].compact
-      when [:props, :select] ; ->(p) { props_p.call(p) && select_p.call(p) }
-      when [:props]          ; props_p
-      when [:select]         ; select_p
-      when []                ; MONADIC_TRUTH_
-      end
+        def fetch sym, & else_p
 
-      reduce_with_changes( params_p: -> do
-        ::Enumerator.new do |y|
-          params_p.call.each { |p| _filter_p.call(p) and y << p }
-        end
-      end )
-    end
-
-  private
-
-    meta_param :inherit, boolean: true, writer: true
-    param :known_p, accessor: true, inherit: true
-    param :label_p, accessor: true, inherit: true
-    param :params_p, accessor: true, inherit: true
-    param :read_p, accessor: true, inherit: true
-    param :set_p, accessor: true, inherit: true
-    param :upstream_p, accessor: true, inherit: true
-    param :visit_p, writer: true, inherit: true
-    param :write_p, accessor: true, inherit: true
-
-    def init
-      @mixed &&= begin
-        if ::Hash === @mixed then @mixed.each { |k, v| send("#{k}=", v) }
-        else process_host_instance(@mixed)
-        end
-        nil
-      end
-    end
-
-    def bound parameter
-      Bound.new(parameter,
-        ->{ read_p.call(parameter) if known_p.call(parameter) },
-        ->(val) { write_p.call(parameter, val) }, label_p)
-    end
-
-    def reduce_with_changes changes
-      init # should be ok to call multiple times
-      self.class.new(Hash[
-        self.class.parameters.each_value.select(&:inherit?).map do |param|
-          [param.normalized_parameter_name, send(param.normalized_parameter_name)]
-        end].merge(changes) )
-    end
-
-    def process_host_instance host_instance
-      f = {}
-      host_instance.instance_exec do
-        f[:set_p] = ->{ formal_parameters }
-        f[:params_p] = -> { formal_parameters.to_a }
-        f[:known_p] = ->(param) { known? param.normalized_parameter_name }
-
-        f[ :label_p ] = -> param, d=nil do
-
-          parameter_label param, d
-        end
-
-        f[:read_p] = ->(param) do
-          m = method(param.normalized_parameter_name) # catch these errors here, they are sneaky
-          m.arity <= 0 or fail("You do not have a reader for #{param.normalized_parameter_name}")
-          m.call
-        end
-        f[:upstream_p] = ->(param, val, &valid_p) do
-          param.apply_upstream_filter(self, val, &valid_p)
-        end
-        f[:write_p] = ->(param, val) do
-          param.apply_upstream_filter(self, val) { |v| self[param.normalized_parameter_name] = v }
-        end
-      end
-      f.each { |k, v| send("#{k}=", v) }
-    end
-
-    def visit y
-      params_p.call.each { |p| visit_p.call(y, p) }
-    end
-
-    # The builtin implementation for visit_p flattens list-like parameters
-    # into each their own bound parameter.
-
-    def visit_p
-      @visit_p ||= (->(y, param) do
-        # Note that the below implementation for processing list-likes relies
-        # on the lists being implemented as array-like.  Also note that
-        # it might fail variously if there are not readers / writers in place.
-        if param.list?
-          a = read_p.call(param) and a.length.times do |i| # nil iff zero items
-            y << Bound.new(param,
-              ->{ a[i] }, # ok iff there is no lazy evaluation
-              ->(val) { upstream_p.call(param, val) { |_val| a[i] = _val } },
-              ->(_) { label_p.call(param, i) })
+          if else_p
+            no = nil
+            prp = @_formal_parameters.fetch sym do
+              no = true
+            end
+          else
+            prp = @_formal_parameters.fetch sym
           end
-        else
-          y << bound(param)
+
+          if no
+            else_p[]
+          else
+            _build_bound_prototype._init prp
+          end
         end
-      end)
-    end
-  end
 
-  _BP = -> do
-    Bound_Parameter_Collection___.new self
-  end
+        def each
+          st = to_value_stream
+          begin
+            bp = st.gets
+            bp or break
+            yield bp
+            redo
+          end while nil
+        end
 
-  Definer_instance_methods = -> mod do
+        def to_bound_item_stream  # like the next method, but flattens lists
 
-    mod.send :define_method, :bound_parameters, _BP
-  end
+          to_value_stream.expand_by do | bnd |  # mentor is in spec
 
-  class Bound_Parameter_Collection___
+            if bnd.parameter.is_list
+              bnd.to_stream
+            else
+              Callback_::Stream.via_item bnd
+            end
+          end
+        end
 
-    # This may be a design smell, but see the commit where this thing first
-    # appeared.  it is kind of a deep problem, and after some thought this
-    # was considered the optimal solution.  suggestions welcome.
+        def to_value_stream
 
-    def initialize host_instance
-      @bridge = Enumerator___.new(host_instance)
-    end
+          proto = _build_bound_prototype
 
-    def [](k) ; @bridge.fetch(k) end # !
+          @_formal_parameters.to_value_stream.map_by do | prp |
 
-    def at *a, &b ; @bridge.at(*a, &b) end
+            proto.dup._init prp
+          end
+        end
 
-    def each *a, &b ; @bridge.each(*a, &b) end
+        def _build_bound_prototype
+          Here_.new @_entity
+        end
+      end
 
-    def reduce_by * a, & p
-      @bridge.reduce_by_( * a, & p )
-    end
-  end
-# 2 ->
+      Here_ = self
+      class Here_
+
+        # ~ as bound parameter model
+
+        attr_reader(
+          :parameter,
+        )
+
+        def initialize ent
+          @_ent = ent
+        end
+
+        # ~ special for (assume) list
+
+        def to_stream
+
+          a = value
+          if a
+            proto = Models_::For_Item.new a, @parameter
+
+            Callback_::Stream.via_times a.length do | d |
+              proto.dup.__init d
+            end
+          else
+            Callback_::Stream.the_empty_stream
+          end
+        end
+
+        # ~ normal
+
+        def _init prp
+          @parameter = prp
+          self
+        end
+
+        def value
+          @_ent.send :fetch, @parameter.name_symbol do
+            NIL_
+          end
+        end
+
+        def value= x
+          @_ent.send @parameter.writer_method_name, x
+          x
+        end
+
+        def name_symbol
+          @parameter.name_symbol
+        end
+
+        def name
+          @parameter.name
+        end
+
+        def is_item
+          false
+        end
+      end
+
+      class Models_::For_Item
+
+        attr_reader :parameter
+
+        def initialize a, para
+          @_a = a
+          @parameter = para
+        end
+
+        def __init d
+          @_d = d
+          self
+        end
+
+        def value
+          @_a.fetch @_d
+        end
+
+        def value= x  # ..
+          @_a[ @_d ] = x
+        end
+
+        def name_symbol
+          @parameter.name_symbol
+        end
+
+        def name
+          @parameter.name
+        end
+
+        def is_item
+          true
+        end
+      end
     end
   end
 end

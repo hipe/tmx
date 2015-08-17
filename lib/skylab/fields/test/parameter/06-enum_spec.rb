@@ -10,38 +10,51 @@ describe '[fi] P - enum: given "object" with parameter "foo"' do
     context 'you get no readers or writers out of the box so..' do
 
       with do
-        param :color, enum: [:red, :blue]
+        param :color, :enum, [ :red, :blue ]
       end
 
       frame do
-        it '"object.foo" and "object.foo = x" you do not have' do
-          ->{ object.color }.should raise_error(::NoMethodError)
-          ->{ object.color = :red }.should raise_error(::NoMethodError)
+
+        it "at declaration time, it will complain that there is no writer" do
+          begin
+            the_class_
+          rescue ::ArgumentError => e
+          end
+          e.message.should eql "`enum` modifier #{
+            }must come after a modification that establishes a writer method"
         end
       end
     end
 
-    context 'but if "foo" also has the property "writer: true"' do
+    context 'but if "foo" is a regular writer' do
 
       with do
-        param :color, enum: [:red, :blue], writer: true
+        param :color, :writer, :enum, [ :red, :blue ]
       end
 
-      capture_emit_lines_
+      spy_on_events_
 
       frame do
 
         it '"object.foo = :beta" (a valid value) changes the parameter value' do
-          object.send(:known?, :color).should eql(false)
+
+          object = object_
+
+          expect_unknown_ :color, object
+
           object.color = :blue
-          object.send(:[], :color).should eql(:blue)
+
+          force_read_( :color, object ).should eql :blue
         end
 
-        it('"object.foo = :gamma" (an invalid value) will use the host ' <<
-           'instance\'s _with_client method to call_digraph_listeners an error message') do # [#012]
+        it "`object.foo = :gamma` will emit an error event" do
+
+          object = object_
           object.color = :orange
-          @emit_lines_.shift.should match(/:orange is an invalid value for .*color/i)
-          @emit_lines_.length.should eql(0)
+          expect_not_OK_event :invalid_property_value,
+            "invalid color (ick :orange), expecting { red | blue }"
+
+          expect_unknown_ :orange, object
         end
       end
     end

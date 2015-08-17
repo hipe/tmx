@@ -5,18 +5,37 @@ describe "[fi] P - meta-parameters" do
   extend Skylab::Fields::TestSupport
   use :parameter
 
-  context 'can be defined inline alongside parameters with "meta_param"' do
+  context "some built-in meta-meta-parameters can modify meta-parameters." do
 
     with do
-      meta_param :inheritable, boolean: true, writer: true
-      param :direction, inheritable: true
+
+      param :first_name
+
+      meta_param :highly_sensitive, :boolean
+
+      param :social_security_number, :highly_sensitive
+
+      param :last_name
     end
 
     frame do
-      it 'and they can then be used in property assignments ' <<
-        'on subsequent parameter definitions WOW!' do
-        param = object.class.parameters[:direction]
-        param.inheritable?.should eql(true)
+
+      it "a parameter that *was* modified with the meta-parameter says so" do
+
+        _param = the_class_.parameters.fetch :social_security_number
+        _param.highly_sensitive?.should eql true
+      end
+
+      it "a parameter that was not modified with the meta-parameter says so" do
+
+        _param = the_class_.parameters.fetch :last_name
+        _param.highly_sensitive?.should eql nil
+      end
+
+      it "but what of a parameter created before the meta-parameter existed?" do
+
+        _param = the_class_.parameters.fetch :first_name
+        _param.respond_to?( :highly_sensitive? ).should eql false
       end
     end
   end

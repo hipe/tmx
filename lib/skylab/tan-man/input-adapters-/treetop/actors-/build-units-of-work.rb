@@ -2,152 +2,201 @@ module Skylab::TanMan
 
   module Input_Adapters_::Treetop
 
-  class Load
+    class Actors_::Build_units_of_work
 
-    class Actors_::Normalize_and_validate_paths  # this looks like :+[#sy-004] but may not be
+      # build the array of units of work, necessarily in one batch so we
+      # memoize the existential state of the various dirs involved, only
+      # hitting the filesystem once per dir, not once per unit of work.
+      #
+      #   • this used to be over-generalized. we have since parsimonized it.
+      #   • this once looked like a :+[#sy-004] normalizer. but no longer.
 
-      Callback_::Actor.call self, :properties,
-        :root_bp,
-        :event_receiver  # and proprietor
+      Callback_::Actor.call( self, :properties,
+        :bound_parameters,
+        :filesystem,
+      )
 
       Callback_::Event.selective_builder_sender_receiver self
 
       def execute
-        resolve_pathname_actual_a
-        ok = nil
-        @pathname_actual_a.each do |bp|
-          ok = process_bound_property bp
-          ok or break
-        end
-        ok
-      end
 
-      def resolve_pathname_actual_a
-        @pathname_actual_a = @event_receiver.bound_parameters.reduce_by do |bp|
-          if bp.known? :pathname
-            bp[ :pathname ]
-          end
-        end.to_a ; nil
-      end
+        out_a = []
 
-      def process_bound_property bp
-        if bp.value
-          process_valued_bound_property bp
-        else
-          PROCEDE_  # it path wasn't specified, leave brittany alone
-        end
-      end
+        @_gx_bp = @bound_parameters.fetch :add_treetop_grammar  # a "list" b.p
+        @_gx_bp.value.each_with_index do | grammar_path, d |
 
-      def process_valued_bound_property bp
-        pn = bp.value
-        ok = if pn.absolute?
-          PROCEDE_
-        else
-          expand_relative_path bp
-        end
-        if ok
-          ok = process_absolute_bound_pathname bp
-        end
-        ok
-      end
+          @_grammar_path = grammar_path
+          @_item_index = d
 
-      def process_absolute_bound_pathname bp
-        if bp.value.exist?
-          process_absolute_when_exists bp
-        else
-          process_absolute_when_not_exists bp
-        end
-      end
-
-      def process_absolute_when_exists bp
-        ok = PROCEDE_
-        if bp.parameter.dir?
-          if ! bp.value.directory?
-            send_not_directory_error bp
-            ok = UNABLE_
-          end
-        end
-        ok
-      end
-
-      def process_absolute_when_not_exists bp
-        ok = PROCEDE_
-        if bp.parameter.known? :exist
-          if :must == bp.parameter.exist
-            send_not_found_error bp
-            ok = UNABLE_
-          end
-        end
-        ok
-      end
-
-      def expand_relative_path bp
-        root_pn = produce_root_pn_given_pathname_bp bp
-        if root_pn
-          bp.value = root_pn.join bp.value
-          PROCEDE_
-        else
-          UNABLE_
-        end
-      end
-
-      def produce_root_pn_given_pathname_bp bp
-        @did_resolve_root_pn ||= resolve_root_pn( bp )
-        @root_pn
-      end
-
-      def resolve_root_pn bp
-        x = @root_bp.value
-        if x
-          if x.absolute?
-            @root_pn = x
+          gr = __build_grammar
+          if gr
+            out_a.push gr
           else
-            send_not_abspath_error bp
-            @root_pn = false
+            out_a = gr
+            break
+          end
+        end
+        out_a
+      end
+
+      def __build_grammar
+
+        @_uow = Models_::Grammar_to_Load.new
+
+        if FILE_SEPARATOR_ == @_grammar_path[ 0 ]  # ..
+          __when_grammar_path_is_absolute
+        else
+          __when_grammar_path_is_relative
+        end
+      end
+
+      def __when_grammar_path_is_relative
+
+        _ok = __maybe_normalize_head_paths
+        _ok && __when_head_paths_are_normal
+      end
+
+      def __maybe_normalize_head_paths
+
+        @___did_normalize_head_paths ||= __init_normalize_head_paths
+        @_head_paths_are_normal
+      end
+
+      def __init_normalize_head_paths  # must assert both head dirs exist
+
+        @_head_paths_are_normal = true
+
+        _check_dir :input_path_head_for_relative_paths
+        _check_dir :output_path_head_for_relative_paths
+        ACHIEVED_
+      end
+
+      def _check_dir sym  # must assert is (existent) directory
+
+        bp = @bound_parameters.fetch sym
+        dir = bp.value
+
+        ok = if dir
+
+          if @filesystem.directory? dir
+            instance_variable_set :"@__#{ sym }__", dir
+            ACHIEVED_
+          else
+            maybe_send_error :__build_not_directory_error, bp
           end
         else
-          send_no_anchor_error bp
-          @root_pn = false
+          maybe_send_error :__build_no_anchor_path_event, :xx, bp
         end
-        true
+
+        if ! ok
+          @_head_paths_are_normal = ok
+        end
+
+        NIL_
       end
 
-      def send_not_abspath_error prop
-        prop_ = @root_bp
-        _ev = build_not_OK_event_with :not_absolute_path, :prop, prop do |y, o|
-          y << "#{ prop_.normalized_parameter_name } must be an absolute #{
-            }path in order to expand paths like #{ prop.label }"
+      def __when_head_paths_are_normal  # assume relative path, head dirs exist
+
+        stem = @_grammar_path
+        uow = @_uow
+
+        uow.input_path = ::File.join(
+          @__input_path_head_for_relative_paths__, stem )
+
+        output_path = ::File.join(
+          @__output_path_head_for_relative_paths__,
+          _convert_basename( stem ) )
+
+        uow.output_path = output_path
+
+        dir = ::File.dirname output_path  # *not* necessaritly same as ivar
+
+        if ! @filesystem.directory? dir
+
+          # assume that the head paths are (existent) directories. therefor,
+          # to mkdir -p the above dir is "guaranteed" to make only a number
+          # directories that corresponds to the number of slashes in the stem
+
+          uow.make_this_directory_minus_p = dir
         end
-        send_error_event _ev
+
+        _common_finish
       end
 
-      def send_no_anchor_error prop
-        prop_ = @root_bp
-        _ev = build_not_OK_event_with :no_anchor_path do |y, o|
-          y << "#{ prop_.normalized_parameter_name } must be set #{
-            }in order to support a relative path like #{ prop.label }!"
+      def __when_grammar_path_is_absolute
+
+        path = @_grammar_path
+
+        if @filesystem.file? path
+
+          @_uow.input_path = path
+
+          @_uow.output_path = ::File.join(
+            ::File.dirname( path ),
+            _convert_basename( ::File.basename( path ) ) )
+
+          _common_finish
+        else
+          maybe_send_error :__build_not_found_error
         end
-        send_error_event _ev
       end
 
-      def send_not_directory_error prop
-        _ev = build_not_OK_event_with :not_a_directory, :prop, prop do |y, o|
+      def _convert_basename bn
+        "#{ bn }#{ Autoloader_::EXTNAME }"
+      end
+
+      def _common_finish
+
+        uow = @_uow
+
+        i_a = Actors_::Hack_peek_module_name.call(
+          uow.input_path,
+          @filesystem,
+          & @on_event_selectively )
+
+        if i_a
+
+          uow.module_name_i_a = i_a
+
+          uow.output_path_did_exist = @filesystem.file? uow.output_path
+
+          uow.freeze
+        else
+          i_a
+        end
+      end
+
+      def __build_not_abspath_event prp, prp_
+
+        build_not_OK_event_with :not_absolute_path, :prop, prp do |y, o|
+
+          y << "#{ prp_.name_symbol } must be an absolute #{
+            }path in order to expand paths like #{ prp.label }"
+        end
+      end
+
+      def __build_no_anchor_path_event prp, prp_
+
+        build_not_OK_event_with :no_anchor_path do |y, o|
+
+          y << "#{ prp_.name_symbol } must be set #{
+            }in order to support a relative path like #{ prp.label }!"
+        end
+      end
+
+      def __build_not_directory_error prop
+
+        build_not_OK_event_with :not_a_directory, :prop, prop do |y, o|
           y << "#{ o.prop.label } is not a directory: #{ pth prop.value }"
         end
-        send_error_event _ev
       end
 
-      def send_not_found_error prop
-        _ev = build_not_OK_event_with :not_found, :prop, prop do |y, o|
+      def __build_not_found_error prop
+
+        build_not_OK_event_with :not_found, :prop, prop do |y, o|
           y << "#{ prop.label } not found: #{ pth prop.value }"
         end
-        send_error_event _ev
-      end
-
-      def send_error_event ev
-        @event_receiver.receive_error_event ev
       end
     end
-  end
   end
 end

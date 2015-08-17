@@ -75,13 +75,15 @@ module Skylab::Brazen
 
       # ~ #hook-out to #parameter-reflection-API
 
-      def fetch_parameter norm_i, & else_p
-        parm = @farg_a.detect do |x|
-          norm_i == x.normalized_parameter_name
+      def fetch_parameter sym, & else_p
+
+        parm = @farg_a.detect do | prp |
+          sym == prp.name_symbol
         end
+
         if parm then parm else
           (( else_p || -> do
-            raise ::KeyError, "argument not found: #{ norm_i.inspect }"
+            raise ::KeyError, "argument not found: #{ sym.inspect }"
           end )).call
         end
       end
@@ -167,11 +169,11 @@ module Skylab::Brazen
 
           My_Hooks____ = _Parameter::Definer.new do
 
-            param :on_missing, hook: true
+            param :on_missing, :hook, :reader
 
-            param :on_extra, hook: true
+            param :on_extra, :hook, :reader
 
-            param :on_success, hook: true
+            param :on_success, :hook, :reader
           end  # result
         end
 
@@ -183,7 +185,7 @@ module Skylab::Brazen
           if @_range_failure_method_name
             send @_range_failure_method_name
           else
-            p = @hooks.on_success
+            p = @hooks.handle_success
             if p
               p[]
             else
@@ -224,14 +226,14 @@ module Skylab::Brazen
 
           _stx = Models_::Base_Syntax.new _farg_a
           _ev = Events_::Missing[ :vertical, _stx, nil, @syntax ]
-          @hooks.on_missing[ _ev ]
+          @hooks.handle_missing[ _ev ]
         end
 
         def __when_extra
 
           _s_a = @actual_arguments[ @_end_d .. -1 ]
           _ev = Events_::Extra[ _s_a ]
-          @hooks.on_extra[ _ev ]
+          @hooks.handle_extra[ _ev ]
         end
       end
 

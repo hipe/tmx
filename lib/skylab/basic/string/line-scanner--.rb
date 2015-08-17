@@ -34,10 +34,6 @@ module Skylab::Basic
         @upstream.__lineno
       end
 
-      def lineno
-        @upstream.__lineno
-      end
-
       def rewind
         @upstream.__rewind
       end

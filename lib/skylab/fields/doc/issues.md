@@ -1,5 +1,5 @@
 [#025]       #parent-node: [#002] "formal vs. actual attributes.."
-[#012] #open redesign this `with_client` nonsense
+[#012]       #done redesign this `with_client` nonsense
 [#009]       transplant "parameters" from [hl]
 [#008]       #in-situ [ the absorber method maker ]
 [#006]       for retrospective ..

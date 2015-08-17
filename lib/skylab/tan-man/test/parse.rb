@@ -58,32 +58,18 @@ module Skylab::TanMan::TestSupport
 
         # create a load session that produces (hopefully) a parser class
 
-        _load = Home_::Input_Adapters_::Treetop::Load.new(
+        o = Home_::Input_Adapters_::Treetop::Sessions::Require.new(
+          & @on_event_selectively )
 
-          -> o do
-            o.generated_grammar_dir @_h.fetch :generated_grammar_dir_path
-            o.root_for_relative_paths @_h.fetch :root_for_relative_paths_for_load
-            o.treetop_grammar @_h.fetch :grammar_path
-          end,
+        o.input_path_head_for_relative_paths =
+          @_h.fetch :root_for_relative_paths_for_load
 
-          -> o do
+        o.output_path_head_for_relative_paths =
+          @_h.fetch :generated_grammar_dir_path
 
-            # for clarity, we may below duplicate some of parent's wiring logic
+        o.add_treetop_grammar @_h.fetch :grammar_path
 
-            o.on_info do | ev |
-              @on_event_selectively.call :info, ev.terminal_channel_i do
-                ev
-              end
-            end
-            o.on_error do | ev |
-              @on_event_selectively.call :error, ev.terminal_channel_i do
-                ev
-              end
-            end
-          end,
-        )
-
-        _load.execute
+        o.execute
       end
     end
   end

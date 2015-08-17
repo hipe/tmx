@@ -26,11 +26,11 @@ module Skylab::TanMan
 
       def execute
 
-        o = Home_::Input_Adapters_::Treetop.new_parse
+        o = Home_::Input_Adapters_::Treetop::Sessions::Parse.new
 
         o.receive_byte_upstream_identifier @byte_upstream_identifier
 
-        o.receive_parser_class produce_parser_class_
+        o.accept_parser_class produce_parser_class_
 
         x = o.flush_to_parse_tree
         if x
@@ -41,7 +41,7 @@ module Skylab::TanMan
       end
 
       def produce_parser_class_
-        Memoized_parser_class__[] || Memoize_parser_class__[ __build_parser_class ]
+        Memoized_parser_class__[] || Memoize_parser_class__[ __require_parser_class ]
       end
 
       -> do
@@ -50,40 +50,32 @@ module Skylab::TanMan
         Memoize_parser_class__ = -> x { cls = x ; x }
       end.call
 
-      def __build_parser_class
+      def __require_parser_class
 
-        Home_::Input_Adapters_::Treetop::Load.new(
+        o = Home_::Input_Adapters_::Treetop::Sessions::Require.new(
 
-          -> o do
+        ) do | * i_a, & ev_p |
 
-            # o.force_overwrite!  will re-write generated parser files
+          if :error == i_a.first
+            raise ev_p[].to_exception
+          else
+            @on_event_selectively.call( * i_a, & ev_p )
+          end
+        end
 
-            o.generated_grammar_dir @generated_grammar_dir_path
+        # o.force_overwrite!  will re-write generated parser files
 
-            o.root_for_relative_paths Models_::DotFile.dir_pathname.to_path
+        _path = Models_::DotFile.dir_pathname.to_path
 
-            o.treetop_grammar 'dot-language-hand-made.treetop'
+        o.input_path_head_for_relative_paths = _path
 
-            o.treetop_grammar 'dot-language.generated.treetop'
-          end,
+        o.output_path_head_for_relative_paths = @generated_grammar_dir_path
 
-          -> o do
+        o.add_treetop_grammar 'dot-language-hand-made.treetop'
 
-            # #open [#025] one day ..
+        o.add_treetop_grammar 'dot-language.generated.treetop'
 
-            o.on_info do | ev |
-              @on_event_selectively.call :info, ev.terminal_channel_i do
-                ev
-              end
-            end
-
-            o.on_error do | ev |
-              @on_event_selectively.call :error, ev.terminal_channel_i do
-                ev
-              end
-            end
-
-          end ).execute
+        o.execute
       end
 
       def build_parse_failure_event  # #hook-out for [ttt]

@@ -5,36 +5,54 @@ describe '[fi] given "object" with parameter "foo"' do
   extend Skylab::Fields::TestSupport
   use :parameter
 
-  context 'and "foo" has the property "hook: true"' do
+  context 'with a `hook` modifier' do
 
     with do
-      param :on_error, hook: true
+      param :on_error, :hook
     end
 
     frame do
 
-      it '"object.foo" is a reader (whose result is nil by default)' do
+      it "`object.on_foo { .. }` acts as a writer" do
 
-        object.send(:known?, :on_error).should eql(false)
+        o = object_
+        o.on_error { :x }
+        force_read_( :error, o ).call.should eql :x
       end
 
-      it '"object.foo { .... }" is a writer that sets the parameter ' <<
-           'value to that proc (the proc, not the proc\'s result' do
+      it "but out of the box there's no reader" do
 
-        object = send :object
-        object.on_error { }
-        object.send(:[], :on_error).should be_kind_of(::Proc)
+        o = object_
+        o.on_error { :x }
+        o.respond_to?( :handle_error ).should eql false
       end
 
-      it '"object.foo.call" will then call that proc (when set)' do
+      it "also, we protect against misuse" do
 
-        object = send :object
-        canary = :red
-        object.on_error { canary = :blue }
-        canary.should eql(:red)
-        object.on_error.call
-        canary.should eql(:blue)
+        object = object_
+        begin
+          object.on_error
+        rescue ::ArgumentError => e
+        end
+        e.message.should eql '[past-proofing]'
       end
+    end
+  end
+
+  context "with a `hook` modifier with a `reader` modifier" do
+
+    with do
+      param :on_error, :hook, :reader
+    end
+
+    it "is useful if the client is to behave like an argument struct" do
+
+      object = object_
+      canary = :red
+      object.on_error { canary = :blue }
+      canary.should eql(:red)
+      object.handle_error.call
+      canary.should eql(:blue)
     end
   end
 end

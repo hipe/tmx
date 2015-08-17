@@ -2,37 +2,6 @@ module Skylab::Fields
 
   class Parameter  # *read* [#009]
 
-    class << self
-
-      def _same mod, * x_a
-        Bundles__.edit_module_via_mutable_iambic mod, x_a
-      end
-
-      alias_method :[], :_same
-      alias_method :call, :_same
-    end  # >>
-
-    module Bundles__
-
-      Oldschool_parameter_error_structure_handler = -> _ do
-        private
-        def parameter_error_structure ev
-          _msg = instance_exec( * ev.to_a, & ev.message_proc )
-          send_error_string _msg
-        end
-      end
-
-      Parameter_controller = -> a do
-        module_exec a, & Here_::Controller__.to_proc
-      end
-
-      Parameter_controller_struct_adapter = -> a do
-        module_exec a, & Here_::Controller__::Struct_Adapter.to_proc
-      end
-
-      Home_.lib_.plugin::Bundle::Multiset[ self ]
-    end
-
     Definer = -> mod do
 
       mod.extend Definer_Module_Methods
@@ -52,19 +21,17 @@ module Skylab::Fields
       NIL_
     end
 
-    # <-
-
     module Definer_Module_Methods  # :+#public-API ([tm])
 
       attr_reader :parameters_p
 
-    def meta_param name, props=nil, &b
-      parameters.meta_param! name, props, &b
-    end
+      def meta_param sym, * x_a, & x_p
+        parameters.__touch_meta_parameter( sym )._accept_iambic x_a, & x_p
+      end
 
-    def param name, props=nil, &b
-      parameters.fetch!( name ).merge! props, &b
-    end
+      def param sym, * x_a, & x_p
+        parameters._touch_parameter( sym )._accept_iambic x_a, & x_p
+      end
 
       attr_reader :parameters
       alias_method :any_parameters, :parameters
@@ -74,7 +41,8 @@ module Skylab::Fields
       end
 
       def __build_parameters
-        p = Set___.new self
+
+        col = Models__Collection.new self
         a = ancestors
         nil until ::Object == a.pop
         self == a[0] and a.shift
@@ -87,52 +55,29 @@ module Skylab::Fields
             ! (klass && klass.ancestors.include?(mod)) and mods.push(mod)
           end
         end
-        mods.reverse.each { |mod| p.merge!(mod.parameters) }
+
+        mods.reverse.each do | mod |
+          col._receive_parameter_collection_to_merge mod.parameters
+        end
+
         if parameters_p
-          @parameters = p # prevent inf. recursion, the below call may need this
+          @parameters = col # prevent inf. recursion, the below call may need this
           instance_exec(&@parameters_p)
           @parameters_p = nil
         end
-        if const_defined? :PARAMS, false       # this is an ugly little
-          self::PARAMS.each do |name|          # #experimental shorthand
-            p.fetch!( name ).merge!( accessor: true, required: true )
+
+        if const_defined? :PARAMS, false
+
+          # this is an ugly little #experimental shorthand
+
+          self::PARAMS.each do | sym |
+            col._touch_parameter( name )._be :accessor, :required
           end
         end
-        p
+
+        col
       end
     end
-
-  module Hash_Adapter_Methods___
-    def known? k
-      key? k
-    end                           # useless for reflection unless made public
-  end
-
-  module Struct_Adapter_Methods  # :+#public-API [tm]
-    def known? k
-      ! self[k].nil?              # caution meet wind
-    end
-  end
-
-  module Ivars_Adapter_Methods  # :+#public-API [tm]
-  protected  # #protected-not-private
-
-    def [] k
-      if ! instance_variable_defined? "@#{ k }"
-        fail "getting without checking -- ivar not defined: @#{ k } in a #{
-          self.class }"
-      end
-      instance_variable_get "@#{ k }"
-    end
-
-    def []= k, v
-      instance_variable_set "@#{ k }", v
-    end
-
-    def known? k
-      instance_variable_defined? "@#{ k }"
-    end
-  end
 
     # ~ conveninence maker for hash-based parameters structure [hl]
 
@@ -142,7 +87,56 @@ module Skylab::Fields
       cls
     end
 
+    # ~ instance method modules
+
+    CONST__ = :Parameter
+    Here_ = self
+
+    module Hash_Adapter_Methods___
+
+      const_set CONST__, Here_
+
+    end
+
+    module Struct_Adapter_Methods  # :+#public-API [tm]
+
+      const_set CONST__, Here_
+
+    protected
+      def fetch k
+        self[ k ]
+      end
+    end
+
+    module Ivars_Adapter_Methods  # :+#public-API [tm]
+
+      const_set CONST__, Here_
+
+    protected  # :+#protected-not-private
+
+      def fetch k, & else_p
+
+        ivar = :"@#{ k }"
+
+        if else_p
+          if instance_variable_defined? ivar
+            instance_variable_get ivar
+          else
+            else_p[]
+          end
+        else
+          instance_variable_get ivar
+        end
+      end
+
+      def []= k, x
+        instance_variable_set :"@#{ k }", x
+      end
+    end
+
     class Dynamic_Definer___ < ::Hash
+
+      const_set CONST__, Here_
 
       extend Definer_Module_Methods
 
@@ -153,302 +147,533 @@ module Skylab::Fields
 
     # ~ internal support (models)
 
-  class Set___
+    class Models__Collection  # was "set"
 
-    def initialize host
-      host.respond_to? :formal_parameter_class or
-        def host.formal_parameter_class
-          DEFAULT_DEFINITION_CLASS___
-        end
-      @meta_set = nil ; @host = host
-      @bx = Callback_::Box.new
-    end
-
-    def has? k
-      @bx.has_name k
-    end
-
-    def get_names
-      @bx.get_names
-    end
-
-    def to_a
-      @bx.to_enum( :each_value ).to_a
-    end
-
-    def each_name & p
-      if p
-        @bx.each_name( & p )
-      else
-        @bx.to_enum :each_name
+      def initialize entity_model
+        @_bx = Callback_::Box.new
+        @_entity_model = entity_model
       end
-    end
 
-    def each_value( & p )
-      if p
-        @bx.each_value( & p )
-      else
-        @bx.to_enum :each_value
+      # ~ readers
+
+      def fetch k, & p
+        @_bx.fetch k, & p
       end
-    end
 
-    def each_pair( & p )
-      if p
-        @bx.each_pair( & p )
-      else
-        @bx.to_enum :each_pair
+      def to_value_stream & x_p
+        @_bx.to_value_stream( & x_p )
       end
-    end
 
-    def [] normalized_parameter_name
-      @bx[ normalized_parameter_name ]
-    end
+      # ~ writers
 
-    def fetch k, & p
-      @bx.fetch k, & p
-    end
-
-    def fetch! name
-      @bx.touch name do
-        @host.formal_parameter_class.new @host, name
-      end
-    end
-
-    def merge! set
-      set.each_pair do |name, param|
-        fetch!( name ).merge! param
-      end ; nil
-    end
-
-    def meta_param! name, props, &b
-      meta_set.fetch!( name ).merge!( props, &b )
-    end
-  private
-    def meta_set
-      @meta_set ||= bld_meta_set
-    end
-    def bld_meta_set  # #storypoint-220
-      @host.const_defined?( :ParameterDefinition0 ) and self._sanity_
-      meta_host = ::Class.new @host.formal_parameter_class
-      @host.const_set :ParameterDefinition0, meta_host
-      @host.singleton_class.class_eval do
-        remove_method :formal_parameter_class # avoid warnings, careful!
-        def formal_parameter_class
-          self::ParameterDefinition0
+      def _touch_parameter sym
+        @_bx.touch sym do
+          ( @_entity_model.const_get CONST__ ).new @_entity_model, sym
         end
       end
-      meta_host.parameters
-    end
-  end
-  # ->
-  end
 
-  # ~ as class
+      def _receive_parameter_collection_to_merge col
 
-  class Parameter  # re-opened, #storypoint-230
+        st = col.to_value_stream
+        begin
+          prp = st.gets
+          prp or break
 
-    # -- * -- stuff you need because you're not a hash
+          prp_ = _touch_parameter( prp.name_symbol )
+          st_ = prp.__to_any_polymorphic_upstream
+          if st_
+            prp_._accept_polymorphic_upstream st_
+          end
+          redo
+        end while nil
+        NIL_
+      end
 
-    include Ivars_Adapter_Methods
+      def __touch_meta_parameter sym
 
-    def each &y
-      @property_keys.each { |k| y.call(k, self[k]) }
-    end
+        _mp = __meta_collection._touch_parameter sym
+        _mp
+      end
 
-    # -- * --
+    private
 
-    def merge! mixed, &b # might be a Hash, might be a self-class, can be nil ..
-      # ..if is parameter with no properties
-      mixed and mixed.each do |k, v| # is nil with a param with no hash def
-        if known? k
-          self[k] == v and next # do not reprocess sameval properties
+      def __meta_collection
+        @___mc ||= __build_meta_collection
+      end
+
+      def __build_meta_collection  # [#.A]
+
+        # always makes a dedicated class in the entity model for now
+
+        entity_model = @_entity_model
+
+        if entity_model.const_defined? CONST__, false
+          self._COVER_ME
+          cls = entity_model.const_get CONST__
         else
-          @property_keys.push k
+          cls = ::Class.new entity_model.const_get CONST__
+          entity_model.const_set CONST__, cls
         end
-        self[k] = v # do this here to kiss. inheritable property, always
-        send("#{k}=", v) # possibly re-process with diffval, possibly newprop
+
+        cls.parameters
       end
-      block_given? and instance_exec(&b)
-      @has_tail_queue and at_tail
-      nil
     end
+
+    # ~ as class
+
+    attr_reader(
+      :name_symbol,
+    )
+
+    def initialize host_module, sym  # [#.B]
+
+      @entity_model = host_module
+      @name_symbol = sym
+      @normal_iambic = []
+    end
+
+    def _accept_parameter_to_merge prp
+
+      _accept_polymorphic_upstream prp.__to_polymorphic_upstream
+    end
+
+    def __to_any_polymorphic_upstream
+
+      Callback_::Polymorphic_Stream.via_array @normal_iambic
+    end
+
+    def _accept_iambic x_a, & x_p
+
+      _accept_polymorphic_upstream(
+        Callback_::Polymorphic_Stream.via_array( x_a ), & x_p )
+    end
+
+    def _accept_polymorphic_upstream st, & edit_p
+
+      @polymorphic_upstream_ = st
+
+      while st.unparsed_exists
+        send :"when__#{ st.gets_one }__"
+      end
+
+      if edit_p
+        instance_exec( & edit_p )
+      end
+
+      remove_instance_variable :@polymorphic_upstream_
+      NIL_
+    end
+
+    # ~ modifiers [#.C]
+
+    ## ~~ pre support
+
+    def when__monadic__
+
+      send :"when__#{ @polymorphic_upstream_.gets_one }__"
+    end
+
+    ## ~~ boolean: reader_looks_like_this?, writer_looks_like_this! (legacy)
+
+    def when__boolean__
+
+      @normal_iambic.push :monadic, :boolean
+
+      mod = @entity_model
+      sym = @name_symbol
+
+      st = @polymorphic_upstream_
+      if st.unparsed_exists &&
+          :negated_boolean_reader_method_name == st.current_token
+
+        st.advance_one
+        neg = st.gets_one
+      else
+        neg = :"not_#{ sym }"
+      end
+
+      mod.module_exec do
+
+        define_method :"#{ sym }?" do
+
+          fetch sym do
+            NIL_  # (was once false)
+          end
+        end
+
+        define_method :"#{ neg }?" do
+
+          ! fetch sym do
+            false
+          end
+        end
+
+        define_method :"#{ sym }!" do
+          self[ sym ] = true
+          NIL_
+        end
+
+        define_method :"#{ neg }!" do
+          self[ sym ] = false
+          NIL_
+        end
+
+        define_method :"when__#{ sym }__" do
+          self[ sym ] = true
+          KEEP_PARSING_
+        end
+      end
+      KEEP_PARSING_
+    end
+
+    ## ~~ enum: validation on write. assumes selective event handler.
+
+    def when__enum__
+
+      enum_list = @polymorphic_upstream_.gets_one
+      enum_box = nil  # built late
+      init_box = -> do
+        enum_box = Callback_::Box.new
+        enum_list.each do | x |
+          enum_box.add x, true
+        end
+        NIL_
+      end
+
+      me = self
+      sym = @name_symbol
+      wm = writer_method_name or raise ::ArgumentError, __say_enum
+
+      is_writer = EQUALS_BYTE__ == wm.id2name.getbyte( -1 )
+
+      @entity_model.module_exec do
+
+        if is_writer
+
+          downstream_method = :"accept__#{ sym }__after_enum"
+
+          alias_method downstream_method, wm
+
+          accept_bad_enum = :"accept_bad_enum_value_for__#{ sym }__"
+
+          define_method wm do | x |
+
+            enum_box || init_box[]
+            if enum_box.has_name x
+              send downstream_method, x
+            else
+              send accept_bad_enum, x, enum_box, me
+            end
+            x
+          end
+
+          define_method accept_bad_enum, ACCEPT_BAD_ENUM_VALUE__
+        else
+
+          downstream_method = :"receive__#{ sym }__after_enum"
+
+          alias_method downstream_method, wm
+
+          receive_bad_enum = :"receive_bad_enum_value_for__#{ sym }__"
+
+          define_method wm do | x |
+
+            enum_box || init_box[]
+            if enum_box.has_name x
+              send downstream_method, x
+            else
+              send receive_bad_enum, x, enum_box, me
+            end
+          end
+
+          define_method receive_bad_enum, RECEIVE_BAD_ENUM_VALUE___
+        end
+      end
+      KEEP_PARSING_
+    end
+
+    attr_reader :writer_method_name
+
+    def __say_enum
+      "`enum` modifier must come after #{
+        }a modification that establishes a writer method"
+    end
+
+    build_extra_value_event_proc = -> do
+      Home_.lib_.brazen::Entity::Meta_Meta_Properties::Enum::
+        Build_extra_value_event
+    end
+
+    EQUALS_BYTE__ = '='.getbyte 0
+
+    RECEIVE_BAD_ENUM_VALUE___ = -> x, bx, prp do
+
+      @on_event_selectively.call :error, :invalid_property_value do
+
+        build_extra_value_event_proc[][ x, prp.name, bx.get_names ]
+      end
+    end
+
+    ACCEPT_BAD_ENUM_VALUE__ = -> x, bx, prp do
+
+      @on_event_selectively.call :error, :invalid_property_value do
+
+        build_extra_value_event_proc[][ x, prp.name, bx.get_names ]
+      end
+      NIL_
+    end
+
+    ## ~~ DSL (atom | list): the writer does not end in a '='
+
+    def when__DSL__
+      send :"when_DSL__#{ @polymorphic_upstream_.gets_one }__"
+    end
+
+    attr_reader :is_list
+
+    def when_DSL__list__
+
+      @normal_iambic.push :DSL, :list
+      do_reader = _maybe_do_DSL_reader
+      sym = @name_symbol
+      @writer_method_name = sym
+      @is_list = true
+
+      @entity_model.module_exec do
+
+        define_method sym do | x |
+
+          a = fetch sym do end
+
+          if ! a
+            a = []
+            self[ sym ] = a
+          end
+
+          a.push x
+
+          NIL_
+        end
+
+        if do_reader
+
+          define_method :"#{ sym }_array" do
+
+            fetch sym do end
+          end
+        end
+      end
+
+      KEEP_PARSING_
+    end
+
+    def when_DSL__atom__
+
+      @normal_iambic.push :DSL, :atom
+      do_reader = _maybe_do_DSL_reader
+      sym = @name_symbol
+      @writer_method_name = sym
+
+      @entity_model.module_exec do
+
+        define_method sym do | x |
+          self[ sym ] = x
+          NIL_
+        end
+
+        if do_reader
+
+          define_method :"#{ sym }_x" do
+
+            fetch sym do end
+          end
+        end
+      end
+
+      KEEP_PARSING_
+    end
+
+    def _maybe_do_DSL_reader
+
+      if @polymorphic_upstream_.unparsed_exists &&
+          :reader == @polymorphic_upstream_.current_token
+
+        @polymorphic_upstream_.advance_one
+
+        @normal_iambic.push :reader
+
+        true
+      end
+    end
+
+    ## ~~ default: needs special processing by client
+
+    attr_reader :has_default
+    alias_method :has_default?, :has_default  # #todo
+
+    def default_value
+      @_default_proc.call
+    end
+
+    def when__default__
+      x = @polymorphic_upstream_.gets_one
+      _accept_default_by do
+        x
+      end
+      KEEP_PARSING_
+    end
+
+    def _accept_default_by & p
+      @normal_iambic.push :default_proc, p
+      @has_default = true
+      @_default_proc = p
+      NIL_
+    end
+
+    ## ~~ hook: an accessor sugared for being a proc
+
+    def when__hook__
+
+      if @polymorphic_upstream_.unparsed_exists &&
+          :reader == @polymorphic_upstream_.current_token
+
+        @polymorphic_upstream_.advance_one
+        do_reader = true
+      end
+
+      sym = @name_symbol
+
+      md = HOOK_METHOD_NAME_RX___.match sym
+      if md
+        stem = md[ 0 ]
+        read_write_key = stem
+        on_like_method_name = sym
+        if do_reader
+          reader_method_name = :"handle_#{ stem }"
+        end
+      else
+        read_write_key = sym
+        on_like_method_name = :"on_#{ sym }"
+        if do_reader
+          reader_method_name = :"handle_#{ sym }"
+        end
+      end
+
+      handle_like_method_name = :"handle_#{ read_write_key }"
+      normal_writer_method_name = :"#{ handle_like_method_name }="
+
+      @entity_model.module_exec do
+
+        if reader_method_name
+
+          define_method reader_method_name do
+
+            fetch read_write_key do end
+          end
+        end
+
+        define_method on_like_method_name do | & p |
+          p or raise ::ArgumentError, '[past-proofing]'  # past-proof
+          self[ read_write_key ] = p
+        end
+
+        define_method normal_writer_method_name do | p |
+          self[ read_write_key ] = p
+        end
+      end
+      KEEP_PARSING_
+    end
+
+    HOOK_METHOD_NAME_RX___ = /(?<=\Aon_).+/
+
+    ## ~~ builder: a reader that initializes with a proc (named thru reader)
+
+    def when__builder__
+
+      builder_proc_reader_name = @polymorphic_upstream_.gets_one
+      sym = @name_symbol
+
+      @entity_model.module_exec do
+
+        define_method sym do
+
+          yes = nil
+          x = fetch sym do
+            yes = true
+          end
+          if yes
+            x = send( builder_proc_reader_name ).call
+            self[ sym ] = x
+          end
+          x
+        end
+      end
+      KEEP_PARSING_
+    end
+
+    ## ~~ accesssor: like `attr_accessor`
+
+    def when__accessor__
+
+      when__reader__
+      when__writer__
+    end
+
+    ## ~~ reader: like `attr_reader`
+
+    def when__reader__
+
+      @normal_iambic.push :reader
+      sym = @name_symbol
+
+      @entity_model.module_exec do
+
+        define_method sym do
+          fetch sym do end
+        end
+      end
+
+      KEEP_PARSING_
+    end
+
+    ## ~~ writer: like `attr_writer`
+
+    def when__writer__
+
+      @normal_iambic.push :writer
+
+      sym = @name_symbol
+      wm = :"#{ sym }="
+      @writer_method_name = wm
+
+      @entity_model.module_exec do
+
+        define_method wm do | x |
+          self[ sym ] = x
+        end
+      end
+
+      KEEP_PARSING_
+    end
+
+    # ~ constants
+
+    KEEP_PARSING_ = true
+
+    # ~ DOGFOOD [#.E] - the below are implemented with the the above facilities
+
+    Definer[ self ]
+
+    ## ~~ the `desc` meta-property
+
+    param :desc, :DSL, :list, :reader  # (really only here b.c is covered)
+
+    # ~ all-around reflection & support
 
     def name
-      @name ||= Callback_::Name.via_variegated_symbol @normalized_parameter_name
+      @___nm ||= Callback_::Name.via_variegated_symbol @name_symbol
     end
 
-    attr_reader :normalized_parameter_name
-
-    def reader_method_name
-      @normalized_parameter_name
-    end
-
-    def writer_method_name
-      @writer_method_name ||= :"#{ @normalized_parameter_name }="
-    end
-
-  private
-
-    def initialize host, name  # #storypoint-280
-      @has_tail_queue = nil
-      @property_keys = []
-      class << self
-        define_method_p = ->(meth, &b) { define_method(meth, &b) }
-        define_method(:def!) { |meth, &b| define_method_p.call(meth, &b) }
-      end
-      upstream_queue = []
-      def!(:apply_upstream_filter) do |host_obj, val, &final_p|
-        mutated = [* upstream_queue[0..-2], ->(v, _) { final_p.call(v) } ]
-        (f = ->(o, v, i=0) do
-          o.instance_exec(v, ->(_v) { f[o, _v, i+1] }, &mutated[i])
-        end).call(host_obj, val)
-      end
-      upstream_last_mutex = nil
-      def!(:assert_writer) do |msg|
-        upstream_last_mutex or fail("sanity check failed: #{msg}")
-      end
-      tail_queue = nil
-      def!(:at_tail) do
-        begin ; tail_queue.shift.call end while tail_queue.length.nonzero?
-        tail_queue = nil
-      end
-      def!(:filter_upstream!) { |&node| upstream_queue.unshift node }
-      upstream_p = ->(host_obj, val, i = 0) do
-        host_obj.instance_exec(val,
-          ->(_val) { upstream_p.call(host_obj, _val, i+1) }, &upstream_queue[i])
-      end
-      def!(:filter_upstream_last!) do |&node|
-        upstream_last_mutex and
-          fail('upstream filter endpoint can only be set once')
-        upstream_queue.push(upstream_last_mutex = node)
-      end
-      def!(:host_def) { |meth, &b| host.send(:define_method, meth, &b) }
-      def!(:on_tail) { |&b| (tail_queue ||= []).push b ; @has_tail_queue = true}
-      # -- * --
-      def!(:accessor=) { |_| self.reader = self.writer = true } # !!!
-      def! :boolean= do |no|
-        true == no and no = "not_#{name}"
-        host_def("#{name}!") { self[name] = true }
-        host_def("#{no}!")   { self[name] = false }
-        host_def("#{name}?") { known?(name) and self[name] }
-        host_def("#{no}?") { ! known?(name) || ! self[name] }
-      end
-      def! :builder= do |builder_f_method_name|
-        host_def(name) do
-          unless known?(name)
-            _p = send(builder_f_method_name) or fail("no builder: #{name}")
-            self[name] = _p.call
-          end
-          self[name]
-        end
-      end
-      param = self
-      def! :dsl= do |flags| # ( :list | :value ) [ :reader ]
-        flags = [flags] if ::Symbol === flags
-        list_or_value = ( %i( value list ) & flags ).
-          join( EMPTY_S_ ).intern  # ick
-        reader = flags.include?(:reader)
-        case list_or_value
-        when :list
-          list!
-          filter_upstream_last! do |val, _|
-            known?(name) && self[name] or self[name] = []
-            self[name].push val
-          end
-          host_def(name, & (if reader then
-            ->(*a) do
-              if a.length.zero? then known?(name) ? self[name] : nil
-              else a.each { |val| upstream_p.call(self, val) } end
-            end
-          else
-            ->(v, *a) { a.unshift(v).each { |_v| upstream_p.call(self, _v) } }
-          end))
-        when :value
-          filter_upstream_last! { |val, _| self[name] = val } # buck stops here
-          host_def(name, &(if reader then
-            ->(*v) do
-              case v.length
-              when 0 ; self[name] # trigger warnings in some implementations
-              when 1 ; upstream_p.call(self, v.first)
-              else   ; raise ::ArgumentError.new(
-                  "wrong number of arguments (#{v.length} for 1)")
-              end
-            end
-          else
-            ->(v) { upstream_p.call(self, v) }
-          end))
-        else fail('no')
-        end
-      end
-      def! :enum= do |enum|
-        filter_upstream! do |val, valid_p|
-          if enum.include? val
-            valid_p[ val ]
-          else
-           _with_client do  # slated to be improved [#012]
-             send_error_string "#{ val.inspect } is an invalid value #{
-               }for #{ parameter_label param }"
-            end
-          end
-        end
-      end
-      def! :hook= do |_|
-        host_def name do | *a, &p |
-          case ( p ? a <<  p : a ).length
-          when 0 ; self[ name ]
-          when 1 ; self[ name ] = a[ 0 ]
-          else   ; raise ::ArgumentError, "no - (#{ a.length } for 0..1)"
-          end
-        end
-      end
-      def!(:reader=) { |_| host_def(name) { self[name] if known? name } }
-      def!(:upstream_passthru_filter) do |&f|
-        on_tail { assert_writer("passthru filter found with no writer!") }
-        filter_upstream! { |val, valid_p| valid_p.call(f.call val) }
-      end
-      def! :writer= do |_|
-        filter_upstream_last! { |val, _| self[name] = val } # buck stops here
-        host_def("#{name}=") { |val| upstream_p.call(self, val) }
-      end
-      @normalized_parameter_name = name ; @host = host
-    end
-
-    DEFAULT_DEFINITION_CLASS___ = self
-      # when the host module doesn't specify explicitly a formal_parameter_class
-
-    EMPTY_S_ = ' '
-
-    Here_ = self
-
-
-    # -- * --
-    # now we use our own hands to hit ourself with our own dogfood
-
-    extend Definer_Module_Methods
-
-    def self.formal_parameter_class ; self end # during transition
-
-    param :has_default, boolean: 'does_not_have_default'
-
-    def default= anything
-      has_default!  # defining default_value here is important, and protects us
-      def!(:default_value) { anything } # defining it like so is just because
-    end
-
-    param :list, boolean: true, writer: true # define this before below line
-
-    param :desc, dsl: [:list, :reader]       # define this after above line
-
-    param :internal, boolean: :external, writer: true
-
-    def pathname= _
-      (host = @host).respond_to?(:pathname_class) or
-        def host.pathname_class ; ::Pathname end
-      on_tail { assert_writer("can't use 'pathname' without a writer") } #sanity
-      upstream_passthru_filter { |v| v ? host.pathname_class.new(v.to_s) : v }
-    end
-
-    param :required, boolean: true, writer: true
   end
 end
 

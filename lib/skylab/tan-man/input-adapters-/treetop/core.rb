@@ -2,17 +2,23 @@ module Skylab::TanMan
 
   module Input_Adapters_::Treetop
 
-    class Parser__
+    Autoloader_[ Sessions = ::Module.new ]
 
-      def receive_upstream_path path
-        receive_byte_upstream_identifier Brazen_.byte_upstream_identifier.via_path path ; nil
+    class Sessions::Parse
+
+      def accept_upstream_path path
+
+        _bu_ID =  Brazen_.byte_upstream_identifier.via_path path
+        receive_byte_upstream_identifier _bu_ID
+        NIL_
       end
 
       def receive_byte_upstream_identifier x
         @_upstream_ID = x ; nil
       end
 
-      def receive_parser_class cls
+      def accept_parser_class cls
+        cls or self._SANITY
         @_parser_class = cls ; nil
       end
 
@@ -35,6 +41,20 @@ module Skylab::TanMan
       attr_reader :parser_failure_reason
 
     end
+
+    Models_ = ::Module.new
+    class Models_::Grammar_to_Load
+
+      attr_accessor(
+        :input_path,
+        :make_this_directory_minus_p,
+        :module_name_i_a,
+        :output_path,
+        :output_path_did_exist,
+      )
+    end
+
+    Treetop_ = self
   end
 end
 # :#tombstone: this used to be must more overwrought and hookable

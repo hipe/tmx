@@ -13,20 +13,11 @@ sure to read that before investing in this at all. and then no matter what,
 don't invest in this at all.
 
 
-
-
-## :#storypoint-220
-
-We must make our own procedurally-generated parameter definition class
-no matter what lest we create unintentional mutations out of our
-scope. If a formal_parameter_class has been indicated explicitly
-otherwise, that's fine, use it as a base class here.
+## :[#.A]  (was explanation of meta-params)
 
 
 
-
-## :#storypoint-230
-
+## :[#.B]
 Experimentally let a formal parameter be defined as a name (symbol)
 and an unordered set of zero or more properties, each defined as a
 name-value pair (with Symbols for names, values as as-yet undefined.)
@@ -38,15 +29,27 @@ example a child class of a parent class that has parameter definitions.
 
 
 
-## :#storypoint-280
+## :[#.C]
 
-EDIT: this is the worst thing i've ever done.
+the order of the subsections of this section is from general to specific
+in an abstract, perhaps arbitrary sense:
 
-this badboy bears some explanation: so many of these method definitions
-need the same variables to be in scope that it is tighter to define
-them all here in this way.  Also it looks really really weird.
-[#049] we're gonna shut this whole thing down and merge this in with
-the way formal attributes does it.
+  • boolean can be conceived a special form of enum
+
+  • the DSL modifiers are special forms of writers
+
+  • defaulting and building are related in that they both need
+    special processing by the client. for whatever reason they are
+    seen as more general than the above, but more specific then writers.
 
 
-## :[#.D]  (in situ)
+
+
+## :[#.D]  (now a tombstone)
+
+
+
+
+## dogfood :[#.E]
+
+"now we use our own hands to hit ourself with our own dogfood"

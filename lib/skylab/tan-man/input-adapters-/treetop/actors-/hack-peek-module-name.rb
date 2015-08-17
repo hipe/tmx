@@ -1,30 +1,38 @@
 module Skylab::TanMan
 
   module Input_Adapters_::Treetop
-
-  class Load
-
+    # <-
   class Actors_::Hack_peek_module_name  # READ [#011]
 
-    Callback_::Actor[ self, :properties, :path ]
+    Callback_::Actor.call( self, :properties,
+      :path,
+      :filesystem,
+    )
 
     def execute
 
-      file = LIB_.list_scanner ::File.open @path, 'r'
+      file = Home_.lib_.list_scanner @filesystem.open @path, ::File::RDONLY
 
       scn = nil ; set_scanner_to_line = -> line do
         if scn then scn.string = line else
-          scn = LIB_.string_scanner.new line
+          scn = Home_.lib_.string_scanner.new line
         end
         nil
       end
+
       say = -> exp_s do
-        "expected #{ exp_s } near #{ Strange_[ scn.rest ] }"
+
+        "expected #{ exp_s } #{
+         }near #{ Home_.lib_.basic::String.via_mixed scn.rest } #{
+          }in #{ @path }:#{ file.lineno }"
       end
+
       fetch = -> rx do
         scn.scan( rx ) or raise say[ rx.inspect ]
       end
+
       first = true
+
       memo_a = [ ] ; eat_one_or_more_parts = -> do
         first &&= false
         begin
@@ -32,7 +40,9 @@ module Skylab::TanMan
         end while scn.scan( /::/ )
         nil
       end
+
       pushed_back = nil
+
       gets = -> do
         line = if pushed_back
           r = pushed_back ; pushed_back = nil ; r
@@ -44,6 +54,7 @@ module Skylab::TanMan
           true
         end
       end
+
       if gets[]  # so bad ..
         did = false ; have = true
         while scn.skip( /[ \t]*require(_relative)?[ \t(]/ )
@@ -54,6 +65,7 @@ module Skylab::TanMan
           pushed_back = scn.string
         end
       end
+
       while gets[]
         scn.skip SPACE_RX_
         scn.eos? and next
@@ -68,6 +80,7 @@ module Skylab::TanMan
         scn.skip SPACE_RX_
         scn.eos? or raise say[ 'eos' ]
       end
+
       memo_a.length.nonzero? and memo_a
     end
 
@@ -80,6 +93,6 @@ module Skylab::TanMan
     T_MODULE_ = 'module'.freeze
 
   end
-  end
+# ->
   end
 end

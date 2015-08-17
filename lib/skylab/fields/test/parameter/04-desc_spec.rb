@@ -6,7 +6,7 @@ describe '[fi] P - desc: given "object" with parameter "foo"' do
   use :parameter
 
   let :lovely do
-    the_class_.parameters[ :lovely ]
+    the_class_.parameters.fetch :lovely
   end
 
   context 'and "foo" assigns a desc using the DSL' do
@@ -14,6 +14,7 @@ describe '[fi] P - desc: given "object" with parameter "foo"' do
     with do
 
       param(:lovely) do
+
         desc 'this is a lovely parameter'
       end
     end
@@ -21,7 +22,8 @@ describe '[fi] P - desc: given "object" with parameter "foo"' do
     frame do
 
       it '"foo.desc" is an array with the description' do
-        lovely.desc.should eql(['this is a lovely parameter'])
+
+        lovely.desc_array.should eql [ 'this is a lovely parameter' ]
       end
     end
   end
@@ -33,8 +35,10 @@ describe '[fi] P - desc: given "object" with parameter "foo"' do
     end
 
     frame do
+
       it '"foo.desc" will be nil (not an empty array' do
-        lovely.desc.should be_nil
+
+        lovely.desc_array.should be_nil
       end
     end
   end

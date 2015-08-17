@@ -5,105 +5,118 @@ describe '[fi] P - DSL lis[..]: given "object" with parameter "foo"' do
   extend Skylab::Fields::TestSupport
   use :parameter
 
-  context 'and "foo" has the property of "dsl: :value"' do
+  context 'and "foo" has the meta property of DSL (atom)' do
 
     with do
-      param :comment, dsl: :value
+      param :comment, :DSL, :atom
     end
 
     frame do
 
       it '"object.foo" raises error (only a writer not a reader)' do
 
+        object = object_
         ->{ object.comment }.should raise_error(::ArgumentError, /0 for 1/)
       end
 
       it '"object.foo \'x\'" is a writer that sets the internal value' do
 
-        object = send :object
-        object.send(:known?, :comment).should eql(false)
+        object = object_
+
+        expect_unknown_ :comment, object
+
         object.comment 'x'
-        object.send(:[], :comment).should eql('x')
+        force_read_( :comment, object ).should eql 'x'
       end
     end
   end
 
-  context 'and "foo" has the property of ' <<
-     '"dsl: :value, pathname: true"' do
+  context 'and "foo" is DSL (atom), `perthnerm`' do
 
     with do
-      param :comment, dsl: :value, pathname: true
+      const_set :Parameter, Skylab::Fields::TestSupport::Parameter.Frookie
+      param :comment, :DSL, :atom, :perthnerm
     end
 
     frame do
       it '"object.foo \'x\'" will create a pathname as if a normal writer' do
 
-        object = send :object
+        object = object_
         object.comment 'x'
-        object.send(:[], :comment).should be_kind_of(::Pathname)
+        force_read_( :comment, object ).class.should eql ::Pathname
       end
     end
   end
 
-  context 'and "foo" has the property of "dsl: :list"' do
+  context 'and "foo" is DSL (list)' do
 
     with do
-      param :topping, dsl: :list
+      param :topping, :DSL, :list
     end
 
     frame do
 
       it '"object.foo" should not be a reader because it is a writer ' <<
           '(keep it orthoganal and "simple")' do
+
+        object = object_
+
         -> { object.topping }.should raise_error( ::ArgumentError,
-          /wrong number of arguments \(0 for 1\+\)/ )
+          /\Awrong number of arguments \(0 for 1/ )
       end
 
       it '(access "foo" internally to see that it starts out as nil ' <<
           'and not an array)' do
-        object.send(:known?, :topping).should eql(false)
+
+        expect_unknown_ :topping, object_
       end
 
       it '"object.foo "x" adds "x" to the foo list and so on ' <<
           'in the "overloaded (reader)/writer" way (hence dsl)' do
 
-        object = send :object
+        object = object_
         object.topping :sprinkles
         object.instance_variable_get('@topping').should eql([:sprinkles])
         object.topping :sparkles
-        object.send(:[], :topping).should eql([:sprinkles, :sparkles])
+        force_read_( :topping, object ).should eql [ :sprinkles, :sparkles ]
       end
     end
   end
 
-  context 'and "foo" has the properties ' <<
-    '"dsl: :list, enum: [:up, :down, :over]" (CHECK THIS OUT ^_^:)' do
-
-    capture_emit_lines_
+  context 'and "foo" is DSL (list), `enum` ( `up`, `down`, `over` )' do
 
     with do
-      param :move, dsl: :list, enum: [:up, :down, :over]
+      param :move, :DSL, :list, :enum, [ :up, :down, :over ]
     end
+
+    spy_on_events_
 
     frame do
 
       it '"object.foo :left" is invalid, (still) invokes client ui mechanics' do
 
-        object.move :left
-        @emit_lines_.first.should match(/left.+invalid.+move/)
+        object_.move :left
+        _expect_this_was_not_ok :left
       end
 
       it '"object.foo <valid> ; object.foo <invalid>" now works as ' <<
           'expected, as a map-reduce' do
 
-        object = send :object
-        object.send(:known?, :move).should eql(false)
+        object = object_
+
+        expect_unknown_ :move, object
+
         object.move :up
         object.move :over
         object.move :sideways
         object.move :down
-        @emit_lines_.length.should eql(1)
-        object.send(:[], :move).should eql([:up, :over, :down])
+        force_read_( :move, object ).should eql [ :up, :over, :down ]
+      end
+
+      def _expect_this_was_not_ok sym
+
+        expect_not_OK_event :invalid_property_value,
+          "invalid move (ick :#{ sym.id2name }), expecting { up | down | over }"
       end
     end
   end

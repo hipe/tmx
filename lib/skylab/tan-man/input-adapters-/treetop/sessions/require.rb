@@ -2,419 +2,234 @@ module Skylab::TanMan
 
   module Input_Adapters_::Treetop
 
-  class Load < Treetop_::DSL_::Client
+    class Sessions::Require  # see [#008]
 
-  class Shell__ < Treetop_::DSL_::Shell
+      _Parameter = Home_.lib_.fields::Parameter
 
-    # Define the DSL that will be used to load grammars.
+      _Parameter::Definer[ self ]
 
-    def self.formal_parameter_class            # [#sl-119] one day DSL
-      Parameter___ # has extra nonsense for dirs [#fi-009] HL::P strain?
-    end
+      meta_param :required, :boolean
 
-    class Parameter___ < LIB_.parameter
+      param :add_parser_enhancer_module, :DSL, :list, :default, nil
 
-      param :dir, boolean: true
-      param :exist, enum: [:must], accessor: true
+      param :add_treetop_grammar, :DSL, :list, :required
 
-      public :[]                    # the Definer::I_M of this is private
-      public :known?                # the Definer::I_M of this is private
+      param :force_overwrite, :boolean, :default, false
 
-      def pathname= x
-        super x
-        :dir == x and dir!
+      param :input_path_head_for_relative_paths, :writer
+
+      param :output_path_head_for_relative_paths, :writer
+
+      # ~ internally we use the below against the above
+
+      define_method :normalize, _Parameter::Controller::NORMALIZE_METHOD
+
+      define_method :bound_parameters, _Parameter::Bound::PARAMETERS_METHOD
+
+      def initialize( & oes_p )
+
+        @on_event_selectively = oes_p
       end
-    end
 
-    param :enhance_parser_with, dsl: :list
+      LOADED__ = Callback_::Box.new
 
-    param :force_overwrite, boolean: true
+      def execute  # see [#.A]
 
-    param :generated_grammar_dir, dsl: :value, required: true,
-      pathname: :dir, exist: :must
+        # to save "time", we don't even normalize the parameters yet.
 
-    param :root_for_relative_paths, dsl: :value, pathname: :dir
+        key = @add_treetop_grammar.last
 
-    param :treetop_grammar, dsl: :list, required: true,
-      pathname: true, exist: :must
-
-  end
-
-
-    LIB_.parameter::Bound::Definer_instance_methods[ self ]  # `bound_parameters`
-
-    attr_reader( * Shell__.parameters.get_names )
-
-
-                                  # for after call_body_and_absorb
-
-    Callback_::Event.selective_builder_sender_receiver self
-
-    def execute
-      ok = call_body_and_absorb!
-      ok && init_ivars
-      ok &&= normalize_and_validate_paths
-      ok && start_loads
-      ok &&= load_or_generate_grammar_files
-      ok && produce_parser_class
-    end
-
-  private
-
-    def init_ivars
-      @treetop_grammar_pn_a_before_absolution = @treetop_grammar.dup ; nil
-    end
-
-    def normalize_and_validate_paths
-      _relpath_root = bound_parameters[ :root_for_relative_paths ]
-      Load_::Actors_::Normalize_and_validate_paths[ _relpath_root, self ]
-    end
-
-    def start_loads
-      @grammar_a = @treetop_grammar.length.times.map do |d|
-        start_load_grammar d
-      end
-    end
-
-    def start_load_grammar d
-      g = Load_Grammar__.new
-      g.in_pn = @treetop_grammar.fetch d
-      tail_pn = @treetop_grammar_pn_a_before_absolution.fetch d
-      g.tail_path = tail_pn.to_path
-      _base_pn = if tail_pn.absolute?
-        tail_pn
-      else
-        @generated_grammar_dir.join tail_pn
-      end
-      g.out_path = "#{ _base_pn }#{ Autoloader_::EXTNAME }"  # [..]/g1.treetop.rb
-      g.module_name_i_a = Load_::Actors_::Hack_peek_module_name[ g.in_pn.to_path ]
-      g
-    end
-
-    class Load_Grammar__
-      attr_accessor :in_pn, :module_name_i_a, :tail_path
-      def out_path= s
-        @out_pn = ( s ? ::Pathname.new( s ) : s ) ; s
-      end
-      attr_reader :out_pn
-    end
-
-    def produce_parser_class
-      g = @grammar_a.last
-      i_a = g.module_name_i_a.dup
-      i_a[ -1 ] = :"#{ i_a.last }Parser"
-      cls = Callback_::Const_value_via_parts[ i_a ]
-      a = enhance_parser_with
-      if a
-        cls = enhance_parser_via_a cls, a
-      end
-      cls
-    end
-
-    def enhance_parser_via_a cls, a
-      a.each do |mod|
-        cls = subclass cls, mod
-      end
-      cls
-    end
-
-    def compiler
-      @compiler ||= ::Treetop::Compiler::GrammarCompiler.new
-    end
-
-    def load_or_generate_grammar_files
-      via_grammars_summarize
-      if @grammar_a.length.nonzero?
-        LIB_.TT
-      end
-      ok = PROCEDE_
-      @grammar_a.each do |g|
-        ok = load_or_generate_grammar_file_for_grammar g
-        ok or break
-      end
-      ok
-    end
-
-    def via_grammars_summarize
-      grammar_a = @grammar_a
-      exist_g_a = [] ; create_g_a = []
-      grammar_a.each do |g|
-        ( if g.out_pn.exist?
-          exist_g_a
-        else
-          create_g_a
-        end ).push g
-      end
-      if exist_g_a.length.nonzero?
-        send_overwriting_event exist_g_a
-      end
-      if create_g_a.length.nonzero?
-        send_creating_event create_g_a
-      end
-      if grammar_a.length.zero?
-        send_none_event
-      end
-      PROCEDE_
-    end
-
-    def load_or_generate_grammar_file_for_grammar g
-      ok = recompile_if_necessary g
-      ok and require_the_file g
-    end
-
-    def recompile_if_necessary g
-      if @force_overwrite or ! g.out_pn.exist?
-        recompile g
-      else
-        PROCEDE_
-      end
-    end
-
-    def require_the_file g
-      _path = g.out_pn.sub_ext( EMPTY_S_ ).to_path
-      require _path
-      PROCEDE_
-    rescue ::NameError => e
-      raise say_name_error_in_grammar_file e
-    end
-
-    def say_name_error_in_grammar_file e
-      md = STACK_RX_.match e.backtrace[ 0 ]
-      _ctx_s = if md
-        "in #{ ::File.basename( md[ :file ] ) }:#{ md[ :line ] }"
-      else
-        "(#{ e.backgrace[ 0 ] })"
-      end
-      "#{ e.message } #{ _ctx_s }"
-    end
-
-    STACK_RX_ = %r{\A(?<file>[^:]+):(?<line>\d+)(?::in `(?<method>[^']+)')?\z/}
-
-    def mkdir_safe g
-      # don't make any new directories deeper than the amt of dirs in grammar
-      parent = g.out_pn.dirname
-      _num_slashes = g.tail_path.scan( %r(/) ).length
-      _num_slashes.times do
-        parent = parent.dirname
-      end
-      if parent.directory?
-        LIB_.file_utils.mkdir_p g.out_pn.dirname.to_s, verbose: true
-        PROCEDE_
-      else
-        send_directory_must_exist_error parent
-        UNABLE_
-      end
-    end
-
-    def send_directory_must_exist_error pn
-      _ev = build_error_event :directory_must_exist, :pathname, pn
-      send_error_event _ev
-    end
-
-
-    def normalize_and_validate_paths_to param_i
-      @error_count ||= 0
-      error_count_before = @error_count
-      resolve_pathname_actual_a
-
-      @pathname_actual_a.each do |bp|
-
-        bp.value or next  # it path wasn't specified, leave brittany alone
-
-        if ! bp.value.absolute?  # expand  relative paths
-          root_pn = produce_root_pn_given_pathname_bp bp, param_i
-          root_pn or break
-          bp.value = root_pn.join bp.value
+        if FILE_SEPARATOR_BYTE_ != key.getbyte( 0 )
+          key = ::File.join @input_path_head_for_relative_paths, key
         end
 
-        if bp.value.exist?
-          if bp.parameter.dir? and ! bp.value.directory?
-            send_not_directory_error bp
+        none = nil
+        cls = LOADED__.fetch key do
+          none = true
+        end
+
+        if none
+          __do_load
+        else
+          cls
+        end
+      end
+
+      def __do_load
+
+        @_filesystem = Home_.lib_.system.filesystem  # mkdir_p
+
+        @formal_parameters = self.class.parameters
+
+        ok = normalize
+        ok &&= __resolve_units_of_work
+        ok && Home_.lib_.TT  # either for compiling or for loading
+        ok &&= __maybe_compile_some_files
+        ok && __require_the_files
+        ok && __produce_the_final_parser_class
+      end
+
+    private
+
+      def __resolve_units_of_work
+
+        uow_a = Treetop_::Actors_::Build_units_of_work.call(
+          bound_parameters,
+          @_filesystem,
+          & @on_event_selectively )
+
+        if uow_a
+          @_units_of_work = uow_a
+          ACHIEVED_
+        else
+          uow_a
+        end
+      end
+
+      # ~ compile
+
+      def __maybe_compile_some_files
+
+        a = nil
+        will_create = nil
+        will_overwrite = nil
+
+        @_units_of_work.each do | uow |
+          if uow.output_path_did_exist
+            if @force_overwrite
+              will_overwrite = true
+              ( a ||= [] ).push uow
+            end
+          else
+            will_create = true
+            ( a ||= [] ).push uow
+          end
+        end
+
+        if a
+
+          if will_create
+            @on_event_selectively.call :info, :creating do
+              __build_creating_event a.reject( & :output_path_did_exist )
+            end
           end
 
-        elsif bp.parameter.known? :exist and :must == bp.parameter.exist
-          send_not_found_error bp
-        end
-      end
-      @error_count == error_count_before
-    end
+          if will_overwrite
+            @on_event_selectively.call :info, :overwriting do
+              __build_overwriting_event a.select( & :output_path_did_exist )
+            end
+          end
 
-    def resolve_pathname_actual_a
-      @pathname_actual_a = bound_parameters.reduce_by do | bp |
-        if bp.known? :pathname
-          bp[ :pathname ]  # if is trueish
-        end
-      end.to_a ; nil
-    end
-
-    def produce_root_pn_given_pathname_bp bp, param_i
-      @did_resolve_root_pn ||= resolve_root_pn( bp, param_i )
-      @root_pn
-    end
-
-    def resolve_root_pn bp, param_i
-      root_bp = bound_parameters[ param_i ]
-      x = root_bp.value
-      if x
-        if x.absolute?
-          @root_pn = x
+          __compile_these a
         else
-          send_not_abspath_error bp, root_bp
-          @root_pn = false
+          ACHIEVED_
         end
-      else
-        send_no_anchor_error bp, root_bp
-        @root_pn = false
-      end
-      true
-    end
-
-    def send_no_anchor_error prop, prop_
-      _ev = build_not_OK_event_with :no_anchor_path do |y, o|
-        y << "#{ prop_.normalized_parameter_name } must be set #{
-          }in order to support a relative path like #{ prop.label }!"
-      end
-      send_error_event _ev
-    end
-
-    def send_not_abspath_error prop, ro
-      _ev = build_not_OK_event_with :not_absolute_path, :prop, prop do |y, o|
-        y << "#{ prop_.normalized_parameter_name } must be an absolute #{
-          }path in order to expand paths like #{ prop.label }"
-      end
-      send_error_event _ev
-    end
-
-    def send_not_directory_error prop
-      _ev = build_not_OK_event_with :not_a_directory, :prop, prop do |y, o|
-        y << "#{ o.prop.label } is not a directory: #{ pth prop.value }"
-      end
-      send_error_event _ev
-    end
-
-    def send_not_found_error prop
-      _ev = build_not_OK_event_with :not_found, :prop, prop do |y, o|
-        y << "#{ prop.label } not found: #{ pth prop.value }"
-      end
-      send_error_event _ev
-    end
-
-    def recompile g
-      ok = maybe_mkdir g
-      ok and via_compiler_compile g
-    end
-
-    def maybe_mkdir g
-      ok = PROCEDE_
-      if ! g.out_pn.dirname.directory?
-        ok = mkdir_safe g
-      end
-      ok
-    end
-
-    def via_compiler_compile g
-      compiler.compile g.in_pn, g.out_pn
-      PROCEDE_
-    rescue ::RuntimeError => e  # #open [#005]
-      raise ::RuntimeError, say_wrapped_runtime_error_message( e, g )
-    end
-
-    def say_wrapped_runtime_error_message e, g
-      "when compiling #{ g.normalized_grammar_name }:\n#{
-        }#{ e.message }"
-    end
-
-    def subclass cls, mod
-      newcls = ::Class.new(cls)
-      cls_modname, cls_basename =
-        cls.to_s.match(/\A(?:(.*[^:])::)?([^:]+)\Z/).captures
-      newcls.class_eval do
-        include mod
-        mod.override.each { |meth| alias_method meth, "my_#{meth}" }
       end
 
-      parent_mod = if cls_modname
-        cls_modname.split( CONST_SEP_ ).reduce( ::Object ) do | m, s |
-          m.const_get s
+      def __build_creating_event g_a
+        _build_grammar_event :creating, :create_g_a, g_a
+      end
+
+      def __build_overwriting_event g_a
+        _build_grammar_event :overwriting, :exist_g_a, g_a
+      end
+
+      def _build_grammar_event which_sym, ing_sym, g_a
+
+        Callback_::Event.inline_neutral_with(
+          which_sym,
+          ing_sym, g_a,
+
+        ) do | y, o |
+
+          _s_a = o.send( ing_sym ).map do |g|
+            pth g.output_path
+          end
+
+          y << "#{ o.ing_sym }: #{ _s_a * ', ' }"
         end
-      else
-        ::Object
       end
 
-      nonum, num = cls_basename.match(/\A(.*[^0-9])([0-9]+)?\Z/).captures
-      i = num ? (num.to_i + 1) : 2
-      i += 1 while(parent_mod.const_defined?(usename = "#{nonum}#{i}"))
-      newconst = parent_mod.const_set(usename, newcls)
-      newconst
-    end
+      def __compile_these uow_a
+        ok = true
+        uow_a.each do | uow |
+          ok = __compile uow
+          ok or break
+        end
+        ok
+      end
 
-    def send_overwriting_event exist_g_a
+      def __compile uow
 
-      sym = @force_overwrite ? :rewriting_parser_files : :using_parser_files
+        _ok = __mkdir_if_necessary uow
+        _ok &&= __via_compiler_compile uow
+      end
 
-      _ev = Callback_::Event.inline_neutral_with(
-        sym,
-        :exist_g_a, exist_g_a,
-        :sym, sym
+      def __mkdir_if_necessary uow
 
-      ) do | y, o |
+        mkdir_p = uow.make_this_directory_minus_p
+        if mkdir_p
+          @_filesystem.mkdir_p mkdir_p, & @on_event_selectively  # #todo
+        else
+          ACHIEVED_
+        end
+      end
 
-        _s_a = o.exist_g_a.map do |g|
-          pth g.out_pn
+      def __via_compiler_compile uow
+
+        cmp = ( @___compiler ||= ::Treetop::Compiler::GrammarCompiler.new )
+        d = cmp.compile uow.input_path, uow.output_path
+
+        if d.nonzero?  # number of bytes
+          ACHIEVED_
+        else
+          self._COVER_ME
+        end
+      end
+
+      # ~ load
+
+      def __require_the_files
+
+        uow_a = @_units_of_work
+
+        load = -> uow do
+          ::Kernel.load uow.output_path
+         end
+
+        ( 0 ... ( uow_a.length - 1 ) ).each do | d |  # all but the last ..
+
+          uow = uow_a.fetch d
+          LOADED__.add uow.input_path, :_loaded_as_ancillary_grammar_  # ..
+          load[ uow ]
+
         end
 
-        y << "#{ o.sym }: #{ _s_a * ', ' }"
+        load.call uow_a.fetch( -1 )
+
+        NIL_
       end
 
-      send_info_event _ev
-    end
+      # ~ produce the final parser class
 
-    def send_creating_event create_g_a
+      def __produce_the_final_parser_class
 
-      _ev = Callback_::Event.inline_neutral_with(
-        :creating,
-        :create_g_a, create_g_a
-      ) do | y, o |
+        uow = @_units_of_work.last
+        sym_a = uow.module_name_i_a
+        sym_a[ -1 ] = :"#{ sym_a.last }Parser"
+        cls = Callback_::Const_value_via_parts[ sym_a ]
 
-        _s_a = o.create_g_a.map do |g|
-          pth g.out_pn
+        if @add_parser_enhancer_module  # an array
+          self._FUN
         end
 
-        y << "creating: #{ _s_a * ', ' }"
+        LOADED__.add uow.input_path, cls
+        cls
       end
 
-      send_info_event _ev
+      FILE_SEPARATOR_BYTE_ = ::File::SEPARATOR.getbyte 0
     end
-
-    def send_none_event
-
-      _ev = Callback_::Event.inline_neutral_with(
-        :none
-      ) do | y, o |
-
-        y << "none."
-      end
-
-      send_info_event _ev
-    end
-
-  public
-    def receive_error_event ev
-      send_error_event ev
-    end
-  private
-
-    def send_info_event ev
-      call_digraph_listeners :info, ev
-    end
-
-    def send_error_event ev
-      @error_count += 1
-      call_digraph_listeners :error, ev
-    end
-
-    Autoloader_[ Actors_ = ::Module.new ]
-    Load_ = self
-  end
   end
 end
+# :#tombstone: crazy formal parameter class with directory / f.s "smarts" and..
+#              silly detailed error messages from requiring treetop parsers

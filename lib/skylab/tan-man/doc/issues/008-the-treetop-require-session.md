@@ -1,58 +1,38 @@
-# the treetop load DSL narrative :[#008]
-
-
-
-## introduction
-
-at the time of this writing this code is very old. some of these
-comments are from the original code and their commit date may not be
-indicative of their original time of writing.
-
-we consider this DSL node an :+#abstraction-candidate.
+# the treetop require session :[#008]
 
 
 
 
-## :#the-shell-narrative
+## [#.A]
 
-this class was originally called "Joystick" and later evolved into
-what we now call the [#bs-035] Shell/Kernel pattern. what
-follows is the original text back from when it was called "Joystick" but
-with the term search-and-replace'd.
+maintainting a *global* cache of the grammars we have loaded is
+certainly nasty, but here's the justification:
 
-A "Shell" is our cute moniker for the object that forms the
-sole point of interface for a DSL. The entirety of the DSL
-consists of messages that can be sent to the object.  (Conversely,
-the interface of the Shell *is* the DSL.)
+when a client wants to load a grammar (identified by a filesystem
+path), we don't want the client to have to worry about whether or not
+that grammar has been loaded already. this is exactly the game mechanic
+of the platform `require` method, which is why we have named this actor
+that.
 
-The developer would subclass this DSL::Shell class and use
-(ahem) DSL of the parameter definer (e.g.) to define the desired DSL.
-
-An instance of this Shell would then be passed to e.g. some
-user-provided block, during which the Shell would "record" the
-information from the user, which is then retrivable later by the
-`__actual_parameters` method.
-
-(In this implementation, the 'actual parameters' is an object
-of a simple, custom-built struct built dynamically from the
-elements of the DSL.)
+the constant namespace is constant, and that's just the way it is. once
+a constant is set, it must not be set again. we are using normalized
+filesystem paths as keys into those constants. if a given path points to
+a constant that has already been resolved, we result in that value.
+otherwise we attempt to load the grammar, with all the fireworks that
+entails.
 
 
+### even more detail
 
+in "production" we expect that this whole issue is not as much of an
+issue as in testing. in testing we call "Require" once for each test, in
+order to produce a parser for the relevant grammar (there are several).
 
-## :#note-15
-
-make a simple, custom actuals holder that is just a struct whose members
-are determined by the names of the parameters of our DSL.
+in production we cache the parser class itself away somewhere reasonable
+(#todo - confirm this) so when we call "Require" it is when a load is
+actuall necessary (i.e only the first time).
 
 
 
 
-## :#the-minimal-DSL-client-narrative
-
-(this used to be a struct subclass, but was too confusing w/ `[]=`)
-
-You, the DSL Client, are the one that runs the client (user)'s block
-around your shell, runs the validation etc, emits any errors, does any
-normalization, and then comes out at the other end with an
-`actual_parameters` structure that holds the client's (semi valid) request.
+# :+#tombstone: overwrought shell stuff

@@ -5,24 +5,23 @@ describe '[fi] P - boolean: given "object" with parameter "foo"' do
   extend Skylab::Fields::TestSupport
   use :parameter
 
-  context 'and "foo" has the property "boolean: true"' do
+  context 'and "foo" is boolean' do
 
     with do
-      param :finished, boolean: true
+      param :finished, :boolean
     end
 
     frame do
 
-      it '"object.foo?" is a reader of the (presumably boolean) value ' <<
-        '(note it used to return nil out of the box, now false)' do
+      it '"object.foo?" is a reader of the (presumably boolean) value' do
 
-        object.finished?.should eql(false)
+        object_.finished?.should be_nil
       end
 
       it '"object.foo!" is a DSL-y writer that sets the parameter ' <<
         'value of "foo" to true' do
 
-        object = send :object
+        object = object_
         object.finished!
         object.finished?.should eql(true)
       end
@@ -30,7 +29,7 @@ describe '[fi] P - boolean: given "object" with parameter "foo"' do
       it '"object.not_foo!" is a DSL-y writer that sets the parameter value ' <<
         'of "foo" to false' do
 
-        object = send :object
+        object = object_
         object.not_finished!
         object.finished?.should eql(false)
       end
@@ -38,13 +37,23 @@ describe '[fi] P - boolean: given "object" with parameter "foo"' do
       it '"object.foo", however, (a reader) you do not get ' <<
         'out of the box just like that.' do
 
-        -> { object.finished }.should raise_error(::NoMethodError)
+        o = object_
+        begin
+          o.finished
+        rescue ::NoMethodError => e
+        end
+        e or fail
       end
 
       it '"object.foo = x", however, (the writer) you do not just get ' <<
         'out of the box just like that just for doing nothing ' do
 
-        -> { object.finished = true }.should raise_error(::NoMethodError)
+        o = object_
+        begin
+          o.finished = true
+        rescue ::NoMethodError => e
+        end
+        e or fail
       end
     end
   end

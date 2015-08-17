@@ -8,21 +8,32 @@ module Skylab::Fields::TestSupport
       tcc.include Test_Context_Instance_Methods___
     end
 
+    def self.Frookie
+      Frookie_class___[]
+    end
+
     SM___ = -> do
       Home_::Parameter
     end
 
-    def capture_emit_lines_
-      define_method :_do_capture_emit_lines do
+    def frame &b
+      class_exec( & b )
+    end
+
+    def spy_on_events_
+
+      define_method :_do_spy_on_events do
         true
       end
+
+      TS_::Expect_Event[ self ]
     end
 
     def with &b                   # define the class body you will use in
                                   # the frame.
       memo = nil
 
-      build = -> do
+      build = -> do_spy do
 
         build = nil  # one call to this method corresponds to one class that
         # employs the user's edit. however, we effect the class lazily, the
@@ -35,7 +46,11 @@ module Skylab::Fields::TestSupport
 
           Home_::Parameter::Definer[ self ]
 
-          include Definer_Instance_Methods___
+          if do_spy
+            define_method :initialize do | oes_p |
+              @on_event_selectively = oes_p
+            end
+          end
 
           class_exec( & b )
         end
@@ -45,7 +60,7 @@ module Skylab::Fields::TestSupport
       define_method :the_class_ do
 
         if build
-          build[]
+          build[ _do_spy_on_events ]
         end
 
         memo
@@ -64,71 +79,73 @@ module Skylab::Fields::TestSupport
 
       TestSupport_::Let[ self ]
 
-      let :object do
+      let :object_ do
 
-        if _do_capture_emit_lines
+        if _do_spy_on_events
 
-          a = []
-          @emit_lines_ = a
-
-          the_class_.new do | * i_a, & ev_p |
-            2 == i_a.length or fail
-            :info == i_a.first or fail
-            :emission == i_a.last or fail
-            ev_p[ a ]
-            NIL_
-          end
+          the_class_.new handle_event_selectively
         else
           the_class_.new
         end
       end
 
-      def _do_capture_emit_lines
+      def _do_spy_on_events
         false
+      end
+
+      def force_read_ sym, o
+        o.send :fetch, sym
+      end
+
+      def force_write_ x, sym, o
+        o.send :[]=, sym, x
+      end
+
+      def expect_unknown_ sym, obj
+
+        known = true
+        obj.send :fetch, sym do
+          known = false
+        end
+        if known
+          fail __say_expected_unknown sym
+        end
+      end
+
+      def __say_expected_unknown sym
+        "expected '#{ sym }' to be unknown"
       end
 
       define_method :subject_module_, SM___
     end
 
-    module Definer_Instance_Methods___
+    Frookie_class___ = -> do
+      p = -> do
+        class Frookie < Home_::Parameter
 
-      def initialize & oes_p
-        if oes_p
-          @on_event_selectively = oes_p
+          def when__perthnerm__
+            sym = @writer_method_name or fail
+            @entity_model.module_exec do
+
+              alias_method :item_writer_after_perthnerm, sym
+              define_method sym do | x |
+                if x
+                  x.respond_to? :ascii_only? or raise ::ArgumentError
+                  item_writer_after_perthnerm ::Pathname.new x
+                else
+                  item_writer_after_perthnerm x
+                end
+              end
+            end
+            true  # KEEP_PARSING_
+          end
         end
-      end
-
-      def _with_client &b        # slated for improvement [#012]
-        instance_exec( &b )
-      end
-
-      def parameter_label x, idx=nil  # [#br-115] explains it all, somewhat
-
-        if idx
-          _idx_s = "[#{ idx }]"
+        p = -> do
+          Frookie
         end
-
-        _stem = if x.respond_to? :id2name
-          Home_::Callback_::Name.via_variegated_symbol( x ).as_slug
-        else
-          x.name.as_slug  # errors please
-        end
-
-        "<#{ _stem }#{ _idx_s }>"  # was `em`
+        Frookie
       end
-
-      def send_error_string s
-
-        @on_event_selectively.call :info, :emission do | y |
-          y << s
-        end
-
-        NIL_
-      end
-    end
-
-    def frame &b
-      class_exec( & b )
-    end
+      -> { p[] }
+    end.call
   end
 end

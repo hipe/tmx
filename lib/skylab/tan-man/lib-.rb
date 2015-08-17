@@ -28,6 +28,8 @@ module Skylab::TanMan
       Brazen_::Entity
     end
 
+    Fields = sidesys[ :Fields ]
+
     File_utils = stdlib[ :FileUtils ]
 
     Home_directory_pathname = -> do
@@ -40,12 +42,6 @@ module Skylab::TanMan
 
     Module_lib = -> do
       Basic[]::Module
-    end
-
-    ___Fields = sidesys[ :Fields ]
-
-    Parameter = -> do  # this is used in so many places, we defy convention
-      ___Fields[]::Parameter
     end
 
     Parse_lib = sidesys[ :Parse ]
@@ -78,7 +74,7 @@ module Skylab::TanMan
     System_lib___ = sidesys[ :System ]
 
     Tmpdir_stem = Callback_.memoize do
-      'tina-man'.freeze
+      'tm-production-cache'.freeze
     end
 
     TT = stdlib[ :Treetop ]

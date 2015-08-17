@@ -39,6 +39,8 @@ module Skylab::Fields::TestSupport
     def memoize_ sym, & p
       define_method sym, Callback_.memoize( & p )
     end
+
+    define_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
   end
 
   module InstanceMethods

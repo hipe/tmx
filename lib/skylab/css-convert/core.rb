@@ -71,6 +71,8 @@ module Skylab::CSS_Convert
 
     Param_Lib__::Definer[ self ]
 
+    if false
+
     param :directives_file, pathname: true, writer: true do
       desc 'A file with directives in it.' # (not used yet)
     end
@@ -81,6 +83,8 @@ module Skylab::CSS_Convert
     param :force_overwrite, boolean: true
     param :tmpdir_absolute, accessor: true,
       default: LIB_.system.defaults.dev_tmpdir_pathname.join( 'css-cnvrt' )
+
+    end
   end
 
   module Core::Client
@@ -92,10 +96,12 @@ module Skylab::CSS_Convert
 
     include Core::SubClient::InstanceMethods
 
+    if false
     Param_Lib__.call( self,
       :parameter_controller,
       :oldschool_parameter_error_structure_handler,
     )
+    end
 
     def receive_event ev
       scn = ev.to_stream_of_lines_rendered_under expression_agent
