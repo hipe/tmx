@@ -109,7 +109,7 @@ module Skylab::CodeMolester
         b = num_occurences[ Path_part__[], '/' ]
         ( a < b ) or fail "sanity - #{ a } dirs to create for #{ b - 1 }"
 
-        LIB_.system.filesystem.file_utils_controller.new do | msg |
+        LIB_.system.filesystem.file_utils_controller.new_via do | msg |
 
           debug and y << msg
         end.mkdir_p d_pn.to_s

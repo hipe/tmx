@@ -1,12 +1,101 @@
-# Trackmarks
+# tmx
 
 ## synopsis
 
-testing and metaprogramming experiments.
+testing and metaprogramming experiments. a perpetual work in progress
+towards something wonderful.
 
 try:
 
     ./bin/tmx
+
+
+
+
+## installation on OSX
+
+in a treatment that is perhaps too broad and too narrow at the same
+time, the end of this section is an outline detailing exactly how we get
+a development system up and running "from scratch" on a system with
+nothing but an OS (in theory).
+
+First, some caveats:
+
+  • here we do not cover getting our editors/IDE's set up.
+
+  • one day it would be nice to use something like boxen for these
+    instructions, so do not get too attached to them :P
+
+  • today we are installing from an OS X Yostemite (10.10.5)
+
+Here's the outline:
+
+  1) we will use homebrew for the next step. if you have not installed
+     it before now, install it per http://brew.sh which takes around
+     2 minutes.
+
+  2) to manage different versions of ruby we will use `chruby`
+
+    • we chose `chruby` over `rbenv` and `rvm` because of the compelling
+      manifesto at [zaiste.net][].
+
+    • per the instructions there, having done `brew install chruby` we
+      add the two lines to our (in our case) .zshrc
+
+    this whole thing takes only a few minutes.
+
+  3) as the author of `chruby` does, we build the ruby we want
+     with `ruby-install`:
+
+    • per https://github.com/sstephenson/ruby-build, follow
+        "Installing as a standalone program (advanced)" (about 70 seconds)
+
+      • (using brew to install this might have worked too)
+
+    • to install openssl and ruby in this manner takes under 7 minutes:
+        mkdir ~/.rubies
+        ruby-build 2.2.3 ~/.rubies/ruby-2.2.3
+
+    • to have this new ruby appear in the list of rubies (output by the
+      `chruby` command alone), I had to open a new shell after the above
+      was completed.
+
+   4) now that our requisite ruby is installed, when we `cd` into
+      the top directory of this project, the `.ruby-version` file is
+      seen and the correct ruby version is activated (whew!). do this.
+
+      with that done, we need to install the requisite gems thru bundler:
+
+      • we had to do this, we don't know when we should have done it:
+
+        `gem update --system`
+
+        (per [this nokogiri note][])
+
+      • `gem install bundler` - takes under a minute.
+
+      • `bundle`
+
+  [zaiste.net]: http://zaiste.net/2013/04/towards_simplicity_from_rbenv_to_chruby/ zaiste.net
+
+  [this nokogiri note]: http://www.nokogiri.org/tutorials/installing_nokogiri.html#mac_os_x  this nokogiri note
+
+
+
+
+### other useful tools on OSX
+
+although not a part of tmx per se, we exploit this space here to remind
+ourselves of these softwares we can't do without:
+
+  • ack - `brew install ack`
+
+  • gitx
+
+  • macvim
+    • "janus" for same
+    • .vimrc.before, .vimrc.after, .gvimrc.after (#todo)
+
 
 
 

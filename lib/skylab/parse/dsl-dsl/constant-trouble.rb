@@ -46,7 +46,7 @@ module Skylab::Parse
         h.freeze
 
         dynamic [ :const, const ], [ :superclass, superclass ],
-          [ :field_a, fld_a ], [ :shell, ::Class.new.class_exec do
+          [ :field_a, fld_a ], [ :shell, ( ::Class.new.class_exec do
 
           define_method :initialize do |res_a|
             @set = -> i, *tpl do
@@ -75,7 +75,7 @@ module Skylab::Parse
           end
 
           self
-        end ]
+        end ) ]
         self
       end
     end

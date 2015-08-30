@@ -107,7 +107,12 @@ module Skylab::GitViz
 
         _rsx = Ad_Hoc_Resources___.new h[ :stderr ] || NULL_STDERR___
 
-        _relpath = Home_::Actors_::Relpath[ @__path, @repo.path ]
+        path = @__path
+        _relpath = if @repo.path == path
+          DOT_
+        else
+          Home_::Actors_::Relpath[ path, @repo.path ]
+        end
 
         @mutable_VCS_bundle = @VCS_adapter.models::Bundle.build_bundle_via(
           _relpath,
