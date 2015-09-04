@@ -1,0 +1,128 @@
+<html lang="en" ng-app>
+<head>
+  <meta charset="utf-8">
+  <script src="../bower_components/angular/angular.js"></script>
+</head>
+<body>
+
+<p>(Angular {{ 'O' + 'K' }})</p>
+
+<style type="text/css">
+<!--
+
+/* (thanks to @nickSallout sitepoint.com/easy-responsive-grid-layouts )
+
+/* resets */
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* layout */
+
+.container {
+  border-top: 1px solid grey;
+  border-bottom: 1px solid grey;
+  border-left: 2px solid grey;
+  border-right: 2px solid grey;
+}
+.primary {
+  padding: 15px;
+  padding-left: 13px;
+}
+.secondary {
+  padding-top: 0px;
+  padding-bottom: 9px;
+  text-align: center;
+}
+table.hacky-scrubber-vertical {
+  margin-left: auto;
+  margin-right: auto;
+}
+@media all and ( min-width: 410px ) {
+  .container {
+    padding-right: 60px;
+  }
+  .primary {
+    float: left;
+    padding-right: 0;
+    width: 100%;
+  }
+  .secondary {
+    float: right;
+    margin-right: -60px;
+    padding-top:  19px;
+    padding-bottom: 15px;
+    width: 60px;
+  }
+}
+
+/* old hat */
+
+table.hacky-scrubber-vertical {
+  border-collapse: collapse;
+  border-top: 2px solid #b0b0b0;
+  border-bottom: 2px solid #b0b0b0;
+}
+table.hacky-scrubber-vertical td {
+  height: 2px;
+  width: 26px;
+}
+table.hacky-scrubber-vertical tr:last-child td {
+  border-top: 2px solid #b0b0b0;
+}
+
+-->
+</style>
+
+<h3> order: </h3>
+
+<div class="container clearfix">
+  <div class="primary">
+    item 1
+  </div>
+  <div class="secondary">
+    <table class='hacky-scrubber-vertical'>
+      <tr><td></td></tr>
+      <tr><td class='last'></td></tr>
+    </table>
+  </div>
+</div>
+<div class="container clearfix">
+  <div class="primary">
+    item 2 - gerrymandering
+  </div>
+  <div class="secondary">
+    <table class='hacky-scrubber-vertical'>
+      <tr><td></td></tr>
+      <tr><td class='last'></td></tr>
+    </table>
+  </div>
+</div>
+<div class="container clearfix">
+  <div class="primary">
+    item 3 - what if the content gets really long and is quite long
+  </div>
+  <div class="secondary">
+    <table class='hacky-scrubber-vertical'>
+      <tr><td></td></tr>
+      <tr><td class='last'></td></tr>
+    </table>
+  </div>
+</div>
+
+<p>the above divs should each have the "thumb scrubber" whose positioning
+   looks good. the layout should "adaptively" click into a different layout
+   when the window is resized down to (say) 410 px wide.
+</p>
+
+</body>
+</html>

@@ -1,0 +1,93 @@
+<html lang="en" ng-app>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css">
+  <link rel="stylesheet" href="../css/app.css">
+  <script src="../bower_components/angular/angular.js"></script>
+</head>
+<body>
+
+<p>(Angular is {{ 'O' + 'K' }})</p>
+
+<style type="text/css">
+<!--
+.tile {
+  border: 1px solid black;
+  float: left;
+  margin-left: 10px;
+  margin-top: 10px;
+  padding: 10px;
+  width: 300px;
+}
+-->
+</style>
+
+
+<style type="text/css">
+<!--
+table.hacky-scrubber-vertical {
+  border-top: 2px solid #b0b0b0;
+  border-bottom: 2px solid #b0b0b0;
+}
+
+table.hacky-scrubber-vertical td {
+  font-size: 2px;
+  width: 26px;
+}
+
+table.hacky-scrubber-vertical td.last {
+  border-top: 2px solid #b0b0b0;
+}
+
+-->
+</style>
+
+<div class="tile">
+
+  <h4> this is a hacky scrubber (vert): </h4>
+
+  <table class="hacky-scrubber-vertical">
+    <tr><td>&nbsp;</td></tr>
+    <tr><td class="last">&nbsp;</td></tr>
+  </table>
+
+</div>
+
+<style type="text/css">
+<!--
+table.hacky-scrubber-horizontal {
+  border-left: 2px solid #b0b0b0;
+  border-right: 2px solid #b0b0b0;
+}
+
+table.hacky-scrubber-horizontal td {
+  height: 23px;
+  font-size: 7px;
+}
+
+table.hacky-scrubber-horizontal td.last {
+  border-left: 2px solid #b0b0b0;
+}
+-->
+</style>
+
+<div class="tile">
+
+  <h4> this is a hacky scrubber (horiz): </h4>
+
+  <table class="hacky-scrubber-horizontal">
+    <tr>
+      <td>&nbsp;</td>
+      <td class="last">&nbsp;</td>
+    </tr>
+
+  </table>
+
+</div>
+
+<br style="clear: both">
+
+that is all.
+
+</body>
+</html>
