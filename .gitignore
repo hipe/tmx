@@ -1,6 +1,7 @@
 /coverage
 .DS_Store
 /Guardfile
+*.IDEA
 /.rspec
 /.rvmrc
 /pkg

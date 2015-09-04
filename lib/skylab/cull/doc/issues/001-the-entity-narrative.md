@@ -9,7 +9,7 @@ some ways similar and in others distinct.
 
 in [cu]  (as elsewhere) an entity encapsulates a collection of actual
 properties. but let's set aside any preconceptions of what we think
-this term "entity" means means and reapproach it anew for [cu]:
+this term "entity" means and reapproach it anew for [cu]:
 
 the shortest reasonable synopsis of this whole document is:
 
@@ -80,7 +80,7 @@ next may have a totally different "structure" than the one before it.
 
 ## what is an actual value?
 
-to keep things simple and consistent, we decree that in [cu], the
+to keep things simple and consistent, we decree that in [cu] the
 entities produced by an entity stream have actual properties each of
 which come with *no* type associations. that is, they are some sort of
 "raw data". this makes things more interesting further down on the

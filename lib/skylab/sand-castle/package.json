@@ -1,0 +1,18 @@
+{
+  "version": "0.0.0",
+  "private": true,
+  "name": "skylab-sandcastle'",
+  "description": "sandcastles in the sky..",
+  "repository": "https://github.com/hipe/skylab-sandcastle",
+  "license": "Unfair",
+  "devDependencies": {
+    "bower": "^1.3.1",
+    "http-server": "^0.6.1"
+  },
+  "scripts": {
+
+    "postinstall": "bower install",
+
+    "start": "http-server -a 0.0.0.0 -p 8000"
+  }
+}

@@ -10,7 +10,6 @@ module Skylab::Cull::TestSupport
 
     it "money" do
 
-      debug!
       map_against_file :horizontal_01_first_my_md
       expect_no_events
       st = @result

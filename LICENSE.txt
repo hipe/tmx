@@ -1,5 +1,10 @@
 Copyright (c) 2011 Skylab, LLC
 
+This project consists solely of sub-projects (or "side-systems"). Any
+sidesystem may specify its own "LICENSE" file, a file which must reside
+in the sidesystem's top directory. All side-systems that do not specify
+a license in this manner are covered by the following license.
+
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
 "Software"), to deal in the Software without restriction, including

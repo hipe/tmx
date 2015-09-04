@@ -49,6 +49,7 @@ getting ahead of ourselves.
 
 
 
+
 ## alternate introduction for functionalists
 
 `cull` is a tool to aid the human in making decisions. one way of
@@ -58,6 +59,7 @@ function takes is a stream of "entites". each such entity will be
 perhaps the input quantity) of entities, presented (typically) in
 descending order by score (with details of how the score was produced
 perhaps being presented as well).
+
 
 
 
@@ -82,13 +84,15 @@ implementation.
 
 to step away from the holodeck and get back to the deck, a "criteria"
 against an "entity" produces a "score", which (simply) is a *real* number
-representing that particular entity's (again) "score" against this entity.
+representing that particular entity's (again) "score" against this
+criteria.
 
 this is largely where `cull`'s scope of responsibility both begins and
 ends: to figure out (given a criteria) what the score is for a particular
 entity (and perhaps present it (perhaps given a stream of entities)).
 
 ([#001] for more on the entity datamodel.)
+
 
 
 
@@ -118,6 +122,7 @@ perhaps the same as each other (using the sense of "identity" for a
 in other words: a "criteria" might have multiple "criterion" that are
 the same as each other. if at this point this doesn't make sense to you
 then it probably has no utility in doing so (again) at this point.
+
 
 
 
