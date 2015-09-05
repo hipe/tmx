@@ -1,0 +1,126 @@
+<html lang="en" ng-app>
+<head>
+  <meta charset="utf-8">
+  <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="../bower_components/gsap/src/uncompressed/TweenMax.js"></script>
+  <script src="../bower_components/gsap/src/uncompressed/utils/Draggable.js"></script>
+  <script src="../js/sortable-list-core.js"></script>
+</head>
+<body>
+
+<style type="text/css">
+<!--
+
+/* OSUblake below */
+
+html {
+  font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
+}
+
+body {
+  background: #3A3A4D;
+  padding: 25px;
+}
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+h1 {
+  color: #efefef;
+  font-weight: normal;
+  font-weight: 300;
+  margin-bottom: 30px;
+}
+h1 a {
+  color: #efefef;
+  border-bottom: 2px solid #efefef;
+  text-decoration: none;
+  padding-bottom: 3px;
+}
+h1 a:hover {
+  color: yellowgreen;
+  border-color: yellowgreen;
+}
+
+#list {
+  background-color: rgba(0, 0, 0, 0.2);
+  width: 250px;
+  width: 90%;
+  width: 0;
+  position: relative;
+  display: block;
+  margin-top: 50px;
+}
+
+.tile {
+  display: block;
+  position: absolute;
+  background-color: yellowgreen;
+  color: #3A3A4D;
+  font-weight: bold;
+}
+
+/* mine below */
+
+.tile {
+  padding: 0;  /* any padding will screw up height calculation */
+  width: 300px;
+}
+
+.scrubber {
+  cursor: ns-resize;
+  float: right;
+  margin-top: 10px;
+  margin-right: 10px;
+  background-color: white;
+  width: 50px;
+  height: 20px;
+}
+-->
+</style>
+
+<p> thanks OSU blake! </p>
+
+<h1>Sortable List Using GreenSock
+  <a href="http://greensock.com/draggable" target="_blank">
+    Draggable</a>
+</h1>
+
+<div id="list" style="height: 700px; border: 1px solid black;">
+
+  <div class="tile" style="height: 43px">
+    1
+    <div class='scrubber'></div>
+  </div>
+
+  <div class="tile" style="height: 43px; top: 50">
+    2
+    <div class='scrubber'></div>
+  </div>
+
+  <div class="tile" style="height: 43px; top: 100px">
+    3
+    <div class='scrubber'></div>
+  </div>
+
+  <div class="tile" style="height: 68px; top: 150px">
+    4
+    <div class='scrubber'></div>
+  </div>
+
+  <div class="tile" style="height: 43px; top: 225px">
+    5
+    <div class='scrubber'></div>
+  </div>
+</div>
+
+</body>
+<script type="text/javascript">
+<!--
+
+SkylabSortableListCore( $( '#list' ) );
+
+-->
+</script>
+</html>

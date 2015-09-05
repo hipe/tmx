@@ -1,0 +1,13 @@
+digraph g {
+
+one [label="get it in its own file" style=filled]
+two [label="the shading style" style=filled]
+
+three [label="integrated with the drag thing"]
+four [label="MAYBE with angular bindings"]
+
+two->one
+three->two
+four->three
+
+}
