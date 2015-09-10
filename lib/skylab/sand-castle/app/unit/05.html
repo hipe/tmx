@@ -1,0 +1,129 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="../bower_components/angular/angular.js"></script>
+  <script src="../bower_components/gsap/src/uncompressed/TweenMax.js"></script>
+  <script src="../bower_components/gsap/src/uncompressed/utils/Draggable.js"></script>
+  <script src="../js/sortable-list-core.js"></script>
+
+  <style type='text/css'>
+  <!--
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.the-list {
+  border: 1px solid red;
+  height: 300px;
+}
+
+.tile {
+  border-top: 1px solid grey;
+  border-bottom: 1px solid grey;
+  border-left: 2px solid grey;
+  border-right: 2px solid grey;
+  clear: both;
+  content: "";
+  display: table;  /* from "table" or "block" */
+}
+.content {
+  padding: 15px;
+  padding-left: 13px;
+}
+.tools {
+  padding-top: 0px;
+  padding-bottom: 9px;
+  text-align: center;
+}
+
+table.hacky-scrubber-vertical {
+  margin-left: auto;
+  margin-right: auto;
+}
+table.hacky-scrubber-vertical {
+  border-collapse: collapse;
+  border-top: 2px solid #b0b0b0;
+  border-bottom: 2px solid #b0b0b0;
+}
+table.hacky-scrubber-vertical td {
+  height: 2px;
+  width: 26px;
+}
+table.hacky-scrubber-vertical tr:last-child td {
+  border-top: 2px solid #b0b0b0;
+}
+
+@media all and ( min-width: 410px ) {
+  .tile {
+    padding-right: 60px;
+  }
+  .content {
+    float: left;
+    padding-right: 0;
+    width: 100%;
+  }
+  .tools {
+    float: right;
+    margin-right: -60px;
+    padding-top:  19px;
+    padding-bottom: 15px;
+    width: 60px;
+  }
+}
+
+-->
+  </style>
+
+</head>
+<body>
+<h1> OK computer </h1>
+
+<p>
+hello.
+</p>
+
+
+  <div class="tile clearfix">
+    <div class="content">
+      item 1
+    </div>
+    <div class="tools">
+      <table class='scrubber hacky-scrubber-vertical'>
+        <tr><td></td></tr>
+        <tr><td class='last'></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="tile clearfix">
+    <div class="content">
+      item 2 <br>
+      it has to flow
+    </div>
+    <div class="tools">
+      <table class='scrubber hacky-scrubber-vertical'>
+        <tr><td></td></tr>
+        <tr><td class='last'></td></tr>
+      </table>
+    </div>
+  </div>
+
+</body>
+
+<script type="text/javascript">
+<!--
+// SkylabSortableListCore( $( '.the-list' ) );
+-->
+</script>
+</html>
