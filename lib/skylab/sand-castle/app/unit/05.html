@@ -10,32 +10,27 @@
 
   <style type='text/css'>
   <!--
+
 *,
 *:before,
 *:after {
   box-sizing: border-box;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
-
 .clearfix:after {
   content: "";
   display: table;
   clear: both;
 }
 
-.the-list {
-  border: 1px solid red;
-  height: 300px;
-}
+/* layout */
 
 .tile {
+  background-color: white;
   border-top: 1px solid grey;
   border-bottom: 1px solid grey;
   border-left: 2px solid grey;
   border-right: 2px solid grey;
-  clear: both;
-  content: "";
-  display: table;  /* from "table" or "block" */
 }
 .content {
   padding: 15px;
@@ -46,24 +41,10 @@
   padding-bottom: 9px;
   text-align: center;
 }
-
 table.hacky-scrubber-vertical {
   margin-left: auto;
   margin-right: auto;
 }
-table.hacky-scrubber-vertical {
-  border-collapse: collapse;
-  border-top: 2px solid #b0b0b0;
-  border-bottom: 2px solid #b0b0b0;
-}
-table.hacky-scrubber-vertical td {
-  height: 2px;
-  width: 26px;
-}
-table.hacky-scrubber-vertical tr:last-child td {
-  border-top: 2px solid #b0b0b0;
-}
-
 @media all and ( min-width: 410px ) {
   .tile {
     padding-right: 60px;
@@ -82,6 +63,28 @@ table.hacky-scrubber-vertical tr:last-child td {
   }
 }
 
+.one-such-list {
+  border: 1px solid red;
+  padding-top: 100px;
+  padding-bottom: 100px;
+}
+
+/* hack nasty */
+
+table.hacky-scrubber-vertical {
+  border-collapse: collapse;
+  border-top: 2px solid #b0b0b0;
+  border-bottom: 2px solid #b0b0b0;
+}
+table.hacky-scrubber-vertical td {
+  height: 2px;
+  width: 26px;
+}
+table.hacky-scrubber-vertical tr:last-child td {
+  border-top: 2px solid #b0b0b0;
+}
+
+
 -->
   </style>
 
@@ -93,6 +96,7 @@ table.hacky-scrubber-vertical tr:last-child td {
 hello.
 </p>
 
+<div class='one-such-list'>
 
   <div class="tile clearfix">
     <div class="content">
@@ -108,8 +112,7 @@ hello.
 
   <div class="tile clearfix">
     <div class="content">
-      item 2 <br>
-      it has to flow
+      item 2
     </div>
     <div class="tools">
       <table class='scrubber hacky-scrubber-vertical'>
@@ -119,11 +122,57 @@ hello.
     </div>
   </div>
 
+  <div class="tile clearfix">
+    <div class="content">
+      item 3<br>
+      ya i got that flow<br>
+      i got to flow
+    </div>
+    <div class="tools">
+      <table class='scrubber hacky-scrubber-vertical'>
+        <tr><td></td></tr>
+        <tr><td class='last'></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="tile clearfix">
+    <div class="content">
+      item 4<br>
+      one more to flow
+    </div>
+    <div class="tools">
+      <table class='scrubber hacky-scrubber-vertical'>
+        <tr><td></td></tr>
+        <tr><td class='last'></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!--
+  <div class="tile clearfix">
+    <div class="content">
+      item 5
+    </div>
+    <div class="tools">
+      <table class='scrubber hacky-scrubber-vertical'>
+        <tr><td></td></tr>
+        <tr><td class='last'></td></tr>
+      </table>
+    </div>
+  </div>
+  -->
+</div>
+
+<p>back to <a href='../index.html'>experiments</a></p>
+
 </body>
 
 <script type="text/javascript">
 <!--
-// SkylabSortableListCore( $( '.the-list' ) );
+
+SkylabSortableListCore( $( '.one-such-list' ) );
+
 -->
 </script>
 </html>
