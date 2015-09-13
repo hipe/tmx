@@ -1,4 +1,4 @@
-<html lang="en" ng-app>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <script src="../bower_components/jquery/dist/jquery.min.js"></script>
@@ -45,75 +45,103 @@ h1 a:hover {
 
 #list {
   background-color: rgba(0, 0, 0, 0.2);
-  width: 250px;
-  width: 90%;
-  width: 0;
-  position: relative;
-  display: block;
   margin-top: 50px;
+  padding-bottom: 50px;  /* TODO: necessary util we figure out how to .. */
+  padding-top: 50px;     /*   .. constraint to the Y axis */
+  width: 300px;
 }
 
 .tile {
-  display: block;
-  position: absolute;
   background-color: yellowgreen;
   color: #3A3A4D;
+  position: relative;  /* only in order to make z-index used */
   font-weight: bold;
 }
 
 /* mine below */
 
 .tile {
-  padding: 0;  /* any padding will screw up height calculation */
+  clear: both;
+  /* display: table; not here */
+  margin-top: 10px;
+  padding: 0px;  /* any padding will screw up height calculation */
   width: 300px;
+}
+
+.tile:first-child {
+  /* margin-top: 0;  if you do this, when the top piece is no longer
+                     the top piece, it would need fixing in the code */
+}
+
+.tile .content {  /* this exists only so that we can have padding without messing up height calculations of tile */
+  padding: 10px;
 }
 
 .scrubber {
   cursor: ns-resize;
   float: right;
-  margin-top: 10px;
-  margin-right: 10px;
   background-color: white;
   width: 50px;
   height: 20px;
 }
+
+.note {
+  color: grey;
+  font-size: smaller;
+  transform: matrix(1, 0, -0.1, 1, 0, 0);
+}
 -->
 </style>
-
-<p> thanks OSU blake! </p>
 
 <h1>Sortable List Using GreenSock
   <a href="http://greensock.com/draggable" target="_blank">
     Draggable</a>
 </h1>
 
-<div id="list" style="height: 700px; border: 1px solid black;">
+<div id="list">
 
-  <div class="tile" style="height: 43px">
-    1
-    <div class='scrubber'></div>
+  <div class="tile" style="height: 40px">
+    <div class="content">
+      <div class='scrubber'></div>
+      1
+    </div>
   </div>
 
-  <div class="tile" style="height: 43px; top: 50">
-    2
-    <div class='scrubber'></div>
+  <div class="tile" style="height: 60px">
+    <div class="content">
+      <div class='scrubber'></div>
+      2 <br>
+      second line
+    </div>
   </div>
 
-  <div class="tile" style="height: 43px; top: 100px">
-    3
-    <div class='scrubber'></div>
+  <div class="tile" style="height: 80px">
+    <div class="content">
+      <div class='scrubber'></div>
+      3<br/>
+    </div>
   </div>
 
-  <div class="tile" style="height: 68px; top: 150px">
-    4
-    <div class='scrubber'></div>
+  <div class="tile">
+    <div class="content">
+      <div class='scrubber'></div>
+      4 <br>
+      second line <br>
+      third line
+    </div>
   </div>
 
-  <div class="tile" style="height: 43px; top: 225px">
-    5
-    <div class='scrubber'></div>
+  <div class="tile">
+    <div class="content">
+      <div class='scrubber'></div>
+      5
+    </div>
   </div>
 </div>
+
+<p class='note'>
+  (thanks is due to "OSUblake" whose work was the foundation for this)
+</p>
 
 </body>
 <script type="text/javascript">

@@ -31,6 +31,7 @@
   border-bottom: 1px solid grey;
   border-left: 2px solid grey;
   border-right: 2px solid grey;
+  position: relative;  /* so that z-index is honored during drags */
 }
 .content {
   padding: 15px;
@@ -42,6 +43,7 @@
   text-align: center;
 }
 table.hacky-scrubber-vertical {
+  cursor: ns-resize;
   margin-left: auto;
   margin-right: auto;
 }
@@ -149,7 +151,6 @@ hello.
     </div>
   </div>
 
-  <!--
   <div class="tile clearfix">
     <div class="content">
       item 5
@@ -161,7 +162,6 @@ hello.
       </table>
     </div>
   </div>
-  -->
 </div>
 
 <p>back to <a href='../index.html'>experiments</a></p>
