@@ -1,38 +1,78 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <!--
+
+  <link rel="stylesheet" href="../css/06.css">
 
   <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+  <!--
   <script src="../bower_components/angular/angular.js"></script>
   <script src="../bower_components/gsap/src/uncompressed/utils/Draggable.js"></script>
-
-  <style type='text/css'>
-
-  </style>
   -->
 </head>
-
-<style type="text/css">
-<!--
-
-
--->
-</style>
 
 <body>
 <div id="design-wrap">
   <div id="design">
-    <div id="top">
-      <div id="nav-top">
-      </div>
-      <div id="sigil-area-wrap">
-        <div id="sigil-area">
-          <div id="sigil-wrap">
-            <h1 id='sigil'> &#9822; sigil </h1>
+    <div id="top-wrap">
+      <div id="top">
+        <div id="nav-top">
+          no see
+        </div>
+        <div id="sigil-area-wrap">
+          <div id="sigil-area">
+            <div id="sigil-wrap">
+              <span id='logo'>&#9822;</span><h1 id='sigil'>sigil.</h1>
+            </div>
+            <br class="clearman">
+          </div>
+        </div>
+        <div id="nav-bottom">
+          <div id="menu-icon">
+            &#9776;  <!-- "trigram for heaven" -->
+          </div>
+          <div class="horizontal-nav-bar">
+            <ul class="nav">
+              <li>
+                <div class='save-me'>
+                  <a href='#'><span>Recent</span></a>
+                </div>
+              </li>
+              <li>
+                <div class='save-me'>
+                  <a href='#'><span>Products</span></a>
+                </div>
+              </li>
+              <li>
+                <div class='save-me'>
+                  <a href='#'><span>About</span></a>
+                </div>
+              </li>
+            </ul>
+            <br class="clearman">
           </div>
         </div>
       </div>
     </div>
+    <div id='mid-wrap'>
+    </div>
+    <div id='bottom-wrap'>
+    </div>
   </div>
 </div>
+</body>
+
+<script type="text/javascript">
+<!--
+jQuery( document ).ready( function( $ ) {
+
+  $( '#menu-icon' ).on( 'click', function() {
+
+    $( '.horizontal-nav-bar' ).slideToggle();
+    // (note we do not toggle anything about the menu icon itself)
+
+  });
+});
+-->
+</script>
+</html>

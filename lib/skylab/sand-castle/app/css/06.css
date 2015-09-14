@@ -1,0 +1,179 @@
+/* mentor is futureinsights.com */
+
+body {
+  color: #a5a5a5;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 15px;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1.75em
+}
+
+#design,
+#design-wrap {
+  margin: 0;
+  min-width: 0;
+  overflow: visible;
+  padding: 0;
+  width: 100%;
+}
+
+#top-wrap {
+  background-color: #292929;
+  border-color: #e8e8e8;
+  box-sizing: border-box;
+  min-width: 0;
+  overflow: visible;
+  padding-top: 20px;
+  padding-left: 5%;
+  padding-right: 5%;
+  padding-bottom: 5px;
+  width: 100%;
+}
+
+#nav-top {
+  display: none;
+  width: 100%;
+}
+
+#nav-bottom {
+  margin-top: 18px;
+  width: 100%;
+}
+
+.horizontal-nav-bar {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1024px;
+}
+
+.horizontal-nav-bar a {
+  color: #e6e5e1;
+  display: block;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: normal;
+  margin-right: 7px;
+  padding: 0 10px 0 10px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+ul.nav {
+  float: left;
+  /* min-width: 300px; */
+  min-width: 198px;
+}
+
+#nav-bottom .horizontal-nav-bar ul li {
+  border-top: 1px solid #383838;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+#sigil-area-wrap {
+  overflow: hiddden;
+  margin: 0 auto;
+  max-width: 1024px;
+}
+
+#sigil-area {
+  line-height: 0;
+}
+
+#sigil-wrap {
+  color: #ffffff;
+  line-height: 0;
+  margin-left: 0;
+  margin-top: 0;
+  padding-left: 0;
+  padding-top: 0;
+}
+
+#logo {
+  float: left;
+  font-size: 60px;
+  margin-top: -7px;
+}
+
+#sigil {
+  font-size: 1.65em;
+  font-weight: 600;  /* 500 too light, but 600 too heavy */
+  letter-spacing: 0.2em;
+  /* line-height: 0.65em; */
+  margin-top: 29px;
+  margin-left: 70px;
+  text-transform: uppercase;
+}
+
+#menu-icon {
+  color: #ffffff;
+  display: none;
+  font-size: 25px;
+  position: absolute;
+  right: 0;
+  width: 55px;
+}
+
+@media screen {
+
+  body {
+    border: 0;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  ul.nav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  ul.nav li {
+    float: left;
+    margin: 0;
+    padding: 0;
+  }
+
+  .clearman {
+    clear: both;
+    height: 0;
+    line-height: 0;
+  }
+}
+
+@media screen and (max-width: 644px) {
+
+  #menu-icon {
+    display: inline-block;
+    top: 16px;
+  }
+
+  #nav-bottom .horizontal-nav-bar {
+    display: none;
+  }
+
+  .horizontal-nav-bar ul {
+    width: 100%;  /* mentor doesn't need this but we do. gave up after 1 d */
+  }
+
+  .horizontal-nav-bar ul li {
+    text-align: left;
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 550px) {
+
+  #logo {
+    font-size: 31px;
+    margin-top: -2px;
+  }
+
+  #sigil {
+    font-size: 1em;
+    margin-left: 40px;
+    margin-top: 9px;
+  }
+}
