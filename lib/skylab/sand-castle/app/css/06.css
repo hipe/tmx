@@ -1,5 +1,8 @@
 /* mentor is futureinsights.com */
 
+
+/* section 1 - top */
+
 body {
   color: #a5a5a5;
   font-family: 'Open Sans', sans-serif;
@@ -175,5 +178,39 @@ ul.nav {
     font-size: 1em;
     margin-left: 40px;
     margin-top: 9px;
+  }
+}
+
+/* section 2 - mid */
+
+#mid-wrap {
+  box-shadow: inset 0 8px 10px -8px #292929, inset 0 -8px 10px -8px #292929;
+  margin-top: 0px;
+  padding-top: 30px;
+  padding-bottom: 50px;
+  background-color: #fafafa;
+  color: #fcfcfc;
+  background-position: 0% 0%;
+}
+
+#mid {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 0;
+  width: 100%;
+}
+
+#content-wrap {
+  color: #353535;
+  float: left;
+  line-height: 1.4em;
+  padding-bottom: 0;
+  width: 100%;
+}
+
+@media screen and (max-width: 1080px) {
+
+  #content-wrap {
+    max-width: 800px;
   }
 }

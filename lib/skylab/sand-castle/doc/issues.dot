@@ -1,13 +1,43 @@
 digraph g {
 
-one [label="get it in its own file" style=filled]
-two [label="the shading style" style=filled]
+app1 [label="?? make\nan app ??" color=grey];
+app1->plan;
 
-three [label="integrated with the drag thing"]
+plan [label="?? skylab roadmap ??" color=grey];
+plan->ssg;
+
+ssg [label="?? static\nsite gen??" color=grey];
+ssg->ct;
+ssg->ctg;
+ctg [label="contanct\nthose folks"]
+
+ct [label="?? cull table ??", color=grey];
+ct->nxt; ct->atns;
+
+atns [label="integrated with\nscrollable"]
+atns->atn;
+
+atn [label="a unit for\npullshade"]
+atn->sq
+
+nxt [label="a unit for\nsortable list\ninside scrollable"] ; nxt->three;
+
+moz [label="understand\nthat whatsit box\nmozilla thing"] ; tut->moz;
+
+sq [label="create responsive\nwireframe" shape=square] ; sq->tut ; tut->sq;
+three->sq
+three->two
+
+
+tut [label="get thru that whole\ngoogle developer tut"]
+
+tut -> tut_ ; tut_ [label="(what is that whole\ninfo arch about?)"]
+
+one [label="get sortable list\nJS in its own\nfile" style=filled]
+two [label="the moving\ntile animates\ncorrectly" style=filled]
+
+three [label="a unit for scrollable integrated\nwith a responsive layout"]
 four [label="MAYBE with angular bindings"]
 
 two->one
-three->two
-four->three
-
 }
