@@ -11,6 +11,9 @@ ssg->ct;
 ssg->ctg;
 ctg [label="contanct\nthose folks"]
 
+ctfrwd [label="?? cull table\nfor responsive\nweb design all stars ??", color=grey]
+ctfrwd -> ct;
+
 ct [label="?? cull table ??", color=grey];
 ct->nxt; ct->atns;
 
