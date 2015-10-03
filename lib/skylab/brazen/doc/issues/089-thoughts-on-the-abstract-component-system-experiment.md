@@ -135,7 +135,7 @@ be a bit arbitrary. as it is etc.)
      the "generated form" described in (6)).
 
      e.g the class must produce the association called "foo" with a method
-     called `__foo__association_for_mutation_session`. the mixed value that
+     called `__foo__component_model`. the mixed value that
      is produced by this method call is known as "the assocation".
 
      (we don't yet get into the important facet of association "arities"

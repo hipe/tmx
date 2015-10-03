@@ -84,7 +84,9 @@ module Skylab::Snag
 
         @on_event_selectively.call :info, :added_entity do
 
-          Home_.lib_.brazen::Mutation_Session.event_class(
+          Home_.lib_.brazen::
+              Autonomous_Component_System::Mutation_Session.event_class(
+
             :entity_added
           ).new_with(
 

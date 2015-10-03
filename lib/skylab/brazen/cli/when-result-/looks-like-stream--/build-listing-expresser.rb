@@ -11,6 +11,14 @@ module Skylab::Brazen
           :expag, :first_item
 
         def execute
+          if @first_item.respond_to? :to_component_knownness_stream
+            self._THIS #  __function_when_components
+          else
+            __function_when_line_up_columns
+          end
+        end
+
+        def __function_when_line_up_columns
 
           _FIELD_I_A, _FORMAT_H = build_black_and_white_property_formatters
 

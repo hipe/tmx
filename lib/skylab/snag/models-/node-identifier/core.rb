@@ -69,16 +69,18 @@ module Skylab::Snag
     class << self
 
       def edit_entity * x_a, & x_p  # :+#ACS-tenet-2
-        Home_.lib_.brazen::Mutation_Session.create x_a, self, & x_p
+
+        Home_.lib_.brazen::Autonomous_Component_System::
+            Mutation_Session.create x_a, self, & x_p
       end
 
       # ~ the associations
 
-      def __suffix__association_for_mutation_session  # :+#ACS-tenet-7
+      def __suffix__component_model  # :+#ACS-tenet-7
         NI_::Models_::Suffix
       end
 
-      define_method :__integer__association_for_mutation_session,
+      define_method :__integer__component_model,
 
         # :+#ACS-tenet-4
         # a dedicated class for this association seems overkill when

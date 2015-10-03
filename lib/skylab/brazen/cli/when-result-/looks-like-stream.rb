@@ -103,12 +103,11 @@ module Skylab::Brazen
             method :__express_item_via_into_under
           end
 
-        elsif o.respond_to? :properties
-
-          _build_listing_expresser
-
-        elsif o.respond_to? :members
-
+        elsif (
+          o.respond_to? :members or
+          o.respond_to? :properties or
+          o.respond_to? :to_component_knownness_stream
+        )
           _build_listing_expresser
         else
 

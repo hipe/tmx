@@ -13,10 +13,11 @@ module Skylab::Basic
         def add_state * x_a
 
           x_a.unshift :add, :state
-          Home_.lib_.brazen::Mutation_Session.edit x_a, self
+          Home_.lib_.brazen::Autonomous_Component_System::
+              Mutation_Session.edit x_a, self
         end
 
-        def self.__state__association_for_mutation_session
+        def self.__state__component_model
           State_
         end
 

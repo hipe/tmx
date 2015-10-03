@@ -199,7 +199,7 @@ module Skylab::Snag
 
         class << self
 
-          def __criteria__association_for_mutation_session
+          def __criteria__component_model
             Criteria_
           end
         end  # >>

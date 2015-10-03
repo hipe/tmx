@@ -19,12 +19,14 @@ module Skylab::Snag
 
       def interpret_for_mutation_session arg_st, & x_p
 
-        Home_.lib_.brazen::Mutation_Session.interpret arg_st, self, & x_p
+        Home_.lib_.brazen::Autonomous_Component_System::
+            Mutation_Session.interpret arg_st, self, & x_p
       end
 
       def edit_entity * x_a, & x_p  # ..
 
-        Home_.lib_.brazen::Mutation_Session.create x_a, self, & x_p
+        Home_.lib_.brazen::Autonomous_Component_System::
+            Mutation_Session.create x_a, self, & x_p
       end
 
       def collection_module_for_criteria_resolution
@@ -49,26 +51,26 @@ module Skylab::Snag
 
       # ~ :+#ACS-tenet-7
 
-      def __extended_content__association_for_mutation_session
+      def __extended_content__component_model
         EC___
       end
 
-      def __identifier__association_for_mutation_session
+      def __identifier__component_model
 
         Home_::Models_::Node_Identifier
       end
 
-      def __message__association_for_mutation_session
+      def __message__component_model
 
         Mixed_Message___
       end
 
-      def __string__association_for_mutation_session
+      def __string__component_model
 
         Home_::Models::Hashtag::String_Piece
       end
 
-      def __tag__association_for_mutation_session
+      def __tag__component_model
 
         Home_::Models_::Tag
       end
@@ -261,7 +263,8 @@ module Skylab::Snag
 
     def edit * x_a, & x_p
 
-      Home_.lib_.brazen::Mutation_Session.edit x_a, self, & x_p
+      Home_.lib_.brazen::Autonomous_Component_System::
+          Mutation_Session.edit x_a, self, & x_p
     end
 
     def mutable_body_for_mutation_session

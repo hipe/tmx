@@ -16,7 +16,7 @@ module Skylab::Snag
             item_one.formal_properties.each do | prp |
 
               _ = cls.send(
-                :"__#{ prp.name_symbol }__association_for_mutation_session" )
+                :"__#{ prp.name_symbol }__component_model" )
 
               _p = _::Expression_Adapters::CLI.express_of_via_under expag
 

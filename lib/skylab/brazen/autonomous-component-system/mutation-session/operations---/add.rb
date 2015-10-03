@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   # ->
 
-    class Mutation_Session
+    class Autonomous_Component_System::Mutation_Session
 
       module Operations___
 

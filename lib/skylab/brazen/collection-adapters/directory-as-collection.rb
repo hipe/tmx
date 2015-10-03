@@ -253,7 +253,8 @@ module Skylab::Brazen
 
     def edit * x_a, & x_p
 
-      Home_::Mutation_Session.edit x_a, self, & x_p
+      Home_::Autonomous_Component_System::
+          Mutation_Session.edit x_a, self, & x_p
     end
 
     def mutable_body_for_mutation_session

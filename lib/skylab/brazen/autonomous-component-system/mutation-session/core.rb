@@ -2,7 +2,9 @@ module Skylab::Brazen
 
   # ->
 
-    class Mutation_Session  # see [#089]
+    Autonomous_Component_System = ::Module.new  # until etc
+
+    class Autonomous_Component_System::Mutation_Session  # see [#089]
 
       # an attempt to generalize prepends, appends, and removes
       # for all collections of associated entites of all entities
@@ -464,7 +466,7 @@ module Skylab::Brazen
           arg_st = @arg_st
 
           asc_x = @subject_component_class.send(  # :7
-            :"__#{ @association_symbol }__association_for_mutation_session" )
+            :"__#{ @association_symbol }__component_model" )
 
           via_sym = @via_
 

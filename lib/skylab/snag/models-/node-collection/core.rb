@@ -51,7 +51,7 @@ module Skylab::Snag
           node_collection_via_upstream_identifier_( id, & oes_p )
       end
 
-      def __node__association_for_mutation_session
+      def __node__component_model
 
         Models_::Node
       end
@@ -64,7 +64,8 @@ module Skylab::Snag
 
     def edit * x_a, & x_p
 
-      Home_.lib_.brazen::Mutation_Session.edit x_a, self, & x_p
+      Home_.lib_.brazen::Autonomous_Component_System::
+         Mutation_Session.edit x_a, self, & x_p
     end
 
     module Expression_Adapters

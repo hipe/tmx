@@ -46,7 +46,8 @@ module Skylab::Git
 
         _o = Stow_.new_via_path ::File.join( @path, name_s )
 
-        _ = Home_.lib_.brazen::Mutation_Session.event_class :entity_not_found
+        _ = Home_.lib_.brazen::Autonomous_Component_System::
+            Mutation_Session.event_class :entity_not_found
 
         _ev = _.new_with(
           :entity, _o,

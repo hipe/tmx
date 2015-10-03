@@ -39,7 +39,7 @@ module Skylab::Human
           polymorphic_upstream )
       end
 
-      def self.__object_argument__association_for_mutation_session
+      def self.__object_argument__component_model
         EF_::Models_::Argument_Adapter::Nounish::Object
       end
 
@@ -62,7 +62,7 @@ module Skylab::Human
           polymorphic_upstream )
       end
 
-      def self.__subject_argument__association_for_mutation_session
+      def self.__subject_argument__component_model
         EF_::Models_::Argument_Adapter::Nounish::Subject
       end
 
@@ -75,7 +75,7 @@ module Skylab::Human
           polymorphic_upstream )
       end
 
-      def self.__verb__association_for_mutation_session
+      def self.__verb__component_model
         EF_::Models_::Argument_Adapter::Verbish
       end
 
@@ -108,7 +108,8 @@ module Skylab::Human
 
       def _edit_self * x_a, & x_p
 
-        Home_.lib_.brazen::Mutation_Session.edit x_a, self, & x_p
+        Home_.lib_.brazen::Autonomous_Component_System::
+            Mutation_Session.edit x_a, self, & x_p
       end
 
       def mutable_body_for_mutation_session
