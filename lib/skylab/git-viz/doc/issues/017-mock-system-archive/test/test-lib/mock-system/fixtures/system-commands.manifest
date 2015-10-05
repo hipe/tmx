@@ -1,5 +1,0 @@
-nerk-my-derk --ok	file not-exist options {"foo":"bar"}
-nerk-my-derk --ok	options {"foo":"biz"} file nmd.txt
-neek-my-deek	options {"foo":"foo"}
-neek-my-deek	options {"foo":"foo"}
-mock-ping --message\=\"derkiss\"	file ping-simple.txt

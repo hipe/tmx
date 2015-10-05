@@ -1,5 +1,0 @@
-#!/usr/bin/env zsh  #just-for-syntax-highlighting
-
-# read [#017]:#how-asset-building-scripts-are-typically-integrated
-
-$component_node_local_top_dir/asset-script/for-mock-repo-1/script/build $*

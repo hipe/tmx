@@ -1,2 +1,0 @@
-hello from mock-system.
-you said "derkiss." goodbye.

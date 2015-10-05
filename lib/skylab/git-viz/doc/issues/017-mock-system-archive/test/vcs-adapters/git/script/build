@@ -1,7 +1,0 @@
-#!/usr/bin/env zsh  #just-for-syntax-highlighting
-
-me=$0 ; typeset -a rest ; rest=($*)
-
-source $0/../../../../zsh-lib/init-component-node.zsh
-
-component-node-splay
