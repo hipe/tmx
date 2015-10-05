@@ -1,9 +1,2 @@
-/coverage
 .DS_Store
-/Guardfile
 *.IDEA
-/.rspec
-/.rvmrc
-/pkg
-/tmx-*.gem
-/tmx.gemspec
