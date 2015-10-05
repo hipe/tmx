@@ -10,5 +10,5 @@
              ( #was: #done consider scrapping `_p` name convention for.. )
 [#002]       ( #moved-to: [#pa-002] )
              ( #was: #done instance method klass creator tests )
-[#001]       sidesystem intro ..
+[#001]       [ the README ]
              ( #was: #done metahell tests and resolve #kick issue maybe )
