@@ -7,7 +7,7 @@
 [#021]       track a shared maneuver (stat)
 [#020]       the tmpdir narrative
 [#019]       #parent-node: [#016]
-[#001]       the top narrative ..
+[#001]       [ the README ]
 [#002]       [ flock etc ]
 [#003]       [ the FS byte upstream ID ]
 [#004]       #parent-node: [#010] the normalizers ..
