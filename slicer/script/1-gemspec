@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby -w
+
+require 'skylab/slicer'
+sli = Skylab::Slicer::API
+
+upstream = Skylab::Slicer::Script_Support_.resolve_upstream $stdin, $stderr, ARGV
+upstream or exit( 5 )
+
+begin
+
+  item = upstream.gets
+  item or break
+  item.chomp!
+
+  _ok = sli.call :gemify, :sidesystem_path, item
+  _ok or break
+  redo
+end while nil
