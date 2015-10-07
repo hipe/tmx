@@ -15,17 +15,6 @@ module Skylab::TestSupport
 
         Autoloader_[ self, :boxxy ]
 
-        class << self
-          def constants( * )
-            @constants ||= begin  # remove this selfsame file from the list :/
-              a = super
-              d = a.index :Core
-              a[ d ] = nil
-              a.compact!
-              a
-            end
-          end
-        end
       end
 
       class Actions::Ping < Action_

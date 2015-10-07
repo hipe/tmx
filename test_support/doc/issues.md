@@ -2,7 +2,7 @@
 [#044] #hole
 [#043] #open modernize doc-test templates
 [#042]       "nasty OCD memoize" caveat (for [gv], [sg])..
-[#041]       [ sidesystem ]  (variants exist universally. this is #hub)
+[#041] #hole (this used to track the sidesystem class. now in [tmx] & [sli])
 [#040]       is find nearest TS file broken?
 [#039]       #parent-node: [#030] #tracking a `Subject_` parameter function
 [#038]       expect line

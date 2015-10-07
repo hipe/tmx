@@ -50,14 +50,6 @@ module Skylab::TestSupport
           nil
         end
 
-        def __resolve_stateful_matcher
-
-          sm.root_directory_path = @root_directory_path
-          sm.serr = @serr
-          @stateful_matcher = sm.normalize
-          @stateful_matcher && ACHIEVED_
-        end
-
         class Stateful_Matcher___
 
           # decide whether or not you want each file (whose paths are each
@@ -73,7 +65,9 @@ module Skylab::TestSupport
 
           def normalize
 
-            @root_path = @on_event_selectively.call :for_plugin, :root_directory_path
+            self._HELLO  # change below to use sidesys_inference_stream_proc
+
+            @root_path = @on_event_selectively.call :for_plugin, :r_oot_directory_path
             d_a = ( 0 ... @ARGV_coverage_switch_index ).to_a
             d_a.concat ( @ARGV_coverage_switch_index + 1 ... @ARGV.length ).to_a
 

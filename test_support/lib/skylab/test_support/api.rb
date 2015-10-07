@@ -38,10 +38,10 @@ module Skylab::TestSupport
         end
 
         oes_p.call :info, :expression, :ping do | y |
-          y << "hello from #{ kr.app_name.gsub SPACE_, DASH_ }#{ _x }\n"
+          y << "hello from #{ kr.app_name }#{ _x }\n"
         end
 
-        :"hello_from_test-support"
+        :hello_from_test_support
       end
 
       Autoloader_[ self, :boxxy ]

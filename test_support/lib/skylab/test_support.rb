@@ -8,14 +8,14 @@ class ::String  # :1:[#sl-131] [#022] "to extlib or not to extlib.."
   end
 end
 
-require_relative '../callback/core'
+require 'skylab/callback'
 
 module Skylab::TestSupport  # :[#021].
 
   class << self
 
     def describe_into_under y, _
-      y << "simplecov (and?..)"
+      y << "quickie, the tree runner, doctest (defunct), simplecov (defunct)"
     end
 
     def constant i
@@ -79,7 +79,7 @@ module Skylab::TestSupport  # :[#021].
 
   Autoloader_ = Callback_::Autoloader
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
   CONST_SEP_ = '::'.freeze

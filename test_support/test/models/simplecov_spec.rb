@@ -6,13 +6,14 @@ module Skylab::TestSupport::TestSupport::Models
 
     extend TS__
 
-    it "SO BEAUTIFUL / SO UGLY : test simplecov CLI integration in a #sub-process" do
+    it "SO BEAUTIFUL / SO UGLY : test simplecov CLI integration in a #sub-process", wip: true do
 
-      _exe = ::File.join Top_TS_.universal_skylab_bin_path, 'tmx-test-support'
+      self._HEY_this_is_WIPPED_until_simplecov_is_back
 
-      _exe_ = Home_.dir_pathname.join(
-        'test/fixture-executables/for-simplecov.rb'
-      ).to_path
+      _exe = ::File.join Top_TS_.my_bin_path, 'tmx-test-support'
+
+      _exe_ = ::File.join(
+        Top_TS_.my_test_path, 'fixture-executables/for-simplecov.rb' )
 
       sys = Home_.lib_.system
 

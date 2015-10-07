@@ -36,7 +36,8 @@ module Skylab::TestSupport
               Home_.lib_.basic::Pathname.normalization.new_with(
                 :absolute, :downward_only,
                 :no_single_dots,
-                :no_dotfiles ).normalize_argument arg, & oes_p
+                # :no_dotfiles, must allow these when gem
+              ).normalize_argument arg, & oes_p
             else
               arg
             end

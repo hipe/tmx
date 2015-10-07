@@ -122,7 +122,7 @@ module Skylab::TestSupport
             begin
               ss = bx.at_position box_d
               box_d += 1
-              s = "#{ ss.path }#{ ::File::SEPARATOR }"
+              s = "#{ ss.path_to_gem }#{ ::File::SEPARATOR }"
               len = s.length
               if s == path[ 0, len ]
                 break
@@ -154,7 +154,7 @@ module Skylab::TestSupport
 
             if count
               @upstream_item_count += count
-              Record___.new( ss.basename, count )
+              Record___.new( ss.stem, count )
             else
               p2[]  # recurse
             end

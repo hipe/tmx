@@ -9,7 +9,8 @@ module Skylab::TestSupport::TestSupport::DocTest
     include TS_::Case_::Test_Context_Instance_Methods
 
     with_big_file_path do
-      Home_.dir_pathname.join( 'doc/issues/014-how-nodes-are-generated.md' ).to_path
+
+      Top_TS_.doc_path_ 'issues/014-how-nodes-are-generated.md'
     end
 
     it "loads" do

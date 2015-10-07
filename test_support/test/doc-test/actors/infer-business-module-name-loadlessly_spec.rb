@@ -9,7 +9,9 @@ module Skylab::TestSupport::TestSupport::DocTest
 
     it "when matching leaf nodes not found, search branch nodes" do
 
-      _path = ::File.join Top_TS_.skylab_dir_path, 'basic/method.rb'
+      _Basic = Home_.lib_.basic
+
+      _path = ::File.join _Basic.dir_pathname.to_path, 'method.rb'
 
       subject( _path ).should eql "Skylab::Basic::Method"
     end
@@ -34,37 +36,6 @@ module Skylab::TestSupport::TestSupport::DocTest
         :line_upstream, _line_ups, & handle_event_selectively )
 
       _name.should eql "Skorlab::MortaHorl::Porse::Voa_ordered_set__"
-
-    end
-
-    if false  # visual test - useful for debugging
-
-      _RX = /[^[:space:]]+/
-
-      it "CHECK ALL (visual test for now)" do
-        @oes_p = handle_event_selectively
-        dflts = Home_.lib_.system.defaults
-        _mani_path = dflts.doc_test_manifest_path
-        lines = ::File.open _mani_path, 'r'
-        pn = dflts.top_of_the_universe_pathname
-        count = 0
-        while line = lines.gets
-          count += 1
-          _path = _RX.match( line )[ 0 ]
-          try_this_path pn.join( _path ).to_path
-        end
-        debug_IO.puts "DONE with #{ count } paths."
-      end
-
-      def try_this_path path
-        debug_IO.write "DOING: -->#{ path }<---"
-        x = subject path, & @oes_p
-        if x
-          debug_IO.puts "  -->#{ x }<----"
-        else
-          self._HERE
-        end
-      end
 
     end
 

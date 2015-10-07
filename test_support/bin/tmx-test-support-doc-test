@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../lib/skylab/test-support/core'
+require 'skylab/test_support'
 
 Skylab::Doc_test = -> i, o, e, pn_s_a, argv do
   Skylab::TestSupport::DocTest::CLI.new( i, o, e, pn_s_a ).invoke argv

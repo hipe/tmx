@@ -4,11 +4,12 @@ module Skylab::TestSupport
 
     # ~ [#002] #at-this-exact-point: manual loading is necessary..
 
-    sl_lib = ::File.expand_path '../..', HERE_
+    require 'skylab/test_support'
 
-    require "#{ sl_lib }/test-support/core"
-
-    Autoloader_[ self ]
+    if ! self.respond_to? :dir_pathname
+      self._HELLO
+      Autoloader_[ self ]
+    end
 
     Autoloader_[ Plugins__, :boxxy ]
 

@@ -98,7 +98,7 @@ module Skylab::TestSupport
       def _express_chunk d, d_
 
         _ = ( d ... ( d + d_ ) ).map do | d__ |
-          @bx.at_position( d__ ).basename
+          @bx.at_position( d__ ).stem
         end * SPACE_
 
         @resources.serr.puts "#{ @head_s }#{ _ }"

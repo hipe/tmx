@@ -205,7 +205,7 @@ module Skylab::TestSupport
       end
 
       def when_nothing_was_filtered
-        CEASE_
+        UNABLE_  # "CEASE_"
       end
 
       def when_everything_was_filtered

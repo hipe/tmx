@@ -44,8 +44,8 @@ module Skylab::TestSupport
     #     here = DocTest_::Models_::Front::Actions::Generate.
     #       dir_pathname.join( 'core.rb' ).to_path
     #
-    #     output_pn = Home_.dir_pathname.
-    #       join( 'test/doc-test/models-front-actions/generate/integration/core_spec.rb' )
+    #     output_pn = ::Pathname.new Top_TS_.test_path_(
+    #       'doc-test/models-front-actions/generate/integration/core_spec.rb' )
     #
     #     stat = output_pn.stat
     #     size1 = stat.size

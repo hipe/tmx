@@ -29,7 +29,7 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
     it "1.1) no ent" do
       invoke 'generate', a_path_for_a_file_that_does_not_exist
       on_stream :errput
-      expect %r(\Acouldn't generate .+ because no such file or direc.+not-exi)i
+      expect %r(\Acouldn't generate .+ because no such file or direc.+noent\.f)i
       @exitstatus.should equal_generic_error
     end
 

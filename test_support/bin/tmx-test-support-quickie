@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../lib/skylab'
-require 'skylab/test-support/core'
+require 'skylab/test_support'
 
 program = -> i, o, e, pn_a, argv, & p do
 
@@ -47,9 +46,9 @@ end
 # perhaps a better solution would be to get the above logic out of this
 # runner but that is contray to the fundamental axiom of tmx.
 
-Skylab::Quickie = program
+Skylab::TestSupport_quickie = program
 
-if __FILE__ === $PROGRAM_NAME
+if ::File.basename( __FILE__ ) == ::File.basename( $PROGRAM_NAME )
 
   exit( program.call( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ) do | dae |
     dae.listen

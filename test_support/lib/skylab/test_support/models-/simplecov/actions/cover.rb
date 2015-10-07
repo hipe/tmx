@@ -50,6 +50,10 @@ module Skylab::TestSupport
             false
           end
 
+          def adapter_class_for _
+            NIL_
+          end
+
           def is_promoted
             true
           end
@@ -232,7 +236,11 @@ module Skylab::TestSupport
 
           ::SimpleCov.command_name "#{ ::File.basename path } (skylab simplecov)"
 
-          ::SimpleCov.add_filter( & @matcher.method( :filter ) )
+          ::SimpleCov.add_filter do | sourcefile |
+
+            # hello
+            @matcher.filter sourcefile
+          end
 
           ::SimpleCov.start
 

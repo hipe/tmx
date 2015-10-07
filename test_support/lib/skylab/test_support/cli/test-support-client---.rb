@@ -2,8 +2,17 @@ module Skylab::TestSupport
 
   class CLI::Test_Support_Client___ < Home_.lib_.brazen::CLI
 
+    expose_executables_with_prefix 'tmx-test-support-'
+
     def back_kernel
       Home_::API.krnl
+    end
+
+    def lookup_sidesystem_module
+
+      # (because we have a nonstandard location)
+
+      Home_
     end
 
     # ~ the currently cludgy way we get resources directly to the model action

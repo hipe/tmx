@@ -4,17 +4,12 @@ module Skylab::TestSupport
 
     class << self
 
-      def [] mod
+      def [] mod, dir
 
-        if ! mod.respond_to? :dir_pathname  # #storypoint-35
-
-          s_a = mod.name.split CONST_SEP_
-          s_a.pop  # autoloader doesn't care that our const name is TestSupp..
-          _pmod = Callback_::Const_value_via_parts[ s_a ]
-
-          _pmod.using_file_entry_string_autoloaderize_child_node(
-            TEST_DIR_FILENAME_,
-            mod )
+        if mod.respond_to? :dir_pathname
+          self._WHERE
+        else
+          Autoloader_[ mod, dir ]
         end
 
         mod.extend Anchor_ModuleMethods

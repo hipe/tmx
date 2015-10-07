@@ -7,13 +7,13 @@ module Skylab
       def initialize _, o, e, a
 
         @argv = a
-        @resources = Resources___.new o, e
+        @resources = Resources___.new o, e, a
         @was_unable = false
       end
 
-      Resources___ = ::Struct.new :sout, :serr
+      attr_writer :sidesystem_load_ticket_stream_proc
 
-      attr_accessor :root_directory_path
+      Resources___ = ::Struct.new :sout, :serr, :argv
 
       def execute
         __init_callback_handler
@@ -133,8 +133,8 @@ module Skylab
         _program_name
       end
 
-      def __receive__for_plugin_root_directory_path__
-        @root_directory_path
+      def __receive__for_plugin_sidesystem_stream_proc__
+        @sidesystem_load_ticket_stream_proc
       end
 
       def __receive__for_plugin_sidesystem_box__

@@ -2,7 +2,9 @@ require_relative '../test-support'
 
 module Skylab::TestSupport::TestSupport::DocTest
 
-  ::Skylab::TestSupport::TestSupport[ TS_ = self ]
+  Top_TS_ = ::Skylab::TestSupport::TestSupport
+
+  Top_TS_[ TS_ = self ]
 
   include Constants
 
@@ -55,7 +57,8 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
 
     def a_path_for_a_file_that_does_not_exist
-      Home_.dir_pathname.join( 'this-file-does-not-exist.somefile' ).to_path
+
+      Top_TS_.noent_path_
     end
 
     def with_comment_block_in_ad_hoc_fake_file symbol

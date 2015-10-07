@@ -7,7 +7,7 @@ module Skylab::TestSupport::TestSupport::DocTest::Input
     extend TS_
 
     with_big_file_path do
-      Home_.dir_pathname.join( 'doc/issues/015-the-doc-test-narrative.md' ).to_path
+      Top_TS_.doc_path_ 'issues/015-the-doc-test-narrative.md'
     end
 
     with_magic_line %r(\A[ ]{4,}this is some code$)

@@ -21,6 +21,7 @@ module Skylab::TestSupport
 
       def initialize( * )
         super
+        @bx = nil
         @verbosity = 0
         @white_a = nil
       end
@@ -29,43 +30,30 @@ module Skylab::TestSupport
 
       def do__build_sidesystem_tree__
 
-        @root_path = @on_event_selectively.call(
-          :for_plugin, :root_directory_path )
+        p = @on_event_selectively.call :for_plugin, :sidesystem_stream_proc
 
-        @root_path && __via_root_path_establish_SS_tree
+        p and __build_sidesystem_tree p
       end
 
-      def __via_root_path_establish_SS_tree
+      def __build_sidesystem_tree p
 
         @on_event_selectively.call :from_plugin, :sidesystem_box do
 
           bx = Callback_::Box.new
 
-          ::Dir[ "#{ @root_path }/*" ].each do | path |  # :+[#sl-118] ( 2 of N )
-
-            bn = ::File.basename path
-            bx.add bn, Sidesystem___.new( bn, path )
+          st = p[]
+          while lt = st.gets
+            bx.add lt.stem, lt
           end
 
           @bx = bx
+
           if @white_a
             __reduce_via_whitelist
           else
             bx
           end
         end
-      end
-
-      class Sidesystem___  # :+[#041]
-
-        def initialize basename, path
-
-          @basename = basename
-          @path = path
-
-        end
-
-        attr_reader :basename, :path
       end
 
       # ~ finding the test files
@@ -100,11 +88,11 @@ module Skylab::TestSupport
 
         base_p = p = -> do  # write our own map-expand stream
 
-          test_diretory_path = st.gets
+          test_directory_path = st.gets
 
-          if test_diretory_path
+          if test_directory_path
 
-            _find = proto.new_with( :path, test_diretory_path )
+            _find = proto.new_with :path, test_directory_path
 
             st_ = _find.to_path_stream
 
@@ -132,29 +120,38 @@ module Skylab::TestSupport
 
       def __build_stream_of_test_directories
 
-        _paths = @bx.to_enum( :each_value ).map do | ss |
-          ss.path
+        # now that we base our collection off of installed gems (and not a
+        # top-of-the-universe directory), we assume that per convention,
+        # *every* gem has a test directory. (we used to call `find`!)
+
+        # because of The Graph, if we have gotten this far we are "certain"
+        # the box exists
+
+        if @bx
+          _stream @bx
+        elsif @white_a
+          @resources.serr.puts "(cannot process whitelist with this source)"
+          UNABLE_
+        else
+          _bx = @on_event_selectively.call :for_plugin, :sidesystem_box
+          _stream _bx
         end
+      end
 
-        ( _Find.new_with :paths, _paths,
-            :freeform_query_infix_words, %w'-type d -maxdepth 1',
-            :filename, 'test' do | * i_a, & ev_p |
+      def _stream bx
 
-          if :info != i_a.first || 1 < @verbosity
-            @on_event_selectively.call( * i_a, & ev_p )
-          end
-        end ).to_path_stream
+        bx.to_value_stream.map_by do | lt |
+
+          ::File.join lt.path_to_gem, TEST_DIR_FILENAME_
+        end
       end
 
       def __build_find_test_files_prototype
 
-        _Find.new_with :freeform_query_infix_words, %w'-type f',
-          :filename, '*_spec.rb'
-
-      end
-
-      def _Find
-        Lib_::System[].filesystem.find
+        Lib_::System[].filesystem.find.new_with(
+          :freeform_query_infix_words, %w'-type f',
+          :filename, '*_spec.rb',
+        )
       end
 
       # ~ whitelisting sidesystems
@@ -175,6 +172,7 @@ module Skylab::TestSupport
       end
 
       def __process_nonzero_length_ARGV argv
+
         d = 0 ; len = argv.length
         a = []
         until len == d

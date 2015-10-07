@@ -68,7 +68,7 @@ module Skylab::TestSupport::TestSupport::DocTest
     it "`force` argument works" do
 
       call_API :generate,
-        :output_path, common_real_life_output_path,
+        :output_path, _common_real_life_output_path,
         :output_adapter, :quickie
 
       ev = expect_not_OK_event :missing_required_permission
@@ -86,7 +86,7 @@ module Skylab::TestSupport::TestSupport::DocTest
         :generate,
         :dry_run,  # comment this out to re-write the file!
         :force,
-        :output_path, common_real_life_output_path,
+        :output_path, _common_real_life_output_path,
         :upstream_path, common_upstream_path,
         :output_adapter, :quickie,
         :on_event_selectively, handle_event_selectively )
@@ -101,10 +101,10 @@ module Skylab::TestSupport::TestSupport::DocTest
       DocTest_.dir_pathname.join( 'models-/front/actions/generate/core.rb' ).to_path
     end
 
-    def common_real_life_output_path
-      Home_.dir_pathname.join(
-        'test/doc-test/models-front-actions/generate/integration/core_spec.rb'
-      ).to_path
+    def _common_real_life_output_path
+
+      Top_TS_.test_path_(
+        'doc-test/models-front-actions/generate/integration/core_spec.rb' )
     end
 
     def call_API_with * x_a

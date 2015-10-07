@@ -53,16 +53,6 @@ module Skylab::TestSupport
       Basic[]::Function.chain p_a
     end
 
-    Permute = sidesys[ :Permute ]
-
-    Plugin = sidesys[ :Plugin ]
-
-    Properties_stack_frame = -> * a do
-      Brazen[]::Property::Stack.common_frame.call_via_arglist a
-    end
-
-    _Snag = sidesys[ :Snag ]
-
     Hashtag = -> do
       _Snag[]::Models::Hashtag
     end
@@ -104,6 +94,20 @@ module Skylab::TestSupport
       Callback_::Name.lib.constantize_sanitize_file
     end
 
+    Parse = sidesys[ :Parse ]  # only for 1 tree runner plugin (greenlist)
+
+    Permute = sidesys[ :Permute ]
+
+    Plugin = sidesys[ :Plugin ]
+
+    Properties_stack_frame = -> * a do
+      Brazen[]::Property::Stack.common_frame.call_via_arglist a
+    end
+
+    Slicer = sidesys[ :Slicer ]  # only for 1 tree runner plugin (greenlist)
+
+    _Snag = sidesys[ :Snag ]
+
     Skylab__ = Callback_.memoize do
       require_relative DOT_DOT_
       ::Skylab
@@ -126,6 +130,8 @@ module Skylab::TestSupport
     Tmpdir = -> do
       System[].filesystem.tmpdir
     end
+
+    TMX = sidesys[ :TMX ]
 
     INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(
       self, Home_ )
