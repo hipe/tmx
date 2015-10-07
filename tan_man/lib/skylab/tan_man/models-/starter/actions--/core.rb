@@ -9,11 +9,13 @@ module Skylab::TanMan
     class << self
 
       def path_for_directory_as_collection_
-        @__path ||= Home_.dir_pathname.join( RELPATH___ ).to_path
+        @__path ||= __DIRECTORY
+      end
+
+      def __DIRECTORY
+        ::File.join( Home_.sidesys_path_, 'data-documents/starters' ).freeze
       end
     end  # >>
-
-    RELPATH___ = 'data-documents/starters'.freeze
 
     Actions__ = make_action_making_actions_module
 
@@ -37,7 +39,7 @@ module Skylab::TanMan
         edit_entity_class :preconditions, EMPTY_A_
 
         def entity_collection
-          @___col ||= Build_collection__[ @kernel ]
+          @___col ||= Build_collection__[ @kernel, & @on_event_selectively ]
         end
       end
 
@@ -71,7 +73,13 @@ module Skylab::TanMan
 
     def entity_collection
 
-      @__col ||= Hybrid_Collection_Controller___.new @preconditions, self.class, @kernel
+      @__col ||= __build_collection_via_kernel
+    end
+
+    def __build_collection_via_kernel
+
+      Hybrid_Collection_Controller___.new(
+        @preconditions, self.class, @kernel, & @on_event_selectively )
     end
 
     class Silo_Daemon < superclass::Silo_Daemon
@@ -121,9 +129,10 @@ module Skylab::TanMan
       # use the filesystem when reading the available collection,
       # use the workspace when writing the currently selected entity.
 
-      def initialize bx, mc, k
+      def initialize bx, mc, k, & oes_p
         @kernel = k
         @model_class = mc
+        @on_event_selectively = oes_p
         @ws = bx.fetch :workspace
       end
 
@@ -159,19 +168,23 @@ module Skylab::TanMan
       include Common_Collection_Controller_Methods_
 
       def _fs
+        @__fs ||= __build_directory_as_collection
+      end
 
-        @__fs ||= Build_collection__[ @kernel ]
+      def __build_directory_as_collection
+        Build_collection__[ @kernel, & @on_event_selectively ]
       end
     end
 
-    Build_collection__ = -> kr do
+    Build_collection__ = -> kr, & oes_p do
 
-      Brazen_::Collection_Adapters::Directory_as_Collection.new(
-        kr
-      ) do | o |
+      Brazen_::Collection_Adapters::Directory_as_Collection.new do | o |
+
         o.directory_path = Starter_.path_for_directory_as_collection_
         o.filesystem = Home_.lib_.system.filesystem
         o.flyweight_class = Starter_
+        o.kernel = kr
+        o.on_event_selectively = oes_p
       end
     end
 

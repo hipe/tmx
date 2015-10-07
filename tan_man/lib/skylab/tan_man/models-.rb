@@ -71,6 +71,10 @@ module Skylab::TanMan
       false
     end
 
+    def adapter_class_for _
+      NIL_
+    end
+
     attr_accessor :is_promoted
 
     def new boundish, & oes_p

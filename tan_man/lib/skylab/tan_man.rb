@@ -1,5 +1,4 @@
-require_relative '..'
-require 'skylab/brazen/core'
+require 'skylab/brazen'
 
 module Skylab::TanMan
 
@@ -22,6 +21,10 @@ module Skylab::TanMan
     def name_function
       @nf ||= Callback_::Name.via_module self
     end
+
+    def sidesys_path_
+      @___sidesys_path ||= ::File.expand_path( '../../..', __FILE__ )
+    end
   end  # >>
 
   Autoloader_ = Callback_::Autoloader
@@ -30,7 +33,7 @@ module Skylab::TanMan
     Autoloader_[ self ]
   end
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true
   Brazen_ = ::Skylab::Brazen

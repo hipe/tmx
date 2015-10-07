@@ -1,9 +1,9 @@
-require_relative '../core'
-require 'skylab/test-support/core'
+require 'skylab/tan_man'
+require 'skylab/test_support'
 
 module Skylab::TanMan::TestSupport
 
-  ::Skylab::TestSupport::Regret[ TS_ = self ]
+  ::Skylab::TestSupport::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
 
   Home_ = ::Skylab::TanMan
 
