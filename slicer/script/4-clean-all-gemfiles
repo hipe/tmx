@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+git ls-files --others --exclude-standard | grep '\.gem$' | while read line ; do
+
+  echo "rm $line"
+  rm "$line"
+
+done

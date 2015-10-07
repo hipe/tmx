@@ -1,0 +1,65 @@
+#!/usr/bin/env ruby -w
+
+require 'skylab/slicer'
+require 'open3'
+
+top_of_universe = ::Dir.pwd
+
+serr = $stderr
+
+# ~ boilerplate
+
+upstream = Skylab::Slicer::Script_Support_.resolve_upstream $stdin, $stderr, ARGV
+upstream or exit( 5 )
+
+begin
+
+  item = upstream.gets
+  item or break
+  item.chomp!
+
+  path = ::File.join top_of_universe, item
+
+  serr.puts "cd #{ path }"
+  ::Dir.chdir path
+
+  cmd = [ "gem", "build", "./skylab-#{ item }.gemspec" ]
+  serr.puts cmd.join( ' ' )
+
+  _, o, e, w = ::Open3.popen3( * cmd )
+
+  begin
+    s = e.gets
+    s or break
+    serr.puts s
+    redo
+  end while nil
+
+  d = w.value.exitstatus
+  if d.nonzero?
+    serr.puts "nonzero: #{ d }"
+    exit 0
+  end
+
+  last = nil
+  begin
+    s = o.gets
+    s or break
+    last = s
+    redo
+  end while nil
+
+  neat = /\A[[:space:]]*File: (.+)/.match( last )[ 1 ]
+
+  serr.puts( cmd * ' ' )
+
+  cmd = [ "gem", "install", "./#{ neat }" ]
+
+  _ok = ::Kernel.system( * cmd )
+  _ok or break
+
+
+  redo
+end while nil
+
+serr.puts "done."
