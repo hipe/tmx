@@ -1,5 +1,4 @@
-require_relative '../callback/core'
-require_relative '..'
+require 'skylab/callback'
 
 module Skylab::Fields
 
@@ -32,7 +31,7 @@ module Skylab::Fields
 
   end
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
 
   CLI = nil  # for host
   EMPTY_A_ = []

@@ -1,14 +1,16 @@
-# discussion of all the meta-property libraries :[#001]
+# the skylab "fields" sidesystem
 
-## introduction
+## objective & scope
 
-this is the world of :#parameter-library's, "field libraries", actors
-and entites.
+this "fields" sidesystem is an umbrella-libary for facilities dealing
+with modeling { properties | fields | attributes } of entity models.
+(but note currently one of the main such libraries lives in [br] under
+"entity".)
 
 
 
 
-## introduction to the [fi] sidesystem
+## historical context
 
 this sidesystem was created long after all the below facilities were
 created; *only* as an intermediate step to help gather many of them into
