@@ -1,3 +1,5 @@
+[#119] #open get [fm] out of test (see)
+[#118]       do we want the ability to have a model-less-action? for now, no
 [#117] #open we might want top invocation to be able to emit events with
              the same interface as action adapters, which would change
              the inheritence graph considerably

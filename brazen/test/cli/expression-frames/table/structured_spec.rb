@@ -127,7 +127,9 @@ module Skylab::Brazen::TestSupport
 
     define_method :_common_tree, ( Callback_.memoize do
 
-      _FM = Home_::Autoloader_.require_sidesystem :FileMetrics  # #todo - mock this?
+      _FM = Home_::Autoloader_.require_sidesystem :FileMetrics
+      # above is #open [#119] - see if we can reverse this test to put it
+      # in [fm] so it is an integration test maybe?
 
       _T = _FM::Models_::Report::Actions::Line_Count::Totaller_class___[]
 

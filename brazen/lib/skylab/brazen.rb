@@ -1,6 +1,4 @@
-require_relative '..'
-
-require_relative '../callback/core'
+require 'skylab/callback'
 
 module Skylab::Brazen
 
@@ -58,7 +56,11 @@ module Skylab::Brazen
     end
 
     def test_support  # :+[#ts-035]
-      require_relative 'test/test-support'
+
+      if ! Home_.const_defined? :TestSupport, false
+        require_relative '../../test/test-support'
+      end
+
       Home_::TestSupport
     end
   end  # >>
@@ -140,6 +142,10 @@ module Skylab::Brazen
     # (the categories are pursuant to [#024] top)
 
     # ~ actionability - identity in & navigation of the interface tree
+
+    def self.adapter_class_for _  # moda. specific hook for hax
+      NIL_
+    end
 
     def to_kernel
       @kernel
@@ -406,7 +412,7 @@ module Skylab::Brazen
     end
   end
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
   ACTIONS_CONST_ = :Actions

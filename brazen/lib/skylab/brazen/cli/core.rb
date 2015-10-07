@@ -8,6 +8,12 @@ module Skylab::Brazen
         CLI_::Action_Adapter::Arguments
       end
 
+      def expose_executables_with_prefix s
+        define_method :to_child_unbound_action_stream,
+          CLI_::Action_Adapter_::Executables_Exposure::Action_stream_method[ s ]
+        NIL_
+      end
+
       def expression_agent_instance
         CLI_::Expression_Agent.instance
       end
@@ -196,6 +202,12 @@ module Skylab::Brazen
         @app_kernel.unbound_action_via_normalized_name i_a
       end
 
+      def lookup_sidesystem_module  # for auxiliaries, :+#hook-in
+
+        ( s_a = self.class.name.split CONST_SEP_ ).pop
+        Callback_::Const_value_via_parts[ s_a ]
+      end
+
       ## ~~ description & inflection
 
       def has_description
@@ -277,7 +289,7 @@ module Skylab::Brazen
           end
         end.call
       end  # >>
-    end
+    end  # top invocation
 
     # ~
 
@@ -423,15 +435,13 @@ module Skylab::Brazen
 
       def __array_of_matching_unbounds_against_token tok
 
-        p = bound_action.fast_lookup
+        p = fast_lookup_proc
 
         # the client can implement & expose this "fast lookup" to circumvent
-        # needing to load (perhaps) all constituents to resolve a name. this
-        # proc is modality agnostic. towards this for now we pass a symbol
+        # needing to load (perhaps) all constituents to resolve a name.
 
         if p
-          _sym = Callback_::Name.via_slug( tok ).as_variegated_symbol
-          cls = p[ _sym ]
+          cls = p[ tok.gsub( DASH_, UNDERSCORE_ ).intern ]
         end
 
         if cls
@@ -439,6 +449,10 @@ module Skylab::Brazen
         else
           __array_of_matching_unbounds_against_token_slow tok
         end
+      end
+
+      def fast_lookup_proc
+        bound_action.fast_lookup
       end
 
       def __array_of_matching_unbounds_against_token_slow tok
@@ -463,13 +477,17 @@ module Skylab::Brazen
 
       def adapter_via_unbound unbound  # :+#public-API
 
-        _cls = if unbound.is_branch
-          __branch_class_for_unbound_action unbound
-        else
-          __leaf_class_for_unbound_action unbound
+        cls = unbound.adapter_class_for :CLI
+
+        if ! cls
+          cls = if unbound.is_branch
+            __branch_class_for_unbound_action unbound
+          else
+            __leaf_class_for_unbound_action unbound
+          end
         end
 
-        _cls.new unbound, bound_action
+        cls.new unbound, bound_action
       end
 
       # this is CLI. you need not cache these.
@@ -813,6 +831,10 @@ module Skylab::Brazen
         false
       end
 
+      def adapter_class_for _
+        NIL_
+      end
+
       # ~
 
       def new bnd, & x_p
@@ -1083,7 +1105,8 @@ module Skylab::Brazen
         s = inflect_line_for_positivity_via_event a.first, ev
         s and a[ 0 ] = s
         send_non_payload_event_lines_with_redundancy_filter a
-        maybe_use_exit_status_via_OK_or_not_OK_event ev_ ; nil
+        maybe_use_exit_status_via_OK_or_not_OK_event ev_
+        NIL_
       end
 
       def receive_negative_event ev
@@ -1092,7 +1115,8 @@ module Skylab::Brazen
         s and a[ 0 ] = s
         send_non_payload_event_lines_with_redundancy_filter a
         send_invitation ev
-        maybe_use_exit_status some_err_code_for_event ev ; nil
+        maybe_use_exit_status some_err_code_for_event ev
+        NIL_
       end
 
       def receive_success_event ev
@@ -1104,19 +1128,22 @@ module Skylab::Brazen
         s = maybe_inflect_line_for_completion_via_event a.first, ev
         s and a[ 0 ] = s
         send_non_payload_event_lines a
-        maybe_use_exit_status SUCCESS_EXITSTATUS ; nil
+        maybe_use_exit_status SUCCESS_EXITSTATUS
+        NIL_
       end
 
       def receive_neutral_event ev
         a = render_event_lines ev
         send_non_payload_event_lines a
-        maybe_use_exit_status SUCCESS_EXITSTATUS ; nil
+        maybe_use_exit_status SUCCESS_EXITSTATUS
+        NIL_
       end
 
       attr_reader :_invite_ev_a
 
       def _receive_invitation ev, adapter
-        @parent._receive_invitation ev, adapter ; nil
+        @parent._receive_invitation ev, adapter
+        NIL_
       end
 
       def express_invite_to_general_help
@@ -1130,7 +1157,8 @@ module Skylab::Brazen
 
       def receive_info_event ev
         _a = render_event_lines ev
-        send_non_payload_event_lines _a ; nil
+        send_non_payload_event_lines _a
+        NIL_
       end
 
       def expression_agent_class
@@ -1263,18 +1291,21 @@ module Skylab::Brazen
       end
 
       def send_payload_event_lines a
-        a.each( & outbound_line_yielder_for__payload__.method( :<< ) ) ; nil
+        a.each( & outbound_line_yielder_for__payload__.method( :<< ) )
+        NIL_
       end
 
       def send_non_payload_event_lines a
-        a.each( & help_renderer.y.method( :<< ) ) ; nil
+        a.each( & help_renderer.y.method( :<< ) )
+        NIL_
       end
 
       def maybe_use_exit_status_via_OK_or_not_OK_event ev
         d = any_err_code_for_event ev
         d or ev.ok && ( d = SUCCESS_EXITSTATUS )
         d ||= some_err_code_for_event ev
-        maybe_use_exit_status d ; nil
+        maybe_use_exit_status d
+        NIL_
       end
 
       def any_err_code_for_event ev
@@ -1340,7 +1371,8 @@ module Skylab::Brazen
 
       def write_invocation_string_parts y
         @parent.write_invocation_string_parts y
-        y << name.as_slug ; nil
+        y << name.as_slug
+        NIL_
       end
 
       def produce_populated_option_parser op, opt_a
@@ -1691,7 +1723,8 @@ module Skylab::Brazen
           ( @arg_a ||= [] ).push found
           @opt_a[ d, 1 ] = EMPTY_A_
           @opt_a.length.zero? and @opt_a = nil
-        end ; nil
+        end
+        NIL_
       end
 
       def __determine_placement_for_many
@@ -1712,7 +1745,8 @@ module Skylab::Brazen
       def _re_order a
         a.sort_by! do |prop|
           @original_index.fetch prop.name_symbol
-        end ; nil
+        end
+        NIL_
       end
     end
 
@@ -1777,7 +1811,8 @@ module Skylab::Brazen
 
       def __add_arg_section o
         o.arg_a = @arg_a
-        o.add_section :item_section, 'argument', @arg_a ; nil
+        o.add_section :item_section, 'argument', @arg_a
+        NIL_
       end
 
       def __add_env_section o

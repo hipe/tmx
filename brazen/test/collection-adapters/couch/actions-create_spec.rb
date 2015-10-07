@@ -35,7 +35,7 @@ module Skylab::Brazen::TestSupport::Collection_Adapters__Couch_OMNI_MODULE
 
       call_API :collection, :couch, :create, :name, 'zeep',
         :workspace_path,
-        TestSupport_::Data::Universal_Fixtures[ :not_here ]
+        TestSupport_::Fixtures.file( :not_here )
 
       expect_not_OK_event :start_directory_does_not_exist
       expect_failed
@@ -45,7 +45,7 @@ module Skylab::Brazen::TestSupport::Collection_Adapters__Couch_OMNI_MODULE
 
       call_API :collection, :couch, :create, :name, 'zeep',
         :workspace_path,
-        TestSupport_::Data::Universal_Fixtures[ :empty_esque_directory ]
+        TestSupport_::Fixtures.dir( :empty_esque_directory )
 
       ev = expect_not_OK_event :workspace_not_found
       ev.to_event.invite_to_action.should eql [ :init ]

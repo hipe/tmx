@@ -1,5 +1,5 @@
-require_relative '../core'
-require 'skylab/test-support/core'
+require 'skylab/brazen'
+require 'skylab/test_support'
 
 module Skylab::Brazen::TestSupport
 
@@ -19,7 +19,7 @@ module Skylab::Brazen::TestSupport
 
   extend TestSupport_::Quickie
 
-  TestSupport_::Regret[ TS_ = self ]
+  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
 
   module ModuleMethods
 

@@ -1,5 +1,3 @@
-require_relative '../test-support'
-
 module Skylab::Brazen::TestSupport::CLI
 
   ::Skylab::Brazen::TestSupport[ TS_ = self ]

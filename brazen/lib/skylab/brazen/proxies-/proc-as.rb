@@ -22,6 +22,10 @@ module Skylab::Brazen
           false
         end
 
+        def adapter_class_for _
+          NIL_
+        end
+
         def is_actionable
           true
         end

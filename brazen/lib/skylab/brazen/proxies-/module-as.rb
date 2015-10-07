@@ -14,6 +14,10 @@ module Skylab::Brazen
         true  # all unadorned modules are
       end
 
+      def adapter_class_for _moda
+        NIL_
+      end
+
       def name_function
         @nf
       end

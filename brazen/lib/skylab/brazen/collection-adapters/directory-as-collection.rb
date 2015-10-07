@@ -8,15 +8,11 @@ module Skylab::Brazen
       end
     end  # >>
 
-    def initialize k
+    def initialize & build
 
       @directory_is_assumed_to_exist = true
       @filename_pattern = nil
-      @_kernel = k
-
-      if block_given?
-        yield self
-      end
+      build[ self ]
     end
 
     attr_writer(
@@ -25,6 +21,7 @@ module Skylab::Brazen
       :filesystem,
       :filename_pattern,  # respond to `=~`
       :flyweight_class,
+      :kernel,
       :on_event_selectively,
     )
 
@@ -216,7 +213,7 @@ module Skylab::Brazen
 
     def __proc_via_path_a path_a, & x_p
 
-      fly = @flyweight_class.new_flyweight @_kernel, & x_p
+      fly = @flyweight_class.new_flyweight @kernel, & x_p
 
       pass = __produce_pass_proc
 

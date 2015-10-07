@@ -158,6 +158,10 @@ module Skylab::Brazen
         @_user_utility_class
       end
 
+      def adapter_class_for _moda
+        NIL_
+      end
+
       def _is_defined_
         true
       end
