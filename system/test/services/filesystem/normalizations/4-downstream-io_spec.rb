@@ -31,7 +31,7 @@ module Skylab::System::TestSupport
     it "exists, formal force, actual force is known and false" do
 
       @result = subject_.with(
-        :path, TestSupport_::Data::Universal_Fixtures[ :three_lines ],
+        :path, TestSupport_::Fixtures.file( :three_lines ),
         :force_arg, __build_force_no_arg,
         & handle_event_selectively )
 
@@ -66,7 +66,7 @@ module Skylab::System::TestSupport
     it "no exist, parent directory is file" do
 
       _path = ::File.join(
-        TestSupport_::Data::Universal_Fixtures[ :three_lines ],
+        TestSupport_::Fixtures.file( :three_lines ),
         'some-other-file',
       )
       against_ _path
@@ -118,7 +118,7 @@ module Skylab::System::TestSupport
     end
 
     def _not_here
-      TestSupport_::Data::Universal_Fixtures[ :not_here ]
+      TestSupport_::Fixtures.file( :not_here )
     end
 
     def subject_

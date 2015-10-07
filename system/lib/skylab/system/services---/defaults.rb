@@ -11,14 +11,6 @@ module Skylab::System
 
       Home_.lib_.properties_stack_frame self,
 
-        :memoized, :inline_method, :bin_path, -> do
-          bin_pathname.to_path
-        end,
-
-        :memoized, :inline_method, :bin_pathname, -> do
-          top_of_the_universe_pathname.join 'bin'
-        end,
-
         :memoized, :inline_method, :cache_pathname, -> do
           ::Pathname.new cache_path
         end,
@@ -44,7 +36,8 @@ module Skylab::System
         end,
 
         :memoized, :inline_method, :dev_tmpdir_pathname, -> do
-          top_of_the_universe_pathname.join 'tmp'  # [#128] the devil's work
+          ::Pathname.new( ::File.join ::ENV.fetch( 'HOME' ), 'tmp' )
+          # [#128] the devil's work
         end,
 
 
@@ -52,14 +45,10 @@ module Skylab::System
 
         :memoized, :proc, :doc_test_manifest_file, -> do
           'doc-test.manifest'.freeze
-        end,
-
-
-        # ~ support
-
-        :memoized, :proc, :top_of_the_universe_pathname, -> do
-          ::Skylab.dir_pathname.join( '../..' ).expand_path
         end
+
+
+
 
         CACHE_FILE__ = 'sl.skylab'.freeze  # covered
 

@@ -12,7 +12,7 @@ module Skylab::System
 
           case 1 <=> x_a.length
           when -1
-            require 'byebug' ; send :"byeb#{}ug" ; 1==1 && :hyebug
+            self._COVER_ME
           when 0
             self._K
           when 1

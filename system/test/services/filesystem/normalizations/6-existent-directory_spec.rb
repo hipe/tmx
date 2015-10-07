@@ -9,7 +9,7 @@ module Skylab::System::TestSupport
 
     it "noent - whines" do
 
-      _path = TestSupport_::Data::Universal_Fixtures[ :not_here ]
+      _path = TestSupport_::Fixtures.file( :not_here )
       against_ _path
 
       expect_not_OK_event :errno_enoent
@@ -54,7 +54,7 @@ module Skylab::System::TestSupport
     end
 
     def _three_lines
-      TestSupport_::Data::Universal_Fixtures[ :three_lines ]
+      TestSupport_::Fixtures.file( :three_lines )
     end
 
     def _expect_same

@@ -407,7 +407,7 @@ module Skylab::System
           if :info == i_a.first
 
             if @be_verbose
-              __express_event_as_string e_p[]
+              __express_event_as_string ev_p[]
             end
           else
             raise ev_p[].to_exception

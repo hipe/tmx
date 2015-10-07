@@ -1,6 +1,4 @@
-require_relative '..'
-
-require_relative '../callback/core'
+require 'skylab/callback'
 
 module Skylab::System
 
@@ -67,7 +65,10 @@ module Skylab::System
 
       def test_support  # :+[#ts-035]
 
-        ::Kernel.require_relative 'test/test-support'
+        if ! Home_.const_defined? :TestSupport, false
+          ::Kernel.require_relative(
+            ::File.expand_path( '../../../test/test-support', __FILE__ ) )
+        end
 
         Home_::TestSupport
       end
@@ -78,7 +79,7 @@ module Skylab::System
 
   Autoloader_ = Callback_::Autoloader
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
 
   Autoloader_[ Services___ = ::Module.new, :boxxy ]
 

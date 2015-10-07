@@ -10,7 +10,7 @@ module Skylab::System::TestSupport
     it "no exist" do
 
       begin
-        against_ TestSupport_::Data::Universal_Fixtures[ :not_here ]
+        against_ TestSupport_::Fixtures.file( :not_here )
       rescue ::Errno::ENOENT => e
       end
 
@@ -19,7 +19,7 @@ module Skylab::System::TestSupport
 
     it "`probably_exists`" do
 
-      _path = TestSupport_::Data::Universal_Fixtures[ :not_here ]
+      _path = TestSupport_::Fixtures.file( :not_here )
 
       @result = subject_.with(
 

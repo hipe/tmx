@@ -37,19 +37,19 @@ module Skylab::System::TestSupport
     end
 
     def _not_here
-      TestSupport_::Data::Universal_Fixtures[ :not_here ]
+      TestSupport_::Fixtures.file( :not_here )
     end
 
     it "wrong ftype" do
 
-      against_ TestSupport_::Data::Universal_Fixtures[ :empty_esque_directory ]
+      against_ TestSupport_::Fixtures.dir( :empty_esque_directory )
       expect_not_OK_event :wrong_ftype
       expect_failed
     end
 
     it "exist" do
 
-      against_ TestSupport_::Data::Universal_Fixtures[ :three_lines ]
+      against_ TestSupport_::Fixtures.file( :three_lines )
       expect_no_events
       kn = @result
       kn.is_known or fail

@@ -1,11 +1,15 @@
-# the top narrative :[#001]
+# the skylab "system" sidesystem :[#001]
+
+## objective & scope
 
 ## :#section-1 introduction
 
-welcome to the system sidesystem. thie node provides system / environment
-reflection and defaults access in a zero-configuration manner, e.g things
-like the pathname to a usable cache dir or temp dir, for whatever the
-particular system is that we are running on.
+encapsulates access to basic and not-no-basic facilities of the
+underlying system. attempts to do so in a zero-configuration manner.
+for example it attempts to produce a path to a usable cache or temp dir
+for whatever particular system we are running on. it wraps basic
+filesystem access so such things can be mocked. it has wrappers for UNIX
+utilities like `find` and `grep`.
 
 it does not have an especially robust or adaptable implementation yet, but
 it stands as façade for such a future; and to any extent that it works now
