@@ -1,8 +1,9 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../lib/skylab/slicer/core'
+require 'skylab/slicer'
 
-_x = Skylab::Slicer::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
-  invoke ARGV
+_x = Skylab::Slicer::CLI.new(
+  $stdin, $stdout, $stderr, [ ::File.basename( $PROGRAM_NAME ) ] ).
+    invoke ARGV
 
 $stderr.puts "(exitstatus: #{ _x })"

@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../core'
+require 'skylab/slicer'
+require 'skylab/tmx'
 
 module Skylab::Slicer
 
@@ -25,9 +26,9 @@ module Skylab::Slicer
 
       @stdout.puts "digraph {"
 
-      _o = Home_::Sessions_::Traversal.new
+      _st = ::Skylab::TMX.to_reflective_sidesystem_stream
 
-      _o.to_sidesystem_stream.each do | ss |
+      _st.each do | ss |
 
         @h[ ss.const ] = ss
         @a.push ss
@@ -77,10 +78,10 @@ module Skylab::Slicer
 
     def __go_deps ss  # etc
 
-      lhs = "  #{ ss.medo } -> "
+      lhs = "  #{ ss.sigil } -> "
 
       ss.inferred_dependencies.each do | sym |
-        @stdout.puts "#{ lhs }#{ @h.fetch( sym ).medo }"
+        @stdout.puts "#{ lhs }#{ @h.fetch( sym ).sigil }"
       end
       NIL_
     end

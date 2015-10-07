@@ -10,7 +10,7 @@ group :development do  # (until we are in "production" there is only this group)
 
   #  ~ for testing, universe-wide
 
-  gem 'rspec'  # (until [ts] "quickie" obviates this..)
+  # gem 'rspec'  # (until [ts] "quickie" obviates this..)
 
   #  ~ needed by one or more subsystems
 
@@ -21,17 +21,17 @@ group :development do  # (until we are in "production" there is only this group)
   #  annotation with an alphabetical list of the subsystem(s) that need that
   #  gem, along with an explanation of what they intend to do with that gem.
 
-  gem 'adsf'  # [ts] for the static file server used by some tests ([de])
+  # gem 'adsf'  # [ts] for the static file server used by some tests ([de])
 
   # gem 'debugger', platform: :mri (sidestep for now)
 
-  gem 'highline'
+  # gem 'highline'
 
-  gem 'levenshtein'  # [hu] reduces large sets of strings to smaller sets
+  # gem 'levenshtein'  # [hu] reduces large sets of strings to smaller sets
 
-  gem 'treetop'  # [ta] for parsing graph-viz dot files
+  # gem 'treetop'  # [ta] for parsing graph-viz dot files
 
-  gem 'simplecov', require: false, group: :test
+  # gem 'simplecov', require: false, group: :test borked at 2.0.0?
     #  [ts] test-runner, regret, quickie-recursive-runner
 
 end

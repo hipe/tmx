@@ -8,7 +8,7 @@ module Skylab::Slicer
       end
 
       def << ss
-        @_down.puts "  #{ ss.medo } [ label=\"#{ ss.const }\" ]"
+        @_down.puts "  #{ ss.sigil } [ label=\"#{ ss.const }\" ]"
         self
       end
     end

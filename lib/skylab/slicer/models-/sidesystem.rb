@@ -2,7 +2,7 @@ module Skylab::Slicer
 
   class Models_::Sidesystem  # :+[#ts-041]
 
-    Actions = THE_EMPTY_MODULE_
+    Actions = ::Module.new.freeze ;  # THE_EMPTY_MODULE_
 
     attr_accessor :mod, :const, :deps, :medo, :norm, :stem
 

@@ -6,21 +6,22 @@ module Skylab::Slicer
 
     def [] ss_a
 
-      rx = /\A([A-Z])(?:[a-z_]*)([A-Z0-9])/
+      rx = /(?:_|(?=[0-9]))/  # only for 2
 
-      first_try = -> const_s do
-        md = rx.match const_s
-        if md
-          "#{ md[ 1 ] }#{ md[ 2 ] }".downcase
+      first_try = -> ss do
+
+        s_a = ss.stem.split rx, 2
+        if 1 == s_a.length
+          s_a.first[ 0, 2 ]
         else
-          const_s[ 0, 2 ].downcase
+          s_a.map { |s| s[ 0 ] }.join EMPTY_S_
         end
       end
 
       h = ::Hash.new { |h_, k| h_[ k ] = [] }
 
       ss_a.each do | ss |
-        _medo = first_try[ ss.const.id2name ]
+        _medo = first_try[ ss ]
         h[ _medo ].push ss
       end
 
@@ -34,7 +35,7 @@ module Skylab::Slicer
         resolve_conflict = -> ss_a_ do
           d = 3
           ss_a_.each do | ss |
-            ss.medo = ss.const.id2name[ 0, d ].downcase
+            ss.sigil = ss.const.id2name[ 0, d ].downcase
             y << ss
           end
           nil
@@ -43,7 +44,7 @@ module Skylab::Slicer
         h.each_pair do | medo, ss_a_ |
           if 1 == ss_a_.length
             ss = ss_a_.first
-            ss.medo = medo
+            ss.sigil = medo
             y << ss
           else
             resolve_conflict[ ss_a_ ]

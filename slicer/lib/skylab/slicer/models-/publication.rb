@@ -1,8 +1,10 @@
 module Skylab::Slicer
 
-  module Models_::Transfer
+  module Models_::Publication
 
-    class Actions::Push < Action_
+    Actions = ::Module.new
+
+    class Actions::Publish < Action_
 
       @is_promoted = true
 

@@ -1,10 +1,16 @@
 module Skylab::Slicer
 
-  module Models_::Transfer
+  module Models_::Greenlist_Verification
+
+    Actions = ::Module.new
 
     class Actions::Verify_Greenlist < Action_
 
       @is_promoted = true
+
+      @description_block = -> y do
+        y << "(currently defunct but we will bring it back!)"
+      end
 
       def produce_result
 

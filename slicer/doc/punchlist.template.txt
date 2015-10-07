@@ -7,8 +7,8 @@ css-convert         q [ ]
 
 code-molester       Q [ ]
 
-dependency          Q [ ]
-slake               q [ ]
+task_examples       Q [ ]
+task                q [ ]
 treemap             q [ ]
 
 file-metrics        q [ ]
