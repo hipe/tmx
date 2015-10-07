@@ -151,7 +151,7 @@ module Skylab::FileMetrics
 
         def bound_call_via_bound_call_from_back bc
 
-          Callback_::Bound_Call.via_this do
+          Callback_::Bound_Call.by do
 
             totes = bc.receiver.send bc.method_name, * bc.args
             if totes

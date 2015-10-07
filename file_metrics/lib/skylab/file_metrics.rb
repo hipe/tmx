@@ -1,5 +1,4 @@
-require_relative '..'
-require 'skylab/callback/core'
+require 'skylab/callback'
 
 module Skylab::FileMetrics
 
@@ -84,6 +83,6 @@ module Skylab::FileMetrics
   THE_EMPTY_MODULE_ = ::Module.new
   UNABLE_ = false
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
 
 end

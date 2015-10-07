@@ -43,7 +43,7 @@ module Skylab::FileMetrics::TestSupport::CLI
         _expect_integer sm.fetch( 0 ).fetch( 1 )
         _expect_percent sm.fetch( 1 ).fetch( 2 )
         _expect_percent sm.fetch( 2 ).fetch( 3 )
-        _expect_pluses sm.fetch( 2 ).fetch( 4 ), 7..7
+        _expect_pluses sm.fetch( 2 ).fetch( 4 ), 11..11
       end
 
       it "summary" do

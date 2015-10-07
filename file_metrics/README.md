@@ -1,6 +1,9 @@
-filemetrics
+# the skylab "filemetrics" utility
 
-This is a collection of tools that makes reports using the unix utilities
+## objective & scope
+
+SLOC and more: this is a collection of tools that makes reports using the
+unix utilities
 "find" and "wc" (wordcount) to show statistical information about files
 in terms of the number of lines of code, and other things involving
 the number and distribution of files in terms of their extensions, etc.
