@@ -2,7 +2,7 @@
 
 ## objective & scope
 
-this was one of the earliest attempts at something resembling an
-application (alongside "tan-man"): ...
-
+the longterm goal of this is to be able to display passing & failing
+tests as a treemap visualization. currently it is a stub with an ornate
+history.
 _

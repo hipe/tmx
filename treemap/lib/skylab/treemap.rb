@@ -1,5 +1,4 @@
-require_relative '..'
-require 'skylab/callback/core'
+require 'skylab/callback'
 
 module Skylab::Treemap
 
@@ -54,7 +53,7 @@ module Skylab::Treemap
 
   end
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true
   Autoloader_[ Input_Adapters_ = ::Module.new ]
