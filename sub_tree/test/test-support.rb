@@ -1,4 +1,4 @@
-require_relative '../core'
+require 'skylab/sub_tree'
 
 module Skylab::SubTree::TestSupport
 
@@ -7,9 +7,7 @@ module Skylab::SubTree::TestSupport
 
   TestSupport_ = Autoloader_.require_sidesystem :TestSupport
 
-  TestSupport_::Regret[ self ]
-
-  TS_ = self
+  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
 
   module Constants
     Home_ = Home_

@@ -1,5 +1,3 @@
-require_relative 'core'
-
 module Skylab::SubTree
 
   class CLI < Home_.lib_.brazen::CLI

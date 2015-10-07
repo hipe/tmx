@@ -1,4 +1,4 @@
-require_relative '../callback/core'
+require 'skylab/callback'
 
 module Skylab::SubTree
 
@@ -36,7 +36,7 @@ module Skylab::SubTree
 
   Autoloader_ = Callback_::Autoloader
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
 
   Autoloader_[ Models_ = ::Module.new, :boxxy ]
 

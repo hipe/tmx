@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../lib/skylab/sub-tree/core'
+require 'skylab/sub_tree'
 
 _x = Skylab::SubTree::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
   invoke ARGV
