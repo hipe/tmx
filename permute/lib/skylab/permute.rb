@@ -1,5 +1,4 @@
-require_relative '..'
-require 'skylab/callback/core'
+require 'skylab/callback'
 
 module Skylab::Permute
 
@@ -33,7 +32,7 @@ module Skylab::Permute
     Brazen = sidesys[ :Brazen ]
   end
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true
   KEEP_PARSING_ = true
