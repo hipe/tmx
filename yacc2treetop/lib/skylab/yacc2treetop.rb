@@ -5,6 +5,8 @@ if ! defined? Skylab::Yacc2Treetop
 
   # when running all of the specs, we won't know if tmx ran before our own test
 
-  load ::File.expand_path( '../../../../bin/tmx-yacc2treetop', __FILE__ )
+  _my_bin_dir = ::File.expand_path '../../../bin', __FILE__
+
+  load ::File.join( _my_bin_dir, 'tmx-yacc2treetop' )
 
 end

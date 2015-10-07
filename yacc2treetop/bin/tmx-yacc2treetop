@@ -37,6 +37,10 @@ module Skylab::Yacc2Treetop
       tr.wrap_in_grammar = o.wrap_in_grammar
       tr.execute
     end
+
+    def sidesys_path_
+      @___sidesys_path ||= ::File.expand_path( '../..', __FILE__ )
+    end
   end  # >>
 
   Translation_Arguments___ = ::Struct.new(

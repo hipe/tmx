@@ -100,7 +100,7 @@ describe "[y2] CLI integration" do
     it 'writes specific complaint, usage, invite to stderr' do
 
       stream_for_expect_stdout_stderr
-      expect :e, /\ANo such file or directory: [-\/a-zA-Z0-9]+\.yacc\z/
+      expect :e, /\ANo such file or directory: [-_\/\.a-zA-Z0-9]+\.yacc\z/
       _expect_invited
     end
   end

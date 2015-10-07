@@ -1,29 +1,13 @@
 # (because the asset file is standalone, we have to do more work here)
 
-top = ::File.expand_path '../../../../..', __FILE__
-
-load ::File.join( top, 'bin/tmx-yacc2treetop' )  # doesn't need anything else
-
-require ::File.join( top, 'lib/skylab' )
-
-require 'skylab/test-support/core'
-
-Skylab::Yacc2Treetop::TestSupport = ::Module.new
-
-Skylab::Yacc2Treetop::TestSupport::DIR_PATHNAME__ =
-
-  ::File.join( top, 'lib/skylab/yacc2treetop' )
+require 'skylab/yacc2treetop'
+require 'skylab/test_support'
 
 module Skylab::Yacc2Treetop::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
-  def self.dir_pathname
-    # (without this, [ts] regret will crawl up to the unadorned sidesystem mod.)
-    self._EEK
-  end
-
-  TestSupport_::Regret[ TS_ = self ]
+  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
 
   extend TestSupport_::Quickie
 
@@ -37,7 +21,7 @@ module Skylab::Yacc2Treetop::TestSupport
       when :expect_event
         Callback_.test_support::Expect_Event[ self ]
       when :expect_CLI
-        ::Kernel.require 'skylab/brazen/core'
+        require 'skylab/brazen'
         ::Skylab::Brazen.test_support.CLI::Expect_CLI[ self ]
         extend CLI_Module_Methods__
         include CLI_Instance_Methods__
@@ -109,8 +93,11 @@ module Skylab::Yacc2Treetop::TestSupport
     end
   end
 
-  Home_ = ::Skylab::Yacc2Treetop
   Callback_ = ::Skylab::Callback
-  FIXTURES_PATH = ::File.join DIR_PATHNAME__, 'test/fixtures'
+  Home_ = ::Skylab::Yacc2Treetop
+
+  _TEST_DIR = ::File.join( Home_.sidesys_path_, TestSupport_::TEST_DIR_FILENAME_ )
+
+  FIXTURES_PATH = ::File.join _TEST_DIR, 'fixtures'
 
 end
