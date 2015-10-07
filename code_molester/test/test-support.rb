@@ -1,6 +1,5 @@
-require_relative '../core'
-
-Skylab::CodeMolester::Autoloader_.require_sidesystem :TestSupport
+require 'skylab/code_molester'
+require 'skylab/test_support'
 
 module Skylab::CodeMolester::TestSupport
 
@@ -15,7 +14,7 @@ module Skylab::CodeMolester::TestSupport
 
   TestSupport_ = TestSupport_
 
-  TestSupport_::Regret[ self ]
+  TestSupport_::Regret[ self, ::File.dirname( __FILE__ ) ]
 
   TestSupport_::Quickie.enable_kernel_describe
 

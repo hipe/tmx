@@ -1,4 +1,4 @@
-require_relative '../callback/core'
+require 'skylab/callback'
 
 module Skylab::CodeMolester
 
@@ -23,7 +23,7 @@ module Skylab::CodeMolester
     Config = self  # for now for prettier treetop grammars
   end
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
 
   Home_ = self
   CLI = nil  # for host
