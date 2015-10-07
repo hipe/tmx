@@ -1,10 +1,9 @@
-require_relative '../core'
-
-::Skylab::Cull::Autoloader_.require_sidesystem :TestSupport
+require 'skylab/cull'
+require 'skylab/test_support'
 
 module Skylab::Cull::TestSupport
 
-  ::Skylab::TestSupport::Regret[ TS_ = self ]
+  ::Skylab::TestSupport::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
 
   module Constants
     Home_ = ::Skylab::Cull

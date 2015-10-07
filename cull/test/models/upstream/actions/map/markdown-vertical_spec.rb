@@ -34,7 +34,7 @@ module Skylab::Cull::TestSupport
 
     def markdown_map_against_file sym
       call_API :upstream, :map, :upstream,
-        TestSupport_::Data::Universal_Fixtures[ sym ],
+        TestSupport_::Fixtures.file( sym ),
           :upstream_adapter, :markdown
     end
 

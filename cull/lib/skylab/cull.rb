@@ -1,4 +1,4 @@
-require_relative '../callback/core'
+require 'skylab/callback'
 
 module Skylab::Cull
 
@@ -12,7 +12,7 @@ module Skylab::Cull
 
   Autoloader_[ Models_ = ::Module.new, :boxxy ]
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
 
   stowaway :CLI do
     CLI = ::Class.new Brazen_::CLI
