@@ -1,5 +1,4 @@
-require_relative '..'
-require 'skylab/callback/core'
+require 'skylab/callback'
 
 module Skylab::CSS_Convert
 
@@ -243,8 +242,8 @@ module Skylab::CSS_Convert
     def __ping
 
       @_can_exit = true
-      @resources.serr.puts "hello from css-convert."
-      @exitstatus = :'hello_from_css-convert'
+      @resources.serr.puts "hello from css convert."
+      @exitstatus = :'hello_from_css_convert'
       CLI::SUCCESS_EXITSTATUS
     end
 
@@ -356,7 +355,7 @@ module Skylab::CSS_Convert
 
       _dr = Home_::Directive__::Runner.new self
       _ok = _dr.invoke @_directives
-      require 'byebug' ; send :"bye#{}bug" ; 1==1 && :hibg
+      self._HELLO
     end
 
     # ~ params (boilerplate adaptation, legacy names)
@@ -590,7 +589,7 @@ module Skylab::CSS_Convert
     end
   end
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true
   EARLY_FINISH_ = nil

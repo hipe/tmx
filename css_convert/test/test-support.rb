@@ -1,11 +1,11 @@
-require_relative '../core'
-require 'skylab/test-support/core'
+require 'skylab/css_convert'
+require 'skylab/test_support'
 
 module Skylab::CSS_Convert::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
-  TestSupport_::Regret[ TS_ = self ]
+  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
 
   extend TestSupport_::Quickie
 
@@ -53,7 +53,7 @@ module Skylab::CSS_Convert::TestSupport
     end
 
     def fixture_path_ tail
-      ::File.join Home_.dir_pathname.to_path, 'test/fixtures', tail
+      ::File.join FIXTURES_DIR___, tail
     end
 
     def build_CSS_parser__
@@ -117,5 +117,9 @@ module Skylab::CSS_Convert::TestSupport
   end
 
   Home_ = ::Skylab::CSS_Convert
+
+  FIXTURES_DIR___ = ::File.expand_path( '../fixtures', __FILE__ )
+
   NIL_ = nil
+
 end
