@@ -1,5 +1,4 @@
-require_relative '..'
-require 'skylab/callback/core'
+require 'skylab/callback'
 
 module Skylab::Parse  # see [#001]
 
@@ -92,7 +91,7 @@ module Skylab::Parse  # see [#001]
       Stdlib_set = Autoloader_.build_require_stdlib_proc[ :Set ]
     end
 
-    Autoloader_[ self ]
+    Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
 
     CLI = nil  # for host
     EMPTY_A_ = [].freeze
