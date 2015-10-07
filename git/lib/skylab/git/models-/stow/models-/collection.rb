@@ -63,14 +63,15 @@ module Skylab::Git
 
       def to_entity_stream
 
-        _dac =
-        Bz__::Collection_Adapters::Directory_as_Collection.new( @kernel ) do | o |
+        _dac = Bz__::Collection_Adapters::Directory_as_Collection.new do | o |
 
           o.directory_path = @path
           o.directory_is_assumed_to_exist = true  # so it whines
 
           o.filesystem = @filesystem
           o.flyweight_class = Stow_
+
+          o.kernel = @kernel
 
           o.on_event_selectively = @on_event_selectively
         end

@@ -23,11 +23,11 @@ module Skylab::Git::TestSupport
       end )
 
       def no_ent_path_
-        TestSupport_::Data::Universal_Fixtures[ :not_here ]
+        TestSupport_::Fixtures.file( :not_here )
       end
 
       def empty_dir_
-        TestSupport_::Data::Universal_Fixtures[ :empty_esque_directory ]
+        TestSupport_::Fixtures.dir( :empty_esque_directory )
       end
 
       def mock_system_conduit_where_ chdir, cmd, & three_p

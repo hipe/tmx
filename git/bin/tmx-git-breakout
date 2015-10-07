@@ -634,5 +634,5 @@ if __FILE__ == $PROGRAM_NAME   # (or broader)
   exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
 else
 
-  Skylab::Breakout = program
+  Skylab::Git_breakout = program
 end

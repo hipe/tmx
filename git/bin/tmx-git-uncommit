@@ -232,5 +232,5 @@ end
 if __FILE__ == $PROGRAM_NAME
   exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
 else
-  Skylab::Uncommit = program
+  Skylab::Git_uncommit = program
 end

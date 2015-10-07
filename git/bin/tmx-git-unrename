@@ -182,13 +182,12 @@ cls = class Skylab_Git_Models_Whatever_Unrename
 
         def __resolve_filechange_stream
 
-          self._SEE_ME  # #open [#sc-001]: the below worked as-is at writing
+          # self._SEE_ME  # #open [#sc-001]: the below worked as-is at writing
           # but we really must cover this if we want it to stop being broken
           # whenever we come around to needing it
 
-          require_relative '../lib/skylab'
-          require 'skylab/git-viz/core'
-          require 'skylab/system/core'
+          require 'skylab/git_viz'
+          require 'skylab/system'
 
           o = ::Skylab
           system = o::System.services
@@ -308,7 +307,7 @@ program = -> i, o, e, pn_s_a, argv do
   cls.new( i, o, e, pn_s_a, argv ).execute
 end
 
-if __FILE__ == $PROGRAM_NAME
+if ::File.basename( __FILE__ ) == ::File.basename( $PROGRAM_NAME )
   program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
 else
   Skylab::Git_unrename = program

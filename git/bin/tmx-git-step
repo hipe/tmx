@@ -3,7 +3,7 @@
 module Skylab
 end
 
-class Skylab::Step
+class Skylab::Git_step
 
   # ->
 
@@ -81,7 +81,9 @@ y << 'rebasing/squashing etc. the second form sets "the file".'
 
         first, rest = md.captures
 
-        @serr.puts "#{ first } \"#{ rest }\" - use `#{ pn[] }` with a path argument"
+        _pgn = @pn_s_a.join ' '
+
+        @serr.puts "#{ first } \"#{ rest }\" - use `#{ _pgn }` with a path argument"
         FAILED_
       else
 
@@ -214,5 +216,5 @@ y << 'rebasing/squashing etc. the second form sets "the file".'
 end
 
 if __FILE__ == $PROGRAM_NAME
-  exit Skylab::Step[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+  exit Skylab::Git_step[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
 end

@@ -5,12 +5,15 @@
 module Skylab
 end
 
-module Skylab::Citxt
+module Skylab::Git_citxt
 
-  def self.call i, o, e, pn_s_a, argv
-
-    CLI.new( i, o, e, pn_s_a ).invoke argv
-  end
+  class << self
+    def _same i, o, e, pn_s_a, argv
+      CLI.new( i, o, e, pn_s_a ).invoke argv
+    end
+    alias_method :[], :_same
+    alias_method :[], :_same
+  end  # >>
 
   CLI = ::Class.new ::Class.new
   class CLI
@@ -344,5 +347,5 @@ end
 
 if __FILE__ == $PROGRAM_NAME
 
-  Skylab::Citxt.call $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV
+  Skylab::Git_citxt.call $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV
 end

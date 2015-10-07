@@ -1,5 +1,5 @@
-require_relative '../core'
-require 'skylab/test-support/core'
+require 'skylab/git'
+require 'skylab/test_support'
 
 module Skylab::Git::TestSupport
 
@@ -7,7 +7,7 @@ module Skylab::Git::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
-  TestSupport_::Regret[ TS_ = self ]
+  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
 
   extend TestSupport_::Quickie
 

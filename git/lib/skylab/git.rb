@@ -1,5 +1,4 @@
-require_relative '..'
-require 'skylab/callback/core'
+require 'skylab/callback'
 
 module Skylab::Git
 
@@ -16,6 +15,8 @@ module Skylab::Git
   stowaway :CLI do
 
     class CLI < Home_.lib_.brazen::CLI
+
+      expose_executables_with_prefix 'tmx-git-'
 
       def back_kernel
         Home_::API.application_kernel_

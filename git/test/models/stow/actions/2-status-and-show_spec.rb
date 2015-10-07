@@ -26,7 +26,7 @@ module Skylab::Git::TestSupport
 
     it "status - dir not dir" do
 
-      _path = TestSupport_::Data::Universal_Fixtures[ :one_line ]
+      _path = TestSupport_::Fixtures.file( :one_line )
       _sc = real_system_conduit_
 
       begin
