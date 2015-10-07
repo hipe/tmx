@@ -2,10 +2,10 @@ require_relative 'test-support'
 
 Skylab::TestSupport::Quickie.enable_kernel_describe
 
-module Skylab::Slake  # [#ts-010]
+module Skylab::Task  # [#ts-010]
 # ..
 describe "[sla] interpolate" do
-  # include ::Skylab::Slake
+  # include ::Skylab::Task
 
   it "works" do
     src = ::Struct.new(:a, :b).new('one', 'two')

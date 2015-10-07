@@ -1,16 +1,17 @@
-require_relative '../core'
-require 'skylab/test-support/core'
+require 'skylab/task'
+require 'skylab/test_support'
 
-module Skylab::Slake::TestSupport
+module Skylab::Task::TestSupport
 
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
-  Home_ = ::Skylab::Slake
+  Home_ = ::Skylab::Task
 
   TestSupport_ = ::Skylab::TestSupport
 
-  TestSupport_::Regret[ Slake_TestSupport = self ]
+  Slake_TestSupport = self
+  TestSupport_::Regret[ self, ::File.dirname( __FILE__ ) ]
 
   module Constants
     TEST_ROOT_DIR = ::File.expand_path '..', __FILE__

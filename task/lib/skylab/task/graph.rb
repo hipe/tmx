@@ -1,6 +1,6 @@
 require 'rake' # for fun and as an implementation detail we use it
 
-module Skylab::Slake
+module Skylab::Task
   class Graph
     include Home_::Parenthood
     include ::Rake::TaskManager

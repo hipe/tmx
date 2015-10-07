@@ -1,6 +1,6 @@
 require 'rake' # for fun and as an implementation detail we use it
 
-module Skylab::Slake
+module Skylab::Task
 
   module TaskClassMethods
     def task_type_name
@@ -8,7 +8,7 @@ module Skylab::Slake
     end
   end
 
-  class Task < ::Rake::Task
+  class LegacyTask < ::Rake::Task
 
     Home_.lib_.fields::Attribute::DSL[ self ]
 
@@ -45,7 +45,7 @@ module Skylab::Slake
       n = nil
       if @name
         n = @name
-      elsif Task != self.class # awful #todo
+      elsif LegacyTask != self.class # awful #todo
         self.class.task_type_name
       end
       n

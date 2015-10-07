@@ -1,6 +1,6 @@
 require 'strscan'
 
-module Skylab::Slake
+module Skylab::Task
   module Interpolate  # deprecated for [#ba-028]
     extend self
     def interpolate string, source
@@ -14,7 +14,7 @@ module Skylab::Slake
   end
 end
 
-module Skylab::Slake::Interpolate
+module Skylab::Task::Interpolate
   class Interpolation
     def initialize source, string
       @source = source

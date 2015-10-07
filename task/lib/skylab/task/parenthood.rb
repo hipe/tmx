@@ -1,4 +1,4 @@
-module Skylab::Slake
+module Skylab::Task
   module Parenthood
     def init_parenthood
       @has_parent = false
