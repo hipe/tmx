@@ -116,7 +116,7 @@ module Skylab::Snag
 
             d = occurrences.seen_count or self._SANITY
 
-            Callback_::Bound_Call.via_this do
+            Callback_::Bound_Call.by do
               __express_as_tree d, bc
             end
           else

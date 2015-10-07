@@ -1,11 +1,11 @@
-require_relative '../core'
-require 'skylab/test-support/core'
+require 'skylab/snag'
+require 'skylab/test_support'
 
 module Skylab::Snag::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
-  TestSupport_::Regret[ TS_ = self ]
+  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
 
   extend TestSupport_::Quickie
 

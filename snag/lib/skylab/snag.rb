@@ -1,5 +1,4 @@
-require_relative '..'
-require 'skylab/callback/core'
+require 'skylab/callback'
 
 module Skylab::Snag
 
@@ -198,7 +197,7 @@ module Skylab::Snag
     Autoloader_[ self ]
   end
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_= true
   Bsc__ = Autoloader_.build_require_sidesystem_proc :Basic

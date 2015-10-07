@@ -167,7 +167,7 @@ module Skylab::Snag
 
       def self.__build_collection_via_kernel kr
 
-        Directory_as_collection_class___[].new( kr ) do | o |
+        Directory_as_collection_class___[].new do | o |
 
           o.directory_is_assumed_to_exist = false
 
@@ -180,6 +180,8 @@ module Skylab::Snag
           o.filesystem = Home_.lib_.system.filesystem
 
           o.flyweight_class = Criteria_
+
+          o.kernel = kr
 
           yield o if block_given?
 

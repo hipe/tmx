@@ -10,7 +10,7 @@ module Skylab::Git
 
   Autoloader_ = Callback_::Autoloader
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
 
   stowaway :CLI do
 

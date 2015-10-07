@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../lib/skylab/snag/core'
+require 'skylab/snag'
 
 _x = Skylab::Snag::CLI.new( nil, $stdout, $stderr, [ $PROGRAM_NAME ] ).
   invoke ARGV
