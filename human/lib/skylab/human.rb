@@ -1,4 +1,4 @@
-require_relative '../callback/core'
+require 'skylab/callback'
 
 module Skylab::Human  # :[#001].
 
@@ -19,7 +19,7 @@ module Skylab::Human  # :[#001].
     NLP_ = self
   end
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
   CLI = nil  # for host

@@ -1,12 +1,11 @@
-require_relative '../core'
-
-Skylab::Human::Autoloader_.require_sidesystem :TestSupport
+require 'skylab/human'
+require 'skylab/test_support'
 
 module Skylab::Human::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
-  TestSupport_::Regret[ TS_ = self ]
+  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
 
   extend TestSupport_::Quickie
 
