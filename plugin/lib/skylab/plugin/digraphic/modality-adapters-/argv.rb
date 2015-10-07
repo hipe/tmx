@@ -142,14 +142,9 @@ module Skylab::Plugin
         end
 
         def __init a, x, & any_p
-          @arg_category_string = nil
           @args = a
           @block = any_p
           @formal_path_x = x
-          @_long_d = nil
-          @long_id_s = nil
-          @_short_d_a = nil
-          @short_id_s_a = nil
           __index
         end
 
@@ -198,57 +193,93 @@ module Skylab::Plugin
         end
 
         def __index
-          a = @args
 
-          d = 0 ; len = a.length
+          # based on the syntax [ short [..]] [ long ] [ other [..]]
+          # init these ivars:
+          #
+          #     @_short_d_a, @short_id_s_a,
+          #     @_long_d, @long_id_s, @arg_category_string
+          #
 
-          last_sep_s = nil
+          args = @args
+          st = Callback_::Stream.via_times args.length
+          d = nil ; s = nil
 
-          begin
-            len == d and break
-            md = SHORT_RX___.match a.fetch d
-            md or break
-            @short_id_s_a ||= begin
-              @_short_d_a = []
-              []
+          gets = -> do
+            d = st.gets
+            if d
+              s = args.fetch d
+              true
+            else
+              s = nil
+              false
             end
-            @_short_d_a.push d
-            @short_id_s_a.push md[ :id ]
-            s = md[ :arg ]
-            s and last_sep_s = s
-
-            d += 1
-            redo
-          end while nil
-
-          long_md_a = []
-          last_long_d = nil
-          begin
-            len == d and break
-            md = LONG_RX___.match a.fetch d
-            md or break
-            long_md_a.push md
-            last_long_d = d
-            d += 1
-            redo
-          end while nil
-
-          if 1 == long_md_a.length
-            md = long_md_a.first
-            @_long_d = last_long_d
-            @long_id_s = md[ :id ]
-            s = md[ :arg ]
-            s and last_sep_s = s
           end
 
-          @arg_category_string = s
+          local_short_d_a = nil
+          local_short_id_s_a = nil
 
-          nil
+          add_short = -> do
+            local_short_d_a = []
+            local_short_id_s_a = []
+            add_short = -> do
+              local_short_d_a.push d
+              local_short_id_s_a.push s
+              NIL_
+            end
+            add_short[]
+          end
+
+          gets[]  # assume at least one
+
+          begin
+
+            md = SHORT_RX___.match s
+            if md
+              last_cat_s = md[ :arg ]
+              add_short[]
+              _yes = gets[]
+              if _yes
+                redo
+              end
+            end
+            break
+          end while nil
+
+          local_long_d = nil
+          local_long_id_s = nil
+
+          if d  # if one unprocessed line
+            md = LONG_RX___.match s
+            if md
+
+              last_cat_s = md[ :arg ]
+
+              local_long_d = d
+              local_long_id_s = s
+
+              if gets[] and LONG_RX___.match s
+                self._COVER_ME
+              end
+            end
+          end
+
+          @arg_category_string = last_cat_s
+
+          @_short_d_a = local_short_d_a
+          @short_id_s_a = local_short_id_s_a
+
+          @_long_d = local_long_d
+          @long_id_s = local_long_id_s
+
+          NIL_
         end
 
-        SHORT_RX___ = /\A (?<id> -(?!-) [^ =\[] )  (?<arg> [ =\[]+ )? /x
+        arg_rsx = '(?<arg> \\[? [ =] )?'  # just enough to categorize
 
-        LONG_RX___ = /\A (?<id> --(?!-) [^ =\[]* )  (?<arg> [ =\[]+ )? /x
+        SHORT_RX___ = /\A (?<id> -(?!-) [^ =\[] )  #{ arg_rsx }/x
+
+        LONG_RX___ = /\A (?<id> --(?!-) [^ =\[]* )  #{ arg_rsx }/x
 
           # our goal is only to capture enough for equality comparison: we
           # must know the identifying string of the switch and we must know
@@ -391,7 +422,7 @@ module Skylab::Plugin
               NIL_
             end
           else
-            -> _ do
+            -> _=true do
               true == _ or self._SANITY  # #todo remove after :+#dev
               _receive_knowledge_of slc
               NIL_

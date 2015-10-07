@@ -497,7 +497,7 @@ module Skylab::Plugin
 
           ( @catalyzing_formals ||= [] ).push op ; nil
         end
-        nil
+        NIL_
       end
 
       def my_symbol_

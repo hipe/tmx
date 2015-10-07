@@ -1,5 +1,4 @@
-require_relative '..'
-require_relative '../callback/core'
+require 'skylab/callback'
 
 module Skylab::Plugin
 
@@ -78,7 +77,7 @@ module Skylab::Plugin
     end
   end
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
 
   Autoloader_[ Bundle = ::Module.new ]
 
@@ -86,6 +85,7 @@ module Skylab::Plugin
   CLI = nil  # for host
   DASH_ = '-'
   EMPTY_A_ = [].freeze
+  EMPTY_S_ = ' '.freeze
   Home_ = self
   KEEP_PARSING_ = true
   NIL_ = nil
