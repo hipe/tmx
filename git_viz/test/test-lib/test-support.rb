@@ -14,13 +14,9 @@ module Skylab::GitViz::TestSupport::Test_Lib
 
   _ = ::File.join ::Skylab::GitViz::TestSupport.dir_pathname.to_path, 'test-lib'
 
-  Autoloader_[ self, _ ]
-
-  # ~
-
   TestSupport_ = ::Skylab::TestSupport
 
-  TestSupport_::Regret[ TS_ = self ]
+  TestSupport_::Regret[ TS_ = self, _ ]
 
   extend TestSupport_::Quickie
 
