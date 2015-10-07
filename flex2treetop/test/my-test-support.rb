@@ -1,5 +1,5 @@
-require_relative '../core'
-require 'skylab/test-support/core'
+require 'skylab/flex2treetop'
+require 'skylab/test_support'
 
 module Skylab::Flex2Treetop::MyTestSupport
 
@@ -153,7 +153,11 @@ module Skylab::Flex2Treetop::MyTestSupport
   end
 
   Home_ = ::Skylab::Flex2Treetop
-  FIXTURE_FILES_DIR_ = Home_.dir_pathname.join( 'test/fixture-files' ).to_path
+
+  _test_dir = ::File.join Home_.sidesys_path_, 'test'
+
+  FIXTURE_FILES_DIR_ = ::File.join( _test_dir, 'fixture-files' )
+
   ICK_ = '@ rb_file_s_stat '.freeze  # 2.1.0 added this
   NEWLINE_ = "\n"
   NIL_ = nil

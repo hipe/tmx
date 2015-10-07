@@ -1,18 +1,16 @@
-require_relative '..'
-require 'skylab/callback/core'
-require 'skylab/brazen/core'
+require 'skylab/brazen'
 
 module Skylab::Flex2Treetop  # see [#008] the narrative
 
   def self.describe_into_under y, _
-    y << "attepts to convert a FLEX grammar into a treetop grammar"
+    y << "attempts to convert a FLEX grammar into a treetop grammar"
   end
 
   Callback_ = ::Skylab::Callback
 
   Autoloader_ = Callback_::Autoloader
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
 
   stowaway :CLI do
     CLI = ::Class.new Brazen_::CLI
@@ -58,6 +56,11 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
     def lib_
       @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+    end
+
+    def sidesys_path_
+      @___sidesys_path ||=
+        ::File.expand_path( '../../..', dir_pathname.to_path )
     end
   end  # >>
 
@@ -130,11 +133,11 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
       Actions::List = -> act_pxy do
 
-        _path = Home_.dir_pathname.join( 'test/fixture-files' ).to_path
+        _path = ::File.join Home_.sidesys_path_, 'test/fixture-files'
 
         path_a = ::Dir.glob( "#{ _path }/*.flex", ::File::FNM_PATHNAME )
 
-        path = ::Skylab.dir_pathname.to_path
+        path = '[ other gems ]'
 
         ADDITIONAL_RECOMMENDED_VISUAL_TEST_FILES___.each do | universe_file |
           path_a.push ::File.join( path, universe_file )
