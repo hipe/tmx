@@ -1,4 +1,4 @@
-require_relative '../core'
+require 'skylab/callback'
 
 module Skylab::Callback::TestSupport
 
@@ -21,7 +21,8 @@ module Skylab::Callback::TestSupport
 
   extend TestSupport_::Quickie
 
-  TestSupport_::Regret[ TS_ = self ]
+  TS_ = self
+  TestSupport_::Regret[ self, ::File.dirname( __FILE__ ) ]
 
   define_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
 
@@ -64,6 +65,4 @@ module Skylab::Callback::TestSupport
     KEEP_PARSING_ = KEEP_PARSING_
     TestSupport_ = TestSupport_
   end
-
-  Autoloader_[ self, Home_.dir_pathname.join( 'test' ).to_path ]
 end

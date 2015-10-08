@@ -1,3 +1,5 @@
+Skylab.const_defined?( :Callback, false ) or self._SANITY
+
 module Skylab::Callback
 
   # #todo - this is still needed and it's not pretty
@@ -7,8 +9,10 @@ module Skylab::Callback
   # easiest way to achieve that given the break in the isomorphicism between
   # filesystem and constants graph ([#ts-011] tracks this)
 
-  require_relative 'core'
-  require_relative 'test/test-support'
+  # we could avoid the orphan by putting this in a function stowaway,
+  # but we'd rather keep any trace of this mess out of the main file.
+
+  require_relative '../../../test/test-support'
 
   Test = TestSupport  # ick/meh
 

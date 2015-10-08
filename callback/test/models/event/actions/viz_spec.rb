@@ -10,7 +10,7 @@ module Skylab::Callback::TestSupport
     it "with the ideal case - works" do
 
       io =  TestSupport_::Library_::StringIO.new
-      _path = ::File.join( Home_.dir_pathname.to_path, 'core.rb' )
+      _path = Home_.dir_pathname.to_path
 
       call_API(
         :viz,

@@ -5,17 +5,27 @@ module Skylab::Callback
     module Boxxy_  # read [#030] #the-boxxy-narrative
 
       module Methods  # ~ constants
+
         def constants
           a = super
           a_ = boxxy_infrrd_constants a
           [ * a, * a_ ]
         end
+
       private
+
         def boxxy_infrrd_constants a
+
           et = entry_tree
           stem_p = fuzzy_stem_cache
           have_h = ::Hash[ a.map { |i| [ stem_p[ i ], true ] } ]
-          scn = et ? et.to_stream : Scn.the_empty_stream
+
+          scn = if et
+            et.to_stream_without_any__ CORE_.intern
+          else
+            Scn.the_empty_stream
+          end
+
           y = []
           while (( np = scn.gets ))
             have_h[ stem_p[ np.corename_as_const ] ] and next
@@ -27,6 +37,7 @@ module Skylab::Callback
           end
           y
         end
+
         def fuzzy_stem_cache
           @fuzzy_stem_cache ||= ::Hash.new{ |h, k| h[ k ] = Distill_[ k ] }
         end

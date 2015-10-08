@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../lib/skylab/callback/core'
+require 'skylab/callback'
 
 _x = Skylab::Callback::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
   invoke ARGV

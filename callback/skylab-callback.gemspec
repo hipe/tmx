@@ -31,6 +31,7 @@ Gem::Specification.new do | s |
   s.version = inf.version_via_VERSION_file
 
   # s.add_runtime_dependency ..
+  # [ca] nominally depends on [sy] to pass its tests but this is conceptually ugly..
 
   # s.add_development_dependency ..
 

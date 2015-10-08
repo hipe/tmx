@@ -779,6 +779,10 @@ module Skylab::Callback
 
     class << self
 
+      def by & p
+        new nil, p, :call
+      end
+
       def the_empty_call
         @tec ||= new EMPTY_P_, :call
       end
@@ -789,10 +793,6 @@ module Skylab::Callback
 
       def via_receiver_and_method_name rc, mn, & p
         new nil, rc, mn, & p
-      end
-
-      def via_this & p
-        new nil, p, :call
       end
 
       def via_value x, & p
@@ -814,6 +814,8 @@ module Skylab::Callback
     attr_reader :args, :block, :method_name, :receiver
 
   end
+
+  DOT_ = '.'
 
   module Autoloader  # read [#024] the new autoloader narrative
 
@@ -1263,11 +1265,32 @@ module Skylab::Callback
         @h.key? s
       end
 
+      def to_stream_without_any__ entry_stem_symbol
+
+        @_did_index_all ||= _index_all
+        a = @stem_i_a
+
+        indexes = ( 0 ... a.length.to_i ).to_a
+
+        dd = a.index( entry_stem_symbol )
+        if dd
+          indexes[ dd, 1 ] = EMPTY_A_
+        end
+
+        d = -1 ; last = indexes.length - 1
+
+        Home_.stream do
+          if last != d
+            @normpath_lookup_p[ a.fetch indexes.fetch d += 1 ]
+          end
+        end
+      end
+
       def to_stream  # :+#public-API, #the-fuzzily-unique-entry-scanner, #fuzzy-sibling-pairs
         @_did_index_all ||= _index_all
         a = @stem_i_a ; d = -1 ; last = a.length - 1
         Home_.stream do
-          if d < last
+          if last != d
             @normpath_lookup_p[ a.fetch d += 1 ]
           end
         end
@@ -1478,7 +1501,7 @@ module Skylab::Callback
         NIL_
       end
 
-      DOT__ = '.'.getbyte 0
+      DOT__ = DOT_.getbyte 0
 
       EXTNAME_RXS_ = ::Regexp.escape EXTNAME_
 
@@ -2001,12 +2024,12 @@ module Skylab::Callback
 
       define_method :require_sidesystem, -> do
 
-        sl_path = -> do
-          x = Home_.dir_pathname.dirname.to_path ; sl_path = -> { x } ; x
-        end
-
         require_via_const = -> const_i do
-          require "#{ sl_path[] }/#{  Name.via_const( const_i ).as_slug }/core"
+
+          _compliant_slug = Name.via_const( const_i ).
+            as_lowercase_with_underscores_symbol
+
+          require "skylab/#{ _compliant_slug }"
         end
 
         produce_via_const = -> const_i do
@@ -2017,6 +2040,7 @@ module Skylab::Callback
         end
 
         require_sidesystem = -> * i_a do
+
           case i_a.length <=> 1
           when -1 ; require_sidesystem
           when  0 ; produce_via_const[ i_a.first ]
@@ -2422,7 +2446,12 @@ module Skylab::Callback
   SPACE_ = ' '.freeze
   UNABLE_ = false
 
+  Without_extension = -> path do
+
+    path[ 0 ... path.rindex( DOT_ ) ]
+  end
+
   require 'pathname'  # eat our own dogfood. necessary before below.
 
-  Autoloader[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader[ self, Without_extension[ __FILE__ ] ]
 end
