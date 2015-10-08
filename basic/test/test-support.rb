@@ -1,4 +1,4 @@
-require_relative '../core'
+require 'skylab/basic'
 
 module Skylab::Basic
 
@@ -6,7 +6,7 @@ module Skylab::Basic
 
     TestSupport_ = Autoloader_.require_sidesystem :TestSupport
 
-    TestSupport_::Regret[ TS_ = self ]
+    TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
 
     TestSupport_::Sandbox::Host[ self ]
 

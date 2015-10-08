@@ -125,7 +125,7 @@ module Skylab::Basic
       end
     end
 
-    DOT_DOT_ = ::Skylab::DOT_DOT_
+    DOT_DOT_ = '..'
 
     FILE_SEP_ = ::File::SEPARATOR
 

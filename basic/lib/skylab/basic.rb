@@ -1,4 +1,4 @@
-require_relative '../callback/core'
+require 'skylab/callback'
 
 module Skylab::Basic  # introduction at [#020]
 
@@ -206,5 +206,5 @@ module Skylab::Basic  # introduction at [#020]
   SPACE_ = ' '.freeze
   UNABLE_ = false
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
 end
