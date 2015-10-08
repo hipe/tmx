@@ -1,0 +1,139 @@
+#!/usr/bin/env ruby -w
+
+argv = ::ARGV
+sout = $stdout
+serr = $stderr
+
+case argv.length
+when 0
+  is_wet = true
+when 1
+  if ! %w( --dry -n ).include? argv.first
+    do_usage = true
+  end
+else
+  do_usage = true
+end
+
+if do_usage
+
+  serr.puts "usage: #{ ::File.basename $PROGRAM_NAME } [--dry]"
+  serr.puts "synopsis: will bucket into [abc], [def] etc (use --dry to see)"
+
+else
+
+  # ~ requires
+
+  require 'open3'
+  require 'skylab/tmx'
+  require 'shellwords'
+
+  # ~ constants
+
+  _ACHIEVED = true
+  _GIT_CMD = 'git'
+  _SPACE = ' '
+  _UNABLE = false
+
+  # ~ globals (would-be ivars)
+
+  map_entry_to_sidesystem = nil
+  system = ::Open3
+  uow_box = nil
+
+  # ~ functions
+
+  resolve_map_of_entry_to_sidesystem = -> do
+
+    h = {}
+
+    ss_a = ::Skylab::TMX.build_sigilized_list
+    ss_a.each do | ss |
+      h[ ss.stem ] = ss
+    end
+
+    map_entry_to_sidesystem = h
+    _ACHIEVED
+  end
+
+  resolve_unit_of_work_box = -> do
+
+    _, o, _e, _w = system.popen3 'git', 'ls-files', '-m'
+
+    bx = ::Skylab::Callback::Box.new
+
+    rx = /\A [^ #{::Regexp.escape ::File::SEPARATOR }]+ /x
+
+    begin
+      line = o.gets
+      line or break
+      stem = rx.match( line )[ 0 ]
+
+      if bx.has_name stem
+        redo
+      end
+
+      ss = map_entry_to_sidesystem[ stem ]
+      if ss
+        bx.add stem, ss
+        redo
+      end
+
+      serr.puts "leaving as-is file with no sidesystem - #{ line }"
+
+      redo
+    end while nil
+
+    uow_box = bx
+    _ACHIEVED
+  end
+
+  command = nil
+  distribute = -> do
+
+    ok = true
+    uow_box.each_value do | ss |
+
+      ok = command[ 'add', '--update', ss.stem ]
+
+      ok &&= command[ 'commit', '-m', "([#{ ss.sigil }] bucket)" ]
+
+      ok or break
+    end
+    ok
+  end
+
+  m = ::Shellwords.method :shellescape
+
+  command = -> * s_a do
+    s_a.unshift _GIT_CMD
+    sout.puts( s_a.map( & m ) * _SPACE )
+    if is_wet
+      x = system( * s_a )
+      case x
+      when nil
+        serr.puts "execution failed: #{ s_a.inspect }"
+        _UNABLE
+      when false
+        serr.puts "exeuction exited with nonzero status"
+        _UNABLE
+      when true
+        _ACHIEVED
+      else
+        self._SANITY
+      end
+    else
+      _ACHIEVED
+    end
+  end
+
+  # ~ main
+
+  ok = resolve_map_of_entry_to_sidesystem[]
+  ok &&= resolve_unit_of_work_box[]
+  ok &&= distribute[]
+  if ok
+    serr.puts "done."
+  end
+
+end

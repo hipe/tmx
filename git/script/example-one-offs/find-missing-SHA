@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby -w
+
+require 'skylab/git'
+
+serr = $stderr
+
+if 2 != ARGV.length
+  serr.puts "usage: #{ $PROGRAM_NAME } rebase-file log-file"
+  exit 5
+end
+
+rebase_file = ARGV.shift
+logfile = ARGV.shift
+
+rb = Skylab::Git::Models::Rebase.new
+rb.read_from_rebase_file rebase_file
+
+log = Skylab::Git::Models::Rebase.new
+log.read_from_log_file logfile
+
+rb.express_comparison_against_into log, serr
+
+serr.puts "wahoo."

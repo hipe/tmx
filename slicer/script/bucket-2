@@ -1,0 +1,321 @@
+#!/usr/bin/env ruby -w
+
+argv = ::ARGV
+sout = $stdout
+serr = $stderr
+
+do_express_usage = false
+do_express_help_screen = false
+do_express_invite = false
+do_main = false
+
+require 'optparse'
+
+op = ::OptionParser.new
+op.on '--help', 'this screen and exit' do
+  do_express_help_screen = true
+end
+
+skips = nil
+
+op.on '--bucketless SIGIL',
+    'for this source bucket with no target, leave "in place"' do | s |
+
+  ( skips ||= [] ).push s
+end
+
+begin
+  op.parse! argv
+rescue ::OptionParser::ParseError => e
+  serr.puts e.message
+  do_express_usage = true
+  do_express_invite = true
+end
+
+if do_express_help_screen
+  do_express_usage = true
+end
+
+do_main = ! do_express_usage
+
+formal_arg_names = %w( MAGIC_KEYWORD BASE_BRANCH )
+
+if do_main
+
+  formal_len = formal_arg_names.length
+  actual_len = argv.length
+
+  case ( actual_len <=> formal_len )
+
+  when -1
+    serr.puts "missing required argument: #{ formal_arg_names[ actual_len ] }"
+    do_express_usage = true
+    do_express_invite = true
+
+  when 0
+    kw, sha = argv
+
+  when 1
+    do_express_usage = true
+    do_express_invite = true
+    serr.puts "unexpected: #{ argv.fetch( formal_len ).inspect }"
+  end
+
+  do_main = ! do_express_usage
+end
+
+
+# ~ go ?
+
+prgn = -> do
+  ::File.basename $PROGRAM_NAME
+end
+
+_SPACE = ' '
+
+if do_express_usage
+  serr.puts "usage: #{ prgn[] } [opts] #{ formal_arg_names.join _SPACE }"
+end
+
+if do_express_invite
+  serr.puts "use '#{ prgn[] } -h' for help"
+end
+
+if do_express_help_screen
+
+  serr.puts
+
+  serr.puts "synopsis: output a rebase where \"source buckets\" fixup \"target buckets\""
+
+  serr.puts
+
+  serr.puts "options:"
+
+  op.summarize( & serr.method( :puts ) )
+
+end
+
+if do_main
+
+# module Sklab::SomeSidesys
+  # class Models_::SomeMod
+    class SkylabSidesys_SomeModel_SomeAction
+
+      def initialize o, e, kw, base_branch, skips
+
+        @serr = e
+        @sout = o
+
+        @kw = kw
+        @base_branch = base_branch
+
+        @_skip_OK = if skips
+          ::Hash[ skips.map { |s| [ s, true ] } ]
+        else
+          -> _ do
+            false
+          end
+        end
+      end
+
+      def execute
+
+        @_source_buckets = {}
+
+        ok = __validate
+        ok &&= __find_source_buckets
+        ok &&= __distribute_into_target_buckets
+        ok &&= __confirm_all_were_used
+        ok && __flush
+      end
+
+      def __validate
+
+        @_word_rxs = '[a-zA-Z][-_a-zA-Z0-9]*'
+        @_sha_rxs = '[a-z0-9]{7}'
+        @_sigil_rxs = '[a-z][a-z0-9]+'
+
+        if /\A#{ @_word_rxs }\z/ =~ @base_branch
+          ACHIEVED_
+        else
+          @serr.puts "invalid branch identifier: #{ @base_branch }"
+          UNABLE_
+        end
+      end
+
+      def __find_source_buckets
+
+        @_source_bucket_rx = /\A
+          (?<sha> #{ @_sha_rxs } )
+          [ ]
+          \(
+            \[  (?<sigil> #{ @_sigil_rxs } )  \]
+            [ ] bucket
+          \)
+        \z/x
+
+        require 'open3'
+        @_system = ::Open3
+        _i, o, _e, @_w = @_system.popen3(
+          'git', 'log', '--oneline', "#{ @base_branch }..head" )
+
+        @_up = o
+
+        if _step_via_source_bucket
+
+          begin
+            _yes = _step_via_source_bucket
+          end while _yes
+
+          @serr.puts "(will try to distribute #{ @_source_buckets.length } #{
+            }source buckets)"
+
+          ACHIEVED_
+
+        else
+          @serr.puts "was not source bucket: #{ @_line.inspect }"
+          @_w.kill
+          UNABLE_
+        end
+      end
+
+      def _step_via_source_bucket
+
+        @_line = @_up.gets
+        @_line.chomp!
+        md = @_source_bucket_rx.match @_line
+        if md
+          @_source_buckets[ md[ :sigil ] ] = md
+          ACHIEVED_
+        else
+          UNABLE_
+        end
+      end
+
+      def __distribute_into_target_buckets
+
+        @_target_bucket_rx = /\A
+          #{ @_sha_rxs }
+          [ ]
+          (?<rest> [^a-zA-Z]* \[ (?<sigil> #{ @_sigil_rxs } ) \] .* )
+        \z/x
+
+        require 'skylab/git'
+
+        @_rebase = ::Skylab::Git::Models::Rebase.new
+        @_rebase.will_add_manually
+
+        begin
+
+          if __is_a_target_bucket
+
+            _md = @_source_buckets.delete @_md[ :sigil ]
+
+            @_rebase.add_fixup _md[ 0 ]
+            @_rebase.add_pick @_line
+
+          else
+            @_rebase.add_pick @_line
+          end
+          @_line = @_up.gets
+          @_line or break
+          @_line.chomp!
+          redo
+        end while nil
+        ACHIEVED_
+      end
+
+      def __is_a_target_bucket
+
+        md = @_target_bucket_rx.match @_line
+        @_md = md
+        if md
+
+          if @_source_buckets.key? md[ :sigil ]
+
+            if md[ :rest ].include? @kw
+              ACHIEVED_
+            end
+          else
+            false
+          end
+        else
+          false
+        end
+      end
+
+      # ~
+
+      def __confirm_all_were_used
+
+        sb = remove_instance_variable :@_source_buckets
+
+        if sb.length.nonzero?
+          extra = sb.keys.reduce [] do | m, k |
+            if ! @_skip_OK[ k ]
+              m.push k
+            end
+            m
+          end
+        end
+
+        if extra && extra.length.nonzero?
+
+          serr = @serr
+
+          serr.puts "MUST STOP because no destination bucket(s) found #{
+            }for (#{ extra * ', ' })"
+
+          serr.puts "acknowledge each one of these with a «bucketless» #{
+            }option if they are OK to leave in place."  # :+#guillemets
+
+          serr.puts "got this far:"
+
+          st = @_rebase.to_item_stream
+
+          while line = st.gets
+            serr.puts "(#{ line.string })"
+          end
+
+          UNABLE_
+        else
+
+          @__unmoved = if sb.length.nonzero?
+            sb
+          end
+
+          ACHIEVED_
+        end
+      end
+
+      # ~
+
+      def __flush
+
+        rb = @_rebase
+        rb.reverse!
+
+        h = remove_instance_variable :@__unmoved
+        if h
+          h.each_value do | md |
+            rb.add_pick md[ 0 ]
+          end
+        end
+
+        st = rb.to_item_stream
+
+        out = @sout
+        while line_o = st.gets
+          out.puts line_o.string
+        end
+        @serr.puts "(done.)"
+        ACHIEVED_
+      end
+
+      ACHIEVED_ = true
+      UNABLE_ = false
+
+      self
+    end.new( sout, serr, kw, sha, skips ).execute
+
+end
