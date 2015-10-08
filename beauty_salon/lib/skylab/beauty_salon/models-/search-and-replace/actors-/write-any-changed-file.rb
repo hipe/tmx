@@ -13,9 +13,8 @@ module Skylab::BeautySalon
       Callback_::Event.selective_builder_sender_receiver self
 
       def execute
-        ok = write_temp_file
-        ok && via_tmpfile_pn
-        @result
+        _ok = write_temp_file
+        _ok && via_tmpfile_pn
       end
 
       def write_temp_file
@@ -24,7 +23,7 @@ module Skylab::BeautySalon
         if line
           via_stream_write_lines line
         else
-          @result = @on_event_selectively.call :error do
+          @on_event_selectively.call :error do
             build_not_OK_event_with :file_was_empty, :path, @edit_session.path
           end
           UNABLE_
@@ -61,10 +60,10 @@ module Skylab::BeautySalon
       end
 
       def when_no_change
-        @result = @on_event_selectively.call :info do
+        @on_event_selectively.call :info do
           build_neutral_event_with :no_change, :path, @edit_session.path
         end
-        nil
+        UNABLE_  # don't stop the whole process.. or do?
       end
 
       def flush
@@ -72,13 +71,14 @@ module Skylab::BeautySalon
         _cls = Home_.lib_.system.filesystem.file_utils_controller
 
         _fuc = _cls.new_via -> msg do
-          @result = @on_event_selectively.call :info do
+          @on_event_selectively.call :info do
             Changed_[ @edit_session.path, @is_dry_run ]
           end
         end
 
         _fuc.mv @tmpfile, @edit_session.path, noop: @is_dry_run  # result is nil
-        nil
+
+        ACHIEVED_
       end
 
       Changed_ = Callback_::Event.prototype_with :changed_file,

@@ -18,7 +18,7 @@ module Skylab::BeautySalon::TestSupport
 
     it "no ent" do
 
-      _path = TestSupport_::Data::Universal_Fixtures[ :not_here ]
+      _path = TestSupport_::Fixtures.file( :not_here )
 
       invoke 'deliterate', '1', '2', _path
 

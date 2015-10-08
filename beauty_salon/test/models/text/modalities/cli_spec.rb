@@ -23,7 +23,7 @@ module Skylab::BeautySalon::TestSupport
 
       @_stdin = _stdin_mocks.interactive_STDIN_instance
 
-      _path = TestSupport_::Data::Universal_Fixtures[ :one_line ]
+      _path = TestSupport_::Fixtures.file( :one_line )
 
       invoke 'wrap', '-n14', '-v', _path
 

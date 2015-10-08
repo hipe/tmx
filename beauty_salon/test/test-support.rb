@@ -1,11 +1,11 @@
-require_relative '../core'
-require 'skylab/test-support/core'
+require 'skylab/beauty_salon'
+require 'skylab/test_support'
 
 module Skylab::BeautySalon::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
-  TestSupport_::Regret[ TS_ = self ]
+  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
 
   extend TestSupport_::Quickie
 
@@ -93,6 +93,15 @@ module Skylab::BeautySalon::TestSupport
 
   # ~
 
+  def self._COMMON_DIR
+    @___common_dir ||= TestSupport_::Fixtures.files_path
+  end
+
+  def self._MY_BIN_PATH
+    @___mbp ||= ::File.expand_path( '../../bin', __FILE__ )
+  end
+
+  # ~
   Home_ = ::Skylab::BeautySalon
   Callback_ = ::Skylab::Callback
   Autoloader_ = Callback_::Autoloader

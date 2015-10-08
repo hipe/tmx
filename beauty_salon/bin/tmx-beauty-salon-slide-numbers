@@ -15,11 +15,9 @@ program = -> stdin, stdout, stderr, pn_s_a, argv do
   repl_str = '%d'
   _1 = 'digit-1' ; _2 = 'digit-2'
 
-  subsystem = -> i do
-    defined? ::Skylab or require_relative '../lib/skylab'
-    ::Skylab.const_defined?( i, false ) or
-      require "skylab/#{ i.downcase }/core"
-    ::Skylab.const_get i, false
+  subsystem = -> sym do
+    require 'skylab/callback'
+    ::Skylab::Callback::Autoloader.require_sidesystem sym
   end
 
   require 'optparse'

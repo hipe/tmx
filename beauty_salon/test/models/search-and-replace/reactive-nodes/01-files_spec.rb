@@ -17,7 +17,7 @@ module Skylab::BeautySalon::TestSupport
     it "stream of first-pass search-space of files (`find`)" do
 
       call_API(
-        :dirs, TestSupport_::Data.dir_pathname.to_path,
+        :dirs, TS_._COMMON_DIR,
         :files, '*-line*.txt',
         :preview,
         :files,

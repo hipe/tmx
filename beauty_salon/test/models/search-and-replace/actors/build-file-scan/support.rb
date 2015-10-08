@@ -9,7 +9,7 @@ module Skylab::BeautySalon::TestSupport
     def build_stream_for_single_path_to_file_with_three_lines_
 
       Callback_::Stream.via_item(
-        TestSupport_::Data::Universal_Fixtures[ :three_lines ] )
+        TestSupport_::Fixtures.file( :three_lines ) )
     end
 
     def actors_

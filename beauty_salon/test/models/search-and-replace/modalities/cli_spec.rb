@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] search and replace - interactive" do
+  describe "[bs] search and replace - (interactive) CLI" do
 
     extend TS_
     use :expect_interactive  # [br]
@@ -73,7 +73,10 @@ module Skylab::BeautySalon::TestSupport
         @interactive_session.close
 
         after_any_blanks_expect_line %r(\A\(grep command head: grep -E )
-        after_any_blanks_expect_line "#{ ::File.expand_path( __FILE__ ) }:2\n"
+
+        _rx = /\b#{ ::Regexp.escape( ::File.basename __FILE__ ) }:2$/
+
+        after_any_blanks_expect_line _rx
         after_any_blanks_expect_line "(2 matches in 1 file)\n"
 
         expect_blank_line

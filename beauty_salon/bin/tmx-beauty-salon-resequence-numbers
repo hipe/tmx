@@ -10,11 +10,9 @@ program = -> sin, sout, serr, pn_s_a, argv do
 
   y = ::Enumerator::Yielder.new( & serr.method( :puts ) )
 
-  subsystem = -> i do
-    defined? ::Skylab or require_relative '../lib/skylab'
-    ::Skylab.const_defined?( i, false ) or
-      require "skylab/#{ i.downcase }/core"
-    ::Skylab.const_get i, false
+  subsystem = -> sym do
+    require 'skylab/callback'
+    ::Skylab::Callback::Autoloader.require_sidesystem sym
   end
 
   pen = -> do

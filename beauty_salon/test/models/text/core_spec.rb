@@ -43,7 +43,7 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def _universal_fixture sym
-      TestSupport_::Data::Universal_Fixtures[ sym ]
+      TestSupport_::Fixtures.file( sym )
     end
 
     def _with * x_a

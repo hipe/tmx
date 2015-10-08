@@ -12,7 +12,7 @@ module Skylab::BeautySalon::TestSupport
       p = -> do
         x = [
           :search, /\bwazoozle\b/i,
-          :dirs, TestSupport_::Data.dir_pathname.to_path,
+          :dirs, TS_._COMMON_DIR,
           :files, '*-line*.txt',
           :preview,
           :matches,

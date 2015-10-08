@@ -13,7 +13,7 @@ module Skylab::BeautySalon::TestSupport
 
       call_API :search, /wazoo/i,
         :replace, '{{ $0.downcase.well_well_well.nope }}',
-        :dirs, TestSupport_::Data.dir_pathname.join( 'universal-fixtures' ).to_path,
+        :dirs, TS_._COMMON_DIR,
         :files, '*-line*.txt',
         :preview,
         :matches,

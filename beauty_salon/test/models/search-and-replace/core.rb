@@ -50,17 +50,11 @@ module Skylab::BeautySalon::TestSupport
 
     ## ~~ [br] "expect interactive"
 
-    define_method :interactive_bin_path, -> do
-      p = -> do
-        ::File.join(
-          Home_.lib_.system.defaults.bin_path,
-          'tmx-beauty-salon search-and-r' )
-      end
-      x = nil
-      -> do
-        x ||= p[]
-      end
-    end.call
+    define_method :interactive_bin_path, ( Callback_.memoize do
+
+      ::File.join TS_._MY_BIN_PATH, 'tmx-beauty-salon search-and-r'
+
+    end )
 
     # ~ support for support
 

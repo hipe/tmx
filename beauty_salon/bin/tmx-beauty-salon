@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../lib/skylab/beauty-salon/core'
+require 'skylab/beauty_salon'
 
 _x = Skylab::BeautySalon::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
   invoke ARGV

@@ -105,7 +105,7 @@ module Skylab::BeautySalon
               if seg
                 do_build_before_stream seg, stream
               else
-                Callback_::stream.the_empty_stream
+                Callback_::Stream.the_empty_stream
               end
             end
 
