@@ -1,4 +1,4 @@
-module Skylab::Dependency
+module Skylab::TaskExamples
   class TaskTypes::ExecutableFile < Home_::Task
     attribute :executable_file, :required => true, :pathname => true
     listeners_digraph  :all, :info => :all

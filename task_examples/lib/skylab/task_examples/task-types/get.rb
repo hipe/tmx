@@ -1,6 +1,6 @@
 require 'net/http'
 
-module Skylab::Dependency
+module Skylab::TaskExamples
 
   class TaskTypes::Get < Home_::Task
 

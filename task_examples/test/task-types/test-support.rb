@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Dependency::TestSupport::Tasks
+module Skylab::TaskExamples::TestSupport::Tasks
 
-  ::Skylab::Dependency::TestSupport[ TS_ = self ]
+  ::Skylab::TaskExamples::TestSupport[ TS_ = self ]
 
   module Constants
     include Home_

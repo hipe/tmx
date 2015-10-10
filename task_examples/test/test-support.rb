@@ -1,14 +1,15 @@
-require_relative '../core'
-require 'skylab/test-support/core'
+require 'skylab/task_examples'
+require 'skylab/test_support'
 
-module Skylab::Dependency::TestSupport
+module Skylab::TaskExamples::TestSupport
 
-  ::Skylab::TestSupport::Regret[ Dependency_TestSupport = self ]
+   Dependency_TestSupport = self
+  ::Skylab::TestSupport::Regret[ self, ::File.dirname( __FILE__ )]
 
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
-  Home_ = ::Skylab::Dependency
+  Home_ = ::Skylab::TaskExamples
 
   TestSupport_ = ::Skylab::TestSupport
 

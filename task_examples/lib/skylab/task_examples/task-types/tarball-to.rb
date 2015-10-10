@@ -1,4 +1,4 @@
-module Skylab::Dependency
+module Skylab::TaskExamples
   class TaskTypes::TarballTo < TaskTypes::Get
     attribute :build_dir, :required => true, :pathname => true, :from_context => true
     attribute :from, :required => true # override parent

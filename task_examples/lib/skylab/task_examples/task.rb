@@ -1,6 +1,6 @@
-module Skylab::Dependency
+module Skylab::TaskExamples
 
-  class Task < Home_.lib_.slake::Task
+  class Task < Home_.lib_.task::LegacyTask
 
     attribute_metadata_class do
       def [] k ; fetch( k ) { } end # soften it

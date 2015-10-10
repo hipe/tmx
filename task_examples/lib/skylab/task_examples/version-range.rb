@@ -1,4 +1,4 @@
-module Skylab::Dependency
+module Skylab::TaskExamples
   class VersionRange
     class << self
       alias_method :build, :new

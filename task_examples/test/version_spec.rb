@@ -1,9 +1,11 @@
 require_relative 'test-support'
-require 'skylab/slake/test/test-support'
+require 'skylab/task'
 
-module Skylab::Dependency::TestSupport
+Skylab::Task.test_support
 
-  include ::Skylab::Slake::TestSupport # so it's avail in s.c. calls below
+module Skylab::TaskExamples::TestSupport
+
+  include ::Skylab::Task::TestSupport # so it's avail in s.c. calls below
 
   Slake_TestSupport::UI::Tee || nil #(#kick) laod it now so prettier below
 

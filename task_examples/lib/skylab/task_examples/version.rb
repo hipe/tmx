@@ -1,4 +1,4 @@
-module Skylab::Dependency
+module Skylab::TaskExamples
 
   class Version < Home_.lib_.sexp
 

@@ -1,4 +1,4 @@
-module Skylab::Dependency
+module Skylab::TaskExamples
   class TaskTypes::Symlink < Home_::Task
     attribute :symlink
     attribute :target

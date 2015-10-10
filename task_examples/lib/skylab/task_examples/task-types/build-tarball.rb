@@ -1,4 +1,4 @@
-module Skylab::Dependency
+module Skylab::TaskExamples
 
   self._NOT_COVERED  # #todo
 

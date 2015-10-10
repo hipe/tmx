@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::Dependency::TestSupport::Tasks
+module Skylab::TaskExamples::TestSupport::Tasks
 
   describe "[de] task-types version from spec" do
 

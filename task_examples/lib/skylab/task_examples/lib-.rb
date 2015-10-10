@@ -1,4 +1,4 @@
-module Skylab::Dependency
+module Skylab::TaskExamples
 
   module Lib_
 
@@ -26,7 +26,7 @@ module Skylab::Dependency
       Ba___[]::Sexp
     end
 
-    Slake = sidesys[ :Slake ]
+    Task = sidesys[ :Task ]
 
     _System = sidesys[ :System ]
 

@@ -1,7 +1,6 @@
-require_relative '..'
-require 'skylab/callback/core'
+require 'skylab/callback'
 
-module Skylab::Dependency
+module Skylab::TaskExamples
 
   class << self
 
@@ -15,7 +14,7 @@ module Skylab::Dependency
 
   Autoloader_ = Callback_::Autoloader
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
 
   CLI = nil  # for host
   Home_ = self

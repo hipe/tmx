@@ -1,4 +1,4 @@
-module Skylab::Dependency
+module Skylab::TaskExamples
 
   class TaskTypes::Executable < Home_::Task
 

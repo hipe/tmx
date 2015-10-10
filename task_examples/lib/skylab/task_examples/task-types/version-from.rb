@@ -1,4 +1,4 @@
-module Skylab::Dependency
+module Skylab::TaskExamples
 
   class TaskTypes::VersionFrom < Home_::Task
 
