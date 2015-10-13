@@ -17,7 +17,7 @@
 
       def execute
 
-        require_relative '../lib/skylab/callback/core'
+        require 'skylab/callback'
         Me_.const_set :Callback_, ::Skylab::Callback  # etc
 
         ok = __parse_argv

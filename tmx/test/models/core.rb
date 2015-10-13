@@ -61,7 +61,7 @@ module Skylab::TMX::TestSupport
     end
 
     def subject_module_
-      Home_::Models::Front
+      Home_::Models_::Reactive_Model_Dispatcher
     end
 
     def init_front_with_box_ fr, bx

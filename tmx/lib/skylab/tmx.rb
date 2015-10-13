@@ -1,5 +1,4 @@
-require_relative '..'
-require 'skylab/callback/core'
+require 'skylab/callback'
 
 module Skylab::TMX
 
@@ -9,52 +8,53 @@ module Skylab::TMX
 
   Callback_ = ::Skylab::Callback
 
-  -> o, h do
-
-    o[ :bin_path ] = Callback_.memoize do
-      Home_.lib_.system.defaults.bin_path
-    end
-
-    o[ :binfile_prefix ] = Callback_.memoize do
-      'tmx-'.freeze
-    end
-
-    o[ :supernode_binfile ] = Callback_.memoize do
-      'tmx'.freeze
-    end
-
-    h
-  end.call( * -> do
-
-    h = {}
-    sc = singleton_class
-    o = -> i, p do
-      sc.send :define_method, i, p
-      h[ i ] = p
-    end
-    o.singleton_class.send :alias_method, :[]=, :call
-    [ o, h ]
-
-  end.call ).tap do |h|
-
-    define_singleton_method( :at ) do |* i_a|
-      i_a.map do |i|
-        h.fetch( i ).call
-      end
-    end
-  end
-
   class << self
+
+    def lookup_sidesystem entry_s
+      installation_.lookup_reflective_sidesystem__ entry_s
+    end
+
+    def build_sigilized_list
+
+      ss_a = to_reflective_sidesystem_stream.to_a
+
+      Home_.lib_.slicer.distribute_sigils ss_a
+
+      ss_a
+    end
+
+    def to_reflective_sidesystem_stream
+      installation_.to_reflective_sidesystem_stream__
+    end
+
+    def to_sidesystem_load_ticket_stream
+      installation_.to_sidesystem_load_ticket_stream
+    end
 
     define_method :application_kernel_, ( Callback_.memoize do
       Home_.lib_.brazen::Kernel.new Home_
     end )
 
+    def installation_
+      @___installation ||= __build_installation
+    end
+
+    def __build_installation
+
+      o = Home_::Models_::Installation.new
+
+      o.single_gems_dir = ::File.join ::Gem.paths.home, 'gems'
+      o.participating_gem_prefix = 'skylab-'
+      o.participating_gem_const_path_head = [ :Skylab ]
+      o.participating_exe_prefix = 'tmx-'
+
+      o.done
+    end
+
     def lib_
       @___lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
         self::Lib_, self )
     end
-
   end  # >>
 
   Autoloader_ = Callback_::Autoloader
@@ -75,8 +75,15 @@ module Skylab::TMX
     end
   end
 
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
-  Home_ = self
+  module Models_
+    Autoloader_[ self ]
+    Sidesystem = Autoloader_[ ::Module.new ]
+  end
+
+  ACHIEVED_ = true
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
+  DASH_ = '-'
   NIL_ = nil
-  UNABLE_ = false
+  Home_ = self
+  UNDERSCORE_ = '_'
 end

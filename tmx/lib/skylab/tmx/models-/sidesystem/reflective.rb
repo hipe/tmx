@@ -1,44 +1,26 @@
-module Skylab::Slicer
+module Skylab::TMX
 
-  class Models_::Sidesystem  # :+[#ts-041]
+  module Models_::Sidesystem
 
-    Actions = ::Module.new.freeze ;  # THE_EMPTY_MODULE_
+    # <-
 
-    attr_accessor :mod, :const, :deps, :medo, :norm, :stem
+  class Reflective
 
-    def get_core_path
-      "#{ @norm }/core.rb"
-    end
-
-    def receive_any_module mod
-
-      @mod = mod
-
-      if mod
-        s = mod.name
-        d = s.rindex COLON___
-        @const = s[ d + 1 .. -1 ].intern
+    class << self
+      def via_load_ticket lt
+        new lt
       end
-      nil
+      private :new
     end
 
-    COLON___ = ':'
+    def initialize load_ticket
 
-    def has_library_node
-      @___library_known_is_known ||= __know_library
-      @_has_library_node
+      @_lt = load_ticket
+      @mod = @_lt.require_sidesystem_module
+      @_nf = Callback_::Name.via_module @mod
     end
 
-    def __know_library
-
-      # although within the platform runtime we load any library module,
-      # sadly to index each library node for sidesystems it is *better*
-      # to do this via grepping for (codepoint) [#152] because..
-
-      _yes = @mod.const_get :Lib_, false  # to be sure
-      @_has_library_node = _yes ? true : false
-      ACHIEVED_
-    end
+    # ~ dependency inference
 
     def inferred_dependencies  # assume library node
 
@@ -65,6 +47,22 @@ module Skylab::Slicer
       ACHIEVED_
     end
 
+    # ~ reflection of "library"
+
+    def has_library_node
+      @___library_known_is_known ||= __know_library
+      @_has_library_node
+    end
+
+    def __know_library  # (was [#sli-152]
+
+      _yes = @mod.const_get :Lib_, false  # to be sure
+      @_has_library_node = _yes ? true : false
+      ACHIEVED_
+    end
+
+    # so it appears what's going on here is .. ah.
+
     def to_inferred_library_item_symbol_stream  # assume has lib node
 
       _lib_path = __whichever_lib_path
@@ -88,18 +86,55 @@ module Skylab::Slicer
 
     def __whichever_lib_path  # assume has lib node
 
-      @__lib_path ||= __determine_whichever_lib_path
+      @__lib_path ||= __determine_the_PATH_to_the_lib
     end
 
-    def __determine_whichever_lib_path
+    def __determine_the_PATH_to_the_lib
 
-      try_deep = "#{ @norm }/lib-#{ Autoloader_::EXTNAME }"
+      # so this is hacky af - we need to read the file "by hand"
+
+      code_root = @mod.dir_pathname.to_path
+
+      try_deep = "#{ code_root }/lib-#{ Autoloader_::EXTNAME }"
 
       if ::File.exist? try_deep
         try_deep
+
       else
-        "#{ @norm }/core#{ Autoloader_::EXTNAME }"
+
+        try_deep = "#{ code_root }#{ Autoloader_::EXTNAME }"
+
+        if ::File.exist? try_deep
+          try_deep
+        else
+          fail __say_misbehaving
+        end
       end
     end
+
+    def __say_misbehaving
+      "autoloader is probably not configured right: #{ @mod }"
+    end
+
+    # ~ readers
+
+    def const
+      @_nf.as_const
+    end
+
+    def path_to_gem
+      @_lt.path_to_gem
+    end
+
+    def stem
+      @_lt.stem
+    end
+
+    attr_accessor(
+      :sigil,  # comes from a complex outside process
+    )
+
+  end
+# ->
   end
 end

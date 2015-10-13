@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../lib/skylab/tmx/core'
+require 'skylab/tmx'
 
-Skylab::TMX::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).invoke ARGV
+Skylab::TMX::CLI.new(
+  $stdin, $stdout, $stderr,
+  [ ::File.basename( $PROGRAM_NAME ) ]
+).invoke ARGV

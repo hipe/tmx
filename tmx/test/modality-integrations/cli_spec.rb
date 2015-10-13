@@ -10,56 +10,69 @@ module Skylab::TMX::TestSupport
     extend TS_
     use :modalities_CLI
 
+    _ARG = 'ping'.freeze
     _FLAG = '--ping'.freeze
-    _PING_ARG = 'ping'.freeze
 
     it "beauty salon" do
-      go :beauty_salon, _PING_ARG
+      _against 'beauty-salon', _ARG
+      _expect_common
     end
 
     it "bnf2treetop" do
-      go :bnf2treetop, _FLAG
+      _against 'bnf2treetop', _FLAG
+      _expect_common
     end
 
     it "breakup - capture3" do
-      go_ :breakup, _FLAG
+      _against 'git', 'breakup', _FLAG
+      _expect_succeeded
     end
 
     it "callback" do
-      go :'callback', _PING_ARG
+      _against 'callback', _ARG
+      _expect_common
     end
 
     it "citxt" do
-      go_ :citxt, _FLAG
+      _against 'git', 'citxt', _FLAG
+      _expect_succeeded
     end
 
     it "css-convert" do
-      go :'css-convert', 'convert', '--ping'
+
+      _against 'css-convert', 'convert', _FLAG
+      @_slug = 'css-convert'
+      _expect_common
     end
 
     it "cull" do
-      go :cull, _PING_ARG
+      _against 'cull', _ARG
+      _expect_common
     end
 
     it "file metrics" do
-      go :file_metrics, _PING_ARG
+      _against 'file-metrics', _ARG
+      _expect_common
     end
 
     it "flex2treetop" do
-      go :flex2treetop, _PING_ARG
+      _against 'flex2treetop', _ARG
+      _expect_common
     end
 
     it "git" do
-      go :git, _PING_ARG
+      _against 'git', _ARG
+      _expect_common
     end
 
     it "permute" do
-      go :permute, _PING_ARG
+      _against 'permute', _ARG
+      _expect_common
     end
 
     it "quickie" do
 
-      invoke "quickie", "-ping"
+      invoke 'test-support', 'quickie', '-ping'
 
       expect :e, /\bquickie daemon is already running\b/
       expect "hello from quickie."
@@ -68,78 +81,85 @@ module Skylab::TMX::TestSupport
     end
 
     it "slicer" do
-      go :slicer, _PING_ARG
+      _against 'slicer', _ARG
+      _expect_common
     end
 
     it "snag" do
-      go :snag, _PING_ARG
+      _against 'snag', _ARG
+      _expect_common
     end
 
     it "sub tree" do
 
-      _go :styled, true, [ :sub_tree, _PING_ARG ]
+      _against 'sub-tree', _ARG
+      expect :styled, :e, "hello from sub tree."
+      @exitstatus.should eql :hello_from_sub_tree
     end
 
     it "test support" do
-      go :"test-support", _PING_ARG
+      _against 'test-support', _ARG
+      _expect_common
     end
 
     it "tan man" do
-      go :tan_man, _PING_ARG
+      _against 'tan-man', _ARG
+      _expect_common
     end
 
     it "treemap" do
-      go :treemap, _PING_ARG
+      _against 'treemap', _ARG
+      _expect_common
     end
 
     it "uncommit" do
-      go_ :uncommit, _FLAG
+      _against 'git', 'uncommit', _FLAG
+      _expect_succeeded
     end
 
     it "xargs-ish-i" do
-      go_ :'xargs-ish-i', _FLAG
+      _against 'xargs-ish-i', _FLAG
+      _expect_succeeded
     end
 
     it "yacc2treetop" do
-      go :'yacc2treetop', _FLAG
+      _against 'yacc2treetop', _FLAG
+      _expect_common
     end
 
-    def go * argv
-      _go true, argv
+    def _against * argv
+
+      invoke( * argv )
+      @_argv = argv
+      NIL_
     end
 
-    def go_ * argv
-      _go false, argv
+    _DASH = '-'
+    _SPACE = ' '
+    _UNDERSCORE = '_'
+
+    define_method :_expect_common do
+
+      _expect_common_start
+
+      @exitstatus.should eql :"hello_from_#{ @_s_a.join _UNDERSCORE }"
     end
 
-    define_method :_go, -> do
+    define_method :_expect_succeeded do
 
-      _DASH = '-'
-      _SPACE = ' '
-      _UNDERSCORE = '_'
+      _expect_common_start
+      @exitstatus.should be_zero
+    end
 
-      -> * x_a, yes, argv do
+    define_method :_expect_common_start do
 
-        a = argv.first.id2name.split _UNDERSCORE
+      @_slug ||= @_argv.fetch( -2 )
+      @_s_a = @_slug.split _DASH
 
-        argv[ 0 ] = a.join _DASH
+      expect :e, "hello from #{ @_s_a.join _SPACE }."
 
-        invoke( * argv )
-
-        expect( * x_a, :e, "hello from #{ a.join _SPACE }." )
-
-        expect_no_more_lines
-
-        x = @exitstatus
-        if yes
-
-          _sym = :"hello_from_#{ a.join _UNDERSCORE }"
-          x.should eql _sym
-        else
-          x.should eql 0
-        end
-      end
-    end.call
+      expect_no_more_lines
+    end
 
     def subject_CLI
       Home_::CLI

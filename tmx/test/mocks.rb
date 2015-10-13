@@ -27,6 +27,10 @@ module Skylab::TMX::TestSupport
         true
       end
 
+      def adapter_class_for _
+        NIL_
+      end
+
       def new k, & oes_p
         Bound___.new self, k, & oes_p
       end

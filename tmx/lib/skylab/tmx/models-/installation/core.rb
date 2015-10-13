@@ -1,294 +1,203 @@
 module Skylab::TMX
 
-  Sessions_ = ::Module.new
-  class Sessions_::Front_Loader  # notes are in [#002]
+  class Models_::Installation
 
-    attr_writer(
-      :bin_path,
-      :filesystem,
-      :number_of_synopsis_lines,
-      :program_name_string_array,
-      :tmx_host_mod,
+    # NOTE "installation" is a confusing name only at first: it does not
+    # involve the act of installing anything. we mean it in the sense of
+    # *your* installation of tmx on *your* system at this moment.
+
+    # the "installation" is the first step towards being a tmx instance: it
+    # holds basic configuration-like parameters and brings to life the rest
+    # of the graph from that. see [#002] "tmx theory" for more.
+
+    attr_accessor(
+      :participating_gem_const_path_head,
+      :participating_gem_prefix,
+      :participating_exe_prefix,
+      :single_gems_dir,
     )
 
-    def execute
+    def done
+      freeze  # or not..
+    end
 
-      p = -> do
-        p = -> do
-          p = EMPTY_P_
-          __build_second_level_stream
-        end
-        __build_first_level_stream
-      end
+    def lookup_reflective_sidesystem__ stem
 
-      _st = Callback_.stream do
-        p[]
-      end
+      # assume that `stem` is isomorphic with a sidesystem in the
+      # installation.
 
-      _st.expand_by do | st |  # flatten a stream of streams into a stream
-        st
+      gem_name = "#{ @participating_gem_prefix }#{ stem }"
+
+      gne = Gem_Name_Elements_.new
+
+      gne.stem = stem
+      gne.gem_name = gem_name
+      gne.const_a = @participating_gem_const_path_head
+      gne.exe_prefix = @participating_exe_prefix
+
+      _sp = Gem::Specification.find_by_name gem_name, '>= 0.pre'
+      _entry = "#{ gem_name }-#{ _sp.version }"
+      gne.gem_path = ::File.join @single_gems_dir, _entry
+
+      Load_Ticket_.new gne
+    end
+
+    def to_reflective_sidesystem_stream__
+
+      cls = Home_::Models_::Sidesystem::Reflective
+
+      to_sidesystem_load_ticket_stream.map_by do | lt |
+        cls.via_load_ticket lt
       end
     end
 
-    EMPTY_P_ = -> { }
+    def to_sidesystem_manifest_stream
 
-    def __build_first_level_stream
+      Here_::Build_manifest_stream___[ self ]
+    end
 
-      proto = Models_::Sidesystem_Module_Adapter.new(
-        @program_name_string_array,
-        __build_helpscreen_reducer_for_sidesystem,
+    def to_sidesystem_load_ticket_stream
+
+      _wow = __build_filesystem_listing_of_all_participating_gems
+
+      p = -> path do
+
+        name_elements_for = Name_elementser___[ path, self ]
+
+        p = -> path_ do
+
+          Load_Ticket_.new name_elements_for[ path_ ]
+        end
+
+        p[ path ]
+      end
+
+      Callback_::Stream.via_nonsparse_array _wow do | path |
+        p[ path ]
+      end
+    end
+
+    def __build_filesystem_listing_of_all_participating_gems
+
+      ::Dir[ ::File.join( @single_gems_dir, "#{ @participating_gem_prefix }*" ) ]
+    end
+
+    # our coupling to the gem API (and beyond) is both tight and
+    # ephemeral, so we try to hide all of that here.
+
+    Name_elementser___ = -> path, inst do
+
+      exe_pfx = inst.participating_exe_prefix
+      gem_prefix = inst.participating_gem_prefix
+      const_a = inst.participating_gem_const_path_head
+
+
+      # assume that the first path is like all the others in this respect,
+      # so cache some details from it so that we don't recalculate the
+      # same thing over and over
+
+      stem_via_range = gem_prefix.length .. -1
+      basename_via_range = path.length - ::File.basename( path ).length .. -1
+
+      gem_name_via_entry = Gem_name_tools_[].Gem_name_via_entry
+
+      proto = Gem_Name_Elements_.new nil, nil, nil, const_a, exe_pfx
+
+      -> path_ do
+
+        gemname = gem_name_via_entry[ path_[ basename_via_range ] ]
+
+        gne = proto.dup
+        gne.stem = gemname[ stem_via_range ]
+        gne.gem_name = gemname
+        gne.gem_path = path_
+        gne
+      end
+    end
+
+    Gem_Name_Elements_ = ::Struct.new(
+      :stem, :gem_name, :gem_path, :const_a, :exe_prefix )
+
+    class Load_Ticket_
+
+      attr_reader(
+        :const_path_array_guess,
+        :gem_name_elements,
+        :require_path,
       )
 
-      seen = {}
-      @_seen_in_first_level = seen  # will be used in second pass
+      def initialize gne  # Gem_Name_Elements_
 
-      Home_.lib_.slicer.new_traversal.to_sidesystem_stream.map_reduce_by do | ss |
+        @require_path = gne.gem_name.gsub DASH_, ::File::SEPARATOR
 
-        if ss.mod::CLI
-          nm = Callback_::Name.via_module ss.mod
-          seen[ nm.as_slug ] = true
-          proto.new nm, ss.mod
+        cpa = gne.const_a.dup
+
+        gne.stem.split( DASH_ ).each do | segment |
+          cpa.push segment.gsub( WORD_SEP_RX___ ){ $1.upcase }.intern
         end
+
+        @const_path_array_guess = cpa
+
+        @gem_name_elements = gne
+
+      end
+
+      WORD_SEP_RX___ = /(?:(?<=^|\d)|_)([a-z])/
+
+      def require_sidesystem_module
+        @____sidesys_mod ||= __induce_sidesystem_module
+      end
+
+      def __induce_sidesystem_module
+
+        require @require_path
+
+        Autoloader_.const_reduce @const_path_array_guess, ::Object
+      end
+
+      def path_to_gem
+        @gem_name_elements.gem_path
+      end
+
+      def stem
+        @gem_name_elements.stem
       end
     end
 
-    def __build_second_level_stream
+    Gem_name_tools_ = Callback_.memoize do
 
-      _all = @filesystem.glob ::File.join( @bin_path, '*' )
+      # EGADS: it would be good to use whatever Gem does instead
 
-      proto = Models_::Script_Adapter.new(
-        @program_name_string_array,
-        __build_helpscreen_reducer_for_script,
-      )
+      module GEM_NAME_TOOLS___
 
-      # (using glob and not `entries` saves us from skipping '.' and '..')
+        user_word = '[a-z][a-z0-9_]*'
+        major_number = '[0-9]+'
+        freeform = '[a-z0-9][a-z0-9_]*'  # a guess
 
-      rsx = ::Regexp.escape ::File::SEPARATOR
+        rxs = "(?<gem_name> #{ user_word } (?: - #{ user_word } )* )
+          - (?<version> #{ major_number } (?: \\. #{ freeform } )*  )"
 
-      rx = /#{ rsx } tmx- (?<slug>  (?: (?!#{ rsx }) . )+  )  \z/x
+        rx = /\A#{ rxs }\z/x
 
-        # (the "tmx-" in above should be a variable)
-
-      seen = @_seen_in_first_level
-
-      Callback_::Stream.via_nonsparse_array( _all ).map_reduce_by do | entry |
-
-        md = rx.match entry
-        if md
-          if ! seen[ md[ :slug ] ]
-            proto.new md, entry
-          end
+        p = -> entry do
+          rx.match( entry )[ :gem_name ]
         end
-      end
-    end
 
-    def __build_helpscreen_reducer_for_sidesystem
-
-      o = _begin_reducer
-      o.proxy_class = String_Receiver_as_Enumerator_Yielder___
-      o
-    end
-
-    def __build_helpscreen_reducer_for_script
-
-      o = _begin_reducer
-
-      o.match_the_following_section_names_in_a_case_insensitive_manner
-
-      o.use_section_in_descending_order_of_preference(
-        :synopsis, :description, :usage )
-
-      o.proxy_class = Home_.lib_.basic::String::Receiver::As_IO
-
-      o
-    end
-
-    def _begin_reducer
-
-      o = Home_::Modalities::CLI::Input_Adapters::Help_Screen.new
-
-      o.number_of_lines = @number_of_synopsis_lines
-      o.skip_blanks
-      o.unstylize
-      o
-    end
-
-    class Reactive_Node__
-
-      def initialize pn_s_a, reducer
-        @program_name_string_array = pn_s_a
-        @reducer_ = reducer
-      end
-
-      def name_value_for_order
-        @name_.as_lowercase_with_underscores_symbol
-      end
-
-      def name_function
-        @name_
-      end
-
-      def after_name_value_for_order
-        NIL_
-      end
-
-      def is_visible
-        true
-      end
-
-      def has_description
-        true
-      end
-
-      # ~
-
-      def _init_pn_s_a
-
-        @_pn_s_a = [ * @program_name_string_array, @name_.as_slug ]
-      end
-    end
-
-    Models_ = ::Module.new
-    class Models_::Sidesystem_Module_Adapter < Reactive_Node__ # akin to "action adapter", etc
-
-      def new nm, mod
-        otr = dup
-        otr.__init nm, mod
-        otr
-      end
-
-      def __init nm, mod
-        @mod = mod
-        @name_ = nm
-        NIL_
-      end
-
-      def under_expression_agent_get_N_desc_lines expag, number_of_lines
-
-        number_of_lines == @reducer_.number_of_lines or self._SANITY
-
-        @reducer_.lines_by do | line_yielder |
-          @mod.describe_into_under line_yielder, expag
+        define_singleton_method :Gem_name_via_entry do
+          p
         end
-      end
 
-      def name
-        @name_
-      end
-
-      def bound_call_via_receive_frame fr
-
-        _init_pn_s_a
-
-        o = fr.resources
-
-        _cli = @mod::CLI.new o.sin, o.sout, o.serr, @_pn_s_a
-
-        Callback_::Bound_Call.new(
-          [ o.argv ],
-          _cli,
-          :invoke )
-      end
-    end
-
-    class Models_::Script_Adapter < Reactive_Node__  # algorithm at [#.B]
-
-      def new md, entry
-        otr = dup
-        otr.__init md, entry
-        otr
-      end
-
-      def __init md, entry
-        @entry = entry
-        @name_ = Callback_::Name.via_slug md[ :slug ]
-        NIL_
-      end
-
-      def name
-        @name_
-      end
-
-      def under_expression_agent_get_N_desc_lines expag, number_of_lines
-
-        # if description is being requested, we assume that execution
-        # will not be requested for this same node (eew)
-
-        _load_script_if_necessary
-
-        number_of_lines == @reducer_.number_of_lines or self._SANITY
-
-        @reducer_.lines_by do | out_IO_proxy |
-
-          @_univeral_proc.call(
-
-            NOT_TTY___,
-            :_no_stdout_for_help_display_,
-            out_IO_proxy,
-            @_pn_s_a,
-            [ HELP_ARG___ ],  # must be mutable
-          )
+        define_singleton_method :RXS do
+          rxs
         end
-      end
 
-      HELP_ARG___ = '-h'.freeze
-
-      class Not_TTY___  # :_[#sy-024]
-        def tty?
-          false
-        end
-      end
-      NOT_TTY___ = Not_TTY___.new
-
-      def bound_call_via_receive_frame frm  # assume script is not loaded
-
-        _load_script_if_necessary
-
-        _argv = __argv_via_resources frm.resources
-
-        Callback_::Bound_Call.new(
-          _argv,
-          @_univeral_proc,
-          :call )
-      end
-
-      def __argv_via_resources rsx
-
-        [ rsx.sin, rsx.sout, rsx.serr, @_pn_s_a, rsx.argv ]
-      end
-
-      def _load_script_if_necessary
-
-        @_const ||= __build_const
-        if ! ::Skylab.const_defined? @_const
-
-          ::Kernel.load @entry  # result is 'true'
-        end
-        _init_pn_s_a
-
-        @_univeral_proc = ::Skylab.const_get @_const, false
-
-        NIL_
-      end
-
-      def __build_const
-
-        s = @name_.as_lowercase_with_underscores_symbol.id2name
-        s[ 0 ] = s[ 0 ].upcase
-        s.intern
-      end
-    end
-
-    class String_Receiver_as_Enumerator_Yielder___ < Home_.lib_.basic::String::Receiver
-
-      def _same x
-        @receive_string[ x ]
         self
       end
-
-      alias_method :<<, :_same
-      alias_method :yield, :_same
     end
+
+    DASH_ = '-'
+    Here_ = self
   end
 end
+# :#tombstone: again
 # :#tombstone: was rewritten

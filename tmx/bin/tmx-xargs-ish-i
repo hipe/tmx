@@ -14,7 +14,6 @@ program = -> _, stdout_, stderr_, pn_s_a, argv do
 
   do_stay = true ; do_not_stay = false
   ok = 0 ; not_ok = 1
-  moniker = 'xargs-ish-i'
   _SPACE = ' '
 
   #         ~ asssign global-ishes to locals ~
@@ -513,7 +512,7 @@ program = -> _, stdout_, stderr_, pn_s_a, argv do
     end
 
     ping = -> do
-      y << "hello from #{ moniker }."
+      y << "hello from xargs ish i."
       [ do_not_stay, ok ]
     end
 
@@ -700,5 +699,5 @@ end
 if __FILE__ == $PROGRAM_NAME
   exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
 else
-  Skylab::Xargs_ish_i = program
+  Skylab::TMX_xargs_ish_i = program
 end

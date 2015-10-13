@@ -1,5 +1,13 @@
 # what is tmx? :[#001]
 
+## synopsis
+
+testing and metaprogramming experiments. a perpetual work in progress
+towards something wonderful.
+
+
+
+
 ## introduction
 
 "tmx" is a mostly meaningless "fake-croynm" that was chosen as a name
@@ -20,3 +28,10 @@ available as "Testing and Metaprogramming eXeriments". but meh.
 
 in the context of the diaspora before you, "tmx" is a [#br-100]
 "reactive node" whose only purpose is to glue together other such nodes.
+
+
+
+
+## Copyright
+
+Copyright (c) 2011 Skylab, LLC. See (EDIT: LICENSE.txt) for further details.

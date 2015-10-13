@@ -1,11 +1,13 @@
 #!/usr/bin/env ruby -w
 
-path = ::File.expand_path '../../lib/skylab', __FILE__
+require 'skylab/tmx'
+require 'skylab/test_support'
 
-require "#{ path }/test-support/tree-runner/core"
+o = Skylab::TestSupport::Tree_Runner.new nil, $stdout, $stderr, ::ARGV
 
-o = ::Skylab::TestSupport::Tree_Runner.new nil, $stdout, $stderr, ::ARGV
+o.sidesystem_load_ticket_stream_proc = -> do
 
-o.root_directory_path = path
+  Skylab::TMX.installation_.to_sidesystem_load_ticket_stream
+end
 
 o.execute

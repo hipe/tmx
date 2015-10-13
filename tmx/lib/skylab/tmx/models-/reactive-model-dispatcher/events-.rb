@@ -1,6 +1,6 @@
 module Skylab::TMX
 
-  class Models::Front
+  class Models_::Reactive_Model_Dispatcher
 
     Events_ = ::Module.new
 

@@ -1,16 +1,4 @@
-# tmx
-
-## synopsis
-
-testing and metaprogramming experiments. a perpetual work in progress
-towards something wonderful.
-
-try:
-
-    ./bin/tmx
-
-
-
+# "tmx" installation
 
 ## installation on OSX
 
@@ -135,9 +123,4 @@ chunks are listed in GREENLIST.txt.
 try:
 
     ./script/test-all -h
-
-
-
-## Copyright
-
-Copyright (c) 2011 Skylab, LLC. See LICENSE.txt for further details.
+_

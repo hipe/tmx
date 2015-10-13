@@ -1,6 +1,6 @@
 module Skylab::TMX
 
-  class Models::Front
+  class Models_::Reactive_Model_Dispatcher
 
     def initialize & oes_p
       @on_event_selectively = oes_p
@@ -10,7 +10,7 @@ module Skylab::TMX
 
     def to_kernel_adapter
 
-      Me_::Models_::As_Kernel.new self
+      As_Kernel___.new self
     end
 
     # ~ direct call & support
@@ -103,6 +103,25 @@ module Skylab::TMX
     def _build_event sym
 
       Me_::Events_.const_get( sym, false )[ self ]
+    end
+
+    class As_Kernel___
+
+      def initialize front
+        @_client = front
+      end
+
+      def module
+        :__no_module__
+      end
+
+      def fast_lookup
+        @_client.fast_lookup
+      end
+
+      def to_unbound_action_stream
+        @_client.unbound_stream_builder.call
+      end
     end
 
     Me_ = self

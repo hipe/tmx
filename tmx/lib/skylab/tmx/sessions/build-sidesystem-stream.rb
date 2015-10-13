@@ -1,32 +1,79 @@
-module Skylab::Slicer
+module Skylab::TMX
 
-  Sessions_ = ::Module.new
+  Sessions = ::Module.new
 
-  class Sessions_::Traversal
+  class Sessions::Build_Sidesystem_Stream
 
-    def to_sidesystem_stream
+    attr_writer(
+      :const_path_prefix,
+      :gem_pass_prefix,
+    )
 
-      _path_a = ::Dir[ "#{ ::Skylab.dir_pathname.to_path }/*/core.rb" ]  # :+[#118]
+    def execute
 
-      _st = Callback_::Stream.via_nonsparse_array _path_a
+      # hack-nasty: infer which gems (in *one* directory) are ours using our
+      # universal prefix (thank you filesystem) then do some string math to
+      # infer what the const name and require path are for each such gem.
 
-      _st.map_reduce_by do | path |
+      gem_pass_prefix = @gem_pass_prefix
 
-        ss = __begin_sidesystem_via_path path
-        if ss.mod
-          ss
+      p = -> path do
+
+        cpp = @const_path_prefix
+        filesep = ::File::SEPARATOR
+        range_for_basename = path.length - ::File.basename( path ).length .. -1
+        range_for_stem = gem_pass_prefix.length .. -1
+
+        p = -> path_ do
+
+          _basename = path_[ range_for_basename ]
+
+          md = RX___.match( _basename )
+          if md
+            gemname = md[ 0 ]
+          else
+            require 'byebug' ; byebug ; 1==1 and :hibd
+            exit 0
+          end
+
+          a = cpp.dup
+          stem = gemname[ range_for_stem ]
+          stem.split( DASH_ ).each do | segment |
+
+            a.push segment.gsub( RX2___ ){ $1.upcase }.intern
+          end
+
+          Sidesystem_Name_Inference___.new(
+            a, stem, gemname.gsub( DASH_, filesep ), path_ )
         end
+
+        p[ path ]
+      end
+
+      _wow = ::Dir[ "#{ ::Gem.paths.home }/gems/#{ gem_pass_prefix }*" ]  # or .path (array))
+
+      Callback_::Stream.via_nonsparse_array _wow do | path |
+        p[ path ]
       end
     end
 
-    def __begin_sidesystem_via_path path
+    DASH_ = '-'
 
-      ss = Home_::Models_::Sidesystem.new
-      ss.norm = ::File.dirname path
-      ss.stem = ::File.basename ss.norm
-      _mod = Autoloader_.const_reduce [ ss.stem ], ::Skylab do end
-      ss.receive_any_module _mod
-      ss
-    end
+    # EGADS: (would be good to use whatever Gem does instead)
+
+    word = '[a-z][a-z_0-9]*'
+    verword1 = '[0-9][a-z_0-9]*'
+    verword2 = '[a-z0-9][a-z_0-9]*'
+
+    RX___ = /\A
+      #{ word } (?: - #{ word } )*
+      (?= - #{ verword1 } (?: \. #{ verword2 } )* \z )  # the version part
+    /x
+
+    RX2___ = /(?:(?<=^|\d)|_)([a-z])/
+
+    Sidesystem_Name_Inference___ = ::Struct.new(
+      :const_path_array, :stem, :require_path, :path_to_gem )
+
   end
 end

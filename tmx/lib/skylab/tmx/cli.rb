@@ -5,44 +5,73 @@ module Skylab::TMX
     # we do not yet need and so are not yet worried about "our tmx" as a
     # back-leaning "reactive service". for now all of the below is in
     # service of *our* tmx CLI client. a more abstract such construction
-    # is a false requirement at present. but we do have these requirements:
+    # is a false requirement for today. but we do have these requirements:
     #
     #   • there must be *no* sidesystem-specific knowledge *anywhere* here.
 
     def initialize i, o, e, pn_s_a
 
-      tmx_host_mod = ::Skylab
+      disp = Home_::Models_::Reactive_Model_Dispatcher.new
 
-      filesystem = Home_.lib_.system.filesystem  # directory?, glob
-      front = Home_::Models::Front.new
+      disp.fast_lookup = method :__fast_lookup
 
-      front.fast_lookup = -> sym do
+      disp.unbound_stream_builder = method :__to_unbound_stream
 
-        Actors_::Fast_lookup.new( sym, tmx_host_mod, filesystem ).execute
-      end
-
-      front.unbound_stream_builder = -> do
-
-        o = Home_::Sessions_::Front_Loader.new
-        o.bin_path = Home_.bin_path
-        o.filesystem = filesystem
-        o.number_of_synopsis_lines = 2
-        o.program_name_string_array = pn_s_a
-        o.tmx_host_mod = tmx_host_mod
-        o.execute
-      end
-
-      _kr = front.to_kernel_adapter
-
-      super i, o, e, pn_s_a, :back_kernel, _kr
+      super i, o, e, pn_s_a, :back_kernel, disp.to_kernel_adapter
     end
 
-    def adapter_via_unbound ada
+    expose_executables_with_prefix 'tmx-'
 
-      # always pass these thru. they come from two places, and they
-      # must have been converted to adapters by now
+    def __fast_lookup sym
 
-      ada
+      # when the front element of the ARGV directly corresponds to a
+      # sidesystem (gem), then resolution of the intended recipient is much
+      # more straightforward than having to load possibly the whole tree.
+
+      possible_gem_path =
+        "#{ Home_.installation_.participating_gem_prefix[ 0 .. -2 ] }/#{ sym }"
+
+      _ok = ::Gem.try_activate possible_gem_path
+      if _ok
+        require possible_gem_path
+        __fast_lookup_when_gem possible_gem_path, sym
+      else
+
+        # (we could extend this "optimization" to the executables but meh)
+
+        NIL_
+      end
+    end
+
+    def __fast_lookup_when_gem path, sym
+
+      sym_a = Home_.installation_.participating_gem_const_path_head.dup
+      sym_a.push sym  # EEK
+      ss_mod = Autoloader_.const_reduce sym_a, ::Object
+
+      _cli_class = ss_mod.const_get :CLI, false  # :+#hook-out
+
+      if _cli_class
+
+        _nf = Callback_::Name.via_module ss_mod
+
+        Home_::Model_::Showcase_as_Unbound.new _nf, ss_mod
+      else
+        self._COVER_ME
+      end
+    end
+
+    def __to_unbound_stream
+
+      _st = Home_.installation_.to_sidesystem_manifest_stream
+
+      # sess.number_of_synopsis_lines = 2
+      # sess.program_name_string_array = pn_s_a
+
+      _st.expand_by do | manifest |
+
+        manifest.to_unboundish_stream
+      end
     end
 
     def init_properties
@@ -60,68 +89,31 @@ module Skylab::TMX
       NIL_
     end
 
-    Actors_ = ::Module.new
+    class Showcase_as_Bound
 
-    class Actors_::Fast_lookup
+      include Home_::Model_::Common_Bound_Methods
 
-      # we don't need to walk (perhaps) the whole interface tree IFF we are
-      # invoking a single reactive node and the whole slug was provided.
+      # make the top client look like a reactive node! eek
 
-      def initialize * a
-        @symbol, @tmx_host_mod, @filesystem = a
+      def initialize bound_parent_action, nf, ss_mod, & oes_p
+        @_bound_parent = bound_parent_action
+        @nf_ = nf
+        @_ss_mod = ss_mod
       end
 
-      def execute
-
-        # hit the real filesystem once. we aren't bothering with any of
-        # our several API's yet, like autoloading and [sl]
-
-        @_slug = @symbol.id2name.gsub UNDERSCORE_, DASH_
-
-        if SANITY_RX___ =~ @_slug  # because filesystem
-          __when_sane
-        end
-      end
-
-      SANITY_RX___ = /\A[a-z0-9]+(?:-[a-z0-9]+)*\z/  # while it works
-
-      def __when_sane
-
-        @_path = ::File.join @tmx_host_mod.dir_pathname.to_path, @_slug
-
-        if @filesystem.directory? @_path
-          __when_directory
-        end
-      end
-
-      def __when_directory
-
-        mod = Autoloader_.const_reduce [ @_slug ], @tmx_host_mod  # block for et
-
-        if mod.const_get :CLI, false
-
-          Sidesystem_Module_as_Bound___.new mod
-        else
-          self._WE_CAN_LOOK_ELSEWHERE
-        end
-      end
-    end
-
-    class Sidesystem_Module_as_Bound___
-
-      def initialize mod
-        @mod = mod
+      def under_expression_agent_get_N_desc_lines expag, n=nil
+        @_ss_mod.describe_into_under [], expag
       end
 
       def bound_call_via_receive_frame otr
 
         rsx = otr.resources
 
-        _slug = Callback_::Name.via_module( @mod ).as_slug
+        _slug = @nf_.as_slug
 
         _s_a = [ * rsx.invocation_string_array, _slug ]
 
-        cli = @mod::CLI.new rsx.sin, rsx.sout, rsx.serr, _s_a
+        cli = @_ss_mod::CLI.new rsx.sin, rsx.sout, rsx.serr, _s_a
 
         if rsx.has_bridges
           self._TRIVIALLY_WRITE_AND_COVER_ME
@@ -131,8 +123,5 @@ module Skylab::TMX
         Callback_::Bound_Call.new( [ rsx.argv ], cli, :invoke )
       end
     end
-
-    DASH_ = '-'
-    UNDERSCORE_ = '_'
   end
 end

@@ -91,7 +91,6 @@ module Skylab::TMX
       @_box = bx
       ACHIEVED_
     end
-    ACHIEVED_ = true
 
     def __init_state_machine
 
