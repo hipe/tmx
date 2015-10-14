@@ -2,7 +2,7 @@ module Skylab::TaskExamples
 
   self._NOT_COVERED  # #todo
 
-  class TaskTypes::BuildTarball < Home_.lib_.slake::Graph
+  class TaskTypes::BuildTarball < Home_.lib_.slake::Support::Execute_Graph
 
     attribute :build_tarball
     attribute :configure_with, :required => false

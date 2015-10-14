@@ -1,6 +1,6 @@
 require 'rake' # for fun and as an implementation detail we use it
 
-module Skylab::Task
+class Skylab::Task
 
   module TaskClassMethods
     def task_type_name

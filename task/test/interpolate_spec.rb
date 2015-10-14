@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 Skylab::TestSupport::Quickie.enable_kernel_describe
 
-module Skylab::Task  # [#ts-010]
+class Skylab::Task  # [#ts-010]
 # ..
 describe "[sla] interpolate" do
   # include ::Skylab::Task

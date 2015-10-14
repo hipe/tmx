@@ -8,7 +8,7 @@ module Skylab  # [#ts-010]
 
 describe "[sla] graph" do
 
-  let( :graph ) { Task::Graph.new }
+  let( :graph ) { Task::Sessions::Execute_Graph.new }
   describe "when built empty" do
     it "does nothing interesting" do
       graph.nodes.empty?.should eql(true)
@@ -62,7 +62,7 @@ describe "[sla] graph" do
 
   describe "with a graph with one task, set as target" do
     let(:graph) do
-      Task::Graph.new(
+      Task::Sessions::Execute_Graph.new(
         :name => 'test1',
         :target => 'do this whootily',
           'do this whootily' => Task::LegacyTask.new(
@@ -81,7 +81,7 @@ describe "[sla] graph" do
 
   describe "with a graph with two tasks with a unidirectional dependency" do
     let(:graph) do
-      Task::Graph.new(
+      Task::Sessions::Execute_Graph.new(
         :target => :foo,
         :foo => Task::LegacyTask.new(
           :prerequisites => [:bar],
