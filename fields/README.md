@@ -27,6 +27,8 @@ at writing, [br] is that place, and subject has all the ancient stuff.
 
 first, a quick history (most recent at top):
 
+    [#br-089] the autonomous component system                 2015-04-23
+
     [#cb-042] actors                                          2014-08-00
 
     [#br-001] the entity library                              2014-07-22
@@ -113,6 +115,15 @@ has edit sessions    | no        |
 
 
 ## more in-depth comments about the particular implementations
+
+### [#hl-089] is the new favorite..
+
+  • we want to re-implement the *backend* of brazen entity with this! EEK
+
+  • the beginnig of that document has a section on how it's better
+    (or worse) than [#br-001]
+
+
 
 
 ### the [gv] isomorphic interface parameter library

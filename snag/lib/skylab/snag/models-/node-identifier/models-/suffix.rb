@@ -21,7 +21,7 @@ module Skylab::Snag
           a and new a
         end
 
-        private :new  # :+ACS-tenet-1
+        private :new
       end  # >>
 
       def initialize a

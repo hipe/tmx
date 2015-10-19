@@ -44,6 +44,10 @@ module Skylab::System
         _common( :Filesystem ).for_mutable_args_ x_a, & x_p
       end
 
+      def filesystem_lib
+        _lib :Filesystem
+      end
+
       def IO
         _common( :IO )
       end
@@ -59,8 +63,12 @@ module Skylab::System
       def _common sym
 
         @_h.fetch sym do
-          @_h[ sym ] = Services___.const_get( sym, false ).new self
+          @_h[ sym ] = _lib( sym ).new self
         end
+      end
+
+      def _lib sym
+        Services___.const_get sym, false
       end
 
       def test_support  # :+[#ts-035]

@@ -68,11 +68,11 @@ module Skylab::Callback
         h = @argument_box.h_
         @_do_open = h[ :do_open ]
 
-        pa = trio :output_file
+        pa = qualified_knownness_of :output_file
 
         if pa.is_known && pa.value_x
 
-          fa = trio :force
+          fa = qualified_knownness_of :force
 
           kn = Home_.lib_.system.filesystem( :Downstream_IO ).with(
             :path_arg, pa,

@@ -322,6 +322,10 @@ module Skylab::Callback
       @a.fetch d
     end
 
+    def to_collection
+      Box::As__::Collection[ self ]
+    end
+
     def to_name_stream
       Home_::Stream.via_nonsparse_array @a
     end
@@ -493,10 +497,6 @@ module Skylab::Callback
 
     def to_new_mutable_box_like_proxy
       dup
-    end
-
-    def to_struct  # ~ ditto
-      Box::Proxies::Struct::For[ @a, @h, self ]
     end
 
     private def _say_not_found i
@@ -2189,8 +2189,6 @@ module Skylab::Callback
       @camelcase_const
     end
 
-    $x = 0
-
     def as_const
       @const_is_resolved_ || __resolve_const
       @as_const
@@ -2207,6 +2205,8 @@ module Skylab::Callback
     def as_human
       @as_human ||= __build_human
     end
+
+    attr_writer :as_ivar  # for irregulars
 
     def as_ivar
       @as_ivar ||= __build_ivar

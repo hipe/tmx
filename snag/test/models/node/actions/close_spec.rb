@@ -35,8 +35,9 @@ module Skylab::Snag::TestSupport
 
       _against '001'
 
-      _ev = expect_neutral_event :entity_not_found
+      _ev = expect_not_OK_event :entity_not_found
       black_and_white( _ev ).should eql "[#1] does not have #open"
+
       expect_noded_ 1
 
       scn = scanner_via_output_string_

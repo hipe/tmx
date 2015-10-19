@@ -52,7 +52,7 @@ module Skylab::Snag::TestSupport
         _ev = expect_not_OK_event :entity_already_added
         black_and_white( _ev ).should eql "[#1] already has #hi"
 
-        expect_neutralled
+        expect_failed
       end
 
       it "to [#07] append tag '2014-ok'" do

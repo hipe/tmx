@@ -55,6 +55,10 @@ module Skylab::Snag
 
   # ~ support
 
+  ACS_ = -> do
+    Home_.lib_.brazen::Autonomous_Component_System
+  end
+
   module Actor_as_Model_Module_Methods_
 
     def new_with * x_a, & oes_p
@@ -67,23 +71,6 @@ module Skylab::Snag
           @on_event_selectively = oes_p
         end
         process_iambic_fully x_a
-      end
-    end
-  end
-
-  Argument_interpreter_via_normalization_ = -> n11n do
-
-    -> arg_st, & x_p do
-
-      _trio = Callback_::Known.new_known arg_st.gets_one
-
-      n11n.normalize_argument _trio do | * i_a, & ev_p |
-
-        if x_p
-          x_p[ * i_a, & ev_p ]
-        else
-          raise ev_p[].to_exception
-        end
       end
     end
   end

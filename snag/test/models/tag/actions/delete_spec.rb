@@ -29,7 +29,7 @@ module Skylab::Snag::TestSupport
         black_and_white( expect_not_OK_event :entity_not_found ).should eql(
           "[#1] does not have #three" )  # :+[#015]
 
-        expect_neutralled
+        expect_failed
       end
 
       it "remove a tag at the end" do

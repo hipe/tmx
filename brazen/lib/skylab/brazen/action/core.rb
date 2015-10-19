@@ -340,23 +340,7 @@ module Skylab::Brazen
       Callback_::Box.allocate.init a_, h_
     end
 
-    def to_trio_stream
-
-      fp = formal_properties
-      a = @argument_box.a_ ; h = @argument_box.h_
-      d = 0 ; len = a.length
-
-      Callback_.stream do
-
-        if d < len
-          k = a.fetch d
-          d += 1
-          Callback_::Qualified_Knownness.via_value_and_model h.fetch( k ), fp.fetch( k )
-        end
-      end
-    end
-
-    def trio sym
+    def qualified_knownness_of sym
       had = true
       x = @argument_box.fetch sym do
         had = false
@@ -598,3 +582,4 @@ module Skylab::Brazen
     end
   end
 end
+# :+#tombstone: to_trio_stream (`to_qualified_knownness_stream`)

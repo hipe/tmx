@@ -46,8 +46,8 @@ module Skylab::Git
 
         _o = Stow_.new_via_path ::File.join( @path, name_s )
 
-        _ = Home_.lib_.brazen::Autonomous_Component_System::
-            Mutation_Session.event_class :entity_not_found
+        _ = Home_.lib_.brazen::
+          Autonomous_Component_System.mutation_event_class( :entity_not_found )
 
         _ev = _.new_with(
           :entity, _o,
@@ -63,7 +63,7 @@ module Skylab::Git
 
       def to_entity_stream
 
-        _dac = Bz__::Collection_Adapters::Directory_as_Collection.new do | o |
+        _dac = Home_.lib_.system.filesystem_lib::Models::Directory::As::Collection.new do | o |
 
           o.directory_path = @path
           o.directory_is_assumed_to_exist = true  # so it whines

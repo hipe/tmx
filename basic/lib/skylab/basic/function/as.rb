@@ -1,8 +1,8 @@
-module Skylab::Brazen
+module Skylab::Basic
 
-    module Proxies_::Proc_As  # see [#083]
+  module Function::As  # see [#052]
 
-      # :+#by:tm, cu, sg
+    # -> ; :+#by:ta, cu, sg
 
       class Unbound_Action
 
@@ -37,7 +37,7 @@ module Skylab::Brazen
         attr_reader :p, :box_module, :model_class
 
         def name_function
-          @___nf ||= Concerns_::Name::Build_name_function[ self ]
+          @___nf ||= ::Skylab::Brazen::Concerns_::Name::Build_name_function[ self ]
         end
 
         def name
@@ -46,7 +46,7 @@ module Skylab::Brazen
 
         def name_function_class  # #hook-in
 
-          Home_::Model.common_action_class.name_function_class
+          ::Skylab::Brazen::Model.common_action_class.name_function_class
         end
 
         def custom_action_inflection
@@ -154,7 +154,7 @@ module Skylab::Brazen
 
             bx.add( name_symbol,
 
-            Home_::Model.common_entity_module::Property.new do
+            ::Skylab::Brazen::Model.common_entity_module::Property.new do
 
               @argument_arity = argument_arity
               @name = Callback_::Name.via_variegated_symbol name_symbol
@@ -180,7 +180,7 @@ module Skylab::Brazen
 
             if :req == orr && x.nil?
 
-              _prp = Home_.lib_.basic::Minimal_Property.
+              _prp = Home_::Minimal_Property.
                 via_variegated_symbol name_sym
 
               miss_prp_a ||= []
@@ -229,7 +229,7 @@ module Skylab::Brazen
 
         def __build_when_extra_arguments_event extra_sym_a
 
-          _sign_event Home_::Property.
+          _sign_event ::Skylab::Brazen::Property.
             build_extra_values_event extra_sym_a, nil, 'argument', 'unexpected'
         end
 
@@ -244,7 +244,7 @@ module Skylab::Brazen
 
         def __build_missing_arguments_event miss_prp_a
 
-          _sign_event Home_::Property.
+          _sign_event ::Skylab::Brazen::Property.
             build_missing_required_properties_event miss_prp_a, 'argument'
         end
 
@@ -291,6 +291,6 @@ module Skylab::Brazen
           true  # for now
         end
       end
-    end
-
+    # <-
+  end
 end

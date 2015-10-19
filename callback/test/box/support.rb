@@ -1,37 +1,40 @@
-require_relative '../test-support'
+module Skylab::Callback::TestSupport
 
-module Skylab::Callback::TestSupport::Box
+  module Box::Support
 
-  ::Skylab::Callback::TestSupport[ TS_ = self ]
+    def self.[] ts_mod
 
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  Home_ = Home_
-
-  module ModuleMethods
-
-    def memoize_subject & p
-
-      define_method :subject, Home_.memoize( & p )
-
+      ts_mod.extend Module_Methods___
+      ts_mod.include Instance_Methods___
+      NIL_
     end
-  end
 
-  module InstanceMethods
+    module Module_Methods___
 
-    def subject_with_entries * pairs
-      bx = Subject_[].new
-      pairs.each_slice 2 do | k, x |
-        bx.add k, x
+      def memoize_subject_ & p
+
+        define_method :subject_, Home_.memoize( & p )
+
       end
-      bx
+
+      def subject_
+        Home_::Box
+      end
     end
 
-  end
+    module Instance_Methods___
 
-  Subject_ = -> do
-    Home_::Box
+      def subject_with_entries_ * pairs
+        bx = subject_.new
+        pairs.each_slice 2 do | k, x |
+          bx.add k, x
+        end
+        bx
+      end
+
+      def subject_
+        self.class.subject_
+      end
+    end
   end
 end

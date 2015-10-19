@@ -13,29 +13,25 @@ module Skylab::Basic
         def add_state * x_a
 
           x_a.unshift :add, :state
-          Home_.lib_.brazen::Autonomous_Component_System::
-              Mutation_Session.edit x_a, self
+          Home_.lib_.brazen::Autonomous_Component_System.edit x_a, self
         end
 
-        def self.__state__component_model
+        def __state__component_association
+          yield :can, :add
           State_
         end
 
-        def mutable_body_for_mutation_session
-          self
-        end
-
-        def __add__object_for_mutation_session x
+        def __add__component x, _ca, & _
           if x
             @_bx.add x.name_symbol, x
-            ACHIEVED_
+            x
           else
             x
           end
         end
 
-        def receive_changed_during_mutation_session
-          ACHIEVED_
+        def result_for_component_mutation_session_when_changed change_log, & _
+          change_log.last_delivery_result
         end
 
         def build_state_machine

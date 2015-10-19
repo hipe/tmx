@@ -1,6 +1,8 @@
-module Skylab::Brazen
+module Skylab::Basic
 
-  class Collection_Adapters::Module_as_Collection
+  class Module::As::Collection
+
+    # :+#by: [f2]
 
     class << self
 

@@ -44,20 +44,16 @@ module Skylab::Snag
           ).FS_adapter_
         end
 
-        # ~ interface with the mutation session (compliments those in parent clas)
+        # ~ for [#br-089] the ACS (compliments same in parent class)
 
-        def mutable_body_for_mutation_session
-          self
-        end
-
-        def receive_changed_during_mutation_session
-          # nothing.
-          ACHIEVED_
-        end
-
-        def __add__object_for_mutation_session bx, node, & oes_p
+        def __add__component bx, node, ca, & oes_p
 
           persist_entity bx, node, & oes_p
+        end
+
+        def result_for_component_mutation_session_when_changed log, &__
+
+          log.last_delivery_result || self._COVER_ME
         end
 
         # c r u d

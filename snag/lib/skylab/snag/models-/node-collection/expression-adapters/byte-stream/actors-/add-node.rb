@@ -100,20 +100,21 @@ module Skylab::Snag
 
     Rewrite = -> id, o, & x_p do
 
-      ok = o.subject_entity.edit(
+      last_value = o.subject_entity.edit(
 
         :via, :object,
         :set, :identifier, id,
         & x_p )
 
-      if ok
+      if last_value
 
         o.write_each_node_whose_identifier_is_greater_than_that_of_subject
         o.write_the_subject_node
         o.write_any_floating_node
-        o.write_the_remaining_nodes
+        _ok = o.write_the_remaining_nodes
+        _ok && last_value
       else
-        ok
+        last_value
       end
     end
 

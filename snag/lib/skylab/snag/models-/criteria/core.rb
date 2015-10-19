@@ -103,13 +103,13 @@ module Skylab::Snag
           @_persistence_arg,
           @kernel.silo( :node_collection ).FS_adapter_.tmpfile_sessioner )
 
-        a = _cc.edit(
+        _o = _cc.edit(
           :via, :object,
-          :unless_present,
+          :assuming, :not, :exists,
           :add, :criteria, @_criteria,
           & handle_event_selectively )
 
-        a && ACHIEVED_
+        _o && ACHIEVED_
       end
 
       def __stream_via_criteria
@@ -141,7 +141,7 @@ module Skylab::Snag
       def produce_result
 
         _cc.edit(
-          :if_present,
+          :assuming, :exists,
           :via, :slug,
           :remove, :critera, @property_box.fetch( :name ),
           & handle_event_selectively )
@@ -197,17 +197,13 @@ module Skylab::Snag
 
     Directory_as_collection_class___ = Callback_.memoize do
 
-      class D_as_C____ < Brazen_::Collection_Adapters::Directory_as_Collection
+      class D_as_C____ < Home_.lib_.system.filesystem_lib::Models::Directory::As::Collection
 
-        class << self
+        def __criteria__component_association
 
-          def __criteria__component_model
-            Criteria_
-          end
-        end  # >>
+          yield :can, :add, :remove
 
-        def has_equivalent__criteria__for_mutation_session c
-          has_equivalent_item_for_mutation_session c
+          Criteria_
         end
 
         def description_under expag

@@ -17,16 +17,16 @@ module Skylab::Snag
 
     class << self
 
-      def interpret_for_mutation_session arg_st, & x_p
+      def interpret_for_component_mutation_session st, & x_p  # t5..
 
-        Home_.lib_.brazen::Autonomous_Component_System::
-            Mutation_Session.interpret arg_st, self, & x_p
+        # the "t" notations refer to tenets of [#br-089]
+
+        ACS_[].interpret st, new, & x_p
       end
 
-      def edit_entity * x_a, & x_p  # ..
+      def edit_entity * x_a, & x_p  # t2
 
-        Home_.lib_.brazen::Autonomous_Component_System::
-            Mutation_Session.create x_a, self, & x_p
+        ACS_[].create x_a, new, & x_p
       end
 
       def collection_module_for_criteria_resolution
@@ -34,49 +34,20 @@ module Skylab::Snag
         Home_::Models_::Node_Collection
       end
 
-      def new_via_body x  # :+#ACS-tenet-8B
+      def new_via_body x  # t7A1
 
         new nil, x
       end
 
-      def new_via__identifier__ x
+      def new_via__identifier__ x  # t7
 
         new x
       end
 
-      def new_empty_for_mutation_session
-
-        new
-      end
-
-      # ~ :+#ACS-tenet-7
-
-      def __extended_content__component_model
-        EC___
-      end
-
-      def __identifier__component_model
-
-        Home_::Models_::Node_Identifier
-      end
-
-      def __message__component_model
-
-        Mixed_Message___
-      end
-
-      def __string__component_model
-
-        Home_::Models::Hashtag::String_Piece
-      end
-
-      def __tag__component_model
-
-        Home_::Models_::Tag
-      end
-
-      private :new  # :+#ACS-tenet-1
+      private :new  # t1
     end  # >>
+
+    # ~ initializing & copying (internal)
 
     def initialize id_o=nil, body=nil
 
@@ -115,83 +86,183 @@ module Skylab::Snag
       NIL_
     end
 
-    attr_reader :body, :ID
-
-    def changed
-      @_did_change
-    end
-
-    # ~
-
-    def express_of_via_into_under y, expag
-
-      sym = expag.modality_const
-
-      if sym
-        expad_for_( sym ).express_of_via_into_under_of y, expag, self
-      else
-        express_into_ y
-      end
-    end
-
-    include Expression_Methods_
-
-    def description_under expag
-      y = expag.new_expression_context
-      @ID.express_into_under y, expag
-      y
-    end
-
-    def property_value_via_property prp
-      send :"__property_value_for__#{ prp.name_symbol }__"
-    end
-
-    def __property_value_for__identifier__
-      @ID
-    end
-
-    def __property_value_for__message__
-      @body
-    end
-
-    def __property_value_for__extended_content__
-
-      eca = @_extended_content_adapter
-      if eca
-        eca.any_extended_content_filename_via_node_ID @ID
-      end
-    end
-
-    define_method :formal_properties, ( Callback_.memoize do
-
-      p = Callback_.lib_.basic::Minimal_Property.method :via_variegated_symbol
-
-      [ p[ :identifier ],
-        p[ :message ],
-        p[ :extended_content ]
-      ].freeze
-    end )
-    # ~
-
-    def receive__identifier__for_mutation_session o
-
-      @ID = o
-      ACHIEVED_
-    end
-
-    # ~
-
-    def append_string s, & oes_p
-
-      edit :append, :string, s, & oes_p
-    end
+    # ~ mutation
 
     def prepend_string s, & oes_p
 
       edit :prepend, :string, s, & oes_p
     end
 
-    # ~
+    def append_string s, & oes_p
+
+      edit :append, :string, s, & oes_p
+    end
+
+    def prepend_tag symbol, & oes_p
+
+      edit :prepend, :tag, symbol, & oes_p
+    end
+
+    def append_tag symbol, & oes_p
+
+      edit :append, :tag, symbol, & oes_p
+    end
+
+    def remove_tag symbol, & oes_p
+
+      edit :remove, :tag, symbol, & oes_p
+    end
+
+    def edit * x_a, & x_p
+
+      ACS_[].edit x_a, self, & x_p
+    end
+
+    ## ~~ t4 implement above
+
+    def __extended_content__component_association
+
+      # model only (used by reflecting for CLI)
+
+      EC___
+    end
+
+    def __identifier__component_association
+
+      yield :can, :set
+
+      yield :stored_in_ivar, :@ID
+
+      Home_::Models_::Node_Identifier
+    end
+
+    def __message__component_association
+
+      yield :can, :append
+
+      Mixed_Message___
+    end
+
+    def __string__component_association
+
+      yield :can, :prepend, :append
+
+      Home_::Models::Hashtag::String_Piece
+    end
+
+    def __tag__component_association
+
+      yield :can, :prepend, :append, :remove
+
+      Home_::Models_::Tag
+    end
+
+    ## ~~ assumption & conditional test implementations
+
+    def component_is__present__ * x_a, & x_p
+      _route_test :present, * x_a, & x_p
+    end
+
+    def component_is_not__present__ * x_a, & x_p
+      _route_test :absent, * x_a, & x_p
+    end
+
+    def expect_component__present__ * x_a, & x_p
+      _route_test :present, * x_a, & x_p
+    end
+
+    def expect_component__absent__ * x_a, & x_p
+      _route_test :absent, * x_a, & x_p
+    end
+
+    def _route_test adj, o, ca, & x_p
+
+      send :"__expect__#{ ca.name.as_variegated_symbol }__is__#{ adj }__",
+        o, & x_p
+    end
+
+    def __expect__tag__is__present__ tag, & oes_p
+
+      existing = first_equivalent_item tag
+      if existing
+        ACHIEVED_
+      else
+        ACS_[].entity_not_found tag, self, & oes_p
+      end
+    end
+
+    def __expect__tag__is__absent__ tag, & oes_p
+
+      existing = first_equivalent_item tag
+      if existing
+        ACS_[].entity_already_added tag, self, & oes_p
+      else
+        ACHIEVED_
+      end
+    end
+
+    def first_equivalent_item tag  # :+[#ba-051]
+
+      to_tag_stream.detect do | tag_ |
+
+        tag == tag_
+      end
+    end
+
+    ## ~~ implementation of operations
+
+    def __set__component x, ca, & oes_p
+
+      instance_variable_set ca.name.as_ivar, x
+      x || self._COVER_ME  # as soon as you have valid false-ishes, things change
+    end
+
+    def __prepend__component x, ca, & oes_p
+
+      _mutable_body_for_mutation_session.prepend_component_ x, ca, & oes_p
+    end
+
+    def __append__component x, ca, & oes_p
+
+      _mutable_body_for_mutation_session.append_component_ x, ca, & oes_p
+    end
+
+    def __remove__component x, ca, & oes_p
+
+      o = _mutable_body_for_mutation_session.remove_component_ x, ca, & oes_p
+      if o
+        ACS_[].entity_removed o, self, & oes_p
+      end
+      o
+    end
+
+    def _mutable_body_for_mutation_session
+
+      if @body
+        if ! @body.is_mutable
+          @body = @body.to_mutable
+        end
+      else
+        @body = Node_::Models_::Agnostic_Mutable_Body.new
+      end
+
+      @body
+    end
+
+    def result_for_component_mutation_session_when_changed o, &_
+
+      @_did_change = true
+      o.last_delivery_result
+    end
+
+    def result_for_component_mutation_session_when_no_change &_
+
+      NIL_  # a no-op is not a success (covered)
+    end
+
+    # ~ expression & reflection
+
+    ## ~~ reflection related to tagging
 
     def is_not_tagged_with sym
       ! is_tagged_with sym
@@ -224,16 +295,6 @@ module Skylab::Snag
       count
     end
 
-    def has_equivalent__tag__for_mutation_session o
-
-      _ = to_tag_stream.detect do | tag |
-
-        o == tag
-      end
-
-      _ ? true : false
-    end
-
     def to_tag_stream
 
       if @body
@@ -243,49 +304,7 @@ module Skylab::Snag
       end
     end
 
-    def prepend_tag symbol, & oes_p
-
-      edit :prepend, :tag, symbol, & oes_p
-    end
-
-    def append_tag symbol, & oes_p
-
-      edit :append, :tag, symbol, & oes_p
-    end
-
-    def remove_tag symbol, & oes_p
-
-      self._COVER_ME
-      edit :remove, :tag, symbol, & oes_p
-    end
-
-    # ~
-
-    def edit * x_a, & x_p
-
-      Home_.lib_.brazen::Autonomous_Component_System::
-          Mutation_Session.edit x_a, self, & x_p
-    end
-
-    def mutable_body_for_mutation_session
-
-      if @body
-        if ! @body.is_mutable
-          @body = @body.to_mutable
-        end
-      else
-        @body = Node_::Models_::Agnostic_Mutable_Body.new
-      end
-      @body
-    end
-
-    def receive_changed_during_mutation_session
-
-      @_did_change = true
-      ACHIEVED_
-    end
-
-    # ~
+    ## ~~ reflection related to e.c
 
     def has_extended_content
 
@@ -295,9 +314,69 @@ module Skylab::Snag
       end
     end
 
+    ## ~~ hook-ins related to reflection, simple derived & straighforward
+
+    def express_of_via_into_under y, expag
+
+      sym = expag.modality_const
+
+      if sym
+        expad_for_( sym ).express_of_via_into_under_of y, expag, self
+      else
+        express_into_ y
+      end
+    end
+
+    include Expression_Methods_
+
+    def description_under expag
+      y = expag.new_expression_context
+      @ID.express_into_under y, expag
+      y
+    end
+
+    define_method :formal_properties, ( Callback_.memoize do
+
+      p = Callback_.lib_.basic::Minimal_Property.method :via_variegated_symbol
+
+      [ p[ :identifier ],
+        p[ :message ],
+        p[ :extended_content ]
+      ].freeze
+    end )
+
+    def property_value_via_property prp
+      send :"__property_value_for__#{ prp.name_symbol }__"
+    end
+
+    def __property_value_for__identifier__
+      @ID
+    end
+
+    def __property_value_for__message__
+      @body
+    end
+
+    def __property_value_for__extended_content__
+
+      eca = @_extended_content_adapter
+      if eca
+        eca.any_extended_content_filename_via_node_ID @ID
+      end
+    end
+
+    def changed
+      @_did_change
+    end
+
+    attr_reader(
+      :body,
+      :ID,
+    )
+
     Brazen_ = Home_.lib_.brazen
 
-    class Common_Action < Brazen_::Model.common_action_class
+    class Common_Action_ < Brazen_::Model.common_action_class
 
       # (this could just as easily be a plain mixin module but it's slightly
       # convenient to be able to establish the entity module in one place)
@@ -417,7 +496,7 @@ module Skylab::Snag
 
       class << self
 
-        def interpret_for_mutation_session arg_st, & x_p
+        def interpret_for_component_mutation_session arg_st, & x_p
           Interpret_mixed_message___[ arg_st, & x_p ]
         end
       end  # >>

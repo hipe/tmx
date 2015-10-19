@@ -56,6 +56,11 @@ module Skylab::Basic
 
       public
 
+        def to_component_argument_interpreter
+
+          ACS_[].argument_interpreter_via_normalization self
+        end
+
         def to_parser_proc
 
           -> in_st, & x_p do

@@ -20,7 +20,7 @@ module Skylab::Snag
           @row_a = row_a
         end
 
-        def __prepend__object_for_mutation_session obj, & oes_p
+        def prepend_component_ obj, _ca, & oes_p
 
           a = _mutable_row_at_index( @r.begin ).o_a_
           if a.length.nonzero?
@@ -37,7 +37,7 @@ module Skylab::Snag
           ACHIEVED_
         end
 
-        def __append__object_for_mutation_session obj, & oes_p
+        def append_component_ obj, _ca, & oes_p
 
           a = _mutable_row_at_index( @r.end - 1 ).o_a_
           if a.length.nonzero?
@@ -59,7 +59,7 @@ module Skylab::Snag
           Home_::Models::Hashtag::String_Piece.new_via_string SPACE_
         end
 
-        def __remove__object_for_mutation_session obj
+        def remove_component_ obj, _ca
 
           did = false
           x = nil

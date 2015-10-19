@@ -3,33 +3,30 @@ permute             q [ ]
 flex2treetop        q [ ]
 yacc2treetop        q [ ]
 bnf2treetop         q [ ]
-css-convert         q [ ]
+css_convert         q [ ]
 
-code-molester       Q [ ]
+code_molester       Q [ ]
 
 task_examples       Q [ ]
 task                q [ ]
 treemap             q [ ]
 
-file-metrics        q [ ]
+file_metrics        q [ ]
 git                 Q [ ]
-beauty-salon        q [ ]
+beauty_salon        q [ ]
 cull                q [ ]
 snag                q [ ]
-test-support        q [ ]
+test_support        q [ ]
 
-tan-man             q [ ]
-git-viz             q [ ]
+tan_man             q [ ]
+git_viz             q [ ]
 
 # libs
 
 plugin              q [ ]
 fields              q [ ]
 
-face                q [ ]
-headless            q [ ]
-
-sub-tree            q [ ]
+sub_tree            q [ ]
 
 basic               q [ ]
 

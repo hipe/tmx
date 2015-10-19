@@ -333,6 +333,10 @@ module Skylab
         _inflect_first_word s, :third_person
       end
 
+      def val x
+        x.inspect
+      end
+
       def _inflect_first_word s, meth
 
         s_a = s.split SPACE_

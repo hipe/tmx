@@ -1,8 +1,8 @@
 module Skylab::Brazen
 
-  class Autonomous_Component_System::Mutation_Session
+  module Autonomous_Component_System
 
-    module Event_Factory_
+    module Sessions_::Mutation::Event_Factory_
 
       # (a placeholder for an idea)
 

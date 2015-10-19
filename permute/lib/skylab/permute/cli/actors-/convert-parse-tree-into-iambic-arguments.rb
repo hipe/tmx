@@ -18,7 +18,7 @@ module Skylab::Permute
         cat_bx.add cat.name_string, cat
 
         @_bx = cat_bx
-        @_col = Home_.lib_.brazen::Collection_Adapters::Box_as_Collection[ cat_bx ]
+        @_col = @_bx.to_collection
         @_st = st
 
         ok = true
@@ -45,8 +45,10 @@ module Skylab::Permute
         _trio = Callback_::Qualified_Knownness.via_value_and_variegated_symbol(
           short_category_s, :category_letter )
 
-        cat_o = Home_.lib_.brazen::Collection::Common_fuzzy_retrieve[
-          _trio, @_col, & @on_event_selectively ]
+        cat_o = Home_.lib_.brazen::Collection::Common_fuzzy_retrieve.call(
+          _trio,
+          @_col.method( :to_entity_stream ),
+          & @on_event_selectively )
 
         if cat_o
           cat_o.s_a.push value_s
@@ -62,7 +64,9 @@ module Skylab::Permute
           long_partial_catgory_s, :category_letter )
 
         cat_o = Home_.lib_.brazen::Collection::Common_fuzzy_retrieve.call(
-          _trio, @_col ) do end
+          _trio,
+          @_col.method( :to_entity_stream ),
+        ) do end
 
         if cat_o
           cat_o.s_a.push value_s

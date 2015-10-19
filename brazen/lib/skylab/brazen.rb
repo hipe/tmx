@@ -415,7 +415,7 @@ module Skylab::Brazen
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
-  ACTIONS_CONST_ = :Actions
+  ACTIONS_CONST = :Actions
   Home_ = self
   Box_ = Callback_::Box
   Autoloader_[ Concerns_ = ::Module.new ]
@@ -437,7 +437,6 @@ module Skylab::Brazen
   NEWLINE_ = "\n".freeze
   NIL_ = nil
   PROCEDE_ = true
-  Autoloader_[ Proxies_ = ::Module.new ]
   SPACE_ = ' '.freeze
   STOP_PARSING_ = false
   stowaway :TestSupport, 'test/test-support'

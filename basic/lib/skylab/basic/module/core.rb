@@ -188,7 +188,6 @@ module Skylab::Basic
       end
     end
 
-    CONST_SEP_ = '::'.freeze
     PATH_SEP_RX__ = %r(::|/)
 
     Module_ = self

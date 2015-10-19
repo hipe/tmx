@@ -4,9 +4,10 @@ module Skylab::Human
 
     class Models_::Idea
 
-      Callback_::Actor.methodic self, :properties,
+      Callback_::Actor.methodic( self, :properties,
 
-        :syntactic_category
+        :syntactic_category,
+      )
 
       def initialize & edit_p
 
@@ -39,10 +40,6 @@ module Skylab::Human
           polymorphic_upstream )
       end
 
-      def self.__object_argument__component_model
-        EF_::Models_::Argument_Adapter::Nounish::Object
-      end
-
       def subject
         ( subject_atom || subject_list || subject_count ) && true
       end
@@ -62,10 +59,6 @@ module Skylab::Human
           polymorphic_upstream )
       end
 
-      def self.__subject_argument__component_model
-        EF_::Models_::Argument_Adapter::Nounish::Subject
-      end
-
       private def verb=
 
         _edit_self(
@@ -73,10 +66,6 @@ module Skylab::Human
           :add,
           :verb,
           polymorphic_upstream )
-      end
-
-      def self.__verb__component_model
-        EF_::Models_::Argument_Adapter::Verbish
       end
 
       attr_reader :verb_argument
@@ -108,21 +97,37 @@ module Skylab::Human
 
       def _edit_self * x_a, & x_p
 
-        Home_.lib_.brazen::Autonomous_Component_System::
-            Mutation_Session.edit x_a, self, & x_p
+        Home_.lib_.brazen::Autonomous_Component_System.edit x_a, self, & x_p  # ACS_
       end
 
-      def mutable_body_for_mutation_session
-        self
+      def __object_argument__component_association
+
+        yield :can, :add
+
+        EF_::Models_::Argument_Adapter::Nounish::Object
       end
 
-      def __add__object_for_mutation_session o
+      def __subject_argument__component_association
+
+        yield :can, :add
+
+        EF_::Models_::Argument_Adapter::Nounish::Subject
+      end
+
+      def __verb__component_association
+
+        yield :can, :add
+
+        EF_::Models_::Argument_Adapter::Verbish
+      end
+
+      def __add__component o, _ca, & _
 
         @__slots.add o.slot_symbol, o
-        ACHIEVED_
+        o
       end
 
-      def receive_changed_during_mutation_session
+      def result_for_component_mutation_session_when_changed _, &__
         ACHIEVED_
       end
     end

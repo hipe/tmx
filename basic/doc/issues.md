@@ -1,3 +1,8 @@
+[#052]       adapting a proc into a [br] action ..
+[#051]       track universal collection operations
+[#050] #open tracks universal locations possibly to back-integrate once
+             the future non-vapor feature of cached component models
+             becomes a thing
 [#049]       queue ..
 [#048]       [ module & class creator ]
 [#047]       f.chain ..

@@ -1,6 +1,8 @@
-module Skylab::Brazen
+module Skylab::Basic
 
-  module Proxies_::Module_As  # :[#085].
+  module Module::As::Models  # :[#053].
+
+    # :+#by: [f2]
 
     class Unbound_Model
 
@@ -57,9 +59,10 @@ module Skylab::Brazen
 
       def to_lower_unbound_action_stream
 
-        _acr = Home_::Model::Child_Node_Index.new(
+        _acr = ::Skylab::Brazen::Model::Child_Node_Index.new(
           @cls_pxy,
-          @cls_pxy.__mod.const_get( ACTIONS_CONST_, false ) )
+          @cls_pxy.__mod.const_get( ::Skylab::Brazen::ACTIONS_CONST, false ),
+        )
 
         _acr.to_lower_action_class_stream_
       end

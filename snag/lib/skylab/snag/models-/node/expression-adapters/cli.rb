@@ -6,23 +6,24 @@ module Skylab::Snag
 
       class << self
 
-        def express_of_via_into_under_of y, expag, item_one
+        def express_of_via_into_under_of y, expag, first
 
-          cls = item_one.class
           sess = Home_.lib_.string_lib.yamlizer.new
 
           sess.register_properties do | o |
 
-            item_one.formal_properties.each do | prp |
+            p = ACS_[]::Component_Association.builder_for first
 
-              _ = cls.send(
-                :"__#{ prp.name_symbol }__component_model" )
+            first.formal_properties.each do | prp |
 
-              _p = _::Expression_Adapters::CLI.express_of_via_under expag
+              _p = p[ prp.name_symbol ].
+                component_model::Expression_Adapters::CLI.
+                  express_of_via_under expag
 
               o.register_property prp, & _p
             end
           end
+
           sess.line_downstream = y
 
           -> item do

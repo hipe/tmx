@@ -133,9 +133,9 @@ module Skylab::Brazen
         acr and acr.to_upper_action_cls_strm
       end
 
-      def to_node_stream
+      def to_unbound_stream
         acr = _action_class_reflection
-        acr and acr.to_node_stream
+        acr and acr.to_unbound_stream
       end
 
       def to_lower_unbound_action_stream  # :+#public-API
@@ -145,7 +145,7 @@ module Skylab::Brazen
 
       def to_intrinsic_unbound_action_stream
         acr = _action_class_reflection
-        acr and acr.to_node_stream
+        acr and acr.to_unbound_stream
       end
 
       def is_actionable
@@ -159,7 +159,7 @@ module Skylab::Brazen
       end
 
       def init_action_class_reflection_
-        has = const_defined? ACTIONS_CONST_, false  # #one
+        has = const_defined? ACTIONS_CONST, false  # #one
         if ! has
           h = entry_tree.instance_variable_get :@h
           if h.key? ACTIONS_DIR__ or h.key? ACTIONS_FILE__
@@ -172,7 +172,7 @@ module Skylab::Brazen
       end
 
       def __build_action_class_reflection
-        Child_Node_Index.new self, const_get( ACTIONS_CONST_, false )
+        Child_Node_Index.new self, const_get( ACTIONS_CONST, false )
       end
     end
 
@@ -205,7 +205,7 @@ module Skylab::Brazen
         Callback_::Stream.via_nonsparse_array @_down_a
       end
 
-      def to_node_stream
+      def to_unbound_stream
 
         @_did ||= _work
         Callback_::Stream.via_nonsparse_array @_all_a
@@ -254,7 +254,7 @@ module Skylab::Brazen
 
         if x.respond_to? :call
 
-          Proxies_::Proc_As::Unbound_Action.new x, i, @_mod, @_class
+          Home_.lib_.basic::Function::As::Unbound_Action.new x, i, @_mod, @_class
         end
       end
     end

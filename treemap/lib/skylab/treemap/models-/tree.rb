@@ -69,11 +69,11 @@ module Skylab::Treemap
 
         def __resolve_output_adapter
 
-          lib = Home_.lib_.brazen
+          _col = Home_.lib_.basic::Module::As::Collection[ Output_Adapters_ ]
 
-          oa = lib::Collection::Common_fuzzy_retrieve[
+          oa = Home_.lib_.brazen::Collection::Common_fuzzy_retrieve[
             qualified_knownness( :output_adapter ),
-            lib::Collection_Adapters::Module_as_Collection[ Output_Adapters_ ],
+            _col.method( :to_entity_stream ),
             & handle_event_selectively ]
 
           if oa

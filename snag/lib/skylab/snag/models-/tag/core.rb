@@ -14,7 +14,7 @@ module Skylab::Snag
         ].intern
       end
 
-      def interpret_for_mutation_session arg_st, & x_p  # :+#ACS-tenet-5
+      def interpret_for_component_mutation_session arg_st, & x_p  # [#br-089]:t6
 
         arg = Tag_::Actors_::Normalize_stem[ arg_st.gets_one, & x_p ]
         arg and begin
@@ -26,7 +26,7 @@ module Skylab::Snag
         :tag
       end
 
-      private :new  # :+#ACS-tenet-1
+      private :new  # [#br-089]:t1
     end  # >>
 
     HASHTAG_PREFIX_LENGTH___ = 1

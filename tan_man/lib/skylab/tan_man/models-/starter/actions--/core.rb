@@ -178,10 +178,9 @@ module Skylab::TanMan
 
     Build_collection__ = -> kr, & oes_p do
 
-      Brazen_::Collection_Adapters::Directory_as_Collection.new do | o |
+      Home_.lib_.system.filesystem.directory_as_collection do | o |
 
         o.directory_path = Starter_.path_for_directory_as_collection_
-        o.filesystem = Home_.lib_.system.filesystem
         o.flyweight_class = Starter_
         o.kernel = kr
         o.on_event_selectively = oes_p

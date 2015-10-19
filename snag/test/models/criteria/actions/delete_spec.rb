@@ -15,7 +15,7 @@ module Skylab::Snag::TestSupport
 
       _init_cc_via_path td.to_path
 
-      a = _common
+      o = _common
 
       expect_neutral_event :file_utils_mv_event,
         /\Amv \(pth "[^"]+"\) \(pth "[^"]+"\)\z/
@@ -25,8 +25,7 @@ module Skylab::Snag::TestSupport
       black_and_white( _ev ).should eql(
         'removed "zap-tango" from persisted criteria collection' )
 
-      1 == a.length or fail
-      a.first.natural_key_string.should eql 'zap-tango'
+      o.natural_key_string.should eql 'zap-tango'
     end
 
     it "backend - no" do
@@ -35,10 +34,12 @@ module Skylab::Snag::TestSupport
 
       x = _common
 
-      expect_neutral_event :entity_not_found,
+      expect_not_OK_event :entity_not_found,
         'persisted criteria collection does not have (val "zap-tango")'
 
-      x.should be_nil
+      expect_no_more_events
+
+      x.should eql false
     end
 
     def _init_cc_via_path path
@@ -55,7 +56,7 @@ module Skylab::Snag::TestSupport
     def _common
 
       @cc.edit(
-        :if_present,
+        :assuming, :exists,
         :via, :slug,
         :remove, :criteria, 'zap-tango',
         & handle_event_selectively )

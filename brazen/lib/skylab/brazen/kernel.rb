@@ -2,27 +2,32 @@ module Skylab::Brazen
 
   class Kernel  # [#015]
 
-    def initialize mod
+    def initialize mod=nil
 
-      @models_mod = mod.const_get :Models_, false
       @module = mod
-      @nm = nil
-      @silo_cache = -> do
-        x = Silo_Cache___.new @models_mod, self
-        @silo_cache = -> { x }
+
+      yield self if block_given?
+
+      @unbound_models ||= mod.const_get :Models_, false
+
+      @_name_function = nil
+
+      @_silo_cache = -> do
+        x = Silo_Cache___.new @unbound_models, self
+        @_silo_cache = -> { x }
         x
       end
     end
 
-    def members
-      [ :app_name, :bound_call_via_mutable_iambic, :debug_IO, :module, :silo ]
-    end
+    attr_reader(
+      :module,
+      :unbound_models,
+    )
 
-    def models_module
-      @models_mod
-    end
-
-    attr_reader :module
+    attr_writer(
+      :module,
+      :unbound_models,
+    )
 
     # ~ call exposures
 
@@ -70,13 +75,18 @@ module Skylab::Brazen
     end
 
     def app_name
-      ( if @nm
-        @nm
+
+      if @_name_function
+        @_name_function
+
       elsif @module.respond_to? :name_function
         @module.name_function
+
       else
-        @nm = Callback_::Name.via_module @module
-      end ).as_human
+        nf = Callback_::Name.via_module @module
+        @_name_function = nf
+        nf
+      end.as_human
     end
 
     def do_debug
@@ -115,12 +125,12 @@ module Skylab::Brazen
     end
 
     def unbound const_sym
-      @models_mod.const_get const_sym, false
+      @unbound_models.const_get const_sym, false
     end
 
     def to_unbound_action_stream
 
-      _to_model_stream.expand_by do | item |
+      to_unbound_stream.expand_by do | item |
         if item.respond_to? :to_upper_unbound_action_stream
           item.to_upper_unbound_action_stream
         else
@@ -143,16 +153,16 @@ module Skylab::Brazen
 
     def __default_upper_unbound_action_stream_via_item item  # experiment #open [#067]
 
-      box_mod = const_i_a = d = p = main = nil
+      box_mod = _const_sym_a = d = p = main = nil
 
       p = -> do
 
         box_mod = item::Actions
 
         if box_mod
-          const_i_a = box_mod.constants
-          const_i_a.sort!
-          d = const_i_a.length
+          _const_sym_a = box_mod.constants
+          _const_sym_a.sort!
+          d = _const_sym_a.length
         else
           d = 0
         end
@@ -172,7 +182,7 @@ module Skylab::Brazen
                 item
 
               else
-                Proxies_::Module_As::Unbound_Model.new item
+                Home_.lib_.basic::Module::As::Models::Unbound_Model.new item
 
               end
             end
@@ -181,7 +191,7 @@ module Skylab::Brazen
             break
           end
           d -= 1
-          unb = box_mod.const_get const_i_a.fetch d
+          unb = box_mod.const_get _const_sym_a.fetch d
 
           if unb.respond_to? :is_promoted
             if unb.is_promoted
@@ -211,38 +221,34 @@ module Skylab::Brazen
       cls.new self, & oes_p
     end
 
-    def to_node_stream
-      _to_model_stream
-    end
+    def to_unbound_stream
 
-  private
+      @_const_sym_a ||= __produce_sorted_const_sym_a
 
-    def _to_model_stream
-
-      @const_i_a ||= prdc_sorted_const_i_a
-
-      d = -1 ; last = @const_i_a.length - 1
+      d = -1 ; last = @_const_sym_a.length - 1
 
       Callback_.stream do
+
         while d < last
           d += 1
-          i = @const_i_a.fetch d
-          x = @models_mod.const_get i, false
+          sym = @_const_sym_a.fetch d
+          x = @unbound_models.const_get sym, false
 
           if x.respond_to? :name
             modish = x
             break
           end
 
-          modish = __try_convert_to_unbound_node_via_mixed x, i, @models_mod
+          modish = __try_convert_to_unbound_node_via_mixed x, sym, @unbound_models
           modish and break
         end
+
         modish
       end
     end
 
-    def prdc_sorted_const_i_a
-      i_a = @models_mod.constants
+    def __produce_sorted_const_sym_a
+      i_a = @unbound_models.constants
       i_a.sort!  # #note-35
       i_a
     end
@@ -251,7 +257,7 @@ module Skylab::Brazen
 
       if x.respond_to? :call
 
-        Proxies_::Proc_As::Unbound_Action.new x, i, mod, @module
+        Home_.lib_.basic::Function::As::Unbound_Action.new x, i, mod, @module
       end
     end
 
@@ -264,7 +270,7 @@ module Skylab::Brazen
 
     def silo_via_normal_stream st
 
-      x = @silo_cache[].__fetch_via_normal_identifier_component[ st.gets_one ]
+      x = @_silo_cache[].__fetch_via_normal_identifier_component[ st.gets_one ]
       if st.unparsed_exists
         x = x.silo_via_normal_stream st
       end
@@ -282,7 +288,7 @@ module Skylab::Brazen
 
       if id.is_resolved
 
-        @silo_cache[]._touch_via_silo_daemon_class_and_identifier[
+        @_silo_cache[]._touch_via_silo_daemon_class_and_identifier[
           id.value.const_get( SILO_DAEMON_CONST__, false ),
           id ]
       else
@@ -326,7 +332,7 @@ module Skylab::Brazen
 
           if cls
             id.bake node
-            x = @silo_cache[]._touch_via_silo_daemon_class_and_identifier[ cls, id ]
+            x = @_silo_cache[]._touch_via_silo_daemon_class_and_identifier[ cls, id ]
             break
           end
           mod_a = nil
@@ -386,8 +392,8 @@ module Skylab::Brazen
 
     def __some_modules_array_via_mod mod
 
-      if mod.respond_to? :to_node_stream
-        mod.to_node_stream.to_a
+      if mod.respond_to? :to_unbound_stream
+        mod.to_unbound_stream.to_a
       else
         box_mod = mod.const_get :Nodes, false
         box_mod.constants.map do |i|
@@ -398,7 +404,7 @@ module Skylab::Brazen
 
     class Silo_Cache___
 
-      def initialize models_mod, kernel
+      def initialize unbound_models, kernel
 
         cache_h = {}
 
@@ -408,7 +414,7 @@ module Skylab::Brazen
 
           cache_h.fetch sym do
 
-            unbound = models_mod.const_get const, false
+            unbound = unbound_models.const_get const, false
 
             x = unbound.const_get( SILO_DAEMON_CONST__, false ).
               new kernel, unbound  # two of #two

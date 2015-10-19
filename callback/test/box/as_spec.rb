@@ -1,32 +1,23 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Callback::TestSupport::Box
+module Skylab::Callback::TestSupport
 
-  describe "[ca] box struct" do
+  describe "[ca] box - as" do
 
     extend TS_
+    use :box_support
 
-    it "requires at least 1 entry" do
+    it "entity collection" do
 
-      Subject_[].new.to_struct.should eql false
+      _bx = subject_with_entries_ :a, :One, :b, :Two
 
-    end
+      _col = _bx.to_collection
 
-    memoize_subject do
+      st = _col.to_entity_stream
 
-      bx = Subject_[].new
-      bx.add :foo, :Foo
-      bx.add :bar, :Bar
-      bx.to_struct
-
-    end
-
-    it "looks like struct" do
-      subject.members.should eql [ :foo, :bar ]
-    end
-
-    it "does certain box-like things" do
-      subject.at( :bar, :foo ).should eql [ :Bar, :Foo]
+      st.gets.should eql :One
+      st.gets.should eql :Two
+      st.gets.should be_nil
     end
   end
 end

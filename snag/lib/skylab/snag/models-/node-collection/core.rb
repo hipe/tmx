@@ -51,11 +51,6 @@ module Skylab::Snag
           node_collection_via_upstream_identifier_( id, & oes_p )
       end
 
-      def __node__component_model
-
-        Models_::Node
-      end
-
       def expression_adapter_ modality_const
 
         NC_::Expression_Adapters.const_get modality_const, false
@@ -64,8 +59,12 @@ module Skylab::Snag
 
     def edit * x_a, & x_p
 
-      Home_.lib_.brazen::Autonomous_Component_System::
-         Mutation_Session.edit x_a, self, & x_p
+      ACS_[].edit x_a, self, & x_p
+    end
+
+    def __node__component_association
+      yield :can, :add
+      Models_::Node
     end
 
     module Expression_Adapters

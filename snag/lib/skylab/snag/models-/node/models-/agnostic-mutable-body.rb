@@ -8,17 +8,17 @@ module Skylab::Snag
         @_o_a = []
       end
 
-      def is_mutable
-        true
+      def prepend_component_ o, _ca, & _oes_p
+        @_o_a.unshift o
+        o
       end
 
-      def modality_const
-        NIL_
+      def append_component_ o, _ca, & _oes_p
+        @_o_a.push o
+        o
       end
 
-      def r_
-        0 ... 1
-      end
+      # remove component is etc
 
       def to_business_row_stream_
 
@@ -50,18 +50,16 @@ module Skylab::Snag
         Callback_::Stream.via_nonsparse_array @_o_a
       end
 
-      def __append__object_for_mutation_session o, & oes_p
-        @_o_a.push o
-        ACHIEVED_
+      def r_
+        0 ... 1
       end
 
-      def __prepend__object_for_mutation_session o, & oes_p
-        @_o_a.unshift o
-        ACHIEVED_
+      def is_mutable
+        true
       end
 
-      def remove_equivalent_object o, & oes_p
-        self._FUN
+      def modality_const
+        NIL_
       end
     end
   end

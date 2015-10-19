@@ -26,6 +26,18 @@ module Skylab::Callback::TestSupport
 
   define_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
 
+  module ModuleMethods
+
+    define_method :use, -> do
+      cache = {}
+      -> sym do
+        ( cache.fetch sym do
+          cache[ sym ] = TestSupport_.fancy_lookup sym, TS_
+        end )[ self ]
+      end
+    end.call
+  end
+
   module InstanceMethods
 
     def debug!

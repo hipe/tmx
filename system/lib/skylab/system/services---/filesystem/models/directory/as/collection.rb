@@ -1,6 +1,8 @@
-module Skylab::Brazen
+module Skylab::System
 
-  class Collection_Adapters::Directory_as_Collection
+  class Services___::Filesystem
+    # <-
+  class Models::Directory::As::Collection
 
     class << self
       def is_actionable
@@ -33,8 +35,7 @@ module Skylab::Brazen
 
     # ~~ create (by way of ACS)
 
-    def __add__object_for_mutation_session o, & x_p
-
+    def __add__component o, _ca, & x_p
       ok = __resolve_entry_name o, & x_p
       ok &&= __resolve_destination_directory( & x_p )
       ok && __finish_add( o, & x_p )
@@ -97,9 +98,10 @@ module Skylab::Brazen
 
     # ~~ delete (by way of ACS)
 
-    def __remove__object_for_mutation_session o, & x_p
+    def __remove__component o, _ca, & x_p
 
       # per ACS, assume that last we checked, item is present in collection
+      # this is only exploraory - we emit an event on success
 
       succ = Home_.lib_.basic::String.succ.with(
 
@@ -108,7 +110,7 @@ module Skylab::Brazen
 
         :template, '{{ sep if ID }}{{ ID }}{{ tail }}',
 
-        :sep, '.',
+        :sep, DOT_,
         :tail, '.previous',
       )
 
@@ -128,19 +130,42 @@ module Skylab::Brazen
         break
       end while nil
 
-      ok && o
+      if ok
+        ACS_[].entity_removed o, self, & x_p  # ..
+        o
+      else
+        ok
+      end
     end
 
-    def has_equivalent_item_for_mutation_session item
+    def expect_component_not__exists__ x, _ca, & oes_p
+
+      _found = first_equivalent_item x
+      if _found
+        ACS_[].entity_already_added x, self, & oes_p
+      else
+        true
+      end
+    end
+
+    def expect_component__exists__ x, _ca, & oes_p
+
+      _found = first_equivalent_item x
+      if _found
+        true
+      else
+        ACS_[].entity_not_found x, self, & oes_p
+      end
+    end
+
+    def first_equivalent_item item  # :+[#ba-051] universal collection operation
 
       s = item.natural_key_string
 
-      _x = to_entity_stream.detect do | item_ |
+      to_entity_stream.detect do | item_ |
 
         s == item_.natural_key_string
       end
-
-      _x ? true : false
     end
 
     # ~~ retrieve
@@ -202,7 +227,7 @@ module Skylab::Brazen
 
     def __whine_about_missing_directory path
 
-      _x = Home_.lib_.system.filesystem( :Existent_Directory ).against_path(
+      _x = Home_.services.filesystem( :Existent_Directory ).against_path(
         path,
         & @on_event_selectively
       )
@@ -250,23 +275,24 @@ module Skylab::Brazen
 
     def edit * x_a, & x_p
 
-      Home_::Autonomous_Component_System::
-          Mutation_Session.edit x_a, self, & x_p
+      ACS_[].edit x_a, self, & x_p
     end
 
-    def mutable_body_for_mutation_session
-      self
-    end
+    def result_for_component_mutation_session_when_changed o, & _
 
-    def receive_changed_during_mutation_session & x_p
-
-      ACHIEVED_
+      o.last_delivery_result
     end
 
     # :+#hook-out: `description_under`
 
     # ~
 
+    ACS_ = -> do
+      Home_.lib_.brazen::Autonomous_Component_System
+    end
+
     MONADIC_TRUTH_ = -> _ { true }
+  end
+# ->
   end
 end

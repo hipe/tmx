@@ -68,36 +68,6 @@ module Skylab::Snag
 
     class << self
 
-      def edit_entity * x_a, & x_p  # :+#ACS-tenet-2
-
-        Home_.lib_.brazen::Autonomous_Component_System::
-            Mutation_Session.create x_a, self, & x_p
-      end
-
-      # ~ the associations
-
-      def __suffix__component_model  # :+#ACS-tenet-7
-        NI_::Models_::Suffix
-      end
-
-      define_method :__integer__component_model,
-
-        # :+#ACS-tenet-4
-        # a dedicated class for this association seems overkill when
-        # all we want is to effect the valid subset of all integers:
-
-        ( Callback_.memoize do
-
-          _n11n = Home_.lib_.basic::Number.normalization.new_with(
-            :minimum, 1,
-            :number_set, :integer
-          )
-
-          Argument_interpreter_via_normalization_[ _n11n ]
-        end )
-
-      # ~ :+#ACS-tenet-8
-
       # parsing the user value is like parsing "byte upstream" (below) but:
       #   • plus error reporting -AND-
       #   • minus the recognition of the open and close sequence
@@ -139,6 +109,11 @@ module Skylab::Snag
         new x, x_
       end
 
+      def edit_entity * x_a, & x_p
+
+        ACS_[].create x_a, new, & x_p
+      end
+
       # ~ (for existing entities)
 
       def express_into_under_of_ y, expag, id
@@ -158,7 +133,7 @@ module Skylab::Snag
         y << "#{ OPEN_SEQUENCE__ }#{ _s }#{ _s_ }#{ CLOSE_SEQUENCE__ }"
       end
 
-      private :new  # :+#ACS-tenet-1
+      private :new
     end  # >>
 
     Parse__ = ::Module.new
@@ -217,6 +192,8 @@ module Skylab::Snag
       end
     end  # >>
 
+    # ~ initialization & related
+
     def reinitialize suffix_o=nil, d=nil
 
       @suffix = suffix_o
@@ -237,7 +214,45 @@ module Skylab::Snag
       NIL_
     end
 
-    attr_reader :suffix, :to_i
+    # ~ ACS for creation & editing
+
+    def __suffix__component_association
+
+      yield :can, :set
+
+      NI_::Models_::Suffix
+    end
+
+    def __integer__component_association
+
+      yield :can, :set
+      yield :stored_in_ivar, :@to_i
+
+      Integer_component_model___[]
+    end
+
+    Integer_component_model___ = Callback_.memoize do
+
+      # a dedicated class for this component association is overkill when
+      # all we want is to effect the valid subset of all integers
+      # ( but #open :+[#ba-050] )
+
+      Home_.lib_.basic::Number.normalization.new_with(
+        :minimum, 1,
+        :number_set, :integer
+
+      ).to_component_argument_interpreter
+    end
+
+    def __set__component x, ca, & _
+
+      instance_variable_set ca.name.as_ivar, x
+      ACHIEVED_
+    end
+
+    # HERE
+
+    # ~ outward reflection
 
     def description_under expag
 
@@ -316,6 +331,11 @@ module Skylab::Snag
     end
 
     # ~ end suffixes
+
+    attr_reader(
+      :suffix,
+      :to_i,
+    )
 
     include Expression_Methods_
 

@@ -4,8 +4,6 @@ module Skylab::System
 
   class Services___::Filesystem
 
-    Models_ = ::Module.new
-
     class Models_::Tmpdir < ::Pathname  # (implementd as a frozen, dupable session)
 
       class << self

@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::Node
 
-    class Actions::Close < Common_Action
+    class Actions::Close < Common_Action_
 
       edit_entity_class(
 
@@ -23,10 +23,10 @@ module Skylab::Snag
 
         _ok = @node.edit(
 
-          :if_present,
+          :if, :present,
             :remove, :tag, :open,
 
-          :unless_present,
+          :if, :not, :present,
             :prepend, :tag, :done,
 
           & handle_event_selectively )

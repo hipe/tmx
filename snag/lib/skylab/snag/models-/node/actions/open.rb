@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::Node
 
-    class Actions::Create < Common_Action
+    class Actions::Create < Common_Action_
 
       edit_entity_class(
 
@@ -19,18 +19,16 @@ module Skylab::Snag
 
         bx = @argument_box
 
-        a = @node_collection.edit(
+        @node_collection.edit(
 
           :using, bx,
           :add, :node,
             :append, :message, bx.fetch( :message ),
           & handle_event_selectively )
-
-        a && a.fetch( 0 )
       end
     end
 
-    class Actions::Open < Common_Action  # egads as long as it is found here :+#stowaway
+    class Actions::Open < Common_Action_  # egads as long as it is found here :+#stowaway
 
       edit_entity_class(
 
@@ -49,15 +47,13 @@ module Skylab::Snag
 
         bx = @argument_box
 
-        a = @node_collection.edit(
+        @node_collection.edit(
 
           :using, bx,
           :add, :node,
             :append, :tag, :open,
             :append, :message, bx.fetch( :message ),
           & handle_event_selectively )
-
-        a && a.fetch( 0 )
       end
 
       Try_to_reappropriate = -> node_, sess, & x_p do

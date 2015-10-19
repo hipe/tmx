@@ -1,3 +1,4 @@
+[#120] #open extensible component modifiers
 [#119] #open get [fm] out of test (see)
 [#118]       do we want the ability to have a model-less-action? for now, no
 [#117] #open we might want top invocation to be able to emit events with
@@ -36,9 +37,9 @@
 [#087]       #track similar normalization logics (this might be a redundant tracker)
 [#086]       #track cases where failure is "fuzzy" (i.e non-atomic),
                ignored for the greater good, for usability
-[#085]       [ module as model ]
+[#085] #hole (#moved-to: [#ba-053])
 [#084]       :+#wishlist a `flag` meta-meta prperty
-[#083]       use blocks as selective event receiver (optionally) for proc as action
+[#083] #hole (#moved-to: [#ba-052])
              ( #was: #done workspace `init` action should not default to '.' in API )
 [#082]       #track meta-meta-property candidates (list, enum etc)
 [#081]       #track experimental extensions to Actor

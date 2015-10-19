@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::Tag
 
-    Tag_Action__ = Home_::Models_::Node::Common_Action  # stowaway
+    Tag_Action__ = Home_::Models_::Node::Common_Action_  # stowaway
 
     Actions = ::Module.new
 
@@ -52,7 +52,7 @@ module Skylab::Snag
 
         _ok = @node.edit(
 
-          :unless_present,
+          :assuming, :absent,
 
           ( h[ :prepend ] ? :prepend : :append ),
 
@@ -87,8 +87,8 @@ module Skylab::Snag
         _h = @argument_box.h_
 
         _ok = @node.edit(
-          :if_present,
-          :remove, :tag, _h[ :tag ],
+          :assuming, :present,
+          :remove, :tag, _h.fetch( :tag ),
           & handle_event_selectively )
 
         _ok && persist_node_

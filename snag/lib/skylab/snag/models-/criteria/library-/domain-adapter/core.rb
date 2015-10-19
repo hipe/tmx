@@ -13,7 +13,7 @@ module Skylab::Snag
           def new_via_kernel_and_NLP_const kr, const
 
             x = new kr
-            mod = kr.models_module
+            mod = kr.unbound_models
 
             mod.constants.each do | const_ |
 

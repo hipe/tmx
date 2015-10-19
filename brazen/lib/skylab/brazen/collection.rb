@@ -161,72 +161,100 @@ module Skylab::Brazen
 
     class Common_fuzzy_retrieve
 
-      name_map = -> o do
-        o.name.as_slug
+      # (this node is an interesting case study)
+
+      class << self
+
+        def _same kn, stream_builder, & oes_p
+          new(
+            kn,
+            stream_builder,
+            -> o do
+              o.name.as_slug
+            end,
+            -> o do
+              o.dup  # flyweights
+            end,
+            & oes_p
+          ).execute
+        end
+
+        alias_method :[], :_same
+        alias_method :call, :_same
+      end  # >>
+
+      def initialize kn=nil, sb=nil, nm=nil, fm=nil, & oes_p
+
+        @found_map = fm
+        @name_map = nm
+        @on_event_selectively = oes_p
+        @stream_builder = sb
+        @qualified_knownness = kn
       end
 
-      p = -> trio, col, & oes_p do
+      attr_writer(
+        :found_map,
+        :name_map,
+        :on_event_selectively,
+        :qualified_knownness,
+        :stream_builder,
+      )
 
-        x = trio.value_x
+      def execute
+
+        x = @qualified_knownness.value_x
 
         if x.respond_to? :id2name
           self._DO_ME_exact_match
         else
 
-          _st = col.to_entity_stream
-          _lib = Home_.lib_.basic::Fuzzy
-
-          o_a = _lib.reduce_to_array_stream_against_string(
-            _st,
+          a = Home_.lib_.basic::Fuzzy.reduce_to_array_stream_against_string(
+            @stream_builder.call,
             x,
-            name_map,
-            -> ent do
-              ent.dup
-            end )
+            @name_map,
+            @found_map,
+          )
 
-          case 1 <=> o_a.length
+          case 1 <=> a.length
           when 0
-            o_a.fetch 0
+            a.fetch 0
 
           when 1
-            new( col, name_map ).__not_found trio, & oes_p
+            __not_found
 
           when -1
-            new( col, name_map ).__ambiguous o_a, trio, & oes_p
+            __ambiguous a
           end
         end
       end
 
-      define_singleton_method :call, p
-      define_singleton_method :[], p
+      def __ambiguous a
 
-      def initialize col, p
-        @_col = col
-        @_name_map = p
-      end
-
-      def __ambiguous o_a, trio, & oes_p
-
-        oes_p.call :error, :ambiguous_property do
+        @on_event_selectively.call :error, :ambiguous_property do
           Home_::Property.build_ambiguous_property_event(
-            o_a,
-            trio.value_x,
-            trio.name )
+            a,
+            @qualified_knownness.value_x,
+            @qualified_knownness.name,
+          )
         end
       end
 
-      def __not_found trio, & oes_p
+      def __not_found
 
-        oes_p.call :error, :extra_properties do
+        @on_event_selectively.call :error, :extra_properties do
 
-          _did_you_mean_s_a = @_col.to_entity_stream.map_by do | ent |
-            ent.name.as_slug
+          kn = @qualified_knownness
+          name_map = @name_map
+          _st = @stream_builder.call
+
+          _did_you_mean_s_a = _st.map_by do | ent |
+            name_map[ ent ]
           end.to_a
 
           Home_::Property.build_extra_values_event(
-            [ trio.value_x ],
+            [ kn.value_x ],
             _did_you_mean_s_a,
-            trio.name.as_human )
+            kn.name.as_human )
         end
       end
     end

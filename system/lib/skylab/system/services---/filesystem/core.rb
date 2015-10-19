@@ -54,7 +54,19 @@ module Skylab::System
       FS_::Bridges_::Path_Tools
     end
 
-    # ~ model exposures ; ## ~~ tmpdir
+    # ~ model exposures
+
+    ## ~~ dir as collection
+
+    def directory_as_collection & build
+
+      FS_::Models::Directory::As::Collection.new do | o |
+        o.filesystem = self  # as a default
+        build[ o ]
+      end
+    end
+
+    ## ~~ tmpdir
 
     def tmpdir_path
       @__tmpdir_path ||= Home_.lib_.tmpdir

@@ -35,6 +35,10 @@ module Skylab::Basic  # introduction at [#020]
     end
   end  # >>
 
+  ACS_ = -> do
+    Home_.lib_.brazen::Autonomous_Component_System
+  end
+
   Callback_ = ::Skylab::Callback
 
   Default_property_instance__ = Callback_.memoize do
@@ -191,6 +195,7 @@ module Skylab::Basic  # introduction at [#020]
 
   ACHIEVED_ = true
   CLI = nil  # for host
+  CONST_SEP_ = '::'.freeze
   Autoloader_ = Callback_::Autoloader
   Home_ = self
   EMPTY_A_ = [].freeze
