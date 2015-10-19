@@ -183,7 +183,12 @@ module Skylab::BeautySalon
 
       def initialize x
         super
-        @work_dir = '.search-and-replace'
+
+        # something somewhere doesn't like a relative path for the below.
+        # ideally, relative paths would "just work" for the rest of the
+        # system just like abspaths do, so this is a workaround for now
+
+        @work_dir = ::File.join ::Dir.pwd, '.search-and-replace'
       end
 
       def prepare_for_focus

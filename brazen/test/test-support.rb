@@ -106,8 +106,11 @@ module Skylab::Brazen::TestSupport
     end
 
     Tmpdir = memoize.call do
+
       sys = Home_::LIB_.system
-      _path = sys.defaults.dev_tmpdir_pathname.join( 'brzn' ).to_path
+
+      _path = ::File.join sys.defaults.dev_tmpdir_path, 'brzn'
+
       sys.filesystem.tmpdir :path, _path
     end
   end

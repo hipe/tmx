@@ -6,8 +6,8 @@ module Skylab::CodeMolester
 
   class << self
 
-    def cache_pathname
-      Home_.lib_.system.defaults.cache_pathname
+    def cache_path
+      Home_.lib_.existent_cache_dir
     end
 
     def lib_

@@ -35,17 +35,12 @@ module Skylab::CodeMolester
 
     Brazen = sidesys[ :Brazen ]
 
-    Cache_pathname = _memoize do
-
-      module Home_::Cache
-
-        _p = Home_.lib_.system.filesystem.cache.cache_pathname_proc_via_module(
-          self, :abbrev, 'cm' )
-
-        define_singleton_method :pathname, _p
-
-        self
-      end.pathname
+    Existent_cache_dir = _memoize do
+      path = ::File.join System[].defaults.cache_path, '[cm]'
+      if ! ::File.exist? path
+        ::Dir.mkdir path
+      end
+      path
     end
 
     Human = sidesys[ :Human ]

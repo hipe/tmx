@@ -22,10 +22,11 @@ module Skylab::BeautySalon::TestSupport
 
       ev = expect_not_OK_event :missing_function_definitions
 
-      black_and_white( ev ).should eql(
-        "replace error: 'well_well_well' and 'nope' are missing #{
+      black_and_white( ev ).should match(
+        %r(\Areplace error: 'well_well_well' and 'nope' are missing #{
          }the expected files #{
-          }«.search-and-replace/functions/{well-well-well.rb, nope.rb}»" )
+          }«.*search-and-replace/functions/\{well-well-well\.rb, nope\.rb\}»\z)
+      )
 
       expect_failed
     end

@@ -101,7 +101,8 @@ module Skylab::Snag
 
         o.tmpdir_path ::File.join(
           Home_.lib_.system.defaults.dev_tmpdir_path,
-          'sn0g' )
+          '[sg]',
+        )
 
         o.create_at_most_N_directories 2  # etc
 

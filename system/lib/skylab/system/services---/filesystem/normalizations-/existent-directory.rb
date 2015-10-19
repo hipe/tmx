@@ -201,16 +201,27 @@ module Skylab::System
           )
         end
 
-        d = if @_is_dry_run
-          0
+        if @_is_dry_run
+          ok = true
         else
-          @filesystem.mkdir path_  # result is exitstatus
+          ok = @filesystem.mkdir_p path_ do | * i_a, & ev_p |
+            if NORMAL_SIGNATURE__ == i_a
+              # ignore these. we emitted our own above.
+              # this is too implementation specific to emit here (for now)
+              ACHIEVED_
+            else
+              self._COVER_ME
+            end
+          end
         end
-
-        d.zero? or self._COVER_ME  # probably never gets here
-
-        _build_normal_result
+        if ok
+          _build_normal_result
+        else
+          ok
+        end
       end
+
+      NORMAL_SIGNATURE__ = [ :info, :mkdir_p ]
 
       # ~ 2 of 2 branches
 

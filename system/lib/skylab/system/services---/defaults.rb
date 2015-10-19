@@ -9,13 +9,11 @@ module Skylab::System
         @__system_services = svx
       end
 
-      Home_.lib_.properties_stack_frame self,
-
-        :memoized, :inline_method, :cache_pathname, -> do
-          ::Pathname.new cache_path
-        end,
+      Home_.lib_.properties_stack_frame( self,
 
         :memoized, :inline_method, :cache_path, -> do
+
+          # contrast with the tmp path, the difference is perhaps arbitrary
 
           fs = @__system_services.filesystem
 
@@ -25,32 +23,26 @@ module Skylab::System
             fs.mkdir dir, 0766  # same perms as `TemporaryItems`
           end
 
-          dir
+          dir.freeze
         end,
-
-
-        # ~ tmpdir paths
 
         :memoized, :inline_method, :dev_tmpdir_path, -> do
-          dev_tmpdir_pathname.to_path.freeze
+
+          # sidesystems cannot assume that this directory *itself* exists,
+          # but they must be able to assume that its *dirname* *does* exist.
+          # we place the responsibility of ensuring *that* directory's
+          # existence as outside of this scope (for now).
+          #
+          # permissions are a whole other issue that we sidestep dealing
+          # with for now, assuming that the default permissions mask for
+          # mkdir is the permissions of its parent, and the permissions of
+          # the parent are outside our scope as stated.
+
+          ::File.join( ::ENV.fetch( 'HOME' ), 'tmp', '__tmx_dev_tmpdir__' ).freeze
         end,
+      )
 
-        :memoized, :inline_method, :dev_tmpdir_pathname, -> do
-          ::Pathname.new( ::File.join ::ENV.fetch( 'HOME' ), 'tmp' )
-          # [#128] the devil's work
-        end,
-
-
-        # ~ doc-test related paths (for dev & hax)
-
-        :memoized, :proc, :doc_test_manifest_file, -> do
-          'doc-test.manifest'.freeze
-        end
-
-
-
-
-        CACHE_FILE__ = 'sl.skylab'.freeze  # covered
+      CACHE_FILE__ = 'sl.skylab'.freeze  # covered
 
       # <-
   end

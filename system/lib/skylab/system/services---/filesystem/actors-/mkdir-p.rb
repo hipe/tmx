@@ -73,13 +73,17 @@ module Skylab::System
               redo
             end
           else
-            self._COVER_ME_relative_path
+            raise ::ArgumentError, __say_relative( path )
           end
         end while nil
 
         @_existant_directory_filehandle = _lock_directory try_path
         @_stack = stack
         NIL_
+      end
+
+      def __say_relative path
+        "realtive path - #{ path }"
       end
 
       def __execute_stack

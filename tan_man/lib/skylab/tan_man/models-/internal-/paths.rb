@@ -96,7 +96,7 @@ module Skylab::TanMan
         kn = Home_.lib_.system.filesystem( :Existent_Directory ).with(
           :path, _app_tmpdir_path,
           :create_if_not_exist,
-          :max_mkdirs, 1  # you may make the [tm] directory only.
+          :max_mkdirs, 2   # you can make __tmx__ and you can make this path
 
         ) do | * i_a, & ev_p |
 
@@ -135,7 +135,7 @@ module Skylab::TanMan
 
         lib = Home_.lib_
 
-        lib.dev_tmpdir_pathname.join( lib.tmpdir_stem ).to_path
+        ::File.join lib.dev_tmpdir_path, lib.tmpdir_stem
 
       end
     end

@@ -90,10 +90,6 @@ module Skylab::Snag
 
     System_lib___ = sidesys[ :System ]
 
-    Tmpdir_pathname = -> do
-      System[].filesystem.tmpdir_pathname
-    end
-
     class << self
       attr_reader :instance
     end  # >>

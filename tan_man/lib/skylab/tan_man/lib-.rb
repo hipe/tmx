@@ -16,8 +16,8 @@ module Skylab::TanMan
       Callback_::Name.lib.constantize x
     end
 
-    Dev_tmpdir_pathname = -> do
-      System[].defaults.dev_tmpdir_pathname
+    Dev_tmpdir_path = -> do
+      System[].defaults.dev_tmpdir_path
     end
 
     Ellipsify = -> s do

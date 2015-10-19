@@ -13,8 +13,8 @@ module Skylab::System::TestSupport
       if a.length.zero?
         subject_front[]
       else
-        _p = subject_front[].cache_pathname_proc_via_module( * a )
-        a.first.define_singleton_method :cache_pathname, _p
+        _p = subject_front[].cache_path_proc_via_module( * a )
+        a.first.define_singleton_method :cache_path, _p
         nil
       end
     end
@@ -47,14 +47,14 @@ module Skylab::System::TestSupport
         end
       end
 
-      it "the module now responds to `cache_pathname`" do
-        Wiz_Waz.should be_respond_to :cache_pathname
+      it "the module now responds to `cache_path`" do
+        Wiz_Waz.should be_respond_to :cache_path
       end
 
       it "but if you try to access this pn, it fails bc no parent complies" do
         _rx = %r(\Anone of the \d+ parent module\(s\) responded to `cac)
         -> do
-          Wiz_Waz.cache_pathname
+          Wiz_Waz.cache_path
         end.should raise_error _rx
       end
     end
@@ -63,7 +63,7 @@ module Skylab::System::TestSupport
 
       before :all do
         module Wiff_Waff
-          def self.cache_pathname
+          def self.cache_path
             TMPDIR_PATH__
           end
 
@@ -77,7 +77,7 @@ module Skylab::System::TestSupport
         tmpdir_pn.prepare
         _rx = %r(\Afilename contains invalid characters - ['"]zoipey)
         -> do
-          Wiff_Waff::Weezy_Deezy.cache_pathname
+          Wiff_Waff::Weezy_Deezy.cache_path
         end.should raise_error ::ArgumentError, _rx
       end
     end
@@ -86,7 +86,7 @@ module Skylab::System::TestSupport
 
       before :all do
         module Woo_Wee
-          def self.cache_pathname
+          def self.cache_path
             TMPDIR_PATH__
           end
 
@@ -103,15 +103,17 @@ module Skylab::System::TestSupport
         end
         _rx = %r(No such file or directory .+/woo-wee\z)
         -> do
-          Woo_Wee::BarBaz.cache_pathname
+          Woo_Wee::BarBaz.cache_path
         end.should raise_error ::Errno::ENOENT, _rx
       end
 
       it "if parent directory exists, ok have at it #after-above" do
         pn = tmpdir_pn
         pn.prepare
-        pn_ = Woo_Wee::BarBaz.cache_pathname
-        pn_.to_path.should match %r(\[sy\]/woo-wee/bar-baz\z)
+
+        _path = Woo_Wee::BarBaz.cache_path
+        _path.should match %r(\[sy\]/woo-wee/bar-baz\z)
+
         pn.should be_exist
       end
     end
@@ -120,7 +122,7 @@ module Skylab::System::TestSupport
 
       before :all do
         module Hiff_Heff
-          def self.cache_pathname
+          def self.cache_path
             TMPDIR_PATH__
           end
 
@@ -131,11 +133,14 @@ module Skylab::System::TestSupport
       end
 
       it "ok" do
+
         tmpdir_pn.prepare
-        pn = Hiff_Heff::Wip_Nizzle.cache_pathname
-        pn.to_path.match( %r([^/]{4}/[^/]+/[^/]+\z) )[ 0 ].
+
+        path = Hiff_Heff::Wip_Nizzle.cache_path
+        path.match( %r([^/]{4}/[^/]+/[^/]+\z) )[ 0 ].
           should eql "[sy]/woo-wee/zee_dee-doo-789"
-        pn.should be_exist
+
+        ::File.exist?( path ).should eql true
       end
     end
 

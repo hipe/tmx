@@ -17,7 +17,7 @@ module Skylab::TestSupport::TestSupport::Models
 
       sys = Home_.lib_.system
 
-      _path = sys.defaults.dev_tmpdir_pathname.join( '[ts]' ).to_path
+      _path = ::File.join sys.defaults.dev_tmpdir_path, '[ts]'
 
       tmpdir = sys.filesystem.tmpdir :path, _path,
         :be_verbose, do_debug, :debug_IO, debug_IO

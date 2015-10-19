@@ -6,27 +6,31 @@ module Skylab::System::TestSupport
 
     extend TS_
 
-    it "dev_tmpdir_pathname (memoized)" do
+    it "dev_tmpdir_path is trueish" do
 
-      oid1 = _subject.dev_tmpdir_pathname
-      oid2 = _subject.dev_tmpdir_pathname
-      oid1.should eql oid2
+      _subject.dev_tmpdir_path or fail
     end
 
-    it "dev_tmpdir_path" do
+    it "dev_tmpdir_path is memoized" do
 
-      _build_it_manually = _subject.dev_tmpdir_pathname.to_path
-      _subject.dev_tmpdir_path.should eql _build_it_manually
+      p1 = _subject.dev_tmpdir_path
+      p2 = _subject.dev_tmpdir_path
+      p1.object_id.should eql p2.object_id
     end
 
-    it "cache_pathname (#fragile)" do
+    it "cache_path (#fragile)" do
 
-      _subject  # sic
+      path = _subject.cache_path
 
-      _fn = Home_::Services___::Defaults::CACHE_FILE__
+      foo = "FOO"
 
-      _subject.cache_pathname.join( "FOO" ).to_path.
-        should be_include( "#{ _fn }/FOO" )
+      _target = ::File.join(
+        Home_::Services___::Defaults::CACHE_FILE__,
+        foo
+      )
+      _actual = ::File.join path, foo
+
+      _actual.should be_include _target
     end
 
     def _subject

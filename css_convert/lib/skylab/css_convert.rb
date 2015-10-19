@@ -29,8 +29,18 @@ module Skylab::CSS_Convert
 
     Flex_to_treetop = sidesys[ :Flex2Treetop ]
 
-    My_tmpdir = Callback_.memoize do
-      ::File.join System[].defaults.dev_tmpdir_path, 'css-cnvrt'
+    My_sufficiently_existent_tmpdir = Callback_.memoize do
+
+      dirname = Home_.lib_.system.defaults.dev_tmpdir_path
+      if ! ::File.exist? dirname
+        ::Dir.mkdir dirname
+      end
+
+      path = ::File.join dirname, '[cc]'
+      if ! ::File.exist? path
+        ::Dir.mkdir path
+      end
+      path
     end
 
     Path_tools = -> do
@@ -78,7 +88,7 @@ module Skylab::CSS_Convert
     param :tmpdir_absolute, :accessor do
 
       default do
-        ::File.join Home_.lib_.system.defaults.dev_tmpdir_path, 'css-cnvrt'
+        Home_.lib_.my_sufficiently_existent_tmpdir
       end
     end
 

@@ -20,8 +20,7 @@ module Skylab::System
     # ~ bridge exposures
 
     def cache
-
-      FS_::Bridges_::Cache
+      @___cache_bridge ||= FS_::Bridges_::Cache.new self
     end
 
     def file_utils_controller & x_p

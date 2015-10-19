@@ -312,6 +312,11 @@ module Skylab::TestSupport
       end
     end
 
+    s = 'doc-test.manifest'.freeze
+    Manifest_filename_ = -> do
+      s
+    end
+
     Brazen_ = Home_.lib_.brazen
     BLANK_RX_ = /\A[[:space:]]*\z/
     DocTest_ = self

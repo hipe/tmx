@@ -63,56 +63,82 @@ module Skylab::CodeMolester
         # *and* the output path (the generated parser class)
         # will be derived from the above.
 
+      cache_path = LIB_.existent_cache_dir
       compile_parser = nil
+      fs = ::File
+
       load_parser_class = -> do
-        o_pn = LIB_.cache_pathname.join Path_part__[]
-        if o_pn.exist?
-          debug and y << "using cached parser - #{ o_pn }"
+
+        path = ::File.join cache_path, Path_part__[]
+
+        if fs.exist? path
+          debug and y << "using cached parser - #{ path }"
         else
-          compile_parser[ o_pn ] or break  # (result is num bytes)
+          compile_parser[ path ] or break  # (result is num bytes)
         end
+
         Home_::Library_.touch :Treetop  # load it late, close to where it is used
-        load o_pn.to_s
+
+        load path
+
         parent_module.const_defined? const, false or fail "we expected but #{
-          }did not see #{ parent_module }::#{ const } in #{ o_pn }"
+          }did not see #{ parent_module }::#{ const } in #{ path }"
+
         parent_module.const_get const, false
       end
 
       mkdir_p = nil
-      compile_parser = -> o_pn do
+      compile_parser = -> path do
 
         i_pn = Home_.dir_pathname.join( Path_part__[] ).  # hack around
           dirname.join( 'grammar.treetop' )                  #   'version-'
         cmp = Home_::Library_::Treetop::Compiler::GrammarCompiler.new
-        ovr = o_pn.exist?  # even if we never overwrite we don't know that here.
+
+        ovr = fs.exist? path  # even if we never overwrite we don't know that here.
+
         if debug
           y << "#{ ovr ? 'overwriting existing' : 'creating new' } #{
-            }generated treetop grammar parser class file - #{ o_pn }"
+            }generated treetop grammar parser class file - #{ path }"
         end
-        o_pn.dirname.tap do |d_pn|
-          if ! d_pn.exist?
-            mkdir_p[ d_pn ]  # result is an array of the paths created
-          end
+
+        dirname = ::File.dirname path
+        if ! fs.exist? dirname
+          mkdir_p[ dirname ]  # result is an array of the paths created
         end
-        bts = cmp.compile i_pn.to_s, o_pn.to_s
-        debug and y << "#{ ovr ? 'overwrote.' : 'created.' } (#{ bts } bytes)"
-        bts
+
+        d = cmp.compile i_pn.to_s, path
+        if debug
+          y << "#{ ovr ? 'overwrote.' : 'created.' } (#{ d } bytes)"
+        end
+        d
       end
 
       num_occurences = nil
-      mkdir_p = -> d_pn do
+
+      mkdir_p = -> dirname do
+
         # the number of dirs you have to create should not exceed the
         # number of dirs present in `path_part`
-        LIB_.cache_pathname.exist? or fail "sanity"
-        relpath = d_pn.relative_path_from LIB_.cache_pathname
-        a = num_occurences[ relpath.to_s, '/' ]
-        b = num_occurences[ Path_part__[], '/' ]
+
+        if ! fs.exist? cache_path
+          self._COVER_ME
+        end
+
+        relpath = ::Pathname.new( dirname ).relative_path_from(
+          ::Pathname.new cache_path
+        ).to_path
+
+        a = num_occurences[ relpath, ::File::SEPARATOR ]
+
+        b = num_occurences[ Path_part__[], ::File::SEPARATOR ]
+
         ( a < b ) or fail "sanity - #{ a } dirs to create for #{ b - 1 }"
 
         LIB_.system.filesystem.file_utils_controller.new_via do | msg |
 
           debug and y << msg
-        end.mkdir_p d_pn.to_s
+
+        end.mkdir_p dirname
       end
 
       num_occurences = -> str, substr do

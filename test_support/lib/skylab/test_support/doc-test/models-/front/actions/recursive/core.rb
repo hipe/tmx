@@ -96,8 +96,7 @@ module Skylab::TestSupport
 
           via_properties_init_ivars
 
-          o = Home_.lib_.system.defaults
-          @doc_test_files_file = o.doc_test_manifest_file
+          @doc_test_files_file = Manifest_filename_[]
 
           pn = ::Pathname.new @path
           if pn.relative?

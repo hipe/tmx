@@ -12,9 +12,9 @@ module Skylab::CSS_Convert
 
     def produce_parser_class
 
-      dir_o = DIR_N11N__.against_path @out_dir_head do | *, & ev_p |
-        @delegate.receive_event ev_p[]
-        UNABLE_
+      dir_o = DIR_N11N__.against_path @out_dir_head do | * _i_a, & ev_p |
+
+        self._COVER_ME  # used to use @delegate
       end
 
       if dir_o

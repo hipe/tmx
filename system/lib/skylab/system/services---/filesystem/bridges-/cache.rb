@@ -4,50 +4,50 @@ module Skylab::System
 
     class Bridges_::Cache
 
-    # `cache_pathname_proc_via_module` -
+    # `cache_path_proc_via_module` -
     #
-    # given a module Foo that responds to `cache_pathname`
+    # given a module Foo that responds to `cache_path`
     # (you must use this name (for now), for any parent module whose cache
-    # dir pathname you want to be inherited by nested modules), and given
+    # dir path you want to be inherited by nested modules), and given
     # nested module Foo::Bar, if you call e.g:
     #
-    #    Subject_[].cache_pathname_proc_via_module Foo::Bar
+    #    Subject_[].cache_path_proc_via_module Foo::Bar
     #
-    # the result is a function that will result in a memoized pathname that
+    # the result is a function that will result in a memoized path that
     # represents the cache directory for you to use based on appending an
-    # an inferred (or indicatded) filename to the parent node's pathname.
+    # an inferred (or indicatded) filename to the parent node's path.
     #
     # the first this generated proc is called the directory will be created if
-    # necessary, and it is required that the `cache_pathname` of the parent
+    # necessary, and it is required that the `cache_path` of the parent
     # module reflect a directory that exists. any such created directory
     # will use the same mode (permission set) as this parent directory.
     #
-    # some top module will need to define `cache_pathname` for itself,
+    # some top module will need to define `cache_path` for itself,
     # then a nested module can use the topic:
     #
     #     module Foo
-    #       def self.cache_pathname
-    #         @pn
+    #       def self.cache_path
+    #         @path
     #       end
-    #       @pn = ::Pathname.new '/var/xkcd/foo'
+    #       @path = '/var/xkcd/foo'
     #     end
     #
     #     module Foo::BarBaz
-    #       define_singleton_method :cache_pathname, &
-    #         Subject_[].cache_pathname_proc_via_module( self )
+    #       define_singleton_method :cache_path, &
+    #         Subject_[].cache_path_proc_via_module( self )
     #     end
     #
-    # the nested client module builds its `cache_pathname` isomoprhically:
+    # the nested client module builds its `cache_path` isomoprhically:
     #
-    #     Foo::BarBaz.cache_pathname  # => #<Pathname:/var/xkcd/foo/bar-baz>
+    #     Foo::BarBaz.cache_path  # => "/var/xkcd/foo/bar-baz"
     #
     #     # which exists and has the same permissions as the parent diretory.
     #
     # Some gotchas so far:
     #
     #   + the directory is created (if necessary) *lazily* the first time
-    #     `cache_pathname` is called for that module, hence do not expect
-    #     the directory to exist if you never called `cache_pathname` for
+    #     `cache_path` is called for that module, hence do not expect
+    #     the directory to exist if you never called `cache_path` for
     #     that module.
     #
     #   + the fact that it is memoized means that this check for the
@@ -62,55 +62,64 @@ module Skylab::System
     #     from the const name ("FooBar" in the example above.
     #     for a different filename you can use the `abbrev` iambic option:
     #
-    #         p = Subject_[].cache_pathname_proc_via_module self,
+    #         p = Subject_[].cache_path_proc_via_module self,
     #           :abbrev, 'some-other-filename'
     #
-    #         p[]  # => #<Pathname:/var/xkcd/foo-some-other-filename>
+    #         p[]  # => "/var/xkcd/foo-some-other-filename"
     #
     #   + when searching upwards for a parent module that responds to
-    #     `cache_pathname`, the search will hop over intermediate modules
+    #     `cache_path`, the search will hop over intermediate modules
     #     that do not do so; so you can design your module graph to contain
     #     as many modules as you find taxonomically useful, and not be held
     #     to making intermediate directories in your cache tree. so not all
     #     modules need to have their own cache directories:
     #
     #         module Foo_
-    #           define_singleton_method :cache_pathname, -> do
-    #             _PN = ::Pathname.new( '/var/xkcd' ).join( 'my-app' )
+    #           define_singleton_method :cache_path, -> do
+    #             _PATH = ::File.join '/var/xkcd', 'my-app'
     #             -> do
-    #               _PN
+    #               _PATH
     #             end
     #           end.call
     #
     #           module Bar
     #             module Baz
-    #               define_singleton_method :cache_pathname, &
-    #                 Subject_[].cache_pathname_proc_via_module( self )
+    #               define_singleton_method :cache_path, &
+    #                 Subject_[].cache_path_proc_via_module( self )
     #             end
     #           end
     #         end
     #
-    #         Foo_.cache_pathname  # => <Pathname:/var/xkcd/my-app>
-    #         Foo_::Bar.respond_to?( :cache_pathname )  # => false
-    #         Foo_::Bar::Baz.cache_pathname  # => <Pathname:/var/xkcd/my-app/baz>
+    #         Foo_.cache_path  # => "/var/xkcd/my-app"
+    #         Foo_::Bar.respond_to?( :cache_path )  # => false
+    #         Foo_::Bar::Baz.cache_path  # => "/var/xkcd/my-app/baz"
     #
     # happy hacking!
 
-      class << self
+      def initialize fs
+        @_filesystem = fs
+      end
 
-        def cache_pathname_proc_via_module mod, * x_a
-          x_a.push :mod, mod
-          Actor__.call_via_iambic x_a
-        end
-      end  # >>
+      def cache_path_proc_via_module mod, * x_a
+
+        @_actor_curry ||= Actor___.curry_with(
+          :filesystem, @_filesystem,
+        )
+
+        x_a.push :mod, mod
+
+        @_actor_curry.call_via_iambic x_a
+      end
 
       # ->
 
-        class Actor__
+        class Actor___
 
-          Callback_::Actor.call self, :properties,
+          Callback_::Actor.call( self, :properties,
             :mod,
-            :abbrev
+            :abbrev,
+            :filesystem,
+          )
 
           Callback_::Event.selective_builder_sender_receiver self
 
@@ -148,7 +157,7 @@ module Skylab::System
 
           def build_proc
             p = -> do
-              _PN = build_pathname
+              _PN = build_path
               p = -> { _PN }
               _PN
             end
@@ -157,18 +166,18 @@ module Skylab::System
             end
           end
 
-          def build_pathname
-            ok = resolve_parent_pathname
+          def build_path
+            ok = resolve_parent_path
             ok &&= resolve_filename
-            ok && via_everything_build_existant_pathname
+            ok && via_everything_build_existant_path
           end
 
-          def resolve_parent_pathname
-            ok = resolve_parent_cache_pathname_proprietor
-            ok && via_parent_cache_pathname_proprietor_resolve_parent_pathname
+          def resolve_parent_path
+            ok = resolve_parent_cache_path_proprietor
+            ok && __via_parent_cache_path_proprietor_resolve_parent_path
           end
 
-          def resolve_parent_cache_pathname_proprietor
+          def resolve_parent_cache_path_proprietor
             len = @const_a.length - 1
             mod_a = ::Array.new len
             cls = ::Object
@@ -180,13 +189,13 @@ module Skylab::System
             while d.nonzero?
               d -= 1
               mod = mod_a.fetch d
-              if mod.respond_to? :cache_pathname
+              if mod.respond_to? :cache_path
                 found = mod
                 break
               end
             end
             if found
-              @parent_cache_pathname_proprietor = found
+              @parent_cache_path_proprietor = found
               ACHIEVED_
             else
               @mod_a = mod_a
@@ -195,18 +204,24 @@ module Skylab::System
           end
 
           def when_parent_not_found
-            _ev = build_not_OK_event_with :parent_cache_pathname_proprietor_not_found,
+            _ev = build_not_OK_event_with :parent_cache_path_proprietor_not_found,
                 :mod, @mod, :mod_a, @mod_a do |y, o|
 
               y << "none of the #{ o.mod_a.length } parent module(s) #{
-                }responded to `cache_pathname` among #{ o.mod_a.last.name }"
+                }responded to `cache_path` among #{ o.mod_a.last.name }"
             end
             finish_with_error_event _ev
           end
 
-          def via_parent_cache_pathname_proprietor_resolve_parent_pathname
-            @parent_pn = @parent_cache_pathname_proprietor.cache_pathname
-            @parent_pn && ACHIEVED_
+          def __via_parent_cache_path_proprietor_resolve_parent_path
+
+            path = @parent_cache_path_proprietor.cache_path
+            if path
+              @_parent_path = path
+              ACHIEVED_
+            else
+              path
+            end
           end
 
           def resolve_filename
@@ -233,13 +248,17 @@ module Skylab::System
             finish_with_error_event _ev
           end
 
-          def via_everything_build_existant_pathname  # :+![#022]
-            pn = @parent_pn.join @filename
-            if ! pn.exist?
-              _mode = @parent_pn.stat.mode
-              ::Dir.mkdir pn.to_path, _mode
+          def via_everything_build_existant_path  # :+![#022]
+
+            path = ::File.join @_parent_path, @filename
+
+            if ! @filesystem.exist? path
+
+              _mode = @filesystem.stat( @_parent_path ).mode
+              @filesystem.mkdir path, _mode
             end
-            pn
+
+            path
           end
 
           def finish_with_error_event ev

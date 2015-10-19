@@ -9,10 +9,17 @@ module Skylab::TanMan::TestSupport
 
   class << self
 
-    def tmpdir_pathname_
-      @tdpn ||= Home_.lib_.dev_tmpdir_pathname.join 'tm-testing-cache'
+    def tmpdir_path_
+      @___tmpdir_path ||= __build_tmpdir_path
     end
-  end
+
+    def __build_tmpdir_path
+      ::File.join(
+        Home_.lib_.dev_tmpdir_path,
+        'tm-testing-cache',
+      )
+    end
+  end  # >>
 
   module TestLib_
 
@@ -26,7 +33,7 @@ module Skylab::TanMan::TestSupport
 
     Base_tmpdir__ = _memoize do
       Home_.lib_.system.filesystem.tmpdir(
-        :path, TS_.tmpdir_pathname_.to_path,
+        :path, TS_.tmpdir_path_,
         :max_mkdirs, 1 )
     end
 
@@ -316,15 +323,14 @@ module Skylab::TanMan::TestSupport
 
       Memoize_GGD_path__ = -> do_debug, debug_IO do
 
-        pn = TS_.tmpdir_pathname_.join 'grammerz'
-        _PATH = pn.to_path
+        _PATH = ::File.join TS_.tmpdir_path_, 'grammerz'
 
-        if ! pn.exist?
+        if ! ::File.exist? _PATH
 
           _tmpdir = Home_.lib_.system.filesystem.tmpdir :path, _PATH,
             :be_verbose, do_debug,
             :debug_IO, debug_IO,
-            :max_mkdirs, 2
+            :max_mkdirs, 3  # you can make __tmx__, you can make [tm], and this
 
           _tmpdir.prepare_when_not_exist
         end
