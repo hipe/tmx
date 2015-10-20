@@ -8,9 +8,9 @@ module Skylab::Brazen
 
       Normalize_via_qualified_known = -> qkn, & oes_p do
 
-        enum_bx = qkn.model.enum_box
+        enum_bx = qkn.association.enum_box
 
-        if qkn.is_known
+        if qkn.is_known_known
 
           if enum_bx.has_name qkn.value_x
             qkn
@@ -18,7 +18,7 @@ module Skylab::Brazen
 
             event = -> do
               Build_extra_value_event[
-                qkn.value_x, qkn.model.name_function, enum_bx.get_names ]
+                qkn.value_x, qkn.association.name_function, enum_bx.get_names ]
             end
 
             if oes_p

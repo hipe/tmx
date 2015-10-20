@@ -6,9 +6,9 @@ module Skylab::SubTree
 
       class Extensions_::Line_Count
 
-        def initialize trio, & oes_p
+        def initialize qualified_knownness, & oes_p
           @on_event_selectively = oes_p
-          @trio = trio
+          @qualified_knownness = qualified_knownness
         end
 
         def is_collection_operation
@@ -19,7 +19,7 @@ module Skylab::SubTree
         end
 
         def local_normal_name
-          @trio.name_symbol
+          @qualified_knownness.name_symbol
         end
 
         def receive_collection_of_mutable_items row_a

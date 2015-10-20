@@ -127,7 +127,7 @@ module Skylab::Treemap
             :down, :stdout )
         end
 
-        def _resolve_waypoint destination_ivar, trio, up_down, dash_means_sym
+        def _resolve_waypoint destination_ivar, qualified_knownness, up_down, dash_means_sym
 
           h = @argument_box.h_
 
@@ -144,7 +144,7 @@ module Skylab::Treemap
           kn = @_n11n.with(
             :up_or_down, up_down,
             * _standards,
-            :path_arg, trio,
+            :qualified_knownness_of_path, qualified_knownness,
             :dash_means, dash_means_sym,
           )
 

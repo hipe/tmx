@@ -42,7 +42,7 @@ module Skylab::Brazen
 
         if sess.via_current_branch_resolve_action_promotion_insensitive
           st = sess.poly_stream
-          h = { trio_box: nil, preconditions: nil }
+          h = { qualified_knownness_box: nil, preconditions: nil }
           while st.unparsed_exists
             if :with == st.current_token
               st.advance_one
@@ -53,7 +53,7 @@ module Skylab::Brazen
             h[ k ] = st.gets_one
           end
           preconds = h[ :preconditions ]
-          trio_box = h[ :trio_box ]
+          qualified_knownness_box = h[ :qualified_knownness_box ]
           h = nil
 
           act = sess.bound
@@ -64,8 +64,8 @@ module Skylab::Brazen
           end
 
           ok = true
-          if trio_box
-            ok = act.process_trio_box_passively__ trio_box
+          if qualified_knownness_box
+            ok = act.process_qualified_knownness_box_passively__ qualified_knownness_box
           end
 
           ok &&= act.process_polymorphic_stream_fully st

@@ -18,8 +18,8 @@ module Skylab::TanMan
 
       def __init_downstream_identifier
 
-        @arg = @entity.qualified_knownness :digraph_path
-        x = @arg.value_x
+        @_qkn = @entity.qualified_knownness :digraph_path
+        x = @_qkn.value_x
 
         if x.respond_to? :write
           @down_ID = Brazen_.byte_downstream_identifier.via_stream x
@@ -30,18 +30,18 @@ module Skylab::TanMan
       end
 
       def __execute_for__path__
-        Touch_path___.new( @arg, self, & @on_event_selectively ).execute
+        Touch_path___.new( @_qkn, self, & @on_event_selectively ).execute
       end
 
       def __execute_for__IO__
         _ok = resolve_upstream_lines_
-        _ok and flush_upstream_lines_to_file_ @arg.value_x
+        _ok and flush_upstream_lines_to_file_ @_qkn.value_x
       end
 
       class Touch_path___
 
         def initialize arg, parent, & oes_p
-          @arg = arg
+          @_qkn = arg
           @parent = parent
           @on_event_selectively = oes_p
         end
@@ -57,11 +57,11 @@ module Skylab::TanMan
         def __path_is_absolute
 
           ok_arg = Home_.lib_.basic::Pathname.
-            normalization.new_with( :absolute ).normalize_argument(
-              @arg, & @on_event_selectively )
+            normalization.new_with( :absolute ).normalize_qualified_knownness(
+              @_qkn, & @on_event_selectively )
 
           if ok_arg
-            @arg = ok_arg
+            @_qkn = ok_arg
             ACHIEVED_
           else
             ok_arg
@@ -92,7 +92,7 @@ module Skylab::TanMan
         end
 
         def __path_exists
-          e, @stat = __noent_exception_and_stat_via_path @arg.value_x
+          e, @stat = __noent_exception_and_stat_via_path @_qkn.value_x
           e ? false : true
         end
 
@@ -110,7 +110,7 @@ module Skylab::TanMan
 
           _o = sys.filesystem( :Upstream_IO ).edit_with(
             :stat, @stat,
-            :path_arg, @arg,
+            :qualified_knownness_of_path, @_qkn,
             :only_apply_expectation_that_path_is_ftype_of, _ftype,
             & @on_event_selectively )
 
@@ -118,7 +118,7 @@ module Skylab::TanMan
         end
 
         def __path_has_extension
-          ::File.extname( @arg.value_x ).length.nonzero?
+          ::File.extname( @_qkn.value_x ).length.nonzero?
         end
 
         def __add_extension_to_path
@@ -129,8 +129,8 @@ module Skylab::TanMan
             __build_adding_extension_event
           end
 
-          @arg = @arg.new_with_value(
-            ::Pathname.new( @arg.value_x ).sub_ext( @ext ).to_path )
+          @_qkn = @_qkn.new_with_value(
+            ::Pathname.new( @_qkn.value_x ).sub_ext( @ext ).to_path )
 
           nil
         end
@@ -141,7 +141,7 @@ module Skylab::TanMan
 
             :adding_extension,
             :extension, @ext,
-            :path, @arg.value_x
+            :path, @_qkn.value_x
 
           ) do | y, o |
 
@@ -150,7 +150,7 @@ module Skylab::TanMan
         end
 
         def _write_path_to_entity
-          @parent.into_entity_write_digraph_path__ @arg.value_x
+          @parent.into_entity_write_digraph_path__ @_qkn.value_x
         end
 
         def __write_upstream_content
@@ -163,7 +163,7 @@ module Skylab::TanMan
         def __resolve_downstream_file
 
           kn = _sys.filesystem( :Downstream_IO ).with(
-            :path_arg, @arg,
+            :qualified_knownness_of_path, @_qkn,
             & @on_event_selectively )
 
           if kn

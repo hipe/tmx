@@ -78,7 +78,7 @@ module Skylab::Brazen
           @value_models.to_value_stream ]
       end
 
-      def knownness_via_property_ prp
+      def qualified_knowness_via_association_ prp
 
         had = true
         x = @value_collection.fetch prp.name_symbol do
@@ -86,9 +86,9 @@ module Skylab::Brazen
         end
 
         if had
-          Callback_::Known.new_known x
+          Callback_::Known_Known[ x ]
         else
-          Callback_::Known::UNKNOWN
+          Callback_::KNOWN_UNKNOWN
         end
       end
 

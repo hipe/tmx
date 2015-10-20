@@ -75,8 +75,12 @@ module Skylab::Brazen
         _NLP_agent.or_ x
       end
 
-      def par prop  # referenced by :[#115].
-        _unstyled = send @categorized_properties.rendering_method_name_for_property( prop ), prop
+      def par prp  # referenced by :[#115].
+
+        m, * a = @categorized_properties.expression_strategy_for_property prp
+
+        _unstyled = send m, prp, * a
+
         highlight _unstyled
       end
 
@@ -121,8 +125,8 @@ module Skylab::Brazen
         @categorized_properties.adapter.environment_variable_name_string_via_property prp
       end
 
-      def render_prop_as_unknown prop
-        "« #{ prop.name.as_human } »"  # :+#guillemets
+      def custom_property_expression_strategy prp, p, * a
+        calculate( prp, * a, & p )
       end
 
       def s * x_a
@@ -171,7 +175,7 @@ module Skylab::Brazen
 
         _categorized_properties = LIB_.basic::Proxy::Inline.new(
 
-          :rendering_method_name_for_property, -> prp do
+          :expression_strategy_for_property, -> prp do
             :render_property_as_unknown
           end,
         )

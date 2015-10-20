@@ -4,27 +4,18 @@ module Skylab::Brazen
 
     class << self
 
-      def argument_interpreter_via_normalization n11n
-
-        -> arg_st, & oes_p do
-
-          _trio = Callback_::Known.new_known arg_st.gets_one
-
-          n11n.normalize_argument _trio do | * i_a, & ev_p |
-
-            if oes_p
-              oes_p[ * i_a, & ev_p ]
-            else
-              raise ev_p[].to_exception
-            end
-          end
-        end
+      def _same * x_a, & x_p
+        dsl = ACS_::Sessions_::DSL.new( & x_p )
+        dsl.accept_argument_array x_a
+        dsl.execute
       end
+      alias_method :[], :_same
+      alias_method :call, :_same
 
       def create x_a, new_o, & x_p  # :t2.
 
         o = _Mutation_Session.new( & x_p )
-        o.receive_argument_array x_a
+        o.accept_argument_array x_a
         o.subject_component = new_o
         o.macro_operation_method_name = :create
         o.execute
@@ -33,7 +24,7 @@ module Skylab::Brazen
       def edit x_a, subj_o, & x_p  # :t3.
 
         o = _Mutation_Session.new( & x_p )
-        o.receive_argument_array x_a
+        o.accept_argument_array x_a
         o.subject_component = subj_o
         o.macro_operation_method_name = :edit
         o.execute
@@ -157,6 +148,10 @@ module Skylab::Brazen
         end
       end
 
+      def name_symbol
+        @name.as_variegated_symbol
+      end
+
       attr_reader(
         :component_model,
         :name,
@@ -181,6 +176,32 @@ module Skylab::Brazen
         NIL_
       end
 
+      def interpret arg_st, & x_p
+
+        if @component_model.respond_to?(
+            :interpret_for_component_mutation_session )  # :+t6
+
+          x = @component_model.interpret_for_component_mutation_session(
+            arg_st, & x_p )
+
+          if x
+            Value_Wrapper[ x ]
+          else
+            x
+          end
+        else
+          @component_model[ arg_st, & x_p ]
+        end
+      end
+
+      def is_of_compound_component
+        mdl = @component_model
+        if mdl.respond_to? :public_method_defined? and
+            mdl.public_method_defined? :component_name_symbols
+          true
+        end  # etc
+      end
+
       def can sym
         if @_operations_hash
           @_operations_hash[ sym ]
@@ -198,8 +219,12 @@ module Skylab::Brazen
     end
 
     ACS_ = self
-    Value_Wrapper = ::Struct.new :value_x
+    Autoloader_[ Modalities = ::Module.new ]
     Autoloader_[ Sessions_ = ::Module.new ]
+
+    Value_Wrapper = -> x do
+      Callback_::Known_Known[ x ]
+    end
 
   end
 end

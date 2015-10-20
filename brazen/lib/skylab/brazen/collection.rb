@@ -42,8 +42,8 @@ module Skylab::Brazen
           Home_.lib_.basic::String::Byte_Upstream_Identifier.new s
         end
 
-        def via_trios trio_a, & oes_p
-          o = __method_call_via_shape trio_a, & oes_p
+        def via_qualified_knownnesses qkn_a, & oes_p
+          o = __method_call_via_shape qkn_a, & oes_p
           o and send o.method_name, * o.args
         end
       end  # >>
@@ -98,8 +98,8 @@ module Skylab::Brazen
           Home_.lib_.basic::String::Byte_Downstream_Identifier.new s
         end
 
-        def via_trios trio_a, & oes_p
-          o = __method_call_via_shape trio_a, & oes_p
+        def via_qualified_knownnesses qualified_knownness_a, & oes_p
+          o = __method_call_via_shape qualified_knownness_a, & oes_p
           o and send o.method_name, * o.args
         end
 
@@ -113,15 +113,15 @@ module Skylab::Brazen
 
     module Byte_Stream_Singleton_Methods__
 
-      def __method_call_via_shape trio_a, & oes_p
-        Byte_stream_method_call_via_shape___.new( trio_a, & oes_p ).execute
+      def __method_call_via_shape qualified_knownness_a, & oes_p
+        Byte_stream_method_call_via_shape___.new( qualified_knownness_a, & oes_p ).execute
       end
     end
 
     class Byte_stream_method_call_via_shape___
 
-      def initialize trio_a, & oes_p
-        @arg = trio_a.fetch 0
+      def initialize qualified_knownness_a, & oes_p
+        @arg = qualified_knownness_a.fetch 0
         @on_event_selectively = oes_p
       end
 

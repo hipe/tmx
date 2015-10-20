@@ -51,9 +51,9 @@ module Skylab::System
 
         # implement [#.A] the common algorithm (see)
 
-        pa = @path_arg
+        pa = @qualified_knownness_of_path
 
-        if pa && pa.is_known
+        if pa && pa.is_known_known
 
           if @do_recognize_common_string_patterns_
             md_x = via_path_arg_match_common_pattern_
@@ -79,7 +79,7 @@ module Skylab::System
 
           elsif @_neither_is_OK
 
-            Callback_::Known::UNKNOWN
+            Callback_::KNOWN_UNKNOWN
           else
             maybe_emit_missing_required_properties_event_
           end
@@ -110,12 +110,12 @@ module Skylab::System
 
         build_not_OK_event_with(
           :ambiguous_upstream_arguments,
-          :path_arg, @path_arg,
+          :qualified_knownness_of_path, @qualified_knownness_of_path,
 
         ) do | y, o |
 
           y << "ambiguous upstream arguments - cannot read from both #{
-            }STDIN and #{ par o.path_arg.model }"
+            }STDIN and #{ par o.qualified_knownness_of_path.association }"
         end
       end
 
@@ -127,7 +127,7 @@ module Skylab::System
 
         build_not_OK_event_with(
           :missing_required_properties,
-          :path_property, @path_arg.model,
+          :path_property, @qualified_knownness_of_path.association,
           :for_both, both,
 
         ) do | y, o |
@@ -173,7 +173,7 @@ module Skylab::System
 
         if @_expected_ftype == @stat_.ftype
 
-          Callback_::Known.new_known ACHIEVED_
+          Callback_::Known_Known[ ACHIEVED_ ]
         else
 
           maybe_send_event :error, :wrong_ftype do
@@ -206,7 +206,7 @@ module Skylab::System
             %r(\bfile or directory\b),
 
             -> o do
-              par o.path_arg.model
+              par o.qualified_knownness_of_path.association
             end,
           ]
         end

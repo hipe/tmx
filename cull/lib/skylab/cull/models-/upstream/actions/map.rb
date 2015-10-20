@@ -9,7 +9,7 @@ module Skylab::Cull
       Brazen_::Model.common_entity self,
 
           :ad_hoc_normalizer, -> arg, & oes_p do
-            if arg.is_known
+            if arg.is_known_known
               Home_.lib_.basic::Number.normalization.with(
                 :argument, arg,
                 :number_set, :integer,
@@ -33,7 +33,7 @@ module Skylab::Cull
 
       def produce_result
         @upstream = @parent_node.edit do | o |
-          o.mutable_trio_box to_trio_box_except__ :table_number
+          o.mutable_qualified_knownness_box to_qualified_knownness_box_except__ :table_number
         end
         @upstream and via_upstream
       end

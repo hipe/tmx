@@ -287,11 +287,11 @@ module Skylab::Brazen
 
           def __add_ad_hoc_normalization n11n
 
-            append_ad_hoc_normalizer_ do | arg, & oes_p |
-              if ( arg.value_x if arg.is_known ).nil?
-                arg
+            append_ad_hoc_normalizer_ do | qkn, & oes_p |
+              if ( qkn.value_x if qkn.is_known_known ).nil?
+                qkn
               else
-                n11n.normalize_argument arg, & oes_p
+                n11n.normalize_qualified_knownness qkn, & oes_p
               end
             end
             KEEP_PARSING_
@@ -303,12 +303,12 @@ module Skylab::Brazen
               :number_set, :integer,
               :minimum, 0 )
 
-            append_ad_hoc_normalizer_ do | arg, & oes_p |
+            append_ad_hoc_normalizer_ do | qkn, & oes_p |
 
-              if ! arg.is_known || arg.value_x.nil?
-                arg
+              if ! qkn.is_known_known || qkn.value_x.nil?
+                qkn
               else
-                _NORMER.normalize_argument arg, & oes_p
+                _NORMER.normalize_qualified_knownness qkn, & oes_p
               end
             end
             KEEP_PARSING_

@@ -54,7 +54,7 @@ module Skylab::Cull
 
         kn = @dry_run_arg
 
-        @survey.write_( ( kn.value_x if kn.is_known ) )
+        @survey.write_( ( kn.value_x if kn.is_known_known ) )
 
       end
     end

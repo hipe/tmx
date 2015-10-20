@@ -51,7 +51,7 @@ module Skylab::Snag
       # ~~ (
 
       def par x  # :+[#br-115]
-        _unstyled = send @_prp_index.rendering_method_name_for_property( x ), x
+        _unstyled = send @_prp_index.expression_strategy_for_property( x ), x
         _strongly_emphasized _unstyled
       end
 

@@ -79,22 +79,23 @@ module Skylab::GitViz
 
             sym = x_a.fetch 0
 
-            _arg = Callback_::Qualified_Knownness.via_value_and_variegated_symbol(
-              x_a.fetch( 1 ), sym )
+            _qkn = Callback_::Qualified_Knownness.via_value_and_symbol(
+              x_a.fetch( 1 ), sym
+            )
 
             bx = @front_properties.fetch( sym ).ad_hoc_normalizer_box
 
             _p = bx.h_.fetch( bx.a_.first )
 
-            arg = _p.call _arg do | * i_a, & ev_p |
+            qkn = _p.call _qkn do | * i_a, & ev_p |
 
               receive_event_on_channel ev_p[], i_a
             end
 
             x_a[ 0, 2 ] = EMPTY_A_
 
-            arg and begin
-              @width = arg.value_x
+            qkn and begin
+              @width = qkn.value_x
               ACHIEVED_
             end
           end

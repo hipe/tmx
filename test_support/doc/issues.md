@@ -18,7 +18,7 @@
              ( #was: #done folderize plugins ([#xx-008]) )
              ( #was: #done #parent-node: [#015] change syntax to work with contiguous nonblank lines )
 
-[#031] #open sunset io spy trio for io spy group, re-purpose former to house mocks
+[#031] #open sunset io spy qualified_knownness for io spy group, re-purpose former to house mocks
              ( #was: #done #universal while regret no longer wires test nodes for autoloading  )
 [#030] #open #parent-node:[#015] the doc-test recursive spec needs mock fs
 [#029]       #tracking-tag the 'expect' omnibus and narrative ..

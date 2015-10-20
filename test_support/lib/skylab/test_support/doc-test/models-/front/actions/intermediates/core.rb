@@ -30,16 +30,16 @@ module Skylab::TestSupport
             y << "a spec file that needs a corresponding test-support file"
           end,
 
-          :ad_hoc_normalizer, -> arg, & oes_p do
+          :ad_hoc_normalizer, -> qkn, & oes_p do
 
-            if arg.is_known && arg.value_x
+            if qkn.is_known_known && qkn.value_x
               Home_.lib_.basic::Pathname.normalization.new_with(
                 :absolute, :downward_only,
                 :no_single_dots,
                 # :no_dotfiles, must allow these when gem
-              ).normalize_argument arg, & oes_p
+              ).normalize_qualified_knownness qkn, & oes_p
             else
-              arg
+              qkn
             end
           end,
           :property, :path

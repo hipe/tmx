@@ -23,8 +23,8 @@ module Skylab::Cull
 
         @survey = @parent_node.edit do | edit |
 
-          edit.edit_via_mutable_trio_box_and_look_path(
-            to_trio_box_proxy,
+          edit.edit_via_mutable_qualified_knownness_box_and_look_path(
+            to_qualified_knownness_box_proxy,
             @argument_box.fetch( :path ) )
 
         end

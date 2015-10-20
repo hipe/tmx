@@ -150,14 +150,14 @@ module Skylab::TanMan
 
       attr_reader :stdin_, :stdout_
 
-      def to_trio_box__
+      def to_qualified_knownness_box__
 
         bx = Callback_::Box.new
         fo = formal_properties
 
         ( @argument_box.each_pair do | k, x |
 
-          bx.add k, Callback_::Qualified_Knownness.via_value_and_model( x, fo.fetch( k ) )
+          bx.add k, Callback_::Qualified_Knownness.via_value_and_association( x, fo.fetch( k ) )
 
         end )
         bx

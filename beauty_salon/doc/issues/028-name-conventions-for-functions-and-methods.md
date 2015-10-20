@@ -204,6 +204,17 @@ better this time.
 
 + `run`, `run_` - reserved for starting a long-running process :+[#.E]
 
++ `to_`, `_to_` - the second form is explicitly not defined conventionally
+  here. use it as you would like to naturally. (but use `via` instead if
+  you can, because whereas `bar_via_foo()` is unambiguous,
+  `foo_to_bar` is ambiguous with respect to whether the argument
+  is `foo`, `bar`, or both.
+
+  the first form (`to_`) is used in the platform idiomatic way, e.g
+  `to_a` etc. `to_stream` is a popular one in this universe (it used
+  to be `to_scan`, and before that `get_scan`, and still it has the
+  same underlying sematics as the `get_` prefix).
+
 + `via_` will one day have its own section #todo
 
 + `when_`, `_when_` - often takes no arguments, must be private when using
@@ -226,22 +237,6 @@ better this time.
   this bareword name must not accept any arguments. this is a lazy method
   name - it should only be used if the behavior that occurs in the method
   is exactly that as described by the name of the containing class.
-
-+ `resolve_[..]_then` in a framework action, this is a call to a library
-  method that will try to resolve the `[..]` (to ivars) and then IFF
-  successful, call the client's `via_[..]` method. (this makes more
-  sense if you see it (originated in [sg]).)
-
-+ `to_`, `_to_` - the second form is explicitly not defined conventionally
-  here. use it as you would like to naturally. (but use `via` instead if
-  you can, because whereas `bar_via_foo()` is unambiguous,
-  `foo_to_bar` is ambiguous with respect to whether the argument
-  is `foo`, `bar`, or both.
-
-  the first form (`to_`) is used in the platform idiomatic way, e.g
-  `to_a` etc. `to_stream` is a popular one in this universe (it used
-  to be `to_scan`, and before that `get_scan`, and still it has the
-  same underlying sematics as the `get_` prefix).
 
 
 

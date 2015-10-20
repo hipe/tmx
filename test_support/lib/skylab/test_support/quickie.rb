@@ -550,7 +550,7 @@ module Skylab::TestSupport
           raise e
         end,
 
-        :on_info_trio, method( :add_tag_description ),
+        :on_info_qualified_knownness, method( :add_tag_description ),
 
         :on_filter_proc, method( :add_or_p ) )
     end
@@ -1258,7 +1258,7 @@ module Skylab::TestSupport
   class Tag_Shell_
 
     def initialize * x_a
-      @send_error_p = @send_info_trio_p = @send_filter_proc_p =
+      @send_error_p = @send_info_qualified_knownness_p = @send_filter_proc_p =
       @send_pass_filter_proc_p = @send_no_pass_filter_proc_p = nil
       d = -1 ; last = x_a.length - 1
       while d < last
@@ -1302,8 +1302,8 @@ module Skylab::TestSupport
   private
 
     def build_and_send_tag_byproducts_via_three_parts yes, tag_i, val_x
-      if @send_info_trio_p
-        x = @send_info_trio_p[ yes ? :include : :exclude, tag_i, val_x ]
+      if @send_info_qualified_knownness_p
+        x = @send_info_qualified_knownness_p[ yes ? :include : :exclude, tag_i, val_x ]
       end
       if yes
         p = -> tagset do

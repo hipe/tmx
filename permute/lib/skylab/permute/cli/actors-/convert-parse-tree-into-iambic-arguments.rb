@@ -42,11 +42,11 @@ module Skylab::Permute
 
       def __on__short_switch__ value_s, short_category_s
 
-        _trio = Callback_::Qualified_Knownness.via_value_and_variegated_symbol(
+        _qkn = Callback_::Qualified_Knownness.via_value_and_symbol(
           short_category_s, :category_letter )
 
         cat_o = Home_.lib_.brazen::Collection::Common_fuzzy_retrieve.call(
-          _trio,
+          _qkn,
           @_col.method( :to_entity_stream ),
           & @on_event_selectively )
 
@@ -60,11 +60,11 @@ module Skylab::Permute
 
       def __on__long_switch__ value_s, long_partial_catgory_s
 
-        _trio = Callback_::Qualified_Knownness.via_value_and_variegated_symbol(
+        _qkn = Callback_::Qualified_Knownness.via_value_and_symbol(
           long_partial_catgory_s, :category_letter )
 
         cat_o = Home_.lib_.brazen::Collection::Common_fuzzy_retrieve.call(
-          _trio,
+          _qkn,
           @_col.method( :to_entity_stream ),
         ) do end
 

@@ -44,7 +44,7 @@ module Skylab::BeautySalon
 
               Home_.lib_.system.filesystem( :Upstream_IO ).with(
 
-                :path_arg, arg,
+                :qualified_knownness_of_path, arg,
                 :stdin, @resources.sin,
                 :recognize_common_string_patterns,
                 :dash_means, :stdin,

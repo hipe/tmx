@@ -884,6 +884,10 @@ module Skylab::Brazen
         fetch k do end
       end
 
+      def fetch_at_position d  # no block
+        fetch @_a.fetch d
+      end
+
       def fetch k
 
         shib = @_h[ k ]
@@ -1061,11 +1065,11 @@ module Skylab::Brazen
 
       # ~~ normalization API
 
-      define_method :knownness_via_property_, KNOWNNESS_VIA_IVAR_METHOD_
+      define_method :qualified_knowness_via_association_, KNOWNNESS_VIA_IVAR_METHOD_
 
-      def normalize_argument kn, & x_p  # :+[#ba-027] assume some normalizer (for now)
+      def normalize_qualified_knownness qkn, & x_p  # :+[#ba-027] assume some normalizer (for now)
 
-        Home_::Concerns_::Normalization::Against_model[ kn, self, & x_p ]
+        Home_::Concerns_::Normalization::Against_model[ qkn, self, & x_p ]
       end
 
       def is_normalizable_

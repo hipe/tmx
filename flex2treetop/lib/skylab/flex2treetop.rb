@@ -284,15 +284,15 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
         def __resolve_upstream
 
-          path_arg = qualified_knownness :flex_file
-          path = path_arg.value_x
+          qualified_knownness_of_path = qualified_knownness :flex_file
+          path = qualified_knownness_of_path.value_x
 
           if DASH_ == path
-            path_arg = path_arg.to_unknown
+            qualified_knownness_of_path = qualified_knownness_of_path.to_unknown
           end
 
           kn = LIB_.system.filesystem( :Upstream_IO ).with(
-            :path_arg, path_arg,
+            :qualified_knownness_of_path, qualified_knownness_of_path,
             :stdin, @resources.sin,
             & handle_event_selectively )
 
@@ -319,16 +319,16 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
         def __resolve_normal_downstream
 
-          path_arg = qualified_knownness :output_path
-          path = path_arg.value_x
+          qualified_knownness_of_path = qualified_knownness :output_path
+          path = qualified_knownness_of_path.value_x
 
           if DASH_ == path
-            path_arg = path_arg.to_unknown
+            qualified_knownness_of_path = qualified_knownness_of_path.to_unknown
           end
 
           kn = LIB_.system.filesystem( :Downstream_IO ).with(
 
-            :path_arg, path_arg,
+            :qualified_knownness_of_path, qualified_knownness_of_path,
             :stdout, @resources.sout,
             :force_arg, qualified_knownness( :force )
 

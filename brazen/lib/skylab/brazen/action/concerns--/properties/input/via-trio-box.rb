@@ -7,7 +7,7 @@ module Skylab::Brazen
       module Input::Via_trio_box
 
         # PASSIVELY parse-out values from the box, whose each value is a
-        # trio. do this using any custom parsers and parsing logic that
+        # qualified_knownness. do this using any custom parsers and parsing logic that
         # exist to parse normal polymorphic upstream, by spoofing the
         # upstream. unless we add more hacks to this, this can only work
         # for formls whose argument arity is zero or one (separately).
@@ -22,18 +22,18 @@ module Skylab::Brazen
           act.set_polymorphic_upstream__ hsm
 
           kp = KEEP_PARSING_
-          bx.each_pair do | k, trio |
+          bx.each_pair do | k, qualified_knownness |
 
             if ! foz.has_name k  # not my formal property - disregard
               next
             end
 
-            if ! trio.is_known  # formal only, no value - disregard
+            if ! qualified_knownness.is_known_known  # formal only, no value - disregard
               next
             end
 
-            prp = trio.model
-            x = trio.value_x
+            prp = qualified_knownness.association
+            x = qualified_knownness.value_x
 
             if :zero == prp.argument_arity && ! x
               next  # for now we handle flag-like fields whose actual values

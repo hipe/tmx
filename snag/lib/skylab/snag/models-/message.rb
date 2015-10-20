@@ -6,9 +6,9 @@ module Skylab::Snag
 
       def normalize_value__ x, & x_p  # valid values are true-ish
 
-        _trio = Callback_::Known.new_known x
-        trio = N11n_instance___[].normalize_argument _trio, & x_p
-        trio and trio.value_x
+        _qkn_ = Callback_::Qualified_Knownness.via_value_and_symbol( x, :arg )
+        qkn_ = N11n_instance___[].normalize_qualified_knownness _qkn_, & x_p
+        qkn_ and qkn_.value_x
       end
     end  # >>
 
@@ -104,14 +104,14 @@ module Skylab::Snag
 
     public
 
-      def normalize_argument arg, & oes_p
+      def normalize_qualified_knownness qkn, & oes_p
 
         @p_a.each do | p |
 
-          arg = p[ arg, & oes_p ]
-          arg or break
+          qkn = p[ qkn, & oes_p ]
+          qkn or break
         end
-        arg
+        qkn
       end
 
     private

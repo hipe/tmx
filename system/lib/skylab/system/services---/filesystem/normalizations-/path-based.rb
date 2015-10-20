@@ -169,8 +169,8 @@ module Skylab::System
         _accept_path gets_one_polymorphic_value
       end
 
-      def path_arg=
-        @path_arg = gets_one_polymorphic_value
+      def qualified_knownness_of_path=
+        @qualified_knownness_of_path = gets_one_polymorphic_value
         @path_arg_was_explicit_ = true
         KEEP_PARSING_
       end
@@ -183,13 +183,11 @@ module Skylab::System
       def _accept_path path
 
         if path
-          @path_arg = Callback_::Qualified_Knownness.via_x_and_i path, :path
+          @qualified_knownness_of_path = Callback_::Qualified_Knownness.via_value_and_symbol path, :path
+          KEEP_PARSING_
         else
           self._COVER_ME_path_argument_was_falseish
-          @path_arg = Callback_::Known::UNKNOWN
         end
-
-        KEEP_PARSING_
       end
 
       # ~ support for the commonest `execute`s
@@ -300,16 +298,16 @@ module Skylab::System
       def wrap_exception_ e, * xtra
 
         Callback_::Event.wrap.exception e, :path_hack,
-          :event_property, :path_arg, @path_arg, * xtra
+          :event_property, :qualified_knownness_of_path, @qualified_knownness_of_path, * xtra
       end
 
       def produce_result_via_open_IO_ io
 
-        Callback_::Known.new_known io
+        Callback_::Known_Known[ io ]
       end
 
       def path_
-        @path_arg.value_x
+        @qualified_knownness_of_path.value_x
       end
 
       Callback_::Event.selective_builder_sender_receiver self

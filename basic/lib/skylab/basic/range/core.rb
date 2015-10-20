@@ -10,8 +10,8 @@ module Skylab::Basic
         Range_::Normalization__
       end
 
-      def normalize_argument arg, * x_a, & oes_p
-        x_a.push :arg, arg
+      def normalize_qualified_knownness qkn, * x_a, & oes_p
+        x_a.push :qualified_knownness, qkn
         Range_::Normalization__.call_via_iambic x_a, & oes_p
       end
     end

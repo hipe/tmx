@@ -25,8 +25,8 @@ module Skylab::Snag::TestSupport
 
       def subject s
 
-        @result = Home_::Models_::Date.normalize_argument(
-          Callback_::Known.new_known( s ),
+        @result = Home_::Models_::Date.normalize_qualified_knownness(
+          Callback_::Qualified_Knownness.via_value_and_symbol( s, :argument ),
           & handle_event_selectively )
 
         NIL_

@@ -63,10 +63,10 @@ module Skylab::TanMan
         o.produce_document_controller
       end
 
-      def document_controller_via_trio_box bx, & oes_p
+      def document_controller_via_qualified_knownness_box bx, & oes_p
 
         o = DotFile_::Small_Time_::Sessions::Build_Document_Controller.new( @kernel, & oes_p )
-        o.receive_trio_box bx
+        o.receive_qualified_knownness_box bx
         o.produce_document_controller
       end
     end

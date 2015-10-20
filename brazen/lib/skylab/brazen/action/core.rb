@@ -295,7 +295,7 @@ module Skylab::Brazen
 
     ## ~~ readers
 
-    def to_full_trio_box
+    def to_full_qualified_knownness_box
 
       bx = Callback_::Box.new
       h = @argument_box.h_
@@ -311,7 +311,7 @@ module Skylab::Brazen
         end
 
         bx.add sym, Callback_::Qualified_Knownness.
-          via_value_and_had_and_model( x, had, prp )
+          via_value_and_had_and_association( x, had, prp )
 
         prp = st.gets
       end
@@ -319,12 +319,12 @@ module Skylab::Brazen
       bx
     end
 
-    def to_trio_box_proxy
+    def to_qualified_knownness_box_proxy
       Concerns__::Properties::Output::Actual_Values_as_Box.
         new @argument_box, formal_properties
     end
 
-    def to_trio_box_except__ * i_a  # [cu]
+    def to_qualified_knownness_box_except__ * i_a  # [cu]
 
       fo = formal_properties
       h = @argument_box.h_
@@ -333,7 +333,7 @@ module Skylab::Brazen
 
       a_.each do | k |
 
-        h_[ k ] = Callback_::Qualified_Knownness.via_value_and_model(
+        h_[ k ] = Callback_::Qualified_Knownness.via_value_and_association(
           h.fetch( k ), fo.fetch( k ) )
       end
 
@@ -341,11 +341,13 @@ module Skylab::Brazen
     end
 
     def qualified_knownness_of sym
+
       had = true
       x = @argument_box.fetch sym do
         had = false
       end
-      Callback_::Qualified_Knownness.via_value_and_had_and_model(
+
+      Callback_::Qualified_Knownness.via_value_and_had_and_association(
         x, had, formal_properties.fetch( sym ) )
     end
 
@@ -359,7 +361,7 @@ module Skylab::Brazen
 
     ## ~~ writers ( for actual properties ( "values" ) ) & support
 
-    def process_trio_box_passively__ bx
+    def process_qualified_knownness_box_passively__ bx
 
       Concerns__::Properties::Input::Via_trio_box[ self, bx ]  # result is result
     end

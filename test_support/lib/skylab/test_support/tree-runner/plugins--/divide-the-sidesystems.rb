@@ -28,16 +28,18 @@ module Skylab::TestSupport
 
       def __normalize_number
 
-        _arg = Callback_::Qualified_Knownness.via_value_and_variegated_symbol @N, :number
+        _qkn = Callback_::Qualified_Knownness.via_value_and_symbol @N, :number
 
-        ok_arg = Lib_::Basic[]::Number.normalization.with(
-          :argument, _arg,
+        qkn_ = Lib_::Basic[]::Number.normalization.with(
+          :qualified_knownness, _qkn,
           :minimum, 1,
           & @on_event_selectively )
 
-        ok_arg and begin
-          @d = ok_arg.value_x
+        if qkn_
+          @d = qkn_.value_x
           ACHIEVED_
+        else
+          qkn_
         end
       end
 

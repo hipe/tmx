@@ -50,10 +50,10 @@ module Skylab::SubTree
 
         end
 
-        def load_extension trio
+        def load_extension qualified_knownness
 
-          ext = Extensions_.const_get( trio.name.as_const, false ).
-            new trio, & @on_event_selectively
+          ext = Extensions_.const_get( qualified_knownness.name.as_const, false ).
+            new qualified_knownness, & @on_event_selectively
 
           __categorize_operation_mode ext
 

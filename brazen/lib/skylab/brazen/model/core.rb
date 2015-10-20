@@ -515,7 +515,7 @@ module Skylab::Brazen
       begin
         kn = st.gets
         kn or break
-        _x = if kn.is_known
+        _x = if kn.is_known_known
           kn.value_x
         end
         y.push kn.name_symbol, _x
@@ -531,7 +531,7 @@ module Skylab::Brazen
 
     def property_value_via_property prp  # :+#public-API (limited but varied use)
 
-      knownness_via_property_( prp ).value_x
+      qualified_knowness_via_association_( prp ).value_x
     end
 
     def normalize_property_value_via_normal_entity prp, ent, & oes_p

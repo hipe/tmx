@@ -68,25 +68,25 @@ module Skylab::Basic
 
         def normalize_value x, & oes_p
 
-          normalize_argument(
-            Callback_::Qualified_Knownness.via_value_and_variegated_symbol( x, :path ),
+          normalize_qualified_knownness(
+            Callback_::Qualified_Knownness.via_value_and_symbol( x, :path ),
             & oes_p )
         end
 
-        def normalize_argument arg, & oes_p
+        def normalize_qualified_knownness arg, & oes_p
           otr = dup
           otr.init_copy arg, & oes_p
           otr.execute
         end
 
         protected def init_copy arg, & oes_p
-          @arg = arg
+          @qualified_knownness = arg
           oes_p and @on_event_selectively = oes_p
           nil
         end
 
         def execute
-          @value_x = @arg.value_x
+          @value_x = @qualified_knownness.value_x
           @value_x and via_value_x
         end
 
@@ -224,7 +224,7 @@ module Skylab::Basic
         #   + `path_cannot_contain_contain_dot_file`
 
         def accept_arg_as_is
-          @result = @arg
+          @result = @qualified_knownness
           ACHIEVED_
         end
 
@@ -236,7 +236,7 @@ module Skylab::Basic
 
               terminal_channel_symbol,
               :path, @value_x,
-              :prop, @arg.model
+              :prop, @qualified_knownness.association
 
            ) do | y, o |
 

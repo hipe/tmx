@@ -510,7 +510,7 @@ module Skylab::TestSupport
 
         def via_output_path_rslv_line_downstream
 
-          _force_arg = Callback_::Qualified_Knownness.via_value_and_model(
+          _force_arg = Callback_::Qualified_Knownness.via_value_and_association(
             # because we use ivars and not property boxes, we must make this manually
             @force,
             self.class.properties.fetch( :force ) )

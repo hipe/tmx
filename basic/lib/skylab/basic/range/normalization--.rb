@@ -19,7 +19,7 @@ module Skylab::Basic
       def initialize & edit_p
 
         @on_event_selectively = nil  # none will be supported
-        @arg = nil
+        @qualified_knownness = nil
         instance_exec( & edit_p )
       end
 
@@ -29,7 +29,7 @@ module Skylab::Basic
 
     private
 
-      def arg=
+      def qualified_knownness=
         _receive_arg gets_one_polymorphic_value
       end
 
@@ -76,7 +76,7 @@ module Skylab::Basic
 
       def execute
 
-        if ! @arg
+        if ! @qualified_knownness
           self._MODERNIZE_THIS_CALL
         end
 
@@ -89,14 +89,14 @@ module Skylab::Basic
 
       protected def _receive_value x
 
-        _kn = Callback_::Qualified_Knownness.via_value_and_model(
+        _kn = Callback_::Qualified_Knownness.via_value_and_association(
           x, Home_.default_property )
 
         _receive_arg _kn
       end
 
       def _receive_arg arg
-        @arg = arg
+        @qualified_knownness = arg
         KEEP_PARSING_
       end
 
@@ -111,7 +111,7 @@ module Skylab::Basic
       def __normal_normalize
 
         ok = false
-        x = @arg.value_x
+        x = @qualified_knownness.value_x
 
         @or_a.each do |range|
           d = range.compare x
@@ -122,11 +122,11 @@ module Skylab::Basic
         end
 
         if ok
-          @arg
+          @qualified_knownness
 
         elsif @on_event_selectively
           @on_event_selectively.call :error, :not_in_range do
-            Explanation__.new_with :bp, @arg, :or_a, @or_a
+            Explanation__.new_with QKN__, @qualified_knownness, :or_a, @or_a
           end
         else
 
@@ -134,10 +134,12 @@ module Skylab::Basic
         end
       end
 
+      QKN__ = :qualified_knownness
+
       Explanation__ = Callback_::Event.prototype_with(
 
         :actual_property_is_outside_of_formal_property_set,
-        :bp, nil,
+        QKN__, nil,
         :or_a, nil,
         :error_category, :argument_error,
         :ok, false,
@@ -149,8 +151,10 @@ module Skylab::Basic
           adj_p_s_a.push range.phrase_under self
         end
 
-        y << "#{ par o.bp.model } must be #{ or_ adj_p_s_a }. #{
-          }had #{ ick o.bp.value_x }"
+        qkn = o.send QKN__
+
+        y << "#{ par qkn.association } must be #{ or_ adj_p_s_a }. #{
+          }had #{ ick qkn.value_x }"
       end
 
       class Mutable_Range___

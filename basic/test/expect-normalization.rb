@@ -23,7 +23,7 @@ module Skylab::Basic
 
       @input_arg = _mock_argument x
 
-      ok_arg = _cls.normalize_argument @input_arg, & _oes_p
+      ok_arg = _cls.normalize_qualified_knownness @input_arg, & _oes_p
 
       @event_proc_was_called = @ev_a ? true : false  # [br] expect event
 
@@ -95,7 +95,7 @@ module Skylab::Basic
             MOCK_PROPERTY__
           end
 
-          Callback_::Qualified_Knownness.via_value_and_had_and_model(
+          Callback_::Qualified_Knownness.via_value_and_had_and_association(
             value_x, actuals_has_name, _prop )
         end
       end

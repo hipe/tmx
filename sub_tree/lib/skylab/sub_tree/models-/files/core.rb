@@ -81,15 +81,15 @@ module Skylab::SubTree
 
           a = []
 
-          trios = to_trio_box_proxy
+          qkn_bx = to_qualified_knownness_box_proxy
 
-          x = trios.any_trueish :file_of_input_paths
+          x = qkn_bx.any_trueish :file_of_input_paths
           x and x.value_x.length.nonzero? and a.push x
 
-          x = trios.any_trueish :path
+          x = qkn_bx.any_trueish :path
           x and a.push x
 
-          x = trios.any_trueish :input_stream
+          x = qkn_bx.any_trueish :input_stream
           x and ! x.value_x.tty? and a.push x
 
           case 1 <=> a.length
@@ -124,8 +124,8 @@ module Skylab::SubTree
 
             ) do | y, o |
 
-              _s_a = o.a.map do | trio |
-                par trio.model
+              _s_a = o.a.map do | qualified_knownness |
+                par qualified_knownness.association
               end
 
               y << "can't read input from #{ both _s_a }#{ and_ _s_a } at the same time"
@@ -146,7 +146,7 @@ module Skylab::SubTree
             x or next
             prp = @formal_properties[ k ]
             prp.is_extension or next
-            ok = __load_extension Callback_::Qualified_Knownness.via_value_and_model( x, prp )
+            ok = __load_extension Callback_::Qualified_Knownness.via_value_and_association( x, prp )
             ok or break
           end
 
@@ -224,7 +224,7 @@ module Skylab::SubTree
           else
 
             kn = Home_.lib_.system.filesystem( :Upstream_IO ).with(
-              :path_arg, @upstream_arg,
+              :qualified_knownness_of_path, @upstream_arg,
               & handle_event_selectively )
 
             if kn

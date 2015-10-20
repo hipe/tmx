@@ -24,7 +24,7 @@ module Skylab::TanMan
             pt = hrd.parse_tree
 
             hrd.kernel.silo( :meaning ).bound_call :add,
-              :trio_box, hrd.trio_box,
+              :qualified_knownness_box, hrd.qualified_knownness_box,
               :with,
               :name, pt.fetch( 0 ).join( SPACE_ ),
               :value, pt.fetch( 2 ).join( SPACE_ ),
@@ -69,7 +69,7 @@ module Skylab::TanMan
             pt = hrd.parse_tree
 
             hrd.kernel.silo( :meaning ).bound_call :associate,
-              :trio_box, hrd.trio_box,
+              :qualified_knownness_box, hrd.qualified_knownness_box,
               :with,
               :node_label, pt.first.join( SPACE_ ),
               :meaning_name, pt.last.join( SPACE_ ),

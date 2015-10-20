@@ -6,9 +6,9 @@ module Skylab::SubTree
 
       class Extensions_::Mtime
 
-        def initialize trio, & _
+        def initialize qualified_knownness, & _
           @now_t = Home_::Library_::Time.new  # doesn't get cleared anywhere
-          @trio = trio
+          @qualified_knownness = qualified_knownness
         end
 
         def is_collection_operation
@@ -16,7 +16,7 @@ module Skylab::SubTree
         end
 
         def local_normal_name
-          @trio.name_symbol
+          @qualified_knownness.name_symbol
         end
 
         def receive_inline_mutable_leaf leaf

@@ -82,13 +82,13 @@ module Skylab::TanMan
         produce_document_controller
       end
 
-      def receive_trio_box bx
+      def receive_qualified_knownness_box bx
 
         o = Home_::Model_::Document_Entity::
           Byte_Stream_Identifier_Resolver.new(
             @kernel, & @on_event_selectively )
 
-        o.against_trio_box bx
+        o.against_qualified_knownness_box bx
 
         @_BUID = o.solve_for :input
 

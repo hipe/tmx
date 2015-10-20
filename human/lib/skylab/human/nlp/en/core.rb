@@ -94,6 +94,8 @@ module Skylab::Human
 
       S__ = -> do
 
+        it_them = [ 'them', 'it' ]
+
         inflected = {
               a: [ 'no ', 'a ', nil ],  # no birds  / a bird   / birds
              an: [ 'no ', 'an ', nil ],  # no errors / an error / errors
@@ -101,13 +103,14 @@ module Skylab::Human
              es: [ 'es', nil, 'es' ],  # matches / match
           exist: [ 'exist', 'is', 'are' ],
              is: [ 'are', 'is' ],
+             it: it_them,
              no: [ 'no ', 'the only ', nil ],
          one_of: [  nil, nil, 'one of '  ],
               s: [ 's', nil ],
              _s: [  nil, 's'  ],  # it requires, they require
            this: [ 'these', 'this' ],
             was: [ 'were', 'was' ],
-           them: [ 'them', 'it' ],
+           them: it_them,
               y: [ 'ies', 'y' ]
           }
 

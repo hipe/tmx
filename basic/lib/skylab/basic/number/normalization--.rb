@@ -56,11 +56,6 @@ module Skylab::Basic
 
       public
 
-        def to_component_argument_interpreter
-
-          ACS_[].argument_interpreter_via_normalization self
-        end
-
         def to_parser_proc
 
           -> in_st, & x_p do
@@ -70,22 +65,25 @@ module Skylab::Basic
               x_p and self._NICE
 
               _x = in_st.current_token
-              _trio = Callback_::Known.new_known _x
 
-              arg = normalize_argument _trio do | * i_a, & ev_p |
+              _qkn = Callback_::Qualified_Knownness.via_value_and_symbol(
+                _x, :argument )
+
+              vw = normalize_qualified_knownness _qkn do | * i_a, & ev_p |
 
                 self._HAVE_FUN
               end
-
-              arg and begin
+              if vw
                 in_st.advance_one
-                Home_.lib_.parse_lib::output_node.new arg.value_x
+                Home_.lib_.parse_lib::output_node.new vw.value_x
+              else
+                vw
               end
             end
           end
         end
 
-        def normalize_argument arg, & oes_p
+        def normalize_qualified_knownness arg, & oes_p
           otr = dup
           otr.__init_copy_with :argument, arg, & oes_p
           otr.execute
@@ -113,7 +111,7 @@ module Skylab::Basic
           end
 
           if ok
-            Callback_::Known.new_known @number
+            Callback_::Known_Known[ @number ]
           else
             @result
           end
@@ -158,7 +156,7 @@ module Skylab::Basic
 
           maybe_send_event :error, :invalid_property_value do
 
-            _new_invalid_event.did_not_match @x, @argument.model, @number_set
+            _new_invalid_event.did_not_match @x, _assoc, @number_set
           end
         end
 
@@ -200,8 +198,12 @@ module Skylab::Basic
           maybe_send_event :error, :invalid_property_value do
 
             _new_invalid_event.number_too_small(
-              @number, @argument.model, @minimum )
+              @number, _assoc, @minimum )
           end
+        end
+
+        def _assoc
+          @argument.association
         end
 
         def _new_invalid_event

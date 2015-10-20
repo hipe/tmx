@@ -44,9 +44,9 @@ module Skylab::System
         # algorithm and should probably not be abstracted
 
         io = @_stdout
-        pa = @path_arg
+        pa = @qualified_knownness_of_path
 
-        if pa && pa.is_known && pa.value_x
+        if pa && pa.is_known_known && pa.value_x
 
           if @do_recognize_common_string_patterns_
             md_x = via_path_arg_match_common_pattern_
@@ -80,7 +80,7 @@ module Skylab::System
 
         build_not_OK_event_with(
           :missing_required_properties,
-          :path_property, @path_arg.model
+          :path_property, @qualified_knownness_of_path.association
 
         ) do | y, o |
 
@@ -171,7 +171,7 @@ module Skylab::System
 
         fa = @_force_arg
         if fa
-          if fa.is_known && fa.value_x
+          if fa.is_known_known && fa.value_x
             _overwrite
           else
             maybe_send_event :error, :missing_required_properties do
@@ -188,14 +188,14 @@ module Skylab::System
         build_not_OK_event_with(
           :missing_required_permission,
           :force_arg, @_force_arg,
-          :path_arg, @path_arg,
+          :qualified_knownness_of_path, @qualified_knownness_of_path,
 
         ) do | y, o |
 
-          y << "#{ par o.path_arg.model } #{
+          y << "#{ par o.qualified_knownness_of_path.association } #{
            }exists, won't overwrite without #{
-            }#{ par o.force_arg.model }: #{
-             }#{ pth o.path_arg.value_x }"
+            }#{ par o.force_arg.association }: #{
+             }#{ pth o.qualified_knownness_of_path.value_x }"
         end
       end
 
@@ -242,11 +242,11 @@ module Skylab::System
 
         build_neutral_event_with(
           :before_probably_creating_new_file,
-          :path_arg, @path_arg,
+          :qualified_knownness_of_path, @qualified_knownness_of_path,
 
         ) do | y, o |
 
-          y << "creating #{ pth o.path_arg.value_x }"
+          y << "creating #{ pth o.qualified_knownness_of_path.value_x }"
         end
       end
 
@@ -254,7 +254,7 @@ module Skylab::System
 
         build_neutral_event_with(
           :before_editing_existing_file,
-          :path_arg, @path_arg,
+          :qualified_knownness_of_path, @qualified_knownness_of_path,
           :stat, @stat_
 
         ) do | y, o |
@@ -262,7 +262,7 @@ module Skylab::System
           if o.stat.size.zero?
             _zero_note = " empty file"
           end
-          _path = o.path_arg.value_x
+          _path = o.qualified_knownness_of_path.value_x
 
           y << "updating#{ _zero_note } #{ pth _path }"
         end

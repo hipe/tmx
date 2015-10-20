@@ -23,44 +23,44 @@ module Skylab::Brazen
       end
 
       o.on_event_selectively = oes_p
-      normalize_argument = o.flush
+      normalize_qualified_knownness = o.flush
 
-      kn = ACHIEVED_  # if there are no formal properties, watch what happens
+      qkn = ACHIEVED_  # if there are no formal properties, watch what happens
 
       begin
 
         prp = formal_prp_st.gets
         prp or break
 
-        kn = entity_x.knownness_via_property_ prp
+        qkn = entity_x.qualified_knowness_via_association_ prp
 
-        if kn.is_known
+        if qkn.is_known_known
           was_known = true
-          orig_x = kn.value_x
+          orig_x = qkn.value_x
         else
           was_known = false
         end
 
-        kn = normalize_argument[ kn, prp ]
-        kn or break
+        qkn = normalize_qualified_knownness[ qkn, prp ]
+        qkn or break
 
         yes = nil
         if was_known
-          if kn.is_known
-            if orig_x != kn.value_x
+          if qkn.is_known_known
+            if orig_x != qkn.value_x
               yes = true
             end
           else
             self._STRANGE
           end
-        elsif kn.is_known
+        elsif qkn.is_known_known
           yes = true
         end
 
         # (it may be that it was not known and it is not known)
 
         if yes
-          _ = entity_x.set_value_of_formal_property_ kn.value_x, prp
+          _ = entity_x.set_value_of_formal_property_ qkn.value_x, prp
           _ or self._NEVER  # #todo - assume this always succeeds?
         end
 
@@ -69,10 +69,10 @@ module Skylab::Brazen
 
       if miss_prp_a
         entity_x.receive_missing_required_properties_array miss_prp_a
-      elsif kn
+      elsif qkn
         ACHIEVED_
       else
-        kn
+        qkn
       end
     end
 
@@ -90,7 +90,7 @@ module Skylab::Brazen
 
           # 1. if value is unknown and defaulting is available, apply it.
 
-          __is_unknown = if kn.is_known
+          __is_unknown = if kn.is_known_known
             kn.value_x.nil?
           else
             true
@@ -98,7 +98,7 @@ module Skylab::Brazen
 
           if __is_unknown && model.has_default
 
-            kn = Callback_::Known.new_known @apply_default[ model ]
+            kn = Callback_::Known_Known[ @apply_default[ model ] ]
           end
 
           # (it may be that you don't know the value and there is no default)
@@ -114,7 +114,7 @@ module Skylab::Brazen
           #    (skip this if the field failed a normalization above.)
 
           if kn
-            __is_unknown = if kn.is_known
+            __is_unknown = if kn.is_known_known
               kn.nil?
             else
               true

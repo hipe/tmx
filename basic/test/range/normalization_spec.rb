@@ -27,7 +27,7 @@ module Skylab::Basic::TestSupport
       expect_no_events
 
       qkn = @result
-      qkn.model or fail
+      qkn.association or fail
       -1 == qkn.value_x or fail
     end
 

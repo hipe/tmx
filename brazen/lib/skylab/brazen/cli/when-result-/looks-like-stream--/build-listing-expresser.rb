@@ -11,8 +11,10 @@ module Skylab::Brazen
           :expag, :first_item
 
         def execute
-          if @first_item.respond_to? :to_component_knownness_stream
-            self._THIS #  __function_when_components
+
+          if @first_item.respond_to? :component_name_symbols
+            self._REDO_FUN_ride_along  # (current work branch)
+            __function_when_components
           else
             __function_when_line_up_columns
           end
@@ -99,6 +101,65 @@ module Skylab::Brazen
             m < d_ ? d_ : m
           end
           "%#{ d }s"
+        end
+
+        # ~
+
+        def __function_when_components
+
+          express_item = -> comp, y do
+
+            Recurse_into_component__[ comp, EMPTY_S_, y, '  ' ]
+          end
+
+          p = -> comp, y do
+
+            x = express_item[ comp, y ]
+            p = -> comp_, y_ do
+              y_ << YAML_SEPARATOR__
+              express_item[ comp_, y_ ]
+            end
+            x
+          end
+
+          -> comp, y do
+            p[ comp, y ]
+          end
+        end
+
+        Recurse_into_component__ = -> comp, margin_s, y, tab_s do
+
+          next_margin = -> do
+            s = "#{ margin_s }#{ tab_s }"
+            next_margin = -> { s }
+            s
+          end
+
+          st = comp.to_component_knownness_stream
+          begin
+            kn = st.gets
+            kn or break
+
+            cm = kn.association.component_model
+
+            if kn.is_known_known
+              x = kn.value_x
+              if x
+                if x.respond_to? :to_component_knownness_stream
+                  y << "#{ margin_s }#{ kn.name.as_human }:"
+                  Recurse_into_component__[ x, next_margin[], y, tab_s ]
+                else
+                  cm.express_primitive_text kn, margin_s, y, tab_s
+                end
+              else
+                cm.express_falseish_text kn, margin_s, y, tab_s
+              end
+            else
+              cm.express_unknown_text kn, margin_s, y, tab_s
+            end
+            redo
+          end while nil
+          y
         end
       end
     end

@@ -22,11 +22,11 @@ module Skylab::System::TestSupport
 
     it "not exist (path arg passed, name is used)" do
 
-      _pa = Callback_::Qualified_Knownness.via_value_and_variegated_symbol(
+      _pa = Callback_::Qualified_Knownness.via_value_and_symbol(
         _not_here, :wazoozie )
 
       @result = subject_.with(
-        :path_arg, _pa,
+        :qualified_knownness_of_path, _pa,
         & handle_event_selectively )
 
       _ev = expect_not_OK_event :errno_enoent
@@ -52,7 +52,7 @@ module Skylab::System::TestSupport
       against_ TestSupport_::Fixtures.file( :three_lines )
       expect_no_events
       kn = @result
-      kn.is_known or fail
+      kn.is_known_known or fail
       io = kn.value_x
       io.gets or fail
       io.close

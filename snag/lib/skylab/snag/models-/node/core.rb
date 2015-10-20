@@ -530,7 +530,7 @@ module Skylab::Snag
 
     Normalize_ID_ = -> arg, & x_p do
 
-      x = ( arg.value_x if arg.is_known )
+      x = ( arg.value_x if arg.is_known_known )
       if x
         o = Home_::Models_::Node_Identifier.new_via_user_value x, & x_p
         if o

@@ -14,20 +14,20 @@ module Skylab::Brazen
       o :description, -> y do
         y << "the name of the database"
       end,
-      :ad_hoc_normalizer, -> arg, & oes_p do
+      :ad_hoc_normalizer, -> qkn, & oes_p do
 
-        if ! arg.is_known || arg.value_x.nil?
+        if ! qkn.is_known_known || qkn.value_x.nil?
           # fallthru. let missing required check catch it.
-          arg
+          qkn
 
-        elsif /\A[-a-z0-9]+\z/ =~ arg.value_x
-          arg
+        elsif /\A[-a-z0-9]+\z/ =~ qkn.value_x
+          qkn
 
         else
           oes_p.call :error, :invalid_property_value do
             Callback_::Event.inline_not_OK_with(
               :name_must_be_lowercase_alphanumeric_with_dashes,
-                :name_s, arg.value_x )
+                :name_s, qkn.value_x )
           end
         end
       end,
@@ -46,13 +46,13 @@ module Skylab::Brazen
         y << "the HTTP port to connect to (default: #{ property_default })"
       end,
       :default, '5984',
-      :ad_hoc_normalizer, -> arg, & oes_p do
-        if arg.is_known
-          x = arg.value_x
+      :ad_hoc_normalizer, -> qkn, & oes_p do
+        if qkn.is_known_known
+          x = qkn.value_x
         end
         if x
           if /\A[0-9]{1,4}\z/ =~ x
-            arg
+            qkn
           else
             oes_p.call :error, :invalid_property_value do
               Callback_::Event.inline_not_OK_with(
@@ -60,7 +60,7 @@ module Skylab::Brazen
             end
           end
         else
-          arg
+          qkn
         end
       end,
       :property, :port

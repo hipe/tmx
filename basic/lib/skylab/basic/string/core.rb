@@ -31,10 +31,6 @@ module Skylab::Basic
         String_::Succ__.call_via_iambic x_a
       end
 
-      def succ
-        String_::Succ__
-      end
-
       def count_occurrences_in_string_of_string haystack, needle
         String_::Small_Time_Actors__::Count_occurrences_OF_string_IN_string[
           needle, haystack ]
@@ -124,6 +120,10 @@ module Skylab::Basic
             end
           end
         end
+      end
+
+      def succ
+        String_::Succ__
       end
 
       def template

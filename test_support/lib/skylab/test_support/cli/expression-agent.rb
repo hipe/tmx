@@ -51,7 +51,7 @@ module Skylab::TestSupport
       end
 
       def par prp
-        send @up.rendering_method_name_for_property( prp ), prp
+        send @up.expression_strategy_for_property( prp ), prp
       end
 
       # ~ (from above)

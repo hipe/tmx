@@ -138,7 +138,7 @@ module Skylab::Brazen::TestSupport
 
   # ~ to be an entity (model or action) you have to:
 
-    def knownness_via_property_ prp  # :+#cp
+    def qualified_knowness_via_association_ prp  # :+#cp
 
       if bx
         had = true
@@ -148,9 +148,9 @@ module Skylab::Brazen::TestSupport
       end
 
       if had
-        Callback_::Known.new_known x
+        Callback_::Known_Known[ x ]
       else
-        Callback_::Known::UNKNOWN
+        Callback_::KNOWN_UNKNOWN
       end
     end
 

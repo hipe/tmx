@@ -15,7 +15,7 @@ module Skylab::Cull
           :filename, FILENAME_,
           :ftype, fs.constants::DIRECTORY_FTYPE,
           :max_num_dirs_to_look, -1,
-          :prop, arg.model
+          :prop, arg.association
         ) do | * i_a, & ev_p |
           result = oes_p[ * i_a, & ev_p ]
           UNABLE_
@@ -61,16 +61,16 @@ module Skylab::Cull
 
       attr_reader :m, :a
 
-      def create_via_mutable_trio_box_and_look_path bx, path
-        _call :__create_via_mutable_trio_box_and_look_path, bx, path
+      def create_via_mutable_qualified_knownness_box_and_look_path bx, path
+        _call :__create_via_mutable_qualified_knownness_box_and_look_path, bx, path
       end
 
-      def edit_via_mutable_trio_box_and_look_path bx, path
-        _call :__edit_via_mutable_trio_box_and_look_path, bx, path
+      def edit_via_mutable_qualified_knownness_box_and_look_path bx, path
+        _call :__edit_via_mutable_qualified_knownness_box_and_look_path, bx, path
       end
 
-      def edit_via_mutable_trio_box bx
-        _call :_edit_via_mutable_trio_box, bx
+      def edit_via_mutable_qualified_knownness_box bx
+        _call :_edit_via_mutable_qualified_knownness_box, bx
       end
 
       def retrieve_via_workspace_path path
@@ -84,18 +84,18 @@ module Skylab::Cull
       end
     end
 
-    def __create_via_mutable_trio_box_and_look_path bx, path
+    def __create_via_mutable_qualified_knownness_box_and_look_path bx, path
       @_path = path
       @persist_step_a ||= []
       @persist_step_a.push [ :__create_editable_document ]
 
-      _edit_via_mutable_trio_box bx
+      _edit_via_mutable_qualified_knownness_box bx
     end
 
-    def __edit_via_mutable_trio_box_and_look_path bx, path
+    def __edit_via_mutable_qualified_knownness_box_and_look_path bx, path
       ok = _retrieve_via_workspace_path ::File.join( path, FILENAME_ )
       ok and begin
-        _edit_via_mutable_trio_box bx
+        _edit_via_mutable_qualified_knownness_box bx
       end
     end
 
@@ -121,10 +121,10 @@ module Skylab::Cull
       @_path
     end
 
-    def _edit_via_mutable_trio_box bx
+    def _edit_via_mutable_qualified_knownness_box bx
 
       arg_a = bx.to_value_stream.reduce_by do | arg |
-        arg.is_known && :path != arg.name_symbol
+        arg.is_known_known && :path != arg.name_symbol
       end.to_a
 
       if arg_a.length.zero?
@@ -464,10 +464,10 @@ module Skylab::Cull
 
       def via_path_argument_resolve_existent_survey
 
-        _trio = qualified_knownness :path
+        _qualified_knownness = qualified_knownness :path
 
         path = Models_::Survey.any_nearest_path_via_looking_upwards_from_path(
-          _trio,
+          _qualified_knownness,
           & handle_event_selectively )
 
         path and rslv_existent_survey_via_existent_path path

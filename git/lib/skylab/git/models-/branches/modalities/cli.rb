@@ -72,17 +72,17 @@ module Skylab::Git
 
         def __produce_name_stream
 
-          _path_arg = remove_backstream_argument_argument :file
+          _path_arg = remove_backstream_argument :file
 
           kn = Home_.lib_.system.filesystem( :Upstream_IO ).with(
             :instream, @resources.sin,
-            :path_arg, _path_arg,
+            :qualified_knownness_of_path, _path_arg,
             :neither_is_OK,
             & handle_event_selectively
           )
 
           if kn
-            if kn.is_known
+            if kn.is_known_known
               kn.value_x.to_simple_line_stream
             else
 

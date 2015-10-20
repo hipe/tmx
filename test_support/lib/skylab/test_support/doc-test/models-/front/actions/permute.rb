@@ -40,7 +40,7 @@ module Skylab::TestSupport
         def __resolve_upstream_IO
 
           kn = Home_.lib_.system.filesystem( :Upstream_IO ).with(
-            :path_arg, knownness( :test_file ),
+            :qualified_knownness_of_path, knownness( :test_file ),
             & handle_event_selectively )
 
           if kn

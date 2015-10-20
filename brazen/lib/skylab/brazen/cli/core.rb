@@ -750,7 +750,7 @@ module Skylab::Brazen
         _sketchily_remove_argument _d, sym
       end
 
-      def remove_backstream_argument_argument sym
+      def remove_backstream_argument sym
 
         # until random access - go backwards from the end looking for it
 
@@ -780,7 +780,7 @@ module Skylab::Brazen
           x_a[ d, 2 ] = EMPTY_A_  # eew
         end
 
-        Callback_::Qualified_Knownness.via_value_and_had_and_model(
+        Callback_::Qualified_Knownness.via_value_and_had_and_association(
           x,
           had,
           @front_properties.fetch( sym ),
@@ -1326,6 +1326,10 @@ module Skylab::Brazen
         @parent.app_name
       end
 
+      def expression_strategy_for_informal_property prp
+        @parent.expression_strategy_for_informal_property prp
+      end
+
       def maybe_use_exit_status d
         @parent.maybe_use_exit_status d
       end
@@ -1821,13 +1825,22 @@ module Skylab::Brazen
         end
       end
 
-      def rendering_method_name_for_property prp  # for expag
+      def expression_strategy_for_property prp  # for expag
 
-        __any_rendering_method_name_for_property( prp ) ||
-          :render_property_as_unknown
+        es = __expression_strategy_for_formal_property prp
+        if es
+          es
+        else
+          es = @adapter.expression_strategy_for_informal_property prp
+          if es
+            es
+          else
+            :render_property_as_unknown
+          end
+        end
       end
 
-      def __any_rendering_method_name_for_property prp
+      def __expression_strategy_for_formal_property prp
 
         sym, = category_symbol_and_property_via_name_symbol prp.name_symbol
 
@@ -2107,7 +2120,7 @@ module Skylab::Brazen
 
       def knownness_for sym  # [gi]
 
-        Callback_::Known.new_known bridge_for sym
+        Callback_::Known_Known[ bridge_for( sym ) ]
       end
 
       def bridge_for sym
@@ -2494,7 +2507,7 @@ module Skylab::Brazen
 
       def __derelativize_path arg, & oes_p
 
-        if arg.is_known
+        if arg.is_known_known
           path = arg.value_x
           if path
             if FILE_SEPARATOR_BYTE_ != path.getbyte( 0 )  # ick/meh

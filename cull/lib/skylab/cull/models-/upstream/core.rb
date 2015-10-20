@@ -13,12 +13,12 @@ module Skylab::Cull
         nil
       end
 
-      def mutable_trio_box bx
+      def mutable_qualified_knownness_box bx
 
         @bx.add :upstream, bx[ :upstream ].value_x
         kn = bx[ :upstream_adapter ]
         if kn
-          @bx.add :upstream_adapter, ( kn.value_x if kn.is_known )
+          @bx.add :upstream_adapter, ( kn.value_x if kn.is_known_known )
         end
 
         nil

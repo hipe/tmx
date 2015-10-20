@@ -72,7 +72,7 @@ module Skylab::TanMan::TestSupport::Models
           lbl_s_a = record.fetch 1
         end
 
-        trios = lbl_s_a.map do | lbl_s |
+        qkn_a = lbl_s_a.map do | lbl_s |
           id_s = nil
           have_seen = seen_lbl_h.fetch lbl_s do
             seen_lbl_h[ lbl_s ] = true
@@ -86,7 +86,7 @@ module Skylab::TanMan::TestSupport::Models
           [ lbl_s, id_s, have_seen ]
         end
 
-        trios.each do | lbl_s, id_s, have_seen |
+        qkn_a.each do | lbl_s, id_s, have_seen |
 
           if ! have_seen
             line_a.push "  #{ id_s } [ label=\"#{ lbl_s }\" ]"
@@ -94,9 +94,10 @@ module Skylab::TanMan::TestSupport::Models
         end
 
         if is_assoc
-          line_a.push "  #{ trios.first[ 1 ] } -> #{ trios.last[ 1 ] }"
+          line_a.push "  #{ qkn_a.first[ 1 ] } -> #{ qkn_a.last[ 1 ] }"
         end
       end
+
       line_a.push "}\n"
       line_a.join "\n"
     end

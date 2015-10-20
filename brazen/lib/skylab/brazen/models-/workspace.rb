@@ -210,17 +210,17 @@ module Skylab::Brazen
 
       # ~ custom exposures
 
-      def workspace_via_trio_box box, & oes_p
-        WS_via_trio_box___.new( box, @model_class, @kernel, & oes_p ).execute
+      def workspace_via_qualified_knownness_box box, & oes_p
+        WS_via_qualified_knownness_box___.new( box, @model_class, @kernel, & oes_p ).execute
       end
 
       # ~ hook-outs / hook-ins
 
       def precondition_for action, id, box, & oes_p
 
-        _bx = action.to_trio_box_proxy
+        _bx = action.to_qualified_knownness_box_proxy
 
-        WS_via_trio_box___.new( _bx, @model_class, @kernel, & oes_p ).execute
+        WS_via_qualified_knownness_box___.new( _bx, @model_class, @kernel, & oes_p ).execute
       end
 
       def any_mutated_formals_for_depender_action_formals x
@@ -240,7 +240,7 @@ module Skylab::Brazen
       end
     end
 
-    class WS_via_trio_box___
+    class WS_via_qualified_knownness_box___
 
       def initialize bx, mc, k, & oes_p
         @bx = bx
@@ -250,7 +250,7 @@ module Skylab::Brazen
 
         _ = Callback_::Event.produce_handle_event_selectively_through_methods
 
-        @oes_p = _.bookends self, :Workspace_via_trio_boX do | * i_a, & ev_p |
+        @oes_p = _.bookends self, :Workspace_via_qualified_knownness_boX do | * i_a, & ev_p |
           maybe_send_event_via_channel i_a, & ev_p
         end
       end
@@ -258,7 +258,7 @@ module Skylab::Brazen
       def execute
 
         qkn = @bx.fetch :workspace_path
-        if qkn.is_known
+        if qkn.is_known_known
           ws_path = qkn.value_x
         end
 
@@ -286,21 +286,21 @@ module Skylab::Brazen
             :surrounding_path, @bx.fetch( :workspace_path ).value_x )
         end
 
-        @ws and __via_workspace_produce_existent_workspace_via_trio_box @bx
+        @ws and __via_workspace_produce_existent_workspace_via_qualified_knownness_box @bx
       end
 
-      def __via_workspace_produce_existent_workspace_via_trio_box bx
+      def __via_workspace_produce_existent_workspace_via_qualified_knownness_box bx
 
         _did_find = @ws.resolve_nearest_existent_surrounding_path(
           bx.fetch( :max_num_dirs ).value_x,
-          :prop, bx.fetch( :workspace_path ).model,
+          :prop, bx.fetch( :workspace_path ).association,
           & @oes_p )
 
         _did_find and begin
 
           q = bx[ :verbose ]
 
-          if q && q.is_known && q.value_x  # #tracking :+[#069] verbose manually
+          if q && q.is_known_known && q.value_x  # #tracking :+[#069] verbose manually
 
             maybe_send_event :info, :verbose, :using_workspace do
 
@@ -315,7 +315,7 @@ module Skylab::Brazen
         end
       end
 
-      def on_Workspace_via_trio_boX_resource_not_found_via_channel i_a, & ev_p
+      def on_Workspace_via_qualified_knownness_boX_resource_not_found_via_channel i_a, & ev_p
 
         pair = @bx[ :just_looking ]
 

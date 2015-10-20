@@ -56,11 +56,11 @@ module Skylab::BeautySalon
 
         def prepare_backstream_call x_a
 
-          _arg = remove_backstream_argument_argument :file
+          _qkn = remove_backstream_argument :file
 
           kn = Home_.lib_.system.filesystem( :Upstream_IO ).with(
 
-            :path_arg, _arg,
+            :qualified_knownness_of_path, _qkn,
             :filesystem, @resources.bridge_for( :filesystem ),
             & handle_event_selectively
           )

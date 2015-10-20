@@ -29,11 +29,11 @@ module Skylab::TanMan::TestSupport::Models::DotFile
 
       bx = Home_::Callback_::Box.new
 
-      bx.add sym, Callback_::Qualified_Knownness.via_value_and_model( x,
+      bx.add sym, Callback_::Qualified_Knownness.via_value_and_association( x,
         Home_::Model_::Document_Entity::IO_PROPERTIES__.fetch( sym ) )
 
       Home_.application_kernel_.silo( :dot_file ).
-        document_controller_via_trio_box bx, & @on_event_selectively
+        document_controller_via_qualified_knownness_box bx, & @on_event_selectively
     end
   end
 end

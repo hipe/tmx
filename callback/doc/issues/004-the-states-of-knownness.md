@@ -1,61 +1,79 @@
 # the states of knownness :[#004]
 
 
-## introduction
+## synopsis
 
-we love a good neologism and "knownness" is our favorite yet. this idea
-grew out of [#ba-027] normaliztion and has since become both auxiliary
-to that and its own thing.
+• a "known known" simply wraps a value. it can be a value of be `nil` or
+  `false` (typically when these are valid values or the model).
 
-for casual use we are keeping the name "trio" in some places, for both
-its brevity and historical significance. however this tuple at first grew
-to have more than three components and then fractured into a family of
-closely related singletons and one class:
+• a "known known" has the important side-effect that it itself is always
+  true-ish (because it is an instance of a class we created).
 
-a "knownness" can be:
+• a "known known" can be qualified or unqualified.
 
-  • the "known unknown" singleton -OR-
-  • a "known" instance
+• the qualified variety of "known known" has an `association` field that
+  must produce an assocation structure of any shape provided that it has
+  a `name` field that produces a name *function*.
 
-the first singleton and instances of the second class all answer the
-question `is_known`. the first always answers the question `false`. the
-second always answers the question `true`, *even when the known value is
-`nil`*.
+• the unqualified "known known" has no `association` field (and to
+  request one should raise a no method exception).
 
-
-from any of these we can build a "qualified knownness". the qualified
-knowness answers either some or all of the above questions, and also:
-
-  • the `name_symbol` of the field (derived from the any "model" next)
-
-  • the `model` of the field (see #intentionally-confusing below).
+• a "known unknown" itself does not have a value field. (however it is
+  still true-ish like all "knownnesses"). because an unqualified known
+  unknown has no internal state to maintain, it is a singleton object.
 
 
-the fun of working with knowing what we don't know was the focus of the
 
-this document was born from a cluster of work whose focus was to toy
-with the idea of modeling formally "knowing what we don't know". in
-fact, we experimentally added one more boolean field to manage trying to
-model an unknown unknown until we realized that didn't make any sense
-(see tombstone at the end of this file).
+
+## prerequisites and side-reading
+
+this is perhaps one step after [#br-088] the meta-meta-properties
+justification.
+
+an important application of this "theory" at [#ba-027] normal
+normalization.
 
 
 
 
 
+## what is a "knownness", and what is a known known?
 
-## intentionally confusing
+this is not epistemology - we are simply describing our data structures,
+so hopefully we won't be here long.
 
-in an earlier incarnation of this structure we called the component that
-we now call `model` `property`. `property` was short for "formal
-property", a concept that is now universally understood to us. this kind
-of structure is universally understood as being a distinct ancilliary to
-an "entity model" (which we call "model") for short.
+### what is a "knownness"?
 
-the fact that this structure component is usualy occupied by a formal
-property but is called `model` is knowingly confusing. all we can say
-for now is that this choice in name represents a possible further
-abstraction we may take in the future near [#br-089] the ACS.
+  • a "knownness" is the generic term for everything we are describing
+    here.
+
+  • a "knownness" is always true-ish. this fact can be leveraged by
+    methods to result in a "knownness" on success and false-ish on
+    failure when approriate.
+
+  • a "knowness" can always answer the question "is this a known known?",
+    that is, "is there a value associated with this knownness?"
+
+  • a "knowness" can always answer the question "is this a qualified knownness?"
+    (to be explained below.)
+
+### what is a "known known"?
+
+  • because it is a knownness, all of the above points apply to it.
+
+  • a known known always has a value associated with it.
+
+  • the value may be validly false or nil as appropriate.
+
+  • in another incarnation we used the less opaque name "value wrapper"
+    for this structure.
+
+### what is a qualified knownness?
+
+  • formally a qualified knownness is (either a known uknown or a known
+    known) that also has an association structure associated with it.
+
+  • because it is a knownness it can answer those points there.
 
 
 
@@ -173,10 +191,10 @@ entity is represented by an object (i.e instance of the model class) or
 in some other collection of values, like a hash, "iambic" array or
 "box".
 
-the `is_known` field indicates whether the association exists
+the `is_known_known` field indicates whether the association exists
 in the value collection. so for a "full" collection of knownness built
 from an entity, the number of knownnesses will correspond to the number
-of formal properties, and the number of those whose `is_known` is true
+of formal properties, and the number of those whose `is_known_known` is true
 will correspond to the number of elements in the value collection.
 
 now, of those that are `nil`, someone has to decide what `nil` means.
@@ -184,4 +202,5 @@ but we see that as a business concern outside of the scope of this
 "knownness" structure.
 
 _
+:+#tombstone: remove longwinded intro with some history
 :+#tombstone: when we used to have one more field, to model unknown unknown

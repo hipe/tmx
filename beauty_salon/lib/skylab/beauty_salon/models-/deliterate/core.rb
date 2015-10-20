@@ -42,7 +42,7 @@ module Skylab::BeautySalon
           _prp = self.properties.fetch :to_line
           _qkn = arg.to_qualified_known_around _prp
 
-          Home_.lib_.basic::Range.normalize_argument(
+          Home_.lib_.basic::Range.normalize_qualified_knownness(
             _qkn, :is, -1, :or, :begin, 1,
             & oes_p )
         end,

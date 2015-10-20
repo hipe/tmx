@@ -6,8 +6,8 @@ module Skylab::TanMan
 
       class << self
 
-        def downstream_identifier_via_trios trio_a, & oes_p
-          Brazen_.byte_downstream_identifier.via_trios trio_a, & oes_p
+        def downstream_identifier_via_qualified_knownnesss qkn_a, & oes_p
+          Brazen_.byte_downstream_identifier.via_qualified_knownnesses qkn_a, & oes_p
         end
 
         def entity_property_class
@@ -26,8 +26,8 @@ module Skylab::TanMan
           IO_PROPERTIES__.output_stream
         end
 
-        def upstream_identifier_via_trios trio_a, & oes_p
-          Brazen_.byte_upstream_identifier.via_trios trio_a, & oes_p
+        def upstream_identifier_via_qualified_knownnesss qkn_a, & oes_p
+          Brazen_.byte_upstream_identifier.via_qualified_knownnesses qkn_a, & oes_p
         end
       end  # >>
 
@@ -247,8 +247,8 @@ module Skylab::TanMan
           @custom_direction_mappings_h[ i ] = i_
         end
 
-        def against_trio_box bx
-          @trio_box = bx ; nil
+        def against_qualified_knownness_box bx
+          @qualified_knownness_box = bx ; nil
         end
 
         def against_argument_box bx
@@ -380,23 +380,23 @@ module Skylab::TanMan
 
           bucket_h = ::Hash[ direction_sym_a.map { | sym | [ sym, [] ] } ]
 
-          __each_relevant_trio do | trio |
+          __each_relevant_qualified_knownness do | qualified_knownness |
 
-            trio.model.direction_symbols.each do | sym |
+            qualified_knownness.association.direction_symbols.each do | sym |
 
               a = bucket_h[ sym ]
               a or next
-              a.push trio
+              a.push qualified_knownness
             end
           end
 
           bucket_h
         end
 
-        def __each_relevant_trio
+        def __each_relevant_qualified_knownness
 
           # if we were given formals we assume we have the arguments as a
-          # box and so we can build our own trios. if we weren't we don't
+          # box and so we can build our own qualified knownnesses. if we weren't we don't
 
           if @formals
 
@@ -408,17 +408,17 @@ module Skylab::TanMan
                 next
               end
 
-              yield Callback_::Qualified_Knownness.via_value_and_model( x, prp )
+              yield Callback_::Qualified_Knownness.via_value_and_association( x, prp )
             end
           else
 
-            @trio_box.each_value do | trio |
+            @qualified_knownness_box.each_value do | qualified_knownness |
 
-              if ! trio.model.respond_to? :expresses_direction
+              if ! qualified_knownness.association.respond_to? :expresses_direction
                 next
               end
 
-              yield trio
+              yield qualified_knownness
             end
           end
           nil
@@ -436,7 +436,7 @@ module Skylab::TanMan
           others = nil
 
           sort_me.each do | arg |
-            prp = arg.model
+            prp = arg.association
             if 1 == prp.direction_symbols.length
               ( specifics ||= [] ).push arg
             elsif prp.is_essential_to_direction
@@ -504,7 +504,7 @@ module Skylab::TanMan
               _xtra = " (provide #{ or_ _s_a })"
             else
               _s_a = arg_a.map do |arg|
-                par arg.model
+                par arg.association
               end
               _xtra = " (#{ _s_a * ', ' })"
             end
@@ -565,9 +565,9 @@ module Skylab::TanMan
 
           id = Brazen_::Collection.const_get(
 
-            @parent.const_via_direction_ @arg.model.direction_specific_symbol
+            @parent.const_via_direction_ @arg.association.direction_specific_symbol
 
-          ).via_trios(
+          ).via_qualified_knownnesses(
             @arglist, & @parent.oes_p_ )
 
           id and begin
@@ -581,7 +581,7 @@ module Skylab::TanMan
           kr = @parent.kr_
           oes_p = @parent.oes_p_
 
-          ws = kr.silo( :workspace ).workspace_via_trio_box(
+          ws = kr.silo( :workspace ).workspace_via_qualified_knownness_box(
             Callback_::Stream.via_nonsparse_array( @arglist ).
               flush_to_box_keyed_to_method( :name_symbol ),
               & oes_p )

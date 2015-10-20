@@ -157,7 +157,7 @@ module Skylab::Brazen
 
       p = -> do
 
-        box_mod = item::Actions
+        box_mod = item.const_get :Actions, false  # can't assume item is a module
 
         if box_mod
           _const_sym_a = box_mod.constants

@@ -22,8 +22,8 @@ module Skylab::TanMan
 
         def produce_result
           Session.new @kernel, handle_event_selectively do | o |
-            o.trio_box = to_trio_box_proxy
-          end.via_trio_box
+            o.qualified_knownness_box = to_qualified_knownness_box_proxy
+          end.via_qualified_knownness_box
         end
 
         class << self
@@ -47,20 +47,20 @@ module Skylab::TanMan
         Callback_::Event.selective_builder_sender_receiver self
 
         def initialize k, oes_p
-          @trio_box = nil
+          @qualified_knownness_box = nil
           @kernel = k
           @on_event_selectively = oes_p
           @value_fetcher = nil
           yield self
         end
 
-        attr_writer :starter, :trio_box, :value_fetcher
+        attr_writer :starter, :qualified_knownness_box, :value_fetcher
 
-        def via_trio_box
+        def via_qualified_knownness_box
 
-          q = @trio_box[ :use_default ]
+          q = @qualified_knownness_box[ :use_default ]
 
-          if q && q.is_known && q.is_known && q.value_x
+          if q && q.is_known_known && q.is_known_known && q.value_x
 
             via_default
           else
@@ -114,8 +114,8 @@ module Skylab::TanMan
 
         def via_workspace_related_arguments
 
-          @ws = @kernel.silo( :workspace ).workspace_via_trio_box(
-            @trio_box, & handle_event_selectively )
+          @ws = @kernel.silo( :workspace ).workspace_via_qualified_knownness_box(
+            @qualified_knownness_box, & handle_event_selectively )
 
           @ws and via_workspace
         end

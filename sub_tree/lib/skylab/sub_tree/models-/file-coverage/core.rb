@@ -43,13 +43,13 @@ module Skylab::SubTree
           y << "the path to any file or folder in a project"
         end,
 
-        :ad_hoc_normalizer, -> arg, & oes_p do
+        :ad_hoc_normalizer, -> qkn, & oes_p do
 
-          if arg.is_known && arg.value_x
+          if qkn.is_known_known && qkn.value_x
             Home_.lib_.basic::Pathname.normalization.new_with( :absolute ).
-              normalize_argument( arg, & oes_p )
+              normalize_qualified_knownness( qkn, & oes_p )
           else
-            arg
+            qkn
           end
         end,
 

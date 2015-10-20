@@ -1,3 +1,5 @@
+[#122]       as if you would ever..
+[#121]       #tracking this wrapping algo
 [#120] #open extensible component modifiers
 [#119] #open get [fm] out of test (see)
 [#118]       do we want the ability to have a model-less-action? for now, no
@@ -37,9 +39,10 @@
 [#087]       #track similar normalization logics (this might be a redundant tracker)
 [#086]       #track cases where failure is "fuzzy" (i.e non-atomic),
                ignored for the greater good, for usability
-[#085] #hole (#moved-to: [#ba-053])
+[#085]       track redundant implementations of poly.stream for one value
+             (#was: (#moved-to: [#ba-053]))
 [#084]       :+#wishlist a `flag` meta-meta prperty
-[#083] #hole (#moved-to: [#ba-052])
+[#083]       ACS unmarshalling .. (#parent-node: [#089])
              ( #was: #done workspace `init` action should not default to '.' in API )
 [#082]       #track meta-meta-property candidates (list, enum etc)
 [#081]       #track experimental extensions to Actor

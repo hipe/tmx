@@ -22,7 +22,7 @@ module Skylab::TanMan
 
           def bound_call_via_heard hrd, & oes_p
 
-            bx = hrd.trio_box
+            bx = hrd.qualified_knownness_box
             x = bx.remove :word
 
             s_a = x.value_x
@@ -56,7 +56,7 @@ module Skylab::TanMan
 
               @bx.add :just_looking, Callback_::Pair[ true, :just_looking ]
 
-              @ws = @kernel.silo( :workspace ).workspace_via_trio_box(
+              @ws = @kernel.silo( :workspace ).workspace_via_qualified_knownness_box(
                 @bx, & @on_event_selectively )
 
               if ! @ws
@@ -69,7 +69,7 @@ module Skylab::TanMan
             def __create_ws_at_path path
 
               @ws = @kernel.silo( :workspace ).call :init,
-                :trio_box, @bx,
+                :qualified_knownness_box, @bx,
                 :with, :path, path, & @on_event_selectively
 
               @ws and ACHIEVED_

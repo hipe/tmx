@@ -233,15 +233,16 @@ module Skylab::Snag
 
     Integer_component_model___ = Callback_.memoize do
 
-      # a dedicated class for this component association is overkill when
-      # all we want is to effect the valid subset of all integers
-      # ( but #open :+[#ba-050] )
+      # expirimental near :+[#ba-050]
+      # ->
 
-      Home_.lib_.basic::Number.normalization.new_with(
-        :minimum, 1,
-        :number_set, :integer
+        _n11n = Home_.lib_.basic::Number.normalization.new_with(
+          :minimum, 1,
+          :number_set, :integer,
+        )
+        # <-
 
-      ).to_component_argument_interpreter
+      ACS_[]::Model::Via_normalization[ _n11n ]
     end
 
     def __set__component x, ca, & _

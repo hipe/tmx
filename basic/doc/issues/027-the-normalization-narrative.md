@@ -9,7 +9,7 @@ for a single, unified solution that is universally applicable,
 recognizable, and poka-yoke; we have adopted this one method name,
 signature and semantics:
 
-    normalize_argument <qualified-knownness>, & <oes_p>
+    normalize_qualified_knownness <qualified-knownness>, & <oes_p>
 
 
 
@@ -99,7 +99,7 @@ this one subject method replaces all of what were once 5 (five)
 
     any_error_event_via_validate_x
     normalize
-    normalize_argument
+    normalize_qualified_knownness
     normalize_via_two
     normalize_via_three
 

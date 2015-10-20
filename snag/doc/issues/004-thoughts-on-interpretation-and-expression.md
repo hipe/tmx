@@ -14,7 +14,7 @@ adapters.
 the Big Things we have on the table so far are:
 
   • the input/output dichotomy to be presented below
-  • [#ba-027] `normalize_argument` is the universal way for n11n
+  • [#ba-027] `normalize_qualified_knownness` is the universal way for n11n
   • `express_into_under` is the univeral way for expression
   • the nascent "expression adapters" puts modality first
   • all of the above under "composition" to be presented below

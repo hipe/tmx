@@ -243,7 +243,7 @@ module Skylab::Brazen
       end
     end
 
-    def knownness_via_property_ prp
+    def qualified_knowness_via_association_ prp
 
       knownness prp.name_symbol
     end
@@ -255,7 +255,7 @@ module Skylab::Brazen
         had = false
       end
 
-      Callback_::Qualified_Knownness.via_value_and_had_and_model(
+      Callback_::Qualified_Knownness.via_value_and_had_and_association(
         x, had, formal_properties.fetch( sym ) )
     end
 
@@ -267,9 +267,9 @@ module Skylab::Brazen
       end
 
       if had
-        Callback_::Known.new_known x
+        Callback_::Known_Known[ x ]
       else
-        Callback_::Known::UNKNOWN
+        Callback_::KNOWN_UNKNOWN
       end
     end
 
@@ -325,9 +325,9 @@ module Skylab::Brazen
 
     if instance_variable_defined? ivar
 
-      Callback_::Known.new_known instance_variable_get ivar
+      Callback_::Known_Known[ instance_variable_get ivar ]
     else
-      Callback_::Known::UNKNOWN
+      Callback_::KNOWN_UNKNOWN
       # raise ::NameError, __say_no_ivar( ivar )
     end
   end

@@ -656,122 +656,141 @@ module Skylab::Callback
     self
   end
 
+  # knownnesses (see [#004])
+
+  module KNOWN_UNKNOWN ; class << self
+
+    def to_qualified_known_around asc
+      Qualified_Knownness.via_association asc
+    end
+
+    def is_known_known
+      false
+    end
+
+    def is_qualified
+      false
+    end
+
+  end ; end
+
+  class Known_Known
+
+    class << self
+
+      alias_method :[], :new
+      private :new
+    end  # >>
+
+    def initialize x
+      @value_x = x
+    end
+
+    def to_qualified_known_around asc
+      Qualified_Knownness.via_value_and_association @value_x, asc
+    end
+
+    attr_reader :value_x
+
+    def is_known_known
+      true
+    end
+
+    def is_qualified
+      false
+    end
+  end
+
+  class Qualified_Knownness
+
+    class << self
+
+      def via_association asc
+        new nil, false, asc
+      end
+
+      _CA = nil ; p = -> do
+        p = nil
+        _CA = Home_.lib_.basic::Minimal_Property.via_variegated_symbol :against
+      end
+
+      define_method :via_value_and_symbol do | x, sym |
+
+        _asc = if :argument == sym
+          _CA || p[]
+        else
+          Home_.lib_.basic::Minimal_Property.via_variegated_symbol sym
+        end
+
+        via_value_and_association x, _asc
+      end
+
+      def via_value_and_association x, asc
+        new x, true, asc
+      end
+
+      alias_method :via_value_and_had_and_association, :new
+      private :new
+    end  # >>
+
+    def initialize x, is_knkn, asc
+
+      @association = asc
+
+      @is_known_known = is_knkn
+      if is_knkn
+        @value_x = x
+      end
+    end
+
+    def new_with_value x
+      self.class.via_value_and_had_and_association x, true, @association
+    end
+
+    def to_unknown
+      self.class.via_association @association
+    end
+
+    def value_x
+      if @is_known_known
+        @value_x
+      else
+        raise __say_is_known_unknown
+      end
+    end
+
+    def __say_is_known_unknown
+      "#{ description } is a known unknown - do not request its value"
+    end
+
+    def description  # look good for [#010]
+      "«qualified-knownness#{ ":#{ name.as_slug }" }»"  # :+#guillemets
+    end
+
+    def name_symbol
+      name.as_variegated_symbol
+    end
+
+    def name
+      @association.name
+    end
+
+    attr_reader(
+      :association,
+      :is_known_known,
+    )
+
+    def is_qualified
+      true
+    end
+  end
+
   Pair_ = Pair = ::Struct.new :value_x, :name_x do  # :[#055].
 
     alias_method :name_symbol, :name_x  # as you like it
 
     def new_with_value x
       self.class.new x, name_symbol
-    end
-  end
-
-  class Known  # see [#004]
-
-    module UNKNOWN ; class << self
-
-      def is_known
-        false
-      end
-
-      def to_qualified_known_around prp
-        Qualified_Knownness.via_model prp
-      end
-    end ; end
-
-    class << self
-      alias_method :new_known, :new
-      private :new
-    end  # >>
-
-    # ->
-      def initialize x
-        @value_x = x
-      end
-
-      def new_with_value x
-        self.class.new_known x
-      end
-
-      def is_known
-        true
-      end
-
-      attr_reader :value_x
-
-      def to_qualified_known_around prp
-        Qualified_Knownness.via_value_and_model @value_x, prp
-      end
-      # <-
-  end
-
-  class Qualified_Knownness  # :[#004]. (near [#br-088]. intro at [#ba-027])
-
-    class << self
-
-      def via_model prp
-        new false, prp
-      end
-
-      def via_value_and_had_and_model x, b, prp
-        if b
-          new x, true, prp
-        else
-          new false, prp
-        end
-      end
-
-      def via_value_and_model x, prp
-        new x, true, prp
-      end
-
-      def via_value_and_variegated_symbol x, sym
-        new x, true,
-          Home_.lib_.basic::Minimal_Property.via_variegated_symbol( sym )
-      end
-
-      alias_method :via_x_and_i, :via_value_and_variegated_symbol
-
-      alias_method :_new, :new
-      private :new
-    end  # >>
-
-    def initialize vx=nil, ik, prp
-      @is_known = ik
-      @model = prp
-      if ik
-        @__value_x = vx
-      end
-      freeze
-    end
-
-    def to_unknown
-      self.class._new false, true, @model
-    end
-
-    def new_with_value x
-      self.class._new x, @is_known, @model
-    end
-
-    attr_reader :is_known, :model
-
-    def value_x
-      if @is_known
-        @__value_x
-      else
-        raise "unknown: '#{ @model.name_function.as_variegated_symbol }'"
-      end
-    end
-
-    def name_symbol
-      @model.name_function.as_variegated_symbol
-    end
-
-    def name
-      @model.name
-    end
-
-    def description  # look good for [#010]
-      "«qualified-known#{ ":#{ @model.name.as_slug }" if @model}»"  # :+#guillemets
     end
   end
 

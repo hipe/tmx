@@ -1,7 +1,14 @@
 # names :[#059]
 
+## prerequisites
 
-"actual value" vs. "formal value" is defined [#fi-025] here.
+to understand how "actual value" is distinct from "formal value",
+see [#fi-025].
+
+
+
+
+## "property"
 
 "property" generally means the formal property as object. we now may use
 this generally to refer to the structure representing the metatdata for
@@ -9,12 +16,12 @@ this formal, business-specific conception that we have referred to
 in the past variously as "attribute", "parameter", "field" in our
 [#fi-001] various takes on this through history.
 
+for some deep context, consider that we are now conceptualizing a
+"formal property" as a sort of [#098] "association" structure. (the
+relationship between these two is tracked by [#122]).
+
 `property_value_via_symbol` is one method you can use to get the actual
 value from the formal value's name symbol.
-
-"argument" has two meanings: for one it is the values that actions hold
-and model, as opposed to the values that entities hold and model, which
-we call "properties." the other meaning will be presented below.
 
 some of the action's arguments may parse into property values for the
 entity being described. those that do not may describe details of
@@ -27,11 +34,35 @@ become "properties").
 
 
 
+## "argument"
+
+as a name for a phenomenon in code, we now recommend against all usages
+but one for the word "argument":
+
+  • only use "argument" to refer to the actual value passed by a user
+    (or client, etc). for example, `@argument_box` is an appropriate use
+    of the term "argument" - it is a box whose names are symbolic and whose
+    values are the actual values that the user passed to the action.
+
+we used to allow the term "argument" to refer to a qualified knownness
+structure (below). we now recommend against this because it is too confusing
+alongside "pairs" and "unqualified knownnesses".
+
+
+
+
+
 ## a pair :[#cb-055]
 
 when we group a name and a value in a general way we call this a "pair."
 always the means of accessing this pair's constituents must be with the
-methods `value_x` and `name_i`. avoid `to_a` because our conventional
+methods `value_x` and `name_x` (or use the alias for `name` IFF it
+holds a name function).
+
+the members are suffixed with `x` to remind the user that their shape is
+freeform -- the "name" is not necesssarily a name function, for example.
+
+although this is currently a platform struct, avoid `to_a` because our conventional
 ordering of this pair is "value, name" (volatility order) not
 "name, value" (the more familiar, idiomatic order of these terms).
 since our convention is at oods with the idiom and the idiom is at odds
@@ -40,33 +71,21 @@ with our convention, we opt to formaize this order as undefined.
 
 
 
-## a trio
+## a "qualified knownness"
 
-the other meaning for "argument" is now known formerly as "trio".
-the "trio" is the grouping of the following three things:
-
-  1) the formal value ("property" above) as object
-  2) a boolean-ish indicating whether or not any actual value is to be
-     considered as "known" i.e "provided" for this formal value.
-     true-ish means "known", false-ish means "not known"
-  3) the actual value (if (2) is true.) if (2) is false, this value
-     has no meaning.
-
-it might read better to have a variable called "arg" as opposed to "trio",
-but whenever we need to avoid ambiguity we will say "trio". but note we
-we may still use the name "arg" for this in some contexts.
-
-we may also call the above a "bound property".
-
-whew!
+see [#ca-004] for a full treatment on this.
 
 
 
 
 ## summary
 
-`argument` - what actions handle. also, an informal name for "trio"
-`pair` - value and name
-`parameter` - a (non-property) argument in the eyes of the entity
+`argument` - what actions handle.
+
+`pair` - value and (of some particular shape) a name.
+
+`parameter` - in the eyes of the entity, an argument that is not a property.
+
 `property` - what entities handle. also an object modeling the formal value.
-`trio` - formal property (or argument), boolean, any value
+
+`qualified_knownness` - see [#ca-004]

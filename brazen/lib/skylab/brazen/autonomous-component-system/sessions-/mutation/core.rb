@@ -20,7 +20,7 @@ module Skylab::Brazen
         :subject_component,
       )
 
-      def receive_argument_array x_a
+      def accept_argument_array x_a
         @arg_st = Callback_::Polymorphic_Stream.new x_a
         NIL_
       end
@@ -270,33 +270,22 @@ module Skylab::Brazen
 
         def __resolve_sub_component
 
-          cm = @_association.component_model
-
           sym = @modifiers.via
           if sym  # :t7.
 
-            comp_x = cm.send(
+            comp_x = @_association.component_model.send(
               :"new_via__#{ sym }__",
               @arg_st.gets_one,
               & @on_event_selectively
             )
             ok = comp_x ? true : false
-
-          elsif cm.respond_to? :interpret_for_component_mutation_session  # :+t6
-
-            comp_x = cm.interpret_for_component_mutation_session(
-              @arg_st, & @on_event_selectively )
-
-            ok = comp_x ? true : false
-
           else
-
-            value_wrapper = cm[ @arg_st, & @on_event_selectively ]  # :t5.
-            if value_wrapper
-              comp_x = value_wrapper.value_x
+            vw = @_association.interpret @arg_st, & @on_event_selectively
+            if vw
               ok = true
+              comp_x = vw.value_x
             else
-              ok = value_wrapper
+              ok = vw
             end
           end
 

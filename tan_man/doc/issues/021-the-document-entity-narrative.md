@@ -135,12 +135,12 @@ so, to be able to say that we don't have something, we have to know
 that that something is a thing. the way we do this here is through
 a formal properties collection. note that thus far, we have
 accomplished the normalized described by inspecting *paritcular*
-"trios", that is, the tuple of 1) a formal property with 2) knowing
+qualified knownneses, that is, the tuple of 1) a formal property with 2) knowing
 whether we know or don't know its actual value and 3) if 2 is true,
 what that actual value is.
 
-having simply a list of "trios" can accomplish the normalizations
-described thus far, but depending on how the trio collection was built,
+having simply a list of qualified knownnesss can accomplish the normalizations
+described thus far, but depending on how the qualified knownness collection was built,
 its underlying set of formal properties may not reflect the complete
 set of formals for the particular (for e.g) action.
 

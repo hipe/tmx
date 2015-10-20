@@ -25,7 +25,7 @@ module Skylab::SubTree
 
             prp.dup.prepend_ad_hoc_normalizer do | arg, & oes_p |
 
-            path = ( arg.value_x if arg.is_known )
+            path = ( arg.value_x if arg.is_known_known )
               if path && ::File::SEPARATOR != path[ 0 ]
                 arg = arg.new_with_value ::File.expand_path path
               end

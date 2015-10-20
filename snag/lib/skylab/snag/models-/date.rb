@@ -6,17 +6,17 @@ module Skylab::Snag
 
     class << self
 
-      def normalize_argument arg, & oes_p  # :+[#ba-027]
+      def normalize_qualified_knownness qkn, & oes_p  # :+[#ba-027]
 
-        if arg.is_known
+        if qkn.is_known_known
 
-          if RX___ =~ arg.value_x
+          if RX___ =~ qkn.value_x
 
-            arg.new_with_value new arg.value_x
+            qkn.new_with_value new qkn.value_x
           else
 
             oes_p.call :error, :invalid_date do
-              __build_invalid_date_event arg.value_x
+              __build_invalid_date_event qkn.value_x
             end
           end
         end

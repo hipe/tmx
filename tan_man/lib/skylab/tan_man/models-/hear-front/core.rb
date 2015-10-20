@@ -26,12 +26,12 @@ module Skylab::TanMan
 
       def produce_result
 
-        bx = to_trio_box__
+        bx = to_qualified_knownness_box__
 
         bx.add :stdout, Callback_::Qualified_Knownness.
-          via_value_and_model( stdout_, :__no_model__ )
+          via_value_and_symbol( stdout_, :stdout )
 
-        bc = @kernel.silo( :hear_front ).__bound_call_via_trio_box(
+        bc = @kernel.silo( :hear_front ).__bound_call_via_qualified_knownness_box(
           bx,
           & handle_event_selectively )
 
@@ -57,7 +57,7 @@ module Skylab::TanMan
           :name_value_for_order )
       end
 
-      def __bound_call_via_trio_box bx, & oes_p
+      def __bound_call_via_qualified_knownness_box bx, & oes_p
 
         word_s_a = bx.fetch( :word ).value_x
 
@@ -97,7 +97,7 @@ module Skylab::TanMan
         end
       end
 
-      Heard__ = ::Struct.new :parse_tree, :trio_box, :kernel
+      Heard__ = ::Struct.new :parse_tree, :qualified_knownness_box, :kernel
 
       def __to_name_of_module_that_has_hear_map_stream
 

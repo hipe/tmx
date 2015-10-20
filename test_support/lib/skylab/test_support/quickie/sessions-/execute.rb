@@ -94,7 +94,7 @@ module Skylab::TestSupport
         end, :on_no_pass_filter_proc, -> p do
           ( bk_p_a ||= [] ).push p ; nil
         end,
-        :on_info_trio, method( :report_tag )
+        :on_info_qualified_knownness, method( :report_tag )
       end
 
       def report_tag i, i_, x

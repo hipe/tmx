@@ -27,7 +27,7 @@ module Skylab::TanMan
             Touch_Node_and_Create_Association__.new(
               pt.fetch( 0 ).join( SPACE_ ),
               pt.fetch( 3 ).join( SPACE_ ),
-              hrd.trio_box,
+              hrd.qualified_knownness_box,
               hrd.kernel, & oes_p ).bound_call
           end
         end
@@ -57,7 +57,7 @@ module Skylab::TanMan
       class Touch_Node_and_Create_Association__
 
         def initialize * a, & oes_p
-          @src_lbl_s, @dst_lbl_s, @trio_box, @kernel = a
+          @src_lbl_s, @dst_lbl_s, @qualified_knownness_box, @kernel = a
           @did_mutate = false
           @did_mutate_filter = -> * i_a, & ev_p do
             ev = ev_p[]
@@ -86,8 +86,8 @@ module Skylab::TanMan
 
         def __resolve_document_controller
 
-          @dc = @kernel.silo( :dot_file ).document_controller_via_trio_box(
-            @trio_box, & @on_event_selectively )
+          @dc = @kernel.silo( :dot_file ).document_controller_via_qualified_knownness_box(
+            @qualified_knownness_box, & @on_event_selectively )
 
           @dc && ACHIEVED_
         end
@@ -153,7 +153,7 @@ module Skylab::TanMan
 
           o.for_model Association_
 
-          o.against_trio_box @trio_box
+          o.against_qualified_knownness_box @qualified_knownness_box
 
           id = o.solve_for :output
 
@@ -162,7 +162,7 @@ module Skylab::TanMan
             if :path == id.shape_symbol && DASH_ == id.path
 
               id = Brazen_::Collection::Byte_Downstream_Identifier.via_stream(
-                @trio_box.fetch( :stdout ).value_x )
+                @qualified_knownness_box.fetch( :stdout ).value_x )
             end
 
             __persist_into_byte_downstream id
@@ -171,7 +171,7 @@ module Skylab::TanMan
 
         def __persist_into_byte_downstream id
 
-          arg = @trio_box[ :dry_run ]
+          arg = @qualified_knownness_box[ :dry_run ]
           if arg
             is_dry = arg.value_x
           end
