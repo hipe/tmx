@@ -191,7 +191,7 @@ module Skylab::Brazen
       end
 
       def execute_parse
-        ok = PROCEDE_
+        ok = ACHIEVED_
         while @line = @lines.gets
           @lineno += 1
           BLANK_LINE_OR_COMMENT_RX_ =~ @line and next
@@ -254,7 +254,7 @@ module Skylab::Brazen
 
       def resolve_document
         @document = Document_.new @input_id
-        PROCEDE_
+        ACHIEVED_
       end
 
       # ~
@@ -280,7 +280,7 @@ module Skylab::Brazen
         @sect = Section_.new @md[ :name ], ss
         @document.sections.accept_sect @sect
         @state_i = :when_section_or_assignment
-        PROCEDE_
+        ACHIEVED_
       end
 
       # ~
@@ -303,7 +303,7 @@ module Skylab::Brazen
       def accpt_assignment
         @sect.assignments.accept_asmt(
           Assignment_.new( * @md.captures, & @on_event_selectively ) )
-        PROCEDE_
+        ACHIEVED_
       end
     end
 
@@ -604,7 +604,7 @@ module Skylab::Brazen
     CEASE_ = false
     Git_Config_ = self
     ParseError = ::Class.new ::RuntimeError
-    PROCEDE_ = true
+    ACHIEVED_ = true
     QUOTE_= '"'.freeze
 
   end

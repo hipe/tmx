@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config::Mutable
 
-  describe "[br] collections: git config mutable assignments" do
+  describe "[br] collection adapters - git config mutable assignments" do
 
     extend TS_
     use :expect_event

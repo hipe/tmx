@@ -16,6 +16,8 @@ tree* of the constant namespace tree in several regards:
     officious "box modules" with names matching particular
     patterns, which must be "hopped over" when deriving names.
 
+([#016] describes "inferred inflection" which informs the above.)
+
 
 
 
@@ -38,7 +40,7 @@ the only forseeable cons to this sort of cacheing are deemed moot:
 
   • this will cause nasty failures if ever the constant values are
     changed for nodes in the reactive tree, but no one should ever
-    be doing this anyway. (we const re-assignment as a mis-feature).
+    be doing this anyway. (we see const re-assignment as a mis-feature).
 
 
 

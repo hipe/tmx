@@ -1,446 +1,153 @@
 module Skylab::Brazen
 
-  class Kernel  # [#015]
+class Kernel  # [#015]
 
-    def initialize mod=nil
+  def initialize mod=nil
 
-      @module = mod
+    @module = mod
 
-      yield self if block_given?
+    yield self if block_given?
 
-      @unbound_models ||= mod.const_get :Models_, false
-
-      @_name_function = nil
-
-      @_silo_cache = -> do
-        x = Silo_Cache___.new @unbound_models, self
-        @_silo_cache = -> { x }
-        x
-      end
-    end
-
-    attr_reader(
-      :module,
-      :unbound_models,
-    )
-
-    attr_writer(
-      :module,
-      :unbound_models,
-    )
-
-    # ~ call exposures
-
-    def call * x_a, & x_p
-
-      bc = bound_call_via_mutable_iambic x_a, & x_p
-
-      bc and bc.receiver.send bc.method_name, * bc.args
-    end
-
-    def bound_call_via_mutable_iambic x_a, & oes_p
-
-      o = Home_::Sessions_::Produce_Bound_Call.new self, & oes_p
-      o.iambic = x_a
-      o.module = @module
-      o.execute
-    end
-
-    def call_via_mutable_box * i_a, bx, & x_p  # [sg]
-
-      bc = bound_call_via_mutable_box i_a, bx, & x_p
-
-      bc and bc.receiver.send bc.method_name, * bc.args
-    end
-
-    def bound_call_via_mutable_box i_a, bx, & x_p  # [bs] only so far
-
-      o = Home_::Sessions_::Produce_Bound_Call.new self, & x_p
-      o.iambic = i_a
-      o.mutable_box = bx
-      o.execute
-    end
-
-    def bound_call_via_polymorphic_stream st, & x_p
-
-      o = Home_::Sessions_::Produce_Bound_Call.new self, & x_p
-      o.poly_stream = st
-      o.execute
-    end
-
-    # ~ client exposures
-
-    def to_kernel
-      self  # the top
-    end
-
-    def app_name
-
-      if @_name_function
-        @_name_function
-
-      elsif @module.respond_to? :name_function
-        @module.name_function
-
-      else
-        nf = Callback_::Name.via_module @module
-        @_name_function = nf
-        nf
-      end.as_human
-    end
-
-    def do_debug
-      # true
-    end
-
-    def debug_IO
-      LIB_.system.IO.some_stderr_IO  # etc
-    end
-
-    # ~ "unbound" ( e.g model class ) production
-
-    def fast_lookup
-      NIL_  # not implemented here because with promotions it's not worth it
-    end
-
-    def unbound_via_normal_identifier const_a
-
-      unbound_via_normal_stream Callback_::Polymorphic_Stream.new( 0, const_a )
-    end
-
-    def unbound_via_normal_stream st
-
-      const = st.gets_one
-      if st.unparsed_exists
-        unbound( const ).unbound_via_normal_stream st
-      else
-        unbound const
-      end
-    end
-
-    def unbound_via_identifier id, & oes_p
-
-      silo = silo_via_identifier id, & oes_p
-      silo and silo.model_class
-    end
-
-    def unbound const_sym
-      @unbound_models.const_get const_sym, false
-    end
-
-    def to_unbound_action_stream
-
-      to_unbound_stream.expand_by do | item |
-        if item.respond_to? :to_upper_unbound_action_stream
-          item.to_upper_unbound_action_stream
-        else
-          __default_upper_unbound_action_stream_via_item item
-        end
-      end
-    end
-
-    def unbound_action_via_normalized_name i_a
-
-      i_a.reduce self do |m, i|
-        scn = m.to_unbound_action_stream
-        while cls = scn.gets
-          _i = cls.name_function.as_lowercase_with_underscores_symbol
-          i == _i and break( found = cls )
-        end
-        found or raise ::KeyError, "not found: #{ i } in #{ m }"
-      end
-    end
-
-    def __default_upper_unbound_action_stream_via_item item  # experiment #open [#067]
-
-      box_mod = _const_sym_a = d = p = main = nil
-
-      p = -> do
-
-        box_mod = item.const_get :Actions, false  # can't assume item is a module
-
-        if box_mod
-          _const_sym_a = box_mod.constants
-          _const_sym_a.sort!
-          d = _const_sym_a.length
-        else
-          d = 0
-        end
-        p = main
-        p[]
-      end
-
-      has_non_promoted_children = false
-      main = -> do
-        begin
-
-          if d.zero?
-
-            if has_non_promoted_children
-
-              x = if item.respond_to? :is_branch
-                item
-
-              else
-                Home_.lib_.basic::Module::As::Models::Unbound_Model.new item
-
-              end
-            end
-
-            p = EMPTY_P_
-            break
-          end
-          d -= 1
-          unb = box_mod.const_get _const_sym_a.fetch d
-
-          if unb.respond_to? :is_promoted
-            if unb.is_promoted
-              x = unb
-              break
-            else
-              has_non_promoted_children = true
-            end
-          else
-
-            # assume proc which is [#065] never treated as promoted
-            has_non_promoted_children = true
-
-          end
-
-          redo
-        end while nil
-        x
-      end
-
-      Callback_.stream do
-        p[]
-      end
-    end
-
-    def bound_action_via_unbound_action_bound_to cls, & oes_p
-      cls.new self, & oes_p
-    end
-
-    def to_unbound_stream
-
-      @_const_sym_a ||= __produce_sorted_const_sym_a
-
-      d = -1 ; last = @_const_sym_a.length - 1
-
-      Callback_.stream do
-
-        while d < last
-          d += 1
-          sym = @_const_sym_a.fetch d
-          x = @unbound_models.const_get sym, false
-
-          if x.respond_to? :name
-            modish = x
-            break
-          end
-
-          modish = __try_convert_to_unbound_node_via_mixed x, sym, @unbound_models
-          modish and break
-        end
-
-        modish
-      end
-    end
-
-    def __produce_sorted_const_sym_a
-      i_a = @unbound_models.constants
-      i_a.sort!  # #note-35
-      i_a
-    end
-
-    def __try_convert_to_unbound_node_via_mixed x, i, mod
-
-      if x.respond_to? :call
-
-        Home_.lib_.basic::Function::As::Unbound_Action.new x, i, mod, @module
-      end
-    end
-
-  public  # ~ silo production
-
-    def silo_via_normal_identifier const_a
-
-      silo_via_normal_stream Callback_::Polymorphic_Stream.new( 0, const_a )
-    end
-
-    def silo_via_normal_stream st
-
-      x = @_silo_cache[].__fetch_via_normal_identifier_component[ st.gets_one ]
-      if st.unparsed_exists
-        x = x.silo_via_normal_stream st
-      end
-      x
-    end
-
-    def silo sym, & x_p  # (was `silo_via_symbol`)
-
-      silo_via_identifier(
-        Concerns_::Identifier.via_symbol( sym ),
-        & x_p )
-    end
-
-    def silo_via_identifier id, & oes_p
-
-      if id.is_resolved
-
-        @_silo_cache[]._touch_via_silo_daemon_class_and_identifier[
-          id.value.const_get( SILO_DAEMON_CONST__, false ),
-          id ]
-      else
-        __silo_via_unresolved_id id, & oes_p
-      end
-    end
-
-    def __silo_via_unresolved_id id, & oes_p  # #note-40, :+[#pa-002]
-
-      id = id.as_mutable_for_resolving
-
-      full_raw_s_a = id.raw_name_parts
-
-      index = -1
-      last = full_raw_s_a.length - 1
-      mod_a = nil
-      node = self
-
-      while index != last
-
-        index += 1
-        target_s = full_raw_s_a.fetch index
-
-        if ! mod_a
-          mod_a = __some_modules_array_via_mod node
-          local_index = -1
-        end
-
-        local_index += 1
-        __reduce_search_space mod_a, local_index, target_s
-
-        case 1 <=> mod_a.length
-
-        when  0
-          node = mod_a.fetch 0
-          _num_parts = _some_name_function_via_mod( node ).as_parts.length
-          _start_of_next_part = index - local_index + _num_parts
-          id.add_demarcation_index _start_of_next_part
-
-          cls = node.const_get SILO_DAEMON_CONST__, false
-
-          if cls
-            id.bake node
-            x = @_silo_cache[]._touch_via_silo_daemon_class_and_identifier[ cls, id ]
-            break
-          end
-          mod_a = nil
-
-        when  1
-          x = __when_not_found id, target_s, & oes_p
-          break
-
-        when -1
-          # #note-265 - although it is a class of use cases for which this..
-          NIL_
-        end
-      end
-      x
-    end
-
-    def __when_not_found id, target_s, & oes_p
-
-      if oes_p
-        oes_p.call :not_found do
-          _build_model_not_found_event id, target_s
-        end
-      else
-        raise _build_model_not_found_event( id, target_s ).to_exception
-      end
-    end
-
-    def _build_model_not_found_event id, s
-
-      Callback_::Event.inline_with :node_not_found,
-        :token, s, :identifier, id,
-        :error_category, :name_error
-    end
-
-    def __reduce_search_space mod_a, local_index, target_s
-
-      mod_a.each_with_index do |mod, d|
-        s = _some_name_function_via_mod( mod ).as_parts[ local_index ]
-        if ! ( s and target_s == s )
-          mod_a[ d ] = nil
-        end
-      end
-      mod_a.compact! ; nil
-    end
-
-    def _some_name_function_via_mod mod
-
-      if mod.respond_to? :name_function
-        mod.name_function
-      else
-        @mod_nf_h ||= {}
-        @mod_nf_h.fetch mod do
-          @mod_nf_h[ mod ] = Callback_::Name.via_module mod
-        end
-      end
-    end
-
-    def __some_modules_array_via_mod mod
-
-      if mod.respond_to? :to_unbound_stream
-        mod.to_unbound_stream.to_a
-      else
-        box_mod = mod.const_get :Nodes, false
-        box_mod.constants.map do |i|
-          box_mod.const_get i, false
-        end
-      end
-    end
-
-    class Silo_Cache___
-
-      def initialize unbound_models, kernel
-
-        cache_h = {}
-
-        @__fetch_via_normal_identifier_component = -> const do
-
-          sym = const.downcase
-
-          cache_h.fetch sym do
-
-            unbound = unbound_models.const_get const, false
-
-            x = unbound.const_get( SILO_DAEMON_CONST__, false ).
-              new kernel, unbound  # two of #two
-
-            cache_h[ sym ] = x
-            x
-          end
-        end
-
-        @_touch_via_silo_daemon_class_and_identifier = -> cls, id do
-
-          cache_h.fetch id.silo_name_symbol do
-            x = cls.new kernel, id.value
-            cache_h[ id.silo_name_symbol ] = x
-            x
-          end
-        end
-      end
-
-      attr_reader(
-        :__fetch_via_normal_identifier_component,
-        :_touch_via_silo_daemon_class_and_identifier,
-      )
-    end
+    @_name_function = nil
+    @unbound_models ||= mod.const_get :Models_, false
   end
 
-  SILO_DAEMON_CONST__ = :Silo_Daemon
-  SILO_DAEMON_FILE___ = "silo-daemon#{ Autoloader_::EXTNAME }"
+  attr_reader(
+    :module,
+    :unbound_models,
+  )
+
+  attr_writer(
+    :module,
+    :unbound_models,
+  )
+
+  # ~ call exposures
+
+  def call * x_a, & x_p
+
+    bc = bound_call_via_mutable_iambic x_a, & x_p
+    bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
+  end
+
+  def bound_call_via_mutable_iambic x_a, & oes_p
+
+    o = Home_::Actionesque::Produce_Bound_Call.new self, & oes_p
+    o.iambic = x_a
+    o.module = @module
+    o.execute
+  end
+
+  def call_via_mutable_box * i_a, bx, & x_p  # [sg]
+
+    bc = bound_call_via_mutable_box i_a, bx, & x_p
+
+    bc and bc.receiver.send bc.method_name, * bc.args
+  end
+
+  def bound_call_via_mutable_box i_a, bx, & x_p  # [bs] only so far
+
+    o = Home_::Actionesque::Produce_Bound_Call.new self, & x_p
+    o.iambic = i_a
+    o.mutable_box = bx
+    o.execute
+  end
+
+  def bound_call_via_polymorphic_stream arg_st, & x_p
+
+    o = Home_::Actionesque::Produce_Bound_Call.new self, & x_p
+    o.argument_stream = arg_st
+    o.execute
+  end
+
+  # ~ general client exposures
+
+  def app_name
+
+    if @_name_function
+      @_name_function
+
+    elsif @module.respond_to? :name_function
+      @module.name_function
+
+    else
+      nf = Callback_::Name.via_module @module
+      @_name_function = nf
+      nf
+    end.as_human
+  end
+
+  def do_debug
+    # true
+  end
+
+  def debug_IO
+    LIB_.system.IO.some_stderr_IO  # etc
+  end
+
+  # ~ silo production
+
+  def silo sym, & x_p  # (was `silo_via_symbol`)
+
+    _silos.via_symbol sym, & x_p
+  end
+
+  def silo_via_normal_identifier const_a
+
+    _silos.via_normal_stream( Callback_::Polymorphic_Stream.new( 0, const_a ) )
+  end
+
+  def silo_via_normal_stream st
+
+    _silos.via_normal_stream st
+  end
+
+  def silo_via_identifier id, & oes_p
+
+    _silos.via_identifier id, & oes_p
+  end
+
+  def _silos
+    @__silos ||= Home_::Silo::Collection.new @unbound_models, self
+  end
+
+  def init_silos unb_models
+    @__silos = Home_::Silo::Collection.new unb_models, self
+    yield @__silos
+    NIL_
+  end
+
+  # ~ unbound resolution
+
+  def fast_lookup
+    NIL_  # not implemented here because with promotions it's not worth it
+  end
+
+  def build_unordered_selection_stream & x_p
+
+    # used most importantly by "produce bound call"
+
+    _unbounds_indexation.build_unordered_selection_stream( & x_p )
+  end
+
+  def build_unordered_real_stream & x_p
+
+    # for silo selection
+
+    _unbounds_indexation.build_unordered_real_stream( & x_p )
+  end
+
+  def unbound const_sym, & x_p
+    unbound_via :const, const_sym, & x_p
+  end
+
+  def unbound_via * x_a, & x_p
+    _unbounds_indexation.unbound_via_arglist x_a, & x_p
+  end
+
+  def _unbounds_indexation
+
+    @___UI ||= Home_::Branchesque::Indexation.new @unbound_models
+  end
+end
 end

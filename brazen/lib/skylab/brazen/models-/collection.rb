@@ -12,13 +12,16 @@ module Skylab::Brazen
 
     class << self
 
-      def to_upper_unbound_action_stream
-        Callback_::Stream.via_item self
-      end
+      def build_unbounds_indexation_
 
-      def init_action_class_reflection_
-        @acr = Home_::Model::Child_Node_Index.new self, Home_::Collection_Adapters
-        true
+        # this node is weird - it gets its children nodes from somewhere
+        # else. amazingy this is all we have to do for this hack
+        # (contrast w/ parent):
+
+        Home_::Branchesque::Indexation.new(
+          Home_::Collection_Adapters,  # <- look! as if it is an Actions
+          self,
+        )
       end
     end  # >>
 

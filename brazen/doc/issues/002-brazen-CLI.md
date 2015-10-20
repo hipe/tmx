@@ -10,7 +10,7 @@
       |              \                      /
     Top_Invocation__  \----- Branch_Adapter__
 
-    (see also the sibling dotfile "class-digraph.dot")
+    (the associated "class-digraph.dot" also depicts the above.)
 
 
 This model grew out of literally years of rewrites.
@@ -137,6 +137,24 @@ first place because the qualifier for this list is that the property is
 "actually required". in such cases EXPERIMENTALLY we go ahead
 and make the transformation to put the last option in with the args as a
 trailing optional.
+
+
+
+
+## :#note-930
+
+contrast with leaf implementation (covered). without this, this adpater
+renders exactly as a terminal action, which has slightly different styling
+than we want: we want the invite line to invite the deeper usage, and
+hence we do not need the option section explaining the options (because
+it is redundant.)
+
+incidentally, at writing this *is* the only method that appears
+necessary to exist in the branch adapter class that it does not inherit
+from the graph already. i.e, without this one method, the branch adapter
+class would be purely a composite of subclassing the one class and
+mixing in the other module (see the associated "class-digraph.dot").
+
 
 
 

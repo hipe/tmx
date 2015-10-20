@@ -40,7 +40,7 @@ module Skylab::Brazen
 
     def produce_result
 
-      @ws = model_class.edit_entity @kernel, handle_event_selectively do |o|
+      @ws = silo_module.edit_entity @kernel, handle_event_selectively do | o |
         bx = @argument_box
         o.edit_with(
           :surrounding_path, bx.fetch( :path ),

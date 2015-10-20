@@ -79,7 +79,7 @@ module Skylab::FileMetrics
 
       Totaller_class___ = Callback_.memoize do
 
-        Totaller____ = Home_::Models_::Totaller.new
+        Totaller____ = Totaller_[].new
       end
 
       def __resolve_file_array

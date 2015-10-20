@@ -27,7 +27,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
 
       it "1.4) (help screen) (normal style)" do
         invoke '-h'
-        expect_helpscreen_for_workspace_node
+        _expect_helpscreen_for_workspace_node
       end
     end
 
@@ -35,13 +35,13 @@ module Skylab::Brazen::TestSupport::CLI::Actions
 
       it "1.4) (help screen) (goofy style)" do
         using_expect_stdout_stderr_invoke_with_no_prefix '-h', 'workspace'
-        expect_helpscreen_for_workspace_node
+        _expect_helpscreen_for_workspace_node
       end
     end
 
-    def expect_helpscreen_for_workspace_node
-      expect_branch_help_screen_first_half
-      expect_branch_help_screen_second_half
+    def _expect_helpscreen_for_workspace_node
+      expect_branch_help_screen_first_half__
+      expect_branch_help_screen_second_half__
     end
 
     def expect_description_line

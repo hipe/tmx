@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
 
-  describe "[br] collections: git config (mutable!)" do
+  describe "[br] collection adapters: git config (mutable!)" do
 
     extend TS_
 

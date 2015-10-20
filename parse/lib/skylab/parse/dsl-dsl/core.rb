@@ -1,6 +1,6 @@
 module Skylab::Parse
 
-  module DSL_DSL  # #borrow-one-indent
+  module DSL_DSL
 
   # this DSL_DSL is a simple DSL for making simple DSL's.
   #
@@ -55,111 +55,64 @@ module Skylab::Parse
   #
   # happy hacking!
 
+    class << self
 
-  def self.enhance host, &def_blk
-    Story.new( host.singleton_class, host, ENHANCE_ADAPTER__ ).
-      instance_exec( & def_blk )
-    nil
-  end
+      def enhance subj, & edit
+        o = Session__.new
+        o.edit_block = edit
+        o.instance_methods = subj
+        o.module_methods = subj.singleton_class
+        o.execute
+      end
+    end  # >>
 
-  class Enhance_Adapter
-    def add_field mm, im, fs
-      Add_field__[ mm, im, fs ]
-      nil
-    end
+    class Session__
 
-    def add_or_change_value host, fs, x
-      Add_or_change_value__[ host.singleton_class, fs, x ]
-      nil
-    end
-  end
-  ENHANCE_ADAPTER__ = Enhance_Adapter.new
+      attr_writer(
+        :edit_block,
+        :instance_methods,
+        :module_methods,
+      )
 
-  Add_field__ = -> mm, im, fs do
-    mm.send :private, fs.w1  # make the writer private
-    mm.send :define_method, fs.r1 do end  # if it is never set
-    mg = fs.r1
-    if fs.r2
-      im.send :define_method, fs.r2 do  # one of these
-        self.class.send mg
+      def execute
+
+        _shell = Shell__.new self
+        _shell.instance_exec( & @edit_block )
+        NIL_
       end
     end
-    nil
-  end
 
-  Add_or_change_value__ = -> mm, fs, x do
-    mm.send :undef_method, fs.r1
-    mm.send :define_method, fs.r1 do x end
-    nil
-  end
+    class Shell__ < ::BasicObject
 
-  Story = Callback_::Session::Ivars_with_Procs_as_Methods.new(
-    :atom, :atom_accessor, :list, :block )
-
-  class Story
-
-    # (the implementation of the DSL DSL)
-
-    def initialize mm, im, box
-
-      @atom, @atom_accessor, @list, @block = mm.module_exec do
-
-        atom = -> i do
-          fs = Fstory__[ i, :atom ]
-          define_method i do |x|
-            box.add_or_change_value self, fs, x
-            nil
-          end
-          box.add_field self, im, fs
-          nil
-        end
-
-        atom_accessor = -> i do
-          ivar = "@#{ i }".intern
-          im.class_exec do
-            swi_a = [
-              -> { instance_variable_get ivar },
-              -> x { instance_variable_set ivar, x }
-            ]
-            define_method i do |*a|
-              instance_exec( *a, & swi_a.fetch( a.length ) )
-            end
-          end
-          nil
-        end
-
-        list = -> i do
-          fs = Fstory__[ i, :list ]
-          define_method i do | * x_a |
-            x_a.freeze  # at both instance and mod-level don't accid. mutate.
-            box.add_or_change_value self, fs, x_a
-            nil
-          end
-          box.add_field self, im, fs
-          nil
-        end
-
-        block = -> i do
-          fs = Fstory__[ i, :block ]
-          define_method i do |&blk|
-            blk or raise ::ArgumentError, "block required"
-            box.add_or_change_value self, fs, blk
-            nil
-          end
-          box.add_field self, im, fs
-          nil
-        end
-
-        [ atom, atom_accessor, list, block ]
+      def initialize sess
+        @_session = sess
       end
-      nil
+
+      def atom sym
+        @_session.__receive_atom sym
+      end
     end
 
-    Fstory__ = ::Struct.new :nn, :type, :r1, :w1, :r2 do
-    # `nn` = normalize name ; `r1` = read 1 (the module) ; `w1` = write 1 (
-    # the module) ; `r2` = read 2 (the instance)
-      def initialize nn, type, r1="#{ nn }_value".intern, w1=nn, r2=nn
-        super
+    class Session__
+
+      def __receive_atom sym
+
+        reader_method_name = :"#{ sym }_value"
+
+        @module_methods.send :define_method, sym do | x |
+
+          define_singleton_method reader_method_name do
+            x
+          end
+
+          define_method sym do
+            x
+          end
+        end
+
+        @module_methods.send :private, sym
+
+        NIL_
       end
     end
 
@@ -186,6 +139,26 @@ module Skylab::Parse
     #     bar.zinger.call  # => 2
     #
 
+    class Shell__
+
+      def block sym
+        @_session.__receive_block sym
+      end
+    end
+
+    class Session__
+
+      def __receive_block sym
+
+        @module_methods.send :define_method, sym do | & blk |
+
+          define_method sym do
+            blk
+          end
+        end
+      end
+    end
+
     # if you define an `atom_accessor` field 'with_name'
     #
     #     class Foc
@@ -202,9 +175,86 @@ module Skylab::Parse
     #     foo.with_name  # => :x
     #
 
-  end
+    class Shell__
 
+      def atom_accessor sym
+        @_session.__receive_atom_accessor sym
+      end
+    end
 
+    class Session__
+
+      def __receive_atom_accessor sym
+
+        ivar = :"@#{ sym }"
+
+        @instance_methods.send :define_method, sym do | * a |
+          case a.length
+          when 0
+            instance_variable_get ivar
+          when 1
+            instance_variable_set ivar, a.fetch( 0 )
+          else
+            raise ::ArgumentError, Say___[ a ]
+          end
+        end
+      end
+    end
+
+    Say___ = -> a do
+      "wrong number of arguments (#{ a.length } for 0..1)"
+    end
+
+    # (list)
+
+    class Shell__
+      def list sym
+        @_session.__receive_list sym
+      end
+    end
+
+    class Session__
+
+      def __receive_list sym
+
+        @module_methods.send :define_method, sym do | * x_a |
+
+          x_a.freeze
+          define_method sym do
+            x_a
+          end
+        end
+      end
+    end
+
+    # (memoize)
+
+    class Shell__
+      def memoize writer_meth_name, reader_meth_name
+        @_session.__receive_memo writer_meth_name, reader_meth_name
+      end
+    end
+
+    class Session__
+
+      def __receive_memo writer_meth_name, reader_meth_name
+
+        @module_methods.send :define_method, writer_meth_name do | & user_p |
+
+          current_p = -> do
+            x = user_p[]
+            current_p = -> do
+              x
+            end
+            x
+          end
+
+          send :define_method, reader_meth_name do
+            current_p[]
+          end
+        end
+      end
+    end
 
   # if you must, use a module and not a class to encapsulate reusability:
   #
@@ -226,39 +276,26 @@ module Skylab::Parse
   #     Badd.pik_value # => :nic
   #     Badd.new.pik # => :nic
 
-  def self.enhance_module amod, &def_blk
-    mm, im = %i| ModuleMethods InstanceMethods |.map do |i|
-      if amod.const_defined? i, false
-        amod.const_get i, false
+    class << self
+
+      def enhance_module extmod, & edit
+
+        o = Session__.new
+        o.edit_block = edit
+        o.instance_methods = Touch_mod__[ :InstanceMethods, extmod ]
+        o.module_methods = Touch_mod__[ :ModuleMethods, extmod ]
+        o.execute
+      end
+    end  # >>
+
+    Touch_mod__ = -> const, extmod do
+      if extmod.const_defined? const, false
+        extmod.const_get const
       else
-        amod.const_set i, ::Module.new
+        x = ::Module.new
+        extmod.const_set const, x
+        x
       end
     end
-    Story.new( mm, im, ENHANCE_MODULE_ADAPTER__ ).instance_exec( & def_blk )
-    nil
   end
-
-  Enhance_Module_Adapter__ = Callback_::Session::Ivars_with_Procs_as_Methods.new(
-
-    :add_field, :add_or_change_value )
-
-  class Enhance_Module_Adapter__
-    def initialize
-      @add_field = -> mm, im, fs do
-        Add_field__[ mm, im, fs ]
-        nil
-      end
-      @add_or_change_value = -> host, fs, x do
-        # imagine a child class that extended a module methods is changing
-        # the defn for a field.
-        Add_or_change_value__[ host.singleton_class, fs, x ]
-        nil
-      end
-      nil
-    end
-  end
-
-  ENHANCE_MODULE_ADAPTER__ = Enhance_Module_Adapter__.new
-
-  end  # #pay-one-back
 end

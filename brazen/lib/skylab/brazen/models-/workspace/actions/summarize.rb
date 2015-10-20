@@ -18,7 +18,7 @@ module Skylab::Brazen
 
         bx = @argument_box
 
-        @ws = model_class.edit_entity @kernel, handle_event_selectively do |o|
+        @ws = silo_module.edit_entity @kernel, handle_event_selectively do |o|
           o.preconditions @preconditions
           o.edit_with(
             :surrounding_path, bx.fetch( :path ),

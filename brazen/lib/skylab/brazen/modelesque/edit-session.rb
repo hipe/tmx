@@ -1,8 +1,6 @@
 module Skylab::Brazen
-
-  class Model
-
-    class Concerns__::Edit_Session
+  # ->
+    class Modelesque::Edit_Session
 
       # (ultimately we would like for this to go away in lieu of ACS)
 
@@ -136,5 +134,5 @@ module Skylab::Brazen
         end
       # <- as class
     end
-  end
+    # <-
 end

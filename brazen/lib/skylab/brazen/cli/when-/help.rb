@@ -5,6 +5,7 @@ module Skylab::Brazen
     class When_::Help < As_Bound_Call_
 
       def initialize cmd_s, help_renderer, action_adapter
+
         @aa = action_adapter
         @any_cmd_string = cmd_s
         @help_renderer = help_renderer
@@ -27,6 +28,7 @@ module Skylab::Brazen
 
         case 1 <=> a.length
         when  0
+
           a.first.receive_show_help_ @help_renderer.invocation
 
         when  1
@@ -61,7 +63,7 @@ module Skylab::Brazen
         o.express_header_ 'actions'
         o.express_option_parser_summary_  # sic
 
-        _visible_st = aa.to_adapter_stream.reduce_by( & :is_visible )
+        _visible_st = aa.to_adapter_stream_.reduce_by( & :is_visible )
 
         _ordered_st = aa.wrap_adapter_stream_with_ordering_buffer_ _visible_st
 

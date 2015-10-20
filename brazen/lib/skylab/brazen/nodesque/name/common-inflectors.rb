@@ -1,19 +1,11 @@
 module Skylab::Brazen
 
-  module Concerns_::Inflection  # see [#016]
+  module Nodesque::Name::Common_Inflectors  # [#016] describes adj-noun-verb pattern
 
-    class << self
+    # although there are dedicated cateogry nodes for the below two,
+    # they are in this same file because they are algorithmically related.
 
-      def for_model nf
-        Model_Inflection_Implementor__.new nf
-      end
-
-      def for_action nf
-        Action_Inflection_Implementor___.new nf
-      end
-    end  # >>
-
-    class Model_Inflection_Implementor__
+    class Inflector_for_Model
 
       def initialize name_function
 
@@ -163,7 +155,7 @@ module Skylab::Brazen
 
     end
 
-    class Action_Inflection_Implementor___ < Model_Inflection_Implementor__
+    class Inflector_for_Action < Inflector_for_Model
 
       def initialize name_function
 
@@ -238,11 +230,13 @@ module Skylab::Brazen
 
         ci = @_custom_action_inflection
 
-        if ci && ci.has_verb_exponent_combination
-          ci.verb_exponent_combination_symbol
-        else
-          :lemma  # i.e do not inflect, just use the "dictionary entry" word
+        if ci
+          if ci.has_verb_exponent_combination
+            _sym = ci.verb_exponent_combination_symbol
+          end
         end
+
+        _sym || :lemma  # i.e do not inflect, just use the "dictionary entry" word
       end
 
       def __infer_noun_stem  # #to-determine-a-noun
@@ -264,13 +258,15 @@ module Skylab::Brazen
 
         ci = @_custom_action_inflection
 
-        if ci && ci.has_noun_exponent_combination
-
-          ci.noun_exponent_combination_symbol
-
-        else
-          :indefinite_singular  # "add a couch db collection"
+        if ci
+          if ci.has_noun_exponent_combination
+            _sym = ci.noun_exponent_combination_symbol
+          end
         end
+
+        _sym || :indefinite_singular
+
+        # "add a couch db collection"
       end
     end
   end

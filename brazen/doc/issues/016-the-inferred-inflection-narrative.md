@@ -29,27 +29,17 @@ so from a module graph like the above, we could construe:
 
 
 
+
 ## deciding what module names from which to derive meaning
 
-typically we ignore N number of contiguous top-most module names (in
-this universe it is almost always 2), but this should be determines by
-some sort of variable:
+typically we keep reading upwards until we hit a "stop" pattern in a
+const name (like `Models_`). also we skip over the "box" (or "source")
+module const name patterns (like `Actions`)
 
-    Skorlab::MyApp::Widget::Add
+    Skorlab::MyApp::Models_::Widget::Actions::Add
 
-in the above node path, "skorlab" and "my app" are nt intereting to us
-here.
-
-often there is some sort of "taxonomical" branch node whose only purpose
-it to be a box node that holds only other nodes. this often has some
-semi-magical name, for example 'Actions':
-
-    Skrolab::MyApp::Widget::Actions::Add
-
-in the above node path, 'Actions' is a module that exists only to hold
-other modules within it. we will not use the name "actions" when
-inferring meaningful phrases from this node path, but rather we will
-ignore it and other modules like it.
+in the above node path, `Models_` stops us from reading up to the
+non-interesting "skorlab" and "my app".
 
 in this document, we will refer to what is left over from the above
 considerations as the "semantic node path". in the above examples, the

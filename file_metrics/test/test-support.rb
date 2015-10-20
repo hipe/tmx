@@ -11,10 +11,6 @@ module Skylab::FileMetrics::TestSupport
 
   Home_ = ::Skylab::FileMetrics
 
-  Home_.lib_.DSL_DSL_enhance_module self, -> do
-    block :with_klass
-  end
-
   module ModuleMethods
 
     def use sym
@@ -35,7 +31,7 @@ module Skylab::FileMetrics::TestSupport
 
     define_singleton_method :let, TestSupport_::Let::LET_METHOD
 
-    let :klass do
+    let :_NOT_USED_klass do
        Sandbox_.kiss with_klass_value.call
     end
 
@@ -54,8 +50,8 @@ module Skylab::FileMetrics::TestSupport
       TestSupport_.debug_IO
     end
 
-    def klass  # nonstandard thing: ..
-      self.class.klass
+    def _NOT_USED_2_klass  # nonstandard thing: ..
+      self.class._NOT_USED_3_klass
     end
 
     def subject_API

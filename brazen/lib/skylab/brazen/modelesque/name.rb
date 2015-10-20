@@ -1,8 +1,12 @@
 class Skylab::Brazen
 
-  class Model
+  Modelesque::Name = ::Module.new
 
-    class Concerns__::Inflection
+    # looking for a name *class*? see comments [#005] code node.
+
+  # ->
+
+    class Modelesque::Name::Inflection
 
       def initialize scanner, cls
         @cls = cls
@@ -40,5 +44,5 @@ class Skylab::Brazen
 
       Model___ = ::Struct.new :noun_lemma
     end
-  end
+  # <-
 end

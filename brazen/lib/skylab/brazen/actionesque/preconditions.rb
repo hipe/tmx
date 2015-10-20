@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   # ->
 
-    module Concerns_::Preconditions
+    module Actionesque::Preconditions
 
       class Produce_Box
 
@@ -51,7 +51,7 @@ module Skylab::Brazen
                   next
                 end
                 _sub_silo = @kernel.silo_via_identifier id
-                _id_a_ = _sub_silo.model_class.preconditions
+                _id_a_ = _sub_silo.silo_module.preconditions
                 ok = resolve_silo[ id, _id_a_ ]
                 ok or break
               end

@@ -1,8 +1,10 @@
 module Skylab::Brazen
 
-  Concerns_::Name = ::Class.new ::Class.new Callback_::Name
+  Nodesque::Name = ::Class.new ::Class.new Callback_::Name
 
-  class Concerns_::Name  # notes in [#005]
+  class Nodesque::Name
+
+    # notes in [#005] - this is almost an abstract base. see #here
 
     class << self
 
@@ -99,17 +101,17 @@ module Skylab::Brazen
         end
       end
 
-      define_singleton_method :[] do | mod |
+      define_singleton_method :[] do | unb |
 
-        entry = entry_for[ mod.name ]
+        entry = entry_for[ unb.name ]
 
-        _cls = if mod.respond_to? :name_function_class
-          mod.name_function_class
+        _cls = if unb.respond_to? :name_function_class
+          unb.name_function_class
         else
-          Concerns_::Name
+          Here_
         end
 
-        _cls.new_via mod, entry.parent_module, entry.intern
+        _cls.new_via unb, entry.parent_module, entry.intern
       end
     end
 
@@ -134,7 +136,11 @@ module Skylab::Brazen
     end
 
     def _inflection
-      @___inflection ||= Home_::Concerns_::Inflection.for_model self
+
+      # #here is the only method that would be in the would-be dedicated
+      # subclass for model names.
+
+      @___inflection ||= Here_::Common_Inflectors::Inflector_for_Model.new self
     end
 
     Name_with_Parent__ = superclass
@@ -158,5 +164,7 @@ module Skylab::Brazen
 
       attr_reader :parent
     end
+
+    Here_ = self
   end
 end

@@ -10,7 +10,7 @@ module Skylab::Brazen::TestSupport::Mo_Ent
 
   extend TestSupport_::Quickie
 
-  describe "[br] model entity" do
+  describe "[br] modelesque - entity" do
 
     class << self
 
@@ -165,9 +165,9 @@ module Skylab::Brazen::TestSupport::Mo_Ent
     Subject_ = -> * a, & p do
 
       if a.length.nonzero? || p
-        Home_::Model.common_entity( * a, & p )
+        Home_::Modelesque.entity( * a, & p )
       else
-        Home_::Model.common_entity_module
+        Home_::Modelesque::Entity
       end
     end
 

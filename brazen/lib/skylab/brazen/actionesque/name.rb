@@ -1,8 +1,25 @@
 module Skylab::Brazen
 
-  class Action
+  class Actionesque::Name < Home_::Nodesque::Name
 
-    class Concerns__::Inflection
+    def inflected_verb
+      _inflection.inflected_verb
+    end
+
+    def verb_lexeme
+      _inflection.verb_lexeme
+    end
+
+    def verb_as_noun_lexeme
+      _inflection.verb_as_noun_lexeme
+    end
+
+    def _inflection
+      @___inflecion ||=
+        Nodesque::Name::Common_Inflectors::Inflector_for_Action.new self
+    end
+
+    class Inflection
 
       def initialize upstream, cls
 
@@ -98,7 +115,9 @@ module Skylab::Brazen
 
       class Model___
 
-        attr_reader :has_verb_exponent_combination,
+        attr_reader(
+          :has_plural_exponent_combination,
+          :has_verb_exponent_combination,
           :has_verb_lemma,
           :verb_lemma,
 
@@ -107,7 +126,8 @@ module Skylab::Brazen
           :noun_lemma,
 
           :has_verb_as_noun_lemma,
-          :verb_as_noun_lemma
+          :verb_as_noun_lemma,
+        )
 
         def noun_exponent_combination_symbol
           @__noun__exponent_combination_symbol
@@ -128,7 +148,7 @@ module Skylab::Brazen
         def _set_combination sym, sym_
 
           instance_variable_set(
-            :"@has_#{ sym }_exponent_combination", true )
+            :"@has_#{ sym_ }_exponent_combination", true )
 
           instance_variable_set(
             :"@__#{ sym_ }__exponent_combination_symbol", sym )

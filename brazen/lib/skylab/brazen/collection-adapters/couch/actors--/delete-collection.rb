@@ -26,7 +26,7 @@ module Skylab::Brazen
 
       def check_force
         if @force_arg.value_x
-          PROCEDE_
+          ACHIEVED_
         else
           when_force_not_present
         end
@@ -48,7 +48,7 @@ module Skylab::Brazen
       def work
         if @dry_run_arg.value_x
           delete_collection_when_dry_run
-          PROCEDE_
+          ACHIEVED_
         else
           x_a = []
           x_a.push :entity_identifier_strategy, :__N_O_N_E__

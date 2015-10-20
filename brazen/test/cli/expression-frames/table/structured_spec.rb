@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport
 
   C_EF_T_S_Struct__ = ::Struct.new :x, :y  # meh
 
-  describe "[fm] models - report - modalities - CLI - expression-frames - t" do
+  describe "[br] - CLI - expression framse - table - structured" do
 
     it "by default it aligns right with reasonable glyphs. label." do
 
@@ -127,11 +127,8 @@ module Skylab::Brazen::TestSupport
 
     define_method :_common_tree, ( Callback_.memoize do
 
-      _FM = Home_::Autoloader_.require_sidesystem :FileMetrics
-      # above is #open [#119] - see if we can reverse this test to put it
-      # in [fm] so it is an integration test maybe?
-
-      _T = _FM::Models_::Report::Actions::Line_Count::Totaller_class___[]
+      C_EF_T_S = Home_.lib_.basic::Tree::Totaller.new
+      _T = C_EF_T_S
 
       t = _T.new
       t_ = _T.new

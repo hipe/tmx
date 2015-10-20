@@ -1,14 +1,14 @@
 module Skylab::Brazen
 
-  class Concerns_::Name
+  class Nodesque::Name
 
     Sessions_ = ::Module.new
 
     class Sessions_::Deep_Action_Isomorphicism_for_EN  # compare [#hu-043]
 
       # :+[#sl-134] this is a feature island - this is covered ONLY by a
-      # spec but  it is not currently used anywhere in production. however
-      # we retain it for the tme being for now for possible
+      # spec but it is not currently used anywhere in production. however
+      # we retain it for the time being for now for possible future use
 
       def initialize slug_a
         @len = slug_a.length
@@ -46,7 +46,7 @@ module Skylab::Brazen
           if _has_many_adjectives
             y.concat @slug_a[ 1 .. -3 ].reverse
           end
-          DONE_
+          ACHIEVED_
         end
       end
 
@@ -54,7 +54,7 @@ module Skylab::Brazen
         v_o = _any_curried_verb
         if v_o
           y << "was #{ v_o.lexeme.progressive }"
-          DONE_
+          ACHIEVED_
         end
       end
 
@@ -62,14 +62,14 @@ module Skylab::Brazen
         v_o = _any_curried_verb
         if v_o
           y << "#{ prefix_s } #{ v_o.lemma }"
-          DONE_
+          ACHIEVED_
         end
       end
 
       def express_into_yielder_any_adjectives y
         if 3 < @len and ! _has_many_adjectives
           y.concat @slug_a[ 1 .. -3 ]
-          DONE_
+          ACHIEVED_
         end
       end
 
@@ -77,7 +77,7 @@ module Skylab::Brazen
         n_o = _any_curried_object_noun
         if n_o
           y << n_o.to_string
-          DONE_
+          ACHIEVED_
         end
       end
 

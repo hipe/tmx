@@ -1,10 +1,6 @@
 module Skylab::Brazen
-
-  class Action
-
-    module Concerns__::Properties
-
-      module Input::Via_trio_box
+  # -> 2
+      module Actionesque::Input_Adapters::Via_qualified_knownness_box
 
         # PASSIVELY parse-out values from the box, whose each value is a
         # qualified_knownness. do this using any custom parsers and parsing logic that
@@ -70,6 +66,5 @@ module Skylab::Brazen
           end
         end
       end
-    end
-  end
+      # <- 2
 end

@@ -1,12 +1,6 @@
 module Skylab::Brazen
-
-  class Action
-
-    module Concerns__::Properties
-
-      Output = ::Module.new
-
-      class Output::Actual_Values_as_Box
+  # -> 2
+      class Actionesque::Output_Adapters::Actual_Values_as_Box
 
         def initialize argument_box, formals
           @argument_box = argument_box
@@ -69,6 +63,5 @@ module Skylab::Brazen
           end
         end
       end
-    end
-  end
+      # <- 2
 end

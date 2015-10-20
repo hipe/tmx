@@ -75,6 +75,15 @@ module Skylab::Brazen
       super i, o, e, pn_s_a, :back_kernel, User_Utility_as_Kernel___.new( self )
     end
 
+    def send_invitation ev
+
+      # (the normal top client cannot itself send invitations because
+      #  these must happen from an action so thre is an action to invite
+      #  towards)
+
+      _receive_invitation ev, @adapter
+    end
+
     class User_Utility_as_Kernel___
 
       attr_reader :_user_utility
@@ -92,7 +101,7 @@ module Skylab::Brazen
         NIL_  # maybe one day
       end
 
-      def to_unbound_action_stream
+      def build_unordered_selection_stream & _
         @_user_utility_class.__cooked_unbounds.to_value_stream
       end
     end
@@ -154,8 +163,8 @@ module Skylab::Brazen
         @_user_utility_class = uu
       end
 
-      def model_class
-        @_user_utility_class
+      def silo_module
+        @_user_utility_class  # or maybe not..
       end
 
       def adapter_class_for _moda
@@ -173,11 +182,11 @@ module Skylab::Brazen
 
     class Action_Adapter__ < CLI::Action_Adapter_
 
-      def initialize defined_entry, custom_kernel
+      def initialize defined_entry, bound_kernel
 
         @bound = self
         @_nf = defined_entry.name_function
-        @_custom_kernel = custom_kernel
+        @_custom_kernel = bound_kernel.kernel
 
         @_settable_by_environment_h = nil  # sux
       end

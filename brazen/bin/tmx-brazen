@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../lib/skylab/brazen/core'
+require 'skylab/brazen'
 
 _x = Skylab::Brazen::CLI::Client_for_Brazen_as_Application.new(
   $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).

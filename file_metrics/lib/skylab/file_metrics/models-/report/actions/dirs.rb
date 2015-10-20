@@ -47,7 +47,7 @@ module Skylab::FileMetrics
 
       Totaller_class___ = Callback_.memoize do
 
-        Totaller____ = Home_::Models_::Totaller.new(
+        Totaller____ = Totaller_[].new(
           :num_files,
           :num_lines,
         )

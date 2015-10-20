@@ -1,8 +1,6 @@
-module Skylab::FileMetrics
+module Skylab::Basic
 
-  class Models_::Totaller < Home_::Model_::Tree_Branch
-
-    Actions = THE_EMPTY_MODULE_
+  class Tree::Totaller < Tree::Business
 
     def initialize
       super()
@@ -11,7 +9,8 @@ module Skylab::FileMetrics
     attr_accessor(
       :count,
       :total_share,
-      :normal_share )
+      :normal_share,
+    )
 
     def finish
       _mutate_by_sort

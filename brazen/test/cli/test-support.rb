@@ -1,3 +1,5 @@
+require_relative '../test-support'
+
 module Skylab::Brazen::TestSupport::CLI
 
   ::Skylab::Brazen::TestSupport[ TS_ = self ]
@@ -79,7 +81,8 @@ module Skylab::Brazen::TestSupport::CLI
       expect :styled, 'expecting <action>'
     end
 
-    def expect_branch_help_screen_first_half
+    def expect_branch_help_screen_first_half__
+
       expect_branch_usage_line
       expect_branch_secondary_syntax_line
       expect_maybe_a_blank_line
@@ -88,7 +91,8 @@ module Skylab::Brazen::TestSupport::CLI
       expect_maybe_a_blank_line
     end
 
-    def expect_branch_help_screen_second_half
+    def expect_branch_help_screen_second_half__
+
       expect_header_line 'actions'
       expect_these_actions
       expect_maybe_a_blank_line

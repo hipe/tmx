@@ -73,7 +73,7 @@ module Skylab::Brazen
 
       def normalize  # compare to [#047.B]
 
-        Concerns_::Normalization::Against_model_stream[
+        Home_::Normalization::Against_model_stream[
           self,
           @value_models.to_value_stream ]
       end

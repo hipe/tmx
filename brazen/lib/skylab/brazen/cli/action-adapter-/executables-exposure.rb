@@ -10,7 +10,7 @@ module Skylab::Brazen
 
       Action_stream_method = -> s do
 
-        # result is the method body for a `to_child_unbound_action_stream`
+        # result is the method body for a `to_unordered_selection_stream`
         # that exposes all the executable files in the usual location that
         # have the provided prefix, as if they were reactive action nodes.
 

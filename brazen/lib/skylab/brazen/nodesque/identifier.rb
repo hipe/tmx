@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Concerns_::Identifier  # :[#091].
+  class Nodesque::Identifier  # :[#091].
 
     class << self
 

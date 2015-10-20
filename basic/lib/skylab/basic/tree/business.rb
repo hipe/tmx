@@ -1,8 +1,6 @@
-module Skylab::FileMetrics
+module Skylab::Basic
 
-  Model_ = ::Module.new
-
-  class Model_::Tree_Branch < Home_.lib_.basic::Tree.mutable_node::Frugal
+  class Tree::Business < Tree.mutable_node::Frugal
 
     class << self
 

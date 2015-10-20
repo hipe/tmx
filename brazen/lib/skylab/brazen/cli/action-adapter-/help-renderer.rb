@@ -8,7 +8,7 @@ module Skylab::Brazen
 
         def initialize op, ad
           @arg_a = nil
-          @action = ad.bound_action
+          @bound = ad.bound_
           @action_adapter = ad.action_adapter
           @expression_agent = ad.expression_agent
           @invocation = ad.invocation
@@ -45,12 +45,13 @@ module Skylab::Brazen
 
           express_usage_
 
-          if @action.has_description
+          if @bound.has_description
             express_description_
           end
 
           @section_a.each( & method( :__express_section ) )
-          NIL_
+
+          SUCCESS_EXITSTATUS
         end
 
         # ~ usage lines
@@ -60,7 +61,7 @@ module Skylab::Brazen
           a = []
           subject.write_any_primary_syntax_string a
           _express_single_line_section 'usage', a[ 0 ]
-          @action
+          @bound
         end
 
         def express_usage_
@@ -274,7 +275,7 @@ module Skylab::Brazen
 
           __express_multiline_section(
             'description',
-            @action.under_expression_agent_get_N_desc_lines(
+            @bound.under_expression_agent_get_N_desc_lines(
               @expression_agent ) )
 
           NIL_
@@ -318,7 +319,7 @@ module Skylab::Brazen
         end
 
         def express_invite_to_particular_action__ i_a
-          o = @action_adapter.retrieve_bound_action_via_nrml_nm i_a
+          o = @action_adapter.bound_action_via_normal_name_ i_a
           s = o.primary_syntax_string
           express do
             "use #{ code s }"
@@ -385,15 +386,16 @@ module Skylab::Brazen
           d_ = d + s.length + 1  # " " is 1 char wide
           subsequent_line_item_format = "#{ SPACE_ * d_ }%s"
 
-          -> prp do
+          -> ada do
 
-            expag.current_property = prp
-            a = prp.under_expression_agent_get_N_desc_lines expag, num_lines_per
+            expag.current_property = ada
+
+            a = ada.under_expression_agent_get_N_desc_lines expag, num_lines_per
 
             if a.length.zero?
-              y << "#{ s }#{ labelize_p[ prp ] }"
+              y << "#{ s }#{ labelize_p[ ada ] }"
             else
-              y << first_line_item_format % [ labelize_p[ prp ], a.fetch( 0 ) ]
+              y << first_line_item_format % [ labelize_p[ ada ], a.fetch( 0 ) ]
             end
 
             1.upto( a.length - 1 ) do |idx|

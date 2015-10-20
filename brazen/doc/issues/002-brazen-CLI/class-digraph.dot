@@ -1,21 +1,39 @@
 digraph {
 
-Invocation__ [ label="Invocation__\n(no event handling)" ]
+labelloc="t"
 
-Branch_Invocation__ [ label="Branch_Invocation__\n(bound node creator)" ]
+label="CLI expression of the [br] reactive model tree - class/module hierarchy
 
-Action_Adapter_ -> Invocation__
+legend:
+  • rectangles are classes, ellipses are mixin modules
+  • classes that parent are always abstract base clases
+  •\"adapter\" means it binds to a reactive model node
 
-Branch_Invocation__ -> Invocation__
+
+"
+
+Top_Invocation__ [ shape=rect label="Top_Invocation__\n(has kernel)" ]
 
 Top_Invocation__ -> Branch_Invocation__
 
-Branch_Adapter__ -> Branch_Invocation__
+Branch_Invocation__ [ shape=rect label="Branch_Invocation__\n(reduces unbounds to bound)" ]
 
-Adapter_Methods__ [ label="Adapter_Methods__\n(event handling)" ]
+Branch_Invocation__ -> Invocation__
 
-Branch_Adapter__ -> Adapter_Methods__
+Invocation__ [ shape=rect label="Invocation__\n(expresses events)" ]
 
-Action_Adapter_ -> Adapter_Methods__
+Action_Adapter [ shape=rect ]
+
+Action_Adapter -> Invocation__
+
+Branch_Adapter [ shape=rect label="Branch_Adapter\n(almost nothing special)" ]
+
+Branch_Adapter -> Branch_Invocation__
+
+Adapter_Methods__ [ label="Adapter_Methods__\n(mainly delegates up/in)" ]
+
+Branch_Adapter -> Adapter_Methods__
+
+Action_Adapter -> Adapter_Methods__
 
 }

@@ -16,7 +16,7 @@ module Skylab::Brazen
       def via_entity_resolve_entity_identifier
         @entity_identifier = @entity.class.node_identifier.
           with_local_entity_identifier_string @entity.natural_key_string  # #todo - is this covered
-        PROCEDE_
+        ACHIEVED_
       end
     end
 

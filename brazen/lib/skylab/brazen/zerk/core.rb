@@ -293,13 +293,13 @@ module Skylab::Brazen
 
       def when_ambiguous cx_a
         @y << "did you mean #{ cx_a.map( & :slug ) * ' or ' }?"
-        PROCEDE_
+        ACHIEVED_
       end
 
       def when_none s
         @y << "unrecognized command: #{ s.inspect }"
         @y << "please enter #{ build_prompt_line }"
-        PROCEDE_
+        ACHIEVED_
       end
 
       def when_one cx
@@ -325,7 +325,7 @@ module Skylab::Brazen
 
       def prompt
         write_and_flush "#{ build_prompt_line }: "
-        PROCEDE_
+        ACHIEVED_
       end
 
       def build_prompt_line  # #note-190
@@ -423,12 +423,12 @@ module Skylab::Brazen
 
       def prompt_when_value  #:+public-API
         write_and_flush "new #{ noun } (nothing to cancel): "
-        PROCEDE_
+        ACHIEVED_
       end
 
       def prompt_when_no_value
         write_and_flush "#{ noun } (nothing to cancel): "
-        PROCEDE_
+        ACHIEVED_
       end
 
       public def noun
@@ -495,7 +495,7 @@ module Skylab::Brazen
         if ok
           when_value_changed
         else
-          PROCEDE_
+          ACHIEVED_
         end
       end
 
@@ -526,7 +526,7 @@ module Skylab::Brazen
           when_value_changed
         else
           @y << "cannot delete #{ slug } value"
-          PROCEDE_
+          ACHIEVED_
         end
       end
 
@@ -657,7 +657,7 @@ module Skylab::Brazen
           @y << 'goodbye.'
           FINISHED_
         else
-          PROCEDE_
+          ACHIEVED_
         end
       end
 

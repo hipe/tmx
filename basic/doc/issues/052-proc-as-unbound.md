@@ -19,7 +19,7 @@ the platform proc (and its built-in reflection API) has considerable
 expressive power in its context:
 
   • we can infer an action name from the const the proc is stored under
-    (but note the proc itself will not tell us this - we have to rememer
+    (but note the proc itself will not tell us this - we have to remember
      the const we used to acces it.)
 
 
@@ -58,7 +58,7 @@ this path.
 
 ### emitting possible events from your proc
 
-if from your proc you wnat to emit possible events, accept a block
+if from your proc you want to emit possible events, accept a block
 argument in the arguments to your proc. use *this* proc as an
 "on event selectively" proc to emit the events.
 
@@ -82,7 +82,8 @@ if your proc opts-in to this arrangement per the above rule:
     exclude this parameter.
 
   • your proc when invoked will then be passed *some* object that
-    can be used to access for e.g your application's kernel.
+    can be used to access for e.g your application's kernel
+    (probably the proc-as-bound proxy).
 
 because this is still :+#experimental, details may change; but the spirit
 of this mechanic will likely endure.

@@ -12,6 +12,7 @@ module Skylab::Brazen
       end,
 
       :inflect, :noun, :lemma, :with_lemma, 'workspace',
+        # the above gives us "inited workspace" instead of ".. *a* workspace"
 
       :promote_action,
 
@@ -33,7 +34,7 @@ module Skylab::Brazen
 
       bx = @argument_box
 
-      @ws = model_class.edit_entity @kernel, handle_event_selectively do | ent |
+      @ws = silo_module.edit_entity @kernel, handle_event_selectively do | ent |
         ent.edit_with(
           :surrounding_path, bx.fetch( :path ),
           :config_filename, bx.fetch( :config_filename ) )

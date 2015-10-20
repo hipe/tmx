@@ -15,7 +15,7 @@ module Skylab::Basic
     module ModuleMethods
 
       def use sym, * args
-        Use___[ args, sym, self ]
+        Use_[ args, sym, self ]
       end
 
       define_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
@@ -27,7 +27,7 @@ module Skylab::Basic
       end
     end
 
-    Use___ = -> do
+    Use_ = -> do
 
       cache_h = {}
 
@@ -67,9 +67,92 @@ module Skylab::Basic
       end
     end
 
+    Expect_CLI = -> tcc do
+      Home_.lib_.brazen.test_support.CLI::Expect_CLI[ tcc ]
+    end
+
     Expect_Event = -> test_context_class do
 
       Home_::Callback_.test_support::Expect_Event[ test_context_class ]
+    end
+
+    module Expect_Event_Micro
+
+      def self.[] tcc
+        tcc.include self ; nil
+      end
+
+      def future_expect * a, & p
+        _add a, & p
+      end
+
+      def future_expect_only * a, & p
+        _add a, & p
+        future_expect_no_more
+      end
+
+      def _add a, & p
+        a.push p
+        ( @_future_expect_queue ||= [] ).push a
+        NIL_
+      end
+
+      def future_expect_no_more
+        ( @_future_expect_queue ||= [] ).push false
+        NIL_
+      end
+
+      def fut_p
+
+        st = _future_stream
+
+        -> * i_a, & oes_p do
+
+          if do_debug
+            debug_IO.puts "(#{ i_a.inspect })"
+          end
+
+          if st.unparsed_exists
+            a = st.gets_one
+            if a
+              p = a.pop
+              if a == i_a
+                if p
+                  p[ oes_p[] ]
+                end
+              else
+                fail "expected #{ a.inspect } had #{ i_a.inspect }"
+              end
+            else
+              fail "expected no more events, had #{ i_a.inspect }"
+            end
+          else
+            # when no unparsed exists and above didn't trigger, ignore event
+          end
+
+          false  # if client depends on this, it shouldn't
+        end
+      end
+
+      def future_is_now
+
+        st = _future_stream
+        if st.unparsed_exists
+          a = st.gets_one
+          if a
+            a.pop
+            fail "expected #{ a.inspect }, had no more events"
+          end
+        end
+      end
+
+      def _future_stream
+        @___future_stream ||= Callback_::Polymorphic_Stream.
+          via_array @_future_expect_queue
+      end
+
+      Cheap_Event_Record___ = ::Struct.new :category, :event_proc
+
     end
 
     String = -> tcc do  # :+#stowaway

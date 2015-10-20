@@ -66,8 +66,11 @@ module Skylab::TestSupport
 
         @IO_spy_group_for_expect_stdout_stderr = g
 
-        invo = subject_CLI.new( * g.values_at( :i, :o, :e ),  # :+#hook-out
-          invocation_strings_for_expect_stdout_stderr )  # :+#hook-out
+        invo = subject_CLI.new(  # :+#hook-out
+          * g.values_at( :i, :o, :e ),
+          invocation_strings_for_expect_stdout_stderr,  # :+#hook-out
+          * self.CLI_options_for_expect_stdout_stderr,
+        )
 
         if instance_variable_defined? :@for_expect_stdout_stderr_prepare_invocation
           @for_expect_stdout_stderr_prepare_invocation[ invo ]
@@ -87,6 +90,10 @@ module Skylab::TestSupport
 
       attr_reader :stdin_for_expect_stdout_stderr,  # :+#hook-in
         :stderr_for_expect_stdout_stderr
+
+      def CLI_options_for_expect_stdout_stderr
+        NIL_
+      end
 
     private
 

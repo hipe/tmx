@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  module Concerns_::Normalization  # see [#087]
+  module Home_::Normalization  # see [#087]
 
     # HOLDING: formal_prp_st = entity_x.formal_properties.to_value_stream
     # HOLDING : __during_entity_normalize do | entity_x |

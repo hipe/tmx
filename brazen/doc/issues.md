@@ -1,11 +1,14 @@
+[#123]       track nasty peeks into filesystem
 [#122]       as if you would ever..
 [#121]       #tracking this wrapping algo
 [#120] #open extensible component modifiers
-[#119] #open get [fm] out of test (see)
+[#119] #hole
+             ( #was: get [fm] out of test (see) )
 [#118]       do we want the ability to have a model-less-action? for now, no
-[#117] #open we might want top invocation to be able to emit events with
+[#117]       track abstraction candidates near reactive model, normalization
+             (#was: we might want top invocation to be able to emit events with
              the same interface as action adapters, which would change
-             the inheritence graph considerably
+             the inheritence graph considerably )
 [#116]       :+#tombstone: "client services" is no longer a thing
 [#115]       the `par` method of expags ..
 [#114]       (posterity) ..
@@ -24,7 +27,7 @@
 [#101]       #investigation - how to architect.
 [#100]       an introduction to a reactive model ..
 [#099]       [ branch node for historical documents ]
-[#098]       things that should probably subclass interface tree node
+[#098]       ouroboros ..
 [#097] #open get this ellipsis hack out
 [#096] #open the (CLI) table narrative ..
 [#095]       features that [fa] has that you don't #universal
@@ -40,7 +43,7 @@
 [#086]       #track cases where failure is "fuzzy" (i.e non-atomic),
                ignored for the greater good, for usability
 [#085]       track redundant implementations of poly.stream for one value
-             (#was: (#moved-to: [#ba-053]))
+             (#was: (#moved-to: [#ba-052]))
 [#084]       :+#wishlist a `flag` meta-meta prperty
 [#083]       ACS unmarshalling .. (#parent-node: [#089])
              ( #was: #done workspace `init` action should not default to '.' in API )
@@ -79,7 +82,8 @@
 [#067] #open smooth different interfacings with API actions taxonomy
 [#066]       [branch adapter] how add modality-only action #parent-node: [#003]
              ( #was: #done cool new build-less events )
-[#065]       #track procs are always not-promoted
+[#065]       track stubbing hacks in the universe (for reactive model trees)
+             ( #was: #track procs are always not-promoted )
              ( #was: #done implement unmarshaling for strings with newlines (git-config) )
 [#064] #open either rename `desc` to `entity_description` or make
              the syntax smarter without bloating it.
@@ -161,7 +165,7 @@
 [#016]       #parent-node: [#013] the inferred inflection narrative ..
 [#015]       #doc-node: the kernel narrative ..
 [#014] #open `has_custom_moniker` is a smell to exist in entity.
-[#013]       #parent-node: [#025] the model
+[#013]       #parent-node: [#025] the model ..
 [#012] #open now that the `properties` shell is not memoized, see if etc
 [#011]       the unobtrusive lexical-esque ordering narrative ..
              ( was: #parent-node: [#001] the event narrative )

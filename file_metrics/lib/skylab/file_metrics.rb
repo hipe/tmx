@@ -80,7 +80,6 @@ module Skylab::FileMetrics
   MONADIC_TRUTH_ = -> _ { true }
   NIL_ = nil
   SPACE_ = ' '.freeze
-  THE_EMPTY_MODULE_ = ::Module.new
   UNABLE_ = false
 
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]

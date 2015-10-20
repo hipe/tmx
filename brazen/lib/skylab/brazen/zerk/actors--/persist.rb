@@ -48,7 +48,7 @@ module Skylab::Brazen
         if @path.include? ::File::SEPARATOR
           do_resolve_downstream_directory
         else
-          PROCEDE_
+          ACHIEVED_
         end
       end
 

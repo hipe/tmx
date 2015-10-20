@@ -34,7 +34,7 @@ module Skylab::Brazen
             s = s.strip  # b.c it has been frozen in the past
             if s.length.nonzero?
               @subsection_s = s
-              PROCEDE_
+              ACHIEVED_
             end
           end
         end

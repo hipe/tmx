@@ -14,7 +14,7 @@ module Skylab::Brazen
 
       def _call_via_arglist a, & edit_p
 
-        o = Session__.new
+        o = Session.new
         o.arglist = a
         o.block = edit_p
         o.execute
@@ -23,7 +23,7 @@ module Skylab::Brazen
 
     EXTMOD_CALL_METHOD__ = -> * x_a, & edit_p do
 
-      o = Session__.new
+      o = Session.new
       o.arglist = x_a
       o.block = edit_p
       o.extmod = self
@@ -32,7 +32,7 @@ module Skylab::Brazen
 
     EEC_METHOD__ = -> * a, & edit_p do
 
-      o = Session__.new
+      o = Session.new
       o.client = self
       o.arglist = a
       o.block = edit_p
@@ -43,7 +43,7 @@ module Skylab::Brazen
       cls, st, extmod
     ) do
 
-      o = Session__.new
+      o = Session.new
       o.block = NIL_
       o.client = cls
       o.extmod = extmod
@@ -51,7 +51,16 @@ module Skylab::Brazen
       o.execute
     end
 
-    class Session__
+    Apply_entity = -> extmod, arglist, & edit_p do
+
+      o = Session.new
+      o.arglist = arglist
+      o.block = edit_p
+      o.extmod = extmod
+      o.execute
+    end
+
+    class Session
 
       attr_reader :client, :upstream
       alias_method :downstream, :client  # for now
@@ -720,7 +729,6 @@ module Skylab::Brazen
         "property or metaproperty never received a name - #{ _s }"
       end
     end
-    Session = Session__  # :+#experimental
 
     # ~ module methods (some)
 
@@ -1069,17 +1077,17 @@ module Skylab::Brazen
 
       def normalize_qualified_knownness qkn, & x_p  # :+[#ba-027] assume some normalizer (for now)
 
-        Home_::Concerns_::Normalization::Against_model[ qkn, self, & x_p ]
+        Home_::Home_::Normalization::Against_model[ qkn, self, & x_p ]
       end
 
       def is_normalizable_
 
         if has_default
-          PROCEDE_
+          ACHIEVED_
         elsif ad_hoc_normalizer_box
-          PROCEDE_
+          ACHIEVED_
         elsif __parameter_arity_object.begin.nonzero?
-          PROCEDE_
+          ACHIEVED_
         end
       end
 

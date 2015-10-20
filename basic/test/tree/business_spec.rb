@@ -1,19 +1,29 @@
 require_relative '../test-support'
 
-module Skylab::FileMetrics::TestSupport
+module Skylab::Basic::TestSupport
 
-  describe "[fm] model - tree-branch [ struct ]" do
+  describe "[ba] tree - business" do
 
     extend TS_
 
+    _Subject = -> do
+      Home_::Tree::Business
+    end
+
+    Home_.lib_.parse_lib::DSL_DSL.enhance self do
+      memoize :_with_class, :_class
+    end
+
     context "a produced subclass with one field" do
 
-      with_klass do
-        Home_::Model_::Tree_Branch.new :foo
+      _with_class do
+
+        T_B_1 = _Subject[].new :foo
       end
 
       it "trying to pass too many args - arg error" do
-        cls = klass
+
+        cls = _class
         begin
           cls.new :one, :two
         rescue ::ArgumentError => e
@@ -22,18 +32,18 @@ module Skylab::FileMetrics::TestSupport
       end
 
       it "trying to pass too few args - ok, you get nil (and reader)" do
-        me = klass.new
+        me = _class.new
         me.foo.should eql( nil )
       end
     end
 
       it "unlike struct, it can subclass" do
 
-        kls1 = ::Class.new( _subject_class.new( :foo, :bar ) )
+        T_B_2 = ::Class.new( _Subject[].new( :foo, :bar ) )
 
-        Sandbox_.kiss kls1
+        T_B_3 = T_B_2.subclass :wing, :wang
 
-        kls2 = Sandbox_.kiss( kls1.subclass :wing, :wang )
+        kls2 = T_B_3
 
         kls2.const_get( :BX____ ).a_.should eql(
 
@@ -45,9 +55,5 @@ module Skylab::FileMetrics::TestSupport
 
         o2.wang.should eql 'wAng'
       end
-
-    def _subject_class
-      Home_::Model_::Tree_Branch
-    end
   end
 end

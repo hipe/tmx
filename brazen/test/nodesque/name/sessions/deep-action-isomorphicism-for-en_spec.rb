@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Brazen::TestSupport
 
-  describe "[br] concerns - name - sessions - deep action isomorphicism for EN" do
+  describe "[br] nodesque - name - sessions - deep action isomorphicism for EN" do
 
     it "loads" do
       subject
@@ -45,7 +45,7 @@ module Skylab::Brazen::TestSupport
 
     def subject
 
-      Home_::Concerns_::Name::Sessions_::Deep_Action_Isomorphicism_for_EN
+      Home_::Nodesque::Name::Sessions_::Deep_Action_Isomorphicism_for_EN
     end
   end
 end

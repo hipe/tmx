@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Collection_Adapters::Couch < Home_::Collection::Model_  # see [#038]
 
-    Home_::Model::Entity.call self do
+    Home_::Modelesque.entity self do
 
       o :desc, -> y do
         y << "manage couch collections."
@@ -77,7 +77,7 @@ module Skylab::Brazen
 
       Rm = make_action_class :Delete do
 
-        Home_::Model::Entity.call self do
+        Home_::Modelesque.entity self do
 
           o :description,
             -> y do
@@ -105,7 +105,7 @@ module Skylab::Brazen
 
       oes_p ||= handle_event_selectively
       Couch_::Actors__::Touch_collection[ self, & oes_p ]
-      PROCEDE_  # #note-085
+      ACHIEVED_  # #note-085
     end
 
     def entity_via_intrinsic_key id, & oes_p
@@ -136,7 +136,7 @@ module Skylab::Brazen
       # the failure of the one not to prevent the other from proceding
       # (otherwise you wouldn't be able to remove rogue records)
 
-      PROCEDE_
+      ACHIEVED_
     end
 
     # ~ for actors
@@ -167,7 +167,7 @@ module Skylab::Brazen
 
   public  # ~ hook out's & hook in's
 
-    class Silo_Daemon < Home_::Model::Silo_Daemon
+    class Silo_Daemon < Home_::Silo::Daemon
 
       def precondition_for_self _action, _id, box, & oes_p
         :"???"  # we might want to use this for write-collection operations

@@ -195,7 +195,7 @@ module Skylab::Brazen
             @did_succeed = true
             @final_output_iambic = [ * @early_output_segment,
               * @middle_output_segment, * @late_output_segment ]
-            CONTINUE_
+            NIL_  # CONTINUE_
           end
 
         public

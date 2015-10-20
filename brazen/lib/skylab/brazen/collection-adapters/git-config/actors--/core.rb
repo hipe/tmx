@@ -142,7 +142,7 @@ module Skylab::Brazen
       def via_both_strings_resolve_subsection_id_
         @subsection_id = Subsection_Identifier_.
           new @section_s, @subsection_s
-        PROCEDE_
+        ACHIEVED_
       end
 
       def via_subsection_id_resolve_some_result
@@ -218,12 +218,12 @@ module Skylab::Brazen
 
         _sym = @subsection_id.to_silo_name_i
 
-        _id = Concerns_::Identifier.via_symbol _sym
+        _id = Home_::Nodesque::Identifier.via_symbol _sym
 
         silo = @kernel.silo_via_identifier _id, & @on_event_selectively
 
         if silo
-          @model_class = silo.model_class
+          @model_class = silo.silo_module
           ACHIEVED_
         end
       end
@@ -241,7 +241,7 @@ module Skylab::Brazen
           end
         end
 
-        @result and PROCEDE_
+        @result and ACHIEVED_
       end
 
       def resolve_result_via_write_file dry_run

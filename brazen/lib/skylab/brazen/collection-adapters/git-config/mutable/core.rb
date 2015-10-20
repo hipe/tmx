@@ -76,11 +76,11 @@ module Skylab::Brazen
         def resolve_document
           @document = Document__.new @input_id, self
           @current_nonterminal_node = @document
-          PROCEDE_
+          ACHIEVED_
         end
 
         def execute_parse
-          ok = PROCEDE_
+          ok = ACHIEVED_
           while @line = @lines.gets
             @lineno += 1
             if BLANK_LINE_OR_COMMENT_RX_ =~ @line
@@ -104,7 +104,7 @@ module Skylab::Brazen
           sect = Section_or_Subsection__.via_parse self
           sect and begin
             accept_sect sect
-            PROCEDE_
+            ACHIEVED_
           end
         end
 
@@ -113,13 +113,13 @@ module Skylab::Brazen
           if sect
             sect.parse_after_peek and begin
               accept_sect sect
-              PROCEDE_
+              ACHIEVED_
             end
           else
             ast = Assignment__.via_parse self
             ast and begin
               accept_asmt ast
-              PROCEDE_
+              ACHIEVED_
             end
           end
         end
@@ -380,7 +380,7 @@ module Skylab::Brazen
 
         def add_comment str
           @a.push Blank_Line_Or_Comment_Line__.new "# #{ str }#{ NEWLINE_ }"
-          PROCEDE_
+          ACHIEVED_
         end
 
         def write * x_a, & oes_p  # experimental
@@ -923,7 +923,7 @@ module Skylab::Brazen
           @column_number = @scn = nil
           # keep @parse around for any subsequent events we may emit!
           rslv_names
-          PROCEDE_
+          ACHIEVED_
         end
 
         def rslv_names
@@ -1155,11 +1155,11 @@ module Skylab::Brazen
               UNABLE_
             else
               @subsect_s = @unsanitized_subsect_s ; @unsanitized_subsect_s = nil
-              PROCEDE_
+              ACHIEVED_
             end
           else
             @subsect_s = @unsanitized_subsect_s ; @unsanitized_subsect_s = nil
-            PROCEDE_
+            ACHIEVED_
           end
           ok and begin
             rslv_names
@@ -1447,7 +1447,7 @@ module Skylab::Brazen
           if d
             @seg_s_a.push @scn.string[ @column_number - 1, d ]
             @column_number += d
-            PROCEDE_
+            ACHIEVED_
           end
         end
         NON_QUOTED_STRING_RX__ = /[^ \t\r\n#;"]+(?:[ \t]+[^ \t\r\n#;"]+)*/
@@ -1463,7 +1463,7 @@ module Skylab::Brazen
               if Assignment_.mutate_value_string_for_unmarshal(
                   s, @parse.handle_event_selectively )
                 @seg_s_a.push s
-                PROCEDE_
+                ACHIEVED_
               else
                 UNABLE_
               end
@@ -1480,7 +1480,7 @@ module Skylab::Brazen
           finish_line do |d|
             @value_is_converted = true
             @value_x = @seg_s_a.join EMPTY_S_ ; @seg_s_a = nil
-            PROCEDE_
+            ACHIEVED_
           end
         end
 
@@ -1493,7 +1493,7 @@ module Skylab::Brazen
             if block_given?
               yield d
             else
-              PROCEDE_
+              ACHIEVED_
             end
           else
             recv_error_symbol :expected_end_of_line
@@ -1636,7 +1636,7 @@ module Skylab::Brazen
 
         def accept_new_value x
           @x = x
-          PROCEDE_
+          ACHIEVED_
         end
       end
 

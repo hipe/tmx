@@ -9,7 +9,7 @@ module Skylab::Brazen
       end
 
       def expose_executables_with_prefix s
-        define_method :to_child_unbound_action_stream,
+        define_method :to_unordered_selection_stream,
           CLI_::Action_Adapter_::Executables_Exposure::Action_stream_method[ s ]
         NIL_
       end
@@ -67,10 +67,6 @@ module Skylab::Brazen
         # (abstract base class "invocation" has no initialize method)
       end
 
-      def members
-        [ :application_kernel, :bound_action, * super ]
-      end
-
       def invoke argv
 
         rsx = @resources
@@ -94,7 +90,12 @@ module Skylab::Brazen
 
       # ~ ( others at top, then the list from [#024] )
 
-      ## ~~ invitations
+      ## ~~ help & invitations
+
+      def receive_show_help_ otr
+        accept_frame otr
+        help_renderer.express_help_screen_
+      end
 
       def __flush_any_invitations
 
@@ -122,7 +123,11 @@ module Skylab::Brazen
             end
 
           else
-            k_x = adapter.bound_action.class.name.intern  # must work for proc proxies too
+
+            k_x = adapter.bound_.name.as_const
+
+            # (the top bound node doesn't have a name)
+
             seen_general_h.fetch k_x do
               seen_general_h[ k_x ] = true
               adapter.express_invite_to_general_help
@@ -159,10 +164,18 @@ module Skylab::Brazen
         end
       end
 
-      ## ~~ actionability (near "navigation of the interface tree")
+      ## ~~ actionability (near "navigation of the reactive model")
 
       def action_adapter
         NIL_
+      end
+
+      def bound_
+        @___bound_kernel ||= __build_bound_kernel
+      end
+
+      def __build_bound_kernel
+        Bound_Kernel___.new( @app_kernel, & handle_event_selectively )
       end
 
       def application_kernel
@@ -176,14 +189,6 @@ module Skylab::Brazen
         Home_.lib_.basic::Module.value_via_relative_path(
           self.class, DOT_DOT_
         ).application_kernel_
-      end
-
-      def bound_
-        @app_kernel
-      end
-
-      def bound_action
-        @app_kernel
       end
 
       def branch_class
@@ -233,7 +238,19 @@ module Skylab::Brazen
       ## ~~ event receiving & sending
 
       def maybe_use_exit_status d  # #note-075
-        if ! instance_variable_defined? :@exitstatus or @exitstatus < d
+
+        d or raise ::ArgumentError
+
+        if instance_variable_defined? :@exitstatus
+          x = @exitstatus
+          if x < d
+            yes = true
+          end
+        else
+          yes = true
+        end
+
+        if yes
           @exitstatus = d
           NIL_
         end
@@ -296,10 +313,6 @@ module Skylab::Brazen
     class Branch_Invocation__ < Invocation__
 
       Actions = ::Module.new.freeze  # #note-165
-
-      def members
-        [ * super ]
-      end
 
       def resources
         @resources
@@ -382,14 +395,14 @@ module Skylab::Brazen
 
     public
 
-      def retrieve_bound_action_via_nrml_nm i_a
+      def bound_action_via_normal_name_ i_a
         retrv_bound_action_via_normal_name_symbol_stream(
           Callback_::Polymorphic_Stream.via_array i_a )
       end
 
       def retrv_bound_action_via_normal_name_symbol_stream sym_st
 
-        ad_st = to_adapter_stream
+        ad_st = to_adapter_stream_
         sym = sym_st.gets_one
 
         ad = ad_st.gets
@@ -413,9 +426,9 @@ module Skylab::Brazen
         end
       end
 
-      def to_adapter_stream
+      def to_adapter_stream_
 
-        to_child_unbound_action_stream.map_by do | unbound |
+        to_unordered_selection_stream.map_by do | unbound |
 
           adapter_via_unbound unbound
 
@@ -452,42 +465,37 @@ module Skylab::Brazen
       end
 
       def fast_lookup_proc
-        bound_action.fast_lookup
+        bound_.fast_lookup
       end
 
       def __array_of_matching_unbounds_against_token_slow tok
 
         Home_.lib_.basic::Fuzzy.reduce_to_array_stream_against_string(
-          to_child_unbound_action_stream,
+          to_unordered_selection_stream,
           tok,
           -> unbound do
             unbound.name_function.as_slug
           end )
       end
 
-      def to_child_unbound_action_stream  # :+#public-API
+      def to_unordered_selection_stream  # :+#public-API
 
-        # rely on your associated bound action to give you an unbound action
-        # stream representing its children. your bound action may be for e.g
-        # a model instance just querying its child consts, or maybe it is an
-        # arbitrary kernel doing something else, you neither know nor care.
-
-        bound_action.to_unbound_action_stream
+        bound_.to_unordered_selection_stream
       end
 
       def adapter_via_unbound unbound  # :+#public-API
 
-        cls = unbound.adapter_class_for :CLI
+        ada_cls = unbound.adapter_class_for :CLI
 
-        if ! cls
-          cls = if unbound.is_branch
+        if ! ada_cls
+          ada_cls = if unbound.is_branch
             __branch_class_for_unbound_action unbound
           else
             __leaf_class_for_unbound_action unbound
           end
         end
 
-        cls.new unbound, bound_action
+        ada_cls.new unbound, bound_
       end
 
       # this is CLI. you need not cache these.
@@ -499,35 +507,38 @@ module Skylab::Brazen
 
       def __leaf_class_for_unbound_action unbound
 
-        __any_specialized_adapter_under_model_node_for( unbound ) ||
+        _cls = __any_specialized_adapter_in_silo_for unbound
 
-          _any_specialized_adapter_in_self_for( unbound ) || leaf_class
+        _cls ||= _any_specialized_adapter_in_self_for unbound
+
+        _cls || leaf_class
       end
 
       # ~ begin modalities (per model)
 
-      def __any_specialized_adapter_under_model_node_for unbound  # leaf
+      def __any_specialized_adapter_in_silo_for unbound  # leaf
 
-        mc = unbound.model_class
+        sm = unbound.silo_module
 
-        if mc
-          if mc.respond_to?( :entry_tree ) && mc.entry_tree.has_entry( MODA___ )
+        if sm
+          if sm.respond_to?( :entry_tree ) && sm.entry_tree.has_entry( MODA___ )
 
-            # hacking a peek into the filesystem (for free) here is not as ugly
-            # as a) needing to opt-in to boxxy everywhere or b) requiring stubs
+            # :+[#123] hacking a free peek into the filesystem is not as ugly
+            # as a) needing to opt-in to boxxy everywhere or a) using stubs
 
-            mc.const_get :Modalities, false
+            sm.const_get :Modalities, false
           end
-          if mc.const_defined? :Modalities
-            __any_branch_or_leaf_class_for_unoubnd_when_modalities unbound
+
+          if sm.const_defined? :Modalities
+            __any_branch_or_leaf_class_for_unbound_when_modalities unbound
           end
         end
       end
 
-      def __any_branch_or_leaf_class_for_unoubnd_when_modalities unb
+      def __any_branch_or_leaf_class_for_unbound_when_modalities unb
 
         sym = unb.name_function.as_const
-        _box = unb.model_class::Modalities::CLI::Actions
+        _box = unb.silo_module::Modalities::CLI::Actions
         if _box.const_defined? sym, false
           _box.const_get sym
         end
@@ -620,12 +631,8 @@ module Skylab::Brazen
         @_settable_by_environment_h = nil
         if unbound
           super
-          @bound.accept_parent_node_ boundish
+          @bound.accept_parent_node boundish
         end
-      end
-
-      def members
-        [ * super ]
       end
 
       def _to_full_inferred_property_stream
@@ -639,12 +646,6 @@ module Skylab::Brazen
         else
           Callback_::Stream.the_empty_stream
         end
-      end
-
-      def receive_show_help_ otr
-        accept_frame otr
-        help_renderer.express_help_screen_
-        SUCCESS_EXITSTATUS
       end
 
       def _some_bound_call
@@ -676,6 +677,12 @@ module Skylab::Brazen
         end
 
         Aggregate_Bound_Call__.new a
+      end
+
+      def receive_show_help_ otr
+        # contrast with branch implementation
+        accept_frame otr
+        help_renderer.express_help_screen_
       end
 
       def __bound_call_class_for__help__option
@@ -850,7 +857,7 @@ module Skylab::Brazen
         @_x_p = x_p
       end
 
-      def accept_parent_node_ x
+      def accept_parent_node x
         @_par_nod = x
         NIL_
       end
@@ -913,7 +920,6 @@ module Skylab::Brazen
 
       def produce_result
         @_help_renderer.express_help_screen_
-        SUCCESS_EXITSTATUS
       end
     end
 
@@ -922,6 +928,9 @@ module Skylab::Brazen
       include Adapter_Methods__
 
       def receive_show_help_ otr
+
+        # contrast with leaf implementation (covered).. [see #note-930]
+
         accept_frame otr
         CLI_::When_::Help.new( nil, help_renderer, self ).produce_result
       end
@@ -931,34 +940,10 @@ module Skylab::Brazen
 
       def initialize unbound, boundish  # :+#public-API
 
-        @bound = unbound.new boundish, & handle_event_selectively
+        @bound = unbound.new boundish.kernel, & handle_event_selectively
       end
 
-      def members
-        [ :bound_, :resources, * super ]
-      end
-
-      def bound_  # #experiment
-        @bound
-      end
-
-      attr_reader :resources  # for magic results [#021]
-
-      def name
-        @bound.name
-      end
-
-      def is_visible
-        @bound.is_visible
-      end
-
-      def has_description
-        @bound.has_description
-      end
-
-      def under_expression_agent_get_N_desc_lines exp, d=nil
-        @bound.under_expression_agent_get_N_desc_lines exp, d
-      end
+      # ~ implementation commonn to both branch & action (leaf) adapters:
 
       def bound_call_via_receive_frame otr  # :+#public-API
         accept_frame otr
@@ -973,20 +958,48 @@ module Skylab::Brazen
         NIL_
       end
 
-      def bound_action
-        @bound
+      # ~ delegate to (or derive trivially from) bound:
+
+      ## ~~ description & inflection & name
+
+      def has_description
+        @bound.has_description
       end
 
-      def action_adapter
-        self
+      def under_expression_agent_get_N_desc_lines exp, d=nil
+        @bound.under_expression_agent_get_N_desc_lines exp, d
       end
 
-      def invocation
-        self
+      def name
+        @bound.name
       end
 
-      def retrieve_bound_action_via_nrml_nm i_a
-        @parent.retrieve_bound_action_via_nrml_nm i_a
+      ## ~~ placement & visibility
+
+      def name_value_for_order
+        @bound.name.as_lowercase_with_underscores_symbol
+      end
+
+      def after_name_value_for_order
+        @bound.after_name_symbol
+      end
+
+      def is_visible
+        @bound.is_visible
+      end
+
+      # ~ delegate to parent:
+
+      def write_invocation_string_parts y
+        @parent.write_invocation_string_parts y
+        y << name.as_slug
+        NIL_
+      end
+
+      ## ~~ navigate the reactive model
+
+      def bound_action_via_normal_name_ i_a
+        @parent.bound_action_via_normal_name_ i_a
       end
 
       def retrieve_unbound_action * i_a
@@ -997,9 +1010,63 @@ module Skylab::Brazen
         @parent.unbound_action_via_normalized_name i_a
       end
 
+      ## ~~ events & related
+
+      def send_invitation ev
+        @parent._receive_invitation ev, self
+      end
+
+      def _receive_invitation ev, adapter
+        @parent._receive_invitation ev, adapter
+        NIL_
+      end
+
+      def expression_strategy_for_informal_property prp
+        @parent.expression_strategy_for_informal_property prp
+      end
+
+      def expression_agent_class
+        @parent.expression_agent_class
+      end
+
+      def outbound_line_yielder_for__payload__
+        @parent.outbound_line_yielder_for__payload__
+      end
+
+      def maybe_use_exit_status d
+        @parent.maybe_use_exit_status d
+      end
+
+      ## ~~ resources/services near kernel & application
+
+      def app_name
+        @parent.app_name
+      end
+
       def application_kernel
         @parent.application_kernel
       end
+
+      # ~ simple readers
+
+      def bound_
+        @bound
+      end
+
+      def action_adapter  # todo - unify w/ below
+        self
+      end
+
+      def invocation  # #todo - unify w/ above
+        self
+      end
+
+      attr_reader(
+        :resources,  # for magic results [#021]
+      )
+    end
+
+    class Invocation__  # used to be part of above
 
       def handle_event_selectively  # :+#public-API #hook-in
 
@@ -1009,7 +1076,7 @@ module Skylab::Brazen
         # will for example first check if a special method is defined which
         # corresponds to the channel name in some way and instead use that.
 
-        @___oes_p ||= -> * i_a, & x_p do
+        @on_event_selectively ||= -> * i_a, & x_p do
           receive_uncategorized_emission i_a, & x_p
         end
       end
@@ -1066,11 +1133,15 @@ module Skylab::Brazen
         end
       end
 
-      # ~ end
+      # ~ end implement that.
 
       def receive_conventional_emission i_a, & ev_p  # :+#public-API
 
-        receive_event_on_channel ev_p[], i_a
+        if ev_p
+          receive_event_on_channel ev_p[], i_a
+        else
+          self._COVER_ME_emission_does_not_comply_to_this_modality
+        end
       end
 
       def receive_event_on_channel ev, i_a  # :+#public-API
@@ -1141,11 +1212,6 @@ module Skylab::Brazen
 
       attr_reader :_invite_ev_a
 
-      def _receive_invitation ev, adapter
-        @parent._receive_invitation ev, adapter
-        NIL_
-      end
-
       def express_invite_to_general_help
         help_renderer.express_invite_to_general_help
       end
@@ -1161,19 +1227,7 @@ module Skylab::Brazen
         NIL_
       end
 
-      def expression_agent_class
-        @parent.expression_agent_class
-      end
-
-      def outbound_line_yielder_for__payload__
-        @parent.outbound_line_yielder_for__payload__
-      end
-
     private
-
-      def send_invitation ev
-        @parent._receive_invitation ev, self
-      end
 
       def maybe_inflect_line_for_positivity_via_event s, ev
         if ev.verb_lexeme
@@ -1301,59 +1355,30 @@ module Skylab::Brazen
       end
 
       def maybe_use_exit_status_via_OK_or_not_OK_event ev
-        d = any_err_code_for_event ev
+        d = _any_exit_status_for_event ev
         d or ev.ok && ( d = SUCCESS_EXITSTATUS )
         d ||= some_err_code_for_event ev
         maybe_use_exit_status d
         NIL_
       end
 
-      def any_err_code_for_event ev
-        any_ext_status_for_chan_i ev.terminal_channel_i
-      end
-
-      def any_ext_status_for_chan_i i
-        Home_::API.exit_statii[ i ]
-      end
-
       def some_err_code_for_event ev
-        any_err_code_for_event( ev ) || GENERIC_ERROR_EXITSTATUS
+        _any_exit_status_for_event( ev ) || GENERIC_ERROR_EXITSTATUS
       end
+
+      def _any_exit_status_for_event ev
+        any_exit_status_for_channel_symbol ev.terminal_channel_i
+      end
+
+      def any_exit_status_for_channel_symbol sym
+        Home_::API.exit_statii[ sym ]
+      end
+
+      # ~ end event handling
 
     public
 
-      def app_name
-        @parent.app_name
-      end
-
-      def expression_strategy_for_informal_property prp
-        @parent.expression_strategy_for_informal_property prp
-      end
-
-      def maybe_use_exit_status d
-        @parent.maybe_use_exit_status d
-      end
-
-      # ~ #hook-outs for adjunct facet: ordering
-
-      def name_value_for_order
-        @bound.name.as_lowercase_with_underscores_symbol
-      end
-
-      def after_name_value_for_order
-        @bound.after_name_symbol
-      end
-    end
-
-    # ~
-
-    class Invocation__
-
       MUTATE_THESE_PROPERTIES = [ :stdin, :stdout ]
-
-      def members
-        EMPTY_A_
-      end
 
       def begin_option_parser  # :+#public-API
         option_parser_class.new
@@ -1371,12 +1396,6 @@ module Skylab::Brazen
       def invocation_string
         write_invocation_string_parts y = []
         y * SPACE_
-      end
-
-      def write_invocation_string_parts y
-        @parent.write_invocation_string_parts y
-        y << name.as_slug
-        NIL_
       end
 
       def produce_populated_option_parser op, opt_a
@@ -2130,6 +2149,10 @@ module Skylab::Brazen
         end
       end
 
+      def __default__environment__
+        ::ENV
+      end
+
       def __default__filesystem__
 
         Home_.lib_.system.filesystem  # directory? exist? mkdir mv open rmdir
@@ -2244,6 +2267,28 @@ module Skylab::Brazen
       def __APPNAME
         @__APPNAME ||= application_kernel.app_name.gsub( /[^[:alnum:]]+/, EMPTY_S_ ).upcase
       end
+    end
+
+    class Bound_Kernel___
+
+      def initialize k, & oes_p
+        @kernel = k
+        @on_event_selectively = oes_p
+      end
+
+      # ~ delegation & related
+
+      def to_unordered_selection_stream
+
+        @kernel.build_unordered_selection_stream(
+          & @on_event_selectively )
+      end
+
+      def fast_lookup
+        @kernel.fast_lookup
+      end
+
+      attr_reader :kernel
     end
 
     CLI_ = self
@@ -2415,7 +2460,7 @@ module Skylab::Brazen
       def build_property sym, * x_a  # convenience
 
         ok = true
-        prp = Home_::Model::Entity::Property.new do
+        prp = Home_::Modelesque::Entity::Property.new do
 
           @name = Callback_::Name.via_variegated_symbol sym
           ok = process_iambic_fully x_a

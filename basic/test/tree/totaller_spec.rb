@@ -1,12 +1,12 @@
 require_relative '../test-support'
 
-module Skylab::FileMetrics::TestSupport
+module Skylab::Basic::TestSupport
 
-  describe "[fm] models - totaller" do
+  describe "[ba] tree - totaller" do
 
     before :all do
 
-      FMMT_One = Home_::Models_::Totaller.new :a, :b
+      T_T_1 = Home_::Tree::Totaller.new :a, :b
     end
 
     it "makes" do
@@ -14,7 +14,7 @@ module Skylab::FileMetrics::TestSupport
 
     it "builds" do
 
-      o = FMMT_One.new
+      o = T_T_1.new
       o.slug = :x
       o.a = :a
       o.a.should eql :a

@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
 
-  describe "[br] data stores - git config - write" do
+  describe "[br] collection adapters - git config - write" do
 
     extend TS_
 

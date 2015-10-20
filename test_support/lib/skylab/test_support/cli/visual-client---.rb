@@ -17,7 +17,9 @@ module Skylab::TestSupport
 
         @pth_mod = mod::TestSupport
         @viz_mod = mod::TestSupport_Visual
-        @the_dir_pathname_ = mod.dir_pathname.join 'test'
+
+        _path = ::File.expand_path '../../../test', mod.dir_pathname.to_path  # `sidesys_path_`
+        @the_dir_pathname_ = ::Pathname.new _path
       end
 
       attr_reader :the_dir_pathname_

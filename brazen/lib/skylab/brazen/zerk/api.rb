@@ -65,7 +65,7 @@ module Skylab::Brazen
         if @node_.is_branch
           @node = @node_ ; @node_ = nil
           @node.before_focus
-          PROCEDE_  # bubble back up to the main loop
+          ACHIEVED_  # bubble back up to the main loop
         else
           when_second_node_is_leaf
         end

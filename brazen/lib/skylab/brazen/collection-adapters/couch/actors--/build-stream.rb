@@ -104,7 +104,7 @@ module Skylab::Brazen
             y << "added design document #{ val ev.id }"
           end
         end
-        CONTINUE_
+        NIL_  # CONTINUE_
       end
     end
   end

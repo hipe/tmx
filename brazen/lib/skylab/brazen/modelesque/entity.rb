@@ -1,10 +1,10 @@
 module Skylab::Brazen
 
-  class Model
+  Modelesque::Entity = ::Module.new
 
-    Entity = ::Module.new
+  # ->
 
-    Home_::Entity.call( Entity,  # see [#047]
+    Home_::Entity.call( Modelesque::Entity,  # see [#047]
 
       # ~ ad-hoc processors
 
@@ -64,7 +64,7 @@ module Skylab::Brazen
 
     )
 
-    module Entity
+    module Modelesque::Entity
 
       def receive_polymorphic_property prp  # (method MUST be public)  :.A
 
@@ -110,7 +110,7 @@ module Skylab::Brazen
         # assume that the entity has some formal properties.
 
 
-        Concerns_::Normalization::Against_model_stream.call(
+        Home_::Normalization::Against_model_stream.call(
 
           self,
           formal_properties.to_value_stream,
@@ -364,6 +364,7 @@ module Skylab::Brazen
 
       # ~ courtesy
 
+      # <-
 
     def via_properties_init_ivars  # #note-360
 
@@ -416,10 +417,7 @@ module Skylab::Brazen
       "sanity - won't clobber existing #{ ivar } #{
         }(#{ p[ x ] }) with new value (#{ p[ x_ ] })"
     end
-
-
-
-
-    end  # end building the extension module
-  end  # M-odel_
-end  # sl [br]
+    # ->
+    end
+    # <-
+end

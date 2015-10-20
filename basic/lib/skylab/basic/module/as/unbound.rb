@@ -1,94 +1,80 @@
 module Skylab::Basic
 
-  module Module::As::Models  # :[#053].
+  module Module::As  # :[#053].
 
-    # :+#by: [f2]
+    class Unbound  # [#br-013] is instructive.
 
-    class Unbound_Model
+      Brazen_ = ::Skylab::Brazen  # assumed
 
-      def initialize mod
+      include Brazen_.branchesque_defaults::Unbound_Methods
 
-        @mod = mod
-        @nf = Callback_::Name.via_module mod
+      def initialize source, mod
+        @silo_module = mod
+        @source = source
       end
 
-      def is_branch
-        true  # all unadorned modules are
+      # ~ for indexing & UI
+
+      def build_unordered_selection_stream & x_p
+        _unbounds_indexation.build_unordered_selection_stream( & x_p )
       end
 
-      def adapter_class_for _moda
-        NIL_
+      def build_unordered_index_stream & x_p
+        _unbounds_indexation.build_unordered_index_stream( & x_p )
+      end
+
+      def _unbounds_indexation
+        @___UI ||= Brazen_::Branchesque::Indexation.new(
+          @source, self )
       end
 
       def name_function
-        @nf
+        @___nf ||= __build_name_function
       end
 
-      def new kr, & oes_p
-
-        As_Bound_Model___.new self, kr, & oes_p
+      def __build_name_function
+        Brazen_::Nodesque::Name::Build_name_function[ self ]
       end
 
-      def const_defined? * a
-        @mod.const_defined?( * a )
+      def name  # for above
+        @___name_s ||= @silo_module.name
       end
 
-      def __mod
-        @mod
-      end
-    end
+      # ~ for invocation, and used by modality interpreters
 
-    class As_Bound_Model___
-
-      # :+[#br-098] things that should probably subclass interface node base
-
-      def initialize cls_pxy, kr, & oes_p
-
-        @cls_pxy = cls_pxy
-        @kernel = kr
-        @on_event_selectively = oes_p
+      def new ke, & x_p
+        Bound___.new self, ke, & x_p
       end
 
-      def fast_lookup
-        NIL_
-      end
+      attr_reader :silo_module
 
-      def to_unbound_action_stream
-        to_lower_unbound_action_stream
-      end
+      class Bound___
 
-      def to_lower_unbound_action_stream
+        include Brazen_.branchesque_defaults::Bound_Methods
 
-        _acr = ::Skylab::Brazen::Model::Child_Node_Index.new(
-          @cls_pxy,
-          @cls_pxy.__mod.const_get( ::Skylab::Brazen::ACTIONS_CONST, false ),
-        )
+        def initialize unb, ke, & oes_p
 
-        _acr.to_lower_action_class_stream_
-      end
+          @kernel = ke
+          @on_event_selectively = oes_p
+          @unbound = unb
+        end
 
-      def name
-        @cls_pxy.name_function
-      end
+        # ~ indexing & reflection
 
-      def to_kernel
-        @kernel
-      end
+        def to_unordered_selection_stream
+          @unbound.build_unordered_selection_stream( & @on_event_selectively )
+        end
 
-      def after_name_symbol
-        NIL_
-      end
+        # ~ invocation & used by modality interpreters
 
-      def has_description
-        false
-      end
+        def accept_parent_node _
+          @_USE_ME_could_have_parent_bound = true
+          NIL_
+        end
 
-      def is_branch
-        true  # modules are always treated as branch nodes
-      end
-
-      def is_visible
-        true
+        def name
+          @unbound.name_function
+        end
       end
     end
   end

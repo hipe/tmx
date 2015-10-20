@@ -30,7 +30,7 @@ module Skylab::Brazen
         def via_native_entity_identifier_rslv_payload_h
           @payload_h = @collection.get @native_entity_identifier_s,
             :response_receiver, @response_receiver
-          @payload_h ? PROCEDE_ : UNABLE_
+          @payload_h ? ACHIEVED_ : UNABLE_
         end
 
         def via_payload_h_prdc_entity
@@ -93,8 +93,18 @@ module Skylab::Brazen
       end
 
       def via_entity_identifier_and_kernel_rslv_model_class
-        @model_class = @kernel.unbound_via_identifier @entity_identifier, & @on_event_selectively
-        @model_class ? ACHIEVED_ : UNABLE_
+
+        mc = @kernel.unbound_via(
+          :identifier,
+          @entity_identifier,
+          & @on_event_selectively )
+
+        if mc
+          @model_class = mc
+          ACHIEVED_
+        else
+          mc
+        end
       end
 
       def via_entity_identifier_when_valid_rslv_native_entity_identifier

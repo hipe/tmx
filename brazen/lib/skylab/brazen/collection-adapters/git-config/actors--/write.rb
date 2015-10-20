@@ -25,20 +25,20 @@ module Skylab::Brazen
         end
         @section = Git_Config_::Mutable::Section_or_Subsection__.
           via_literals @subsection_name, @section_name, _prs
-        @section ? PROCEDE_ : UNABLE_
+        @section ? ACHIEVED_ : UNABLE_
       end
 
       def resolve_assignment_lines
         while ast = @assignment_scan.gets
           @section[ ast.name_symbol ] = ast.value_x
         end
-        DONE_
+        ACHIEVED_
       end
 
       def flush
         scn = @section.to_line_stream
         if line = scn.gets
-          ok = PROCEDE_
+          ok = ACHIEVED_
           @downstream_IO.write line
         end
         while line = scn.gets

@@ -167,7 +167,7 @@ module Skylab::Brazen
       sess.edit_common_properties_module(
 
         :default_proc, -> action do
-          action.to_kernel.unbound( :Workspace ).default_config_filename
+          action.kernel.unbound( :Workspace ).default_config_filename
         end,
         :property, :config_filename,
 
@@ -206,12 +206,12 @@ module Skylab::Brazen
 
     # ~ the custom stack
 
-    class Silo_Daemon < superclass::Silo_Daemon
+    class Silo_Daemon < Home_::Silo::Daemon
 
       # ~ custom exposures
 
       def workspace_via_qualified_knownness_box box, & oes_p
-        WS_via_qualified_knownness_box___.new( box, @model_class, @kernel, & oes_p ).execute
+        WS_via_qualified_knownness_box___.new( box, @silo_module, @kernel, & oes_p ).execute
       end
 
       # ~ hook-outs / hook-ins
@@ -220,7 +220,7 @@ module Skylab::Brazen
 
         _bx = action.to_qualified_knownness_box_proxy
 
-        WS_via_qualified_knownness_box___.new( _bx, @model_class, @kernel, & oes_p ).execute
+        WS_via_qualified_knownness_box___.new( _bx, @silo_module, @kernel, & oes_p ).execute
       end
 
       def any_mutated_formals_for_depender_action_formals x
@@ -242,10 +242,10 @@ module Skylab::Brazen
 
     class WS_via_qualified_knownness_box___
 
-      def initialize bx, mc, k, & oes_p
+      def initialize bx, sm, k, & oes_p
         @bx = bx
         @kernel = k
-        @model_class = mc
+        @silo_module = sm
         @on_event_selectively = oes_p
 
         _ = Callback_::Event.produce_handle_event_selectively_through_methods
@@ -280,7 +280,7 @@ module Skylab::Brazen
 
       def __execute_via_workspace_path ws_path
 
-        @ws = @model_class.edit_entity @kernel, @oes_p do |o|
+        @ws = @silo_module.edit_entity @kernel, @oes_p do |o|
           o.edit_with(
             :config_filename, @bx.fetch( :config_filename ).value_x,
             :surrounding_path, @bx.fetch( :workspace_path ).value_x )

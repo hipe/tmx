@@ -1,8 +1,6 @@
 module Skylab::Brazen
-
-  class Model
-
-    class Action_Factory__
+  # ->
+    class Actionesque::Factory
 
       Events = ::Module.new
 
@@ -57,5 +55,5 @@ module Skylab::Brazen
         y << "there is no#{ _subj } #{ _identifier }#{ _prep_phrase }"
       end
     end
-  end
+    # <-
 end

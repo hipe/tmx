@@ -2,9 +2,8 @@
 
 ## the list of shared concerns (between model & action)
 
-  • actionability - identity in & navigation of the interface tree
-  • description & inflection
-  • name
+  • actionability - identity in & navigation of the reactive model
+  • description & inflection & name
   • placement & visibility
   • preconditions
   • properties

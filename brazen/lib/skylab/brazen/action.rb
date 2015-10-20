@@ -1,115 +1,89 @@
 module Skylab::Brazen
 
-  class Action < Interface_Tree_Node_  # see [#024]
+  class Action < Home_::Nodesque::Node  # see [#024]
 
-    # -- Concerns --
-
-    # ~ actionability - identity in & navigation of the interface tree
+    # -- Actionability - identity in & navigation of the ractive model
 
     class << self
+
+      def build_unordered_index_stream & _
+
+        # by default, (and for you always):
+
+        if is_promoted
+          # then you do not appear at this level
+          NIL_
+        else
+          # it's just you
+          Callback_::Stream.via_item self
+        end
+      end
 
       def entity_enhancement_module
 
         if const_defined? :ENTITY_ENHANCEMENT_MODULE
           self::ENTITY_ENHANCEMENT_MODULE
         else
-          model_class.superclass.entity_enhancement_module
+          silo_module.superclass.entity_enhancement_module
         end
       end
 
-      def is_actionable
-        true
+      def silo_module
+        name_function.parent
       end
 
       def is_branch
         false
       end
-
-      def model_class
-        name_function.parent
-      end
     end  # >>
-
-    def controller_nucleus  # :+#experimental
-      [ @kernel, handle_event_selectively ]
-    end
 
     def is_branch
       false
     end
 
-    def model_class
-      self.class.model_class
+    def silo_module
+      self.class.silo_module
     end
 
-    def accept_parent_node_ x
-      @parent_node = x ; nil
-    end
-
-    # ~ description & inflection
-
-    class << self
-
-      def custom_action_inflection
-        NIL_
-      end
-
-      def process_some_customized_inflection_behavior upstream
-        Concerns__::Inflection.new( upstream, self ).execute
-      end
-    end
-
-    # ~ name
+    # -- Description, inflection & name --
 
     class << self
 
       def name_function_class
-        Concerns__::Name
-      end
-    end
-
-    Autoloader_[ Concerns__ = ::Module.new, :boxxy ]
-
-    class Concerns__::Name < Concerns_::Name
-
-      def inflected_verb
-        _inflection.inflected_verb
+        Home_::Actionesque::Name
       end
 
-      def verb_lexeme
-        _inflection.verb_lexeme
+      def name_function_lib
+        Home_::Actionesque::Name
       end
 
-      def verb_as_noun_lexeme
-        _inflection.verb_as_noun_lexeme
+      def custom_action_inflection  # #hook-in for that concern
+        NIL_
       end
+    end  # >>
 
-      def _inflection
-        @___inflecion ||= Home_::Concerns_::Inflection.for_action self
-      end
-    end
+    # -- Placement & visibilty --
 
-    # ~ placement & visibility
+    # -- As instance --
 
-    class << self
-
-      attr_accessor :is_promoted
-    end
-
-    # ~ as instance
-
-    def initialize boundish, & oes_p
+    def initialize kernel, & oes_p
 
       oes_p or raise ::ArgumentError
+      kernel.respond_to? :unbound_models or raise ::ArgumentError, __say_not_kernel( kernel )
+
 
       @formal_properties = nil
       @preconditions = nil
-      @kernel = boundish.to_kernel
+      @kernel = kernel
 
       accept_selective_listener_proc oes_p
     end
 
-    # ~ invocation ( various means )
+    def __say_not_kernel k
+      "update interface: should be kernel - #{ k.class }"   # #todo
+    end
+
+    # -- Invocation ( various means ) --
 
     def bound_call_against_polymorphic_stream_and_mutable_box st, bx
 
@@ -130,7 +104,7 @@ module Skylab::Brazen
     def bound_call_against_box box
 
       _bound_call_after do
-        Concerns__::Properties::Input::Via_value_box[ self, box ]
+        Home_::Actionesque::Input_Adapters::Via_value_box[ self, box ]
       end
     end
 
@@ -222,7 +196,7 @@ module Skylab::Brazen
       ACHIEVED_  # OK is the default. override or use entity lib to go nuts..
     end
 
-    # ~ preconditions
+    # -- Preconditions --
 
     class << self
 
@@ -232,14 +206,14 @@ module Skylab::Brazen
 
           @precondition_controller_i_a_.map do | sym |
 
-            Concerns_::Identifier.via_symbol sym
+            Home_::Nodesque::Identifier.via_symbol sym
           end
 
         else
-          mc = model_class
-          if mc
-            if mc.respond_to? :preconditions
-              mc.preconditions
+          sm = silo_module
+          if sm
+            if sm.respond_to? :preconditions
+              sm.preconditions
             end
           end
         end
@@ -277,10 +251,10 @@ module Skylab::Brazen
 
       oes_p = handle_event_selectively
 
-      bx = Home_::Concerns_::Preconditions::Produce_Box.new(
+      bx = Home_::Actionesque::Preconditions::Produce_Box.new(
         a,  # the identifiers for silos i depend on
         @preconditions,  # any starting box
-        model_class.node_identifier,  # my identifier
+        silo_module.node_identifier,  # my identifier
         self,  # the action
         @kernel,
         & oes_p ).produce_box
@@ -291,7 +265,7 @@ module Skylab::Brazen
       end
     end
 
-    # ~ properties ( name conventions express visibility for ALL methods )
+    # -- Properties ( name conventions express visibility for ALL methods )
 
     ## ~~ readers
 
@@ -320,8 +294,10 @@ module Skylab::Brazen
     end
 
     def to_qualified_knownness_box_proxy
-      Concerns__::Properties::Output::Actual_Values_as_Box.
-        new @argument_box, formal_properties
+      Home_::Actionesque::Output_Adapters::Actual_Values_as_Box.new(
+        @argument_box,
+        formal_properties,
+      )
     end
 
     def to_qualified_knownness_box_except__ * i_a  # [cu]
@@ -363,7 +339,7 @@ module Skylab::Brazen
 
     def process_qualified_knownness_box_passively__ bx
 
-      Concerns__::Properties::Input::Via_trio_box[ self, bx ]  # result is result
+      Home_::Actionesque::Input_Adapters::Via_qualified_knownness_box[ self, bx ]  # result is result
     end
 
     def set_polymorphic_upstream__ x
@@ -386,11 +362,6 @@ module Skylab::Brazen
     def receive_extra_values_event ev
 
       raise ev.to_exception
-    end
-
-    module Concerns__::Properties
-      Autoloader_[ Input = ::Module.new ]
-      Autoloader_[ self ]
     end
 
     ## ~~ the formal properties
@@ -448,9 +419,9 @@ module Skylab::Brazen
       @argument_box
     end
 
-    # ~ event .. ( all method & ivar names :+#public-API per name conv. )
+    # ( all below method & ivar names :+#public-API per name conv. )
 
-    ## ~~ sending
+    # -- Event sending --
 
     def maybe_send_event_via_channel i_a, & ev_p
 
@@ -467,7 +438,7 @@ module Skylab::Brazen
       Callback_::Event.inline_OK_via_mutable_iambic_and_message_proc x_a, msg_p
     end
 
-    ## ~~ receiving
+    # -- Event receiving --
 
   public
 
@@ -476,7 +447,6 @@ module Skylab::Brazen
       @on_event_selectively = -> * i_a, & ev_p do
 
         receive_uncategorized_emission oes_p, i_a, & ev_p
-
       end
       NIL_
     end

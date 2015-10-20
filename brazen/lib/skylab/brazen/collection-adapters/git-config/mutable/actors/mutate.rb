@@ -58,7 +58,7 @@ module Skylab::Brazen
 
           if did_see_name
             @body_pair_a = body_pair_a  # zero length ok
-            PROCEDE_
+            ACHIEVED_
 
           elsif body_pair_a.length.zero?
             cannot_persist_entity_with_no_properties

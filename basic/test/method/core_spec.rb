@@ -16,6 +16,7 @@ module Skylab::Basic::TestSupport::Method
       x = mc.receiver.send mc.method_name, * mc.arguments
       x.should eql "ok:yessir"
     end
+
     it "you can validate your argument arity before the call" do
       class Bar
         def bar x, y=nil

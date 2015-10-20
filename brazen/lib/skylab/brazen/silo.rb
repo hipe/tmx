@@ -1,28 +1,228 @@
 module Skylab::Brazen
 
-  class Model
+  module Silo
 
-    class Silo_Daemon
+    class Collection
 
-      def initialize kernel, model_class
+      # intended as a long-running cache of any and every silo (daemon)
+      # requested of the client kernel - each created lazily on request
 
-        @kernel = kernel
-        @model_class = model_class
+      def initialize unb_mod, k
 
-        if @kernel.do_debug
-          @kernel.debug_IO.puts(
-            ">>          MADE #{ Callback_::Name.via_module( @model_class ).as_slug } SILO" )
+        @_bx = Callback_::Box.new
+        @_h = @_bx.h_
+        @_kernel = k
+        @_unbound_modules = unb_mod
+      end
+
+      def via_symbol sym, & x_p
+
+        @_h.fetch sym do
+          _id = Home_::Nodesque::Identifier.via_symbol sym
+          via_identifier _id, & x_p
         end
       end
 
-      def members
-        [ :model_class, :name_symbol ]
+      def _via_resolved_identifier id
+
+        _touch_via_silo_daemon_class_and_identifier(
+          _silo_daemon_class_via_unbound( id.value ),
+          id )
       end
 
-      attr_reader :model_class
+      def via_normal_stream  st
+
+        x = __via_normal_item st.gets_one
+        if st.unparsed_exists
+          x = x.silo_via_normal_stream st
+        end
+        x
+      end
+
+      def __via_normal_item const
+
+        sym = const.downcase
+        @_h.fetch sym do
+          unb = @_unbound_modules.const_get const, false
+          _cls = _silo_daemon_class_via_unbound unb
+          _add _cls, sym, unb
+        end
+      end
+
+      def via_identifier id, & x_p
+        if id.is_resolved
+          _via_resolved_identifier id, & x_p
+        else
+          __via_unresolved_identifier id, & x_p
+        end
+      end
+
+      def __via_unresolved_identifier id, & oes_p  # #note-40, :+[#pa-002]
+
+        id = id.as_mutable_for_resolving
+
+        full_raw_s_a = id.raw_name_parts
+
+        index = -1
+        last = full_raw_s_a.length - 1
+        mod_a = nil
+        node_x = @_kernel
+
+        while index != last
+
+          index += 1
+          target_s = full_raw_s_a.fetch index
+
+          if ! mod_a
+            mod_a = __real_modules_array_via_unbound node_x, & oes_p
+            local_index = -1
+          end
+
+          local_index += 1
+          __reduce_search_space mod_a, local_index, target_s
+
+          case 1 <=> mod_a.length
+
+          when  0
+            node_x = mod_a.fetch 0
+            _num_parts = _some_name_function_via_mod( node_x ).as_parts.length
+            _start_of_next_part = index - local_index + _num_parts
+            id.add_demarcation_index _start_of_next_part
+
+            cls = _silo_daemon_class_via_unbound node_x
+
+            if cls
+              id.bake node_x
+              x = _touch_via_silo_daemon_class_and_identifier cls, id
+              break
+            end
+            mod_a = nil
+
+          when  1
+            x = __when_not_found id, target_s, & oes_p
+            break
+
+          when -1
+            # #note-265 - although it is a class of use cases for which this..
+            NIL_
+          end
+        end
+        x
+      end
+
+      def __when_not_found id, target_s, & oes_p
+
+        if oes_p
+          oes_p.call :not_found do
+            _build_model_not_found_event id, target_s
+          end
+        else
+          raise _build_model_not_found_event( id, target_s ).to_exception
+        end
+      end
+
+      def _build_model_not_found_event id, s
+
+        Callback_::Event.inline_with :node_not_found,
+          :token, s, :identifier, id,
+          :error_category, :name_error
+      end
+
+      def __reduce_search_space mod_a, local_index, target_s
+
+        mod_a.each_with_index do |mod, d|
+          s = _some_name_function_via_mod( mod ).as_parts[ local_index ]
+          if ! ( s and target_s == s )
+            mod_a[ d ] = nil
+          end
+        end
+
+        mod_a.compact!
+
+        NIL_
+      end
+
+      def _some_name_function_via_mod mod
+
+        if mod.respond_to? :name_function
+          mod.name_function
+        else
+          @_mod_nf_h ||= {}
+          @_mod_nf_h.fetch mod do
+            @_mod_nf_h[ mod ] = Callback_::Name.via_module mod
+          end
+        end
+      end
+
+      def __real_modules_array_via_unbound unb, & oes_p
+
+        if unb.respond_to? :build_unordered_selection_stream
+
+          # the above method is the universal way to detect a [normal]
+          # unbound. despite this:
+
+          _st = unb.build_unordered_real_stream( & oes_p )
+
+          _st.to_a  # or cover me
+
+        else
+
+          # it's very temping to use [etc] here as [#013] does, but
+          # we hold off for now for reasons..
+
+          self._COVER_ME
+        end
+      end
+
+      def _touch_via_silo_daemon_class_and_identifier cls, id
+
+        sym = id.silo_name_symbol
+        @_h.fetch sym do
+          _add cls, sym, id.value
+        end
+      end
+
+      def _add cls, sym, unb
+        _cls = _silo_daemon_class_via_unbound unb
+        x = cls.new @_kernel, unb
+        @_bx.add sym, x
+        x
+      end
+
+      def _silo_daemon_class_via_unbound x
+
+        if x.respond_to? :to_module
+          x.to_module
+        else
+          x
+        end.const_get DAEMON_CONST___, false
+      end
+
+      def register_silo x, sym
+        @_bx.add sym, x
+        NIL_
+      end
+    end
+
+    class Daemon
+
+      # the silo's silo daemon can have any shape at all as long as it
+      # constructs with the signature this class constructs by. this class,
+      # then, is just a common choice for base class.
+
+      def initialize kernel, silo_mod
+
+        @kernel = kernel
+        @silo_module = silo_mod
+
+        if @kernel.do_debug
+          @kernel.debug_IO.puts(
+            ">>          MADE #{ Callback_::Name.via_module( @silo_module ).as_slug } SILO" )
+        end
+      end
 
       def name_symbol
-        @model_class.name_function.as_lowercase_with_underscores_symbol
+        @silo_module.name_function.as_lowercase_with_underscores_symbol
       end
 
       def call * x_a, & oes_p
@@ -36,12 +236,18 @@ module Skylab::Brazen
 
       def _bound_call_via x_a, & oes_p
 
-        sess = Home_::Sessions_::Produce_Bound_Call.new @kernel, & oes_p
-        sess.iambic = x_a
-        sess.receive_top_bound_node @model_class.new( @kernel, & oes_p )
+        o = Home_::Actionesque::Produce_Bound_Call.new @kernel, & oes_p
+        o.iambic = x_a
+        bound = @silo_module.new @kernel, & oes_p
+        o.current_bound = bound
+        o.unbound_stream = bound.to_unordered_real_stream
+          # real not, selection or index (for now)
 
-        if sess.via_current_branch_resolve_action_promotion_insensitive
-          st = sess.poly_stream
+        _ok = o.find_via_unbound_stream
+
+        if _ok
+
+          st = o.argument_stream
           h = { qualified_knownness_box: nil, preconditions: nil }
           while st.unparsed_exists
             if :with == st.current_token
@@ -56,7 +262,7 @@ module Skylab::Brazen
           qualified_knownness_box = h[ :qualified_knownness_box ]
           h = nil
 
-          act = sess.bound
+          act = o.current_bound
           act.first_edit
 
           if preconds
@@ -71,7 +277,7 @@ module Skylab::Brazen
           ok &&= act.process_polymorphic_stream_fully st
           ok and act.via_arguments_produce_bound_call
         else
-          sess.bound_call
+          o.bound_call
         end
       end
 
@@ -82,9 +288,9 @@ module Skylab::Brazen
         # override this IFF your silo wants to add to (or otherwise mutate)
         # the formal properties of every client action that depends on you.
 
-        my_name_sym = @model_class.node_identifier.full_name_symbol
+        my_name_sym = @silo_module.node_identifier.full_name_symbol
 
-        a = @model_class.preconditions
+        a = @silo_module.preconditions
         if a and a.length.nonzero?
           x_ = x
           a.each do | silo_id |
@@ -100,6 +306,12 @@ module Skylab::Brazen
         end
         x_  # nothing by default
       end
-    end
+
+      attr_reader(
+        :silo_module,
+      )
+    end  # silo daemon class
+
+    DAEMON_CONST___ = :Silo_Daemon
   end
 end

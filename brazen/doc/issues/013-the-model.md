@@ -4,7 +4,7 @@
 
 
 
-## :#one.
+## :#A.
 
 a particular model node (that is, business model class) has an exposed
 API IFF it has an 'actions' node. we take a nasty peak into the
@@ -13,7 +13,7 @@ filesystem here for now.
 
 
 
-## :#two.
+## :#B.
 
 each given action node under the 'actions' node either does or does not
 "promote" itself. a promoted action is one that is visible at one level
@@ -72,7 +72,7 @@ it has a nonzero number of child nodes that did not promote themselves.
 
 
 
-## :#three.
+## :#C.
 
 the model is like the body. it craves sustenence and expression. the
 actions of the model are like the hands of the body. they reach out to
@@ -80,6 +80,48 @@ touch things and bring them to the mouth to eat.
 
 the properties of the actions are like the fingers of the hand.
 
+
+
+
+## :API.A - unbound nodes whose consts have trailing underscores..
+
+some model trees "in the wild" have nodes whose consts end in
+underscores (always one at writing). of these trees, none of them intend
+for these nodes to be public. that is, these nodes are not intended to be
+part of the application's reactive model tree per se, but are just there
+as a support model node.
+
+note that a corollary of this is that you couldn't have a node as part
+of your reactive tree that has such a name. this seems to be fine.
+
+this in conjunction with boxxy's [#ca-030] inferred constants means
+that such nodes do not even have to load (rather than loading it and
+looking for an `Actions` const that is false-ish) when a node identifier
+is being resolved.
+
+
+
+
+## :API.B - now a "leaf node" can be at level-1 of the tree
+
+some model trees "in the wild" now have actions at the top level in
+their models tree. this is in opposition to the "pure" model created
+15 months ago, where the first level had to be model (branch) nodes.
+that is, if the tree itself is "level-1", and all of its immediate
+children are at level-1, then it use to be that level-1 was exclusively
+supposed to be model nodes proper. now this constraint no longer exists.
+
+this initially happened by the necessity of simplification - when we
+experimentally resolved silo names with the same promotion-aware logic
+we use for unbound selection, would have had to put the silo daemon in
+the action class that was promoted, which was ick. avoiding that
+potential graph, we just promote the action but rather have it in the top
+level of the tree. if ever there needs to be mre than one action it can
+branch back down again.
+
+however, silo selection must *not* be subject to promotionality -
+otherwise (covered [tm]) we can end up with inacessible silos for those
+branch nodes for which every child is promoted (covered).
 
 
 
@@ -91,14 +133,6 @@ copy-pasted from 'action'. models that do have any child actions may get
 wont.
 
 
-
-
-## :#note-A
-
-whether or not the client entity class uses the "mo-ent" enhancer
-module to model its properties etc, if the client does so we want
-the topic class to be in front of the entity support modules just
-in case we want to customize its methods, like `initialize` below
 
 
 

@@ -2,68 +2,51 @@ module Skylab::Basic
 
   module Function::As  # see [#052]
 
-    # -> ; :+#by:ta, cu, sg
+    # -> ; (covered here, also :+#by:ta, cu, sg)
 
-      class Unbound_Action
+      Brazen_ = ::Skylab::Brazen  # assumed
 
-        def initialize p, const_sym, box_mod, model_cls
+      class Unbound
 
-          @box_module = box_mod
-          @model_class = model_cls
-          @name_s = "#{ box_mod.name }#{ CONST_SEP_ }#{ const_sym }"
-          @p = p
+        include Brazen_.actionesque_defaults::Unbound_Methods
+
+        def initialize p, const_sym, source, parent_unbound
+
+          @name_s = "#{ source.name }#{ CONST_SEP_ }#{ const_sym }"
+          @_p = p
+          @_parent_unbound = parent_unbound
         end
 
-        def members
-          [ :box_module, :model_class, :name_function ]
+        def silo_module
+          pu = @_parent_unbound
+          if pu
+            pu.silo_module
+          end
         end
 
-        def is_branch
-          false
-        end
+        def build_unordered_index_stream & _
 
-        def adapter_class_for _
-          NIL_
+          Callback_::Stream.via_item self
         end
-
-        def is_actionable
-          true
-        end
-
-        def is_promoted
-          false  # :+[#065] procs are always not promoted
-        end
-
-        attr_reader :p, :box_module, :model_class
 
         def name_function
-          @___nf ||= ::Skylab::Brazen::Concerns_::Name::Build_name_function[ self ]
+          @___nf ||= Brazen_::Actionesque::Name::Build_name_function[ self ]
         end
 
         def name
           @name_s
         end
 
-        def name_function_class  # #hook-in
-
-          ::Skylab::Brazen::Model.common_action_class.name_function_class
-        end
-
-        def custom_action_inflection
-          NIL_
-        end
-
-        def to_upper_unbound_action_stream
-
-          Callback_::Stream.via_item self
-        end
-
         def new k, & oes_p
 
-          @cx ||= Signature_Classifications___.new( @p )
+          @__cx ||= Signature_Classifications___.new( @_p )
 
-          As_Bound_Action___.new @cx, k, self, & oes_p
+          As_Bound_Action___.new @__cx, k, self, & oes_p
         end
+
+        attr_reader(
+          :_p,
+        )
       end
 
       class Signature_Classifications___
@@ -106,21 +89,23 @@ module Skylab::Basic
 
       class As_Bound_Action___
 
-        def initialize cx, k, action_class_like, & oes_p
+        include Brazen_.actionesque_defaults::Bound_Methods
 
-          @action_class_like = action_class_like
+        def initialize cx, k, unbound, & oes_p
+
           @kernel = k
           @on_event_selectively = oes_p
           @signature_classifications = cx
+          @unbound = unbound
         end
 
-        attr_reader :action_class_like, :kernel, :on_event_selectively
+        attr_reader :unbound, :on_event_selectively
 
-        def accept_parent_node_ _
+        def accept_parent_node _
         end
 
         def name
-          @action_class_like.name_function
+          @unbound.name_function
         end
 
         def formal_properties
@@ -154,7 +139,7 @@ module Skylab::Basic
 
             bx.add( name_symbol,
 
-            ::Skylab::Brazen::Model.common_entity_module::Property.new do
+            ::Skylab::Brazen::Modelesque::Entity::Property.new do
 
               @argument_arity = argument_arity
               @name = Callback_::Name.via_variegated_symbol name_symbol
@@ -262,7 +247,7 @@ module Skylab::Basic
             p = @on_event_selectively
           end
 
-          Callback_::Bound_Call.new arglist, @action_class_like.p, :call, & p
+          Callback_::Bound_Call.new arglist, @unbound._p, :call, & p
         end
 
         def _maybe_send_event * i_a, & ev_p
@@ -271,24 +256,8 @@ module Skylab::Basic
         end
 
         def _sign_event ev
-          _nf = @action_class_like.name_function
+          _nf = @unbound.name_function
           Callback_::Event.wrap.signature _nf, ev
-        end
-
-        def after_name_symbol
-          NIL_
-        end
-
-        def has_description
-          NIL_  # for now
-        end
-
-        def is_branch
-          false  # :+ procs are never branches
-        end
-
-        def is_visible
-          true  # for now
         end
       end
     # <-

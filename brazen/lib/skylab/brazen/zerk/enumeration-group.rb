@@ -58,7 +58,7 @@ module Skylab::Brazen
         if @is_interactive
           @branch.change_focus_to @branch
         end
-        PROCEDE_
+        ACHIEVED_
       end
 
 
@@ -67,7 +67,7 @@ module Skylab::Brazen
         if @is_interactive
           @branch.change_focus_to @branch
         end
-        PROCEDE_
+        ACHIEVED_
       end
 
     public

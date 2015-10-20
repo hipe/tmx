@@ -1,23 +1,22 @@
 module Skylab::Brazen
-
   # ->
-
-    Sessions_ = ::Module.new
-    class Sessions_::Produce_Bound_Call
+    class Actionesque::Produce_Bound_Call
 
       attr_reader(
-        :bound,
-        :poly_stream,
+        :argument_stream,
+        :current_bound,
       )
 
       attr_writer(
-        :module,
-        :poly_stream,
+        :module,  # just for resolving some event handler when necessary
+        :argument_stream,
+        :current_bound,
+        :unbound_stream,
       )
 
       def initialize k, & oes_p
-        @bound = nil
-        @kernel = k
+        @current_bound = nil
+        @subject_unbound = k
         @on_event_selectively = oes_p
         @mutable_box = nil
       end
@@ -33,7 +32,7 @@ module Skylab::Brazen
           @on_event_selectively = oes_p
         end
 
-        @poly_stream = Callback_::Polymorphic_Stream.via_array x_a
+        @argument_stream = Callback_::Polymorphic_Stream.via_array x_a
         NIL_
       end
 
@@ -47,24 +46,22 @@ module Skylab::Brazen
         NIL_
       end
 
-      def receive_top_bound_node x
-        @bound = x
-        @current_unbound_action_stream = @bound.to_unbound_action_stream
-        NIL_
-      end
-
-      def execute  # `prouduce_bound_call` was subsumed by here
+      def execute
 
         @on_event_selectively ||= __produce_some_handle_event_selectively
 
-        _ok = __resolve_bound_action
-        _ok && __via_bound_action_produce_bound_call
+        _ok = __resolve_bound
+        _ok && __via_bound_produce_bound_call
       end
 
-      def __resolve_bound_action
+      def __resolve_bound
 
-        if @poly_stream.unparsed_exists
-          __via_current_tokens_resolve_action
+        if @argument_stream.unparsed_exists
+
+          @unbound_stream = @subject_unbound.build_unordered_selection_stream(
+            & @on_event_selectively )
+
+          __parse_arugument_stream_against_unbound_stream
         else
           __whine_about_how_there_is_an_empty_iambic_arglist
         end
@@ -74,43 +71,34 @@ module Skylab::Brazen
         _end_in_error_with :no_such_action, :action_name, nil
       end
 
-      def __via_current_tokens_resolve_action
-
-        @current_unbound_action_stream = @kernel.to_unbound_action_stream
+      def __parse_arugument_stream_against_unbound_stream
 
         begin
 
-          ok = via_current_branch_resolve_action
+          ok = find_via_unbound_stream
           ok or break
 
-          if ! @bound.is_branch
+          if ! @current_bound.is_branch
             break
           end
 
-          if @poly_stream.no_unparsed_exists
+          if @argument_stream.no_unparsed_exists
             __when_name_is_too_short
             ok = false
             break
           end
 
-          @current_unbound_action_stream = @bound.to_lower_unbound_action_stream
+          @unbound_stream = @current_bound.to_unordered_selection_stream
 
           redo
         end while nil
         ok
       end
 
-      def via_current_branch_resolve_action
-        _resolve_action_via_unbound_stream @current_unbound_action_stream
-      end
+      def find_via_unbound_stream  # resolves current_bound. results in t/f
 
-      def via_current_branch_resolve_action_promotion_insensitive
-        _resolve_action_via_unbound_stream @bound.class.to_intrinsic_unbound_action_stream
-      end
-
-      def _resolve_action_via_unbound_stream st
-
-        sym = @poly_stream.current_token
+        st = @unbound_stream
+        sym = @argument_stream.current_token
 
         begin
 
@@ -118,7 +106,7 @@ module Skylab::Brazen
           unb or break
 
           if sym == unb.name_function.as_lowercase_with_underscores_symbol
-            @poly_stream.advance_one
+            @argument_stream.advance_one
             break
           end
 
@@ -126,40 +114,41 @@ module Skylab::Brazen
         end while nil
 
         if unb
-          bnd = @bound
-          @bound = unb.new @kernel, & @on_event_selectively
+
+          bnd = @current_bound
+          @current_bound = unb.new @subject_unbound, & @on_event_selectively
           if bnd
-            @bound.accept_parent_node_ bnd
+            @current_bound.accept_parent_node bnd
           end
           ACHIEVED_
         else
-          __when_no_action_at_this_step
+          __when_no_bound_at_this_step
         end
       end
 
-      def __when_no_action_at_this_step
-        _end_in_error_with :no_such_action, :action_name, @poly_stream.current_token
+      def __when_no_bound_at_this_step
+        _end_in_error_with :no_such_action, :action_name, @argument_stream.current_token
       end
 
       def __when_name_is_too_short
         _end_in_error_with :action_name_ends_on_branch_node,
-          :local_node_name, @bound.name.as_lowercase_with_underscores_symbol
+          :local_node_name, @current_bound.name.as_lowercase_with_underscores_symbol
       end
 
-      def __via_bound_action_produce_bound_call
+      def __via_bound_produce_bound_call
 
         if @mutable_box
 
-          if @poly_stream.unparsed_exists
+          if @argument_stream.unparsed_exists
 
-            @bound.bound_call_against_polymorphic_stream_and_mutable_box(
-              @poly_stream, @mutable_box )
+            @current_bound.bound_call_against_polymorphic_stream_and_mutable_box(
+              @argument_stream, @mutable_box )
 
           else
-            @bound.bound_call_against_box @mutable_box
+            @current_bound.bound_call_against_box @mutable_box
           end
         else
-          @bound.bound_call_against_polymorphic_stream @poly_stream
+          @current_bound.bound_call_against_polymorphic_stream @argument_stream
         end
       end
 

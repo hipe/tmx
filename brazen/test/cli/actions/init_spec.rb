@@ -15,7 +15,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
 
       it "ok, inits." do
         invoke
-        expect %r(\Ainited a workspace: created \./brazen\.conf .+bytes)
+        expect %r(\Ainited workspace: created \./brazen\.conf .+bytes)
         expect " config filename: brazen.conf"
         expect "surrounding path: ."
         expect_succeeded

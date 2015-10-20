@@ -1,10 +1,10 @@
 module Skylab::Brazen
 
-  class Model
+  Modelesque::Flyweight = ::Module.new
 
-    Concerns__::Flyweight = ::Module.new
+  # ->
 
-    class Concerns__::Flyweight::Property_Box
+    class Modelesque::Flyweight::Property_Box
 
       # if iterating over a dataset, only allocate memory when you chose to
 
@@ -76,5 +76,5 @@ module Skylab::Brazen
         NIL_
       end
     end
-  end
+    # <-
 end

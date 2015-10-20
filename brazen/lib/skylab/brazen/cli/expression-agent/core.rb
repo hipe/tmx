@@ -28,7 +28,7 @@ module Skylab::Brazen
       end
 
       def app_name
-        @categorized_properties.adapter.bound_.to_kernel.app_name  # ick/meh
+        @categorized_properties.adapter.bound_.kernel.app_name  # ick/meh
       end
 
       def both x

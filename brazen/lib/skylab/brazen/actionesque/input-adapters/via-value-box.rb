@@ -1,10 +1,8 @@
 module Skylab::Brazen
 
-  class Action
+  # -> 2
 
-    module Concerns__::Properties
-
-      module Input::Via_value_box
+      module Actionesque::Input_Adapters::Via_value_box
 
         # "iambic literals" are easier to read, but sometimes you just want
         # to pass a plain old box of name-value pairs to your action. this
@@ -59,7 +57,7 @@ module Skylab::Brazen
           kp
         end
 
-        class Value_as_Stream___
+        class Value_as_Stream___  # #tracking :+[#085] redundancies
 
           def current_token
             @p[]
@@ -82,6 +80,5 @@ module Skylab::Brazen
           end
         end
       end
-    end
-  end
+      # <-2
 end

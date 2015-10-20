@@ -1,8 +1,6 @@
 module Skylab::Brazen
-
-  class Model
-
-    class Action_Factory__ < ::Module  # see [#046]
+  # ->
+    class Actionesque::Factory < ::Module  # see [#046]
 
       class << self
 
@@ -11,11 +9,7 @@ module Skylab::Brazen
             init_via_model_action_entity( * a )
           end
         end
-
-        def retrieve_methods
-          Retrieve_Methods__
-        end
-      end
+      end  # >>
 
       def initialize & p
         instance_exec( & p )
@@ -217,7 +211,7 @@ module Skylab::Brazen
         end
       end
 
-      module Retrieve_Methods__
+      module Retrieve_Methods
 
         include Semi_Generated_Instance_Methods__
 
@@ -357,12 +351,12 @@ module Skylab::Brazen
           _name_s = @argument_box.fetch NAME_SYMBOL
           id = _model_class.node_identifier.with_local_entity_identifier_string _name_s
           @identifier = id
-          PROCEDE_
+          ACHIEVED_
         end
 
         def __via_identifier_resolve_subject_entity
           @subject_entity = entity_collection.entity_via_intrinsic_key @identifier, & handle_event_selectively
-          @subject_entity ? PROCEDE_ : UNABLE_
+          @subject_entity ? ACHIEVED_ : UNABLE_
         end
       end
 
@@ -380,5 +374,5 @@ module Skylab::Brazen
 
       AF_ = self
     end
-  end
+  # <-
 end

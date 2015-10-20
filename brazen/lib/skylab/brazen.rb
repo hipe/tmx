@@ -6,9 +6,17 @@ module Skylab::Brazen
 
   class << self
 
+    def actionesque_defaults
+      Home_::Nodesque::Methods::Actionesque_Defaults
+    end
+
     define_method :application_kernel_, ( Callback_.memoize do
       Home_::Kernel.new Home_
     end )
+
+    def branchesque_defaults
+      Home_::Nodesque::Methods::Branchesque_Defaults
+    end
 
     def byte_downstream_identifier
       Home_::Collection::Byte_Downstream_Identifier
@@ -35,6 +43,10 @@ module Skylab::Brazen
       Home_::API::Expression_Agent__::LIB
     end
 
+    def event_class const
+      Home_::Actionesque::Factory::Events.const_get const, false
+    end
+
     def lib_
       LIB_
     end
@@ -44,7 +56,7 @@ module Skylab::Brazen
     end
 
     def name_library
-      Concerns_::Name
+      Home_::Nodesque::Name
     end
 
     def name_function
@@ -52,7 +64,7 @@ module Skylab::Brazen
     end
 
     def node_identifier
-      Concerns_::Identifier
+      Home_::Nodesque::Identifier
     end
 
     def test_support  # :+[#ts-035]
@@ -136,189 +148,6 @@ module Skylab::Brazen
     kp
   end
 
-  class Interface_Tree_Node_  # ([#098] tracks client candidates)
-
-    # base class for nodes in the inteface tree (currently model, action).
-    # (the categories are pursuant to [#024] top)
-
-    # ~ actionability - identity in & navigation of the interface tree
-
-    def self.adapter_class_for _  # moda. specific hook for hax
-      NIL_
-    end
-
-    def to_kernel
-      @kernel
-    end
-
-    # ~ description & inflection
-
-    class << self
-      attr_accessor :description_block
-    end
-
-    def has_description
-      ! self.class.description_block.nil?
-    end
-
-    def under_expression_agent_get_N_desc_lines expag, d=nil  # assume has
-
-      LIB_.N_lines[ [], d, [ self.class.description_block ], expag ]
-    end
-
-    # ~ name
-
-    class << self
-
-      def name_function
-        @name_function ||= Concerns_::Name::Build_name_function[ self ]
-          # ivar name is :+#public-API
-      end
-
-      def name_function_class
-        Concerns_::Name
-      end
-    end
-
-    def name
-      self.class.name_function
-    end
-
-    # ~ placement & visibility
-
-    class << self
-      attr_accessor :after_name_symbol
-    end
-
-    def after_name_symbol
-      self.class.after_name_symbol
-    end
-
-    def is_visible
-      true
-    end
-
-    # ~ preconditions
-
-    class << self
-
-      attr_accessor :precondition_controller_i_a_
-
-      def preconditions
-        @__did_resolve_pcia ||= resolve_precondition_controller_identifer_array
-        @preconditions
-      end
-    end
-
-    # ~ properties ( these :#hook-out's MUST get overridden by property lib )
-
-    ## ~~ readers (narrated)
-
-    def to_qualified_knownness_stream_
-
-      foz = formal_properties
-
-      if foz
-
-        sym_a = foz.get_names
-        sym_a.sort!
-
-        Callback_::Stream.via_nonsparse_array( sym_a ).map_by do | sym |
-
-          qualified_knownness sym
-        end
-      else
-        Callback_::Stream.the_empty_stream
-      end
-    end
-
-    def formal_properties
-      self.class.properties
-    end
-
-    class << self
-
-      def properties
-        NIL_  # by default you have none, be you action or model
-      end
-    end
-
-    def qualified_knowness_via_association_ prp
-
-      knownness prp.name_symbol
-    end
-
-    def qualified_knownness sym
-
-      had = true
-      x = as_entity_actual_property_box_.fetch sym do
-        had = false
-      end
-
-      Callback_::Qualified_Knownness.via_value_and_had_and_association(
-        x, had, formal_properties.fetch( sym ) )
-    end
-
-    def knownness sym
-
-      had = true
-      x = as_entity_actual_property_box_.fetch sym do
-        had = false
-      end
-
-      if had
-        Callback_::Known_Known[ x ]
-      else
-        Callback_::KNOWN_UNKNOWN
-      end
-    end
-
-    ## ~~ writers ( & related )
-
-    define_method :process_polymorphic_stream_fully, PPSF_METHOD_
-    ppsp = :process_polymorphic_stream_passively
-    define_method ppsp, PPSP_METHOD_
-    private ppsp
-
-    def receive_missing_required_properties_event ev
-
-      # [#001]:#stowaway-1 explains why this method is here
-
-      raise ev.to_exception
-    end
-
-    ## ~~ editing your node's set of *formal* properties
-
-    class << self
-
-      def edit_entity_class * x_a, & edit_p
-
-        # (block is used in one place in [ts] at writing)
-
-        _what = entity_enhancement_module
-
-        o = Home_::Entity::Session.new
-        o.arglist = x_a
-        o.client = self
-        o.extmod = _what
-        o.block = edit_p
-        o.execute
-      end
-    end
-
-    # ~ event receiving & sending
-
-    private def maybe_send_event * i_a, & ev_p
-
-      handle_event_selectively[ * i_a, & ev_p ]
-    end
-
-    def handle_event_selectively  # idiomatic accessor for this, :+#public-API
-
-      @on_event_selectively
-    end
-  end
-
   KNOWNNESS_VIA_IVAR_METHOD_ = -> prp do
 
     ivar = prp.ivar
@@ -343,6 +172,15 @@ module Skylab::Brazen
     end  # >>
 
     Autoloader_[ self, :boxxy ]
+  end
+
+  module Modelesque
+
+    def self.entity * a, & edit_p
+      Home_::Entity::Apply_entity[ self::Entity, a, & edit_p ]
+    end
+
+    Autoloader_[ self ]
   end
 
   module Lib_
@@ -416,27 +254,23 @@ module Skylab::Brazen
 
   ACHIEVED_ = true
   ACTIONS_CONST = :Actions
-  Home_ = self
   Box_ = Callback_::Box
-  Autoloader_[ Concerns_ = ::Module.new ]
-  CONTINUE_ = nil
   CONST_SEP_ = Callback_.const_sep
   DASH_ = '-'.freeze
-  DONE_ = true
   DOT_DOT_ = '..'
   EMPTY_A_ = [].freeze
   EMPTY_H_ = {}.freeze
   EMPTY_P_ = -> { NIL_ }
   EMPTY_S_ = ''.freeze
-  Autoloader_[ Models_ = ::Module.new, :boxxy ]
+  Home_ = self
   IDENTITY_ = -> x { x }
   KEEP_PARSING_ = true
   LIB_ = Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+  Autoloader_[ Models_ = ::Module.new, :boxxy ]
   MONADIC_EMPTINESS_ = -> _ { NIL_ }
   NAME_SYMBOL = :name
   NEWLINE_ = "\n".freeze
   NIL_ = nil
-  PROCEDE_ = true
   SPACE_ = ' '.freeze
   STOP_PARSING_ = false
   stowaway :TestSupport, 'test/test-support'
