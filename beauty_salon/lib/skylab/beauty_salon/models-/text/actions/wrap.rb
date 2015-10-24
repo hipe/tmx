@@ -10,7 +10,7 @@ module Skylab::BeautySalon
 
       @is_promoted = true
 
-      Brazen_::Model.common_entity( self,
+      Brazen_::Modelesque.entity( self,
 
         :desc, -> y do
 

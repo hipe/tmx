@@ -8,7 +8,7 @@ module Skylab::Git
 
     class Actions::ReNumber < Brazen_::Action  # :[#012].
 
-      Brazen_::Model::Entity.call( self,
+      Brazen_::Modelesque.entity( self,
 
         :desc, -> y do
 

@@ -37,7 +37,7 @@ module Skylab::TanMan
     end  # >>
   end
 
-  # ~ see [#024]:stubbing
+  # ~ this is :+[#br-065] a stubbing hack. a few notes in [#024].
 
   class Stub_Making_Action_Box_Module__ < ::Module
 
@@ -53,8 +53,20 @@ module Skylab::TanMan
 
   class Action_Stub_ < ::Module
 
+    include Brazen_.actionesque_defaults::Unbound_Methods
+
     def initialize & real_action_class_p
+      @is_promoted = false
       @real_action_class_p = real_action_class_p
+    end
+
+    def build_unordered_selection_stream & _
+      self._WHY
+    end
+
+    def build_unordered_index_stream
+      # terminal nodes never expand beyond themselves
+      Callback_::Stream.via_item self
     end
 
     def name_function
@@ -63,19 +75,12 @@ module Skylab::TanMan
       end
     end
 
-    def is_actionable
-      true
+    def is_promoted= x
+      # in at least one place .. eew
+      @is_promoted = x
     end
 
-    def is_branch
-      false
-    end
-
-    def adapter_class_for _
-      NIL_
-    end
-
-    attr_accessor :is_promoted
+    attr_reader :is_promoted
 
     def new boundish, & oes_p
       produce_real_action_class_.new boundish, & oes_p
@@ -88,20 +93,24 @@ module Skylab::TanMan
 
   class Common_Action_Stub___ < Action_Stub_
 
-    def initialize mc
-      @model_class = mc
+    def initialize sm
+
+      @is_promoted = false
+      @silo_module = sm
     end
 
-    attr_reader :model_class
+    attr_reader(
+      :silo_module,
+    )
 
     def produce_real_action_class_
-      @model_class::Actions__.const_get @nf.as_const
+      @silo_module::Actions__.const_get @nf.as_const
     end
   end
 
   # ~
 
-  class Action_ < Brazen_::Model.common_action_class
+  class Action_ < Brazen_::Action
 
     extend( module MM
 
@@ -167,7 +176,7 @@ module Skylab::TanMan
     end
   end
 
-  Entity_ = Brazen_::Model.common_entity do
+  Entity_ = Brazen_::Modelesque.entity do
 
     # create an entity extension module whose foundation is another entity
     # extension module. effectively we inherit its metaproperties & ad-hoc
@@ -260,7 +269,9 @@ module Skylab::TanMan
 
     def __build_zero_entities_found_against_natural_key_event name_s
 
-      _st = to_entity_stream_via_model _model_class do  # :+#hook-in
+      mc = _model_class
+
+      _st = to_entity_stream_via_model mc do  # :+#hook-in
         self._HELLO
       end
 
@@ -271,7 +282,7 @@ module Skylab::TanMan
       build_not_OK_event_with :entity_not_found,
           :name_string, name_s,
           :a_few_ent_a, _a_few_ent_a,
-          :model_class, _model_class do | y, o |
+          :model_class, mc do | y, o |
 
         human_s = o.model_class.name_function.as_human
 
@@ -300,6 +311,10 @@ module Skylab::TanMan
     def _model_class
       @model_class or self._SET_THIS_IVAR
     end
+  end
+
+  Silo_daemon_base_class_ = -> do
+    Brazen_::Silo::Daemon
   end
 
   # ~
@@ -337,6 +352,7 @@ module Skylab::TanMan
     Actions = Stub_Making_Action_Box_Module__.new self
 
     module Actions
+
       Status = stub
       Status.is_promoted = true
       Init = stub
@@ -540,8 +556,6 @@ module Skylab::TanMan
       @property_box.replace_name_in_hash ::File.basename path
       NIL_
     end
-
-    NAME_S___ = 'name'
   end
 
   Models_::Paths = -> path, verb, call, & oes_p do

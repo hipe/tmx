@@ -64,7 +64,7 @@ module Skylab::System
         ACHIEVED_
       elsif @directory_is_assumed_to_exist
         x_p.call :error, :expression, :noent do | y |
-          y < "no. (hl-xyzzy)"
+          y < "no. (hl-xyzizzy)"
         end
         UNABLE_
       else

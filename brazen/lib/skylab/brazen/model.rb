@@ -70,6 +70,10 @@ module Skylab::Brazen
       def is_branch
         true
       end
+
+      def silo_module
+        self
+      end
     end  # >>
 
     def to_unordered_selection_stream
@@ -184,16 +188,10 @@ module Skylab::Brazen
 
     def initialize kernel, & oes_p  # #note-180 do not set error count here
 
-      kernel.respond_to? :unbound_models or raise ::ArgumentError, __say_etc( kernel )  # #todo - this is temporary
-
       @on_event_selectively = oes_p or self._WHY
       @kernel = kernel
       @kernel.do_debug and @kernel.debug_IO.
         puts ">> >> >> >> MADE #{ name.as_slug } CTRL"
-    end
-
-    def __say_etc k
-      "update interface: should be kernel - #{ k.class }"
     end
 
     # ~~ dup-like and dup-related

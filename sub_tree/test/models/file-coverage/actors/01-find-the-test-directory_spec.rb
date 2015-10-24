@@ -94,16 +94,23 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
       "#{ fixture_tree :one }/test/foo_speg.rb"
     end
 
-    def where
+    check = -> unb do
+      check = nil
+      unb.is_branch and fail  # assert the firs ever [#br-013]:API.B
+    end
 
-      bnd = Home_::API.application_kernel_.
-        silo( :file_coverage ).model_class::Actions::File_Coverage.
-          new MOCK_BOUNDISH_, & handle_event_selectively
+    define_method :where do | & sess |
+
+      unb = Home_::API.application_kernel_.silo( :file_coverage ).unbound
+
+      check and check[ unb ]
+
+      bnd = unb.new Kernel_stub_[] , & handle_event_selectively
 
       bnd.instance_variable_set :@nc, Name_conventions_[]
       bnd.instance_variable_set :@be_verbose, false
       @__bound__ = bnd
-      yield
+      sess[]
       @result = bnd.__find_the_test_directory
       NIL_
     end

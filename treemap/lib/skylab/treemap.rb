@@ -26,9 +26,9 @@ module Skylab::Treemap
 
     define_singleton_method :common_action_class, ( Callback_.memoize do
 
-      class Common_Action_Class___ < Home_.lib_.brazen::Model.common_action_class
+      class Common_Action_Class___ < Home_.lib_.brazen::Action
 
-        Home_.lib_.brazen::Model.common_entity_module[ self ]
+        Home_.lib_.brazen::Modelesque.entity self
 
         self
       end

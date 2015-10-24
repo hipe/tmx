@@ -111,16 +111,20 @@ module Skylab::TMX
         @_client = front
       end
 
-      def module
-        :__no_module__
-      end
-
       def fast_lookup
         @_client.fast_lookup
       end
 
-      def to_unbound_action_stream
-        @_client.unbound_stream_builder.call
+      def build_unordered_selection_stream & x_p
+        @_client.unbound_stream_builder.call( & x_p )
+      end
+
+      def module
+        :__no_module__
+      end
+
+      def unbound_models
+        self._REFERENCE_ONLY
       end
     end
 

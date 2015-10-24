@@ -9,9 +9,8 @@ module Skylab::Brazen
         def initialize op, ad
           @arg_a = nil
           @bound = ad.bound_
-          @action_adapter = ad.action_adapter
+          @action_adapter = ad
           @expression_agent = ad.expression_agent
-          @invocation = ad.invocation
           __receive_any_option_parser op
           @section_a = []
           @section_separator_p = -> { @y << nil }
@@ -20,10 +19,16 @@ module Skylab::Brazen
           screen_boundary
         end
 
-        attr_reader :expression_agent, :op, :y
-        attr_reader :invocation
+        attr_writer(
+          :arg_a,
+        )
 
-        attr_writer :arg_a
+        attr_reader(
+          :action_adapter,
+          :expression_agent,
+          :op,
+          :y
+        )
 
         def __receive_any_option_parser op
 
@@ -331,7 +336,7 @@ module Skylab::Brazen
         end
 
         def subject
-          ( @action_adapter || @invocation )
+          @action_adapter
         end
 
         # ~ support

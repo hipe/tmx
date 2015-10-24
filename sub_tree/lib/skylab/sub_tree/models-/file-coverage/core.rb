@@ -1,22 +1,23 @@
 module Skylab::SubTree
 
-  class Models_::File_Coverage  # :[#002].
+  class Models_::File_Coverage < API.action_class_  # :[#002].
 
-    Actions = ::Module.new
+    # (at writing this is the only :+[#br-013]:API.B - action at top.)
 
     class Silo_Daemon
-      def initialize kr, mc
+
+      def initialize kr, unb
+
         @kernel = kr
-        @model_class = mc
+        @unbound = unb
       end
-      attr_reader :model_class
+
+      attr_reader :unbound
     end
 
-    class Actions::File_Coverage < API.action_class_
+    # ->
 
-      @is_promoted = true
-
-      Home_.lib_.brazen::Model.common_entity self,
+      Home_.lib_.brazen::Modelesque.entity self,
 
         :argument_arity, :one_or_more,
 
@@ -124,7 +125,7 @@ module Skylab::SubTree
           ACHIEVED_
         end
       end
-    end
+      # <-
 
     class Agnostic_Tree_Wrapper___
 

@@ -12,7 +12,7 @@ module Skylab::TestSupport
         _base_cls = if const_defined? :Property
           self::Property
         else
-          Brazen_::Model::Entity::Property
+          Brazen_::Modelesque::Entity::Property
         end
 
         const_set :Property, ::Class.new( _base_cls )

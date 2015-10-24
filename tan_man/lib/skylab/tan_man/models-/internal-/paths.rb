@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   module Models_::Internal_
 
-    Actions = ::Module.new
+    # :+[#br-013]:API.A trailing underscore = not part of reactive model tree)
 
     class Paths
 

@@ -6,7 +6,7 @@ module Skylab::Cull
 
     class Actions::Map < Action_
 
-      Brazen_::Model.common_entity self,
+      Brazen_::Modelesque.entity self,
 
           :ad_hoc_normalizer, -> arg, & oes_p do
             if arg.is_known_known

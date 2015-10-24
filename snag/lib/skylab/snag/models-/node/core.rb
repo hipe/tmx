@@ -376,12 +376,12 @@ module Skylab::Snag
 
     Brazen_ = Home_.lib_.brazen
 
-    class Common_Action_ < Brazen_::Model.common_action_class
+    class Common_Action_ < Brazen_::Action
 
       # (this could just as easily be a plain mixin module but it's slightly
       # convenient to be able to establish the entity module in one place)
 
-      Brazen_::Model.common_entity self
+      Brazen_::Modelesque.entity self
 
     private
 

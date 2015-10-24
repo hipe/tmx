@@ -45,7 +45,7 @@ module Skylab::Cull
         end
 
         if bx.length.nonzero?
-          @_top_entity = Models_::Upstream.edit_entity @survey.to_kernel, @on_event_selectively do | edit |
+          @_top_entity = Models_::Upstream.edit_entity @survey.kernel, @on_event_selectively do | edit |
             edit.derelativizer @survey
             edit.mutable_value_box bx
           end
@@ -87,7 +87,7 @@ module Skylab::Cull
 
       def _set arg, bx
 
-        @_top_entity = Models_::Upstream.edit_entity @survey.to_kernel, @on_event_selectively do | edit |
+        @_top_entity = Models_::Upstream.edit_entity @survey.kernel, @on_event_selectively do | edit |
           edit.derelativizer @survey
           edit.mutable_qualified_knownness_box bx
         end

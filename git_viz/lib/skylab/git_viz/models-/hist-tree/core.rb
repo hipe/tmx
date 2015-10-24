@@ -2,7 +2,7 @@ module Skylab::GitViz
 
   Models_ = ::Module.new  # ~ :+#stowaway (IFF all models in this file)
 
-  Action_ = Home_.lib_.brazen::Model.common_action_class
+  Action_ = Home_.lib_.brazen::Action
 
   # ->
 
@@ -48,7 +48,7 @@ module Skylab::GitViz
 
       @is_promoted = true
 
-      Home_.lib_.brazen::Model.common_entity( self,
+      Home_.lib_.brazen::Modelesque.entity( self,
 
         :property, :stderr,  # progressive output of building large hist-trees
 

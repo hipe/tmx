@@ -419,7 +419,7 @@ module Skylab::Cull
         KEEP_PARSING_
       end
 
-      Brazen_::Model.common_entity self do
+      Common_entity_.call self do
 
         const_set :Property, ::Class.new( const_get( :Property  ) )
 

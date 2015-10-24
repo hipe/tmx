@@ -2,7 +2,7 @@ module Skylab::Cull
 
   class Models_::Entity_
 
-    Actions = ::Module.new  # no actions
+    # :+[#br-013]:API.A trailing underscore = not part of reactive model tree)
 
     class << self
 

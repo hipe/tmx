@@ -80,7 +80,7 @@ module Skylab::TanMan::TestSupport::Models::Node
 
       silo = kr.silo :node
 
-      id = silo.model_class.node_identifier
+      id = silo.silo_module.node_identifier
 
       oes_p = handle_event_selectively
 
@@ -114,10 +114,13 @@ module Skylab::TanMan::TestSupport::Models::Node
       @oes_p = oes_p
     end
 
-    attr_reader :document_entity_byte_upstream_identifier
+    attr_reader(
+      :document_entity_byte_upstream_identifier,
+      :kernel,
+    )
 
-    def controller_nucleus  # #experiment in [br]
-      [ @kernel, @oes_p ]
+    def handle_event_selectively
+      @oes_p
     end
   end
 end

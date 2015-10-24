@@ -6,7 +6,7 @@ module Skylab::Git
 
     class Action_ < Bz__::Action
 
-      Bz__::Model::Entity.call self
+      Bz__::Modelesque.entity self
 
       # will re-open!
     end

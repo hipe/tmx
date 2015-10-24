@@ -23,7 +23,7 @@ module Skylab::Callback::TestSupport::Tree
 
       it "try to call a call that goes off the end" do
         -> do
-          callbacks.call_listeners :za_zang, :feeple_deeple do :xyzzy end
+          callbacks.call_listeners :za_zang, :feeple_deeple do :xyzizzy end
         end.should raise_error ::KeyError, /\Aoff the end: 'feeple_deeple'/
       end
 

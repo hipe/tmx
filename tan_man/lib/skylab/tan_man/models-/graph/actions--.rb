@@ -78,7 +78,7 @@ module Skylab::TanMan
       @property_box.fetch :digraph_path
     end
 
-    class Silo_Daemon < superclass::Silo_Daemon
+    class Silo_Daemon < Silo_daemon_base_class_[]
 
       def produce_byte_stream_identifiers_at_in i_a, ws, & oes_p
         Produce_byte_stream_identifiers_at_in___.new( i_a, ws, & oes_p ).go

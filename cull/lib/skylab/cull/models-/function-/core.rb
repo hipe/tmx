@@ -2,6 +2,8 @@ module Skylab::Cull
 
   class Models_::Function_ < Model_
 
+    # :+[#br-013]:API.A trailing underscore = not part of reactive model tree)
+
     class << self
 
       def unmarshal s, & oes_p

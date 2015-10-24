@@ -63,11 +63,6 @@ module Skylab::Brazen
         def is_branch
           true
         end
-
-        def to_module
-          # used by concerns that want to const get a certain class end
-          self.module
-        end
       end
 
       Bound_Methods = Bound_Methods.dup

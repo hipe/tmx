@@ -6,7 +6,7 @@ module Skylab::Snag
     # action adapter, an exposure that calls one of two distinct model
     # actions depending on its arguments.
 
-    def to_child_unbound_action_stream
+    def to_unordered_selection_stream
 
       # this is :[#br-066] currently the only example of the code
       # necessary to expose & implement a modality-only action adatper..
@@ -166,7 +166,7 @@ module Skylab::Snag
           new( & @_oes_p )
 
         o.filesystem = @_filesystem
-        o.kernel = _top_kernel
+        o.kernel = application_kernel
         o.name = self.name
         o.number_limit = bx[ :number_limit ]
         o.upstream_identifier = bx.fetch :upstream_identifier
@@ -178,7 +178,7 @@ module Skylab::Snag
 
       def __prepare_backstream_for_opening bx
 
-        o = Home_::Models_::Node::Actions::Open.new( _top_kernel, & @_oes_p )
+        o = Home_::Models_::Node::Actions::Open.new( application_kernel, & @_oes_p )
 
         o.argument_box = bx
 
@@ -186,10 +186,6 @@ module Skylab::Snag
           # overwrites mock bound
 
         ACHIEVED_
-      end
-
-      def _top_kernel
-        @parent.bound_
       end
     end
 

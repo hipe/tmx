@@ -1,5 +1,24 @@
 digraph g {
 
+_4 [label="re-implement\n\"myterm\""]
+
+// --
+
+_2c->_3
+_3 [label="learn scala"]
+
+// --
+
+_2c [label="scraper"]
+_2a->_2c
+_2b [label="d3"]
+_2a -> _2b
+
+_2a [label="this wild report"]
+tut_ -> _2a
+
+// ---
+
 app1 [label="?? make\nan app ??" color=grey];
 app1->plan;
 
@@ -41,6 +60,7 @@ two [label="the moving\ntile animates\ncorrectly" style=filled]
 
 three [label="a unit for scrollable integrated\nwith a responsive layout"]
 four [label="MAYBE with angular bindings"]
+ct->four
 
 two->one
 }

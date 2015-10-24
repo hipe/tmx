@@ -86,7 +86,7 @@ module Skylab::System::TestSupport
 
       fs = services_.filesystem
 
-      _path = ::File.join fs.tmpdir_path, 'hl-xyzzy-patch'
+      _path = ::File.join fs.tmpdir_path, 'hl-xyzizzy-patch'
 
       fs.tmpdir(
         :path, _path,

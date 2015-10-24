@@ -62,8 +62,7 @@ module Skylab::TanMan
       end
     end  # >>
 
-
-    class Silo_Daemon < superclass::Silo_Daemon
+    class Silo_Daemon < Silo_daemon_base_class_[]
 
       def node_collection_controller_via_document_controller dc, & oes_p
 
@@ -73,13 +72,13 @@ module Skylab::TanMan
         bx.add :dot_file, dc
 
         precondition_for_self :_no_action_,
-          @model_class.node_identifier,
+          @silo_module.node_identifier,
           bx,
           & oes_p
       end
 
       def precondition_for_self act, id, box, & oes_p
-        Collection_Controller__.new act, box, @model_class, @kernel, & oes_p
+        Collection_Controller__.new act, box, @silo_module, @kernel, & oes_p
       end
     end
 

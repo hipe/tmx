@@ -4,16 +4,6 @@ module Skylab::TestSupport
 
     Brazen_ = Autoloader_.require_sidesystem :Brazen
 
-    class << Home_
-
-      # sketchy #stowaway: only when the [ts] interactive API is being called
-      # do we need the below, for support of procs as actions:
-
-      def action_base_class
-        Brazen_::Model.common_action_class
-      end
-    end  # >>
-
     class << self
 
       define_method :krnl, ( Callback_.memoize do

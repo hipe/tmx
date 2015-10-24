@@ -191,11 +191,7 @@ module Skylab::Brazen
 
       def _silo_daemon_class_via_unbound x
 
-        if x.respond_to? :to_module
-          x.to_module
-        else
-          x
-        end.const_get DAEMON_CONST___, false
+        x.silo_module.const_get DAEMON_CONST___, false
       end
 
       def register_silo x, sym

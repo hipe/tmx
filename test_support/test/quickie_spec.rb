@@ -35,7 +35,7 @@ module Skylab::TestSupport::TestSupport::Quickie
     let :context do
       ctx = Quickie_TestSupport.const_set "CTX_#{ last_id += 1 }",
         ( ::Class.new Quickie::Context__ )
-      desc_a = [ "desc xyzzy #{ last_id }" ]
+      desc_a = [ "desc xyzizzy #{ last_id }" ]
       Quickie::Init_context__[ ctx, desc_a, nil, -> { } ]
       ctx.new runtime
     end

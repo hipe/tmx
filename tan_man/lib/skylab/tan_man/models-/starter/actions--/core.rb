@@ -47,7 +47,7 @@ module Skylab::TanMan
 
         edit_entity_class :preconditions, [ :workspace, :starter ]
 
-        include Brazen_::Model.common_retrieve_methods
+        include Brazen_::Actionesque::Factory::Retrieve_Methods
 
         def produce_result
           produce_one_entity do | * i_a, & ev_p |
@@ -82,7 +82,7 @@ module Skylab::TanMan
         @preconditions, self.class, @kernel, & @on_event_selectively )
     end
 
-    class Silo_Daemon < superclass::Silo_Daemon
+    class Silo_Daemon < Silo_daemon_base_class_[]
 
       # ~ custom exposures
 
@@ -129,6 +129,10 @@ module Skylab::TanMan
       # use the filesystem when reading the available collection,
       # use the workspace when writing the currently selected entity.
 
+      include Callback_::Event::Selective_Builder_Receiver_Sender_Methods
+
+      include Common_Collection_Controller_Methods_
+
       def initialize bx, mc, k, & oes_p
         @kernel = k
         @model_class = mc
@@ -138,34 +142,18 @@ module Skylab::TanMan
 
       def persist_entity x=nil, ent, & oes_p
 
-        _ok = __normalize_entity_name_via_fuzzy_lookup ent, & oes_p
-        _ok and begin
-          @ws.persist_entity( * x, ent, & oes_p )
-        end
-      end
-
-      def __normalize_entity_name_via_fuzzy_lookup ent, & oes_p
-
-        # :+#CC-abstraction-candidate
-
-        ent_ = one_entity_against_natural_key_fuzzily_(
-          ent.natural_key_string, & oes_p )
-
-        ent_ and begin
-          ent.normalize_property_value_via_normal_entity(
-            ent.class.natural_key_string, ent_, & oes_p )
-          ACHIEVED_
-        end
+        o = Persist_in_Collection2_IFF_Found_in_Collection1___.new( & oes_p )
+        o.arg = x
+        o.collection1 = self
+        o.collection2 = @ws
+        o.entity = ent
+        o.workspace = @ws
+        o.execute
       end
 
       def to_entity_stream_via_model cls, & oes_p
         _fs.to_entity_stream_via_model cls, & oes_p
       end
-
-      # ~
-
-      include Callback_::Event::Selective_Builder_Receiver_Sender_Methods
-      include Common_Collection_Controller_Methods_
 
       def _fs
         @__fs ||= __build_directory_as_collection
@@ -173,6 +161,94 @@ module Skylab::TanMan
 
       def __build_directory_as_collection
         Build_collection__[ @kernel, & @on_event_selectively ]
+      end
+    end
+
+    class Persist_in_Collection2_IFF_Found_in_Collection1___
+
+      # we are storing the entity in the workspace IFF it is a "valid"
+      # entity. validity is determined solely by whether the entity is
+      # found in some collecion (fuzzily) using natural keys. we use this
+      # process to normalize the name, too.
+      #
+      # :+[#br-117] abstraction candidate for entity normalization
+      # :+#CC-abstraction-candidate
+
+      def initialize & oes_p
+        @on_event_selectively = oes_p
+      end
+
+      attr_writer(
+        :arg,
+        :collection1,
+        :collection2,
+        :entity,
+        :workspace,
+      )
+
+      def execute
+
+        ok = __find_entity_in_collection_one
+        ok &&= __via_normal_entity_maybe_normalize_subject_entity
+        ok && __persist_subject_entity
+      end
+
+      def __find_entity_in_collection_one
+
+        arg_s = @entity.natural_key_string
+
+        ent = @collection1.one_entity_against_natural_key_fuzzily_(
+          arg_s, & @on_event_selectively )
+
+        if ent
+          @normal_entity = ent
+          ACHIEVED_
+        else
+          ent  # above emitted
+        end
+      end
+
+      def __via_normal_entity_maybe_normalize_subject_entity
+
+        prp = @entity.class.natural_key_string_property
+        _NAME = prp.name_symbol
+
+        normal_name_x = @normal_entity.property_value_via_symbol _NAME
+        current_name_x = @entity.property_value_via_symbol _NAME
+
+        if normal_name_x == current_name_x
+          ok_x = ACHIEVED_
+        else
+          ok_x = @entity.edit do | sess |
+            sess.edit_with _NAME, normal_name_x
+          end
+          if ok_x
+            @on_event_selectively.call :info, :normalized_value do
+              __build_normalized_value_event normal_name_x, current_name_x, prp
+            end
+          end
+        end
+
+        ok_x
+      end
+
+      def __build_normalized_value_event normal_x, mine_x, prp
+
+        Callback_::Event.inline_OK_with(
+          :normalized_value,
+          :prop, prp,
+          :previous_x, mine_x,
+          :current_x, normal_x
+        ) do | y, o |
+
+          y << "using #{ ick o.current_x } for #{ par o.prop } #{
+           }(inferred from #{ ick o.previous_x })"
+        end
+      end
+
+      def __persist_subject_entity
+
+        @workspace.persist_entity( * @arg, @entity, & @on_event_selectively )
       end
     end
 

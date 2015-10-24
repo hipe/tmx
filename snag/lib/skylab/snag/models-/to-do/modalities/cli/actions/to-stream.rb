@@ -19,7 +19,7 @@ module Skylab::Snag
           super nil, nil
 
           @be_verbose = false
-          @bound = unbound.new boundish do | * i_a, & ev_p |
+          @bound = unbound.new boundish.kernel do | * i_a, & ev_p |
 
             if :error == i_a.first
               receive_uncategorized_emission i_a, & ev_p

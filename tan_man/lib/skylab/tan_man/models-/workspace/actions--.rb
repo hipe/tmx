@@ -23,7 +23,7 @@ module Skylab::TanMan
       @is_promoted = true
 
       desc do |y|
-        _ = @kernel.silo( :workspace ).model_class.default_config_filename
+        _ = @kernel.silo( :workspace ).silo_module.default_config_filename
         y << "create the #{ val _ } directory"
       end
     end

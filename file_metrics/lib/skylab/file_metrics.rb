@@ -18,6 +18,10 @@ module Skylab::FileMetrics
     end
   end  # >>
 
+  Totaller_ = -> do
+    Home_.lib_.basic::Tree::Totaller
+  end
+
   Callback_ = ::Skylab::Callback
 
   Autoloader_ = Callback_::Autoloader

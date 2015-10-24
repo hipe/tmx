@@ -29,7 +29,10 @@ module Skylab::Brazen
       end
 
       def silo_module
-        name_function.parent
+
+        _any_parent = name_function.parent
+
+        _any_parent || self  # if you are at top, you are at top.
       end
 
       def is_branch
@@ -211,7 +214,7 @@ module Skylab::Brazen
 
         else
           sm = silo_module
-          if sm
+          if sm && sm.object_id != self.object_id
             if sm.respond_to? :preconditions
               sm.preconditions
             end

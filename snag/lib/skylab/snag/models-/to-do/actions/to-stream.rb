@@ -2,9 +2,9 @@ module Skylab::Snag
 
   class Models_::To_Do
 
-    class Actions::To_Stream  # < Brazen_::Model.common_action_class  # re-open because [#026]
+    class Actions::To_Stream  #  #re-open because [#026]. descends from [br]
 
-      Brazen_::Model.common_entity self,
+      Brazen_::Modelesque.entity self,
 
         :desc, -> y do
           y << "a report of the ##{}todo's (or TODO's etc) in a tree"

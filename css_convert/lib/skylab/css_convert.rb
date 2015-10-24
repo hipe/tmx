@@ -146,6 +146,14 @@ module Skylab::CSS_Convert
       ok &&= __via_directives
       ok || @_result
     end
+
+    def any_exit_status_for_channel_symbol sym  # covered
+      if :errno_enoent == sym
+        super :resource_not_found
+      else
+        super sym
+      end
+    end
   end
 
   class CLI::Modalities::CLI::Actions::Convert
@@ -197,54 +205,17 @@ module Skylab::CSS_Convert
     def initialize( * )
 
       @_can_exit = false
-      @exitstatus = nil
       @_must_stay = false
 
-      @on_event_selectively = -> * i_a, & ev_p do  # while [#br-117]..
-        receive_possible_event_via_channel i_a, & ev_p
-      end
+      handle_event_selectively
 
+      oes_p = @on_event_selectively
+      @on_event_selectively = -> * i_a, & ev_p do
+
+        oes_p[ * i_a, & ev_p ]
+      end
 
       super
-    end
-
-    def receive_possible_event_via_channel i_a, & ev_p
-
-     # while #open [#br-117] event expression
-
-      k = i_a.fetch 0
-
-      _y = send :"outbound_line_yielder_for__#{ k }__"
-
-      ev = ev_p[]
-
-      ev.express_into_under _y, expression_agent
-
-      if :error == k && ! @exitstatus
-        __first_error ev
-      end
-
-      TRADITIONAL_RESULT_TRIAD___.fetch k
-    end
-
-    TRADITIONAL_RESULT_TRIAD___ = {
-      error: false,
-      info: nil,
-      payload: true,
-    }
-
-    def __first_error ev  # eew. assume exitstatus is falseish
-
-      @adapter.express_invite_to_general_help  # eew
-
-      @exitstatus = if :errno_enoent == ev.terminal_channel_symbol
-
-        Brazen_::API.exit_statii.fetch :resource_not_found
-
-      else
-        Brazen_::CLI::GENERIC_ERROR_EXITSTATUS
-      end
-      NIL_
     end
 
     # ~ business

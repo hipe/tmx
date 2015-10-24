@@ -4,7 +4,7 @@ module Skylab::Snag
 
     class Actions::Melt  # see [#063]
 
-      Home_.lib_.brazen::Model.common_entity( self,
+      Home_.lib_.brazen::Modelesque.entity( self,
 
         :default_proc, -> do
           To_Do_.default_pattern_strings

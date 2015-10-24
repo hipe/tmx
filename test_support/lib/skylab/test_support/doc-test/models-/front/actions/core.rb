@@ -2,9 +2,9 @@ module Skylab::TestSupport
 
   module DocTest
 
-    class Action_ < Brazen_::Model.common_action_class
+    class Action_ < Brazen_::Action
 
-      Brazen_::Model.common_entity self do
+      Brazen_::Modelesque.entity self do
 
       end
     end

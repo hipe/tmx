@@ -44,6 +44,8 @@ module Skylab::TestSupport
 
       class Actions::Cover
 
+        Actions = nil
+
         class << self
 
           def is_branch
@@ -68,7 +70,7 @@ module Skylab::TestSupport
 
         end  # >>
 
-        Brazen_::Model.common_entity self,
+        Brazen_::Modelesque.entity self,
 
           :required, :argument_arity, :one_or_more, :property, :arg
 
@@ -97,7 +99,7 @@ module Skylab::TestSupport
           [ 'ya sure whatever' ]
         end
 
-        def accept_parent_node_ x
+        def accept_parent_node x
           @__NOT_USED_the_kernel_again__ = x
           nil
         end

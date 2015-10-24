@@ -538,9 +538,11 @@ module Skylab::Brazen
       def __any_branch_or_leaf_class_for_unbound_when_modalities unb
 
         sym = unb.name_function.as_const
-        _box = unb.silo_module::Modalities::CLI::Actions
-        if _box.const_defined? sym, false
-          _box.const_get sym
+
+        _source = unb.silo_module::Modalities::CLI::Actions
+
+        if _source.const_defined? sym, false
+          _source.const_get sym
         end
       end
 
@@ -830,7 +832,7 @@ module Skylab::Brazen
 
       attr_reader :name_function
 
-      def model_class
+      def silo_module
         NIL_
       end
 
@@ -1051,14 +1053,6 @@ module Skylab::Brazen
 
       def bound_
         @bound
-      end
-
-      def action_adapter  # todo - unify w/ below
-        self
-      end
-
-      def invocation  # #todo - unify w/ above
-        self
       end
 
       attr_reader(

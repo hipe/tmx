@@ -77,7 +77,10 @@ module Skylab::TanMan
       end
 
       def receive_document_action action
-        @kernel, @on_event_selectively = action.controller_nucleus.to_a
+
+        @kernel = action.kernel
+        @on_event_selectively = action.handle_event_selectively
+
         receive_byte_upstream_identifier action.document_entity_byte_upstream_identifier
         produce_document_controller
       end

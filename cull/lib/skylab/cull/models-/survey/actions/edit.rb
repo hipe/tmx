@@ -6,7 +6,7 @@ module Skylab::Cull
 
       @after_name_symbol = :ping
 
-      Brazen_::Model.common_entity self,
+      Common_entity_.call self,
 
         :flag, :property, :dry_run,
 

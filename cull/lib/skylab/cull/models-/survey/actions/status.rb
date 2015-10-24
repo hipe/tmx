@@ -6,7 +6,7 @@ module Skylab::Cull
 
       @after_name_symbol = :edit
 
-      Brazen_::Model.common_entity self,
+      Common_entity_.call self,
 
         :desc, -> y do
           y << "display status of the survey"

@@ -390,7 +390,7 @@ is covered below. what happens when required fields are missing is
 normalization.
 
 
-### channel of concern xyzzy: is the value we should store different than the
+### channel of concern three: is the value we should store different than the
     value we received (and if so, what is this new value)?
 
 this is the bread and butter of normalization: a data node comes in in
@@ -537,7 +537,7 @@ upstream, it must do so by sending the new value to the `value change`
 callback.
 
 the reason it should not do this through a more straightforward means is
-explained somewhat above, at "channel of concern xyzzy", which is the
+explained somewhat above, at "channel of concern three", which is the
 corresponding channel of concern for this control point. we will offer other
 reasons below, when we explain why the `value change` callback is the third
 and final argument to the `normalizer callable` below.

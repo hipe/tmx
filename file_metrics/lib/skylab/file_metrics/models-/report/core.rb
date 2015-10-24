@@ -4,7 +4,7 @@ module Skylab::FileMetrics
 
     br = Home_.lib_.brazen
 
-    My_Entity__ = br::Model::Entity
+    My_Entity__ = br::Modelesque::Entity
 
     class Report_Action_ < br::Action
 
@@ -73,7 +73,7 @@ module Skylab::FileMetrics
       end
     end
 
-    COMMON_PROPERTIES_ = br::Model.common_properties_class.new My_Entity__ do | sess |
+    COMMON_PROPERTIES_ = br::Nodesque::Common_Properties.new My_Entity__ do | sess |
 
       sess.edit_common_properties_module(
 

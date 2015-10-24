@@ -66,9 +66,9 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
   Brazen_ = ::Skylab::Brazen
 
-  class Action__ < Brazen_::Model.common_action_class
+  class Action__ < Brazen_::Action
 
-    Brazen_::Model.common_entity self
+    Brazen_::Modelesque.entity self
 
   end
 

@@ -29,7 +29,7 @@ module Skylab::Brazen
         case 1 <=> a.length
         when  0
 
-          a.first.receive_show_help_ @help_renderer.invocation
+          a.first.receive_show_help_ @help_renderer.action_adapter
 
         when  1
           aa.receive_no_matching_via_token__ @any_cmd_string

@@ -59,7 +59,7 @@ module Skylab::System::TestSupport
         if o
           o.for self
         else
-          o = TestSupport_.tmpdir.memoizer_for self, 'sy-xyzzy'
+          o = TestSupport_.tmpdir.memoizer_for self, 'sy-xyzizzy'
           o.instance
         end
       end

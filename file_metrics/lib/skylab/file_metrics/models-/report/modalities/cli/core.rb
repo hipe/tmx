@@ -38,9 +38,9 @@ module Skylab::FileMetrics
       # ~ our common properties
 
       bz = Home_.lib_.brazen
-      EXTMOD__ = bz::Model::Entity
+      EXTMOD__ = bz::Modelesque::Entity
 
-      Common_properties__ = bz::Model.common_properties_class.new(
+      Common_properties__ = bz::Nodesque::Common_Properties.new(
         EXTMOD__
       ) do | sess |
 

@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../lib/skylab'
-require 'skylab/flex2treetop/core'
+require 'skylab/flex2treetop'
 
 _x = Skylab::Flex2Treetop::CLI.new(
   $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]

@@ -105,20 +105,20 @@ module Skylab::TanMan
 
     attr_reader :has_both_labels_, :has_both_IDs_
 
-    class Silo_Daemon < superclass::Silo_Daemon
+    class Silo_Daemon < Silo_daemon_base_class_[]
 
       def association_collection_controller_via_preconditions bx, & oes_p
 
         # :+#actionless-collection-controller-experiment
 
         precondition_for_self :_no_action_2_,
-          @model_class.node_identifier,
+          @silo_module.node_identifier,
           bx,
           & oes_p
       end
 
       def precondition_for_self action, id, bx, & oes_p
-        Collection_Controller___.new action, bx, @model_class, @kernel, & oes_p
+        Collection_Controller___.new action, bx, @silo_module, @kernel, & oes_p
       end
     end
 

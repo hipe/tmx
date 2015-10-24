@@ -33,7 +33,7 @@ module Skylab::CSS_Convert::TestSupport
 
       _path = fixture_path_ 'not-there.txt'
       invoke 'convert', _path
-      expect :e, /\ANo such file or directory - .+\/fixtures\/not-there\.txt\z/
+      expect :e, /\ANo such file or directory - .+\/fixtures\/not-there\.txt\z/i
 
       expect_specific_invite_line_to :convert
       expect_no_more_lines

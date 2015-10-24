@@ -86,10 +86,10 @@ module Skylab::TanMan
       end
     end
 
-    class Silo_Daemon < superclass::Silo_Daemon
+    class Silo_Daemon < Silo_daemon_base_class_[]
 
       def precondition_for_self action, id, box, & oes_p
-        Meaning_::Collection_Controller__.new action, box, @model_class, @kernel, & oes_p
+        Meaning_::Collection_Controller__.new action, box, @silo_module, @kernel, & oes_p
       end
     end
 

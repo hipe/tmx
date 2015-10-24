@@ -126,7 +126,7 @@ module Skylab::Snag
 
         def __build_enity_not_found_event id_o
 
-          Brazen_::Model.common_events::Entity_Not_Found.new_with(
+          Brazen_.event_class( :Entity_Not_Found ).new_with(
             :identifier, id_o,
             :model, Home_::Models_::Node,
             :describable_source, @byte_upstream_ID )

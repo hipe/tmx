@@ -368,7 +368,7 @@ module Skylab::Brazen
         end
 
         def _model_class
-          self.class.model_class
+          self.class.silo_module
         end
       end
 

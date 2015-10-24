@@ -117,7 +117,7 @@ better this time.
 
 + `_by` used frequently for method that necessarily take procs;
   although this is also used when it is linguistically natural sounding
-  given the following formal argument(s).
+  given the following formal argument(s). (see also `use_<..>_by`)
 
 + `calculate`, `calculate_*` - method must take a block. result of method
   block (as determined by the user) be the result of the call to this
@@ -214,6 +214,15 @@ better this time.
   `to_a` etc. `to_stream` is a popular one in this universe (it used
   to be `to_scan`, and before that `get_scan`, and still it has the
   same underlying sematics as the `get_` prefix).
+
++ `use_<foo_bar>_by` -
+
+  such a method necessarily takes a block that will receive a "foo bar" if
+  one can be produced, in which case the result of this call is the result
+  of the block. otherwise (and a "foo bar" cannot be produced), this call
+  will result in the `nil` or `false` that occured when trying to produce the
+  foo bar (ergo the "foo bar" of these methods cannot be something that is
+  validly false-ish). similar to `_by` (see).
 
 + `via_` will one day have its own section #todo
 
@@ -409,7 +418,7 @@ arguments (and perhaps a block pursuant to the particular method).
 
 
 
-note that this meta-convention is not very restrictive because
+note that this meta-convention is not very restrictive because the
 specification for iambics is itself not very restrictive. in fact,
 whether or not the term "iambic" could formally be applied to any syntax
 is not formally defined here, but suffice it to say "maybe".

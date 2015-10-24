@@ -35,7 +35,7 @@ module Skylab::TanMan
 
         # we've got to get in front of `normalize` so ..
 
-        include Brazen_::Model::Entity
+        include Brazen_::Modelesque::Entity
 
         def document_entity_byte_upstream_identifier
           @_DEBUID
@@ -62,7 +62,7 @@ module Skylab::TanMan
 
           o.formals formal_properties
 
-          o.for_model model_class
+          o.for_model silo_module
 
           o.against_argument_box @argument_box
 
@@ -134,7 +134,7 @@ module Skylab::TanMan
 
         sess.edit_common_properties_module do
 
-          const_set :Property, ::Class.new( Brazen_::Model::Entity::Property )
+          const_set :Property, ::Class.new( Brazen_::Modelesque::Entity::Property )
           class self::Property
 
             def initialize
@@ -221,7 +221,7 @@ module Skylab::TanMan
         end )
       end
 
-      INPUT_PROPERTIES___ = Model_.common_properties_class.new( nil ).set_properties_proc do
+      INPUT_PROPERTIES___ = Brazen_::Nodesque::Common_Properties.new( nil ).set_properties_proc do
 
         IO_PROPERTIES__.to_value_stream.reduce_by do | prp |
 

@@ -29,14 +29,14 @@ module Skylab::Cull
     end  # >>
   end
 
-  Models_::Ping = -> act_pxy, & oes_p do
+  Models_::Ping = -> bound, & oes_p do
 
     oes_p.call :info, :ping do
 
       Callback_::Event.wrap.signature(
-        act_pxy.action_class_like.name_function,
+        bound.unbound.name_function,
         ( Callback_::Event.inline_neutral_with :ping do | y, o |
-          y << "hello from #{ act_pxy.kernel.app_name }."
+          y << "hello from #{ bound.kernel.app_name }."
         end ) )
     end
 
@@ -53,6 +53,11 @@ module Skylab::Cull
       @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
     end
   end  # >>
+
+  Common_entity_ = -> * x_a, & x_p do
+
+    Brazen_::Entity::Apply_entity[ Brazen_::Modelesque::Entity, x_a, & x_p ]
+  end
 
   HARD_CALL_METHOD_ = -> * values, arg_box, & oes_p do
 
@@ -155,7 +160,7 @@ module Skylab::Cull
 
   ACHIEVED_ = true
   Brazen_ = Autoloader_.require_sidesystem :Brazen
-  Action_ = Brazen_::Model.common_action_class  # for name stop index we need this const
+  Action_ = Brazen_::Action
   Home_ = self
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze

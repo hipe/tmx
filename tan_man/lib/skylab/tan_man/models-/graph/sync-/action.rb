@@ -36,7 +36,7 @@ module Skylab::TanMan
 
           o.formals formal_properties
 
-          o.for_model model_class
+          o.for_model silo_module
 
           o.against_argument_box @argument_box
 

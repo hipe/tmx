@@ -6,7 +6,7 @@ module Skylab::Snag
 
       WORDWRAP_ASPECT_RATIO___ = [ 3, 1 ]
 
-      Home_.lib_.brazen::Model.common_entity( self,
+      Home_.lib_.brazen::Modelesque.entity( self,
 
         :desc, -> y do
           y << "write to the output stream a digrpah of doc nodes"

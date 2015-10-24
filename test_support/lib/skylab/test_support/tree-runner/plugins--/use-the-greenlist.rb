@@ -186,8 +186,11 @@ module Skylab::TestSupport
           end
           ord, num = opt
 
+          chomp_size = num.value_x
+
           _factor = ord.value_x - 1  # first=0, second=1 etc
-          s_a = s_a[ _factor, num.value_x ]
+
+          s_a = s_a[ _factor * chomp_size, chomp_size ]
         end
 
         @resources.serr.puts "(#{ s_a * SPACE_ })"

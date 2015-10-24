@@ -22,7 +22,7 @@ module Skylab::BeautySalon
 
       @is_promoted = true
 
-      Brazen_::Model::Entity.call self
+      Brazen_::Modelesque.entity self
 
       edit_entity_class(
 

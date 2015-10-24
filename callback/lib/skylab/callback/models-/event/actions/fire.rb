@@ -42,7 +42,7 @@ module Skylab::Callback
 
       @is_promoted = true
 
-      Brazen_::Model::Entity[ self ]
+      Brazen_::Modelesque::Entity[ self ]
 
       edit_entity_class(
 

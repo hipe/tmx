@@ -79,9 +79,9 @@ module Skylab::System::TestSupport
 
       x = yield sess
 
-      i.puts "xyzzy"
+      i.puts "xyzizzy"
       s = o.gets
-      "goodbye (xyzzy).\n" == s or fail( s )
+      "goodbye (xyzizzy).\n" == s or fail( s )
       t.value.exitstatus.zero? or fail
       x
     end

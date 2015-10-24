@@ -8,9 +8,9 @@ module Skylab::Snag
 
     Actions = ::Module.new
 
-    class Action__ < Brazen_::Model.common_action_class  # re-opens
+    class Action__ < Brazen_::Action  # re-opens
 
-      Brazen_::Model.common_entity self
+      Brazen_::Modelesque.entity self
 
     end
 
@@ -379,19 +379,18 @@ module Skylab::Snag
 
         @criteria_tree =  ct
 
-        _mc = @kernel.unbound_via_normal_identifier(
-          @criteria_tree.name_x )
+        unb = @kernel.unbound_via :normal_identifier, @criteria_tree.name_x
 
         remove_instance_variable :@kernel  # ick/meh
 
-        _receive _mc, :model_class
+        _receive unb.silo_module, :silo_module
       end
 
-      def __receive_trueish__model_class__ mc
+      def __receive_trueish__silo_module__ sm
 
-        @model_class = mc
+        @silo_module = sm
 
-        _expad = mc::Expression_Adapters::Criteria_Tree
+        _expad = sm::Expression_Adapters::Criteria_Tree
 
         _receive _expad, :expression_adapter
       end
@@ -411,7 +410,7 @@ module Skylab::Snag
 
       def to_reduced_entity_stream_via_collection_identifier id_x
 
-        col = @model_class.collection_module_for_criteria_resolution.
+        col = @silo_module.collection_module_for_criteria_resolution.
 
           new_via_upstream_identifier( id_x, & @on_event_selectively )
 

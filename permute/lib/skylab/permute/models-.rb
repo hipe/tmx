@@ -6,7 +6,7 @@ module Skylab::Permute
 
     Actions = ::Module.new
 
-    same = Home_.lib_.brazen::Model.common_action_class
+    same = Home_.lib_.brazen::Action
 
     class Actions::Ping < same
 
@@ -27,7 +27,7 @@ module Skylab::Permute
 
       @is_promoted = true
 
-      Home_.lib_.brazen::Model.common_entity_module[ self ]
+      Home_.lib_.brazen::Modelesque.entity self
 
       edit_entity_class(
 

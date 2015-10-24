@@ -9,7 +9,7 @@ module Skylab::Cull
       _prp = Models_::Upstream::Actions::Map::TABLE_NUMBER_PROPERTY.
         new_without_default
 
-      Brazen_::Model.common_entity self,
+      Common_entity_.call self,
 
         :reuse, COMMON_PROPERTIES_,
 

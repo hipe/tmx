@@ -35,7 +35,7 @@ module Skylab::TMX::TestSupport
         Bound___.new self, k, & oes_p
       end
 
-      def __to_unbound_action_stream
+      def __build_unordered_selection_stream
 
         mod = const_get :Models_, false
         _const_a = mod.constants
@@ -63,6 +63,7 @@ module Skylab::TMX::TestSupport
 
         @_kr = k
         @_mock_class = mock_cls
+        @_oes_p = oes_p
       end
 
       def is_visible
@@ -84,11 +85,11 @@ module Skylab::TMX::TestSupport
         end
       end
 
-      def to_unbound_action_stream
-        @_mock_class.__to_unbound_action_stream
+      def to_unordered_selection_stream
+        @_mock_class.__build_unordered_selection_stream( & @_oes_p )
       end
 
-      def to_kernel
+      def kernel
         @_kr
       end
     end

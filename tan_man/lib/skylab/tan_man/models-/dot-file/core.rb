@@ -25,11 +25,6 @@ module Skylab::TanMan
         end
       end
 
-      # ~
-
-      def to_upper_unbound_action_stream
-      end
-
       # ~ support
 
       def node_identifier
@@ -47,7 +42,7 @@ module Skylab::TanMan
 
     Actions = ::Module.new
 
-    class Silo_Daemon < Model_::Silo_Daemon
+    class Silo_Daemon < Silo_daemon_base_class_[]
 
       def precondition_for action, id, box, & oes_p
 

@@ -126,6 +126,18 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
   Callback_ = Callback_
 
+  Kernel_stub_ = Callback_.memoize do
+
+    class Kernel_Stub
+
+      def unbound_models
+        self._NOT_USED
+      end
+
+      self
+    end.new.freeze
+  end
+
   Name_conventions_ = Callback_.memoize do
 
     Subject_[]::Models_::Name_Conventions.new %w( *_speg.rb *_spek.rb )
@@ -134,10 +146,6 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
   Subject_ = -> do
     Home_::Models_::File_Coverage
   end
-
-  Mock_Boundish___ = ::Struct.new :to_kernel
-
-  MOCK_BOUNDISH_ = Mock_Boundish___.new :_no_kernel_
 
   NIL_ = nil
 
