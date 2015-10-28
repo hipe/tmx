@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   module Autonomous_Component_System
 
-    class Sessions_::Mutation  # see [#089]
+    class Mutation  # notes in [#089]
 
       class << self
         def event_class sym

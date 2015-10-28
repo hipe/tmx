@@ -73,7 +73,7 @@ module Skylab::Brazen
       end
 
       def _Mutation_Session
-        ACS_::Sessions_::Mutation
+        ACS_::Mutation
       end
     end  # >>
 
@@ -213,7 +213,6 @@ module Skylab::Brazen
 
     ACS_ = self
     Autoloader_[ Modalities = ::Module.new ]
-    Autoloader_[ Sessions_ = ::Module.new ]
 
     Value_Wrapper = -> x do
       Callback_::Known_Known[ x ]

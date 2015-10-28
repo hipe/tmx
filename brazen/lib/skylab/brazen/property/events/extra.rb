@@ -8,6 +8,7 @@ module Skylab::Brazen
 
       :name_x_a, nil,
       :did_you_mean_i_a, nil,
+      :context_prepositional_phrase_proc, nil,
       :lemma, nil,
       :adj, nil,
       :error_category, :argument_error,
@@ -26,10 +27,18 @@ module Skylab::Brazen
         "unrecognized "
       end
 
-      # e.g: "unrecognized property 'foo'"
+      p = o.context_prepositional_phrase_proc
+      if p
+        s = instance_exec( & p )
+        if s
+          _context = " #{ s }"
+        end
+      end
+
+      # e.g: "unrecognized property 'foo' in blah blah"
 
       y << "#{ adj_ }#{ plural_noun s_a.length, _lemma }#{
-        } #{ and_ s_a }"
+        } #{ and_ s_a }#{ _context }"
 
       if o.did_you_mean_i_a
         _s_a_ = o.did_you_mean_i_a.map( & method( :code ) )

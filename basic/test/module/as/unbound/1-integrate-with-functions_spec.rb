@@ -5,7 +5,7 @@ module Skylab::Basic::TestSupport
   describe "[ba] module - as - unbound: kernel integration (assumed func)" do
 
     extend TS_
-    use :expect_event_micro
+    use :future_expect
     use :module_as_unbound_support
 
     context "kernel integration - setup 1" do

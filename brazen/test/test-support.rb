@@ -105,6 +105,10 @@ module Skylab::Brazen::TestSupport
       ::FileUtils
     end
 
+    Future_expect = -> tcc do
+      Callback_.test_support::Future_Expect[ tcc ]
+    end
+
     Tmpdir = memoize.call do
 
       sys = Home_::LIB_.system

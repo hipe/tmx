@@ -6,7 +6,7 @@ module Skylab::Brazen
 
       To_qualified_knownness_stream = -> acs do
 
-        To_association_stream___[ acs ].map_by do | asc |
+        To_association_stream[ acs ].map_by do | asc |
 
           ivar = asc.name.as_ivar
           if acs.instance_variable_defined? ivar
@@ -19,7 +19,7 @@ module Skylab::Brazen
         end
       end
 
-      To_association_stream___ = -> acs do
+      To_association_stream = -> acs do
 
         p = Component_Association.builder_for acs
 
@@ -35,49 +35,33 @@ module Skylab::Brazen
 
         if acs.respond_to? :component_association_symbols
           acs.component_association_symbols
-
         else
-          Method_index_of[ acs ].association_name_symbols
+          Method_index_of_class__[ acs.class ].association_name_symbols
         end
       end
 
-      Component_is_compound = -> kn do  # assumes true-ish
+      Model_is_compound = -> mdl do
 
-        x = kn.value_x
+        if mdl.respond_to? :method_defined?
 
-        if x.respond_to? :component_association_symbols
-          true
-        else
-
-          # experimental - rather than requiring the above method, let's see
-          # how it feels to require a dedicated class that has at least one:
-
-          if kn.association.component_model.respond_to? :class_exec
-
-            ! Method_index_of[ x ].association_name_symbols.nil?
+          if mdl.method_defined? :component_association_symbols
+            true
+          else
+            ! Method_index_of_class__[ mdl ].association_name_symbols.nil?
           end
         end
       end
 
-      Method_index_of = -> acs do
-        ivar = IVAR___
-        if acs.instance_variable_defined? ivar
-          mi = acs.instance_variable_get ivar
-        else
-          mi = Method_Index___[ acs ]
-          acs.instance_variable_set ivar, mi
+      Method_index_of_class__ = -> cls do
+
+        cls.class_exec do
+
+          @___ACS_method_index ||=
+            Method_Index___.new( cls.instance_methods( false ) )
         end
-        mi
       end
 
       class Method_Index___
-
-        class << self
-          def [] cmp
-            new cmp.class.instance_methods false
-          end
-          private :new
-        end  # >>
 
         rx = nil
 
@@ -126,10 +110,6 @@ module Skylab::Brazen
           :association_name_symbols,
         )
       end
-
-      IVAR___ = :@___component_related_method_index
-
-      UNDER_UNDER__ = '__'
     end
   end
 end

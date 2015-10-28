@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   module Autonomous_Component_System
 
-    module Sessions_::Mutation::Event_Factory_
+    module Mutation::Event_Factory_
 
       # (a placeholder for an idea)
 

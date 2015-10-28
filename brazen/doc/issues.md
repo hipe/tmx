@@ -43,7 +43,7 @@
 [#087]       #track similar normalization logics (this might be a redundant tracker)
 [#086]       #track cases where failure is "fuzzy" (i.e non-atomic),
                ignored for the greater good, for usability
-[#085]       track redundant implementations of poly.stream for one value
+[#085]       track varied implementations of poly.stream for one value
              (#was: (#moved-to: [#ba-052]))
 [#084]       :+#wishlist a `flag` meta-meta prperty
 [#083]       ACS interpretations & expresssions .. (#parent-node: [#089])
@@ -148,7 +148,7 @@
 [#026]       #parent-node: [#025] the collection controller narrative ..
 [#025]       #doc-node: the brazen four layer model model ..
 [#024]       #parent-node: [#025] the action narrative ..
-[#023]       #experimental-feature-tracker: ( described in [#024] )
+[#023]       track the magic of `expression` ( described in [#024] )
              ( was: #parent-node: [#011] event prototype )
 [#022]       [ EDIT: document formal properties  ]
              ( #was: entity identifier. #moved-to: [#here-091] )

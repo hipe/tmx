@@ -57,7 +57,7 @@ module Skylab::Brazen
               kn.value_x
             end
 
-            if x && ACS_::Reflection::Component_is_compound[ kn ]
+            if x && ACS_::Reflection::Model_is_compound[ kn.association.component_model ]
               x = _recurse x
             end
 

@@ -42,4 +42,35 @@ just so we agree on terms in this document,
       * nodes that have children have nothing but children, and nodes
         that have no children we've called a variety of things (e.g "field",
         "atom") but we'll call "leaf" for now.
+
+
+
+
+## towards an interpretation API - unmarshaling
+
+there exists a potentially limitless variety of ways that one component
+for one ACS can be interpreted from the potentially limitless variety of
+input "modalities". we will refer to the "thing" that does this
+interpretation as an "interpreter", but we will offer no rigorous
+specification for interpreters here.
+
+it's worth comparing a [#089] "mutation session" to an interpreter - it
+"feels like" the mutation session is acting as an interpretor for tenet
+3 from there (thru which all compound components are presumably built in
+a normal world). (however, internally it is the particular component class
+itself that actually constructs a mutable component, before passing it off
+to a mutation session which interprets the input.)
+
+
+
+
+### :#note-JSON-A
+
+we do this by interating over the *whole* formal structure first, and
+then complaining about any remaining unparsed items second. rather, we
+*could* give the formal structure a hash-like inteface somehow, and then
+iterate over each element of the parsed JSON structure using this map -
+the different would be that for serialized structures that do not occupy
+every formal component, there would be less iteration. however, because
+we don't have that hash-like interface we are sticking with this.
 _
