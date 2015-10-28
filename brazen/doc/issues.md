@@ -1,8 +1,9 @@
+[#124]       argument moniker hax
 [#123]       track nasty peeks into filesystem
 [#122]       as if you would ever..
 [#121]       #tracking this wrapping algo
 [#120] #open extensible component modifiers
-[#119] #hole
+[#119]       track expression of ACS associations into brazen unbound tree
              ( #was: get [fm] out of test (see) )
 [#118]       do we want the ability to have a model-less-action? for now, no
 [#117]       track abstraction candidates near reactive model, normalization
@@ -17,11 +18,11 @@
 [#111]       what does application even mean ..
 [#110]       ..
 [#109]       when missing arguments fancy ..
-[#108]       ..
-[#107]       ..
-[#106]       ..
-[#105]       ..
-[#104]       ..
+[#108]       testing conventions near CLI ..
+[#107] #hole
+[#106]       fun with help screen parsing ..
+[#105]       the isomorphic method argument narrative ..
+[#104]       the isomorphic methods client narrative ..
 [#103]       the CLI isomorphic methods client narrative ..
 [#102]       :+#tombstone: removed old & complex o.p that parsed '--'
 [#101]       #investigation - how to architect.
@@ -45,7 +46,7 @@
 [#085]       track redundant implementations of poly.stream for one value
              (#was: (#moved-to: [#ba-052]))
 [#084]       :+#wishlist a `flag` meta-meta prperty
-[#083]       ACS unmarshalling .. (#parent-node: [#089])
+[#083]       ACS interpretations & expresssions .. (#parent-node: [#089])
              ( #was: #done workspace `init` action should not default to '.' in API )
 [#082]       #track meta-meta-property candidates (list, enum etc)
 [#081]       #track experimental extensions to Actor

@@ -167,7 +167,7 @@ module Skylab::Brazen
         __any_unbound_via_module x
 
       else
-        self._COVER_ME
+        self._COVER_ME_unrecognized_shape_for_reactive_tree_node
       end
     end
 

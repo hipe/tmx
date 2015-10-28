@@ -4,14 +4,6 @@ module Skylab::Brazen
 
     class << self
 
-      def _same * x_a, & x_p
-        dsl = ACS_::Sessions_::DSL.new( & x_p )
-        dsl.accept_argument_array x_a
-        dsl.execute
-      end
-      alias_method :[], :_same
-      alias_method :call, :_same
-
       def create x_a, new_o, & x_p  # :t2.
 
         o = _Mutation_Session.new( & x_p )
@@ -112,7 +104,7 @@ module Skylab::Brazen
 
       def initialize
         @_name_mutation = nil
-        @_operations_hash = nil
+        @_operations = nil
       end
 
       def _init_for_component comp
@@ -159,7 +151,11 @@ module Skylab::Brazen
 
       def __accept__can__meta_component * i_a  # :t8.
 
-        @_operations_hash = ::Hash[ i_a.map { | k | [ k, true ] } ]
+        bx = Callback_::Box.new
+        i_a.each do | sym |
+          bx.add sym, :declared
+        end
+        @_operations = bx
         NIL_
       end
 
@@ -179,9 +175,9 @@ module Skylab::Brazen
       def interpret arg_st, & x_p
 
         if @component_model.respond_to?(
-            :interpret_for_component_mutation_session )  # :+t6
+            :interpret_component )  # :+t6
 
-          x = @component_model.interpret_for_component_mutation_session(
+          x = @component_model.interpret_component(
             arg_st, & x_p )
 
           if x
@@ -194,24 +190,21 @@ module Skylab::Brazen
         end
       end
 
-      def is_of_compound_component
-        mdl = @component_model
-        if mdl.respond_to? :public_method_defined? and
-            mdl.public_method_defined? :component_name_symbols
-          true
-        end  # etc
-      end
-
       def can sym
-        if @_operations_hash
-          @_operations_hash[ sym ]
+        if @_operations
+          @_operations[ sym ]
         end
       end
 
+      def has_operations
+        ! @_operations.nil?
+      end
+
       def operation_name_symbols
-        h = @_operations_hash
-        if h
-          h.keys
+
+        bx = @_operations
+        if bx
+          bx.get_names
         else
           EMPTY_A_
         end
@@ -225,6 +218,5 @@ module Skylab::Brazen
     Value_Wrapper = -> x do
       Callback_::Known_Known[ x ]
     end
-
   end
 end

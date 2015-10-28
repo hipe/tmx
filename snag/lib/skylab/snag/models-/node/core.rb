@@ -17,7 +17,7 @@ module Skylab::Snag
 
     class << self
 
-      def interpret_for_component_mutation_session st, & x_p  # t5..
+      def interpret_component st, & x_p  # t5..
 
         # the "t" notations refer to tenets of [#br-089]
 
@@ -496,7 +496,7 @@ module Skylab::Snag
 
       class << self
 
-        def interpret_for_component_mutation_session arg_st, & x_p
+        def interpret_component arg_st, & x_p
           Interpret_mixed_message___[ arg_st, & x_p ]
         end
       end  # >>

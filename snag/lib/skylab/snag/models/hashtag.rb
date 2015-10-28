@@ -206,7 +206,7 @@ module Skylab::Snag
 
       class << self
 
-        def interpret_for_component_mutation_session arg_st, & x_p
+        def interpret_component arg_st, & x_p
 
           new_via_string arg_st.gets_one
         end

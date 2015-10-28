@@ -14,7 +14,7 @@ module Skylab::Snag
         ].intern
       end
 
-      def interpret_for_component_mutation_session arg_st, & x_p  # [#br-089]:t6
+      def interpret_component arg_st, & x_p  # [#br-089]:t6
 
         arg = Tag_::Actors_::Normalize_stem[ arg_st.gets_one, & x_p ]
         arg and begin

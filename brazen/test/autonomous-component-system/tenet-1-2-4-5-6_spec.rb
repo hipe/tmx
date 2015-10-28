@@ -115,7 +115,7 @@ module Skylab::Brazen::TestSupport
 
       class ACS_1_Age
 
-        def self.interpret_for_component_mutation_session st, & oes_p
+        def self.interpret_component st, & oes_p
           d = st.gets_one
           if 0 > d
             self._COVER_ME

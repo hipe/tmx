@@ -1,5 +1,8 @@
 # thoughts on the abstract component system ("ACS") experiment :[#089]
 
+(EDIT: the correct name is "[..] autonomous [..]" but we are holding off
+on the file rename until etc.)
+
 ## principles & patterns
 
 • model classes are implemeted as many small, "autonomous" components
@@ -85,7 +88,7 @@ in summary:
 
 5) simple or one-off models typically produce components thru `[]`
 
-6) `interpret_for_component_mutation_session` is above for dedicated models
+6) `interpret_component` is above for dedicated models
 
 7) modifiers (experimental): `via`, `using`, `if` and `assuming`
 
@@ -288,7 +291,7 @@ or `nil`), the result of this call must be an object that responds to
 
 ### 6) the build API for ACS-aware models that model true-ish components
 
-if the model responds to `interpret_for_component_mutation_session`,
+if the model responds to `interpret_component`,
 the ACS will use this means (instead of the means described above) to
 attempt to produce the component.
 
