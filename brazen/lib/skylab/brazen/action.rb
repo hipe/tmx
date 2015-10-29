@@ -72,7 +72,7 @@ module Skylab::Brazen
     def initialize kernel, & oes_p
 
       oes_p or raise ::ArgumentError
-      kernel.respond_to? :unbound_models or raise ::ArgumentError, __say_not_kernel( kernel )
+      kernel.respond_to? :source_for_unbounds or raise ::ArgumentError, __say_not_kernel( kernel )
 
 
       @formal_properties = nil

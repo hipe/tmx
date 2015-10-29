@@ -6,7 +6,7 @@ module Skylab::Brazen
 
       class << self
         def event_class sym
-          Mutation_Session_::Event_Factory_.class_for sym
+          Here_::Event_Factory_.class_for sym
         end
       end  # >>
 
@@ -26,6 +26,7 @@ module Skylab::Brazen
       end
 
       def execute
+
         if @arg_st.unparsed_exists
           send :"__do__#{ @macro_operation_method_name }__"
         else
@@ -118,12 +119,12 @@ module Skylab::Brazen
 
         a = []
         ok = ACHIEVED_
-        p = Operation___.new( @arg_st, @subject_component, & @x_p ).build_p
+        p = Operation___.gets_proc_for @arg_st, @subject_component, & @x_p
 
         begin
           op = p[]
           op or break
-          ok = op.prepare
+          ok = op.interpret
           ok or break
           a.push op
           redo
@@ -191,75 +192,125 @@ module Skylab::Brazen
 
       class Operation___
 
-        def initialize arg_st, comp, & x_p
-          @arg_st = arg_st
-          @component = comp
-          @on_event_selectively = x_p
-        end
+        class << self
 
-        def build_p
+          def gets_proc_for st, acs, & x_p
 
-          arg_st = @arg_st
-          modifiers = nil
+            p = nil
 
-          try = -> do
+            done = -> do
+              p = EMPTY_P_ ; nil
+            end
 
-            begin
-              p = MODIFIERS___[ arg_st.current_token ]
-              if p
-                arg_st.advance_one
-                modifiers ||= Modifiers___.new
-                p[ modifiers, arg_st ]  # cannot soft fail
-                redo
+            p = -> do
+              if st.no_unparsed_exists
+                done[]
+              else
+                new st, acs, & x_p   # we cannot parse yet - see "2 channel" here
               end
-            end while nil
-
-            mystery_verb_sym = arg_st.gets_one
-
-            _association_name_sym = arg_st.gets_one
-
-            _moddies = if modifiers
-              x = modifiers
-              modifiers = nil
-              x
             end
 
-            otr = dup
-            otr.__init _moddies, mystery_verb_sym, _association_name_sym
-            otr
+            -> do
+              p[]
+            end
           end
 
-          -> do
-            if arg_st.unparsed_exists
-              try[]
+          private :new
+        end  # >>
+
+        def initialize arg_st, acs, & x_p
+          @ACS = acs
+          @arg_st = arg_st
+          @modifiers = nil
+          @oes_p = x_p
+        end
+
+        def interpret
+
+          # "2 channel": the presence or absence of any apparent next
+          # operation in the stream is distinct from whether that operation
+          # parses successfully, which is distinct from whether the operation
+          # is received without failure upon delivery.
+
+          if @ACS.respond_to? :"__#{ @arg_st.current_token }__component_operation"
+            __interpret_as_self
+          else
+            p = MODIFIERS__[ @arg_st.current_token ]
+            if p
+              __modifiers p
             end
+            @operation_symbol = @arg_st.gets_one
+            __interpret_deeply
           end
         end
 
-        def __init moddies, mystery_verb_sym, assoc_name_sym
-          @mystery_association_name_symbol = assoc_name_sym
-          @mystery_verb_symbol = mystery_verb_sym
-          @modifiers = moddies || NO_MODIFIERS___
+        def __modifiers p
+
+          @modifiers = Modifiers___.new
+
+          begin
+            @arg_st.advance_one
+            p[ @modifiers, @arg_st ]  # cannot soft fail
+
+            p = MODIFIERS__[ @arg_st.current_token ]
+            p ? redo : break
+          end while nil
           NIL_
         end
 
-        def prepare  # see :#A.: this must be called more or less immediately
+        def __interpret_deeply
 
-          @_association = Component_Association.via_symbol_and_component(
-            @mystery_association_name_symbol, @component )
+          st = @arg_st
+          begin
 
-          if @_association.can @mystery_verb_symbol
-            __resolve_sub_component
+            # current token must be an association
+
+            @association = Component_Association.via_symbol_and_component(
+              st.gets_one,
+              @ACS,
+            )
+
+            # if that association recognizes the operation, success.
+
+            mode = @association.any_delivery_mode_for @operation_symbol
+            if mode
+              break
+            end
+
+            if st.no_unparsed_exists
+              break
+            end
+
+            # if the association itself has an association by this name..
+
+            if @association.model_has_association st.current_token
+              __descend
+              redo
+            end
+
+            break
+          end while nil
+
+          if mode
+            @_delivery_mode = mode
+            __interpret_via_delivery_mode
           else
             raise ::ArgumentError, __say_cannot
           end
         end
 
+        def __descend
+
+          _acs = ACS_::Interpretation::Touch[ @association, @ACS, & @oes_p ]
+          @ACS = _acs
+          @association = nil
+        end
+
         def __say_cannot
 
-          a_i = @mystery_association_name_symbol
-          a = @_association.operation_name_symbols
-          v_i = @mystery_verb_symbol
+          a_i = @arg_st.current_token
+          a = @association.operation_symbols
+          v_i = @operation_symbol
 
           if a.length.zero?
             "no operations defined for '#{ a_i }' - cannot '#{ v_i }'"
@@ -268,19 +319,25 @@ module Skylab::Brazen
           end
         end
 
-        def __resolve_sub_component
+        def __interpret_via_delivery_mode
+          send :"__interpret_when_operation_defined_in__#{ @_delivery_mode }__"
+        end
+
+        def __interpret_when_operation_defined_in__association__
+
+          @modifiers ||= NO_MODIFIERS__
 
           sym = @modifiers.via
           if sym  # :t7.
 
-            comp_x = @_association.component_model.send(
+            comp_x = @association.component_model.send(
               :"new_via__#{ sym }__",
               @arg_st.gets_one,
-              & @on_event_selectively
+              & @oes_p
             )
             ok = comp_x ? true : false
           else
-            vw = @_association.interpret @arg_st, & @on_event_selectively
+            vw = @association.interpret @arg_st, & @oes_p
             if vw
               ok = true
               comp_x = vw.value_x
@@ -291,8 +348,49 @@ module Skylab::Brazen
 
           if ok
             @_sub_component_x = comp_x
+            INTERPRETATION_SUCCEEDED__
+          else
+            ok
           end
-          ok
+        end
+
+        def __interpret_when_operation_defined_in__model__
+
+          _normalize_when_model_op
+          ( o = dup ).extend ACS_::Operation::Preparation::Deep_Methods
+          _interpret_when_model_op_via o
+        end
+
+        def __interpret_as_self
+
+          @_delivery_mode = :model  # be careful
+          @operation_symbol = @arg_st.gets_one
+
+          _normalize_when_model_op
+          ( o = dup ).extend ACS_::Operation::Preparation::Self_Methods
+          _interpret_when_model_op_via o
+        end
+
+        def _normalize_when_model_op
+
+          if @modifiers
+            raise ::ArgumentError, self._COVER_ME
+          else
+            @modifiers = NO_MODIFIERS__
+            NIL_
+          end
+        end
+
+        def _interpret_when_model_op_via o
+          ok = o.prepare
+          if ok
+            @ACS = o.ACS  # might be same
+            @args = o.args
+            @operation = o.operation
+            INTERPRETATION_SUCCEEDED__
+          else
+            ok
+          end
         end
 
         def deliver
@@ -334,11 +432,11 @@ module Skylab::Brazen
             :"component_is__#{ if_o.symbol }__"
           end
 
-          @component.send(
+          @ACS.send(
             _m,
             @_sub_component_x,
-            @_association,
-            & @on_event_selectively )
+            @association,
+            & @oes_p )
         end
 
         def _deliver_when_unevaluated_assumptions_exist
@@ -353,11 +451,11 @@ module Skylab::Brazen
               :"expect_component__#{ assu.symbol }__"
             end
 
-            last_value = @component.send(
+            last_value = @ACS.send(
               _m,
               @_sub_component_x,
-              @_association,
-              & @on_event_selectively )
+              @association,
+              & @oes_p )
 
             last_value or break
           end
@@ -374,22 +472,41 @@ module Skylab::Brazen
 
         def _deliver_when_all_conditions_cleared
 
-          x = @component.send(
-            :"__#{ @mystery_verb_symbol }__component",
+          send :"__deliver_when_operation_defined_in__#{ @_delivery_mode }__"
+        end
+
+        def __deliver_when_operation_defined_in__association__
+
+          _x = @ACS.send(
+            :"__#{ @operation_symbol }__component",
             * @modifiers.using,
             @_sub_component_x,
-            @_association,
-            & @on_event_selectively )
+            @association,
+            & @oes_p )
+
+          _accept_delivery_value _x
+
+          NIL_
+        end
+
+        def __deliver_when_operation_defined_in__model__
+
+          _x = @operation.callable.call( * @args )
+
+          _accept_delivery_value _x
+
+          NIL_
+        end
+
+        def _accept_delivery_value x
 
           @_delivery_was_evaluated = true
           @_delivery_value = x
-
           if x
             @delivery_status = :delivery_succeeded
           else
             @delivery_status = :delivery_was_rejected
           end
-
           NIL_
         end
 
@@ -416,7 +533,7 @@ module Skylab::Brazen
         If_or_Assuming___.new is_negated, st.gets_one
       end
 
-      MODIFIERS___ = {
+      MODIFIERS__ = {
 
         assuming: -> modz, st do
           if ! modz.assuming
@@ -454,13 +571,15 @@ module Skylab::Brazen
 
       Change_Log___ = ::Struct.new :last_delivery_result
 
+      Here_ = self
+
       If_or_Assuming___ = ::Struct.new :is_negated, :symbol
+
+      INTERPRETATION_SUCCEEDED__ = true
 
       Modifiers___ = ::Struct.new :assuming, :has_conditions, :if, :using, :via
 
-      Mutation_Session_ = self
-
-      NO_MODIFIERS___ = Modifiers___.new.freeze
+      NO_MODIFIERS__ = Modifiers___.new.freeze
 
     end
   end

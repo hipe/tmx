@@ -130,8 +130,8 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
     class Kernel_Stub
 
-      def unbound_models
-        self._NOT_USED
+      def source_for_unbounds
+        self._ONLY_for_respond_to
       end
 
       self

@@ -551,16 +551,3 @@ for edit sessions that build or remove items where the caller may want to
 do something with this item). but not this technique cannot be used for
 models where the component can be valid-ly false-ish. (rather, look into
 using the "value wrapper" if you really need to.)
-
-
-
-
-## code notes
-
-### :#A
-
-these "operations" must resolve (build) their one sub-component as they
-are parsed, not after. this is because the sub-components have the autonomy
-to parse as much as they want off the argument stream, so we can't parse
-each next operation until the current operation is done parsing fully.
-_

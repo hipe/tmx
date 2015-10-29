@@ -73,4 +73,26 @@ iterate over each element of the parsed JSON structure using this map -
 the different would be that for serialized structures that do not occupy
 every formal component, there would be less iteration. however, because
 we don't have that hash-like interface we are sticking with this.
+
+
+
+
+### :#note-REF-A
+
+when the method index is in its beginning state, use the below hand-written
+map-reduce to produce each next "entry"; all the while memo'ing each entry
+produced for the one stream. if such a stream ever reaches its end, this
+moves the index out of this beginning state: for subsequent requests we used
+the cached array of entries.
+
+the rationale behind this is that we don't want to index every node if we
+don't have to (for example if we are seeking only one thing as opposed to
+all things). (although the way we may do this now may not need this
+stream anyway.)
+
+the benefit of this is revealed by #coverage-1, which shows the cache
+being used.
+
+the worst case cost to this is if we were were repeatedly request a node
+near the the end but never reach the end.
 _

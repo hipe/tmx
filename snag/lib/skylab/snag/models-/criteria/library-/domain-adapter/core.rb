@@ -13,11 +13,11 @@ module Skylab::Snag
           def new_via_kernel_and_NLP_const kr, const
 
             x = new kr
-            mod = kr.unbound_models
+            src = kr.source_for_unbounds
 
-            mod.constants.each do | const_ |
+            src.constants.each do | const_ |
 
-              x_ = mod.const_get const_, false
+              x_ = src.const_get const_, false
               x_.respond_to? :const_get or next
 
               p = x_.const_get( :Expression_Adapters, false ).

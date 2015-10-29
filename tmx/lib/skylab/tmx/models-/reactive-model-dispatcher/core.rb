@@ -123,8 +123,8 @@ module Skylab::TMX
         :__no_module__
       end
 
-      def unbound_models
-        self._REFERENCE_ONLY
+      def source_for_unbounds
+        self._ONLY_for_respond_to
       end
     end
 

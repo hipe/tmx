@@ -9,17 +9,17 @@ class Kernel  # [#015]
     yield self if block_given?
 
     @_name_function = nil
-    @unbound_models ||= mod.const_get :Models_, false
+    @source_for_unbounds ||= mod.const_get :Models_, false
   end
 
   attr_reader(
     :module,
-    :unbound_models,
+    :source_for_unbounds,
   )
 
   attr_writer(
     :module,
-    :unbound_models,
+    :source_for_unbounds,
   )
 
   # ~ call exposures
@@ -108,7 +108,7 @@ class Kernel  # [#015]
   end
 
   def _silos
-    @__silos ||= Home_::Silo::Collection.new @unbound_models, self
+    @__silos ||= Home_::Silo::Collection.new @source_for_unbounds, self
   end
 
   def init_silos unb_models
@@ -147,7 +147,7 @@ class Kernel  # [#015]
 
   def _unbounds_indexation
 
-    @___UI ||= Home_::Branchesque::Indexation.new @unbound_models
+    @___UI ||= Home_::Branchesque::Indexation.new @source_for_unbounds
   end
 end
 end

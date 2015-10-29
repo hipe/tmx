@@ -141,3 +141,4 @@ module Skylab::Brazen::TestSupport
     end
   end
 end
+# tests in here demonstrate #coverage-1

@@ -4,7 +4,28 @@ module Skylab::Brazen
 
     module Interpretation
 
-      Build_empty_child_bound_to_parent = -> asc, acs, & oes_p do
+      Touch = -> asc, acs, & x_p do
+
+        wv = ACS_::Reflection::Wrapped_value_for[ asc, acs ]
+        if wv
+
+          wv.value_x or self._COVER_ME  # nils may haunt us..
+
+        else
+
+          acs_ = Build_empty_child_bound_to_parent[ asc, acs, & x_p ]
+
+          Accept_valid_value___[ acs_, asc, acs ]  # dat
+
+          acs_
+        end
+      end
+
+      Build_empty_child_bound_to_parent = -> asc, acs, & oes_p do  # 1
+
+        # NOTE this does not assign the child to the parent, it only
+        # creates a one-way dependency of child upon parent with the
+        # eventing.
 
         _special_oes_p = -> * i_a, & ev_p do
 
@@ -21,14 +42,23 @@ module Skylab::Brazen
           & _special_oes_p )
       end
 
+      # ~ encapsulate the fragile assumption about ivars
+
+      Accept_valid_value___ = -> x, asc, acs do
+
+        acs.instance_variable_set asc.name.as_ivar, x
+        NIL_
+      end
+
       Accepter_for = -> acs do
 
-        # assign a *valid* value as an ivar after validation has succeeded.
         -> x, asc do
           acs.instance_variable_set asc.name.as_ivar, x
           NIL_
         end
       end
+
+      # ~
 
       UNDER_UNDER__ = '__'
     end

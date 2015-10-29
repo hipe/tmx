@@ -190,17 +190,33 @@ module Skylab::Brazen
         end
       end
 
-      def can sym
+      def any_delivery_mode_for sym
+
         if @_operations
-          @_operations[ sym ]
+          if @_operations[ sym ]
+            mode = :association
+          end
         end
+        if mode
+          mode
+        elsif __model_has_operation sym
+          :model
+        end
+      end
+
+      def model_has_association sym
+        @component_model.method_defined? :"__#{ sym }__component_association"
+      end
+
+      def __model_has_operation sym
+        @component_model.method_defined? :"__#{ sym }__component_operation"
       end
 
       def has_operations
         ! @_operations.nil?
       end
 
-      def operation_name_symbols
+      def operation_symbols
 
         bx = @_operations
         if bx
@@ -208,6 +224,10 @@ module Skylab::Brazen
         else
           EMPTY_A_
         end
+      end
+
+      def category
+        :association
       end
     end
 

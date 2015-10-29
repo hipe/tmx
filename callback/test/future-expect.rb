@@ -80,13 +80,15 @@ module Skylab::Callback::TestSupport
 
     def __build_future_stream
 
-      a = @_future_expect_queue  # we want warnings
+      a = _future_expect_queue
       if a
         Home_::Polymorphic_Stream.via_array a
       else
         Home_::Polymorphic_Stream.the_empty_polymorphic_stream
       end
     end
+
+    attr_reader :_future_expect_queue
 
     def future_black_and_white ev
 
