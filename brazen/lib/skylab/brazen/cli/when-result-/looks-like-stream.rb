@@ -65,7 +65,7 @@ module Skylab::Brazen
 
       def __resolve_name
 
-        @name = if @item.respond_to? :name
+        @name = if @item.respond_to? :name  # #open [#107] will change this name
           @item.name
         else
 

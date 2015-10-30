@@ -1,5 +1,15 @@
 # myterm changelog
 
+## reset to version 0.0.0.my.pre.bleeding
+
+  • (EDIT: no need to write anything here until this is actually released)
+
+  • (when we do so, we aggregate all "new" (or renewed) features into
+     one summary)
+
+
+
+
 ## for version 0.0.4 -
 
 ### 2012-01-20

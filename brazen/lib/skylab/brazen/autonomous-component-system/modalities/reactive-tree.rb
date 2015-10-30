@@ -10,6 +10,10 @@ module Skylab::Brazen
           @_bx = Callback_::Box.new
         end
 
+        attr_writer(
+          :fallback_module,
+        )
+
         def add const, x
           @_bx.add const, x
         end
@@ -18,7 +22,7 @@ module Skylab::Brazen
           @_bx.get_names
         end
 
-        def const_get const, _inherit=true
+        def const_get const, inherit=true
 
           had = true
           x = @_bx.fetch const do
@@ -28,7 +32,7 @@ module Skylab::Brazen
           if had
             x
           else
-            self._COVER_ME
+            @fallback_module.const_get const, inherit
           end
         end
       end

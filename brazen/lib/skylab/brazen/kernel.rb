@@ -87,9 +87,16 @@ class Kernel  # [#015]
 
   # ~ silo production
 
-  def silo sym, & x_p  # (was `silo_via_symbol`)
+  const_rx = nil
 
-    _silos.via_symbol sym, & x_p
+  define_method :silo do | sym, & x_p |
+
+    const_rx ||= /\A[A-Z]/
+    if const_rx =~ sym
+      silo_via_normal_identifier [ sym ]
+    else
+      _silos.via_symbol sym, & x_p
+    end
   end
 
   def silo_via_normal_identifier const_a

@@ -43,9 +43,16 @@ module Skylab::Brazen
 
         sym = const.downcase
         @_h.fetch sym do
-          unb = @_unbound_modules.const_get const, false
-          _cls = _silo_daemon_class_via_unbound unb
-          _add _cls, sym, unb
+
+          x = @_unbound_modules.const_get const, false
+
+          _cls = if x.respond_to? :build_unordered_selection_stream
+            _silo_daemon_class_via_unbound x
+          else
+            x.const_get DAEMON_CONST__, false
+          end
+
+          _add _cls, sym, x
         end
       end
 
@@ -183,15 +190,14 @@ module Skylab::Brazen
       end
 
       def _add cls, sym, unb
-        _cls = _silo_daemon_class_via_unbound unb
         x = cls.new @_kernel, unb
         @_bx.add sym, x
         x
       end
 
-      def _silo_daemon_class_via_unbound x
+      def _silo_daemon_class_via_unbound unb
 
-        x.silo_module.const_get DAEMON_CONST___, false
+        unb.silo_module.const_get DAEMON_CONST__, false
       end
 
       def register_silo x, sym
@@ -308,6 +314,6 @@ module Skylab::Brazen
       )
     end  # silo daemon class
 
-    DAEMON_CONST___ = :Silo_Daemon
+    DAEMON_CONST__ = :Silo_Daemon
   end
 end

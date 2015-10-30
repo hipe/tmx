@@ -1,3 +1,7 @@
 #!/usr/bin/env ruby -w
 
-# (this executable file has been reverted to empty for the transition)
+require 'skylab/myterm'
+
+Skylab::MyTerm::CLI.new(
+  $stdin, $stdout, $stderr, [ ::File.basename( $PROGRAM_NAME ) ]
+).invoke ARGV

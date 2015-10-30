@@ -90,7 +90,7 @@ module Skylab::Brazen
           assocs = acs.component_association_symbols
           if assocs
             as_st = Callback_::Stream.via_nonsparse_array assocs do | sym |
-              Entry__.new sym, :@is_association
+              Entry__.new sym, :association
             end
           end
         end
@@ -103,13 +103,13 @@ module Skylab::Brazen
           ops = acs.component_operation_symbols
           if ops
             op_st = Callback_::Stream.via_nonsparse_array ops do | sym |
-              Entry__.new sym, :@is_operation
+              Entry__.new sym, :operation
             end
           end
         end
 
         mi = -> do
-          x = Method_index_of_class__[ acs.class ]
+          x = Method_index_of_class[ acs.class ]
           mi = -> { x }
           x
         end
@@ -144,7 +144,7 @@ module Skylab::Brazen
         end
       end
 
-      Method_index_of_class__ = -> cls do
+      Method_index_of_class = -> cls do  # 1
 
         cls.class_exec do
 
@@ -192,14 +192,23 @@ module Skylab::Brazen
               x
             end
           end
+
+          @_indexed = false
         end
 
-        def association_name_symbols
-          @__did_index ||= __index
-          @_association_name_symbols
+        def association_symbols
+          @_indexed || _index
+          @_association_symbols
         end
 
-        def __index
+        def operation_symbols
+          @_indexed || _index
+          @_operation_symbols
+        end
+
+        def _index
+
+          @_indexed = true
 
           entry = nil
           freeze_me = []
@@ -219,8 +228,8 @@ module Skylab::Brazen
             end
           end
 
-          o[ :@_association_name_symbols, :association ]
-          o[ :@_operation_name_symbols, :operation ]
+          o[ :@_association_symbols, :association ]
+          o[ :@_operation_symbols, :operation ]
 
           st = @_entry_stream[]
           while entry = st.gets
@@ -286,7 +295,7 @@ module Skylab::Brazen
           if mdl.method_defined? :component_association_symbols
             true
           else
-            ! Method_index_of_class__[ mdl ].association_name_symbols.nil?
+            ! Method_index_of_class[ mdl ].association_symbols.nil?
           end
         end
       end
