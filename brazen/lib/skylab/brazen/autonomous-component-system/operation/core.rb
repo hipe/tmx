@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   module Autonomous_Component_System
 
-    class Operation  # experimental dsl for "rich" operations
+    class Operation  # experimental dsl for "rich" operations. notes in [#083]
 
       class << self
 
@@ -84,6 +84,10 @@ module Skylab::Brazen
         )
         NIL_
       end
+
+      attr_reader(
+        :name_symbol,
+      )
 
       def association  # (look like qkn for now)
         self

@@ -64,6 +64,28 @@ to a mutation session which interprets the input.)
 
 
 
+## the modality API of "reactive tree"
+
+### what is a hybrid? :#note-RT-A
+
+the "unbound"/"bound" dichotomy is one that tries to leverage the
+"classical model" in which taxonomic, model and action nodes are
+represented variously by modules, classes and (again) classes
+respectively. this adaptation of an ACS into a reactive tree is
+decidedly not the classical model. as such, we attempt to reduce noise
+in our implementation by using the same object to act as an unbound and
+bound node. we refer to such objects as "hybrids" here.
+
+
+
+
+### :#note-RT-B
+
+we don't want it
+
+
+
+
 ### :#note-JSON-A
 
 we do this by interating over the *whole* formal structure first, and
@@ -77,7 +99,22 @@ we don't have that hash-like interface we are sticking with this.
 
 
 
-### :#note-REF-A
+
+### :#note-REFL-A
+
+we want the node to be able to define its own (perhaps nil-ish) list of
+each of the things. if one or more of the things is not defined in this
+manner, we use the simple method index.
+
+however, if one or both of these "name symbols" methods is defined,
+then we effectively group the entries by category in this hard-coded
+order.
+
+
+
+
+
+### :#note-REFL-B
 
 when the method index is in its beginning state, use the below hand-written
 map-reduce to produce each next "entry"; all the while memo'ing each entry
@@ -95,4 +132,22 @@ being used.
 
 the worst case cost to this is if we were were repeatedly request a node
 near the the end but never reach the end.
+
+
+
+
+### "why no blocks?" :#note-OPER-A
+
+for now, we don't pass the oes block here because (child) components
+have a special block created for them that lets them send messages to
+the parent without knowing whether or not they have a parent. this
+special block is created at construction time and is an instance
+variable. to reduce the strain on the ACS class, we don't require that
+it create an attr-reader for this proc, just so that we can read this
+proc and pass it back to the selfsame component. rather, we expec that
+the component manage its own eventing in this manner, by calling its own
+ivar with the special block.
+
+however, this treatment of this situation is *very* default and is not
+expected to hold up for all uses.
 _

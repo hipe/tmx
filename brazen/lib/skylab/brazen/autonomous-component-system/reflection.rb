@@ -15,11 +15,45 @@ module Skylab::Brazen
 
         p = Component_Association.builder_for acs
 
-        To_entry_stream___[ acs ].map_reduce_by do | entry |
+        To_entry_stream__[ acs ].map_reduce_by do | entry |
 
           if entry.is_association
             p[ entry.name_symbol ]
           end
+        end
+      end
+
+      To_node_stream = -> acs do  # 1
+
+        h = {}
+
+        h[ :association ] = -> x do
+
+          build_asc = Component_Association.builder_for acs
+
+          build_qkn = Qualified_knownness_builder_for__[ acs ]
+
+          p = -> sym do
+            build_qkn[ build_asc[ sym ] ]
+          end
+          h[ :association ] = p
+          p[ x ]
+        end
+
+        h[ :operation ] = -> x do
+
+          build_op = ACS_::Operation.builder_for acs
+
+          p = -> sym do
+            build_op[ sym ]
+          end
+          h[ :operation ] = p
+          p[ x ]
+        end
+
+        To_entry_stream__[ acs ].map_by do | entry |
+
+          h.fetch( entry.category )[ entry.name_symbol ]
         end
       end
 
@@ -42,11 +76,11 @@ module Skylab::Brazen
         end
       end
 
-      To_entry_stream___ = -> acs do
+      To_entry_stream__ = -> acs do
 
         # for now, we don't cache the reflection on the below 2 methods which
         # leaves the door open for some extreme hacking of singleton classes.
-        # see "why so serious?" in [#doc]:#note-REF-A for more.
+        # see "why so serious?" in [#doc]:#note-REFL-A for more.
 
         if acs.respond_to? :component_association_symbols
 
@@ -123,7 +157,7 @@ module Skylab::Brazen
 
         def initialize meth_a
 
-          # the below cacheing rationale is explored at #note-REF-A
+          # the below cacheing rationale is explored at #note-REFL-B
 
           @_entry_stream = -> do
 

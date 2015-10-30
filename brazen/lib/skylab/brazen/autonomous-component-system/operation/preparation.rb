@@ -17,11 +17,31 @@ module Skylab::Brazen
       #   • real defaults and
       #   • the implementation of named arguments on top of all the above
       #
-      # as for implementation, because so many parameters are shared by
-      # this concern and its client we do the strange trick with duping
-      # and extending to create a session.
+      # this library has three exposures: one is as a typical session. the
+      # other two of are to be used with the strange trick of duping and
+      # extending to create a session, because of how many parameters are
+      # shared by this concern and the client there.
 
       Common__ = ::Module.new
+
+      class Session
+
+        include Common__
+
+        def operation= x
+          @operation = x
+          _init_box_via_operation
+          NIL_
+        end
+
+        attr_writer(
+          :arg_st,
+        )
+
+        attr_reader(
+          :args,
+        )
+      end
 
       module Self_Methods
 
@@ -61,6 +81,12 @@ module Skylab::Brazen
             @ACS,
           )
 
+          _init_box_via_operation
+
+          NIL_
+        end
+
+        def _init_box_via_operation
           @_bx = @operation.formal_properties
           NIL_
         end
@@ -70,7 +96,7 @@ module Skylab::Brazen
           if 1 == @_bx.length && @_bx.at_position( 0 ).is_required
             __prepare_single_style
           else
-            __prepare_multi_style
+            process_named_arguments
           end
         end
 
@@ -84,7 +110,7 @@ module Skylab::Brazen
           end
         end
 
-        def __prepare_multi_style
+        def process_named_arguments
 
           # the objective is to implement the interpretation of named
           # arguments in such a way that uses the real defaults in the
@@ -121,7 +147,10 @@ module Skylab::Brazen
           # ~
 
           wrapped_value = nil ; when_missing = nil
-          value_for_optional = nil ; no_value_for_optional = nil
+
+          value_for_optional = nil
+          value_for_glob = nil
+          no_value_for_optional = nil
 
           op_h = {
 
@@ -146,9 +175,13 @@ module Skylab::Brazen
 
             zero_or_more: -> do  # `rest`
 
-              self._FUN_GLOB_WAHOO
               op_h.delete :zero_or_more  # sanity
-              ACHIEVED_
+              wv = wrapped_value[]
+              if wv
+                value_for_glob[]
+              else
+                no_value_for_optional[]
+              end
             end
           }
 
@@ -188,6 +221,12 @@ module Skylab::Brazen
             KEEP_PARSING_
           end
 
+          value_for_glob = -> do
+
+            args.concat wv.value_x  # oh man
+            KEEP_PARSING_
+          end
+
           no_value_for_optional = -> do
 
             # once you start (effectively) requesting platform ("real")
@@ -199,9 +238,12 @@ module Skylab::Brazen
 
             last_opt = nil
 
-            value_for_optional = -> do
+            same = -> do
               raise ::ArgumentError, __say_opt_hop( par, last_opt )
             end
+
+            value_for_optional = same
+            value_for_glob = same
 
             no_value_for_optional = -> do
               last_opt = par
@@ -243,7 +285,7 @@ module Skylab::Brazen
             "`#{ par.name_symbol }`"
           end
 
-          _ = "`#{ @operation_symbol }`"
+          _ = "`#{ @operation.name_symbol }`"
 
           "call to #{ _ } missing required argument(s): (#{ _s_a * ', '})"
         end
@@ -271,11 +313,7 @@ module Skylab::Brazen
             x = arg_st.gets_one
 
             h ||= {}
-            if par.takes_many_arguments
-              self._COVER_ME_easy_fun_many_args
-            else
-              h[ k ] = x  # overwrite OK
-            end
+            h[ k ] = x  # overwrite OK, NOTWITHSTANDING globs (be careful!)
 
             redo
           end while nil

@@ -67,6 +67,13 @@ on the file rename until etc.)
   more than one entity of one class in one runtime, which we haven't
   yet (but hope to..)
 
+• an ACS does not express its tree thru use of the platform module system,
+  (nor the filesystem tree that usually isomorphs with this). the ACS
+  instead expresses its tree thru explicitly stated component associations.
+  this means that each association is effectively loaded lazily, freeing
+  us from [#br-065] stubbing hacks. also it means that modlue (and
+  filesystem) structure can stay flat as the application tree evolves.
+
 • there is as yet no facility for what we used to call business-specific
   meta-properties. we want this, and will provision for it when its
   absence becomes at all painful. (again this is :+[#120].)
