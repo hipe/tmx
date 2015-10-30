@@ -45,7 +45,8 @@
                ignored for the greater good, for usability
 [#085]       track varied implementations of poly.stream for one value
              (#was: (#moved-to: [#ba-052]))
-[#084]       :+#wishlist a `flag` meta-meta prperty
+[#084]       thoughts on ACS isomophisms ..
+             ( #also :+#wishlist a `flag` meta-meta property )
 [#083]       ACS interpretations & expresssions .. (#parent-node: [#089])
              ( #was: #done workspace `init` action should not default to '.' in API )
 [#082]       #track meta-meta-property candidates (list, enum etc)

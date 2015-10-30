@@ -52,7 +52,7 @@ module Skylab::Brazen::TestSupport
         # ~ to be an unbound
 
         def build_unordered_index_stream & oes_p
-          Local_subject__[]::Build_unordered_index_stream[ __nf, self, & oes_p ]
+          Local_subject__[]::Self_as_unbound_stream[ __nf, self, & oes_p ]
         end
 
         def __nf
@@ -78,15 +78,11 @@ module Skylab::Brazen::TestSupport
         end
       end
 
+      Local_Lib__ = TS_.lib :autonomous_component_system_support
+
       class Lace
 
-        def self.interpret_component st, & oes_p
-
-          if st.unparsed_exists
-            self._SANITY
-          end
-          new( & oes_p )
-        end
+        Local_Lib__::Common_child_class_methods[ self ]
 
         def initialize & p
 

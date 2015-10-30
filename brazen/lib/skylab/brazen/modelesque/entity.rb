@@ -230,7 +230,7 @@ module Skylab::Brazen
 
           def under_expression_agent_get_N_desc_lines expag, n=nil
 
-            LIB_.N_lines[ [], n, @desc_p_a, expag ]
+            N_lines_[ [], n, @desc_p_a, expag ]
           end
 
           def describe_by & p

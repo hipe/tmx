@@ -21,6 +21,11 @@ prerequisites:
 acceptable number of occurrences of actual parameters for it in actual
 request?"
 
+this concept is reinforced by the platform language's reflective
+`Method#parameters` method and the sorts of categorizations it applies
+to parameters: `opt`, `req`, `rest`. our treatment here acts as a more
+general superset to these three (and is not concerned with `block`).
+
 "parameter arity" itself is a "metaproperty", that is, it is a property
 of properties.
 
@@ -40,11 +45,13 @@ recognizes something like the following classifications:
 
     `zero_or_one`              the actual parameter may acceptably
                                occur zero or one times. i.e it is
-                               an "optional field".
+                               an "optional field". the platform
+                               equivalent category is `opt`.
 
     `one`                      the actual parameter must occur
                                exactly one time in the request. i.e
-                               it is a "required field".
+                               it is a "required field". the platform
+                               equivalent category is `req`.
 
 in a world where we put the "polyady" on the "parameter" and not
 "argument" arity (explored later), we might find it useful to
@@ -52,7 +59,8 @@ classify the below:
 
     `zero_or_more`             a "polyadic arity", the "field" can take
                                multiple actual paramters, but none is
-                               necessary.
+                               necessary. the platform equivalent
+                               category of this is `rest`.
 
     `one_or_more`              also a "polyadic arity", the minimum
                                acceptable number of actual parameters

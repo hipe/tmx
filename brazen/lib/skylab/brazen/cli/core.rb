@@ -883,7 +883,7 @@ module Skylab::Brazen
           me.describe_into_under y, self  # :+#hook-out
         end ]
 
-        LIB_.N_lines.call [], d, _p_a, expag
+        N_lines_[ [], d, _p_a, expag ]
       end
 
       def formal_properties
@@ -1973,7 +1973,7 @@ module Skylab::Brazen
 
       def under_expression_agent_get_N_desc_lines expag, d=nil
 
-        LIB_.N_lines.call [], d, [ @desc ], expag
+        N_lines_[ [], d, [ @desc ], expag ]
       end
 
       def takes_argument  # zero to many takes argument

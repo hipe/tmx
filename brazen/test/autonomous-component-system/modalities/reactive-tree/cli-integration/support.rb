@@ -1,0 +1,120 @@
+module Skylab::Brazen::TestSupport
+
+  module Autonomous_Component_System::Modalities::Reactive_Tree::CLI_Integration::Support
+
+    class << self
+
+      def [] tcc
+        TS_.CLI::Expect_CLI[ tcc ]
+        tcc.include self ; nil
+      end
+
+      def kernel_
+        @___kernel ||= Load_kernel___[]
+      end
+    end  # >>
+
+    Load_kernel___ = -> do
+
+      ds = Local_subject__[]::Dynamic_Source_for_Unbounds.new
+
+      ds.add :Appie, Appie.new
+
+      Home_::Kernel.new Here_ do | ke |
+        ke.source_for_unbounds = ds
+      end
+    end
+
+    class Appie
+
+      def build_unordered_index_stream & cli_oes_p
+
+        @_oes_p = cli_oes_p
+
+        Local_subject__[]::Children_as_unbound_stream[ self, & cli_oes_p ]
+      end
+
+      def __wazoozie_foozie__component_operation
+
+        yield :description, -> y do
+          y << "have #{ code 'fun' }"
+        end
+
+        yield :parameter, :flim_flam, :description, -> y do
+          y << code( 'yes' )
+        end
+
+        -> flim_flam do
+
+          @_oes_p.call :info, :expression, :hello do | y |
+            y << "hello #{ code flim_flam }"
+          end
+
+          12332
+        end
+      end
+
+      def __fantazzle_dazzle__component_association
+
+        Faz_Daz
+      end
+    end
+
+    Local_Lib__ = TS_.lib :autonomous_component_system_support
+
+    class Faz_Daz
+
+      Local_Lib__::Common_child_methods[ self ]
+
+      def describe_into_under y, expag
+        expag.calculate do
+          y << code( 'yay' )
+        end
+      end
+
+      def __open__component_operation
+
+        yield :parameters, :default, nil,
+
+              :parameter, :verbose, :is_flag,
+                :description, -> y { y << 'tha V' },
+
+              :parameter, :dry_run, :is_flag,
+
+              :end
+
+        -> verbose=nil, dry_run=nil, file do
+
+          @oes_p_.call :info, :expression, :k do | y |
+            y << [ :file, file, * ( :V if verbose ), * ( :D if dry_run ) ].inspect
+          end
+
+          :_neat_
+        end
+      end
+    end
+
+    # ~ as module
+
+      def subject_CLI
+        Home_::CLI
+      end
+
+      def get_invocation_strings_for_expect_stdout_stderr
+        [ 'fam' ]
+      end
+
+      def CLI_options_for_expect_stdout_stderr
+
+        [ :back_kernel, Here_.kernel_ ]
+      end
+
+    # ~
+
+    Local_subject__ = -> do
+      Home_::Autonomous_Component_System::Modalities::Reactive_Tree
+    end
+
+    Here_ = self
+  end
+end

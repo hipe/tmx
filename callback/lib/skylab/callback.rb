@@ -545,6 +545,18 @@ module Skylab::Callback
       p
     end
 
+    def gets_last_one
+      x = gets_one
+      if unparsed_exists
+        raise ::ArgumentError, __say_unexpected
+      end
+      x
+    end
+
+    def __say_unexpected
+      "unexpected: #{ Home_.lib_.basic::String.via_mixed current_token }"
+    end
+
     def no_unparsed_exists
       @x_a_length == @d
     end

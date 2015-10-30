@@ -30,6 +30,19 @@ module Skylab::Brazen
       end
     end  # >>
 
+    teea = nil
+    build_the_empty_expression_agent = -> do
+      class Empty_Expag < ::BasicObject
+        def calculate y, & p
+          instance_exec y, & p
+        end
+        new
+      end
+    end
+    API.send :define_singleton_method, :the_empty_expression_agent do
+      teea ||= build_the_empty_expression_agent[]
+    end
+
     Exit_statii__ = Callback_.memoize do
 
       class Exit_Statii__

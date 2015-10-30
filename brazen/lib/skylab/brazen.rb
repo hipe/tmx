@@ -183,6 +183,10 @@ module Skylab::Brazen
     Autoloader_[ self ]
   end
 
+  N_lines_ = -> a, d, p_a, expag do
+    Callback_::Event::N_Lines.new_via_four( a, d, p_a, expag ).execute
+  end
+
   module Lib_
 
     sidesys, stdlib = Autoloader_.at(
@@ -207,10 +211,6 @@ module Skylab::Brazen
 
     Mutable_iambic_scanner = -> do
       Home_::Entity.mutable_polymorphic_stream
-    end
-
-    N_lines = -> do
-      Callback_::Event::N_Lines
     end
 
     Net_HTTP = _memoize do

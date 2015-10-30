@@ -14,6 +14,32 @@ module Skylab::Brazen::TestSupport
       ACS__[]
     end
 
+    Common_child_methods = -> cls do
+
+      Common_child_class_methods[ cls ]
+
+      cls.send :define_method, :initialize do | & x_p |
+        @oes_p_ = x_p
+      end
+      NIL_
+    end
+
+    Common_child_class_methods = -> cls do
+      class << cls
+        define_method :interpret_component, INTERPRET_COMPONENT
+        private :new
+      end
+      NIL_
+    end
+
+    INTERPRET_COMPONENT = -> st, & x_p do
+      if st.unparsed_exists
+        self._SANITY
+      else
+        new( & x_p )
+      end
+    end
+
     class Simple_Name
 
       attr_accessor(

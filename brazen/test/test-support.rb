@@ -23,12 +23,19 @@ module Skylab::Brazen::TestSupport
 
   module ModuleMethods
 
-    define_method :use, -> do
+    def use sym
+      TS_.lib( sym )[ self ]
+    end
+  end
+
+  # ->
+
+    TS_.send :define_singleton_method, :lib, -> do
 
       cache_h = {}
 
       -> sym do
-        ( cache_h.fetch sym do
+        cache_h.fetch sym do
 
           s = sym.id2name
           const = :"#{ s[ 0 ].upcase }#{ s[ 1 .. -1 ] }"
@@ -39,10 +46,11 @@ module Skylab::Brazen::TestSupport
           end
           cache_h[ sym ] = x
           x
-        end )[ self ]
+        end
       end
     end.call
-  end
+
+    # <-
 
   module InstanceMethods
 

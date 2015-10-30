@@ -14,13 +14,15 @@ module Skylab::Brazen
       #
       #   • required-ness,
       #   • globs,
-      #   • real defaults and
+      #   • real defaults/specified defaults
       #   • the implementation of named arguments on top of all the above
       #
       # this library has three exposures: one is as a typical session. the
       # other two of are to be used with the strange trick of duping and
       # extending to create a session, because of how many parameters are
       # shared by this concern and the client there.
+      #
+      # more notes in [#084]
 
       Common__ = ::Module.new
 
@@ -87,7 +89,7 @@ module Skylab::Brazen
         end
 
         def _init_box_via_operation
-          @_bx = @operation.formal_properties
+          @_bx = @operation.formal_properties_in_callable_signature_order
           NIL_
         end
 
@@ -112,27 +114,78 @@ module Skylab::Brazen
 
         def process_named_arguments
 
-          # the objective is to implement the interpretation of named
-          # arguments in such a way that uses the real defaults in the
-          # signature while asserting the required parameters and
-          # integrating any one glob parameter.
-          #
-          # towards using real defaults we cannot merely place the values
-          # into a fixed-width array with holes left in it. rather we have
-          # to "skip over" an entry for `opt` params that were not passed.
-          #
-          # the syntax of the platform language dictates that these "real"
-          # defaults (`opt`) must always be contiguous with respect to one
-          # another; and if there is a `rest` param along with them, it
-          # must be placed immediately after them. but this "section" can
-          # occur in front of, behind, or in the middle of the zero or more
-          # `req` parameters.
-          #
-          # as such we do not assert that syntax here but assume it.
+          proto = @operation.prototype_parameter
+
+          if proto && proto.default_block
+            __process_named_arguments_with_default_default proto
+
+          else
+            __process_named_arguments_feebly
+          end
+        end
+
+        def __process_named_arguments_with_default_default proto  # see #note-B
+
+          default_default = -> do
+            x = proto.default_block.call
+            default_default = -> { x }
+            x
+          end
+
+          args = []
+          st = @_bx.to_value_stream
+          wv_h = _slice_off_relevant_args
+
+          begin
+
+            par = st.gets
+            par or break
+
+            wv = wv_h[ par.name_symbol ]
+            if wv
+              x = wv.value_x
+
+            elsif par.is_required
+              self._COVER_ME_as_written
+              raise ::ArgumentError, __say_missing( par, wv_h, st )
+
+            else
+              p = par.default_block
+              x = if p
+                p[]
+              else
+                default_default[]
+              end
+            end
+
+            if par.takes_many_arguments
+              self._HOLD_THE_PHONE
+            end
+
+            args.push x
+
+            redo
+          end while nil
+
+          @args = args
+          ACHIEVED_
+        end
+
+        def __say_missing par, wv_h, st
+          a = [ par ]
+          while par = st.gets
+            wv_h[ par.name_symbol ] and next
+            par.is_required or next
+            a.push par
+          end
+          _say_missing a
+        end
+
+        def __process_named_arguments_feebly  # see #note-A
 
           # ~ local globals for work
 
-          h = __slice_off_relevant_args
+          wv_h = _slice_off_relevant_args
           op_h = nil
           par = nil
           st = @_bx.to_value_stream
@@ -185,12 +238,9 @@ module Skylab::Brazen
             end
           }
 
-          wrapped_value = if h
+          wrapped_value = if wv_h
             -> do
-              had = true ; x = h.fetch( par.name_symbol ) { had = false }
-              if had
-                Value_Wrapper[ x ]
-              end
+              wv_h[ par.name_symbol ]
             end
           else
             EMPTY_P_
@@ -227,14 +277,7 @@ module Skylab::Brazen
             KEEP_PARSING_
           end
 
-          no_value_for_optional = -> do
-
-            # once you start (effectively) requesting platform ("real")
-            # defaults by not passing an argument, you cannot stop using
-            # defaults and go back to explicitly passing values for these
-            # `opt` parameters because of a necessary asymmetry determined
-            # by the platform syntax (because platform arguments are not
-            # in fact named).
+          no_value_for_optional = -> do  # see #note-A.2
 
             last_opt = nil
 
@@ -257,7 +300,7 @@ module Skylab::Brazen
           begin
             par = st.gets
             par or break
-            ok = op_h.fetch( par.normal_arity ).call
+            ok = op_h.fetch( par.parameter_arity ).call
             ok or break
             redo
           end while nil
@@ -266,20 +309,13 @@ module Skylab::Brazen
             @args = args
             ok
           elsif missing
-
-            # it's the responsibility of the client to express validity in
-            # its own modality appropriate way. if required parameters are
-            # not passed at this low level it is deemed a failure at using
-            # one's own internal API, and as such it is not appropriate to
-            # emit an event. to raise an exception is useful for debugging.
-
-            raise ::ArgumentError, __say_missing( missing )
+            raise ::ArgumentError, _say_missing( missing )  # :+#note-C
           else
             self._COVER_ME
           end
         end
 
-        def __say_missing missing
+        def _say_missing missing
 
           _s_a = missing.map do | par |
             "`#{ par.name_symbol }`"
@@ -297,9 +333,12 @@ module Skylab::Brazen
             }of our leaky isomorphism between methods and named args"
         end
 
-        def __slice_off_relevant_args
+        def _slice_off_relevant_args
 
-          arg_st = @arg_st ; bx = @_bx ; h = nil
+          # random access to name-value pairs to algorithms that want it.
+          # argument arities of zero and one are recognized but no others.
+
+          arg_st = @arg_st ; bx = @_bx.h_ ; h = nil
 
           begin
             if arg_st.no_unparsed_exists
@@ -309,11 +348,16 @@ module Skylab::Brazen
             par or break
 
             arg_st.advance_one
-            k = par.name_symbol
-            x = arg_st.gets_one
+
+            _x = if par.takes_argument
+              arg_st.gets_one  # ..
+            else
+              true  # as flag
+            end
 
             h ||= {}
-            h[ k ] = x  # overwrite OK, NOTWITHSTANDING globs (be careful!)
+            h[ par.name_symbol ] = Value_Wrapper[ _x ]
+              # overwrite OK, NOTWITHSTANDING globs (be careful!)
 
             redo
           end while nil

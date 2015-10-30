@@ -20,7 +20,7 @@ on the file rename until etc.)
     * entire collections of entites can be conceived of as components
 
 • components are mutated through "edit sessions" (referred to internally
-  as "muation sessions"). if we ever apply this to a platform that likes
+  as "mutation sessions"). if we ever apply this to a platform that likes
   immutable data, we have this assumption isolated conceptually.
 
 • participating "compound components" (components that consist mainly
@@ -44,18 +44,30 @@ on the file rename until etc.)
 
 
 
+
 ## how it is better (or worse) than [#001] entities?
 
-• less minimum API - the way this necessarily alters the interface of the
-  client class is simplified: for basic "inward reception" (below)
-  without special features, there need be only the component association
-  builder method(s), all of which have a namespace-safe name convention that
-  is of the safe "generated form" variety.
+• no subclassing or mixin modules or load-time DSL's -
 
-    • also, `result_for_component_mutation_session_when_changed`
-    • also, `result_for_component_mutation_session_when_no_change`
+  the ACS has a much simpler minimum API than its predecessor.
+  participating classes need only implement particular methods with
+  names matching patterns to express their associations and operations.
+  and the must implement themselves only the methods they need to reach
+  ACS subsystems (typically one line each).
 
-• dynamicism is heavily assumed - using [#001] we had to jump thru some hoops
+  the instance method namespace is respected because only "generated
+  names" are used by the ACS (with the exception of:
+
+    • `result_for_component_mutation_session_when_changed`
+    • `result_for_component_mutation_session_when_no_change`
+
+  IFF you want edit sessions (and for now only!))
+
+
+
+• dynamicism is heavily assumed -
+
+  with our [#001] predecessor we had to jump thru some hoops
   to allow the individual entity to have "dynamic formal properties".
   here, neither by default nor at all do we ever think that to reflect
   on the entity's formal associations should we look to its class.
@@ -67,12 +79,16 @@ on the file rename until etc.)
   more than one entity of one class in one runtime, which we haven't
   yet (but hope to..)
 
+
+
 • an ACS does not express its tree thru use of the platform module system,
   (nor the filesystem tree that usually isomorphs with this). the ACS
   instead expresses its tree thru explicitly stated component associations.
   this means that each association is effectively loaded lazily, freeing
-  us from [#br-065] stubbing hacks. also it means that modlue (and
+  us from [#br-065] stubbing hacks. also it means that module (and
   filesystem) structure can stay flat as the application tree evolves.
+
+
 
 • there is as yet no facility for what we used to call business-specific
   meta-properties. we want this, and will provision for it when its

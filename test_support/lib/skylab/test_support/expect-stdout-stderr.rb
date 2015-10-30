@@ -239,7 +239,7 @@ module Skylab::TestSupport
 
       def flush_to_expect_stdout_stderr_emission_summary_expecter
 
-        # (it would be nice to use Enumerable.chunk by we have a reduce too)
+        # (it would be nice to use Enumerable.chunk but we have a reduce too)
 
         st = stream_for_expect_stdout_stderr
         y = []
@@ -266,9 +266,12 @@ module Skylab::TestSupport
       end
 
       def flush_to_content_scanner
+        flush_to_content_scanner_on_stream @__sout_serr_default_stream_symbol__
+      end
 
-        _st = sout_serr_line_stream_for_contiguous_lines_on_stream(
-          @__sout_serr_default_stream_symbol__ )
+      def flush_to_content_scanner_on_stream sym
+
+        _st = sout_serr_line_stream_for_contiguous_lines_on_stream sym
 
         Home_::Expect_Line::Scanner.via_line_stream _st
       end

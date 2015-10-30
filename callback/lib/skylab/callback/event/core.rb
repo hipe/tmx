@@ -325,23 +325,60 @@ module Skylab::Callback
           end
 
           def _call_via_arglist a
-            new( * a ).execute
+            new_via_four( * a ).execute
           end
 
-          alias_method :new_via_four, :new
+          def new_via_four y, d, p_a, expag
+            o = new
+            o.__init_via_four y, d, p_a, expag
+            o
+          end
+
+          alias_method :session, :new
           private :new
         end  # >>
 
-        def initialize y, n, p_a, expag
+        def initialize
 
-          @do_first_line = true
-          @expag = expag
-          @p_a = p_a
-          @y = y
+          @_do_first_line = true
+
+          super() do | line |
+            @_receive_line[ line ]
+          end
+        end
+
+        attr_writer(
+          :downstream_yielder,
+          :num_lines,
+          :expression_agent,
+        )
+
+        def describe_by & p
+          @_p_a = [ p ] ; nil
+        end
+
+        def __init_via_four y, n, p_a, expag
+
+          @downstream_yielder = y
+          @expression_agent = expag
+          @num_lines = n
+          @_p_a = p_a
+          NIL_
+        end
+
+        def execute * a
+
+          @_receive_line = __build_receive_line_proc
+          __execute a
+        end
+
+        def __build_receive_line_proc
+
+          n = @num_lines
 
           if n
             if 1 > n
-              @do_first_line = false
+              @_do_first_line = false
             else
               d = 0
               tick_p = -> { n != ( d += 1 ) }
@@ -350,29 +387,29 @@ module Skylab::Callback
             tick_p = NILADIC_TRUTH_
           end
 
-          super() do | line |
-            @y << line
+          -> line do
+            @downstream_yielder << line
             tick_p[] or throw :__done_with_N_lines__
             NIL_
           end
         end
 
-        def execute( * a )
+        def __execute a
 
-          if @do_first_line
+          if @_do_first_line
 
             catch :__done_with_N_lines__ do
 
-              @p_a.each do | p |
+              @_p_a.each do | p |
 
                 p ||= Inferred_Message.to_proc
 
-                @expag.calculate self, * a, & p
+                @expression_agent.calculate self, * a, & p
               end
             end
           end
 
-          @y
+          @downstream_yielder
         end
       end
 

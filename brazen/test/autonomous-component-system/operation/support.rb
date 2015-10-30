@@ -65,31 +65,11 @@ module Skylab::Brazen::TestSupport
         attr_reader( :lace, :size, :special )
       end
 
-      Common__ = -> cls do
-        cls.class_exec do
-          class << self
-            define_method :interpret_component, IC__
-            private :new
-          end
-
-          def initialize & x_p
-            @_oes_p = x_p
-          end
-        end
-        NIL_
-      end
-
-      IC__ = -> st, & x_p do
-        if st.unparsed_exists
-          self._SANITY
-        else
-          new( & x_p )
-        end
-      end
+      Local_Lib__ = TS_.lib :autonomous_component_system_support
 
       class Lace
 
-        Common__[ self ]
+        Local_Lib__::Common_child_methods[ self ]
 
         def __color__component_association
           Color
@@ -100,13 +80,13 @@ module Skylab::Brazen::TestSupport
 
       class Color
 
-        Common__[ self ]
+        Local_Lib__::Common_child_methods[ self ]
 
         def __set__component_operation
 
           -> x do
 
-            @_oes_p.call :info, :expression, :hi do | y |
+            @oes_p_.call :info, :expression, :hi do | y |
               y <<  "hi #{ highlight 'there' }"
             end
 
