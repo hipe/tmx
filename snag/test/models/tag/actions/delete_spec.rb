@@ -16,8 +16,12 @@ module Skylab::Snag::TestSupport
 
         _call :node_identifier, 10, :tag, :x
 
-        black_and_white( expect_not_OK_event :entity_not_found ).should match(
-          /\Athere is no node with identifier \[#10\] in [^ ]+sutherlands\./ )
+        _ev = expect_not_OK_event :component_not_found
+
+        _s = black_and_white _ev
+
+        _s.should match(
+          /\Athere is no node '\[#10\]' in [^ ]+sutherlands\./ )
 
         expect_failed
       end
@@ -26,8 +30,12 @@ module Skylab::Snag::TestSupport
 
         _call :node_identifier, 1, :tag, :three
 
-        black_and_white( expect_not_OK_event :entity_not_found ).should eql(
-          "[#1] does not have #three" )  # :+[#015]
+        _ev = expect_not_OK_event :component_not_found
+
+        _s = black_and_white _ev
+
+        _s.should eql(
+          "node [#1] does not have tag '#three'" )  # :+[#015]
 
         expect_failed
       end

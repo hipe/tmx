@@ -15,10 +15,10 @@ module Skylab::Git::TestSupport
 
         _against 'n.s', 'n.s', 'stow-wadoodle', _stoz
 
-        _ev = expect_not_OK_event :entity_not_found
+        _ev = expect_not_OK_event :component_not_found
 
         black_and_white( _ev ).should match(
-          /\Astows collection at «[^»]+» does not have stow "stow-wadoodle"\z/ )
+          /\Athere is no stow "stow-wadoodle" in stows collection «[^»]+»\z/ )
 
         expect_failed
       end

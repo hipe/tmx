@@ -117,7 +117,7 @@ module Skylab::Snag
 
             node or begin
 
-              oes_p.call :error, :entity_not_found do
+              oes_p.call :error, :component_not_found do
                 __build_enity_not_found_event id_o
               end
             end
@@ -126,10 +126,12 @@ module Skylab::Snag
 
         def __build_enity_not_found_event id_o
 
-          Brazen_.event_class( :Entity_Not_Found ).new_with(
-            :identifier, id_o,
-            :model, Home_::Models_::Node,
-            :describable_source, @byte_upstream_ID )
+          Brazen_.event( :Component_Not_Found ).new_with(
+
+            :component, id_o,
+            :component_association, Models_::Node,
+            :ACS, @byte_upstream_ID,
+          )
         end
 
         def __first_by st, & p

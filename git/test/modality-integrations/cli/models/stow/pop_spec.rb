@@ -51,7 +51,7 @@ module Skylab::Git::TestSupport
       end
 
       expect :e, %r(\Acouldn't pop stow because #{
-        }stows collection at \.\./Stows does not have stow "wazoozle"\z)
+        }there is no stow "wazoozle" in stows collection \.\./Stows\z)
 
       _expect_common_failure
     end

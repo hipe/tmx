@@ -84,11 +84,11 @@ module Skylab::Snag
       Basic[]::String
     end
 
-    System = -> do
-      System_lib___[].services
-    end
+    system_lib = sidesys[ :System ]
 
-    System_lib___ = sidesys[ :System ]
+    System = -> do
+      system_lib[].services
+    end
 
     class << self
       attr_reader :instance

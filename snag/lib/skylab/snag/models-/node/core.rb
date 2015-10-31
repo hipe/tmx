@@ -178,20 +178,20 @@ module Skylab::Snag
     def _route_test adj, o, ca, & x_p
 
       send :"__expect__#{ ca.name.as_variegated_symbol }__is__#{ adj }__",
-        o, & x_p
+        o, ca, & x_p
     end
 
-    def __expect__tag__is__present__ tag, & oes_p
+    def __expect__tag__is__present__ tag, ca, & oes_p
 
       existing = first_equivalent_item tag
       if existing
         ACHIEVED_
       else
-        ACS_[].entity_not_found tag, self, & oes_p
+        ACS_[].component_not_found tag, ca, self, & oes_p
       end
     end
 
-    def __expect__tag__is__absent__ tag, & oes_p
+    def __expect__tag__is__absent__ tag, _ca, & oes_p
 
       existing = first_equivalent_item tag
       if existing

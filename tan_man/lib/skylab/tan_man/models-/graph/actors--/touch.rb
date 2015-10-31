@@ -247,8 +247,8 @@ module Skylab::TanMan
           @kernel.silo( :starter ).lines_via__(
               @value_fetcher, @workspace ) do | * i_a, & ev_p |
 
-            if :entity_not_found == i_a.last
-              @on_event_selectively.call :info, :entity_not_found do
+            if :component_not_found == i_a.last
+              @on_event_selectively.call :info, :component_not_found do
                 wrap = ev_p[]
                 wrap.new_with_event wrap.to_event.new_inline_with( :ok, nil )
               end

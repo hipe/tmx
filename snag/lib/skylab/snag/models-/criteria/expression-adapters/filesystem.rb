@@ -50,7 +50,7 @@ module Skylab::Snag
 
       def __build_a_stream_of_marshalled_words
 
-        scn = Callback_::Polymorphic_Stream.new @word_array
+        scn = Callback_::Polymorphic_Stream.via_array @word_array
 
         Callback_.stream do
 
@@ -76,7 +76,7 @@ module Skylab::Snag
       def __maybe_emit_event
 
         # a criteria getting saved is part of a "macro operation" that also
-        # includes the criteria begin run. the "slot" of the result value
+        # includes the criteria being run. the "slot" of the result value
         # is used for the result of the criteria being run. so we need
         # another way of expressing whether or not the saved worked, because
         # it's otherwise bad design to have this look identitcal to a non-
@@ -84,7 +84,7 @@ module Skylab::Snag
 
         @on_event_selectively.call :info, :added_entity do
 
-          ACS_[].mutation_event_class( :entity_added ).new_with(
+          ACS_[].event( :Entity_Added ).new_with(
             :entity, @ent,
             :entity_collection, @col_x
           )

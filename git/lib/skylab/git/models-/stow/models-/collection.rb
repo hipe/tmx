@@ -15,14 +15,6 @@ module Skylab::Git
         @path = path
       end
 
-      def description_under expag
-
-        path = @path
-        expag.calculate do
-          "stows collection at #{ pth path }"
-        end
-      end
-
       def entity_via_intrinsic_key name_s
 
         st = to_entity_stream
@@ -44,17 +36,15 @@ module Skylab::Git
 
       def __when_not_found name_s
 
-        _o = Stow_.new_via_path ::File.join( @path, name_s )
+        _stow = Stow_.new_via_path ::File.join( @path, name_s )
 
-        _ = Home_.lib_.brazen::
-          Autonomous_Component_System.mutation_event_class( :entity_not_found )
-
-        _ev = _.new_with(
-          :entity, _o,
-          :entity_collection, self
+        _ev = Home_.lib_.brazen.event( :Component_Not_Found ).new_with(
+          :component, _stow,
+          :component_association, Stow_.name_function,
+          :ACS, self,
         )
 
-        @on_event_selectively.call :error, :entity_not_found do
+        @on_event_selectively.call :error, :component_not_found do
           _ev
         end
 
@@ -115,6 +105,21 @@ module Skylab::Git
           y << "a stow already exists with that name: #{ pth id.path }"
         end
         UNABLE_
+      end
+
+      # ~ for [#br-035] expressive events
+
+      def description_under expag
+
+        path = @path
+        expag.calculate do
+          pth path
+        end
+      end
+
+      nf = nil
+      define_method :name do
+        nf ||= Callback_::Name.via_variegated_symbol :stows_collection
       end
     end
   end

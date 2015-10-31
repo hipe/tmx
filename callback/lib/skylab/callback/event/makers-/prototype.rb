@@ -135,7 +135,7 @@ module Skylab::Callback
 
           bx = formal_properties
           ok = true
-          st = Home_::Polymorphic_Stream.new 0, x_a
+          st = Home_::Polymorphic_Stream.via_array x_a
 
           at_end = EMPTY_P_
           once = -> do

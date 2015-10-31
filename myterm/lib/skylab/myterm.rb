@@ -34,7 +34,7 @@ module Skylab::MyTerm
       Brazen_::Kernel.new Home_ do | kr |
 
         bx.add :Appearance, Models_::Appearance::Silo_Daemon.new( kr )
-        kr.source_for_unbounds = bx
+        kr.reactive_tree_seed = bx
         NIL_
       end
     end )

@@ -13,7 +13,7 @@ module Skylab::Snag
           def new_via_kernel_and_NLP_const kr, const
 
             x = new kr
-            src = kr.source_for_unbounds
+            src = kr.reactive_tree_seed
 
             src.constants.each do | const_ |
 

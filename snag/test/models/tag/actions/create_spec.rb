@@ -28,8 +28,8 @@ module Skylab::Snag::TestSupport
 
         _call :node_identifier, '00002', :tag, :x
 
-        black_and_white( expect_not_OK_event :entity_not_found ).should match(
-          %r(\Athere is no node with identifier \[#2\]) )
+        black_and_white( expect_not_OK_event :component_not_found ).should match(
+          %r(\Athere is no node '\[#2\]') )
 
         expect_failed
       end

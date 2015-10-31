@@ -1,59 +1,252 @@
 module Skylab::Brazen
-  # ->
-    class Actionesque::Factory
 
-      Events = ::Module.new
+  module Event_Support_  # :+"that trick"
 
-      Events::Entity_Not_Found_for_One = Callback_::Event.prototype_with(
+    Events_::Component_Not_Found = Callback_::Event.prototype_with(
 
-        :entity_not_found,
-        :model, nil,
-        :describable_source, nil,
-        :error_category, :key_error,  # meh
-        :ok, false
+      :component_not_found,
 
-      ) do | y, o |
+      :component, nil,
+      :component_association, nil,
+      :ACS, nil,
 
-        _lemma = o.model.name_function.as_human
-        _source = o.describable_source.description_under self
+      :error_category, :key_error,
+      :ok, false
 
-        y << "in #{ _source } there are no #{ plural_noun _lemma }"
+    ) do | y, o |
+
+      Events_::Component_Not_Found::Express_into_under_of___[ y, self, o ]
+    end
+
+    module Events_::Component_Not_Found::Express_into_under_of___
+
+      # although an event object itself is immutable, it is convenient for
+      # the sake of this complex expression to use "session pattern" on a
+      # object that is of the same structure and content but is mutable so:
+
+      def self.[] y, expag, o
+        o.dup.extend( self ).__express_into_under y, expag
       end
 
-      Events::Entity_Not_Found = Callback_::Event.prototype_with(
+      def __express_into_under y, expag
 
-        :entity_not_found,
-        :identifier, nil,
-        :model, nil,
-        :describable_source, nil,
-        :error_category, :key_error,
-        :ok, false
+        @_expag = expag
+        __resolve_association_related
+        __resolve_component_strings  # after above
+        __resolve_ACS_strings
 
-      ) do | y, o |
+        # WONDERHACK: distilled from real world usage; if the collection
+        # term looks like it might be a filesystem path, assume it is
+        # possibly long and use the construction that puts that string at
+        # the end, etc..
 
-        mo = o.model
-        if mo
+        @_y = y
+        if @_cmp_s
+          if @_ACS_s and @_ACS_s.include? ::File::SEPARATOR
 
-          _nf = if mo.respond_to? :name_function
-            mo.name_function
+            __there_is_no_M_with_A_C_in_S
           else
-            Callback_::Name.via_module mo
+            __S_has_no_A_C
           end
+        else
+          __in_S_there_are_no_M
+        end
+      end
 
-          _subj = " #{ _nf.as_human } with"
+      def __in_S_there_are_no_M
+
+        component_noun_s = @_component_model_s || 'such component'
+
+        a = []
+
+        s = @_ACS_model_s
+        if s
+          a.push s
         end
 
-        _identifier = o.identifier.description_under self
-
-        ds = o.describable_source
-        if ds
-          _prep_phrase = " in #{ ds.description_under self }"
+        s = @_ACS_s
+        if s
+          a.push s
         end
 
-        _source = o.describable_source.description_under self
+        if a.length.zero?
+          a.push 'component collection'
+        end
 
-        y << "there is no#{ _subj } #{ _identifier }#{ _prep_phrase }"
+        @_y << ( @_expag.calculate do
+          "in #{ a * SPACE_ } there are no #{ plural_noun component_noun_s }"
+        end )
+      end
+
+      def __resolve_association_related
+
+        # resolve any component model and any string
+
+        asc = @component_association
+
+        if asc.respond_to? :component_model  # original, "real" asc from ACS
+          cm = asc.component_model
+
+        elsif asc.respond_to? :module_exec  # to sneak in only the model class
+          cm = asc
+          asc = nil
+        end
+
+        if asc
+          s = asc.description_under @_expag
+        end
+
+        @_asc_s = s
+        @_component_model = cm
+        NIL_
+      end
+
+      def __resolve_component_strings
+
+        mdl = @_component_model
+        if mdl
+          nf = if mdl.respond_to? :name_function
+            mdl.name_function
+          elsif mdl.respond_to? :module_exec
+            Callback_::Name.via_module mdl
+          end
+          if nf
+            s_ = nf.as_human
+          end
+        end
+
+        if @component
+          s = @component.description_under @_expag
+        end
+
+        @_cmp_s = s
+        @_component_model_s = s_
+        NIL_
+      end
+
+      def __resolve_ACS_strings
+
+        acs = @ACS
+
+        nf = if acs.respond_to? :name
+          acs.name
+        else
+          Callback_::Name.via_module acs.class
+        end
+
+        if nf
+          s = nf.as_human
+        end
+
+        @_ACS_s = @ACS.description_under @_expag  # might come out nil
+        @_ACS_model_s = s
+        NIL_
+      end
+
+      def __S_has_no_A_C
+
+        # "<acs> has no <asc> <cmp>"
+
+        cmp_s = @_cmp_s
+        asc_s = @_asc_s
+        acs_s = @_ACS_s
+
+        a = []
+        d = a.length
+
+        s = @_ACS_model_s and a.push s
+
+        acs_s and a.push acs_s
+        if d == a.length
+          a.push 'there is no'
+        else
+          needs_article = true
+          a.push 'does not have'
+        end
+
+        d = a.length
+        if asc_s
+          a.push asc_s
+        end
+
+        if cmp_s
+          cmp_s = Ick_if_necessary_of_under[ cmp_s, @_expag ]
+          a.push cmp_s
+        end
+
+        if d == a.length
+          if needs_article
+            a.push 'such a component'
+          else
+            a.push 'such component'
+          end
+        end
+
+        @_y << ( a * SPACE_ )
+      end
+
+      def __there_is_no_M_with_A_C_in_S
+
+        # "there is no <mdl> with <asc> "<cmp>" in <ACS>"
+        # e.g "three is no no with identifer '[#10]' in foo/bar" (covered)
+
+
+        a = [ 'there is no' ]
+        d = a.length
+
+        asc_s = @_asc_s
+        cmp_s = @_cmp_s
+
+        mdl_s = __model_string
+        if mdl_s
+          a.push mdl_s
+          if asc_s
+            a.push 'with'
+          end
+        end
+
+        if asc_s
+          a.push asc_s
+        end
+
+        if cmp_s
+          if mdl_s || asc_s
+            cmp_s = Ick_if_necessary_of_under[ cmp_s, @_expag ]
+          end
+          a.push cmp_s
+        end
+
+        if d == a.length
+          a.push 'such component'
+        end
+
+        # any ACS brings us the prepositional phrase
+
+        a_ = []
+        s = @_ACS_model_s and a_.push s
+        s = @_ACS_s
+        s and a_.push s
+        if a_.length.nonzero?
+          a.push 'in'
+          a.concat a_
+        end
+
+        @_y << ( a * SPACE_ )
+      end
+
+      def __model_string
+        mdl = @_component_model
+        if mdl
+          nf = if mdl.respond_to? :name_function
+            mdl.name_function
+          elsif mdl.respond_to? :module_exec
+            Callback_::Name.via_module mdl
+          end
+          if nf
+            nf.as_human
+          end
+        end
       end
     end
-    # <-
+  end
 end

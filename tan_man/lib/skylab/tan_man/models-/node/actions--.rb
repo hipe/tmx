@@ -139,8 +139,8 @@ module Skylab::TanMan
           _entity_via_node node
 
         elsif oes_p
-          oes_p.call :info, :entity_not_found do
-            Callback_::Event.inline_neutral_with :entity_not_found,
+          oes_p.call :info, :component_not_found do
+            Callback_::Event.inline_neutral_with :component_not_found,
               :entity_name_string, node_identifier.entity_name_string
           end
         end

@@ -78,7 +78,7 @@ module Skylab::Brazen
 
         def _init_operation
 
-          @operation = ACS_::Operation.via_symbol_and_component(
+          @operation = ACS_::Operation.via_symbol_and_ACS(
             @operation_symbol,
             @ACS,
           )

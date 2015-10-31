@@ -39,6 +39,11 @@ module Skylab::Brazen
       y << "the prototype [br] app (sidelined for now as a real app)"
     end
 
+    def event const
+
+      Home_::Events_.const_get const, false
+    end
+
     def expression_agent_library
       Home_::API::Expression_Agent__::LIB
     end

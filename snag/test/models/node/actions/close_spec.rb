@@ -18,13 +18,13 @@ module Skylab::Snag::TestSupport
     it "closing one that doesn't exist - whines gracefully" do
 
       _against '867'
-      expect_failed_by :entity_not_found
+      expect_failed_by :component_not_found
     end
 
     it "closing one that is already closed - whines gracefully" do
 
       _against '002'
-      _expect :entity_not_found, "[#2] does not have #open"
+      _expect :component_not_found, "node [#2] does not have tag '#open'"
       _expect :entity_already_added, "[#2] already has #done"
       expect_neutralled
     end
@@ -35,8 +35,8 @@ module Skylab::Snag::TestSupport
 
       _against '001'
 
-      _ev = expect_not_OK_event :entity_not_found
-      black_and_white( _ev ).should eql "[#1] does not have #open"
+      _ev = expect_not_OK_event :component_not_found
+      black_and_white( _ev ).should eql "node [#1] does not have tag '#open'"
 
       expect_noded_ 1
 

@@ -184,7 +184,7 @@ module Skylab::Brazen
           ACHIEVED_
         else
           @count = count
-          maybe_send_event :error, :entity_not_found do
+          maybe_send_event :error, :component_not_found do
             build_entity_not_found_event
           end
           UNABLE_
@@ -193,7 +193,7 @@ module Skylab::Brazen
 
       def build_entity_not_found_event
 
-        build_not_OK_event_with :entity_not_found,
+        build_not_OK_event_with :component_not_found,
           :count, @count,
           :subsection_id, @subsection_id,
           :input_id, @document.input_id do |y, o|

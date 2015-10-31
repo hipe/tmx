@@ -21,7 +21,7 @@ module Skylab::Brazen::TestSupport
       ds.add :Appie, Appie.new
 
       Home_::Kernel.new Here_ do | ke |
-        ke.source_for_unbounds = ds
+        ke.reactive_tree_seed = ds
       end
     end
 

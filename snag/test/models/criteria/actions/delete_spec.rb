@@ -34,8 +34,12 @@ module Skylab::Snag::TestSupport
 
       x = _common
 
-      expect_not_OK_event :entity_not_found,
-        'persisted criteria collection does not have (val "zap-tango")'
+      _ev = expect_not_OK_event :component_not_found
+
+      _s = black_and_white _ev
+
+      _s.should eql(
+        'persisted criteria collection does not have criteria "zap-tango"' )
 
       expect_no_more_events
 

@@ -42,8 +42,8 @@ module Skylab::TanMan::TestSupport::Models::Starter
       call_API :starter, :get,
         :workspace_path, @ws_pn.to_path, :config_filename, cfn
 
-      ev = expect_not_OK_event :entity_not_found
-      black_and_white( ev ).should eql 'in config there are no starters'
+      ev = expect_not_OK_event :component_not_found
+      black_and_white( ev ).should eql 'in workspace config there are no starters'
       expect_failed
     end
 

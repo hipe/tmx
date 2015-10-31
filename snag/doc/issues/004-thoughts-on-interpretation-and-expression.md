@@ -39,8 +39,8 @@ common UAO's for entities:
   • [#br-030] create
   • [#br-031] retrive
   • [#br-032] stream
-  • [#br-034] update
-  • [#br-035] delete
+  • [#br-033] update
+  • [#br-034] delete
 
   • under the former: create, retrieve, ( sort of: update, delete )
   • under the latter: stream

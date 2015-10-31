@@ -240,7 +240,7 @@ module Skylab::Callback
     end
 
     def polymorphic_stream_via_iambic x_a
-      Polymorphic_Stream_via_Array_.new x_a
+      Polymorphic_Stream.via_array x_a
     end
 
     def formal_fields_ivar_box_for_read_
@@ -521,9 +521,53 @@ module Skylab::Callback
     end
   end
 
-  Polymorphic_Stream_via_Array_ = class Polymorphic_Stream  # :[#046]
+  class Polymorphic_Stream  # :[#046]
 
-    def reinitialize d=0, x_a
+    class << self
+
+      def the_empty_polymorphic_stream
+        @__teps ||= via_array EMPTY_A_
+      end
+
+      def try_convert x  # :+[#056]
+
+        if x.respond_to? :gets
+
+          x.flush_to_polymorphic_stream  # while it works..
+
+        elsif x.respond_to? :each_index
+          via_array x
+
+        elsif x.respond_to? :read
+
+          Home_.lib_.system.IO.polymorphic_stream_via_readable x
+
+        elsif x.respond_to? :each
+
+          Home_.lib_.basic::Enumerator.polymorphic_stream_via_eachable x
+
+        elsif x.respond_to? :ascii_only?
+
+          Home_.lib_.basic::String.polymorphic_stream_via_string x
+        else
+          UNABLE_
+        end
+      end
+
+      def via * x_a
+        new 0, x_a
+      end
+
+      def via_array x_a
+        new 0, x_a
+      end
+
+      alias_method :via_start_index_and_array, :new
+
+      private :new
+    end  # >>
+
+    def reinitialize d, x_a
       @d = d ; @x_a = x_a ; @x_a_length = x_a.length
     end
 
@@ -628,42 +672,6 @@ module Skylab::Callback
     end
 
     attr_accessor :x_a_length
-
-    class << self
-
-      def the_empty_polymorphic_stream
-        @__teps ||= via_array EMPTY_A_
-      end
-
-      def try_convert x  # :+[#056]
-
-        if x.respond_to? :gets
-
-          x.flush_to_polymorphic_stream  # while it works..
-
-        elsif x.respond_to? :each_index
-          via_array x
-
-        elsif x.respond_to? :read
-
-          Home_.lib_.system.IO.polymorphic_stream_via_readable x
-
-        elsif x.respond_to? :each
-
-          Home_.lib_.basic::Enumerator.polymorphic_stream_via_eachable x
-
-        elsif x.respond_to? :ascii_only?
-
-          Home_.lib_.basic::String.polymorphic_stream_via_string x
-        else
-          UNABLE_
-        end
-      end
-
-      def via_array x_a
-        new 0, x_a
-      end
-    end  # >>
 
     self
   end
@@ -885,7 +893,7 @@ module Skylab::Callback
 
         @edit_p = edit_p
         @in_st = if x_a.length.nonzero?
-          Polymorphic_Stream_via_Array_.new x_a
+          Polymorphic_Stream.via_array x_a
         end
         @mod = mod
       end
@@ -2213,6 +2221,10 @@ module Skylab::Callback
         y << nm( name )
       end
       KEEP_PARSING_
+    end
+
+    def description_under _expag  # experiment for [#br-035] expressive events
+      as_human
     end
 
     def as_camelcase_const

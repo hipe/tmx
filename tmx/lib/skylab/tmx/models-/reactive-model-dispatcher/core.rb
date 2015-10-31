@@ -123,7 +123,7 @@ module Skylab::TMX
         :__no_module__
       end
 
-      def source_for_unbounds
+      def reactive_tree_seed
         self._ONLY_for_respond_to
       end
     end

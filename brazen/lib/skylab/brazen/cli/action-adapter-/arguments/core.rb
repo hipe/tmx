@@ -92,8 +92,8 @@ module Skylab::Brazen
           end
 
           def prepare_streams
-            @arg_a_scan = Crazy_Scanner__.new 0, @arg_a
-            @argv_scan = Crazy_Scanner__.new 0, @argv
+            @arg_a_scan = Crazy_Scanner__.via_array @arg_a
+            @argv_scan = Crazy_Scanner__.via_array @argv
           end
         private
           def parse_any_required_arguments_off_beginning
@@ -225,7 +225,7 @@ module Skylab::Brazen
             end
           end
 
-          class Crazy_Scanner__ < Callback_::Polymorphic_Stream_via_Array_
+          class Crazy_Scanner__ < Callback_::Polymorphic_Stream  # assumes via array!
             attr_writer :d, :x_a_length
             attr_reader :d
           end

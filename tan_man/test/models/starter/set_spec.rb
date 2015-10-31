@@ -22,7 +22,7 @@ module Skylab::TanMan::TestSupport::Models::Starter
         :name, 'wiz',
         :workspace_path, @ws_pn.to_path, :config_filename, cfn
 
-      expect_not_OK_event :entity_not_found do | ev |
+      expect_not_OK_event :component_not_found do | ev |
 
         ev = ev.to_event
 

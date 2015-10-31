@@ -35,7 +35,7 @@ module Skylab::Brazen
 
         oes_p.call :error, :entity_already_added do
 
-          mutation_event_class( :entity_already_added ).new_with(
+          event( :Entity_Already_Added ).new_with(
             :entity, sub_comp,
             :entity_collection, subj_comp,
             :ok, nil  # overwrite to change error into info
@@ -44,13 +44,14 @@ module Skylab::Brazen
         UNABLE_  # important
       end
 
-      def entity_not_found sub_comp, subj_comp, & oes_p
+      def component_not_found cmp, asc, acs, & oes_p
 
-        oes_p.call :error, :entity_not_found do
+        oes_p.call :error, :component_not_found do
 
-          mutation_event_class( :entity_not_found ).new_with(
-            :entity, sub_comp,
-            :entity_collection, subj_comp,
+          Home_.event( :Component_Not_Found ).new_with(
+            :component, cmp,
+            :component_association, asc,
+            :ACS, acs,
           )
         end
         UNABLE_  # important
@@ -60,7 +61,7 @@ module Skylab::Brazen
 
         oes_p.call :info, :entity_removed do
 
-          mutation_event_class( :entity_removed ).new_with(
+          event( :Entity_Removed ).new_with(
             :entity, sub_comp,
             :entity_collection, subj_comp,
           )
@@ -68,8 +69,8 @@ module Skylab::Brazen
         ACHIEVED_  # ..?
       end
 
-      def mutation_event_class sym
-        _Mutation_Session.event_class sym
+      def event sym
+        Home_::Events_.const_get sym, false
       end
 
       def _Mutation_Session
@@ -80,10 +81,11 @@ module Skylab::Brazen
     class Component_Association
 
       # different concerns will blow these up on demand
+      # :[#089]:WISH-1: times when it feels wasteful to etc
 
       class << self
 
-        def via_symbol_and_component sym, comp
+        def via_symbol_and_ACS sym, comp
 
           ca = new
           ca._init_for_component comp
@@ -140,14 +142,9 @@ module Skylab::Brazen
         end
       end
 
-      def name_symbol
-        @name.as_variegated_symbol
+      def description_under _expag
+        @name.as_human
       end
-
-      attr_reader(
-        :component_model,
-        :name,
-      )
 
       def __accept__can__meta_component * i_a  # :t8.
 
@@ -225,6 +222,15 @@ module Skylab::Brazen
           EMPTY_A_
         end
       end
+
+      def name_symbol
+        @name.as_variegated_symbol
+      end
+
+      attr_reader(
+        :component_model,
+        :name,
+      )
 
       def category
         :association

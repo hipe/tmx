@@ -217,11 +217,6 @@ module Skylab::Brazen
 
       private
 
-        def send_one_entity
-          @entity = produce_one_entity
-          @entity and __via_entity_send_one
-        end
-
         def produce_one_entity & oes_p
           oes_p ||= handle_event_selectively
           @__entity_stream = entity_collection.to_entity_stream_via_model(
@@ -282,11 +277,13 @@ module Skylab::Brazen
 
         def __for_one_resolve_entity_when_had_none & oes_p
 
-          oes_p.call :error, :entity_not_found do
+          oes_p.call :error, :component_not_found do
 
-            AF_::Events::Entity_Not_Found_for_One.new_with(
-              :model, _model_class,
-              :describable_source, entity_collection )
+            Home_.event( :Component_Not_Found ).new_with(
+              # :+[#035]:COVERAGE-A: no component
+              :component_association, _model_class,
+              :ACS, entity_collection,
+            )
           end
 
           UNABLE_
@@ -371,7 +368,6 @@ module Skylab::Brazen
           self.class.silo_module
         end
       end
-
       AF_ = self
     end
   # <-

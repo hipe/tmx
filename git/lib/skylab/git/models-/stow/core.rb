@@ -344,10 +344,9 @@ module Skylab::Git
       end
 
       def description_under expag
-
-        me = self
+        s = _item_name
         expag.calculate do
-          "stow #{ val me._item_name }"
+          val s
         end
       end
 

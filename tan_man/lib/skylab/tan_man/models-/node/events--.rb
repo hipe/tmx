@@ -30,8 +30,9 @@ module Skylab::TanMan
 
   if false
 
-  class Models::Node::Events::Not_Founds <
-    Model::Event.new :node_not_founds
+    self._SEE  # [#br-035]:A if ever we integrate this
+
+  class Models::Node::Events::Not_Founds < Model::Event.new :node_not_founds
 
     def build_message
       x = node_not_founds.length ; y = node_not_founds.first.seen_count

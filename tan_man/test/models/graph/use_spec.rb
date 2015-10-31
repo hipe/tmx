@@ -84,7 +84,7 @@ module Skylab::TanMan::TestSupport::Models::Graph
         ev = _expect_events_order_insensitive(
 
           adding_extension: nil,
-          entity_not_found: nil,
+          component_not_found: nil,
           using_default: nil,
           parent_directory_must_exist: IDENTITY_ )
 
@@ -226,8 +226,8 @@ module Skylab::TanMan::TestSupport::Models::Graph
               adding_extension: [ nil,
                 "adding .dot extension to make-me" ],
 
-              entity_not_found: [ nil,
-                "in config there are no starters" ],
+              component_not_found: [ nil,
+                "in workspace config there are no starters" ],
 
               using_default: [ nil,
                 /\Ausing default starter "minimal\.dot" \(the last of [23] starters\)/ ],
@@ -263,7 +263,7 @@ module Skylab::TanMan::TestSupport::Models::Graph
               :config_filename, cfn
 
             ev = _expect_events_order_insensitive(
-              entity_not_found: nil,
+              component_not_found: nil,
               using_default: nil,
               before_probably_creating_new_file: nil,
               wrote_file: IDENTITY_,

@@ -444,13 +444,13 @@ module Skylab::TanMan
 
         def send_created_event_for_node node_stmt
           maybe_send_event :info, :created_node do
-            bld_created_node_event node_stmt
+            __build_created_node_event node_stmt
           end
         end
 
-        def bld_created_node_event node_stmt
+        def __build_created_node_event node_stmt
 
-          build_OK_event_with :created_node,
+          build_OK_event_with :created_node,  # :+[#br-035]:D
 
               :node_stmt, node_stmt,
               :did_mutate_document, true do | y, o |

@@ -45,7 +45,7 @@ module Skylab::TanMan::TestSupport::Models::Node
         :workspace_path, dir( :two_nodes ),
         :config_filename, cfn_shallow
 
-      ev = expect_neutral_event :entity_not_found
+      ev = expect_neutral_event :component_not_found
       ev.to_event.entity_name_string.should eql 'berk'
       expect_failed
     end

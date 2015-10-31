@@ -130,7 +130,7 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
     class Kernel_Stub
 
-      def source_for_unbounds
+      def reactive_tree_seed
         self._ONLY_for_respond_to
       end
 

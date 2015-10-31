@@ -9,17 +9,17 @@ class Kernel  # [#015]
     yield self if block_given?
 
     @_name_function = nil
-    @source_for_unbounds ||= mod.const_get :Models_, false
+    @reactive_tree_seed ||= mod.const_get :Models_, false
   end
 
   attr_reader(
     :module,
-    :source_for_unbounds,
+    :reactive_tree_seed,
   )
 
   attr_writer(
     :module,
-    :source_for_unbounds,
+    :reactive_tree_seed,
   )
 
   # ~ call exposures
@@ -101,7 +101,7 @@ class Kernel  # [#015]
 
   def silo_via_normal_identifier const_a
 
-    _silos.via_normal_stream( Callback_::Polymorphic_Stream.new( 0, const_a ) )
+    _silos.via_normal_stream Callback_::Polymorphic_Stream.via_array const_a
   end
 
   def silo_via_normal_stream st
@@ -115,7 +115,7 @@ class Kernel  # [#015]
   end
 
   def _silos
-    @__silos ||= Home_::Silo::Collection.new @source_for_unbounds, self
+    @__silos ||= Home_::Silo::Collection.new @reactive_tree_seed, self
   end
 
   def init_silos unb_models
@@ -154,7 +154,7 @@ class Kernel  # [#015]
 
   def _unbounds_indexation
 
-    @___UI ||= Home_::Branchesque::Indexation.new @source_for_unbounds
+    @___UI ||= Home_::Branchesque::Indexation.new @reactive_tree_seed
   end
 end
 end

@@ -41,7 +41,7 @@ module Skylab::Callback
               when :simple
                 Apply_simple_enhancement__.new(
                   cls,
-                  Polymorphic_Stream_via_Array_.new( 1, i_a )
+                  Polymorphic_Stream.via_start_index_and_array( 1, i_a )
                 ).execute
               when :properties
                 __apply_seed_treatment start_index, cls, i_a
@@ -168,7 +168,7 @@ module Skylab::Callback
         end
 
         def polymorphic_stream_via_iambic x_a
-          Polymorphic_Stream_via_Array_.new 0, x_a
+          Polymorphic_Stream.via_array x_a
         end
 
         # ~ experiment (looks like [br] `edit_entity_class`)
@@ -195,7 +195,7 @@ module Skylab::Callback
         end
 
         def polymorphic_stream_via_iambic x_a
-          Polymorphic_Stream_via_Array_.new 0, x_a
+          Polymorphic_Stream.via_array x_a
         end
 
         def process_polymorphic_stream_fully stream  # :+#public-API :+#hook-in

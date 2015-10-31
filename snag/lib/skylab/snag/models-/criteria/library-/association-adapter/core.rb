@@ -29,7 +29,7 @@ module Skylab::Snag
             st_ = if :sequence == func_sym  # we change the syntax, experimentally
               _a = st.gets_one
               _a_= [ :functions, * _a ]
-              Callback_::Polymorphic_Stream.new 0, _a_
+              Callback_::Polymorphic_Stream.via_array _a_
             else
               st
             end

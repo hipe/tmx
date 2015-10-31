@@ -14,7 +14,7 @@ module Skylab::TanMan
     end
   end
 
-  class Models::Meaning::Events::Changed <
+  class Models::Meaning::Events::Changed <  # :+[#br-035]:F
     Model::Event.new :name, :old_value, :new_value
 
     def build_message
@@ -23,7 +23,7 @@ module Skylab::TanMan
     end
   end
 
-  class Models::Meaning::Events::Created <
+  class Models::Meaning::Events::Created <  # :+[#br-035]:D
     Model::Event.new :name, :is_before, :other_name, :bytes
 
     def build_message
@@ -41,7 +41,7 @@ module Skylab::TanMan
     end
   end
 
-  class Models::Meaning::Events::Forgotten <
+  class Models::Meaning::Events::Forgotten <  # :+[#br-035]:B
     Model::Event.new :name, :bytes
 
     def build_message
@@ -49,7 +49,7 @@ module Skylab::TanMan
     end
   end
 
-  class Models::Meaning::Events::Not_Found <
+  class Models::Meaning::Events::Not_Found <  # :+[#br-035]:A
     Model::Event.new :name, :verb, :tense
 
     def build_message

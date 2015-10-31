@@ -6,7 +6,7 @@ module Skylab::Brazen
 
       class << self
 
-        def via_symbol_and_component sym, acs
+        def via_symbol_and_ACS sym, acs
 
           new( acs )._init_for_sym sym
         end

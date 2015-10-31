@@ -85,7 +85,7 @@ returned by ruby reflection is non-deterministic (or should be treated as
 so, if it is in load order and autoloading is being used, which it should
 be generally.)
 
-secondly, care must be taken with such modules that we don't :[#035]
+secondly, care must be taken with such modules that we don't :![#035]
 add constants to it that we don't intend to. typically through its ancestor
 such a "box module" may unintentionally pick up constants that are just
 private helpers to the side-stream libraries, uness we are using method

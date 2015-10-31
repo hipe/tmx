@@ -206,10 +206,15 @@ module Skylab::Snag
           Criteria_
         end
 
-        def description_under expag
-          expag.calculate do
-            'persisted criteria collection'
-          end
+        # ~ the next two are for [#br-035] expressive events
+
+        def description_under _expag
+          NIL_  # let next method express everything
+        end
+
+        nf = nil
+        define_method :name do
+          nf ||= Callback_::Name.via_human 'persisted criteria collection'
         end
 
         self

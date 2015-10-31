@@ -18,40 +18,6 @@ module Skylab::System
         end
       end
 
-      # ~ reflection
-
-      def members
-        [ :description_under,  :to_path, :to_pathname, :to_simple_line_stream ]
-      end
-
-      def is_same_waypoint_as x
-        :path == x.shape_symbol && @path == x.path  # can fail because etc.
-      end
-
-      def description_under expr
-        Home_.lib_.basic::Pathname.description_under_of_path expr, @path
-      end
-
-      def shape_symbol
-        :path
-      end
-
-      def modality_const
-        :Byte_Stream
-      end
-
-      attr_reader :path
-
-      # ~~ off-grid reflection
-
-      def to_pathname
-        @path and ::Pathname.new @path_s
-      end
-
-      def to_path
-        @path
-      end
-
       # ~ data delivery
 
       def whole_string
@@ -72,10 +38,42 @@ module Skylab::System
         end
       end
 
-      # ~ fun etc.
+      # ~ conversion, standard readers, reflection, etc
 
       def to_byte_downstream_identifier
         FS_::Byte_Downstream_Identifier.new @path, & @on_event_selectively
+      end
+
+      def is_same_waypoint_as x
+        :path == x.shape_symbol && @path == x.path  # can fail because etc.
+      end
+
+      def description_under expr
+        Home_.lib_.basic::Pathname.description_under_of_path expr, @path
+      end
+
+      def name
+        NIL_  # for [#br-035] expressive events, this class name is not pretty
+      end
+
+      def to_pathname
+        @path and ::Pathname.new @path_s
+      end
+
+      def to_path
+        @path
+      end
+
+      attr_reader(
+        :path,
+      )
+
+      def shape_symbol
+        :path
+      end
+
+      def modality_const
+        :Byte_Stream
       end
     end
   end

@@ -376,11 +376,11 @@ more broadly this has applicability to writing text file in general: we
 may typically think of the newline sequence as a line "separator"; but
 in fact in UNIX land (and perhaps more broadly than that) the newline
 sequence is generally used as more of a line "terminator" than
-"separator" [1][1]. the difference is subtle but important: wheras a
+"separator" [1][1]. the difference is subtle but important: whereas a
 separator would separate lines, a terminator terminates every line,
 including the last one.
 
-from the manpage for the wc utility [2][2]
+from the manpage for the `wc` utility [2][2],
 
    A line is defined as a string of characters delimited by a <newline>
    character.  Characters beyond the final <newline> character will not

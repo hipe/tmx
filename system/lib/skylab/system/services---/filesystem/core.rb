@@ -2,6 +2,13 @@ module Skylab::System
 
   class Services___::Filesystem  # see [#009]
 
+    class << self  # experimental static lib interface
+
+      def event sym
+        FS_::Events_.const_get sym, false
+      end
+    end  # >>
+
     def initialize _svx
     end
 

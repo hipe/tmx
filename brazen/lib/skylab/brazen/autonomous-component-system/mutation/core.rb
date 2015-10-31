@@ -4,12 +4,6 @@ module Skylab::Brazen
 
     class Mutation  # notes in [#089]
 
-      class << self
-        def event_class sym
-          Here_::Event_Factory_.class_for sym
-        end
-      end  # >>
-
       def initialize & x_p
         @x_p = x_p
       end
@@ -21,7 +15,7 @@ module Skylab::Brazen
       )
 
       def accept_argument_array x_a
-        @arg_st = Callback_::Polymorphic_Stream.new x_a
+        @arg_st = Callback_::Polymorphic_Stream.via_array x_a
         NIL_
       end
 
@@ -265,7 +259,7 @@ module Skylab::Brazen
 
             # current token must be an association
 
-            @association = Component_Association.via_symbol_and_component(
+            @association = Component_Association.via_symbol_and_ACS(
               st.gets_one,
               @ACS,
             )

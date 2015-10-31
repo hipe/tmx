@@ -369,17 +369,10 @@ module Skylab::Snag
 
           def __build_wrote_event d, path
 
-            Callback_::Event.inline_OK_with(
-
-              :wrote,
+            Home_.lib_.system.filesystem_lib.event( :Wrote ).new_with(
+              :preterite_verb, 'updated',
               :bytes, d,
-              :path, path,
-              :is_completion, true
-
-            ) do | y, o |
-
-              y << "updated #{ pth o.path } (#{ o.bytes } bytes)"
-            end
+              :path, path )
           end
         end
 

@@ -260,7 +260,7 @@ module Skylab::TanMan
 
       oes_p ||= handle_event_selectively
 
-      oes_p.call :error, :entity_not_found do
+      oes_p.call :error, :component_not_found do
         __build_zero_entities_found_against_natural_key_event name_s
       end
 
@@ -279,7 +279,7 @@ module Skylab::TanMan
         _fly.dup
       end
 
-      build_not_OK_event_with :entity_not_found,
+      build_not_OK_event_with :component_not_found,
           :name_string, name_s,
           :a_few_ent_a, _a_few_ent_a,
           :model_class, mc do | y, o |

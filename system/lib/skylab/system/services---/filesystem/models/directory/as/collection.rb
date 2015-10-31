@@ -148,13 +148,13 @@ module Skylab::System
       end
     end
 
-    def expect_component__exists__ x, _ca, & oes_p
+    def expect_component__exists__ x, ca, & oes_p
 
       _found = first_equivalent_item x
       if _found
         true
       else
-        ACS_[].entity_not_found x, self, & oes_p
+        ACS_[].component_not_found x, ca, self, & oes_p
       end
     end
 

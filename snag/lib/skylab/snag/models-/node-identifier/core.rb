@@ -251,23 +251,16 @@ module Skylab::Snag
       ACHIEVED_
     end
 
-    # HERE
-
     # ~ outward reflection
 
     def description_under expag
 
-      y = expag.new_expression_context
-      y << "identifier "  # ick/meh
-      express_into_under y, expag
-      y
+      express_into_under expag.new_expression_context, expag
     end
 
     def express_under expag
 
-      y = expag.new_expression_context
-      express_into_under y, expag
-      y
+      express_into_under expag.new_expression_context, expag
     end
 
     def express_into_ y
@@ -278,7 +271,6 @@ module Skylab::Snag
         @suffix.express_into_ y
       end
       y << CLOSE_SEQUENCE__
-      ACHIEVED_
     end
 
     def == otr

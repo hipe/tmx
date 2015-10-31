@@ -37,7 +37,7 @@ module Skylab::Parse
 
           st.advance_one
 
-          _st = Callback_::Polymorphic_Stream.new 0, a
+          _st = Callback_::Polymorphic_Stream.via_array a
 
           _process_functions_via_polymorphic_stream _st
         else
