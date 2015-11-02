@@ -231,7 +231,7 @@ module Skylab::Snag
 
       o = _mutable_body_for_mutation_session.remove_component_ x, ca, & oes_p
       if o
-        ACS_[].entity_removed o, self, & oes_p
+        ACS_[].entity_removed o, ca, self, & oes_p
       end
       o
     end

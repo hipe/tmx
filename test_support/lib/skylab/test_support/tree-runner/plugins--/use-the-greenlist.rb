@@ -141,6 +141,7 @@ module Skylab::TestSupport
                 :proc, ord,
                 :end_functions,
               :end_functions,
+          :zero_or_one, :keyword, 'show'
         )
 
         st = _Parse.input_stream.via_array argv
@@ -172,12 +173,13 @@ module Skylab::TestSupport
         pt = remove_instance_variable :@__parse_tree
 
         line = nil
-        pt.first.value_x.times do
+
+        thing, opt, do_show = pt
+
+        thing.value_x.times do
           ( line = io.gets ).chomp!
         end
         io.close
-
-        opt = pt.last
 
         s_a = line.split %r([[:space:]]+)
         if opt
@@ -192,6 +194,16 @@ module Skylab::TestSupport
 
           s_a = s_a[ _factor * chomp_size, chomp_size ]
         end
+
+        if do_show
+          @resources.sout.puts s_a * SPACE_
+          NIL_
+        else
+          __run_them s_a
+        end
+      end
+
+      def __run_them s_a
 
         @resources.serr.puts "(#{ s_a * SPACE_ })"
 

@@ -57,13 +57,14 @@ module Skylab::Brazen
         UNABLE_  # important
       end
 
-      def entity_removed sub_comp, subj_comp, & oes_p
+      def entity_removed cmp, asc, acs, & oes_p
 
         oes_p.call :info, :entity_removed do
 
           event( :Entity_Removed ).new_with(
-            :entity, sub_comp,
-            :entity_collection, subj_comp,
+            :component, cmp,
+            :component_association, asc,
+            :ACS, acs,
           )
         end
         ACHIEVED_  # ..?

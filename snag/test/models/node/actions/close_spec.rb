@@ -56,7 +56,7 @@ module Skylab::Snag::TestSupport
       _DS_ID downstream_ID_for_output_string_ivar_
       _against '0003'
 
-      expect_OK_event :entity_removed, "removed #open from [#3]"
+      expect_OK_event :entity_removed, "removed tag #open from node [#3]"
 
       @output_s.should eql <<-O
 [#003]       #done biff bazz this 2nd will get flowed into the previous one

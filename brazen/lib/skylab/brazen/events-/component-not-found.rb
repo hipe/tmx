@@ -20,9 +20,7 @@ module Skylab::Brazen
 
     module Events_::Component_Not_Found::Express_into_under_of___
 
-      # although an event object itself is immutable, it is convenient for
-      # the sake of this complex expression to use "session pattern" on a
-      # object that is of the same structure and content but is mutable so:
+      include Expresser  # (see comments here)
 
       def self.[] y, expag, o
         o.dup.extend( self ).__express_into_under y, expag
@@ -30,8 +28,9 @@ module Skylab::Brazen
 
       def __express_into_under y, expag
 
-        @_expag = expag
-        __resolve_association_related
+        @expag_ = expag
+
+        resolve_association_related_
         __resolve_component_strings  # after above
         __resolve_ACS_strings
 
@@ -73,73 +72,22 @@ module Skylab::Brazen
           a.push 'component collection'
         end
 
-        @_y << ( @_expag.calculate do
+        @_y << ( @expag_.calculate do
           "in #{ a * SPACE_ } there are no #{ plural_noun component_noun_s }"
         end )
       end
 
-      def __resolve_association_related
-
-        # resolve any component model and any string
-
-        asc = @component_association
-
-        if asc.respond_to? :component_model  # original, "real" asc from ACS
-          cm = asc.component_model
-
-        elsif asc.respond_to? :module_exec  # to sneak in only the model class
-          cm = asc
-          asc = nil
-        end
-
-        if asc
-          s = asc.description_under @_expag
-        end
-
-        @_asc_s = s
-        @_component_model = cm
-        NIL_
-      end
-
       def __resolve_component_strings
 
-        mdl = @_component_model
-        if mdl
-          nf = if mdl.respond_to? :name_function
-            mdl.name_function
-          elsif mdl.respond_to? :module_exec
-            Callback_::Name.via_module mdl
-          end
-          if nf
-            s_ = nf.as_human
-          end
-        end
-
-        if @component
-          s = @component.description_under @_expag
-        end
-
-        @_cmp_s = s
-        @_component_model_s = s_
+        @_cmp_s = determine_component_string_
+        @_component_model_s = determine_component_model_string_
         NIL_
       end
 
       def __resolve_ACS_strings
 
-        acs = @ACS
-
-        nf = if acs.respond_to? :name
-          acs.name
-        else
-          Callback_::Name.via_module acs.class
-        end
-
-        if nf
-          s = nf.as_human
-        end
-
-        @_ACS_s = @ACS.description_under @_expag  # might come out nil
-        @_ACS_model_s = s
+        @_ACS_s = determine_ACS_string_
+        @_ACS_model_s = determine_ACS_model_string_
         NIL_
       end
 
@@ -148,7 +96,7 @@ module Skylab::Brazen
         # "<acs> has no <asc> <cmp>"
 
         cmp_s = @_cmp_s
-        asc_s = @_asc_s
+        asc_s = @asc_s_
         acs_s = @_ACS_s
 
         a = []
@@ -170,7 +118,7 @@ module Skylab::Brazen
         end
 
         if cmp_s
-          cmp_s = Ick_if_necessary_of_under[ cmp_s, @_expag ]
+          cmp_s = Ick_if_necessary_of_under[ cmp_s, @expag_ ]
           a.push cmp_s
         end
 
@@ -190,14 +138,13 @@ module Skylab::Brazen
         # "there is no <mdl> with <asc> "<cmp>" in <ACS>"
         # e.g "three is no no with identifer '[#10]' in foo/bar" (covered)
 
-
         a = [ 'there is no' ]
         d = a.length
 
-        asc_s = @_asc_s
+        asc_s = @asc_s_
         cmp_s = @_cmp_s
 
-        mdl_s = __model_string
+        mdl_s = determine_component_model_string_
         if mdl_s
           a.push mdl_s
           if asc_s
@@ -211,7 +158,7 @@ module Skylab::Brazen
 
         if cmp_s
           if mdl_s || asc_s
-            cmp_s = Ick_if_necessary_of_under[ cmp_s, @_expag ]
+            cmp_s = Ick_if_necessary_of_under[ cmp_s, @expag_ ]
           end
           a.push cmp_s
         end
@@ -232,20 +179,6 @@ module Skylab::Brazen
         end
 
         @_y << ( a * SPACE_ )
-      end
-
-      def __model_string
-        mdl = @_component_model
-        if mdl
-          nf = if mdl.respond_to? :name_function
-            mdl.name_function
-          elsif mdl.respond_to? :module_exec
-            Callback_::Name.via_module mdl
-          end
-          if nf
-            nf.as_human
-          end
-        end
       end
     end
   end

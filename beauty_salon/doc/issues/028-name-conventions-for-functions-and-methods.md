@@ -134,6 +134,8 @@ better this time.
 
 + `curry_with` - see the #iambic family of method name conventions
 
++ `decide_` - in hand-written language production, result in any string
+
 + `edit_with` - see the #iambic family of method name conventions
 
 + `execute` has a strict API meaning for a lot of our libraries as the

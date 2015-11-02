@@ -52,7 +52,7 @@ module Skylab::Snag::TestSupport
         scn.next_line.should be_nil
 
         _ev = expect_OK_event :entity_removed
-        black_and_white( _ev ).should eql "removed #two from [#1]"
+        black_and_white( _ev ).should eql "removed tag #two from node [#1]"
 
         expect_noded_ 1
       end
@@ -70,8 +70,8 @@ module Skylab::Snag::TestSupport
           :node_identifier, 1, :tag, :one
 
         ev = expect_OK_event( :entity_removed ).to_event
-        ev.entity.intern.should eql :one
-        black_and_white( ev ).should eql "removed #one from [#1]"
+        ev.component.intern.should eql :one
+        black_and_white( ev ).should eql "removed tag #one from node [#1]"
 
         @result.ID.to_i.should eql 1
 

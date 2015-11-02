@@ -131,7 +131,7 @@ module Skylab::System
       end while nil
 
       if ok
-        ACS_[].entity_removed o, self, & x_p  # ..
+        ACS_[].entity_removed o, o.class, self, & x_p
         o
       else
         ok

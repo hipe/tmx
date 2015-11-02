@@ -23,7 +23,7 @@ module Skylab::Snag::TestSupport
       _ev = expect_OK_event :entity_removed
 
       black_and_white( _ev ).should eql(
-        'removed "zap-tango" from persisted criteria collection' )
+        'removed criteria "zap-tango" from persisted criteria collection' )
 
       o.natural_key_string.should eql 'zap-tango'
     end
