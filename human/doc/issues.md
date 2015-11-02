@@ -1,3 +1,4 @@
+[#044]       design patterns of expression ..
 [#043]       the API action inflection hack ..
 [#042]       (segment on NPR - joel warner ; peter macgraw ; manatee)
 [#041]       track wishes for conjunction phrase support #universal

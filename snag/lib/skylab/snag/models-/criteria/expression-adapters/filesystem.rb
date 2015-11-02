@@ -84,9 +84,9 @@ module Skylab::Snag
 
         @on_event_selectively.call :info, :added_entity do
 
-          ACS_[].event( :Entity_Added ).new_with(
-            :entity, @ent,
-            :entity_collection, @col_x
+          ACS_[].event( :Component_Added ).new_with(
+            :component, @ent,
+            :ACS, @col_x,
           )
         end
 

@@ -131,7 +131,7 @@ module Skylab::System
       end while nil
 
       if ok
-        ACS_[].entity_removed o, o.class, self, & x_p
+        ACS_[].component_removed o, o.class, self, & x_p
         o
       else
         ok
@@ -142,7 +142,7 @@ module Skylab::System
 
       _found = first_equivalent_item x
       if _found
-        ACS_[].entity_already_added x, self, & oes_p
+        ACS_[].component_already_added x, self, & oes_p
       else
         true
       end

@@ -191,11 +191,11 @@ module Skylab::Snag
       end
     end
 
-    def __expect__tag__is__absent__ tag, _ca, & oes_p
+    def __expect__tag__is__absent__ tag, ca, & oes_p
 
       existing = first_equivalent_item tag
       if existing
-        ACS_[].entity_already_added tag, self, & oes_p
+        ACS_[].component_already_added tag, ca, self, & oes_p
       else
         ACHIEVED_
       end
@@ -231,7 +231,7 @@ module Skylab::Snag
 
       o = _mutable_body_for_mutation_session.remove_component_ x, ca, & oes_p
       if o
-        ACS_[].entity_removed o, ca, self, & oes_p
+        ACS_[].component_removed o, ca, self, & oes_p
       end
       o
     end

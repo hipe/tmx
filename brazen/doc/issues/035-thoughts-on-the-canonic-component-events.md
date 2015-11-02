@@ -19,4 +19,8 @@
 
 ## wishes
 
-• :#WISH-A: one day tie EN-like expression adaters in with etc ..
+• :#WISH-A: one day tie EN-like expression adaters in with expressive
+  events so that individual component (models) can specifiy what verbs to
+  use and so on (and maybe what expression structures to use too) much like
+  we do with [near]  [#016] reactive tree models that specify how to
+  inflect verbs, nouns, etc.

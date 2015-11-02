@@ -5,16 +5,36 @@ module Skylab::Callback
       class Makers_::Prototype < self  # :[#012].
 
         class << self
+
+          def prototype_with * i_a, & msg_p
+
+            o = Session__.new
+            o.deflist = i_a
+            o.message_proc = msg_p
+            o.base_class = self
+            o.execute
+          end
+
           def via_deflist_and_message_proc i_a, p
-            Make___[ i_a, p ]
+
+            o = Session__.new
+            o.deflist = i_a
+            o.message_proc = p
+            o.execute
           end
         end  # >>
 
-        class Make___
+        class Session__
 
-          Home_::Actor.call self, :properties,
-            :deflist_a,
-            :message_proc
+          def initialize
+            @base_class = nil
+          end
+
+          attr_writer(
+            :base_class,
+            :deflist,
+            :message_proc,
+          )
 
           def execute
             validate
@@ -22,12 +42,12 @@ module Skylab::Callback
           end
 
           def validate
-            len = @deflist_a.length
+            len = @deflist.length
             1 == len % 2 or raise ::ArgumentError, say_odd_number
           end
 
           def say_odd_number
-            "#{ @deflist_a.length } for odd number for deflist (#{ syntax_s })"
+            "#{ @deflist.length } for odd number for deflist (#{ syntax_s })"
           end
 
           def syntax_s
@@ -35,25 +55,100 @@ module Skylab::Callback
           end
 
           def work
-            scn = Home_::Polymorphic_Stream.via_array @deflist_a
-            cls = ::Class.new Here__
-            _MESSAGE_PROC_ = @message_proc
+
+            st = Home_::Polymorphic_Stream.via_array @deflist
+
+            _base_class = @base_class || Here___
+
+            cls = ::Class.new _base_class
+
+            msg_p = @message_proc
+
             cls.class_exec do
+
               extend Module_Methods__
-              const_set :TERMINAL_CHANNEL_SYMBOL___, scn.gets_one
-              define_method :message_proc do _MESSAGE_PROC_ end
-              _BOX_ = Home_::Box.new
-              while scn.unparsed_exists
-                prp = Prop__.new scn.gets_one, scn.gets_one
-                _BOX_.add prp.name_symbol, prp
-                attr_reader prp.name_symbol
-              end
-              _BOX_.freeze
-              define_singleton_method :prop_bx do _BOX_ end
-              define_method :formal_properties do _BOX_ end
+
+              const_set :TERMINAL_CHANNEL_SYMBOL___, st.gets_one
+
+              Process_messge_proc___[ msg_p, self ]
+
+              Process_property_box___[ st, self ]
+
+              self
             end
-            cls
           end
+        end
+
+        Process_messge_proc___ = -> msg_p, cls do
+
+          if msg_p
+
+            cls.send :define_method, :message_proc do
+              msg_p
+            end
+
+          end ; nil
+        end
+
+        Process_property_box___ = -> st, cls do
+
+          _BOX_ = nil
+
+          build_new_property = Prop__.method :new
+
+          see_new_property = ( cls.class_exec do
+
+            # (when we tried (send ...) for below we got weird warnings about
+            # issues with private attr reader :[#sli]:IWR:3
+
+            -> prp do
+              attr_reader prp.name_symbol
+            end
+          end )
+
+          if cls.respond_to? :prop_bx  # modify a dup of an existing prop box
+
+            _BOX_ = cls.prop_bx.dup
+
+            for_property = -> k, v do
+
+              _BOX_.add_or_replace( k,
+                -> do
+                  prp = build_new_property[ k, v ]
+                  see_new_property[ prp ]
+                  prp
+                end,
+                -> _ do
+                  build_new_property[ k, v ]
+                end,
+              )
+            end
+          else  # build the first ever property box in the chain
+
+            _BOX_ = Home_::Box.new
+
+            for_property = -> k, v do
+
+              prp = build_new_property[ k, v ]
+              see_new_property[ prp ]
+              _BOX_.add prp.name_symbol, prp
+              NIL_
+            end
+          end
+
+          while st.unparsed_exists
+
+            for_property[ st.gets_one, st.gets_one ]
+          end
+
+          _BOX_.freeze
+
+          cls.class_exec do
+            define_singleton_method :prop_bx do _BOX_ end
+            define_method :formal_properties do _BOX_ end
+          end
+
+          NIL_
         end
 
         class Prop__
@@ -138,8 +233,9 @@ module Skylab::Callback
           st = Home_::Polymorphic_Stream.via_array x_a
 
           at_end = EMPTY_P_
+          did = false
           once = -> do
-            once = EMPTY_P_
+            did = true
             at_end = -> do
               remove_instance_variable :@polymorphic_upstream_
             end
@@ -162,7 +258,7 @@ module Skylab::Callback
               next
             end
 
-            once[]
+            did || once[]
 
             ok = send :"#{ sym }="
             ok or break
@@ -240,7 +336,7 @@ module Skylab::Callback
           end
         end
 
-        Here__ = self
+        Here___ = self
       end
     end
 end

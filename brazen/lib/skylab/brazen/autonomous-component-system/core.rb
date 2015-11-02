@@ -31,14 +31,15 @@ module Skylab::Brazen
         o.execute
       end
 
-      def entity_already_added sub_comp, subj_comp, & oes_p
+      def component_already_added cmp, asc, acs, & oes_p
 
-        oes_p.call :error, :entity_already_added do
+        oes_p.call :error, :component_already_added do
 
-          event( :Entity_Already_Added ).new_with(
-            :entity, sub_comp,
-            :entity_collection, subj_comp,
-            :ok, nil  # overwrite to change error into info
+          event( :Component_Already_Added ).new_with(
+            :component, cmp,
+            :component_association, asc,
+            :ACS, acs,
+            :ok, nil,  # overwrite so error becomes info
           )
         end
         UNABLE_  # important
@@ -57,11 +58,11 @@ module Skylab::Brazen
         UNABLE_  # important
       end
 
-      def entity_removed cmp, asc, acs, & oes_p
+      def component_removed cmp, asc, acs, & oes_p
 
-        oes_p.call :info, :entity_removed do
+        oes_p.call :info, :component_removed do
 
-          event( :Entity_Removed ).new_with(
+          event( :Component_Removed ).new_with(
             :component, cmp,
             :component_association, asc,
             :ACS, acs,

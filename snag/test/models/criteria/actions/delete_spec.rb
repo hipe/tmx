@@ -20,7 +20,7 @@ module Skylab::Snag::TestSupport
       expect_neutral_event :file_utils_mv_event,
         /\Amv \(pth "[^"]+"\) \(pth "[^"]+"\)\z/
 
-      _ev = expect_OK_event :entity_removed
+      _ev = expect_OK_event :component_removed
 
       black_and_white( _ev ).should eql(
         'removed criteria "zap-tango" from persisted criteria collection' )

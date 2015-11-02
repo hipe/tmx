@@ -9,82 +9,40 @@ module Skylab::Brazen
   #
   # (but while we are at it we stowaway "small" event prototypes here too)
 
-
   Autoloader_[ Events_ = ::Module.new ]
 
   module Event_Support_
 
     module Home_::Events_
 
-      Entity_Already_Added = Callback_::Event.prototype_with(  # :+[#035]:C
+      Component_Added = Callback_::Event.prototype_with(  # :+[#035]:D
 
-        :entity_already_added,
+        :component_added,
+        :component, nil,
+        :component_association, nil,
+        :ACS, nil,
 
-        :entity, nil,
-        :entity_collection, nil,
+        :ok, true,
 
-        :error_category, :key_error,
-        :ok, false
+      ) do | y, ev |
 
-      ) do | y, o |
-
-        a = []
-        subject = o.entity_collection.description_under self
-        subject and a.push subject
-
-        a.push 'already'
-
-        conjugated_verb = 'has'  # (one day [#015])
-        a.push conjugated_verb
-
-        object = o.entity.description_under self
-        object and a.push object
-
-        y << ( a * SPACE_ )
-      end
-
-      Entity_Added = Callback_::Event.prototype_with(  # :+[#035]:D
-
-        :entity_added,
-
-        :entity, nil,
-        :entity_collection, nil,
-
-        :verb_symbol, :add,
-
-        :ok, true
-
-      ) do | y, o |
-
-        _s = Home_.lib_.human::NLP::EN::POS::Verb[ o.verb_symbol.to_s ].preterite
-
-        a = [ _s ]
-
-        s = o.entity.description_under self
-        if s
-          a.push s
+        o = Event_Support_::Expresser[ self, ev ]
+        _verb_sym = :add  # :+[#035]:WISH-A
+        s = Home_.lib_.human::NLP::EN::POS::Verb[ _verb_sym.to_s ].preterite
+        o.instance_exec do
+          say s
+          express_component or say 'component'
+          if @can_express_collection_related_
+            say 'to'
+            express_collection
+          end
+          flush_into y
         end
-
-        acs = o.entity_collection
-        s = acs.description_under self
-        if ! s
-          s = acs.name.as_human
-        end
-        a.push 'to'
-        a.push s
-
-        y << ( a * SPACE_ )
-
-        NIL_
       end
 
-      def __WAS__verb_i
-        @do_prepend ? :prepend : :append
-      end
+      Component_Removed = Callback_::Event.prototype_with(  # [#035]:B
 
-      Entity_Removed = Callback_::Event.prototype_with(  # [#035]:B
-
-        :entity_removed,
+        :component_removed,
         :component, nil,
         :component_association, nil,
         :ACS, nil,
@@ -96,10 +54,10 @@ module Skylab::Brazen
 
         o = Event_Support_::Expresser[ self, o ]
 
-        o << 'removed'  # (one day [#035]:WISH-A EN-like expression adapters)
-        o.express_referent
+        o << 'removed'  # one day [#035]:WISH-A
+        o.express_component or say 'component'
         o << 'from'
-        o.express_collection
+        o.express_collection or say 'collection'
         o.flush_into y
       end
     end
@@ -107,112 +65,83 @@ module Skylab::Brazen
 
   module Event_Support_  # publicize if needed. stowaway.
 
+    SubPhrase_Methods__ = ::Module.new
+
     module Expresser
 
+      include SubPhrase_Methods__
+
       # although an event object itself is immutable, it is convenient for
-      # the sake of this complex expression to use "session pattern" on a
-      # object that is of the same structure and content but is mutable so:
+      # the sake of complex expression strategies to use "session pattern"
+      # on a object that is of the same structure and content but mutable
 
-      def self.[] expag, o
-        o.dup.extend( self ).__init expag
+      def self.[] expag, ev
+        o = ev.dup.extend self
+        o.initialize_as_expresser expag
+        o
       end
 
-      def __init expag
-        init_list_
-        @expag_ = expag
-        self
-      end
+      def initialize_as_expresser expag
 
-      def << s
-        _accept s ; self
-      end
-
-      def express_referent
-
-        resolve_association_related_
-
-        d = list_length_
-
-        _ = determine_component_model_string_
-        _accept_unique _, @asc_s_
-
-        _accept_any determine_component_string_
-
-        if d == list_length_
-          _accept 'component'
-        end
+        @expag_ = expag  # before next
+        __index_external_expressions
+        init_expresser_list
         NIL_
       end
 
-      def express_collection
+      # ~ indexing
 
-        d = list_length_
-
-        _ = determine_ACS_model_string_
-        __ = determine_ACS_string_
-        _accept_unique _, __
-
-        if d == list_length_
-          _accept 'collection'
-        end
-
-        NIL_
+      def __index_external_expressions
+        __index_component_related_external_expressions
+        __index_collection_related_external_expressions
       end
 
-      def determine_component_model_string_
-
-        mdl = @component_model_
-        if mdl
-          nf = if mdl.respond_to? :name_function
-            mdl.name_function
-          elsif mdl.respond_to? :module_exec
-            Callback_::Name.via_module mdl
-          end
-          if nf
-            nf.as_human
-          end
-        end
-      end
-
-      def determine_component_string_
-
-        if @component
-          @component.description_under @expag_
-        end
-      end
-
-      def resolve_association_related_
-
-        # resolve any component model and any string
+      def __index_component_related_external_expressions
 
         asc = @component_association
 
-        if asc.respond_to? :component_model  # original, "real" asc from ACS
-          cm = asc.component_model
-
-        elsif asc.respond_to? :module_exec  # to sneak in only the model class
-          cm = asc
-          asc = nil
-        end
-
         if asc
-          s = asc.description_under @expag_
+          if asc.respond_to? :component_model  # original, "real" asc from ACS
+            cm = asc.component_model
+
+          elsif asc.respond_to? :module_exec  # to sneak in only the model class
+            cm = asc
+            asc = nil
+          end
+
+          if asc
+            ca_s = asc.description_under @expag_
+          end
         end
 
-        @asc_s_ = s
-        @component_model_ = cm
+        if cm
+          cm_s = __determine_component_model_string_via_component_model cm
+        end
+
+        @component_association_string_ = ca_s
+        @component_model_string_ = cm_s
+
+        if @component
+          cmp_s = @component.description_under @expag_
+        end
+
+        @can_express_component_related_ = ( cmp_s || ca_s || cm_s ) && true
+        @can_express_component_ = cmp_s && true
+        @component_string_ = cmp_s
         NIL_
       end
 
-      def determine_ACS_model_string_
+      def __determine_component_model_string_via_component_model mdl
 
-        acs = @ACS
-        if acs
-          nf = if acs.respond_to? :name
-            acs.name
-          else
-            Callback_::Name.via_module acs.class
-          end
+        # any module-looking models that want to opt-out of the below
+        # default behavior must implement the below method as nil
+
+        nf = if mdl.respond_to? :name_function
+          mdl.name_function
+
+        elsif mdl.respond_to? :module_exec
+
+          Callback_::Name.via_module mdl
         end
 
         if nf
@@ -220,11 +149,84 @@ module Skylab::Brazen
         end
       end
 
-      def determine_ACS_string_
+      def __index_collection_related_external_expressions
+
+        # this feels like an inappropriate amound of detail to index at this
+        # level, but it is a glint at something deeper we are developing; and
+        # it is for now necessary to have it here to faithfully abstract
+        # surface structures from our real-world targets:
+        #
+        # filesystem paths (notwithstanding relative) are generally longer
+        # than one "word" so we find that it flows better to use a structure
+        # that gets them at the very end of the expression rather than
+        # anywhere else. (indeed, this idea came from platform exception
+        # messages.) compare:
+        #
+        #     "<model> does not have <component> - <long path>"
+        # vs.
+        #
+        #     "<model> <long path> does not have <component>"
+        #
+        # when faced with a path-looking surface expression for the
+        # collection, the expresion-building client may want to chose a
+        # structure that is like the first form with the path cojoined by
+        # a hyphen in its own phrase, rather than the second form that
+        # places the full collection string as the agent of the sentence.
+        #
+        # we started [#hu-044]:1 to explore this
+
         acs = @ACS
         if acs
-          acs.description_under @expag_  # might come out nil
+
+          if acs.respond_to? :description_under
+            acs_s = acs.description_under @expag_
+
+            if acs_s
+              looks_like_FN = acs_s.include? ::File::SEPARATOR
+
+            end
+          end
+
+          acs_model_s = begin
+
+            nf = if acs.respond_to? :name
+              acs.name
+            else
+              Callback_::Name.via_module acs.class
+            end
+
+            if nf
+              nf.as_human
+            end
+          end
         end
+
+        @can_express_collection_related_ = ( acs_s || acs_model_s ) && true
+
+        @can_express_collection_ = acs_s && true
+        @collection_model_string_ = acs_model_s
+        @collection_string_ = acs_s
+        @collection_string_looks_like_filename_ = looks_like_FN
+        NIL_
+      end
+
+      # ~ higher-level "macros"
+
+      def express_component
+
+        say_unique(
+          @component_model_string_,
+          @component_association_string_,
+          @component_string_,
+        )
+      end
+
+      def express_collection
+
+        say_unique(
+          @collection_model_string_,
+          @collection_string_,
+        )
       end
 
       # ~ style support
@@ -233,46 +235,89 @@ module Skylab::Brazen
         Ick_if_necessary_of_under___[ s, @expag_ ]
       end
 
-      # ~ "list" (cache) and flush support
+      # ~ "sub-phrase" & related
 
-      def _accept_unique s, s_
-
-        if s
-          if s_
-            if s == s_
-              _accept s
-            else
-              _accept s
-              _accept s_
-            end
-          else
-            _accept s
-          end
-        elsif s_
-          _accept s_
-        end
+      def new_subphrase
+        SubPhrase___.new
       end
 
-      def _accept_any s
-        if s
-          _accept s
-        end
-      end
-
-      def init_list_
-        @_a = [] ; nil
-      end
-
-      def list_length_
-        @_a.length
-      end
-
-      def _accept s
-        @_a.push s ; nil
+      def say_by & p
+        say_any @expag_.calculate( & p )
       end
 
       def flush_into y
         y << remove_instance_variable( :@_a ).join( SPACE_ )
+      end
+    end
+
+    class SubPhrase___
+
+      include SubPhrase_Methods__
+
+      def initialize
+        init_expresser_list
+      end
+    end
+
+    module SubPhrase_Methods__
+
+      def init_expresser_list
+        @_a = [] ; nil
+      end
+
+      def maybe_say & p
+        d = list_length
+        instance_exec( & p )
+        d != list_length
+      end
+
+      def say_unique * s_a
+        seen = {}
+        s_a.each do | s |
+          s or next
+          seen.fetch s do
+            say s
+            seen[ s ] = nil
+          end
+        end
+        seen.length.nonzero?
+      end
+
+      def say_via_nonsparse_array a
+        @_a.concat a ; nil
+      end
+
+      def say_any s
+        if s
+          say s
+        end
+      end
+
+      def << s  # prettier when used as session
+        say s
+        self
+      end
+
+      def say s
+        @_a.push s
+        ACHIEVED_
+      end
+
+      def list_length
+        @_a.length
+      end
+
+      def list
+        @_a
+      end
+
+      def flush_into_list a
+        a.concat flush_to_array
+        NIL_
+      end
+
+      def flush_to_array
+        remove_instance_variable :@_a
       end
     end
 

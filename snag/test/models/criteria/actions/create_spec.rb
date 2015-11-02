@@ -40,6 +40,14 @@ module Skylab::Snag::TestSupport
     it "yes" do
 
       fn = 'xyzzy1-tmp-for-test'
+      path = ::File.join criteria_directory_, fn
+
+      require 'fileutils'
+
+      if ::File.exist? path
+        debug_IO.puts "hacking cleanup, assuming last test failed - #{ path }"
+        ::FileUtils.rm path
+      end
 
       call_API(
 
@@ -59,10 +67,9 @@ module Skylab::Snag::TestSupport
       st.gets.ID.to_i.should eql 5
       st.gets.ID.to_i.should eql 7
 
-      _ev = expect_OK_event :entity_added
+      _ev = expect_OK_event :component_added
       black_and_white( _ev ).should match %r(\Aadded \"#{ fn }\" to persi)
 
-      path  = ::File.join criteria_directory_, fn
       ::File.read( path ).should eql "nodes that are tagged with #rocket\n"
 
       # cleanup ICK :

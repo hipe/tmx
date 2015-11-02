@@ -378,8 +378,13 @@ module Skylab::TanMan
           is_ok = send :"when__#{ @verb }__and_you_found_one_it_is_OK"
 
           maybe_send_event normal_top_channel_via_OK_value( is_ok ), :found_existing_node do
-            Node_::Events__::Found_Existing_Node.
-              new_with :node_stmt, one, :ok, is_ok
+
+            lib = Node_::Events__
+
+            lib::Found_Existing_Node.new_with(
+              :component, lib::Node_Statement_as_Component.new( one ),
+              :ok, is_ok,
+            )
           end
 
           if :create == @verb

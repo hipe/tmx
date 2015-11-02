@@ -49,8 +49,8 @@ module Skylab::Snag::TestSupport
 
         _call :node_identifier, 1, :tag, 'hi'
 
-        _ev = expect_not_OK_event :entity_already_added
-        black_and_white( _ev ).should eql "[#1] already has #hi"
+        _ev = expect_not_OK_event :component_already_added
+        black_and_white( _ev ).should eql "node [#1] already has tag #hi"
 
         expect_failed
       end
