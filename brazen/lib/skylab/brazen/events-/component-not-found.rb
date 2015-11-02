@@ -28,27 +28,70 @@ module Skylab::Brazen
 
       def __express_into_under y, expag
 
+        # all of the below are abstracted from real-word usage expression
+        # structures. even with just the condition tree being the four
+        # permutation of two conditionals, the cleanup of a jumble like this
+        # is the purpose of [#hu-039] (rule-table-like), investigation of
+        # which we are prerequisiting on the completion of [#br-035] at
+        # least.
+
+        # but our condition tree is deeper still: one of the more spurious
+        # (while still pragmatic) of our decisions is based on whether the
+        # collection expression looks like a path, because filesystem paths
+        # are generally "longer" and so they look "better" at the very end
+        # of the expression; so we express these as a prepositional phrase
+        # as "..in <path>" instead of expressing the path as the referent
+        # ("<path> did not have..")!
+
+        # remember that by design any client can implement its own
+        # expression of events. all of this is just the default expression
+        # strategy.
+
         @expag_ = expag
+        @_y = y
 
         resolve_association_related_
         __resolve_component_strings  # after above
         __resolve_ACS_strings
 
-        # WONDERHACK: distilled from real world usage; if the collection
-        # term looks like it might be a filesystem path, assume it is
-        # possibly long and use the construction that puts that string at
-        # the end, etc..
+        # ~ the would-be rule table inputs
 
-        @_y = y
-        if @_cmp_s
-          if @_ACS_s and @_ACS_s.include? ::File::SEPARATOR
+        component = @_cmp_s && true
+        component_model = @_component_model_s && true
+        component_related = component || component_model
 
-            __there_is_no_M_with_A_C_in_S
+        collection = @_ACS_s && true
+        collection_model = @_ACS_model_s && true
+        collection_related = collection || collection_model
+
+        if collection
+          collection_looks_like_filename = @_ACS_s.include? ::File::SEPARATOR
+        end
+
+        # ~ the would-be rule table
+
+        if collection_related
+
+          if collection_looks_like_filename
+
+             __there_is_no_M_with_A_C_in_S
+
+          elsif component_related
+
+            if component
+
+              __S_has_no_A_C
+            else
+              __in_S_there_are_no_M
+            end
           else
-            __S_has_no_A_C
+            self._DECIDE_ME_collection_related_but_no_component_related
           end
+        elsif component_related  # but not collection related
+
+          __A_not_found__C
         else
-          __in_S_there_are_no_M
+          self._DECIDE_ME_neither
         end
       end
 
@@ -118,7 +161,7 @@ module Skylab::Brazen
         end
 
         if cmp_s
-          cmp_s = Ick_if_necessary_of_under[ cmp_s, @expag_ ]
+          cmp_s = style_as_ick_if_necessary cmp_s
           a.push cmp_s
         end
 
@@ -133,7 +176,7 @@ module Skylab::Brazen
         @_y << ( a * SPACE_ )
       end
 
-      def __there_is_no_M_with_A_C_in_S
+      def __there_is_no_M_with_A_C_in_S  # assume ONLY @_ACS_s
 
         # "there is no <mdl> with <asc> "<cmp>" in <ACS>"
         # e.g "three is no no with identifer '[#10]' in foo/bar" (covered)
@@ -158,7 +201,7 @@ module Skylab::Brazen
 
         if cmp_s
           if mdl_s || asc_s
-            cmp_s = Ick_if_necessary_of_under[ cmp_s, @expag_ ]
+            cmp_s = style_as_ick_if_necessary cmp_s
           end
           a.push cmp_s
         end
@@ -179,6 +222,19 @@ module Skylab::Brazen
         end
 
         @_y << ( a * SPACE_ )
+      end
+
+      def __A_not_found__C
+
+        init_list_
+
+        _accept @_component_model_s
+
+        _accept 'not found -'
+
+        _accept style_as_ick_if_necessary @_cmp_s
+
+        flush_into @_y
       end
     end
   end

@@ -15,22 +15,22 @@ module Skylab::TanMan::TestSupport::Models::Association
 
     it "remove when first node not found" do
       call_API_against "digraph {\nbaz}\n"
-      expect_not_OK_event :node_not_found, 'node not found - (ick "foo")'
+      expect_not_OK_event :component_not_found, 'node not found - (ick "foo")'
       expect_empty_output
       expect_failed
     end
 
     it "remove when 2nd node not found" do
       call_API_against "digraph {\n foo [ label = \"foo\"]\n }\n"
-      expect_not_OK_event :node_not_found, 'node not found - (ick "bar")'
+      expect_not_OK_event :component_not_found, 'node not found - (ick "bar")'
       expect_empty_output
       expect_failed
     end
 
     it "remove when not associated" do
       call_API_against "digraph {\n foo\nbar\nbar -> foo\n }\n"
-      expect_not_OK_event :association_not_found,
-        'association not found: (code "foo -> bar")'
+      expect_not_OK_event :component_not_found,
+        'association not found - (code "foo -> bar")'
       expect_empty_output
       expect_failed
     end

@@ -118,7 +118,7 @@ module Skylab::Brazen
       end
 
       def __init expag
-        @_a = []
+        init_list_
         @expag_ = expag
         self
       end
@@ -131,14 +131,14 @@ module Skylab::Brazen
 
         resolve_association_related_
 
-        d = _current_length
+        d = list_length_
 
         _ = determine_component_model_string_
         _accept_unique _, @asc_s_
 
         _accept_any determine_component_string_
 
-        if d == _current_length
+        if d == list_length_
           _accept 'component'
         end
         NIL_
@@ -146,13 +146,13 @@ module Skylab::Brazen
 
       def express_collection
 
-        d = _current_length
+        d = list_length_
 
         _ = determine_ACS_model_string_
         __ = determine_ACS_string_
         _accept_unique _, __
 
-        if d == _current_length
+        if d == list_length_
           _accept 'collection'
         end
 
@@ -227,6 +227,14 @@ module Skylab::Brazen
         end
       end
 
+      # ~ style support
+
+      def style_as_ick_if_necessary s
+        Ick_if_necessary_of_under___[ s, @expag_ ]
+      end
+
+      # ~ "list" (cache) and flush support
+
       def _accept_unique s, s_
 
         if s
@@ -251,22 +259,26 @@ module Skylab::Brazen
         end
       end
 
+      def init_list_
+        @_a = [] ; nil
+      end
+
+      def list_length_
+        @_a.length
+      end
+
       def _accept s
         @_a.push s ; nil
       end
 
-      def _current_length
-        @_a.length
-      end
-
       def flush_into y
-        y << @_a.join( SPACE_ )
+        y << remove_instance_variable( :@_a ).join( SPACE_ )
       end
     end
 
     rx = nil
-    Ick_if_necessary_of_under = -> s, expag do
-      rx ||= /\A['"]/
+    Ick_if_necessary_of_under___ = -> s, expag do
+      rx ||= /\A['"(]/
       if rx =~ s
         s
       else

@@ -377,17 +377,41 @@ module Skylab::TanMan
       end
 
       def when_not_found
-        @result = maybe_send_event :error, :association_not_found do
-          bld_association_no_found_event
-        end
+
+        @result = __maybe_send_association_not_found_event
         UNABLE_
       end
 
-      def bld_association_no_found_event
-        build_not_OK_event_with :association_not_found,
-            :from_node, @from_node, :to_node, @to_node do |y, o|
-          _s = "#{ o.from_node.node_id } -> #{ o.to_node.node_id }"
-          y << "association not found: #{ code _s }"
+      def __maybe_send_association_not_found_event
+
+        maybe_send_event :error, :component_not_found do
+
+          _as_component = Conceptual_Association___.new @from_node, @to_node
+
+          Brazen_.event( :Component_Not_Found ).new_with(
+            :component, _as_component,
+            :component_association, Models_::Association,
+          )
+        end
+      end
+
+      class Conceptual_Association___
+
+        # experimental :+[#029] entity not yet associated with document
+        # we shoehorned this in after everything to work with the new
+        # [#br-035] exprssive events. could use better integration..
+
+        def initialize from_node, to_node
+          @from_node = from_node
+          @to_node = to_node
+        end
+
+        def description_under expag
+
+          s = "#{ @from_node.node_id } -> #{ @to_node.node_id }"
+          expag.calculate do
+            code s
+          end
         end
       end
 

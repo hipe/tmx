@@ -269,8 +269,18 @@ module Skylab::TanMan
         end
 
         def when_not_found
+
           maybe_send_event :error, :node_not_found do
-            build_not_OK_event_with :node_not_found, :label, @name_s
+
+            _as_componet = Callback_::Name.via_slug @name_s
+            # this might give us "human" inflection. we could do better,
+            # but it would invole heavy hacking of the node class
+
+            Brazen_.event( :Component_Not_Found ).new_with(
+
+              :component, _as_componet,
+              :component_association, Node_,
+            )
           end
           UNABLE_
         end
