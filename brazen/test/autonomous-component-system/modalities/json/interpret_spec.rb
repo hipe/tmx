@@ -129,7 +129,7 @@ module Skylab::Brazen::TestSupport
       o = subject_::Modalities::JSON::Interpret.new( & x_p )
 
       o.JSON = json
-      o.component = new_empty
+      o.ACS = new_empty
       o.context_string_proc_stack = [
         -> do
           "in #{ code 'someplace' }"

@@ -11,7 +11,7 @@ module Skylab::Brazen
         end
 
         attr_writer(
-          :component,
+          :ACS,
           :context_string_proc_stack,
           :JSON,
         )
@@ -32,7 +32,7 @@ module Skylab::Brazen
 
           ok = _common_execute
           if ok
-            @sanitized_value = remove_instance_variable :@component
+            @sanitized_value = remove_instance_variable :@ACS
             ok
           else
             ok
@@ -74,11 +74,13 @@ module Skylab::Brazen
         def __init_units_of_work  # #note-JSON-A about this loop
 
           uow_a = []
-          st = ACS_::Reflection::To_association_stream[ @component ]
+
+          cmp_oes_p = ACS_::Interpretation::Component_handler[
+            @ACS, & @on_event_selectively ]
 
           h = remove_instance_variable :@_mutable_hash
-
           ok = true
+          st = ACS_::Reflection::To_association_stream[ @ACS ]
 
           begin
             asc = st.gets
@@ -104,7 +106,7 @@ module Skylab::Brazen
                 break
               end
             else
-              uow_a.push Leaf___.new( x, asc, & @on_event_selectively )
+              uow_a.push Leaf___.new( x, asc, & cmp_oes_p )
               ok = true
             end
 
@@ -138,11 +140,11 @@ module Skylab::Brazen
 
           cmp = ACS_::Interpretation::Build_empty_child_bound_to_parent.call(
             asc,
-            @component,
+            @ACS,
             & @on_event_selectively )
 
           if cmp
-            o.component = cmp
+            o.ACS = cmp
             ACHIEVED_
           else
             self._COVER_ME_failed_to_build_empty_child_component__assumed_correct_as_is
@@ -178,7 +180,7 @@ module Skylab::Brazen
 
         def __accept_sanitized_values
 
-          accpt = ACS_::Interpretation::Accepter_for[ @component ]
+          accpt = ACS_::Interpretation::Accepter_for[ @ACS ]
 
           @_units_of_work.each do | uow |
 
@@ -199,7 +201,7 @@ module Skylab::Brazen
           def initialize x, asc, & p
 
             @association = asc
-            @_oes = p
+            @_my_oes = p
             @_unsanitized_value_x = x
           end
 
@@ -212,8 +214,11 @@ module Skylab::Brazen
 
               # (can happen if null is present for a compound component)
 
-              obj = mdl.interpret_component vp, & @_oes
+              obj = mdl.interpret_component vp, & @_my_oes
               if obj
+                if obj.respond_to? :accept_identity_via_component_association
+                  obj.accept_identity_via_component_association @association
+                end
                 @sanitized_value = obj
                 ACHIEVED_
               else
@@ -222,7 +227,7 @@ module Skylab::Brazen
 
             else
 
-              vw = mdl[ vp, & @_oes ]
+              vw = mdl[ vp, & @_my_oes ]
               if vw
                 @sanitized_value = vw.value_x
                 ACHIEVED_
@@ -251,6 +256,10 @@ module Skylab::Brazen
               remove_instance_variable :@_p
               x
             end
+          end
+
+          def no_unparsed_exists
+            ! @unparsed_exists
           end
 
           attr_reader :unparsed_exists

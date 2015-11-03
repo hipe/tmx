@@ -144,7 +144,7 @@ module Skylab::Brazen
         end
       end
 
-      Method_index_of_class = -> cls do  # 1
+      Method_index_of_class = -> cls do  # 2
 
         cls.class_exec do
 
@@ -267,7 +267,7 @@ module Skylab::Brazen
 
       # ~ encapsulate the fragile assumption about ivars
 
-      Wrapped_value_for = -> asc, acs do  # 1
+      Wrapped_value_for = -> asc, acs do  # 2
 
         ivar = asc.name.as_ivar
         if acs.instance_variable_defined? ivar

@@ -55,7 +55,7 @@ module Skylab::Brazen::TestSupport
     def _begin_to_json sn
 
       o = subject_::Modalities::JSON::Express.new
-      o.upstream_component = sn
+      o.upstream_ACS = sn
       o
     end
   end

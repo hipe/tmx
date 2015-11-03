@@ -28,15 +28,7 @@ module Skylab::MyTerm
 
     define_method :application_kernel_, ( Callback_.memoize do
 
-      bx = ACS_[]::Modalities::Reactive_Tree::Dynamic_Source_for_Unbounds.new
-      bx.fallback_module = Models_
-
-      Brazen_::Kernel.new Home_ do | kr |
-
-        bx.add :Appearance, Models_::Appearance::Silo_Daemon.new( kr )
-        kr.reactive_tree_seed = bx
-        NIL_
-      end
+      Build_default_application_kernel___[]
     end )
 
     def lib_
@@ -45,6 +37,19 @@ module Skylab::MyTerm
         Lib_, self )
     end
   end  # >>
+
+  Build_default_application_kernel___ = -> do
+
+    bx = ACS_[]::Modalities::Reactive_Tree::Dynamic_Source_for_Unbounds.new
+    bx.fallback_module = Models_
+
+    Brazen_::Kernel.new Home_ do | kr |
+
+      bx.add :Appearance, Models_::Appearance::Silo_Daemon.new( kr )
+      kr.reactive_tree_seed = bx
+      NIL_
+    end
+  end
 
   # ~ simple stowaways, functions
 
@@ -62,7 +67,11 @@ module Skylab::MyTerm
 
     Basic = sidesys[ :Basic ]
 
-    System = sidesys[ :System ]
+    system_lib = sidesys[ :System ]
+
+    System = -> do
+      system_lib[].services
+    end
   end
 
   ACHIEVED_ = true

@@ -53,9 +53,15 @@ module Skylab::Brazen
         # in our stream constitute the first level of elements for the app.
 
         class << self
-          def [] acs, & x_p
+
+          def _same acs, & x_p
+            x_p or self._WHERE
             new( acs, & x_p ).__to_stream
           end
+
+          alias_method :[], :_same
+          alias_method :call, :_same
+
           private :new
         end  # >>
 
@@ -72,7 +78,7 @@ module Skylab::Brazen
 
               if qkn.is_known_known
 
-                self._WRITE_ME__unbound_for_association_with_known_value qkn
+                __unbound_for_association_with_known_value qkn
               else
                 __unbound_for_association_with_unknown_value qkn
               end
@@ -92,9 +98,15 @@ module Skylab::Brazen
           _cmp = ACS_::Interpretation::Build_empty_child_bound_to_parent[
             asc, @_acs, & @_oes_p ]  # #todo - why do we not assign child?
 
-          # the below hybrid does not get the "special" handler
+          # the above component got the "special" handler,
+          # but the below hybrid needs the ordinary one.
 
           Compound_as_Hybrid__.new asc.name, _cmp, & @_oes_p
+        end
+
+        def __unbound_for_association_with_known_value qkn
+
+          Compound_as_Hybrid__.new qkn.name, qkn.value_x, & @_oes_p
         end
       end
 

@@ -4,34 +4,101 @@ module Skylab::MyTerm
 
     class << self
 
-      def interpret_component arg_st, & x_p
+      def interpret_component st, & x_p
 
-        if arg_st.no_unparsed_exists
-          new( & x_p )
+        if st.no_unparsed_exists
+          _new_entity( & x_p )
         else
-          self._DESIGN_ME_syntax_for_creation_for_edit_session
+          o = _new_entity( & x_p )
+          ada = o._lookup st.gets_one
+          if ada
+            ada._accept_selected
+            ada
+          else
+            ada
+          end
         end
       end
 
-      alias_method :__new_entity, :new
-
+      alias_method :_new_entity, :new
       private :new
     end  # >>
 
-    def initialize & oes_p
-      @_on_event_selectively = oes_p
+    def initialize & oes_p  # on event selectively
+      @is_selected = false
+      @_oes_p = oes_p
     end
 
-    def describe_into_under y, expag
-      me = self
-      expag.calculate do
-        y << "#{ me.__operation_symbols * ', ' } adapters"  # etc
+    def accept_identity_via_component_association asc
+      @_asc = asc ; nil
+    end
+
+    # ~ the "set" operation
+
+    def __set__component_operation
+
+      yield :description, -> y do
+        y << "set the adapter"
+      end
+
+      yield :parameter, :adapter, :description, -> y do
+        y << "the name of the adapter to use"
+        y << "(see `list` for a list of adapters)"   # etc
+      end
+
+      method :__receive_set_adapter_name
+    end
+
+    def __receive_set_adapter_name adapter
+
+      ada = _lookup adapter
+      if ada
+        if object_id == ada.object_id
+          # for now we let this slide (covered), just so we can cover the
+          # mechanics of it. but follow this up if you want to..
+        end
+        __receive_set_adapter ada
+      else
+        ada
       end
     end
 
-    def __operation_symbols
-      ACS_[]::Reflection::Method_index_of_class[ self.class ].operation_symbols
+    def __receive_set_adapter ada
+
+      if object_id != ada.object_id
+        @is_selected = false  # maybe not important
+      end
+
+      ada._accept_selected
+
+      @_oes_p.call :component, :change do | y |
+        y.yield :new_component, ada
+        y.yield :association, @_asc
+      end
     end
+
+    def _lookup x
+
+      oes_p = @_oes_p
+
+      o = Brazen_::Collection::Common_fuzzy_retrieve.new( & oes_p )
+
+      _ = Callback_::Qualified_Knownness.via_value_and_symbol x, :adapter
+
+      o.qualified_knownness = _
+
+      o.stream_builder = -> do
+        _to_stream( & oes_p )
+      end
+
+      o.name_map = -> ada do
+        ada._adapter_name.as_slug
+      end
+
+      o.execute
+    end
+
+    # ~ the "list" operation
 
     def __list__component_operation
 
@@ -39,17 +106,48 @@ module Skylab::MyTerm
         y << "list the available adapters"
       end
 
-      method :__to_stream
+      method :_to_stream
     end
 
-    def __to_stream & oes_p
+    # ~ operation support
 
-      proto = self.class.__new_entity( & oes_p )
+    def _to_stream
 
-      _ = ::Dir[ "#{ Home_::Image_Output_Adapters_.dir_pathname.to_path }/*" ]
+      # function soup for this: if you are selected and you are providing
+      # the list, provide yourself as the appropriate item in the stream.
 
-      Callback_::Stream.via_nonsparse_array _ do | path |
-        proto.new path
+      build_via_proto = nil
+
+      use_build_via_proto = -> path do
+        build_via_proto[ path ]
+      end
+
+      if @is_selected
+        my_path = @path
+        p = -> path do
+          if my_path == path
+            p = use_build_via_proto
+            self
+          else
+            build_via_proto[ path ]
+          end
+        end
+      else
+        p = use_build_via_proto
+      end
+
+      build_via_proto = -> x do
+        proto = self.class._new_entity( & @_oes_p )
+        build_via_proto = -> path do
+          proto.new path
+        end
+        build_via_proto[ x ]
+      end
+
+      @__ls ||= ::Dir[ "#{ Home_::Image_Output_Adapters_.dir_pathname.to_path }/*" ]
+
+      Callback_::Stream.via_nonsparse_array @__ls do | path |
+        p[ path ]
       end
     end
 
@@ -63,29 +161,42 @@ module Skylab::MyTerm
 
     def __init path
 
-      @_is_selected = false
+      @is_selected = false
       @path = path
       NIL_
     end
 
-    attr_reader(
-      :path,
-    )
+    def express_into_under y, _expag  # for a mode client
 
-    nf = nil
-    define_method :name do  # #open [#br-107] will change this name
-      nf ||= Callback_::Name.via_variegated_symbol( :adapter )
-    end
-
-    def express_into_under y, _expag
-
-      _glyph_for_is_selected = if @_is_selected
+      _glyph_for_is_selected = if @is_selected
         SELECTED_GLYPH__
       else
         NULL_GLYPH__
       end
 
       y << "#{ _glyph_for_is_selected }#{ _adapter_name.as_slug }"
+    end
+
+    def describe_into_under y, expag  # for reactive tree
+      me = self
+      expag.calculate do
+        y << "#{ me.__operation_symbols * ', ' } adapters"  # etc
+      end
+    end
+
+    def description_under expag  # for [#br-035] expressive events
+      me = self
+      expag.calculate do
+        nm me._adapter_name
+      end
+    end
+
+    def __operation_symbols
+      ACS_[]::Reflection::Method_index_of_class[ self.class ].operation_symbols
+    end
+
+    def to_component_value
+      _adapter_name.as_slug
     end
 
     def _adapter_name
@@ -97,6 +208,20 @@ module Skylab::MyTerm
       bn = ::File.basename @path
       Callback_::Name.via_slug bn[ 0 ... - ::File.extname( bn ).length ]
     end
+
+    nf = nil
+    define_method :name do  # #open [#br-107] will change this name
+      nf ||= Callback_::Name.via_variegated_symbol( :adapter )
+    end
+
+    def _accept_selected
+      @is_selected = true ; nil
+    end
+
+    attr_reader(
+      :is_selected,
+      :path,
+    )
 
     NULL_GLYPH__ = '  '
     SELECTED_GLYPH__ = '• '

@@ -18,7 +18,7 @@ module Skylab::MyTerm
       end
     end
 
-    # ~ as model ->
+      # ~ initialization as entity
 
       def initialize ke, & x_p
         @_kernel = ke
@@ -28,48 +28,73 @@ module Skylab::MyTerm
       def init
 
         inst = @_kernel.silo :Installation
-        fs = inst.filesystem
-        path = inst.appearance_delta_path
 
-        begin
-          io = fs.open path, ::File::RDWR
-        rescue ::Errno::ENOENT
-        end
-
+        io = inst.any_existing_read_writable_IO
         if io
-          self._RETRIEVE__init_retrieved_via_IO io
+          self.__init_retrieved_via_IO io
         else
-          __init_created path, fs
+          __init_created inst
         end
       end
 
-      def __init_created path, fs
+      def __init_retrieved_via_IO io
+
+        o = ACS_[]::Modalities::JSON::Interpret.new( & @_oes_p )
+        o.ACS = self
+        o.context_string_proc_stack = [ -> do
+          "in #{ pth io.path }"
+        end ]
+        o.JSON = io.read
+
+        @_CAS = [ :adapter ]  # for now, still only this
+
+        ok = o.execute
+
+        if ok
+
+          @_is_created = false
+          @_is_modified = false
+
+          @_produce_writable_IO = -> do
+            io.rewind
+            io.truncate 0
+            io
+          end
+          ACHIEVED_
+        else
+          io.close
+          ok
+        end
+      end
+
+      def __init_created inst
 
         @_CAS = [ :adapter ]  # LOOK to start, you only have this one component
 
         @_is_created = true
         @_is_modified = false
 
-        @_produce_writable_IO = -> & x_p do
-
-          # we don't create directories or lock until we need to
-
-          dirname = ::File.dirname path
-          if ! fs.exist? dirname
-            fs.mkdir_p dirname, & x_p
-          end
-          fs.open path, ::File::CREAT | ::File::WRONLY
-        end
+        @_produce_writable_IO = inst.method :writable_IO
 
         ACHIEVED_
       end
 
+      # ~ adapt to reactive tree, express via ACS
+
       def to_unordered_index_stream
-        ACS_[]::Modalities::Reactive_Tree::Children_as_unbound_stream[ self ]
+
+        ACS_[]::Modalities::Reactive_Tree::Children_as_unbound_stream.call(
+          self, & @_oes_p )
       end
 
       def component_association_symbols
-        @_CAS
+        a = @_CAS  # when freshly initted, no children
+        if a
+          a
+        else
+          _ = ACS_[]::Reflection::Method_index_of_class[ self.class ]
+          _.association_symbols
+        end
       end
 
       def __adapter__component_association
@@ -80,7 +105,20 @@ module Skylab::MyTerm
         NIL_  # LOOK don't bother indexing our methods for operations ever
       end
 
-    # ~ <-
+      # ~ receive messages from children
+
+      def __receive__component__change__ & ev_p
+
+        ACS_[]::Interpretation::Accept_component_change[ ev_p, self, & @_oes_p ]
+
+        o = ACS_[]::Modalities::JSON::Express.new( & @_oes_p )
+
+        o.downstream_IO_proc = remove_instance_variable :@_produce_writable_IO
+
+        o.upstream_ACS = self
+
+        o.execute
+      end
 
     Here_ = self
   end

@@ -10,8 +10,26 @@ module Skylab::MyTerm
       def initialize _k, _mod
       end
 
-      def appearance_delta_path
-        @___AD_path ||= ::File.join _data_path, 'myterm.json'
+      def any_existing_read_writable_IO
+
+        _filesystem.open _appearance_persistence_path, ::File::RDWR
+      rescue ::Errno::ENOENT
+      end
+
+      def writable_IO * x_p
+
+        fs = _filesystem
+        path = _appearance_persistence_path
+
+        dirname = ::File.dirname path
+        if ! fs.exist? dirname
+          fs.mkdir_p dirname, & x_p
+        end
+        fs.open path, ::File::CREAT | ::File::WRONLY
+      end
+
+      def _appearance_persistence_path
+        @___path ||= ::File.join _data_path, 'myterm.json'
       end
 
       def get_font_file_extensions
@@ -26,7 +44,7 @@ module Skylab::MyTerm
         ::File.join _data_path, 'volatile-image.png'
       end
 
-      def filesystem
+      def _filesystem
         ::File
       end
 

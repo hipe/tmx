@@ -16,7 +16,7 @@ to be cheeky, we refer to input as "interpretation" and output as
 
 ..is our catch-all term that refers broadly to "substrate" and
 "encoding" when it comes to IO. for example, "JSON" is one modality.
-there is a particular way that we "interpret from this modality, and a
+there is a particular way that we "interpret from" this modality, and a
 particular way we "express to" it as well.
 
 
@@ -55,7 +55,7 @@ interpretation as an "interpreter", but we will offer no rigorous
 specification for interpreters here.
 
 it's worth comparing a [#089] "mutation session" to an interpreter - it
-"feels like" the mutation session is acting as an interpretor for tenet
+"feels like" the mutation session is acting as an interpreter for tenet
 3 from there (thru which all compound components are presumably built in
 a normal world). (however, internally it is the particular component class
 itself that actually constructs a mutable component, before passing it off
@@ -132,6 +132,38 @@ being used.
 
 the worst case cost to this is if we were were repeatedly request a node
 near the the end but never reach the end.
+
+
+
+
+### :#note-INTERP-A
+
+honoring tenets t1 and t6 [#089], "interpret component" is for now the
+de-facto standard way we build a new empty component for example for
+edit sessions, unserializing, building reactive trees, etc.
+
+testing the important theory that ACS encourages decoupled design, we
+would like for the ["child"] components not to "know" that they are
+children per se. (indeed, part of autonomy means gaining independence
+from our parents.)
+
+the [#ca-001] selective listener pattern is a perfect fit for this: the
+children can emit events as if a parent might be there, not knowing
+whether a parent is actually there.
+
+on the other side of this, however, the parent won't be able to do
+anything useful with this event unless it knows who the child is. that
+is why we pass the child its association structure so it can identify
+itself when it emits events. this breaks the illusion somewhat, but is
+for now necessary to carry us forward on this path.
+
+
+
+
+### :#note-INTERP-B
+
+deciding when to add components and to what extent "atomic" components
+are a thing is the focus of this point of reference.
 
 
 
