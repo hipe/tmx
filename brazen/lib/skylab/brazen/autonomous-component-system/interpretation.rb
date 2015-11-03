@@ -22,7 +22,15 @@ module Skylab::Brazen
         Accept_valid_value__[ cmp_, asc, acs ]  # init or change
 
         if wv
+          oes_p.call :info, :component_changed do
 
+            ACS_.event( :Component_Changed ).new_with(
+              :current_component, cmp_,
+              :previous_component, wv.value_x,
+              :component_association, asc,
+              :ACS, acs,
+            )
+          end
         else
           oes_p.call :info, :component_added do
 

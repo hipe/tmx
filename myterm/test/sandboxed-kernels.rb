@@ -145,7 +145,11 @@ module Skylab::MyTerm::TestSupport
 
         _mock_installation_method :any_existing_read_writable_IO do
           require 'stringio'
-          ::StringIO.new string
+          io = ::StringIO.new string
+          def io.path
+            "[mt]/string-IO-xizzi.json"
+          end
+          io
         end
       end
 

@@ -84,22 +84,18 @@ module Skylab::Brazen
       def initialize_as_expresser expag
 
         @expag_ = expag  # before next
-        __index_external_expressions
+        __index_component_association_related
+        index_component_related
+        __index_collection_related
         init_expresser_list
         NIL_
       end
 
       # ~ indexing
 
-      def __index_external_expressions
-        __index_component_related_external_expressions
-        __index_collection_related_external_expressions
-      end
-
-      def __index_component_related_external_expressions
+      def __index_component_association_related
 
         asc = @component_association
-
         if asc
           if asc.respond_to? :component_model  # original, "real" asc from ACS
             cm = asc.component_model
@@ -120,12 +116,20 @@ module Skylab::Brazen
 
         @component_association_string_ = ca_s
         @component_model_string_ = cm_s
+        NIL_
+      end
+
+      def index_component_related
 
         if @component
-          cmp_s = @component.description_under @expag_
+          cmp_s = describe_component @component
         end
 
-        @can_express_component_related_ = ( cmp_s || ca_s || cm_s ) && true
+        @can_express_component_related_ = (
+          cmp_s ||
+          @component_association_string_ ||
+          @component_model_string_ ) && true
+
         @can_express_component_ = cmp_s && true
         @component_string_ = cmp_s
         NIL_
@@ -149,7 +153,7 @@ module Skylab::Brazen
         end
       end
 
-      def __index_collection_related_external_expressions
+      def __index_collection_related
 
         # this feels like an inappropriate amound of detail to index at this
         # level, but it is a glint at something deeper we are developing; and
@@ -219,6 +223,14 @@ module Skylab::Brazen
           @component_association_string_,
           @component_string_,
         )
+      end
+
+      def say_component cmp
+        say describe_component cmp
+      end
+
+      def describe_component cmp
+        cmp.description_under @expag_
       end
 
       def express_collection
