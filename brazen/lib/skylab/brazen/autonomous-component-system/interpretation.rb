@@ -21,6 +21,11 @@ module Skylab::Brazen
 
         Accept_valid_value__[ cmp_, asc, acs ]  # init or change
 
+        if wv && ! wv.value_x
+          wv.value_x.nil? or self._DESIGN_ME_issue_083_INTERP_B_when_falseish
+          wv = nil
+        end
+
         if wv
           oes_p.call :info, :component_changed do
 
@@ -47,9 +52,15 @@ module Skylab::Brazen
       Touch = -> asc, acs, & x_p do
 
         wv = ACS_::Reflection::Wrapped_value_for[ asc, acs ]
+
+        if wv && ! wv.value_x
+          wv.value_x.nil? or self._DESIGN_ME_issue_083_INTERP_B_when_falseish
+          wv = nil
+        end
+
         if wv
 
-          wv.value_x or self._COVER_ME  # nils may haunt us..
+          wv.value_x
 
         else
 
@@ -61,24 +72,92 @@ module Skylab::Brazen
         end
       end
 
-      Build_empty_child_bound_to_parent = -> asc, acs, & oes_p do
+      becbtpn = nil
+      Build_empty_child_bound_to_parent = -> asc, acs, & acs_oes_p do
 
-        # NOTE this does not assign the child to the parent, it only
-        # creates a one-way dependency of child upon parent with the
-        # eventing. more at #note-INTERP-A
+        wv = becbtpn[ asc, acs, & acs_oes_p ]
+        if wv
+          wv.value_x
+        else
+          wv
+        end
+      end
+
+      becbtpn = -> asc, acs, & acs_oes_p do
+
+        # ("build empty child bound to parent normally" ..)
+
+        # (see instream comments - this does not assign child to parent)
 
         _st = Callback_::Polymorphic_Stream.the_empty_polymorphic_stream
 
-        _special_oes_p = Component_handler[ acs, & oes_p ]
+        _cmp_oes_p = Component_handler[ acs, & acs_oes_p ]
 
-        cmp = asc.component_model.interpret_component _st, & _special_oes_p
-        if cmp and cmp.respond_to? :accept_identity_via_component_association
-          cmp.accept_identity_via_component_association asc
+        Build_component_normally[ _st, asc, acs, & _cmp_oes_p ]
+      end
+
+      class Build_component_normally
+
+        # NOTE this results in a wrapped value, not the component itself!
+        # (so that it looks the same whether it's the one or the other means)
+
+        # the only purpose this node serves is to implement :t5 and :t6,
+        # and the only node that knows of those tenets is this one.
+
+        # this does not assign child to parent in any way, nor does it check
+        # if there is already an existing child in any sort of parent member
+        # "slot". if caller wants the child to have a one-way/passive/blind
+        # connection to parent, it may do by passing an appropriate handler.
+
+        class << self
+          def _call st, asc, acs, & p
+            new( st, asc, acs, & p ).execute
+          end
+          alias_method :[], :_call
+          alias_method :call, :_call
+        end  # >>
+
+        def initialize st, asc, acs, & p
+          @ACS = acs
+          @argument_stream = st
+          @association = asc
+          @_oes_p = p
         end
-        cmp
+
+        def execute
+          @_model = @association.component_model
+          if @_model.respond_to? :interpret_component
+            __via_component_model
+          else
+            @_model[ @argument_stream, & @_oes_p ]
+          end
+        end
+
+        def __via_component_model
+
+          cmp = @_model.interpret_component @argument_stream, & @_oes_p
+          if cmp
+
+            ok = if cmp.respond_to? :initialize_component
+              cmp.initialize_component @association, @ACS
+            else
+              true
+            end
+
+            if ok
+              Value_Wrapper[ cmp ]
+            else
+              ok
+            end
+          else
+            cmp
+          end
+        end
       end
 
       Component_handler = -> acs, & oes_p do
+
+        oes_p or self._SANITY_no_handler_from_ACS?
 
         -> * i_a, & ev_p do
 

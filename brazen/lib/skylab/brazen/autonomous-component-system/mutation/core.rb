@@ -5,13 +5,17 @@ module Skylab::Brazen
     class Mutation  # notes in [#089]
 
       def initialize & x_p
-        @x_p = x_p
+        @x_p = x_p || Unhandler___
+      end
+
+      Unhandler___ = -> * i_a, & _ev_p do
+        raise "handle me: #{ i_a.inspect }"
       end
 
       attr_writer(
+        :ACS,
         :arg_st,
         :macro_operation_method_name,
-        :subject_component,
       )
 
       def accept_argument_array x_a
@@ -85,7 +89,7 @@ module Skylab::Brazen
         if @_at_least_one_delivery_failed
           @_last_delivery_failure_result
         else
-          @subject_component
+          @ACS
         end
       end
 
@@ -98,14 +102,12 @@ module Skylab::Brazen
 
         elsif @_at_least_one_delivery_changed_something
 
-          @subject_component.
-            result_for_component_mutation_session_when_changed(
-              Change_Log___.new( @_last_changeful_delivery_result ),
-              & @x_p )
+          @ACS.result_for_component_mutation_session_when_changed(
+            Change_Log___.new( @_last_changeful_delivery_result ),
+            & @x_p )
         else
 
-          @subject_component.
-            result_for_component_mutation_session_when_no_change( & @x_p )
+          @ACS.result_for_component_mutation_session_when_no_change( & @x_p )
         end
       end
 
@@ -113,7 +115,8 @@ module Skylab::Brazen
 
         a = []
         ok = ACHIEVED_
-        p = Operation___.gets_proc_for @arg_st, @subject_component, & @x_p
+
+        p = Operation___.gets_proc_for @arg_st, @ACS, & @x_p
 
         begin
           op = p[]
@@ -331,12 +334,13 @@ module Skylab::Brazen
             )
             ok = comp_x ? true : false
           else
-            vw = @association.interpret @arg_st, & @oes_p
-            if vw
+
+            wv = ___interpret_component_normally
+            if wv
               ok = true
-              comp_x = vw.value_x
+              comp_x = wv.value_x
             else
-              ok = vw
+              ok = wv
             end
           end
 
@@ -346,6 +350,19 @@ module Skylab::Brazen
           else
             ok
           end
+        end
+
+        def ___interpret_component_normally
+
+          lib = ACS_::Interpretation
+
+          _special_oes = lib::Component_handler[ @ACS, & @oes_p ]
+
+          lib::Build_component_normally.call(
+            @arg_st,
+            @association,
+            @ACS,
+            & _special_oes )
         end
 
         def __interpret_when_operation_defined_in__model__

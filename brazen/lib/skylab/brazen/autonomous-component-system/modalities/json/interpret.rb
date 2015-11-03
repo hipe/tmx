@@ -80,7 +80,12 @@ module Skylab::Brazen
 
           h = remove_instance_variable :@_mutable_hash
           ok = true
-          st = ACS_::Reflection::To_association_stream[ @ACS ]
+
+          st = if @ACS.respond_to? :to_association_stream_for_serialization
+            @ACS.to_association_stream_for_serialization
+          else
+            ACS_::Reflection::To_association_stream[ @ACS ]
+          end
 
           begin
             asc = st.gets
@@ -106,7 +111,7 @@ module Skylab::Brazen
                 break
               end
             else
-              uow_a.push Leaf___.new( x, asc, & cmp_oes_p )
+              uow_a.push Leaf___.new( x, asc, @ACS, & cmp_oes_p )
               ok = true
             end
 
@@ -198,8 +203,9 @@ module Skylab::Brazen
 
         class Leaf___
 
-          def initialize x, asc, & p
+          def initialize x, asc, acs, & p
 
+            @_ACS = acs
             @association = asc
             @_my_oes = p
             @_unsanitized_value_x = x
@@ -207,33 +213,16 @@ module Skylab::Brazen
 
           def _resolve_sanitized_value
 
-            vp = Value_Popper___.new @_unsanitized_value_x
+            _vp = Value_Popper___.new @_unsanitized_value_x
 
-            mdl = @association.component_model
-            if mdl.respond_to? :interpret_component
+            vw = ACS_::Interpretation::Build_component_normally[
+              _vp, @association, @_ACS, & @_my_oes ]
 
-              # (can happen if null is present for a compound component)
-
-              obj = mdl.interpret_component vp, & @_my_oes
-              if obj
-                if obj.respond_to? :accept_identity_via_component_association
-                  obj.accept_identity_via_component_association @association
-                end
-                @sanitized_value = obj
-                ACHIEVED_
-              else
-                obj
-              end
-
+            if vw
+              @sanitized_value = vw.value_x
+              ACHIEVED_
             else
-
-              vw = mdl[ vp, & @_my_oes ]
-              if vw
-                @sanitized_value = vw.value_x
-                ACHIEVED_
-              else
-                vw
-              end
+              vw
             end
           end
 

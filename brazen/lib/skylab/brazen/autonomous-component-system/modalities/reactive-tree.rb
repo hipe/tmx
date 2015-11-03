@@ -54,41 +54,65 @@ module Skylab::Brazen
 
         class << self
 
-          def _same acs, & x_p
+          def _call acs, & x_p
             x_p or self._WHERE
-            new( acs, & x_p ).__to_stream
+            o = new( & x_p )
+            o.ACS = acs
+            o.execute
           end
 
-          alias_method :[], :_same
-          alias_method :call, :_same
-
-          private :new
+          alias_method :[], :_call
+          alias_method :call, :_call
         end  # >>
 
-        def initialize acs, & oes_p
-          @_acs = acs
+        def initialize & oes_p
+          @node_stream = nil
           @_oes_p = oes_p
         end
 
-        def __to_stream
+        attr_writer(
+          :ACS,
+          :node_stream,
+        )
 
-          ACS_::Reflection::To_node_stream[ @_acs ].map_by do | qkn |
+        def execute
+
+          _st = if @node_stream
+            @node_stream
+          else
+            ACS_::Reflection::To_node_stream[ @ACS ]
+          end
+
+          _st.map_by do | qkn |
 
             if :association == qkn.association.category
 
               if qkn.is_known_known
 
-                __unbound_for_association_with_known_value qkn
+                x = qkn.value_x
+
+                if x
+                  __unbound_for_association_with_trueish_value qkn
+
+                elsif x.nil?
+
+                  # (near [#083]:INTERP-B .. might change)
+
+                  _unbound_for_association_with_unknown_value qkn
+                else
+
+                  self._DESIGN_ME_issue_083_INTERP_B_when_falseish
+                end
               else
-                __unbound_for_association_with_unknown_value qkn
+                _unbound_for_association_with_unknown_value qkn
               end
             else
-              Operation_as_Hybrid___.new qkn, @_acs
+              Operation_as_Hybrid___.new qkn, @ACS
             end
           end
         end
 
-        def __unbound_for_association_with_unknown_value qkn
+        def _unbound_for_association_with_unknown_value qkn
 
           # this part is kind of nasty - create & join children like these
           # for now we assume class-like model but this could be granulated
@@ -96,7 +120,7 @@ module Skylab::Brazen
           asc = qkn.association
 
           _cmp = ACS_::Interpretation::Build_empty_child_bound_to_parent[
-            asc, @_acs, & @_oes_p ]  # #todo - why do we not assign child?
+            asc, @ACS, & @_oes_p ]  # #todo - why do we not assign child?
 
           # the above component got the "special" handler,
           # but the below hybrid needs the ordinary one.
@@ -104,7 +128,7 @@ module Skylab::Brazen
           Compound_as_Hybrid__.new asc.name, _cmp, & @_oes_p
         end
 
-        def __unbound_for_association_with_known_value qkn
+        def __unbound_for_association_with_trueish_value qkn
 
           Compound_as_Hybrid__.new qkn.name, qkn.value_x, & @_oes_p
         end

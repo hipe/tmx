@@ -196,6 +196,10 @@ module Skylab::Brazen::TestSupport
     Callback_::Autoloader[ self ]  # don't load fixture file when autoloading lib
   end
 
+  No_events_ = -> * i_a, & ev_p do
+    fail "unexpected: #{ i_a.inspect }"
+  end
+
   module Zerk
     Callback_::Autoloader[ self ]  # don't load spec file when autoloading lib
   end

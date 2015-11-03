@@ -4,29 +4,29 @@ module Skylab::Brazen
 
     class << self
 
-      def create x_a, new_o, & x_p  # :t2.
+      def create x_a, acs, & x_p  # :t2.
 
         o = _Mutation_Session.new( & x_p )
         o.accept_argument_array x_a
-        o.subject_component = new_o
+        o.ACS = acs
         o.macro_operation_method_name = :create
         o.execute
       end
 
-      def edit x_a, subj_o, & x_p  # :t3.
+      def edit x_a, acs, & x_p  # :t3.
 
         o = _Mutation_Session.new( & x_p )
         o.accept_argument_array x_a
-        o.subject_component = subj_o
+        o.ACS = acs
         o.macro_operation_method_name = :edit
         o.execute
       end
 
-      def interpret arg_st, new_o, & x_p  # :+t6
+      def interpret arg_st, acs, & x_p  # :+t6
 
         o = _Mutation_Session.new( & x_p )
         o.arg_st = arg_st
-        o.subject_component = new_o
+        o.ACS = acs
         o.macro_operation_method_name = :interpret
         o.execute
       end
@@ -68,7 +68,7 @@ module Skylab::Brazen
             :ACS, acs,
           )
         end
-        ACHIEVED_  # ..?
+        ACHIEVED_
       end
 
       def event sym
@@ -80,29 +80,106 @@ module Skylab::Brazen
       end
     end  # >>
 
+    module CA_Builder__ ; class << self
+
+      def single sym, acs
+        _lookup( acs ).single sym, acs
+      end
+
+      def for acs
+        _lookup( acs ).for acs
+      end
+
+      def _lookup acs
+        if acs.respond_to? :lookup_component_association
+          Dynamic_CA_Builder___
+        else
+          Conventional_CA_Builder
+        end
+      end
+    end ; end
+
+    class Common_CA_Builder__
+
+      class << self
+        def for acs
+          new._init_for acs
+        end
+        private :new
+      end  # >>
+
+      def _init_for acs
+        @_ACS = acs
+        self
+      end
+    end
+
+    class Dynamic_CA_Builder___ < Common_CA_Builder__
+
+      def build_association_for sym
+        @_ACS.lookup_component_association sym
+      end
+    end
+
+    class Conventional_CA_Builder < Common_CA_Builder__
+
+      class << self
+
+        def single sym, acs
+
+          _ca = Component_Association.new_prototype
+          _ca._init_via_definition_method(
+            Method_name_for__[ sym ],
+            sym,
+            acs )
+        end
+      end  # >>
+
+      def _init_for acs
+        @_prototype = Component_Association.new_prototype
+        super
+      end
+
+      def build_association_for sym
+
+        @_prototype.dup._init_via_definition_method(
+          _method_name_for( sym ),
+          sym,
+          @_ACS
+        )
+      end
+
+      def can_build_association_for sym
+        @_ACS.respond_to? _method_name_for sym
+      end
+
+      Method_name_for__ = -> sym do
+        :"__#{ sym }__component_association"
+      end
+
+      define_method :_method_name_for, Method_name_for__
+    end
+
     class Component_Association
 
-      # different concerns will blow these up on demand
+      # different concerns will construct these subject objects on demand
+      # on-the-fly. for now internally we provide no way of memoizing them,
+      # in contrast to [#001] properties which we took pains to freeze etc.
       # :[#089]:WISH-1: times when it feels wasteful to etc
 
       class << self
 
-        def via_symbol_and_ACS sym, comp
+        def via_symbol_and_ACS sym, acs
 
-          ca = new
-          ca._init_for_component comp
-          ca._init_for_sym sym
+          CA_Builder__.single sym, acs
         end
 
-        def builder_for comp
+        def builder_for acs
 
-          proto = new
-          proto._init_for_component comp
-          -> sym do
-            proto.dup._init_for_sym sym
-          end
+          CA_Builder__.for acs
         end
 
+        alias_method :new_prototype, :new
         private :new
       end  # >>
 
@@ -111,18 +188,9 @@ module Skylab::Brazen
         @_operations = nil
       end
 
-      def _init_for_component comp
-        @__component = comp
-        NIL_
-      end
+      def _init_via_definition_method m, sym, acs
 
-      def _init_for_sym sym
-
-        cm = remove_instance_variable( :@__component ).send(
-
-          :"__#{ sym }__component_association"
-
-        ) do | * x_a |  # :t4.
+        cm = acs.send m do | * x_a | # :t4.
           send :"__accept__#{ x_a.first }__meta_component", * x_a[ 1 .. -1 ]
           NIL_
         end
@@ -169,24 +237,6 @@ module Skylab::Brazen
           NIL_
         end
         NIL_
-      end
-
-      def interpret arg_st, & x_p
-
-        if @component_model.respond_to?(
-            :interpret_component )  # :+t6
-
-          x = @component_model.interpret_component(
-            arg_st, & x_p )
-
-          if x
-            Value_Wrapper[ x ]
-          else
-            x
-          end
-        else
-          @component_model[ arg_st, & x_p ]
-        end
       end
 
       def any_delivery_mode_for sym

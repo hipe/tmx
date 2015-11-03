@@ -181,6 +181,14 @@ better this time.
   deprecated because it expresses neither what it accepts or what shape
   its result is. :+[#.E]
 
++ `lookup_` - this word (or whatever we change it to) has reserved
+  meaning: a method that contains this word is for retrieving one
+  component from the receiver where the component is expected to be
+  present. behavior on failure is not proscribed here other than that
+  it *cannot* emit events to a callback.
+  [#br-031] about the universal retrieve operation discusses this term
+  and other related terms.
+
 + `[_]make[_]` - this verb used in perhaps *any* method name should
   confer this one meaning only: this method results in a generated
   class. as well, all methods (and function-likes) that produce a class

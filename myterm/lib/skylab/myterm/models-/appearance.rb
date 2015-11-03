@@ -13,7 +13,7 @@ module Skylab::MyTerm
       def build_unordered_index_stream & x_p
 
         app = Here_.new @_kernel, & x_p
-        _ok = app.init
+        _ok = app.__init
         _ok && app.to_unordered_index_stream
       end
     end
@@ -21,11 +21,13 @@ module Skylab::MyTerm
       # ~ initialization as entity
 
       def initialize ke, & x_p
+
+        @adapter = nil
         @_kernel = ke
         @_oes_p = x_p
       end
 
-      def init
+      def __init
 
         inst = @_kernel.silo :Installation
 
@@ -45,8 +47,6 @@ module Skylab::MyTerm
           "in #{ pth io.path }"
         end ]
         o.JSON = io.read
-
-        @_CAS = [ :adapter ]  # for now, still only this
 
         ok = o.execute
 
@@ -69,8 +69,6 @@ module Skylab::MyTerm
 
       def __init_created inst
 
-        @_CAS = [ :adapter ]  # LOOK to start, you only have this one component
-
         @_is_created = true
         @_is_modified = false
 
@@ -79,21 +77,48 @@ module Skylab::MyTerm
         ACHIEVED_
       end
 
-      # ~ adapt to reactive tree, express via ACS
+      # ~ adapt to reactive tree & ACS
 
-      def to_unordered_index_stream
+      def to_unordered_index_stream  # for reactive tree
 
-        ACS_[]::Modalities::Reactive_Tree::Children_as_unbound_stream.call(
-          self, & @_oes_p )
+        o = ACS_[]::Modalities::Reactive_Tree::Children_as_unbound_stream.new(
+          & @_oes_p )
+
+        o.ACS = self
+
+        o.node_stream = ___to_node_stream_for_interface
+
+        o.execute
       end
 
-      def component_association_symbols
-        a = @_CAS  # when freshly initted, no children
-        if a
-          a
+      def ___to_node_stream_for_interface
+
+        st = ACS_[]::Reflection::To_node_stream[ self ]
+
+        if @adapter
+          _st_ = @adapter.to_particular_node_stream__
+          st = st.concat_by _st_
+        end
+
+        st
+      end
+
+      def to_association_stream_for_serialization
+
+        # (hi - this is what is default, here for clarity: when serializing/
+        #  unserializing, use our methods (index) to define our assocs)
+
+        ACS_[]::Reflection::To_association_stream[ self ]
+      end
+
+      def lookup_component_association sym
+
+        cb = ( @___CA_builder ||= ACS_[]::Conventional_CA_Builder.for self )
+
+        if cb.can_build_association_for sym
+          cb.build_association_for sym
         else
-          _ = ACS_[]::Reflection::Method_index_of_class[ self.class ]
-          _.association_symbols
+          self._K
         end
       end
 
@@ -101,11 +126,7 @@ module Skylab::MyTerm
         Models_::Adapter
       end
 
-      def component_operation_symbols
-        NIL_  # LOOK don't bother indexing our methods for operations ever
-      end
-
-      # ~ receive messages from children
+      # ~ receive messages from children, provide services to children
 
       def __receive__component__change__ & ev_p
 
@@ -118,6 +139,10 @@ module Skylab::MyTerm
         o.upstream_ACS = self
 
         o.execute
+      end
+
+      def kernel_
+        @_kernel
       end
 
     Here_ = self

@@ -51,10 +51,15 @@ module Skylab::Brazen::TestSupport
 
       bike._num_times_change_event_occurred.should eql 1
 
-      ok = bike.edit_entity :set, :year, 4, :set, :make, 'DOOHAH'
+      ev_i_a = []
+      ok = bike.edit_entity :set, :year, 4, :set, :make, 'DOOHAH' do | * a |
+        ev_i_a.push a ; :_no_see_
+      end
       ok.should eql false
       bike.make.should eql 'ohai'
       bike.year.should eql 3
+
+      ev_i_a.should eql [[ :error, :expression ]]
 
       bike._num_times_change_event_occurred.should eql 1
     end

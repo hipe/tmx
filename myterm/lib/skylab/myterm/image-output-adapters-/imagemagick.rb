@@ -1,6 +1,18 @@
-self._WILL_REDO
+module Skylab::MyTerm
 
-      @background = 'transparent'
-      @fill = 'grey'
-      @gravity = nil
-      @size = '600x800'
+  # (placeholder indentation for would-be :+"that trick" library module)
+
+    class Image_Output_Adapters_::Imagemagick
+
+      def initialize name, & oes_p
+
+        @_asc = name
+      end
+
+      def __background_font__component_association
+
+        Home_::Models_::Font
+      end
+    end
+
+end

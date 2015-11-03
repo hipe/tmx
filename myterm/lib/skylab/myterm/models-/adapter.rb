@@ -29,8 +29,11 @@ module Skylab::MyTerm
       @_oes_p = oes_p
     end
 
-    def accept_identity_via_component_association asc
-      @_asc = asc ; nil
+    def initialize_component asc, acs
+
+      @_asc = asc
+      @_kernel = acs.kernel_
+      ACHIEVED_
     end
 
     # ~ the "set" operation
@@ -88,7 +91,7 @@ module Skylab::MyTerm
       o.qualified_knownness = _
 
       o.stream_builder = -> do
-        _to_stream( & oes_p )
+        _to_adapter_stream( & oes_p )
       end
 
       o.name_map = -> ada do
@@ -106,12 +109,12 @@ module Skylab::MyTerm
         y << "list the available adapters"
       end
 
-      method :_to_stream
+      method :_to_adapter_stream
     end
 
     # ~ operation support
 
-    def _to_stream
+    def _to_adapter_stream
 
       # function soup for this: if you are selected and you are providing
       # the list, provide yourself as the appropriate item in the stream.
@@ -144,11 +147,29 @@ module Skylab::MyTerm
         build_via_proto[ x ]
       end
 
-      @__ls ||= ::Dir[ "#{ Home_::Image_Output_Adapters_.dir_pathname.to_path }/*" ]
+      @__ls ||= ::Dir[ "#{ Home_::Image_Output_Adapters_.dir_pathname.to_path }/[a-z0-9]*" ]
 
       Callback_::Stream.via_nonsparse_array @__ls do | path |
         p[ path ]
       end
+    end
+
+    # ~ as dispatcher to adapter
+
+    def to_particular_node_stream__
+      @__ada ||= __build_particular_adapter
+      ACS_[]::Reflection::To_node_stream[ @__ada ]
+    end
+
+    def __build_particular_adapter
+
+      nf = _adapter_name
+
+      _cls = Home_::Image_Output_Adapters_.const_get( nf.as_const, false )
+
+      _oes_p_ = ACS_[]::Interpretation::Component_handler[ self, & @_oes_p ]
+
+      _cls.new nf, & _oes_p_
     end
 
     # ~ as entity
@@ -180,8 +201,12 @@ module Skylab::MyTerm
     def describe_into_under y, expag  # for reactive tree
       me = self
       expag.calculate do
-        y << "#{ me.__operation_symbols * ', ' } adapters"  # etc
+        y << "#{ me.___operation_symbols * ', ' } adapters"  # etc
       end
+    end
+
+    def ___operation_symbols
+      ACS_[]::Reflection::Method_index_of_class[ self.class ].operation_symbols
     end
 
     def description_under expag  # for [#br-035] expressive events
@@ -189,10 +214,6 @@ module Skylab::MyTerm
       expag.calculate do
         nm me._adapter_name
       end
-    end
-
-    def __operation_symbols
-      ACS_[]::Reflection::Method_index_of_class[ self.class ].operation_symbols
     end
 
     def to_component_value

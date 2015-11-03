@@ -13,28 +13,28 @@ module Skylab::Brazen
 
       To_association_stream = -> acs do  # 1
 
-        p = Component_Association.builder_for acs
+        cab = Component_Association.builder_for acs
 
         To_entry_stream__[ acs ].map_reduce_by do | entry |
 
           if entry.is_association
-            p[ entry.name_symbol ]
+            cab.build_association_for entry.name_symbol
           end
         end
       end
 
-      To_node_stream = -> acs do  # 1
+      To_node_stream = -> acs do  # l1 u1
 
         h = {}
 
         h[ :association ] = -> x do
 
-          build_asc = Component_Association.builder_for acs
+          assoc = Component_Association.builder_for acs
 
           build_qkn = Qualified_knownness_builder_for__[ acs ]
 
           p = -> sym do
-            build_qkn[ build_asc[ sym ] ]
+            build_qkn[ assoc.build_association_for( sym )  ]
           end
           h[ :association ] = p
           p[ x ]
@@ -82,27 +82,27 @@ module Skylab::Brazen
         # leaves the door open for some extreme hacking of singleton classes.
         # see "why so serious?" in [#doc]:#note-REFL-A for more.
 
-        if acs.respond_to? :component_association_symbols
+        if acs.respond_to? :to_component_symbol_stream
 
           assocs_defined = true
           something_defined = true
 
-          assocs = acs.component_association_symbols
-          if assocs
-            as_st = Callback_::Stream.via_nonsparse_array assocs do | sym |
+          cmp_sym_st = acs.to_component_symbol_stream
+          if cmp_sym_st
+            as_st = cmp_sym_st.map_by do | sym |
               Entry__.new sym, :association
             end
           end
         end
 
-        if acs.respond_to? :component_operation_symbols
+        if acs.respond_to? :to_component_operation_symbol_stream
 
           ops_defined = true
           something_defined = true
 
-          ops = acs.component_operation_symbols
-          if ops
-            op_st = Callback_::Stream.via_nonsparse_array ops do | sym |
+          op_sym_st = acs.to_component_operation_symbol_stream
+          if op_sym_st
+            op_st = op_sym_st.map_by do | sym |
               Entry__.new sym, :operation
             end
           end
@@ -121,11 +121,11 @@ module Skylab::Brazen
           # order instead of by method definition order.
 
           if ! assocs_defined
-            as_st = mi[].any_nonzero_length_operation_entry_stream
+            as_st = mi[].to_any_nonzero_length_association_entry_stream
           end
 
           if ! ops_defined
-            op_st = mi[].any_nonzero_length_association_entry_stream
+            op_st = mi[].to_any_nonzero_length_operation_entry_stream
           end
 
           if op_st
@@ -196,6 +196,23 @@ module Skylab::Brazen
           @_indexed = false
         end
 
+        def to_any_nonzero_length_association_entry_stream
+          _to_nonzero :@_association_symbols, :association
+        end
+
+        def to_any_nonzero_length_operation_entry_stream
+          _to_nonzero :@_operation_symbols, :operation
+        end
+
+        def _to_nonzero ivar, sym
+          @_indexed || _index
+          if instance_variable_get( ivar )
+            to_entry_stream.reduce_by do | ent |
+              sym == ent.category
+            end
+          end
+        end
+
         def association_symbols
           @_indexed || _index
           @_association_symbols
@@ -204,6 +221,10 @@ module Skylab::Brazen
         def operation_symbols
           @_indexed || _index
           @_operation_symbols
+        end
+
+        def to_entry_stream
+          @_entry_stream[]
         end
 
         def _index
@@ -239,10 +260,6 @@ module Skylab::Brazen
           freeze_me.each( & :freeze )
 
           ACHIEVED_
-        end
-
-        def to_entry_stream
-          @_entry_stream[]
         end
 
         RX___ = /\A__(?<name>.+)__component_(?<which>association|operation)\z/
@@ -292,7 +309,7 @@ module Skylab::Brazen
 
         if mdl.respond_to? :method_defined?
 
-          if mdl.method_defined? :component_association_symbols
+          if mdl.method_defined? :to_component_symbol_stream
             true
           else
             ! Method_index_of_class[ mdl ].association_symbols.nil?

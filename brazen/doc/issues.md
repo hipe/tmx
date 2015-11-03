@@ -137,8 +137,8 @@
 [#034]       #parent-node: [#026] the deleting narrative ..
 [#033]       #parent-node: [#026]  [the update narrative]
 [#032]       #parent-node: [#026] the entity scan narrative ..
-[#031]       #parent-node: [#026] the retrieving narrative ..
-[#030]       #parent-node: [#026] the creating narrative ..
+[#031]       #parent-node: [#026] the `retrieve` narrative ..
+[#030]       #parent-node: [#026] the `create` narrative ..
 [#029]       #parent-node: [#028] "a universal normal name convention.."
 [#028]       #parent-node: [#010] the collection actor narrative ...
 [#027] #open #tracking the zero-configuration dream - one day, [br]-powered

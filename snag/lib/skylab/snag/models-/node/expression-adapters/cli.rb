@@ -12,11 +12,11 @@ module Skylab::Snag
 
           sess.register_properties do | o |
 
-            p = ACS_[]::Component_Association.builder_for first
+            cab = ACS_[]::Component_Association.builder_for first
 
             first.formal_properties.each do | prp |
 
-              _p = p[ prp.name_symbol ].
+              _p = cab.build_association_for( prp.name_symbol ).
                 component_model::Expression_Adapters::CLI.
                   express_of_via_under expag
 

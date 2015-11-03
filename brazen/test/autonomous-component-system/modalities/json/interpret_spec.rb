@@ -122,11 +122,13 @@ module Skylab::Brazen::TestSupport
       _x.should eql false
     end
 
-    def _from json, & x_p
+    def _from json, & oes_p
+
+      oes_p ||= No_events_
 
       new_empty = const_( _which ).new
 
-      o = subject_::Modalities::JSON::Interpret.new( & x_p )
+      o = subject_::Modalities::JSON::Interpret.new( & oes_p )
 
       o.JSON = json
       o.ACS = new_empty
