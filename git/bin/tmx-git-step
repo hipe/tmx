@@ -9,12 +9,12 @@ class Skylab::Git_step
 
     class << self
 
-      def _same i, o, e, pn_s_a, a
+      def _call i, o, e, pn_s_a, a
         new( i, o, e, pn_s_a, a ).execute
       end
 
-      alias_method :[], :_same
-      alias_method :call, :_same
+      alias_method :[], :_call
+      alias_method :call, :_call
 
     end  # >>
 

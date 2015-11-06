@@ -268,8 +268,9 @@ module Skylab::Snag
 
             @pred_tail_trees = nil
 
-            @tree_of_predicates = Callback_::Pair.new(
-              _top_x, @model_reflection.identifier )
+            @tree_of_predicates = Callback_::Pair.via_value_and_name(
+              _top_x,
+              @model_reflection.identifier )
 
             ACHIEVED_
           end

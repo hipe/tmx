@@ -6,7 +6,7 @@ module Skylab::Human
 
       class << self
 
-        def _same mod, * x_a
+        def _call mod, * x_a
           if x_a.length.zero?
             mod.include self
           else
@@ -14,8 +14,8 @@ module Skylab::Human
           end
         end
 
-        alias_method :[], :_same
-        alias_method :call, :_same
+        alias_method :[], :_call
+        alias_method :call, :_call
       end  # >>
 
       -> fun do

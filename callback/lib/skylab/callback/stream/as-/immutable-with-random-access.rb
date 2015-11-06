@@ -345,8 +345,8 @@ module Skylab::Callback
       end
 
       def to_pair_stream
-        _to_name_stream.map_by do |i|
-          Pair_.new @h.fetch( i ), i
+        _to_name_stream.map_by do | sym |
+          Pair.via_value_and_name @h.fetch( sym ), sym
         end
       end
 

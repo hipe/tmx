@@ -96,7 +96,9 @@ module Skylab::Brazen
 
       def to_marshal_pair
         if @has_active_boolean
-          Callback_::Pair[ @active_boolean.name_symbol, @group_name.as_slug.intern ]
+          Callback_::Pair.via_value_and_name(
+            @active_boolean.name_symbol,
+            @group_name.as_slug.intern )
         end
       end
 

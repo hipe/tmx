@@ -32,21 +32,25 @@ module Skylab::Basic
         end
       end
 
-      def pairs_scan_via_even_iambic a
-        Build_pairs_scan_via_even_iambic__[ a ]
+      def pair_stream_via_even_iambic a
+        Build_pair_stream_via_even_iambic__[ a ]
       end
     end
 
     Build_each_pairable_via_even_iambic__ = -> a do
-      Callback_::Scanner.build_each_pairable_via_pairs_stream_proc do
-        Build_pairs_scan_via_even_iambic__[ a ]
+      Callback_::Scanner.build_each_pairable_via_pair_stream_by do
+        Build_pair_stream_via_even_iambic__[ a ]
       end
     end
 
-    Build_pairs_scan_via_even_iambic__ = -> a do
-      Callback_::Stream.via_times( a.length / 2 ).map_by do |d|
-        d = d << 1
-        [ a.fetch( d ), a.fetch( d + 1 ) ]
+    Build_pair_stream_via_even_iambic__ = -> a do
+
+      Callback_::Stream.via_times( a.length / 2 ).map_by do | d |
+        d <<= 1
+        Callback_::Pair.via_value_and_name(
+          a.fetch( d + 1 ),
+          a.fetch( d ),
+        )
       end
     end
 

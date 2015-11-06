@@ -4,12 +4,12 @@ module Skylab::Plugin
 
     class << self
 
-      def _same mod, * x_a
+      def _call mod, * x_a
         edit_module_via_iambic mod, x_a
       end
 
-      alias_method :[], :_same
-      alias_method :call, :_same
+      alias_method :[], :_call
+      alias_method :call, :_call
 
       def edit_module_via_iambic mod, x_a
 

@@ -27,7 +27,7 @@ module Skylab::Callback
         self::MEMBER_I_A__
       end
 
-      define_singleton_method :_same do | * x_a |
+      define_singleton_method :_call do | * x_a |
 
         o = _Params.new
         x_a.each_slice 2 do | k, x |
@@ -73,8 +73,8 @@ module Skylab::Callback
 
       class << self
 
-        alias_method :[], :_same
-        alias_method :call, :_same
+        alias_method :[], :_call
+        alias_method :call, :_call
       end
     end
   end

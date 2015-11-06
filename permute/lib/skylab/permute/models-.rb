@@ -43,7 +43,9 @@ module Skylab::Permute
 
         name_x = gets_one_polymorphic_value
 
-        _pair = Callback_::Pair.new gets_one_polymorphic_value, name_x
+        _pair = Callback_::Pair.via_value_and_name(
+          gets_one_polymorphic_value,
+          name_x )
 
         @argument_box.touch :pair do
           []
@@ -59,7 +61,7 @@ module Skylab::Permute
         @argument_box.fetch( :pair ).each do | pair |
 
           cat_box.touch pair.name_x do
-            Callback_::Pair.new [], pair.name_x
+            Callback_::Pair.via_value_and_name [], pair.name_x
           end.value_x.push pair.value_x
         end
 

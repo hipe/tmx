@@ -273,9 +273,9 @@ module Skylab::TanMan
 
             Callback_::Stream.via_times @direction_symbol_list.length do | d |
 
-              Callback_::Pair[
+              Callback_::Pair.via_value_and_name(
                 rest.fetch( d ),
-                @direction_symbol_list.fetch( d ) ]
+                @direction_symbol_list.fetch( d ) )
             end
           end
         end

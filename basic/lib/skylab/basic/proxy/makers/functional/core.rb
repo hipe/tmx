@@ -100,15 +100,15 @@ module Skylab::Basic
           @p_h = {}
         end
 
-        def process_arglist_fully p_a
+        def process_iambic_fully x_a
           begin_process
-          resolve_pairs_scan_via_arglist p_a
+          __init_pair_stream_via_iambic x_a
           finish_process
         end
 
-        def process_iambic_fully x_a
+        def process_arglist_fully p_a
           begin_process
-          resolve_pairs_scan_via_iambic x_a
+          __init_pair_stream_via_arglist p_a
           finish_process
         end
 
@@ -122,21 +122,33 @@ module Skylab::Basic
           @missing_h = ::Hash[ @box.a_.map { |i| [ i, nil ] } ] ; nil
         end
 
-        def resolve_pairs_scan_via_iambic x_a
-          @pairs_scan = Try_convert_iambic_to_pairs_scan_[ x_a ] ; nil
+        def __init_pair_stream_via_iambic x_a
+          @_pair_stream = Try_convert_iambic_to_pair_stream_[ x_a ]
+          NIL_
         end
 
-        def resolve_pairs_scan_via_arglist p_a
-          @pairs_scan = Callback_::Stream.via_times( p_a.length ) do |d|
-            [ @box.at_position( d ), p_a.fetch( d ) ]
-          end ; nil
+        def __init_pair_stream_via_arglist p_a
+
+          @_pair_stream = Callback_::Stream.via_times p_a.length do | d |
+
+            Callback_::Pair.via_value_and_name(
+              p_a.fetch( d ),
+              @box.at_position( d ) )
+          end
+          NIL_
         end
 
         def finish_process
-          @pairs_scan.each do |i, p|
-            @p_h[ @box.fetch i ] = p
-            @missing_h.delete i
+
+          @_pair_stream.each do | pair |
+
+            sym = pair.name_symbol
+
+            @p_h[ @box.fetch sym ] = pair.value_x
+
+            @missing_h.delete sym
           end
+
           if @missing_h.length.nonzero?
             when_missing @missing_h.keys
           end

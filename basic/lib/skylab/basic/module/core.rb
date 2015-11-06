@@ -74,7 +74,7 @@ module Skylab::Basic
       mod = ::Object
       s_a.each_with_index do |s, d|
         mod = mod.const_get s, false
-        pair_a[ d ] = _Pair.new( mod, s.intern )
+        pair_a[ d ] = _Pair.via_value_and_name( mod, s.intern )
       end
       pair_a
     end

@@ -237,7 +237,7 @@ module Skylab::Snag
               when :keyword
                 if x_a.fetch( d + 2 ) == s
                   did_match = true
-                  x = Callback_::Pair.new true, x_a.fetch( d )
+                  x = Callback_::Pair.via_value_and_name true, x_a.fetch( d )
                   break
                 end
 
@@ -245,7 +245,7 @@ module Skylab::Snag
                 md = x_a.fetch( d + 2 ).match s
                 if md
                   did_match = true
-                  x = Callback_::Pair.new md, x_a.fetch( d )
+                  x = Callback_::Pair.via_value_and_name md, x_a.fetch( d )
                   break
                 end
               end

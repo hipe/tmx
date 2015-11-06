@@ -12,10 +12,11 @@ module Skylab::Basic
         METHODS__.pairs_at_via_names i_a, & p
       end
 
-      def pairs_scan h
+      def pair_stream h
         a = h.keys
         Callback_::Stream.via_times( a.length ).map_by do |d|
-          [ a.fetch( d ), h.fetch( a.fetch d ) ]
+          k = a.fetch d
+          Callback_::Pair.via_value_and_name h.fetch( k ), k
         end
       end
     end

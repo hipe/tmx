@@ -192,7 +192,9 @@ module Skylab::Plugin
 
             if entry
 
-              Callback_::Pair.new entry, ( entry.name.as_slug.split DASH_ )
+              Callback_::Pair.via_value_and_name(
+                entry,
+                entry.name.as_slug.split( DASH_ ) )
             end
           end
         end

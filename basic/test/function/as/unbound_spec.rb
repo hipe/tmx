@@ -55,7 +55,7 @@ module Skylab::Basic::TestSupport
             end
 
             Some_func_two = -> _  do
-              self._K
+              self._NOT_USED
             end
           end
         end

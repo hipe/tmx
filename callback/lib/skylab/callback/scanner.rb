@@ -4,23 +4,28 @@ module Skylab::Callback
 
     class << self
 
-      def build_each_pairable_via_pairs_stream_proc & p  # #todo covered by [sg]
-        Build_each_pairable_via_pairs_scanner_proc__.new( & p )
+      def build_each_pairable_via_pair_stream_by & p  # #todo covered by [sg]
+        Each_Pairable_via_Pair_Stream_By___.new( & p )
       end
     end
 
-    class Build_each_pairable_via_pairs_scanner_proc__
+    class Each_Pairable_via_Pair_Stream_By___
 
       def initialize & p
-        @scn_p = p
+        @__p = p
       end
 
       def each_pair
+
         if block_given?
-          scn = @scn_p.call
-          while a = scn.gets
-            yield( * a )
-          end ; nil
+
+          st = @__p.call
+
+          while pair = st.gets
+            yield pair.name_symbol, pair.value_x
+          end
+
+          NIL_
         else
           to_enum :each_pair
         end

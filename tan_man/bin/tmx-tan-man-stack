@@ -1,0 +1,453 @@
+#!/usr/bin/env ruby -w
+
+Skylab = ::Module.new
+
+class Skylab::Stack
+
+  Models_ = ::Module.new
+  Models_::Stack = self
+
+  # ~ temporary (until either [br] ACS settles or we become self-supporting)
+
+  class Models_::Stack
+
+    def initialize * a
+
+      @stdin, @stdout, @stderr, @pn_s_a, @_filesystem = a
+
+      y = nil
+      @_oes_p = -> * i_a, & ev_p do
+
+        y ||= ::Enumerator::Yielder.new do | s |
+          @stderr.puts s
+        end
+
+        _expag.calculate y, & ev_p
+      end
+    end
+
+    def invoke argv
+
+      if argv.length.zero?
+        _do_execute_operation :list
+
+      elsif /\A-(?:h|-he(?:lp?))?\z/ =~ argv.first
+        __help
+
+      else
+
+        sym = argv.first.intern
+        if _can_execute_operation sym
+          argv.shift
+          _do_execute_operation sym, argv
+        else
+          @stderr.puts "unrecognized operation '#{ argv.first }'"
+          __invite
+        end
+      end
+    end
+
+    def __invite
+      @stderr.puts "use '#{ _pn } -h' for help"
+      5
+    end
+
+    def __help
+
+      io = @stderr
+      sym_a = _operation_names
+
+      io.puts "description: manage the lines of a file like a stack."
+      io.puts "             (for simple, short-term task management)"
+
+      io.puts
+
+      io.puts "usage: #{ _pn } { #{ sym_a * ' | ' } } [opts] [args]"
+
+      sym_a.each do | sym |
+
+        _m = _operation_method_for sym
+
+        _proc = send _m
+
+        _params = _proc.parameters
+
+        a = _params.reduce [] do | m, ( _c, sym_ ) |
+
+          _expag.calculate do
+            m.push par sym_
+          end
+
+          m
+        end
+
+        if a.length.nonzero?
+          _args = " #{ a * ' ' }"
+        end
+
+        io.puts
+        io.puts "       #{ _pn } #{ sym }#{ _args }"
+
+      end
+      0
+    end
+
+    def _pn
+      ::File.basename @pn_s_a.last
+    end
+
+    def _operation_names
+      rx = /\A__((?:[^_]|_(?=[^_]))+)__component_operation\z/
+      self.class.instance_methods( false ).reduce [] do | m, i |
+        md = rx.match i
+        if md
+          m.push md[ 1 ].intern
+        end
+        m
+      end
+    end
+
+    def _can_execute_operation sym
+      respond_to? _operation_method_for sym
+    end
+
+    def _do_execute_operation sym, args=nil
+
+      _proc = send _operation_method_for sym
+      x = _proc.call( * args )
+      if x
+        if true == x
+          0
+        elsif x.respond_to?( :gets )
+          while line = x.gets
+            @stderr.puts line
+          end
+          0
+        else
+          x
+        end
+      else
+        5
+      end
+    end
+
+    def _operation_method_for sym
+      :"__#{ sym }__component_operation"
+    end
+
+    def _expag
+      @___expag ||= Expag___.new
+    end
+  end
+
+  class Expag___
+
+    alias_method :calculate, :instance_exec
+
+    def ick x
+      x.inspect
+    end
+
+    def par sym
+      "<#{ sym.id2name.gsub UNDERSCORE_, DASH_ }>"
+    end
+
+    alias_method :val, :ick
+
+    DASH_ = '-'
+    UNDERSCORE_ = '_'
+  end
+
+  # ~
+
+  class Models_::Stack
+
+    def __push__component_operation
+
+      -> text do
+        io = _read_writable_IO
+        if io
+          io.puts text
+          io.close
+          ACHIEVED_
+        end
+      end
+    end
+
+    def __pop__component_operation
+
+      -> do
+        io = _read_writable_IO
+        if io
+          line_before_that = nil
+          last_line = nil
+          last_bytes = 0
+          this_bytes = 0
+          begin
+            line = io.gets
+            line or break
+            line_before_that = last_line
+            last_line = line
+            last_bytes = this_bytes
+            this_bytes = last_bytes + line.length
+            redo
+          end while nil
+
+          if last_line
+            @_oes_p.call :info, :expression, :popping do | y |
+              y << "popped: #{ last_line }"
+            end
+          end
+
+          if last_bytes.zero?
+
+            @_oes_p.call :info, :expression, :removing_file do | y |
+              y << "(stack cleared. removing file.)"
+            end
+
+            io.close
+
+            @_filesystem.unlink io.path
+            # (result should be 1 - the number of files removed)
+
+            ACHIEVED_
+          else
+
+            @_oes_p.call :info, :expression, :current_top do | y |
+              y << "top: #{ line_before_that }"
+            end
+
+            io.truncate last_bytes
+            io.close
+            ACHIEVED_
+          end
+        end
+      end
+    end
+
+    def __list__component_operation
+
+      -> do
+        st = ___to_item_line_stream
+        if st
+          d = 0
+          Stream__.new do
+            line = st.gets
+            if line
+              "#{ d += 1 } #{ line }"
+            end
+          end
+        else
+          @_oes_p.call :info, :expression, :stack_empty do | y |
+            y << "(stack empty.)"
+          end
+          Stream__.new do
+          end
+        end
+      end
+    end
+
+    def ___to_item_line_stream
+      io = _readable_IO
+      if io
+        stack = []
+        while line = io.gets
+          stack.push line
+        end
+        d = stack.length
+        Stream__.new do
+          if d.nonzero?
+            d -= 1
+            stack.fetch d
+          end
+        end
+      end
+    end
+
+    def __swap__component_operation
+
+      -> item_number_A, item_number_B do
+        io = _read_writable_IO
+        if io
+          o = Swap___.new( & @_oes_p )
+          o.IO = io
+          o.number_A = item_number_A
+          o.number_B = item_number_B
+          o.execute
+        end
+      end
+    end
+
+    def _readable_IO
+      begin
+        @_filesystem.open _path, ::File::RDONLY
+      rescue ::Errno::ENOENT => e
+        @_oes_p.call :info, :expression, :no_file do | y |
+          y << e.message
+        end
+        UNABLE_
+      end
+    end
+
+    def _read_writable_IO
+
+      @_filesystem.open _path, ::File::CREAT | ::File::RDWR | ::File::APPEND
+    end
+
+    def _path
+      '.stack'  # etc
+    end
+
+    class Stream__ < ::Proc
+      alias_method :gets, :call
+    end
+
+    class Swap___
+      def initialize & oes_p
+        @_oes_p = oes_p
+      end
+      attr_writer(
+        :IO,
+        :number_A,
+        :number_B,
+      )
+      def execute
+
+        ok = _validate :@_number_A, @number_A, :number_A
+        ok &&= _validate :@_number_B, @number_B, :number_B
+        ok &&= __normalize
+        if ok
+          __work
+        else
+          @IO.close
+          ok
+        end
+      end
+
+      def _validate ivar, s, sym
+        md = RX__.match s
+        if md
+          d = md[0].to_i
+          if 0 == d
+            @_oes_p.call :error, :expression, :invalid_digit do | y |
+              y << "#{ par sym } cannot be less than one (had #{ ick d })"
+            end
+            UNABLE_
+          else
+            instance_variable_set ivar, md[0].to_i
+            ACHIEVED_
+          end
+        else
+          @_oes_p.call :error, :expression, :invalid_digit do | y |
+            y << "#{ par sym } doesn't look like positive integer: #{ ick s }"
+          end
+          UNABLE_
+        end
+      end
+      RX__ = /\A[0-9]+\z/
+
+      def __normalize
+
+        ok = __normalize_lesser_vs_greater
+        ok && __init_raw_lines
+        ok && __normalize_greater_vs_max
+      end
+
+      def __normalize_lesser_vs_greater
+
+        @_lesser = remove_instance_variable :@_number_A
+        @_greater = remove_instance_variable :@_number_B
+
+        case @_lesser <=> @_greater
+        when -1
+          @_did_switch = false
+          ACHIEVED_
+        when 0
+          __when_same
+        when 1
+          @_did_switch = true
+          d = @_greater
+          @_greater = @_lesser
+          @_lesser = d
+          ACHIEVED_
+        end
+      end
+
+      def __when_same
+        @_oes_p.call :error, :expression, :wont_swap_same do | y |
+          y << "won't swap the same number"
+        end
+        UNABLE_
+      end
+
+      def __init_raw_lines
+        raw_lines = []
+        io = @IO
+        while line = io.gets
+          raw_lines.push line
+        end
+        @_raw_lines = raw_lines ; nil
+      end
+
+      def __normalize_greater_vs_max
+
+        if @_raw_lines.length < @_greater
+          __when_too_large
+        else
+          ACHIEVED_
+        end
+      end
+
+      def __when_too_large
+
+        had_d = @_greater
+        limit_d = @_raw_lines.length
+        if @_did_switch
+          sym = :number_A
+          your = "your "
+        else
+          sym = :number_B
+        end
+
+        @_oes_p.call :error, :expression, :too_large do | y |
+          y << "#{ your }#{ par sym } cannot be greater than #{
+            }#{ val limit_d } (had #{ val had_d })"
+        end
+
+        UNABLE_
+      end
+
+      def __work
+
+        offset = @_raw_lines.length
+        d = offset - @_lesser
+        d_ = offset - @_greater
+        tmp = @_raw_lines.fetch d
+        @_raw_lines[ d ] = @_raw_lines.fetch d_
+        @_raw_lines[ d_ ] = tmp
+
+        io = @IO
+        io.rewind
+        io.truncate 0
+
+        @_raw_lines.each do | line |
+          io.write line
+        end
+        io.close
+
+        ACHIEVED_
+      end
+    end
+
+    ACHIEVED_ = true
+    UNABLE_ = false
+  end
+end
+
+# ~
+
+_ = Skylab::Stack.new( nil, $stdout, $stderr, [ $PROGRAM_NAME ], ::File )
+
+_x = _.invoke ::ARGV
+
+$stderr.puts "(exitstatus: #{ _x })"

@@ -25,7 +25,7 @@ module Skylab::Basic::TestSupport
       \z/x
 
       pair = -> v_x=nil, n_x=nil do
-        Callback_::Pair.new v_x, n_x
+        Callback_::Pair.via_value_and_name v_x, n_x
       end
 
       o = Home_::State::Machine::Edit_Session.new

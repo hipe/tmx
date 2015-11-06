@@ -587,7 +587,7 @@ module Skylab::Brazen
         if @group
           nil  # the group controller does this
         elsif @is_activated
-          Callback_::Pair[ :yes, name_symbol ]
+          Callback_::Pair.via_value_and_name( :yes, name_symbol )
         end
       end
     end

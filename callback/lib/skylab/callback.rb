@@ -352,8 +352,8 @@ module Skylab::Callback
       d = -1 ; last = @a.length - 1
       Home_.stream do
         if d < last
-          i = @a.fetch d += 1
-          Pair_.new @h.fetch( i ), i
+          sym = @a.fetch d += 1
+          Pair.via_value_and_name @h.fetch( sym ), sym
         end
       end
     end
@@ -805,7 +805,13 @@ module Skylab::Callback
     end
   end
 
-  Pair_ = Pair = ::Struct.new :value_x, :name_x do  # :[#055].
+  Pair = ::Struct.new :value_x, :name_x do  # :[#055].
+
+    class << self
+      alias_method :via_value_and_name, :new
+      private :new
+      private :[]
+    end  # >>
 
     alias_method :name_symbol, :name_x  # as you like it
 

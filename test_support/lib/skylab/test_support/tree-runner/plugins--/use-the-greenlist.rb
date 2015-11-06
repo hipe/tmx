@@ -66,7 +66,7 @@ module Skylab::TestSupport
         _Parse = Home_.lib_.parse
         opn = _Parse.output_node
         pair = -> x, sym do
-          Callback_::Pair.new x, sym
+          Callback_::Pair.via_value_and_name x, sym
         end
 
         en_num_rx = /\A(?:

@@ -24,7 +24,7 @@ module Skylab::Basic
 
       def initialize * x_a, & convenience_p
 
-        pairs_scn = Try_convert_iambic_to_pairs_scan_[ x_a ]
+        pair_st = Try_convert_iambic_to_pair_stream_[ x_a ]
 
         _I_A = []
 
@@ -32,27 +32,28 @@ module Skylab::Basic
           class << self  # because basic object
             self
           end.class_exec do
-            -> i, p do
-              _I_A.push i
-              define_method i, -> * a, & p_ do
+            -> sym, p do
+              _I_A.push sym
+              define_method sym, -> * a, & p_ do
                 p[ * a, & p ]  # call the proc in its original context
               end
             end
           end
         end.call
 
-        while pair = pairs_scn.gets
-          i, p = pair
-          add[ i, p ]
-          if :inspect == i
+        while pair = pair_st.gets
+
+          sym = pair.name_symbol
+          add[ sym, pair.value_x ]
+          if :inspect == sym
             did_inspect = true
             break
           end
         end
 
         if did_inspect
-          while pair = pairs_scn.gets
-            add[ * pair ]
+          while pair = pair_st.gets
+            add[ pair.name_symbol, pair.value_x ]
           end
         else
           add[ :inspect, -> do

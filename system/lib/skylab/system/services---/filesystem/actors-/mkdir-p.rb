@@ -17,12 +17,12 @@ module Skylab::System
 
       class << self
 
-        def _same path, fs, & oes_p
+        def _call path, fs, & oes_p
           new( path, fs, & oes_p ).execute
         end
 
-        alias_method :[], :_same
-        alias_method :call, :_same
+        alias_method :[], :_call
+        alias_method :call, :_call
 
         private :new
       end  # ..

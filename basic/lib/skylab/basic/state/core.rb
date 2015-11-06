@@ -56,7 +56,7 @@ module Skylab::Basic
             process_polymorphic_stream_passively st
           end
 
-          Callback_::Pair.new _o
+          Callback_::Known_Known[ _o ]
         end
 
       end  # >>
@@ -410,7 +410,7 @@ module Skylab::Basic
             @_p = @__step_via_single_state
           end
         else
-          self._K
+          self._COVER_ME
         end
 
         NIL_

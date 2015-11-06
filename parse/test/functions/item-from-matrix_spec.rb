@@ -184,7 +184,9 @@ module Skylab::Parse::TestSupport
 
         Callback_::Stream.via_nonsparse_array a_a do | row |
 
-          Callback_::Pair.new :"__#{ row * UNDERSCORE_ }__", row
+          Callback_::Pair.via_value_and_name(
+            :"__#{ row * UNDERSCORE_ }__",
+            row )
 
         end
       end

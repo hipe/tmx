@@ -165,7 +165,7 @@ module Skylab::Brazen
 
       class << self
 
-        def _same kn, stream_builder, & oes_p
+        def _call kn, stream_builder, & oes_p
           new(
             kn,
             stream_builder,
@@ -179,8 +179,8 @@ module Skylab::Brazen
           ).execute
         end
 
-        alias_method :[], :_same
-        alias_method :call, :_same
+        alias_method :[], :_call
+        alias_method :call, :_call
       end  # >>
 
       def initialize kn=nil, sb=nil, nm=nil, fm=nil, & oes_p

@@ -22,15 +22,14 @@ module Skylab::Basic
 
             cls.send :define_singleton_method, :new do | * x_a |
 
-              pairs_scan = Try_convert_iambic_to_pairs_scan_[ x_a ]
+              pair_stream = Try_convert_iambic_to_pair_stream_[ x_a ]
 
               bx = const_get CONST_
 
               arglist = ::Array.new bx.length
 
-              while pairs = pairs_scan.gets
-                i, p = pairs
-                arglist[ bx.index( i ) ] = p
+              while pair = pair_stream.gets
+                arglist[ bx.index( pair.name_symbol ) ] = pair.value_x
               end
 
               o = orig_new_( * arglist )  # ick

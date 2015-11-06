@@ -185,11 +185,11 @@ module Skylab::Basic  # introduction at [#020]
     end
   end
 
-  Try_convert_iambic_to_pairs_scan_ = -> x_a do  # (used only under 'Proxy')
+  Try_convert_iambic_to_pair_stream_ = -> x_a do  # (used only under 'Proxy')
     if 1 == x_a.length
-      Home_::Hash.pairs_scan x_a.first
+      Home_::Hash.pair_stream x_a.first
     else
-      Home_::List.pairs_scan_via_even_iambic x_a
+      Home_::List.pair_stream_via_even_iambic x_a
     end
   end
 

@@ -8,11 +8,11 @@ end
 module Skylab::Git_citxt
 
   class << self
-    def _same i, o, e, pn_s_a, argv
+    def _call i, o, e, pn_s_a, argv
       CLI.new( i, o, e, pn_s_a ).invoke argv
     end
-    alias_method :[], :_same
-    alias_method :[], :_same
+    alias_method :[], :_call
+    alias_method :[], :_call
   end  # >>
 
   CLI = ::Class.new ::Class.new

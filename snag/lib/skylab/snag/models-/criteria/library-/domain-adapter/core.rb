@@ -159,7 +159,7 @@ module Skylab::Snag
             s_a = _human_s_a
             s_a_ = s_a.dup
             s_a_[ -1 ] = Home_.lib_.NLP::EN::POS::Noun[ s_a.fetch( -1 ) ].plural
-            Callback_::Pair.new self, s_a_
+            Callback_::Pair.via_value_and_name self, s_a_
           end
 
           def to_item_for_singular_name
@@ -169,7 +169,7 @@ module Skylab::Snag
 
           def __build_singular_item
 
-            Callback_::Pair.new self, _human_s_a
+            Callback_::Pair.via_value_and_name self, _human_s_a
           end
 
           def _human_s_a

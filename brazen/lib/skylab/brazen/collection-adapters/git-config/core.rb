@@ -455,7 +455,9 @@ module Skylab::Brazen
           if d < last
             d += 1
             ast = @a.fetch d
-            Callback_::Pair.new ast.value_x, ast.external_normal_name_symbol
+            Callback_::Pair.via_value_and_name(
+              ast.value_x,
+              ast.external_normal_name_symbol )
           end
         end
       end
