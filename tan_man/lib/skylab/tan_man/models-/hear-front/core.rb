@@ -51,10 +51,14 @@ module Skylab::TanMan
       # ever create one parse function for the lifetime of the process.
 
       def initialize k, _model_class
+
         @k = k
-        @definition_collection = Callback_::Stream.immutable_with_random_access.new(
-          Callback_::Stream.ordered( __to_definition_stream ),
-          :name_value_for_order )
+
+        _st = Callback_::Stream.ordered __to_definition_stream
+
+        @definition_collection =
+          _st.flush_to_immutable_with_random_access_keyed_to_method(
+            :name_value_for_order )
       end
 
       def __bound_call_via_qualified_knownness_box bx, & oes_p

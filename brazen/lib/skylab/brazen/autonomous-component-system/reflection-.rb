@@ -2,85 +2,58 @@ module Skylab::Brazen
 
   module Autonomous_Component_System
 
-    module Reflection  # notes in [#083]
+    module Reflection_  # notes in [#083]
 
-      To_qualified_knownness_stream = -> acs do  #  1
+      Reader = -> acs do
 
-        _p = Qualified_knownness_builder_for__[ acs ]
-
-        To_association_stream[ acs ].map_by( & _p )
-      end
-
-      To_association_stream = -> acs do  # 1
-
-        cab = Component_Association.builder_for acs
-
-        To_entry_stream__[ acs ].map_reduce_by do | entry |
-
-          if entry.is_association
-            cab.build_association_for entry.name_symbol
+        if acs.respond_to? READ_METHOD__
+          -> asc do
+            Read_via_method__[ asc, acs ]
+          end
+        else
+          -> asc do
+            Read_via_ivar__[ asc, acs ]
           end
         end
       end
 
-      To_node_stream = -> acs do  # l1 u1
+      Read = -> asc, acs do  # redunds with above
 
-        h = {}
-
-        h[ :association ] = -> x do
-
-          assoc = Component_Association.builder_for acs
-
-          build_qkn = Qualified_knownness_builder_for__[ acs ]
-
-          p = -> sym do
-            build_qkn[ assoc.build_association_for( sym )  ]
-          end
-          h[ :association ] = p
-          p[ x ]
-        end
-
-        h[ :operation ] = -> x do
-
-          build_op = ACS_::Operation.builder_for acs
-
-          p = -> sym do
-            build_op[ sym ]
-          end
-          h[ :operation ] = p
-          p[ x ]
-        end
-
-        To_entry_stream__[ acs ].map_by do | entry |
-
-          h.fetch( entry.category )[ entry.name_symbol ]
+        if acs.respond_to? READ_METHOD__
+          Read_via_method__[ asc, acs ]
+        else
+          Read_via_ivar__[ asc, acs ]
         end
       end
 
-      Qualified_knownness_builder_for__ = -> acs do
+      Read_via_method__ = -> asc, acs do
 
-        p = Wrapped_value_reader_for___[ acs ]
-
-        -> asc do
-
-          vw = p[ asc ]
-          if vw
-            had = true
-            x = vw.value_x
-          else
-            had = false
-          end
-
-          Callback_::Qualified_Knownness.via_value_and_had_and_association(
-            x, had, asc )
+        wv = acs.send READ_METHOD__, asc
+        if wv
+          Callback_::Qualified_Knownness.via_value_and_association(
+            wv.value_x,
+            asc )
+        else
+          Callback_::Qualified_Knownness.via_association asc
         end
       end
 
-      To_entry_stream__ = -> acs do
+      Read_via_ivar__ = -> asc, acs do
+
+        ivar = asc.name.as_ivar
+        if acs.instance_variable_defined? ivar
+          _x = acs.instance_variable_get ivar
+          Callback_::Qualified_Knownness.via_value_and_association _x, asc
+        else
+          Callback_::Qualified_Knownness.via_association asc
+        end
+      end
+
+      To_entry_stream = -> acs do
 
         # for now, we don't cache the reflection on the below 2 methods which
         # leaves the door open for some extreme hacking of singleton classes.
-        # see "why so serious?" in [#doc]:#note-REFL-A for more.
+        # see #REFL-A for more.
 
         if acs.respond_to? :to_component_symbol_stream
 
@@ -144,7 +117,9 @@ module Skylab::Brazen
         end
       end
 
-      Method_index_of_class = -> cls do  # 2
+      # ~ method index
+
+      Method_index_of_class = -> cls do
 
         cls.class_exec do
 
@@ -157,7 +132,7 @@ module Skylab::Brazen
 
         def initialize meth_a
 
-          # the below cacheing rationale is explored at #note-REFL-B
+          # the below cacheing rationale is explored at #REFL-C
 
           @_entry_stream = -> do
 
@@ -265,7 +240,7 @@ module Skylab::Brazen
         RX___ = /\A__(?<name>.+)__component_(?<which>association|operation)\z/
       end
 
-      class Entry__
+      class Entry__  # entries are build by m.i and to entry stream
 
         def initialize name_symbol, cat_sym
           @category = cat_sym
@@ -282,40 +257,7 @@ module Skylab::Brazen
         )
       end
 
-      # ~ encapsulate the fragile assumption about ivars
-
-      Wrapped_value_for = -> asc, acs do  # 2
-
-        ivar = asc.name.as_ivar
-        if acs.instance_variable_defined? ivar
-          Value_Wrapper[ acs.instance_variable_get( ivar ) ]
-        end
-      end
-
-      Wrapped_value_reader_for___ = -> acs do
-
-        -> asc do
-
-          ivar = asc.name.as_ivar
-          if acs.instance_variable_defined? ivar
-            Value_Wrapper[ acs.instance_variable_get( ivar ) ]
-          end
-        end
-      end
-
-      # ~
-
-      Model_is_compound = -> mdl do  # 2
-
-        if mdl.respond_to? :method_defined?
-
-          if mdl.method_defined? :to_component_symbol_stream
-            true
-          else
-            ! Method_index_of_class[ mdl ].association_symbols.nil?
-          end
-        end
-      end
+      READ_METHOD__ = :component_wrapped_value
     end
   end
 end

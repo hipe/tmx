@@ -9,7 +9,7 @@ module Skylab::MyTerm::TestSupport
 
     context "(some context)" do
 
-      it "the operation produces a stream that produces strings" do
+      it "the operation produces a stream that produces strings FOR NOW" do
 
         @subject_kernel_ = new_mutable_kernel_with_appearance_ appearance_JSON_one_
 

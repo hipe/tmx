@@ -1,248 +1,215 @@
 module Skylab::MyTerm
 
-  class Models_::Adapter
+  module Models_::Adapter
+
+    # this is our experimental frontier of "factory pattern" under ACS:
+
+    # the scope of this "node" is
+    #   1) list available adapters,
+    #   2) be the custodian of and express which adapter is selected and
+    #   3) to process requests to change the selected adapter.
+
+    # it's annoying to attempt all of this with one component (near state
+    # changes and serialization) so we attempt a factory pattern. however,
+    # our client need not be aware (directly) that we switch classes.
+
+    # creating an inheritance hierarchy for this is both problematic in
+    # theory and helpful in practice.
 
     class << self
 
-      def interpret_component st, & x_p
+      def interpret_component st, acs, & p
 
-        if st.no_unparsed_exists
-          _new_entity( & x_p )
+        adapters = acs.method :adapters
+
+        if st.unparsed_exists
+
+          Selected__._new_entity( adapters, & p ).
+            _interpret_self_through_selected_adapter_name st.gets_one
+
         else
-          o = _new_entity( & x_p )
-          ada = o._lookup st.gets_one
-          if ada
-            ada._accept_selected
-            ada
-          else
-            ada
-          end
+          Selection___._new_controller adapters, & p
         end
       end
-
-      alias_method :_new_entity, :new
-      private :new
     end  # >>
 
-    def initialize & oes_p  # on event selectively
-      @is_selected = false
-      @_oes_p = oes_p
-    end
+    Common__ = ::Class.new
 
-    def initialize_component asc, acs
+    class Selection___ < Common__
 
-      @_asc = asc
-      @_kernel = acs.kernel_
-      ACHIEVED_
-    end
+      class << self
+        alias_method :_new_controller, :new
+        private :new
+      end  # >>
 
-    # ~ the "set" operation
+      # inherit these actions:
 
-    def __set__component_operation
-
-      yield :description, -> y do
-        y << "set the adapter"
+      def __list__component_operation
+        super
       end
 
-      yield :parameter, :adapter, :description, -> y do
-        y << "the name of the adapter to use"
-        y << "(see `list` for a list of adapters)"   # etc
+      def __set__component_operation
+        super
       end
-
-      method :__receive_set_adapter_name
     end
 
-    def __receive_set_adapter_name adapter
+    class Selected__ < Common__
 
-      ada = _lookup adapter
-      if ada
-        if object_id == ada.object_id
-          # for now we let this slide (covered), just so we can cover the
-          # mechanics of it. but follow this up if you want to..
+      class << self
+        alias_method :_new_entity, :new
+        private :new
+      end  # >>
+
+      def _interpret_self_through_selected_adapter_name s
+
+        # assume this is for all of your constructions. if you don't resolve
+        # an adapter from the name, you cannot exist as a "selected."
+
+        ada  = @_adapters[].touch_adapter_via_string__ s
+        if ada
+          ada = ada.flush_to_selected_adapter
+          @selected_adapter = ada
+          self
+        else
+          ada
         end
-        __receive_set_adapter ada
-      else
-        ada
+      end  # >>
+
+      # inherit these actions:
+
+      def __list__component_operation
+        super
+      end
+
+      def __set__component_operation
+        super
+      end
+
+      # ~ for [#br-035] expressive events
+
+      def description_under expag
+
+        ada = @selected_adapter
+        expag.calculate do
+          nm ada.adapter_name
+        end
+      end
+
+      # for ACS serialization
+
+      def to_primitive_for_component_serialization
+        @selected_adapter.adapter_name.as_slug
+      end
+
+      # ~ entity-like exposures
+
+      def selected_adapter__
+        @selected_adapter
       end
     end
 
-    def __receive_set_adapter ada
+    class Common__
 
-      if object_id != ada.object_id
-        @is_selected = false  # maybe not important
+      def initialize adapters_p, & oes_p
+
+        @_adapters = adapters_p
+        @_oes_p = oes_p
       end
 
-      ada._accept_selected
+      # ~ the "set" operation
 
-      @_oes_p.call :component, :change do | y |
-        y.yield :new_component, ada
-        y.yield :association, @_asc
-      end
-    end
+      def __set__component_operation
 
-    def _lookup x
+        yield :description, -> y do
+          y << "set the adapter"
+        end
 
-      oes_p = @_oes_p
+        yield :parameter, :adapter, :description, -> y do
+          y << "the name of the adapter to use"
+          y << "(see `list` for a list of adapters)"   # etc
+        end
 
-      o = Brazen_::Collection::Common_fuzzy_retrieve.new( & oes_p )
-
-      _ = Callback_::Qualified_Knownness.via_value_and_symbol x, :adapter
-
-      o.qualified_knownness = _
-
-      o.stream_builder = -> do
-        _to_adapter_stream( & oes_p )
+        method :__receive_set_adapter_name
       end
 
-      o.name_map = -> ada do
-        ada._adapter_name.as_slug
-      end
+      def __receive_set_adapter_name adapter
 
-      o.execute
-    end
+        sel = Selected__._new_entity( @_adapters, & @_oes_p ).
+          _interpret_self_through_selected_adapter_name adapter
 
-    # ~ the "list" operation
+        if sel
 
-    def __list__component_operation
+          # here is the horcrux (i mean crux) of our factory pattern: we
+          # signal to any listening client that "we" should be replaced
+          # with this new value. in some cases this means effectively
+          # changing the class of the component, in other cases not.
 
-      yield :description, -> y do
-        y << "list the available adapters"
-      end
+          @_oes_p.call :component, :change do | y |
 
-      method :_to_adapter_stream
-    end
-
-    # ~ operation support
-
-    def _to_adapter_stream
-
-      # function soup for this: if you are selected and you are providing
-      # the list, provide yourself as the appropriate item in the stream.
-
-      build_via_proto = nil
-
-      use_build_via_proto = -> path do
-        build_via_proto[ path ]
-      end
-
-      if @is_selected
-        my_path = @path
-        p = -> path do
-          if my_path == path
-            p = use_build_via_proto
-            self
-          else
-            build_via_proto[ path ]
+            y.yield :new_component, sel
           end
+        else
+          sel
         end
-      else
-        p = use_build_via_proto
       end
 
-      build_via_proto = -> x do
-        proto = self.class._new_entity( & @_oes_p )
-        build_via_proto = -> path do
-          proto.new path
+      # ~ the "list" operation
+
+      def __list__component_operation
+
+        yield :description, -> y do
+          y << "list the available adapters"
         end
-        build_via_proto[ x ]
-      end
 
-      @__ls ||= ::Dir[ "#{ Home_::Image_Output_Adapters_.dir_pathname.to_path }/[a-z0-9]*" ]
-
-      Callback_::Stream.via_nonsparse_array @__ls do | path |
-        p[ path ]
+        -> do
+          @_adapters[].to_adapter_stream_for_list__
+        end
       end
     end
 
-    # ~ as dispatcher to adapter
+    class Visiting_Association
 
-    def to_particular_node_stream__
-      @__ada ||= __build_particular_adapter
-      ACS_[]::Reflection::To_node_stream[ @__ada ]
-    end
+      # for [#003]:#storypoint-1 (in-situ)
 
-    def __build_particular_adapter
-
-      nf = _adapter_name
-
-      _cls = Home_::Image_Output_Adapters_.const_get( nf.as_const, false )
-
-      _oes_p_ = ACS_[]::Interpretation::Component_handler[ self, & @_oes_p ]
-
-      _cls.new nf, & _oes_p_
-    end
-
-    # ~ as entity
-
-    def new path
-      otr = dup
-      otr.__init path
-      otr
-    end
-
-    def __init path
-
-      @is_selected = false
-      @path = path
-      NIL_
-    end
-
-    def express_into_under y, _expag  # for a mode client
-
-      _glyph_for_is_selected = if @is_selected
-        SELECTED_GLYPH__
-      else
-        NULL_GLYPH__
+      class << self
+        alias_method :new_prototype, :new
+        private :new
       end
 
-      y << "#{ _glyph_for_is_selected }#{ _adapter_name.as_slug }"
-    end
+      def initialize ada
+        @adapter_ = ada
+      end
 
-    def describe_into_under y, expag  # for reactive tree
-      me = self
-      expag.calculate do
-        y << "#{ me.___operation_symbols * ', ' } adapters"  # etc
+      def new asc
+        dup.__init asc
+      end
+
+      def __init asc
+        @real_association_ = asc
+        self
+      end
+
+      def name
+        @real_association_.name
+      end
+
+      def component_model
+        @real_association_.component_model
+      end
+
+      def category
+        @real_association_.category
+      end
+
+      attr_reader(
+        :adapter_,
+        :real_association_,
+      )
+
+      def sub_category
+        :visiting
       end
     end
-
-    def ___operation_symbols
-      ACS_[]::Reflection::Method_index_of_class[ self.class ].operation_symbols
-    end
-
-    def description_under expag  # for [#br-035] expressive events
-      me = self
-      expag.calculate do
-        nm me._adapter_name
-      end
-    end
-
-    def to_component_value
-      _adapter_name.as_slug
-    end
-
-    def _adapter_name
-      @___nf ||= __build_adapter_name_function
-    end
-
-    def __build_adapter_name_function
-
-      bn = ::File.basename @path
-      Callback_::Name.via_slug bn[ 0 ... - ::File.extname( bn ).length ]
-    end
-
-    nf = nil
-    define_method :name do  # #open [#br-107] will change this name
-      nf ||= Callback_::Name.via_variegated_symbol( :adapter )
-    end
-
-    def _accept_selected
-      @is_selected = true ; nil
-    end
-
-    attr_reader(
-      :is_selected,
-      :path,
-    )
 
     NULL_GLYPH__ = '  '
     SELECTED_GLYPH__ = '• '

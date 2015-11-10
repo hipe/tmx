@@ -1,3 +1,5 @@
+[#039]       #case-study: how does my future self think this should be
+             refactored? (in [mt])
 [#038]       precedence rules for logical taxonomies ..
 [#037]       n.c for filenames ..
 [#036]       historic ascii graph (in directory [#034])

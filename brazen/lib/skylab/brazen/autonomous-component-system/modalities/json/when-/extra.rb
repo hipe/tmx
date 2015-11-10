@@ -6,7 +6,7 @@ module Skylab::Brazen
 
       module Extra
 
-        def self.[] h, sess
+        def self.[] sym_a, sess
 
           sess.on_event_selectively.call :error, :extra_properties do
 
@@ -21,7 +21,7 @@ module Skylab::Brazen
             end
 
             Home_::Property::Events::Extra.new_with(
-              :name_x_a, h.keys,
+              :name_x_a, sym_a,
               :lemma, 'element',
               :context_prepositional_phrase_proc, _p,
             )

@@ -298,7 +298,7 @@ module Skylab::Brazen
 
         def __descend
 
-          _acs = ACS_::Interpretation::Touch[ @association, @ACS, & @oes_p ]
+          _acs =  ACS_::For_Interface::Read_or_write[ @association, @ACS, & @oes_p ]
           @ACS = _acs
           @association = nil
         end
@@ -354,15 +354,12 @@ module Skylab::Brazen
 
         def ___interpret_component_normally
 
-          lib = ACS_::Interpretation
+          o = ACS_::Interpretation_::Universal_Build.new(
+            @association, @ACS, & @oes_p )
 
-          _special_oes = lib::Component_handler[ @ACS, & @oes_p ]
-
-          lib::Build_component_normally.call(
-            @arg_st,
-            @association,
-            @ACS,
-            & _special_oes )
+          o.wrap_handler_as_component_handler
+          o.mixed_argument = @arg_st
+          o.execute
         end
 
         def __interpret_when_operation_defined_in__model__

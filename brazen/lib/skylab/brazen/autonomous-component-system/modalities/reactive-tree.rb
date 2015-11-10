@@ -4,7 +4,7 @@ module Skylab::Brazen
 
     module Modalities::Reactive_Tree  # notes in [#083]
 
-      class Dynamic_Source_for_Unbounds
+      class Dynamic_Source_for_Unbounds  # [mt]
 
         def initialize
           @_bx = Callback_::Box.new
@@ -66,73 +66,99 @@ module Skylab::Brazen
         end  # >>
 
         def initialize & oes_p
-          @node_stream = nil
+          @stream_for_interface = nil
           @_oes_p = oes_p
         end
 
         attr_writer(
           :ACS,
-          :node_stream,
+          :stream_for_interface,
         )
 
         def execute
 
-          _st = if @node_stream
-            @node_stream
-          else
-            ACS_::Reflection::To_node_stream[ @ACS ]
-          end
+          @__read_component_value = ___component_value_reader
 
-          _st.map_by do | qkn |
+          _st = ___to_stream_for_component_interface
 
-            if :association == qkn.association.category
+          # because the above is reduced to only component associations of
+          # interface intent and operations, we need not reduce it further
 
-              if qkn.is_known_known
+          qkn = nil
+          h = {
 
-                x = qkn.value_x
-
-                if x
-                  __unbound_for_association_with_trueish_value qkn
-
-                elsif x.nil?
-
-                  # (near [#083]:INTERP-B .. might change)
-
-                  _unbound_for_association_with_unknown_value qkn
-                else
-
-                  self._DESIGN_ME_issue_083_INTERP_B_when_falseish
-                end
+            association: -> do
+              if qkn.is_effectively_known
+                __unbound_for_association_with_knownish_value qkn
               else
-                _unbound_for_association_with_unknown_value qkn
+                __unbound_for_association_with_unknownish_value qkn
               end
-            else
+            end,
+
+            operation: -> do
+              # (operations are only ever for the interface intent)
               Operation_as_Hybrid___.new qkn, @ACS
+            end
+          }
+
+          _st.map_by do | qkn_ |
+            qkn = qkn_
+            h.fetch( qkn.association.category ).call
+          end
+        end
+
+        def ___to_stream_for_component_interface
+
+          if @stream_for_interface
+            @stream_for_interface
+          else
+            ACS_::For_Interface::To_stream[ @ACS ]
+          end
+        end
+
+        def __unbound_for_association_with_unknownish_value qkn
+
+          asc = qkn.association
+
+          cmp = @__read_component_value[ asc ]
+
+          # the component that was created above is typically bound to parent
+          # through the "special" handler that routes "signals", but for the
+          # below hybrid we only want the ordinary, unmodified handler
+
+          if cmp
+            Compound_as_Hybrid__.new asc.name, cmp, & @_oes_p
+          else
+            # if the model declined to build an empty component, then it
+            # doesn't want to for whatever reason. reduce over it.
+            cmp
+          end
+        end
+
+        def ___component_value_reader
+
+          if @ACS.respond_to? READER_METHOD__
+
+            @ACS.send READER_METHOD__, & @_oes_p
+
+          else
+
+            -> asc do
+
+              # :+#suspect - do we want touch or Read_or_write ?
+
+              ACS_::For_Interface::Touch[ asc, @ACS, & @_oes_p ]
             end
           end
         end
 
-        def _unbound_for_association_with_unknown_value qkn
-
-          # this part is kind of nasty - create & join children like these
-          # for now we assume class-like model but this could be granulated
-
-          asc = qkn.association
-
-          _cmp = ACS_::Interpretation::Build_empty_child_bound_to_parent[
-            asc, @ACS, & @_oes_p ]  # #todo - why do we not assign child?
-
-          # the above component got the "special" handler,
-          # but the below hybrid needs the ordinary one.
-
-          Compound_as_Hybrid__.new asc.name, _cmp, & @_oes_p
-        end
-
-        def __unbound_for_association_with_trueish_value qkn
+        def __unbound_for_association_with_knownish_value qkn
 
           Compound_as_Hybrid__.new qkn.name, qkn.value_x, & @_oes_p
         end
       end
+
+      READER_METHOD__ = :component_value_reader_for_reactive_tree
 
       class Hybrid__  # see "what is a hybrid?" (#note-RT-A)
 

@@ -9,7 +9,7 @@ module Skylab::Brazen::TestSupport
 
     it "non-sparse one-level structure" do
 
-      sn = const_( :Simple_Name ).new
+      sn = const_( :Simple_Name ).new_empty_for_test_
       sn.first_name = "\"spike\""
       sn.last_name = "jonez"
 
@@ -18,22 +18,22 @@ module Skylab::Brazen::TestSupport
       _h.should eql( first_name: '"spike"', last_name: 'jonez' )
     end
 
-    it "with a hole, it renders nil (so structure is checked)" do
+    it "with sparse structres it does NOT render nil" do
 
-      sn = const_( :Simple_Name ).new
+      sn = const_( :Simple_Name ).new_empty_for_test_
       sn.last_name = "gustav"
 
       _s = _to_json_not_pretty sn
-      _s.should eql '{"first_name":null,"last_name":"gustav"}'
+      _s.should eql '{"last_name":"gustav"}'
     end
 
     it "two levels ..?" do
 
-      sn = const_( :Simple_Name ).new
+      sn = const_( :Simple_Name ).new_empty_for_test_
       sn.first_name = "FN"
       sn.last_name = "LN"
 
-      cn = const_( :Credits_Name ).new
+      cn = const_( :Credits_Name ).new_empty_for_test_
       cn.simple_name = sn
       cn.nickname = "NN"
 

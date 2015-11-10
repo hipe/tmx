@@ -76,6 +76,7 @@ module Skylab::MyTerm
 
   ACHIEVED_ = true
   Home_ = self
+  IDENTITY_ = -> x { x }
   Autoloader_[ Models_ = ::Module.new ]
   NIL_ = nil
   UNABLE_ = false

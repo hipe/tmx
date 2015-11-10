@@ -26,37 +26,27 @@ module Skylab::Callback::TestSupport
       ( @_future_expect_queue ||= [] ).push false ; nil
     end
 
-    def on_past_emissions em_a
-      @_past_emissions = em_a ; nil
+    def on_past_emissions x
+      @_past_emissions = x ; nil
     end
 
     def past_expect_eventually * i_a, & ev_p
 
-      looked = [] ; st = _stream_of_actual_emissions_from_past
-      while em = st.gets
-        if i_a == em.category
-          break
-        end
-        looked.push em.category
-      end
-      if em
+      em_a = @_past_emissions.all_on_channel i_a
+      case 1 <=> em_a.length
+      when 0
+        em = em_a.fetch 0
         if ev_p
           Assert_procs__[ em.event_proc, em.category, ev_p ]
         else
           em
         end
+      when -1
+        fail Say_expected_one_thing_had_many_things__[ i_a, em_a.length ]
       else
-        fail Say_expected_one_thing_had_another_thing__[ i_a, looked ]  # egads
+        _x = @_past_emissions.mixed_for_description
+        fail Say_expected_one_thing_had_another_thing__[ i_a, _x ]
       end
-    end
-
-    def _stream_of_actual_emissions_from_past
-      @___actual_emissions_from_past ||= __build_SofAEfP
-    end
-
-    def __build_SofAEfP
-      Home_::Stream.via_nonsparse_array(
-        remove_instance_variable( :@_past_emissions ) )
     end
 
     def fut_p
@@ -114,12 +104,60 @@ module Skylab::Callback::TestSupport
 
     def future_black_and_white ev
 
-      future_expression_agent_instance = Home_.lib_.brazen::API.expression_agent_instance
       a = ev.express_into_under [], future_expression_agent_instance
       a.join '//'
     end
 
     alias_method :past_black_and_white, :future_black_and_white
+
+    def future_expression_agent_instance
+      Home_.lib_.brazen::API.expression_agent_instance
+    end
+
+    # ~ public models
+
+    Event_Record = ::Struct.new :category, :event_proc
+
+    class Emissions
+
+      def initialize bx
+        @_bx = bx
+      end
+
+      def only_on * i_a
+        em_a = all_on_channel i_a
+        case 1 <=> em_a.length
+        when 0   ; em_a.fetch( 0 )
+        when -1  ; fail __say_none( i_a )
+        else     ; fail __say_many( em_a.length, i_a )
+        end
+      end
+
+      def __say_none i_a
+        _say "had none expected some", i_a
+      end
+
+      def __say_many d, i_a
+        _say "expected one had #{ d }", i_a
+      end
+
+      def _say i_a
+        " on #{ i_a.inspect }"
+      end
+
+      def all_on_channel i_a
+
+        @_bx.fetch i_a do
+          EMPTY_A_
+        end
+      end
+
+      def mixed_for_description  # [ca]
+        @_bx.a_
+      end
+    end
+
+    # ~ support
 
     Assert__ = -> act_p, act_a, exp_p, exp_a do
 
@@ -161,7 +199,9 @@ module Skylab::Callback::TestSupport
       "expected #{ exp_a.inspect } had #{ act_a.inspect }"
     end
 
-    Event_Record = ::Struct.new :category, :event_proc
+    Say_expected_one_thing_had_many_things__ = -> exp_a, d do
+      "expected 1 had #{ d } of #{ exp_a.inspect }"
+    end
 
   end
 end

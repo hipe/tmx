@@ -17,7 +17,7 @@ module Skylab::Brazen::TestSupport
         sn.last_name.should eql 'Bar'
       end
 
-      it "when one is nil - validation must allow for this" do
+      it "when one is null - validation must allow for this TODO change this behavior" do
 
         sn = _from '{"first_name":"Foo", "last_name":null}'
         sn.first_name.should eql 'Foo'
@@ -126,7 +126,12 @@ module Skylab::Brazen::TestSupport
 
       oes_p ||= No_events_
 
-      new_empty = const_( _which ).new
+      cls = const_ _which
+      if cls.respond_to? :new_empty_for_test_
+        new_empty = cls.new_empty_for_test_
+      else
+        raise ::NoMethodError, ___say( cls )
+      end
 
       o = subject_::Modalities::JSON::Interpret.new( & oes_p )
 
@@ -140,6 +145,11 @@ module Skylab::Brazen::TestSupport
 
       _ok = o.execute
       _ok && new_empty
+    end
+
+    def ___say cls
+      # honestly platform
+      "undefined method `new_empty_for_test_` for #{ cls.name }"
     end
   end
 end

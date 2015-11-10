@@ -1,6 +1,6 @@
 module Skylab::Parse
 
-  module DSL_DSL
+  module DSL_DSL  # :[#011].
 
   # this DSL_DSL is a simple DSL for making simple DSL's.
   #

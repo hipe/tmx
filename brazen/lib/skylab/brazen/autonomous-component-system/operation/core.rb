@@ -11,7 +11,7 @@ module Skylab::Brazen
           new( acs )._init_for_sym sym
         end
 
-        def builder_for acs
+        def reader_for acs
 
           proto = new acs
           -> sym do

@@ -116,6 +116,10 @@ module Skylab::Callback
 
     public
 
+      def h_  # READ ONLY ! accomplices only!
+        @h
+      end
+
       def to_mutable_box_like_proxy
         to_new_mutable_box_like_proxy
       end
@@ -146,7 +150,7 @@ module Skylab::Callback
 
       def gets
         if ! @done
-          at_unknown_index @d + 1
+          _at_unknown_index @d + 1
         end
       end
 
@@ -161,7 +165,7 @@ module Skylab::Callback
         elsif @h.key? i
           true
         else
-          has_name_for_unseen_name_when_not_done i
+          __has_name_for_unseen_name_when_not_done i
         end
       end
 
@@ -170,15 +174,23 @@ module Skylab::Callback
       end
 
       def at_position_if_any d
-        advance_to_position_if_any d
+        _advance_to_position_if_any d
         if d < @a.length
           @h.fetch @a.fetch d
         end
       end
 
       def at_position d
-        advance_to_position_if_any d
+        _advance_to_position_if_any d
         @h.fetch @a.fetch d
+      end
+
+      def index k
+        if @h.key? k
+          @a.index k
+        else
+          self._WRITE_ME
+        end
       end
 
       def [] i
@@ -186,7 +198,13 @@ module Skylab::Callback
       end
 
       def fetch i, & p
-        x = lookup i
+
+        x = @h[ i ]
+
+        if ! ( x || @done )
+          x = ___lookup_any_value_for_unseen_name_when_not_done i
+        end
+
         if x
           if @value_mapper
             @value_mapper[ x ]
@@ -200,38 +218,31 @@ module Skylab::Callback
             p[]
           end
         else
-          raise ::KeyError, say_name_not_found( i )
+          raise ::KeyError, __say_name_not_found( i )
         end
       end
 
-    private
-
-      def lookup i
-        x = @h[ i ]
-        if x || @done
-          x
-        else
-          lookup_any_value_for_unseen_name_when_not_done i
-        end
+      def cached k
+        @h.fetch k
       end
 
-      def lookup_any_value_for_unseen_name_when_not_done i  # see note #ra-180 in [#044]
-        yes = has_name_for_unseen_name_when_not_done i
+      def ___lookup_any_value_for_unseen_name_when_not_done i  # see note #ra-180 in [#044]
+        yes = __has_name_for_unseen_name_when_not_done i
         if yes
           @h.fetch i
         end
       end
 
-      def has_name_for_unseen_name_when_not_done i
+      def __has_name_for_unseen_name_when_not_done i
         did_have = false
         while true
           x = @upstream.gets
           if ! x
-            become_done
+            _become_done
             break
           end
           name_i = x.send @key_method_name
-          store_via_value_and_supposedly_unique_name x, name_i
+          _store_via_value_and_supposedly_unique_name x, name_i
           if i == name_i
             did_have = true
             break
@@ -240,11 +251,9 @@ module Skylab::Callback
         did_have
       end
 
-      def say_name_not_found i
+      def __say_name_not_found i
         "key not found: #{ i.inspect }"
       end
-
-    public
 
       def reduce_by i=nil
         if i
@@ -322,10 +331,6 @@ module Skylab::Callback
         end
       end
 
-      def to_simple_stream
-        to_value_stream
-      end
-
       def each_name & p
         if @done
           @a.each( & p )
@@ -336,7 +341,7 @@ module Skylab::Callback
               yield @a.fetch d += 1
               redo
             end
-            x = at_unknown_index d += 1
+            x = _at_unknown_index d += 1
             x or break
             yield x.send @key_method_name
             redo
@@ -352,9 +357,9 @@ module Skylab::Callback
 
       def to_value_stream
         if @done
-          to_stream_when_done Home_::Stream
+          __to_stream_when_done Home_::Stream
         else
-          to_stream_when_not_done Home_::Stream
+          __to_stream_when_not_done Home_::Stream
         end
       end
 
@@ -370,13 +375,13 @@ module Skylab::Callback
 
       def _to_name_stream
         if @done
-          to_name_stream_when_done
+          __to_name_stream_when_done
         else
-          to_name_stream_when_not_done
+          __to_name_stream_when_not_done
         end
       end
 
-      def to_stream_when_done cls
+      def __to_stream_when_done cls
         d = -1 ; last = @last
         cls.new do
           if d < last
@@ -385,7 +390,7 @@ module Skylab::Callback
         end
       end
 
-      def to_name_stream_when_done
+      def __to_name_stream_when_done
         d = -1 ; last = @last
         Stream_.new do
           if d < last
@@ -394,22 +399,22 @@ module Skylab::Callback
         end
       end
 
-      def to_stream_when_not_done cls
+      def __to_stream_when_not_done cls
         d = -1
         cls.new do
           if @done
             if d < @last
-              at_known_index d += 1
+              _at_known_index d += 1
             end
           elsif d < @d
-            at_known_index d += 1
+            _at_known_index d += 1
           else
-            at_unknown_index d += 1
+            _at_unknown_index d += 1
           end
         end
       end
 
-      def to_name_stream_when_not_done
+      def __to_name_stream_when_not_done
         d = -1
         Stream_.new do
           if @done
@@ -417,42 +422,42 @@ module Skylab::Callback
           elsif d < @d
             @a.fetch d += 1
           else
-            key_at_unknown_index d += 1
+            __key_at_unknown_index d += 1
           end
         end
       end
 
-      def at_known_index d
+      def _at_known_index d
         @h.fetch @a.fetch d
       end
 
       def flush
         while ! @done
-          at_unknown_index @d + 1
+          _at_unknown_index @d + 1
         end ; nil
       end
 
-      def key_at_unknown_index d
-        x = at_unknown_index d
+      def __key_at_unknown_index d
+        x = _at_unknown_index d
         if x
           x.send @key_method_name
         end
       end
 
-      def advance_to_position_if_any d
+      def _advance_to_position_if_any d
         while ! @done && @d < d
-          at_unknown_index @d + 1
+          _at_unknown_index @d + 1
         end ; nil
       end
 
-      def at_unknown_index d
+      def _at_unknown_index d
         while @d < d
           x = @upstream.gets
           if x
             name_i = x.send @key_method_name
-            store_via_value_and_supposedly_unique_name x, name_i
+            _store_via_value_and_supposedly_unique_name x, name_i
           else
-            become_done
+            _become_done
             x = nil
             break
           end
@@ -460,7 +465,7 @@ module Skylab::Callback
         x
       end
 
-      def store_via_value_and_supposedly_unique_name x, name_i  # must increment d
+      def _store_via_value_and_supposedly_unique_name x, name_i  # must increment d
         did = nil
         @h.fetch name_i do
           did = true
@@ -470,15 +475,15 @@ module Skylab::Callback
           @d += 1
           @a.push name_i ; nil
         else
-          raise ::KeyError, say_wont_clobber_name( name_i )
+          raise ::KeyError, ___say_wont_clobber_name( name_i )
         end
       end
 
-      def say_wont_clobber_name name_i
+      def ___say_wont_clobber_name name_i
         "won't clobber existing '#{ name_i }'"
       end
 
-      def become_done
+      def _become_done
         @done = true
         @length = @a.length
         @last = @length - 1 ; nil

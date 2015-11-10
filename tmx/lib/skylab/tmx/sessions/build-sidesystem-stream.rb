@@ -32,7 +32,7 @@ module Skylab::TMX
           if md
             gemname = md[ 0 ]
           else
-            require 'byebug' ; byebug ; 1==1 and :hibd
+            self._COVER_ME
             exit 0
           end
 

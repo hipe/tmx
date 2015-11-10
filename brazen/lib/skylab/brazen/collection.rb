@@ -166,69 +166,110 @@ module Skylab::Brazen
       class << self
 
         def _call kn, stream_builder, & oes_p
-          new(
-            kn,
-            stream_builder,
-            -> o do
-              o.name.as_slug
-            end,
-            -> o do
-              o.dup  # flyweights
-            end,
-            & oes_p
-          ).execute
+
+          o = new( & oes_p )
+
+          o.found_map = -> x do
+            x.dup  # flyweights
+          end
+
+          o.name_map = -> x do
+            x.name.as_slug
+          end
+
+          o.qualified_knownness = kn
+
+          o.stream_builder = stream_builder
+
+          o.execute
         end
 
         alias_method :[], :_call
         alias_method :call, :_call
       end  # >>
 
-      def initialize kn=nil, sb=nil, nm=nil, fm=nil, & oes_p
+      def initialize  & oes_p
 
-        @found_map = fm
-        @name_map = nm
+        @found_map = nil
+        @levenshtein_number = nil
+        @name_map = nil
         @on_event_selectively = oes_p
-        @stream_builder = sb
-        @qualified_knownness = kn
+        @success_map = nil
+        @target_map = nil
       end
 
       attr_writer(
-        :found_map,
-        :name_map,
-        :on_event_selectively,
-        :qualified_knownness,
-        :stream_builder,
+
+        :found_map,  # each candidate that is matched off the input stream
+        # (even when more than one) is mapped through this optional mapper.
+        # this is typically used to un-flyweight a flyweight, so error-
+        # reporting works in cases of ambiguity.
+
+        :levenshtein_number,  # if provided, will be used to reduce the
+        # number of items in the "did you mean [..]?"-type expressions.
+
+        :name_map,  # how do we resolve a string-like name from each
+        # candidate item? if not provided, the assumption is that the
+        # candidate items are string-like (or perhaps only that they are
+        # `=~` compatible.)
+
+        :on_event_selectively,  # (required) a [#ca-001 selective listener
+        # proc to call in case not exactly one match can be resolved.
+
+        :qualified_knownness,  # (required) wrap your target value in
+        # this [#ca-004] which associates a name function with the value.
+
+        :stream_builder,  # (required) build the candidate stream. we need
+        # a builder and not the stream itself because in case one match
+        # is not resolved, we need the whole stream anew to report on it.
+
+        :success_map,  # if exactly one match is resolved from the stream
+        # of items, before it is presented as the final result it will be
+        # mapped through this proc if provided.
+
+        :target_map,  # for the purposes of matching each candidate against
+        # the target value (in the qkn), alter the target in this way
       )
+
+      def set_qualified_knownness_value_and_symbol x, sym
+        @qualified_knownness =
+          Callback_::Qualified_Knownness.via_value_and_symbol x, sym
+        NIL_
+      end
 
       def execute
 
         x = @qualified_knownness.value_x
 
-        if x.respond_to? :id2name
-          self._DO_ME_exact_match
-        else
+        if @target_map
+          x = @target_map[ x ]
+        end
 
-          a = Home_.lib_.basic::Fuzzy.reduce_to_array_stream_against_string(
-            @stream_builder.call,
-            x,
-            @name_map,
-            @found_map,
-          )
+        a = Home_.lib_.basic::Fuzzy.reduce_to_array_stream_against_string(
+          @stream_builder.call,
+          x,
+          @name_map,
+          @found_map,
+        )
 
-          case 1 <=> a.length
-          when 0
-            a.fetch 0
-
-          when 1
-            __not_found
-
-          when -1
-            __ambiguous a
+        case 1 <=> a.length
+        when 0
+          x = a.fetch 0
+          if @success_map
+            @success_map[ x ]
+          else
+            x
           end
+
+        when 1
+          __not_found
+
+        when -1
+          ___ambiguous a
         end
       end
 
-      def __ambiguous a
+      def ___ambiguous a
 
         @on_event_selectively.call :error, :ambiguous_property do
           Home_::Property.build_ambiguous_property_event(
@@ -247,13 +288,26 @@ module Skylab::Brazen
           name_map = @name_map
           _st = @stream_builder.call
 
-          _did_you_mean_s_a = _st.map_by do | ent |
+          did_you_mean_s_a = _st.map_by do | ent |
             name_map[ ent ]
           end.to_a
 
+          d = @levenshtein_number
+          if d
+            _Lev = Home_.lib_.human::Levenshtein
+            a = _Lev.with(
+              :item, kn.value_x,
+              :items, did_you_mean_s_a,
+              :closest_N_items, d,
+            )
+            if a && a.length.nonzero?
+              did_you_mean_s_a = a
+            end
+          end
+
           Home_::Property.build_extra_values_event(
             [ kn.value_x ],
-            _did_you_mean_s_a,
+            did_you_mean_s_a,
             kn.name.as_human )
         end
       end

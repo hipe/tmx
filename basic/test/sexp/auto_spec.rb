@@ -59,7 +59,6 @@ describe "[ba] sexp - auto" do
     def grammar
 
       <<-HERE.unindent
-
         module Skylab::Basic::TestSupport
           grammar PersonName_02
             rule person_name

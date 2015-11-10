@@ -1,13 +1,51 @@
 # thoughts on the abstract component system ("ACS") experiment :[#089]
 
-(EDIT: the correct name is "[..] autonomous [..]" but we are holding off
-on the file rename until etc.)
+## brief introduction
+
+"the ACS" is less of a library in the traditional, object-oriented sense
+and more a set of conventions you can opt-in to in a piecemeal way in
+your classes; and a corresponding collection of library *functions*
+(usually) that can do something interesting with participating objects.
+
+
+
+
+## design tenets
+
+these tenets are a distilled expression of the "principles & patterns"
+to be explored next, as well as observed tendencies that manifest
+throughout the project. we give them identifiers because they are referred
+to elsewhere in documentation. they are distinct from the 8 API tenets
+to be introduced in a subsequent section of this document. it is worth
+noting that some of these tenets were decidedly derived from the work
+after it was effected, rather than informing it.
+
+also the tenets are not hard-and-fast rules, but rather guidelines the
+violoation of which should occur only with good reason.
+
+• :dt1: autonomy: a component must be able to effect its own behavior
+    without depending on any client (i.e would be "parent") component
+    to the furthest extent possible.
+
+• :dt2: DRY-ness: a component must express its normalization logic in a
+    way that can be applied trivially to both serialization and UI intents
+    (and future intents as we discover them).
+
+• :dt3: dynamicism: the constituent list of a compound node's components
+    (in both actual *and* formal sense) must never be assumed to be
+    static. likewise meta-components of component associations.
+
+• :dt4: converatism: it is better to determine earlier that you won't
+    need a structure, rather than to build it and not use it.
+
+
+
 
 ## principles & patterns
 
 • model classes are implemeted as many small, "autonomous" components
   rather than needing to cram many different property-level concerns
-  into one node.
+  into one node. (:#+dt1)
 
 • (new in this version) we attempt a consistent inteface whether the
   mutatee is more like a "collection" or more like an "entity" (because
@@ -19,9 +57,10 @@ on the file rename until etc.)
     * objects at the sub-entity level, that help to make up the entity
     * entire collections of entites can be conceived of as components
 
-• components are mutated through "edit sessions" (referred to internally
-  as "mutation sessions"). if we ever apply this to a platform that likes
-  immutable data, we have this assumption isolated conceptually.
+• one way that a component is mutated is through an "edit session"
+  (which may be referred to interlally as a "mutation session").
+  if we ever apply this to a platform that likes immutable data,
+  we have this assumption isolated conceptually.
 
 • participating "compound components" (components that consist mainly
   of other components) define themselves in terms of a set (possibly
@@ -30,9 +69,9 @@ on the file rename until etc.)
   conceived of as a "component association", which consists of:
 
     * a name (imagine it is any string) that is unique in the context of
-      all the other subject component's component associations.
+      all of the "custodian ACS"'s component association names.
 
-    * a "component model" (needs only implement one method (see (5) below)).
+    * a "component model" (needs only implement one method, #t5.)
 
     * a set of zero or more operation verbs (each string-like) that can
       deliver such a component to the subject component thru the
@@ -101,21 +140,21 @@ on the file rename until etc.)
 
 in summary:
 
-1) in application code, ACS components are *not* constructed using `new`
+• in application code, ACS components are *not* constructed using `new` :t1
 
-2) new components are constructed by sending `edit_entity` to the class
+• new components are constructed by sending `edit_entity` to the class :t2
 
-3) existing components are mutated by sending `edit_entity` to the component
+• existing components are mutated by sending `edit_entity` to the component :t3
 
-4) for "inward" purposes, associations are defined thru *instance* methods
+• for "inward" purposes, associations are defined thru *instance* methods :t5
 
-5) simple or one-off models typically produce components thru `[]`
+• simple or one-off models typically produce components thru `[]` :t6
 
-6) `interpret_component` is above for dedicated models
+• `interpret_component` (and similar) is above for dedicated models :t7
 
-7) modifiers (experimental): `via`, `using`, `if` and `assuming`
+• modifiers (experimental): `via`, `using`, `if` and `assuming` :t8
 
-8) verbs ("operations") are implemented wholly by the subject component
+• the operation verbs of mutation sessions are defined in the assoc.. :t9
 
 
 we may tag some (or all!?) of the various occurrences of these tenets in
@@ -318,6 +357,9 @@ if the model responds to `interpret_component`,
 the ACS will use this means (instead of the means described above) to
 attempt to produce the component.
 
+(we are in the midst of developing an experimental new form for the
+above that is only for "compound models" tracked with [#083]:INTERP-D)
+
 we say "interpret" because this method is expected to interpret one
 or more tokens off the argument stream to turn it into a (trueish)
 object.
@@ -383,12 +425,17 @@ argument from the operation expression.
 this naming convention with the nested double underscores is
 the "generated form" desribed in (4).
 
-`via` modifiers are an assertion of shape with an expression of
-intent: it allows us to implement a variety of ways that the input
+a `via` modifier is an assertion of shape with an expression of intent.
+(but we don't mean "intent" in the [#083] sense, just the non-technial
+sense.)
+
+the `via` modifier allows us to implement a variety of ways that the input
 can be created from a variety of shapes of input, and then specify
-at construction time which way is supposed to be used; rather than
-a more loosey-goosey process of type inferrence, that might lead to
-unintended success or encourage poorly thought out design.
+at construction time which way is supposed to be used. it is an explicit
+way to declare what the shape is of the argument you are passing, lest
+we be tempted to fall back on a loosey-goosey process of type inferrence,
+that might lead to unintended success or encourage wishy-washy or
+implicit intefaces.
 
 the result semantics of this form are (and must be) exactly as in (6),
 ergo this form cannot be used for components that are validly false-ish.
@@ -531,6 +578,10 @@ although this is a *very* exploratory pair of features, here's a thing:
 
 
 ### 8) the operation verb
+
+currently there are two ways to define "operations" - one is in the
+component association and the other is by a model class. we cover the
+first way here.
 
 the ACS assigns no special meaning to the various one or more verbs to be
 supported in edit sessions.

@@ -25,7 +25,7 @@ module Skylab::Callback
     end
 
     def lib_
-      @__lib ||= produce_library_shell_via_library_and_app_modules self::Lib_, self
+      @___lib ||= produce_library_shell_via_library_and_app_modules self::Lib_, self
     end
 
     # memoize defined below
@@ -721,7 +721,7 @@ module Skylab::Callback
     end
   end
 
-  class Qualified_Knownness
+  class Qualified_Knownness  # [#004]
 
     class << self
 
@@ -767,8 +767,27 @@ module Skylab::Callback
       self.class.via_value_and_had_and_association x, true, @association
     end
 
+    def new_with_association asc
+      self.class.via_value_and_had_and_association(
+        ( @value_x if @is_known_known ),
+        @is_known_known,
+        asc )
+    end
+
     def to_unknown
       self.class.via_association @association
+    end
+
+    def is_effectively_known
+
+      # munge nil-ness with being unknown. NOTE: this is provided as a
+      # convenience only. use it IFF it fits with your semantics/logic
+
+      if @is_known_known
+        ! @value_x.nil?
+      else
+        false
+      end
     end
 
     def value_x
@@ -2181,7 +2200,7 @@ module Skylab::Callback
       end
 
       def via_slug s
-        _new_via :__init_via_slug, s
+        _new_via :init_via_slug, s
       end
 
       def via_variegated_symbol i
@@ -2212,7 +2231,7 @@ module Skylab::Callback
       @as_slug = human_s.gsub( SPACE__, DASH_ ).downcase.freeze
     end
 
-    def __init_via_slug s
+    def init_via_slug s
       @as_slug = s.freeze
     end
 
@@ -2221,6 +2240,24 @@ module Skylab::Callback
       @as_slug = i.to_s.gsub( NORMALIZE_CONST_RX__, DASH_ ).
         gsub( UNDERSCORE_, DASH_ ).downcase.freeze
     end
+
+    # ~
+
+    def to_linked_list_node_in_front_of name
+      dup.___init_as_linked_list_node_in_front_of name
+    end
+
+    def ___init_as_linked_list_node_in_front_of x
+      @next = x ; self
+    end
+
+    attr_reader :next
+
+    def name  # use a name object as a mock for something else
+      self
+    end
+
+    # ~
 
     def express_into_under y, expag  # #hook-out [#br-023]
       name = self
@@ -2340,10 +2377,6 @@ module Skylab::Callback
     def __resolve_const
       @const_is_resolved_ = true
       @as_const = Constify_if_possible_[ as_variegated_symbol.to_s ]
-    end
-
-    def name_function  # use a name object as a mock for something else
-      self
     end
 
     NORMALIZE_CONST_RX__ = /(?<=[a-z])(?=[A-Z])/

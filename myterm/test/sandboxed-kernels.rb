@@ -28,7 +28,7 @@ module Skylab::MyTerm::TestSupport
     # ~ assertion methods (might move) & references
 
     _memoize :appearance_JSON_one_ do
-      <<-HERE.unindent
+      <<-HERE.unindent.freeze
         {
           "adapter": "imagemagick"
         }
@@ -52,8 +52,10 @@ module Skylab::MyTerm::TestSupport
 
       def initialize test_context
 
-        @emissions = nil
         @_test_context = test_context
+
+        bx = Callback_::Box.new
+        @__em_bx = bx
 
         @proc = -> * i_a, & ev_p  do
 
@@ -61,9 +63,11 @@ module Skylab::MyTerm::TestSupport
             @_test_context.debug_IO.puts i_a.inspect
           end
 
+          _a = bx.touch i_a do
+            []
+          end
           _ = Callback_.test_support::Future_Expect::Event_Record[ i_a, ev_p ]
-
-          ( @emissions ||= [] ).push _
+          _a.push _
 
           false  # err on this side
         end
@@ -72,6 +76,9 @@ module Skylab::MyTerm::TestSupport
       def finish
 
         remove_instance_variable :@proc
+
+        _bx = remove_instance_variable :@__em_bx
+        @emissions = Callback_.test_support::Future_Expect::Emissions.new _bx
 
         tc = remove_instance_variable :@_test_context
 
@@ -143,12 +150,22 @@ module Skylab::MyTerm::TestSupport
 
       def _set_data string
 
+        ke = @_kernel
+
         _mock_installation_method :any_existing_read_writable_IO do
+
           require 'stringio'
+
           io = ::StringIO.new string
+
+          ke.send :define_singleton_method, :_string_IO_for_testing_ do
+            io
+          end
+
           def io.path
             "[mt]/string-IO-xizzi.json"
           end
+
           io
         end
       end
@@ -174,5 +191,7 @@ module Skylab::MyTerm::TestSupport
         :be_verbose, do_debug,
       )
     end
+
+    EMPTY_A_ = [].freeze
   end
 end

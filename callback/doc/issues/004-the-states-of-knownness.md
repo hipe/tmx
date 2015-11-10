@@ -70,10 +70,37 @@ so hopefully we won't be here long.
 
 ### what is a qualified knownness?
 
-  • formally a qualified knownness is (either a known uknown or a known
+  • formally a qualified knownness is (either a known unknown or a known
     known) that also has an association structure associated with it.
 
   • because it is a knownness it can answer those points there.
+
+
+
+
+## shortwinded car analogy: known unknown vs. known known
+
+if your headlights stop working on your car, you know you have a
+problem. so we can say the problem is a "known" at this point.
+
+you may suspect (as we did) that the solution is to replace the bulbs
+(both of them, which oddly burned out at the same time). after you drive
+to the car parts store (during the day) and get the lights and look up
+on the internet how to replace them yourself and make an evening out of
+it, the new lights you put in quickly burn out again after about 10
+minutes of driving.
+
+because you know part of the whole story (something about headlights
+together with your car not working), but you know you don't know the
+whole story ("why do they keep burning out so quickly?"), you know that
+you don't know something. this state of formalized ignorance is the
+central purpose of the subject library, and is what is meant by "known
+unknown."
+
+when finally you take your car to a *third* mechanic, and they finally
+figure out as your dad suspected that it is in fact the alternator that
+is causing the electrical problems, and this *finally* appears to solve
+the problem, we can say that the problem is a "known known".
 
 
 

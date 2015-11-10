@@ -80,84 +80,57 @@ module Skylab::Brazen
       end
     end  # >>
 
-    module CA_Builder__ ; class << self
+    Component_Association = ::Class.new
 
-      def single sym, acs
-        _lookup( acs ).single sym, acs
-      end
+    # how this unit is structured is the subject of the [#bs-039] case study
 
-      def for acs
-        _lookup( acs ).for acs
-      end
+    method_name_for = -> sym do
+      :"__#{ sym }__component_association"
+    end
 
-      def _lookup acs
-        if acs.respond_to? :lookup_component_association
-          Dynamic_CA_Builder___
+    Component_Association::Read = -> sym, acs, & else_p do
+
+      m = method_name_for[ sym ]
+
+      send = -> do
+        ca = nil
+        p = -> x do
+          ca = Component_Association._begin_definition
+          p = -> x_a do
+            ca.send :"__accept__#{ x_a.first }__meta_component", * x_a[ 1..-1 ]
+            NIL_
+          end
+          p[ x ]
+        end
+
+        cm = acs.send m do | * x_a |  # :t4.
+          p[ x_a ]
+        end
+
+        if ca
+          if cm
+            ca._finish_definition_via cm, sym
+          else
+            self._DESIGN_ME_cover_me_compnoent_assoc_method_had_no_model
+          end
+        elsif cm
+          Component_Association.
+            _begin_definition.
+              _finish_definition_via cm, sym
         else
-          Conventional_CA_Builder
+          self._DESIGN_ME_cover_me__totally_empty_component_assoc
         end
       end
-    end ; end
 
-    class Common_CA_Builder__
-
-      class << self
-        def for acs
-          new._init_for acs
+      if else_p
+        if acs.respond_to? m
+          send[]
+        else
+          else_p[]
         end
-        private :new
-      end  # >>
-
-      def _init_for acs
-        @_ACS = acs
-        self
+      else
+        send[]
       end
-    end
-
-    class Dynamic_CA_Builder___ < Common_CA_Builder__
-
-      def build_association_for sym
-        @_ACS.lookup_component_association sym
-      end
-    end
-
-    class Conventional_CA_Builder < Common_CA_Builder__
-
-      class << self
-
-        def single sym, acs
-
-          _ca = Component_Association.new_prototype
-          _ca._init_via_definition_method(
-            Method_name_for__[ sym ],
-            sym,
-            acs )
-        end
-      end  # >>
-
-      def _init_for acs
-        @_prototype = Component_Association.new_prototype
-        super
-      end
-
-      def build_association_for sym
-
-        @_prototype.dup._init_via_definition_method(
-          _method_name_for( sym ),
-          sym,
-          @_ACS
-        )
-      end
-
-      def can_build_association_for sym
-        @_ACS.respond_to? _method_name_for sym
-      end
-
-      Method_name_for__ = -> sym do
-        :"__#{ sym }__component_association"
-      end
-
-      define_method :_method_name_for, Method_name_for__
     end
 
     class Component_Association
@@ -169,17 +142,28 @@ module Skylab::Brazen
 
       class << self
 
+        def reader_for acs
+          if acs.respond_to? CUSTOM_LOOKUP_METHOD__
+            Dynamic_Reader___.for acs
+          else
+            Reader.for acs
+          end
+        end
+
         def via_symbol_and_ACS sym, acs
-
-          CA_Builder__.single sym, acs
+          if acs.respond_to? CUSTOM_LOOKUP_METHOD__
+            acs.send CUSTOM_LOOKUP_METHOD__, sym
+          else
+            Read[ sym, acs ]
+          end
         end
 
-        def builder_for acs
+        def via_name_and_model nf, mdl
 
-          CA_Builder__.for acs
+          _begin_definition._init_via nf, mdl
         end
 
-        alias_method :new_prototype, :new
+        alias_method :_begin_definition, :new
         private :new
       end  # >>
 
@@ -188,29 +172,38 @@ module Skylab::Brazen
         @_operations = nil
       end
 
-      def _init_via_definition_method m, sym, acs
+      def _finish_definition_via cm, sym
 
-        cm = acs.send m do | * x_a | # :t4.
-          send :"__accept__#{ x_a.first }__meta_component", * x_a[ 1 .. -1 ]
-          NIL_
+        nf = Callback_::Name.via_variegated_symbol sym
+
+        if @_name_mutation
+          @_name_mutation[ nf ]  # *mutates*
         end
 
-        if cm
-          @component_model = cm
-
-          nm = Callback_::Name.via_variegated_symbol sym
-
-          if @_name_mutation
-            @_name_mutation[ nm ]
-          end
-
-          @name = nm
-
-          self
-        else
-          self._COVER_ME  # maybe one day c.a's can dynamically disappear
-        end
+        _init_via nf, cm
       end
+
+      def _init_via nf, mdl
+
+        remove_instance_variable :@_name_mutation
+        @component_model = mdl
+        @name = nf
+        self
+      end
+
+      # ~
+
+      def to_linked_list_node_in_front_of name
+        dup.___init_as_linked_list_node_in_front_of name
+      end
+
+      def ___init_as_linked_list_node_in_front_of x
+        @next = x ; self
+      end
+
+      attr_reader :next
+
+      # ~
 
       def description_under _expag
         @name.as_human
@@ -225,6 +218,13 @@ module Skylab::Brazen
         @_operations = bx
         NIL_
       end
+
+      def __accept__intent__meta_component sym  # see [#083]:INTERP-B
+        @intent = sym
+        NIL_
+      end
+
+      attr_reader :intent
 
       def __accept__stored_in_ivar__meta_component ivar
 
@@ -286,6 +286,58 @@ module Skylab::Brazen
 
       def category
         :association
+      end
+
+      def sub_category
+        :common
+      end
+
+      class Reader
+
+        class << self
+          alias_method :for, :new
+          private :new
+        end  # >>
+
+        def initialize acs
+          @_ACS = acs
+        end
+
+        def [] sym
+          Read[ sym, @_ACS ]
+        end
+
+        def fetch sym, & p
+          Read[ sym, @_ACS, & p ]
+        end
+      end
+
+      class Dynamic_Reader___ < Reader
+
+        def [] sym
+          @_ACS.send CUSTOM_LOOKUP_METHOD__, sym
+        end
+
+        def fetch sym, & p
+          self._K
+        end
+      end
+
+      CUSTOM_LOOKUP_METHOD__ = :lookup_component_association
+    end
+
+    module Reflection
+
+      Model_is_compound = -> mdl do
+
+        if mdl.respond_to? :method_defined?
+
+          if mdl.method_defined? :to_component_symbol_stream
+            true
+          else
+            ! ACS_::Reflection_::Method_index_of_class[ mdl ].association_symbols.nil?
+          end
+        end
       end
     end
 

@@ -27,9 +27,17 @@ module Skylab::Brazen
 
         initialize_as_expresser expag
 
-        say 'changed'
-        express_collection
+        _verb_sym = :change  # :+[#035]:WISH-A
+        _s = Home_.lib_.human::NLP::EN::POS::Verb[ _verb_sym.to_s ].preterite
+
+        say _s
+
+        if ! @did_express_context_chain_
+          express_collection
+        end
+
         say @component_association_string_
+
         say 'from'
         say_component @previous_component
         say 'to'

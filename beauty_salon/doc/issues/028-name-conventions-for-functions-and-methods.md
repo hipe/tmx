@@ -15,7 +15,7 @@ its "API scope". here is a summary of the N tiers of scope:
 
     __we_call_this_one_off_scope  # #tier-3: two leading underscores
 
-    ___SHOUTWORD_this_method_is_never_called  # (only used during develoment!)
+    ___one_off_scope_where_caller_is_immediately_above
 
 
 
@@ -165,6 +165,17 @@ better this time.
   with some irreversable internal side-effects that make this method not
   idempotent (but perhaps yet idempotent).
 
+  `flush_to_` is an interesting portmanteau - this has all the semantics
+  of `to_` (see) except that it irreversably mutates the receiver,
+  rendering it effectively useless. in some cases we can think of this
+  as "changing the class" of an object (e.g to refine it to a more
+  specific class).
+
+  (this may also be used to pretend we are dealing with immutable data:
+  we might mutate and result in self but pretend we are dup-mutating.
+  because `flush` is in the method name we can be assured that the
+  "old self" will no longer be used with its old meaning [mt].)
+
 + `init_` has at least two distinct meanings: 1) as `init` it is a
   specialized initializer when it is not practical or possible to use
   `initialize` (e.g a `dup`ed object that gets initialized by a
@@ -183,11 +194,13 @@ better this time.
 
 + `lookup_` - this word (or whatever we change it to) has reserved
   meaning: a method that contains this word is for retrieving one
-  component from the receiver where the component is expected to be
-  present. behavior on failure is not proscribed here other than that
-  it *cannot* emit events to a callback.
-  [#br-031] about the universal retrieve operation discusses this term
-  and other related terms.
+  component from a collection-like receiver with this important difference
+  from the `retrieve_` disussed in [#br-031]: the subject method *cannot*
+  take a block or similar handler *as a parameter* to effect fail-case
+  behavior. (it may however use such a handler that is interanal to the
+  receiver.) its fail-case behavior may be undefined. [#br-031] about
+  the universal retrieve operation discusses this term and other related
+  terms. in practice a subject method is used to implement such a method.
 
 + `[_]make[_]` - this verb used in perhaps *any* method name should
   confer this one meaning only: this method results in a generated
@@ -198,6 +211,11 @@ better this time.
   fit your method, consider (see) `build`.
 
 + `new_with` - see the #iambic family of method name conventions below.
+
+  `new_with_` - similar to `to_` in that it does not mutate the receiver
+  and results in an object with similar identity, this one results in
+  a new object of the same class but with the indicated member(s)
+  being set by the parameters (as possible).
 
 + `on_` see [#.C] method naming conventions around events below.
 
@@ -214,16 +232,32 @@ better this time.
 
 + `run`, `run_` - reserved for starting a long-running process :+[#.E]
 
-+ `to_`, `_to_` - the second form is explicitly not defined conventionally
-  here. use it as you would like to naturally. (but use `via` instead if
-  you can, because whereas `bar_via_foo()` is unambiguous,
-  `foo_to_bar` is ambiguous with respect to whether the argument
-  is `foo`, `bar`, or both.
++ `to_`, `_to_` -
 
-  the first form (`to_`) is used in the platform idiomatic way, e.g
-  `to_a` etc. `to_stream` is a popular one in this universe (it used
-  to be `to_scan`, and before that `get_scan`, and still it has the
-  same underlying sematics as the `get_` prefix).
+  `_to_` - we now say to avoid this form except for the meaning to be
+  proscribed below. consider that whereas `foo_to_bar` is ambiguous
+  ast to whether 'foo', 'bar', or both represent the parameters to this
+  method, `bar_via_foo` is unambiguous: this method certainly results in
+  a 'bar', and uses as input a 'foo' that is either indicated by its one
+  parameter *or* (if the method takes no parameter) some member data 'bar'.
+
+  `to_` - we use this in the platform idiomatic way (e.g `to_a`, `to_s`,
+  etc.) with the same semantics: this does *not* mutate the recevier,
+  rather it results in a new object that holds the "intrinsic" (or
+  "constituent") identity of the receiver, but in a shape corresponding
+  to the named shape. whether this is a lossless conversion or not is
+  not proscribed here.
+
+  as a case study and segway, `to_stream` (and related) is a popular one
+  in this universe (it used to be `to_scan`, and before that `get_scan`..)
+
+  as it would happen, the underlying semantics of our `get_` (see) apply
+  to our `to_` as well; and indeed `to_` would overtake `get_` except
+  that `get_` does not confer this idea of representing some sort of
+  intrinsic identity, but only of "some (possibly derived) member".
+
+  `to_` may be combined with other conventions here that may override
+  components of its meaning, for example `flush_to_` (see).
 
 + `use_<foo_bar>_by` -
 

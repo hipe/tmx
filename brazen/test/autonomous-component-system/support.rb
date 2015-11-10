@@ -42,6 +42,29 @@ module Skylab::Brazen::TestSupport
 
     class Simple_Name
 
+      class << self
+
+        def interpret_compound_component p, & _  # experimental for [#083]:INTERP-D
+          if p
+            _me = new
+            p[ _me ]
+          else
+
+            # the proc is not there IFF `null` was in the JSON payload. but
+            # this is only experimental - remember that it is mechanically
+            # impossible to result in false-ish validly from here, so we
+            # will probably either make a major, earth-shattering change to
+            # this #t6 inteface make `null` invalid in JSON payloads, -OR-
+            # imply skip over nulls higher up (violating #dt1 autonomy)
+
+            new
+          end
+        end
+
+        alias_method :new_empty_for_test_, :new
+        private :new
+      end
+
       attr_accessor(
         :first_name,
         :last_name,
@@ -73,23 +96,14 @@ module Skylab::Brazen::TestSupport
           ACS__[]::Value_Wrapper[ _s ]
         end
       end
-
-      def self.interpret_component st, & _
-
-        # (needed for making empty components for now)
-
-        if st.unparsed_exists  # implement parsing null from json
-          x = st.gets_one
-          x.nil? or self._SANITY
-        end
-
-        st.unparsed_exists and self._SANITY
-
-        new
-      end
     end
 
     class Credits_Name
+
+      class << self
+        alias_method :new_empty_for_test_, :new
+        private :new
+      end  # >>
 
       attr_accessor(
         :nickname,

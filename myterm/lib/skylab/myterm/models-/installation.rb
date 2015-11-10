@@ -44,13 +44,15 @@ module Skylab::MyTerm
         ::File.join _data_path, 'volatile-image.png'
       end
 
-      def _filesystem
-        ::File
-      end
-
       def _data_path
         @__data_path ||= ::File.join( ::ENV.fetch( 'HOME' ), '.myterm' )
       end
+
+      def _filesystem
+        @___FS ||= Home_.lib_.system.filesystem
+      end
+
+      alias_method :filesystem, :_filesystem  # localize the exposure
     end
   end
 end

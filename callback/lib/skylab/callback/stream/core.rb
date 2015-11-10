@@ -10,10 +10,6 @@ module Skylab::Callback
         @tes ||= new do end
       end
 
-      def immutable_with_random_access
-        Stream_::As_::Immutable_with_Random_Access
-      end
-
       def mutable_with_random_access
         Stream_::As_::Mutable_with_Random_Access
       end

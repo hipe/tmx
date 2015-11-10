@@ -4,7 +4,7 @@ module Skylab::Brazen
 
     module Modalities::JSON
 
-      class Express
+      class Express  # notes in [#083]
 
         def initialize & p
           @be_pretty = true
@@ -37,61 +37,83 @@ module Skylab::Brazen
 
         def build_string
 
-          _h = _recurse @upstream_ACS
+          h = _recurse @upstream_ACS
 
-          _m = @be_pretty ? :pretty_generate : :generate
+          if h
 
-          Home_.lib_.JSON.send _m, _h
+            _m = @be_pretty ? :pretty_generate : :generate
+
+            Home_.lib_.JSON.send _m, h
+
+          else
+            self._COVER_ME_no_data_at_all
+          end
         end
 
-        def _recurse compound
+        def _recurse acs  # see [#083]:note-JSON-expression
 
-          h = {}  # we care that hashes are ordered here (for first time ever)
+          result = nil
 
           o = nil
-          store = -> x do
-            h[ o.name.as_variegated_symbol ] = x ; nil
+          store = -> xx do
+            # only create the hash if there's something to put in it
+            result = {}
+            store = -> x do
+              result[ o.name.as_variegated_symbol ] = x
+              NIL_
+            end
+            store[ xx ]
           end
 
-          st = ACS_::Reflection::To_qualified_knownness_stream[ compound ]
+          st = ACS_::For_Serialization::To_stream[ acs ]
+
           begin
             o = st.gets
             o or break
 
-            # if it's a known unknown for now we store null for more detail..
-
             if ! o.is_known_known
-              store[ nil ] ; redo
+              redo  # if it's a known unknown, don't write anything
             end
-
-            # if it's nil or false *and* it's known, easy - store as is
 
             x = o.value_x
-            if ! x
-              store[ x ] ; redo
+            if ! x  # if it's false-ish, *even if it's a compound component*,
+
+              if false == x
+                store[ x ] ; redo  # false is always stored as-is
+              end
+
+              redo  # nil is never stored per #INOUT-A
             end
 
-            # if it's a compound component, always recurse
+            # if it's a true-ish compound component, always recurse
 
-            mdl = o.association.component_model
-            if ACS_::Reflection::Model_is_compound[ mdl ]
-              _x = _recurse x
-              store[ _x ] ; redo
+            _mdl = o.association.component_model
+            if ACS_::Reflection::Model_is_compound[ _mdl ]
+
+              x_ = _recurse x
+              if x_
+                store[ x_ ]
+              end
+              # it's possible that a recursion can
+              # result in false-ish, as we might do below
+              redo
             end
 
-            # it's gotta be either a trueish primitive or it's what we're
-            # calling a "heavy atomic". against all decency (would go up):
+            # at this point we know it's true-ish and not a compound node:
 
-            case x
-            when ::TrueClass, ::Fixnum, ::Float, ::String
+            if Looks_primitive__[ x ]
+
+              # if it's a primitive, store as-is
               store[ x ] ; redo
+
             else
-              _x = x.to_component_value
-              store[ _x ] ; redo
+              x_ = x.to_primitive_for_component_serialization
+              Looks_primitive__[ x_ ] or self._COVER_ME_wrong_shape
+              store[ x_ ] ; redo
             end
           end while nil
 
-          h
+          result
         end
 
         # ~
@@ -131,6 +153,15 @@ module Skylab::Brazen
         attr_reader(
           :downstream_IO,  # experimental..
         )
+
+        Looks_primitive__ = -> x do
+          case x
+          when ::TrueClass, ::Fixnum, ::Float, ::String  # #INOUT-C
+            true
+          else
+            false
+          end
+        end
       end
     end
   end

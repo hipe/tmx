@@ -27,15 +27,20 @@ module Skylab::Brazen
       ) do | y, ev |
 
         o = Event_Support_::Expresser[ self, ev ]
+
         _verb_sym = :add  # :+[#035]:WISH-A
-        s = Home_.lib_.human::NLP::EN::POS::Verb[ _verb_sym.to_s ].preterite
+        _s = Home_.lib_.human::NLP::EN::POS::Verb[ _verb_sym.to_s ].preterite
+
         o.instance_exec do
-          say s
+
+          say _s
           express_component or say 'component'
-          if @can_express_collection_related_
+
+          if @can_express_collection_related_ && ! @did_express_context_chain_
             say 'to'
             express_collection
           end
+
           flush_into y
         end
       end
@@ -97,6 +102,26 @@ module Skylab::Brazen
 
         asc = @component_association
         if asc
+
+          # if x is linked-list-friendly (nf or ca), get to the back of it
+
+          if asc.respond_to? :next
+
+            back = asc.next
+            if back
+              context_chain = [ asc ]
+              begin
+                context_chain.push back
+                asc = back
+                back = back.next
+                back or break
+                redo
+              end while nil
+            end
+          end
+
+          # after that:
+
           if asc.respond_to? :component_model  # original, "real" asc from ACS
             cm = asc.component_model
 
@@ -105,7 +130,19 @@ module Skylab::Brazen
             asc = nil
           end
 
-          if asc
+          if context_chain  # experimental
+
+            expressed_context_chain = true
+
+            _s_a = context_chain.reduce [] do | m, x |
+              s = x.description_under @expag_
+              s and m.push s
+              m
+            end
+
+            ca_s = _s_a * SPACE_
+
+          elsif asc
             ca_s = asc.description_under @expag_
           end
         end
@@ -116,6 +153,7 @@ module Skylab::Brazen
 
         @component_association_string_ = ca_s
         @component_model_string_ = cm_s
+        @did_express_context_chain_ = expressed_context_chain
         NIL_
       end
 
@@ -284,15 +322,57 @@ module Skylab::Brazen
       end
 
       def say_unique * s_a
-        seen = {}
-        s_a.each do | s |
-          s or next
-          seen.fetch s do
-            say s
-            seen[ s ] = nil
-          end
+
+        # given a list of N surface expression strings going from general
+        # to specific (e.g "human", "user", "Jaako"), express each one in
+        # order after having de-duped the items in this way:
+
+        # for any two would-be contiguous items that have a redundancy where
+        # the more general item alreay expressed at the *tail* of the more
+        # specific item, omit the expression of the general item:
+
+        #     "foo", "foo", "bar"         => "foo", "bar",
+        #     "color", "background color" => "background color"
+        #     "user", "super-user"        => "super-user"
+        #   ~ "user", "superuser"
+
+        raw_st = Callback_::Polymorphic_Stream.via_array s_a
+
+        st = Callback_.stream do  # ignore empties
+
+          begin
+            raw_st.no_unparsed_exists and break
+            s = raw_st.gets_one
+            s ? break : redo
+          end while nil
+          s
         end
-        seen.length.nonzero?
+
+        general_s = st.gets
+        if general_s
+
+          did_any = true
+
+          begin
+
+            specific_s = st.gets
+
+            if ! specific_s
+              say general_s
+              break
+            end
+
+            rx = /\b#{ ::Regexp.escape general_s }\z/
+
+            if rx !~ specific_s
+              say general_s
+            end
+            general_s = specific_s
+            redo
+          end while nil
+        end
+
+        did_any
       end
 
       def say_via_nonsparse_array a

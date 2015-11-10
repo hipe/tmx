@@ -45,14 +45,10 @@ module Skylab::MyTerm::TestSupport
 
         future_is_now  # assert no unexpected events
       else
-        fail __say_failed_to_make_bound_call x_a
+        @result = bc
       end
 
       NIL_
-    end
-
-    def __say_failed_to_make_bound_call x_a
-      "bound call failed to #{ x_a[ 0, 2 ].inspect } (turn debugging on)"
     end
 
     def subject_kernel_

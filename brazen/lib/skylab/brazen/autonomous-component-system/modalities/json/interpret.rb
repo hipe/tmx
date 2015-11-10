@@ -4,10 +4,10 @@ module Skylab::Brazen
 
     module Modalities::JSON
 
-      class Interpret  # (notes in [#083])
+      class Interpret  # notes in [#083]:#JSON-interpretation
 
         def initialize & p
-          @on_event_selectively = p
+          @_oes_p = p
         end
 
         attr_writer(
@@ -17,246 +17,349 @@ module Skylab::Brazen
         )
 
         def execute
-          @_parsed_unsanitized_mutable_mixed = Home_.lib_.JSON.parse @JSON
-          _common_execute
+
+          _x = Home_.lib_.JSON.parse(
+            remove_instance_variable( :@JSON ),
+            symbolize_names: true,
+          )
+
+          rec = Recurse_.new(
+            _x,
+            remove_instance_variable( :@context_string_proc_stack ),
+            @ACS,
+            & @_oes_p )
+
+          rec._execute
+        end
+      end
+
+      class Interpret::Recurse_
+
+        def initialize x, ctx_a, acs, & p
+          @ACS = acs
+          @_ctx_a = ctx_a
+          @_oes_p = p
+          @_x = x
         end
 
-      protected
+        def _execute
 
-        attr_writer(
-          :_association,
-          :_parsed_unsanitized_mutable_mixed,
-        )
+          ok = __resolve_pair_stream
+          ok && __prepare_to_accept_values
+          ok &&= __lineup
+          ok &&= __go_deep
+          ok &&= __go_shallow
+          ok && __flush
+        end
 
-        def _resolve_sanitized_value
+        def __prepare_to_accept_values
 
-          ok = _common_execute
-          if ok
-            @sanitized_value = remove_instance_variable :@ACS
-            ok
-          else
-            ok
+          @_did_any_assignments = false
+
+          p = ACS_::Interpretation_::Writer[ @ACS ]
+
+          @_accept_qkn = -> qkn do
+
+            @_did_any_assignments = true
+            @_accept_qkn = p
+            p[ qkn ]
           end
+
+          NIL_
         end
 
-        # ~ look like leaf
+        def __resolve_pair_stream
 
-        def sanitized_value
-          @sanitized_value  # warn me
-        end
-
-        def association
-          @_association
-        end
-
-      private
-
-        def _common_execute
-
-          ok = __resolve_mutable_hash
-          ok &&= __init_units_of_work
-          ok &&= __resolve_sanitized_values
-          ok && __accept_sanitized_values
-        end
-
-        def __resolve_mutable_hash
-
-          x = remove_instance_variable :@_parsed_unsanitized_mutable_mixed
-
+          x = remove_instance_variable :@_x
           if x.respond_to? :each_pair
-            @_mutable_hash = x
-            ACHIEVED_
+             @_pair_stream = Home_.lib_.basic::Hash.pair_stream x
+             ACHIEVED_
           else
             Modalities::JSON::When_[ x, self, :Shape ]
           end
         end
 
-        def __init_units_of_work  # #note-JSON-A about this loop
+        def __lineup
 
-          uow_a = []
+          deeps = nil
+          shallows = nil
 
-          cmp_oes_p = ACS_::Interpretation::Component_handler[
-            @ACS, & @on_event_selectively ]
-
-          h = remove_instance_variable :@_mutable_hash
-          ok = true
-
-          st = if @ACS.respond_to? :to_association_stream_for_serialization
-            @ACS.to_association_stream_for_serialization
-          else
-            ACS_::Reflection::To_association_stream[ @ACS ]
-          end
+          bxish = ___build_boxish
+          st = remove_instance_variable :@_pair_stream
 
           begin
-            asc = st.gets
-            asc or break
 
-            k = asc.name.as_lowercase_with_underscores_symbol.id2name
+            pair = st.gets
+            pair or break
+            sym = pair.name_symbol
+            x = pair.value_x
 
-            none = false
-            x = h.fetch k do
-              none = true ; nil
+            had = true
+            qkn = bxish.fetch sym do
+              had = false
             end
-            none and redo  # (we don't nilify these for now)
-            h.delete k
 
-            _yes = ACS_::Reflection::Model_is_compound[ asc.component_model ]
+            if ! had
+              has_extra = true
+              break
+            end
 
-            if _yes && x  # process a false-ish compound value as leaf
-              uow = __recurse x, asc
-              if uow
-                uow_a.push uow
-              else
-                ok = uow
-                break
-              end
+            _asc = qkn.association
+            _is = ACS_::Reflection::Model_is_compound[ _asc.component_model ]
+
+            _category = if _is
+              ( deeps ||= [] )
             else
-              uow_a.push Leaf___.new( x, asc, @ACS, & cmp_oes_p )
-              ok = true
+              ( shallows ||= [] )
             end
+
+            _category.push qkn.new_with_value x
 
             redo
           end while nil
 
-          if ok && h.length.nonzero?
-            ok = Modalities::JSON::When_[ h, self, :Extra ]
-          end
-
-          if ok && uow_a.length.zero?
-            ok = Modalities::JSON::When_[ self, :Empty ]
-          end
-
-          if ok
-            @_units_of_work = uow_a
-          end
-
-          ok
-        end
-
-        def __recurse x, asc
-
-          o = self.class.new( & @on_event_selectively )
-          ok = __add_child_component o, asc
-          ok &&= __add_the_rest o, x, asc
-          ok && o
-        end
-
-        def __add_child_component o, asc
-
-          cmp = ACS_::Interpretation::Build_empty_child_bound_to_parent.call(
-            asc,
-            @ACS,
-            & @on_event_selectively )
-
-          if cmp
-            o.ACS = cmp
-            ACHIEVED_
+          if has_extra
+            __when_extra sym, st
           else
-            self._COVER_ME_failed_to_build_empty_child_component__assumed_correct_as_is
-            cmp
+            @_boxish = bxish
+            @_unorderd_deeps = deeps
+            @_unorderd_shallows = shallows
+            ACHIEVED_
           end
         end
 
-        def __add_the_rest o, x, asc
+        def ___build_boxish
 
-          o._association = asc
+          _st = ACS_::For_Serialization::To_stream[ @ACS ]
 
-          a = @context_string_proc_stack.dup
-          a.push -> do
-            "in #{ ick asc.name.as_lowercase_with_underscores_symbol.id2name }"
-          end
-
-          o.context_string_proc_stack = a
-
-          o._parsed_unsanitized_mutable_mixed = x
-
-          ACHIEVED_
+          _st.flush_to_immutable_with_random_access_keyed_to_method(
+            :name_symbol )
         end
 
-        def __resolve_sanitized_values
+        def __when_extra sym, st
 
-          ok = false
-          @_units_of_work.each do | uow |
-            ok = uow._resolve_sanitized_value
+          extra_a = []
+          begin
+            extra_a.push sym
+            pair = st.gets
+            pair or break
+            extra_a.push pair.name_symbol
+            redo
+          end while nil
+          Modalities::JSON::When_[ extra_a, self, :Extra ]
+          UNABLE_
+        end
+
+        def __go_deep
+
+          if @_unorderd_deeps
+             ___do_go_deep
+          else
+            ACHIEVED_
+          end
+        end
+
+        def ___do_go_deep
+
+          a = remove_instance_variable :@_unorderd_deeps
+          _sort a
+          ok = true
+          a.each do | qkn |
+            ok = ___go_deep_on qkn
             ok or break
           end
           ok
         end
 
-        def __accept_sanitized_values
+        def ___go_deep_on qkn
 
-          accpt = ACS_::Interpretation::Accepter_for[ @ACS ]
+          wv = ___resolve_branch_component_recursively qkn
+          if wv
 
-          @_units_of_work.each do | uow |
+            _qkn_ = qkn.new_with_value wv.value_x
 
-            accpt[ uow.sanitized_value, uow.association ]
+            @_accept_qkn[ _qkn_ ]
+
+            ACHIEVED_
+          else
+            wv
           end
-          ACHIEVED_
         end
 
-      public
+        def ___resolve_branch_component_recursively qkn
 
-        attr_reader(
-          :context_string_proc_stack,
-          :on_event_selectively,
-        )
+          # (evntually, fall back on using the normal constructors)
 
-        class Leaf___
+          _on_component = if qkn.is_effectively_known
 
-          def initialize x, asc, acs, & p
+            -> acs do
 
-            @_ACS = acs
-            @association = asc
-            @_my_oes = p
-            @_unsanitized_value_x = x
-          end
+              # the model itself does the actual contsruction, and once we
+              # get this "empty" component, we can populate it by recursing
 
-          def _resolve_sanitized_value
-
-            _vp = Value_Popper___.new @_unsanitized_value_x
-
-            vw = ACS_::Interpretation::Build_component_normally[
-              _vp, @association, @_ACS, & @_my_oes ]
-
-            if vw
-              @sanitized_value = vw.value_x
-              ACHIEVED_
-            else
-              vw
+              ___recurse_into acs, qkn
             end
+          else
+
+            # experimentally, the model can build from null if it
+            # accepts `nil` for the proc
+
+            NIL_
           end
 
-          def sanitized_value
-            @sanitized_value
-          end
+          o = ACS_::Interpretation_::Universal_Build.new(
+            qkn.association, @ACS, & @_oes_p )
 
-          attr_reader(
-            :association,
-          )
+          o.mixed_argument = _on_component
+
+          o.wrap_handler_as_component_handler
+
+          @_component_oes_p = o.handler_for_component
+
+          o.construction_method = :interpret_compound_component
+
+          o.execute
         end
 
-        class Value_Popper___  # :+[#br-085]
+        def ___recurse_into cmp, qkn
 
-          def initialize x
+          a = @_ctx_a.dup
 
-            @unparsed_exists = true
-            @_p = -> do
-              @unparsed_exists = false
-              remove_instance_variable :@_p
-              x
-            end
+          a.push -> do
+
+            _nf = qkn.association.name
+
+            "in #{ ick _nf.as_lowercase_with_underscores_symbol.id2name }"
           end
 
-          def no_unparsed_exists
-            ! @unparsed_exists
-          end
+          _x = qkn.value_x
 
-          attr_reader :unparsed_exists
+          o = self.class.new( _x, a, cmp, & @_component_oes_p )
 
-          def gets_one
-            @_p[]
+          _xx_ = o._execute
+
+          # (hi.)
+
+          _xx_
+        end
+
+        def __go_shallow
+
+          if @_unorderd_shallows
+            ___do_go_shallow
+          else
+            ACHIEVED_
           end
         end
+
+        def ___do_go_shallow
+
+          a = remove_instance_variable :@_unorderd_shallows
+          _sort a
+          ok = true
+          a.each do | qkn |
+            ok = ___go_shallow qkn
+            ok or break
+          end
+          ok
+        end
+
+        def ___go_shallow qkn
+
+          # accept each of these in a batch manner. we don't bother with
+          # UOW any more: we are in the middle of a depth-first building
+          # of xxx
+
+          _argument_stream = Interpret::Value_Popper___.new qkn.value_x
+
+          # using the "value popper" (a shortlived proxy that looks like
+          # a stream but only wraps one value) is our way of leveraging
+          # the same validation & normalization used in "edit sessions"
+          # for unserialization.. (interface experimental)
+
+          asc = qkn.association
+
+          o = ACS_::Interpretation_::Universal_Build.new(
+            asc, @ACS, & @_oes_p)
+
+          o.mixed_argument = _argument_stream
+
+          o.wrap_handler_as_component_handler
+
+          wv = o.execute
+          if wv
+
+            # replace e.g the string "foo" with an object of Foo
+
+            _qkn_ = qkn.new_with_value( wv.value_x )
+
+            @_accept_qkn[ _qkn_ ]
+
+            ACHIEVED_
+          else
+            wv
+          end
+        end
+
+        def _sort qkn_a
+
+          # processing the assignments in "formal order" as opposed to
+          # received order helps us normalize failures: two different JSON
+          # payloads with a different ordering of their members but the same
+          # underlying structure will in this way be processed identically,
+          # making unserialization errors consistent with respect to content,
+          # not surface representation.
+
+          bx = @_boxish
+
+          qkn_a.sort_by do | qkn |
+
+            bx.index qkn.name_symbol
+          end
+          NIL_
+        end
+
+        def __flush
+
+          if @_did_any_assignments
+            @ACS
+          else
+            Modalities::JSON::When_[ self, :Empty ]
+          end
+        end
+
+        # ~ for "when"s
+
+        def context_string_proc_stack
+          @_ctx_a
+        end
+
+        def on_event_selectively
+          @_oes_p
+        end
+      end
+
+      class Interpret::Value_Popper___  # :+[#br-085]
+
+        def initialize x
+
+          @unparsed_exists = true
+          @_p = -> do
+            @unparsed_exists = false
+            remove_instance_variable :@_p
+            x
+          end
+        end
+
+        def gets_one
+          @_p[]
+        end
+
+        def no_unparsed_exists
+          ! @unparsed_exists
+        end
+
+        attr_reader :unparsed_exists
       end
     end
   end

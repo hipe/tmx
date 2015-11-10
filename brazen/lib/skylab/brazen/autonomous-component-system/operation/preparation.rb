@@ -68,7 +68,7 @@ module Skylab::Brazen
 
         def __init_next_ACS
 
-          _cmp = ACS_::Interpretation::Touch[ @association, @ACS, & @oes_p ]
+          _cmp = ACS_::For_Interface::Read_or_write[ @association, @ACS, & @oes_p ]
           @ACS = _cmp
           NIL_
         end

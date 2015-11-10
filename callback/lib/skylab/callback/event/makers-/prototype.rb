@@ -189,6 +189,13 @@ module Skylab::Callback
               freeze
             end
           end
+
+          def new_via_each_pairable bx
+            construct do
+              __init_via_each_pairable bx
+              freeze
+            end
+          end
         end  # end module methds
 
         # ~ instance methods of event class
@@ -213,6 +220,15 @@ module Skylab::Callback
           x_a.length.upto( bx.length - 1 ) do |d|
             prop = bx.at_position d
             instance_variable_set prop.name_as_ivar, prop.default_value
+          end
+          NIL_
+        end
+
+        def __init_via_each_pairable bx
+          fbox = formal_properties
+          bx.each_pair do | k, v |
+            _prp = fbox.fetch k
+            instance_variable_set _prp.name_as_ivar, v
           end
           NIL_
         end

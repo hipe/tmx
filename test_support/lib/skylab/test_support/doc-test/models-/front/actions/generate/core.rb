@@ -392,10 +392,10 @@ module Skylab::TestSupport
 
           @__generate_action_formal_props_box__ = bx
 
-          Callback_::Stream.immutable_with_random_access.new_with(
-            :key_method_name, :name_symbol,
-            :upstream, bx.to_value_stream )
+          _st = bx.to_value_stream
 
+          _st.flush_to_immutable_with_random_access_keyed_to_method(
+            :name_symbol )
         end
 
         Cached_dictionary_starter___ = Callback_.memoize do

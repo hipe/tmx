@@ -4,174 +4,72 @@ module Skylab::Brazen
 
     module Interpretation  # notes in [#083]
 
-      Accept_component_change = -> ev_p, acs, & oes_p do
+      Accept_component_change = -> acs, asc, change_p do  # [mt] ONLY
 
-        # mainly, store the new component value as a member value.
-        # secondarily, emit an appropriate event.
+        # required reading: #INTERP-accept-component-change
 
-        am = Component_Change___.via( & ev_p )
+        # make a note of any exisiting value before we replace it
 
-        asc = am.association
-        cmp_ = am.new_component
+        orig_qkn = ACS_::Reflection_::Read[ asc, acs ]
 
-        # the component doesn't need to know if it has actually been part
-        # of the parent as a member or if it was just floating there
+        # what is the new value we are chaning the component to?
 
-        wv = ACS_::Reflection::Wrapped_value_for[ asc, acs ]
+        new_component = Change___.via( & change_p ).new_component
 
-        Accept_valid_value__[ cmp_, asc, acs ]  # init or change
+        # (we assume A) that we are #ASSUMPTION-A not long-running, and that
+        # B) in the typical request, at most one component will change (per
+        # ACS, and in general). if one or more of A, B is not true, probably
+        # the client should make kind of component change writer..)
 
-        if wv && ! wv.value_x
-          wv.value_x.nil? or self._DESIGN_ME_issue_083_INTERP_B_when_falseish
-          wv = nil
-        end
+        ACS_::Interpretation_::Write_value[ new_component, asc, acs ]  # guaranteed
 
-        if wv
-          oes_p.call :info, :component_changed do
+        # (see "epilogue":)
 
-            ACS_.event( :Component_Changed ).new_with(
-              :current_component, cmp_,
-              :previous_component, wv.value_x,
+        if orig_qkn.is_effectively_known  # #INOUT-A, #INOUT-B
+
+          _mutation_p = -> y do
+            y.yield :info_channel, [ :info, :component_changed ]
+            y.yield :event_class, ACS_.event( :Component_Changed )
+            y.yield :event_members,
+              :current_component, new_component,
+              :previous_component, orig_qkn.value_x,
               :component_association, asc,
-              :ACS, acs,
-            )
+              :ACS, acs
           end
         else
-          oes_p.call :info, :component_added do
 
-            ACS_.event( :Component_Added ).new_with(
-              :component, cmp_,
+          _mutation_p = -> y do
+            y.yield :info_channel, [ :info, :component_added ]
+            y.yield :event_class, ACS_.event( :Component_Added )
+            y.yield :event_members,
+              :component, new_component,
               :component_association, asc,
-              :ACS, acs,
-            )
-          end
-        end
-        NIL_
-      end
-
-      Touch = -> asc, acs, & x_p do
-
-        wv = ACS_::Reflection::Wrapped_value_for[ asc, acs ]
-
-        if wv && ! wv.value_x
-          wv.value_x.nil? or self._DESIGN_ME_issue_083_INTERP_B_when_falseish
-          wv = nil
-        end
-
-        if wv
-
-          wv.value_x
-
-        else
-
-          acs_ = Build_empty_child_bound_to_parent[ asc, acs, & x_p ]
-
-          Accept_valid_value__[ acs_, asc, acs ]  # dat
-
-          acs_
-        end
-      end
-
-      becbtpn = nil
-      Build_empty_child_bound_to_parent = -> asc, acs, & acs_oes_p do
-
-        wv = becbtpn[ asc, acs, & acs_oes_p ]
-        if wv
-          wv.value_x
-        else
-          wv
-        end
-      end
-
-      becbtpn = -> asc, acs, & acs_oes_p do
-
-        # ("build empty child bound to parent normally" ..)
-
-        # (see instream comments - this does not assign child to parent)
-
-        _st = Callback_::Polymorphic_Stream.the_empty_polymorphic_stream
-
-        _cmp_oes_p = Component_handler[ acs, & acs_oes_p ]
-
-        Build_component_normally[ _st, asc, acs, & _cmp_oes_p ]
-      end
-
-      class Build_component_normally
-
-        # NOTE this results in a wrapped value, not the component itself!
-        # (so that it looks the same whether it's the one or the other means)
-
-        # the only purpose this node serves is to implement :t5 and :t6,
-        # and the only node that knows of those tenets is this one.
-
-        # this does not assign child to parent in any way, nor does it check
-        # if there is already an existing child in any sort of parent member
-        # "slot". if caller wants the child to have a one-way/passive/blind
-        # connection to parent, it may do by passing an appropriate handler.
-
-        class << self
-          def _call st, asc, acs, & p
-            new( st, asc, acs, & p ).execute
-          end
-          alias_method :[], :_call
-          alias_method :call, :_call
-        end  # >>
-
-        def initialize st, asc, acs, & p
-          @ACS = acs
-          @argument_stream = st
-          @association = asc
-          @_oes_p = p
-        end
-
-        def execute
-          @_model = @association.component_model
-          if @_model.respond_to? :interpret_component
-            __via_component_model
-          else
-            @_model[ @argument_stream, & @_oes_p ]
+              :ACS, acs
           end
         end
 
-        def __via_component_model
-
-          cmp = @_model.interpret_component @argument_stream, & @_oes_p
-          if cmp
-
-            ok = if cmp.respond_to? :initialize_component
-              cmp.initialize_component @association, @ACS
-            else
-              true
-            end
-
-            if ok
-              Value_Wrapper[ cmp ]
-            else
-              ok
-            end
-          else
-            cmp
-          end
+        -> do
+          Mutation___.via( & _mutation_p )
         end
       end
 
-      Component_handler = -> acs, & oes_p do
+      # ~ experimental component signal API
+
+      Component_handler = -> asc, acs, & oes_p do
 
         oes_p or self._SANITY_no_handler_from_ACS?
 
         -> * i_a, & ev_p do
 
           if :component == i_a.first
-            acs.send :"__receive__#{ i_a * UNDER_UNDER___ }__", & ev_p
+            acs.send :"receive__#{ i_a * UNDER_UNDER___ }__", asc, & ev_p
           else
             oes_p.call( * i_a, & ev_p )
           end
         end
       end
 
-      # ~ experimental component signal API
-
-      CONSTRUCT_STRUCT_VIA_YIELDS___ = -> & defn_p do
+      CONSTRUCT_STRUCT_VIA_PAIRS___ = -> & defn_p do
         mut = new
         _y = ::Enumerator::Yielder.new do | * x_a |
           x_a.each_slice 2 do | k, v |
@@ -182,30 +80,91 @@ module Skylab::Brazen
         mut
       end
 
-      Component_Change___ = ::Struct.new(  # experimental...
+      Change___ = ::Struct.new(  # experimental...
         :new_component,
-        :association,
       ) do
+        define_singleton_method :via, CONSTRUCT_STRUCT_VIA_PAIRS___
+      end
+
+      class Mutation___
+
+        # a "proto event" experiment - maybe mutable ..
+
+        attr_accessor(
+          :info_channel,
+          :event_class,
+          :event_members,
+        )
+
+        def self.via & defn_p
+          shell = self::Shell___.new self
+          _y = ::Enumerator::Yielder.new do | sym, * x_a |
+            shell.__send__ sym, * x_a
+          end
+          defn_p[ _y ]
+          shell.flush
+        end
+
+        def to_event
+
+          @event_class.new_via_each_pairable @event_members
+        end
+
+        def flush_to_mutation_with_context__ higher_x  # see [#bs-028] `flush_to_`
+
+          # add an item of context to the context chain. if this mutation
+          # hasn't been made already, this replaces the original "component
+          # association" structure with a name function (that can be chained)
+
+          _lower_x = @event_members.fetch :component_association
+
+          _lower_name = _lower_x.name
+
+          _higher_name = higher_x.name
+
+          _new_name = _higher_name.to_linked_list_node_in_front_of _lower_name
+
+          @event_members.replace :component_association, _new_name
+
+          self
+        end
+      end
+
+      class Mutation___::Shell___ < ::BasicObject
+
+        def initialize cls
+          @_cls = cls
+        end
+
         class << self
-          define_method :via, CONSTRUCT_STRUCT_VIA_YIELDS___
-          private :[]
-          private :new
+
+          def single m
+            define_method m do | x |
+              ( @_x ||= @_cls.new ).send :"#{ m }=", x ; nil
+            end
+          end
         end  # >>
-      end
 
-      # ~ encapsulate the fragile assumption about ivars
+        def mutable_struct x
+          @_x = x ; nil
+        end
 
-      Accept_valid_value__ = -> x, asc, acs do
+        single :info_channel
+        single :event_class
 
-        acs.instance_variable_set asc.name.as_ivar, x
-        NIL_
-      end
-
-      Accepter_for = -> acs do
-
-        -> x, asc do
-          acs.instance_variable_set asc.name.as_ivar, x
+        def event_members * x_a
+          o = ( @_x ||= @_cls.new )
+          o.event_members and self._NO
+          bx = Callback_::Box.new
+          o.event_members = bx
+          x_a.each_slice 2 do | k, v |
+            bx.add k, v
+          end
           NIL_
+        end
+
+        def flush
+          @_x
         end
       end
 

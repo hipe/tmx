@@ -69,7 +69,12 @@ module Skylab::Brazen::TestSupport
 
       class Lace
 
-        Local_Lib__::Common_child_methods[ self ]
+        Local_Lib__::Common_child_class_methods[ self ]
+
+        def initialize & x_p
+          # (hi.)
+          @oes_p_ = x_p
+        end
 
         def __color__component_association
           Color

@@ -31,7 +31,7 @@ module Skylab::MyTerm::TestSupport
         redo
       end while nil
 
-      ada._adapter_name.as_slug.should eql 'imagemagick'
+      ada.adapter_name.as_slug.should eql 'imagemagick'
     end
 
     def subject_kernel_

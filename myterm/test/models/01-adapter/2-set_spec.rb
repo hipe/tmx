@@ -26,9 +26,14 @@ module Skylab::MyTerm::TestSupport
 
     context "successful initial set" do
 
+      it "appears to work (results in true)" do
+
+        _state.result.should eql true
+      end
+
       it "(matches fuzzily!) emits natural sounding event" do
 
-        on_past_emissions _good_set_state.emissions
+        on_past_emissions _state.emissions
 
         past_expect_eventually :info, :component_added do | ev |
 
@@ -37,15 +42,10 @@ module Skylab::MyTerm::TestSupport
         end
       end
 
-      it "emits wrote event" do
+      it "emits 'wrote' event" do
 
-        on_past_emissions _good_set_state.emissions
+        on_past_emissions _state.emissions
         _expect_same_wrote_event
-      end
-
-      it "results in true" do
-
-        _good_set_state.result.should eql true
       end
 
       it "creates JSON file that looks right" do
@@ -53,7 +53,7 @@ module Skylab::MyTerm::TestSupport
         _expect_same_JSON_file
       end
 
-      dangerous_memoize_ :_good_set_state do
+      dangerous_memoize_ :_state do
 
         @subject_kernel_ = new_mutable_kernel_with_no_data_
 
@@ -63,17 +63,26 @@ module Skylab::MyTerm::TestSupport
 
         state.finish
       end
+
+      def _written_JSON_string
+
+        _em = _state.emissions.only_on :info, :wrote
+
+        _ev = _em.event_proc[]
+
+        ::File.read _ev.path
+      end
     end
 
     context "successful subsequent set" do
 
       it "works (results in true)" do
-        _good_set_state.result.should eql true
+        _state.result.should eql true
       end
 
       it "natural" do
 
-        on_past_emissions _good_set_state.emissions
+        on_past_emissions _state.emissions
 
         past_expect_eventually :info, :component_changed do | ev |
           _s = future_black_and_white ev
@@ -82,15 +91,23 @@ module Skylab::MyTerm::TestSupport
         end
       end
 
-      it "writes" do
-
-        on_past_emissions _good_set_state.emissions
+      it "emits 'wrote' event" do
+        on_past_emissions _state.emissions
         _expect_same_wrote_event
       end
 
-      dangerous_memoize_ :_good_set_state do
+      it "updates JSON file that looks right" do
+        _expect_same_JSON_file
+      end
 
-        @subject_kernel_ = new_mutable_kernel_with_appearance_ appearance_JSON_one_
+      def _written_JSON_string
+
+        _state.kernel._string_IO_for_testing_.string
+      end
+
+      dangerous_memoize_ :_state do
+
+        @subject_kernel_ = new_mutable_kernel_with_appearance_ appearance_JSON_one_.dup
 
         state = begin_state_
 
@@ -106,14 +123,13 @@ module Skylab::MyTerm::TestSupport
 
         ev.preterite_verb.should eql 'wrote'
         ev.path.should match %r(\[mt\]/[-a-zA-Z0-9]+\.json\z)
-        ( 29..32 ).should be_include ev.bytes  # :P
+        ( 31..109 ).should be_include ev.bytes  # :P
       end
     end
 
     def _expect_same_JSON_file
 
-      _ev = _good_set_state.emissions.last.event_proc[]   # egads
-      _act = ::File.read _ev.path
+      _act = _written_JSON_string
       _act.should eql appearance_JSON_one_
     end
 

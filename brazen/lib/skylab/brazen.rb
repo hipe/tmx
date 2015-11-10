@@ -223,10 +223,6 @@ module Skylab::Brazen
       ::Net::HTTP
     end
 
-    Old_CLI_lib = -> do
-      self._WHERE
-    end
-
     Open_3 = stdlib[ :Open3 ]
 
     Parse = sidesys[ :Parse ]
