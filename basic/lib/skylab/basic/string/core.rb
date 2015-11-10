@@ -77,9 +77,13 @@ module Skylab::Basic
 
         rx = nil
         -> s do
-          rx ||= /\A[[:space:]]+/
+
+          rx ||= /\A[ \t]+/
+
           _rx = /^#{ ::Regexp.escape rx.match( s )[ 0 ] }/
+
           s.gsub! _rx, EMPTY_S_
+
           NIL_  # don't result a mutant
         end
       end.call

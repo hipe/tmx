@@ -8,19 +8,38 @@ module Skylab::Basic
 
         class Build_stream
 
-          Callback_::Actor.call self, :properties,
-            :node
+          Callback_::Actor.call( self, :properties,
+            :do_branches,
+            :node,
+          )
+
+          def initialize
+            @do_branches = true
+            super
+          end
 
           def execute
 
-            To_path_stream___[ @node ]
+            To_path_stream___[ @node, @do_branches ]
           end
         end
       end
 
-      To_path_stream___ = -> root_node do
+      To_path_stream___ = -> root_node, do_branches do
 
         sep = root_node.path_separator
+
+        join = -> pp, s do
+          if pp
+            if s
+              "#{ pp }#{ sep }#{ s }"
+            else
+              pp
+            end
+          else
+            s
+          end
+        end
 
         p = nil
         visit = nil
@@ -49,7 +68,7 @@ module Skylab::Basic
 
         recurse[ root_node, nil, EMPTY_P_ ]
 
-        visit = -> node, prefix_path, next_p do
+        visit_when_do_branches = -> node, prefix_path, next_p do
 
           p = -> do
 
@@ -82,6 +101,47 @@ module Skylab::Basic
             x
           end
           nil
+        end
+
+        # -- No branches (only)
+
+        visit_when_not_do_branches = -> node, path, next_p do
+
+          p = -> do
+
+            st = node.to_child_stream
+            p = -> do
+
+              node_ = st.gets
+              if node_
+                path_ = join[ path, node_.slug ]
+
+                if node_.has_children
+
+                  visit[ node_, path_, p ]
+                  p[]
+                else
+                  path_
+                end
+              else
+                p = next_p
+                p[]
+              end
+            end
+            p[]
+          end
+        end
+
+        # --
+
+        if do_branches
+          visit = visit_when_do_branches
+        else
+          visit = visit_when_not_do_branches
+          p = -> do
+            visit[ root_node, root_node.slug, EMPTY_P_ ]
+            p[]
+          end
         end
 
         Callback_.stream do

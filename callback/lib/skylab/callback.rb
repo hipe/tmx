@@ -814,6 +814,7 @@ module Skylab::Callback
     end  # >>
 
     alias_method :name_symbol, :name_x  # as you like it
+    alias_method :to_sym, :name_x
 
     def new_with_value x
       self.class.new x, name_symbol

@@ -17,7 +17,28 @@ module Skylab::Basic
         NIL_
       end
 
-      # ~ readers as parent
+      # -- As parent --
+
+      # ~ mutators (newer)
+
+      def accept & visit  # visitor pattern experiment
+
+        visit[ self ]
+
+        st = to_child_stream
+        begin
+          x = st.gets
+          x or break
+          _yes = x.has_children
+          _yes or redo
+          x.accept( & visit )
+          redo
+        end while nil
+
+        NIL_
+      end
+
+      # ~ readers
 
       def to_classified_stream_for i, * x_a
 
@@ -121,7 +142,7 @@ module Skylab::Basic
 
       alias_method :children_count, :length
 
-      # ~ mutators as parent
+      # ~ mutators (placement in file is legacy placement)
 
       def merge_destructively otr
 
@@ -163,11 +184,9 @@ module Skylab::Basic
         ::File::SEPARATOR
       end
 
-      # ~ readers as data node
+      # -- As data node --
 
-      attr_reader :node_payload, :slug
-
-      # ~ mutators as data node
+      # ~ mutators
 
       def set_node_payload x
         @node_payload = x
@@ -200,6 +219,13 @@ module Skylab::Basic
           NIL_
         end
       end
+
+      # ~ readers
+
+      attr_reader(
+        :node_payload,
+        :slug,
+      )
     end
   end
 end
