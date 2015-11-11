@@ -35,6 +35,25 @@ module Skylab::Basic
       def pair_stream_via_even_iambic a
         Build_pair_stream_via_even_iambic__[ a ]
       end
+    end  # >>
+
+    module Linked
+
+      As_stream = -> node do
+
+        p = -> do
+          x = node
+          node = node.next
+          if ! node
+            p = EMPTY_P_
+          end
+          x
+        end
+
+        Callback_.stream do
+          p[]
+        end
+      end
     end
 
     Build_each_pairable_via_even_iambic__ = -> a do

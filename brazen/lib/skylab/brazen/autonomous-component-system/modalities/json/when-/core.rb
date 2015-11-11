@@ -9,13 +9,17 @@ module Skylab::Brazen
         const_get( const, false )[ * x_a ]
       end
 
-      Express_context_under_ = -> p_a, expag, prep=nil do
+      Express_context_under_ = -> context_x, expag, prep=nil do
 
         expag.calculate do
 
-          s_a = p_a.reduce [] do | m, p |
+          _st = context_x.to_proc_stream
+
+          s_a = _st.reduce_into_by [] do | m, p |
             m << calculate( & p )
           end
+
+          s_a.reverse!
 
           s = s_a.pop
           if s

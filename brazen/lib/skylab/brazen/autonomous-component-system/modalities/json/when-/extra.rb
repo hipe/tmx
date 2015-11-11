@@ -10,13 +10,22 @@ module Skylab::Brazen
 
           sess.on_event_selectively.call :error, :extra_properties do
 
-            p_a = sess.context_string_proc_stack
+            context_x = sess.context_x
 
             _p = -> do
-              if p_a
-                p_a.reduce [] do | m, p |
+
+              if context_x
+
+                st = context_x.to_proc_stream
+
+                s_a = st.reduce_into_by [] do | m, p |
+
                   m << calculate( & p )
-                end.join SPACE_
+                end
+
+                s_a.reverse!
+
+                s_a * SPACE_
               end
             end
 

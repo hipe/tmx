@@ -137,11 +137,10 @@ module Skylab::Brazen::TestSupport
 
       o.JSON = json
       o.ACS = new_empty
-      o.context_string_proc_stack = [
-        -> do
-          "in #{ code 'someplace' }"
-        end
-      ]
+
+      o.prepend_more_specific_context_by do
+        "in #{ code 'someplace' }"
+      end
 
       _ok = o.execute
       _ok && new_empty

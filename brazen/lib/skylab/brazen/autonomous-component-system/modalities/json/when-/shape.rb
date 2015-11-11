@@ -8,14 +8,14 @@ module Skylab::Brazen
 
         :bad_shape,
         :x, nil,
-        :context_string_proc_stack, nil,
+        :context_x, nil,
         :error_category, :type_error,
         :ok, false,
 
       ) do | y, o |
 
         tightest_context, trailing_context = Express_context_under_[
-          o.context_string_proc_stack, self, 'for' ]
+          o.context_x, self, 'for' ]
 
         y << "#{ tightest_context }#{
           }expected hash, had #{ ick o.x }#{
@@ -30,7 +30,7 @@ module Skylab::Brazen
 
           new_with(
             :x, x,
-            :context_string_proc_stack, sess.context_string_proc_stack,
+            :context_x, sess.context_x,
           )
         end
         UNABLE_

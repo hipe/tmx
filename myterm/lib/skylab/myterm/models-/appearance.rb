@@ -43,10 +43,13 @@ module Skylab::MyTerm
       def __init_retrieved_via_IO io
 
         o = ACS_[]::Modalities::JSON::Interpret.new( & @_oes_p )
+
         o.ACS = self
-        o.context_string_proc_stack = [ -> do
+
+        o.prepend_more_specific_context_by do
           "in #{ pth io.path }"
-        end ]
+        end
+
         o.JSON = io.read
 
         ok = o.execute

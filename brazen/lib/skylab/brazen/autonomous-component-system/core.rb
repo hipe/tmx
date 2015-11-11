@@ -194,7 +194,7 @@ module Skylab::Brazen
 
       # ~
 
-      def to_linked_list_node_in_front_of name
+      def to_linked_list_node_in_front_of name  # :+[#ba-002]:LL
         dup.___init_as_linked_list_node_in_front_of name
       end
 

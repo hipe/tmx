@@ -170,6 +170,16 @@ module Skylab::Callback
 
     # ~ result in structures of lesser constituency (st's, ary's, bx's)
 
+    def reduce_into_by m, & p  # comparable to platform `reduce`
+      begin
+        x = gets
+        x or break
+        m = p[ m, x ]
+        redo
+      end while nil
+      m
+    end
+
     def reduce_by & p
 
       new do

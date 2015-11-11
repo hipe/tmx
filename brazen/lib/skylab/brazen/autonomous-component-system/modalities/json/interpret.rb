@@ -7,14 +7,51 @@ module Skylab::Brazen
       class Interpret  # notes in [#083]:#JSON-interpretation
 
         def initialize & p
+
+          @context_x = nil
           @_oes_p = p
         end
 
         attr_writer(
           :ACS,
-          :context_string_proc_stack,
+          :context_x,
           :JSON,
         )
+
+        def prepend_more_specific_context_by & desc_p
+
+          if @context_x
+            @context_x = @context_x.prepend_more_specific_context_by( & desc_p )
+          else
+            @context_x = Experimental_Linked_List_Node__[ nil, desc_p ]
+          end
+
+          NIL_
+        end
+
+        class Experimental_Linked_List_Node__ < Callback_::Known_Known
+
+          # :+[#ba-002]:LL
+
+          def initialize nxt, x
+            @next = nxt
+            super( x )
+          end
+
+          def prepend_more_specific_context_by & x
+            self.class[ self, x ]
+          end
+
+          def to_proc_stream
+
+            _st = Home_.lib_.basic::List::Linked::As_stream[ self ]
+            _st.map_by do | node |
+              node.value_x or self._SANITY
+            end
+          end
+
+          attr_reader :next
+        end
 
         def execute
 
@@ -25,7 +62,7 @@ module Skylab::Brazen
 
           rec = Recurse_.new(
             _x,
-            remove_instance_variable( :@context_string_proc_stack ),
+            remove_instance_variable( :@context_x ),
             @ACS,
             & @_oes_p )
 
@@ -35,9 +72,9 @@ module Skylab::Brazen
 
       class Interpret::Recurse_
 
-        def initialize x, ctx_a, acs, & p
+        def initialize x, context_x, acs, & p
           @ACS = acs
-          @_ctx_a = ctx_a
+          @context_x = context_x
           @_oes_p = p
           @_x = x
         end
@@ -223,9 +260,7 @@ module Skylab::Brazen
 
         def ___recurse_into cmp, qkn
 
-          a = @_ctx_a.dup
-
-          a.push -> do
+          _ctx_ = @context_x.prepend_more_specific_context_by do
 
             _nf = qkn.association.name
 
@@ -234,7 +269,7 @@ module Skylab::Brazen
 
           _x = qkn.value_x
 
-          o = self.class.new( _x, a, cmp, & @_component_oes_p )
+          o = self.class.new( _x, _ctx_, cmp, & @_component_oes_p )
 
           _xx_ = o._execute
 
@@ -330,8 +365,8 @@ module Skylab::Brazen
 
         # ~ for "when"s
 
-        def context_string_proc_stack
-          @_ctx_a
+        def context_x
+          @context_x
         end
 
         def on_event_selectively

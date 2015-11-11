@@ -7,13 +7,12 @@ module Skylab::Brazen
       Empty = Callback_::Event.prototype_with(
 
         :empty_object,
-        :context_string_proc_stack, nil,
+        :context_x, nil,
         :ok, false,
 
       ) do | y, o |
 
-        leading, trailing = Express_context_under_[
-          o.context_string_proc_stack, self, 'for' ]
+        leading, trailing = Express_context_under_[ o.context_x, self, 'for' ]
 
         if ! trailing
           leading.strip!
@@ -28,9 +27,7 @@ module Skylab::Brazen
 
         sess.on_event_selectively.call :error, :empty_object do
 
-          new_with(
-            :context_string_proc_stack, sess.context_string_proc_stack,
-          )
+          new_with :context_x, sess.context_x
         end
       end
     end
