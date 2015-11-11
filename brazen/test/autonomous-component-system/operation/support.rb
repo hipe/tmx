@@ -7,13 +7,11 @@ module Skylab::Brazen::TestSupport
       def [] tcc
         tcc.include self
       end
-
-      def _memoize sym, & p
-        define_method sym, & Callback_::Memoize[ & p ]
-      end
     end  # >>
 
-    _memoize :shoe_model_ do
+    TS_::TestLib_::Memoizer_methods[ self ]
+
+    memoize_ :shoe_model_ do
 
       class Shoe
 

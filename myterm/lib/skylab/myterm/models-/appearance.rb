@@ -169,15 +169,6 @@ module Skylab::MyTerm
         ACS_[]::For_Serialization::Infer_stream[ self ]
       end
 
-      # ~ general ACS hook-in's (alter default ACS behavior)
-
-      def lookup_component_association sym
-
-        ACS_[]::Component_Association::Read.call sym, self do
-          self._K_now_you_have_to_read_a_visiting_component_association
-        end
-      end
-
       # -- Component Associations --
 
       # ~ "adapter" (to put this before next looks better in JSON payloads)
@@ -203,7 +194,7 @@ module Skylab::MyTerm
         # to accomodate the above we must sometimes build
         # the component association structure explicitly
 
-        ca = ACS_[]::Component_Association::Read[ :adapters, self ]
+        ca = @_real_assoc[ :adapters ]
 
         _p = ACS_[]::Interpretation::Component_handler[ ca, self, & @_oes_p ]
 
@@ -263,7 +254,21 @@ module Skylab::MyTerm
         o.execute  # result is result
       end
 
-      # ~
+      # -- more ACS hook-ins (when also in support of above) --
+
+      # ~ general ACS hook-in's (alter default ACS behavior)
+
+      def component_association_reader
+
+        @_real_assoc = ACS_[]::Component_Association.method_based_reader_for self
+        -> sym do
+          @_real_assoc.call sym do
+            self._K_now_you_have_to_read_a_visiting_component_association
+          end
+        end
+      end
+
+      # --
 
       attr_reader(
         :adapter,

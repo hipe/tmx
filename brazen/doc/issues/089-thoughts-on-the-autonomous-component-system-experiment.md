@@ -77,9 +77,10 @@ violoation of which should occur only with good reason.
       deliver such a component to the subject component thru the
       execution of an "operation" during an edit session.
 
-    * we are considering the different ways to provide an extensible
-      grammar for edit sessions #tracked-by :[#120].
-
+    * for use in component associations you can create your own
+      set of meta-components that exists the existing set, by
+      subclassing the base component association class
+      (as demonstrated in [#083]:X1)
 
 
 

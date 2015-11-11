@@ -5,7 +5,7 @@ module Skylab::Brazen::TestSupport
   describe "[br] ACS tenet 7 B - the `using` modifer" do
 
     extend TS_
-    use :danger_memo
+    use :memoizer_methods
 
     it "works for multiple" do
 

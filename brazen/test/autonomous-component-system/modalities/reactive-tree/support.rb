@@ -7,13 +7,9 @@ module Skylab::Brazen::TestSupport
       def [] tcc
         tcc.include self
       end
-
-      define_method :_danger_memo, TestSupport_::DANGEROUS_MEMOIZE
-
-      def _memoize sym, & p
-        define_method sym, Callback_.memoize( & p )
-      end
     end  # >>
+
+    TS_::TestLib_::Memoizer_methods[ self ]
 
     def call_ * x_a
 
@@ -29,7 +25,7 @@ module Skylab::Brazen::TestSupport
       @result.should eql false
     end
 
-    _danger_memo :kernel_ do
+    dangerous_memoize_ :kernel_ do
 
       ds = new_dynamic_source_for_unbounds_
 
@@ -49,7 +45,7 @@ module Skylab::Brazen::TestSupport
       end
     end
 
-    _memoize :shoe_model_ do
+    memoize_ :shoe_model_ do
 
       class Shoe  # similar to another model elsewhere
 

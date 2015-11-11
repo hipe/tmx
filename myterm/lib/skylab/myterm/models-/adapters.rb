@@ -90,11 +90,13 @@ module Skylab::MyTerm
 
     # (assume the ACS will only ask for pieces of items we told it about.)
 
-    def lookup_component_association const
+    def component_association_reader
 
       # from above, when ACS wants the CA from one of the symbols
 
-      @_cache.cached( const )._component_association
+      -> const do
+        @_cache.cached( const )._component_association
+      end
     end
 
     def component_wrapped_value asc

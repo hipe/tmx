@@ -5,7 +5,7 @@ module Skylab::Brazen::TestSupport
   describe "[br] ACS - modalities - reactive tree - CLI integ. - 1." do
 
     extend TS_
-    use :danger_memo
+    use :memoizer_methods
     use :future_expect
     use :autonomous_component_system_modalities_reactive_tree_CLI_integration_support
 

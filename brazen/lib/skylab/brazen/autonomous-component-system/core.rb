@@ -88,16 +88,16 @@ module Skylab::Brazen
       :"__#{ sym }__component_association"
     end
 
-    Component_Association::Read = -> sym, acs, & else_p do
+    Component_Association::Method_based_reader_for___ = -> ca_class, acs do
 
-      m = method_name_for[ sym ]
+      send = -> m, sym do
 
-      send = -> do
         ca = nil
+
         p = -> x do
-          ca = Component_Association._begin_definition
+          ca = ca_class._begin_definition
           p = -> x_a do
-            ca.send :"__accept__#{ x_a.first }__meta_component", * x_a[ 1..-1 ]
+            ca.send :"accept__#{ x_a.first }__meta_component", * x_a[ 1..-1 ]
             NIL_
           end
           p[ x ]
@@ -114,22 +114,25 @@ module Skylab::Brazen
             self._DESIGN_ME_cover_me_compnoent_assoc_method_had_no_model
           end
         elsif cm
-          Component_Association.
-            _begin_definition.
-              _finish_definition_via cm, sym
+          ca_class._begin_definition._finish_definition_via cm, sym
         else
           self._DESIGN_ME_cover_me__totally_empty_component_assoc
         end
       end
 
-      if else_p
-        if acs.respond_to? m
-          send[]
+      -> sym, & else_p do
+
+        m = method_name_for[ sym ]
+
+        if else_p
+          if acs.respond_to? m
+            send[ m, sym ]
+          else
+            else_p[]
+          end
         else
-          else_p[]
+          send[ m, sym ]
         end
-      else
-        send[]
       end
     end
 
@@ -142,19 +145,16 @@ module Skylab::Brazen
       class << self
 
         def reader_for acs
-          if acs.respond_to? CUSTOM_LOOKUP_METHOD__
-            Dynamic_Reader___.for acs
+
+          if acs.respond_to? METHOD__
+            acs.send METHOD__
           else
-            Reader.for acs
+            method_based_reader_for acs
           end
         end
 
-        def via_symbol_and_ACS sym, acs
-          if acs.respond_to? CUSTOM_LOOKUP_METHOD__
-            acs.send CUSTOM_LOOKUP_METHOD__, sym
-          else
-            Read[ sym, acs ]
-          end
+        def method_based_reader_for acs
+          Method_based_reader_for___[ self, acs ]
         end
 
         def via_name_and_model nf, mdl
@@ -165,6 +165,8 @@ module Skylab::Brazen
         alias_method :_begin_definition, :new
         private :new
       end  # >>
+      METHOD__ = :component_association_reader
+
 
       def initialize
         @_name_mutation = nil
@@ -262,7 +264,7 @@ module Skylab::Brazen
         @name.as_human
       end
 
-      def __accept__can__meta_component * i_a  # :t8.
+      def accept__can__meta_component * i_a  # :t8.
 
         bx = Callback_::Box.new
         i_a.each do | sym |
@@ -272,14 +274,14 @@ module Skylab::Brazen
         NIL_
       end
 
-      def __accept__intent__meta_component sym  # see [#083]:INTERP-B
+      def accept__intent__meta_component sym  # see [#083]:INTERP-B
         @intent = sym
         NIL_
       end
 
       attr_reader :intent
 
-      def __accept__stored_in_ivar__meta_component ivar
+      def accept__stored_in_ivar__meta_component ivar
 
         p = @_name_mutation
         @_name_mutation = -> nm do
@@ -348,39 +350,6 @@ module Skylab::Brazen
       def sub_category
         :common
       end
-
-      class Reader
-
-        class << self
-          alias_method :for, :new
-          private :new
-        end  # >>
-
-        def initialize acs
-          @_ACS = acs
-        end
-
-        def [] sym
-          Read[ sym, @_ACS ]
-        end
-
-        def fetch sym, & p
-          Read[ sym, @_ACS, & p ]
-        end
-      end
-
-      class Dynamic_Reader___ < Reader
-
-        def [] sym
-          @_ACS.send CUSTOM_LOOKUP_METHOD__, sym
-        end
-
-        def fetch sym, & p
-          self._K
-        end
-      end
-
-      CUSTOM_LOOKUP_METHOD__ = :lookup_component_association
     end
 
     module Reflection

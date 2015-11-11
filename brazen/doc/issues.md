@@ -2,7 +2,8 @@
 [#123]       track nasty peeks into filesystem
 [#122]       as if you would ever..
 [#121]       #tracking this wrapping algo
-[#120] #open extensible component modifiers
+[#120] #open extensible modifiers for use in mutation sessions
+             (note [#083]:X1 is related but is not the same)
 [#119]       track expression of ACS associations into brazen unbound tree
              ( #was: get [fm] out of test (see) )
 [#118]       do we want the ability to have a model-less-action? for now, no

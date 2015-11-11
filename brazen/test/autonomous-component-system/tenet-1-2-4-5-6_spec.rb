@@ -5,8 +5,7 @@ module Skylab::Brazen::TestSupport
   describe "[br] ACS tenets 1, 2, 4, 5 and 6" do
 
     extend TS_
-
-    use :danger_memo
+    use :memoizer_methods
 
     it "subject class loads" do
       _subject_class
@@ -61,7 +60,7 @@ module Skylab::Brazen::TestSupport
       guy.should eql false
     end
 
-    dangerous_memoize_ :_subject_class do
+    memoize_ :_subject_class do
 
       class ACS_1_one
 

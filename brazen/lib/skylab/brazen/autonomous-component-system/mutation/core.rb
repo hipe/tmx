@@ -216,10 +216,12 @@ module Skylab::Brazen
         end  # >>
 
         def initialize arg_st, acs, & x_p
-          @ACS = acs
+
           @arg_st = arg_st
           @modifiers = nil
           @oes_p = x_p
+
+          _accept_ACS acs
         end
 
         def interpret
@@ -262,10 +264,7 @@ module Skylab::Brazen
 
             # current token must be an association
 
-            @association = Component_Association.via_symbol_and_ACS(
-              st.gets_one,
-              @ACS,
-            )
+            @association = @assoc_reader[ st.gets_one ]
 
             # if that association recognizes the operation, success.
 
@@ -298,9 +297,15 @@ module Skylab::Brazen
 
         def __descend
 
-          _acs =  ACS_::For_Interface::Read_or_write[ @association, @ACS, & @oes_p ]
-          @ACS = _acs
+          _ = ACS_::For_Interface::Read_or_write[ @association, @ACS, & @oes_p ]
+          _accept_ACS _
           @association = nil
+        end
+
+        def _accept_ACS acs
+
+          @assoc_reader = Component_Association.reader_for acs
+          @ACS = acs ; nil
         end
 
         def __say_cannot

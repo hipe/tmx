@@ -5,7 +5,7 @@ module Skylab::Brazen::TestSupport
     def self.[] tcc
 
       TS_::CLI::Expect_CLI[ tcc ]
-      TS_::TestLib_::Danger_memo[ tcc ]
+      TS_::TestLib_::Memoizer_methods[ tcc ]
 
       tcc.extend VERY_TEMPORARY_LEGACIES
       tcc.include self

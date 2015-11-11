@@ -452,6 +452,13 @@ example because it is expected to be controller-like ..
 
 
 
+### extensibility - creating custom meta-components for comp assocs :X1
+
+(this is demonstrated in the spec that references this identifier.)
+
+
+
+
 ### "why no blocks?" :#note-OPER-A
 
 for now, we don't pass the oes block here because (child) components

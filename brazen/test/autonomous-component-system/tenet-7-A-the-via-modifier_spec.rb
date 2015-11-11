@@ -5,7 +5,7 @@ module Skylab::Brazen::TestSupport
   describe "[br] ACS tenet 7 A - the `via` modifier" do
 
     extend TS_
-    use :danger_memo
+    use :memoizer_methods
 
     it "on a construction" do
 

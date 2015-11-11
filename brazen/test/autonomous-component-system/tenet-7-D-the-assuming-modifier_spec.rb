@@ -5,7 +5,7 @@ module Skylab::Brazen::TestSupport
   describe "[br] ACS tenet 7 D - the `assuming` modifer" do
 
     extend TS_
-    use :danger_memo
+    use :memoizer_methods
 
     it "when two assumptions pass" do
 

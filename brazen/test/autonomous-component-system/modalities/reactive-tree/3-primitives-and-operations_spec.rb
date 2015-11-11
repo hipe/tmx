@@ -5,7 +5,7 @@ module Skylab::Brazen::TestSupport
   describe "[br] primitives with operations" do
 
     extend TS_
-    use :danger_memo
+    use :memoizer_methods
     use :future_expect
     use :autonomous_component_system_modalities_reactive_tree_support
 

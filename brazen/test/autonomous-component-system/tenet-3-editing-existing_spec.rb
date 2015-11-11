@@ -5,8 +5,7 @@ module Skylab::Brazen::TestSupport
   describe "[br] ACS tenet 3 - edit existing" do
 
     extend TS_
-
-    use :danger_memo
+    use :memoizer_methods
 
     it "subject class loads" do
       _subject_class
