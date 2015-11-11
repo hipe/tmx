@@ -444,6 +444,14 @@ lifetime.
 
 
 
+### :note-inout-E
+
+..would be used to mark places where the component must be true-ish, for
+example because it is expected to be controller-like ..
+
+
+
+
 ### "why no blocks?" :#note-OPER-A
 
 for now, we don't pass the oes block here because (child) components

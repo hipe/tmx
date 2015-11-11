@@ -170,6 +170,36 @@ module Skylab::Brazen
 
       # ~
 
+      class Value_Popper  # :+[#br-085]
+
+        class << self
+          alias_method :[], :new
+          private :new
+        end  # >>
+
+        def initialize x
+
+          @unparsed_exists = true
+          @_p = -> do
+            @unparsed_exists = false
+            remove_instance_variable :@_p
+            x
+          end
+        end
+
+        def gets_one
+          @_p[]
+        end
+
+        def no_unparsed_exists
+          ! @unparsed_exists
+        end
+
+        attr_reader :unparsed_exists
+      end
+
+      # ~
+
       UNDER_UNDER___ = '__'
     end
   end

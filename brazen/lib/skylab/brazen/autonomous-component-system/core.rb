@@ -135,10 +135,9 @@ module Skylab::Brazen
 
     class Component_Association
 
-      # different concerns will construct these subject objects on demand
-      # on-the-fly. for now internally we provide no way of memoizing them,
-      # in contrast to [#001] properties which we took pains to freeze etc.
-      # :[#089]:WISH-1: times when it feels wasteful to etc
+      # assume that the ACS assumes that these structures are produced
+      # lazily, on-the-fly, and are not memoized to be used beyond the
+      # "moment": they are #dt3 dynamic and should not be #dt4 cached.
 
       class << self
 
@@ -202,6 +201,60 @@ module Skylab::Brazen
       end
 
       attr_reader :next
+
+      # ~
+
+      def model_looks_like_proc  # always true or false
+
+        @_did_classify_against_model_construction_method ||= _classify_etc
+        @_model_looks_like_proc
+      end
+
+      def construction_method_name  # can be nil
+
+        @_did_classify_against_model_construction_method ||= _classify_etc
+        @_construction_method_name
+      end
+
+      def _classify_etc
+
+        mdl = @component_model
+
+        m = if mdl.respond_to? GENERIC_CONSTRUCTION_METHOD__
+          GENERIC_CONSTRUCTION_METHOD__
+        elsif mdl.respond_to? COMPOUND_CONSTRUCTION_METHOD__
+          COMPOUND_CONSTRUCTION_METHOD__
+        end
+
+        if ! m and mdl.respond_to? :[]
+          looks_like_proc = true
+        end
+
+        @_construction_method_name = m
+        @_model_looks_like_proc = looks_like_proc
+
+        ACHIEVED_
+      end
+
+      def say_no_method
+
+        # assume model does not look like proc - for use in raising e.g a
+        # `NoMethodError` regarding an expected but missing construction
+        # method. this exists partly because the platform is strange about
+        # when it decides to include the class name in the message.
+
+        a = [ GENERIC_CONSTRUCTION_METHOD__ ]
+        a.push COMPOUND_CONSTRUCTION_METHOD__
+        a.push :[]
+        _s_a = a.map { | sym | "`#{ sym }`" }
+        _or = Callback_::Oxford_or[ _s_a ]
+
+        "must respond to #{ _or } - #{ @component_model.name }"
+      end
+
+      GENERIC_CONSTRUCTION_METHOD__ = :interpret_component
+
+      COMPOUND_CONSTRUCTION_METHOD__ = :interpret_compound_component
 
       # ~
 
@@ -273,6 +326,10 @@ module Skylab::Brazen
         else
           EMPTY_A_
         end
+      end
+
+      def to_operation_symbol_stream  # assume operations
+        @_operations.to_name_stream
       end
 
       def name_symbol

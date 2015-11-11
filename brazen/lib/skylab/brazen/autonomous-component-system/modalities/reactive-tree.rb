@@ -77,17 +77,11 @@ module Skylab::Brazen
 
         def execute
 
-          @__read_component_value = ___component_value_reader
-
-          _st = ___to_stream_for_component_interface
-
-          # because the above is reduced to only component associations of
-          # interface intent and operations, we need not reduce it further
-
           qkn = nil
           h = {
 
             association: -> do
+
               if qkn.is_effectively_known
                 __unbound_for_association_with_knownish_value qkn
               else
@@ -101,9 +95,27 @@ module Skylab::Brazen
             end
           }
 
-          _st.map_by do | qkn_ |
-            qkn = qkn_
-            h.fetch( qkn.association.category ).call
+          @__read_component_value = ___component_value_reader
+          st = ___to_stream_for_component_interface
+
+          # the above stram is reduced to only those component associations
+          # of interface intent and operations, but we may need to reduce it
+          # further per a comment #here.
+
+          Callback_.stream do  # (hand-written map-reduce for clarity)
+
+            begin
+
+              qkn = st.gets
+              qkn or break
+              x = h.fetch( qkn.association.category ).call
+              x and break
+
+              # - :#note-inout-E: components here must be controller-like
+              # so they must be true-ish so we *can* map-reduce here
+              redo
+            end while nil
+            x
           end
         end
 
@@ -130,7 +142,7 @@ module Skylab::Brazen
             Compound_as_Hybrid__.new asc.name, cmp, & @_oes_p
           else
             # if the model declined to build an empty component, then it
-            # doesn't want to for whatever reason. reduce over it.
+            # doesn't want to for whatever reason. reduce over it. (:#here)
             cmp
           end
         end

@@ -4,7 +4,7 @@ module Skylab::Brazen
 
     module Interpretation_
 
-      class Universal_Build  # 3x
+      class Build_Value
 
         # NOTE this results in a wrapped value, not the component itself!
         # (so that it looks the same whether it's the one or the other means)
@@ -50,7 +50,7 @@ module Skylab::Brazen
 
         def execute
 
-          component_handler
+          component_handler  # init if necessary
 
           @_mdl = @association.component_model
 
@@ -58,27 +58,21 @@ module Skylab::Brazen
 
             _via_construction_method @construction_method
 
-          elsif @_mdl.respond_to? METHOD__
-
-            _via_construction_method METHOD__
-
-          elsif @_mdl.respond_to? :[]
+          elsif @association.model_looks_like_proc
 
             @_mdl[ @mixed_argument, & @component_handler ]
 
           else
-            raise ::NoMethodError, ___say_no_method_error
+
+            m = @association.construction_method_name
+
+            if m
+              _via_construction_method m
+            else
+              raise ::NoMethodError, @assocation.say_no_method
+            end
           end
         end
-
-        def ___say_no_method_error
-
-          # (only because sometimes platform is not friendly w/ class name)
-
-          "must respond to `#{ METHOD__ }` or `[]` - #{ @_mdl.name }"
-        end
-
-        METHOD__ = :interpret_component
 
         def handler_for_component
 

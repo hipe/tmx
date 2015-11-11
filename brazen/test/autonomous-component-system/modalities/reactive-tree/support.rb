@@ -31,11 +31,20 @@ module Skylab::Brazen::TestSupport
 
     _danger_memo :kernel_ do
 
-      ds = Local_subject__[]::Dynamic_Source_for_Unbounds.new
+      ds = new_dynamic_source_for_unbounds_
 
       ds.add :Shoe, shoe_model_.new
 
-      Home_::Kernel.new Here_ do | ke |
+      build_kernel_from_seed_and_module_ ds, Here_
+    end
+
+    def new_dynamic_source_for_unbounds_
+      Subject[]::Dynamic_Source_for_Unbounds.new
+    end
+
+    def build_kernel_from_seed_and_module_ ds, mod
+
+      Home_::Kernel.new mod do | ke |
         ke.reactive_tree_seed = ds
       end
     end
@@ -52,7 +61,7 @@ module Skylab::Brazen::TestSupport
         # ~ to be an unbound
 
         def build_unordered_index_stream & oes_p
-          Local_subject__[]::Self_as_unbound_stream[ __nf, self, & oes_p ]
+          Subject[]::Self_as_unbound_stream[ __nf, self, & oes_p ]
         end
 
         def __nf
@@ -140,7 +149,7 @@ module Skylab::Brazen::TestSupport
       Shoe
     end
 
-    Local_subject__ = -> do
+    Subject = -> do
       Home_::Autonomous_Component_System::Modalities::Reactive_Tree
     end
 

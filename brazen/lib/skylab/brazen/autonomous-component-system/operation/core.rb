@@ -8,14 +8,14 @@ module Skylab::Brazen
 
         def via_symbol_and_ACS sym, acs
 
-          new( acs )._init_for_sym sym
+          new( acs ).init_for_sym_ sym
         end
 
         def reader_for acs
 
           proto = new acs
           -> sym do
-            proto.dup._init_for_sym sym
+            proto.dup.init_for_sym_ sym
           end
         end
 
@@ -24,16 +24,18 @@ module Skylab::Brazen
 
       def initialize acs
 
-        @_acs = acs
+        @_ACS = acs
         @_done = false
         @prototype_parameter = nil
       end
 
-      def _init_for_sym sym
+      def init_for_sym_ sym
 
         @name_symbol = sym
 
-        _p = @_acs.send :"__#{ sym }__component_operation" do | * x_a |
+        _args = method_and_args_for_ sym
+
+        _p = @_ACS.send( * _args ) do | * x_a |
 
           st = Callback_::Polymorphic_Stream.via_array x_a
           begin
@@ -47,6 +49,10 @@ module Skylab::Brazen
         @callable = _p
 
         self
+      end
+
+      def method_and_args_for_ sym
+        :"__#{ sym }__component_operation"
       end
 
       def __accept__end__meta_component _

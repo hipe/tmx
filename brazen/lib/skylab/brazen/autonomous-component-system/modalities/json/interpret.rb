@@ -207,7 +207,7 @@ module Skylab::Brazen
             NIL_
           end
 
-          o = ACS_::Interpretation_::Universal_Build.new(
+          o = ACS_::Interpretation_::Build_Value.new(
             qkn.association, @ACS, & @_oes_p )
 
           o.mixed_argument = _on_component
@@ -270,7 +270,7 @@ module Skylab::Brazen
           # UOW any more: we are in the middle of a depth-first building
           # of xxx
 
-          _argument_stream = Interpret::Value_Popper___.new qkn.value_x
+          _argument_stream = ACS_::Interpretation::Value_Popper[ qkn.value_x ]
 
           # using the "value popper" (a shortlived proxy that looks like
           # a stream but only wraps one value) is our way of leveraging
@@ -279,7 +279,7 @@ module Skylab::Brazen
 
           asc = qkn.association
 
-          o = ACS_::Interpretation_::Universal_Build.new(
+          o = ACS_::Interpretation_::Build_Value.new(
             asc, @ACS, & @_oes_p)
 
           o.mixed_argument = _argument_stream
@@ -337,29 +337,6 @@ module Skylab::Brazen
         def on_event_selectively
           @_oes_p
         end
-      end
-
-      class Interpret::Value_Popper___  # :+[#br-085]
-
-        def initialize x
-
-          @unparsed_exists = true
-          @_p = -> do
-            @unparsed_exists = false
-            remove_instance_variable :@_p
-            x
-          end
-        end
-
-        def gets_one
-          @_p[]
-        end
-
-        def no_unparsed_exists
-          ! @unparsed_exists
-        end
-
-        attr_reader :unparsed_exists
       end
     end
   end

@@ -354,7 +354,7 @@ module Skylab::Brazen
 
         def ___interpret_component_normally
 
-          o = ACS_::Interpretation_::Universal_Build.new(
+          o = ACS_::Interpretation_::Build_Value.new(
             @association, @ACS, & @oes_p )
 
           o.wrap_handler_as_component_handler
