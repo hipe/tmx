@@ -44,9 +44,16 @@ module Skylab::Brazen::TestSupport
           y << code( 'yes' )
         end
 
-        -> flim_flam do
+        -> flim_flam, & call_p do  # see [#085]#Event-models:#ick
 
-          @_oes_p.call :info, :expression, :hello do | y |
+          if call_p
+            use_p = call_p
+          else
+            self._COVER_ME
+            use_p =  @_oes_p
+          end
+
+          use_p.call :info, :expression, :hello do | y |
             y << "hello #{ code flim_flam }"
           end
 
@@ -57,6 +64,11 @@ module Skylab::Brazen::TestSupport
       def __fantazzle_dazzle__component_association
 
         Faz_Daz
+      end
+
+      def receive_component_event asc, i_a, & ev_p
+
+        @_oes_p.call( * i_a, & ev_p )
       end
     end
 
@@ -83,9 +95,16 @@ module Skylab::Brazen::TestSupport
 
               :end
 
-        -> verbose=nil, dry_run=nil, file do
+        -> verbose=nil, dry_run=nil, file, & call_p do  # [#085]#Event-models:#ick
 
-          @oes_p_.call :info, :expression, :k do | y |
+          if call_p
+            use_p = call_p
+          else
+            self._COVER_ME
+            use_p = @oes_p_
+          end
+
+          use_p.call :info, :expression, :k do | y |
             y << [ :file, file, * ( :V if verbose ), * ( :D if dry_run ) ].inspect
           end
 

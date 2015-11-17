@@ -298,6 +298,10 @@ module Skylab::Brazen
         def __descend
 
           _ = ACS_::For_Interface::Read_or_write[ @association, @ACS, & @oes_p ]
+
+          # (we pass the handler that was passed to the edit session -
+          #  we don't bind the constructed component to the ACS) :#here
+
           _accept_ACS _
           @association = nil
         end
@@ -359,12 +363,9 @@ module Skylab::Brazen
 
         def ___interpret_component_normally
 
-          o = ACS_::Interpretation_::Build_Value.new(
-            @association, @ACS, & @oes_p )
+          ACS_::Interpretation_::Build_value[ @arg_st, @association, @ACS, & @oes_p ]
 
-          o.wrap_handler_as_component_handler
-          o.mixed_argument = @arg_st
-          o.execute
+          # (same note as #here)
         end
 
         def __interpret_when_operation_defined_in__model__
@@ -504,7 +505,10 @@ module Skylab::Brazen
 
         def __deliver_when_operation_defined_in__model__
 
-          _x = @operation.callable.call( * @args )
+          # NOTE - we leave it to the model to chose which handler
+          # to use, if it has its own :/
+
+          _x = @operation.callable.call( * @args, & @oes_p )
 
           _accept_delivery_value _x
 

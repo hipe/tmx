@@ -13,7 +13,7 @@ module Skylab::Brazen
         if qkn.is_known_known
 
           if enum_bx.has_name qkn.value_x
-            qkn
+            qkn.to_knownness
           else
 
             event = -> do
@@ -30,7 +30,7 @@ module Skylab::Brazen
             end
           end
         else
-          qkn  # whether or not the field is required is not our concern
+          qkn.to_knownness  # whether or not the field is required is not our concern
         end
       end
 

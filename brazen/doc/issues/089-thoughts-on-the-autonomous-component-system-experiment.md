@@ -70,6 +70,7 @@ violoation of which should occur only with good reason.
 
     * a name (imagine it is any string) that is unique in the context of
       all of the "custodian ACS"'s component association names.
+      (the meaning of "custodian" is explained in [#085].)
 
     * a "component model" (needs only implement one method, #t5.)
 
@@ -359,7 +360,7 @@ the ACS will use this means (instead of the means described above) to
 attempt to produce the component.
 
 (we are in the midst of developing an experimental new form for the
-above that is only for "compound models" tracked with [#083]:INTERP-D)
+above that is only for "compound models" tracked with [#083]:#interp-D)
 
 we say "interpret" because this method is expected to interpret one
 or more tokens off the argument stream to turn it into a (trueish)

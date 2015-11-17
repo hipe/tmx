@@ -73,14 +73,14 @@ module Skylab::Basic
             & oes_p )
         end
 
-        def normalize_qualified_knownness arg, & oes_p
+        def normalize_qualified_knownness qkn, & oes_p
           otr = dup
-          otr.init_copy arg, & oes_p
+          otr.init_copy qkn, & oes_p
           otr.execute
         end
 
-        protected def init_copy arg, & oes_p
-          @qualified_knownness = arg
+        protected def init_copy qkn, & oes_p
+          @qualified_knownness = qkn
           oes_p and @on_event_selectively = oes_p
           nil
         end
@@ -224,7 +224,7 @@ module Skylab::Basic
         #   + `path_cannot_contain_contain_dot_file`
 
         def accept_arg_as_is
-          @result = @qualified_knownness
+          @result = @qualified_knownness.to_knownness
           ACHIEVED_
         end
 

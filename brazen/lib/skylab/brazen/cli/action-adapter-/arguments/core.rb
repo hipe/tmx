@@ -48,7 +48,7 @@ module Skylab::Brazen
               prop = @arg_a.fetch d
               if prop.has_default || ! prop.is_required   # :+[#006]
                 if m.length.nonzero?
-                  m.last == d - 1 or raise say_bad_optional_indexes( m, d )
+                  m.last == d - 1 or raise ___say_bad_optional_indexes( m, d )
                 end
                 m.push d
               end ; m
@@ -56,7 +56,7 @@ module Skylab::Brazen
             @indexes_of_optional_arguments = ( a if a.length.nonzero? ) ; nil
           end
 
-          def say_bad_optional_indexes m, d
+          def ___say_bad_optional_indexes m, d
             "optional argument '#{ @arg_a.fetch( d ).name_symbol }' must but did #{
               }not occur immediately after optional argument #{
             }'#{ @arg_a.fetch( m.last ).name_symbol }'"

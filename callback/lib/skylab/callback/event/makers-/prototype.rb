@@ -319,7 +319,7 @@ module Skylab::Callback
 
           bx = ivar_box
 
-          x_a.each_slice( 2 ) do | i, x |
+          x_a.each_slice 2 do | i, x |
             instance_variable_set bx.fetch( i ), x
           end
 

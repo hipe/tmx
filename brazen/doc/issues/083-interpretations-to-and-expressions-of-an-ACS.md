@@ -8,7 +8,7 @@ here we specify how both [#089] "compound" and "terminal" components of
 an ACS typically handle input & output from and to various "modalities."
 to be cheeky, we refer to input as "interpretation" and output as
 "expression". there is also the closely related idea of "intent"
-explored below at #INTERP-B.
+explored below at #interp-B
 
 
 
@@ -47,7 +47,7 @@ just so we agree on terms in this document,
 
 
 
-## :ASSUMPTION-A ..
+## :assumption-A
 
 .. is the assumption that we are not yet long-running. we use this tag
 to track areas that could be improved if we become long-running.
@@ -95,7 +95,7 @@ we don't want it
 
 
 
-### :REFL-A
+### :refl-A
 
 that component association structures are built anew on-the-fly whenever
 they are requested is an experiment. let's track where this potentially
@@ -107,7 +107,7 @@ to waste it is because of #dt4 conservatism.)
 
 
 
-### :#note-REFL-B
+### :refl-B
 
 we want the node to be able to define its own (perhaps nil-ish) list of
 each of the things. if one or more of the things is not defined in this
@@ -121,7 +121,7 @@ order.
 
 
 
-### :#note-REFL-C
+### :refl-C
 
 when the method index is in its beginning state, use the below hand-written
 map-reduce to produce each next "entry"; all the while memo'ing each entry
@@ -142,46 +142,7 @@ near the the end but never reach the end.
 
 
 
-### notes about "univeral build" & "upbinding" :#note-INTERP-A
-
-honoring tenets t1 and t6 [#089], "interpret component" is for now the
-de-facto standard way we build a new empty component for example for
-edit sessions, unserializing, building reactive trees, etc.
-
-now consider all this:
-
-when parent receives events from child (we call them "signals" when
-they are intercepted like this), it needs to know which child sent the
-signal. a direct approach for this would be for the child to receive
-its name function in the eyes of its parents through some sort of API
-callback method near construction time. (indeed we went pretty far with
-this approach before revisiting its design.)
-
-but the experiment of ACS is meant to encourage decoupled design. for
-the child to need to know what its name is in the eyes of the parent
-is a bit of a challenge to this principle. that is, we would like for
-the ("child") component not to know that it is even a child per se.
-(indeed, part of autonomy is gaining independence from one's parents!)
-
-in fact we avoid the use of the term "child" in our code here for this
-reason. we would like for the component's behavior to be effected
-similarly whether it is some sort of child or some sort of top. ideally,
-the concept of "being a child" would be meaningless to the component.
-
-the [#ca-001] selective listener pattern is a perfect fit for this: the
-component is constructed with an event handler, and need merely emit
-events when appropriate. (typically, when its constituent business data
-changes).
-
-if the component is constructed by something like a parent, the parent
-can construct (usually wrap) the handler specially to add information
-about the "child"'s name when the signature of the emission matches the
-approrpriate channels.
-
-
-
-
-### "intention method", "intent" - :INTERP-B
+### "intention method", "intent" - :#interp-B
 
 the elegant wonder of the ACS near "interpret component" is the idea
 that we could use the same method (validation) whether we are
@@ -246,7 +207,7 @@ whatever the active intent is.
 
 
 
-#### case-study: :#JSON-interpretation (as a segway into something...)
+#### case-study: :on-JSON-interpretation (as a seqway into something..)
 
 at one time the JSON interpretation node effected a "unit of work"
 pattern whereby in two separate passes it would 1) "line up" JSON
@@ -287,12 +248,12 @@ experimentally we attempt this trick (next section):
 
 the experimentation of this is the subject of this commit, and will not
 be commented on until it has incubated a bit. it is tracked with
-#INTERP-D.
+ #interp-D.
 
 
 
 
-### the "super-signature" of construction methods :#INTERP-C
+### the "super-signature" of construction methods :interp-C
 
 in an ideal utopia of "true autonomy" the component model needs nothing
 more than the argument stream and a handler to construct itself from
@@ -321,7 +282,7 @@ methods:
           typically for use in the interface "intent"
 
       * for compound models, this is under exploration and is
-        being tracked with INTERP-D.
+        being tracked with #interp-D.
 
   • if this construction method takes more than one argument, the *last*
     argument will be the ACS that is building this as a component
@@ -331,7 +292,7 @@ methods:
 
   • if the constructor takes more than 2 arguments, the *second to last*
     argument will be the association structure. (but keep in mind that per
-    #INTERP-A "most" components won't need to know their own name.)
+    [#085]:A "most" components won't need to know their own name.)
 
   • the constructor cannot take more than 3 arguments.
 
@@ -341,40 +302,7 @@ not define defaults for any parameters.
 
 
 
-### :#INTERP-accept-component-change
-
-all about this important method:
-
-mainly, implement the handling of the signal by storing the
-new component value. (this is guaranteed at this point.)
-
-secondarily, result in a *proc* that results in a structure that
-can be used to propagate this mutation signal outward to cilents.
-
-(see code)
-
-epilogue:
-
-now: we are an ACS that has mutated. in some cases we have stored
-a first-ever component value into one of our component "slots",
-and in other cases we have swapped-in a new component value
-over an old one. these two cases correspond (in reverse) to the
-two different forms of "soft event" we make from the same DSL.
-
-as a crucial part of the typical ACS's specified behavior, it
-must notify any listening clients that it has changed. however,
-it is outside our own scope of concern here to know whether the
-ACS has any listening clients and if so, how to signal this
-mutation to them. that is why we result in a proc that builds a
-specialized informational structure. it is up to the client (our
-client) to decide whether to build and if so what to do with this
-built structure.
-
-
-
-
-
-### :note-JSON-expression
+### :on-JSON-expression
 
 (this section is to precede the INOUT notes next)
 
@@ -393,7 +321,7 @@ furthermore this makes tests fragile as we add components.
 
 
 
-### :INOUT-A
+### :#inout-A
 
 the "common" way we deal with `nil` for both expression and interpretation
 is that we treat it as equivalent to the value not being set. this is so
@@ -415,7 +343,7 @@ being set to `nil` over serialization.
 
 
 
-### :INOUT-B
+### :inout-B
 
 when it comes to `false`, however, (in contrast to handling `nil`
 above), we always simply treat it as-is.
@@ -423,7 +351,7 @@ above), we always simply treat it as-is.
 
 
 
-### :INOUT-C
+### :inout-C
 
 truish-primitives..
 
@@ -444,7 +372,7 @@ lifetime.
 
 
 
-### :note-inout-E
+### :inout-E
 
 ..would be used to mark places where the component must be true-ish, for
 example because it is expected to be controller-like ..
@@ -459,25 +387,7 @@ example because it is expected to be controller-like ..
 
 
 
-### "why no blocks?" :#note-OPER-A
-
-for now, we don't pass the oes block here because (child) components
-have a special block created for them that lets them send messages to
-the parent without knowing whether or not they have a parent. this
-special block is created at construction time and is an instance
-variable. to reduce the strain on the ACS class, we don't require that
-it create an attr-reader for this proc, just so that we can read this
-proc and pass it back to the selfsame component. rather, we expec that
-the component manage its own eventing in this manner, by calling its own
-ivar with the special block.
-
-however, this treatment of this situation is *very* default and is not
-expected to hold up for all uses.
-
-
-
-
-### :#issue-1
+### :issue-1
 
 the way we autovivify here should be the way we do there (see).
 _

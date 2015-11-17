@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   module Autonomous_Component_System
 
-    module Operation::Preparation
+    module Operation::Preparation  # notes in [#084]
 
       # the "operation" structure is pure model - it mostly just implements
       # the DSL for model-defined operations, but does not come with strong
@@ -21,8 +21,6 @@ module Skylab::Brazen
       # other two of are to be used with the strange trick of duping and
       # extending to create a session, because of how many parameters are
       # shared by this concern and the client there.
-      #
-      # more notes in [#084]
 
       Common__ = ::Module.new
 
@@ -124,7 +122,7 @@ module Skylab::Brazen
           end
         end
 
-        def __process_named_arguments_with_default_default proto  # see #note-B
+        def __process_named_arguments_with_default_default proto  # see [#]note-B
 
           default_default = -> do
             x = proto.default_block.call
@@ -181,7 +179,7 @@ module Skylab::Brazen
           _say_missing a
         end
 
-        def __process_named_arguments_feebly  # see #note-A
+        def __process_named_arguments_feebly  # see [#]note-A
 
           # ~ local globals for work
 
@@ -277,7 +275,7 @@ module Skylab::Brazen
             KEEP_PARSING_
           end
 
-          no_value_for_optional = -> do  # see #note-A.2
+          no_value_for_optional = -> do  # see [#]note-A.2
 
             last_opt = nil
 
@@ -309,7 +307,7 @@ module Skylab::Brazen
             @args = args
             ok
           elsif missing
-            raise ::ArgumentError, _say_missing( missing )  # :+#note-C
+            raise ::ArgumentError, _say_missing( missing )  # [#]note-C
           else
             self._COVER_ME
           end

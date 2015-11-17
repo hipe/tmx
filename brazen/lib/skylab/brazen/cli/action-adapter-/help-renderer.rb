@@ -169,7 +169,7 @@ module Skylab::Brazen
           arity_i = argument_arity_from_native_optparse_switch opt
 
           if :zero != arity_i
-            moniker = some_arg_moniker_for_switch opt
+            moniker = _some_arg_moniker_for_switch opt
           end
 
           tail = render_argument_moniker_and_arity moniker, arity_i
@@ -201,7 +201,7 @@ module Skylab::Brazen
 
           if :zero != arity_sym
             moniker = prop.argument_moniker
-            moniker ||= some_arg_moniker_for_switch opt
+            moniker ||= _some_arg_moniker_for_switch opt
           end
 
           tail = render_argument_moniker_and_arity moniker, arity_sym
@@ -219,16 +219,16 @@ module Skylab::Brazen
           when :zero
           when :zero_or_one_placed ; " [#{ moniker }]"
           when :zero_or_one_misplaced ; "[=#{ moniker }]"
-          else raise say_bad_shape arity_i
+          else raise ___say_bad_shape arity_i
           end
         end
 
-        def say_bad_shape arity_i
+        def ___say_bad_shape arity_i
           "unepxected shape: #{ arity_i }"
         end
 
-        def some_arg_moniker_for_switch sw
-          'X'  # eventually we will do etc. that one hack
+        def _some_arg_moniker_for_switch sw
+          'X'  # eventually we will do etc. that one hack [#124]
         end
 
         def argument_arity_from_native_optparse_switch arg

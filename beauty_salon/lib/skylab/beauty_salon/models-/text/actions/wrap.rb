@@ -60,17 +60,17 @@ module Skylab::BeautySalon
           y << "how wide can the longest line be? (default: #{ val _x })"
         end,
         :default, 80,
-        :ad_hoc_normalizer, -> arg, & oes_p do
+        :ad_hoc_normalizer, -> qkn, & oes_p do
 
           # ( was :+[#ba-027], used to have what is now [#br.024.C] shape )
 
-          if arg.is_known_known
+          if qkn.is_known_known
             Home_.lib_.basic::Number.normalization.with(
               :number_set, :integer,
               :minimum, 1,
-              :argument, arg, & oes_p )
+              :qualified_knownness, qkn, & oes_p )
           else
-            arg  # required-ness is out of our scope
+            qkn  # required-ness is out of our scope
           end
         end,
         :required,
@@ -286,20 +286,22 @@ module Skylab::BeautySalon
       # ~
 
       Actors_ = ::Module.new
-      class Actors_::Normalize_line_ranges
+      class Actors_::Normalize_line_ranges  # 1x
 
         # :+[#br-024.C] (still?) assume that x is nil or an array.
 
         def initialize arg, & oes_p
-          @arg = arg ; @on_event_selectively = oes_p
+
+          @on_event_selectively = oes_p
+          @_qualified_knownness = arg
         end
 
         def execute
-          @x = @arg.value_x
+          @x = @_qualified_knownness.value_x
           if @x
             __when_value
           else
-            @arg  # leave it as-is
+            @_qualified_knownness.to_knownness  # leave value as-is
           end
         end
 
@@ -326,7 +328,7 @@ module Skylab::BeautySalon
           end while nil
 
           if @ok
-            @arg.new_with_value @union.prune
+            Callback_::Known_Known[ @union.prune ]
           else
             UNABLE_
           end

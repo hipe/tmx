@@ -2,52 +2,36 @@ module Skylab::Brazen
 
   module Event_Support_  # :+"that trick"
 
+    expression = nil
+
     Events_::Component_Changed = Callback_::Event.prototype_with(  # :+[#035]:F
 
       :component_changed,
 
       :current_component, nil,
       :previous_component, nil,
-      :component_association, nil,
-      :ACS, nil,
+      :context_as_linked_list_of_names, nil,
+      :suggested_event_channel, nil,
+      :verb_lemma_symbol, :change,
 
       :ok, true,
 
     ) do | y, ev |
-      o = ev.dup
-      o.extend ev.class::Expresser___
-      o.__express_into_under y, self
+      Express[ y, self, ev, & expression ]
     end
 
-    module Events_::Component_Changed::Expresser___
+    expression = -> do
 
-      include Expresser
+      express_verb_lemma_symbol_as_preterite
 
-      def __express_into_under y, expag
+      express_context_as_linked_list_of_names
 
-        initialize_as_expresser expag
+      accept_sentence_part 'from'
+      express_component @previous_component
+      accept_sentence_part 'to'
+      express_component @current_component
 
-        _verb_sym = :change  # :+[#035]:WISH-A
-        _s = Home_.lib_.human::NLP::EN::POS::Verb[ _verb_sym.to_s ].preterite
-
-        say _s
-
-        if ! @did_express_context_chain_
-          express_collection
-        end
-
-        say @component_association_string_
-
-        say 'from'
-        say_component @previous_component
-        say 'to'
-        say_component @current_component
-        flush_into y
-      end
-
-      def index_component_related
-        NIL_
-      end
+      NIL_
     end
   end
 end

@@ -91,11 +91,12 @@ module Skylab::Brazen
 
             operation: -> do
               # (operations are only ever for the interface intent)
-              Operation_as_Hybrid___.new qkn, @ACS
+              Operation_as_Hybrid___.new qkn, @ACS, & @_oes_p
             end
           }
 
-          @__read_component_value = ___component_value_reader
+          @__read_component_value = __build_read_component_value
+
           st = ___to_stream_for_component_interface
 
           # the above stram is reduced to only those component associations
@@ -111,7 +112,7 @@ module Skylab::Brazen
               x = h.fetch( qkn.association.category ).call
               x and break
 
-              # - :#note-inout-E: components here must be controller-like
+              # - [#]inout-E: components here must be controller-like
               # so they must be true-ish so we *can* map-reduce here
               redo
             end while nil
@@ -130,16 +131,14 @@ module Skylab::Brazen
 
         def __unbound_for_association_with_unknownish_value qkn
 
-          asc = qkn.association
-
-          cmp = @__read_component_value[ asc ]
+          cmp = @__read_component_value[ qkn ]
 
           # the component that was created above is typically bound to parent
           # through the "special" handler that routes "signals", but for the
           # below hybrid we only want the ordinary, unmodified handler
 
           if cmp
-            Compound_as_Hybrid__.new asc.name, cmp, & @_oes_p
+            Compound_as_Hybrid__.new qkn.association.name, cmp, & @_oes_p
           else
             # if the model declined to build an empty component, then it
             # doesn't want to for whatever reason. reduce over it. (:#here)
@@ -147,7 +146,7 @@ module Skylab::Brazen
           end
         end
 
-        def ___component_value_reader
+        def __build_read_component_value
 
           if @ACS.respond_to? READER_METHOD__
 
@@ -155,11 +154,11 @@ module Skylab::Brazen
 
           else
 
-            -> asc do
+            -> qkn do
 
               # :+#suspect - do we want touch or Read_or_write ?
 
-              ACS_::For_Interface::Touch[ asc, @ACS, & @_oes_p ]
+              ACS_::For_Interface::Touch[ qkn, @ACS ]
             end
           end
         end
@@ -257,9 +256,10 @@ module Skylab::Brazen
 
         defaults = Home_.actionesque_defaults
 
-        def initialize op, acs
+        def initialize op, acs, & oes_p
 
           @_acs = acs
+          @_oes_p = oes_p
           @_op = op
         end
 
@@ -324,7 +324,8 @@ module Skylab::Brazen
             o.args,
             @_op.callable,
             :call,
-          )  # see #note-OPER-A for why no blocks
+            & @_oes_p  # see [#085]#Event-models:choice
+          )
         end
 
         # ~ parameters

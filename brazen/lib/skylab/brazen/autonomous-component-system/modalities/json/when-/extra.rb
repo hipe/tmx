@@ -12,11 +12,11 @@ module Skylab::Brazen
 
             context_x = sess.context_x
 
-            _p = -> do
+            _p = -> _ev do
 
               if context_x
 
-                st = context_x.to_proc_stream
+                st = context_x.to_element_stream_assuming_nonsparse
 
                 s_a = st.reduce_into_by [] do | m, p |
 
@@ -32,7 +32,7 @@ module Skylab::Brazen
             Home_::Property::Events::Extra.new_with(
               :name_x_a, sym_a,
               :lemma, 'element',
-              :context_prepositional_phrase_proc, _p,
+              :suffixed_prepositional_phrase_context_proc, _p,
             )
           end
         end

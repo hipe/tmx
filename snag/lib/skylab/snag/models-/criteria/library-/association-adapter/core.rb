@@ -198,7 +198,7 @@ module Skylab::Snag
 
           adapter = Home_.lib_.NLP::EN::POS::Verb[ s ]
 
-          if ! adapter.lexeme.is_irregular
+          if adapter.lexeme.is_regular
             self._SANITY_we_almost_always_use_irregulr_verb_like_have_and_be
           end
 

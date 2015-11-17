@@ -46,7 +46,7 @@ module Skylab::Brazen
           kp
         end
 
-        class Hacky_State_Machine___  # mocky proxy for a polymorphic upstream  :+[#br-085]
+        class Hacky_State_Machine___  # mocky proxy for a polymorphic upstream [#br-085]#VP
 
           def __replace_value x
             @_state = :containing

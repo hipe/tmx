@@ -11,149 +11,86 @@ module Skylab::Brazen
 
   Autoloader_[ Events_ = ::Module.new ]
 
-  module Event_Support_
-
-    module Home_::Events_
-
-      Component_Added = Callback_::Event.prototype_with(  # :+[#035]:D
-
-        :component_added,
-        :component, nil,
-        :component_association, nil,
-        :ACS, nil,
-
-        :ok, true,
-
-      ) do | y, ev |
-
-        o = Event_Support_::Expresser[ self, ev ]
-
-        _verb_sym = :add  # :+[#035]:WISH-A
-        _s = Home_.lib_.human::NLP::EN::POS::Verb[ _verb_sym.to_s ].preterite
-
-        o.instance_exec do
-
-          say _s
-          express_component or say 'component'
-
-          if @can_express_collection_related_ && ! @did_express_context_chain_
-            say 'to'
-            express_collection
-          end
-
-          flush_into y
-        end
-      end
-
-      Component_Removed = Callback_::Event.prototype_with(  # [#035]:B
-
-        :component_removed,
-        :component, nil,
-        :component_association, nil,
-        :ACS, nil,
-
-        :is_completion, true,  # remember this? hehe
-        :ok, true
-
-      ) do | y, o |
-
-        o = Event_Support_::Expresser[ self, o ]
-
-        o << 'removed'  # one day [#035]:WISH-A
-        o.express_component or say 'component'
-        o << 'from'
-        o.express_collection or say 'collection'
-        o.flush_into y
-      end
-    end
-  end
-
   module Event_Support_  # publicize if needed. stowaway.
+
+    Express = -> y, expag, ev, & expression do
+      o = ev.dup
+      o.extend Expresser
+      o.initialize_as_expresser expag
+      o.calculate( & expression )
+      o.flush_into y
+    end
 
     SubPhrase_Methods__ = ::Module.new
 
     module Expresser
 
-      include SubPhrase_Methods__
-
       # although an event object itself is immutable, it is convenient for
       # the sake of complex expression strategies to use "session pattern"
       # on a object that is of the same structure and content but mutable
 
-      def self.[] expag, ev
+      def self.[] expag, ev  # oldschool
         o = ev.dup.extend self
         o.initialize_as_expresser expag
+        o.index_for_expression_oldschool
         o
       end
 
-      def initialize_as_expresser expag
+      include SubPhrase_Methods__
+
+      alias_method :calculate, :instance_exec
+
+      def initialize_as_expresser expag  # (oldschool)
 
         @expag_ = expag  # before next
-        __index_component_association_related
-        index_component_related
-        __index_collection_related
         init_expresser_list
         NIL_
       end
 
-      # ~ indexing
+      # -- Oldschool indexing
 
-      def __index_component_association_related
+      def index_for_expression_oldschool
+        __index_component_association_related
+        index_component_related
+        __index_collection_related
+      end
 
-        asc = @component_association
-        if asc
+      def __index_component_association_related  # (this is old verbose mode)
 
-          # if x is linked-list-friendly (nf or ca), get to the back of it
+        # the component association can be a formal instance of one,
+        # a model-class-like, or a name function.
 
-          if asc.respond_to? :next
+        x = @component_association
+        if x
 
-            back = asc.next
-            if back
-              context_chain = [ asc ]
-              begin
-                context_chain.push back
-                asc = back
-                back = back.next
-                back or break
-                redo
-              end while nil
-            end
+          if x.respond_to? :component_model
+
+            # if it looks like an ACS association
+
+            asc = x
+            cm = x.component_model
+
+          elsif x.respond_to? :module_exec
+
+            # if we "snuck" a model class in for the thing
+            cm = x
+
+          else
+
+            ca_s = x.name.as_human  # [gi] experiment?
           end
 
-          # after that:
-
-          if asc.respond_to? :component_model  # original, "real" asc from ACS
-            cm = asc.component_model
-
-          elsif asc.respond_to? :module_exec  # to sneak in only the model class
-            cm = asc
-            asc = nil
+          if cm
+            cm_s = __determine_component_model_string_via_component_model cm
           end
 
-          if context_chain  # experimental
-
-            expressed_context_chain = true
-
-            _s_a = context_chain.reduce [] do | m, x |
-              s = x.description_under @expag_
-              s and m.push s
-              m
-            end
-
-            ca_s = _s_a * SPACE_
-
-          elsif asc
+          if asc
             ca_s = asc.description_under @expag_
           end
         end
 
-        if cm
-          cm_s = __determine_component_model_string_via_component_model cm
-        end
-
         @component_association_string_ = ca_s
         @component_model_string_ = cm_s
-        @did_express_context_chain_ = expressed_context_chain
         NIL_
       end
 
@@ -252,31 +189,72 @@ module Skylab::Brazen
         NIL_
       end
 
-      # ~ higher-level "macros"
+      # -- Newschool in vaguely typical EN syntactic order
 
-      def express_component
+      def express_verb_lemma_symbol_as_preterite
 
-        say_unique(
+        verb_sym = @verb_lemma_symbol
+        if verb_sym
+          _s = Home_.lib_.human::NLP::EN::POS::Verb[ verb_sym.to_s ].preterite
+          accept_sentence_part _s
+        end
+      end
+
+      def express_context_as_linked_list_of_names
+
+        _LL = @context_as_linked_list_of_names
+
+        _st = _LL.to_element_stream_assuming_nonsparse
+
+        s_a = _st.reduce_into_by [] do | m, x |
+          s = x.description_under @expag_
+          s and m.push s
+          m
+        end
+
+        if s_a.length.nonzero?
+          _ca_s = s_a * SPACE_
+          accept_sentence_part _ca_s
+        end
+      end
+
+      # -- "Macros" (higher-level, oldschool)
+
+      def express_component_via_members
+
+        express_unique(
           @component_model_string_,
           @component_association_string_,
           @component_string_,
         )
       end
 
-      def say_component cmp
-        say describe_component cmp
+      def express_component cmp
+        s = describe_component cmp
+        if s
+          accept_sentence_part s
+        end
       end
 
       def describe_component cmp
         cmp.description_under @expag_
       end
 
-      def express_collection
+      def express_collection_via_members
 
-        say_unique(
+        express_unique(
           @collection_model_string_,
           @collection_string_,
         )
+      end
+
+      # -- Support
+
+      def express_name nf
+        s = nf.as_human
+        if s
+          accept_sentence_part s
+        end
       end
 
       # ~ style support
@@ -291,8 +269,8 @@ module Skylab::Brazen
         SubPhrase___.new
       end
 
-      def say_by & p
-        say_any @expag_.calculate( & p )
+      def express_by & p
+        express_any @expag_.calculate( & p )
       end
 
       def flush_into y
@@ -321,7 +299,7 @@ module Skylab::Brazen
         d != list_length
       end
 
-      def say_unique * s_a
+      def express_unique * s_a
 
         # given a list of N surface expression strings going from general
         # to specific (e.g "human", "user", "Jaako"), express each one in
@@ -358,14 +336,14 @@ module Skylab::Brazen
             specific_s = st.gets
 
             if ! specific_s
-              say general_s
+              accept_sentence_part general_s
               break
             end
 
             rx = /\b#{ ::Regexp.escape general_s }\z/
 
             if rx !~ specific_s
-              say general_s
+              accept_sentence_part general_s
             end
             general_s = specific_s
             redo
@@ -375,22 +353,22 @@ module Skylab::Brazen
         did_any
       end
 
-      def say_via_nonsparse_array a
+      def express_via_nonsparse_array a
         @_a.concat a ; nil
       end
 
-      def say_any s
+      def express_any s
         if s
-          say s
+          accept_sentence_part s
         end
       end
 
       def << s  # prettier when used as session
-        say s
+        accept_sentence_part s
         self
       end
 
-      def say s
+      def accept_sentence_part s
         @_a.push s
         ACHIEVED_
       end

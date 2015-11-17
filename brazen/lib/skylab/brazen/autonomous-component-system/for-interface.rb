@@ -4,28 +4,17 @@ module Skylab::Brazen
 
     module For_Interface  # notes in [#083]
 
-      class Common_Three__  # (experiment)
-
+      class Procesque_Double__
         class << self
-
-          def _call asc, acs, & oes_p
-            new( asc, acs, & oes_p ).execute
+          def _call x, y
+            new( x, y ).execute
           end
-
           alias_method :[], :_call
-
           alias_method :call, :_call
-
         end  # >>
-
-        def initialize asc, acs, & oes_p
-          @ACS = acs
-          @asc_ = asc
-          @oes_p_ = oes_p
-        end
       end
 
-      class Read_or_write < Common_Three__
+      class Read_or_write < Procesque_Double__
 
         # #open :[#083]:issue-1: this effects a "crude autovivification" -
         # it builds a component for a missing member and stores it whether
@@ -34,9 +23,14 @@ module Skylab::Brazen
         # changes (etc), but this will be tricky; and we don't need it yet
         # in the "real world" anyway
 
+        def initialize asc, acs
+          @ACS = acs
+          @asc_ = asc
+        end
+
         def execute
 
-          if @asc_.model_looks_like_proc
+          if @asc_.model_classifications.looks_like_proc
             self.__WRITE_ME_cover_me_via_primitive
           else
             ___when_entitesque
@@ -58,19 +52,24 @@ module Skylab::Brazen
 
         def ___build_new_empty_entitesque
 
-          cmp = Upbind__[ @asc_, @ACS, & @oes_p_ ]
+          cmp = ACS_::Interpretation::Build_empty_hot[ @asc_, @ACS ]
           ACS_::Interpretation_::Write_value[ cmp, @asc_, @ACS ]
           cmp
         end
       end
 
-      class Touch < Common_Three__
+      class Touch < Procesque_Double__
+
+        def initialize qkn, acs
+          @ACS = acs
+          @qkn = qkn
+        end
 
         def execute
 
-          @_qkn = ACS_::Reflection_::Read[ @asc_, @ACS ]
+          @_asc = @qkn.association
 
-          if @asc_.model_looks_like_proc  # start logic that is repeated #here
+          if @_asc.model_classifications.looks_like_proc  # start logic that is repeated #here
             __when_primitivesque
           else
             __when_entitesque
@@ -79,7 +78,7 @@ module Skylab::Brazen
 
         def __when_primitivesque
 
-          if @asc_.has_operations
+          if @_asc.has_operations
             ___when_primitivesque_with_operations
           else
             NIL_  # as covered
@@ -88,37 +87,20 @@ module Skylab::Brazen
 
         def ___when_primitivesque_with_operations
 
-          Here_::Primitivesque.new @_qkn, @ACS
+          Here_::Primitivesque.new @qkn, @ACS
         end
 
         def __when_entitesque
 
-          if @_qkn.is_effectively_known
+          if @qkn.is_effectively_known
 
             self._REVIEW_two
-            @_qkn.value_x
+            @qkn.value_x
 
           else
-
-            Upbind__[ @asc_, @ACS, & @oes_p_ ]
+            ACS_::Interpretation::Build_empty_hot[ @_asc, @ACS ]
           end
         end
-      end
-
-      Upbind__ = -> asc, acs, & oes_p do
-
-        # create a new empty component that is bound to the client,
-        # but is *NOT* (yet) stored as a member value of client!
-
-        o = ACS_::Interpretation_::Build_Value.new( asc, acs, & oes_p )
-
-        o.use_empty_argument_stream
-
-        o.wrap_handler_as_component_handler
-
-        wv = o.execute
-
-        wv && wv.value_x
       end
 
       To_stream = -> acs do
@@ -142,7 +124,7 @@ module Skylab::Brazen
 
         known_qkn = -> qkn do  # repetition of :#here
           asc = qkn.association
-          if asc.model_looks_like_proc
+          if asc.model_classifications.looks_like_proc
             if asc.has_operations
 
               _ = Here_::Primitivesque.new qkn, acs
@@ -164,7 +146,7 @@ module Skylab::Brazen
           int = asc.intent
           if ! int || :interface == int
             qkn = qkn_for[ asc ]
-            if qkn.is_known_known
+            if qkn.is_effectively_known
               known_qkn[ qkn ]
             else
               qkn

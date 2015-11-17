@@ -199,7 +199,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
 
     def expect_the_passthru_normalization_with s
       normalize_against s
-      expect_the_passthru_normalization
+      expect_the_passthru_normalization__
     end
 
     def expect_errored_with * a, & p

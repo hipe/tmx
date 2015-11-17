@@ -13,7 +13,7 @@ module Skylab::Brazen
 
         expag.calculate do
 
-          _st = context_x.to_proc_stream
+          _st = context_x.to_element_stream_assuming_nonsparse
 
           s_a = _st.reduce_into_by [] do | m, p |
             m << calculate( & p )

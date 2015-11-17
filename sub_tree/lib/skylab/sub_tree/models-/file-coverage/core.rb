@@ -50,7 +50,7 @@ module Skylab::SubTree
             Home_.lib_.basic::Pathname.normalization.new_with( :absolute ).
               normalize_qualified_knownness( qkn, & oes_p )
           else
-            qkn
+            qkn.to_knownness
           end
         end,
 

@@ -57,7 +57,7 @@ module Skylab::Brazen
           kp
         end
 
-        class Value_as_Stream___  # #tracking :+[#085] redundancies
+        class Value_as_Stream___  # #tracking :+[#085]:VP redundancies
 
           def current_token
             @p[]

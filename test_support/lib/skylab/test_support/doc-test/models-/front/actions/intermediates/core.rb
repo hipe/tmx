@@ -39,7 +39,7 @@ module Skylab::TestSupport
                 # :no_dotfiles, must allow these when gem
               ).normalize_qualified_knownness qkn, & oes_p
             else
-              qkn
+              qkn.to_knownness
             end
           end,
           :property, :path

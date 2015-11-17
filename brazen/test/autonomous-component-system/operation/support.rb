@@ -87,9 +87,15 @@ module Skylab::Brazen::TestSupport
 
         def __set__component_operation
 
-          -> x do
+          -> x, & call_p do
 
-            @oes_p_.call :info, :expression, :hi do | y |
+            if call_p
+              use_p = call_p
+            else
+              self._COVER_ME  # use @oes_p_
+            end
+
+            use_p.call :info, :expression, :hi do | y |
               y <<  "hi #{ highlight 'there' }"
             end
 

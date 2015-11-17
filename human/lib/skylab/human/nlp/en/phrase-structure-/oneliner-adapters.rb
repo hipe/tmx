@@ -76,8 +76,12 @@ module Skylab::Human
           end
 
           def lemma
-
-            @_vp.lexeme.to_lemma_string
+            lxm = @_vp.lexeme
+            if lxm.is_regular
+              lxm.to_lemma_string
+            else
+              lxm.lemma_x  # as long as it works?
+            end
           end
 
           def lexeme

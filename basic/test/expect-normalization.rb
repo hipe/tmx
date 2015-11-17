@@ -43,11 +43,29 @@ module Skylab::Basic
       Mock_arg__[].call_via_arglist a
     end
 
-    def expect_the_passthru_normalization
+    def expect_the_passthru_normalization__
+
       event_proc_was_not_called
+
       output_value_was_written
-      @output_arg.object_id.should eql @input_arg.object_id
+
+      qkn = @input_arg
+      kn = @output_arg
+
+      qkn.is_qualified or fail ___say_not( qkn )
+      kn.is_qualified and fail __say( kn )
+
+      qkn.value_x.should eql kn.value_x
+
       nil
+    end
+
+    def ___say_not qkn
+      "expected QKN had #{ qkn.class }"
+    end
+
+    def ___say kn
+     "expected (non-qualified) knownness had #{ kn.class }"
     end
 
     def expect_nothing

@@ -37,13 +37,10 @@ module Skylab::BeautySalon
 
         :required,
         :integer,
-        :ad_hoc_normalizer, -> arg, & oes_p do
-
-          _prp = self.properties.fetch :to_line
-          _qkn = arg.to_qualified_known_around _prp
+        :ad_hoc_normalizer, -> qkn, & oes_p do
 
           Home_.lib_.basic::Range.normalize_qualified_knownness(
-            _qkn, :is, -1, :or, :begin, 1,
+            qkn, :is, -1, :or, :begin, 1,
             & oes_p )
         end,
 

@@ -78,7 +78,7 @@ module Skylab::Brazen
           @value_models.to_value_stream ]
       end
 
-      def qualified_knowness_via_association_ prp
+      def knowness_via_association_ prp
 
         had = true
         x = @value_collection.fetch prp.name_symbol do

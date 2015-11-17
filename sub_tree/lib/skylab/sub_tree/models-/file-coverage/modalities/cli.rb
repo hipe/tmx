@@ -23,13 +23,16 @@ module Skylab::SubTree
 
           fp.replace_by :path do | prp |
 
-            prp.dup.prepend_ad_hoc_normalizer do | arg, & oes_p |
+            prp.dup.prepend_ad_hoc_normalizer do | qkn, & oes_p |
 
-            path = ( arg.value_x if arg.is_known_known )
+              path = ( qkn.value_x if qkn.is_known_known )
+
               if path && ::File::SEPARATOR != path[ 0 ]
-                arg = arg.new_with_value ::File.expand_path path
+
+                Callback_::Known_Known[ ::File.expand_pat path ]
+              else
+                qkn.to_knownness
               end
-              arg
             end
           end
 

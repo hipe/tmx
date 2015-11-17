@@ -122,7 +122,7 @@ module Skylab::Basic
         end
 
         if ok
-          @qualified_knownness
+          @qualified_knownness.to_knownness
 
         elsif @on_event_selectively
           @on_event_selectively.call :error, :not_in_range do

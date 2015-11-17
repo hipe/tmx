@@ -325,7 +325,7 @@ module Skylab::Brazen
 
     def property_value_via_property prp  # :+#public-API (limited but varied use)
 
-      qualified_knowness_via_association_( prp ).value_x
+      knowness_via_association_( prp ).value_x
     end
 
     def property_value_via_symbol i  # ( was #note-120 )

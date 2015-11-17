@@ -49,12 +49,14 @@ module Skylab::Brazen::TestSupport
 
       class Shoe  # similar to another model elsewhere
 
+        # -- Components
+
         def __lace__component_association
 
           Lace
         end
 
-        # ~ to be an unbound
+        # -- Modality hook-outs
 
         def build_unordered_index_stream & oes_p
           Subject[]::Self_as_unbound_stream[ __nf, self, & oes_p ]
@@ -66,6 +68,8 @@ module Skylab::Brazen::TestSupport
 
           @___nf ||= Callback_::Name.via_variegated_symbol( :shoe )
         end
+
+        # -- Operations
 
         def __globbie_guy__component_operation
 
@@ -97,9 +101,9 @@ module Skylab::Brazen::TestSupport
 
         def __get_color__component_operation
 
-          -> do
+          -> & use_p do  # [#085]#Event-models
 
-            @_oes_p.call :info, :expression, :working do | y |
+            use_p.call :info, :expression, :working do | y |
               y << "retrieving #{ highlight 'color' }"
             end
 
@@ -109,7 +113,9 @@ module Skylab::Brazen::TestSupport
 
         def __set_length__component_operation
 
-          -> length do
+          -> length, & call_p do
+
+            use_p = call_p  # currently, parents have no signal processing methods
 
             x = length
 
@@ -121,7 +127,7 @@ module Skylab::Brazen::TestSupport
                 x = x.to_i
                 true
               else
-                @_oes_p.call :info, :expression, :not_int do | y | y << 'not.' end
+                use_p.call :info, :expression, :not_int do | y | y << 'not.' end
                 false
               end
             end
@@ -129,7 +135,7 @@ module Skylab::Brazen::TestSupport
             if ok
 
               if 0 >= x
-                @_oes_p.call :info, :expression, :too_low do | y | y << 'low.' end
+                use_p.call :info, :expression, :too_low do | y | y << 'low.' end
                 false
               else
                 @x = x

@@ -1221,7 +1221,7 @@ module Skylab::Brazen
         NIL_
       end
 
-    private
+    private  # (:[#]:GEC (generated event contextualizations))
 
       def maybe_inflect_line_for_positivity_via_event s, ev
         if ev.verb_lexeme
@@ -2534,8 +2534,8 @@ module Skylab::Brazen
 
             if absolutize_rel_paths
 
-              otr.append_ad_hoc_normalizer do | arg, & x_p |
-                __derelativize_path arg, & x_p
+              otr.append_ad_hoc_normalizer do | qkn, & x_p |
+                __derelativize_path qkn, & x_p
               end
             end
             otr.freeze
@@ -2544,19 +2544,20 @@ module Skylab::Brazen
         NIL_
       end
 
-      def __derelativize_path arg, & oes_p
+      def __derelativize_path qkn, & oes_p
 
-        if arg.is_known_known
-          path = arg.value_x
+        if qkn.is_known_known
+          path = qkn.value_x
           if path
             if FILE_SEPARATOR_BYTE_ != path.getbyte( 0 )  # ick/meh
 
               _path_ = _filesystem.expand_path path, present_working_directory
-              arg = arg.new_with_value _path_
+              kn = Callback_::Known_Known[ _path ]
             end
           end
         end
-        arg
+
+        kn || qkn.to_knownness
       end
 
       def present_working_directory

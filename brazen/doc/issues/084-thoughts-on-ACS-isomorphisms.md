@@ -1,6 +1,6 @@
 # thoughts on ACS isomorphisms :[#084]
 
-## the successful experiment #note-A
+## the successful experiment :note-A
 
 the below was a successful experiment in that it proved
 the theory wrong: we cannot have named arguments that work with
@@ -28,7 +28,7 @@ objective:
 we had to get halfway thru implementing this to figure out that it
 doesn't work and that's OK.
 
-we disovered (#note-A.2):
+we disovered :note-A.2:
 
     once you start (effectively) requesting platform ("real")
     defaults by not passing an argument, you cannot stop using
@@ -42,7 +42,7 @@ we came up with the term "opt-hopping" to help us understand this.
 
 
 
-## today's compromize #note-B
+## today's compromize :note-B
 
 this compromise still feels kind of nasty, but not as nasty as its
 predecessor:
@@ -62,7 +62,7 @@ default specified somehow specially).
 
 
 
-## when to raise exceptions :#note-C
+## when to raise exceptions :note-C
 
 it's the responsibility of the client to express validity in
 its own modality appropriate way. if required parameters are

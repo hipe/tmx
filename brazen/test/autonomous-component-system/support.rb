@@ -44,7 +44,7 @@ module Skylab::Brazen::TestSupport
 
       class << self
 
-        def interpret_compound_component p, & _  # experimental for [#083]:INTERP-D
+        def interpret_compound_component p, & _  # experimental for [#083]:#interp-D
           if p
             _me = new
             p[ _me ]
@@ -69,6 +69,10 @@ module Skylab::Brazen::TestSupport
         :first_name,
         :last_name,
       )
+
+      def component_event_model  # experimental near [#085]:#Event-models
+        :cold
+      end
 
       def __first_name__component_association
 
@@ -109,6 +113,10 @@ module Skylab::Brazen::TestSupport
         :nickname,
         :simple_name,
       )
+
+      def component_event_model  # see [#085]:#Event-models
+        :cold
+      end
 
       def __nickname__component_association
 

@@ -79,15 +79,11 @@ module Skylab::TanMan
         y << "on node #{ lbl o.node_stmt.label } #{ pred_a * ' and ' }"
       end
 
-      class Normalize_name
+      Normalize_name = -> ent, qkn, & oes_p do
 
-        Callback_::Actor.call self, :properties,
-          :ent,
-          :arg
+        # (placeholder for the idea)
 
-        def execute
-          @arg
-        end
+        qkn.to_knownness
       end
     end
   end

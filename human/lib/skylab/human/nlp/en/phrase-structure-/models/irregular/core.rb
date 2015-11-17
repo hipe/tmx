@@ -131,10 +131,6 @@ module Skylab::Human
 
         attr_reader :lemma_x
 
-        def is_irregular  # (for one sanity check in one place)
-          true
-        end
-
         def inflect_words_into_against_sentence_phrase y, sp
 
           _and_a = __to_grammatical_category_state_around_ sp
@@ -160,6 +156,10 @@ module Skylab::Human
           _st = Callback_::Stream.via_nonsparse_array @form_array
 
           Irregular_::Actors_::Inflect[ y, and_a, _st ]
+        end
+
+        def is_regular  # ..
+          false
         end
       end
 

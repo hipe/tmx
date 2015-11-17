@@ -136,6 +136,8 @@ module Skylab::Brazen
       end
     end
 
+    COMPOUND_CONSTRUCTOR_METHOD_ = :interpret_compound_component
+
     class Component_Association
 
       # assume that the ACS assumes that these structures are produced
@@ -192,61 +194,34 @@ module Skylab::Brazen
         self
       end
 
-      # ~
-
-      def to_linked_list_node_in_front_of name  # :+[#ba-002]:LL
-        dup.___init_as_linked_list_node_in_front_of name
+      def model_classifications
+        @___cx ||= ___build_model_classifications
       end
 
-      def ___init_as_linked_list_node_in_front_of x
-        @next = x ; self
-      end
-
-      attr_reader :next
-
-      # ~
-
-      def model_looks_like_proc  # always true or false
-
-        @_did_classify_against_model_construction_method ||= _classify_etc
-        @_model_looks_like_proc
-      end
-
-      def construction_method_name  # can be nil
-
-        @_did_classify_against_model_construction_method ||= _classify_etc
-        @_construction_method_name
-      end
-
-      def _classify_etc
+      def ___build_model_classifications
 
         mdl = @component_model
 
-        m = if mdl.respond_to? GENERIC_CONSTRUCTION_METHOD__
-          GENERIC_CONSTRUCTION_METHOD__
-        elsif mdl.respond_to? COMPOUND_CONSTRUCTION_METHOD__
-          COMPOUND_CONSTRUCTION_METHOD__
+        m = CONSTRUCTOR_METHODS__.detect { | m_ | mdl.respond_to? m_ }
+
+        if m
+          Model_Looks_Entitesque___.new m
+
+        elsif mdl.respond_to? :[]
+          LOOKS_LIKE_PROC___
+        else
+          self._COVER_ME
         end
-
-        if ! m and mdl.respond_to? :[]
-          looks_like_proc = true
-        end
-
-        @_construction_method_name = m
-        @_model_looks_like_proc = looks_like_proc
-
-        ACHIEVED_
       end
 
-      def say_no_method
+      def say_no_method__
 
         # assume model does not look like proc - for use in raising e.g a
         # `NoMethodError` regarding an expected but missing construction
         # method. this exists partly because the platform is strange about
         # when it decides to include the class name in the message.
 
-        a = [ GENERIC_CONSTRUCTION_METHOD__ ]
-        a.push COMPOUND_CONSTRUCTION_METHOD__
+        a = CONSTRUCTOR_METHODS__.dup
         a.push :[]
         _s_a = a.map { | sym | "`#{ sym }`" }
         _or = Callback_::Oxford_or[ _s_a ]
@@ -254,9 +229,50 @@ module Skylab::Brazen
         "must respond to #{ _or } - #{ @component_model.name }"
       end
 
-      GENERIC_CONSTRUCTION_METHOD__ = :interpret_component
+      ENTITESQUE_CONSTRUCTOR_METHOD__ = :interpret_component
 
-      COMPOUND_CONSTRUCTION_METHOD__ = :interpret_compound_component
+      CONSTRUCTOR_METHODS__ = [
+        ENTITESQUE_CONSTRUCTOR_METHOD__,
+        COMPOUND_CONSTRUCTOR_METHOD_,
+      ]
+
+      class Model_Looks_Entitesque___
+
+        def initialize m
+          @construction_method_name = m
+        end
+
+        def looks_compound
+          COMPOUND_CONSTRUCTOR_METHOD_ == @construction_method_name
+        end
+
+        def looks_entitesque
+          ENTITESQUE_CONSTRUCTOR_METHOD__ == @construction_method_name
+        end
+
+        attr_reader(
+          :construction_method_name,
+        )
+
+        def looks_like_proc
+          false
+        end
+      end
+
+      module LOOKS_LIKE_PROC___ ; class << self
+
+        def looks_compound
+          false
+        end
+
+        def looks_entitesque
+          false
+        end
+
+        def looks_like_proc
+          true
+        end
+      end ; end
 
       # ~
 
@@ -274,7 +290,9 @@ module Skylab::Brazen
         NIL_
       end
 
-      def accept__intent__meta_component sym  # see [#083]:INTERP-B
+      attr_reader :_operations
+
+      def accept__intent__meta_component sym  # see [#083]:#interp-B
         @intent = sym
         NIL_
       end
@@ -354,14 +372,44 @@ module Skylab::Brazen
 
     module Reflection
 
-      Model_is_compound = -> mdl do
+      To_qualified_knownness_stream = -> acs do
 
-        if mdl.respond_to? :method_defined?
+        asc_for = Component_Association.reader_for acs
 
-          if mdl.method_defined? :to_component_symbol_stream
-            true
-          else
-            ! ACS_::Reflection_::Method_index_of_class[ mdl ].association_symbols.nil?
+        qkn_for = ACS_::Reflection_::Reader[ acs ]
+
+        ACS_::Reflection_::To_entry_stream[ acs ].map_reduce_by do | entry |
+
+          if entry.is_association
+
+            _asc = asc_for[ entry.name_symbol ]
+
+            qkn_for[ _asc ]
+          end
+        end
+      end
+
+      To_component_association_name_symbol_stream = -> acs do
+        ACS_::Reflection_::To_entry_stream[ acs ].map_by do | entry |
+          entry.name_symbol
+        end
+      end
+
+      Ivar_based_value_writer = -> acs do
+
+        -> qkn do
+          ACS_::Interpretation_::Write_via_ivar[ qkn, acs ]
+        end
+      end
+
+      Ivar_based_value_reader = -> acs do
+
+        # (similar but necessarily different from the other)
+
+        -> asc do
+          ivar = asc.name.as_ivar
+          if acs.instance_variable_defined? ivar
+            Value_Wrapper[ acs.instance_variable_get( ivar ) ]
           end
         end
       end

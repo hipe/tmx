@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  module List
+  module List  # :[#002].
 
     class << self
 
@@ -32,21 +32,67 @@ module Skylab::Basic
         end
       end
 
+      def linked_list_via_array a
+
+        if a.length.nonzero?
+          d = a.length - 1
+          curr = nil
+          begin
+            curr = Linked[ curr, a.fetch( d ) ]
+            if d.zero?
+              break
+            end
+            d -= 1
+            redo
+          end while nil
+          curr
+        end
+      end
+
       def pair_stream_via_even_iambic a
         Build_pair_stream_via_even_iambic__[ a ]
       end
     end  # >>
 
-    module Linked
+    class Linked
 
-      As_stream = -> node do
+      class << self
+        alias_method :[], :new
+        private :new
+      end  # >>
+
+      def initialize next_LL, element_x
+        @element_x = element_x
+        @next = next_LL  # nil ok
+      end
+
+      def to_a
+        a = []
+        curr = self
+        begin
+          a.push curr.element_x
+          curr = curr.next
+          curr or break
+          redo
+        end while nil
+        a
+      end
+
+      def to_element_stream_assuming_nonsparse
+
+        existent_linked_list = self
 
         p = -> do
-          x = node
-          node = node.next
-          if ! node
+
+          x = existent_linked_list.element_x
+
+          next_linked_list = existent_linked_list.next
+          if next_linked_list
+            existent_linked_list = next_linked_list
+          else
             p = EMPTY_P_
           end
+
           x
         end
 
@@ -54,6 +100,11 @@ module Skylab::Basic
           p[]
         end
       end
+
+      attr_reader(
+        :element_x,
+        :next,
+      )
     end
 
     Build_each_pairable_via_even_iambic__ = -> a do

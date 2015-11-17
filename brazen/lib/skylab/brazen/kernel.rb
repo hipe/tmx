@@ -87,12 +87,17 @@ class Kernel  # [#015]
 
   # ~ silo production
 
-  const_rx = nil
+  def register_silo_daemon x, sym
 
-  define_method :silo do | sym, & x_p |
+    _silos.register_silo_daemon__ x, sym
+  end
 
-    const_rx ||= /\A[A-Z]/
-    if const_rx =~ sym
+  def silo sym, & x_p
+
+    if Home_::Silo::CONSTISH_RX =~ sym
+
+      # when it looks like a const, assume we don't have to separate it
+
       silo_via_normal_identifier [ sym ]
     else
       _silos.via_symbol sym, & x_p
@@ -115,13 +120,7 @@ class Kernel  # [#015]
   end
 
   def _silos
-    @__silos ||= Home_::Silo::Collection.new @reactive_tree_seed, self
-  end
-
-  def init_silos unb_models
-    @__silos = Home_::Silo::Collection.new unb_models, self
-    yield @__silos
-    NIL_
+    @___silos ||= Home_::Silo::Collection.new @reactive_tree_seed, self
   end
 
   # ~ unbound resolution

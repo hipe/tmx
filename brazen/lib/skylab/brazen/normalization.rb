@@ -2,14 +2,11 @@ module Skylab::Brazen
 
   module Home_::Normalization  # see [#087]
 
-    # HOLDING: formal_prp_st = entity_x.formal_properties.to_value_stream
-    # HOLDING : __during_entity_normalize do | entity_x |
-
     Against_model_stream = -> entity_x, formal_prp_st, & oes_p do  # see [#087]
 
       miss_prp_a = nil
 
-      o = Argument_Normalizer_Construction__.new
+      o = Build_Knownness_Normalizer__.new
 
       o.apply_default = -> model do
         model.default_value_via_entity_ entity_x
@@ -23,44 +20,44 @@ module Skylab::Brazen
       end
 
       o.on_event_selectively = oes_p
-      normalize_qualified_knownness = o.flush
+      normalize_knownness = o.flush
 
-      qkn = ACHIEVED_  # if there are no formal properties, watch what happens
+      kn = ACHIEVED_  # if there are no formal properties, watch what happens
 
       begin
 
         prp = formal_prp_st.gets
         prp or break
 
-        qkn = entity_x.qualified_knowness_via_association_ prp
+        kn = entity_x.knowness_via_association_ prp
 
-        if qkn.is_known_known
+        if kn.is_known_known
           was_known = true
-          orig_x = qkn.value_x
+          orig_x = kn.value_x
         else
           was_known = false
         end
 
-        qkn = normalize_qualified_knownness[ qkn, prp ]
-        qkn or break
+        kn = normalize_knownness[ kn, prp ]
+        kn or break
 
         yes = nil
         if was_known
-          if qkn.is_known_known
-            if orig_x != qkn.value_x
+          if kn.is_known_known
+            if orig_x != kn.value_x
               yes = true
             end
           else
             self._STRANGE
           end
-        elsif qkn.is_known_known
+        elsif kn.is_known_known
           yes = true
         end
 
         # (it may be that it was not known and it is not known)
 
         if yes
-          _ = entity_x.set_value_of_formal_property_ qkn.value_x, prp
+          _ = entity_x.set_value_of_formal_property_ kn.value_x, prp
           _ or self._NEVER  # #todo - assume this always succeeds?
         end
 
@@ -69,14 +66,14 @@ module Skylab::Brazen
 
       if miss_prp_a
         entity_x.receive_missing_required_properties_array miss_prp_a
-      elsif qkn
+      elsif kn
         ACHIEVED_
       else
-        qkn
+        kn
       end
     end
 
-    class Argument_Normalizer_Construction__
+    class Build_Knownness_Normalizer__
 
       attr_writer(
         :apply_default,
@@ -90,15 +87,9 @@ module Skylab::Brazen
 
           # 1. if value is unknown and defaulting is available, apply it.
 
-          __is_unknown = if kn.is_known_known
-            kn.value_x.nil?
-          else
-            true
-          end
+          if ! kn.is_effectively_known && model.has_default
 
-          if __is_unknown && model.has_default
-
-            kn = Callback_::Known_Known[ @apply_default[ model ] ]
+            kn = kn.new_with_value @apply_default[ model ]
           end
 
           # (it may be that you don't know the value and there is no default)
@@ -107,20 +98,15 @@ module Skylab::Brazen
 
           bx = model.ad_hoc_normalizer_box
           if bx
-            kn = __add_hocs kn.to_qualified_known_around( model ), bx, & x_p
+            kn = __add_hocs kn, bx, model, & x_p
           end
 
           # 3. if this is a required property and it is unknown, act.
           #    (skip this if the field failed a normalization above.)
 
           if kn
-            __is_unknown = if kn.is_known_known
-              kn.nil?
-            else
-              true
-            end
 
-            if __is_unknown && model.is_required
+            if ! kn.is_effectively_known && model.is_required
 
               kn = @when_missing.call kn, MISSING___ do
                 Home_::Property.build_missing_required_properties_event(
@@ -135,7 +121,7 @@ module Skylab::Brazen
 
       MISSING___ = [ :error, :missing_required_properties ].freeze
 
-      def __add_hocs qkn, bx, & x_p
+      def __add_hocs kn, bx, model, & x_p
 
         # ad-hocs need to know the property too (née "trios not pairs")
 
@@ -143,14 +129,18 @@ module Skylab::Brazen
 
           # at each step, value might have changed. [#053]
 
-          qkn = norm_norm_p[ qkn, & ( x_p || @on_event_selectively ) ]  # (was [#072])
-          qkn or break
+          _qkn = kn.to_qualified_known_around model
+
+          kn = norm_norm_p[ _qkn, & ( x_p || @on_event_selectively ) ]  # (was [#072])
+          kn or break
+          kn.is_qualified and self._SHAPE_ERROR_we_want_QKNs_in_and_KNs_out
         end
-        qkn
+
+        kn
       end
     end
 
-    o = Argument_Normalizer_Construction__.new
+    o = Build_Knownness_Normalizer__.new
 
     o.apply_default = -> model do
 

@@ -4,15 +4,18 @@ module Skylab::Brazen
 
     module Reflection_  # notes in [#083]
 
+      read_via_ivar = nil
+      read_via_method = nil
+
       Reader = -> acs do
 
         if acs.respond_to? READ_METHOD__
           -> asc do
-            Read_via_method__[ asc, acs ]
+            read_via_method[ asc, acs ]
           end
         else
           -> asc do
-            Read_via_ivar__[ asc, acs ]
+            read_via_ivar[ asc, acs ]
           end
         end
       end
@@ -20,13 +23,13 @@ module Skylab::Brazen
       Read = -> asc, acs do  # redunds with above
 
         if acs.respond_to? READ_METHOD__
-          Read_via_method__[ asc, acs ]
+          read_via_method[ asc, acs ]
         else
-          Read_via_ivar__[ asc, acs ]
+          read_via_ivar[ asc, acs ]
         end
       end
 
-      Read_via_method__ = -> asc, acs do
+      read_via_method = -> asc, acs do
 
         wv = acs.send READ_METHOD__, asc
         if wv
@@ -38,7 +41,7 @@ module Skylab::Brazen
         end
       end
 
-      Read_via_ivar__ = -> asc, acs do
+      read_via_ivar = -> asc, acs do
 
         ivar = asc.name.as_ivar
         if acs.instance_variable_defined? ivar
@@ -53,7 +56,7 @@ module Skylab::Brazen
 
         # for now, we don't cache the reflection on the below 2 methods which
         # leaves the door open for some extreme hacking of singleton classes.
-        # see #REFL-A for more.
+        # see [#]refl-A for more.
 
         if acs.respond_to? :to_component_symbol_stream
 
@@ -91,7 +94,7 @@ module Skylab::Brazen
 
           # if one, the other, or both had method definitions; then the
           # aggregate order will be in "categories" (in our hard-coded)
-          # order instead of by method definition order.
+          # order instead of by method definition order. (more at [#]refl-B.)
 
           if ! assocs_defined
             as_st = mi[].to_any_nonzero_length_association_entry_stream
@@ -132,7 +135,7 @@ module Skylab::Brazen
 
         def initialize meth_a
 
-          # the below cacheing rationale is explored at #REFL-C
+          # the below cacheing rationale is explained at [#]refl-C
 
           @_entry_stream = -> do
 

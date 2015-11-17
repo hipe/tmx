@@ -2,175 +2,102 @@ module Skylab::Brazen
 
   module Autonomous_Component_System
 
-    module Interpretation  # notes in [#083]
+    module Interpretation
 
-      Accept_component_change = -> acs, asc, change_p do  # [mt] ONLY
+      Accept_component_change = -> new_component, asc, acs do  # [mt] ONLY
 
-        # required reading: #INTERP-accept-component-change
+        # guarantee storage of new component. result in proc that produces
+        # event describing the change.
 
         # make a note of any exisiting value before we replace it
 
         orig_qkn = ACS_::Reflection_::Read[ asc, acs ]
 
-        # what is the new value we are chaning the component to?
-
-        new_component = Change___.via( & change_p ).new_component
-
-        # (we assume A) that we are #ASSUMPTION-A not long-running, and that
+        # (we assume A) that we are [#083]:assumption-A not long-running, and that
         # B) in the typical request, at most one component will change (per
         # ACS, and in general). if one or more of A, B is not true, probably
-        # the client should make kind of component change writer..)
+        # the client should make some kind of component change writer..)
 
         ACS_::Interpretation_::Write_value[ new_component, asc, acs ]  # guaranteed
 
-        # (see "epilogue":)
+        # (see #resulting-in-proc)
 
-        if orig_qkn.is_effectively_known  # #INOUT-A, #INOUT-B
+        _LL = Home_.lib_.basic::List::Linked[ nil, asc.name ]
 
-          _mutation_p = -> y do
-            y.yield :info_channel, [ :info, :component_changed ]
-            y.yield :event_class, ACS_.event( :Component_Changed )
-            y.yield :event_members,
+        if orig_qkn.is_effectively_known  # #inout-A, [#]inout-B
+
+          -> do
+            ACS_.event( :Component_Changed ).new_with(
               :current_component, new_component,
               :previous_component, orig_qkn.value_x,
-              :component_association, asc,
-              :ACS, acs
+              :context_as_linked_list_of_names, _LL,
+              :suggested_event_channel, [ :info, :component_changed ],
+            )
           end
         else
-
-          _mutation_p = -> y do
-            y.yield :info_channel, [ :info, :component_added ]
-            y.yield :event_class, ACS_.event( :Component_Added )
-            y.yield :event_members,
+          -> do
+            ACS_.event( :Component_Added ).new_with(
               :component, new_component,
-              :component_association, asc,
-              :ACS, acs
-          end
-        end
-
-        -> do
-          Mutation___.via( & _mutation_p )
-        end
-      end
-
-      # ~ experimental component signal API
-
-      Component_handler = -> asc, acs, & oes_p do
-
-        oes_p or self._SANITY_no_handler_from_ACS?
-
-        -> * i_a, & ev_p do
-
-          if :component == i_a.first
-            acs.send :"receive__#{ i_a * UNDER_UNDER___ }__", asc, & ev_p
-          else
-            oes_p.call( * i_a, & ev_p )
+              :context_as_linked_list_of_names, _LL,
+              :suggested_event_channel, [ :info, :component_added ],
+              :verb_lemma_symbol, :set,
+              :context_expresses_slot, true,  # "set C to X" !"added X to C"
+            )
           end
         end
       end
 
-      CONSTRUCT_STRUCT_VIA_PAIRS___ = -> & defn_p do
-        mut = new
-        _y = ::Enumerator::Yielder.new do | * x_a |
-          x_a.each_slice 2 do | k, v |
-            mut[ k ] = v
-          end
+      Build_empty_hot = -> asc, acs, & oes_p do
+
+        # assume model is "entitesque" (not primitive-esque).
+        # create a new empty component that is bound to the ACS.
+        # new component is *NOT* stored as a member value in that ACS.
+
+        o = ACS_::Interpretation_::Build_value.new nil, asc, acs, & oes_p
+
+        o.mixed_argument = if o.looks_like_compound_component__
+          IDENTITY_
+        else
+          Callback_::Polymorphic_Stream.the_empty_polymorphic_stream
         end
-        defn_p[ _y ]
-        mut
+
+        o.execute.value_x  # ..
       end
 
-      Change___ = ::Struct.new(  # experimental...
-        :new_component,
-      ) do
-        define_singleton_method :via, CONSTRUCT_STRUCT_VIA_PAIRS___
-      end
+      Component_handler = -> asc, acs do
 
-      class Mutation___
+        # see [#085]:#how-components-are-bound-to-listeners (4 lines)
 
-        # a "proto event" experiment - maybe mutable ..
+        -> * i_a, & x_p do
 
-        attr_accessor(
-          :info_channel,
-          :event_class,
-          :event_members,
-        )
+          st = Callback_::Polymorphic_Stream.via_array i_a
 
-        def self.via & defn_p
-          shell = self::Shell___.new self
-          _y = ::Enumerator::Yielder.new do | sym, * x_a |
-            shell.__send__ sym, * x_a
-          end
-          defn_p[ _y ]
-          shell.flush
-        end
+          base = :"receive_component__"
+          begin
 
-        def to_event
+            try_m = :"#{ base }#{ st.current_token }__"
 
-          @event_class.new_via_each_pairable @event_members
-        end
-
-        def flush_to_mutation_with_context__ higher_x  # see [#bs-028] `flush_to_`
-
-          # add an item of context to the context chain. if this mutation
-          # hasn't been made already, this replaces the original "component
-          # association" structure with a name function (that can be chained)
-
-          _lower_x = @event_members.fetch :component_association
-
-          _lower_name = _lower_x.name
-
-          _higher_name = higher_x.name
-
-          _new_name = _higher_name.to_linked_list_node_in_front_of _lower_name
-
-          @event_members.replace :component_association, _new_name
-
-          self
-        end
-      end
-
-      class Mutation___::Shell___ < ::BasicObject
-
-        def initialize cls
-          @_cls = cls
-        end
-
-        class << self
-
-          def single m
-            define_method m do | x |
-              ( @_x ||= @_cls.new ).send :"#{ m }=", x ; nil
+            if acs.respond_to? try_m
+              m = try_m
+              st.advance_one
+              if st.unparsed_exists
+                base = try_m
+                redo
+              end
             end
+            break
+          end while nil
+
+          if m
+            _maybe_none = st.flush_remaining_to_array
+            acs.send m, asc, * _maybe_none, & x_p
+          else
+            acs.receive_component_event asc, i_a, & x_p
           end
-        end  # >>
-
-        def mutable_struct x
-          @_x = x ; nil
-        end
-
-        single :info_channel
-        single :event_class
-
-        def event_members * x_a
-          o = ( @_x ||= @_cls.new )
-          o.event_members and self._NO
-          bx = Callback_::Box.new
-          o.event_members = bx
-          x_a.each_slice 2 do | k, v |
-            bx.add k, v
-          end
-          NIL_
-        end
-
-        def flush
-          @_x
         end
       end
 
-      # ~
-
-      class Value_Popper  # :+[#br-085]
+      class Value_Popper  # :+[#085]:VP
 
         class << self
           alias_method :[], :new
@@ -197,10 +124,6 @@ module Skylab::Brazen
 
         attr_reader :unparsed_exists
       end
-
-      # ~
-
-      UNDER_UNDER___ = '__'
     end
   end
 end

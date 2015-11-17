@@ -15,6 +15,11 @@ module Skylab::Brazen
         @_unbound_modules = unb_mod
       end
 
+      def register_silo_daemon__ x, sym
+
+        @_bx.add sym, x ; nil
+      end
+
       def via_symbol sym, & x_p
 
         @_h.fetch sym do
@@ -199,11 +204,6 @@ module Skylab::Brazen
 
         unb.silo_module.const_get DAEMON_CONST__, false
       end
-
-      def register_silo x, sym
-        @_bx.add sym, x
-        NIL_
-      end
     end
 
     class Daemon
@@ -314,6 +314,7 @@ module Skylab::Brazen
       )
     end  # silo daemon class
 
+    CONSTISH_RX = /\A[A-Z]/
     DAEMON_CONST__ = :Silo_Daemon
   end
 end

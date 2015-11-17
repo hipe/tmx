@@ -9,14 +9,14 @@ module Skylab::TanMan
       :preconditions, [ :dot_file ],
 
       :required,
-      :ad_hoc_normalizer, -> arg, & oes_p do
-        Meaning_::Actors__::Edit::Normalize_name[ arg, & oes_p ]
+      :ad_hoc_normalizer, -> qkn, & oes_p do
+        Meaning_::Actors__::Edit::Normalize_name[ qkn, & oes_p ]
       end,
       :property, :name,
 
       :required,
-      :ad_hoc_normalizer, -> arg, & oes_p do
-        Meaning_::Actors__::Edit::Normalize_value[ arg, & oes_p ]
+      :ad_hoc_normalizer, -> qkn, & oes_p do
+        Meaning_::Actors__::Edit::Normalize_value[ qkn, & oes_p ]
       end,
       :property, :value )
 

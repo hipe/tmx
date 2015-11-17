@@ -1073,7 +1073,7 @@ module Skylab::Brazen
 
       # ~~ normalization API
 
-      define_method :qualified_knowness_via_association_, KNOWNNESS_VIA_IVAR_METHOD_
+      define_method :knowness_via_association_, KNOWNNESS_VIA_IVAR_METHOD_
 
       def normalize_qualified_knownness qkn, & x_p  # :+[#ba-027] assume some normalizer (for now)
 

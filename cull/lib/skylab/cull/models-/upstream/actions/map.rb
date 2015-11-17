@@ -8,15 +8,15 @@ module Skylab::Cull
 
       Brazen_::Modelesque.entity self,
 
-          :ad_hoc_normalizer, -> arg, & oes_p do
-            if arg.is_known_known
+          :ad_hoc_normalizer, -> qkn, & oes_p do
+            if qkn.is_known_known
               Home_.lib_.basic::Number.normalization.with(
-                :argument, arg,
+                :qualified_knownness, qkn,
                 :number_set, :integer,
                 :minimum, 1,
                 & oes_p )
             else
-              arg
+              qkn.to_knownness
             end
           end,
           :default, 1,

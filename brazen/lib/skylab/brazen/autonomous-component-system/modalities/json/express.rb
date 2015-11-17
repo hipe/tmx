@@ -50,7 +50,7 @@ module Skylab::Brazen
           end
         end
 
-        def _recurse acs  # see [#083]:note-JSON-expression
+        def _recurse acs  # see [#083]:on-JSON-expression
 
           result = nil
 
@@ -82,13 +82,13 @@ module Skylab::Brazen
                 store[ x ] ; redo  # false is always stored as-is
               end
 
-              redo  # nil is never stored per #INOUT-A
+              redo  # nil is never stored per #inout-A
             end
 
             # if it's a true-ish compound component, always recurse
 
-            _mdl = o.association.component_model
-            if ACS_::Reflection::Model_is_compound[ _mdl ]
+            _is = o.association.model_classifications.looks_compound
+            if _is
 
               x_ = _recurse x
               if x_
@@ -156,7 +156,7 @@ module Skylab::Brazen
 
         Looks_primitive__ = -> x do
           case x
-          when ::TrueClass, ::Fixnum, ::Float, ::String  # #INOUT-C
+          when ::TrueClass, ::Fixnum, ::Float, ::String  # [#]inout-C
             true
           else
             false

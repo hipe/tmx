@@ -26,18 +26,18 @@ module Skylab::Basic
         end  # >>
 
         Callback_::Actor.methodic self, :properties,
-          :argument,
+          :qualified_knownness,
           :number_set,  # symbol
           :minimum
 
         def initialize & edit_p
 
-          @argument = nil
+          @qualified_knownness = nil
           @_do_recognize_positive_sign = false
           @minimum = nil
           instance_exec( & edit_p )
           _normalize_self
-          if ! @argument
+          if ! @qualified_knownness
             freeze
           end
         end
@@ -67,7 +67,7 @@ module Skylab::Basic
               _x = in_st.current_token
 
               _qkn = Callback_::Qualified_Knownness.via_value_and_symbol(
-                _x, :argument )
+                _x, :qualified_knownness )
 
               vw = normalize_qualified_knownness _qkn do | * i_a, & ev_p |
 
@@ -85,7 +85,7 @@ module Skylab::Basic
 
         def normalize_qualified_knownness arg, & oes_p
           otr = dup
-          otr.__init_copy_with :argument, arg, & oes_p
+          otr.__init_copy_with :qualified_knownness, arg, & oes_p
           otr.execute
         end
 
@@ -102,7 +102,7 @@ module Skylab::Basic
 
         def execute
 
-          @x = @argument.value_x  # might not have been provided. we don't care
+          @x = @qualified_knownness.value_x  # might not have been provided. we don't care
 
           ok = send :"__when_set_is__#{ @number_set }__"
 
@@ -203,7 +203,7 @@ module Skylab::Basic
         end
 
         def _assoc
-          @argument.association
+          @qualified_knownness.association
         end
 
         def _new_invalid_event

@@ -44,7 +44,7 @@
 [#087]       #track similar normalization logics (this might be a redundant tracker)
 [#086]       #track cases where failure is "fuzzy" (i.e non-atomic),
                ignored for the greater good, for usability
-[#085]       track varied implementations of poly.stream for one value
+[#085]       ACS construction, composition and eventings ..
              (#was: (#moved-to: [#ba-052]))
 [#084]       thoughts on ACS isomophisms ..
              ( #also :+#wishlist a `flag` meta-meta property )

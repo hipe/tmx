@@ -4,7 +4,7 @@ module Skylab::Snag
 
     Actors_ = ::Module.new
 
-    class Actors_::Normalize_stem
+    class Actors_::Normalize_stem  # 1x
 
       Callback_::Actor.call self, :properties,
         :x

@@ -15,6 +15,8 @@ module Skylab::Snag
       end  # >>
     end
 
+    # -- Construction methods
+
     class << self
 
       def interpret_component st, & x_p  # t5..
@@ -47,7 +49,7 @@ module Skylab::Snag
       private :new  # t1
     end  # >>
 
-    # ~ initializing & copying (internal)
+    # -- Initializers
 
     def initialize id_o=nil, body=nil
 
@@ -86,7 +88,7 @@ module Skylab::Snag
       NIL_
     end
 
-    # ~ mutation
+    # -- Operations (sort of)
 
     def prepend_string s, & oes_p
 
@@ -118,7 +120,7 @@ module Skylab::Snag
       ACS_[].edit x_a, self, & x_p
     end
 
-    ## ~~ t4 implement above
+    # -- Components
 
     def __extended_content__component_association
 
@@ -260,7 +262,7 @@ module Skylab::Snag
       NIL_  # a no-op is not a success (covered)
     end
 
-    # ~ expression & reflection
+    # -- expression & reflection
 
     ## ~~ reflection related to tagging
 
@@ -528,18 +530,18 @@ module Skylab::Snag
       end
     end
 
-    Normalize_ID_ = -> arg, & x_p do
+    Normalize_ID_ = -> qkn, & x_p do
 
-      x = ( arg.value_x if arg.is_known_known )
+      x = ( qkn.value_x if qkn.is_known_known )
       if x
         o = Home_::Models_::Node_Identifier.new_via_user_value x, & x_p
         if o
-          arg.new_with_value o
+          Callback_::Known_Known[ o ]
         else
           o
         end
       else  # let required/optional handle this, *not* us
-        arg
+        qkn.to_knownness
       end
     end
 

@@ -8,12 +8,12 @@ module Skylab::TanMan
 
       class Edit::Normalize_name
 
-        Actor_.call self, :properties, :arg
+        Actor_.call self, :properties, :qualified_knownness
 
         def execute
-          @arg.value_x
-          if VALID_NAME_RX__ =~ @arg.value_x
-            @arg
+
+          if VALID_NAME_RX__ =~ @qualified_knownness.value_x
+            @qualified_knownness.to_knownness
           else
             when_invalid
           end
@@ -22,7 +22,7 @@ module Skylab::TanMan
         def when_invalid
           @on_event_selectively.call :error, :invalid_property_value do
             Callback_::Event.inline_not_OK_with :invalid_meaning_name,
-                :meaning_name, @arg.value_x do | y, o |
+                :meaning_name, @qualified_knownness.value_x do | y, o |
               y << "invalid meaning name #{ ick o.meaning_name } - meaning names #{
                }must start with a-z followd by [-a-z0-9]"
             end
@@ -34,10 +34,10 @@ module Skylab::TanMan
 
       class Edit::Normalize_value
 
-        Actor_.call self, :properties, :arg
+        Actor_.call self, :properties, :qualified_knownness
 
         def execute
-          @x = @arg.value_x
+          @x = @qualified_knownness.value_x
           if NL_RX__ =~ @x
             when_invalid
           else
@@ -62,7 +62,7 @@ module Skylab::TanMan
             report_strip d
             @x = s
           end
-          @arg
+          @qualified_knownness.to_knownness
         end
 
         def report_strip d

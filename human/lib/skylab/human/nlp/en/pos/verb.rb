@@ -52,7 +52,10 @@ module Skylab::Human
             [ :singular, :third, :present ] => 'has',
             [ :plural, :present ] => have,
             [ :preterite ] => 'had'
-          }
+          },
+          'set' => {
+            [ :preterite ] => 'set',
+          },
         }
       end
 
@@ -308,6 +311,10 @@ module Skylab::Human
       ENDS_IN_E_RX__ = /e\z/i
 
       DOUBLE_T_RX___ = /[aeiou]t\z/
+
+      def is_regular
+        true
+      end
 
       module THE_NEGATION_PHRASE___
         class << self

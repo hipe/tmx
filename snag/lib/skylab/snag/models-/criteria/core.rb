@@ -206,14 +206,14 @@ module Skylab::Snag
           Criteria_
         end
 
-        # ~ the next two are for [#br-035] expressive events
+        # ~ near [#br-035] expressive events
 
-        def description_under _expag
-          NIL_  # let next method express everything
+        def name  # while #open [#br-107]
+          model_name
         end
 
         nf = nil
-        define_method :name do
+        define_method :model_name do
           nf ||= Callback_::Name.via_human 'persisted criteria collection'
         end
 

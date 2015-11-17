@@ -155,7 +155,7 @@ module Skylab::Brazen
           end
         end
 
-        define_method :qualified_knowness_via_association_, KNOWNNESS_VIA_IVAR_METHOD_
+        define_method :knowness_via_association_, KNOWNNESS_VIA_IVAR_METHOD_
 
         def _set_value_of_property x, prp
           instance_variable_set prp.as_ivar, x
@@ -454,7 +454,7 @@ module Skylab::Brazen
 
             define_method prp_.name_symbol do
 
-              kn = self.qualified_knowness_via_association_ prp_
+              kn = self.knowness_via_association_ prp_
 
               if kn.is_known_known
                 kn.value_x
@@ -479,7 +479,7 @@ module Skylab::Brazen
 
           prp.__set_internal_read_proc do | entity, prp_ |
 
-            kn = entity.qualified_knowness_via_association_ prp
+            kn = entity.knowness_via_association_ prp
 
             if kn.is_known_known
               known.value_x
@@ -537,7 +537,7 @@ module Skylab::Brazen
 
             prp.is_required or next
 
-            kn = entity.qualified_knowness_via_association_ prp
+            kn = entity.knowness_via_association_ prp
 
             __is_unknown = if kn.is_known_known
               kn.value_x.nil?

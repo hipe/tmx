@@ -26,9 +26,9 @@ module Skylab::Basic::TestSupport
 
       expect_no_events
 
-      qkn = @result
-      qkn.association or fail
-      -1 == qkn.value_x or fail
+      _kn = @result
+      _kn.is_known_known or fail
+      -1 == _kn.value_x or fail
     end
 
     def _against x

@@ -684,6 +684,14 @@ module Skylab::Callback
       Qualified_Knownness.via_association asc
     end
 
+    def new_with_value x
+      Known_Known[ x ]
+    end
+
+    def is_effectively_known
+      false
+    end
+
     def is_known_known
       false
     end
@@ -708,6 +716,14 @@ module Skylab::Callback
 
     def to_qualified_known_around asc
       Qualified_Knownness.via_value_and_association @value_x, asc
+    end
+
+    def new_with_value x
+      self.class[ x ]
+    end
+
+    def is_effectively_known
+      ! @value_x.nil?
     end
 
     attr_reader :value_x
@@ -760,6 +776,14 @@ module Skylab::Callback
       @is_known_known = is_knkn
       if is_knkn
         @value_x = x
+      end
+    end
+
+    def to_knownness
+      if @is_known_known
+        Known_Known[ @value_x ]
+      else
+        KNOWN_UNKNOWN
       end
     end
 
@@ -1101,7 +1125,8 @@ module Skylab::Callback
 
     module Methods__
       def const_missing i
-        Const_Missing_.new( self, i ).resolve_some_x
+        _ = Const_Missing_.new( self, i ).resolve_some_x
+        _
       end
     end
 
@@ -2240,18 +2265,6 @@ module Skylab::Callback
       @as_slug = i.to_s.gsub( NORMALIZE_CONST_RX__, DASH_ ).
         gsub( UNDERSCORE_, DASH_ ).downcase.freeze
     end
-
-    # ~
-
-    def to_linked_list_node_in_front_of name  # :+[#ba-002]:LL
-      dup.___init_as_linked_list_node_in_front_of name
-    end
-
-    def ___init_as_linked_list_node_in_front_of x
-      @next = x ; self
-    end
-
-    attr_reader :next
 
     def name  # use a name object as a mock for something else
       self

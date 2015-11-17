@@ -41,6 +41,7 @@ module Skylab::Brazen
 
         @_y = y
         initialize_as_expresser expag
+        index_for_expression_oldschool
 
         if @can_express_collection_related_
 
@@ -69,17 +70,17 @@ module Skylab::Brazen
 
       def __in_S_there_are_no_M
 
-        say 'in'
+        accept_sentence_part 'in'
 
-        _did = say_unique @collection_model_string_, @collection_string_
+        _did = express_unique @collection_model_string_, @collection_string_
 
         if ! _did
-          say 'component collection'
+          accept_sentence_part 'component collection'
         end
 
         component_noun_s = @component_model_string_ || 'such component'
 
-        say_by do
+        express_by do
           "there are no #{ plural_noun component_noun_s }"
         end
 
@@ -90,20 +91,20 @@ module Skylab::Brazen
 
         # "<acs> does not have <asc> <cmp>"
 
-        say_any @collection_model_string_
+        express_any @collection_model_string_
 
-        say_any @collection_string_
+        express_any @collection_string_
 
-        say 'does not have'
+        accept_sentence_part 'does not have'
 
         if @can_express_component_related_
 
-          say_any @component_association_string_
+          express_any @component_association_string_
 
-          say_any style_as_ick_if_necessary @component_string_
+          express_any style_as_ick_if_necessary @component_string_
 
         else
-          say 'such a component'
+          accept_sentence_part 'such a component'
         end
 
         _flush
@@ -114,18 +115,18 @@ module Skylab::Brazen
         # "there is no <mdl> with <asc> "<cmp>" in <ACS>"
         # e.g "three is no no with identifer '[#10]' in foo/bar" (covered)
 
-        say 'there is no'
+        accept_sentence_part 'there is no'
 
         d = list_length
 
-        did_model = say_any @component_model_string_
+        did_model = express_any @component_model_string_
 
         asc_s = @component_association_string_
         if asc_s
           if did_model
-            say 'with'
+            accept_sentence_part 'with'
           end
-          did_asc = say asc_s
+          did_asc = accept_sentence_part asc_s
         end
 
         s = @component_string_
@@ -133,20 +134,20 @@ module Skylab::Brazen
           if did_model || did_asc
             s = style_as_ick_if_necessary s
           end
-          say s
+          accept_sentence_part s
         end
 
         if d == list_length
-          say 'such component'
+          accept_sentence_part 'such component'
         end
 
         # any ACS brings us the prepositional phrase
 
         sp = new_subphrase
-        sp.say_any @collection_model_string_
-        sp.say_any @collection_string_
+        sp.express_any @collection_model_string_
+        sp.express_any @collection_string_
         if sp.list_length.nonzero?
-          say 'in'
+          accept_sentence_part 'in'
           sp.flush_into_list list
         end
 
@@ -157,11 +158,11 @@ module Skylab::Brazen
 
         init_expresser_list
 
-        say @component_model_string_
+        accept_sentence_part @component_model_string_
 
-        say 'not found -'
+        accept_sentence_part 'not found -'
 
-        say style_as_ick_if_necessary @component_string_
+        accept_sentence_part style_as_ick_if_necessary @component_string_
 
         _flush
       end

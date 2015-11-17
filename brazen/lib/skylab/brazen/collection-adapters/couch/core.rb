@@ -16,12 +16,13 @@ module Skylab::Brazen
       end,
       :ad_hoc_normalizer, -> qkn, & oes_p do
 
-        if ! qkn.is_known_known || qkn.value_x.nil?
-          # fallthru. let missing required check catch it.
-          qkn
+        if ! qkn.is_effectively_known
+
+          qkn.to_knownness  # fallthru. let missing required's catch it
 
         elsif /\A[-a-z0-9]+\z/ =~ qkn.value_x
-          qkn
+
+          qkn.to_knownness  # valid!
 
         else
           oes_p.call :error, :invalid_property_value do
@@ -52,7 +53,7 @@ module Skylab::Brazen
         end
         if x
           if /\A[0-9]{1,4}\z/ =~ x
-            qkn
+            qkn.to_knownness
           else
             oes_p.call :error, :invalid_property_value do
               Callback_::Event.inline_not_OK_with(
@@ -60,7 +61,7 @@ module Skylab::Brazen
             end
           end
         else
-          qkn
+          qkn.to_knownness
         end
       end,
       :property, :port

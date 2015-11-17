@@ -27,6 +27,7 @@ module Skylab::Brazen
       def __express_into_under y, expag
 
         initialize_as_expresser expag
+        index_for_expression_oldschool
 
         # the way the `@ok` member sees expression is interesting, and has
         # to do with how we express what is expected alongside an expression
@@ -55,19 +56,19 @@ module Skylab::Brazen
 
         if ok
 
-          say 'found existing'
+          accept_sentence_part 'found existing'
           _express_component_somehow
 
         elsif @can_express_collection_related_
 
-          express_collection
-          say 'already has'  # :+[#035]:WISH-A
+          express_collection_via_members
+          accept_sentence_part 'already has'  # :+[#035]:WISH-A
           _express_component_somehow
 
         else
 
           sp = new_subphrase
-          sp.say_unique(
+          sp.express_unique(
             @component_model_string_,
             @component_association_string_,
             @component_string_,
@@ -76,11 +77,11 @@ module Skylab::Brazen
 
           if a.length <= 1
             _express_component_somehow
-            say "already existed"
+            accept_sentence_part "already existed"
           else
-            say a.shift
-            say "already existed:"
-            say_via_nonsparse_array a
+            accept_sentence_part a.shift
+            accept_sentence_part "already existed:"
+            express_via_nonsparse_array a
           end
         end
 
@@ -88,7 +89,7 @@ module Skylab::Brazen
       end
 
       def _express_component_somehow
-        express_component or say 'component'
+        express_component_via_members or accept_sentence_part 'component'
       end
     end
   end

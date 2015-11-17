@@ -90,15 +90,21 @@ module Skylab::FileMetrics
           y << "(ETC explain the thing with the '[]')"
 
         end,
+
         :argument_arity, :zero_or_more,
+
         :ad_hoc_normalizer, -> qkn, & oes_p do
-          if '[]' == qkn.value_x.last
-            qkn.value_x.clear
+          a = qkn.value_x
+          if '[]' == a.last
+            a.clear  # EGADS!
           end
-          qkn
+          Callback_::Known_Known[ a ]
         end,
+
         :default, [ '.*' ],
+
         :property, :exclude_dir,
+
 
         :description, -> y do
 
@@ -107,8 +113,11 @@ module Skylab::FileMetrics
           y << 'adding more patterns broadens the search (OR not AND).'
           y << 'this option is only relevant on directories.'
         end,
+
         :argument_arity, :zero_or_more,
+
         :property, :include_name,
+
 
         :description, -> y do
           y <<  "whether or not to actually run the report (dry-run-esque)"

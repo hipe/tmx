@@ -51,16 +51,16 @@ rubric one might wonder why we haven't simplfied our implementation further:
     required that has not been provided, couldn't you signal a
     normalization failure in the same way that ad-hocs do?
 
-well the answer is "yes" and "sort-of", resepctively. for (1), we have
+well the answer is "yes" and "sort-of", respectively. for (1), we have
 kept the logic for applying defaults "hard-coded" so that (a) the
 explicit, special treatment that this popular meta-meta-property gets in
 the property-related code has a readable counerpart here and (b) sort of
 for the "historical" reasons we want to keep this code readable, and
-that processing defauls is "more important" than processing ad-hoc
+that processing defaults is "more important" than processing ad-hoc
 processors (because it's been around longer and is more widely used).
 
 for (3), we *could* try to implement required-ness if we had to through
-the API, but we like to aggretate all required-ness failures into one
+the API, but we like to aggregate all required-ness failures into one
 event when normalizing an entity. do to so is easier if we give this one
 its own dedicated code.
 

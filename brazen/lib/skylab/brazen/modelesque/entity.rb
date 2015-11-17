@@ -100,15 +100,12 @@ module Skylab::Brazen
         "write a dipatcher method or whatever for '#{ prp.argument_arity }'"
       end
 
-
-
       # ~ normalization (a thin layer on top of entity concerns)
 
       def normalize  # :.B
 
         # since we have reached ths method at all it is safe to
         # assume that the entity has some formal properties.
-
 
         Home_::Normalization::Against_model_stream.call(
 
@@ -288,12 +285,14 @@ module Skylab::Brazen
           def __add_ad_hoc_normalization n11n
 
             append_ad_hoc_normalizer_ do | qkn, & oes_p |
-              if ( qkn.value_x if qkn.is_known_known ).nil?
-                qkn
-              else
+
+              if qkn.is_effectively_known
                 n11n.normalize_qualified_knownness qkn, & oes_p
+              else
+                qkn.to_knownness
               end
             end
+
             KEEP_PARSING_
           end
 
@@ -305,12 +304,13 @@ module Skylab::Brazen
 
             append_ad_hoc_normalizer_ do | qkn, & oes_p |
 
-              if ! qkn.is_known_known || qkn.value_x.nil?
-                qkn
-              else
+              if qkn.is_effectively_known
                 _NORMER.normalize_qualified_knownness qkn, & oes_p
+              else
+                qkn.to_knownness
               end
             end
+
             KEEP_PARSING_
           end
         end
