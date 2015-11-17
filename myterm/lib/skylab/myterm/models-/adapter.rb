@@ -1,217 +1,210 @@
 module Skylab::MyTerm
 
-  module Models_::Adapter
+  class Models_::Adapter
 
-    # this is our experimental frontier of "factory pattern" under ACS:
+    # a controller that
+    #   1) lists available adapters
+    #   2) processes a change to the selected adapter
+    #   3) maintains a readable reference to any selected adapter
+    #   4) the above *reference* is persistest
 
-    # the scope of this "node" is
-    #   1) list available adapters,
-    #   2) be the custodian of and express which adapter is selected and
-    #   3) to process requests to change the selected adapter.
-
-    # it's annoying to attempt all of this with one component (near state
-    # changes and serialization) so we attempt a factory pattern. however,
-    # our client need not be aware (directly) that we switch classes.
-
-    # creating an inheritance hierarchy for this is both problematic in
-    # theory and helpful in practice.
+    # -- Construction methods
 
     class << self
 
       def interpret_component st, acs, & p
-
-        adapters = acs.method :adapters
-
         if st.unparsed_exists
-
-          Selected__._new_entity( adapters, & p ).
-            _interpret_self_through_selected_adapter_name st.gets_one
-
+          Unresolved_Reference___.new st.gets_one, acs, & p
         else
-          Selection___._new_controller adapters, & p
+          new acs, & p
         end
       end
+
+      def _via_selected_adapter ada, svs, & p
+        new ada, svs, & p
+      end
+
+      private :new
     end  # >>
 
-    Common__ = ::Class.new
+    # -- Unserialization intermediary
 
-    class Selection___ < Common__
+    class Unresolved_Reference___
 
-      class << self
-        alias_method :_new_controller, :new
-        private :new
-      end  # >>
+      # see [#003]:#note-about-serialized-references
 
-      # inherit these actions:
+      def initialize s, svs, & p
 
-      def __list__component_operation
-        super
+        @_oes_p = p
+        @s = s
+        @svs = svs
       end
 
-      def __set__component_operation
-        super
-      end
-    end
+      def unserialize_
 
-    class Selected__ < Common__
-
-      class << self
-        alias_method :_new_entity, :new
-        private :new
-      end  # >>
-
-      def _interpret_self_through_selected_adapter_name s
-
-        # assume this is for all of your constructions. if you don't resolve
-        # an adapter from the name, you cannot exist as a "selected."
-
-        ada  = @_adapters[].touch_adapter_via_string__ s
+        ada = Adapter_via_string__[ @s, @svs, & @_oes_p ]
         if ada
-          ada = ada.flush_to_selected_adapter
-          @selected_adapter = ada
-          self
+
+          # breaking immutability, it is this codepoint that decides what
+          # adapter is selected. it does not notify the adapter's custodian.
+
+          ada.mutate_by_becoming_selected_
+
+          Here_._via_selected_adapter ada, @svs, & @_oes_p
         else
           ada
         end
-      end  # >>
-
-      # inherit these actions:
-
-      def __list__component_operation
-        super
-      end
-
-      def __set__component_operation
-        super
-      end
-
-      # ~ for [#br-035] expressive events
-
-      def description_under expag
-
-        ada = @selected_adapter
-        expag.calculate do
-          nm ada.adapter_name
-        end
-      end
-
-      # for ACS serialization
-
-      def to_primitive_for_component_serialization
-        @selected_adapter.adapter_name.as_slug
-      end
-
-      # ~ entity-like exposures
-
-      def selected_adapter__
-        @selected_adapter
       end
     end
 
-    class Common__
+    # -- Initializers
 
-      def initialize adapters_p, & oes_p
+    def initialize ada=nil, svs, & p
 
-        @_adapters = adapters_p
-        @_oes_p = oes_p
+      @_oes_p = p
+      @_svs = svs
+
+      if ada
+        @_has_selected_adapter = true
+        @_selected_adapter = ada
+      else
+        @_has_selected_adapter = false
+      end
+    end
+
+
+    # -- Expressive event hook-outs
+
+    def describe_into_under y, expag  # for modality clients
+      ACS_[]::Modalities::Reactive_Tree::Generate_description[ y, expag, self ]
+    end
+
+    def description_under expag  # for [#br-035] expressive events
+
+      ada = @_selected_adapter
+      expag.calculate do
+        nm ada.adapter_name
+      end
+    end
+
+    # -- ACS hook-ins
+
+    def to_primitive_for_component_serialization  # for s11n
+      @_selected_adapter.adapter_name.as_slug
+    end
+
+    # -- Operations
+
+    def __set__component_operation
+
+      yield :description, -> y do
+        y << "set the adapter"
       end
 
-      # ~ the "set" operation
-
-      def __set__component_operation
-
-        yield :description, -> y do
-          y << "set the adapter"
-        end
-
-        yield :parameter, :adapter, :description, -> y do
-          y << "the name of the adapter to use"
-          y << "(see `list` for a list of adapters)"   # etc
-        end
-
-        method :__receive_set_adapter_name
+      yield :parameter, :adapter, :description, -> y do
+        y << "the name of the adapter to use"
+        y << "(see `list` for a list of adapters)"   # etc
       end
 
-      def __receive_set_adapter_name adapter
+      method :___receive_set_adapter_name
+    end
 
-        sel = Selected__._new_entity( @_adapters, & @_oes_p ).
-          _interpret_self_through_selected_adapter_name adapter
+    def ___receive_set_adapter_name adapter
 
-        if sel
+      _hacky_wrap_to_add_verb = -> * i_a, & ev_p do
 
-          # here is the horcrux (i mean crux) of our factory pattern: we
-          # signal to any listening client that "we" should be replaced
-          # with this new value. in some cases this means effectively
-          # changing the class of the component, in other cases not.
+        _structured_event = ev_p[]
+        _contexted = Begin_context_[ :set, _structured_event ]
+        @_oes_p.call( * i_a ) do
+          _contexted
+        end
+      end
 
-          @_oes_p.call :component, :change do | y |
+      ada = Adapter_via_string__[ adapter, @_svs, & _hacky_wrap_to_add_verb ]
+      if ada
+        ___change_via ada
+      else
+        ada
+      end
+    end
 
-            y.yield :new_component, sel
-          end
+    def ___change_via ada
+
+      # epic: when a new valid adapter is selected, feign immutability and
+      # make a new version of yourself that reflects the change. send this
+      # new version in a signal to any custodian, which should swap in new
+      # for old and generate a natural-sounding event. s11n works.
+      # (we do not currently check if new adapter is same as old for one reason)
+
+      if @_has_selected_adapter
+        @_selected_adapter.mutate_by_becoming_not_selected__
+      end
+
+      ada.mutate_by_becoming_selected_
+
+      new_self = self.class._via_selected_adapter ada, @_svs, & @_oes_p
+
+      @_oes_p.call :change do
+        new_self
+      end
+    end
+
+    def __list__component_operation
+
+      yield :description, -> y do
+        y << "list the available adapters"
+      end
+
+      -> do
+        @_svs.adapters_.all_to_stream__
+      end
+    end
+
+    # -- Project hook-outs
+
+    def selected_adapter__
+      @_selected_adapter or self._SANITY
+    end
+
+    load_ticket_via_string = nil
+
+    Adapter_via_string__ = -> s, svs, & oes_p do
+
+      # for unserialization and UI.
+      # allow partial match, be expressive about failure.
+
+        lt = load_ticket_via_string[ s, svs, & oes_p ]
+        if lt
+          svs.adapters_.adapter_for_load_ticket_ lt
         else
-          sel
+          lt
         end
       end
 
-      # ~ the "list" operation
+      load_ticket_via_string = -> s, svs, & oes_p do
 
-      def __list__component_operation
+        cache = svs.kernel_.silo( :Adapters ).cache
 
-        yield :description, -> y do
-          y << "list the available adapters"
+        o = Brazen_::Collection::Common_fuzzy_retrieve.new( & oes_p )
+
+        o.set_qualified_knownness_value_and_symbol s, :adapter
+
+        o.stream_builder = -> do
+          cache.to_value_stream
         end
 
-        -> do
-          @_adapters[].to_adapter_stream_for_list__
+        o.name_map = -> lt do
+          lt.adapter_name.as_distilled_stem
         end
+
+        o.success_map = -> lt do
+          lt  # hi
+        end
+
+        o.execute
       end
-    end
+    # -
 
-    class Visiting_Association
-
-      # for [#003]:#storypoint-1 (in-situ)
-
-      class << self
-        alias_method :new_prototype, :new
-        private :new
-      end
-
-      def initialize ada
-        @adapter_ = ada
-      end
-
-      def new asc
-        dup.__init asc
-      end
-
-      def __init asc
-        @real_association_ = asc
-        self
-      end
-
-      def name
-        @real_association_.name
-      end
-
-      def component_model
-        @real_association_.component_model
-      end
-
-      def category
-        @real_association_.category
-      end
-
-      attr_reader(
-        :adapter_,
-        :real_association_,
-      )
-
-      def sub_category
-        :visiting
-      end
-    end
-
-    NULL_GLYPH__ = '  '
-    SELECTED_GLYPH__ = '• '
+    Here_ = self
   end
 end

@@ -19,7 +19,7 @@ module Skylab::MyTerm::TestSupport
 
     it "the selected adapter is indicated" do
 
-      @_subject_kernel = new_mutable_kernel_with_appearance_ appearance_JSON_one_
+      @subject_kernel_ = new_mutable_kernel_with_appearance_ appearance_JSON_one_
 
       call_ :adapter, :list
 
@@ -34,13 +34,9 @@ module Skylab::MyTerm::TestSupport
       ada.adapter_name.as_slug.should eql 'imagemagick'
     end
 
-    def subject_kernel_
-      _subject_kernel or super
-    end
-
-    attr_reader :_subject_kernel
-
     dangerous_memoize_ :_real_list_summary do
+
+      @subject_kernel_ = new_mutable_kernel_with_nothing_persisted_
 
       call_ :adapter, :list
 
@@ -68,5 +64,8 @@ module Skylab::MyTerm::TestSupport
       ADA_List_State = ::Struct.new :found, :count, :target
       ADA_List_State.new found, count, target
     end
+
+    attr_reader :subject_kernel_
+
   end
 end

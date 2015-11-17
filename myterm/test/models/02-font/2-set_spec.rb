@@ -18,7 +18,8 @@ module Skylab::MyTerm::TestSupport
         future_expect :error, :extra_properties do | ev |
           _s = future_black_and_white ev
           _s.should match(
-            %r(\Aunrecognized font path 'NOTAFONT'//#{
+           %r(\Acouldn't set background font because #{
+             }unrecognized font path 'NOTAFONT'//#{
               }did you mean '[^']+', '[^']+' or '[^']+'\?\z) )
         end
 
@@ -35,14 +36,14 @@ module Skylab::MyTerm::TestSupport
         _state.result.should eql true
       end
 
-      it "expresses a 'component added' emission WITH CONTEXT CHAIN" do
+      it "natural expression comes of 'component_added'" do
 
         on_past_emissions _state.emissions
 
         past_expect_eventually :info, :component_added do | ev |
 
           _s = future_black_and_white ev
-          _s.should eql 'added imagemagick background font "Monaco.dfont"'
+          _s.should eql 'set background font to "Monaco.dfont"'
         end
       end
 
@@ -82,7 +83,7 @@ module Skylab::MyTerm::TestSupport
       end
     end
 
-    it "what if you try to set with no adapter selected? - DYANMIC INTERFACE" do
+    it "what if you try to set with no adapter selected? - DYNAMIC INTERFACE" do
 
       future_expect_only :error, :no_such_action do | ev |
 
@@ -135,7 +136,7 @@ module Skylab::MyTerm::TestSupport
 
           _s = future_black_and_white ev
 
-          _s.should match %r(\Achanged imagemagick background font from #{
+          _s.should match %r(\Achanged background font from #{
             }"#{ _EXISTENT_FONT }[^"]*" to #{
               }"#{ ::Regexp.escape _OTHER }"\z)i
         end

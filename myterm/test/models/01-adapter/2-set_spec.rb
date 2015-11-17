@@ -15,8 +15,9 @@ module Skylab::MyTerm::TestSupport
 
         _s = future_black_and_white ev
 
-        _s.should match %r(\Aunrecognized adapter 'wazoozle'//#{
-          }did you mean .*'imagemagick'.*\?\z)
+        _s.should match %r(\Acouldn't set adapter because #{
+          }unrecognized adapter 'wazoozle'//#{
+            }did you mean .*'imagemagick'.*\?\z)
       end
 
       call_ :adapter, :set, :adapter, "wazoozle"
@@ -38,7 +39,7 @@ module Skylab::MyTerm::TestSupport
         past_expect_eventually :info, :component_added do | ev |
 
           _s = past_black_and_white ev
-          _s.should eql "added adapter 'imagemagick' to appearance"
+          _s.should eql "set adapter to 'imagemagick'"
         end
       end
 
@@ -87,7 +88,7 @@ module Skylab::MyTerm::TestSupport
         past_expect_eventually :info, :component_changed do | ev |
           _s = future_black_and_white ev
           _s.should eql(
-            "changed appearance adapter from 'imagemagick' to 'imagemagick'" )
+            "changed adapter from 'imagemagick' to 'imagemagick'" )
         end
       end
 

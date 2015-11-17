@@ -104,6 +104,14 @@ module Skylab::MyTerm::TestSupport
       _new_kernel_with_data_path _path
     end
 
+    def new_mutable_kernel_with_nothing_persisted_
+
+      _ke = Home_::Build_default_application_kernel___[]
+      Edit_kernel__.call _ke do | o |
+        o.__eradicate_thing
+      end
+    end
+
     def new_mutable_kernel_with_no_data_
 
       td = common_tmpdir_
@@ -139,6 +147,13 @@ module Skylab::MyTerm::TestSupport
 
       def initialize ke
         @_kernel = ke
+      end
+
+      def __eradicate_thing
+
+        _mock_installation_method :any_existing_read_writable_IO do
+          NIL_
+        end ; nil
       end
 
       def _set_data_path path

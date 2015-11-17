@@ -9,7 +9,7 @@ module Skylab::MyTerm::TestSupport
 
     context "(some context)" do
 
-      it "the operation produces a stream that produces strings FOR NOW" do
+      it "the operation produces a stream that produces font objects" do
 
         @subject_kernel_ = new_mutable_kernel_with_appearance_ appearance_JSON_one_
 
@@ -19,9 +19,10 @@ module Skylab::MyTerm::TestSupport
 
         x = st.gets
 
-        x.respond_to?( :ascii_only? ) or fail
+        x.to_primitive_for_component_serialization or fail  # eew
 
-        # why be more stringent -- etc
+        # (we need something that exerts font shape, but there is very little)
+
       end
 
       attr_reader :subject_kernel_

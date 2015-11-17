@@ -2,6 +2,8 @@ module Skylab::MyTerm
 
   class Models_::Font
 
+    # -- Construction methods
+
     class << self
 
       def interpret_component st, acs, & oes_p
@@ -9,13 +11,19 @@ module Skylab::MyTerm
         if st.no_unparsed_exists
           new nil, acs, & oes_p
         else
-          new( st.gets_one, acs, & oes_p ).___normalize
+          new( st.gets_one, acs, & oes_p ).__normalize
         end
+      end
+
+      def __new_flyweight
+        allocate
       end
 
       alias_method :new_entity, :new
       private :new
     end  # >>
+
+    # -- Initializers
 
     def initialize x, ke_source, & oes_p
 
@@ -28,7 +36,43 @@ module Skylab::MyTerm
       @path = x  # any
     end
 
-    # -- Operations --
+    # ~ (experimental flyweightism)
+
+    def __reinit path
+      @path = path ; self
+    end
+
+    # -- Expressive event & modality hook-ins/hook-outs
+
+    def express_into_under y, expag
+      self._RESPOND_TO_ONLY
+    end
+
+    def express_of_via_into_under y, _expag
+      -> me do
+        y << me.path
+      end
+    end
+
+    def describe_into_under y, _
+      y << "set font, list available fonts"
+    end
+
+    def description_under expag
+
+      s = ::File.basename @path
+      expag.calculate do
+        val s
+      end
+    end
+
+    # -- ACS hook-ins
+
+    def to_primitive_for_component_serialization
+      @path
+    end
+
+    # -- Operations
 
     # ~ the "set" operation
 
@@ -43,24 +87,23 @@ module Skylab::MyTerm
 
     def __set path
 
-      path_ = _lookup path
+      path_ = _lookup :set, path
 
       if path_
 
         _new_self = self.class.new_entity path_, self, & @_oes_p
 
-        @_oes_p.call :component, :change do | y |
-
-          y.yield :new_component, _new_self
+        @_oes_p.call :change do
+          _new_self
         end  # result is result
       else
         path_
       end
     end
 
-    def ___normalize  # assume path is set
+    def __normalize  # assume path is set
 
-      path = _lookup @path
+      path = _lookup :normalize, @path
       if path
         @path = path
         self
@@ -69,11 +112,18 @@ module Skylab::MyTerm
       end
     end
 
-    def _lookup path
+    def _lookup action_sym, path
 
-      oes_p = @_oes_p
+      _oes_p = -> * i_a, & ev_p do
 
-      o = Brazen_::Collection::Common_fuzzy_retrieve.new( & oes_p )
+        _context = Begin_context_[ action_sym, ev_p[] ]
+
+        @_oes_p.call( * i_a ) do
+          _context
+        end
+      end
+
+      o = Brazen_::Collection::Common_fuzzy_retrieve.new( & _oes_p )
 
       o.set_qualified_knownness_value_and_symbol path, :font_path
 
@@ -102,7 +152,10 @@ module Skylab::MyTerm
       end
 
       -> do
-        _to_path_stream
+        fly = self.class.__new_flyweight
+        _to_path_stream.map_by do | path |
+          fly.__reinit path
+        end
       end
     end
 
@@ -192,29 +245,20 @@ module Skylab::MyTerm
       -> do
         if @path
           self
+        else
+          NIL_  # currently ..
         end
       end
     end
 
-    # -- ACS [reactive tree] hook-out's/hook-ins --
+    # -- Project hook-outs
 
-    def describe_into_under y, _
-      y << "set font, list available fonts"
-    end
+    protected = [
+      :kernel_,
+      :path,
+    ]
 
-    def description_under expag
-
-      s = ::File.basename @path
-      expag.calculate do
-        val s
-      end
-    end
-
-    def to_primitive_for_component_serialization
-      @path
-    end
-
-    attr_reader :kernel_
-    protected :kernel_
+    attr_reader( * protected )
+    protected( * protected )
   end
 end

@@ -1,8 +1,10 @@
 module Skylab::MyTerm
 
-  class Models_::Appearance
+  class Models_::Appearance  # notes in [#003]
 
-    # "appearance" as in the iTerm appearance.
+    # (by "appearance" we mean the iTerm appearance.)
+
+    # -- Construction methods
 
     class Silo_Daemon
 
@@ -18,267 +20,449 @@ module Skylab::MyTerm
       end
     end
 
-      # ~ initialization as entity
+    # -- Initializers
 
-      def initialize ke, & x_p
+    def initialize ke, & x_p
 
-        @adapter = nil
-        @adapters = nil
-        @kernel_ = ke
-        @_oes_p = x_p
+      @adapter = nil
+      @adapters = nil
+      @kernel_ = ke
+      @_oes_p = x_p
+    end
+
+    def __init
+
+      inst = @kernel_.silo :Installation
+
+      io = inst.any_existing_read_writable_IO
+      if io
+        __init_retrieved_via_IO io
+      else
+        __init_created inst
+      end
+    end
+
+    def __init_retrieved_via_IO io
+
+      _ok = ___unserialize io
+      _ok and __post_unserialize io
+    end
+
+    def ___unserialize io
+
+      o = ACS_[]::Modalities::JSON::Interpret.new( & @_oes_p )
+
+      o.ACS = self
+
+      o.prepend_more_specific_context_by do
+        "in #{ pth io.path }"
       end
 
-      def __init
+      o.JSON = io.read
 
-        inst = @kernel_.silo :Installation
+      o.execute
+    end
 
-        io = inst.any_existing_read_writable_IO
-        if io
-          self.__init_retrieved_via_IO io
-        else
-          __init_created inst
-        end
-      end
+    def __post_unserialize io
 
-      def __init_retrieved_via_IO io
+      # (yes we could automate the de-referencing of references in our
+      # graph that is freshly unserialized, but that is not something
+      # we want to undertake at the moment..)
 
-        o = ACS_[]::Modalities::JSON::Interpret.new( & @_oes_p )
-
-        o.ACS = self
-
-        o.prepend_more_specific_context_by do
-          "in #{ pth io.path }"
-        end
-
-        o.JSON = io.read
-
-        ok = o.execute
-
-        if ok
-
-          @_is_created = false
-          @_is_modified = false
-
-          @_produce_writable_IO = -> do
-            io.rewind
-            io.truncate 0
-            io
-          end
+      ok = if @adapter
+        x = @adapter.unserialize_
+        if x
+          @adapter = x
           ACHIEVED_
         else
-          io.close
-          ok
+          x
         end
+      else
+        true
       end
 
-      def __init_created inst
+      if ok
 
-        @_is_created = true
+        @_is_created = false
         @_is_modified = false
 
-        @_produce_writable_IO = inst.method :writable_IO
-
-        ACHIEVED_
-      end
-
-      # -- adapt to reactive tree & ACS --
-
-      # ~ reactive tree hook-in's
-
-      def __to_unordered_index_stream_for_reactive_tree
-
-        o = ACS_[]::Modalities::Reactive_Tree::Children_as_unbound_stream.new(
-          & @_oes_p )
-
-        o.ACS = self
-
-        o.stream_for_interface = ___to_stream_for_reactive_tree
-
-        o.execute
-      end
-
-      def ___to_stream_for_reactive_tree
-
-        st = ACS_[]::For_Interface::Infer_stream[ self ]
-
-        if @adapter
-
-          # this is the crux of our adapter mechanic:
-          #
-          # 1) an adapter is selected IFF the above ivar is set. per the
-          # component association that defines it, the ivar holds not the
-          # adapter itself but a "selected adapter" controller. this ivar is
-          # set *only* thru a signal handler in this file or underialization.
-          #
-          # 2) if an an adapter is selected, it can add nodes ("qualified
-          # knownnesses") to our interface stream as if they were our own.
-          # somewhere else we manage delegating requests to the correct
-          # component (the real adapter) by using the proxy class "visiting
-          # association" to unwrap this
-
-          ada = @adapter.selected_adapter__
-
-          va = Models_::Adapter::Visiting_Association.new_prototype ada
-
-          _st_ = ACS_[]::For_Interface::To_stream[ ada ]
-
-          _st__ = _st_.map_by do | qkn |
-
-            asc = qkn.association
-            if :association == asc.category
-              qkn.new_with_association va.new qkn.association
-            else
-              self._DESIGN_ME_write_me
-            end
-          end
-
-          st = st.concat_by _st__
+        @_produce_writable_IO = -> do
+          io.rewind
+          io.truncate 0
+          io
         end
+      else
+        io.close
+      end
+      ok
+    end
 
-        st
+    def __init_created inst
+
+      @_is_created = true
+      @_is_modified = false
+
+      @_produce_writable_IO = inst.method :writable_IO
+
+      ACHIEVED_
+    end
+
+    # -- Expressive event & modality hook-ins/hook-outs
+
+    def __to_unordered_index_stream_for_reactive_tree
+
+      o = ACS_[]::Modalities::Reactive_Tree::Children_as_unbound_stream.new(
+      ) do | * i_a, & ev_p |
+        self._K
       end
 
-      def component_value_reader_for_reactive_tree  # [#003]:storypoint-2
+      o.ACS = self
 
-        # here is where we undo the truncating cleverness above: for any
-        # association that we were pretending was ours but actually wasn't,
-        # let the real parent build it; and let that component signal up to
-        # the real parent, not to us.
+      o.stream_for_interface = ___to_stream_for_reactive_tree
 
-        h = {
-          common: -> asc do
+      o.execute
+    end
 
-            ACS_[]::For_Interface::Touch[ asc, self, & @_oes_p ]
-          end,
+    def ___to_stream_for_reactive_tree
 
-          visiting: -> vasc do
-            vasc.adapter_.read_for_component_interface__ vasc
-          end
-        }
+      st = ACS_[]::For_Interface::Infer_stream[ self ]
 
-        -> asc do
-
-          h.fetch( asc.sub_category )[ asc ]
-        end
+      if @adapter
+        st = ___concatenate_adapter_specific_items st
       end
 
-      # ~ [un]serialization hook-in's
+      st
+    end
 
-      def to_stream_for_component_serialization
+    def ___concatenate_adapter_specific_items st
 
-        # (this is what is default, here for clarity - when serializing/
-        #  unserializing, use our methods (index) to define our assocs)
+      # see :+#how-component-injection-is-currently-implemented
 
-        ACS_[]::For_Serialization::Infer_stream[ self ]
+      ada = @adapter.selected_adapter__
+
+      va = nil
+
+      _adapter_stream = ACS_[]::For_Interface::To_stream[ ada ]
+
+      _st_ = _adapter_stream.map_by do | qkn |
+
+        # (works whether qkn is an effective known or not)
+
+        asc = qkn.association
+        :association == asc.category or self._DESIGN_ME_write_me
+
+        va ||= Visiting_Association___.new ada
+        _asc_ = va.new qkn.association
+         qkn.new_with_association _asc_
       end
 
-      # -- Component Associations --
+      st.concat_by _st_
+    end
 
-      # ~ "adapter" (to put this before next looks better in JSON payloads)
+    # -- ACS hook-in
 
-      def __adapter__component_association
+    def component_association_reader
+      @___comp_assoc_reader ||= ___build_comp_assoc_reader
+    end
 
-        Models_::Adapter
-      end
+    def ___build_comp_assoc_reader
 
-      # ~ "adapters" & related
-
-      def adapters
-
-        # breaking autonomy, some components need this component as a
-        # service. other times, the below is reconstructed from
-        # serialization. (use of a silo daemon might be cleaner.)
-
-        @adapters ||= ___build_adapters
-      end
-
-      def ___build_adapters
-
-        # to accomodate the above we must sometimes build
-        # the component association structure explicitly
-
-        ca = @_real_assoc[ :adapters ]
-
-        _p = ACS_[]::Interpretation::Component_handler[ ca, self, & @_oes_p ]
-
-        ca.component_model.interpret_compound_component(
-          IDENTITY_,
-          self,
-          & _p )
-      end
-
-      def __adapters__component_association
-
-        # this has no interface expression but serialization expression
-
-        yield :intent, :serialization
-
-        Models_::Adapters
-      end
-
-      # ~ receive messages from children, provide services to children
-
-      def receive__component__change__ asc, & change
-
-        # • one of our own component values has changed. swap in the new value
-
-        _ = ACS_[]::Interpretation::Accept_component_change[ self, asc, change ]
-
-        _receive_mutation_as_top _[]
-      end
-
-      def receive__component__mutation__ asc, & mutation_p
-
-        # • this is a signal that a component *changed* (past tense)
-        #   somewhere "down deep". we don't have to change our own state.
-
-        # • we don't push an item to the context chain because for whatever
-        #   reason stating the box node explicitly sounds too verbose
-
-        _mutation = mutation_p[]
-
-        _receive_mutation_as_top _mutation
-      end
-
-      def _receive_mutation_as_top mutation
-
-        # • here is where we must act like a top: convert signal to emission
-
-        @_oes_p.call( * mutation.info_channel ) do
-          mutation.to_event
-        end
-
-        o = ACS_[]::Modalities::JSON::Express.new( & @_oes_p )
-
-        o.downstream_IO_proc = remove_instance_variable :@_produce_writable_IO
-
-        o.upstream_ACS = self
-
-        o.execute  # result is result
-      end
-
-      # -- more ACS hook-ins (when also in support of above) --
-
-      # ~ general ACS hook-in's (alter default ACS behavior)
-
-      def component_association_reader
-
-        @_real_assoc = ACS_[]::Component_Association.method_based_reader_for self
-        -> sym do
-          @_real_assoc.call sym do
-            self._K_now_you_have_to_read_a_visiting_component_association
-          end
+      real_assoc = ACS_[]::Component_Association.method_based_reader_for self
+      -> sym do
+        real_assoc.call sym do
+          self._K_now_you_have_to_read_a_visiting_component_association
         end
       end
+    end
 
-      # --
+    def component_value_reader_for_reactive_tree
+
+      # :#here is where we pay back what we borrowed above when we reported
+      # a visiting association as one of our own: when the time comes to
+      # build such a component, we delegate this to the real custodian
+      # through a special method. this is actually three "hops" we are
+      # going down (e.g):
+      #
+      #     "appearance" <-> "adapters" <-> "imagemagick" <-> "font"
+
+      h = {
+        common: -> qkn do
+          ACS_[]::For_Interface::Touch[ qkn, self ]
+        end,
+        visiting: -> qkn do
+          qkn.association._real_ACS.read_for_interface__ qkn
+        end
+      }
+
+      -> qkn do
+        h.fetch( qkn.association.sub_category )[ qkn ]
+      end
+    end
+
+    def accept_component_qualified_knownness qkn  # write component value
+      @___value_writer ||= ___build_writer
+      @___value_writer[ qkn ]
+    end
+
+    def ___build_writer
+      hi = ACS_[]::Reflection::Ivar_based_value_writer[ self ]
+      h = {
+        common: -> qkn do
+          hi[ qkn ]
+        end,
+        visiting: -> qkn do
+          qkn.association._real_ACS.accept_component_qualified_knownness qkn
+        end,
+      }
+      -> qkn do
+        h.fetch( qkn.association.sub_category )[ qkn ]
+      end
+    end
+
+    def component_wrapped_value asc
+
+      @___value_reader ||= ___build_reader
+      @___value_reader[ asc ]
+    end
+
+    def ___build_reader
+
+      hi = ACS_[]::Reflection::Ivar_based_value_reader[ self ]
+      h = {
+        common: -> asc do
+          hi[ asc ]
+        end,
+        visiting: -> asc do
+          asc._real_ACS.component_wrapped_value asc
+        end,
+      }
+      -> asc do
+        h.fetch( asc.sub_category )[ asc ]
+      end
+    end
+
+    # ~ [un]serialization hook-ins
+
+    def to_stream_for_component_serialization
+
+      # (this is what is default, here for clarity - when serializing/
+      #  unserializing, use our methods (index) to define our assocs)
+
+      ACS_[]::For_Serialization::Infer_stream[ self ]
+    end
+
+    # -- Components
+
+    # ~ "adapter" (to put this before next looks better in JSON payloads)
+
+    def __adapter__component_association
+
+      Models_::Adapter
+    end
+
+    def __adapters__component_association
+
+      yield :intent, :serialization  # no UI expression, only s11n
+
+      Models_::Adapters
+    end
+
+    # -- ACS signal handling
+
+    def component_event_model
+      :hot  # for now, un-s11n needs to know this [#br-085]:#Event-models
+    end
+
+    # ~ hook-out's for component change, mutation
+
+    def receive_component__change__ asc, & x_p
+
+      # a 'change' means the component is telling any custodian to swap
+      # in the new component for the old (as a result of a UI action or
+      # similar). how it is handled is different based on etc:
+
+      send :"__receive__#{ asc.sub_category }__component_change", asc, & x_p
+    end
+
+    def __receive__visiting__component_change asc, & new_component
+
+      asc._real_ACS.receive_component_change__ asc, & new_component
+    end
+
+    def __receive__common__component_change asc, & new_component
+
+      # one of our own component values has changed. swap in the new value
+
+      _new_component = new_component[]
+
+      _ev_p = ACS_[]::Interpretation::Accept_component_change[
+        _new_component, asc, self ]
+
+      _emit_and_persist _ev_p[]
+    end
+
+    def receive_component__event_and_mutated__ asc, & event_and_mutated_p
+
+      # this is called when an immediate compound component signals that
+      # it has mutated in-place..
+
+      ev_p, cmp = event_and_mutated_p.call
+
+      ___store_possibly_floating_component cmp, asc
+
+      _context = ev_p[]
+
+      _event = ACS_[]::Modalities::Human::Event_via_context[ _context ]
+
+      _emit_and_persist _event
+    end
+
+    def ___store_possibly_floating_component cmp, asc
+
+      # setting the ivar where it was not set before makes it serializable
+
+      ivar = asc.name.as_ivar
+      x = instance_variable_get ivar  # assume is set *for now*
+      if x
+        x.object_id == cmp.object_id or self._SANITY
+      else
+        instance_variable_set ivar, cmp
+        _gulp_ivar =
+          :"@_read_only__#{ asc.name.as_lowercase_with_underscores_symbol }__"
+        x = remove_instance_variable _gulp_ivar
+        x.object_id == cmp.object_id or self._SANITY
+      end
+      NIL_
+    end
+
+    def _emit_and_persist ev
+
+      @_oes_p.call( * ev.suggested_event_channel ) do
+        ev
+      end
+
+      o = ACS_[]::Modalities::JSON::Express.new( & @_oes_p )
+
+      o.downstream_IO_proc = remove_instance_variable :@_produce_writable_IO
+
+      o.upstream_ACS = self
+
+      o.execute  # result is result
+    end
+
+    # ~ error and info
+
+    def receive_component__error__ asc, desc_sym, & linked_list_p
+
+      # tricky -
+
+      if asc.model_classifications.looks_entitesque
+
+        # assume that if the immediate component of origin is "entitesque"
+        # than it is model-controller-like and we must add one element.
+
+        _LL = linked_list_p[]
+        _linked_list = Add_context_[ asc.name, _LL ]
+
+      else
+
+        # otherwise (and this is from prehaps an adpater, but whatever)
+        # assume that it is already contextualized to the desired amount.
+
+        _linked_list = linked_list_p[]
+      end
+
+      # convert the linked list back into a plain event for the final
+      # (top) emission (for now fail early)
+
+      _ev = ACS_[]::Modalities::Human::Event_via_context[ _linked_list ]
+
+      @_oes_p.call :error, desc_sym do
+        _ev
+      end
+    end
+
+    def receive_component__info__expression__ _acs, desc_sym, & y_p
+
+      @_oes_p.call :info, :expression, desc_sym do | y |
+        calculate y, & y_p  # hi.
+      end
+      NIL_
+    end
+
+    def receive_component__info__  # respond to only
+    end
+
+    # -- Project hook-outs
+
+    def adapters_
+
+      # because one component serves as the cache and another component
+      # wants to touch items in the cache, we need to expose it.
+
+      if @adapters  # if persisted
+        @adapters
+      else
+        @_read_only__adapters__ ||= ___build_read_only_adapters_model
+      end
+    end
+
+    def ___build_read_only_adapters_model
+
+      _asc = component_association_reader[ :adapters ]
+
+      ACS_[]::Interpretation::Build_empty_hot.call _asc, self
+
+    end
+
+    attr_reader(
+      :kernel_,
+    )
+
+    # -- ACS hook-in (and related) NODES
+
+    class Visiting_Association___
+
+      def initialize real_ACS
+        @_real_ACS = real_ACS
+      end
+
+      # - Look like an assoc
+
+      def new asc
+        dup.___init asc
+      end
+
+      def ___init asc
+        @_real_assoc = asc ; self
+      end
+
+      def model_classifications
+        @_real_assoc.model_classifications
+      end
+
+      def component_model
+        @_real_assoc.component_model
+      end
+
+      def name
+        @_real_assoc.name
+      end
+
+      def category
+        @_real_assoc.category
+      end
+
+      def sub_category
+        :visiting
+      end
+
+      # -- Doesn't look like an assoc
 
       attr_reader(
-        :adapter,
-        :kernel_,
+        :_real_ACS,
       )
-
-    # -
+    end
 
     Here_ = self
   end
