@@ -48,7 +48,7 @@ module Skylab::GitViz::TestSupport
       Home_.lib_.some_stderr_IO
     end
 
-    def cache_hash_for_mock_FS
+    def cache_hash_for_stubbed_FS
       Universal_cache___[]
     end
 
@@ -123,9 +123,9 @@ module Skylab::GitViz::TestSupport
     TestSupport_::Expect_line[ tcc ]
   end
 
-  Mock_Filesystem = -> tcc do
+  Stubbed_filesystem = -> tcc do
 
-    Home_.lib_.mock_system_lib::Mock_Filesystem.enhance_client_class tcc
+    Home_.lib_.system_lib::Doubles::Stubbed_Filesystem.enhance_client_class tcc
   end
 
   Mock_System = -> tcc do
@@ -153,28 +153,6 @@ module Skylab::GitViz::TestSupport
     end
   end
 
-  # ~ model-like & abstraction candidates
-
-  class Lazy_Constants_
-
-    class << self
-      def lookup sym
-        ( @___instance ||= new ).lookup sym
-      end
-      private :new
-    end
-
-    def initialize
-      @_entries = {}
-    end
-
-    def lookup sym
-      @_entries.fetch sym do
-        @_entries[ sym ] = send sym
-      end
-    end
-  end
-
   # ~ non-contant-ish support
 
   Expect_CLI_lib_ = -> do
@@ -196,7 +174,7 @@ module Skylab::GitViz::TestSupport
     end
   end
 
-  class CONSTANTS___ < Lazy_Constants_
+  class CONSTANTS___ < TestSupport_::Lazy_Constants
 
     define_method :GIT_STORY_03_PATHS_ do
 

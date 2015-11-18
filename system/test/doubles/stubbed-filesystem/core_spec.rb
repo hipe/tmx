@@ -1,11 +1,11 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::GitViz::TestSupport::Test_Lib
+module Skylab::System::TestSupport
 
-  describe "[gv] test lib - mock filesystem" do
+  describe "[gv] test lib - stubbed filesystem" do
 
     extend TS_
-    use :mock_filesystem_support
+    use :doubles_stubbed_filesystem_support
 
     it "loads" do
       subject_module_
@@ -20,8 +20,8 @@ module Skylab::GitViz::TestSupport::Test_Lib
 
       o = _incomplete_client_class.new
 
-      _expect_no_method :manifest_path_for_mock_FS do
-        o.send :mock_filesystem
+      _expect_no_method :manifest_path_for_stubbed_FS do
+        o.send :stubbed_filesystem
       end
     end
 
@@ -29,15 +29,15 @@ module Skylab::GitViz::TestSupport::Test_Lib
 
       cls = ::Class.new
       subject_module_.enhance_client_class cls
-      cls.send :define_method, :manifest_path_for_mock_FS do :_MPFMFS_ end
+      cls.send :define_method, :manifest_path_for_stubbed_FS do :_MPFSFS_ end
 
       o = cls.new
-      _expect_no_method :cache_hash_for_mock_FS do
-        o.send :mock_filesystem
+      _expect_no_method :cache_hash_for_stubbed_FS do
+        o.send :stubbed_filesystem
       end
     end
 
-    it "the mock filesystem is memoized into the client" do
+    it "the stubbed filesystem is memoized into the client" do
 
       mfs = _fs
       mfs or fail
@@ -120,7 +120,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
     end
 
     def _fs
-      _good_client.send :mock_filesystem
+      _good_client.send :stubbed_filesystem
     end
 
     def _expect_no_method sym
@@ -135,7 +135,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
 
     dangerous_memoize_ :_incomplete_client_class do
 
-      cls = MFS_01_Client_Class = ::Class.new
+      cls = DSFS_01_Client_Class = ::Class.new
 
       subject_module_.enhance_client_class cls
 
@@ -148,18 +148,18 @@ module Skylab::GitViz::TestSupport::Test_Lib
 
     dangerous_memoize_ :_good_client_class do
 
-      cls = MFS_02_Client_Class = ::Class.new
+      cls = DSFS_02_Client_Class = ::Class.new
 
       subject_module_.enhance_client_class cls
 
       h = {}
-      cls.send :define_method, :cache_hash_for_mock_FS do
+      cls.send :define_method, :cache_hash_for_stubbed_FS do
         h
       end
 
-      path = at_ :COMMON_MOCK_FS_MANIFEST_PATH_
+      path = at_ :COMMON_STUBBED_FS_MANIFEST_PATH_
 
-      cls.send :define_method, :manifest_path_for_mock_FS do
+      cls.send :define_method, :manifest_path_for_stubbed_FS do
         path
       end
 

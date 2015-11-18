@@ -39,7 +39,7 @@ module Skylab::GitViz::TestSupport
       _repo = front_.new_repository_via(
         @path,
         mock_system_conduit,
-        mock_filesystem,
+        stubbed_filesystem,
       )
 
       @ci = _repo.fetch_commit_via_identifier s
@@ -47,8 +47,8 @@ module Skylab::GitViz::TestSupport
       NIL_
     end
 
-    def manifest_path_for_mock_FS
-      @mock_FS
+    def manifest_path_for_stubbed_FS
+      @stubbed_FS
     end
 
     def manifest_path_for_mock_system
@@ -57,14 +57,14 @@ module Skylab::GitViz::TestSupport
 
     def __using_story_02
 
-      @mock_FS = at_ :STORY_02_PATHS_
+      @stubbed_FS = at_ :STORY_02_PATHS_
       @mock_SYS = at_ :STORY_02_COMMANDS_
       @path = '/m02/repo'
     end
 
     def __using_story_03
 
-      @mock_FS = at_ :STORY_03_PATHS_
+      @stubbed_FS = at_ :STORY_03_PATHS_
       @mock_SYS = at_ :STORY_03_COMMANDS_
       @path = '/m03/repo'
     end

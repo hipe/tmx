@@ -44,7 +44,7 @@ module Skylab::GitViz::TestSupport
     Repository_Support = -> tcc do
 
       TS_::Expect_Event[ tcc ]
-      TS_::Mock_Filesystem[ tcc ]
+      TS_::Stubbed_filesystem[ tcc ]
       TS_::Mock_System[ tcc ]
       tcc.include Instance_Methods__
 
@@ -53,7 +53,7 @@ module Skylab::GitViz::TestSupport
         x = front_.new_repository_via(
           path,
           mock_system_conduit,
-          mock_filesystem,
+          stubbed_filesystem,
         )
 
         if x
@@ -85,7 +85,7 @@ module Skylab::GitViz::TestSupport
           a.push repo.relative_path_of_interest
           a.push repo
           a.push CONSTANTS__.lookup :__mock_resources
-          a.push mock_filesystem
+          a.push stubbed_filesystem
 
           _oes_p = handle_event_selectively
 
@@ -108,7 +108,7 @@ module Skylab::GitViz::TestSupport
 
     # ~
 
-    class CONSTANTS__ < Lazy_Constants_
+    class CONSTANTS__ < TestSupport_::Lazy_Constants
 
       def __mock_resources
 

@@ -50,11 +50,11 @@ module Skylab::GitViz::TestSupport
       call_API( * hist_tree_head_iambic_,
         :path, path,
         :system_conduit, :_s_c_,
-        :filesystem, mock_filesystem,
+        :filesystem, stubbed_filesystem,
       )
     end
 
-    def manifest_path_for_mock_FS
+    def manifest_path_for_stubbed_FS
       at_ :GIT_STORY_03_PATHS_
     end
 

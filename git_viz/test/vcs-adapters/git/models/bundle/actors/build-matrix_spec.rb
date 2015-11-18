@@ -49,7 +49,7 @@ module Skylab::GitViz::TestSupport
       @bundle.build_matrix_via_repository @repository
     end
 
-    def manifest_path_for_mock_FS
+    def manifest_path_for_stubbed_FS
       at_ :STORY_04_PATHS_
     end
 

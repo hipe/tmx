@@ -260,7 +260,6 @@ module Skylab::System
     FS_ = self
     IDENTITY_ = -> x { x }
     NIL_ = nil
-    UNABLE_ = false
 
   end
 end

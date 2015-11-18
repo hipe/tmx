@@ -6,7 +6,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
     extend TS_
     use :expect_event
-    # use :mock_FS
+    # use :stubbed_FS
 
     it "path is required" do
 

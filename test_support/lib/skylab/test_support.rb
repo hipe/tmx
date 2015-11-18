@@ -56,6 +56,28 @@ module Skylab::TestSupport  # :[#021].
     end
   end  # >>
 
+  class Lazy_Constants
+
+    # subclass and define your "constant-like" values thru instance methods.
+    # call the *class* method `lookup` for value lazy-evaluated & memoized.
+
+    class << self
+      def lookup sym
+        ( @___instance ||= new ).lookup sym
+      end
+      private :new
+    end
+
+    def initialize
+      @_entries = {}
+    end
+
+    def lookup sym
+      @_entries.fetch sym do
+        @_entries[ sym ] = send sym
+      end
+    end
+  end
 
   Memoizer_methods = -> tcc do
 

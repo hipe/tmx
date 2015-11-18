@@ -1,21 +1,35 @@
-# the mock FS narrative :[#013]
-
+# the stubbed filesystem narrative :[#027]
 
 ## the new introduction
 
-a mock filesystem is defined by an absolute (real filesystem) path to a
+a stubbed filesystem is defined by an absolute (real filesystem) path to a
 manifest file. the manifest file is simply a list of paths (absolute or
-relative) that constitute the imaginary files and directories of the mock
+relative) that constitute the imaginary files and directories of the stubbed
 fileystem. (directories are the paths that end in "/".)
 
-the function of the mock filesystem is to act like a real filesystem
+the function of the stubbed filesystem is to act like a real filesystem
 that has these nodes and these nodes only (unless otherwise noted); but
 only with respect to the operations that we perform on paths: we may
 only report whether or not given path exists on this imaginary system, and
 if so whether it is a file or a directory.
 
-(we could also perform imaginary directory listings, but we don't need
-that yet.)
+(we could also perform imaginary directory listings, globs, etc; but we
+will add that when we need it and not before.)
+
+
+
+
+
+## a quick note about the name and scope
+
+we are using Martin Fowler's definitions based on Gerard Meszaros's, to
+the best that we understand them: this models a "stub" (and not a "mock",
+"dummy" or "fake") per the literature. (we *almost* went "fake", but
+turned back because of how tighly "stub" covered this.)
+
+this as yet offers on behavioral verification - no spies, no
+recording/playback. at the moment it is 200 lines long and does exactly
+what we need.
 
 
 
@@ -23,14 +37,14 @@ that yet.)
 ## :#storypoint-5 introduction
 
 years and years ago we knew that chris wanstrath et. al. had a gem like this.
-at the time our thinking was, "why would you want to mock the FS?, it's easy
+at the time our thinking was, "why would you want to stub the FS?, it's easy
 enough to setup and tear down your own filesystem trees on your actual
 filesystem, and it's not that much overhead, is it?" "isn't this the kind
-of mocking that people hate, the kind that adds too much insulation between
+of test doubling that people hate, the kind that adds too much insulation between
 you and the SUT"?
 
 but our thinking may have changed: the current tangent we are on started from
-one known point: we must mock git responses. although setting up and tearing
+one known point: we must stub git responses. although setting up and tearing
 down git repos is certainly an option, (indeed we do so with the bash scripts
 that create our fixtures) it apporaches our comfortable limit on coupling to
 "outside systems" when testing (generally accepted as problematic for unit-
@@ -40,40 +54,40 @@ tyle tests), at least at some testing level.
 unit testing when you get into things like working with absolute paths.)
 
 this is why in our heads we got obsessed with wanting to have both "live" but
-scripted automated tests, and mocked tests. then we could make recordings of
+scripted automated tests, and stubbed tests. then we could make recordings of
 live responses and "play them back", which is the absolute best of both worlds
 (#to-do insert tangent here about two-way verification).
 
 
-## tangent 1: mocking the agent classes
+## tangent 1: stubbing the agent classes
 
-as will be described in [#008] the narrative about [system?] agents, we rely
+as will be described in [#gv-008] the narrative about [system?] agents, we rely
 on these small "method classes" we call "agents" especially for system calls.
-this seems like a convenient hookpoint to insert a mock into the mix. for this
-first phase of our first in-earnest attempt at mocking anything, we wanted to
+this seems like a convenient hookpoint to insert a stub into the mix. for this
+first phase of our first in-earnest attempt at doubling anything, we wanted to
 do it raw & from the ground up. (no external libraries, and don't write any
 libraries of our own yet.) and what we started out with (not pictured) was
 indeed raw.
 
 so what we ended up with was agent classes where every system call (e.g circa
 three of them) was run through the system call method that was ad-hoc
-hand-overidden for that (mock) class (in turn a subclass of the real-life
+hand-overidden for that (stubbed) class (in turn a subclass of the real-life
 agent class). the body of this ad-hoc method usually consisted of running some
 part of the request through a switch expression and hand-writing the
 appropriate result and side-effects.
 
-this was fun for getting the feel of mocking and essential for mocking the
+this was fun for getting the feel of doubles and essential for stubbing the
 git responses, but for one thing it did not scale. the swith statements got
 unweidly, and we ended up with one big file of soup.
 
 for another thing it was super sludgy because we had twice as many classes
 to maintain. especially near all the agent classes, the const names of our
-mocks had to line up precisely with our reals (because of the ostensibly
+stubs had to line up precisely with our reals (because of the ostensibly
 clever way we had all of the components resolving their sub-agent classes
 with something like e.g `self.class::Foo__` instead of just `Foo__`).
 
 
-## the idea of lower-level mocking is synthesized from giant shoulders
+## the idea of lower-level stubbing is synthesized from giant shoulders
 
 the sequence of steps we took to get to this "better design" took about half
 a day, and was almost pre-determined: first we though "how can we re-work
@@ -107,7 +121,7 @@ can put different manifests inside of different directories on the filesystem
 as needed (yes the same could be said for any other of the above methods).
 
 it doesn't introduce headaches of too much coupling; and it greatly reduces
-the "soup-factor" by turning "imperative" mocking logic into "declarative"
+the "soup-factor" by turning "imperative" stubbing logic into "declarative"
 (and very readable) manifest files.
 
 and since we are making it ourselves we can strive to keep it as simple as
@@ -117,17 +131,17 @@ possible.
 
 ## but then we thought, "why stop at system calls?"
 
-in the first place, note that we are no longer mocking "git responses" in
+in the first place, note that we are no longer stubbing "git responses" in
 particular, but "system calls" in general. this is a pretty huge "multiplier
-effect." this got us thinking about things like "web mock", and crazy forays
+effect." this got us thinking about things like "web mocked", and crazy forays
 we had gone into years ago with recording API responses from external services
 (oh tumblr, you were so young).
 
 and it was then that we thought, "given how easy it seems that it will be
-to mock system calls, and given that we are already hand-writing calls to
+to stub system calls, and given that we are already hand-writing calls to
 things like ::File#stat (oh by the way we were doing that), and furthermore
 given that we have stashed away a plan for "live automated tests" anyway,
-how hard would it really be to mock the filesystem for our purposes?
+how hard would it really be to stub the filesystem for our purposes?
 
 as we looked at it, we realized that a significant majority of our filesystem
 interaction happened through ::Pathname. things like `exist?`, `expand_path`,
@@ -140,7 +154,7 @@ point that the experiment begins.
 
 why do anything yourself ever? given skylab's slant on numerous DIY
 testing experiments, we deemed it an appropriate use-case for a home-rolled
-solution. also, the scope of our plans for mocking is both narrower *for*
+solution. also, the scope of our plans for stubbing is both narrower *for*
 filesystems, and broader *than* filesystems as compared to whatever else is
 out there. also, wanstrath et. al have been busy running one of the greatest
 websites on the planet and so probably don't maintain piddly little ruby
@@ -157,7 +171,7 @@ parent class), and often when we read the source we cringe (but granted, a lot
 of this may be for reasons that don't interest us, like compatibilty non
 POSIX-compliant filesystems).
 
-as long as it feels "simple" we are mocking out those parts of pathname that
+as long as it feels "simple" we are stubbing out those parts of pathname that
 we need, and leveraging it somehow for the parts we feel silly re-writing
 ourselves.
 
@@ -166,7 +180,7 @@ ourselves.
 ## :#storypoint-80
 
 we might change the name, but for now, note: don't be confused by our meaning
-of "touch". this does NOT mock the behavior of the unix utility `touch`; we
+of "touch". this does NOT stub the behavior of the unix utility `touch`; we
 are merely using the same verb and the same semantics. ("touch" is our new
 favorite idiomatic name for this category of methods (we used to say "puff"
 for this !?) and saying "touch" borrows its namesake from the unix utility of
@@ -198,7 +212,7 @@ so that it resolves such paths into paths that contain one or more trailing
 empty strings. but we don't feel like hacking [po] right now: we are currently
 8 sub-tagents deep on the seventh of an 8-step tangent.
 
-instead, what we do (because it is how we specified this mock FS hack to work)
+instead, what we do (because it is how we specified this stubbed FS hack to work)
 is simply detect multiple trailing slashes in the pathname. but note there
 are almost certainly edge cases where we can make this fail, depending on
 how our cacheing works..

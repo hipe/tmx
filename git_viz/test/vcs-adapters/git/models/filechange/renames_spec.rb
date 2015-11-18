@@ -48,7 +48,7 @@ module Skylab::GitViz::TestSupport
       _repo = Home_.repository.new_via(
         '/the/repo',
         mock_system_conduit,
-        mock_filesystem,
+        stubbed_filesystem,
       )
 
       _repo.fetch_commit_via_identifier( 'head' ).filechanges.each do | fc |

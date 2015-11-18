@@ -100,6 +100,7 @@ module Skylab::System
   NIL_ = nil
   NILADIC_TRUTH_ = -> { true }
   SPACE_ = ' '.freeze
+  UNABLE_ = false
 
 end
 

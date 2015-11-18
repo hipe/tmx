@@ -69,7 +69,7 @@ module Skylab::GitViz::TestSupport
 
       invo.receive_system_conduit mock_system_conduit
 
-      invo.receive_filesystem mock_filesystem
+      invo.receive_filesystem stubbed_filesystem
 
       NIL_
     end
@@ -127,7 +127,7 @@ module Skylab::GitViz::TestSupport
       expect_succeeded
     end
 
-    def manifest_path_for_mock_FS
+    def manifest_path_for_stubbed_FS
 
       at_ :STORY_03_PATHS_
     end

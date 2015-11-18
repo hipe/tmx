@@ -67,8 +67,6 @@ module Skylab::GitViz::TestSupport::Test_Lib
 
   # ~ shorties
 
-  Lazy_Constants_ = Parent__::Lazy_Constants_
-
   NIL_ = nil
 
   Subject_module_ = -> do

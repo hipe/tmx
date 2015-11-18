@@ -59,7 +59,7 @@ module Skylab::GitViz::TestSupport
       @repository.should be_respond_to :fetch_commit_via_identifier
     end
 
-    def manifest_path_for_mock_FS
+    def manifest_path_for_stubbed_FS
       at_ :STORY_02_PATHS_
     end
 

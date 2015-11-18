@@ -18,7 +18,7 @@ module Skylab::GitViz::TestSupport
         def [] tcm
 
           TS_::Expect_Event[ tcm ]
-          TS_::Mock_Filesystem[ tcm ]
+          TS_::Stubbed_filesystem[ tcm ]
           TS_::Mock_System[ tcm ]
 
           tcm.include TS_::Reactive_Model_Support[ self ]
@@ -34,7 +34,7 @@ module Skylab::GitViz::TestSupport
           * hist_tree_head_iambic_,
           :path, path,
           :system_conduit, mock_system_conduit,
-          :filesystem, mock_filesystem,
+          :filesystem, stubbed_filesystem,
         )
       end
 

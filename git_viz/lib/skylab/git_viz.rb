@@ -8,10 +8,6 @@ module Skylab::GitViz
       y << "awesome, simple tabular visualiztion of a repository over time"
     end
 
-    def mock_FS
-      Home_.lib_.mock_system_lib::Mock_FS
-    end
-
     def repository
       Home_::VCS_Adapters_::Git.repository
     end

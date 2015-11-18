@@ -55,7 +55,7 @@ module Skylab::GitViz::TestSupport
 
     end
 
-    def manifest_path_for_mock_FS
+    def manifest_path_for_stubbed_FS
       at_ :STORY_03_PATHS_
     end
 

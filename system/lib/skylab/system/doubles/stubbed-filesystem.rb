@@ -1,6 +1,6 @@
-module Skylab::GitViz
+module Skylab::System
 
-  class Test_Lib_::Mock_Filesystem  # see [#013]
+  class Doubles::Stubbed_Filesystem  # see [#027]
 
     class << self
 
@@ -17,30 +17,30 @@ module Skylab::GitViz
     module Client_Instance_Methods___
     private
 
-      def mock_filesystem
-        @__mock_filesystem__ ||= Build_mock_filesystem_for___[ self ]
+      def stubbed_filesystem
+        @__stubbed_filesystem__ ||= Build_stubbed_filesystem_for___[ self ]
       end
     end
 
-    Build_mock_filesystem_for___ = -> client do
+    Build_stubbed_filesystem_for___ = -> client do
 
-      path = client.manifest_path_for_mock_FS  # #:+#hook-out
+      path = client.manifest_path_for_stubbed_FS  # #:+#hook-out
 
-      cache = client.cache_hash_for_mock_FS  # #:+#hook-out
+      cache = client.cache_hash_for_stubbed_FS  # #:+#hook-out
 
       o = cache[ path ]
       if ! o
-        o = Models_::Mock_FS.__new_via_path path
+        o = Models_::Stubbed_FS.__new_via_path path
         cache[ path ] = o
       end
       o
     end
 
     Models_ = ::Module.new
-    Models_::Mock_FS = self
-    class Models_::Mock_FS
+    Models_::Stubbed_FS = self
+    class Models_::Stubbed_FS
 
-      # (implemented as a tree) ("mentor" is [#sy-009])
+      # (implemented as a tree) ("mentor" is [#009])
 
       def initialize path
 
@@ -127,7 +127,7 @@ module Skylab::GitViz
 
       def path_is_absolute path
         # let the real filesystem decide
-        Home_.lib_.system.filesystem.path_is_absolute path
+        Home_.services.filesystem.path_is_absolute path
       end
 
       # ~ internal support
@@ -161,7 +161,7 @@ module Skylab::GitViz
       end
 
       def _const sym
-        Home_.lib_.system.filesystem.constants.const_get sym, false
+        Home_.services.filesystem.constants.const_get sym, false
       end
     end
 
@@ -195,6 +195,7 @@ module Skylab::GitViz
 
     ABNORMAL_SEPARATOR_RX__ = %r((?<=/)/+|/+\z)
     DOT_SYMBOL___ = :'.'
+    FILE_SEPARATOR_BYTE_ = ::File::SEPARATOR.getbyte 0
   end
 end
 # :+#tombstone: #storypoint-80

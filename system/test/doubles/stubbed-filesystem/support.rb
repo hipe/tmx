@@ -1,7 +1,6 @@
-module Skylab::GitViz::TestSupport::Test_Lib
+module Skylab::System::TestSupport
 
-  module Mock_Filesystem::Support
-
+  module Doubles::Stubbed_Filesystem::Support
     def self.[] tcc
 
       tcc.send :define_singleton_method,
@@ -15,7 +14,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
     private
 
       def subject_module_
-        Subject_module_[]::Mock_Filesystem
+        Home_::Doubles::Stubbed_Filesystem
       end
 
       def at_ sym
@@ -23,11 +22,11 @@ module Skylab::GitViz::TestSupport::Test_Lib
       end
     end
 
-    class CONSTANTS___ < Lazy_Constants_
+    class CONSTANTS___ < TestSupport_::Lazy_Constants
 
-      define_method :COMMON_MOCK_FS_MANIFEST_PATH_ do
+      define_method :COMMON_STUBBED_FS_MANIFEST_PATH_ do
 
-        TS_.dir_pathname.join( 'mock-filesystem/fixtures/paths.manifest' ).to_path
+        TS_.dir_pathname.join( 'doubles/stubbed-filesystem/fixtures/paths.manifest' ).to_path
       end
     end
   end
