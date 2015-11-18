@@ -23,8 +23,11 @@ module Skylab::System
 
         @__NS ||= Stdin__.new false
       end
-    end  # >>
 
+      def successful_wait
+        @___sw ||= Home_::Doubles::Stubbed_System::Mock_Thread.new 0
+      end
+    end  # >>
 
     class IO__
 

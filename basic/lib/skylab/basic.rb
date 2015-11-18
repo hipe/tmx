@@ -35,6 +35,11 @@ module Skylab::Basic  # introduction at [#020]
     end
   end  # >>
 
+  _ACS = nil
+  ACS_ = -> do
+    _ACS ||= Home_.lib_.autonomous_component_system
+  end
+
   Callback_ = ::Skylab::Callback
 
   Default_property_instance__ = Callback_.memoize do

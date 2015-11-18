@@ -95,6 +95,22 @@ module Skylab::MyTerm::TestSupport
       )
     end
 
+    # ~
+
+    def persistence_payload_for_font_ s  # BE CAREFUL - we don't escape the name!
+
+      <<-HERE.unindent
+        {
+          "adapter": "imagemagick",
+          "adapters": {
+            "imagemagick": {
+              "background_font" : "#{ s }"
+            }
+          }
+        }
+      HERE
+    end
+
     # ~ mutate kernels
 
     _danger_memo :read_only_kernel_with_no_data_ do
@@ -106,8 +122,8 @@ module Skylab::MyTerm::TestSupport
 
     def new_mutable_kernel_with_nothing_persisted_
 
-      _ke = Home_::Build_default_application_kernel___[]
-      Edit_kernel__.call _ke do | o |
+      hack_a_kernel_ do | o |
+
         o.__eradicate_thing
       end
     end
@@ -121,26 +137,42 @@ module Skylab::MyTerm::TestSupport
 
     def new_mutable_kernel_with_appearance_ string
 
-      _ke = Home_::Build_default_application_kernel___[]
-      Edit_kernel__.call _ke do | o |
-        o._set_data string
+      hack_a_kernel_ do | o |
+
+        o.accept_persistence_payload_string string
       end
     end
 
     def _new_kernel_with_data_path path
 
-      _ke = Home_::Build_default_application_kernel___[]
-      Edit_kernel__.call _ke do | o |
+      hack_a_kernel_ do | o |
+
         o._set_data_path path
       end
+    end
+
+    def hack_a_kernel_ & edit
+
+      ke = start_a_kernel_
+      edit_kernel_by_ ke, & edit
+      ke
+    end
+
+    def start_a_kernel_
+      Home_::Build_default_application_kernel___[]
+    end
+
+    def edit_kernel_by_ ke, & edit
+      Edit_kernel__[ ke, & edit ]
+      NIL_
     end
 
     class Edit_kernel__
 
       class << self
-        def call ke
+        def [] ke
           yield new ke
-          ke
+          NIL_
         end
         private :new
       end
@@ -148,6 +180,8 @@ module Skylab::MyTerm::TestSupport
       def initialize ke
         @_kernel = ke
       end
+
+      # ~ manupulate dootily has
 
       def __eradicate_thing
 
@@ -163,33 +197,44 @@ module Skylab::MyTerm::TestSupport
         end ; nil
       end
 
-      def _set_data string
+      def accept_persistence_payload_string string
 
-        ke = @_kernel
-
-        _mock_installation_method :any_existing_read_writable_IO do
-
+        once = Callback_.memoize do
           require 'stringio'
-
           io = ::StringIO.new string
-
-          ke.send :define_singleton_method, :_string_IO_for_testing_ do
-            io
-          end
-
           def io.path
             "[mt]/string-IO-xizzi.json"
           end
-
           io
         end
+
+        @_kernel.send :define_singleton_method, :_string_IO_for_testing_ do
+          once[]
+        end
+
+        _mock_installation_method :any_existing_read_writable_IO do
+
+          io = once[]
+          io.rewind
+          io
+        end
+
+        NIL_
       end
 
       def _mock_installation_method m, & p
 
-        _dae = @_kernel.silo :Installation
-        _dae.send :define_singleton_method, m, & p
+        _installation_daemon.send :define_singleton_method, m, & p
         NIL_
+      end
+
+      def mess_with_installation & xxx
+
+        TS_::Mess_With.call _installation_daemon, & xxx
+      end
+
+      def _installation_daemon
+        @_kernel.silo :Installation
       end
     end
 

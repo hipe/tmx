@@ -60,7 +60,7 @@ module Skylab::Autonomous_Component_System
 
           else
             cx = @association.model_classifications
-            if ! cx.looks_like_proc
+            if ! cx.looks_primitivesque
               m = cx.construction_method_name
               if m
                 cm = m

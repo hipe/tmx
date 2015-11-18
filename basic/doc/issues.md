@@ -24,7 +24,7 @@
 [#033]       [ word wrap ]
 [#032]       [ ellipsify ]
 [#031] #open domain partitioning of scanners
-[#030]       #code-node the basic struct
+[#030]       (would be struct notes)
              [#.A]  (ancient) "memberhood" means an instance of a member
 [#029]       #doc-node the string node
 [#028]       #parent-node: [#029] the string template narrative ..

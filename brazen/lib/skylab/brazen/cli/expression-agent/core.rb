@@ -141,8 +141,8 @@ module Skylab::Brazen
         Home_::CLI::Styling.stylify i_a, s
       end
 
-      def val s
-        s.inspect
+      def val x  # assume "primitive"
+        x.inspect
       end
 
       # ~ support

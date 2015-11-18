@@ -136,11 +136,11 @@ module Skylab::MyTerm
 
     def ___concatenate_adapter_specific_items st
 
-      # see :+#how-component-injection-is-currently-implemented
+      # see [#]:how-component-injection-is-currently-implemented
 
       ada = @adapter.selected_adapter__
 
-      va = nil
+      hacky_mutator = nil
 
       _adapter_stream = ACS_[]::For_Interface::To_stream[ ada ]
 
@@ -151,9 +151,11 @@ module Skylab::MyTerm
         asc = qkn.association
         :association == asc.category or self._DESIGN_ME_write_me
 
-        va ||= Visiting_Association___.new ada
-        _asc_ = va.new qkn.association
-         qkn.new_with_association _asc_
+        hacky_mutator ||= Make_hacky_mutator___[ ada ]
+
+        hacky_mutator[ qkn.association ]
+
+        qkn
       end
 
       st.concat_by _st_
@@ -366,7 +368,7 @@ module Skylab::MyTerm
 
       else
 
-        # otherwise (and this is from prehaps an adpater, but whatever)
+        # otherwise (and this is from perhaps an adpater, but whatever)
         # assume that it is already contextualized to the desired amount.
 
         _linked_list = linked_list_p[]
@@ -380,17 +382,23 @@ module Skylab::MyTerm
       @_oes_p.call :error, desc_sym do
         _ev
       end
+
+      UNABLE_  # (perhaps not important)
     end
 
-    def receive_component__info__expression__ _acs, desc_sym, & y_p
+    def receive_component__info__expression__ _asc, desc_sym, & y_p
 
-      @_oes_p.call :info, :expression, desc_sym do | y |
-        calculate y, & y_p  # hi.
+      @_oes_p.call :info, :expression, desc_sym, & y_p
+    end
+
+    def receive_component__info__ _asc, desc_sym, & ev_p
+
+      # info's are expected to come from adapters already contextualized
+
+      @_oes_p.call :info, desc_sym do
+
+        ev_p[] # (hi.)
       end
-      NIL_
-    end
-
-    def receive_component__info__  # respond to only
     end
 
     # -- Project hook-outs
@@ -421,43 +429,28 @@ module Skylab::MyTerm
 
     # -- ACS hook-in (and related) NODES
 
-    class Visiting_Association___
+    Make_hacky_mutator___ = -> ada do
 
-      def initialize real_ACS
+      -> asc do
+        if asc.respond_to? :__accept_real_ACS
+          self._BOY_HOWDY
+        end
+        asc.singleton_class.send :prepend, Hackland___  # [#]:somewhat-nasty
+        asc.__accept_real_ACS ada
+        NIL_
+      end
+    end
+
+    module Hackland___
+
+      def __accept_real_ACS real_ACS
         @_real_ACS = real_ACS
-      end
-
-      # - Look like an assoc
-
-      def new asc
-        dup.___init asc
-      end
-
-      def ___init asc
-        @_real_assoc = asc ; self
-      end
-
-      def model_classifications
-        @_real_assoc.model_classifications
-      end
-
-      def component_model
-        @_real_assoc.component_model
-      end
-
-      def name
-        @_real_assoc.name
-      end
-
-      def category
-        @_real_assoc.category
+        NIL_
       end
 
       def sub_category
         :visiting
       end
-
-      # -- Doesn't look like an assoc
 
       attr_reader(
         :_real_ACS,

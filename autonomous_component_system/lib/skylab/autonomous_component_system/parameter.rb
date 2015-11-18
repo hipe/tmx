@@ -168,8 +168,13 @@ module Skylab::Autonomous_Component_System
         end
       end
 
+      def __interpret__name__ st
+        @_nf = st.gets_one
+        KEEP_PARSING_
+      end
+
       def name
-        @__nf ||= Callback_::Name.via_variegated_symbol( @name_symbol )
+        @_nf ||= Callback_::Name.via_variegated_symbol( @name_symbol )
       end
 
       attr_reader(

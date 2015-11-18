@@ -256,12 +256,12 @@ module Skylab::System
 
         def __to_mock_thread
           if @exitstatus
-            Mock_Thread___.new @exitstatus
+            Mock_Thread.new @exitstatus
           end
         end
       end
 
-      class Mock_Thread___
+      class Mock_Thread
 
         def initialize es
           @value = Mock_Thread_Value___.new es

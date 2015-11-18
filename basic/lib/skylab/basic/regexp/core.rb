@@ -4,6 +4,11 @@ module Skylab::Basic
 
     class << self
 
+      def build_component_model & build
+        Require_component_model_support___[]
+        Component_Model[ & build ]
+      end
+
       def marshal_load s, & oes_p
         Marshal_load__[ s, & oes_p ]
       end
@@ -124,6 +129,83 @@ module Skylab::Basic
       end
 
       attr_reader :is_ignorecase, :is_multiline, :is_extended
+    end
+
+    Require_component_model_support___ = Callback_.memoize do
+
+      class Component_Model
+
+        # if you are only using this as a "matcher", your matcher need only
+        # respond to `=~` (and need not be a regexp). if you see `mapper`,
+        # etc.
+
+        class << self
+          def [] & build
+            o = new
+            build[ o ]
+            if o.mapper
+              o.__init_as_mapper
+            else
+              o.__init_as_matcher
+            end
+            o
+          end
+          private :new
+        end  # >>
+
+        def initialize
+          @mapper = nil
+        end
+
+        attr_writer(
+          :mapper,
+          :matcher,
+          :on_failure_to_match,
+        )
+
+        attr_reader(
+          :mapper,
+        )
+
+        def __init_as_matcher
+
+          @_p = -> arg_st, & x_p do
+
+            x = arg_st.gets_one
+
+            if @matcher =~ x
+              ACS_[]::Value_Wrapper[ x ]
+            else
+              @on_failure_to_match[ :_reserved_, & x_p ]
+            end
+          end
+
+          NIL_
+        end
+
+        def __init_as_mapper
+
+          @_p = -> arg_st, & x_p do
+
+            x = arg_st.gets_one
+            md = @matcher.match x
+
+            if md
+              _x = @mapper[ * md.captures ]
+              ACS_[]::Value_Wrapper[ _x ]
+            else
+              @on_failure_to_match[ :_reserved_, & x_p ]
+            end
+          end
+          NIL_
+        end
+
+        def [] arg_st, & x_p
+          @_p[ arg_st, & x_p ]
+        end
+      end
+
+      NIL_
     end
 
     Regexp_ = self

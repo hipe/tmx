@@ -9,37 +9,39 @@ module Skylab::Brazen
       :name_x_a, nil,
       :did_you_mean_i_a, nil,
       :prefixed_conjunctive_phrase_context_proc, nil,
+      :prefixed_conjunctive_phrase_context_stack, nil,
       :suffixed_prepositional_phrase_context_proc, nil,
       :lemma, nil,
       :adj, nil,
+      :invite_to_action, nil,
       :error_category, :argument_error,
       :ok, false
 
     ) do | y, o |
 
-      s_a = o.name_x_a.map( & method( :ick ) )
+      # e.g: "couldn't wizzle - unrecognized property 'foo' in blah blah"
 
-      _lemma = o.lemma || DEFAULT_PROPERTY_LEMMA_
-
-      s = o.adj
-      adj_ = if s
-        "#{ s } "
-      else
-        "unrecognized "
+      a = []
+      p = o.prefixed_conjunctive_phrase_context_proc
+      if p
+        calculate a, o, & p
       end
 
-      p = o.prefixed_conjunctive_phrase_context_proc
-      s = ( calculate o, & p if p )
-      _pre = "#{ s } " if s
+      s = o.adj
+      a.push s || "unrecognized"
+
+      s_a = o.name_x_a.map( & method( :ick ) )
+      _lemma = o.lemma || DEFAULT_PROPERTY_LEMMA_
+      a.push plural_noun s_a.length, _lemma
+
+      a.push and_ s_a
 
       p = o.suffixed_prepositional_phrase_context_proc
-      s = ( calculate o, & p if p )
-      _post = " #{ s }" if s
+      if p
+        calculate a, o, & p
+      end
 
-      # e.g: "unrecognized property 'foo' in blah blah"
-
-      y << "#{ _pre }#{ adj_ }#{ plural_noun s_a.length, _lemma }#{
-        } #{ and_ s_a }#{ _post }"
+      y << a.join( SPACE_ )
 
       if o.did_you_mean_i_a
         _s_a_ = o.did_you_mean_i_a.map( & method( :code ) )

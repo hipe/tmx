@@ -26,13 +26,9 @@ module Skylab::Callback::TestSupport
       ( @_future_expect_queue ||= [] ).push false ; nil
     end
 
-    def on_past_emissions x
-      @_past_emissions = x ; nil
-    end
-
     def past_expect_eventually * i_a, & ev_p
 
-      em_a = @_past_emissions.all_on_channel i_a
+      em_a = past_emissions.all_on_channel i_a
       case 1 <=> em_a.length
       when 0
         em = em_a.fetch 0
@@ -44,7 +40,7 @@ module Skylab::Callback::TestSupport
       when -1
         fail Say_expected_one_thing_had_many_things__[ i_a, em_a.length ]
       else
-        _x = @_past_emissions.mixed_for_description
+        _x = past_emissions.mixed_for_description
         fail Say_expected_one_thing_had_another_thing__[ i_a, _x ]
       end
     end

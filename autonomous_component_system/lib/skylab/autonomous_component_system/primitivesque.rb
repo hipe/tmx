@@ -1,10 +1,12 @@
 module Skylab::Autonomous_Component_System
 
-  # ->
+  module Primitivesque  # notes in [#003]
 
-    class Primitivesque  # notes in [#003]
+    class For_Interface
 
-      # (for now this moudule is public b/c we are anticipating adding
+      # (todo promote this node one level and rename within it)
+
+      # (for now this module is public b/c we are anticipating adding
       # public library functions to it)
 
       # the component model models a component that is primitive-esque
@@ -19,8 +21,19 @@ module Skylab::Autonomous_Component_System
         @_qkn = qkn
       end
 
+      def describe_into_under y, expag
+
+        p = @_qkn.association.description_block
+
+        if p
+          expag.calculate y, & p
+        else
+          y
+        end
+      end
+
       def component_value_reader_for_reactive_tree
-        -> asc do
+        -> qkn do
           self._K
         end
       end
@@ -36,7 +49,21 @@ module Skylab::Autonomous_Component_System
       end
     end
 
-    class ACS_::Primitivesque::Operation___ < ACS_::Operation
+    class As_Component  # lx2
+
+      def initialize qkn
+        @_qkn = qkn
+      end
+
+      def description_under expag
+        qkn = @_qkn
+        expag.calculate do
+          val qkn.value_x
+        end
+      end
+    end
+
+    class Operation___ < ACS_::Operation
 
       class << self
         alias_method :__new, :new
@@ -57,5 +84,5 @@ module Skylab::Autonomous_Component_System
         [ :"__#{ sym }__primitivesque_component_operation_for", @_qkn ]
       end
     end
-  # -
+  end
 end

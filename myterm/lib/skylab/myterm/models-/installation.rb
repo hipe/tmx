@@ -12,13 +12,13 @@ module Skylab::MyTerm
 
       def any_existing_read_writable_IO
 
-        _filesystem.open _appearance_persistence_path, ::File::RDWR
+        filesystem.open _appearance_persistence_path, ::File::RDWR
       rescue ::Errno::ENOENT
       end
 
       def writable_IO * x_p
 
-        fs = _filesystem
+        fs = filesystem
         path = _appearance_persistence_path
 
         dirname = ::File.dirname path
@@ -48,11 +48,13 @@ module Skylab::MyTerm
         @__data_path ||= ::File.join( ::ENV.fetch( 'HOME' ), '.myterm' )
       end
 
-      def _filesystem
+      def filesystem
         @___FS ||= Home_.lib_.system.filesystem
       end
 
-      alias_method :filesystem, :_filesystem  # localize the exposure
+      def system_conduit
+        Home_.lib_.open3
+      end
     end
   end
 end

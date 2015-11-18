@@ -177,9 +177,11 @@ module Skylab::MyTerm
 
       fonts_dir = @_sys.fonts_dir
 
-      remove_instance_variable :@_sys
+      _glob_path = "#{ fonts_dir }/*"
 
-      _paths = ::Dir[ "#{ fonts_dir }/*" ]
+      _paths = @_sys.filesystem.glob _glob_path
+
+      remove_instance_variable :@_sys
 
       _st = Callback_::Stream.via_nonsparse_array _paths
 

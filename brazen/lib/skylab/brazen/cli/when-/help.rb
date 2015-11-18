@@ -13,15 +13,13 @@ module Skylab::Brazen
 
       def produce_result
         if @any_cmd_string
-          whn_command_string
+          __when_command_string
         else
-          whn_no_command_string
+          __when_no_command_string
         end
       end
 
-    private
-
-      def whn_command_string
+      def __when_command_string
 
         aa = @aa
         a = aa.find_matching_action_adapters_against_tok_ @any_cmd_string
@@ -39,7 +37,7 @@ module Skylab::Brazen
         end
       end
 
-      def whn_no_command_string
+      def __when_no_command_string
 
         aa = @aa
         o = @help_renderer
@@ -67,13 +65,31 @@ module Skylab::Brazen
 
         _ordered_st = aa.wrap_adapter_stream_with_ordering_buffer_ _visible_st
 
-        o.express_items_with_descriptions_ nil, _ordered_st.to_a, 2
+        item_a = _ordered_st.to_a
 
+        if item_a.length.zero?
+
+          o.express do
+            "(no actions)"
+          end
+
+          GENERIC_ERROR_EXITSTATUS
+        else
+          __when_nonzero_items item_a, o
+        end
+      end
+
+      def __when_nonzero_items item_a, o
+
+        o = @help_renderer
+
+        o.express_items_with_descriptions_ nil, item_a, 2
 
         # ~ invite to more help
 
         o.section_boundary
 
+        aa = @aa
         prp = aa.properties.fetch :action
         o.express do
           "use #{ code "#{ aa.invocation_string } -h #{

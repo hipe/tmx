@@ -92,11 +92,39 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
     # how this unit is structured is the subject of the [#bs-039] case study
 
+    Component_Association::Caching_method_based_reader_for___ = -> cls, acs do
+
+      # see [#]how-we-cache-component-associations
+
+      read = Component_Association::Method_based_reader_for__[ cls, acs ]
+
+      h = {}
+
+      -> sym, & else_p do
+
+        x = h.fetch sym do
+
+          x_ = read.call sym do
+            NIL_
+          end
+          # when nil, we munge the detail of how `x_` became that way here.
+          h[ sym ] = x_
+          x_
+        end
+
+        if x
+          x
+        elsif else_p
+          else_p[]
+        end
+      end
+    end
+
     method_name_for = -> sym do
       :"__#{ sym }__component_association"
     end
 
-    Component_Association::Method_based_reader_for___ = -> ca_class, acs do
+    Component_Association::Method_based_reader_for__ = -> ca_class, acs do
 
       send = -> m, sym do
 
@@ -154,6 +182,10 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       class << self
 
+        def caching_method_based_reader_for acs
+          Caching_method_based_reader_for___[ self, acs ]
+        end
+
         def reader_for acs
 
           if acs.respond_to? METHOD__
@@ -164,7 +196,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         end
 
         def method_based_reader_for acs
-          Method_based_reader_for___[ self, acs ]
+          Method_based_reader_for__[ self, acs ]
         end
 
         def via_name_and_model nf, mdl
@@ -213,7 +245,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         m = CONSTRUCTOR_METHODS__.detect { | m_ | mdl.respond_to? m_ }
 
         if m
-          Model_Looks_Entitesque___.new m
+          NON_PRIMITIVES___.fetch m
 
         elsif mdl.respond_to? :[]
           LOOKS_LIKE_PROC___
@@ -244,43 +276,72 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         COMPOUND_CONSTRUCTOR_METHOD_,
       ]
 
-      class Model_Looks_Entitesque___
-
-        def initialize m
-          @construction_method_name = m
-        end
+      class Looks_Like__ < ::Module
 
         def looks_compound
-          COMPOUND_CONSTRUCTOR_METHOD_ == @construction_method_name
+          false
         end
 
         def looks_entitesque
-          ENTITESQUE_CONSTRUCTOR_METHOD__ == @construction_method_name
+          false
         end
 
-        attr_reader(
-          :construction_method_name,
-        )
-
-        def looks_like_proc
+        def looks_primitivesque
           false
         end
       end
 
-      module LOOKS_LIKE_PROC___ ; class << self
+      h = {}
+
+      LOOKS_LIKE_COMPOUND___ = Looks_Like__.new
+      sing = LOOKS_LIKE_COMPOUND___
+      class << sing
+
+        def construction_method_name
+          COMPOUND_CONSTRUCTOR_METHOD_
+        end
+
+        def category_symbol
+          :compound
+        end
 
         def looks_compound
-          false
+          true
+        end
+      end
+      h[ sing.construction_method_name ] = sing
+
+      LOOKS_LIKE_ENTITY___ = Looks_Like__.new
+      sing = LOOKS_LIKE_ENTITY___
+      class << sing
+
+        def construction_method_name
+          ENTITESQUE_CONSTRUCTOR_METHOD__
+        end
+
+        def category_symbol
+          :entitesque
         end
 
         def looks_entitesque
-          false
-        end
-
-        def looks_like_proc
           true
         end
-      end ; end
+      end
+      h[ sing.construction_method_name ] = sing
+      NON_PRIMITIVES___ = h
+      h = nil
+
+      LOOKS_LIKE_PROC___ = Looks_Like__.new
+      class << LOOKS_LIKE_PROC___
+
+        def category_symbol
+          :primitivesque
+        end
+
+        def looks_primitivesque
+          true
+        end
+      end
 
       # ~
 
@@ -299,6 +360,25 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       end
 
       attr_reader :_operations
+
+      def accept__generate_description__meta_component  # [#003]#infer-desc
+
+        # (for now this is only covered for primitives w/ operations)
+
+        me = self
+        @description_block = -> y do
+
+          _s_a = me._operations.to_name_stream.reduce_into_by [] do | m, sym |
+
+            m << Callback_::Name.via_variegated_symbol( sym ).as_human
+          end
+
+          y << "#{ and_ _s_a } #{ me.name.as_human }"  # ..
+        end
+        NIL_
+      end
+
+      attr_reader :description_block
 
       def accept__intent__meta_component sym  # see [#003]:#interp-B
         @intent = sym
@@ -380,26 +460,27 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
     module Reflection
 
+      to_component_association_stream = nil
       To_qualified_knownness_stream = -> acs do
 
-        asc_for = Component_Association.reader_for acs
-
         qkn_for = ACS_::Reflection_::Reader[ acs ]
+
+        to_component_association_stream[ acs ].map_by do | asc |
+
+          qkn_for[ asc ]
+        end
+      end
+
+      to_component_association_stream = -> acs do
+
+        asc_for = Component_Association.reader_for acs
 
         ACS_::Reflection_::To_entry_stream[ acs ].map_reduce_by do | entry |
 
           if entry.is_association
 
-            _asc = asc_for[ entry.name_symbol ]
-
-            qkn_for[ _asc ]
+            asc_for[ entry.name_symbol ]
           end
-        end
-      end
-
-      To_component_association_name_symbol_stream = -> acs do
-        ACS_::Reflection_::To_entry_stream[ acs ].map_by do | entry |
-          entry.name_symbol
         end
       end
 

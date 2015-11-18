@@ -1,6 +1,6 @@
 module Skylab::MyTerm
 
-  class Image_Output_Adapters_::Imagemagick  # (notes in [#003])
+  class Image_Output_Adapters_::Imagemagick  # (notes in [#003], [#004])
 
     # -- Construction methods
 
@@ -56,6 +56,10 @@ module Skylab::MyTerm
 
     # -- ACS hook-ins
 
+    def component_association_reader
+      @___car ||= Component_Association___[].caching_method_based_reader_for self
+    end
+
     # (the next 2 are what is default, but #note-about-explicit-readers-writers)
 
     def accept_component_qualified_knownness qkn
@@ -72,12 +76,27 @@ module Skylab::MyTerm
 
     def __background_font__component_association
 
-      # yield :required_to_make_image
+      yield :required_to_make_image
+
+      yield :internal_name, :font
 
       Home_::Models_::Font
     end
 
-    # -- ACS hook-outs  (implement primitive-esque operations)
+    def __label__component_association
+
+      yield :required_to_make_image
+
+      yield :can, :set, :get
+
+      yield :generate_description
+
+      Home_.lib_.basic::String.component_model_for :NONBLANK
+    end
+
+    # -- ACS hook-outs (implement primitive-esque operations)
+
+    # ~ primitivesque setting
 
     def __set__primitivesque_component_operation_for qkn
 
@@ -85,20 +104,54 @@ module Skylab::MyTerm
         y << "set #{ qkn.name.as_human }"
       end
 
+      yield :parameter, :x, :name, qkn.name
+
       -> x do
-
-        _vp = ACS_[]::Interpretation::Value_Popper[ x ]
-
-        _oes_p_ = ACS_[]::Interpretation::Component_handler[
-          qkn.association, self ]
-
-        wv = qkn.association.component_model[ _vp, & _oes_p_ ]
-        if wv
-          self._K
-        else
-          wv
-        end
+        ___set_primitivesque x, qkn
       end
+    end
+
+    def ___set_primitivesque x, qkn
+
+      asc = qkn.association
+
+      wv = ___build_primitive x, asc
+
+      wv and __accept_primitive wv, qkn
+    end
+
+    def ___build_primitive x, asc
+
+      _oes_p = -> * i_a, & ev_p do
+
+        # when you get an emission, contextualize it by adding asc and verb
+
+        _nf = asc.name
+
+        _linked_list = Home_.lib_.basic::List.linked_list_via _nf, :set
+
+        _ch = ACS_[]::Interpretation::Component_handler[ _linked_list, self ]
+
+        _x = _ch[ * i_a, & ev_p ]
+
+        _x
+      end
+
+      _vp = ACS_[]::Interpretation::Value_Popper[ x ]
+
+      asc.component_model[ _vp, & _oes_p ]
+    end
+
+    def __accept_primitive wv, qkn
+
+      _ = ACS_[]::Interpretation::Accept_component_change[
+        wv.value_x, qkn.association, self ]
+
+      _ev = _[]
+
+      _ctx = Begin_context_[ qkn.association.name, _ev ]
+
+      _mutated _ctx
     end
 
     def __get__primitivesque_component_operation_for qkn
@@ -108,7 +161,19 @@ module Skylab::MyTerm
       end
 
       -> do
-        self._CONSIDER_THIS_CAREFULLY
+        if qkn.is_effectively_known
+          x = qkn.value_x
+          if x.respond_to? :ascii_only?
+            x
+          else
+            self._COVER_ME  # watch for etc
+          end
+        else
+          @oes_p_.call :info, :expression, :not_set do | y |
+            y << "(no value set for #{ qkn.name.as_human })"
+          end
+          NIL_
+        end
       end
     end
 
@@ -133,22 +198,24 @@ module Skylab::MyTerm
 
       _ctx = Begin_context_[ asc.name, _ev ]
 
-      persisted_OK = @oes_p_.call :mutated do
-        _ctx
-      end
-
-      if persisted_OK
-        ___when_persisted_OK
-      else
-        persisted_OK
-      end
-    end
-
-    def ___when_persisted_OK
-      ACHIEVED_  # this will become etc..
+      _mutated _ctx
     end
 
     # ~  error and info
+
+    def receive_component__error__expression__is_not__ _LL, desc_sym, & y_p
+
+      _ev = ACS_[]::Modalities::Human::Event_via_is_not[ desc_sym, & y_p ]
+
+      _LL_ = _LL + _ev
+
+      @oes_p_.call :error, desc_sym do | y |
+        _LL_
+      end
+    end
+
+    def receive_component__error__expression__  # respond to only
+    end
 
     def receive_component__error__ asc, desc_sym, & ev_p
 
@@ -165,16 +232,11 @@ module Skylab::MyTerm
 
     def receive_component__info__expression__ asc, desc_sym, & y_p
 
-      @oes_p_.call :info, :expression, desc_sym do | y |
+      _ev = ACS_[]::Modalities::Human::Event_via_expression[ asc, desc_sym, & y_p ]
 
-        ACS_[]::Modalities::Human::Contextualize_lines[ y, self, asc, nil, & y_p ]
+      @oes_p_.call :info, desc_sym do | y |
+        _ev
       end
-    end
-
-    def receive__component__is_not__ * rest, asc, & p
-
-      @oes_p_.call :component, :is_not, * rest, asc, & p
-
     end
 
     # -- Project hook-ins/hook-outs
@@ -215,5 +277,124 @@ module Skylab::MyTerm
       :is_selected,
       :kernel_,
     )
+
+    # -- Support
+
+    def _mutated _ctx
+
+      persisted_OK = @oes_p_.call :mutated do
+        _ctx
+      end
+
+      if persisted_OK
+        ___maybe_build_and_send_image
+      else
+        persisted_OK
+      end
+    end
+
+    # ~ (see [#004]:principal-algorithm-1 - when images are made)
+
+    def ___maybe_build_and_send_image
+
+      _yes = __check_if_all_requireds_are_set
+      if _yes
+        __via_snapshot_build_and_send_image
+      else
+        ACHIEVED_  # missing requireds is not a failure
+      end
+    end
+
+    def __check_if_all_requireds_are_set
+
+      # all about this name and implementation at [#004]:subnote-1
+
+      missing = nil
+      snapshot = Callback_::Box.new  # stowaway logic while making the trip
+
+      st = ACS_[]::Reflection::To_qualified_knownness_stream[ self ]
+
+      begin
+
+        qkn = st.gets
+        qkn or break
+
+        snapshot.add qkn.name.as_variegated_symbol, qkn
+
+        if ! qkn.association.is_required_to_make_image_
+          redo
+        end
+
+        if ! qkn.is_effectively_known
+          ( missing ||= [] ).push qkn.association
+        end
+
+        redo
+      end while nil
+
+      if missing
+        ___emit_information_about_remaining_required_fields missing
+        UNABLE_
+      else
+        @snapshot_ = snapshot
+        ACHIEVED_
+      end
+    end
+
+    def ___emit_information_about_remaining_required_fields missing
+
+      @oes_p_.call :info, :expression, :remaining_required_fields do | y |
+
+        _s_a = missing.map do | asc |
+          val asc.name.as_human  # ..
+        end
+
+        y << "(still needed before we can produce an image: #{ and_ _s_a })"
+      end
+
+      NIL_
+    end
+
+    # -- personal
+
+    def __via_snapshot_build_and_send_image
+
+      Here_::Build_and_send_image_[ @snapshot_, @kernel_, & @oes_p_ ]
+    end
+
+    Here_ = self
+  end
+
+  Image_Output_Adapters_::Imagemagick::Component_Association___ = Callback_.memoize do
+
+    # in keeping with tradition we only ever load ACS libs lazily
+
+    class Component_Association < ACS_[]::Component_Association
+
+      def accept__internal_name__meta_component x
+        @__internal_name_symbol = x
+        NIL_
+      end
+
+      def internal_name_symbol_
+        __internal_name_symbol || @name.as_variegated_symbol
+      end
+
+      # "requiredness" is a business-specific concern - it is not modeled
+      # by the ACS (nor should it be). but because it is a useful concept
+      # here, we can enrich our DSL to recognize this meta-component:
+
+      def accept__required_to_make_image__meta_component
+        @is_required_to_make_image_ = true
+        NIL_
+      end
+
+      attr_reader(
+        :__internal_name_symbol,
+        :is_required_to_make_image_,
+      )
+
+      self
+    end
   end
 end

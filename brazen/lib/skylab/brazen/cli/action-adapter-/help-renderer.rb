@@ -317,18 +317,26 @@ module Skylab::Brazen
         # ~ "interjections"
 
         def express_invite_to_general_help
-          s = subject_invocation_string
-          express do
-            "use #{ code "#{ s } -h" } for help"
-          end
+
+          _s = subject_invocation_string
+          _express_this_string_as_an_invite_to_help "#{ _s } -h"  # eek
         end
 
         def express_invite_to_particular_action__ i_a
-          o = @action_adapter.bound_action_via_normal_name_ i_a
-          s = o.primary_syntax_string
+
+          _ada = @action_adapter.bound_action_via_normal_name_ i_a
+
+          _s = _ada.help_syntax_string  # assume if invited then produced
+
+          _express_this_string_as_an_invite_to_help _s
+        end
+
+        def _express_this_string_as_an_invite_to_help s
+
           express do
-            "use #{ code s }"
+            "use #{ code s } for help"
           end
+          NIL_
         end
 
         def subject_invocation_string

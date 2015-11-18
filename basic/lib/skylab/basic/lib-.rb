@@ -6,7 +6,7 @@ module Skylab::Basic
       :build_require_sidesystem_proc,
       :build_require_stdlib_proc )
 
-    ACS = sidesys[ :Autonomous_Component_System ]
+    Autonomous_component_system = sidesys[ :Autonomous_Component_System ]
 
     Brazen = sidesys[ :Brazen ]
 

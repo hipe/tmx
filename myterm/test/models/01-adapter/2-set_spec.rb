@@ -34,8 +34,6 @@ module Skylab::MyTerm::TestSupport
 
       it "(matches fuzzily!) emits natural sounding event" do
 
-        on_past_emissions _state.emissions
-
         past_expect_eventually :info, :component_added do | ev |
 
           _s = past_black_and_white ev
@@ -45,13 +43,16 @@ module Skylab::MyTerm::TestSupport
 
       it "emits 'wrote' event" do
 
-        on_past_emissions _state.emissions
         _expect_same_wrote_event
       end
 
       it "creates JSON file that looks right" do
 
         _expect_same_JSON_file
+      end
+
+      def past_emissions
+        _state.emissions
       end
 
       dangerous_memoize_ :_state do
@@ -83,8 +84,6 @@ module Skylab::MyTerm::TestSupport
 
       it "natural" do
 
-        on_past_emissions _state.emissions
-
         past_expect_eventually :info, :component_changed do | ev |
           _s = future_black_and_white ev
           _s.should eql(
@@ -93,8 +92,11 @@ module Skylab::MyTerm::TestSupport
       end
 
       it "emits 'wrote' event" do
-        on_past_emissions _state.emissions
         _expect_same_wrote_event
+      end
+
+      def past_emissions
+        _state.emissions
       end
 
       it "updates JSON file that looks right" do

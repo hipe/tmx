@@ -32,6 +32,10 @@ module Skylab::Basic
         end
       end
 
+      def linked_list_via * a
+        linked_list_via_array a
+      end
+
       def linked_list_via_array a
 
         if a.length.nonzero?
@@ -64,6 +68,30 @@ module Skylab::Basic
       def initialize next_LL, element_x
         @element_x = element_x
         @next = next_LL  # nil ok
+      end
+
+      def + x
+        cls = self.class
+        curr = cls[ nil, x ]
+        stack = ___to_node_stack
+        begin
+          node = stack.pop
+          node or break
+          curr = cls[ curr, node.element_x ]
+          redo
+        end while nil
+        curr
+      end
+
+      def ___to_node_stack
+        a = [] ; curr = self
+        begin
+          a.push curr
+          curr = curr.next
+          curr or break
+          redo
+        end while nil
+        a
       end
 
       def to_a

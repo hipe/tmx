@@ -617,3 +617,23 @@ for edit sessions that build or remove items where the caller may want to
 do something with this item). but not this technique cannot be used for
 models where the component can be valid-ly false-ish. (rather, look into
 using the "value wrapper" if you really need to.)
+
+
+
+
+# component association notes
+
+## :how-we-cache-component-associations
+
+• for every item that is ever requested we will only ever attempt to
+  retrieve from the real source once, regardless of whether it
+  was found that time or not.
+
+• for some goof-proofing we conflate not knowing the item with knowing
+  it and resulting in false-ish (for now!), because presumably the ACS
+  that results in false-ish for a "known" item wants us to "think" it
+  doesn't "have" the item in any way. (this related to some nearby non-
+  covered codepoints.)
+
+• any "else" block the client passes must be evaluated anew for each call
+  and must not impact any real (inner) retrieval that is performed.

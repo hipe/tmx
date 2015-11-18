@@ -12,20 +12,20 @@ module Skylab::Autonomous_Component_System
 
             context_x = sess.context_x
 
-            _p = -> _ev do
+            _p = -> s_a, _ev do
 
               if context_x
 
                 st = context_x.to_element_stream_assuming_nonsparse
 
-                s_a = st.reduce_into_by [] do | m, p |
+                s_a_ = st.reduce_into_by [] do | m, p |
 
                   m << calculate( & p )
                 end
 
-                s_a.reverse!
-
-                s_a * SPACE_
+                s_a_.reverse!
+                s_a.concat s_a_
+                s_a
               end
             end
 

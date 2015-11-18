@@ -24,12 +24,30 @@ module Skylab::Autonomous_Component_System
 
         _LL = Home_.lib_.basic::List::Linked[ nil, asc.name ]
 
+        looks_primitive = asc.model_classifications.looks_primitivesque
+
+        as_new_component = if looks_primitive
+
+          _new_qkn = Callback_::Qualified_Knownness.via_value_and_association(
+            new_component, asc )
+
+          ACS_::Primitivesque::As_Component.new _new_qkn
+        else
+          new_component
+        end
+
         if orig_qkn.is_effectively_known  # #inout-A, [#]inout-B
+
+          _as_previous_component = if looks_primitive
+            ACS_::Primitivesque::As_Component.new orig_qkn
+          else
+            orig_qkn.value_x
+          end
 
           -> do
             ACS_.event( :Component_Changed ).new_with(
-              :current_component, new_component,
-              :previous_component, orig_qkn.value_x,
+              :current_component, as_new_component,
+              :previous_component, _as_previous_component,
               :context_as_linked_list_of_names, _LL,
               :suggested_event_channel, [ :info, :component_changed ],
             )
@@ -37,7 +55,7 @@ module Skylab::Autonomous_Component_System
         else
           -> do
             ACS_.event( :Component_Added ).new_with(
-              :component, new_component,
+              :component, as_new_component,
               :context_as_linked_list_of_names, _LL,
               :suggested_event_channel, [ :info, :component_added ],
               :verb_lemma_symbol, :set,

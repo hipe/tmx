@@ -293,14 +293,13 @@ module Skylab::Brazen
         NIL_
       end
 
-      def write_any_auxiliary_syntax_string y
+      def write_any_auxiliary_syntax_strings y
 
         # unlike parent which checks for the existence of any property
         # called 'help', we always support this action-like option.
 
         _ho = CLI::STANDARD_ACTION_PROPERTY_BOX_.fetch :help
-        write_auxiliary_syntax_string_for_help_option_ y, _ho
-        y
+        y << auxiliary_syntax_string_for_help_option_( _ho )
       end
 
       def bound_call_via_ARGV_

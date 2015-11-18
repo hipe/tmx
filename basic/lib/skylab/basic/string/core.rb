@@ -31,6 +31,11 @@ module Skylab::Basic
         String_::Succ__.call_via_iambic x_a
       end
 
+      def component_model_for sym
+        Require_components_models___[]
+        Component_Models.const_get sym, false
+      end
+
       def count_occurrences_in_string_of_string haystack, needle
         String_::Small_Time_Actors__::Count_occurrences_OF_string_IN_string[
           needle, haystack ]
@@ -169,6 +174,51 @@ module Skylab::Basic
       end
 
       Autoloader_[ self ]
+    end
+
+    Require_components_models___ = Callback_.memoize do
+
+      module Component_Models
+
+        module NONBLANK_TOKEN
+
+          nb_t_rx = /\A[-A-Za-z0-9_]+\z/  # or w/e
+
+          same = -> arg_st, & oes_p do
+
+            if nb_t_rx =~ arg_st.current_token
+
+              ACS_[]::Value_Wrapper[ arg_st.gets_one.to_sym ]
+
+            else
+
+              oes_p.call :error, :expression, :is_not, :nonblank_token do | y |
+                y << "must be a valid nonblank token"
+              end
+
+              UNABLE_
+            end
+          end
+
+          define_singleton_method :[], same
+          define_singleton_method :call, same
+        end
+
+        NONBLANK = Home_::Regexp.build_component_model do | o |
+
+          o.matcher = /[^[:space:]]/
+
+          o.on_failure_to_match = -> _reserved, & oes_p do
+
+            oes_p.call :error, :expression, :is_not, :nonblank do | y |
+              y << "cannot be blank"
+            end
+
+            UNABLE_
+          end
+        end
+      end
+      NIL_
     end
 
     class Receiver

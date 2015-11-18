@@ -6,22 +6,22 @@ module Skylab::MyTerm
     #   1) lists available adapters
     #   2) processes a change to the selected adapter
     #   3) maintains a readable reference to any selected adapter
-    #   4) the above *reference* is persistest
+    #   4) the selected adapter name is persisted *as a reference*
 
     # -- Construction methods
 
     class << self
 
-      def interpret_component st, acs, & p
+      def interpret_component st, asc, acs, & p
         if st.unparsed_exists
-          Unresolved_Reference___.new st.gets_one, acs, & p
+          Unresolved_Reference___.new st.gets_one, asc.name, acs, & p
         else
-          new acs, & p
+          new nil, asc.name, acs, & p
         end
       end
 
-      def _via_selected_adapter ada, svs, & p
-        new ada, svs, & p
+      def _via_selected_adapter ada, nf, svs, & p
+        new ada, nf, svs, & p
       end
 
       private :new
@@ -33,8 +33,9 @@ module Skylab::MyTerm
 
       # see [#003]:#note-about-serialized-references
 
-      def initialize s, svs, & p
+      def initialize s, nf, svs, & p
 
+        @_nf = nf
         @_oes_p = p
         @s = s
         @svs = svs
@@ -50,7 +51,7 @@ module Skylab::MyTerm
 
           ada.mutate_by_becoming_selected_
 
-          Here_._via_selected_adapter ada, @svs, & @_oes_p
+          Here_._via_selected_adapter ada, @_nf, @svs, & @_oes_p
         else
           ada
         end
@@ -59,8 +60,9 @@ module Skylab::MyTerm
 
     # -- Initializers
 
-    def initialize ada=nil, svs, & p
+    def initialize ada, nf, svs, & p
 
+      @_nf = nf
       @_oes_p = p
       @_svs = svs
 
@@ -72,11 +74,10 @@ module Skylab::MyTerm
       end
     end
 
-
     # -- Expressive event hook-outs
 
     def describe_into_under y, expag  # for modality clients
-      ACS_[]::Modalities::Reactive_Tree::Generate_description[ y, expag, self ]
+      ACS_[]::Infer::Description[ y, expag, @_nf, self ]
     end
 
     def description_under expag  # for [#br-035] expressive events
@@ -142,7 +143,7 @@ module Skylab::MyTerm
 
       ada.mutate_by_becoming_selected_
 
-      new_self = self.class._via_selected_adapter ada, @_svs, & @_oes_p
+      new_self = self.class._via_selected_adapter ada, @_nf, @_svs, & @_oes_p
 
       @_oes_p.call :change do
         new_self

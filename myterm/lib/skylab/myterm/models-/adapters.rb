@@ -127,8 +127,6 @@ module Skylab::MyTerm
       @_oes_p.call :info, * one_or_two, & y_p
     end
 
-      # (WRITE ME)
-
     # -- Project hook-outs
 
     def all_to_stream__
@@ -221,13 +219,91 @@ module Skylab::MyTerm
 
       def ___build_cache
 
-        _paths = ___paths_via_filesystem_and_glob
+        # ridiculous experiment - index the filesystem listing like the
+        # autoloader does but do it in a streaming manner, not all at once ..
 
-        _st = Callback_::Stream.via_nonsparse_array _paths do | path |
-          Load_Ticket___.__new_via_path path
+        _st = ___build_path_classifications_stream
+
+        _st_ = _st.map_by do | cx |
+          Load_Ticket___.new cx
         end
 
-        _st.flush_to_immutable_with_random_access_keyed_to_method :as_const
+        _st_.flush_to_immutable_with_random_access_keyed_to_method :as_const
+      end
+
+      def ___build_path_classifications_stream
+
+        _paths = ___paths_via_filesystem_and_glob
+
+        all_path_st = Callback_::Stream.via_nonsparse_array _paths
+
+        dir_queue = []
+        file_queue = []
+        seen = {}
+
+        Callback_.stream do
+
+          begin
+
+            if file_queue.length.nonzero?
+              x = file_queue.shift
+              break
+            end
+
+            if dir_queue.length.zero?
+              path = all_path_st.gets
+              path or break
+              cx = Path_Classifications__.new path
+
+              if cx.looks_like_file
+                seen[ cx.normal ] = true
+                x = cx
+                break
+              end
+            else
+              cx = dir_queue.shift
+              path = cx.path
+            end
+
+            # current path looks like directory. if seen match already, skip
+
+            if seen[ cx.normal ]
+              redo
+            end
+
+            # find any next file that looks like a match. if found, done.
+            # if not, assume corefile. queue many things. eek
+
+            begin
+              path_ = all_path_st.gets
+              if ! path_
+                cx.mutate_by_guessing
+                x = cx
+                break
+              end
+              cx_ = Path_Classifications__.new path_
+              if cx_.looks_like_file
+                seen[ cx_.normal ] = true
+                if cx.normal == cx_.normal
+                  x = cx_
+                  break
+                end
+                file_queue.push cx_
+                redo
+              end
+
+              # current path looks like directory also. add it to the
+              # dir queue for the future and try again.
+
+              dir_queue.push cx_
+
+              redo
+            end while nil
+            x and break
+            redo
+          end while nil
+          x
+        end
       end
 
       def ___paths_via_filesystem_and_glob
@@ -240,15 +316,35 @@ module Skylab::MyTerm
       end
     end  # end of silo daemon
 
-    class Load_Ticket___
-
-      class << self
-        alias_method :__new_via_path, :new
-        private :new
-      end  # >>
+    class Path_Classifications__
 
       def initialize path
-        @adapter_name = Adapter_Name___.__new_via_path_ path
+        @path = path
+
+        d = ::File.extname( path ).length
+
+        if d.zero?
+          @normal = path
+        else
+          @looks_like_file = true
+          @normal = path[ 0 ... - d ]
+        end
+      end
+
+      def mutate_by_guessing
+        @guessed_path = "#{ @path }/#{ Callback_::Autoloader.default_core_file }"
+        NIL_
+      end
+
+      attr_reader :guessed_path, :looks_like_file, :normal, :path
+    end
+
+    class Load_Ticket___
+
+      def initialize cx
+
+        @adapter_name = Adapter_Name___.new cx
+        @_normpath = cx.normal
       end
 
       def component_association
@@ -269,11 +365,14 @@ module Skylab::MyTerm
         const = nf.as_const
         mod = Home_::Image_Output_Adapters_
 
-        if ! mod.const_defined? const, false
+        if mod.const_defined? const, false
+          mod.const_get const, false
+        else
           load nf.path
+          x = mod.const_get const, false
+          Autoloader_[ x, @_normpath ]
+          x
         end
-
-        mod.const_get const, false
       end
 
       def as_const
@@ -287,12 +386,17 @@ module Skylab::MyTerm
 
     class Adapter_Name___ < Callback_::Name
 
-      def self.__new_via_path_ path
+      def self.new cx
 
-        new do
-          @path = path
-          bn = ::File.basename path
-          init_via_slug bn[ 0 ... - ::File.extname( bn ).length ]
+        _path = if cx.looks_like_file
+          cx.path
+        else
+          cx.guessed_path
+        end
+
+        super() do
+          @path = _path
+          init_via_slug ::File.basename cx.normal
         end
       end
 

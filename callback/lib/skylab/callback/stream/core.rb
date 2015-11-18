@@ -7,7 +7,7 @@ module Skylab::Callback
     class << self
 
       def the_empty_stream
-        @tes ||= new do end
+        @tes ||= new do NIL_ end
       end
 
       def mutable_with_random_access

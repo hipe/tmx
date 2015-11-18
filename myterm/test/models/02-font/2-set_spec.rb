@@ -13,7 +13,7 @@ module Skylab::MyTerm::TestSupport
 
         @subject_kernel_ = new_mutable_kernel_with_appearance_ appearance_JSON_one_
 
-        future_expect :info, :expression, :skipped
+        future_expect :info, :skipped
 
         future_expect :error, :extra_properties do | ev |
           _s = future_black_and_white ev
@@ -38,8 +38,6 @@ module Skylab::MyTerm::TestSupport
 
       it "natural expression comes of 'component_added'" do
 
-        on_past_emissions _state.emissions
-
         past_expect_eventually :info, :component_added do | ev |
 
           _s = future_black_and_white ev
@@ -49,9 +47,6 @@ module Skylab::MyTerm::TestSupport
 
       it "writes correct-looking JSON" do
 
-        state = _state
-        on_past_emissions state.emissions
-
         past_expect_eventually :info, :wrote do | ev |
 
           ( 141 .. 141 ).should be_include ev.bytes  # etc
@@ -59,7 +54,7 @@ module Skylab::MyTerm::TestSupport
           ev.preterite_verb.should eql "wrote"
         end
 
-        _s = state.kernel._string_IO_for_testing_.string
+        _s = _state.kernel._string_IO_for_testing_.string
         _exp_rx = /\A\{\n
           [ ][ ]"adapter":[ ]"imagemagick",\n
           [ ][ ]"adapters":[ ]{\n
@@ -68,6 +63,10 @@ module Skylab::MyTerm::TestSupport
         /x
 
         _s.should match _exp_rx
+      end
+
+      def past_emissions
+        _state.emissions
       end
 
       dangerous_memoize_ :_state do
@@ -102,7 +101,7 @@ module Skylab::MyTerm::TestSupport
 
     it "after having set it, you can get it (FRAGILE)" do
 
-      _s = _persistence_payload_for _EXISTENT_FONT
+      _s = persistence_payload_for_font_ _EXISTENT_FONT
 
       @subject_kernel_ = new_mutable_kernel_with_appearance_ _s
 
@@ -130,8 +129,6 @@ module Skylab::MyTerm::TestSupport
 
       it "expresses a 'component added' emission WITH CONTEXT CHAIN" do
 
-        on_past_emissions _state.emissions
-
         past_expect_eventually :info, :component_changed do | ev |
 
           _s = future_black_and_white ev
@@ -142,9 +139,13 @@ module Skylab::MyTerm::TestSupport
         end
       end
 
+      def past_emissions
+        _state.emissions
+      end
+
       dangerous_memoize_ :_state do
 
-        s = _persistence_payload_for _EXISTENT_FONT
+        s = persistence_payload_for_font_ _EXISTENT_FONT
         _ke = new_mutable_kernel_with_appearance_ s
 
         @subject_kernel_ = _ke
@@ -155,20 +156,6 @@ module Skylab::MyTerm::TestSupport
 
         state.finish
       end
-    end
-
-    def _persistence_payload_for s  # BE CAREFUL - we don't escape the name!
-
-      <<-HERE.unindent
-        {
-          "adapter": "imagemagick",
-          "adapters": {
-            "imagemagick": {
-              "background_font" : "#{ s }"
-            }
-          }
-        }
-      HERE
     end
 
     attr_reader :subject_kernel_

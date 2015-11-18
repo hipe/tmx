@@ -109,14 +109,16 @@ module Skylab::Brazen
         seen_i_a_h = {}
         seen_general_h = {}
 
-        a = _invite_ev_a
+        a = remove_instance_variable :@_invite_ev_a
 
         a.each do | ev, adapter |
 
           ev_ = ev.to_event
 
           if ev_.has_member :invite_to_action
+
             i_a = ev_.invite_to_action
+
             seen_i_a_h.fetch i_a do
               adapter.help_renderer.express_invite_to_particular_action__ i_a
               seen_i_a_h[ i_a ] = true
@@ -124,19 +126,27 @@ module Skylab::Brazen
 
           else
 
-            k_x = adapter.bound_.name.as_const
+            nf = adapter.bound_.name
 
-            # (the top bound node doesn't have a name)
-
-            seen_general_h.fetch k_x do
-              seen_general_h[ k_x ] = true
-              adapter.express_invite_to_general_help
+            if nf
+              k_x = nf.as_const
+              seen_general_h.fetch k_x do
+                seen_general_h[ k_x ] = true
+                adapter.express_invite_to_general_help
+              end
+            else
+              # (the top bound node doesn't have a name. do nothing here
+              # when invites happen from the top node as #here-2
             end
           end
-
         end
-        a.clear
+
         NIL
+      end
+
+      def send_invitation ev
+        _receive_invitation ev, self  # at top, you are your own adapter
+        NIL_
       end
 
       def _receive_invitation ev, adapter
@@ -1523,7 +1533,7 @@ module Skylab::Brazen
 
       def write_full_syntax_strings__ y
         write_any_primary_syntax_string y
-        write_any_auxiliary_syntax_string y
+        write_any_auxiliary_syntax_strings y
       end
 
       def write_any_primary_syntax_string y
@@ -1536,24 +1546,30 @@ module Skylab::Brazen
         help_renderer.produce_full_main_syntax_string
       end
 
-      def write_any_auxiliary_syntax_string y
+      def write_any_auxiliary_syntax_strings y
+        s = help_syntax_string
+        if s
+          y << s
+        end
+        y
+      end
+
+      def help_syntax_string
 
         help = _to_full_inferred_property_stream.each.detect do | prp |
           :help == prp.name_symbol
         end
 
         if help
-          write_auxiliary_syntax_string_for_help_option_ y, help
+          auxiliary_syntax_string_for_help_option_ help
         end
-
-        y
       end
 
-      def write_auxiliary_syntax_string_for_help_option_ y, help
+      def auxiliary_syntax_string_for_help_option_ help
 
         _ai_s = invocation_string
         _op_s = help_renderer.as_opt_render_property help
-        y << "#{ _ai_s } #{ _op_s }"
+        "#{ _ai_s } #{ _op_s }"
       end
 
       def argument_label_for prop
@@ -2280,6 +2296,10 @@ module Skylab::Brazen
 
       def fast_lookup
         @kernel.fast_lookup
+      end
+
+      def name
+        NIL_  # the top kernel *cannot* have a name, per :#here-2
       end
 
       attr_reader :kernel

@@ -128,7 +128,7 @@ it holds until all unserialization is complete ..
 
 
 
-## :#how-component-injection-is-currently-implemented
+## :how-component-injection-is-currently-implemented
 
 1) an adapter is selected IFF the above ivar is set. per the
 component association that defines it, the ivar holds not the
@@ -137,9 +137,20 @@ set *only* thru a signal handler in this file or underialization.
 
 2) if an adapter is selected, it can add nodes ("qualified
 knownnesses") to our interface stream as if they were our own.
-somewhere else we manage delegating requests to the correct
-component (the real adapter) by using the proxy class "visiting
-association" to unwrap this
+
+
+### :somewhat-nasty
+
+we do a tremendous hack to "inject" an association:
+the SELFSAME association object is MUTATED so that it reports
+it is a sub-category of `visiting`.
+
+  • `method_missing` hacks are nasty and we never do them.
+
+  • we were hand-writing the proxy class but it didn't scale.
+
+  • we mutate these guys because they are regenrated on-the-fly anyway.
+    if this doesn't work ok, dup-mutate should work.
 
 
 

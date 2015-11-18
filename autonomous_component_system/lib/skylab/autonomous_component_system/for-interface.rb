@@ -30,7 +30,7 @@ module Skylab::Autonomous_Component_System
 
         def execute
 
-          if @asc_.model_classifications.looks_like_proc
+          if @asc_.model_classifications.looks_primitivesque
             self.__WRITE_ME_cover_me_via_primitive
           else
             ___when_entitesque
@@ -69,7 +69,7 @@ module Skylab::Autonomous_Component_System
 
           @_asc = @qkn.association
 
-          if @_asc.model_classifications.looks_like_proc  # start logic that is repeated #here
+          if @_asc.model_classifications.looks_primitivesque  # start logic that is repeated #here
             __when_primitivesque
           else
             __when_entitesque
@@ -87,7 +87,7 @@ module Skylab::Autonomous_Component_System
 
         def ___when_primitivesque_with_operations
 
-          ACS_::Primitivesque.new @qkn, @ACS
+          ACS_::Primitivesque::For_Interface.new @qkn, @ACS
         end
 
         def __when_entitesque
@@ -124,10 +124,10 @@ module Skylab::Autonomous_Component_System
 
         known_qkn = -> qkn do  # repetition of :#here
           asc = qkn.association
-          if asc.model_classifications.looks_like_proc
+          if asc.model_classifications.looks_primitivesque
             if asc.has_operations
 
-              _ = ACS_::Primitivesque.new qkn, acs
+              _ = ACS_::Primitivesque::For_Interface.new qkn, acs
 
               qkn.new_with_value _
             else

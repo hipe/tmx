@@ -285,4 +285,7 @@ here is a crash-course on how you make a custom action adapter:
   • we subclass our custom action adapter class. if you had none you
     would use the base class of the same name from the [br] lib, which
     might actually look exactly the same because of how consts work.
+
+
+## :GEC (generated event contextualizations - inline)
 _
