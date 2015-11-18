@@ -1,10 +1,12 @@
-module Skylab::Brazen
+require 'skylab/callback'
 
-  module Autonomous_Component_System  # see [#089]
+module Skylab::Autonomous_Component_System  # notes in [#002]
+
+  # ->
 
     class << self
 
-      def create x_a, acs, & x_p  # :t2.
+      def create x_a, acs, & x_p  # :Tenet2.
 
         o = _Mutation_Session.new( & x_p )
         o.accept_argument_array x_a
@@ -13,7 +15,7 @@ module Skylab::Brazen
         o.execute
       end
 
-      def edit x_a, acs, & x_p  # :t3.
+      def edit x_a, acs, & x_p  # :Tenet3.
 
         o = _Mutation_Session.new( & x_p )
         o.accept_argument_array x_a
@@ -22,7 +24,7 @@ module Skylab::Brazen
         o.execute
       end
 
-      def interpret arg_st, acs, & x_p  # :+t6
+      def interpret arg_st, acs, & x_p  # :+Tenet6
 
         o = _Mutation_Session.new( & x_p )
         o.arg_st = arg_st
@@ -72,11 +74,17 @@ module Skylab::Brazen
       end
 
       def event sym
-        Home_::Events_.const_get sym, false
+        Home_.lib_.brazen.event sym
       end
 
       def _Mutation_Session
         ACS_::Mutation
+      end
+
+      def lib_
+        @___lib ||=
+          Callback_.produce_library_shell_via_library_and_app_modules(
+            Lib_, self )
       end
     end  # >>
 
@@ -103,7 +111,7 @@ module Skylab::Brazen
           p[ x ]
         end
 
-        cm = acs.send m do | * x_a |  # :t4.
+        cm = acs.send m do | * x_a |  # :Tenet4.
           p[ x_a ]
         end
 
@@ -280,7 +288,7 @@ module Skylab::Brazen
         @name.as_human
       end
 
-      def accept__can__meta_component * i_a  # :t8.
+      def accept__can__meta_component * i_a  # :Tenet8.
 
         bx = Callback_::Box.new
         i_a.each do | sym |
@@ -292,7 +300,7 @@ module Skylab::Brazen
 
       attr_reader :_operations
 
-      def accept__intent__meta_component sym  # see [#083]:#interp-B
+      def accept__intent__meta_component sym  # see [#003]:#interp-B
         @intent = sym
         NIL_
       end
@@ -415,11 +423,38 @@ module Skylab::Brazen
       end
     end
 
-    ACS_ = self
-    Autoloader_[ Modalities = ::Module.new ]
-
     Value_Wrapper = -> x do
       Callback_::Known_Known[ x ]
     end
-  end
+
+    Callback_ = ::Skylab::Callback
+    Autoloader_ = Callback_::Autoloader
+
+    module Lib_
+
+      sidesys, stdlib = Autoloader_.at(
+        :build_require_sidesystem_proc,
+        :build_require_stdlib_proc )
+
+      Basic = sidesys[ :Basic ]
+      Brazen = sidesys[ :Brazen ]
+      JSON = stdlib[ :JSON ]
+
+      system_lib = sidesys[ :System ]
+      System = -> do
+        system_lib[].services
+      end
+    end
+
+    ACHIEVED_ = true
+    Autoloader_[ ( ACS_ = self ), Callback_::Without_extension[ __FILE__ ] ]
+    EMPTY_A_ = [].freeze
+    EMPTY_P_ = -> { NIL_ }
+    Home_ = self
+    KEEP_PARSING_ = true
+    Autoloader_[ Modalities = ::Module.new ]
+    NIL_ = nil
+    SPACE_ = ' '.freeze
+    UNABLE_ = false
+  # -
 end

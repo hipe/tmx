@@ -1,11 +1,11 @@
-module Skylab::Brazen::TestSupport
+module Skylab::Autonomous_Component_System::TestSupport
 
-  module Autonomous_Component_System::Modalities::Reactive_Tree::CLI_Integration::Support
+  module Modalities::Reactive_Tree::CLI_Integration::Support
 
     class << self
 
       def [] tcc
-        TS_.CLI::Expect_CLI[ tcc ]
+        Home_.lib_.brazen.test_support.CLI::Expect_CLI[ tcc ]
         tcc.include self ; nil
       end
 
@@ -20,7 +20,7 @@ module Skylab::Brazen::TestSupport
 
       ds.add :Appie, Appie.new
 
-      Home_::Kernel.new Here_ do | ke |
+      Home_.lib_.brazen::Kernel.new Here_ do | ke |
         ke.reactive_tree_seed = ds
       end
     end
@@ -44,7 +44,7 @@ module Skylab::Brazen::TestSupport
           y << code( 'yes' )
         end
 
-        -> flim_flam, & call_p do  # see [#085]#Event-models:#ick
+        -> flim_flam, & call_p do  # see [#006]#Event-models:#ick
 
           if call_p
             use_p = call_p
@@ -72,7 +72,7 @@ module Skylab::Brazen::TestSupport
       end
     end
 
-    Local_Lib__ = TS_.lib :autonomous_component_system_support
+    Local_Lib__ = TS_.lib :support
 
     class Faz_Daz
 
@@ -95,7 +95,7 @@ module Skylab::Brazen::TestSupport
 
               :end
 
-        -> verbose=nil, dry_run=nil, file, & call_p do  # [#085]#Event-models:#ick
+        -> verbose=nil, dry_run=nil, file, & call_p do  # [#006]#Event-models:#ick
 
           if call_p
             use_p = call_p
@@ -116,7 +116,7 @@ module Skylab::Brazen::TestSupport
     # ~ as module
 
       def subject_CLI
-        Home_::CLI
+        Home_.lib_.brazen::CLI
       end
 
       def get_invocation_strings_for_expect_stdout_stderr
@@ -131,7 +131,7 @@ module Skylab::Brazen::TestSupport
     # ~
 
     Local_subject__ = -> do
-      Home_::Autonomous_Component_System::Modalities::Reactive_Tree
+      Home_::Modalities::Reactive_Tree
     end
 
     Here_ = self

@@ -8,6 +8,8 @@ module Skylab::Human
 
     gemlib = stdlib
 
+    ACS = sidesys[ :Autonomous_Component_System ]
+
     Basic = sidesys[ :Basic ]
 
     Brazen = sidesys[ :Brazen ]

@@ -97,7 +97,7 @@ module Skylab::Human
 
       def _edit_self * x_a, & x_p
 
-        Home_.lib_.brazen::Autonomous_Component_System.edit x_a, self, & x_p  # ACS_
+        Home_.lib_.ACS.edit x_a, self, & x_p  # ACS_
       end
 
       def __object_argument__component_association

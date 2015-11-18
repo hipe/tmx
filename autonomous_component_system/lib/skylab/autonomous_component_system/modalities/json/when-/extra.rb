@@ -1,6 +1,6 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Autonomous_Component_System
+  # ->
 
     module Modalities::JSON::When_
 
@@ -29,7 +29,7 @@ module Skylab::Brazen
               end
             end
 
-            Home_::Property::Events::Extra.new_with(
+            Home_.lib_.brazen::Property::Events::Extra.new_with(
               :name_x_a, sym_a,
               :lemma, 'element',
               :suffixed_prepositional_phrase_context_proc, _p,
@@ -38,5 +38,5 @@ module Skylab::Brazen
         end
       end
     end
-  end
+  # -
 end

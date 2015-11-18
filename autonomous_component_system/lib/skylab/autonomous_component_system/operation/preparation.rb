@@ -1,8 +1,8 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Autonomous_Component_System
+  # ->
 
-    module Operation::Preparation  # notes in [#084]
+    module Operation::Preparation  # notes in [#004]
 
       # the "operation" structure is pure model - it mostly just implements
       # the DSL for model-defined operations, but does not come with strong
@@ -370,5 +370,5 @@ module Skylab::Brazen
         )
       end
     end
-  end
+  # -
 end

@@ -56,6 +56,18 @@ module Skylab::TestSupport  # :[#021].
     end
   end  # >>
 
+
+  Memoizer_methods = -> tcc do
+
+    tcc.send :define_singleton_method, :memoize_, -> sym, & p do
+      define_method sym, Callback_::Memoize[ & p ]
+    end
+
+    tcc.send :define_singleton_method, :dangerous_memoize_, DANGEROUS_MEMOIZE
+
+    NIL_
+  end
+
   DANGEROUS_MEMOIZE = -> sym, & once_p do  # read [#042]
 
     define_method sym, & Build_dangerous_memoizer_method[ & once_p ]

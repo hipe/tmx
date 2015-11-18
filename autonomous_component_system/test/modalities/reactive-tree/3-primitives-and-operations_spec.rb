@@ -1,13 +1,13 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Autonomous_Component_System::TestSupport
 
   describe "[br] primitives with operations" do
 
     extend TS_
     use :memoizer_methods
     use :future_expect
-    use :autonomous_component_system_modalities_reactive_tree_support
+    use :modalities_reactive_tree_support
 
     context "several component association with proc-like models.." do
 
@@ -86,7 +86,7 @@ module Skylab::Brazen::TestSupport
 
         module ACS_RT_3
 
-          ACS_ = Home_::Autonomous_Component_System
+          ACS_ = Home_
 
           class Ugg_Shoe_with_Laces
 
@@ -183,7 +183,7 @@ module Skylab::Brazen::TestSupport
     end
 
     module ACS_RT_3
-      RT__ = TS_::Autonomous_Component_System::Modalities::Reactive_Tree::Support
+      RT__ = TS_::Modalities::Reactive_Tree::Support
     end
   end
 end

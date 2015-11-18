@@ -13,7 +13,7 @@ module Skylab::Basic
         def add_state * x_a
 
           x_a.unshift :add, :state
-          Home_.lib_.brazen::Autonomous_Component_System.edit x_a, self
+          Home_.lib_.ACS.edit x_a, self
         end
 
         def __state__component_association

@@ -1,10 +1,10 @@
-# interpretations to and expressions of an ACS [#083]
+# interpretations to and expressions of an ACS [#003]
 
 
 
 ## context & scope
 
-here we specify how both [#089] "compound" and "terminal" components of
+here we specify how both [#002] "compound" and "terminal" components of
 an ACS typically handle input & output from and to various "modalities."
 to be cheeky, we refer to input as "interpretation" and output as
 "expression". there is also the closely related idea of "intent"
@@ -63,8 +63,8 @@ input "modalities". we will refer to the "thing" that does this
 interpretation as an "interpreter", but we will offer no rigorous
 specification for interpreters here.
 
-it's worth comparing a [#089] "mutation session" to an interpreter - it
-"feels like" the mutation session is acting as an interpreter for #t3
+it's worth comparing a [#002] "mutation session" to an interpreter - it
+"feels like" the mutation session is acting as an interpreter for #Tenet3
 from there (thru which all compound components are presumably built in
 a normal world). (however, internally it is the particular component class
 itself that actually constructs a mutable component, before passing it off
@@ -192,13 +192,13 @@ experimentally, you can now specify an `intent` in your componenent
 
     intent { serialization | interface }
 
-A) to use this "meta-component" is in violation of #t2 the tenet of
+A) to use this "meta-component" is in violation of #Tenet2 the tenet of
 DRY-ness across all intents; so it should be used sparingly let the
 whole ACS experiment will be proven a failure! when not expressed
 explicitly, the compnent association being defined is assumed to be
 relevant for all intents (as it should be).
 
-B) it is arguably a violation of #t1 "component autonomy" to have the
+B) it is arguably a violation of #Tenet1 "component autonomy" to have the
 parent component deciding how it wants to the child (with regards to its
 intent); but by designing the formal expression this way rather than
 leaving it up to the child to express (somehow) allows for code that
@@ -222,7 +222,7 @@ on false premises that stem from a violation of what we now call our
   • per #dt2 we must use the same underlying logic assets for unserialization
     that we use for normalization (thru API/UI interface). in implementation
     of this principle, for all non-primitive components we use the component
-    model's "construction method" (near #t6) and we use the same construction
+    model's "construction method" (near #Tenet6) and we use the same construction
     method regardless of intent (unserialization or UI)..
 
   • (..and towards autonomy #dt1 it must be that all such constructed
@@ -292,7 +292,7 @@ methods:
 
   • if the constructor takes more than 2 arguments, the *second to last*
     argument will be the association structure. (but keep in mind that per
-    [#085]:A "most" components won't need to know their own name.)
+    [#006]:A "most" components won't need to know their own name.)
 
   • the constructor cannot take more than 3 arguments.
 
@@ -380,7 +380,7 @@ example because it is expected to be controller-like ..
 
 
 
-### extensibility - creating custom meta-components for comp assocs :X1
+### extensibility - creating custom meta-components for comp assocs :#X1
 
 (this is demonstrated in the spec that references this identifier.)
 

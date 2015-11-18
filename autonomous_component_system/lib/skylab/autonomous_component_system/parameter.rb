@@ -1,6 +1,6 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Autonomous_Component_System
+  # ->
 
     class Parameter  # a fresh take on an old hat
 
@@ -187,5 +187,5 @@ module Skylab::Brazen
         false
       end
     end
-  end
+  # -
 end

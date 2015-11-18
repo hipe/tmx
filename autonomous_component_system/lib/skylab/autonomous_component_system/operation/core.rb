@@ -1,8 +1,8 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Autonomous_Component_System
+  # ->
 
-    class Operation  # experimental dsl for "rich" operations. notes in [#083]
+    class Operation  # experimental dsl for "rich" operations. notes in [#003]
 
       class << self
 
@@ -161,5 +161,5 @@ module Skylab::Brazen
         :operation
       end
     end
-  end
+  # -
 end

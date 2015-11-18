@@ -1,6 +1,6 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Autonomous_Component_System
+  # ->
 
     module Interpretation
 
@@ -13,7 +13,7 @@ module Skylab::Brazen
 
         orig_qkn = ACS_::Reflection_::Read[ asc, acs ]
 
-        # (we assume A) that we are [#083]:assumption-A not long-running, and that
+        # (we assume A) that we are [#003]:assumption-A not long-running, and that
         # B) in the typical request, at most one component will change (per
         # ACS, and in general). if one or more of A, B is not true, probably
         # the client should make some kind of component change writer..)
@@ -66,7 +66,7 @@ module Skylab::Brazen
 
       Component_handler = -> asc, acs do
 
-        # see [#085]:#how-components-are-bound-to-listeners (4 lines)
+        # see [#006]:#how-components-are-bound-to-listeners (4 lines)
 
         -> * i_a, & x_p do
 
@@ -97,7 +97,7 @@ module Skylab::Brazen
         end
       end
 
-      class Value_Popper  # :+[#085]:VP
+      class Value_Popper  # :+[#006]:VP
 
         class << self
           alias_method :[], :new
@@ -124,6 +124,8 @@ module Skylab::Brazen
 
         attr_reader :unparsed_exists
       end
+
+      IDENTITY_ = -> x { x }
     end
-  end
+  # -
 end

@@ -204,8 +204,9 @@ module Skylab::Brazen
     Fields = sidesys[ :Fields ]
     Human = sidesys[ :Human ]
 
+    system_lib = nil
     IO_lib = -> do
-      System_lib__[]::IO
+      system_lib[]::IO
     end
 
     JSON = stdlib[ :JSON ]
@@ -241,10 +242,10 @@ module Skylab::Brazen
     end
 
     System = -> do
-      System_lib__[].services
+      system_lib[].services
     end
 
-    System_lib__ = sidesys[ :System ]
+    system_lib = sidesys[ :System ]
 
     Two_streams = -> do
       System[].IO.some_two_IOs

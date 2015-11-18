@@ -1,8 +1,8 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Autonomous_Component_System
+  # ->
 
-    class For_Interface::Primitivesque  # notes in [#083]
+    class Primitivesque  # notes in [#003]
 
       # (for now this moudule is public b/c we are anticipating adding
       # public library functions to it)
@@ -36,7 +36,7 @@ module Skylab::Brazen
       end
     end
 
-    class For_Interface::Primitivesque::Operation___ < ACS_::Operation
+    class ACS_::Primitivesque::Operation___ < ACS_::Operation
 
       class << self
         alias_method :__new, :new
@@ -57,5 +57,5 @@ module Skylab::Brazen
         [ :"__#{ sym }__primitivesque_component_operation_for", @_qkn ]
       end
     end
-  end
+  # -
 end

@@ -1,10 +1,10 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Autonomous_Component_System
+  # ->
 
     module Modalities::JSON
 
-      class Interpret  # notes in [#083]:on-JSON-interpretation
+      class Interpret  # notes in [#003]:on-JSON-interpretation
 
         def initialize & p
 
@@ -326,7 +326,7 @@ module Skylab::Brazen
 
         def _resolve_event_model
 
-          # read [#085]:#Event-models. this is the first codepoint where we
+          # read [#006]:#Event-models. this is the first codepoint where we
           # must know which event-model is being used, because it determines
           # how the component is built - do we pass the construction method
           # a "special" handler or the raw "modality" handler? the ACS (not
@@ -390,5 +390,5 @@ module Skylab::Brazen
         end
       end
     end
-  end
+  # -
 end

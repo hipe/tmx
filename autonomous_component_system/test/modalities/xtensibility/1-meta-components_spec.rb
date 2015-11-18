@@ -1,10 +1,10 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Autonomous_Component_System::TestSupport
 
   describe "[br] ACS - [e]xtensibility - meta components" do
 
-    # (what is accomplished here is referenced elsewhere as :[#083]:X1)
+    # (what is accomplished here is referenced elsewhere as :[#003]#X1)
 
     extend TS_
     use :memoizer_methods
@@ -48,7 +48,7 @@ module Skylab::Brazen::TestSupport
 
         module ACS_X_1
 
-          ACS_ = Home_::Autonomous_Component_System
+          ACS_ = Home_
 
           class Donkulous
 

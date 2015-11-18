@@ -17,7 +17,7 @@ in the past variously as "attribute", "parameter", "field" in our
 [#fi-001] various takes on this through history.
 
 for some deep context, consider that we are now conceptualizing a
-"formal property" as a sort of [#089] "association" structure. (the
+"formal property" as a sort of [#ac-002] "association" structure. (the
 relationship between these two is tracked by [#122]).
 
 `property_value_via_symbol` is one method you can use to get the actual

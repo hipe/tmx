@@ -53,7 +53,7 @@
              ( #was: #done inconsistencies over writing terminal newlines
                in file #parent-node: [#020] )
 [#023]       a list of hashtags ..
-             ( #moved-to: [#br-089] thoughts on the abstract component system experiment .. )
+             ( #moved-to: [#ac-002] thoughts on the abstract component system experiment .. )
              ( #was: #done refactor whatever )
 [#022]       #done #gimmick thing that converts @todo's into issues!??
              2012-06-04   (formerly [#sl-097])

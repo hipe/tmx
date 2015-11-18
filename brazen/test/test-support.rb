@@ -107,20 +107,8 @@ module Skylab::Brazen::TestSupport
       ::FileUtils
     end
 
-    Future_expect = -> tcc do
-      Callback_.test_support::Future_Expect[ tcc ]
-    end
-
     Memoizer_methods = -> tcc do
-
-      tcc.send :define_singleton_method, :memoize_, -> sym, & p do
-        define_method sym, Callback_::Memoize[ & p ]
-      end
-
-      tcc.send :define_singleton_method, :dangerous_memoize_,
-        TestSupport_::DANGEROUS_MEMOIZE
-
-      nil
+      TestSupport_::Memoizer_methods[ tcc ]
     end
 
     Tmpdir = memoize.call do
@@ -200,10 +188,6 @@ module Skylab::Brazen::TestSupport
 
   module Fixtures
     Callback_::Autoloader[ self ]  # don't load fixture file when autoloading lib
-  end
-
-  No_events_ = -> * i_a, & ev_p do
-    fail "unexpected: #{ i_a.inspect }"
   end
 
   module Zerk

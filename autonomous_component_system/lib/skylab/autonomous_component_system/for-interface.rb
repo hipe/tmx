@@ -1,8 +1,8 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Autonomous_Component_System
+  # ->
 
-    module For_Interface  # notes in [#083]
+    module For_Interface  # notes in [#003]
 
       class Procesque_Double__
         class << self
@@ -16,7 +16,7 @@ module Skylab::Brazen
 
       class Read_or_write < Procesque_Double__
 
-        # #open :[#083]:issue-1: this effects a "crude autovivification" -
+        # #open :[#003]:issue-1: this effects a "crude autovivification" -
         # it builds a component for a missing member and stores it whether
         # or not it is ultimately necessary. we would like for it to work
         # like it does thru signals where it only sets the member when it
@@ -87,7 +87,7 @@ module Skylab::Brazen
 
         def ___when_primitivesque_with_operations
 
-          Here_::Primitivesque.new @qkn, @ACS
+          ACS_::Primitivesque.new @qkn, @ACS
         end
 
         def __when_entitesque
@@ -127,7 +127,7 @@ module Skylab::Brazen
           if asc.model_classifications.looks_like_proc
             if asc.has_operations
 
-              _ = Here_::Primitivesque.new qkn, acs
+              _ = ACS_::Primitivesque.new qkn, acs
 
               qkn.new_with_value _
             else
@@ -193,8 +193,6 @@ module Skylab::Brazen
           qkn_ish
         end
       end
-
-      Here_ = self
     end
-  end
+  # -
 end

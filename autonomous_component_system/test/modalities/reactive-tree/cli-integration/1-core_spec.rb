@@ -1,13 +1,13 @@
-require_relative '../../../../test-support'
+require_relative '../../../test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Autonomous_Component_System::TestSupport
 
   describe "[br] ACS - modalities - reactive tree - CLI integ. - 1." do
 
     extend TS_
     use :memoizer_methods
     use :future_expect
-    use :autonomous_component_system_modalities_reactive_tree_CLI_integration_support
+    use :modalities_reactive_tree_CLI_integration_support
 
     it "1.4)   operation has description" do
 

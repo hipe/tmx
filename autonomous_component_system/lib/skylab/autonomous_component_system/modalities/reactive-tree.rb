@@ -1,8 +1,8 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Autonomous_Component_System
+  # ->
 
-    module Modalities::Reactive_Tree  # notes in [#083]
+    module Modalities::Reactive_Tree  # notes in [#003]
 
       class Dynamic_Source_for_Unbounds  # [mt]
 
@@ -183,7 +183,7 @@ module Skylab::Brazen
 
       class Compound_as_Hybrid__ < Hybrid__
 
-        defaults = Home_.branchesque_defaults
+        defaults = Home_.lib_.brazen.branchesque_defaults
 
         def initialize nf, acs, & oes_p
 
@@ -235,7 +235,7 @@ module Skylab::Brazen
             acs.describe_into_under y, expag
           end
           o.downstream_yielder = []
-          o.expression_agent = Home_::API.the_empty_expression_agent
+          o.expression_agent = Home_.lib_.brazen::API.the_empty_expression_agent
           o.num_lines = n
           o.execute
         end
@@ -254,7 +254,7 @@ module Skylab::Brazen
 
       class Operation_as_Hybrid___ < Hybrid__
 
-        defaults = Home_.actionesque_defaults
+        defaults = Home_.lib_.brazen.actionesque_defaults
 
         def initialize op, acs, & oes_p
 
@@ -324,7 +324,7 @@ module Skylab::Brazen
             o.args,
             @_op.callable,
             :call,
-            & @_oes_p  # see [#085]#Event-models:choice
+            & @_oes_p  # see [#006]#Event-models:choice
           )
         end
 
@@ -341,5 +341,5 @@ module Skylab::Brazen
         end
       end
     end
-  end
+  # -
 end

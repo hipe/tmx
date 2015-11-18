@@ -1,14 +1,4 @@
-# thoughts on the abstract component system ("ACS") experiment :[#089]
-
-## brief introduction
-
-"the ACS" is less of a library in the traditional, object-oriented sense
-and more a set of conventions you can opt-in to in a piecemeal way in
-your classes; and a corresponding collection of library *functions*
-(usually) that can do something interesting with participating objects.
-
-
-
+# thoughts on the abstract component system ("ACS") experiment :[#002]
 
 ## design tenets
 
@@ -70,9 +60,9 @@ violoation of which should occur only with good reason.
 
     * a name (imagine it is any string) that is unique in the context of
       all of the "custodian ACS"'s component association names.
-      (the meaning of "custodian" is explained in [#085].)
+      (the meaning of "custodian" is explained in [#006].)
 
-    * a "component model" (needs only implement one method, #t5.)
+    * a "component model" (needs only implement one method, #Tenet5.)
 
     * a set of zero or more operation verbs (each string-like) that can
       deliver such a component to the subject component thru the
@@ -81,7 +71,7 @@ violoation of which should occur only with good reason.
     * for use in component associations you can create your own
       set of meta-components that exists the existing set, by
       subclassing the base component association class
-      (as demonstrated in [#083]:X1)
+      (as demonstrated in [#003]#X1)
 
 
 
@@ -142,21 +132,21 @@ violoation of which should occur only with good reason.
 
 in summary:
 
-• in application code, ACS components are *not* constructed using `new` :t1
+• in application code, ACS components are *not* constructed using `new` :Tenet1
 
-• new components are constructed by sending `edit_entity` to the class :t2
+• new components are constructed by sending `edit_entity` to the class :Tenet2
 
-• existing components are mutated by sending `edit_entity` to the component :t3
+• existing components are mutated by sending `edit_entity` to the component :Tenet3
 
-• for "inward" purposes, associations are defined thru *instance* methods :t5
+• for "inward" purposes, associations are defined thru *instance* methods :Tenet5
 
-• simple or one-off models typically produce components thru `[]` :t6
+• simple or one-off models typically produce components thru `[]` :Tenet6
 
-• `interpret_component` (and similar) is above for dedicated models :t7
+• `interpret_component` (and similar) is above for dedicated models :Tenet7
 
-• modifiers (experimental): `via`, `using`, `if` and `assuming` :t8
+• modifiers (experimental): `via`, `using`, `if` and `assuming` :Tenet8
 
-• the operation verbs of mutation sessions are defined in the assoc.. :t9
+• the operation verbs of mutation sessions are defined in the assoc.. :Tenet9
 
 
 we may tag some (or all!?) of the various occurrences of these tenets in
@@ -360,7 +350,7 @@ the ACS will use this means (instead of the means described above) to
 attempt to produce the component.
 
 (we are in the midst of developing an experimental new form for the
-above that is only for "compound models" tracked with [#083]:#interp-D)
+above that is only for "compound models" tracked with [#003]:#interp-D)
 
 we say "interpret" because this method is expected to interpret one
 or more tokens off the argument stream to turn it into a (trueish)
@@ -428,7 +418,7 @@ this naming convention with the nested double underscores is
 the "generated form" desribed in (4).
 
 a `via` modifier is an assertion of shape with an expression of intent.
-(but we don't mean "intent" in the [#083] sense, just the non-technial
+(but we don't mean "intent" in the [#003] sense, just the non-technial
 sense.)
 
 the `via` modifier allows us to implement a variety of ways that the input

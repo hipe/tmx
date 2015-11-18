@@ -32,6 +32,8 @@ module Skylab::Snag
       Basic[]::String.a_reasonably_short_length_for_a_string
     end
 
+    Autonomous_component_system = sidesys[ :Autonomous_Component_System ]
+
     Basic = sidesys[ :Basic ]
 
     Brazen = sidesys[ :Brazen ]

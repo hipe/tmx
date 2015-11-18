@@ -1,6 +1,6 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Autonomous_Component_System
+  # ->
 
     module Modalities::JSON::When_
 
@@ -37,7 +37,7 @@ module Skylab::Brazen
         end
       end
 
-      Autoloader_[ self ]
+      Callback_::Autoloader[ self ]
     end
-  end
+  # -
 end

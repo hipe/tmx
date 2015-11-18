@@ -3,7 +3,7 @@
 [#122]       as if you would ever..
 [#121]       #tracking this wrapping algo
 [#120] #open extensible modifiers for use in mutation sessions
-             (note [#083]:X1 is related but is not the same)
+             (note [#083]#X1 is related but is not the same)
 [#119]       track expression of ACS associations into brazen unbound tree
              ( #was: get [fm] out of test (see) )
 [#118]       do we want the ability to have a model-less-action? for now, no
@@ -39,17 +39,14 @@
 [#091]       [ entity identifier ]
              ( #moved-from [#here-022] )
 [#090]       arity ..
-[#089]       the ACS (autonomous component system) ..
+[#089] #hole ( became the ACS )
 [#088]       the meta-meta-properties justification ..
 [#087]       #track similar normalization logics (this might be a redundant tracker)
 [#086]       #track cases where failure is "fuzzy" (i.e non-atomic),
                ignored for the greater good, for usability
-[#085]       ACS construction, composition and eventings ..
-             (#was: (#moved-to: [#ba-052]))
-[#084]       thoughts on ACS isomophisms ..
-             ( #also :+#wishlist a `flag` meta-meta property )
-[#083]       ACS interpretations & expresssions .. (#parent-node: [#089])
-             ( #was: #done workspace `init` action should not default to '.' in API )
+[#085] #hole (#was: (#moved-to: [#ba-052]))
+[#084]       +#wishlist a `flag` meta-meta property
+[#083] #hole ( #was: #done workspace `init` action should not default to '.' in API )
 [#082]       #track meta-meta-property candidates (list, enum etc)
 [#081]       #track experimental extensions to Actor
 [#080]       #parent-node:[#013] actors, agents and models ..

@@ -1,4 +1,4 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
   module TestSupport_Visual
 
@@ -14,13 +14,15 @@ module Skylab::Brazen
 
       def execute
 
-        _tsmod = Home_.test_support.lib(
+        br = Home_.lib_.brazen
+
+        _tsmod = br.test_support.lib(
           :autonomous_component_system_modalities_reactive_tree_CLI_integration_support
         )
 
         _ke = _tsmod.kernel_
 
-        _cli = Home_::CLI.new(
+        _cli = br::CLI.new(
           @stdin, @stdout, @stderr,
           [ 'hi' ],
           :back_kernel, _ke,

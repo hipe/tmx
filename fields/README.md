@@ -27,7 +27,7 @@ at writing, [br] is that place, and subject has all the ancient stuff.
 
 first, a quick history (most recent at top):
 
-    [#br-089] the autonomous component system                 2015-04-23
+    [#ac-001] the autonomous component system                 2015-04-23
 
     [#cb-042] actors                                          2014-08-00
 

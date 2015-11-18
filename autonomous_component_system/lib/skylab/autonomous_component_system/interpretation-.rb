@@ -1,10 +1,10 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Autonomous_Component_System
+  # ->
 
     module Interpretation_
 
-      class Build_value  # [#085]:the-universal-component-builder explains everything
+      class Build_value  # [#006]:the-universal-component-builder explains everything
 
         class << self
           def _call ma, asc, acs, & p
@@ -86,7 +86,7 @@ module Skylab::Brazen
 
           d = @_mdl.method( m ).arity
           if 1 < d
-            # see construction args [#085]:interp-C
+            # see construction args [#006]:interp-C
             xtra = []
             if 2 < d
               xtra.push @association
@@ -145,5 +145,5 @@ module Skylab::Brazen
 
       WRITE_METHOD__ = :accept_component_qualified_knownness
     end
-  end
+  # -
 end

@@ -1,4 +1,4 @@
-# ACS construction, composition and eventing :[#085]
+# ACS construction, composition and eventing :[#006]
 
 ## :the-universal-component-builder
 
@@ -8,7 +8,7 @@ construction like UI (edit sessions, reactive trees) or otherwise.
 
 the primary purpose this node serves is to effect the call to the
 component model's construction method (`interpret_component` or
-related (:t5)) or `[]` (:t6). while there are other code locations
+related (:Tenet5)) or `[]` (:Tenet6). while there are other code locations
 that "know" about these tenets, we want the subject node to be the
 only one that *ever* calls these construction methods.
 
@@ -74,7 +74,7 @@ custodian. we might call such a component a "cold-entity", meaning
 it models business data and nothing else.
 
 if the cold component exposes itself to operations in some way
-(like an [#089] `edit` (mutation) method), it typically recognizes
+(like an [#002] `edit` (mutation) method), it typically recognizes
 a block passed to the entrypoint method, that will serve as *the*
 handler for the entire (roundtrip, full-stack) execution of the
 operation.

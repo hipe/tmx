@@ -288,7 +288,7 @@ module Skylab::System
     # ~
 
     ACS_ = -> do
-      Home_.lib_.brazen::Autonomous_Component_System
+      Home_.lib_.autonomous_component_system
     end
 
     MONADIC_TRUTH_ = -> _ { true }

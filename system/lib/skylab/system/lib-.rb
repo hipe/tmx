@@ -8,6 +8,8 @@ module Skylab::System
 
     define_singleton_method :memoize, Callback_::Memoize
 
+    Autonomous_component_system = sidesys[ :Autonomous_Component_System ]
+
     Basic = sidesys[ :Basic ]
 
     Brazen = sidesys[ :Brazen ]  # used in tests too

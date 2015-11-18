@@ -1,10 +1,10 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Autonomous_Component_System
+  # ->
 
     module Modalities::JSON
 
-      class Express  # notes in [#083]
+      class Express  # notes in [#003]
 
         def initialize & p
           @be_pretty = true
@@ -50,7 +50,7 @@ module Skylab::Brazen
           end
         end
 
-        def _recurse acs  # see [#083]:on-JSON-expression
+        def _recurse acs  # see [#003]:on-JSON-expression
 
           result = nil
 
@@ -163,6 +163,8 @@ module Skylab::Brazen
           end
         end
       end
+
+      NEWLINE_ = "\n"
     end
-  end
+  # -
 end

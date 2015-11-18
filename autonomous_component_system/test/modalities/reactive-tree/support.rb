@@ -1,6 +1,6 @@
-module Skylab::Brazen::TestSupport
+module Skylab::Autonomous_Component_System::TestSupport
 
-  module Autonomous_Component_System::Modalities::Reactive_Tree::Support
+  module Modalities::Reactive_Tree::Support
 
     class << self
 
@@ -40,7 +40,7 @@ module Skylab::Brazen::TestSupport
 
     def build_kernel_from_seed_and_module_ ds, mod
 
-      Home_::Kernel.new mod do | ke |
+      Home_.lib_.brazen::Kernel.new mod do | ke |
         ke.reactive_tree_seed = ds
       end
     end
@@ -87,7 +87,7 @@ module Skylab::Brazen::TestSupport
         end
       end
 
-      Local_Lib__ = TS_.lib :autonomous_component_system_support
+      Local_Lib__ = TS_.lib :support
 
       class Lace
 
@@ -101,7 +101,7 @@ module Skylab::Brazen::TestSupport
 
         def __get_color__component_operation
 
-          -> & use_p do  # [#085]#Event-models
+          -> & use_p do  # [#006]#Event-models
 
             use_p.call :info, :expression, :working do | y |
               y << "retrieving #{ highlight 'color' }"
@@ -152,7 +152,7 @@ module Skylab::Brazen::TestSupport
     end
 
     Subject = -> do
-      Home_::Autonomous_Component_System::Modalities::Reactive_Tree
+      Home_::Modalities::Reactive_Tree
     end
 
     Here_ = self

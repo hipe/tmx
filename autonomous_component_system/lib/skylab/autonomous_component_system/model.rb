@@ -1,6 +1,6 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Autonomous_Component_System
+  # ->
 
     Model = ::Module.new
 
@@ -27,5 +27,5 @@ module Skylab::Brazen
         end
       end
     end
-  end
+  # -
 end

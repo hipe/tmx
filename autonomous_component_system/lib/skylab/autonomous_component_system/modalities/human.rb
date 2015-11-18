@@ -1,6 +1,6 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Autonomous_Component_System
+  # ->
 
     module Modalities::Human
 
@@ -157,5 +157,5 @@ module Skylab::Brazen
         phrases
       end
     end
-  end
+  # -
 end

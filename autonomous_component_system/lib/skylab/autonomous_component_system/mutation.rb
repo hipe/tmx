@@ -1,8 +1,8 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Autonomous_Component_System
+  # ->
 
-    class Mutation  # notes in [#089]
+    class Mutation  # notes in [#002]
 
       def initialize & x_p
         @x_p = x_p || Unhandler___
@@ -334,7 +334,7 @@ module Skylab::Brazen
           @modifiers ||= NO_MODIFIERS__
 
           sym = @modifiers.via
-          if sym  # :t7.
+          if sym  # :Tenet7.
 
             comp_x = @association.component_model.send(
               :"new_via__#{ sym }__",
@@ -599,5 +599,5 @@ module Skylab::Brazen
       NO_MODIFIERS__ = Modifiers___.new.freeze
 
     end
-  end
+  # -
 end

@@ -10,7 +10,7 @@ in more detail:
 
   • the [#001] "entity" library
 
-  • the [#089] Autonomous Component System library
+  • (used to house the ACS but that moved to its own lib)
 
   • [#062] the "zerk" command-line utility framework
 _

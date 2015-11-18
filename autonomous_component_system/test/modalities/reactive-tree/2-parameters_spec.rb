@@ -1,12 +1,12 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Autonomous_Component_System::TestSupport
 
   describe "[br] ACS - modalities - reactive tree - 2. parameters" do
 
     extend TS_
     use :future_expect
-    use :autonomous_component_system_modalities_reactive_tree_support
+    use :modalities_reactive_tree_support
 
     it "call a thing with one required arg (invalid)" do
 

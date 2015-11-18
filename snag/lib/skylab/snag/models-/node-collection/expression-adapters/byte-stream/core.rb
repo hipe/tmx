@@ -44,7 +44,7 @@ module Skylab::Snag
           ).FS_adapter_
         end
 
-        # ~ for [#br-089] the ACS (compliments same in parent class)
+        # ~ for [#ac-002] the ACS (compliments same in parent class)
 
         def __add__component bx, node, ca, & oes_p
 

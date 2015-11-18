@@ -1,6 +1,6 @@
-module Skylab::Brazen::TestSupport
+module Skylab::Autonomous_Component_System::TestSupport
 
-  module Autonomous_Component_System::Support
+  module Support
 
     def self.[] tcc
       tcc.include self
@@ -44,7 +44,7 @@ module Skylab::Brazen::TestSupport
 
       class << self
 
-        def interpret_compound_component p, & _  # experimental for [#083]:#interp-D
+        def interpret_compound_component p, & _  # experimental for [#003]:#interp-D
           if p
             _me = new
             p[ _me ]
@@ -54,7 +54,7 @@ module Skylab::Brazen::TestSupport
             # this is only experimental - remember that it is mechanically
             # impossible to result in false-ish validly from here, so we
             # will probably either make a major, earth-shattering change to
-            # this #t6 inteface make `null` invalid in JSON payloads, -OR-
+            # this #Tenet6 inteface make `null` invalid in JSON payloads, -OR-
             # imply skip over nulls higher up (violating #dt1 autonomy)
 
             new
@@ -70,7 +70,7 @@ module Skylab::Brazen::TestSupport
         :last_name,
       )
 
-      def component_event_model  # experimental near [#085]:#Event-models
+      def component_event_model  # experimental near [#006]:#Event-models
         :cold
       end
 
@@ -82,7 +82,7 @@ module Skylab::Brazen::TestSupport
 
           s = st.gets_one
           if rx =~ s
-            Home_::Autonomous_Component_System::Value_Wrapper[ s ]
+            Home_::Value_Wrapper[ s ]
           else
             oes_p.call :error, :expression, :no do | y |
               y << "no: #{ s }"
@@ -114,7 +114,7 @@ module Skylab::Brazen::TestSupport
         :simple_name,
       )
 
-      def component_event_model  # see [#085]:#Event-models
+      def component_event_model  # see [#006]:#Event-models
         :cold
       end
 
@@ -132,7 +132,7 @@ module Skylab::Brazen::TestSupport
     end
 
     ACS__ = -> do
-      Home_::Autonomous_Component_System
+      Home_
     end
 
     Here_ = self

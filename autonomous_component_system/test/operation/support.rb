@@ -1,6 +1,6 @@
-module Skylab::Brazen::TestSupport
+module Skylab::Autonomous_Component_System::TestSupport
 
-  module Autonomous_Component_System::Operation::Support
+  module Operation::Support
 
     class << self
 
@@ -63,7 +63,7 @@ module Skylab::Brazen::TestSupport
         attr_reader( :lace, :size, :special )
       end
 
-      Local_Lib__ = TS_.lib :autonomous_component_system_support
+      Local_Lib__ = TS_.lib :support
 
       class Lace
 
@@ -111,7 +111,7 @@ module Skylab::Brazen::TestSupport
     end
 
     ACS__  = -> do
-      Home_::Autonomous_Component_System
+      Home_
     end
   end
 end

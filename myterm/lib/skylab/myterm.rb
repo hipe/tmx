@@ -76,8 +76,9 @@ module Skylab::MyTerm
 
   # -- Simple stowaways, functions
 
+  _ACS = nil
   ACS_ = -> do
-    Brazen_::Autonomous_Component_System
+    _ACS ||= Home_.lib_.autonomous_component_system
   end
 
   Autoloader_[ Image_Output_Adapters_ = ::Module.new ]
@@ -87,6 +88,8 @@ module Skylab::MyTerm
   module Lib_
 
     sidesys = Autoloader_.build_require_sidesystem_proc
+
+    Autonomous_component_system = sidesys[ :Autonomous_Component_System ]
 
     Basic = sidesys[ :Basic ]
 
@@ -99,7 +102,6 @@ module Skylab::MyTerm
 
   ACHIEVED_ = true
   Home_ = self
-  IDENTITY_ = -> x { x }
   Autoloader_[ Models_ = ::Module.new ]
   NIL_ = nil
   UNABLE_ = false

@@ -1,6 +1,6 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Autonomous_Component_System::TestSupport
 
   describe "[br] ACS tenet 7 C - the `if` modifer" do
 
@@ -103,7 +103,7 @@ module Skylab::Brazen::TestSupport
         end
 
         ACS_ = -> do
-          Home_::Autonomous_Component_System
+          Home_
         end
 
         self

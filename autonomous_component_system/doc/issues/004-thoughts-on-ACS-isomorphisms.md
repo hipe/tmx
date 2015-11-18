@@ -1,4 +1,4 @@
-# thoughts on ACS isomorphisms :[#084]
+# thoughts on ACS isomorphisms :[#004]
 
 ## the successful experiment :note-A
 

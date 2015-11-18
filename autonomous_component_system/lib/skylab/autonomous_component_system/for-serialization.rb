@@ -1,8 +1,8 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Autonomous_Component_System
+  # ->
 
-    module For_Serialization  # notes in [#083]
+    module For_Serialization  # notes in [#003]
 
       To_stream = -> acs do
 
@@ -58,5 +58,5 @@ module Skylab::Brazen
         end
       end
     end
-  end
+  # -
 end

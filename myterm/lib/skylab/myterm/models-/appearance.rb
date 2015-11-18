@@ -270,7 +270,7 @@ module Skylab::MyTerm
     # -- ACS signal handling
 
     def component_event_model
-      :hot  # for now, un-s11n needs to know this [#br-085]:#Event-models
+      :hot  # for now, un-s11n needs to know this [#ac-006]:#Event-models
     end
 
     # ~ hook-out's for component change, mutation

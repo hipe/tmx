@@ -35,10 +35,6 @@ module Skylab::Basic  # introduction at [#020]
     end
   end  # >>
 
-  ACS_ = -> do
-    Home_.lib_.brazen::Autonomous_Component_System
-  end
-
   Callback_ = ::Skylab::Callback
 
   Default_property_instance__ = Callback_.memoize do

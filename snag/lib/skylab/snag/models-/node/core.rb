@@ -19,14 +19,14 @@ module Skylab::Snag
 
     class << self
 
-      def interpret_component st, & x_p  # t5..
+      # (tenets in [#ac-002])
 
-        # the "t" notations refer to tenets of [#br-089]
+      def interpret_component st, & x_p  # #Tenet5..
 
         ACS_[].interpret st, new, & x_p
       end
 
-      def edit_entity * x_a, & x_p  # t2
+      def edit_entity * x_a, & x_p  # #Tenet2
 
         ACS_[].create x_a, new, & x_p
       end
@@ -36,17 +36,17 @@ module Skylab::Snag
         Home_::Models_::Node_Collection
       end
 
-      def new_via_body x  # t7A1
+      def new_via_body x  # #Tenet7A1
 
         new nil, x
       end
 
-      def new_via__identifier__ x  # t7
+      def new_via__identifier__ x  # #Tenet7
 
         new x
       end
 
-      private :new  # t1
+      private :new  # #Tenet1
     end  # >>
 
     # -- Initializers

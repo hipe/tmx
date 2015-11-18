@@ -50,8 +50,9 @@ module Skylab::Snag
 
   # ~ support
 
+  _ACS = nil
   ACS_ = -> do
-    Home_.lib_.brazen::Autonomous_Component_System
+    _ACS ||= Home_.lib_.autonomous_component_system
   end
 
   module Actor_as_Model_Module_Methods_
@@ -187,7 +188,6 @@ module Skylab::Snag
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> { }
   EMPTY_S_ = ''
-  IDENTITY_ = -> x { x }
   stowaway :Library_, 'lib-'
   LINE_SEP_ = "\n"
   NIL_ = nil

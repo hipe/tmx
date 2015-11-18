@@ -14,7 +14,7 @@ module Skylab::Snag
         ].intern
       end
 
-      def interpret_component arg_st, & x_p  # [#br-089]:t6
+      def interpret_component arg_st, & x_p  # [#ac-002]#Tenet6
 
         arg = Tag_::Actors_::Normalize_stem[ arg_st.gets_one, & x_p ]
         arg and begin
@@ -26,7 +26,7 @@ module Skylab::Snag
         :tag
       end
 
-      private :new  # [#br-089]:t1
+      private :new  # [#ac-002]#Tenet1
     end  # >>
 
     HASHTAG_PREFIX_LENGTH___ = 1

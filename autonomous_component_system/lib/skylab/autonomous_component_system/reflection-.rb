@@ -1,8 +1,8 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Autonomous_Component_System
+  # ->
 
-    module Reflection_  # notes in [#083]
+    module Reflection_  # notes in [#003]
 
       read_via_ivar = nil
       read_via_method = nil
@@ -262,5 +262,5 @@ module Skylab::Brazen
 
       READ_METHOD__ = :component_wrapped_value
     end
-  end
+  # -
 end
