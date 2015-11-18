@@ -16,7 +16,7 @@ part of the distribution; i.e. re-building the story not normally necessary.
 "story" is our chosen jargon term for some fake command and fake files
 that go together. real commands are "recorded" here, when you rebuild
 the story. then when tests are run, what you recorded here is "played back".
-more at [#007].
+more at [#sy-028].
 
 
 

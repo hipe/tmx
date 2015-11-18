@@ -1,20 +1,20 @@
-# the mock sys narrative :[#007]
+# the stubbed sys narrative :[#028]
 
 ## introduction
 
-"mock-sys" is a mechanism for writing the results of arbitrary system
+"stubbed-system" is a mechanism for writing the results of arbitrary system
 calls to disk and then later "playing them back" as if they were the results
 of those calls, in lieu of actually making those calls again. it intended
 for use in nothing more and nothing less then automated testing, exactly in
-the way tha "web-mock" is used to mock the web in such contexts.
+the way tha "web-mock" is used to stubbed the web in such contexts.
 
 its main objectives are simplicity and readability (appologies to OGDL).
 
-(hypothetically "mock-sys" could provide additional value by checking
+(hypothetically "stubbed-system" could provide additional value by checking
 system compatibility under various software upgrades or arbitrary other
 systems; by comparig the real resuls of system calls against the stored,
 expected results; effectively providing "external regression testing"
-against the outside world. although "mock-sys" was designed from the
+against the outside world. although "stubbed-system" was designed from the
 ground up to be amenable to such a purpose, it is currently beyond our
 scope and immediate interests.)
 
@@ -23,10 +23,10 @@ scope and immediate interests.)
 
 ## immediate history
 
-"mock-sys" is a ground-up rewrite of [#023] "mock system" without
-the #issues-that-mock-system-has, and with
+"stubbed-system" is a ground-up rewrite of [#gv-023]
+"stubbed system" without the #issues-that-mock-system-had, and with
 a #justification-for-why-we-didnt-just-improve-the-existing-library.
-given this, we thinking about #what-we-plan-to-do-with-mock-system.
+given this, we thinking about #what-we-plan-to-do-with-stubbed-system.
 
 
 
@@ -39,14 +39,14 @@ create new system call fixtures we had to build rbx *and* install zmq.
 
 for a sense of the byzantine scope of this stack, you may want to skim:
 
-  • [#017] the fixture building narrative
-  • [#018] the system call fixtures narrative
-  • [#021] wtf is a rainbow kick (this is still cool)
-  • [#022] the shutodown timer narrative
-  • [#023] the mock system narrative
-  • [#024] the manifest client narrative
-  • [#027] the freetags feature
-  • [#028] the artbuilding scripts narrative
+  • [#gv-017] the fixture building narrative
+  • [#gv-018] the system call fixtures narrative
+  • [#gv-021] wtf is a rainbow kick (this is still cool)
+  • [#gv-022] the shutodown timer narrative
+  • [#gv-023] the stubbed system narrative
+  • [#gv-024] the manifest client narrative
+  • [#gv-027] the freetags feature
+  • [#gv-028] the artbuilding scripts narrative
 
 what it amounted to was an exercize in overdoing the architecture for
 what we told ourselves at the time was a "good" reason, but really we
@@ -54,10 +54,10 @@ were just looking for an excuse to play with concurrency and server
 architectures.
 
 that's all fine and good for the massively false requirements it had
-created for itself, but today we just want a mock system. this now
+created for itself, but today we just want a stubbed system. this now
 legacy system is a showstopper for our requirements today:
 
-the fact that the runtime of "mock-system" was not the runtime of tmx
+the fact that the runtime of "stubbed-system" was not the runtime of tmx
 meant that it had gone stale and was broken against current tmx.
 
 so, for these reasons, we thought a rewrite was in order. in summary
@@ -94,7 +94,7 @@ it is used.
 
 
 
-### :#what-we-plan-to-do-with-mock-system
+### :#what-we-plan-to-do-with-stubbed-system
 
 can we put it in a museum? the rainbow kicking, the plugin architure,
 it's all kind of cool. but actually this is an open issue, is what to do

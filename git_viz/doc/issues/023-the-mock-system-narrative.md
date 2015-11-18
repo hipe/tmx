@@ -1,6 +1,6 @@
 # the mock system narrative :[#023]
 
-(EDIT: this is mostly archival, documenting the first mock system. see [#007].)
+(EDIT: this is mostly archival, documenting the first mock system. see [#sy-028].)
 
 ## introduction
 

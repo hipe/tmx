@@ -1,9 +1,7 @@
-module Skylab::GitViz
+module Skylab::System
 
-  module Test_Lib_
-
-    module Mock_System  # see [#007]
-
+  module Doubles::Stubbed_System  # see [#007]
+    # ->
       class << self
 
         def enhance_client_class test_context
@@ -12,16 +10,16 @@ module Skylab::GitViz
         end
 
         def recording_session byte_downstream, & edit_p
-          Mock_System_::Recording_Session__.new( byte_downstream, & edit_p ).execute
+          Here_::Recording_Session__.new( byte_downstream, & edit_p ).execute
         end
       end  # >>
 
       module Instance_Methods___
 
-        def mock_system_conduit
+        def stubbed_system_conduit
 
-          h = cache_hash_for_mock_system
-          h.fetch manifest_path_for_mock_system do | path |
+          h = cache_hash_for_stubbed_system
+          h.fetch manifest_path_for_stubbed_system do | path |
             h[ path ] = Conduit.new path
           end
         end
@@ -138,7 +136,7 @@ module Skylab::GitViz
 
         def write_to io
 
-          oa = Mock_System_::Output_Adapters_::OGDL_esque.new io, :command
+          oa = Here_::Output_Adapters_::OGDL_esque.new io, :command
 
           if @argv
             oa.write @argv, :argv, :string_array
@@ -224,7 +222,7 @@ module Skylab::GitViz
 
       Build_unmarshalling_stream___ = -> x, sym, model_class do
 
-        st = Mock_System_::Input_Adapters_.const_get( sym ).tree_stream_from_lines( x )
+        st = Here_::Input_Adapters_.const_get( sym ).tree_stream_from_lines( x )
 
         Callback_.stream do
 
@@ -280,8 +278,7 @@ module Skylab::GitViz
 
       # ~ end
 
-      Mock_System_ = self
-
-    end
+      Here_ = self
+    # -
   end
 end

@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-module Skylab::GitViz::TestSupport::Test_Lib
+module Skylab::System::TestSupport::Doubles_Stubbed_System
 
-  describe "[gv] test-lib - mock-sys - 02: input-adapters" do
+  describe "[sy] doubles - mock-sys - 02: input-adapters" do
 
     it "reads one command" do
 
@@ -55,10 +55,9 @@ module Skylab::GitViz::TestSupport::Test_Lib
 
     def _against s
 
-      _st = LIB_.basic::String.line_stream s
+      _st = Home_.lib_.basic::String.line_stream s
 
-      @st = Subject_module_[]::Mock_System::Models_::Command.
-        unmarshalling_stream _st, :OGDL
+      @st = Subject_[]::Models_::Command.unmarshalling_stream _st, :OGDL
 
       NIL_
     end

@@ -18,7 +18,7 @@ module Skylab::GitViz::TestSupport
 
       def __build_front
         subject_VCS::Front.new_via_system_conduit(
-          mock_system_conduit, & handle_event_selectively )
+          stubbed_system_conduit, & handle_event_selectively )
       end
 
       def subject_VCS
@@ -45,14 +45,14 @@ module Skylab::GitViz::TestSupport
 
       TS_::Expect_Event[ tcc ]
       TS_::Stubbed_filesystem[ tcc ]
-      TS_::Mock_System[ tcc ]
+      TS_::Stubbed_system[ tcc ]
       tcc.include Instance_Methods__
 
       tcc.send :define_method, :init_respository_via_path_ do | path |
 
         x = front_.new_repository_via(
           path,
-          mock_system_conduit,
+          stubbed_system_conduit,
           stubbed_filesystem,
         )
 

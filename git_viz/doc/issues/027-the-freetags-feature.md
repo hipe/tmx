@@ -1,6 +1,6 @@
 # the freetags feature :[#027]
 
-(EDIT: this document is all +#archival. the simplified [#007] replaces this.)
+(EDIT: this document is all +#archival. the simplified [#sy-028] replaces this.)
 
 
 .. would be that in the manifest you would write whatever tags you want

@@ -1,9 +1,7 @@
-module Skylab::GitViz
+module Skylab::System
 
-  module Test_Lib_
-
-    module Mock_System
-
+  module Doubles::Stubbed_System
+    # -
       class Recording_Session__
 
         def initialize byte_downstream, & edit_p
@@ -27,7 +25,7 @@ module Skylab::GitViz
 
           _i, o, e, t = Home_.lib_.open3.popen3( * args )
 
-          co = Mock_System_::Models_::Command.new
+          co = Here_::Models_::Command.new
 
           co.receive_args args
 
@@ -52,6 +50,6 @@ module Skylab::GitViz
           NIL_
         end
       end
-    end
+    # -
   end
 end

@@ -47,7 +47,7 @@ module Skylab::GitViz::TestSupport
 
       _repo = Home_.repository.new_via(
         '/the/repo',
-        mock_system_conduit,
+        stubbed_system_conduit,
         stubbed_filesystem,
       )
 

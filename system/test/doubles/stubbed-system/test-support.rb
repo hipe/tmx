@@ -1,75 +1,33 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::GitViz::TestSupport::Test_Lib
+module Skylab::System::TestSupport::Doubles_Stubbed_System
 
-  Parent__ = ::Skylab::GitViz::TestSupport  # except for when we use <- this..
-
-  # ~
-  # we are a child node by position only - we don't want to pull in
-  # assets from the parent node. to this end, we do a lot manually:
-
-  Callback_ = ::Skylab::Callback
-
-  Autoloader_ = Callback_::Autoloader
-
-  _ = ::File.join ::Skylab::GitViz::TestSupport.dir_pathname.to_path, 'test-lib'
-
-  TestSupport_ = ::Skylab::TestSupport
-
-  TestSupport_::Regret[ TS_ = self, _ ]
+  parent = ::Skylab::System::TestSupport
+  parent[ TS_ = self ]
+  TestSupport_ = parent::TestSupport_
 
   extend TestSupport_::Quickie
-
-  module ModuleMethods
-
-    define_method :use, -> do
-      h = {}
-      -> sym do
-        ( h.fetch sym do
-
-          x = TestSupport_.fancy_lookup sym, TS_
-
-          h[ sym ] = x
-        end )[ self ]
-      end
-    end.call
-
-    define_method :dangerous_memoize, TestSupport_::DANGEROUS_MEMOIZE
-  end
 
   module InstanceMethods
 
     def new_string_IO_
-      LIB_.string_IO.new
+      Home_.lib_.string_IO.new
     end
   end
 
-  Expect_Line = -> tcc do
+  s = nil
+  Path_for_ = -> tail_s do
 
-    TestSupport_::Expect_line[ tcc ]
+    s ||= parent.dir_pathname.join( 'doubles/stubbed-system' ).to_path
+
+    File.join s, tail_s
   end
 
-  module LIB_ ; class << self
+  Subject_ = -> do
+    Home_::Doubles::Stubbed_System
+  end
 
-    def basic
-      @__basic ||= Autoloader_.require_sidesystem( :Basic )
-    end
-
-    def plugin
-      Autoloader_.require_sidesystem :Plugin
-    end
-
-    def string_IO
-      @__string_IO ||= Autoloader_.require_stdlib( :StringIO )
-    end
-
-  end ; end
-
-  # ~ shorties
-
+  Callback_ = parent::Callback_
+  Home_ = parent::Home_
   NIL_ = nil
-
-  Subject_module_ = -> do
-    ::Skylab::GitViz::Test_Lib_
-  end
 end

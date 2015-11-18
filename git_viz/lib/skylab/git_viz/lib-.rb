@@ -84,11 +84,6 @@ module Skylab::GitViz
       Basic[]::String.via_mixed 120, x
     end
 
-    String_scanner = _memoize do
-      require 'strscan'
-      ::StringScanner
-    end
-
     System = -> do
       System_lib[].services
     end

@@ -1,6 +1,6 @@
 # the system call fixtures server :[#018]
 
-(EDIT: this document is all +#archival. the simplified [#007] replaces this.)
+(EDIT: this document is all +#archival. the simplified [#sy-028] replaces this.)
 
 ## :#introduction-to-the-server-micro-architecture
 

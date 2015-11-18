@@ -52,7 +52,7 @@ module Skylab::GitViz::TestSupport
       Universal_cache___[]
     end
 
-    def cache_hash_for_mock_system
+    def cache_hash_for_stubbed_system
       Universal_cache___[]
     end
   end
@@ -128,9 +128,9 @@ module Skylab::GitViz::TestSupport
     Home_.lib_.system_lib::Doubles::Stubbed_Filesystem.enhance_client_class tcc
   end
 
-  Mock_System = -> tcc do
+  Stubbed_system = -> tcc do
 
-    Home_.lib_.mock_system_lib::Mock_System.enhance_client_class tcc
+    Home_.lib_.system_lib::Doubles::Stubbed_System.enhance_client_class tcc
   end
 
   module Reactive_Model_Support

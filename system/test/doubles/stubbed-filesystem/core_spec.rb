@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[gv] test lib - stubbed filesystem" do
+  describe "[sy] doubles - stubbed filesystem" do
 
     extend TS_
     use :doubles_stubbed_filesystem_support

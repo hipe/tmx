@@ -42,7 +42,7 @@ module Skylab::Git::TestSupport
       end
     end
 
-    class Mock_System___  # stay close to [#gv-007]
+    class Mock_System___  # stay close to [#sy-028]
 
       def initialize
 

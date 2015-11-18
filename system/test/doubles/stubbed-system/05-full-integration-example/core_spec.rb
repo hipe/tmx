@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-module Skylab::GitViz::TestSupport::Test_Lib
+module Skylab::System::TestSupport::Doubles_Stubbed_System
 
-  describe "[gv] test-lib - mock-sys - 05: full integration example" do
+  describe "[sy] doubles - mock-sys - 05: full integration example" do
 
     extend TS_
 
@@ -10,16 +10,16 @@ module Skylab::GitViz::TestSupport::Test_Lib
 
       class MS_05_Fake_Test_Context
 
-        Subject_module_[]::Mock_System.enhance_client_class self
+        Subject_[].enhance_client_class self
 
-        define_method :cache_hash_for_mock_system, ( Callback_.memoize do
+        define_method :cache_hash_for_stubbed_system, ( Callback_.memoize do
           {}
         end )
 
-        define_method :manifest_path_for_mock_system, ( Callback_.memoize do
-          TS_.dir_pathname.join(
-            'mock-system/05-full-integration-example/fixtures/commands.ogdl'
-          ).to_path
+        define_method :manifest_path_for_stubbed_system, ( Callback_.memoize do
+
+          Path_for_[ '05-full-integration-example/fixtures/commands.ogdl' ]
+
         end )
       end
     end
@@ -31,7 +31,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
     it "look a ping" do
 
       tc = _test_context_instance
-      _, o, e, t = tc.mock_system_conduit.popen3 'echo', 'hello'
+      _, o, e, t = tc.stubbed_system_conduit.popen3 'echo', 'hello'
       t.value.exitstatus.should be_zero
       e.should be_nil  # you get none because you had none
       o.gets.should eql "hello\n"
@@ -41,7 +41,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
     it "if you submit a command that isn't in manifest, key error is raised" do
 
       begin
-        _mock_system_conduit.popen3( 'not', 'there' )
+        _stubbed_system_conduit.popen3( 'not', 'there' )
       rescue ::KeyError => e
       end
       e.message.should match(
@@ -64,11 +64,11 @@ module Skylab::GitViz::TestSupport::Test_Lib
     end
 
     def _hack_lookup * args
-      _mock_system_conduit.instance_variable_get( :@lookup )[ args ]
+      _stubbed_system_conduit.instance_variable_get( :@lookup )[ args ]
     end
 
-    def _mock_system_conduit
-      _test_context_instance.mock_system_conduit
+    def _stubbed_system_conduit
+      _test_context_instance.stubbed_system_conduit
     end
 
     define_method :_test_context_instance, ( Callback_.memoize do

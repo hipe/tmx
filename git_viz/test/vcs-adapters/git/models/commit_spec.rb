@@ -38,7 +38,7 @@ module Skylab::GitViz::TestSupport
 
       _repo = front_.new_repository_via(
         @path,
-        mock_system_conduit,
+        stubbed_system_conduit,
         stubbed_filesystem,
       )
 
@@ -51,7 +51,7 @@ module Skylab::GitViz::TestSupport
       @stubbed_FS
     end
 
-    def manifest_path_for_mock_system
+    def manifest_path_for_stubbed_system
       @mock_SYS
     end
 

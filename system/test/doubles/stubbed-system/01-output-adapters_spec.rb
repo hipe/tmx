@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::GitViz::TestSupport::Test_Lib
+module Skylab::System::TestSupport::Doubles_Stubbed_System
 
-  describe "[gv] test-lib - mock-sys - 01: output-adapters" do
+  describe "[sy] doubles - mock-sys - 01: output-adapters" do
 
     extend TS_
 
@@ -20,7 +20,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
       io = new_string_IO_
       co.write_to io
 
-      st = LIB_.basic::String.line_stream io.string
+      st = Home_.lib_.basic::String.line_stream io.string
 
       st.gets.should eql "command\n"
       st.gets.should eql "  argv\n"
@@ -48,7 +48,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
     end
 
     def _subject
-      Subject_module_[]::Mock_System
+      Subject_[]
     end
   end
 end

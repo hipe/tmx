@@ -1,9 +1,7 @@
-module Skylab::GitViz
+module Skylab::System
 
-  module Test_Lib_
-
-    module Mock_System
-
+  module Doubles::Stubbed_System
+    # -
       Input_Adapters_ = ::Module.new
 
       class Input_Adapters_::OGDL
@@ -19,7 +17,7 @@ module Skylab::GitViz
 
         def initialize lines
           @lines = lines
-          @scn = Home_.lib_.string_scanner.new EMPTY_S_
+          @scn = Home_.lib_.string_scanner EMPTY_S_
           @stack = [ Frame__.new( 0, Root_Node___.new ) ]
         end
 
@@ -337,6 +335,8 @@ module Skylab::GitViz
           attr_reader :string
         end
 
+        EMPTY_A_ = [].freeze
+
         EOL__ = /\r?\n/
 
         INDENT__ = /[ \t]*/  # if this is not also space, look
@@ -347,6 +347,6 @@ module Skylab::GitViz
 
         STAY_ = true
       end
-    end
+    # -
   end
 end

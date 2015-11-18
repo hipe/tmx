@@ -7,7 +7,7 @@ module Skylab::GitViz::TestSupport
       def [] tcc
 
         TS_::Stubbed_filesystem[ tcc ]
-        TS_::Mock_System[ tcc ]
+        TS_::Stubbed_system[ tcc ]
 
         tcc.include Instance_Methods___
       end
@@ -19,7 +19,7 @@ module Skylab::GitViz::TestSupport
         ::File.join STORY__, 'paths.list'
       end )
 
-      define_method :manifest_path_for_mock_system, ( Callback_.memoize do
+      define_method :manifest_path_for_stubbed_system, ( Callback_.memoize do
         ::File.join STORY__, 'commands.ogdl'
       end )
     end

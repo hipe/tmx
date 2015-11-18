@@ -51,7 +51,7 @@ module Skylab::GitViz::TestSupport
       at_ :STORY_04_PATHS_
     end
 
-    def manifest_path_for_mock_system
+    def manifest_path_for_stubbed_system
       at_ :STORY_04_COMMANDS_
     end
   end

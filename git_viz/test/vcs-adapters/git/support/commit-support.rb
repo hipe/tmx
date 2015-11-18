@@ -10,7 +10,7 @@ module Skylab::GitViz::TestSupport
 
           TS_::Expect_Event[ tcc ]
           TS_::Stubbed_filesystem[ tcc ]
-          TS_::Mock_System[ tcc ]
+          TS_::Stubbed_system[ tcc ]
           VCS_Adapters::Git::Support[ tcc ]
 
           tcc.include self

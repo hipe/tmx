@@ -43,7 +43,7 @@
 [#010]       #parent-node:[#011] the git commit poool narrative ..
 [#009]       #parent-node:[#011] the git commit narrative ..
 [#008]       #parent-node:[#005] the VCS adapter agent narrative ..
-[#007]       the mock-sys narrative ..
+[#007] #hole ( #moved-to: [sy]. #was: the mock-sys narrative )
              ( #was: #parent-node:[#005] the CLI action narrative .. )
 [#006]       the flattening experiment ..
              ( #was: #parent-node:[#005] the CLI client narrative .. )

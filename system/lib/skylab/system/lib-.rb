@@ -6,7 +6,7 @@ module Skylab::System
       :build_require_sidesystem_proc,
       :build_require_stdlib_proc )
 
-    define_singleton_method :memoize, Callback_::Memoize
+    define_singleton_method :_memoize, Callback_::Memoize
 
     Autonomous_component_system = sidesys[ :Autonomous_Component_System ]
 
@@ -30,22 +30,18 @@ module Skylab::System
 
     Shellwords = stdlib[ :Shellwords ]
 
-    String_scanner = -> do
-      p = -> s do
-        require 'strscan'
-        p = -> s_ do
-          ::StringScanner.new s_
-        end
-        p[ s ]
-      end
-      -> s do
-        p[ s ]
-      end
-    end.call
+    string_scanner_class = _memoize do
+      require 'strscan'
+      ::StringScanner
+    end
+
+    String_scanner = -> s do
+      string_scanner_class[].new s
+    end
 
     String_IO = stdlib[ :StringIO ]
 
-    Tmpdir = memoize do
+    Tmpdir = _memoize do
       require 'tmpdir'
       ::Dir.tmpdir
     end

@@ -94,6 +94,10 @@ module Skylab::System::TestSupport
         Home_.lib_.brazen::API.expression_agent_instance
       end
     end
+
+    Expect_Line = -> tcc do
+      TestSupport_::Expect_line[ tcc ]
+    end
   end
 
   Home_ = ::Skylab::System

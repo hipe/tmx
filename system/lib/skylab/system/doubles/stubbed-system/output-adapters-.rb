@@ -1,9 +1,7 @@
-module Skylab::GitViz
+module Skylab::System
 
-  module Test_Lib_
-
-    module Mock_System
-
+  module Doubles::Stubbed_System
+    # -
       Output_Adapters_ = ::Module.new
 
       class Output_Adapters_::OGDL_esque
@@ -167,6 +165,6 @@ module Skylab::GitViz
           ACHIEVED_
         end
       end
-    end
+    # -
   end
 end

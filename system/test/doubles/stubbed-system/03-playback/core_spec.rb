@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-module Skylab::GitViz::TestSupport::Test_Lib
+module Skylab::System::TestSupport::Doubles_Stubbed_System
 
-  describe "[gv] test-lib - mock-sys - 03: playback" do
+  describe "[sy] doubles - mock-sys - 03: playback" do
 
     it "a mock system conduit is built with a pathname (any string)" do
 
@@ -41,11 +41,13 @@ module Skylab::GitViz::TestSupport::Test_Lib
     end )
 
     define_method :_manifest_A, ( Callback_.memoize do
-      TS_.dir_pathname.join( 'mock-system/03-playback/fixtures/story-A.ogdl' ).to_path
+
+      Path_for_[ '03-playback/fixtures/story-A.ogdl' ]
+
     end )
 
     def _subject
-      Subject_module_[]::Mock_System
+      Subject_[]
     end
   end
 end

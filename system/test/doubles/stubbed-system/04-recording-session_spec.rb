@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::GitViz::TestSupport::Test_Lib
+module Skylab::System::TestSupport::Doubles_Stubbed_System
 
-  describe "[gv] test-lib - mock-sys - recording session (#LIVE)" do
+  describe "[sy] doubles - mock-sys - recording session (#LIVE)" do
 
     extend TS_
     use :expect_line
@@ -51,7 +51,7 @@ module Skylab::GitViz::TestSupport::Test_Lib
     end
 
     def _subject
-      Subject_module_[]::Mock_System
+      Subject_[]
     end
   end
 end

@@ -122,7 +122,11 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
       def start_session
 
         @fh = ::File.open @path, ::File::CREAT | ::File::TRUNC | ::File::WRONLY
-        @sess = Home_.lib_.mock_system_lib::Mock_System.recording_session @fh
+
+        _ = Home_.lib_.system_lib::Doubles::Stubbed_System
+
+        @sess = _.recording_session @fh
+
         NIL_
       end
 

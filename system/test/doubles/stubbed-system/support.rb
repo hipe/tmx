@@ -1,13 +1,13 @@
-module Skylab::GitViz::TestSupport::Test_Lib
+module Skylab::System::TestSupport
 
-  module Mock_System::Support
+  module Doubles::Stubbed_System::Support
 
     OGDL = -> tcm do
 
       tcm.send :define_method, :against_ do | s |
 
-        @st = Subject_module_[]::Mock_System::Input_Adapters_::
-          OGDL.tree_stream_from_lines( LIB_.basic::String.line_stream s )
+        @st = Home_::Doubles::Stubbed_System::Input_Adapters_::
+        OGDL.tree_stream_from_lines( Home_.lib_.basic::String.line_stream s )
 
         NIL_
       end
