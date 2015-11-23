@@ -39,14 +39,16 @@
 [#091]       [ entity identifier ]
              ( #moved-from [#here-022] )
 [#090]       arity ..
-[#089] #hole ( became the ACS )
+[#089] #open integrate the *four* redundancies at [#002]#GEC
+             ( became the ACS )
 [#088]       the meta-meta-properties justification ..
 [#087]       #track similar normalization logics (this might be a redundant tracker)
 [#086]       #track cases where failure is "fuzzy" (i.e non-atomic),
                ignored for the greater good, for usability
 [#085] #hole (#was: (#moved-to: [#ba-052]))
 [#084]       +#wishlist a `flag` meta-meta property
-[#083] #hole ( #was: #done workspace `init` action should not default to '.' in API )
+[#083]       ( this #feature-island is descirbed at [#002]#GEC )
+             ( #was: #done workspace `init` action should not default to '.' in API )
 [#082]       #track meta-meta-property candidates (list, enum etc)
 [#081]       #track experimental extensions to Actor
 [#080]       #parent-node:[#013] actors, agents and models ..
@@ -179,5 +181,5 @@
              ( #was: #done re-arch expressions agents to work correctly with 'par')k
 [#004]       #parent-node: [#002] the help renderer narrative ..
 [#003]       #parent-node: [#002] the CLI state processors narrative ..
-[#002]       #doc-node brazen CLI
+[#002]       #doc-node brazen CLI and definition of "modality"
 [#001]       #doc-node the entity enhacnement narrative ..

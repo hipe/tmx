@@ -84,13 +84,13 @@ module Skylab::GitViz::TestSupport
     end
   end.call
 
-  module Expect_CLI
+  module My_CLI_Expectations
 
     class << self
 
       def [] test_cls
 
-        Expect_CLI_lib_[][ test_cls ]
+        CLI_lib_[][ test_cls ]
 
         test_cls.include self
 
@@ -105,7 +105,7 @@ module Skylab::GitViz::TestSupport
       %w( gvz )
     end
 
-    def the_list_of_all_visible_actions_for_expect_CLI
+    def the_list_of_all_visible_actions_for_CLI_expectations
       %w( ping hist-tree )
     end
   end
@@ -155,9 +155,9 @@ module Skylab::GitViz::TestSupport
 
   # ~ non-contant-ish support
 
-  Expect_CLI_lib_ = -> do
+  CLI_lib_ = -> do
 
-    Home_.lib_.brazen.test_support.CLI::Expect_CLI
+    Home_.lib_.brazen.test_support.lib( :CLI_expectations )
   end
 
   # ~ constant-ishes

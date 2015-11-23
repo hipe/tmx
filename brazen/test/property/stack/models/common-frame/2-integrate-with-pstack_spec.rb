@@ -1,12 +1,16 @@
-require_relative 'test-support'
+require_relative '../../../../test-support'
 
-module Skylab::Brazen::TestSupport::Pstack_Cframe
+module Skylab::Brazen::TestSupport::PropertyStack_Namespace_2____
+
+  ::Skylab::Brazen::TestSupport.lib_(
+    :property_stack_models_common_frame
+  ).prepare_sandbox self
 
   describe "[br] property - stack - common frame - integrate with pstack" do
 
     before :all do
 
-      class IWP_Base_Frame
+      class Base_Frame
 
         Subject_.call self,
 
@@ -40,7 +44,7 @@ module Skylab::Brazen::TestSupport::Pstack_Cframe
     end
 
     it "ok" do
-      frame = IWP_Base_Frame.new {}
+      frame = Base_Frame.new {}
       stack = Home_::Property::Stack.new
       stack.push_frame frame
       stack.push_frame_with :foo, :FOO

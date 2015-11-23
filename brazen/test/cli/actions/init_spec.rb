@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport::CLI::Actions
+module Skylab::Brazen::TestSupport
 
   describe "[br] CLI actions init" do
 
     extend TS_
+    use :CLI_actions
 
     with_invocation 'init', '.'
     with_max_num_dirs_ '1'

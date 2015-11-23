@@ -5,7 +5,7 @@ module Skylab::Brazen::TestSupport
   describe "[br] CLI - expr-fr - table - actor - max-share" do
 
     extend TS_
-    use :CLI_expression_frames_table_actor_support
+    use :CLI_expression_frames_table_actor
 
     _PERCENT_SHARE = -> mtx do
 

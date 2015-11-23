@@ -6,7 +6,7 @@ module Skylab::GitViz::TestSupport
 
     extend TS_
     use :VCS_adapters_git_support_bundle_support
-    use :expect_CLI  # order matters
+    use :my_CLI_expectations  # order matters
 
     it "help screen - expect [#br-042] back-to-front property mutation" do
 
@@ -37,7 +37,7 @@ module Skylab::GitViz::TestSupport
 
       invoke 'hi', '--', '-1', 'x'
 
-      expect :styled, '<width> must be greater than or equal to 1, had \'-1\''
+      expect :styled, '<width> must be greater than or equal to 1, had -1'
       expect_result_for_failure
     end
 
@@ -62,7 +62,7 @@ module Skylab::GitViz::TestSupport
     def _common_prepare
 
       @for_expect_stdout_stderr_prepare_invocation = method :__prepare_invo
-      @stderr_for_expect_stdout_stderr = mock_stderr_instance_for_expect_CLI
+      @stderr_for_expect_stdout_stderr = mock_stderr_instance_for_CLI_expectations
     end
 
     def __prepare_invo invo

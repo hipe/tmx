@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport::CLI::Actions
+module Skylab::Brazen::TestSupport
 
   describe "[br] CLI actions - canon level-2" do
 
     extend TS_
+    use :CLI_behavior
 
     with_invocation 'workspace'
 

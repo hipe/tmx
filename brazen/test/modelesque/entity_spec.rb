@@ -1,14 +1,16 @@
 require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport::Mo_Ent
+module Skylab::Brazen::TestSupport::Modelesque_Entity_Namespace____
 
-  o = ::Skylab::Brazen::TestSupport
+  _TS = ::Skylab::Brazen::TestSupport
 
-  o[ TS_ = self ]
+  _TS[ self ]
 
-  include Constants
+  extend _TS::TestSupport_::Quickie
 
-  extend TestSupport_::Quickie
+  include _TS::Constants  # e.g Home_
+
+  Test_Instance_Methods_ = _TS::Test_Instance_Methods_  # because [#ts-044]
 
   describe "[br] modelesque - entity" do
 
@@ -16,11 +18,11 @@ module Skylab::Brazen::TestSupport::Mo_Ent
 
       def _with_class & p
 
-        tcm = self
+        tcc = self
 
         before :all do
           _THE_CLASS_ = nil.instance_exec( & p )
-          tcm.send :define_method, :_subject_class do
+          tcc.send :define_method, :_subject_class do
             _THE_CLASS_
           end
         end
@@ -170,11 +172,5 @@ module Skylab::Brazen::TestSupport::Mo_Ent
         Home_::Modelesque::Entity
       end
     end
-
-    Home_ = Home_
-    Enhance_for_test_ = o::Enhance_for_test_
-    NIL_ = nil
-    WITH_MODULE_METHOD_ = o::WITH_MODULE_METHOD_
-    Test_Instance_Methods_ = o::Test_Instance_Methods_
   end
 end

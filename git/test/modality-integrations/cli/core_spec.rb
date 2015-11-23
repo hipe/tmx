@@ -30,7 +30,7 @@ module Skylab::Git::TestSupport
     it "ping error channel (expect STDERR)" do
 
       invoke 'ping', '--channel', 'ero', 'wrong'
-      expect :styled, :e, "(pretending this was wrong: 'wrong')"
+      expect :e, '(pretending this was wrong: "wrong")'
       expect_specific_invite_line_to :ping
       expect_failed
     end

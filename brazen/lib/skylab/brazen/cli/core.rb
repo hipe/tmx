@@ -116,8 +116,10 @@ module Skylab::Brazen
           ev_ = ev.to_event
 
           if ev_.has_member :invite_to_action
-
             i_a = ev_.invite_to_action
+          end
+
+          if i_a
 
             seen_i_a_h.fetch i_a do
               adapter.help_renderer.express_invite_to_particular_action__ i_a
@@ -1231,7 +1233,7 @@ module Skylab::Brazen
         NIL_
       end
 
-    private  # (:[#]:GEC (generated event contextualizations))
+    private  # #GEC
 
       def maybe_inflect_line_for_positivity_via_event s, ev
         if ev.verb_lexeme

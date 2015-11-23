@@ -4,10 +4,12 @@ module Skylab::Brazen::TestSupport
 
     def self.[] tcc
 
-      TS_::CLI::Expect_CLI[ tcc ]
+      TS_.lib_( :CLI_expectations )[ tcc ]
+
       TS_::TestLib_::Memoizer_methods[ tcc ]
 
       tcc.extend VERY_TEMPORARY_LEGACIES
+
       tcc.include self
 
       tcc.send :define_singleton_method, :invoke_appropriate_action, IIA__
@@ -78,11 +80,11 @@ module Skylab::Brazen::TestSupport
       client_class_
     end
 
-    define_method :get_invocation_strings_for_expect_stdout_stderr, -> do
-      a = %w( zeepo )
-      -> do
-        a
-      end
-    end.call
+    s = 'zeepo'.freeze
+    s_a = [ s ].freeze
+
+    define_method :get_invocation_strings_for_expect_stdout_stderr do
+      s_a
+    end
   end
 end

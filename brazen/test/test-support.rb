@@ -3,18 +3,6 @@ require 'skylab/test_support'
 
 module Skylab::Brazen::TestSupport
 
-  class << self
-
-    def CLI
-      require_relative 'cli/test-support'
-      CLI
-    end
-
-    def expect_interactive x
-      self::Zerk::Expect_Interactive[ x ]
-    end
-  end  # >>
-
   TestSupport_ = ::Skylab::TestSupport
 
   extend TestSupport_::Quickie
@@ -24,33 +12,79 @@ module Skylab::Brazen::TestSupport
   module ModuleMethods
 
     def use sym
-      TS_.lib( sym )[ self ]
+      TS_.lib_( sym )[ self ]
     end
   end
 
-  # ->
+  class << self
 
-    TS_.send :define_singleton_method, :lib, -> do
+    def lib sym
+      LIB__.public_library sym
+    end
 
-      cache_h = {}
+    def lib_ sym
+      LIB__.protected_library sym
+    end
+  end  # >>
 
+  module LIB__ ; class << self
+
+    # (special treatment for our experiment with public/protected..)
+
+    def public_library sym
+      ( @___public_lib ||= __build_public_library )[ sym ]
+    end
+
+    def __build_public_library
+
+      cache = {}
       -> sym do
-        cache_h.fetch sym do
-
-          s = sym.id2name
-          const = :"#{ s[ 0 ].upcase }#{ s[ 1 .. -1 ] }"
-          x = if TestLib_.const_defined? const, false
-            TestLib_.const_get const
-          else
-            TestSupport_.fancy_lookup sym, TS_
+        cache.fetch sym do
+          x = protected_library sym
+          if x.const_defined? :PUBLIC, false
+            yes = x.const_get :PUBLIC, false
           end
-          cache_h[ sym ] = x
+          if yes
+            cache[ sym ] = x
+            x
+          else
+            raise ::NameError, __say_etc( sym )
+          end
+        end
+      end
+    end
+
+    def protected_library sym
+      ( @___protected_lib ||= __build_protected_library )[ sym ]
+    end
+
+    def __build_protected_library
+
+      cache = {}
+      -> sym do
+        cache.fetch sym do
+          x = _lookup sym
+          cache[ sym ] = x
           x
         end
       end
-    end.call
+    end
 
-    # <-
+    def _lookup sym
+      s = sym.id2name
+      const = :"#{ s[ 0 ].upcase }#{ s[ 1 .. -1 ] }"
+      if @_close_lib.const_defined? const, false
+        @_close_lib.const_get const
+      else
+        TestSupport_.fancy_lookup sym, @_far_lib
+      end
+    end
+
+    def __say_etc sym
+      "#{ @_far_lib.name } `#{ sym }` is not public but can be made public #{
+        }by setting in it a constant `PUBLIC` with a true-ish value."
+    end
+  end ; end
 
   module InstanceMethods
 
@@ -119,6 +153,11 @@ module Skylab::Brazen::TestSupport
 
       sys.filesystem.tmpdir :path, _path
     end
+  end
+
+  module LIB__
+    @_close_lib = TestLib_
+    @_far_lib = TS_
   end
 
   Enhance_for_test_ = -> mod do
@@ -190,10 +229,6 @@ module Skylab::Brazen::TestSupport
     Callback_::Autoloader[ self ]  # don't load fixture file when autoloading lib
   end
 
-  module Zerk
-    Callback_::Autoloader[ self ]  # don't load spec file when autoloading lib
-  end
-
   EMPTY_S_ = ''.freeze
   Home_ = ::Skylab::Brazen
   NIL_ = nil
@@ -203,6 +238,7 @@ module Skylab::Brazen::TestSupport
     Home_ = Home_
     Callback_ = Callback_
     EMPTY_S_ = EMPTY_S_
+    NIL_ = nil
     SPACE_ = SPACE_
     TestLib_ = TestLib_
     TestSupport_ = TestSupport_

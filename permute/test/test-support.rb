@@ -44,11 +44,11 @@ module Skylab::Permute::TestSupport
 
     class << self
 
-      def [] test_cls
+      def [] tcc
 
-        Home_.lib_.brazen.test_support.CLI::Expect_CLI[ test_cls ]
+        Home_.lib_.brazen.test_support.lib( :CLI_expectations )[ tcc ]
 
-        test_cls.include self
+        tcc.include self
 
       end
     end  # >>
@@ -61,7 +61,7 @@ module Skylab::Permute::TestSupport
       %w( pmt )
     end
 
-    def the_list_of_all_visible_actions_for_expect_CLI
+    def the_list_of_all_visible_actions_for_CLI_expectations
       %w( ping generate )
     end
   end

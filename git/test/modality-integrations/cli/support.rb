@@ -3,7 +3,7 @@ module Skylab::Git::TestSupport
   module Modality_Integrations::CLI::Support
 
     def self.[] tcc
-      Home_.lib_.brazen.test_support.CLI::Expect_CLI[ tcc ]
+      Home_.lib_.brazen.test_support.lib( :CLI_expectations )[ tcc ]
       tcc.include Instance_Methods___
       NIL_
     end

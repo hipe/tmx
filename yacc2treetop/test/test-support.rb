@@ -22,7 +22,7 @@ module Skylab::Yacc2Treetop::TestSupport
         Callback_.test_support::Expect_Event[ self ]
       when :expect_CLI
         require 'skylab/brazen'
-        ::Skylab::Brazen.test_support.CLI::Expect_CLI[ self ]
+        ::Skylab::Brazen.test_support.lib( :CLI_expectations )[ self ]
         extend CLI_Module_Methods__
         include CLI_Instance_Methods__
       else

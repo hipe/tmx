@@ -13,7 +13,7 @@ module Skylab::TestSupport
         end
 
         mod.extend Anchor_ModuleMethods
-        mod.initialize_for_regret_with_parent_anchor_mod nil
+        mod._initialize_for_regret_with_parent_anchor_mod nil
       end
     end  # >>
 
@@ -21,44 +21,74 @@ module Skylab::TestSupport
 
       def [] mod, * x_a
 
-        if ! mod.respond_to? :dir_pathname
+        # enhance the module with autoloading IFF:
+        #
+        #   • it wasn't turned off explicitly in this call -AND-
+        #   • it wasn't turned off in the parent enhancement module -AND-
+        #   • the module doesn't already evince autoloading -AND-
 
-          if x_a.length.nonzero? && :filename == x_a.first  # :+[#br-049]
-            filename  = x_a.fetch 1
-            x_a[ 0, 2 ] = EMPTY_A_
-          end
+        autoloading_maybe = _autoloading_maybe
+
+        if x_a.length.nonzero?
+
+          autoloading_maybe, filename = ___parse_parameters x_a, mod
+        end
+
+        if autoloading_maybe and ! mod.respond_to? :dir_pathname
 
           if filename
             using_file_entry_string_autoloaderize_child_node filename, mod
           else
             autoloaderize_child_node mod
           end
-
-          # alternate:
-
-          if false
-          _filename = if x_a.length.nonzero? && :filename == x_a.first
-            x = x_a.fetch 1  # :+[#br-049]
-            x_a[ 0, 2 ] = EMPTY_A_
-            x
-          else
-            s = mod.name
-            Callback_::Name.via_const(
-              s[ s.rindex( CONST_SEP_ ) + 2 .. -1 ]
-            ).as_slug
-          end
-
-          end
         end
 
         mod.extend Anchor_ModuleMethods
-        mod.initialize_for_regret_with_parent_anchor_mod self
-        x_a.length.nonzero? and
-          apply_x_a_on_child_test_node x_a, mod  # :#hook-out
-        nil
+
+        mod._initialize_for_regret_with_parent_anchor_mod self
+
+        NIL_
       end
 
-    private
+      def ___parse_parameters x_a, mod
+
+        st = Callback_::Polymorphic_Stream.via_array x_a
+
+        yes = _autoloading_maybe
+
+        if yes
+
+          if :filename == st.current_token
+
+            st.advance_one
+            filename = st.gets_one
+
+          elsif :autoloading == st.current_token
+
+            st.advance_one
+            if :none != st.current_token
+              raise ::ArgumentError, self._WRITE_ME__say_missing( st )
+            end
+            st.advance_one
+
+            mod.send :define_singleton_method, :_autoloading_maybe do
+              false
+            end  # we don't know at this point is mod is terminal or not
+
+            yes = false
+          end
+        end
+
+        if st.unparsed_exists
+          raise ::ArgumentError, self._WRITE_ME__say_extra( st )
+        end
+
+        [ yes, filename ]
+      end
+
+      def _autoloading_maybe
+        true
+      end
 
       def extended mod
         mod.extend module_methods_module
@@ -67,39 +97,45 @@ module Skylab::TestSupport
         nil
       end
 
-    public
-
-      def initialize_for_regret_with_parent_anchor_mod pam
+      def _initialize_for_regret_with_parent_anchor_mod pam
 
         @parent_anchor_module = pam  # nil ok
 
-        o = Bump_module__.curry[ self ]
+        o = Touch_module___.curry[ self ]
 
-        o[ :Constants, -> do
-          pam and include pam.constants_module
-        end ]
+        o.call :Constants do
+          if pam
+            include pam.constants_module
+          end
+        end
 
         test_module_me = self
 
-        o[ :ModuleMethods, -> do
-          pam and include pam.module_methods_module
+        o.call :ModuleMethods do
+
+          if pam
+            include pam.module_methods_module
+          end
+
           if ! instance_methods( false ).include? NEAREST__
             # if not multiparent. if not custom hacks
             define_method NEAREST__ do test_module_me end
           end
-        end ]
+        end
 
-        o[ :InstanceMethods, -> do
+        o.call :InstanceMethods do
 
-          if ! singleton_class.method_defined? :let
+          if ! singleton_class.method_defined? :let  # #todo away this
 
               # some define it early to use it inline
 
             define_singleton_method :let, Home_::Let::LET_METHOD
           end
 
-          pam and include pam.instance_methods_module
-        end ]
+          if pam
+            include pam.instance_methods_module
+          end
+        end
 
         nil
       end
@@ -158,14 +194,19 @@ module Skylab::TestSupport
       end
       public :count_to_top
     end
-    #
-    Bump_module__ = -> host_module, const, p=nil do
+
+    Touch_module___ = -> host_module, const, & p do
+
       mod = if host_module.const_defined? const, false
         host_module.const_get const, false
       else
         host_module.const_set const, ::Module.new
       end
-      p and mod.module_exec( & p )
+
+      if p
+        mod.module_exec( & p )
+      end
+
       mod
     end
 

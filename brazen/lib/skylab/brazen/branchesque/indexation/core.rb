@@ -120,7 +120,6 @@ module Skylab::Brazen
       # this caching of course assumes non-dynamic trees. and dynamic trees
       # will certainly become a thing..
 
-
       _st = Callback_::Stream.via_nonsparse_array @_source.constants
 
       _st = _st.map_reduce_by do | const |

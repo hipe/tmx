@@ -13,7 +13,7 @@ module Skylab::Slicer::TestSupport
 
     def use sym
       :expect_CLI == sym or fail
-      Brazen_.test_support.CLI::Expect_CLI[ self ]
+      Brazen_.test_support.lib( :CLI_expectations )[ self ]
       NIL_
     end
   end

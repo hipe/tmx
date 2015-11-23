@@ -5,7 +5,7 @@ module Skylab::Brazen::TestSupport
   describe "[br] CLI - expr-fr - table - actor - stats" do
 
     extend TS_
-    use :CLI_expression_frames_table_actor_support
+    use :CLI_expression_frames_table_actor
 
     _SUBJECT_SYMBOL = :gather_statistics
 

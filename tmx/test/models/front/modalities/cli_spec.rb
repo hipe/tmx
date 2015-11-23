@@ -5,13 +5,15 @@ module Skylab::TMX::TestSupport
   describe "[tmx] models - front - modalities - CLI" do
 
     extend TS_
+
+    Home_.lib_.brazen.test_support.lib( :CLI_expectations )[ self ]
     use :models_building
     use :modalities_CLI
 
     it "1.1 strange arg" do
 
       invoke 'strange'
-      expect :styled, :e, /\Aunrecognized action 'strange'/
+      expect_unrecognized_action :strange
       expect :styled, :e, /\Aknown actions are \('zorpa-norpa'\)/
       expect_generic_invite_line
       expect_failed
@@ -50,7 +52,7 @@ module Skylab::TMX::TestSupport
 
     def _same_win
 
-      expect :styled, :e, "wazoozle 'YAY'"
+      expect :e, 'wazoozle "YAY"'
       expect_no_more_lines
       @exitstatus.should eql :__shazznastic__
     end

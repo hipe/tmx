@@ -1,6 +1,6 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport::CLI
+module Skylab::Brazen::TestSupport
 
   describe "[br] CLI - expect section (inspired by OGDL)" do
 
@@ -52,8 +52,9 @@ module Skylab::Brazen::TestSupport::CLI
       root.only_child
     end
 
+    x = nil
     subject = -> do
-      TS_::Expect_Section
+      x ||= TS_.lib_( :CLI_expect_section )
     end
   end
 end

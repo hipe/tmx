@@ -115,7 +115,8 @@ module Skylab::Snag::TestSupport
 
       _st = sout_serr_line_stream_for_contiguous_lines_on_stream :e
 
-      Home_.lib_.brazen.test_support.CLI::Expect_Section.tree_via_line_stream_ _st
+      Home_.lib_.brazen.test_support.lib( :CLI_expect_section ).
+        tree_via_line_stream_ _st
     end
 
     def o * x_a, & p  # legacy

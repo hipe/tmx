@@ -1,3 +1,30 @@
+# (quick definition of "modality") :[#002]
+
+we lean so heavily on this term in this universe that it has become
+something of an idiom. rougly it means "kind of interface." it is an
+attempt to model a taxonomy of user interfaces.
+
+
+    |                                                        NLP AI agent
+    |
+    |                                          Desktop GUI
+    |                                       Mobile/Tablet/Phablet
+    |                                     Watch!
+    |              Web
+    |
+    |    CLI
+    |
+    |  "API"
+    |
+    | (complexity of implementation -->
+    +----------------------------------------------------------------------
+
+our obsession is with what these disparate "modalities" have in common..
+
+
+
+
+
 # introduction
 
     Invocation__
@@ -263,6 +290,7 @@ some important facets of this employed here:
 
 
 
+
 ## :#pedagogy-1975
 
 here is a crash-course on how you make a custom action adapter:
@@ -287,5 +315,19 @@ here is a crash-course on how you make a custom action adapter:
     might actually look exactly the same because of how consts work.
 
 
-## :GEC (generated event contextualizations - inline)
+
+
+## :#GEC - generated event contextualizations
+
+this has now become a "redundancy pool" with:
+
+  • [#hu-043] the API Action inflection hack (a "feature island") -AND-
+
+  • our [#083], a "feature island" -AND-
+
+  • [#ac-007] a small implementation there (the newest)
+
+so that's *four* implementations of pretty much the same behavior,
+with *two* that are #[#sl-134] "feature islands" meaning they have test
+coverage but aren't used anywhere in production.
 _

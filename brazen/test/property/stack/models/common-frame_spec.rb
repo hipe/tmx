@@ -1,6 +1,10 @@
-require_relative 'common-frame/test-support'
+require_relative '../../../test-support'
 
-module Skylab::Brazen::TestSupport::Pstack_Cframe
+module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
+
+  ::Skylab::Brazen::TestSupport.lib_(
+    :property_stack_models_common_frame
+  ).prepare_sandbox self
 
   describe "[br] property - stack - common frame" do
 

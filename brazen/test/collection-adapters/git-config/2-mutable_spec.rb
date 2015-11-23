@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
+module Skylab::Brazen::TestSupport
 
   describe "[br] collection adapters: git config (mutable!)" do
 
     extend TS_
+    use :collection_adapters_git_config_mutable
 
     it "the empty string parses" do
       expect_no_sections_from EMPTY_S_
@@ -71,10 +72,6 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
         @document = config
         p[ config ]
       end
-    end
-
-    def subject
-      Home_::Collection_Adapters::Git_Config::Mutable
     end
 
     def expect_unparses

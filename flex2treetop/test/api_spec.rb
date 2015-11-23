@@ -23,7 +23,7 @@ module Skylab::Flex2Treetop::MyTestSupport
         @result.should eql :_cheeky_monkey_
       end
 
-      it "unrecognized action" do
+      it "u-nrecognized action" do
 
         call_API :wiggle, :you_never, :see_these, :args
 

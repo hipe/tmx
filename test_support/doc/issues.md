@@ -1,5 +1,5 @@
 [#045]       permute (as a doctest action)
-[#044] #hole
+[#044]       lexical scope vs inheritence (as it pertains to us)..
 [#043] #open modernize doc-test templates
 [#042]       "nasty OCD memoize" caveat (for [gv], [sg])..
 [#041] #hole (this used to track the sidesystem class. now in [tmx] & [sli])
@@ -18,10 +18,10 @@
              ( #was: #done folderize plugins ([#xx-008]) )
              ( #was: #done #parent-node: [#015] change syntax to work with contiguous nonblank lines )
 
-[#031] #open sunset io spy qualified_knownness for io spy group, re-purpose former to house mocks
+[#031] #open sunset io spy `qualified_knownness` for io spy group, re-purpose former to house mocks
              ( #was: #done #universal while regret no longer wires test nodes for autoloading  )
 [#030] #open #parent-node:[#015] the doc-test recursive spec needs mock fs
-[#029]       #tracking-tag the 'expect' omnibus and narrative ..
+[#029]       #track the 'expect' omnibus and narrative ..
 [#028]       [ "possible" ]
              ( #was: #done borked quickie architecture near constants )k
 [#027]       #parent-node: [#015] peek hack explained .. (was templo)
@@ -44,11 +44,11 @@
 [#012]       #doc-point #in-situ (the particular importance of result values)
              ( #was: [#xx-006] )
              ( #was: #done #parent-node: [#015] setup vs example? )
-[#011]       #tracking-tag fix 'test/' - 'TestSupport' for autoloading?
-[#010]       #tracking-tag "dark hack" this one weird old trick makes ..
+[#011]       #track fix 'test/' - 'TestSupport' for autoloading?
+[#010]       #track "dark hack" this one weird old trick makes ..
 [#009]       #subscription - will Quickie ever short-circuit (throw
                exceptions) on individual test-failures like ::Rspec?
-[#008]       #tracking-tag quickie root invocation (runtime/context)
+[#008]       #track quickie root invocation (runtime/context)
 [#007]       #tracking tag of similar places with line / `call_digraph_listeners` structs
 [#006] #open test/all: redundancy points, maybe waits for [#tm-056]
 [#005] #open #quickie #redundant s-tylize

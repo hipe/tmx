@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport::CLI
+module Skylab::Brazen::TestSupport
 
   describe "[br] CLI canon level 1" do
 
     extend TS_
+    use :CLI_behavior
 
     # it "  0)  no arguments"
 
@@ -50,7 +51,7 @@ module Skylab::Brazen::TestSupport::CLI
 
     it "2)    extra argument - ( E U I )" do
       invoke 'wing', 'wang'
-      expect :styled, %r(\Aunexpected argument:? ['"]?wang['"]?)
+      expect_unexpected_argument 'wang'
       expect_action_usage_line
       expect_action_invite_line
     end

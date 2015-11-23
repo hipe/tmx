@@ -1,6 +1,8 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport::Entity
+Skylab::Brazen::TestSupport.lib_( :entity ).require_common_sandbox
+
+module Skylab::Brazen::TestSupport::Entity_Sandbox
 
   describe "[br] entity - 2. processing the polymorphic upstrem" do
 

@@ -1,21 +1,21 @@
-require_relative '../test-support'
+module Skylab::Brazen::TestSupport
 
-module Skylab::Brazen::TestSupport::Zerk
+  module Zerk
 
-  ::Skylab::Brazen::TestSupport[ self ]
+    class << self
 
-  module Constants
-    Zerk_ = Home_::Zerk
-  end
+      def prepare_test_context tcc
+        TestLib_::Expect_event[ tcc ]
+        tcc.include self
+        NIL_
+      end
 
-  include Constants
-
-  Home_ = Home_
-  Zerk_ = Zerk_
-
-  module InstanceMethods
-
-    Constants::TestLib_::Expect_event[ self ]
+      def write_constants_into mod
+        mod.const_set :Home_, Home_
+        mod.const_set :Zerk_, Home_::Zerk
+        NIL_
+      end
+    end  # >>
 
     def call * x_a
       @branch ||= build_branch
@@ -32,12 +32,14 @@ module Skylab::Brazen::TestSupport::Zerk
         evr.maybe_receive_on_channel_event i_a, & ev_p
       end
     end
-  end
 
-  Mock_Parent__ = ::Struct.new :handle_event_selectively_via_channel do
+    Mock_Parent__ = ::Struct.new :handle_event_selectively_via_channel do
 
-    def is_interactive
-      false
+      def is_interactive
+        false
+      end
     end
+
+    write_constants_into self
   end
 end

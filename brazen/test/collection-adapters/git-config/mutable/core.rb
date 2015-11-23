@@ -1,17 +1,21 @@
-require_relative '../test-support'
+module Skylab::Brazen::TestSupport
 
-module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config::Mutable
+  module Collection_Adapters::Git_Config::Mutable
 
-  ::Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config[ TS_ = self ]
+    class << self
+      def [] tcc
 
-  include Constants
+        TS_.lib_( :collection_adapters_git_config )[ tcc ]
 
-  extend TestSupport_::Quickie
+        tcc.extend Module_Methods___
+        tcc.include Instance_Methods___
+        NIL_
+      end
+    end  # >>
 
-  Home_ = Home_
-  EMPTY_S_ = EMPTY_S_
+    # <-
 
-  module ModuleMethods
+  module Module_Methods___
 
     def with_empty_document
       with_content EMPTY_S_
@@ -35,29 +39,23 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config::Mutable
 
     def with_content s
       document_p = -> do
-        doc = Subject__[].parse_string s do self._NEVER end
+        doc = subject.parse_string s do self._NEVER end
         document_p = -> { doc } ; doc
       end
       define_method :__build_document__ do
         document_p[].dup_via_parse_context parse_context
       end ; nil
     end
+
+    def subject
+      Home_::Collection_Adapters::Git_Config::Mutable  # repeat
+    end
   end
 
-  Subject__ = -> do
-    Home_::Collection_Adapters::Git_Config::Mutable
-  end
-
-  module InstanceMethods
+  module Instance_Methods___
 
     def document
       @document ||= __build_document__
-    end
-
-    define_method :subject, Subject__
-
-    def super_subject
-      Home_::Collection_Adapters::Git_Config
     end
 
     def parse_context
@@ -66,7 +64,7 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config::Mutable
 
     def bld_parse_context
       @ev_a = nil
-      Subject__[]::Pass_Thru_Parse__.new_with :on_event_selectively, -> *, & ev_p do
+      subject::Pass_Thru_Parse__.new_with :on_event_selectively, -> *, & ev_p do
         ev = ev_p[]
         if do_debug
           debug_IO.puts ev.description
@@ -86,5 +84,19 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config::Mutable
       _actual_string = @document.unparse
       _actual_string.should eql expected_string
     end
+
+    # ~ support
+
+    def subject
+      super_subject::Mutable
+    end
+
+    def super_subject
+      Home_::Collection_Adapters::Git_Config
+    end
+  end
+  # ->
   end
 end
+
+# Home_::Collection_Adapters::Git_Config::Mutable

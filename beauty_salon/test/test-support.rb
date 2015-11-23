@@ -84,11 +84,11 @@ module Skylab::BeautySalon::TestSupport
   end
 
   Expect_Interactive = -> tcc do
-    Home_.lib_.brazen.test_support.expect_interactive tcc
+    Home_.lib_.brazen.test_support.lib( :Zerk_expect_interactive )[ tcc ]
   end
 
   Modality_Integrations_CLI_Support = -> tcc do
-    Home_.lib_.brazen.test_support.CLI::Expect_CLI[ tcc ]
+    Home_.lib_.brazen.test_support.lib( :CLI_expectations )[ tcc ]
   end
 
   # ~

@@ -72,7 +72,7 @@ module Skylab::FileMetrics::TestSupport::CLI
 
       case sym
       when :expect_CLI
-        Home_.lib_.brazen.test_support.CLI::Expect_CLI[ self ]
+        Home_.lib_.brazen.test_support.lib( :CLI_expectations )[ self ]
 
       when :classify_common_screen
         TS_::Classify_Common_Screen[ self ]

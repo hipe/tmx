@@ -53,7 +53,7 @@ module Skylab::Basic
 
       elsif is_probably_string
 
-        _s = String_.ellipsify x, A_REASONABLY_SHORT_LENGTH_FOR_A_STRING
+        _s = String_.ellipsify x, A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_
 
         "\"#{ _s }\""
 
@@ -71,11 +71,9 @@ module Skylab::Basic
       end
     end
 
-    A_REASONABLY_SHORT_LENGTH_FOR_A_STRING = 10
-
     SIMPLE_RX___ = /\A[[:alnum:] _]+\z/
 
-    Via_x___ = Proc__.curry[ A_REASONABLY_SHORT_LENGTH_FOR_A_STRING ]
+    Via_x___ = Proc__.curry[ A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_ ]
 
   end
   end

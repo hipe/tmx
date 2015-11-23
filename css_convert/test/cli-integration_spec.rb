@@ -5,7 +5,7 @@ module Skylab::CSS_Convert::TestSupport
   describe "[cssc] CLI integration" do
 
     extend TS_
-    use :my_expect_CLI
+    use :my_CLI_expectations
 
     it "with no args, gives warm, inviting message" do
 

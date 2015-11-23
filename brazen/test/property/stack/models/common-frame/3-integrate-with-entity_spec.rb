@@ -1,12 +1,16 @@
-require_relative 'test-support'
+require_relative '../../../../test-support'
 
-module Skylab::Brazen::TestSupport::Pstack_Cframe
+module Skylab::Brazen::TestSupport::PropertyStack_Namespace_3____
+
+  ::Skylab::Brazen::TestSupport.lib_(
+    :property_stack_models_common_frame
+  ).prepare_sandbox self
 
   describe "[br] property - stack - common frame - integrate with entity" do
 
     before :all do
 
-      class IWE_Foo
+      class Foo
 
         Subject_.call self,
           :globbing, :processor, :initialize,
@@ -28,23 +32,23 @@ module Skylab::Brazen::TestSupport::Pstack_Cframe
     end
 
     it "property names look good" do
-      IWE_Foo.properties.get_names.should eql [ :foo, :bar, :biz ]
+      Foo.properties.get_names.should eql [ :foo, :bar, :biz ]
     end
 
     it "required fields still bork" do
       _rx = /\Amissing required field - 'bar'/
       -> do
-        IWE_Foo.new
+        Foo.new
       end.should raise_error ::ArgumentError, _rx
     end
 
     it "works with all" do
-      foo = IWE_Foo.new :biz, :B, :foo, :F, :bar, :A
+      foo = Foo.new :biz, :B, :foo, :F, :bar, :A
       [ foo.foo, foo.bar, foo.biz_x ].should eql %i| F A B |
     end
 
     it "works with one" do
-      foo = IWE_Foo.new :bar, :A
+      foo = Foo.new :bar, :A
       [ foo.foo, foo.bar, foo.biz_x ].should eql [ nil, :A, nil ]
     end
   end

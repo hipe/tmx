@@ -1,10 +1,13 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport::CLI
+module Skylab::Brazen::TestSupport
 
   describe "[br] CLI canon" do
 
     extend TS_
+    use :CLI_behavior
+
+    with_invocation  # (root)
 
     it "  0)  no arguments - error / usage / invite" do
       invoke

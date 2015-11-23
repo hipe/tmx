@@ -1,10 +1,17 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport::CLI::A_A_
+module Skylab::Brazen::TestSupport::CLI_ActionAdapter_Namepace___
+
+  lib = ::Skylab::Brazen::TestSupport.lib_ :CLI_action_adapter
+
+  Ent_ = lib::Constants::Ent_  # because #[#ts-044]
+
+  extend ::Skylab::TestSupport::Quickie
 
   describe "[br] CLI action adapters - parse ARGV (R=required, O=optional" do
 
-    extend T_S__
+    include lib::InstanceMethods
+    extend lib::ModuleMethods
 
     context "some syntaxes are not meant to be (O R O)" do
 

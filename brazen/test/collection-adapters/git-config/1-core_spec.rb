@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
+module Skylab::Brazen::TestSupport
 
   describe "[br] collection adapters - git config" do
 
     extend TS_
+    use :collection_adapters_git_config
 
     it "the empty string parses" do
       expect_no_sections_from EMPTY_S_
@@ -41,10 +42,5 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
     it "a variety of other assignments work" do
       a_variety_of_other_assignments_work
     end
-
-    def subject
-      Home_::Collection_Adapters::Git_Config
-    end
-
   end
 end

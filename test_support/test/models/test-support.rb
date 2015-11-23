@@ -11,5 +11,3 @@ module Skylab::TestSupport::TestSupport::Models
   Top_TS_ = Home_::TestSupport
 
 end
-
-# :+#tombstone: `apply_x_a_on_child_test_node`

@@ -1,6 +1,6 @@
 module Skylab::Brazen::TestSupport
 
-  module CLI::Expression_Frames::Table::Actor::Support
+  module CLI::Expression_Frames::Table::Actor
 
     class << self
 

@@ -1,10 +1,12 @@
-module Skylab::Brazen::TestSupport::CLI
+module Skylab::Brazen::TestSupport
 
-  module Expect_Section  # :[#045]. :+[#106]
+  module CLI::Expect_Section  # :[#045]. :+[#106]
 
     # in one go, parse a whole "screen" with indentation-sensitive syntax
     # reminiscent of a super simplified python or OGDL. the result data
-    # structure it geared towards assertion.
+    # structure is geared towards assertion.
+
+    PUBLIC = true
 
     class << self
 

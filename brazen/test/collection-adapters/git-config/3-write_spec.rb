@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
+module Skylab::Brazen::TestSupport
 
   describe "[br] collection adapters - git config - write" do
 
     extend TS_
+    use :collection_adapters_git_config
 
     it "an easy way to write a single-section config" do
       td = prepared_tmpdir
@@ -43,15 +44,11 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
 
       _cfg_path = Home_::TestSupport::Fixtures.dir_pathname.join( '00-escape.cfg' ).to_path
 
-      doc = Subject_[].parse_path _cfg_path
+      doc = subject.parse_path _cfg_path
       sect = doc.sections.first
       ast = sect.assignments.first
       ast.value_x.should eql '\\b'
 
-    end
-
-    def subject
-      Home_.cfg
     end
   end
 end

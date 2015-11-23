@@ -4,11 +4,9 @@ module Skylab::Brazen
 
     Sessions_ = ::Module.new
 
-    class Sessions_::Deep_Action_Isomorphicism_for_EN  # compare [#hu-043]
+    class Sessions_::Deep_Action_Isomorphicism_for_EN  # [#083] which is..
 
-      # :+[#sl-134] this is a feature island - this is covered ONLY by a
-      # spec but it is not currently used anywhere in production. however
-      # we retain it for the time being for now for possible future use
+      # ..described in [#002]#GEC (see)
 
       def initialize slug_a
         @len = slug_a.length

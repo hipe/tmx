@@ -31,7 +31,7 @@ module Skylab::Brazen::TestSupport
       it "1 args - whines of unexpected, result is multi line" do
 
         invoke 'foo'
-        expect :styled, :e, /\Aunexpected argument 'foo'\z/
+        expect_unexpected_argument 'foo'
         expect_common_failure_
       end
 
@@ -70,7 +70,7 @@ module Skylab::Brazen::TestSupport
       it "2 args - whines of unexpected" do
 
         invoke 'aa', 'bb'
-        expect :styled, :e, "unexpected argument 'bb'"
+        expect_unexpected_argument 'bb'
         expect_common_failure_
       end
 

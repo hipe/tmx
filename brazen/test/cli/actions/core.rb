@@ -1,16 +1,20 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport::CLI::Actions
+module Skylab::Brazen::TestSupport
 
-  ::Skylab::Brazen::TestSupport::CLI[ TS_ = self ]
+  module CLI::Actions
 
-  include Constants
+    class << self
+      def [] tcc
+        TS_.lib_( :CLI_behavior )[ tcc ]
+        tcc.extend Module_Methods___
+        tcc.include Instance_Methods___
+        NIL_
+      end
+    end  # >>
+    # <-
 
-  extend TestSupport_::Quickie
-
-  Home_ = Home_
-
-  module ModuleMethods
+  module Module_Methods___
 
     def with_max_num_dirs_ d
       __add_env_setting :MAX_NUM_DIRS, d ; nil
@@ -76,7 +80,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
     end
   end
 
-  module InstanceMethods
+  module Instance_Methods___
 
     def argv_prefix_for_expect_stdout_stderr
       self.class.sub_action_s_a
@@ -130,8 +134,15 @@ module Skylab::Brazen::TestSupport::CLI::Actions
       expect_exitstatus_for :resource_not_found
     end
 
-    def ick s
-      "'#{ ::Regexp.escape s }'"
+    def ick x
+
+      if x.respond_to? :ascii_only?
+        x.inspect
+      elsif x.respond_to? :bit_length
+        x.inspect
+      else
+        self._COVER_ME
+      end
     end
 
     def env s
@@ -152,9 +163,11 @@ module Skylab::Brazen::TestSupport::CLI::Actions
       end
       -> { p_[] }
     end
+
     File_utils = -> do_debug_proc, debug_IO do
       File_utils_class[].new do_debug_proc, debug_IO
     end
+
     File_utils_class = memoize[ -> do
       require 'fileutils'
       class FU_Agent__  # re-write of similar [#sy-011]
@@ -183,6 +196,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
         self
       end
     end ]
+
     Tempdir_pathname = -> do
       p = -> do_dbg_p, io do
         require 'tmpdir'
@@ -196,5 +210,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
         p[ do_dbg_p, io ]
       end
     end.call
+  end
+  # ->
   end
 end

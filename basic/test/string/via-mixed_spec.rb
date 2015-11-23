@@ -19,8 +19,8 @@ module Skylab::Basic::TestSupport
       subject( "\"\n" ).should eql '"\"\n"'
     end
 
-    it "a string 11 chars wide becomes 10 chars wide and is ellipsified" do
-      subject( 'eleven_chrs' ).should eql '"eleven[..]"'
+    it "a string 16 chars wide becomes 15 chars wide and is ellipsified" do
+      subject( 'sixteen_chars_wd' ).should eql '"sixteen_cha[..]"'
     end
 
     it "a typical symbol gets single quotes" do

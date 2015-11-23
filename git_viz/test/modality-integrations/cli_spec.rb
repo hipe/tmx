@@ -5,7 +5,7 @@ module Skylab::GitViz::TestSupport
   describe "[gv] modality integrations - CLI" do
 
     extend TS_
-    use :expect_CLI
+    use :my_CLI_expectations
 
     define_method :expect, instance_method( :expect )  # because rspec
 
@@ -17,7 +17,7 @@ module Skylab::GitViz::TestSupport
 
     it "1.1 invoke with strange arg - w/e/i" do
       invoke 'strange'
-      expect_whine_about_unrecognized_action :strange
+      expect_unrecognized_action :strange
       expect_express_all_known_actions
       expect_generically_invited
     end

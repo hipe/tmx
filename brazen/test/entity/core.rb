@@ -1,15 +1,22 @@
-require_relative '../test-support'
+module Skylab::Brazen::TestSupport
 
-module Skylab::Brazen::TestSupport::Entity
+  module Entity
 
-  Parent_ = ::Skylab::Brazen::TestSupport
+    class << self
+      def require_common_sandbox
+        # (currently it is defined by having loaded this support file)
+        NIL_
+      end
+    end  # >>
+  end
 
-  Parent_[ TS_ = self ]
+  module Entity_Sandbox
 
-  include Constants
+    extend TestSupport_::Quickie
 
-  extend TestSupport_::Quickie
+    # -- Functions
 
+    # <-
   Add_common_methods_ = -> mod do
 
     mod.send :define_method, :initialize do | & edit_p |
@@ -20,17 +27,20 @@ module Skylab::Brazen::TestSupport::Entity
 
     NIL_
   end
+  # ->
 
-  Subject_ = -> do
-    Home_::Entity
+    Subject_ = -> do
+      Home_::Entity
+    end
+
+    # -- Constants (we do X=X because [#ts-044])
+
+    Callback_ = Callback_
+    Enhance_for_test_ = Enhance_for_test_
+    Home_ = Home_
+    KEEP_PARSING_ = Home_::KEEP_PARSING_
+    Test_Instance_Methods_ = Test_Instance_Methods_
+    TS_ = self
+    WITH_MODULE_METHOD_ = WITH_MODULE_METHOD_
   end
-
-  Home_ = Home_
-  Callback_ = Callback_
-  Enhance_for_test_ = Parent_::Enhance_for_test_
-  KEEP_PARSING_ = true
-  NIL_ = nil
-  Test_Instance_Methods_ = Parent_::Test_Instance_Methods_
-  WITH_MODULE_METHOD_ = Parent_::WITH_MODULE_METHOD_
-
 end

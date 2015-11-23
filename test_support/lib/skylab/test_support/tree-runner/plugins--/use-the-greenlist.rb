@@ -141,7 +141,7 @@ module Skylab::TestSupport
                 :proc, ord,
                 :end_functions,
               :end_functions,
-          :zero_or_one, :keyword, 'show'
+          :zero_or_one, :keyword, 'list'
         )
 
         st = _Parse.input_stream.via_array argv

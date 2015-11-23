@@ -17,9 +17,13 @@ module Skylab::Cull::TestSupport::Clients_CLI
 
     it "1.2 strange arg" do
       invoke 'cow'
-      expect :styled, /\Aunrecognized action 'cow'\z/i
+      expect_unrecognized_action :cow
       expect :styled, /\Aknown actions are \('ping', 'create'/
       expect_top_invite_line
+    end
+
+    def expect_unrecognized_action sym
+      expect :e, "unrecognized action #{ sym.id2name.inspect }"
     end
 
     it "1.3 easy money" do

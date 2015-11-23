@@ -16,7 +16,7 @@ module Skylab::TestSupport
           a, argv_prefix_for_expect_stdout_stderr )
       end
 
-      def argv_prefix_for_expect_stdout_stderr  # :+#hook-in
+      def argv_prefix_for_expect_stdout_stderr  # #hook-in:1
         NIL_
       end
 
@@ -68,7 +68,7 @@ module Skylab::TestSupport
 
         invo = subject_CLI.new(  # :+#hook-out
           * g.values_at( :i, :o, :e ),
-          invocation_strings_for_expect_stdout_stderr,  # :+#hook-out
+          invocation_strings_for_expect_stdout_stderr,  # #hook-out:1
           * self.CLI_options_for_expect_stdout_stderr,
         )
 

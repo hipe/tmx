@@ -1,6 +1,6 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport::CLI
+module Skylab::Brazen::TestSupport
 
   describe "[br] CLI - option parser - option stream" do
 

@@ -17,8 +17,10 @@ module Skylab::Brazen::TestSupport
 
         invoke 'wingzors', '-h'
 
-        tr = Home_::TestSupport.CLI::Expect_Section.tree_via_line_stream_(
-          sout_serr_line_stream_for_contiguous_lines_on_stream :e )
+        _lib = Home_::TestSupport.lib_ :CLI_expect_section
+        _lines = sout_serr_line_stream_for_contiguous_lines_on_stream :e
+
+        tr = _lib.tree_via_line_stream_ _lines
 
         unstyle_styled = Home_::CLI::Styling::Unstyle_styled
 

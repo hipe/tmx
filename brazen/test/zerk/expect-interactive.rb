@@ -1,17 +1,18 @@
-require_relative 'test-support'
+module Skylab::Brazen::TestSupport
 
-module Skylab::Brazen
+  module Zerk::Expect_Interactive
 
-  module TestSupport
+    PUBLIC = true
 
-    module Zerk::Expect_Interactive
+    class << self
 
-      class << self
+      def [] tcc
+        tcc.include Instance_Methods___
+        NIL_
+      end
+    end  # >>
 
-        def [] test_context_class
-          test_context_class.include self
-        end
-      end  # >>
+    module Instance_Methods___
 
       def start_interactive_session chdir_path
 
@@ -144,6 +145,8 @@ module Skylab::Brazen
         end
         nil
       end
+    end
+    # ->
 
       Sessions_ = ::Module
       class Sessions_::Main
@@ -292,15 +295,14 @@ module Skylab::Brazen
             }(#{ sym } chunk: #{ chunk.inspect })"
         end
       end
+      # <-
 
-      BLANK_RX_ = Home_::Zerk::BLANK_RX_
+    ACHIEVED_ = true
+    BLANK_RX_ = Home_::Zerk::BLANK_RX_
+    LINE_DELIM_RX__ = /(?<=\n)/
+    MONADIC_EMPTINESS_ = Home_::MONADIC_EMPTINESS_
+    READ_BYTES___ = 8000  # like 100-ish lines - enough for now
+    READ_TIMEOUT_SECONDS__ = 1.0
 
-      LINE_DELIM_RX__ = /(?<=\n)/
-
-      READ_BYTES___ = 8000  # like 100-ish lines - enough for now
-
-      READ_TIMEOUT_SECONDS__ = 1.0
-
-    end
   end
 end

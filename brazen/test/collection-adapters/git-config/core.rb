@@ -1,28 +1,13 @@
-require_relative '../../test-support'
+module Skylab::Brazen::TestSupport
 
-module Skylab::Brazen::TestSupport::Collection_Adapters
+  module Collection_Adapters::Git_Config
 
-  ::Skylab::Brazen::TestSupport[ self ]
-
-end
-
-module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
-
-  ::Skylab::Brazen::TestSupport::Collection_Adapters[ TS_ = self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  module Constants
-    Callback_ = Home_::Callback_
-  end
-
-  Callback_ = Callback_
-
-  EMPTY_S_ = EMPTY_S_
-
-  module InstanceMethods
+    class << self
+      def [] tcc
+        tcc.include self
+        NIL_
+      end
+    end  # >>
 
     def expect_no_sections_from str
       @document = subject.parse_string str do
@@ -145,10 +130,10 @@ module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config
       end
     end
 
-    MARGIN_RX__ = /^[ ]{8}/
-  end
+    def subject
+      Home_::Collection_Adapters::Git_Config
+    end
 
-  Subject_ = -> do
-    Home_::Collection_Adapters::Git_Config
+    MARGIN_RX__ = /^[ ]{8}/
   end
 end

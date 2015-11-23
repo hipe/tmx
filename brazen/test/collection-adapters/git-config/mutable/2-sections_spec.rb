@@ -1,11 +1,12 @@
-require_relative 'test-support'
+require_relative '../../../test-support'
 
-module Skylab::Brazen::TestSupport::Collection_Adapters::Git_Config::Mutable
+module Skylab::Brazen::TestSupport
 
   describe "[br] collection adaptes - git config mutable sections" do
 
     extend TS_
     use :expect_event
+    use :collection_adapters_git_config_mutable
 
     context "to an empty document" do
 

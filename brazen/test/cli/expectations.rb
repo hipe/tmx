@@ -1,29 +1,20 @@
-require_relative 'test-support'  # some clients come in from the top
+module Skylab::Brazen::TestSupport
 
-module Skylab::Brazen::TestSupport::CLI
+  module CLI::Expectations
 
-  module Expect_CLI
+    PUBLIC = true
 
     class << self
 
-      def [] tcm
+      def [] tcc
 
-        tcm.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
-        tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
-        tcm.include self
+        tcc.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
 
-        mem = Yikes_memoizer_for___[ tcm ]
+        tcc.send :define_method, :expect, tcc.instance_method( :expect )  # :+#this-rspec-annoyance
 
-        mem.call :program_name_for_expect_CLI do
-          invocation_strings_for_expect_stdout_stderr.join SPACE_
-        end
+        tcc.include self
 
-        mem.call :invocation_strings_for_expect_stdout_stderr do
-          get_invocation_strings_for_expect_stdout_stderr.
-            each( & :freeze ).freeze
-        end
-
-        mem.call :short_category_s
+        NIL_
       end
 
       def mock_stderr_instance
@@ -32,13 +23,30 @@ module Skylab::Brazen::TestSupport::CLI
       end
     end  # >>
 
-    def mock_stderr_instance_for_expect_CLI
+    def mock_stderr_instance_for_CLI_expectations
 
       MOCK_STDERR__
     end
 
     def invoke * argv
       using_expect_stdout_stderr_invoke_via_argv argv
+    end
+
+    def invocation_strings_for_expect_stdout_stderr
+      get_invocation_strings_for_expect_stdout_stderr
+    end
+
+    def _pn
+      get_invocation_strings_for_expect_stdout_stderr.join SPACE_
+    end
+
+    s_a = nil
+    define_method :get_invocation_strings_for_expect_stdout_stderr do
+
+      # override if you want the would-be program name in your assertions
+      # to look more natural. see [#ts-029]#hook-out:1.
+
+      s_a ||= [ 'xaz'.freeze ].freeze
     end
 
     # ~ assertion phase (ad-hocs)
@@ -54,9 +62,12 @@ module Skylab::Brazen::TestSupport::CLI
 
     ## ~~ our own
 
-    def expect_whine_about_unrecognized_action x
-      expect :styled,
-        %r(\Aunrecognized action:? ['"]?#{ ::Regexp.escape x }['"]?\z)i
+    def expect_unexpected_argument s
+      expect :e, "unexpected argument #{ s.inspect }"
+    end
+
+    def expect_unrecognized_action sym
+      expect "unrecognized action \"#{ sym }\""
     end
 
     def expect_whine_about_unrecognized_option x
@@ -68,7 +79,7 @@ module Skylab::Brazen::TestSupport::CLI
       _s = expect( :styled ) { |x| x }  # IDENTITY_
       _a = /\Aknown actions are \('([^\)]+)'\)\z/.match( _s )[ 1 ].split( "', '" )
 
-      _s_a = the_list_of_all_visible_actions_for_expect_CLI
+      _s_a = the_list_of_all_visible_actions_for_CLI_expectations
 
       h = ::Hash[ _s_a.map { |s| [ s, true ] } ]
 
@@ -91,7 +102,7 @@ module Skylab::Brazen::TestSupport::CLI
     end
 
     def expect_usage_line
-      expect :styled, "usage: #{ program_name_for_expect_CLI } <action> [..]"
+      expect :styled, "usage: #{ _pn } <action> [..]"
     end
 
     def expect_generically_invited
@@ -106,12 +117,12 @@ module Skylab::Brazen::TestSupport::CLI
 
     def expect_generic_invite_line
 
-      _expect_styled_invite_to program_name_for_expect_CLI
+      _expect_styled_invite_to _pn
     end
 
     def expect_specific_invite_line_to * sym_a
 
-      _expect_styled_invite_to program_name_for_expect_CLI, * sym_a
+      _expect_styled_invite_to _pn, * sym_a
     end
 
     def _expect_styled_invite_to * parts
@@ -143,24 +154,5 @@ module Skylab::Brazen::TestSupport::CLI
 
       Memo___ = ::Struct.new( * a ).new( * a_ )
     end )
-
-    Yikes_memoizer_for___ = -> cls do
-
-      -> m, & p do
-
-        val_p = nil
-
-        cls.send :define_method, m do
-
-          if val_p
-            val_p[]
-          else
-            x = instance_exec( & p )
-            val_p = -> { x }
-            x
-          end
-        end
-      end
-    end
   end
 end

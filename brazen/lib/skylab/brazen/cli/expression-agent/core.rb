@@ -55,8 +55,8 @@ module Skylab::Brazen
       end
       HIGHLIGHT_STYLE__ = [ STRONG__, GREEN__ ].freeze
 
-      def ick s
-        code s
+      def ick x
+        Home_.lib_.basic::String.via_mixed x
       end
 
       def indefinite_noun lemma_s

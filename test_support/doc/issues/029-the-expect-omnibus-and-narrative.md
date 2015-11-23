@@ -29,6 +29,30 @@ ideas or look for near-perfect abstract candidates, for each net time we
 write something like this.
 
 
+
+
+## hook-outs
+
+### :#hook-out:1
+
+these "invocation strings" are an array of strings. they can be frozen
+but need not be - attempts to mutate will not be made to them. they can
+be thought of as equivalent to an array consisting of one element:
+`$PROGRAM_NAME` typically.
+
+
+
+
+## hook-ins
+
+### :hook-in:1
+
+this is used typically to reach a sub-action of a utility.
+
+
+
+
+
 (EDIT: the rest of this document is written in a shorthand form that will
 probably only be meaningful to the author, and probably only for a short time
 at that)

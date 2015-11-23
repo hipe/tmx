@@ -102,9 +102,8 @@ module Skylab::Basic
       end
 
       def a_reasonably_short_length_for_a_string
-        A_REASONABLY_SHORT_LENGTH_FOR_A_STRING__
+        A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_
       end
-      A_REASONABLY_SHORT_LENGTH_FOR_A_STRING__ = 15
 
       def regex_for_line_scanning
         LINE_RX__
@@ -261,6 +260,7 @@ module Skylab::Basic
       end
     end
 
+    A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_ = 15
     EMPTY_S_ = ''.freeze
     NEWLINE_ = "\n".freeze
     String_ = self

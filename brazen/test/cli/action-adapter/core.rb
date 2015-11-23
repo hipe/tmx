@@ -1,16 +1,12 @@
-require_relative '../test-support'
+module Skylab::Brazen::TestSupport
 
-module Skylab::Brazen::TestSupport::CLI::A_A_
+  module CLI::Action_Adapter
 
-  ::Skylab::Brazen::TestSupport::CLI[ T_S__ = self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  Home_ = Home_
+    # (this support module is employed "manually"
+    #  b.c it is used by a sandboxed namespace)
 
   module ModuleMethods
+
     def with_class & blk
       contxt = self
       before :all do
@@ -48,7 +44,9 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
     end
   end
 
-  Ent_ = -> do
+  Constants = ::Module.new
+
+  Constants::Ent_ = -> do
 
     p = -> do
 
@@ -95,4 +93,6 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
 
     -> { p.call }
   end.call
+  # ->
+  end
 end

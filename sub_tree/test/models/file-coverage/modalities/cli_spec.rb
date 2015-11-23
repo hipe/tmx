@@ -28,7 +28,7 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
       s.should be_include(
         "the test file suffixes to use (default: \"_spec.rb\")" )
-    end
+    end
 
     it "minimal" do
 

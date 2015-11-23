@@ -1,12 +1,6 @@
 require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport::Collection_Adapters__Couch_OMNI_MODULE
-
-  ::Skylab::Brazen::TestSupport[ TS_ = self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
+module Skylab::Brazen::TestSupport
 
   describe "[br] collections - couch - actions - create (COVER edit sess, precons)" do
 

@@ -18,7 +18,7 @@ module Skylab::Permute::TestSupport
     it '1.1   one wrong arg - says invalid action / usage / invite' do
 
       invoke 'foiple'
-      expect_whine_about_unrecognized_action :foiple
+      expect_unrecognized_action :foiple
       expect_express_all_known_actions
       expect_generically_invited
     end
@@ -35,8 +35,9 @@ module Skylab::Permute::TestSupport
       using_expect_stdout_stderr_invoke_via_argv(
         %w( generate --county=washtenaw --coint=pariah -c fooz ) )
 
-      expect :styled,
-        'ambiguous category letter \'c\' - did you mean "county" or "coint"?'
+      expect(
+        'ambiguous category letter "c" - did you mean "county" or "coint"?',
+      )
 
       expect_specifically_invited_to :generate
     end

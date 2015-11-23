@@ -38,7 +38,7 @@ module Skylab::Brazen::TestSupport
       it "1.1 strange name" do
 
         invoke 'bazel'
-        expect :styled, :e, "unrecognized action 'bazel'"
+        expect_unrecognized_action :bazel
         expect :styled, :e, "known actions are ('yuan-jia')"
         expect_generically_invited
       end

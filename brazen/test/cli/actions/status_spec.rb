@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport::CLI::Actions
+module Skylab::Brazen::TestSupport
 
   describe "[br] CLI actions status" do
 
     extend TS_
+    use :CLI_actions
 
     with_invocation 'status'
 
@@ -35,7 +36,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
         invoke 'x'
 
         expect :styled, /#{ env 'max-num-dirs' } must be non-negative, #{
-          }had #{ ick '-1' }/
+          }had #{ ick( -1 ) }/
 
         expect_localized_invite_line
         expect_errored
@@ -67,8 +68,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
 
           invoke '.'
 
-          expect :styled,
-            %r('#{ ::Regexp.escape cfg_filename }' not found in \. or 1 dir up\b)
+          expect "#{ _prefix_and_conf_file } not found in \. or 1 dir up"
 
           expect_exitstatus_for_resource_not_found
         end
@@ -89,7 +89,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
         end
 
         def expect_same_result
-          expect :styled, %r('#{ ::Regexp.escape cfg_filename }' not found in \.)
+          expect "#{ _prefix_and_conf_file } not found in ."
           expect_exitstatus_for_resource_not_found
         end
       end
@@ -108,6 +108,11 @@ module Skylab::Brazen::TestSupport::CLI::Actions
 
     def invoke * argv
       using_expect_stdout_stderr_invoke_via_argv argv
+    end
+
+    _ICK_CONF_FILE = nil
+    define_method :_prefix_and_conf_file do
+      _ICK_CONF_FILE ||= 'while determining a workspace, "brazen.conf"'
     end
 
     def expect_negative_exitstatus

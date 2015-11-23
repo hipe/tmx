@@ -153,7 +153,7 @@ module Skylab::GitViz::TestSupport
     class Mock_Resources___
 
       def stderr
-        TS_::Expect_CLI_lib_[].mock_stderr_instance
+        TS_::CLI_lib_[].mock_stderr_instance
       end
     end
   end

@@ -31,7 +31,7 @@ leading up to this, some general axioms:
     and unambiguous :[#.B].
 
     indeed we now derive significant utility from this convention thru
-    [#st.002] the "file coverage" utility (b. feb 2012), which relies
+    [#st-002] the "file coverage" utility (b. feb 2012), which relies
     on it.
 
 that much is solid - we still like those points. building from those

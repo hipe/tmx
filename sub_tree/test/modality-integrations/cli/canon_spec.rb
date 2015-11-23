@@ -63,9 +63,13 @@ module Skylab::SubTree::TestSupport::Modality_Integrations::CLI
     it "2.1 : `-h unrec`     : msg invite" do
 
       invoke '-h', 'wat'
-      expect "unrecognized action \"wat\""
+      expect_unrecognized_action :wat
       _expect_known_actions
       _expect_generic_invite
+    end
+
+    def expect_unrecognized_action sym  # #todo
+      expect :e, "unrecognized action #{ sym.id2name.inspect }"
     end
 
     -> do

@@ -1,6 +1,28 @@
 # nasty OCD memoize caveat :[#042]
 
-## caveat
+## synopsis:
+
+"dangerous memoize" refers to the act of memoizing a structure
+in *one* test context that you use in *another*. it is VERY dangerous if
+you don't know what you're doing!
+
+the advantage is that you can use the familiar stack of "fully wired"
+API methods that you use in your normal tests to build a possibly complex
+stucture (with a possibly expensive build-time) that you can run many small
+tests against.
+
+the disadvantage is only if you don't know what you're doing: do NOT
+accidentally pull in spies from the one test context where the
+structureu under test is built.
+
+the author feels this bit of nastiness is justified if used with caution
+because it encourages many small tests without indirectly discouraging
+testing a high-level result structure that is possibly complex.
+
+
+
+
+## caveat re-stated:
 
 realize the EXTREME danger in this: the first time the produced method
 is called, it produces its result by running the argument proc against
@@ -15,7 +37,7 @@ perhaps leading to test incorrectly succeeding or silently failing.
 
 
 
-## justification
+## justification re-stated:
 
 the OCD of this is that we don't want to "waste" the effort of lots of
 convoluted setup multiple times just so we can make make many small tests

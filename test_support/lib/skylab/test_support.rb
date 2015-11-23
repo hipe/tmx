@@ -90,20 +90,20 @@ module Skylab::TestSupport  # :[#021].
     NIL_
   end
 
-  DANGEROUS_MEMOIZE = -> sym, & once_p do  # read [#042]
+  DANGEROUS_MEMOIZE = -> m, & p do
 
-    define_method sym, & Build_dangerous_memoizer_method[ & once_p ]
+    Define_dangerous_memoizer[ self, m, & p ]
+    NIL_
   end
 
-  Build_dangerous_memoizer_method = -> & once_p do
+  Define_dangerous_memoizer = -> cls, m, & p do
 
-    first = true
-    x = nil
+    first = true ; x = nil
 
-    -> do
+    cls.send :define_method, m do
       if first
         first = false
-        x = instance_exec( & once_p )
+        x = instance_exec( & p )  # (the center of the crime of [#042])
       end
       x
     end

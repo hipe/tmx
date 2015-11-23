@@ -1,6 +1,6 @@
-# the ordered dictionary narrative :[#037]
+# the listeners manifesto :[#037]
 
-(actually the "listeners manifesto")
+## objective & scope
 
 
 ## introduction
@@ -11,6 +11,7 @@ endeavor to produce a listener solution within these design contraints:
   • for now we want it to be simple enough that we can write it
     "by hand" as needed per application that wants it, maybe
   • so rather than a library this is more an architecture convention
+
 
 
 
@@ -25,6 +26,7 @@ now we want to take it a step further and come up with an easy-to-understand
 callback solution that is powerful enough to keep things modular and
 de-coupled yet simple enough to be written in about a screen of code
 per-application.
+
 
 
 
@@ -45,6 +47,7 @@ they are not just procs passed as arguments, or tuples of procs. they
 are first-class objects. the fact that the listener is a single, atomic
 object has this one advantage at least: it is far easier to pass it
 around to other endpoints.  :+[#035]
+
 
 
 
@@ -125,6 +128,7 @@ very old days we used to shoot strings everywhere, and then we got
 smarter and starting sending around event objects. but we were left with
 a bunch of methods with names like `info()` and `error()`, and at a
 glace we had no idea whether those methods could take objects or not.
+
 
 
 
