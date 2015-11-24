@@ -1,57 +1,94 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TaskExamples::TestSupport::Tasks
+module Skylab::TaskExamples::TestSupport
 
-  describe "[de] task-types - executable file" do
+  describe "[te] task-types - executable file" do
 
-    extend TS_
+    TS_[ self ]
+    use :task_types
 
-    let(:build_args) { { :executable_file => executable_file } }
+    def subject_class_
 
-    let(:context) { { } }
-
-    let :subject do
-      TaskTypes::ExecutableFile.new( build_args ) { |t| wire! t }
+      Task_types_[]::ExecutableFile
     end
 
     context "with empty build args" do
 
-      let(:build_args) { { } }
-
       it "raises an exception complaining of missing required attributes" do
 
-        _rx = /missing required attribute: executable_file/
-        -> do
-          subject.invoke
-        end.should raise_error _rx
+        expect_missing_required_attributes_are_ :executable_file
+      end
+
+      def build_arguments_
+        EMPTY_H_
       end
     end
 
     context "when pointing to an executable file" do
-      let(:executable_file) { `which ruby`.strip }
-      it "should call_digraph_listeners a notice and return true" do
-        r = subject.invoke
-        r.should eql(true)
-        fingers[:info].last.should match(/executable: .*\/ruby/)
+
+      shared_state_
+
+      it "succeeds" do
+        succeeds_
+      end
+
+      it "expresses" do
+
+        _rx = /executable: .*\/ruby/
+        expect_only_ :info, _rx
+      end
+
+      def executable_file
+        `which ruby`.strip
       end
     end
 
     context "when pointing to a file not found" do
-      let(:executable_file) { BUILD_DIR.join('not-a-file').to_s }
-      it "should call_digraph_listeners a notice and return false" do
-        r = subject.invoke
-        fingers[:info].last.should match(/executable does not exist.*not-a-file/)
-        r.should eql( false )
+
+      shared_state_
+
+      it "fails" do
+        fails_
+      end
+
+      it "expresses" do
+
+        _rx = /executable does not exist.*not-a-file/
+        expect_only_ :info, _rx
+      end
+
+      def executable_file
+        ::File.join BUILD_DIR, 'not-a-file'
       end
     end
 
     context "when pointing to a found, not executable file" do
-      let(:executable_file) { FIXTURES_DIR.join('some-file.txt') }
-      it "should call_digraph_listeners a notice and return false" do
-        r = subject.invoke
-        fingers[:info].last.should match(/exists but is not executable.*some-file/)
-        r.should eql( false )
+
+      shared_state_
+
+      it "fails" do
+        fails_
       end
+
+      it "expresses" do
+
+        _rx = /exists but is not executable.*some-file/
+        expect_only_ :info, _rx
+      end
+
+      def executable_file
+        ::File.join FIXTURES_DIR, 'some-file.txt'
+      end
+    end
+
+    def build_arguments_
+      {
+        executable_file: executable_file,
+      }
+    end
+
+    def context_
+      NIL_
     end
   end
 end

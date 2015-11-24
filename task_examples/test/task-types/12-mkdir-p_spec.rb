@@ -1,111 +1,140 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TaskExamples::TestSupport::Tasks
+module Skylab::TaskExamples::TestSupport
 
-  describe "[de] task-types - mkdir p" do  # :+#no-quickie because: nested `before`
+  describe "[te] task-types - mkdir p" do
 
-    extend TS_
+    TS_[ self ]
+    use :task_types
 
-    let :subject do
-      TaskTypes::MkdirP
+    def subject_class_
+      Task_types_[]::MkdirP
     end
 
-    let :all do
-      lambda do |t|
-        t.on_all do |e|
-          debug_event e if do_debug
-          stderr << e.text
-        end
-      end
-    end
+    it "whines about unhandled event channels" do
 
-    it "won't build an empty object" do
       _rx = /unhandled event streams?.+all.+info/
-      -> do
-        subject.new
-      end.should raise_error ::RuntimeError, _rx
+      _cls = subject_class_
+
+      expect_strong_failure_with_message_by_ _rx do
+        _cls.new
+      end
     end
 
     context "as empty" do
 
-      let :subject do
-        TaskTypes::MkdirP.new(&all)
+      it "whines about required arg missing if you try to run it" do
+
+        _rx = /missing required attributes?: .*mkdir_p/
+
+        expect_strong_failure_with_message_ _rx
       end
 
-      it "whines about required arg missing if you try to run it" do
-        _rx = /missing required attributes?: .*mkdir_p/
-        -> do
-          subject.invoke
-        end.should raise_exception ::RuntimeError, _rx
+      def build_arguments_
+        NIL_
       end
     end
 
     context "when the required parameters are present" do
 
-      let :dir_arg do
-        "#{ BUILD_DIR }/foo/bar"
-      end
-
-      let :subject do
-        TaskTypes::MkdirP.new( :mkdir_p => dir_arg, &all )
-      end
-
       context "with regards to dry_run" do
 
-        before :each do
-          subject.context = context
-        end
+        context "it is off (hot) by default" do
 
-        context "by default" do
+          it "like so" do
 
-          let( :context ) { { } }
+            _task = build_task_with_context_
+            _task.dry_run?.should eql false
+          end
 
-          it "o" do
-            should_not be_dry_run
+          def mkdir_p
+            :hello
+          end
+
+          def context_
+            EMPTY_H_
           end
         end
 
         context "with dry run in context" do
 
-          let( :context ) { { :dry_run => true } }
+          it "registers that dry run is on" do
 
-          it "o" do
-            should be_dry_run
+            _task = build_task_with_context_
+            _task.should be_dry_run
           end
 
-          context "when invoked" do
+          context "when `max_depth` would be exceeded" do
 
-            let( :stderr ) { "" }
+            shared_state_
 
-            before :each do
-              BUILD_DIR.prepare
+            it "fails (NOTE is nil)" do
+              state_.result_x.should be_nil
+              # fails_
             end
 
-            context "a two-element do-hah" do
-
-              context "with default max_depth" do
-
-                it "will not go because it is past max depth" do
-                  subject.invoke
-                  stderr.should match(/more than 1 levels? deep/)
-                end
-              end
-
-              context "with max_depth increased to two" do
-
-                let :subject do
-                  TaskTypes::MkdirP.new(:mkdir_p => dir_arg, :max_depth => 2, &all)
-                end
-
-                it "will go because it is equal to max depth" do
-                  subject.invoke
-                  stderr.should match(%r{mkdir .*foo/bar})
-                end
-              end
+            it "expresses" do
+              expect_only_ :info, /\bmore than 1 levels deep\b/i
             end
+
+            def max_depth
+              1
+            end
+          end
+
+          context "when `max_depth` is satisfied" do
+
+            shared_state_
+
+            it "succeeds (NOTE is n11n!)" do
+
+              _x = state_.result_x
+
+              ::Skylab::System::Services___::
+                Filesystem::Normalizations_::
+                 Existent_Directory::Mock_Dir__ == _x.class or self._WHEW
+            end
+
+            it "expresses" do
+              _rx = %r(mkdir .*foo/bar)
+              expect_only_ :info, _rx
+            end
+
+            def max_depth
+              2
+            end
+          end
+
+          def context_
+            { dry_run: true }
+          end
+
+          def build_arguments_
+            {
+              mkdir_p: mkdir_p,
+              max_depth: max_depth,
+            }
+          end
+
+          def max_depth
+            0
+          end
+
+          memoize_ :mkdir_p do
+
+            _ = TestSupport_::Fixtures.dir :empty_esque_directory
+            ::File.join( _, 'foo/bar' ).freeze
           end
         end
       end
+    end
+
+    def build_arguments_
+      { mkdir_p: mkdir_p }
+    end
+
+    def context_
+      NIL_
     end
   end
 end

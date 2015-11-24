@@ -7,7 +7,7 @@ css_convert         q [ ]
 
 code_molester       Q [ ]
 
-task_examples       Q [ ]
+task_examples       q [ ]
 task                q [ ]
 treemap             q [ ]
 

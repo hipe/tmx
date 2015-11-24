@@ -1,53 +1,68 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TaskExamples::TestSupport::Tasks
+module Skylab::TaskExamples::TestSupport
 
-  describe "[de] task-types - tarball to " do  # :+#no-quickie because: nested `before`
+  describe "[te] task-types - tarball to" do
 
-    extend TS_
+    TS_[ self ]
+    use :task_types
 
-    let :context do
-      { build_dir: BUILD_DIR.to_s }
-    end
-
-    let :subject do
-      TaskTypes::TarballTo.new( build_args ) { |t| wire! t }
+    def subject_class_
+      Task_types_[]::TarballTo
     end
 
     context "with bad build args" do
 
-      let( :build_args ) { { } }
-
       it "throws an exception about what it needs" do
-        ->() { subject.invoke }.should raise_exception(RuntimeError,
-          /missing required attributes:? from, tarball_to/
-        )
+
+        _rx = /missing required attributes:? from, tarball_to/
+
+        expect_strong_failure_with_message_ _rx
+      end
+
+      def build_arguments_
+        EMPTY_H_
       end
     end
 
     context "with good build args (no interpolation)" do
-      before :all do
-        FILE_SERVER.run
+
+      shared_state_
+
+      it "succeeds" do
+        succeeds_
       end
 
-      before :each do
-        BUILD_DIR.prepare
+      it "expresses" do
+        expect_only_ :shell, /curl -o.*tar\.gz.*tar\.gz/
       end
 
-      let(:to ) { BUILD_DIR.join 'ohai' }
+      def before_execution_
 
-      let :build_args do
-        { tarball_to: to,
-          from: 'http://localhost:1324/mginy-0.0.1.tar.gz'
+        run_file_server_if_not_running_
+        prepare_build_directory_
+        NIL_
+      end
+
+      def tarball_to
+        ::File.join BUILD_DIR, 'ohai'
+      end
+
+      _URL = 'http://localhost:1324/mginy-0.0.1.tar.gz'.freeze
+
+      define_method :build_arguments_ do
+        {
+          from: _URL,
+          tarball_to: tarball_to,
         }
       end
+    end
 
-      it "must work" do
-        r = subject.invoke
-        r.should eql(true)
-        # the below is temporary, it is not to spec afaik
-        fingers[:shell].last.should match(/curl -o.*tar\.gz.*tar\.gz/)
-      end
+    h = nil
+    define_method :context_ do
+      h ||= {
+        build_dir: BUILD_DIR,
+      }.freeze
     end
   end
 end

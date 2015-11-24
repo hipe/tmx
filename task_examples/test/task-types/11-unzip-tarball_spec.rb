@@ -1,76 +1,151 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TaskExamples::TestSupport::Tasks
+module Skylab::TaskExamples::TestSupport
 
-  describe "[de] task-types unzip tarball" do   # :+#no-quickie because: nested `before`
+  describe "[te] task-types unzip tarball" do
 
-    extend TS_
+    TS_[ self ]
+    use :task_types
 
-    let :subject do
-      TaskTypes::UnzipTarball.new( build_args ) { |t| wire! t }
+    def subject_class_
+      Task_types_[]::UnzipTarball
     end
 
     context "with no build args" do
-      let(:build_args) { {  } }
-      let(:context) { { } }
+
       it "whines about missing required fields" do
-        lambda{ subject.invoke }.should raise_exception(
-          RuntimeError, /missing required attributes: unzip_tarball, build_dir/
-        )
+
+        expect_missing_required_attributes_are_ :unzip_tarball, :build_dir
+      end
+
+      def build_arguments_
+        EMPTY_H_
+      end
+
+      def context_
+        EMPTY_H_
       end
     end
 
     context "with good build args" do
-      let(:build_args) { { :unzip_tarball => unzip_tarball } }
-      let(:context) { { :build_dir => BUILD_DIR } }
+
       context "when tarball does not exist" do
-        let(:unzip_tarball) { "#{FIXTURES_DIR}/not-there.tar.gz" }
+
+        shared_state_
+
+        it "fails" do
+          fails_
+        end
+
         it "whines (returns false, emits error)" do
-          r = subject.invoke
-          r.should eql(false)
-          fingers[:error].length.should eql(1)
-          fingers[:error][0].should match(/tarball not found.*not-there/)
+
+          _rx = /tarball not found.*not-there/
+          expect_only_ :error, _rx
+        end
+
+        def unzip_tarball
+          "#{ FIXTURES_DIR }/not-there.tar.gz"
         end
       end
+
       context "when the tarball exists" do
-        let(:unzip_tarball) { FIXTURES_DIR.join('mginy-0.0.1.tar.gz') }
-        before :each do
-          # BUILD_DIR.verbose = true  # e.g.
-          BUILD_DIR.prepare
-          BUILD_DIR.copy(unzip_tarball)
+
+        shared_state_
+
+        def before_execution_
+
+          _this_ build_build_directory_controller_
         end
+
+        def _this_ o
+
+          o.prepare
+          o.copy unzip_tarball
+          NIL_
+        end
+
+        memoize_ :unzip_tarball do
+          ::File.join( FIXTURES_DIR, 'mginy-0.0.1.tar.gz' ).freeze
+        end
+
         context "when the target directery exists" do
-          before(:each) { BUILD_DIR.mkdir("#{BUILD_DIR}/mginy", verbose: false) }
-          it "emits a notice, returns true" do
-            r = subject.invoke
-            r.should eql(true)
-            fingers[:info].length.should eql(1)
-            fingers[:info].first.should match(/exists, won't tar extract: .*mginy/)
+
+          shared_state_
+
+          it "succeeds" do
+            succeeds_
+          end
+
+          it "expresses" do
+
+            _rx = /exists, won't tar extract: .*mginy/
+            expect_only_ :info, _rx
+          end
+
+          def _this_ o
+            super
+            o.mkdir "#{ BUILD_DIR }/mginy"
+            NIL_
           end
         end
+
         context "when it's not a tarball" do
-          let(:unzip_tarball) { FIXTURES_DIR.join('not-a-tarball.tar.gz') }
-          it "returns false, emits original error" do
-            r = subject.invoke
-            r.should eql(false)
-            fingers[:error].length.should eql(1)
-            fingers[:error].first.should match(/failed to unzip.*unrecognized archive format/i)
+
+          shared_state_
+
+          it "fails" do
+            fails_
+          end
+
+          it "expresses" do
+            _rx = /failed to unzip.*unrecognized archive format/i
+            expect_eventually_ :error, _rx
+         end
+
+          def unzip_tarball
+            ::File.join FIXTURES_DIR, 'not-a-tarball.tar.gz'
           end
         end
+
         context "when it is a tarball and the target directory does not exist" do
-          it "returns true, emits shell and tar errstream" do
-            r = subject.invoke
-            r.should eql(true)
-            fingers[:shell].length.should eql(1)
-            fingers[:shell].first.should match(/cd .*build-dependency.*tar -xzvf mginy.*/)
-            tgt = <<-HERE.unindent.strip
-              x mginy/
-              x mginy/README
-            HERE
-            fingers[:err].join('').strip.should eql(tgt)
-            # fingers[:err].length.should eql(2)
+
+          shared_state_
+
+          it "succeeds" do
+            succeeds_
+          end
+
+          it "expresses shell" do
+
+            _rx = /cd [^ ]+\[te\]; tar -xzvf mginy/
+            expect_eventually_ :shell, _rx
+          end
+
+          it "errput lists etc" do
+
+            st = emission_stream_controller_
+            st.advance_to_first :err
+
+            expect_ :err, "x mginy/"
+            expect_ :err, "\nx mginy/README\n"
+
+            if st.unparsed_exists
+              :err == st.current_token.stream_symbol and fail
+            end
           end
         end
+      end
+
+      def build_arguments_
+        {
+          unzip_tarball: unzip_tarball,
+        }
+      end
+
+      memoize_ :context_ do
+        {
+          build_dir: BUILD_DIR,
+        }.freeze
       end
     end
   end

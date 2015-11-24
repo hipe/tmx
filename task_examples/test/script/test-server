@@ -4,9 +4,7 @@ require_relative '../test-support'
 
 module Skylab::TaskExamples::TestSupport
 
-  module Constants
-
-    FILE_SERVER.run
-
+  Run_static_file_server_if_necessary_.call do
+    [ false, $stderr ]
   end
 end

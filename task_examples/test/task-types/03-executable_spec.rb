@@ -1,47 +1,71 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TaskExamples::TestSupport::Tasks
+module Skylab::TaskExamples::TestSupport
 
-  describe "[de] task-types - executable" do
+  describe "[te] task-types - executable" do
 
-    extend TS_
+    TS_[ self ]
+    use :task_types
 
-    let(:context) { { } }
-
-    let(:build_args) { {
-      :executable => executable
-    } }
-
-    let :subject do
-      TaskTypes::Executable.new( build_args ) { |t| wire! t }
+    def subject_class_
+      Task_types_[]::Executable
     end
 
     context "requires some things" do
-      let(:executable) { nil }
+
       it "and raises hell when it doesn't have them" do
-        lambda { subject.invoke }.should raise_error(
-          RuntimeError, /missing required attribute.*executable/
-        )
+
+        expect_missing_required_attributes_are_ :executable
+      end
+
+      def executable
+        NIL_
       end
     end
 
-    context "when checking an executable not in path" do
-      let(:executable) { 'not-an-executable' }
-      it "returns false and emits info" do
-        r = subject.invoke
-        r.should eql(false)
-        fingers[:info].length.should eql(1)
-        fingers[:info].last.should match(/not in PATH: not-an-executable/)
+    context "when checking an executable not in path (NASTY)" do
+
+      shared_state_
+
+      it "fails" do
+        fails_
+      end
+
+      it "expresses" do
+        _rx = /not in PATH: not-an-executable/
+        expect_only_ :styled, :info, _rx
+      end
+
+      def executable
+        'not-an-executable'
       end
     end
 
-    context "when checking an executable in the path" do
-      let(:executable) { 'ruby' }
-      it "returns true and emits info" do
-        r = subject.invoke
-        r.should eql(true)
-        fingers[:info].last.should match(/ruby$/)
+    context "when checking an executable in the path (FRAGILE)" do
+
+      shared_state_
+
+      it "succeeds" do
+        succeeds_
       end
+
+      it "expresses" do
+
+        _rx = /\bruby$/
+        expect_only_ :info, _rx
+      end
+
+      def executable
+        'ruby'
+      end
+    end
+
+    def build_arguments_
+      { executable: executable }
+    end
+
+    def context_
+      NIL_
     end
   end
 end

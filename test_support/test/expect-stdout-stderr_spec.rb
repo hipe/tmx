@@ -41,13 +41,13 @@ module Skylab::TestSupport::TestSupport
       it "build an expectation with CHANNEL STRING" do
         exp = build_sout_serr_expectation_with :err, 'xx'
         exp.stream_symbol.should eql :err
-        exp.method_name.should eql :_sout_serr_expect_given_string
+        exp.method_name.should eql :sout_serr_expect_given_string
       end
 
       it "build an expectation with CHANNEL REGEX" do
         exp = build_sout_serr_expectation_with :out, //
         exp.stream_symbol.should eql :out
-        exp.method_name.should eql :_sout_serr_expect_given_regex
+        exp.method_name.should eql :sout_serr_expect_given_regex
       end
 
       def build_sout_serr_expectation_with * x_a, & p

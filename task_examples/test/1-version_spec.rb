@@ -1,17 +1,8 @@
 require_relative 'test-support'
-require 'skylab/task'
-
-Skylab::Task.test_support
 
 module Skylab::TaskExamples::TestSupport
 
-  include ::Skylab::Task::TestSupport # so it's avail in s.c. calls below
-
-  Slake_TestSupport::UI::Tee || nil #(#kick) laod it now so prettier below
-
-  describe "[de] version" do
-
-    include Dependency_TestSupport # so constants are avail. in i.m.'s below
+  describe "[te] version" do
 
     it "parses the minimal case" do
       _parse "1.2"
@@ -30,7 +21,7 @@ module Skylab::TaskExamples::TestSupport
     end
 
     it "whines on ambiguity" do
-      ui = UI::Tee.new silent: true
+      ui = _UI_Spy.new silent: true
       str = "abc1.2.3def4.5"
       sexp = Home_::Version.parse_string_with_version str do |o|
         o.on_error do |e|
@@ -60,12 +51,16 @@ module Skylab::TaskExamples::TestSupport
     end
 
     def _parse str
-      ui = UI::Tee.new
+      ui = _UI_Spy.new
       sexp = Home_::Version::parse_string_with_version(str) do |o|
         o.on_informational { |e| ui.err.puts("#{e.stream_symbol}: #{e.text}") }
       end
       sexp.unparse.should eql(str)
       ui.err_string.should eql("")
+    end
+
+    def _UI_Spy
+      TestLib_::Task[].test_support.lib :UI_spy
     end
   end
 end

@@ -1,95 +1,226 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TaskExamples::TestSupport::Tasks
+module Skylab::TaskExamples::TestSupport
 
-  describe "[de] task-types version from spec" do
+  describe "[te] task-types version from spec" do
 
-    extend TS_
+    TS_[ self ]
+    use :task_types
 
-    let(:klass) { TaskTypes::VersionFrom }
-    let(:log) { Home_::Library_::StringIO.new }
-    let(:must_be_in_range) { nil }
-    let(:parse_with) { '/(\d+\.\d+\.\d+)/' }
-    let(:version_from) { 'echo "version 1.2.34 is the version"' }
-    let :subject do
-      klass.new(
-        :must_be_in_range => must_be_in_range,
-        :parse_with => parse_with,
-        :version_from => version_from
-      ) do |t|
-        t.on_all do |e|
-          debug_event e if do_debug
-          log.puts e.text
-        end
-      end
+    def subject_class_
+      Task_types_[]::VersionFrom
     end
+
     context "when reporting a version" do
-      let(:context) { { :show_version => true } }
+
+      memoize_ :context_ do
+        { show_version: true }.freeze
+      end
+
       context 'without using a regex' do
-        let(:parse_with) { nil }
+
+        shared_state_
+
+        it "succeeds" do
+          succeeds_
+        end
+
         it "just reports the output" do
-          subject.invoke context
+
+          _expect_only_string 'version 1.2.34 is the version'
+        end
+
+        def parse_with
+          NIL_
         end
       end
+
       context 'with a regex' do
+
         context('against a matching output') do
-          let(:version_from) { 'echo "ver 1.3.78 is it"' }
+
+          shared_state_
+
+          it "succeeds" do
+            succeeds_
+          end
+
           it "shows the matched portion of the output" do
-            subject.invoke context
+            _expect_only_version '1.3.78'
+          end
+
+          def version_from
+            'echo "ver 1.3.78 is it"'
           end
         end
+
         context 'against a non-matching output' do
-          let(:version_from) { 'echo "ver A.B.foo"' }
+
+          shared_state_
+
+          it "succeeds" do
+            succeeds_
+          end
+
           it "shows all of the output" do
-            subject.invoke context
+            _expect_only_string 'ver A.B.foo'
+          end
+
+          def version_from
+            'echo "ver A.B.foo"'
           end
         end
       end
     end
+
     context "when checking a version" do
-      let(:context) { { } }
-      let(:must_be_in_range) { '1.2+' }
+
       context "with a bad 'must_be_in_range' assertion" do
-        let(:must_be_in_range) { '~> 1.2' }
-        it "fails" do
-          lambda{ subject.invoke context }.should(
-            raise_error(/Bad range assertion/)
-          )
+
+        shared_state_
+
+        it "fails with message (LOOK)" do
+
+          _rx = %r(\A Bad range assertion)
+          expect_strong_failure_with_message_ _rx
+        end
+
+        def version_from
+          '1.2+'
+        end
+
+        def must_be_in_range
+          '~> 1.2'
         end
       end
+
       context "without a 'must_be_in_range' assertion" do
-        let(:must_be_in_range) { nil }
+
+        shared_state_
+
         it "fails" do
-          lambda{ subject.invoke context }.should(
-            raise_error(/do not use.*without.*must be in range/i)
-          )
+
+          _rx = %r(\ADo not use "[^"]+" as a target #{
+            }without a "must be in range" assertion\b)
+
+          expect_strong_failure_with_message_ _rx
+        end
+
+        def must_be_in_range
+          NIL_
         end
       end
+
       context "when the regex matches" do
+
         context "and the version matches" do
-          let(:version_from) { 'echo "ver 1.2.1"' }
+
+          shared_state_
+
+          it "succeeds" do
+            succeeds_
+          end
+
           it "says that it matches" do
-            subject.invoke( context ).should eql( true )
-            log.string.include?('version 1.2.1 is in range 1.2+').should eql(true)
+
+            _expect_OK 'version 1.2.1 is in range 1.2+'
+          end
+
+          def version_from
+            'echo "ver 1.2.1"'
           end
         end
+
         context "and the version does not match" do
-          let(:version_from) { 'echo "version 0.0.1"' }
+
+          shared_state_
+
+          it "fails" do
+            fails_
+          end
+
           it "says that is doesn't match" do
-            subject.invoke( context ).should eql( false )
-            unstyle( log.string ).should match(
-              /\bversion mismatch: needed 1\.2\+ had 0\.0\.1\b/i
-            )
+
+            _expect_version_mismatch_against '0.0.1'
+          end
+
+          def version_from
+            'echo "version 0.0.1"'
           end
         end
-      end
-      context "when the regex does not match" do
-        let(:version_from) { 'echo "version A.B.C"' }
-        it "reports a failure" do
-          subject.invoke(context).should eql(false)
-          log.string.include?('needed 1.2+ had version A.B.C').should eql(true)
+
+        def context_
+          NIL_
         end
       end
+
+      context "when the regex does not match" do
+
+        shared_state_
+
+        it "fails" do
+          fails_
+        end
+
+        it "reports a failure (SMALL ISSUE HERE)" do
+
+          _expect_version_mismatch_against "version A.B.C\n"  # newline is the issue
+        end
+
+        def version_from
+          'echo "version A.B.C"'
+        end
+      end
+
+      def context_
+        EMPTY_H_
+      end
+
+      memoize_ :must_be_in_range do
+        '1.2+'.freeze
+      end
+
+      def _expect_version_mismatch_against s
+
+        _s_ = "version mismatch: needed 1.2+ had #{ s }"
+
+        expect_only_ :styled, :info, _s_
+      end
+    end
+
+    def build_arguments_
+      {
+        must_be_in_range: must_be_in_range,
+        parse_with: parse_with,
+        version_from: version_from,
+      }
+    end
+
+    def must_be_in_range
+      NIL_
+    end
+
+    memoize_ :parse_with do
+      '/(\d+\.\d+\.\d+)/'.freeze
+    end
+
+    memoize_ :version_from do
+      'echo "version 1.2.34 is the version"'.freeze
+    end
+
+    def _expect_only_version s
+
+      expect_only_ :styled, :payload, /\Aversion: #{ ::Regexp.escape s }\z/
+    end
+
+    def _expect_only_string s
+
+      expect_only_ :styled, :payload, "version: #{ s }"
+    end
+
+    def _expect_OK s
+
+      expect_only_ :styled, :info, "version ok: #{ s }"
     end
   end
 end

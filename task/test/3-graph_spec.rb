@@ -6,7 +6,7 @@ module Skylab  # [#ts-010]
 
 # ..
 
-describe "[sla] graph" do
+describe "[ta] graph" do
 
   let( :graph ) { Task::Sessions::Execute_Graph.new }
   describe "when built empty" do

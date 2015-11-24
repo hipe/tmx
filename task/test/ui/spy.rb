@@ -1,7 +1,6 @@
 module Skylab::Task::TestSupport
 
-  class UI::Tee                   # experimental custom runtime spy etc.
-                                  # (not really a proper tee - misnomer?)
+  class UI::Spy
 
     attr_accessor :err, :out, :silent
 

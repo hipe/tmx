@@ -3,65 +3,39 @@ require 'skylab/test_support'
 
 module Skylab::TaskExamples::TestSupport
 
-   Dependency_TestSupport = self
-  ::Skylab::TestSupport::Regret[ self, ::File.dirname( __FILE__ )]
+  class << self
 
-  Callback_ = ::Skylab::Callback
-    Autoloader_ = Callback_::Autoloader
+    def [] tcc
 
-  Home_ = ::Skylab::TaskExamples
+      tcc.include Instance_Methods___
+
+      h = {}
+      tcc.send :define_singleton_method, :use do | sym |
+
+        _lib = h.fetch sym do
+          x = TestSupport_.fancy_lookup sym, TS_
+          h[ sym ] = x
+          x
+        end
+
+        _lib[ self ]
+      end
+
+      NIL_
+    end
+
+    def const_missing sym
+      x = LAZY_CONSTANTS___.lookup sym
+      const_set sym, x
+      x
+    end
+  end  # >>
 
   TestSupport_ = ::Skylab::TestSupport
 
   extend TestSupport_::Quickie
 
-  module TestLib_
-
-    sidesys = Autoloader_.build_require_sidesystem_proc
-
-    Brazen = sidesys[ :Brazen ]
-
-    CLI_lib = -> do
-      HL__[]::CLI
-    end
-
-    HL__ = sidesys[ :Headless ]
-
-    System = -> do
-      System_lib___[].services
-    end
-
-    System_lib___ = sidesys[ :System ]
-
-    Tmpdir_path = -> do
-      System[].filesystem.tmpdir_path
-    end
-  end
-
-  tmpdir = TestSupport_.tmpdir.new_with(
-    :path, TestLib_::Tmpdir_path[] )
-
-  build_dir = TestSupport_.tmpdir.new_with(
-    :path, tmpdir.join( 'build-dependency' ) )
-
-  fixtures_dir = Dependency_TestSupport.dir_pathname.join 'fixtures'
-
-  file_server = TestSupport_::Servers::Static_File_Server.new fixtures_dir,
-    log_level_i: :info, # (:info | :warn) e.g.
-    pid_path: tmpdir
-
-  Constants::BUILD_DIR = build_dir # #bound
-  Constants::FIXTURES_DIR = fixtures_dir # #bound
-  Constants::FILE_SERVER = file_server # #bound
-
-  module Constants
-    Home_ = Home_
-    TestSupport_ = TestSupport_
-  end
-
-  module InstanceMethods
-
-    define_method :unstyle, TestLib_::Brazen[]::CLI::Styling::Unstyle
+  module Instance_Methods___
 
     def debug!
       @do_debug = true
@@ -69,14 +43,123 @@ module Skylab::TaskExamples::TestSupport
 
     attr_reader :do_debug
 
-    -> do
-      sdbg = ::STDERR
-      define_method :dputs do |x|
-        sdbg.puts x
-      end
-    end.call
-
-    let(:fingers) { ::Hash.new { |h, k| h[k] = [] } }
-
+    def debug_IO
+      TestSupport_.debug_IO
+    end
   end
+
+  # ~ function-like
+
+  yes = true
+  do_run = nil
+  Run_static_file_server_if_necessary_ = -> & x_y do  # (from our cmdline script too)
+    if yes
+      yes = false
+      do_run[ & x_y ]
+    end
+  end
+
+  do_run = -> & x_y do
+
+    do_debug, debug_IO = x_y[]
+
+    expag = nil ; y = nil
+
+    emit = -> x, & p do
+
+      expag = Home_.lib_.brazen::API.expression_agent_instance
+      y = ::Enumerator::Yielder.new do | s |
+        debug_IO.puts s
+      end
+
+      emit = -> i_a, & ev_p do
+        if :expression == i_a[ 1 ]
+          expag.calculate y, & ev_p
+        else
+          ev_p[].express_into_under y, expag
+        end
+      end
+      emit[ x, & p ]
+    end
+
+    if do_debug
+
+      _handle = -> * i_a, & ev_p do
+        debug_IO.puts i_a.inspect
+        emit[ i_a, & ev_p ]
+      end
+    else
+      _handle = -> * i_a, & ev_p do
+        if :info != i_a.first
+          emit[ i_a, & ev_p ]
+        end
+      end
+    end
+
+    _path = FIXTURES_DIR
+    _PID_path = TestLib_::Tmpdir_path[]
+
+    _ok = TestSupport_::Servers::Static_File_Server.new(
+      _path,
+      :PID_path, _PID_path,
+      & _handle
+    ).execute
+
+    _ok or self._FAIL
+
+    NIL_
+  end
+
+  Task_types_ = -> do
+    Home_::TaskTypes
+  end
+
+  # ~ library-like
+
+  class LAZY_CONSTANTS___ < TestSupport_::Lazy_Constants
+
+    def BUILD_DIR
+      ::File.join( TestLib_::Tmpdir_path[], '[te]' ).freeze
+    end
+
+    def FIXTURES_DIR
+      TS_.dir_pathname.join( 'fixtures' ).to_path
+    end
+  end
+
+  Home_ = ::Skylab::TaskExamples
+  Autoloader__ = Home_::Autoloader_
+
+  module TestLib_
+
+    sidesys = Autoloader__.build_require_sidesystem_proc
+
+    Brazen = sidesys[ :Brazen ]
+
+    hl = sidesys[ :Headless ]
+
+    CLI_lib = -> do
+      hl[]::CLI
+    end
+
+    system_lib = sidesys[ :System ]
+
+    System = -> do
+      system_lib[].services
+    end
+
+    Task = sidesys[ :Task ]
+
+    Tmpdir_path = -> do
+      System[].filesystem.tmpdir_path
+    end
+  end
+
+  Autoloader__[ self, ::File.dirname( __FILE__ ) ]
+
+  Callback_ = Home_::Callback_
+  DOT_BYTE_ = '.'.getbyte 0
+  EMPTY_H_ = {}.freeze
+  NIL_ = nil
+  TS_ = self
 end

@@ -5,7 +5,7 @@ module Skylab::Task::TestSupport  # [#ts-010]
   TestSupport_::Quickie.enable_kernel_describe
 
 # ..
-describe "[sla] task" do
+describe "[ta] task" do
 
   it "descends from Rake::Task (fyi)" do
     Home_::LegacyTask.new.should be_kind_of ::Rake::Task

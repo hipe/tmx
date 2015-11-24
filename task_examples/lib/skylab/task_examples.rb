@@ -5,8 +5,12 @@ module Skylab::TaskExamples
   class << self
 
     def lib_
-      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+      @___lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
         self::Lib_, self )
+    end
+
+    def sidesystem_path
+      @___ss_path ||= ::File.expand_path( '../../..', Home_.dir_pathname.to_path )
     end
   end  # >>
 

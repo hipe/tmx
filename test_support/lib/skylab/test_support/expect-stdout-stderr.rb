@@ -145,13 +145,9 @@ module Skylab::TestSupport
       end
 
       def bld_sout_serr_expectation_via_iambic x_a, & p
-        _sout_serr_expectation_class.new(
+        Expectation.new(
           Callback_::Polymorphic_Stream.via_array( x_a ),
             & p )
-      end
-
-      def _sout_serr_expectation_class
-        Expectation__
       end
 
       # ~ for the end
@@ -307,14 +303,14 @@ module Skylab::TestSupport
 
       # ~~ implementation support
 
-      def _sout_serr_expect_given_regex
+      def sout_serr_expect_given_regex
         if _sout_serr_expect_and_resolve_emission_line
           @__sout_serr_line__.should match @__sout_serr_expectation__.pattern_x
           @__sout_serr_emission__
         end
       end
 
-      def _sout_serr_expect_given_string
+      def sout_serr_expect_given_string
         if _sout_serr_expect_and_resolve_emission_line
           @__sout_serr_line__.should eql @__sout_serr_expectation__.pattern_x
           @__sout_serr_emission__
@@ -416,22 +412,31 @@ module Skylab::TestSupport
 
     METHODIC_ = Callback_::Actor::Methodic
 
-    class Expectation__
+    class Expectation  # [te]
 
       include METHODIC_.polymorphic_processing_instance_methods
 
       def initialize st, & p
+
         @expect_is_styled = false
         @method_name = :_sout_serr_expect_and_resolve_emission
+
         process_polymorphic_stream_passively st
+
         while st.unparsed_exists
           process_the_rest_using_shape_hack st
         end
+
         @receive_unstyled_string = p
       end
 
-      attr_reader :stream_symbol, :expect_is_styled,
-        :method_name, :pattern_x, :receive_unstyled_string
+      attr_reader(
+        :expect_is_styled,
+        :method_name,
+        :pattern_x,
+        :receive_unstyled_string,
+        :stream_symbol,
+      )
 
     private
 
@@ -447,13 +452,13 @@ module Skylab::TestSupport
       end
 
       def Regexp st
-        @method_name = :_sout_serr_expect_given_regex
+        @method_name = :sout_serr_expect_given_regex
         @pattern_x = st.gets_one
         KEEP_PARSING_
       end
 
       def String st
-        @method_name = :_sout_serr_expect_given_string
+        @method_name = :sout_serr_expect_given_string
         @pattern_x = st.gets_one
         KEEP_PARSING_
       end
