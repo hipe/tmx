@@ -1,6 +1,6 @@
 # wtf is a rainbow kick :[#021]
 
-(EDIT: this document is +#archival, related as it did to the archived
+(EDIT: this document is +#archival, relating as it did to the archived
  [#017]. however, in itself it is a :+#cool-server-plugin.)
 
 

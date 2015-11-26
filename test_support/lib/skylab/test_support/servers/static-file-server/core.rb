@@ -1,296 +1,151 @@
 module Skylab::TestSupport
 
-  class Servers::Static_File_Server
+  class Servers::Static_File_Server  # [#041] ..
 
-    Callback_[ self, :employ_DSL_for_digraph_emitter ]
+    # modeled like an actor but wraps something that is long-running.
 
-    listeners_digraph info: :all, warn: :all, error: :all  # used internally
+    def initialize doc_root_s, * x_a, & oes_p
 
-    include Home_::Library_::FileUtils
+      @doc_root = doc_root_s
+      @_oes_p = oes_p
 
-    def initialize *a, &b  # [ doc_root_str ] [ opt_hash ] <<no blocks>>
-      Home_::Library_.touch :Adsf, :Rack
-      init_event_handling
-      Parse_args_[ h = { }, a, b ]
-      h = { log_level_i: DEFAULT_LOG_LEVEL_, port: DEFAULT_PORT_ }.merge h
-      @doc_root = @doc_root_pathname = @rack_app = nil
-      h.each { |k, v| send OPT_H_.fetch( k ), v }
-      @downstream = Home_.lib_.stderr  # or configured if nec.
-      nil
-    end
+      @filesystem = nil
+      @PID_path = nil
+      @processes = nil
 
-    DEFAULT_LOG_LEVEL_ = :info
-
-    DEFAULT_PORT_ = 1324
-
-    OPT_H_ = {
-      doc_root: :set_doc_root,
-      port: :set_port,
-      pid_path: :set_pid_path,
-      log_level_i: :set_log_level_i
-    }.freeze
-
-    def run
-      start_unless_running
-    end
-
-  private
-
-    def init_event_handling
-      on_all do |e|
-        lvl_d = LEVELS_.index e.stream_symbol
-        if ! lvl_d || lvl_d >= @log_level_idx
-          @downstream.puts render_event_as_line( e )
-        end
+      if x_a.length.nonzero?
+        st = Callback_::Polymorphic_Stream.via_array x_a
+        begin
+          _m = :"#{ st.gets_one }="
+          send _m, st.gets_one
+        end while st.unparsed_exists
       end
-      nil
+
+      if ! @filesystem
+        @filesystem = Home_.lib_.system.filesystem
+      end
+
+      # ~
+
+      if ! @PID_path
+        @PID_path = @filesystem.tmpdir_path
+      end
+
+      @port ||= 1324
+
+      @processes ||= Home_.lib_.system.processes
     end
 
-    LEVELS_= Callback_::Digraph::COMMON_LEVELS
+    attr_writer(
+      :filesystem,
+      :PID_path,
+      :port,
+    )
 
-    def render_event_as_line e
-      ">>> (#{ moniker } #{ e.stream_symbol } - #{ e.text })"
+    def execute
+
+      _ok = ___resolve_PID_classifications
+      _ok && __via_PID_classifications
     end
 
-    def send_error_string msg
-      call_digraph_listeners :error, msg
-      false
-    end
+    def ___resolve_PID_classifications
 
-    def warn msg
-      call_digraph_listeners :warn, msg
-      false
-    end
-
-    def send_info_string msg
-      call_digraph_listeners :info, msg
-      nil
-    end
-
-    def fu_output_message msg  # #comport with ruby stdlib file utils
-      send_info_string msg
-    end
-
-    def build_digraph_event s, i, _esg
-      Textual_Old_Event___.new s, i
-    end
-
-    Textual_Old_Event___ = ::Struct.new :text, :stream_symbol
-
-    def moniker
-      MONIKER_
-    end
-    MONIKER_ = 'static file server'
-
-    Parse_args_ = -> arg_h, a, b do
-      b and raise ::ArgumentError, "unexpected block"
-      ::Hash === a.last and opt_h = a.pop
-      a.length.nonzero? and arg_h[ :doc_root ] = a.shift
-      a.length.nonzero? and raise ::ArgumentError, "too many args"
-      opt_h and Merge_safely_[ arg_h, opt_h ]
-      nil
-    end
-
-    Merge_safely_ = -> arg_h, opt_h do
-      ( a = opt_h.keys & arg_h.keys ).empty? or raise ::ArgumentError.
-        new "duplicated in args, opts: #{ a.join ', ' }"
-      arg_h.merge! opt_h
-      nil
-    end
-
-    def set_doc_root root
-      @doc_root_pathname = nil
-      @doc_root = root
-    end
-
-    def set_port port
-      @port = port
-    end
-
-    def set_pid_path x
-      @pid_path_arg = x
-      @pid_pathname = nil
-      nil
-    end
-
-    def set_log_level_i level_i
-      level_a = LEVELS_
-      (( idx = level_a.index level_i )) or raise ::ArgumentError, "invalid #{
-        }log level: #{ level_i.inspect } - expecting one of : #{
-        } (#{ level_a.map( & :inspect ) *' ' })"
-      @log_level_i = level_i
-      @log_level_idx = idx
-      nil
-    end
-
-    def start_unless_running
-      -> do  # #result-block
-        fetch_pid_pathname { |m| send_error_string "can't start server - #{ m }" } or
-          break false
-        (( p = any_pid_of_known_already_running_process )) and break send_info_string(
-          "using already running server process - (pid #{ p } in #{
-            }#{ @pid_pathname.basename })." )
-        start  # result is pid
-      end.call
-    end
-
-    def pid_pathname
-      fetch_pid_pathname
-    end
-
-    def fetch_pid_pathname &els
-      if @pid_pathname then @pid_pathname
-      elsif false == @pid_pathname
-        els ? els[ "pid pathname is in failure state" ] : false
+      x = Here_::Classify_PID_file___[ @PID_path, @filesystem, & @_oes_p ]
+      if x
+        @_PID_file = x
+        ACHIEVED_
       else
-        init_pid_pathname els
+        x
       end
     end
 
-    def init_pid_pathname er
-      pn = nil ; bork = -> msg { ( er || method( :send_error_string ) )[ msg ] }
-      r = -> do  # #result-block
-        @pid_path_arg or break bork[ "pid_path arg was not set" ]
-        dirname, basename = Dirname_basename_[ @pid_path_arg ]
-        dirname.exist? or break bork[ "pid dir not found: #{ dirname }" ]
-        dirname.directory? or break bork[ "not a directory: #{ dirname }" ]
-        pn = r = dirname.join( basename || DEFAULT_BASENAME_ )
-      end.call
-      @pid_pathname = pn || false
-      r
-    end
+    def __via_PID_classifications
 
-    DEFAULT_BASENAME_ = 'static-file-server.pid'.freeze
+      # the below code is based on "[#]/figure-1" a logic flowchart.
 
-    Dirname_basename_ = -> pid_path_arg do
-      pn = ::Pathname.new pid_path_arg.to_s
-      if pn.exist?                # if the file exists
-        if pn.directory?          #   and it looks like a directory
-          dirname = pn            #     then assume that that's the pid dir
-        else                      #   otherwise
-          dirname = pn.dirname    #     split it into a dirname
-          basename = pn.basename  #     and a basename
-        end                       #
-      elsif pn.extname.length.zero?  # otherwise, if the path has no extension,
-        dirname = pn              #   assume it's supposed to be a dir
-      else                        # otherwise assume it's supposed to be a file
-        dirname = pn.dirname      #   split it into a dirname
-        basename = pn.basename    #   and a basename
+      if @_PID_file.did_exist
+        __when_PID_file_existed
+      else
+        _maybe_start_server
       end
-      [dirname, basename]
     end
 
-    def any_pid_of_known_already_running_process  # #hacks
-      begin
-        pid_pathname && @pid_pathname.exist? or break
-        pid_s = @pid_pathname.read.strip
-        /\A\d+\z/ =~ pid_s or break warn( "pid file content is not a #{
-          }digit: #{ pid_s.inspect }" )
-        cmd = "ps -p #{ pid_s } -o%cpu -ostat"
-        hack_a = `#{ cmd }`.strip.split NEWLINE_  # [#sl-120]
-        header = hack_a.shift
-        '%CPU STAT' == header or break warn( "failed to parse first line #{
-          }of ps response - #{ header.inspect }" )
-        hack_a.length.zero? and break remove_stale_pid_file
-        1 < hack_a.length and warn "multiple lines in pid file?"
-        r = pid_s.to_i
-      end while nil
-      r
-    end
+    def __when_PID_file_existed
 
-    def remove_stale_pid_file
-      send_info_string "removing stale pid file - #{ @pid_pathname.basename }"
-      rm @pid_pathname.to_s, verbose: true
-      nil
-    end
+      kn = @processes.record_for(
+        @_PID_file.PID, :etime, :pid, :state, & @_oes_p )
 
-    def start
-      begin
-        fetch_ok_filesystem_status do |e|
-          send_error_string "can't start server - #{ e }"
-        end or break
-        rack_app or break
-        rack_handler or break
-        @port && @pid_pathname && @rack_handler && @rack_app or fail "sanity"
-        p = fork do
-          pid = ::Process.pid
-          send_info_string "writing new pid file - #{ @pid_pathname.basename } #{
-            } (pid: #{ pid })"
-          @pid_pathname.open( 'w' ) { |o| o.write pid }
-          set_interrupt_handler
-          @rack_handler.run @rack_app, :Port => @port  # Errno::EADDRINUSE
-          @downstream.puts "YOU SHOULD NEVER SEE THIS: ROCK HANOI"
-          nil
+      if kn
+        if kn.is_known_known
+          _rec = kn.value_x
+          ___express_that_process_is_still_running _rec
+        else
+          _ok = __cleanup_PID_file
+          _ok && _maybe_start_server
         end
-        p or break
-        ::Process.detach p
-        send_info_string "parent process has parent process id : #{ ::Process.pid }#{
-          } and child id: #{ p }"
-        r = p
-      end while nil
-      r
-    end
-
-    def set_interrupt_handler
-      trap :INT do
-        @downstream.puts "#{ moniker } received interrupt signal. goodbye."
-        exit! 0
+      else
+        kn
       end
     end
 
-    def fetch_ok_filesystem_status &er
-      begin
-        bork = -> msg { ( er || method( :send_error_string ) )[ msg ] }
-        pid_pathname or break bork[ "failed to resolve pid pathname." ]
-        @pid_pathname.dirname.writable? or break bork[ "not writable: #{
-          }#{ @pid_pathname.dirname }" ]
-        doc_root_pathname or break bork[ "doc_root not set" ]
-        @doc_root_pathname.exist? or break bork[ "doc_root directory not #{
-          }found - #{ doc_root_pathname }" ]
-        @doc_root_pathname.directory? or break bork[ "not a directory - #{
-          }#{ @doc_root_pathname }" ]
-        r = true
-      end while nil
-      r
-    end
+    def ___express_that_process_is_still_running rec
 
-    def doc_root_pathname
-      if @doc_root_pathname.nil?
-        @doc_root_pathname = @doc_root ? ::Pathname.new( @doc_root ) : false
+      @_oes_p.call :info, :expression, :already_running do | y |
+
+        unit, x = Home_.lib_.basic::Time::EN::Summarize[ rec.etime.to_i ]
+
+        _f_s = ( '%0.2f' % x )
+
+        y << "server is already running: #{
+          }PID #{ rec.pid } (status: #{ rec.state }) #{
+           }up for #{ _f_s } #{ plural_noun unit.id2name }"
       end
-      @doc_root_pathname
-    end
-    public :doc_root_pathname
 
-    def rack_app
-      @rack_app.nil? and @rack_app = build_rack_app
-      @rack_app
+      ACHIEVED_
     end
 
-    def build_rack_app
-      send_info_string "building rack app (doc_root: #{ @doc_root } port: #{ @port })"
-      doc_root_ = @doc_root
-      builder = ::Rack::Builder.new do
-        use ::Rack::CommonLogger
-        use ::Rack::ShowExceptions
-        use ::Rack::Lint
-        use ::Adsf::Rack::IndexFileFinder, root: doc_root_
-        run ::Rack::File.new( doc_root_ )
+    def __cleanup_PID_file
+
+      path = @_PID_file.path
+
+      @_oes_p.call :info, :expression, :removing_stale_PID do | y |
+        y << "removing stale PID file - #{ pth path }"
       end
-      builder.to_app || false
+
+      _num_d = @filesystem.unlink path
+      1 == _num_d or self._SANITY
+      ACHIEVED_
     end
 
-    def rack_handler
-      @rack_handler ||= resolve_rack_handler
+    def _maybe_start_server
+
+      _ok = ___doc_root_must_exist
+      _ok && __start_server
     end
 
-    def resolve_rack_handler
-      # ::Rack::Handler.get
-      begin
-        ::Rack::Handler::Mongrel
-      rescue ::LoadError
-        ::Rack::Handler::WEBrick
-      end
+    def ___doc_root_must_exist
+
+      @filesystem.normalization( :Upstream_IO ).call(
+        :path, @doc_root,
+        :must_be_ftype, :DIRECTORY_FTYPE,
+        & @_oes_p )
     end
+
+    def __process_is_still_running
+      @processes.has_PID @_PID_file.PID
+    end
+
+    def __start_server
+
+      o = Here_::Rainbow_Kick___.new( & @_oes_p )
+      o.doc_root = @doc_root
+      o.filesystem = @filesystem
+      o.PID_path = @_PID_file.path
+      o.port = @port
+      o.execute
+    end
+
+    DEFAULT_BASENAME_ = 'static-file-server.pid'
+    Here_ = self
   end
 end

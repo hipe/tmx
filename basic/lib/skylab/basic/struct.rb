@@ -2,6 +2,9 @@ module Skylab::Basic
 
   module Struct  # [#030].
 
+    # (if you are looking for guys that generate structs from lists of
+    # names, [#sy-028] has the latest..)
+
     # make a basic struct class with a list of member names (like ::Struct)
     #
     #     Foo = Home_::Struct.new :nerp

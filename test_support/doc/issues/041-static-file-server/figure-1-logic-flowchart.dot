@@ -1,0 +1,30 @@
+digraph g {
+
+  label="figure 1. Logic flowchart for starting the server\n(with many error cases omitted)"
+
+  pid_file [ label="PID\nfile?" ]
+  pid_file->proc[ label="yes" ]
+  pid_file->run_server[ label="no" ]
+
+  proc [ label="process\nrunning?" ]
+  proc->nothing_to_do [ label="yes" ]
+  proc->stale_PID [ label="no" ]
+
+  stale_PID [ label="stale PID.\nremove file." ]
+  stale_PID->run_server
+
+  run_server [ label="run server.\nport in use?" ]
+  run_server->express_port_in_use[ label="yes" ]
+  run_server->write_PID_file[ label="no" ]
+
+  express_port_in_use [ label="exprees that\nit is so" ]
+  express_port_in_use -> write_PID_file
+
+  write_PID_file [ label="write\nPID file" ]
+  write_PID_file->nothing_to_do
+
+
+  nothing_to_do [ label="nothing\nto do" ]
+
+
+}

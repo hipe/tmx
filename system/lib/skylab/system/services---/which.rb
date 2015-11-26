@@ -3,7 +3,8 @@ module Skylab::System
 
     class Services___::Which
 
-      def initialize _services
+      def initialize x
+        @_mama = x
       end
 
       def call exe_name
@@ -16,7 +17,7 @@ module Skylab::System
       SAFE_NAME_RX__ = /\A[-a-z0-9_]+\z/i
 
       def wch_exe_safe exe_name
-        out = Home_.lib_.open3.popen3 'which', exe_name do |_, o, e|
+        out = @_mama.popen3 'which', exe_name do |_, o, e|
           err = e.read
           if EMPTY_S_ != err
             _msg = "unexpected response from `which` - #{ err }"

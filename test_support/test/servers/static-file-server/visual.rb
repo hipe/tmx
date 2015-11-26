@@ -1,11 +1,33 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../../core'
+require 'skylab/test_support'
 
-clas = ::Skylab::TestSupport::Servers::Static_File_Server
+_cls = Skylab::TestSupport::Servers::Static_File_Server
 
-doc_root = ::Skylab::dir_pathname.join( 'dependency/test/fixtures' ).to_s
+require 'skylab/task_examples'
 
-server = clas.new doc_root, pid_path: '.', log_level_i: :info
+_path = ::File.join Skylab::TaskExamples.sidesystem_path, 'test/fixtures'
 
-server.run
+serr = $stderr
+expag = nil
+yld = nil
+
+_guy = _cls.new _path, :PID_path, '.' do | * i_a, & ev_p |
+
+  serr.puts "#{ i_a.inspect }:"
+
+  expag ||= ::Skylab::TestSupport.lib_.brazen::API.expression_agent_instance
+
+  if :expression == i_a[ 1 ]
+
+    yld ||= ::Enumerator::Yielder.new( & serr.method( :puts ) )
+
+    expag.calculate yld, & ev_p
+  else
+    _ev = ev_p[]
+    _ev.express_into_under serr, expag
+  end
+  false
+end
+
+_guy.execute
