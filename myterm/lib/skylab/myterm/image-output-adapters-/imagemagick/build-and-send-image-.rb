@@ -2,15 +2,7 @@ module Skylab::MyTerm
 
   class Image_Output_Adapters_::Imagemagick
 
-    class Build_and_send_image_
-
-      class << self
-        def _call x, y, & p
-          new( x, y, & p ).execute
-        end
-        alias_method :[], :_call
-        alias_method :call, :_call
-      end  # >>
+    class Build_and_send_image_ < Callback_::Actor::Dyadic
 
       def initialize snapshot, kernel, & oes_p
         @_kernel = kernel

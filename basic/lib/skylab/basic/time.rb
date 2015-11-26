@@ -1,8 +1,11 @@
-module Skylab::Human
+module Skylab::Basic
+
+  Time = ::Module.new
+  Time::EN = ::Module.new
 
   #                      ~ this is only a sketch ~                       #
 
-  Summarize::Time = -> do # apologies to chronic
+  Time::EN::Summarize = -> do  # apologies to "chronic"
 
     a = [[ :second, 1.0 ]]
     a << [ :minute, 60 * a.last.last ]

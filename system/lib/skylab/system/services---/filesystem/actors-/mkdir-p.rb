@@ -2,7 +2,7 @@ module Skylab::System
 
   class Services___::Filesystem
 
-    class Actors_::Mkdir_p  # :[#026].
+    class Actors_::Mkdir_p < Callback_::Actor::Dyadic  # :[#026].
 
       # we do this on our own instead of using the FileUtils method because
       # A) we don't like FileUtils's way of "emitting" "events" and B) this
@@ -14,18 +14,6 @@ module Skylab::System
       # of atomicity. (we must unlock them before this actor returns,
       # however, lest it make itself fail on subsequent invocations on a
       # sub-directory of the same directory (encountered))
-
-      class << self
-
-        def _call path, fs, & oes_p
-          new( path, fs, & oes_p ).execute
-        end
-
-        alias_method :[], :_call
-        alias_method :call, :_call
-
-        private :new
-      end  # ..
 
       def initialize path, fs, & oes_p
 

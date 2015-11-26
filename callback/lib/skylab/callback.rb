@@ -45,6 +45,17 @@ module Skylab::Callback
 
   module Actor  # see [#042] the actor narrative
 
+    class Dyadic
+      class << self
+        def _call x, y, & p
+          new( x, y, & p ).execute
+        end
+        alias_method :[], :_call
+        alias_method :call, :_call
+        private :new
+      end  # >>
+    end
+
     class << self
 
       def [] cls, * i_a

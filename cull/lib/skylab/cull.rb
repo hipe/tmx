@@ -151,11 +151,11 @@ module Skylab::Cull
       ::StringScanner.new x
     end
 
-    System = -> do
-      System_lib___[].services
-    end
+    system_lib = sidesys[ :System ]
 
-    System_lib___ = sidesys[ :System ]
+    System = -> do
+      system_lib[].services
+    end
   end
 
   ACHIEVED_ = true

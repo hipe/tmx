@@ -65,7 +65,20 @@ module Skylab::System
         end
       end
 
+      def _call * x_a, & oes_p
+
+        kn = _with x_a, & oes_p
+        kn && kn.value_x
+      end
+
+      alias_method :[], :_call
+      alias_method :call, :_call
+
       def with * x_a, & oes_p
+        _with x_a, & oes_p
+      end
+
+      def _with x_a, & oes_p
 
         if frozen?
 

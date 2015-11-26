@@ -16,6 +16,7 @@ module Skylab::System::TestSupport
       end
 
       e.should be_kind_of ::Errno::ENOENT
+      e.message.should match %r(\ANo such file or directory - must exist )
     end
 
     it "creates those directories since necessary" do

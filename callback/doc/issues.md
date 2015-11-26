@@ -74,7 +74,7 @@
              ( was: #event-marker: asssuming event shape/utility is a smell )
 [#005]       track all (usually legacy) event class [generator] transplants
              ( #was: use nifty ridiculous of treemap )
-[#004] #open [ the "knowness" structure ] and "the states of knowness" ..
+[#004] #open [ the "knownness" structure ] and "the states of knownness" ..
              ( #was: rename `name_i` => `name_symbol` universe-wide )
              (was: #done rename `event_cloud` -> `event_graph`)
 [#003]       the event narrative ..

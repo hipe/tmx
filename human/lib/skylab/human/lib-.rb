@@ -24,8 +24,5 @@ module Skylab::Human
       require 'strscan'
       ::StringScanner.new s
     end
-
-    Time = stdlib[ :Time ]
-
   end
 end

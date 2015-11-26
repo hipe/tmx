@@ -81,6 +81,8 @@ module Skylab::Basic
 
     Test_support = sidesys[ :TestSupport ]
 
+    Time = stdlib[ :Time ]
+
     Treetop = Callback_.memoize do
 
       require 'treetop'

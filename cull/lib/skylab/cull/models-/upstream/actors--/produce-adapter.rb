@@ -101,12 +101,9 @@ module Skylab::Cull
 
       def process_as_file_absolute_path path
 
-        sys = Home_.lib_.system
-        _file_ftype = sys.filesystem.constants::FILE_FTYPE
-
-        yes = sys.filesystem( :Upstream_IO ).with(
+        yes = Home_.lib_.system.filesystem.normalization( :Upstream_IO ).call(
           :path, path,
-          :only_apply_expectation_that_path_is_ftype_of, _file_ftype,
+          :must_be_ftype, :FILE_FTYPE,
           & @on_event_selectively )
 
         if yes

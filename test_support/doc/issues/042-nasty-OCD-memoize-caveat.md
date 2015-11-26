@@ -6,14 +6,17 @@
 in *one* test context that you use in *another*. it is VERY dangerous if
 you don't know what you're doing!
 
-the advantage is that you can use the familiar stack of "fully wired"
-API methods that you use in your normal tests to build a possibly complex
-stucture (with a possibly expensive build-time) that you can run many small
-tests against.
+the advantage is that you can use your same familar stack of API test
+setup methods here for this "shared state" that would for any other
+test. you can then run many small tests against the produced structure
+which may be complex, with possibly an expensive build-time.
 
-the disadvantage is only if you don't know what you're doing: do NOT
-accidentally pull in spies from the one test context where the
-structureu under test is built.
+the disadvantage is only if you don't know what you're doing: generally,
+whatever is "dangerously memoized" in this manner should be a *stateless*,
+*immutable* structure: for example, you would not want to pull-in spies
+during the construction of the structure, and fail to memoize and
+freeze those spies as part of your "shared state", and then in
+subsequent tests be using the wrong spies.
 
 the author feels this bit of nastiness is justified if used with caution
 because it encourages many small tests without indirectly discouraging

@@ -303,18 +303,22 @@ module Skylab::Basic
     end
 
     def absorb_node name_i, target_a=nil, accum=nil  # #storypoint-75
+
       if ! @h.key? name_i
         node = @node_class.new name_i
         @a.push name_i
         @h[ name_i ] = node
         accum and accum << name_i
       end
+
       if target_a
         target_a.each do |tsym|
           absorb_node( tsym, nil, accum ) if ! @h.key? tsym
           @h[ name_i ].absorb_association tsym
         end
-      end ; nil
+      end
+
+      NIL_
     end
 
     def clear  # #storypoint-85

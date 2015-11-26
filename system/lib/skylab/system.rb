@@ -56,6 +56,14 @@ module Skylab::System
         Home_::Sessions__::Open2.new( cmd_s_a, sout, serr, & x_p ).execute
       end
 
+      def popen3 * cmd_s_a, & please_not_this_way
+        Home_.lib_.open3.popen3( * cmd_s_a, & please_not_this_way )
+      end
+
+      def processes
+        _common :Processes
+      end
+
       def which s
         _common( :Which ).call s
       end

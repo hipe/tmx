@@ -41,15 +41,15 @@ class Skylab::Task
         attr_reader name
       end
     end
+
     def name
-      n = nil
       if @name
-        n = @name
+        @name
       elsif LegacyTask != self.class # awful #todo
         self.class.task_type_name
       end
-      n
     end
+
     def name= name
       result = name
       name = name.to_s # per rake

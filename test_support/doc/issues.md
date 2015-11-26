@@ -1,8 +1,9 @@
 [#045]       permute (as a doctest action)
 [#044]       lexical scope vs inheritence (as it pertains to us)..
 [#043] #open modernize doc-test templates
-[#042]       "nasty OCD memoize" caveat (for [gv], [sg])..
-[#041] #hole (this used to track the sidesystem class. now in [tmx] & [sli])
+[#042]       "dangerous memoize" (was "nasty OCD memoize") caveat ..
+[#041]       static file server ..
+             (#was: sidesystem class now in [tmx] & [sli])
 [#040]       is find nearest TS file broken?
 [#039]       #parent-node: [#030] #tracking a `Subject_` parameter function
 [#038]       expect line

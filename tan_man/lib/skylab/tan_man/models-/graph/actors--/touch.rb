@@ -104,14 +104,10 @@ module Skylab::TanMan
 
         def __path_is_file
 
-          sys = _sys
-
-          _ftype = sys.filesystem.constants::FILE_FTYPE
-
-          _o = sys.filesystem( :Upstream_IO ).edit_with(
+          _o = _sys.filesystem.normalization( :Upstream_IO ).edit_with(
             :stat, @stat,
             :qualified_knownness_of_path, @_qkn,
-            :only_apply_expectation_that_path_is_ftype_of, _ftype,
+            :must_be_ftype, :FILE_FTYPE,
             & @on_event_selectively )
 
           _o.via_stat_execute

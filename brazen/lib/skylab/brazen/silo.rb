@@ -144,7 +144,7 @@ module Skylab::Brazen
 
         mod_a.each_with_index do |mod, d|
           s = _some_name_function_via_mod( mod ).as_parts[ local_index ]
-          if ! ( s and target_s == s )
+          if ! ( s && target_s == s )
             mod_a[ d ] = nil
           end
         end

@@ -1,15 +1,19 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::Human::TestSupport
+module Skylab::Basic::TestSupport
 
-  describe "[hu] summarize time" do
+  describe "[ba] time - EN - summarize" do
 
     it "2 days" do
 
       time_a = Home_.lib_.time.parse '2012-06-16 12:01 PM'
       time_b = ::Time.parse '2012-06-18 12:02 PM'
-      unit, amt = Home_::Summarize::Time[ time_a - time_b ]
+      unit, amt = _subject_against time_a - time_b
       "#{ amt.to_i } #{ unit }s".should eql '2 days'
+    end
+
+    def _subject_against x
+      Home_::Time::EN::Summarize[ x ]
     end
   end
 end

@@ -4,7 +4,8 @@
 ## synopsis
 
 • a "known known" simply wraps a value. it can be a value of be `nil` or
-  `false` (typically when these are valid values or the model).
+  `false` (typically when these are valid values or the model), or any
+  other value.
 
 • a "known known" has the important side-effect that it itself is always
   true-ish (because it is an instance of a class we created).
@@ -13,7 +14,7 @@
 
 • the qualified variety of "known known" has an `association` field that
   must produce an assocation structure of any shape provided that it has
-  a `name` field that produces a name *function*.
+  a `name` field that produces a [#ca-060] name *function*.
 
 • the unqualified "known known" has no `association` field (and to
   request one should raise a no method exception).
@@ -37,10 +38,12 @@ normalization.
 
 
 
-## what is a "knownness", and what is a known known?
+## a "knownness" is our formal treatment of a "known known"
 
 this is not epistemology - we are simply describing our data structures,
 so hopefully we won't be here long.
+
+
 
 ### what is a "knownness"?
 
@@ -57,6 +60,8 @@ so hopefully we won't be here long.
   • a "knowness" can always answer the question "is this a qualified knownness?"
     (to be explained below.)
 
+
+
 ### what is a "known known"?
 
   • because it is a knownness, all of the above points apply to it.
@@ -68,12 +73,30 @@ so hopefully we won't be here long.
   • in another incarnation we used the less opaque name "value wrapper"
     for this structure.
 
+
+
 ### what is a qualified knownness?
 
   • formally a qualified knownness is (either a known unknown or a known
     known) that also has an association structure associated with it.
 
   • because it is a knownness it can answer those points there.
+
+
+
+
+## a short example:
+
+there is a filesystem path with exactly three meaninful states:
+
+  1) we know that nothing existed at that path
+  2) we know that something existed at that path
+  3) we don't know whether or not anything existed at that path
+
+knowing that we don't know is crucially different than knowing that the
+answer is "no": if we know we don't know, we must effect work. on the
+other hand, if we already know the answer is "no", then to do this same
+work again is a waste.
 
 
 

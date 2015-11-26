@@ -1,3 +1,4 @@
+myterm              q [ ]
 slicer              q [ ]
 permute             q [ ]
 flex2treetop        q [ ]
@@ -12,7 +13,7 @@ task                q [ ]
 treemap             q [ ]
 
 file_metrics        q [ ]
-git                 Q [ ]
+git                 q [ ]
 beauty_salon        q [ ]
 cull                q [ ]
 snag                q [ ]
@@ -30,6 +31,7 @@ sub_tree            q [ ]
 
 basic               q [ ]
 
+autonomous[..]      q [ ]
 brazen              q [ ]
 callback            q [ ]
 

@@ -30,9 +30,14 @@ module Skylab::System
         KEEP_PARSING_
       end
 
-      def only_apply_expectation_that_path_is_ftype_of=
+      def must_be_ftype=
 
-        @_expected_ftype = gets_one_polymorphic_value
+        x = gets_one_polymorphic_value
+        if x.respond_to? :id2name
+          x = FS_.const_get x, false
+        end
+
+        @_expected_ftype = x
         @_only_apply_ftype_expectation = true
         KEEP_PARSING_
       end
@@ -47,7 +52,9 @@ module Skylab::System
         KEEP_PARSING_
       end
 
-      public def execute
+    public
+
+      def execute
 
         # implement [#.A] the common algorithm (see)
 
@@ -149,7 +156,7 @@ module Skylab::System
         else
           maybe_send_event :error, :stat_error do
             wrap_exception_ @exception_
-          end
+          end  # result.
         end
       end
 

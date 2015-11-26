@@ -19,6 +19,7 @@ module Skylab::TestSupport
       def desc y
         y << "a search-replace hack: all `describe` blocks in"
         y << "the files that look \"normal\", add a `wip` tag"
+        y << "(no dry-run yet, but only mutates unmodified files)"
         nil
       end
 

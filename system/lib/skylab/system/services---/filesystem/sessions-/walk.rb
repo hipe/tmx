@@ -184,12 +184,10 @@ module Skylab::System
 
         def __found found_path, surrounding_path
 
-          _ftype = @ftype || FILE_FTYPE
+          yes = Home_.services.filesystem.normalization( :Upstream_IO ).call(
 
-          yes = Home_.services.filesystem( :Upstream_IO ).with(
-
-            :only_apply_expectation_that_path_is_ftype_of, _ftype,
             :path, found_path,
+            :must_be_ftype, ( @ftype || :FILE_FTYPE ),
             :filesystem, @filesystem,
             & @on_event_selectively )
 

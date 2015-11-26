@@ -63,3 +63,16 @@ it's almost a "convention over configuration" principle applied against
 the principle of encapsulation.
 
 but to the nub of this section: EEK
+
+
+
+
+## :note-C
+
+every normalization performance that is ever effected must typically be
+bound to a filesystem façade. as such we produce them that way, from the
+façade, and make this the only way to produce them.
+
+for now there are these two different ways we produce normalizations.
+the first way is for getting to a n11n from the "system" façade, the
+second is for getting to one from the filesystem façade.

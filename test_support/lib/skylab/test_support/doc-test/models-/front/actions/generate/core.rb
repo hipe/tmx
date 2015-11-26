@@ -176,7 +176,7 @@ module Skylab::TestSupport
               KEEP_PARSING_
             else
               @output_adapter = x
-              rslv_output_adapter_instance
+              _resolve_output_adapter_instance
             end
           end
 
@@ -294,7 +294,7 @@ module Skylab::TestSupport
           if ok
             aftr = [ @dry_run, @output_adapter ]
             if befor != aftr
-              ok = rslv_output_adapter_instance
+              ok = _resolve_output_adapter_instance
             end
           end
           ok
@@ -462,14 +462,18 @@ module Skylab::TestSupport
           _ok = if @output_adapter_o
             ACHIEVED_
           else
-            rslv_output_adapter_instance  # even if no symbol, get the errmsg
+            _resolve_output_adapter_instance  # even if no symbol, get the errmsg
           end
           _ok && rslv_line_downstream
         end
 
-        def rslv_output_adapter_instance
+        def _resolve_output_adapter_instance
 
-          mod = Autoloader_.const_reduce [ @output_adapter ], DocTest_::Output_Adapters_ do |* i_a, & ev_p|
+          mod = Autoloader_.const_reduce(
+            [ @output_adapter ],  # nil ok
+            DocTest_::Output_Adapters_
+
+          ) do |* i_a, & ev_p|
             @result = maybe_send_event_via_channel i_a, & ev_p
             UNABLE_
           end

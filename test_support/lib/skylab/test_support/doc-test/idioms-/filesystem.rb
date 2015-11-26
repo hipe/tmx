@@ -49,20 +49,10 @@ module Skylab::TestSupport
 
       def file_must_exist path, & oes_p
 
-        sys = Home_.lib_.system
-
-        _ftype = sys.filesystem.constants::FILE_FTYPE
-
-        kn = sys.filesystem( :Upstream_IO ).with(
+        Home_.lib_.system.filesystem.normalization( :Upstream_IO ).call(
           :path, path,
-          :only_apply_expectation_that_path_is_ftype_of, _ftype,
+          :must_be_ftype, :FILE_FTYPE,
           & ( oes_p || @oes_p ) )
-
-        if kn
-          kn.value_x
-        else
-          kn
-        end
       end
     end
   end

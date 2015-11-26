@@ -26,7 +26,7 @@ module Skylab::SubTree
 
           seconds_old = @now_t - stat.mtime
 
-          unit_i, amt_f = Home_.lib_.human::Summarize::Time[ seconds_old ]
+          unit_i, amt_f = Home_.lib_.basic::Time::EN::Summarize[ seconds_old ]
 
           leaf.add_subcel "#{ amt_f.round } #{ ABBR_H_[ unit_i ] }"
 

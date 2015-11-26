@@ -16,7 +16,7 @@ references. here is a summary of the N tiers of scope:
 
     Cozy_Scope__  # (2) this const is used *only* by this file
 
-    One_Off_Scope___  # (3) set in only 1 place, referenced in only 1 other
+    One_Off_Scope___  # (3) is as (2) and also referenced exactly once
 
     Singleton_Scope____   # (4) this const (as string) only exists in 1 place
 
@@ -33,6 +33,30 @@ the name (we will use "cozy" scope becuase it is common):
     This_casing_is_reserved_for_proc_likes_eg_actors__
 
     ANY_OBJECT_TREATED_AS_A_VALUE__
+
+
+
+
+## quick side-note: what happened to good old CamelCase?
+
+we use `This_Convention` insted of `CamelCase`:
+
+  • generally not always. sidesystem names still use the classic
+    camelcase names out of deference to the strong platform idiom.
+    we may also use it when it has some sort of expressive utility
+    to do so.
+
+  • (A) this solves the problem of acronyms in const names,
+    e.g: better: `API_Key`, worse: `APIKey`.
+
+  • (B) conceptually we think of `_` as being halfway to `::`.
+    if you have a name like `API_Key` are you sure you don't want
+    it to be `API::Key` instead? using the underscore as an imaginary
+    ersatz for a `::` is a visual reminder that we should be planning
+    for our name graphs to grow.
+
+  • we don't yet have a good name for this convention.
+    `Titlecase_with_Underscores` is .. meh.
 
 
 

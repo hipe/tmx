@@ -74,7 +74,9 @@ module Skylab::TestSupport  # :[#021].
 
     def lookup sym
       @_entries.fetch sym do
-        @_entries[ sym ] = send sym
+        x = send sym
+        @_entries[ sym ] = x
+        x
       end
     end
   end

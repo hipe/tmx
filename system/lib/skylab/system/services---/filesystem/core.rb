@@ -89,10 +89,15 @@ module Skylab::System
 
       if x_a.length.zero?
         self
-      else  # see [#.C]
-        _cls = Normalizations_.const_get( * x_a, false )
-        _cls.begin_ self
+      else
+        normalization( * x_a )
       end
+    end
+
+    def normalization sym  # [#]:note-C
+
+      _cls = Normalizations_.const_get sym, false
+      _cls.begin_ self
     end
 
     # ~ session exposures

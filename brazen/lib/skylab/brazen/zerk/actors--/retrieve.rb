@@ -109,8 +109,11 @@ module Skylab::Brazen
       end
 
       def via_child
-        @child.marshal_load @ast.value_x do |ev|
+
+        old_way = -> ev do
+
           noun = @child.noun
+
           _ev_ = ev.with_message_string_mapper -> s, line_index do
             if line_index.zero?
               "couldn't unmarshal #{ noun }: #{ s }"
@@ -118,7 +121,22 @@ module Skylab::Brazen
               s
             end
           end
+
           maybe_send_persistence_error _ev_
+        end
+
+        new_way = -> * i_a, & ev_p do
+          self._COVER_ME
+        end
+
+        @child.marshal_load @ast.value_x do | * i_a, & x_p |
+
+          if :error == i_a.first
+            new_way[ * i_a, & x_p ]
+          else
+            old_way[ * i_a, & x_p ]
+          end
+
           UNABLE_
         end
       end
