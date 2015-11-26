@@ -199,7 +199,7 @@ module Skylab::Cull
       def get_upstream_adapters_names
 
         Upstream_::Adapters__.constants.reduce [] do | m, x |
-          m.push Callback_::Name.via_const x
+          m.push Callback_::Name.via_const_symbol x
           m
         end
       end

@@ -180,7 +180,7 @@ module Skylab::Snag
           def __build_human_s_a
 
             @_sym_a.map do | sym |
-              Callback_::Name.via_const( sym ).as_human
+              Callback_::Name.via_const_symbol( sym ).as_human
             end
           end
 

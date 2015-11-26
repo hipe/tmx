@@ -384,7 +384,7 @@ module Skylab::MyTerm
       )
     end
 
-    class Adapter_Name___ < Callback_::Name
+    class Adapter_Name___ < Callback_::Slug
 
       def self.new cx
 
@@ -394,10 +394,13 @@ module Skylab::MyTerm
           cx.guessed_path
         end
 
-        super() do
-          @path = _path
-          init_via_slug ::File.basename cx.normal
-        end
+        super().___ cx.normal, _path
+      end
+
+      def ___ normal, path
+
+        @path = path
+        finish_via_normal_string ::File.basename normal
       end
 
       attr_reader :path

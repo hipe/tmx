@@ -52,7 +52,7 @@ module Skylab::Callback
           s_a[ - num_parts .. -1 ]  # whether positive or negative
         end
         _s_a_.map do |s|
-          Home_::Name.via_const( s.intern ).as_human
+          Home_::Name.via_const_string( s ).as_human
         end * TERM_SEPARATOR_STRING_
       end
 
@@ -68,7 +68,7 @@ module Skylab::Callback
               EMPTY_A_
             else
               s_[ s.length + 2 .. -1 ].split( CONST_SEP_ ).reduce [] do | m, c |
-                m.push Home_::Name.via_const c.intern
+                m.push Home_::Name.via_const_string c
                   # freeze each name because we expose them individually
               end
             end )

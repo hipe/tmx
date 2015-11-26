@@ -128,8 +128,9 @@ module NLP::EN::API_Action_Inflection_Hack  # see [#018]. was: [#sl-123] exempt
         end
       end
 
-      word = Callback_::Name.
-        via_const( chain[ do_hop ? -3 : -2 ].name_symbol ).as_human.dup
+      _sym = chain[ do_hop ? -3 : -2 ].name_symbol
+      _nf = Callback_::Name.via_const_symbol _sym
+      word = _nf.as_human.dup
 
       word.gsub! PLURAL_RX__, EMPTY_S_  # :+#singularize-hack
       NLP::EN::POS::Noun[ word ]
@@ -147,7 +148,13 @@ module NLP::EN::API_Action_Inflection_Hack  # see [#018]. was: [#sl-123] exempt
     end
 
     define_method :verb do
-      @verb ||= NLP::EN::POS::Verb[ Callback_::Name.via_const( name_pieces.last ).as_human ]
+      @verb ||= ___build_verb
+    end
+
+    def ___build_verb
+
+      _lemma = Callback_::Name.via_const_string( name_pieces.last ).as_human
+      NLP::EN::POS::Verb[ _lemma ]
     end
 
     def verb= x

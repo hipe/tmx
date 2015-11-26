@@ -1,0 +1,57 @@
+digraph g {
+
+label = "\nfigure 1. \
+the new implementation has one level of hierarchical abstraction. \
+a scale path is clearer: add a new function or function family."
+
+node [style="filled" shape="rect" fillcolor="grey"]
+
+as_const->const_name
+as_camelcase_const->const_name
+as_distilled_stem->const_name
+
+const_name->common
+const_name [label="const\nname" style="normal" shape="oval" ]
+
+
+
+
+as_lowercase_with_underscores_x->LwU
+as_lowercase_with_underscores_x [label="as_lowercase_with_underscores_{ string | symbol }"]
+
+LwU->common
+LwU [label="lowercase\nwith underscores" style="normal" shape="oval"]
+
+
+
+
+as_slug->slug
+slug->common
+slug [style="normal" shape="oval"]
+
+
+
+
+as_ivar->variegated_name
+as_parts->variegated_name
+
+as_variegated_x->variegated_name
+as_variegated_x [ label="as_variegated_{ string | symbol }" ]
+
+
+variegated_name->common
+variegated_name [label="variegated\nname" style="normal" shape="oval"]
+
+
+
+as_human->human
+human->common
+human [style="normal" shape="oval"]
+
+
+common [label="each function family\nre-opens a common base class
+so that any surface name can reach\nany other translation function
+in any other family\n" style="normal" shape="oval" ]
+
+
+}

@@ -45,7 +45,7 @@ module Skylab::Callback
         end
 
         def name_symbol
-          Home_::Name.via_module( self ).as_trimmed_variegated_symbol
+          Home_::Name.via_module( self ).as_variegated_symbol
         end
       end
     end
@@ -115,7 +115,7 @@ module Skylab::Callback
           end
 
           def name_symbol
-            Home_::Name.via_module( self ).as_trimmed_variegated_symbol
+            Home_::Name.via_module( self ).as_variegated_symbol
           end
         end  # >>
 

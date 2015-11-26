@@ -1,5 +1,124 @@
 # the Name narrative :[#060]
 
+## overview & intro to theory via a table of "standard libary" name functions
+
+    | name conv. [family] name   | upcase ok? | trailing sep? | sep |
+    | const                      |     •      |      •        | [1] |
+    | lowercase with underscores |            |               | "_" |
+    | human                      |     •      |               | " " |
+    | slug                       |            |      • [2]    | "-" |
+    | variegated name            |     •      |               | "_" |
+
+
+### details
+
+  • [1] any given const might use a combination of `CamelCase` and/or
+    `Titlecase_with_Underscores` per [#bs-029], so there is no separator
+    per se but rather a pattern or ad-hoc logic for separation.
+
+  • [2] because slugs are used for filesystem names they need to
+    "isomorph" with const names, and const names have that strange
+    convention around trailing underscores (same reference as above).
+    this phenomenon of trailing "separators" is something we only
+    express in these two families and no where else.
+
+
+
+
+# intro
+
+imagine we have an instance of a class `FooBar` (or maybe it's
+`Foo_Bar`). if we need to store that object in an instance variable,
+then (all things being equal) a reasonable choice for the name of that
+instance variable is `@foo_bar`.
+
+imagine further that we have a simple reader method for this member
+value. given the above, any developer familiar with the platform idioms
+will be safe to assume that this reader method is named `foo_bar`.
+
+the developer familiar with our own local "universe" idioms can safely
+assume further that if one exists, the dedicated file for the subject
+class is called "foo-bar.rb".
+
+this fabricated but entirely plausible example produced *five* different
+"surface names": `FooBar` (or `Foo_Bar`), `@foo_bar`, `foo_bar` and
+`foo-bar.rb`.
+
+but (of course) it is not the case that the participating developer needs
+to remember each of these names individually. in fact when you read
+the above strings, your brain (being the pattern-matching dynamo that
+it is) probably read them all as the same "name", just "rendered" for
+different contexts.
+
+to put this phenomenon in terms that will be useful to us here, each of
+these "surface names" is actually the same "deep name" merely
+"inflected" for the each various "context" using a "name function".
+
+
+
+
+
+the "name" that we are discussing here somewhat resembles the "lemma" and
+"lexemes" of natural language in the sense that both are concerned with
+regular patterns of inflection.
+
+  • in the code we generally we discourage the use of the word "name"
+    for any other sense than the sense discussed here, per [#bs-030]:A.
+
+  • [#hu-037] is our dedicated node to natural inflection. although not
+    a general introduction to linguistics, it is our closest node to it.
+
+
+interestingly, here we do not (yet) offer a formal, concrete
+representation for some sort of "deep name". really the "deep name" is
+just the imaginary node floating in the middle of all these other nodes.
+
+what interests us is how we can transform these "surface names" to
+one another. our answer to this is the "name function":
+
+  • it is an object
+
+  • it represents a "name" in an abstract sense
+
+  • it is built from the tuple of a "surface representation" (value)
+    and "context" (reference).
+
+  • it can produce or attempt to produce a surface representation
+    for any other known context.
+
+we achieve this thru something like adapter pattern slammed into factory
+pattern ..
+
+
+
+
+## implementation of translations
+
+### judgement of implementation
+
+this implementation is "better" than it was before but is still not
+ideal. in the old way we had a single, monolithic class with an
+ever-growing jumble of circularly referencing methods as depicted by
+[#]/[figure 1].
+
+in the new way, we make a subclass for each name-convention-category
+(a somewhat arbitrary delineation), each of which:
+
+  • ultimately descends from a common base class and
+
+  • needs to touch that base class, if other names are to reach it.
+
+(see [#]/[figure 2].)
+
+the second point above is not pretty, but doing something like
+dependency injection for something as lowlevel and ubiquitous as name
+functions would incur complexity at too low a level.
+
+
+
+
+--
+
 EDIT: below is for old name that used to be in [hl]. subject node
 was rewritten from scratch for [gv] and distilled up to here, but has
 the same intent.

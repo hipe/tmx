@@ -96,7 +96,9 @@ module Skylab::Callback
         steps && rslv_result
         @result
       end
+
     private
+
       def steps
         @scn = bld_any_step_stream
         if @scn
@@ -106,6 +108,7 @@ module Skylab::Callback
           PROCEDE_
         end
       end
+
       def bld_any_step_stream
         if 1 < @const_path.length
           d = -1 ; last = @const_path.length - 2
@@ -114,25 +117,48 @@ module Skylab::Callback
           end
         end
       end
+
       def step
         @const_x = @scn.gets
         @const_x and step_with_const_x
       end
+
       def step_with_const_x
         @step_OK = procure_valid_name_from_const_x && step_with_valid_name
       end
+
       def procure_valid_name_from_const_x
-        @name = Name.via_variegated_symbol @const_x
-        @name.as_const or cannot_construe_valid_const
+
+        x = @const_x
+        if x
+
+          nf = if x.respond_to? :ascii_only?
+            Name.via_variegated_string x
+          else
+            Name.via_variegated_symbol x
+          end
+
+          const = nf.as_const
+          @name = nf  # needed for error reporting too
+        else
+          @name = Name.empty_name_for__ x
+        end
+
+        if const
+          const
+        else
+          ___cannot_construe_valid_const
+        end
       end
 
-      def cannot_construe_valid_const
+      def ___cannot_construe_valid_const
+
         if @else_p && @else_p.arity.nonzero?  # covered
           if 1 == @else_p.arity
             @result = @else_p[ bld_wrong_const_name_exception ]
           else
             @result = @else_p.call :error, :wrong_const_name do
-              bld_wrong_const_name_event
+              ___build_wrong_const_name_event
             end
           end
         else
@@ -141,7 +167,8 @@ module Skylab::Callback
         CEASE_
       end
 
-      def bld_wrong_const_name_event
+      def ___build_wrong_const_name_event
+
         Home_::Event.inline_not_OK_with :wrong_const_name,
             :name, @name.as_variegated_symbol,
             :error_category, :name_error do |y, o|
@@ -170,7 +197,7 @@ module Skylab::Callback
       # ~ final step (intermixed with support for pre-final step)
 
       def rslv_result
-        @const_x = @const_path.fetch( -1 )  # or not
+        @const_x = @const_path.fetch( -1 )  # fail loudly if not there
         if procure_valid_name_from_const_x
           @do_result_in_n_and_v_for_step = @do_result_in_n_and_v
           rslv_result_with_valid_name

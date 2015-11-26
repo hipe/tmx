@@ -148,7 +148,7 @@ module Skylab::TanMan
         @external_definition = cls.new
 
         @name_value_for_order = [ nm.as_lowercase_with_underscores_symbol,
-          Callback_::Name.via_const( const ).as_lowercase_with_underscores_symbol ]
+          Callback_::Name.via_const_symbol( const ).as_lowercase_with_underscores_symbol ]
 
         @parse_function = Home_.lib_.parse_lib.function_via_definition_array(
           @external_definition.definition )

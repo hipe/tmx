@@ -10,7 +10,7 @@ module Skylab::Cull
 
       def produce_result
         Callback_::Stream.via_nonsparse_array Mutator_::Items__.constants do | const_i |
-          Callback_::Name.via_const const_i
+          Callback_::Name.via_const_symbol const_i
         end
       end
     end

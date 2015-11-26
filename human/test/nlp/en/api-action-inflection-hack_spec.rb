@@ -87,7 +87,7 @@ module Skylab::Human::TestSupport
 
         let(:inflection) { MyAction.inflection }
 
-        specify { should eql("my actioning nlp en aaih") }
+        specify { should eql("my actioning NLP EN AAIH") }
       end
     end
   end

@@ -1107,7 +1107,7 @@ module Skylab::Callback
         s_a = name.split CONST_SEP_
         const_basename = s_a.pop
 
-        @_filesystem_entry_name ||= Name.via_const( const_basename )
+        @_filesystem_entry_name ||= Name.via_const_string( const_basename )
 
         @_parent_module = Const_value_via_parts[ s_a ]
 
@@ -1117,33 +1117,44 @@ module Skylab::Callback
       def __isomoprh_filesystem_entry_name
 
         s = name  # `::Module#name`
-        Home_::Name.via_const s[ s.rindex( CONST_SEP_ ) + 2 .. -1 ]
+        Home_::Name.via_const_string s[ s.rindex( CONST_SEP_ ) + 2 .. -1 ]
       end
     end
 
     # :#the-file-story
 
     module Methods__
-      def const_missing i
-        _ = Const_Missing_.new( self, i ).resolve_some_x
+
+      def const_missing x  # we have to accept both
+        _ = Const_Missing__.new( self, x.to_s ).resolve_some_x
         _
       end
     end
 
-    class Const_Missing_
+    class Const_Missing__
 
-      def initialize mod, i
-        @name = Name.any_valid_via_const( i ) || Name.via_variegated_symbol( i )
-        @mod = mod ; nil
+      def initialize mod, s
+
+        nf = Name.__via_valid_const_string s
+        nf or self._WHERE
+        @name = nf
+        @mod = mod
       end
 
       def resolve_some_x
+
         stow_h = @mod.stowaway_h
+
         if stow_h && stow_h[ @name.as_const ]
           __result_when_stowaway
         else
-          ( et = @mod.entry_tree ) and et.has_directory and
+
+          et = @mod.entry_tree
+
+          if et && et.has_directory
             np = et.normpath_from_distilled( @name.as_distilled_stem )
+          end
+
           if np
             @normpath = np
             send @normpath.method_name_for_state
@@ -1740,7 +1751,7 @@ module Skylab::Callback
 
     # ~ the loaded story
 
-    class Const_Missing_
+    class Const_Missing__
       def __result_when_loaded
         _fuzzy_lookup method :_result_via_different_casing_or_scheme
       end
@@ -1772,7 +1783,7 @@ module Skylab::Callback
       end
     end
 
-    class Const_Missing_
+    class Const_Missing__
 
       def __result_when_stowaway  # [cu] relies on this heavily
 
@@ -1827,7 +1838,7 @@ module Skylab::Callback
 
     # ~ the loading story (bolsters two others)
 
-    class Const_Missing_
+    class Const_Missing__
 
       def __result_when_loading  # :#spot-1
         @mod.__produce_autoloderized_module_for_const_missing self
@@ -1852,7 +1863,7 @@ module Skylab::Callback
 
     # :#the-directory-story
 
-    class Const_Missing_
+    class Const_Missing__
 
     private
 
@@ -2098,7 +2109,7 @@ module Skylab::Callback
 
       def require_quietly const_i_or_path_s
         without_warning do
-          if Name.is_valid_const const_i_or_path_s
+          if VALID_CONST_RX__ =~ const_i_or_path_s
             require_stdlib const_i_or_path_s
           else
             require const_i_or_path_s
@@ -2116,7 +2127,7 @@ module Skylab::Callback
 
         require_via_const = -> const_i do
 
-          _compliant_slug = Name.via_const( const_i ).
+          _compliant_slug = Name.via_const_symbol( const_i ).
             as_lowercase_with_underscores_symbol
 
           require "skylab/#{ _compliant_slug }"
@@ -2146,13 +2157,11 @@ module Skylab::Callback
     end
   end
 
-  class Name  # :[#060]
+  class Name  # see [#060]
 
     class << self
 
-      def is_valid_const const_i
-        VALID_CONST_RX__ =~ const_i
-      end
+      # -- "library" nodes
 
       def labelize * a
         if a.length.zero?
@@ -2178,99 +2187,19 @@ module Skylab::Callback
         Home_::Name__::Unique_Features::Simple_Chain
       end
 
+      def empty_name_for__ x
+        Home_::Name__::Empty_name_for[ x ]
+      end
+
       def variegated_human_symbol_via_variable_name_symbol sym
         s = sym.id2name
         Home_::Name__::Unique_Features::
           Mutate_string_by_chomping_any_trailing_name_convention_suffixes[ s ]
         s.downcase.intern
       end
-
-      def any_valid_via_const const_sym
-
-        if VALID_CONST_RX__ =~ const_sym
-          _new_via :init_via_const, const_sym
-        end
-      end
-
-      def via_const const_sym
-
-        if VALID_CONST_RX__ =~ const_sym
-          _new_via :init_via_const, const_sym
-        else
-          raise ::NameError, __say_wrong( const_sym )
-        end
-      end
-
-      def __say_wrong const_sym
-        "wrong constant name #{ const_sym }"
-      end
-
-      def via_human human_s
-        _new_via :__init_via_human, human_s
-      end
-
-      def via_module mod
-        via_module_name mod.name
-      end
-
-      def via_module_name s
-        d = s.rindex CONST_SEP_
-        d and s = s[ d + 2 .. -1 ]
-        _new_via :init_via_const, s.intern
-      end
-
-      def via_module_name_anchored_in_module_name s, s_
-        Home_::Name__::Unique_Features::
-          Via_anchored_in_module_name_module_name[ s_, s ]
-      end
-
-      def via_slug s
-        _new_via :init_via_slug, s
-      end
-
-      def via_variegated_symbol i
-        _new_via :__init_via_variegated_symbol, i
-      end
-
-      def _new_via method_sym, x
-        new do
-          send method_sym, x
-        end
-      end
-
-      private :new
     end  # >>
 
-    def initialize & edit_p
-      @const_is_resolved_ = false
-      instance_exec( & edit_p )
-    end
-
-    def init_via_const const  # :+#public-API
-      @as_const = const
-      @const_is_resolved_ = true
-    end
-
-    def __init_via_human human_s
-      @as_human = human_s.freeze
-      @as_slug = human_s.gsub( SPACE__, DASH_ ).downcase.freeze
-    end
-
-    def init_via_slug s
-      @as_slug = s.freeze
-    end
-
-    def __init_via_variegated_symbol i
-      @as_variegated_symbol = i
-      @as_slug = i.to_s.gsub( NORMALIZE_CONST_RX__, DASH_ ).
-        gsub( UNDERSCORE_, DASH_ ).downcase.freeze
-    end
-
-    def name  # use a name object as a mock for something else
-      self
-    end
-
-    # ~
+    # -- higher-level derivatives (for [#br-035] expressive events usually)
 
     def express_into_under y, expag  # #hook-out [#br-023]
       name = self
@@ -2280,145 +2209,447 @@ module Skylab::Callback
       KEEP_PARSING_
     end
 
-    def description_under _expag  # experiment for [#br-035] expressive events
+    def description_under _expag
       as_human
     end
 
-    def as_camelcase_const
-      @___camelcase_const_is_resolved ||= __resolve_camelcase_const
-      @camelcase_const
-    end
-
-    def as_const
-      @const_is_resolved_ || __resolve_const
-      @as_const
-    end
-
-    def as_distilled_stem
-      @as_distilled_stem ||= Distill_[ as_const ]
-    end
-
-    def as_doc_slug
-      @as_doc_slug ||= __build_doc_slug
-    end
-
-    def as_human
-      @as_human ||= __build_human
-    end
-
-    attr_writer :as_ivar  # for irregulars
-
-    def as_ivar
-      @as_ivar ||= __build_ivar
-    end
-
-    def as_lowercase_with_underscores_symbol
-      @a_lwus ||= build_lwus
-    end
-
-    def as_parts
-      @as_parts ||= as_variegated_string.split( UNDERSCORE_ ).freeze
-    end
-
-    def description  # for our minimal expression agent under event
+    def description
       as_slug
     end
 
-    def as_slug
-      @as_slug ||= __build_slug
+    def name  # use a name object as a mock for something else
+      self
     end
 
-    def as_trimmed_variegated_symbol
-      @as_trimmed_variegated_symbol ||= __build_trimmed_variegated_symbol
+    TRAILING_DASHES_RX = /-+\z/  # was once used here, now no longer
+  end
+
+  same = Name  # common base class
+
+  class Const_Name < same
+
+    Here_ = self
+    class Home_::Name
+      class << self
+
+        def via_module mod
+          via_module_name mod.name
+        end
+
+        def via_module_name s
+
+          d = s.rindex CONST_SEP_
+          if d
+            s = s[ d + 2 .. -1 ]
+          end
+          Here_._via_normal_string_ s
+        end
+
+        def via_const_symbol const_sym
+          via_const_string const_sym.id2name
+        end
+
+        def via_const_string s
+
+          if VALID_CONST_RX__ =~ s
+            Here_._via_normal_string_ s
+          else
+            raise ::NameError, ___say_wrong_const_name( s )
+          end
+        end
+
+        def ___say_wrong_const_name x
+          "wrong constant name #{ x }"
+        end
+
+        def __via_valid_const_string s
+          Here_._via_normal_string_ s
+        end
+      end  # >>
+
+      def as_camelcase_const
+        _const.as_camelcase_const
+      end
+
+      def as_const
+        o = _const
+        o && o.as_const
+      end
+
+      def as_distilled_stem
+        o = _const
+        o && o.as_distilled_stem
+      end
+
+      def _const
+        _stem_.___const_when_stem
+      end
+
+      def ___const_when_stem
+        @___did_attempt_const ||= ___attempt_const
+        @_const
+      end
+
+      def ___attempt_const
+        @_const = Here_._via_stem_ self
+        ACHIEVED_
+      end
+    end
+
+    def _interpret_
+
+      _titlecase_the_pieces
+      _join_using_ UNDERSCORE_
+
+      # certainly not all names isomorph into valid consts (covered)
+
+      if VALID_CONST_RX__ !~ @x_
+        @x_ = false
+      end
+    end
+
+    def _express_
+
+      # break up the const string into universally normal pieces
+
+      # for each trailing underscore, we want one trailing empty string
+
+      s_a = @value_x_.split SPLITTER_RX___, -1
+
+      # downcase the piece IFF it doesn't look like an acroynym
+
+      s_a.each do | s |
+        s.gsub! DOWNCASER_RX___, & :downcase
+      end
+
+      s_a
+    end
+
+    def as_camelcase_const
+      @___camelcase ||= ___build_camelcase
+    end
+
+    def ___build_camelcase
+      @x_ = _stem_._stem_value_x_
+      _titlecase_the_pieces
+      _join_using_ EMPTY_S_
+      remove_instance_variable :@x_
+    end
+
+    def as_const  # symbol
+      @value_x_as_symbol_ ||= @value_x_.intern
+    end
+
+    def as_distilled_stem
+      @___distilled_stem ||= Distill_[ @value_x_ ]
+    end
+
+    def _titlecase_the_pieces
+
+      @x_ = @x_.map do | s |
+        s.sub UPCASER_RX___, & :upcase
+      end ; nil
+    end
+
+    DOWNCASER_RX___ = /[A-Z](?=[a-z])/
+    SPLITTER_RX___ = /(?<=[a-z])(?=[A-Z])|_/
+    UPCASER_RX___ = /\A[a-z]/
+  end
+
+  VALID_CONST_RX__ = /\A[A-Z][A-Z_a-z0-9]*\z/
+
+  class Lowercase_with_Underscores____ < same
+
+    Here_ = self
+    class Home_::Name
+      class << self
+
+        def via_lowercase_with_underscores_string s
+          Here_._via_normal_string_ s
+        end
+
+        def via_lowercase_with_underscores_symbol sym
+          Here_._via_normal_symbol_ sym
+        end
+      end  # >>
+
+      def as_lowercase_with_underscores_symbol
+        _LwU.as_lowercase_with_underscores_symbol
+      end
+
+      def as_lowercase_with_underscores_string
+        _LwU.as_lowercase_with_underscores_string
+      end
+
+      def _LwU
+        _stem_.___LwU_when_stem
+      end
+
+      def ___LwU_when_stem
+        @___LwU ||= Here_._via_stem_ self
+      end
+    end
+
+    def _interpret_
+      _no_trailing_separators_
+      _join_using_ UNDERSCORE_
+      _downcase_
+    end
+
+    def _express_
+      @value_x_.split UNDERSCORE_  # NOTE trailing separators lost
+    end
+
+    def as_lowercase_with_underscores_symbol
+      @value_x_as_symbol_ ||= @value_x_.intern
+    end
+
+    def as_lowercase_with_underscores_string
+      @value_x_
+    end
+  end
+
+  class Human____ < same
+
+    Here_ = self
+    class Home_::Name
+      class << self
+
+        def via_human s
+          Here_._via_normal_string_ s
+        end
+      end  # >>
+
+      def as_human
+        _stem_.___human_when_stem.as_human
+      end
+
+      def ___human_when_stem
+        @___human ||= Here_._via_stem_ self
+      end
+    end  # >>
+
+    def _interpret_
+      _no_trailing_separators_
+      _join_using_ SPACE_
+    end
+
+    def _express_
+      @value_x_.split SPACE_
+    end
+
+    def as_human
+      @value_x_
+    end
+  end
+
+  class Slug < same
+
+    Here_ = self
+    class Home_::Name
+      class << self
+
+        def via_slug s
+          Here_._via_normal_string_ s
+        end
+      end  # >>
+
+      def as_slug
+        _stem_.___slug_when_stem.as_slug
+      end
+
+      def ___slug_when_stem
+        @___slug ||= Here_._via_stem_ self
+      end
+    end  # >>
+
+    def _interpret_
+      # NOTE slugs preserve trailing "separators"
+      _join_using_ DASH_
+      _downcase_
+    end
+
+    def _express_
+      @value_x_.split DASH_, -1  # NOTE keep trailing separators
+    end
+
+    def as_slug
+      @value_x_
+    end
+  end
+
+  class Variegated_Name____ < same
+
+    Here_ = self
+    class Home_::Name
+      class << self
+
+        def via_variegated_string s
+          Here_._via_normal_string_ s
+        end
+
+        def via_variegated_symbol sym
+          Here_._via_normal_symbol_ sym
+        end
+      end  # >>
+
+      def as_ivar= sym
+        self._K   # for irregulars
+        _vari.as_ivar = sym
+      end
+
+      def as_ivar
+        _vari.as_ivar
+      end
+
+      def as_parts
+        _vari.as_parts
+      end
+
+      def as_variegated_string
+        _vari.as_variegated_string
+      end
+
+      def as_variegated_symbol
+        _vari.as_variegated_symbol
+      end
+
+      def _vari
+        _stem_.___variegated_when_stem
+      end
+
+      def ___variegated_when_stem
+        @___variegated ||= Here_._via_stem_ self
+      end
+    end
+
+    def _interpret_
+      _no_trailing_separators_
+      _join_using_ UNDERSCORE_
+    end
+
+    def _express_
+
+      # perserve trailing separators IFF they were in the original symbol [sg]
+
+      @value_x_.split UNDERSCORE_, -1
+    end
+
+    def as_ivar= x
+      @_ivar = x
+    end
+
+    def as_ivar
+      @_ivar ||= :"@#{ @value_x_ }"
+    end
+
+    def as_parts  # special just for [br] silo reference symbols
+      _stem_._stem_value_x_
     end
 
     def as_variegated_string
-      @as_variegated_string ||= as_variegated_symbol.id2name.freeze
+      @value_x_  # eek
     end
 
     def as_variegated_symbol
-      @as_variegated_symbol ||= __build_variegated_symbol
+      @value_x_as_symbol_ ||= @value_x_.intern
+    end
+  end
+
+  class Name  # re-open as common base
+
+    class << self
+
+      def _via_stem_ stem
+        new.__via_stem stem
+      end
+
+      def _via_normal_string_ s
+        new.finish_via_normal_string s
+      end
+
+      def _via_normal_symbol_ sym
+        new.finish_via_normal_symbol sym
+      end
+
+      private :new
+    end  # >>
+
+    def __via_stem stem
+
+      @x_ = stem._stem_value_x_
+      self._interpret_
+      x = remove_instance_variable :@x_
+      if x
+        @value_x_ = x
+        @_stem = stem
+        self
+      else
+        x  # cannot produce a name for this context from this stem
+      end
     end
 
-    def __build_doc_slug
-      _as_normalized_const.gsub( SLUGIFY_CONST_RX__, & :downcase ).
-        gsub( UNDERSCORE_, DASH_ ).freeze
+    def finish_via_normal_symbol sym
+      @value_x_as_symbol_ = sym
+      finish_via_normal_string sym.id2name
     end
 
-    def __build_human
-      s = as_slug.dup
-      s.gsub! TRAILING_DASHES_RX, EMPTY_S_
-      s.gsub! DASH_, SPACE__
-      s.freeze
+    def finish_via_normal_string s
+      @value_x_ = s ; self
     end
 
-    def build_lwus
-      as_slug.gsub( DASH_, UNDERSCORE_ ).downcase.intern
+    def _stem_
+      x = ( @_stem ||= ___resolve_stem )
+      if true == x  # ick but prettier graphs
+        self
+      else
+        x
+      end
     end
 
-    def __build_ivar
-      :"@#{ as_variegated_symbol }"
-    end
-
-    def __build_slug
-      _as_normalized_const.gsub( UNDERSCORE_, DASH_ ).downcase.freeze
-    end
-
-    def __build_variegated_symbol
-      s = as_slug.dup
-      s.gsub! DASH_, UNDERSCORE_
-      s.intern
-    end
-
-    def __build_trimmed_variegated_symbol
-      s = as_slug.dup
-      s.gsub! TRAILING_DASHES_RX, EMPTY_S_
-      s.gsub! DASH_, UNDERSCORE_
-      s.intern
-    end
-
-    def _as_normalized_const
-      as_const.to_s.gsub NORMALIZE_CONST_RX__, UNDERSCORE_
-    end
-
-    def __resolve_camelcase_const
-      @camelcase_const = ( i = as_const and
-        i.to_s.gsub( UNDERSCORE_, THE_EMPTY_STRING__ ).intern  )
+    def ___resolve_stem
+      x = self._express_
+      x or fail
+      @stem_value_x_ = x
       true
     end
 
-    def __resolve_const
-      @const_is_resolved_ = true
-      @as_const = Constify_if_possible_[ as_variegated_symbol.to_s ]
+    def _stem_value_x_
+      @stem_value_x_
     end
 
-    NORMALIZE_CONST_RX__ = /(?<=[a-z])(?=[A-Z])/
-    SLUGIFY_CONST_RX__ = /[A-Z](?=[a-z])/
-    SPACE__ = ' '.freeze
-    TRAILING_DASHES_RX = /-+\z/
-    THE_EMPTY_STRING__ = ''.freeze
-    VALID_CONST_RX__ = /\A[A-Z][A-Z_a-z0-9]*\z/
+    def _no_trailing_separators_  # assume at least 1 piece, not all empty
+
+      if @x_.last.length.zero?
+        s_a = @x_.dup
+        begin
+          s_a.pop
+          if s_a.last.length.zero?
+            redo
+          end
+          break
+        end while nil
+        @x_ = s_a
+      end
+      NIL_
+    end
+
+    def _join_using_ s
+      @x_ = @x_.join s ; nil
+    end
+
+    def _downcase_
+      @x_ = @x_.downcase ; nil
+    end
   end
+
+  # -- done
 
   Const_value_via_parts = -> x_a do  # :+[#ba-034]
     x_a.reduce ::Object do |mod, x|
       mod.const_get x, false
     end
   end
-
-  Constify_if_possible_ = -> do
-    white_rx = %r(\A[a-z][-_a-z0-9]*\z)i
-    gsub_rx = /([-_]+)([a-z])?/
-    -> s do
-      if white_rx =~ s
-        s_ = s.gsub( gsub_rx ) do
-          "#{ UNDERSCORE_ * $~[1].length }#{ $~[2].upcase if $~[2] }"
-        end
-        s_[0] = s_[0].upcase
-        s_.intern
-      end
-    end
-  end.call
 
     DASH_ = '-'.freeze
     UNDERSCORE_ = '_'.freeze

@@ -256,7 +256,7 @@ module Skylab::TestSupport
 
           prop_cls.new do
 
-            @name = Callback_::Name.via_const sym
+            @name = Callback_::Name.via_const_symbol sym
             @argument_arity = argument_arity_symbol
             @origin_category = category
 

@@ -129,6 +129,29 @@ module Skylab::Callback
       p
     end
 
+    Empty_name_for = -> do
+      cache = {}
+      -> x do
+        if ! x
+          cache.fetch x do
+            en = Empty_Name___.new x
+            _const = :"#{ x.inspect.upcase }_AS_EMPTY_NAME"
+            const_set _const, en
+            cache[ x ] = en
+            en
+          end
+        end
+      end
+    end.call
+
+    class Empty_Name___ < ::Module
+      def initialize x
+        @as_variegated_symbol = x
+        freeze
+      end
+      attr_reader :as_variegated_symbol
+    end
+
     SANITIZE_FILE_ = module Sanitize_File__
       p = -> part_s do
         part_s.gsub( PART_RX__ ).each do

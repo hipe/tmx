@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  Nodesque::Name = ::Class.new ::Class.new Callback_::Name
+  Nodesque::Name = ::Class.new ::Class.new Callback_::Const_Name
 
   class Nodesque::Name
 
@@ -148,18 +148,18 @@ module Skylab::Brazen
 
       class << self
 
-        def new_via mod, parent, const
+        def new_via mod, parent, const_sym
 
-          new do
-            _init_via_three mod, parent, const
-          end
+          new._init_via_three mod, parent, const_sym
         end
+
+        private :new
       end  # >>
 
-      def _init_via_three _mod, parent, const
+      def _init_via_three _mod, parent, const_sym
 
         @parent = parent
-        init_via_const const
+        finish_via_normal_symbol const_sym
       end
 
       attr_reader :parent

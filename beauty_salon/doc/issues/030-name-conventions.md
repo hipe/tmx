@@ -6,7 +6,7 @@ more interesting).
 
 
 
-## some thoughts on the name `name`
+## some thoughts on the name `name` :[#]:A
 
 (EDIT: we use the name `name` strictly for name functions..but this may
 change. the platform uses it for a const name, we may eschew using it at

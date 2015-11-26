@@ -151,7 +151,7 @@ module Skylab::Snag
 
             model_class = chain.last.value_x
 
-            _slug = Callback_::Name.via_const( first.name_symbol ).as_slug
+            _slug = Callback_::Name.via_const_symbol( first.name_symbol ).as_slug
             _path = model_class.dir_pathname.join( 'actions', _slug ).to_path
 
             require _path

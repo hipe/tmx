@@ -126,7 +126,7 @@ module Skylab::Brazen
         __mutate_by_removing_interceding_underscores s
         __mutate_by_depluralizing s
 
-        nf.class.via_const( s ).as_human
+        nf.class.via_const_string( s ).as_human
       end
 
       def __mutate_by_removing_trailing_underscores s

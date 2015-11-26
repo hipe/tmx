@@ -33,7 +33,7 @@ module Skylab::Brazen
 
           _cnst = RX__.match( _const )[ 0 ]
 
-          Callback_::Name.via_const _cnst
+          Callback_::Name.via_const_string _cnst
         end
         RX__ = /\A.+(?=_(?:Agent|Branch|Boolean|Button|Field|Node)_*\z)/  # :+#experimental
 
@@ -66,7 +66,7 @@ module Skylab::Brazen
       # ~~ getters of symbols & strings (little to big)
 
       def name_symbol
-        @name.as_variegated_symbol
+        @name.as_lowercase_with_underscores_symbol
       end
 
       def slug

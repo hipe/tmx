@@ -1,0 +1,22 @@
+digraph g {
+
+  label="figure 1. the original monolithic implementation consisted \
+of a circularly dependant (and confusing) graph of name function methods. \
+there was no clear scale path."
+
+
+as_camelcase_const -> as_const
+as_const -> as_variegated_symbol
+as_distilled_stem -> as_const
+as_doc_slug -> _as_normalized_const
+as_human -> as_slug
+as_ivar -> as_variegated_symbol
+as_lowercase_with_underscores_symbol -> as_slug
+_as_normalized_const -> as_const
+as_parts -> as_variegated_symbol
+as_slug -> _as_normalized_const
+as_trimmed_variegated_symbol -> as_slug
+as_variegated_string -> as_variegated_symbol
+as_variegated_symbol -> as_slug
+
+}

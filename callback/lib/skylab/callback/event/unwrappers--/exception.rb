@@ -17,13 +17,13 @@ module Skylab::Callback
 
         def resolve_exception_class
           @exception_class = if @event.has_member :error_category
-            exception_class_via_error_catgory @event.error_category
+            ___exception_class_via_error_category @event.error_category
           else
             ::RuntimeError
           end ; nil
         end
 
-        def exception_class_via_error_catgory sym
+        def ___exception_class_via_error_category sym
 
           first_guess_sym = Home_::Name.via_variegated_symbol( sym ).
             as_camelcase_const

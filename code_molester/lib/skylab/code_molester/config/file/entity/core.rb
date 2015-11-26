@@ -76,7 +76,7 @@ module Skylab::CodeMolester
         a.length.nonzero? or fail "sanity - hack failed (#{ n })"
 
         Callback_::Name.simple_chain.new( a.map do | s |
-          Callback_::Name.via_const s.intern
+          Callback_::Name.via_const_string s
         end )
 
       end
