@@ -3,7 +3,7 @@ digraph {
   au [ label="Autobleed" ]
   ba [ label="Basic" ]
   bs [ label="BeautySalon" ]
-  b2 [ label="Bnf2Treetop" ]
+  b2 [ label="BNF2Treetop" ]
   br [ label="Brazen" ]
   ca [ label="Callback" ]
   cm [ label="CodeMolester" ]

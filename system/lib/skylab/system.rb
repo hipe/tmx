@@ -15,6 +15,15 @@ module Skylab::System
     def services
       Services_front___[]
     end
+
+    def test_support
+
+      if ! Home_.const_defined? :TestSupport, false
+        require_relative '../../test/test-support'
+      end
+
+      Home_::TestSupport
+    end
   end  # >>
 
   Callback_ = ::Skylab::Callback
@@ -80,13 +89,7 @@ module Skylab::System
       end
 
       def test_support  # :+[#ts-035]
-
-        if ! Home_.const_defined? :TestSupport, false
-          ::Kernel.require_relative(
-            ::File.expand_path( '../../../test/test-support', __FILE__ ) )
-        end
-
-        Home_::TestSupport
+        Home_.test_support
       end
 
       self

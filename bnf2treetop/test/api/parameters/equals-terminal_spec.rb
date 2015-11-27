@@ -1,8 +1,9 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
 describe "[bnf2tt] API parameter - `equals_terminal`" do
 
-  extend ::Skylab::Bnf2Treetop::API::Parameters::TestSupport
+  Skylab::BNF2Treetop::TestSupport[ self ]
+  use :API
 
   it 'the parameter "equals_terminal" lets you use different e.g. ::=' do
 

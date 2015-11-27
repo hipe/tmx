@@ -1,38 +1,14 @@
-require_relative '../test-support'
-
-module Skylab::Bnf2Treetop::TestSupport
-
-  Home_ = ::Skylab::Bnf2Treetop
-  Callback_ = ::Skylab::Callback
-  TestSupport_ = ::Skylab::TestSupport
-
-  module TestLib_
-
-    sidesys = Callback_::Autoloader.build_require_sidesystem_proc
-
-    Brazen = sidesys[ :Brazen ]
-
-  end
+module Skylab::BNF2Treetop::TestSupport
 
   module CLI
-    def self.extended mod
-      mod.module_eval do
-        extend CLI::ModuleMethods
-        include CLI::InstanceMethods
-      end
+
+    def self.[] tcc
+      tcc.extend Module_Methods___
+      tcc.include Instance_Methods___
     end
   end
 
-  module CLI::ModuleMethods
-
-    MOCK_INTERACTIVE_STDIN___ = -> do
-      o = ::Module.new
-      Mock_Interactive_STDIN___ =  o
-      def o.tty?
-        false
-      end
-      o
-    end.call
+  module CLI::Module_Methods___
 
     def invoke *argv, &output_p
 
@@ -43,8 +19,11 @@ module Skylab::Bnf2Treetop::TestSupport
         errstream = TestSupport_::IO.spy.new
         outstream = TestSupport_::IO.spy.new
 
+        _stdin = CLI::TestLib__::System_lib[].test_support::
+          MOCKS.noninteractive_STDIN_instance
+
         cli = Home_::CLI.new(
-          MOCK_INTERACTIVE_STDIN___,
+          _stdin,
           outstream,
           errstream,
           [ '/no-see/bnf2treetop' ]
@@ -78,7 +57,7 @@ module Skylab::Bnf2Treetop::TestSupport
       sc = class << o ; self end # ::BasicObject has no define_singleton_method
       sc.send :define_method,  :method_missing do |m, *aa|
         if aa.length.nonzero?
-          labels.push "#{ m.to_s.gsub '_', ' ' }#{ '(..)' }"
+          labels.push "#{ m.to_s.gsub UNDERSCORE_, SPACE_ }#{ '(..)' }"
         end
       end
       o.instance_eval(&output_p)
@@ -89,16 +68,26 @@ module Skylab::Bnf2Treetop::TestSupport
     end
   end
 
-  module CLI::InstanceMethods
+  module CLI::Instance_Methods___
 
-    FIXTURES = ::Pathname.new(File.expand_path('../../fixtures', __FILE__))
+    FIXTURES = ::File.join Home_.sidesystem_path, 'test/fixtures'
 
     def debug! ; _frame.debug_p.call end
     def err    ; _frame.err_p.call   end
     def out    ; _frame.out_p.call   end
 
     def unstyle x
-      TestLib_::Brazen[]::CLI::Styling.unstyle x
+      CLI::TestLib__::Brazen[]::CLI::Styling.unstyle x
     end
+  end
+
+  module CLI::TestLib__
+
+    sidesys = Callback_::Autoloader.build_require_sidesystem_proc
+
+    Brazen = sidesys[ :Brazen ]
+
+    System_lib = sidesys[ :System ]
+
   end
 end

@@ -16,13 +16,17 @@ module Skylab
   # we variously are or are not creating this module here. maybe by host
 end
 
-module Skylab::Bnf2Treetop
+module Skylab::BNF2Treetop
 
   class << self
 
     def describe_into_under y, expag
 
       y << "attempts to convert a BNF grammar to a treetop grammar"
+    end
+
+    def sidesystem_path
+      @___ssp ||= ::File.expand_path '../..', __FILE__
     end
   end  # >>
 
@@ -551,7 +555,7 @@ module Skylab::Bnf2Treetop
         list_p = ->(a) do
           a.map do |n, v|
             true == v ? n : "#{ n }=#{ /[ \t=:]/ =~ v ? v.inspect : v }"
-          end.join(' ')
+          end.join SPACE_
         end
         send_info_string "(using file's modeline parameters: #{ list_p[modelines] })"
         begin # this is all porcelain, grouped only for semantics
@@ -1045,6 +1049,6 @@ end
 
 if $PROGRAM_NAME == __FILE__
 
-  Skylab::Bnf2Treetop::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
+  Skylab::BNF2Treetop::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
     invoke ARGV
 end

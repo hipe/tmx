@@ -1,12 +1,4 @@
-# -- sweep 2 (reinforcement apps):
-
-./bnf2treetop/test/api/features/test-support.rb
-./bnf2treetop/test/api/parameters/test-support.rb
-./bnf2treetop/test/api/test-support.rb
-./bnf2treetop/test/cli/test-support.rb
-
-
-
+# -- sweep 2 (reinforcement apps) (done)
 
 # -- sweep 3 (smalls):
 

@@ -1,21 +1,19 @@
-require_relative '../test-support'
 
-Skylab::Bnf2Treetop::API::Parameters = ::Module.new
+module Skylab::BNF2Treetop::TestSupport
 
-module Skylab::Bnf2Treetop::API::Parameters::TestSupport
+  module API::Parameters
 
-  def self.extended mod
-    mod.module_eval do
-      include InstanceMethods
+    def self.[] tcc
+      API[ tcc ]
+      tcc.include self
     end
-  end
-
-  module InstanceMethods
-
-    include ::Skylab::Bnf2Treetop::API::TestSupport::InstanceMethods
 
     def normal_of str
-      str.gsub( %r([[:space:]]+), ' ').strip
+      s = str.gsub RX___, SPACE_
+      s.strip!
+      s
     end
+
+    RX___ = %r([[:space:]]+)
   end
 end

@@ -1,7 +1,7 @@
 
 #                     ~ [#bn-005] explains it all ~
 
-if ! defined? ::Skylab::Bnf2Treetop
+if ! defined? ::Skylab::BNF2Treetop
 
   # we won't know if the tmx specs run before our own do
 

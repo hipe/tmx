@@ -1,8 +1,9 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
 describe "[bnf2tt] API feature - output comment" do
 
-  extend ::Skylab::Bnf2Treetop::API::Features::TestSupport
+  Skylab::BNF2Treetop::TestSupport[ self ]
+  use :API
 
   it "passes-thru comments with the VERY EXPERIMENTAL #{
     }(output \"...\") syntax" do

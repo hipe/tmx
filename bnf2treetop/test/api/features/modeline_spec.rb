@@ -1,8 +1,9 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
 describe "[bnf2tt] API feature - modeline" do
 
-  extend ::Skylab::Bnf2Treetop::API::Features::TestSupport
+  Skylab::BNF2Treetop::TestSupport[ self ]
+  use :API
 
   it "lets you use any command-line options also as \"modeline\" params" do
     here = <<-HERE.unindent

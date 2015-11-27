@@ -1,8 +1,9 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
 describe "[bnf2tt] API parameter - square" do
 
-  extend ::Skylab::Bnf2Treetop::API::Parameters::TestSupport
+  Skylab::BNF2Treetop::TestSupport[ self ]
+  use :API_parameters
 
   it 'the parameter "square" lets you use square brackets differently' do
     normal = translate(string: 'foo ::= [bar]')

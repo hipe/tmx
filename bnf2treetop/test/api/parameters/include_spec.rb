@@ -1,8 +1,9 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-describe "[bnf2tt] API parameter - include" do
+describe "[bnf2tt] API parameter - square" do
 
-  extend ::Skylab::Bnf2Treetop::API::Parameters::TestSupport
+  Skylab::BNF2Treetop::TestSupport[ self ]
+  use :API
 
   it 'includes that module in the output treetop grammar' do
     translate(string: 'foo ::= bar', include: 'X')
