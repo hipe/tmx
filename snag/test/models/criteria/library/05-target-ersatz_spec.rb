@@ -41,7 +41,7 @@ module Skylab::Snag::TestSupport
       HERE
     end
 
-    memoize_ :_ersatz_domain do
+    memoize :_ersatz_domain do
 
       mod = subject_module_
 

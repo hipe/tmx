@@ -35,7 +35,7 @@ module Skylab::Snag::TestSupport
 
     end
 
-    memoize_ :_the_first_domain do
+    memoize :_the_first_domain do
 
       mod = subject_module_
 

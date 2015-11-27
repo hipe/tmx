@@ -27,13 +27,32 @@ module Skylab::Plugin
 
       s = sym.id2name
 
-      @_in_st = _parse_lib.input_stream.via_array s.downcase.split UNDERSCORE_
+      _ = s.downcase.split UNDERSCORE_, -1  # include trailing underscores..
 
-      @_received_s_a = s.split UNDERSCORE_
+      @_in_st = _parse_lib.input_stream.via_array _
 
-      @_const_s_a = @_received_s_a.map do | s_ |
-        :"#{ s_[ 0 ].upcase }#{ s_[ 1..-1 ] }"
+      s_a = s.split UNDERSCORE_, -1
+
+      @_received_s_a = s_a
+
+      d = 0  # (handle trailing underscores in an OCD way)
+      if s_a.last.length.zero?
+        s_a = s_a.dup
+        begin
+          s_a.pop
+          d += 1
+        end while s_a.last.length.zero?
       end
+
+      const_s_a = s_a.map do | s_ |
+        "#{ s_[ 0 ].upcase }#{ s_[ 1..-1 ] }"
+      end
+
+      d.times do
+        const_s_a.push EMPTY_S_
+      end
+
+      @_const_s_a = const_s_a
 
       @_module = mod
       NIL_

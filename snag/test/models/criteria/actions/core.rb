@@ -1,14 +1,11 @@
-require_relative '../../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  module Criteria_Test_Support_
+  module Models::Criteria::Actions
 
-    class << self
-      def [] tcm
-        tcm.include self
-      end
-    end  # >>
+    def self.[] tcc
+      tcc.include self
+    end
 
     # this is definitely some testing antipattern - we possibly mutate
     # our "real live" application "installation" by adding a blank file

@@ -128,7 +128,7 @@ module Skylab::Snag::TestSupport
       Home_::Models_::Node_Identifier.send :new, nil, d
     end
 
-    memoize_ :_body do
+    memoize :_body do
 
       o = Home_::Models_::Node::Expression_Adapters::Byte_Stream::Models_
 

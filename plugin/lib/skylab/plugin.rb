@@ -85,7 +85,7 @@ module Skylab::Plugin
   CLI = nil  # for host
   DASH_ = '-'
   EMPTY_A_ = [].freeze
-  EMPTY_S_ = ' '.freeze
+  EMPTY_S_ = ''.freeze
   Home_ = self
   KEEP_PARSING_ = true
   NIL_ = nil

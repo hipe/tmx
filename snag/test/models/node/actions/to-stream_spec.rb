@@ -99,7 +99,7 @@ module Skylab::Snag::TestSupport
       st.gets.should be_nil
     end
 
-    memoize_ :_second_manifest do
+    memoize :_second_manifest do
       Fixture_file_[ :the_second_manifest ]
     end
 

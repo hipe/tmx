@@ -134,11 +134,11 @@ module Skylab::Snag::TestSupport
         scanner_via_string_ y
       end
 
-      memoize_ :_six_width_fake_ID do
+      memoize :_six_width_fake_ID do
         _build_fake_ID '[#fake]'
       end
 
-      memoize_ :_zero_width_fake_ID do
+      memoize :_zero_width_fake_ID do
         _build_fake_ID EMPTY_S_
       end
 

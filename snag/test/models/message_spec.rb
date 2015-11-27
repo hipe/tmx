@@ -55,7 +55,7 @@ module Skylab::Snag::TestSupport
       ev.to_event
     end
 
-    memoize_ :_the_null_DS_ID do
+    memoize :_the_null_DS_ID do
       :HI
     end
   end

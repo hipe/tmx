@@ -13,23 +13,29 @@ module Skylab::Snag::TestSupport
 
     def use sym, * x_a
 
+      _ = TS_.___lib sym
+
       if x_a.length.nonzero?
-        rest = [ x_a ]
+        x = [ x_a ]
       end
 
-      TS_.const_get(
-        Callback_::Name.via_variegated_symbol( sym ).as_const, false
-      )[ self, * rest ]
-
-      NIL_
+      _[ self, * x ]
     end
 
-    def memoize_ sym, & p
+    def memoize sym, & p
       define_method sym, Callback_.memoize( & p )
     end
 
-    define_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
+    define_method :dangerous_memoize, TestSupport_::DANGEROUS_MEMOIZE
+  end
 
+  cache = {}
+  define_singleton_method :___lib do | sym |
+    cache.fetch sym do
+      x = TestSupport_.fancy_lookup sym, TS_
+      cache[ sym ] = x
+      x
+    end
   end
 
   module InstanceMethods

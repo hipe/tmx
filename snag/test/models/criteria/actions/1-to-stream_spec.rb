@@ -1,4 +1,4 @@
-require_relative 'test-support'
+require_relative '../../../test-support'
 
 module Skylab::Snag::TestSupport
 
@@ -6,7 +6,7 @@ module Skylab::Snag::TestSupport
 
     extend TS_
     use :expect_event
-    Criteria_Test_Support_[ self ]
+    use :models_criteria_actions
 
     it "`to_criteria_stream` lists the files that are in the folder" do
 

@@ -170,7 +170,7 @@ module Skylab::Snag::TestSupport
       grammatical_context_for_singular_subject_number_
     end
 
-    memoize_ :_min_assoc_adptr do
+    memoize :_min_assoc_adptr do
 
       subject_module_::Association_Adapter.new_with(
         :verb_lemma, 'be',

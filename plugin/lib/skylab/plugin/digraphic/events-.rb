@@ -215,7 +215,7 @@ module Skylab
             Home_.lib_.brazen::CLI::Expression_Frames::Table::Actor.call(
 
               :left, '  ',
-              :right, EMPTY_S_,
+              :right, SPACE_,
               :sep, '  ',
               :field, :right,
               :field, :left,

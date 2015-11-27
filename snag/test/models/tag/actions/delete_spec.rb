@@ -85,7 +85,7 @@ module Skylab::Snag::TestSupport
         call_API_via_iambic x_a
       end
 
-      memoize_ :__common_head do
+      memoize :__common_head do
         [ :tag, :delete,
           :upstream_identifier, Fixture_file_[ :the_sutherlands_mani ] ]
       end

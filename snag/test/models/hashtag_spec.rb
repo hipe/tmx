@@ -82,7 +82,7 @@ module Skylab::Snag::TestSupport
         expect_no_more_pieces_
       end
 
-      memoize_ :_normal_complexity do
+      memoize :_normal_complexity do
         'this is some code #public-API, #bill-Deblazio:2014 wee'.freeze
       end
 

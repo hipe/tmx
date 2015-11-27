@@ -50,7 +50,7 @@ module Skylab::Snag::TestSupport
         expect_no_more_pieces_
       end
 
-      dangerous_memoize_ :_nasty do
+      dangerous_memoize :_nasty do
 
         _init_piece_stream
         st = @piece_st
@@ -70,7 +70,7 @@ module Skylab::Snag::TestSupport
         NIL_
       end
 
-      memoize_ :_the_byte_upstream do
+      memoize :_the_byte_upstream do
 
         Home_.lib_.basic::String::Byte_Upstream_Identifier.new(
 

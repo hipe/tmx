@@ -51,7 +51,7 @@ module Skylab::Snag::TestSupport
 
     # ~ hook-outs & support
 
-    memoize_ :_simplest_width do
+    memoize :_simplest_width do
 
       n11n = Home_.lib_.basic::Number.normalization.new_with(
         :number_set, :integer, :minimum, 0 ).to_parser_proc

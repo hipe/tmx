@@ -38,7 +38,7 @@ O
       fh.gets.should be_nil
     end
 
-    memoize_ :_collection_one_string do
+    memoize :_collection_one_string do
       <<-HERE.unindent.freeze
         [#03] B
         [#01] A

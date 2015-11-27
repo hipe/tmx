@@ -118,16 +118,16 @@ module Skylab::Snag::TestSupport
       define_method :_new_via_integer_and_suffix_string,
         _New_via_integer_and_suffix_string
 
-      memoize_ :_subject do
+      memoize :_subject do
         _New_via_integer_and_suffix_string[ 3, '.xyz--23/A' ]
       end
     end
 
-    memoize_ :_one do
+    memoize :_one do
       _new_via_integer 1
     end
 
-    memoize_ :_two do
+    memoize :_two do
       _new_via_integer 2
     end
 
