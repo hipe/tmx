@@ -4,9 +4,8 @@ module Skylab::Cull::TestSupport
 
   describe "[cu] models - survey - reduce (integrate with markdown)" do
 
-    Expect_event_[ self ]
-
-    extend TS_
+    TS_[ self ]
+    use :expect_event
 
     it "if persistend table count is high" do
 

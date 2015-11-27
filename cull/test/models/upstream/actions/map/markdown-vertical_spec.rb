@@ -4,9 +4,8 @@ module Skylab::Cull::TestSupport
 
   describe "[cu] models - upstream map (markdown (vertical)" do
 
-    Expect_event_[ self ]
-
-    extend TS_
+    TS_[ self ]
+    use :expect_event
 
     it "files must be absolute here" do
       call_API :upstream, :map, :upstream, 'non-absolute-path'

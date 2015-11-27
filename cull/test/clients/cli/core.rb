@@ -1,20 +1,14 @@
-require_relative '../../test-support'
+module Skylab::Cull::TestSupport
 
-module Skylab::Cull::TestSupport::Clients_CLI
+  module Clients::CLI
 
-  ::Skylab::Cull::TestSupport[ TS_ = self ]
+    def self.[] tcc
 
-  include Constants
+      tcc.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
+      tcc.send :define_method, :expect, tcc.instance_method( :expect )  # #rspec-annoyance
 
-  Home_ = Home_
-
-  TestSupport_ = TestSupport_
-
-  extend TestSupport_::Quickie
-
-  module InstanceMethods
-
-    include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
+      tcc.include self
+    end
 
     def invoke * argv
 
@@ -36,8 +30,6 @@ module Skylab::Cull::TestSupport::Clients_CLI
 
       nil
     end
-
-    define_method :expect, instance_method( :expect )  # because rpsec
 
     def expect_exitstatus_for_general_failure
 

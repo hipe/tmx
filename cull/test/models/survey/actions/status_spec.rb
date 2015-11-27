@@ -4,9 +4,8 @@ module Skylab::Cull::TestSupport
 
   describe "[cu] models - survey status" do
 
-    Expect_event_[ self ]
-
-    extend TS_
+    TS_[ self ]
+    use :expect_event
 
     it "with a noent path" do
       against TS_.dir_pathname.join( 'no-ent' ).to_path

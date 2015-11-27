@@ -4,7 +4,7 @@ module Skylab::Cull::TestSupport
 
   describe "[cu] models - mutator - parse args (unit test)" do
 
-    extend TS_
+    TS_[ self ]
 
     it "minimal no prefix" do
 

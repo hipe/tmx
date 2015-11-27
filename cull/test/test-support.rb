@@ -3,22 +3,33 @@ require 'skylab/test_support'
 
 module Skylab::Cull::TestSupport
 
-  ::Skylab::TestSupport::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
+  class << self
 
-  module Constants
-    Home_ = ::Skylab::Cull
-    TestSupport_ = ::Skylab::TestSupport
-  end
+    def [] tcc
+      tcc.send :define_singleton_method, :use, The_use_method___
+      tcc.include Instance_Methods___
+    end
 
-  include Constants
+    cache = {}
+    define_method :___lib do | sym |
+      cache.fetch sym do
+        x = TestSupport_.fancy_lookup sym, TS_
+        cache[ sym ] = x
+        x
+      end
+    end
 
-  TestSupport_ = TestSupport_
+  end  # >>
+
+  TestSupport_ = ::Skylab::TestSupport
 
   extend TestSupport_::Quickie
 
-  Home_ = Home_
+    The_use_method___ = -> sym do
+      TS_.___lib( sym )[ self ]
+    end
 
-  module InstanceMethods
+  module Instance_Methods___
 
     def debug!
       @do_debug = true
@@ -88,16 +99,22 @@ module Skylab::Cull::TestSupport
     end
   end
 
-  Config_filename___ = Home_::Callback_.memoize do
+  Callback__ = ::Skylab::Callback
+
+  Config_filename___ = Callback__.memoize do
     o = Home_::Models_::Survey
     ::File.join o::FILENAME_, o::CONFIG_FILENAME_
   end
 
-  Expect_event_ = -> test_context_module do
-    Home_::Callback_.test_support::Expect_Event[ test_context_module ]
+  Expect_Event = -> test_context_class do
+    Callback__.test_support::Expect_Event[ test_context_class ]
   end
 
+  Callback__::Autoloader[ self,  ::File.dirname( __FILE__ ) ]
+
   DASH_ = '-'
+  Home_ = ::Skylab::Cull
   NEWLINE_ = "\n"
   UNDERSCORE_ = '_'
+  TS_ = self
 end

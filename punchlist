@@ -1,11 +1,6 @@
 # -- sweep 2 (reinforcement apps) (done)
 
-# -- sweep 3 (smalls):
-
-./cull/test/clients/cli/test-support.rb
-
-
-
+# -- sweep 3 (smalls) (done)
 
 # -- sweep 4 (tm):
 

@@ -4,9 +4,8 @@ module Skylab::Cull::TestSupport
 
   describe "[cu] models - survey mutators" do
 
-    Expect_event_[ self ]
-
-    extend TS_
+    TS_[ self ]
+    use :expect_event
 
     it "add strange name" do
 
