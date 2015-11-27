@@ -1,9 +1,5 @@
 # -- sweep 2 (reinforcement apps):
 
-
-./code_molester/test/config/file/test-support.rb
-./code_molester/test/config/test-support.rb
-
 ./bnf2treetop/test/api/features/test-support.rb
 ./bnf2treetop/test/api/parameters/test-support.rb
 ./bnf2treetop/test/api/test-support.rb

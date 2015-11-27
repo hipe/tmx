@@ -6,7 +6,7 @@ yacc2treetop        q [ ]
 bnf2treetop         q [ ]
 css_convert         q [ ]
 
-code_molester       Q [ ]
+code_molester       q [ ]
 
 task_examples       q [ ]
 task                q [ ]

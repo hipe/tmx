@@ -1,46 +1,49 @@
-require_relative '../test-support'
+module Skylab::CodeMolester::TestSupport
 
-module Skylab::CodeMolester::TestSupport::Config::File
+  module Config::File
 
-  ::Skylab::CodeMolester::TestSupport::Config[ TS_ = self ]
+    def self.[] tcc
 
-  include Constants
+      tcc.extend Module_Methods___
 
-  extend TestSupport_::Quickie
+      tcc.include self
 
-  Home_ = Home_
+      NIL_
+    end  # >>
 
-  TestLib_ = TestLib_
+    module Module_Methods___
 
-  module InstanceMethods
+      def share_file_as_subject_  # (deprecated for next method)
 
-    include Constants
+        share_subject :subject do
 
-    attr_reader :o
+          build_config_file_
+        end
+      end
 
-    let :subject do
-      config_file_class.new_with :path, path, :string, input_string
+      def share_file_as_config_ & p
+
+        share_subject :config do
+
+          x = build_config_file_
+          if p
+            p[ x ]
+          end
+          x
+        end
+      end
     end
 
-    def config
-      @config ||= bld_config
+    def build_config_file_
+
+      build_config_file_with_ :path, path, :string, input_string
     end
 
-    def bld_config
-      config_file_class.new_with :path, path, :string, content
+    def build_config_file_with_ * x_a
+      _build_config_file x_a
     end
 
-    def path
-    end
-
-    def input_string
-    end
-
-    def init_o_with * x_a
-      @o = config_file_class.new_via_iambic x_a ; nil
-    end
-
-    def build_config_file_with * x_a
+    def _build_config_file x_a
       config_file_class.new_via_iambic x_a
     end
 
@@ -48,46 +51,78 @@ module Skylab::CodeMolester::TestSupport::Config::File
       Home_::Config::File::Model
     end
 
-    let :tmpdir do
-      tmpdir = Tmpdir_instance_[]
-      b = do_debug ; b_ = tmpdir.be_verbose
-      if b && ! b_ or b_ && ! b
-        tmpdir = tmpdir.with :be_verbose, b, :debug_IO, debug_IO
-      end
-      tmpdir
+    def not_here_file_
+      TestSupport_::Fixtures.file :not_here
     end
 
-    def parses_and_unparses_OK
-      parses_OK
-      unparses_OK
+    def not_here_directory_
+      TestSupport_::Fixtures.dir :not_here
     end
 
-    def parses_OK
-      config.invalid_reason.should be_nil
-      config.should be_valid
+    def some_directory_
+      TestSupport_::Fixtures.dir :empty_esque_directory
     end
 
-    def unparses_OK
-      sx = config.sexp
-      s = sx.unparse
-      s_ = content
-      s.should eql s_
+    def config_is_not_valid_
+      config.valid?.should eql false
+    end
+
+    def subject_invalid_reason_is_nil_
+      subject.invalid_reason.should be_nil
+    end
+
+    def subject_has_no_content_items_
+      subject.content_items.length.should be_zero
+    end
+
+    def unparses_losslessly_
+      subject.string.should eql input_string
+    end
+
+    def read_path_ path
+      ::File.open( path, ::File::RDONLY ).read
+    end
+
+    def path_does_not_exist_
+      _file_exists( path ).should eql false
+    end
+
+    def path_exists_
+      _file_exists( path ).should eql true
+    end
+
+    def _file_exists path
+      ::File.exist? path
     end
 
     def black_and_white ev
 
-      join_with_newlines_under ev, TestLib_::Bzn[]::API.expression_agent_instance
+      _join_with_newlines_under ev, TestLib_::Bzn[]::API.expression_agent_instance
     end
 
-    def render_as_codified ev
+    def render_as_codified_ ev
 
       _expag = ::Skylab::Callback::Event.codifying_expression_agent_instance
-      join_with_newlines_under ev, _expag
+      _join_with_newlines_under ev, _expag
     end
 
-    def join_with_newlines_under ev, expag
-      scan = ev.to_stream_of_lines_rendered_under expag
-      scan.to_a.join Home_::NEWLINE_
+    def _join_with_newlines_under ev, expag
+
+      _st = ev.to_stream_of_lines_rendered_under expag
+      _st.to_a.join Home_::NEWLINE_
+    end
+
+    def parses_and_unparses_OK_
+
+      config = self.config
+
+      config.invalid_reason.should be_nil
+      config.should be_valid
+
+      _act = config.sexp.unparse
+      _exp = input_string
+
+      _act.should eql _exp
     end
   end
 end

@@ -90,7 +90,32 @@ module Skylab::System
 
     public
 
-      def rebuilt_for tc
+      def to_memoizer
+
+        hot = nil ; cold = nil
+
+        -> tcc do
+          if tcc.do_debug
+            if ! hot
+              hot = new_with(
+                :be_verbose, true,
+                :debug_IO, tcc.debug_IO,
+              )
+            end
+            hot
+          else
+            if ! cold
+              cold = new_with(
+                :be_verbose, false,
+                :debug_IO, tcc.debug_IO
+              )
+            end
+            cold
+          end
+        end
+      end
+
+      def rebuilt_for tc  # the above is an experimental replacement for this #todo
 
         yes = do_debug
         yes_ = td.be_verbose

@@ -1,89 +1,82 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::CodeMolester::TestSupport::Config::File
+module Skylab::CodeMolester::TestSupport
 
-  describe "[cm] config file edge (actualy just old rspec-only tests)" do  # :+#no-quickie because: specify is too crazy
+  describe "[cm] config file edge" do
 
-    extend TS_
+    TS_[ self ]
+    use :config_file
 
     context "B-asic overall grammar check:" do
 
       context "grammar check: many values" do
 
-        let :content do
-          "a=b\nc=d\ne=f"
+        it "parses and unparses OK" do
+          parses_and_unparses_OK_
         end
 
-        specify do
-          parses_and_unparses_OK
+        memoize :input_string do
+          "a=b\nc=d\ne=f"
         end
       end
 
       context "grammar check: one section" do
 
-        let :content do
-          '[nerp]'
+        it "parses and unparses OK" do
+          parses_and_unparses_OK_
         end
 
-        specify do
-          parses_and_unparses_OK
+        memoize :input_string do
+          '[nerp]'
         end
       end
 
       context "grammar check: two sections" do
 
-        let :content do
-          "[nerp]\n[derp]"
+        it "parses and unparses OK" do
+          parses_and_unparses_OK_
         end
 
-        specify do
-          parses_and_unparses_OK
+        memoize :input_string do
+          "[nerp]\n[derp]"
         end
       end
 
       context "grammar check: blearg" do
 
-        let :content do
-          "foo = bar\n [bizzo]\nfoo = biz\n[bazzo]\nfoo = buz"
+        it "parses and unparses OK" do
+          parses_and_unparses_OK_
         end
 
-        specify do
-          parses_and_unparses_OK
+        memoize :input_string do
+          "foo = bar\n [bizzo]\nfoo = biz\n[bazzo]\nfoo = buz"
         end
       end
     end
 
     context "with a file with some sections" do
 
-      let :content do
+      share_file_as_config_
+
+      memoize :input_string do
         "foo = bar\n [bizzo]\nfoo = biz\n[bazzo]\nfoo = buz"
       end
 
-      specify do
-        parses_OK
+      it "parses and unparses OK" do
+        parses_and_unparses_OK_
       end
 
-      context "when you use [] to get a section that exists" do
-
-        let :subject do
-          config[ 'bizzo' ]
-        end
-
-        specify do
-          subject.should be_respond_to :get_names
-        end
-
-        specify do
-          subject.section_name.should eql 'bizzo'
-        end
-
-        context "when you use [] to get a child value that exists" do
-          it "works" do
-            o = subject[ 'foo' ]
-            o.should eql 'biz'
-          end
-        end
+      it "get child value OK" do
+        config[ 'bizzo' ][ 'foo' ].should eql 'biz'
       end
+    end
+
+    def config
+      build_config_file_
+    end
+
+    def path
+      NIL_
     end
   end
 end

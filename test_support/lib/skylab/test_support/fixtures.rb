@@ -18,13 +18,23 @@ module Skylab::TestSupport
       )
 
       def __dirs_box
-        @___dirs_box ||= _build_box( @dirs_path )
+        @___dirs_box ||= ___build_dirs_box
+      end
+
+      def ___build_dirs_box
+        bx = _build_box @dirs_path
+        bx.add :not_here, 'not-here.d'  # guaranteed never to exist
+        bx
       end
 
       def __files_box
-        @___files_box ||= _build_box( @files_path ).tap do |bx|
-          bx.add :not_here, 'not-here.file'  # guaranteed never to exist
-        end
+        @___files_box ||= ___build_files_box
+      end
+
+      def ___build_files_box
+        bx = _build_box @files_path
+        bx.add :not_here, 'not-here.file'  # guaranteed never to exist
+        bx
       end
 
       def _build_box path_head
