@@ -4,7 +4,7 @@ module Skylab::FileMetrics::TestSupport
 
   describe "[fm] models - 2. dirs" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
 
     it "ok." do

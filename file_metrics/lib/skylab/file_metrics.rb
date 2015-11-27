@@ -85,6 +85,7 @@ module Skylab::FileMetrics
   NIL_ = nil
   SPACE_ = ' '.freeze
   UNABLE_ = false
+  UNDERSCORE_ = '_'
 
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
 

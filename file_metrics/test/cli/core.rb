@@ -1,18 +1,21 @@
-require_relative '../test-support'
+module Skylab::FileMetrics::TestSupport
 
-module Skylab::FileMetrics::TestSupport::CLI
+  module CLI
 
-  Parent__ = ::Skylab::FileMetrics::TestSupport
+    def self.[] tcc
+      tcc.extend Module_Methods__
+      tcc.include Instance_Methods__
+    end
 
-  Parent__[ TS_ = self ]
+    Expectations = -> tcc do
+      Home_.lib_.brazen.test_support.lib( :CLI_expectations )[ tcc ]
+    end
 
-  TestSupport_ = ::Skylab::TestSupport
-
-  extend TestSupport_::Quickie
+    # <-
 
   # ~ table-specific layer atop "execution snapshot"
 
-  module InstanceMethods
+  module Instance_Methods__
 
     def subject_CLI
       Home_::CLI
@@ -29,7 +32,7 @@ module Skylab::FileMetrics::TestSupport::CLI
 
   # ~ experimental "execution snapshot"
 
-  module ModuleMethods
+  module CLI::Module_Methods__
 
     def memoize_output_lines_ & p
 
@@ -42,7 +45,7 @@ module Skylab::FileMetrics::TestSupport::CLI
     end
   end
 
-  module InstanceMethods
+  module Instance_Methods__
 
     def __flush_execution p
 
@@ -63,37 +66,6 @@ module Skylab::FileMetrics::TestSupport::CLI
 
     attr_reader :exitstatus, :memo, :output_lines
   end
-
-  # ~ standard
-
-  module ModuleMethods
-
-    def use sym
-
-      case sym
-      when :expect_CLI
-        Home_.lib_.brazen.test_support.lib( :CLI_expectations )[ self ]
-
-      when :classify_common_screen
-        TS_::Classify_Common_Screen[ self ]
-
-      else
-        raise ::KeyError, sym
-      end
-      NIL_
-    end
+  # ->
   end
-
-  o = Parent__
-
-  Home_ = ::Skylab::FileMetrics
-
-  Callback_ = Home_::Callback_
-  EMPTY_S_ = o::EMPTY_S_
-  Fixture_file_directory_ = o::Fixture_file_directory_
-  Fixture_tree_directory_ = o::Fixture_tree_directory_
-  NEWLINE_ = o::NEWLINE_
-  NIL_ = nil
-  SPACE_ = Home_::SPACE_
-  UNDERSCORE_ = '_'
 end

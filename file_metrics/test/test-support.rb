@@ -3,42 +3,29 @@ require 'skylab/test_support'
 
 module Skylab::FileMetrics::TestSupport
 
-  TestSupport_ = ::Skylab::TestSupport
+  def self.[] tcc
+    tcc.extend Module_Methods___
+    tcc.include Instance_Methods___
+  end
 
-  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
+  TestSupport_ = ::Skylab::TestSupport
 
   extend TestSupport_::Quickie
 
-  Home_ = ::Skylab::FileMetrics
+  module Module_Methods___
 
-  module ModuleMethods
-
-    def use sym
-
-      case sym
-      when :expect_event
-        Callback_.test_support::Expect_event[ self ]
-      when :classify_common_screen
-        CLI::Classify_Common_Screen[ self ]
-      else
-        raise ::KeyError, sym
+    cache = {}
+    define_method :use do | sym |
+      _ = cache.fetch sym do
+        x = TestSupport_.fancy_lookup sym, TS_
+        cache[ sym ] = x
+        x
       end
-      NIL_
+      _[ self ]
     end
-
-    # exeriment - is this worth it? this is for the "nonstandard thing" below
-    # that memoized **into** the test context **class**
-
-    define_singleton_method :let, TestSupport_::Let::LET_METHOD
-
-    let :_NOT_USED_klass do
-       Sandbox_.kiss with_klass_value.call
-    end
-
-    define_method :__memoized, TestSupport_::Let::MEMOIZED_METHOD
   end
 
-  module InstanceMethods
+  module Instance_Methods___
 
     attr_reader :do_debug
 
@@ -63,10 +50,20 @@ module Skylab::FileMetrics::TestSupport
     end
   end
 
+  # -- for `use`
+
+  Expect_Event = -> tcc do
+    Callback_.test_support::Expect_event[ tcc ]
+  end
+
+  # --
+
   Fixture_file_ = -> s do
 
     ::File.join Fixture_file_directory_[], s
   end
+
+  Home_ = ::Skylab::FileMetrics
 
   Callback_ = Home_::Callback_
 
@@ -84,8 +81,11 @@ module Skylab::FileMetrics::TestSupport
     TestSupport_::Sandbox.enhance( self ).kiss_with 'KLS_'
   end
 
+  Callback_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
+
   EMPTY_S_ = Home_::EMPTY_S_
   NEWLINE_ = "\n"
   NIL_ = nil
   SPACE_ = Home_::SPACE_
+  TS_ = self
 end

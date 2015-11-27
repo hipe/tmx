@@ -2,8 +2,6 @@
 
 # -- sweep 3 (smalls):
 
-./file_metrics/test/cli/test-support.rb
-
 ./plugin/test/delegation/test-support.rb
 
 ./snag/test/models/criteria/actions/test-support.rb

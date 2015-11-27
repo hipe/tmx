@@ -1,11 +1,11 @@
-module Skylab::FileMetrics::TestSupport::CLI
+module Skylab::FileMetrics::TestSupport
 
-  class Classify_Common_Screen
+  class CLI::Classify_Common_Screen
 
     class << self
 
-      def [] tcm
-        tcm.include Test_Context_Instance_Methods__
+      def [] tcc
+        tcc.include Test_Context_Instance_Methods__
       end
     end  # >>
 
@@ -82,7 +82,7 @@ module Skylab::FileMetrics::TestSupport::CLI
           if s_.length.zero?
             :_blank_header_
           else
-            s_.downcase.gsub( SPACE_, UNDERSCORE_ ).intern
+            s_.downcase.gsub( SPACE_, Home_::UNDERSCORE_ ).intern
           end
         end
 

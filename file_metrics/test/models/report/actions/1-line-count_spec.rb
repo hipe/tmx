@@ -4,7 +4,7 @@ module Skylab::FileMetrics::TestSupport
 
   describe "[fm] models - 1. line count" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
 
     it "ping" do

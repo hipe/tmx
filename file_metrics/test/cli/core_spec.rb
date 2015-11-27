@@ -1,11 +1,12 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::FileMetrics::TestSupport::CLI
+module Skylab::FileMetrics::TestSupport
 
   describe "[fm] CLI" do
 
-    extend TS_
-    use :expect_CLI
+    TS_[ self ]
+    use :CLI
+    use :CLI_expectations
 
     it "0.0 - nothing" do
 

@@ -1,12 +1,13 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::FileMetrics::TestSupport::CLI
+module Skylab::FileMetrics::TestSupport
 
   describe "[fm] CLI - integration" do
 
-    extend TS_
-    use :expect_CLI
-    use :classify_common_screen
+    TS_[ self ]
+    use :CLI
+    use :CLI_expectations
+    use :CLI_classify_common_screen
 
     context "lc" do
 

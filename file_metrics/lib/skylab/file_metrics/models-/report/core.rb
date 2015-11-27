@@ -134,8 +134,6 @@ module Skylab::FileMetrics
       s
     end
 
-    UNDERSCORE_ = '_'
-
     module Actions
 
       class Ping < Report_Action_
