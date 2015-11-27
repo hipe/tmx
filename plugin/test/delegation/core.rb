@@ -1,15 +1,17 @@
-require_relative '../test-support'
+module Skylab::Plugin::TestSupport
 
-module Skylab::Plugin::TestSupport::Delegation_TS
+  module Delegation
 
-  parent = ::Skylab::Plugin::TestSupport
+    def self.use
+      NIL_  # if this file is loaded, we are loaded
+    end
+  end
 
-  parent[ TS_ = self ]
+  module Delegation_Namespace
 
-  extend parent::TestSupport_::Quickie
+    extend TestSupport_::Quickie
 
-  Home_ = parent::Home_
+    Subject_ = Home_::Delegation
 
-  Subject_ = Home_::Delegation
-
+  end
 end

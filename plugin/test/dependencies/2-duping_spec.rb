@@ -4,8 +4,8 @@ module Skylab::Plugin::TestSupport
 
   describe "[pl] dependencies - duping" do
 
-    extend TS_
-    use :dependencies_support
+    TS_[ self ]
+    use :dependencies
 
     context "(one)" do
 
@@ -126,7 +126,7 @@ module Skylab::Plugin::TestSupport
         a_.should eql [ 'mama_2 k2' ]
       end
 
-      dangerous_let_ :_pair do
+      dangerous_memoize :_pair do
 
         o = subject_class_.new :mama_1 do :k1 end
 

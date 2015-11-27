@@ -2574,7 +2574,7 @@ module Skylab::Brazen
             if FILE_SEPARATOR_BYTE_ != path.getbyte( 0 )  # ick/meh
 
               _path_ = _filesystem.expand_path path, present_working_directory
-              kn = Callback_::Known_Known[ _path ]
+              kn = Callback_::Known_Known[ _path_ ]
             end
           end
         end

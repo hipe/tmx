@@ -4,8 +4,8 @@ module Skylab::Plugin::TestSupport
 
   describe "[pl] depdendencies - argument - composite (partial)" do
 
-    extend TS_
-    use :dependencies_support
+    TS_[ self ]
+    use :dependencies
 
     context "(one)" do
 

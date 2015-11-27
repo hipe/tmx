@@ -4,8 +4,8 @@ module Skylab::Plugin::TestSupport
 
   describe "[pl] depdendencies - argument demux" do
 
-    extend TS_
-    use :dependencies_support
+    TS_[ self ]
+    use :dependencies
 
     rxs = '[A-Za-z0-9_:]+'
 
@@ -114,6 +114,10 @@ module Skylab::Plugin::TestSupport
         end
       end
 
+      share_subject :_common_guy do
+        _common_guy_against DeA_Mod2
+      end
+
       it "\"flag\"-style arguments are de-muxed (when definitions OK)" do
 
         o = _common_guy
@@ -160,10 +164,6 @@ module Skylab::Plugin::TestSupport
 
         e.message.should eql "unrecognized property 'howzaa'"
       end
-
-      dangerous_let_ :_common_guy do
-        _common_guy_against DeA_Mod2
-      end
     end
 
     context "(three)" do
@@ -198,6 +198,11 @@ module Skylab::Plugin::TestSupport
         end
       end
 
+      share_subject :_common_guy do
+
+        _common_guy_against DeA_Mod3
+      end
+
       it "if a dependency wants to 'custom' parse, this cannot be shared" do
 
         o = _common_guy
@@ -211,11 +216,6 @@ module Skylab::Plugin::TestSupport
           /\A#{ rxs }Vegetabler cannot also declare that it parses 'x'#{
            } because #{ rxs }Breader has already declared a custom parser #{
             }for it\z/ )
-      end
-
-      dangerous_let_ :_common_guy do
-
-        _common_guy_against DeA_Mod3
       end
     end
 

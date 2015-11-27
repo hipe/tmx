@@ -1,6 +1,10 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Plugin::TestSupport::Delegation_TS
+module Skylab::Plugin::TestSupport
+
+  lib_( :delegation ).use
+
+  module Delegation_Namespace  # <-
 
   describe "[pl] delegation - 03: central features" do
 
@@ -148,5 +152,7 @@ module Skylab::Plugin::TestSupport::Delegation_TS
         cli.foo.should eql :FOO
         cli.bar.should eql :BAR
     end
+  end
+  # ->
   end
 end

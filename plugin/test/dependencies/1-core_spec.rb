@@ -4,8 +4,8 @@ module Skylab::Plugin::TestSupport
 
   describe "[pl] depdendencies" do
 
-    extend TS_
-    use :dependencies_support
+    TS_[ self ]
+    use :dependencies
 
     context "(one)" do
 
@@ -156,7 +156,7 @@ module Skylab::Plugin::TestSupport
         a.first.class.should eql De2_Box::One
       end
 
-      dangerous_let_ :_o do
+      dangerous_memoize :_o do
 
         o = subject_class_.new
         o.roles = [ :lungs, :heart ]

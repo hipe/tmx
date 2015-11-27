@@ -4,8 +4,8 @@ module Skylab::Plugin::TestSupport
 
   describe "[pl] dependencies - pub-sub" do
 
-    extend TS_
-    use :dependencies_support
+    TS_[ self ]
+    use :dependencies
 
     before :all do
 
@@ -62,7 +62,7 @@ module Skylab::Plugin::TestSupport
       end
     end
 
-    dangerous_let_ :_disp do
+    dangerous_memoize :_disp do
 
       o = subject_class_.new
       o.emits = [ :carbonate, :miff, :tangle, :warbonate ]

@@ -5,33 +5,28 @@ module Skylab::Plugin::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
-  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
-
   extend TestSupport_::Quickie
 
-  module ModuleMethods
+  class << self
 
-    define_method :use, -> do
+    def [] tcc
+      tcc.send :define_singleton_method, :use, The_use_method___
+    end
 
-      cache_h = {}
+    cache = {}
+    define_method :lib_ do | sym |
 
-      -> sym do
-
-        ( cache_h.fetch sym do
-
-          const = Callback_::Name.via_variegated_symbol( sym ).as_const
-
-          x = if TS_.const_defined? const, false
-            TS_.const_get const, false
-          else
-            TestSupport_.fancy_lookup sym, TS_
-          end
-          cache_h[ sym ] = x
-          x
-        end )[ self ]
+      cache.fetch sym do
+        x = TestSupport_.fancy_lookup sym, TS_
+        cache[ sym ] = x
+        x
       end
-    end.call
-  end
+    end
+  end  # >>
+
+    The_use_method___ = -> sym do
+      TS_.lib_( sym )[ self ]
+    end
 
   module InstanceMethods
 
@@ -59,7 +54,11 @@ module Skylab::Plugin::TestSupport
 
   Home_ = ::Skylab::Plugin
 
-  ACHIEVED_ = true
   Callback_ = Home_::Callback_
+
+  Callback_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
+
+  ACHIEVED_ = true
   NIL_ = nil
+  TS_ = self
 end

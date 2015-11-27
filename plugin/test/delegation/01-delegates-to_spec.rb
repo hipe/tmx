@@ -1,6 +1,10 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Plugin::TestSupport::Delegation_TS
+module Skylab::Plugin::TestSupport
+
+  lib_( :delegation ).use
+
+  module Delegation_Namespace  # <-
 
   describe "[pl] delegation - the oldschool way" do
 
@@ -21,5 +25,7 @@ module Skylab::Plugin::TestSupport::Delegation_TS
       x.downcase.should eql :morple
       x.id2name.should eql 'MORPLE'
     end
+  end
+# ->
   end
 end

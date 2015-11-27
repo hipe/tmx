@@ -1,8 +1,6 @@
-module Skylab::Plugin
-
-  module TestSupport
-
-    module Dependencies::Support
+module Skylab::Plugin::TestSupport
+  # ->
+    module Dependencies
 
       def self.[] tcc
 
@@ -13,12 +11,14 @@ module Skylab::Plugin
 
       module MM___
 
-        def dangerous_let_ m, & p
+        def dangerous_memoize m, & p
 
           TestSupport_::Define_dangerous_memoizer[ self, m, & p ]
 
           NIL_
         end
+
+        alias_method :share_subject, :dangerous_memoize  # when read-only
       end
 
       module IM___
@@ -32,5 +32,5 @@ module Skylab::Plugin
         end
       end
     end
-  end
+  # -
 end

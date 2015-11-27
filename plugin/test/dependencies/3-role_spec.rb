@@ -4,8 +4,8 @@ module Skylab::Plugin::TestSupport
 
   describe "[pl] dependencies - roles" do
 
-    extend TS_
-    use :dependencies_support
+    TS_[ self ]
+    use :dependencies
 
     # -> "one"
 
