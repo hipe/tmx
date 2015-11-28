@@ -4,7 +4,7 @@ module Skylab::System::TestSupport
 
   describe "[sy] services - defaults" do
 
-    extend TS_
+    TS_[ self ]
 
     it "dev_tmpdir_path is trueish" do
 

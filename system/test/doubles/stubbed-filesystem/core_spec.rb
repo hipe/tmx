@@ -4,8 +4,8 @@ module Skylab::System::TestSupport
 
   describe "[sy] doubles - stubbed filesystem" do
 
-    extend TS_
-    use :doubles_stubbed_filesystem_support
+    TS_[ self ]
+    use :doubles_stubbed_filesystem
 
     it "loads" do
       subject_module_

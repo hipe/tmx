@@ -1,8 +1,8 @@
 module Skylab::System::TestSupport
 
-  Services::Filesystem::Normalizations::Support = -> tcm do
+  Services::Filesystem::Normalizations = -> tcm do
 
-    TS_::Test_Support_Bundles_::Expect_Event[ tcm ]
+    Expect_Event[ tcm ]
 
     tcm.send :define_method, :against_ do | path |
 

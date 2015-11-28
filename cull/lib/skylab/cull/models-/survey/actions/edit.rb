@@ -26,7 +26,6 @@ module Skylab::Cull
           edit.edit_via_mutable_qualified_knownness_box_and_look_path(
             to_qualified_knownness_box_proxy,
             @argument_box.fetch( :path ) )
-
         end
 
         @survey and via_survey

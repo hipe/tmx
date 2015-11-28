@@ -81,21 +81,27 @@ module Skylab::TestSupport  # :[#021].
     end
   end
 
-  Memoizer_methods = -> tcc do
-
-    tcc.send :define_singleton_method, :memoize_, -> sym, & p do
-      define_method sym, Callback_::Memoize[ & p ]
-    end
-
-    tcc.send :define_singleton_method, :dangerous_memoize_, DANGEROUS_MEMOIZE
-
-    NIL_
-  end
+  # -- (see discussion of "dangerous memoize" at [#042])
 
   DANGEROUS_MEMOIZE = -> m, & p do
-
     Define_dangerous_memoizer[ self, m, & p ]
-    NIL_
+  end
+
+  MEMOIZE = -> m, & p do
+    Define_memoizer___[ self, m, & p ]
+  end
+
+  module Memoization_and_subject_sharing
+
+    def self.[] tcc
+      tcc.extend self
+    end
+
+    define_method :dangerous_memoize, & DANGEROUS_MEMOIZE
+
+    define_method :shared_subject, & DANGEROUS_MEMOIZE
+
+    define_method :memoize, & MEMOIZE
   end
 
   Define_dangerous_memoizer = -> cls, m, & p do
@@ -110,6 +116,21 @@ module Skylab::TestSupport  # :[#021].
       x
     end
   end
+
+  Define_memoizer___ = -> cls, m, & p do
+
+    first = true ; x = nil
+
+    cls.send :define_method, m do
+      if first
+        first = false
+        x = p[]
+      end
+      x
+    end
+  end
+
+  # --
 
   Callback_ = ::Skylab::Callback
 

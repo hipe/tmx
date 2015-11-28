@@ -63,7 +63,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       bike._num_times_change_event_occurred.should eql 1
     end
 
-    dangerous_memoize_ :_subject_class do
+    shared_subject :_subject_class do
 
       class ACS_3_Bicycle
 

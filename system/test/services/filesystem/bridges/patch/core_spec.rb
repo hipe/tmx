@@ -4,7 +4,7 @@ module Skylab::System::TestSupport
 
   describe "[sy] services - filesystem - bridges - patch" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
 
     it "file _against file" do

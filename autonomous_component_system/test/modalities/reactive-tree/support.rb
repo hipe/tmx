@@ -25,7 +25,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       @result.should eql false
     end
 
-    dangerous_memoize_ :kernel_ do
+    shared_subject :kernel_ do
 
       ds = new_dynamic_source_for_unbounds_
 
@@ -45,7 +45,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       end
     end
 
-    memoize_ :shoe_model_ do
+    memoize :shoe_model_ do
 
       class Shoe  # similar to another model elsewhere
 

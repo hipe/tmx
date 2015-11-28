@@ -145,7 +145,7 @@ module Skylab::Brazen
           x
         end
 
-        WRITE_MODE_ = 'w'.freeze
+        WRITE_MODE_ = ::File::WRONLY | ::File::TRUNC | ::File::CREAT
       end
     end
   end

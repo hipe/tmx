@@ -1,11 +1,11 @@
-require_relative '../../test-support'
+require_relative '../../../../test-support'
 
-module Skylab::System::TestSupport::Doubles_Stubbed_System
+module Skylab::System::TestSupport
 
-  describe "[sy] doubles - mock-sys - input-adapters - OGDL - e.g's 2" do
+  describe "[sy] doubles - stubbed-system - input-adapters - OGDL - e.g's 2" do
 
-    extend TS_
-    use :doubles_stubbed_system_support_OGDL
+    TS_[ self ]
+    use :doubles_stubbed_system_OGDL
 
     it "vendor example 2 (1 of 5)" do
 

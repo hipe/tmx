@@ -6,9 +6,6 @@
 
 # -- sweep 5 ([sy], [st], [ts]):
 
-./system/test/doubles/stubbed-system/test-support.rb
-./system/test/io/line-scanner/test-support.rb
-
 ./sub_tree/test/modality-integrations/cli/test-support.rb
 ./sub_tree/test/models/file-coverage/test-support.rb
 ./sub_tree/test/models/files/modalities/cli/test-support.rb

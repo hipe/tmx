@@ -410,7 +410,11 @@ module TmxGit
         all_lines = first_half_lines + [json_string] + second_half_lines
         all_content = all_lines.join("\n")
         ret = nil
-        File.open(path, 'w') { |fh| ret = fh.write(all_content) }
+
+        _mode = ::File::WRONLY | ::File::TRUNC | ::File::CREAT
+
+        File.open(path, _mode) { |fh| ret = fh.write(all_content) }
+
         req[:verbose] and _report_updated(id, old_line, json_string)
         ret
       end

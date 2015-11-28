@@ -40,7 +40,7 @@ module Skylab::Brazen::TestSupport
         cx.last.x.line.should eql "\n"
       end
 
-      dangerous_memoize_ :client_class_ do
+      shared_subject :client_class_ do
 
         class TS_::CLI_IMC_04 < subject_class_
 

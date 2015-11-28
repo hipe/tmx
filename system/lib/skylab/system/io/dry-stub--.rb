@@ -25,7 +25,7 @@ module Skylab::System
       end
 
       APPEND_MODE_ = 'a'
-      WRITE_MODE_ = 'w'
+      WRITE_MODE_ = ::File::WRONLY | ::File::CREAT | ::File::TRUNC
 
       def __say_d mode_d
 

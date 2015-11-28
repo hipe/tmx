@@ -4,9 +4,8 @@ module Skylab::System::TestSupport
 
   describe "[sy] IO - line scanner" do
 
-    extend TS_
-
-    use :IO_line_scanner_test_support
+    TS_[ self ]
+    use :IO_line_scanner
 
     context "normal case" do
 

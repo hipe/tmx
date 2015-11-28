@@ -405,8 +405,13 @@ module Skylab::Git_head
         @write_line_p[ s ] ; nil
       end
       def init_write_line_p
+
         @write_line_p = -> s do
-          @o_fh = ::File.open @output_patch_path, 'w'
+
+          _mode = ::File::WRONLY | ::File::TRUNC | ::File::CREAT
+
+          @o_fh = ::File.open @output_patch_path, _mode
+
           (( @write_line_p = -> s_ do
             @o_fh.puts s_ ; nil
           end ))[ s ]

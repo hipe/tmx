@@ -142,7 +142,7 @@ module Skylab::Brazen::TestSupport
     end
 
     Memoizer_methods = -> tcc do
-      TestSupport_::Memoizer_methods[ tcc ]
+      TestSupport_::Memoization_and_subject_sharing[ tcc ]
     end
 
     Tmpdir = memoize.call do

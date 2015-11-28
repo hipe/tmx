@@ -25,7 +25,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       _subject_class.new
     end
 
-    dangerous_memoize_ :_subject_class do
+    shared_subject :_subject_class do
 
       class ACS_7B1
 

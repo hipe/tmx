@@ -265,7 +265,10 @@ module Skylab::TestSupport
                 Home_.lib_.IO.dry_stub_instance
               else
                 @did_open = true
-                ::File.open @desired_path, 'w'
+                ::File.open(
+                  @desired_path,
+                  ::File::WRONLY | ::File::CREAT | ::File::TRUNC,
+                )
               end
             end
           end

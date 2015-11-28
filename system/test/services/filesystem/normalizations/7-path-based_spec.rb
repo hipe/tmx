@@ -4,8 +4,8 @@ module Skylab::System::TestSupport
 
   describe "[sy] services - filesystem - n11ns - file-related STUB" do
 
-    extend TS_
-    use :services_filesystem_normalizations_support
+    TS_[ self ]
+    use :services_filesystem_normalizations
 
     it "(builds in edit mode) STUB" do
       subject_

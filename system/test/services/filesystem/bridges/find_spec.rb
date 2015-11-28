@@ -4,7 +4,7 @@ module Skylab::System::TestSupport
 
   describe "[sy] - services - filesystem - bridges - find" do
 
-    extend TS_
+    TS_[ self ]
 
     it "minimal working example - find one file" do
 

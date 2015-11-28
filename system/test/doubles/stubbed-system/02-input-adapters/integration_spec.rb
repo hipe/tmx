@@ -1,8 +1,11 @@
-require_relative '../test-support'
+require_relative '../../../test-support'
 
-module Skylab::System::TestSupport::Doubles_Stubbed_System
+module Skylab::System::TestSupport
 
-  describe "[sy] doubles - mock-sys - 02: input-adapters" do
+  describe "[sy] doubles - stubbed-system - 02: input-adapters" do
+
+    TS_[ self ]
+    use :doubles_stubbed_system
 
     it "reads one command" do
 
@@ -57,7 +60,7 @@ module Skylab::System::TestSupport::Doubles_Stubbed_System
 
       _st = Home_.lib_.basic::String.line_stream s
 
-      @st = Subject_[]::Models_::Command.unmarshalling_stream _st, :OGDL
+      @st = subject_::Models_::Command.unmarshalling_stream _st, :OGDL
 
       NIL_
     end

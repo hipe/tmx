@@ -6,8 +6,8 @@ module Skylab::System::TestSupport
 
     # ([#004.A] explains the numbering rational of these files.)
 
-    extend TS_
-    use :services_filesystem_normalizations_support
+    TS_[ self ]
+    use :services_filesystem_normalizations
 
     it "not exist" do
 

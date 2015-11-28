@@ -4,7 +4,7 @@ module Skylab::System::TestSupport
 
   describe "[sy] - services - FS - bridges - grep (a HACK)" do
 
-    extend TS_
+    TS_[ self ]
 
     it "minimal case - " do
       _parent_subject.grep( :ruby_regexp, /foo/ ).string.should eql "grep -E foo"
@@ -82,9 +82,9 @@ module Skylab::System::TestSupport
       scan.gets.should be_nil
     end
 
-    define_method :_here_path, ( Callback_.memoize do  # `memoize_`
+    memoize :_here_path do
       TS_.dir_pathname.join( 'services/filesystem/bridges/grep_spec.rb' ).to_path
-    end )
+    end
 
     def _parent_subject
       services_.filesystem

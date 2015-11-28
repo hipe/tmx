@@ -4,7 +4,7 @@ module Skylab::System::TestSupport
 
   describe "[sy] - services - filesystem - models - dir - as - collection" do
 
-    extend TS_
+    TS_[ self ]
     define_singleton_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
 
     it "works" do

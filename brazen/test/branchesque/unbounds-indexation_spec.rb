@@ -45,7 +45,7 @@ module Skylab::Brazen::TestSupport
         _name_symbol.should eql :node_2_which_is_module
       end
 
-      dangerous_memoize_ :_kernel do
+      dangerous_memoize :_kernel do
 
         module BUI_App1
 

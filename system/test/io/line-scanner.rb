@@ -1,17 +1,17 @@
 module Skylab::System::TestSupport
 
-  module IO::Line_Scanner::Test_Support
+  module IO::Line_Scanner
 
     class << self
       def [] tcm
-        tcm.extend ModuleMethods
-        tcm.include InstanceMethods
+        tcm.extend Module_Methods__
+        tcm.include Instance__Methods__
       end
     end  # >>
 
     # <-
 
-  module ModuleMethods
+  module Module_Methods__
 
     def with path_s, & o_p
       define_method :pathname do
@@ -20,7 +20,7 @@ module Skylab::System::TestSupport
     end
   end
 
-  module InstanceMethods
+  module Instance__Methods__
 
     def subject_via_pathname pn, d=nil
       Home_.services.filesystem.line_stream_via_path pn.to_path, d
@@ -34,7 +34,7 @@ module Skylab::System::TestSupport
       td = resolve_some_tmpdir
       pn = td.join path_s
       if ! pn.exist?  # DANGER ZONE
-        fh = pn.open 'w'
+        fh = pn.open ::File::WRONLY | ::File::CREAT | ::File::TRUNC
         o_p[ fh ]
         fh.close
       end

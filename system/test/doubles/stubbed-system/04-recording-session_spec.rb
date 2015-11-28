@@ -1,17 +1,18 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::System::TestSupport::Doubles_Stubbed_System
+module Skylab::System::TestSupport
 
-  describe "[sy] doubles - mock-sys - recording session (#LIVE)" do
+  describe "[sy] doubles - stubbed-system - recording session (#LIVE)" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_line
+    use :doubles_stubbed_system
 
     it "works" do
 
       io = new_string_IO_
 
-      x = _subject.recording_session io do | sess |
+      x = subject_.recording_session io do | sess |
 
         i, o, e, t = sess.popen3 'echo', "it's", '"fun"'
 
@@ -48,10 +49,6 @@ module Skylab::System::TestSupport::Doubles_Stubbed_System
       HERE
 
       excerpt_lines( 10..10 ).first.should eql "  argv date\n"
-    end
-
-    def _subject
-      Subject_[]
     end
   end
 end

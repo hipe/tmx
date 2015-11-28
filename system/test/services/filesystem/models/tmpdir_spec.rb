@@ -4,7 +4,7 @@ module Skylab::System::TestSupport
 
   describe "[sy] - services - filesystem - models - tmpdir" do
 
-    extend TS_
+    TS_[ self ]
     define_singleton_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
 
     it "with no pathname - you get ::Dir.tmpdir for your system" do

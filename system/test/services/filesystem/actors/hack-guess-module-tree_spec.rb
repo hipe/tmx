@@ -4,7 +4,7 @@ module Skylab::System::TestSupport
 
   describe "[sy] - services - filesystem - hack guess module tree" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
 
     it "simple - OK" do

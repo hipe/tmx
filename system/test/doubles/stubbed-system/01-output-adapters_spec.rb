@@ -1,18 +1,19 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::System::TestSupport::Doubles_Stubbed_System
+module Skylab::System::TestSupport
 
-  describe "[sy] doubles - mock-sys - 01: output-adapters" do
+  describe "[sy] doubles - stubbed-system - 01: output-adapters" do
 
-    extend TS_
+    TS_[ self ]
+    use :doubles_stubbed_system
 
     it "loads" do
-      _subject
+      subject_
     end
 
     it "writes one command" do
 
-      co = _subject::Models_::Command.new
+      co = subject_::Models_::Command.new
       co.receive_args [ "echo", "it's", '"fun"' ]
       co.stdout_string = "it's \"fun\"\n"
       co.exitstatus = 0
@@ -34,7 +35,7 @@ module Skylab::System::TestSupport::Doubles_Stubbed_System
 
     it "if options are provided, they get special treatment" do
 
-      co = _subject::Models_::Command.new
+      co = subject_::Models_::Command.new
       co.receive_args [ 'hi', chdir: 'etc' ]
 
       io = new_string_IO_
@@ -45,10 +46,6 @@ module Skylab::System::TestSupport::Doubles_Stubbed_System
           argv hi
           chdir etc
       HERE
-    end
-
-    def _subject
-      Subject_[]
     end
   end
 end

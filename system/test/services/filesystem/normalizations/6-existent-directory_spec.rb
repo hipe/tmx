@@ -4,8 +4,8 @@ module Skylab::System::TestSupport
 
   describe "[sy] services - filesystem - n11ns - existent dir" do
 
-    extend TS_
-    use :services_filesystem_normalizations_support
+    TS_[ self ]
+    use :services_filesystem_normalizations
 
     it "noent - whines" do
 

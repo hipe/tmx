@@ -265,7 +265,7 @@ program = -> sin, sout, serr, pn_s_a, argv do
       end
       def make_that_change
         tpn = ::Pathname.new( ::Dir.tmpdir ).join 'SEMUFOR.txt'
-        ofh = tpn.open 'w'
+        ofh = tpn.open ::File::WRONLY | ::File::CREAT | ::File::TRUNC
         ofh.puts @new_line
         count = 1
         while (( line = @fh.gets ))

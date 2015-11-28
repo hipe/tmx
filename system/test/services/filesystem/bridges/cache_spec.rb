@@ -25,7 +25,7 @@ module Skylab::System::TestSupport
 
   TS_.describe "[sy] - services - filesystem - bridges - cache (manual)" do
 
-    extend TS_
+    TS_[ self ]
 
     it "loads" do
       Subject__[]

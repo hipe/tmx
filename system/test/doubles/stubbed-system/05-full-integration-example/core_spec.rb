@@ -1,16 +1,26 @@
-require_relative '../test-support'
+require_relative '../../../test-support'
 
-module Skylab::System::TestSupport::Doubles_Stubbed_System
+module Skylab::System::TestSupport
 
-  describe "[sy] doubles - mock-sys - 05: full integration example" do
+  module Doubles_StubbedSystem_Namespace
 
-    extend TS_
+    o = TS_.lib_ :doubles_stubbed_system
+
+    Subject__ = o::Subject
+    Path_for__ = o::Path_for
+
+    # <-
+
+  TS_.describe "[sy] doubles - stubbed-system - 05: full integration example" do
+
+    TS_[ self ]
+    o[ self ]
 
     before :all do
 
       class MS_05_Fake_Test_Context
 
-        Subject_[].enhance_client_class self
+        Subject__[].enhance_client_class self
 
         define_method :cache_hash_for_stubbed_system, ( Callback_.memoize do
           {}
@@ -18,7 +28,7 @@ module Skylab::System::TestSupport::Doubles_Stubbed_System
 
         define_method :manifest_path_for_stubbed_system, ( Callback_.memoize do
 
-          Path_for_[ '05-full-integration-example/fixtures/commands.ogdl' ]
+          Path_for__[ '05-full-integration-example/fixtures/commands.ogdl' ]
 
         end )
       end
@@ -71,8 +81,10 @@ module Skylab::System::TestSupport::Doubles_Stubbed_System
       _test_context_instance.stubbed_system_conduit
     end
 
-    define_method :_test_context_instance, ( Callback_.memoize do
+    memoize :_test_context_instance do
       MS_05_Fake_Test_Context.new
-    end )
+    end
+  end
+# ->
   end
 end

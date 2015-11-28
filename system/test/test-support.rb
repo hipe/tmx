@@ -3,45 +3,53 @@ require 'skylab/test_support'
 
 module Skylab::System::TestSupport
 
-  TestSupport_ = ::Skylab::TestSupport
-
-  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
-
-  extend TestSupport_::Quickie
-
   class << self
+
+    def [] tcc  # "test context class"
+
+      tcc.extend Module_Methods__
+      tcc.include Instance_Methods__ ; nil
+    end
 
     def mocks
       TS_::MOCKS
     end
+
+    def tmpdir_path_
+      @___tmpdir_path ||= ___assemble_tmpdir_path
+    end
+
+    def ___assemble_tmpdir_path
+      _path = Home_.services.filesystem.tmpdir_path
+      ::File.join _path, '[sy]'
+    end
+  end  # >>
+
+  cache = {}
+  define_singleton_method :lib_ do | sym |
+    cache.fetch sym do
+      x = TestSupport_.fancy_lookup sym, TS_
+      cache[ sym ] = x
+      x
+    end
   end
 
-  module ModuleMethods
+  TestSupport_ = ::Skylab::TestSupport
 
-    define_method :use, -> do
+  extend TestSupport_::Quickie
 
-      cache_h = {}
+  module Module_Methods__
 
-      -> sym do
+    def use sym
+      TS_.lib_( sym )[ self ]
+    end
 
-        ( cache_h.fetch sym do
+    define_method :memoize, & TestSupport_::MEMOIZE
 
-          const = Callback_::Name.via_variegated_symbol( sym ).as_const
-
-          x = if Test_Support_Bundles_.const_defined? const, false
-            Test_Support_Bundles_.const_get const, false
-          else
-            TestSupport_.fancy_lookup sym, TS_
-          end
-          cache_h[ sym ] = x
-          x
-        end )[ self ]
-      end
-
-    end.call
+    define_method :dangerous_memoize, & TestSupport_::DANGEROUS_MEMOIZE
   end
 
-  module InstanceMethods
+  module Instance_Methods__
 
     def debug!
       @do_debug = true
@@ -82,41 +90,37 @@ module Skylab::System::TestSupport
     end
   end
 
-  module Test_Support_Bundles_
+  # -- test library nodes
 
-    Expect_Event = -> tcc do
+  Expect_Event = -> tcc do
 
-      Callback_.test_support::Expect_Event[ tcc ]
+    Callback_.test_support::Expect_Event[ tcc ]
 
-      tcc.send :define_method,
-          :black_and_white_expression_agent_for_expect_event do
-
-        Home_.lib_.brazen::API.expression_agent_instance
-      end
-    end
-
-    Expect_Line = -> tcc do
-      TestSupport_::Expect_line[ tcc ]
+    tcc.send(
+      :define_method,
+      :black_and_white_expression_agent_for_expect_event,
+    ) do
+      Home_.lib_.brazen::API.expression_agent_instance
     end
   end
+
+  Expect_Line = -> tcc do
+    TestSupport_::Expect_line[ tcc ]
+  end
+
+  # --
 
   Home_ = ::Skylab::System
 
   Callback_ = Home_::Callback_
 
-  class << self
-
-    define_method :tmpdir_path_, ( Callback_.memoize do
-
-      ::File.join( Home_.services.filesystem.tmpdir_path, '[sy]' )  # :+#FS-eek
-    end )
-  end  # >>
+  Callback_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
 
   EMPTY_A_ = [].freeze
   EMPTY_S_ = Home_::EMPTY_S_
-
   NIL_ = Home_::NIL_
-
+  TS_ = self
 end
 
 # (point of history - what used to be this node became [#br-xxx])
+# (which is now [#pl-024] the "fancy lookup" algorithm)

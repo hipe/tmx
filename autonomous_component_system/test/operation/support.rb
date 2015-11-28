@@ -11,7 +11,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     TS_::TestLib_::Memoizer_methods[ self ]
 
-    memoize_ :shoe_model_ do
+    memoize :shoe_model_ do
 
       class Shoe
 

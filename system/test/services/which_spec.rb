@@ -4,7 +4,7 @@ module Skylab::System::TestSupport
 
   describe "[sy] services - which" do
 
-    extend TS_
+    TS_[ self ]
 
     it "works #fragile" do  # an `ed` has to be installed on the system and in the PATH
 

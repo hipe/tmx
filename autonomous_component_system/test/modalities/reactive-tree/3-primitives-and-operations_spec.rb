@@ -82,7 +82,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       attr_reader :kernel_
 
-      dangerous_memoize_ :_shoe_model do
+      shared_subject :_shoe_model do
 
         module ACS_RT_3
 

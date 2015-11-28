@@ -1,10 +1,10 @@
 module Skylab::System::TestSupport
 
-  module Services::Filesystem::Bridges::Path_Tools::Pretty_Path::Support
+  module Services::Filesystem::Bridges::Path_Tools::Pretty_Path
 
     class << self
       def [] tcm
-        tcm.extend ModuleMethods
+        tcm.extend Module_Methods__
 
         tcm.send :define_method, :__parent_subject, ( Callback_.memoize do
           Home_.services.filesystem.path_tools
@@ -14,7 +14,7 @@ module Skylab::System::TestSupport
 
     # <-
 
-  module ModuleMethods
+  module Module_Methods__
 
     def frame & p
       context( & p )

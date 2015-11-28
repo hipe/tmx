@@ -60,7 +60,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       guy.should eql false
     end
 
-    memoize_ :_subject_class do
+    memoize :_subject_class do
 
       class ACS_1_one
 

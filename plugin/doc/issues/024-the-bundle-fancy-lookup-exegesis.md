@@ -1,4 +1,4 @@
-# the bunle fancy lookup exegesis :[024]
+# the bundle fancy lookup exegesis :[024]
 
 
 ## introduction

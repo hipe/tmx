@@ -24,7 +24,7 @@ module Skylab::Brazen::TestSupport
         expect_succeeded
       end
 
-      dangerous_memoize_ :client_class_ do
+      shared_subject :client_class_ do
 
         class CLI_IMC_06 < subject_class_
 

@@ -35,7 +35,7 @@ module Skylab::Brazen::TestSupport
         expect_common_failure_
       end
 
-      dangerous_memoize_ :client_class_ do
+      shared_subject :client_class_ do
 
         class TS_::CLI_IMC_02_zas < subject_class_
 
@@ -74,7 +74,7 @@ module Skylab::Brazen::TestSupport
         expect_common_failure_
       end
 
-      dangerous_memoize_ :client_class_ do
+      shared_subject :client_class_ do
 
         class TS_::CLI_IMC_02_oars < subject_class_
 
@@ -111,7 +111,7 @@ module Skylab::Brazen::TestSupport
         expect_succeeded_with_ '{{ foo -- blearg }}'
       end
 
-      dangerous_memoize_ :client_class_ do
+      shared_subject :client_class_ do
 
         class TS_::CLI_IMC_02_sgs < subject_class_
 
@@ -152,7 +152,7 @@ module Skylab::Brazen::TestSupport
         expect_succeeded_with_ '_x*y*z_'
       end
 
-      dangerous_memoize_ :client_class_ do
+      shared_subject :client_class_ do
 
         class TS_::CLI_IMC_02_tgs < subject_class_
 
@@ -199,7 +199,7 @@ module Skylab::Brazen::TestSupport
         expect_succeeded_with_ 'sure'
       end
 
-      dangerous_memoize_ :client_class_ do
+      shared_subject :client_class_ do
 
         class TS_::CLI_IMC_02_ws1 < subject_class_
 
@@ -246,7 +246,7 @@ module Skylab::Brazen::TestSupport
         expect_succeeded_with_ '(A|B|C)'
       end
 
-      dangerous_memoize_ :client_class_ do
+      shared_subject :client_class_ do
 
         class TS_::CLI_IMC_02_ws2 < subject_class_
 

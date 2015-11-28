@@ -26,7 +26,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       hi.thingo.sym.should eql :is_prockie
     end
 
-    dangerous_memoize_ :_subject_class do
+    shared_subject :_subject_class do
 
       class ACS_7_Via_1
 

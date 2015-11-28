@@ -193,7 +193,7 @@ program = -> stdin, stdout, stderr, pn_s_a, argv do
       opn = fh = nil
       _output = -> do
         opn = ::Pathname.new "#{ ::Dir.tmpdir }/_my_foo_"
-        fh = opn.open 'w'
+        fh = opn.open ::File::WRONLY | ::File::TRUNC | ::File::CREAT
         fh
       end
       _conclude = -> lines_d do

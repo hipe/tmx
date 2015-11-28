@@ -62,7 +62,7 @@ module Skylab::Brazen::TestSupport
         _expect_same_help_screen
       end
 
-      dangerous_memoize_ :client_class_ do
+      shared_subject :client_class_ do
 
         class TS_::CLI_IMC_03 < subject_class_
 

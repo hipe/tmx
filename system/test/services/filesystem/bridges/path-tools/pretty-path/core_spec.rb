@@ -4,8 +4,8 @@ Skylab::TestSupport::Quickie.enable_kernel_describe
 
 describe "[sy] - serivces - filesystem - bridges - path-tools pretty-path" do
 
-  extend Skylab::System::TestSupport
-  use :services_filesystem_bridges_path_tools_pretty_path_support
+  Skylab::System::TestSupport[ self ]
+  use :services_filesystem_bridges_path_tools_pretty_path
 
   frame do
     home '/home/rms'

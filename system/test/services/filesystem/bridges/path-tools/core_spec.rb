@@ -4,7 +4,7 @@ module Skylab::System::TestSupport
 
   describe "[sy] - services - filesystem - bridges - path-tools" do
 
-    extend TS_
+    TS_[ self ]
 
     define_singleton_method :o do |str, capture, *tags|
 

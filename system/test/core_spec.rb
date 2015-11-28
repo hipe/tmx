@@ -4,7 +4,7 @@ module Skylab::System::TestSupport
 
   describe "[sy] system (front) (stub)" do
 
-    extend TS_
+    TS_[ self ]
 
     it "loads" do
       services_

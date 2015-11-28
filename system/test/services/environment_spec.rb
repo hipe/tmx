@@ -4,7 +4,7 @@ module Skylab::System::TestSupport
 
   describe "[sy] services - environment" do
 
-    extend TS_
+    TS_[ self ]
 
     it "any_home_directory_path (#bad-test)" do
 

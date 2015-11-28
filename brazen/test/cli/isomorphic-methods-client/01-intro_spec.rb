@@ -43,7 +43,7 @@ module Skylab::Brazen::TestSupport
         expect_generically_invited
       end
 
-      dangerous_memoize_ :client_class_ do
+      shared_subject :client_class_ do
 
         class TS_::CLI_IMC_01 < subject_class_
 

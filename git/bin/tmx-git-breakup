@@ -14,7 +14,7 @@
 program = -> _, _, stderr, pn_s_a, argv do
 
   exit_status = 0
-  writemode = 'w'.freeze
+  writemode = ::File::WRONLY | ::File::CREAT | ::File::TRUNC
 
   stay = true
 

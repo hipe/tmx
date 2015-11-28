@@ -4,7 +4,7 @@ module Skylab::System::TestSupport
 
   describe "[sy] - services - filesystem - flock first avail[..]" do
 
-    extend TS_
+    TS_[ self ]
 
     it "simple - OK" do
       _init_tmppdir

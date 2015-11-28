@@ -38,7 +38,7 @@ module Skylab::Autonomous_Component_System::TestSupport
         _s_.should match %r(^argument\n +flim-flam +'yes'$)
       end
 
-      dangerous_memoize_ :_s_ do
+      dangerous_memoize :_s_ do
 
         invoke 'waz', '-h'
         flush_to_unstyled_string_contiguous_lines_on_stream :e
@@ -94,7 +94,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       end
     end
 
-    dangerous_memoize_ :_s do
+    dangerous_memoize :_s do
       invoke '-h'
       flush_to_unstyled_string_contiguous_lines_on_stream :e
     end

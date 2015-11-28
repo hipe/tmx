@@ -4,7 +4,7 @@ module Skylab::System::TestSupport
 
   describe "[sy] services - filesystem - bridges - patch - model" do
 
-    extend TS_
+    TS_[ self ]
 
     it 'loads' do
       patch

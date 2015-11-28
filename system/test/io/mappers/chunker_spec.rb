@@ -4,7 +4,7 @@ module Skylab::System::TestSupport
 
   describe "[sy] IO - mappers - chunker" do
 
-    extend TS_
+    TS_[ self ]
 
     it 'chunks' do
 

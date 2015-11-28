@@ -60,7 +60,7 @@ module Skylab::Autonomous_Component_System::TestSupport
     end
 
     Memoizer_methods = -> tcc do
-      TestSupport_::Memoizer_methods[ tcc ]
+      TestSupport_::Memoization_and_subject_sharing[ tcc ]
     end
   end
 

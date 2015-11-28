@@ -1,11 +1,14 @@
 module Skylab::System::TestSupport
 
-  module Doubles::Stubbed_Filesystem::Support
+  module Doubles::Stubbed_Filesystem
+
     def self.[] tcc
 
-      tcc.send :define_singleton_method,
+      tcc.send(
+        :define_singleton_method,
         :dangerous_memoize_,
-        TestSupport_::DANGEROUS_MEMOIZE
+        TestSupport_::DANGEROUS_MEMOIZE,
+      )
 
       tcc.include Instance_Methods___
     end

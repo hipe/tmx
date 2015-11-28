@@ -4,7 +4,7 @@ module Skylab::System::TestSupport
 
   describe "[sy] - filesystem - sessions - tmpfile sessioner" do
 
-    extend TS_
+    TS_[ self ]
 
     it "won't create more directories than it is allowed to" do
 
