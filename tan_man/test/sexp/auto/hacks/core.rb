@@ -1,18 +1,23 @@
-require_relative '../test-support'
+module Skylab::TanMan::TestSupport
 
-module Skylab::TanMan::TestSupport::Sexp::Auto::Hacks
+  module Sexp::Auto::Hacks
 
-  ::Skylab::TanMan::TestSupport::Sexp::Auto[ TS_ = self ]
+    def self.[] tcc
+      Sexp::Auto[ tcc ]
+      tcc.extend Module_Methods___
+      tcc.include Instance_Methods___
+    end
+    # <-
 
-  include Constants
+  module Module_Methods___
 
-  extend TestSupport_::Quickie
+    def use_statement_list_instance_methods__
+      include Statement_List_Instance_Methods___
+    end
 
-  Home_ = Home_
-  TestLib_ = TestLib_
-  EMPTY_S_ = TestLib_::EMPTY_S_
-
-  module ModuleMethods
+    def use_attr_list_instance_methods__
+      include Attr_List_Instance_Methods___
+    end
 
     def add_separating_prototype_to_stmt_list
 
@@ -43,7 +48,7 @@ module Skylab::TanMan::TestSupport::Sexp::Auto::Hacks
 
   end.call
 
-  module Attr_List_I_M___
+  module Attr_List_Instance_Methods___
 
     def insrt asst_to_insert_s
 
@@ -108,7 +113,7 @@ module Skylab::TanMan::TestSupport::Sexp::Auto::Hacks
     end
   end.call
 
-  module Stmt_List_I_M___
+  module Statement_List_Instance_Methods___
 
     def insrt node_to_insert_s
 
@@ -164,7 +169,7 @@ module Skylab::TanMan::TestSupport::Sexp::Auto::Hacks
     end
   end
 
-  module InstanceMethods
+  module Instance_Methods___
 
     def _resolve_graph_sexp
 
@@ -199,5 +204,6 @@ module Skylab::TanMan::TestSupport::Sexp::Auto::Hacks
       node[ k ]
     end
   end
-
+# ->
+  end
 end

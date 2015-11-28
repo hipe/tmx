@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby -w
 
-require_relative 'test-support'
+# (..)
 
-module Skylab::TanMan::TestSupport::Models::DotFile
+module Skylab::TanMan::TestSupport
 
-  class Client
+  class Models::Dot_File::Client
 
     def initialize
       @on_event_selectively = -> * i_a, & ev_p do
@@ -39,5 +39,5 @@ module Skylab::TanMan::TestSupport::Models::DotFile
 end
 
 if __FILE__ == $PROGRAM_NAME
-  ::Skylab::TanMan::TestSupport::Models::DotFile::Client.new.invoke ARGV
+  ::Skylab::TanMan::TestSupport::Models::Dot_File::Client.new.invoke ARGV
 end

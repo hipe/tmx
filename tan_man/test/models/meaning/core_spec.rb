@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::TanMan::TestSupport::Models::Meaning
+module Skylab::TanMan::TestSupport
 
   describe "[tm] models - meaning" do
 
-    extend TS_
+    TS_[ self ]
+    use :models
 
     it "add - shell-style, after, in between - spacing mimics greatest lesser neighbor" do
       s = "digraph{}\n # cutie : patootey\n  # fazinkle: doo-dinkle\n"
@@ -108,8 +109,9 @@ module Skylab::TanMan::TestSupport::Models::Meaning
     end
 
     def _parse_string s
-      require Parent_.dir_pathname.join( 'dot-file/test-support' ).to_path  # meh
-      Parent_::DotFile.client_class.new.parse_string s
+
+      _bruh = TS_.lib_ :models_dot_file
+      _bruh.client_class__.new.parse_string s
     end
 
     it "OMG associate" do

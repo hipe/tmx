@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../../test-support'
 
-module Skylab::TanMan::TestSupport::Models::DotFile::Parsing
+module Skylab::TanMan::TestSupport
 
 describe "[tm] models - dot-file parsing - examples 001 to 489" do
 
-  extend TS_
+  TS_[ self ]
+  use :models_dot_file_parsing
 
   context "parsing an empty digraph" do
 

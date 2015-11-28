@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::TanMan::TestSupport::Models::Node
+module Skylab::TanMan::TestSupport
 
   describe "[tm] models node create" do
 
-    extend TS_
+    TS_[ self ]
+    use :models_node
 
     it "ping the 'node add' action" do
       call_API :node, :add, :ping
@@ -91,7 +92,7 @@ module Skylab::TanMan::TestSupport::Models::Node
     using_input 'simple-prototype-and-graph-with/zero.dot' do
 
       it 'adds a node to zero nodes' do
-        get_node_array.should eql Home_::EMPTY_A_
+        get_node_array.should eql EMPTY_A_
         touch_node_via_label 'feep'
         a = get_node_array
         a.length.should eql 1

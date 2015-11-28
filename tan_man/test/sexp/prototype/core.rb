@@ -1,25 +1,28 @@
-require_relative '../test-support'
+module Skylab::TanMan::TestSupport
 
-module Skylab::TanMan::TestSupport::Sexp::Prototype # #topic-module
+  module Sexp::Prototype
 
-  ::Skylab::TanMan::TestSupport::Sexp[ TS_ = self ]
+    def self.[] tcc
+      Sexp[ tcc ]
+      tcc.include Instance_Methods___
+    end
 
-  include Constants
+    module Instance_Methods___
 
-  extend TestSupport_::Quickie  # if you want it, load the spec file with ruby -w
+      def assemble_fixtures_path_
 
-  Home_ = Home_
-  EMPTY_S_ = Home_::EMPTY_S_
-  NEWLINE_ = TestLib_::NEWLINE_
+        _tail = "sexp/prototype/grammars/#{ grammar_pathpart_ }/fixtures"
 
-  module Grammars
-    Home_::Autoloader_[ self ]
-  end
+        ::File.join TS_.dir_pathname.to_path, _tail
+      end
 
-  module InstanceMethods
+      def grammars_module_
+        Grammars
+      end
+    end
 
-    def grammars_module
-      Grammars
+    module Grammars
+      Home_::Autoloader_[ self ]
     end
   end
 end

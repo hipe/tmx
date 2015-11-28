@@ -13,7 +13,7 @@ module Skylab::TanMan
       end
 
       def __DIRECTORY
-        ::File.join( Home_.sidesys_path_, 'data-documents/starters' ).freeze
+        ::File.join( Home_.sidesystem_path_, 'data-documents/starters' ).freeze
       end
     end  # >>
 

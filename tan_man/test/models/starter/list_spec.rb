@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::TanMan::TestSupport::Models::Starter
+module Skylab::TanMan::TestSupport
 
   describe "[tm] models starter list" do
 
-    extend TS_
+    TS_[ self ]
+    use :models
 
     it "lists the two items, from the filesystem" do
 

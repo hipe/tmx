@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::TanMan::TestSupport::Models::Starter
+module Skylab::TanMan::TestSupport
 
   describe "[tm] models starter get" do
 
-    extend TS_
+    TS_[ self ]
+    use :models
 
     it "'workspace_path' is required (currently)" do
       call_API :starter, :get

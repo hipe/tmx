@@ -1,12 +1,12 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::TanMan::TestSupport::Models::Graph
+module Skylab::TanMan::TestSupport
 
   describe "[tm] models graph use" do
 
-    extend TS_
-
-    TestSupport_::Expect_line[ self ]
+    TS_[ self ]
+    use :expect_line
+    use :models
 
     context "when no workspace" do
 
@@ -164,7 +164,7 @@ module Skylab::TanMan::TestSupport::Models::Graph
             :digraph_path, _file,
             :workspace_path, @ws_pn.to_path, :config_filename, cfn
 
-          @ev_a[ 0 .. -3 ] = Home_::EMPTY_A_
+          @ev_a[ 0 .. -3 ] = EMPTY_A_
 
           expect_OK_event :wrote_file
           expect_OK_event :collection_resource_committed_changes

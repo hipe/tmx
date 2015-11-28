@@ -2000,24 +2000,10 @@ module Skylab::Callback
     CORE_ = 'core'.freeze
     CORE_FILE_ = "#{ CORE_ }#{ EXTNAME_ }".freeze
 
-    # ~ the const_reduce integration
-
-    module Methods__
-      def const_reduce a=nil, & p
-        Autoloader_.const_reduce do |cr|
-          cr.from_module self
-          if a
-            cr.const_path a
-            p and p[ cr ]
-          else
-            p[ cr ]
-          end
-        end
-      end
-    end
+    # ~ the const_reduce integration (see spec for tombstones)
 
     def self.const_reduce *a, &p
-      self::Const_Reduction__::Dispatch[ a, p ]
+      self::Const_Reduction__.new( a, & p ).execute
     end
 
     class Entry_Tree_

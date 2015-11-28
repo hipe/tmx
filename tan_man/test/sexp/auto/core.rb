@@ -1,27 +1,50 @@
-require_relative '../test-support'
+module Skylab::TanMan::TestSupport
 
-::Skylab::TestSupport::Quickie.enable_kernel_describe
+  module Sexp::Auto
 
-module Skylab::TanMan::TestSupport::Sexp::Auto
+    def self.[] tcc
 
-  ::Skylab::TanMan::TestSupport::Sexp[ self ]
+      Sexp[ tcc ]
+      tcc.extend Module_Methods___
+      tcc.include Instance_Methods___
+    end
 
-  module ModuleMethods
+    module Module_Methods___
 
-    def it_unparses_losslessly *tags
-      it "unparses losslessly", *tags do
-        unparse_losslessly
+      def it_unparses_losslessly *tags
+        it SAME___, *tags do
+          unparse_losslessly
+        end
+      end
+
+      SAME___ = "unparses losslessly"
+
+      def it_yields_the_stmts *items
+
+        tags = if items.last.respond_to? :each_pair
+          [ items.pop ]
+        end
+
+        it "yields the #{ items.length } items", *tags do
+
+          a = result.stmt_list.stmts
+
+          a.length.should eql items.length
+
+          a.each_with_index do | x, d |
+            a.fetch( d ).to_s.should eql items.fetch( d )
+          end
+        end
       end
     end
 
-    def it_yields_the_stmts *items
-      tags = ::Hash === items.last ? [items.pop] : [ ]
-      it "yields the #{items.length} items", *tags do
-        a = result.stmt_list.stmts
-        a.length.should eql(items.length)
-        a.each_with_index do |x, i|
-          a[i].to_s.should eql(items[i])
-        end
+    module Instance_Methods___
+
+      def assemble_fixtures_path_
+
+        _tail = "sexp/grammars/#{ grammar_pathpart_ }/fixtures"
+
+        ::File.join TS_.dir_pathname.to_path, _tail
       end
     end
   end

@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::TanMan::TestSupport::Models::Association
+module Skylab::TanMan::TestSupport
 
   describe "[tm] models - association - hear" do
 
-    extend TS_
+    TS_[ self ]
+    use :models_association
 
     it "when all 3 exist already" do
       add_association_to_abstract_graph 'buy almond milk', 'get to the store'

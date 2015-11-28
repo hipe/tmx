@@ -1,10 +1,11 @@
-require_relative 'prototype/test-support'
+require_relative '../test-support'
 
-module Skylab::TanMan::TestSupport::Sexp::Prototype
+module Skylab::TanMan::TestSupport
 
   describe "[tm] sexp prototype" do
 
-    extend TS_
+    TS_[ self ]
+    use :sexp_prototype
 
   # <-
 
@@ -63,7 +64,7 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
 
         exp = 'faeioup ;  fooooop ;  fuuup'
         o.unparse.should eql exp
-        @result.unparse.split( Home_::NEWLINE_ ).last.should eql exp
+        @result.unparse.split( NEWLINE_ ).last.should eql exp
 
         o.insert_item_before_item_string_ 'faeup', 'fooooop'
         o.unparse.should eql 'faeioup ;  faeup ;  fooooop ;  fuuup'
@@ -105,7 +106,7 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
       it "append valid strings - separator semantics because prototype" do
 
         o = result.node_list
-        o.nodes.should eql Home_::EMPTY_A_
+        o.nodes.should eql EMPTY_A_
 
         x = o.append_item_via_string_ 'fiiiiip;'
         x.object_id.should eql o.object_id

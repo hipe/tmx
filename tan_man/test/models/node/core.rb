@@ -1,18 +1,21 @@
-require_relative '../test-support'
+module Skylab::TanMan::TestSupport
 
-module Skylab::TanMan::TestSupport::Models::Node
+  module Models::Node
 
-  ::Skylab::TanMan::TestSupport::Models[ TS_ = self ]
+    def self.[] tcc
+      Models[ tcc ]
+      tcc.include Instance_Methods___
+    end
+    # <-
 
-  include Constants
+  module Instance_Methods___
 
-  extend TestSupport_::Quickie
+    define_method :fixtures_path_, ( Callback_.memoize do
 
-  EMPTY_S_ = TestLib_::EMPTY_S_
-  NEWLINE_ = TestLib_::NEWLINE_
-  Home_ = Home_
+      _path = Models::Node.dir_pathname.to_path
 
-  module InstanceMethods
+      ::File.join _path, FIXTURES_ENTRY_
+    end )
 
     def stmt_list
       _node_collection_controller.at_graph_sexp :stmt_list
@@ -46,10 +49,6 @@ module Skylab::TanMan::TestSupport::Models::Node
       s = ''
       _node_collection_controller.unparse_into s
       s
-    end
-
-    def module_with_subject_fixtures_node
-      TS_
     end
 
     def subject_model_name_i
@@ -102,10 +101,6 @@ module Skylab::TanMan::TestSupport::Models::Node
     end
   end
 
-  H__ = {
-    input_path: :path
-  }
-
   class Mock_Action___
 
     def initialize up_id, k, & oes_p
@@ -122,5 +117,7 @@ module Skylab::TanMan::TestSupport::Models::Node
     def handle_event_selectively
       @oes_p
     end
+  end
+# ->
   end
 end

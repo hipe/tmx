@@ -2,28 +2,7 @@
 
 # -- sweep 3 (smalls) (done)
 
-# -- sweep 4 (tm):
-
-./tan_man/test/api/test-support.rb
-./tan_man/test/models/association/test-support.rb
-./tan_man/test/models/dot-file/manipulating/label/test-support.rb
-./tan_man/test/models/dot-file/manipulating/test-support.rb
-./tan_man/test/models/dot-file/parsing/test-support.rb
-./tan_man/test/models/dot-file/test-support.rb
-./tan_man/test/models/graph/test-support.rb
-./tan_man/test/models/meaning/graph/test-support.rb
-./tan_man/test/models/meaning/test-support.rb
-./tan_man/test/models/node/test-support.rb
-./tan_man/test/models/starter/test-support.rb
-./tan_man/test/models/test-support.rb
-./tan_man/test/models/workspace/test-support.rb
-./tan_man/test/sexp/auto/hacks/test-support.rb
-./tan_man/test/sexp/auto/test-support.rb
-./tan_man/test/sexp/prototype/test-support.rb
-./tan_man/test/sexp/test-support.rb
-
-
-
+# -- sweep 4 (tm) (done)
 
 # -- sweep 5 ([sy], [st], [ts]):
 

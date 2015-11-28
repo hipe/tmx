@@ -1,8 +1,9 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
 describe "[tm] sexp auto list pattern (grammar 25)", g: true do
 
-  extend ::Skylab::TanMan::TestSupport::Sexp::Auto
+  Skylab::TanMan::TestSupport[ self ]
+  use :sexp_auto
 
   using_grammar '25' do
     using_input '200-zero-items' do

@@ -1,12 +1,12 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::TanMan::TestSupport::Models::Association
+module Skylab::TanMan::TestSupport
 
   describe "[tm] models association create" do
 
-    TestSupport_::Expect_line[ self ]
-
-    extend TS_
+    TS_[ self ]
+    use :expect_line
+    use :models_association
 
     it 'ping' do
       call_API :association, :add, :ping
@@ -67,7 +67,7 @@ module Skylab::TanMan::TestSupport::Models::Association
 
       it 'does not associate again redundantly' do
         associate 'alpha', 'gamma'
-        @ev_a[ 0 .. -2 ] = Home_::EMPTY_A_  # hack ignore 3 events
+        @ev_a[ 0 .. -2 ] = EMPTY_A_  # hack ignore 3 events
         expect_neutral_event :document_did_not_change
         expect_neutralled
       end

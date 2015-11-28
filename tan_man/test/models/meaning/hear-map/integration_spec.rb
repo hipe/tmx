@@ -1,12 +1,11 @@
-require_relative '../test-support'
+require_relative '../../../test-support'
 
-module Skylab::TanMan::TestSupport::Models::Meaning
+module Skylab::TanMan::TestSupport
 
   describe "[tm] models - meaning - hear map (integration, [br] frontier)" do
 
-    TestSupport_::Expect_line[ self ]
-
-    extend TS_
+    TS_[ self ]
+    use :expect_line
 
     it "add meaning"
 

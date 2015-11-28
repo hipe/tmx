@@ -1,6 +1,6 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::TanMan::TestSupport::Models::Graph
+module Skylab::TanMan::TestSupport
 
   # the three booleans (input, hereput, output) together have 8 permutations:
   #
@@ -15,7 +15,8 @@ module Skylab::TanMan::TestSupport::Models::Graph
 
   describe "[tm] models - graph - sync" do
 
-    extend TS_
+    TS_[ self ]
+    use :models
 
     it "case 8 - error: no input, no output" do  #  indirectly case 3, case 6, case 7 too
       call_API :graph, :sync
@@ -26,7 +27,7 @@ module Skylab::TanMan::TestSupport::Models::Graph
 
     it "case 4 with input syntax failure" do
 
-      out_a = Home_::EMPTY_A_
+      out_a = EMPTY_A_
       call_API :graph, :sync,
         :input_string, "wazoozle\n",
         :output_path, out_a

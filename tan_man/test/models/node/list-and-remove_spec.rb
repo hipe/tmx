@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::TanMan::TestSupport::Models::Node
+module Skylab::TanMan::TestSupport
 
   describe "[tm] node list and remove" do
 
-    extend TS_
+    TS_[ self ]
+    use :models_node
 
     it "a workspace without a graph value complains & invite" do
 

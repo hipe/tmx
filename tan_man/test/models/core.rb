@@ -1,26 +1,10 @@
-require_relative '../test-support'
+module Skylab::TanMan::TestSupport
 
-module Skylab::TanMan::TestSupport::Models
+  module Models
 
-  ::Skylab::TanMan::TestSupport[ TS_ = self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  Brazen_ = Home_::Brazen_
-
-  Callback_ = Home_::Callback_
-
-  Home_ = Home_
-
-  TestLib_ = TestLib_
-
-  EMPTY_S_ = TestLib_::EMPTY_S_
-
-  NEWLINE_ = TestLib_::NEWLINE_
-
-  module InstanceMethods
+    def self.[] tcc
+      tcc.include self
+    end
 
     # ~ adjunct facet : hearing ( & abstract graphs )
 
@@ -103,7 +87,7 @@ module Skylab::TanMan::TestSupport::Models
     end
 
     def __generate_unique_id_for_label lbl_s
-      s_a = lbl_s.split Home_::SPACE_
+      s_a = lbl_s.split SPACE_
       s_a_ = s_a[ 0, 1 ]
       len = s_a.length
       d = 1
@@ -112,7 +96,7 @@ module Skylab::TanMan::TestSupport::Models
         d += 1
       end
       @__seen_id_h[ s_a_ ] = true
-      s_a_ * TestLib_::UNDERSCORE_
+      s_a_ * UNDERSCORE_
     end
 
     # ~ fixture and prepared dir and file paths
@@ -123,15 +107,19 @@ module Skylab::TanMan::TestSupport::Models
 
       @workspace_path = @ws_pn.to_path  # push up as needed
 
-      ::File.open( dotfile_path, W_ ) do | fh |
+      _graph_path = dotfile_path
+
+      ::File.open _graph_path, ::File::WRONLY | ::File::CREAT do | fh |
         fh.write content_s
       end
 
-      ::File.open( File.join( @workspace_path, cfn_shallow ), W_ ) do | fh |
+      _conf_path = ::File.join @workspace_path, cfn_shallow
+
+      ::File.open _conf_path, ::File::WRONLY | ::File::CREAT do | fh |
         fh.write "[ graph \"#{ THE_DOTFILE__ }\" ]\n"
       end
 
-      nil
+      NIL_
     end
 
     def dotfile_path
@@ -193,7 +181,7 @@ module Skylab::TanMan::TestSupport::Models
 
     def dir sym
       ::File.join( dirs,
-        sym.id2name.gsub( TestLib_::UNDERSCORE_, TestLib_::DASH_ ) )
+        sym.id2name.gsub( UNDERSCORE_, DASH_ ) )
     end
 
     def dirs
@@ -209,9 +197,7 @@ module Skylab::TanMan::TestSupport::Models
       CONFIG_FILENAME_SHALLOW___
     end
     CONFIG_FILENAME_SHALLOW___ = 'tern-mern.conf'
+
+    THE_DOTFILE__ = 'the.dot'
   end
-
-  THE_DOTFILE__ = 'the.dot'
-
-  W_ = 'w'  # track its use
 end

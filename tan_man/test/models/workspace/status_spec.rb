@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::TanMan::TestSupport::Models::Workspace
+module Skylab::TanMan::TestSupport
 
   describe "[tm] models workspace - `status`" do
 
-    extend TS_
+    TS_[ self ]
+    use :models
 
     it "dir w/o config file - is not failure" do
       call_API :status, :path, dirs

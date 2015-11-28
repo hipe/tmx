@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::TanMan::TestSupport::Models::Association
+module Skylab::TanMan::TestSupport
 
   describe "[tm] models association delete" do
 
-    extend TS_
+    TS_[ self ]
+    use :models_association
 
     it "remove when first node not found (no stmt_list)" do
       call_API_against "digraph {\n}\n"

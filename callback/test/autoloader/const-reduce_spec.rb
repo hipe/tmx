@@ -18,27 +18,27 @@ module Skylab::Callback::TestSupport::Autoloader
         Autoloader_.const_reduce( %i( bar_biff baz ), Foo1 ).should eql :some_x
       end
 
-      it "& it is curry friendly - when called with no args you get a proc" do
-        p = Autoloader_.const_reduce.curry[ %i( bar_biff baz) ]
-        p[ Foo1 ].should eql :some_x
-        p[ Foo1 ].should eql :some_x  # important - don't mutate the arg path
-      end
-
       it "& it has an explicit form of syntax (tight form, remote ctx)" do
-        Autoloader_.const_reduce do
-          from_module Foo1
-          const_path %i( bar_biff baz )
-        end.should eql :some_x
+
+        _ = Autoloader_.const_reduce(
+          :from_module, Foo1,
+          :const_path, %i( bar_biff baz ),
+        )
+
+        _.should eql :some_x
       end
 
       it "& it is infinitely extensible (one day) (long form, local ctx)" do
-        s = Autoloader_.const_reduce do |cr|
-          cr.from_module Foo1
-          cr.const_path %i( bar_biff cowabungaa bowzer )
-          cr.else do |name_error|
-            "name_error: #{ name_error.message } (#{ name_error.name })"
-          end
+
+        s = Autoloader_.const_reduce(
+
+          :from_module, Foo1,
+          :const_path, %i( bar_biff cowabungaa bowzer ),
+
+        ) do | name_error |
+          "name_error: #{ name_error.message } (#{ name_error.name })"
         end
+
         s.should match %r(\Aname_error: uninitialized constant #{
           }[A-Za-z:]+::Foo1::Bar_Biff::\( ~ cowabungaa \) \(cowabungaa\))
       end
@@ -113,20 +113,16 @@ module Skylab::Callback::TestSupport::Autoloader
       end
 
       it ".. which allows you to be unobtrusive but induce fuzzily" do
-        n, v = Autoloader_.const_reduce do |cr|
-          cr.assume_is_defined
-          cr.const_path %i( NCSA_Spy )
-          cr.from_module Foo3
-          cr.result_in_name_and_value
-        end
-        n.should eql :NCSA_Spy ; v.should eql :x
-      end
 
-      it "this puppy is also integrated in with the extension methods" do
-        _x = Foo3.const_reduce do |cr|
-          cr.const_path %i( NCSA_Spy )
-        end
-        _x.should eql :x
+        n, x = Autoloader_.const_reduce(
+
+          :assume_is_defined,
+          :const_path, %i( NCSA_Spy ),
+          :from_module, Foo3,
+          :result_in_name_and_value,
+        )
+
+        n.should eql :NCSA_Spy ; x.should eql :x
       end
     end
 
@@ -139,43 +135,46 @@ module Skylab::Callback::TestSupport::Autoloader
       end
 
       it "(loads, has dir_pathname, ancestor chain is not mutated)" do
+
         mod = TS_::Const_Reduce::Fixtures::One_Skorlab
+
         mod.singleton_class.ancestors[ 1 ].should eql ::Module
+
         _s = mod.dir_pathname.to_path
         _s.should match %r(fixtures/one-skorlab\z)
       end
 
       it "with a node that does not autoload, also use iambic form" do
-        n, v = Autoloader_.const_reduce.call_via_iambic( [
+
+        n, x = Autoloader_.const_reduce(
           :core_basename, nil,
-          :do_assume_is_defined, false,
-          :do_result_in_n_and_v, true,
+          :result_in_name_and_value,
           :from_module, TS_::Const_Reduce::Fixtures::One_Skorlab,
-          :path_x, :Infermation_Terktix
-        ] )
+          :path_x, :Infermation_Terktix,
+        )
 
         n.should eql :InfermationTerktix
-        v.name.should match %r(Fixtures::One_Skorlab::InfermationTerktix\z)
+        x.name.should match %r(Fixtures::One_Skorlab::InfermationTerktix\z)
       end
 
       it "the same as above but value only (name correction)" do
-        v = Autoloader_.const_reduce.call_via_iambic( [
+
+        _x = Autoloader_.const_reduce(
           :core_basename, nil,
-          :do_assume_is_defined, false,
           :from_module, TS_::Const_Reduce::Fixtures::Two_Skorlab,
-          :path_x, :Infermation_Terktix
-        ] )
-        v.name.should match %r(Fixtures::Two_Skorlab::InfermationTerktix\z)
+          :path_x, :Infermation_Terktix,
+        )
+        _x.name.should match %r(Fixtures::Two_Skorlab::InfermationTerktix\z)
       end
 
       it "the same as above, but via loading" do
-        v = Autoloader_.const_reduce.call_via_iambic( [
+
+        _x = Autoloader_.const_reduce(
           :core_basename, nil,
-          :do_assume_is_defined, false,
           :from_module, TS_::Const_Reduce::Fixtures::Tre_Skorlab,
           :path_x, :Infermation_Terktix
-        ] )
-        v.name.should match %r(Fixtures::Tre_Skorlab::InfermationTerktix\z)
+        )
+        _x.name.should match %r(Fixtures::Tre_Skorlab::InfermationTerktix\z)
       end
     end
 
@@ -191,4 +190,6 @@ module Skylab::Callback::TestSupport::Autoloader
   end
 end
 
+# :+#tombsone: integration with autoloader methods
+# :+#tombstone: curry
 # :+#tombstone: original issue

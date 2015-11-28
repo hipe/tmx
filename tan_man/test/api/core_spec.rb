@@ -1,10 +1,10 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TanMan::TestSupport::API
+module Skylab::TanMan::TestSupport
 
   describe "[tm] API" do
 
-    extend TS_
+    TS_[ self ]
 
     it "the API is called with `call` - the empty call reports as error" do
       call_API

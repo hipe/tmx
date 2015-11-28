@@ -34,7 +34,7 @@ module Skylab::GitViz
 
     def initialize x, repo
 
-      # note this can be pure business IFF every action is promoted
+      # we are not a controller, just a model IFF every action is promoted
 
       @bundle = x
       @repo = repo

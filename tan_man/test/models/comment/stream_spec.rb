@@ -1,42 +1,18 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::TanMan::TestSupport::Models::Comment
+module Skylab::TanMan::TestSupport
 
-  ::Skylab::TanMan::TestSupport::Models[ TS__ = self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  Home_ = Home_
-
-  EMPTY_S_ = Home_::EMPTY_S_
-  NEWLINE_ = Home_::NEWLINE_
-
-  module ModuleMethods
-    def use _METH_I_
-      define_method :use_method do _METH_I_ end
-    end
-  end
-
-  module InstanceMethods
-    def with s
-      @s = s
-    end
-    def expect * s_a
-      _subject = Home_::Models_::Comment::Line_Stream
-      scn = _subject.send use_method, @s
-      a = []
-      while s = scn.gets
-        a.push s
-      end
-      a.should eql s_a ; nil
-    end
-  end
+  TS_[ self ]
 
   describe "[tm] comment stream" do
 
-    extend TS__
+    class << self
+      def use m
+        define_method :use_method do
+          m
+        end
+      end
+    end  # >>
 
     context "ordinary strings" do
 
@@ -97,6 +73,20 @@ module Skylab::TanMan::TestSupport::Models::Comment
       end
 
       use :of_comment_string
+    end
+
+    def with s
+      @s = s
+    end
+
+    def expect * s_a
+      _subject = Home_::Models_::Comment::Line_Stream
+      scn = _subject.send use_method, @s
+      a = []
+      while s = scn.gets
+        a.push s
+      end
+      a.should eql s_a ; nil
     end
   end
 end

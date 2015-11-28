@@ -22,7 +22,7 @@ module Skylab::TanMan
       @nf ||= Callback_::Name.via_module self
     end
 
-    def sidesys_path_
+    def sidesystem_path_
       @___sidesys_path ||= ::File.expand_path( '../../..', __FILE__ )
     end
   end  # >>

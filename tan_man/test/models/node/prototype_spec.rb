@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::TanMan::TestSupport::Models::Node
+module Skylab::TanMan::TestSupport
 
   describe "[tm] models node prototypes" do
 
-    extend TS_
+    TS_[ self ]
+    use :models_node
 
     using_input 'simple-prototype-and-graph-with/zero.dot' do
 

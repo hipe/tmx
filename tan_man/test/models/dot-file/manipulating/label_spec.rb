@@ -1,10 +1,15 @@
-require_relative 'label/test-support'
+require_relative '../../../test-support'
 
-module Skylab::TanMan::TestSupport::Models::DotFile::Manipulating::Label
+module Skylab::TanMan::TestSupport
 
   describe "[tm] models - dot file - manipulating: labels" do
 
-    extend TS_
+    TS_[ self ]
+    use :models_dot_file
+
+    memoize :fixtures_path_ do
+      ::File.expand_path( '../label/fixtures', __FILE__ )
+    end
 
     using_input '3.0-with-existing-label.dot' do
 
@@ -35,8 +40,9 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Manipulating::Label
 
         removed = result.stmt_list.remove_item_ _retrieve_label_statement
 
-        _expected_s = ::File.read(
-          ::File.join TS_.dir_pathname.to_path, 'fixtures/1.0-with-no-label.dot' )
+        _path = ::File.join fixtures_path_, '1.0-with-no-label.dot'
+
+        _expected_s = read_file_ _path
 
         @result.unparse.should eql _expected_s
 
@@ -46,9 +52,11 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Manipulating::Label
         _retrieve_label_statement.should be_nil
       end
 
-      def _retrieve_label_statement
+      _LABEL = 'label'
+
+      define_method :_retrieve_label_statement do
         result.stmt_list.stmts.detect do |sx|
-          :equals_stmt == sx.class.rule && LABEL__ == sx.lhs.normalized_string
+          :equals_stmt == sx.class.rule && _LABEL == sx.lhs.normalized_string
         end
       end
     end

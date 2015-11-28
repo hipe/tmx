@@ -12,7 +12,7 @@ module Skylab::GitViz
 
           def start create_glyph, * glyphs
 
-            new  glyphs, create_glyph
+            new glyphs, create_glyph
           end
         end  # >>
 

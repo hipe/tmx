@@ -1,23 +1,18 @@
-require_relative '../test-support'
+module Skylab::TanMan::TestSupport
 
-module Skylab::TanMan::TestSupport::Models::Meaning::Graph
+  module Models::Meaning::Graph
 
-  ::Skylab::TanMan::TestSupport::Models::Meaning[ TS_ = self ]
-
-  include Constants
-
-  Home_ = Home_
-
-  extend TestSupport_::Quickie
-
-  module InstanceMethods
-
-    def graph_from * s_pair_a
-
-      Home_::Models_::Meaning::Graph__.new(
-        Home_::Callback_::Stream.via_nonsparse_array( s_pair_a ) do | s, s_ |
-          Home_::Models_::Meaning.new s, s_
-        end )
+    def self.[] tcc
+      tcc.send :define_method, :graph_from, Graph_from_method___
     end
+
+      Graph_from_method___ = -> * s_pair_a do
+
+        _st = Home_::Callback_::Stream.via_nonsparse_array s_pair_a do | s, s_ |
+          Home_::Models_::Meaning.new s, s_
+        end
+
+        Home_::Models_::Meaning::Graph__.new _st
+      end
   end
 end

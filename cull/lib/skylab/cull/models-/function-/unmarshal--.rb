@@ -105,11 +105,11 @@ module Skylab::Cull
 
       def when_one const
 
-        x = Autoloader_.const_reduce do | o |
-          o.from_module @box_mod
-          o.const_path [ const ]
-          # o.result_in_name_and_value  # name is not case-corrected
-        end
+        x = Autoloader_.const_reduce(
+          :from_module, @box_mod,
+          :const_path, [ const ],
+          # :result_in_name_and_value  # name is not case-corrected
+        )
 
         p = Callback_.distill
 

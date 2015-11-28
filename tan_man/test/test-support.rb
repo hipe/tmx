@@ -3,11 +3,32 @@ require 'skylab/test_support'
 
 module Skylab::TanMan::TestSupport
 
-  ::Skylab::TestSupport::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
-
-  Home_ = ::Skylab::TanMan
-
   class << self
+
+    def [] tcc
+      tcc.extend Module_Methods___
+      tcc.include Instance_Methods___
+    end
+
+    def client_proximity_index_
+      @___cpi ||= ___build_CPI
+    end
+
+    def ___build_CPI
+
+      _ = Home_.sidesystem_path_
+
+      TS_::Proximity_Index_.new _, 'client', 'test', TS_
+    end
+
+    cache = {}
+    define_method :lib_ do | sym |
+      cache.fetch sym do
+        x = TestSupport_.fancy_lookup sym, TS_
+        cache[ sym ] = x
+        x
+      end
+    end
 
     def tmpdir_path_
       @___tmpdir_path ||= __build_tmpdir_path
@@ -21,123 +42,20 @@ module Skylab::TanMan::TestSupport
     end
   end  # >>
 
-  module TestLib_
+  Callback_ = ::Skylab::Callback
 
-    sidesys, stdlib = Home_::Autoloader_.at(
-      :build_require_sidesystem_proc,
-      :build_require_stdlib_proc )
+  TestSupport_ = ::Skylab::TestSupport
 
-    define_singleton_method :_memoize, Home_::Callback_::Memoize
+  extend TestSupport_::Quickie
 
-    Basic = sidesys[ :Basic ]
+  TestSupport_::Quickie.enable_kernel_describe
 
-    Base_tmpdir__ = _memoize do
-      Home_.lib_.system.filesystem.tmpdir(
-        :path, TS_.tmpdir_path_,
-        :max_mkdirs, 1 )
-    end
+  Expect_Event__ = Callback_.test_support::Expect_Event
 
-    CLI_lib = -> do
-      HL__[]::CLI
-    end
+  module Module_Methods___
 
-    Constantize = -> x do
-      Home_::Callback_::Name.lib.constantize[ x ]
-    end
-
-    Debug_IO = -> do
-      System[].IO.some_stderr_IO
-    end
-
-    Dev_client = -> do
-      HL__[]::DEV::Client
-    end
-
-    Empty_dir_pn = _memoize do
-      Base_tmpdir__[].tmpdir_via_join 'empty-tmpdir', :max_mkdirs, 2
-    end
-
-    Entity = -> do
-      Home_::Brazen_::Entity
-    end
-
-    File_utils = stdlib[ :FileUtils ]
-
-    FUC = -> do
-      System[].filesystem.file_utils_controller
-    end
-
-    HL__ = sidesys[ :Headless ]
-
-    IO_adapter_spy = -> do
-      HL__[]::TestSupport::IO_Adapter_Spy
-    end
-
-    JSON = stdlib[ :JSON ]
-
-    PP = stdlib[ :PP ]
-
-    String_lib = -> do
-      Basic[]::String
-    end
-
-    Shellwords = stdlib[ :Shellwords ]
-
-    System = -> do
-      HL__[].system
-    end
-
-    Three_IOs = -> do
-      HL__[].system.IO.some_three_IOs
-    end
-
-    TS__ = sidesys[ :TestSupport ]
-
-    Volatile_tmpdir = _memoize do
-      Base_tmpdir__[].tmpdir_via_join 'volatile-tmpdir', :max_mkdirs, 2
-    end
-
-    # ~
-
-    EMPTY_S_ = Home_::EMPTY_S_
-
-    DASH_ = '-'.freeze
-
-    NEWLINE_ = Home_::NEWLINE_
-
-    SPACE_ = Home_::SPACE_
-
-    UNDERSCORE_ = Home_::UNDERSCORE_
-
-  end
-
-  module Constants
-    Callback_ = Home_::Callback_
-    Home_ = Home_
-    TestLib_ = TestLib_
-    TestSupport_  = ::Skylab::TestSupport
-  end
-
-  include Constants # for use here, below
-
-  Callback_ = Callback_
-
-  Expect_Event__ = Home_::Callback_.test_support::Expect_Event
-
-  TestSupport_ = TestSupport_
-
-  module ModuleMethods
-
-    def using_grammar _GRAMMAR_PATHPART_ , *tags, & p
-
-      context "using grammar #{ _GRAMMAR_PATHPART_ }", *tags do
-
-        define_method :using_grammar do
-          _GRAMMAR_PATHPART_
-        end
-
-        module_exec( & p )
-      end
+    def use sym
+      TS_.lib_( sym )[ self ]
     end
 
     def using_input stem, *tags, & p
@@ -194,9 +112,32 @@ module Skylab::TanMan::TestSupport
 
     define_method :ignore_these_events, Expect_Event__::IGNORE_THESE_EVENTS_METHOD
 
+    def shared_subject sym, & p
+      x = nil ; yes = true
+      define_method sym do
+        if yes
+          yes = false
+          x = instance_exec( & p )
+        end
+        x
+      end
+    end
+
+    alias_method :dangerous_memoize, :shared_subject
+
+    def memoize sym, & p
+      x = nil ; yes = true
+      define_method sym do
+        if yes
+          yes = false
+          x = p[]
+        end
+        x
+      end
+    end
   end
 
-  module InstanceMethods
+  module Instance_Methods___
 
     include Expect_Event__::Test_Context_Instance_Methods
 
@@ -229,11 +170,11 @@ module Skylab::TanMan::TestSupport
     end
 
     def result
-      @did_resolve_result ||= __resolve_result
+      @did_resolve_result ||= ___resolve_result
       @result
     end
 
-    def __resolve_result
+    def ___resolve_result
       @result = produce_result
       true
     end
@@ -250,8 +191,8 @@ module Skylab::TanMan::TestSupport
     end
 
     def __resolve_grammar_class
-      granule_s = using_grammar
-      mod = grammars_module
+      granule_s = grammar_pathpart_
+      mod = grammars_module_
       desired_module_const_i = bld_grammar_const granule_s
       if ! mod.const_defined? desired_module_const_i
         _BASE_PN_ = mod.dir_pathname.join granule_s
@@ -269,12 +210,17 @@ module Skylab::TanMan::TestSupport
     CLIENT___ = 'client'
 
     def bld_grammar_const granule_s
+
       md = GRANULE_TO_CONST_RX__.match granule_s
-      _underscore_separated_zero_padded_integer_segment_sequence =
-        md[ :num ].gsub TestLib_::DASH_, TestLib_::UNDERSCORE_
-      rest_s = md[ :rest ] and rest_s = "_#{ TestLib_::Constantize[ rest_s ] }"
-      :"Grammar#{
-        _underscore_separated_zero_padded_integer_segment_sequence }#{ rest_s }"
+
+      _number_part = md[ :num ].gsub DASH_, UNDERSCORE_
+
+      rest_s = md[ :rest ]
+      if rest_s
+        rest_s = "_#{ Callback_::Name.lib.constantize[ rest_s ] }"
+      end
+
+      :"Grammar#{ _number_part }#{ rest_s }"
     end
 
     GRANULE_TO_CONST_RX__ = /\A(?<num>\d+(?:-\d+)*)(?:-(?<rest>.+))?\z/
@@ -358,12 +304,16 @@ module Skylab::TanMan::TestSupport
     end
 
     def build_input_file_path
-      module_with_subject_fixtures_node.dir_pathname.
-        join( "fixtures/#{ input_file_granule }" ).to_path
+
+      _head = fixtures_path_
+
+      _tail = input_file_granule
+
+      ::File.join _head, _tail
     end
 
-    def module_with_subject_fixtures_node
-      @grammar_class
+    def fixtures_path_
+      ::File.join @grammar_path.dir_pathname.to_path, FIXTURES_ENTRY_
     end
 
     def produce_result_via_parse_method_i
@@ -420,26 +370,78 @@ module Skylab::TanMan::TestSupport
     CONFIG_FILENAME_THAT_IS_NOT_A_DOTFILE_FOR_VISIBILITY__ = "#{
       CONFIG_DIRNAME_THAT_IS_NOT_A_DOTFILE_FOR_VISIBILITY__ }/conf.conf".freeze
 
+
+    # ~ fs
+
+    def read_file_ path
+      ::File.open( path, ::File::RDONLY ).read
+    end
   end
 
+  Expect_Line = -> tcc do
+    TestSupport_::Expect_line[ tcc ]
+  end
+
+  Autoloader_ = Callback_::Autoloader
+
   module Fixtures
-    Callback_::Autoloader[ self ]
+    Autoloader_[ self ]
 
     module Dirs
-      Callback_::Autoloader[ self ]
+      Autoloader_[ self ]
     end
 
     module Graphs
       class << self
         def [] sym
           dir_pathname.join(
-            "#{ sym.id2name.gsub( Home_::UNDERSCORE_, Home_::DASH_ ) }.dot"
+            "#{ sym.id2name.gsub( UNDERSCORE_, DASH_ ) }.dot"
           ).to_path
         end
       end
-      Callback_::Autoloader[ self ]
+      Autoloader_[ self ]
     end
   end
 
+  module TestLib_
+
+    stdlib, = Autoloader_.at(
+      :build_require_stdlib_proc,
+    )
+
+    define_singleton_method :_memoize, Callback_::Memoize
+
+    base_tmpdir = _memoize do
+      Home_.lib_.system.filesystem.tmpdir(
+        :path, TS_.tmpdir_path_,
+        :max_mkdirs, 1 )
+    end
+
+    Empty_dir_pn = _memoize do
+      base_tmpdir[].tmpdir_via_join 'empty-tmpdir', :max_mkdirs, 2
+    end
+
+    PP = stdlib[ :PP ]
+
+    Volatile_tmpdir = _memoize do
+      base_tmpdir[].tmpdir_via_join 'volatile-tmpdir', :max_mkdirs, 2
+    end
+  end
+
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
+  Home_ = ::Skylab::TanMan
+
+  ACHIEVED_ = true
+  DASH_ = Home_::DASH_
+  EMPTY_A_ = Home_::EMPTY_A_
+  EMPTY_S_ = Home_::EMPTY_S_
+  IDENTITY_= -> x { x }
+  FIXTURES_ENTRY_ = 'fixtures'
+  NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
+  SPACE_ = Home_::SPACE_
+  TS_ = self
+  UNDERSCORE_ = Home_::UNDERSCORE_
+
 end

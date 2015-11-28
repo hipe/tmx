@@ -47,7 +47,7 @@ module Skylab::GitViz::TestSupport
 
       invoke 'hi', '--', '46', _the_path
 
-       __expect_day_view_dots
+      __expect_day_view_dots
     end
 
     it "SHIFT VIEW!" do

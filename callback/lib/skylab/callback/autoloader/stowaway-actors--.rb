@@ -265,13 +265,18 @@ module Skylab::Callback
       end
 
       def when_is_different  # near :+[#ba-034]
+
         const_a = @mod.name.split CONST_SEP_
+
         const_a[ - ( @existant_a.length ) .. -1 ] = EMPTY_A_
+
         _mod = Const_value_via_parts[ const_a ]
-        _mod_ = Autoloader.const_reduce do |cr|
-          cr.from_module _mod
-          cr.const_path @imagined_a
-        end
+
+        _mod_ = Autoloader.const_reduce(
+          :from_module, _mod,
+          :const_path, @imagined_a,
+        )
+
         _mod_.entry_tree
       end
     end

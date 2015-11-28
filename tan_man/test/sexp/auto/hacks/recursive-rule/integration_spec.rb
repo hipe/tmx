@@ -1,14 +1,15 @@
-require_relative '../test-support'
+require_relative '../../../../test-support'
 
-module Skylab::TanMan::TestSupport::Sexp::Auto::Hacks
+module Skylab::TanMan::TestSupport
 
   describe "[tm] sexp - auto - hacks - recursive rule (with production grammar)", g: true do
 
-    extend TS_
+    TS_[ self ]
+    use :sexp_auto_hacks
 
     context "against a `stmt_list`" do
 
-      include Stmt_List_I_M___
+      use_statement_list_instance_methods__
 
       context "against zero items, prototype with separator semantics" do
 
@@ -71,7 +72,7 @@ module Skylab::TanMan::TestSupport::Sexp::Auto::Hacks
 
     context "against an `attr_list`" do
 
-      include Attr_List_I_M___
+      use_attr_list_instance_methods__
 
       context "against zero items" do
 

@@ -1,10 +1,11 @@
-require_relative 'graph/test-support'
+require_relative '../../test-support'
 
-module Skylab::TanMan::TestSupport::Models::Meaning::Graph
+module Skylab::TanMan::TestSupport
 
   describe "[tm] models - meaning graph (resolving (i.e expand NT into N T's))" do
 
-    extend TS_
+    TS_[ self ]
+    use :models_meaning_graph
 
     context "with an empty graph" do
 

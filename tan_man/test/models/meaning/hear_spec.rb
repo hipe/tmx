@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::TanMan::TestSupport::Models::Meaning
+module Skylab::TanMan::TestSupport
 
   describe "[tm] models - meaning - hear" do
 
-    extend TS_
+    TS_[ self ]
+    use :models
 
     it "`foo means bar` assigns a heretofor unknown meaning (OMG OMG OMG)" do
 

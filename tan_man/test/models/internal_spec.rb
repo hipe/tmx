@@ -1,16 +1,10 @@
-require_relative 'test-support'
+require_relative '.././test-support'
 
-module Skylab::TanMan::TestSupport::Models::Internal
-
-  ::Skylab::TanMan::TestSupport::Models[ TS_ = self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
+module Skylab::TanMan::TestSupport
 
   describe "[tm] internal models" do
 
-    extend TS_
+    TS_[ self ]
 
     context "the `paths` node (and more importantly, procs as nodes)" do
 

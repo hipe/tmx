@@ -1,10 +1,10 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TanMan::TestSupport::Models
+module Skylab::TanMan::TestSupport
 
   describe "[tm] models - the hear front" do
 
-    extend TS_
+    TS_[ self ]
 
     it "unrecognized input" do
       call_API :hear, :word, [ 'zing', 'zang' ]

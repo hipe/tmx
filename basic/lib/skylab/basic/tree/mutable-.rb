@@ -40,6 +40,27 @@ module Skylab::Basic
 
       # ~ readers
 
+      def winnow path_s  # find closest match. result is that node plus scan
+
+        wahoo_p = -> node, st do
+          [ st, node ]
+        end
+
+        x = Tree_::Actors__::Fetch_or_touch.new self do
+
+          @fetch_or_touch = :fetch
+          @path_x = path_s
+          @result_tuple_proc = wahoo_p
+          @when_not_found = wahoo_p
+
+        end.execute
+
+        if ! x
+          self._SANITY
+        end
+        x
+      end
+
       def to_classified_stream_for i, * x_a
 
         _expad( x_a, i )::Actors::Build_classified_stream.call_via_iambic x_a
@@ -89,13 +110,10 @@ module Skylab::Basic
 
       def fetch_node path_x, & else_p  # #todo covered only by [gv]
 
-        me = self
-
-        Tree_::Actors__::Fetch_or_touch.new do
-          @path_x = path_x
-          @x_p = else_p
-          @node = me
+        Tree_::Actors__::Fetch_or_touch.new self do
           @fetch_or_touch = :fetch
+          @path_x = path_x
+          @when_not_found = else_p
 
         end.execute
       end
@@ -164,20 +182,22 @@ module Skylab::Basic
 
       def touch_node path_x, * x_a, & node_payload_p
 
-        me = self
-        ok = nil
-        o = Tree_::Actors__::Fetch_or_touch.new do
+        o = Tree_::Actors__::Fetch_or_touch.new self do
           @path_x = path_x
-          @x_p = node_payload_p
-          @node = me
+          @node_payload_proc = node_payload_p
           @fetch_or_touch = :touch
-          ok = if x_a.length.zero?
-            ACHIEVED_
-          else
-            process_iambic_fully x_a
-          end
         end
-        ok && o.execute
+
+        ok = if x_a.length.zero?
+          ACHIEVED_
+        else
+          o.process_iambic_fully x_a
+        end
+        if ok
+          o.execute
+        else
+          ok
+        end
       end
 
       def path_separator  # #hook-out for above

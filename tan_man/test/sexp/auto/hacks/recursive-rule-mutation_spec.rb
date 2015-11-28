@@ -1,8 +1,9 @@
-require_relative 'test-support'
+require_relative '../../../test-support'
 
 describe "[tm] sexp - auto - hacks - mutation", g: true do
 
-  extend ::Skylab::TanMan::TestSupport::Sexp::Auto::Hacks
+  Skylab::TanMan::TestSupport[ self ]
+  use :sexp_auto_hacks
 
   using_grammar '70-75-minimal-recursive-list' do
 
@@ -29,11 +30,13 @@ describe "[tm] sexp - auto - hacks - mutation", g: true do
 
       context 'remove', remove: true do
 
+        o = Skylab::TanMan::TestSupport
+
         it 'the only (and hence last) item, yielding a stub' do
           removed_x = result.remove_item_via_string_ 'fip'
-          node_s_a.should eql ::Skylab::TanMan::EMPTY_A_
+          node_s_a.should eql o::EMPTY_A_
           removed_x.should eql 'fip'
-          result.unparse.should eql ::Skylab::TanMan::EMPTY_S_
+          result.unparse.should eql o::EMPTY_S_
         end
       end
     end

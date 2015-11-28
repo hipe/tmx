@@ -1,8 +1,9 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
 describe "[tm] sexp auto list pattern (grammar 12)", g: true do
 
-  extend ::Skylab::TanMan::TestSupport::Sexp::Auto
+  Skylab::TanMan::TestSupport[ self ]
+  use :sexp_auto
 
   def self.it_trees_as arr, *tags
     it "it trees as #{arr.map{ |a| a.join(',') }.join(';')}", *tags do

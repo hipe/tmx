@@ -1,18 +1,18 @@
-require_relative '../test-support'
+module Skylab::TanMan::TestSupport
 
-module Skylab::TanMan::TestSupport::Models::DotFile::Parsing
+  module Models::Dot_File::Parsing
 
-  Skylab::TanMan::TestSupport::Models::DotFile[ TS_ = self ]
+    def self.[] tcc
 
-  include Constants
+      Models::Dot_File[ tcc ]
 
-  extend TestSupport_::Quickie
-
-  module InstanceMethods
-
-    def module_with_subject_fixtures_node
-      TS_
+      tcc.include self
     end
+
+    define_method :fixtures_path_, ( Callback_.memoize do
+
+      ::File.expand_path "../#{ FIXTURES_ENTRY_ }", __FILE__
+    end )
 
     def expect_digraph_document_sexp
       x = result
@@ -25,7 +25,7 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Parsing
         fail "expected containing moudle to be '#{ SEXPS__ }', had #{ part }"
       end
     end
-  end
+    # <-
 
   Parent_module_name__ = -> do  # (is in and belongs in neither [ba] nor [br])
     rx = /[^:]+(?=::[^:]+\z)/
@@ -36,5 +36,8 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Parsing
 
   SEXPS__ = 'Sexps'
 
+  # ->
+
+  end
 end
 # (WAS reference: http://solnic.eu/2014/01/14/custom-rspec-2-matchers.html)
