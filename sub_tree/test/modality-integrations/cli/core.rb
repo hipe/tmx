@@ -1,19 +1,50 @@
-require_relative 'test-support'
+module Skylab::SubTree::TestSupport
 
-module Skylab::SubTree::TestSupport::Modality_Integrations::CLI
-
-  module Expect_expression
+  module Modality_Integrations::CLI
 
     class << self
 
-      def [] test_context_module
+      def [] tcc, * x_a
 
-        test_context_module.include Instance_Methods
-        NIL_
+        tcc.include self
+
+        x_a.each do | sym |
+
+          _const = Callback_::Name.via_variegated_symbol( sym ).as_const
+
+          Here_.const_get( _const, false )[ tcc ]
+        end
+
       end
     end  # >>
 
-    module Instance_Methods
+    # -- hook-ins/outs for expect stdout stderr
+
+    def subject_CLI
+      Home_::CLI
+    end
+
+    define_method :invocation_strings_for_expect_stdout_stderr, -> do
+      a = [ 'stcli' ].freeze
+      -> do
+        a
+      end
+    end.call
+
+    # --
+
+    module Expect_Expression
+
+      class << self
+
+        def [] tcc
+          tcc.include self
+        end
+
+        def instance_methods_module__
+          self
+        end
+      end  # >>
 
       include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
 
@@ -43,5 +74,7 @@ module Skylab::SubTree::TestSupport::Modality_Integrations::CLI
         @exitstatus.should be_zero
       end
     end
+
+    Here_ = self
   end
 end

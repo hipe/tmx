@@ -4,7 +4,7 @@ module Skylab::SubTree::TestSupport
 
   describe "[st] output adapters - minimal" do
 
-    extend TS_
+    TS_[ self ]
 
     it "works" do
 

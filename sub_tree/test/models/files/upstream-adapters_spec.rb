@@ -1,17 +1,18 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::SubTree::TestSupport::Models_Files
+module Skylab::SubTree::TestSupport
 
   describe "[st] models - files - upstream adapters" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
+    use :models_files
 
     it "stdin and file - can't read from both stdin and file" do
 
       call_API :files,
         :file_of_input_paths, :x,
-        :input_stream, Mock_noninteractive_IO_[],
+        :input_stream, mock_noninteractive_IO_,
         :output_stream, :x
 
       _ev = expect_not_OK_event
@@ -45,7 +46,7 @@ module Skylab::SubTree::TestSupport::Models_Files
 
       call_API :files, :path, [ 'a' ],
         :file_of_input_paths, :x,
-        :input_stream, Mock_noninteractive_IO_[],
+        :input_stream, mock_noninteractive_IO_,
         :output_stream, :x
 
       _ev = expect_not_OK_event
@@ -71,7 +72,7 @@ module Skylab::SubTree::TestSupport::Models_Files
 
       expect_succeeded
 
-      io.string.should eql PRETTY_
+      io.string.should eql _PRETTY_
 
       fh.should be_closed
     end
@@ -86,7 +87,7 @@ module Skylab::SubTree::TestSupport::Models_Files
 
       expect_succeeded
 
-      io.string.should eql PRETTY_
+      io.string.should eql _PRETTY_
     end
 
     it "from path (using find) with funky path" do

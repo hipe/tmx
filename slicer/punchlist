@@ -6,11 +6,6 @@
 
 # -- sweep 5 ([sy], [st], [ts]):
 
-./sub_tree/test/modality-integrations/cli/test-support.rb
-./sub_tree/test/models/file-coverage/test-support.rb
-./sub_tree/test/models/files/modalities/cli/test-support.rb
-./sub_tree/test/models/files/test-support.rb
-
 ./test_support/test/doc-test/input-adapters/test-support.rb
 ./test_support/test/doc-test/integration/cli/test-support.rb
 ./test_support/test/doc-test/models-front-actions/generate/integration/test-support.rb

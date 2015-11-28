@@ -4,7 +4,7 @@ module Skylab::SubTree::TestSupport
 
   describe "[st] models (core)" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
 
     it "loads." do

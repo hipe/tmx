@@ -1,12 +1,12 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::SubTree::TestSupport::Models_File_Coverage
+module Skylab::SubTree::TestSupport
 
   describe "[st] models - file-coverage" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
-    use :expect_node_characteristics
+    use :models_file_coverage, :expect_node_characteristics
 
     it "no path argument - exception" do
 
@@ -20,13 +20,16 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
     it "easy boogie against the project tree" do
 
-      _against_path Fixture_tree_[ :one ]
+      _against_path _one
       _common_result_for_one
     end
 
     it "easy boogie against the asset file" do
 
-      _against_path ::File.join( _one, 'foo.rb' )
+      _path = ::File.join _one, 'foo.rb'
+
+      _against_path _path
+
       _common_result_for_one
     end
 
@@ -48,7 +51,7 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
     end
 
     def _one
-      Fixture_tree_[ :one ]
+      fixture_tree_top_dir_for_ :one
     end
 
     it "sub-tree under the test dir (counterparted)" do
@@ -80,8 +83,7 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
     # sub-tree within test dir (no counterpart) :+#skipped-because-boring
 
     def _three
-
-      Fixture_tree_[ :three ]
+      fixture_tree_top_dir_for_ :three
     end
 
     def _common_result_for_three

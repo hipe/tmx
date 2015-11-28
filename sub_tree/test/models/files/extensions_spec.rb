@@ -1,11 +1,12 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::SubTree::TestSupport::Models_Files
+module Skylab::SubTree::TestSupport
 
   describe "[st] models - files - extensions" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
+    use :models_files
 
     _MTIME = "\\d+ [acdehikmnorswy]{1,3}"
 

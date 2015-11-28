@@ -1,10 +1,13 @@
-require_relative 'test-support'
+require_relative '../../../../test-support'
 
-module Skylab::SubTree::TestSupport::Models_Files::The_CLI_Modality
+module Skylab::SubTree::TestSupport
 
   describe "[st] models - files - CLI - cannon" do
 
-    extend TS_
+    TS_[ self ]
+    use :models_files_modalities_CLI
+
+    define_method :expect, instance_method( :expect )  # because rspec
 
     it "1.2 : one unrec opt : msg / usage / invite" do
 

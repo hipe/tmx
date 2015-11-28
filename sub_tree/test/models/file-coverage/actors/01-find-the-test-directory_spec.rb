@@ -1,11 +1,12 @@
-require_relative '../test-support'
+require_relative '../../../test-support'
 
-module Skylab::SubTree::TestSupport::Models_File_Coverage
+module Skylab::SubTree::TestSupport
 
   describe "[st] models - file-coverage - 01: find the test directory" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
+    use :models_file_coverage
 
     it "against an asset file when the root dir is not found" do
 
@@ -105,9 +106,9 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
       check and check[ unb ]
 
-      bnd = unb.new Kernel_stub_[] , & handle_event_selectively
+      bnd = unb.new kernel_stub_, & handle_event_selectively
 
-      bnd.instance_variable_set :@nc, Name_conventions_[]
+      bnd.instance_variable_set :@nc, name_conventions_
       bnd.instance_variable_set :@be_verbose, false
       @__bound__ = bnd
       sess[]
@@ -127,10 +128,15 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
     # ~ test assertion
 
-    def expect_that_the_root_is_found
+    fixed = nil
+    define_method :expect_that_the_root_is_found do
 
-      _s = @__bound__.instance_variable_get( :@test_dir )
-      TEST__ == _s[ - TEST__.length .. -1 ] or fail
+      fixed ||= _TEST
+
+      _s = @__bound__.instance_variable_get :@test_dir
+
+      fixed == _s[ - fixed.length .. -1 ] or fail
+
       expect_succeeded
     end
   end

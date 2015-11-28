@@ -1,12 +1,11 @@
-require_relative '../test-support'
+require_relative '../../../test-support'
 
-module Skylab::SubTree::TestSupport::Models_File_Coverage
+module Skylab::SubTree::TestSupport
 
   describe "[st] models - file-coverage - modalities - CLI" do
 
-    extend TS_
-
-    use :expect_stdin_stdout
+    TS_[ self ]
+    use :models_file_coverage, :expect_stdin_stdout
 
     it "2.2 - help infixed - ambiguity!" do
 
@@ -58,10 +57,11 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
     def _path sym, s=nil
 
+      head = fixture_tree_test_dir_for_ sym
       if s
-        ::File.join Fixture_tree_[ sym ], s
+        ::File.join head, s
       else
-        Fixture_tree_[ sym ]
+        head
       end
     end
 

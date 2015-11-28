@@ -1,14 +1,15 @@
 # encoding: utf-8
 
-require_relative 'test-support'
+require_relative '../../../../test-support'
 
-module Skylab::SubTree::TestSupport::Models_Files::The_CLI_Modality
+module Skylab::SubTree::TestSupport
 
   # <-
 
 describe "[st] models - files - modalities - CLI - expression" do
 
-  extend TS_
+  TS_[ self ]
+  use :models_files_modalities_CLI
 
   it "this magic example that brought it all home (the pink paper sessions)" do
 

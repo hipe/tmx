@@ -1,20 +1,14 @@
-require_relative '../../test-support'
+module Skylab::SubTree::TestSupport
 
-module Skylab::SubTree::TestSupport::Models_Files::The_CLI_Modality
+  module Models::Files::Modalities::CLI
 
-  ::Skylab::SubTree::TestSupport::Models_Files[ TS_ = self ]
+    def self.[] tcc
+      tcc.include self
+    end
 
-  include Constants
+    _ = TS_.lib_ :modality_integrations_CLI_expect_expression
 
-  extend TestSupport_::Quickie
-
-  Home_ = Home_
-
-  module InstanceMethods
-
-    include Home_::TestSupport::Modality_Integrations::CLI::Expect_expression::Instance_Methods
-
-    define_method :expect, instance_method( :expect )  # because rspec
+    include _.instance_methods_module__
 
     # ~ ad-hoc DSL (for one file currently)
 

@@ -1,13 +1,12 @@
-require_relative '../../test-support'
+require_relative '../../../../test-support'
 
-module Skylab::SubTree::TestSupport::Models_File_Coverage
+module Skylab::SubTree::TestSupport
 
   describe "[st] models - file-coverage - 03: build compound tree - for single file" do
 
-    extend TS_
-
+    TS_[ self ]
     use :expect_event
-    use :build_compound_tree
+    use :models_file_coverage, :build_compound_tree
 
     it "of single test with counterpart" do
 
@@ -104,7 +103,7 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
     def test_dir_for_build_compound_tree
 
-      Fixture_tree_test_dir_for_[ :two ]
+      fixture_tree_test_dir_for_ :two
     end
   end
 end

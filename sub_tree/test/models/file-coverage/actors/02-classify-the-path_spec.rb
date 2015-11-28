@@ -1,11 +1,12 @@
-require_relative '../test-support'
+require_relative '../../../test-support'
 
-module Skylab::SubTree::TestSupport::Models_File_Coverage
+module Skylab::SubTree::TestSupport
 
   describe "[st] models - file-coverage - 02: classify the path" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
+    use :models_file_coverage
 
     it "path does not exist" do
 
@@ -93,7 +94,7 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
     def where
       yield
-      @result = Subject_[]::Actors_::Classify_the_path[
+      @result = subject_::Actors_::Classify_the_path[
         @test_dir, @path, & handle_event_selectively ]
       NIL_
     end

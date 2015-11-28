@@ -2,45 +2,37 @@ require 'skylab/sub_tree'
 
 module Skylab::SubTree::TestSupport
 
-  Home_ = ::Skylab::SubTree
-  Autoloader_ = Home_::Autoloader_
+  class << self
 
+    def [] tcc  # "test context class"
+      tcc.extend Module_Methods___
+      tcc.include Instance_Methods___
+    end
+
+    cache = {}
+    define_method :lib_ do | sym |
+      cache.fetch sym do
+        x = TestSupport_.fancy_lookup sym, TS_
+        cache[ sym ] = x
+        x
+      end
+    end
+  end  # >>
+
+  Callback_ = ::Skylab::Callback
+  Autoloader_ = Callback_::Autoloader
   TestSupport_ = Autoloader_.require_sidesystem :TestSupport
-
-  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
-
-  module Constants
-    Home_ = Home_
-    TestSupport_ = TestSupport_
-  end
 
   extend TestSupport_::Quickie
 
-  module ModuleMethods
+  module Module_Methods___
 
-    def use sym
-
-      const_i = Callback_::Name.via_variegated_symbol( sym ).as_const
-      mod = nearest_test_node
-
-      begin
-
-        if mod.const_defined? const_i, false
-          found = mod.const_get const_i
-          break
-        end
-
-        mod = mod.parent_anchor_module
-
-        redo
-      end while nil
-
-      found[ self ]
-      NIL_
+    def use sym, * x_a
+      TS_.lib_( sym )[ self, * x_a ]
     end
   end
 
-  module InstanceMethods
+  module Instance_Methods___
 
     attr_reader :do_debug
 
@@ -52,45 +44,42 @@ module Skylab::SubTree::TestSupport
       TestSupport_.debug_IO
     end
 
-    define_method :fixture_tree, -> do
-      h = {}
+    _MID = 'fixture-trees'
+    define_method :fixture_tree, ( -> do
+      cache = {}
       -> sym do
-        h.fetch sym do
-          h[ sym ] = TS_.dir_pathname.join(
-            "fixture-trees/#{ sym.id2name.gsub UNDERSCORE_, DASH_ }" ).
-              to_path.freeze
+        cache.fetch sym do
+
+          x = ::File.join(
+            TS_.dir_pathname.to_path,
+            _MID,
+            sym.id2name.gsub( UNDERSCORE_, DASH_ ),
+          ).freeze
+
+          cache[ sym ] = x
+          x
         end
       end
-    end.call
+    end ).call
 
     def subject_API
       Home_::API
     end
   end
 
-  Expect_Event = -> tcm do
+  Expect_Event = -> tcc do
 
-    tcm.include Callback_.test_support::Expect_event::Test_Context_Instance_Methods
-
+    tcc.include Callback_.test_support::Expect_event::Test_Context_Instance_Methods
   end
 
-  Callback_ = Home_::Callback_
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
+  Home_ = ::Skylab::SubTree
 
   DASH_ = Home_::DASH_
-
+  EMPTY_A_ = Home_::EMPTY_A_
   EMPTY_S_ = Home_::EMPTY_S_
-
-  UNDERSCORE_ = Home_::UNDERSCORE_
-
-  module Constants
-    Callback_ = Callback_
-    DASH_ = DASH_
-    EMPTY_A_ = Home_::EMPTY_A_
-    EMPTY_S_ = EMPTY_S_
-    NIL_ = Home_::NIL_
-    Top_TS_ = TS_
-    UNDERSCORE_ = UNDERSCORE_
-  end
-
   NIL_ = nil
+  TS_ = self
+  UNDERSCORE_ = Home_::UNDERSCORE_
 end

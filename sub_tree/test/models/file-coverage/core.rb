@@ -1,12 +1,83 @@
-require_relative '../../test-support'
+module Skylab::SubTree::TestSupport
 
-module Skylab::SubTree::TestSupport::Models_File_Coverage
+  module Models::File_Coverage
 
-  ::Skylab::SubTree::TestSupport[ TS_ = self, :filename, 'models/file-coverage' ]
+    def self.[] tcc, * x_a
 
-  include Constants
+      tcc.include self
 
-  extend TestSupport_::Quickie
+      x_a.each do | sym |
+        _const = Callback_::Name.via_variegated_symbol( sym ).as_const
+        Here_.const_get( _const, false )[ tcc ]
+      end
+
+      NIL_
+    end
+
+    -> do
+
+      _FIXTURE_TREE = 'fixture-trees'
+
+      path = -> do
+        cache = {}
+        -> sym do
+          cache.fetch sym do
+
+            x = ::File.join(
+              TS_.dir_pathname.to_path,
+              _FIXTURE_TREE,
+              sym.id2name,
+            ).freeze
+
+            cache[ sym ] = x
+            x
+          end
+        end
+      end.call
+
+      _TEST = 'test'
+
+      define_method :fixture_tree_test_dir_for_ do | sym |
+        ::File.join path[ sym ], _TEST
+      end
+
+      define_method :fixture_tree_top_dir_for_, path
+
+    end.call
+
+    define_method :kernel_stub_, ( -> do
+
+      p = -> do
+        x = class Kernel_Stub
+
+          def reactive_tree_seed
+            self._ONLY_for_respond_to
+          end
+
+          self
+        end.new.freeze
+        p = -> { x }
+        x
+      end
+      -> do
+        p[]
+      end
+    end ).call
+
+    def name_conventions_
+      Name_conventions__[]
+    end
+
+    def subject_
+      Subject__[]
+    end
+
+    _TEST = 'test'.freeze
+    define_method :_TEST do
+      _TEST
+    end
+
+    # <-
 
   module Build_Compound_Tree
 
@@ -18,13 +89,15 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
 
     def against t_or_a, f_or_d, r_or_nr=nil, path
 
-      _cx = Subject_[]::Actors_::
-        Classify_the_path::Classifications___.new( t_or_a, f_or_d, r_or_nr )
+      o = Subject__[]
 
-      @tree = Subject_[]::Actors_::Build_compound_tree[
+      _cx = o::Actors_::Classify_the_path::Classifications___.new(
+        t_or_a, f_or_d, r_or_nr )
+
+      @tree = o::Actors_::Build_compound_tree[
         _cx, path,
         test_dir_for_build_compound_tree,
-        Name_conventions_[],
+        Name_conventions__[],
         ___real_filesystem, & handle_event_selectively ]
 
       NIL_
@@ -46,7 +119,6 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
         tcm.include self
       end
     end  # >>
-
 
     def expect_tests_but_no_assets_ node
 
@@ -104,54 +176,17 @@ module Skylab::SubTree::TestSupport::Models_File_Coverage
     tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
   end
 
-  Fixture_tree_ = -> do
-    h = {}
-    -> sym do
-      h.fetch sym do
-        h[ sym ] = Top_TS_.dir_pathname.
-          join( "fixture-trees/#{ sym }" ).to_path.freeze
-      end
-    end
-  end.call
+  Name_conventions__ = Callback_.memoize do
 
-  Fixture_tree_test_dir_for_ = -> do
-    h = {}
-    -> sym do
-      h.fetch sym do
-        h[ sym ] = ::File.join( Fixture_tree_[ sym ], 'test' ).freeze
-      end
-    end
-
-  end.call
-
-  Callback_ = Callback_
-
-  Kernel_stub_ = Callback_.memoize do
-
-    class Kernel_Stub
-
-      def reactive_tree_seed
-        self._ONLY_for_respond_to
-      end
-
-      self
-    end.new.freeze
+    Subject__[]::Models_::Name_Conventions.new %w( *_speg.rb *_spek.rb )
   end
 
-  Name_conventions_ = Callback_.memoize do
-
-    Subject_[]::Models_::Name_Conventions.new %w( *_speg.rb *_spek.rb )
-  end
-
-  Subject_ = -> do
+  Subject__ = -> do
     Home_::Models_::File_Coverage
   end
 
-  NIL_ = nil
+  # ->
 
-  Home_ = Home_
-
-  TEST__ = 'test'.freeze
-
-
+    Here_ = self
+  end
 end

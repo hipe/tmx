@@ -1,18 +1,11 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::SubTree::TestSupport::Modality_Integrations::CLI
-
-  if ! const_defined?( :Expect_expression )
-    require_relative 'core'  # this must be conditional because our own
-    # autoloader doesn't require files it loads them. sometimes the subject
-    # node is already loaded (but not yet required) when we get to this point
-  end
+module Skylab::SubTree::TestSupport
 
   describe "[st] modality integration - CLI - canon" do
 
-    extend TS_
-
-    Expect_expression[ self ]
+    TS_[ self ]
+    use :modality_integrations_CLI, :expect_expression
 
     define_method :expect, instance_method( :expect )  # #because-rspec
 
