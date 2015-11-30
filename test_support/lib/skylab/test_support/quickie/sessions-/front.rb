@@ -167,7 +167,7 @@ module Skylab::TestSupport
             @plugins = col
             ACHIEVED_
           else
-            UNABLE_
+            col
           end
         end
       end
@@ -185,15 +185,14 @@ module Skylab::TestSupport
           Autoloader_[ mod, :boxxy ]
         end
 
-        col = Here_::Plugin_::Collection.new self, mod
+        o = Home_.lib_.plugin::BaselessCollection.new
+        o.eventpoint_graph = POSSIBLE_GRAPH
+        o.modality_const = :CLI
+        o.plugin_services = self
+        o.plugin_tree_seed = mod
 
-        ok = col.initialize_all__
-
-        if ok
-          col
-        else
-          ok
-        end
+        ok = o.load_all_plugins
+        ok ? o : ok
       end
 
       def parse_argv argv
@@ -213,8 +212,14 @@ module Skylab::TestSupport
       end
 
       def collect_signatures argv
+
         argv_ = argv.dup.freeze
-        a = @plugins.a_.map { |pi| pi.prepare argv_ }
+
+        a = []
+        @plugins.accept do | de |
+          a.push de.prepare argv_
+        end
+
         if a.any?
           [ true, a ]
         elsif argv.any?
@@ -298,13 +303,20 @@ module Skylab::TestSupport
       end
 
       def emit_eventpoint eventpoint_i
+
         ok = true
+
         ep = POSSIBLE_GRAPH.fetch_eventpoint eventpoint_i
-        @plugins.a_.each do |pi|
-          (( sig = pi.signature )) or next
+
+        @plugins.accept do | de |
+          sig = de.signature
+          sig or next
           if sig.subscribed_to? ep
-            r = pi.eventpoint_notify ep
-            false == r and break( ok = false )
+            x = de.eventpoint_notify ep
+            if false == x
+              ok = false
+              break
+            end
           end
         end
         ok

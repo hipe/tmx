@@ -1,25 +1,26 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Callback::Test::Name::EE__
+module Skylab::Basic::TestSupport
 
-  extend ::Skylab::Callback::TestSupport::Constants::TestSupport_::Quickie
-
-  describe "[ca] name extname experiment" do
+  describe "[ba] pathname - FEATURE ISLAND extname experiment" do
 
     # #todo this isn't used anywhere. but we are keeping it around
     # in case we we ever decide to raw-dog the extname logic
 
-    RX__ = /\A (?: (?<stem>|.*[^\.]|\.+)
+    _RX = /\A (?: (?<stem>|.*[^\.]|\.+)
       (?<extname>\.[^\.]*)
       |(?<stem>[^\.]*)
     ) \z/x
 
-    def self.o input_s, output_a, *a
+    define_singleton_method :o do | input_s, output_a, * a |
+
       it "#{ input_s.inspect } -> #{ output_a.inspect }", *a do
-        if (( md = RX__.match( input_s  ) ))
+
+        md = _RX.match input_s
+        if md
           stem, extname = output_a
-          md[ :stem ].should eql( stem )
-          md[ :extname ].should eql( extname )
+          md[ :stem ].should eql stem
+          md[ :extname ].should eql extname
         else
           fail "did not match - #{ input_s.inspect }"
         end

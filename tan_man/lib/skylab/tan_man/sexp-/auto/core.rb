@@ -41,12 +41,14 @@ module Skylab::TanMan
         tree_cls.include mod
       end
 
-      im = [
+      _a = [
         :Sexp,
         :InstanceMethods,
-        Home_.lib_.constantize( tree_cls.rule ) ].
-      reduce(
-        tree_cls.grammar.anchor_module ) do | mod_, i |
+        Callback_::Name::Conversion_Functions::Constantize[ tree_cls.rule ] ]
+
+      im = _a.reduce(
+        tree_cls.grammar.anchor_module
+      ) do | mod_, i |
 
         mod_.const_defined? i, false  or break  # one end of [#078]
         mod_.const_get i, false

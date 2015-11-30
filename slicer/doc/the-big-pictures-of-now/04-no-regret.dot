@@ -1,0 +1,27 @@
+digraph g {
+
+  /* color for active thing: #b5d5fb */
+
+  label="(started nov 28, 2015)"
+
+  clean_up_doctest -> re_house_xx
+  re_house_xx [label="re-house\nquickie\nplugin lib" fillcolor="gray" style="filled"]
+  clean_up_doctest [label="clean up\ndoc-test" ]
+  clean_up_doctest -> re_house_yy
+  re_house_yy [label="re-house\nquickie dependency-graph"]
+  clean_up_doctest->insane_CM_redux
+  insane_CM_redux [label="insane\ncode-molester\nredux"]
+
+  no_regret -> clean_up_doctest
+
+  myterm
+  dpn->sea
+  dpn [label="`dir_pathname` -> `dir_path`"]
+  sea [label="search-replace -\nfix that one bug"]
+  sea->zerk
+  zerk [label="zerk - full rewrite\nto use ACS"]
+  zerk->acs
+  acs [label="ACS - that\none eventing\nre-arch branch"]
+  acs->no_regret
+  no_regret [label="no\nregret"]
+}

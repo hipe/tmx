@@ -228,7 +228,8 @@ module Skylab::System
             if @abbrev
               @filename = @abbrev
             else
-              @filename = Callback_::Name.lib.pathify @const_a.last
+              @filename = Callback_::Name::Conversion_Functions::Pathify[
+                @const_a.last ]
             end
             via_filename_validate
           end

@@ -58,10 +58,10 @@ module Skylab
 
         fo, or_s_a = st.gets
 
-        pu = o.plugins.fetch o.steps.last.plugin_idx
+        de = o.plugins.fetch o.steps.last.plugin_idx
 
         y << "the application would finish by #{
-         }#{ progressive_verb pu.name.as_human } #{
+         }#{ progressive_verb de.name.as_human } #{
           }before it would #{ or_ or_s_a }, making the #{
            }'#{ fo.local_identifier_x }' option meaningless."
 
@@ -128,32 +128,32 @@ module Skylab
             a = nil
             bx = Callback_::Box.new
 
-            @plugins.each do | pu |
+            @plugins.each do | de |
 
-              if pu.respond_to? :process_ARGV
-                ( a ||= [] ).push pu
+              if de.respond_to? :process_ARGV
+                ( a ||= [] ).push de
               end
 
-              pu.each_reaction do | tr |
+              de.each_reaction do | tr |
 
                 tr.each_catalyzing_formal do | fo |
 
-                  bx.touch( fo.local_identifier_x ) { [] }.push [ fo, pu ]
+                  bx.touch( fo.local_identifier_x ) { [] }.push [ fo, de ]
 
                 end
 
                 tr.each_ancillary_formal_option do | fo |
 
-                  bx.touch( fo.local_identifier_x ) { [] }.push [ fo, pu ]
+                  bx.touch( fo.local_identifier_x ) { [] }.push [ fo, de ]
 
                 end
               end
 
-              pu.each_capability do | tr |
+              de.each_capability do | tr |
 
                 tr.each_ancillary_formal_option do | fo |
 
-                  bx.touch( fo.local_identifier_x ) { [] }.push [ fo, pu ]
+                  bx.touch( fo.local_identifier_x ) { [] }.push [ fo, de ]
 
                 end
               end
@@ -176,8 +176,8 @@ module Skylab
 
             _pn = @on_event_selectively.call :for_plugin, :program_name
 
-            s_a = @takes_ARGV_pu_a.reduce [] do | m, pu |
-              s = pu.description_for_ARGV_syntax_under @expag
+            s_a = @takes_ARGV_pu_a.reduce [] do | m, de |
+              s = de.description_for_ARGV_syntax_under @expag
               s and m.push s
               m
             end
@@ -239,7 +239,7 @@ module Skylab
 
           def __write_to_matrix_first_formal fo_a
 
-            fo, pu = fo_a.first
+            fo, de = fo_a.first
             s = fo.full_pedagogic_moniker_rendered_under @expag
 
             st = fo.to_description_line_stream_rendered_under @expag
@@ -248,37 +248,37 @@ module Skylab
 
             @mat_a.push [ s ]
             if line
-              _maybe_add_thing line, fo, pu
-              _flush_into_matrix_stream st, fo, pu
+              _maybe_add_thing line, fo, de
+              _flush_into_matrix_stream st, fo, de
             else
-              _maybe_add_thing line, fo, pu
+              _maybe_add_thing line, fo, de
             end
             nil
           end
 
           def __write_to_matrix_nonfirst_formals fo_a
 
-            fo_a[ 1 .. -1 ].each do | fo, pu |
+            fo_a[ 1 .. -1 ].each do | fo, de |
 
               _st = fo.to_description_line_stream_rendered_under @expag
 
-              _flush_into_matrix_stream _st, fo, pu
+              _flush_into_matrix_stream _st, fo, de
             end
 
             nil
           end
 
-          def _flush_into_matrix_stream st, fo, pu
+          def _flush_into_matrix_stream st, fo, de
 
             begin
               line = st.gets
               line or break
-              _maybe_add_thing line, fo, pu
+              _maybe_add_thing line, fo, de
               redo
             end while nil
           end
 
-          def _maybe_add_thing line, fo, pu
+          def _maybe_add_thing line, fo, de
 
             # massive hacking ahead. everything is a proof of concept.
             # none of this is real.
@@ -296,7 +296,7 @@ module Skylab
                 # specific than and otherwise redundant with the above.)
 
                 _s = @expag.calculate do
-                  third_person pu.name.as_human
+                  third_person de.name.as_human
                 end
                 _add_cel "#{ _s }."
               end
@@ -304,7 +304,7 @@ module Skylab
             elsif :ancillary_formals == pth_x[ 1 ]
 
               _s = @expag.calculate do
-                "while #{ progressive_verb pu.name.as_human },"
+                "while #{ progressive_verb de.name.as_human },"
               end
 
               _add_cel _s

@@ -217,7 +217,7 @@ module Skylab::TanMan::TestSupport
 
       rest_s = md[ :rest ]
       if rest_s
-        rest_s = "_#{ Callback_::Name.lib.constantize[ rest_s ] }"
+        rest_s = "_#{ Callback_::Name::Conversion_Functions::Constantize[ rest_s ] }"
       end
 
       :"Grammar#{ _number_part }#{ rest_s }"

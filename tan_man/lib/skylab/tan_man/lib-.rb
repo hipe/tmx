@@ -12,10 +12,6 @@ module Skylab::TanMan
 
     # = sidesys[ :Brazen ]  # for [sl]
 
-    Constantize = -> x do
-      Callback_::Name.lib.constantize x
-    end
-
     Dev_tmpdir_path = -> do
       System[].defaults.dev_tmpdir_path
     end

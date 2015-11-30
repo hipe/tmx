@@ -1,79 +1,86 @@
-module Skylab::TestSupport
+module Skylab::Plugin
+  # ->
+    class BaselessCollection  # backstory in [#023]
 
-  module Quickie
+      # -- initialization
 
-    class Plugin_::Collection
-
-      def initialize host, mod
-        @a = nil
-        @__cool_pool = Cool_Pool__.new host.y
-        @h = nil
-        @host = host
-        @mod = mod
+      def initialize
+        @_index = {}
+        @_last_indexed_index = -1
       end
 
-      def _host  # #hacks-only
-        @host
-      end
+      attr_writer(
+        :eventpoint_graph,
+        :plugin_services,
+        :plugin_tree_seed,
+        :modality_const,
+      )
 
-      def a_
-        @a
-      end
+      def load_all_plugins
 
-      def _init_hash  # assume @h is nil
+        _ada_cls = Here_::Modality_Adapters_.const_get @modality_const, false
 
-        ok = if @a
-          ACHIEVED_
-        else
-          initialize_all__
+        o = _ada_cls.new
+        o.eventpoint_graph = @eventpoint_graph
+        o.plugin_collection = self
+        o.plugin_services = @plugin_services
+        o.plugin_tree_seed = @plugin_tree_seed
+        send :"__#{ @modality_const }__specific_adapter_customizations", o
+
+        a = []
+
+        @plugin_tree_seed.constants.each do | plugin_const |
+          a.push o.new plugin_const
         end
 
-        if ok
-          h = {}
-          @a.each_with_index do | pu, d |
-            h[ pu.plugin_symbol ] = d
-          end
-          @h = h
-        else
-          @h = ok
-        end
+        @_dependency_adapter_a = a
+        @_length = a.length
+
+        ACHIEVED_
+      end
+
+      def __CLI__specific_adapter_customizations o
+        o.cool_pool = Cool_Pool___.new @plugin_services.y
         NIL_
       end
 
-      def initialize_all__
-        a = __build_array
-        if a
-          @a = a
-          ACHIEVED_
-        else
-          a
+      # -- access of a single dependency adapter
+
+      def [] lwu_sym  # lowercase with underscores symbol
+
+        x = @_index[ lwu_sym ]
+        if ! x
+          d = @_last_indexed_index
+          begin
+            d += 1
+            da = @_dependency_adapter_a.fetch d  # etc
+            k = da.plugin_symbol
+            @_index[ k ] = da
+            if lwu_sym == k
+              x = da
+              @_last_indexed_index = d
+              break
+            end
+            redo
+          end while nil
         end
+        x
       end
 
-      def __build_array
+      # -- collection comprehension
 
-        mod = @mod
-
-        proto = Plugin_::Adapter.new @__cool_pool, self, @host, @mod
-
-        mod.constants.map do | const |
-          proto.new const
-        end
+      def accept & visit
+        @_dependency_adapter_a.each( & visit )
+        NIL_
       end
 
-      def keys
-        @h.nil? && _init_hash
-        @h.keys
+      def to_stream
+        Callback_::Stream.via_nonsparse_array @_dependency_adapter_a
       end
 
-      def [] i
-        @h.nil? && _init_hash
-        @a.fetch( @h.fetch i )
-      end
+      # -- support
 
-      # ~
-
-      class Cool_Pool__
+      class Cool_Pool___
         def initialize y
           @back_a = [] ; @y = y ; nil
         end
@@ -169,7 +176,6 @@ module Skylab::TestSupport
           @back.back_moniker
         end
       end
-
       class Fuzzy_Flag_Front__
 
         def initialize back, pool
@@ -227,6 +233,8 @@ module Skylab::TestSupport
           end
         end
       end
+
+      Here_ = self
     end
-  end
+  # -
 end

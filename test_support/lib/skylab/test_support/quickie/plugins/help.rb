@@ -46,20 +46,25 @@ module Skylab::TestSupport
       end
 
       def beginning_eventpoint_notify
-        usage
-        @y << "options:"
-        Home_.lib_.brazen::CLI::Expression_Frames::Table::Actor.call(
 
+        usage
+
+        @y << "options:"
+
+        row_a = []
+        @svc.plugins.accept do | da |
+          Multiline_column_B__[ row_a, da.syntax_moniker, da.some_desc_a ]
+        end
+
+        Home_.lib_.brazen::CLI::Expression_Frames::Table::Actor.call(
           :field,
           :field, :left,
           :header, :none,
           :left, '  ', :sep, '     ', :right, EMPTY_S_,
           :write_lines_to, @y,
-          :read_rows_from, @svc.plugins.a_.reduce( [] ) do |row_a, p|
-            Multiline_column_B__[ row_a, p.syntax_moniker, p.some_desc_a ]
-            row_a
-          end )
-        nil
+          :read_rows_from, row_a,
+        )
+        NIL_
       end
 
       Multiline_column_B__ = -> row_a, cel_a, a do
@@ -86,10 +91,10 @@ module Skylab::TestSupport
 
         s_a = [ ] ; a_a = [ ]
 
-        @svc.plugins.a_.each do | pu |
-          s = pu.dependency_.opts_moniker
+        @svc.plugins.accept do | da |
+          s = da.dependency_.opts_moniker
           s and s_a.push s
-          s = pu.dependency_.args_moniker
+          s = da.dependency_.args_moniker
           s and a_a.push s
         end
         [

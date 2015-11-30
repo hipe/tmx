@@ -568,12 +568,12 @@ module Skylab::Plugin
 
             @step_a.each do | step |
 
-              pu = @plugin_a.fetch step.plugin_idx
+              de = @plugin_a.fetch step.plugin_idx
 
-              step.write_actuals_into_plugin pu
+              step.write_actuals_into_plugin de
 
               if step.does_process_input
-                ok = pu.send @input_method_name, input_x
+                ok = de.send @input_method_name, input_x
                 ok or break
 
                 if step.is_last_to_process_input && input_x.length.nonzero?
@@ -583,7 +583,7 @@ module Skylab::Plugin
                 end
               end
 
-              ok = pu.send :"do__#{ step.transition_symbol }__"
+              ok = de.send :"do__#{ step.transition_symbol }__"
               ok or break
             end
           end

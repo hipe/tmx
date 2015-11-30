@@ -1,3 +1,4 @@
+[#010] #open upgrade "simple chain" to etc
 [#009] #open cleanup all old event digraph to send only [br] events
 [#008] #open maybe get rid of all delegation
 [#007] #open unify all event classes to use [br]

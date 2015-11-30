@@ -75,12 +75,46 @@ module Skylab::CodeMolester
         a = ( n[ ( n.rindex str ) + len .. -1 ] ).split CONST_SEP_
         a.length.nonzero? or fail "sanity - hack failed (#{ n })"
 
-        Callback_::Name.simple_chain.new( a.map do | s |
-          Callback_::Name.via_const_string s
-        end )
+        self._THE_LAST_BASTION_of_simple_chain
 
+        _a = a.map do | s |
+          Callback_::Name.via_const_string s
+        end
+        Simple_Chain___.new _a
       end
     end.call
+  end
+
+  class Simple_Chain___  # #open [#010] go this away for etc
+
+    class << self
+
+      def via_symbol_list name_i_a
+        new( name_i_a.map do | sym |
+          Home_::Name.via_variegated_symbol sym
+        end )
+      end
+    end  # >>
+
+    def initialize a  # please provide an array of name functions
+      @name_a = a ; nil
+    end
+
+    def length
+      @name_a.length
+    end
+
+    def local
+      @name_a.last
+    end
+
+    def map sym  # for now we protect constituents by doing it like this
+      @name_a.map(& sym )
+    end
+
+    def anchored_normal
+      @anchored_normal ||= @name_a.map( & :as_variegated_symbol ).freeze
+    end
   end
 
   CONST_SEP_ = '::'.freeze

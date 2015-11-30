@@ -1,6 +1,6 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Callback::TestSupport::Name
+module Skylab::Callback::TestSupport
 
   describe "[ca] name" do
 

@@ -1,6 +1,6 @@
 module Skylab::Callback
 
-  module Name__::Unique_Features  # see [#060]
+  module Name::Unique_Features  # see [#060]
 
     # this grain of sand is all that remains of our universe's first name
     # lib. at some point (and with reason) [cb] rewrote a name class from
@@ -58,54 +58,6 @@ module Skylab::Callback
 
       Module_moniker = Mod_moniker_via_num_parts_and_module___.curry[ 1 ]
 
-      Via_anchored_in_module_name_module_name = -> s, s_ do  # #storypoint-105  # :+#curry-friendly
-
-        # the first arg is the one that existed first - the surrounding module
-
-        if 0 == s_.index( s )
-          Simple_Chain.new(
-            if s == s_
-              EMPTY_A_
-            else
-              s_[ s.length + 2 .. -1 ].split( CONST_SEP_ ).reduce [] do | m, c |
-                m.push Home_::Name.via_const_string c
-                  # freeze each name because we expose them individually
-              end
-            end )
-        end
-      end
-
-      class Simple_Chain  # #storypoint-55
-
-        class << self
-
-          def via_symbol_list name_i_a
-            new( name_i_a.map do | sym |
-              Home_::Name.via_variegated_symbol sym
-            end )
-          end
-        end
-
-        def initialize a  # please provide an array of name functions
-          @name_a = a ; nil
-        end
-
-        def length
-          @name_a.length
-        end
-
-        def local
-          @name_a.last
-        end
-
-        def map sym  # for now we protect constituents by doing it like this
-          @name_a.map(& sym )
-        end
-
-        def anchored_normal
-          @anchored_normal ||= @name_a.map( & :as_variegated_symbol ).freeze
-        end
-      end
-
   end
 end
+# #tombstone Via_anchored_in_module_name_module_name

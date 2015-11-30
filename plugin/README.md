@@ -72,7 +72,7 @@ is outside the scope of this document `^_^ #yolo ¯\_(ツ)_/¯`
 
  7. [pl] digraph-powered simplification of below Feb.,  2015  active
  6. [  ] import [gv]'s custom facility           Jan.,  2014  sunsetted
- 5. [ts] quickie rolls a custom solution         June,  2013  active (custom)
+ 5. [pl] quickie rolls a custom solution         June,  2013  active (custom)
  4. [fa] the forgettable `Services_`             June,  2013  sunsetting
  3. [  ] Plugin abstracted out of test/all       April, 2013  sunsetted
  2. [tr] "adapter" (plugin) facility             June,  2012  paved
@@ -129,12 +129,16 @@ following reasons:
 
 ## library 5 of N: [ts] Quickie rolls a reasonable custom solution.
 
+(UPDATE: this moved to here and is now [#023]. EDIT: this makes half of
+the below historial sentiment. we add fresh commentary in a dedicated
+document at that node but the below is still half-relevant.)
+
 for quickie to have its own custom solution makes like easier because
 we can use the quickie in the same distribution as the plugin lib
 (or whichever) we are developing without breaking quickie.
 
 although it's not as minimal and powerful as our latest effort, this stab
-at plugins is easiliy comprehendable; and by this point it's clear that 90%
+at plugins is easily comprehendable; and by this point it's clear that 90%
 of what we are doing "now" was established by this point.
 
 

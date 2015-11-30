@@ -215,9 +215,3 @@ deep graph.
 a "compound name" made up of multiple monadic names. usually used to represent
 a "fully qualified" name, which can then be turned into a variety of
 derivatives.
-
-
-
-## :#storypoint-105
-
-centralize this hacky fun here

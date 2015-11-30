@@ -2,7 +2,57 @@ module Skylab::Plugin
 
   class Digraphic  # see [#004]
 
-    class Dispatcher < Dispatcher_
+    class Base_Dispatcher___  # meh - this used to be in our topmost ..
+
+      # file but wans't shared. we have not yet un-abstracted it fully
+
+      def initialize resources, & oes_p
+        @on_event_selectively = oes_p
+        @plugin_a = []
+        @resources = resources
+      end
+
+      undef_method :initialize_dup
+
+      def load_plugins_in_module mod
+
+        _st = Callback_::Stream.via_nonsparse_array mod.constants do | const |
+
+          mod.const_get const, false
+
+        end
+
+        load_plugins_in_prototype_stream _st
+      end
+
+      def load_plugins_in_prototype_stream st
+
+        st.each do | plugin_class_like |
+
+          add_plugin_via_prototype plugin_class_like
+        end
+        NIL_
+      end
+
+      def add_plugin_via_prototype plugin_class_like
+
+        pu_d = @plugin_a.length
+
+        de = plugin_class_like.new_via_plugin_identifier_and_resources(
+          pu_d, @resources, & @on_event_selectively )
+
+        receive_plugin pu_d, de
+        NIL_
+      end
+
+      def receive_plugin pu_d, de
+
+        @plugin_a[ pu_d ] = de
+        NIL_
+      end
+    end
+
+    class Dispatcher < Base_Dispatcher___
 
       def initialize resources, & oes_p
 
@@ -24,7 +74,7 @@ module Skylab::Plugin
 
         pu_d = @plugin_a.length
 
-        pu = Mutable___.new_via_name_and_plugin_identifier_and_resources(
+        de = Mutable___.new_via_name_and_plugin_identifier_and_resources(
           Callback_::Name.via_variegated_symbol( name_symbol ),
           pu_d,
           @resources )
@@ -39,16 +89,16 @@ module Skylab::Plugin
 
         yield sess
 
-        pu.reactions.push reac
+        de.reactions.push reac
 
-        _accept_plugin pu_d, pu
+        _accept_plugin pu_d, de
 
-        pu
+        de
       end
 
-      def receive_plugin pu_d, pu
+      def receive_plugin pu_d, de
 
-        pu.each_reaction do | tr |
+        de.each_reaction do | tr |
 
           tr_i = tr.transition_symbol
 
@@ -61,7 +111,7 @@ module Skylab::Plugin
           end
         end
 
-        pu.each_capability do | tr |
+        de.each_capability do | tr |
 
           tr_i = tr.transition_symbol
           h = @all_capabilities
@@ -193,13 +243,13 @@ module Skylab::Plugin
           @_ast_a = ast_a
         end
 
-        def write_actuals_into_plugin pu
+        def write_actuals_into_plugin de
           if @_ast_a
             @_ast_a.each do | ast |
               if ast.arg_cat_s
-                pu.instance_exec( * ast.args, & ast.block )
+                de.instance_exec( * ast.args, & ast.block )
               else
-                pu.instance_exec( * ast.args, & ast.block )  # etc
+                de.instance_exec( * ast.args, & ast.block )  # etc
               end
             end
           end
@@ -315,11 +365,11 @@ module Skylab::Plugin
 
             if pairs
 
-              pu = @plugin_a.fetch step.plugin_idx
+              de = @plugin_a.fetch step.plugin_idx
 
               pairs.each_slice 2 do | args, formal_path_x |
 
-                fo = pu.formal_via_formal_path_ formal_path_x
+                fo = de.formal_via_formal_path_ formal_path_x
 
                 @formals_used[ fo.local_identifier_x ] = true
 
@@ -348,11 +398,11 @@ module Skylab::Plugin
 
             pu_id_to_pairs.each_pair do | pu_id, pairs |
 
-              pu = @plugin_a.fetch pu_id
+              de = @plugin_a.fetch pu_id
 
               pairs.each_slice 2 do | args, formal_path_x |
 
-                fo = pu.formal_via_formal_path_ formal_path_x
+                fo = de.formal_via_formal_path_ formal_path_x
 
                 @formals_used[ fo.local_identifier_x ] and next
 
@@ -360,7 +410,7 @@ module Skylab::Plugin
 
                 bx.touch fo.local_identifier_x do
                   []
-                end.push Unused___.new( pu.plugin_index, fo )
+                end.push Unused___.new( de.plugin_index, fo )
               end
             end
           end

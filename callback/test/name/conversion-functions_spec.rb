@@ -1,38 +1,26 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Callback::Test::Name::CMP_
+module Skylab::Callback::TestSupport
 
-  ::Skylab::Callback::Test::Name[ self ]
+  describe "[ca] name - conversion functions" do
 
-  include Constants
+    # TS_[ self ]
 
-  extend TestSupport_::Quickie
-
-  name_mod = ::Object.new
-
-  def name_mod.constantize
-    Home_::Name.lib.constantize
-  end
-
-  def name_mod.methodize
-    Home_::Name.lib.methodize
-  end
-
-  def name_mod.pathify
-    Home_::Name.lib.pathify
-  end
-
-  def name_mod.pathify_name
-    Home_::Name.lib.pathify_name
-  end
-
-  describe "[ca] name (multiple methods)" do
+    memoizer_for = -> sym do
+      p = -> x do
+        p = Home_::Name::Conversion_Functions.const_get sym, false
+        p[ x ]
+      end
+      -> x do
+        p[ x ]
+      end
+    end
 
     format = "%-48s %18s => %s"
 
     context "`pathify` - tries to turn constants into path fragments:" do
 
-      pathify = name_mod.pathify
+      pathify = memoizer_for[ :Pathify ]
 
       define_singleton_method :o do |const, exp_path, desc, *a|
 
@@ -61,28 +49,11 @@ module Skylab::Callback::Test::Name::CMP_
 
     end
 
-    context "`pathify_name`" do
-
-      pn = nil
-      define_singleton_method :o do |const, exp_path, desc, *a|
-        it "#{ format % [ desc, const.inspect, exp_path.inspect ] }", *a do
-          pn ||= name_mod.pathify_name
-          pn[ const ].should eql( exp_path )
-        end
-      end
-
-      o "CSV::API", 'csv/api', 'this is what acronyms look like'
-
-      o "a::b", 'a/b', 'atomic separators case'
-
-      o "Foo::BarBaz:::Biff", 'foo/bar-baz/:biff', 'garbage in garbage out'
-
-    end
+    constantize = memoizer_for[ :Constantize ]
 
     context "`constantize` tries to turn path framents #{
         }into constants-looking strings" do
 
-       constantize = name_mod.constantize
        define_singleton_method :o do |path, exp_const, desc, *a|
         it "#{ format % [ desc, path.inspect, exp_const.inspect ] }", *a do
           constantize[ path ].should eql( exp_const )
@@ -115,8 +86,6 @@ module Skylab::Callback::Test::Name::CMP_
     context "`constantize` tries to turn method-looking #{
       }symbols into constants" do
 
-      constantize = name_mod.constantize
-
       define_singleton_method :o do |in_str, out_str, desc, *tags|
         it "#{ format % [ desc, in_str, out_str ] }", *tags do
           constantize[ in_str ].should eql( out_str )
@@ -131,7 +100,7 @@ module Skylab::Callback::Test::Name::CMP_
 
     context "`methodize` - tries to make whatevers look like method names" do
 
-      methodize = name_mod.methodize
+      methodize = memoizer_for[ :Methodize ]
 
       fmt = "%20s => %s"
 
@@ -143,7 +112,7 @@ module Skylab::Callback::Test::Name::CMP_
 
       o 'a b', :a_b
 
-      o 'AbcDef', :abc_def, f: true
+      o 'AbcDef', :abc_def
 
       o 'NASASpaceStation', :nasa_space_station
 

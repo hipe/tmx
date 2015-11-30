@@ -148,8 +148,8 @@ module Skylab::Plugin::TestSupport
       it "pubby that subby" do
 
         a = []
-        _o.accept_by :heartbeat do | pu |
-          a.push pu
+        _o.accept_by :heartbeat do | de |
+          a.push de
           nil
         end
         1 == a.length or fail

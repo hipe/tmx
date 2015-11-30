@@ -11,6 +11,7 @@ module Skylab::Plugin::TestSupport
 
     def [] tcc
       tcc.send :define_singleton_method, :use, The_use_method___
+      tcc.include Instance_Methods__
     end
 
     cache = {}
@@ -28,7 +29,7 @@ module Skylab::Plugin::TestSupport
       TS_.lib_( sym )[ self ]
     end
 
-  module InstanceMethods
+  module Instance_Methods__
 
     def debug!
       @do_debug = true
@@ -41,15 +42,19 @@ module Skylab::Plugin::TestSupport
     end
   end
 
-  Expect_Event = -> tcm do
+  Expect_Event = -> tcc do
 
-    Callback_.test_support::Expect_Event[ tcm ]
+    Callback_.test_support::Expect_Event[ tcc ]
 
-    tcm.send :define_method, :black_and_white_expression_agent_for_expect_event do
+    tcc.send :define_method, :black_and_white_expression_agent_for_expect_event do
       Home_.lib_.brazen::API.expression_agent_instance
     end
 
     NIL_
+  end
+
+  Memoizers = -> tcc do
+    TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
 
   Home_ = ::Skylab::Plugin

@@ -2162,9 +2162,9 @@ module Skylab::Callback
 
       def labelize * a
         if a.length.zero?
-          Home_::Name__::Unique_Features::Labelize
+          Home_::Name::Modality_Functions::Labelize
         else
-          Home_::Name__::Unique_Features::Labelize[ * a ]
+          Home_::Name::Modality_Functions::Labelize[ * a ]
         end
       end
 
@@ -2176,21 +2176,17 @@ module Skylab::Callback
         if a.length.zero?
           Home_::Name__::Unique_Features::Module_moniker
         else
-          Home_::Name__::Unique_Features::Module_moniker[ * a ]
+          Home_::Name::Modality_Functions::Module_moniker[ * a ]
         end
       end
 
-      def simple_chain
-        Home_::Name__::Unique_Features::Simple_Chain
-      end
-
       def empty_name_for__ x
-        Home_::Name__::Empty_name_for[ x ]
+        Home_::Name::Conversion_Functions::Empty_name_for[ x ]
       end
 
       def variegated_human_symbol_via_variable_name_symbol sym
         s = sym.id2name
-        Home_::Name__::Unique_Features::
+        Home_::Name::Modality_Functions::
           Mutate_string_by_chomping_any_trailing_name_convention_suffixes[ s ]
         s.downcase.intern
       end
@@ -2219,6 +2215,8 @@ module Skylab::Callback
     end
 
     TRAILING_DASHES_RX = /-+\z/  # was once used here, now no longer
+
+    Autoloader[ self ]
   end
 
   same = Name  # common base class

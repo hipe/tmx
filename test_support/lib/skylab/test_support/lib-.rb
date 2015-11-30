@@ -78,22 +78,6 @@ module Skylab::TestSupport
       end
     end.call
 
-    Name_from_const_to_method = -> i do
-      Callback_::Name.lib.methodize i
-    end
-
-    Name_from_const_to_path = -> x do
-      Callback_::Name.lib.pathify x
-    end
-
-    Name_from_path_to_const = -> pn do
-      Callback_::Name.lib.constantize pn
-    end
-
-    Name_sanitize_for_constantize_file_proc = -> do
-      Callback_::Name.lib.constantize_sanitize_file
-    end
-
     Parse = sidesys[ :Parse ]  # only for 1 tree runner plugin (greenlist)
 
     Permute = sidesys[ :Permute ]

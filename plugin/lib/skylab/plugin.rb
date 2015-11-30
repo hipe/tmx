@@ -10,54 +10,6 @@ module Skylab::Plugin
     end
   end  # >>
 
-  class Dispatcher_
-
-    def initialize resources, & oes_p
-      @on_event_selectively = oes_p
-      @plugin_a = []
-      @resources = resources
-    end
-
-    undef_method :initialize_dup
-
-    def load_plugins_in_module mod
-
-      _st = Callback_::Stream.via_nonsparse_array mod.constants do | const |
-
-        mod.const_get const, false
-
-      end
-
-      load_plugins_in_prototype_stream _st
-    end
-
-    def load_plugins_in_prototype_stream st
-
-      st.each do | plugin_class_like |
-
-        add_plugin_via_prototype plugin_class_like
-      end
-      NIL_
-    end
-
-    def add_plugin_via_prototype plugin_class_like
-
-      pu_d = @plugin_a.length
-
-      pu = plugin_class_like.new_via_plugin_identifier_and_resources(
-        pu_d, @resources, & @on_event_selectively )
-
-      receive_plugin pu_d, pu
-      NIL_
-    end
-
-    def receive_plugin pu_d, pu
-
-      @plugin_a[ pu_d ] = pu
-      NIL_
-    end
-  end
-
   Callback_ = ::Skylab::Callback
 
   Autoloader_ = Callback_::Autoloader

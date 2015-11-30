@@ -113,13 +113,13 @@ module Skylab::Plugin::TestSupport
         o, o_ = _pair
 
         a = []
-        o.accept_by :zaza do | pu |
-          a.push pu.honk
+        o.accept_by :zaza do | de |
+          a.push de.honk
         end
 
         a_ = []
-        o_.accept_by :zaza do | pu |
-          a_.push pu.honk
+        o_.accept_by :zaza do | de |
+          a_.push de.honk
         end
 
         a.should eql [ 'mama_1 k1' ]

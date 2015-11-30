@@ -14,8 +14,9 @@ module Skylab::TaskExamples
       System_lib___[].services.environment.any_home_directory_pathname
     end
 
-    Methodize = -> i do
-      Callback_::Name.lib.methodize i
+    Methodize = -> sym do
+      self._HELLO
+      Callback_::Name::Methodize[ sym ]
     end
 
     Path_tools = -> do
@@ -37,31 +38,33 @@ module Skylab::TaskExamples
 
   module Library_  # :+[#su-001]
 
-    def self.const_missing const_i
-      m_i = load_methodize const_i
-      if respond_to? m_i
-        const_set const_i, send( m_i )
-      else
-        fail "no such service defined - #{ const_i }"
-        # NameError: uninitialized constant Foo::Bar
+    class << self
+
+      cache = {}
+      define_method :o do | sym, & p |
+        cache[ sym ] = p
       end
+
+      define_method :const_missing do | sym |
+        x = cache.fetch( sym ).call
+        const_set sym, x
+        x
+      end
+    end  # >>
+
+    o :FileUtils do
+      require 'fileutils'
+      ::FileUtils
     end
 
-    def self.o const_i, p
-      define_singleton_method load_methodize( const_i ), & p
+    o :StringIO do
+      require 'stringio'
+      ::StringIO
     end
 
-    def self.load_methodize i
-      :"load_#{ Lib_::Methodize[ i ] }"
+    o :StringScanner do
+      require 'strscan'
+      ::StringScanner
     end
-
-    o :FileUtils, -> { require 'fileutils' ; ::FileUtils }
-
-    o :StringIO, -> { require 'stringio' ; ::StringIO }
-
-    o :StringScanner, -> { require 'strscan' ; ::StringScanner }
-
-    o :Tree, -> { self::Basic__::Tree }  # for the future if ever
-
   end
 end

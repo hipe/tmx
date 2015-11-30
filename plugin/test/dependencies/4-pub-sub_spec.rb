@@ -32,8 +32,8 @@ module Skylab::Plugin::TestSupport
 
       carb_a = []
 
-      _disp.accept_by :carbonate do | pu |
-        carb_a.push pu.class
+      _disp.accept_by :carbonate do | de |
+        carb_a.push de.class
         ACHIEVED_
       end
 
@@ -46,7 +46,7 @@ module Skylab::Plugin::TestSupport
 
       seen_count = 0
 
-      _disp.accept_by :carbonate do | pu |
+      _disp.accept_by :carbonate do | de |
 
         seen_count += 1
         break
@@ -57,7 +57,7 @@ module Skylab::Plugin::TestSupport
 
     it "if an emission is sent on a channel with no subscribers, nothing" do
 
-      _disp.accept_by :warbonate do | pu |
+      _disp.accept_by :warbonate do | de |
         fail
       end
     end
