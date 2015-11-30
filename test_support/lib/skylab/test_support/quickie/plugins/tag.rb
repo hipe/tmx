@@ -4,10 +4,10 @@ module Skylab::TestSupport
 
     class Plugins::Tag
 
-      def initialize svc
-        @svc = svc
-        @sw = svc.build_required_arg_switch FLAG__
-        @y = svc.y
+      def initialize adapter
+        @adapter = adapter
+        @sw = adapter.build_required_arg_switch FLAG__
+        @y = adapter.y
       end
 
       FLAG__ = '-tag'.freeze
@@ -33,8 +33,8 @@ module Skylab::TestSupport
       end
 
       def culled_test_files_eventpoint_notify
-        @svc.add_iambic [ :tag, * @o_a ]
-        nil
+        @adapter.add_iambic [ :tag, * @o_a ]
+        NIL_
       end
 
     private

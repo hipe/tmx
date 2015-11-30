@@ -4,12 +4,12 @@ module Skylab::TestSupport
 
     class Plugins::RunRecursive
 
-      def initialize svc
+      def initialize adapter
         @be_verbose = false
-        @fuzzy_flag = svc.build_fuzzy_flag %w( -verbose )
+        @fuzzy_flag = adapter.build_fuzzy_flag %w( -verbose )
         @test_path_a = nil
-        @svc = svc
-        @y = svc.y
+        @adapter = adapter
+        @y = adapter.y
       end
 
       attr_reader :be_verbose
@@ -90,10 +90,19 @@ module Skylab::TestSupport
         # eventpoint, because we are the only ones that move the application
         # state from BEGINNING to TEST_FILES
 
-        nil
+        NIL_
       end
 
       def culled_test_files_eventpoint_notify
+
+        NIL_
+      end
+
+      def execution_eventpoint_notify
+
+        @adapter.services.yes_do_execute__
+
+        NIL_
       end
 
       # ~ services that this node provides upwards (for siblings!) ~
@@ -157,7 +166,7 @@ module Skylab::TestSupport
 
       def ready_test_path_a
         @test_path_a.nil? and @test_path_a = my_get_any_test_path_a
-        nil
+        NIL_
       end
 
       def my_get_any_test_path_a
@@ -195,7 +204,7 @@ module Skylab::TestSupport
 
       def files_not_found path
 
-        @y << "#{ @svc.client_moniker }found no #{ @local_glob } files #{
+        @y << "#{ @adapter.client_moniker }found no #{ @local_glob } files #{
           }under \"#{ path }\""
 
         NIL_

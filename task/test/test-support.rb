@@ -5,16 +5,44 @@ module Skylab::Task::TestSupport
 
   class << self
 
-    h = {}
-    define_method :lib do | sym |
+    def [] tcc
+      tcc.send :define_singleton_method, :use, Use_method___
+      tcc.include Instance_Methods___
+    end
 
-      h.fetch sym do
-        x = TestSupport_.fancy_lookup sym, TS_
-        h[ sym ] = x
-        x
-      end
+    def lib sym
+      _lib.public_library sym
+    end
+
+    def lib_ sym
+      _lib.protected_library sym
+    end
+
+    def _lib
+      @___lib ||= TestSupport_::Library.new TS_
     end
   end  # >>
+
+  TestSupport_ = ::Skylab::TestSupport
+
+  extend TestSupport_::Quickie
+
+    Use_method___ = -> sym do
+      TS_.lib_( sym )[ self ]
+    end
+
+  module Instance_Methods___
+
+    def debug!
+      @do_debug = true
+    end
+
+    attr_reader :do_debug
+
+    def debug_IO
+      TestSupport_.debug_IO
+    end
+  end
 
   Home_ = ::Skylab::Task
   Autoloader__ = Home_::Autoloader_
@@ -34,7 +62,5 @@ module Skylab::Task::TestSupport
 
   Autoloader__[ self, ::File.dirname( __FILE__ ) ]
 
-  TestSupport_ = ::Skylab::TestSupport
   TS_ = self
-
 end

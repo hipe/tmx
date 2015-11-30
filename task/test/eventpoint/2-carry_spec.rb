@@ -1,16 +1,19 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::Quickie::Possible
+module Skylab::Task::TestSupport
 
-  describe "[ts] quickie possible carry" do
+  module Eventpoint_Namespace  # <-
 
-    include Possible_TS_::InstanceMethods
+  TS_.describe "[ts] quickie possible carry" do
+
+    TS_[ self ]
+    use :eventpoint
 
     context "with a Y-shaped graph with two nodes" do
 
       before :all do
         module Y_shape
-          Possible_::Graph[ self ]
+          Subject::Graph[ self ]
           A = eventpoint
           B = eventpoint { from A }
           C = eventpoint { from B }
@@ -56,5 +59,7 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible
         path.map( & :client ).should eql( [:sig1, :sig2] )
       end
     end
+  end
+# ->
   end
 end

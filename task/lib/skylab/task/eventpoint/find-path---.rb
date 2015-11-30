@@ -1,32 +1,34 @@
-module Skylab::TestSupport
+class Skylab::Task
 
-  module Quickie
+  class Eventpoint
 
-    module Possible_
+    class Find_Path___
 
-      class Pathfinder__
+      include Worker_Methods_
 
-        include Grid_Methods_
+      # (style below ranges from ancient to contemporary)
+
+      # ->
 
         def initialize y, graph, from_i, to_i, sig_a
-          @grid = @path = nil
-          @y, @graph, @from_i, @to_i, @sig_a = y, graph, from_i, to_i, sig_a
+
+          @expression_grid  = nil
+          @before_symbol = from_i
+          @graph = graph
+          @path = nil
+          @after_symbol = to_i
+          @sig_a = sig_a
+          @y = y
         end
 
-        def execute
-          resolve_path
-          perform_execution_result
-        end
-
-        def execute_with_path_or_failure
-          if (( r = execute ))
-            [ r, @path ]
+        def work_
+          ok = ___resolve_path
+          if ok
+            Callback_::Known_Known[ @path ]
           else
-            [ r, @grid ]
+            ok
           end
         end
-
-      private
 
         # central thesis: start from the beginning node. at each current node
         # resolve exactly zero or one move that you can make. the ambiguity of
@@ -37,27 +39,36 @@ module Skylab::TestSupport
         # appropritely and the result is false. else you were silent and
         # result is true-ish.
 
-        def resolve_path
-          bep = @graph.fetch_eventpoint @from_i
-          fep = @graph.fetch_eventpoint @to_i
-          cep = bep ; path = Path__.new
-          @t = Node_Transitions__.new @graph, @sig_a  # validate names early, even
+        def ___resolve_path
+
+          bep = @graph.fetch_eventpoint @before_symbol
+          fep = @graph.fetch_eventpoint @after_symbol
+
+          cep = bep ; path = Path___.new
+
+          @t = Node_Transitions___.new @graph, @sig_a  # validate names early, even
+
           goal_id = fep.node_id
+
           until (( goal_reached = goal_id == cep.node_id ))
             (( move_pred = resolve_one_move_predicate cep )) or break
             path << move_pred
-            cep = @graph.fetch_eventpoint move_pred.to_pred.to_i
+            cep = @graph.fetch_eventpoint move_pred.to_pred.after_symbol
           end
+
           if goal_reached
             @path = path
+            ACHIEVED_
+          else
+            UNABLE_
           end
-          nil
         end
 
         def resolve_one_move_predicate ep
+
           if ! (( a = @t[ ep.node_id ] ))
             add_goal_not_met_frames
-            add_frame say_agents, say::Got_passed_[ ep ]
+            add_expression_frame_ _express_agents, express_( :Got_passed, ep )
             nil
           elsif 1 == a.length
             a.first
@@ -77,59 +88,87 @@ module Skylab::TestSupport
           if 1 == same_a.length
             same_a.fetch 0  # then this must be trumping something
           else
-            add_frame say::Agents_[ :inclusive, same_a.map( & :sig ) ],
-              say::Ambiguity_[ ep, same_a ]
-            false
+            _ = express_ :Agents, :inclusive, same_a.map( & :sig )
+            __ = express_ :Ambiguity, ep, same_a
+
+            add_expression_frame_ _, __
+
+            UNABLE_
           end
         end
 
-        define_method :say, & Say_
-
-        def say_agents
-          say::Agents_[ :exclusive, @sig_a ]
+        def _express_agents
+          express_ :Agents, :exclusive, @sig_a
         end
 
         def add_goal_not_met_frames
-          ep = @graph.fetch_eventpoint @to_i
+
+          ep = @graph.fetch_eventpoint @after_symbol
+
           if @sig_a.length.zero?
-            add_frame say::Exist_[ :present ], say::Agents_[ :inclusive, @sig_a ]
-              # "there are no active agents"
-            add_frame say::System_[], say::Reach_[ ep ], say::So_[]
-              # "so the system cannot reach the FINISHED state"
+            __when_etc ep
           else
-            add_frame say_agents, say::Bring_[ ep ]
+
+            add_expression_frame_ _express_agents, express_( :Bring, ep )
               # "none of the 3 agents brings the system to the FINISHED state"
           end
-          nil
+          NIL_
         end
-      end
 
-      class Pathfinder__::Path__
+        def __when_etc ep
+
+          _ = express_ :Exist, :present
+          __ = express_ :Agents, :inclusive, @sig_a
+
+          add_expression_frame_ _, __
+            # "there are no active agents"
+
+          add_expression_frame_(
+            express_( :System ),
+            express_( :Reach, ep ),
+            express_( :So ))
+            # "so the system cannot reach the FINISHED state"
+
+          NIL_
+        end
+
+        # <-
+
+      class Path___
+
         def initialize
-          @a = []
+          @_a = []
         end
+
         def length
-          @a.length
+          @_a.length
         end
+
         def fetch idx
-          @a.fetch idx
+          @_a.fetch idx
         end
+
         def map &blk
-          @a.map( &blk )
+          @_a.map( &blk )
         end
+
         def each &blk
-          @a.each( & blk )
+          @_a.each( & blk )
         end
-        def get_a
-          @a.dup
+
+        def to_stream
+          Callback_::Stream.via_nonsparse_array @_a
         end
+
         def << x
-          @a << x
-          nil
+          @_a.push x
+          NIL_
         end
       end
 
-      class Pathfinder__::Node_Transitions__
+      class Node_Transitions___
+
+        include Worker_Methods_  # `express_`, `errmsg_` only
 
         def initialize graph, sig_a
           @graph = graph
@@ -139,8 +178,8 @@ module Skylab::TestSupport
               graph.fetch_eventpoint node_i  # validate the name
               pred_a.each do |pred|
                 :from == pred.predicate_i or next
-                check_transition pred
-                add_transition node_i, pred
+                __check_transition pred
+                __add_transition node_i, pred
               end
             end
           end
@@ -151,20 +190,26 @@ module Skylab::TestSupport
           @h.fetch( node_i ) { }
         end
 
-      private
+        def __check_transition pred
 
-        def check_transition pred
-          fep = @graph.fetch_eventpoint pred.from_i
-          tep = @graph.fetch_eventpoint pred.to_pred.to_i
-          fep.transitions_to? tep or raise "signature error - #{
-            }#{ errmsg say::Client_[ pred.sig.client ],
-              say::Transition_[ fep, tep ]  }"
-          nil
+          fep = @graph.fetch_eventpoint pred.before_symbol
+
+          tep = @graph.fetch_eventpoint pred.to_pred.after_symbol
+
+          if ! fep.transitions_to? tep
+            raise ___say_etc tep, fep, pred
+          end
         end
 
-        define_method :add_transition, & Multi_add_
-        define_method :errmsg, & Errmsg_
-        define_method :say, & Say_
+        def ___say_etc tep, fep, pred
+
+          _ = express_ :Client, pred.sig.client
+          __ = express_ :Transition, fep, tep
+
+          "signature error - #{ errmsg_ _, __ }"
+        end
+
+        define_method :__add_transition, & Multi_add_
       end
     end
   end

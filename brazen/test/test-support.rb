@@ -9,6 +9,21 @@ module Skylab::Brazen::TestSupport
 
   TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
 
+  class << self
+
+    def lib sym
+      _libs.public_library sym
+    end
+
+    def lib_ sym
+      _libs.protected_library sym
+    end
+
+    def _libs
+      @___libs ||= TestSupport_::Library.new TestLib_, TS_
+    end
+  end  # >>
+
   module ModuleMethods
 
     def use sym
@@ -16,75 +31,6 @@ module Skylab::Brazen::TestSupport
     end
   end
 
-  class << self
-
-    def lib sym
-      LIB__.public_library sym
-    end
-
-    def lib_ sym
-      LIB__.protected_library sym
-    end
-  end  # >>
-
-  module LIB__ ; class << self
-
-    # (special treatment for our experiment with public/protected..)
-
-    def public_library sym
-      ( @___public_lib ||= __build_public_library )[ sym ]
-    end
-
-    def __build_public_library
-
-      cache = {}
-      -> sym do
-        cache.fetch sym do
-          x = protected_library sym
-          if x.const_defined? :PUBLIC, false
-            yes = x.const_get :PUBLIC, false
-          end
-          if yes
-            cache[ sym ] = x
-            x
-          else
-            raise ::NameError, __say_etc( sym )
-          end
-        end
-      end
-    end
-
-    def protected_library sym
-      ( @___protected_lib ||= __build_protected_library )[ sym ]
-    end
-
-    def __build_protected_library
-
-      cache = {}
-      -> sym do
-        cache.fetch sym do
-          x = _lookup sym
-          cache[ sym ] = x
-          x
-        end
-      end
-    end
-
-    def _lookup sym
-      s = sym.id2name
-      const = :"#{ s[ 0 ].upcase }#{ s[ 1 .. -1 ] }"
-      if @_close_lib.const_defined? const, false
-        @_close_lib.const_get const
-      else
-        TestSupport_.fancy_lookup sym, @_far_lib
-      end
-    end
-
-    def __say_etc sym
-      "#{ @_far_lib.name } `#{ sym }` is not public but can be made public #{
-        }by setting in it a constant `PUBLIC` with a true-ish value."
-    end
-  end ; end
 
   module InstanceMethods
 
@@ -153,11 +99,6 @@ module Skylab::Brazen::TestSupport
 
       sys.filesystem.tmpdir :path, _path
     end
-  end
-
-  module LIB__
-    @_close_lib = TestLib_
-    @_far_lib = TS_
   end
 
   Enhance_for_test_ = -> mod do

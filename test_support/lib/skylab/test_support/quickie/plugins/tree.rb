@@ -4,9 +4,9 @@ module Skylab::TestSupport
 
     class Plugins::Tree
 
-      def initialize svc
-        @fuzzy_flag = svc.build_fuzzy_flag %w( -tree )
-        @svc = svc
+      def initialize adapter
+        @fuzzy_flag = adapter.build_fuzzy_flag %w( -tree )
+        @adapter = adapter
       end
 
       def opts_moniker
@@ -19,7 +19,6 @@ module Skylab::TestSupport
       def desc y
         y << "like -list but as a tree (experimental)"
         y << "(mutually exclusive with -list)"
-        nil
       end
 
       def prepare sig
@@ -33,8 +32,10 @@ module Skylab::TestSupport
       end
 
       def culled_test_files_eventpoint_notify
-        io = @svc.paystream
-        _a = @svc.get_test_path_a
+
+        io = @adapter.paystream
+        _a = @adapter.services.get_test_path_array
+
         tree = Home_.lib_.basic::Tree.via :paths, _a
         path_s, tree_ = condense_stem tree
         if path_s
@@ -49,7 +50,7 @@ module Skylab::TestSupport
         while (( card = st.gets ))
           io.puts "#{ card.prefix_string }#{ card.node.slug }"
         end
-        nil
+        NIL_
       end
 
     private

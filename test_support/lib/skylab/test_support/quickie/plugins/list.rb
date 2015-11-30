@@ -4,9 +4,9 @@ module Skylab::TestSupport
 
     class Plugins::List
 
-      def initialize svc
-        @fuzzy_flag = svc.build_fuzzy_flag %w( -list )
-        @svc = svc
+      def initialize adapter
+        @fuzzy_flag = adapter.build_fuzzy_flag %w( -list )
+        @adapter = adapter
       end
 
       def opts_moniker
@@ -19,7 +19,6 @@ module Skylab::TestSupport
       def desc y
         y << "write to stdout the list of resultant"
         y << "test file(s) then exit"
-        nil
       end
 
       def prepare sig
@@ -33,9 +32,10 @@ module Skylab::TestSupport
       end
 
       def culled_test_files_eventpoint_notify
-        ps = @svc.paystream
-        @svc.get_test_path_a.each( & ps.method( :puts ) )
-        nil
+
+        _ = @adapter.paystream.method :puts
+        @adapter.services.to_test_path_stream.each( & _ )
+        NIL_
       end
     end
   end

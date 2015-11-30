@@ -3,12 +3,10 @@ module Skylab::TestSupport
   module Quickie
 
     class Sessions_::Front
-
       # <-
+    module Eventpoint_Graph___
 
-    module Possibilities___
-
-      Here_::Possible_::Graph[ self ]
+      Home_.lib_.task::Eventpoint::Graph[ self ]
 
       BEGINNING = eventpoint
 
@@ -34,10 +32,8 @@ module Skylab::TestSupport
         from EXECUTION
       end
     end
-
     # ->
-
-      POSSIBLE_GRAPH = Possibilities___.possible_graph
+      POSSIBLE_GRAPH = Eventpoint_Graph___.possible_graph
 
       def initialize dae
 
@@ -46,7 +42,7 @@ module Skylab::TestSupport
         @_daemon = dae
         @infostream = nil
         @paystream = nil
-        @plugins = nil
+        @_plugins = nil
         @program_moniker = nil
         @x_a_a = nil
         @y = nil
@@ -57,7 +53,6 @@ module Skylab::TestSupport
       end
 
       attr_writer :do_recursive, :program_moniker
-      alias_method :program_name=, :program_moniker=
 
       def set_three_streams _, o, e
         @paystream = o ; @infostream = e
@@ -66,33 +61,59 @@ module Skylab::TestSupport
 
       def invoke argv
 
-        _p = Home_.lib_.function_chain(
+        @_do_execute = false
 
-          -> do
-            load_plugins
-          end,
+        ok = __load_plugins
+        ok &&= __via_plugins_resolve_signatures argv
+        ok &&= __check_if_ARGV_is_completely_parsed_via_sigs
+        ok &&= __resolve_path_via_trueish_sigs
+        ok &&= __emit_each_eventpoint_to_all_subscribed_plugins
 
-          -> do
-            parse_argv argv
-          end,
-
-          -> sig_a do
-
-            produce_bound_call_via_sig_a sig_a
-          end,
-        )
-
-        bc = _p[]
-        if bc
-          bc.receiver.send bc.method_name, * bc.args
+        if @_do_execute
+          bc = __bound_call_for_test_execution
+          if bc
+            bc.receiver.send bc.method_name, * bc.args, & bc.block
+          else
+            bc
+          end
+        else
+          ok
         end
       end
 
-      #  ~ services that plugins want ~
+      # -- services for dependencies
 
-      def paystream_
-        @paystream || @_daemon.paystream_  # may be mounted under a supernode
+      # ~ test path, execution writers
+
+      def yes_do_execute__
+        @_do_execute = true
       end
+
+      def replace_test_path_s_a path_s_a
+        @_plugins[ :run_recursive ].dependency_.replace_test_path_s_a path_s_a
+      end
+
+      # ~ test-path readers
+
+      def get_test_path_a  # #reach-down
+        @_plugins[ :run_recursive ].dependency_.get_any_test_path_a
+      end
+
+      def to_test_path_stream
+        @_plugins[ :run_recursive ].dependency_.to_test_path_stream
+      end
+
+      # ~ UI-related readers
+
+      def program_moniker
+        @program_moniker or ::File.basename $PROGRAM_NAME
+      end
+
+      def moniker_
+        "#{ program_moniker } "
+      end
+
+      # ~ IO-related readers
 
       def y
         @y ||= ::Enumerator::Yielder.new( & infostream_.method( :puts ) )
@@ -102,9 +123,11 @@ module Skylab::TestSupport
         @infostream || @_daemon.infostream_
       end
 
-      def program_moniker
-        @program_moniker or ::File.basename $PROGRAM_NAME
+      def paystream_
+        @paystream || @_daemon.paystream_  # may be mounted under a supernode
       end
+
+      # ~ misc
 
       def add_iambic x_a
         @x_a_a ||= []
@@ -113,66 +136,42 @@ module Skylab::TestSupport
 
       attr_reader :x_a_a
 
-      def get_test_path_a  # #reach-down
-        @plugins[ :run_recursive ].dependency_.get_any_test_path_a
-      end
+      # -- service API for performers
 
-      def to_test_path_stream
-        @plugins[ :run_recursive ].dependency_.to_test_path_stream
-      end
-
-      def replace_test_path_s_a path_s_a
-        @plugins[ :run_recursive ].dependency_.replace_test_path_s_a path_s_a
-      end
-
-      def receive_context_class__ ctx
+      def receive_test_context_class__ tcc  # from an outermost runtime
         # when the files start loading, this is the hookback
-        @executor.receive_context_class___ ctx
-      end
-
-      def moniker_
-        "#{ program_moniker } "
+        @executor.receive_test_context_class___ tcc
       end
 
     private
 
-      # ~ UI
+      # -- UI
 
       def invite_string
         "see '#{ program_moniker } --help'"
       end
 
       def argument_error argv
+
         @y << "#{ moniker_ }aborting because none of the plugins or #{
           }loaded spec files processed the argument(s) - #{
           }#{ argv.map( & :inspect ) * SPACE_ }"
+
         @y << invite_string
-        nil
+
+        NIL_
       end
 
       def usage
-        @plugins[ :help ].dependency_.usage
-        nil
+        @_plugins[ :help ].dependency_.usage
+        NIL_
       end
 
-      #  ~ plugin mechanics ~
+      # -- plugin mechanics
 
-      def load_plugins
+      def __load_plugins
 
-        if @plugins
-          self._STATE_FAILURE
-        else
-          col = __build_plugins_collection
-          if col
-            @plugins = col
-            ACHIEVED_
-          else
-            col
-          end
-        end
-      end
-
-      def __build_plugins_collection
+        @_plugins and self._STATE_FAILURE
 
         if Here_.const_defined? :Plugins, false
 
@@ -192,135 +191,159 @@ module Skylab::TestSupport
         o.plugin_tree_seed = mod
 
         ok = o.load_all_plugins
-        ok ? o : ok
+        ok and begin @_plugins = o ; ACHIEVED_ end
       end
 
-      def parse_argv argv
-
-        _p = Home_.lib_.function_chain(
-
-          -> { collect_signatures argv },
-
-          -> sig_a { check_if_argv_is_completely_parsed sig_a },
-        )
-
-        _array_of_one_element = _p[]
-
-        if _array_of_one_element
-          [ true, _array_of_one_element ]
-        end
-      end
-
-      def collect_signatures argv
+      def __via_plugins_resolve_signatures argv
 
         argv_ = argv.dup.freeze
 
         a = []
-        @plugins.accept do | de |
+
+        @_plugins.accept do | de |
           a.push de.prepare argv_
         end
 
-        if a.any?
-          [ true, a ]
-        elsif argv.any?
-          argument_error argv
+        if a.length.zero?
+          if argv_.length.zero?
+            @y << "nothing to do."
+            @y << invite_string
+            NIL_
+          else
+            argument_error argv
+          end
         else
-          @y << "nothing to do."
-          @y << invite_string
-          nil
+          @_sig_a = a ; KEEP_PARSING_
         end
       end
 
-      def check_if_argv_is_completely_parsed sig_a  # assume any
+      def __check_if_ARGV_is_completely_parsed_via_sigs  # assume any
 
-        g = nil
-        scn = Callback_::Scn.try_convert sig_a
-        until (( g = scn.gets )) ; end
-        xtra_a = ::Array.new g.input.length, true
-        begin  # ( bitwise OR )
-          g.input.each_with_index do |x, idx|
+        st = Callback_::Polymorphic_Stream.via_array @_sig_a
+        sig = Next_trueish__[ st ]   # assume one
+
+        xtra_a = ::Array.new sig.input.length, true
+
+        begin
+
+          sig.input.each_with_index do |x, idx|  # ( bitwise OR )
             if x.nil?
               xtra_a[ idx ] &&= nil
             elsif true == xtra_a[ idx ]
               xtra_a[ idx ] = x
             end
           end
-          g = nil
-          until (( scn.eos? or g = scn.gets )) ; end
-          g or break
-        end while true
+
+          sig = Next_trueish__[ st ]
+
+          sig or break
+          redo
+        end while nil
+
         if xtra_a.any?
           argument_error xtra_a.compact
         else
-          sig_a.compact!
-          [ true, sig_a ]
+          ( @_trueish_sig_a = remove_instance_variable( :@_sig_a ) ).compact!
+          ACHIEVED_
         end
       end
 
-      def produce_bound_call_via_sig_a sig_a
+      Next_trueish__ = -> st do
         begin
-          r, path = POSSIBLE_GRAPH.reconcile_with_path_or_failure @y,
-            :BEGINNING, :FINISHED, sig_a
-          r or break
-          path_a = path.get_a
-          current_eventpoint = :BEGINNING
-          while true
-            emit_eventpoint( current_eventpoint ) or break(( r = false ))
-            (( from_pred = path_a.shift )) or break
-            :EXECUTION == (( current_eventpoint = from_pred.to_i )) and
-              break(( r = via_executor_produce_bound_call ))  # hack for short stacks
+          if st.no_unparsed_exists
+            break
           end
+          x = st.gets_one
+          x and break
+          redo
         end while nil
-        if false == r
-          @y << "aborting because of the above. #{ invite_string }"
-          r = nil
-        end
-        r
+        x
       end
 
-      def via_executor_produce_bound_call
+      def __resolve_path_via_trueish_sigs
 
-        e = Here_::Sessions_::Execute.new(
+        @_graph = POSSIBLE_GRAPH
+
+        wv = @_graph.reconcile @y, :BEGINNING, :FINISHED, @_trueish_sig_a
+        if wv
+          @_path = wv.value_x
+          ACHIEVED_
+        else
+          @y << "aborting because of the above. #{ invite_string }"
+          NIL_
+        end
+      end
+
+      def __emit_each_eventpoint_to_all_subscribed_plugins
+
+        st = @_path.to_stream
+        sym = :BEGINNING
+        begin
+
+          ok = ___emit_eventpoint_to_all_subscribed_plugins sym
+          ok or break
+
+          pred = st.gets
+          if ! pred
+            break
+          end
+
+          sym = pred.after_symbol
+
+          redo
+        end while nil
+        ok
+      end
+
+      def ___emit_eventpoint_to_all_subscribed_plugins eventpoint_sym
+
+        ep = @_graph.fetch_eventpoint eventpoint_sym
+
+        ok = true
+
+        @_plugins.accept do | de |
+
+          sig = de.signature
+          sig or next
+
+          if ! sig.subscribed_to? ep
+            next
+          end
+
+          x = de.eventpoint_notify ep
+          if false == x
+            ok = x
+            break
+          end
+        end
+        ok
+      end
+
+      def __bound_call_for_test_execution
+
+        o = Here_::Sessions_::Execute.new(
 
           @y, get_test_path_a, @_daemon.program_name_string_array_
 
         ) do | q |
 
           if @x_a_a
-            set_quickie_options q
+            __set_quickie_options q
           end
         end
 
-        e.be_verbose = @plugins[ :run_recursive ].dependency_.be_verbose
-        @executor = e
-        e.produce_bound_call
+        o.be_verbose = @_plugins[ :run_recursive ].dependency_.be_verbose
+        @executor = o
+        o.produce_bound_call
       end
 
-      def set_quickie_options quickie
+      def __set_quickie_options quickie
         @x_a_a.each do |x_a|
           quickie.with_iambic_phrase x_a
-        end ; nil
-      end
-
-      def emit_eventpoint eventpoint_i
-
-        ok = true
-
-        ep = POSSIBLE_GRAPH.fetch_eventpoint eventpoint_i
-
-        @plugins.accept do | de |
-          sig = de.signature
-          sig or next
-          if sig.subscribed_to? ep
-            x = de.eventpoint_notify ep
-            if false == x
-              ok = false
-              break
-            end
-          end
         end
-        ok
+        NIL_
       end
     end
   end
 end
+# #tombstone: `function_chain`

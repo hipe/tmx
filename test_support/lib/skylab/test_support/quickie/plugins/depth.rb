@@ -4,10 +4,10 @@ module Skylab::TestSupport
 
     class Plugins::Depth
 
-      def initialize svc
-        @svc = svc
-        @sw = svc.build_required_arg_switch FLAG__
-        @y = svc.y
+      def initialize adapter
+        @adapter = adapter
+        @sw = adapter.build_required_arg_switch FLAG__
+        @y = adapter.y
       end
 
       FLAG__ = '-depth'.freeze
@@ -30,7 +30,6 @@ module Skylab::TestSupport
         y << "spec files at depths 2 and 3, but none at depth 1"
         y << "nor at depth 4 or deeper. useful for working thru"
         y << "a test-suite one layer at a time."
-        nil
       end
 
       def prepare sig
@@ -86,18 +85,23 @@ module Skylab::TestSupport
       def accpt_args_and_activate_plugin
         @sig.nilify_input_element_at_index @idx
         @sig.carry :TEST_FILES, :CULLED_TEST_FILES
-        nil
+        NIL_
       end
 
       def test_files_eventpoint_notify
-        a = @svc.get_test_path_a
+
         if @range.end.zero?
           when_depth_zero
-        elsif a.length.zero?
-          when_no_test_files
         else
-          first_pass a
-          second_pass
+
+          a = _services.get_test_path_array
+
+          if a.length.zero?
+            when_no_test_files
+          else
+            first_pass a
+            second_pass
+          end
         end
       end
 
@@ -191,7 +195,7 @@ module Skylab::TestSupport
 
       def report_nothing_was_filtered
         @y << "#{ ick_arg } filters nothing out. please omit this flag."
-        nil
+        NIL_
       end
 
       def act num_filtered_out, path_s_a
@@ -210,7 +214,7 @@ module Skylab::TestSupport
 
       def when_everything_was_filtered
         report_everything_was_filtered
-        @svc.replace_test_path_s_a EMPTY_A_
+        _services.replace_test_path_s_a EMPTY_A_
         ACHIEVED_
       end
 
@@ -220,7 +224,7 @@ module Skylab::TestSupport
       end
 
       def replace_list_with path_s_a
-        @svc.replace_test_path_s_a path_s_a
+        _services.replace_test_path_s_a path_s_a
         ACHIEVED_
       end
 
@@ -230,6 +234,10 @@ module Skylab::TestSupport
 
       def flg
         FLAG__
+      end
+
+      def _services
+        @adapter.services
       end
     end
   end

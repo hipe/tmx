@@ -111,6 +111,8 @@ module Skylab::TestSupport
 
     System_lib = sidesys[ :System ]
 
+    Task = sidesys[ :Task ]
+
     Tmpdir = -> do
       System[].filesystem.tmpdir
     end

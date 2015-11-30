@@ -4,13 +4,15 @@ module Skylab::TestSupport
 
     class Plugins::Cover::Worker__
 
-      def initialize svc
-        @svc = svc
-        @y = @svc.y
+      def initialize adapter
+        @adapter = adapter
+        @y = @adapter.y
       end
 
       def execute
-        @path_a = @svc.get_test_path_a
+
+        @path_a = @adapter.services.get_test_path_array
+
         case @path_a.length <=> 1
         when -1 ; self.when_there_are_no_paths
         when  0 ; when_there_is_one_path
@@ -169,7 +171,7 @@ module Skylab::TestSupport
       end
 
       def resolve_stderr_IO
-        @svc.infostream
+        @adapter.infostream
       end
 
       Longest_common_base_path__ = -> do  # becase we are covering that

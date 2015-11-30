@@ -8,7 +8,7 @@ digraph g {
   re_house_xx [label="re-house\nquickie\nplugin lib" fillcolor="gray" style="filled"]
   clean_up_doctest [label="clean up\ndoc-test" ]
   clean_up_doctest -> re_house_yy
-  re_house_yy [label="re-house\nquickie dependency-graph"]
+  re_house_yy [label="re-house\nquickie dependency-graph" style="filled"]
   clean_up_doctest->insane_CM_redux
   insane_CM_redux [label="insane\ncode-molester\nredux"]
 

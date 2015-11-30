@@ -4,9 +4,9 @@ module Skylab::TestSupport
 
     class Plugins::Cover
 
-      def initialize svc
-        @fuzzy_flag = svc.build_fuzzy_flag %w( -cover )
-        @svc = svc ; nil
+      def initialize adapter
+
+        @fuzzy_flag = adapter.build_fuzzy_flag %w( -cover )
       end
 
       def opts_moniker
@@ -19,7 +19,6 @@ module Skylab::TestSupport
       def desc y
         y << "run the coverage service for the"
         y << "subtree inferred by the test files"
-        nil
       end
 
       def prepare sig
@@ -32,7 +31,7 @@ module Skylab::TestSupport
       end
 
       def before_execution_eventpoint_notify
-        Here_::Plugins::Cover::Worker__.new( @svc ).execute
+        Here_::Plugins::Cover::Worker__.new( @adapter ).execute
       end
     end
   end

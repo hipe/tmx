@@ -4,9 +4,9 @@ module Skylab::TestSupport
 
     class Plugins::Wip_It
 
-      def initialize svc
-        @fuzzy_flag = svc.build_fuzzy_flag %w( -wip-them-all )
-        @svc = svc
+      def initialize adapter
+        @fuzzy_flag = adapter.build_fuzzy_flag %w( -wip-them-all )
+        @adapter = adapter
       end
 
       def opts_moniker
@@ -20,7 +20,6 @@ module Skylab::TestSupport
         y << "a search-replace hack: all `describe` blocks in"
         y << "the files that look \"normal\", add a `wip` tag"
         y << "(no dry-run yet, but only mutates unmodified files)"
-        nil
       end
 
       def prepare sig
@@ -38,7 +37,7 @@ module Skylab::TestSupport
         @BS = Autoloader_.require_sidesystem :BeautySalon
 
         @pwd = ::Dir.pwd
-        @y = @svc.y
+        @y = @adapter.y
 
         ok = __resolve_first_path
         ok &&= __via_first_path_resolve_VCS_session
@@ -46,7 +45,8 @@ module Skylab::TestSupport
       end
 
       def __resolve_first_path
-        @st = @svc.to_test_path_stream
+
+        @st = @adapter.services.to_test_path_stream
         @first_path = @st.gets
         @first_path && ACHIEVED_
       end
@@ -79,7 +79,7 @@ module Skylab::TestSupport
         else
           @y << "not tracked by #{ @sess.base_name_string }, skipping: #{ path }"
         end
-        nil
+        NIL_
       end
 
       def __work path

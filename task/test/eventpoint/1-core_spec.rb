@@ -1,8 +1,12 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::Quickie::Possible
+module Skylab::Task::TestSupport
 
-  describe "[ts] quickie possile" do
+  module Eventpoint_Namespace  # <-
+
+  TS_.describe "[ts] quickie possile" do
+
+    TS_.lib_ :eventpoint
 
     context "with a graph with three nodes" do
 
@@ -10,7 +14,7 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible
 
         module Zing
 
-          Possible_::Graph[ self ]
+          Subject::Graph[ self ]
 
           BEGINNING = eventpoint
 
@@ -38,5 +42,7 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible
         HERE
       end
     end
+  end
+# ->
   end
 end

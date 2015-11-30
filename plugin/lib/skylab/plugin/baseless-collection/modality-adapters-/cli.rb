@@ -88,14 +88,22 @@ module Skylab::Plugin
         @_dependency
       end
 
-      # -- for dependency of client (alphabetical)
+      # -- for dependency of client
+
+      # ~ writers
 
       def add_iambic x_a
         @plugin_services.add_iambic x_a
       end
 
-      def client_moniker
-        @plugin_services.moniker_
+      def replace_test_path_s_a s_a
+        @plugin_services.replace_test_path_s_a s_a
+      end
+
+      # ~ readers
+
+      def some_desc_a
+        @_dependency.desc []
       end
 
       def build_fuzzy_flag a
@@ -106,8 +114,16 @@ module Skylab::Plugin
         @cool_pool.build_required_arg_switch a
       end
 
-      def get_test_path_a
-        @plugin_services.get_test_path_a
+      def client_moniker
+        @plugin_services.moniker_
+      end
+
+      def program_moniker
+        @plugin_services.program_moniker
+      end
+
+      def y
+        @plugin_services.y
       end
 
       def infostream
@@ -118,30 +134,14 @@ module Skylab::Plugin
         @plugin_services.paystream_
       end
 
+      ## ~~ elemental readers
+
       def plugins
         @plugin_collection
       end
 
-      def program_moniker
-        @plugin_services.program_moniker
-      end
-
-      def replace_test_path_s_a s_a
-        @plugin_services.replace_test_path_s_a s_a
-      end
-
-      def some_desc_a
-        a = []
-        @_dependency.desc a
-        a
-      end
-
-      def to_test_path_stream
-        @plugin_services.to_test_path_stream
-      end
-
-      def y
-        @plugin_services.y
+      def services
+        @plugin_services
       end
     end
   end

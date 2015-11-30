@@ -2,9 +2,7 @@ module Skylab::TestSupport
 
   module Quickie  # see [#004] the quickie narrative #intro
 
-    Here_ = self
-
-    class << Here_
+    class << self
 
       def extended mod  # :+[#sl-111] deprecteded `extended` pattern
 
@@ -119,7 +117,7 @@ module Skylab::TestSupport
     # (..or you can use `describe` from almost
     #  anywhere with this experimental hack:)
 
-    class << Here_
+    class << self
 
       def enable_kernel_describe
 
@@ -207,7 +205,7 @@ module Skylab::TestSupport
             # if there is already a client started, assume it will
             # "drive" itself and does not need to be invoked ..
 
-            cli.receive_context_class__ tcc  # nil
+            cli.receive_test_context_class__ tcc  # nil
             NIL_
           else
 
@@ -1192,20 +1190,20 @@ module Skylab::TestSupport
 
     #  ~ section.
 
-    class << Home_
+    class << self
 
       def do_not_invoke!
 
-        # prevents quikcie from flushing its tests.
+        # prevents quickie from flushing its tests.
         # for hacks in e.g your test file. might make noise. might go away..
 
-        _any_daemon.do_not_invoke!
+        _any_daemon.___do_not_invoke
       end
     end
 
     class Top_Front__ # #re-open
 
-      def do_not_invoke!
+      def ___do_not_invoke
 
         y = @_info_yielder
 
@@ -1245,7 +1243,7 @@ module Skylab::TestSupport
 
     #  ~ section.
 
-    class << Here_
+    class << self
       def apply_experimental_specify_hack test_context_class
         Here_::Actors_::Specify.apply_if_not_defined test_context_class
       end
@@ -1321,5 +1319,6 @@ module Skylab::TestSupport
     end
   end
 # -> (net: 0)
+    Here_ = self
   end
 end

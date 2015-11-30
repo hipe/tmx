@@ -1,16 +1,19 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::Quickie::Possible
+module Skylab::Task::TestSupport
 
-  describe "[ts] quickie possible react and rely" do
+  module Eventpoint_Namespace  # <-
 
-    include Possible_TS_::InstanceMethods
+  TS_.describe "[ta] eventpoint - react and rely" do
+
+    TS_[ self ]
+    use :eventpoint
 
     context "with a triangle" do
 
       before :all do
         module Triangle
-          Possible_::Graph[ self ]
+          Subject::Graph[ self ]
           A = eventpoint
           B = eventpoint { from A }
           C = eventpoint { from B ; from A }
@@ -73,5 +76,7 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible
         path.map( & :client ).should eql( [ :sig4, :sig2 ] )
       end
     end
+  end
+# ->
   end
 end

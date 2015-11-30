@@ -1,21 +1,25 @@
-module Skylab::TestSupport
-
-  module Quickie
-
-    module Possible_  # :[#028].
+class Skylab::Task
+  # ->
+    class Eventpoint < ::Module  # :[#004].
 
       class Graph
 
         def self.[] mod
-          ADAPTER_MOD_H_.fetch( mod.class )[][ mod ]
+          Adapter_module_for___[ mod ][ mod ]
         end
 
-        ADAPTER_MOD_H_ = {
-          ::Module => -> { Module_Adapter_Methods__ }
-        }.freeze
+        Adapter_module_for___ = -> do
+          h = {
+            ::Module => -> { Module_Adapter_Methods___ }
+          }
+          -> x do
+            h.fetch( x.class ).call
+          end
+        end.call
 
         def initialize a, h  # mutates nodes with linkbacks
-          @a, @h = a, h
+          @a = a
+          @h = h
           calculate_linkbacks
         end
 
@@ -31,15 +35,15 @@ module Skylab::TestSupport
             n = @h.fetch i
             if (( a = n.to_a ))
               a.each do |n_|
-                seen_h[ i_ = n_.node_i ] = true
+                seen_h[ i_ = n_.node_symbol ] = true
                 if (( idx = maybe_single_h[ i_ ] ))
                   cache_a[ idx ] = nil
                 end
                 cache_a << "#{ i } -> #{ i_ }"
               end
             elsif ! seen_h[ i ]
-              maybe_single_h[ n.node_i ] = cache_a.length
-              cache_a << n.node_i.to_s
+              maybe_single_h[ n.node_symbol ] = cache_a.length
+              cache_a << n.node_symbol.id2name
             end
           end
           cache_a.compact!
@@ -48,16 +52,22 @@ module Skylab::TestSupport
         end
 
         def new_graph_signature client_x, input_x=nil
+
           Signature__.new client_x, input_x
         end
 
         def reconcile y, from_i, to_i, sig_a
-          Reconciliation__.new( y, self, from_i, to_i, sig_a ).execute
+          o = build_reconciliation y, from_i, to_i, sig_a
+          wv = o.work_
+          if wv
+            wv
+          else
+            o._express_via_expression_grid
+          end
         end
 
-        def reconcile_with_path_or_failure y, from_i, to_i, sig_a
-          Reconciliation__.new( y, self, from_i, to_i, sig_a ).
-            execute_with_story_or_failure
+        def build_reconciliation y, from_i, to_i, sig_a
+          Reconciliation___.new y, self, from_i, to_i, sig_a
         end
 
         def fetch_eventpoint i
@@ -76,7 +86,7 @@ module Skylab::TestSupport
             n = @h.fetch i
             if (( a = n.from_a ))                # if node `n` has from nodes
               a.each do |n_|                     # then for each from node
-                to_a_h.fetch( n_.node_i ) do |i_|  # memo that there is a `to`
+                to_a_h.fetch( n_.node_symbol ) do |i_|  # memo that there is a `to`
                   a_ << i_                       # from the from node to `n`
                   to_a_h[ i_ ] = [ ]
                 end << n
@@ -90,7 +100,7 @@ module Skylab::TestSupport
         end
       end
 
-      module Graph::Module_Adapter_Methods__
+      module Graph::Module_Adapter_Methods___
 
         def self.[] mod
           mod.extend self
@@ -121,15 +131,20 @@ module Skylab::TestSupport
         end
       end
 
-      class Eventpoint__ < ::Module
+      Eventpoint__ = self
+      class Eventpoint__
 
         def initialize blk
-          @node_i = nil ; @to_a = nil
+
+          @node_symbol = nil
+          @to_a = nil
+
           if blk
             Shell__.new( a = [] ).instance_exec( & blk )
             @from_a = a.freeze
           end
         end
+
         class Shell__
           def initialize a
             @a = a
@@ -142,11 +157,12 @@ module Skylab::TestSupport
 
         attr_reader :from_a
 
-        attr_reader :node_i ; alias_method :node_id, :node_i  # some contexts
+        attr_reader :node_symbol
+        alias_method :node_id, :node_symbol  # some contexts
 
         def name_notify node_i
-          @node_i and fail "hack failed - do this better"
-          @node_i = node_i
+          @node_symbol and fail "hack failed - do this better"
+          @node_symbol = node_i
           nil
         end
 
@@ -159,24 +175,20 @@ module Skylab::TestSupport
         end
 
         def transitions_to? ep
-          i = ep.node_i
+          i = ep.node_symbol
           if @to_a
             @to_a.index do |x|
-              x.node_i == i
+              x.node_symbol == i
             end
           end
         end
 
         def eventpoint_notify_method_name
-          @enmn ||= :"#{ @node_i.downcase }_eventpoint_notify"
+          @enmn ||= :"#{ @node_symbol.downcase }_eventpoint_notify"
         end
       end
 
-      Say_ = -> do  # #protected-not-private
-        Possible_::Articulators__
-      end
-
-      Multi_add_ = -> i, x do  # #protected-not-private
+      Multi_add_ = -> i, x do
         @h.fetch( i ) do |_|
           @a << i
           @h[ i ] = [ ]
@@ -184,39 +196,49 @@ module Skylab::TestSupport
         nil
       end
 
-      Errmsg_ = -> agent, predicate, any_conj=nil do  # #protected-not-private
-        Grid_Frame__[ agent, predicate, any_conj ].articulate_self
-      end
-      #
-      # ( above and below share signature, make it easy to swap )
-      #
-      Add_grid_frame__ = -> agent, predicate, any_conj=nil do
-        ( @grid ||= Grid__.new ) << Grid_Frame__[ agent, predicate, any_conj ]
-        nil
-      end
+      Same_method_ = -> * x_a, & x_p do
 
-      Articulate_grid__ = -> do # assume @grid
-        @grid.articulate_each_frame_to @y.method( :<< )
-        nil
+        o = new( * x_a, & x_p )
+        wv = o.work_
+        if wv
+          wv
+        else
+          o._express_via_expression_grid
+          UNABLE_
+        end
       end
 
-      module Grid_Methods_  # #protected-not-private
+      module Worker_Methods_
 
-        define_method :add_frame, & Add_grid_frame__
-        private :add_frame
+        def add_expression_frame_ agent, predicate, any_conj=nil
 
-        define_method :errmsg, & Errmsg_
-        private :errmsg
-
-        def perform_execution_result
-          if ! @grid then true else
-            articulate
-            false
+          eg = @expression_grid
+          if ! eg
+            eg = Grid__.new
+            @expression_grid = eg
           end
+
+          eg << Grid_Frame__[ agent, predicate, any_conj ]
+
+          NIL_
         end
 
-        define_method :articulate, & Articulate_grid__
-        private :articulate
+        def _express_via_expression_grid
+          @expression_grid.articulate_each_frame_to @y.method( :<< )
+          UNABLE_
+        end
+
+        def express_ const, * args
+          Here_::Expressions___.const_get( const, false )[ * args ]
+        end
+
+        def errmsg_ agent, predicate, any_conj=nil
+          Grid_Frame__[ agent, predicate, any_conj ].articulate_self
+        end
+
+        attr_reader(
+          :expression_grid,
+        )
       end
 
       class Grid__
@@ -274,27 +296,46 @@ module Skylab::TestSupport
         end
       end
 
-      class Reconciliation__
+      class Reconciliation___
+
+        include Worker_Methods_
 
         def initialize y, graph, from_i, to_i, sig_a
-          @grid = nil
-          @y, @graph, @from_i, @to_i, @sig_a = y, graph, from_i, to_i, sig_a
+
+          @after_symbol = to_i
+          @expression_grid = nil
+          @before_symbol = from_i
+          @graph = graph
+          @sig_a = sig_a
+          @y = y
         end
 
-        def execute
-          execute_with_story_or_failure.fetch 0
+        def work_
+          wv = ___find_path
+          wv && __check_dependencies( wv.value_x )
         end
 
-        def execute_with_story_or_failure
-          begin
-            ok, x = Possible_::Pathfinder__.
-              new( @y, @graph, @from_i, @to_i, @sig_a ).
-                execute_with_path_or_failure
-            ok or break
-            ok, x = Possible_::Dependency_Checker__.
-              new( @y, @graph, x, @sig_a ).execute_with_path_or_failure
-          end while nil
-          [ ok, x ]
+        def ___find_path
+
+          _ = Here_::Find_path___.new(
+            @y, @graph, @before_symbol, @after_symbol, @sig_a )
+
+          _common _
+        end
+
+        def __check_dependencies x
+
+          _common Here_::Check_dependencies___.new( @y, @graph, x, @sig_a )
+        end
+
+        def _common o
+          wv = o.work_
+          if wv
+            wv
+          else
+            @expression_grid = o.expression_grid
+            UNABLE_
+          end
         end
       end
 
@@ -366,13 +407,13 @@ module Skylab::TestSupport
               @h.fetch( node_i ).each do |pred|
                 case pred.predicate_i
                 when :from, :depend
-                  h[ pred.node_i ] = true
+                  h[ pred.node_symbol ] = true
                 end
               end
             end
             h
           end
-          @subscribed_to_cache_h[ ep.node_i ]
+          @subscribed_to_cache_h[ ep.node_symbol ]
         end
 
       private
@@ -443,7 +484,7 @@ module Skylab::TestSupport
 
       module Signature__::Predicates
 
-        Depend_Soft = Signature__::Predicate.new :depend, :node_i
+        Depend_Soft = Signature__::Predicate.new :depend, :node_symbol
 
         class Depend_Soft
           def strength_i
@@ -457,27 +498,29 @@ module Skylab::TestSupport
           end
         end
 
-        From_Soft__ = Signature__::Predicate.new :from, :from_i, :to_pred
+        From_Soft__ = Signature__::Predicate.new :from, :before_symbol, :to_pred
 
-        To__ = Signature__::Predicate.new :to, :from_pred, :to_i
+        To__ = Signature__::Predicate.new :to, :from_pred, :after_symbol
 
         class From_Soft__  # this little tricklette lets us compose
           # two objects that are immutable but associated with each other.
+
           alias_method :_, :initialize
+
           def initialize sig, from_i
-            @sig, @from_i = sig, from_i
+            @before_symbol = from_i
+            @sig = sig
             @to_pred = yield self
-            nil
           end
 
-          alias_method :node_i, :from_i  # in some contexts
+          alias_method :node_symbol, :before_symbol  # in some contexts
+
+          def after_symbol
+            @to_pred.after_symbol
+          end
 
           def strength
             SOFT_STRENGTH_
-          end
-
-          def to_i
-            @to_pred.to_i
           end
         end
 
@@ -487,6 +530,11 @@ module Skylab::TestSupport
           end
         end
       end
+
+      EMPTY_S_ = ''
+      Here_ = self
+      NEWLINE_ = "\n"
+      SPACE_ = ' '
     end
-  end
+  # -
 end

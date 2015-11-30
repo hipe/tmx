@@ -23,7 +23,7 @@
              ( #was: #done #universal while regret no longer wires test nodes for autoloading  )
 [#030] #open #parent-node:[#015] the doc-test recursive spec needs mock fs
 [#029]       #track the 'expect' omnibus and narrative ..
-[#028]       [ "possible" ]
+[#028] #hole ( #was: "possible" #moved-to: [#ta-004]  ("eventpoint"))
              ( #was: #done borked quickie architecture near constants )k
 [#027]       #parent-node: [#015] peek hack explained .. (was templo)
 [#026]       #parent-node: [#015] the view-controller narrative ..

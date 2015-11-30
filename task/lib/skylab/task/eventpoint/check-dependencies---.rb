@@ -1,25 +1,32 @@
-module Skylab::TestSupport
+class Skylab::Task
+  # ->
+    class Eventpoint
 
-  module Quickie
+      class Check_dependencies___
 
-    module Possible_
+        include Worker_Methods_
 
-      class Dependency_Checker__
-
-        include Grid_Methods_
+        # (most style below this line is ancient)
 
         def initialize y, graph, mutable_path, sig_a
-          @grid = nil
-          @y, @graph, @mutable_path, @sig_a = y, graph, mutable_path, sig_a
+
+          @expression_grid = nil
+          @graph = graph
+          @mutable_path = mutable_path
+          @sig_a = sig_a
+          @y = y
         end
 
-        def execute_with_path_or_failure
+        def work_
+
           @nodes_visited_by_path_h = get_nodes_visited_by_path_h
+
           rely_a = react_a = nil
           strength_h = {
             react: -> x { ( react_a ||= [ ] ) << x },
             rely: -> x { ( rely_a ||= [ ] ) << x }
           }.freeze
+
           @sig_a.each do |sig|
             sig_had_effect = false ; maybe_untouched_pred_a = nil
             sig.each_pair do |node_i, pred_a|
@@ -39,11 +46,11 @@ module Skylab::TestSupport
             end
             sig_had_effect or sig_had_no_effect sig, maybe_untouched_pred_a
           end
-          if ! @grid then
-            [ true, @mutable_path ]
+
+          if @expression_grid
+            UNABLE_
           else
-            articulate
-            [ false, @grid ]
+            Callback_::Known_Known[ @mutable_path ]
           end
         end
 
@@ -52,32 +59,45 @@ module Skylab::TestSupport
         def get_nodes_visited_by_path_h
           nodes_visited_by_path_h = { }
           @mutable_path.each do |pred|
-            nodes_visited_by_path_h[ pred.to_i ] = true
+            nodes_visited_by_path_h[ pred.after_symbol ] = true
           end
           nodes_visited_by_path_h
         end
 
-        define_method :say, & Say_
-
         def check_sig_rely_node sig, node_i, _rely_a  # assume rely_a
+
           if ! @nodes_visited_by_path_h[ node_i ]
-            add_frame say::Signature_[ sig ], say::Unmet_Reliance_[
-              @graph.fetch_eventpoint( node_i ) ]
+
+            _ = express_ :Signature, sig
+            __ = express_ :Unmet_Reliance, @graph.fetch_eventpoint( node_i )
+
+            add_expression_frame_ _, __
           end
         end
 
         def sig_had_no_effect sig, untouched_pred_a
+
           seen_h = ::Hash.new { |h, k| h[k] = true ; nil }
+
           ep_a = untouched_pred_a.reduce [] do |m, x|
-            if ! seen_h[ x.node_i ]
-              m << @graph.fetch_eventpoint( x.node_i )
+
+            k = x.node_symbol
+
+            if ! seen_h[ k ]
+              m << @graph.fetch_eventpoint( k )
             end
+
             m
           end
-          @y << errmsg( say::Signature_[ sig ], say::Had_no_effect_[ ep_a ] )
-          nil
+
+          _ = express_ :Signature, sig
+          __ = express_ :Had_no_effect, ep_a
+
+          @y << errmsg_( _, __ )
+
+          NIL_
         end
       end
     end
-  end
+  # -
 end

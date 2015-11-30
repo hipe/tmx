@@ -4,10 +4,10 @@ module Skylab::TestSupport
 
     class Plugins::Help
 
-      def initialize svc
-        @fuzzy_flag = svc.build_fuzzy_flag %w( -help )
-        @svc = svc
-        @y = svc.y
+      def initialize adapter
+        @fuzzy_flag = adapter.build_fuzzy_flag %w( -help )
+        @adapter = adapter
+        @y = adapter.y
       end
 
       def opts_moniker
@@ -33,7 +33,7 @@ module Skylab::TestSupport
       end
 
       def desc y
-        y << "this screen" ; nil
+        y << "this screen"
       end
 
       def prepare sig
@@ -52,7 +52,7 @@ module Skylab::TestSupport
         @y << "options:"
 
         row_a = []
-        @svc.plugins.accept do | da |
+        @adapter.plugins.accept do | da |
           Multiline_column_B__[ row_a, da.syntax_moniker, da.some_desc_a ]
         end
 
@@ -81,8 +81,8 @@ module Skylab::TestSupport
       end
 
       def usage  # may be called directly
-        @y << "usage: #{ @svc.program_moniker } #{ get_syntax_string }"
-        nil
+        @y << "usage: #{ @adapter.program_moniker } #{ get_syntax_string }"
+        NIL_
       end
 
     private
@@ -91,7 +91,7 @@ module Skylab::TestSupport
 
         s_a = [ ] ; a_a = [ ]
 
-        @svc.plugins.accept do | da |
+        @adapter.plugins.accept do | da |
           s = da.dependency_.opts_moniker
           s and s_a.push s
           s = da.dependency_.args_moniker

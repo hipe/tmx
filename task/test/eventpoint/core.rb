@@ -1,37 +1,28 @@
-require_relative '../../test-support'
+module Skylab::Task::TestSupport
 
-module Skylab::TestSupport::TestSupport::Quickie
+  module Eventpoint
 
-  ::Skylab::TestSupport::TestSupport[ self ]
-
-end
-
-module Skylab::TestSupport::TestSupport::Quickie::Possible
-
-  ::Skylab::TestSupport::TestSupport::Quickie[ Possible_TS_ = self ]
-
-  Home_ = ::Skylab::TestSupport
-  Quickie = Home_::Quickie
-    Possible_ = Quickie::Possible_
-
-  extend Quickie
-
-  LIB_ = Home_.lib_
-
-  module InstanceMethods
-
-    def debug!
-      @do_debug = true
+    def self.[] tcc
+      tcc.include self
     end
-
-    attr_reader :do_debug
 
     def recon from_i, to_i, sig_a
       possible_graph.reconcile y, from_i, to_i, sig_a
     end
 
     def recon_plus from_i, to_i, sig_a
-      possible_graph.reconcile_with_path_or_failure y, from_i, to_i, sig_a
+
+      o = possible_graph.build_reconciliation y, from_i, to_i, sig_a
+
+      wv = o.work_
+
+      # (we are translating back to the old "pair" style for legacy tests)
+
+      if wv
+        [ true, wv.value_x ]
+      else
+        [ wv, o.expression_grid ]
+      end
     end
 
     def y
@@ -67,5 +58,14 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible
     def new_sig x=:meh
       possible_graph.new_graph_signature x
     end
+
+    def subject_
+      Eventpoint_Namespace::Subject
+    end
+  end
+
+  module Eventpoint_Namespace
+
+    Subject = Home_::Eventpoint
   end
 end

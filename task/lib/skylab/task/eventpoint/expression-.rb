@@ -1,14 +1,12 @@
-module Skylab::TestSupport
+class Skylab::Task
+  # ->
+    class Eventpoint
 
-  module Quickie
-
-    module Possible_
-
-      class Articulator_
+      class Expression_
 
         # this generates a simple articulator class.
         #
-        #     _Wing_Wang_Predicate = Articulator_.
+        #     _Wing_Wang_Predicate = Subject.
         #       new( :wing, :wang, -> do
         #         "wing is: #{ @wing }, wang: #{ @wang }"
         #       end )
@@ -24,14 +22,14 @@ module Skylab::TestSupport
 
         # with `articulate_self` pass the same fields in as arguments
         #
-        #     o = Articulator_.new( :a, :b, -> a, b { "#{ a } + #{ b }" } )
+        #     o = Subject.new( :a, :b, -> a, b { "#{ a } + #{ b }" } )
         #     o[ "one", "two" ].articulate_self  # => "one + two"
 
 
-        # a shorthand way to accomplish the above is
+
         # definine the articulator with ony one function:
         #
-        #     o = Articulator_.new do |a, b|
+        #     o = Subject.new do |a, b|
         #       "#{ a } + #{ b }"
         #     end
         #
@@ -101,16 +99,15 @@ module Skylab::TestSupport
           instance_exec( * to_a, & articulation_proc )
         end
 
-        define_method :at, & Possible_::At_
+        define_method :at, & Here_::At_
 
         def to_a
           ivar_a.map( & method( :instance_variable_get ) )
         end
-      end
 
       # other times you might do clever things with the rendering context
       #
-      #     _Error_Predicate = Articulator_.new(
+      #     _Error_Predicate = Subject.new(
       #       :name, :val, -> o do
       #         n, v = o.at :name, :val
       #         "#{ n } had a #{ em 'bad' } issue - #{ v }"
@@ -127,7 +124,7 @@ module Skylab::TestSupport
 
       # write your proc signature however you like, e.g use `to_a`
       #
-      #     _Art = Articulator_.new :up, :down, -> up, down do
+      #     _Art = Subject.new :up, :down, -> up, down do
       #       "#{ up } and #{ down }"
       #     end
       #
@@ -135,11 +132,10 @@ module Skylab::TestSupport
       #     p.articulation_proc[ * p.to_a ]  # => 'hi and lo'
       #
 
-
       # articulators have a stupid simple but powerful algorithm for inflection
       #
-      #     _NP = Articulator_[ :a, -> a { a * ' and ' } ]
-      #     _VP = Articulator_[ :tense, :a, -> t, a do
+      #     _NP = Subject[ :a, -> a { a * ' and ' } ]
+      #     _VP = Subject[ :tense, :a, -> t, a do
       #       :present == t ? ( 1 == a.length ? 'has' : 'have' ) : 'had'
       #     end ]
       #
@@ -149,9 +145,8 @@ module Skylab::TestSupport
       #
       #     ( _NP[ %w( Jack ) ] | _VP[ :past ] ).inflect  # => "Jack had"
 
-      class Articulator_
         def | art_x
-          Inflector_.new self, art_x
+          Inflection___.new self, art_x
         end
 
         def [] member_i
@@ -163,7 +158,7 @@ module Skylab::TestSupport
         end
       end
 
-      class Inflector_
+      class Inflection___
 
         def initialize first, second
           @a = [ first, second ]
@@ -210,5 +205,5 @@ module Skylab::TestSupport
         end
       end
     end
-  end
+  # -
 end

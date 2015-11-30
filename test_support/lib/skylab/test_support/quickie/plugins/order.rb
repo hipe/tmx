@@ -73,10 +73,10 @@ module Skylab::TestSupport
         HERE
       end
 
-      def initialize svc
+      def initialize adapter
 
-        @_services = svc
-        @_switch = svc.build_required_arg_switch FLAG__
+        @_adapter = adapter
+        @_switch = adapter.build_required_arg_switch FLAG__
       end
 
       def opts_moniker
@@ -297,7 +297,7 @@ module Skylab::TestSupport
           NIL_
         end
 
-        orig_paths = @_services.get_test_path_a
+        orig_paths = @_adapter.services.get_test_path_array
 
         tree = Home_.lib_.basic::Tree.via :paths, orig_paths
 
@@ -475,7 +475,7 @@ module Skylab::TestSupport
         if @_do_reverse
           slice.reverse!
         end
-        @_services.replace_test_path_s_a slice  # result is result
+        @_adapter.replace_test_path_s_a slice  # result is result
       end
 
       # -- Help --
@@ -533,7 +533,7 @@ module Skylab::TestSupport
       end
 
       def _y
-        @_services.y
+        @_adapter.y
       end
 
       def _flag

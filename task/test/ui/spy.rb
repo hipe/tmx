@@ -2,6 +2,8 @@ module Skylab::Task::TestSupport
 
   class UI::Spy
 
+    PUBLIC = true
+
     attr_accessor :err, :out, :silent
 
     [:out, :err].each do |stream|

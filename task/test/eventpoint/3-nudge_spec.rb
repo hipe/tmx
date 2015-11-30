@@ -1,16 +1,19 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::Quickie::Possible
+module Skylab::Task::TestSupport
 
-  describe "[ts] quickie possible nudge" do
+  module Eventpoint_Namespace  # <-
 
-    include Possible_TS_::InstanceMethods
+  TS_.describe "[ta] eventpoint - nudge" do
+
+    TS_[ self ]
+    use :eventpoint
 
     context "with a graph with two nodes" do
 
       before :all do
         module Diadic
-          Possible_::Graph[ self ]
+          Subject::Graph[ self ]
           A = eventpoint
           B = eventpoint { from A }
         end
@@ -53,18 +56,27 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible
       end
 
       it "reconcile with invalid direction - rt at recon time" do
-        (( sig = new_sig )).nudge :B, :A
-        -> do
+
+        sig = new_sig
+        sig.nudge :B, :A
+        begin
           recon :A, :B, [ sig ]
-        end.should raise_error( ::RuntimeError, "signature error - meh #{
+        rescue ::RuntimeError => e
+        end
+
+        e.message.should eql "signature error - meh #{
           }expresses an invalid transition from B to A (B does not #{
-          }transition to any other nodes)" )
+           }transition to any other nodes)"
       end
 
       it "reconcile one nudge - WORKS" do
-        (( sig = new_sig )).nudge :A, :B
-        x = recon :A, :B, [ sig ]
-        x.should eql( true )
+
+        sig = new_sig
+        sig.nudge :A, :B
+
+        wv = recon :A, :B, [ sig ]
+
+        wv.value_x or fail
       end
 
       it "reconcile with ambiguous nudges - soft failure" do
@@ -75,5 +87,7 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible
         grid.fetch_frame( 0 ).get_exponent.should eql( :agents_ambiguity )
       end
     end
+  end
+# ->
   end
 end

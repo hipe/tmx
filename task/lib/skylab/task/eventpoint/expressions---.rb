@@ -1,14 +1,12 @@
-module Skylab::TestSupport
+class Skylab::Task
+  # ->
+    class Eventpoint
 
-  module Quickie
+      module Expressions___
 
-    module Possible_
+        o = Here_::Expression_.method :new
 
-      module Articulators__
-
-        o = Possible_::Articulator_.method :new
-
-        Agents_ = -> do
+        Agents = -> do
           h = {
             inclusive: -> n do
               case n
@@ -34,12 +32,12 @@ module Skylab::TestSupport
           end ]
         end.call
 
-        Ambiguity_ = o[ -> ep, pred_a do
+        Ambiguity = o[ -> ep, pred_a do
           "express transitions of the same strength from #{
             }#{ The_state_[ ep ] }"
         end ]
 
-        Bring_ = o[ -> ep, a, inclusion_i do
+        Bring = o[ -> ep, a, inclusion_i do
           excl = :exclusive == inclusion_i
           v = case a.length
               when 1 ; excl ? "does not bring" : "brings"
@@ -52,13 +50,13 @@ module Skylab::TestSupport
           "#{ client_x.intern }"
         end
 
-        Client_ = o[ Client__ ]
+        Client = o[ Client__ ]
 
-        Ep_ = -> ep do
-          ep.node_i
+        Ep__ = -> ep do
+          ep.node_symbol
         end
 
-        Exist_ = -> do
+        Exist = -> do
           h = {
             present: -> n { 1 == n ? 'is' : 'are' },
             past: -> n { 1 == n ? 'was' : 'were' }
@@ -68,7 +66,7 @@ module Skylab::TestSupport
           end ]
         end.call
 
-        Got_passed_ = o[ -> ep, a do
+        Got_passed = o[ -> ep, a do
           if 1 == a.length
             "failed to get passed #{ The_state_[ ep ] }"
           else
@@ -76,49 +74,49 @@ module Skylab::TestSupport
           end
         end ]
 
-        Had_no_effect_ = o[ -> ep_a do
+        Had_no_effect = o[ -> ep_a do
 
           _ = Callback_::Oxford_or[ ep_a.map( & The_state_ ) ]
 
           "will have no effect because the system does not reach #{ _ }"
         end ]
 
-        Reach_ = o[ -> ep do
+        Reach = o[ -> ep do
           "cannot reach #{ The_state_[ ep ] }"
         end ]
 
-        Signature_ = o[ -> sig do
+        Signature = o[ -> sig do
           Client__[ sig.client ]
         end ]
 
-        So_ = o[ -> { "so" } ]
+        So = o[ -> { "so" } ]
 
-        System_ = o[ -> { "the system" } ]
+        System = o[ -> { "the system" } ]
 
         The_state_ = -> ep do
-          "the #{ Ep_[ ep ] } state"
+          "the #{ Ep__[ ep ] } state"
         end
 
-        Transition_ = o[ -> fep, tep do
+        Transition = o[ -> fep, tep do
 
           a = fep.to_a
           x = if a
 
-            _ = Callback_::Oxford_and[ a.map( & :node_i ) ]
+            _ = Callback_::Oxford_and[ a.map( & :node_symbol ) ]
 
-            " (#{ Ep_[ fep ] } goes to #{ _ })"
+            " (#{ Ep__[ fep ] } goes to #{ _ })"
               else
-            " (#{ Ep_[ fep ] } does not transition to any other nodes)"
+            " (#{ Ep__[ fep ] } does not transition to any other nodes)"
               end
 
-          "expresses an invalid transition from #{ Ep_[ fep ] } to #{
-            }#{ Ep_[ tep ] }#{ x }"
+          "expresses an invalid transition from #{ Ep__[ fep ] } to #{
+            }#{ Ep__[ tep ] }#{ x }"
         end ]
 
-        Unmet_Reliance_ = o[ -> ep do
+        Unmet_Reliance = o[ -> ep do
           "cannot operate without reaching #{ The_state_[ ep ] }"
         end ]
       end
     end
-  end
+  # -
 end

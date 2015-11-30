@@ -34,7 +34,7 @@ module Skylab::TestSupport
         ok && via_client_produce_bound_call
       end
 
-      def receive_context_class___ ctx_class
+      def receive_test_context_class___ ctx_class
         @ctx_class_a << ctx_class
         nil
       end
@@ -135,9 +135,8 @@ module Skylab::TestSupport
       end
 
       def via_client_produce_bound_call
-        Bound_Call__.new @client, :execute_
+        Callback_::Bound_Call.new nil, @client, :execute_
       end
-      Bound_Call__ = ::Struct.new :receiver, :method_name, :args
 
       def build_client
 
