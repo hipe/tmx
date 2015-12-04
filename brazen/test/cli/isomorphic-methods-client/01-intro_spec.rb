@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport
 
   describe "[br] CLI - isomorphic methods client - 01 intro" do
 
-    extend TS_
+    TS_[ self ]
     use :CLI_isomorphic_methods_client
 
     context "a client with one action with no option parser" do

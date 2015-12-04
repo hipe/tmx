@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport
 
   describe "[br] CLI - iso. - desc intro" do
 
-    extend TS_
+    TS_[ self ]
     use :CLI_isomorphic_methods_client
 
     context "`description` (for an action)" do
@@ -13,31 +13,47 @@ module Skylab::Brazen::TestSupport
         client_class_
       end
 
-      it "shows" do
+      context "(state)" do
 
-        invoke 'wingzors', '-h'
-
-        _lib = Home_::TestSupport.lib_ :CLI_expect_section
-        _lines = sout_serr_line_stream_for_contiguous_lines_on_stream :e
-
-        tr = _lib.tree_via_line_stream_ _lines
-
-        unstyle_styled = Home_::CLI::Styling::Unstyle_styled
-
-        styled = -> line do
-          line.chomp!  # meh
-          unstyle_styled[ line ]
+        shared_subject :state_ do
+          immutable_helpscreen_state_via_invoke_ 'wingzors', '-h'
         end
 
-        desc = tr.children.fetch 1
+        it "succeeds" do
+          state_.exitstatus.should be_zero
+        end
 
-        styled[ desc.x.line ].should eql 'description'
+        it "description section (NOT TIGHT)" do
 
-        cx = desc.children
-        cx.length.should eql 3
-        cx.first.x.line.should eql "  line 1.\n"
-        styled[ cx[ 1 ].x.line ].should eql "  line two."
-        cx.last.x.line.should eql "\n"
+          _ = state_.lookup "description"
+
+          _act = _.to_string :unstyled
+
+          _act.should eql <<-HERE.unindent
+            description
+              line 1.
+              line two.
+
+          HERE
+        end
+
+        it "option section (OK to toss?)" do
+
+          _ = state_.lookup "option"
+
+          _act = _.to_body_string :string
+
+          _act.should match %r(\A[ ]+-h, --help[ ]{2,}this screen\n\n\z)
+        end
+
+        it "argument section" do
+
+          t = state_.lookup "argument"
+
+          t.children.length.should eql 1
+
+          t.children.first.x.unstyled_header_content.should eql '<a>'
+        end
       end
 
       shared_subject :client_class_ do

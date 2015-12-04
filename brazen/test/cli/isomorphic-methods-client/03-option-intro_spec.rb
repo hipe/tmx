@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport
 
   describe "[br] CLI - iso. - o.p intro" do
 
-    extend TS_
+    TS_[ self ]
     use :CLI_isomorphic_methods_client
 
     context "a client with one action with an option parser" do
@@ -50,16 +50,90 @@ module Skylab::Brazen::TestSupport
         expect_specifically_invited_to 'wen-kel'
       end
 
-      it "2.4 help (postfix)" do
+      context "2.4 help (postfix)" do
 
-        invoke 'wen-kel', '-h'
-        _expect_same_help_screen
+        shared_subject :state_ do
+          immutable_helpscreen_state_via_invoke_ 'wen-kel', '-h'
+        end
+
+        it "succeeded" do
+          _succeeded
+        end
+
+        it "usage section" do
+          _usage_section
+        end
+
+        it "options section" do
+          _options_section
+        end
+
+        it "argument section" do
+          _argument_section
+        end
       end
 
-      it "2.4 help (prefix)" do
+      context "2.4 help (prefix)" do
 
-        invoke '-h', 'wen-kel'
-        _expect_same_help_screen
+        shared_subject :state_ do
+          immutable_helpscreen_state_via_invoke_ '-h', 'wen-kel'
+        end
+
+        it "succeeded" do
+          _succeeded
+        end
+
+        it "usage section" do
+          _usage_section
+        end
+
+        it "options section" do
+          _options_section
+        end
+
+        it "argument section" do
+          _argument_section
+        end
+      end
+
+      def _succeeded
+        state_.exitstatus.should be_zero
+      end
+
+      def _usage_section
+        expect_section_ "usage", _expect_usage
+      end
+
+      def _options_section
+        expect_section_ "options", _expect_options
+      end
+
+      def _argument_section
+        expect_section_ "argument", _expect_argument
+      end
+
+      memoize :_expect_usage do
+        <<-HERE.unindent
+          usage: zeepo wen-kel [-x X] <bar>
+                 zeepo wen-kel -h
+
+        HERE
+      end
+
+      memoize :_expect_options do
+        <<-HERE.unindent
+          options
+              -x, --ex <wat-fun>               ohai
+              -h, --help                       this screen
+
+        HERE
+      end
+
+      memoize :_expect_argument do
+        <<-HERE.unindent
+          argument
+              <bar>
+        HERE
       end
 
       shared_subject :client_class_ do
@@ -85,30 +159,6 @@ module Skylab::Brazen::TestSupport
           self
         end
       end
-
-      define_method :_expect_same_help_screen, -> do
-
-        _HELP_SCREEN_UNSTYLED = <<-HERE.unindent
-          usage: zeepo wen-kel [-x X] <bar>
-                 zeepo wen-kel -h
-
-          options
-              -x, --ex <wat-fun>               ohai
-              -h, --help                       this screen
-
-          argument
-              bar
-        HERE
-
-        -> do
-
-          _str = flush_to_unstyled_string_contiguous_lines_on_stream :e
-
-          _str.should eql _HELP_SCREEN_UNSTYLED  # or more regressible
-
-          expect_succeeded
-        end
-      end.call
     end
   end
 end

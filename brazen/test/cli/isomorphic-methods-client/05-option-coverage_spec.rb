@@ -6,7 +6,7 @@ module Skylab::Brazen::TestSupport
 
     # (this is now somewhat of a stub)
 
-    extend TS_
+    TS_[ self ]
     use :CLI_isomorphic_methods_client
 
     context "no o.p" do

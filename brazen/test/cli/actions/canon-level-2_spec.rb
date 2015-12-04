@@ -4,7 +4,8 @@ module Skylab::Brazen::TestSupport
 
   describe "[br] CLI actions - canon level-2" do
 
-    extend TS_
+    TS_[ self ]
+    use :memoizer_methods
     use :CLI_behavior
 
     with_invocation 'workspace'
@@ -12,59 +13,112 @@ module Skylab::Brazen::TestSupport
     context "(canon numbers are relativized)" do
 
       it "  0) (no args) - error / usage / invite" do
+
         invoke
-        expect_branch_pattern_zero
+        expect_branch_expression_pattern_zero__
       end
 
       it "1.1) (funky arg) error / usage / invite" do
+
         invoke 'fiffle'
-        expect_branch_pattern_one_one
+        expect_branch_expression_pattern_one_dot_one__
       end
 
       it "1.2) (funky opt) error / invite" do
+
         invoke '-x'
-        expect_branch_pattern_one_two
-      end
-
-      it "1.4) (help screen) (normal style)" do
-        invoke '-h'
-        _expect_helpscreen_for_workspace_node
+        expect_branch_expression_pattern_one_dot_two__
       end
     end
 
-    context "-" do
+    context "1.4) (help screen) (normal style)" do
 
-      it "1.4) (help screen) (goofy style)" do
-        using_expect_stdout_stderr_invoke_with_no_prefix '-h', 'workspace'
-        _expect_helpscreen_for_workspace_node
+      shared_subject :state_ do
+        help_screen_oriented_state_from_invoke '-h'
+      end
+
+      it "succeeds" do
+        results_in_success_exitstatus_
+      end
+
+      it "usage" do
+        _usage
+      end
+
+      it "desc" do
+        _desc
+      end
+
+      it "actions" do
+        _actions
+      end
+
+      it "invite" do
+        _invite
       end
     end
 
-    def _expect_helpscreen_for_workspace_node
-      expect_branch_help_screen_first_half__
-      expect_branch_help_screen_second_half__
+    context "1.4) (help screen) (goofy style)" do
+
+      shared_subject :state_ do
+        help_screen_oriented_state_from_invoke_using(
+          :mutable_argv, [ '-h', 'workspace' ],
+          :prefix, nil,
+        )
+      end
+
+      it "succeeds" do
+        results_in_success_exitstatus_
+      end
+
+      it "usage" do
+        _usage
+      end
+
+      it "desc" do
+        _desc
+      end
+
+      it "actions" do
+        _actions
+      end
+
+      it "invite" do
+        _invite
+      end
     end
 
-    def expect_description_line
+    def _usage
+
+      on_lines_from_help_screen_section_ 'usage'
+      expect_branch_usage_line_
+      expect_stdout_stderr_via branch_secondary_syntax_line_
+      expect_a_blank_line
+    end
+
+    def _desc
+
+      on_lines_from_help_screen_section_ 'description'
       expect :styled, %r(\Adescription: .*\bworkspaces?\b)
+      expect_no_more_lines
     end
 
-    def expect_these_actions
+    def _actions
+
+      on_body_lines_from_help_screen_section_ 'actions'
       expect %r(\A[ ]{4,}-h, --help \[cmd\][ ]{10,}this screen \(or)
       expect %r(\A[ ]{4,}ping\z)
       expect %r(\A[ ]{4,}rm[ ]{10,}removes? a workspace)
       expect %r(\A[ ]{4,}summarize\z)
+      expect_a_blank_line
     end
 
-    def expect_options
-      expect_maybe_a_blank_line
+    def _invite
+      only_line_of_section( -1 ).should match_ branch_invite_line_
     end
 
-    def expect_help_screen_second_half
-      expect_header_line 'action'
-      expect %r(\A[ ]{4,}rm[ ]{10,}removes? a workspace)i
+    memoize :expected_action_name_string_array_ do
+      %w( ping rm summarize )
     end
-
-    self::EXPECTED_ACTION_NAME_S_A = [ 'ping', 'rm', 'summarize' ].freeze
   end
 end

@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport
 
   describe "[br] CLI - iso. - argument intro" do
 
-    extend TS_
+    TS_[ self ]
     use :CLI_isomorphic_methods_client
 
     invoke_appropriate_action
@@ -180,7 +180,7 @@ module Skylab::Brazen::TestSupport
         st = stream_for_expect_stdout_stderr
         _line_o = st.gets_one
 
-        _omg = Home_::CLI::Styling::Parse_styles[ _line_o.string ]
+        _omg = Home_::CLI_Support::Styling::Parse_styles[ _line_o.string ]
 
         _omg.should eql(
 
