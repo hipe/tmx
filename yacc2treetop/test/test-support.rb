@@ -15,13 +15,29 @@ module Skylab::Yacc2Treetop::TestSupport
 
   module ModuleMethods
 
-    def use sym
+    o = {}
 
     o[ :expect_CLI ] = -> tcc do
       require 'skylab/brazen'
       ::Skylab::Brazen.test_support.lib( :CLI_support_expectations )[ tcc ]
       tcc.extend CLI_Module_Methods__
       tcc.include CLI_Instance_Methods__
+    end
+
+    o[ :expect_event ] = -> tcc do
+      Callback_.test_support::Expect_Event[ tcc ]
+    end
+
+    o[ :memoizer_methods ] = -> tcc do
+      TestSupport_::Memoization_and_subject_sharing[ tcc ]
+    end
+
+    define_method :use do |sym|
+      o.fetch( sym )[ self ]
+    end
+
+    def _share sym, & p
+      dangerous_memoize sym, & p
     end
   end
 
@@ -44,17 +60,30 @@ module Skylab::Yacc2Treetop::TestSupport
   module CLI_Module_Methods__
 
     def invoke * argv
+      _invoke_by_args do
+        argv
+      end
+    end
+
+    def invoke_by & single_arg
+      _invoke_by_args do
+        [ single_arg[] ]
+      end
+    end
+
+    def _invoke_by_args & args_p
 
       first = true
-      frame = nil
+      state = nil
 
-      define_method :_frame do
+      define_method :invocation_state_ do
 
         if first
           first = false
-          frame = __build_frame argv
+          _argv = args_p[]
+          state = __build_invocation_state _argv
         end
-        frame
+        state
       end
     end
   end
@@ -63,16 +92,14 @@ module Skylab::Yacc2Treetop::TestSupport
 
     def flush_baked_emission_array  # use [#ts-023.A] frame technique
 
-      fr = _frame
-      @exitstatus = fr.exitstatus
-      @IO_spy_group_for_expect_stdout_stderr = fr.IO_spy_group.dup
-      super
+      _state = invocation_state_
+      _state.lines
     end
 
-    def __build_frame argv
+    def __build_invocation_state argv
 
       using_expect_stdout_stderr_invoke_via_argv argv
-      flush_frozen_frame_from_expect_stdout_stderr__
+      flush_frozen_state_from_expect_stdout_stderr
     end
 
     define_method :get_invocation_strings_for_expect_stdout_stderr, -> do

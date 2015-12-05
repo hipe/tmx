@@ -5,15 +5,30 @@ module Skylab::BeautySalon::TestSupport
   describe "[bs] models - delit - modalities - CLI" do
 
     extend TS_
+    use :memoizer_methods
     use :modality_integrations_CLI_support
 
-    it "help" do
+    context "help" do
 
-      invoke 'deliterate', '-h'
+      shared_subject :state_ do
 
-      _tree = flush_help_screen_to_tree
-      _ = _tree.children.last.children.map { |nd| nd.x.get_column_A_content  }
-      _.should eql %w( from-line to-line file )
+        invoke 'deliterate', '-h'
+        flush_invocation_to_help_screen_oriented_state
+      end
+
+      it "succeeds" do
+        state_.exitstatus.should match_successful_exitstatus
+      end
+
+      it "the children" do
+
+        _ = state_.tree.children.last.children.reduce [] do | m, node |
+
+          m << node.x.get_column_A_content
+        end
+
+        _.should eql %w( <from-line> <to-line> <file> )
+      end
     end
 
     it "no ent" do

@@ -5,23 +5,41 @@ module Skylab::GitViz::TestSupport
   describe "[gv] VCS adapters - git - models - hist-tree - CLI - integration" do
 
     extend TS_
+    use :memoizer_methods
     use :VCS_adapters_git_support_bundle_support
     use :my_CLI_expectations  # order matters
 
-    it "help screen - expect [#br-042] back-to-front property mutation" do
+    context "help screen - expect [#br-042] back-to-front property mutation" do
 
-      invoke 'hi', '-h'
+      shared_subject :state_ do
 
-      screen = flush_help_screen_to_tree
+        invoke 'hi', '-h'
+        flush_invocation_to_help_screen_oriented_state
+      end
 
-      screen.children.map { |cx| cx.x.unstyled_header_content }.should eql(
-        [ 'usage', 'options', 'arguments' ] )
+      it "succeeds" do
+        state_.exitstatus.should match_successful_exitstatus
+      end
 
-      args = screen.children.last
-      args.children.map { |cx| cx.x.unstyled_header_content }.should eql(
-        %w( width path ) )
+      it "these three sections (note singular)" do
 
-      expect_result_for_success
+        _ = state_.tree.children.reduce [] do | m, node |
+          m << node.x.unstyled_header_content
+        end
+
+        _.should eql %w( usage option arguments )
+      end
+
+      it "args should have these items" do
+
+        _args = state_.tree.children.last
+
+        _ = _args.children.reduce [] do | m, node |
+          m << node.x.unstyled_header_content
+        end
+
+        _.should eql %w( <width> <path> )
+      end
     end
 
     it "when width is not present" do
