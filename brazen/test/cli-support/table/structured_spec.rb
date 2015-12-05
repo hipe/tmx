@@ -1,10 +1,10 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Brazen::TestSupport
 
   C_EF_T_S_Struct__ = ::Struct.new :x, :y  # meh
 
-  describe "[br] - CLI - expression framse - table - structured" do
+  describe "[br] - CLI support - table - structured" do
 
     it "by default it aligns right with reasonable glyphs. label." do
 
@@ -153,7 +153,7 @@ module Skylab::Brazen::TestSupport
     end
 
     def _begin_table
-      Home_::CLI::Expression_Frames::Table::Structured.new
+      Home_::CLI_Support::Table::Structured.new
     end
 
     def _line_expector_via_array y

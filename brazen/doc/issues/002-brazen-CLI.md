@@ -180,7 +180,7 @@ incidentally, at writing this *is* the only method that appears
 necessary to exist in the branch adapter class that it does not inherit
 from the graph already. i.e, without this one method, the branch adapter
 class would be purely a composite of subclassing the one class and
-mixing in the other module (see the associated "class-digraph.dot").
+mixing in the other module (see "[#]/figure-1").
 
 
 
@@ -190,7 +190,7 @@ mixing in the other module (see the associated "class-digraph.dot").
 
 a central feature of [br] CLI, property categorization is a concrete
 manifestion of the whole underlying [br] experiment, one that traces its
-lineage years back to [hl]: the model models its action's properties
+lineage years back to [hl]: the model models its actions' properties
 with metadata that is processed by the modality to make design
 decisions about how to express the various properties using appropriate
 modality-specific mechanics.

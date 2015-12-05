@@ -31,7 +31,7 @@ module Skylab::Brazen::TestSupport
     end
 
     def _subject_module
-      Home_::CLI::Styling
+      Home_::CLI_Support::Styling
     end
   end
 end

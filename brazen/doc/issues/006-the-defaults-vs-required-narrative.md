@@ -3,7 +3,7 @@
 
 ## introduction
 
-although it's a a bit of an oxymoron to have a property with a default
+although it's a bit of an oxymoron to have a property with a default
 be called "required", we think it's crucial to be able to define all required
 fields as such (even those with defaults) so at the last-line-of-defense
 required fields check we are given an earlier warning about unexpected nils.

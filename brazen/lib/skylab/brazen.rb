@@ -198,7 +198,7 @@ module Skylab::Brazen
       :build_require_sidesystem_proc,
       :build_require_stdlib_proc )
 
-    define_singleton_method :_memoize, Callback_::Memoize
+    define_singleton_method :_memoize, Callback_::Lazy
 
     Basic = sidesys[ :Basic ]
     Fields = sidesys[ :Fields ]
@@ -229,6 +229,11 @@ module Skylab::Brazen
     Parse = sidesys[ :Parse ]
 
     Plugin = sidesys[ :Plugin ]
+
+    Stdlib_option_parser = _memoize do
+      require 'optparse'
+      ::OptionParser
+    end
 
     Strange = -> x do
       Basic[]::String.via_mixed x

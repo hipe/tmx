@@ -1,489 +1,281 @@
 module Skylab::Brazen
 
-  class CLI
+  module CLI_Support
 
-    class Action_Adapter_
+    class Syntax_Assembly
 
-      class Help_Renderer  # read [#004]
+      # session.
 
-        def initialize op, ad
-          @arg_a = nil
-          @bound = ad.bound_
-          @action_adapter = ad
-          @expression_agent = ad.expression_agent
-          __receive_any_option_parser op
-          @section_a = []
-          @section_separator_p = -> { @y << nil }
-          @y = ::Enumerator::Yielder.new( & ad.stderr.method( :puts ) )
-          ad.categorized_properties.mutate_help_renderer_ self
-          screen_boundary
+      class << self
+
+        def brackets_for_reqity_ opt_req_rest_sym
+          _singleton.__brackets_for_reqity opt_req_rest_sym
         end
 
-        attr_writer(
-          :arg_a,
-        )
-
-        attr_reader(
-          :action_adapter,
-          :expression_agent,
-          :op,
-          :y
-        )
-
-        def __receive_any_option_parser op
-
-          @op = op
-          if op
-            __init_formatting_via_option_parser op
-          end
-          NIL_
+        def render_as_argument_uninflected_for_arity__ prp  # (with default styling)
+          _singleton._render_moniker_for_property prp
         end
 
-        def __init_formatting_via_option_parser op
-
-          @summary_indent = op.summary_indent
-          @summary_width = op.summary_width
-          NIL_
+        def _singleton
+          Singleton___[]
         end
 
-        def express_help_screen_
-
-          express_usage_
-
-          if @bound.has_description
-            express_description_
-          end
-
-          @section_a.each( & method( :__express_section ) )
-
-          SUCCESS_EXITSTATUS
-        end
-
-        # ~ usage lines
-
-        def express_primary_usage_line_
-
-          a = []
-          subject.write_any_primary_syntax_string a
-          _express_single_line_section 'usage', a[ 0 ]
-          @bound
-        end
-
-        def express_usage_
-
-          section_boundary
-          __express_usage_section_via_full_syntax_strings get_full_syntax_strings
-          NIL_
-        end
-
-        def __express_usage_section_via_full_syntax_strings a
-
-          __express_multiline_section_tight 'usage', a
-          NIL_
-        end
-
-        def get_full_syntax_strings
-          subject.write_full_syntax_strings__ []
-        end
-
-        def produce_full_main_syntax_string
-
-          y = [ subject_invocation_string ]
-          a = any_main_syntax_string_parts
-          if a
-            y.concat a
-          end
-          y * SPACE_
-        end
-
-        def produce_main_syntax_string
-
-          a = any_main_syntax_string_parts
-          if a
-            a * SPACE_
-          end
-        end
-
-        def any_main_syntax_string_parts
-
-          @___custom_SSP_is_known_is_known ||= __know_custom_syntax_str_parts
-
-          if @_custom_SSP_is_known
-            @_custom_SSP
-          else
-            __via_optparse_components_any_main_syntax_string_parts
-          end
-        end
-
-        def __know_custom_syntax_str_parts
-
-          # :+#experimental: :+#public-API-for-custom-option-parsers
-
-          if @op.respond_to? :main_syntax_string_parts
-
-            @_custom_SSP_is_known = true
-            @_custom_SSP = @op.main_syntax_string_parts  # nil OK
-          else
-            @_custom_SSP_is_known = false
-          end
-
-          ACHIEVED_
-        end
-
-        def __via_optparse_components_any_main_syntax_string_parts
-
-          a = any_option_glyphs
-          a_ = any_argument_glyphs
-
-          if a
-            if a_
-              a.concat a_
-            end
-            a
-          else
-            a_
-          end
-        end
-
-        def any_option_glyphs
-
-          sw_s_a = []
-
-          @op.top.list.each do |opt|
-
-            sw = opt.short.first
-            sw or next
-
-            SHORT_HELP__ == sw and next
-
-            sw_s_a.push "[#{ render_native_opt_switch_with_arg opt }]"
-          end
-
-          sw_s_a.length.nonzero? and sw_s_a
-        end
-
-        SHORT_HELP__ = '-h'.freeze
-
-        def render_native_opt_switch_with_arg opt
-
-          arity_i = argument_arity_from_native_optparse_switch opt
-
-          if :zero != arity_i
-            moniker = _some_arg_moniker_for_switch opt
-          end
-
-          tail = render_argument_moniker_and_arity moniker, arity_i
-
-          sw = shortest_moniker_for_opt opt
-
-          "#{ sw }#{ tail }"
-        end
-
-        def as_opt_render_property prop
-
-          look_for = "--#{ prop.name.as_slug }"
-
-          found = @op.top.list.detect do |arg|
-            look_for == arg.long.first
-          end
-
-          if found
-            as_opt_render_property_when_found_opt prop, found
-          end
-        end
-
-        def as_opt_render_property_when_found_opt prop, opt
-
-          arity_sym = argument_arity_from_native_optparse_switch opt
-
-          head = shortest_moniker_for_opt opt
-            ( opt.short ? opt.short : opt.long ).first
-
-          if :zero != arity_sym
-            moniker = prop.argument_moniker
-            moniker ||= _some_arg_moniker_for_switch opt
-          end
-
-          tail = render_argument_moniker_and_arity moniker, arity_sym
-
-          "#{ head }#{ tail }"
-        end
-
-        def shortest_moniker_for_opt opt
-          ( opt.short ? opt.short : opt.long ).first
-        end
-
-        def render_argument_moniker_and_arity moniker, arity_i
-          case arity_i
-          when :one ; " #{ moniker }"
-          when :zero
-          when :zero_or_one_placed ; " [#{ moniker }]"
-          when :zero_or_one_misplaced ; "[=#{ moniker }]"
-          else raise ___say_bad_shape arity_i
-          end
-        end
-
-        def ___say_bad_shape arity_i
-          "unepxected shape: #{ arity_i }"
-        end
-
-        def _some_arg_moniker_for_switch sw
-          'X'  # eventually we will do etc. that one hack [#124]
-        end
-
-        def argument_arity_from_native_optparse_switch arg
-          case arg
-          when ::OptionParser::Switch::RequiredArgument ; :one
-          when ::OptionParser::Switch::NoArgument ; :zero
-          when ::OptionParser::Switch::PlacedArgument ; :zero_or_one_placed
-          when ::OptionParser::Switch::OptionalArgument ; :zero_or_one_misplaced
-          else
-            arg.option_argument_arity
-          end
-        end
-
-        def any_argument_glyphs
-          @arg_a and arg_glyphs
-        end
-
-        def arg_glyphs
-
-          a = @arg_a.reduce [] do | m, prp |
-
-            s = if prp.has_custom_moniker
-              prp.custom_moniker
-            else
-              "<#{ prp.name.as_slug }>"
-            end
-
-            _is_effectively_optional = prp.has_default || ! prp.is_required
-
-            if _is_effectively_optional  # near [#006]
-              open = '[' ; close = ']'
-            end
-
-            if prp.takes_many_arguments
-              addendum = " [#{ s } [..]]"
-            end
-
-            m << "#{ open }#{ s }#{ addendum }#{ close }"
-          end
-
-          a.length.nonzero? and a
-        end
-
-        # ~ section rendering (description, options, arguments, child actions)
-
-        def express_description_
-
-          section_boundary
-
-          __express_multiline_section(
-            'description',
-            @bound.under_expression_agent_get_N_desc_lines(
-              @expression_agent ) )
-
-          NIL_
-        end
-
-        def express_option_parser_summary_
-          @op.summarize @y ; nil
-        end
-
-        def add_section rendering_method, * a, & p
-          @section_a.push Section__.new( rendering_method, a, p ) ; nil
-        end
-        Section__ = ::Struct.new :rendering_method_i, :arguments, :p
-
-        def __express_section section
-          send section.rendering_method_i, * section.arguments, & section.p
-        end
-
-        def ad_hoc_section label_s, & p
-          section_boundary
-          y = @y
-          @expression_agent.calculate do
-            y << hdr( label_s )
-          end
-          p[ self ]
-          NIL_
-        end
-
-        def item_section label_s, item_a, & p
-          section_boundary
-          express_items_with_descriptions_ label_s, item_a, & p ; nil
-        end
-
-        # ~ "interjections"
-
-        def express_invite_to_general_help
-
-          _s = subject_invocation_string
-          _express_this_string_as_an_invite_to_help "#{ _s } -h"  # eek
-        end
-
-        def express_invite_to_particular_action__ i_a
-
-          _ada = @action_adapter.bound_action_via_normal_name_ i_a
-
-          _s = _ada.help_syntax_string  # assume if invited then produced
-
-          _express_this_string_as_an_invite_to_help _s
-        end
-
-        def _express_this_string_as_an_invite_to_help s
-
-          express do
-            "use #{ code s } for help"
-          end
-          NIL_
-        end
-
-        def subject_invocation_string
-          subject.invocation_string
-        end
-
-        def subject
-          @action_adapter
-        end
-
-        # ~ support
-
-        # ~ render section boundaries
-
-        def screen_boundary
-          @is_subsequent_section = false
-        end
-
-        def section_boundary
-          if @is_subsequent_section
-            @section_separator_p && @section_separator_p[]
-          else
-            @is_subsequent_section = true
-          end ; nil
-        end
-
-        # ~ two-column item renderers
-
-        def express_items_with_descriptions_ hdr_s, x_a, d=nil, & labelize_p
-          hdr_s and express_header_ "#{ hdr_s }#{ 's' if 1 != x_a.length }"
-          p = bld_item_outputter d, labelize_p, @y
-          x_a.each( & p ) ; nil
-        end
-
-        def bld_item_outputter num_lines_per, label_p, y
-          label_p ||= DEFAULT_LABELIZE_P__
-          ex = @expression_agent
-          no_desc = bld_item_without_desc_outputter y, label_p
-          desc = __build_item_with_desc_outputter y, ex, num_lines_per, label_p
-          -> x do
-            ( x.has_description ? desc : no_desc )[ x ]
-          end
-        end
-        DEFAULT_LABELIZE_P__ = -> x do
-          x.name.as_slug
-        end
-
-        def bld_item_without_desc_outputter y, labelize_p
-          summary_s = @summary_indent
-          -> x do
-            y << "#{ summary_s }#{ labelize_p[ x ] }" ; nil
-          end
-        end
-
-        def __build_item_with_desc_outputter y, expag, num_lines_per, labelize_p
-
-          d = @summary_width
-          s = @summary_indent
-          first_line_item_format = "#{ s }%-#{ d }s %s"
-          d_ = d + s.length + 1  # " " is 1 char wide
-          subsequent_line_item_format = "#{ SPACE_ * d_ }%s"
-
-          -> ada do
-
-            expag.current_property = ada
-
-            a = ada.under_expression_agent_get_N_desc_lines expag, num_lines_per
-
-            if a.length.zero?
-              y << "#{ s }#{ labelize_p[ ada ] }"
-            else
-              y << first_line_item_format % [ labelize_p[ ada ], a.fetch( 0 ) ]
-            end
-
-            1.upto( a.length - 1 ) do |idx|
-              y << subsequent_line_item_format % a.fetch( idx )
-            end
-
-            NIL_
-          end
-        end
-
-        # ~ multiline section renderers and their headers
-
-        def __express_multiline_section hdr_s, line_a
-
-          case 1 <=> line_a.length
-          when  0 ; _express_single_line_section hdr_s, line_a.fetch( 0 )
-          when -1 ; __do_express_multiline_section hdr_s, line_a
-          end
-          NIL_
-        end
-
-        def __express_multiline_section_tight hdr_s, line_a
-
-          case 1 <=> line_a.length
-          when  0 ; _express_single_line_section hdr_s, line_a.fetch( 0 )
-          when -1 ; __do_express_multi_line_section_tight hdr_s, line_a
-          end
-          NIL_
-        end
-
-        def __do_express_multiline_section hdr_s, line_a
-
-          express_header_ hdr_s
-          line_a.each do |line|
-            @y << line
-          end
-          NIL_
-        end
-
-        def __do_express_multi_line_section_tight hdr_s, line_a
-
-          _express_single_line_section hdr_s, line_a.fetch( 0 )
-          margin = SPACE_ * ( hdr_s.length + 2 )  # ": " is 2 chars wide
-          line_a[ 1 .. -1 ].each do |line|
-            @y << "#{ margin }#{ line }"
-          end
-          NIL_
-        end
-
-        def _express_single_line_section hdr_s, line
-          y = @y
-          @expression_agent.calculate do
-            y << "#{ hdr hdr_s }: #{ line }"  # :[#072].
-          end
-          NIL_
-        end
-
-        def express_header_ hdr_s  # 16
-          y = @y
-          @expression_agent.calculate do
-            y << hdr( hdr_s )
-          end
-          nil
-        end
-
-        # ~ courtesy
-
-        def express & p
-          if p.arity.zero?
-            @y << @expression_agent.calculate( & p ) ; nil
-          else
-            @expression_agent.calculate @y, & p ; nil
-          end
+        alias_method :via, :new
+        private :new
+      end  # >>
+
+      def initialize op, invocation_reflection
+
+        @_reflection = invocation_reflection
+        @_option_parser = op
+      end
+
+      def render_main_syntax_string_didactically
+
+        @_parts = []
+        ___add_invocation_string_parts
+        __add_parts_from_option_parser
+        __add_didactic_parts_for_arguments
+        s_a = remove_instance_variable :@_parts
+        if s_a.length.nonzero?
+          s_a.join SPACE_
         end
       end
+
+      def ___add_invocation_string_parts
+
+        s = @_reflection.subprogram_name_string_
+        if s
+          @_parts.push s
+        end
+        NIL_
+      end
+
+      # -- from & of option-parser
+
+      def render_property_as_option prp
+
+        look_for = "--#{ prp.name.as_slug }"
+
+        found = @_option_parser.top.list.detect do | sw |
+          look_for == sw.long.first
+        end
+
+        if found
+          @_property = prp ; @_switch = found
+          __render_as_option
+        end
+      end
+
+      def __add_parts_from_option_parser
+
+        # :+#experimental: :+#public-API-for-custom-option-parsers
+
+        op = @_option_parser
+        if op
+          if op.respond_to? :main_syntax_string_parts
+            ___when_custom_option_parser
+          else
+            __when_standard_libraryesque_option_parser
+          end
+        end
+        remove_instance_variable :@_option_parser
+        NIL_
+      end
+
+      def ___when_custom_option_parser
+
+        s_a = @_option_parser.main_syntax_string_parts
+        if s_a
+          @_parts.concat s_a
+        end
+        NIL_
+      end
+
+      def __when_standard_libraryesque_option_parser
+
+        @_option_parser.top.list.each do | sw |
+
+          s = sw.short.first
+          if ! s
+            next
+          end
+          if SHORT_HELP == s
+            next
+          end
+          s_ = ___add_parts_for_option_parser_switch sw
+          if s_
+            @_parts.push s_
+          end
+        end
+        NIL_
+      end
+
+      def ___add_parts_for_option_parser_switch sw
+
+        _head = _shortest_moniker_for sw
+
+        arity_sym = _argument_arity_of sw
+
+        if :zero != arity_sym
+          _moniker = _some_option_argument_moniker_for sw
+        end
+
+        _tail = _render_option_argument_moniker_and_arity _moniker, arity_sym
+
+        "[#{ _head }#{ _tail }]"
+      end
+
+      def __render_as_option
+
+        _head = _shortest_moniker_for @_switch
+
+        arity_sym = _argument_arity_of @_switch
+
+        if :zero != arity_sym
+          moniker = @_property.argument_moniker
+          moniker ||= _some_option_argument_moniker_for opt
+        end
+
+        _tail = _render_option_argument_moniker_and_arity moniker, arity_sym
+
+        remove_instance_variable :@_property
+        remove_instance_variable :@_switch
+
+        "#{ _head }#{ _tail }"
+      end
+
+      # -- support for o.p
+
+      def _argument_arity_of sw
+
+        case sw
+        when ::OptionParser::Switch::RequiredArgument ; :one
+        when ::OptionParser::Switch::NoArgument ; :zero
+        when ::OptionParser::Switch::PlacedArgument ; :zero_or_one_placed
+        when ::OptionParser::Switch::OptionalArgument ; :zero_or_one_misplaced
+        else
+          sw.option_argument_arity
+        end
+      end
+
+      def _shortest_moniker_for sw
+        ( sw.short ? sw.short : sw.long ).first
+      end
+
+      def _some_option_argument_moniker_for sw
+        X___  # eventually we will do etc. that one hack [#124]
+      end
+      X___ = 'X'
+
+      def _render_option_argument_moniker_and_arity moniker, arity_sym
+
+        case arity_sym
+
+        when :one
+          " #{ moniker }"
+
+        when :zero
+
+        when :zero_or_one_placed
+          " [#{ moniker }]"
+
+        when :zero_or_one_misplaced
+          "[=#{ moniker }]"
+
+        else
+          self._NO
+        end
+      end
+
+      # -- arguments
+
+      def __add_didactic_parts_for_arguments
+
+        arg_a = @_reflection.didactic_argument_properties
+
+        if arg_a
+          arg_a.each do | prp |
+            s = __render_as_argument prp
+            if s
+              @_parts.push s
+            end
+          end
+        end
+
+        remove_instance_variable :@_reflection
+
+        NIL_
+      end
+
+      def __render_as_argument prp
+
+        s = _render_moniker_for_property prp
+
+        if prp.takes_many_arguments
+          s = __render_moniker_as_glob s
+        end
+
+        if prp.is_effectively_optional_
+          s = __render_expression_as_optional s
+        end
+        s
+      end
+
+      def _render_moniker_for_property prp
+
+        # (from here on down either don't mutate state or don't use singleton)
+
+        if prp.has_custom_moniker
+          prp.custom_moniker
+        else
+          ARGUMENT_MONIKER_FORMAT___ % prp.name.as_slug
+        end
+      end
+
+      ARGUMENT_MONIKER_FORMAT___ = '<%s>'
+
+      def __render_moniker_as_glob moniker
+        LONG_GLOB_FORMAT___ % { moniker: moniker }
+      end
+
+      LONG_GLOB_FORMAT___ = '%{moniker} [%{moniker} [..]]'
+      # SHORT_GLOB_FORMAT___ = '%{moniker} [..]'
+
+      def __render_expression_as_optional s
+
+        _, __ = Brackets_of_arity__[ :zero_or_one ]
+
+        "#{ _ }#{ s }#{ __ }"
+      end
+
+      def __brackets_for_reqity opt_req_rest_sym
+
+        Brackets_of_arity__[ Arity_of_reqity___[ opt_req_rest_sym ] ]
+      end
+
+      Arity_of_reqity___ = {
+        opt: :zero_or_one,
+        req: :one,
+        rest: :one_or_more,
+        # ([#105]storypoint-2 explains why no `block`)
+        req_group: :syntactic_group,
+      }.method :fetch
+
+      open = '[' ; close = ']'
+
+      Brackets_of_arity__ = {
+        zero_or_one: [ open, close ],
+        one: nil,
+        one_or_more: [ open, ' [..]]' ],
+        syntactic_group: %w( { } ),
+      }.method :fetch
+
+      Singleton___ = Callback_::Lazy.call do
+        Here_.via( NIL_, NIL_ ).freeze
+      end
+
+      Here_ = self
     end
   end
 end

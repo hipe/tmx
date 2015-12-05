@@ -4,11 +4,15 @@ module Skylab::Brazen::TestSupport
 
     # detailed expectation methods for how a [br] CLI expresses itself
 
+    # sections fugue with those in "CLI expectations"
+
+    # (note we are transitioning between paradigms - ..)
+
     class << self
 
       def [] tcc
 
-        TS_.lib_( :CLI_expectations )[ tcc ]
+        TS_.lib_( :CLI_support_expectations )[ tcc ]
 
         tcc.extend Module_Methods___
 
@@ -40,7 +44,10 @@ module Skylab::Brazen::TestSupport
         o.call :_deep_strings do
 
           s_a_ = invocation_strings_for_expect_stdout_stderr.dup
-          s_a_.concat argv_prefix_for_expect_stdout_stderr
+          a = argv_prefix_for_expect_stdout_stderr
+          if a
+            s_a_.concat a
+          end
           s_a_.freeze
         end
 
@@ -59,147 +66,19 @@ module Skylab::Brazen::TestSupport
       Home_::CLI::Client_for_Brazen_as_Application
     end
 
-    # ~ common business assertions
+    # -- the general shape of invocation (exitstatus, which streams)
 
-    def expect_branch_pattern_zero
-      expect_expecting_action_line
-      expect_branch_usage_line
-      expect_action_invite_line
-      expect_errored
-    end
-
-    def expect_branch_pattern_one_one
-      expect_unrecognized_action :fiffle
-      _rx = ___build_known_actions_rx
-      expect :styled, _rx
-      expect_action_invite_line
-      expect_errored
-    end
-
-    def ___build_known_actions_rx
-      /\Aknown actions are \(#{ self.class::EXPECTED_ACTION_NAME_S_A.
-        map { |s| "'?#{ ::Regexp.escape s }'?" } * ', ' }\)\z/
-    end
-
-    def expect_branch_pattern_one_two
-      expect 'invalid option: -x'
-      expect_action_invite_line
-      expect_errored
-    end
-
-    def expect_expecting_action_line
-      expect :styled, 'expecting <action>'
-    end
-
-    def expect_branch_help_screen_first_half__
-
-      expect_branch_usage_line
-      expect_branch_secondary_syntax_line
-      expect_maybe_a_blank_line
-
-      expect_description_line
-      expect_maybe_a_blank_line
-    end
-
-    def expect_branch_help_screen_second_half__
-
-      expect_header_line 'actions'
-      expect_these_actions
-      expect_maybe_a_blank_line
-
-      expect_branch_invite_line
-      expect_succeeded
-    end
-
-    def expect_action_help_screen
-      expect_action_usage_lines
-      expect_description
-      expect_options
-      expect_arguments
-      expect_environment_variables
-      expect_succeeded
-    end
-
-    def expect_action_usage_lines
-      expect_action_usage_line
-      expect "#{ ' ' * 7 }#{ _invocation_string } -h"
-      expect_maybe_a_blank_line
-    end
-
-    def expect_action_usage_line
-      expect :styled, "usage: #{ _invocation_string }#{ prop_syntax }"
-    end
-
-    def expect_description
-      expect :styled, "description: #{ description_body_copy }"
-      expect_maybe_a_blank_line
-    end
-
-    def expect_options
-      expect_header_line 'options'
-      expect_these_options
-      expect_maybe_a_blank_line
-    end
-
-    def expect_arguments
-      expect :styled, %r(\Aarguments?\z)  # no colon because [#072]
-      expect_these_arguments
-      expect_maybe_a_blank_line
-    end
-
-    def expect_environment_variables
-    end
-
-    def expect_branch_usage_line
-      expect :styled, "usage: #{ _invocation_string } <action> [..]"
-    end
-
-    def expect_branch_secondary_syntax_line
-      expect "#{ ' ' * 7 }#{ _invocation_string } -h [cmd]"
-    end
-
-    def expect_help_screen_for_init
-
-      expect :styled, 'usage: xaz init [-d] [-v] <path>'
-      expect %r(\A[ ]{7}xaz init -h\z)
-      expect_maybe_a_blank_line
-      expect_header_line 'description'
-      expect :styled, 'init a <workspace>'
-      expect 'this is the second line of the init description'
-      expect_maybe_a_blank_line
-      expect_header_line 'options'
-      expect %r(\A[ ]{4}-d, --dry-run\z)
-      expect %r(\A[ ]{4}-v, --verbose\z)
-      expect %r(\A[ ]{4}-h, --help[ ]{10,}this screen\z)
-      expect_maybe_a_blank_line
-      expect_header_line 'argument'
-      expect %r(\A[ ]{4}path[ ]{7,}the dir)
-      expect_succeeded
-    end
-
-    def status_prop_syntax
-      ' [-v] [<path>]'
-    end
-
-    def expect_branch_auxiliary_usage_line
-      expect "#{ ' ' * 7 }#{ _invocation_string } -h [cmd]"
-    end
-
-    def expect_branch_invite_line
-      expect :styled, "use '#{ _invocation_string } -h <action>' for help on that action."
-    end
-
-    def expect_action_invite_line
-      expect :styled, "use '#{ _invocation_string } -h' for help"
-    end
-
-    def expect_errored_with i
+    def expect_errored_with sym
       expect_no_more_lines
-      expect_exitstatus_for i
+      expect_exitstatus_for sym
     end
 
-    def expect_exitstatus_for i
-      @exitstatus.should eql Home_::API.exit_statii.fetch i
+    def results_in_error_exitstatus_
+      state_.exitstatus.should match_common_error_code_
+    end
+
+    def expect_exitstatus_for sym
+      @exitstatus.should eql Home_::API.exit_statii.fetch sym
     end
 
     def expect_errored
@@ -208,44 +87,154 @@ module Skylab::Brazen::TestSupport
     end
 
     def expect_generic_error_exitstatus
-      @exitstatus.should eql Home_::CLI::GENERIC_ERROR_EXITSTATUS
+      @exitstatus.should match_common_error_code_
+    end
+
+    def match_common_error_code_
+      eql result_for_failure_for_expect_stdout_stderr
     end
 
     def expect_succeeded
       expect_no_more_lines
-      @exitstatus.should eql Home_::CLI::SUCCESS_EXITSTATUS
+      @exitstatus.should match_successful_exitstatus
     end
 
-    def expect_option i, rx=nil
-      if rx
-        _xtra_rxs = "[ ]{10,}.*#{ rx.source }.*"
-      end
-      s = i.to_s
-      expect %r(\A[ ]{4,}-#{ s[0] }, --#{ s }#{ _xtra_rxs }\z)
+    def results_in_success_exitstatus_
+      state_.exitstatus.should match_successful_exitstatus
     end
 
-    def expect_item i, * x_a
-      a = []
-      :styled == x_a.first and a.push x_a.shift
-      rx = x_a.shift
-      if rx
-        _xtra_rxs = ".*#{ rx.source }.*"
+    def match_common_informational_stream_set_
+      eql STDERR_STREAM_ONLY___
+    end
+
+    STDERR_STREAM_ONLY___ = [ :e ]
+
+    # -- macros (predicates over several lines) (we don't want these)
+
+# ________BEGIN: these need improvement somehow
+
+    def expect_branch_expression_pattern_zero__
+      expect_expecting_action_line
+      expect_branch_usage_line_
+      expect_action_invite_line_
+      expect_errored
+    end
+
+    def expect_branch_expression_pattern_one_dot_one__
+      expect_unrecognized_action :fiffle
+      expect_stdout_stderr_via known_actions_are_
+      expect_action_invite_line_
+      expect_errored
+    end
+
+    def known_actions_are_
+
+      _s_a = expected_action_name_string_array_.map do | s |
+        "'?#{ ::Regexp.escape s }'?"
       end
-      s = i.to_s
-      a.push %r(\A[ ]{4,}#{ ::Regexp.escape s }[ ]{10,}#{ _xtra_rxs }\z)
-      expect( * a )
-      while x_a.length.nonzero?
-        d = x_a.length
-        a.clear
-        :styled == x_a.first and a.push x_a.shift
-        rx = x_a.first
-        if rx
-          x_a.shift
-          a.push %r(\A[ ]{15,}.*#{ rx.source }.*\z)
-        end
-        d == x_a.length and raise ::ArgumentError, "#{ x_a.first.inspect }"
-        expect( * a )
-      end
+
+      _rx = /\Aknown actions are \(#{ _s_a.join ', ' }\)\z/
+
+      expectation :styled, _rx
+    end
+
+    def expect_branch_expression_pattern_one_dot_two__
+
+      expect_stdout_stderr_via invalid_option '-x'
+      expect_action_invite_line_
+      expect_errored
+    end
+
+# ________END
+
+    # -- invalid / unexpected / expecting (none)
+
+    # -- usage (syntax summaries, suggestions)
+
+    def expect_branch_usage_line_
+
+      expect_stdout_stderr_via branch_usage_line_
+    end
+
+    def branch_usage_line_
+
+      expectation :styled, "usage: #{ _invocation_string } <action> [..]"
+    end
+
+    def branch_secondary_syntax_line_
+
+      expectation "#{ SPACE_ * 7 }#{ _invocation_string } -h [cmd]"
+    end
+
+    def _expect_action_usage_line
+
+      expect_stdout_stderr_via action_usage_line_
+    end
+
+    def action_usage_line_
+
+      expectation :styled, "usage: #{ _invocation_string }#{ usage_syntax_tail_ }"
+    end
+
+    # -- invitations
+
+    def expect_branch_invite_line_
+
+      expect_stdout_stderr_via branch_invite_line_
+    end
+
+    def branch_invite_line_
+
+      _s = "use '#{ _invocation_string } -h <action>' for help on that action."
+      expectation :styled, _s
+    end
+
+    def expect_action_invite_line_
+
+      expect_stdout_stderr_via action_invite_line_
+    end
+
+    def action_invite_line_
+
+      styled_invite_to _invocation_string
+    end
+
+    # -- bridge to line-by-line assertion
+
+    def on_body_lines_from_help_screen_section_ s
+
+      st = _normal_emission_stream_via_section s
+
+      st.gets  # discard the header line (typically)
+
+      _receive_normal_emissions_stream_intended_to_be_used_as_upstream st
+    end
+
+    def on_lines_from_help_screen_section_ s
+
+      _st = _normal_emission_stream_via_section s
+
+      _receive_normal_emissions_stream_intended_to_be_used_as_upstream _st
+    end
+
+    def _normal_emission_stream_via_section s
+
+      _state = state_
+
+      _t = _state.lookup s
+
+      _st = _t.to_emission_stream
+
+      _st
+    end
+
+    def _receive_normal_emissions_stream_intended_to_be_used_as_upstream st
+
+      _st_ = st.flush_to_polymorphic_stream
+
+      self.stream_for_expect_stdout_stderr = _st_
+
+      NIL_
     end
   end
 end

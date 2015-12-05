@@ -1,8 +1,8 @@
-require_relative '../../../../test-support'
+require_relative '../../../test-support'
 
 module Skylab::Brazen::TestSupport
 
-  describe "[br] CLI - exp-fr - table - actor" do
+  describe "[br] CLI support - table - actor" do
 
     context "is a pesudo-proc .." do
 
@@ -71,7 +71,7 @@ module Skylab::Brazen::TestSupport
     end
 
     _Subject_callable = -> do
-      Home_::CLI::Expression_Frames::Table::Actor
+      Home_::CLI_Support::Table::Actor
     end
 
     context "you can curry properties and behavior for table in one place .." do

@@ -4,22 +4,18 @@ module Skylab::Brazen
 
     class << self
 
-      def arguments
-        CLI_::Action_Adapter::Arguments
-      end
-
       def expose_executables_with_prefix s
         define_method :to_unordered_selection_stream,
-          CLI_::Action_Adapter_::Executables_Exposure::Action_stream_method[ s ]
+          CLI_::Executables_Exposure___::Action_stream_method[ s ]
         NIL_
       end
 
       def expression_agent_instance
-        CLI_::Expression_Agent.instance
+        Home_::CLI_Support::Expression_Agent.instance
       end
 
       def pretty_path x
-        CLI::Expression_Agent.pretty_path x
+        Home_::CLI_Support::Expression_Agent::Pretty_path[ x ]
       end
 
       def some_screen_width
@@ -34,6 +30,7 @@ module Skylab::Brazen
     Invocation__ = Branch_Invocation__.superclass
 
     class Top_Invocation__
+    private
 
       def initialize i, o, e, pn_s_a, * x_a  # pn_s_a = program name string array
 
@@ -58,11 +55,13 @@ module Skylab::Brazen
 
         @app_kernel = ak
 
+        @_invite_ev_a = nil
+
         @mod = ak.module
 
         @_resource_components = nil
 
-        @resources ||= Resources.new i, o, e, pn_s_a, @mod
+        @resources ||= Resources.new i, o, e, pn_s_a, @mod   # ivar name is #public_API
 
         # (abstract base class "invocation" has no initialize method)
       end
@@ -70,17 +69,21 @@ module Skylab::Brazen
       def invoke argv
 
         rsx = @resources
-        if rsx._is_finished  # :+#experimental: subsequent invocation
+
+        if rsx._is_finished
+          # #experimental! subsequent invocation [sg]
           @resources = rsx.new argv
+          @_expression = nil  # eew
         else
           rsx._finish argv, remove_instance_variable( :@_resource_components )
         end
 
         init_properties
         init_categorized_properties
+
         bc = _some_bound_call
         x = bc.receiver.send bc.method_name, * bc.args, & bc.block
-        __flush_any_invitations
+        ___flush_any_invitations
         if x
           __result_as_top_via_trueish_backstream_result x
         else
@@ -92,12 +95,7 @@ module Skylab::Brazen
 
       ## ~~ help & invitations
 
-      def receive_show_help_ otr
-        accept_frame otr
-        help_renderer.express_help_screen_
-      end
-
-      def __flush_any_invitations
+      def ___flush_any_invitations
 
         if _invite_ev_a
           __flush_invitations
@@ -122,7 +120,7 @@ module Skylab::Brazen
           if i_a
 
             seen_i_a_h.fetch i_a do
-              adapter.help_renderer.express_invite_to_particular_action__ i_a
+              ___express_invite_to_particular_action i_a
               seen_i_a_h[ i_a ] = true
             end
 
@@ -143,7 +141,16 @@ module Skylab::Brazen
           end
         end
 
-        NIL
+        NIL_
+      end
+
+      def ___express_invite_to_particular_action sym_a
+
+        _ada = _bound_action_via_normal_name sym_a
+
+        _s = _ada._help_syntax_string  # assume if invited then produced
+
+        _express_invite_to _s
       end
 
       def send_invitation ev
@@ -156,7 +163,9 @@ module Skylab::Brazen
         NIL_
       end
 
-      attr_reader :_invite_ev_a
+      def _invite_ev_a
+        @_invite_ev_a
+      end
 
       ## ~~ exitstatus & result handling
 
@@ -172,7 +181,10 @@ module Skylab::Brazen
           @resources.sout.puts x
           SUCCESS_EXITSTATUS
         else
-          CLI_::When_Result_::Looks_like_stream.new( @adapter, x ).execute
+
+          CLI_::When_Result_::Looks_like_stream.new(
+            x, @adapter, @adapter._expression_agent, @resources
+          ).execute
         end
       end
 
@@ -203,16 +215,12 @@ module Skylab::Brazen
         ).application_kernel_
       end
 
-      def branch_class
+      def _branch_class
         self.class::Branch_Adapter
       end
 
-      def leaf_class  # (related to above)
+      def _leaf_class  # (related to above)
         self.class::Action_Adapter
-      end
-
-      def invocation
-        self
       end
 
       def unbound_action_via_normalized_name i_a
@@ -237,14 +245,19 @@ module Skylab::Brazen
 
       ## ~~ name & related
 
-      def write_invocation_string_parts y
-
-        y.concat @resources.invocation_string_array
-        NIL_
+      def _write_invocation_string_parts_into y
+        y.concat @resources.invocation_string_array  # result
       end
 
       def app_name
         Callback_::Name.via_module( @mod ).as_slug  # etc.
+      end
+
+      ## ~~ expag top-stopper
+
+      def _expression_agent_class
+
+        self.class.___tricky_const_get :Expression_Agent
       end
 
       ## ~~ event receiving & sending
@@ -284,65 +297,83 @@ module Skylab::Brazen
         ::Enumerator::Yielder.new( & io.method( :puts ) )
       end
 
-      # ~ towards investigation :+[#101]:
+      def self.___tricky_const_get const  # experiment #[#101] (has line-by-line)
 
-      def expression_agent_class
-
-        self.class._instance_expression_agent_class
-      end
-
-      class << self
-
-        def _instance_expression_agent_class
-
-          if const_defined? :Expression_Agent, false
-
-            # do NOT inherit in the above const resolution - see [#101.A]
-
-            const_get :Expression_Agent, false
-
+        cache = @___tricky_cache ||= {}
+        cache.fetch const do
+          x = if const_defined? const, false
+            const_get const, false
           else
-            _cls = __any_custom_expag_class_via_filesystem
-            _cls || superclass._instance_expression_agent_class
-          end
-        end
 
-        define_method :__any_custom_expag_class_via_filesystem, -> do
-
-          _SLUG = 'expression-agent'
-          -> do
+            _slug = Callback_::Name.via_const_symbol( const ).as_slug
             et = entry_tree
-            if et.has_directory && et.has_entry_for_slug( _SLUG )
-              const_get :Expression_Agent, false
+
+            if et.has_directory and et.has_entry_for_slug _slug
+              const_get const, false  # hack trigger the autoload
+            else
+              Home_::CLI_Support.const_get const, false
             end
           end
-        end.call
-      end  # >>
+          cache[ const ] = x
+          x
+        end
+      end
+
+      public(
+        :app_name,  # by our expag (covered by [f2])
+        :application_kernel,
+        :_expression_agent_class,
+        :has_description,
+        :invoke,
+        :_leaf_class,
+        :maybe_use_exit_status,
+        :outbound_line_yielder_for__payload__,  # [gi]
+        :_receive_invitation,
+        :_write_invocation_string_parts_into,
+      )
     end  # top invocation
 
-    # ~
+    Lazy_ = Callback_::Lazy
+
+    # -- branch invocation (reduces unbounds to bounds)
 
     class Branch_Invocation__ < Invocation__
+    private
+
+      # -- branch - initialization
 
       Actions = ::Module.new.freeze  # #note-165
 
-      def resources
-        @resources
+      def init_properties  # [*]
+        @front_properties = Standard_branch_property_box___[]
+        NIL_
       end
 
-    private
+      def properties
+        @front_properties
+      end
 
-      def init_properties
-        @front_properties = STANDARD_BRANCH_PROPERTY_BOX__
+      # -- branch - reflection
+
+      def didactic_argument_properties  # as branch, contrast with leaf
+        _ = @_categorized_properties.arg_a || EMPTY_A_
+        [ * _, Ellipsis_hack___[] ]
+      end
+
+      Ellipsis_hack___ = Lazy_.call do
+
+        Home_::CLI_Support::Property.new( :ellipsis,
+          :argument_arity, :zero_or_one,
+          :custom_moniker, DOT_DOT_,
+        )
       end
 
       def _to_full_inferred_property_stream
 
-        _st = @front_properties.to_value_stream
-        _st.push_by STANDARD_ACTION_PROPERTY_BOX_.fetch :ellipsis  # #open [#097]
+        @front_properties.to_value_stream
       end
 
-    public
+      # -- branch - invocation
 
       def receive_no_matching_via_token__ token
 
@@ -356,13 +387,13 @@ module Skylab::Brazen
         call_bound_call _bc
       end
 
-    private
-
       def call_bound_call exe
         exe.receiver.send exe.method_name, * exe.args
       end
 
       def _some_bound_call
+
+        argv = @resources.argv
 
         if argv.length.zero?
 
@@ -377,11 +408,9 @@ module Skylab::Brazen
       end
 
       def _bound_call_when_no_arguments
-        CLI_::When_::No_Arguments.new action_prop, help_renderer
-      end
 
-      def action_prop
-        @front_properties.fetch :action
+        _prp = @front_properties.fetch :action
+        When_[]::No_Arguments.new _prp, _expression
       end
 
       def _bound_call_via_action_looking_first_argument
@@ -405,14 +434,12 @@ module Skylab::Brazen
         end
       end
 
-    public
-
-      def bound_action_via_normal_name_ i_a
-        retrv_bound_action_via_normal_name_symbol_stream(
+      def _bound_action_via_normal_name i_a
+        _bound_action_via_normal_name_symbol_stream(
           Callback_::Polymorphic_Stream.via_array i_a )
       end
 
-      def retrv_bound_action_via_normal_name_symbol_stream sym_st
+      def _bound_action_via_normal_name_symbol_stream sym_st
 
         ad_st = to_adapter_stream_
         sym = sym_st.gets_one
@@ -429,7 +456,7 @@ module Skylab::Brazen
         if found
           found.accept_frame self
           if sym_st.unparsed_exists
-            found.retrv_bound_action_via_normal_name_symbol_stream sym_st
+            found._bound_action_via_normal_name_symbol_stream sym_st
           else
             found
           end
@@ -512,9 +539,14 @@ module Skylab::Brazen
 
       # this is CLI. you need not cache these.
 
+      def __view_controller_class_for__help__option
+
+        When_[]::Help::For_Branch
+      end
+
       def __branch_class_for_unbound_action unbound
 
-        _any_specialized_adapter_in_self_for( unbound ) || branch_class
+        _any_specialized_adapter_in_self_for( unbound ) || _branch_class
       end
 
       def __leaf_class_for_unbound_action unbound
@@ -523,7 +555,7 @@ module Skylab::Brazen
 
         _cls ||= _any_specialized_adapter_in_self_for unbound
 
-        _cls || leaf_class
+        _cls || _leaf_class
       end
 
       # ~ begin modalities (per model)
@@ -572,23 +604,21 @@ module Skylab::Brazen
         end
       end
 
-      def leaf_class
-        @parent.leaf_class
+      def _leaf_class
+        @parent._leaf_class
       end
 
-      def branch_class
-        @parent.branch_class
+      def _branch_class
+        @parent._branch_class
       end
 
       def wrap_adapter_stream_with_ordering_buffer_ st
         Callback_::Stream.ordered st
       end
 
-    private
-
       def _bound_call_for_unrecognized_via token
 
-        CLI_::When_::No_Matching_Action.new token, help_renderer, self
+        When_[]::No_Matching_Action.new token, _expression, self
       end
 
       def __bound_call_via_option_looking_first_arg
@@ -599,8 +629,9 @@ module Skylab::Brazen
       end
 
       def _bound_call_via_parsed_options
+
         if @mutable_backbound_iambic.length.zero?
-          if argv.length.zero?
+          if @resources.argv.length.zero?
             _bound_call_when_no_arguments
           else
             _bound_call_via_action_looking_first_argument
@@ -611,34 +642,72 @@ module Skylab::Brazen
       end
 
       def __bound_call_via_successfully_parsed_options
-        a = [] ; scn = to_actual_parameters_stream
-        scn.next
+
+        a = []
+        st = Normal_stream___[ @mutable_backbound_iambic, @front_properties ]
         begin
-          i, x = scn.pair
-          cls = _bound_call_class_via_option_property_name_symbol i
-          a.push cls.new( x, help_renderer, self )
-        end while scn.next
+          qkn = st.gets
+          qkn or break
+
+          sym = qkn.name_symbol
+          _x = qkn.value_x
+
+          cls = ___view_controller_class_via_option_property_name_symbol sym
+
+          a.push cls.new( _x, _expression, self )
+          redo
+        end while nil
+
         Aggregate_Bound_Call__.new a
       end
 
-      def to_actual_parameters_stream
-        Actual_Parameter_Scanner__.new @mutable_backbound_iambic, @front_properties
+      def ___view_controller_class_via_option_property_name_symbol sym
+
+        m = _view_controller_class_method_for sym
+
+        if respond_to? m
+          send m
+        else
+          _const = Callback_::Name.via_variegated_symbol( sym ).as_const
+          When_[].const_get _const, false
+        end
       end
 
       def _bound_call_for_ambiguous_via adapter_a, token
 
-        CLI_::When_::Multiple_Matching_Actions.
-          new adapter_a, token, help_renderer
+        When_[]::Multiple_Matching_Actions.
+          new adapter_a, token, _expression
       end
-    end
 
-    # ~
+      def resources  # bestowed to child from here, [tm]
+        @resources
+      end
+
+      public(
+        :didactic_argument_properties,
+        :find_matching_action_adapters_against_tok_,
+        :_leaf_class,
+        :properties,
+        :resources,
+        :receive_multiple_matching_via_adapters_and_token__,
+        :receive_no_matching_via_token__,
+        :to_adapter_stream_,
+        :wrap_adapter_stream_with_ordering_buffer_,
+        :__view_controller_class_for__help__option,
+      )
+
+    end  # branch invocation
+
+    # -- action adapter (combines invocation and adapter methods)
 
     Adapter_Methods__ = ::Module.new
 
     class Action_Adapter_ < Invocation__
+    private
 
       include Adapter_Methods__
+
+      # -- leaf - initialization
 
       def initialize unbound, boundish
 
@@ -649,9 +718,93 @@ module Skylab::Brazen
         end
       end
 
+      # -- leaf - reflection
+
+      def receive_show_help_ otr  # as leaf, contrast with branch
+
+        accept_frame otr
+
+        _exp = _expression
+
+        _when = When_[]::Help::For_Action.new nil, _exp, self
+
+        _when.produce_result
+      end
+
+      def to_section_stream__  # not options. see [#]/figure-3
+
+        cp = @_categorized_properties
+        cat_st = ___to_relevant_category_stream
+        category_renderers = __category_renderers
+
+        Callback_.stream do
+          begin
+            cat = cat_st.gets
+            cat or break
+            prp_a = cp.for cat
+            prp_a or redo
+            _nf = Callback_::Name.via_variegated_symbol cat.symbol
+            p = category_renderers.fetch cat.symbol
+
+            _st = Callback_::Stream.via_nonsparse_array prp_a do | prp |
+
+              _name_x = p[ prp ]
+
+              _desc_p = -> expag, n do
+                if prp.has_description
+                  prp.under_expression_agent_get_N_desc_lines expag, n
+                end
+              end
+
+              Callback_::Pair.via_value_and_name( _desc_p, _name_x )
+            end
+
+            x = Callback_::Pair.via_value_and_name( _st, _nf )
+            break
+          end while nil
+          x
+        end
+      end
+
+      def ___to_relevant_category_stream
+        Callback_::Stream.via_nonsparse_array Relevant_categories___[]
+      end
+
+      Relevant_categories___ = Lazy_.call do
+        cats = Home_::CLI_Support::Categorized_Properties::CATEGORIES.dup
+        cats[ cats.index { | cat | :option == cat.symbol } ] = nil
+        cats.compact!
+        cats
+      end
+
+      def __category_renderers
+
+        _ = method :environment_variable_name_string_via_property_
+        {
+          argument: -> prp do
+            -> _expag do
+              Home_::CLI_Support::Syntax_Assembly.
+                render_as_argument_uninflected_for_arity__ prp
+            end
+          end,
+          environment_variable: -> prp do
+            -> _expag do
+              _[ prp ]
+            end
+          end,
+        }
+      end
+
+      def didactic_argument_properties  # as leaf, contrast with branch
+
+        @_categorized_properties.arg_a
+      end
+
       def _to_full_inferred_property_stream
 
-        to_property_stream.push_by STANDARD_ACTION_PROPERTY_BOX_.fetch :help
+        _bx = Home_::CLI_Support.standard_action_property_box_
+        _help = _bx.fetch :help
+        to_property_stream.push_by _help
       end
 
       def to_property_stream
@@ -661,6 +814,8 @@ module Skylab::Brazen
           Callback_::Stream.the_empty_stream
         end
       end
+
+      # -- leaf - invocation
 
       def _some_bound_call
         prepare_to_parse_parameters
@@ -677,39 +832,40 @@ module Skylab::Brazen
         end
       end
 
-      def bound_call_for_help_request  # :+#public-API
+      def bound_call_for_help_request  # [ts]
 
-        hr = help_renderer
+        exp = _expression
 
-        _cls = _bound_call_class_via_option_property_name_symbol :help
+        _m = _view_controller_class_method_for :help
 
-        a = [ _cls.new( hr ) ]  # (we used to pass `self` too)
+        _cls = send _m  # ensure that it is explicit
+
+        _when = _cls.new nil, exp, self
+
+        a = []
+        a.push _when
+
+        argv = @resources.argv
 
         if argv.length.nonzero?
 
-          a.push CLI_::When_::Unhandled_Arguments.new argv, hr
+          a.push When_[]::Unhandled_Arguments.new argv, exp
         end
 
         Aggregate_Bound_Call__.new a
       end
 
-      def receive_show_help_ otr
-        # contrast with branch implementation
-        accept_frame otr
-        help_renderer.express_help_screen_
-      end
+      def __view_controller_class_for__help__option
 
-      def __bound_call_class_for__help__option
-
-        When_Action_Help___
+        When_[]::Help::For_Action
       end
 
       def bound_call_via_ARGV_
 
-        _n11n = Action_Adapter::Arguments.normalization(
-          @categorized_properties.arg_a || EMPTY_A_ )
+        _n11n = Home_::CLI_Support::Arguments.normalization(
+          @_categorized_properties.arg_a || EMPTY_A_ )
 
-        @arg_parse = _n11n.new_via_argv argv
+        @arg_parse = _n11n.new_via_argv @resources.argv
 
         ev = @arg_parse.execute
         if ev
@@ -724,18 +880,18 @@ module Skylab::Brazen
       end
 
       def __bound_call_when__missing__arguments ev
-        CLI_::When_::Missing_Arguments.new ev, help_renderer
+        When_[]::Missing_Arguments.new ev.property, _expression
       end
 
       def __bound_call_when__extra__arguments ev
-        CLI_::When_::Extra_Arguments.new ev, help_renderer
+        When_[]::Extra_Arguments.new ev.x, _expression
       end
 
       def __bound_call_via_parsed_ARGV
 
         @mutable_backbound_iambic.concat @arg_parse.release_result_iambic
 
-        if @categorized_properties.env_a
+        if @_categorized_properties.env_a
           bc = __process_environment
         end
 
@@ -829,135 +985,47 @@ module Skylab::Brazen
 
       Autoloader_[ self ]
 
-    end
+      public(
+        :didactic_argument_properties,
+        :receive_show_help_,
+        :to_section_stream__,
+        :__view_controller_class_for__help__option,
+      )
+    end  # action adapter
     Action_Adapter = Action_Adapter_
 
-    # ~ for [#066] a modality-only action adapter
-
-    class Mock_Unbound
-
-      def initialize ada_cls
-
-        @_ada_cls = ada_cls
-        @name_function = Callback_::Name.via_module ada_cls
-      end
-
-      attr_reader :name_function
-
-      def silo_module
-        NIL_
-      end
-
-      def is_branch
-        false
-      end
-
-      def adapter_class_for _
-        NIL_
-      end
-
-      # ~
-
-      def new bnd, & x_p
-        @_ada_cls::Mock_Bound.new bnd, self, & x_p
-      end
-    end
-
-    class Mock_Bound
-
-      def initialize bnd, mock_unb, & x_p
-        @_bnd = bnd
-        @_mock_unb = mock_unb
-        @_x_p = x_p
-      end
-
-      def accept_parent_node x
-        @_par_nod = x
-        NIL_
-      end
-
-      def after_name_symbol
-        NIL_
-      end
-
-      def has_description
-        true
-      end
-
-      def is_visible
-        true
-      end
-
-      def under_expression_agent_get_N_desc_lines expag, d=nil
-
-        me = self
-        _p_a = [ -> y do
-          me.describe_into_under y, self  # :+#hook-out
-        end ]
-
-        N_lines_[ [], d, _p_a, expag ]
-      end
-
-      def formal_properties
-        @__fp ||= produce_formal_properties
-      end
-
-      def name
-        @_mock_unb.name_function
-      end
-    end
-
-    # ~
-
-    class As_Bound_Call_
-
-      def receiver
-        self
-      end
-
-      def method_name
-        :produce_result
-      end
-
-      def args
-      end
-
-      def block
-      end
-    end
-
-    class When_Action_Help___ < As_Bound_Call_
-
-      def initialize help_renderer
-        @_help_renderer = help_renderer
-      end
-
-      def produce_result
-        @_help_renderer.express_help_screen_
-      end
-    end
+    # -- branch adapter ( almost nothing special )
 
     class Branch_Adapter < Branch_Invocation__
+    private
 
       include Adapter_Methods__
 
-      def receive_show_help_ otr
-
-        # contrast with leaf implementation (covered).. [see #note-930]
+      def receive_show_help_ otr  # as branch, contrast with leaf, see [#]note-930
 
         accept_frame otr
-        CLI_::When_::Help.new( nil, help_renderer, self ).produce_result
+
+        When_[]::Help::For_Branch.new(
+          nil, _expression, self
+        ).produce_result
       end
+
+      public(
+        :receive_show_help_
+      )
     end
 
+    # -- adapter methods ( mainly delegates up/in )
+
     module Adapter_Methods__
+    private
 
       def initialize unbound, boundish  # :+#public-API
 
         @bound = unbound.new boundish.kernel, & handle_event_selectively
       end
 
-      # ~ implementation commonn to both branch & action (leaf) adapters:
+      # ~ implementation common to both branch & action (leaf) adapters:
 
       def bound_call_via_receive_frame otr  # :+#public-API
         accept_frame otr
@@ -1004,16 +1072,15 @@ module Skylab::Brazen
 
       # ~ delegate to parent:
 
-      def write_invocation_string_parts y
-        @parent.write_invocation_string_parts y
+      def _write_invocation_string_parts_into y
+        @parent._write_invocation_string_parts_into y
         y << name.as_slug
-        NIL_
       end
 
       ## ~~ navigate the reactive model
 
-      def bound_action_via_normal_name_ i_a
-        @parent.bound_action_via_normal_name_ i_a
+      def _bound_action_via_normal_name i_a
+        @parent._bound_action_via_normal_name i_a
       end
 
       def retrieve_unbound_action * i_a
@@ -1035,12 +1102,12 @@ module Skylab::Brazen
         NIL_
       end
 
-      def expression_strategy_for_informal_property prp
-        @parent.expression_strategy_for_informal_property prp
+      def _expression_strategy_for_uncategorized_property prp
+        @parent._expression_strategy_for_uncategorized_property prp
       end
 
-      def expression_agent_class
-        @parent.expression_agent_class
+      def _expression_agent_class
+        @parent._expression_agent_class
       end
 
       def outbound_line_yielder_for__payload__
@@ -1057,7 +1124,7 @@ module Skylab::Brazen
         @parent.app_name
       end
 
-      def application_kernel
+      def application_kernel  # [tm]
         @parent.application_kernel
       end
 
@@ -1067,12 +1134,282 @@ module Skylab::Brazen
         @bound
       end
 
-      attr_reader(
-        :resources,  # for magic results [#021]
+      public(
+        # UI
+        :app_name,  # ibid
+        :after_name_value_for_order,
+        :_expression_agent_class,
+        :has_description,
+        :is_visible,
+        :name_value_for_order,
+        :_receive_invitation,  # [gi]
+        :under_expression_agent_get_N_desc_lines,
+        :_write_invocation_string_parts_into,
+        # invocation & lower
+        :application_kernel,
+        :bound_,
+        :bound_call_via_receive_frame,
+        :maybe_use_exit_status,
+        :name,
       )
-    end
+    end  # adapter methods
 
-    class Invocation__  # used to be part of above
+    # -- invocation ( the master base class - expresses events )
+
+    class Invocation__
+    private
+
+      MUTATE_THESE_PROPERTIES = [ :stdin, :stdout ]
+
+      # the ordering rational for the sections is a mix between chronological
+      # (in terms of invocation lifecycle) and high-level-to-low-level.
+
+      # -- invocation - initialization
+
+      def init_categorized_properties  # [ts]
+
+        o = Home_::CLI_Support::Categorized_Properties.begin
+
+        o.property_stream = _to_full_inferred_property_stream
+
+        o.settable_by_environment_h = __build_settable_by_environment_h_
+
+        cp = o.execute
+        @_categorized_properties = cp
+        NIL_
+      end
+
+      # -- invocation - invocation
+
+      def prepare_to_parse_parameters  # [ts], branch & leaf
+
+        @mutable_backbound_iambic = []  # ivar name is #public-API
+        @seen = Callback_::Box.new  # ivar name is #public-API
+        NIL_
+      end
+
+      def bound_call_from_parse_options  # [*]
+
+        argv = @resources.argv
+        op = _option_parser
+
+        begin
+          op.parse! argv
+        rescue ::OptionParser::ParseError => e
+        end
+
+        if e
+          When_[]::Parse_Error.new e.message, _expression
+        end
+      end
+
+      # (the next few screens are arranged pursuant to [#]/figure-2)
+
+      # -- invocation - expression
+
+      def _expression
+        @_expression ||= ___build_adapter_expression
+      end
+
+      def ___build_adapter_expression
+
+        _expag = _expression_agent
+
+        _op = _option_parser
+
+        _puts = @resources.serr.method :puts
+        _line_yielder = ::Enumerator::Yielder.new( & _puts )
+
+        CLI_::Adapter_Expression__.new _line_yielder, _expag, _op, self
+      end
+
+      # -- invocation - as invocation reflection (assume expression)
+
+      def write_any_auxiliary_syntax_strings_into_ y
+        s = _help_syntax_string
+        if s
+          y << s
+        end
+        y
+      end
+
+      def _help_syntax_string  # (2x here)
+
+        help = _to_full_inferred_property_stream.each.detect do | prp |
+          :help == prp.name_symbol
+        end
+
+        if help
+          auxiliary_syntax_string_for_help_option_ help
+        end
+      end
+
+      def auxiliary_syntax_string_for_help_option_ help  # (iso.client)
+
+        _ = subprogram_name_string_
+        __ = @_expression.render_property_as_option_ help
+        "#{ _ } #{ __ }"
+      end
+
+      def subprogram_name_string_
+        _write_invocation_string_parts_into( [] ) * SPACE_
+      end
+
+      # -- invocation - o.p
+
+      def _option_parser
+        @___did_op ||= ___init_op
+        @__op
+      end
+
+      def ___init_op
+        op = begin_option_parser
+        if op
+          opt_a = @_categorized_properties.opt_a
+          if opt_a
+            _expression_agent  # (it's prettier if we access the ivar below)
+            op = populated_option_parser_via opt_a, op
+          end
+        end
+        @__op = op
+        ACHIEVED_
+      end
+
+      def begin_option_parser  # :+#public-API
+        option_parser_class.new
+      end
+
+      def option_parser_class
+        Home_.lib_.stdlib_option_parser
+      end
+
+      def populated_option_parser_via opt_a, op  # [sg]
+
+        h = Build_unique_letter_hash___[ opt_a ]
+
+        opt_a.each do |prp|
+
+          args = []
+          letter = h[ prp.name_symbol ]
+          letter and args.push "-#{ letter }"
+          base = "--#{ prp.name.as_slug }"
+
+          if prp.takes_argument
+            if prp.argument_is_required
+              args.push "#{ base } #{ _op_argument_label_for prp }"
+            else
+              args.push "#{ base } [#{ _op_argument_label_for prp }]"
+            end
+          else
+            args.push base
+          end
+
+          if prp.has_description
+            __express_property_description_into args, prp
+          end
+
+          _p = optparse_behavior_for_property prp
+
+          op.on( * args, & _p )
+        end
+
+        op
+      end
+
+      def _op_argument_label_for prp
+        s = prp.argument_moniker
+        if s
+          s
+        else
+          prp.name.as_variegated_string.split( UNDERSCORE_ ).last.upcase
+        end
+      end
+
+      def __express_property_description_into a, prp
+
+        @_expag.current_property = prp
+        a_ = prp.under_expression_agent_get_N_desc_lines @_expag
+        if a_
+          a.concat a_
+        end
+        a
+      end
+
+      def optparse_behavior_for_property prp  # [ts]
+
+        -> x do
+          m = :"receive__#{ prp.name_symbol }__option"
+          if respond_to? m
+            send m, x, prp
+          else
+            ___receive_uncategorized_option x, prp
+          end
+          NIL_
+        end
+      end
+
+      def ___receive_uncategorized_option x, prp
+
+        if prp.takes_argument
+
+          if prp.takes_many_arguments
+
+            mutate_backbound_iambic_ prp, [ x ]
+          else
+
+            mutate_backbound_iambic_ prp, x
+          end
+        elsif :zero_or_more == prp.parameter_arity
+
+          mutate_backbound_iambic_( prp )._increment_seen_count  # :#here
+        else
+
+          mutate_backbound_iambic_ prp
+        end
+        NIL_
+      end
+
+      def mutate_backbound_iambic_ prp, * rest  # (iso.client)
+
+        a = @mutable_backbound_iambic
+        k = prp.name_symbol
+
+        d = a.length
+        a.push k, * rest
+
+        amd = touch_argument_metadata k
+
+        amd.add_seen_at_index d
+
+        amd  # this result used in only one place currently (#here)
+      end
+
+      def increment_seen_count name_symbol  # [sn]
+
+        touch_argument_metadata( name_symbol )._increment_seen_count
+        NIL_
+      end
+
+      def touch_argument_metadata k  # [ts]
+
+        @seen.touch k do
+          Argument_Metadata___.new
+        end
+      end
+
+      # -- invocation - expag
+
+      def _expression_agent
+        @_expag ||= _expression_agent_class.new self
+      end
+
+      # -- invocation - view controller ("when") support
+
+      def _view_controller_class_method_for sym
+        :"__view_controller_class_for__#{ sym }__option"
+      end
+
+      # -- invocation event handling ( implement #[#023] )
 
       def handle_event_selectively  # :+#public-API #hook-in
 
@@ -1086,8 +1423,6 @@ module Skylab::Brazen
           receive_uncategorized_emission i_a, & x_p
         end
       end
-
-      # ~ begin implement :+[#023]:
 
       def receive_uncategorized_emission i_a, & x_p
 
@@ -1138,8 +1473,6 @@ module Skylab::Brazen
           instance_exec y, & msg_p
         end
       end
-
-      # ~ end implement that.
 
       def receive_conventional_emission i_a, & ev_p  # :+#public-API
 
@@ -1216,10 +1549,9 @@ module Skylab::Brazen
         NIL_
       end
 
-      attr_reader :_invite_ev_a
-
       def express_invite_to_general_help
-        help_renderer.express_invite_to_general_help
+
+        _expression.express_invite_to_general_help
       end
 
       def receive_payload_event ev
@@ -1233,7 +1565,7 @@ module Skylab::Brazen
         NIL_
       end
 
-    private  # #GEC
+      # ~ #GEC
 
       def maybe_inflect_line_for_positivity_via_event s, ev
         if ev.verb_lexeme
@@ -1333,7 +1665,7 @@ module Skylab::Brazen
       end.call
 
       def render_event_lines ev
-        ev.express_into_under y=[], expression_agent
+        ev.express_into_under y=[], _expression_agent
         y
       end
 
@@ -1347,7 +1679,7 @@ module Skylab::Brazen
       end
 
       def redundancy_filter
-        @redundancy_filter ||= CLI_::Redundancy_Filter__.new
+        @redundancy_filter ||= CLI_::Adapter_Expression__::Redundancy_Filter.new
       end
 
       def send_payload_event_lines a
@@ -1356,7 +1688,8 @@ module Skylab::Brazen
       end
 
       def send_non_payload_event_lines a
-        a.each( & help_renderer.y.method( :<< ) )
+
+        a.each( & _expression.line_yielder.method( :<< ) )
         NIL_
       end
 
@@ -1380,556 +1713,91 @@ module Skylab::Brazen
         Home_::API.exit_statii[ sym ]
       end
 
-      # ~ end event handling
+      def expression_strategy_for_property prp  # hook-out for expag
 
-    public
-
-      MUTATE_THESE_PROPERTIES = [ :stdin, :stdout ]
-
-      def begin_option_parser  # :+#public-API
-        option_parser_class.new
-      end
-
-      def option_parser_class
-        Option_parser___[]
-      end
-
-      def accept_categorized_properties_ cp
-        @categorized_properties = cp
-        NIL_
-      end
-
-      def invocation_string
-        write_invocation_string_parts y = []
-        y * SPACE_
-      end
-
-      def produce_populated_option_parser op, opt_a
-
-        h = Build_unique_letter_hash___[ opt_a ]
-
-        opt_a.each do |prp|
-
-          args = []
-          letter = h[ prp.name_symbol ]
-          letter and args.push "-#{ letter }"
-          base = "--#{ prp.name.as_slug }"
-
-          if prp.takes_argument
-            if prp.argument_is_required
-              args.push "#{ base } #{ argument_label_for prp }"
-            else
-              args.push "#{ base } [#{ argument_label_for prp }]"
-            end
-          else
-            args.push base
-          end
-
-          if prp.has_description
-            __render_property_description args, prp
-          end
-
-          _p = optparse_behavior_for_property prp
-
-          op.on( * args, & _p )
-        end
-
-        op
-      end
-
-      # ~ begin
-
-      def optparse_behavior_for_property prp  # :+#public-API #hook-in
-
-        -> x do
-          m = :"receive__#{ prp.name_symbol }__option"
-          if respond_to? m
-            send m, x, prp
-          else
-            __receive_uncategorized_option x, prp
-          end
-          NIL_
-        end
-      end
-
-      def __receive_uncategorized_option x, prp
-
-        if prp.takes_argument
-
-          if prp.takes_many_arguments
-
-            mutate_backbound_iambic_ prp, [ x ]
-          else
-
-            mutate_backbound_iambic_ prp, x
-          end
-        elsif :zero_or_more == prp.parameter_arity
-
-          mutate_backbound_iambic_( prp )._increment_seen_count  # :#here
-        else
-
-          mutate_backbound_iambic_ prp
-        end
-        NIL_
-      end
-
-      def mutate_backbound_iambic_ prp, * rest
-
-        a = @mutable_backbound_iambic
-        k = prp.name_symbol
-
-        d = a.length
-        a.push k, * rest
-
-        amd = touch_argument_metadata k
-
-        amd.add_seen_at_index d
-
-        amd  # this result used in only one place currently (#here)
-      end
-
-      def increment_seen_count name_symbol
-
-        touch_argument_metadata( name_symbol )._increment_seen_count
-        NIL_
-      end
-
-      def touch_argument_metadata k
-
-        @seen.touch k do
-          Argument_Metadata___.new
-        end
-      end
-
-      class Argument_Metadata___
-
-        def initialize
-        end
-
-        attr_reader :last_seen_index
-
-        def add_seen_at_index d
-          @last_seen_index = d
-          NIL_
-        end
-
-        attr_reader :seen_count
-
-        def _increment_seen_count
-          if seen_count.nil?
-            @seen_count = 1
-          else
-            @seen_count += 1
-          end
-        end
-      end
-
-      # ~ end
-
-      def __render_property_description a, prop
-        expag = expression_agent
-        expag.current_property = prop
-        a.concat prop.under_expression_agent_get_N_desc_lines expag
-        NIL_
-      end
-
-      def write_full_syntax_strings__ y
-        write_any_primary_syntax_string y
-        write_any_auxiliary_syntax_strings y
-      end
-
-      def write_any_primary_syntax_string y
-        s = primary_syntax_string
-        s and y << s
-        y
-      end
-
-      def primary_syntax_string
-        help_renderer.produce_full_main_syntax_string
-      end
-
-      def write_any_auxiliary_syntax_strings y
-        s = help_syntax_string
-        if s
-          y << s
-        end
-        y
-      end
-
-      def help_syntax_string
-
-        help = _to_full_inferred_property_stream.each.detect do | prp |
-          :help == prp.name_symbol
-        end
-
-        if help
-          auxiliary_syntax_string_for_help_option_ help
-        end
-      end
-
-      def auxiliary_syntax_string_for_help_option_ help
-
-        _ai_s = invocation_string
-        _op_s = help_renderer.as_opt_render_property help
-        "#{ _ai_s } #{ _op_s }"
-      end
-
-      def argument_label_for prop
-        s = prop.argument_moniker
-        s or prop.name.as_variegated_string.split( UNDERSCORE_ ).last.upcase
-      end
-
-      def prepare_to_parse_parameters  # :+#public-API :+#hook-in
-
-        @mutable_backbound_iambic = []  # :+#public-API (name)
-        @seen = Callback_::Box.new
-        NIL_
-      end
-
-      def bound_call_from_parse_options  # :+#public-API
-        @op ||= option_parser
-        @op.parse! argv
-        NIL_
-      rescue ::OptionParser::ParseError => e
-        __bound_call_when_parse_error e
-      end
-
-      def option_parser
-        help_renderer.op
-      end
-
-      def _bound_call_class_via_option_property_name_symbol i
-        m_i = :"__bound_call_class_for__#{ i }__option"
-        if respond_to? m_i
-          send m_i
-        else
-          i_ = Callback_::Name.via_variegated_symbol( i ).as_const
-          CLI_::When_.const_get( i_, false )
-        end
-      end
-
-      def __bound_call_when_parse_error e
-        CLI_::When_::Parse_Error.new e, help_renderer
-      end
-
-      def expression_agent
-        @categorized_properties.expression_agent
-      end
-
-      def categorized_properties
-        @categorized_properties
-      end
-
-      def properties
-        @front_properties
-      end
-
-      def stderr
-        @resources.serr
-      end
-
-      def help_renderer
-        @categorized_properties.help_renderer
-      end
-
-    private
-
-      def argv
-        @resources.argv
-      end
-
-      def init_categorized_properties
-
-        o = Categorize_properties___.new
-        o.st = _to_full_inferred_property_stream
-        o.adapter = self
-        o.settable_by_environment_h = __build_settable_by_environment_h_
-        o.execute
-        NIL_
-      end
-    end
-
-    Option_parser___ = Callback_.memoize do
-      require 'optparse'
-      ::OptionParser
-    end
-
-    # ~
-
-    class Categorize_properties___  # #note-600
-
-      attr_writer(
-        :st,
-        :settable_by_environment_h,
-        :adapter
-      )
-
-      def execute
-
-        Categorized_Properties_.new do | cp |
-
-          @adapter.accept_categorized_properties_ cp
-
-          @categorized_properties = cp
-
-          __work
-        end
-
-        @categorized_properties
-      end
-
-      def __work
-
-        @arg_a = @env_a = @opt_a = @many_a = nil
-
-        d = 0 ; @original_index = {}
-
-        env_h = @settable_by_environment_h || MONADIC_EMPTINESS_
-
-        begin
-          prp = @st.gets
-          prp or break
-
-          @original_index[ prp.name_symbol ] = ( d += 1 )
-
-          if env_h[ prp.name_symbol ]
-            ( @env_a ||= [] ).push prp
-            redo
-          end
-
-          # if is_hidden ; redo
-
-          if prp.takes_many_arguments
-            ( @many_a ||= [] ).push prp
-            redo
-          end
-
-          _is_effectively_required = if prp.is_required
-            if prp.has_default
-              false  # explained fully at [#006]
-            else
-              true
-            end
-          end
-
-          if _is_effectively_required
-
-            ( @arg_a ||= [] ).push prp
-          else
-
-            ( @opt_a ||= [] ).push prp
-          end
-
-          redo
-        end while nil
-
-        if @many_a
-          __determine_placement_for_many
-        end
-
-        __maybe_make_experimental_aesthetic_readjustment
-
-        o = @categorized_properties
-        o.adapter = @adapter
-        o.arg_a = @arg_a.freeze
-        o.env_a = @env_a.freeze
-        o.opt_a = @opt_a.freeze
-        NIL_
-      end
-
-      def __maybe_make_experimental_aesthetic_readjustment  # #note-575
-
-        if ! @many_a && @opt_a && ( ! @arg_a || @opt_a.last.takes_argument  ) # (a), (b) and (c)
-          __make_experimental_aestethic_adjustment
-        end
-      end
-
-      def __make_experimental_aestethic_adjustment  # #note-610
-
-        d = @opt_a.length
-        while d.nonzero?
-          prop = @opt_a.fetch d -= 1
-          prop.takes_argument or next
-          STANDARD_BRANCH_PROPERTY_BOX__.has_name( prop.name_symbol ) and next
-          found = prop
-          break
-        end
-        if found
-          ( @arg_a ||= [] ).push found
-          @opt_a[ d, 1 ] = EMPTY_A_
-          @opt_a.length.zero? and @opt_a = nil
-        end
-        NIL_
-      end
-
-      def __determine_placement_for_many
-
-        if @arg_a
-          @arg_a.push @many_a.pop
-          _re_order @arg_a
-        else
-          @arg_a = [ @many_a.pop ]
-        end
-        if @many_a.length.nonzero?
-          @opt_a.concat @many_a
-          _re_order @opt_a
-        end
-        @many_a = true
-      end
-
-      def _re_order a
-        a.sort_by! do |prop|
-          @original_index.fetch prop.name_symbol
-        end
-        NIL_
-      end
-    end
-
-    class Categorized_Properties_
-
-      def initialize
-
-        @expression_agent = @help_renderer = @op = nil
-        yield self
-        @expression_agent || __init_expression_agent
-        @op || __init_option_parser
-        @help_renderer || __init_help_renderer
-      end
-
-      attr_accessor(
-        :adapter,
-        :arg_a,
-        :env_a,
-        :opt_a,
-      )
-
-      attr_reader :expression_agent, :help_renderer, :categorized_properties
-
-      def __init_expression_agent
-        @expression_agent = @adapter.expression_agent_class.new self
-        NIL_
-      end
-
-      def __init_option_parser
-
-        op = @adapter.begin_option_parser
-        if op
-          if @opt_a
-            op = @adapter.produce_populated_option_parser op, @opt_a
-          end
-          @op = op
-        else
-          @op = nil
-        end
-        NIL_
-      end
-
-      def __init_help_renderer
-        CLI_::Action_Adapter_::Help_Renderer.new @op, @adapter
-        NIL_
-      end
-
-      def mutate_help_renderer_ o
-
-        @help_renderer = o
-        @opt_a and __add_option_section o
-        @arg_a and __add_arg_section o
-        @env_a and __add_env_section o
-        NIL_
-      end
-
-      def __add_option_section o
-        o.add_section :ad_hoc_section, 'options' do |help|
-          help.express_option_parser_summary_
-        end
-      end
-
-      def __add_arg_section o
-        o.arg_a = @arg_a
-        o.add_section :item_section, 'argument', @arg_a
-        NIL_
-      end
-
-      def __add_env_section o
-        o.add_section :item_section, 'environment variable', @env_a do | prp |
-          adapter.environment_variable_name_string_via_property prp
-        end
-      end
-
-      def expression_strategy_for_property prp  # for expag
-
-        es = __expression_strategy_for_formal_property prp
-        if es
-          es
-        else
-          es = @adapter.expression_strategy_for_informal_property prp
-          if es
-            es
-          else
-            :render_property_as_unknown
-          end
-        end
-      end
-
-      def __expression_strategy_for_formal_property prp
-
-        sym, = category_symbol_and_property_via_name_symbol prp.name_symbol
-
+        sym = category_for prp
         if sym
-          rendering_method_name_for_property_category_name_symbol sym
+          expression_strategy_for_category sym
+        else
+          _expression_strategy_for_uncategorized_property prp
         end
       end
 
-      def rendering_method_name_for_property_category_name_symbol sym
+      def category_for prp
+        @_categorized_properties.__category_for prp
+      end
+
+      def expression_strategy_for_category sym
         :"render_property_as__#{ sym }__"
       end
 
-      def lookup sym
-        category_symbol_and_property_via_name_symbol( sym ).fetch 1
+      alias_method :option_parser__, :_option_parser  # publicize only one
+
+      public(
+        :category_for,  # [st]
+        :_expression_agent,  # 1x in file
+        :expression_strategy_for_category,  # [st]
+        :express_invite_to_general_help,
+        :expression_strategy_for_property,
+        :option_parser__,
+        :subprogram_name_string_,
+        :write_any_auxiliary_syntax_strings_into_,
+      )
+
+      alias_method :expression_, :_expression  # for iso.client, [pe]
+
+    public
+
+      def front_properties  # [bs], [st]
+        @front_properties
       end
+    end  # invocation
 
-      def category_symbol_and_property_via_name_symbol sym
+    # -- performers that interpret actual properties
 
-        prp = __option_via_name_symbol sym
+    Normal_stream___ = -> mutable_backbound_iambic, props do
 
-        if prp
-          [ :option, prp ]
-        else
+      st = Callback_::Polymorphic_Stream.via_array mutable_backbound_iambic
 
-          prp = __argument_via_name_symbol sym
-          if prp
-            [ :argument, prp ]
+      Callback_.stream do
+        if st.unparsed_exists
+          sym = st.gets_one
+          prp = props.fetch sym
 
-          else
-
-            prp = __environment_variable_via_name_symbol sym
-            if prp
-              [ :environment_variable, prp ]
-            end
+          _x = if prp.takes_argument
+            st.gets_one
           end
-        end
-      end
 
-      def __option_via_name_symbol sym
-        any_i_in_a sym, @opt_a
-      end
-
-      def __argument_via_name_symbol sym
-        any_i_in_a sym, @arg_a
-      end
-
-      def __environment_variable_via_name_symbol sym
-        any_i_in_a sym, @env_a
-      end
-
-      def any_i_in_a i, a
-        if a
-          a.detect do |o|
-            i == o.name_symbol
-          end
+          Callback_::Qualified_Knownness.via_value_and_had_and_association(
+            _x, true, prp )
         end
       end
     end
+
+    class Argument_Metadata___
+
+      def initialize
+      end
+
+      attr_reader :last_seen_index
+
+      def add_seen_at_index d
+        @last_seen_index = d
+        NIL_
+      end
+
+      attr_reader :seen_count
+
+      def _increment_seen_count
+        if seen_count.nil?
+          @seen_count = 1
+        else
+          @seen_count += 1
+        end
+      end
+    end
+
+    # -- performers that interpret formal properties
 
     Build_unique_letter_hash___ = -> opt_a do
 
@@ -1951,124 +1819,28 @@ module Skylab::Brazen
       h
     end
 
-    class Property__  # #todo
+    # -- performers that model formal properties
 
-      def initialize name_i, * x_a
-        @argument_arity = :one
-        @custom_moniker = nil
-        @desc = nil
-        @name = Callback_::Name.via_variegated_symbol name_i
-        x_a.each_slice( 2 ) do |i, x|
-          instance_variable_set :"@#{ i }", x
-        end
-        freeze
-      end
+    Standard_branch_property_box___ = Callback_::Lazy.call do
 
-      def dup_by & edit_p
-        otr = dup
-        otr.instance_exec( & edit_p )
-        otr
-      end
-
-      attr_reader :desc, :name,
-        :argument_arity,
-        :argument_moniker,
-        :custom_moniker,
-        :is_required,
-        :parameter_arity
-
-      def name_symbol
-        @name.as_variegated_symbol
-      end
-
-      def has_custom_moniker
-        @custom_moniker
-      end
-
-      def has_description
-        @desc
-      end
-
-      def under_expression_agent_get_N_desc_lines expag, d=nil
-
-        N_lines_[ [], d, [ @desc ], expag ]
-      end
-
-      def takes_argument  # zero to many takes argument
-        :zero != @argument_arity
-      end
-
-      def argument_is_required
-        :one == @argument_arity or :one_or_more == @argument_arity
-      end
-
-      def takes_many_arguments
-        :zero_or_more == @argument_arity or :one_or_more == @argument_arity
-      end
-
-      def has_default
-      end
-    end
-
-    STANDARD_ACTION_PROPERTY_BOX_ = -> do
-
-      box = Box_.new
-
-      box.add :help, Property__.new( :help,
-        :argument_arity, :zero,
-        :desc, -> y do
-          y << "this screen"
-        end )
-
-      box.add :ellipsis, Property__.new( :ellipsis,
-        # :argument_arity, :zero_or_more,
-        :argument_arity, :zero_or_one,
-        :custom_moniker, DOT_DOT_ )
-
-      box.freeze
-    end.call
-
-    STANDARD_BRANCH_PROPERTY_BOX__ = -> do
+      _Property = Home_::CLI_Support::Property
 
       bx = Box_.new
 
-      bx.add :action, Property__.new( :action, :is_required, true )
+      bx.add :action, _Property.new( :action, :is_required, true )
 
-      bx.add :help, Property__.new( :help,
+      bx.add :help, _Property.new( :help,
 
         :argument_arity, :zero_or_one,
         :argument_moniker, 'cmd',
         :desc, -> y do
           y << 'this screen (or help for action)'
-       end )
+        end )
 
       bx.freeze
-
-    end.call
-
-    class Actual_Parameter_Scanner__
-
-      def initialize mutable_backbound_iambic, props
-
-        scn = Callback_::Polymorphic_Stream.via_array mutable_backbound_iambic
-        prop = i = x = nil
-        @prop_p = -> { prop }
-        @pair_p = -> { [ i, x ] }
-        @next_p = -> do
-          if scn.unparsed_exists
-            i = scn.gets_one
-            prop = props.fetch i
-            x = ( scn.gets_one if prop.takes_argument )
-            true
-          else
-            prop = i = x = nil
-          end
-        end
-      end
-      def next ; @next_p[] end
-      def pair ; @pair_p[] end
-      def prop ; @prop_p[] end
     end
+
+    # -- lower-level performers
 
     class Resources  # see [#110]
 
@@ -2176,7 +1948,9 @@ module Skylab::Brazen
       end
     end
 
-    class Aggregate_Bound_Call__ < As_Bound_Call_
+    # -- bound proxies
+
+    class Aggregate_Bound_Call__ < Home_::CLI_Support::As_Bound_Call
 
       def initialize a
         @a = a
@@ -2200,7 +1974,108 @@ module Skylab::Brazen
       end
     end
 
-    # ~ environment concern
+    class Bound_Kernel___
+
+      def initialize k, & oes_p
+        @kernel = k
+        @on_event_selectively = oes_p
+      end
+
+      # ~ delegation & related
+
+      def to_unordered_selection_stream
+
+        @kernel.build_unordered_selection_stream(
+          & @on_event_selectively )
+      end
+
+      def fast_lookup
+        @kernel.fast_lookup
+      end
+
+      def name
+        NIL_  # the top kernel *cannot* have a name, per :#here-2
+      end
+
+      attr_reader :kernel
+    end
+
+    # ~ for [#066] a modality-only action adapter
+
+    class Mock_Unbound
+
+      def initialize ada_cls
+
+        @_ada_cls = ada_cls
+        @name_function = Callback_::Name.via_module ada_cls
+      end
+
+      attr_reader :name_function
+
+      def silo_module
+        NIL_
+      end
+
+      def is_branch
+        false
+      end
+
+      def adapter_class_for _
+        NIL_
+      end
+
+      # ~
+
+      def new bnd, & x_p
+        @_ada_cls::Mock_Bound.new bnd, self, & x_p
+      end
+    end
+
+    class Mock_Bound
+
+      def initialize bnd, mock_unb, & x_p
+        @_bnd = bnd
+        @_mock_unb = mock_unb
+        @_x_p = x_p
+      end
+
+      def accept_parent_node x
+        @_par_nod = x
+        NIL_
+      end
+
+      def after_name_symbol
+        NIL_
+      end
+
+      def has_description
+        true
+      end
+
+      def is_visible
+        true
+      end
+
+      def under_expression_agent_get_N_desc_lines expag, d=nil
+
+        me = self
+        _p_a = [ -> y do
+          me.describe_into_under y, self  # :+#hook-out
+        end ]
+
+        N_lines_[ [], d, _p_a, expag ]
+      end
+
+      def formal_properties
+        @__fp ||= produce_formal_properties
+      end
+
+      def name
+        @_mock_unb.name_function
+      end
+    end
+
+    # -- environment concern ( #todo - gut this )
 
     class Branch_Invocation__
       def __build_settable_by_environment_h_
@@ -2257,9 +2132,9 @@ module Skylab::Brazen
 
         env = @resources.bridge_for :environment
 
-        @categorized_properties.env_a.each do | prp |
+        @_categorized_properties.env_a.each do | prp |
 
-          s = env[ environment_variable_name_string_via_property prp ]
+          s = env[ environment_variable_name_string_via_property_ prp ]
           s or next
           cased_i = prp.name_symbol.downcase  # [#039] casing
 
@@ -2272,7 +2147,7 @@ module Skylab::Brazen
         NIL_
       end
 
-      def environment_variable_name_string_via_property prp
+      def environment_variable_name_string_via_property_ prp
         "#{ __APPNAME }_#{ prp.name.as_lowercase_with_underscores_symbol.id2name.upcase }"
       end
 
@@ -2281,37 +2156,7 @@ module Skylab::Brazen
       end
     end
 
-    class Bound_Kernel___
-
-      def initialize k, & oes_p
-        @kernel = k
-        @on_event_selectively = oes_p
-      end
-
-      # ~ delegation & related
-
-      def to_unordered_selection_stream
-
-        @kernel.build_unordered_selection_stream(
-          & @on_event_selectively )
-      end
-
-      def fast_lookup
-        @kernel.fast_lookup
-      end
-
-      def name
-        NIL_  # the top kernel *cannot* have a name, per :#here-2
-      end
-
-      attr_reader :kernel
-    end
-
-    CLI_ = self
-    DASH_BYTE_ = DASH_.getbyte 0
-    GENERIC_ERROR_EXITSTATUS = 5
-    NOTHING_ = nil
-    SUCCESS_EXITSTATUS = 0
+    # --
 
     # ~ demonstration of modality-specific formal property mutation
 
@@ -2571,7 +2416,7 @@ module Skylab::Brazen
         if qkn.is_known_known
           path = qkn.value_x
           if path
-            if FILE_SEPARATOR_BYTE_ != path.getbyte( 0 )  # ick/meh
+            if FILE_SEPARATOR_BYTE != path.getbyte( 0 )  # ick/meh
 
               _path_ = _filesystem.expand_path path, present_working_directory
               kn = Callback_::Known_Known[ _path_ ]
@@ -2599,6 +2444,15 @@ module Skylab::Brazen
       end
     end
 
-    FILE_SEPARATOR_BYTE_ = ::File::SEPARATOR.getbyte 0
+    o = Home_::CLI_Support
+
+    FILE_SEPARATOR_BYTE = o::FILE_SEPARATOR_BYTE
+    CLI_ = self
+    DASH_BYTE_ = DASH_.getbyte 0
+    GENERIC_ERROR_EXITSTATUS = o::GENERIC_ERROR_EXITSTATUS
+    NOTHING_ = nil
+    SUCCESS_EXITSTATUS = o::SUCCESS_EXITSTATUS
+    When_ = -> { o::When }
+
   end
 end

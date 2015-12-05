@@ -10,7 +10,7 @@ see [#103] for important caveats and historical context.
 ## (salvaged from old [#!hl-065])
 
 basically all we are ever doing with arg parsing at this level is verifying
-that the number of arguments passed one of the set of valid numbers of
+that the number of arguments passed is a member of the set of valid numbers of
 arguments supported by that particular argument syntax. (this concept is
 referred to generally as 'arity' and is something we go crazy with over
 in [fa] but not here, in as precise of terms).
@@ -19,6 +19,7 @@ this is something that programmers are used to dealing with all the time,
 becuase it is exactly isomorphic with passing arguments to methods. (at least,
 this is true for the kind of argument syntaxes implemented by this node).
 this isomorphicism is one of the obsessions of this library..
+
 
 
 

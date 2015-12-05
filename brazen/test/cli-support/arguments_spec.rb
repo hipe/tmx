@@ -1,17 +1,18 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport::CLI_ActionAdapter_Namepace___
+module Skylab::Brazen::TestSupport
 
-  lib = ::Skylab::Brazen::TestSupport.lib_ :CLI_action_adapter
+  module CLI_Support_Arguments_Namespace
 
-  Ent_ = lib::Constants::Ent_  # because #[#ts-044]
+    bruh = TS_.lib_ :CLI_support
 
-  extend ::Skylab::TestSupport::Quickie
+    Ent_ = bruh::Ent
 
-  describe "[br] CLI action adapters - parse ARGV (R=required, O=optional" do
+    # <-
 
-    include lib::InstanceMethods
-    extend lib::ModuleMethods
+  TS_.describe "[br] CLI support - arguments - parse ARGV (R=required, O=optional" do
+
+    bruh[ self ]
 
     context "some syntaxes are not meant to be (O R O)" do
 
@@ -231,5 +232,7 @@ module Skylab::Brazen::TestSupport::CLI_ActionAdapter_Namepace___
         expect_failure :extra, :A
       end
     end
+  end
+  # ->
   end
 end

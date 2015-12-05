@@ -1,17 +1,18 @@
-digraph {
+digraph g {
 
-partitions -> properties
+  label="figure 2. because we use stdlib optparse, to
+parse opts we need the expag (but not the ada expr)"
 
-expr_ag -> partitions
+  ada_exp -> ada [label="(builds\nwith)"]
+  ada_exp [label="adapter\nexpression"]
+  ada [label="action\nadapter"]
+  ada_exp -> expag [label="(builds\nwith)"]
+  expag [label="expression\nagent"]
+  ada_exp -> op [label="(builds\nwith)"]
+  op [label="option\nparser"]
 
-op -> partitions
+  op -> expag [label="(builds\nusing)"]
 
-help_renderer -> op
-
-help_renderer -> action
-
-help_renderer -> action_adapter
-
-help_renderer -> invocation
+  expag -> ada [label="(builds\nwith)" ]
 
 }

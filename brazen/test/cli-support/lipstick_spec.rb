@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport
 
-  describe "[br] CLI - expr-frames - lipstick" do
+  describe "[br] CLI support - lipstick" do
 
     it "one segment" do
 
@@ -51,12 +51,12 @@ module Skylab::Brazen::TestSupport
     end
 
     def _subject_module
-      Home_::CLI::Expression_Frames::Lipstick
+      Home_::CLI_Support::Lipstick
     end
 
     def _unstyle_styled s
 
-      s_ = Home_::CLI::Styling.unstyle_styled s
+      s_ = Home_::CLI_Support::Styling.unstyle_styled s
       if s_
         s_
       else

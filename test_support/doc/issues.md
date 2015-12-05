@@ -23,8 +23,8 @@
              ( #was: #done #universal while regret no longer wires test nodes for autoloading  )
 [#030] #open #parent-node:[#015] the doc-test recursive spec needs mock fs
 [#029]       #track the 'expect' omnibus and narrative ..
-[#028]  #considering .. briding our implementation closer to r.s for
-             custom matchers ..
+[#028]   #watching what do we have to do to get our custom predicates to
+             work in both
              ( #was: "possible" #moved-to: [#ta-004]  ("eventpoint"))
              ( #was: #done borked quickie architecture near constants )k
 [#027]       #parent-node: [#015] peek hack explained .. (was templo)

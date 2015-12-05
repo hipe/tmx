@@ -12,26 +12,25 @@ the client had to override an accessor method for that class to tell the
 lib to effectively trigger autoloading for that node.)
 
 the ugliest part of our emerging solution here is that we assume that
-the [cb] autoloader is being used on the participating modules (an
+the [ca] autoloader is being used on the participating modules (an
 assumption that is however fair in this universe).
 
 
 
 
-## :[#.A]
+## line-by-line
 
-do NOT inherit here - to do so would lead to the client's custom expag in
-file not loading IFF the fallback expag has already loaded!
+we do *not* use the default `inherit` value of `true` here - to do so
+would expose us to the possibility of flickering failure based on
+whether or not a parent class has loaded its own (any) custom item or
+not yet. (this has certainly happened.)
 
-(when things first start up, [br] doesn't know that an expag class will
-exist under its "CLI" because it hasn't asked for it yet so the file
-hasn't been loaded. however, once anything in the system has loaded this
-node, that const will be set under [br]'s CLI module, and so to inherit
-the const resoution here will do one thing or another based on whether
-this or any other application has loaded the fallback expag class.
-nasty.)
+if that is what you actually did want, set the const in your node
+explicitly.
 
-a few lines down, we effect inheritence-like behavior "manually" (but
-only along the class sub-chain, not the full ancestor chain).
+if the const was not defined immediately inside of us, then peek into
+the filesystem, assumes [ca] autoloading. (note this peek is performed
+on a cached directory listing that is typically created earlier.)
 
-_
+the last-ditch fallback is to load an item with this same name from the
+"CLI support" node..

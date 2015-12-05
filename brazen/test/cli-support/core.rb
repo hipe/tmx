@@ -1,11 +1,15 @@
 module Skylab::Brazen::TestSupport
 
-  module CLI::Action_Adapter
+  module CLI_Support
 
-    # (this support module is employed "manually"
-    #  b.c it is used by a sandboxed namespace)
+    def self.[] tcc
+      tcc.extend Module_Methods___
+      tcc.include Instance_Methods___
+    end  # >>
 
-  module ModuleMethods
+    # <-
+
+  module Module_Methods___
 
     def with_class & blk
       contxt = self
@@ -17,10 +21,10 @@ module Skylab::Brazen::TestSupport
     end
   end
 
-  module InstanceMethods
+  module Instance_Methods___
 
     def with * x_a
-      _n11n = Home_::CLI::Action_Adapter_::Arguments.normalization arg_a
+      _n11n = Home_::CLI_Support::Arguments.normalization arg_a
       @normalization = _n11n.new_via_argv x_a
       @result = @normalization.execute
     end
@@ -44,9 +48,7 @@ module Skylab::Brazen::TestSupport
     end
   end
 
-  Constants = ::Module.new
-
-  Constants::Ent_ = -> do
+  Ent = -> do
 
     p = -> do
 
@@ -66,6 +68,18 @@ module Skylab::Brazen::TestSupport
 
         const_get( :Property, false ).class_exec do
 
+          # -- ew, per f.w:
+
+          def is_effectively_optional_
+            ! is_required
+          end
+
+          def has_default
+            false  # per f.w
+          end
+
+          # --
+
           def is_required
             :one == @parameter_arity
           end
@@ -77,10 +91,6 @@ module Skylab::Brazen::TestSupport
 
           def takes_argument
             :one == @argument_arity
-          end
-
-          def has_default
-            false  # per f.w
           end
         end
       end

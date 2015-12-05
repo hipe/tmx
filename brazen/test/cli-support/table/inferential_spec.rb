@@ -1,8 +1,8 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Brazen::TestSupport
 
-  describe "[br] CLI - exp-fr - table - inferrential" do
+  describe "[br] CLI support - table - inferrential" do
 
     it "_when_rendering( [] ){ .. } - renders the empty table" do
 
@@ -141,7 +141,7 @@ module Skylab::Brazen::TestSupport
           Home_::CLI.expression_agent_instance.method( :hdr )
 
         o.on_row do |txt|
-          a.push Home_::CLI::Styling.unstyle txt
+          a.push Home_::CLI_Support::Styling.unstyle txt
         end
       end
 
@@ -153,7 +153,7 @@ module Skylab::Brazen::TestSupport
 
     def _when_rendering * ea_and_h, & edit_p
 
-      Home_::CLI::Expression_Frames::Table::Inferential.
+      Home_::CLI_Support::Table::Inferential.
         render( * ea_and_h, & edit_p )
     end
   end

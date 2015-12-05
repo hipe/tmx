@@ -168,6 +168,12 @@ module Skylab::Brazen
         :Event
       end
 
+    private
+
+      def action_reflection  # [bs]
+        @_action_reflection
+      end
+
       # ~ end
 
       Singleton_instance__ = Callback_.memoize do

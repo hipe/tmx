@@ -6,10 +6,10 @@ module Skylab::Brazen::TestSupport
 
     it "normative" do
 
-      op = Home_::CLI::Option_parser___[].new
+      op = Home_.lib_.stdlib_option_parser.new
       op.on '-x', '--ex'
       op.on '-y', '--yes[=ok]'
-      scn = Home_::CLI::Option_Parser::Option_stream[ op ]
+      scn = Home_::CLI_Support::Option_Parser::Option_stream[ op ]
       sw = scn.gets
       sw.short.last.should eql '-x'
       sw = scn.gets

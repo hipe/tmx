@@ -207,6 +207,15 @@ module Skylab::Brazen
             end
             self
           end
+
+          def is_effectively_optional_  # explained at [#006]. needs drying
+
+            if has_default
+              true
+            else
+              ! is_required
+            end
+          end
         end
 
       ## ~~ description

@@ -1,0 +1,27 @@
+digraph {
+
+label="
+fig 3. - a general help screen structure.
+for each branch that has exactly 2 children, we
+can use our common \"pair\" tuple."
+
+document -> category [arrowhead="odot" label="(is a stream\nof many)" ]
+
+document [label="help screen"]
+
+category [label="section\n(or \"category\")"]
+
+category -> name_ [arrowhead="none"]
+name_ [label="name\n(a Name Function)" shape="rect"]
+
+category -> item [arrowhead="odot" label="(has a stream\nof many)"]
+
+item -> name__ [arrowhead="none"]
+name__ [label="name\n(a function\nthat renders it)" shape="rect"]
+
+item -> xx [arrowhead="odot" label="has many"]
+xx [label="description lines\n(a function that\nproduces a stream of them" shape="rect"]
+
+# [arrowhead="odot"]
+
+}

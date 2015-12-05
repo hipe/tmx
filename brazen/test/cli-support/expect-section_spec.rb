@@ -2,26 +2,65 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport
 
-  describe "[br] CLI - expect section (inspired by OGDL)" do
+  describe "[br] CLI support - expect section (inspired by OGDL)" do
+
+    TS_[ self ]
+    use :memoizer_methods
 
     subject = nil
 
+    it "loads" do
+      subject[]
+    end
+
     context "with a two-node snowman" do
 
-      it ".children, .x.line, .x.line_content" do
-
-        top = root.only_child
-        top.x.line.should eql "aaa\n"
-        top.children.length.should eql 1
-        top.only_child.x.line_content.should eql 'bbb'
+      it "the structure parses" do
+        _tree or fail
       end
 
-      define_method :root, ( Callback_.memoize do
-        subject[].tree_via_string <<-HERE.unindent
+      it "the root knows it has an only child" do
+
+        _tree.only_child or fail
+      end
+
+      it "this only child knows its own line (with newline)" do
+
+        _tree.only_child.x.string.should eql "aaa\n"
+      end
+
+      it "both root and \"top\" know their children length" do
+
+        root = _tree
+        root.children.length.should eql 1
+
+        _top = root.only_child
+        _top.children.length.should eql 1
+      end
+
+      it "`line_content` omits any newline" do
+
+        _some_node.x.line_content.should eql 'bbb'
+      end
+
+      it "the internal line structure preserves channel" do
+
+        _some_node.x.stream_symbol.should eql :_no_stream_
+      end
+
+      shared_subject :_some_node do
+        _tree.only_child.only_child
+      end
+
+      memoize :_tree do
+
+        _ = <<-HERE.unindent
           aaa
             bbb
         HERE
-      end )
+
+        subject[].tree_via :string, _
+      end
     end
 
     context "with a deeper but well formed tree" do
@@ -31,8 +70,9 @@ module Skylab::Brazen::TestSupport
           [ 'head', 'torso', 'legs' ] )
       end
 
-      define_method :root, ( Callback_.memoize do
-        subject[].tree_via_string <<-HERE.unindent
+      memoize :root do
+
+        _ = <<-HERE.unindent
           head
             mouth
           torso
@@ -41,7 +81,9 @@ module Skylab::Brazen::TestSupport
               tailbone
           legs
         HERE
-      end )
+
+        subject[].tree_via :string, _
+      end
     end
 
     def section
@@ -54,7 +96,7 @@ module Skylab::Brazen::TestSupport
 
     x = nil
     subject = -> do
-      x ||= TS_.lib_( :CLI_expect_section )
+      x ||= TS_.lib_ :CLI_support_expect_section
     end
   end
 end

@@ -2,7 +2,7 @@ digraph {
 
 labelloc="t"
 
-label="CLI expression of the [br] reactive model tree - class/module hierarchy
+label="fig.1 - CLI expression of the [br] reactive model tree - class/module hierarchy
 
 legend:
   • rectangles are classes, ellipses are mixin modules

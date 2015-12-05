@@ -243,7 +243,7 @@ custom dependecy class for this specific behavior:
     a thing once per table..
 
 we achieve the last point above by introducing the mechanism of
-[#007.H] dynamic dependencies" which we are formulating presently..
+"dynamic dependencies" which we are formulating presently..
 
 
 

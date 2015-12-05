@@ -242,16 +242,16 @@ module Skylab::Brazen
 
         @_stx = Here_::Models_::Isomorphic_Method_Parameters.new _ruby_params
 
-        _opt_a = [ CLI_.standard_action_property_box.fetch( :help ) ]
+        _opt_a = [
+          Home_::CLI_Support.standard_action_property_box_.fetch( :help ) ]
 
         if @_stx.argument_term_count.nonzero?
           _arg_a = @_stx.to_a
         end
 
-        @_categorized_properties = CLI_::Categorized_Properties_.new(
-          _arg_a, NIL_, _opt_a )
-
-        # #VIOLATION above
+        @_categorized_properties =  # #VIOLATION
+          Home_::CLI_Support::Categorized_Properties.via_args_opts_envs(
+            _arg_a, NIL_, _opt_a )
 
         NIL_
       end
@@ -297,7 +297,7 @@ module Skylab::Brazen
         # unlike parent which checks for the existence of any property
         # called 'help', we always support this action-like option.
 
-        _ho = CLI_.standard_action_property_box.fetch :help
+        _ho = Home_::CLI_Support.standard_action_property_box_.fetch :help
         y << auxiliary_syntax_string_for_help_option_( _ho )
       end
 

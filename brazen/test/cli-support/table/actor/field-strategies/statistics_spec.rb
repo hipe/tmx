@@ -1,11 +1,11 @@
-require_relative '../../../../../test-support'
+require_relative '../../../../test-support'
 
 module Skylab::Brazen::TestSupport
 
-  describe "[br] CLI - expr-fr - table - actor - stats" do
+  describe "[br] CLI support - table - actor - stats" do
 
-    extend TS_
-    use :CLI_expression_frames_table_actor
+    TS_[ self ]
+    use :CLI_support_table_actor
 
     _SUBJECT_SYMBOL = :gather_statistics
 
