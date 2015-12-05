@@ -1,19 +1,23 @@
 module Skylab::Brazen
 
-  class CLI
+  module CLI_Support
 
-    class When_::Unhandled_Arguments < As_Bound_Call_
+    class When::Unhandled_Arguments < As_Bound_Call
 
-      def initialize args, help_renderer
-        @args = args
-        @render = help_renderer
+      def initialize args, invocation_expression
+
+        @_args = args
+        @_expression = invocation_expression
       end
 
       def produce_result
-        a = @args
-        @render.express do
+
+        a = @_args
+
+        @_expression.express do
           "(unhandled argument#{ s a }: #{ a * ', ' })"
         end
+
         GENERIC_ERROR_EXITSTATUS
       end
     end

@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  module CLI::Expression_Frames::Table::Inferential  # [#096.C]
+  module CLI_Support::Table::Inferential  # [#096.C]
 
     # emigrated from [hl] - this file has some ANCIENT style in it...
 
@@ -236,7 +236,7 @@ module Skylab::Brazen
 
   module Types__
 
-    mod = Home_::CLI::Styling
+    mod = Home_::CLI_Support::Styling
     unstyle = mod::Unstyle
 
     parse_styles = mod::Parse_styles
@@ -312,7 +312,7 @@ module Skylab::Brazen
 
     start_type = Types__::INTEGER
 
-    unstyle = Home_::CLI::Styling::Unstyle
+    unstyle = Home_::CLI_Support::Styling::Unstyle
 
     define_method :see do |cel_x|  # `cel_x` must be ::String or nil
       if ! cel_x.nil?

@@ -1,26 +1,26 @@
 module Skylab::Brazen
 
-  class CLI
+  module CLI_Support
 
-    class When_::Multiple_Matching_Actions < As_Bound_Call_
+    class When::Multiple_Matching_Actions < As_Bound_Call
 
-      def initialize adapter_a, token, help_renderer
+      def initialize adapter_a, token, invocation_expression
 
-        @a = adapter_a
-        @help_renderer = help_renderer
-        @token = token
+        @_adapter_array = adapter_a
+        @_expression = invocation_expression
+        @_token = token
       end
 
       def produce_result
 
-        hr = @help_renderer
+        ae = @_expression
 
         _ev = Home_::Property.build_ambiguous_property_event(
-          @a, @token, :action )
+          @_adapter_array, @_token, :action )
 
-        _ev.express_into_under hr.y, hr.expression_agent
+        _ev.express_into_under ae.line_yielder, ae.expression_agent
 
-        hr.express_invite_to_general_help
+        ae.express_invite_to_general_help :because, :argument
 
         GENERIC_ERROR_EXITSTATUS
       end

@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport
 
   describe "[br] collection adapters: git config (mutable!)" do
 
-    extend TS_
+    TS_[ self ]
     use :collection_adapters_git_config_mutable
 
     it "the empty string parses" do

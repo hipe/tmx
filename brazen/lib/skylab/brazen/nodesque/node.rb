@@ -42,7 +42,10 @@ module Skylab::Brazen
 
     def under_expression_agent_get_N_desc_lines expag, d=nil  # assume has
 
-      N_lines_[ [], d, [ self.class.description_block ], expag ]
+      p = self.class.description_block
+      if p
+        N_lines_[ [], d, [ p ], expag ]
+      end
     end
 
     def name

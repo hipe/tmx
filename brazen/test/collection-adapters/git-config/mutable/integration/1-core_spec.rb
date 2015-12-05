@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport
 
   describe "[br] collection adapters - git config mutable integration" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
     use :collection_adapters_git_config_mutable
 

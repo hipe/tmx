@@ -1,10 +1,10 @@
 module Skylab::Brazen
 
-  class CLI
+  module CLI_Support
 
     class Expression_Agent
 
-      class Pretty_Path__  # re-write [#sy-005]
+      class Pretty_Path  # re-write [#sy-005]
 
         Callback_::Actor[ self, :properties, :path ]
 
@@ -44,10 +44,9 @@ module Skylab::Brazen
         def path_has_this_at_head s
           s_length = s.length
           @path_length >= s_length && @path[ 0, s_length ] == s &&
-            ( @path_length == s_length || SLASH_BYTE_ == @path.getbyte( s_length ) )
+            ( @path_length == s_length ||
+             FILE_SEPARATOR_BYTE == @path.getbyte( s_length ) )
         end
-
-        SLASH_BYTE_ = '/'.getbyte 0
 
         def do_the_one_that_is_longer
           if @home.length > @pwd.length  # when lengths are equal, pwd wins

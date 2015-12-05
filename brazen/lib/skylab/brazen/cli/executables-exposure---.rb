@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class CLI
 
-    module Action_Adapter_::Executables_Exposure
+    module Executables_Exposure___
 
       # [br] CLI is an adaptation of a reactive model to a particular
       # modality. this is an adaption of of scripts written "natively"

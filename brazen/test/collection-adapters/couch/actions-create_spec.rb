@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport
 
   describe "[br] collections - couch - actions - create (COVER edit sess, precons)" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
 
     it "with no name: missing required property: argument error" do

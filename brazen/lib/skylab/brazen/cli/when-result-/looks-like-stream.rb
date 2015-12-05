@@ -4,11 +4,12 @@ module Skylab::Brazen
 
     class When_Result_::Looks_like_stream  # :[#068] for the list shape.
 
-      def initialize ada, x
+      def initialize x, ada, expag, resources
         @adapter = ada
+        @expag = expag
+        @resources = resources
         @upstream = x
-        @expag = ada.expression_agent
-        io = ada.resources.sout
+        io = resources.sout
         @y = ::Enumerator::Yielder.new do | s |
           io.puts s
         end
@@ -36,7 +37,7 @@ module Skylab::Brazen
       end
 
       def when_no_items
-        @adapter.resources.serr.puts "empty."
+        @resources.serr.puts "empty."
         ACHIEVED_
       end
 
@@ -155,7 +156,7 @@ module Skylab::Brazen
 
         d = @count
         nm = @name
-        serr = @adapter.resources.serr
+        serr = @resources.serr
 
         if nm.respond_to? :verb_as_noun_lexeme
           lexeme = nm.verb_as_noun_lexeme

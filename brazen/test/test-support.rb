@@ -3,13 +3,12 @@ require 'skylab/test_support'
 
 module Skylab::Brazen::TestSupport
 
-  TestSupport_ = ::Skylab::TestSupport
-
-  extend TestSupport_::Quickie
-
-  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
-
   class << self
+
+    def [] tcc
+      tcc.send :define_singleton_method, :use, Use_method
+      tcc.include Instance_Methods___
+    end
 
     def lib sym
       _libs.public_library sym
@@ -24,15 +23,15 @@ module Skylab::Brazen::TestSupport
     end
   end  # >>
 
-  module ModuleMethods
+  TestSupport_ = ::Skylab::TestSupport
 
-    def use sym
+  extend TestSupport_::Quickie
+
+     Use_method = -> sym do
       TS_.lib_( sym )[ self ]
     end
-  end
 
-
-  module InstanceMethods
+  module Instance_Methods___
 
     def debug!
       @do_debug = true
@@ -76,7 +75,7 @@ module Skylab::Brazen::TestSupport
 
   module TestLib_
 
-    memoize = Callback_::Memoize
+    memoize = Callback_::Lazy
 
     Expect_event = -> test_context_cls do
       Callback_.test_support::Expect_Event[ test_context_cls ]
@@ -170,18 +169,11 @@ module Skylab::Brazen::TestSupport
     Callback_::Autoloader[ self ]  # don't load fixture file when autoloading lib
   end
 
+  Callback_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
+
   EMPTY_S_ = ''.freeze
   Home_ = ::Skylab::Brazen
   NIL_ = nil
   SPACE_ = ' '.freeze
-
-  module Constants
-    Home_ = Home_
-    Callback_ = Callback_
-    EMPTY_S_ = EMPTY_S_
-    NIL_ = nil
-    SPACE_ = SPACE_
-    TestLib_ = TestLib_
-    TestSupport_ = TestSupport_
-  end
+  TS_ = self
 end

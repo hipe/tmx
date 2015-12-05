@@ -1,8 +1,6 @@
 module Skylab::Brazen
 
-  CLI::Expression_Frames = ::Module.new
-
-  module CLI::Expression_Frames::Lipstick  # see [#073]
+  module CLI_Support::Lipstick  # see [#073]
 
     # ~ phase 1: "static" definition
 
@@ -80,7 +78,7 @@ module Skylab::Brazen
 
       def __build_style_proc
         if @color
-          Home_::CLI::Styling::Stylify.curry[ [ @color ] ]
+          Home_::CLI_Support::Styling::Stylify.curry[ [ @color ] ]
         else
           IDENTITY_
         end

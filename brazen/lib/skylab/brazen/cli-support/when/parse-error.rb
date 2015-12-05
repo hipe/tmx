@@ -1,18 +1,22 @@
 module Skylab::Brazen
 
-  class CLI
+  module CLI_Support
 
-    class When_::Parse_Error < As_Bound_Call_
+    class When::Parse_Error < As_Bound_Call
 
-      def initialize e, help_renderer
-        @exception = e
-        @render = help_renderer
+      # (typically used to express the expression raised by stdlib o.p)
+
+      def initialize message, invocation_expression
+
+        @_expression = invocation_expression
+        @_message = message
       end
 
       def produce_result
-        o = @render
-        o.y << @exception.message
-        o.express_invite_to_general_help
+
+        o = @_expression
+        o.line_yielder << @_message
+        o.express_invite_to_general_help :because, :option
         GENERIC_ERROR_EXITSTATUS
       end
     end

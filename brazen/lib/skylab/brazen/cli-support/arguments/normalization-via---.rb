@@ -1,12 +1,10 @@
 module Skylab::Brazen
 
-  class CLI
-
-    class Action_Adapter_
-
+  module CLI_Support
+    # ->
       module Arguments
 
-        class Normalization_Via__
+        class Normalization_Via___
 
           Callback_::Actor.call self,
             :properties,
@@ -48,6 +46,6 @@ module Skylab::Brazen
           end
         end
       end
-    end
+    # -
   end
 end

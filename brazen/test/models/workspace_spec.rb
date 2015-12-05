@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport
 
   describe "[br] models workspace" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
 
     it "ping the workspace silo" do

@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class CLI
+  module CLI_Support
 
     module Option_Parser
 

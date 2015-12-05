@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class CLI
+  module CLI_Support
 
     class Expression_Agent
 
@@ -9,14 +9,10 @@ module Skylab::Brazen
         def instance  # see #note-br-10 in [#br-093]. this is for hacks
           @inst ||= Singleton_instance__[]
         end
-
-        def pretty_path x
-          self::Pretty_Path__[ x ]
-        end
       end  # >>
 
-      def initialize cp
-        @categorized_properties = cp
+      def initialize ar
+        @_action_reflection = ar
       end
 
       attr_writer :current_property
@@ -28,7 +24,7 @@ module Skylab::Brazen
       end
 
       def app_name
-        @categorized_properties.adapter.bound_.kernel.app_name  # ick/meh
+        @_action_reflection.app_name
       end
 
       def both x
@@ -77,11 +73,14 @@ module Skylab::Brazen
 
       def par prp  # referenced by :[#115].
 
-        m, * a = @categorized_properties.expression_strategy_for_property prp
+        highlight parameter_in_black_and_white prp
+      end
 
-        _unstyled = send m, prp, * a
+      def parameter_in_black_and_white prp
 
-        highlight _unstyled
+        m, * a = @_action_reflection.expression_strategy_for_property prp
+
+        send m, prp, * a
       end
 
       def plural_noun * a
@@ -104,8 +103,8 @@ module Skylab::Brazen
         if s.respond_to? :to_path
           s = s.to_path
         end
-        if FILE_SEPARATOR_BYTE_ == s.getbyte( 0 )
-          CLI::Expression_Agent::Pretty_Path__[ s ]
+        if FILE_SEPARATOR_BYTE == s.getbyte( 0 )
+          CLI_Support::Expression_Agent::Pretty_Path[ s ]
         else
           s
         end
@@ -119,10 +118,10 @@ module Skylab::Brazen
         "<#{ prop.name.as_slug }>"
       end
 
-      alias_method :render_property_as_argument_, :render_property_as__argument__
+      alias_method :render_property_as_argument, :render_property_as__argument__
 
       def render_property_as__environment_variable__ prp
-        @categorized_properties.adapter.environment_variable_name_string_via_property prp
+        @_action_reflection.environment_variable_name_string_via_property_ prp
       end
 
       def custom_property_expression_strategy prp, p, * a
@@ -138,7 +137,7 @@ module Skylab::Brazen
       end
 
       public def stylize s, * i_a
-        Home_::CLI::Styling.stylify i_a, s
+        Home_::CLI_Support::Styling.stylify i_a, s
       end
 
       def val x  # assume "primitive"

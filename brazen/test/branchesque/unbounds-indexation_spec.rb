@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport
 
   describe "[br] branchesque - unbounds indexation - promotions" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
 
     context "full minimal example (scene 1)" do

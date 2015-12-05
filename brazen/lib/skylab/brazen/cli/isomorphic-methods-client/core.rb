@@ -242,22 +242,21 @@ module Skylab::Brazen
 
         @_stx = Here_::Models_::Isomorphic_Method_Parameters.new _ruby_params
 
-        CP___.new do | cp |
+        _opt_a = [ CLI_.standard_action_property_box.fetch( :help ) ]
 
-          accept_categorized_properties_ cp
-
-          cp.adapter = self
-
-          cp.opt_a = [ CLI::STANDARD_ACTION_PROPERTY_BOX_.fetch( :help ) ]
-
-          cp.arg_a = if @_stx.argument_term_count.nonzero?
-            @_stx.to_a
-          end
+        if @_stx.argument_term_count.nonzero?
+          _arg_a = @_stx.to_a
         end
+
+        @_categorized_properties = CLI_::Categorized_Properties_.new(
+          _arg_a, NIL_, _opt_a )
+
+        # #VIOLATION above
+
         NIL_
       end
 
-      def produce_populated_option_parser op, opt_a
+      def populated_option_parser_via opt_a, op
 
         # (the fact that this works is fragile. see caller)
 
@@ -293,12 +292,12 @@ module Skylab::Brazen
         NIL_
       end
 
-      def write_any_auxiliary_syntax_strings y
+      def write_any_auxiliary_syntax_strings_into_ y
 
         # unlike parent which checks for the existence of any property
         # called 'help', we always support this action-like option.
 
-        _ho = CLI::STANDARD_ACTION_PROPERTY_BOX_.fetch :help
+        _ho = CLI_.standard_action_property_box.fetch :help
         y << auxiliary_syntax_string_for_help_option_( _ho )
       end
 
@@ -312,12 +311,12 @@ module Skylab::Brazen
 
           o.on_missing do | miss_ev |
 
-            CLI::When_::Missing_Arguments_Fancy.new miss_ev, help_renderer
+            When_[]::Missing_Arguments_Fancy.new miss_ev, expression_
           end
 
           o.on_extra do | xtra_ev |
 
-            CLI::When_::Extra_Arguments.new xtra_ev, help_renderer
+            When_[]::Extra_Arguments.new xtra_ev.x, expression_
           end
 
           o.on_success do
@@ -339,20 +338,10 @@ module Skylab::Brazen
       end
     end
 
-    class CP___ < CLI::Categorized_Properties_
-
-      def mutate_help_renderer_ o
-
-        @help_renderer = o
-        @opt_a and __add_option_section o
-        @arg_a and __add_arg_section o
-        # @env_a and __add_env_section o  we never have these
-        NIL_
-      end
-    end
-
+    CLI_ = CLI
     Here_ = self
     Autoloader_[ Models_ = ::Module.new ]
+    When_ = CLI::When_
 
   end
 end

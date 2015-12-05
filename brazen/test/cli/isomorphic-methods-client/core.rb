@@ -4,30 +4,16 @@ module Skylab::Brazen::TestSupport
 
     def self.[] tcc
 
-      TS_.lib_( :CLI_expectations )[ tcc ]
-
       TS_::TestLib_::Memoizer_methods[ tcc ]
 
-      tcc.extend VERY_TEMPORARY_LEGACIES
+      TS_.lib_( :CLI_support_expectations )[ tcc ]
+
+      tcc.send :define_singleton_method, :invoke_appropriate_action, IAA__
 
       tcc.include self
-
-      tcc.send :define_singleton_method, :invoke_appropriate_action, IIA__
     end
 
-    module VERY_TEMPORARY_LEGACIES
-
-      def client_cls_with_op _
-      end
-      def with_action_class
-      end
-      def action_class_with_DSL _
-      end
-    end
-
-    # ~ infer appropriate action
-
-    IIA__ = -> do
+    IAA__ = -> do  # infer appropriate action
 
       define_method :invoke do | * argv |
         s = __appropriate_action_slug
@@ -52,7 +38,37 @@ module Skylab::Brazen::TestSupport
       end
     end.call
 
-    # ~ end
+    def immutable_helpscreen_state_via_invoke_ * argv
+
+      # (will probably deprecate for the next method)
+
+      _same argv
+    end
+
+    def immutable_lax_helpscreen_state_via_invoke_ * argv
+
+      _same :lax_parsing, argv
+    end
+
+    def _same * x_a, argv
+
+      using_expect_stdout_stderr_invoke_via_argv argv
+
+      _state = flush_frozen_state_from_expect_stdout_stderr
+
+      x_a.push :state, _state, :stream, :e
+
+      _cls = TS_.lib_( :CLI_support_expect_section )::Help_Screen_State
+
+      _cls.via_iambic x_a
+    end
+
+    def expect_section_ k, exp  # assume `state_`
+
+      _t = state_.lookup k
+      _act = _t.to_string :unstyled
+      _act.should eql exp
+    end
 
     def expect_common_failure_
 

@@ -1,23 +1,24 @@
 module Skylab::Brazen
 
-  class CLI
+  module CLI_Support
 
-    class When_::No_Matching_Action < As_Bound_Call_
+    class When::No_Matching_Action < As_Bound_Call
 
-      def initialize token, help_renderer, invo
-        @invo = invo
-        @render = help_renderer
-        @token = token
+      def initialize token, invocation_expression, invocation_reflection
+
+        @_reflection = invocation_reflection
+        @_expression = invocation_expression
+        @_token = token
       end
 
       def produce_result
 
-        o = @render
-        token = @token
+        o = @_expression
+        token = @_token
 
-        _scn = @invo.to_adapter_stream_.reduce_by( & :is_visible )
+        _scn = @_reflection.to_adapter_stream_.reduce_by( & :is_visible )
 
-        scn = @invo.wrap_adapter_stream_with_ordering_buffer_ _scn
+        scn = @_reflection.wrap_adapter_stream_with_ordering_buffer_ _scn
 
         o.express do
           "unrecognized action #{ ick token }"
@@ -32,7 +33,7 @@ module Skylab::Brazen
           ad = scn.gets
         end
 
-        o.y << "known actions are (#{ s_a * ', ' })"
+        o.line_yielder << "known actions are (#{ s_a * ', ' })"
 
         o.express_invite_to_general_help
 

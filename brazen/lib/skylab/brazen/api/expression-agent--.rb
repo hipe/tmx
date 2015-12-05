@@ -57,6 +57,10 @@ module Skylab::Brazen
       end
 
       def par x
+        parameter_in_black_and_white x
+      end
+
+      def parameter_in_black_and_white x
         if x.respond_to? :ascii_only?
           "'#{ x }'"
         else

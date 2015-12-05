@@ -1,9 +1,7 @@
 module Skylab::Brazen
 
-  class CLI
-
-    class Action_Adapter_
-
+  module CLI_Support
+    # ->
       module Arguments
 
         class << self
@@ -15,14 +13,14 @@ module Skylab::Brazen
               Normalization_.new( * a )
             end
           end
-        end
+        end  # >>
 
         class Normalization_
 
           class << self
 
             def via * x_a
-              Arguments::Normalization_Via__.call_via_iambic x_a
+              Arguments::Normalization_Via___.call_via_iambic x_a
             end
           end
 
@@ -45,8 +43,8 @@ module Skylab::Brazen
 
             a = @arg_a.length.times.reduce [] do |m, d|
 
-              prop = @arg_a.fetch d
-              if prop.has_default || ! prop.is_required   # :+[#006]
+              prp = @arg_a.fetch d
+              if prp.is_effectively_optional_
                 if m.length.nonzero?
                   m.last == d - 1 or raise ___say_bad_optional_indexes( m, d )
                 end
@@ -231,6 +229,6 @@ module Skylab::Brazen
           end
         end
       end
-    end
+    # -
   end
 end

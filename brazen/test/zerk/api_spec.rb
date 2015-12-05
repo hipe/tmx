@@ -1,18 +1,16 @@
 require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport::Zerk_Namespace_1____
+module Skylab::Brazen::TestSupport
 
-  _TS = ::Skylab::Brazen::TestSupport
+  module Zerk_Namespace_1____  # <-
 
-  extend _TS::TestSupport_::Quickie
-
-  zerk = _TS.lib_ :zerk
+  zerk = TS_.lib_ :zerk
 
   zerk.write_constants_into self
 
-  describe "[br] zerk API" do
+  TS_.describe "[br] zerk API" do
 
-    extend _TS
+    TS_[ self ]
     zerk.prepare_test_context self
 
     context "the minimal branch" do
@@ -187,5 +185,7 @@ module Skylab::Brazen::TestSupport::Zerk_Namespace_1____
         nil
       end
     end
+  end
+# ->
   end
 end

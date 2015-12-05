@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport
 
   describe "[br] CLI actions status" do
 
-    extend TS_
+    TS_[ self ]
     use :CLI_actions
 
     with_invocation 'status'
@@ -98,7 +98,7 @@ module Skylab::Brazen::TestSupport
         it "says as much" do
           invoke 'foozie'
           expect :styled, %r(#{ par 'path' } does not exist - ./foozie\z)
-          expect_action_invite_line
+          expect_action_invite_line_
           expect_errored
         end
       end

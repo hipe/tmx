@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class CLI::Expression_Frames::Table::Actor  # see [#096.B]
+  class CLI_Support::Table::Actor  # see [#096.B]
 
     class << self
 

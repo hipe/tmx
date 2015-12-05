@@ -1,12 +1,12 @@
 module Skylab::Brazen
 
-  module CLI::Option_Parser
+  module CLI_Support::Option_Parser
 
     Actors = ::Module.new
 
     # a hack to see if a basic switch looks to be present in an array
     #
-    #     p = Home_::CLI::Option_Parser::Actors::Build_basic_switch_proc[ '--foom' ]
+    #     p = Home_::CLI_Support::Option_Parser::Actors::Build_basic_switch_proc[ '--foom' ]
     #     p[ [ 'abc' ] ]  # => nil
     #     p[ [ 'abc', '--fo', 'def' ] ]  # => 1
     #     p[ [ '--foomer', '-fap', '-f', '--foom' ] ]  # => 2

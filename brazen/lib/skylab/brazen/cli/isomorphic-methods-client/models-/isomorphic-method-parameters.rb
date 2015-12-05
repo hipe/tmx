@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class CLI::Isomorphic_Methods_Client
 
-    class Models_::Isomorphic_Method_Parameters < ::Class.new  # see [#106]
+    class Models_::Isomorphic_Method_Parameters < ::Class.new  # see [#105]
 
       Models_ = ::Module.new
 
@@ -114,12 +114,16 @@ module Skylab::Brazen
           @reqity_symbol = type_sym
         end
 
+        def is_effectively_optional_  # #[#006]
+          has_default || ! is_required
+        end
+
         def name
-          @__nf ||= Callback_::Name.via_variegated_symbol( @_name_symbol )
+          @__nf ||= Callback_::Name.via_variegated_symbol @_name_symbol
         end
 
         def is_required
-          :req === @reqity_symbol
+          :req == @reqity_symbol
         end
 
         def takes_many_arguments
@@ -358,18 +362,6 @@ module Skylab::Brazen
           @formal_argument.name
         end
       end
-
-      open = '[' ; close = ']'
-
-      Reqity_brackets = {
-
-        opt: [ open, close ],
-        req: [ NIL_, NIL_ ],
-        rest: [ open, ' [..]]' ],
-        req_group: [ '{', '}' ],  # #storypoint-2 ..
-
-      }.method :fetch
-
     end
   end
 end

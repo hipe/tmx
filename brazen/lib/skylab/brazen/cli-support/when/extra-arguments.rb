@@ -1,27 +1,27 @@
 module Skylab::Brazen
 
-  class CLI
+  module CLI_Support
 
-    class When_::Extra_Arguments < As_Bound_Call_
+    class When::Extra_Arguments < As_Bound_Call
 
-      def initialize ev, help_renderer
+      def initialize x, invocation_expression
 
-        @render = help_renderer
-        @x = ev.x
+        @_expression = invocation_expression
+        @_x = x
       end
 
       def produce_result
 
-        o = @render
-        x = @x
+        o = @_expression
+        x = @_x
 
         o.express do
           "unexpected argument #{ ick x }"
         end
 
-        o.express_primary_usage_line_
+        o.express_primary_usage_line
 
-        o.express_invite_to_general_help
+        o.express_invite_to_general_help :because, :argument
 
         GENERIC_ERROR_EXITSTATUS
       end

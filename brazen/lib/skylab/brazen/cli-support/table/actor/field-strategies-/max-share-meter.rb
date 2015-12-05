@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class CLI::Expression_Frames::Table::Actor
+  class CLI_Support::Table::Actor
 
     class Field_Strategies_::Max_Share_Meter
 

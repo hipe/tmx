@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport
 
   describe "[br] property - stack" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
 
     it "the empty stack will never find anything" do

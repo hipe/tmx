@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport
 
   describe "[br] CLI - iso. - arg coverage" do
 
-    extend TS_
+    TS_[ self ]
     use :CLI_isomorphic_methods_client_models_isomorphic_method_parameters
 
     context "the zero syntax ()" do

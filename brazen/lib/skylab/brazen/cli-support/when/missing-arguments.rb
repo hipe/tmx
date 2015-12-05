@@ -1,20 +1,28 @@
 module Skylab::Brazen
 
-  class CLI
+  module CLI_Support
 
-    class When_::Missing_Arguments < As_Bound_Call_
+    class When::Missing_Arguments < As_Bound_Call  # #only-covered-by:[gv]
 
-      def initialize ev, help_renderer
-        @property = ev.property
-        @render = help_renderer
+      def initialize prp, invocation_expression
+
+        @_expression = invocation_expression
+        @_property = prp
       end
 
-      def produce_result o = @render ; prop = @property
+      def produce_result
+
+        o = @_expression
+        prp = @_property
+
         o.express do
-          "expecting #{ par prop }"
+          "expecting #{ par prp }"
         end
-        o.express_primary_usage_line_
-        o.express_invite_to_general_help
+
+        o.express_primary_usage_line
+
+        o.express_invite_to_general_help :because, :argument
+
         GENERIC_ERROR_EXITSTATUS
       end
     end

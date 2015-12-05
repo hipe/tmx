@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class CLI
 
-    class Redundancy_Filter__
+    class Redundancy_Filter___
       def initialize
         @last_line = nil
       end

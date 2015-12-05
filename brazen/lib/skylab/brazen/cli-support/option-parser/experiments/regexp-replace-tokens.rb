@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class CLI
+  module CLI_Support
 
     Option_Parser::Experiments = ::Module.new  # :+#stowaway
 

@@ -1,18 +1,10 @@
 require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport::Modelesque_Entity_Namespace____
+module Skylab::Brazen::TestSupport
 
-  _TS = ::Skylab::Brazen::TestSupport
+  module Modelesque_Entity_Namespace____  # <-
 
-  _TS[ self ]
-
-  extend _TS::TestSupport_::Quickie
-
-  include _TS::Constants  # e.g Home_
-
-  Test_Instance_Methods_ = _TS::Test_Instance_Methods_  # because [#ts-044]
-
-  describe "[br] modelesque - entity" do
+  TS_.describe "[br] modelesque - entity" do
 
     class << self
 
@@ -27,7 +19,7 @@ module Skylab::Brazen::TestSupport::Modelesque_Entity_Namespace____
           end
         end
       end
-    end
+    end  # >>
 
     it "loads" do
       Subject_[]
@@ -172,5 +164,7 @@ module Skylab::Brazen::TestSupport::Modelesque_Entity_Namespace____
         Home_::Modelesque::Entity
       end
     end
+  end
+# ->
   end
 end

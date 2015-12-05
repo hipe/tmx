@@ -1,19 +1,19 @@
 module Skylab::Brazen
 
-  class CLI
+  module CLI_Support
 
-    class When_::Missing_Arguments_Fancy < As_Bound_Call_
+    class When::Missing_Arguments_Fancy < As_Bound_Call
 
-      def initialize ev, help_renderer
+      def initialize ev, invocation_expression
 
-        @ev = ev
-        @hr = help_renderer
+        @_expression = invocation_expression
+        @_event = ev
       end
 
       def produce_result o=nil
 
         if o
-          self.class.new( @ev, o )._produce_result
+          self.class.new( @_event, o )._produce_result
         else
           _produce_result
         end
@@ -21,27 +21,27 @@ module Skylab::Brazen
 
       def _produce_result
 
-        o = @hr
+        o = @_expression
 
         _ = __render_syntax
 
-        o.y << "expecting: #{ _ }"
+        o.line_yielder << "expecting: #{ _ }"
 
-        o.express_primary_usage_line_
+        o.express_primary_usage_line
 
-        o.express_invite_to_general_help
+        o.express_invite_to_general_help :because, :argument
 
         GENERIC_ERROR_EXITSTATUS
       end
 
-      def __render_syntax  # #storypoint-920
+      def __render_syntax
 
-        slice = @ev.syntax_slice
+        slice = @_event.syntax_slice
         _st = slice.to_argument_stream
         arg = _st.gets
         _missing_idx = arg.syntax_index
 
-        syntax = @ev.any_full_syntax
+        syntax = @_event.any_full_syntax
 
         a = [ arg ]
         ( _missing_idx - 1 ).downto( 0 ).each do | d |  # neg ok
@@ -59,7 +59,7 @@ module Skylab::Brazen
         __render_this_syntax _my_slice, local_emph_idx .. local_emph_idx
       end
 
-      def __render_this_syntax stx, em_range  # #storypoint-435
+      def __render_this_syntax stx, em_range
 
         st = stx.to_argument_stream
         arg = st.gets
@@ -71,7 +71,7 @@ module Skylab::Brazen
           begin
             s = __render_arg_text arg
             if em_range.include? d
-              s = @hr.expression_agent.calculate do
+              s = @_expression.expression_agent.calculate do
                 highlight s
               end
             end
@@ -90,16 +90,15 @@ module Skylab::Brazen
         end
       end
 
-      def __render_arg_text arg  # #storypoint-450
+      def __render_arg_text arg
 
-        s, s__ = CLI_::Isomorphic_Methods_Client::Models_::
-          Isomorphic_Method_Parameters::Reqity_brackets[ arg.reqity_symbol ]
+        _, ___ = Here_::Syntax_Assembly.brackets_for_reqity_ arg.reqity_symbol
 
-        _s_ = @hr.expression_agent.calculate do
-          render_property_as_argument_ arg
+        __ = @_expression.expression_agent.calculate do
+          render_property_as_argument arg
         end
 
-        "#{ s }#{ _s_ }#{ s__ }"
+        "#{ _ }#{ __ }#{ ___ }"
       end
     end
   end
