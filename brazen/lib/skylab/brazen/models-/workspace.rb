@@ -172,9 +172,13 @@ module Skylab::Brazen
         :property, :config_filename,
 
         :description, -> y do
-          if @current_property.has_primitive_default
-            _ = " (default: #{ ick @current_property.primitive_default_value })"
+
+          prp = action_reflection.front_properties.fetch :man_num_dirs
+
+          if prp.has_primitive_default
+            _ = " (default: #{ ick prp.primitive_default_value })"
           end
+
           y << "max num dirs to look for workspace in#{ _ }"
         end,
         :non_negative_integer,

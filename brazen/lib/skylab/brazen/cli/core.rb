@@ -1327,7 +1327,6 @@ module Skylab::Brazen
 
       def __express_property_description_into a, prp
 
-        @_expag.current_property = prp
         a_ = prp.under_expression_agent_get_N_desc_lines @_expag
         if a_
           a.concat a_

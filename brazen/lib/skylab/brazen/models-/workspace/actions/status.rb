@@ -17,10 +17,13 @@ module Skylab::Brazen
       :after, :init,
 
       :description, -> y do
-        prp = @current_property
+
+        prp = action_reflection.front_properties.fetch :max_num_dirs
+
         if prp.has_primitive_default
           _dflt = " (default: #{ ick prp.primitive_default_value })"
         end
+
         y << "how far up do we look?#{ _dflt }"
       end,
 

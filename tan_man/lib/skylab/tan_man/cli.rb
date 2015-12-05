@@ -70,8 +70,6 @@ module Skylab::TanMan
         @kernel = action_reflection.application_kernel
       end
 
-      attr_writer :current_property
-
       alias_method :calculate, :instance_exec
 
       def app_name

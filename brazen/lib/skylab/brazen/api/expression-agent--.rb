@@ -3,6 +3,7 @@ module Skylab::Brazen
   module API
 
     class Expression_Agent__
+    private
 
       # specifically we created this expression agent to render expressions
       # in "black & white" when we are rendering their messages
@@ -100,7 +101,9 @@ module Skylab::Brazen
         s.inspect
       end
 
-      # ~ begin :#exeriment
+      # -- #experiment
+
+    public
 
       def new_expression_context
         ::String.new
@@ -114,7 +117,9 @@ module Skylab::Brazen
         :Event
       end
 
-      # ~ end
+    private
+
+      # --
 
       def _NLP_agent
         @context ||= self.class.NLP_agent.new

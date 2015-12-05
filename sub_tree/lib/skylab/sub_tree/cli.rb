@@ -48,8 +48,6 @@ module Skylab::SubTree
 
       alias_method :calculate, :instance_exec
 
-      attr_writer :current_property
-
       # ~
 
       lib = Home_.lib_

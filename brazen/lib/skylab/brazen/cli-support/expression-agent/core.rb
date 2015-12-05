@@ -3,19 +3,18 @@ module Skylab::Brazen
   module CLI_Support
 
     class Expression_Agent
+    private
 
       class << self
 
         def instance  # see #note-br-10 in [#br-093]. this is for hacks
-          @inst ||= Singleton_instance__[]
+          @inst ||= Singleton_instance___[]
         end
       end  # >>
 
       def initialize ar
         @_action_reflection = ar
       end
-
-      attr_writer :current_property
 
       alias_method :calculate, :instance_exec
 
@@ -35,7 +34,7 @@ module Skylab::Brazen
       STRONG__ = 1
 
       def code string
-        "'#{ styl CODE_STYLE__, string }'"
+        "'#{ _stylize CODE_STYLE__, string }'"
       end
       CODE_STYLE__ = [ GREEN__ ].freeze
 
@@ -43,11 +42,11 @@ module Skylab::Brazen
 
         # (trailing colon must not happen here but at [#072])
 
-        styl HIGHLIGHT_STYLE__, "#{ s }"
+        _stylize HIGHLIGHT_STYLE__, "#{ s }"
       end
 
       def highlight string
-        styl HIGHLIGHT_STYLE__, string
+        _stylize HIGHLIGHT_STYLE__, string
       end
       HIGHLIGHT_STYLE__ = [ STRONG__, GREEN__ ].freeze
 
@@ -95,10 +94,6 @@ module Skylab::Brazen
         _NLP_agent.progressive_verb[ lemma_i ]
       end
 
-      def property_default
-        @current_property.default_value_
-      end
-
       def pth s
         if s.respond_to? :to_path
           s = s.to_path
@@ -124,10 +119,6 @@ module Skylab::Brazen
         @_action_reflection.environment_variable_name_string_via_property_ prp
       end
 
-      def custom_property_expression_strategy prp, p, * a
-        calculate( prp, * a, & p )
-      end
-
       def s * x_a
         _NLP_agent.s( * x_a )
       end
@@ -144,9 +135,9 @@ module Skylab::Brazen
         x.inspect
       end
 
-      # ~ support
+      # -- support
 
-      def styl style_d_a, string
+      def _stylize style_d_a, string
         "\e[#{ style_d_a.map( & :to_s ).join( ';' ) }m#{ string }\e[0m"
       end
 
@@ -154,8 +145,9 @@ module Skylab::Brazen
         @NLP_agent ||= Home_::API.expression_agent_class.NLP_agent.new
       end
 
-      # ~ begin :+#experiment
+      # -- #experiment
 
+    public
       def new_expression_context
         ::String.new
       end
@@ -164,28 +156,27 @@ module Skylab::Brazen
         :CLI
       end
 
-      def intern  # what expression  adapter should be used?
+      def intern  # what expression adapter should be used?
         :Event
       end
-
     private
+
+      # --
 
       def action_reflection  # [bs]
         @_action_reflection
       end
 
-      # ~ end
+      Singleton_instance___ = Callback_.memoize do
 
-      Singleton_instance__ = Callback_.memoize do
-
-        _categorized_properties = LIB_.basic::Proxy::Inline.new(
+        _action_reflection = LIB_.basic::Proxy::Inline.new(
 
           :expression_strategy_for_property, -> prp do
             :render_property_as_unknown
           end,
         )
 
-        new _categorized_properties
+        new _action_reflection
       end
     end
   end

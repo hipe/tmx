@@ -189,7 +189,7 @@ module Skylab::Brazen
   end
 
   N_lines_ = -> a, d, p_a, expag do
-    Callback_::Event::N_Lines.new_via_four( a, d, p_a, expag ).execute
+    Home_.lib_.basic::String::N_Lines[ a, d, p_a, expag ]
   end
 
   module Lib_

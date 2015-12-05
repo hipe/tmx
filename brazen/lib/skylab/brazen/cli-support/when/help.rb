@@ -101,8 +101,6 @@ module Skylab::Brazen
 
           ada_a.each do | ada |
 
-            expag.current_property = ada  # EEW
-
             if ada.has_description
               _desc_lines = ada.under_expression_agent_get_N_desc_lines(
                 expag, MAX_DESC_LINES )

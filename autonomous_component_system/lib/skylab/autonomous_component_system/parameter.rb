@@ -171,8 +171,9 @@ module Skylab::Autonomous_Component_System
       def under_expression_agent_get_N_desc_lines expag, n=nil
 
         if n
+
           _p_a = [ @_description_block ]
-          Callback_::Event::N_Lines[ [], n, _p_a, expag ]
+          Home_.lib_.basic::String::N_Lines[ [], n, _p_a, expag ]
         else
           expag.calculate [], & @_description_block
         end

@@ -300,7 +300,11 @@ module Skylab::Callback
 
       def render_into_yielder_N_lines_under y, d, expag
 
-        N_Lines.new_via_four( y, d, [ message_proc ], expag ).execute self
+        _ = Home_.lib_.basic::String::N_Lines
+
+        _p = message_proc
+        _p ||= Inferred_Message.to_proc
+        _.new_via_four( y, d, [ _p ], expag ).execute self
       end
 
       def to_stream_of_lines_rendered_under expag  # :+[#064] imagine threads
@@ -310,107 +314,6 @@ module Skylab::Callback
         end
         expag.calculate y, self, & message_proc
         Home_::Stream.via_nonsparse_array s_a
-      end
-
-      class N_Lines < ::Enumerator::Yielder
-
-        class << self
-
-          def [] * a
-            _call_via_arglist a
-          end
-
-          def call * a
-            _call_via_arglist a
-          end
-
-          def _call_via_arglist a
-            new_via_four( * a ).execute
-          end
-
-          def new_via_four y, d, p_a, expag
-            o = new
-            o.__init_via_four y, d, p_a, expag
-            o
-          end
-
-          alias_method :session, :new
-          private :new
-        end  # >>
-
-        def initialize
-
-          @_do_first_line = true
-
-          super() do | line |
-            @_receive_line[ line ]
-          end
-        end
-
-        attr_writer(
-          :downstream_yielder,
-          :num_lines,
-          :expression_agent,
-        )
-
-        def describe_by & p
-          @_p_a = [ p ] ; nil
-        end
-
-        def __init_via_four y, n, p_a, expag
-
-          @downstream_yielder = y
-          @expression_agent = expag
-          @num_lines = n
-          @_p_a = p_a
-          NIL_
-        end
-
-        def execute * a
-
-          @_receive_line = __build_receive_line_proc
-          __execute a
-        end
-
-        def __build_receive_line_proc
-
-          n = @num_lines
-
-          if n
-            if 1 > n
-              @_do_first_line = false
-            else
-              d = 0
-              tick_p = -> { n != ( d += 1 ) }
-            end
-          else
-            tick_p = NILADIC_TRUTH_
-          end
-
-          -> line do
-            @downstream_yielder << line
-            tick_p[] or throw :__done_with_N_lines__
-            NIL_
-          end
-        end
-
-        def __execute a
-
-          if @_do_first_line
-
-            catch :__done_with_N_lines__ do
-
-              @_p_a.each do | p |
-
-                p ||= Inferred_Message.to_proc
-
-                @expression_agent.calculate self, * a, & p
-              end
-            end
-          end
-
-          @downstream_yielder
-        end
       end
 
       class Inferred_Message  # #experimental - you hate me now

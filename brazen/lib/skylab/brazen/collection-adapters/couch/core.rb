@@ -37,14 +37,22 @@ module Skylab::Brazen
 
 
       o :description, -> y do
-        y << "the HTTP host to connect to (default: #{ property_default })"
+
+        prp = action_reflection.front_properties.fetch :host
+
+        y << "the HTTP host to connect to (default: #{ prp.default_value })"
       end,
+
       :default, 'localhost',
       :property, :host
 
 
       o :description, -> y do
-        y << "the HTTP port to connect to (default: #{ property_default })"
+
+        prp = action_reflection.front_properties.fetch :port
+
+        y << "the HTTP port to connect to (default: #{ prp.default_value })"
+
       end,
       :default, '5984',
       :ad_hoc_normalizer, -> qkn, & oes_p do

@@ -6,8 +6,9 @@ module Skylab::Snag
 
       # subclass Home_.lib_.CLI_lib::Pen::Minimal for less DIY
 
-      def initialize prp_index
-        @_prp_index = prp_index
+      def initialize action_reflection
+
+        @_action_reflection = action_reflection
 
         @_up =
           Home_::Models_::Node_Collection::Expression_Adapters::Byte_Stream.
@@ -15,8 +16,6 @@ module Skylab::Snag
       end
 
       alias_method :calculate, :instance_exec
-
-      attr_writer :current_property
 
       # ~
 
@@ -51,7 +50,9 @@ module Skylab::Snag
       # ~~ (
 
       def par x  # :+[#br-115]
-        _unstyled = send @_prp_index.expression_strategy_for_property( x ), x
+
+        _m = @_action_reflection.expression_strategy_for_property x
+        _unstyled = send _m, x
         _strongly_emphasized _unstyled
       end
 

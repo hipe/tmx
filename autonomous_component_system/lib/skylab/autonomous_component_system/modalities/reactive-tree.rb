@@ -229,7 +229,7 @@ module Skylab::Autonomous_Component_System
 
         def __N_description_lines n, expag
 
-          o = Callback_::Event::N_Lines.session
+          o = Home_.lib_.basic::String::N_Lines.session
           acs = @_acs
           o.describe_by do | y |
             acs.describe_into_under y, expag
@@ -299,7 +299,7 @@ module Skylab::Autonomous_Component_System
 
         def __N_description_lines n, expag
 
-          o = Callback_::Event::N_Lines.session
+          o = Home_.lib_.basic::String::N_Lines.session
 
           o.describe_by( & @_desc_p )
           o.downstream_yielder = []

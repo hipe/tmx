@@ -13,16 +13,13 @@ module Skylab::TestSupport
 
       LIB_.human::NLP::EN::Methods.call self, :private, [ :and_, :or_, :s ]
 
-      def initialize _CLI_partitions
-        @current_property = nil
-        @up = _CLI_partitions
+      def initialize action_reflection
+        @up = action_reflection
       end
 
       # ~ hook-outs for [br]
 
       alias_method :calculate, :instance_exec
-
-      attr_writer :current_property
 
       # ~
 
