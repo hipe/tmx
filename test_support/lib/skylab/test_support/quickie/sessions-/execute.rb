@@ -85,16 +85,24 @@ module Skylab::TestSupport
           end
           do_allow
         end
-        Tag_Shell_.new :on_error, -> x do
-          @ok = false
-          @y << "#{ x }" ; nil
-        end,
-        :on_pass_filter_proc, -> p do
-          ( wt_p_a ||= [] ).push p ; nil
-        end, :on_no_pass_filter_proc, -> p do
-          ( bk_p_a ||= [] ).push p ; nil
-        end,
-        :on_info_qualified_knownness, method( :report_tag )
+
+        Tags_Receiver_.new(
+
+          :on_error, -> x do
+            @ok = false
+            @y << "#{ x }" ; nil
+          end,
+
+          :on_pass_filter_proc, -> p do
+            ( wt_p_a ||= [] ).push p ; nil
+          end,
+
+          :on_no_pass_filter_proc, -> p do
+            ( bk_p_a ||= [] ).push p ; nil
+          end,
+
+          :on_info_qualified_knownness, method( :report_tag ),
+        )
       end
 
       def report_tag i, i_, x
@@ -144,14 +152,15 @@ module Skylab::TestSupport
 
         cli = Run_.new @y, :no_root_context, @_pn_s_a
 
-        cli.tag_filter_p = @tag_filter_p
-        cli.example_producer_p = -> branch, leaf do
+        cli.filter_by_tags_by__( & @tag_filter_p )
+
+        cli.produce_examples_by__ do | branch, leaf |
           p = nil
           pp = -> do
             if p
               true
             elsif a.length.nonzero?
-              p = Build_example_producer_function_[ a.shift, branch, leaf ]
+              p = Build_example_stream_proc_[ a.shift, branch, leaf ]
               true
             end
           end

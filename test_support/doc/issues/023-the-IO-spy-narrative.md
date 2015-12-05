@@ -86,6 +86,8 @@ based on whether debugging is on or off at that moment.
 
 ## "frame technique" :[#.A]
 
+(EDIT: do we call these "states" now?)
+
 the "frame technique" is a way to break what would otherwise be a
 too-large test into smaller tests.
 

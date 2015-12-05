@@ -175,8 +175,10 @@
 [#010]       #doc-node: data stores
 [#009]       #parent-node: [#010] the git config narrative ..
 [#008]       #parent-node: [#009] the mutable git config narrative ..
-[#007] #open anticpating the issue with losing hooks accross inheritance bounds
-[#006]       #doc-node the defaults vs required narrative ..
+[#007]       [ CLI expectations ]
+             ( #was: anticpating the issue with losing hooks accross inheritance bounds )
+[#006] #open - what to do about this custom CLI property class
+             #doc-node the defaults vs required narrative ..
 [#005]       [name]  (compound names derived from model nodes)
              ( #was: #done re-arch expressions agents to work correctly with 'par')k
 [#004]       #parent-node: [#002] the help renderer narrative ..

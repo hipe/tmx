@@ -34,11 +34,7 @@ with [#bm-001])
 
 ## :[#024] the string scanner narrative
 
-minimal abstract enumeration and scanning of the lines of a string.
-+ quacks like a simple scanner
-+ better than plain old ::Enumerator b.c you can call `next` (gets)
-    without catching the ::StopIteration.
-+ future-proof: maybe it uses ::S-tringScanner internally, maybe not.
+(all documentation for this node has been moved *back* to inline.)
 
 
 

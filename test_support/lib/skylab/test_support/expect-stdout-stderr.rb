@@ -1,19 +1,42 @@
 module Skylab::TestSupport
 
-  module Expect_Stdout_Stderr  # see [#029] the expect omnibus and narrative #intro-to-gamma
+  module Expect_Stdout_Stderr  # lots of "theory" in [#029]
 
+    # NOTE this mutates strings under "oldchool" techniques! (see [#]scope )
     # assumes {  @IO_spy_group_for_expect_stdout_stderr | your own `flush_baked_emission_array` }
-
-    # NOTE currently this mutates emission strings!
 
     module Test_Context_Instance_Methods
 
-      # ~ begin optional support for "full stack" CLI (assuming conventions)
+      # -- shared state [#.A]
+
+      def flush_frozen_state_from_expect_stdout_stderr
+
+        remove_instance_variable :@invocation
+
+        _gr = remove_instance_variable :@IO_spy_group_for_expect_stdout_stderr
+
+        _lines = _gr.release_lines
+
+        Frozen_State___.new(
+          remove_instance_variable( :@exitstatus ),
+          _lines.freeze,
+        ).freeze
+      end
+
+      def flush_baked_emission_array  # :+#hook-near #universal
+
+        sg = remove_instance_variable :@IO_spy_group_for_expect_stdout_stderr
+        sg.release_lines
+      end
+
+      # -- optional support for "full stack" CLI testing
 
       def using_expect_stdout_stderr_invoke_via_argv a  # might mutate arg
 
-        _init_invocation_and_invoke_against_mutable_argv_and_prefix(
-          a, argv_prefix_for_expect_stdout_stderr )
+        _init_invocation_and_invoke_using(
+          :mutable_argv, a,
+          :prefix, argv_prefix_for_expect_stdout_stderr,
+        )
       end
 
       def argv_prefix_for_expect_stdout_stderr  # #hook-in:1
@@ -22,10 +45,23 @@ module Skylab::TestSupport
 
       def using_expect_stdout_stderr_invoke_with_no_prefix * argv
 
-        _init_invocation_and_invoke_against_mutable_argv_and_prefix argv, nil
+        _init_invocation_and_invoke_using(
+          :mutable_argv, argv,
+          :prefix, nil,
+        )
       end
 
-      def _init_invocation_and_invoke_against_mutable_argv_and_prefix a, a_
+      def _init_invocation_and_invoke_using * x_a
+        using_expect_stdout_stderr_invoke_via_iambic x_a
+      end
+
+      def using_expect_stdout_stderr_invoke_via_iambic x_a
+
+        opt = Options___.new
+        x_a.each_slice 2 do | k, x |
+          opt[ k ] = x
+        end
+        a, a_ = opt.to_a
 
         init_invocation_for_expect_stdout_stderr
 
@@ -37,6 +73,8 @@ module Skylab::TestSupport
 
         NIL_
       end
+
+      Options___ = ::Struct.new :mutable_argv, :prefix
 
       def init_invocation_for_expect_stdout_stderr
 
@@ -101,11 +139,24 @@ module Skylab::TestSupport
         NIL_
       end
 
-      # ~ end
+      # -- the newschool way (experimental)
 
-      # ~ before the expectation, set default behavior
+      def match_ expectation  # (we don't love the name)
+
+        expectation.to_matcher_bound_to self
+      end
+
+      def expectation * x_a, & x_p
+
+        Expectation.via_args x_a, & x_p
+      end
+
+      # -- the oldschool way - expectations are executed by the test context
 
       def on_stream stream_symbol
+
+        # before the expectation, set default behavior
+
         @__sout_serr_default_stream_symbol__ = stream_symbol ; nil
       end
 
@@ -124,11 +175,15 @@ module Skylab::TestSupport
 
       def expect_stdout_stderr_via_arglist x_a, & p
 
-        @__sout_serr_expectation__ = bld_sout_serr_expectation_via_iambic x_a, & p
+        expect_stdout_stderr_via Expectation.via_args( x_a, & p )
+      end
+
+      def expect_stdout_stderr_via exp
+
+        @__sout_serr_expectation__ = exp
 
         @__sout_serr_is_baked__ ||= _bake_sout_serr
 
-        exp = @__sout_serr_expectation__
         p = exp.receive_unstyled_string
 
         ok = __send__ exp.method_name
@@ -142,12 +197,6 @@ module Skylab::TestSupport
           ok = p[ s ]
         end
         ok
-      end
-
-      def bld_sout_serr_expectation_via_iambic x_a, & p
-        Expectation.new(
-          Callback_::Polymorphic_Stream.via_array( x_a ),
-            & p )
       end
 
       # ~ for the end
@@ -182,6 +231,13 @@ module Skylab::TestSupport
         end
       end
 
+      def expect_a_blank_line
+
+        st = stream_for_expect_stdout_stderr
+        _x = st.gets_one
+        _x.string.should eql NEWLINE_
+      end
+
       def expect_no_more_lines
 
         st = stream_for_expect_stdout_stderr
@@ -206,7 +262,7 @@ module Skylab::TestSupport
 
       def flush_to_unstyled_string_contiguous_lines_on_stream sym
 
-        _p = Home_.lib_.brazen::CLI::Styling::Unstyle
+        _p = Home_.lib_.brazen::CLI_Support::Styling::Unstyle
 
         _flush_to_string_on_stream_by sym, & _p
       end
@@ -301,16 +357,16 @@ module Skylab::TestSupport
         end
       end
 
-      # ~~ implementation support
+      # ~ support for the oldschool way
 
-      def sout_serr_expect_given_regex
+      def sout_serr_expect_given_regex  # [te]
         if _sout_serr_expect_and_resolve_emission_line
           @__sout_serr_line__.should match @__sout_serr_expectation__.pattern_x
           @__sout_serr_emission__
         end
       end
 
-      def sout_serr_expect_given_string
+      def sout_serr_expect_given_string  # [te]
         if _sout_serr_expect_and_resolve_emission_line
           @__sout_serr_line__.should eql @__sout_serr_expectation__.pattern_x
           @__sout_serr_emission__
@@ -319,14 +375,18 @@ module Skylab::TestSupport
 
       def _sout_serr_expect_and_resolve_emission_line
         if _sout_serr_expect_and_resolve_emission
-          line = @__sout_serr_emission__.string  # WE MUTATE IT for now
-          s = line.chomp!
+          line = @__sout_serr_emission__.string
+          s = line.chomp!  # NOTE - we mutate it for now!
           if s
             __sout_serr_receive_chomped_emission_line s
           else
-            fail "for now expecting all lines to be newine terminated: #{ line.inspect }"
+            fail ___say_not_newlined line
           end
         end
+      end
+
+      def ___say_not_newlined line
+        "for now expecting all lines to be newline terminated: #{ line.inspect }"
       end
 
       def __sout_serr_receive_chomped_emission_line line
@@ -368,6 +428,31 @@ module Skylab::TestSupport
         end
       end
 
+      # -- set a "nonstandard" (i.e "newschool") test subject
+
+      def stdout_stderr_against_emission em
+
+        _st = Callback_::Stream.via_item( em ).flush_to_polymorphic_stream
+        self.stream_for_expect_stdout_stderr = _st
+        NIL_
+      end
+
+      def stdout_stderr_against_emissions em_a
+
+        # the subject of your tests will be this array of emissions.
+
+        _st = Callback_::Polymorphic_Stream.via_array em_a
+        self.stream_for_expect_stdout_stderr = _st
+        NIL_
+      end
+
+      def stream_for_expect_stdout_stderr= x
+
+        @__sout_serr_is_baked__ = true
+
+        @__sout_serr_actual_stream__ = x
+      end
+
       def stream_for_expect_stdout_stderr
 
         @__sout_serr_is_baked__ ||= _bake_sout_serr
@@ -382,37 +467,37 @@ module Skylab::TestSupport
         true
       end
 
-      def flush_frozen_frame_from_expect_stdout_stderr  # for [#.A] frame tech.
-
-        gr = remove_instance_variable :@IO_spy_group_for_expect_stdout_stderr
-        gr.freeze
-
-        fr = Frozen_Frame___.new(
-          remove_instance_variable( :@exitstatus ),
-          gr )
-        fr.freeze
-      end
-
-      def flush_baked_emission_array  # :+#hook-near #universal
-
-        sg = remove_instance_variable :@IO_spy_group_for_expect_stdout_stderr
-        sg.release_lines
-      end
     public
 
-
       attr_reader :__sout_serr_default_stream_symbol__
+
+      public(
+        :sout_serr_line_stream_for_contiguous_lines_on_stream,
+      )
     end
 
-    Frozen_Frame___ = ::Struct.new :exitstatus, :IO_spy_group
+    Frozen_State___ = ::Struct.new :exitstatus, :lines
 
     Callback_ = ::Skylab::Callback
 
-    SIMPLE_STYLE_RX__ = Home_.lib_.brazen::CLI::Styling::SIMPLE_STYLE_RX
+    SIMPLE_STYLE_RX__ = Home_.lib_.brazen::CLI_Support::Styling::SIMPLE_STYLE_RX
 
     METHODIC_ = Callback_::Actor::Methodic
 
-    class Expectation  # [te]
+    class Expectation  # [br], [te]
+
+      class << self
+
+        def via * x_a, & x_p
+          via_args x_a, & x_p
+        end
+
+        def via_args x_a, & x_p
+          new Callback_::Polymorphic_Stream.via_array( x_a ), & x_p
+        end
+
+        private :new
+      end  # >>
 
       include METHODIC_.polymorphic_processing_instance_methods
 
@@ -420,23 +505,16 @@ module Skylab::TestSupport
 
         @expect_is_styled = false
         @method_name = :_sout_serr_expect_and_resolve_emission
+        @stream_symbol = nil
 
         process_polymorphic_stream_passively st
 
         while st.unparsed_exists
-          process_the_rest_using_shape_hack st
+          __process_the_rest_using_shape_hack st
         end
 
         @receive_unstyled_string = p
       end
-
-      attr_reader(
-        :expect_is_styled,
-        :method_name,
-        :pattern_x,
-        :receive_unstyled_string,
-        :stream_symbol,
-      )
 
     private
 
@@ -445,9 +523,9 @@ module Skylab::TestSupport
         KEEP_PARSING_
       end
 
-      def process_the_rest_using_shape_hack st
+      def __process_the_rest_using_shape_hack st
         begin
-          send st.current_token.class.name.intern, st
+          send st.current_token.class.name, st
         end
       end
 
@@ -468,7 +546,160 @@ module Skylab::TestSupport
         KEEP_PARSING_
       end
 
+    public
+
+      def to_matcher_bound_to test_context
+        Matcher___.new self, test_context
+      end
+
+      attr_reader(
+        :expect_is_styled,
+        :method_name,
+        :pattern_x,
+        :receive_unstyled_string,
+        :stream_symbol,
+      )
+
       METHODIC_.cache_polymorphic_writer_methods self
+    end
+
+    # -- this is the "newschool" experiment ..
+
+    class Matcher___
+
+      # most of this is necessarily redundant (in spirit) with the above.
+      # see [#]oldschool-newschool-exegesis
+
+      def initialize exp, tc
+        @_expectation = exp
+        @_test_context = tc
+      end
+
+      def matches? line_o
+
+        exp = @_expectation
+        @_matchdata = nil
+
+        @_failures = nil
+        sym = exp.stream_symbol
+        if sym
+          if sym != line_o.stream_symbol
+            _add_failure line_o.stream_symbol, sym, :stream_symbol
+          end
+        end
+
+        m = exp.method_name
+        if m
+          @_against_string = if exp.expect_is_styled
+            __unstyle line_o.string
+          else
+            __chomp line_o.string
+          end
+
+          send m
+        elsif exp.expect_is_styled
+          self._ETC
+        end
+
+        if @_failures
+          ___when_failed
+        else
+          @_matchdata || :_expect_stdout_stderr_matched_
+        end
+      end
+
+      def ___when_failed
+
+        if @_test_context.respond_to? :quickie_fail_with_message_by
+          # (the crux of the hack for this to work in both test fw's)
+          _p = method :failure_message_for_should
+          @_test_context.quickie_fail_with_message_by( & _p )
+        else
+          UNABLE_
+        end
+      end
+
+      def __unstyle s
+        s_ = s.dup.gsub! SIMPLE_STYLE_RX__, EMPTY_S_
+        if s_
+          _yes = s_.chomp!
+          if ! _yes
+            _say_no_newline s_
+          end
+          s_
+        else
+          _add_failure_by do
+            "expected styled, was not: #{ s.inspect }"
+          end
+          s
+        end
+      end
+
+      def __chomp s
+        s_ = s.chomp
+        if s_.length == s.length
+          _say_no_newline s
+        end
+        s_
+      end
+
+      def _say_no_newline s
+
+        _add_failure_by do
+          "all lines must be newline terminated (had: #{ s.inspect })"
+        end
+        NIL_
+      end
+
+      def sout_serr_expect_given_regex
+
+        md = @_expectation.pattern_x.match @_against_string
+        if md
+          @_matchdata = md
+        else
+          _add_failure do
+            "string did not match #{ @_expectation.pattern_x } - #{
+              }#{ @_against_string.inspect }"
+          end
+        end
+        NIL_
+      end
+
+      def sout_serr_expect_given_string
+
+        if @_expectation.pattern_x != @_against_string
+          _add_failure @_against_string, @_expectation.pattern_x, :string
+        end
+        NIL_
+      end
+
+      def _add_failure * trio
+
+        actual_x, expected_x, thing_sym = trio
+
+        _add_failure_by do
+
+          _nf = Callback_::Name.via_variegated_symbol thing_sym
+
+          "expected #{ _nf.as_human } #{ expected_x.inspect }, #{
+            }had #{ actual_x.inspect }"
+        end
+      end
+
+      def _add_failure_by & p
+
+        ( @_failures ||= [] ).push p
+        NIL_
+      end
+
+      def failure_message_for_should
+
+        _s_a = @_failures.reduce [] do | m, p |
+          m << p[]
+        end
+
+        _s_a.join NEWLINE_
+      end
     end
 
     # ~ for "summary"

@@ -25,8 +25,29 @@ module Skylab::Callback
           @x = @up.gets
           x
         else
-          fail
+          raise ::IndexError, _say
         end
+      end
+
+      def current_token
+        if @x
+          @x
+        else
+          raise ::IndexError, _say
+        end
+      end
+
+      def advance_one
+        if @x
+          @x = @up.gets
+          NIL_
+        else
+          raise ::IndexError, _say
+        end
+      end
+
+      def _say
+        "polymorphic stream of one item has already been consumed."
       end
     end
   end

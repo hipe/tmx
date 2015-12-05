@@ -12,16 +12,25 @@ digraph g {
   clean_up_doctest->insane_CM_redux
   insane_CM_redux [label="insane\ncode-molester\nredux"]
 
+  insane_CM_redux->mag
+  mag [label="magnetics" ]
+  mag -> viz_tool
+
+  viz_tool -> ACS_CLI
+  ACS_CLI -> br_cleanup
+  ACS_CLI -> acs
+  br_cleanup [style=filled fillcolor="#b5d5f5"]
+
+  no_regret -> sea
   no_regret -> clean_up_doctest
 
   myterm
-  dpn->sea
+  dpn->no_regret
   dpn [label="`dir_pathname` -> `dir_path`"]
   sea [label="search-replace -\nfix that one bug"]
   sea->zerk
   zerk [label="zerk - full rewrite\nto use ACS"]
   zerk->acs
   acs [label="ACS - that\none eventing\nre-arch branch"]
-  acs->no_regret
   no_regret [label="no\nregret"]
 }

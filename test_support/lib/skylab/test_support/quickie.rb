@@ -60,9 +60,9 @@ module Skylab::TestSupport
       end
     end  # >>
 
-    def self.build_instance_around__ i, o, e, pn_s_a
+    def self.build_instance_around__ stdin, sout, serr, pn_s_a
 
-      Top_Front__.new i, o, e, pn_s_a
+      Top_Front__.new stdin, sout, serr, pn_s_a
     end
 
     -> do  # #storypoint-25
@@ -136,7 +136,7 @@ module Skylab::TestSupport
 
     class Top_Front__
 
-      def initialize i, o, e, pn_s_a
+      def initialize _i, o, e, pn_s_a
 
         @_client = nil
         @_did_produce_invoke = false
@@ -163,30 +163,32 @@ module Skylab::TestSupport
 
         # intended to be called only ever once immediately after the deamon
         # is built, this determines whether or not Quickie is the active
-        # test framework and if so it definds the `should` method for all.
+        # test framework and if so it defines the `should` method for all.
 
         if @_is_listening
-          raise __say_already_listening
+          raise ___say_already_listening
         end
         @_is_listening = true
 
         yes = defined? ::RSpec  # storypoint-10
         if yes
           @quickie_has_reign = false
-
         else
           @quickie_has_reign = true
-          ::Kernel.module_exec do
-            def should pred  # define it for the whole world
-              pred.match self
-            end
-          end
+           ::Kernel.send :define_method, :should, THE_SHOULD_METHOD___
         end
         ACHIEVED_
       end
 
       def __say_already_listening
         "daemon is already listening."
+      end
+
+      THE_SHOULD_METHOD___ = -> pred do
+        # alla r.s, monkeypatch the universe for this `should` method
+
+        pred.matches? self  # alla r.s, use same name & semantics
+        # result is result - possibly a matchdata-type structure.
       end
 
       def _receive_describe desc_s_a, & x_p
@@ -316,27 +318,30 @@ module Skylab::TestSupport
       end  # >>
 
       def initialize rt
-        @__quickie_runtime = rt
+        @__quickie_runtime = rt  # NOTE ivar must be used in this file only!
       end
 
-      def __quickie_passed
-        @__quickie_runtime.passed
-      end
+      def quickie_fail_with_message_by & msg_p
 
-      def __quickie_failed
-        @__quickie_runtime.failed
+        # (experimental hack to allow custom matchers in both q & r.s)
+
+        @__quickie_runtime._failed_by( & msg_p )
+        UNABLE_
       end
 
       Home_::Let[ self ]
     end
 
     class Tagset__
+
       def initialize * a
         @ts_h, @lineno = a
       end
+
       attr_reader :lineno
-      def [] i
-        @ts_h && @ts_h[ i ]
+
+      def [] sym
+        @ts_h && @ts_h[ sym ]
       end
     end
 
@@ -369,7 +374,7 @@ module Skylab::TestSupport
     tagset_h
   end
 
-  Build_example_producer_function_ = -> ctx_class, branch, leaf do  # i love this
+  Build_example_stream_proc_ = -> ctx_class, branch, leaf do  # i love this
     stack = [ ] ; cur = ctx_class
     push = -> do
       els = cur.instance_variable_get :@elements
@@ -412,23 +417,29 @@ module Skylab::TestSupport
       def initialize y, root_context_class, program_name_string_array
 
         @at_end_of_run_p_a = nil
-        @example_producer_p = nil
+        @_example_stream_p_p = nil
         @_info_yielder = y
-        @line_set = nil
-        @or_p_a = nil
+        @_line_set = nil
+        @_OR_p_a = nil
         @_program_name_s_a = program_name_string_array
         @root_context_class = root_context_class
-        @run_option_p_a = nil
+        @_run_option_p_a = nil
         @tag_desc_h = nil
-        @tag_filter_p = nil
+        @_tag_filter_p = nil
+      end
+
+      def filter_by_tags_by__ & p
+        @_tag_filter_p = p
+      end
+
+      def produce_examples_by__ & p
+        @_example_stream_p_p = p
       end
 
       def puts line  # ( svc wants this )
         @_info_yielder << line
         NIL_
       end
-
-      attr_writer :example_producer_p, :tag_filter_p  # #hacks-only
 
       def __produce_invoke_proc argv
 
@@ -455,17 +466,29 @@ module Skylab::TestSupport
           _invite
           NIL_
         else
-          if @tag_filter_p
-            fail "sanity - optparse and tag filter are mutex"
-          end
-
-          if @or_p_a
-            @tag_filter_p = -> tagset { @or_p_a.detect { |p| p[ tagset ] } }
-          else
-            @tag_filter_p = MONADIC_TRUTH_
-          end
+          @_tag_filter_p and fail ___say_this
+          __init_tag_filter_proc
           ACHIEVED_
         end
+      end
+
+      def ___say_this
+        "sanity - optparse and tag filter are mutex"
+      end
+
+      def __init_tag_filter_proc
+
+        @_tag_filter_p = if @_OR_p_a
+          or_p_a = @_OR_p_a
+          -> tagset do
+            or_p_a.detect do | p |
+              p[ tagset ]
+            end
+          end
+        else
+          MONADIC_TRUTH_
+        end
+        NIL_
       end
 
       def __parse_args argv
@@ -520,27 +543,30 @@ module Skylab::TestSupport
 
       o.on '-t', '--tag TAG[:VALUE]',
           '(tries to be like the option in rspec)' do |v|
-        tag_shell.receive_tag_argument v
+        __tags_receiver.receive_tag_argument v
       end
+
       o.on '--line NUMBER', "run the example whose line number equals this" do |v|
         process_line_argument v
       end
+
       o.on '--from NUMBER', "run the examples whose line number is >= this" do |v|
         process_min_line_argument v
       end
+
       o.on '--to NUMBER', "run the examples whose line number is <= this" do |v|
         process_max_line_argument v
       end
       o
     end
 
-    def tag_shell
-      @tag_shell ||= __build_tag_shell
+    def __tags_receiver
+      @___tags_receiver ||= ___build_tags_receiver
     end
 
-    def __build_tag_shell
+    def ___build_tags_receiver
 
-      Tag_Shell_.new(
+      Tags_Receiver_.new(
 
         :on_error, -> s do
           e = ::OptionParser::InvalidArgument.new
@@ -550,24 +576,28 @@ module Skylab::TestSupport
 
         :on_info_qualified_knownness, method( :add_tag_description ),
 
-        :on_filter_proc, method( :add_or_p ) )
+        :on_filter_proc, method( :_receive_OR_proc ) )
+    end
+
+    def _will_OR_reduce_by & p
+      _receive_OR_proc p
+    end
+
+    def _receive_OR_proc p
+      ( @_OR_p_a ||= [] ).push p ; nil
     end
 
     def add_tag_description include_or_exclude_i, tag_i, val_x
       @tag_desc_h ||= {}
       ( @tag_desc_h[ include_or_exclude_i ] ||= [] ).push [ tag_i, val_x ]
       @did_add_render_tag_run_options ||= begin
-        add_run_option_renderer( & method( :render_tag_run_options ) )
+        _add_run_option_renderer( & method( :render_tag_run_options ) )
         true
       end ; nil
     end
 
-    def add_or_p p
-      (( @or_p_a ||= [] )) << p ; nil
-    end
-
-    def add_run_option_renderer & p
-      ( @run_option_p_a ||= [] ) << p ; nil
+    def _add_run_option_renderer & p
+      ( @_run_option_p_a ||= [] ).push p ; nil
     end
 
     def process_line_argument s
@@ -575,18 +605,26 @@ module Skylab::TestSupport
     end
 
     def accept_line_argument d
-      @did_add_line_set_p ||= begin
-        add_or_p -> tagset do
-          @line_set.include? tagset.lineno
-        end
-        require 'set'
-        @line_set = ::Set.new
-        add_run_option_renderer do |y|
-          @line_set.each do |d_| y << "--line #{ d_ }" end
-        end
-        true
+
+      @___did_init_line_set ||= ___init_line_set
+      @_line_set << d ; nil
+    end
+
+    def ___init_line_set
+
+      _will_OR_reduce_by do |tagset|
+        @_line_set.include? tagset.lineno
       end
-      @line_set << d ; nil
+
+      _add_run_option_renderer do |y|
+        @_line_set.each do |d|
+          y << "--line #{ d }"
+        end
+      end
+
+      require 'set'
+      @_line_set = ::Set.new
+      ACHIEVED_
     end
 
     def process_min_line_argument s
@@ -614,21 +652,27 @@ module Skylab::TestSupport
     end
 
     def accept_min_line_argument d
-      add_or_p -> tagset do
+
+      _will_OR_reduce_by do |tagset|
         d <= tagset.lineno
       end
-      add_run_option_renderer do |y|
+
+      _add_run_option_renderer do |y|
         y << "--from #{ d }"
-      end ; nil
+      end
+      NIL_
     end
 
     def accept_max_line_argument d
-      add_or_p -> tagset do
+
+      _will_OR_reduce_by do |tagset|
         d >= tagset.lineno
       end
-      add_run_option_renderer do |y|
+
+      _add_run_option_renderer do |y|
         y << "--to #{ d }"
-      end ; nil
+      end
+      NIL_
     end
 
     def execute_
@@ -636,20 +680,20 @@ module Skylab::TestSupport
         build_rendering_functions
       rt = Runtime__.new passed, failed, pended
       commence
-      producer = __touch_producer_function branch, leaf
+      next_example = ___build_example_stream_proc branch, leaf
       @t1 = ::Time.now
       begin
-        ex = producer.call
-        ex or break
-        # puts "#{ ind[] }<<#{ ex.description }>>"
-        if @tag_filter_p[ ex.tagset ]
-          if ex.block
+        eg = next_example.call
+        eg or break
+        # puts "#{ indent[] }<<#{ eg.description }>>"
+        if @_tag_filter_p[ eg.tagset ]
+          if eg.block
             rt.tick_example
-            ctx = ex.context.new rt
-            if ex.has_before_each
-              ex.run_before_each ctx
+            ctx = eg.context.new rt
+            if eg.has_before_each
+              eg.run_before_each ctx
             end
-            ctx.instance_exec(& ex.block )
+            ctx.instance_exec( & eg.block )
           else
             rt.tick_pending
           end
@@ -663,26 +707,27 @@ module Skylab::TestSupport
       NIL_
     end
 
-    def __touch_producer_function branch, leaf
-      if @example_producer_p
-        @example_producer_p[ branch, leaf ]
+    def ___build_example_stream_proc branch, leaf
+      if @_example_stream_p_p
+        @_example_stream_p_p[ branch, leaf ]
       else
-        Build_example_producer_function_[ @root_context_class, branch, leaf ]
+        Build_example_stream_proc_[ @root_context_class, branch, leaf ]
       end
     end
 
     def build_rendering_functions  # #storypoint-465
+
       tab = '  ' ; y = @_info_yielder ; d = eg = ordinal = nil  # `depth`, `example`
 
       state = :pass  # the first example, even w/ no tests, still is 'pass'
 
-      ind = -> depth { tab * depth }  # indent
+      indent = -> depth { tab * depth }  # indent
 
       render_branch = -> depth, ctx do
         if ctx.__quickie_is_pending  # experimental non-rspec feature
-          y << "#{ ind[ depth ] }#{ stylize :yellow, ctx.description }"
+          y << "#{ indent[ depth ] }#{ stylize :yellow, ctx.description }"
         else
-          y << "#{ ind[ depth ] }#{ ctx.description }"
+          y << "#{ indent[ depth ] }#{ ctx.description }"
         end
       end
 
@@ -708,14 +753,14 @@ module Skylab::TestSupport
 
       flush_h = {
         pass: -> do
-          y << "#{ ind[ d ] }#{ stylize :green, eg.description }"
+          y << "#{ indent[ d ] }#{ stylize :green, eg.description }"
         end,
         fail: -> do
-          y << "#{ ind[ d ] }#{
+          y << "#{ indent[ d ] }#{
             }#{ stylize :red, "#{ eg.description } (FAILED - #{ ordinal })" }"
         end,
         pend: -> do
-          y << "#{ ind[ d ] }#{ stylize :yellow, "#{ eg.description }" }"
+          y << "#{ indent[ d ] }#{ stylize :yellow, "#{ eg.description }" }"
         end
       }
 
@@ -726,16 +771,22 @@ module Skylab::TestSupport
         eg = nil  # (don't ever clear `d` we use it after flush)
       end
 
-      passed = -> msg_func do  # (maybe if verbose, success msg:)
+      passed = -> & msg_p do  # (maybe if verbose, success msg:)
         state = :pass  # important, ofc
         # flush[] if eg  # NOTE this might mixed-color results if .. etc
-        # y << "#{ ind[ d + 1 ] }<<#{ msg_func[] }>>"
+        # y << "#{ indent[ d + 1 ] }<<#{ msg_func[] }>>"
       end
 
-      failed = -> errmsg, ord do
+      failed = -> ord, & errmsg_p do
+
+        ordinal = ord
         state = :fail
-        flush[] if eg  # now it's safe to call_digraph_listeners it
-        y << "#{ ind[ d ] }  #{ stylize :red, errmsg }"
+
+        if eg
+          flush[]
+        end
+
+        y << "#{ indent[ d ] }  #{ stylize :red, errmsg_p[] }"
       end
 
       pended = -> do
@@ -761,7 +812,7 @@ module Skylab::TestSupport
       end
 
       skip = -> do
-        # LIB_.stderr.puts "#{ ind[ d ] }(#{ eg.description } SKIPPED)"
+        # LIB_.stderr.puts "#{ indent[ d ] }(#{ eg.description } SKIPPED)"
         eg = nil
       end
 
@@ -775,7 +826,7 @@ module Skylab::TestSupport
     define_method :stylize, & Stylize__
 
     def commence
-      if @run_option_p_a
+      if @_run_option_p_a
         @_info_yielder << "Run options:#{ render_run_options }#{ NEWLINE_ }#{ NEWLINE_ }"
       end
       NIL_
@@ -783,7 +834,7 @@ module Skylab::TestSupport
 
     def render_run_options
       y = []
-      @run_option_p_a.each do |p|
+      @_run_option_p_a.each do |p|
         p[ y ]
       end
       if 1 == y.length
@@ -808,7 +859,7 @@ module Skylab::TestSupport
       e, f, p = rt.counts   # total [e]xamples, failed, pending
 
       if e.zero?
-        if @or_p_a
+        if @_OR_p_a
           y << "All examples were filtered out"
         else
           y << "No examples found.#{ NEWLINE_ }#{ NEWLINE_ }"  # <- trying to look like r.s there
@@ -833,9 +884,8 @@ module Skylab::TestSupport
     def s num
       's' if 1 != num
     end
-    end
-
-  # -> 1 (net: 0)
+    # -> (net: 0)
+    end  # end `Run_`
 
     class Example__  # simple data structure for holding e.g `it` and its block
 
@@ -850,51 +900,60 @@ module Skylab::TestSupport
       end
     end
 
-    # <- 1 (net: -1)
+    class Runtime__
 
-  class Runtime__
-
-    def initialize * a
-      @emit_passed, @emit_failed, @emit_pending = a
-      @eg_count = 0
-      @eg_failed_count = 0
-      @eg_pending_count = 0
-      @eg_is_failed = nil
-    end
-
-    attr_reader :eg_failed_count
-
-    def counts  # careful
-      [ @eg_count, @eg_failed_count, @eg_pending_count ]
-    end
-
-    def tick_example
-      @eg_is_failed = nil
-      @eg_count += 1 ;  nil
-    end
-
-    def tick_pending
-      @eg_is_failed = nil
-      @eg_pending_count += 1
-      @emit_pending[ ] ; nil
-    end
-
-    def passed msg_func
-      @emit_passed[ msg_func ] ; nil
-    end
-
-    def failed failmsg
-      if ! @eg_is_failed
-        @eg_is_failed = true
-        @eg_failed_count += 1  # before below (render e.g "(FAILED - 2)")
+      def initialize passed_p, failed_p, pended_p
+        @_eg_count = 0
+        @eg_failed_count = 0
+        @_eg_pending_count = 0
+        @_eg_is_failed = nil
+        @_emit_failed = failed_p
+        @_emit_passed = passed_p
+        @_emit_pending = pended_p
       end
-      @emit_failed[ failmsg, @eg_failed_count ] ; nil
+
+      # ~ writers
+
+      def tick_example
+        @_eg_is_failed = nil
+        @_eg_count += 1 ;  nil
+      end
+
+      def tick_pending
+        @_eg_is_failed = nil
+        @_eg_pending_count += 1
+        @_emit_pending[ ] ; nil
+      end
+
+      def __passed_by & msg_p
+        @_emit_passed[ & msg_p ]
+        :_quickie_passed_
+      end
+
+      def _failed_by & msg_p
+
+        # (it's possible for one example to fail several times)
+
+        if ! @_eg_is_failed
+          @_eg_is_failed = true
+          @eg_failed_count += 1  # before below (render e.g "(FAILED - 2)")
+        end
+
+        @_emit_failed[ @eg_failed_count, & msg_p ]
+
+        UNABLE_
+      end
+
+      # ~ readers
+
+      def counts  # careful
+        [ @_eg_count, @eg_failed_count, @_eg_pending_count ]
+      end
+
+      attr_reader :eg_failed_count
     end
-  end
 
-  # -> 1 (net: 0)
-
-    #  ~ facet 1 - predicates (core) !
+    # -- facet 1 - predicates (core)
 
     class Predicate__
 
@@ -911,11 +970,11 @@ module Skylab::TestSupport
             end
 
             define_singleton_method :ivars, ( -> do
-              i_a = args.map do |i|
-                attr_accessor i
-                :"@#{ i }"
+              sym_a = args.map do |sym|
+                attr_accessor sym
+                :"@#{ sym }"
               end.freeze
-              -> { i_a }
+              -> { sym_a }
             end ).call
 
             p and class_exec( & p )
@@ -923,9 +982,7 @@ module Skylab::TestSupport
             self
           end
         end
-      end
-
-    private
+      end  # >>
 
       def initialize * a
         @runtime, @context, * rest = a
@@ -935,98 +992,126 @@ module Skylab::TestSupport
         end
       end
 
-      def passed msg_p
-        @runtime.passed msg_p
+      def _pass_by & msg_p
+
+        @runtime.__passed_by( & msg_p )
       end
 
-      def failed msg_p
-        @runtime.failed msg_p
+      def _fail_by & msg_p
+
+        @runtime._failed_by( & msg_p )
       end
     end
 
     Predicates__ = ::Module.new  # filled with joy, sadness
 
+    # `eql` (as in "should eql(..)") -
+
+    class Predicates__::Eql < Predicate__.new :expected
+
+      def matches? actual
+
+        if @expected == actual
+
+          _pass_by do
+            "equals #{ @expected.inspect }"
+          end
+        else
+
+          _fail_by do
+            "expected #{ @expected.inspect }, got #{ actual.inspect }"
+          end
+        end
+      end
+    end
+
+    # `match` (as in "should match( /.../ )") -
+
+    class Predicates__::Match < Predicate__.new :expected
+
+      def matches? actual
+
+        if @expected =~ actual
+          _pass_by do
+            "matches #{ @expected.inspect }"
+          end
+        else
+
+          _fail_by do
+            "expected #{ @expected.inspect }, had #{ actual.inspect }"
+          end
+        end
+      end
+    end
+
+    class Predicates__::RaiseError < Predicate__.new :expected_class, :message_rx
+
+      def initialize runtime, context, *a  # ick [class] ( regex | string )
+
+        a_ = [ ( a.shift if ::Class === a.first ) ]
+        case a.first
+        when ::Regexp
+          a_.push a.shift
+        when ::String
+          a_.push %r{\A#{ ::Regexp.escape a.shift }\z}
+        else
+          a_.push nil
+        end
+
+        if a.length.nonzero? || a_.length.zero?
+          raise ::ArgumentError, ___say( a )
+        end
+
+        super runtime, context, * a_
+      end
+
+      def ___say a
+        "expecting [class], ( regexp | string ), near: #{ a.first.inspect }"
+      end
+
+      def matches? actual
+        begin
+          actual.call
+        rescue ::StandardError, ::ScriptError => e
+        end
+        ok = e || ___did_not_raise
+        ok &&= @expected_class ? __check_class( e ) : true
+        ok &&= @message_rx ? __check_message( e ) : true
+        ok and __pass e
+      end
+
+      def ___did_not_raise
+        _fail_by { "expected lambda to raise, didn't raise anything." }
+      end
+
+      def __check_class e
+        if e.kind_of? @expected_class
+          ACHIEVED_
+        else
+          _fail_by do
+            "expected #{ @expected_class }, had #{ e.class }"
+          end
+        end
+      end
+
+      def __check_message e
+        if @message_rx =~ e.message
+          ACHIEVED_
+        else
+          _fail_by do
+            "expected #{ e.message } to match #{ @message_rx }"
+          end
+        end
+      end
+
+      def __pass _e
+        _pass_by do
+          "raises #{ @expected_class } matching #{ @message_rx }"
+        end
+      end
+    end
+
     # <- (net: -1)
-
-  # `eql` (as in "should eql(..)") -
-
-  class Predicates__::Eql < Predicate__.new :expected
-    def match actual
-      if @expected == actual
-        passed -> { "equals #{ @expected.inspect }" }
-      else
-        failed "expected #{ @expected.inspect }, got #{ actual.inspect }"
-      end
-      NIL_
-    end
-  end
-
-  # `match` (as in "should match( /.../ )") -
-
-  class Predicates__::Match < Predicate__.new :expected
-    def match actual
-      if @expected =~ actual
-        passed -> { "matches #{ @expected.inspect }" }
-      else
-        failed "expected #{ @expected.inspect }, had #{ actual.inspect }"
-      end
-      NIL_
-    end
-  end
-
-  class Predicates__::RaiseError < Predicate__.new :expected_class, :message_rx
-
-    def match actual
-      begin
-        actual.call
-      rescue ::StandardError, ::ScriptError => e
-      end
-      if ! e
-        failed "expected lambda to raise, didn't raise anything."
-      else
-        ok = true
-        if @expected_class
-          if ! e.kind_of?( @expected_class )
-            ok = false
-            failed "expected #{ @expected_class }, had #{ e.class }"
-          end
-        end
-        if ok && @message_rx
-          if @message_rx !~ e.message
-            ok = false
-            failed "expected #{ e.message } to match #{ @message_rx }"
-          end
-        end
-        if ok
-          passed -> do
-            "raises #{ @expected_class } matching #{ @message_rx }"
-          end
-        end
-      end
-      NIL_
-    end
-
-  private
-
-    # ick [class] ( regex | string )
-
-    def initialize runtime, context, *a
-      use_a = []
-      use_a << ( ( ::Class === a.first ) ? a.shift : nil )
-      if ::Regexp === a.first
-        use_a << a.shift
-      elsif ::String === a.first
-        use_a << %r{\A#{ ::Regexp.escape a.shift }\z}
-      else
-        use_a << nil
-      end
-      if a.length.nonzero? || use_a.length.zero?
-        raise ::ArgumentError, "expecting [class], ( regexp | string ), #{
-          }near: #{ a.first.inspect }"
-      end
-      super runtime, context, * use_a
-    end
-  end
 
   # for each const in the predicates module (each of which must be a
   # predicate class) define the corresponding context instance method
@@ -1040,115 +1125,146 @@ module Skylab::TestSupport
 
   class Context__  # re-open
     Predicates__.constants.each do |const|
-      klass = Predicates__.const_get const, false
+      cls = Predicates__.const_get const, false
       meth = Methify_const__[ const ]
       define_method meth do |*expected|
-        klass.new @__quickie_runtime, self, *expected
+        cls.new @__quickie_runtime, self, *expected
       end
     end
   end
 
-  #  ~ facet 2 - should `be_<foo>( )` method_missing hack
+  # -> (net: 0)
 
-  class Context__  # re-open
+    # -- facet 2 - should `be_<foo>()` method_missing hack
 
-    be_rx = /\Abe_(?<be_what>[a-z][_a-z0-9]*)\z/
+    class Context__  # re-open
 
-    define_method :method_missing do |meth, *args, &p|
-      md = be_rx.match meth.to_s
-      if md
-        _be_the_predicate_you_wish_to_see md, args, p
-      else
-        super meth, *args, &p
-      end
-    end
+      def method_missing meth, * args, & p
 
-    constantize_meth = no_method = msgs = nil
-
-    predicates = Predicates__
-
-    define_method :_be_the_predicate_you_wish_to_see do |md, args, p|
-      const = constantize_meth[ md.string ]
-      if predicates.const_defined? const, false
-        klass = predicates.const_get const, false
-      else
-        takes_args = args.length.nonzero?   # #sketchy - etc
-        attr_a = [ ]
-        attr_a << :expected if takes_args
-        klass = predicates.const_set const,
-          ::Class.new( Predicate__.new(* attr_a ) )
-        class << klass
-          public :define_method
+        md = BE_RX___.match meth.to_s
+        if md
+          ___be_the_predicate_you_wish_to_see md, args, p
+        else
+          super meth, *args, &p
         end
-        klass.define_method :args, & (
-          if takes_args
-            -> { [ @expected ] }
-          else
-            -> { EMPTY_A_ }
-          end )
-        meth = "#{ md[:be_what] }?".intern
-        klass.define_method :expected_method_name do meth end
-        pass_msg, fail_msg = msgs[ md[:be_what], takes_args ]
-        klass.define_method :match do |actual|
-          if actual.respond_to? meth
-            if actual.send meth, * self.args
-              passed -> { pass_msg[ actual, self ] }
-            else
-              failed fail_msg[ actual, self ]
-            end
-          else
-            no_method[ @context, self, actual ]
+      end
+
+      BE_RX___ = /\Abe_(?<be_what>[a-z][_a-z0-9]*)\z/
+
+      def ___be_the_predicate_you_wish_to_see md, args, p
+
+        const = Constantize_method___[ md.string ]
+
+        _cls = if Predicates__.const_defined? const, false
+          Predicates__.const_get const, false
+        else
+          ___build_predicate_dynamically_eew const, md, args, p
+        end
+
+        _cls.new @__quickie_runtime, self, * args
+      end
+
+      def ___build_predicate_dynamically_eew const, md, args, p
+
+        attr_a = []
+
+        takes_args = args.length.nonzero?   # #sketchy - etc
+        if takes_args
+          attr_a.push :expected
+        end
+
+        cls = ::Class.new Predicate__.new( * attr_a )
+        Predicates__.const_set const, cls
+
+        define_method = cls.method :define_method
+
+        _p = if takes_args
+          -> do
+            [ @expected ]
+          end
+        else
+          -> do
+            EMPTY_A_
           end
         end
+
+        define_method.call :args, & _p
+
+        be_what = md[ :be_what ]
+
+        m = "#{ be_what }?".intern
+
+        define_method.call :expected_method_name do
+          m
+        end
+
+        pass_msg, fail_msg = Messages___[ be_what, takes_args ]
+
+        define_method.call :matches? do | actual |
+
+          if actual.respond_to? m
+
+            matchdata = actual.send m, * self.args
+            if matchdata
+              _pass_by do
+                pass_msg[ actual, self ]
+              end
+              matchdata
+            else
+              _fail_by do
+                fail_msg[ actual, self ]
+              end
+            end
+          else
+            No_Method___[ @context, self, actual ]
+          end
+        end
+        cls
       end
-      klass.new @__quickie_runtime, self, * args
-    end
 
-    constantize_meth = -> meth do # foo_bar !ncsa_spy !crack_ncsa_code foo
-      meth.to_s.gsub( /(?:^|_)([a-z])/ ) { $1.upcase }.intern
-    end
-
-    insp = nil
-
-    no_method = -> context, predicate, actual do
-      fail "expected #{ insp[ actual ] } to have a #{
-        }`#{ predicate.expected_method_name }` method"
-      NIL_
-    end
-
-    insp = -> x do # yeah..
-      str = x.inspect
-      str.length > 80 ? x.class.to_s : str  # WHATEVER
-    end
-
-    omfg_h = nil
-
-    msgs = -> be_what, takes_args do
-      pos, neg = omfg_h.fetch be_what.intern do |k|
-        stem = be_what.gsub UNDERSCORE_, SPACE_
-        [ "is #{ stem }", "to be #{ stem }" ]
+      Constantize_method___ = -> meth do # foo_bar !ncsa_spy !crack_ncsa_code foo
+        meth.to_s.gsub( /(?:^|_)([a-z])/ ) { $1.upcase }.intern
       end
-      if takes_args
-        pass_msg = -> a, p { "#{ pos } #{ insp[ p.expected ] }" }
-        fail_msg = -> a, p { "expected #{ insp[a] } #{ neg } #{
-                               }#{ insp[ p.expected ] }" }
-      else
-        pass_msg = -> a, p { pos.dup }
-        fail_msg = -> a, p { "expected #{ insp[a] } #{ neg }" }
+
+      insp = nil
+
+      No_Method___ = -> context, predicate, actual do
+        fail "expected #{ insp[ actual ] } to have a #{
+          }`#{ predicate.expected_method_name }` method"
+        NIL_
       end
-      [pass_msg, fail_msg]
+
+      insp = -> x do # yeah..
+        str = x.inspect
+        str.length > 80 ? x.class.to_s : str  # WHATEVER
+      end
+
+      omfg_h = nil
+
+      Messages___ = -> be_what, takes_args do
+        pos, neg = omfg_h.fetch be_what.intern do |k|
+          stem = be_what.gsub UNDERSCORE_, SPACE_
+          [ "is #{ stem }", "to be #{ stem }" ]
+        end
+        if takes_args
+          pass_msg = -> a, p { "#{ pos } #{ insp[ p.expected ] }" }
+          fail_msg = -> a, p { "expected #{ insp[a] } #{ neg } #{
+                                 }#{ insp[ p.expected ] }" }
+        else
+          pass_msg = -> a, p { pos.dup }
+          fail_msg = -> a, p { "expected #{ insp[a] } #{ neg }" }
+        end
+        [pass_msg, fail_msg]
+      end
+
+      omfg_h = {
+        kind_of: [ "is kind of", "to be kind of" ],
+        include: [ "includes", "to include" ],
+        nil:     [ "is nil", "to be nil" ]
+      }
     end
 
-    omfg_h = {
-      kind_of: [ "is kind of", "to be kind of" ],
-      include: [ "includes", "to include" ],
-      nil:     [ "is nil", "to be nil" ]
-    }
-  end
-
-    # -> (net: 0)
-
-    #  ~ facet 3 - before hooks
+    # -- facet 3 - before hooks
 
     class Context__
       class << self
@@ -1173,7 +1289,7 @@ module Skylab::TestSupport
           "sorry - in the intereset of simplicity there is not yet #{
            }support for nested before( :each | :all ) blocks.."
         end
-      end
+      end  # >>
     end
 
     BEFORE_H__ = { each: :bfr_each, all: :bfr_all }.freeze
@@ -1188,7 +1304,7 @@ module Skylab::TestSupport
       end
     end
 
-    #  ~ section.
+    # --
 
     class << self
 
@@ -1241,7 +1357,7 @@ module Skylab::TestSupport
       end
     end
 
-    #  ~ section.
+    # --
 
     class << self
       def apply_experimental_specify_hack test_context_class
@@ -1253,18 +1369,18 @@ module Skylab::TestSupport
 
     # ~ :+#protected-API
 
-  class Tag_Shell_
+  class Tags_Receiver_  # (used by performers too)
 
     def initialize * x_a
       @send_error_p = @send_info_qualified_knownness_p = @send_filter_proc_p =
       @send_pass_filter_proc_p = @send_no_pass_filter_proc_p = nil
       d = -1 ; last = x_a.length - 1
       while d < last
-        i = x_a.fetch d += 1
-        md = RX__.match i
-        md or raise ::ArgumentError, i
+        sym = x_a.fetch d += 1
+        md = RX__.match sym
+        md or raise ::ArgumentError, sym
         ivar = :"@send_#{ md[ 0 ] }_p"
-        instance_variable_get( ivar ).nil? or raise ::ArgumentError, i
+        instance_variable_get( ivar ).nil? or raise ::ArgumentError, sym
         instance_variable_set ivar, x_a.fetch( d += 1 )
       end
       @send_error_p ||= ev { raise ::ArgumentError, "#{ ev }" }

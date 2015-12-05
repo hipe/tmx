@@ -144,6 +144,14 @@ module Skylab::Autonomous_Component_System
         rx.match( @name_symbol )[ 0 ].upcase
       end
 
+      def is_effectively_optional_
+        if has_default
+          true
+        else
+          ! is_required
+        end
+      end
+
       def is_required
         :one == @parameter_arity
       end
@@ -160,11 +168,13 @@ module Skylab::Autonomous_Component_System
         KEEP_PARSING_
       end
 
-      def under_expression_agent_get_N_desc_lines ex, n=nil
+      def under_expression_agent_get_N_desc_lines expag, n=nil
+
         if n
-          self._WRITE_ME_easy
+          _p_a = [ @_description_block ]
+          Callback_::Event::N_Lines[ [], n, _p_a, expag ]
         else
-          ex.calculate [], & @_description_block
+          expag.calculate [], & @_description_block
         end
       end
 

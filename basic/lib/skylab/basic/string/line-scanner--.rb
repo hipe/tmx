@@ -2,9 +2,29 @@ module Skylab::Basic
 
   module String
 
-    class Line_Scanner__ < Callback_::Stream.stream_class
+    class Line_Scanner__ < Callback_::Stream.stream_class  # :[#024]
 
-      # read [#024] (in [#022]) the string scanner narrative
+      # represent a string as a stream of "lines", each produced successively
+      # through the universal minimal stream interface of a method named
+      # `gets`. any trailing newline sequence is included with each produced
+      # line (per the UNIX-y semantics of line "terminators" (not separators
+      # [#sn-020])). (blank lines are each their own item.)
+      #
+      # in addition to `gets` there are two more exposed API points:
+      #
+      #   • the current "line number" is available thru `lineno`, with
+      #     semantics similar to the synonymous platform method on an `IO`
+      #     in terms of what for e.g "line 1" means.
+      #
+      #   • also like a platform IO, this can be rewound back to the
+      #     beginning with `rewind` (because internally it uses a string
+      #     scanner, but you don't know that).
+      #
+      # only peripherally related, a "reverse scanner" merely writes to
+      # a mutable string though a yielder as proxy, writing newlines as
+      # appropriate with *separator* (not terminator) semantics. as this
+      # is not "correct" (per the previous above reference), this will be
+      # sunsetted #todo.
 
       class << self
 

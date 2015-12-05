@@ -2661,6 +2661,16 @@ module Skylab::Callback
     end
   end.call
 
+  Lazy = -> & p do  # etc
+    x = nil ; yes = true
+    -> do
+      if yes
+        x = p[]
+      end
+      x
+    end
+  end
+
   Memoize = -> & p do
     p_ = -> do
       x = p[]

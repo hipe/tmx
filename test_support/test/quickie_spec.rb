@@ -24,7 +24,7 @@ module Skylab::TestSupport::TestSupport::Quickie
 
   ::Kernel.module_exec do
     def shld predicate
-      predicate.match self
+      predicate.matches? self
     end
   end
 
@@ -41,13 +41,20 @@ module Skylab::TestSupport::TestSupport::Quickie
     end
 
     let :runtime do
-      Quickie::Runtime__.new( -> passed_func do
-        add_output Emission.new( :pass, passed_func[] )
-      end, -> fail_msg, failed_eg_count do
-        add_output Emission.new( :fail, fail_msg, failed_eg_count )
-      end, -> do  # pended
-        add_output Emission.new( :pend )
-      end )
+
+      _pass = -> & msg do
+        add_output Emission.new( :pass, msg[] )
+      end
+
+      _fail = -> failed_eg_count, & msg do
+        add_output Emission.new( :fail, msg[], failed_eg_count )
+      end
+
+      _pend = -> do
+        add_output Emission.new :pend
+      end
+
+      Quickie::Runtime__.new _pass, _fail, _pend
     end
 
     def add_output e

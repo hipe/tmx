@@ -60,9 +60,17 @@ module Skylab::Basic
         k_a.map { |k| h.fetch k }
       end
 
+      say_extra = nil
       Validate_superset__ = -> h, k_a do
-        ( xtra_a = h.keys - k_a ).length.zero? or raise ::KeyError,
-          "unrecognized key(s) - (#{ xtra_a.map( & :inspect ) * ', ' })"
+
+        xtra_a = h.keys - k_a
+        if xtra_a.length.nonzero?
+          raise ::KeyError, say_extra[ xtra_a ]
+        end
+      end
+
+      say_extra = -> xtra_a do
+        "unrecognized key(s) - (#{ xtra_a.map( & :inspect ) * ', ' })"
       end
 
       Unpack_intersect__ = -> h, * k_a do
@@ -71,6 +79,16 @@ module Skylab::Basic
 
       Repack_difference__ = -> h, * k_a do
         ::Hash[ ( h.keys - k_a ).map { |i| [ i, h.fetch( i ) ] } ]
+      end
+
+      Write_even_iambic_subset_into_via___ = -> h, x_a do
+
+        x_a.each_slice 2 do | k, x |
+          if h.key? k
+            h[ k ] = x
+          end
+        end
+        h
       end
 
     -> do  # ~ singleton methods
@@ -86,6 +104,8 @@ module Skylab::Basic
 
       o[ :unpack_equal ] = Unpack_equal__
       o[ :unpack_subset ] = Unpack_subset__
+
+      o[ :write_even_iambic_subset_into_via ] = Write_even_iambic_subset_into_via___
 
     end.call
 
