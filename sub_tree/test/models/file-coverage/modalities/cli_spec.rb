@@ -76,7 +76,7 @@ module Skylab::SubTree::TestSupport
 
     def result_for_failure_for_expect_stdout_stderr
 
-      Home_.lib_.brazen::CLI::GENERIC_ERROR_EXITSTATUS
+      Home_.lib_.brazen::CLI_Support::GENERIC_ERROR_EXITSTATUS
     end
   end
 end

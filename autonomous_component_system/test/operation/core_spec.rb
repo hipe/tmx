@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Autonomous_Component_System::TestSupport
 
-  describe "[br] ACS - operation" do
+  describe "[ac] operation" do
 
     extend TS_
     use :operation_support

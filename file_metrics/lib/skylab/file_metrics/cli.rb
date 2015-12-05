@@ -48,7 +48,7 @@ module Skylab::FileMetrics
       )
     end
 
-    Lipsticker = LIB_.brazen::CLI::Expression_Frames::Lipstick.build_with(
+    Lipsticker = LIB_.brazen::CLI_Support::Lipstick.build_with(
       :segment,
         :glyph,'+',
         :color, :green,

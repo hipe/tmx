@@ -46,7 +46,7 @@ module Skylab::Permute::TestSupport
 
       def [] tcc
 
-        Home_.lib_.brazen.test_support.lib( :CLI_expectations )[ tcc ]
+        Home_.lib_.brazen.test_support.lib( :CLI_support_expectations )[ tcc ]
 
         tcc.include self
 

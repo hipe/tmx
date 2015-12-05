@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Autonomous_Component_System::TestSupport
 
-  describe "[br] primitives with operations" do
+  describe "[ac] primitives with operations" do
 
     extend TS_
     use :memoizer_methods

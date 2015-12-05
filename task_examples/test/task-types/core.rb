@@ -180,9 +180,7 @@ module Skylab::TaskExamples::TestSupport
 
       def __expect_when_one x_a
 
-        _arg_st = Callback_::Polymorphic_Stream.via_array x_a
-
-        exp = TestSupport_::Expect_Stdout_Stderr::Expectation.new _arg_st
+        exp = TestSupport_::Expect_Stdout_Stderr::Expectation.via_args x_a
 
         em = @_emission_stream_controller.gets_one
 
@@ -199,13 +197,14 @@ module Skylab::TaskExamples::TestSupport
           end
         end
 
+        s.chomp!  # read all about it in [#ts-029]
         send exp.method_name, s, exp.pattern_x
 
         NIL_
       end
 
       def ___unstyle_styled s
-        TestLib_::Brazen[]::CLI::Styling::Unstyle_styled[ s ]
+        TestLib_::Brazen[]::CLI_Support::Styling::Unstyle_styled[ s ]
       end
 
       def emission_stream_controller_

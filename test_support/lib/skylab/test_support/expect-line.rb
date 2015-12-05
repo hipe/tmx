@@ -285,7 +285,7 @@ module Skylab::TestSupport
         @line = @up.gets
         if @line
 
-          line = Home_.lib_.brazen::CLI::Styling.unstyle_styled @line
+          line = Home_.lib_.brazen::CLI_Support::Styling.unstyle_styled @line
 
           if line
             @line = line

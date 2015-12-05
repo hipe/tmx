@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Autonomous_Component_System::TestSupport
 
-  describe "[br] ACS tenets 1, 2, 4, 5 and 6" do
+  describe "[ac] ACS tenets 1, 2, 4, 5 and 6" do
 
     extend TS_
     use :memoizer_methods

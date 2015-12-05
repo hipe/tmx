@@ -299,7 +299,7 @@ module Skylab::Snag
         @path_style_a = [ :strong, :green ].freeze
         @tag_style_a = [ :reverse, :yellow ].freeze  # #etc
         @fun = -> do
-          fun = Home_.lib_.brazen::CLI::Styling
+          fun = Home_.lib_.brazen::CLI_Support::Styling
           @fun = -> { fun }
           fun
         end

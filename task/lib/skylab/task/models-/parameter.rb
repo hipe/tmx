@@ -1,6 +1,5 @@
 class Skylab::Task
 
-  Models_ = ::Module.new
   module Models_::Parameter
 
     class Dependee_Reference

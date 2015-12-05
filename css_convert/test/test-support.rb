@@ -26,7 +26,7 @@ module Skylab::CSS_Convert::TestSupport
     end,
 
     my_CLI_expectations: -> tcc do
-      Home_::Brazen_.test_support.lib( :CLI_expectations )[ tcc ]
+      Home_::Brazen_.test_support.lib( :CLI_support_expectations )[ tcc ]
       tcc.class_exec do
 
         def subject_CLI

@@ -23,7 +23,9 @@ module Skylab::SubTree
 
         :description, ( -> y do
 
-          _s = @current_property.default_proc.call.map do | s |
+          _prp = @_action_reflection.front_properties.fetch :test_file_suffix
+
+          _s = _prp.default_proc.call.map do | s |
             ick s
           end.join ', '
 

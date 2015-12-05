@@ -42,8 +42,8 @@ module Skylab::SubTree
 
     class Expression_Agent
 
-      def initialize cp
-        @categorized_properties = cp
+      def initialize ar
+        @_action_reflection = ar
       end
 
       alias_method :calculate, :instance_exec
@@ -54,7 +54,7 @@ module Skylab::SubTree
 
       lib = Home_.lib_
 
-      styling = lib.brazen::CLI::Styling
+      styling = lib.brazen::CLI_Support::Styling
 
       define_method :stylify_, styling::Stylify
 
@@ -92,8 +92,11 @@ module Skylab::SubTree
 
       def par_via_sym sym
 
-        if @categorized_properties
-          cat_sym, prp = @categorized_properties.category_symbol_and_property_via_name_symbol sym
+        if @_action_reflection
+          prp = @_action_reflection.front_properties[ sym ]
+          if prp
+            cat_sym = @_action_reflection.category_for prp
+          end
         end
 
         _par prp, cat_sym, sym
@@ -101,8 +104,8 @@ module Skylab::SubTree
 
       def par prp
 
-        if @categorized_properties
-          cat_sym, = @categorized_properties.category_symbol_and_property_via_name_symbol( prp.name_symbol )
+        if @_action_reflection
+          cat_sym = @_action_reflection.category_for prp
         end
 
         _par prp, cat_sym, prp.name_symbol
@@ -112,7 +115,8 @@ module Skylab::SubTree
 
         if cat_sym
 
-          send @categorized_properties.rendering_method_name_for_property_category_name_symbol( cat_sym ), prp
+          _m = @_action_reflection.expression_strategy_for_category cat_sym
+          send _m, prp
 
         else
           _ = if prp

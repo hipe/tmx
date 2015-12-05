@@ -6,13 +6,13 @@ module Skylab::FileMetrics::TestSupport
 
     TS_[ self ]
     use :CLI
-    use :CLI_expectations
+    use :CLI_support_expectations
 
     it "0.0 - nothing" do
 
       invoke
 
-      expect_generic_expecting_line
+      expect_expecting_action_line
       expect_usaged_and_invited
     end
 

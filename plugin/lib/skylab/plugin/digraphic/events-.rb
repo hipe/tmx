@@ -212,7 +212,7 @@ module Skylab
               __write_to_matrix_formal_group_under fo_a
             end
 
-            Home_.lib_.brazen::CLI::Expression_Frames::Table::Actor.call(
+            Home_.lib_.brazen::CLI_Support::Table::Actor.call(
 
               :left, '  ',
               :right, SPACE_,

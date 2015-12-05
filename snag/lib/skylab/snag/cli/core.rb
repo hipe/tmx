@@ -42,11 +42,13 @@ module Skylab::Snag
 
     class Actions::Open < Action_Adapter
 
-      def produce_populated_option_parser _op, _opt_a
+      def populated_option_parser_via _opt_a, _op
 
         _op_ = super
 
-        CLI.superclass::Option_Parser::Experiments::Regexp_Replace_Tokens.new(
+        Home_.lib_.brazen::
+          CLI_Support::Option_Parser::Experiments::Regexp_Replace_Tokens.
+        new(
 
           _op_,
 

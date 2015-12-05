@@ -164,7 +164,7 @@ module Skylab::TaskExamples::TestSupport
 
         it "reports a failure (SMALL ISSUE HERE)" do
 
-          _expect_version_mismatch_against "version A.B.C\n"  # newline is the issue
+          _expect_version_mismatch_against "version A.B.C"
         end
 
         def version_from

@@ -11,7 +11,7 @@ module Skylab::GitViz::TestSupport
 
     it "0   invoke with no args - e/u/i" do
       invoke
-      expect_generic_expecting_line
+      expect_expecting_action_line
       expect_usaged_and_invited
     end
 

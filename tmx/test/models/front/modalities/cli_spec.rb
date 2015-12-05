@@ -6,7 +6,7 @@ module Skylab::TMX::TestSupport
 
     extend TS_
 
-    Home_.lib_.brazen.test_support.lib( :CLI_expectations )[ self ]
+    Home_.lib_.brazen.test_support.lib( :CLI_support_expectations )[ self ]
     use :models_building
     use :modalities_CLI
 

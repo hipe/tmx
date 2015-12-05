@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module Tree
 
-    class Actors__::Build_classified_stream
+    class Actors__::Build_classified_stream  # :[#053]
 
       def initialize node
         @node = node

@@ -127,7 +127,7 @@ module Skylab::TaskExamples::TestSupport
             st.advance_to_first :err
 
             expect_ :err, "x mginy/"
-            expect_ :err, "\nx mginy/README\n"
+            expect_ :err, "\nx mginy/README"
 
             if st.unparsed_exists
               :err == st.current_token.stream_symbol and fail

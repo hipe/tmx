@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Autonomous_Component_System::TestSupport
 
-  describe "[br] ACS tenet 7 B - the `using` modifer" do
+  describe "[ac] ACS tenet 7 B - the `using` modifer" do
 
     extend TS_
     use :memoizer_methods

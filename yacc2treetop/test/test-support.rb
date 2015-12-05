@@ -17,17 +17,11 @@ module Skylab::Yacc2Treetop::TestSupport
 
     def use sym
 
-      case sym
-      when :expect_event
-        Callback_.test_support::Expect_Event[ self ]
-      when :expect_CLI
-        require 'skylab/brazen'
-        ::Skylab::Brazen.test_support.lib( :CLI_expectations )[ self ]
-        extend CLI_Module_Methods__
-        include CLI_Instance_Methods__
-      else
-        self._CASE
-      end
+    o[ :expect_CLI ] = -> tcc do
+      require 'skylab/brazen'
+      ::Skylab::Brazen.test_support.lib( :CLI_support_expectations )[ tcc ]
+      tcc.extend CLI_Module_Methods__
+      tcc.include CLI_Instance_Methods__
     end
   end
 
@@ -78,7 +72,7 @@ module Skylab::Yacc2Treetop::TestSupport
     def __build_frame argv
 
       using_expect_stdout_stderr_invoke_via_argv argv
-      flush_frozen_frame_from_expect_stdout_stderr
+      flush_frozen_frame_from_expect_stdout_stderr__
     end
 
     define_method :get_invocation_strings_for_expect_stdout_stderr, -> do

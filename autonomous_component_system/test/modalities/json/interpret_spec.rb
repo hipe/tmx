@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Autonomous_Component_System::TestSupport
 
-  describe "[br] ACS - modalities - JSON - interpret" do
+  describe "[ac] modalities - JSON - interpret" do
 
     extend TS_
     use :future_expect

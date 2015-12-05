@@ -167,13 +167,18 @@ class Skylab::Task
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
+    ACS = sidesys[ :Autonomous_Component_System ]
     Basic = sidesys[ :Basic ]
-
+    Brazen = sidesys[ :Brazen ]
     Fields = sidesys[ :Fields ]
 
     String_IO = -> do
       require 'stringio' ; ::StringIO
     end
+  end
+
+  module Models_
+    Autoloader_[ self ]
   end
 
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]

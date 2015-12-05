@@ -48,13 +48,13 @@ module Skylab::Permute
         NIL_
       end
 
-      def __receive__no_arguments_case__ _
+      def __receive__no_arguments_case__ _nil
 
         io = @resources.serr
         io.puts 'please provide one or more name-value pairs'
-        hr = help_renderer
-        # hr.express_primary_usage_line_
-        hr.express_invite_to_general_help
+        _exp = expression_
+        # exp.express_primary_usage_line
+        _exp.express_invite_to_general_help
         @_a = false
         maybe_use_exit_status CLI::GENERIC_ERROR_EXITSTATUS
         UNABLE_

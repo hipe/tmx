@@ -107,7 +107,7 @@ module Skylab::TestSupport
 
       # ~ services that this node provides upwards (for siblings!) ~
 
-      def get_any_test_path_a
+      def get_any_test_path_array
         # assume that pathfinder worked and the eventpoint path is working..
         a = @test_path_a
         if a

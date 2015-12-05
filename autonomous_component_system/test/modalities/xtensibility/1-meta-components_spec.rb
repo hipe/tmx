@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Autonomous_Component_System::TestSupport
 
-  describe "[br] ACS - [e]xtensibility - meta components" do
+  describe "[ac] (e)Xtensibility - meta components" do
 
     # (what is accomplished here is referenced elsewhere as :[#003]#X1)
 

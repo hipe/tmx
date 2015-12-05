@@ -5,6 +5,7 @@ module Skylab::GitViz::TestSupport
   describe "[gv] VCS adapters - git - models - bundle - actors - build matrix" do
 
     extend TS_
+    use :memoizer_methods
     use :VCS_adapters_git_support_bundle_support
 
     it "the matrix box's keys are in order" do
@@ -40,7 +41,7 @@ module Skylab::GitViz::TestSupport
 
     end
 
-    dangerous_memoize_ :_matrix do
+    shared_subject :_matrix do
 
       bundle_against_ '/m04/repo'
 

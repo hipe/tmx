@@ -29,7 +29,7 @@ module Skylab::TMX
 
     def unstylize
 
-      _p = Home_.lib_.brazen::CLI::Styling::Unstyle
+      _p = Home_.lib_.brazen::CLI_Support::Styling::Unstyle
 
       @_lone_filter = -> line do
 

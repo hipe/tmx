@@ -70,7 +70,7 @@ module Skylab::SubTree
 
         def __render_table_via_row_string_array row_s_a
 
-          _ = Home_.lib_.brazen::CLI::Expression_Frames::Table::Actor
+          _ = Home_.lib_.brazen::CLI_Support::Table::Actor
 
           _x = _[
 

@@ -7,8 +7,8 @@ module Skylab::FileMetrics::TestSupport
       tcc.include Instance_Methods__
     end
 
-    Expectations = -> tcc do
-      Home_.lib_.brazen.test_support.lib( :CLI_expectations )[ tcc ]
+    Support_Expectations = -> tcc do
+      Home_.lib_.brazen.test_support.lib( :CLI_support_expectations )[ tcc ]
     end
 
     # <-

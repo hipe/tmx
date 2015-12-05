@@ -95,8 +95,8 @@ module Skylab::TestSupport
 
       # ~ test-path readers
 
-      def get_test_path_a  # #reach-down
-        @_plugins[ :run_recursive ].dependency_.get_any_test_path_a
+      def get_test_path_array  # #reach-down
+        @_plugins[ :run_recursive ].dependency_.get_any_test_path_array
       end
 
       def to_test_path_stream
@@ -323,7 +323,7 @@ module Skylab::TestSupport
 
         o = Here_::Sessions_::Execute.new(
 
-          @y, get_test_path_a, @_daemon.program_name_string_array_
+          @y, get_test_path_array, @_daemon.program_name_string_array_
 
         ) do | q |
 

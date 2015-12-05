@@ -51,7 +51,7 @@ module Skylab::TestSupport::TestSupport
       end
 
       def build_sout_serr_expectation_with * x_a, & p
-        bld_sout_serr_expectation_via_iambic x_a, & p
+        subject::Expectation.via_args x_a, & p
       end
     end
 

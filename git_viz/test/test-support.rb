@@ -32,8 +32,6 @@ module Skylab::GitViz::TestSupport
         end )[ self ]
       end
     end.call
-
-    define_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
   end
 
   module InstanceMethods
@@ -123,6 +121,11 @@ module Skylab::GitViz::TestSupport
     TestSupport_::Expect_line[ tcc ]
   end
 
+  Memoizer_Methods = -> tcc do
+
+    TestSupport_::Memoization_and_subject_sharing[ tcc ]
+  end
+
   Stubbed_filesystem = -> tcc do
 
     Home_.lib_.system_lib::Doubles::Stubbed_Filesystem.enhance_client_class tcc
@@ -157,7 +160,7 @@ module Skylab::GitViz::TestSupport
 
   CLI_lib_ = -> do
 
-    Home_.lib_.brazen.test_support.lib( :CLI_expectations )
+    Home_.lib_.brazen.test_support.lib :CLI_support_expectations
   end
 
   # ~ constant-ishes

@@ -402,7 +402,7 @@ module Skylab::CSS_Convert
 
   CLI.include Transitional___
 
-  class CLI::Expression_Agent < Brazen_::CLI::Expression_Agent
+  class CLI::Expression_Agent < Brazen_::CLI_Support::Expression_Agent
 
     # (this is a pedagogic example of taking the default expag from the
     # distribution and customizing it with in this case a specific color)
@@ -438,7 +438,7 @@ module Skylab::CSS_Convert
 
     STARTS_WITH_VOWEL_RX__ = /\A[aeiouy]/i
 
-    define_method :stylize, Brazen_::CLI::Styling::Stylize
+    define_method :stylize, Brazen_::CLI_Support::Styling::Stylize
   end
 
   # ~ visual tests, etc
@@ -468,11 +468,11 @@ module Skylab::CSS_Convert
     def color_test _test_o
 
       modifiers_a = [ nil, :strong, :reverse ]
-      styling = Brazen_::CLI::Styling
+      styling = Brazen_::CLI_Support::Styling
       stylify = styling::Stylify
       width = 50
 
-      _code_names = Brazen_::CLI::Styling.code_name_symbol_array
+      _code_names = Brazen_::CLI_Support::Styling.code_name_symbol_array
       _code_names.each do | c |
 
         3.times do | d |

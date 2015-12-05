@@ -143,7 +143,7 @@ module Skylab::Git
       Stylify__ = -> do
         p = nil
         -> s_a, s do
-          p ||= Home_.lib_.brazen::CLI::Styling::Stylify
+          p ||= Home_.lib_.brazen::CLI_Support::Styling::Stylify
           p[ s_a, s ]
         end
       end.call

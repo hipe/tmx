@@ -77,7 +77,7 @@ module Skylab::BNF2Treetop::TestSupport
     def out    ; _frame.out_p.call   end
 
     def unstyle x
-      CLI::TestLib__::Brazen[]::CLI::Styling.unstyle x
+      CLI::TestLib__::Brazen[]::CLI_Support::Styling.unstyle x
     end
   end
 

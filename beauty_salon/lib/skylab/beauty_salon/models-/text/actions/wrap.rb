@@ -53,7 +53,7 @@ module Skylab::BeautySalon
 
         :description, -> y do
 
-          prp = @categorized_properties.lookup :num_chars_wide
+          prp = action_reflection.front_properties.fetch :num_chars_wide
           prp.has_primitive_default or fail
           _x = prp.primitive_default_value
 

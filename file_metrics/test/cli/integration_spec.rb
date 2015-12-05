@@ -6,7 +6,7 @@ module Skylab::FileMetrics::TestSupport
 
     TS_[ self ]
     use :CLI
-    use :CLI_expectations
+    use :CLI_support_expectations
     use :CLI_classify_common_screen
 
     context "lc" do

@@ -117,7 +117,7 @@ module Skylab::Git::TestSupport
         +
       HERE
 
-      s = Home_.lib_.brazen::CLI::Styling::Unstyle_styled[ _act ]
+      s = Home_.lib_.brazen::CLI_Support::Styling::Unstyle_styled[ _act ]
       s or fail
       s.should eql _exp
     end

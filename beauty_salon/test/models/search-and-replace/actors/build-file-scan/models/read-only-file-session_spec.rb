@@ -45,7 +45,7 @@ module Skylab::BeautySalon::TestSupport
 
       last_match_line = last_match.to_line_stream.to_a.join EMPTY_S_
 
-      p = Home_.lib_.brazen::CLI::Styling::Parse_styles
+      p = Home_.lib_.brazen::CLI_Support::Styling::Parse_styles
 
       mid_sexp = p[ mid_match_line ]
       last_sexp = p[ last_match_line ]

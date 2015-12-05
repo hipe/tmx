@@ -87,8 +87,12 @@ module Skylab::BeautySalon::TestSupport
     Home_.lib_.brazen.test_support.lib( :Zerk_expect_interactive )[ tcc ]
   end
 
+  Memoizer_Methods = -> tcc do
+    TestSupport_::Memoization_and_subject_sharing[ tcc ]
+  end
+
   Modality_Integrations_CLI_Support = -> tcc do
-    Home_.lib_.brazen.test_support.lib( :CLI_expectations )[ tcc ]
+    Home_.lib_.brazen.test_support.lib( :CLI_support_expectations )[ tcc ]
   end
 
   # ~

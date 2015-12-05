@@ -113,10 +113,11 @@ module Skylab::Snag::TestSupport
 
     def flush_help_screen_to_tree  # COPY PASTE NASTY  # todo
 
-      _st = sout_serr_line_stream_for_contiguous_lines_on_stream :e
+      _state = flush_frozen_state_from_expect_stdout_stderr
 
-      Home_.lib_.brazen.test_support.lib( :CLI_expect_section ).
-        tree_via_line_stream_ _st
+      _ = Home_.lib_.brazen.test_support.lib :CLI_support_expect_section
+
+      _.tree_via :state, _state, :stream, :e
     end
 
     def o * x_a, & p  # legacy

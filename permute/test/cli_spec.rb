@@ -11,7 +11,7 @@ module Skylab::Permute::TestSupport
     it '0     no args - says expecting / usage / invite' do
 
       invoke
-      expect_generic_expecting_line
+      expect_expecting_action_line
       expect_usaged_and_invited
     end
 

@@ -18,7 +18,7 @@ module Skylab::TaskExamples
 
     include Home_.lib_.path_tools.instance_methods_module
 
-    define_method :stylize, Home_.lib_.brazen::CLI::Styling::Stylize
+    define_method :stylize, Home_.lib_.brazen::CLI_Support::Styling::Stylize
 
     def hi str ; stylize str, :strong, :green end
 

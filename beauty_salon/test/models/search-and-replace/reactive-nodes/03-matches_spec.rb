@@ -45,7 +45,7 @@ module Skylab::BeautySalon::TestSupport
       s = o.gets
       o.gets.should be_nil
 
-      haha = Home_.lib_.brazen::CLI::Styling.parse_styles s
+      haha = Home_.lib_.brazen::CLI_Support::Styling.parse_styles s
 
       haha.map( & :first ).should eql [ :string, :style, :string, :style, :string ]
     end

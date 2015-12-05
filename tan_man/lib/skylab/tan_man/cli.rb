@@ -66,8 +66,8 @@ module Skylab::TanMan
 
     class Expression_Agent
 
-      def initialize cp
-        @kernel = cp.adapter.application_kernel
+      def initialize action_reflection
+        @kernel = action_reflection.application_kernel
       end
 
       attr_writer :current_property
@@ -143,7 +143,7 @@ module Skylab::TanMan
           s = s.to_path
         end
         if DIR_SEP___ == s.getbyte( 0 )
-          Brazen_::CLI::Expression_Agent.pretty_path s
+          Brazen_::CLI_Support::Expression_Agent.pretty_path s
         else
           s
         end

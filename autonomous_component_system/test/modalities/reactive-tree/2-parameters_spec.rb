@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Autonomous_Component_System::TestSupport
 
-  describe "[br] ACS - modalities - reactive tree - 2. parameters" do
+  describe "[ac] modalities - reactive tree - 2. parameters" do
 
     extend TS_
     use :future_expect
