@@ -2,7 +2,7 @@ require_relative '../../../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] features - function - hack" do
+  describe "[bs] features - function - hack", wip: true do
 
     extend TS_
     use :models_search_and_replace

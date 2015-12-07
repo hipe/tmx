@@ -2,7 +2,7 @@ require_relative '../../../../../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] models - S & R - models - multi-line edit file session" do
+  describe "[bs] models - S & R - models - multi-line edit file session", wip: true do
 
     extend TS_
     use :models_search_and_replace_actors_build_file_scan_support

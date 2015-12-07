@@ -2,7 +2,7 @@ require_relative '../../../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] S & R - actors - build replace function" do
+  describe "[bs] S & R - actors - build replace function", wip: true do
 
     extend TS_
     use :models_search_and_replace_actors_build_replace_function_support

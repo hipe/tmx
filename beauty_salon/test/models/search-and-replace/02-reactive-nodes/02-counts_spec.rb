@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] S & R - reactive nodes - counts" do
+  describe "[bs] S & R - reactive nodes - counts", wip: true do
 
     extend TS_
     use :models_search_and_replace_reactive_nodes

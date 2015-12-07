@@ -25,6 +25,9 @@ module Skylab::Zerk  # intro in [#001] README
       #   `to_body_item_value_string_when_can_receive_focus` - false-ish means do not display
 
       def initialize x
+
+        self._NEVER
+
         @name ||= self.class.name_function
         @parent = x
         if x.is_interactive

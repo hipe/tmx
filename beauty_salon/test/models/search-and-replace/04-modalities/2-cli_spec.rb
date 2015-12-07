@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] search and replace - (interactive) CLI" do
+  describe "[bs] search and replace - (interactive) CLI", wip: true do
 
     extend TS_
     use :expect_interactive  # [ze]

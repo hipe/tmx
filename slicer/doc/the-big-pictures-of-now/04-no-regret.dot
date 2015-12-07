@@ -30,11 +30,9 @@ digraph g {
   dpn [label="`dir_pathname` -> `dir_path`"]
   sea [label="search-replace -\nfix that one bug"]
   sea->zerk
-  zerk [label="zerk - full rewrite\nto use ACS"]
-  zerk->futex
-  futex [label="integrate `future expect`\n(somehow)"]
-  futex->expect_event
-  expect_event [label="rewrite\nexpect event" style=filled fillcolor="#b5d5fb"]
+  zerk [label="zerk - full rewrite\nto use ACS" style=filled fillcolor="#b5d5fb" ]
+  zerk->expect_event
+  expect_event [label="rewrite\nexpect event" style=filled]
   expect_event -> tally
   tally [label="the \"tally\"\nvisualization" style=filled]
   tally -> rfm

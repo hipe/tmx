@@ -4,7 +4,7 @@ module Skylab::Zerk::TestSupport
 
   module Zerk_Namespace_1____  # <-
 
-  TS_.describe "[ze] zerk API" do
+  TS_.describe "[ze] zerk API", wip: true do
 
     TS_[ self ]
 
