@@ -264,16 +264,20 @@ module Skylab::Basic
 
           nb_t_rx = /\A[-A-Za-z0-9_]+\z/  # or w/e
 
-          same = -> arg_st, & oes_p do
+          same = -> arg_st, & oes_p_p do
 
-            if nb_t_rx =~ arg_st.current_token
+            x = arg_st.current_token
+
+            if nb_t_rx =~ x
 
               ACS_[]::Value_Wrapper[ arg_st.gets_one.to_sym ]
 
             else
 
-              oes_p.call :error, :expression, :is_not, :nonblank_token do | y |
-                y << "must be a valid nonblank token"
+              _oes_p = oes_p_p[ nil ]  # no entity
+
+              _oes_p.call :error, :expression, :is_not, :nonblank_token do | y |
+                y << "must be a valid nonblank token (had #{ ick x })"
               end
 
               UNABLE_

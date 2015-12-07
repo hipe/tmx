@@ -58,15 +58,19 @@ module Skylab::MyTerm
 
       def __add__primitivesque__ qkn  # assume effectively known
 
-        self._IMPLEMENT_ME_probably_easy_primitive_values
-        _add_prepared_value xxx, qkn
+        x = qkn.value_x
+        if ACS_[]::Interpretation::Looks_primitive[ x ]
+          _add_prepared_value x, qkn
+        else
+          self._COVER_ME_primitive_not_primitive
+        end
       end
 
       def _add_prepared_value x, qkn
 
-        _sym = qkn.association.internal_name_symbol_
+        _s = qkn.association.get_internal_name_string__
 
-        @_a.push "-#{ _sym.id2name }"  # ..
+        @_a.push "-#{ _s }"  # ..
         @_a.push "#{ x }"  # hypothetically there is no need to escape here
 
         ACHIEVED_

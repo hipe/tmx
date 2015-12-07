@@ -82,7 +82,8 @@ module Skylab::Brazen::TestSupport
     context "1.4)  one valid option-looking argument (help) - help screen" do
 
       shared_subject :state_ do
-        help_screen_oriented_state_from_invoke '-h'
+        invoke '-h'
+        flush_invocation_to_help_screen_oriented_state
       end
 
       it "succeeds" do
@@ -141,7 +142,8 @@ module Skylab::Brazen::TestSupport
     context "2.4x3) help with a good argument" do
 
       shared_subject :state_ do
-        help_screen_oriented_state_from_invoke '-h', 'ini'
+        invoke '-h', 'ini'
+        flush_invocation_to_help_screen_oriented_state
       end
 
       it "succeeds" do

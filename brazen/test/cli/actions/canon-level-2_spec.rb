@@ -34,7 +34,8 @@ module Skylab::Brazen::TestSupport
     context "1.4) (help screen) (normal style)" do
 
       shared_subject :state_ do
-        help_screen_oriented_state_from_invoke '-h'
+        invoke '-h'
+        flush_invocation_to_help_screen_oriented_state
       end
 
       it "succeeds" do
@@ -61,10 +62,13 @@ module Skylab::Brazen::TestSupport
     context "1.4) (help screen) (goofy style)" do
 
       shared_subject :state_ do
-        help_screen_oriented_state_from_invoke_using(
+
+        using_expect_stdout_stderr_invoke_via(
           :mutable_argv, [ '-h', 'workspace' ],
           :prefix, nil,
         )
+
+        flush_invocation_to_help_screen_oriented_state
       end
 
       it "succeeds" do

@@ -81,40 +81,73 @@ module Skylab::Plugin
       # -- support
 
       class Cool_Pool___
+
         def initialize y
           @back_a = [] ; @y = y ; nil
         end
-        def build_fuzzy_flag a
+
+        def build_fuzzy_flag__ a
           back = Fuzzy_Flag_Back__.new @back_a.length,  a
           @back_a[ back.identifier_index ] = back
           Fuzzy_Flag_Front__.new back, self
         end
-        def build_required_arg_switch x
-          Required_Arg_Switch__.new x
+
+        def build_required_arg_switch__ x
+          Required_Arg_Switch___.new x
         end
-        def any_first_idx_in_inp back, sig
-          match =
-            any_unresolved_match_from_matcher_at_idx back.identifier_index, sig
-          match and match.resolve
+
+        def build_optional_arg_switch__ x
+          Optional_Arg_Switch___.new x
         end
-        def any_unresolved_match_from_matcher_at_idx d, sig
+
+        def any_first_match_in_input__ back, sig
+
+          require 'byebug' ; byebug ; 1==1 and :chill
+
+          _with_match :build_matchdata, back, sig
+        end
+
+        def any_first_index_in_input__ back, sig
+
+          _with_match :resolve, back, sig
+        end
+
+        def _with_match m, back, sig
+
+          match = any_unresolved_match_from_matcher_at_idx_(
+            back.identifier_index, sig )
+
+          if match
+            match.send m
+          end
+        end
+
+        def any_unresolved_match_from_matcher_at_idx_ d, sig
+
           back = @back_a.fetch d ; rx_a = sig.fuzzified ; s_a = back.s_a
+
           formal_variant_s = nil
+
           any_idx = rx_a.index do |rx|
             rx or next
             formal_variant_s = s_a.detect( & rx.method( :=~ ) )
           end
-          any_idx and
+
+          if any_idx
             Unresolved_Match__.new self, back, sig, formal_variant_s, any_idx
+          end
         end
+
         def matcher_count
           @back_a.length
         end
+
         def ambiguous_unresolved_matches a
-          @y << say_ambiguous( a ) ; nil
+          @y << ___say_ambiguous( a )
+          NIL_
         end
-      private
-        def say_ambiguous a
+
+        def ___say_ambiguous a
           unr = a.first
           ambi_s = unr.sig.input[ unr.index_in_sig ]
           a_ = a.map do |unr_|
@@ -127,32 +160,41 @@ module Skylab::Plugin
       end
 
       class Unresolved_Match__
+
         def initialize pool, back, sig, formal_variant_s, index
           @back = back ; @d = index
           @formal_variant_s = formal_variant_s
           @pool = pool ; @provided_s = sig.input[ @d ] ; @sig = sig
         end
-        attr_reader :formal_variant_s, :sig
+
         def index_in_sig
           @d
         end
+
+        def build_matchdata
+          self._K
+        end
+
         def resolve
           if is_exact_match
             @d
           else
-            rslv_when_fuzzy
+            ___resolve_when_fuzzy
           end
         end
+
         def is_exact_match
           @formal_variant_s == @provided_s
         end
-      private
-        def rslv_when_fuzzy
+
+        def ___resolve_when_fuzzy
+
           idx_a = @pool.matcher_count.times.to_a
           idx_a[ @back.identifier_index ] = nil
           idx_a.compact!
+
           @otr_a = idx_a.reduce [] do |m, x|
-            match = @pool.any_unresolved_match_from_matcher_at_idx x, @sig
+            match = @pool.any_unresolved_match_from_matcher_at_idx_ x, @sig
             if match
               if match.is_exact_match
                 break
@@ -161,29 +203,41 @@ module Skylab::Plugin
               end
             end ; m
           end
+
           if @otr_a
             if @otr_a.length.zero? then @d else
-              when_ambiguous
+              ___when_ambiguous
             end
           end
         end
-        def when_ambiguous
+
+        def ___when_ambiguous
           @otr_a.unshift self
           @pool.ambiguous_unresolved_matches @otr_a
         end
-      public
+
         def matcher_moniker
           @back.back_moniker
         end
+
+        attr_reader(
+          :formal_variant_s,
+          :sig,
+        )
       end
+
       class Fuzzy_Flag_Front__
 
         def initialize back, pool
           @back = back ; @pool = pool ; nil
         end
 
+        def any_first_match_in_input sig
+          @pool.any_first_match_in_input__ @back, sig
+        end
+
         def any_first_index_in_input sig
-          @pool.any_first_idx_in_inp @back, sig
+          @pool.any_first_index_in_input__ @back, sig
         end
 
         def some_opts_moniker
@@ -192,45 +246,87 @@ module Skylab::Plugin
       end
 
       class Fuzzy_Flag_Back__
+
         def initialize identifier_index, a
           @identifier_index = identifier_index ; @s_a = a
         end
-        attr_reader :identifier_index, :s_a
+
         def back_moniker
           @s_a.last
         end
+
         def some_opts_mnkr
-          @some_opts_mnkr ||= bld_options_moniker
+          @some_opts_mnkr ||= ___build_options_moniker
         end
-      private
-        def bld_options_moniker
+
+        def ___build_options_moniker
           @s_a * '|'
         end
+
+        attr_reader(
+          :identifier_index,
+          :s_a,
+        )
       end
 
-      class Required_Arg_Switch__
+      class Switch__  # abstract base
+
         def initialize s
           @s = s
-          @rx = /\A#{ ::Regexp.escape s }=/
         end
 
-        attr_reader :s
+        def any_first_match_in_input sig
+
+          a = sig.input
+
+          a.length.times.reduce nil do |_, d|
+
+            md = @rx.match a.fetch d
+            if md
+              break My_Matchdata___[ md, d ]
+            end
+          end
+        end
+
+        My_Matchdata___ = ::Struct.new :matchdata, :index
 
         def any_first_index_in_input sig
+
           a = sig.input
+
           a.length.times.detect do |d|
             @rx =~ a.fetch( d )
           end
         end
 
         def any_several_indexes_in_input sig
+
           a = sig.input
+
           a.length.times.reduce nil do |m, d|
             if @rx =~ a.fetch( d )
               m ||= []
               m.push d
             end ; m
           end
+        end
+
+        attr_reader :s
+      end
+
+      class Required_Arg_Switch___ < Switch__
+
+        def initialize s
+          @rx = /\A#{ ::Regexp.escape s }=/
+          super
+        end
+      end
+
+      class Optional_Arg_Switch___ < Switch__
+
+        def initialize s
+          @rx = /\A#{ ::Regexp.escape s }(?:=(?<value>.*))?\z/
+          super
         end
       end
 

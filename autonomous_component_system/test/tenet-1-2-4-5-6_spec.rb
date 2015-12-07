@@ -66,8 +66,10 @@ module Skylab::Autonomous_Component_System::TestSupport
 
         class << self
 
-          def edit_entity * x_a, & x_p
-            ACS_[].create x_a, new, & x_p
+          def edit_entity * x_a, & oes_p
+            ACS_[].create x_a, new do | _ |
+              oes_p
+            end
           end
 
           private :new
@@ -77,16 +79,20 @@ module Skylab::Autonomous_Component_System::TestSupport
 
           yield :can, :set
 
-          -> st, & oes_p do
+          -> st, & oes_p_p do
 
             s = st.current_token
             if /\A[A-Z ]+\z/ =~ s
               st.advance_one
               ACS_[]::Value_Wrapper[ s ]
             else
-              oes_p.call :error, :expression do | y |
+
+              _oes_p = oes_p_p[ nil ]
+
+              _oes_p.call :error, :expression do | y |
                 y << "name must be in all caps"
               end
+
               false
             end
           end

@@ -101,14 +101,16 @@ module Skylab::Autonomous_Component_System
 
             # at this point we know it's true-ish and not a compound node:
 
-            if Looks_primitive__[ x ]
+            if ACS_::Interpretation::Looks_primitive[ x ]
 
               # if it's a primitive, store as-is
               store[ x ] ; redo
 
             else
               x_ = x.to_primitive_for_component_serialization
-              Looks_primitive__[ x_ ] or self._COVER_ME_wrong_shape
+              if ! ACS_::Interpretation::Looks_primitive[ x_ ]
+                self._COVER_ME_wrong_shape
+              end
               store[ x_ ] ; redo
             end
           end while nil
@@ -153,15 +155,6 @@ module Skylab::Autonomous_Component_System
         attr_reader(
           :downstream_IO,  # experimental..
         )
-
-        Looks_primitive__ = -> x do
-          case x
-          when ::TrueClass, ::Fixnum, ::Float, ::String  # [#]inout-C
-            true
-          else
-            false
-          end
-        end
       end
 
       NEWLINE_ = "\n"

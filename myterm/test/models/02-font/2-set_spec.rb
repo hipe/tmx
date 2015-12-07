@@ -9,23 +9,53 @@ module Skylab::MyTerm::TestSupport
 
     context "bad name (FRAGILE)" do
 
-      it "explains skipped font files (FRAGILE), does levenshtein!" do
+      it "fails" do
+        _state.result.should eql result_value_for_failed_
+      end
 
-        @subject_kernel_ = new_mutable_kernel_with_appearance_ appearance_JSON_one_
+      it "explains skipped font files (LIVE, FRAGILE)" do
 
-        future_expect :info, :skipped
+        past_expect_eventually :info, :expression, :skipped do | y |
 
-        future_expect :error, :extra_properties do | ev |
+          # (perhaps too detailed - probably fine to delete this block)
+
+          _s = y.fetch 0
+          term = '"(?:\.[a-zA-Z0-9]+|)"=>[0-9]+'
+          _rx = /\A\(skipped: \{#{ term }(?:, #{ term })*\}\)\z/
+
+          _s.should match _rx
+        end
+      end
+
+      it "does levenschtein! (\"did you mean ..?\")" do
+
+        past_expect_eventually :error, :extra_properties do | ev |
+
           _s = future_black_and_white ev
+
           _s.should match(
            %r(\Acouldn't set background font because #{
              }unrecognized font path 'NOTAFONT'//#{
               }did you mean '[^']+', '[^']+' or '[^']+'\?\z) )
         end
+      end
 
-        call_ :background_font, :set, :path, 'NOTAFONT'
+      def past_emissions
+        _state.emissions
+      end
 
-        expect_failed_
+      dangerous_memoize_ :_state do
+
+        _ke = new_mutable_kernel_with_appearance_ appearance_JSON_one_
+          # (the above string is frozen so this will stop you from writing)
+
+        @subject_kernel_ = _ke
+
+        state = begin_state_
+
+        call_ :background_font, :set, :path, 'NOTAFONT', & state.proc
+
+        state.finish
       end
     end
 

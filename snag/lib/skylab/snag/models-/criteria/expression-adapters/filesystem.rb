@@ -11,10 +11,13 @@ module Skylab::Snag
         end
       end  # >>
 
-      def initialize a, & x_p
+      def initialize a, & oes_p_p
 
         @col_x, @word_array, @ent, @tmpfile_sessioner, @FS = a
-        x_p and @on_event_selectively = x_p
+
+        if oes_p_p
+          @_oes_p_p = oes_p_p
+        end
 
         @dir_path = @col_x.directory_path
       end
@@ -82,7 +85,9 @@ module Skylab::Snag
         # it's otherwise bad design to have this look identitcal to a non-
         # saving criteria run. so we emit something here "manually":
 
-        @on_event_selectively.call :info, :added_entity do
+        _oes_p = @_oes_p_p[ self ]
+
+        _oes_p.call :info, :added_entity do
 
           _nf = @col_x.model_name
           _linked_list = Home_.lib_.basic::List::Linked[ nil, _nf ]

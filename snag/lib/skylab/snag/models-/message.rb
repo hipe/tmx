@@ -104,7 +104,9 @@ module Skylab::Snag
 
     public
 
-      def normalize_qualified_knownness qkn, & oes_p
+      def normalize_qualified_knownness qkn, & oes_p_p
+
+        oes_p = oes_p_p[ nil ]
 
         @p_a.each do | p |
 
@@ -144,7 +146,7 @@ module Skylab::Snag
             :error_category, :argument_error
 
           ) do | y, o |
-            y << instance_exec( & o.string_proc )
+            y << calculate( & o.string_proc )
           end
         end
         UNABLE_

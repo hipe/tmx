@@ -14,9 +14,11 @@ module Skylab::Snag
         ].intern
       end
 
-      def interpret_component arg_st, & x_p  # [#ac-002]#Tenet6
+      def interpret_component arg_st, & oes_p_p  # [#ac-002]#Tenet6
 
-        arg = Tag_::Actors_::Normalize_stem[ arg_st.gets_one, & x_p ]
+        _oes_p = oes_p_p[ nil ]
+
+        arg = Tag_::Actors_::Normalize_stem[ arg_st.gets_one, & _oes_p ]
         arg and begin
           new arg.value_x
         end

@@ -4,10 +4,14 @@ module Skylab::Autonomous_Component_System
 
     module Interpretation
 
-      Accept_component_change = -> new_component, asc, acs do  # [mt] ONLY
+      Accept_component_change = -> new_component, floating_qkn, acs do  # [mt] ONLY
 
         # guarantee storage of new component. result in proc that produces
         # event describing the change.
+
+        asc = floating_qkn.association ; floating_qkn = nil
+
+        # (disregard any "floating" value. we need to know if it was *stored*.)
 
         # make a note of any exisiting value before we replace it
 
@@ -65,13 +69,19 @@ module Skylab::Autonomous_Component_System
         end
       end
 
-      Build_empty_hot = -> asc, acs, & oes_p do
+      Build_empty_hot = -> asc, acs do
 
         # assume model is "entitesque" (not primitive-esque).
         # create a new empty component that is bound to the ACS.
         # new component is *NOT* stored as a member value in that ACS.
 
-        o = ACS_::Interpretation_::Build_value.new nil, asc, acs, & oes_p
+        block_given? and self._NO  # in practice no one ever wants to
+        # pass their own handler builder YET. but we can change this
+        # easily. for now it's always just:
+
+        _oes_p_p = CHB[ asc, acs ]
+
+        o = ACS_::Interpretation_::Build_value.new nil, asc, acs, & _oes_p_p
 
         o.mixed_argument = if o.looks_like_compound_component__
           IDENTITY_
@@ -82,37 +92,55 @@ module Skylab::Autonomous_Component_System
         o.execute.value_x  # ..
       end
 
-      Component_handler = -> asc, acs do
+      find_handler_method = nil
+      CHB = -> asc, acs do  # :[#-CHB]
 
-        # see [#006]:#how-components-are-bound-to-listeners (4 lines)
+        # "component handler builder" (experimental): pass component listener
+        # both the component value and association whenever it emits.
 
-        -> * i_a, & x_p do
+        -> cmp do  # :[#006]:codepoint-1
 
-          st = Callback_::Polymorphic_Stream.via_array i_a
+          -> * i_a, & x_p do
 
-          base = :"receive_component__"
-          begin
+            qkn = Callback_::Qualified_Knownness[ cmp, asc ]
 
-            try_m = :"#{ base }#{ st.current_token }__"
+            st = Callback_::Polymorphic_Stream.via_array i_a
 
-            if acs.respond_to? try_m
-              m = try_m
-              st.advance_one
-              if st.unparsed_exists
-                base = try_m
-                redo
-              end
+            m = find_handler_method[ st, acs ]
+
+            if m
+              _maybe_none = st.flush_remaining_to_array
+
+              acs.send m, qkn, * _maybe_none, & x_p
+            else
+
+              acs.receive_component_event qkn, i_a, & x_p
             end
-            break
-          end while nil
-
-          if m
-            _maybe_none = st.flush_remaining_to_array
-            acs.send m, asc, * _maybe_none, & x_p
-          else
-            acs.receive_component_event asc, i_a, & x_p
           end
         end
+      end
+
+      find_handler_method = -> st, acs do
+
+        # shift elements from the channel on to the method
+        # name as long as there is a matching method
+
+        base = :"receive_component__"
+        begin
+
+          try_m = :"#{ base }#{ st.current_token }__"
+
+          if acs.respond_to? try_m
+            m = try_m
+            st.advance_one
+            if st.unparsed_exists
+              base = try_m
+              redo
+            end
+          end
+          break
+        end while nil
+        m
       end
 
       class Value_Popper  # :+[#006]:VP
@@ -123,24 +151,32 @@ module Skylab::Autonomous_Component_System
         end  # >>
 
         def initialize x
-
+          @current_token = x
           @unparsed_exists = true
-          @_p = -> do
-            @unparsed_exists = false
-            remove_instance_variable :@_p
-            x
-          end
         end
 
         def gets_one
-          @_p[]
+          @unparsed_exists = true
+          remove_instance_variable :@current_token
         end
 
         def no_unparsed_exists
           ! @unparsed_exists
         end
 
-        attr_reader :unparsed_exists
+        attr_reader(
+          :current_token,
+          :unparsed_exists
+        )
+      end
+
+      Looks_primitive = -> x do  # `nil` is NOT primitive by this definition!
+        case x
+        when ::TrueClass, ::Fixnum, ::Float, ::Symbol, ::String  # [#003]inout-C
+          true
+        else
+          false
+        end
       end
 
       IDENTITY_ = -> x { x }

@@ -7,7 +7,33 @@ module Skylab::TestSupport
 
     module Test_Context_Instance_Methods
 
-      # -- shared state [#.A]
+      # -- freeze an invocation as a shared state [#.A]
+
+      def flush_invocation_to_help_screen_oriented_state  # current favorite
+
+        _state = flush_frozen_state_from_expect_stdout_stderr
+
+        help_screen_oriented_state_via_invocation_state _state
+      end
+
+      def help_screen_oriented_state_via_invocation_state state  # [y2]
+
+        _cls = _expect_section::Help_Screen_State
+
+        _cls.via :state, state, :stream, :e
+      end
+
+      def flush_invocation_to_help_screen_tree
+
+        _state = flush_frozen_state_from_expect_stdout_stderr
+
+        _expect_section.tree_via :state, _state, :stream, :e
+      end
+
+      x = nil
+      define_method :_expect_section do
+        x ||= Home_.lib_.brazen.test_support.lib :CLI_support_expect_section
+      end
 
       def flush_frozen_state_from_expect_stdout_stderr
 
@@ -33,7 +59,7 @@ module Skylab::TestSupport
 
       def using_expect_stdout_stderr_invoke_via_argv a  # might mutate arg
 
-        _init_invocation_and_invoke_using(
+        using_expect_stdout_stderr_invoke_via(
           :mutable_argv, a,
           :prefix, argv_prefix_for_expect_stdout_stderr,
         )
@@ -45,13 +71,13 @@ module Skylab::TestSupport
 
       def using_expect_stdout_stderr_invoke_with_no_prefix * argv
 
-        _init_invocation_and_invoke_using(
+        using_expect_stdout_stderr_invoke_via(
           :mutable_argv, argv,
           :prefix, nil,
         )
       end
 
-      def _init_invocation_and_invoke_using * x_a
+      def using_expect_stdout_stderr_invoke_via * x_a
         using_expect_stdout_stderr_invoke_via_iambic x_a
       end
 

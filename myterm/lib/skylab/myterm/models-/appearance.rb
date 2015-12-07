@@ -275,73 +275,222 @@ module Skylab::MyTerm
       :hot  # for now, un-s11n needs to know this [#ac-006]:#Event-models
     end
 
-    # ~ hook-out's for component change, mutation
+    def receive_component_event qkn, i_a, & ev_p  # mutates channel!
 
-    def receive_component__change__ asc, & x_p
+      # we do our own routing with more specific logic than [#ac-CHB]
 
-      # a 'change' means the component is telling any custodian to swap
-      # in the new component for the old (as a result of a UI action or
-      # similar). how it is handled is different based on etc:
+      if :info == i_a.first
 
-      send :"__receive__#{ asc.sub_category }__component_change", asc, & x_p
+        # our info's are never contextualized, so whatever else this
+        # emission has going on the mode client should can handle it
+
+        @_oes_p[ * i_a, & ev_p ]
+
+      else
+        _cx = ___mutate_channel_by_classifying i_a
+        __receive_classified_event _cx, qkn, i_a, & ev_p
+      end
     end
 
-    def __receive__visiting__component_change asc, & new_component
+    def ___mutate_channel_by_classifying i_a
 
-      asc._real_ACS.receive_component_change__ asc, & new_component
+      # what we're doing here is conceptually similar to [#ac-CHB], but
+      # whereas that one shifts elements from the channel on to the method
+      # name as long as there is a matching method, we shift elements from
+      # the channel into a tuple as long as elements have special meaning.
+
+      cat = i_a.shift
+
+      if :contextualized == i_a.first  # include this magic ..
+        i_a.shift
+        ctx = true
+      end
+
+      if :expression == i_a.first
+        i_a.shift
+        exp = true
+      end
+
+      if :is_not == i_a.first
+        i_a.shift
+        isn = true
+      end
+
+      Event_Classifications___[ cat, ctx, exp, isn ]
     end
 
-    def __receive__common__component_change asc, & new_component
+    Event_Classifications___ = ::Struct.new(
+      :event_category,  # X
+      :is_contextualized,  # X
+      :is_expression,  # X
+      :is_is_not,  # X
+    )
 
-      # one of our own component values has changed. swap in the new value
+    def __receive_classified_event o, qkn, i_a, & x_p
 
-      _new_component = new_component[]
+      # scope soup while we figure out what we want ..
+
+      hu = ACS_[]::Modalities::Human
+
+      is_contextualized = o.is_contextualized
+      can_add_subject = true
+
+      case o.event_category
+      when :mutation
+
+        # if a node mutated (which is to say "in-place"), then *it* changed
+        # (not us), and *it* should have built the potential event already..
+
+        can_add_subject = false
+
+      when :change
+        can_add_subject = false  # awful -  see #note-2 below
+        is_contextualized = true
+
+        ll = ___accept_change qkn, & x_p
+      end
+
+      if is_contextualized
+
+        ll ||= x_p[]
+        x_p = nil
+        if can_add_subject && ll.next.next.nil?  # see #note-1 below
+          ll = Linked_list_[][ ll, qkn.name ]
+        end
+
+        tc = hu::Traverse_context[ ll ]
+        stack = tc.stack
+        x_p = tc.end_value  # LOOK
+      end
+
+      if o.is_is_not
+
+        if ! o.is_expression
+          self._COVER_ME
+        end
+
+        ev = hu::Event_via_is_not[ * i_a, & x_p ]
+
+      elsif o.is_expression
+
+        # e.g system call errorr
+
+        if is_contextualized
+
+          ev = hu::Event_via_expression[ * i_a, o.event_category, & x_p ]
+
+        else
+          self._COVER_ME_expressions_must_be_contextualized_at_this_point
+        end
+      else
+        ev = x_p[]
+      end
+
+      if stack
+        ev = hu::Map_event_against_stack[ ev, stack ]
+      end
+
+      send :"__receive__#{ o.event_category }__", qkn, * i_a, ev
+    end
+
+    def ___accept_change qkn, & x_p
+
+      _new_component = x_p[]
 
       _ev_p = ACS_[]::Interpretation::Accept_component_change[
-        _new_component, asc, self ]
+        _new_component, qkn, self ]
 
-      _emit_and_persist _ev_p[]
+      o = Linked_list_[]
+      _end = o[ nil, _ev_p ]
+      o[ _end, qkn.name ]
     end
 
-    def receive_component__event_and_mutated__ asc, & event_and_mutated_p
+    def __receive__error__ qkn, desc_sym, ev
 
-      # this is called when an immediate compound component signals that
-      # it has mutated in-place..
-
-      ev_p, cmp = event_and_mutated_p.call
-
-      ___store_possibly_floating_component cmp, asc
-
-      _context = ev_p[]
-
-      _event = ACS_[]::Modalities::Human::Event_via_context[ _context ]
-
-      _emit_and_persist _event
-    end
-
-    def ___store_possibly_floating_component cmp, asc
-
-      # setting the ivar where it was not set before makes it serializable
-
-      ivar = asc.name.as_ivar
-      x = instance_variable_get ivar  # assume is set *for now*
-      if x
-        x.object_id == cmp.object_id or self._SANITY
-      else
-        instance_variable_set ivar, cmp
-        _gulp_ivar =
-          :"@_read_only__#{ asc.name.as_lowercase_with_underscores_symbol }__"
-        x = remove_instance_variable _gulp_ivar
-        x.object_id == cmp.object_id or self._SANITY
+      @_oes_p.call :error, desc_sym do
+        ev
       end
-      NIL_
+
+      UNABLE_
     end
 
-    def _emit_and_persist ev
+    # :#note-1 - do we add the association name of the immediate component
+    # to the context stack? IFF this signal came from somewhere under the
+    # "adapters" node we don't want to add the name "adapters" to the context
+    # (nor is that node supposed to have added the name of the particular
+    # adapter to the stack, but that's none of our business here!).
+    # but the adapters node is the only one that gets this special treatment.
+    # otherwise, we *must* add the association name of the immediate
+    # component to the context, or some verbs won't have their subjects.
+    # the way we test for this is a shotgun hack: simply look to see if the
+    # list is deeper than some threshold. this approach won't "scale".
+
+    # :#note-2 - awful - in some cases the event intrinsically expresses
+    # the verb
+
+    def __receive__mutation__ qkn, ev
+
+      # whereas "change" means "definitely swap this new value in",
+      # a "mutation" is at present a bit more involved:
+
+      # a "floating" component is one that is not yet stored as a member
+      # (in this case an ivar). if the component that mutated is floating,
+      # we want to un-float it (that is, store it) because that is how
+      # serialization decides what to serialize.
 
       @_oes_p.call( * ev.suggested_event_channel ) do
         ev
       end
+
+      __shuffle_ivars_because_mutation qkn
+
+      _persist
+    end
+
+    def __receive__change__ _qkn, ev
+
+      # we have already accepted the component.
+
+      @_oes_p.call( * ev.suggested_event_channel ) do
+        ev
+      end
+
+      _persist
+    end
+
+    def __shuffle_ivars_because_mutation qkn  # ..
+
+      new_x = qkn.value_x
+
+      nf = qkn.name
+      ivar = nf.as_ivar
+
+      existing_x = instance_variable_get ivar
+
+      existing_must_be_same_as_new = -> do
+        if existing_x.object_id != new_x.object_id
+          self._SANITY_is_not_mutation
+        end
+      end
+
+      if existing_x.nil?
+
+        _ = nf.as_lowercase_with_underscores_symbol
+        _rd_only_ivar = :"@_read_only__#{ _ }__"
+        existing_x = remove_instance_variable _rd_only_ivar
+        existing_must_be_same_as_new[]
+        instance_variable_set ivar, existing_x
+      else
+        existing_must_be_same_as_new[]
+      end
+      NIL_
+    end
+
+    #   ev.prefixed_conjunctive_phrase_context_stack.length
+
+    def _persist
+
+      # ~ serious business
 
       o = ACS_[]::Modalities::JSON::Express.new( & @_oes_p )
 
@@ -349,56 +498,9 @@ module Skylab::MyTerm
 
       o.upstream_ACS = self
 
-      o.execute  # result is result
-    end
+      _ok = o.execute  # result is result
 
-    # ~ error and info
-
-    def receive_component__error__ asc, desc_sym, & linked_list_p
-
-      # tricky -
-
-      if asc.model_classifications.looks_entitesque
-
-        # assume that if the immediate component of origin is "entitesque"
-        # than it is model-controller-like and we must add one element.
-
-        _LL = linked_list_p[]
-        _linked_list = Add_context_[ asc.name, _LL ]
-
-      else
-
-        # otherwise (and this is from perhaps an adpater, but whatever)
-        # assume that it is already contextualized to the desired amount.
-
-        _linked_list = linked_list_p[]
-      end
-
-      # convert the linked list back into a plain event for the final
-      # (top) emission (for now fail early)
-
-      _ev = ACS_[]::Modalities::Human::Event_via_context[ _linked_list ]
-
-      @_oes_p.call :error, desc_sym do
-        _ev
-      end
-
-      UNABLE_  # (perhaps not important)
-    end
-
-    def receive_component__info__expression__ _asc, desc_sym, & y_p
-
-      @_oes_p.call :info, :expression, desc_sym, & y_p
-    end
-
-    def receive_component__info__ _asc, desc_sym, & ev_p
-
-      # info's are expected to come from adapters already contextualized
-
-      @_oes_p.call :info, desc_sym do
-
-        ev_p[] # (hi.)
-      end
+      _ok
     end
 
     # -- Project hook-outs
@@ -458,5 +560,6 @@ module Skylab::MyTerm
     end
 
     Here_ = self
+    UNDER__ = "__"
   end
 end

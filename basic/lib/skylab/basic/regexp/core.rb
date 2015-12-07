@@ -176,10 +176,9 @@ module Skylab::Basic
             if @matcher =~ x
               ACS_[]::Value_Wrapper[ x ]
             else
-              @on_failure_to_match[ :_reserved_, & x_p ]
+              _failed( & x_p )
             end
           end
-
           NIL_
         end
 
@@ -194,10 +193,15 @@ module Skylab::Basic
               _x = @mapper[ * md.captures ]
               ACS_[]::Value_Wrapper[ _x ]
             else
-              @on_failure_to_match[ :_reserved_, & x_p ]
+              _failed( & x_p )
             end
           end
           NIL_
+        end
+
+        def _failed & oes_p_p
+          _oes_p = oes_p_p[ nil ]
+          @on_failure_to_match[ :_reserved_, & _oes_p ]
         end
 
         def [] arg_st, & x_p

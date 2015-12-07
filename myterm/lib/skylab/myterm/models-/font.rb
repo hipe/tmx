@@ -6,12 +6,12 @@ module Skylab::MyTerm
 
     class << self
 
-      def interpret_component st, acs, & oes_p
+      def interpret_component st, acs, & x_p
 
         if st.no_unparsed_exists
-          new nil, acs, & oes_p
+          new nil, acs, & x_p
         else
-          new( st.gets_one, acs, & oes_p ).__normalize
+          new( st.gets_one, acs, & x_p ).__normalize
         end
       end
 
@@ -25,15 +25,17 @@ module Skylab::MyTerm
 
     # -- Initializers
 
-    def initialize x, ke_source, & oes_p
+    def initialize x, ke_source, & oes_p_p
 
       @_do_express_skipped = true  # eew - avoid repetition here
 
       @kernel_ = ke_source.kernel_
 
-      @_oes_p = oes_p
+      @_oes_p_p = oes_p_p
 
       @path = x  # any
+
+      @_oes_p = oes_p_p[ self ]
     end
 
     # ~ (experimental flyweightism)
@@ -91,7 +93,7 @@ module Skylab::MyTerm
 
       if path_
 
-        _new_self = self.class.new_entity path_, self, & @_oes_p
+        _new_self = self.class.new_entity path_, self, & @_oes_p_p
 
         @_oes_p.call :change do
           _new_self
@@ -112,15 +114,23 @@ module Skylab::MyTerm
       end
     end
 
+    Emit_by_adding_verb_ = -> oes_p, ev_p, action_sym, i_a do
+
+      o = Linked_list_[]
+
+      _end = o[ nil, ev_p ]
+      _LL = o[ _end, action_sym ]
+
+      oes_p.call i_a.fetch( 0 ), :contextualized, * i_a[ 1 .. -1 ] do
+        _LL
+      end
+    end
+
     def _lookup action_sym, path
 
       _oes_p = -> * i_a, & ev_p do
 
-        _context = Begin_context_[ action_sym, ev_p[] ]
-
-        @_oes_p.call( * i_a ) do
-          _context
-        end
+        Emit_by_adding_verb_[ @_oes_p, ev_p, action_sym, i_a ]
       end
 
       o = Brazen_::Collection::Common_fuzzy_retrieve.new( & _oes_p )

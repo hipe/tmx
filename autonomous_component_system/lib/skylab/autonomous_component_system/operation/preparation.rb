@@ -65,8 +65,7 @@ module Skylab::Autonomous_Component_System
         end
 
         def __init_next_ACS
-
-          _cmp = ACS_::For_Interface::Read_or_write[ @association, @ACS, & @oes_p ]
+          _cmp = ACS_::For_Interface::Read_or_write[ @association, @ACS, & @oes_p_p_ ]
           @ACS = _cmp
           NIL_
         end

@@ -46,9 +46,11 @@ module Skylab::Snag
 
         # ~ for [#ac-002] the ACS (compliments same in parent class)
 
-        def __add__component bx, node, ca, & oes_p
+        def __add__component bx, node, ca, & oes_p_p
 
-          persist_entity bx, node, & oes_p
+          _oes_p = oes_p_p[ node ]  # transition from hot to cold
+
+          persist_entity bx, node, & _oes_p
         end
 
         def result_for_component_mutation_session_when_changed log, &__
@@ -99,7 +101,7 @@ module Skylab::Snag
 
         def entity_via_intrinsic_key node_id_x, & oes_p
 
-          id = Home_::Models_::Node_Identifier.new_via_user_value(
+          id = Home_::Models_::Node_Identifier.new_via_user_value_(
             node_id_x, & oes_p )
 
           id and entity_via_identifier_object id, & oes_p

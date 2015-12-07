@@ -2,12 +2,16 @@
 
 ## statement of scope and purpose of this document
 
+(EDIT: this document is now subsumed by [#001]).
+
 there is a variety of callback patterns (at least four) that we want our
 "callback tree" to support. the document hopes to survey them one by one and
 with each pattern: explain its behavior, present potential applications for it
 (when interesting), and finally to highlight the differences among the
 patterns as a means of speculating the feasibility of integrating them into
 one tree.
+
+
 
 
 ## the callback tree structure and story in general
@@ -76,6 +80,7 @@ occurs once during the lifecycle of the host object; we are not sure which.
 
 
 
+
 ## #the-different-callback-patterns-in-brief
 
 currently we employ the below "several" patterns for accepting callbacks and
@@ -112,7 +117,6 @@ the five patterns are "callback", "listeners", "handler", "shorters",
 
 
 
-
 ## the feature matrix
 
                     multiple?   inherits?   result matters?
@@ -120,6 +124,8 @@ callback pattern           no          no              yes
 listeners pattern         yes         yes               no
 handlers pattern           no         yes              yes
 shorters pattern          yes          no              yes
+
+
 
 
 ## :#the-callback-pattern in detail :[#040]
@@ -143,6 +149,7 @@ shorters pattern          yes          no              yes
 
 
 
+
 ## :#the-listeners-pattern in detail
 
 • this is the second simplest of the patterns, next to "callback"
@@ -159,6 +166,7 @@ shorters pattern          yes          no              yes
 
 • results of callbacks are ignored. they never have an impact on the behavior
   of the host (or the callback tree).
+
 
 
 
@@ -215,6 +223,7 @@ shorters pattern          yes          no              yes
 
 
 
+
 ## :#the-shorters-pattern in detail
 
 • this is something like a broadening of the "handler" pattern: it adds power
@@ -239,6 +248,8 @@ shorters pattern          yes          no              yes
 • we take a discrete view of channels here: we do not deal with ascending
   up the "ancestor chain" of parent nodes in the tree, because that would
   make things confusing and weird.
+
+
 
 
 ## issues in integrating all of them into one tree (:#storypoint-200)
@@ -268,6 +279,7 @@ agents depending on how you call them and what you do with the result.
 
 if this ever becomes an issue we will add an extra type-check somewhere
 but for now in the spirit of experimentation this is left as-is.
+
 
 
 

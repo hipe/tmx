@@ -776,6 +776,8 @@ module Skylab::Callback
         new x, true, asc
       end
 
+      alias_method :[], :via_value_and_association  # use IFF it's clear
+
       alias_method :via_value_and_had_and_association, :new
       private :new
     end  # >>
@@ -2041,14 +2043,14 @@ module Skylab::Callback
 
     module Methods__
 
-      def autoloaderize_child_node x
+      def autoloaderize_child_node x  # 1x
 
         Autoloader_.call x do | sess |
           sess._presumably_autoloaderized_parent_module = self
         end
       end
 
-      def using_file_entry_string_autoloaderize_child_node s, x
+      def using_file_entry_string_autoloaderize_child_node s, x  # 1x
 
         Autoloader_.call x do | sess |
           sess._presumably_autoloaderized_parent_module = self

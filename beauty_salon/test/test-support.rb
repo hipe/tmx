@@ -84,7 +84,7 @@ module Skylab::BeautySalon::TestSupport
   end
 
   Expect_Interactive = -> tcc do
-    Home_.lib_.brazen.test_support.lib( :Zerk_expect_interactive )[ tcc ]
+    Home_.lib_.brazen.test_support.lib( :zerk_expect_interactive )[ tcc ]
   end
 
   Memoizer_Methods = -> tcc do

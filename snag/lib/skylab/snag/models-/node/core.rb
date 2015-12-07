@@ -21,14 +21,14 @@ module Skylab::Snag
 
       # (tenets in [#ac-002])
 
-      def interpret_component st, & x_p  # #Tenet5..
+      def interpret_component st, & o_p_p  # #Tenet5..
 
-        ACS_[].interpret st, new, & x_p
+        ACS_[].interpret st, new, & o_p_p
       end
 
-      def edit_entity * x_a, & x_p  # #Tenet2
+      def edit_entity * x_a, & o_p_p  # #Tenet2
 
-        ACS_[].create x_a, new, & x_p
+        ACS_[].create x_a, new, & o_p_p
       end
 
       def collection_module_for_criteria_resolution
@@ -115,9 +115,15 @@ module Skylab::Snag
       edit :remove, :tag, symbol, & oes_p
     end
 
-    def edit * x_a, & x_p
+    def edit * x_a, & oes_p
 
-      ACS_[].edit x_a, self, & x_p
+      # this is a boundary between cold and hot [#ac-006]
+
+      _oes_p_p = -> _ do
+        oes_p
+      end
+
+      ACS_[].edit x_a, self, & _oes_p_p
     end
 
     # -- Components
@@ -189,7 +195,7 @@ module Skylab::Snag
       if existing
         ACHIEVED_
       else
-        ACS_[].component_not_found tag, ca, self, & oes_p
+        ACS_[].send_component_not_found tag, ca, self, & oes_p
       end
     end
 
@@ -197,7 +203,7 @@ module Skylab::Snag
 
       existing = first_equivalent_item tag
       if existing
-        ACS_[].component_already_added tag, ca, self, & oes_p
+        ACS_[].send_component_already_added tag, ca, self, & oes_p
       else
         ACHIEVED_
       end
@@ -213,27 +219,30 @@ module Skylab::Snag
 
     ## ~~ implementation of operations
 
-    def __set__component x, ca, & oes_p
+    def __set__component x, ca, & oes_p_p
 
       instance_variable_set ca.name.as_ivar, x
       x || self._COVER_ME  # as soon as you have valid false-ishes, things change
     end
 
-    def __prepend__component x, ca, & oes_p
+    def __prepend__component x, ca, & oes_p_p
 
-      _mutable_body_for_mutation_session.prepend_component_ x, ca, & oes_p
+      _mutable_body_for_mutation_session.prepend_component_ x, ca, & oes_p_p
     end
 
-    def __append__component x, ca, & oes_p
+    def __append__component x, ca, & oes_p_p
 
-      _mutable_body_for_mutation_session.append_component_ x, ca, & oes_p
+      _mutable_body_for_mutation_session.append_component_ x, ca, & oes_p_p
     end
 
-    def __remove__component x, ca, & oes_p
+    def __remove__component x, ca, & oes_p_p
 
-      o = _mutable_body_for_mutation_session.remove_component_ x, ca, & oes_p
+      o = _mutable_body_for_mutation_session.remove_component_ x, ca, & oes_p_p
       if o
-        ACS_[].component_removed o, ca, self, & oes_p
+
+        _oes_p = oes_p_p[ self ]
+
+        ACS_[].send_component_removed o, ca, self, & _oes_p
       end
       o
     end
@@ -498,8 +507,8 @@ module Skylab::Snag
 
       class << self
 
-        def interpret_component arg_st, & x_p
-          Interpret_mixed_message___[ arg_st, & x_p ]
+        def interpret_component arg_st, & oes_p_p
+          Interpret_mixed_message___[ arg_st, & oes_p_p ]
         end
       end  # >>
     end
@@ -530,11 +539,13 @@ module Skylab::Snag
       end
     end
 
-    Normalize_ID_ = -> qkn, & x_p do
+    Normalize_ID_ = -> qkn, & oes_p do  # 1x. eventing is per [br] API
 
       x = ( qkn.value_x if qkn.is_known_known )
       if x
-        o = Home_::Models_::Node_Identifier.new_via_user_value x, & x_p
+
+        o = Home_::Models_::Node_Identifier.new_via_user_value_ x, & oes_p  # yes
+
         if o
           Callback_::Known_Known[ o ]
         else

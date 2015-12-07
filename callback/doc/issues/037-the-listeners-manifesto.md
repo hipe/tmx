@@ -2,8 +2,7 @@
 
 ## objective & scope
 
-
-## introduction
+(EDIT: use [#001] the selective listener pattern instead.. )
 
 with an ear planted firmly on [#033] the callback tree etc, we
 endeavor to produce a listener solution within these design contraints:

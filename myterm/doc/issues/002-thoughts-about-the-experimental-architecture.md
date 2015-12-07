@@ -18,7 +18,6 @@ what the selected adapter is.
 
 
 
-
 ## key points about adapters
 
   • in order to get this application to produce an image through some
@@ -29,12 +28,14 @@ what the selected adapter is.
   • we use this "adapter pattern" so that our application code is not
     tightly coupled to our backend choices.
 
-  • as an implementation an adapter is simply an object that must
-    respond to a certain set of messages.
-
   • there will only ever be zero or one active adapter at a time. we
     may refer to the active adapter (if any) as being "selected". to say
     "selected" is the same thing as saying it is active.
+
+  • an adapter is effectively a list of components that get injected
+    into the application. the adapter then attempts to build and set
+    the background image whenever all the data changes and all the
+    required components are present (see [#004]).
 
 
 
@@ -61,4 +62,6 @@ here we have a dedicated "model node" (experimentally) *as* a sort of
 singleton that wraps low-level access to system-related things, like
 what fonts as installed and what paths to use for files for persistence.
 this is very hacked and non-configurable for now.
+
+(later this choice would prove fruitful for some stubbing during tests.)
 _

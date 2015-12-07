@@ -11,7 +11,7 @@ module Skylab::Autonomous_Component_System
         Parse_context___[ x ].event
       end
 
-      Event_via_is_not = -> desc_sym, & y_p do
+      Event_via_is_not = -> desc_sym, & y_p do  # [mt] 1x only
 
         _ev = Callback_::Event.inline_with(
 
@@ -59,44 +59,67 @@ module Skylab::Autonomous_Component_System
         _ev
       end
 
-      Event_via_expression = -> asc, desc_sym, & y_p do
+      Event_via_expression = -> desc_sym, event_category, & x_p do
+
+        _ok = :error == event_category ? false : nil
 
         _ev = Callback_::Event.inline_with(
+
           desc_sym,
-          :ok, nil,
+          :description_proc, x_p,
+          :prefixed_conjunctive_phrase_context_proc, nil,
+          :prefixed_conjunctive_phrase_context_stack, nil,
+          # there is NO `invite_to_action` here - we don't know what action
+          :ok, _ok,
+
         ) do | y, o |
-          calculate y, & y_p
+
+          p = -> line do  # with any first line:
+
+            s_a = calculate [], o, & o.prefixed_conjunctive_phrase_context_proc
+            s_a.push line
+            y << s_a.join( SPACE_ )
+
+            p = -> line_ do  # with any subsequent line:
+              y << line_
+            end
+            y
+          end
+
+          _y = ::Enumerator::Yielder.new do | line |
+            p[ line ]
+          end
+
+          calculate _y, & o.description_proc
         end
+
         _ev
       end
 
       # -- Support
 
-      class Parse_context___
+      class Traverse_context
 
-        # take a linked list of the form NAME [ NAME [..]] EVENT and result
-        # in a dup of the event that expresses the name chain somehow..
+        # traverse a linked list of the form NAME [ NAME [..]] VALUE
+        # to build a tuple of the form (( array of NAME ), ( VALUE )).
+        # let this be the one place where we upgrade symbols to names.
 
-        class << self
+        class << self  # Procesque_Monadic
           def _call x
-            new( x ).execute
+            new( x ).__execute
           end
           alias_method :[], :_call
           alias_method :call, :_call
+          private :new
         end  # >>
 
         def initialize linked_list
-          @linked_list = linked_list
+          @_linked_list = linked_list
         end
 
-        def execute
-          ___init_stack_and_event
-          __map_event
-        end
+        def __execute
 
-        def ___init_stack_and_event
-
-          _LL = remove_instance_variable :@linked_list
+          _LL = remove_instance_variable :@_linked_list
           st = _LL.to_element_stream_assuming_nonsparse
 
           stack = []
@@ -119,33 +142,42 @@ module Skylab::Autonomous_Component_System
             redo
           end while nil
 
-          @_event = curr
-          @stack = stack ; nil
-        end
-
-        def __map_event
-
-          # we are exploring the benefits & disadvantanges of these
-          # different ways of expressing context ..
-
-          ev = remove_instance_variable :@_event
-
-          _ev_ = if ev.has_member :prefixed_conjunctive_phrase_context_proc
-            Map_event_by_prefixing_conjunctive_phrase___[ @stack, ev ]
-          else
-            Map_event_by_that_one_member___[ @stack, ev ]
-          end
-
-          @event = _ev_
-
+          @end_value = curr
+          @stack = stack
           freeze
         end
 
-        attr_reader(
-          :event,
-          :stack,
-        )
+        attr_reader( :end_value, :stack )
       end
+
+      module Map_event_against_stack ; class << self  # [mt]1x
+
+        # we are exploring the benefits & disadvantanges of these
+        # different ways of expressing context ..
+
+        def _call ev, stack
+
+          if ev.has_member A__
+            Map_event_by_prefixing_conjunctive_phrase___[ stack, ev ]
+
+          elsif ev.has_member B__
+            Map_event_by_that_one_member___[ stack, ev ]
+
+          else
+            raise ___say_etc( ev )
+          end
+        end
+
+        def ___say_etc ev
+          "must have member `#{ A__ }` or `#{ B__ }` - #{ ev.class }"
+        end
+
+        alias_method :[], :_call ; alias_method :call, :_call
+
+      end ; end
+
+      A__ = :prefixed_conjunctive_phrase_context_proc
+      B__ = :context_as_linked_list_of_names
 
       Map_event_by_prefixing_conjunctive_phrase___ = -> stack, ev do
 
@@ -163,11 +195,11 @@ module Skylab::Autonomous_Component_System
         end
 
         these = [
-          :prefixed_conjunctive_phrase_context_proc, _p,
+          A__, _p,
           :prefixed_conjunctive_phrase_context_stack, stack,
         ]
 
-        if false == ev.ok
+        if false == ev.ok and ev.has_member :invite_to_action
           _sym_a = stack.map( & :as_lowercase_with_underscores_symbol )
           these.push :invite_to_action, _sym_a
         end
@@ -181,12 +213,12 @@ module Skylab::Autonomous_Component_System
 
         _new_LL = Home_.lib_.basic::List.linked_list_via_array stack
 
-        ev.new_with :context_as_linked_list_of_names, _new_LL
+        ev.new_with B__, _new_LL
       end
 
       Write_contextual_prefix_into__ = -> phrases, expag, stack, ok_ness do
 
-        # (redunds with [#002]:GEC)
+        # (:[#007]. redunds with [#br-002]:GEC (see).)
 
         s_a = stack.map do | nf |
           nf.as_human

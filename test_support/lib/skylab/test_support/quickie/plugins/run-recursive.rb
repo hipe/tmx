@@ -26,7 +26,7 @@ module Skylab::TestSupport
 
       def desc y
         y << "looks for test files recursively"
-        y << "in the indicated path(s)" ; nil
+        y << "in the indicated path(s)"
       end
 
       def prepare sig

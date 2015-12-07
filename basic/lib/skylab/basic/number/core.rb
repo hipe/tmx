@@ -4,6 +4,11 @@ module Skylab::Basic
 
     class << self
 
+      def component_model_for sym
+        Require_component_support___[]
+        Component_Models.const_get sym, false
+      end
+
       def normalization
         Number_::Normalization__
       end
@@ -37,6 +42,22 @@ module Skylab::Basic
       def inflect_words_into_against_noun_phrase y, np
         y << "#{ @_x }"  # etc
       end
+    end
+
+    Require_component_support___ = Callback_.memoize do
+
+      module Component_Models
+
+        _positive_integer = Number_.normalization.new_with(
+
+          :minimum, 1,
+          :number_set, :integer,
+        )
+
+        POSITIVE_INTEGER = ACS_[]::Model::Via_normalization[ _positive_integer ]
+      end
+
+      NIL_
     end
 
     Number_ = self

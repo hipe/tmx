@@ -3,12 +3,19 @@ module Skylab::Basic
   module Number
 
     Uninterpretable = Callback_::Event.prototype_with(
+
         :___terminal_channel_is_in_an_ivar___,  # sanity
         :x, nil,
         :prop, nil,
         :number_set, nil,
+
+        :prefixed_conjunctive_phrase_context_proc, nil,
+        :prefixed_conjunctive_phrase_context_stack, nil,
+        :invite_to_action, nil,
         :error_category, :argument_error,
-        :ok, false ) do | y, o |
+        :ok, false
+
+    ) do | y, o |
 
       o.express_all_units_into_under y, self
     end
@@ -103,7 +110,7 @@ module Skylab::Basic
         o = self
         expag.calculate do
 
-          s = o._ns
+          s = o._number_set
           _ = if s
             "a non-negative#{ s }"
           else
@@ -114,28 +121,54 @@ module Skylab::Basic
       end
 
       def __express_minimum y, expag
+
+        s_a = _begin_sentence_under expag
         o = self
         expag.calculate do
 
-          y << "#{ par o.prop || 'number' } must be#{ o._ns }#{
+          s_a << "must be#{ o._number_set }#{
            } greater than or equal to #{
             }#{ val o.minimum }, had #{ ick o.x }"
+
+          y << s_a.join( SPACE_ )
         end
       end
 
       def __express_set y, expag
 
+        s_a = _begin_sentence_under expag
         o = self
         lemma = ( @number_set || :number ).id2name
 
         expag.calculate do
 
-          y << "#{ par o.prop } must be#{
-           } #{ indefinite_noun lemma }, had #{ ick o.x }"
+          s_a << "must be#{
+           } #{ indefinite_noun lemma }, #{
+            }had #{ ick o.x }"
+
+          y << s_a.join( SPACE_ )
         end
       end
 
-      def _ns
+      def _begin_sentence_under expag
+
+        s_a = []
+        p = @prefixed_conjunctive_phrase_context_proc
+        if p
+          _stack_a = @prefixed_conjunctive_phrase_context_stack
+          expag.calculate s_a, self, & p
+          s_a.push 'it'
+        else
+          me = self
+          s = expag.calculate do
+            par me.prop
+          end
+          s_a.push s || 'number'
+        end
+        s_a
+      end
+
+      def _number_set
 
         sym = @number_set
         if sym

@@ -61,6 +61,12 @@ module Skylab::Basic
     class Linked
 
       class << self
+
+        def via * x_a
+
+          List_.linked_list_via_array x_a
+        end
+
         alias_method :[], :new
         private :new
       end  # >>

@@ -36,7 +36,11 @@ module Skylab::MyTerm::TestSupport
     end
 
     def expect_failed_  # might move
-      @result.should eql false
+      @result.should eql result_value_for_failed_
+    end
+
+    def result_value_for_failed_
+      false
     end
 
     # ~ preserve entire state (including emissions) of a request

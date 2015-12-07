@@ -6,9 +6,9 @@ module Skylab::MyTerm
 
     class << self
 
-      def interpret_compound_component p, asc, acs, & oes_p
+      def interpret_compound_component p, asc, acs, & x_p
 
-        p[ new asc, acs, & oes_p ]
+        p[ new asc, acs, & x_p ]
       end
 
       private :new
@@ -16,11 +16,13 @@ module Skylab::MyTerm
 
     # -- Initializers
 
-    def initialize asc, acs, & oes_p
+    def initialize asc, acs, & oes_p_p
 
+      @is_selected = false
       @kernel_ = acs.kernel_
       @_nf = asc.name
-      @oes_p_ = oes_p
+
+      @oes_p_ = oes_p_p[ self ]
     end
 
     def mutate_by_becoming_selected_
@@ -115,43 +117,38 @@ module Skylab::MyTerm
 
       asc = qkn.association
 
-      wv = ___build_primitive x, asc
+      wv = ___for_set_build_primitive x, asc
 
       wv and __accept_primitive wv, qkn
     end
 
-    def ___build_primitive x, asc
+    def ___for_set_build_primitive x, asc
 
-      _oes_p = -> * i_a, & ev_p do
+      _oes_p_p = -> _ do
 
-        # when you get an emission, contextualize it by adding asc and verb
+        -> * i_a, & ev_p do  # experiment :#in-situ-1:
 
-        _nf = asc.name
+          _LL = Linked_list_[].via asc.name, :set, ev_p
 
-        _linked_list = Home_.lib_.basic::List.linked_list_via _nf, :set
-
-        _ch = ACS_[]::Interpretation::Component_handler[ _linked_list, self ]
-
-        _x = _ch[ * i_a, & ev_p ]
-
-        _x
+          @oes_p_.call i_a.fetch( 0 ), :contextualized, * i_a[1..-1] do
+            _LL
+          end
+        end
       end
 
       _vp = ACS_[]::Interpretation::Value_Popper[ x ]
 
-      asc.component_model[ _vp, & _oes_p ]
+      asc.component_model[ _vp, & _oes_p_p ]
     end
 
     def __accept_primitive wv, qkn
 
-      _ = ACS_[]::Interpretation::Accept_component_change[
-        wv.value_x, qkn.association, self ]
+      _ev_proc = ACS_[]::Interpretation::Accept_component_change[
+        wv.value_x, qkn, self ]
 
-      _ev = _[]
+      _LL = Linked_list_[].via qkn.name, _ev_proc  # #no-verb
 
-      _ctx = Begin_context_[ qkn.association.name, _ev ]
-
-      _mutated _ctx
+      _send_mutation _LL
     end
 
     def __get__primitivesque_component_operation_for qkn
@@ -183,7 +180,7 @@ module Skylab::MyTerm
       :hot
     end
 
-    def receive_component__change__ asc, & new_component_p
+    def receive_component__change__ qkn, & new_component_p
 
       # one of our immediate components is emitting a new component that
       # should serve as a replacement for it. we do the swap here and we
@@ -192,50 +189,35 @@ module Skylab::MyTerm
       _new_component = new_component_p[]
 
       _ev_p = ACS_[]::Interpretation::Accept_component_change[
-        _new_component, asc, self ]
+        _new_component, qkn, self ]
 
-      _ev = _ev_p[]
+      o = Linked_list_[]
+      _end = o[ nil, _ev_p ]
+      _LL = o[ _end, qkn.name ]
 
-      _ctx = Begin_context_[ asc.name, _ev ]
-
-      _mutated _ctx
+      _send_mutation _LL
     end
 
-    # ~  error and info
+    def receive_component_event qkn, i_a, & x_p
 
-    def receive_component__error__expression__is_not__ _LL, desc_sym, & y_p
+      if :info == i_a.first  # we never add context to info's
 
-      _ev = ACS_[]::Modalities::Human::Event_via_is_not[ desc_sym, & y_p ]
+        @oes_p_[ * i_a, & x_p ]
 
-      _LL_ = _LL + _ev
+      elsif :contextualized == i_a[ 1 ]
 
-      @oes_p_.call :error, desc_sym do | y |
-        _LL_
-      end
-    end
+        # a component gave us a contextualized signal. add its own
+        # name to the linked list of context and propagate upwards
 
-    def receive_component__error__expression__  # respond to only
-    end
+        _LL = x_p[]
 
-    def receive_component__error__ asc, desc_sym, & ev_p
+        _LL_ = Linked_list_[][ _LL, qkn.name ]
 
-      @oes_p_.call :error, desc_sym do
-
-        Add_context_[ asc.name, ev_p[] ]
-      end
-
-      UNABLE_
-    end
-
-    def receive_component__info__  # respond to only
-    end
-
-    def receive_component__info__expression__ asc, desc_sym, & y_p
-
-      _ev = ACS_[]::Modalities::Human::Event_via_expression[ asc, desc_sym, & y_p ]
-
-      @oes_p_.call :info, desc_sym do | y |
-        _ev
+        @oes_p_.call( * i_a ) do
+          _LL_
+        end
+      else
+        self._UNEXPECTED_emission_channel
       end
     end
 
@@ -280,10 +262,10 @@ module Skylab::MyTerm
 
     # -- Support
 
-    def _mutated _ctx
+    def _send_mutation _LL
 
-      persisted_OK = @oes_p_.call :mutated do
-        _ctx
+      persisted_OK = @oes_p_.call :mutation do
+        _LL
       end
 
       if persisted_OK
@@ -376,8 +358,15 @@ module Skylab::MyTerm
         NIL_
       end
 
-      def internal_name_symbol_
-        __internal_name_symbol || @name.as_variegated_symbol
+      def get_internal_name_string__
+
+        sym = __internal_name_symbol
+        if sym
+          sym.id2name
+        else
+          # @name.as_slug.gsub DASH_, EMPTY_S_  # for example
+          @name.as_slug
+        end
       end
 
       # "requiredness" is a business-specific concern - it is not modeled
@@ -393,6 +382,9 @@ module Skylab::MyTerm
         :__internal_name_symbol,
         :is_required_to_make_image_,
       )
+
+      DASH_ = '-'
+      EMPTY_S_ = ''
 
       self
     end

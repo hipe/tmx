@@ -107,11 +107,15 @@ module Skylab::Plugin
       end
 
       def build_fuzzy_flag a
-        @cool_pool.build_fuzzy_flag a
+        @cool_pool.build_fuzzy_flag__ a
       end
 
       def build_required_arg_switch a
-        @cool_pool.build_required_arg_switch a
+        @cool_pool.build_required_arg_switch__ a
+      end
+
+      def build_optional_arg_switch a
+        @cool_pool.build_optional_arg_switch__ a
       end
 
       def client_moniker

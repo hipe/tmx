@@ -13,6 +13,7 @@ these rules of usage:
   • their order with respect to each other
   • the superset of their wording (see more on this below)
   • their constituency (there can be no "major section" not listed here.)
+  • note: empty sections can be listed/omitted at author's discretion.
 
 we provide the list first and then in the following sections we will
 explain the exact rationale behind its structure.
@@ -20,16 +21,16 @@ explain the exact rationale behind its structure.
 
 
 
-## the master list (11 count)
+## the master list (12 count)
 
-  • Construction methods  (when do we not omit this?)
+  • Construction methods  (often used to separate introduction & code)
   • Unserialization intermediaries
   • Initializers
 
-  • Expressive event & modality hook-ins/hook-outs
-
+  • Expressive event & Modality hook-ins/hook-outs
   • ACS hook-ins (not signal handling)
-  • Operations
+
+  • Operations / Human exposures
   • Components
   • ACS hook-outs (e.g primitive operations)
 
@@ -38,7 +39,7 @@ explain the exact rationale behind its structure.
      (go from mechanical to informational,
       and within that from negative to positive.)
 
-  • Project hook-ins/hook-outs  (these often support the above)
+  • Project/Custom hook-ins/hook-outs/readers  (these often support the above)
 
   • Support  (anything used across sections)
 _
@@ -48,8 +49,13 @@ _
 
 ## rationale for rules of usage
 
+
   • keeping these in the same order across files allows them to
     become landmarks for each other.
+
+  • using these same, distinctive typographic conventions for all the
+    section names from this master list (in concert with the last point)
+    lets you find sections without having to read them.
 
   • using the same wording in the sections allows easier searching,
     to jump to the appropriate section quickly.
@@ -70,8 +76,12 @@ _
 
 ## ordering criteria
 
-in the design of this master list above, we have clustered together
-groups of items semantically as a didactic. we provide detail here
+in order to reinforce the principles we'll offer here, in the above
+depiction of the "master list" we have used whitespace to group together
+visually each cluster of sections to suggest that they are somehow
+semantically related.
+
+we provide further detail here explaining their ordering
 because knowing the underlying rationale behind the ordering can
 act as a mnemonic for its correct application, and as a guide for
 its improvement.
@@ -98,13 +108,13 @@ another.
 
   5) methods with less "moving parts" go below those with more
     "moving parts". (partly this is to keep the interesting methods
-     towards the top.) (sometimes this occurs as a side effect of
+     towards the top. sometimes this occurs as a side effect of
      (3) and/or (4).)
 
 
 
 
-## ordering rational jusitified (where not obvious)
+## the application of our ordering rational justified (where not obvious)
 
   • "modality" concerns are by definition "higher-level" than others.
 
@@ -115,7 +125,11 @@ another.
     also, they often relate to what comes next.
 
   • "operations" are more "special" than components typically?
-    so they are higher-level feeling
+    so they are higher-level feeling.
+
+  • although "human" exposures (namely The Edit Session) are "higher
+    level", supporting this feels so much like supportion operations
+    that we group them together.
 
   • operations and components "feel" simlilar b.c ACS DSL
 

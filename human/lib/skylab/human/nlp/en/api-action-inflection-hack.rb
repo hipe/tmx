@@ -1,17 +1,6 @@
 module Skylab::Human
 
-module NLP::EN::API_Action_Inflection_Hack  # see [#018]. was: [#sl-123] exempt
-
-  # This is a weird old (and fun) #experiment that is salvaged from porcelain.
-  # Watch for it to cross-fertilize with instances of action inflection
-  # happening elsewhere as [#018].
-
-  # See notes at `NLP::EN::POS::Noun` to see how far down the
-  # inflection-hacking rabbit hole goes.
-
-  # Don't be decieved, we don't want self.extended [#sl-111] pattern here,
-  # you just extend this module and you get this one knob:
-
+module NLP::EN::API_Action_Inflection_Hack  # [#043]
 
   def inflection
     # Classes or modules that extend this badboy get an `inflection` knob

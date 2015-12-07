@@ -63,20 +63,25 @@ module Skylab::TestSupport
           `#{ flag }=1-N` will always do all the files in order, however
           many files there are.
 
-          FINALLY, flipping the order of the two numbers so that the 'N'
+          'n' can be used instead of 'N'.
+
+          flipping the order of the two numbers so that the 'N'
           term comes before the 'M' term will reverse the order of the files.
           `#{ flag }=3-1` will do the third, second, then first file.
           `#{ flag }=N-4` wil do the sixth, fifth, then fourth file.
           (this can be useful when you are trying to fail as early as
           possible by running integration-like tests first for whatever
           reason, assuming you structured your tree in the conventional way.)
+
+          FINALLY, if you provide no argument to the `#{ flag }` switch,
+          the default is "#{ DEFAULT__ }".
         HERE
       end
 
       def initialize adapter
 
         @_adapter = adapter
-        @_switch = adapter.build_required_arg_switch FLAG__
+        @_switch = adapter.build_optional_arg_switch FLAG__
       end
 
       def opts_moniker
@@ -90,16 +95,19 @@ module Skylab::TestSupport
 
       ARGS_MONIKER__ = "#{ FLAG__ }=M-N"
 
+      DEFAULT__ = '1-N'
+
       def desc y
         y << "(use \"#{ _flag }=help\")"
       end
 
       def prepare sig
 
-        idx = @_switch.any_first_index_in_input sig
-        if idx
+        match = @_switch.any_first_match_in_input sig
+        if match
 
-          @_index = idx
+          @_argument_value = match.matchdata[ :value ]  # nil or empty s or etc
+          @_index = match.index
           @_request = sig
 
           ___via_index_prepare  # result is sig
@@ -110,7 +118,11 @@ module Skylab::TestSupport
 
       def ___via_index_prepare
 
-        s = @_request.input[ @_index ][ @_switch.s.length + 1 .. -1 ]
+        s = remove_instance_variable :@_argument_value
+
+        if ! s
+          s = DEFAULT__
+        end
 
         if s.length.zero?
 
@@ -128,7 +140,9 @@ module Skylab::TestSupport
 
       def __when_flag_does_not_have_an_argument
 
-        _y << "#{ _flag } must have an argument"
+        _y << "#{ _flag } argument (if any) must be nonzero in length"
+        _invite_to_me
+
         NIL_
       end
 
@@ -258,8 +272,13 @@ module Skylab::TestSupport
         end
 
         _y << "expecting #{ _exp_s } #{ _prep }"
+        _invite_to_me
 
         UNABLE_
+      end
+
+      def _invite_to_me
+        _y << "use `#{ _flag }=help` for help on this option."
       end
 
       def __via_terms

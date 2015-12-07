@@ -68,7 +68,7 @@ module Skylab::Snag::TestSupport
 
         invoke 'to-do', '-h'
 
-        tree = flush_help_screen_to_tree
+        tree = flush_invocation_to_help_screen_tree
 
         cx = tree.children
 

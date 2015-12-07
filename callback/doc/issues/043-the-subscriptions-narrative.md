@@ -1,6 +1,9 @@
 # the subscriptions narrative :[#043]
 
-## introduction
+## objective & scope
+
+(EDIT: use [#001] the selective listener pattern instead, or as an inteface on
+top of what is described here.. )
 
 subscriptions is a flat list of event channels given simple symbol names
 (see #channel-name-conventions below).
@@ -9,6 +12,8 @@ you create a subscriptions class with semantics similar to that of
 creating a struct class, and then you create an instance of this class to
 manage a particular set of subscriptions along particular channels from
 a sender to a receiver.
+
+
 
 
 

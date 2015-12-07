@@ -199,14 +199,7 @@ module Skylab::Snag
 
       class D_as_C____ < Home_.lib_.system.filesystem_lib::Models::Directory::As::Collection
 
-        def __criteria__component_association
-
-          yield :can, :add, :remove
-
-          Criteria_
-        end
-
-        # ~ near [#br-035] expressive events
+        # -- Expressive event hook-ins  (near [#br-035])j
 
         def name  # while #open [#br-107]
           model_name
@@ -215,6 +208,15 @@ module Skylab::Snag
         nf = nil
         define_method :model_name do
           nf ||= Callback_::Name.via_human 'persisted criteria collection'
+        end
+
+        # -- Components
+
+        def __criteria__component_association
+
+          yield :can, :add, :remove
+
+          Criteria_
         end
 
         self
@@ -243,7 +245,7 @@ module Skylab::Snag
           end
         end
 
-        def new_via__slug__ x, & x_p
+        def new_via__slug__ x
           o = new :_no_kernel_
           o.__init_as_reference x
           o

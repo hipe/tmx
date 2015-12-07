@@ -1,7 +1,5 @@
 module Skylab::Autonomous_Component_System
-
   # ->
-
     module Modalities::JSON
 
       class Interpret  # notes in [#003]:on-JSON-interpretation
@@ -219,30 +217,10 @@ module Skylab::Autonomous_Component_System
 
           asc = qkn.association
 
-          @_did_resolve_event_model ||= _resolve_event_model
-
-          if :cold == @_ACS_event_model
-
-            use_p = @_x_p
-
-            # if the ACS uses the "cold" model, use the client (call) handler
-
-          else
-
-            # for under what we assume is the "hot" model, build the
-            # "special" handler explicitly so we have a handle on it. this
-            # is the same handler that would be created by the builder by
-            # default, but with a handle on it we can pass this handler to
-            # the recursions so that when there is a failure "down deep",
-            # the event can be contextualized..
-
-            use_p = ACS_::Interpretation::Component_handler[ asc, @ACS ]
-          end
-
-          @_component_oes_p = use_p
+          _oes_p_p = _crazytimes asc
 
           o = ACS_::Interpretation_::Build_value.new(
-            _on_component, asc, @ACS, & use_p )
+            _on_component, asc, @ACS, & _oes_p_p )
 
           o.construction_method = :interpret_compound_component
 
@@ -262,7 +240,7 @@ module Skylab::Autonomous_Component_System
 
           _x = qkn.value_x
 
-          o = self.class.new( _x, _ctx_, cmp, & @_component_oes_p )
+          o = self.class.new( _x, _ctx_, cmp, & @_LAST_component_oes_p )
 
           _xx_ = o._execute
 
@@ -305,11 +283,11 @@ module Skylab::Autonomous_Component_System
           # the same validation & normalization used in "edit sessions"
           # for unserialization.. (interface experimental)
 
-          _asc = qkn.association
+          asc = qkn.association
 
-          @_did_resolve_event_model ||= _resolve_event_model
+          _pp = _crazytimes asc
 
-          wv = ACS_::Interpretation_::Build_value[ _arg_st, _asc, @ACS, & @_x_p ]
+          wv = ACS_::Interpretation_::Build_value[ _arg_st, asc, @ACS, & _pp ]
 
           if wv
 
@@ -327,32 +305,47 @@ module Skylab::Autonomous_Component_System
           end
         end
 
-        def _resolve_event_model
+        def _crazytimes asc
 
           # read [#006]:#Event-models. this is the first codepoint where we
           # must know which event-model is being used, because it determines
           # how the component is built - do we pass the construction method
-          # a "special" handler or the raw "modality" handler? the ACS (not
-          # the component) decides whether/how to bind the component.
+          # a handler builder that builds a "special" handler or one that
+          # produces the raw "modality" handler that was passed to us? the
+          # ACS (not the component) decides whether/how to bind the component.
 
-          sym = @ACS.component_event_model
-          @_ACS_event_model = sym
+          _sym = @ACS.component_event_model  # gets read N times ..
+          if :cold == _sym
 
-          if :cold == sym
+            # if we the ACS are under the cold model, then the component we
+            # are building must receive the exact same plain old handler
+            # that was passed to the subject performer.
 
-            any_p = @_oes_p
+            @_LAST_component_oes_p = @_oes_p  # we can set itnow
 
-            # under the cold model, the component constructor is passed
-            # the exact same handler that we got from modality space.
+            -> _ do
+              @_oes_p
+            end
+          else
+
+            # otherwise (and we assume the "hot" model), we hack it so we
+            # get a handle on the very .. handler that the built component
+            # builds (whenever (if ever) it builds it) so that in the case
+            # of compound nodes, if we encounter an error "down deep" we
+            # can report it with all of the context..
+
+            chb = ACS_::Interpretation::CHB[ asc, @ACS ]
+
+            @_LAST_component_oes_p = nil  # sanity - it is not set yet
+
+            -> component_x do
+
+              oes_p = chb[ component_x ]
+              # $stderr.puts "WAHOO we received a handler from #{ asc.name.as_human }"
+              @_LAST_component_oes_p = oes_p
+              oes_p
+            end
           end
-
-          # for any value other than `cold` we assume `hot`, which if this
-          # is not what it is, it will probably result in noisy failure.
-          # by passing no block (the `nil` below) to the component builder,
-          # it will assume the hot model.
-
-          @_x_p = any_p
-          ACHIEVED_
         end
 
         def _sort qkn_a

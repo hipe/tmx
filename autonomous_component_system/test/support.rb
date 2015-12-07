@@ -78,13 +78,16 @@ module Skylab::Autonomous_Component_System::TestSupport
 
         rx = /\A[A-Z]/
 
-        -> st, & oes_p do
+        -> st, & oes_p_p do
 
           s = st.gets_one
           if rx =~ s
             Home_::Value_Wrapper[ s ]
           else
-            oes_p.call :error, :expression, :no do | y |
+
+            _oes_p = oes_p_p[ nil ]
+
+            _oes_p.call :error, :expression, :no do | y |
               y << "no: #{ s }"
             end
             false

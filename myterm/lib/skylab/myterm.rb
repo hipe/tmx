@@ -55,23 +55,11 @@ module Skylab::MyTerm
     end
   end
 
-  # -- Context experiment
+  # -- context experiments..
 
   _LL = nil
-  require_LL = -> do
-    require_LL = nil
-    _LL = Home_.lib_.basic::List::Linked ; nil
-  end
-
-  Begin_context_ = -> name_x, ev do
-    require_LL && require_LL[]
-    _deepest_node = _LL[ nil, ev ]  # no next on the deepest node
-    _LL[ _deepest_node, name_x ]
-  end
-
-  Add_context_ = -> name_x, ll do  # 2x
-    require_LL && require_LL[]
-    _LL[ ll, name_x ]
+  Linked_list_ = -> do
+    _LL ||= Home_.lib_.basic::List::Linked
   end
 
   # -- Simple stowaways, functions

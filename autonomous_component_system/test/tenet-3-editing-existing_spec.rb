@@ -27,10 +27,13 @@ module Skylab::Autonomous_Component_System::TestSupport
       i_a_a = [] ; msg_a = []
 
       bike = _subject_class.new 'zeepie'
+
       ok = bike.edit_entity :set, :make, 'SCHWINN' do | *i_a, & ev_p |
         i_a_a.push i_a ; msg_a.push ev_p[ [] ]
       end
+
       ok.should eql false
+
       bike.make.should eql 'zeepie'
 
       i_a_a.should eql [ [ :error, :expression ] ]
@@ -72,8 +75,13 @@ module Skylab::Autonomous_Component_System::TestSupport
           @year = year
         end
 
-        def edit_entity * x_a, & x_p
-          ACS_[].edit x_a, self, & x_p
+        def edit_entity * x_a, & oes_p
+
+          _oes_p_p = -> _ do
+            oes_p
+          end
+
+          ACS_[].edit x_a, self, & _oes_p_p
         end
 
         attr_reader(
@@ -85,14 +93,15 @@ module Skylab::Autonomous_Component_System::TestSupport
 
           yield :can, :set
 
-          -> in_st, & oes_p do
+          -> in_st, & oes_p_p do
+
             s = in_st.gets_one
             if /\A[a-z]+\z/ =~ s
               ACS_[]::Value_Wrapper[ s ]
             else
 
-              if oes_p
-                oes_p.call :error, :expression do |y|
+              if oes_p_p
+                oes_p_p[ nil ].call :error, :expression do | y |
                   y << "all caps? #{ s.inspect }"
                 end
               end

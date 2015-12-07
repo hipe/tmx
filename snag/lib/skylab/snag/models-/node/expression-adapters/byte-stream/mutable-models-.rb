@@ -20,7 +20,7 @@ module Skylab::Snag
           @row_a = row_a
         end
 
-        def prepend_component_ obj, _ca, & oes_p
+        def prepend_component_ obj, _ca, & _
 
           a = _mutable_row_at_index( @r.begin ).o_a_
           if a.length.nonzero?
@@ -37,7 +37,7 @@ module Skylab::Snag
           ACHIEVED_
         end
 
-        def append_component_ obj, _ca, & oes_p
+        def append_component_ obj, _ca, & _
 
           a = _mutable_row_at_index( @r.end - 1 ).o_a_
           if a.length.nonzero?

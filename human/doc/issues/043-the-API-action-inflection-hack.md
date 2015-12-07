@@ -1,9 +1,10 @@
 # the API action inflection hack :[#043]
 
-(EDIT: etc)
-
-
 ## introduction
+
+DO NOT USE. see [#br-002]#GEC.
+
+--
 
 this is the first ever document whose contents are gleaned from [#bs-014]
 the `deliterate` utility.

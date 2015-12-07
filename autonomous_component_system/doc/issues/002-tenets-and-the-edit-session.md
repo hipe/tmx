@@ -25,7 +25,7 @@ violoation of which should occur only with good reason.
     (in both actual *and* formal sense) must never be assumed to be
     static. likewise meta-components of component associations.
 
-• :dt4: converatism: it is better to determine earlier that you won't
+• :DT4: conservatism: it is better to determine earlier that you won't
     need a structure, rather than to build it and not use it.
 
 
@@ -276,7 +276,8 @@ this operation "feels" inward but requires "outward reflection" too.
 (this is why we call them "classifications" and not "categories".)
 
 anyway, the fundamental requirement of all ACS compound models is that they
-produce each model for each of their component associations thru a call to `__foo_bar__component_association` with the association name substituted in
+produce each model for each of their component associations thru a call to
+`__foo_bar__component_association` with the association name substituted in
 for `foo_bar`. the rationale behind this perhaps strange-looking convention
 is described at the end of this section.
 

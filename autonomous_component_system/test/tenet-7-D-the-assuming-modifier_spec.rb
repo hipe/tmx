@@ -63,7 +63,12 @@ module Skylab::Autonomous_Component_System::TestSupport
         )
 
         def edit_entity * x_a, & x_p
-          ACS_[].edit x_a, self, & x_p
+
+          _oes_p_p = -> _ do
+            x_p
+          end
+
+          ACS_[].edit x_a, self, & _oes_p_p
         end
 
         def __jimmy__component_association

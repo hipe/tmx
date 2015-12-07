@@ -19,7 +19,7 @@ digraph g {
   viz_tool -> ACS_CLI
   ACS_CLI -> br_cleanup
   ACS_CLI -> acs
-  br_cleanup [style=filled fillcolor="#b5d5f5"]
+  br_cleanup [style=filled fillcolor="grey"]
 
   no_regret -> sea
   no_regret -> clean_up_doctest
@@ -31,6 +31,6 @@ digraph g {
   sea->zerk
   zerk [label="zerk - full rewrite\nto use ACS"]
   zerk->acs
-  acs [label="ACS - that\none eventing\nre-arch branch"]
+  acs [label="ACS - that\none eventing\nre-arch branch" style=filled fillcolor="#b5d5f5"]
   no_regret [label="no\nregret"]
 }

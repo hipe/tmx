@@ -72,17 +72,23 @@ module Skylab::Snag
       #   • plus error reporting -AND-
       #   • minus the recognition of the open and close sequence
 
-      def new_via_user_value x, & x_p
+      def new_via_user_value_ x, & oes_p
+
+        # (oldschool handler b.c we bridge the gap between [br] and [ca] API)
+
+        oes_p_p = -> _ do
+          oes_p
+        end
 
         if x
           if x.respond_to? :bit_length
-            edit_entity :set, :integer, x, & x_p
+            edit_entity :set, :integer, x, & oes_p_p
           else
 
             id = new
             _scn = Home_::Library_::StringScanner.new x
 
-            ok = Parse__[ id, _scn, & x_p ]
+            ok = Parse__[ id, _scn, & oes_p_p ]
 
             ok && id
           end
@@ -109,9 +115,9 @@ module Skylab::Snag
         new x, x_
       end
 
-      def edit_entity * x_a, & x_p
+      def edit_entity * x_a, & oes_p_p
 
-        ACS_[].create x_a, new, & x_p
+        ACS_[].create x_a, new, & oes_p_p
       end
 
       # ~ (for existing entities)
@@ -139,7 +145,7 @@ module Skylab::Snag
     Parse__ = ::Module.new
     class << Parse__  # experiment: stateless actor
 
-      def [] id, scn, & oes_p
+      def [] id, scn, & oes_p_p
 
         d_s = scn.scan DIGITS___
 
@@ -148,11 +154,12 @@ module Skylab::Snag
             id.reinitialize nil, d_s.to_i
             ACHIEVED_
           else
-            __something_after_digit d_s.to_i, id, scn, & oes_p
+            __something_after_digit d_s.to_i, id, scn, & oes_p_p
           end
         else
-          if oes_p
-            oes_p.call :error, :parse_error, :expecting_number do
+          if oes_p_p
+            _oes_p = oes_p_p[ nil ]
+            _oes_p.call :error, :parse_error, :expecting_number do
               __build_uninterpretable_as_integer_event scn.string
             end
           end

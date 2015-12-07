@@ -33,17 +33,19 @@ module Skylab::MyTerm
 
       # see [#003]:#note-about-serialized-references
 
-      def initialize s, nf, svs, & p
+      def initialize s, nf, svs, & oes_p_p
 
         @_nf = nf
-        @_oes_p = p
+        @_oes_p_p = oes_p_p
         @s = s
         @svs = svs
       end
 
       def unserialize_
 
-        ada = Adapter_via_string__[ @s, @svs, & @_oes_p ]
+        _oes_p = @_oes_p_p[ NIL_ ]
+
+        ada = Adapter_via_string__[ @s, @svs, & _oes_p  ]
         if ada
 
           # breaking immutability, it is this codepoint that decides what
@@ -51,7 +53,7 @@ module Skylab::MyTerm
 
           ada.mutate_by_becoming_selected_
 
-          Here_._via_selected_adapter ada, @_nf, @svs, & @_oes_p
+          Here_._via_selected_adapter ada, @_nf, @svs, & @_oes_p_p
         else
           ada
         end
@@ -60,11 +62,13 @@ module Skylab::MyTerm
 
     # -- Initializers
 
-    def initialize ada, nf, svs, & p
+    def initialize ada, nf, svs, & oes_p_p
 
       @_nf = nf
-      @_oes_p = p
+      @_oes_p_p = oes_p_p
       @_svs = svs
+
+      @_oes_p = oes_p_p[ self ]
 
       if ada
         @_has_selected_adapter = true
@@ -112,16 +116,20 @@ module Skylab::MyTerm
 
     def ___receive_set_adapter_name adapter
 
-      _hacky_wrap_to_add_verb = -> * i_a, & ev_p do
+      _add_verb = -> * i_a, & ev_p do
 
-        _structured_event = ev_p[]
-        _contexted = Begin_context_[ :set, _structured_event ]
-        @_oes_p.call( * i_a ) do
-          _contexted
+        # probably a failure to resolve 1 adapter name. add the verb `set`
+
+        o = Linked_list_[]
+        _end = o[ nil, ev_p ]
+        _LL = o[ _end, :set ]
+
+        @_oes_p.call i_a.fetch( 0 ), :contextualized, * i_a[ 1..-1 ] do
+          _LL
         end
       end
 
-      ada = Adapter_via_string__[ adapter, @_svs, & _hacky_wrap_to_add_verb ]
+      ada = Adapter_via_string__[ adapter, @_svs, & _add_verb ]
       if ada
         ___change_via ada
       else
@@ -143,7 +151,7 @@ module Skylab::MyTerm
 
       ada.mutate_by_becoming_selected_
 
-      new_self = self.class._via_selected_adapter ada, @_nf, @_svs, & @_oes_p
+      new_self = self.class._via_selected_adapter ada, @_nf, @_svs, & @_oes_p_p
 
       @_oes_p.call :change do
         new_self

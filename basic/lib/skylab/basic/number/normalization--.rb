@@ -27,6 +27,7 @@ module Skylab::Basic
 
         Callback_::Actor.methodic self, :properties,
           :qualified_knownness,
+          :knownness,
           :number_set,  # symbol
           :minimum
 
@@ -34,6 +35,7 @@ module Skylab::Basic
 
           @qualified_knownness = nil
           @_do_recognize_positive_sign = false
+          @knownness = nil
           @minimum = nil
           instance_exec( & edit_p )
           _normalize_self
@@ -66,10 +68,9 @@ module Skylab::Basic
 
               _x = in_st.current_token
 
-              _qkn = Callback_::Qualified_Knownness.via_value_and_symbol(
-                _x, :qualified_knownness )
+              _kn = Callback_::Known_Known[ in_st.current_token ]
 
-              vw = normalize_qualified_knownness _qkn do | * i_a, & ev_p |
+              vw = normalize_knownness _kn do | * i_a, & ev_p |
 
                 self._HAVE_FUN
               end
@@ -83,13 +84,19 @@ module Skylab::Basic
           end
         end
 
-        def normalize_qualified_knownness arg, & oes_p
+        def normalize_qualified_knownness qkn, & oes_p
           otr = dup
-          otr.__init_copy_with :qualified_knownness, arg, & oes_p
+          otr._init_copy_with :qualified_knownness, qkn, & oes_p
           otr.execute
         end
 
-        protected def __init_copy_with * x_a, & oes_p
+        def normalize_knownness kn, & oes_p
+          otr = dup
+          otr._init_copy_with :knownness, kn, & oes_p
+          otr.execute
+        end
+
+        protected def _init_copy_with * x_a, & oes_p
           oes_p and @on_event_selectively = oes_p
           process_iambic_fully x_a
           _normalize_self
@@ -102,7 +109,13 @@ module Skylab::Basic
 
         def execute
 
-          @x = @qualified_knownness.value_x  # might not have been provided. we don't care
+          if @qualified_knownness
+            @_is_qualified = true
+            @x = @qualified_knownness.value_x
+          else
+            @_is_qualified = false
+            @x = @knownness.value_x
+          end
 
           ok = send :"__when_set_is__#{ @number_set }__"
 
@@ -203,7 +216,9 @@ module Skylab::Basic
         end
 
         def _assoc
-          @qualified_knownness.association
+          if @_is_qualified
+            @qualified_knownness.association
+          end
         end
 
         def _new_invalid_event

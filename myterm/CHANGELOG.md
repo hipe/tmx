@@ -1,5 +1,7 @@
 # myterm changelog
 
+## working prototype generates image 2015-11-18
+
 ## reset to version 0.0.0.my.pre.bleeding
 
   • (EDIT: no need to write anything here until this is actually released)

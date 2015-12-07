@@ -19,7 +19,7 @@ module Skylab::BeautySalon::TestSupport
 
       invoke '-h'
 
-      _guy = flush_help_screen_to_tree
+      _guy = flush_invocation_to_help_screen_tree
 
       sect = _guy.children[ 1 ]
 

@@ -93,10 +93,10 @@ module Skylab::Autonomous_Component_System::TestSupport
 
         Local_Lib__::Common_child_class_methods[ self ]
 
-        def initialize & p
+        def initialize & oes_p_p
 
           @color = 'white'
-          @_oes_p = p
+          @_oes_p = oes_p_p[ self ]
         end
 
         def __get_color__component_operation

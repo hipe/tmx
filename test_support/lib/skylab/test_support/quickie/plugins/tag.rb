@@ -26,9 +26,11 @@ module Skylab::TestSupport
 
       def prepare sig
         @sig = sig
-        @d_a = @sw.any_several_indexes_in_input @sig
+        @_d_a = @sw.any_several_indexes_in_input @sig
         @result_of_prepare = nil
-        @d_a && via_d_a_prepare
+        if @_d_a
+          __via_d_a_prepare
+        end
         @result_of_prepare
       end
 
@@ -37,49 +39,52 @@ module Skylab::TestSupport
         NIL_
       end
 
-    private
-
-      def via_d_a_prepare
+      def __via_d_a_prepare
         @o_a = []
-        @d_a.each do |d|
+        @_d_a.each do |d|
           @s = @sig.input[ d ][ @sw.s.length + 1 .. -1 ]
           if @s.length.zero?
-            @y << "#{ flg } must have an argument"
+            @y << "#{ _flag } must have an argument"
             @o_a = nil
             break
           else
-            via_s_parse
+            ___via_s_parse
             @o_a or break
           end
         end
-        @o_a and accpt_args_and_activate_plugin ; nil
+        if @o_a
+          __accept_args_and_activate_plugin
+        end
+        NIL_
       end
 
-      def via_s_parse
-        md = TAG_RX__.match @s
+      def ___via_s_parse
+        md = TAG_RX___.match @s
         if md
-          parse_tag( * md.captures )
+          ___parse_tag( * md.captures )
         else
-          @y << "#{ flg } must be a valid tag (had: \"#{ @s }\")"
+          @y << "#{ _flag } must be a valid tag (had: \"#{ @s }\")"
           @o_a = nil
         end ; nil
       end
-      TAG_RX__ = /\A(~)?([_a-zA-Z][_a-zA-Z0-9]*)(:.+)?\z/
 
-      def parse_tag not_, tag, asst
-        @o_a.push "#{ not_ }#{ tag }#{ asst }" ; nil
+      TAG_RX___ = /\A(~)?([_a-zA-Z][_a-zA-Z0-9]*)(:.+)?\z/
+
+      def _flag
+        FLAG__
       end
 
-      def accpt_args_and_activate_plugin
-        @d_a.each do |d|
+      def ___parse_tag not_, tag, asst
+        @o_a.push "#{ not_ }#{ tag }#{ asst }"
+        NIL_
+      end
+
+      def __accept_args_and_activate_plugin
+        @_d_a.each do |d|
           @sig.nilify_input_element_at_index d
         end
         @sig.rely :CULLED_TEST_FILES
         @result_of_prepare = @sig ; nil
-      end
-
-      def flg
-        FLAG__
       end
     end
   end

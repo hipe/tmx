@@ -21,7 +21,12 @@ module Skylab::Autonomous_Component_System::TestSupport
         end  # >>
 
         def edit * x_a, & x_p
-          ACS__[].edit x_a, self, & x_p
+
+          _oes_p_p = -> _ do
+            x_p
+          end
+
+          ACS__[].edit x_a, self, & _oes_p_p
         end
 
         def __lace__component_association
@@ -87,10 +92,10 @@ module Skylab::Autonomous_Component_System::TestSupport
 
         def __set__component_operation
 
-          -> x, & call_p do
+          -> x, & oes_p_p do
 
-            if call_p
-              use_p = call_p
+            if oes_p_p
+              use_p = oes_p_p[ nil ]
             else
               self._COVER_ME  # use @oes_p_
             end

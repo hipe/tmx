@@ -19,11 +19,12 @@ module Skylab::MyTerm
 
     # -- Initializers
 
-    def initialize acs, & p
+    def initialize acs, & oes_p_p
 
       @_cached_adapter_instances = nil
       @kernel_ = acs.kernel_
-      @_oes_p = p
+
+      @_oes_p = oes_p_p[ self ]
     end
 
     # -- ACS hook-ins
@@ -92,7 +93,7 @@ module Skylab::MyTerm
       :hot
     end
 
-    def receive_component__mutated__ acs, & linked_list_p
+    def receive_component__mutation__ qkn, & linked_list_p
 
       # currently we cache every adapter we ever build, and each of those
       # will (in theory) be produced when we deliver components to be
@@ -102,29 +103,40 @@ module Skylab::MyTerm
       # they have peristent data (and become detached for the oppposite),
       # we could do it here.
 
-      @_cached_adapter_instances.fetch acs.name.as_const  # sanity
+      @_cached_adapter_instances.fetch qkn.name.as_const  # sanity
 
-      # like in a `change` signal, we want our payload to express ourselves,
-      # in case the listener isn't already storing us and wants to in case
-      # of mutation. but also, we want to propagate the above event ..
+      _LL = linked_list_p[]
 
-      @_oes_p.call :event_and_mutated do
-        [ linked_list_p, self ]
+      @_oes_p.call :mutation, :contextualized do
+        _LL
       end
     end
 
-    def receive_component__error__ _asc, desc_sym, & ev_p
+    def receive_component_event qkn, i_a, & ev_x_p
 
-      # adapter component can add its component as context. add none here.
+      # infos are not contextualized and errors should have context already.
 
-      @_oes_p.call :error, desc_sym, & ev_p
-    end
+      if :info != i_a.first
+        if :contextualized != i_a.fetch( 1 )
 
-    def receive_component__info__ _asc, * one_or_two, & y_p
+          # or not (let's decide whether we want the adapter name in the context)
 
-      # informational events from components are propagated as-is. no context.
+          # this whole block is optional - but let's be JERKS and to THIS:
+          # if the emission isn't contextualized, contextualize it by hacking
+          # the verb as "generate image with", and the *object* as
+          # "adapter <foo>". this won't last ..
 
-      @_oes_p.call :info, * one_or_two, & y_p
+          i_a = [ i_a.first, :contextualized, * i_a[ 1..-1 ] ]
+
+          _LL = Linked_list_[].via qkn.name, :adapter, :generate_image_with, ev_x_p
+
+          ev_x_p = -> do
+            _LL
+          end
+        end
+      end
+
+      @_oes_p[ * i_a, & ev_x_p ]
     end
 
     # -- Project hook-outs

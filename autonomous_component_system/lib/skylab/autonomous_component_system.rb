@@ -1,39 +1,37 @@
 require 'skylab/callback'
 
 module Skylab::Autonomous_Component_System  # notes in [#002]
-
   # ->
-
     class << self
 
-      def create x_a, acs, & x_p  # :Tenet2.
+      def create x_a, acs, & oes_p_p  # :Tenet2, (same as below)
 
-        o = _Mutation_Session.new( & x_p )
+        o = _Mutation_Session.new( & oes_p_p )
         o.accept_argument_array x_a
         o.ACS = acs
         o.macro_operation_method_name = :create
         o.execute
       end
 
-      def edit x_a, acs, & x_p  # :Tenet3.
+      def edit x_a, acs, & oes_p_p  # :Tenet3, [#006]#hot-binding
 
-        o = _Mutation_Session.new( & x_p )
+        o = _Mutation_Session.new( & oes_p_p )
         o.accept_argument_array x_a
         o.ACS = acs
         o.macro_operation_method_name = :edit
         o.execute
       end
 
-      def interpret arg_st, acs, & x_p  # :+Tenet6
+      def interpret arg_st, acs, & oes_p_p  # :+Tenet6, [#003]:hb-again
 
-        o = _Mutation_Session.new( & x_p )
+        o = _Mutation_Session.new( & oes_p_p )
         o.arg_st = arg_st
         o.ACS = acs
         o.macro_operation_method_name = :interpret
         o.execute
       end
 
-      def component_already_added cmp, asc, acs, & oes_p
+      def send_component_already_added cmp, asc, acs, & oes_p
 
         oes_p.call :error, :component_already_added do
 
@@ -47,7 +45,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         UNABLE_  # important
       end
 
-      def component_not_found cmp, asc, acs, & oes_p
+      def send_component_not_found cmp, asc, acs, & oes_p
 
         oes_p.call :error, :component_not_found do
 
@@ -60,7 +58,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         UNABLE_  # important
       end
 
-      def component_removed cmp, asc, acs, & oes_p
+      def send_component_removed cmp, asc, acs, & oes_p
 
         oes_p.call :info, :component_removed do
 
@@ -178,7 +176,9 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       # assume that the ACS assumes that these structures are produced
       # lazily, on-the-fly, and are not memoized to be used beyond the
-      # "moment": they are #dt3 dynamic and should not be #dt4 cached.
+      # "moment": they are #dt3 dynamic and should not be #DT4 cached.
+
+      # -- Construction methods
 
       class << self
 
@@ -207,8 +207,10 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         alias_method :_begin_definition, :new
         private :new
       end  # >>
+
       METHOD__ = :component_association_reader
 
+      # -- Initializers
 
       def initialize
         @_name_mutation = nil
@@ -343,23 +345,15 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         end
       end
 
-      # ~
+      # -- Expressive event hook-outs
 
       def description_under _expag
         @name.as_human
       end
 
-      def accept__can__meta_component * i_a  # :Tenet8.
+      # -- "meta-components" (similar to #[#fi-010] universal meta-properties)
 
-        bx = Callback_::Box.new
-        i_a.each do | sym |
-          bx.add sym, :declared
-        end
-        @_operations = bx
-        NIL_
-      end
-
-      attr_reader :_operations
+      # ~ description
 
       def accept__generate_description__meta_component  # [#003]#infer-desc
 
@@ -380,12 +374,12 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       attr_reader :description_proc
 
-      def accept__intent__meta_component sym  # see [#003]:#interp-B
-        @intent = sym
+      def accept__description__meta_component p
+        @description_proc = p
         NIL_
       end
 
-      attr_reader :intent
+      # ~ name
 
       def accept__stored_in_ivar__meta_component ivar
 
@@ -397,6 +391,24 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
           end
           NIL_
         end
+        NIL_
+      end
+
+      def name_symbol
+        @name.as_variegated_symbol
+      end
+
+      attr_reader :name
+
+      # ~ operations
+
+      def accept__can__meta_component * i_a  # :Tenet8.
+
+        bx = Callback_::Box.new
+        i_a.each do | sym |
+          bx.add sym, :declared
+        end
+        @_operations = bx
         NIL_
       end
 
@@ -414,18 +426,6 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         end
       end
 
-      def model_has_association sym
-        @component_model.method_defined? :"__#{ sym }__component_association"
-      end
-
-      def __model_has_operation sym
-        @component_model.method_defined? :"__#{ sym }__component_operation"
-      end
-
-      def has_operations
-        ! @_operations.nil?
-      end
-
       def operation_symbols
 
         bx = @_operations
@@ -440,14 +440,43 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         @_operations.to_name_stream
       end
 
-      def name_symbol
-        @name.as_variegated_symbol
+      def has_operations
+        ! @_operations.nil?
       end
 
-      attr_reader(
-        :component_model,
-        :name,
-      )
+      attr_reader :_operations
+
+      # ~ default
+
+      def accept__default__meta_component x
+        @default_proc = x
+        NIL_
+      end
+
+      attr_reader :default_proc
+
+      # ~ intent
+
+      def accept__intent__meta_component sym  # see [#003]:#interp-B
+        @intent = sym
+        NIL_
+      end
+
+      attr_reader :intent
+
+      # ~ model
+
+      def model_has_association__ sym
+        @component_model.method_defined? :"__#{ sym }__component_association"
+      end
+
+      def __model_has_operation sym
+        @component_model.method_defined? :"__#{ sym }__component_operation"
+      end
+
+      attr_reader :component_model
+
+      # ~ constants
 
       def category
         :association

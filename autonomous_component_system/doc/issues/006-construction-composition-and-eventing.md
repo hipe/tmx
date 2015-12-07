@@ -66,12 +66,13 @@ is fresh, and is going thru its experimental "incubation" period.
 
 two different event models have emerged "naturally" from the work.
 some concerns are sensitive to which model is being employed.
-to integrate these models into one unified model somehow would be nice,
-but is outside of the current scope.
+at writing we are making efforts to integrate these two models,
+but to be clear these two disparate models will never be "unified",
+because they each have a distinct applicability.
 
 in the "cold" eventmodel, components are themselves not "bound" to a
 custodian. we might call such a component a "cold-entity", meaning
-it models business data and nothing else.
+it models business data and nothing else (no event bindings).
 
 if the cold component exposes itself to operations in some way
 (like an [#002] `edit` (mutation) method), it typically recognizes
@@ -80,7 +81,10 @@ handler for the entire (roundtrip, full-stack) execution of the
 operation.
 
 in the "hot" eventmodel, a component holds its "binding" (its
-"listeners" proc) *as* member data. we might call such a component
+"listeners" proc) *as* member data. this handler (proc) is an intrinsic,
+unchanging member of the entity that is present for its lifetime.
+
+we might call such a component
 a entity-controller or "hot entity". under this "hot" model, the
 custodian typically passes the component a "special" event handler at
 its construction time. then, when the component emits "signals",
@@ -98,10 +102,80 @@ the action. the client cannot pass its own handler to such an operation
 
 
 
-### :#how-components-are-bound-to-listeners
 
-from the codepoint, assume that every emission will have at least
-one item (symbol) in the event channel. see next section.
+### :hot-binding
+
+first off, if the component plans to emit no events then it need not
+be concerned with any of this, but what's the fun of a component
+like that!?
+
+the component that might emit events needs to know of this interface.
+
+assume an ACS instance that has exposed an edit method, and is using
+this library method to implement it. if the edit session were to build
+any components (which is what typically happens in edit sessions (for
+adding and removing alike)), the custodian *might* want to give the
+built component a "hot binding" so that whenever the component sends
+signals to the custodian, the custodian can automatically see which
+component is sending the signal without the custodian needing to be
+aware this is happening.
+
+(that is, the custodian builds the handler for the component. whenever
+the component emits potential events into the handler, the custodian
+may actually get an "enhanced" emission that also includes the
+component itself, because of how the custodian built the handler
+(typically by creating a "closure", as in [#]:codepoint-1)).
+
+in order for the ACS to have this ability (i.e in order for this API
+to support the possibility of this, regardless of what the ACS wants),
+this call to the library method *must* take an `oes_p_p` - style block.
+
+if the ACS uses a "cold" event model (where event handlers ride along
+with operation invocations and not an intrinsic part of ACS's), then
+it can do this but it still needs to honor the interface.
+
+the inner-stream mutation session knows this interface..
+
+
+
+#### :hb-again
+
+assume an ACS *class* has exposed an `interpret_component` or similar
+method, and is using this library method to implement it. in the exact
+same way as above, the caller may want the component to bind to it via
+hot binding.
+
+
+
+#### the hot binding implementation explanation.
+
+assume the ACS wants to build the component. the component typically
+can't be built without being provided a handler: dynamic mutation of
+handlers is something we just don't do. whether the component employs
+a hot or cold event model, it will need the handler to be present before
+the component can attempt to build. so: components can't be built
+without the handler they will be built with.
+
+with hot binding, the handler can't be built without a handle on the
+component. in light of the previous crollary, it would seem we are
+blocked by a circular dependency. it's sort of like trying to get a
+job without experience, while and trying to get experiance without a
+job.
+
+so how we get around this is a bit complex: the ACS passes the
+component model a proc that produces a handler, in exchange for the
+component passing itself in as the only argument to that proc.
+
+
+
+#### :#note-1:
+
+handlers blah - we hare at the
+intersection between the "cold" and "hot" models. this whole
+"edit session" thing was developed before the "hot" model existed.
+the uptake is, we've got to have an interface for one model
+so we must chose hot because while it can act as a superset of
+cold, the reverse is not true.
 
 
 
@@ -143,7 +217,7 @@ serialization).
 
 
 
-### `mutated`
+### `mutated` (:#Mutated)
 
 this is for a component to tell its listener(s) that it itself
 mutated. the payload is a linked list of context, terminating in

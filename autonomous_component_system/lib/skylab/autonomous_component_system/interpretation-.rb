@@ -1,24 +1,26 @@
 module Skylab::Autonomous_Component_System
-
   # ->
-
     module Interpretation_
 
       class Build_value  # [#006]:the-universal-component-builder explains everything
 
         class << self
-          def _call ma, asc, acs, & p
-            new( ma, asc, acs, & p ).execute
+          def _call ma, asc, acs, & oes_p_p
+            new( ma, asc, acs, & oes_p_p ).execute
           end
           alias_method :call, :_call
           alias_method :[], :_call
         end  # >>
 
-        def initialize ma, asc, acs, & chand
+        def initialize ma, asc, acs, & chb
+
+          if 1 != chb.arity
+            self._WORLDWIDE_PROTEST
+          end
 
           @ACS = acs
           @association = asc
-          @component_handler = chand
+          @_CHB = chb
           @construction_method = nil
           @mixed_argument = ma
         end
@@ -39,16 +41,18 @@ module Skylab::Autonomous_Component_System
 
           @_did_categorize_shape ||= _categorize_supposed_model_shape
 
-          @_component_handler = if @component_handler
-            @component_handler
+          if @_CHB
+
+            @_use_CHB = @_CHB
           else
-            ACS_::Interpretation::Component_handler[ @association, @ACS ]
+            @_use_CHB = ACS_::Interpretation::CHB[ @association, @ACS ]
           end
 
           if @_use_construction_method
             __via_construction_method
           else
-            @_mdl[ @mixed_argument, & @_component_handler ]
+
+            @_mdl[ @mixed_argument, & @_CHB ]
           end
         end
 
@@ -94,7 +98,7 @@ module Skylab::Autonomous_Component_System
             xtra.push @ACS
           end
 
-          cmp = @_mdl.send m, @mixed_argument, * xtra, & @_component_handler
+          cmp = @_mdl.send m, @mixed_argument, * xtra, & @_use_CHB
           if cmp
             Value_Wrapper[ cmp ]
           else

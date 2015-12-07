@@ -1,15 +1,24 @@
 module Skylab::Autonomous_Component_System
-
   # ->
-
     class Mutation  # notes in [#002]
 
-      def initialize & x_p
-        @x_p = x_p || Unhandler___
+      def initialize & oes_p_p
+        if oes_p_p
+          if 1 == oes_p_p.arity
+            @oes_p_p_ = oes_p_p
+          else
+            self._BECOME_THE_FUTURE
+          end
+        else
+          @oes_p_p_ = No_handler___
+        end
       end
 
-      Unhandler___ = -> * i_a, & _ev_p do
-        raise "handle me: #{ i_a.inspect }"
+      No_handler___ = -> _ do
+
+        -> * i_a, & ev_p do
+          raise "handle me: #{ i_a.inspect }"
+        end
       end
 
       attr_writer(
@@ -102,21 +111,25 @@ module Skylab::Autonomous_Component_System
 
         elsif @_at_least_one_delivery_changed_something
 
+          _changelog = Change_Log___.new @_last_changeful_delivery_result
+
           @ACS.result_for_component_mutation_session_when_changed(
-            Change_Log___.new( @_last_changeful_delivery_result ),
-            & @x_p )
+            _changelog,
+            & @oes_p_p_ )
         else
 
-          @ACS.result_for_component_mutation_session_when_no_change( & @x_p )
+          @ACS.result_for_component_mutation_session_when_no_change(
+            & @oes_p_p_ )
         end
+
+        # about [#006] handlers, noone uses these yet anyway..
       end
 
       def _prepare_unit_of_work_queue
 
         a = []
         ok = ACHIEVED_
-
-        p = Operation___.gets_proc_for @arg_st, @ACS, & @x_p
+        p = Mutation_Operation___.gets_proc_for @arg_st, @ACS, & @oes_p_p_
 
         begin
           op = p[]
@@ -187,11 +200,11 @@ module Skylab::Autonomous_Component_System
         ACHIEVED_  # keep delivering
       end
 
-      class Operation___
+      class Mutation_Operation___
 
         class << self
 
-          def gets_proc_for st, acs, & x_p
+          def gets_proc_for st, acs, & oes_p_p
 
             p = nil
 
@@ -203,7 +216,7 @@ module Skylab::Autonomous_Component_System
               if st.no_unparsed_exists
                 done[]
               else
-                new st, acs, & x_p   # we cannot parse yet - see "2 channel" here
+                new st, acs, & oes_p_p   # we cannot parse yet - see "2 channel" here
               end
             end
 
@@ -215,11 +228,11 @@ module Skylab::Autonomous_Component_System
           private :new
         end  # >>
 
-        def initialize arg_st, acs, & x_p
+        def initialize arg_st, acs, & oes_p_p
 
           @arg_st = arg_st
           @modifiers = nil
-          @oes_p = x_p
+          @oes_p_p_ = oes_p_p  # used in lib
 
           _accept_ACS acs
         end
@@ -279,7 +292,7 @@ module Skylab::Autonomous_Component_System
 
             # if the association itself has an association by this name..
 
-            if @association.model_has_association st.current_token
+            if @association.model_has_association__ st.current_token
               __descend
               redo
             end
@@ -295,12 +308,10 @@ module Skylab::Autonomous_Component_System
           end
         end
 
-        def __descend
+        def __descend  # [#006]#note-1
 
-          _ = ACS_::For_Interface::Read_or_write[ @association, @ACS, & @oes_p ]
-
-          # (we pass the handler that was passed to the edit session -
-          #  we don't bind the constructed component to the ACS) :#here
+          _ = ACS_::For_Interface::Read_or_write.call(
+            @association, @ACS, & @oes_p_p_ )
 
           _accept_ACS _
           @association = nil
@@ -339,11 +350,10 @@ module Skylab::Autonomous_Component_System
             comp_x = @association.component_model.send(
               :"new_via__#{ sym }__",
               @arg_st.gets_one,
-              & @oes_p
-            )
+              & @oes_p_p_ )
+
             ok = comp_x ? true : false
           else
-
             wv = ___interpret_component_normally
             if wv
               ok = true
@@ -361,11 +371,10 @@ module Skylab::Autonomous_Component_System
           end
         end
 
-        def ___interpret_component_normally
+        def ___interpret_component_normally  # [#006]#note-1
 
-          ACS_::Interpretation_::Build_value[ @arg_st, @association, @ACS, & @oes_p ]
-
-          # (same note as #here)
+          ACS_::Interpretation_::Build_value.call(
+            @arg_st, @association, @ACS, & @oes_p_p_ )
         end
 
         def __interpret_when_operation_defined_in__model__
@@ -446,11 +455,13 @@ module Skylab::Autonomous_Component_System
             :"component_is__#{ if_o.symbol }__"
           end
 
+          _oes_p = @oes_p_p_[ nil ]
+
           @ACS.send(
             _m,
             @_sub_component_x,
             @association,
-            & @oes_p )
+            & _oes_p )
         end
 
         def _deliver_when_unevaluated_assumptions_exist
@@ -465,11 +476,13 @@ module Skylab::Autonomous_Component_System
               :"expect_component__#{ assu.symbol }__"
             end
 
+            _oes_p = @oes_p_p_[ nil ]
+
             last_value = @ACS.send(
               _m,
               @_sub_component_x,
               @association,
-              & @oes_p )
+              & _oes_p )
 
             last_value or break
           end
@@ -496,7 +509,7 @@ module Skylab::Autonomous_Component_System
             * @modifiers.using,
             @_sub_component_x,
             @association,
-            & @oes_p )
+            & @oes_p_p_ )
 
           _accept_delivery_value _x
 
@@ -508,7 +521,7 @@ module Skylab::Autonomous_Component_System
           # NOTE - we leave it to the model to chose which handler
           # to use, if it has its own :/
 
-          _x = @operation.callable.call( * @args, & @oes_p )
+          _x = @operation.callable.call( * @args, & @oes_p_p_ )
 
           _accept_delivery_value _x
 

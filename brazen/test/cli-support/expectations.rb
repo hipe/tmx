@@ -35,55 +35,6 @@ module Skylab::Brazen::TestSupport
 
     # -- freeze an invocation as a shared state
 
-    def flush_invocation_to_help_screen_oriented_state  # current favorite
-
-      _state = flush_frozen_state_from_expect_stdout_stderr
-
-      help_screen_oriented_state_via_invocation_state _state
-    end
-
-    def help_screen_oriented_state_from_invoke * argv
-
-      help_screen_oriented_state_from_invoke_using(
-        :mutable_argv, argv,
-        :prefix, argv_prefix_for_expect_stdout_stderr,
-      )
-    end
-
-    def help_screen_oriented_state_from_invoke_using * x_a
-
-      _help_screen_oriented_state_from_invoke_via_iambic x_a
-    end
-
-    def _help_screen_oriented_state_from_invoke_via_iambic x_a
-
-      using_expect_stdout_stderr_invoke_via_iambic x_a
-
-      _state = flush_frozen_state_from_expect_stdout_stderr
-
-      help_screen_oriented_state_via_invocation_state _state
-    end
-
-    def help_screen_oriented_state_via_invocation_state state
-
-      _cls = TS_.lib_( :CLI_support_expect_section )::Help_Screen_State
-
-      _cls.via :state, state, :stream, :e
-    end
-
-    def flush_help_screen_to_tree
-
-      _state = flush_frozen_state_from_expect_stdout_stderr
-
-      tree_via_CLI_invocation_state _state
-    end
-
-    def tree_via_CLI_invocation_state state
-
-      TS_.lib_( :CLI_support_expect_section ).tree_via(
-        :state, state, :stream, :e )
-    end
-
     def line_oriented_state_from_invoke * argv
       line_oriented_state_from_invoke_using(
         :mutable_argv, argv,

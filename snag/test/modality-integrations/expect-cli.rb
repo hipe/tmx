@@ -111,15 +111,6 @@ module Skylab::Snag::TestSupport
       using_expect_stdout_stderr_invoke_via_argv argv
     end
 
-    def flush_help_screen_to_tree  # COPY PASTE NASTY  # todo
-
-      _state = flush_frozen_state_from_expect_stdout_stderr
-
-      _ = Home_.lib_.brazen.test_support.lib :CLI_support_expect_section
-
-      _.tree_via :state, _state, :stream, :e
-    end
-
     def o * x_a, & p  # legacy
 
       if x_a.length.nonzero? || p

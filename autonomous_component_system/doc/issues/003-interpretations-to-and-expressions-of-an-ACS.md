@@ -102,7 +102,7 @@ they are requested is an experiment. let's track where this potentially
 feels wasteful in case we change our minds.
 
 (that we create it anew is because of #dt3 dynamicism. that we want not
-to waste it is because of #dt4 conservatism.)
+to waste it is because of #DT4 conservatism.)
 
 
 
@@ -202,7 +202,7 @@ B) it is arguably a violation of #Tenet1 "component autonomy" to have the
 parent component deciding how it wants to the child (with regards to its
 intent); but by designing the formal expression this way rather than
 leaving it up to the child to express (somehow) allows for code that
-"feels" still #dt3 dynamic while trying to be #dt4 conservative under
+"feels" still #dt3 dynamic while trying to be #DT4 conservative under
 whatever the active intent is.
 
 
