@@ -44,7 +44,7 @@ module Skylab::Brazen
 
           send :"__when_argument_arity_of__#{ mprp.argument_arity }__", mprp
 
-          if mprp.is_normalizable_
+          if mprp.is_normalizable__
             __memoize_metapropery_because_it_has_a_hook mprp
           end
 

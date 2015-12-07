@@ -178,23 +178,6 @@ module Skylab::Basic
     class N_Lines
 
       class << self
-
-        def _call * a
-          ___call_via_arglist a
-        end
-        alias_method :[], :_call
-        alias_method :call, :_call
-
-        def ___call_via_arglist a
-          new_via_four( * a ).execute
-        end
-
-        def new_via_four y, d, p_a, expag
-          o = new
-          o.__init_via_four y, d, p_a, expag
-          o
-        end
-
         alias_method :session, :new
         private :new
       end  # >>
@@ -204,22 +187,14 @@ module Skylab::Basic
       end
 
       attr_writer(
-        :downstream_yielder,
-        :num_lines,
+        :description_proc,
+        :downstream_line_yielder,
         :expression_agent,
+        :number_of_lines,
       )
 
       def describe_by & p
-        @_p_a = [ p ] ; nil
-      end
-
-      def __init_via_four y, n, p_a, expag
-
-        @downstream_yielder = y
-        @expression_agent = expag
-        @num_lines = n
-        @_p_a = p_a
-        NIL_
+        @description_proc = p ; nil
       end
 
       def execute * a
@@ -229,7 +204,9 @@ module Skylab::Basic
 
       def ___prepare
 
-        n = @num_lines
+        @downstream_line_yielder ||= []
+
+        n = @number_of_lines
 
         if n
           if 0 < n
@@ -249,7 +226,7 @@ module Skylab::Basic
 
         @_receive_line = -> line do
 
-          @downstream_yielder << line
+          @downstream_line_yielder << line
           _stop = stop_p[]
           if _stop
             throw :__done_with_N_lines__
@@ -260,7 +237,7 @@ module Skylab::Basic
         NIL_
       end
 
-      def __execute a
+      def __execute user_x_a
 
         if @_allow_at_least_one_line
 
@@ -271,14 +248,11 @@ module Skylab::Basic
 
           catch :__done_with_N_lines__ do
 
-            @_p_a.each do | p |
-
-              @expression_agent.calculate y, * a, & p
-            end
+            @expression_agent.calculate y, * user_x_a, & @description_proc
           end
         end
 
-        @downstream_yielder
+        @downstream_line_yielder
       end
     end
 

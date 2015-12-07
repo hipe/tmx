@@ -68,6 +68,11 @@ module Skylab::Brazen
       self
     end.new
 
+    def description_proc
+      # for the top-level (branch) node description. for now, no DSL.
+      NIL_
+    end
+
     # ~ execution phase
 
     def initialize i, o, e, pn_s_a
@@ -206,12 +211,8 @@ module Skylab::Brazen
         o.execute
       end
 
-      def has_description
-        ( @_desc_model ||= __build_description_model ).has_content
-      end
-
-      def under_expression_agent_get_N_desc_lines exp, d=nil
-        @_desc_model.under_expag_get_N_desc_lines_ exp, d
+      def description_proc
+        ( @_desc_model ||= __build_description_model ).instance_description_proc
       end
 
       def __build_description_model
@@ -249,7 +250,7 @@ module Skylab::Brazen
           _arg_a = @_stx.to_a
         end
 
-        @_categorized_properties =  # #VIOLATION
+        @categorized_properties =
           Home_::CLI_Support::Categorized_Properties.via_args_opts_envs(
             _arg_a, NIL_, _opt_a )
 

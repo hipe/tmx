@@ -1,7 +1,5 @@
 module Skylab::Autonomous_Component_System
-
   # ->
-
     class Parameter  # a fresh take on an old hat
 
       class << self
@@ -52,7 +50,7 @@ module Skylab::Autonomous_Component_System
 
       def initialize & p
 
-        @takes_argument = true
+        @argument_arity = :one
 
         instance_exec( & p )
       end
@@ -92,23 +90,52 @@ module Skylab::Autonomous_Component_System
         NIL_
       end
 
-      # ~ default (experimental)
+      # -- #[#fi-010]
+
+      def __interpret__description__ st
+        @description_proc = st.gets_one
+        KEEP_PARSING_
+      end
+
+      attr_reader :description_proc
+
+      rx = nil
+      define_method :option_argument_moniker do  # #[#br-124]
+
+        rx ||= /\A[^_]+/
+        rx.match( @name_symbol )[ 0 ].upcase
+      end
+
+      def argument_argument_moniker  # play along w/ [br] experiment for now
+        NIL_
+      end
+
+      def __interpret__name__ st
+        @_nf = st.gets_one
+        KEEP_PARSING_
+      end
+
+      def name
+        @_nf ||= Callback_::Name.via_variegated_symbol( @name_symbol )
+      end
+
+      attr_reader(
+        :name_symbol,
+      )
 
       def __interpret__default__ st
 
         x = st.gets_one
-        @default_block = -> { x }
+        @default_proc = -> { x }
         KEEP_PARSING_
       end
 
       attr_reader(
-        :default_block,
+        :default_proc,
       )
 
-      # ~ arities & related
-
       def __interpret__is_flag__ _
-        @takes_argument = false
+        @argument_arity = :zero
         KEEP_PARSING_
       end
 
@@ -127,81 +154,10 @@ module Skylab::Autonomous_Component_System
         NIL_
       end
 
-      attr_reader :takes_argument
-
-      def takes_many_arguments
-        :zero_or_more == @parameter_arity
-      end
-
-      def argument_is_required
-        true
-      end
-
-      rx = nil
-      define_method :argument_moniker do  # :+[#124]
-
-        rx ||= /\A[^_]+/
-        rx.match( @name_symbol )[ 0 ].upcase
-      end
-
-      def is_effectively_optional_
-        if has_default
-          true
-        else
-          ! is_required
-        end
-      end
-
-      def is_required
-        :one == @parameter_arity
-      end
-
       attr_reader(
-        :parameter_arity,  # as [#090]
+        :parameter_arity,
+        :argument_arity,
       )
-
-      # ~ description & name
-
-      def __interpret__description__ st
-        @has_description = true
-        @_description_block = st.gets_one
-        KEEP_PARSING_
-      end
-
-      def under_expression_agent_get_N_desc_lines expag, n=nil
-
-        if n
-
-          _p_a = [ @_description_block ]
-          Home_.lib_.basic::String::N_Lines[ [], n, _p_a, expag ]
-        else
-          expag.calculate [], & @_description_block
-        end
-      end
-
-      def __interpret__name__ st
-        @_nf = st.gets_one
-        KEEP_PARSING_
-      end
-
-      def name
-        @_nf ||= Callback_::Name.via_variegated_symbol( @name_symbol )
-      end
-
-      attr_reader(
-        :has_description,
-        :name_symbol,
-      )
-
-      # ~ intrinsic reflection (needed by mode clients)
-
-      def has_custom_moniker
-        false
-      end
-
-      def has_default
-        false
-      end
     end
   # -
 end

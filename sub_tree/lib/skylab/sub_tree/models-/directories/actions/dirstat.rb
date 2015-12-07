@@ -24,7 +24,7 @@ module Skylab::SubTree
 
       @is_promoted = true
 
-      self.description_block = -> y do
+      self.instance_description_proc = -> y do
 
         y <<
 

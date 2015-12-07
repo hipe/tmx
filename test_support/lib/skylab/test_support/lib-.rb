@@ -4,23 +4,19 @@ module Skylab::TestSupport
 
   module Library_
 
-    gemlib = stdlib = Autoloader_.method :require_stdlib
+    stdlib = Autoloader_.method :require_stdlib
 
     o = { }
-    o[ :Adsf ] = gemlib
     o[ :Benchmark ] = stdlib
-    o[ :FileUtils ] = stdlib
-    o[ :JSON ] = stdlib
     o[ :Open3 ] = stdlib
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
-    o[ :Rack ] = gemlib
     o[ :StringIO ] = stdlib
     o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
 
     def self.const_missing c
-      const_set c, H_.fetch( c )[ c ]
+      const_set c, H___.fetch( c )[ c ]
     end
-    H_ = o.freeze
+    H___ = o.freeze
 
     def self.touch * i_a
       i_a.each do |i|
@@ -29,47 +25,14 @@ module Skylab::TestSupport
     end
   end
 
-  module Lib_
+  _instance = module Lib_
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
     Basic = sidesys[ :Basic ]
-
     Brazen = sidesys[ :Brazen ]
-
-    Box = -> do
-      Basic[]::Box.new
-    end
-
-    Default_core_file = -> do
-      Autoloader_.default_core_file
-    end
-
-    Enhancement_shell = -> * i_a do
-      Plugin[]::Bundle::Enhance::Shell.new i_a
-    end
-
-    Function_chain = -> * p_a do
-      Basic[]::Function.chain p_a
-    end
-
-    Hashtag = -> do
-      _Snag[]::Models::Hashtag
-    end
-
+    Fields = sidesys[ :Fields ]
     Human = sidesys[ :Human ]
-
-    Iambic_scanner = -> do
-      Callback_::Polymorphic_Stream
-    end
-
-    IO = -> do
-      System_lib[]::IO
-    end
-
-    Levenshtein = -> * x_a do
-      Human[]::Levenshtein.call_via_iambic x_a
-    end
 
     Match_test_dir_proc = -> do
       mtdp = nil
@@ -79,50 +42,25 @@ module Skylab::TestSupport
     end.call
 
     Parse = sidesys[ :Parse ]  # only for 1 tree runner plugin (greenlist)
-
     Permute = sidesys[ :Permute ]
-
     Plugin = sidesys[ :Plugin ]
-
-    Properties_stack_frame = -> * a do
-      Brazen[]::Property::Stack.common_frame.call_via_arglist a
-    end
-
     Slicer = sidesys[ :Slicer ]  # only for 1 tree runner plugin (greenlist)
-
-    _Snag = sidesys[ :Snag ]
-
-    Skylab__ = Callback_.memoize do
-      require_relative DOT_DOT_
-      ::Skylab
-    end
 
     Stderr = -> { ::STDERR }  # [#001.E]: why access system resources this way
 
     Stdout = -> { ::STDOUT }
-
-    Struct = -> * i_a do
-      Basic[]::Struct.make_via_arglist i_a
-    end
 
     System = -> do
       System_lib[].services
     end
 
     System_lib = sidesys[ :System ]
-
     Task = sidesys[ :Task ]
-
-    Tmpdir = -> do
-      System[].filesystem.tmpdir
-    end
-
     TMX = sidesys[ :TMX ]
 
-    INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(
+    Callback_.produce_library_shell_via_library_and_app_modules(
       self, Home_ )
   end
 
-  LIB_ = Lib_::INSTANCE
-
+  LIB_ = _instance
 end

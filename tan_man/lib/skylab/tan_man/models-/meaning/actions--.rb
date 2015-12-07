@@ -44,7 +44,7 @@ module Skylab::TanMan
 
         Entity_.call self,
 
-          :desc, -> y do
+          :branch_description, -> y do
             y << "apply a meaningful tag to a node"
           end,
 

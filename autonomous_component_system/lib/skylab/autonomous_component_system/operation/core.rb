@@ -1,7 +1,5 @@
 module Skylab::Autonomous_Component_System
-
   # ->
-
     class Operation  # experimental dsl for "rich" operations. notes in [#003]
 
       class << self
@@ -23,7 +21,6 @@ module Skylab::Autonomous_Component_System
       end  # >>
 
       def initialize acs
-
         @_ACS = acs
         @_done = false
         @prototype_parameter = nil
@@ -67,7 +64,7 @@ module Skylab::Autonomous_Component_System
 
       def __accept__description__meta_component st
 
-        @description_block = st.gets_last_one
+        @description_proc = st.gets_last_one
         NIL_
       end
 
@@ -76,7 +73,7 @@ module Skylab::Autonomous_Component_System
       end
 
       attr_reader(
-        :description_block,
+        :description_proc,
         :name_symbol,
       )
 

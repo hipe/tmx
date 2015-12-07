@@ -27,7 +27,7 @@ to parameters: `opt`, `req`, `rest`. our treatment here acts as a more
 general superset to these three (and is not concerned with `block`).
 
 "parameter arity" itself is a "metaproperty", that is, it is a property
-of properties.
+about properties.
 
 until a large amount of dust settles there will be contention between
 parameter arity and "argument arity" (introduced below) with regards to

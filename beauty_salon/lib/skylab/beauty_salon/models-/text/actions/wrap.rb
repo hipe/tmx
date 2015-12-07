@@ -12,7 +12,7 @@ module Skylab::BeautySalon
 
       Brazen_::Modelesque.entity( self,
 
-        :desc, -> y do
+        :branch_description, -> y do
 
           s = <<-HERE
             outputs to stdout (unless stated otherwise) the selected lines

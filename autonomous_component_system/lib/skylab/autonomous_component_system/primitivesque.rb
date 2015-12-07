@@ -23,7 +23,7 @@ module Skylab::Autonomous_Component_System
 
       def describe_into_under y, expag
 
-        p = @_qkn.association.description_block
+        p = @_qkn.association.instance_description_proc
 
         if p
           expag.calculate y, & p

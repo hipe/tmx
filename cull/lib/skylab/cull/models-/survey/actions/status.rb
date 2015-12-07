@@ -8,7 +8,7 @@ module Skylab::Cull
 
       Common_entity_.call self,
 
-        :desc, -> y do
+        :branch_description, -> y do
           y << "display status of the survey"
         end,
 

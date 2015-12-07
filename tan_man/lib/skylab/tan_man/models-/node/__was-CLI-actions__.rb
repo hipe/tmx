@@ -6,7 +6,7 @@ module Skylab::TanMan
 
   class CLI::Actions::Graph::Node::Actions::Add < CLI::Action
 
-    desc "add a node (without associating it with another node)"
+    description_ "add a node (without associating it with another node)"
 
     inflection.inflect.noun :singular
 
@@ -27,7 +27,7 @@ module Skylab::TanMan
 
   class CLI::Actions::Graph::Node::Actions::List < CLI::Action
 
-    desc "list nodes in the graph"
+    description_ "list nodes in the graph"
 
     inflection.inflect.noun :plural
 
@@ -42,7 +42,7 @@ module Skylab::TanMan
 
   class CLI::Actions::Graph::Node::Actions::Rm < CLI::Action
 
-    desc "destroys the node and all its associations!"
+    description_ "destroys the node and all its associations!"
 
     inflection.inflect.noun :singular
 

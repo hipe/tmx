@@ -55,13 +55,15 @@ module Skylab::TestSupport
         _ok and execute
       end
 
+      Fields___ = Home_.lib_.fields
+
       def receive_stream_and_pfunc_prop st, prp
 
         pfunc = Autoloader_.const_reduce(
           [ prp.name.as_const ],
           self.class::Parameter_Functions_ )
 
-        if prp.takes_argument
+        if Fields___::Takes_argument[ prp ]
           _x = st.gets_one
           pfunc.call self, _x, @o, & @on_event_selectively
         else

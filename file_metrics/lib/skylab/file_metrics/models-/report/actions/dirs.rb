@@ -8,7 +8,7 @@ module Skylab::FileMetrics
 
       edit_entity_class(
 
-        :desc, -> y do
+        :branch_description, -> y do
            y << "with each immediate child directory of <path>"
            y << "report its number of files and total SLOC,"
            y << "and display them in descending order of SLOC."

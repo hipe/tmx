@@ -10,7 +10,7 @@ module Skylab::TestSupport
 
           :promote_action,
 
-          :desc, -> y do
+          :branch_description, -> y do
             y << "magnets HACK"
           end,
 

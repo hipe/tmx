@@ -12,7 +12,7 @@ module Skylab::TanMan
 
       Entity_.call self,
 
-        :desc, -> y do
+        :branch_description, -> y do
           y << 'experimental natural language-ISH interface'
         end,
 

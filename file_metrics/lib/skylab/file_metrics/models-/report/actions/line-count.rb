@@ -10,7 +10,7 @@ module Skylab::FileMetrics
 
       edit_entity_class(
 
-        :desc, -> y do
+        :branch_description, -> y do
           y << "Shows the linecount of each file, longest first."
           y << "Show percentages of max for each file."
         end,

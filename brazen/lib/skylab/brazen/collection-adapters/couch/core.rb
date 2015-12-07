@@ -4,7 +4,7 @@ module Skylab::Brazen
 
     Home_::Modelesque.entity self do
 
-      o :desc, -> y do
+      o :branch_description, -> y do
         y << "manage couch collections."
       end
 

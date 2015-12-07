@@ -93,7 +93,7 @@ module Skylab::Autonomous_Component_System
 
         def _prepare_args
 
-          if 1 == @_bx.length && @_bx.at_position( 0 ).is_required
+          if 1 == @_bx.length && Field_::Is_required[ @_bx.at_position( 0 ) ]
             __prepare_single_style
           else
             process_named_arguments
@@ -114,7 +114,7 @@ module Skylab::Autonomous_Component_System
 
           proto = @operation.prototype_parameter
 
-          if proto && proto.default_block
+          if proto && proto.default_proc
             __process_named_arguments_with_default_default proto
 
           else
@@ -125,7 +125,7 @@ module Skylab::Autonomous_Component_System
         def __process_named_arguments_with_default_default proto  # see [#]note-B
 
           default_default = -> do
-            x = proto.default_block.call
+            x = proto.default_proc.call
             default_default = -> { x }
             x
           end
@@ -143,20 +143,17 @@ module Skylab::Autonomous_Component_System
             if wv
               x = wv.value_x
 
-            elsif par.is_required
+            elsif Field_::Is_required[ par ]
               self._COVER_ME_as_written
               raise ::ArgumentError, __say_missing( par, wv_h, st )
 
+            elsif Field_::Has_default[ par ]
+              x = par.default_proc[]
             else
-              p = par.default_block
-              x = if p
-                p[]
-              else
-                default_default[]
-              end
+              x = default_default[]
             end
 
-            if par.takes_many_arguments
+            if Field_::Takes_many_arguments[ par ]
               self._HOLD_THE_PHONE
             end
 
@@ -173,7 +170,7 @@ module Skylab::Autonomous_Component_System
           a = [ par ]
           while par = st.gets
             wv_h[ par.name_symbol ] and next
-            par.is_required or next
+            Field_::Is_required[ par ] or next
             a.push par
           end
           _say_missing a
@@ -253,7 +250,7 @@ module Skylab::Autonomous_Component_System
             missing = [ par ]
             op_h = nil  # sanity
             while par = st.gets
-              par.is_required or next
+              Field_::Is_required[ par ] or next
               wrapped_value[] and next
               missing.push par
             end
@@ -331,6 +328,8 @@ module Skylab::Autonomous_Component_System
             }of our leaky isomorphism between methods and named args"
         end
 
+        Field_ = Home_.lib_.fields  # idiomatic name
+
         def _slice_off_relevant_args
 
           # random access to name-value pairs to algorithms that want it.
@@ -347,7 +346,7 @@ module Skylab::Autonomous_Component_System
 
             arg_st.advance_one
 
-            _x = if par.takes_argument
+            _x = if Field_::Takes_argument[ par ]
               arg_st.gets_one  # ..
             else
               true  # as flag

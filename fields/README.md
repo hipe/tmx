@@ -7,6 +7,9 @@ with modeling { properties | fields | attributes } of entity models.
 (but note currently one of the main such libraries lives in [br] under
 "entity".)
 
+currently its flagship contribution is the "external functions"
+described in [#010].
+
 
 
 

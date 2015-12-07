@@ -6,7 +6,9 @@ module Skylab::TanMan
 
   class CLI::Actions::Graph::Remote::Actions::Add < CLI::Action
 
-    desc "adds a remote data { source | destination } to the graph (for syncing)"
+    @description_proc = -> y do
+      y << "adds a remote data { source | destination } to the graph (for syncing)"
+    end
 
     def process
       api_invoke [ :graph, :remote, :add ], @param_h
@@ -37,7 +39,7 @@ module Skylab::TanMan
 
     TanMan::Sub_Client[ self, :expression_agent ]
 
-    desc "list the known remotes for this graph"
+    description_ "list the known remotes for this graph"
 
     def process
       begin
@@ -67,7 +69,7 @@ module Skylab::TanMan
 
     class CLI::Actions::Graph::Remote::Actions::Remove < CLI::Action
 
-      desc "remove that remote"
+      description_ "remove that remote"
 
       option_parser do |o|
         dry_run_option o

@@ -8,14 +8,14 @@ module Skylab::Autonomous_Component_System
 
         :bad_shape,
         :x, nil,
-        :context_x, nil,
+        :context_linked_list, nil,
         :error_category, :type_error,
         :ok, false,
 
       ) do | y, o |
 
         tightest_context, trailing_context = Express_context_under_[
-          o.context_x, self, 'for' ]
+          o.context_linked_list, self, 'for' ]
 
         y << "#{ tightest_context }#{
           }expected hash, had #{ ick o.x }#{
@@ -30,7 +30,7 @@ module Skylab::Autonomous_Component_System
 
           new_with(
             :x, x,
-            :context_x, sess.context_x,
+            :context_linked_list, sess.context_linked_list,
           )
         end
         UNABLE_

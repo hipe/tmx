@@ -10,8 +10,7 @@ module Skylab::Autonomous_Component_System::TestSupport
     use :modalities_reactive_tree_CLI_integration_support
 
     it "1.4)   operation has description" do
-
-      _s.should match %r(^ +wazoozie-foozie +have 'fun'\n)
+      _top_help_screen.should match %r(^ +wazoozie-foozie +have 'fun'\n)
     end
 
     context "for one particular operation" do
@@ -62,48 +61,55 @@ module Skylab::Autonomous_Component_System::TestSupport
       end
     end
 
-    context "for a branch node at level 1" do
+    it "+1  1.4.B) has description in first help screen" do
+      _top_help_screen.should match %r(^ +fantazzle-dazzle +'yay'$)
+    end
 
-      it "1.4.B) has description in first help screen" do
-        _s.should match %r(^ +fantazzle-dazzle +'yay'$)
-      end
+    context "+1  3.4)   request help on its action" do
 
-      it "3.4)   request help on its action" do
-
+      shared_subject :state_ do
         invoke 'fantaz', 'open', '-h'
-
-        t = flush_help_screen_to_tree
-        cx = t.children
-        cx.length.should eql 3
-
-        # usage
-
-        cx[ 0 ].x.unstyled_content.should eql(
-          "usage: fam fantazzle-dazzle open [-v] [-d] <file>" )
-
-        # options
-
-        cx[ 1 ].x.unstyled_header_content.should eql 'options'
-        cx[ 1 ].children[ 0 ].x.line_content.should match(
-          %r(\A-v, --verbose  +tha V\z) )
-
-        # argument
-
-        cx[ 2 ].x.unstyled_header_content.should eql 'argument'
-        cx[ 2 ].children[ 0 ].x.line_content.should eql '<file>'
-
+        flush_invocation_to_help_screen_oriented_state
       end
 
-      it "3.3)   money" do
+      it "succeeds" do
+        state_.exitstatus.should match_successful_exitstatus
+      end
 
-        invoke 'fantaz', 'open', '-v', 'zang'
-        expect :e, '[:file, "zang", :V]'
-        expect_no_more_lines
-        @exitstatus.should eql :_neat_
+      it "usage" do
+
+        a = state_.lookup( 'usage' ).to_lines :unstyled
+
+        _1 = "usage: fam fantazzle-dazzle open [-v] [-d] <file>"
+        _2 = "       fam fantazzle-dazzle open -h"
+
+        a[ 0 ].should eql _1
+        a[ 1 ].should eql _2
+        a.fetch( 2 ).should eql EMPTY_S_
+      end
+
+      it "options" do
+
+        state_.lookup( 'options' ).children.fetch( 0 ).
+          x.string.should match %r(\A  +-v, --verbose  +tha V$)
+      end
+
+      it "argument" do
+
+        state_.lookup( 'argument' ).children.fetch( 0 ).
+          x.string.should match %r(\A  +<file>)
       end
     end
 
-    dangerous_memoize :_s do
+    it "3.3)   money" do
+
+      invoke 'fantaz', 'open', '-v', 'zang'
+      expect :e, '[:file, "zang", :V]'
+      expect_no_more_lines
+      @exitstatus.should eql :_neat_
+    end
+
+    dangerous_memoize :_top_help_screen do
       invoke '-h'
       flush_to_unstyled_string_contiguous_lines_on_stream :e
     end

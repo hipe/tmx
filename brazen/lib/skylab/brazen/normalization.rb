@@ -83,11 +83,13 @@ module Skylab::Brazen
 
       def flush
 
+        Require_fields_lib_[]
+
         -> kn, model, & x_p do
 
           # 1. if value is unknown and defaulting is available, apply it.
 
-          if ! kn.is_effectively_known && model.has_default
+          if ! kn.is_effectively_known && Field_::Has_default[ model ]
 
             kn = kn.new_with_value @apply_default[ model ]
           end
@@ -106,7 +108,7 @@ module Skylab::Brazen
 
           if kn
 
-            if ! kn.is_effectively_known && model.is_required
+            if ! kn.is_effectively_known && Field_::Is_required[ model ]
 
               kn = @when_missing.call kn, MISSING___ do
                 Home_::Property.build_missing_required_properties_event(

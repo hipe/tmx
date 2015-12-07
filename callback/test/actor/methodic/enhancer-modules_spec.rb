@@ -14,6 +14,8 @@ module Skylab::Callback::TestSupport::Actor::Methodic::MP
 
   Grandparent_Subject_ = Parent_TS_::Parent_subject_
 
+  Home_ = Home_
+
   KEEP_PARSING_ = KEEP_PARSING_
 
   describe "[ca] actor - methodic - enhancer modules" do
@@ -126,9 +128,13 @@ module Skylab::Callback::TestSupport::Actor::Methodic::MP
           module_methods_module_for_write
 
           module ModuleMethods
+
             def to_required_properties_stream
-              properties.to_value_stream.reduce_by do |prop|
-                prop.is_required
+
+              p = Home_.lib_.fields::Is_required
+
+              properties.to_value_stream.reduce_by do | prp |
+                p[ prp ]
               end
             end
           end

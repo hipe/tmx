@@ -518,10 +518,6 @@ module Skylab::Callback
           ivar || @name.as_ivar
         end
 
-        def is_required
-          :one == @parameter_arity
-        end
-
         attr_reader :default_proc  # :+#hook-in-esque. the ivar is not set here
 
         def polymorphic_writer_method_proc
@@ -867,9 +863,10 @@ module Skylab::Callback
 
           def via_default_proc_and_is_required_normalize  # #note-515, :+#courtesy
 
+            Require_fields_lib_[]
+
             miss_prp_a = nil
             st = self.class.properties.to_value_stream
-
             begin
               prp = st.gets
               prp or break
@@ -887,7 +884,7 @@ module Skylab::Callback
                 instance_variable_set ivar, x
               end
 
-              if prp.is_required && x.nil?
+              if Field_::Is_required[ prp ] && x.nil?
                 ( miss_prp_a ||= [] ).push prp
               end
 
@@ -998,6 +995,12 @@ module Skylab::Callback
         end
 
         IAMBIC_WRITER_METHOD_NAME_RX__ = /\A.+(?==\z)/
+      end
+
+      Require_fields_lib_ = Lazy.call do  # NOTE - push this up, do not rewrite it
+        _x = Home_.lib_.fields
+        Home_.const_set :Field_, _x
+        NIL_
       end
 
       BX_ = :PROPERTIES_FOR_WRITE__

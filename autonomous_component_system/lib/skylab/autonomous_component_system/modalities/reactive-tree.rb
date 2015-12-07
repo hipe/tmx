@@ -1,7 +1,5 @@
 module Skylab::Autonomous_Component_System
-
   # ->
-
     module Modalities::Reactive_Tree  # notes in [#003]
 
       class Dynamic_Source_for_Unbounds  # [mt]
@@ -90,7 +88,9 @@ module Skylab::Autonomous_Component_System
             end,
 
             operation: -> do
+
               # (operations are only ever for the interface intent)
+
               Operation_as_Hybrid___.new qkn, @ACS, & @_oes_p
             end
           }
@@ -214,33 +214,19 @@ module Skylab::Autonomous_Component_System
 
         # ~ desc & name
 
-        def has_description
-          @_acs.respond_to? :describe_into_under
-        end
+        def description_proc
 
-        def under_expression_agent_get_N_desc_lines expag, n=nil
+          # for CLI we want loud failure. violate ACS passivity
 
-          if n
-            __N_description_lines n, expag
-          else
-            @_acs.describe_into_under [], expag
-          end
-        end
-
-        def __N_description_lines n, expag
-
-          o = Home_.lib_.basic::String::N_Lines.session
           acs = @_acs
-          o.describe_by do | y |
-            acs.describe_into_under y, expag
+          if acs.respond_to? :describe_into_under  # the hand-written-convenient form
+            -> y do
+              acs.describe_into_under y, self
+            end
+          else
+            acs.description_proc
           end
-          o.downstream_yielder = []
-          o.expression_agent = Home_.lib_.brazen::API.the_empty_expression_agent
-          o.num_lines = n
-          o.execute
         end
-
-        # ~ op
 
         alias_method :name, :name_function
 
@@ -267,6 +253,10 @@ module Skylab::Autonomous_Component_System
 
         include defaults::Unbound_Methods
 
+        def description_proc
+          @_op.description_proc
+        end
+
         def name_function
           @_op.name
         end
@@ -282,32 +272,6 @@ module Skylab::Autonomous_Component_System
         alias_method :name, :name_function
 
         # ~ desc
-
-        def has_description
-          @_desc_p = @_op.description_block
-          ! @_desc_p.nil?
-        end
-
-        def under_expression_agent_get_N_desc_lines expag, n=nil
-
-          if n
-            __N_description_lines n, expag
-          else
-            expag.calculate [], & @_desc_p
-          end
-        end
-
-        def __N_description_lines n, expag
-
-          o = Home_.lib_.basic::String::N_Lines.session
-
-          o.describe_by( & @_desc_p )
-          o.downstream_yielder = []
-          o.expression_agent = expag
-          o.num_lines = n
-
-          o.execute
-        end
 
         # ~ execution
 

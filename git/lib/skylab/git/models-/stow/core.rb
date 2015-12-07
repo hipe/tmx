@@ -69,10 +69,12 @@ module Skylab::Git
     class Actions::Save < Action_
 
       edit_entity_class(
-        :desc, -> y do
+
+        :branch_description, -> y do
           "move all untracked files in the current path to #{
             }a \"stow\" directory"
         end,
+
         :required, :property, :filesystem,
         :required, :property, :system_conduit,
         :required, :property, :stows_path,
@@ -105,9 +107,11 @@ module Skylab::Git
     class Actions::Pop < Action_
 
       edit_entity_class(
-        :desc, -> y do
+
+        :branch_description, -> y do
           y << "attempts to put the files back if there are no collisions."
         end,
+
         :required, :property, :filesystem,
         :required, :property, :system_conduit,
         :required, :property, :stows_path,
@@ -136,9 +140,11 @@ module Skylab::Git
     class Actions::Show < Action_
 
       edit_entity_class(
-        :desc, -> y do
+
+        :branch_description, -> y do
           y << "in the spirit of `git stash show`, show contents of stash"
         end,
+
         :required, :property, :filesystem,
         :required, :property, :system_conduit,
         :required, :property, :stows_path,
@@ -154,9 +160,11 @@ module Skylab::Git
     class Actions::Status < Action_
 
       edit_entity_class(
-        :desc, -> y do
+
+        :branch_description, -> y do
           y << "shows the files that would be stashed."
         end,
+
         :required, :property, :system_conduit,
         :required, :property, :project_path,
         :required, :property, :current_relpath,
@@ -172,9 +180,11 @@ module Skylab::Git
     class Actions::List < Action_
 
       edit_entity_class(
-        :desc, -> y do
+
+        :branch_description, -> y do
           y << "list the stows"
         end,
+
         :required, :property, :filesystem,
         :required, :property, :stows_path,
       )

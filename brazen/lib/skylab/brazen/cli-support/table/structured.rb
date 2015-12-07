@@ -113,14 +113,14 @@ module Skylab::Brazen
 
         def __accept_field fld
 
-          fld = Field__.new fld
+          fld = Table_Field__.new fld
           @_bx.add fld.name_symbol, fld
           NIL_
         end
 
         # ~
 
-        class Field__
+        class Table_Field__
 
           attr_reader(
             :does_summary,

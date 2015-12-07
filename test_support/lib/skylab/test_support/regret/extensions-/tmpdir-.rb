@@ -9,7 +9,7 @@ module Skylab::TestSupport
       end
 
       def bld_tmpdir
-        LIB_.tmpdir.new_with(
+        LIB_.system.filesystem.tmpdir.new_with(
           :path, tmpdir_pathname,
           :max_mkdirs, ( count_to_top + 1 ) )  # one for tmp/your-sub-product
       end

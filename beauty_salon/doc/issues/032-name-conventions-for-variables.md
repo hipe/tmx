@@ -55,7 +55,7 @@ very particular meaning: it means *either*:
 
 
 
-## local variables - scope
+## local variables - scope :A
 
 we haved developed a bunch of weird idioms that help us read our code
 with respect to how we name instance variables:
@@ -73,14 +73,8 @@ with respect to how we name instance variables:
 
     _as_a_local_variable = ..
 
-      # we use this convention often to signify that the variable is
-      # only only ever referenced from one place (and usually nearby).
-      # technically, using these variables "wastes processing", but we
-      # do so to break up a long trainwreck and/or to document something.
+      # see [#]explanation-of-this-convention below
 
-      # when we see several of these in one scope, it often indicates
-      # some code that is "hot off the press" and remains in a very raw,
-      # debug-friendly state because it hasn't "settled" yet..
 
 
 
@@ -114,4 +108,56 @@ with respect to how we name instance variables:
 
 
       _SOMETIMES   # we use this crazy thing to .. etc
+
+
+
+
+## :explanation-of-this-convention
+
+when a single leading underscore is used in a local variable's name,
+this means that the variable is not "necessary" in strict terms; however
+in our universe you will find that we employ this convention quite
+frequently (ergo we have a lot of local variables that are not strictly
+necessary)..
+
+1) in the less-frequently seen form, we use this convention to name a
+variable that we do not use but sort-of have to assign. like:
+
+    _sin, sout, serr, wait = ::Open3.popen3 'hack', 'my', 'box'
+
+    # (we don't intend to use the 'stdin' handle ever)
+
+this evolved from the useful platform feature of issuing a warning for
+local variables that are assigned but not used. the platform will side-
+step this warning if the variable name has one (or more) leading
+underscore(s).
+
+2) the more frequently-seen form is this: the variable is only ever
+referenced from one place (and it should be "nearby").
+
+although technically it "wastes processing", this convention is employed
+to break up trainwreck of a long line of code, so that A) it is more
+self-documenting and B) it is more amenable to step-debugging. it is our
+contention that the "overhead" from this "waste" is typically a cost
+well-spent in exchange for these benefits.
+
+in [sn]  (referencing this subject doc node), the subject codepoint is
+exemplary of this convention:
+
+the significant outcome of the case expression to assign a single
+variable, and nothing more. since the platform conveniently conceives of
+these as expressions, it was redundant to name the variable three times.
+
+also, in some branches of the case expression there are variables that
+are assigned to and only ever referenced one in the same code block,
+right below where the variables are assigned.
+
+if we wanted to we could rewrite this whole "block" as a single (large)
+in-line expreession in the place where the value is needed, but that
+would be a beast to comprehend and debug.
+
+also, when we see several of these in one scope, it can sometimes
+be an indication of some code that is "hot off the press" and remains
+in a very raw, debug-friendly state because it hasn't "settled" yet..
+
 _

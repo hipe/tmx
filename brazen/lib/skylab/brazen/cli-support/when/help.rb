@@ -101,9 +101,8 @@ module Skylab::Brazen
 
           ada_a.each do | ada |
 
-            if ada.has_description
-              _desc_lines = ada.under_expression_agent_get_N_desc_lines(
-                expag, MAX_DESC_LINES )
+            if Field_::Has_description[ ada ]
+              _desc_lines = Field_::N_lines[ MAX_DESC_LINES, expag, ada ]
             end
 
             y.yield ada.name.as_slug, ( _desc_lines || EMPTY_A_ )

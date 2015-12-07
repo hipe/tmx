@@ -1,51 +1,76 @@
 module Skylab::Brazen
 
   module CLI_Support
-    # ->
-      module Arguments
 
-        class Normalization_Via___
+    class Property_via_Platform_Parameter  # tiny intro at [#105]A
 
-          Callback_::Actor.call self,
-            :properties,
-              :parameters
+      def initialize opt_req_rest_sym, name_symbol
 
-          def execute
-            Normalization_.new( @parameters.map do |a|
-              Argument_via_Native_Parameter__.new( * a )
-            end )
-          end
+        @_name_symbol = name_symbol
 
-          class Argument_via_Native_Parameter__
+        instance_exec( & H___.fetch( opt_req_rest_sym ) )
 
-            def initialize opt_req_rest_i, name_symbol
-              @opt_req_rest_i = opt_req_rest_i
-              @name_symbol = name_symbol
-            end
-
-            def has_default
-              false
-            end
-
-            attr_reader :name_symbol
-
-            def is_required
-              :req == @opt_req_rest_i
-            end
-
-            def name
-              @name ||= bld_name_function_with_hack
-            end
-
-          private
-
-            def bld_name_function_with_hack
-              Callback_::Name.via_variegated_symbol(
-                Callback_::Name.variegated_human_symbol_via_variable_name_symbol @name_symbol )
-            end
-          end
-        end
+        @reqity_symbol_ = opt_req_rest_sym
       end
-    # -
+
+      # -- #[#fi-010]
+
+      def description_proc
+        NIL_  # there is no isomorph from the substrate to this
+      end
+
+      def option_argument_moniker  # this one [br] expansion
+        NIL_
+      end
+
+      def argument_argument_moniker  # ditto
+        NIL_
+      end
+
+      def name
+        @___nf ||= ___build_name_function
+      end
+
+      def ___build_name_function
+
+        s = @_name_symbol.id2name
+        Callback_::Name::Modality_Functions::
+          Mutate_string_by_chomping_any_trailing_name_convention_suffixes[ s ]
+
+        Callback_::Name.via_variegated_symbol s.downcase.intern
+      end
+
+      def default_proc
+        NIL_  # we can't reflect on default arguments
+      end
+
+      H___ = {
+
+        opt: -> do  # "flag"
+          @parameter_arity = :zero_or_one
+          @argument_arity = :zero ; nil
+        end,
+
+        req: -> do  # regular argument
+          @parameter_arity = :one
+          @argument_arity = :one
+        end,
+
+        rest: -> do  # "glob"
+          @parameter_arity = :zero_or_more
+          @argument_arity = :one
+        end
+      }
+
+      attr_reader(
+
+        :parameter_arity,
+        :argument_arity,
+
+        :reqity_symbol_,  # internally convenient to preserve this
+      )
+    end
   end
 end
+
+# #tombstone: variegated_human_symbol_via_variable_name_symbol (absorbed here)

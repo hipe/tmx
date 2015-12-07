@@ -2,6 +2,8 @@ module Skylab::Snag
 
   class CLI < Home_.lib_.brazen::CLI
 
+    CLI_Lib__ = superclass
+
     # ~ the bulk of this file is the implementation of the hybrid "open"
     # action adapter, an exposure that calls one of two distinct model
     # actions depending on its arguments.
@@ -11,7 +13,7 @@ module Skylab::Snag
       # this is :[#br-066] currently the only example of the code
       # necessary to expose & implement a modality-only action adatper..
 
-      super.unshift_by CLI::Mock_Unbound.new( Actions::Open )
+      super.unshift_by CLI_Lib__::Backless::Backless_Unbound_Action.new Actions::Open
     end
 
     class Action_Adapter < Action_Adapter
@@ -213,7 +215,7 @@ module Skylab::Snag
       end
     end
 
-    class Actions::Open::Mock_Bound < CLI::Mock_Bound
+    class Actions::Open::Backless_Bound_Action < CLI_Lib__::Backless::Backless_Bound_Action
 
       attr_reader :hybrid
 
@@ -299,45 +301,90 @@ module Skylab::Snag
       def _hack_qualify_description k, bx, s
 
         prp = bx.fetch k
-        p_a = prp.desc_p_a
-
         if prp.frozen?
-
-          prp = prp.dup
-          bx.replace k, prp
-          if p_a
-            p_a = p_a.dup
-            prp.desc_p_a = p_a
-          end
+          mutable_prp = prp.dup
+          bx.replace k, mutable_prp
+        else
+          mutable_prp = prp
         end
+        prp = nil
 
         addendum = "(#{ s })"
 
-        if p_a
+        desc_p = mutable_prp.description_proc
 
-          orig_p = p_a.last
-
-          p_a[ -1 ] = -> y do
-
-            a = orig_p[ [] ]
-
-            if a.last.length > addendum.length  # break line if etc. eew
-              a.push addendum
-            else
-              a[ -1 ] = "#{ a.last } #{ addendum }"
-            end
-
-            a.each do | s_ |
-              y << s_
-            end
-            y
-          end
+        if desc_p
+          _new_description_proc = ___fantastic_hack addendum, desc_p
         else
-          prp.desc_p_a = [ -> y do
+          _new_description_proc = -> y do
             y << addendum
-          end  ]
+          end
         end
 
+        mutable_prp.description_proc = _new_description_proc
+        NIL_
+      end
+
+      def ___fantastic_hack addendum, upstream_description_p
+
+        # a hacky (fun) heuristic descides whether we break the line..
+
+        me = self
+        -> y do
+
+          # render the lines as they used to appear. (self is expression agent.)
+
+          s_a = []
+          _y_ = ::Enumerator::Yielder.new( & s_a.method( :push ) )
+          calculate _y_, & upstream_description_p
+
+          # here's the hacky part: we want to break the line if the would-be
+          # new line would be considered "too long". so what is long?
+
+          me.___mutate_lines_using_adendum s_a, addendum
+        end
+      end
+
+      def ___mutate_lines_using_adendum s_a, addendum
+
+        case 1 <=> s_a.length
+        when 0
+
+          # if there is only one line, we have no reference point except
+          # the addendum, so we use the addendum itself to determine if
+          # the existing line is already "long"
+
+          _on_its_own_line = s_a.last.length > addendum.length
+
+        when -1
+
+          # when there is more than one line, will the would-be new line
+          # be longer than the longest of all the non-final lines?
+
+          _longest = ( 0 ... s_a.length ).reduce 0 do | m, d |
+            length = s_a.fetch( d ).length
+            m < length ? length : m
+          end
+
+          _would_be_new_line_length =
+            s_a.last.length + SPACE_.length + addendum.length
+
+          _on_its_own_line = _longest < _would_be_new_line_length
+
+        when 1
+
+          # if there are no existing lines, addendum gets its own line
+
+          _on_its_own_line = true
+        end
+
+        # (the above block is exemplary of name conv. [#bs-032]:A)
+
+        if _on_its_own_line
+          s_a.push s
+        else
+          s_a[ -1 ] = "#{ s_a.last } #{ addendum }"
+        end
         NIL_
       end
     end

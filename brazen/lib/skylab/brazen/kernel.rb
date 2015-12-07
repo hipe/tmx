@@ -62,6 +62,10 @@ class Kernel  # [#015]
 
   # ~ general client exposures
 
+  def description_proc
+    NIL_  # etc
+  end
+
   def app_name
 
     if @_name_function

@@ -118,11 +118,7 @@ module Skylab::Brazen
 
       module Semi_Generated_Module_Methods___
 
-        def has_description
-          true
-        end
-
-        def description_block
+        def instance_description_proc
           cls = self
           -> y do
             nf = cls.name_function

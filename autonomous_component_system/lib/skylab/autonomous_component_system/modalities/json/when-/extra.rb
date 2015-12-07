@@ -1,7 +1,5 @@
 module Skylab::Autonomous_Component_System
-
   # ->
-
     module Modalities::JSON::When_
 
       module Extra
@@ -10,13 +8,13 @@ module Skylab::Autonomous_Component_System
 
           sess.on_event_selectively.call :error, :extra_properties do
 
-            context_x = sess.context_x
+            _LL = sess.context_linked_list
 
-            _p = -> s_a, _ev do
+            _p = -> s_a, ev do
 
-              if context_x
+              if _LL
 
-                st = context_x.to_element_stream_assuming_nonsparse
+                st = _LL.to_element_stream_assuming_nonsparse
 
                 s_a_ = st.reduce_into_by [] do | m, p |
 
@@ -29,12 +27,16 @@ module Skylab::Autonomous_Component_System
               end
             end
 
-            Home_.lib_.brazen::Property::Events::Extra.new_with(
+            _ev = Home_.lib_.brazen::Property::Events::Extra.new_with(
               :name_x_a, sym_a,
               :lemma, 'element',
               :suffixed_prepositional_phrase_context_proc, _p,
             )
+
+            _ev
           end
+
+          NIL_
         end
       end
     end

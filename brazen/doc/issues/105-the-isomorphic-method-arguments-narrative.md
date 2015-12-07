@@ -27,11 +27,7 @@ this isomorphicism is one of the obsessions of this library..
 
 this is a vestige of what used to be an important top node in [hl]
 ("argument", that is, formal argument of argv and a counterpart to
-"option" as a formal option of an o.p). currently we make it quack like
-a modern property of [br], but we do not subclass the same. however this
-is an avenue worth keeping in mind IFF there is too much redundancy of
-method implementations here. ( but note that when we call these "hook
-outs" it makes them OK. :P )
+"option" as a formal option of an o.p).
 
 what follows is from the original work:
 

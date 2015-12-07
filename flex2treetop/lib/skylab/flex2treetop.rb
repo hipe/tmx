@@ -111,10 +111,13 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
         @is_promoted = true
 
         edit_entity_class(
-          :desc, -> y do
+
+          :branch_description, -> y do
             y << "output the #{ app_name } version"
           end,
-          :flag, :property, :bare )
+
+          :flag, :property, :bare,
+        )
 
         def produce_result
 

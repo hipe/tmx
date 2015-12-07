@@ -46,9 +46,9 @@ module Skylab::Brazen
 
       def express_description
 
-        if @_reflection.has_description
-          s_a = @_reflection.under_expression_agent_get_N_desc_lines(
-            @_expression_agent )
+        if Field_::Has_description[ @_reflection ]  # woah
+
+          s_a = Field_::N_lines[ nil, @_expression_agent, @_reflection ]
         end
 
         if s_a && s_a.length.nonzero?

@@ -531,11 +531,14 @@ module Skylab::Brazen
 
         Check_for_missing_requireds___ = -> entity do  # near [#087]
 
+          Require_fields_lib_[]
+
           miss_a = nil
 
           entity.class.properties.each_value do | prp |
 
-            prp.is_required or next
+            _is = Field_::Is_required[ prp ]
+            _is or next
 
             kn = entity.knowness_via_association_ prp
 

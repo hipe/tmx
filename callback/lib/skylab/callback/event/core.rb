@@ -300,11 +300,18 @@ module Skylab::Callback
 
       def render_into_yielder_N_lines_under y, d, expag
 
-        _ = Home_.lib_.basic::String::N_Lines
+        o = Home_.lib_.basic::String::N_Lines.session
 
-        _p = message_proc
-        _p ||= Inferred_Message.to_proc
-        _.new_via_four( y, d, [ _p ], expag ).execute self
+        p = message_proc
+        if ! p
+          p = Inferred_Message.to_proc
+        end
+
+        o.description_proc = p
+        o.downstream_line_yielder = y
+        o.expression_agent = expag
+        o.number_of_lines = d
+        o.execute self
       end
 
       def to_stream_of_lines_rendered_under expag  # :+[#064] imagine threads

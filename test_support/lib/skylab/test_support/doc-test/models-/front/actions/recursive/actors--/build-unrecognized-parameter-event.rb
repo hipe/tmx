@@ -19,12 +19,13 @@ module Skylab::TestSupport
 
             end
 
-            _reduced_s_a = Home_.lib_.levenshtein(
+            _reduced_s_a = Home_.lib_.human::Levenshtein.with(
               :item, o.name.id2name,
               :items, _item_s_a,
               :closest_N_items, 3,
               :item_proc, IDENTITY_,
-              :aggregation_proc, IDENTITY_ )
+              :aggregation_proc, IDENTITY_,
+            )
 
             _inferred_tag_s_a = _reduced_s_a.map do | s |
               code "##{ s.gsub UNDERSCORE_, DASH_ }"

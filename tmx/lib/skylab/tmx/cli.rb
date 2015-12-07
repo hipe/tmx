@@ -101,8 +101,11 @@ module Skylab::TMX
         @_ss_mod = ss_mod
       end
 
-      def under_expression_agent_get_N_desc_lines expag, n=nil
-        @_ss_mod.describe_into_under [], expag
+      def description_proc
+        ss_mod = @_ss_mod
+        -> y do
+          ss_mod.describe_into_under y, self
+        end
       end
 
       def bound_call_via_receive_frame otr

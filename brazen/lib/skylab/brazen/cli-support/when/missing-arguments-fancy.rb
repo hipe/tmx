@@ -47,7 +47,7 @@ module Skylab::Brazen
         ( _missing_idx - 1 ).downto( 0 ).each do | d |  # neg ok
           arg_ = syntax[ d ]
 
-          if :req == arg_.reqity_symbol
+          if :req == arg_.reqity_symbol_
             break
           end
           a.unshift arg_
@@ -92,7 +92,7 @@ module Skylab::Brazen
 
       def __render_arg_text arg
 
-        _, ___ = Here_::Syntax_Assembly.brackets_for_reqity_ arg.reqity_symbol
+        _, ___ = Here_::Syntax_Assembly.brackets_for_reqity_ arg.reqity_symbol_
 
         __ = @_expression.expression_agent.calculate do
           render_property_as_argument arg

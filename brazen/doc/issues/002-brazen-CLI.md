@@ -290,6 +290,34 @@ some important facets of this employed here:
 
 
 
+## Spot-1
+
+fields that take optional arguments are a nastly class of formal
+properties that we only support because we have to because of their
+analog in option parsers that support them. they have no known analog
+in other modalities.
+
+  • because of this we prefer to conceptualize them as two
+    different mututally exclusive formal properties with the same
+    name, one being boolean-like and one being argumentative. but
+    that's a personal choice that has no palpable consequence.
+
+  • perhaps ironically the very existence of this class of formal
+    properties being supported by option parsers is what led us to
+    develop the theory of argument arity and parameter arity.
+
+from here (or anywhere) the only way to know which form of the formal
+parameter was employed is to test if it is equal to `true`. (this
+because of the stdlib optparser.)
+
+this sort of situation is what our "known known" structure was made for:
+the clientstream will *that* this formal property was engaged by virtue
+of the existence of the known known. to know *whether* the one form or
+the other was used it can infer this from the true-ish-ness of the
+value.
+
+
+
 
 ## :#pedagogy-1975
 

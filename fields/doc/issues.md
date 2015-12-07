@@ -1,5 +1,6 @@
 [#025]       #parent-node: [#002] "formal vs. actual attributes.."
 [#012]       #done redesign this `with_client` nonsense
+[#010]       the external functions experiment ..
 [#009]       transplant "parameters" from [hl]
 [#008]       #in-situ [ the absorber method maker ]
 [#006]       for retrospective ..

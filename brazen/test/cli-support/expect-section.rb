@@ -30,9 +30,7 @@ module Skylab::Brazen::TestSupport
 
       def to_body_string m
 
-        st = _to_full_pre_order_stream
-        st.gets
-        st.reduce_into_by "" do | memo, node |
+        to_pre_order_stream.reduce_into_by "" do | memo, node |
           memo << node.x.send( m )
         end
       end
@@ -42,6 +40,20 @@ module Skylab::Brazen::TestSupport
         _to_full_pre_order_stream.reduce_into_by "" do | memo, node |
           memo << node.x.send( m )
         end
+      end
+
+      def to_body_lines m  # see next
+
+        to_pre_order_stream.map_by do | node |
+          node.x.send( m ).chomp!
+        end.to_a
+      end
+
+      def to_lines m  # NOTE WARNING mutates originals!
+
+        _to_full_pre_order_stream.map_by do | node |
+          node.x.send( m ).chomp!
+        end.to_a
       end
 
       def to_emission_stream  # assume not called on root
@@ -71,7 +83,7 @@ module Skylab::Brazen::TestSupport
 
     module Parent_Methods__
 
-      def to_pre_order_stream_
+      def to_pre_order_stream
         st = _to_full_pre_order_stream
         st.gets
         st

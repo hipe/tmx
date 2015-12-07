@@ -8,7 +8,7 @@ module Skylab::Snag
 
       Home_.lib_.brazen::Modelesque.entity( self,
 
-        :desc, -> y do
+        :branch_description, -> y do
           y << "write to the output stream a digrpah of doc nodes"
         end,
 

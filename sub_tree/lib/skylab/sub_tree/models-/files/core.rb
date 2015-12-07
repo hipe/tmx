@@ -12,7 +12,7 @@ module Skylab::SubTree
 
         Home_.lib_.brazen::Modelesque.entity self,
 
-          :desc, -> y do
+          :branch_description, -> y do
             y << "inspired by unix builtin `tree`"
             y << "but adds custom features geared towards development"
           end,

@@ -1,4 +1,4 @@
-[#124]       argument moniker hax
+[#124]       track argument moniker derivation formulas [ac]
 [#123]       track nasty peeks into filesystem
 [#122]       as if you would ever..
 [#121]       #tracking this wrapping algo
@@ -30,7 +30,8 @@
 [#100]       an introduction to a reactive model ..
 [#099]       [ branch node for historical documents ]
 [#098]       ouroboros ..
-[#097] #open get this ellipsis hack out
+[#097] #hole
+             ( #was: get this ellipsis hack out )
 [#096] #open the (CLI) table narrative ..
 [#095]       features that [fa] has that you don't #universal
 [#094]       expression agents adjunct notes ..
@@ -87,8 +88,9 @@
 [#065]       track stubbing hacks in the universe (for reactive model trees)
              ( #was: #track procs are always not-promoted )
              ( #was: #done implement unmarshaling for strings with newlines (git-config) )
-[#064] #open either rename `desc` to `entity_description` or make
-             the syntax smarter without bloating it.
+[#064] #hole
+             ( #was: either rename `desc` to `entity_description` or make
+             the syntax smarter without bloating it. )
              ( #was: #done marshal issue near regexps with escape-looking sequences )
 [#063]       [ isomorphicisms and emergent interfaces ]
                [fa] near [ CLI revelation gone ], [#gv-030] sets the stage nicely)
@@ -167,7 +169,8 @@
                where the front client handles this alone.
 [#016]       #parent-node: [#013] the inferred inflection narrative ..
 [#015]       #doc-node: the kernel narrative ..
-[#014] #open `has_custom_moniker` is a smell to exist in entity.
+[#014] #hole
+             ( #was: `has_custom_moniker` is a smell to exist in entity. )
 [#013]       #parent-node: [#025] the model ..
 [#012] #open now that the `properties` shell is not memoized, see if etc
 [#011]       the unobtrusive lexical-esque ordering narrative ..

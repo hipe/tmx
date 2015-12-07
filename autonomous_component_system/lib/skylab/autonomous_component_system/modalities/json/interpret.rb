@@ -8,19 +8,19 @@ module Skylab::Autonomous_Component_System
 
         def initialize & p
 
-          @context_x = nil
+          @context_linked_list = nil
           @_oes_p = p
         end
 
         def prepend_more_specific_context_by & desc_p
 
-          @context_x = Home_.lib_.basic::List::Linked[ @context_x, desc_p ]
+          @context_linked_list = Home_.lib_.basic::List::Linked[ @context_linked_list, desc_p ]
           NIL_
         end
 
         attr_writer(
           :ACS,
-          :context_x,
+          :context_linked_list,
           :JSON,
         )
 
@@ -33,7 +33,7 @@ module Skylab::Autonomous_Component_System
 
           rec = Recurse_.new(
             _x,
-            remove_instance_variable( :@context_x ),
+            remove_instance_variable( :@context_linked_list ),
             @ACS,
             & @_oes_p )
 
@@ -44,8 +44,9 @@ module Skylab::Autonomous_Component_System
       class Interpret::Recurse_
 
         def initialize x, context_x, acs, & p
+
           @ACS = acs
-          @context_x = context_x
+          @context_linked_list = context_x
           @_oes_p = p
           @_x = x
         end
@@ -153,7 +154,9 @@ module Skylab::Autonomous_Component_System
             extra_a.push pair.name_symbol
             redo
           end while nil
+
           Modalities::JSON::When_[ extra_a, self, :Extra ]
+
           UNABLE_
         end
 
@@ -255,7 +258,7 @@ module Skylab::Autonomous_Component_System
             "in #{ ick _nf.as_lowercase_with_underscores_symbol.id2name }"
           end
 
-          _ctx_ = ::Skylab::Basic::List::Linked[ @context_x, _desc_p ]
+          _ctx_ = ::Skylab::Basic::List::Linked[ @context_linked_list, _desc_p ]
 
           _x = qkn.value_x
 
@@ -381,8 +384,8 @@ module Skylab::Autonomous_Component_System
 
         # ~ for "when"s
 
-        def context_x
-          @context_x
+        def context_linked_list
+          @context_linked_list
         end
 
         def on_event_selectively

@@ -114,7 +114,7 @@ module Skylab::Brazen::TestSupport
 
       memoize :_expect_usage do
         <<-HERE.unindent
-          usage: zeepo wen-kel [-x X] <bar>
+          usage: zeepo wen-kel [-x FUN] <bar>
                  zeepo wen-kel -h
 
         HERE

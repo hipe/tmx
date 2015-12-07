@@ -1,6 +1,6 @@
 module Skylab::Callback
 
-  module Name::Unique_Features  # see [#060]
+  module Name::Modality_Functions  # see [#060]
 
     # this grain of sand is all that remains of our universe's first name
     # lib. at some point (and with reason) [cb] rewrote a name class from

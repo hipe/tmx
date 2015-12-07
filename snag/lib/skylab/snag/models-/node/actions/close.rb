@@ -6,7 +6,7 @@ module Skylab::Snag
 
       edit_entity_class(
 
-        :desc, -> y do
+        :branch_description, -> y do
           'close a node (remove tag #open and add tag #done)'
         end,
 

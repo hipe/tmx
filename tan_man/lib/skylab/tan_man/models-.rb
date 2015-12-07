@@ -1,16 +1,19 @@
 module Skylab::TanMan
 
-  DESC_METHOD_ = -> s = nil, & p do
-    if s && ! p
-      self.description_block = -> y { y << s }
-    elsif p
-      self.description_block = p
-    end ; nil
+  DESCRIPTION_METHOD_ = -> s do
+
+    self.instance_description_proc = -> y do
+      y << s
+    end
+    NIL_
   end
 
   class Model_ < Brazen_::Model
 
-    define_singleton_method :desc, DESC_METHOD_
+    class << self
+      define_method :description_, DESCRIPTION_METHOD_
+      private :description_
+    end  # >>
 
     class << self
 
@@ -114,8 +117,8 @@ module Skylab::TanMan
 
     extend( module MM
 
-      define_method :desc, DESC_METHOD_
-      private :desc
+      define_method :description_, DESCRIPTION_METHOD_
+      private :description_
 
       def entity_enhancement_module
         Entity_
@@ -404,7 +407,7 @@ module Skylab::TanMan
 
     @after_name_symbol = :init
 
-    desc "with the current graph.."
+    description_ "with the current graph.."
 
     Actions = stubber
 
@@ -444,7 +447,7 @@ module Skylab::TanMan
 
     @after_name_symbol = :hear
 
-    desc do |y|
+    @description_proc = -> y do
       y << "view and edit nodes"
     end
 
@@ -483,7 +486,7 @@ module Skylab::TanMan
 
     @after_name_symbol = :node
 
-    desc do |y|
+    @description_proc = -> y do
       y << "view and edit associations"
     end
 
@@ -499,7 +502,7 @@ module Skylab::TanMan
 
     @after_name_symbol = :association
 
-    desc "manage meaning"
+    description_ "manage meaning"
 
     def initialize * a
       if 1 == a.length
@@ -534,7 +537,7 @@ module Skylab::TanMan
 
     @after_name_symbol = :meaning
 
-    desc do | y |
+    @description_proc = -> y do
       y << "get or set the starter file used to create digraphs"
     end
 

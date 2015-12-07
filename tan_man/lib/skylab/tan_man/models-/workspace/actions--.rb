@@ -12,7 +12,9 @@ module Skylab::TanMan
 
       @after_name_symbol = :init
 
-      desc "show the status of the config director{y|ies} active at the path"
+      @description_proc = -> y do
+        y << "show the status of the config director{y|ies} active at the path"
+      end
 
     end
 
@@ -22,7 +24,7 @@ module Skylab::TanMan
 
       @is_promoted = true
 
-      desc do |y|
+      @description_proc = -> y do
         _ = @kernel.silo( :workspace ).silo_module.default_config_filename
         y << "create the #{ val _ } directory"
       end
@@ -34,7 +36,7 @@ module Skylab::TanMan
 
           :promote_action,
 
-          :desc, -> y do
+          :branch_description, -> y do
             y << "pings tanman (lowlevel)"
           end
 

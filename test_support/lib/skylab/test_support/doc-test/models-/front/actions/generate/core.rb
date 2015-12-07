@@ -84,7 +84,7 @@ module Skylab::TestSupport
               :noun, 'test document',
               :verb_as_noun, 'test document generation',
 
-            :desc, -> y do
+            :branch_description, -> y do
               y << "generate a test file from special"
               y << "comments in a code file."
             end,
@@ -341,6 +341,8 @@ module Skylab::TestSupport
           end
         end
 
+        Field_ = Home_.lib_.fields  # name is idiomatic
+
         def __parse_parameter_function_property
 
           prp = @__parameter_function_property__
@@ -352,7 +354,7 @@ module Skylab::TestSupport
 
           oes_p = handle_event_selectively
 
-          if prp.takes_argument
+          if Field_::Takes_argument[ prp ]
 
             pfunc.call(
               self,

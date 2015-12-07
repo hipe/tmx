@@ -5,7 +5,8 @@ module Skylab::Brazen
     class Actions::Rm < Home_::Action
 
       edit_entity_class(
-        :desc, -> y do
+
+        :branch_description, -> y do
           y << "remove a workspace"
         end,
 

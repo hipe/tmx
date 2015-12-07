@@ -5,13 +5,10 @@ module Skylab::Callback
     sidesys = Autoloader.build_require_sidesystem_proc
 
     Basic = sidesys[ :Basic ]
-
     Brazen = sidesys[ :Brazen ]
-
+    Fields = sidesys[ :Fields ]
     Human = sidesys[ :Human ]
-
     Parse = sidesys[ :Parse ]
-
     Plugin = sidesys[ :Plugin ]
 
     Stdlib_option_parser = -> do

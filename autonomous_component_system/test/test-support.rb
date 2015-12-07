@@ -64,7 +64,9 @@ module Skylab::Autonomous_Component_System::TestSupport
     end
   end
 
-  Callback_ = ::Skylab::Callback
   Home_ = ::Skylab::Autonomous_Component_System
+
+  Callback_ = ::Skylab::Callback
+  EMPTY_S_ = ''
   NIL_ = nil
 end

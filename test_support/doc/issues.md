@@ -39,7 +39,8 @@
 [#018]       #quickie #in-situ
 [#017]       #doc-node #regret narrative
 [#016]       #parent-node:[#017] why we do not include parent anchor module..
-[#015]       #doc-node the doc-test narrative ..
+[#015] #open this tracks the rewrite (nodes waiting on it)
+             #doc-node the doc-test narrative ..
 [#014]       #parent-node: [#015] how nodes are generated ..
 [#013]       #historical #done #inquiry-point choke point etc
                (#relates-to [#ts-013]) ([#xx-004]))

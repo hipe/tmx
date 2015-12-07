@@ -23,6 +23,8 @@ module Skylab::Brazen
 
         def execute
 
+          Require_fields_lib_[]
+
           @arg_a = @env_a = @opt_a = @many_a = nil
 
           d = 0 ; @original_index = {}
@@ -43,12 +45,12 @@ module Skylab::Brazen
 
             # if is_hidden ; redo
 
-            if prp.takes_many_arguments
+            if Field_::Takes_many_arguments[ prp ]
               ( @many_a ||= [] ).push prp
               redo
             end
 
-            if prp.is_effectively_optional_
+            if Field_::Is_effectively_optional[ prp ]
               ( @opt_a ||= [] ).push prp
             else
               ( @arg_a ||= [] ).push prp
@@ -68,12 +70,17 @@ module Skylab::Brazen
 
         def __maybe_make_experimental_aesthetic_readjustment  # #note-575
 
-          if ! @many_a && @opt_a && ( ! @arg_a || @opt_a.last.takes_argument  ) # (a), (b) and (c)
-            __make_experimental_aestethic_adjustment
+          # if (a), (b) and (c)
+
+          if ! @many_a && @opt_a
+            # (hi.)
+            if ! @arg_a || Field_::Takes_argument[ @opt_a.last ]
+              ___make_experimental_aestethic_adjustment
+            end
           end
         end
 
-        def __make_experimental_aestethic_adjustment  # #note-610
+        def ___make_experimental_aestethic_adjustment  # #note-610
 
           skip = Home_::CLI_Support.standard_action_property_box_.h_
 
@@ -81,7 +88,7 @@ module Skylab::Brazen
           while d.nonzero?
 
             prp = @opt_a.fetch d -= 1
-            if ! prp.takes_argument
+            if ! Field_::Takes_argument[ prp ]
               next
             end
 

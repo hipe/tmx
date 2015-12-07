@@ -11,7 +11,7 @@ module Skylab::Brazen::TestSupport
 
       _tree = _subject.tree_via :string, _string
 
-      st = _tree.to_pre_order_stream_
+      st = _tree.to_pre_order_stream
 
       _1 = st.gets
       _2 = st.gets

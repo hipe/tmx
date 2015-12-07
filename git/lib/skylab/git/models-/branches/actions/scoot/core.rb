@@ -4,7 +4,7 @@ module Skylab::Git
 
     class Actions::Scoot < ::Skylab::Brazen::Action
 
-      @description_block = -> y do
+      @instance_description_proc = -> y do
         y << 'furloughed (used sunsetted plugins arch; no coverage at all)'
         y << "(probably just merge any outstanding work here into re-number)"
       end

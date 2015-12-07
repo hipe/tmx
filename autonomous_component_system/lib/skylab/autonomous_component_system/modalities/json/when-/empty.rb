@@ -7,12 +7,12 @@ module Skylab::Autonomous_Component_System
       Empty = Callback_::Event.prototype_with(
 
         :empty_object,
-        :context_x, nil,
+        :context_linked_list, nil,
         :ok, false,
 
       ) do | y, o |
 
-        leading, trailing = Express_context_under_[ o.context_x, self, 'for' ]
+        leading, trailing = Express_context_under_[ o.context_linked_list, self, 'for' ]
 
         if ! trailing
           leading.strip!
@@ -27,7 +27,7 @@ module Skylab::Autonomous_Component_System
 
         sess.on_event_selectively.call :error, :empty_object do
 
-          new_with :context_x, sess.context_x
+          new_with :context_linked_list, sess.context_linked_list
         end
       end
     end

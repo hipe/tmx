@@ -12,7 +12,7 @@ module Skylab::BeautySalon
 
       @is_promoted = true
 
-      @description_block = -> y do
+      @instance_description_proc = -> y do
 
         s = <<-HERE
           ridiculous interactive search and replace: in a simple interactive

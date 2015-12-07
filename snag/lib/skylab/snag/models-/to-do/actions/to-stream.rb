@@ -6,7 +6,7 @@ module Skylab::Snag
 
       Brazen_::Modelesque.entity self,
 
-        :desc, -> y do
+        :branch_description, -> y do
           y << "a report of the ##{}todo's (or TODO's etc) in a tree"
         end,
 

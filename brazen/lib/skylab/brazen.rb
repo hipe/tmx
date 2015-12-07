@@ -166,6 +166,11 @@ module Skylab::Brazen
     end
   end
 
+  Require_fields_lib_ = Callback_::Lazy.call do  # ..
+    Field_ = Home_.lib_.fields
+    NIL_
+  end
+
   Autoloader_ = Callback_::Autoloader
 
   module Collection_Adapters
@@ -188,9 +193,7 @@ module Skylab::Brazen
     Autoloader_[ self ]
   end
 
-  N_lines_ = -> a, d, p_a, expag do
-    Home_.lib_.basic::String::N_Lines[ a, d, p_a, expag ]
-  end
+  # (was N_Lines_)
 
   module Lib_
 

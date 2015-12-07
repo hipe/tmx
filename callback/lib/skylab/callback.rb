@@ -2183,13 +2183,6 @@ module Skylab::Callback
       def empty_name_for__ x
         Home_::Name::Conversion_Functions::Empty_name_for[ x ]
       end
-
-      def variegated_human_symbol_via_variable_name_symbol sym
-        s = sym.id2name
-        Home_::Name::Modality_Functions::
-          Mutate_string_by_chomping_any_trailing_name_convention_suffixes[ s ]
-        s.downcase.intern
-      end
     end  # >>
 
     # -- higher-level derivatives (for [#br-035] expressive events usually)
@@ -2665,6 +2658,7 @@ module Skylab::Callback
     x = nil ; yes = true
     -> do
       if yes
+        yes = false
         x = p[]
       end
       x

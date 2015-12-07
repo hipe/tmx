@@ -27,7 +27,7 @@ module Skylab::TestSupport
         @path_s = @path_a.fetch 0
         @path_a = nil
         @lcbp_a = @path_s.split ::File::SEPARATOR
-        @test_dir_idx = @lcbp_a.index( & Home_.lib_.match_test_dir_proc[] )
+        @test_dir_idx = @lcbp_a.index( & Home_.lib_.match_test_dir_proc )
         if @test_dir_idx
           money_for_single_path
         else

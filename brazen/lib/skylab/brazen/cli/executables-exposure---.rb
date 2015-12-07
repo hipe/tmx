@@ -91,12 +91,16 @@ module Skylab::Brazen
 
         # ~ needed to reflect
 
-        def has_description
-          true
+        def description_proc
+          @___dp ||= ___build_description_proc
         end
 
-        def under_expression_agent_get_N_desc_lines expag, n=nil
-          [ ::File.basename( @_bound.__path ) ]
+        def ___build_description_proc
+
+          bound = @_bound
+          -> y do
+            y << ::File.basename( bound.__path )
+          end
         end
 
         # ~ needed to invoke

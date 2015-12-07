@@ -14,9 +14,9 @@ module Skylab::Brazen
         KEEP_PARSING_
       end,
 
-      :ad_hoc_processor, :desc, -> o do
+      :ad_hoc_processor, :branch_description, -> o do
 
-        o.downstream.description_block = o.upstream.gets_one
+        o.downstream.instance_description_proc = o.upstream.gets_one
         KEEP_PARSING_
       end,
 
@@ -59,7 +59,7 @@ module Skylab::Brazen
 
       # ~ simple metaproperties
 
-      :meta_property, :argument_moniker
+      :meta_property, :option_argument_moniker  # [sg]
         # (used in some modalities to label the argument term itself)
 
     )
@@ -162,19 +162,6 @@ module Skylab::Brazen
       ## ~~ argument arity
 
         class self::Property
-
-          def argument_is_required  # *not the same as* parameter is required
-            :one == @argument_arity || :one_or_more == @argument_arity
-          end
-
-          def takes_argument
-            :zero != @argument_arity
-          end
-
-          def takes_many_arguments
-            :zero_or_more == @argument_arity || :one_or_more == @argument_arity
-          end
-
         private
 
           def flag=
@@ -189,32 +176,26 @@ module Skylab::Brazen
 
           # ~ :*#public-API
 
-          attr_reader :has_primitive_default, :primitive_default_value
-
           private def default=
+
             # when the default is expressed as a simple primitive-ish
             # value, we want to be able to just have it back
-            set_primitive_default gets_one_polymorphic_value
+
+            x = gets_one_polymorphic_value
+            @default_proc = -> do
+              x
+            end
             KEEP_PARSING_
           end
 
-          def set_primitive_default x
-            @has_default = true
-            @has_primitive_default = true
-            @primitive_default_value = x
-            @default_proc = -> do
-              @primitive_default_value
+          def has_primitive_default
+            if @default_proc
+              @default_proc.arity.zero?
             end
-            self
           end
 
-          def is_effectively_optional_  # explained at [#006]. needs drying
-
-            if has_default
-              true
-            else
-              ! is_required
-            end
+          def primitive_default_value  # assume
+            @default_proc.call
           end
         end
 
@@ -224,21 +205,6 @@ module Skylab::Brazen
 
           # ~ :*#public-API
 
-          def description_proc
-            @desc_p_a.fetch @desc_p_a.length - 1 << 1
-          end
-
-          def has_description
-            desc_p_a
-          end
-
-          attr_accessor :desc_p_a
-
-          def under_expression_agent_get_N_desc_lines expag, n=nil
-
-            N_lines_[ [], n, @desc_p_a, expag ]
-          end
-
           def describe_by & p
             accept_description_proc p
             self
@@ -247,23 +213,37 @@ module Skylab::Brazen
         private
 
           def description=
-            x = gets_one_polymorphic_value
-            if x.respond_to? :ascii_only?
+
+            p = gets_one_polymorphic_value
+
+            if p.respond_to? :ascii_only?
               _STRING = x
-              x = -> y do
+              p = -> y do
                 y << _STRING
               end
             end
-            accept_description_proc x
-          end
 
-          def accept_description_proc p
             if p
-              ( @desc_p_a ||= [] ).push p
+              accept_description_proc p
               KEEP_PARSING_
             else
               STOP_PARSING_
             end
+          end
+
+          def accept_description_proc p  # [ts]
+            @description_proc = p ; nil
+          end
+
+        public
+
+          alias_method :description_proc=, :accept_description_proc  # [sg]
+          public :description_proc=
+
+          attr_reader :description_proc
+
+          def argument_argument_moniker  # [gv]
+            NIL_  # for 1 hack in sidesys, for now
           end
         end
 
@@ -362,12 +342,6 @@ module Skylab::Brazen
           def name_symbol=
             @name = Callback_::Name.via_variegated_symbol gets_one_polymorphic_value
             KEEP_PARSING_
-          end
-
-        public
-
-          def has_custom_moniker  # [#014] maybe a smell, maybe not
-            false
           end
         end
 

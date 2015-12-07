@@ -20,7 +20,7 @@ module Skylab::Slicer
 
       @is_promoted = true
 
-      @description_block = -> y do
+      @instance_description_proc = -> y do
         y << "see how #{ highlight 'well' } this minimal action works"
       end
 

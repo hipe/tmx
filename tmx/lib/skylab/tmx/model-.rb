@@ -44,10 +44,6 @@ module Skylab::TMX
         NIL_
       end
 
-      def has_description
-        true
-      end
-
       def name
         @nf_
       end

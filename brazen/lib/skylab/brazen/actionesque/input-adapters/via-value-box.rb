@@ -11,6 +11,8 @@ module Skylab::Brazen
 
         def self.[] act, bx
 
+          Require_fields_lib_[]
+
           formals = act.formal_properties
           kp = KEEP_PARSING_
 
@@ -27,7 +29,7 @@ module Skylab::Brazen
               break
             end
 
-            if prp.takes_argument
+            if Field_::Takes_argument[ prp ]
 
               pxy.accept_current_token_ x
               kp = act.receive_polymorphic_property prp

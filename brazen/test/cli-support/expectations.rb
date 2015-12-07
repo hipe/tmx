@@ -35,7 +35,7 @@ module Skylab::Brazen::TestSupport
 
     # -- freeze an invocation as a shared state
 
-    def flush_invocation_to_help_screen_oriented_state  # current favoirte
+    def flush_invocation_to_help_screen_oriented_state  # current favorite
 
       _state = flush_frozen_state_from_expect_stdout_stderr
 

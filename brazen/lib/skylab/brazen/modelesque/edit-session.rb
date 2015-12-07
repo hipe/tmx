@@ -86,12 +86,14 @@ module Skylab::Brazen
 
         def edit_via_iambic x_a
 
+          Require_fields_lib_[]
+
           bx = @_tree._mutable_delta_box
           fo = @_formals
           st = Callback_::Polymorphic_Stream.via_array x_a
           while st.unparsed_exists
             prp = fo.fetch st.gets_one
-            if prp.takes_argument
+            if Field_::Takes_argument[ prp ]
               bx.add prp.name_symbol, st.gets_one  # change to `set` when necessary
             else
               self._COVER_ME

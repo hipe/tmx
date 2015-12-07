@@ -366,7 +366,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         # (for now this is only covered for primitives w/ operations)
 
         me = self
-        @description_block = -> y do
+        @instance_description_proc = -> y do
 
           _s_a = me._operations.to_name_stream.reduce_into_by [] do | m, sym |
 
@@ -378,7 +378,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         NIL_
       end
 
-      attr_reader :description_block
+      attr_reader :description_proc
 
       def accept__intent__meta_component sym  # see [#003]:#interp-B
         @intent = sym
@@ -519,6 +519,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       Basic = sidesys[ :Basic ]
       Brazen = sidesys[ :Brazen ]
+      Fields = sidesys[ :Fields ]
       JSON = stdlib[ :JSON ]
 
       system_lib = sidesys[ :System ]

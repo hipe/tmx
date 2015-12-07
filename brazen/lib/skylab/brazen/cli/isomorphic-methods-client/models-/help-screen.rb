@@ -31,47 +31,20 @@ module Skylab::Brazen
         end  # >>
 
         def initialize inst
-          @_p = inst.class.const_get :DESCRIPTION_BLOCK_
+          @__description_proc = inst.class.const_get :DESCRIPTION_BLOCK_
         end
 
-        def under_expag_get_N_desc_lines_ expag, d
-
-          if d && d.zero?
-            EMPTY_A_
-          else
-
-            a = []
-            counter = 0
-
-            _yielder = ::Enumerator::Yielder.new do | line |
-
-              a.push line
-              counter += 1
-
-              if d == counter
-                self._COVER_ME_YAY
-                throw :done
-              end
-            end
-
-            catch :done do
-              expag.calculate _yielder, & @_p
-            end
-
-            a
-          end
-        end
-
-        def has_content
-          true
+        def instance_description_proc
+          @__description_proc  # (hi.)
         end
       end
 
-      THE_EMPTY_DESCRIPTION___ =
-      class Models_::The_Empty_Description___
-        def has_content
-          false
+      THE_EMPTY_DESCRIPTION___ = class Models_::The_Empty_Description____
+
+        def instance_description_proc
+          NIL_
         end
+
         self
       end.new
 

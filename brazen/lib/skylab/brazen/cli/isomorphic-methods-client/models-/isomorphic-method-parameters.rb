@@ -94,55 +94,15 @@ module Skylab::Brazen
       def initialize ruby_param_a
 
         a = []
+
+        _cls = Home_::CLI_Support::Property_via_Platform_Parameter
+
         ruby_param_a.each do | typ, sym |
 
-          a.push Models_::Formal_Argument_as_Property.new( sym, typ )
+          a.push _cls.new( typ, sym )
         end
 
         super a
-      end
-
-      class Models_::Formal_Argument_as_Property  # read [#.A]
-
-        attr_reader(
-          :reqity_symbol,
-        )
-
-        def initialize name_sym, type_sym
-
-          @_name_symbol = name_sym
-          @reqity_symbol = type_sym
-        end
-
-        def is_effectively_optional_  # #[#006]
-          has_default || ! is_required
-        end
-
-        def name
-          @__nf ||= Callback_::Name.via_variegated_symbol @_name_symbol
-        end
-
-        def is_required
-          :req == @reqity_symbol
-        end
-
-        def takes_many_arguments
-          :rest == @reqity_symbol
-        end
-
-        # ~ (not relevant or available when doing isomorphic clients:)
-
-        def has_custom_moniker
-          false
-        end
-
-        def has_default  # ..
-          false
-        end
-
-        def has_description
-          false
-        end
       end
 
       def validate_against_args argv, & wiring_p
@@ -279,7 +239,7 @@ module Skylab::Brazen
         def execute
 
           @formal_arguments.each do | fa |
-            send :"__when__#{ fa.reqity_symbol }__"
+            send :"__when__#{ fa.reqity_symbol_ }__"
           end
           if @_did_see_glob
             @end = nil
@@ -320,7 +280,7 @@ module Skylab::Brazen
           @farg_a.each_with_index do | arg, d |
             @_farg = arg
             @_d = d
-            send :"__when__#{ arg.reqity_symbol }__"
+            send :"__when__#{ arg.reqity_symbol_ }__"
           end
           @_missing_term_a
         end
@@ -354,8 +314,8 @@ module Skylab::Brazen
           @formal_argument = farg
         end
 
-        def reqity_symbol
-          @formal_argument.reqity_symbol
+        def reqity_symbol_
+          @formal_argument.reqity_symbol_
         end
 
         def name

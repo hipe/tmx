@@ -1,14 +1,13 @@
 module Skylab::Autonomous_Component_System
-
   # ->
-
     module Modalities::Human
 
       # mostly contextualize expressions of events
 
       # -- Event via X
 
-      Event_via_context = -> x do
+      Event_via_context = -> x do  # [my]
+
         Parse_context___[ x ].event
       end
 

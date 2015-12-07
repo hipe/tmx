@@ -46,7 +46,7 @@ module Skylab::BeautySalon
 
         :property, :to_line,
 
-        :desc, -> y do
+        :branch_description, -> y do
           # <- 2
       _big_string =  <<-O.gsub %r(^ {8}), EMPTY_S_
         from line <from-line> to line <to-line> of file <file>, use a

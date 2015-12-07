@@ -31,16 +31,16 @@ module Skylab::Brazen
 
     module Bound_Methods
 
+      def description_proc
+        NIL_
+      end
+
       def after_name_symbol
         NIL_
       end
 
       def fast_lookup
         NIL_
-      end
-
-      def has_description
-        false
       end
 
       def is_visible

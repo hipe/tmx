@@ -44,7 +44,7 @@ module Skylab::TestSupport  # :[#021].
     end.call
 
     def lib_
-      @___lib ||= Home_::Lib_::INSTANCE
+      @___lib ||= Home_::LIB_
     end
 
     def spec_rb
@@ -52,7 +52,7 @@ module Skylab::TestSupport  # :[#021].
     end
 
     def tmpdir
-      self::Lib_::Tmpdir[]
+      lib_.system.filesystem.tmpdir
     end
   end  # >>
 

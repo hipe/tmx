@@ -10,7 +10,7 @@ module Skylab::Snag
 
       edit_entity_class(
 
-        :desc, -> y do
+        :branch_description, -> y do
           y << 'list the tags for a given node.'
         end,
 
@@ -31,7 +31,7 @@ module Skylab::Snag
 
       edit_entity_class(
 
-        :desc, -> y do
+        :branch_description, -> y do
            y << "add a tag to a node."
         end,
 
@@ -68,7 +68,7 @@ module Skylab::Snag
 
       edit_entity_class(
 
-        :desc, -> y do
+        :branch_description, -> y do
           y << 'remove a tag from a node.'
         end,
 

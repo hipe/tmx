@@ -31,7 +31,7 @@ module Skylab::Permute
 
       edit_entity_class(
 
-        :desc, -> y do
+        :branch_description, -> y do
           y << "minimal permutations generator."
         end,
 

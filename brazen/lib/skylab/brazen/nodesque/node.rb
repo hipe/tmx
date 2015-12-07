@@ -24,7 +24,7 @@ module Skylab::Brazen
 
     class << self
 
-      attr_accessor :description_block
+      attr_accessor :instance_description_proc
 
       def process_some_customized_inflection_behavior upstream
         name_function_lib::Inflection.new( upstream, self ).execute
@@ -36,16 +36,8 @@ module Skylab::Brazen
       end
     end  # >>
 
-    def has_description
-      ! self.class.description_block.nil?
-    end
-
-    def under_expression_agent_get_N_desc_lines expag, d=nil  # assume has
-
-      p = self.class.description_block
-      if p
-        N_lines_[ [], d, [ p ], expag ]
-      end
+    def description_proc
+      self.class.instance_description_proc
     end
 
     def name

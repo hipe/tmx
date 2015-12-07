@@ -1,11 +1,16 @@
-# the desc parsing narrative :[#106]
+# fun with help screen parsing :[#106]
 
 ## intro
 
-this tag now tracks similar implementations elsewhere in this
-universe of nodes that do something like parsing help screens (there
-are at least two others - one for testing help screens and one custom
-one in [tmx]  (at writing)).
+this tag both documents the subject asset node and tracks other similar
+implementations elsewhere in this universe that do something like parse
+help screens.
+
+at writing we know of at least three:
+  • [#045] the "expect section" help screen parse tree (2 parsers)
+  • the asset node tracked by the subject identifier
+  • one in [tmx]
+
 
 despite this, this node was preserved during the sunsetting [hl] largely
 because its state-machine-based implementation -- while being redundant

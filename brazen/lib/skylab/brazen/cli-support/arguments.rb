@@ -4,25 +4,14 @@ module Skylab::Brazen
     # ->
       module Arguments
 
-        class << self
+        # (all "normalization")
 
-          def normalization * a
-            if a.length.zero?
-              Normalization_
-            else
-              Normalization_.new( * a )
-            end
-          end
-        end  # >>
-
-        class Normalization_
+        class Normalization
 
           class << self
-
-            def via * x_a
-              Arguments::Normalization_Via___.call_via_iambic x_a
-            end
-          end
+            alias_method :via_properties, :new
+            private :new
+          end  # >>
 
           def initialize prp_a
             @arg_a = prp_a
@@ -41,12 +30,16 @@ module Skylab::Brazen
 
             # we are ignoring the idea of #globbing for now
 
+            Require_fields_lib_[]
+
             a = @arg_a.length.times.reduce [] do |m, d|
 
               prp = @arg_a.fetch d
-              if prp.is_effectively_optional_
+              if Field_::Is_effectively_optional[ prp ]
                 if m.length.nonzero?
-                  m.last == d - 1 or raise ___say_bad_optional_indexes( m, d )
+                  if m.last != d - 1
+                    raise Syntax_Syntax_Error, ___say_bad_optional_indexes( m, d )
+                  end
                 end
                 m.push d
               end ; m
@@ -167,20 +160,24 @@ module Skylab::Brazen
             end
           end
 
-          def accept_monadic_actual_property_value i
-            a = instance_variable_get i
-            a ||= instance_variable_set i, []
-            formal = @arg_a_scan.gets_one
-            if formal.takes_many_arguments
+          def accept_monadic_actual_property_value sym
+
+            a = instance_variable_get sym
+            a ||= instance_variable_set sym, []
+
+            prp = @arg_a_scan.gets_one
+
+            if Field_::Takes_many_arguments[ prp ]
               if @arg_a_scan.unparsed_exists
                 self._DO_ME
               end
               # naive implementation:
-              a.push formal.name_symbol, @argv_scan.flush_remaining_to_array
+              a.push prp.name_symbol, @argv_scan.flush_remaining_to_array
             else
-              a.push formal.name_symbol, @argv_scan.gets_one
+              a.push prp.name_symbol, @argv_scan.gets_one
             end
-            nil
+
+            NIL_
           end
 
           def complain_about_any_extra_arguments
@@ -227,6 +224,8 @@ module Skylab::Brazen
             attr_writer :d, :x_a_length
             attr_reader :d
           end
+
+          Syntax_Syntax_Error = ::Class.new ::RuntimeError
         end
       end
     # -

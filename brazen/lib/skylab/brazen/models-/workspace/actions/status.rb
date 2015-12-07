@@ -6,7 +6,7 @@ module Skylab::Brazen
 
     edit_entity_class(
 
-      :desc, -> y do
+      :branch_description, -> y do
         y << "get status of a workspace"
       end,
 
@@ -35,8 +35,8 @@ module Skylab::Brazen
 
       :property_object, COMMON_PROPERTIES_[ :config_filename ],
 
-      :description, "the location of the workspace",
       :description, -> y do
+        y << "the location of the workspace"
         y << "it's #{ highlight 'really' } neat"
       end,
       :required, :property, :path )

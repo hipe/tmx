@@ -8,7 +8,7 @@ module Skylab::FileMetrics
 
       edit_entity_class(
 
-        :desc, -> y do
+        :branch_description, -> y do
           y << "just report on the number of files with different extensions,"
           y << "ordered by frequency of extension"
         end,

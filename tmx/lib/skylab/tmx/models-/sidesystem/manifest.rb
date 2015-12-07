@@ -85,11 +85,17 @@ module Skylab::TMX
           @nf_ = nf
         end
 
-        def under_expression_agent_get_N_desc_lines expag, n=nil
-          nm = @nf_
+        def description_proc
+          @___dp ||= ___build_description_proc
+        end
+
+        def ___build_description_proc
+
           d = @_mani.__child_count
-          expag.calculate do
-            [ "#{ nm.as_slug }: #{ d } small utilit#{ s d, :y }" ]
+          nf = @nf_
+
+          -> y do
+            y << "#{ nf.as_slug }: #{ d } small utilit#{ s d, :y }"
           end
         end
       end

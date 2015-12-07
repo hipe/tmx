@@ -8,7 +8,7 @@ module Skylab::Slicer
 
       @is_promoted = true
 
-      @description_block = -> y do
+      @instance_description_proc = -> y do
         y << "our personal spin on 'hoe' for our own uses. try it!"
       end
 

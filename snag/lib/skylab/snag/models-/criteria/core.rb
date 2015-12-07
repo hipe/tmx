@@ -21,13 +21,13 @@ module Skylab::Snag
         :description, -> y do
           y << "adds to the persisted criteria collection"
         end,
-        :argument_moniker, :name,
+        :option_argument_moniker, :name,
         :property, :save,
 
         :description, -> y do
           y << "replaces an existing persisted critera with this name"
         end,
-        :argument_moniker, :name,
+        :option_argument_moniker, :name,
         :property, :edit,
 
         :required,
@@ -131,7 +131,7 @@ module Skylab::Snag
 
       edit_entity_class(
 
-        :desc, -> y do
+        :branch_description, -> y do
           y << "(actually \"archives\")"
         end,
 

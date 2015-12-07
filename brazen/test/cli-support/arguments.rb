@@ -1,108 +1,80 @@
 module Skylab::Brazen::TestSupport
 
-  module CLI_Support
+  module CLI_Support::Arguments
 
     def self.[] tcc
-      tcc.extend Module_Methods___
+      tcc.send :define_singleton_method, :with_class_, With_class___
       tcc.include Instance_Methods___
-    end  # >>
+    end
 
-    # <-
+    # -
 
-  module Module_Methods___
+      With_class___ = -> & defn_p do
 
-    def with_class & blk
-      contxt = self
-      before :all do
-        _the_class = nil.instance_exec( & blk )
-        _ARG_A_ = _the_class.properties.each_value.to_a.freeze
-        contxt.send :define_method, :arg_a do _ARG_A_ end
+        shared_subject :__n11n do
+
+          _cls = nil.instance_exec( & defn_p )
+            # do not evaluate it in the context in which it was
+            # defined, but under "no" context (just for sanity)
+
+          _prp_a = _cls.properties.to_value_stream.to_a.freeze
+
+          Subject__[].via_properties _prp_a
+
+        end
       end
-    end
-  end
 
-  module Instance_Methods___
+    # -
 
-    def with * x_a
-      _n11n = Home_::CLI_Support::Arguments.normalization arg_a
-      @normalization = _n11n.new_via_argv x_a
-      @result = @normalization.execute
-    end
+    module Instance_Methods___
 
-    def expect_failure event_channel_i, x_i
-      if @result
-        @result.terminal_channel_i.should eql event_channel_i
-        if :missing == event_channel_i
-          @result.property.name_symbol.should eql x_i
+      def subject_
+        Subject__[]
+      end
+
+      def against_ * actual_arg_a
+
+        _n11n_prototype = __n11n
+
+        @__normalization = _n11n_prototype.new_via_argv actual_arg_a
+
+        @__result = @__normalization.execute
+
+        NIL_
+      end
+
+      def expect_failure_ event_channel_sym, x_i
+
+        x = @__result
+        if x
+          x.terminal_channel_i.should eql event_channel_sym
+          if :missing == event_channel_sym
+            x.property.name_symbol.should eql x_i
+          else
+            x.x.should eql x_i
+          end
         else
-          @result.x.should eql x_i
+          fail "expected result, had none"
         end
-      else
-        fail "expected result, had none"
+      end
+
+      def expect_success_ * x_a
+        a = @__normalization.release_result_iambic
+        a.should eql x_a
       end
     end
 
-    def expect_success * x_a
-      a = @normalization.release_result_iambic
-      a.should eql x_a
+    Subject__ = -> do
+      Home_::CLI_Support::Arguments::Normalization
     end
   end
 
-  Ent = -> do
+  module CLI_Support_Arguments_Namespace
 
-    p = -> do
+    Ent_ = -> do
 
-      Entete_ = Home_::Entity.call do
+      Home_::Modelesque::Entity
 
-        o :enum, [ :zero, :one ],
-          :default, :one,
-          :meta_property, :argument_arity,
-
-          :enum, [ :zero_or_one, :one ],
-          :default, :zero_or_one,
-          :meta_property, :parameter_arity
-
-      end
-
-      module Entete_
-
-        const_get( :Property, false ).class_exec do
-
-          # -- ew, per f.w:
-
-          def is_effectively_optional_
-            ! is_required
-          end
-
-          def has_default
-            false  # per f.w
-          end
-
-          # --
-
-          def is_required
-            :one == @parameter_arity
-          end
-
-          def takes_many_arguments
-            :zero_or_more == @argument_arity ||
-              :one_or_more == @argument_arity
-          end
-
-          def takes_argument
-            :one == @argument_arity
-          end
-        end
-      end
-
-      p = -> do
-        Entete_
-      end
-      Entete_
     end
-
-    -> { p.call }
-  end.call
-  # ->
   end
 end

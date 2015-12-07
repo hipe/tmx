@@ -235,10 +235,6 @@ module Skylab::Brazen
 
       ## ~~ description & inflection
 
-      def has_description
-        false  # for now
-      end
-
       def get_styled_description_string_array_via_name nm  # for #ouroboros
         [ "the #{ nm.as_slug } utility" ]  # placeholder
       end
@@ -323,7 +319,6 @@ module Skylab::Brazen
         :app_name,  # by our expag (covered by [f2])
         :application_kernel,
         :_expression_agent_class,
-        :has_description,
         :invoke,
         :_leaf_class,
         :maybe_use_exit_status,
@@ -356,15 +351,20 @@ module Skylab::Brazen
       # -- branch - reflection
 
       def didactic_argument_properties  # as branch, contrast with leaf
-        _ = @_categorized_properties.arg_a || EMPTY_A_
+        _ = @categorized_properties.arg_a || EMPTY_A_
         [ * _, Ellipsis_hack___[] ]
       end
 
       Ellipsis_hack___ = Lazy_.call do
 
-        Home_::CLI_Support::Property.new( :ellipsis,
-          :argument_arity, :zero_or_one,
-          :custom_moniker, DOT_DOT_,
+        # the syntax assembly does not yet have an API [designed] to support
+        # custom glyphs like `[..]`. as long as this works .. (was [#097])
+
+        Home_::CLI_Support::Modality_Specific_Property.new(
+          :_ellipsis_hack_,
+          :argument_argument_moniker, DOT_DOT_,
+          :argument_arity, :one,
+          :parameter_arity, :zero_or_one,
         )
       end
 
@@ -733,7 +733,7 @@ module Skylab::Brazen
 
       def to_section_stream__  # not options. see [#]/figure-3
 
-        cp = @_categorized_properties
+        cp = @categorized_properties
         cat_st = ___to_relevant_category_stream
         category_renderers = __category_renderers
 
@@ -751,8 +751,8 @@ module Skylab::Brazen
               _name_x = p[ prp ]
 
               _desc_p = -> expag, n do
-                if prp.has_description
-                  prp.under_expression_agent_get_N_desc_lines expag, n
+                if Field_::Has_description[ prp ]
+                  Field_::N_lines[ n, expag, prp ]
                 end
               end
 
@@ -797,7 +797,7 @@ module Skylab::Brazen
 
       def didactic_argument_properties  # as leaf, contrast with branch
 
-        @_categorized_properties.arg_a
+        @categorized_properties.arg_a
       end
 
       def _to_full_inferred_property_stream
@@ -862,8 +862,8 @@ module Skylab::Brazen
 
       def bound_call_via_ARGV_
 
-        _n11n = Home_::CLI_Support::Arguments.normalization(
-          @_categorized_properties.arg_a || EMPTY_A_ )
+        _n11n = Home_::CLI_Support::Arguments::Normalization.via_properties(
+          @categorized_properties.arg_a || EMPTY_A_ )
 
         @arg_parse = _n11n.new_via_argv @resources.argv
 
@@ -891,7 +891,7 @@ module Skylab::Brazen
 
         @mutable_backbound_iambic.concat @arg_parse.release_result_iambic
 
-        if @_categorized_properties.env_a
+        if @categorized_properties.env_a
           bc = __process_environment
         end
 
@@ -1044,14 +1044,6 @@ module Skylab::Brazen
 
       ## ~~ description & inflection & name
 
-      def has_description
-        @bound.has_description
-      end
-
-      def under_expression_agent_get_N_desc_lines exp, d=nil
-        @bound.under_expression_agent_get_N_desc_lines exp, d
-      end
-
       def name
         @bound.name
       end
@@ -1139,11 +1131,9 @@ module Skylab::Brazen
         :app_name,  # ibid
         :after_name_value_for_order,
         :_expression_agent_class,
-        :has_description,
         :is_visible,
         :name_value_for_order,
         :_receive_invitation,  # [gi]
-        :under_expression_agent_get_N_desc_lines,
         :_write_invocation_string_parts_into,
         # invocation & lower
         :application_kernel,
@@ -1175,7 +1165,11 @@ module Skylab::Brazen
         o.settable_by_environment_h = __build_settable_by_environment_h_
 
         cp = o.execute
-        @_categorized_properties = cp
+        @categorized_properties = cp
+
+        # (visible by child classes, but not outside of sidesys. however
+        #  because the surrounding method is public API so is this name.)
+
         NIL_
       end
 
@@ -1225,6 +1219,10 @@ module Skylab::Brazen
 
       # -- invocation - as invocation reflection (assume expression)
 
+      def description_proc
+        bound_.description_proc
+      end
+
       def write_any_auxiliary_syntax_strings_into_ y
         s = _help_syntax_string
         if s
@@ -1265,7 +1263,7 @@ module Skylab::Brazen
       def ___init_op
         op = begin_option_parser
         if op
-          opt_a = @_categorized_properties.opt_a
+          opt_a = @categorized_properties.opt_a
           if opt_a
             _expression_agent  # (it's prettier if we access the ivar below)
             op = populated_option_parser_via opt_a, op
@@ -1285,53 +1283,59 @@ module Skylab::Brazen
 
       def populated_option_parser_via opt_a, op  # [sg]
 
-        h = Build_unique_letter_hash___[ opt_a ]
+        Require_fields_lib_[]
+
+        @__unique_letter_hash = Build_unique_letter_hash___[ opt_a ]
 
         opt_a.each do |prp|
 
-          args = []
-          letter = h[ prp.name_symbol ]
-          letter and args.push "-#{ letter }"
-          base = "--#{ prp.name.as_slug }"
-
-          if prp.takes_argument
-            if prp.argument_is_required
-              args.push "#{ base } #{ _op_argument_label_for prp }"
-            else
-              args.push "#{ base } [#{ _op_argument_label_for prp }]"
-            end
-          else
-            args.push base
-          end
-
-          if prp.has_description
-            __express_property_description_into args, prp
-          end
+          _args = ___optparse_args_for prp
 
           _p = optparse_behavior_for_property prp
 
-          op.on( * args, & _p )
+          op.on( * _args, & _p )
         end
+
+        remove_instance_variable :@__unique_letter_hash
 
         op
       end
 
-      def _op_argument_label_for prp
-        s = prp.argument_moniker
-        if s
-          s
+      def ___optparse_args_for prp
+
+        args = []
+
+        letter = @__unique_letter_hash[ prp.name_symbol ]
+
+        if letter
+          args.push "-#{ letter }"
+        end
+
+        long = "--#{ prp.name.as_slug }"
+
+        if Field_::Takes_argument[ prp ]
+
+          moniker = Home_::CLI_Support::Option_argument_moniker_via_property[ prp ]
+
+          if Field_::Argument_is_optional[ prp ]
+
+            args.push "#{ long } [#{ moniker }]"  # no equals (covered)
+          else
+            args.push "#{ long } #{ moniker }"
+          end
         else
-          prp.name.as_variegated_string.split( UNDERSCORE_ ).last.upcase
+          args.push long
         end
-      end
 
-      def __express_property_description_into a, prp
+        if Field_::Has_description[ prp ]
 
-        a_ = prp.under_expression_agent_get_N_desc_lines @_expag
-        if a_
-          a.concat a_
+          a = Field_::N_lines[ nil, @_expag, prp ]  # all lines
+
+          if a
+            args.concat a
+          end
         end
-        a
+        args
       end
 
       def optparse_behavior_for_property prp  # [ts]
@@ -1349,9 +1353,11 @@ module Skylab::Brazen
 
       def ___receive_uncategorized_option x, prp
 
-        if prp.takes_argument
+        Require_fields_lib_[]
 
-          if prp.takes_many_arguments
+        if Field_::Takes_argument[ prp ]
+
+          if Field_::Takes_many_arguments[ prp ]
 
             mutate_backbound_iambic_ prp, [ x ]
           else
@@ -1723,7 +1729,7 @@ module Skylab::Brazen
       end
 
       def category_for prp
-        @_categorized_properties.__category_for prp
+        @categorized_properties.__category_for prp
       end
 
       def expression_strategy_for_category sym
@@ -1734,6 +1740,7 @@ module Skylab::Brazen
 
       public(
         :category_for,  # [st]
+        :description_proc,  # expr
         :_expression_agent,  # 1x in file
         :expression_strategy_for_category,  # [st]
         :express_invite_to_general_help,
@@ -1756,19 +1763,30 @@ module Skylab::Brazen
 
     Normal_stream___ = -> mutable_backbound_iambic, props do
 
+      Require_fields_lib_[]
+
       st = Callback_::Polymorphic_Stream.via_array mutable_backbound_iambic
 
       Callback_.stream do
+
         if st.unparsed_exists
+
           sym = st.gets_one
           prp = props.fetch sym
 
-          _x = if prp.takes_argument
-            st.gets_one
+          if Field_::Takes_argument[ prp ]
+
+            x = st.gets_one
+
+            if Field_::Argument_is_optional[ prp ]
+
+              if true == x  # :Spot-1 ([#])
+                x = nil
+              end
+            end
           end
 
-          Callback_::Qualified_Knownness.via_value_and_had_and_association(
-            _x, true, prp )
+          Callback_::Qualified_Knownness.via_value_and_association x, prp
         end
       end
     end
@@ -1822,7 +1840,7 @@ module Skylab::Brazen
 
     Standard_branch_property_box___ = Callback_::Lazy.call do
 
-      _Property = Home_::CLI_Support::Property
+      _Property = Home_::CLI_Support::Modality_Specific_Property
 
       bx = Box_.new
 
@@ -1830,11 +1848,14 @@ module Skylab::Brazen
 
       bx.add :help, _Property.new( :help,
 
-        :argument_arity, :zero_or_one,
-        :argument_moniker, 'cmd',
-        :desc, -> y do
+        :description_proc, -> y do
           y << 'this screen (or help for action)'
-        end )
+        end,
+
+        :option_argument_moniker, 'cmd',
+        :parameter_arity, :zero_or_one,
+        :argument_arity, :zero_or_one,  # LOOK Spot-1
+      )
 
       bx.freeze
     end
@@ -1982,6 +2003,10 @@ module Skylab::Brazen
 
       # ~ delegation & related
 
+      def description_proc
+        @kernel.description_proc
+      end
+
       def to_unordered_selection_stream
 
         @kernel.build_unordered_selection_stream(
@@ -1997,81 +2022,6 @@ module Skylab::Brazen
       end
 
       attr_reader :kernel
-    end
-
-    # ~ for [#066] a modality-only action adapter
-
-    class Mock_Unbound
-
-      def initialize ada_cls
-
-        @_ada_cls = ada_cls
-        @name_function = Callback_::Name.via_module ada_cls
-      end
-
-      attr_reader :name_function
-
-      def silo_module
-        NIL_
-      end
-
-      def is_branch
-        false
-      end
-
-      def adapter_class_for _
-        NIL_
-      end
-
-      # ~
-
-      def new bnd, & x_p
-        @_ada_cls::Mock_Bound.new bnd, self, & x_p
-      end
-    end
-
-    class Mock_Bound
-
-      def initialize bnd, mock_unb, & x_p
-        @_bnd = bnd
-        @_mock_unb = mock_unb
-        @_x_p = x_p
-      end
-
-      def accept_parent_node x
-        @_par_nod = x
-        NIL_
-      end
-
-      def after_name_symbol
-        NIL_
-      end
-
-      def has_description
-        true
-      end
-
-      def is_visible
-        true
-      end
-
-      def under_expression_agent_get_N_desc_lines expag, d=nil
-
-        me = self
-        _p_a = [ -> y do
-          me.describe_into_under y, self  # :+#hook-out
-        end ]
-
-        N_lines_[ [], d, _p_a, expag ]
-      end
-
-      def formal_properties
-        @__fp ||= produce_formal_properties
-      end
-
-      def name
-        @_mock_unb.name_function
-      end
     end
 
     # -- environment concern ( #todo - gut this )
@@ -2131,7 +2081,7 @@ module Skylab::Brazen
 
         env = @resources.bridge_for :environment
 
-        @_categorized_properties.env_a.each do | prp |
+        @categorized_properties.env_a.each do | prp |
 
           s = env[ environment_variable_name_string_via_property_ prp ]
           s or next

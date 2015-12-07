@@ -9,11 +9,11 @@ module Skylab::Autonomous_Component_System
         const_get( const, false )[ * x_a ]
       end
 
-      Express_context_under_ = -> context_x, expag, prep=nil do
+      Express_context_under_ = -> context_linked_list, expag, prep=nil do
 
         expag.calculate do
 
-          _st = context_x.to_element_stream_assuming_nonsparse
+          _st = context_linked_list.to_element_stream_assuming_nonsparse
 
           s_a = _st.reduce_into_by [] do | m, p |
             m << calculate( & p )

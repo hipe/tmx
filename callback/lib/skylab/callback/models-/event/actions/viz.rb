@@ -12,7 +12,7 @@ module Skylab::Callback
 
       edit_entity_class(
 
-        :desc, -> y do
+        :branch_description, -> y do
           y << "visualize an event graph for a particular module"
         end,
 

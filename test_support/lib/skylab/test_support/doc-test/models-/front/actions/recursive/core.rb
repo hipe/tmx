@@ -42,7 +42,7 @@ module Skylab::TestSupport
               :verb, '(recursively) generate',
               :noun, 'document',
 
-            :desc, -> y do
+            :branch_description, -> y do
               y << 'generate multiple documents at once'
               y << 'using a manifest file'
             end,

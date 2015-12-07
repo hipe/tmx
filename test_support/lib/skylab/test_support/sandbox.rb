@@ -111,7 +111,9 @@ module Skylab::TestSupport
     end
   end
 
-  Shell_ = LIB_.enhancement_shell :kiss_with, :produce_subclasses_of
+  Shell_ = LIB_.plugin::Bundle::Enhance::Shell.new(
+    :kiss_with, :produce_subclasses_of,
+  )
 
   Kernel_ = Callback_::Session::Ivars_with_Procs_as_Methods.new :flush do
 

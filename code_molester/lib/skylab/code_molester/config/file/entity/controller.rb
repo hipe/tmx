@@ -168,14 +168,18 @@ module Skylab::CodeMolester
     end
 
     def missing_fields
+
       miss_a = required_fields.reduce [] do |m, fld|
+
         k = fld.local_normal_name
-        if fld.is_required and ! @field_h.key?( k ) ||
-              @field_h[ k ].nil? # might become option one day.
+
+        if ! @field_h.key?( k ) || @field_h[ k ].nil? # might become option one day.
           m << fld
         end
+
         m
       end
+
       if miss_a.length.nonzero?
         Missing__[ :miss_o_a, miss_a ]
       end

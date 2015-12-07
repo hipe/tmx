@@ -60,6 +60,8 @@ module Skylab::Brazen
       o.execute
     end
 
+    Require_fields_lib_[]  # the only place where we do this statically?
+
     class Session
 
       attr_reader :client, :upstream
@@ -1080,9 +1082,9 @@ module Skylab::Brazen
         Home_::Home_::Normalization::Against_model[ qkn, self, & x_p ]
       end
 
-      def is_normalizable_
+      def is_normalizable__
 
-        if has_default
+        if Field_::Has_default[ self ]
           ACHIEVED_
         elsif ad_hoc_normalizer_box
           ACHIEVED_
@@ -1124,8 +1126,6 @@ module Skylab::Brazen
 
       ## ~~ default (a meta-meta property & part of the normalization API)
 
-      attr_reader :has_default
-
       def new_without_default
         new_with_default
       end
@@ -1163,10 +1163,8 @@ module Skylab::Brazen
 
       def _set_default_proc & p
         if block_given?
-          @has_default = true
           @default_proc = p
         else
-          remove_instance_variable :@has_default
           remove_instance_variable :@default_proc
         end
         KEEP_PARSING_

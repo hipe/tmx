@@ -133,8 +133,10 @@ module Skylab::Brazen
         arity_sym = _argument_arity_of @_switch
 
         if :zero != arity_sym
-          moniker = @_property.argument_moniker
-          moniker ||= _some_option_argument_moniker_for opt
+          moniker = @_property.option_argument_moniker
+          if ! moniker
+            moniker = _some_option_argument_moniker_for opt
+          end
         end
 
         _tail = _render_option_argument_moniker_and_arity moniker, arity_sym
@@ -164,9 +166,8 @@ module Skylab::Brazen
       end
 
       def _some_option_argument_moniker_for sw
-        X___  # eventually we will do etc. that one hack [#124]
+        Home_::CLI_Support::Option_argument_moniker_via_switch[ sw ]
       end
-      X___ = 'X'
 
       def _render_option_argument_moniker_and_arity moniker, arity_sym
 
@@ -195,6 +196,7 @@ module Skylab::Brazen
         arg_a = @_reflection.didactic_argument_properties
 
         if arg_a
+          Require_fields_lib_[]
           arg_a.each do | prp |
             s = __render_as_argument prp
             if s
@@ -212,11 +214,11 @@ module Skylab::Brazen
 
         s = _render_moniker_for_property prp
 
-        if prp.takes_many_arguments
+        if Field_::Takes_many_arguments[ prp ]
           s = __render_moniker_as_glob s
         end
 
-        if prp.is_effectively_optional_
+        if Field_::Is_effectively_optional[ prp ]
           s = __render_expression_as_optional s
         end
         s
@@ -226,8 +228,9 @@ module Skylab::Brazen
 
         # (from here on down either don't mutate state or don't use singleton)
 
-        if prp.has_custom_moniker
-          prp.custom_moniker
+        s = prp.argument_argument_moniker
+        if s
+          s
         else
           ARGUMENT_MONIKER_FORMAT___ % prp.name.as_slug
         end

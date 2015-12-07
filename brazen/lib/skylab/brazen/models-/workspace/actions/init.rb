@@ -6,7 +6,7 @@ module Skylab::Brazen
 
     edit_entity_class(
 
-      :desc, -> y do
+      :branch_description, -> y do
         y << "init a #{ highlight '<workspace>' }"
         y << "this is the second line of the init description"
       end,

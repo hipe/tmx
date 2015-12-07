@@ -8,7 +8,7 @@ module Skylab::TestSupport
 
         edit_entity_class :promote_action,
 
-          :desc, -> y do
+          :branch_description, -> y do
             y << "generate #{ val Home_::Init.test_support_filenames.first } files"
           end,
 
@@ -262,7 +262,7 @@ module Skylab::TestSupport
               end
 
               if @is_dry
-                Home_.lib_.IO.dry_stub_instance
+                Home_.lib_.system_lib::IO.dry_stub_instance
               else
                 @did_open = true
                 ::File.open(

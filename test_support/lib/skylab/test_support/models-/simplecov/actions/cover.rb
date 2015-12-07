@@ -91,11 +91,8 @@ module Skylab::TestSupport
           self.class.name_function
         end
 
-        def has_description
-          true
-        end
-
-        def under_expression_agent_get_N_desc_lines expag, d=nil
+        def description_proc
+          self._WAS_look
           [ 'ya sure whatever' ]
         end
 

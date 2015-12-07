@@ -63,7 +63,7 @@ module Skylab::Callback
       def via_template_parse_remainder_of_polymorphic_stream st
         bx = Box.new
         @nucleus.template.to_formal_variable_stream.each do | param |
-          bx.add param.name_symbol, Field__.new( param )
+          bx.add param.name_symbol, Behaviors___.new( param )
         end
         @nucleus.field_box = bx
         @nucleus.name_i_a = bx.get_names.freeze
@@ -127,7 +127,7 @@ module Skylab::Callback
         @nucleus.name_i_a
       end
 
-      class Field__
+      class Behaviors___
 
         def initialize tparam
           @aggregate_p = nil

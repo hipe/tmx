@@ -9,34 +9,90 @@ module Skylab::Brazen
       end
     end  # >>
 
+    option_argument_moniker_via_variegated_string = nil
+
+    Option_argument_moniker_via_property = -> prp do
+      s = prp.option_argument_moniker
+      if s
+        s
+      else
+        option_argument_moniker_via_variegated_string[
+          prp.name.as_variegated_string ]
+      end
+    end
+
+    term = '[a-z][a-z0-9]+'
+    hack_rx = /\A <(?:#{ term }-)*(?<main>#{ term })>\z/i
+
+    second_try_rx = nil
+
+    Option_argument_moniker_via_switch = -> sw_o do
+
+      # for its production syntax strings related to o.p, the syntax assembly
+      # uses only the stdlib o.p as input. as such we have to reverse-infer
+      # the same argument moniker (if any custom) from the o.p that came from
+      # the formal. (and we do the shortening heuristic used elsewhere in
+      # this document.)
+
+      md = hack_rx.match sw_o.arg
+      if  md
+
+        md[ :main ].upcase
+
+      else
+
+        second_try_rx ||= /(?<=\A )[A-Z]+\z/
+        md = second_try_rx.match sw_o.arg
+
+        if md
+          md[ 0 ]
+        else
+
+          sw_o.arg  # [cc]
+        end
+      end
+    end
+
+    option_argument_moniker_via_variegated_string = -> s do
+
+      s.split( UNDERSCORE_ ).last.upcase
+    end
+
     Standard_action_property_box___ = Callback_::Lazy.call do
 
       bx = Box_.new
 
-      bx.add :help, Property.new(
+      bx.add :help, Modality_Specific_Property.new(
+
         :help,
-        :argument_arity, :zero,
-        :desc, -> y do
+
+        :description_proc, -> y do
           y << "this screen"
-        end )
+        end,
+
+        :argument_arity, :zero,
+        :parameter_arity, :zero_or_one,
+      )
 
       bx.freeze
     end
 
-    class Property  # #open [#006] what to do about this custom CLI prop class?
+    class Modality_Specific_Property
 
-      # (we don't want to keep this but despite that we'll clean it up:)
+      # #open [#006] what to do about this custom CLI prop class?
 
-      # -- initialization & dup-mutate
+      def initialize name_sym, * x_a
 
-      def initialize name_i, * x_a
+        @name = Callback_::Name.via_variegated_symbol name_sym
+
         @argument_arity = :one
-        @custom_moniker = nil
-        @desc = nil
-        @name = Callback_::Name.via_variegated_symbol name_i
+
+        @parameter_arity = :one
+
         x_a.each_slice( 2 ) do |i, x|
           instance_variable_set :"@#{ i }", x
         end
+
         freeze
       end
 
@@ -46,68 +102,21 @@ module Skylab::Brazen
         otr
       end
 
-      # -- reflection (higher-to-lower-level)
-
-      def under_expression_agent_get_N_desc_lines expag, d=nil
-        if @desc
-          N_lines_[ [], d, [ @desc ], expag ]
-        end
-      end
-
-      # ~ simple derived properties
-
-      def is_effectively_optional_  # explained in [#006]
-
-        # since these have no defaults, it is simply a function of:
-
-        ! is_required
-      end
+      # -- #[#fi-010]
 
       def name_symbol
         @name.as_variegated_symbol
       end
 
-      def has_custom_moniker
-        @custom_moniker
-      end
-
-      def has_description
-        @desc
-      end
-
-      def takes_argument  # zero to many takes argument
-        :zero != @argument_arity
-      end
-
-      def argument_is_required
-        :one == @argument_arity || :one_or_more == @argument_arity
-      end
-
-      def takes_many_arguments
-        :zero_or_more == @argument_arity || :one_or_more == @argument_arity
-      end
-
-      # ~ direct properties
-
       attr_reader(
-        :argument_arity,
-        :argument_moniker,
-        :custom_moniker,
-        :desc,
-        :is_required,
+        :option_argument_moniker,
+        :argument_argument_moniker,
         :name,
+        :description_proc,
+        :default_proc,
         :parameter_arity,
+        :argument_arity,
       )
-
-      # ~ constant properties
-
-      def has_default
-        NIL_
-      end
-
-      def has_primitive_default
-        NIL_
-      end
     end
 
     class As_Bound_Call
