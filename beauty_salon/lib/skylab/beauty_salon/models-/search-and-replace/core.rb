@@ -6,8 +6,6 @@ module Skylab::BeautySalon
 
     class Actions::Search_and_Replace < Home_.lib_.brazen::Action  # sorry
 
-      Brazen_ = Home_.lib_.brazen
-
       # this is :[#br-043] the frontier example of a back-less front..
 
       @is_promoted = true
@@ -142,9 +140,7 @@ module Skylab::BeautySalon
       end
     end
 
-    Brazen_ = Home_.lib_.brazen
-
-    Zerk_ = Brazen_::Zerk
+    Zerk_ = Home_.lib_.zerk
 
     class Node_ < Zerk_::Common_Node
 

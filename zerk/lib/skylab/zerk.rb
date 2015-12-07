@@ -1,7 +1,23 @@
-module Skylab::Brazen
+require 'skylab/callback'
 
-  module Zerk  # see [#062]
+module Skylab::Zerk  # intro in [#001] README
 
+  class << self
+
+    def lib_
+      @___lib ||= Callback_.
+        produce_library_shell_via_library_and_app_modules Lib_, self
+    end
+
+    def test_support
+      if ! Home_.const_defined? :TestSupport
+        load ::File.expand_path( '../../../test/test-support.rb', __FILE__ )
+      end
+      Home_.const_get :TestSupport, false
+    end
+  end
+
+  # ->
     class Common_Node
 
       # :+#hook-out's: (methods you need to implement in your child class)
@@ -173,7 +189,7 @@ module Skylab::Brazen
       end
 
       def build_extra_values_event stream
-        Home_::Property.
+        Home_.lib_.brazen::Property.
           build_extra_values_event [ stream.current_token ], nil, 'iambic token'
       end
 
@@ -272,7 +288,7 @@ module Skylab::Brazen
         s.strip!
         rx = Home_.lib_.basic::Fuzzy.case_sensitive_regex_via_string s
         cx_a = []
-        @children.each do |cx|  # :~+[#ba-015] the simple fuzzy algorithm
+        @children.each do |cx|  # ~#[#ba-015] the simple fuzzy algorithm
           cx.can_receive_focus or next
           rx =~ cx.slug or next
           if s == cx.slug
@@ -329,13 +345,15 @@ module Skylab::Brazen
       end
 
       def build_prompt_line  # #note-190
+
         a = []
+
         @children.each do |cx|
           cx.can_receive_focus or next
           a.push cx.slug
         end
 
-        LIB_.basic::Hash.determine_hotstrings( a ).map do | o |
+        Home_.lib_.basic::Hash.determine_hotstrings( a ).map do | o |
           if o
             "[#{ o.hotstring }]#{ o.rest }"
           end
@@ -361,7 +379,7 @@ module Skylab::Brazen
       # ~ persistence stuff for branch node :+#courtesy
 
       def receive_try_to_persist
-        Zerk_::Actors__::Persist.with(
+        Home_::Actors__::Persist.with(
           :path, persist_path,
           :children, @children,
           :serr, @serr,
@@ -371,7 +389,7 @@ module Skylab::Brazen
     private
 
       def retrieve_values_from_FS_if_exist
-        Zerk_::Actors__::Retrieve[
+        Home_::Actors__::Retrieve[
           persist_path,
           @children,
           handle_unsigned_event_selectively ]
@@ -468,7 +486,7 @@ module Skylab::Brazen
       end
 
       def when_passed_zero_length_string
-        maybe_send_event :error, :invalid_property_value, :empty_string_is_meaningless  # #open :+[#066]
+        maybe_send_event :error, :invalid_property_value, :empty_string_is_meaningless  # #open #[#br-066]
         UNABLE_
       end
 
@@ -479,7 +497,7 @@ module Skylab::Brazen
       end
 
       def when_passed_nonzero_length_blank_string s
-        maybe_send_event :error, :invalid_property_value, :blank_string_is_meaningless  # #open :+[#066]
+        maybe_send_event :error, :invalid_property_value, :blank_string_is_meaningless  # #open #[#br-066]
         UNABLE_
       end
 
@@ -512,10 +530,16 @@ module Skylab::Brazen
       end
 
       def build_request_ended_prematurely_event
-        build_not_OK_event_with :request_ended_prematurely,
-            :name, @name do |y, o|
-          _prop = LIB_.basic::Minimal_Property.via_name_function o.name
-          y << "request ended prematurely - expecting value for #{ par _prop }"
+
+        build_not_OK_event_with(
+          :request_ended_prematurely,
+          :name, @name,
+
+        ) do | y, o |
+
+          _prp = Home_.lib_.basic::Minimal_Property.via_name_function o.name
+
+          y << "request ended prematurely - expecting value for #{ par _prp }"
         end
       end
 
@@ -668,12 +692,35 @@ module Skylab::Brazen
       end
     end
 
+    Callback_ = ::Skylab::Callback
+    Autoloader_ = Callback_::Autoloader
+
+    module Lib_
+
+      sidesys, stdlib = Autoloader_.at(
+        :build_require_sidesystem_proc,
+        :build_require_stdlib_proc )
+
+      Basic = sidesys[ :Basic ]
+      Brazen = sidesys[ :Brazen ]
+      Open_3 = stdlib[ :Open3 ]
+
+      system_lib = sidesys[ :System ]
+      System = -> do
+        system_lib[].services
+      end
+    end
+
+    Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
+
     ACHIEVED_ = true
     BLANK_RX_ = /\A[[:space:]]*\z/
+    EMPTY_A_ = [].freeze
     FINISHED_ = nil
+    Home_ = self
     NONE_S = '(none)'.freeze
     NOTHING_TO_DO_ = nil
-
-    Zerk_ = self
-  end
+    SPACE_ = ' '
+    UNABLE_ = false
+  # -
 end

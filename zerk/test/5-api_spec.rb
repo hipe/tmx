@@ -1,23 +1,18 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
   module Zerk_Namespace_1____  # <-
 
-  zerk = TS_.lib_ :zerk
-
-  zerk.write_constants_into self
-
-  TS_.describe "[br] zerk API" do
+  TS_.describe "[ze] zerk API" do
 
     TS_[ self ]
-    zerk.prepare_test_context self
 
     context "the minimal branch" do
 
       before :all do
 
-        class Mezo_Branch < Zerk_::Branch_Node
+        class Mezo_Branch < Home_::Branch_Node
 
           def initialize x
             @children = Home_::EMPTY_A_
@@ -49,7 +44,7 @@ module Skylab::Brazen::TestSupport
 
         module M2
 
-          class Free_Branch_Node < Zerk_::Branch_Node
+          class Free_Branch_Node < Home_::Branch_Node
 
             def initialize * cls_a, x
               super x
@@ -61,7 +56,7 @@ module Skylab::Brazen::TestSupport
             attr_reader :children
           end
 
-          class Field_Field < Zerk_::Field
+          class Field_Field < Home_::Field
 
             def against_nonempty_polymorphic_stream stream
               @s = stream.gets_one
@@ -71,14 +66,14 @@ module Skylab::Brazen::TestSupport
             attr_reader :s
           end
 
-          Quit_Button = Zerk_::Quit_Button
+          Quit_Button = Home_::Quit_Button
 
-          Up_Button = Zerk_::Up_Button
+          Up_Button = Home_::Up_Button
 
-          class Be_Excited_Boolean < Zerk_::Boolean
+          class Be_Excited_Boolean < Home_::Boolean
           end
 
-          class Go_Agent < Zerk_::Common_Node
+          class Go_Agent < Home_::Common_Node
 
             def is_terminal_node
               true
@@ -103,7 +98,7 @@ module Skylab::Brazen::TestSupport
             end
           end
 
-          class Integral_Branch_Node < Zerk_::Branch_Node
+          class Integral_Branch_Node < Home_::Branch_Node
 
             def initialize x
               super
@@ -145,7 +140,7 @@ module Skylab::Brazen::TestSupport
         with_branch_with M2::Field_Field
         @result = call :field
         expect_not_OK_event :request_ended_prematurely,
-          "field error: request ended prematurely - expecting value for (par « field »)"
+          "field error: request ended prematurely - expecting value for 'field'"
         expect_failed
       end
 

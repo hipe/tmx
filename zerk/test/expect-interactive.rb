@@ -1,6 +1,6 @@
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
-  module Zerk::Expect_Interactive
+  module Expect_Interactive
 
     PUBLIC = true
 
@@ -162,7 +162,7 @@ module Skylab::Brazen::TestSupport
         attr_reader :err
 
         def start
-          @in, @out, @err, @thread = Home_::LIB_.open_3.popen3 @bin_path,
+          @in, @out, @err, @thread = Home_.lib_.open_3.popen3 @bin_path,
             chdir: @chdir_path
           self
         end
@@ -298,9 +298,9 @@ module Skylab::Brazen::TestSupport
       # <-
 
     ACHIEVED_ = true
-    BLANK_RX_ = Home_::Zerk::BLANK_RX_
+    BLANK_RX_ = Home_::BLANK_RX_
+    EMPTY_S_ = ''
     LINE_DELIM_RX__ = /(?<=\n)/
-    MONADIC_EMPTINESS_ = Home_::MONADIC_EMPTINESS_
     READ_BYTES___ = 8000  # like 100-ish lines - enough for now
     READ_TIMEOUT_SECONDS__ = 1.0
 

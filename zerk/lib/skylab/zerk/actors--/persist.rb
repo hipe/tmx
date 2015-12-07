@@ -1,8 +1,6 @@
-module Skylab::Brazen
-
-  module Zerk
-
-    class Actors__::Persist  # notes stow away in [#062] under the "3" suffix
+module Skylab::Zerk
+  # ->
+    class Actors__::Persist  # notes stow away in [#001] under the "3" suffix
 
       Callback_::Actor.call self, :properties,
         :path,
@@ -33,7 +31,7 @@ module Skylab::Brazen
 
       def when_no_fields
 
-        LIB_.system.filesystem( :Unlink_File ).with(
+        Home_.lib_.system.filesystem( :Unlink_File ).with(
           :path, @path,
           :if_exists,
           & @on_event_selectively )
@@ -56,7 +54,7 @@ module Skylab::Brazen
 
         _dirname = ::File.dirname @path
 
-        kn = LIB_.system.filesystem( :Existent_Directory ).with(
+        kn = Home_.lib_.system.filesystem( :Existent_Directory ).with(
           :path, _dirname,
           :create_if_not_exist,
           :max_mkdirs, 1,
@@ -76,7 +74,7 @@ module Skylab::Brazen
 
       def write  # assume any dirname of path exists and is a directory
 
-        io = LIB_.system.filesystem( :Downstream_IO ).against_path(
+        io = Home_.lib_.system.filesystem( :Downstream_IO ).against_path(
           @path
 
         ) do | * i_a, & ev_p |
@@ -98,7 +96,10 @@ module Skylab::Brazen
       end
 
       def line_scan_for_event ev
-        ev.to_stream_of_lines_rendered_under Home_::API.expression_agent_instance
+
+        _expag = Home_.lib_.brazen::API.expression_agent_instance
+
+        ev.to_stream_of_lines_rendered_under _expag
       end
 
       def via_down_IO_write
@@ -106,7 +107,7 @@ module Skylab::Brazen
           @down_IO.truncate 0
         end
         _scan = Callback_::Stream.via_nonsparse_array @pair_a
-        ok = Home_.cfg.write @down_IO,
+        ok = Home_.lib_.brazen.cfg.write @down_IO,
           _scan, 'current', 'curried-search-and-replace-agent'
         if ok
           @down_IO.close
@@ -119,5 +120,5 @@ module Skylab::Brazen
         end
       end
     end
-  end
+  # -
 end

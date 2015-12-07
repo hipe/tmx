@@ -94,7 +94,8 @@
              ( #was: #done marshal issue near regexps with escape-looking sequences )
 [#063]       [ isomorphicisms and emergent interfaces ]
                [fa] near [ CLI revelation gone ], [#gv-030] sets the stage nicely)
-[#062]       #doc-node the zerk narrative ..
+[#062] #hole
+             ( #moved-to: [#ze-001] )
 [#061]       #tracking-tag `members` as a universal thing
 [#060]       #tracking ways we customize CLI action adapter rendering customization
              ( #was: #done issue with parsing properties )

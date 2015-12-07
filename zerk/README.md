@@ -1,9 +1,11 @@
-# the zerk narrative :[#062]
+# the zerk narrative :[#001]
 
-## introduction
+## objective & scope
 
+"zerk" is a goofy fun experiment for command-line apps.
 the name "zerk" is a portmanteau of "zork" and "jerk"; "zork" out of
 deference to the seminal text-adventure, and "jerk" just because.
+
 
 "zerk" is meant to be a
   • modular
@@ -252,7 +254,7 @@ this. busiess objects are providing name value pairs in a format that is
 "normal" by some standard, and somewhere in this pipeline we need to
 convert those names to names compatible with the collection.
 
-for now, that place is here. but this has become [#029], which suggests
+for now, that place is here. but this has become [#br-029], which suggests
 a possible better way.
 
 

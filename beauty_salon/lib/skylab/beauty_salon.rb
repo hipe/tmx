@@ -93,6 +93,8 @@ module Skylab::BeautySalon
     Tree_lib = -> do
       ST__[]::Tree
     end
+
+    Zerk = sidesys[ :Zerk ]
   end
 
   ACHIEVED_ = true

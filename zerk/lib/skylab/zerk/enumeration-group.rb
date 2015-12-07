@@ -1,8 +1,6 @@
-module Skylab::Brazen
-
-  module Zerk
-
-    class Enumeration_Group  # see #note-enum in [#062]
+module Skylab::Zerk
+  # ->
+    class Enumeration_Group  # see #note-enum in [#001]
 
       def initialize i_a, group_name_i, branch
         @active_boolean = nil
@@ -109,5 +107,5 @@ module Skylab::Brazen
         UNABLE_
       end
     end
-  end
+  # -
 end

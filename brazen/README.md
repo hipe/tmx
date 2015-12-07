@@ -12,5 +12,5 @@ in more detail:
 
   • (used to house the ACS but that moved to its own lib)
 
-  • [#062] the "zerk" command-line utility framework
+  • [#ze-000] the "zerk" command-line utility framework
 _

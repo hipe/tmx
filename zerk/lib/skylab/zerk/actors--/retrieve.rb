@@ -1,7 +1,5 @@
-module Skylab::Brazen
-
-  module Zerk
-
+module Skylab::Zerk
+  # ->
     class Actors__::Retrieve
 
       Callback_::Actor.call self, :properties,
@@ -11,7 +9,7 @@ module Skylab::Brazen
 
       def execute
 
-        @up_IO = LIB_.system.filesystem( :Upstream_IO ).against_path(
+        @up_IO = Home_.lib_.system.filesystem( :Upstream_IO ).against_path(
           @path
 
         ) do | *, & ev_p |
@@ -34,7 +32,7 @@ module Skylab::Brazen
       end
 
       def via_IO
-        doc = Home_.cfg.read @up_IO do |ev|
+        doc = Home_.lib_.brazen.cfg.read @up_IO do |ev|
           @on_event_selectively.call :error do
             ev
           end
@@ -147,5 +145,5 @@ module Skylab::Brazen
         end
       end
     end
-  end
+  # -
 end

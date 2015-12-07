@@ -5,7 +5,7 @@ module Skylab::BeautySalon::TestSupport
   describe "[bs] search and replace - (interactive) CLI" do
 
     extend TS_
-    use :expect_interactive  # [br]
+    use :expect_interactive  # [ze]
     use :models_search_and_replace  # defines hook-outs for above
 
     context "counts" do

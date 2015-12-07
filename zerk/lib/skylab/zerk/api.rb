@@ -1,7 +1,5 @@
-module Skylab::Brazen
-
-  module Zerk
-
+module Skylab::Zerk
+  # ->
     class API  # models one particular invocation of the API (a "call")
 
       class << self
@@ -148,5 +146,5 @@ module Skylab::Brazen
         @node.maybe_receive_unsigned_event_via_channel i_a, & ev_p
       end
     end
-  end
+  # -
 end
