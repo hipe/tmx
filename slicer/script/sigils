@@ -4,7 +4,8 @@
 
   sout = $stdout
 
-  _ss_a = ::Skylab::TMX.build_sigilized_list
-  _ss_a.each do | ss |
+  _st = ::Skylab::TMX.build_sigilized_sidesystem_stream
+
+  _st.each do | ss |
     sout.puts "#{ ss.sigil } #{ ss.stem }"
   end

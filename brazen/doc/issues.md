@@ -2,7 +2,8 @@
 [#123]       track nasty peeks into filesystem
 [#122]       as if you would ever..
 [#121]       #tracking this wrapping algo
-[#120] #open extensible modifiers for use in mutation sessions
+[#120] #hole
+             (#moved-to: [#ac-008])
              (note [#083]#X1 is related but is not the same)
 [#119]       track expression of ACS associations into brazen unbound tree
              ( #was: get [fm] out of test (see) )
@@ -97,7 +98,8 @@
 [#062] #hole
              ( #moved-to: [#ze-001] )
 [#061]       #tracking-tag `members` as a universal thing
-[#060]       #tracking ways we customize CLI action adapter rendering customization
+[#060]   #track custom CLI adapter resolution client needs not covered here;
+             ways we customize CLI action adapter rendering
              ( #was: #done issue with parsing properties )
 [#059]       #doc-node names
 [#058]       #parent-node: [#057] the default frame

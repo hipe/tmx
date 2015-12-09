@@ -4,17 +4,7 @@ module Skylab::Autonomous_Component_System
 
     module For_Interface  # notes in [#003]
 
-      class Procesque_Dyadic__
-        class << self
-          def _call x, y
-            new( x, y ).execute
-          end
-          alias_method :[], :_call
-          alias_method :call, :_call
-        end  # >>
-      end
-
-      class Read_or_write < Procesque_Dyadic__
+      class Read_or_write < Callback_::Actor::Dyadic
 
         # #open :[#003]:issue-1: this effects a "crude autovivification" -
         # it builds a component for a missing member and stores it whether
@@ -58,7 +48,7 @@ module Skylab::Autonomous_Component_System
         end
       end
 
-      class Touch < Procesque_Dyadic__
+      class Touch < Callback_::Actor::Dyadic
 
         def initialize qkn, acs
           @ACS = acs

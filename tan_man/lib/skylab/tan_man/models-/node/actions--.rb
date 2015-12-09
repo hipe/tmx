@@ -130,7 +130,7 @@ module Skylab::TanMan
 
         label_s = node_identifier.entity_name_string
 
-        node = to_node_sexp_stream.detect do | node_ |
+        node = to_node_sexp_stream.flush_until_detect do | node_ |
           label_s == node_.label
         end
 
@@ -155,7 +155,7 @@ module Skylab::TanMan
       end
 
       def retrieve_any_node_with_id sym
-        to_node_sexp_stream.detect do | node |
+        to_node_sexp_stream.flush_until_detect do | node |
           sym == node.node_id
         end
       end

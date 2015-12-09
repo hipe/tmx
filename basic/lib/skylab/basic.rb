@@ -35,11 +35,6 @@ module Skylab::Basic  # introduction at [#020]
     end
   end  # >>
 
-  _ACS = nil
-  ACS_ = -> do
-    _ACS ||= Home_.lib_.autonomous_component_system
-  end
-
   Callback_ = ::Skylab::Callback
 
   Default_property_instance__ = Callback_.memoize do
@@ -192,6 +187,11 @@ module Skylab::Basic  # introduction at [#020]
     else
       Home_::List.pair_stream_via_even_iambic x_a
     end
+  end
+
+  Assume_ACS_ = Callback_::Lazy.call do
+    ACS_ = ::Skylab::Autonomous_Component_System
+    NIL_
   end
 
   ACHIEVED_ = true

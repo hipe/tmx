@@ -37,51 +37,61 @@ module Skylab::Slicer
       graph_viz_labeller = Home_::Output_Adapters_::Graph_Viz::Labeller.new(
         @stdout )
 
-      _ea = Home_::Actors_::Determine_and_distribute_medallions[ @a ]
+      _ = Home_.lib_.TMX
 
-      _ea.each do | ss |
-        graph_viz_labeller << ss
+      _st = _::Models::Sigil.via_reflective_sidesystem_array_( @a ).to_stream
+      h = {}
+      _st.each do | s10n |
+
+        h[ s10n.stem ] = s10n.sigil
+
+        graph_viz_labeller << s10n
       end
 
-      __walk_each_sidesystem
+      @_sigils = h
+
+      ___walk_each_sidesystem
 
       @stdout.puts "}"
 
       NIL_
     end
 
-    def __walk_each_sidesystem
+    def ___walk_each_sidesystem
 
       @a.each do | ss |
-        __do_sidesystem ss
+        ___do_sidesystem ss
       end
       NIL_
     end
 
-    def __do_sidesystem ss
+    def ___do_sidesystem ss
 
       if ss.has_library_node
-        __do_library_file ss
+        ___do_library_file ss
       end
       NIL_
     end
 
-    def __do_library_file ss
+    def ___do_library_file ss
 
       if ss.inferred_dependencies
-        __go_deps ss
+        ___go_deps ss
       else
         @stderr.puts "(library node with no sidesystems?, skipping - #{ ss.norm })"
       end
       NIL_
     end
 
-    def __go_deps ss  # etc
+    def ___go_deps ss  # etc
 
-      lhs = "  #{ ss.sigil } -> "
+      sigils = @_sigils
+
+      lhs = "  #{ sigils.fetch ss.stem } -> "
 
       ss.inferred_dependencies.each do | sym |
-        @stdout.puts "#{ lhs }#{ @h.fetch( sym ).sigil }"
+
+        @stdout.puts "#{ lhs }#{ sigils.fetch @h.fetch( sym ).stem }"
       end
       NIL_
     end

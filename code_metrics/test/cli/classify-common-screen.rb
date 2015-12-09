@@ -1,6 +1,8 @@
-module Skylab::FileMetrics::TestSupport
+module Skylab::CodeMetrics::TestSupport
 
   class CLI::Classify_Common_Screen
+
+    # (this is probably a predecessor to etc in [br] "expect section")
 
     class << self
 

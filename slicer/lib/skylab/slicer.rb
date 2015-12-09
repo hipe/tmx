@@ -23,26 +23,8 @@ module Skylab::Slicer
 
   class << self
 
-    def data_documents_path
-      ::File.expand_path '../../../data-documents', dir_pathname.to_path
-    end
-
     def describe_into_under y, _
       y << "(secret)"
-    end
-
-    def distribute_sigils ss_a
-
-      ea = Home_::Actors_::Determine_and_distribute_medallions[ ss_a ]
-      begin
-        begin
-          ea.next
-          redo
-        rescue ::StopIteration
-          break
-        end
-      end while nil
-      NIL_
     end
 
     def application_kernel_
@@ -64,9 +46,8 @@ module Skylab::Slicer
     sidesys = Autoloader_.build_require_sidesystem_proc
 
     Basic = sidesys[ :Basic ]
-
     Task = sidesys[ :Task ]
-
+    TMX = sidesys[ :TMX ]
   end
 
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
@@ -78,7 +59,6 @@ module Skylab::Slicer
 
   ACHIEVED_ = true
   Brazen_ = Autoloader_.require_sidesystem :Brazen
-  EMPTY_S_ = ''.freeze
   NIL_ = nil
   Home_ = self
   UNABLE_ = false

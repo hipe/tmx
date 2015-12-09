@@ -138,6 +138,7 @@ module Skylab::Brazen
       end
     end
 
+    Actions = ::Module.new.freeze  # [#002]note-165
     FILE_SEPARATOR_BYTE = ::File::SEPARATOR.getbyte 0
     GENERIC_ERROR_EXITSTATUS = 5
     Here_ = self

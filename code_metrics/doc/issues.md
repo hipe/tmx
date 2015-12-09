@@ -1,10 +1,13 @@
+[#011]    #investigate how to pipe from one process to another from ruby
+             not with this string command
 [#010]       conjuncter ..
 [#009] #idea imagine a facility that let you see every occurence of a
              semantic construct (like initializing a class with a certain
              local name, or including a module statically in a class) and
              displaying its frequency over time. rename this project
              `meta-metrics`!
-[#008]       #wormhole
+[#008]       model support ..
+             ( #was: #wormhole )
 [#007]       #doc-point - during tests, we physically `cd` into (whererver)
                because although ugly, we *really* like the simplicity of
                always showing the raw filepaths in the application code.

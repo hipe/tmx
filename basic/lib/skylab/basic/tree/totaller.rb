@@ -16,7 +16,7 @@ module Skylab::Basic
       _mutate_by_sort
     end
 
-    def accept_and_finish_by & visit_p
+    def finish_by & visit_p
       _mutate_by_sort( & visit_p )
     end
 

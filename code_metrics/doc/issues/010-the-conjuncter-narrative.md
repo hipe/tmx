@@ -17,7 +17,7 @@ pseudogrammar:
 
   { "including" | "excluding" } { A | B | .. },
 
-this novelty :+[#hu-034] "expression frame"-like session wiil condense
+this novelty :+[#hu-034] "expression frame"-like session will condense
 the produced expressions down to fewer phrases and/or words, so the
 multiple predicates (gerund phrases?) can be aggregated into one so
 that instead of
@@ -64,6 +64,7 @@ elsewhere.
   • it is the frontier driver of wishlist :+[#hu-041]
     conjuctive phrase logic, which perhaps me while overkilled by
     [#cb-047] the eventing articulator it uses.
+    (EDIT: the above "sentence")
 
 
 
@@ -71,7 +72,7 @@ elsewhere.
 ## features of implementation
 
   • this should have relatively low cost to use for clients that
-    end up not expressing thru NLP bbecause it builds the mutable
+    end up not expressing thru NLP because it builds the mutable
     phrase productions only on demand, not early.
 
 

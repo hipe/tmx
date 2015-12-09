@@ -270,7 +270,7 @@ module Skylab::Basic
 
             if nb_t_rx =~ x
 
-              ACS_[]::Value_Wrapper[ arg_st.gets_one.to_sym ]
+              Callback_::Known_Known[ arg_st.gets_one.to_sym ]
 
             else
 

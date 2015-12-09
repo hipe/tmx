@@ -129,11 +129,6 @@ module Skylab::TMX
     def stem
       @_lt.stem
     end
-
-    attr_accessor(
-      :sigil,  # comes from a complex outside process
-    )
-
   end
 # ->
   end

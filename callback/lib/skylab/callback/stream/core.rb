@@ -129,7 +129,7 @@ module Skylab::Callback
 
     # ~ result in number
 
-    def count
+    def flush_to_count
       d = 0
       d +=1 while gets
       d
@@ -137,7 +137,7 @@ module Skylab::Callback
 
     # ~ result in zero or one item
 
-    def last
+    def flush_to_last
       begin
         x = gets
         x or break
@@ -147,7 +147,7 @@ module Skylab::Callback
       x_
     end
 
-    def map_detect & p
+    def flush_until_map_detect & p
       begin
         x = gets
         x or break
@@ -158,7 +158,7 @@ module Skylab::Callback
       x_
     end
 
-    def detect & p
+    def flush_until_detect & p
       begin
         x = gets
         x or break
@@ -250,6 +250,18 @@ module Skylab::Callback
       end
     end
 
+    def map & p
+
+      a = []
+      begin
+        x = gets
+        x or break
+        a.push p[ x ]
+        redo
+      end while nil
+      a
+    end
+
     def map_by & p
 
       new do
@@ -268,18 +280,6 @@ module Skylab::Callback
         x = gets
         x or break
         a.push x
-        redo
-      end while nil
-      a
-    end
-
-    def map & p
-
-      a = []
-      begin
-        x = gets
-        x or break
-        a.push p[ x ]
         redo
       end while nil
       a

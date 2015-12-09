@@ -113,6 +113,8 @@ module Skylab::Slicer
         s.gsub!( /^#{ s.match( /\A[ ]+/ ) }/, EMPTY_S_ )
         s.freeze
       end
+
+      EMPTY_S_ = ''
     end
   end
 end

@@ -1,16 +1,8 @@
-module Skylab::FileMetrics
+module Skylab::CodeMetrics
 
-  class Models_::Report
+  # -- stowaway our custom action adapter shared base class notes in [#005]
 
-    Modalities = ::Module.new
-
-    module Modalities::CLI  # (notes in [#005])
-
-      Actions = ::Module.new
-
-      # ~ the mutable front properties API frontier
-
-      class Action_Adapter__ < Home_::CLI::Action_Adapter
+    class CLI::Action_Adapter < CLI::Action_Adapter
 
         MUTATE_PRPS__ = nil
 
@@ -25,7 +17,7 @@ module Skylab::FileMetrics
           p = self.class::MUTATE_PRPS__
           if p
 
-            sess = Modz_CLI_::Sessions_::Property_Mutation_Session.new
+            sess = CLI::Mutate_Front_and_Back_Properties___.new
             sess.extmod = EXTMOD__
             sess.mutable_front_props = mutable_front_properties
             sess.mutable_back_props = mutable_back_properties
@@ -33,14 +25,13 @@ module Skylab::FileMetrics
           end
           NIL_
         end
-      end
 
-      # ~ our common properties
+      # -- our common properties
 
       bz = Home_.lib_.brazen
       EXTMOD__ = bz::Modelesque::Entity
 
-      Common_properties__ = bz::Nodesque::Common_Properties.new(
+      COMMON_PROPERTIES = bz::Nodesque::Common_Properties.new(
         EXTMOD__
       ) do | sess |
 
@@ -54,20 +45,17 @@ module Skylab::FileMetrics
           :argument_arity, :zero,
           :parameter_arity, :zero_or_more,
           :property, :verbose,
-
         )
       end
 
-      # ~ misc support for our action adapters
+      # -- misc support for our action adapters
 
       fmt = "%0.2f%%"
-      Common_percent_formatting__ = -> f do
+      Common_percent_formatting = -> f do
         fmt % ( f * 100 )
       end
 
-      # ~ our default hook-in behavior for particular shared events
-
-      class Action_Adapter__
+        # -- our default hook-in behavior for particular shared events
 
         # ~ most of our events ore on the "data" channel but see #note-075
 
@@ -78,6 +66,15 @@ module Skylab::FileMetrics
           else
             super
           end
+        end
+
+        def receive__ping__data i_a, & ev_p
+
+          _ev = ev_p[]
+
+          receive_event_on_channel _ev, i_a
+
+          NIL_
         end
 
         def receive__file_list__data i_a, & x_p
@@ -143,18 +140,16 @@ module Skylab::FileMetrics
             NIL_
           end
         end
-      end
 
-      # ~ our universal customization to achieve final custom rendering
-
-      class Action_Adapter__
+        # -- our universal customization to achieve final custom rendering
 
         def bound_call_via_bound_call_from_back bc
 
           Callback_::Bound_Call.by do
 
             totes = bc.receiver.send bc.method_name, * bc.args
-            if totes
+
+            if totes and totes.respond_to? :count
               _result_via_backstream_result totes
             else
               totes
@@ -175,15 +170,22 @@ module Skylab::FileMetrics
           @resources.serr.puts "(no files)"
           NIL_
         end
-      end
+      # -
+    end
 
-      # ~ our action adapters
+  # -- end the stowed away custom action adapter shared base class
 
-      class Actions::Line_Count < Action_Adapter__
+  class CLI
+    # -
+      # -- our action adapters
+
+      Actions = ::Module.new  # everything's here
+
+      class Actions::Line_Count < Action_Adapter
 
         _mutate_properties do | sess |
           sess.add_additional_properties(
-            :property_object, Common_properties__.fetch( :verbose ),
+            :property_object, COMMON_PROPERTIES.fetch( :verbose ),
           )
         end
 
@@ -195,7 +197,7 @@ module Skylab::FileMetrics
 
         def __express_totals_as_table out, totes
 
-          percent = Common_percent_formatting__
+          percent = Common_percent_formatting
 
           tbl = _begin_table
 
@@ -229,11 +231,11 @@ module Skylab::FileMetrics
         end
       end
 
-      class Actions::Ext < Action_Adapter__
+      class Actions::Ext < Action_Adapter
 
         _mutate_properties do | sess |
           sess.add_additional_properties(
-            :property_object, Common_properties__.fetch( :verbose ),
+            :property_object, COMMON_PROPERTIES.fetch( :verbose ),
           )
         end
 
@@ -246,7 +248,7 @@ module Skylab::FileMetrics
 
         def __express_totals_as_table out, totes
 
-          percent = Common_percent_formatting__
+          percent = Common_percent_formatting
 
           tbl = _begin_table
 
@@ -282,11 +284,11 @@ module Skylab::FileMetrics
         end
       end
 
-      class Actions::Dirs < Action_Adapter__
+      class Actions::Dirs < Action_Adapter
 
         _mutate_properties do | sess |
           sess.add_additional_properties(
-            :property_object, Common_properties__.fetch( :verbose ),
+            :property_object, COMMON_PROPERTIES.fetch( :verbose ),
           )
         end
 
@@ -304,7 +306,7 @@ module Skylab::FileMetrics
             integer_format % x
           end
 
-          percent = Common_percent_formatting__
+          percent = Common_percent_formatting
 
           tbl = _begin_table
 
@@ -347,9 +349,9 @@ module Skylab::FileMetrics
         end
       end
 
-      # ~ support for table rendering
+      class Action_Adapter  # re-open shared base class
 
-      class Action_Adapter__
+        # -- support for table rendering
 
         def _begin_table
           Home_.lib_.brazen::CLI_Support::Table::Structured.new
@@ -358,11 +360,8 @@ module Skylab::FileMetrics
         def _lookup_expression_width
           Home_::CLI::Lipsticker::EXPRESSION_WIDTH_PROC[]
         end
-      end
 
-      # ~ a model frontier for verbosities
-
-      class Action_Adapter__
+        # -- a model frontier for verbosities
 
         # the canonical levels: ( fatal error warning notice info trace )
 
@@ -413,8 +412,6 @@ module Skylab::FileMetrics
           ACHIEVED_
         end
       end
-
-      Modz_CLI_ = self
-    end
+    # -
   end
 end

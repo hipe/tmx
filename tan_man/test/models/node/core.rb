@@ -22,7 +22,7 @@ module Skylab::TanMan::TestSupport
     end
 
     def number_of_nodes
-      get_node_statement_scan.count
+      get_node_statement_scan.flush_to_count
     end
 
     def retrieve_any_node_with_id i

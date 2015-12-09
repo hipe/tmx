@@ -1,10 +1,8 @@
-module Skylab::FileMetrics
+module Skylab::CodeMetrics
 
-  class Models_::Report
+  module Home_::Model_::Support
 
-    class Actions::Ext < Report_Action_
-
-      @is_promoted = true
+    class Models_::Ext < Report_Action
 
       edit_entity_class(
 
@@ -13,7 +11,7 @@ module Skylab::FileMetrics
           y << "ordered by frequency of extension"
         end,
 
-        :reuse, COMMON_PROPERTIES_.at(
+        :reuse, COMMON_PROPERTIES.at(
           :exclude_dir,
           :include_name,
         ),
@@ -157,7 +155,7 @@ module Skylab::FileMetrics
 
       def __via_find_files_comand_resolve_file_stream
 
-        st = stdout_line_stream_via_args_( @_find_files_command.args )
+        st = line_upstream_via_system_command_ @_find_files_command.args
         if st
           @_file_stream = st
           ACHIEVED_

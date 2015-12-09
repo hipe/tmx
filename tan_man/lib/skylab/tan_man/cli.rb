@@ -18,9 +18,7 @@ module Skylab::TanMan
       end
     end
 
-    Previous_Actions___ = Actions
     module Actions
-      include Previous_Actions___
 
       class Status < Action_Adapter
 

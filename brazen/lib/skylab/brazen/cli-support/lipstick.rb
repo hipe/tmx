@@ -187,12 +187,24 @@ module Skylab::Brazen
         -> f_a do  # assume each component is normal and sum is normal
 
           s_a = []
+          tot = 0.0
+
           @_number_of_segments.times do | d |
-            s = segment_expressors.fetch( d ).call f_a.fetch( d )
-            if s
-              s_a.push s
+
+            _express_segment = segment_expressors.fetch d
+
+            float = f_a.fetch d
+
+            tot += float
+
+            styled_string = _express_segment[ float ]
+
+            if styled_string
+
+              s_a.push styled_string
             end
           end
+
           s_a * EMPTY_S_
         end
       end
@@ -204,6 +216,8 @@ module Skylab::Brazen
 
         surplus_f = 0.0  # this is sketchy just floating here, but it will
           # work as long as our rendering logic doesn't change. see below
+
+        eek = 1 == @segments.length
 
         @segments.map do | seg |
 
@@ -223,7 +237,20 @@ module Skylab::Brazen
               surplus_f -= 1.0
             end
 
-            style_p[ glyph_s * glyph_d ]
+            unstyled_string = glyph_s * glyph_d
+
+            styled_string = style_p[ unstyled_string ]
+
+            if eek
+
+              _number_of_empty_cels = w - glyph_d
+
+              _empty_spacer_string = SPACE_ * _number_of_empty_cels  # etc
+
+              "#{ styled_string }#{ _empty_spacer_string }"
+            else
+              styled_string
+            end
           end
         end
       end

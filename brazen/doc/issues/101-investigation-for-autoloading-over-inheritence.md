@@ -18,19 +18,44 @@ assumption that is however fair in this universe).
 
 
 
-## line-by-line
+## about the code generally
 
-we do *not* use the default `inherit` value of `true` here - to do so
-would expose us to the possibility of flickering failure based on
-whether or not a parent class has loaded its own (any) custom item or
-not yet. (this has certainly happened.)
+  • if this isn't used on a client subclass of one of our pantheon
+    classes (those in [#002]/figure-1), behavior is undefined.
 
-if that is what you actually did want, set the const in your node
-explicitly.
+  • we do *not* *ever* use the default value of `true` for the
+    `inherit` parameter in the calls to `const_get`: this can cause
+    nasty flickering behavior because it is vulnerable to the arbitrary
+    and volatile state the *parent classes* are in with regard to
+    whether or not something has been autoloaded yet. :gotcha-A
 
-if the const was not defined immediately inside of us, then peek into
-the filesystem, assumes [ca] autoloading. (note this peek is performed
-on a cached directory listing that is typically created earlier.)
+  • we use "known knowns" here so that the client can set explicitly
+    a false-ish value for a const, and have that value float all the
+    way up to be the value that is used for whatever the thing is.
+    (we don't know if this is needed now but it has been in the past
+    and may again be in the future.)
 
-the last-ditch fallback is to load an item with this same name from the
-"CLI support" node..
+    for example, to set your 'Expression_Adapter' const to `nil`
+    might be a way to say "i definitely don't want to use an expression
+    adapter; neither my own nor the default one."
+
+
+
+
+## pseudocode (maybe just an example)
+
+if we have already cached a value for this const, use that.
+
+otherwise we will cache whatever value we end up getting from the below:
+
+if there is a const defined directly in the client class (and
+it already loaded), use that.
+
+otherwise, if it looks like there is a file that defines this const,
+use that.
+
+otherwise, as a default case assume that "CLI support" has an
+appropriate value for this const.
+
+  (true for: `Expression_Agent`, `Actions` ..)
+_

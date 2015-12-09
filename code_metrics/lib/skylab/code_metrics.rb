@@ -1,6 +1,6 @@
 require 'skylab/callback'
 
-module Skylab::FileMetrics
+module Skylab::CodeMetrics
 
   class << self
 
@@ -22,8 +22,13 @@ module Skylab::FileMetrics
     Home_.lib_.basic::Tree::Totaller
   end
 
-  Callback_ = ::Skylab::Callback
+  Hack_lemma_via_symbol_ = -> sym do
+    s = sym.id2name
+    s.gsub! UNDERSCORE_, SPACE_
+    s
+  end
 
+  Callback_ = ::Skylab::Callback
   Autoloader_ = Callback_::Autoloader
 
   module Lib_

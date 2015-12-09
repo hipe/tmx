@@ -46,6 +46,8 @@ module Skylab::Basic
 
     Require_component_support___ = Callback_.memoize do
 
+      Assume_ACS_[]
+
       module Component_Models
 
         _positive_integer = Number_.normalization.new_with(
@@ -54,7 +56,7 @@ module Skylab::Basic
           :number_set, :integer,
         )
 
-        POSITIVE_INTEGER = ACS_[]::Model::Via_normalization[ _positive_integer ]
+        POSITIVE_INTEGER = ACS_::Model::Via_normalization[ _positive_integer ]
       end
 
       NIL_

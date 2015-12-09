@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby -w
 
-require 'skylab/file_metrics'
+require 'skylab/code_metrics'
 
-_x = Skylab::FileMetrics::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
+_x = Skylab::CodeMetrics::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
   invoke ARGV
 
 $stderr.puts "(exitstatus: #{ _x })"

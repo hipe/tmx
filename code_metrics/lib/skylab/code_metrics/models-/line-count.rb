@@ -1,12 +1,10 @@
-module Skylab::FileMetrics
+module Skylab::CodeMetrics
 
-  class Models_::Report
+  module Home_::Model_::Support
 
-    class Actions::Line_Count < Report_Action_
+    class Home_::Models_::Line_Count < Report_Action
 
-      @is_promoted = true
-
-      o = COMMON_PROPERTIES_.method :fetch
+      o = COMMON_PROPERTIES.method :fetch
 
       edit_entity_class(
 
@@ -65,7 +63,7 @@ module Skylab::FileMetrics
 
         h = @argument_box.h_
 
-        o = Report_::Sessions_::Line_Count.new
+        o = Home_::Magnetics_::Line_Count_via_Arguments.new
 
         o.count_blank_lines = ! h[ :without_blank_lines ]
         o.count_comment_lines = ! h[ :without_comment_lines ]
@@ -131,7 +129,7 @@ module Skylab::FileMetrics
 
         d = y.length
 
-        ok = Report_::Sessions_::Synchronous_Read.call(
+        ok = Home_::Throughput_Adapters_::Synchronous_Read.call(
           y, nil, sout, serr, wait
 
         ) do  | * i_a, & ev_p |

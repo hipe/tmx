@@ -1,3 +1,4 @@
+[#008] #open extensible modifiers for use in mutation sessions
 [#007]       our take on [#br-002]#GEC (see)
 [#006]       construction, composition and eventing ..
 [#005]       the master list of sections ..

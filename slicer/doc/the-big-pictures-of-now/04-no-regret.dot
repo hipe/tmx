@@ -29,8 +29,14 @@ digraph g {
   dpn [label="`dir_pathname` -> `dir_path`"]
   sea [label="search-replace -\nfix that one bug"]
   sea->zerk
-  zerk [label="zerk - full rewrite\nto use ACS"]
+  zerk [label="zerk - full rewrite\nto use ACS" style=filled]
+  zerk->expect_event
+  expect_event [label="rewrite\nexpect evenet"]
+  expect_event -> tally
+  tally [label="the \"tally\"\nvisualization"]
+  tally -> rfm
+  rfm [label="rebrand file-metrics\nas code-metrics" style=filled fillcolor="#b5d5fb"]
   zerk->acs
-  acs [label="ACS - that\none eventing\nre-arch branch" style=filled fillcolor="#b5d5f5"]
+  acs [label="ACS - that\none eventing\nre-arch branch" style=filled]
   no_regret [label="no\nregret"]
 }

@@ -253,7 +253,7 @@ module Skylab::Brazen
 
       def _expression_agent_class
 
-        self.class.___tricky_const_get :Expression_Agent
+        self.class._const_get_magically :Expression_Agent
       end
 
       ## ~~ event receiving & sending
@@ -293,28 +293,6 @@ module Skylab::Brazen
         ::Enumerator::Yielder.new( & io.method( :puts ) )
       end
 
-      def self.___tricky_const_get const  # experiment #[#101] (has line-by-line)
-
-        cache = @___tricky_cache ||= {}
-        cache.fetch const do
-          x = if const_defined? const, false
-            const_get const, false
-          else
-
-            _slug = Callback_::Name.via_const_symbol( const ).as_slug
-            et = entry_tree
-
-            if et.has_directory and et.has_entry_for_slug _slug
-              const_get const, false  # hack trigger the autoload
-            else
-              Home_::CLI_Support.const_get const, false
-            end
-          end
-          cache[ const ] = x
-          x
-        end
-      end
-
       public(
         :app_name,  # by our expag (covered by [f2])
         :application_kernel,
@@ -336,8 +314,6 @@ module Skylab::Brazen
     private
 
       # -- branch - initialization
-
-      Actions = ::Module.new.freeze  # #note-165
 
       def init_properties  # [*]
         @front_properties = Standard_branch_property_box___[]
@@ -526,12 +502,10 @@ module Skylab::Brazen
 
         ada_cls = unbound.adapter_class_for :CLI
 
-        if ! ada_cls
-          ada_cls = if unbound.is_branch
-            __branch_class_for_unbound_action unbound
-          else
-            __leaf_class_for_unbound_action unbound
-          end
+        ada_cls ||= if unbound.is_branch
+          __branch_class_for_unbound_action unbound
+        else
+          __leaf_class_for_unbound_action unbound
         end
 
         ada_cls.new unbound, bound_
@@ -598,9 +572,12 @@ module Skylab::Brazen
 
         # the "classical" way to override - all special actions in one file
 
+        mod = self.class._const_get_magically :Actions
+
         sym = unbound.name_function.as_const
-        if self.class::Actions.const_defined? sym, false
-          self.class::Actions.const_get sym
+
+        if mod.const_defined? sym, false
+          mod.const_get sym
         end
       end
 
@@ -1735,6 +1712,64 @@ module Skylab::Brazen
       def expression_strategy_for_category sym
         :"render_property_as__#{ sym }__"
       end
+
+      # -- experiment (see article) #[#101] (near [#060])
+
+      class << self
+
+        def _const_get_magically sym  # see line-by-line pseudocode
+
+          kn = _cached sym
+          if ! kn
+            kn = _const_get_any_already_loaded sym
+            kn ||= _const_get_any_using_filesystem_peek sym
+            kn ||= ___const_get_support_node sym
+            _cache kn, sym
+          end
+          kn.value_x
+        end
+
+        def ___const_get_support_node const
+
+          _definitely_there Home_::CLI_Support, const
+        end
+
+        def _const_get_any_already_loaded const
+
+          # if the *client* defined the const and it is already loaded
+
+          if const_defined? const, false
+            _definitely_there self, const
+          end
+        end
+
+        def _const_get_any_using_filesystem_peek const
+
+          if respond_to? :entry_tree
+
+            _slug = Callback_::Name.via_const_symbol( const ).as_slug
+            et = entry_tree
+            if et.has_directory and et.has_entry_for_slug _slug
+              _definitely_there self, const
+            end
+          end
+        end
+
+        def _definitely_there mod, const
+
+          Callback_::Known_Known[ mod.const_get( const, false ) ]
+        end
+
+        def _cached sym
+          ( @__tricky_cache ||= {} )[ sym ]
+        end
+
+        def _cache kn, sym
+          @__tricky_cache[ sym ] = kn ; nil
+        end
+      end  # >>
+
+      # --
 
       alias_method :option_parser__, :_option_parser  # publicize only one
 

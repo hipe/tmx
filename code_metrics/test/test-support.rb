@@ -1,7 +1,7 @@
-require 'skylab/file_metrics'
+require 'skylab/code_metrics'
 require 'skylab/test_support'
 
-module Skylab::FileMetrics::TestSupport
+module Skylab::CodeMetrics::TestSupport
 
   def self.[] tcc
     tcc.extend Module_Methods___
@@ -63,7 +63,7 @@ module Skylab::FileMetrics::TestSupport
     ::File.join Fixture_file_directory_[], s
   end
 
-  Home_ = ::Skylab::FileMetrics
+  Home_ = ::Skylab::CodeMetrics
 
   Callback_ = Home_::Callback_
 

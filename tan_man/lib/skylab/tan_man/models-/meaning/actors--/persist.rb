@@ -87,7 +87,7 @@ module Skylab::TanMan
 
         def find_first_flyweight_with_name s
           @stream = @session.to_stream_of_meanings_with_mutable_string_metadata
-          @stream.detect do |ent|
+          @stream.flush_until_detect do |ent|
             s == ent.property_value_via_symbol( :name )
           end
         end

@@ -68,7 +68,9 @@ module Skylab::Slicer
       graph_viz_labeller = Home_::Output_Adapters_::Graph_Viz::Labeller.new(
         @stdout )
 
-      Home_::Actors_::Determine_and_distribute_medallions[ a ].each do | ss |
+      _ = Home_.lib_.TMX
+
+      _::Models::Sigil.via_reflective_sidesystem_array_( a ).each do | ss |
 
         graph_viz_labeller << ss
       end

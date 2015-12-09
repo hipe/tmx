@@ -18,7 +18,7 @@ Gem::Specification.new do | s |
 
   s.files = inf.to_stream_of_one_or_more_codefiles.to_a
 
-  s.homepage = 'http://localhost:8080/homepage-for-fm'
+  s.homepage = 'http://localhost:8080/homepage-for-cme'
 
   s.license = 'MIT'
 
@@ -28,8 +28,7 @@ Gem::Specification.new do | s |
 
   s.version = inf.version_via_VERSION_file
 
-  # s.add_runtime_dependency 'skylab-callback', [ '0.0.0.ca.pre.bleeding' ]
+  s.add_runtime_dependency 'skylab-callback', [ '0.0.0.ca.pre.bleeding' ]
 
   # s.add_development_dependency ..
-
 end

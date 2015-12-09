@@ -3,7 +3,7 @@
 require 'skylab/tmx'
 require 'skylab/test_support'
 
-o = Skylab::TestSupport::Tree_Runner.new nil, $stdout, $stderr, ::ARGV
+o = Skylab::TestSupport::Tree_Runner.new nil, $stdout, $stderr, ::ARGV, ::ENV
 
 o.sidesystem_load_ticket_stream_proc = -> do
 

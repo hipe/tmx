@@ -113,7 +113,7 @@ unset so we can more easily track when & where we fail to set it.
 
 
 
-## :#note-165
+## :note-165
 
 the implementor may in her top adapter class (usually called `CLI`)
 create a module called `Actions` and provide appropriately named clases

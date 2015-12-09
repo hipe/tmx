@@ -1,9 +1,6 @@
+module Skylab::CodeMetrics
 
-module Skylab::FileMetrics
-
-  class Models_::Report
-
-    class Sessions_::Line_Count_via_Grep_Chain
+    class Magnetics_::Line_Count_via_Grep_Chain
 
       attr_writer(
         :file_array,
@@ -40,7 +37,7 @@ module Skylab::FileMetrics
 
           _, o, e, w = @system_conduit.popen3 cmd_s
 
-          y = Sessions_::Synchronous_Read[
+          y = Home_::Throughput_Adapters_::Synchronous_Read[
             [], nil, o, e, w, & @on_event_selectively ]
 
           if y
@@ -104,5 +101,5 @@ module Skylab::FileMetrics
         "expected numeric line: #{ line.inspect }"
       end
     end
-  end
+  # -
 end

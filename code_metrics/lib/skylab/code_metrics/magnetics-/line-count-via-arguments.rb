@@ -1,8 +1,6 @@
-module Skylab::FileMetrics
+module Skylab::CodeMetrics
 
-  class Models_::Report
-
-    class Sessions_::Line_Count
+    class Magnetics_::Line_Count_via_Arguments
 
       attr_writer(
         :count_blank_lines,
@@ -16,13 +14,14 @@ module Skylab::FileMetrics
 
       def execute
 
-        filter_a = __develop_filter
+        filter_a = ___build_and_explain_filter_array
 
-        yes = filter_a.length.nonzero?
-        o = if yes
-          Sessions_::Line_Count_via_Grep_Chain.new
+        has_filters = filter_a.length.nonzero?
+
+        o = if has_filters
+          Magnetics_::Line_Count_via_Grep_Chain.new
         else
-          Sessions_::Line_Count_via_WC.new
+          Magnetics_::Line_Count_via_WC.new
         end
 
         o.label = @label
@@ -31,19 +30,19 @@ module Skylab::FileMetrics
         o.system_conduit = @system_conduit
         o.totaller_class = @totaller_class
 
-        if yes
+        if has_filters
           o.filter_array = filter_a
         end
 
-        # (no `accept_and_finish_by` here, caller might customize its call)
-        o.execute
+        # (no `finish_by` here, caller might customize its call)
 
+        o.execute
       end
 
-      def __develop_filter
+      def ___build_and_explain_filter_array
 
         filter_a = []
-        o = Sessions_::Conjuncter.new
+        o = Home_::Expression_Adapters_::Human::Conjuncter.new
 
         if @count_blank_lines
 
@@ -72,5 +71,5 @@ module Skylab::FileMetrics
         filter_a
       end
     end
-  end
+  # -
 end

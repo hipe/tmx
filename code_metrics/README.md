@@ -1,4 +1,4 @@
-# the skylab "filemetrics" utility
+# the skylab "code metris" utility
 
 ## objective & scope
 
@@ -10,14 +10,17 @@ the number and distribution of files in terms of their extensions, etc.
 
 It can do things like:
 
-  - show you a list of the filenames, from longest to shortest file,
+  • create a visualization showing the distribution of calls to
+    different methods across all your files
+
+  • show you a list of the filenames, from longest to shortest file,
     with their respective linecounts and what percentage of the
     maximum linecount that file is,
 
-  - for each folder in PATH, match the files in the filename query and
+  • for each folder in PATH, match the files in the filename query and
     show summary information like above for each folder.
 
-  - show the numbers of files of the different extension types
+  • show the numbers of files of the different extension types
 
 
 I find it useful when I am perusing a new library of code, and I want

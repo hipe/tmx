@@ -123,7 +123,7 @@ violoation of which should occur only with good reason.
 
 • there is as yet no facility for what we used to call business-specific
   meta-properties. we want this, and will provision for it when its
-  absence becomes at all painful. (again this is :+[#120].)
+  absence becomes at all painful. (again this is #[#008].)
 
 
 
@@ -395,7 +395,7 @@ an operation expression. contrast:
 in the above, the second edit session has an operaton that uses a `via`
 modifer (described below).
 
-the implementation of modifiers is currently exploratory. #open [#120]
+the implementation of modifiers is currently exploratory. #open #[#008]
 we intend to make it a more extensible API (and have them be less
 hard-coded) once modifiers incubate for a while.
 

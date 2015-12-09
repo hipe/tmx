@@ -31,7 +31,7 @@ module Skylab::Snag
         _st = @kernel.call :criteria, :to_criteria_stream, & @oes_p
 
         s = 'open'
-        found = _st.detect do | crit |
+        found = _st.flush_until_detect do | crit |
           s == crit.natural_key_string
         end
 

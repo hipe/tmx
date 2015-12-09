@@ -5,11 +5,9 @@ digraph {
   b2 [ label="BNF2Treetop" ]
   br [ label="Brazen" ]
   ca [ label="Callback" ]
-  cm [ label="CodeMolester" ]
   cc [ label="CSS_Convert" ]
   cu [ label="Cull" ]
   fi [ label="Fields" ]
-  fm [ label="FileMetrics" ]
   f2 [ label="Flex2Treetop" ]
   gi [ label="Git" ]
   gv [ label="GitViz" ]
@@ -22,15 +20,19 @@ digraph {
   sn [ label="Snag" ]
   st [ label="SubTree" ]
   sy [ label="System" ]
-  tan [ label="TanMan" ]
-  tmx [ label="TMX" ]
   ta [ label="Task" ]
   te [ label="TaskExamples" ]
   ts [ label="TestSupport" ]
   tr [ label="Treemap" ]
   y2 [ label="Yacc2Treetop" ]
+  ze [ label="Zerk" ]
+  cme [ label="CodeMetrics" ]
+  cmo [ label="CodeMolester" ]
+  tm [ label="TanMan" ]
+  tmx [ label="TMX" ]
   ac -> ba
   ac -> br
+  ac -> fi
   ac -> sy
   ba -> ac
   ba -> br
@@ -43,6 +45,7 @@ digraph {
   bs -> br
   bs -> st
   bs -> sy
+  bs -> ze
   br -> ba
   br -> fi
   br -> hu
@@ -57,18 +60,24 @@ digraph {
   ca -> pl
   ca -> sy
   ca -> ts
-  cm -> ba
-  cm -> br
-  cm -> hu
-  cm -> pa
-  cm -> pl
-  cm -> sy
+  cme -> br
+  cme -> ba
+  cme -> hu
+  cme -> pa
+  cme -> sy
+  cme -> ts
+  cmo -> ba
+  cmo -> br
+  cmo -> hu
+  cmo -> pa
+  cmo -> pl
+  cmo -> sy
   cc -> ba
   cc -> br
   cc -> fi
   cc -> f2
   cc -> sy
-  cc -> tan
+  cc -> tm
   cc -> y2
   cu -> ba
   cu -> br
@@ -77,12 +86,6 @@ digraph {
   fi -> br
   fi -> hu
   fi -> pl
-  fm -> br
-  fm -> ba
-  fm -> hu
-  fm -> pa
-  fm -> sy
-  fm -> ts
   f2 -> ba
   f2 -> br
   f2 -> sy
@@ -112,6 +115,7 @@ digraph {
   pl -> pa
   sl -> ba
   sl -> ta
+  sl -> tmx
   sn -> ac
   sn -> ba
   sn -> br
@@ -129,36 +133,37 @@ digraph {
   sy -> hu
   sy -> pa
   sy -> pl
-  tan -> ba
-  tan -> br
-  tan -> fi
-  tan -> pa
-  tan -> sy
+  tm -> ba
+  tm -> br
+  tm -> fi
+  tm -> pa
+  tm -> sy
   ta -> ac
   ta -> ba
   ta -> br
   ta -> fi
   te -> ba
   te -> br
-  te -> cm
+  te -> cmo
   te -> ta
   te -> sy
   ts -> ba
   ts -> br
+  ts -> fi
   ts -> hu
   ts -> pa
   ts -> pe
   ts -> pl
-  ts -> sl
-  ts -> sn
   ts -> sy
   ts -> ta
   ts -> tmx
   tmx -> ba
   tmx -> br
-  tmx -> sl
   tmx -> sy
   tr -> ba
   tr -> br
   tr -> sy
+  ze -> ba
+  ze -> br
+  ze -> sy
 }

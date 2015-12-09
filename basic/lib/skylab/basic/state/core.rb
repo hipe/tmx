@@ -7,13 +7,18 @@ module Skylab::Basic
       class Edit_Session
 
         def initialize
+
+          Home_.lib_.autonomous_component_system
+          Assume_ACS_[]
+
           @_bx = Callback_::Box.new
         end
 
         def add_state * x_a
 
           x_a.unshift :add, :state
-          ACS_[].edit x_a, self
+
+          ACS_.edit x_a, self
         end
 
         def __state__component_association

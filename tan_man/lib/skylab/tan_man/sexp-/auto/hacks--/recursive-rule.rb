@@ -672,7 +672,7 @@ module Skylab::TanMan
         # the new final node. 3) style the old final node appropriately now
         # that it is non-final.
 
-        _last = pl.to_node_stream_.last  # (1)
+        _last = pl.to_node_stream_.flush_to_last  # (1)
         new_item_node = _last.dup
         new_item_node[ @item_k ] = @new_item_x
 
@@ -771,7 +771,7 @@ module Skylab::TanMan
 
         front_node = @front_node
 
-        final_proto_node = _prototype_list.to_node_stream_.last
+        final_proto_node = _prototype_list.to_node_stream_.flush_to_last
 
         final_proto_node.members.each do | k |
           front_node[ k ] = final_proto_node[ k ]

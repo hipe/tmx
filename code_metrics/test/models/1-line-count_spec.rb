@@ -1,8 +1,8 @@
-require_relative '../../../test-support'
+require_relative '../test-support'
 
-module Skylab::FileMetrics::TestSupport
+module Skylab::CodeMetrics::TestSupport
 
-  describe "[fm] models - 1. line count" do
+  describe "[cm] models - 1. line count" do
 
     TS_[ self ]
     use :expect_event
@@ -10,9 +10,9 @@ module Skylab::FileMetrics::TestSupport
     it "ping" do
 
       call_API :ping
-      expect_neutral_event :ping, "hello from file metrics."
+      expect_neutral_event :ping, "hello from code metrics."
       expect_no_more_events
-      @result.should eql :hello_from_file_metrics
+      @result.should eql :hello_from_code_metrics
     end
 
     it "noent" do

@@ -98,26 +98,17 @@ module Skylab::Autonomous_Component_System
 
       # -- Support
 
-      class Traverse_context
+      class Traverse_context < Callback_::Actor::Monadic
 
         # traverse a linked list of the form NAME [ NAME [..]] VALUE
         # to build a tuple of the form (( array of NAME ), ( VALUE )).
         # let this be the one place where we upgrade symbols to names.
 
-        class << self  # Procesque_Monadic
-          def _call x
-            new( x ).__execute
-          end
-          alias_method :[], :_call
-          alias_method :call, :_call
-          private :new
-        end  # >>
-
         def initialize linked_list
           @_linked_list = linked_list
         end
 
-        def __execute
+        def execute
 
           _LL = remove_instance_variable :@_linked_list
           st = _LL.to_element_stream_assuming_nonsparse

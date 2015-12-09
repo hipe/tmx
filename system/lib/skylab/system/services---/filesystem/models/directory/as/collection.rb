@@ -39,7 +39,7 @@ module Skylab::System
 
       s = item.natural_key_string
 
-      to_entity_stream.detect do | item_ |
+      to_entity_stream.flush_until_detect do | item_ |
 
         s == item_.natural_key_string
       end

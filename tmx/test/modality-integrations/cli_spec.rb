@@ -38,6 +38,11 @@ module Skylab::TMX::TestSupport
       _expect_succeeded
     end
 
+    it "code metrics" do
+      _against 'code-metrics', _ARG
+      _expect_common
+    end
+
     it "css-convert" do
 
       _against 'css-convert', 'convert', _FLAG
@@ -47,11 +52,6 @@ module Skylab::TMX::TestSupport
 
     it "cull" do
       _against 'cull', _ARG
-      _expect_common
-    end
-
-    it "file metrics" do
-      _against 'file-metrics', _ARG
       _expect_common
     end
 

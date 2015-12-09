@@ -553,7 +553,7 @@ module Skylab::Autonomous_Component_System
         end
       end
 
-      # #open [#br-120] we would like to make the below extensible
+      # #open [#008] we would like to make the below extensible
 
       if_or_assuming = -> st do
         if :not == st.current_token

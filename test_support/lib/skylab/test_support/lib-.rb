@@ -44,7 +44,6 @@ module Skylab::TestSupport
     Parse = sidesys[ :Parse ]  # only for 1 tree runner plugin (greenlist)
     Permute = sidesys[ :Permute ]
     Plugin = sidesys[ :Plugin ]
-    Slicer = sidesys[ :Slicer ]  # only for 1 tree runner plugin (greenlist)
 
     Stderr = -> { ::STDERR }  # [#001.E]: why access system resources this way
 

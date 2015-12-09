@@ -1,8 +1,8 @@
-require_relative '../../../test-support'
+require_relative '../test-support'
 
-module Skylab::FileMetrics::TestSupport
+module Skylab::CodeMetrics::TestSupport
 
-  describe "[fm] models - 2. dirs" do
+  describe "[cm] models - 2. dirs" do
 
     TS_[ self ]
     use :expect_event

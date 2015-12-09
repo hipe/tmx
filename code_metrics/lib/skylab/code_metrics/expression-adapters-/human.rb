@@ -1,8 +1,10 @@
-module Skylab::FileMetrics
+module Skylab::CodeMetrics
 
-  class Models_::Report
+  module Expression_Adapters_
+    Human = ::Module.new
+  end
 
-    class Sessions_::Conjuncter  # see [#010]
+    class Expression_Adapters_::Human::Conjuncter  # see [#010]
 
       def initialize
 
@@ -127,5 +129,5 @@ module Skylab::FileMetrics
 
       AND__ = 'and'
     end
-  end
+  # -
 end

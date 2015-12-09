@@ -1,16 +1,20 @@
-module Skylab::FileMetrics
+module Skylab::CodeMetrics
 
-  class Models_::Report
+  Model_ = ::Module.new
+  module Model_::Support  # ( [#008]note-A is about this scope stack trick )
 
-    br = Home_.lib_.brazen
+    _Brazen = Home_.lib_.brazen
 
-    My_Entity__ = br::Modelesque::Entity
+    My_Entity__ = _Brazen::Modelesque::Entity
 
-    class Report_Action_ < br::Action
+    class Report_Action < _Brazen::Action
 
-      def self.entity_enhancement_module
-        My_Entity__
-      end
+      class << self
+
+        def entity_enhancement_module
+          My_Entity__
+        end
+      end  # >>
 
     private
 
@@ -57,9 +61,11 @@ module Skylab::FileMetrics
         NIL_
       end
 
-      def stdout_line_stream_via_args_ a
-        o = Report_::Sessions_::Stdout_Stream.new( & @on_event_selectively )
-        o.args = a
+      def line_upstream_via_system_command_ a
+
+        _ = Home_::Magnetics_::Line_Upstream_via_System_Command
+        o = _.new( & @on_event_selectively )
+        o.system_command_string_array = a
         o.system_conduit = system_conduit_
         o.execute
       end
@@ -73,7 +79,9 @@ module Skylab::FileMetrics
       end
     end
 
-    COMMON_PROPERTIES_ = br::Nodesque::Common_Properties.new My_Entity__ do | sess |
+    _ = _Brazen::Nodesque::Common_Properties
+
+    COMMON_PROPERTIES = _.new My_Entity__ do | sess |
 
       sess.edit_common_properties_module(
 
@@ -127,34 +135,5 @@ module Skylab::FileMetrics
         :property, :skip_report,
       )
     end
-
-    Hack_lemma_via_symbol_ = -> sym do
-      s = sym.id2name
-      s.gsub! UNDERSCORE_, SPACE_
-      s
-    end
-
-    module Actions
-
-      class Ping < Report_Action_
-
-        @is_promoted = true
-
-        # set :node, :ping, :invisible  # :+[#br-095]
-
-        def produce_result
-
-          @on_event_selectively.call :info, :expression, :ping do | y |
-            y << "hello from file metrics."
-          end
-          :hello_from_file_metrics
-        end
-      end
-
-      Autoloader_[ self, :boxxy ]
-    end
-
-    Report_ = self
-    Autoloader_[ Sessions_ = ::Module.new ]
   end
 end

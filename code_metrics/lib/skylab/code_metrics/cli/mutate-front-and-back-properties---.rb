@@ -1,12 +1,6 @@
-module Skylab::FileMetrics
+module Skylab::CodeMetrics
 
-  class Models_::Report
-
-    module Modalities::CLI
-
-      Sessions_ = ::Module.new
-
-      class Sessions_::Property_Mutation_Session
+      class CLI::Mutate_Front_and_Back_Properties___
 
         attr_writer(
           :extmod,
@@ -41,6 +35,6 @@ module Skylab::FileMetrics
           NIL_
         end
       end
-    end
-  end
+    # -
+  # -
 end

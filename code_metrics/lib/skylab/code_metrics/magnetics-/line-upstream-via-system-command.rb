@@ -1,21 +1,19 @@
-module Skylab::FileMetrics
+module Skylab::CodeMetrics
 
-  class Models_::Report
-
-    class Sessions_::Stdout_Stream
+    class Magnetics_::Line_Upstream_via_System_Command
 
       def initialize & p
         @on_event_selectively = p
       end
 
       attr_writer(
-        :args,
-        :system_conduit
+        :system_conduit,
+        :system_command_string_array,
       )
 
       def execute
 
-        _, o, e, w = @system_conduit.popen3( * @args )
+        _, o, e, w = @system_conduit.popen3( * @system_command_string_array )
 
         s = o.gets
         if s
@@ -66,5 +64,5 @@ module Skylab::FileMetrics
         end
       end
     end
-  end
+  # -
 end

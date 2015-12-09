@@ -12,7 +12,7 @@ task_examples       q [ ]
 task                q [ ]
 treemap             q [ ]
 
-file_metrics        q [ ]
+code_metrics        q [ ]
 git                 q [ ]
 beauty_salon        q [ ]
 cull                q [ ]

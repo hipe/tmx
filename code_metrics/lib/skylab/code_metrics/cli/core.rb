@@ -1,4 +1,4 @@
-module Skylab::FileMetrics
+module Skylab::CodeMetrics
 
   class CLI < lib_.brazen::CLI
 
@@ -27,7 +27,6 @@ module Skylab::FileMetrics
                 :expression_width, available_w )
 
               -> dao do
-
                 s.replace lipstick_p[ dao.normal_share ]
                 NIL_
               end

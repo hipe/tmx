@@ -1,8 +1,8 @@
-module Skylab::FileMetrics
+module Skylab::CodeMetrics
 
-  class Models_::Report
+  Throughput_Adapters_ = ::Module.new
 
-    class Sessions_::Synchronous_Read
+    class Throughput_Adapters_::Synchronous_Read
 
       # read from STDOUT with timeout. behavior on stderr.
 
@@ -75,7 +75,7 @@ module Skylab::FileMetrics
 
         ok = ACHIEVED_
         sess.on @serr do | s |
-          s.chmop!
+          s.chomp!
           ok = UNABLE_
           @on_event_selectively.call :error, :expression, :unexpected_errput do | y_ |
             y_ << "unexpected errput: #{ s }"
@@ -92,5 +92,5 @@ module Skylab::FileMetrics
         ok && @y
       end
     end
-  end
+  # -
 end

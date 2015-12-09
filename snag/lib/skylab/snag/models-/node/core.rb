@@ -211,7 +211,7 @@ module Skylab::Snag
 
     def first_equivalent_item tag  # :+[#ba-051]
 
-      to_tag_stream.detect do | tag_ |
+      to_tag_stream.flush_until_detect do | tag_ |
 
         tag == tag_
       end
@@ -281,7 +281,7 @@ module Skylab::Snag
 
     def is_tagged_with sym
 
-      _ = to_tag_stream.detect do | tag |
+      _ = to_tag_stream.flush_until_detect do | tag |
 
         sym == tag.intern
       end

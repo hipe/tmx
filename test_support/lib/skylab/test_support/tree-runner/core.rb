@@ -4,16 +4,16 @@ module Skylab
 
     class Tree_Runner
 
-      def initialize _, o, e, a
+      def initialize _, o, e, a, env
 
         @argv = a
-        @resources = Resources___.new o, e, a
-        @was_unable = false
+        @resources = Resources___.new o, e, a, env
+        @_was_unable = false
       end
 
       attr_writer :sidesystem_load_ticket_stream_proc
 
-      Resources___ = ::Struct.new :sout, :serr, :argv
+      Resources___ = ::Struct.new :sout, :serr, :argv, :environment_variables
 
       def execute
         __init_callback_handler
@@ -39,14 +39,14 @@ module Skylab
           long_a = rest.reverse
           long_a.concat first_two  # `__receive__user_authentication_failure_error_string__`
 
-          meth = :"__receive__#{ long_a * UNDERSCORE_ }__"
+          m = :"__receive__#{ long_a * UNDERSCORE_ }__"
 
-          if ! respond_to? meth
-            meth = :"__receive__#{ first_two * UNDERSCORE_ }__"
+          if ! respond_to? m
+            m = :"__receive__#{ first_two * UNDERSCORE_ }__"
             args = rest
           end
 
-          send meth, * args, & ev_p  # result is result
+          send m, * args, & ev_p  # result is result
         end
         nil
       end
@@ -63,7 +63,7 @@ module Skylab
       end
 
       def _when_not_OK x
-        if @was_unable
+        if @_was_unable
           __invite
         end
         x
@@ -157,7 +157,7 @@ module Skylab
       def __receive__error_expression__ *, & y_p
 
         _expression_agent.calculate _serr_yielder, & y_p
-        @was_unable = true
+        @_was_unable = true
         nil
       end
 
@@ -185,13 +185,13 @@ module Skylab
 
       def _receive_error_event ev
         _render_into_stderr_event ev
-        @was_unable = true
+        @_was_unable = true
         UNABLE_
       end
 
       def __receive_error_exception e
         @resources.serr.puts e.message
-        @was_unable = true
+        @_was_unable = true
         UNABLE_
       end
 
@@ -337,10 +337,10 @@ module Skylab
         x.inspect
       end
 
-      def _inflect_first_word s, meth
+      def _inflect_first_word s, m
 
         s_a = s.split SPACE_
-        s_a[ 0 ] = _NLP_agent.send meth, s_a.fetch( 0 )
+        s_a[ 0 ] = _NLP_agent.send m, s_a.fetch( 0 )
         s_a * SPACE_
       end
 

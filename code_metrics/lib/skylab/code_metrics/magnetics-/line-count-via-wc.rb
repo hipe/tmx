@@ -1,8 +1,6 @@
-module Skylab::FileMetrics
+module Skylab::CodeMetrics
 
-  class Models_::Report
-
-    class Sessions_::Line_Count_via_WC  # read [#001]
+    class Magnetics_::Line_Count_via_WC  # read [#001]
 
       attr_writer(
 
@@ -19,16 +17,19 @@ module Skylab::FileMetrics
         totes.slug = @label
         @_totes = totes
 
-        _ok = if @file_array.length.zero?
+        ok = if @file_array.length.zero?
 
           self._MAYBE_ZERO_IT_OUT
-
         else
-
           __when_nonzero_file_array
         end
-
-        _ok && @_totes
+        if ok
+          tot = @_totes
+          tot.count or self._SANITY
+          tot
+        else
+          ok
+        end
       end
 
       def __when_nonzero_file_array  # [#001] is highly recommended reading
@@ -40,7 +41,7 @@ module Skylab::FileMetrics
 
       def __resolve_command_string
 
-        # (we would build this as a tokenized array but for the pipe:)
+        # (we would build this as a tokenized array but for the pipe: [#011])
 
         cmd = [ 'wc', '-l' ]
 
@@ -69,7 +70,7 @@ module Skylab::FileMetrics
 
         _, o, e, w = @system_conduit.popen3 @_command_string  # (was [#004])
 
-        y = Sessions_::Synchronous_Read[
+        y = Home_::Throughput_Adapters_::Synchronous_Read[
           [], nil, o, e, w, & @on_event_selectively ]
 
         if y
@@ -96,7 +97,17 @@ module Skylab::FileMetrics
 
       def __when_one
 
-        _accrue_counts_from_range_of_output_lines 0
+        _ok = _accrue_counts_from_range_of_output_lines 0
+        _ok && ___finish_one
+      end
+
+      def ___finish_one
+
+        # ridiculous gotcha -  when you have only one we don't have the
+        # finaly summary line from `wc` to do the math for us! eek
+
+        @_totes.count = @_totes.fetch_at_position( 0 ).count
+        ACHIEVED_
       end
 
       def __when_many
@@ -109,7 +120,7 @@ module Skylab::FileMetrics
 
         line = @_output_lines.fetch( -1 )
 
-        md = /\A *(\d+) total\z/.match line
+        md = WC_TOTAL_LINE_RX___.match line
 
         if md
           @_totes.count = md[ 1 ].to_i
@@ -118,6 +129,8 @@ module Skylab::FileMetrics
           raise ::SystemError, __say_totes( line )
         end
       end
+
+      WC_TOTAL_LINE_RX___ = /\A *(\d+) total\z/
 
       def __say_totes line
         "expecting total line - #{ line }"
@@ -157,5 +170,5 @@ module Skylab::FileMetrics
         "expecting integer token - #{ line }"
       end
     end
-  end
+  # -
 end

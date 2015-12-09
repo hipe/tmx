@@ -70,7 +70,6 @@ class Skylab::Task
     # <-
   class Newschool
 
-
     def initialize & oes_p
       @on_event_selectively = oes_p
       @parameter_box = nil

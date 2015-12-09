@@ -174,7 +174,7 @@ module Skylab::Basic
             x = arg_st.gets_one
 
             if @matcher =~ x
-              ACS_[]::Value_Wrapper[ x ]
+              Callback_::Known_Known[ x ]
             else
               _failed( & x_p )
             end
@@ -191,7 +191,7 @@ module Skylab::Basic
 
             if md
               _x = @mapper[ * md.captures ]
-              ACS_[]::Value_Wrapper[ _x ]
+              Callback_::Known_Known[ _x ]
             else
               _failed( & x_p )
             end

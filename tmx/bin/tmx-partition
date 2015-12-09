@@ -87,7 +87,7 @@ y << 'lock *any* files or check permissions, so integrity is not "guaranteed".'
 
           io.puts 'argument:'
 
-          _ = ' ' * 27  # SPACE_
+          _ = SPACE_ * 27
 
           io.puts "    <file>#{ _ }(as described in the description)"
 
@@ -379,6 +379,7 @@ y << 'lock *any* files or check permissions, so integrity is not "guaranteed".'
       KEEP_PARSING_ = true
       Me_ = self
       NEWLINE_ = "\n"
+      SPACE_ = ' '
       STOP_PARSING_ = false
       UNABLE_ = false
 

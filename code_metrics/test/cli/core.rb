@@ -1,4 +1,4 @@
-module Skylab::FileMetrics::TestSupport
+module Skylab::CodeMetrics::TestSupport
 
   module CLI
 

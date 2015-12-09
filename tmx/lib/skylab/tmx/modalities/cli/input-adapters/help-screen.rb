@@ -442,7 +442,6 @@ module Skylab::TMX
     end
 
     BLANK_RX_ = /\A[[:space:]]*\z/
-    EMPTY_S_ = ''
     STOP_ = :"::Skylab::TMX::__stop__"
   end
 end

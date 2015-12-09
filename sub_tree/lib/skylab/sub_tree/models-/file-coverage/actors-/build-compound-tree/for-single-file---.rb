@@ -24,7 +24,7 @@ module Skylab::SubTree
 
           test_dir = ::File.join @test_dir, * a
 
-          test_fn = @fs.entry_stream( test_dir ).map_detect do | s |
+          test_fn = @fs.entry_stream( test_dir ).flush_until_map_detect do | s |
 
             ent = File_Coverage_::Models_::Entry[ s ]
 

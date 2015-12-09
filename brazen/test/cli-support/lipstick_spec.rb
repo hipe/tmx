@@ -19,9 +19,10 @@ module Skylab::Brazen::TestSupport
 
       line = _unstyle_styled line
 
-      md = /\A\*+\z/.match line
+      md = /\A(?<pluses>\*+)(?<spaces>[ ]+)\z/.match line
 
-      ( 3 .. 150 ).should be_include md[ 0 ].length  # :+[#073.A]
+      md[ :pluses ].length.should eql 10
+      md[ :spaces ].length.should eql 10  # :+[#073.A]
     end
 
     it "multiple segments" do
@@ -47,7 +48,6 @@ module Skylab::Brazen::TestSupport
       line = _unstyle_styled line
 
       line.should eql "#{ '+' * 30 }#{ '-' * 15 }"
-
     end
 
     def _subject_module

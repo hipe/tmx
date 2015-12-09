@@ -1,10 +1,8 @@
-module Skylab::FileMetrics
+module Skylab::CodeMetrics
 
-  class Models_::Report
+  module Home_::Model_::Support
 
-    class Actions::Dirs < Report_Action_
-
-      @is_promoted = true
+    class Models_::Dirs < Report_Action
 
       edit_entity_class(
 
@@ -14,7 +12,7 @@ module Skylab::FileMetrics
            y << "and display them in descending order of SLOC."
         end,
 
-        :reuse, COMMON_PROPERTIES_.at(
+        :reuse, COMMON_PROPERTIES.at(
           :exclude_dir,
           :include_name
         ),
@@ -42,7 +40,20 @@ module Skylab::FileMetrics
           ok = __visit_dir dir
           ok or break
         end
-        ok && __synthesize
+        if ok
+          ___finish
+          @_totes
+        end
+        ok
+      end
+
+      def ___finish
+
+        @_totes.finish_by do | cx |
+          cx.num_files = cx.children_count
+          cx.num_lines = cx.count  # redundant, but more clear
+        end
+        NIL_
       end
 
       Totaller_class___ = Callback_.memoize do
@@ -51,16 +62,6 @@ module Skylab::FileMetrics
           :num_files,
           :num_lines,
         )
-      end
-
-      def __synthesize
-
-        @_totes.accept_and_finish_by do | cx |
-
-          cx.num_files = cx.children_count
-          cx.num_lines = cx.count  # redundant, but more clear
-        end
-        @_totes
       end
 
       def __visit_dir dir
@@ -73,7 +74,7 @@ module Skylab::FileMetrics
 
         h = @argument_box.h_
 
-        o = Report_::Sessions_::Line_Count.new
+        o = Home_::Magnetics_::Line_Count_via_Arguments.new
         o.count_blank_lines = ! h[ :without_blank_lines ]
         o.count_comment_lines = ! h[ :without_comment_lines ]
         o.file_array = y
@@ -83,10 +84,13 @@ module Skylab::FileMetrics
         o.totaller_class = @_totes_class
 
         totes = o.execute
+
         if totes
-          totes.count or self._WHEN
+          if ! totes.count
+            self._SANITY  # there's that one gotcha when one line from wc
+          end
           @_totes.append_child_ totes
-          ACHIEVED_
+          @_totes
         else
           totes
         end
@@ -98,7 +102,7 @@ module Skylab::FileMetrics
 
         if cmd
 
-          st = stdout_line_stream_via_args_ cmd.args
+          st = line_upstream_via_system_command_ cmd.args
           if st
 
             __produce_dir_files_via_path_stream st, dir
@@ -148,7 +152,7 @@ module Skylab::FileMetrics
 
         _, o, e, w = system_conduit_.popen3( * @_find_dirs_command.args )
 
-        y = Report_::Sessions_::Synchronous_Read[
+        y = Home_::Throughput_Adapters_::Synchronous_Read[
           [], nil, o, e, w, & @on_event_selectively ]
 
         if y

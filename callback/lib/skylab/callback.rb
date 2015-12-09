@@ -56,6 +56,17 @@ module Skylab::Callback
       end  # >>
     end
 
+    class Monadic
+      class << self
+        def _call x, & p
+          new( x, & p ).execute
+        end
+        alias_method :[], :_call
+        alias_method :call, :_call
+        private :new
+      end  # >>
+    end
+
     class << self
 
       def [] cls, * i_a

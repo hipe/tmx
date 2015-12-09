@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::FileMetrics::TestSupport
+module Skylab::CodeMetrics::TestSupport
 
-  describe "[fm] CLI" do
+  describe "[cm] CLI" do
 
     TS_[ self ]
     use :CLI

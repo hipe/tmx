@@ -10,17 +10,17 @@ module Skylab::TMX
 
   class << self
 
-    def lookup_sidesystem entry_s
-      installation_.lookup_reflective_sidesystem__ entry_s
+    def build_sigilized_sidesystem_stream
+
+      _st = to_sidesystem_load_ticket_stream
+
+      _anything = Home_::Models::Sigil.via_stemish_stream _st
+
+      _anything.to_stream
     end
 
-    def build_sigilized_list
-
-      ss_a = to_reflective_sidesystem_stream.to_a
-
-      Home_.lib_.slicer.distribute_sigils ss_a
-
-      ss_a
+    def lookup_sidesystem entry_s
+      installation_.lookup_reflective_sidesystem__ entry_s
     end
 
     def to_reflective_sidesystem_stream
@@ -67,7 +67,6 @@ module Skylab::TMX
 
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
-    Slicer = sidesys[ :Slicer ]
 
     _System_lib = sidesys[ :System ]
     System = -> do
@@ -83,7 +82,7 @@ module Skylab::TMX
   ACHIEVED_ = true
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
   DASH_ = '-'
+  EMPTY_S_ = ''
   NIL_ = nil
   Home_ = self
-  UNDERSCORE_ = '_'
 end

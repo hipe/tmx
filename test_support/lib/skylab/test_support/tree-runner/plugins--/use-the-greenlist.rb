@@ -4,13 +4,6 @@ module Skylab::TestSupport
 
     class Plugins__::Use_the_GREENLIST < Plugin_
 
-      GREENLIST_path___ = -> do
-
-        _path = Home_.lib_.slicer.data_documents_path
-
-        ::File.join _path, 'GREENLIST'
-      end
-
       does :build_sidesystem_tree do | tr |
 
         tr.transition_is_effected_by do | o |
@@ -40,15 +33,46 @@ module Skylab::TestSupport
       end
 
       def do__build_sidesystem_tree__
-        if @_do_display
-          __express_info
+
+        io = ___produce_GREENLIST_IO
+        if io
+          @_IO = io
+          if @_do_display
+            __express_info
+          else
+            __get_busy
+          end
         else
-          __do_etc
+          io
         end
       end
 
+      def ___produce_GREENLIST_IO
+
+        env = ENVIRONMENT_VARIABLE_NAME___
+
+        s = @resources.environment_variables[ env ]
+        if s
+          ::File.open s, ::File::RDONLY
+        else
+          ___when_no_env env
+        end
+      end
+
+      ENVIRONMENT_VARIABLE_NAME___ = 'TMX_GREENLIST'
+
+      def ___when_no_env env
+
+        @resources.serr.puts(
+          "`#{ env }` environment variable not set. must be a path to #{
+          }the greenlist. cannot procede." )
+
+        UNABLE_
+      end
+
       def __express_info
-        io = _produce_GREENLIST_IO
+
+        io = @_IO
         serr = @resources.serr
         serr.puts "(greenlist path: #{ io.path })"
         while line = io.gets
@@ -166,9 +190,9 @@ module Skylab::TestSupport
         end
       end
 
-      def __do_etc
+      def __get_busy
 
-        io = _produce_GREENLIST_IO
+        io = @_IO
 
         pt = remove_instance_variable :@__parse_tree
 
@@ -221,10 +245,6 @@ module Skylab::TestSupport
         end
 
         ACHIEVED_
-      end
-
-      def _produce_GREENLIST_IO
-        ::File.open GREENLIST_path___[], ::File::RDONLY
       end
     end
   end
