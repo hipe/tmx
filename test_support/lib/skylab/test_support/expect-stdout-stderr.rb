@@ -130,9 +130,11 @@ module Skylab::TestSupport
 
         @IO_spy_group_for_expect_stdout_stderr = g
 
+        _s_a = invocation_strings_for_expect_stdout_stderr  # #hook-out:1
+
         invo = subject_CLI.new(  # :+#hook-out
           * g.values_at( :i, :o, :e ),
-          invocation_strings_for_expect_stdout_stderr,  # #hook-out:1
+          _s_a,
           * self.CLI_options_for_expect_stdout_stderr,
         )
 

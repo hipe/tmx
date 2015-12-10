@@ -2,9 +2,9 @@ module Skylab::TMX::TestSupport
 
   module Mocks
 
-    # (black-box - what is needed ?)
-
     class Unbound < ::Module
+
+      include Home_.lib_.brazen::Nodesque::Methods::Unbound_Methods
 
       attr_reader :sym
 
@@ -25,10 +25,6 @@ module Skylab::TMX::TestSupport
 
       def is_branch
         true
-      end
-
-      def adapter_class_for _
-        NIL_
       end
 
       def new k, & oes_p
@@ -79,7 +75,7 @@ module Skylab::TMX::TestSupport
       end
 
       def fast_lookup
-        -> sym do
+        -> _nf do
           # we would have to walk the models
           NIL_
         end

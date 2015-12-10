@@ -60,7 +60,9 @@ module Skylab::TMX
 
       @first_argument = @_in_st.gets_one
 
-      @unbound = @fast_lookup[ @first_argument ]
+      _nf = Callback_::Name.via_variegated_symbol @first_argument
+
+      @unbound = @fast_lookup[ _nf ]
 
       if @unbound
 
@@ -109,6 +111,14 @@ module Skylab::TMX
 
       def initialize front
         @_client = front
+      end
+
+      def description_proc
+
+        _p = Home_.method :describe_into_under
+        -> y do
+          _p[ y, self ]
+        end
       end
 
       def fast_lookup

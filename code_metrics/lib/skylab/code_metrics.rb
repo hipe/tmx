@@ -5,7 +5,32 @@ module Skylab::CodeMetrics
   class << self
 
     def application_kernel_
-      @___kr ||= Home_.lib_.brazen::Kernel.new Home_
+      @___kr ||= ___build_kernel
+    end
+
+    def ___build_kernel
+
+      Require_brazen_[]  # 1 of 2
+
+      ke = Brazen_::Kernel.new Home_
+
+      ke.fast_lookup = -> nf do
+
+        # any time any name needs to be resolved from the top-level, try
+        # to resolve it this way first so we don't have to stream over
+        # several nodes, loading and binding each one (#[#br-015]A).
+        # doing this allows that a lowlevel utility-like script like
+        # "tally" can perhaps still work while its sibling nodes are
+        # in a developmental (broken) state.
+
+        et = ke.reactive_tree_seed.entry_tree
+        # assume `et.has_directory`
+        if et.has_entry_for_slug nf.as_slug
+          ke.reactive_tree_seed.const_get nf.as_const, false
+        end
+      end
+
+      ke
     end
 
     def describe_into_under y, _expag
@@ -30,6 +55,10 @@ module Skylab::CodeMetrics
 
   Callback_ = ::Skylab::Callback
   Autoloader_ = Callback_::Autoloader
+
+  Require_brazen_ = Callback_::Lazy.call do  # called only 2x
+    Brazen_ = Home_.lib_.brazen ; NIL_
+  end
 
   module Lib_
 
@@ -80,6 +109,7 @@ module Skylab::CodeMetrics
   end
 
   ACHIEVED_ = true
+  EMPTY_A_ = []
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
   Home_ = self

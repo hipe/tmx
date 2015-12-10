@@ -67,7 +67,7 @@ module Skylab::Brazen
         shell.on_text { |txt| x.puts txt }
       end
       shell.instance_exec do
-        @head ||=nil ; @tail ||= nil ; @separator ||=  SPACE_  # TERM_SEPARATOR_STRING_
+        @head ||=nil ; @tail ||= nil ; @separator ||=  SPACE_
       end
       [ shell, x ]
     end

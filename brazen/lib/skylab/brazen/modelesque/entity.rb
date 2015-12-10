@@ -242,8 +242,8 @@ module Skylab::Brazen
 
           attr_reader :description_proc
 
-          def argument_argument_moniker  # [gv]
-            NIL_  # for 1 hack in sidesys, for now
+          def argument_argument_moniker  # [gv], [cme]. for "didactics"..
+            NIL_
           end
         end
 

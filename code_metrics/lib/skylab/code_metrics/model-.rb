@@ -3,11 +3,9 @@ module Skylab::CodeMetrics
   Model_ = ::Module.new
   module Model_::Support  # ( [#008]note-A is about this scope stack trick )
 
-    _Brazen = Home_.lib_.brazen
+    My_Entity__ = Brazen_::Modelesque::Entity
 
-    My_Entity__ = _Brazen::Modelesque::Entity
-
-    class Report_Action < _Brazen::Action
+    class Report_Action < Brazen_::Action
 
       class << self
 
@@ -79,7 +77,7 @@ module Skylab::CodeMetrics
       end
     end
 
-    _ = _Brazen::Nodesque::Common_Properties
+    _ = Brazen_::Nodesque::Common_Properties
 
     COMMON_PROPERTIES = _.new My_Entity__ do | sess |
 

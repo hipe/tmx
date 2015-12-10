@@ -1,6 +1,8 @@
 module Skylab::CodeMetrics
 
-  class CLI < lib_.brazen::CLI
+  Require_brazen_[]  # 2 of 2
+
+  class CLI < Brazen_::CLI
 
     Build_custom_lipstick_field = -> o do
 
@@ -51,6 +53,9 @@ module Skylab::CodeMetrics
       :segment,
         :glyph,'+',
         :color, :green,
-      :expression_width_proc, -> { 160 } )
+      :expression_width_proc, -> { HARD_CODED_WIDTH_ } )
+
+    HARD_CODED_WIDTH_ = 150
+    MONADIC_EMPTINESS_ = -> _ { NIL_ }
   end
 end

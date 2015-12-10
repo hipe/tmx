@@ -8,7 +8,7 @@ module Skylab::TanMan
 
     class Action_Adapter < Action_Adapter
 
-      def accept_frame adapter
+      def prepare_for_employment_under adapter
         if @bound.respond_to? :receive_stdin_
           o = adapter.resources
           @bound.receive_stdin_ o.sin

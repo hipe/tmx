@@ -16,7 +16,28 @@ module Skylab::Brazen
 
       class Categorize_properties___
 
+        def initialize
+          @when_many = nil
+
+          @arg_a = nil
+          @env_a = nil
+          @many_a = nil
+          @opt_a = nil
+        end
+
         attr_writer(
+
+          # -- in order
+
+          :on_environment_property,
+          :on_takes_many_arguments_property,
+          :when_many,
+          :on_effectively_optional_property,
+          :on_effectively_required_property,
+          :make_aesthetic_readjustments,
+
+          # -- alpha.
+
           :property_stream,
           :settable_by_environment_h,
         )
@@ -25,7 +46,19 @@ module Skylab::Brazen
 
           Require_fields_lib_[]
 
-          @arg_a = @env_a = @opt_a = @many_a = nil
+          @on_environment_property ||= method :categorize_as_environment_property
+
+          @on_takes_many_arguments_property ||=
+            method :categorize_as_takes_many_arguments_property
+
+          @on_effectively_optional_property ||=
+            method :categorize_as_option
+
+          @on_effectively_required_property ||=
+            method :categorize_as_argument
+
+          @make_aesthetic_readjustments ||=
+            method :__make_aesthetic_readjustments
 
           d = 0 ; @original_index = {}
 
@@ -39,36 +72,75 @@ module Skylab::Brazen
             @original_index[ prp.name_symbol ] = ( d += 1 )
 
             if env_h[ prp.name_symbol ]
-              ( @env_a ||= [] ).push prp
-              redo
+              _did = @on_environment_property[ prp ]
+              if _did
+                redo
+              end
             end
 
             # if is_hidden ; redo
 
             if Field_::Takes_many_arguments[ prp ]
-              ( @many_a ||= [] ).push prp
+
+              _did = @on_takes_many_arguments_property[ prp ]
+              if _did
+                redo
+              end
               redo
             end
 
             if Field_::Is_effectively_optional[ prp ]
-              ( @opt_a ||= [] ).push prp
-            else
-              ( @arg_a ||= [] ).push prp
+
+              _did = @on_effectively_optional_property[ prp ]
+              if _did
+                redo
+              end
             end
+
+            @on_effectively_required_property[ prp ]
 
             redo
           end while nil
 
           if @many_a
-            __determine_placement_for_many
+
+            ( @when_many || method( :determine_placement_for_many ) ).call
           end
 
-          __maybe_make_experimental_aesthetic_readjustment
+          @make_aesthetic_readjustments.call
 
           Here_.via_args_opts_envs @arg_a.freeze, @env_a.freeze, @opt_a.freeze
         end
 
-        def __maybe_make_experimental_aesthetic_readjustment  # #note-575
+        def categorize_as_environment_property prp
+          ( @env_a ||= [] ).push prp
+          ACHIEVED_
+        end
+
+        def categorize_as_takes_many_arguments_property prp
+          ( @many_a ||= [] ).push prp
+          ACHIEVED_
+        end
+
+        def pop_many
+          x = @many_a.pop
+          if @many_a.length.zero?
+            @many_a = nil  # etc
+          end
+          x
+        end
+
+        def categorize_as_option prp
+          ( @opt_a ||= [] ).push prp
+          ACHIEVED_
+        end
+
+        def categorize_as_argument prp
+          ( @arg_a ||= [] ).push prp
+          ACHIEVED_
+        end
+
+        def __make_aesthetic_readjustments  # #note-575
 
           # if (a), (b) and (c)
 
@@ -110,7 +182,13 @@ module Skylab::Brazen
           NIL_
         end
 
-        def __determine_placement_for_many
+        def determine_placement_for_any_many
+          if ! @many_a.nil?
+            determine_placement_for_any_many
+          end
+        end
+
+        def determine_placement_for_many
 
           if @arg_a
             @arg_a.push @many_a.pop
@@ -118,11 +196,15 @@ module Skylab::Brazen
           else
             @arg_a = [ @many_a.pop ]
           end
+
           if @many_a.length.nonzero?
             @opt_a.concat @many_a
             _re_order @opt_a
           end
+
           @many_a = true
+
+          NIL_
         end
 
         def _re_order a

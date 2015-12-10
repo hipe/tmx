@@ -2,7 +2,7 @@
 
 require 'skylab/brazen'
 
-_x = Skylab::Brazen::CLI::Client_for_Brazen_as_Application.new(
+_x = Skylab::Brazen::Command_Line_Client.new(
   $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
     invoke ARGV
 

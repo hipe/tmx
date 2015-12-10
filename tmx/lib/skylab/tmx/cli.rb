@@ -22,19 +22,19 @@ module Skylab::TMX
 
     expose_executables_with_prefix 'tmx-'
 
-    def __fast_lookup sym
+    def __fast_lookup nf
 
       # when the front element of the ARGV directly corresponds to a
       # sidesystem (gem), then resolution of the intended recipient is much
       # more straightforward than having to load possibly the whole tree.
 
-      possible_gem_path =
-        "#{ Home_.installation_.participating_gem_prefix[ 0 .. -2 ] }/#{ sym }"
+      _ = Home_.installation_.participating_gem_prefix[ 0 .. -2 ]  # "skylab"
+
+      possible_gem_path = ::File.join _, nf.as_slug
 
       _ok = ::Gem.try_activate possible_gem_path
       if _ok
-        require possible_gem_path
-        __fast_lookup_when_gem possible_gem_path, sym
+        ___fast_lookup_when_gem possible_gem_path, nf
       else
 
         # (we could extend this "optimization" to the executables but meh)
@@ -43,10 +43,14 @@ module Skylab::TMX
       end
     end
 
-    def __fast_lookup_when_gem path, sym
+    def ___fast_lookup_when_gem path, nf
+
+      require path
 
       sym_a = Home_.installation_.participating_gem_const_path_head.dup
-      sym_a.push sym  # EEK
+
+      sym_a.push nf.as_const  # EEK
+
       ss_mod = Autoloader_.const_reduce sym_a, ::Object
 
       _cli_class = ss_mod.const_get :CLI, false  # :+#hook-out
@@ -101,6 +105,17 @@ module Skylab::TMX
         @_ss_mod = ss_mod
       end
 
+      def receive_show_help parent
+
+        _cli = _build_new_CLI_for_under parent
+
+        _cli.invoke [ '--help' ]  # le meh
+      end
+
+      def description_proc_for_summary_under _
+        description_proc
+      end
+
       def description_proc
         ss_mod = @_ss_mod
         -> y do
@@ -108,9 +123,18 @@ module Skylab::TMX
         end
       end
 
-      def bound_call_via_receive_frame otr
+      def bound_call_under ada
 
-        rsx = otr.resources
+        _cli = _build_new_CLI_for_under ada
+
+        _args = [ ada.resources.argv ]
+
+        Callback_::Bound_Call.new _args, _cli, :invoke
+      end
+
+      def _build_new_CLI_for_under ada
+
+        rsx = ada.resources
 
         _slug = @nf_.as_slug
 
@@ -123,7 +147,7 @@ module Skylab::TMX
           cli.resources.share_bridge_resources_of rsx
         end
 
-        Callback_::Bound_Call.new( [ rsx.argv ], cli, :invoke )
+        cli
       end
     end
   end

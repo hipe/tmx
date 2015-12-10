@@ -27,9 +27,17 @@ module Skylab::Brazen
       def preconditions
         NIL_
       end
+
+      def silo_module
+        NIL_
+      end
     end
 
     module Bound_Methods
+
+      def description_proc_for_summary_of_under _, _
+        description_proc
+      end
 
       def description_proc
         NIL_

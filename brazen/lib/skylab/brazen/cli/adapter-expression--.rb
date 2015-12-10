@@ -104,6 +104,10 @@ module Skylab::Brazen
         @_line_yielder
       end
 
+      def reflection  # [cme]
+        @_reflection
+      end
+
       # -- for client
 
       def render_property_as_option_ prp

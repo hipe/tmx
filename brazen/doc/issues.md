@@ -1,5 +1,6 @@
 [#124]       track argument moniker derivation formulas [ac]
-[#123]       track nasty peeks into filesystem
+[#123] #hole
+             (#was: track nasty peeks into filesystem)
 [#122]       as if you would ever..
 [#121]       #tracking this wrapping algo
 [#120] #hole
@@ -34,7 +35,8 @@
 [#097] #hole
              ( #was: get this ellipsis hack out )
 [#096] #open the (CLI) table narrative ..
-[#095]       features that [fa] has that you don't #universal
+[#095] #hole (#was: old o.p notes)
+             (#was: features that [fa] has that you don't #universal)
 [#094]       expression agents adjunct notes ..
 [#093]       what is the deal with expression agents ..
 [#092]       [ CLI styling ]
@@ -95,7 +97,7 @@
              ( #was: #done marshal issue near regexps with escape-looking sequences )
 [#063]       [ isomorphicisms and emergent interfaces ]
                [fa] near [ CLI revelation gone ], [#gv-030] sets the stage nicely)
-[#062] #hole
+[#062]       #parent-node: [#002] custom reactive node adaptations ..
              ( #moved-to: [#ze-001] )
 [#061]       #tracking-tag `members` as a universal thing
 [#060]   #track custom CLI adapter resolution client needs not covered here;
@@ -172,7 +174,9 @@
                where the front client handles this alone.
 [#016]       #parent-node: [#013] the inferred inflection narrative ..
 [#015]       #doc-node: the kernel narrative ..
-[#014] #hole
+[#014] #open `fast_lookup` could still exist alongside promotions, just
+             use its value if one is reolved, and otherwise load them
+             promo's in a second pass.
              ( #was: `has_custom_moniker` is a smell to exist in entity. )
 [#013]       #parent-node: [#025] the model ..
 [#012] #open now that the `properties` shell is not memoized, see if etc

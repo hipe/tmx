@@ -10,10 +10,8 @@ module Skylab::CodeMetrics
 
         def add_additional_properties * x_a
 
-          lib = Home_.lib_.brazen
-
           empty_module  = ::Module.new
-          sess = lib::Entity::Session.new
+          sess = Brazen_::Entity::Session.new
           sess.arglist = x_a
           sess.block = nil
           sess.client = empty_module

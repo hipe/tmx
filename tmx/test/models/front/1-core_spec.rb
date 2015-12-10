@@ -73,9 +73,9 @@ module Skylab::TMX::TestSupport
 
         o = subject_module_.new( & method( :fail ) )
 
-        o.fast_lookup = -> sym do
+        o.fast_lookup = -> nf do
 
-          box[ sym ]
+          box[ nf.as_lowercase_with_underscores_symbol ]
         end
 
         o.unbound_stream_builder = -> do

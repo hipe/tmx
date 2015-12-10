@@ -161,7 +161,7 @@ module Skylab::Plugin
       Occurrence__ = ::Struct.new :occurrence_index, :formal, :plugin_idx,
         :transition_symbol, :is_catalyst
 
-      def bound_call_via_ARGV input_x
+      def bound_call_via_ARGV input_x  # [pl]
 
         Me_::Modality_Adapters_::ARGV::Produce_bound_call.new(
 

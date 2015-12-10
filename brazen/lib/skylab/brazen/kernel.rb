@@ -13,11 +13,13 @@ class Kernel  # [#015]
   end
 
   attr_reader(
+    :fast_lookup,
     :module,
     :reactive_tree_seed,
   )
 
   attr_writer(
+    :fast_lookup,
     :module,
     :reactive_tree_seed,
   )
@@ -128,10 +130,6 @@ class Kernel  # [#015]
   end
 
   # ~ unbound resolution
-
-  def fast_lookup
-    NIL_  # not implemented here because with promotions it's not worth it
-  end
 
   def build_unordered_selection_stream & x_p
 

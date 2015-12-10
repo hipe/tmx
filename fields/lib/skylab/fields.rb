@@ -20,14 +20,12 @@ module Skylab::Fields
 
   # ~ description & name
 
-  n_lines = nil
-
   N_lines = -> d, expag, prp do  # #curry-friendly
 
     p = prp.description_proc
     if p
       if d
-        n_lines[ d, expag, p ]
+        N_lines_via_proc[ d, expag, p ]
       else
         expag.calculate [], & p
       end
@@ -36,7 +34,7 @@ module Skylab::Fields
     end
   end
 
-  n_lines = -> d, expag, p do
+  N_lines_via_proc = -> d, expag, p do
 
     o = Home_.lib_.basic::String::N_Lines.session
 

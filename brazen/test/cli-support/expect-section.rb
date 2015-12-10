@@ -28,6 +28,38 @@ module Skylab::Brazen::TestSupport
 
     class Branch_Node__
 
+      def to_column_B_string m
+
+        # where "column" is defined as those spans of text that are
+        # delimited by by *two* or more spaces on each relevant side.
+
+        st = _to_full_pre_order_stream
+        s = st.gets.x.send m
+
+        md = RX___.match s
+
+        begin_ = md.offset( :col_B ).first
+        r = begin_ .. -1
+
+        a = []
+        begin
+
+          if s.length <= begin_
+            a.push s
+          else
+            a.push s[ r ]  # including trailing newline
+          end
+          node = st.gets
+          node or break
+          s = node.x.send m
+          redo
+        end while nil
+
+        a.join EMPTY_S_
+      end
+
+      RX___ = /^[ ]{2,}(?<col_A>(?:(?![ ]{2}).)+)[ ]{2,}(?<col_B>.+)/m
+
       def to_body_string m
 
         to_pre_order_stream.reduce_into_by "" do | memo, node |

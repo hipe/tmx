@@ -7,28 +7,7 @@ module Skylab::CodeMetrics::TestSupport
       tcc.include Instance_Methods__
     end
 
-    Support_Expectations = -> tcc do
-      Home_.lib_.brazen.test_support.lib( :CLI_support_expectations )[ tcc ]
-    end
-
     # <-
-
-  # ~ table-specific layer atop "execution snapshot"
-
-  module Instance_Methods__
-
-    def subject_CLI
-      Home_::CLI
-    end
-
-    define_method :get_invocation_strings_for_expect_stdout_stderr, -> do
-
-      s_a = [ '[flz]' ]
-      -> do
-        s_a
-      end
-    end.call
-  end
 
   # ~ experimental "execution snapshot"
 
@@ -53,6 +32,14 @@ module Skylab::CodeMetrics::TestSupport
 
       _em_a = flush_baked_emission_array
       Execution_Snapshot___.new _em_a, @exitstatus
+    end
+
+    def invocation_strings_for_expect_stdout_stderr
+      memoized_invocation_strings_for_expect_stdout_stderr_
+    end
+
+    def get_invocation_strings_for_expect_stdout_stderr
+      get_invocation_strings_for_expect_stdout_stderr_
     end
   end
 

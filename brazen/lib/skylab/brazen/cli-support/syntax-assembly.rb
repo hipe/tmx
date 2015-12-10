@@ -198,7 +198,7 @@ module Skylab::Brazen
         if arg_a
           Require_fields_lib_[]
           arg_a.each do | prp |
-            s = __render_as_argument prp
+            s = ___render_as_argument prp
             if s
               @_parts.push s
             end
@@ -210,7 +210,7 @@ module Skylab::Brazen
         NIL_
       end
 
-      def __render_as_argument prp
+      def ___render_as_argument prp
 
         s = _render_moniker_for_property prp
 

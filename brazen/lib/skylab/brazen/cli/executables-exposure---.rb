@@ -91,6 +91,10 @@ module Skylab::Brazen
 
         # ~ needed to reflect
 
+        def description_proc_for_summary_under _
+          description_proc
+        end
+
         def description_proc
           @___dp ||= ___build_description_proc
         end
@@ -105,7 +109,7 @@ module Skylab::Brazen
 
         # ~ needed to invoke
 
-        def bound_call_via_receive_frame fr, & oes_p
+        def bound_call_under fr, & oes_p  # [tmx]
 
           Callback_::Bound_Call.by do
 

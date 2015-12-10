@@ -63,7 +63,7 @@ module Skylab::Brazen::TestSupport
     end
 
     def subject_CLI  # ..
-      Home_::CLI::Client_for_Brazen_as_Application
+      Home_::Command_Line_Client
     end
 
     # -- the general shape of invocation (exitstatus, which streams)

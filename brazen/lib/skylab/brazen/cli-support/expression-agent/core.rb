@@ -163,7 +163,7 @@ module Skylab::Brazen
 
       # --
 
-      def action_reflection  # [bs]
+      def action_reflection  # [bs], [cme]
         @_action_reflection
       end
 

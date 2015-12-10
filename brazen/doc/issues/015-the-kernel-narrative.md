@@ -34,6 +34,52 @@ other parts of the model.
 
 
 
+## `fast_lookup` :A
+
+this attribute (like all the others here) is meant to be written to only
+at construction time. (it is a plain `attr_writer` only because it saves
+the client from needing to write a subclass and/or us needing to maintain
+a shell/kernel metaphor.)
+
+if set to a true-ish value, that value should be proc-like.
+
+the purpose is to provide the front client with an alternate algorithm
+to be used as a first-try attempt at name resolution; an algorithm that
+does not for example need to load (from the filesystem) many nodes just to
+resolve one.
+
+you might want to do this because;
+
+  • it saves the resources of hitting the filesytem and then parsing &
+    evaluating sibling nodes (perhaps all) at this level.
+
+  • it may make for nodes that are less coupled to their sibling nodes,
+    for better regression and more robustitude. (the one node can still
+    work even if the other node for e.g employs a DSL that is not
+    working at the time, for example during development.)
+
+reasons that the client *would* need to load several nodes from the
+filesystem include:
+
+  • if you are using "promotions" the client needs to peek into every
+    node at the current level to see if it promotes any of its children.
+
+  • if you want fuzzy name matching, this is an aggregate operation that
+    necessitates that the client stream over every node.
+
+hypothetically a "fast lookup" can coexist cleanly with the above
+points. (fast lookup should only implement exact match.) the client can
+try the fast lookup first, and only after that fall back to the more
+processing intensive aggregate operation.
+
+(but come to think of it, #open [#014])
+
+the sub-identifier of this subject is used to track client
+implementations of this proc "in the wild."
+
+
+
+
 ## :#note-40
 
 this is an area of some experimentation: the 'persist to' identifiers

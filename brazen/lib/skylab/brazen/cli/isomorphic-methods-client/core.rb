@@ -302,7 +302,7 @@ module Skylab::Brazen
         y << auxiliary_syntax_string_for_help_option_( _ho )
       end
 
-      def bound_call_via_ARGV_
+      def bound_call_from_parse_arguments
 
         # the last step: fail because args length or succeed w/ the bound call
 

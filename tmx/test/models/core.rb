@@ -66,8 +66,8 @@ module Skylab::TMX::TestSupport
 
     def init_front_with_box_ fr, bx
 
-      fr.fast_lookup = -> sym do
-        bx[ sym ]
+      fr.fast_lookup = -> nf do
+        bx[ nf.as_lowercase_with_underscores_symbol ]
       end
 
       fr.unbound_stream_builder = -> do

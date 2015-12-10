@@ -41,7 +41,7 @@ module Skylab::Brazen
 
         case 1 <=> a.length
         when  0
-          a.first.receive_show_help_ o
+          a.first.receive_show_help o
 
         when  1
           o.receive_no_matching_via_token__ @_command_string
@@ -102,7 +102,12 @@ module Skylab::Brazen
           ada_a.each do | ada |
 
             if Field_::Has_description[ ada ]
-              _desc_lines = Field_::N_lines[ MAX_DESC_LINES, expag, ada ]
+
+              # #[#002]an-optimization-for-summary-of-child-under-parent
+
+              _p = ada.description_proc_for_summary_under exp
+
+              _desc_lines = Field_::N_lines_via_proc[ MAX_DESC_LINES, expag, _p ]
             end
 
             y.yield ada.name.as_slug, ( _desc_lines || EMPTY_A_ )

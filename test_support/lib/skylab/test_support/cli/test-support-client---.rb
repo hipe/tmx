@@ -23,7 +23,7 @@ module Skylab::TestSupport
 
       class Cover < CLI_Client_::Action_Adapter
 
-        def accept_frame x
+        def prepare_for_employment_under x
           super
           @bound.sout = @resources.sout
           @bound.serr = @resources.serr

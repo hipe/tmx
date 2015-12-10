@@ -37,6 +37,8 @@ module Skylab::Brazen
 
     class Backless::Backless_Bound_Action
 
+      include Home_::Nodesque::Methods::Bound_Methods
+
       def initialize bnd, mock_unb, & x_p
         @_bnd = bnd
         @_mock_unb = mock_unb
@@ -46,14 +48,6 @@ module Skylab::Brazen
       def accept_parent_node x
         @_par_nod = x
         NIL_
-      end
-
-      def after_name_symbol
-        NIL_
-      end
-
-      def is_visible
-        true
       end
 
       def description_proc

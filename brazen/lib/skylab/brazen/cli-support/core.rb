@@ -77,6 +77,21 @@ module Skylab::Brazen
       bx.freeze
     end
 
+    param_arity = {
+      optional: :zero_or_one,
+      required: :one,
+    }
+
+    Didactic_glyph = -> sym, moniker, debugging_symbol do
+
+      Modality_Specific_Property.new(
+        debugging_symbol,
+        :argument_argument_moniker, moniker,
+        :argument_arity, :one,
+        :parameter_arity, param_arity.fetch( sym ),
+      )
+    end
+
     class Modality_Specific_Property
 
       # #open [#006] what to do about this custom CLI prop class?
@@ -138,7 +153,11 @@ module Skylab::Brazen
       end
     end
 
-    Actions = ::Module.new.freeze  # [#002]note-165
+    module Option_Parser
+      Autoloader_[ self ]
+    end
+
+    Actions = nil  # [#062]
     FILE_SEPARATOR_BYTE = ::File::SEPARATOR.getbyte 0
     GENERIC_ERROR_EXITSTATUS = 5
     Here_ = self

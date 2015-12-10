@@ -5,8 +5,8 @@ module Skylab::CodeMetrics::TestSupport
   describe "[cm] CLI - integration" do
 
     TS_[ self ]
-    use :CLI
     use :CLI_support_expectations
+    use :CLI
     use :CLI_classify_common_screen
 
     context "lc" do
@@ -44,7 +44,7 @@ module Skylab::CodeMetrics::TestSupport
         _expect_integer sm.fetch( 0 ).fetch( 1 )
         _expect_percent sm.fetch( 1 ).fetch( 2 )
         _expect_percent sm.fetch( 2 ).fetch( 3 )
-        _expect_pluses sm.fetch( 2 ).fetch( 4 ), 11..11
+        _expect_pluses sm.fetch( 2 ).fetch( 4 ), 6..6
       end
 
       it "summary" do

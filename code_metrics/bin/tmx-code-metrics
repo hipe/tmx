@@ -2,7 +2,9 @@
 
 require 'skylab/code_metrics'
 
-_x = Skylab::CodeMetrics::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
+_pn = ::File.basename $PROGRAM_NAME
+
+_x = Skylab::CodeMetrics::CLI.new( $stdin, $stdout, $stderr, [ _pn ] ).
   invoke ARGV
 
 $stderr.puts "(exitstatus: #{ _x })"

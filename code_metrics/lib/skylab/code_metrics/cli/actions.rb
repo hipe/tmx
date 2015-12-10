@@ -28,10 +28,9 @@ module Skylab::CodeMetrics
 
       # -- our common properties
 
-      bz = Home_.lib_.brazen
-      EXTMOD__ = bz::Modelesque::Entity
+      EXTMOD__ = Brazen_::Modelesque::Entity
 
-      COMMON_PROPERTIES = bz::Nodesque::Common_Properties.new(
+      COMMON_PROPERTIES = Brazen_::Nodesque::Common_Properties.new(
         EXTMOD__
       ) do | sess |
 
@@ -74,6 +73,13 @@ module Skylab::CodeMetrics
 
           receive_event_on_channel _ev, i_a
 
+          NIL_
+        end
+
+        def receive__enoent__data i_a, & x_p
+
+          _ev = x_p[]
+          receive_event_on_channel _ev, i_a
           NIL_
         end
 
@@ -354,11 +360,11 @@ module Skylab::CodeMetrics
         # -- support for table rendering
 
         def _begin_table
-          Home_.lib_.brazen::CLI_Support::Table::Structured.new
+          Brazen_::CLI_Support::Table::Structured.new
         end
 
         def _lookup_expression_width
-          Home_::CLI::Lipsticker::EXPRESSION_WIDTH_PROC[]
+          Home_::CLI::HARD_CODED_WIDTH_
         end
 
         # -- a model frontier for verbosities
