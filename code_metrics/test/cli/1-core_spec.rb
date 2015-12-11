@@ -5,7 +5,7 @@ module Skylab::CodeMetrics::TestSupport
   describe "[cm] CLI" do
 
     TS_[ self ]
-    use :memoization_methods
+    use :memoizer_methods
     use :CLI_support_expectations
     use :CLI
 

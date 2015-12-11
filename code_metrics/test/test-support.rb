@@ -95,7 +95,7 @@ module Skylab::CodeMetrics::TestSupport
     tcc.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
   end
 
-  Memoization_Methods = -> tcc do
+  Memoizer_Methods = -> tcc do
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
 

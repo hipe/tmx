@@ -1,6 +1,6 @@
 module Skylab::Callback::TestSupport
 
-  class Expect_Event
+  class Expect_Event  # [#065] (has subscribers to the rewrite)
 
     class << self
 

@@ -1,5 +1,7 @@
 module Skylab::CodeMetrics
 
+  Require_brazen_[]  # 1 of 2
+
   class Models_::Tally < Brazen_::Action
 
     def self.entity_enhancement_module
@@ -72,6 +74,10 @@ module Skylab::CodeMetrics
         y << "are you ready to party."
       end
       :yep
+    end
+
+    module Magnetics_
+      Autoloader_[ self ]
     end
   end
 end
