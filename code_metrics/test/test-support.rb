@@ -149,7 +149,7 @@ module Skylab::CodeMetrics::TestSupport
   Callback_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
 
   EMPTY_S_ = Home_::EMPTY_S_
-  NEWLINE_ = "\n"
+  NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
   SPACE_ = Home_::SPACE_
   TS_ = self

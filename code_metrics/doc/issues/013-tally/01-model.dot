@@ -1,0 +1,43 @@
+digraph G {
+
+  label="how to rock and roll"
+
+	subgraph cluster_METHODS {
+		label="Methods";
+		style=filled;
+		color=lightgrey;
+		node [style=filled color=white shape=rect];
+
+    m1 [label="method 1"]
+    m2 [label="method 2"]
+    m3 [label="method 3"]
+    m4 [label="method not used"]
+	}
+
+	subgraph cluster_FILES {
+		label="Files";
+
+		node [style=filled shape=rect];
+
+    subgraph cluster_2 {
+      label="foo/bar"
+
+      f1 [label="file 1"]
+      f3 [label="file 3"]
+      f2 [label="file 2"]
+
+      subgraph cluster_3 {
+        label="wizlo/bazlo"
+
+        f4 [label="jimmy jam"]
+      }
+    }
+	}
+
+  m1->f1 [label="(2x)"]
+  m2->f2
+  m2->f3
+  m2->f4
+  m3->f1
+  m3->f2
+}

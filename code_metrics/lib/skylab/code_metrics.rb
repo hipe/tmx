@@ -122,6 +122,7 @@ module Skylab::CodeMetrics
   LIB_ = Home_.lib_
   Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
   MONADIC_TRUTH_ = -> _ { true }
+  NEWLINE_ = "\n"
   NIL_ = nil
   SPACE_ = ' '.freeze
   UNABLE_ = false
