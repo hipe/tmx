@@ -43,6 +43,7 @@ module Skylab::CodeMetrics
             cmd.concat chunk
 
             _i, o, e, active_wait = system.popen3( * cmd )
+
             p = -> do
               s = o.gets
               if s
@@ -100,6 +101,7 @@ module Skylab::CodeMetrics
       COMMON_BEGINNING___ = [
         'grep',
         '--extended-regexp',
+        '-H',  # always pring the filename headers with output lines
         '--line-number',
       ]
 

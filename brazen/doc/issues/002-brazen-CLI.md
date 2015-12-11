@@ -179,12 +179,12 @@ mixing in the other module (see "[#]/figure-1").
 
 
 
-## property categorization :#note-600
+## property categorization (:E)
 
 a central feature of [br] CLI, property categorization is a concrete
 manifestion of the whole underlying [br] experiment, one that traces its
 lineage years back to [hl]: the model models its actions' properties
-with metadata that is processed by the modality to make design
+with metadata that is processed by "modality inference" to make design
 decisions about how to express the various properties using appropriate
 modality-specific mechanics.
 
@@ -202,17 +202,7 @@ functional shortcomings:
 
   • properties with polyadic argument arities (i.e those that take
     more than one value) are most usable when they are expressed
-    (when possible) as globbed positional arguments (more on this
-    below).
-
-some specific (and experimental) "rules" for this modality, see in the
-couterpart code (roughly in code order):
-
-  • if a property is tagged as `hidden`, it can be read in from the
-    environment but otherwise gets no direct expression in the UI.
-    the design of this needs to change - the model probably shouldn't
-    know what the environment is.
-
+    (when possible) as globbed positional arguments.
 
 
 
@@ -248,11 +238,10 @@ parameter was employed is to test if it is equal to `true`. (this
 because of the stdlib optparser.)
 
 this sort of situation is what our "known known" structure was made for:
-the clientstream will *that* this formal property was engaged by virtue
+the clientstream will know *that* this formal property was engaged by virtue
 of the existence of the known known. to know *whether* the one form or
 the other was used it can infer this from the true-ish-ness of the
 value.
-
 
 
 

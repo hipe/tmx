@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   module CLI_Support
 
-    class Categorized_Properties  # [#002]note-600
+    class Categorized_Properties  # the asset node of [#002]E
 
       class << self
 

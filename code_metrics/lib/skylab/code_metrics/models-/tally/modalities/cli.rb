@@ -5,10 +5,16 @@ module Skylab::CodeMetrics
     Modalities = ::Module.new
     class Modalities::CLI < Brazen_::CLI::Action_Adapter
 
+      # the below method definitions with [#bs-028] "public API"-looking
+      # names (i.e almost all of them) are overriding methods (and default
+      # behavior) defined in the parent class.
+
       def description_proc_for_summary_of_under__ bound, exp
 
         # #[#br-002]:A finally here is the end of the line for this.
         # (we want to move this up or do away with the optimization..)
+        # this is necessary because we are surprisingly uncommon in our
+        # behavior of rendering properties in the first 2 lines of desc.
 
         prepare_for_employment_under exp.reflection  # makes a bold assumption about state
 
@@ -66,7 +72,6 @@ module Skylab::CodeMetrics
         if d
           @_paths = argv[ d+1 .. -1 ]
           argv[ d .. -1 ] = EMPTY_A_
-          argv[ d+1 .. -1 ]
         else
           # no errors yet. note we are munging the case of "--" and no "--"
           @_paths = EMPTY_A_
@@ -78,6 +83,9 @@ module Skylab::CodeMetrics
       STOPPER__ = '--'
 
       def init_categorized_properties
+
+        # this won't make any sense without a deep understanding of
+        # [#br-002]E property categorization.
 
         # categorize our properties differently than what is default. by
         # default, the first of the two "glob" parameters would become an

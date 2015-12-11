@@ -99,6 +99,11 @@ module Skylab::CodeMetrics
       end
     end
 
+    String_scanner = Callback_::Lazy.call do
+      require 'strscan'
+      ::StringScanner
+    end
+
     System = -> do
       System_lib__[].services
     end
