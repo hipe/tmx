@@ -118,7 +118,7 @@
 [#048]       #parent-node: [#024] "#action-preconditions.."
 [#047]       #parent-node: [#013] the model entity narrative
 [#046]       #parent-ndoe: [#024] the action factory narrative ..
-[#045]       [ expect section ]
+[#045]   #subscribed - :A - (see in asset node) [ expect section ]
              ( #was: #done graph has an action so maybe we don't need to pass it everywhere )
 [#044]       #parent-node: [#001] the meta-properties justification ..
 [#043]       the frontier of a back-less front action

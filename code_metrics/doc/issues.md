@@ -1,3 +1,4 @@
+[#012]     #gotcha inline - flickering near helpscreens
 [#011]    #investigate how to pipe from one process to another from ruby
              not with this string command
 [#010]       conjuncter ..

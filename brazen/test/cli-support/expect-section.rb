@@ -6,6 +6,12 @@ module Skylab::Brazen::TestSupport
     # reminiscent of a super simplified python or OGDL. the result data
     # structure is geared towards assertion.
 
+    # :#gotcha #subscribed - if the treeifier encounters a blank like (i.e
+    # only a newline), what it does is context dependant: if it's in  the
+    # middle of a multiline node, it adds it to that node. otherwise it
+    # counts the newline as its own toplevel item. this annoys some clients
+    # and might change somehow, but for now it is just being watched ..
+
     PUBLIC = true
 
     class << self

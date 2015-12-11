@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::CodeMetrics::TestSupport
 
-  describe "[cm] tally - 2/1: files slice stream" do
+  describe "[cm] tally - 2 - 1: files slice stream" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -10,17 +10,16 @@ module Skylab::CodeMetrics::TestSupport
     use :models_tally_magnetics
 
     it "loads" do
-      _subject
+      files_slice_stream_session_class_
     end
 
     context "two extensions, two asset paths, one bad path" do
 
       shared_subject :_state do
 
-        o = _begin_guy
+        o = begin_files_slice_stream_session_
 
-        eek = Home_::Models_::Tally.dir_pathname.to_path
-
+        eek = the_asset_directory_for_this_project_
         _one = ::File.join eek, 'magnetics-'
         _two = '-egads-not-a-path-nor-an-operator'
         _three = ::File.join eek, 'modalities'
@@ -67,7 +66,7 @@ module Skylab::CodeMetrics::TestSupport
 
       shared_subject :_state do
 
-        o = _begin_guy
+        o = begin_files_slice_stream_session_
 
         o.ignore_paths = %w( *ixture-files-on* */hi.code )
 
@@ -103,18 +102,6 @@ module Skylab::CodeMetrics::TestSupport
       x = @ev_a
       @ev_a = nil
       x.freeze
-    end
-
-    def _begin_guy
-
-      o = _subject.new( & handle_event_selectively )
-      o.chunk_size = 2
-      o.system_conduit = Home_.lib_.open_3
-      o
-    end
-
-    def _subject
-      magnetics_module_::Files_Slice_Stream_via_Parameters
     end
   end
 end

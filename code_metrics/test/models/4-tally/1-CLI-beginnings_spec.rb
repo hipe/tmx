@@ -15,15 +15,22 @@ module Skylab::CodeMetrics::TestSupport
 
       it "properties render correctly in the summary [#br-002]:A " do
 
-        _act = _subject.to_column_B_string :unstyled
+        act = _subject.to_column_B_string :unstyled
 
-        _exp = <<-HERE.unindent
+        exp = <<-HERE.unindent
           find every occurrence of every <word> in every file
           selected by every <path> recursively and hackishly..
-
         HERE
 
-        _act.should eql _exp
+        # for now, we've got to normalize these both because
+        # of some nasty #flickering behavior (see #gotcha [#012]):
+
+        exp.chomp!
+
+        act.chomp!
+        act.chomp!  # only when run alone is this necessary (at writing)
+
+        act.should eql exp
       end
 
       me = 'tally'

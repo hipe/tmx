@@ -38,6 +38,32 @@ module Skylab::CodeMetrics::TestSupport
       _x = toplevel_help_screen_.lookup 'actions'
       bx = Callback_::Box.new
       _x.children.each do | cx |
+
+        # #gotacha :[#012]: this is nasty: what the treeifier does with blank
+        # lines is context-dependant for now (#watching [#br-045]A.) now
+        # consider the following three (at present) facts put together:
+        #
+        #   • "ping" has no desc lines.
+        #
+        #   • the "actions" section ends with a blank line.
+        #
+        #   • the order that the action items comes out on help screens
+        #     is volatile: it depends on on whether we have run our "model-"
+        #     level tests or not.
+        #
+        # given the above, whether or not that final blank line will be
+        # counted as part of an action's descrption depends on whether
+        # "ping" occcurs as the last item. hence this is flickering unless
+        # we do the below.
+        #
+        # probably the right fix for this is to make the order of actions
+        # rigid but incurs its own kind of costs..
+
+        if NEWLINE_ == cx.x.string
+          # you may only hit this line when running multiple tests (-order)
+          next
+        end
+
         bx.add cx.x.get_column_A_content, cx
       end
       bx

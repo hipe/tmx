@@ -1,4 +1,4 @@
-# the meta-meta-properties justification [#045]
+# the meta-meta-properties justification [#088]
 
 hopefully without needing to explain it here we know what "formal
 properties" are and that they are useful. but if not, see [#022].
