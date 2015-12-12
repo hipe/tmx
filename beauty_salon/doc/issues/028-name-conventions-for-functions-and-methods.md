@@ -294,7 +294,7 @@ better this time.
 
 
 
-### the `get_` prefix semantics as a nod to an ObjC convention :[#.B]
+### the `get_` prefix semantics as a nod to an ObjC convention :B
 
 (NOTE: there is some spurious confusion btwn this node and [#bs-031.B] )
 

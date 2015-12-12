@@ -154,7 +154,7 @@ module Skylab::Basic
         children_count.zero?
       end
 
-      alias_method :child_at_position, :fetch_at_position
+      alias_method :child_at_position, :at_position
 
       alias_method :to_child_stream, :to_value_stream
 

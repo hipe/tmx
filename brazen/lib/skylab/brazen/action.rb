@@ -316,7 +316,7 @@ module Skylab::Brazen
           h.fetch( k ), fo.fetch( k ) )
       end
 
-      Callback_::Box.allocate.init a_, h_
+      Callback_::Box.via_integral_parts a_, h_
     end
 
     def qualified_knownness_of sym

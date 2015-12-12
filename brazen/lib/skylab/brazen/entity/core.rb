@@ -894,7 +894,7 @@ module Skylab::Brazen
         fetch k do end
       end
 
-      def fetch_at_position d  # no block
+      def at_position d  # no block
         fetch @_a.fetch d
       end
 

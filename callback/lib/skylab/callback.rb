@@ -222,7 +222,7 @@ module Skylab::Callback
     def process_arglist_fully a
       bx = formal_fields_ivar_box_for_read_
       a.length.times do |d|
-        instance_variable_set bx.fetch_at_position( d ), a.fetch( d )
+        instance_variable_set bx.at_position( d ), a.fetch( d )
       end
       NIL_
     end
@@ -274,82 +274,228 @@ module Skylab::Callback
 
   class Box  # :[#061]
 
+    class << self
+
+      def the_empty_box
+        @___the_empty_box ||= new.freeze
+      end
+
+      def via_integral_parts a, h
+        allocate.__init a, h
+      end
+    end  # >>
+
+    # -- intialization & related
+
     def initialize
       @a = [] ; @h = {}
     end
 
-    def init a, h
+    def __init a, h
       @a = a ; @h = h
       self
+    end
+
+    def initialize_copy _otr_
+      @_algorithms = nil
+      @a = @a.dup ; @h = @h.dup ; nil
     end
 
     def freeze
       @a.freeze ; @h.freeze ; super
     end
 
-    def initialize_copy _otr_
-      @_alogrithms = nil
-      @a = @a.dup ; @h = @h.dup ; nil
+    # -- mutation
+
+    def merge_box! otr  # [tm]
+      a = otr.a_ ; h = otr.h_
+      a.each do | k |
+        if ! @h.key? k
+          @a.push k
+        end
+        @h[ k ] = h.fetch k
+      end
+      NIL_
+    end
+
+    def add_to_front k, x
+      had = true
+      @h.fetch k do
+        @a[ 0, 0 ] = [ k ]
+        @h[ k ] = x
+        had = nil
+      end
+      if had
+        raise ::KeyError, _say_wont_clobber( k )
+      end
+    end
+
+    def add_or_replace k, add_p, replace_p
+      had = true
+      x = @h.fetch k do
+        had = false
+      end
+      if had
+        @h[ k ] = replace_p[ x ]
+      else
+        @a.push k
+        @h[ k ] = add_p.call
+      end
+    end
+
+    def replace k, x_
+      had = true
+      x = @h.fetch k do
+        had = false
+      end
+      if had
+        @h[ k ] = x_
+        x
+      else
+        raise ::KeyError, _say_not_found( k )
+      end
+    end
+
+    def replace_by k, & p
+      had = true
+      x = @h.fetch k do
+        had = false
+      end
+      if had
+        x_ = p[ x ]
+        @h[ k ] = x_
+        x_
+      else
+        raise ::KeyError, _say_not_found( k )
+      end
+    end
+
+    def remove k, & else_p
+      d = @a.index k
+      if d
+        @a[ d, 1 ] = EMPTY_A_
+        @h.delete k
+      elsif else_p
+        else_p[]
+      else
+        raise ::KeyError, _say_not_found( k )
+      end
+    end
+
+    def set k, x
+      @h.fetch k do
+        @a.push k
+      end
+      @h[ k ] = x ; nil
+    end
+
+    def touch k, & p
+      @h.fetch k do
+        @a.push k
+        @h[ k ] = p.call
+      end
+    end
+
+    def add k, x
+      had = true
+      @h.fetch k do
+        had = false
+        @a.push k
+        @h[ k ] = x ; nil
+      end
+      if had
+        raise ::KeyError, _say_wont_clobber( k )
+      end
+    end
+
+    # -- reduction
+
+    # ~ ..given nothing
+
+    def first_name
+      @a.first
     end
 
     def length
       @a.length
     end
 
-    def has_name i
-      @h.key? i
-    end
-
-    def index i
-      @a.index i
-    end
-
-    def first_name
-      @a.first
-    end
-
-    def fetch_at_position d
-      @h.fetch @a.fetch d
-    end
-
-    def fetch_name_at_position d
-      @a.fetch d
-    end
-
-    def fetch_pair_at_position d
-      [ @a.fetch( d ), @h.fetch( @a.fetch d ) ]
-    end
-
-    def at * a
-      a.map( & @h.method( :[] ) )
-    end
-
-    def get_names
-      @a.dup
-    end
-
-    def [] sym
-      @h[ sym ]
-    end
-
-    def fetch i, & p
-      @h.fetch i, & p
-    end
+    # ~ ..given a position
 
     def at_position d
-      @h.fetch name_at_position d
+      @h.fetch name_at_position_ d
     end
 
-    def name_at_position d
+    def name_at_position_ d
       @a.fetch d
     end
+
+    # ~ ..given a name or names
+
+    def has_name k
+      @h.key? k
+    end
+
+    def index k
+      @a.index k
+    end
+
+    def at * k_a
+      k_a.map( & @h.method( :[] ) )
+    end
+
+    def [] k
+      @h[ k ]
+    end
+
+    def fetch k, & p
+      @h.fetch k, & p
+    end
+
+    # -- mapping and visitation
+
+    # ~ ad-hoc in-universe
 
     def to_collection
       Box::As__::Collection[ self ]
     end
 
+    def to_new_mutable_box_like_proxy
+      dup
+    end
+
+    def to_mutable_box_like_proxy
+      self
+    end
+
+    def algorithms  # bridge to legacy
+      @_alogrithms ||= Box::Algorithms__.new( @a, @h, self )
+    end
+
+    # ~ ..of names
+
+    def get_names  # #[#bs-028]B
+      @a.dup
+    end
+
+    def each_name
+      @a.each do |k|
+        yield k
+      end
+      NIL_
+    end
+
     def to_name_stream
       Home_::Stream.via_nonsparse_array @a
+    end
+
+    # ~ ..of values
+
+    def each_value
+      @a.each do |k|
+        yield @h.fetch k
+      end
+      NIL_
     end
 
     def to_value_minimal_stream
@@ -370,162 +516,29 @@ module Skylab::Callback
       end
     end
 
-    def to_pair_stream
-      d = -1 ; last = @a.length - 1
-      Home_.stream do
-        if d < last
-          sym = @a.fetch d += 1
-          Pair.via_value_and_name @h.fetch( sym ), sym
-        end
-      end
-    end
-
-    def each_name
-      @a.each do |i| yield i end ; nil
-    end
-
-    def each_value
-      @a.each do |i| yield @h.fetch( i ) end ; nil
-    end
+    # ~ ..of both names & values
 
     def each_pair
-      @a.each do |i| yield i, @h.fetch( i ) end ; nil
+      @a.each do |k|
+        yield k, @h.fetch( k )
+      end
+      NIL_
     end
 
-    # ~ mutators
+    def to_pair_stream
 
-    def merge_box! otr
-      a = otr.a_ ; h = otr.h_
-      a.each do | sym |
-        @h.key?( sym ) or @a.push sym
-        @h[ sym ] = h.fetch sym
-      end ; nil
-    end
+      d = -1
+      last = @a.length - 1
 
-    def ensuring_same_values_merge_box! otr
-      a = otr.a_ ; h = otr.h_
-      a.each do |i|
-        had = true
-        m_i = @h.fetch i do
-          had = false
+      Home_.stream do
+        if d < last
+          k = @a.fetch d += 1
+          Pair.via_value_and_name @h.fetch( k ), k
         end
-        if had
-          m_i == @h.fetch( i ) or raise "merge failure near #{ m_i }"
-        else
-          @a.push i ; @h[ i ] = h.fetch i
-        end
-      end ; nil
-    end
-
-    def set i, x
-      @h.fetch i do
-        @a.push i
-      end
-      @h[ i ] = x ; nil
-    end
-
-    def touch i, & p
-      @h.fetch i do
-        @a.push i
-        @h[ i ] = p.call
       end
     end
 
-    def add_or_assert i, x_
-      has = true
-      x = @h.fetch i do
-        has = false
-      end
-      if has
-        x == x_ or raise "assertion failure - not equal: (#{ x }, #{ x_ })"
-        nil
-      else
-        @a.push i ; @h[ i ] = x_ ; true
-      end
-    end
-
-    def add_or_replace i, add_p, replace_p
-      has = true
-      x = @h.fetch i do
-        has = false
-      end
-      if has
-        @h[ i ] = replace_p[ x ]
-      else
-        @a.push i
-        @h[ i ] = add_p.call
-      end
-    end
-
-    def add_to_front sym, x
-      had = true
-      @h.fetch sym do
-        @a[ 0, 0 ] = [ sym ]
-        @h[ sym ] = x
-        had = nil
-      end
-      had and raise ::KeyError, _say_wont_clobber( sym )
-    end
-
-    def add i, x
-      had = true
-      @h.fetch i do had = nil ; @a.push i ; @h[ i ] = x end
-      had and raise ::KeyError, _say_wont_clobber( i )
-    end
-
-    def _say_wont_clobber sym
-      "won't clobber existing '#{ sym }'"
-    end
-
-    def replace i, x_
-      had = true
-      x = @h.fetch i do
-        had = false
-      end
-      had or raise ::KeyError, _say_not_found( i )
-      @h[ i ] = x_ ; x
-    end
-
-    def replace_by i, & p
-      had = true
-      x = @h.fetch i do
-        had = false
-      end
-      had or raise ::KeyError, _say_not_found( i )
-      @h[ i ] = p[ x ]
-    end
-
-    def remove i, & else_p
-      d = @a.index i
-      if d
-        @a[ d, 1 ] = EMPTY_A_
-        @h.delete i
-      elsif else_p
-        else_p[]
-      else
-        raise ::KeyError, _say_not_found( i )
-      end
-    end
-
-    # ~ conversion
-
-    def algorithms  # ~ experimental bridge to the past
-      @_alogrithms ||= Box::Algorithms__.new( @a, @h, self )
-    end
-
-    def to_mutable_box_like_proxy
-      self
-    end
-
-    def to_new_mutable_box_like_proxy
-      dup
-    end
-
-    private def _say_not_found i
-      "key not found: #{ i.inspect }"
-    end
-
-    # ~ collaborators
+    # -- collaboration & support
 
     def a_
       @a
@@ -535,11 +548,12 @@ module Skylab::Callback
       @h
     end
 
-    class << self
+    def _say_wont_clobber k
+      "won't clobber existing '#{ k }'"
+    end
 
-      def the_empty_box
-        @teb ||= new.freeze
-      end
+    def _say_not_found k
+      "key not found: #{ k.inspect }"
     end
   end
 

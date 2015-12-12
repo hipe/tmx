@@ -104,7 +104,7 @@ module Skylab::Autonomous_Component_System
       def __order
 
         bx = formal_properties
-        bx_ = Callback_::Box.allocate.init bx.a_.dup, bx.h_  # careful!
+        bx_ = Callback_::Box.via_integral_parts bx.a_.dup, bx.h_  # careful!
 
         _h = ::Hash[ @callable.parameters.each_with_index.map do | (_, k), d |
           [ k,d ]

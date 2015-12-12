@@ -12,19 +12,11 @@ module Skylab::CodeMetrics::TestSupport
       _subject
     end
 
-    _THING_ONE = 'THING_ONE'
-    _THING_TWO = 'THING_TWO'
-    _FILE_A = '/file-A'
-    _FILE_B = '/file-B'
-    _WIDTH = _THING_ONE.length
-
     context "(6 matches of 2 patterns in two files)" do
 
       shared_subject :_state do
 
-        o = _subject.new
-        o.pattern_strings = [ _THING_ONE, _THING_TWO ]
-        o.vendor_match_stream = ___build_mock
+        o = stub_match_stream_session_one_
         _state_me o.execute
       end
 
@@ -53,24 +45,9 @@ module Skylab::CodeMetrics::TestSupport
       it "no other matches" do
         _state.length.should eql 6
       end
-
-      define_method :___build_mock do
-
-        eek = magnetics_module_::Vendor_Match_Stream_via_Files_Slice_Stream::Vendor_Match___
-
-        a = []
-
-        a << eek[ 3, _FILE_A, '  so there is THING_ONE and THING_TWO huzza' ]
-
-        a << eek[ 6, _FILE_A, 'THING_TWO again' ]
-
-        a << eek[ 9, _FILE_A, 'at the end we have THING_ONE' ]
-
-        a << eek[ 2, _FILE_B, 'both THING_ONE and THING_TWO (different file)' ]
-
-        Callback_::Stream.via_nonsparse_array a
-      end
     end
+
+    _WIDTH = 'THING_ONE'.length
 
     define_method :_ do |match_index, path, lineno, pattern_string, range_begin|
 
