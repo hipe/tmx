@@ -51,7 +51,7 @@ module Skylab::CodeMetrics::TestSupport
     end
 
     it "the last assocation" do
-      _state.lines.fetch( -2 ).should match %r(^[ ]{2}feature3->bucket2$)
+      _state.lines.fetch( -2 ).should match %r(^[ ]{2}bucket2->feature3$)
     end
 
     it "one feature item" do

@@ -195,10 +195,8 @@ module Skylab::CodeMetrics
 
         @graph_structure.occurrence_groups.each do | og |
 
-          _left = og.feature_symbol
-          _right = og.bucket_symbol
-
-          association_string = "#{ _left }#{ ARROW___ }#{ _right }"
+          association_string =
+            "#{ og.bucket_symbol }#{ ARROW___ }#{ og.feature_symbol }"
 
           d = og.occurrences.length
           if 1 == d

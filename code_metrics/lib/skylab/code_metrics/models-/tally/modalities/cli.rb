@@ -103,8 +103,16 @@ module Skylab::CodeMetrics
           o.categorize_as_argument @_words_property
           o.categorize_as_argument @_paths_property
 
-          o.determine_placement_for_any_many
+          # other formals that take many arguments, always categorize them
+          # as options (otherwise the default is try and make them globbing
+          # final arguments).
 
+          many = o.release_any_many
+          if many
+            many.each do | prp |
+              o.categorize_as_option prp
+            end
+          end
           NIL_
         end
 

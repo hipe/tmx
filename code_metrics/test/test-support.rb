@@ -142,6 +142,11 @@ module Skylab::CodeMetrics::TestSupport
     TS_.dir_pathname.join( 'fixture-trees/fixture-tree-one' ).to_path
   end
 
+  Fixture_tree_two_ = Callback_::Lazy.call do
+
+    ::File.join TS_.dir_pathname.to_path, 'fixture-trees/fixture-tree-two'
+  end
+
   module Sandbox_
     TestSupport_::Sandbox.enhance( self ).kiss_with 'KLS_'
   end

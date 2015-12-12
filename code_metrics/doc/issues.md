@@ -1,3 +1,4 @@
+[#014] #open #in-situ about argv limits in shells..
 [#013]       the tally visualation (assets)
 [#012]     #gotcha inline - flickering near helpscreens
 [#011]    #investigate how to pipe from one process to another from ruby

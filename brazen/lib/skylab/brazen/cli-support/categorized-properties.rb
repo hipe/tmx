@@ -122,6 +122,14 @@ module Skylab::Brazen
           ACHIEVED_
         end
 
+        def release_any_many
+          x = @many_a
+          if x
+            @many_a = nil
+            x
+          end
+        end
+
         def pop_many
           x = @many_a.pop
           if @many_a.length.zero?
@@ -184,7 +192,7 @@ module Skylab::Brazen
 
         def determine_placement_for_any_many
           if ! @many_a.nil?
-            determine_placement_for_any_many
+            determine_placement_for_many
           end
         end
 
