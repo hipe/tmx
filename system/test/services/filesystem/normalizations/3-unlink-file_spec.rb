@@ -25,7 +25,7 @@ module Skylab::System::TestSupport
 
         :path, _path,
         :probably_exists,
-        & handle_event_selectively
+        & handle_event_selectively_
       )
 
       expect_not_OK_event :errno_enoent

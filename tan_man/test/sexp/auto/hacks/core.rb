@@ -181,7 +181,7 @@ module Skylab::TanMan::TestSupport
 
         :generated_grammar_dir_path, existent_testing_GGD_path,
 
-        & handle_event_selectively )
+        & handle_event_selectively_ )
 
       nil
     end

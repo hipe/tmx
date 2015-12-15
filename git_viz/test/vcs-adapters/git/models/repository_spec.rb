@@ -12,9 +12,13 @@ module Skylab::GitViz::TestSupport
     end
 
     it "pings" do
+
       x = front_.ping
-      expect_OK_event :ping, "hello from front."
+
+      expect_neutral_event :ping, "hello from front."
+
       x.should eql :hello_from_front
+
       expect_no_more_events
     end
 
@@ -37,17 +41,17 @@ module Skylab::GitViz::TestSupport
     it "resolve when provide a path that totally doesn't exist - x" do
 
       init_respository_via_path_ '/totally/doesn-t-exist'
-      __expect_totally_doesnt_exist
+
+      _ev = start_directory_noent_
+
+      __expect_totally_doesnt_exist _ev
     end
 
-    def __expect_totally_doesnt_exist
+    def __expect_totally_doesnt_exist ev
 
-      ev = expect_not_OK_event :start_directory_does_not_exist
       ev.exception or fail
       ev.prop or fail
       ev.start_path.should eql '/totally/doesn-t-exist'
-
-      expect_failed
     end
 
     it "give it a FILE in a dir that is a repo - WORKS" do

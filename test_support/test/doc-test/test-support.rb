@@ -105,10 +105,6 @@ module Skylab::TestSupport::TestSupport::DocTest
       end
     end
 
-    def black_and_white_expression_agent_for_expect_event
-      Home_.lib_.brazen::API.expression_agent_instance
-    end
-
     define_method :next_interesting_line_dedented, -> do
       rx = /\A[[:space:]]*/
       -> do

@@ -7,7 +7,7 @@ module Skylab::Brazen::TestSupport
     TS_[ self ]
     use :expect_event
 
-    it "ping the workspace silo" do
+    it "ping the workspace silo", wip: true do
 
       call_API :workspace, :ping
 
@@ -17,7 +17,7 @@ module Skylab::Brazen::TestSupport
       @result.should eql :_hello_from_brazen_
     end
 
-    it "when provide path=(empty dir) and maxdirs=1, workspace directory is empty" do
+    it "when provide path=(empty dir) and maxdirs=1, workspace directory is empty", wip: true do
 
       _prepare_ws_tmpdir
 
@@ -33,7 +33,7 @@ module Skylab::Brazen::TestSupport
       expect_succeeded
     end
 
-    it "when provide 'good' path and maxdirs=`, OK" do
+    it "when provide 'good' path and maxdirs=`, OK", wip: true do
 
       _prepare_ws_tmpdir <<-O.unindent
         --- /dev/null
@@ -65,7 +65,7 @@ module Skylab::Brazen::TestSupport
       expect_failed
     end
 
-    it "summarize (a development proxy of 'plural_noun')" do
+    it "summarize (a development proxy of 'plural_noun')", wip: true do
 
       _prepare_ws_tmpdir <<-O.unindent
         --- /dev/null
@@ -82,7 +82,9 @@ module Skylab::Brazen::TestSupport
       call_API :workspace, :summarize,
         :path, __ws_tmpdir.to_path
 
-      ev = expect_event :summary
+      _em = expect_event :summary
+      ev = _em.cached_event_value
+
       ev.express_into_under y=[], black_and_white_expression_agent_for_expect_event
       scn = Home_::Callback_::Stream.via_nonsparse_array y
       scn.gets.should match %r(\Asummary of «.+#{ ::Regexp.escape cfg_filename }»:\z)

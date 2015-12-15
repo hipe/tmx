@@ -27,7 +27,7 @@ module Skylab::Parse::TestSupport
 
         in_st = the_empty_input_stream
 
-        _go( in_st, & handle_event_selectively ).should eql false
+        _go( in_st, & handle_event_selectively_ ).should eql false
 
         _ev = _expect_common_event
         black_and_white( _ev ).should eql( _at_end_expecting 'frodo', 'bilbo' )
@@ -37,7 +37,7 @@ module Skylab::Parse::TestSupport
 
         in_st = input_stream_via_array %w( bilbo dazoink )
 
-        _go( in_st, & handle_event_selectively ).value_x.should eql :__bilbo__
+        _go( in_st, & handle_event_selectively_ ).value_x.should eql :__bilbo__
 
         in_st.current_index.should eql 1
       end
@@ -46,7 +46,7 @@ module Skylab::Parse::TestSupport
 
         in_st = input_stream_via_array %w( frodo nodo )
 
-        _go( in_st, & handle_event_selectively ).should eql false
+        _go( in_st, & handle_event_selectively_ ).should eql false
 
         ev = _expect_common_event
 
@@ -65,7 +65,7 @@ module Skylab::Parse::TestSupport
 
         in_st = input_stream_via_array %w( frodo )
 
-        _go( in_st, & handle_event_selectively ).should eql false
+        _go( in_st, & handle_event_selectively_ ).should eql false
 
         black_and_white( _expect_common_event ).should eql(
           _at_end_expecting 'baggins' )
@@ -77,7 +77,7 @@ module Skylab::Parse::TestSupport
 
         in_st = input_stream_via_array %w( nodo )
 
-        _go( in_st, & handle_event_selectively ).should eql false
+        _go( in_st, & handle_event_selectively_ ).should eql false
 
         black_and_white( _expect_common_event ).should eql(
           "#{ _uninterpretable 'nodo' }#{ _expecting 'frodo', 'bilbo' }" )
@@ -125,7 +125,7 @@ module Skylab::Parse::TestSupport
 
         in_st = input_stream_via_array %w( xx yy )
 
-        _go( in_st, & handle_event_selectively ).value_x.should(
+        _go( in_st, & handle_event_selectively_ ).value_x.should(
           eql :__xx_yy__ )
 
         in_st.current_index.should eql 2
@@ -151,10 +151,6 @@ module Skylab::Parse::TestSupport
 
     def _go in_st, & x_p
       _subject_f.output_node_via_input_stream in_st, & x_p
-    end
-
-    def _expect_common_event
-      expect_not_OK_event :expecting
     end
 
     def _uninterpretable s
@@ -195,5 +191,11 @@ module Skylab::Parse::TestSupport
         Home_.function :item_from_matrix
       end
     end  # >>
+
+    def _expect_common_event
+
+      _em = expect_not_OK_event :expecting
+      _em.cached_event_value
+    end
   end
 end

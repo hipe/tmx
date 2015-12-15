@@ -7,8 +7,11 @@ module Skylab::TanMan::TestSupport
   class Models::Dot_File::Client
 
     def initialize
+
       @on_event_selectively = -> * i_a, & ev_p do
+
         ev = ev_p[]
+
         if :using_parser_files != ev.terminal_channel_i
           raise ev.to_exception
         end

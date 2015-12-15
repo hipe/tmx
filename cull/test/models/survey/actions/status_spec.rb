@@ -2,14 +2,14 @@ require_relative '../../../test-support'
 
 module Skylab::Cull::TestSupport
 
-  describe "[cu] models - survey status" do
+  describe "[cu] models - survey - status" do
 
     TS_[ self ]
     use :expect_event
 
     it "with a noent path" do
       against TS_.dir_pathname.join( 'no-ent' ).to_path
-      expect_not_OK_event :start_directory_does_not_exist
+      expect_not_OK_event_ :start_directory_does_not_exist
       expect_failed
     end
 
@@ -40,7 +40,7 @@ module Skylab::Cull::TestSupport
       x = scn.gets
       while x
         count += 1
-        x.express_into_under y, expression_agent_for_expect_event
+        x.express_into_under y, default_expression_agent_for_expect_event
         x = scn.gets
       end
       count.should eql 1

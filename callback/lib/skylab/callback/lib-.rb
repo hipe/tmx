@@ -25,7 +25,12 @@ module Skylab::Callback
       -> x { p[ x ] }
     end.call
 
-    StringScanner = -> do
+    String_IO = Lazy.call do
+      require 'stringio'
+      ::StringIO
+    end
+
+    StringScanner = Lazy.call do
       require 'strscan'
       ::StringScanner
     end

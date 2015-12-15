@@ -4,6 +4,8 @@ module Skylab::Callback
 
     class Event
 
+      Models_ = ::Module.new
+
       class Models_::Expression_Agent  # :[#010].
 
         # used for 'description' of events (typically for development & tests)

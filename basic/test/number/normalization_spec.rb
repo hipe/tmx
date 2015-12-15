@@ -8,7 +8,7 @@ module Skylab::Basic::TestSupport::Numeric
 
   extend TestSupport_::Quickie
 
-  describe "[ba] number normalization" do
+  describe "[ba] number normalization", wip: true do
 
     extend TS_
     use :expect_event

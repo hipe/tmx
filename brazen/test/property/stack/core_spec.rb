@@ -20,7 +20,7 @@ module Skylab::Brazen::TestSupport
     end
 
     it "the first frame determines what names the subsequent frames may have" do
-      stack = _subject.new( & handle_event_selectively )
+      stack = _subject.new( & handle_event_selectively_ )
       stack.push_frame_with :a, :X, :b, :Y
       x = stack.push_frame_with :derp, :Z, :b, :B, :nerp, :Q
       x.should eql false
@@ -52,7 +52,7 @@ module Skylab::Brazen::TestSupport
     end
 
     it "strange value when event receiver produces the same event as earlier" do
-      stack = _subject.new( & handle_event_selectively )
+      stack = _subject.new( & handle_event_selectively_ )
       stack.push_frame_with :a, :A1, :b, :B1
       stack.push_frame_with :b, :B2
       x = stack.property_value_via_symbol :c

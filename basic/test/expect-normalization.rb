@@ -19,7 +19,7 @@ module Skylab::Basic
 
       _cls = subject
 
-      _oes_p = handle_event_selectively
+      _oes_p = handle_event_selectively_
 
       @input_arg = _mock_argument x
 

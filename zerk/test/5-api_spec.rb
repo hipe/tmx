@@ -27,13 +27,13 @@ module Skylab::Zerk::TestSupport
 
       it "with no args fails talking bout ended prematurely" do
         @result = call
-        expect_not_OK_event :request_ended_prematurely
+        expect_not_OK_event_ :request_ended_prematurely
         expect_failed
       end
 
       it "with any args fails talking bout expecting nothing" do
         @result = call :foo
-        expect_not_OK_event :child_not_found
+        expect_not_OK_event_ :child_not_found
         expect_failed
       end
     end
@@ -125,21 +125,21 @@ module Skylab::Zerk::TestSupport
       it "a 'quit' button is unreachable" do
         with_branch_with M2::Quit_Button
         @result = call :quit
-        expect_not_OK_event :child_not_found
+        expect_not_OK_event_ :child_not_found
         expect_failed
       end
 
       it "an 'up' button is unreachable" do
         with_branch_with M2::Up_Button
         @result = call :up
-        expect_not_OK_event :child_not_found
+        expect_not_OK_event_ :child_not_found
         expect_failed
       end
 
       it "with just the field and nothing else" do
         with_branch_with M2::Field_Field
         @result = call :field
-        expect_not_OK_event :request_ended_prematurely,
+        expect_not_OK_event_ :request_ended_prematurely,
           "field error: request ended prematurely - expecting value for 'field'"
         expect_failed
       end
@@ -147,13 +147,13 @@ module Skylab::Zerk::TestSupport
       it "when you do provide a value for the field" do
         with_branch_with M2::Field_Field
         @result = call :field, :x
-        expect_not_OK_event :request_ended_prematurely
+        expect_not_OK_event_ :request_ended_prematurely
         expect_failed
       end
 
       it "ok let's see the money" do
         @result = call :field, :x, :be_excited, :go
-        expect_OK_event :yep, "HELLO X"
+        expect_OK_event_ :yep, "HELLO X"
         unwrap_result
         expect_succeeded
       end
@@ -165,7 +165,7 @@ module Skylab::Zerk::TestSupport
         x.children.push x_
         @branch = x
         @result = call :foofie, :field, :y, :go
-        expect_OK_event :yep, "hello y"
+        expect_OK_event_ :yep, "hello y"
         unwrap_result
         expect_succeeded
       end

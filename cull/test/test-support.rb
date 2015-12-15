@@ -57,7 +57,7 @@ module Skylab::Cull::TestSupport
 
     # ~ mutable workspace methods
 
-    def prepare_tmpdir_with_patch sym
+    def prepare_tmpdir_with_patch_ sym
       td = prepare_tmpdir
       td.patch_via_path TS_::Fixtures::Patches[ sym ]
       td
@@ -88,11 +88,30 @@ module Skylab::Cull::TestSupport
       Config_filename___[]
     end
 
-    # ~ #hook-outs for [br]
+    # ~ retrofit
 
-    def black_and_white_expression_agent_for_expect_event
-      Home_::Brazen_::API.expression_agent_instance
+    def expect_not_OK_event_ sym
+
+      em = expect_not_OK_event
+      em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
+      em
     end
+
+    def expect_event_ sym
+
+      em = expect_event
+      em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
+      em
+    end
+
+    def expect_OK_event_ sym
+
+      em = expect_OK_event
+      em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
+      em
+    end
+
+    # ~ #hook-outs for [br]
 
     def subject_API
       Home_::API

@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::CodeMetrics::TestSupport
 
-  describe "[cm] tally - 2 - 4: digraph" do
+  describe "[cme] tally - 2 - 4: digraph" do
 
     # this test is based around trying to generate a document that is
     # structurally similar to [#013]/document-1.

@@ -10,7 +10,8 @@ module Skylab::GitViz::TestSupport
     it "noent - soft error" do
 
       bundle_against_ '/m03/repo/xx/not-there'
-      expect_failed_by :start_directory_does_not_exist
+
+      start_directory_noent_
     end
 
     it "file - soft error" do

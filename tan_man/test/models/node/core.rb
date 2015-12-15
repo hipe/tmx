@@ -81,7 +81,7 @@ module Skylab::TanMan::TestSupport
 
       id = silo.silo_module.node_identifier
 
-      oes_p = handle_event_selectively
+      oes_p = handle_event_selectively_
 
       action = Mock_Action___.new(
         send( :"__via__#{ input_mechanism_i }__build_byte_upstream_identifier" ),

@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - node criteria - library (02)" do
+  describe "[sg] models - criteria - library (02)" do
 
     extend TS_
     use :expect_event
@@ -17,7 +17,7 @@ module Skylab::Snag::TestSupport
 
       st = input_stream_via_array %w( is blue and pink or green )
 
-      _x = against_ st, & handle_event_selectively # , & _ignore_expecting
+      _x = against_ st, & handle_event_selectively_  # , & _ignore_expecting
       __expect_result_for_ambiguity _x, st
     end
 
@@ -25,9 +25,9 @@ module Skylab::Snag::TestSupport
 
       x.should eql false
 
-      _ev = expect_not_OK_event :ambiguous
+      _em = expect_not_OK_event :ambiguity
 
-      black_and_white( _ev ).should eql(
+      black_and_white( _em.cached_event_value ).should eql(
         "'or' is ambiguous here because of a previous \"and\"" )
 
       st.current_index.should eql 0
@@ -58,9 +58,9 @@ module Skylab::Snag::TestSupport
         or is green
         and is lavender )
 
-      _x = against_ st, & handle_event_selectively
+      _x = against_ st, & handle_event_selectively_
 
-      expect_not_OK_event :ambiguous
+      expect_not_OK_event :ambiguity
       _x.should eql false
     end
 
@@ -138,7 +138,7 @@ module Skylab::Snag::TestSupport
 
       -> * i_a, & ev_p do
         if :expecting != i_a.last
-          handle_event_selectively.call( * i_a, & ev_p )
+          handle_event_selectively_.call( * i_a, & ev_p )
         end
       end
     end

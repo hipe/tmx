@@ -16,11 +16,9 @@ module Skylab::Snag::TestSupport
 
         _call :node_identifier, 10, :tag, :x
 
-        _ev = expect_not_OK_event :component_not_found
+        _em = expect_not_OK_event :component_not_found
 
-        _s = black_and_white _ev
-
-        _s.should match(
+        black_and_white( _em.cached_event_value ).should match(
           /\Athere is no node '\[#10\]' in [^ ]+sutherlands\./ )
 
         expect_failed
@@ -30,11 +28,9 @@ module Skylab::Snag::TestSupport
 
         _call :node_identifier, 1, :tag, :three
 
-        _ev = expect_not_OK_event :component_not_found
+        _em = expect_not_OK_event :component_not_found
 
-        _s = black_and_white _ev
-
-        _s.should eql(
+        black_and_white( _em.cached_event_value ).should eql(
           "node [#1] does not have tag '#three'" )  # :+[#015]
 
         expect_failed
@@ -51,8 +47,10 @@ module Skylab::Snag::TestSupport
         scn.next_line.should eql "[#3]   donald #four\n"
         scn.next_line.should be_nil
 
-        _ev = expect_OK_event :component_removed
-        black_and_white( _ev ).should eql "removed tag #two from node [#1]"
+        _em = expect_OK_event :component_removed
+
+        black_and_white( _em.cached_event_value ).should eql(
+          "removed tag #two from node [#1]" )
 
         expect_noded_ 1
       end
@@ -69,8 +67,10 @@ module Skylab::Snag::TestSupport
           :upstream_identifier, my_tmpfile_path,
           :node_identifier, 1, :tag, :one
 
-        ev = expect_OK_event( :component_removed ).to_event
+        ev = expect_OK_event( :component_removed ).cached_event_value.to_event
+
         ev.component.intern.should eql :one
+
         black_and_white( ev ).should eql "removed tag #one from node [#1]"
 
         @result.ID.to_i.should eql 1

@@ -77,7 +77,7 @@ module Skylab::CSS_Convert::TestSupport
       # if the parser emits old-style resource-based events,
       # we turn them into new-style selective events.
 
-      p = handle_event_selectively  # from `expect_event`
+      p = event_log.handle_event_selectively  # from `expect_event`
 
       _rsx = Selective_Listener_as_Resources___.new( & p )
 

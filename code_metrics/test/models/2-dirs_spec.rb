@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::CodeMetrics::TestSupport
 
-  describe "[cm] models - 2. dirs" do
+  describe "[cme] models - 2. dirs" do
 
     TS_[ self ]
     use :expect_event

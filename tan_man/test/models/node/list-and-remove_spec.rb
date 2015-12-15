@@ -13,7 +13,7 @@ module Skylab::TanMan::TestSupport
         :workspace_path, dir( :with_freshly_initted_conf ),
         :config_filename, 'tan-man.conf'
 
-      ev = expect_not_OK_event :property_not_found
+      ev = expect_not_OK_event( :property_not_found ).cached_event_value
 
       ev.to_event.invite_to_action.should eql [ :graph, :use ]
 
@@ -46,8 +46,10 @@ module Skylab::TanMan::TestSupport
         :workspace_path, dir( :two_nodes ),
         :config_filename, cfn_shallow
 
-      ev = expect_neutral_event :component_not_found
-      ev.to_event.entity_name_string.should eql 'berk'
+      _em = expect_neutral_event :component_not_found
+
+      _em.cached_event_value.to_event.entity_name_string.should eql 'berk'
+
       expect_failed
     end
 
@@ -64,7 +66,7 @@ module Skylab::TanMan::TestSupport
         :workspace_path, @workspace_path,
         :config_filename, cfn_shallow
 
-      ev = expect_OK_event( :wrote_resource ).to_event
+      ev = expect_OK_event( :wrote_resource ).cached_event_value.to_event
       ev.is_completion.should eql true
       ev.bytes.should eql 14
 

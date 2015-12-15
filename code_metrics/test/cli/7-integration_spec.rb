@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::CodeMetrics::TestSupport
 
-  describe "[cm] CLI - integration" do
+  describe "[cme] CLI - integration" do
 
     TS_[ self ]
     use :CLI_support_expectations

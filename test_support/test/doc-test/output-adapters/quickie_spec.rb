@@ -60,7 +60,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       def against business_module_name, desc_line, code_line_a
 
-        _oa = subject.output_adapter false, & handle_event_selectively  # is known dry
+        _oa = subject.output_adapter false, & _handle_event_selectively  # is known dry
 
         _mns = mock_node_stream desc_line, code_line_a
 
@@ -106,19 +106,24 @@ module Skylab::TestSupport::TestSupport::DocTest
         _output_path = TS_.dir_pathname.join(
           'integration/final/top_spec.rb' ).to_path
 
-        @result = DocTest_::API.call :generate,
+        @result = DocTest_::API.call(
+          :generate,
           :upstream_path, _input_path,
           :output_path, _output_path,
           :dry_run,
           :force,
           :output_adapter, :quickie,
-          :on_event_selectively, handle_event_selectively
+          :on_event_selectively, _handle_event_selectively,
+        )
 
         expect_neutral_event :before_editing_existing_file
         expect_neutral_event :wrote
         expect_no_more_events
-
       end
+    end
+
+    def _handle_event_selectively
+      event_log.handle_event_selectively
     end
 
     def subject

@@ -37,7 +37,7 @@ module Skylab::Basic::TestSupport
         :begin, -1,
         :end, 2,
         :x, x,
-        & handle_event_selectively )
+        & handle_event_selectively_ )
       NIL_
     end
 
@@ -49,8 +49,10 @@ module Skylab::Basic::TestSupport
 
       false == @result or fail
 
-      ev = expect_event :actual_property_is_outside_of_formal_property_set
-      actual_s = black_and_white ev
+      _em = expect_event_ :actual_property_is_outside_of_formal_property_set
+
+      actual_s = black_and_white _em.cached_event_value
+
       if x.respond_to? :ascii_only?
         actual_s.should eql x
       else

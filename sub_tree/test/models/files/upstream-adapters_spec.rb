@@ -15,9 +15,9 @@ module Skylab::SubTree::TestSupport
         :input_stream, mock_noninteractive_IO_,
         :output_stream, :x
 
-      _ev = expect_not_OK_event
+      _em = expect_not_OK_event
 
-      black_and_white( _ev ).should match(
+      black_and_white( _em.cached_event_value ).should match(
         /\Acan't read input from both #{
           }[^a-z]*file-of-input-paths[^a-z ]*#{
           } and #{
@@ -34,9 +34,9 @@ module Skylab::SubTree::TestSupport
         :path, [ :x ],
         :output_stream, :x
 
-      _ev = expect_not_OK_event
+      _em = expect_not_OK_event
 
-      _ev.to_event.a.map( & :name_symbol ).should eql(
+      _em.cached_event_value.to_event.a.map( & :name_symbol ).should eql(
         [ :file_of_input_paths, :path ] )
 
       expect_failed
@@ -49,9 +49,9 @@ module Skylab::SubTree::TestSupport
         :input_stream, mock_noninteractive_IO_,
         :output_stream, :x
 
-      _ev = expect_not_OK_event
+      _em = expect_not_OK_event
 
-      black_and_white( _ev ).should eql(
+      black_and_white( _em.cached_event_value ).should eql(
         "can't read input from #{
         }«file-of-input-paths»#{
         }, #{

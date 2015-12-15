@@ -126,7 +126,7 @@ module Skylab::Plugin
         ACHIEVED_
       else
 
-        @_module = __build_and_load_module
+        @_module = ___build_and_load_module
       end
 
       if is_final
@@ -137,24 +137,33 @@ module Skylab::Plugin
       end
     end
 
-    def __build_and_load_module
+    def ___build_and_load_module  # assume the const is not defined
 
-      et = @_this_entry_tree
+      # et = @_entry_tree  # not used here, but remember that we have it
+      et_ = @_this_entry_tree
 
-      o = ::Module.new
-      @_module.const_set @_const, o
-      @_module.autoloaderize_with_normpath_value et, o
+      # if there is an asset to load the onus is on us to autoloaderize the
+      # asset. otherwise (and there is no asset to load) we will create and
+      # autoloaderize it and be are done. for parsimony, in both cases we:
 
-      # we require and not load the file because a child node may have
-      # already loaded this node as a parent before this actor's invocation
+      mod = ::Module.new
+      @_module.const_set @_const, mod
+      @_module.autoloaderize_with_normpath_value et_, mod
 
-      if et.can_produce_load_file_path
-        ::Kernel.require et.get_require_file_path
-      else
-        # nothing to load. there is no such file.
+      # if there is a "foo/" directory the path to require is normally
+      # "foo/core.rb". however we still check for and use any "foo.rb"
+      # because e.g [#ca-065] wants us to anticipate the possibility of
+      # abnormal trees like this (so that the public file can be shallow
+      # but the test code can be deep).
+
+      if et_.can_produce_load_file_path
+
+        ::Kernel.load et_.get_load_file_path
       end
 
-      o
+      # (it's entirely common to have a node that is only taxonomic (no asset))
+
+      mod
     end
 
     def __load_final_file

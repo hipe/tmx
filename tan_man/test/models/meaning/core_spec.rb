@@ -133,10 +133,11 @@ module Skylab::TanMan::TestSupport
         :input_string, _input_string,
         :output_string, output_string
 
-      ev = expect_OK_event :updated_attributes
+      _em = expect_OK_event :updated_attributes
+
       expect_succeeded
 
-      black_and_white( ev ).should eql(
+      black_and_white( _em.cached_event_value ).should eql(
         "on node 'fizzle' added attributes: [ style=filled, fillcolor=#79f234 ]" )
 
       scn = TestSupport_::Expect_Line::Scanner.via_string output_string

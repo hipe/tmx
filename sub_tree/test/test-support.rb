@@ -44,6 +44,10 @@ module Skylab::SubTree::TestSupport
       TestSupport_.debug_IO
     end
 
+    def handle_event_selectively_
+      event_log.handle_event_selectively
+    end
+
     _MID = 'fixture-trees'
     define_method :fixture_tree, ( -> do
       cache = {}

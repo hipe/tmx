@@ -17,9 +17,9 @@ module Skylab::Cull::TestSupport
 
       markdown_map_against_file :zero_bytes
 
-      ev = expect_not_OK_event( :early_end_of_stream ).to_event
+      _em = expect_not_OK_event :early_end_of_stream
 
-      black_and_white( ev ).should match(
+      black_and_white( _em.cached_event_value ).should match(
         /\Aearly end of stream - there were no markdown tables anywhere/ )
 
       expect_failed
@@ -64,8 +64,9 @@ module Skylab::Cull::TestSupport
 
       map_against_file :GFM_misc, :table_number, '0'
 
-      ev = expect_not_OK_event :number_too_small
-      black_and_white( ev ).should match(
+      _em = expect_not_OK_event_ :number_too_small
+
+      black_and_white( _em.cached_event_value ).should match(
         /\A'table-number' must be greater than or equal to 1, had '0'/ )
 
       expect_failed
@@ -75,8 +76,9 @@ module Skylab::Cull::TestSupport
 
       map_against_file :GFM_misc, :table_number, '6'
 
-      ev = expect_not_OK_event :early_end_of_stream
-      black_and_white( ev ).should match(
+      _em = expect_not_OK_event :early_end_of_stream
+
+      black_and_white( _em.cached_event_value ).should match(
         / - needed 6 but had only 5 markdown tables in the entirety of the\b/ )
 
       expect_failed

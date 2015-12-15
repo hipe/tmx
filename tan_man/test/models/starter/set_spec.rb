@@ -54,8 +54,9 @@ module Skylab::TanMan::TestSupport
         :workspace_path, volatile_tmpdir.to_path,
         :config_filename, cfn
 
-      ev = expect_not_OK_event :config_parse_error
-      a = black_and_white_lines ev.to_event
+      _em = expect_not_OK_event :config_parse_error
+
+      a = black_and_white_lines _em.cached_event_value.to_event
       a[ 0 ].should eql 'section expected in config:1:1'
       a[ 1 ].should eql "  1: using_starter=hoitus-toitus.dot\n"
       a[ 2 ].should eql "     ^"
@@ -81,9 +82,11 @@ module Skylab::TanMan::TestSupport
         :config_filename, cfn
 
       expect_OK_event :normalized_value
-      expect_OK_event :collection_resource_committed_changes do |ev|
-        ev.to_event.bytes.should eql 64
-      end
+
+      _ev = expect_committed_changes_
+
+      _ev.to_event.bytes.should eql 64
+
       expect_succeeded
 
       @output_s = @pn.read

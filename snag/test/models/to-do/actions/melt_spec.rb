@@ -30,9 +30,9 @@ module Skylab::Snag::TestSupport
 
     def _expect_same
 
-      _ev = expect_neutral_event :no_matches
+      _em = expect_neutral_event :no_matches
 
-      black_and_white( _ev ).should match(
+      black_and_white( _em.cached_event_value ).should match(
         /\Athere are no found todos #{
          }in files whose name matched "\*\.[a-z]{2,4}" #{
           }in «[^»]+»\z/ )
@@ -47,8 +47,9 @@ module Skylab::Snag::TestSupport
         :path, [ Fixture_tree_[ :some_todos ] ],
         :name, [ '*.code' ]
 
-      _ev = expect_neutral_event :no_matches
-      black_and_white( _ev ).should match(
+      _em = expect_neutral_event :no_matches
+
+      black_and_white( _em.cached_event_value ).should match(
         /\Aof the 3 found todos, #{
         }none of them have message content after them #{
         }in files whose name matched "\*\.code" #{
@@ -82,7 +83,8 @@ module Skylab::Snag::TestSupport
 
       expect_OK_event :wrote
 
-      ev = expect_neutral_event :process_line
+      ev = expect_neutral_event( :process_line ).cached_event_value
+
       black_and_white( ev ).should match %r(\Apatching file .+jeebis.sc$)
 
       fh = ::File.open @_source_pn.to_path
@@ -96,7 +98,7 @@ module Skylab::Snag::TestSupport
       fh.gets.should eql "[#001]       we should fix this\n"
       fh.gets.should be_nil
 
-      ev = expect_OK_event( :summary ).to_event
+      ev = expect_OK_event( :summary ).cached_event_value.to_event
       ev.number_of_files_seen_here.should eql 1
       ev.number_of_qualified_matches.should eql 1
       ev.number_of_seen_matches.should eql 1
@@ -124,9 +126,10 @@ module Skylab::Snag::TestSupport
       expect_neutral_event :process_line
       expect_OK_event :wrote
       expect_neutral_event :process_line
-      _ev = expect_OK_event :summary
 
-      black_and_white( _ev ).should eql(
+      _em = expect_OK_event :summary
+
+      black_and_white( _em.cached_event_value ).should eql(
         '(dryly) changed the 3 qualified todos of 5 todos in 2 files' )
 
       expect_succeeded

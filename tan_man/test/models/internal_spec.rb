@@ -9,30 +9,56 @@ module Skylab::TanMan::TestSupport
     context "the `paths` node (and more importantly, procs as nodes)" do
 
       it "missing" do
+
         call_API :paths
-        ev = expect_not_OK_event :missing_required_properties
-        black_and_white( ev ).should match %r(\bmissing required arguments 'path' and 'verb')
+
+        _em = expect_not_OK_event :error
+
+        ev = _em.cached_event_value.to_event
+
+        :missing_required_properties == ev.terminal_channel_symbol or fail
+
+        black_and_white( ev ).should match(
+          %r(\bmissing required arguments 'path' and 'verb') )
+
         expect_failed
       end
 
       it "extra" do
+
         call_API :paths, :wiz, :waz, :wazoozle
-        ev = expect_not_OK_event :extra_properties
-        black_and_white( ev ).should match %r(\bunexpected arguments :wiz and :wazoozle)
+
+        _em = expect_not_OK_event :error
+
+        ev = _em.cached_event_value.to_event
+
+        :extra_properties == ev.terminal_channel_symbol or fail
+
+        black_and_white( ev ).should match(
+          %r(\bunexpected arguments :wiz and :wazoozle) )
+
         expect_failed
       end
 
       it "strange verb" do
+
         call_API :paths, :path, :generated_grammar_dir, :verb, :wiznippl
-        ev = expect_not_OK_event :unrecognized_verb
-        ev.verb.should eql :wiznippl
+
+        _em = expect_not_OK_event :unrecognized_verb
+
+        _em.cached_event_value.verb.should eql :wiznippl
+
         expect_failed
       end
 
       it "strange noun" do
+
         call_API :paths, :path, :waznoozle, :verb, :retrieve
-        ev = expect_not_OK_event :unknown_path
-        ev.did_you_mean.should be_include :generated_grammar_dir
+
+        _em = expect_not_OK_event :unknown_path
+
+        _em.cached_event_value.did_you_mean.should be_include :generated_grammar_dir
+
         expect_failed
       end
 

@@ -31,7 +31,12 @@ module Skylab::Brazen::TestSupport
         :workspace_path,
         TestSupport_::Fixtures.file( :not_here )
 
-      expect_not_OK_event :start_directory_does_not_exist
+      _em = expect_not_OK_event :start_directory_is_not_directory
+
+      _sym = _em.cached_event_value.to_event.terminal_channel_symbol
+
+      :start_directory_does_not_exist == _sym or fail
+
       expect_failed
     end
 
@@ -41,8 +46,14 @@ module Skylab::Brazen::TestSupport
         :workspace_path,
         TestSupport_::Fixtures.dir( :empty_esque_directory )
 
-      ev = expect_not_OK_event :workspace_not_found
-      ev.to_event.invite_to_action.should eql [ :init ]
+      _em = expect_not_OK_event :resource_not_found
+
+      ev = _em.cached_event_value.to_event
+
+      :workspace_not_found == ev.terminal_channel_symbol or fail
+
+      _em.cached_event_value.to_event.invite_to_action.should eql [ :init ]
+
       expect_failed
     end
   end

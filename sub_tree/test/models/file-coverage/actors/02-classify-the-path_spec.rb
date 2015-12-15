@@ -95,7 +95,7 @@ module Skylab::SubTree::TestSupport
     def where
       yield
       @result = subject_::Actors_::Classify_the_path[
-        @test_dir, @path, & handle_event_selectively ]
+        @test_dir, @path, & handle_event_selectively_ ]
       NIL_
     end
 

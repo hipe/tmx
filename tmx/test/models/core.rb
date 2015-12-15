@@ -20,7 +20,7 @@ module Skylab::TMX::TestSupport
       block_given? and self._NOT_YET
 
       _o = front_
-      @result = _o.call( * x_a, & handle_event_selectively )
+      @result = _o.call( * x_a, & event_log.handle_event_selectively )
       NIL_
     end
 

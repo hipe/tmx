@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::CodeMetrics::TestSupport
 
-  describe "[cm] models - 1. line count" do
+  describe "[cme] models - 1. line count" do
 
     TS_[ self ]
     use :expect_event
@@ -27,12 +27,13 @@ module Skylab::CodeMetrics::TestSupport
 
       call_API :line_count, * _same
 
-      _conj = _expect_these_events
-      y = _conj.linecount_NLP_frame.express_into_line_context( [] )
+      _linecount_NLP_frame = _expect_these_events
+
+      y = _linecount_NLP_frame.express_into_line_context( [] )
 
       y.should eql [ 'including blank lines and comment lines' ]
 
-      expect_neutral_event :wc_command
+      expect_freeform_event :wc_command
       expect_no_more_events
 
       totes = @result
@@ -62,14 +63,14 @@ module Skylab::CodeMetrics::TestSupport
         :without_comment_lines,
         :without_blank_lines
 
-      _conj = _expect_these_events
+      _linecount_NLP_frame = _expect_these_events
 
-      y = _conj.linecount_NLP_frame.express_into_line_context []
+      y = _linecount_NLP_frame.express_into_line_context []
 
       y.should eql [ 'excluding blank lines and comment lines' ]
 
-      expect_neutral_event :wc_pipey_command_string
-      expect_neutral_event :wc_pipey_command_string
+      expect_freeform_event :wc_pipey_command_string
+      expect_freeform_event :wc_pipey_command_string
 
       totes = @result
       totes.count.should eql 4
@@ -81,10 +82,13 @@ module Skylab::CodeMetrics::TestSupport
 
     def _expect_these_events
 
-      expect_neutral_event :find_command_args
-      expect_neutral_event :file_list
-      expect_neutral_event :linecount_NLP_frame
+      expect_neutral_event :line_count_command
 
+      expect_freeform_event :file_list
+
+      _em = expect_freeform_event :linecount_NLP_frame
+
+      _em.cached_event_value
     end
   end
 end

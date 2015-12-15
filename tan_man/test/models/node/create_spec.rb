@@ -7,7 +7,7 @@ module Skylab::TanMan::TestSupport
     TS_[ self ]
     use :models_node
 
-    it "ping the 'node add' action" do
+    it "ping the 'node add' action", wip: true do
       call_API :node, :add, :ping
       expect_OK_event :ping_from_action, "ping from action - (ick :add)"
       expect_succeeded
@@ -126,9 +126,9 @@ module Skylab::TanMan::TestSupport
 
           touch_node_via_label "\t\t\n\x7F"
 
-          _ev = expect_not_OK_event :invalid_characters
+          _em = expect_not_OK_event :invalid_characters
 
-          black_and_white( _ev ).should eql exp
+          black_and_white( _em.cached_event_value ).should eql exp
 
           expect_no_more_events
         end

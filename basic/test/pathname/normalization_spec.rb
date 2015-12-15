@@ -10,7 +10,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
 
   extend TestSupport_::Quickie
 
-  describe "[ba] pathname normalization" do
+  describe "[ba] pathname normalization", wip: true do
 
     extend TS_
     use :expect_event

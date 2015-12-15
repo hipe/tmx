@@ -106,7 +106,7 @@ module Skylab::SubTree::TestSupport
 
       check and check[ unb ]
 
-      bnd = unb.new kernel_stub_, & handle_event_selectively
+      bnd = unb.new kernel_stub_, & handle_event_selectively_
 
       bnd.instance_variable_set :@nc, name_conventions_
       bnd.instance_variable_set :@be_verbose, false

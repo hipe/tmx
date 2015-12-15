@@ -10,13 +10,13 @@ module Skylab::BeautySalon::TestSupport
     it "number not number" do
 
       _with :num_chars_wide, 'zango'
-      expect_failed_by :uninterpretable_under_number_set
+      expect_failed_by_ :uninterpretable_under_number_set
     end
 
     it "number too low" do
 
       _with :num_chars_wide, -1
-      expect_failed_by :number_too_small
+      expect_failed_by_ :number_too_small
     end
 
     it "some money" do

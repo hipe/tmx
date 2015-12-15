@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Cull::TestSupport
 
-  describe "[cu] models - survey aggregators" do
+  describe "[cu] models - survey - aggregators" do
 
     TS_[ self ]
     use :expect_event
@@ -17,17 +17,17 @@ module Skylab::Cull::TestSupport
       expect_failed
     end
 
-
     it "add a good name" do
 
-      td = prepare_tmpdir_with_patch :with_fuzz_biff
+      td = prepare_tmpdir_with_patch_ :with_fuzz_biff
 
       call_API :survey, :edit,
         :add_aggregator, 'unique-features',
         :path, td.to_path
 
       expect_neutral_event :added_function_call
-      expect_OK_event :collection_resource_committed_changes
+
+      expect_OK_event_ :collection_resource_committed_changes
 
       content_of_the_file( td ).scan( /(?<=^function = ).+/ ).should(
         eql( [

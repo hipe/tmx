@@ -16,7 +16,7 @@ module Skylab::Snag::TestSupport
       _x = st.gets
       _x.should  eql false
 
-      expect_not_OK_event :errno_enoent
+      expect_not_OK_event :stat_error
     end
 
     it "uses flyweighting" do
@@ -66,9 +66,9 @@ module Skylab::Snag::TestSupport
       call_API :node, :to_stream,
         :identifier, '-12'
 
-      _ev = expect_not_OK_event( :uninterpretable_under_number_set ).to_event
+      _em = expect_not_OK_event :expecting_number
 
-      black_and_white( _ev ).should eql(
+      black_and_white( _em.cached_event_value ).should eql(
         "'node-identifier-number-component' #{
          }must be a non-negative integer, had '-12'" )
 

@@ -71,11 +71,15 @@ module Skylab::Cull::TestSupport
         :table_number, 3,
         :upstream, file( :minimal_json )
 
-      ( black_and_white expect_not_OK_event :early_end_of_stream ).should(
+      _em = expect_event :early_end_of_stream
 
-        match %r(\bJSON files are always exactly one entity #{
-        }collection.+table '3' was requested, but had only 1 table\b)
-      )
+      expect_no_more_events
+
+      black_and_white( _em.cached_event_value ).should match(
+
+        %r(\bJSON files are always exactly one entity #{
+         }collection.+table '3' was requested, but had only 1 table\b) )
+
       expect_failed
     end
   end

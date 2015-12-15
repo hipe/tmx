@@ -17,7 +17,7 @@ module Skylab::TanMan::TestSupport
 
       _expected_config_path = @ws_pn.join( config_filename ).to_path
 
-      expect_OK_event :collection_resource_committed_changes
+      expect_committed_changes_
 
       o = TestSupport_::Expect_Line::Scanner.via_line_stream(
         io = ::File.open( _expected_config_path ) )

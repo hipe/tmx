@@ -4,6 +4,12 @@ module Skylab::Callback::TestSupport
 
   class << self
 
+    def etc_ tcc
+      tcc.extend ModuleMethods
+      tcc.include InstanceMethods
+      NIL_
+    end
+
     def call_digraph_listeners_spy *a
 
       if a.length.zero?
@@ -29,7 +35,13 @@ module Skylab::Callback::TestSupport
   module ModuleMethods
 
     define_method :use, -> do
+
       cache = {}
+
+      cache[ :memoizer_methods ] = -> tcc do  # until etc.
+        TestSupport_::Memoization_and_subject_sharing[ tcc ]
+      end
+
       -> sym do
         ( cache.fetch sym do
           cache[ sym ] = TestSupport_.fancy_lookup sym, TS_
@@ -68,6 +80,7 @@ module Skylab::Callback::TestSupport
   KEEP_PARSING_ = true
   NEWLINE_ = "\n".freeze
   NIL_ = nil
+  UNABLE_ = false
 
   # ~ give these to the children
 

@@ -49,7 +49,7 @@ module Skylab::CodeMetrics::TestSupport
 
       def begin_files_slice_stream_session_
 
-        o = files_slice_stream_session_class_.new( & handle_event_selectively )
+        o = files_slice_stream_session_class_.new( & handle_event_selectively_ )
         o.chunk_size = 2
         o.system_conduit = Home_.lib_.open_3
         o

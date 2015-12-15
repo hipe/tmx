@@ -129,7 +129,6 @@ module Skylab::SubTree
               end
 
               y << "can't read input from #{ both _s_a }#{ and_ _s_a } at the same time"
-
             end
           end
           UNABLE_

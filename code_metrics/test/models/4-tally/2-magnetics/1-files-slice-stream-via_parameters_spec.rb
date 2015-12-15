@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::CodeMetrics::TestSupport
 
-  describe "[cm] tally - 2 - 1: files slice stream" do
+  describe "[cme] tally - 2 - 1: files slice stream", wip: true do
 
     TS_[ self ]
     use :memoizer_methods

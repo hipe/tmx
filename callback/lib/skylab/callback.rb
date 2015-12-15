@@ -943,6 +943,7 @@ module Skylab::Callback
   end
 
   DOT_ = '.'
+  EMPTY_H_ = {}.freeze
 
   module Autoloader  # read [#024] the new autoloader narrative
 
@@ -1315,16 +1316,25 @@ module Skylab::Callback
     class Normpath_
 
       def initialize parent_pn, file_entry, dir_entry
-        @dir_entry = dir_entry ; @file_entry = file_entry
-        block_given? and yield self
+
+        @file_entry = file_entry
+        @dir_entry = dir_entry
+
+        if block_given?
+          yield self
+        end
+
         if file_entry
           @norm_pathname = parent_pn.join file_entry.entry_s
         end
+
         if dir_entry
           @dir_pn ||= parent_pn.join dir_entry.entry_s
           @norm_pathname ||= @dir_pn
         end
+
         SANITY_CHECK__[ @norm_pathname ]
+
         @parent_pn = parent_pn
         @state_i = :not_loaded
         @value_is_known = false
@@ -1762,7 +1772,7 @@ module Skylab::Callback
       STATES__ = {
         not_loaded: { loading: true, loaded: true },
         loading: { loaded: true },
-        loaded: { }  # EMPTY_H_
+        loaded: EMPTY_H_,
       }
 
       def assert_state i

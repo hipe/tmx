@@ -32,9 +32,9 @@ module Skylab::TanMan::TestSupport
         :input_string, "wazoozle\n",
         :output_path, out_a
 
-      _ev = expect_not_OK_event :input_parse_error
+      _em = expect_not_OK_event :input_parse_error
 
-      black_and_white( _ev ).should eql(
+      black_and_white( _em.cached_event_value ).should eql(
         "expecting opening digraph line (e.g \"digraph{\") #{
           }near line 1: \"wazoozle\\n\"" )
 
@@ -163,5 +163,9 @@ module Skylab::TanMan::TestSupport
     end
 
     ignore_these_events :using_parser_files
+
+    def expression_agent_for_expect_event
+      black_and_white_expression_agent_for_expect_event  # BE CAREFUL
+    end
   end
 end

@@ -14,7 +14,7 @@ module Skylab::Snag::TestSupport
 
       o = _subject.send :new
 
-      o.append_tag :A, & handle_event_selectively
+      o.append_tag :A, & handle_event_selectively_
 
       o.to_tag_stream.map_by do | tag |
         tag.intern
@@ -27,9 +27,11 @@ module Skylab::Snag::TestSupport
 
       o = _subject.send :new
 
-      ok = o.prepend_tag :"#A", & handle_event_selectively
+      ok = o.prepend_tag :"#A", & handle_event_selectively_
 
-      expect_not_OK_event( :invalid_tag_stem ).tag_s.should eql '##A'
+      _em = expect_not_OK_event :invalid_tag_stem
+
+      _em.cached_event_value.tag_s.should eql '##A'
 
       ok.should eql false
     end
@@ -70,7 +72,7 @@ module Skylab::Snag::TestSupport
 
       o = _new_node_via_identifier_and_body _id( 4 ), _body
 
-      _ok = o.prepend_tag :boo, & handle_event_selectively
+      _ok = o.prepend_tag :boo, & handle_event_selectively_
       expect_no_events
       _ok or fail
 
@@ -95,7 +97,7 @@ module Skylab::Snag::TestSupport
 
       o = _new_node_via_identifier_and_body _id( 3 ), _body
 
-      _ok = o.append_tag :zoo, & handle_event_selectively
+      _ok = o.append_tag :zoo, & handle_event_selectively_
       expect_no_events
       _ok or fail
 

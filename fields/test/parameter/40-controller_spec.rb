@@ -40,7 +40,7 @@ module Skylab::Fields::TestSupport
           o = _object
           _x = o.normulize
 
-          expect_not_OK_event :missing,
+          expect_not_OK_event :missing_required_properties,
             /\Aguy-\d+ parameter missing the required parameters #{
               }'last-name' and 'soc'\z/
 
@@ -148,8 +148,9 @@ module Skylab::Fields::TestSupport
 
         o.normulize.should eql false
 
-        _ev = expect_not_OK_event :missing
-        a = _ev.parameters
+        _em = expect_not_OK_event :missing_required_properties
+
+        a = _em.cached_event_value.parameters
 
         a.length.should eql 1
         a.first.name_symbol.should eql :b
@@ -164,7 +165,7 @@ module Skylab::Fields::TestSupport
     def _object
 
       o = object_
-      o.on_event_selectively = handle_event_selectively
+      o.on_event_selectively = handle_event_selectively_
       o
     end
 

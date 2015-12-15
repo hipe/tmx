@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Cull::TestSupport
 
-  describe "[cu] models - survey upstream set" do
+  describe "[cu] models - survey - upstream set" do
 
     TS_[ self ]
     use :expect_event
@@ -14,16 +14,20 @@ module Skylab::Cull::TestSupport
     end
 
     it "use a strange prefix" do
+
       freshly_initted_against "zoidberg:no see"
-      ev = expect_not_OK_event :extra_properties
-      black_and_white_lines( ev ).should eql(
+
+      _em = expect_not_OK_event_ :extra_properties
+
+      black_and_white_lines( _em.cached_event_value ).should eql(
         [ "unrecognized prefix 'zoidberg'", "did you mean 'file'?" ] )
+
       expect_failed
     end
 
     it "use the 'file' prefix but noent" do
       freshly_initted_against 'file:wazoo.json'
-      expect_not_OK_event :errno_enoent
+      expect_not_OK_event_ :errno_enoent
       expect_failed
     end
 
@@ -41,9 +45,9 @@ module Skylab::Cull::TestSupport
         :path, various_extensions_path,
         :upstream, 'file:strange-ext.beefer'
 
-      ev = expect_not_OK_event :extra_properties
+      _em = expect_not_OK_event :invalid_extension
 
-      s_a = black_and_white_lines ev
+      s_a = black_and_white_lines _em.cached_event_value
 
       s_a.first.should eql "unrecognized extension '.beefer'"
       s_a.last.should eql "did you mean '.json' or '.markdown'?"
@@ -53,25 +57,25 @@ module Skylab::Cull::TestSupport
 
     it "add existent file with good extension on fresh workspace" do
 
-      prepare_tmpdir_with_patch_and_do_common :freshly_initted
+      _prepare_tmpdir_with_patch_and_do_common :freshly_initted
 
-      expect_common_OK
+      _expect_common_OK
     end
 
     it "add valid upstream file on workspace with existing, erroneous upstream" do
 
-      td = prepare_tmpdir_with_patch_and_do_common :some_config_file
+      td = _prepare_tmpdir_with_patch_and_do_common :some_config_file
 
       expect_not_OK_event :path_must_be_absolute
 
-      expect_common_OK
+      _expect_common_OK
 
       __expect_detail td
     end
 
     it "add valid upstream on a workspace with multiple upstreams" do
 
-      td = prepare_tmpdir_with_patch :many_upstreams
+      td = prepare_tmpdir_with_patch_ :many_upstreams
 
       s = content_of_the_file td
 
@@ -81,7 +85,7 @@ module Skylab::Cull::TestSupport
 
       expect_not_OK_event :path_must_be_absolute
 
-      expect_common_OK
+      _expect_common_OK
 
       s_ = content_of_the_file td
 
@@ -116,22 +120,26 @@ module Skylab::Cull::TestSupport
 
     it "unset - yes" do
 
-      td = prepare_tmpdir_with_patch :many_upstreams
+      td = prepare_tmpdir_with_patch_ :many_upstreams
 
       call_API :survey, :edit,
         :upstream, Home_::EMPTY_S_,
         :path, td.to_path
 
       expect_not_OK_event :path_must_be_absolute
-      ev = expect_OK_event :deleted_upstreams
-      expect_event :collection_resource_committed_changes
-      s = black_and_white ev
-      s.should eql "deleted 3 'upstreams'"
+
+      _em = expect_OK_event :deleted_upstream
+
+      expect_event_ :collection_resource_committed_changes
+
+      black_and_white( _em.cached_event_value ).should eql(
+        "deleted 3 'upstreams'" )
+
       expect_succeeded
     end
 
-    def prepare_tmpdir_with_patch_and_do_common sym
-      td = prepare_tmpdir_with_patch sym
+    def _prepare_tmpdir_with_patch_and_do_common sym
+      td = prepare_tmpdir_with_patch_ sym
       call_API_with_td_and_file td, big_JSON_file
       td
     end
@@ -157,11 +165,14 @@ module Skylab::Cull::TestSupport
 
     # ~ expect
 
-    def expect_common_OK
+    def _expect_common_OK
 
-      expect_OK_event :json_upstream
-      ev = expect_OK_event :collection_resource_committed_changes
-      ev.to_event.is_completion.should eql true
+      expect_OK_event_ :json_upstream
+
+      _em = expect_OK_event_ :collection_resource_committed_changes
+
+      _em.cached_event_value.to_event.is_completion.should eql true
+
       expect_succeeded
     end
 

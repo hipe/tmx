@@ -11,9 +11,13 @@ module Skylab::BeautySalon::TestSupport
 
       call_API :ping
 
-      _ev = expect_neutral_event :ping
-      black_and_white( _ev ).should eql "hello from beauty salon."
+      _em = expect_neutral_event :ping
+
+      black_and_white( _em.cached_event_value ).should eql(
+        "hello from beauty salon." )
+
       expect_no_more_events
+
       @result.should eql :hello_from_beauty_salon
     end
 
@@ -21,9 +25,9 @@ module Skylab::BeautySalon::TestSupport
 
       _from_to( -1, 2 )
 
-      _ev = expect_not_OK_event :number_too_small
+      _em = expect_not_OK_event_ :number_too_small
 
-      black_and_white( _ev ).should eql(
+      black_and_white( _em.cached_event_value ).should eql(
         "'from-line' must be greater than or equal to 1, had '-1'" )
 
       expect_failed
@@ -33,10 +37,10 @@ module Skylab::BeautySalon::TestSupport
 
       _from_to 1, -2
 
-      _ev = expect_not_OK_event(
+      _em = expect_not_OK_event_(
         :actual_property_is_outside_of_formal_property_set )
 
-      black_and_white( _ev ).should eql(
+      black_and_white( _em.cached_event_value ).should eql(
         "'to-line' must be -1 or greater than or equal to 1. had '-2'" )
 
       expect_failed
@@ -46,9 +50,9 @@ module Skylab::BeautySalon::TestSupport
 
       _from_to 3, 2
 
-      _ev = expect_not_OK_event :upside_down_range
+      _em = expect_not_OK_event :upside_down_range
 
-      black_and_white( _ev ).should eql (
+      black_and_white( _em.cached_event_value ).should eql (
         "'to-line' (2) cannot be less than 'from-line' (3)" )
 
       expect_failed

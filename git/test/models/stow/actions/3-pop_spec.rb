@@ -15,9 +15,9 @@ module Skylab::Git::TestSupport
 
         _against 'n.s', 'n.s', 'stow-wadoodle', _stoz
 
-        _ev = expect_not_OK_event :component_not_found
+        _em = expect_not_OK_event :component_not_found
 
-        black_and_white( _ev ).should match(
+        black_and_white( _em.cached_event_value ).should match(
           /\Athere is no stow "stow-wadoodle" in stows collection «[^»]+»\z/ )
 
         expect_failed
@@ -51,12 +51,12 @@ module Skylab::Git::TestSupport
 
       def __expect_these_events
 
-        expect_neutral_event :mkdir
-        expect_neutral_event :mkdir
-        expect_neutral_event :mkdir
-        expect_neutral_event :file_utils_mv_event
-        expect_neutral_event :file_utils_mv_event
-        expect_neutral_event :file_utils_mv_event
+        expect_neutral_event_ :mkdir
+        expect_neutral_event_ :mkdir
+        expect_neutral_event_ :mkdir
+        expect_neutral_event_ :file_utils_mv_event
+        expect_neutral_event_ :file_utils_mv_event
+        expect_neutral_event_ :file_utils_mv_event
         expect_no_more_events
       end
 
@@ -82,7 +82,7 @@ module Skylab::Git::TestSupport
         path = _pop_into_working_dir_Y_stow_X 'dir-2', 'proj-1', 'sto-1'
 
         expect_neutral_event :mkdir
-        expect_neutral_event :file_utils_mv_event
+        expect_neutral_event_ :file_utils_mv_event
         expect_succeeded
 
         st = dirs_in_ path

@@ -9,10 +9,10 @@ module Skylab::System::TestSupport
 
     it "noent - whines" do
 
-      _path = TestSupport_::Fixtures.file( :not_here )
+      _path = TestSupport_::Fixtures.file :not_here
       against_ _path
 
-      expect_not_OK_event :errno_enoent
+      expect_not_OK_event :enoent
       expect_failed
     end
 
@@ -24,7 +24,7 @@ module Skylab::System::TestSupport
       @result = subject_.with(
         :path, _path,
         :create_if_not_exist,
-        & handle_event_selectively )
+        & handle_event_selectively_ )
 
       expect_neutral_event :creating_directory
       expect_no_more_events
@@ -45,7 +45,7 @@ module Skylab::System::TestSupport
 
       o = subject_.new_with(
         :create_if_not_exist,
-        & handle_event_selectively )
+        & handle_event_selectively_ )
 
       o.frozen? or fail
 

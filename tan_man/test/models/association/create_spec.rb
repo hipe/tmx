@@ -8,7 +8,7 @@ module Skylab::TanMan::TestSupport
     use :expect_line
     use :models_association
 
-    it 'ping' do
+    it 'ping', wip: true do
       call_API :association, :add, :ping
       expect_OK_event :ping_from_action, 'ping from action - (ick :add)'
       expect_succeeded
@@ -27,7 +27,7 @@ module Skylab::TanMan::TestSupport
 
     using_input '../../node/fixtures/simple-prototype-and-graph-with/zero-but-with-leading-space.dot' do
 
-      it 'associates nodes when neither exists, creating them' do
+      it 'associates nodes when neither exists, creating them', wip: true do
         associate 'one', 'two'
 
         if :creating == @ev_a.first.terminal_channel_i  # ugly fix for [#086]
@@ -65,7 +65,7 @@ module Skylab::TanMan::TestSupport
 
     using_input '2-nodes-1-edge.dot' do
 
-      it 'does not associate again redundantly' do
+      it 'does not associate again redundantly', wip: true do
         associate 'alpha', 'gamma'
         @ev_a[ 0 .. -2 ] = EMPTY_A_  # hack ignore 3 events
         expect_neutral_event :document_did_not_change
@@ -107,7 +107,7 @@ module Skylab::TanMan::TestSupport
         associate 'a', 'b', :prototype, :clancy
         expect_OK_event :created_node
         expect_OK_event :created_node
-        expect_not_OK_event :association_prototype_not_found,
+        expect_not_OK_event :association_prototypes_not_found,
           "the stmt_list has no prototype named (ick :clancy)"
         expect_failed
       end

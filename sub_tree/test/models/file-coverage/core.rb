@@ -98,7 +98,7 @@ module Skylab::SubTree::TestSupport
         _cx, path,
         test_dir_for_build_compound_tree,
         Name_conventions__[],
-        ___real_filesystem, & handle_event_selectively ]
+        ___real_filesystem, & handle_event_selectively_ ]
 
       NIL_
     end

@@ -64,7 +64,7 @@ module Skylab::Flex2Treetop::MyTestSupport
           :resources, Mock_resources_[],
           * _outpath_arg( '_no_see_' )
 
-        expect_not_OK_event :errno_enoent,
+        expect_not_OK_event_ :errno_enoent,
           %r(\bNo such \(par flex_file\) - \(pth ".+not-there\.flex"\)\z)
 
         expect_failed
@@ -77,9 +77,9 @@ module Skylab::Flex2Treetop::MyTestSupport
           :resources, Mock_resources_[],
           * _outpath_arg( '_meh_' )
 
-        ev = expect_not_OK_event :wrong_ftype
+        em = expect_not_OK_event :wrong_ftype
 
-        black_and_white( ev ).should match(
+        black_and_white( em.cached_event_value ).should match(
           %r(\A«[^»]+/fixture-files» exists but is not a file, it is a directory\b) )
 
         expect_failed
@@ -89,9 +89,9 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         call_API :translate, * _etc( _file_with_some_content )
 
-        ev = expect_not_OK_event :missing_required_permission
+        _em = expect_not_OK_event_ :missing_required_permission
 
-        black_and_white( ev ).should match(
+        black_and_white( _em.cached_event_value ).should match(
           %r(\A'output-path' exists, won't overwrite without 'force': #{
             }«[^»]+file-with-some-content) )
 
@@ -106,9 +106,11 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         call_API :translate, :force, :flex_file, _in_path, * _etc( _out_path )
 
-        ev = expect_not_OK_event :errno_eisdir
+        _em = expect_not_OK_event_ :errno_eisdir
 
-        black_and_white( ev ).should match %r(\AIs a directory - «.+/fixture-files)
+        _rx = %r(\AIs a directory - «.+/fixture-files)
+
+        black_and_white( _em.cached_event_value ).should match _rx
 
         expect_failed
       end
@@ -212,9 +214,9 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         expect_neutral_event :before_probably_creating_new_file
 
-        ev = expect_not_OK_event :invalid_NS
+        _em = expect_not_OK_event :invalid_NS
 
-        black_and_white( ev ).should eql(
+        black_and_white( _em.cached_event_value ).should eql(
 
           "grammar namespaces look like \"Foo::BarBaz\". #{
             }this is not a valid grammar namespace: \"Doonesbury Cartoon\"" )

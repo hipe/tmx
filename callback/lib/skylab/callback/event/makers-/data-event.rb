@@ -107,7 +107,6 @@ module Skylab::Callback
                 o.send i
               end
               y << instance_exec( * _a, & o.class::P____ )
-              nil
             end )
             cls.const_set :P____, msg_p
             const_set :Event___, cls

@@ -7,7 +7,7 @@ module Skylab::System::TestSupport
     TS_[ self ]
     use :expect_event
 
-    it "file _against file" do
+    it "file against file" do
 
       path = produce_temporary_starting_file
 
@@ -19,7 +19,7 @@ module Skylab::System::TestSupport
       ::File.read( path ).should eql "after\n"
     end
 
-    it "file _against directory" do
+    it "file against directory" do
 
       path = produce_temporary_directory
 
@@ -31,7 +31,7 @@ module Skylab::System::TestSupport
       ::File.read( _expected_path_that_will_be_created ).should eql "huzzah\n"
     end
 
-    it "string _against file" do
+    it "string against file" do
 
       path = produce_temporary_starting_file
 
@@ -49,7 +49,7 @@ module Skylab::System::TestSupport
       ::File.read( path ).should eql "after\n"
     end
 
-    it "string _against directory" do
+    it "string against directory" do
 
       _against :target_directory, produce_temporary_directory,
         :patch_string, <<-HERE.gsub( /^[ ]+/, EMPTY_S_ )
@@ -112,7 +112,7 @@ module Skylab::System::TestSupport
 
     def _against * x_a
 
-      @result = services_.filesystem.patch( * x_a, & handle_event_selectively )
+      @result = services_.filesystem.patch( * x_a, & handle_event_selectively_ )
       nil
     end
 
@@ -122,8 +122,8 @@ module Skylab::System::TestSupport
 
     define_method :_expect_common_event_pattern do
 
-      ev = expect_neutral_event :process_line
-      line = black_and_white ev
+      _em = expect_neutral_event :process_line
+      line = black_and_white _em.cached_event_value
       line.should match _PATCHING_FILE_RX
       expect_succeeded
     end

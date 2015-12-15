@@ -23,7 +23,7 @@ module Skylab::System::TestSupport
       @result = subject_.with(
         :path, @_path,
         :force_arg, __build_force_yes_arg,
-        & handle_event_selectively )
+        & handle_event_selectively_ )
 
       _expect_overwrote
     end
@@ -33,9 +33,14 @@ module Skylab::System::TestSupport
       @result = subject_.with(
         :path, TestSupport_::Fixtures.file( :three_lines ),
         :force_arg, __build_force_no_arg,
-        & handle_event_selectively )
+        & handle_event_selectively_ )
 
-      expect_not_OK_event :missing_required_permission
+      _em = expect_not_OK_event :missing_required_properties
+
+      _sym = _em.cached_event_value.terminal_channel_symbol
+
+      :missing_required_permission == _sym or fail
+
       expect_failed
     end
 
@@ -68,7 +73,11 @@ module Skylab::System::TestSupport
         'some-other-file',
       )
       against_ _path
-      expect_not_OK_event :errno_enotdir
+
+      expect_not_OK_event :exception do | ev |
+        :errno_enotdir == ev.terminal_channel_symbol or fail
+      end
+
       expect_failed
     end
 
@@ -79,7 +88,7 @@ module Skylab::System::TestSupport
       @result = subject_.with(
         :path, _path,
         :is_dry_run, true,
-        & handle_event_selectively )
+        & handle_event_selectively_ )
 
       expect_neutral_event :before_probably_creating_new_file
       expect_no_more_events

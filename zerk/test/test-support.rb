@@ -49,10 +49,27 @@ module Skylab::Zerk::TestSupport
     end
 
     def build_mock_parent
-      evr = event_receiver_for_expect_event
-      Mock_Parent__.new -> i_a, & ev_p do
-        evr.maybe_receive_on_channel_event i_a, & ev_p
+
+      oes_p = event_log.handle_event_selectively
+
+      Mock_Parent__.new -> x_a, & ev_p do
+
+        oes_p[ * x_a, & ev_p ]
       end
+    end
+
+    def expect_not_OK_event_ sym, msg=nil
+
+      em = expect_not_OK_event nil, msg
+      em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
+      em
+    end
+
+    def expect_OK_event_ sym, msg
+
+      em = expect_OK_event nil, msg
+      em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
+      em
     end
 
     def expression_agent_for_expect_event

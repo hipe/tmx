@@ -30,11 +30,15 @@ module Skylab::Basic::TestSupport::Tree_TS
     end
 
     it "when a line does not have the glyph" do
+
       _against_lines _dedent <<-HERE
         hi + no
       HERE
+
       @tree.should eql false
-      expect_not_OK_event :line_does_not_have_glyph
+
+      expect_not_OK_event_ :line_does_not_have_glyph
+
       expect_no_more_events
     end
 
@@ -148,7 +152,7 @@ module Skylab::Basic::TestSupport::Tree_TS
 
     def build_tree
 
-      _oes_p = handle_event_selectively
+      _oes_p = handle_event_selectively_
 
       @tree = Subject_[].via(
         :indented_line_stream, @lines,

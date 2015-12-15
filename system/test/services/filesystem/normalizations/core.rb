@@ -11,7 +11,7 @@ module Skylab::System::TestSupport
 
       @result = subject_.with(
         :path, path,
-        & handle_event_selectively )
+        & handle_event_selectively_ )
       NIL_
     end
   end

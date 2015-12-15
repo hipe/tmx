@@ -72,8 +72,30 @@ module Skylab::BeautySalon::TestSupport
       Home_::API
     end
 
-    def black_and_white_expression_agent_for_expect_event
-      Home_.lib_.brazen::API.expression_agent_instance
+    # -- retrofit
+
+    def expect_failed_by_ sym
+
+      em = expect_not_OK_event
+      em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
+      expect_no_more_events
+      @result.should eql false
+      em
+    end
+
+    def expect_not_OK_event_ sym
+      em = expect_not_OK_event
+      em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
+      em
+    end
+
+    def expect_OK_event_ sym=nil, msg=nil
+
+      em = expect_OK_event nil, msg
+      if sym
+        em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
+      end
+      em
     end
   end
 

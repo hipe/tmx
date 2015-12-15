@@ -13,9 +13,9 @@ module Skylab::System::TestSupport
 
       against_ _not_here
 
-      _ev = expect_not_OK_event :errno_enoent
+      _em = expect_not_OK_event :stat_error
 
-      black_and_white( _ev ).should match %r(\ANo such file or directory )
+      black_and_white( _em.cached_event_value ).should match %r(\ANo such file or directory )
 
       expect_failed
     end
@@ -27,11 +27,11 @@ module Skylab::System::TestSupport
 
       @result = subject_.with(
         :qualified_knownness_of_path, _pa,
-        & handle_event_selectively )
+        & handle_event_selectively_ )
 
-      _ev = expect_not_OK_event :errno_enoent
+      _em = expect_not_OK_event :stat_error
 
-      black_and_white( _ev ).should match %r(\ANo such 'wazoozie' - )
+      black_and_white( _em.cached_event_value ).should match %r(\ANo such 'wazoozie' - )
 
       expect_failed
     end
@@ -63,7 +63,7 @@ module Skylab::System::TestSupport
       @result = subject_.with(
         :stdin, _non_interactive_stdin,
         :path, 'no-see',
-        & handle_event_selectively )
+        & handle_event_selectively_ )
 
       expect_not_OK_event :ambiguous_upstream_arguments
       expect_failed

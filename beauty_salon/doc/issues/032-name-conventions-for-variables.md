@@ -55,10 +55,10 @@ very particular meaning: it means *either*:
 
 
 
-## local variables - scope :A
+## local variables - scope (:#D)
 
 we haved developed a bunch of weird idioms that help us read our code
-with respect to how we name instance variables:
+with respect to how we name local variables:
 
 
     a_normal_local_variable  # must be referenced more than once
@@ -85,17 +85,18 @@ with respect to how we name instance variables:
       #    thing in the same scope (and has the corresponding name
       #    without the underscore.)
       #
-      #  • you will occasionally see two trailing underscores to
+      #  • you will occasionally see *two* trailing underscores to
       #    indicate a "third such thing", but this is not recommended.
       #    typically we break such scenarios up into smaller scopes.
       #
-      #  • we use this when it is necessary to avoid using a keyword for
+      #  • we also use this when it is necessary to avoid using a keyword for
       #    a name we want to use. eg. `end_ = r.end` for holding the
-      #    "end" component of a range object.
+      #    "end" component of a range object (because `end` is a keyword).
       #
       #  • similar to the first bullet, we use this when it is necessary
       #    to avoid a name collision with a semantically similar
-      #    variable in a surrounding scope.
+      #    variable in a surrounding scope. again, this can mean it is
+      #    time to break things down into smaller method scopes..
 
 
 
@@ -133,7 +134,8 @@ step this warning if the variable name has one (or more) leading
 underscore(s).
 
 2) the more frequently-seen form is this: the variable is only ever
-referenced from one place (and it should be "nearby").
+referenced from one place (and it should be "nearby"; most often in the
+next expression after the current one (e.g the next line)).
 
 although technically it "wastes processing", this convention is employed
 to break up trainwreck of a long line of code, so that A) it is more
@@ -155,6 +157,8 @@ right below where the variables are assigned.
 if we wanted to we could rewrite this whole "block" as a single (large)
 in-line expreession in the place where the value is needed, but that
 would be a beast to comprehend and debug.
+
+..
 
 also, when we see several of these in one scope, it can sometimes
 be an indication of some code that is "hot off the press" and remains

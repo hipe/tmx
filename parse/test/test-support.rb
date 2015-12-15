@@ -39,6 +39,10 @@ module Skylab::Parse::TestSupport
       subject_parse_function_.output_node_via_input_stream st
     end
 
+    def handle_event_selectively_
+      event_log.handle_event_selectively
+    end
+
     def the_empty_input_stream
       Home_::Input_Streams_::Array.the_empty_stream
     end
@@ -61,15 +65,6 @@ module Skylab::Parse::TestSupport
     Expect_Event = -> tcm do
 
       Callback_.test_support::Expect_Event[ tcm ]
-
-      tcm.send(
-        :define_method,
-        :black_and_white_expression_agent_for_expect_event
-      ) do
-
-        Autoloader_.require_sidesystem( :Brazen )::API.expression_agent_instance
-
-      end
     end
   end
 

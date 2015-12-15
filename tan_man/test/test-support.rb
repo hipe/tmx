@@ -147,20 +147,35 @@ module Skylab::TanMan::TestSupport
 
     attr_reader :do_debug
 
-    def debug_IO
-      Some_debug_IO[]
-    end
-
-    def some_debug_IO
-      Some_debug_IO[]
-    end
-
-    Some_debug_IO = -> do
+    def _same
       TestSupport_.debug_IO
+    end
+
+    alias_method :debug_IO, :_same
+
+    alias_method :some_debug_IO, :_same
+
+    def handle_event_selectively_
+      event_log.handle_event_selectively
     end
 
     def black_and_white_expression_agent_for_expect_event
       Home_::API::expression_agent_instance
+    end
+
+    # -- ..
+
+    def expect_committed_changes_
+
+      _em = expect_OK_event :success
+
+      ev = _em.cached_event_value
+
+      _sym = ev.to_event.terminal_channel_symbol
+
+      :collection_resource_committed_changes == _sym or fail
+
+      ev
     end
 
     # ~ grammar testing support
@@ -240,7 +255,7 @@ module Skylab::TanMan::TestSupport
       end
 
       # but if you wanted to test for specific events here:
-      # _oes_p = event_receiver_for_expect_event.handle_event_selectively
+      # _oes_p = handle_event_selectively_
 
       @parse = TS_::Parse.new _oes_p do | o |
 

@@ -75,6 +75,13 @@ module Skylab::Flex2Treetop::MyTestSupport
       def debug_IO
         TestSupport_.debug_IO
       end
+
+      def expect_not_OK_event_ sym, msg=nil
+
+        em = expect_not_OK_event nil, msg
+        em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
+        em
+      end
     end
 
     Fixture_file__ = -> do
@@ -122,11 +129,6 @@ module Skylab::Flex2Treetop::MyTestSupport
         tcm.include self
       end
     end  # >>
-
-    def black_and_white_expression_agent_for_expect_event
-
-      Home_::Brazen_::API.expression_agent_instance
-    end
   end
 
   Expect_Line = -> tcm do

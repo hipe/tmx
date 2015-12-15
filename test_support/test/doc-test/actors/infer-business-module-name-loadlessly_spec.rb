@@ -33,7 +33,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       _name = subject(
         :path, '/var/xkcd/skorlorb/morta-horl/porse/voa-ordered-set--.rb',
-        :line_upstream, _line_ups, & handle_event_selectively )
+        :line_upstream, _line_ups, & event_log.handle_event_selectively )
 
       _name.should eql "Skorlab::MortaHorl::Porse::Voa_ordered_set__"
 

@@ -34,10 +34,6 @@ module Skylab::Permute::TestSupport
     def subject_API
       Home_.application_kernel_
     end
-
-    def black_and_white_expression_agent_for_expect_event
-      Home_.lib_.brazen::API.expression_agent_instance
-    end
   end
 
   module Expect_CLI

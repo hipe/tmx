@@ -39,9 +39,11 @@ module Skylab::GitViz
       end
 
       def ping
+
         @on_event_selectively.call :payload, :expression, :ping do | y |
           y << "hello from front."
         end
+
         :hello_from_front
       end
     end

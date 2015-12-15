@@ -20,9 +20,9 @@ module Skylab::BeautySalon::TestSupport
         :grep,
         :replace
 
-      ev = expect_not_OK_event :missing_function_definitions
+      _em = expect_not_OK_event_ :missing_function_definitions
 
-      black_and_white( ev ).should match(
+      black_and_white( _em.cached_event_value ).should match(
         %r(\Areplace error: 'well_well_well' and 'nope' are missing #{
          }the expected files #{
           }«.*search-and-replace/functions/\{well-well-well\.rb, nope\.rb\}»\z)
@@ -51,7 +51,8 @@ module Skylab::BeautySalon::TestSupport
       @result.gets.should be_nil
 
       expect_neutral_event :grep_command_head
-      expect_OK_event :changed_file
+
+      expect_OK_event_ :changed_file
 
       _s = ::File.read @tmpdir.join( 'ok-whatever-wazoozle.txt' ).to_path
       _s.should eql "ok oh my geez --> ORLY-->holy foxx: ahah<--YARLY <--\n"

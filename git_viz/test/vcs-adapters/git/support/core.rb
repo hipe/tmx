@@ -18,7 +18,7 @@ module Skylab::GitViz::TestSupport
 
       def __build_front
         subject_VCS::Front.new_via_system_conduit(
-          stubbed_system_conduit, & handle_event_selectively )
+          stubbed_system_conduit, & handle_event_selectively_ )
       end
 
       def subject_VCS
@@ -27,10 +27,6 @@ module Skylab::GitViz::TestSupport
 
       def expect_result_for_failure  # #hook-out
         @result.should eql false
-      end
-
-      def black_and_white_expression_agent_for_expect_event
-        Home_.lib_.brazen::API.expression_agent_instance
       end
 
       def at_ sym
@@ -87,7 +83,7 @@ module Skylab::GitViz::TestSupport
           a.push CONSTANTS__.lookup :__mock_resources
           a.push stubbed_filesystem
 
-          _oes_p = handle_event_selectively
+          _oes_p = handle_event_selectively_
 
           x = subject_VCS::Models_::Bundle.build_bundle_via( * a, & _oes_p )
 

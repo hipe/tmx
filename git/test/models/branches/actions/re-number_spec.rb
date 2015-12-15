@@ -11,8 +11,11 @@ module Skylab::Git::TestSupport
 
       _against [ 1, 3, 5 ], [ 2, 4, 999 ]
 
-      _ev = expect_not_OK_event :strange_items
-      black_and_white( _ev ).should eql "'2' and '4' must be in the collection"
+      _em = expect_not_OK_event :strange_items
+
+      black_and_white( _em.cached_event_value ).should eql(
+        "'2' and '4' must be in the collection" )
+
       expect_failed
     end
 
@@ -41,9 +44,9 @@ module Skylab::Git::TestSupport
 
       _against [ 1, 3, 5, 7, 9, 11 ], [ 3, 9, -4 ]
 
-      _ev = expect_not_OK_event :too_much_squeeze
+      _em = expect_not_OK_event :too_much_squeeze
 
-      black_and_white( _ev ).should eql(
+      black_and_white( _em.cached_event_value ).should eql(
        "between 3 and 9 there are 4 items.\n#{
         }desired contraction of -4 would bring distance down to 2, #{
          }but distance cannot go below 3 for 4 items." )

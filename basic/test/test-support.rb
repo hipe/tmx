@@ -62,8 +62,22 @@ module Skylab::Basic
         TestSupport_.debug_IO
       end
 
-      def black_and_white_expression_agent_for_expect_event
-        Home_.lib_.brazen::API.expression_agent_instance
+      def handle_event_selectively_
+        event_log.handle_event_selectively
+      end
+
+      def expect_not_OK_event_ sym
+
+        em = expect_not_OK_event
+        em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
+        em
+      end
+
+      def expect_event_ sym
+
+        em = expect_event
+        em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
+        em
       end
     end
 

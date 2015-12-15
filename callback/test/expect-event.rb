@@ -1,81 +1,59 @@
 module Skylab::Callback::TestSupport
 
-  class Expect_Event  # [#065] (has subscribers to the rewrite)
+  module Expect_Event  # [#065] (has subscribers to the rewrite)
+
+    # per name conventions, all method *and ivar* names with neither leading
+    # nor trailing underscores are part of the [sub-]subject's public API.
+
+    # in the subject module those methods that are not part of the public
+    # API will use the reserved name-piece "expev" in the name to avoid
+    # unintentional collision with names in other [event] libraries.
 
     class << self
 
-      def [] test_context_cls, x_a=nil
+      def [] tcc, x_a=nil
 
-        test_context_cls.include Test_Context_Instance_Methods
+        tcc.include Test_Context_Instance_Methods
+
         if x_a && x_a.length.nonzero?
-          Modifiers___.new( x_a, test_context_cls ).execute
+          x_a.each_slice 2 do | sym, x |
+            tcc.send :instance_exec, x, & OPTS___.fetch( sym )
+          end
         end
+
         NIL_
       end
     end  # >>
 
-    class Modifiers___
+    IGNORE_METHOD__ = :_hash_of_terminal_channels_for_expev_to_ignore
 
-      def initialize x_a, tcm
-        @tcm = tcm
-        @x_a = x_a
-      end
+    OPTS___ = {
 
-      def execute
+      ignore: -> sym do
 
-        @ignore_these = []
+        h = { sym => true }
 
-        @x_a.each_slice 2 do | sym, x |
-          send :"__#{ sym }__", x
-        end
+        define_method IGNORE_METHOD__ do h end ; nil
+      end,
 
-        __finish
-      end
+      ignore_these: -> a do
 
-      def __ignore__ x
-        @ignore_these.push x
-        NIL_
-      end
+        h = ::Hash[ a.map { | sym | [ sym, true ] } ]
 
-      def __finish
-        Define_module_method_for_ignoring__[ @tcm, @ignore_these ]
+        define_method IGNORE_METHOD__ do h end ; nil
+      end,
+    }
+
+    IGNORE_THESE_EVENTS_METHOD = -> * terminal_channel_sym_a do
+
+      h = ::Hash[ terminal_channel_sym_a.map { | sym | [ sym, true ] } ]
+
+      define_method IGNORE_METHOD__ do
+        h
       end
     end
 
-    IGNORE_THESE_EVENTS_METHOD = -> * top_chan_i_a do
-
-      Define_module_method_for_ignoring__[ self, top_chan_i_a ]
-    end
-
-    Define_module_method_for_ignoring__ = -> tcm, chan_i_a do
-
-      _YOU_SHALL_NOT_PASS = ::Hash[ chan_i_a.map { | i | [ i, true ] } ]
-
-      tcm.send :define_method, :_build_event_receiver_for_expect_event do
-
-        er = super()
-        er.add_map_reducer do | ev_p, i_a, chan_p |
-
-          if _YOU_SHALL_NOT_PASS[ i_a.last ]
-
-            if do_debug
-              debug_IO.puts event_receiver_for_expect_event.
-                first_line_description(
-                  "ignoring: ", ev_p[] )
-            end
-
-            Home_::UNABLE_  # err on the side of us having swallowed
-              # a failure, if anybody's asking
-          else
-
-            chan_p[ i_a, & ev_p ]
-          end
-        end
-        er
-      end
-      NIL_
-    end
-
+    # (see [#]note-C about this oldschool section)
     # ->
 
       module Test_Context_Instance_Methods
@@ -85,533 +63,822 @@ module Skylab::Callback::TestSupport
         end
 
         def call_API_via_iambic x_a, & x_p
-
           if ! block_given?
-            x_a.push :on_event_selectively, handle_event_selectively
+            _oes_p = event_log.handle_event_selectively
+            x_a.push :on_event_selectively, _oes_p
           end
-
           @result = subject_API.call( * x_a, & x_p )
           NIL_
         end
 
-        def handle_event_selectively
-          event_receiver_for_expect_event.handle_event_selectively
-        end
-
-        def event_receiver_for_expect_event  # :+#public-API
-          @evr ||= begin
-            @ev_a = nil
-            _build_event_receiver_for_expect_event
-          end
-        end
-
-        def _build_event_receiver_for_expect_event
-
-          Event_Receiver__.new -> ev do
-            ( @ev_a ||= [] ).push ev
-          end, self
-        end
-
         def expect_one_event_and_neutral_result * x_a, & p
-          expect_event_via_iambic_and_proc [ :shorthand, x_a ], p
-          expect_no_more_events
-          expect_neutralled
+          em = _next_actual_expev_emission do | em_ |
+            em_.should _match_expev_em_via_TCS( * x_a, & p )
+          end
+          if em
+            _expect_no_next_actual_expev_emission
+            # (note we don't let a failure above mess up the rest:)
+            em
+          end
         end
 
         def expect_one_event * x_a, & p
-          expect_event_via_iambic_and_proc [ :shorthand, x_a ], p
-          expect_no_more_events
+          em = _next_actual_expev_emission do | em_ |
+            em_.should _match_expev_em_via_TCS( * x_a, & p )
+          end
+          if em
+            _expect_no_next_actual_expev_emission
+            em
+          end
         end
 
         def expect_not_OK_event * x_a, & p
-          expect_event_via_iambic_and_proc [ :is_ok, false, :shorthand, x_a ], p
+          _next_actual_expev_emission do | em |
+            em.should _match_expev_em_via_3( false, * x_a, & p )
+          end
         end
 
         def expect_neutral_event * x_a, & p
-          expect_event_via_iambic_and_proc [ :is_ok, nil, :shorthand, x_a ], p
+          _next_actual_expev_emission do | em |
+            em.should _match_expev_em_via_3( nil, * x_a, & p )
+          end
         end
 
         def expect_OK_event * x_a, & p
-          expect_event_via_iambic_and_proc [ :is_ok, true, :shorthand, x_a ], p
-        end
-
-        def expect_N_events d, term_chn_sym
-          block_given? and raise ::ArgumentError
-          idx = ( 0 ... d ).detect do | d_ |
-            term_chn_sym != @ev_a.fetch( d_ ).terminal_channel_i
-          end
-          if idx
-            fail "expected '#{ term_chn_sym }', #{
-              }had '#{ @ev_a.fetch( idx ).terminal_channel_i }' (event at index #{ idx })"
-          else
-            @ev_a[ 0, d ] = EMPTY_A_
-            nil
+          _next_actual_expev_emission do | em |
+            em.should _match_expev_em_via_3( true, * x_a, & p )
           end
         end
 
         def expect_event * x_a, & p
-          expect_event_via_iambic_and_proc [ :shorthand, x_a ], p
-        end
-
-        def expect_event_via_iambic_and_proc x_a, p
-          @ev = nil
-          exp = Expectation__.new x_a, p
-          exp.call_a.each do | method_i, args |
-            send method_i, * args
+          _next_actual_expev_emission do | em |
+            em.should _match_expev_em_via_TCS_and_message( * x_a, & p )
           end
-          @ev
         end
 
         def expect_no_events
-          @ev_a.should be_nil
+          _expect_no_next_actual_expev_emission
         end
 
         def expect_no_more_events
-          if @ev_a
-            if @ev_a.length.nonzero?
-              _ev = @ev_a.first.to_event
-              raise "expected no more events, had #{ @evr.first_line_description _ev }"
-            end
-          end
-        end
-
-        def resolve_ev_by_expect_one_event
-          if @ev_a
-            if @ev_a.length.zero?
-              raise "expected event, had no more."
-            else
-              @ev = @ev_a.shift ; nil
-            end
-          else
-            raise "expected event, had none."
-          end
+          _expect_no_next_actual_expev_emission
         end
 
         def flush_to_event_stream
-          st = Home_::Stream.via_nonsparse_array @ev_a
-          @ev_a = EMPTY_A_
-          st
+          # (kept for continuity with a possible future)
         end
 
         # ~ expectations along the different qualities of events
 
-        def via_ev_expect_terminal_channel_of i
-          @ev.to_event.terminal_channel_i.should eql i
-        end
+        #
 
-        def via_ev_expect_OK_value_of bool
-          ev = @ev.to_event
-          if bool.nil?
-            if ev.has_member :ok
-              if ! ev.ok.nil?
-                when_ev_OK_value_is_not_nil ev.ok
-              end
-            else
-              when_neutral_expected_and_ev_does_not_have_OK_tag
-            end
-          elsif ev.has_member :ok
-            x = ev.ok
-            if bool
-              x or when_ev_is_not_OK
-            else
-              x and when_ev_is_OK
-            end
-          else
-            when_ev_does_not_have_OK_tag
-          end
-        end
+        #
 
-        def when_ev_OK_value_is_not_nil x
-          send_event_failure "expected OK value of `nil`, had #{ x.inspect }"
-        end
+        #
 
-        def when_ev_is_not_OK
-          send_event_failure "was not 'ok', expected 'ok'"
-        end
+        #
 
-        def when_ev_is_OK
-          send_event_failure "was 'ok', expected not"
-        end
+        #
 
-        def when_neutral_expected_and_ev_does_not_have_OK_tag
-          when_ev_does_not_have_OK_tag
-        end
+        #
 
-        def when_ev_does_not_have_OK_tag
-          send_event_failure "did not have 'ok' tag"
-        end
+        #
 
-        def via_ev_expect_codified_message_string s
-          s_ = expct_that_event_renders_as_one_string
-          s_ and s_.should eql s
-        end
+        #
 
-        def via_ev_expect_codified_message_string_via_regexp rx
-          s = expct_that_event_renders_as_one_string
-          s and s.should match rx
-        end
+        #
 
-        def expct_that_event_renders_as_one_string
-          @ev.express_into_under s_a=[], expression_agent_for_expect_event
-          if 1 == s_a.length
-            s_a.fetch 0
-          else
-            s_a * NEWLINE_  # meh
-          end
-        end
+        #
 
-        def expression_agent_for_expect_event
-          Home_::Event.codifying_expression_agent_instance
-        end
+        #
 
         def black_and_white ev
           black_and_white_lines( ev ).join NEWLINE_
         end
 
         def black_and_white_lines ev
-          ev.express_into_under y=[], black_and_white_expression_agent_for_expect_event
-          y
+          _expag = __expev_upper_level_expression_agent
+          ev.express_into_under [], _expag
         end
 
         # ~ support and resolution
 
-        def send_event_failure msg
-          fail "#{ msg }: #{ @ev.terminal_channel_i }"
-        end
+        #
 
-        def via_ev_expect_via_proc p
-          p[ @ev ]
-        end
+        #
 
         def expect_failed_by * x_a, & x_p
-
-          x = expect_event_via_iambic_and_proc(
-            [ :is_ok, false, :shorthand, x_a ], x_p )
-
+          em = _next_actual_expev_emission do | em_ |
+            if 1 == x_a.length
+              x_a.push nil
+            end
+            em_.should _match_expev_em_via_3( false, * x_a, & x_p )
+          end
           expect_failed
-          x
+          em
         end
 
         def expect_failed
-          expect_no_more_events
-          expect_failed_result
+          __expev_expect_failed_result
+          _expect_no_next_actual_expev_emission
         end
 
         def expect_neutralled
-          expect_no_more_events
           expect_neutral_result
+          _expect_no_next_actual_expev_emission
         end
 
         def expect_succeeded
-          expect_no_more_events
           expect_succeeded_result
+          _expect_no_next_actual_expev_emission
         end
 
-        def expect_failed_result
-          @result.should eql false
+        def __expev_expect_failed_result
+          if false != @result
+            _expev_fail Say_unexpected_result__[ @result, false ]
+          end
         end
 
         def expect_neutral_result
-          @result.should be_nil
+          if nil != @result
+            _expev_fail Say_unexpected_result__[ @result, nil ]
+          end
         end
 
         def expect_succeeded_result
-          @result.should eql true
-        end
-      end
-
-      class Event_Receiver__
-
-        def initialize recv_ev_p, test_context
-
-          @chan_p = method :__receive_on_channel_unclassified
-
-          if test_context.do_debug
-            @do_debug = true
-            @debug_IO = test_context.debug_IO
-          else
-            @do_debug = false
-          end
-
-          @recv_ev_p = recv_ev_p
-
-          @test_context = test_context
-        end
-
-        def __receive_on_channel_unclassified i_a, & x_p
-
-          # buy-in to :+[#br-023]
-
-          if i_a
-            special_channel = i_a[ 1 ]
-          end
-
-          case special_channel
-
-          when :expression
-            __receive_expression i_a, & x_p
-
-          when :data
-            __receive_data i_a, & x_p
-
-          else
-            _receive_passed_event(
-              if x_p
-                x_p[]
-              else
-                Home_::Event.inline_via_normal_extended_mutable_channel i_a
-              end )
+          if true != @result
+            _expev_fail Say_unexpected_result__[ @result, true ]
           end
         end
 
-        def __receive_data i_a, & data_p
-
-          _ok = _ok_value_via_first_channel i_a.first
-
-          _x = data_p[]
-
-          same_sym = i_a.fetch 2
-
-          _ev = Home_::Event.inline_with(
-            same_sym,
-            same_sym, _x,
-            :ok, _ok )
-
-          _receive_passed_event _ev
-        end
-
-        def __receive_expression i_a, & msg_p
-
-          _ok = _ok_value_via_first_channel i_a.first
-
-          _ev = Home_::Event.inline_with(
-
-              i_a.fetch( 2 ), :ok, _ok ) do | y, _ |
-
-            instance_exec y, & msg_p
-          end
-
-          _receive_passed_event _ev
-        end
-
-        def _ok_value_via_first_channel sym
-
-          case sym
-          when :info    ; nil
-          when :payload ; true
-          else          ; false  # meh
-          end
-        end
-
-        def handle_event_selectively
-          @__HES_p ||= -> * i_a, & ev_p do
-            @chan_p[ i_a, & ev_p ]
-          end
-        end
-
-        def maybe_receive_on_channel_event i_a, & ev_p
-          @chan_p[ i_a, & ev_p ]
-        end
-
-        def add_map_reducer & map_reducer_p
-
-          next_p = @chan_p
-
-          @chan_p = -> i_a, & ev_p do
-            map_reducer_p[ ev_p, i_a, next_p ]
-          end ; nil
-        end
-
-        def _receive_passed_event ev
-          @do_debug and __express_event_into ev, @debug_IO
-          ev_ = ev.to_event
-          if ev_.has_member :flyweighted_entity
-            was_wrapped = ev.object_id != ev_.object_id
-            _ent = ev_.flyweighted_entity.dup
-            ev_ = ev_.with :flyweighted_entity, _ent
-            ev = ev_
-            if was_wrapped
-              ev = Fake_Wrapper___.new ev
-            end
-          end
-          @recv_ev_p[ ev ]
-          if ev_.has_member :ok
-            ev_.ok
-          end
-        end
-
-        def __express_event_into ev, io
-          st = _description_line_stream_for ev
-          begin
-            line = st.gets
-            line or break
-            io.puts line
-            redo
-          end while nil
-        end
-
-        def first_line_description comment=nil, ev
-          _description_line_stream_for( comment, ev ).gets
-        end
-
-        def _description_line_stream_for comment=nil, ev
-
-          desc = Describer___.new ev,
-            comment,
-            @test_context.expression_agent_for_expect_event
-
-          Home_.stream do
-            desc.gets
+        def expect_freeform_event sym, & ev_p  # this is a retrofit -
+          # a new method to make old code work in the old way [cm]
+          _next_actual_expev_emission do | em |
+            em.should _match_expev_em_via_TCS( sym, & ev_p )
           end
         end
       end
 
-      Fake_Wrapper___ = ::Struct.new :to_event
+    # --
 
-    # <-
+    Callback_ = Home_  # b.c we keep forgetting ..
 
-    Expectation__ = self
+    module Test_Context_Instance_Methods
+
+      # -- invocation (convenience methods to get X into Y)
+
+      # -- log-based event testing
+
+      def event_log
+        @event_log ||= ___build_expev_log  # ivar name is #public-API
+      end
+
+      def ___build_expev_log
+
+        log = Event_Log___.new
+
+        if do_debug
+          log.set_auxiliary_listener_by( & __build_expev_debug_auxil_proc )
+        end
+
+        h = send IGNORE_METHOD__
+        if h
+          log.set_hash_of_terminal_channels_to_ignore h
+        end
+
+        log
+      end
+
+      define_method IGNORE_METHOD__ do
+        NIL_
+      end
+
+      def __build_expev_debug_auxil_proc
+
+        io = debug_IO
+
+        -> i_a, & _ev_p do
+          io.puts i_a.inspect
+          UNABLE_  # just in case
+        end
+      end
+
+      # -- freeze an invocation as a shared state
+
+      def expect_event_flush_state result_x
+        self._K
+      end
+    end
+
+    module Test_Context_Instance_Methods
+
+      # -- newschool support for the oldschool ways
+
+      # ~ gets'ing (or expecting not to gets) each next emission
+
+      def _next_actual_expev_emission
+
+        em = _gets_expev_emission
+        if em
+          yield em
+          em  # guaranteed
+        else
+          _expev_fail ___say_expected_another_expev_event_had_none
+        end
+      end
+
+      def ___say_expected_another_expev_event_had_none
+        "expected another event, had none"
+      end
+
+      def _expect_no_next_actual_expev_emission
+
+        em = _gets_expev_emission
+        if em
+          _expev_fail ___say_expect_no_more_expev_events_had_emission em
+        else
+          ACHIEVED_  # not sure
+        end
+      end
+
+      def _expev_fail s
+        fail s
+      end
+
+      def ___say_expect_no_more_expev_events_had_emission em
+        "expected no more events, had #{ _expect_event_description em }"
+      end
+
+      def _gets_expev_emission  # a compound assumption.. (#note-B)
+
+        @event_log.gets
+      end
+
+      # ~ produce matchers to link old to new
+
+      def _match_expev_em_via_TCS terminal_channel_symbol, & ev_p
+
+        _expev_expectation_by do
+          terminal_channel_symbol_of terminal_channel_symbol
+          @user_proc = ev_p
+        end
+      end
+
+      def _match_expev_em_via_TCS_and_message sym=nil, msg_x=nil, & ev_p
+
+        _expev_expectation_by do
+
+          if sym
+            terminal_channel_symbol_of sym
+          end
+
+          if msg_x
+            mixed_message_matcher msg_x
+          end
+
+          @user_proc = ev_p
+        end
+      end
+
+      def _match_expev_em_via_3 ok_trilean, sym=nil, msg_x=nil, & ev_p
+
+        _expev_expectation_by do
+
+          trilean ok_trilean
+
+          if sym
+            terminal_channel_symbol_of sym
+          end
+
+          if msg_x
+            mixed_message_matcher msg_x
+          end
+
+          @user_proc = ev_p
+        end
+      end
+
+      def _expect_event_description em
+        em.channel_symbol_array.inspect
+      end
+
+      # -- the newschool ways (matcher-based)
+
+      def only_event
+        a = state_.event_array
+        ev = a.fetch 0
+        if 1 == a.length
+          ev
+        else
+          a.length.should eql 1
+        end
+      end
+
+      def be_event * x_a, & x_p
+        self._NOT_YET_COVERED
+
+        _expev_expectation_by do
+
+          full_channel_of x_a
+          @user_proc = x_p
+        end
+      end
+
+      def _expev_expectation_by & def_p
+
+        Expectation__.new do
+          instance_exec( & def_p )
+        end.to_matcher_bound_to self
+      end
+
+      # -- internal support
+
+      def __expev_expag_for_reification
+        _expev_lower_level_expression_agent
+      end
+
+      lazy = Callback_::Lazy
+
+      define_method :__expev_upper_level_expression_agent, -> do
+
+        m = :black_and_white_expression_agent_for_expect_event
+
+        -> do
+          if respond_to? m
+            send m
+          else
+            default_black_and_white_expression_agent_for_expect_event
+          end
+        end
+      end.call
+
+      define_method(
+        :default_black_and_white_expression_agent_for_expect_event,
+        ( lazy.call do
+          Home_.lib_.brazen::API.expression_agent_instance
+        end ),
+      )
+
+      define_method :_expev_lower_level_expression_agent, -> do
+
+        m = :expression_agent_for_expect_event
+
+        -> do
+          if respond_to? m
+            send m
+          else
+            default_expression_agent_for_expect_event
+          end
+        end
+      end.call
+
+      define_method :default_expression_agent_for_expect_event, ( lazy.call do
+        Home_::Event.codifying_expression_agent_instance
+      end )
+    end
+
+    # -
+
+    class Emission_Matcher___
+
+      def initialize expectation, tc
+        @_expectation = expectation
+        @_test_context = tc
+      end
+
+      def matches? em
+
+        @_emission = em  # :/
+        @_failures = nil
+
+        exp = @_expectation
+        if exp.has_trilean
+          ___check_trilean
+        end
+
+        m = exp.channel_method_name
+        if m
+          send m
+        end
+
+        # we conditionally skip the below checks because [#]note-A
+
+        m = exp.message_method_name
+        if m && ! @_failures
+          send m
+        end
+
+        p = exp.user_proc
+        if p && ! @_failures
+          p[ em.cached_event_value ]
+          # result is disregarded. you only ever always get the emission back.
+        end
+
+        if @_failures
+          __when_failed
+        else
+          @_emission
+        end
+      end
+
+      def ___check_trilean
+
+        if @_expectation.trilean_value != @_emission.cached_event_value.to_event.ok
+
+          _add_failure_by do
+
+            _exp_x = @_expectation.trilean_value
+            _act_x = @_emission.cached_event_value.to_event.ok
+
+            "expected event's `ok` value to be #{ Say_trilean__[ _exp_x ] },#{
+              } was #{ Say_not_trilean__[ _act_x ] }"
+          end
+        end
+        NIL_
+      end
+
+      def check_full_channel
+
+        if @_expectation.full_channel != @_event.dootily_hah
+          ___fail_with_detailed_explanation_about_channel_mismatch
+        end
+        NIL_
+      end
+
+      def ___fail_with_detailed_explanation_about_channel_mismatch
+        self.__FUN_COVER_THIS
+      end
+
+      def check_terminal_channel_symbol
+
+        if @_expectation.terminal_channel_symbol !=
+            @_emission.channel_symbol_array.last
+
+          _add_failure_by do
+
+            _exp_x = @_expectation.terminal_channel_symbol
+            _act_x = @_emission.channel_symbol_array.last
+
+            "expected `#{ _exp_x }` event, had `#{ _act_x }`"
+          end
+        end
+        NIL_
+      end
+
+      # for the next two, we don't leverage built-in predicates for same
+      # so we control how the failure is represented (i.e where it goes)
+
+      # also, on failure the string may be rendered twice (and on success
+      # it is never stored.)
+
+      def check_message_string_against_string
+
+        if @_expectation.message_string != _actual_string_normalized_by_user
+
+          _add_message_failure_by do | act_s |
+
+            "expected #{ @_expectation.message_string.inspect }, #{
+              }had #{ act_s.inspect }"
+          end
+        end
+        NIL_
+      end
+
+      def check_message_string_against_regexp
+
+        if @_expectation.message_regexp !~ _actual_string_normalized_by_user
+
+          _add_message_failure_by do | act_s |
+
+            "did not match #{ @_expectation.message_regexp.inspect } - #{
+              }#{ act_s.inspect }"
+          end
+        end
+        NIL_
+      end
+
+      def _add_message_failure_by
+
+        _add_failure_by do
+          yield _actual_string_normalized_by_user
+        end
+      end
+
+      def _actual_string_normalized_by_user
+
+        _expag = @_test_context._expev_lower_level_expression_agent
+
+        @_emission.cached_event_value.express_into_under '', _expag
+      end
+
+      def _add_failure_by & msg_p
+        ( @_failures ||= [] ).push msg_p
+      end
+
+      def __when_failed  # #c.p
+
+        if @_test_context.respond_to? :quickie_fail_with_message_by
+          _p = method :failure_message_for_should
+          @_test_context.quickie_fail_with_message_by( & _p )
+        else
+          UNABLE_
+        end
+      end
+
+      def failure_message_for_should  # #c.p
+
+        _s_a = @_failures.reduce [] do | m, p |
+          m << p[]
+        end
+
+        _s_a.join NEWLINE_
+      end
+    end
 
     class Expectation__
 
-      def initialize x_a, p
-        @call_a = [ [ :resolve_ev_by_expect_one_event ] ]
-        @scn = Home_::Polymorphic_Stream.via_array x_a
-        while @scn.unparsed_exists
-          send @scn.gets_one
+      def initialize & def_p
+        # (hi.)
+        instance_exec( & def_p )
+      end
+
+      def trilean x
+        @has_trilean = true
+        @trilean_value = x
+        NIL_
+      end
+
+      def terminal_channel_symbol_of sym
+        @channel_method_name = :check_terminal_channel_symbol
+        @terminal_channel_symbol = sym
+        NIL_
+      end
+
+      def full_channel_of x_
+        @channel_method_name = :check_full_channel
+        @full_channel = x_a
+        NIL_
+      end
+
+      def mixed_message_matcher msg_x
+        if msg_x.respond_to? :ascii_only?
+          @message_method_name = :check_message_string_against_string
+          @message_string = msg_x
+        else
+          @message_method_name = :check_message_string_against_regexp
+          @message_regexp = msg_x
         end
-        p and @call_a.push [ :via_ev_expect_via_proc, [ p ] ]
+        NIL_
       end
 
-      attr_reader :call_a
+      # --
 
-      def is_ok
-        @call_a.push [ :via_ev_expect_OK_value_of, [ @scn.gets_one ] ] ; nil
+      def to_matcher_bound_to test_context
+        Emission_Matcher___.new self, test_context
       end
 
-      def shorthand
-        scn = Home_::Polymorphic_Stream.via_array @scn.gets_one
-        scn.unparsed_exists and parse_shorthand scn
-      end
-
-      def parse_shorthand scn
-        @call_a.push [ :via_ev_expect_terminal_channel_of, [ scn.gets_one ] ]
-
-        if scn.unparsed_exists
-          x = scn.current_token
-          if x.respond_to? :ascii_only?
-            @call_a.push [ :via_ev_expect_codified_message_string,
-              [ scn.gets_one ] ]
-          elsif x.respond_to? :named_captures
-            @call_a.push [ :via_ev_expect_codified_message_string_via_regexp,
-              [ scn.gets_one ] ]
-          end
-        end
-
-        if scn.unparsed_exists
-          raise ::ArgumentError, "unreasonable expectation: #{ scn.current_token }"
-        end ; nil
-      end
+      attr_reader(
+        :has_trilean,
+        :trilean_value,
+        # --
+        :channel_method_name,
+        :terminal_channel_symbol,
+        :full_channel,
+        # --
+        :message_method_name,
+        :message_string,
+        :message_regexp,
+        # --
+        :user_proc,
+      )
     end
 
-    class Describer___
+    class Event_Log___
 
-      # we build "Good Design" into our deugging "UI" only because we
-      # know empirically (and state tautologically) that it stands to improve
-      # development productivity by way of improving debugging usability.
+      # at present this wraps multiple concerns and implements them with
+      # function soup.
+      #
+      #   advantage: it serves as a front for this whole API, allowing the
+      #     client (the test context) to clutter its ivar namespace with
+      #     only this one name (and its concept-space with only this object.)
+      #
+      #   disadvantage: it violates the Single Responsibility Principle.
+      #
+      # so its implementation **and interface** is an experiment vulnerable
+      # to (yet more) change..
 
-      def initialize ev, comment, expag
-        @comment = comment
-        @ev = ev.to_event  # we ignore wrappers completely
-        @expag = expag
-        @is_active = true
-        @meth = :__gets_when_line_zero
+      def initialize
+
+        # -- set options
+
+        opts = nil
+        @_receive_option = -> sym, x do
+          opts ||= Options___.new
+          opts[ sym ] = x ; nil
+        end
+
+        # -- log emissions
+
+        a = []
+
+        receive_emission = -> symbol_array, & event_proc do
+
+          @_receive_option = nil
+
+          receive_emission = if opts
+            __special_receiver opts, a
+          else
+            -> sym_a, & ev_p do
+              a.push Emission__.new( ev_p, sym_a )
+              UNRELIABLE_
+            end
+          end
+
+          receive_emission[ symbol_array, & event_proc ]
+        end
+
+        @handle_event_selectively = -> * i_a, & ev_p do
+          receive_emission[ i_a, & ev_p ]
+          UNRELIABLE_
+        end
+
+        # -- read emissions
+
+        @_gets_x = -> do
+          # this ivar could be made to be immutable **but it is NOT currently**
+
+          @_receive_option = nil  # don't assume we've received any events
+          receive_emission = nil  # this isn't a read/write thing
+
+          @_gets_x = Callback_::Stream.via_nonsparse_array a
+          @_gets_x.call
+        end
       end
+
+      # -- set options (counterpart)
+
+      def set_auxiliary_listener_by & chan_p
+        @_receive_option[ :aux_listener, chan_p ]
+        NIL_
+      end
+
+      def set_hash_of_terminal_channels_to_ignore h
+        @_receive_option[ :ignore_term_chan_hash, h ]
+        NIL_
+      end
+
+      # -- log emissions (counterpart)
+
+      attr_reader(
+        :handle_event_selectively,
+      )
+
+      def __special_receiver opts, a
+
+        chan_p = opts.aux_listener
+        ignore_h = opts.ignore_term_chan_hash
+
+        if ignore_h
+          if chan_p
+            ___ignore_and_mux chan_p, ignore_h, a
+          else
+            __ignore ignore_h, a
+          end
+        else
+          __mux chan_p, a
+        end
+      end
+
+      Options___ = ::Struct.new :aux_listener, :ignore_term_chan_hash
+
+      def ___ignore_and_mux chan_p, ignore_h, em_a
+
+        -> sym_a, & p do
+
+          if ignore_h[ sym_a.last ]
+
+            _ = [ :event_ignored, * sym_a ]
+
+            chan_p.call _ do
+              self._NOT_COVERED
+            end
+          else
+            em_a.push Emission__.new( p, sym_a )
+          end
+
+          UNRELIABLE_
+        end
+      end
+
+      def __ignore ignore_h, em_a
+
+        -> sym_a, & p do
+          if ! ignore_h[ sym_a.last ]
+            em_a.push Emission__.new( p, sym_a )
+          end
+          UNRELIABLE_
+        end
+      end
+
+      def __mux chan_p, em_a
+
+        -> sym_a, & p do
+
+          em = Emission__.new p, sym_a
+
+          chan_p.call sym_a do
+            em._NOT_COVERED
+          end
+
+          em_a.push em ; UNRELIABLE_
+        end
+      end
+
+      # -- read emissions (counterpart)
 
       def gets
-        if @is_active
-          send @meth
-        end
-      end
-
-      def __gets_when_line_zero
-        if @ev.message_proc
-          __gets_when_line_zero_and_event_is_expressive
-        else
-          __gets_when_line_zero_and_event_is_not_expressive
-        end
-      end
-
-      def __gets_when_line_zero_and_event_is_not_expressive
-        @is_active = false
-        "« #{ _render_data_head } »"  # :+#guillemets
-      end
-
-      def __gets_when_line_zero_and_event_is_expressive
-        @st = @ev.to_stream_of_lines_rendered_under @expag
-        @line = @st.gets
-        if @line
-          __render_first_line
-        else
-          @is_active = nil
-        end
-      end
-
-      def __render_first_line
-
-        # if the event itself renders out multiple lines, render it with the
-        # event "metadata" creating the first and only line of a left column
-        # with each content line from the event in a right column, an effect
-        # only noticable for the few events that render into multiple lines.
-
-        @first_line_header = "#{ _render_data_head } - "
-
-        s = "#{ @first_line_header }#{ @line.inspect }"
-        @line = @st.gets
-        if @line
-          @meth = :__gets_via_second_line
-        else
-          @is_active = false
-        end
-        s
-      end
-
-      def _render_data_head
-        "#{ @comment }#{ __OK_s }#{
-         } #{ @ev.terminal_channel_i }#{
-          } (#{ @ev.members * ', ' })"
-      end
-
-      def __OK_s
-        ev = @ev.to_event
-        if ev.has_member :ok
-          x = ev.ok
-          if x.nil?
-            '(neutral)'
-          else
-            x ? '(ok)' : '(not ok)'
-          end
-        else
-          '(ok? not ok?)'
-        end
-      end
-
-      def __gets_via_second_line
-
-        @blank_s = Home_::SPACE_ * @first_line_header.length
-        @meth = :_via_line_flush_subsequent_line
-        _via_line_flush_subsequent_line
-      end
-
-      def _via_line_flush_subsequent_line
-
-        s = "#{ @blank_s }#{ @line.inspect }"
-        @line = @st.gets
-        if ! @line
-          @is_active = false
-        end
-        s
+        @_gets_x.call
       end
     end
+
+    class Emission__
+
+      def initialize event_proc, channel_symbol_array
+
+        @channel_symbol_array = channel_symbol_array
+        @_needs_reification = true
+        @_x_p = event_proc
+      end
+
+      def cached_event_value
+        if @_needs_reification
+          ___reify
+          @_needs_reification = false
+        end
+        @_x
+      end
+
+      def ___reify
+        p = remove_instance_variable :@_x_p
+        @_x = if :expression == @channel_symbol_array[ 1 ]  # #[#br-023]
+          Expression_as_Event___.new( p, @channel_symbol_array.last )
+        else
+          p[]
+        end
+        NIL_
+      end
+
+      attr_reader(
+        :channel_symbol_array,
+      )
+    end
+
+    class Expression_as_Event___
+
+      def initialize y_p, sym
+        @terminal_channel_symbol = sym
+        @_y_p = y_p
+      end
+
+      def express_into_under y, expag
+        expag.calculate y, & @_y_p
+      end
+
+      attr_reader(
+        :terminal_channel_symbol,
+      )
+
+      def to_event
+        self
+      end
+
+      def ok
+        NIL_
+      end
+    end
+
+    Say_unexpected_result__ = -> act_x, exp_x do
+      "expected normal #{ Say_trilean__[ exp_x ] } result, #{
+        }had #{ Say_not_trilean__[ act_x ] }"
+    end
+
+    Say_not_trilean__ = -> act_x do
+      Home_.lib_.basic::String.via_mixed act_x
+    end
+
+    Say_trilean__ = -> x do
+      Trilean_string_via_value___[].fetch x
+    end
+
+    Trilean_string_via_value___ = Callback_::Lazy.call do
+      {
+        nil => "neutral",
+        false => "negative",
+        true => "positive",
+      }
+    end
+
+    ACHIEVED_ = true
+    UNRELIABLE_ = false
   end
 end

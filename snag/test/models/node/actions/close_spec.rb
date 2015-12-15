@@ -12,7 +12,7 @@ module Skylab::Snag::TestSupport
     it "closing one with a funny looking name - whines gracefully" do
 
       _against 'abc'
-      expect_failed_by :uninterpretable_under_number_set
+      expect_failed_by :expecting_number
     end
 
     it "closing one that doesn't exist - whines gracefully" do
@@ -24,9 +24,17 @@ module Skylab::Snag::TestSupport
     it "closing one that is already closed - whines gracefully" do
 
       _against '002'
-      _expect :component_not_found, "node [#2] does not have tag '#open'"
+
+      expect_not_OK_event :component_not_found,
+        "node [#2] does not have tag '#open'"
+
       _expect :component_already_added, "node [#2] already has tag #done"
+
       expect_neutralled
+    end
+
+    def expression_agent_for_expect_event
+      default_black_and_white_expression_agent_for_expect_event
     end
 
     it "closing one that has no taggings at all - works, reindents" do
@@ -35,8 +43,10 @@ module Skylab::Snag::TestSupport
 
       _against '001'
 
-      _ev = expect_not_OK_event :component_not_found
-      black_and_white( _ev ).should eql "node [#1] does not have tag '#open'"
+      _em = expect_not_OK_event :component_not_found
+
+      black_and_white( _em.cached_event_value ).should eql(
+        "node [#1] does not have tag '#open'" )
 
       expect_noded_ 1
 
@@ -93,8 +103,10 @@ module Skylab::Snag::TestSupport
 
     def _expect sym, s
 
-      ev = expect_not_OK_event sym
-      black_and_white( ev ).should eql s
+      _em = expect_neutral_event sym
+
+      black_and_white( _em.cached_event_value ).should eql s
+
       NIL_
     end
   end

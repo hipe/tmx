@@ -14,7 +14,13 @@ module Skylab::GitViz::TestSupport
     it "ping with strange parameters - emits expression of failure" do
 
       call_API :ping, :not_an_arg, :_no_see_
-      expect_not_OK_event :extra_properties
+
+      _em = expect_not_OK_event :error
+
+      _sym = _em.cached_event_value.to_event.terminal_channel_symbol
+
+      :extra_properties == _sym or fail
+
       expect_failed
     end
 

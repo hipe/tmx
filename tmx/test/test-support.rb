@@ -47,10 +47,6 @@ module Skylab::TMX::TestSupport
     def debug_IO
       TestSupport_.debug_IO
     end
-
-    def black_and_white_expression_agent_for_expect_event
-      Home_.lib_.brazen::API.expression_agent_instance
-    end
   end
 
   Callback_ = ::Skylab::Callback

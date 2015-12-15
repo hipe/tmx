@@ -19,6 +19,7 @@ digraph g {
   viz_tool -> ACS_CLI
   ACS_CLI -> br_cleanup
   ACS_CLI -> acs
+  ACS_CLI -> zerk
   br_cleanup [style=filled fillcolor="grey"]
 
   no_regret -> sea
@@ -30,10 +31,12 @@ digraph g {
   sea [label="search-replace -\nfix that one bug"]
   sea->zerk
   zerk [label="zerk - full rewrite\nto use ACS"]
-  zerk->expect_event
-  expect_event [label="rewrite\nexpect event"]
+  zerk->futex
+  futex [label="integrate `future expect`\n(somehow)"]
+  futex->expect_event
+  expect_event [label="rewrite\nexpect event" style=filled fillcolor="#b5d5fb"]
   expect_event -> tally
-  tally [label="the \"tally\"\nvisualization" style=filled fillcolor="#b5d5fb"]
+  tally [label="the \"tally\"\nvisualization" style=filled]
   tally -> rfm
   rfm [label="rebrand file-metrics\nas code-metrics" style=filled]
   zerk->acs

@@ -154,9 +154,11 @@ module Skylab::System
             begin
               s = o.gets
               s or break
-              @on_event_selectively.call :info, :process_line do
-                Process_Line_[ s ].to_event
-              end
+              -> s_ do
+                @on_event_selectively.call :info, :process_line do
+                  Process_Line_[ s_ ].to_event
+                end
+              end.call s
               redo
             end while nil
           end

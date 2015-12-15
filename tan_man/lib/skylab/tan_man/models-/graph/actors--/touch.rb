@@ -121,8 +121,10 @@ module Skylab::TanMan
 
           @ext = Home_::Models_::DotFile::DEFAULT_EXTENSION
 
+          path = @_qkn.value_x
+
           maybe_send_event :info, :adding_extension do
-            __build_adding_extension_event
+            __build_adding_extension_event path
           end
 
           @_qkn = @_qkn.new_with_value(
@@ -131,13 +133,13 @@ module Skylab::TanMan
           nil
         end
 
-        def __build_adding_extension_event
+        def __build_adding_extension_event path_before
 
           Callback_::Event.inline_neutral_with(
 
             :adding_extension,
             :extension, @ext,
-            :path, @_qkn.value_x
+            :path, path_before,
 
           ) do | y, o |
 

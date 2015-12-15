@@ -49,12 +49,12 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       call_API :recursive, :sub_action, :preview, :path, 'x'
 
-      ev = expect_not_OK_event :missing_required_properties
+      _em = expect_not_OK_event :missing_required_properties
 
-      black_and_white( ev ).should eql "missing required property 'downstream'"
+      black_and_white( _em.cached_event_value ).should eql(
+        "missing required property 'downstream'" )
 
       expect_failed
-
     end
 
     it "'preview' results in a stream of \"generation\"s", wip: true do

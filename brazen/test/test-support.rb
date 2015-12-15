@@ -43,6 +43,10 @@ module Skylab::Brazen::TestSupport
       TestSupport_.debug_IO
     end
 
+    def handle_event_selectively_
+      event_log.handle_event_selectively
+    end
+
     def prepared_tmpdir
       td = TS_::TestLib_::Tmpdir[]
       if do_debug
@@ -56,10 +60,9 @@ module Skylab::Brazen::TestSupport
       td
     end
 
-    def black_and_white_expression_agent_for_expect_event
-      @eea ||= begin
-        Home_::API.expression_agent_class.new Home_.application_kernel_
-      end
+    expag = nil
+    define_method :black_and_white_expression_agent_for_expect_event do
+      expag ||= Home_::API.expression_agent_class.new Home_.application_kernel_  # ..no..
     end
 
     def cfg_filename

@@ -163,15 +163,15 @@ module Skylab::Basic::TestSupport
 
     define_method :_against do | st |
 
-      @result = _SM.against st, & handle_event_selectively
+      @result = _SM.against st, & handle_event_selectively_
       NIL_
     end
 
     def _expect_failed_with s
 
-      _ev = expect_not_OK_event :no_available_state_transition
+      _em = expect_not_OK_event :no_available_state_transition
 
-      black_and_white( _ev ).should eql s
+      black_and_white( _em.cached_event_value ).should eql s
 
       expect_failed
     end

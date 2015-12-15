@@ -83,7 +83,7 @@ module Skylab::Fields::TestSupport
 
         if _do_spy_on_events
 
-          the_class_.new handle_event_selectively
+          the_class_.new handle_event_selectively_
         else
           the_class_.new
         end

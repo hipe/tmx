@@ -46,12 +46,29 @@ module Skylab::GitViz::TestSupport
       Home_.lib_.some_stderr_IO
     end
 
+    def handle_event_selectively_
+      event_log.handle_event_selectively
+    end
+
     def cache_hash_for_stubbed_FS
       Universal_cache___[]
     end
 
     def cache_hash_for_stubbed_system
       Universal_cache___[]
+    end
+
+    def start_directory_noent_
+
+      _em = expect_failed_by :start_directory_is_not_directory
+
+      ev = _em.cached_event_value
+
+      _sym = ev.to_event.terminal_channel_symbol
+
+      :start_directory_does_not_exist == _sym or fail
+
+      ev
     end
   end
 
@@ -145,10 +162,6 @@ module Skylab::GitViz::TestSupport
 
     def subject_API  # #hook-out for "expect event"
       Home_::API
-    end
-
-    def black_and_white_expression_agent_for_expect_event
-      Home_.lib_.brazen::API.expression_agent_instance
     end
 
     def at_ sym

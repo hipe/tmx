@@ -10,7 +10,7 @@ module Skylab::BeautySalon::TestSupport
     it "ping-esque" do
 
       call_API :ziffo
-      expect_not_OK_event :child_not_found
+      expect_not_OK_event_ :child_not_found
       expect_failed
     end
 

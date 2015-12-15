@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Cull::TestSupport
 
-  describe "[cu] models - survey create" do
+  describe "[cu] models - survey - create" do
 
     TS_[ self ]
     use :expect_event
@@ -14,7 +14,7 @@ module Skylab::Cull::TestSupport
     end
 
     it "ping the top" do
-      x = Home_::API.call :ping, :on_event_selectively, handle_event_selectively
+      x = Home_::API.call :ping, :on_event_selectively, event_log.handle_event_selectively
       expect_neutral_event :ping, "hello from cull."
       expect_no_more_events
       x.should eql :hello_from_cull
@@ -33,7 +33,7 @@ module Skylab::Cull::TestSupport
       expect_failed
     end
 
-    it "go money" do
+    it "go money", wip: true do
       call_API :create, :path, prepare_tmpdir.to_path
       expect_neutral_event :creating_directory
       expect_OK_event :collection_resource_committed_changes

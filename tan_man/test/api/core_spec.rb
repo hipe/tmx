@@ -19,10 +19,21 @@ module Skylab::TanMan::TestSupport
     end
 
     it "xtra tokens on a ping" do
+
       call_API :ping, :wahootey
-      ev = expect_not_OK_event :extra_properties,
-        'unrecognized (plural_noun [1, "property"]) (and_ ["(ick :wahootey)"])'
-      black_and_white( ev ).should eql "unrecognized property :wahootey"
+
+      _ = 'unrecognized (plural_noun [1, "property"]) (and_ ["(ick :wahootey)"])'
+
+      __ = "unrecognized property :wahootey"
+
+      _em = expect_not_OK_event :error, _
+
+      ev = _em.cached_event_value.to_event
+
+      :extra_properties == ev.terminal_channel_symbol or fial
+
+      black_and_white( ev ).should eql __
+
       expect_failed
     end
 

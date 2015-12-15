@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::CodeMetrics::TestSupport
 
-  describe "[cm] tally - 1: CLI beginnings" do
+  describe "[cme] tally - 1: CLI beginnings" do
 
     TS_[ self ]
     use :CLI_support_expectations

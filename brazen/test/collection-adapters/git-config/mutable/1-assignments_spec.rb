@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Brazen::TestSupport
 
-  describe "[br] collection adapters - git config mutable assignments" do
+  describe "[br] collection adapters - git config mutable assignments", wip: true do
 
     TS_[ self ]
     use :expect_event
@@ -23,7 +23,7 @@ module Skylab::Brazen::TestSupport
         end
       end
 
-      it "quotes will not be used if not necessary" do
+      it "quotes will not be used if not necessary", wip: true do
         document.sections[ :foo ][ :hi ] = 'foo bar'
         expect_document_content "[foo]\nhi = foo bar\n"
         expect_one_event :added_value do |ev|

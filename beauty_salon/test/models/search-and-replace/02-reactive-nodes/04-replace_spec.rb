@@ -23,8 +23,6 @@ module Skylab::BeautySalon::TestSupport
         :replace,
       )
 
-      expect_neutral_event :grep_command_head
-
       st = @result
 
       count = 0
@@ -32,12 +30,18 @@ module Skylab::BeautySalon::TestSupport
         count += 1
       end
 
-      ev = expect_OK_event :changed_file,
+      expect_neutral_event :grep_command_head
+
+      _em = expect_OK_event_ :changed_file,
+
         %r(\Areplace node changed file - .+ok-whatever-wazoozle\.txt)
 
       expect_no_more_events
 
-      ::File.read( ev.path ).should eql "ok oh my geez --> GOOD JERB <--\n"
+      _ev = _em.cached_event_value
+
+      ::File.read( _ev.path ).should eql(
+        "ok oh my geez --> GOOD JERB <--\n" )
     end
   end
 end

@@ -16,7 +16,7 @@ module Skylab::Snag::TestSupport
         :upstream_identifier, :hi,
         :save, :hi,
         :edit, :hi,
-        & handle_event_selectively )
+        & handle_event_selectively_ )
 
       expect_not_OK_event :syntax,
         'can\'t simultaneously (par "save") and (par "edit")'
@@ -31,7 +31,7 @@ module Skylab::Snag::TestSupport
         :criteria, %w( nodes that are tagged with #rocket ),
         :upstream_identifier, :hi,
         :save, '-not-valid-',
-        & handle_event_selectively )
+        & handle_event_selectively_ )
 
       expect_not_OK_event :invalid_name, "invalid name (ick \"-not-valid-\")"
       expect_failed
@@ -59,7 +59,7 @@ module Skylab::Snag::TestSupport
 
         :save, fn,
 
-        & handle_event_selectively )
+        & handle_event_selectively_ )
 
       st = @result
       st.gets.ID.to_i.should eql 2
@@ -67,8 +67,10 @@ module Skylab::Snag::TestSupport
       st.gets.ID.to_i.should eql 5
       st.gets.ID.to_i.should eql 7
 
-      _ev = expect_OK_event :component_added
-      black_and_white( _ev ).should match %r(\Aadded \"#{ fn }\" to persi)
+      _em = expect_OK_event :added_entity
+
+      black_and_white( _em.cached_event_value ).should match(
+        %r(\Aadded \"#{ fn }\" to persi) )
 
       ::File.read( path ).should eql "nodes that are tagged with #rocket\n"
 

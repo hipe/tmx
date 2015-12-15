@@ -20,17 +20,19 @@ module Skylab::TMX::TestSupport
       it "when none - whine about it this way" do
 
         build_and_call_
-        ev = expect_failed_by :missing_first_argument
-        black_and_white( ev ).should eql _there_are_none
+
+        _em = expect_failed_by :missing_first_argument
+
+        black_and_white( _em.cached_event_value ).should eql _there_are_none
       end
 
       it "when arg - whine about anything" do
 
         build_and_call_ :wazoozle, :shanoozle
 
-        ev = expect_failed_by :no_such_reactive_node
+        _em = expect_failed_by :no_such_reactive_node
 
-        black_and_white_lines( ev ).should eql( [
+        black_and_white_lines( _em.cached_event_value ).should eql( [
           _unrec_wazoozle,
           _there_are_none ] )
       end
@@ -51,16 +53,20 @@ module Skylab::TMX::TestSupport
       it "when none - whine about it this other way" do
 
         build_and_call_
-        ev = expect_failed_by :missing_first_argument
-        black_and_white( ev ).should eql "missing first argument."
+
+        _em = expect_failed_by :missing_first_argument
+
+        black_and_white( _em.cached_event_value ).should eql(
+          "missing first argument." )
       end
 
       it "when one strange - xx" do
 
         build_and_call_ :wazoozle, :shanoozle
 
-        ev = expect_failed_by :no_such_reactive_node
-        black_and_white_lines( ev ).should eql( [
+        _em = expect_failed_by :no_such_reactive_node
+
+        black_and_white_lines( _em.cached_event_value ).should eql( [
           _unrec_wazoozle,
           'expecting "AAzzAA" or "BBzzBB"' ] )
       end

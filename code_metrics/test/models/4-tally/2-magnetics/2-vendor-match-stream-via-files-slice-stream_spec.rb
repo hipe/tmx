@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::CodeMetrics::TestSupport
 
-  describe "[cm] tally - 2 - 2: vendor match stream via file slice stream" do
+  describe "[cme] tally - 2 - 2: vendor match stream via file slice stream" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -20,11 +20,9 @@ module Skylab::CodeMetrics::TestSupport
       _ok = o.execute
       _ok.should eql false
 
-      _ev = expect_not_OK_event do | ev |
-        ev
-      end
+      _em = expect_neutral_event
 
-      _ = black_and_white _ev
+      _ = black_and_white _em.cached_event_value
 
       _.should match %r(\Ainvalid pattern, must look [a-z ]+: '\[#foo-999\]'\z)
     end
@@ -61,7 +59,7 @@ module Skylab::CodeMetrics::TestSupport
     end
 
     def _begin_session
-      o = _subject.new( & handle_event_selectively )
+      o = _subject.new( & handle_event_selectively_ )
       o.system_conduit = Home_.lib_.open_3
       o
     end

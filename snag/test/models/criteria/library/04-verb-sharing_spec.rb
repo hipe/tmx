@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - node criteria - library (04 - \"verb sharing\")" do
+  describe "[sg] models - criteria - library (04 - \"verb sharing\")" do
 
     extend TS_
     use :criteria_library_support

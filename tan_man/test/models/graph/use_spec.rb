@@ -29,8 +29,10 @@ module Skylab::TanMan::TestSupport
         call_API :graph, :use,
           :digraph_path, 'some-path'
 
-        ev = expect_not_OK_event :missing_required_properties
-        black_and_white( ev ).should eql "missing required property 'workspace_path'"
+        _em = expect_not_OK_event :missing_required_properties
+
+        black_and_white( _em.cached_event_value ).should eql(
+          "missing required property 'workspace_path'" )
 
         expect_failed
       end
@@ -44,7 +46,7 @@ module Skylab::TanMan::TestSupport
           :workspace_path, @ws_pn.to_path,
           :config_filename, cfn
 
-        expect_not_OK_event :workspace_not_found do |ev|
+        expect_not_OK_event :resource_not_found do |ev|
           ev = ev.to_event
           ev.num_dirs_looked.should eql 1
           ev.file_pattern_x.should eql cfn
@@ -64,9 +66,13 @@ module Skylab::TanMan::TestSupport
         call_API :graph, :use, :digraph_path, 'some-relative/path',
           :workspace_path, @ws_pn.to_path, :config_filename, cfn
 
-        expect_not_OK_event :path_cannot_be_relative do |ev|
-          ev.to_event.path.should eql 'some-relative/path'
-        end
+        _em = expect_not_OK_event :invalid_property_value
+
+        ev = _em.cached_event_value.to_event
+
+        :path_cannot_be_relative == ev.terminal_channel_symbol or fail
+
+        ev.to_event.path.should eql 'some-relative/path'
 
         expect_failed
       end
@@ -136,7 +142,11 @@ module Skylab::TanMan::TestSupport
 
           shared_setup_via_config_line '[wiw]'
 
-          expect_OK_event :collection_resource_committed_changes
+          _em = expect_OK_event :success
+
+          _sym = _em.cached_event_value.to_event.terminal_channel_symbol
+
+          :collection_resource_committed_changes == _sym or fail
 
           _read_config_file
 
@@ -145,7 +155,7 @@ module Skylab::TanMan::TestSupport
           expect_succeeded
         end
 
-        it "and diraph path is File object (A HACK)" do
+        it "and diraph path is File object (A HACK)", wip: true do
 
           prepare_ws_tmpdir <<-O.unindent
             --- /dev/null
@@ -208,7 +218,7 @@ module Skylab::TanMan::TestSupport
 
         context "and digraph does *not* exist" do
 
-          it "and digraph path is without extension - adds ext, creates digraph" do
+          it "and digraph path is without extension - adds ext, creates digraph" do  # #too-big
 
             prepare_whatever_workspace
 
@@ -292,7 +302,14 @@ module Skylab::TanMan::TestSupport
 
       h = mutable_h
       last_user_result = nil
-      st = flush_to_event_stream
+
+      el = event_log
+      st = Callback_.stream do
+        em = el.gets
+        if em
+          em.cached_event_value
+        end
+      end
 
       begin
         ev = st.gets

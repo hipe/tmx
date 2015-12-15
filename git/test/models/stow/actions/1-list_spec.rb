@@ -11,9 +11,9 @@ module Skylab::Git::TestSupport
 
       call_API :ping, :zerp, 'hi'
 
-      _ev = expect_OK_event :ping
+      _em = expect_OK_event :ping
 
-      black_and_white( _ev ).should eql "(out: hi)"
+      black_and_white( _em.cached_event_value ).should eql "(out: hi)"
 
       expect_no_more_events
 
@@ -29,8 +29,10 @@ module Skylab::Git::TestSupport
       _x = _st.gets
       _x.should be_nil
 
-      ev = expect_not_OK_event :errno_enoent
-      ev = ev.to_event
+      _em = expect_not_OK_event :enoent
+
+      ev = _em.cached_event_value.to_event
+
       ev.message_head.should eql "No such file or directory"
 
       expect_no_more_events

@@ -49,6 +49,10 @@ module Skylab::Snag::TestSupport
     def debug_IO
       TestSupport_.debug_IO
     end
+
+    def handle_event_selectively_
+      event_log.handle_event_selectively
+    end
   end
 
   module Byte_Up_And_Downstreams
@@ -180,10 +184,6 @@ module Skylab::Snag::TestSupport
 
     def subject_API
       Home_::API
-    end
-
-    def black_and_white_expression_agent_for_expect_event
-      Home_.lib_.brazen::API.expression_agent_instance
     end
   end
 

@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::CodeMetrics::TestSupport
 
-  describe "[cm] models - 3. ext" do
+  describe "[cme] models - 3. ext" do
 
     TS_[ self ]
     use :expect_event
@@ -12,7 +12,7 @@ module Skylab::CodeMetrics::TestSupport
       call_API :ext,
         :path, [ Fixture_file_directory_[] ]
 
-      expect_neutral_event :find_command_args
+      expect_neutral_event :find_files_command
 
       a = @result.to_child_stream.to_a
       2 == a.length or fail

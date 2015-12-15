@@ -22,7 +22,7 @@ describe "[y2] CLI integration" do
         :downstream_IO, io,
         :wrap_in_grammar, 'Bingo::Bongo',
         :yacc_file, _yacc_file,
-        & handle_event_selectively )
+        & event_log.handle_event_selectively )
 
       expect_no_more_events
       d.should be_zero

@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::CodeMetrics::TestSupport
 
-  describe "[cm] CLI" do
+  describe "[cme] CLI" do
 
     TS_[ self ]
     use :memoizer_methods

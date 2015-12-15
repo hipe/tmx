@@ -14,7 +14,7 @@ module Skylab::Snag::TestSupport
         :byte_downstream, y,
         :upstream_identifier, Fixture_file_[ :rochambeaux_mani ]
 
-      expect_neutral_event :generic_info,
+      expect_neutral_event :info,
         "none of the 3 nodes in the collection are doc nodes."
 
       y.length.should eql 3  # digraph open, thing ding, digraph close

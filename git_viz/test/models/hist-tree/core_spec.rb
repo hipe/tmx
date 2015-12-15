@@ -10,19 +10,13 @@ module Skylab::GitViz::TestSupport
     it "absolute path no ent (mocked) - x" do
 
       _call_API_against_path '/this-path-is-not-even-mocked/zang'
-      _same
+      start_directory_noent_
     end
 
     it "abspath no ent, but inside a repo (mocked) - x" do
 
       _call_API_against_path '/m03/repo/nazoozle/fazoozle'
-      _same
-    end
-
-    def _same
-
-      expect_not_OK_event :start_directory_does_not_exist
-      expect_failed
+      start_directory_noent_
     end
 
     it "path is file (mocked) - x" do

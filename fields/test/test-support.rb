@@ -54,6 +54,10 @@ module Skylab::Fields::TestSupport
     def debug_IO
       TestSupport_.debug_IO
     end
+
+    def handle_event_selectively_
+      event_log.handle_event_selectively
+    end
   end
 
   Build_next_integer_generator_starting_after = -> d do
@@ -66,12 +70,6 @@ module Skylab::Fields::TestSupport
   Expect_Event = -> tcm do
 
     Callback_.test_support::Expect_Event[ tcm ]
-
-    tcm.send :define_method, :black_and_white_expression_agent_for_expect_event do
-      Home_.lib_.brazen::API.expression_agent_instance
-    end
-
-    NIL_
   end
 
   Home_ = ::Skylab::Fields

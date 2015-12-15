@@ -15,19 +15,27 @@ module Skylab::TanMan::TestSupport
       expect_failed
     end
 
-    it "when workspace path is illegitamate" do
+    it "when workspace path is illegitimate" do
+
       use_empty_ws
+
       call_API :starter, :get,
         :workspace_path, @ws_pn.join( 'xxx' ).to_path
-      expect_event :start_directory_does_not_exist
+
+      expect_event :start_directory_is_not_directory
+
       expect_failed
     end
 
     it "when workspace path does not have config filename" do
+
       use_empty_ws
+
       call_API :starter, :get,
         :workspace_path, @ws_pn.to_path
-      expect_event :workspace_not_found
+
+      expect_event :resource_not_found
+
       expect_failed
     end
 
@@ -43,8 +51,11 @@ module Skylab::TanMan::TestSupport
       call_API :starter, :get,
         :workspace_path, @ws_pn.to_path, :config_filename, cfn
 
-      ev = expect_not_OK_event :component_not_found
-      black_and_white( ev ).should eql 'in workspace config there are no starters'
+      _em = expect_not_OK_event :component_not_found
+
+      black_and_white( _em.cached_event_value ).should eql(
+        'in workspace config there are no starters' )
+
       expect_failed
     end
 
@@ -61,9 +72,9 @@ module Skylab::TanMan::TestSupport
       call_API :starter, :get,
         :workspace_path, @ws_pn.to_path, :config_filename, cfn
 
-      ev = expect_neutral_event :single_entity_resolved_with_ambiguity
+      _em = expect_neutral_event :single_entity_resolved_with_ambiguity
 
-      black_and_white( ev ).should eql(
+      black_and_white( _em.cached_event_value ).should eql(
         'in config there is more than one starter. using the last one.' )
 
       ent = @result
@@ -89,8 +100,10 @@ module Skylab::TanMan::TestSupport
         scn = @result
         scn.should eql false
 
-        ev = expect_not_OK_event :resource_not_found
-        black_and_white( ev ).should eql "No such file or directory - digraphie"
+        _em = expect_not_OK_event :resource_not_found
+
+        black_and_white( _em.cached_event_value ).should eql(
+          "No such file or directory - digraphie" )
 
         expect_no_more_events
       end

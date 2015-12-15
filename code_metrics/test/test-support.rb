@@ -92,8 +92,8 @@ module Skylab::CodeMetrics::TestSupport
       Home_.application_kernel_
     end
 
-    def black_and_white_expression_agent_for_expect_event
-      Home_.lib_.brazen::API.expression_agent_instance
+    def handle_event_selectively_
+      event_log.handle_event_selectively
     end
 
     def debug!

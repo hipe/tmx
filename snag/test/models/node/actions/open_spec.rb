@@ -24,7 +24,7 @@ module Skylab::Snag::TestSupport
 O
         ] )
 
-      ev = expect_OK_event( :wrote ).to_event
+      ev = expect_OK_event( :wrote ).cached_event_value.to_event
       ev.bytes or fail
       ev.path or fail
 

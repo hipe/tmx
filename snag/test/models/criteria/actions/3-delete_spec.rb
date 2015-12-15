@@ -17,12 +17,12 @@ module Skylab::Snag::TestSupport
 
       o = _common
 
-      expect_neutral_event :file_utils_mv_event,
+      expect_neutral_event :file_utils_message,
         /\Amv \(pth "[^"]+"\) \(pth "[^"]+"\)\z/
 
-      _ev = expect_OK_event :component_removed
+      _em = expect_OK_event :component_removed
 
-      black_and_white( _ev ).should eql(
+      black_and_white( _em.cached_event_value ).should eql(
         'removed criteria "zap-tango" from persisted criteria collection' )
 
       o.natural_key_string.should eql 'zap-tango'
@@ -34,11 +34,9 @@ module Skylab::Snag::TestSupport
 
       x = _common
 
-      _ev = expect_not_OK_event :component_not_found
+      _em = expect_not_OK_event :component_not_found
 
-      _s = black_and_white _ev
-
-      _s.should eql(
+      black_and_white( _em.cached_event_value ).should eql(
         'persisted criteria collection does not have criteria "zap-tango"' )
 
       expect_no_more_events
@@ -63,7 +61,7 @@ module Skylab::Snag::TestSupport
         :assuming, :exists,
         :via, :slug,
         :remove, :criteria, 'zap-tango',
-        & handle_event_selectively )
+        & handle_event_selectively_ )
     end
   end
 end

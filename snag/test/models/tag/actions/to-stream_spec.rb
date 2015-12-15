@@ -16,9 +16,9 @@ module Skylab::Snag::TestSupport
           :upstream_identifier, :xxx,
           :node_identifier, 'Xxx'
 
-        _ev = expect_not_OK_event :uninterpretable_under_number_set
+        _em = expect_not_OK_event :expecting_number
 
-        black_and_white( _ev ).should eql(
+        black_and_white( _em.cached_event_value ).should eql(
           "'node-identifier-number-component' #{
            }must be a non-negative integer, had 'Xxx'" )
 

@@ -49,9 +49,13 @@ module Skylab::Snag::TestSupport
     end
 
     def _expect sym, s
-      ev = expect_not_OK_event sym
+
+      ev = expect_not_OK_event( sym ).cached_event_value
+
       black_and_white( ev ).should eql s
+
       expect_failed
+
       ev.to_event
     end
 

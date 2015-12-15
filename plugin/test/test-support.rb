@@ -46,10 +46,6 @@ module Skylab::Plugin::TestSupport
 
     Callback_.test_support::Expect_Event[ tcc ]
 
-    tcc.send :define_method, :black_and_white_expression_agent_for_expect_event do
-      Home_.lib_.brazen::API.expression_agent_instance
-    end
-
     NIL_
   end
 

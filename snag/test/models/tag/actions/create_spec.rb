@@ -15,9 +15,9 @@ module Skylab::Snag::TestSupport
 
         _call :node_identifier, 'ziffy', :tag, :x
 
-        _ev = expect_not_OK_event :uninterpretable_under_number_set
+        _em = expect_not_OK_event :expecting_number
 
-        black_and_white( _ev ).should eql(
+        black_and_white( _em.cached_event_value ).should eql(
           "'node-identifier-number-component' #{
             }must be a non-negative integer, had 'ziffy'" )
 
@@ -28,7 +28,9 @@ module Skylab::Snag::TestSupport
 
         _call :node_identifier, '00002', :tag, :x
 
-        black_and_white( expect_not_OK_event :component_not_found ).should match(
+        _em = expect_not_OK_event :component_not_found
+
+        black_and_white( _em.cached_event_value ).should match(
           %r(\Athere is no node '\[#2\]') )
 
         expect_failed
@@ -38,7 +40,9 @@ module Skylab::Snag::TestSupport
 
         _call :node_identifier, 3, :tag, 'foo bar'
 
-        black_and_white( expect_not_OK_event :invalid_tag_stem ).should eql(
+        _em = expect_not_OK_event :invalid_tag_stem
+
+        black_and_white( _em.cached_event_value ).should eql(
           "tag must be alphanumeric separated with dashes - #{
             }invalid tag name: '#foo bar'" )
 
@@ -49,8 +53,10 @@ module Skylab::Snag::TestSupport
 
         _call :node_identifier, 1, :tag, 'hi'
 
-        _ev = expect_not_OK_event :component_already_added
-        black_and_white( _ev ).should eql "node [#1] already has tag #hi"
+        _em = expect_neutral_event :component_already_added
+
+        black_and_white( _em.cached_event_value ).should eql(
+          "node [#1] already has tag #hi" )
 
         expect_failed
       end

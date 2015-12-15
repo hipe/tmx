@@ -18,8 +18,9 @@ module Skylab::Callback::TestSupport
         :channel, 'hacking'
       )
 
-      _ev = expect_event :event_event
-      black_and_white( _ev ).should match(
+      _em = expect_event :event_event
+
+      black_and_white( _em.cached_event_value ).should match(
         %r(\Aevent: #<Skylab::Callback::TestSupport::.*\bMock_Old_Event) )
 
       expect_succeeded
@@ -27,10 +28,6 @@ module Skylab::Callback::TestSupport
 
     def subject_API
       Home_::CLI._application_kernel
-    end
-
-    def black_and_white_expression_agent_for_expect_event
-      Home_.lib_.brazen::API.expression_agent_instance
     end
   end
 end

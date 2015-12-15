@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Cull::TestSupport
 
-  describe "[cu] models - survey mutators" do
+  describe "[cu] models - survey - mutator" do
 
     TS_[ self ]
     use :expect_event
@@ -20,7 +20,7 @@ module Skylab::Cull::TestSupport
 
     it "add good name" do
 
-      td = prepare_tmpdir_with_patch :freshly_initted
+      td = prepare_tmpdir_with_patch_ :freshly_initted
 
       call_API :survey, :edit,
         :add_mutator, 'remove-emp',
@@ -28,7 +28,7 @@ module Skylab::Cull::TestSupport
 
       expect_event :added_function_call
 
-      expect_event :collection_resource_committed_changes
+      expect_event_ :collection_resource_committed_changes
 
       expect_succeeded
 
@@ -112,7 +112,7 @@ module Skylab::Cull::TestSupport
 
     it "remove last of three - comments and formatting preserved in the others" do
 
-      td = prepare_tmpdir_with_patch :with_fuzz_biff
+      td = prepare_tmpdir_with_patch_ :with_fuzz_biff
 
       call_API :survey, :edit,
         :remove_mutator, 'remove-em(x,y)',
@@ -130,7 +130,7 @@ module Skylab::Cull::TestSupport
 
     it "remove first of three - also we do this hacktastic thing with comments" do
 
-      td = prepare_tmpdir_with_patch :with_fuzz_biff
+      td = prepare_tmpdir_with_patch_ :with_fuzz_biff
 
       call_API :survey, :edit,
         :remove_mutator, 'remove-em( fuz bif, true, 1.3 )',
@@ -149,8 +149,11 @@ module Skylab::Cull::TestSupport
     def _expect_remove_worked td
 
       expect_neutral_event :removed_function_call
-      expect_OK_event :collection_resource_committed_changes
+
+      expect_OK_event_ :collection_resource_committed_changes
+
       expect_succeeded
+
       sh = _line_shell td
       sh.advance_to_next_rx %r(\A\[ *report *\])
       sh

@@ -48,10 +48,6 @@ module Skylab::Git::TestSupport
       TestSupport_.debug_IO
     end
 
-    def black_and_white_expression_agent_for_expect_event
-      Home_.lib_.brazen::API.expression_agent_instance
-    end
-
     define_method :memoized_tmpdir_, -> do
 
       o = nil
@@ -85,6 +81,13 @@ module Skylab::Git::TestSupport
 
     def subject_API
       Home_::API
+    end
+
+    def expect_neutral_event_ sym
+
+      em = expect_neutral_event
+      sym.should eql em.cached_event_value.to_event.terminal_channel_symbol
+      em
     end
   end
 
