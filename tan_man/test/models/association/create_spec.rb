@@ -8,10 +8,11 @@ module Skylab::TanMan::TestSupport
     use :expect_line
     use :models_association
 
-    it 'ping', wip: true do
+    it 'ping' do
+
       call_API :association, :add, :ping
       expect_OK_event :ping_from_action, 'ping from action - (ick :add)'
-      expect_succeeded
+      @result.should eql :ping_from__add__
     end
 
     context "when input cannot be resolved" do
@@ -27,22 +28,33 @@ module Skylab::TanMan::TestSupport
 
     using_input '../../node/fixtures/simple-prototype-and-graph-with/zero-but-with-leading-space.dot' do
 
-      it 'associates nodes when neither exists, creating them', wip: true do
+      it 'associates nodes when neither exists, creating them' do
+
         associate 'one', 'two'
 
-        if :creating == @ev_a.first.terminal_channel_i  # ugly fix for [#086]
-          @ev_a.shift
+        scn = @event_log.flush_to_scanner
+
+        _ = scn.current_token.channel_symbol_array.last
+
+        if :creating == _
+          scn.advance_one  # ugly fix for [#086]
         end
 
+        @event_log = scn.flush_to_stream
+
         expect_OK_event :created_node, 'created node (lbl "one")'
+
         expect_OK_event :created_node, 'created node (lbl "two")'
+
         expect_OK_event :created_association, 'created association: one -> two'
+
         excerpt( -4 .. -1 ).should eql <<-O.unindent
           one [label=one]
           two [label=two]
           one -> two
           }
         O
+
         expect_succeeded
       end
     end
@@ -65,10 +77,26 @@ module Skylab::TanMan::TestSupport
 
     using_input '2-nodes-1-edge.dot' do
 
-      it 'does not associate again redundantly', wip: true do
+      it 'does not associate again redundantly' do
+
         associate 'alpha', 'gamma'
-        @ev_a[ 0 .. -2 ] = EMPTY_A_  # hack ignore 3 events
+
+        scn = @event_log.flush_to_scanner
+
+        # #hack-ignore :found_existing_node (x2), :found_existing_association
+
+        begin
+          if :document_did_not_change == scn.current_token.channel_symbol_array.last
+            break
+          end
+          scn.advance_one
+          redo
+        end while nil
+
+        @event_log = scn.flush_to_stream
+
         expect_neutral_event :document_did_not_change
+
         expect_neutralled
       end
     end

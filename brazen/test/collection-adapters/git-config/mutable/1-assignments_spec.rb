@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Brazen::TestSupport
 
-  describe "[br] collection adapters - git config mutable assignments", wip: true do
+  describe "[br] collection adapters - git config mutable assignments" do
 
     TS_[ self ]
     use :expect_event
@@ -16,17 +16,19 @@ module Skylab::Brazen::TestSupport
         sect = document.sections[ :foo ]
         sect[ :'is-on' ] = true
         expect_document_content "[foo]\nis-on = true\n"
-        expect_one_event :added_value do |ev|
+        expect_one_event :related_to_assignment_change do |ev|
+          :added_value == ev.terminal_channel_symbol or fail
           ast = ev.new_assignment
           ast.external_normal_name_symbol.should eql :is_on
           ast.value_x.should eql true
         end
       end
 
-      it "quotes will not be used if not necessary", wip: true do
+      it "quotes will not be used if not necessary" do
         document.sections[ :foo ][ :hi ] = 'foo bar'
         expect_document_content "[foo]\nhi = foo bar\n"
-        expect_one_event :added_value do |ev|
+        expect_one_event :related_to_assignment_change do |ev|
+          :added_value == ev.terminal_channel_symbol or fail
           ast = ev.new_assignment
           ast.internal_normal_name_string.should eql 'hi'
           ast.value_x.should eql 'foo bar'
@@ -36,14 +38,14 @@ module Skylab::Brazen::TestSupport
       it "quotes will be used if leading space" do
         document.sections[ :foo ][ :hi ] = ' foo'
         expect_document_content "[foo]\nhi = \" foo\"\n"
-        expect_one_event :added_value
+        expect_one_event_ :added_value
       end
 
       it "things get escaped TODO this won't unmarshal" do  # #todo is there still an issue with unmarshalling?
         _sect = document.sections[ :foo ]
         _sect[ :hi ] = "\\ \" \n \t \b"
         expect_document_content %([foo]\nhi = \\\\ \\" \\\n \\t \\b\n)
-        expect_one_event :added_value
+        expect_one_event_ :added_value
       end
     end
 

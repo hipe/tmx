@@ -10,7 +10,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
 
   extend TestSupport_::Quickie
 
-  describe "[ba] pathname normalization", wip: true do
+  describe "[ba] pathname normalization" do
 
     extend TS_
     use :expect_event
@@ -37,9 +37,10 @@ module Skylab::Basic::TestSupport::Pathname::N11n
       end
 
       it "against false results in false - this is your problem not ours" do
+
         normalize_against false
         output_value_was_not_written
-        event_proc_was_not_called
+        expect_no_events
         @result_x.should eql false
       end
 
@@ -47,7 +48,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
         normalize_against Home_::EMPTY_S_
         output_value_was_not_written
         @result_x.should eql false
-        expect_event :path_cannot_be_empty,
+        expect_not_OK_event_ :path_cannot_be_empty,
           '(par «your_value») cannot be empty - (ick "")'
         expect_no_more_events
       end
@@ -65,8 +66,9 @@ module Skylab::Basic::TestSupport::Pathname::N11n
       end
 
       it "BUT two contiguous separators with nothing between them - NO" do
+
         normalize_against '//'
-        expect_errored_with :path_cannot_contain_repeated_separators,
+        expect_errored_with_ :path_cannot_contain_repeated_separators,
           '(par «your_value») cannot contain repeated separators - (ick "//")'
       end
 
@@ -91,7 +93,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
 
       it "an abspath - NO" do
         normalize_against '/'
-        expect_errored_with :path_cannot_be_absolute,
+        expect_errored_with_ :path_cannot_be_absolute,
           '(par «your_value») cannot be absolute - (ick "/")'
       end
 
@@ -116,7 +118,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
 
       it "a relpath - NO" do
         normalize_against ' '
-        expect_errored_with :path_cannot_be_relative,
+        expect_errored_with_ :path_cannot_be_relative,
           '(par «your_value») cannot be relative - (ick " ")'
       end
 
@@ -136,7 +138,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
 
       it "no" do
         normalize_against '..'
-        expect_errored_with :path_cannot_contain_dot_dot,
+        expect_errored_with_ :path_cannot_contain_dot_dot,
           '(par «your_value») cannot contain dot dot - (ick "..")'
       end
 
@@ -160,7 +162,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
 
       it "in the middle - no" do
         normalize_against 'a/./c'
-        expect_errored_with :path_cannot_contain_single_dot,
+        expect_errored_with_ :path_cannot_contain_single_dot,
           '(par «your_value») cannot contain single dot - (ick "a/./c")'
       end
 
@@ -184,7 +186,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
 
       it "no" do
         normalize_against '...'
-        expect_errored_with :path_cannot_contain_dot_file,
+        expect_errored_with_ :path_cannot_contain_dot_file,
           '(par «your_value») cannot contain dot file - (ick "...")'
       end
 

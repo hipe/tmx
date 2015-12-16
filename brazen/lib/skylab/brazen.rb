@@ -166,7 +166,60 @@ module Skylab::Brazen
     end
   end
 
-  Require_fields_lib_ = Callback_::Lazy.call do  # ..
+  Lazy_ = Callback_::Lazy
+
+  Require_emission_lib_ = Lazy_.call do  # (will move to [ca])
+
+    class Emission_Interpreter_
+
+      def initialize
+
+        @on_conventional = method :__conventional__
+        @on_data = method :__data__
+        @on_expression = method :__expression__
+        freeze
+      end
+
+      attr_writer(
+        :on_conventional,
+        :on_data,
+        :on_expression,
+      )
+
+      def _call i_a, & x_p
+        instance_variable_get( _category_for( i_a ).ivar )[ i_a, & x_p ]
+      end
+
+      alias_method :[], :_call
+      alias_method :call, :_call
+
+      def shape_of i_a
+        _category_for( i_a ).name_symbol
+      end
+
+      h = nil
+      define_method :_category_for do | i_a |
+        h[ ( i_a[ 1 ] if i_a ) ]
+      end
+
+      Category__ = ::Struct.new :ivar, :name_symbol
+      o = Category__
+
+      h = ::Hash.new o[ :@on_conventional, :CONVENTIONAL_EMISSION_SHAPE ]
+
+      h[ :data ] = o[ :@on_data, :DATA_EMISSION_SHAPE ]
+
+      h[ :expression ] = o[ :@on_expression, :EXPRESSION_EMISSION_SHAPE ]
+
+      def _ * args, m, & x_p
+        Callback_::Bound_Call.via_args_and_method_name args, m, & x_p
+      end
+    end
+
+    NIL_
+  end
+
+  Require_fields_lib_ = Lazy_.call do  # ..
     Field_ = Home_.lib_.fields
     NIL_
   end
@@ -286,5 +339,6 @@ module Skylab::Brazen
   stowaway :TestSupport, 'test/test-support'
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
+  UNRELIABLE_ = false
 
 end

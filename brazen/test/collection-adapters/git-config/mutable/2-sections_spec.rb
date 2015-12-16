@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Brazen::TestSupport
 
-  describe "[br] collection adaptes - git config mutable sections", wip: true do
+  describe "[br] collection adaptes - git config mutable sections" do
 
     TS_[ self ]
     use :expect_event

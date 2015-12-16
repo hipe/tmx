@@ -53,7 +53,7 @@ module Skylab::TestSupport
     #
     #       # (this test assumes one such file already exists)
     #
-    #     result = API.call :generate,
+    #     em = API.call :generate,
     #       :output_path, output_pn.to_path,
     #       :upstream_path, here,
     #       :force,
@@ -61,8 +61,9 @@ module Skylab::TestSupport
     #
     #       # the moneyshot. did it work?
     #
-    #     result  # => nil
-    #       # for now this is nil on success
+    #     em.category  # => [ :success, :wrote ]
+    #       # (you could see number of lines, bytes written by calling
+    #       #  the proc of the above emission.)
     #
     #     stat = output_pn.stat
     #
@@ -192,7 +193,7 @@ module Skylab::TestSupport
                 # (because an actor will emit a more specialized event)
 
               @output_path = x
-              @resolve_line_downstream_method_name = :via_output_path_rslv_line_downstream
+              @resolve_line_downstream_method_name = :_resolve_line_downstream_via_output_path
             end
             KEEP_PARSING_
           end
@@ -206,7 +207,6 @@ module Skylab::TestSupport
             end
             KEEP_PARSING_
           end
-
         end
 
         def initialize boundish  # and oes_p
@@ -451,41 +451,46 @@ module Skylab::TestSupport
           # the output adapter first. normalization may hinge on a valid
           # upstream.
 
-          ok = rslv_downstream
-          ok &&= rslv_upstream
-          ok &&= my_normalize
-          ok && via_upstream_and_downstream_synthesize
-          @result
+          ok = ___resolve_downstream
+          ok &&= __resolve_upstream
+          ok &&= __normalize
+          ok && __via_upstream_and_downstream_synthesize
         end
 
         # ~ resolve downstream
 
-        def rslv_downstream
-          _ok = if @output_adapter_o
+        def ___resolve_downstream
+
+          ok = if @output_adapter_o
             ACHIEVED_
           else
             _resolve_output_adapter_instance  # even if no symbol, get the errmsg
           end
-          _ok && rslv_line_downstream
+
+          if ok
+            send @resolve_line_downstream_method_name
+          else
+            ok
+          end
         end
 
         def _resolve_output_adapter_instance
 
+          _ok = ___resolve_output_adapter_module
+          _ok && via_output_adapter_module_resolve_output_adapter
+        end
+
+        def ___resolve_output_adapter_module
+
           mod = Autoloader_.const_reduce(
             [ @output_adapter ],  # nil ok
-            DocTest_::Output_Adapters_
-
-          ) do |* i_a, & ev_p|
-            @result = maybe_send_event_via_channel i_a, & ev_p
-            UNABLE_
-          end
+            DocTest_::Output_Adapters_,
+            & @on_event_selectively )
 
           if mod
             @output_adapter_module = mod
-            via_output_adapter_module_resolve_output_adapter
-
+            ACHIEVED_
           else
-            @output_adapter_module = @output_adapter_o = mod
             mod
           end
         end
@@ -498,23 +503,23 @@ module Skylab::TestSupport
           ACHIEVED_
         end
 
-        def rslv_line_downstream
-          send @resolve_line_downstream_method_name
-        end
-
         def when_no_downstream_indicated_explicitly
+
           output_path
+
           if @output_path
-            via_output_path_rslv_line_downstream
+            _resolve_line_downstream_via_output_path
           else
-            @result = maybe_send_event :error, :no_downstream do
-              build_not_OK_event_with :no_downstream
+
+            @on_event_selectively.call :error, :no_downstream do
+              build_not_OK_event_with :no_downstream  # #could-go
             end
+
             UNABLE_
           end
         end
 
-        def via_output_path_rslv_line_downstream
+        def _resolve_line_downstream_via_output_path
 
           _force_arg = Callback_::Qualified_Knownness.via_value_and_association(
             # because we use ivars and not property boxes, we must make this manually
@@ -535,14 +540,13 @@ module Skylab::TestSupport
             ACHIEVED_
           else
             # upgrade any `nil` to `false` so that this spills all the way out
-            @result = UNABLE_
             UNABLE_
           end
         end
 
         # ~ resolve upstream
 
-        def rslv_upstream
+        def __resolve_upstream
           ok = rslv_line_upstream
           ok &&= rslv_comment_block_stream_via_line_stream
           ok && rslv_node_upstream_via_comment_block_stream
@@ -553,9 +557,12 @@ module Skylab::TestSupport
         end
 
         def when_no_upstream
-          @result = maybe_send_event :error, :no_upstream do
-            build_not_OK_event_with :no_line_upstream
+
+          @on_event_selectively.call :error, :no_upstream do
+
+            build_not_OK_event_with :no_line_upstream  # #could-go
           end
+
           UNABLE_
         end
 
@@ -567,8 +574,8 @@ module Skylab::TestSupport
 
           ) do | * i_a, & ev_p |
 
-            @result = maybe_send_event_via_channel i_a, & ev_p
-            :error != i_a.first
+            @on_event_selectively.call( * i_a, & ev_p )
+            TEMPORARY_
           end
 
           if io
@@ -595,7 +602,7 @@ module Skylab::TestSupport
 
         # ~ normalize
 
-        def my_normalize
+        def __normalize
           @business_module_name ||= DocTest_::Actors_::
             Infer_business_module_name_loadlessly.call(
                @upstream_path, & handle_event_selectively )
@@ -606,6 +613,7 @@ module Skylab::TestSupport
               ACHIEVED_
             end
           else
+            self._FIXX
             @result = @business_module_name
             UNABLE_
           end
@@ -662,26 +670,36 @@ module Skylab::TestSupport
 
         # ~ synthesize
 
-        def via_upstream_and_downstream_synthesize
+        def __via_upstream_and_downstream_synthesize
 
           if @do_emit_current_output_path
-            maybe_send_event :info, :current_output_path do
-              Callback_::Event.inline_neutral_with(
-                :current_output_path, :path, @output_path )
-            end
+            ___emit_current_output_path
           end
 
-          @result = @output_adapter_o.against(
+          x = @output_adapter_o.against(
             :arbitrary_proc_array, @arbitrary_O_A_proc_array,
             :business_module_name, @business_module_name,
             :line_downstream, @line_downstream,
-            :node_upstream, @node_upstream )
+            :node_upstream, @node_upstream,
+          )
 
           if @do_close_downstream
             @line_downstream.close
           end
 
-          nil
+          x
+        end
+
+        def ___emit_current_output_path
+
+          maybe_send_event :info, :current_output_path do
+
+            Callback_::Event.inline_neutral_with(
+              :current_output_path,
+              :path, @output_path,
+            )
+          end
+          NIL_
         end
 
         # ~ support
@@ -695,6 +713,7 @@ module Skylab::TestSupport
         end
 
         Self_ = self
+        TEMPORARY_ = false  # until a perfect work
       end
     end
   end

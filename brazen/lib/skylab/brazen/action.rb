@@ -447,33 +447,49 @@ module Skylab::Brazen
 
     def accept_selective_listener_proc oes_p  # name might change to expose [ca]
 
+      @_upstream_event_handler = oes_p
+
       @on_event_selectively = -> * i_a, & ev_p do
 
-        receive_uncategorized_emission oes_p, i_a, & ev_p
+        receive_uncategorized_emission i_a, & ev_p
       end
       NIL_
     end
 
   private
 
-    def receive_uncategorized_emission oes_p, i_a, & x_p  # #note-100
+    def receive_uncategorized_emission i_a, & x_p  # #note-100
 
-      case i_a[ 1 ]
-      when :expression  # this is [#023.A].
+      bc = Emission_interpreter___[][ i_a, & x_p ]
 
-        __maybe_emit_expression oes_p, i_a, & x_p
-      when :data
+      send bc.method_name, * bc.args, & bc.block
+    end
 
-        __maybe_emit_data oes_p, i_a, & x_p
-      else
+    Emission_interpreter___ = Lazy_.call do
 
-        maybe_emit_wrapped_or_autovivified_event oes_p, i_a, & x_p
+      Require_emission_lib_[]
+
+      class Emission_Interpreter____ < Emission_Interpreter_
+
+        def __expression__ i_a, & x_p  # this is [#023.A].
+          _ i_a, :__receive_expression, & x_p
+        end
+
+        def __data__ i_a, & x_p
+          _ i_a, :__receive_data_emission, & x_p
+        end
+
+        def __conventional__ i_a, & x_p
+          _ i_a, :receive_conventional_emission, & x_p
+        end
+
+        new.freeze
       end
     end
 
-    def maybe_emit_wrapped_or_autovivified_event oes_p, i_a, & ev_p
+    def receive_conventional_emission i_a, & ev_p
 
-      oes_p.call( * i_a ) do
+      @_upstream_event_handler.call( * i_a ) do
 
         _ev = if ev_p
           ev_p[]
@@ -487,23 +503,23 @@ module Skylab::Brazen
 
     # ~ the map filter for [#023.B] `data`-style events
 
-    def __maybe_emit_data oes_p, i_a, & x_p
+    def __receive_data_emission i_a, & x_p
 
       # for now, all the onus is on the client to handle these.
 
-      oes_p.call( * i_a ) do
+      @_upstream_event_handler.call( * i_a ) do
         x_p[]
       end
     end
 
     # ~ the map filter for [#023.A] `expression`-style events
 
-    def __maybe_emit_expression oes_p, i_a, & msg_p
+    def __receive_expression i_a, & msg_p
 
       first = i_a.first
       rest = i_a[ 2 .. -1 ]
 
-      oes_p.call first, * rest do
+      @_upstream_event_handler.call first, * rest do
 
         # (because we have changed the signature of the potential event from
         #  being an expression to an event object we must modify the channel)

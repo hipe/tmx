@@ -7,23 +7,42 @@ module Skylab::TanMan::TestSupport
     TS_[ self ]
     use :models
 
-    it "dir w/o config file - is not failure", wip: true do
+    it "dir w/o config file - is not failure, result is \"promise\"" do
 
       call_API :status, :path, dirs
 
-      _em = expect_OK_event :resource_not_found
+      em = @result
+      em.category.should eql [ :info, :resource_not_found ]
 
-      black_and_white( _em.cached_event_value ).should eql(
+      _ev = em.emission_value_proc[]
+      _ev and fail
+
+      _em = expect_OK_event :resource_not_found
+      _ev = _em.cached_event_value
+
+      black_and_white( _ev ).should eql(
         '"tanman-workspace/config" not found in dirs' )
 
-      expect_succeeded
+      expect_no_more_events
     end
 
-    it "partay", wip: true do
+    it "partay" do
+
       call_API :status, :path, dir( :with_freshly_initted_conf ),
         :config_filename, 'tan-man.conf'
-      expect_OK_event :resource_exists
-      expect_succeeded
+
+      expect_no_events
+      em = @result
+
+      em.category.should eql [ :info, :resource_exists ]
+
+      ev = em.emission_value_proc[]
+
+      ev.terminal_channel_symbol.should eql :resource_exists
+
+      _ = black_and_white( ev )
+
+      _.should eql "resource exists - tan-man.conf"
     end
   end
 end

@@ -31,7 +31,7 @@ module Skylab::System
           end
         end  # >>
 
-        Callback_::Actor.methodic self, :properties,
+        Callback_::Actor.methodic( self, :properties,
 
           :start_path,
           :filename,
@@ -39,7 +39,8 @@ module Skylab::System
           :max_num_dirs_to_look,
           :prop,
           :property_symbol,
-          :filesystem
+          :filesystem,
+        )
 
         Callback_::Event.selective_builder_sender_receiver self
 
@@ -134,18 +135,30 @@ module Skylab::System
         end
 
         def __when_start_directory_is_not_directory st
+
           maybe_send_event :error, :start_directory_is_not_directory do
-            build_not_OK_event_with :start_directory_is_not_directory,
-              :start_path, @start_path, :ftype, st.ftype,
-                :prop, prp
+
+            _ = build_not_OK_event_with(
+              :start_directory_is_not_directory,
+              :start_path, @start_path,
+              :ftype, st.ftype,
+              :prop, prp,
+            )
+            _
           end
         end
 
         def __when_start_directory_does_not_exist e
+
           maybe_send_event :error, :start_directory_is_not_directory do
-            build_not_OK_event_with :start_directory_does_not_exist,
-              :start_path, @start_path, :exception, e,
-                :prop, prp
+
+            _ = build_not_OK_event_with(
+              :start_directory_does_not_exist,
+              :start_path, @start_path,
+              :exception, e,
+              :prop, prp,
+            )
+            _
           end
         end
 

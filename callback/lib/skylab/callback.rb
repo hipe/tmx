@@ -628,13 +628,22 @@ module Skylab::Callback
     def gets_last_one
       x = gets_one
       if unparsed_exists
-        raise ::ArgumentError, __say_unexpected
+        raise ::ArgumentError, ___say_unexpected
       end
       x
     end
 
-    def __say_unexpected
+    def ___say_unexpected
       "unexpected: #{ Home_.lib_.basic::String.via_mixed current_token }"
+    end
+
+    def flush_to_stream
+
+      Home_.stream do
+        if unparsed_exists
+          gets_one
+        end
+      end
     end
 
     def no_unparsed_exists
@@ -900,6 +909,27 @@ module Skylab::Callback
     def new_with_value x
       self.class.new x, name_symbol
     end
+  end
+
+  class Emission
+
+    class << self
+      def of * i_a, & ev_p
+        via_category i_a, & ev_p
+      end
+      alias_method :via_category, :new
+      private :new
+    end  # >>
+
+    def initialize i_a, & ev_p
+      @category = i_a
+      @emission_value_proc = ev_p
+    end
+
+    attr_reader(
+      :category,
+      :emission_value_proc,
+    )
   end
 
   class Bound_Call  # :[#059].

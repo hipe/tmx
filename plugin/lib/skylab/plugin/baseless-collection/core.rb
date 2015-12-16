@@ -102,8 +102,6 @@ module Skylab::Plugin
 
         def any_first_match_in_input__ back, sig
 
-          require 'byebug' ; byebug ; 1==1 and :chill
-
           _with_match :build_matchdata, back, sig
         end
 

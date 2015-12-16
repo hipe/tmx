@@ -66,9 +66,16 @@ module Skylab::Basic
         event_log.handle_event_selectively
       end
 
-      def expect_not_OK_event_ sym
+      def expect_errored_with_ sym, msg=nil
 
-        em = expect_not_OK_event
+        em = expect_errored_with nil, msg
+        em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
+        em
+      end
+
+      def expect_not_OK_event_ sym, msg=nil
+
+        em = expect_not_OK_event nil, msg
         em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
         em
       end

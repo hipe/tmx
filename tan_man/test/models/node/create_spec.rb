@@ -7,10 +7,10 @@ module Skylab::TanMan::TestSupport
     TS_[ self ]
     use :models_node
 
-    it "ping the 'node add' action", wip: true do
+    it "ping the 'node add' action" do
       call_API :node, :add, :ping
       expect_OK_event :ping_from_action, "ping from action - (ick :add)"
-      expect_succeeded
+      @result.should eql :ping_from__add__
     end
 
     it "add a minimal node to the minimal string" do

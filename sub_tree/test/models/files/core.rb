@@ -31,14 +31,24 @@ module Skylab::SubTree::TestSupport
     end
 
     def produce_action_specific_expag_safely_
+      Expag_for_tests[]
+    end
 
-      # don't autoload yourself just to get the expag - ..
+    Expag_for_tests = Callback_::Lazy.call do
 
-      if Home_.const_defined? :API
-        Home_::Models_::Files::Modalities::CLI::EXPRESSION_AGENT
-      else
-        fail
+      expag = Home_::CLI::Expression_Agent.new :_dummy_reflection_
+
+      # EEK:
+
+      def expag.par x
+        par_via_sym x.name_symbol
       end
+
+      def expag.par_via_sym _
+        "«#{ _.id2name.gsub UNDERSCORE_, DASH_ }»"  # #guillemets
+      end
+
+      expag
     end
 
     pretty = nil

@@ -129,15 +129,28 @@ module Skylab::TanMan
 
     include module IM
 
+      def bound_call_for_ping_
 
-    private def bound_call_for_ping
+        Callback_::Bound_Call.by do
 
-        _x = maybe_send_event :payload, :ping_for_action do
-          build_OK_event_with :ping_from_action, :name_symbol,
-            name.as_lowercase_with_underscores_symbol
+          sym = name.as_lowercase_with_underscores_symbol
+
+          ___maybe_send_ping_event sym
+
+          :"ping_from__#{ sym }__"
         end
+      end
 
-        Callback_::Bound_Call.via_value _x
+      def ___maybe_send_ping_event sym
+
+        maybe_send_event :payload, :ping_from_action do
+
+          _ = build_OK_event_with(
+            :ping_from_action,
+            :name_symbol, sym,
+          )
+          _
+        end
       end
 
       def receive_extra_values_event ev  # #hook-in [cb]

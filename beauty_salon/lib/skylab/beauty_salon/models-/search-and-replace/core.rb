@@ -422,8 +422,10 @@ module Skylab::BeautySalon
       end
 
       def know_via_nonblank_mutable_string s
+
         @o = S_and_R_::Actors_::Build_replace_function[
-          s, work_dir, handle_unsigned_event_selectively ]
+          s, work_dir, & handle_unsigned_event_selectively ]
+
         @o ? ACHIEVED_ : UNABLE_
       end
 
@@ -441,11 +443,14 @@ module Skylab::BeautySalon
       end
 
       def marshal_load s, & ep
-        @o = S_and_R_::Actors_::Build_replace_function[ s, work_dir, -> *, & ev_p do
+
+        _oes_p = -> *, & ev_p do
           _ev = ev_p[]
           ep[ _ev ]
           UNABLE_
-        end ]
+        end
+
+        @o = S_and_R_::Actors_::Build_replace_function[ s, work_dir, & _oes_p ]
 
         @o ? ACHIEVED_ : UNABLE_
       end

@@ -6,7 +6,7 @@ module Skylab::TestSupport::TestSupport::Models
 
     extend TS__
 
-    it "SO BEAUTIFUL / SO UGLY : test simplecov CLI integration in a #sub-process", wip: true do
+    it "SO BEAUTIFUL / SO UGLY : test simplecov CLI integration in a #sub-process", wip: true do  # #old-wip:2015-10
 
       self._HEY_this_is_WIPPED_until_simplecov_is_back
 

@@ -2,18 +2,14 @@ module Skylab::BeautySalon
 
   module Models_::Search_and_Replace
 
-    class Actors_::Build_replace_function
+    class Actors_::Build_replace_function < Callback_::Actor::Dyadic
 
-      class << self
-        def [] * a
-          new( a ).execute
-        end
-      end
+      def initialize string, work_dir, & oes_p
 
-      def initialize a
-        string, @work_dir, @on_event_selectively = a
-        @scn = Home_.lib_.string_scanner.new string
         @a = []
+        @on_event_selectively = oes_p
+        @scn = Home_.lib_.string_scanner.new string
+        @work_dir = work_dir
       end
 
       def execute

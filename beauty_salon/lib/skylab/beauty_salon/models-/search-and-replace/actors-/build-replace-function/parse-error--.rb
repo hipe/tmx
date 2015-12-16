@@ -19,7 +19,6 @@ module Skylab::BeautySalon
           y << "expecting #{ _s_a * ' or ' }:"
           y << o.near_excerpt
           y << "#{ '-' * o.near_excerpt.length }^"
-
         end
 
       class Parse_error__

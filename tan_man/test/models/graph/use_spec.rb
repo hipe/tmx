@@ -155,7 +155,7 @@ module Skylab::TanMan::TestSupport
           expect_succeeded
         end
 
-        it "and diraph path is File object (A HACK)", wip: true do
+        it "and diraph path is File object (A HACK)" do
 
           prepare_ws_tmpdir <<-O.unindent
             --- /dev/null
@@ -174,13 +174,22 @@ module Skylab::TanMan::TestSupport
             :digraph_path, _file,
             :workspace_path, @ws_pn.to_path, :config_filename, cfn
 
-          @ev_a[ 0 .. -3 ] = EMPTY_A_
+          scn = @event_log.flush_to_scanner
+
+          while :wrote_file != scn.current_token.channel_symbol_array.last
+            scn.advance_one
+          end
+
+          @event_log = scn.flush_to_stream
 
           expect_OK_event :wrote_file
-          expect_OK_event :collection_resource_committed_changes
+
+          expect_committed_changes_
+
           expect_succeeded
 
           _read_config_file
+
           excerpt( 0 .. 0 ).should eql "[ graph \"../open-this-yourself\" ]\n"
         end
 

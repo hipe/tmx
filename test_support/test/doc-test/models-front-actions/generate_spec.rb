@@ -5,6 +5,7 @@ module Skylab::TestSupport::TestSupport::DocTest
   describe "[ts] doc-test - [ actions ] - generate" do
 
     extend TS_
+    use :memoizer_methods
     use :expect_event
     use :expect_line
 
@@ -41,28 +42,77 @@ module Skylab::TestSupport::TestSupport::DocTest
 
     it "nothing specy in the file"
 
-    it "normal (partial integration) - spot check of content in a single context", wip: true do
+    context "(worky)" do
 
-      _path = DocTest_.dir_pathname.join( Callback_::Autoloader.default_core_file ).to_path
-      call_API_against_path _path
+      shared_subject :_state do
 
-      expect_neutral_event :current_output_path
-      expect_neutral_event :wrote
-      expect_no_more_events
-      expect_neutral_result
+        debug!
 
-      @output_s = @down_IO.string
+        _path = ::File.join(
+          DocTest_.dir_pathname.to_path,
+          Callback_::Autoloader.default_core_file )
 
-      advance_to_module_line
+        call_API_against_path _path
 
-      line.should eql "module Skylab::TestSupport::TestSupport::DocTest\n"
+        DT_Models_Gen_Struct = ::Struct.new(
+          :emission_array,
+          :output_string,
+          :result )
 
-      @interesting_line_rx = /\A      (?!end\b)[^ ]/
+        DT_Models_Gen_Struct.new(
+          @event_log.flush_to_array,
+          @down_IO.string,
+          @result,
+        )
+      end
 
-      next_interesting_line_dedented.should eql "before :all do\n"
+      it "neutral event talkin bout current output path (none)" do
 
-      next_interesting_line_dedented.should match %r(\Ait "this line here)
+        debug!
 
+        @event_log = Callback_::Stream.via_nonsparse_array _state.emission_array
+
+        expect_neutral_event :current_output_path do | we |
+          we.to_event.path and fail
+        end
+
+        expect_no_more_events
+      end
+
+      it "result is an emission talking about wrote - knows if dry" do
+
+        _state.result.category.should eql [ :success, :wrote ]
+        _wrote.is_known_to_be_dry and fail
+      end
+
+      it "wrote has line count" do
+
+        ( 20 .. 40 ).should be_include _wrote.line_count
+      end
+
+      it "knows if dry run" do
+
+        ( 900 .. 1100 ).should be_include _wrote.bytes
+      end
+
+      dangerous_memoize :_wrote do
+        _state.result.emission_value_proc.call
+      end
+
+      it "content looks OK" do
+
+        @output_s = _state.output_string
+
+        advance_to_module_line
+
+        line.should eql "module Skylab::TestSupport::TestSupport::DocTest\n"
+
+        @interesting_line_rx = /\A      (?!end\b)[^ ]/
+
+        next_interesting_line_dedented.should eql "before :all do\n"
+
+        next_interesting_line_dedented.should match %r(\Ait "this line here)
+      end
     end
 
     it "`force` argument works" do
@@ -80,9 +130,9 @@ module Skylab::TestSupport::TestSupport::DocTest
       expect_failed
     end
 
-    it "PRE-FINAL INTEGRATION HACK TESLLT (dry run)", wip: true do
+    it "PRE-FINAL INTEGRATION HACK TEST (dry run)" do
 
-      @result = subject_API.call(
+      em = subject_API.call(
         :generate,
         :dry_run,  # comment this out to re-write the file!
         :force,
@@ -92,9 +142,11 @@ module Skylab::TestSupport::TestSupport::DocTest
         :on_event_selectively, event_log.handle_event_selectively )
 
       expect_neutral_event :before_editing_existing_file
-      expect_neutral_event :wrote
-      expect_no_more_events
-      expect_neutral_result
+      wrote  = em.emission_value_proc[]
+
+      wrote.is_known_to_be_dry or fail
+      ( 1300..1500 ).should be_include wrote.bytes
+      ( 37..57 ).should be_include wrote.line_count
     end
 
     def common_upstream_path

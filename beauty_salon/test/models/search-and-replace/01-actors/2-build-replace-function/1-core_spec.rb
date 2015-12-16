@@ -2,7 +2,7 @@ require_relative '../../../../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] S & R - actors - build replace function", wip: true do
+  describe "[bs] S & R - actors - build replace function" do
 
     extend TS_
     use :models_search_and_replace_actors_build_replace_function_support
@@ -16,17 +16,16 @@ module Skylab::BeautySalon::TestSupport
       against_ "durfie Jimbo wahootey"
 
       expect_ "durfie foo wahootey"
-
     end
 
     it "but if you use the mustache open curlies, watch out:" do
 
       rf_ "{{"
 
-      expect_event :replace_function_parse_error, unindent_(
+      expect_event :replace_function_parse_error,
         "expecting <capture reference> or \"{{\":\n#{
         }\n#{
-        }^" )
+        }^"
 
     end
 

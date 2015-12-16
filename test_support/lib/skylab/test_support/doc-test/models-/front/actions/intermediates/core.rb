@@ -130,6 +130,7 @@ module Skylab::TestSupport
                 }and #{ pth o.lower_TS_path }"
             end
           end
+          NIL_
         end
 
         def via_current_and_dirname current, dirname
@@ -156,19 +157,27 @@ module Skylab::TestSupport
         end
 
         def via_job_stream st
+
           ok = true
           job = st.gets
           count = 0
+
           while job
             count += 1
             ok = job.execute
             ok or break
             job = st.gets
           end
-          report_via_count count
+
+          if ok
+            report_via_count count
+          else
+            ok
+          end
         end
 
         def report_via_count d
+
           @on_event_selectively.call :info, :finished do
             Callback_::Event.inline_with :finished,
                 :number_of_files, d,
@@ -178,6 +187,8 @@ module Skylab::TestSupport
               y << "(generated #{ d_ } file#{ s d_ })"
             end
           end
+
+          ACHIEVED_
         end
 
         class Job__
@@ -238,15 +249,26 @@ module Skylab::TestSupport
               @down_IO.close
             end
 
+            if d_.zero?
+              self._COVER_ME
+            else
+              __emit_wrote_event d, d_
+              ACHIEVED_
+            end
+          end
+
+          def __emit_wrote_event d, d_
+
             @on_event_selectively.call :info, :wrote do
 
               DocTest_::Output_Adapter_.event_for_wrote.new_with(
                 :is_known_to_be_dry, @is_dry,
                 :bytes, d,
                 :line_count, d_,
-                :ok, true )  # important - batch job will stop early without this
-
-            end  # result of client can stop the job here
+                :ok, true,
+              )
+            end
+            UNRELIABLE_
           end
 
           def resolve_down_IO
@@ -275,6 +297,7 @@ module Skylab::TestSupport
         end
 
         Self_ = self
+        UNRELIABLE_ = false
       end
     end
   end

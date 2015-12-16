@@ -90,6 +90,7 @@ module Skylab::Callback::TestSupport
           io = @debug_IO
           io.rewind
           io.gets.should eql "[:event_ignored, :zizzo]\n"
+          io.gets.should eql "[:zizzo, :zIZZo]\n"  # not ignored
           io.gets.should eql "[:event_ignored, :hi, :zizzo]\n"
           io.gets and fail
         end

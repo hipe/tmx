@@ -147,6 +147,10 @@ shorters pattern          yes          no              yes
 • so effectively a "callback"-style node in a callback tree is always a
   required field.
 
+(EDIT: this whole document will probably be archived, but while we are
+here, note that we draft a proper indictment of the above pattern in a
+commit message from this time..)
+
 
 
 

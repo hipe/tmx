@@ -37,7 +37,7 @@ module Skylab::TanMan
 
         def via_arguments_produce_bound_call
           if @argument_box[ :ping ]
-            bound_call_for_ping
+            bound_call_for_ping_
           else
             super
           end

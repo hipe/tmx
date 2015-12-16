@@ -8,7 +8,7 @@ module Skylab::Basic::TestSupport::Numeric
 
   extend TestSupport_::Quickie
 
-  describe "[ba] number normalization", wip: true do
+  describe "[ba] number normalization" do
 
     extend TS_
     use :expect_event
@@ -38,7 +38,7 @@ module Skylab::Basic::TestSupport::Numeric
         normalize_against 'A'
         output_value_was_not_written
         @result_x.should eql false
-        expect_not_OK_event expected_terminal_channel,
+        expect_not_OK_event_ expected_terminal_channel,
           '(par «your_value») must be (indefinite_noun "integer"), had (ick "A")'
         expect_no_more_events
       end
@@ -46,7 +46,7 @@ module Skylab::Basic::TestSupport::Numeric
       it "against a float" do
         normalize_against 1.23
         output_value_was_not_written
-        expect_not_OK_event expected_terminal_channel
+        expect_not_OK_event_ expected_terminal_channel
         @result_x.should eql false
       end
 
@@ -74,7 +74,7 @@ module Skylab::Basic::TestSupport::Numeric
       def expect_result_for_input_was_below_minimum
         output_value_was_not_written
         @result_x.should eql false
-        expect_not_OK_event :number_too_small,
+        expect_not_OK_event_ :number_too_small,
           "(par «your_value») must be greater than or equal to (val -3), #{
             }had (ick -4)" do |ev|
           ev.error_category.should eql :argument_error
@@ -90,9 +90,10 @@ module Skylab::Basic::TestSupport::Numeric
       end
 
       it "when input is above minimum OK too" do
+
         normalize_against( -2 )
         output_value_was_written
-        event_proc_was_not_called
+        expect_no_events
         @output_x.should eql( -2 )
       end
 

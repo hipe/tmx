@@ -33,12 +33,21 @@ module Skylab::Cull::TestSupport
       expect_failed
     end
 
-    it "go money", wip: true do
+    it "go money" do
+
       call_API :create, :path, prepare_tmpdir.to_path
+
+      em = @result
       expect_neutral_event :creating_directory
-      expect_OK_event :collection_resource_committed_changes
-      expect_OK_event :survey
-      expect_succeeded
+      expect_OK_event_ :collection_resource_committed_changes
+
+      em.category.should eql [ :info, :created_survey ]
+
+      ev = em.emission_value_proc.call
+      ev.ok or fail
+      ev.path or fail
+      ev.is_completion or fail
+
     end
   end
 end

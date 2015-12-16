@@ -41,6 +41,10 @@ module Skylab::SubTree::TestSupport
       using_expect_stdout_stderr_invoke_via_argv argv
     end
 
+    def produce_action_specific_expag_safely_
+      Models::Files::Expag_for_tests[]
+    end
+
     # ~ #hook-outs
 
     def subject_CLI

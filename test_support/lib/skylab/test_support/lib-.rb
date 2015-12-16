@@ -5,11 +5,15 @@ module Skylab::TestSupport
   module Library_
 
     stdlib = Autoloader_.method :require_stdlib
+    gemlib = stdlib
 
     o = { }
+
+    o[ :Adsf ] = gemlib
     o[ :Benchmark ] = stdlib
     o[ :Open3 ] = stdlib
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
+    o[ :Rack ] = gemlib
     o[ :StringIO ] = stdlib
     o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
 

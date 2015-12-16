@@ -5,6 +5,7 @@ module Skylab::Brazen::TestSupport
   describe "[br] CLI actions status" do
 
     TS_[ self ]
+    use :memoizer_methods
     use :CLI_actions
 
     with_invocation 'status'
@@ -68,7 +69,7 @@ module Skylab::Brazen::TestSupport
 
           invoke '.'
 
-          expect "#{ _prefix_and_conf_file } not found in \. or 1 dir up"
+          expect "#{ _head } not found in \. or 1 dir up"
 
           expect_exitstatus_for_resource_not_found
         end
@@ -89,7 +90,7 @@ module Skylab::Brazen::TestSupport
         end
 
         def expect_same_result
-          expect "#{ _prefix_and_conf_file } not found in ."
+          expect "#{ _head } not found in ."
           expect_exitstatus_for_resource_not_found
         end
       end
@@ -97,7 +98,7 @@ module Skylab::Brazen::TestSupport
       context "with a path argument that does not exist" do
         it "says as much" do
           invoke 'foozie'
-          expect :styled, %r(#{ par 'path' } does not exist - ./foozie\z)
+          expect :styled, %r(#{ par 'path' } does not exist - \./foozie\z)
           expect_action_invite_line_
           expect_errored
         end
@@ -110,9 +111,8 @@ module Skylab::Brazen::TestSupport
       using_expect_stdout_stderr_invoke_via_argv argv
     end
 
-    _ICK_CONF_FILE = nil
-    define_method :_prefix_and_conf_file do
-      _ICK_CONF_FILE ||= 'while determining a workspace, "brazen.conf"'
+    dangerous_memoize :_head do
+      'while determining a workspace, "brazen.conf"'
     end
 
     def expect_negative_exitstatus

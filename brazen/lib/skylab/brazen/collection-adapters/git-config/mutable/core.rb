@@ -38,13 +38,19 @@ module Skylab::Brazen
           end
         end
 
+        attr_reader :on_event_selectively
+
       private
 
         def absorb_even_iambic_fully a
+
           dsl = DSL__.new self
+
           a.each_slice 2 do |i, x|
             dsl.send i, x
-          end ; nil
+          end
+
+          NIL_
         end
 
         class DSL__
@@ -156,20 +162,6 @@ module Skylab::Brazen
         def accept_asmt asmt
           @current_nonterminal_node.accept_asmt asmt
           nil
-        end
-      end
-
-      class Pass_Thru_Parse__ < Parse__
-        undef_method :execute
-        class << self
-
-          def new_with * x_a, & oes_p
-            new x_a, & oes_p
-          end
-        end
-
-        def on_event_selectively
-          @on_event_selectively
         end
       end
 

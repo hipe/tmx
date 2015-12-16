@@ -38,13 +38,20 @@ module Skylab::Brazen::TestSupport
     end
 
     def with_content s
+
       document_p = -> do
         doc = subject.parse_string s do self._NEVER end
         document_p = -> { doc } ; doc
       end
+
       define_method :__build_document__ do
-        document_p[].dup_via_parse_context parse_context
-      end ; nil
+
+        @__parse_context ||= __build_parse_context
+
+        document_p[].dup_via_parse_context @__parse_context
+      end
+
+      NIL_
     end
 
     def subject
@@ -58,20 +65,11 @@ module Skylab::Brazen::TestSupport
       @document ||= __build_document__
     end
 
-    def parse_context
-      @parse_context ||= bld_parse_context
-    end
+    def __build_parse_context
 
-    def bld_parse_context
-      @ev_a = nil
-      subject::Pass_Thru_Parse__.new_with :on_event_selectively, -> *, & ev_p do
-        ev = ev_p[]
-        if do_debug
-          debug_IO.puts ev.description
-        end
-        ( @ev_a ||= [] ).push ev
-        nil
-      end
+      _oes_p = event_log.handle_event_selectively
+
+      subject::Parse__.new_with( & _oes_p )
     end
 
     def touch_section subsect_s=nil, sect_s, & x_p
@@ -83,6 +81,16 @@ module Skylab::Brazen::TestSupport
     def expect_document_content expected_string
       _actual_string = @document.unparse
       _actual_string.should eql expected_string
+    end
+
+    def expect_one_event_ sym
+      em = expect_event
+      ev = em.cached_event_value.to_event
+      ev.terminal_channel_symbol.should eql sym
+      if block_given?
+        yield ev
+      end
+      em
     end
 
     # ~ support

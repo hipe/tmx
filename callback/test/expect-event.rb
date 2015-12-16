@@ -130,28 +130,6 @@ module Skylab::Callback::TestSupport
 
         # ~ expectations along the different qualities of events
 
-        #
-
-        #
-
-        #
-
-        #
-
-        #
-
-        #
-
-        #
-
-        #
-
-        #
-
-        #
-
-        #
-
         def black_and_white ev
           black_and_white_lines( ev ).join NEWLINE_
         end
@@ -162,10 +140,6 @@ module Skylab::Callback::TestSupport
         end
 
         # ~ support and resolution
-
-        #
-
-        #
 
         def expect_failed_by * x_a, & x_p
           em = _next_actual_expev_emission do | em_ |
@@ -259,7 +233,7 @@ module Skylab::Callback::TestSupport
 
         -> i_a, & _ev_p do
           io.puts i_a.inspect
-          UNABLE_  # just in case
+          UNRELIABLE_
         end
       end
 
@@ -568,7 +542,9 @@ module Skylab::Callback::TestSupport
 
         _expag = @_test_context._expev_lower_level_expression_agent
 
-        @_emission.cached_event_value.express_into_under '', _expag
+        _lines = @_emission.cached_event_value.express_into_under [], _expag
+
+        _lines.join NEWLINE_
       end
 
       def _add_failure_by & msg_p
@@ -681,17 +657,20 @@ module Skylab::Callback::TestSupport
 
         a = []
 
+        close_options = -> do  # idempotent
+          @_receive_option = nil
+        end
+
         receive_emission = -> symbol_array, & event_proc do
 
-          @_receive_option = nil
+          close_options[]
+
+          record = __proc_for_record a
 
           receive_emission = if opts
-            __special_receiver opts, a
+            __proc_when_options opts, record
           else
-            -> sym_a, & ev_p do
-              a.push Emission__.new( ev_p, sym_a )
-              UNRELIABLE_
-            end
+            record
           end
 
           receive_emission[ symbol_array, & event_proc ]
@@ -704,12 +683,31 @@ module Skylab::Callback::TestSupport
 
         # -- read emissions
 
+        close_options_and_readers = -> do
+
+          close_options[]
+          receive_emission = nil
+
+          @_flush_to_scanner = nil
+          @_flush_to_array = nil
+          @_gets_x = nil
+        end
+
+        @_flush_to_scanner = -> do
+          close_options_and_readers[]
+          Callback_::Polymorphic_Stream.via_array a
+        end
+
+        @_flush_to_array = -> do
+          close_options_and_readers[]
+          a.freeze
+        end
+
         @_gets_x = -> do
+
           # this ivar could be made to be immutable **but it is NOT currently**
 
-          @_receive_option = nil  # don't assume we've received any events
-          receive_emission = nil  # this isn't a read/write thing
-
+          close_options_and_readers[]
           @_gets_x = Callback_::Stream.via_nonsparse_array a
           @_gets_x.call
         end
@@ -717,8 +715,8 @@ module Skylab::Callback::TestSupport
 
       # -- set options (counterpart)
 
-      def set_auxiliary_listener_by & chan_p
-        @_receive_option[ :aux_listener, chan_p ]
+      def set_auxiliary_listener_by & aux_chan_p
+        @_receive_option[ :aux_listener, aux_chan_p ]
         NIL_
       end
 
@@ -733,75 +731,116 @@ module Skylab::Callback::TestSupport
         :handle_event_selectively,
       )
 
-      def __special_receiver opts, a
+      def __proc_when_options opts, record
 
-        chan_p = opts.aux_listener
+        aux_chan_p = opts.aux_listener
         ignore_h = opts.ignore_term_chan_hash
 
+        if aux_chan_p
+          mux_p = __proc_for_mux aux_chan_p, record
+        end
+
         if ignore_h
-          if chan_p
-            ___ignore_and_mux chan_p, ignore_h, a
+
+          if aux_chan_p
+            when_ignored = ___proc_for_when_ignored_under_mux aux_chan_p
+            when_not_ignored = mux_p
           else
-            __ignore ignore_h, a
+            when_not_ignored = record
           end
+
+          __if_ignore ignore_h, when_ignored, when_not_ignored
         else
-          __mux chan_p, a
+
+          mux_p
         end
       end
 
       Options___ = ::Struct.new :aux_listener, :ignore_term_chan_hash
 
-      def ___ignore_and_mux chan_p, ignore_h, em_a
+      def ___proc_for_when_ignored_under_mux aux_chan_p
 
-        -> sym_a, & p do
+        -> sym_a, & ev_p do
 
-          if ignore_h[ sym_a.last ]
+          aux_chan_p.call( [ :event_ignored, * sym_a ] ) do
+            self._DESIGN_ME
+          end
 
-            _ = [ :event_ignored, * sym_a ]
+          UNRELIABLE_
+        end
+      end
 
-            chan_p.call _ do
-              self._NOT_COVERED
+      def __if_ignore ignore_h, when_ignore_p, when_not_ignore_p
+
+        ignore = -> sym_a do
+          ignore_h[ sym_a.last ]
+        end
+
+        if when_ignore_p  # #OCD
+
+          -> sym_a, & ev_p do
+
+            if ignore[ sym_a ]
+              when_ignore_p[ sym_a, & ev_p ]
+            else
+              when_not_ignore_p[ sym_a, & ev_p ]
             end
-          else
-            em_a.push Emission__.new( p, sym_a )
+
+            UNRELIABLE_
+          end
+        else
+
+          -> sym_a, & ev_p do
+
+            if ! ignore[ sym_a ]
+              when_not_ignore_p[ sym_a, & ev_p ]
+            end
+
+            UNRELIABLE_
+          end
+        end
+      end
+
+      def __proc_for_mux aux_chan_p, record
+
+        -> sym_a, & p do
+
+          _unreliable = record[ sym_a, & p ]
+
+          aux_chan_p.call sym_a do
+            self._DESIGN_ME
           end
 
           UNRELIABLE_
         end
       end
 
-      def __ignore ignore_h, em_a
+      def __proc_for_record em_a
 
-        -> sym_a, & p do
-          if ! ignore_h[ sym_a.last ]
-            em_a.push Emission__.new( p, sym_a )
-          end
+        -> sym_a, & ev_p do
+
+          _em = Emission___.new ev_p, sym_a
+          em_a.push _em
           UNRELIABLE_
-        end
-      end
-
-      def __mux chan_p, em_a
-
-        -> sym_a, & p do
-
-          em = Emission__.new p, sym_a
-
-          chan_p.call sym_a do
-            em._NOT_COVERED
-          end
-
-          em_a.push em ; UNRELIABLE_
         end
       end
 
       # -- read emissions (counterpart)
+
+      def flush_to_scanner
+        @_flush_to_scanner[]
+      end
+
+      def flush_to_array
+        @_flush_to_array[]
+      end
 
       def gets
         @_gets_x.call
       end
     end
 
-    class Emission__
+    class Emission___
 
       def initialize event_proc, channel_symbol_array
 

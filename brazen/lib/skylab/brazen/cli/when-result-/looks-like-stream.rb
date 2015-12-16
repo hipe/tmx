@@ -16,61 +16,74 @@ module Skylab::Brazen
       end
 
       def execute
+
         if @upstream.respond_to? :gets
-          @was_a_stream = true
+          @_is_single_item = false
           __via_stream
+
         else
-          @item = @upstream
+          @_is_single_item = true
+          @_item = @upstream
           @upstream = Callback_::Scn.the_empty_stream
-          @was_a_stream = false
-          when_at_least_one_item
+          _when_at_least_one_item
         end
       end
 
       def __via_stream
-        @item = @upstream.gets
-        if @item
-          when_at_least_one_item
+
+        @_item = @upstream.gets
+
+        if @_item
+          _when_at_least_one_item
+
         else
-          when_no_items
+          @resources.serr.puts "empty."
+          ACHIEVED_
         end
       end
 
-      def when_no_items
-        @resources.serr.puts "empty."
-        ACHIEVED_
-      end
-
-      def when_at_least_one_item
+      def _when_at_least_one_item
 
         __resolve_name
 
-        p = __proc_for_express_all_items_via_first_item
+        express_current_item =
+          __niladic_proc_to_express_future_item_using_current_item_as_prototype
 
-        @count = 1
+        @_count = 1
         begin
-          p[]
-          @ok or break
-          @item = @upstream.gets
-          @item or break
-          @count += 1
+
+          express_current_item[]
+
+          if ! @_keep_looping
+            break
+          end
+
+          x = @upstream.gets
+          x or break
+
+          @_item = x
+          @_count += 1
           redo
         end while nil
 
-        if @was_a_stream
-          finish_when_at_least_one
+        if @_is_single_item
+          if @_keep_looping
+            SUCCESS_EXITSTATUS
+          else
+            GENERIC_ERROR_EXITSTATUS
+          end
         else
-          @ok ? SUCCESS_EXITSTATUS : GENERIC_ERROR_EXITSTATUS
+          __finish_when_was_stream
         end
       end
 
       def __resolve_name
 
-        @name = if @item.respond_to? :name  # #open [#107] will change this name
-          @item.name
+        @_name = if @_item.respond_to? :name  # #open [#107] will change this name
+          @_item.name
         else
 
-          cls = @item.class
+          cls = @_item.class
 
           name_s = cls.name
           if name_s
@@ -82,80 +95,84 @@ module Skylab::Brazen
         NIL_
       end
 
-      def __proc_for_express_all_items_via_first_item
+      def __niladic_proc_to_express_future_item_using_current_item_as_prototype
 
-        o = @item
-        if o.respond_to? :execute
+        @_keep_looping = true
 
-          method :__express_item_via_execute
+        x = @_item
 
-        elsif o.respond_to? :express_into_under
+        if x.respond_to? :express_into_under
+          __niladic_proc_to_express_current_item_in_the_common_way x
 
-          if o.respond_to? :express_of_via_into_under
-
-            pr = o.express_of_via_into_under @y, @expag
-          end
-          if pr
-            @ok = true
-            @__prepared_expresser = pr
-            method :__express_item_via_prepared_expresser
-          else
-            @ok = true
-            method :__express_item_via_into_under
-          end
+        elsif x.respond_to? :execute
+          __niladic_proc_to_express_current_item_by_the_execute_method
 
         elsif (
-          o.respond_to? :members or
-          o.respond_to? :properties or
-          o.respond_to? :to_component_knownness_stream
+          x.respond_to? :members or
+          x.respond_to? :properties or
+          x.respond_to? :to_component_knownness_stream
         )
-          _build_listing_expresser
+          __niladic_proc_to_express_current_item_by_building_a_listing_expresser
+
         else
-
-          method :__express_item_via_to_s
+          ___niladic_proc_to_express_item_in_the_catch_all_default_manner
         end
       end
 
-      def __express_item_via_execute
-
-        @ok = @item.execute
-        NIL_
-      end
-
-      def __express_item_via_prepared_expresser
-
-        _y = @__prepared_expresser.call @item
-        _y or @ok = false
-        NIL_
-      end
-
-      def __express_item_via_into_under
-
-        _y = @item.express_into_under @y, @expag
-        _y or @ok = false
-        NIL_
-      end
-
-      def __express_item_via_to_s
-
-        @y << @item
-        @ok = true
-        NIL_
-      end
-
-      def _build_listing_expresser
-
-        p = When_Result_::Looks_like_stream__::Build_listing_expresser[ @expag, @item ]
+      def ___niladic_proc_to_express_item_in_the_catch_all_default_manner
         -> do
-          @ok = p[ @item, @y ]
-          nil
+          @y << @_item
+          NIL_
         end
       end
 
-      def finish_when_at_least_one
+      def __niladic_proc_to_express_current_item_by_the_execute_method
+        -> do
+          @_keep_looping = @_item.execute
+          NIL_
+        end
+      end
 
-        d = @count
-        nm = @name
+      def __niladic_proc_to_express_current_item_by_building_a_listing_expresser
+
+        p = When_Result_::Looks_like_stream__::Build_listing_expresser[ @expag, @_item ]
+
+        -> do
+          @_keep_looping = p[ @_item, @y ]
+          NIL_
+        end
+      end
+
+      def __niladic_proc_to_express_current_item_in_the_common_way x
+
+        if x.respond_to? :express_of_via_into_under
+
+          pe = x.express_of_via_into_under @y, @expag
+        end
+
+        if pe
+          -> do
+            y = pe.call @_item
+            if ! y
+              @_keep_looping = y
+            end
+            NIL_
+          end
+        else
+          -> do
+            y = @_item.express_into_under @y, @expag
+            if ! y
+              @_keep_looping = y
+            end
+            NIL_
+          end
+        end
+      end
+
+      def __finish_when_was_stream
+
+        d = @_count
+        nm = @_name
         serr = @resources.serr
 
         if nm.respond_to? :verb_as_noun_lexeme
@@ -188,7 +205,11 @@ module Skylab::Brazen
           end
         end
 
-        @ok ? SUCCESS_EXITSTATUS : GENERIC_ERROR_EXITSTATUS
+        if @_keep_looping
+          SUCCESS_EXITSTATUS
+        else
+          GENERIC_ERROR_EXITSTATUS
+        end
       end
 
       Self_ = self

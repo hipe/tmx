@@ -100,8 +100,16 @@ module Skylab::Brazen
         init_categorized_properties
 
         bc = _bound_call_from_parse_parameters
+
         x = bc.receiver.send bc.method_name, * bc.args, & bc.block
-        ___flush_any_invitations
+
+        # experiment -
+        if x.respond_to? :emission_value_proc
+          x = ___express_result_emission x
+        end
+
+        __flush_any_invitations
+
         if x
           __result_as_top_via_trueish_backstream_result x
         else
@@ -109,11 +117,37 @@ module Skylab::Brazen
         end
       end
 
+      def ___express_result_emission em
+
+        # the experimental #emission-as-result can (perhaps) not be processed
+        # like other true-ish backstream values because A) it may need to
+        # emit invitation events (but how we express those may change..) and
+        # B) so far it's the only shpae that wants to control exitstatus..
+
+        # for an emission to be workable as a result from a backstream call,
+        # it may need to manage its own expression. in such cases the below
+        # result will be false-ish. otherwise for now we assume etc..
+
+        _ = _emission_interpreter.shape_of em.category
+
+        if :CONVENTIONAL_EMISSION_SHAPE == _
+
+          ev = em.emission_value_proc.call
+          if ev
+            receive_event_on_channel ev, em.category
+          end
+          # otherwise the emission autonomously expressed itself
+        else
+          receive_uncategorized_emission em.category, & em.emission_value_proc
+        end
+        NIL_  # important
+      end
+
       # ~ ( others at top, then the list from [#024] )
 
       ## ~~ help & invitations
 
-      def ___flush_any_invitations
+      def __flush_any_invitations
 
         if _invite_ev_a
           __flush_invitations
@@ -323,8 +357,6 @@ module Skylab::Brazen
         :_write_invocation_string_parts_into,
       )
     end  # top invocation
-
-    Lazy_ = Callback_::Lazy
 
     # -- branch invocation (reduces unbounds to bounds)
 
@@ -1537,22 +1569,35 @@ module Skylab::Brazen
 
       def receive_uncategorized_emission i_a, & x_p
 
-        if i_a
-          sym = i_a[ 1 ]
-        end
+        bc = _emission_interpreter[ i_a, & x_p ]
+        send bc.method_name, * bc.args, & bc.block
+      end
 
-        case sym
-        when :expression
+      def _emission_interpreter
+        Emission_interpreter___[]
+      end
 
-          send :"receive__#{ i_a[ 0 ] }__expression", * i_a[ 2 .. -1 ], & x_p
+      Emission_interpreter___ = Lazy_.call do
 
-        when :data
+        # NOTE this might become an overridable
 
-          __receive_data_emission i_a, & x_p
+        Require_emission_lib_[]
 
-        else
+        class Emission_Interpreter____ < Emission_Interpreter_
 
-          receive_conventional_emission i_a, & x_p
+          def __expression__ i_a, & x_p
+            _ i_a[ 2 .. -1 ], :"receive__#{ i_a[ 0 ] }__expression", & x_p
+          end
+
+          def __data__ i_a, & x_p
+            _ i_a, :__receive_data_emission, & x_p
+          end
+
+          def __conventional__ i_a, & x_p
+            _ i_a, :receive_conventional_emission, & x_p
+          end
+
+          new.freeze
         end
       end
 
@@ -1790,8 +1835,10 @@ module Skylab::Brazen
       end.call
 
       def render_event_lines ev
-        ev.express_into_under y=[], expression_agent
-        y
+
+        _expag = expression_agent
+        _ = ev.express_into_under [], _expag
+        _
       end
 
       def send_non_payload_event_lines_with_redundancy_filter a
@@ -2022,7 +2069,7 @@ module Skylab::Brazen
 
     # -- performers that model formal properties
 
-    Standard_branch_property_box___ = Callback_::Lazy.call do
+    Standard_branch_property_box___ = Lazy_.call do
 
       _Property = Home_::CLI_Support::Modality_Specific_Property
 

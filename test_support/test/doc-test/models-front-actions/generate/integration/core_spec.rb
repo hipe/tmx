@@ -25,7 +25,7 @@ module Skylab::TestSupport::TestSupport::DocTest::Models::Front::Actions::Genera
 
           # (this test assumes one such file already exists)
 
-        result = API.call :generate,
+        em = API.call :generate,
           :output_path, output_pn.to_path,
           :upstream_path, here,
           :force,
@@ -33,8 +33,9 @@ module Skylab::TestSupport::TestSupport::DocTest::Models::Front::Actions::Genera
 
           # the moneyshot. did it work?
 
-        result.should eql nil
-          # for now this is nil on success
+        em.category.should eql [ :success, :wrote ]
+          # (you could see number of lines, bytes written by calling
+          #  the proc of the above emission.)
 
         stat = output_pn.stat
 

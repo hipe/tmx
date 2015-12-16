@@ -132,7 +132,7 @@ module Skylab::TestSupport
 
           # do not put a trailing newline on these ones - they
           # are first of a pair and "look better" in one line.
-          # this behavior will probably become [#ba-021] magic
+          # this behavior will probably become [#br-021] magic
 
           include Action_Adapter_Event_Handling_Customizations__
 
@@ -152,17 +152,20 @@ module Skylab::TestSupport
 
           def wrote ev, i_a
 
-            if _saw_first_part
+            _unreliable = if _saw_first_part
+
               receive_event_on_channel ev, i_a
-              true  # don't stop the batch
+
             else
+
               s_a = render_event_lines ev
               s = s_a.first
               s.strip!
               s_a[ 0 ] = "(preview for one file #{ s })"
               send_non_payload_event_lines s_a
-              true  # don't stop the batch
             end
+
+            ACHIEVED_  # don't stop the batch job
           end
 
           attr_reader :_saw_first_part

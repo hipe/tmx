@@ -247,6 +247,7 @@ module Skylab::Brazen
     class WS_via_qualified_knownness_box___
 
       def initialize bx, sm, k, & oes_p
+
         @bx = bx
         @kernel = k
         @silo_module = sm

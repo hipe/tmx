@@ -33,9 +33,10 @@ module Skylab::TestSupport::TestSupport::DocTest
       expect_failed
     end
 
-    it "path exists, has sibling TS file, dry run", wip: true do
+    it "path exists, has sibling TS file, dry run" do
 
       call_API :intermediates, :path, a_deep_path, :dry_run
+
       expect_neutral_event :writing
       expect_OK_event :wrote
       expect_neutral_event :writing
@@ -44,7 +45,7 @@ module Skylab::TestSupport::TestSupport::DocTest
       expect_succeeded
     end
 
-    it "preview works", wip: true do
+    it "preview works" do
 
       io = build_IO_spy_downstream_for_doctest
       call_API :intermediates, :downstream, io, :preview, :path, a_deep_path

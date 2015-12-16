@@ -17,12 +17,16 @@ module Skylab::SubTree::TestSupport
 
       _em = expect_not_OK_event
 
-      black_and_white( _em.cached_event_value ).should match(
+      _actual = black_and_white _em.cached_event_value
+
+      _rx =
         /\Acan't read input from both #{
           }[^a-z]*file-of-input-paths[^a-z ]*#{
           } and #{
           }[^a-z]*input-stream[^a-z ]*#{
-          } at the same time/i )
+          } at the same time/i
+
+      _actual.should match _rx
 
       expect_failed
     end

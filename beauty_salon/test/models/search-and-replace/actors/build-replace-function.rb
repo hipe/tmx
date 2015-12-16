@@ -8,15 +8,17 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def rf_ replace_function_string
+
+      _oes_p = event_log.handle_event_selectively
+
       @replace_function = __subject_module::Actors_::Build_replace_function[
+
         replace_function_string,
+
         :_no_work_dir_,
-        -> *, & ev_p do
-          @ev_a ||= []
-          @ev_a.push ev_p[]
-          false
-        end ]
-      nil
+
+        & _oes_p ]
+      NIL_
     end
 
     def rx_ rx

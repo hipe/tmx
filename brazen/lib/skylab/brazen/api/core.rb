@@ -14,7 +14,7 @@ module Skylab::Brazen
       end
 
       def exit_statii
-        Exit_statii__[]
+        Exit_statii___[]
       end
 
       def expression_agent_class
@@ -43,9 +43,9 @@ module Skylab::Brazen
       teea ||= build_the_empty_expression_agent[]
     end
 
-    Exit_statii__ = Callback_.memoize do
+    Exit_statii___ = Callback_::Lazy.call do
 
-      class Exit_Statii__
+      class Exit_Statii____
 
         h = {
           # order matters: more specific error codes may trump more general ones

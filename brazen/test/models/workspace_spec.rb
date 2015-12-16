@@ -7,7 +7,7 @@ module Skylab::Brazen::TestSupport
     TS_[ self ]
     use :expect_event
 
-    it "ping the workspace silo", wip: true do
+    it "ping the workspace silo" do
 
       call_API :workspace, :ping
 
@@ -17,23 +17,33 @@ module Skylab::Brazen::TestSupport
       @result.should eql :_hello_from_brazen_
     end
 
-    it "when provide path=(empty dir) and maxdirs=1, workspace directory is empty", wip: true do
+    it "when provide path=(empty dir) and maxdirs=1, workspace directory is empty" do
 
       _prepare_ws_tmpdir
 
-      call_API :status,
-        :path, @ws_tmpdir.to_path, :max_num_dirs, 1
+      call_API(
+        :status,
+        :path, @ws_tmpdir.to_path,
+        :max_num_dirs, 1,
+      )
 
-      expect_OK_event :resource_not_found do |ev|
-        ev_ = ev.to_event
-        ev_.num_dirs_looked.should eql 1
-        ev_.start_path.should eql @ws_tmpdir.to_path
-      end
+      em = @result
 
-      expect_succeeded
+      em.category.should eql [ :info, :resource_not_found ]
+
+      x = em.emission_value_proc.call
+      x and fail
+
+      em = @event_log.gets
+      ev = em.cached_event_value.to_event
+
+      ev.num_dirs_looked.should eql 1
+      ev.start_path.should eql @ws_tmpdir.to_path
+
+      expect_no_more_events
     end
 
-    it "when provide 'good' path and maxdirs=`, OK", wip: true do
+    it "when provide 'good' path and maxdirs=`, OK" do
 
       _prepare_ws_tmpdir <<-O.unindent
         --- /dev/null
@@ -42,15 +52,23 @@ module Skylab::Brazen::TestSupport
         +[ whatever ]
       O
 
-      call_API :status,
-        :path, @ws_tmpdir.to_path, :max_num_dirs, 1
+      call_API(
+        :status,
+        :path, @ws_tmpdir.to_path,
+        :max_num_dirs, 1,
+      )
 
-      expect_OK_event :resource_exists do |ev|
-        ev_ = ev.to_event
-        ev_.config_path.should eql @ws_tmpdir.join( cfg_filename ).to_path
-      end
+      em = @result
 
-      expect_succeeded
+      em.category.should eql [ :info, :resource_exists ]
+
+      ev = em.emission_value_proc.call
+
+      _exp = ::File.join @ws_tmpdir.to_path, cfg_filename
+
+      ev.config_path.should eql _exp
+
+      expect_no_more_events
     end
 
     it "summarize with empty path" do
@@ -65,7 +83,7 @@ module Skylab::Brazen::TestSupport
       expect_failed
     end
 
-    it "summarize (a development proxy of 'plural_noun')", wip: true do
+    it "summarize (a development proxy of 'plural_noun')" do
 
       _prepare_ws_tmpdir <<-O.unindent
         --- /dev/null
@@ -82,8 +100,11 @@ module Skylab::Brazen::TestSupport
       call_API :workspace, :summarize,
         :path, __ws_tmpdir.to_path
 
-      _em = expect_event :summary
-      ev = _em.cached_event_value
+      expect_no_events
+
+      em = @result
+      em.category.should eql [ :info, :summary ]
+      ev = em.emission_value_proc.call
 
       ev.express_into_under y=[], black_and_white_expression_agent_for_expect_event
       scn = Home_::Callback_::Stream.via_nonsparse_array y
@@ -93,8 +114,6 @@ module Skylab::Brazen::TestSupport
       scn.gets.should match %r(\A[^[:alnum:]]*1 a single thing\z)
       scn.gets.should eql "3 sections total"
       scn.gets.should be_nil
-      expect_succeeded
-
     end
 
     def _prepare_ws_tmpdir s=nil

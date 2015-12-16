@@ -322,6 +322,11 @@ module Skylab::TestSupport::TestSupport::DocTest
     Expect_Line = -> tcc do
       Home_::Expect_line[ tcc ]
     end
+
+    Memoizer_Methods = -> tcc do
+
+      Home_::Memoization_and_subject_sharing[ tcc ]
+    end
   end
 
   Subject_ = -> do

@@ -6,7 +6,7 @@ the selective listener pattern is an interface recommendation for
 producers of "potential events" and consumers of those "potential
 events".
 
-this is by far and away the de-facto standard ("lingua franca")
+this is far and away the de-facto standard ("lingua franca")
 event model in this universe. (the previous, inferior models are
 listed in an upcoming section.)
 
@@ -33,13 +33,21 @@ the salient charactersistics of this model are:
     listener proc with N args and a block. *each* of the N args
     *must* be a platform symbol.
 
-  • the N args passed to the selective listner proc constitute what is
+  • the N args passed to the selective listener proc constitute what is
     effectively an array of symbols. we call this the "channel" of the
     potential event. this is what is used by the consumer of the
     emission to determine whether or not it is realized. (see
     [#]soft-standards-for-channels below.)
 
   • the block is concerned with producing the event (somehow).
+
+the above idea generally is now recognized in code by the `Emission`
+structure defined by the topic sidesystem. this structure consists of
+nothing but N symbols (where N is positive nonzero) and a proc. the N
+symbols represent the the "cateogory" or "channel" of the emission. the
+proc has a mixed shape that is determined by the sidesystems or
+applications that use them, but generally the produce an event structure
+or effect behavior.
 
 
 

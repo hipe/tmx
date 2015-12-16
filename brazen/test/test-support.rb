@@ -174,8 +174,10 @@ module Skylab::Brazen::TestSupport
 
   Callback_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
 
-  EMPTY_S_ = ''.freeze
   Home_ = ::Skylab::Brazen
+
+  EMPTY_A_ = Home_::EMPTY_A_
+  EMPTY_S_ = ''.freeze
   NIL_ = nil
   SPACE_ = ' '.freeze
   TS_ = self

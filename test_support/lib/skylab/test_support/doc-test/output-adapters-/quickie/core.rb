@@ -408,7 +408,7 @@ module Skylab::TestSupport
           @line_downstream.puts line
         end
 
-        maybe_send_event :success, :wrote do
+        Callback_::Emission.of :success, :wrote do
           Event_for_Wrote_[ @is_known_dry, bytes, lines ]
         end
       end

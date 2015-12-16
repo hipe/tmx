@@ -32,14 +32,14 @@ module Skylab::SubTree::TestSupport
       _expect_beautiful_help
     end
 
-    it "custom expag says 'both'" do
+    it "expag says 'both'" do
 
       # for earlier detection of errors we usually place lower-level, "unit"-
       # like tests either eariler in the file or at a file of shallower depth.
       # but in this case we place this test later so that we cover that the
       # expag is autoloaded by the app and not by us. :(
 
-      _expag = Home_::Models_::Files::Modalities::CLI::EXPRESSION_AGENT
+      _expag = produce_action_specific_expag_safely_
 
       _s = _expag.calculate do
 

@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::CodeMetrics::TestSupport
 
-  describe "[cme] tally - 2 - 1: files slice stream", wip: true do
+  describe "[cme] tally - 2 - 1: files slice stream" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -46,19 +46,17 @@ module Skylab::CodeMetrics::TestSupport
 
       it "emitted the event talkin bout not found" do
 
-        # do this differently at [#ca-065]
+        em_a = _state.emissions
 
-        _state.events.length.should eql 1
+        em_a.length.should eql 1
 
-        ev = _state.events.fetch 0
+        em = em_a.fetch 0
 
-        ev.terminal_channel_i.should eql :from_find
-
-        ev.ok.should be_nil
+        em.channel_symbol_array.last.should eql :from_find
 
         _ = "find: -egads-not-a-path-nor-an-operator: No such file or directory\n"
 
-        black_and_white( ev ).should eql _
+        black_and_white( em.cached_event_value ).should eql _
       end
     end
 
@@ -83,25 +81,32 @@ module Skylab::CodeMetrics::TestSupport
       end
 
       it "no events" do
-        _state.events.should be_nil
+        _state.emissions.length.should be_zero
       end
     end
 
     def _state_me o
       _st = o.execute
       _a = _st.to_a
-      _State.new _a, __flush_events
+      _State.new _a, __flush_emissions
     end
 
     dangerous_memoize :_State do
-      Models_4_2_1_Struct = ::Struct.new :a, :events
+      Models_4_2_1_Struct = ::Struct.new :a, :emissions
     end
 
-    def __flush_events
-      # this will change at [#ca-065]
-      x = @ev_a
-      @ev_a = nil
-      x.freeze
+    def __flush_emissions
+
+      el = @event_log
+      @event_log = :_spent_
+      a = []
+      begin
+        em = el.gets
+        em or break
+        a.push em
+        redo
+      end while nil
+      a.freeze
     end
   end
 end

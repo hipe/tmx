@@ -16,7 +16,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       it "three-part business path OK - note the top const is not there" do
 
-        against "Foo::Bar::Baz",
+        _against "Foo::Bar::Baz",
           "So, your example:\n",
           [ "if foo\n", "  then bar\n", "end\n" ]
 
@@ -28,12 +28,13 @@ module Skylab::TestSupport::TestSupport::DocTest
 
         expect_next_nonblank_line_is "    it \"your example\" do\n"
 
-        expect_one_event_and_neutral_result :wrote
+        em = @result
+        em.category.should eql [ :success, :wrote ]
       end
 
       it "two-part business path OK - intentional redundancy with \"sigil\"" do
 
-        against 'WizzieWazzie::Moo_Moo',
+        _against 'WizzieWazzie::Moo_Moo',
           "THEN IT totally rocks:\n",
           [ "one line\n" ]
 
@@ -47,7 +48,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       it "one-part business path not OK - emits event talking about no" do
 
-        against 'Wazoozle',
+        _against 'Wazoozle',
           "it's fun:\n",
           []
 
@@ -58,7 +59,7 @@ module Skylab::TestSupport::TestSupport::DocTest
         expect_failed
       end
 
-      def against business_module_name, desc_line, code_line_a
+      def _against business_module_name, desc_line, code_line_a
 
         _oa = subject.output_adapter false, & _handle_event_selectively  # is known dry
 
@@ -117,8 +118,8 @@ module Skylab::TestSupport::TestSupport::DocTest
         )
 
         expect_neutral_event :before_editing_existing_file
-        expect_neutral_event :wrote
-        expect_no_more_events
+
+        @result.category.should eql [ :success, :wrote ]
       end
     end
 

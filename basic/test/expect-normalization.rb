@@ -25,8 +25,6 @@ module Skylab::Basic
 
       ok_arg = _cls.normalize_qualified_knownness @input_arg, & _oes_p
 
-      @event_proc_was_called = @ev_a ? true : false  # [br] expect event
-
       if ok_arg
         @output_value_was_written = true
         @output_arg = ok_arg
@@ -45,7 +43,7 @@ module Skylab::Basic
 
     def expect_the_passthru_normalization__
 
-      event_proc_was_not_called
+      expect_no_events
 
       output_value_was_written
 
@@ -69,8 +67,9 @@ module Skylab::Basic
     end
 
     def expect_nothing
+
       output_value_was_not_written
-      event_proc_was_not_called
+      expect_no_events
       @result_x.should be_nil
     end
 
@@ -80,14 +79,6 @@ module Skylab::Basic
 
     def output_value_was_not_written
       @output_value_was_written.should eql false
-    end
-
-    def event_proc_was_called
-      @event_proc_was_called.should eql true
-    end
-
-    def event_proc_was_not_called
-      @event_proc_was_called.should eql false
     end
   end
 

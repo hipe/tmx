@@ -120,7 +120,7 @@ module Skylab::SubTree
             Callback_::Event.inline_not_OK_with(
 
               :irreconcilable_upstream,
-              :a, a
+              :a, a,
 
             ) do | y, o |
 
@@ -288,33 +288,37 @@ module Skylab::SubTree
 
           _close_upstream_and_flush_traversal
           _ok = exts.receive_the_collection_of_mutable_items node_a  # we ignore any failure
-          _ok and __express_line_items node_a
+          _ok && Result_Table___.new( node_a )
         end
 
         Line_Item___ = ::Struct.new :glyphs, :slug, :any_leaf
 
-        def __express_line_items node_a
+        class Result_Table___
 
-          @on_event_selectively.call :payload, :result_table do
+          def initialize node_a
 
-            Callback_::Event.inline_neutral_with(
-
-              :result_table,
-              :line_item_array, node_a
-
-            ) do | y, o |
-
-              # (we would like to call the below as an instance method
-              # on `self` here, but which action adapter you have (the
-              # top node or the 'files' node) is unreliable here.)
-
-              _self = Home_::Models_::Files::Modalities::CLI::EXPRESSION_AGENT
-
-              _self.express_into_yielder_line_items__ y, o.line_item_array
-            end
+            @node_array = node_a
           end
 
-          ACHIEVED_
+          def describe_into_under y, _expag=nil
+
+            _my_CLI::Render_table[ y, @node_array ]
+          end
+
+          def to_line_stream
+
+            _delimited_lines = _my_CLI::Render_table[ [], @node_array ]
+
+            Callback_::Stream.via_nonsparse_array _delimited_lines
+          end
+
+          def _my_CLI
+            Home_::Models_::Files::Modalities::CLI
+          end
+
+          attr_reader(
+            :node_array,
+          )
         end
 
         def __traverse_with_notifications  # assume extensions

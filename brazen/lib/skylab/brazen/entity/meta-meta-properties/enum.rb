@@ -6,33 +6,58 @@ module Skylab::Brazen
 
     module Meta_Meta_Properties::Enum
 
-      Normalize_via_qualified_known = -> qkn, & oes_p do
+      module Normalize_via_qualified_known ; class << self
 
-        enum_bx = qkn.association.enum_box
+        def _call qkn, & oes_p
 
-        if qkn.is_known_known
+          if qkn.is_known_known
+            ___against_known_known qkn, & oes_p
+          else
+            # if this field is not required, no one wants its absence to
+            # trigger enumeration membership failure. so we pass it on..
+            qkn.to_knownness
+          end
+        end
+        alias_method :[], :_call
+        alias_method :call, :_call
+
+        def ___against_known_known qkn, & oes_p
+
+          enum_bx = qkn.association.enum_box
 
           if enum_bx.has_name qkn.value_x
             qkn.to_knownness
           else
-
-            event = -> do
-              Build_extra_value_event[
-                qkn.value_x, qkn.association.name_function, enum_bx.get_names ]
-            end
-
-            if oes_p
-              oes_p.call :error, :invalid_property_value do
-                event[]
-              end
-            else
-              raise event[].to_exception
-            end
+            ___when_failed qkn, enum_bx, & oes_p
           end
-        else
-          qkn.to_knownness  # whether or not the field is required is not our concern
         end
-      end
+
+        def ___when_failed qkn, enum_bx, & oes_p
+
+          p = -> { ___build_event qkn, enum_bx }
+
+          if oes_p
+
+            _unreliable = oes_p.call :error, :invalid_property_value do
+              p[]
+            end
+
+            UNABLE_
+          else
+            raise p[].to_exception
+          end
+        end
+
+        def ___build_event qkn, bx
+
+          _ = Build_extra_value_event[
+            qkn.value_x,
+            qkn.association.name_function,
+            bx.get_names,
+          ]
+          _
+        end
+      end ; end
 
       Build_extra_value_event = -> x, property_name, valid_x_a do
 

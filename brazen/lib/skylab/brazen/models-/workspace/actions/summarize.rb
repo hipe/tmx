@@ -6,11 +6,12 @@ module Skylab::Brazen
 
       edit_entity_class(
         :property_object, COMMON_PROPERTIES_[ :config_filename ],
-        :required, :property, :path )
+        :required, :property, :path,
+      )
 
       def produce_result
         ok = resolve_existent_workspace
-        ok &&= @ws.resolve_document_( & handle_event_selectively )
+        ok &&= @_workspace.resolve_document_( & handle_event_selectively )
         ok && work
       end
 
@@ -18,24 +19,25 @@ module Skylab::Brazen
 
         bx = @argument_box
 
-        @ws = silo_module.edit_entity @kernel, handle_event_selectively do |o|
+        ws = silo_module.edit_entity @kernel, handle_event_selectively do |o|
           o.preconditions @preconditions
           o.edit_with(
             :surrounding_path, bx.fetch( :path ),
             :config_filename, bx.fetch( :config_filename ) )
         end
 
-        if @ws
+        if ws
+          @_workspace = ws
 
           _prp = formal_properties.fetch :path
 
-          @ws.resolve_nearest_existent_surrounding_path(
+          ws.resolve_nearest_existent_surrounding_path(
             ONLY_LOOK_IN_THE_FIRST_DIRECTORY___,
             :prop, _prp,
             & handle_event_selectively )
 
         else
-          @ws
+          ws
         end
       end
 
@@ -45,7 +47,7 @@ module Skylab::Brazen
         bx = Box_.new
         one = -> { 1 }
         increment = -> d { d + 1 }
-        st = @ws.document_.to_section_stream( & handle_event_selectively )
+        st = @_workspace.document_.to_section_stream( & handle_event_selectively )
         sect = st.gets
 
         while sect
@@ -54,27 +56,31 @@ module Skylab::Brazen
         end
 
         @box = bx
-        via_box
-      end
 
-      def via_box
-        maybe_send_event :info, :summary do
-          bld_summary_event
+        Callback_::Emission.of :info, :summary do
+          ___build_summary_event
         end
       end
 
-      def bld_summary_event
-        build_OK_event_with :summary, :box, @box, :ws, @ws do |y, o|
+      def ___build_summary_event
+
+        build_OK_event_with :summary, :box, @box, :ws, @_workspace do |y, o|
+
           y << "summary of #{ o.ws.description_under self }:"
+
           st = o.box.to_pair_stream
           count = 0
-          while pair = st.gets
+          begin
+            pair = st.gets
+            pair or break
             count += 1
             d, i = pair.to_a
             s = i.id2name
             s.gsub! DASH_, SPACE_
             y << "  • #{ d } #{ plural_noun d, s }"
-          end
+            redo
+          end while nil
+
           y << "#{ count } section#{ s count } total"
         end
       end
