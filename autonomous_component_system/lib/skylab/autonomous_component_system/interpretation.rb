@@ -26,29 +26,40 @@ module Skylab::Autonomous_Component_System
 
         # (see #resulting-in-proc)
 
-        _LL = Home_.lib_.basic::List::Linked[ nil, asc.name ]
+        looks_primitive = nil
+        as_new_component = nil
+        _LL = nil
 
-        looks_primitive = asc.model_classifications.looks_primitivesque
+        these = -> do
 
-        as_new_component = if looks_primitive
+          looks_primitive = asc.model_classifications.looks_primitivesque
 
-          _new_qkn = Callback_::Qualified_Knownness.via_value_and_association(
-            new_component, asc )
+          if looks_primitive
 
-          Primitivesque_As_Component__.new _new_qkn
-        else
-          new_component
+            _new_qkn = Callback_::Qualified_Knownness.
+              via_value_and_association( new_component, asc )
+
+            as_new_component = Primitivesque_As_Component__.new _new_qkn
+
+          else
+            as_new_component = new_component
+          end
+
+          _LL = Home_.lib_.basic::List::Linked[ nil, asc.name ]
         end
 
         if orig_qkn.is_effectively_known  # #inout-A, [#]inout-B
 
-          _as_previous_component = if looks_primitive
-            Primitivesque_As_Component__.new orig_qkn
-          else
-            orig_qkn.value_x
-          end
-
           -> do
+
+            these[]
+
+            _as_previous_component = if looks_primitive
+              ACS_::Primitivesque::As_Component.new orig_qkn
+            else
+              orig_qkn.value_x
+            end
+
             ACS_.event( :Component_Changed ).new_with(
               :current_component, as_new_component,
               :previous_component, _as_previous_component,
@@ -57,7 +68,11 @@ module Skylab::Autonomous_Component_System
             )
           end
         else
+
           -> do
+
+            these[]
+
             ACS_.event( :Component_Added ).new_with(
               :component, as_new_component,
               :context_as_linked_list_of_names, _LL,

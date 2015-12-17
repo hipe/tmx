@@ -58,14 +58,14 @@ module Skylab::Zerk::TestSupport
 
         _ = build_top_
 
-        @result = _._persist_into []
+        @result = _.persist_into_ []
 
         flush_state_
       end
 
       it "looks as it does (an empty JSON object)" do
 
-        state_.result.should eql [ "{}\n" ]
+        state_.result.should eql EMPTY_JSON_LINES_
       end
 
       it "emits an event talking bout path and bytes" do
@@ -86,7 +86,7 @@ module Skylab::Zerk::TestSupport
 
         _ = build_top_
 
-        _x = _._unmarshal_from Callback_::Stream.via_nonsparse_array ['{}']
+        _x = _.unmarshal_from_ Callback_::Stream.via_nonsparse_array ['{}']
 
         @result = _x
 
@@ -112,24 +112,10 @@ module Skylab::Zerk::TestSupport
       class Zero_Empty
 
         def initialize & oes_p
-          @_oes_p = oes_p
+          @oes_p_ = oes_p
         end
 
-        def call_via_argument_array_ args
-          Call_[ args, self ]
-        end
-
-        def _unmarshal_from st
-          Unmarshal_[ st, self ]
-        end
-
-        def _persist_into y
-          Persist_[ y, self ]
-        end
-
-        def event_handler_for _
-          @_oes_p
-        end
+        include Unmarshal_and_Call_and_Marshal_
 
         self
       end

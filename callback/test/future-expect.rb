@@ -15,15 +15,15 @@ module Skylab::Callback::TestSupport
     end
 
     def future_expect * a, & p
-      _add_future_expect a, & p
+      add_future_expect a, & p
     end
 
     def future_expect_only * a, & p
-      _add_future_expect a, & p
+      add_future_expect a, & p
       future_expect_no_more
     end
 
-    def _add_future_expect a, & p
+    def add_future_expect a, & p
       a.push p
       ( @_future_expect_queue ||= [] ).push a ; nil
     end

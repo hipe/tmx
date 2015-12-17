@@ -10,17 +10,17 @@ module Skylab::Zerk  # intro in [#001] README
 
       bc = Call___.new( args, acs, & _oes_p_p ).resolve_bound_call
       if bc
-        bc.receiver.send bc.metod_name, * bc.args, & bc.block
+        bc.receiver.send bc.method_name, * bc.args, & bc.block
       else
         bc
       end
     end
 
-    def persist y, acs, & p
+    def persist args, acs, & p
 
       _oes_p_p = _handler_builder_for acs, & p
 
-      Persist___[ y, acs, & _oes_p_p ]
+      Persist___[ args, acs, & _oes_p_p ]
     end
 
     def test_support
@@ -60,6 +60,7 @@ module Skylab::Zerk  # intro in [#001] README
 
       @ACS = acs
       @_argument_stream = Callback_::Polymorphic_Stream.via_array args
+      @__oes_p = nil
       @_oes_p_p = oes_p_p
     end
 
@@ -73,59 +74,61 @@ module Skylab::Zerk  # intro in [#001] README
 
     def ___when_no_arguments
 
-      _oes_p.call :error, :expression, :empty_arguments do | y |
+      _get_handler.call :error, :expression, :empty_arguments do | y |
         y << "#{ highlight 'empty' } argument list."
       end
       UNABLE_
     end
 
-    def __when_some_arguments
+    def __when_some_arguments  # no fuzzy
 
-      _tok = @_argument_stream.current_token
+      begin
 
-      _st = _to_interface_stream
+        node = ___parse_node
+        if ! node
+          x = __when_no_match
+          break
+        end
 
-      _x = _st.gets
-      if _x
-        self._NEAT
-        _found_match = nil
-      end
+        if node.association.model_classifications.looks_compound
+          self._K
+        else
+          x = __parse_node_value node
+          x or break
+        end
 
-      if _found_match
-        self._NEAT
-      else
-        ___when_no_match
-      end
+        if @_argument_stream.no_unparsed_exists
+          x = Callback_::Bound_Call.via_value ACHIEVED_  # not sure..
+          break
+        end
+
+        redo
+      end while nil
+      x
     end
 
-    def ___when_no_match
+    def ___parse_node  # assume at least one token in upstream
 
-      _oes_p = @_oes_p_p[ @ACS ]
+      token_symbol = @_argument_stream.current_token
 
-      _oes_p.call :error, :uninterpretable_token do
-        ___build_request_ended_prematurely_event
+      st = _to_interface_stream
+
+      begin
+        node = st.gets
+        node or break
+
+        if token_symbol == node.name.as_variegated_symbol
+          break
+        end
+
+        redo
+      end while nil
+
+      if node
+        @_argument_stream.advance_one
       end
 
-      UNABLE_
-    end
-
-    def ___build_request_ended_prematurely_event
-
-      _st = ACS_::For_Interface::To_stream[ @ACS ]
-
-      _st_ = _st.map_by do | ting |
-        self._FUN
-      end
-
-      _st__ = _st_.flush_to_polymorphic_stream
-
-      Home_.lib_.fields::MetaMetaFields::Enum::Build_extra_value_event.call(
-
-        @_argument_stream.current_token,
-        _st__,
-        Callback_::Name.via_human( 'argument' ),
-        :uninterpretable_token,
-      )
+      node
     end
 
     def _to_interface_stream
@@ -133,8 +136,90 @@ module Skylab::Zerk  # intro in [#001] README
       ACS_::For_Interface::To_stream[ @ACS ]
     end
 
-    def _oes_p
-      @_oes_p_p[ @ACS ]
+    def __parse_node_value node  # t/f
+
+      if @_argument_stream.no_unparsed_exists
+        __when_missing_value node
+      else
+        wv = ACS_::Interpretation_::Build_value[
+          @_argument_stream,
+          node.association,
+          @ACS,
+          & @_oes_p_p ]
+
+        if wv
+
+          p = ACS_::Interpretation::Accept_component_change[
+            wv.value_x,
+            node,
+            @ACS,
+          ]
+
+          _handler.call :info, :set_leaf_component do
+            p[]
+          end
+
+          ACHIEVED_
+        else
+          wv
+        end
+      end
+    end
+
+    # -- similar eventages
+
+    def __when_no_match
+
+      _get_handler.call :error, :uninterpretable_token do
+        __build_uninterpretable_token_event
+      end
+
+      UNABLE_  # hypothetially could be a b.c instead..
+    end
+
+    def __when_missing_value node
+
+      _get_handler.call :error, :expression, :request_ended_prematurely do | y |
+
+        y << "expecting value for #{ par node.name }"
+      end
+
+      UNABLE_  # important
+    end
+
+    def __build_uninterpretable_token_event
+
+      _st = ACS_::For_Interface::To_stream[ @ACS ]
+
+      _st_ = _st.map_by do | qkn |
+        qkn.name.as_variegated_symbol
+      end
+
+      _st__ = _st_.flush_to_polymorphic_stream
+
+      o = Home_.lib_.fields::MetaMetaFields::Enum::Build_extra_value_event.new
+
+      o.invalid_value = @_argument_stream.current_token
+
+      o.valid_collection = _st__
+
+      o.property_name = Callback_::Name.via_human 'argument'
+
+      o.event_name_symbol = :uninterpretable_token
+
+      o.execute
+    end
+
+    def _handler
+      @__oes_p ||= @_oes_p_p[ @ACS ]
+    end
+
+    def _get_handler
+      if @__oes_p
+        @__oes_p
+      else
+        @_oes_p_p[ @ACS ]
+      end
     end
   end
 
@@ -167,7 +252,9 @@ module Skylab::Zerk  # intro in [#001] README
     o.execute
   end
 
-  Persist___ = -> y, acs, & oes_p_p do
+  Persist___ = -> args, acs, & oes_p_p do
+
+    y = args.shift
 
     _oes_p = oes_p_p[ acs ]
 
@@ -178,6 +265,12 @@ module Skylab::Zerk  # intro in [#001] README
     end
 
     o.upstream_ACS = acs
+
+    if args.length.nonzero?
+      args.each_slice 2 do | k, x |
+        o.send :"#{ k }=", x
+      end
+    end
 
     o.execute
   end

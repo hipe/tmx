@@ -4,6 +4,8 @@ module Skylab::Autonomous_Component_System
 
       class Build_value  # [#006]:the-universal-component-builder explains everything
 
+        # corroboration by: [ze]
+
         class << self
           def _call ma, asc, acs, & oes_p_p
             new( ma, asc, acs, & oes_p_p ).execute
