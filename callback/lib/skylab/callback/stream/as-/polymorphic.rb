@@ -11,6 +11,19 @@ module Skylab::Callback
         @up = up
       end
 
+      def flush_remaining_to_array
+        a = []
+        begin
+          if no_unparsed_exists
+            break
+          end
+          a.push current_token
+          advance_one
+          redo
+        end while nil
+        a
+      end
+
       def no_unparsed_exists
         ! @x
       end

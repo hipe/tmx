@@ -77,7 +77,7 @@ module Skylab::Autonomous_Component_System
 
         def ___when_primitivesque_with_operations
 
-          ACS_::Primitivesque::For_Interface.new @qkn, @ACS
+          ACS_::For_Interface::Primitivesque.new @qkn, @ACS
         end
 
         def __when_entitesque
@@ -117,7 +117,7 @@ module Skylab::Autonomous_Component_System
           if asc.model_classifications.looks_primitivesque
             if asc.has_operations
 
-              _ = ACS_::Primitivesque::For_Interface.new qkn, acs
+              _ = ACS_::For_Interface::Primitivesque.new qkn, acs
 
               qkn.new_with_value _
             else

@@ -2,6 +2,8 @@ module Skylab::Zerk
   # ->
     class API  # models one particular invocation of the API (a "call")
 
+      # REMINDER - this is being replaced by `Call___` (stowed away in same scope)
+
       class << self
         def produce_bound_call x_a, branch
           new( x_a, branch ).produce_bc
@@ -94,49 +96,19 @@ module Skylab::Zerk
 
       def __when_child_not_found
         @result = maybe_send_event :error do
-          build_child_not_found_event
+          self.__GONE__build_child_not_found_event
         end
         UNABLE_
-      end
-
-      def build_child_not_found_event
-
-        build_not_OK_event_with :child_not_found,
-            :name_symbol, @token,
-            :did_you_mean_i_a, childs.map( & :name_symbol ) do |y, o|
-
-          _s_a = o.did_you_mean_i_a.map do |i|
-            val i
-          end
-
-          y << "child not found: #{ ick o.name_symbol } - did you mean #{
-            }#{ or_ _s_a }?"
-        end
       end
 
       def when_terminated_at_branch_node
         @result = maybe_send_event :error do
-          build_request_ended_prematurely_event
+          self.__GONE__build_request_ended_prematurely_event
         end
         UNABLE_
       end
 
-      def build_request_ended_prematurely_event
-
-        build_not_OK_event_with :request_ended_prematurely,
-          :name_symbol, @node.name_symbol,
-          :did_you_mean_i_a, childs.map( & :name_symbol ) do |y, o|
-
-          _s_a = o.did_you_mean_i_a.map do |i|
-            val i
-          end
-
-          y << "premature end of '#{ o.name_symbol }' request - #{
-            }did you mean #{ or_ _s_a }?"
-        end
-      end
-
-      def childs
+      def __HERE_FOR_REFERENDCE__childs
         @node.child_stream.reduce_by do |cx|
           cx.can_receive_focus && ! cx.is_navigational
         end.to_a

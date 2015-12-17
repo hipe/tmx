@@ -4,9 +4,23 @@ module Skylab::Zerk  # intro in [#001] README
 
   class << self
 
-    def lib_
-      @___lib ||= Callback_.
-        produce_library_shell_via_library_and_app_modules Lib_, self
+    def call args, acs, & p
+
+      _oes_p_p = _handler_builder_for acs, & p
+
+      bc = Call___.new( args, acs, & _oes_p_p ).resolve_bound_call
+      if bc
+        bc.receiver.send bc.metod_name, * bc.args, & bc.block
+      else
+        bc
+      end
+    end
+
+    def persist y, acs, & p
+
+      _oes_p_p = _handler_builder_for acs, & p
+
+      Persist___[ y, acs, & _oes_p_p ]
     end
 
     def test_support
@@ -15,6 +29,157 @@ module Skylab::Zerk  # intro in [#001] README
       end
       Home_.const_get :TestSupport, false
     end
+
+    def unmarshal st, acs, & p
+
+      _oes_p = _handler_builder_for acs, & p
+
+      Unmarshal___[ st, acs, & _oes_p ]
+    end
+
+    def _handler_builder_for acs
+
+      Require_ACS__[]
+
+      if block_given?
+        self._DESIGN_ME
+      end
+
+      acs.method :event_handler_for
+    end
+
+    def lib_
+      @___lib ||= Callback_.
+        produce_library_shell_via_library_and_app_modules Lib_, self
+    end
+  end
+
+  class Call___
+
+    def initialize args, acs, & oes_p_p
+
+      @ACS = acs
+      @_argument_stream = Callback_::Polymorphic_Stream.via_array args
+      @_oes_p_p = oes_p_p
+    end
+
+    def resolve_bound_call
+      if @_argument_stream.no_unparsed_exists
+        ___when_no_arguments
+      else
+        __when_some_arguments
+      end
+    end
+
+    def ___when_no_arguments
+
+      _oes_p.call :error, :expression, :empty_arguments do | y |
+        y << "#{ highlight 'empty' } argument list."
+      end
+      UNABLE_
+    end
+
+    def __when_some_arguments
+
+      _tok = @_argument_stream.current_token
+
+      _st = _to_interface_stream
+
+      _x = _st.gets
+      if _x
+        self._NEAT
+        _found_match = nil
+      end
+
+      if _found_match
+        self._NEAT
+      else
+        ___when_no_match
+      end
+    end
+
+    def ___when_no_match
+
+      _oes_p = @_oes_p_p[ @ACS ]
+
+      _oes_p.call :error, :uninterpretable_token do
+        ___build_request_ended_prematurely_event
+      end
+
+      UNABLE_
+    end
+
+    def ___build_request_ended_prematurely_event
+
+      _st = ACS_::For_Interface::To_stream[ @ACS ]
+
+      _st_ = _st.map_by do | ting |
+        self._FUN
+      end
+
+      _st__ = _st_.flush_to_polymorphic_stream
+
+      Home_.lib_.fields::MetaMetaFields::Enum::Build_extra_value_event.call(
+
+        @_argument_stream.current_token,
+        _st__,
+        Callback_::Name.via_human( 'argument' ),
+        :uninterpretable_token,
+      )
+    end
+
+    def _to_interface_stream
+
+      ACS_::For_Interface::To_stream[ @ACS ]
+    end
+
+    def _oes_p
+      @_oes_p_p[ @ACS ]
+    end
+  end
+
+  Unmarshal___ = -> st, acs, & oes_p_p do
+
+    if st.respond_to? :read
+      json = st.read
+    else
+      json = ""
+      while line = st.gets
+        json.concat line
+      end
+    end
+
+    _oes_p = oes_p_p[ acs ]
+
+    o = ACS_::Modalities::JSON::Interpret.new( & _oes_p )
+    o.ACS = acs
+    o.JSON = json
+
+    o.context_linked_list = begin
+
+      _context_value = -> do
+        'in input JSON'
+      end
+
+      Home_.lib_.basic::List::Linked[ nil, _context_value ]
+    end
+
+    o.execute
+  end
+
+  Persist___ = -> y, acs, & oes_p_p do
+
+    _oes_p = oes_p_p[ acs ]
+
+    o = ACS_::Modalities::JSON::Express.new( & _oes_p )
+
+    o.downstream_IO_proc = -> do
+      y
+    end
+
+    o.upstream_ACS = acs
+
+    o.execute
   end
 
   # ->
@@ -696,6 +861,12 @@ module Skylab::Zerk  # intro in [#001] README
     end
 
     Callback_ = ::Skylab::Callback
+
+    Require_ACS__ = Callback_::Lazy.call do
+      ACS_ = Home_.lib_.ACS
+      NIL_
+    end
+
     Autoloader_ = Callback_::Autoloader
 
     module Lib_
@@ -704,8 +875,10 @@ module Skylab::Zerk  # intro in [#001] README
         :build_require_sidesystem_proc,
         :build_require_stdlib_proc )
 
+      ACS = sidesys[ :Autonomous_Component_System ]
       Basic = sidesys[ :Basic ]
       Brazen = sidesys[ :Brazen ]
+      Fields = sidesys[ :Fields ]
       Open_3 = stdlib[ :Open3 ]
 
       system_lib = sidesys[ :System ]
@@ -721,6 +894,7 @@ module Skylab::Zerk  # intro in [#001] README
     EMPTY_A_ = [].freeze
     FINISHED_ = nil
     Home_ = self
+    NIL_ = nil
     NONE_S = '(none)'.freeze
     NOTHING_TO_DO_ = nil
     SPACE_ = ' '

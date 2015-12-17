@@ -35,7 +35,7 @@ module Skylab::Autonomous_Component_System
           _new_qkn = Callback_::Qualified_Knownness.via_value_and_association(
             new_component, asc )
 
-          ACS_::Primitivesque::As_Component.new _new_qkn
+          Primitivesque_As_Component__.new _new_qkn
         else
           new_component
         end
@@ -43,7 +43,7 @@ module Skylab::Autonomous_Component_System
         if orig_qkn.is_effectively_known  # #inout-A, [#]inout-B
 
           _as_previous_component = if looks_primitive
-            ACS_::Primitivesque::As_Component.new orig_qkn
+            Primitivesque_As_Component__.new orig_qkn
           else
             orig_qkn.value_x
           end
@@ -65,6 +65,20 @@ module Skylab::Autonomous_Component_System
               :verb_lemma_symbol, :set,
               :context_expresses_slot, true,  # "set C to X" !"added X to C"
             )
+          end
+        end
+      end
+
+      class Primitivesque_As_Component__
+
+        def initialize qkn
+          @_qkn = qkn
+        end
+
+        def description_under expag
+          qkn = @_qkn
+          expag.calculate do
+            val qkn.value_x
           end
         end
       end

@@ -1,10 +1,8 @@
 module Skylab::Autonomous_Component_System
 
-  module Primitivesque  # notes in [#003]
+  module For_Interface  # notes in [#003]
 
-    class For_Interface
-
-      # (todo promote this node one level and rename within it)
+    class Primitivesque
 
       # (for now this module is public b/c we are anticipating adding
       # public library functions to it)
@@ -45,20 +43,6 @@ module Skylab::Autonomous_Component_System
         _st.map_by do | symmo |
 
           Operation___.__new symmo, @_qkn, @ACS
-        end
-      end
-    end
-
-    class As_Component  # lx2
-
-      def initialize qkn
-        @_qkn = qkn
-      end
-
-      def description_under expag
-        qkn = @_qkn
-        expag.calculate do
-          val qkn.value_x
         end
       end
     end

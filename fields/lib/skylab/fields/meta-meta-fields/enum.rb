@@ -1,12 +1,12 @@
-module Skylab::Brazen
+module Skylab::Fields
 
-  module Entity
+  MetaMetaFields = ::Module.new
 
-    Meta_Meta_Properties = ::Module.new
-
-    module Meta_Meta_Properties::Enum
-
+  module MetaMetaFields::Enum
+    # ->
       module Normalize_via_qualified_known ; class << self
+
+        # assumes `enum_box` (values ignored) as part of the qkn assoc.
 
         def _call qkn, & oes_p
 
@@ -52,29 +52,47 @@ module Skylab::Brazen
 
           _ = Build_extra_value_event[
             qkn.value_x,
-            qkn.association.name_function,
             bx.get_names,
+            qkn.association.name_function,
           ]
           _
         end
       end ; end
 
-      Build_extra_value_event = -> x, property_name, valid_x_a do
+      Build_extra_value_event = -> (
+        x,
+        valid_x_a,
+        property_name,
+        event_name_symbol=:invalid_property_value
+      ) do
 
         Callback_::Event.inline_not_OK_with(
 
-          :invalid_property_value,
+          event_name_symbol,
           :x, x,
           :property_name, property_name,
-          :enum_value_array, valid_x_a,
+          :enum_value_polymorphic_streamable, valid_x_a,
           :error_category, :argument_error
 
         ) do | y, o |
 
+          x = o.enum_value_polymorphic_streamable
+
+          x_a = ::Array.try_convert x
+          if ! x_a
+            x_a = x.flush_remaining_to_array
+          end
+
+          _expecting = if x_a.length.zero?
+            EMPTY_S_
+          else
+            " #{ x_a * ' | ' } "
+          end
+
           y << "invalid #{ o.property_name.as_human } #{ ick o.x }, #{
-            }expecting { #{ o.enum_value_array * ' | ' } }"
+            }expecting {#{ _expecting }}"
         end
       end
-    end
+    # -
   end
 end

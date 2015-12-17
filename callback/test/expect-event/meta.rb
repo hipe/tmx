@@ -122,6 +122,10 @@ module Skylab::Callback::TestSupport
       def _really_fail msg="(this test really failed)"
         ::Kernel.fail msg
       end
+
+      def subject_
+        Home_::TestSupport::Expect_Event
+      end
     # -
   end
 end

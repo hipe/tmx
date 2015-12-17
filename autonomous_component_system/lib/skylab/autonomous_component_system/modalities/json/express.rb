@@ -46,9 +46,11 @@ module Skylab::Autonomous_Component_System
             Home_.lib_.JSON.send _m, h
 
           else
-            self._COVER_ME_no_data_at_all
+            THE_EMPTY_TIMES___  # [ze]
           end
         end
+
+        THE_EMPTY_TIMES___ = '{}'
 
         def _recurse acs  # see [#003]:on-JSON-expression
 
@@ -136,20 +138,79 @@ module Skylab::Autonomous_Component_System
         def __flush
 
           io = remove_instance_variable :@_downstream_IO
+          s = remove_instance_variable :@_whole_string
 
-          bytes = io.write "#{ @_whole_string }#{ NEWLINE_ }"  # [#sn-020]
+          if io.respond_to? :write
 
-          io.close  # result is nil
+            path = io.path  # for event
+
+            bytes = io.write "#{ s }#{ NEWLINE_ }"  # [#sn-020]
+
+            io.close  # result is nil
+
+          else
+            bytes = ___write_string_to_line_oriented_context io, s
+          end
 
           @on_event_selectively.call :info, :wrote do
 
             Home_.lib_.system.filesystem_lib.event( :Wrote ).new_with(
               :bytes, bytes,
-              :path, io.path,
+              :path, path,
             )
           end
 
-          ACHIEVED_  # don't result in bytes, it's confusing
+          # we no longer result in the number of bytes from calls like these
+          # because it's confusing. (N what? is this an exitstatus?)
+          # nowadays it's becoming convention for performers that "write"
+          # to act like `<<` and result in the argument context:
+          io
+        end
+
+        def ___write_string_to_line_oriented_context io, s
+
+          # if the context does not respond to `write` then it is assumed
+          # to be something like an ::Enumerator::Yielder, array, string.
+          #
+          # these are the reasons this isn't just a one-liner:
+          #
+          #   • break up the big string into lines in a memory-efficient
+          #     way (i.e don't just use split)
+          #
+          #   • still track the number of bytes "written"
+          #
+          #   • conditionally add the line terminator sequence.
+          #     (we only check this on the last line because our string
+          #      scanner guarantees that each line already has this
+          #      terminating sequence except the last line.)
+
+          bytes = 0
+
+          st = Home_.lib_.basic::String.line_stream s
+          line = st.gets
+
+          accept_line = -> do
+            bytes += line.length
+            io << line ; nil
+          end
+
+          if line
+            begin
+              line_ = st.gets
+              if line_
+                accept_line[]
+                line = line_
+                redo
+              end
+              if NEWLINE_BYTE___ != line.getbyte( -1 )
+                line.concat NEWLINE_  # ..
+              end
+              accept_line[]
+              break
+            end while nil
+          end
+
+          bytes
         end
 
         attr_reader(
@@ -158,6 +219,7 @@ module Skylab::Autonomous_Component_System
       end
 
       NEWLINE_ = "\n"
+      NEWLINE_BYTE___ = NEWLINE_.getbyte( 0 )
     end
   # -
 end

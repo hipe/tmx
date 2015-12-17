@@ -147,6 +147,8 @@ module Skylab::Fields
 
   CLI = nil  # for host
   EMPTY_A_ = []
+  EMPTY_S_ = ""
   Home_ = self
   NIL_ = nil
+  UNABLE_ = false
 end

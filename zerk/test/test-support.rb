@@ -7,6 +7,7 @@ module Skylab::Zerk::TestSupport
 
     def [] tcc
 
+      TestSupport_::Memoization_and_subject_sharing[ tcc ]
       Callback_.test_support::Expect_event[ tcc ]
       tcc.include TS_
     end
@@ -27,6 +28,9 @@ module Skylab::Zerk::TestSupport
   TestSupport_ = ::Skylab::TestSupport
   extend TestSupport_::Quickie
 
+  Home_ = ::Skylab::Zerk
+  Callback_ = Home_::Callback_
+
   # ->
 
     def debug!
@@ -38,6 +42,51 @@ module Skylab::Zerk::TestSupport
     def debug_IO
       TestSupport_.debug_IO
     end
+
+    def call_ * args
+
+      _guy = build_top_
+      @result = _guy.call_via_argument_array_ args
+      NIL_
+    end
+
+    def build_top_
+
+      _cls = top_ACS_class_
+
+      _oes_p = event_log.handle_event_selectively
+
+      _cls.new( & _oes_p )
+    end
+
+    def expect_result_for_failure_
+      state_.result.should match_result_for_failure_
+    end
+
+    def match_result_for_failure_
+      eql Home_::UNABLE_
+    end
+
+    define_method :expression_agent_for_expect_event, ( Callback_::Lazy.call do
+      Home_.lib_.brazen::API.expression_agent_instance
+    end )
+
+    # -- will certainly go up to expev in some form. ..
+
+    def flush_state_
+
+      _a = remove_instance_variable( :@event_log ).flush_to_array
+
+      _x = remove_instance_variable :@result
+
+      State_After_Invocation___.new _x, _a
+    end
+
+    State_After_Invocation___ = ::Struct.new :result, :emission_array
+
+    # -
+
+    if false
 
     def call * x_a
       @branch ||= build_branch
@@ -82,14 +131,25 @@ module Skylab::Zerk::TestSupport
         false
       end
     end
+    end
 
   # -
 
-  Home_ = ::Skylab::Zerk
+  Call_ = -> args, acs do
+    Home_.call args, acs
+  end
+
+  Unmarshal_ = -> x, y do
+    Home_.unmarshal x, y
+  end
+
+  Persist_ = -> x, y do
+    Home_.persist x, y
+  end
 
   Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
-  Callback_ = Home_::Callback_
+  EMPTY_A_ = []
   MONADIC_EMPTINESS_ = -> _ { NIL_ }
   NIL_ = nil
   TS_ = self

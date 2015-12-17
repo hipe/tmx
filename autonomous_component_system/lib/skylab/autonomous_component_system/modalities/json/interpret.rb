@@ -8,6 +8,7 @@ module Skylab::Autonomous_Component_System
 
           @context_linked_list = nil
           @_oes_p = p
+          @on_empty_JSON_object = nil
         end
 
         def prepend_more_specific_context_by & desc_p
@@ -19,6 +20,7 @@ module Skylab::Autonomous_Component_System
         attr_writer(
           :ACS,
           :context_linked_list,
+          :on_empty_JSON_object,
           :JSON,
         )
 
@@ -33,6 +35,7 @@ module Skylab::Autonomous_Component_System
             _x,
             remove_instance_variable( :@context_linked_list ),
             @ACS,
+            @on_empty_JSON_object,
             & @_oes_p )
 
           rec._execute
@@ -41,11 +44,12 @@ module Skylab::Autonomous_Component_System
 
       class Interpret::Recurse_
 
-        def initialize x, context_x, acs, & p
+        def initialize x, context_x, acs, on_empty, & p
 
           @ACS = acs
           @context_linked_list = context_x
           @_oes_p = p
+          @on_empty_JSON_object = on_empty
           @_x = x
         end
 
@@ -240,7 +244,7 @@ module Skylab::Autonomous_Component_System
 
           _x = qkn.value_x
 
-          o = self.class.new( _x, _ctx_, cmp, & @_LAST_component_oes_p )
+          o = self.class.new( _x, _ctx_, cmp, @on_empty_JSON_object, & @_LAST_component_oes_p )
 
           _xx_ = o._execute
 
@@ -370,6 +374,24 @@ module Skylab::Autonomous_Component_System
 
           if @_did_any_assignments
             @ACS
+          else
+            ___when_empty
+          end
+        end
+
+        def ___when_empty
+
+          p = @on_empty_JSON_object
+
+          if p
+
+            p.call do
+
+              Modalities::JSON::When_::Empty.new_with(
+                :context_linked_list, @context_linked_list,
+                :ok, nil,  # neutralize its semantic gravity
+              )
+            end
           else
             Modalities::JSON::When_[ self, :Empty ]
           end

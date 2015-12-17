@@ -27,8 +27,8 @@ module Skylab::TestSupport
 
           maybe_send_event :error, :invalid_property_value do
 
-            Brazen_::Entity::Meta_Meta_Properties::Enum::
-              Build_extra_value_event[ x, prp_name, enum_box.get_names ]
+            Home_.lib_.fields::MetaMetaFields::Enum::
+              Build_extra_value_event[ x, enum_box.get_names, prp_name ]
           end
         end
 

@@ -400,8 +400,8 @@ module Skylab::Fields
     end
 
     build_extra_value_event_proc = -> do
-      Home_.lib_.brazen::Entity::Meta_Meta_Properties::Enum::
-        Build_extra_value_event
+
+      Home_::MetaMetaFields::Enum::Build_extra_value_event
     end
 
     EQUALS_BYTE__ = '='.getbyte 0
@@ -410,7 +410,7 @@ module Skylab::Fields
 
       @on_event_selectively.call :error, :invalid_property_value do
 
-        build_extra_value_event_proc[][ x, prp.name, bx.get_names ]
+        build_extra_value_event_proc[][ x, bx.get_names, prp.name ]
       end
     end
 
@@ -418,7 +418,7 @@ module Skylab::Fields
 
       @on_event_selectively.call :error, :invalid_property_value do
 
-        build_extra_value_event_proc[][ x, prp.name, bx.get_names ]
+        build_extra_value_event_proc[][ x, bx.get_names, prp.name ]
       end
       NIL_
     end

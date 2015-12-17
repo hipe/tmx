@@ -3,6 +3,12 @@ module Skylab::Callback::TestSupport
   module Future_Expect
 
     # simplify event testing and (with "future") get immediate response
+    #
+    # NOTE - before you do any feature adding or maintence to this file,
+    # look for ways to integrate it with 'expect-event'. as it is, it is
+    # so minimal that we have left it separate. but since its inception
+    # we have overhauled "expect event" so it is now fresher than this.
+    # (and there is certainly conceptual redundancy between the two.)
 
     def self.[] tcc
       tcc.include self ; nil

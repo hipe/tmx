@@ -236,12 +236,6 @@ module Skylab::Callback::TestSupport
           UNRELIABLE_
         end
       end
-
-      # -- freeze an invocation as a shared state
-
-      def expect_event_flush_state result_x
-        self._K
-      end
     end
 
     module Test_Context_Instance_Methods
@@ -292,15 +286,19 @@ module Skylab::Callback::TestSupport
 
       def _match_expev_em_via_TCS terminal_channel_symbol, & ev_p
 
-        _expev_expectation_by do
+        _expev_matcher_by do
+
           terminal_channel_symbol_of terminal_channel_symbol
-          @user_proc = ev_p
+
+          if ev_p
+            traditional_user_proc_of ev_p
+          end
         end
       end
 
       def _match_expev_em_via_TCS_and_message sym=nil, msg_x=nil, & ev_p
 
-        _expev_expectation_by do
+        _expev_matcher_by do
 
           if sym
             terminal_channel_symbol_of sym
@@ -310,13 +308,15 @@ module Skylab::Callback::TestSupport
             mixed_message_matcher msg_x
           end
 
-          @user_proc = ev_p
+          if ev_p
+            traditional_user_proc_of ev_p
+          end
         end
       end
 
       def _match_expev_em_via_3 ok_trilean, sym=nil, msg_x=nil, & ev_p
 
-        _expev_expectation_by do
+        _expev_matcher_by do
 
           trilean ok_trilean
 
@@ -328,7 +328,9 @@ module Skylab::Callback::TestSupport
             mixed_message_matcher msg_x
           end
 
-          @user_proc = ev_p
+          if ev_p
+            traditional_user_proc_of ev_p
+          end
         end
       end
 
@@ -336,29 +338,32 @@ module Skylab::Callback::TestSupport
         em.channel_symbol_array.inspect
       end
 
-      # -- the newschool ways (matcher-based)
+      # -- the newschool ways (matcher-based) (frontiered by [ze] for now..)
 
-      def only_event
-        a = state_.event_array
-        ev = a.fetch 0
+      def only_emission
+
+        a = state_.emission_array
+        em = a.fetch 0
         if 1 == a.length
-          ev
+          em
         else
           a.length.should eql 1
         end
       end
 
-      def be_event * x_a, & x_p
-        self._NOT_YET_COVERED
+      def be_emission * x_a, & x_p
 
-        _expev_expectation_by do
+        _expev_matcher_by do
 
           full_channel_of x_a
-          @user_proc = x_p
+
+          if x_p
+            alternate_user_proc_of x_p
+          end
         end
       end
 
-      def _expev_expectation_by & def_p
+      def _expev_matcher_by & def_p
 
         Expectation__.new do
           instance_exec( & def_p )
@@ -442,10 +447,9 @@ module Skylab::Callback::TestSupport
           send m
         end
 
-        p = exp.user_proc
-        if p && ! @_failures
-          p[ em.cached_event_value ]
-          # result is disregarded. you only ever always get the emission back.
+        m = exp.user_proc_method_name
+        if m && ! @_failures
+          send m
         end
 
         if @_failures
@@ -473,14 +477,50 @@ module Skylab::Callback::TestSupport
 
       def check_full_channel
 
-        if @_expectation.full_channel != @_event.dootily_hah
-          ___fail_with_detailed_explanation_about_channel_mismatch
+        Require_basic___[]
+
+        act = @_emission.channel_symbol_array
+        exp = @_expectation.full_channel
+
+        good_d = Basic_::List.index_of_deepest_common_element act, exp
+
+        # if the actual channel is deeper than the expected channel,
+        # but the expect channel matches the head-anchored slice, it's still
+        # a match (FOR NOW)..
+
+        bad_d = if good_d
+          good_d + 1
+        else
+          0
+        end
+
+        if exp.length != bad_d
+
+          _add_failure_by do
+            ___say_detailed_explanation_about_channel_mismatch bad_d, act, exp
+          end
         end
         NIL_
       end
 
-      def ___fail_with_detailed_explanation_about_channel_mismatch
-        self.__FUN_COVER_THIS
+      Require_basic___ = Callback_::Lazy.call do
+        Basic_ = Home_.lib_.basic
+        NIL_
+      end
+
+      def ___say_detailed_explanation_about_channel_mismatch bad_d, act, exp
+
+        ba = Basic_
+
+        _ord = ba::Number::EN.num2ord bad_d + 1
+
+        _had_x = ba::String.via_mixed act[ bad_d ]  # any
+        _need_x = ba::String.via_mixed exp[ bad_d ]  # any
+
+        _had = act.inspect
+
+        "had #{ _had_x }, needed #{ _need_x } for the #{ _ord } component of #{
+          }#{ _had }"
       end
 
       def check_terminal_channel_symbol
@@ -530,6 +570,41 @@ module Skylab::Callback::TestSupport
         end
         NIL_
       end
+
+      def check_user_proc_alternately
+
+        # this experiment messes with state and reaches outside of silos
+        # for the convenience of getting an array of strings built under
+        # a particular expag when the emission is of shape "expression".
+        # it assume the emission has not been reified yet.
+
+        p = @_expectation.alternate_user_proc
+        em = @_emission
+
+        if Looks_like_expression__[ em.channel_symbol_array ]
+
+          _expag = @_test_context._expev_lower_level_expression_agent
+
+          em.reify_by do | ev_p |
+
+            _expag.calculate( [], & ev_p ).freeze
+          end
+        end
+
+        p[ em.cached_event_value ]
+
+        UNRELIABLE_
+      end
+
+      def check_user_proc_traditionally
+
+        @_expectation.traditional_user_proc[ @_emission.cached_event_value ]
+        # result is disregarded. you only ever always get the emission back.
+
+        UNRELIABLE_
+      end
+
+      # --
 
       def _add_message_failure_by
 
@@ -590,7 +665,7 @@ module Skylab::Callback::TestSupport
         NIL_
       end
 
-      def full_channel_of x_
+      def full_channel_of x_a
         @channel_method_name = :check_full_channel
         @full_channel = x_a
         NIL_
@@ -604,6 +679,19 @@ module Skylab::Callback::TestSupport
           @message_method_name = :check_message_string_against_regexp
           @message_regexp = msg_x
         end
+        NIL_
+      end
+
+      def traditional_user_proc_of p
+
+        @traditional_user_proc = p
+        @user_proc_method_name = :check_user_proc_traditionally
+        NIL_
+      end
+
+      def alternate_user_proc_of p
+        @alternate_user_proc = p
+        @user_proc_method_name = :check_user_proc_alternately
         NIL_
       end
 
@@ -625,7 +713,9 @@ module Skylab::Callback::TestSupport
         :message_string,
         :message_regexp,
         # --
-        :user_proc,
+        :user_proc_method_name,
+        :traditional_user_proc,
+        :alternate_user_proc,
       )
     end
 
@@ -857,9 +947,22 @@ module Skylab::Callback::TestSupport
         @_x
       end
 
+      def reify_by & do_this
+
+        _p = remove_instance_variable :@_x_p
+
+        @_needs_reification = false
+
+        @_x = do_this[ _p ]
+
+        NIL_
+      end
+
       def ___reify
+
         p = remove_instance_variable :@_x_p
-        @_x = if :expression == @channel_symbol_array[ 1 ]  # #[#br-023]
+
+        @_x = if Looks_like_expression__[ @channel_symbol_array ]
           Expression_as_Event___.new( p, @channel_symbol_array.last )
         else
           p[]
@@ -894,6 +997,10 @@ module Skylab::Callback::TestSupport
       def ok
         NIL_
       end
+    end
+
+    Looks_like_expression__ = -> sym_a do  # #[#br-023]
+      :expression == sym_a[ 1 ]
     end
 
     Say_unexpected_result__ = -> act_x, exp_x do

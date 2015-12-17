@@ -27,9 +27,9 @@ module Skylab::MyTerm::TestSupport
 
     context "successful initial set" do
 
-      it "appears to work (results in true)" do
+      it "appears to work (results in context)" do
 
-        _state.result.should eql true
+        _expect_result_after_write
       end
 
       it "(matches fuzzily!) emits natural sounding event" do
@@ -78,8 +78,9 @@ module Skylab::MyTerm::TestSupport
 
     context "successful subsequent set" do
 
-      it "works (results in true)" do
-        _state.result.should eql true
+      it "works (results in context)" do
+
+        _expect_result_after_write
       end
 
       it "natural" do
@@ -128,6 +129,15 @@ module Skylab::MyTerm::TestSupport
         ev.path.should match %r(\[mt\]/[-a-zA-Z0-9]+\.json\z)
         ( 31..109 ).should be_include ev.bytes  # :P
       end
+    end
+
+    def _expect_result_after_write
+
+      _x = _state.result
+
+      # (one time it is a file, one time it is a StringIO ..)
+
+      _x.path or fail
     end
 
     def _expect_same_JSON_file

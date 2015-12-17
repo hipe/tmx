@@ -22,7 +22,12 @@ module Skylab::System
 
     ) do | y, o |
 
-      y << "#{ o.preterite_verb } #{ pth o.path } (#{ o.bytes } bytes)"
+      path = o.path
+      if path
+        y << "#{ o.preterite_verb } #{ pth path } (#{ o.bytes } bytes)"
+      else
+        y << "#{ o.preterite_verb } #{ o.bytes } bytes"
+      end
     end
   end
 end
