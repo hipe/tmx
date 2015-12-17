@@ -84,6 +84,10 @@ module Skylab::Zerk::TestSupport
       eql Home_::UNABLE_
     end
 
+    def expect_result_for_success_
+      state_.result.should eql ACHIEVED_
+    end
+
     define_method :expression_agent_for_expect_event, ( Callback_::Lazy.call do
       Home_.lib_.brazen::API.expression_agent_instance
     end )
@@ -197,6 +201,10 @@ module Skylab::Zerk::TestSupport
 
   module Unmarshal_and_Call_and_Marshal_
 
+    def initialize & oes_p
+      @oes_p_ = oes_p
+    end
+
     def call_via_argument_array_ args
       Home_.call args, self
     end
@@ -265,6 +273,7 @@ module Skylab::Zerk::TestSupport
 
   Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
+  ACHIEVED_ = true
   EMPTY_A_ = []
   MONADIC_EMPTINESS_ = -> _ { NIL_ }
   NIL_ = nil

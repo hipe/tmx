@@ -36,15 +36,8 @@ module Skylab::Autonomous_Component_System
             self._REVIEW_one
             qkn.value_x
           else
-            ___build_new_empty_entitesque
+            Build_and_attach[ @asc_, @ACS ]
           end
-        end
-
-        def ___build_new_empty_entitesque
-
-          cmp = ACS_::Interpretation::Build_empty_hot[ @asc_, @ACS ]
-          ACS_::Interpretation_::Write_value[ cmp, @asc_, @ACS ]
-          cmp
         end
       end
 
@@ -91,6 +84,12 @@ module Skylab::Autonomous_Component_System
             ACS_::Interpretation::Build_empty_hot[ @_asc, @ACS ]
           end
         end
+      end
+
+      Build_and_attach = -> asc, acs do
+        cmp = ACS_::Interpretation::Build_empty_hot[ asc, acs ]
+        ACS_::Interpretation_::Write_value[ cmp, asc, acs ]
+        cmp
       end
 
       To_stream = -> acs do

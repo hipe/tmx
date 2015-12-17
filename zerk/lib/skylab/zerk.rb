@@ -8,7 +8,7 @@ module Skylab::Zerk  # intro in [#001] README
 
       _oes_p_p = _handler_builder_for acs, & p
 
-      bc = Call___.new( args, acs, & _oes_p_p ).resolve_bound_call
+      bc = Call___[ args, acs, & _oes_p_p ]
       if bc
         bc.receiver.send bc.method_name, * bc.args, & bc.block
       else
@@ -56,12 +56,44 @@ module Skylab::Zerk  # intro in [#001] README
 
   class Call___
 
-    def initialize args, acs, & oes_p_p
+    class << self
+
+      def _call args, acs, & oes_p_p
+
+        _st = Callback_::Polymorphic_Stream.via_array args
+        _via( _st, acs, & oes_p_p ).resolve_bound_call
+      end
+
+      alias_method :[], :_call
+      alias_method :call, :_call
+      alias_method :_via, :new
+      private :new
+    end  # >>
+
+    def initialize st, acs, & oes_p_p
 
       @ACS = acs
-      @_argument_stream = Callback_::Polymorphic_Stream.via_array args
+      @_argument_stream = st
       @__oes_p = nil
       @_oes_p_p = oes_p_p
+    end
+
+    def __recurse qkn
+
+      me = remove_instance_variable :@ACS
+      _st = remove_instance_variable :@_argument_stream  # unless #pop-back
+      remove_instance_variable :@__oes_p
+      _oes_p_p = remove_instance_variable :@_oes_p_p  # #when-context
+
+      if qkn.is_known_known
+        self._K
+      else
+        _cmp = ACS_::For_Interface::Build_and_attach[ qkn.association, me ]
+        # #needs-upwards
+      end
+
+      _ = self.class._via( _st, _cmp, & _oes_p_p )
+      _.resolve_bound_call
     end
 
     def resolve_bound_call
@@ -91,7 +123,9 @@ module Skylab::Zerk  # intro in [#001] README
         end
 
         if node.association.model_classifications.looks_compound
-          self._K
+          x = __recurse node
+          # (hypothetically we could allow returning to this frame. :#pop-back)
+          break
         else
           x = __parse_node_value node
           x or break
