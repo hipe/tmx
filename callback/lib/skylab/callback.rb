@@ -792,7 +792,7 @@ module Skylab::Callback
 
       _CA = nil ; p = -> do
         p = nil
-        _CA = Home_.lib_.basic::Minimal_Property.via_variegated_symbol :against
+        _CA = Home_.lib_.basic::Minimal_Property.via_variegated_symbol :argument
       end
 
       define_method :via_value_and_symbol do | x, sym |
@@ -909,27 +909,6 @@ module Skylab::Callback
     def new_with_value x
       self.class.new x, name_symbol
     end
-  end
-
-  class Emission
-
-    class << self
-      def of * i_a, & ev_p
-        via_category i_a, & ev_p
-      end
-      alias_method :via_category, :new
-      private :new
-    end  # >>
-
-    def initialize i_a, & ev_p
-      @category = i_a
-      @emission_value_proc = ev_p
-    end
-
-    attr_reader(
-      :category,
-      :emission_value_proc,
-    )
   end
 
   class Bound_Call  # :[#059].

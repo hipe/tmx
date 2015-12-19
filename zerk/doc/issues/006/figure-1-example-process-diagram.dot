@@ -1,0 +1,46 @@
+digraph G {
+
+  label="figure 1. with each \"(would) block\", the test library
+records something and send the next canned string."
+
+  rankdir="TB"
+
+	subgraph cluster_0 {
+		style=filled;
+		color=lightgrey;
+		node [style=filled color=white];
+    rec0 [label="start the\nsystem under test\n(no arguments)"]
+    rec1 [label="record\nfirst screen"]
+    rec2 [label="send first\ncanned string"]
+    rec3 [label="record\nsecond screen"]
+    rec4 [label="[..]"]
+    rec0->rec1 [color="lightgrey"]
+    rec1->rec2
+    rec2->rec3 [color="lightgrey"]
+    rec3->rec4
+		label = "the test library";
+	}
+
+	subgraph cluster_1 {
+		node [style=filled];
+		label = "system under test";
+    sut0 [label="output\nfirst screen,\n(would) block"]
+    sutfake0 [color="white" label=""]
+    sutfake1 [color="white" label=""]
+    sut0->sutfake0 [color="white"]
+    sutfake0->sut1 [color="white"]
+    sut1 [label="respond to input\nwith another screen,\n(would) block"]
+    sut1->sutfake1 [color="white"]
+		color=blue
+	}
+
+	start [shape=Mdiamond];
+	end [shape=Msquare];
+
+	start->rec0
+  rec0->sut0
+  sut0->rec1
+  rec2->sut1
+  sut1->rec3
+  rec4->end
+}

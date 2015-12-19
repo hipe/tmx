@@ -345,29 +345,33 @@ module Skylab::Autonomous_Component_System
           @modifiers ||= NO_MODIFIERS__
 
           sym = @modifiers.via
-          if sym  # :Tenet7.
+          wv = if sym  # :Tenet7.
 
             comp_x = @association.component_model.send(
               :"new_via__#{ sym }__",
               @arg_st.gets_one,
               & @oes_p_p_ )
 
-            ok = comp_x ? true : false
-          else
-            wv = ___interpret_component_normally
-            if wv
-              ok = true
-              comp_x = wv.value_x
+            if comp_x
+              Callback_::Known_Known[ comp_x ]
             else
-              ok = wv
+              comp_x
             end
+          else
+            ___interpret_component_normally
           end
 
-          if ok
-            @_sub_component_x = comp_x
+          if wv
+
+            # a model will result in the known unknown to allow for the (any)
+            # value in its slot to be deleted without having to reference the
+            # component by value.. see #here
+
+            @_component_wrapped_value = wv
+
             INTERPRETATION_SUCCEEDED__
           else
-            ok
+            wv
           end
         end
 
@@ -459,7 +463,7 @@ module Skylab::Autonomous_Component_System
 
           @ACS.send(
             _m,
-            @_sub_component_x,
+            @_component_wrapped_value.value_x,
             @association,
             & _oes_p )
         end
@@ -480,7 +484,7 @@ module Skylab::Autonomous_Component_System
 
             last_value = @ACS.send(
               _m,
-              @_sub_component_x,
+              @_component_wrapped_value.value_x,
               @association,
               & _oes_p )
 
@@ -504,12 +508,15 @@ module Skylab::Autonomous_Component_System
 
         def __deliver_when_operation_defined_in__association__
 
-          _x = @ACS.send(
-            :"__#{ @operation_symbol }__component",
-            * @modifiers.using,
-            @_sub_component_x,
-            @association,
-            & @oes_p_p_ )
+          args = [ :"__#{ @operation_symbol }__component", * @modifiers.using ]
+
+          wv = @_component_wrapped_value
+          if wv.is_known_known  # :#here
+            args.push wv.value_x  # experimental :#Detail-one
+          end
+          args.push @association
+
+          _x = @ACS.send( * args, & @oes_p_p_ )
 
           _accept_delivery_value _x
 

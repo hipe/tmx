@@ -2,17 +2,14 @@ module Skylab::Basic
 
   module Hash
 
-    class Actors__::Determine_hotstrings
+    class Actors__::Determine_hotstrings < Callback_::Actor::Monadic
 
       # notes at spec
 
-      Callback_::Actor.call self, :properties,
-        :s_a
-
-      def initialize
-        @was_occupied = {}
+      def initialize s_a
         @is_occupied = {}
-        super
+        @s_a = s_a
+        @was_occupied = {}
       end
 
       def execute

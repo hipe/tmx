@@ -5,6 +5,7 @@ module Skylab::Zerk::TestSupport
   describe "[ze] 1 - one leaf" do
 
     TS_[ self ]
+    use :API
 
     it "builds" do
       build_top_

@@ -52,7 +52,7 @@ module Skylab::Autonomous_Component_System
 
           @_asc = @qkn.association
 
-          if @_asc.model_classifications.looks_primitivesque  # start logic that is repeated #here
+          if @_asc.model_classifications.looks_primitivesque
             __when_primitivesque
           else
             __when_entitesque
@@ -61,7 +61,7 @@ module Skylab::Autonomous_Component_System
 
         def __when_primitivesque
 
-          if @_asc.has_operations
+          if @_asc.has_operations  # contrast with #here ..
             ___when_primitivesque_with_operations
           else
             NIL_  # as covered
@@ -111,22 +111,6 @@ module Skylab::Autonomous_Component_System
         # build the bound reader (one per category) lazily, only when the
         # ACS is found to define one or more entries of that category.
 
-        known_qkn = -> qkn do  # repetition of :#here
-          asc = qkn.association
-          if asc.model_classifications.looks_primitivesque
-            if asc.has_operations
-
-              _ = ACS_::For_Interface::Primitivesque.new qkn, acs
-
-              qkn.new_with_value _
-            else
-              NIL_
-            end
-          else
-            qkn
-          end
-        end
-
         asc_for = nil ; qkn_for = nil
         entry = nil
 
@@ -136,7 +120,20 @@ module Skylab::Autonomous_Component_System
           if ! int || :interface == int
             qkn = qkn_for[ asc ]
             if qkn.is_effectively_known
-              known_qkn[ qkn ]
+              if asc.model_classifications.looks_primitivesque
+
+                # in contrast with :#here, we are not placing importance on
+                # whether the thing has operations. why this is is not clear
+                # .. TODO - try to take it off off the other one
+
+                # WAS: if asc.has_operations. now covered not to by [ze]
+
+                _ = ACS_::For_Interface::Primitivesque.new qkn, acs
+
+                qkn.new_with_value _
+              else
+                qkn
+              end
             else
               qkn
             end

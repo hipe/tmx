@@ -296,36 +296,78 @@ module Skylab::Brazen
       # exactly to the expression of one screen (or super-section, document,
       # etc.), because visual separation between sections is important and
       # only relevant in the context of one such node (perhaps by definition,
-      # see [#002]/figure-3)).
+      # see [#002]/figure-3)). (or call `clear` between "screens" to re-use
+      # this same boundarizer.)
 
       def initialize y
 
-        @_touch_boundary = EMPTY_P_  # when in the beginning state before
-          # anything has ever been emitted, touching this does nothing.
+        has_visible_content = normal_touch_boundary = p = nil
+        on_next_line_express_a_boundary = nil
+        when_at_top = when_in_middle = nil
 
-        p = -> ss do
-          # the first time ever something (even false-ish) is emitted,
-          # then we start maintaining this flip-flop flag
+        @_clear = -> do
 
-          pending_boundary_to_express = false
+          # when at the top of the "screen" (or whatever it is), you haven't
+          # outputted anything at all yet, so you do *not* want a boundary
+          # touch to cause the next outputted line to have a separtor line
+          # before it (part of the point of all this) ..
 
-          @_touch_boundary = -> do
-            pending_boundary_to_express = true ; nil
+          @_touch_boundary = EMPTY_P_
+          p = when_at_top
+
+          NIL_
+        end
+
+        when_at_top = -> s do
+          # for the zero or more top-anchored empty lines and
+          # any first non-empty line:
+
+          if has_visible_content[ s ]
+
+            # then state change: now we *do* pay attention to these:
+
+            @_touch_boundary = normal_touch_boundary
+            p = when_in_middle
           end
-          y << ss
-          p = -> s do
-            if pending_boundary_to_express
-              pending_boundary_to_express = false
-              y << NIL_
+
+          y << s
+          NIL_
+        end
+
+        has_visible_content = -> s do
+          s && VISIBLE_CONTENT_RX___ =~ s
+        end
+
+        normal_touch_boundary = -> do
+          on_next_line_express_a_boundary = true ; nil
+        end
+
+        when_in_middle = -> s do
+
+          if on_next_line_express_a_boundary
+
+            on_next_line_express_a_boundary = false  # regardless of below
+
+            if has_visible_content[ s ]
+              y << nil  # output a blank line of our own IFF this. otherwise:
             end
-            y << s
+
+            # if the received string has no visible content, we assume both
+            # that it will appear as a blank line below and that expressing
+            # our own blank line would create an unintended redundancy.
           end
+
+          y << s
         end
 
         @line_yielder = ::Enumerator::Yielder.new do | s |
           p[ s ]
         end
+
+        @_clear.call
       end
+
+      VISIBLE_CONTENT_RX___ = /[^[:space:]]/
 
       attr_reader(
         :line_yielder,

@@ -5,6 +5,7 @@ module Skylab::Zerk::TestSupport
   describe "[ze] 2 - tree spec" do
 
     TS_[ self ]
+    use :API
 
     context "call top node with something strange:" do
 

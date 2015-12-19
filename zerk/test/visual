@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby -w
+
+require 'skylab/zerk'
+
+module Skylab::Zerk::TS_Visual
+
+  z = ::Skylab::Zerk
+
+  CLI = z::CLI.new do | rsx, & ev_p |
+
+    require_relative 'test-support'
+
+    _cls = ::Skylab::Zerk::TestSupport.lib_ :examples_example_01_zombies
+      # replace the above line "manually" with other symbols of the other examples
+
+    _cls.new rsx, & ev_p
+  end
+end
+
+Skylab::Zerk::TS_Visual::CLI.new(
+
+  $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+
+).invoke ::ARGV

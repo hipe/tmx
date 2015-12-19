@@ -362,7 +362,9 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         me = self
         @instance_description_proc = -> y do
 
-          _s_a = me._operations.to_name_stream.reduce_into_by [] do | m, sym |
+          _st = me.operations_box_read_only.to_name_stream
+
+          _s_a = _st.reduce_into_by [] do | m, sym |
 
             m << Callback_::Name.via_variegated_symbol( sym ).as_human
           end
@@ -412,6 +414,10 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         NIL_
       end
 
+      def operations_box_read_only
+        @_operations
+      end
+
       def any_delivery_mode_for sym
 
         if @_operations
@@ -443,8 +449,6 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       def has_operations
         ! @_operations.nil?
       end
-
-      attr_reader :_operations
 
       # ~ default
 

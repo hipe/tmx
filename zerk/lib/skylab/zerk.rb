@@ -39,7 +39,7 @@ module Skylab::Zerk  # intro in [#001] README
 
     def _handler_builder_for acs
 
-      Require_ACS__[]
+      Require_ACS_[]
 
       if block_given?
         self._DESIGN_ME
@@ -53,6 +53,158 @@ module Skylab::Zerk  # intro in [#001] README
         produce_library_shell_via_library_and_app_modules Lib_, self
     end
   end  # >>
+
+  Callback_ = ::Skylab::Callback
+
+  class CLI
+    class << self
+      alias_method :_orig_new, :new
+
+      def new & p
+        cls = ::Class.new self
+        class << cls
+          alias_method :new, :_orig_new
+        end
+        cls.send :define_method, :__top_builder_proc do
+          p
+        end
+        cls
+      end
+    end  # >>
+
+    def initialize sin, sout, serr, pn_s_a
+
+      @program_name_string_array = pn_s_a
+      @serr = serr
+      @sin = sin
+      @sout = sout
+    end
+
+    attr_reader(
+      :argv, :program_name_string_array, :serr, :sin, :sout,
+
+      :boundarizer,
+    )
+
+    def invoke argv
+
+      if argv.length.zero?
+
+        bc = ___bound_call_for_event_loop
+        x = bc.receiver
+        yield x if block_given?  # :/
+        x.send bc.method_name, * bc.args, & bc.block
+
+      elsif %r(\A-(?:h|-h(?:e(?:l(?:p)?)?)?)\z)i =~ argv.first
+
+        @serr.puts "usage: '#{ @program_name_string_array * SPACE_ }'"
+        SUCCESS_EXITSTATUS
+      else
+        self._DESIGN_ME
+      end
+    end
+
+    def ___bound_call_for_event_loop
+
+      @boundarizer =
+        Home_.lib_.brazen::CLI_Support::Section::Boundarizer.new(
+          line_yielder )
+
+      _vmm = Home_::View_Maker_Maker___.new
+
+      _el = Home_::Event_Loop___.new _vmm, self, & __top_builder_proc
+
+      Callback_::Bound_Call.via_receiver_and_method_name _el, :run
+    end
+
+    def receive_uncategorized_emission i_a, & ev_p
+
+      bc = Callback_::Emission::Interpreter.common[ i_a, & ev_p ]
+      _ = send bc.method_name, * bc.args, & bc.block
+      UNRELIABLE_
+    end
+
+    def receive_conventional_emission i_a, & ev_p
+
+      _ev = ev_p[]
+      _y = line_yielder
+      _expag = _expression_agent
+
+      _ev.express_into_under _y, _expag
+
+      @boundarizer.touch_boundary
+
+      UNRELIABLE_
+    end
+
+    def receive_expression_emission i_a, & y_p
+
+      # (came from [#002]#detail-one)
+
+      _y = line_yielder
+      _expag = _expression_agent
+
+      _expag.calculate _y, & y_p
+
+      UNRELIABLE_
+    end
+
+    def _expression_agent
+      Home_.lib_.brazen::CLI.expression_agent_instance
+    end
+
+    def line_yielder
+      @___line_yielder ||= ___build_line_yielder
+    end
+
+    def ___build_line_yielder
+      io = @serr
+      ::Enumerator::Yielder.new do | string |
+        io.puts string
+      end
+    end
+  end
+
+  Interpret_buttonesque_ = -> s, ada do
+
+    o = Home_.lib_.brazen::Collection::Common_fuzzy_retrieve.new
+
+    # -- setup
+
+    o.qualified_knownness = Callback_::Qualified_Knownness.
+      via_value_and_symbol( s, :argument )  # ..
+        # against this string
+
+    o.name_map = -> nameable do
+
+      # given each qkn for each component, map it to a
+      # string that should be used for the comparison
+
+      nameable.name.as_slug
+    end
+
+    o.stream_builder = -> do
+      Callback_::Stream.via_nonsparse_array ada.last_buttonesques_
+    end
+
+    # -- resultage
+
+    o.on_event_selectively = -> * i_a, & ev_p do
+
+      # in case of any kind of error (not found, ambiguity..)
+
+      ada.receive_uncategorized_emission i_a, & ev_p
+
+      if :info == i_a.first
+        self._COVER_ME
+      else
+        UNABLE_  # so that we know to stop below (old-school)
+      end
+    end
+
+    _ = o.execute
+    _
+  end
 
   class Call___
 
@@ -309,9 +461,9 @@ module Skylab::Zerk  # intro in [#001] README
     o.execute
   end
 
-  Callback_ = ::Skylab::Callback
+  Lazy_ = Callback_::Lazy
 
-  Require_ACS__ = Callback_::Lazy.call do
+  Require_ACS_ = Lazy_.call do
     ACS_ = Home_.lib_.ACS
     NIL_
   end
@@ -346,6 +498,8 @@ module Skylab::Zerk  # intro in [#001] README
   NIL_ = nil
   NONE_S = '(none)'.freeze
   NOTHING_TO_DO_ = nil
+  SUCCESS_EXITSTATUS = 0
   SPACE_ = ' '
   UNABLE_ = false
+  UNRELIABLE_ = :_unreliable_  # if you're evaluating this, you shouldn't be
 end

@@ -188,7 +188,7 @@ module Skylab::Brazen
         alias_method :call, :_call
       end  # >>
 
-      def initialize  & oes_p
+      def initialize & oes_p
 
         @found_map = nil
         @levenshtein_number = nil
@@ -213,7 +213,7 @@ module Skylab::Brazen
         # candidate items are string-like (or perhaps only that they are
         # `=~` compatible.)
 
-        :on_event_selectively,  # (required) a [#ca-001 selective listener
+        :on_event_selectively,  # (required) a [#ca-001] selective listener
         # proc to call in case not exactly one match can be resolved.
 
         :qualified_knownness,  # (required) wrap your target value in

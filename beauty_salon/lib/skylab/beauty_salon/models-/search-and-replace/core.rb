@@ -140,7 +140,17 @@ module Skylab::BeautySalon
       end
     end
 
-    Zerk_ = Home_.lib_.zerk
+    # Zerk_ = Home_.lib_.zerk
+
+    module Zerk_
+      # temporary while we wait for the rewrite
+      Branch_Node = ::Class.new
+      Common_Node = ::Class.new
+      Field = ::Class.new
+      Up_Button = ::Class.new
+      Quit_Button = ::Class.new
+      NONE_S = nil
+    end
 
     class Node_ < Zerk_::Common_Node
 

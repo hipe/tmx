@@ -6,9 +6,7 @@ module Skylab::Zerk::TestSupport
   class << self
 
     def [] tcc
-
-      TestSupport_::Memoization_and_subject_sharing[ tcc ]
-      Callback_.test_support::Expect_event[ tcc ]
+      tcc.send :define_singleton_method, :use, Use_method___
       tcc.include TS_
     end
 
@@ -30,8 +28,15 @@ module Skylab::Zerk::TestSupport
 
   Home_ = ::Skylab::Zerk
   Callback_ = Home_::Callback_
+  Lazy_ = Callback_::Lazy
 
-  # ->
+  # -
+    Use_method___ = -> sym do
+      TS_.lib_( sym )[ self ]
+    end
+  # -
+
+  # -
 
     def debug!
       @do_debug = true
@@ -42,6 +47,18 @@ module Skylab::Zerk::TestSupport
     def debug_IO
       TestSupport_.debug_IO
     end
+  # -
+
+  # -- the test library node called "API"
+
+  API = -> tcc do
+
+    TestSupport_::Memoization_and_subject_sharing[ tcc ]
+    Callback_.test_support::Expect_event[ tcc ]
+    tcc.include API_Instance_Methods___ ; nil
+  end
+
+  module API_Instance_Methods___
 
     def call_plus_ * args
 
@@ -88,7 +105,7 @@ module Skylab::Zerk::TestSupport
       state_.result.should eql ACHIEVED_
     end
 
-    define_method :expression_agent_for_expect_event, ( Callback_::Lazy.call do
+    define_method :expression_agent_for_expect_event, ( Lazy_.call do
       Home_.lib_.brazen::API.expression_agent_instance
     end )
 
@@ -123,65 +140,24 @@ module Skylab::Zerk::TestSupport
       :result,
       :emission_array,
     )
-
-  # -
-
-  if false
-
-    def call * x_a
-      @branch ||= build_branch
-      Home_::API.produce_bound_call x_a, @branch
-    end
-
-    def build_branch
-      branch_class.new build_mock_parent
-    end
-
-    def build_mock_parent
-
-      oes_p = event_log.handle_event_selectively
-
-      Mock_Parent__.new -> x_a, & ev_p do
-
-        oes_p[ * x_a, & ev_p ]
-      end
-    end
-
-    def expect_not_OK_event_ sym, msg=nil
-
-      em = expect_not_OK_event nil, msg
-      em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
-      em
-    end
-
-    def expect_OK_event_ sym, msg
-
-      em = expect_OK_event nil, msg
-      em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
-      em
-    end
-
-    def expression_agent_for_expect_event
-      Home_.lib_.brazen::API.expression_agent_instance
-    end
-
-    Mock_Parent__ = ::Struct.new :handle_event_selectively_via_channel do
-
-      def is_interactive
-        false
-      end
-    end
-  end
-
-  Future_Expect = -> tcc do
-    Callback_.test_support::Future_Expect[ tcc ]
   end
 
   # mocks
 
   fn_rx = %r(\A[^/])
 
+  fnm = nil
   File_Name_Model_ = -> arg_st, & oes_p_p do
+
+    if arg_st.no_unparsed_exists
+      # experimental to use #[#ac-002]Detail-one
+      Callback_::KNOWN_UNKNOWN
+    else
+      fnm[ arg_st, & oes_p_p ]
+    end
+  end
+
+  fnm = -> arg_st, & oes_p_p do
 
     x = arg_st.gets_one
     if x.length.zero?
@@ -230,7 +206,7 @@ module Skylab::Zerk::TestSupport
 
   # -- exp
 
-  Future_expect_nothing_ = Callback_::Lazy.call do
+  Future_expect_nothing_ = Lazy_.call do
     -> * i_a do
       fail "unexpected: #{ i_a.inspect }"
     end
@@ -248,7 +224,7 @@ module Skylab::Zerk::TestSupport
           p[ * sym_a, & ev_p ]
         end
 
-        TS_.lib_( :future_expect )[ o.singleton_class ]
+        Callback_.test_support::Future_Expect[ o.singleton_class ]
 
         o.add_future_expect expected_sym_a
 
@@ -275,7 +251,9 @@ module Skylab::Zerk::TestSupport
 
   ACHIEVED_ = true
   EMPTY_A_ = []
+  EMPTY_S_ = "".freeze
   MONADIC_EMPTINESS_ = -> _ { NIL_ }
+  NEWLINE_ = "\n"
   NIL_ = nil
   TS_ = self
   UNABLE_ = false

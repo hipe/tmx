@@ -1581,20 +1581,18 @@ module Skylab::Brazen
 
         # NOTE this might become an overridable
 
-        Require_emission_lib_[]
-
-        class Emission_Interpreter____ < Emission_Interpreter_
+        class Emission_Interpreter____ < Callback_::Emission::Interpreter
 
           def __expression__ i_a, & x_p
-            _ i_a[ 2 .. -1 ], :"receive__#{ i_a[ 0 ] }__expression", & x_p
+            _ :"receive__#{ i_a[ 0 ] }__expression", i_a[ 2 .. -1 ], & x_p
           end
 
           def __data__ i_a, & x_p
-            _ i_a, :__receive_data_emission, & x_p
+            _ :__receive_data_emission, i_a, & x_p
           end
 
           def __conventional__ i_a, & x_p
-            _ i_a, :receive_conventional_emission, & x_p
+            _ :receive_conventional_emission, i_a, & x_p
           end
 
           new.freeze
