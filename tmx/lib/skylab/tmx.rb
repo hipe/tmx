@@ -10,14 +10,31 @@ module Skylab::TMX
 
   class << self
 
-    def build_sigilized_sidesystem_stream
+    def build_sigilized_sidesystem_stream_plus stem
 
-      _st = to_sidesystem_load_ticket_stream
+      # what tmx reports as the "sidesystem stream" is based on the gems
+      # found to be installed. you may want to have included as a sigilized
+      # sidesystem a sidesystem that has not yet been made a gem, for example
+      # if you are making it into a gem..
 
-      _anything = Home_::Models::Sigil.via_stemish_stream _st
+      st = to_sidesystem_load_ticket_stream
+      bx = Callback_::Box.new
+      begin
+        lt = st.gets
+        bx.add lt.stem, lt
+      end while nil
+
+      if stem and ! bx.has_name stem
+        stemmish = Stemmish___[ stem ]
+        bx.add stemmish.stem, stemmish
+      end
+
+      _anything = Home_::Models::Sigil.via_stemish_box bx
 
       _anything.to_stream
     end
+
+    Stemmish___ = ::Struct.new :stem
 
     def lookup_sidesystem entry_s
       installation_.lookup_reflective_sidesystem__ entry_s

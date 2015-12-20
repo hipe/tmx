@@ -22,6 +22,12 @@ module Skylab::TMX
         o.stemish_stream = x
         o.execute
       end
+
+      def via_stemish_box bx
+        o = Index___.new
+        o.stemish_box = bx
+        o.execute
+      end
     end  # >>
 
     class Anything___
@@ -62,11 +68,26 @@ module Skylab::TMX
       # is left intact, perhaps because it is useful as a differentiator for
       # a sigil associated with a sidesystem as opposed to one that is not.
 
-      attr_writer(
-        :stemish_stream,
-      )
+      def initialize
+        @stemish_stream = nil
+        @stemish_box = nil
+      end
+
+      def stemish_stream= x
+        @stemish_stream = x
+        x
+      end
+
+      def stemish_box= x
+        @stemish_box = x
+        x
+      end
 
       def execute
+
+        if ! @stemish_stream
+          @stemish_stream = @stemish_box.to_value_stream
+        end
 
         @_box = Callback_::Box.new
         @_conflicts = nil

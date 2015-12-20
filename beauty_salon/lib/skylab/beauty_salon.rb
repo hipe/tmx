@@ -20,10 +20,6 @@ module Skylab::BeautySalon
       @___lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
         Lib_, self )
     end
-
-    def search_and_replace
-      Home_::Models_::Search_and_Replace
-    end
   end  # >>
 
   Autoloader_ = Callback_::Autoloader

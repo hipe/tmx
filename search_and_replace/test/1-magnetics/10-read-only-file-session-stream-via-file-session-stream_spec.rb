@@ -1,11 +1,12 @@
-require_relative '../../../../../test-support'
+require_relative '../test-support'
 
-module Skylab::BeautySalon::TestSupport
+module Skylab::SearchAndReplace::TestSupport
 
-  describe "[bs] models - S & R - models - read only file session", wip: true do
+  describe "[sa] models - S & R - models - read only file session", wip: true do
 
-    extend TS_
-    use :models_search_and_replace_actors_build_file_scan_support
+    TS_[ self ]
+    use :expect_event
+    use :magnetics_file_stream
 
     it "BFS loads" do
       actors_::Build_file_stream

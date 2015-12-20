@@ -113,7 +113,7 @@ module Skylab::System::TestSupport
 
   Callback_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
 
-  EMPTY_A_ = [].freeze
+  EMPTY_A_ = Home_::EMPTY_A_
   EMPTY_S_ = Home_::EMPTY_S_
   NIL_ = Home_::NIL_
   TS_ = self

@@ -1,6 +1,6 @@
-module Skylab::BeautySalon::TestSupport
-
-  module Models::Search_And_Replace::Fixture_Trees
+module Skylab::SearchAndReplace::TestSupport
+  self._K
+  module Fixture_Trees
 
     class << self
 

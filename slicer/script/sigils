@@ -4,7 +4,7 @@
 
   sout = $stdout
 
-  _st = ::Skylab::TMX.build_sigilized_sidesystem_stream
+  _st = ::Skylab::TMX.build_sigilized_sidesystem_stream_plus nil
 
   _st.each do | ss |
     sout.puts "#{ ss.sigil } #{ ss.stem }"

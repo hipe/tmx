@@ -1,11 +1,11 @@
-require_relative '../../../test-support'
+require_relative '../test-support'
 
-module Skylab::BeautySalon::TestSupport
+module Skylab::SearchAndReplace::TestSupport
 
-  describe "[bs] S & R - reactive nodes - matches", wip: true do
+  describe "[sa] S & R - reactive nodes - matches", wip: true do
 
-    extend TS_
-    use :models_search_and_replace_reactive_nodes
+    TS_[ self ]
+    use :operations
 
     it "matches - many matches on one line." do
 

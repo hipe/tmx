@@ -1,3 +1,4 @@
+self._NOT_YET
 module Skylab::BeautySalon
 
   module Models_::Search_and_Replace

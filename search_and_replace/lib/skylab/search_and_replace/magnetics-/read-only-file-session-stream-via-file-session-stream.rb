@@ -1,6 +1,4 @@
-module Skylab::BeautySalon
-
-  module Models_::Search_and_Replace
+module Skylab::SearchAndReplace
 
     module Actors_::Build_file_scan
 
@@ -125,7 +123,7 @@ module Skylab::BeautySalon
 
         NEWLINE_CHAR__ = NEWLINE_.getbyte 0
 
-        def __to_read_only_match_stream_when_single_line__  # when [#024] explicit choice
+        def __to_read_only_match_stream_when_single_line__  # when [#bs-024] explicit choice
           io = ::File.open @path, ::File::CREAT | ::File::RDONLY
           line_number = 0
           rx = @ruby_regexp

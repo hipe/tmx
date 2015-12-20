@@ -1,11 +1,10 @@
-require_relative '../../../test-support'
+require_relative '../test-support'
 
-module Skylab::BeautySalon::TestSupport
+module Skylab::SearchAndReplace::TestSupport
 
-  describe "[bs] S & R - features - functions", wip: true do
+  describe "[sa] S & R - features - functions", wip: true do
 
-    extend TS_
-    use :models_search_and_replace
+    TS_[ self ]
 
     it "when you use a strange function name (but have a function folder)" do
 

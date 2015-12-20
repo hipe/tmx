@@ -4,10 +4,7 @@
 
 "beauty salon" [bs] is a general dumping ground for ideas and code that
 is concerned with beautification (or other programmatic alteration) of
-code. although it is very built out and has a long history, we don't use
-it for much except the occasional complex search & replace operation,
-and as a repository for notes & ideas.
-
-"search & replace" is important because it is the only utility to use
-the "zerk" interface engine ([br]).
+code. since "search & replace" became its own sidesystem, the main
+useful assets of "beauty salon" at this moment are the documentation
+about name conventions that it holds.
 _

@@ -1,12 +1,11 @@
-require_relative '../../../test-support'
+require_relative '../test-support'
 
-module Skylab::BeautySalon::TestSupport
+module Skylab::SearchAndReplace::TestSupport
 
-  describe "[bs] search and replace - (interactive) CLI", wip: true do
+  describe "[sa] search and replace - (interactive) CLI", wip: true do
 
-    extend TS_
-    use :expect_interactive  # [ze]
-    use :models_search_and_replace  # defines hook-outs for above
+    TS_[ self ]
+    # use :expect_interactive  # [ze]
 
     context "counts" do
 
@@ -29,7 +28,7 @@ module Skylab::BeautySalon::TestSupport
         td.prepare
         _path = td.to_path
         td = nil
-        _near_here = TS_::Models::Search_And_Replace.dir_pathname.to_path
+        _near_here = TS_.dir_pathname.to_path
 
         t = ::Time.now
 

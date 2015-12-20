@@ -1,13 +1,38 @@
-module Skylab::BeautySalon::TestSupport
+require 'skylab/search_and_replace'
+require 'skylab/test_support'
 
-  module Models::Search_And_Replace
+module Skylab::SearchAndReplace::TestSupport
 
-    def self.[] tcc
-      TS_::Expect_Event[ tcc ]
+  class << self
+
+    def [] tcc
+      tcc.send :define_singleton_method, :use, Use_method___
       tcc.include self
     end
 
-    # ~ setup
+    cache = {}
+    define_method :lib_ do | sym |
+      cache.fetch sym do
+        x = TestSupport_.fancy_lookup sym, TS_
+        cache[ sym ] = x
+        x
+      end
+    end
+  end  # >>
+
+  Callback_ = ::Skylab::Callback
+  TestSupport_ = ::Skylab::TestSupport
+
+  extend TestSupport_::Quickie
+
+  # -
+
+    Use_method___ = -> sym do
+      TS_.lib_( sym )[ self ]
+    end
+
+  # -
+    # -- setup
 
     def start_tmpdir_
 
@@ -36,33 +61,28 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def my_fixture_files_
-      Models::Search_And_Replace::Fixture_Trees
+      TS_::Fixture_Trees
     end
 
-    # ~ hook-ins/outs
+    # -- hook-ins/outs
 
-    ## ~~ [ca] "expect event"
+    # ~ [ca] "expect event"
 
-    def subject_API  # CHANGE IT from top
+    def subject_API
 
-      TS_::Models::Search_And_Replace::Subject_module_[]::API
+      Subject_module_[]::API
     end
 
-    ## ~~ [br] "expect interactive"
+    # ~ [br] "expect interactive"
 
-    define_method :interactive_bin_path, ( Callback_.memoize do
-
+    define_method :interactive_bin_path, ( Callback_::Lazy.call do
+      self._REDO
       ::File.join TS_._MY_BIN_PATH, 'tmx-beauty-salon search-and-r'
-
     end )
 
-    # ~ support for support
+    # -- support
 
-    Subject_module_ = -> do
-      Home_::Models_::Search_and_Replace
-    end
-
-    UNINDENT_ = -> do
+    define_method :unindent_, -> do
       rx = %r(^[ ]+)
       -> s do
         s.gsub! rx, EMPTY_S_
@@ -70,7 +90,21 @@ module Skylab::BeautySalon::TestSupport
       end
     end.call
 
-    define_method :unindent_, UNINDENT_
+    Subject_module_ = -> do
+      Home_
+    end
+  # -
 
+  MePROBABLY_moizer_Methods = -> tcc do
+    TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
+
+  Expect_Event = -> tcc do
+    Callback_.test_support::Expect_Event[ tcc ]
+  end
+
+  Callback_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
+
+  Home_ = ::Skylab::SearchAndReplace
+  TS_ = self
 end

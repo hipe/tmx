@@ -1,7 +1,10 @@
-module Skylab::BeautySalon
+require 'skylab/callback'
 
-  module Models_::Search_and_Replace  # see [#016]
+module Skylab::SearchAndReplace
 
+  # notes in [#001] (the readme)
+
+  if false  # old stuff to be removed in the very near future
     Actions = ::Module.new
 
     class Actions::Search_and_Replace < Home_.lib_.brazen::Action  # sorry

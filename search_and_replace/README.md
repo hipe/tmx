@@ -1,9 +1,9 @@
-# the search and replace narrative :[#016]
+# search and replace
 
 ## introduction
 
 ostensibly this started as a one-off to assist us in the process of
-[#017] doing a regular tranformation universe-wide across hundreds of
+[#bs-017] doing a regular tranformation universe-wide across hundreds of
 files. it very quickly grew in scope to become an attempt at a reusable
 utility towards this.
 
@@ -239,7 +239,7 @@ individual constituency:
     file and there are remaining matches (or not?) and we wish to write
     the file nd be done with it.
 
-this whole note reveals a smell and opened up [#022].
+this whole note reveals a smell and opened up [#bs-022].
 
 
 

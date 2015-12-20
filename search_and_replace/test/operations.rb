@@ -1,9 +1,8 @@
-module Skylab::BeautySalon::TestSupport
+module Skylab::SearchAndReplace::TestSupport
 
-  module Models::Search_And_Replace::Reactive_Nodes
+  module Operations
 
     def self.[] tcc
-      Models::Search_And_Replace[ tcc ]
       tcc.include self
     end
 

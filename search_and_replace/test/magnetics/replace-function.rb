@@ -1,9 +1,8 @@
-module Skylab::BeautySalon::TestSupport
+module Skylab::SearchAndReplace::TestSupport
 
-  module Models::Search_And_Replace::Actors::Build_Replace_Function::Support
+  module Magnetics::Replace_Function
 
     def self.[] tcc
-      TS_::Expect_Event[ tcc ]
       tcc.include self
     end
 
@@ -36,10 +35,8 @@ module Skylab::BeautySalon::TestSupport
       @output_string.should eql expect_string
     end
 
-    define_method :unindent_, Models::Search_And_Replace::UNINDENT_
-
     def __subject_module
-      Models::Search_And_Replace::Subject_module_[]
+      Subject_module_[]
     end
   end
 end

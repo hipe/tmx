@@ -1,11 +1,10 @@
-require_relative '../../../../test-support'
+require_relative '../../test-support'
 
-module Skylab::BeautySalon::TestSupport
+module Skylab::SearchAndReplace::TestSupport
 
-  describe "[bs] features - function - hack", wip: true do
+  describe "[sa] features - function - hack", wip: true do
 
-    extend TS_
-    use :models_search_and_replace
+    TS_[ self ]
 
       it "it tries to infer the module tree from a file - FALLIBLE" do
 

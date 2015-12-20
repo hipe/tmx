@@ -1,11 +1,11 @@
-require_relative '../../../../test-support'
+require_relative '../test-support'
 
-module Skylab::BeautySalon::TestSupport
+module Skylab::SearchAndReplace::TestSupport
 
-  describe "[bs] S & R - actors - build replace function", wip: true do
+  describe "[sa] S & R - actors - build replace function", wip: true do
 
-    extend TS_
-    use :models_search_and_replace_actors_build_replace_function_support
+    TS_[ self ]
+    use :magnetics_replace_function
 
     it "a replace function can be used for oridnary string substitution" do
 

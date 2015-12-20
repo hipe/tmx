@@ -28,9 +28,9 @@ digraph g {
   myterm
   dpn->no_regret
   dpn [label="`dir_pathname` -> `dir_path`"]
-  sea [label="search-replace -\nfix that one bug"]
+  sea [label="re-write search-replace\n" style=filled fillcolor="#b5d5fb"]
   sea->zerk
-  zerk [label="zerk - full rewrite\nto use ACS" style=filled fillcolor="#b5d5fb" ]
+  zerk [label="zerk - full rewrite\nto use ACS" style=filled fillcolor="#b5d5fb"]
   zerk->expect_event
   expect_event [label="rewrite\nexpect event" style=filled]
   expect_event -> tally

@@ -335,8 +335,6 @@ module Skylab::System
           attr_reader :string
         end
 
-        EMPTY_A_ = [].freeze
-
         EOL__ = /\r?\n/
 
         INDENT__ = /[ \t]*/  # if this is not also space, look

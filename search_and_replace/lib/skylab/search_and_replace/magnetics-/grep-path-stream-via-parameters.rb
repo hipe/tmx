@@ -1,18 +1,17 @@
-module Skylab::BeautySalon
-
-  module Models_::Search_and_Replace
+module Skylab::SearchAndReplace
 
     Actors_::Build_grep_path_scan = nil
 
     class Actors_::Build_grep_path_stream
 
-      Callback_::Actor.call self, :properties,
+      Callback_::Actor.call( self, :properties,
 
         :upstream_path_stream,
         :grep_extended_regexp_string,
         :ruby_regexp,
         :mode,
         :chunk_size,
+      )
 
       def initialize
         @grep_extended_regexp_string = @ruby_regexp = nil

@@ -104,6 +104,7 @@ module Skylab::System
 
   ACHIEVED_ = true
   CLI = nil  # for host
+  EMPTY_A_ = [].freeze
   EMPTY_S_ = ''.freeze
   Home_ = self
   KEEP_PARSING_ = true

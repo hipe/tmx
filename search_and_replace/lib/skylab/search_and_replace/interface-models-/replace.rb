@@ -190,7 +190,7 @@ module Skylab::BeautySalon
         nil
       end
 
-      class Grep_Boolean__ < Zerk_::Boolean
+      class Grep_Boolean__ < Zerk_::Boolean  # BLAH:69
 
         include Node_Methods_
 
@@ -260,7 +260,7 @@ module Skylab::BeautySalon
         end
       end
 
-      class Ruby_Boolean__ < Zerk_::Boolean
+      class Ruby_Boolean__ < Zerk_::Boolean  # BLAH:20
 
         include Node_Methods_
 
@@ -281,7 +281,7 @@ module Skylab::BeautySalon
         end
       end
 
-      class Files_Node__ < Node_
+      class Files_Node__ < Node_  # BLAH:52
 
         def initialize x
           super
@@ -334,7 +334,7 @@ module Skylab::BeautySalon
         end
       end
 
-      class Counts_Node__ < Node_  # (grep only)
+      class Counts_Node__ < Node_  # (grep only)  BLAH:57
 
         def initialize x
           super
@@ -392,7 +392,7 @@ module Skylab::BeautySalon
         end
       end
 
-      class Matches_Node__ < Node_
+      class Matches_Node__ < Node_  # BLAH:143
 
         def initialize x
           super
@@ -536,7 +536,7 @@ module Skylab::BeautySalon
         end
       end
 
-      class Replace_Node__ < Matches_Node__
+      class Replace_Node__ < Matches_Node__  # BLAH: 233
 
         def to_body_item_value_string_when_can_receive_focus
           "begin interactive search and replace yay!"

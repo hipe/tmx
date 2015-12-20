@@ -1,3 +1,4 @@
+[#046] #open when doc-test rewrite, see subscribers
 [#045]       permute (as a doctest action)
 [#044]       lexical scope vs inheritence (as it pertains to us)..
 [#043] #open modernize doc-test templates
