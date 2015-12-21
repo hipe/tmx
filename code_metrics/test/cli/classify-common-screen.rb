@@ -129,7 +129,7 @@ module Skylab::CodeMetrics::TestSupport
 
       # ~ expectations
 
-      define_method :_expect_absolute_path, -> do
+      define_method :expect_absolute_path_, -> do
 
         rx = /\A\/.+[a-z]+\.code\z/
 
@@ -141,7 +141,7 @@ module Skylab::CodeMetrics::TestSupport
         end
       end.call
 
-      define_method :_expect_integer, -> do
+      define_method :expect_integer_, -> do
 
         rx = /\A  (?<num>  \d+  ) \z/x
 
@@ -162,7 +162,7 @@ module Skylab::CodeMetrics::TestSupport
 
       end.call
 
-      define_method :_expect_percent, -> do
+      define_method :expect_percent_, -> do
 
         rx = /\A (?<num> \d{1,3} \. \d\d ) % \z/x
 
@@ -180,32 +180,67 @@ module Skylab::CodeMetrics::TestSupport
         end
       end.call
 
-      define_method :_expect_pluses, -> do
+      def expect_pluses_ sm, row_range, col_index, * more_or_less
 
-        rx = /\A\++\z/
+        o = Expect_Pluses___.new
+        o.column_index = col_index
+        o.row_classifications = more_or_less
+        o.row_range = row_range
+        o.string_matrix = sm
+        o.test_context = self
+        o.execute
+      end
 
-        -> x, expect_range=nil do
+      class Expect_Pluses___
 
-          s = Home_.lib_.brazen::CLI_Support::Styling.unstyle_styled x
+        attr_writer(
+          :column_index,
+          :row_classifications,
+          :row_range,
+          :string_matrix,
+          :test_context,
+          :execute,
+        )
 
-          if s
-            if rx =~ s
-              if expect_range
-                if ! expect_range.include? s.length
-                  fail __say_range( s, expect_range )
-                end
-              end
-            else
-              fail "expecting this to look like pluses - #{ s.inspect }"
-            end
-          else
-            fail "expect styled, was not: #{ x.inspect }"
-          end
+        def execute
+
+          _num_pluses = ___build_num_pluses
+
+          _act = Home_.lib_.basic::List.classify(
+            _num_pluses,
+            [ :low, :medium, :high ],
+          )
+
+          _act.should @test_context.eql @row_classifications
         end
-      end.call
 
-      def __say_range s, expect_range
-        "expecting number of pluses #{ s.length } to be in #{ expect_range }"
+        def ___build_num_pluses
+
+          num_pluses = []
+
+          col_index = @column_index
+          unstyle = Home_.lib_.brazen::CLI_Support::Styling::Unstyle_styled
+          sm = @string_matrix
+          r = @row_range
+          last = r.end
+          if 0 > last
+            last = sm.length - last
+          end
+
+          ( r.begin.upto last ).each do |d|
+            _row = sm.fetch d
+            s = _row.fetch col_index
+            if s.length.zero?
+              self._OOPS
+            end
+            s = unstyle[ s ]
+            num_pluses.push RX___.match( s )[ 0 ].length
+          end
+
+          num_pluses
+        end
+
+        RX___ = /\A\++\z/
       end
     end
   end

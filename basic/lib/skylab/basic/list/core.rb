@@ -8,6 +8,13 @@ module Skylab::Basic
         Build_each_pairable_via_even_iambic__[ a ]
       end
 
+      def classify actuals, symbols
+        o = List_::Classifier.new
+        o.actuals = actuals
+        o.symbols = symbols
+        o.execute
+      end
+
       def index_of_deepest_common_element list_A_a, list_B_a
 
         deepest_index = nil

@@ -26,33 +26,83 @@ module Skylab::TanMan::TestSupport
     # is not one of the parent directories of the argument directory,
     # that asset is never reached either.
     #
-    # ## comparison to "tree walk"
+    #
+    #
+    # ## algorithm (and comparison to "tree walk")
     #
     # this is expected to have the same result as the [#sy-176] "walk"
-    # performer, but the algorithm is entirely different. whereas that
-    # one starts from the argument path and works progressively upwards,
-    # querying the filesystem for each successive parent directory, this
-    # hits the filesystem only once (to make the "big tree") and then
-    # starts at the common root between argument and tree and works
-    # downwards from there.
+    # performer, but our algorithm is entirely upside-down to that one.
+    # whereas that one starts from the argument path and works progressively
+    # upwards, querying the filesystem for each successive parent directory
+    # ("do you have this path? no? well do you have this path?.."); this
+    # one hits the filesystem only once (to make the "big tree") and walks
+    # downward from the root of this tree using each component from the
+    # argument path ("under the current node, do you have this component?
+    # yes? [changed current node] under the current node do you have [..]?"),
+    # noting the last "current node" that had the asset.
+    #
+    # this "big tree" (whose every leaf is every asset file) is meant to
+    # be memoized so that to find the right asset for any given path the
+    # filesystem is only ever hit once for the lifetime of the process.
+    #
+    # it is expected that this approach scales better to many requests
+    # both for the reason that it reduces the number of filesystem hits
+    # and because for a tree (notwithstanding filesystem) to answer the
+    # questions
+    #
+    #     do you have "/A/B/C/D"? no? well do you have
+    #     do you have "/A/B/C"? no? well do you have
+    #     do you have "/A/B"? yes? ok, thanks.
+    #
+    # the "hits" to resolve "A" then "B" the first two times are effectively
+    # "wasted", whereas with our approach:
+    #
+    #     do you have "A"? yes? well
+    #     do you have "B" (under that)? yes? well
+    #     do you have "C" (under that)? no? ok, thanks.
+    #
+    # minimizes these "hits".
+    #
+    #
     #
     # ## symlinks
     #
-    # because of how we use symlinks during development (and how they may
-    # be used generally), we need to normalize-away the use of symlinks,
-    # otherwise the argument path against the filesystem sub-tree won't
-    # have a partial head match to the adequate length and the algorithm
-    # won't work. if both are certainly symlinks it would be OK, but meh.
+    # sadly the above elegance falls apart in pratice in cases where the
+    # argument path is "really" under the "big tree", but symlinks are
+    # present among the "big tree" path and/or argument path in an
+    # asymmetrical way (that is, if one or the other uses them, or they both
+    # use them for different paths from each other).
+    #
+    # for now, rather than check if every single parent directory in both the
+    # "big tree" path and every single argument path is a symlink, we
+    # heuristically normalize-out such cases based on how we use symlinks
+    # in our devlopement. this makes the subject node "impure" (i.e not fit
+    # for general use), but does not diminish its merit as proof of concept.
 
     def initialize head, entry, middle, mod
 
       @_cache = {}
       @_first = true
 
+       # #heuristic:one - un-symlink the "sidesystem" directory
+
       if ::File.lstat( head ).symlink?
         symlink_used = true
         orig_path = head
         head = ::File.readlink head
+      end
+
+      # #heuristic:two - un-symlink the would be "top-of-the-universe" dir
+
+      if head.include? ::File::SEPARATOR
+        _ToU_dir = ::File.dirname head
+        if ::File.lstat( _ToU_dir ).symlink?
+          if ! symlink_used
+            self._COVER_ME
+          end
+          _real_top_of_universe = ::File.readlink _ToU_dir
+          head = ::File.join _real_top_of_universe, ::File.basename( head )
+        end
       end
 
       assets_dir = ::File.join head, middle

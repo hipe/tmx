@@ -64,7 +64,7 @@ module Skylab::Basic
           elsif do_create
             node_ = ___add_child_because_touch node
           else
-            x = __when_not_found
+            x = __when_not_found st, node
             break
           end
 
@@ -109,10 +109,10 @@ module Skylab::Basic
         node_
       end
 
-      def __when_not_found
+      def __when_not_found st, node
 
         if @when_not_found
-          __when_not_found_via_proc
+          __when_not_found_via_proc st, node
         else
           raise ::KeyError, ___say_no_such_node
         end
@@ -122,7 +122,7 @@ module Skylab::Basic
         "no such node: '#{ @_slug_stream.current_token }'"
       end
 
-      def __when_not_found_via_proc
+      def __when_not_found_via_proc st, node
 
         p = @when_not_found
         d = p.arity

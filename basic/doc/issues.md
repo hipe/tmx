@@ -1,3 +1,4 @@
+[#054]       [ the "classify list" algorithm ]
 [#053]       this one tree traversal algorithm
 [#052]       adapting a proc into a [br] action ..
 [#051]       track universal collection operations

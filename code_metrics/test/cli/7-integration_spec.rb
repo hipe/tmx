@@ -4,6 +4,19 @@ module Skylab::CodeMetrics::TestSupport
 
   describe "[cme] CLI - integration" do
 
+    # the number of pluses that will display is a function of these factors:
+    #
+    #   • the proportionality of their input (numerically)
+    #
+    #   • how many characters wide is available for the whole table
+    #     (which should be controlled here)
+    #
+    #   • how wide the paths are (!)
+    #
+    # we don't normalize the paths per se: they can get wider or narrower
+    # based on the installation directory of the sidesystem! this is #NASTY
+    # but is out of scope at the moment, so #open [#015]
+
     TS_[ self ]
     use :CLI_support_expectations
     use :CLI
@@ -15,7 +28,7 @@ module Skylab::CodeMetrics::TestSupport
 
         st = build_info_line_stream_
         st.gets.should match %r(\Agenerated `find` command\b)
-        d = '/'.getbyte 0
+        d = ::File::SEPARATOR.getbyte 0
         path = -> do
           s = st.gets
           d == s.getbyte( 0 ) or fail "expected absolute path: #{ s.inspect }"
@@ -38,13 +51,17 @@ module Skylab::CodeMetrics::TestSupport
 
         sm = string_matrix_
 
+        # the string matrix is a 2 dimensional array of strings
+        # which are the (stipped) cels that make up the table.
+
         4 == sm.length or fail
 
-        _expect_absolute_path sm.fetch( 0 ).fetch( 0 )
-        _expect_integer sm.fetch( 0 ).fetch( 1 )
-        _expect_percent sm.fetch( 1 ).fetch( 2 )
-        _expect_percent sm.fetch( 2 ).fetch( 3 )
-        _expect_pluses sm.fetch( 2 ).fetch( 4 ), 6..6
+        expect_absolute_path_ sm.fetch( 0 ).fetch( 0 )
+        expect_integer_ sm.fetch( 0 ).fetch( 1 )
+        expect_percent_ sm.fetch( 1 ).fetch( 2 )
+        expect_percent_ sm.fetch( 2 ).fetch( 3 )
+
+        expect_pluses_ sm, 0..2, 4, :high, :low, :low
       end
 
       it "summary" do
@@ -91,13 +108,13 @@ module Skylab::CodeMetrics::TestSupport
         row1.fetch( 0 ).should eql '*.code'
         row2.fetch( 0 ).should eql '*.file'
 
-        _expect_integer row1.fetch( 1 ), 2..2
-        _expect_integer row2.fetch( 1 ), 1..1
+        expect_integer_ row1.fetch( 1 ), 2..2
+        expect_integer_ row2.fetch( 1 ), 1..1
 
-        _expect_percent row1.fetch( 2 )
-        _expect_percent row2.fetch( 3 )
+        expect_percent_ row1.fetch( 2 )
+        expect_percent_ row2.fetch( 3 )
 
-        _expect_pluses row2.fetch( 4 )
+        expect_pluses_ sm, 0..1, 4, :high, :low
       end
 
       it "summary" do
@@ -158,10 +175,10 @@ module Skylab::CodeMetrics::TestSupport
 
         column[ 2 ].should eql %w( 12 3 15 )
 
-        _expect_percent sm[ 0 ][ 3 ], 80.0
-        _expect_percent sm[ 1 ][ 4 ], 25.0
+        expect_percent_ sm[ 0 ][ 3 ], 80.0
+        expect_percent_ sm[ 1 ][ 4 ], 25.0
 
-        _expect_pluses sm[ 1 ][ 5 ]
+        expect_pluses_ sm, 0..1, 5, :high, :low
       end
     end
   end

@@ -1,5 +1,15 @@
 # the glyph allocation narrative :[#026]
 
+## pre-introduction
+
+this algorithm has since been generalized out of [gv] but for now the
+below description *and code* remains extant in this sidesystem, as well
+as being algorithmically duplicated (to some if not the full extent) in
+[#ba-054].
+
+
+
+
 ## introduction
 
 we take pains to do this in a well-documented, non-obfuscated way because
