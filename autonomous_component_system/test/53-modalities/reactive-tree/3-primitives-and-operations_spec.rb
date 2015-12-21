@@ -7,7 +7,7 @@ module Skylab::Autonomous_Component_System::TestSupport
     extend TS_
     use :memoizer_methods
     use :future_expect
-    use :modalities_reactive_tree_support
+    use :modalities_reactive_tree
 
     context "several component association with proc-like models.." do
 
@@ -183,7 +183,7 @@ module Skylab::Autonomous_Component_System::TestSupport
     end
 
     module ACS_RT_3
-      RT__ = TS_::Modalities::Reactive_Tree::Support
+      RT__ = TS_::Modalities::Reactive_Tree
     end
   end
 end

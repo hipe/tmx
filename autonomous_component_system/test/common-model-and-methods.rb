@@ -1,6 +1,6 @@
 module Skylab::Autonomous_Component_System::TestSupport
 
-  module Support
+  module Common_Model_And_Methods
 
     def self.[] tcc
       tcc.include self

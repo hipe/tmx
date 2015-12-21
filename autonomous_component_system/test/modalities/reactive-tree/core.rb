@@ -1,6 +1,6 @@
 module Skylab::Autonomous_Component_System::TestSupport
 
-  module Modalities::Reactive_Tree::Support
+  module Modalities::Reactive_Tree
 
     class << self
 
@@ -87,7 +87,7 @@ module Skylab::Autonomous_Component_System::TestSupport
         end
       end
 
-      Local_Lib__ = TS_.lib :support
+      Local_Lib__ = TS_.lib :common_model_and_methods
 
       class Lace
 

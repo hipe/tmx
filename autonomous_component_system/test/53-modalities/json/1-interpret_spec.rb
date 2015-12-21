@@ -6,7 +6,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     extend TS_
     use :future_expect
-    use :support
+    use :common_model_and_methods
 
     context "(flat structure)" do
 

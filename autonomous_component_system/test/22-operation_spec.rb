@@ -1,11 +1,11 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
 module Skylab::Autonomous_Component_System::TestSupport
 
   describe "[ac] operation" do
 
     extend TS_
-    use :operation_support
+    use :operation
     use :future_expect
 
     it "goes 2 deep; autovivifies; takes 1 arg" do

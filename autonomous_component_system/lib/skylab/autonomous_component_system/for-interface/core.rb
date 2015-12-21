@@ -117,7 +117,7 @@ module Skylab::Autonomous_Component_System
         association = -> do
           asc = asc_for[ entry.name_symbol ]
           int = asc.intent
-          if ! int || :interface == int
+          if ! int || Is_interface_intent___[ int ]
             qkn = qkn_for[ asc ]
             if qkn.is_effectively_known
               if asc.model_classifications.looks_primitivesque
@@ -179,6 +179,14 @@ module Skylab::Autonomous_Component_System
           qkn_ish
         end
       end
+
+      Is_interface_intent___ = {
+        # (etc..)
+        interface: true,
+        API: true,
+        UI: true,
+      }.method :[]
+
     end
   # -
 end

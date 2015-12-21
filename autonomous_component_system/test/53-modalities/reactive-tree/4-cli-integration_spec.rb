@@ -1,4 +1,4 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Autonomous_Component_System::TestSupport
 
@@ -7,7 +7,7 @@ module Skylab::Autonomous_Component_System::TestSupport
     extend TS_
     use :memoizer_methods
     use :future_expect
-    use :modalities_reactive_tree_CLI_integration_support
+    use :modalities_reactive_tree_CLI_integration
 
     it "1.4)   operation has description" do
       _top_help_screen.should match %r(^ +wazoozie-foozie +have 'fun'\n)

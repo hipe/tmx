@@ -6,7 +6,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     extend TS_
     use :future_expect
-    use :modalities_reactive_tree_support
+    use :modalities_reactive_tree
 
     it "shoe model loads" do
 

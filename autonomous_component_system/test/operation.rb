@@ -1,6 +1,6 @@
 module Skylab::Autonomous_Component_System::TestSupport
 
-  module Operation::Support
+  module Operation
 
     class << self
 
@@ -68,7 +68,7 @@ module Skylab::Autonomous_Component_System::TestSupport
         attr_reader( :lace, :size, :special )
       end
 
-      Local_Lib__ = TS_.lib :support
+      Local_Lib__ = TS_.lib :common_model_and_methods
 
       class Lace
 
