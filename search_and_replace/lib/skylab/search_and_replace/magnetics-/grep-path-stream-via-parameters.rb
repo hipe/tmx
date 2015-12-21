@@ -1,9 +1,7 @@
 module Skylab::SearchAndReplace
 
-    Actors_::Build_grep_path_scan = nil
-
-    class Actors_::Build_grep_path_stream
-
+  class Magnetics_::Grep_Path_Stream_via_Parameters
+    # -
       Callback_::Actor.call( self, :properties,
 
         :upstream_path_stream,
@@ -127,6 +125,6 @@ module Skylab::SearchAndReplace
           y
         end
       end
-    end
+    # -
   end
 end

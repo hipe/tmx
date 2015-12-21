@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace
 
-    class Actors_::Build_replace_function
+    class Magnetics_::Replace_Function_via_String_and_Work_Dir
 
       class Build_replace_expression__
 
@@ -253,5 +253,5 @@ module Skylab::SearchAndReplace
 
       end
     end
-  end
+  # -
 end

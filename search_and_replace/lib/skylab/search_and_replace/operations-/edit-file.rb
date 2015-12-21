@@ -317,7 +317,7 @@ module Skylab::BeautySalon
 
       def write_any_changed_file
 
-        S_and_R_::Actors_::Write_any_changed_file.with(
+        S_and_R_::Magnetics_::Write_any_changed_file.with(
 
           :edit_session, @es,
           :work_dir_path, work_dir,

@@ -1,8 +1,6 @@
 module Skylab::SearchAndReplace
 
-    Autoloader_[ Actors_::Build_file_scan = ::Module.new ]
-
-    class Actors_::Build_file_stream
+  class Magnetics_::File_Session_Stream_via_Parameters
 
       Callback_::Actor.methodic( self, :simple, :properties,
 
@@ -53,12 +51,12 @@ module Skylab::SearchAndReplace
       end
 
       def read_only=
-        @currier = Self_::Models__::Read_Only_File_Session
+        @currier = Home_::Magnetics_::Read_Only_File_Session_Stream_via_File_Session_Stream
         KEEP_PARSING_
       end
 
       def for_interactive_search_and_replace=
-        @currier = Self_::Models__::Interactive_File_Session
+        @currier = Home_::Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
         KEEP_PARSING_
       end
 
@@ -82,7 +80,6 @@ module Skylab::SearchAndReplace
 
       KEEP_PARSING_ = true
 
-      Self_ = Actors_::Build_file_scan
-    end
+    Self_ = self
   end
 end

@@ -1,27 +1,28 @@
 module Skylab::SearchAndReplace
 
-    class Actors_::Build_replace_function
+    class Magnetics_::Replace_Function_via_String_and_Work_Dir
 
-      Parse_error__ = Callback_::Event.
+      Parse_error__ = Callback_::Event.prototype_with(
 
-        prototype_with :replace_function_parse_error, :expecting, nil,
+        :replace_function_parse_error,
+        :expecting, nil,
+        :near_excerpt, nil,
+        :ok, false,
+      ) do | y, o |
 
-            :near_excerpt, nil, :ok, false do |y, o|
-
-          _s_a = o.expecting.map do |x|
-
-            x.description_under self
-
-          end
-
-          y << "expecting #{ _s_a * ' or ' }:"
-          y << o.near_excerpt
-          y << "#{ '-' * o.near_excerpt.length }^"
+        _s_a = o.expecting.map do | o_ |
+          o_.description_under self
         end
+
+        y << "expecting #{ _s_a * ' or ' }:"
+        y << o.near_excerpt
+        y << "#{ '-' * o.near_excerpt.length }^"
+      end
 
       class Parse_error__
 
         class << self
+
           def [] * shorthand_things, scn
             pos = scn.pos
             str = scn.scan %r([^\n]*)
@@ -36,10 +37,10 @@ module Skylab::SearchAndReplace
 
             super _x_a, str  # eek
           end
-        end
-
+        end  # >>
 
         class Symbol__
+
           def initialize x
             @name = Callback_::Name.via_variegated_symbol x
           end
@@ -56,6 +57,7 @@ module Skylab::SearchAndReplace
         end
 
         class Literal__
+
           def initialize x
             @x = x
           end
@@ -72,5 +74,5 @@ module Skylab::SearchAndReplace
         end
       end
     end
-  end
+  # -
 end

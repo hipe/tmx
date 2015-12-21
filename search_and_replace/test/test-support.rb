@@ -32,6 +32,17 @@ module Skylab::SearchAndReplace::TestSupport
     end
 
   # -
+
+    def debug!
+      @do_debug = true
+    end
+
+    attr_reader :do_debug
+
+    def debug_IO
+      TestSupport_.debug_IO
+    end
+
     # -- setup
 
     def start_tmpdir_
@@ -95,7 +106,7 @@ module Skylab::SearchAndReplace::TestSupport
     end
   # -
 
-  MePROBABLY_moizer_Methods = -> tcc do
+  Memoizer_Methods = -> tcc do
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
 
@@ -104,7 +115,10 @@ module Skylab::SearchAndReplace::TestSupport
   end
 
   Callback_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
-
   Home_ = ::Skylab::SearchAndReplace
+
+  EMPTY_S_ = ''
+  NEWLINE_ = Home_::NEWLINE_
+  NIL_ = nil
   TS_ = self
 end

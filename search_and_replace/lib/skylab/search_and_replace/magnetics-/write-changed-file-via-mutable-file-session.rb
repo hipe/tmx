@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace
 
-    class Actors_::Write_any_changed_file
+    class Magnetics_::Write_any_changed_file
 
       Callback_::Actor.call( self, :properties,
         :edit_session,

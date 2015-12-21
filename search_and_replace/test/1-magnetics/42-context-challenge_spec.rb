@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[se] models - S & R - models - string edit session", wip: true do
+  describe "[se] models - S & R - models - string edit session" do
 
     TS_[ self ]
     use :expect_event
@@ -79,13 +79,14 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "viewing context - minimal normal (note \"segmented line\" class)" do
 
-        _input = unindent_( <<-O )
+        _input = unindent_( <<-HERE )
           line 1
           line 2
           ohai
           line 4
           line 5
-        O
+        HERE
+
         es = _subject _input, /^ohai$/
         es.gets_match.set_replacement_string 'yerp'
 
@@ -120,13 +121,13 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "viewing context - many matches, many replacements, delimitation changed" do
 
-        _input = unindent_( <<-O )
+        _input = unindent_( <<-HERE )
           zero_then
           one_and
           two_and
           three_and
           four
-        O
+        HERE
 
         es = _subject _input, /_and$/
         es.match_at_index( 0 ).set_replacement_string "\nAND"
@@ -156,7 +157,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         af.gets.should be_nil
 
-        _expect_output es, unindent_( <<-O )
+        _expect_output es, unindent_( <<-HERE )
           zero_then
           one
           AND
@@ -164,7 +165,7 @@ module Skylab::SearchAndReplace::TestSupport
           three
           AND
           four
-        O
+        HERE
       end
 
       it "repl has a repl before it, does not start at column 1, adds lines" do
@@ -200,14 +201,14 @@ module Skylab::SearchAndReplace::TestSupport
 
         af.gets.should be_nil
 
-        _expect_output es, unindent_( <<-O )
+        _expect_output es, unindent_( <<-HERE )
           zip nourk 1
           nourk 2
           nourk 3 zip
           zap nelf 1
           nelf 2
           nelf 3 zap
-        O
+        HERE
       end
 
       it "(regression)" do
@@ -236,11 +237,11 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "viewing context - when many matches on 1 line & actual ctx is low" do
 
-        _input = unindent_( <<-O )
+        _input = unindent_( <<-HERE )
           zo ZE zoo
           ZIM zam ZOM
           ziff ZUP zaff
-        O
+        HERE
         es = _subject _input, /\bZ[A-Z]+\b/
 
         es.gets_match.set_replacement_string 'JE'
@@ -270,16 +271,21 @@ module Skylab::SearchAndReplace::TestSupport
 
         af.gets.should be_nil
 
-        _expect_output es, unindent_( <<-O )
+        _expect_output es, unindent_( <<-HERE )
           zo JE zoo
           JIM zam JOM
           ziff JUP zaff
-        O
+        HERE
       end
     end
 
     def _subject * a
-      actors_::Build_file_scan::Models__::Interactive_File_Session::String_Edit_Session_.new( * a )
+
+      _egads = magnetics_::
+        Mutable_File_Session_Stream_via_File_Session_Stream::
+          String_Edit_Session___
+
+      _egads.new( * a )
     end
 
     def _expect_output es, string

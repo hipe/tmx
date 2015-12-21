@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace
 
-    class Actors_::Build_replace_function < Callback_::Actor::Dyadic
+    class Magnetics_::Replace_Function_via_String_and_Work_Dir < Callback_::Actor::Dyadic
 
       def initialize string, work_dir, & oes_p
 
@@ -191,5 +191,5 @@ module Skylab::SearchAndReplace
       WHITE_RX_ = /[[:space:]]+/
 
     end
-  end
+  # -
 end

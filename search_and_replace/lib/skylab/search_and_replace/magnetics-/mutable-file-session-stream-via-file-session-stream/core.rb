@@ -1,8 +1,6 @@
 module Skylab::SearchAndReplace
 
-    module Actors_::Build_file_scan
-
-      class Models__::Interactive_File_Session
+  class Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
 
         class << self
 
@@ -61,7 +59,7 @@ module Skylab::SearchAndReplace
 
           def when_multiline_OK d, path
 
-            es = Self_::String_Edit_Session_.new(
+            es = Self_::String_Edit_Session___.new(
               ::File.open( path, ::File::CREAT | ::File::RDONLY ).read,  # noent meh
               @ruby_regexp,
               @on_event_selectively )
@@ -72,7 +70,5 @@ module Skylab::SearchAndReplace
         end
 
         Self_ = self
-      end
-    end
   end
 end

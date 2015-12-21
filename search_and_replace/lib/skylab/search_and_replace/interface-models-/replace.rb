@@ -236,7 +236,7 @@ module Skylab::BeautySalon
 
         def via_ivars_build_path_stream_for mode_i
 
-          S_and_R_::Actors_::Build_grep_path_stream.with(
+          S_and_R_::Magnetics_::Build_grep_path_stream.with(
             :upstream_path_stream, @upstream_path_stream,
             * @regexp_pair_a,
             :mode, mode_i,
@@ -451,7 +451,7 @@ module Skylab::BeautySalon
           _do_highlight = @is_interactive && @serr.tty?
           _oes_p = handle_unsigned_event_selectively
 
-          @file_stream = S_and_R_::Actors_::Build_file_stream.with(
+          @file_stream = S_and_R_::Magnetics_::File_Stream_via_Parameters.with(
             :upstream_path_stream, @path_stream,
             :ruby_regexp, @rrx,
             :grep_extended_regexp_string, @gers,
@@ -734,7 +734,7 @@ module Skylab::BeautySalon
 
           -> edit_session, oes_p_=oes_p do
 
-            S_and_R_::Actors_::Write_any_changed_file.with(
+            S_and_R_::Magnetics_::Write_any_changed_file.with(
               :edit_session, edit_session,
               :work_dir_path, tmpdir_path,
               :is_dry_run, false,

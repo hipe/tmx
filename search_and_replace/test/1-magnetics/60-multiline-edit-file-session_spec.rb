@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[se] models - S & R - models - multi-line edit file session", wip: true do
+  describe "[se] models - S & R - models - multi-line edit file session" do
 
     TS_[ self ]
     use :expect_event
@@ -10,17 +10,20 @@ module Skylab::SearchAndReplace::TestSupport
 
     it "when the filesize is under the limit - OK" do
 
-      file_session_stream = actors_::Build_file_stream.with :upstream_path_stream,
-        build_stream_for_single_path_to_file_with_three_lines_,
+      _st = build_stream_for_single_path_to_file_with_three_lines_
+
+      file_session_stream = magnetics_::File_Session_Stream_via_Parameters.with(
+        :upstream_path_stream, _st,
         :ruby_regexp, /e[\n!]/m,
-        :for_interactive_search_and_replace
+        :for_interactive_search_and_replace,
+      )
 
-      stream = file_session_stream
-      file = stream.gets
-      stream.gets.should be_nil
+      st = file_session_stream
+      file = st.gets
+      st.gets.should be_nil
 
-      d = file.match_count
-      d.should eql 3
+      _d = file.match_count
+      _d.should eql 3
 
       # etc ..
     end

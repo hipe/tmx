@@ -1,12 +1,10 @@
 module Skylab::SearchAndReplace
 
-    module Actors_::Build_file_scan
+  class Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
 
-      class Models__::Interactive_File_Session
+        class String_Edit_Session___
 
-        class String_Edit_Session_
-
-          class Mixed_Scan_Agent__
+          class Stream_Adapter___
 
             def initialize x
               @edit_session = x
@@ -106,7 +104,5 @@ module Skylab::SearchAndReplace
             end
           end
         end
-      end
-    end
   end
 end

@@ -4,6 +4,14 @@ module Skylab::SearchAndReplace
 
   # notes in [#001] (the readme)
 
+  class << self
+
+    def lib_
+      @___lib ||= Callback_.
+        produce_library_shell_via_library_and_app_modules Lib_, self
+    end
+  end  # >>
+
   if false  # old stuff to be removed in the very near future
     Actions = ::Module.new
 
@@ -436,8 +444,9 @@ module Skylab::SearchAndReplace
 
       def know_via_nonblank_mutable_string s
 
-        @o = S_and_R_::Actors_::Build_replace_function[
-          s, work_dir, & handle_unsigned_event_selectively ]
+        _oes_p = handle_unsigned_event_selectively
+
+        @o = _build_replace_function_via_string( s, & _oes_p )
 
         @o ? ACHIEVED_ : UNABLE_
       end
@@ -463,9 +472,19 @@ module Skylab::SearchAndReplace
           UNABLE_
         end
 
-        @o = S_and_R_::Actors_::Build_replace_function[ s, work_dir, & _oes_p ]
+        @o = _build_replace_function_via_string s, & _oes_p
 
         @o ? ACHIEVED_ : UNABLE_
+      end
+
+      def _build_replace_function_via_string s, & oes_p
+
+        _work_dir = work_dir
+
+        _ = S_and_R_::Magnetics_::Replace_Function_via_String_and_Work_Dir[
+          s, _work_dir, & _oes_p ]
+
+        _
       end
 
       def to_marshal_pair
@@ -701,16 +720,36 @@ module Skylab::SearchAndReplace
       end
     end
 
-    module Actors_
-      Autoloader_[ self ]
-      stowaway :Build_file_stream, 'build-file-scan'
-      stowaway :Build_grep_path_stream, 'build-grep-path-scan'
-    end
-
     EMPTY_A_ = [].freeze
     EMPTY_RX_ = /\A[[:space:]]*\z/
     FINISHED_ = nil
     NONE_S_ = Zerk_::NONE_S
     S_and_R_ = self
   end
+
+  Callback_ = ::Skylab::Callback
+  Autoloader_ = Callback_::Autoloader
+
+  module Lib_
+
+    sidesys = Autoloader_.build_require_sidesystem_proc
+
+    Basic = sidesys[ :Basic ]
+    Brazen = sidesys[ :Brazen ]
+
+    String_scanner = -> do
+      require 'strscan'
+      ::StringScanner
+    end
+  end
+
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
+
+  ACHIEVED_ = true
+  EMPTY_P_ = -> { NIL_ }
+  EMPTY_S_ = ''
+  Home_ = self
+  NEWLINE_ = "\n"
+  NIL_ = nil
+  UNABLE_ = false
 end

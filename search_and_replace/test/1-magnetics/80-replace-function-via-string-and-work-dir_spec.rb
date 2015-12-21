@@ -2,9 +2,10 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] S & R - actors - build replace function", wip: true do
+  describe "[sa] S & R - actors - build replace function" do
 
     TS_[ self ]
+    use :expect_event
     use :magnetics_replace_function
 
     it "a replace function can be used for oridnary string substitution" do
@@ -64,7 +65,5 @@ module Skylab::SearchAndReplace::TestSupport
       expect_ "well HI susan."
 
     end
-
-    # some extension API is possible but meh
   end
 end

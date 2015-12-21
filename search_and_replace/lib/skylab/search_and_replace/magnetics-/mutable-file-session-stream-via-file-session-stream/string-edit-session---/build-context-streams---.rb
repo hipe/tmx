@@ -1,12 +1,10 @@
 module Skylab::SearchAndReplace
 
-    module Actors_::Build_file_scan
+  class Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
 
-      class Models__::Interactive_File_Session
+        class String_Edit_Session___
 
-        class String_Edit_Session_
-
-          class Build_context_scanners__
+          class Build_context_streams___
 
             def initialize * a
               @num_before, @match_index, @num_after, @match_a, @string = a
@@ -296,7 +294,5 @@ module Skylab::SearchAndReplace
             end
           end
         end
-      end
-    end
   end
 end

@@ -1,8 +1,6 @@
 module Skylab::SearchAndReplace
 
-    module Actors_::Build_file_scan
-
-      class Models__::Read_Only_File_Session
+  class Magnetics_::Read_Only_File_Session_Stream_via_File_Session_Stream
 
         class << self
 
@@ -232,7 +230,5 @@ module Skylab::SearchAndReplace
         end
 
         Self_ = self
-      end
-    end
   end
 end

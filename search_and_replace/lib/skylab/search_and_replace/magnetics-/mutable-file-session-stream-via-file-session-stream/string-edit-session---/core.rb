@@ -1,10 +1,8 @@
 module Skylab::SearchAndReplace
 
-    module Actors_::Build_file_scan
+  class Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
 
-      class Models__::Interactive_File_Session
-
-        class String_Edit_Session_
+        class String_Edit_Session___
 
           def initialize * a
             @string, @ruby_regexp, @on_event_selectively = a
@@ -200,14 +198,14 @@ module Skylab::SearchAndReplace
         public
 
           def to_line_stream
-            Self_::Mixed_Scan_Agent__.new( self ).build_line_stream
+            Self_::Stream_Adapter___.new( self ).build_line_stream
           end
 
           # ~ context line streams (#note-105)
 
           def context_streams num_before, match_d, num_after
 
-            Self_::Build_context_scanners__.new( num_before, match_d, num_after,
+            Self_::Build_context_streams___.new( num_before, match_d, num_after,
               @match_a, @string ).execute
 
           end
@@ -310,7 +308,5 @@ module Skylab::SearchAndReplace
 
           Self_ = self
         end
-      end
-    end
   end
 end
