@@ -4,7 +4,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
   describe "[ac] modalities - reactive tree - 1. reaching an action" do
 
-    extend TS_
+    TS_[ self ]
     use :future_expect
     use :modalities_reactive_tree
 

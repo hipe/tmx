@@ -4,7 +4,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
   describe "[ac] ACS tenet 7 B - the `using` modifer" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
 
     it "works for multiple" do

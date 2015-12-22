@@ -58,7 +58,6 @@ module Skylab::Fields
   end
 
   can_be_more_than_one = nil
-  can_be_more_than_zero = nil
   includes_zero = nil
 
   Is_effectively_optional = -> prp do
@@ -103,7 +102,7 @@ module Skylab::Fields
   end
 
   Takes_argument = -> prp do
-    can_be_more_than_zero[ prp.argument_arity ]
+    Can_be_more_than_zero[ prp.argument_arity ]
   end
 
   # ~ support
@@ -114,7 +113,7 @@ module Skylab::Fields
     zero_or_more: true,
   }
 
-  can_be_more_than_zero = {
+  Can_be_more_than_zero = {
     zero_or_one: true,
     one: true,
     zero_or_more: true,

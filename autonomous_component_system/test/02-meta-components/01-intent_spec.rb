@@ -4,7 +4,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
   describe "[ac] for interface - (1) intent: with an intent of.." do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
 
     context "`API`:" do

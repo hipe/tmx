@@ -4,7 +4,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
   describe "[ac] modalities - reactive tree - CLI integ. - 1." do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
     use :future_expect
     use :modalities_reactive_tree_CLI_integration

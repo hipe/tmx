@@ -6,7 +6,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     # (what is accomplished here is referenced elsewhere as :[#003]#X1)
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
     use :future_expect
 

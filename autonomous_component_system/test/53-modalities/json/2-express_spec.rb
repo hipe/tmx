@@ -4,7 +4,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
   describe "[ac] modalities - JSON - express" do
 
-    extend TS_
+    TS_[ self ]
     use :common_model_and_methods
 
     it "non-sparse one-level structure" do

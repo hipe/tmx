@@ -4,7 +4,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
   describe "[ac] tenet 7 D - the `assuming` modifer" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
 
     it "when two assumptions pass" do

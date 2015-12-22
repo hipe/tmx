@@ -4,7 +4,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
   describe "[ac] operation" do
 
-    extend TS_
+    TS_[ self ]
     use :operation
     use :future_expect
 

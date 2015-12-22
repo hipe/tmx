@@ -14,15 +14,15 @@ module Skylab::Autonomous_Component_System
           alias_method :[], :_call
         end  # >>
 
-        def initialize ma, asc, acs, & chb
+        def initialize ma, asc, acs, & p
 
-          if 1 != chb.arity
+          if 1 != p.arity
             self._WORLDWIDE_PROTEST
           end
 
           @ACS = acs
           @association = asc
-          @_CHB = chb
+          @_argument_oes_p_p = p
           @construction_method = nil
           @mixed_argument = ma
         end
@@ -34,35 +34,36 @@ module Skylab::Autonomous_Component_System
 
         def looks_like_compound_component__
 
-          @_did_categorize_shape ||= _categorize_supposed_model_shape
+          @_did_prepare_call ||= _prepare_call
 
          COMPOUND_CONSTRUCTOR_METHOD_ == @_use_construction_method
         end
 
         def execute
 
-          @_did_categorize_shape ||= _categorize_supposed_model_shape
+          @_did_prepare_call ||= _prepare_call
 
-          if @_CHB
+          if @_argument_oes_p_p
 
-            @_use_CHB = @_CHB
+            @_oes_p_p = @_argument_oes_p_p
           else
-            @_use_CHB = ACS_::Interpretation::CHB[ @association, @ACS ]
+            @_oes_p_p = ACS_::Interpretation::CHB[ @association, @ACS ]
           end
 
           if @_use_construction_method
             __via_construction_method
           else
 
-            @_mdl[ @mixed_argument, & @_CHB ]
+            @_receiver[ @mixed_argument, & @_oes_p_p ]
           end
         end
 
-        def _categorize_supposed_model_shape
+        def _prepare_call
 
           if @construction_method
 
             cm = @construction_method
+            recvr = @association.component_model
 
           else
             cx = @association.model_classifications
@@ -74,9 +75,10 @@ module Skylab::Autonomous_Component_System
                 raise ::NoMethodError, @association.say_no_method__
               end
             end
+            recvr = @association.component_model
           end
 
-          @_mdl = @association.component_model
+          @_receiver = recvr
           @_use_construction_method = cm
 
           ACHIEVED_
@@ -86,11 +88,11 @@ module Skylab::Autonomous_Component_System
 
           m = @_use_construction_method
 
-          if ! @_mdl.respond_to? m
+          if ! @_receiver.respond_to? m
             raise ::NameError, ___say_no_method( m )
           end
 
-          d = @_mdl.method( m ).arity
+          d = @_receiver.method( m ).arity
           if 1 < d
             # see construction args [#006]:interp-C
             xtra = []
@@ -100,7 +102,7 @@ module Skylab::Autonomous_Component_System
             xtra.push @ACS
           end
 
-          cmp = @_mdl.send m, @mixed_argument, * xtra, & @_use_CHB
+          cmp = @_receiver.send m, @mixed_argument, * xtra, & @_oes_p_p
           if cmp
             Value_Wrapper[ cmp ]
           else
@@ -110,7 +112,7 @@ module Skylab::Autonomous_Component_System
 
         def ___say_no_method m
           # platform reporting of class name is not as helpful as it could be
-          "undefined method `#{ m }` for #{ @_mdl.name }"
+          "undefined method `#{ m }` for #{ @_receiver.name }"
         end
       end
 

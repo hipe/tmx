@@ -129,17 +129,8 @@ module Skylab::Zerk::TestSupport
 
     def flush_state_
 
-      _x = remove_instance_variable :@result
-
-      _a = remove_instance_variable( :@event_log ).flush_to_array
-
-      State_After_Invocation___.new _x, _a
+      flush_event_log_and_result_to_state remove_instance_variable :@result
     end
-
-    State_After_Invocation___ = ::Struct.new(
-      :result,
-      :emission_array,
-    )
   end
 
   # mocks

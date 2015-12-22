@@ -53,8 +53,7 @@ module Skylab::Callback::TestSupport
       end
     end
 
-    # (see [#]note-C about this oldschool section)
-    # ->
+    # -- oldschool retro-fitting (see [#]note-C)
 
       module Test_Context_Instance_Methods
 
@@ -199,7 +198,15 @@ module Skylab::Callback::TestSupport
 
     module Test_Context_Instance_Methods
 
-      # -- invocation (convenience methods to get X into Y)
+      # -- flush state
+
+      def flush_event_log_and_result_to_state x
+
+        _a = remove_instance_variable( :@event_log ).flush_to_array
+        Common_State___.new x, _a
+      end
+
+      Common_State___ = ::Struct.new( :result, :emission_array )
 
       # -- log-based event testing
 
@@ -236,9 +243,6 @@ module Skylab::Callback::TestSupport
           UNRELIABLE_
         end
       end
-    end
-
-    module Test_Context_Instance_Methods
 
       # -- newschool support for the oldschool ways
 

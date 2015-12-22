@@ -142,13 +142,23 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         end
 
         if ca
+
           if cm
             ca._finish_definition_via cm, sym
           else
-            self._DESIGN_ME_cover_me_compnoent_assoc_method_had_no_model
+            sym_ = ca.is_plural_of
+            if sym_
+              _m_ = method_name_for[ sym_ ]
+              _sing_ca = send[ _m_, sym_ ]
+              Home_::Singularize___[ _sing_ca, sym_, ca, acs ]
+            else
+              self._COVER_ME
+            end
           end
+
         elsif cm
           ca_class._begin_definition._finish_definition_via cm, sym
+
         else
           self._DESIGN_ME_cover_me__totally_empty_component_assoc
         end
@@ -231,18 +241,16 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       def _init_via nf, mdl
 
         remove_instance_variable :@_name_mutation
-        @component_model = mdl
+        @component_model = mdl  # any
         @name = nf
         self
       end
 
       def model_classifications
-        @___cx ||= ___build_model_classifications
+        @___cx ||= Classify_model___[ @component_model ]
       end
 
-      def ___build_model_classifications
-
-        mdl = @component_model
+      Classify_model___ = -> mdl do
 
         m = CONSTRUCTOR_METHODS__.detect { | m_ | mdl.respond_to? m_ }
 
@@ -385,14 +393,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       def accept__stored_in_ivar__meta_component ivar
 
-        p = @_name_mutation
-        @_name_mutation = -> nm do
-          nm.as_ivar = ivar
-          if p
-            p[ nm ]
-          end
-          NIL_
-        end
+        _name_as_ivar_will_be ivar
         NIL_
       end
 
@@ -400,7 +401,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         @name.as_variegated_symbol
       end
 
-      attr_reader :name
+      attr_accessor :name
 
       # ~ operations
 
@@ -410,8 +411,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         i_a.each do | sym |
           bx.add sym, :declared
         end
-        @_operations = bx
-        NIL_
+        @_operations = bx ; nil
       end
 
       def operations_box_read_only
@@ -453,8 +453,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       # ~ default
 
       def accept__default__meta_component x
-        @default_proc = x
-        NIL_
+        @default_proc = x ; nil
       end
 
       attr_reader :default_proc
@@ -462,8 +461,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       # ~ intent
 
       def accept__intent__meta_component sym  # see [#003]:#interp-B
-        @intent = sym
-        NIL_
+        @intent = sym ; nil
       end
 
       attr_reader :intent
@@ -478,7 +476,49 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         @component_model.method_defined? :"__#{ sym }__component_operation"
       end
 
-      attr_reader :component_model
+      attr_accessor :component_model
+
+      # ~ argument arity (and related)
+
+      def accept__is_plural_of__meta_component sym
+
+        @argument_arity = :one_or_more
+        @is_plural_of = sym ; nil
+      end
+
+      def accept__is_singular_of__meta_component sym
+
+        _name_as_ivar_will_be :"@#{ sym }"
+        @is_singular_of = sym ; nil
+      end
+
+      attr_reader(
+        :argument_arity,
+        :is_plural_of,
+        :is_singular_of,
+      )
+
+      # ~
+
+      def _name_as_ivar_will_be ivar
+
+        mutate_name = -> nm do
+          nm.as_ivar = ivar ; nil
+        end
+
+        p = @_name_mutation
+        if p
+          @_name_mutation = -> nm do
+            p[ nm ]
+            mutate_name[ nm ]
+            NIL_
+          end
+        else
+          @_name_mutation = mutate_name
+        end
+
+        NIL_
+      end
 
       # ~ constants
 
@@ -537,11 +577,17 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       end
     end
 
+    Callback_ = ::Skylab::Callback
+
+    Require_field_library_ = Callback_::Lazy.call do
+      Field_ = Home_.lib_.fields  # idiomatic name
+      NIL_
+    end
+
     Value_Wrapper = -> x do
       Callback_::Known_Known[ x ]
     end
 
-    Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
     module Lib_

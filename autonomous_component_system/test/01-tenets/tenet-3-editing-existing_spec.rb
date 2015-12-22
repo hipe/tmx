@@ -4,7 +4,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
   describe "[ac] ACS tenet 3 - edit existing" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
 
     it "subject class loads" do

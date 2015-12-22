@@ -99,6 +99,8 @@ module Skylab::Autonomous_Component_System
           end
         end
 
+        Require_field_library_[]
+
         def __prepare_single_style
 
           if @arg_st.unparsed_exists
@@ -326,8 +328,6 @@ module Skylab::Autonomous_Component_System
            }when no value is passed for `#{ par.name_symbol }` because #{
             }of our leaky isomorphism between methods and named args"
         end
-
-        Field_ = Home_.lib_.fields  # idiomatic name
 
         def _slice_off_relevant_args
 

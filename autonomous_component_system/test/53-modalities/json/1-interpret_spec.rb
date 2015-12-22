@@ -4,7 +4,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
   describe "[ac] modalities - JSON - interpret" do
 
-    extend TS_
+    TS_[ self ]
     use :future_expect
     use :common_model_and_methods
 
