@@ -78,7 +78,8 @@ module Skylab::Fields
 
       names = []
 
-      @_h.each_pair do |k, (*a)|
+      @_h.each_pair do |k, x|
+        a = [ * x ]
         names.push k
         ivar_h[ k ] = nil
         flag_h[ k ] = nil

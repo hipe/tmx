@@ -137,15 +137,17 @@ module Skylab::SearchAndReplace
       a = nil
       if Nonzero_array_[ @paths ]
 
-        _nf = Callback_::Name.via_variegated_symbol :files_by_find
-        fbf = Home_::Interface_Models_::Files_by_Find.new(
-          @paths, @filename_patterns, _nf )
+        fbf = _build :Files_by_Find, @paths, @filename_patterns
+
         a = [ fbf ]
 
         if @ruby_regexp
-          _nf = Callback_::Name.via_variegated_symbol :files_by_grep
-          a.push Home_::Interface_Models_::Files_by_Grep.new(
-            nil, @ruby_regexp, fbf, _nf )
+
+          fbg = _build :Files_by_Grep, nil, @ruby_regexp, fbf
+
+          a.push fbg
+
+          a.push _build( :Counts, fbg )
         end
       end
 
@@ -157,6 +159,14 @@ module Skylab::SearchAndReplace
           UNABLE_
         end
       end
+    end
+
+    def _build const, * a
+
+      _nf = Callback_::Name.via_variegated_symbol const.downcase
+      a.push _nf
+      _cls = Home_::Interface_Models_.const_get const, false
+      _cls.new( * a )
     end
 
     Cannot_search_until___ = -> pp do

@@ -30,11 +30,6 @@ module Skylab::BeautySalon
           end
         end
 
-        def build_counts_stream
-          ok = refresh_ivars
-          ok and via_ivars_build_path_stream_for :counts  # see #tmp-here
-        end
-
         def refresh_ivars
           ok = refresh_upstream_path_stream
           ok and resolve_regexp_pair_array
@@ -90,16 +85,6 @@ module Skylab::BeautySalon
           nil
         end
 
-      class Counts_Node__ < Node_  # (grep only)  BLAH:57
-
-        def to_body_item_value_string_when_can_receive_focus
-          "the grep --count option - \"Only a count of selected lines ..\""
-        end
-
-        def against_empty_polymorphic_stream
-          @grep_boolean_field.build_counts_stream
-        end
-
         def via_stream
           match_count = file_count = 0
           item = @stream.gets
@@ -148,26 +133,6 @@ module Skylab::BeautySalon
           ACHIEVED_
         end
 
-        def display_matches match, scn
-          @match_path = match.path
-          @subsequent_line_header = "#{ SPACE_ * ( @match_path.length + 1 ) }"  # for colon
-          begin
-            display_match match
-            match = scn.gets
-          end while match
-        end
-
-        def display_match match
-          stream = match.to_line_stream
-          current_line = match.lineno
-          line = stream.gets
-          @serr.puts "#{ @match_path }:#{ current_line }:#{ line }"
-          while line = stream.gets
-            current_line += 1
-            @serr.puts "#{ @subsequent_line_header }#{ current_line }:#{ line }"
-          end
-        end
-
         def summarize did_see_file, did_see_match, file_count
           if ! did_see_file
             @y << "no files match against the grep pattern"
@@ -183,14 +148,6 @@ module Skylab::BeautySalon
             end
           end ; nil
         end
-
-        def execute_via_file_stream_when_non_interactive
-
-          @file_stream.expand_by do |file|
-            file.to_read_only_match_stream
-          end
-        end
-      end
 
       class Replace_Node__ < Matches_Node__  # BLAH: 233
 

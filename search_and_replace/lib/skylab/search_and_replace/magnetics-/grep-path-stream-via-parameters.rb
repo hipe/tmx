@@ -14,8 +14,8 @@ module Skylab::SearchAndReplace
 
     attr_writer(
       :chunk_size,
+      :for,  # { counts | paths }
       :grep_extended_regexp_string,
-      :mode,
       :ruby_regexp,
       :upstream_path_stream,
     )
@@ -39,7 +39,7 @@ module Skylab::SearchAndReplace
 
     def ___via_command
 
-      send :"__init_command_head_for__#{ @mode }__"
+      send :"__init_command_head_for__#{ @for }__"
 
       @_oes_p.call :info, :grep_command_head do
 
@@ -50,7 +50,7 @@ module Skylab::SearchAndReplace
         _
       end
 
-      send :"__via_command_head_when__#{ @mode }__"
+      send :"__via_command_head_when__#{ @for }__"
     end
 
     def __init_command_head_for__counts__

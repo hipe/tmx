@@ -40,8 +40,12 @@ module Skylab::SearchAndReplace::TestSupport
 
       # ~ setup help
 
+      memoize :_ONE_LINE_FILE do
+        'one-line.txt'
+      end
+
       memoize :_THREE_LINES_FILE do
-       'three-lines.txt'
+        'three-lines.txt'
       end
 
       # --

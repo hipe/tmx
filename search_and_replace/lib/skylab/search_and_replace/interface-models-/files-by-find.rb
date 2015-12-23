@@ -15,11 +15,13 @@ module Skylab::SearchAndReplace
       end
 
       @filename_patterns = fn_patterns
-      @paths = paths
       @name_ = nf
+      @paths = paths
     end
 
-    attr_reader :name_
+    attr_reader(
+      :name_
+    )
 
     # -- this is how you be a button:
 
