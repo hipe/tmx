@@ -934,6 +934,9 @@ module Skylab::Callback
       def via_value x, & p
         new nil, -> { x }, :call, & p
       end
+
+      alias_method :[], :new
+      private :new
     end  # >>
 
     def initialize args, receiver, method_name, & p  # volatility order (subjective)

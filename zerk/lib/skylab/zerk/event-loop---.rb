@@ -72,7 +72,11 @@ module Skylab::Zerk
 
     def push_stack_frame_for qkn
 
-      if qkn.is_known_known
+      if qkn.is_effectively_known  # #detail-three: intentionally we munge
+        # the cases of the (for e.g) ivar being set to `nil` and the ivar
+        # not being set so that clients can internally set it to nil and
+        # check if it's set more idiomatically.
+
         self._FUN_TIMES
       else
         _ = qkn.association.model_classifications.category_symbol

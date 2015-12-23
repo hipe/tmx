@@ -119,10 +119,6 @@ module Skylab::BeautySalon::TestSupport
 
   # ~
 
-  def self._COMMON_DIR
-    @___common_dir ||= TestSupport_::Fixtures.files_path
-  end
-
   def self._MY_BIN_PATH
     @___mbp ||= ::File.expand_path( '../../bin', __FILE__ )
   end

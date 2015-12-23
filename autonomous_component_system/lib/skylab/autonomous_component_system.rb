@@ -150,7 +150,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
             if sym_
               _m_ = method_name_for[ sym_ ]
               _sing_ca = send[ _m_, sym_ ]
-              Home_::Singularize___[ _sing_ca, sym_, ca, acs ]
+              Home_::Singularize___[ _sing_ca, sym, ca, acs ]
             else
               self._COVER_ME
             end
@@ -260,7 +260,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         elsif mdl.respond_to? :[]
           LOOKS_LIKE_PROC___
         else
-          self._COVER_ME
+          self._COVER_ME_model_has_unrecognized_shape
         end
       end
 

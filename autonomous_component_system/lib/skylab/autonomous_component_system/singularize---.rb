@@ -10,11 +10,11 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       alias_method :call, :_call
     end  # >>
 
-    def initialize sing_ca, sing_sym, plur_ca, acs
+    def initialize sing_ca, plur_sym, plur_ca, acs
       @ACS = acs
       @plural_comp_assoc = plur_ca
+      @plural_symbol = plur_sym
       @singular_comp_assoc = sing_ca
-      @singular_symbol = sing_sym
     end
 
     def execute
@@ -26,7 +26,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         dup.___build_value arg_st, & x_p
       end
 
-      nf = Callback_::Name.via_variegated_symbol @singular_symbol
+      nf = Callback_::Name.via_variegated_symbol @plural_symbol
       nf.as_ivar = sca.name.as_ivar
       pca.name = nf
       pca

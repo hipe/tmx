@@ -284,12 +284,12 @@ module Skylab::Autonomous_Component_System
 
           o.process_named_arguments or self._SANITY   # all errors must raise
 
-          Callback_::Bound_Call.new(
+          Callback_::Bound_Call[
             o.args,
             @_op.callable,
             :call,
             & @_oes_p  # see [#006]#Event-models:choice
-          )
+          ]
         end
 
         # ~ parameters

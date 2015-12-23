@@ -355,6 +355,22 @@ module Skylab::Callback::TestSupport
         end
       end
 
+      def last_emission
+        state_.emission_array.last
+      end
+
+      def be_emission_ending_with * x_a, & x_p
+
+        _expev_matcher_by do
+
+          channel_tail_of x_a
+
+          if x_p
+            alternate_user_proc_of x_p
+          end
+        end
+      end
+
       def be_emission * x_a, & x_p
 
         _expev_matcher_by do
@@ -479,13 +495,36 @@ module Skylab::Callback::TestSupport
         NIL_
       end
 
-      def check_full_channel
+      def check_channel_tail
 
-        Require_basic___[]
+        act = @_emission.channel_symbol_array
+        exp = @_expectation.channel_tail
+
+        Require_basic__[]
+
+        act_d, exp_d =
+         Basic_::List.lowest_indexes_of_tail_anchored_common_element act, exp
+
+        if ! exp || exp_d.nonzero?
+          _add_failure_by do
+            ___say_channel_tail act_d, exp_d, act, exp
+          end
+        end
+        NIL_
+      end
+
+      def ___say_channel_tail act_d, exp_d, act, exp
+
+        "needed last #{ exp.length } component(s) to be #{
+          }#{ exp.inspect } in #{ act.inspect }"
+      end
+
+      def check_full_channel
 
         act = @_emission.channel_symbol_array
         exp = @_expectation.full_channel
 
+        Require_basic__[]
         good_d = Basic_::List.index_of_deepest_common_element act, exp
 
         # if the actual channel is deeper than the expected channel,
@@ -507,7 +546,7 @@ module Skylab::Callback::TestSupport
         NIL_
       end
 
-      Require_basic___ = Callback_::Lazy.call do
+      Require_basic__ = Callback_::Lazy.call do
         Basic_ = Home_.lib_.basic
         NIL_
       end
@@ -659,20 +698,22 @@ module Skylab::Callback::TestSupport
 
       def trilean x
         @has_trilean = true
-        @trilean_value = x
-        NIL_
+        @trilean_value = x ; nil
       end
 
       def terminal_channel_symbol_of sym
         @channel_method_name = :check_terminal_channel_symbol
-        @terminal_channel_symbol = sym
-        NIL_
+        @terminal_channel_symbol = sym ; nil
+      end
+
+      def channel_tail_of x_a
+        @channel_method_name = :check_channel_tail
+        @channel_tail = x_a ; nil
       end
 
       def full_channel_of x_a
         @channel_method_name = :check_full_channel
-        @full_channel = x_a
-        NIL_
+        @full_channel = x_a ; nil
       end
 
       def mixed_message_matcher msg_x
@@ -689,14 +730,12 @@ module Skylab::Callback::TestSupport
       def traditional_user_proc_of p
 
         @traditional_user_proc = p
-        @user_proc_method_name = :check_user_proc_traditionally
-        NIL_
+        @user_proc_method_name = :check_user_proc_traditionally ; nil
       end
 
       def alternate_user_proc_of p
         @alternate_user_proc = p
-        @user_proc_method_name = :check_user_proc_alternately
-        NIL_
+        @user_proc_method_name = :check_user_proc_alternately ; nil
       end
 
       # --
@@ -711,6 +750,7 @@ module Skylab::Callback::TestSupport
         # --
         :channel_method_name,
         :terminal_channel_symbol,
+        :channel_tail,
         :full_channel,
         # --
         :message_method_name,

@@ -67,12 +67,20 @@ module Skylab::SearchAndReplace::TestSupport
       NIL_
     end
 
+    def self._COMMON_DIR
+      TestSupport_::Fixtures.files_path
+    end
+
     def my_fixture_file_ entry_s
       my_fixture_files_[ entry_s ]
     end
 
     def my_fixture_files_
       TS_::Fixture_Trees
+    end
+
+    def basename_ path
+      ::File.basename path
     end
 
     # -- hook-ins/outs
@@ -117,7 +125,8 @@ module Skylab::SearchAndReplace::TestSupport
   Callback_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
   Home_ = ::Skylab::SearchAndReplace
 
-  EMPTY_S_ = ''
+  EMPTY_A_ = []  # Home_::EMPTY_A_
+  EMPTY_S_ = Home_::EMPTY_S_
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
   TS_ = self

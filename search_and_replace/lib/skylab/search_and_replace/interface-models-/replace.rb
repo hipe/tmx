@@ -8,68 +8,6 @@ module Skylab::BeautySalon
 
     Reactive_Nodes_ = here
 
-    class here::Files_Node < Field_
-
-      def is_terminal_node
-        true
-      end
-
-      def orient_self
-        @dirs_field = @parent.dirs_field
-        @files_field = @parent.files_field
-        nil
-      end
-
-      def to_body_item_value_string_when_can_receive_focus
-        "previews all files matched by the `find` query"
-      end
-
-      def receive_focus
-        resolve_command
-        @cmd && via_command_execute
-      end
-
-      def build_command & maybe_p
-        ok = refresh_values
-        ok and via_fresh_values_build_command( & maybe_p )
-      end
-
-    private
-
-      alias_method :against_empty_polymorphic_stream, :receive_focus
-
-      def resolve_command
-        @cmd = build_command( & handle_unsigned_event_selectively )
-        nil
-      end
-
-      def refresh_values
-        @glob_list = @files_field.glob_list
-        @path_list = @dirs_field.path_list
-        @glob_list && @glob_list.length.nonzero? &&
-          @path_list && @path_list.length.nonzero?
-      end
-
-      def via_fresh_values_build_command & oes_p
-
-        Home_.lib_.system.filesystem.find(
-
-          :filenames, @glob_list,
-          :paths, @path_list,
-          :freeform_query_infix_words, %w'-type f',
-          :when_command, IDENTITY_,
-          & oes_p )
-      end
-
-      def via_command_execute
-        @stream = @cmd.to_path_stream
-        if @is_interactive
-          @stream and via_stream
-        else
-          @stream
-        end
-      end
-
       def via_stream
         count = 0
         while line = @stream.gets
@@ -83,7 +21,6 @@ module Skylab::BeautySalon
         change_focus_to @parent  # necessary, else loop forever
         ACHIEVED_
       end
-    end
 
     class here::Matches_Node < Branch_
 

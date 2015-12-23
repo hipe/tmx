@@ -330,11 +330,11 @@ module Skylab::Brazen
           bc
         else
 
-          Callback_::Bound_Call.new(
+          Callback_::Bound_Call[
             argv,
             @_custom_kernel._user_utility,
             @_nf.as_variegated_symbol
-          )
+          ]
         end
       end
     end

@@ -12,18 +12,25 @@ module Skylab::SearchAndReplace
     end
   end  # >>
 
-  if false  # old stuff to be removed in the very near future
-    Actions = ::Module.new
+  module API
 
-    class Actions::Search_and_Replace < Home_.lib_.brazen::Action  # sorry
+    class << self
 
-      # this is :[#br-043] the frontier example of a back-less front..
+      def call * x_a, & oes_p
 
-      @is_promoted = true
+        root = Root_Autonomous_Component_System___.new( & oes_p )
+        root.__init_with_defaults
 
-      @instance_description_proc = -> y do
+        Home_.lib_.zerk.call x_a, root
+      end
+    end  # >>
+  end
 
-        s = <<-HERE
+  class Root_Autonomous_Component_System___
+
+    Xxx = -> y do
+
+        _ = <<-HERE
           ridiculous interactive search and replace: in a simple interactive
           terminal session, build your transformation progressively.
           then execute the tranformation, which can apply the edit-in-place
@@ -46,110 +53,98 @@ module Skylab::SearchAndReplace
           there is a known issue with files with multibyte characters.
         HERE
 
-        st = Home_.lib_.basic::String[ :line_stream, :mutate_by_unindenting, s ]
-        y << s while s = st.gets
-       end
+      st = Home_.lib_.basic::String[ :line_stream, :mutate_by_unindenting, _ ]
+      while s = st.gets
+        y << s
+      end
+      y
     end
 
-    class API
+    def initialize & oes_p
+      @_oes_p = oes_p
+    end
 
-      class << self
+    def __init_with_defaults
 
-        def call * x_a, & oes_p
-          oes_p and x_a.push :on_event_selectively, oes_p
-          bc = new( x_a ).resolve_bound_call
-          bc and begin
-            bc.receiver.send bc.method_name, * bc.args
-          end
-        end
+      @filename_patterns = [ '*.rb' ]
+      @paths = [ '.' ]
+      NIL_
+    end
 
-        def final_fallback_stdout_and_stderr
-          [ $stdout, $stderr ]
-        end
-      end
+    def event_handler_for _  # for [ze]
+      @_oes_p
+    end
 
-      def initialize x_a
-        @x_a = x_a
-      end
+    def __paths__component_association
 
-      def resolve_bound_call
+      yield :is_plural_of, :path
+    end
 
-        _S_R_node = Zerk_Tree.new Top__.new produce_event_handler
+    def __path__component_association
 
-        Zerk_::API.produce_bound_call @x_a, _S_R_node
-      end
+      yield :is_singular_of, :paths
 
-      def produce_event_handler
-        if :on_event_selectively == @x_a[ -2 ]
-          globbing_p = @x_a.last
-          @x_a[ -2, 2 ] = EMPTY_A_
-          -> i_a, & ev_p do
-            globbing_p[ * i_a, & ev_p ]
-          end
-        else
-          Final_fallback_on_event_selectively_via_channel__[ *
-            self.class.final_fallback_stdout_and_stderr ]
-        end
-      end
-
-      Final_fallback_on_event_selectively_via_channel__ = -> sout, serr do
-
-        lib = Home_.lib_.brazen::API
-
-        evr = lib::Two_Stream_Event_Expresser.new(
-          sout, serr, lib.expression_agent_instance )
-
-        -> * i_a, & ev_p do
-          evr.maybe_receive_on_channel_event i_a, & ev_p
-        end
-      end
-
-      class Top__
-
-        def initialize p
-          @handle_event_selectively_via_channel = p
-        end
-
-        attr_reader :handle_event_selectively_via_channel
-
-        def is_interactive
-          false
+      -> st do
+        x = st.gets_one
+        if x
+          Callback_::Known_Known[ x ]
         end
       end
     end
+
+    def __filename_patterns__component_association
+
+      yield :is_plural_of, :filename_pattern
+    end
+
+    def __filename_pattern__component_association
+
+      yield :is_singular_of, :filename_patterns
+
+      -> st do
+        x = st.gets_one
+        if x
+          Callback_::Known_Known[ x ]
+        end
+      end
+    end
+
+    def __search__component_association
+
+      a = nil
+      if Nonzero_array_[ @paths ]
+
+        _nf = Callback_::Name.via_variegated_symbol :files_by_find
+        ( a ||= [] ).push Home_::Interface_Models_::Files_by_Find.new(
+          @paths, @filename_patterns, _nf )  # NOTE do not pass block to cold model
+      end
+
+      if a
+        Home_::Interface_Models_::Search.new( a, & @_oes_p )
+      else
+        -> _st, & pp do
+          Cannot_search_until___[ pp ]
+          UNABLE_
+        end
+      end
+    end
+
+    Cannot_search_until___ = -> pp do
+      pp[ nil ].call :error, :expression, :uninterpretable_token do |y|
+        y << "(to search you must have some paths..)"  # experiment
+      end
+    end
+  end
+
+  Nonzero_array_ = -> x do
+    if x
+      x.length.nonzero?
+    end
+  end
+
+  if false  # #todo
 
     # ~ the agents
-
-    module Node_Methods_
-
-      # ~ messages received as child from parent
-
-      def prepare_for_focus
-        ACHIEVED_
-      end
-
-      # ~ messages received as parent from children
-
-      def grep_rx_field
-        @parent.grep_rx_field
-      end
-
-      def regexp_field
-        @parent.regexp_field
-      end
-
-      def replace_field
-        @parent.replace_field
-      end
-
-      def work_dir
-        @parent.work_dir
-      end
-
-      def expression_agent
-        @parent.expression_agent
-      end
-    end
 
     # Zerk_ = Home_.lib_.zerk
 
@@ -162,32 +157,6 @@ module Skylab::SearchAndReplace
       Quit_Button = ::Class.new
       NONE_S = nil
     end
-
-    class Node_ < Zerk_::Common_Node
-
-      include Node_Methods_
-
-    end
-
-    class Branch_ < Zerk_::Branch_Node
-
-      include Node_Methods_
-
-      def before_focus
-        @last_prepare_focus_was_OK ||= prepare_for_focus
-        nil
-      end
-    end
-
-    class Field_ < Zerk_::Field
-
-      include Node_Methods_
-
-    end
-
-    Up_Button_ = Zerk_::Up_Button
-
-    Quit_Button_ = Zerk_::Quit_Button
 
     class Zerk_Tree < Branch_
 
@@ -215,8 +184,8 @@ module Skylab::SearchAndReplace
           @regexp_field = Search_Field__.new( self ),
           @replace_field = Replace_Field__.new( self ),
           @dirs_field = Dirs_Field__.new( self ),
-          @files_field = Files_Field__.new( self ),
-          @preview_node = Preview_Node__.new( self ),
+          # @files_field = Files_Field__.new( self ),
+          # @preview_node = Preview_Node__.new( self ),
           Quit_Button_.new( self ) ]
 
         @preview_node.orient_self
@@ -620,106 +589,6 @@ module Skylab::SearchAndReplace
       end
     end
 
-    class Files_Field__ < Field_
-
-      include List_Hack_Methods__
-
-      def glob_list
-        @a
-      end
-    end
-
-    class Preview_Node__ < Branch_
-
-      def initialize x
-        super
-      end
-
-      def orient_self
-
-        @mod = S_and_R_::Reactive_Nodes_
-
-        @parent_files_field = @parent.files_field
-        @parent_dirs_field = @parent.dirs_field
-
-        @matches_agent = @mod::Matches_Node.new self
-        @regexp_field = @parent.regexp_field
-
-        nil
-      end
-
-      def to_body_item_value_string
-      end
-
-      def prepare_for_focus
-        @my_files_agent = @mod::Files_Node.new self
-        @matches_agent.orient_self
-        @children = [
-          Up_Button_.new( self ),
-          @my_files_agent,
-          @matches_agent,
-          Quit_Button_.new( self ) ]
-
-        @my_files_agent.orient_self
-        ACHIEVED_
-      end
-
-      def display_description
-        display_any_find_command
-        @serr.puts
-      end
-
-      def receive_path__ x
-        @matches_agent.receive_path___ x
-      end
-
-      def can_receive_focus
-        @matches_agent.has_path or
-        @parent_files_field.value_is_known &&
-          @parent_dirs_field.value_is_known
-      end
-
-      def prompt
-        @serr.puts  # :+#aesthetics - our items list is too busy, needs more space :/
-        super
-      end
-
-      def to_marshal_pair
-      end
-
-    private
-
-      def display_any_find_command
-        @my_files_agent.build_command do | * i_a, & ev_p|
-          ev = ev_p[]
-          if :info == i_a.first && :find_command_args == i_a[ 1 ]
-            _s_a = ev.find_command_args.map( & Home_.lib_.shellwords.method( :shellescape ) )
-            @serr.puts
-            @serr.puts "current find command: #{ _s_a * SPACE_ }"
-          else
-            maybe_send_event_via_channel i_a do
-              ev
-            end
-          end
-        end
-        nil
-      end
-
-    public  # ~ for children only
-
-      def dirs_field
-        @parent_dirs_field
-      end
-
-      def files_field
-        @parent_files_field
-      end
-
-      def lower_files_agent
-        @my_files_agent
-      end
-    end
-
     EMPTY_A_ = [].freeze
     EMPTY_RX_ = /\A[[:space:]]*\z/
     FINISHED_ = nil
@@ -728,12 +597,19 @@ module Skylab::SearchAndReplace
   end
 
   Callback_ = ::Skylab::Callback
+
+  Require_ACS_ = Callback_::Lazy.call do
+    ACS_ = Lib_::ACS[]
+    NIL_
+  end
+
   Autoloader_ = Callback_::Autoloader
 
   module Lib_
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
+    ACS = sidesys[ :Autonomous_Component_System ]
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
 
@@ -741,6 +617,14 @@ module Skylab::SearchAndReplace
       require 'strscan'
       ::StringScanner
     end
+
+    system_lib = sidesys[ :System ]
+
+    System = -> do
+      system_lib[].services
+    end
+
+    Zerk = sidesys[ :Zerk ]
   end
 
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
@@ -749,7 +633,10 @@ module Skylab::SearchAndReplace
   EMPTY_P_ = -> { NIL_ }
   EMPTY_S_ = ''
   Home_ = self
+  IDENTITY_ = -> x { x }
   NEWLINE_ = "\n"
   NIL_ = nil
   UNABLE_ = false
 end
+
+# #tombstone: [#br-043] the frontier example of a back-less front..

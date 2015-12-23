@@ -129,7 +129,7 @@ module Skylab::TMX
 
         _args = [ ada.resources.argv ]
 
-        Callback_::Bound_Call.new _args, _cli, :invoke
+        Callback_::Bound_Call[ _args, _cli, :invoke ]
       end
 
       def _build_new_CLI_for_under ada

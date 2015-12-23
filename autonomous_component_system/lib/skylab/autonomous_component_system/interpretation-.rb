@@ -12,17 +12,20 @@ module Skylab::Autonomous_Component_System
           end
           alias_method :call, :_call
           alias_method :[], :_call
+
+          alias_method :begin, :new
+          private :new
         end  # >>
 
         def initialize ma, asc, acs, & p
 
-          if 1 != p.arity
+          if p && 1 != p.arity
             self._WORLDWIDE_PROTEST
           end
 
           @ACS = acs
           @association = asc
-          @_argument_oes_p_p = p
+          @emission_handler_builder = p
           @construction_method = nil
           @mixed_argument = ma
         end
@@ -32,25 +35,29 @@ module Skylab::Autonomous_Component_System
           :mixed_argument,
         )
 
+        attr_reader(
+          :emission_handler_builder,
+        )
+
         def looks_like_compound_component__
 
           @_did_prepare_call ||= _prepare_call
 
-         COMPOUND_CONSTRUCTOR_METHOD_ == @_use_construction_method
+          COMPOUND_CONSTRUCTOR_METHOD_ == @_explicit_method_name
         end
 
         def execute
 
           @_did_prepare_call ||= _prepare_call
 
-          if @_argument_oes_p_p
+          if @emission_handler_builder
 
-            @_oes_p_p = @_argument_oes_p_p
+            @_oes_p_p = @emission_handler_builder
           else
             @_oes_p_p = ACS_::Interpretation::CHB[ @association, @ACS ]
           end
 
-          if @_use_construction_method
+          if @_explicit_method_name
             __via_construction_method
           else
 
@@ -79,14 +86,14 @@ module Skylab::Autonomous_Component_System
           end
 
           @_receiver = recvr
-          @_use_construction_method = cm
+          @_explicit_method_name = cm
 
           ACHIEVED_
         end
 
         def __via_construction_method
 
-          m = @_use_construction_method
+          m = @_explicit_method_name
 
           if ! @_receiver.respond_to? m
             raise ::NameError, ___say_no_method( m )
@@ -111,8 +118,15 @@ module Skylab::Autonomous_Component_System
         end
 
         def ___say_no_method m
+
+          x = @_receiver
+          _ = if x.respond_to? :name
+            x.name
+          else
+            "#{ x }"
+          end
           # platform reporting of class name is not as helpful as it could be
-          "undefined method `#{ m }` for #{ @_receiver.name }"
+          "undefined method `#{ m }` for #{ _ }"
         end
       end
 
@@ -127,6 +141,10 @@ module Skylab::Autonomous_Component_System
 
       write = nil
       Write_value = -> x, asc, acs do
+
+        if asc.is_singular_of
+          x = [ x ]  # (not sure if this is the place for this..)
+        end
 
         _ = Callback_::Qualified_Knownness.via_value_and_association x, asc
         write[ _, acs ]

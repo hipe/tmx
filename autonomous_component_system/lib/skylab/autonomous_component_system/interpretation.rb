@@ -110,7 +110,7 @@ module Skylab::Autonomous_Component_System
 
         _oes_p_p = CHB[ asc, acs ]
 
-        o = ACS_::Interpretation_::Build_value.new nil, asc, acs, & _oes_p_p
+        o = ACS_::Interpretation_::Build_value.begin nil, asc, acs, & _oes_p_p
 
         o.mixed_argument = if o.looks_like_compound_component__
           IDENTITY_

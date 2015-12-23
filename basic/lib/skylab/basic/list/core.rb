@@ -31,6 +31,36 @@ module Skylab::Basic
         deepest_index
       end
 
+      def lowest_indexes_of_tail_anchored_common_element _A_a, _B_a
+
+        _A_d = _A_a.length
+        _B_d = _B_a.length
+
+        stay = if _A_d < _B_d
+          -> { _A_d.nonzero? }
+        else
+          -> { _B_d.nonzero? }
+        end
+
+        if stay[]
+          begin
+            _A_d_ = _A_d - 1
+            _B_d_ = _B_d - 1
+
+            if _A_a.fetch( _A_d_ ) == _B_a.fetch( _B_d_ )
+              _A_d = _A_d_
+              _B_d = _B_d_
+              if stay[]
+                redo
+              end
+            end
+            x = [ _A_d, _B_d ]
+            break
+          end while nil
+          x
+        end
+      end
+
       def line_stream * a
         if a.length.zero?
           List_::Line_Scanner__

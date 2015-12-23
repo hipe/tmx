@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace
 
-  class Magnetics_::Grep_Path_Stream_via_Parameters
+  class Magnetics_::Grep_Path_Stream_via_Streamer
     # -
       Callback_::Actor.call( self, :properties,
 

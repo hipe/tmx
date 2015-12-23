@@ -281,11 +281,9 @@ module Skylab::SearchAndReplace::TestSupport
 
     def _subject * a
 
-      _egads = magnetics_::
-        Mutable_File_Session_Stream_via_File_Session_Stream::
-          String_Edit_Session___
+      _ = magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
 
-      _egads.new( * a )
+      _::String_Edit_Session___.new( * a )
     end
 
     def _expect_output es, string

@@ -247,7 +247,7 @@ module Skylab::Basic
             p = @on_event_selectively
           end
 
-          Callback_::Bound_Call.new arglist, @unbound._p, :call, & p
+          Callback_::Bound_Call[ arglist, @unbound._p, :call, & p ]
         end
 
         def _maybe_send_event * i_a, & ev_p

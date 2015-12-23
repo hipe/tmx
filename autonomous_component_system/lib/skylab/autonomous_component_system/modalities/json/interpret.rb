@@ -223,7 +223,7 @@ module Skylab::Autonomous_Component_System
 
           _oes_p_p = _crazytimes asc
 
-          o = ACS_::Interpretation_::Build_value.new(
+          o = ACS_::Interpretation_::Build_value.begin(
             _on_component, asc, @ACS, & _oes_p_p )
 
           o.construction_method = :interpret_compound_component
