@@ -30,6 +30,8 @@ at writing, [br] is that place, and subject has all the ancient stuff.
 
 first, a quick history (most recent at top):
 
+       [#013] parameters                                      2015-12-23
+
     [#ac-001] the autonomous component system                 2015-04-23
 
     [#cb-042] actors                                          2014-08-00
@@ -56,6 +58,7 @@ first, a quick history (most recent at top):
 
 
 annotation (most recent at top, start at bottom for a narrative):
+  • [#013] is the lightest weight
   • [cb] actor is and always will be minimal.
   • [br] entity started out clean, got heavy, is most popular for bus. model
   • [gv]'s is a clean rewrite of the below meant to be rbx-compatible
@@ -119,7 +122,16 @@ has edit sessions    | no        |
 
 ## more in-depth comments about the particular implementations
 
-### [#hl-089] is the new favorite..
+
+### [#013] is quick and dirty minimal
+
+in the interest of being lightweight and minimal it has no property
+structure ..
+
+
+
+
+### [#!hl-089] was the new favorite..
 
   • we want to re-implement the *backend* of brazen entity with this! EEK
 

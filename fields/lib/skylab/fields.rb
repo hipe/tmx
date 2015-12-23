@@ -16,6 +16,99 @@ module Skylab::Fields
     end
   end  # >>
 
+  class Parameters  # :[#013].
+
+    class << self
+      alias_method :[], :new
+      private :new
+    end
+
+    def initialize h
+      @_h = h
+    end
+
+    def symbols sym
+
+      @_indexed ||= _index
+      @_symbols_under_ad_hod_classification[ sym ]
+    end
+
+    def write_ivars me, x_a
+
+      @_indexed ||= _index
+
+      flag = @_is_flag
+      ivar = @_ivar_for
+      seen = {}
+      st = Callback_::Polymorphic_Stream.via_array x_a
+
+      begin
+        k = st.gets_one
+        seen[ k ] = true
+        me.instance_variable_set ivar[k], ( flag[k] ? true : st.gets_one )
+      end until st.no_unparsed_exists
+
+      @_a.each do | k_ |
+        seen[ k_ ] and next
+        me.instance_variable_set ivar[ k_ ], nil
+      end
+
+      NIL_
+    end
+
+    def _index
+
+      flag_h = {}
+      ivar_h = {}
+
+      op_h = {}
+      op_h[ :flag ] = -> k do
+        flag_h[ k ] = true
+      end
+
+      custom = -> kk, kk_ do
+
+        cust_h = ::Hash.new { |h, k| h[k] = [] }
+        @_symbols_under_ad_hod_classification = cust_h.method :fetch
+        custom = -> k, k_ do
+          cust_h[ k_ ].push k ; nil
+        end
+        custom[ kk, kk_ ]
+      end
+
+      names = []
+
+      @_h.each_pair do |k, (*a)|
+        names.push k
+        ivar_h[ k ] = nil
+        flag_h[ k ] = nil
+        a.each do | k_ |
+          p = op_h[ k_ ]
+          if p
+            p[ k ]
+          else
+            custom[ k, k_ ]
+          end
+        end
+      end
+
+      @_a = names
+
+      @_is_flag = flag_h.method :fetch
+
+      @_ivar_for = -> k do
+        ivar = ivar_h.fetch k
+        if ! ivar
+          ivar = :"@#{ k }"
+          ivar_h[ k ] = ivar
+        end
+        ivar
+      end
+
+      ACHIEVED_
+    end
+  end
+
   # -- the external functions experiment ..
 
   # ~ description & name
@@ -144,6 +237,7 @@ module Skylab::Fields
 
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
 
+  ACHIEVED_ = true
   CLI = nil  # for host
   EMPTY_A_ = []
   EMPTY_S_ = ""

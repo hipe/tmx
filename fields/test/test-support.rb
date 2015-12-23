@@ -7,6 +7,10 @@ module Skylab::Fields::TestSupport
 
   TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
 
+  def self.[] tcc  # until etc
+    tcc.extend self
+  end
+
   extend TestSupport_::Quickie
 
   module ModuleMethods
@@ -70,6 +74,11 @@ module Skylab::Fields::TestSupport
   Expect_Event = -> tcm do
 
     Callback_.test_support::Expect_Event[ tcm ]
+  end
+
+  Memoizer_Methods = -> tcc do
+
+    TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
 
   Home_ = ::Skylab::Fields

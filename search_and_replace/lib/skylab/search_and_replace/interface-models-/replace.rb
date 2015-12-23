@@ -4,10 +4,6 @@ module Skylab::BeautySalon
 
      # notes stowed away in [#016] (as 2)
 
-    here = ::Module.new
-
-    Reactive_Nodes_ = here
-
       def via_stream
         count = 0
         while line = @stream.gets
@@ -20,111 +16,6 @@ module Skylab::BeautySalon
         end
         change_focus_to @parent  # necessary, else loop forever
         ACHIEVED_
-      end
-
-    class here::Matches_Node < Branch_
-
-      def initialize( * )
-        @has_path = false
-        super
-      end
-
-      def orient_self
-        @fa = @parent.lower_files_agent
-        @rf = @parent.regexp_field
-        nil
-      end
-
-      def to_body_item_value_string_when_can_receive_focus
-        "different ways to achieve, manipulate matching files, strings"
-      end
-
-      def can_receive_focus
-        @rf.value_is_known
-      end
-
-      def receive_path___ x
-
-        if x
-          @gbf = @rbf = @pag = nil
-          @has_path = true
-          @paths_agent_group = Explicit_Path___.new x
-          ACHIEVED_
-        else
-          @has_path = @paths_agent_group = x
-        end
-      end
-
-      attr_reader :has_path
-
-      class Explicit_Path___
-        def initialize s
-          @path = s
-        end
-        def has_active_boolean
-          true
-        end
-        def active_boolean
-          self
-        end
-        def build_path_stream
-          Callback_::Stream.via_item @path
-        end
-      end
-
-      def prepare_for_focus
-
-        if ! @has_path
-          __init_paths_agent_group
-        end
-
-        @children = [
-          Up_Button_.new( self ),
-          * @gbf,
-          * @rbf,
-          Files_Node__.new( self ),
-          Counts_Node__.new( self ),
-          Matches_Node__.new( self ),
-          Replace_Node__.new( self ),
-          Quit_Button_.new( self ),
-          * @pag ]
-
-        if @is_interactive
-          retrieve_values_from_FS_if_exist
-        end
-
-        ACHIEVED_
-      end
-
-      def __init_paths_agent_group
-
-        grp = Zerk_::Enumeration_Group.new [ :grep, :ruby ], :grep_via, self
-        @paths_agent_group = grp
-        @gbf = Grep_Boolean__.new grp, self
-        @grep_boolean_field = @gbf
-        @rbf = Ruby_Boolean__.new grp, self
-        @pag = grp
-        NIL_
-      end
-
-      attr_reader :paths_agent_group, :grep_boolean_field
-
-      def display_body  # :+#aesthetics :/
-        @serr.puts
-        super
-        @serr.puts
-      end
-
-      def to_marshal_pair
-      end
-
-      # ~ public API for children calling up to us as parent
-
-      def receive_branch_changed_notification
-        if @is_interactive
-          receive_try_to_persist
-        end
-        nil
       end
 
       class Grep_Boolean__ < Zerk_::Boolean  # BLAH:69
@@ -141,12 +32,7 @@ module Skylab::BeautySalon
 
         def build_counts_stream
           ok = refresh_ivars
-          ok and via_ivars_build_path_stream_for :counts
-        end
-
-        def build_path_stream
-          ok = refresh_ivars
-          ok and via_ivars_build_path_stream_for :paths
+          ok and via_ivars_build_path_stream_for :counts  # see #tmp-here
         end
 
         def refresh_ivars
@@ -171,15 +57,6 @@ module Skylab::BeautySalon
           @upstream_path_stream ? ACHIEVED_ : UNABLE_
         end
 
-        def via_ivars_build_path_stream_for mode_i
-
-          S_and_R_::Magnetics_::Build_grep_path_stream.with(
-            :upstream_path_stream, @upstream_path_stream,
-            * @regexp_pair_a,
-            :mode, mode_i,
-            & method( :maybe_receive_grep_event ) )
-        end
-
         def maybe_receive_grep_event * i_a, & ev_p
           if :grep_command_head == i_a.last && @is_interactive
             ev = ev_p[]
@@ -197,59 +74,6 @@ module Skylab::BeautySalon
         end
       end
 
-      class Ruby_Boolean__ < Zerk_::Boolean  # BLAH:20
-
-        include Node_Methods_
-
-        def to_body_item_value_string
-          if @is_activated
-            "ON - matching files will be searched for using ruby."
-          else
-            "(turn on using ruby (not grep) to find matching files)"
-          end
-        end
-
-        def build_path_stream
-          maybe_send_event :error do
-            Callback_::Event.inline_not_OK_with(
-              :not_yet_implemented, :method_name, :build_path_stream )
-          end
-          UNABLE_
-        end
-      end
-
-      class Files_Node__ < Node_  # BLAH:52
-
-        def initialize x
-          super
-          @paths_agent_group = @parent.paths_agent_group
-        end
-
-        def to_body_item_value_string_when_can_receive_focus
-          'list the matching filenames (but not the strings)'
-        end
-
-        def can_receive_focus
-          @paths_agent_group.has_active_boolean
-        end
-
-        def is_terminal_node
-          true
-        end
-
-        def receive_focus
-          @stream = against_empty_polymorphic_stream
-          @stream and via_stream
-          change_focus_to @parent
-          ACHIEVED_
-        end
-
-      private
-
-        def against_empty_polymorphic_stream
-          @paths_agent_group.active_boolean.build_path_stream
-        end
-
         def via_stream
           count = 0
           line =  @stream.gets
@@ -266,38 +90,11 @@ module Skylab::BeautySalon
           nil
         end
 
-      public
-        def to_marshal_pair
-        end
-      end
-
       class Counts_Node__ < Node_  # (grep only)  BLAH:57
-
-        def initialize x
-          super
-          @grep_boolean_field = @parent.grep_boolean_field
-        end
-
-        def is_terminal_node
-          true
-        end
 
         def to_body_item_value_string_when_can_receive_focus
           "the grep --count option - \"Only a count of selected lines ..\""
         end
-
-        def can_receive_focus
-          @grep_boolean_field.is_activated
-        end
-
-        def receive_focus
-          @stream = @grep_boolean_field.build_counts_stream
-          @stream and via_stream
-          change_focus_to @parent
-          ACHIEVED_
-        end
-
-      private
 
         def against_empty_polymorphic_stream
           @grep_boolean_field.build_counts_stream
@@ -322,85 +119,6 @@ module Skylab::BeautySalon
               # e.g. "(X matches in Y files)"
           end
           nil
-        end
-
-      public
-        def to_marshal_pair
-        end
-      end
-
-      class Matches_Node__ < Node_  # BLAH:143
-
-        def initialize x
-          super
-          @paths_agent_group = @parent.paths_agent_group
-        end
-
-        def can_receive_focus
-          @paths_agent_group.has_active_boolean
-        end
-
-        def is_terminal_node
-          true
-        end
-
-        def to_body_item_value_string_when_can_receive_focus
-          'see the matching strings (not just files)'
-        end
-
-        def receive_focus
-          resolve_file_stream && execute_via_file_stream_when_interactive
-        end
-
-        def to_marshal_pair
-        end
-
-      private
-
-        def against_empty_polymorphic_stream
-          resolve_file_stream && execute_via_file_stream_when_non_interactive
-        end
-
-        def resolve_file_stream
-          rslv_file_stream_ivars && via_file_stream_ivars_resolve_file_stream
-        end
-
-        def rslv_file_stream_ivars
-          @path_stream = @paths_agent_group.active_boolean.build_path_stream
-          @path_stream && resolve_regexp_ivars
-        end
-
-        def resolve_regexp_ivars
-
-          fld = @parent.regexp_field
-          if fld.value_is_known
-            grx_fld = @parent.grep_rx_field
-            @gers = if grx_fld.value_is_known
-              grx_fld.value_string
-            end
-            @rrx = fld.regexp
-            ACHIEVED_
-          end
-        end
-
-        def via_file_stream_ivars_resolve_file_stream
-
-          _do_highlight = @is_interactive && @serr.tty?
-          _oes_p = handle_unsigned_event_selectively
-
-          @file_stream = S_and_R_::Magnetics_::File_Stream_via_Parameters.with(
-            :upstream_path_stream, @path_stream,
-            :ruby_regexp, @rrx,
-            :grep_extended_regexp_string, @gers,
-            :do_highlight, _do_highlight,
-            for_interactive_search_and_replace_or_read_only,
-            & _oes_p )
-
-          @file_stream && ACHIEVED_
-        end
-
-        def for_interactive_search_and_replace_or_read_only
-          :read_only
         end
 
         def execute_via_file_stream_when_interactive
@@ -467,6 +185,7 @@ module Skylab::BeautySalon
         end
 
         def execute_via_file_stream_when_non_interactive
+
           @file_stream.expand_by do |file|
             file.to_read_only_match_stream
           end
@@ -705,6 +424,5 @@ module Skylab::BeautySalon
             self
         end
       end
-    end
   end
 end

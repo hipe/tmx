@@ -16,31 +16,39 @@ module Skylab::SearchAndReplace
 
       @filename_patterns = fn_patterns
       @paths = paths
-      @_nf = nf
+      @name_ = nf
     end
 
-    def name_
-      @_nf
-    end
+    attr_reader :name_
+
+    # -- this is how you be a button:
 
     def interpret_component st, & pp
 
-      # this is how you be a button:
-
       if st.no_unparsed_exists
-
-        dup.___bound_call_as_hot( & pp )
+        dup._init_hot( & pp ).___to_bound_call
       end
     end
 
-    def ___bound_call_as_hot & oes_p_p
-
-      @_oes_p = oes_p_p[ self ]
-
-      Callback_::Bound_Call[ nil, self, :___execute ]
+    def ___to_bound_call
+      Callback_::Bound_Call[ nil, self, :_execute ]
     end
 
-    def ___execute
+    # -- this is how we be an internal service (eek?):
+
+    def invoke & pp
+
+      dup._init_hot( & pp )._execute
+    end
+
+    # --
+
+    def _init_hot & oes_p_p  # assume freshly duped
+      @_oes_p = oes_p_p[ self ]
+      self
+    end
+
+    def _execute
 
       _ok = ___init_command
       _ok &&= __via_command
@@ -52,7 +60,7 @@ module Skylab::SearchAndReplace
 
         :filenames, @filename_patterns,
         :paths, @paths,
-        :freeform_query_infix_words, %w'-type f',
+        :freeform_query_infix_words, %w(-type f),
         :when_command, IDENTITY_,
         & @_oes_p )
 
@@ -69,3 +77,4 @@ module Skylab::SearchAndReplace
   end
 end
 # #history - this splintered off of node [#003]
+# [#bs-028] (method name conventions) references this document

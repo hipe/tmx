@@ -64,11 +64,6 @@ module Skylab::BeautySalon
       Callback_::Scn.try_convert x
     end
 
-    Shellwords = -> do
-      require 'shellwords'
-      ::Shellwords
-    end
-
     ST__ = sidesys[ :SubTree ]
 
     String_scanner = Callback_.memoize do

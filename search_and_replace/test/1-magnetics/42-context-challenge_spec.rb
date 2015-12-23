@@ -279,11 +279,11 @@ module Skylab::SearchAndReplace::TestSupport
       end
     end
 
-    def _subject * a
+    def _subject x, y
 
       _ = magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
 
-      _::String_Edit_Session___.new( * a )
+      _::String_Edit_Session___.new x, y
     end
 
     def _expect_output es, string

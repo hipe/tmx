@@ -239,7 +239,7 @@ individual constituency:
     file and there are remaining matches (or not?) and we wish to write
     the file nd be done with it.
 
-this whole note reveals a smell and opened up [#bs-022].
+this whole note reveals a smell and opened up #open [#005].
 
 
 

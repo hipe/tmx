@@ -1,71 +1,63 @@
 module Skylab::SearchAndReplace
 
-  class Magnetics_::Read_Only_File_Session_Stream_via_File_Session_Stream
+  module Magnetics_::Read_Only_File_Session_Stream_via_File_Session_Stream
 
-        class << self
+    class << self
+      def [] up, & p
+        Sessioner___.new up, & p
+      end
+    end  # >>
 
-          def producer_via_iambic x_a
-            ok = nil
-            x = Producer__.new do
-              ok = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
-            end
-            ok && x
-          end
-        end
+    class Sessioner___
 
-        class Producer__
+      def initialize up, & oes_p
 
-          Callback_::Actor.methodic( self, :simple, :properties,
+        @__prototype = Session___.new(
+          up.ruby_regexp,
+          up.do_highlight,
+          & oes_p )
+      end
 
-            :property, :ruby_regexp,
-            :ignore, :property, :grep_extended_regexp_string,
-            :property, :do_highlight,
-            :ignore, :property, :max_file_size_for_multiline_mode,
-          )
+      def produce_file_session_via_ordinal_and_path d, path
+        @__prototype.new d, path
+      end
+    end
 
-          def initialize
-            @do_highlight = nil
-            @on_event_selectively = nil
-            super
-            @prototype = Self_.new @ruby_regexp, @do_highlight, @on_event_selectively
-          end
+    class Session___
 
-          def produce_file_session_via_ordinal_and_path d, path
-            @prototype.dup_with_ordinal_and_path d, path
-          end
-        end
+      def initialize rx, yes, & p
 
-        def initialize * a
-          @ruby_regexp, @do_highlight, @on_event_selectively = a
-          freeze
-        end
+        @do_highlight = yes
+        @ruby_regexp = rx
 
-        def dup_with_ordinal_and_path d, path
-          dup.init_copy d, path
-        end
+        @_oes_p = p
+        freeze
+      end
 
-      protected
+      def new d, path
+        dup.___init_copy d, path
+      end
 
-        def init_copy d, path
-          @ordinal = d
-          @path = path
-          freeze
-        end
+      def ___init_copy d, path
+        @ordinal = d
+        @path = path
+        freeze
+      end
 
-      public
+      attr_reader(
+        :ordinal,
+        :path,
+        :ruby_regexp,
+      )
 
-        def members
-          [ :ordinal, :path, :ruby_regexp ]
-        end
+      def to_read_only_match_stream
+        to_read_only_match_stream_when_multi_line
+      end
 
-        attr_reader :ordinal, :path, :ruby_regexp
-
-        def to_read_only_match_stream
-          to_read_only_match_stream_when_multi_line
-        end
+      # -
 
         def to_read_only_match_stream_when_multi_line
-          match = Read_Only_Match__.new @path, @do_highlight
+          match = Read_Only_Match___.new @path, @do_highlight
           whole_file = ::File.read @path
           line_number = 1
           last_begin = 0
@@ -121,7 +113,7 @@ module Skylab::SearchAndReplace
 
         NEWLINE_CHAR__ = NEWLINE_.getbyte 0
 
-        def __to_read_only_match_stream_when_single_line__  # when [#bs-024] explicit choice
+        def __to_read_only_match_stream_when_single_line__  # #open [#007]
           io = ::File.open @path, ::File::CREAT | ::File::RDONLY
           line_number = 0
           rx = @ruby_regexp
@@ -138,10 +130,11 @@ module Skylab::SearchAndReplace
           end
         end
 
-        class Read_Only_Match__
+        class Read_Only_Match___
 
-          def initialize *a
-            @path, @do_highlight = a
+          def initialize path, yes
+            @do_highlight = yes
+            @path = path
             freeze
           end
 
@@ -150,12 +143,10 @@ module Skylab::SearchAndReplace
           end
 
           def dup_with_args * a
-            dup.init_copy a
+            dup.___init_copy a
           end
 
-         protected
-
-           def init_copy a
+           def ___init_copy a
              @lineno, @before_match, @md, @after_match = a
              freeze
            end
@@ -227,8 +218,8 @@ module Skylab::SearchAndReplace
               p[]
             end
           end
-        end
-
-        Self_ = self
-  end
+        end  # read only match
+      # -
+    end  # session
+  end  # magnetic
 end

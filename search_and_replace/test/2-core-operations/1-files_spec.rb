@@ -101,10 +101,12 @@ module Skylab::SearchAndReplace::TestSupport
       end
     end
 
-    context "see the files matched by grep", wip: true do
+    context "see the files matched by grep" do
 
       call_by_ do
+
         _path = TS_._COMMON_DIR
+
         call_(
           :ruby_regexp, /\bwazoozle\b/i,
           :path, _path,
@@ -112,29 +114,27 @@ module Skylab::SearchAndReplace::TestSupport
           :search,
           :files_by_grep,
         )
+
+        st = @result
+        if st
+          _x = st.gets
+          _x_ = st.gets
+          _x__ = st.gets
+          @freeform_state_value_x = [ _x, _x_, _x__ ]
+        end
+        nil
       end
 
-      it "emits the find command (again)" do
+      it "emits the grep command (sort of)" do
 
-        _SOME_emission.should be_emission_ending_with( :find_command_args )
+        last_emission.should be_emission_ending_with :grep_command_head
       end
 
-      it "emits the grep command" do
+      it "result is a stream of paths" do
 
-        second_emission_.should ( be_emission :info, :grep_command do |ev|
-
-          black_and_white( ev ).should eql 'lala'
-        end )
-
-        expect_no_emissions_after_index_ 1
-      end
-
-      it "result is a stream of the matched files" do
-
-        st = result_value_
-        _ = st.gets
-        st.gets.should be_nil
-        basename_( _ ).should eql _THREE_LINES_FILE
+        a = state_.freeform_value_x
+        basename_( a.fetch 0 ).should eql 'three-lines.txt'
+        a[ 1 ] and fail
       end
     end
   end

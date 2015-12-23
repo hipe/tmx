@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace
 
-  class Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
+  module Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
 
         class String_Edit_Session___
 

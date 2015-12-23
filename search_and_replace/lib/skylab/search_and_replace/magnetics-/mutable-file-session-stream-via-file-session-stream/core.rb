@@ -1,41 +1,29 @@
 module Skylab::SearchAndReplace
 
-  class Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
+  module Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
 
-        class << self
+    class << self
+      def [] up, & p
+        Sessioner___.new up, & p
+      end
+    end  # >>
 
-          def producer_via_iambic x_a, & oes_p
+    class Sessioner___
 
-            oes_p or raise ::ArgumentError
+      def initialize up, & oes_p
 
-            ok = nil
-            x = Producer__.new do
-
-              if oes_p
-                @on_event_selectively = oes_p
-              end
-
-              ok = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
-            end
-            ok && x
-          end
+        x = up.max_file_size_for_multiline_mode
+        if ! x
+          x = DEFAULT_MAX_FILE_SIZE_FOR_MULTIINE_MODE__
         end
+        @max_file_size_for_multiline_mode = x
 
-        class Producer__
+        rx = up.ruby_regexp
+        @rx_opts = Home_.lib_.basic::Regexp.options_via_regexp rx
+        @ruby_regexp = rx
 
-          Callback_::Actor.methodic( self, :simple, :properties,
-
-            :property, :ruby_regexp,
-            :ignore, :property, :grep_extended_regexp_string,
-            :ignore, :property, :do_highlight,
-            :property, :max_file_size_for_multiline_mode,
-          )
-
-          def initialize
-            super
-            @max_file_size_for_multiline_mode ||= DEFAULT_MAX_FILE_SIZE_FOR_MULTIINE_MODE__
-            @rx_opts = Home_.lib_.basic::Regexp.options_via_regexp @ruby_regexp
-          end
+        @_oes_p = oes_p
+      end
 
           DEFAULT_MAX_FILE_SIZE_FOR_MULTIINE_MODE__ = 463296
 
@@ -46,29 +34,37 @@ module Skylab::SearchAndReplace
           # really of interest to us here, which is why we take this field
           # a parameter and provide this just as a last-line catchall.
 
-          def produce_file_session_via_ordinal_and_path d, path
-            stat = ::File.stat path  # noent meh
-            if stat.size <= @max_file_size_for_multiline_mode
-              when_multiline_OK d, path
-            elsif @rx_opts.is_multiline
-              when_multiline_regexp_and_multiline_not_OK
-            else
-              when_single_line d, path
-            end
-          end
+      def produce_file_session_via_ordinal_and_path d, path
 
-          def when_multiline_OK d, path
+        stat = ::File.stat path  # noent meh
 
-            es = Self_::String_Edit_Session___.new(
-              ::File.open( path, ::File::CREAT | ::File::RDONLY ).read,  # noent meh
-              @ruby_regexp,
-              @on_event_selectively )
+        if stat.size <= @max_file_size_for_multiline_mode
 
-            es.set_file_metadata d, path
-            es
-          end
+          ___when_multiline_OK d, path
+
+        elsif @rx_opts.is_multiline
+
+          self._COVER_ME
+        else
+
+          self._COVER_ME
         end
+      end
 
-        Self_ = self
+      def ___when_multiline_OK d, path
+
+        _io = ::File.open path, ::File::CREAT | ::File::RDONLY
+        _big_string = _io.read
+
+        es = Here___::String_Edit_Session___.new(
+          _big_string,
+          @ruby_regexp,
+        )
+        es.set_path_and_ordinal path, d
+        es
+      end
+    end  # sessioner
+
+    Here___ = self
   end
 end

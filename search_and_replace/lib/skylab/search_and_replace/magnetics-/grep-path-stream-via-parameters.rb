@@ -1,64 +1,75 @@
 module Skylab::SearchAndReplace
 
-  class Magnetics_::Grep_Path_Stream_via_Streamer
-    # -
-      Callback_::Actor.call( self, :properties,
+  class Magnetics_::Grep_Path_Stream_via_Parameters
 
-        :upstream_path_stream,
-        :grep_extended_regexp_string,
-        :ruby_regexp,
-        :mode,
-        :chunk_size,
-      )
+    def initialize & pp
 
-      def initialize
-        @grep_extended_regexp_string = @ruby_regexp = nil
-        super
-        @chunk_size ||= 50  # meh etc
-        @shellwords = Home_.lib_.shellwords
+      @chunk_size = 50  # ..
+      @grep_extended_regexp_string = nil
+      @ruby_regexp = nil
+      @shellwords = Home_.lib_.shellwords
+
+      @_pp = pp
+    end
+
+    attr_writer(
+      :chunk_size,
+      :grep_extended_regexp_string,
+      :mode,
+      :ruby_regexp,
+      :upstream_path_stream,
+    )
+
+    def execute
+
+      @_oes_p = @_pp[ nil ]
+
+      cmd = Home_.lib_.system.filesystem.grep(
+        :grep_extended_regexp_string, @grep_extended_regexp_string,
+        :ruby_regexp, @ruby_regexp,
+        & @_oes_p )
+
+      if cmd
+        @_command = cmd
+        ___via_command
+      else
+        cmd
+      end
+    end
+
+    def ___via_command
+
+      send :"__init_command_head_for__#{ @mode }__"
+
+      @_oes_p.call :info, :grep_command_head do
+
+        _ = Callback_::Event.inline_neutral_with(
+          :grep_command_head,
+          :command_head, @_head_s,
+        )
+        _
       end
 
-      def execute
+      send :"__via_command_head_when__#{ @mode }__"
+    end
 
-        @command = Home_.lib_.system.filesystem.grep(
-          :grep_extended_regexp_string, @grep_extended_regexp_string,
-          :ruby_regexp, @ruby_regexp,
+    def __init_command_head_for__counts__
+      @_head_s = "#{ @_command.string } --count ".freeze
+    end
 
-        ) do | * i_a, & ev_p |
-          # hi.
-          @on_event_selectively[ * i_a, & ev_p ]
-          UNABLE_
-        end
+    def __init_command_head_for__paths__
+      @_head_s = "#{ @_command.string } --files-with-matches ".freeze
+    end
 
-        @command and via_command
-      end
+    def __via_command_head_when__counts__
 
-      def via_command
-        send :"init_command_head_for_#{ @mode }"
-
-        @on_event_selectively.call :info, :grep_command_head do
-          Callback_::Event.inline_neutral_with :grep_command_head,
-            :command_head, @head_s
-        end
-
-        send :"via_command_head_when_#{ @mode }"
-      end
-
-      def init_command_head_for_counts
-        @head_s = "#{ @command.string } --count ".freeze
-      end
-
-      def init_command_head_for_paths
-         @head_s = "#{ @command.string } --files-with-matches ".freeze
-      end
-
-      def via_command_head_when_counts
-        via_command_head_when_paths.map_reduce_by do |path|
-          md = COUNT_LINE_RX__.match path
+      __via_command_head_when_paths.map_reduce_by do |path|
+        md = COUNT_LINE_RX___.match path
+        # -
           if md
             d = md[ 2 ].to_i
             if d.nonzero?
-              Count_Item__.new md[ 1 ], md[ 2 ].to_i
+            Count_Item___.new md[ 1 ], md[ 2 ].to_i
             end
           else
             @on_event_selectively.call :error_string do
@@ -66,15 +77,16 @@ module Skylab::SearchAndReplace
             end
             nil
           end
-        end
+        # -
       end
+    end
 
-      COUNT_LINE_RX__ = /\A(.+):(\d+)\z/
+    COUNT_LINE_RX___ = /\A(.+):(\d+)\z/
 
-      Count_Item__ = ::Struct.new :path, :count
+    Count_Item___ = ::Struct.new :path, :count
 
-      def via_command_head_when_paths
-
+    def __via_command_head_when__paths__
+      # -
         st = nil
         p = -> do
           st = produce_next_stream
@@ -89,25 +101,30 @@ module Skylab::SearchAndReplace
           p[]
         end
 
-        o = Callback_::Stream
-        o.new(
-          o::Resource_Releaser.new do
-            if st
-              st.upstream.release_resource
-            else
-              ACHIEVED_
-            end
-          end
-        ) do
-          p[]
+      # -
+
+      _Stream = Callback_::Stream
+
+      _releaser = _Stream::Resource_Releaser.new do
+        if st
+          st.upstream.release_resource
+        else
+          ACHIEVED_
         end
       end
 
+      _Stream.new _releaser do
+        p[]
+      end
+    end
+
+    alias_method :__via_command_head_when_paths, :__via_command_head_when__paths__
+    # -
       def produce_next_stream
         a = take_nonzero_length_escaped_paths_chunk
         if a
-          _command_s = "#{ @head_s }#{ a * SPACE_ }"
-          @command.produce_stream_via_command_string _command_s
+          _command_s = "#{ @_head_s }#{ a * SPACE_ }"
+          @_command.produce_stream_via_command_string _command_s
         end
       end
 

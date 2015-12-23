@@ -1,90 +1,94 @@
 module Skylab::SearchAndReplace
 
-  class Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
+  module Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
 
         class String_Edit_Session___
 
-          def initialize * a
-            @string, @ruby_regexp, @on_event_selectively = a
-            @string_length = @string.length
-            @match_a = []
-            @pos = 0
-            @done = @string_length == @pos
+          def initialize s, rx
+
+            @_match_a = []
+            @ruby_regexp = rx
+            @string = s
+            @_string_length = @string.length
+            @_pos = 0
+
+            @_done = @_string_length == @_pos
           end
 
-          def set_file_metadata * a
-            @ordinal, @path = a ; nil
+          def set_path_and_ordinal path, d
+            @ordinal = d
+            @path = path ; nil
           end
 
-          def members
-            [ :ordinal, :path, :ruby_regexp ]
-          end
-
-          attr_reader :ordinal, :path, :ruby_regexp, :string
+          attr_reader(
+            :ordinal,
+            :path,
+            :ruby_regexp,
+            :string,
+          )
 
           def has_at_least_one_match
-            if @match_a.length.zero? && ! @done
+            if @_match_a.length.zero? && ! @_done
               gets_match
             end
-            @match_a.length.nonzero?
+            @_match_a.length.nonzero?
           end
 
           def match_count
-            @done or find_all_matches
-            @match_a.length
+
+            _find_all_matches_if_necessary
+            @_match_a.length
           end
 
           def match_at_index d
+
             if 0 > d
-              @done or find_all_matches
-            elsif ! @done && @match_a.length <= d
-              try_advance_to d
+              _find_all_matches_if_necessary
+
+            elsif ! @_done && @_match_a.length <= d
+              __try_advance_to d
             end
-            @match_a[ d ]
+
+            @_match_a[ d ]
           end
 
-        private
-
-          def find_all_matches
-            nil while gets_match
-            nil
+          def _find_all_matches_if_necessary
+            if ! @_done
+              nil while gets_match
+            end
+            NIL_
           end
 
-          def try_advance_to d
+          def __try_advance_to d
             stop_length = d + 1
             begin
               gets_match
-              stop_length == @match_a.length and break
-            end while ! @done
+              stop_length == @_match_a.length and break
+            end while ! @_done
           end
 
-        public
-
           def gets_match
-            if ! @done
-              md = @ruby_regexp.match @string, @pos
+            if ! @_done
+              md = @ruby_regexp.match @string, @_pos
               if md
-                build_and_store_match_via_matchdata md
+                ___via_matchdata md
               else
-                @done = true
-                @pos = @string_length
-                nil
+                @_done = true
+                @_pos = @_string_length
+                NOTHING_
               end
             end
           end
 
-        private
+          def ___via_matchdata md
 
-          def build_and_store_match_via_matchdata md
-            match_index = @match_a.length
-            match = Match__.new md, match_index, self
-            @match_a.push match
-            @pos = match.next_begin
-            @string_length == @pos and @done = true
+            match_index = @_match_a.length
+            match = Match___.new md, match_index, self
+            @_match_a.push match
+            @_pos = match.next_begin
+            @_string_length == @_pos and @_done = true
             match
           end
-
-        public
 
           def line_number_of_byte_offset d
             # (etc for static strings a b-tree lookup would be "better" but meh)
@@ -110,15 +114,15 @@ module Skylab::SearchAndReplace
             end
           end
 
-          class Match__
+          class Match___
 
-            def initialize *a
-              @md, @match_index, @parent = a
+            def initialize md, d, o
+
+              @match_index = d
+              @md = md
+              @parent = o
+
               @begin, @next_begin = md.offset 0
-            end
-
-            def members
-              [ :begin, :next_begin, :first_line_number, :md, :match_index ]
             end
 
             def ordinal
@@ -128,12 +132,6 @@ module Skylab::SearchAndReplace
             def first_line_number
               @parent.line_number_of_byte_offset @begin
             end
-
-            attr_reader :begin, :next_begin, :md
-              # we call it "next begin" and not "end"
-              # to remind you to use "..." and not ".."
-
-            attr_reader :match_index
 
             def has_previous_match
               @match_index.nonzero?
@@ -175,12 +173,10 @@ module Skylab::SearchAndReplace
               @parent.match_at_index @match_index + 1
             end
 
-            attr_reader :replacement_is_engaged, :replacement_string
-
             def set_replacement_string x
               @replacement_is_engaged = true
               @replacement_string = x
-              nil
+              NIL_
             end
 
             def disengage_replacement
@@ -193,21 +189,33 @@ module Skylab::SearchAndReplace
                 @replacement_string,
                 Match_Segment_.new( @match_index, :replacement ) ]
             end
+
+            attr_reader(
+              :begin,
+              :match_index,
+              :next_begin,  # as opposed to "end" so you use "..." and not ".."
+              :replacement_is_engaged,
+              :replacement_string,
+              :md,
+            )
           end
 
-        public
-
           def to_line_stream
-            Self_::Stream_Adapter___.new( self ).build_line_stream
+            Here__::Stream_Adapter___.new( self ).build_line_stream
           end
 
           # ~ context line streams (#note-105)
 
           def context_streams num_before, match_d, num_after
 
-            Self_::Build_context_streams___.new( num_before, match_d, num_after,
-              @match_a, @string ).execute
+            _ = Here__::Build_context_streams___.new(
+              num_before,
+              match_d,
+              num_after,
+              @_match_a,
+              @string )
 
+            _.execute
           end
 
           class Segmented_Line_ < ::Array
@@ -306,7 +314,9 @@ module Skylab::SearchAndReplace
 
           DELIM_BYTE_ = NEWLINE_.getbyte 0
 
-          Self_ = self
+          Here__ = self
+
+          NOTHING_ = nil  # in contrast with something
         end
   end
 end

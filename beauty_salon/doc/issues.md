@@ -12,11 +12,11 @@
 [#029]       name conventions for constants .. #parent-node:[#030]
 [#028]       name conventions for functions and methods ..  #parent-node:[#030]
 [#026]       #parent-node: [#010] procedurally find the smaller methods
-[#025]       #feature have the multiple forms save to one file
-[#024]       #feature explicit choice of single line v. multiline
-[#023]       #feature support for spaces in list items
-[#022]       #feature make this one button with three labels instead of three buttons
-[#021]       #feature should check mtime before write, abort for that file if stale
+[#025] #hole (#moved-to: [sa])
+[#024]       (#ditto)
+[#023]       (#ditto)
+[#022]       (#ditto)
+[#021]       (#ditto)
 [#020]       #done encoding issues with git config ([#ba-064])
 [#019]       the `[*]` task of converting all `Foo_::Lib_::Bar_BAZ[]`
                to `Foo_.lib.bar_BAZ`..

@@ -14,17 +14,20 @@ module Skylab::SearchAndReplace::TestSupport
 
         shared_subject :state_ do
 
+          @freeform_state_value_x = nil
+
           instance_exec( & p )
 
           _a = remove_instance_variable( :@event_log ).flush_to_array
           _x = remove_instance_variable :@result
+          _x_ = remove_instance_variable :@freeform_state_value_x
 
-          State___.new _x, _a
+          State___.new _x, _a, _x_
         end
       end
     # -
 
-    State___ = ::Struct.new :result, :emission_array
+    State___ = ::Struct.new :result, :emission_array, :freeform_value_x
 
     # -
 

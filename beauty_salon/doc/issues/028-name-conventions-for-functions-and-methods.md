@@ -19,6 +19,21 @@ its "API scope". here is a summary of the N tiers of scope:
 
 
 
+## introducion through a quick example
+
+although we haven't explained what they all mean yet, a good example of
+that employs several of the above name conventions is a file in [#sa] that
+is taggged with [#]  (the subject doc node).
+
+the "trained eye" can see immediately that it has it has (at writing)
+several methods that part of its public API (or hook-outs/hooks-ins to
+some public API elsewhere); one method that has "library" (in this case
+"app") scope, a few that are "cozy" scope and a few "one-off (for the
+above method) scope". why this is valuable to us is part of the subject
+of this document.
+
+
+
 
 ## sneak preview of scopes
 

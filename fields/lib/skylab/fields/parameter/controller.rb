@@ -102,7 +102,6 @@ module Skylab::Fields
         end * SPACE_
       end
 
-      ACHIEVED_ = true
       CONST_SEP_ = '::'
       SPACE_ = ' '
       UNDERSCORE_ = '_'

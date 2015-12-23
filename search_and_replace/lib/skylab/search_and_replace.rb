@@ -62,6 +62,7 @@ module Skylab::SearchAndReplace
 
     def initialize & oes_p
       @_oes_p = oes_p
+      @ruby_regexp = nil
     end
 
     def __init_with_defaults
@@ -73,6 +74,28 @@ module Skylab::SearchAndReplace
 
     def event_handler_for _  # for [ze]
       @_oes_p
+    end
+
+    def __ruby_regexp__component_association
+
+      -> st, & pp do
+        if st.unparsed_exists
+          ___interpret_ruby_regexp st.gets_one, & pp
+        end
+      end
+    end
+
+    def ___interpret_ruby_regexp s, & pp
+
+      Callback_::Known_Known[ ::Regexp.new s ]
+
+    rescue ::RegexpError => e
+
+      pp[ nil ].call :error, :expression, :regexp_error do | y |
+        y << "deesh: #{ e.message }"
+      end
+
+      UNABLE_
     end
 
     def __paths__component_association
@@ -115,8 +138,15 @@ module Skylab::SearchAndReplace
       if Nonzero_array_[ @paths ]
 
         _nf = Callback_::Name.via_variegated_symbol :files_by_find
-        ( a ||= [] ).push Home_::Interface_Models_::Files_by_Find.new(
-          @paths, @filename_patterns, _nf )  # NOTE do not pass block to cold model
+        fbf = Home_::Interface_Models_::Files_by_Find.new(
+          @paths, @filename_patterns, _nf )
+        a = [ fbf ]
+
+        if @ruby_regexp
+          _nf = Callback_::Name.via_variegated_symbol :files_by_grep
+          a.push Home_::Interface_Models_::Files_by_Grep.new(
+            nil, @ruby_regexp, fbf, _nf )
+        end
       end
 
       if a
@@ -575,7 +605,7 @@ module Skylab::SearchAndReplace
       "for now, multiple values can be separated with one or more spaces."
 
     THATS_COMING__ = -> s do
-      "and for now, there is no support for spaces in #{ s } list but that's coming.."  # #open [#023]
+      "and for now, there is no support for spaces in #{ s } list but that's coming.."  # #open [#006]
     end
 
     LIST_HACK_SEPARATOR_RX__ = /[ \t]+/
@@ -598,6 +628,15 @@ module Skylab::SearchAndReplace
 
   Callback_ = ::Skylab::Callback
 
+  On_event_selectively_ = -> * i_a, & ev_p do
+
+    # a default event handler for when none is provided but one is required
+
+    if :info != i_a.first
+      raise ev_p[].to_exception
+    end
+  end
+
   Require_ACS_ = Callback_::Lazy.call do
     ACS_ = Lib_::ACS[]
     NIL_
@@ -612,6 +651,12 @@ module Skylab::SearchAndReplace
     ACS = sidesys[ :Autonomous_Component_System ]
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
+    Fields = sidesys[ :Fields ]
+
+    Shellwords = -> do
+      require 'shellwords'
+      ::Shellwords
+    end
 
     String_scanner = -> do
       require 'strscan'
@@ -636,6 +681,7 @@ module Skylab::SearchAndReplace
   IDENTITY_ = -> x { x }
   NEWLINE_ = "\n"
   NIL_ = nil
+  SPACE_ = ' '
   UNABLE_ = false
 end
 
