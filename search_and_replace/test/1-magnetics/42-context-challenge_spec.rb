@@ -2,122 +2,12 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[se] models - S & R - models - string edit session" do
+  describe "[sa] magnetics - (42) context challenge (FRAGMENTS)" do
 
     TS_[ self ]
     use :expect_event
-    use :magnetics_file_stream
 
-    context "modeled as a list of string segments separated by match segments" do
-
-      it "the match segements are determined lazily" do
-        es = _subject '__XX__XX__', /XX/
-        m1 = es.gets_match
-        m2 = es.gets_match
-        es.gets_match.should be_nil
-        m1.begin.should eql 2
-        m1.next_begin.should eql 4
-        m2.begin.should eql 6
-        m2.next_begin.should eql 8
-      end
-
-      it "a match segment can retrieve its previous, its next" do
-
-        es = _subject 'Fibble..XX..and faBBle, and Fopple and falafel fubbel',
-          /\bf[a-z][bp]{2}(?:el|le)\b/i
-
-        ma = es.match_at_index 1
-        ma.md[ 0 ].should eql 'faBBle'
-
-        ma_ = ma.previous_match
-        ma_.md[ 0 ].should eql 'Fibble'
-
-        ma__ = ma.next_match
-        ma__.md[ 0 ].should eql 'Fopple'
-
-        ma__.next_match.next_match.should be_nil
-
-        ma_.previous_match.should be_nil
-
-      end
-
-      it "no matches is OK" do
-        es = _subject 'one', /two/
-        es.match_at_index( 3 ).should be_nil
-      end
-
-      it "empty string is OK (but don't bother trying to match it)" do
-        es = _subject '', //
-        es.gets_match.should be_nil
-      end
-    end
-
-    context "replacements, context & output lines" do
-
-      it "in repl string you can add lines that weren't there and opposite" do
-
-        _input = unindent_( <<-O )
-          one
-          two
-          three
-        O
-        es = _subject _input, /(?:thre)?e\n/
-
-        m1 = es.gets_match
-        m2 = es.gets_match
-
-        m1.set_replacement_string "iguruma\nand PCRE are\n"
-        m2.set_replacement_string "rx engines"
-
-        stream = es.to_line_stream
-        stream.gets.should eql "oniguruma\n"
-        stream.gets.should eql "and PCRE are\n"
-        stream.gets.should eql "two\n"
-        stream.gets.should eql "rx engines"
-        stream.gets.should be_nil
-      end
-
-      it "viewing context - minimal normal (note \"segmented line\" class)" do
-
-        _input = unindent_( <<-HERE )
-          line 1
-          line 2
-          ohai
-          line 4
-          line 5
-        HERE
-
-        es = _subject _input, /^ohai$/
-        es.gets_match.set_replacement_string 'yerp'
-
-        bf, m, af = es.context_streams 1, 0, 1
-
-        line = bf.gets
-        line.length.should eql 1
-        line.first.string_index.should eql 7
-        bf.gets.should be_nil
-
-        line = m.gets
-        line.length.should eql 2
-        line.first.string.should eql 'yerp'
-        line.last.string.should eql DELIMITER_
-        line.first.category.should eql :replacement
-        line.last.category.should eql :normal
-        m.gets.should be_nil
-
-        line = af.gets
-        line.length.should eql 1
-        line.first.to_sexp.should eql [ :normal, 19, "line 4\n" ]
-        af.gets.should be_nil
-
-        _expect_output es, unindent_( <<-O )
-          line 1
-          line 2
-          yerp
-          line 4
-          line 5
-        O
-      end
+    context "replacements, context & output lines", wip: true do
 
       it "viewing context - many matches, many replacements, delimitation changed" do
 
@@ -211,30 +101,6 @@ module Skylab::SearchAndReplace::TestSupport
         HERE
       end
 
-      it "(regression)" do
-
-        _input = unindent_( <<-O )
-          ZE zoo
-          ZIM
-        O
-        es = _subject _input, /\bZ[A-Z]+\b/
-
-        es.gets_match.set_replacement_string 'JE'
-        es.gets_match.set_replacement_string 'JIM'
-
-        bf, m, af = es.context_streams 2, 1, 2
-        bf.gets.to_flat_sexp.should eql [ :replacement, 0, 0, "JE", :normal, 2, " zoo\n" ]
-        bf.gets.should be_nil
-        m.gets.to_flat_sexp.should eql [ :replacement, 1, 0, "JIM", :normal, 10, "\n" ]
-        m.gets.should be_nil
-        af.gets.should be_nil
-
-        _expect_output es, unindent_( <<-O )
-          JE zoo
-          JIM
-        O
-      end
-
       it "viewing context - when many matches on 1 line & actual ctx is low" do
 
         _input = unindent_( <<-HERE )
@@ -276,32 +142,6 @@ module Skylab::SearchAndReplace::TestSupport
           JIM zam JOM
           ziff JUP zaff
         HERE
-      end
-    end
-
-    def _subject x, y
-
-      _ = magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
-
-      _::String_Edit_Session___.new x, y
-    end
-
-    def _expect_output es, string
-      queue = string.split %r((?<=\n))
-      stream = es.to_line_stream
-      while line = stream.gets
-        expect = queue.shift
-        if expect
-          if line != expect
-            line.should eql expect
-            fail "skipping the remaining lines."
-          end
-        else
-          fail "unexpected line: #{ line.inspect }"
-        end
-      end
-      if queue.length.nonzero?
-        fail "had no more lines, expecting #{ queue.first.inspect }"
       end
     end
   end
