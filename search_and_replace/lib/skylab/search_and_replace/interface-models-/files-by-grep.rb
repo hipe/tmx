@@ -3,7 +3,6 @@ module Skylab::SearchAndReplace
   class Interface_Models_::Files_by_Grep
 
     def description
-      # 'see the matching strings (not just files)'
       'list the matching filenames (but not the strings)'
     end
 
@@ -18,7 +17,9 @@ module Skylab::SearchAndReplace
     end
 
     attr_reader(
-      :name_
+      :name_,
+      :grep_extended_regexp_string,
+      :ruby_regexp,
     )
 
     attr_writer(

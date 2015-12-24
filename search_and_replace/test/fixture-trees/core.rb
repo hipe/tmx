@@ -1,5 +1,5 @@
 module Skylab::SearchAndReplace::TestSupport
-  self._K
+
   module Fixture_Trees
 
     class << self
@@ -9,20 +9,20 @@ module Skylab::SearchAndReplace::TestSupport
         ::File.join _dir_path, entry_s
       end
 
-      define_method :STFU_OMG_FUNCTION_FILE_PATH, ( Callback_.memoize do
-
+      define_method :_wat_FUNCTION_FILE_PATH, ( Callback_.memoize do
+        self._K
         _FUNCTIONS = 'functions'
         _DOTFILE = '.search-and-replace'
 
         ::File.join(
-          Self__.STFU_OMG_WORKSPACE_PATH,
+          Self__._wat_WORKSPACE_PATH,
           _DOTFILE,
           _FUNCTIONS,
           'stfu-omg.rb' )
       end )
 
-      define_method :STFU_OMG_WORKSPACE_PATH, ( Callback_.memoize do
-
+      define_method :_wat_WORKSPACE_PATH, ( Callback_.memoize do
+        self._K
         ::File.join(
           Self__.dir_pathname.to_path,
           '00-has-hidden-workspace-with-stfu-omg-function' )

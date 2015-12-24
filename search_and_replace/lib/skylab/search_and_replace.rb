@@ -61,8 +61,11 @@ module Skylab::SearchAndReplace
     end
 
     def initialize & oes_p
-      @_oes_p = oes_p
+
+      @egrep_pattern = nil
       @ruby_regexp = nil
+
+      @_oes_p = oes_p
     end
 
     def __init_with_defaults
@@ -81,6 +84,23 @@ module Skylab::SearchAndReplace
       -> st, & pp do
         if st.unparsed_exists
           ___interpret_ruby_regexp st.gets_one, & pp
+        end
+      end
+    end
+
+    def __egrep_pattern__component_association
+
+      # for UI (when we get there), we want this to show up only when etc
+      if ! @ruby_regexp
+        yield :intent, :API  # that is, not UI
+      end
+
+      -> st, & pp do
+        if st.unparsed_exists
+          x = st.gets_one
+          if x
+            Callback_::Known_Known[ x ]
+          end
         end
       end
     end
@@ -143,11 +163,13 @@ module Skylab::SearchAndReplace
 
         if @ruby_regexp
 
-          fbg = _build :Files_by_Grep, nil, @ruby_regexp, fbf
+          fbg = _build :Files_by_Grep, @egrep_pattern, @ruby_regexp, fbf
 
           a.push fbg
 
           a.push _build( :Counts, fbg )
+
+          a.push _build( :Matches, fbg )
         end
       end
 

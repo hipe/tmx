@@ -32,3 +32,5 @@ module Skylab::SearchAndReplace
     end
   end
 end
+
+# #history: this splintered off of node [#003]
