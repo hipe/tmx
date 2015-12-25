@@ -60,7 +60,7 @@ module Skylab::SearchAndReplace
 
     def __resolve_file_path_stream
 
-      _ = @_files_by_grep.call :for, :paths, & @_pp
+      _ = @_files_by_grep.to_file_path_stream :for, :paths, & @_pp
       _write_trueish :@_file_path_stream, _
     end
 

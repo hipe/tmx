@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[se] S & R - reactive nodes - replace", wip: true do
+  describe "[sa] core operations - replace", wip: true do
 
     TS_[ self ]
     use :operations

@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] operations - counts" do
+  describe "[sa] core operations - (2) counts" do
 
     TS_[ self ]
     use :memoizer_methods

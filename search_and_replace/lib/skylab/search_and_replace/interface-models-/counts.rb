@@ -26,7 +26,7 @@ module Skylab::SearchAndReplace
 
     def ___to_count_stream & pp
 
-      @_files_by_grep.call(
+      @_files_by_grep.to_file_path_stream(
         :for, :counts,
         & pp )
     end

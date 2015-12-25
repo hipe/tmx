@@ -2,11 +2,10 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[se] models - S & R - models - multi-line edit file session" do
+  describe "[sa] magnetics - (60) multiline edit file session", wip: true do
 
     TS_[ self ]
     use :expect_event
-    use :magnetics_file_stream
 
     it "when the filesize is under the limit - OK" do
 

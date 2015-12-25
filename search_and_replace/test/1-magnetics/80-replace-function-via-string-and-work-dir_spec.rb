@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] S & R - actors - build replace function" do
+  describe "[sa] magnetics - (80) build replace function" do
 
     TS_[ self ]
     use :expect_event

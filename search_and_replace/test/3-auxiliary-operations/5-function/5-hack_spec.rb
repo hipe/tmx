@@ -8,7 +8,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "it tries to infer the module tree from a file - FALLIBLE" do
 
-        _path = my_fixture_files_._wat_FUNCTION_FILE_PATH
+        _path = my_fixture_trees_._wat_FUNCTION_FILE_PATH
 
         tree = __subject :path, _path
 

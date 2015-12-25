@@ -63,7 +63,7 @@ module Skylab::SearchAndReplace::TestSupport
     end
 
     def _first_workspace
-      my_fixture_files_._wat_WORKSPACE_PATH
+      my_fixture_trees_._wat_WORKSPACE_PATH
     end
   end
 end

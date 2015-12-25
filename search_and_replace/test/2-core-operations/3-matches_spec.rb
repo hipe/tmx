@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] operations - (3) matches" do
+  describe "[sa] core operations - (3) matches" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -112,7 +112,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       call_by_ do
 
-        _path = my_fixture_file_ '1-multiline'
+        _path = my_fixture_tree_ '1-multiline'
 
         call_(
           :egrep_pattern, '[a-z_]+\(',
@@ -133,7 +133,7 @@ module Skylab::SearchAndReplace::TestSupport
         _matches_box.a_.should eql [ _FILE ]
       end
 
-      it "2 matches, one on lines 3 and one on  9" do
+      it "2 matches, one on lines 3 and one on 9" do
 
         a = _matches
         a.length.should eql 2

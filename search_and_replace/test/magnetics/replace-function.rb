@@ -10,7 +10,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       _oes_p = event_log.handle_event_selectively
 
-      _ = __subject_module::Magnetics_::Replace_Function_via_String_and_Work_Dir
+      _ = magnetics_::Replace_Function_via_String_and_Work_Dir
 
       @replace_function = _[
 
@@ -35,10 +35,6 @@ module Skylab::SearchAndReplace::TestSupport
 
     def expect_ expect_string
       @output_string.should eql expect_string
-    end
-
-    def __subject_module
-      Subject_module_[]
     end
   end
 end

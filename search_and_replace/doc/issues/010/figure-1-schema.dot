@@ -1,0 +1,90 @@
+digraph G {
+
+  label="figure 1 - schema and example document structure
+
+• blocks - each block represents a run of one or more adjacent
+lines from the input. (lines are virtual - internally we only
+store indexes.) lines are never broken by matches:
+
+rather, each block is partioned such that it is either a run
+of one or more lines that do not overlap with any matches -OR-
+a run of one or more lines each of which overlaps with matches.
+
+a match can span multiple lines -AND- a line can
+overlap with (or contain fully) multiple matches;
+so the block with matches will be busy.
+
+but note that blocks without matches are forever unaffected by
+substitions (provided that you don't memoize line numbers).
+
+• the document only has a handle on its (any) first block. each
+block is then doubly-linked to its any previous and any next
+block, allowing the document to traverse itself in this manner.
+
+the above facilitates this: each next block is constructed
+lazily, so only as many blocks are built as is required by
+the operation.
+
+• match controllers - each block that has match controllers
+exposes access to those controllers. each match controller has a
+handle on its custodian block. through this each match controller
+can (indirectly) reach any previous or next match controller, or
+any above/below lines.
+"
+
+  compound=true
+
+  subgraph cluster_schema {
+    label="schema"
+    node [shape=ellipse]
+    a->b [label="has zero or more" arrowhead="odot"]
+    b->c [label="has has zero or more" arrowhead="odot"]
+    a [label="document"]
+    b [label="block"]
+    c [label="match controller"]
+  }
+
+  subgraph cluster_doc {
+    label="example document"
+    style=filled
+    fillcolor=white
+
+    subgraph cluster0 {
+      label="block 1"
+      fillcolor=white
+      b0 [style="invis"]
+    }
+
+    subgraph cluster1 {
+      label="block 2"
+      fillcolor=white
+      node [shape=rect style=filled fillcolor=grey]
+      b1_mc [label="match controller"]
+    }
+
+    b0->b1_mc [ltail=cluster0 lhead=cluster1 label="next"]
+    b1_mc->b0 [ltail=cluster1 lhead=cluster0 label="prev"]
+
+    subgraph cluster2 {
+      label="block 3"
+      fillcolor=white
+      b2 [style="invis"]
+    }
+
+    b1_mc->b2 [ltail=cluster1 lhead=cluster2 label="next"]
+    b2->b1_mc [ltail=cluster2 lhead=cluster1 label="prev"]
+
+    subgraph cluster3 {
+      label="block 4"
+      fillcolor=white
+      node [shape=rect style=filled fillcolor=grey]
+      b3_mc0 [label="match controller"]
+      b3_mc1 [label="match controller"]
+      b3_mc1->b3_mc0
+      b3_mc0->b3_mc1
+    }
+
+    b2->b3_mc0 [ltail=cluster2 lhead=cluster3 label="next"]
+    b3_mc0->b2 [ltail=cluster3 lhead=cluster2 label="prev"]
+  }
+}

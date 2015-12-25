@@ -67,15 +67,22 @@ module Skylab::SearchAndReplace::TestSupport
       NIL_
     end
 
+    def build_stream_for_single_path_to_file_with_three_lines_
+
+      _path = TestSupport_::Fixtures.file :three_lines
+
+      Callback_::Stream.via_item _path
+    end
+
     def self._COMMON_DIR
       TestSupport_::Fixtures.files_path
     end
 
-    def my_fixture_file_ entry_s
-      my_fixture_files_[ entry_s ]
+    def my_fixture_tree_ entry_s
+      my_fixture_trees_[ entry_s ]
     end
 
-    def my_fixture_files_
+    def my_fixture_trees_
       TS_::Fixture_Trees
     end
 
@@ -83,13 +90,16 @@ module Skylab::SearchAndReplace::TestSupport
       ::File.basename path
     end
 
+    def magnetics_
+      Home_::Magnetics_
+    end
+
     # -- hook-ins/outs
 
     # ~ [ca] "expect event"
 
     def subject_API
-
-      Subject_module_[]::API
+      Home_::API
     end
 
     # ~ [br] "expect interactive"
@@ -108,10 +118,6 @@ module Skylab::SearchAndReplace::TestSupport
         s
       end
     end.call
-
-    Subject_module_ = -> do
-      Home_
-    end
   # -
 
   Memoizer_Methods = -> tcc do

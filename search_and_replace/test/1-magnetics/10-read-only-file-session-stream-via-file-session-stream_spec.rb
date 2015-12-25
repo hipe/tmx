@@ -2,12 +2,11 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] models - S & R - models - read only file session" do
+  describe "[sa] magnetics - (10) read only file session stream" do
 
     TS_[ self ]
     use :memoizer_methods
     use :expect_event
-    use :magnetics_file_stream
 
     it "the subject performer loads" do
       _subject

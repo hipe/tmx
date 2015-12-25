@@ -53,11 +53,12 @@ module Skylab::SearchAndReplace
 
       def ___when_multiline_OK d, path
 
-        _io = ::File.open path, ::File::CREAT | ::File::RDONLY
-        _big_string = _io.read
+        io = ::File.open path, ::File::RDONLY
+        big_string = io.read
+        io.close
 
         es = Here___::String_Edit_Session___.new(
-          _big_string,
+          big_string,
           @ruby_regexp,
         )
         es.set_path_and_ordinal path, d
