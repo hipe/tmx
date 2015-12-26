@@ -130,6 +130,7 @@ module Skylab::SearchAndReplace
           # so you become static and ..
 
           @_newlines = d_a
+          @_end = d_a.last + 1  # revisit when investigat #open [#011]
           @_line_scn.pos = d_a.last + 1
 
           _scanners = @_scanners
@@ -211,39 +212,159 @@ module Skylab::SearchAndReplace
         end
 
         def _clean
-          remove_instance_variable :@_line_scn
+
           remove_instance_variable :@_md_scn
           remove_instance_variable :@_scanners
+
+          @_big_string = remove_instance_variable( :@_line_scn ).string
+
           NIL_
         end
 
         # --
 
-        def to_line_stream_for_ es
+        def to_output_line_stream__
 
           if has_matches
-            ___to_line_stream_when_matches es
+            ___to_line_stream_when_matches
           else
-            __to_line_stream_when_static es
+            __to_line_stream_when_static
           end
         end
 
-        def ___to_line_stream_when_matches es
+        def write_the_previous_N_line_sexp_arrays_in_front_of a, n
+          if has_matches
+            self._A
+            __wpnl_rotbuf
 
-          o = Here_::Stream_Magnetics_
-          _ = o::Sexp_stream_via_matches_block[ self, es.string ]
+          else  # OCD optimizations for static blocks:
+            my_d = @_newlines.length
+            deficit = n - my_d
+            if 0 < deficit
+              # then we have a deficit
+              _static_wpnl a, my_d
+              __static_wpnl_seek a, deficit
+            else
+              _static_wpnl a, n
+            end
+          end
+        end
+
+        def __static_wpnl_seek a, n
+          self._IS_A_SKETCH
+          bl = @previous_block
+          if bl
+            bl.write_the_previous_N_line_sexp_arrays_in_front_of a, n
+          else
+            a
+          end
+        end
+
+        def _static_wpnl a, n
+
+          # get the last N lines using your newline index
+
+          o = _stream_magnetics::Line_Sexp_Array_Stream_via_Newlines.new
+          d_a = @_newlines
+          len = d_a.length
+          last = len - 1
+          surplus = len - n
+          if 0 < surplus
+
+            d = surplus - 1
+            _st = Callback_.stream do
+              if d != last
+                d += 1
+                d_a.fetch d
+              end
+            end
+
+            _pos = d_a.fetch( d ) + 1  # change this at [#011]
+
+            o.newline_stream = _st
+            o.pos = _pos
+          else
+            self._B
+            o.pos = @_pos
+            o.newlines = d_a
+          end
+
+          o.string = @_big_string
+          _st = o.execute
+          _xa_a = _st.to_a
+          a[ 0, 0 ] = _xa_a
+          a
+        end
+
+        def write_the_next_N_line_sexp_arrays_into a, n
+
+          st = to_inner_line_sexp_array_stream
+          d = 0
+          stop = if -1 < n
+            -> do
+              n == d
+            end
+          else
+            self._ETC
+          end
+
+          begin
+            if stop[]
+              done = true
+              break
+            end
+            x = st.gets
+            x or break
+            a.push x
+            d += 1
+            redo
+          end while nil
+
+          if done
+            a
+          else
+            self._K
+          end
+        end
+
+        def to_inner_line_sexp_array_stream
+          if has_matches
+            _to_line_sexp_array_stream_when_matches
+          else
+            _to_line_sexp_array_stream_when_static
+          end
+        end
+
+        def ___to_line_stream_when_matches
+
+          _ = _to_line_sexp_array_stream_when_matches
+          _ = o::Line_stream_via_line_sexp_array_stream[ _ ]
+          _
+        end
+
+        def _to_line_sexp_array_stream_when_matches
+
+          o = _stream_magnetics
+          _ = o::Sexp_stream_via_matches_block[ self, @_big_string ]
           _ = o::Line_sexp_array_stream_via_sexp_stream[ _ ]
-          _ = o::Line_stream_via_line_sexp_array_stream[ _ ]
           _
         end
 
-        def __to_line_stream_when_static es
+        def __to_line_stream_when_static
 
-          o = Here_::Stream_Magnetics_
-          _ = o::Line_Sexp_Array_Stream_via_Newlines[ @_newlines, @_pos, es.string ]
-          _ = o::Line_stream_via_line_sexp_array_stream[ _ ]
-          _
+          _ = _to_line_sexp_array_stream_when_static
+          o::Line_stream_via_line_sexp_array_stream[ _ ]
         end
+
+        def _to_line_sexp_array_stream_when_static
+          o::Line_Sexp_Array_Stream_via_Newlines[ @_newlines, @_pos, @_big_string ]
+        end
+
+        def _stream_magnetics
+          Here_::Stream_Magnetics_
+        end
+
+        alias_method :o, :_stream_magnetics  # eek
 
         def next_match_controller_after__ d
 

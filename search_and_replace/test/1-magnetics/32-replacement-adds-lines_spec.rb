@@ -18,7 +18,7 @@ module Skylab::SearchAndReplace::TestSupport
           three
         HERE
 
-        es = build_edit_session_ _input, /(?:thre)?e\n/
+        es = build_edit_session_via_ _input, /(?:thre)?e\n/
         _mc1 = es.first_match_controller
         _mc2 = _mc1.next_match_controller
 

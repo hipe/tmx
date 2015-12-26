@@ -1,3 +1,5 @@
+[#013]       the context lines algorithm ..
+
 [#012]       a "tagged sexp node" node is (at writing) effectively a string
              plus a symbolic tag that indicates which one of three categories
              the string is (original, replacement, or newline sequence).

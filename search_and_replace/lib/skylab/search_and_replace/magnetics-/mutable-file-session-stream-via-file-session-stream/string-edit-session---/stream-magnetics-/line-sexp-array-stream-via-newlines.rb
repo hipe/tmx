@@ -12,16 +12,21 @@ module Skylab::SearchAndReplace
         class << self
           def [] a, d, s
             o = new
-            o.indexes = a
+            o.newlines = a
             o.pos = d
             o.string = s
-            o.sexp_symbol_for_context_strings = :orig_str
             o.execute
           end
         end  # >>
 
+        def initialize
+          @newline_stream = nil
+          @sexp_symbol_for_context_strings = nil
+        end
+
         attr_writer(
-          :indexes,
+          :newline_stream,
+          :newlines,
           :pos,
           :sexp_symbol_for_context_strings,
           :string,
@@ -29,16 +34,24 @@ module Skylab::SearchAndReplace
 
         def execute
 
-          s = @string ; sym = @sexp_symbol_for_context_strings
+          sym = @sexp_symbol_for_context_strings
+          if ! sym
+            sym = :orig_str
+          end
 
-          _ = Callback_::Stream.via_nonsparse_array @indexes
+          st = @newline_stream
+          if ! st
+            st = Callback_::Stream.via_nonsparse_array @newlines
+          end
+
+          str = @string
 
           last_newline = @pos - 1
 
-          _.map_by do | d |
+          st.map_by do | d |
             pos = last_newline + 1
             last_newline = d
-            [ [ sym, s[ pos ... d ] ], NEWLINE_SEXP_ ]
+            [ [ sym, str[ pos ... d ] ], NEWLINE_SEXP_ ]
           end
         end
       end

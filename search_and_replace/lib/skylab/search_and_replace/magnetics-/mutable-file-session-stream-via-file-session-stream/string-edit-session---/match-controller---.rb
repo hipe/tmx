@@ -11,7 +11,7 @@ module Skylab::SearchAndReplace
 
         def initialize d, md, block
           @_block = block
-          @_index = d
+          @match_index = d
           @replacement_is_engaged = false
           @matchdata = md
           @offsets = md.offset( 0 ).freeze
@@ -21,9 +21,9 @@ module Skylab::SearchAndReplace
 
         def to_contextualized_sexp_line_streams num_lines_before, num_lines_after
 
-          self._HMMM__how_to_etc
-          o = Home_::Build_Context_Scanners___.new
-          o.match_controllers = self
+          o = Here_::Build_Context_Streams___.new
+          o.block = @_block
+          o.match_controller = self
           o.num_lines_before = num_lines_before
           o.num_lines_after = num_lines_after
           o.execute
@@ -44,7 +44,7 @@ module Skylab::SearchAndReplace
         # -- navigation & intrinsics
 
         def next_match_controller
-          @_block.next_match_controller_after__ @_index
+          @_block.next_match_controller_after__ @match_index
         end
 
         def pos
@@ -56,9 +56,10 @@ module Skylab::SearchAndReplace
         end
 
         attr_reader(
-          :replacement_is_engaged,
+          :match_index,
           :matchdata,
           :offsets,
+          :replacement_is_engaged,
         )
       end
     end

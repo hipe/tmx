@@ -54,7 +54,7 @@ module Skylab::SearchAndReplace::TestSupport
       _STRING = "GAK\nGAK"
 
       define_method :_build_the_session do
-        build_edit_session_ _STRING, _GAK
+        build_edit_session_via_ _STRING, _GAK
       end
 
       it "one block - matches blocks are greedy" do
@@ -71,7 +71,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "two match controllers" do
         _es = _build_the_session
-        _a = match_controller_array_via_edit_session_ _es
+        _a = match_controller_array_for_ _es
         _a.length.should eql 2
       end
     end
@@ -104,7 +104,7 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       define_method :_build_the_session do
-        build_edit_session_ _STRING, _GAK
+        build_edit_session_via_ _STRING, _GAK
       end
 
       it "two blocks" do
@@ -138,7 +138,7 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       define_method :_build_the_session do
-        build_edit_session_ _STRING, _GAK
+        build_edit_session_via_ _STRING, _GAK
       end
 
       it "three blocks" do

@@ -2,29 +2,57 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - (60) multiline edit file session", wip: true do
+  describe "[sa] magnetics - (60) multiline edit file session" do
 
     TS_[ self ]
-    use :expect_event
+    use :memoizer_methods
+    use :magnetics_mutable_file_session  # (only for 1 assertion method)
 
-    it "when the filesize is under the limit - OK" do
+    shared_subject :_edit_session_array do
 
       _st = build_stream_for_single_path_to_file_with_three_lines_
 
-      file_session_stream = magnetics_::File_Session_Stream_via_Parameters.with(
+      _es_st = magnetics_::File_Session_Stream_via_Parameters.with(
         :upstream_path_stream, _st,
         :ruby_regexp, /e[\n!]/m,
         :for_interactive_search_and_replace,
       )
 
-      st = file_session_stream
-      file = st.gets
-      st.gets.should be_nil
+      _a = _es_st.to_a
 
-      _d = file.match_count
+      _a
+    end
+
+    it "this performer builds a stream of edit sessions, one per file" do
+
+      _edit_session_array.length.should eql 1
+    end
+
+    it "the one edit session of that stream has 3 match controllers.." do
+
+      _d = _match_controller_array.length
       _d.should eql 3
+    end
 
-      # etc ..
+    it "let's see if we can change the file (join 2 lines)" do
+
+      _mc = _match_controller_array.fetch 1
+      _mc.engage_replacement_via_string 'e - '
+
+      _exp = unindent_ <<-HERE
+        it's time for WAZOOZLE, see
+          fazzoozle my noozle - when i say "wazoozle" i mean WaZOOzle!
+      HERE
+
+      expect_output_ _edit_session, _exp
+    end
+
+    shared_subject :_match_controller_array do
+      match_controller_array_for_ _edit_session
+    end
+
+    def _edit_session
+      _edit_session_array.fetch 0
     end
   end
 end

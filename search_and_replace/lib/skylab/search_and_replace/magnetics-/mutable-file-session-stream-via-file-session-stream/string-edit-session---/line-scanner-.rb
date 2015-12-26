@@ -27,6 +27,10 @@ module Skylab::SearchAndReplace
           @_scn.pos
         end
 
+        def string
+          @_scn.string
+        end
+
         def advance_to_greatest_index_of_newline_less_than limit_d
 
           x = nil
@@ -94,7 +98,6 @@ module Skylab::SearchAndReplace
 
         NEWLINE_RX__ = /\n/
         NOTHING_ = nil
-        KEEP_PARSING_ = true
         STOP_PARSING_ = nil
       end
     end

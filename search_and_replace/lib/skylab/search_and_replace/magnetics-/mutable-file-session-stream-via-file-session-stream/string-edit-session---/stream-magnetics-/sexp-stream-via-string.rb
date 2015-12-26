@@ -44,13 +44,20 @@ module Skylab::SearchAndReplace
             orig_d = scn.pos
             d = scn.next_newline_before end_d
 
-            if d  # if there is a newline, it's a two-step trick:
-              p = -> do
+            if d
+              if orig_d == d  # newline only
+
                 p = main
                 NEWLINE_SEXP_
+
+              else  # some content followed by a newline is a two-step trick:
+                p = -> do
+                  p = main
+                  NEWLINE_SEXP_
+                end
+                _no_newlines_ = @string[ orig_d ... d ]
+                [ sym, _no_newlines_ ]
               end
-              _no_newlines_ = @string[ orig_d ... d ]
-              [ sym, _no_newlines_ ]
 
             elsif end_d == scn.pos  # we reached the end of the span
               p = EMPTY_P_

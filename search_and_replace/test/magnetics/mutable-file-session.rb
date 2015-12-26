@@ -49,6 +49,23 @@ module Skylab::SearchAndReplace::TestSupport
         fail "had no line #{ d }. (expecting #{ exp.inspect })"
       end
 
+      def assemble_ line_sexp_array
+
+        __these::Line_stream_via_line_sexp_array_stream::
+          Line_via_line_sexp_array___[ line_sexp_array ]
+      end
+
+      def distill_ line_sexp_array
+
+        line_sexp_array.map do | x |
+          if :zero_width == x.first
+            x[ 1 ]
+          else
+            x.first
+          end
+        end
+      end
+
       # --
 
       def expect_no_matches_
@@ -69,35 +86,27 @@ module Skylab::SearchAndReplace::TestSupport
 
       def build_common_state_ s, rx
 
-        es = build_edit_session_ s, rx
-        _a = match_controller_array_via_edit_session_ es
+        es = build_edit_session_via_ s, rx
+        _a = match_controller_array_for_ es
         Common_State___.new _a, es
-      end
-
-      def match_controller_array_via_edit_session_ es
-        # (debugging friendly..)
-        a = []
-        mc = es.first_match_controller
-        if mc
-          a.push mc
-          begin
-            mc = mc.next_match_controller
-            mc or break
-            a.push mc
-            redo
-          end while nil
-        end
-        a
       end
 
       Common_State___ = ::Struct.new :match_controller_array, :edit_session
 
-      def build_edit_session_ s, rx
-
-        _ = magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
-        _::String_Edit_Session___.new s, rx
-
+      def build_edit_session_via_ s, rx
+        _string_edit_session.new s, rx
       end
+
+      def __these
+        _string_edit_session::Stream_Magnetics_
+      end
+
+      def _string_edit_session
+        magnetics_::
+          Mutable_File_Session_Stream_via_File_Session_Stream::
+            String_Edit_Session___
+      end
+
     # -
   end
 end

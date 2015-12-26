@@ -29,7 +29,7 @@ module Skylab::SearchAndReplace
 
       def to_line_stream
         ___to_block_stream.expand_by do | block |
-          block.to_line_stream_for_ self
+          block.to_output_line_stream__
         end
       end
 
@@ -45,6 +45,8 @@ module Skylab::SearchAndReplace
       def first_match_controller
         @first_block.next_match_controller
       end
+
+      alias_method :next_match_controller, :first_match_controller  # for stream algos only
 
       attr_reader(
         :ordinal,

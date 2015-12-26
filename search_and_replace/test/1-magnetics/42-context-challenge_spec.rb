@@ -2,16 +2,17 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - (42) context challenge (FRAGMENTS)" do
+  describe "[sa] magnetics - (42) context challenge" do
 
     TS_[ self ]
-    use :expect_event
+    use :memoizer_methods
+    use :magnetics_DSL
 
-    context "replacements, context & output lines", wip: true do
+    context "many matches, many replacements, delimitation changed" do
 
-      it "viewing context - many matches, many replacements, delimitation changed" do
+      shared_input_ do
 
-        _input = unindent_( <<-HERE )
+        input_string unindent_ <<-HERE
           zero_then
           one_and
           two_and
@@ -19,79 +20,115 @@ module Skylab::SearchAndReplace::TestSupport
           four
         HERE
 
-        es = _subject _input, /_and$/
-        es.match_at_index( 0 ).set_replacement_string "\nAND"
-        es.match_at_index( 1 ).set_replacement_string "_2_and"
-        es.match_at_index( 2 ).set_replacement_string "\nAND"
-
-        bf, m, af = es.context_streams 2, 1, 2
-
-        bf.gets.to_flat_sexp.should eql(
-          [ :normal, 10, "one", :replacement, 0, 0, DELIMITER_ ] )
-
-        bf.gets.to_flat_sexp.should eql(
-          [ :replacement, 0, 1, "AND", :normal, 17, DELIMITER_ ] )
-
-        bf.gets.should be_nil
-
-        m.gets.to_flat_sexp.should eql(
-          [ :normal, 18, "two", :replacement, 1, 0, "_2_and", :normal, 25, DELIMITER_ ] )
-
-        m.gets.should be_nil
-
-        af.gets.to_flat_sexp.should eql(
-          [ :normal, 26, "three", :replacement, 2, 0, DELIMITER_ ] )
-
-        af.gets.to_flat_sexp.should eql(
-          [ :replacement, 2, 1, "AND", :normal, 35, DELIMITER_ ] )
-
-        af.gets.should be_nil
-
-        _expect_output es, unindent_( <<-HERE )
-          zero_then
-          one
-          AND
-          two_2_and
-          three
-          AND
-          four
-        HERE
+        regexp %r(_and$)
       end
 
-      it "repl has a repl before it, does not start at column 1, adds lines" do
+      context "replace all three" do
 
-        _input = unindent_( <<-O )
+        shared_subject :edit_session_ do
+
+          es = build_edit_session_
+          mc = match_controller_array_for_ es
+
+          mc[ 0 ].engage_replacement_via_string "\nAND"
+          mc[ 1 ].engage_replacement_via_string "_2_and"
+          mc[ 2 ].engage_replacement_via_string "\nAND"
+          es
+        end
+
+        it "(output looks right)" do
+
+          expect_output_ edit_session_, unindent_( <<-HERE )
+            zero_then
+            one
+            AND
+            two_2_and
+            three
+            AND
+            four
+          HERE
+        end
+
+        shared_subject :tuple_ do
+          _build_same_tuple
+        end
+
+        it "the line of" do
+
+          st = lines_during_
+          _1 = st.gets
+          _ = st.gets
+          _ and fail
+
+          distill_( _1 ).should eql(
+            [ :orig_str, :replacement_begin, :repl_str,
+              :replacement_end, :newline_sequence ] )
+
+        end
+
+        it "the two after (uses the replacement delineation)" do
+
+          st = lines_after_
+          _1 = st.gets
+          _2 = st.gets
+          st.gets and fail
+
+          assemble_( _1 ).should eql "AND\n"
+          assemble_( _2 ).should eql "four\n"
+        end
+
+        it "the two before (note the previous replace seq. spans 2 lines)" do
+
+          st = lines_before_
+          one = st.gets
+          two = st.gets
+          st.gets and fail
+
+          assemble_( one ).should eql "one\n"
+          distill_( one ).should eql(
+            [ :orig_str, :replacement_begin, :newline_sequence ] )
+
+          assemble_( two ).should eql "AND\n"
+          distill_( two ).should eql(
+            [ :repl_str, :replacement_end, :newline_sequence ] )
+        end
+      end
+    end
+
+    context "repl has a repl before it, does not start at column 1, adds lines" do
+
+      shared_input_ do
+
+        input_string unindent_ <<-HERE
           zip zonk zip
           zap zank zap
-        O
-        es = _subject _input, /\bz[aeiou]nk\b/i
+        HERE
 
-        es.gets_match.set_replacement_string "nourk 1\nnourk 2\nnourk 3"
-        es.gets_match.set_replacement_string "nelf 1\nnelf 2\nnelf 3"
-        es.gets_match.should be_nil
+        regexp %r(\bz[aeiou]nk\b)i
+      end
 
-        bf, m, af = es.context_streams 2, 1, 3
+      shared_subject :edit_session_ do
 
-        bf.gets.to_flat_sexp.should eql(
-          [ :replacement, 0, 8, "nourk 2\n" ] )
+        es = build_edit_session_
 
-        bf.gets.to_flat_sexp.should eql(
-          [ :replacement, 0, 16, "nourk 3", :normal, 8, " zip\n" ] )
+        _mc1 = es.first_match_controller
+        _mc1.engage_replacement_via_string "nourk 1\nnourk 2\nnourk 3"
 
-        bf.gets.should be_nil
+        _mc2 = _mc1.next_match_controller
+        _mc2.engage_replacement_via_string "nelf 1\nnelf 2\nnelf 3"
 
-        m.gets.to_flat_sexp.should eql(
-          [ :normal, 13, "zap ", :replacement, 1, 0, "nelf 1\n" ] )
+        _mc2.next_match_controller and fail
 
-        m.gets.to_flat_sexp.should eql(
-          [ :replacement, 1, 7, "nelf 2\n" ] )
+        es
+      end
 
-        m.gets.to_flat_sexp.should eql(
-          [ :replacement, 1, 14, "nelf 3", :normal, 21, " zap\n" ] )
+      shared_subject :tuple_ do
+        _build_same_tuple
+      end
 
-        af.gets.should be_nil
+      it "(output looks right)" do
 
-        _expect_output es, unindent_( <<-HERE )
+        expect_output_ edit_session_, unindent_( <<-HERE )
           zip nourk 1
           nourk 2
           nourk 3 zip
@@ -101,48 +138,92 @@ module Skylab::SearchAndReplace::TestSupport
         HERE
       end
 
-      it "viewing context - when many matches on 1 line & actual ctx is low" do
+      it "the line of - note it's three lines now. you get all three." do
 
-        _input = unindent_( <<-HERE )
+        for_ lines_during_ do
+          _ 'zap nelf 1'
+          _ 'nelf 2'
+          _ 'nelf 3 zap'
+        end
+      end
+
+      it "there are no two after" do
+
+        for_ lines_after_
+      end
+
+      it "the two before (ditto)" do
+
+        for_ lines_before_ do
+          _ 'nourk 2'
+          _ 'nourk 3 zip'
+        end
+      end
+    end
+
+    context "when many matches on one line and actual context is low" do
+
+      shared_input_ do
+
+        input_string unindent_ <<-HERE
           zo ZE zoo
           ZIM zam ZOM
           ziff ZUP zaff
         HERE
-        es = _subject _input, /\bZ[A-Z]+\b/
 
-        es.gets_match.set_replacement_string 'JE'
-        es.gets_match.set_replacement_string 'JIM'
-        es.gets_match.set_replacement_string 'JOM'
-        es.gets_match.set_replacement_string 'JUP'
+        regexp %r(\bZ[A-Z]+\b)
+      end
 
-        es.gets_match.should be_nil
+      shared_subject :edit_session_ do
 
-        bf, m, af = es.context_streams 2, 1, 2
-        bf.gets.to_flat_sexp.should eql(
-          [ :normal, 0, "zo ", :replacement, 0, 0, "JE", :normal, 5, " zoo\n" ] )
+        es = build_edit_session_
 
-        bf.gets.should be_nil
+        mc = match_controller_array_for_ es
+        mc[0].engage_replacement_via_string 'JE'
+        mc[1].engage_replacement_via_string 'JIM'
+        mc[2].engage_replacement_via_string 'JOM'
+        mc[3].engage_replacement_via_string 'JUP'
+        es
+      end
 
-        m.gets.to_flat_sexp.should eql(
-          [ :replacement, 1, 0, "JIM",
-            :normal, 13, " zam ",
-            :replacement, 2, 0, "JOM",
-            :normal, 21, "\n" ] )
-        m.gets.should be_nil
+      it "(content looks right)" do
 
-        af.gets.to_flat_sexp.should eql(
-          [ :normal, 22, "ziff ",
-            :replacement, 3, 0, "JUP",
-            :normal, 30, " zaff\n" ] )
-
-        af.gets.should be_nil
-
-        _expect_output es, unindent_( <<-HERE )
+        expect_output_ edit_session_, unindent_( <<-HERE )
           zo JE zoo
           JIM zam JOM
           ziff JUP zaff
         HERE
       end
+
+      shared_subject :tuple_ do
+        _build_same_tuple
+      end
+
+      it "the line of" do
+
+        for_ lines_during_ do
+          _ 'JIM zam JOM'
+        end
+      end
+
+      it "asked for two after, only got one" do
+
+        for_ lines_after_ do
+          _ 'ziff JUP zaff'
+        end
+      end
+
+      it "asked for two before, only got one" do
+
+        for_ lines_before_ do
+          _ 'zo JE zoo'
+        end
+      end
+    end
+
+    def _build_same_tuple
+      _mc = edit_session_.first_match_controller.next_match_controller
+      _mc.to_contextualized_sexp_line_streams 2, 2
     end
   end
 end

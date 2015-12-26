@@ -17,112 +17,139 @@ module Skylab::SearchAndReplace
 
         def execute
 
-          _ = Match_controller_stream_via_block___[ @_block ]  # assume 1
-
-          st = _.reduce_by do | mc |
-            mc.replacement_is_engaged
-          end
-
-          mc = st.gets
-
-          if mc
-            @_engaged_match_controller_stream = st
-            ___the_hard_way mc
-          else
-            self._WRONG
-            o = Stream_Magnetics_::Sexp_Stream_via_String.new
-            o.string = @_the_big_string
-            o.sexp_symbol_for_context_strings = :orig_str
-            o.pos = 0
-            o.end = -1
-            o.execute
-          end
-        end
-
-        def ___the_hard_way mc
-
-          p = nil
-
-          block_pos, block_end = @_block.offsets
-
-          after_repl = nil
-
-          repl = -> do
-            ___sexp_stream_via_match_then mc do
-              p = nil
-              after_repl[]
-            end
-          end
-
-          static = -> pos do
-            st = _build_sexp_stream_for_static_run pos, mc.pos
-            -> do
-              x = st.gets
-              if x then x else
-                p = repl[]
-                p[]
-              end
-            end
-          end
-
-          if block_pos == mc.pos  # the match occupies the first cel in the block
-            p = repl[]
-          else
-            # there is some static content we have to express before etc.
-            p = static[ block_pos ]
-          end
-
-          after_repl = -> do
-            # when you have reached the end of the replacement content
-
-            mc_end = mc.end
-            if block_end == mc_end
-              # is the end of the match also the end of the block?
-              p = EMPTY_P_ ; NOTHING_
-            else
-              mc = @_engaged_match_controller_stream.gets
-
-              if mc  # then we have another match ..
-
-                if mc_end == mc.pos
-                  self._A
-
-                else  # but we have some interceding content to express first
-                  p = static[ mc_end ]
-                  p[]
-                end
-              else
-                p = _build_sexp_stream_for_static_run mc_end, @_block.end
-                p[]
-              end
-            end
-          end
-
+          @_current_pos, @_block_end = @_block.offsets
+          @_match_controller_stream = __build_match_controller_stream
+          @_mc = @_match_controller_stream.gets  # assume one
+          _on_unclassified_match
           Callback_.stream do
-            p[]
+            @_p[]
           end
         end
 
-        def ___sexp_stream_via_match_then mc, & after_p
+        def _seek_next_match
 
-          s = mc.replacement_value
-          if s
-            sexp_st = Stream_Magnetics_::Sexp_Stream_via_String[ :repl_str, s ]
+          @_mc = @_match_controller_stream.gets
+          if @_mc  # then we have another match ..
+            _on_unclassified_match
           else
-            self._C
+            # (hi.)
+            if @_block_end == @_current_pos
+              self._FINE_EASY_JUST_END_IT
+            else
+              _ = _sexp_stream_for_static_run @_current_pos, @_block_end
+              @_p = _ ; nil
+            end
           end
+        end
 
-          -> do
+        def _on_unclassified_match
+
+          d = @_mc.pos
+          if @_current_pos == d  # then render this match now
+            _on_match
+          else  # else the block starts with some static
+            _on_static_then @_current_pos, d do
+              @_current_pos = d
+              _on_match
+            end
+          end
+        end
+
+        def _on_match
+
+          if @_mc.replacement_is_engaged
+            _on_engaged_match
+          else
+            _on_disengaged_match
+          end
+        end
+
+        def _on_engaged_match
+          @_p = -> do
+            ___on_engaged_match_body
+            # before we output the content, we will output meta-data:
+            [ :zero_width, :replacement_begin, @_mc.match_index ]
+          end ; nil
+        end
+
+        def ___on_engaged_match_body
+          s = @_mc.replacement_value
+          if s
+            ___on_trueish_replacement s
+          else
+            self._DESIGN_ME_replacement_value_was_falseish_dot_dot_
+            # .. is this an error or do we take it to mean "no content"
+            # (i.e the empty string)? we'll decide when it comes up.
+          end
+        end
+
+        def ___on_trueish_replacement s
+          # produce a gets-proc that produces sexp nodes for the replacement.
+          sexp_st = Stream_Magnetics_::Sexp_Stream_via_String[ :repl_str, s ]
+          @_p = -> do
             x = sexp_st.gets
             if x
               x  # you got a[nother] sexp from the replacement value
             else
-              after_p[]  # the replacement content has been exhausted.
+              d = @_mc.match_index
+              _after_match
+              [ :zero_width, :replacement_end, d ]
             end
+          end ; nil
+        end
+
+        def _on_disengaged_match
+          @_p = -> do
+            d = @_mc.match_index
+            ___on_disengaged_match_body
+            [ :zero_width, :disengaged_match_begin, d ]
+          end ; nil
+        end
+
+        def ___on_disengaged_match_body
+
+          _on_static_then( * @_mc.offsets ) do
+
+            @_p = -> do
+
+              d = @_mc.match_index
+              _after_match
+              [ :zero_width, :disengaged_match_end, d ]
+            end ; nil
           end
         end
 
-        def _build_sexp_stream_for_static_run beg, end_
+        def _after_match
+
+          # when you have reached the end of either sort of match
+
+          @_current_pos = @_mc.end
+
+          if @_block_end == @_current_pos  # end of match is also end of block
+            @_p = EMPTY_P_
+          else
+            _seek_next_match
+          end
+          NIL_
+        end
+
+        def _on_static_then d, d_, & after_p
+
+          st = _sexp_stream_for_static_run d, d_
+          @_p = -> do
+            x = st.gets
+            if x
+              x
+            else
+              @_p = nil
+              _ = after_p[]
+              _ and self._SANITY
+              @_p[]
+            end
+          end ; nil
+        end
+
+        def _sexp_stream_for_static_run beg, end_
 
           o = Stream_Magnetics_::Sexp_Stream_via_String.new
           o.string = @_the_big_string
@@ -132,9 +159,8 @@ module Skylab::SearchAndReplace
           o.execute
         end
 
-        Match_controller_stream_via_block___ = -> block do
-
-          curr = block
+        def __build_match_controller_stream
+          curr = @_block
           Callback_.stream do
             curr = curr.next_match_controller
             curr

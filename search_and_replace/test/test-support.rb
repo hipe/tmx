@@ -94,6 +94,21 @@ module Skylab::SearchAndReplace::TestSupport
       Home_::Magnetics_
     end
 
+    # -- assertion (shared)
+
+    def match_controller_array_for_ es
+      match_controller_stream_for_( es ).to_a
+    end
+
+    def match_controller_stream_for_ es
+
+      curr = es
+      Callback_.stream do
+        curr = curr.next_match_controller
+        curr
+      end
+    end
+
     # -- hook-ins/outs
 
     # ~ [ca] "expect event"
@@ -111,13 +126,11 @@ module Skylab::SearchAndReplace::TestSupport
 
     # -- support
 
-    define_method :unindent_, -> do
-      rx = %r(^[ ]+)
-      -> s do
-        s.gsub! rx, EMPTY_S_
-        s
-      end
-    end.call
+    def unindent_ s  # mutates original! and results in it!
+      Home_.lib_.basic::String.mutate_by_unindenting s
+      s
+    end
+
   # -
 
   Memoizer_Methods = -> tcc do

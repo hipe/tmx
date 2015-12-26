@@ -10,7 +10,7 @@ module Skylab::SearchAndReplace::TestSupport
 
     it "minimal performance" do
 
-      es = build_edit_session_ 'a', /a/
+      es = build_edit_session_via_ 'a', /a/
 
       _mc = es.first_match_controller
 
@@ -28,7 +28,7 @@ module Skylab::SearchAndReplace::TestSupport
 
     it "replace the first of two" do
 
-      es = build_edit_session_ "GAK and GAK\n", /\bgak\b/i
+      es = build_edit_session_via_ "GAK and GAK\n", /\bgak\b/i
       _mc = es.first_match_controller
       _mc.engage_replacement_via_string 'wak'
 
