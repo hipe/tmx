@@ -12,6 +12,25 @@ module Skylab::SearchAndReplace
     end
   end  # >>
 
+  module CLI
+    class << self
+      def highlighting_expression_agent_instance
+        Home_::Modalities::CLI.highlighting_expression_agent_instance
+      end
+    end  # >>
+  end
+
+  rx = /(?:\r?\n|\r)\z/
+  Mutate_by_my_chomp_ = -> mutable_s do
+    md = rx.match mutable_s
+    if md
+      self._COVER_ME
+      s = md[ 0 ]
+      mutable_s[ ( - s.length )..-1 ] = EMPTY_S_
+      s
+    end
+  end
+
   module API
 
     class << self
@@ -24,6 +43,10 @@ module Skylab::SearchAndReplace
         Home_.lib_.zerk.call x_a, root
       end
     end  # >>
+  end
+
+  Parameters_ = -> h do
+    Home_.lib_.fields::Parameters[ h ]
   end
 
   class Root_Autonomous_Component_System___
@@ -206,99 +229,22 @@ module Skylab::SearchAndReplace
 
   if false  # #todo
 
-    # ~ the agents
-
-    # Zerk_ = Home_.lib_.zerk
-
-    module Zerk_
-      # temporary while we wait for the rewrite
-      Branch_Node = ::Class.new
-      Common_Node = ::Class.new
-      Field = ::Class.new
-      Up_Button = ::Class.new
-      Quit_Button = ::Class.new
-      NONE_S = nil
-    end
-
-    class Zerk_Tree < Branch_
-
-      class << self
-
-        def name_function
-          @___nf ||= Callback_::Name.via_variegated_symbol :'search_&_replace'
-        end
-      end
-
-      def initialize x
-        super
-
         # something somewhere doesn't like a relative path for the below.
         # ideally, relative paths would "just work" for the rest of the
         # system just like abspaths do, so this is a workaround for now
 
         @work_dir = ::File.join ::Dir.pwd, '.search-and-replace'
-      end
-
-      def prepare_for_focus
-
-        @children = [
-          @grep_rx_field = Grep_RX_Field__.new( self ),
-          @regexp_field = Search_Field__.new( self ),
-          @replace_field = Replace_Field__.new( self ),
-          @dirs_field = Dirs_Field__.new( self ),
-          # @files_field = Files_Field__.new( self ),
-          # @preview_node = Preview_Node__.new( self ),
-          Quit_Button_.new( self ) ]
-
-        @preview_node.orient_self
-
-        @is_first_display = true
-
-        if @is_interactive
-          retrieve_values_from_FS_if_exist
-        end
-
-        ACHIEVED_
-      end
-
-      def display_separator
-        if @is_first_display
-          @is_first_display = false
-        else
-          super
-        end
-        nil
-      end
 
       def display_description
         @y << "(display, edit, and execute the details of your search)"
         nil
       end
 
-    public
-
-      attr_reader :dirs_field, :files_field, :grep_rx_field, :regexp_field,
-        :replace_field, :work_dir
-
-      def receive__path__ x  # exeriment for API
-        @preview_node.receive_path__ x
-      end
-    end
-
-    class Grep_RX_Field__ < Field_
-
-      def initialize x
-        super
-        @s = nil
-      end
-
-      def to_body_item_value_string
-        if @s
-          @s
-        else
+      def xx
           "(defaults to the same pattern as below)"
-        end
       end
+
+      # #description_for:egrep_pattern
 
       def display_description
         @serr.puts
@@ -333,59 +279,7 @@ module Skylab::SearchAndReplace
         @y << nil
       end
 
-      def know_via_nonblank_mutable_string s
-        marshal_load s
-      end
-
-      def against_nonempty_polymorphic_stream stream
-        against_nonempty_polymorphic_stream_assume_string stream
-      end
-
-      def marshal_load s
-        @s = s
-        ACHIEVED_
-      end
-
-      def value_is_known
-        ! @s.nil?
-      end
-
-      def when_entered_nonzero_length_blank_string
-        when_deleted
-      end
-
-      def unknow_value
-        @s = nil
-        ACHIEVED_
-      end
-
-      def to_marshal_pair
-        if @s
-          Callback_::Pair.via_value_and_name( @s, name_symbol )
-        end
-      end
-
-      def value_string
-        @s
-      end
-    end
-
-    class Search_Field__ < Field_
-
-      def initialize x
-        @rx = nil
-        super
-      end
-
-      NOUN___ = 'search regex'
-
-      def to_body_item_value_string
-        if @rx
-          @rx.inspect
-        else
-          NONE_S_
-        end
-      end
+      # #description_for:ruby_regexp
 
       def display_description
         @y << nil
@@ -395,72 +289,7 @@ module Skylab::SearchAndReplace
         @y << nil
       end
 
-      def know_via_nonblank_mutable_string s
-        @rx = ::Regexp.new s
-        ACHIEVED_
-      rescue ::RegexpError => @e
-        _ = Callback_::Name.via_module( @e.class ).as_human
-        @y << "#{ _ }: #{ @e.message }"
-        PROCEDE_
-      end
-
-      def against_nonempty_polymorphic_stream stream
-        @rx = stream.gets_one
-        ACHIEVED_
-      end
-
-      def marshal_load s, & p
-
-        @rx = Home_.lib_.basic::Regexp.marshal_load s do | * i_a, & ev_p |
-
-          if :error == i_a.first
-            p[ wrap_marshal_load_event ev_p[] ]
-            UNABLE_
-          end
-        end
-        @rx and ACHIEVED_
-      end
-
-      def to_marshal_pair
-        if @rx
-          Callback_::Pair.via_value_and_name( @rx.inspect, name_symbol )
-        end
-      end
-
-      def value_is_known
-        ! @rx.nil?
-      end
-
-      def when_entered_nonzero_length_blank_string
-        when_deleted
-      end
-
-      def unknow_value
-        @rx = nil
-        ACHIEVED_
-      end
-
-      # ~ for children
-
-      def regexp
-        @rx
-      end
-    end
-
-    class Replace_Field__ < Field_
-
-      def initialize x
-        @o = nil
-        super
-      end
-
-      def to_body_item_value_string
-        if @o
-          @o.as_text
-        else
-          NONE_S_
-        end
-      end
+      # #description_for:replacement_expression
 
       def display_description
         @y << nil
@@ -473,93 +302,7 @@ module Skylab::SearchAndReplace
         @y << nil
       end
 
-      def know_via_nonblank_mutable_string s
-
-        _oes_p = handle_unsigned_event_selectively
-
-        @o = _build_replace_function_via_string( s, & _oes_p )
-
-        @o ? ACHIEVED_ : UNABLE_
-      end
-
-      def against_nonempty_polymorphic_stream st
-
-        if st.current_token.respond_to? :call
-          receive_matchdata_values = st.gets_one
-          @o = -> md do
-            receive_matchdata_values[ * md.captures ]
-          end
-          ACHIEVED_
-        else
-          against_nonempty_polymorphic_stream_assume_string st
-        end
-      end
-
-      def marshal_load s, & ep
-
-        _oes_p = -> *, & ev_p do
-          _ev = ev_p[]
-          ep[ _ev ]
-          UNABLE_
-        end
-
-        @o = _build_replace_function_via_string s, & _oes_p
-
-        @o ? ACHIEVED_ : UNABLE_
-      end
-
-      def _build_replace_function_via_string s, & oes_p
-
-        _work_dir = work_dir
-
-        _ = S_and_R_::Magnetics_::Replace_Function_via_String_and_Work_Dir[
-          s, _work_dir, & _oes_p ]
-
-        _
-      end
-
-      def to_marshal_pair
-        if @o
-          Callback_::Pair.via_value_and_name( @o.marshal_dump, name_symbol )
-        end
-      end
-
-      def value_is_known
-        ! @o.nil?
-      end
-
-      def when_entered_nonzero_length_blank_string
-        when_deleted
-      end
-
-      def unknow_value
-        @o = nil
-        ACHIEVED_
-      end
-
-      # ~ for children
-
-      def replace_function
-        @o
-      end
-    end
-
-    NONE_S = Zerk_::NONE_S
-
-    module List_Hack_Methods__
-
-      def initialize x
-        @a = nil
-        super
-      end
-
-      def to_body_item_value_string
-        if @a
-          @a.join SPACE_
-        else
-          NONE_S
-        end
-      end
+      # -- #list_parsing
 
       def display_description
         @y << nil
@@ -600,38 +343,7 @@ module Skylab::SearchAndReplace
         end
       end
 
-      def marshal_load s
-        s.strip!
-        a = s.split SOME_SPACE_RX_
-        if a.length.zero?  # maybe sanity, maybe we use this above
-          @a = nil
-        else
-          @a = a
-        end
-        ACHIEVED_
-      end
-
-      def to_marshal_pair
-        if @a
-          Callback_::Pair.via_value_and_name( @a.join( SPACE_ ), name_symbol )
-        end
-      end
-
-      def value_is_known
-        ! @a.nil?
-      end
-
-      def when_entered_nonzero_length_blank_string
-        when_deleted
-      end
-
-      def unknow_value
-        @a = nil
-        ACHIEVED_
-      end
-
       SOME_SPACE_RX_ = /[[:space:]]+/
-    end
 
     THING_ABOUT_SPACES__ =
       "for now, multiple values can be separated with one or more spaces."
@@ -642,16 +354,6 @@ module Skylab::SearchAndReplace
 
     LIST_HACK_SEPARATOR_RX__ = /[ \t]+/
 
-    class Dirs_Field__ < Field_
-
-      include List_Hack_Methods__
-
-      def path_list
-        @a
-      end
-    end
-
-    EMPTY_A_ = [].freeze
     EMPTY_RX_ = /\A[[:space:]]*\z/
     FINISHED_ = nil
     NONE_S_ = Zerk_::NONE_S
@@ -659,15 +361,6 @@ module Skylab::SearchAndReplace
   end
 
   Callback_ = ::Skylab::Callback
-
-  On_event_selectively_ = -> * i_a, & ev_p do
-
-    # a default event handler for when none is provided but one is required
-
-    if :info != i_a.first
-      raise ev_p[].to_exception
-    end
-  end
 
   Require_ACS_ = Callback_::Lazy.call do
     ACS_ = Lib_::ACS[]
@@ -712,6 +405,7 @@ module Skylab::SearchAndReplace
   Home_ = self
   IDENTITY_ = -> x { x }
   NEWLINE_ = "\n"
+  NOTHING_ = nil
   NIL_ = nil
   SPACE_ = ' '
   UNABLE_ = false

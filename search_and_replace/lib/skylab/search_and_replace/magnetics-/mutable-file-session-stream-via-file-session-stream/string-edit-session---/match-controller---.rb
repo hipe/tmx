@@ -17,6 +17,17 @@ module Skylab::SearchAndReplace
           @offsets = md.offset( 0 ).freeze
         end
 
+        # -- [#014] only for tests
+
+        def dup_for_ block
+          dup.___init_dup block
+        end
+
+        def ___init_dup block
+          @_block = block
+          self
+        end
+
         # -- c15n (contextualization)
 
         def to_contextualized_sexp_line_streams num_lines_before, num_lines_after
@@ -31,9 +42,35 @@ module Skylab::SearchAndReplace
 
         # -- engagement
 
+        def engage_replacement & oes_p
+
+          _proc_like = @_block.replacement_function_
+
+          presumably_string = _proc_like.call(
+            @matchdata,  # (#we-might pass a custom structure instead..)
+            & oes_p )
+
+          if presumably_string
+
+            # #we-might emit something here announcing the change
+
+            engage_replacement_via_string presumably_string
+            ACHIEVED_
+          else
+            self._COVER_ME
+          end
+        end
+
         def engage_replacement_via_string s
           @replacement_is_engaged = true  # ok if redundant
           @_replacement = Callback_::Known_Known[ s ]
+          NIL_
+        end
+
+        def disengage_replacement  # assume is engaged
+
+          remove_instance_variable :@_replacement
+          @replacement_is_engaged = false
           NIL_
         end
 

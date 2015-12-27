@@ -352,19 +352,26 @@ module Skylab::System
 
       def copy_r path, dest_basename=nil  # no dry run.
 
-        self._ETC
+        self._WORKED_AT_WRITING_but_not_covered  # [se] used then didn't use
 
         _dest_path = if dest_basename
-          join( dest_basename )
+          join( dest_basename ).to_path
         else
-          self
-        end.to_path
+          self.path
+        end
 
-        _fuc = System.services.filesystem.file_utils_controller do
+        _FS = Home_.services.filesystem
 
+        _fuc = _FS.file_utils_controller do | fu_message |
+          # (hi.)
+          if @be_verbose
+            @debug_IO.puts fu_message
+          end
         end
 
         _x = _fuc.cp_r path, _dest_path, verbose: true
+
+        _x  # (is nil)
       end
 
       def copy src_path_s, dest_basename=nil

@@ -75,10 +75,9 @@ module Skylab::SearchAndReplace::TestSupport
     context "see the files matched by the find command" do
 
       call_by_ do
-        _path = TS_._COMMON_DIR
 
         call_(
-          :path, _path,
+          :path, common_haystack_directory_,
           :filename_pattern, '*-line*.txt',
           :search, :files_by_find,
         )
@@ -105,11 +104,9 @@ module Skylab::SearchAndReplace::TestSupport
 
       call_by_ do
 
-        _path = TS_._COMMON_DIR
-
         call_(
           :ruby_regexp, /\bwazoozle\b/i,
-          :path, _path,
+          :path, common_haystack_directory_,
           :filename_pattern, '*-line*.txt',
           :search,
           :files_by_grep,

@@ -15,7 +15,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         call_(
           :ruby_regexp, /\b(with one line|wazoozle)\b/i,
-          :path, TS_._COMMON_DIR,
+          :path, common_haystack_directory_,
           :filename_patterns, EMPTY_A_,
           :search,
           :matches,
@@ -83,11 +83,12 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "if highlighting is turned on, you can see where the match is" do
 
-        _match = _matches.fetch 2
+        _read_only_match = _matches.fetch 2
 
-        _m_ = _match.dup_with :do_highlight, true
+        _expag = Home_::CLI.highlighting_expression_agent_instance
+        _st = _read_only_match.to_line_stream_under _expag
 
-        lines = _m_.to_line_stream.to_a
+        lines = _st.to_a
         1 == lines.length or fail
 
         _x_a = Home_.lib_.brazen::CLI_Support::Styling.parse_styles(

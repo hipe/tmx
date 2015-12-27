@@ -97,7 +97,6 @@ module Skylab::SearchAndReplace
         attr_reader :_scn  # shh
 
         NEWLINE_RX__ = /\n/
-        NOTHING_ = nil
         STOP_PARSING_ = nil
       end
     end

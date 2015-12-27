@@ -4,22 +4,24 @@ module Skylab::SearchAndReplace
 
     # #frontier(s) here (and prototyping eyeblood):
     #
-    #   • there are [0..] "dynamic compounds" - each such one's associations
+    #   • subject is a  "dynamic compound" - its associations
     #     are determined entirely at "runtime" (as opposed to by method
-    #     definitions)
+    #     definitions).
     #
-    #   • there are [0..] "component as model"s - each such one defines
+    #   • subject is a "component as model"s - it defines
     #     instance methods that are usually defined as methods on the class
     #     of same. it's a "hybrid" ..
 
-    def initialize comp_a, & oes_p
+    def initialize comp_a, & _IGNORING_oes_P
 
-      # what interface nodes are active are determined from above.
+      # which interface nodes are active is determined from above.
       # #todo is it as open issue that this might go stale & out of sync w/
       # UI, but we can't cover that until much later..
 
       @_component_a = comp_a
-      @_oes_p = oes_p
+
+      @functions_directory = nil
+      @replacement_expression = nil
     end
 
     # .. you want it to look like a *compound* node so the parser recurses ..
@@ -30,9 +32,12 @@ module Skylab::SearchAndReplace
 
     def to_stream_for_component_interface
 
+      # for the components dynamically injected to us from above,
+      # for now we must manaully build the associations for them
+
       _st = Callback_::Stream.via_nonsparse_array @_component_a
 
-      _st.map_by do | component |
+      _from_above = _st.map_by do | component |
 
         _nf = component.name_
 
@@ -42,6 +47,74 @@ module Skylab::SearchAndReplace
         Callback_::Qualified_Knownness.via_value_and_association(
           component, _asc )
       end
+
+      _from_above.concat_by ___my_additional_associations
+    end
+
+    def ___my_additional_associations
+
+      ACS_::For_Interface::Infer_stream[ self ]
+    end
+
+    def __replacement_expression__component_association
+
+      # always from this frame the caller has the ability to specify a
+      # replacement expression. (there's no real reason we don't add this
+      # fieldlike component up above like others except for the "feeling"
+      # that it belongs here.)
+
+      -> st, & pp do
+        if st.unparsed_exists
+          Callback_::Known_Known[ st.gets_one ]
+        end
+      end
+    end
+
+    def __replace__component_association
+
+      if @replacement_expression
+
+        -> st, & pp do
+          if st.no_unparsed_exists
+            __build_replacement_bound_call_wrapped_value( & pp )
+          else
+            self._RIDE_THIS_50_50_its_OK
+          end
+        end
+      end
+    end
+
+    def __functions_directory__component_association
+
+      -> st do
+        if st.unparsed_exists
+          Callback_::Known_Known[ st.gets_one ]
+        end
+      end
+    end
+
+    def __build_replacement_bound_call_wrapped_value & pp
+
+      # because we don't need (or want) a dedicated class for this buttonish
+      # (although the sibling buttons have one), we need to wrap our call to
+      # the actual operation twice: once to be a bound call (because buttons)
+      # and once to be a known known (because ACS).
+
+      dependency = @_component_a.fetch( -1 )
+        # yikes - randomly access a volatile UI structure to get a dependency
+
+      if ! dependency.respond_to? :to_mutable_file_session_stream
+        self._HARDCODED_OFFSET_CHANGED
+      end
+
+      o = Home_::Interface_Models_::Replace.new( & pp )
+      o.functions_directory = @functions_directory
+      o.streamer = dependency
+      o.replacement_expression = @replacement_expression
+
+      _bc = Callback_::Bound_Call[ nil, o, :to_file_session_stream ]
+
+      Callback_::Known_Known[ _bc ]
     end
 
     Require_ACS_[]

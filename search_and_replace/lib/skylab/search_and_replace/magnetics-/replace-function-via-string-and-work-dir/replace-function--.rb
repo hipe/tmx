@@ -4,8 +4,8 @@ module Skylab::SearchAndReplace
 
       class Replace_Function__
 
-        def initialize * a
-          @function_a, @on_event_selectively = a
+        def initialize a
+          @function_a = a
         end
 
         def call md

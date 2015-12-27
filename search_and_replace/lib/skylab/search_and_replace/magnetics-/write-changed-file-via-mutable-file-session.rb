@@ -1,6 +1,9 @@
+self._NOT_USED
+
 module Skylab::SearchAndReplace
 
     class Magnetics_::Write_any_changed_file
+
 
       Callback_::Actor.call( self, :properties,
         :edit_session,
@@ -83,5 +86,4 @@ module Skylab::SearchAndReplace
         :path, nil, :is_dry_run, nil, :ok, true
 
     end
-  end
 end

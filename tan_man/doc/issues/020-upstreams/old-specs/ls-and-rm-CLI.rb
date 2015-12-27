@@ -8,7 +8,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph::Remote::List__
 
   extend TestSupport_::Quickie
 
-  describe "[ts] CLI actions graph remote list, remove", wip: true do
+  describe "[ta] CLI actions graph remote list, remove", wip: true do
 
     extend TS_
 

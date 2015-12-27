@@ -27,10 +27,14 @@ module Skylab::Fields
       @_h = h
     end
 
-    def symbols sym
+    def symbols * sym
 
-      @_indexed ||= _index
-      @_symbols_under_ad_hod_classification[ sym ]
+      if sym.length.zero?
+        @_h.keys
+      else
+        @_indexed ||= _index
+        @_symbols_under_ad_hod_classification[ * sym ]
+      end
     end
 
     def write_ivars me, x_a

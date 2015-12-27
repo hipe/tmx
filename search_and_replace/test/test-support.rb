@@ -25,6 +25,8 @@ module Skylab::SearchAndReplace::TestSupport
 
   extend TestSupport_::Quickie
 
+  TestSupport_::Memoization_and_subject_sharing[ self ]
+
   # -
 
     Use_method___ = -> sym do
@@ -45,26 +47,9 @@ module Skylab::SearchAndReplace::TestSupport
 
     # -- setup
 
-    def start_tmpdir_
+    dangerous_memoize :the_wazizzle_worktree_ do
 
-      td = memoized_tmpdir_
-
-      td.prepare
-
-      @tmpdir = td.new_with(
-        :path, td.join( 'haha-dir' ).to_path,
-        :be_verbose, do_debug,
-        :debug_IO, debug_IO )
-      nil
-    end
-
-    def to_tmpdir_add_wazoozle_file_
-
-      @tmpdir.write 'ok-whatever-wazoozle.txt', unindent_( <<-O )
-        ok oh my geez --> HAHA <--
-      O
-
-      NIL_
+      my_fixture_tree_ '3-the-wazizzle-worktree'
     end
 
     def build_stream_for_single_path_to_file_with_three_lines_
@@ -74,8 +59,18 @@ module Skylab::SearchAndReplace::TestSupport
       Callback_::Stream.via_item _path
     end
 
-    def self._COMMON_DIR
+    def common_haystack_directory_
       TestSupport_::Fixtures.files_path
+    end
+
+    dangerous_memoize :common_functions_dir_ do
+
+      my_fixture_tree_(
+        "2-has-hidden-workspace-with-stfu-omg-function/#{
+          }.search-and-replace/functions" )
+
+      # #pending-rename: the above path no longer needs
+      # to be so deep, nor in a hidden dotfile directory
     end
 
     def my_fixture_tree_ entry_s
@@ -94,6 +89,12 @@ module Skylab::SearchAndReplace::TestSupport
       Home_::Magnetics_
     end
 
+    memoize :no_events_ do
+      -> * i_a, & ev_p do
+        ::Kernel.fail "no: #{ i_a.inspect }"
+      end
+    end
+
     # -- assertion (shared)
 
     def match_controller_array_for_ es
@@ -109,6 +110,13 @@ module Skylab::SearchAndReplace::TestSupport
       end
     end
 
+    # ~ string-related assertion assistance
+
+    def unindent_ s  # mutates original! and results in it!
+      Home_.lib_.basic::String.mutate_by_unindenting s
+      s
+    end
+
     # -- hook-ins/outs
 
     # ~ [ca] "expect event"
@@ -119,16 +127,9 @@ module Skylab::SearchAndReplace::TestSupport
 
     # ~ [br] "expect interactive"
 
-    define_method :interactive_bin_path, ( Callback_::Lazy.call do
+    memoize :interactive_bin_path do
       self._REDO
       ::File.join TS_._MY_BIN_PATH, 'tmx-beauty-salon search-and-r'
-    end )
-
-    # -- support
-
-    def unindent_ s  # mutates original! and results in it!
-      Home_.lib_.basic::String.mutate_by_unindenting s
-      s
     end
 
   # -

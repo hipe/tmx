@@ -32,7 +32,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         it "(the replacement looks good)" do
 
-          expect_output_ edit_session_, unindent_( <<-HERE )
+          expect_edit_session_output_ unindent_( <<-HERE )
             line 1
             line 2
             ohai
@@ -115,7 +115,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         it "(the replacement looks good)" do
 
-          expect_output_ edit_session_, unindent_( <<-HERE )
+          expect_edit_session_output_ unindent_( <<-HERE )
             line 1
             line 2
             yerp

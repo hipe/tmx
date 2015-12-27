@@ -1,58 +1,75 @@
 module Skylab::SearchAndReplace
 
-    class Magnetics_::Replace_Function_via_String_and_Work_Dir < Callback_::Actor::Dyadic
+  class Magnetics_::Replace_Function_via_String_and_Work_Dir < Callback_::Actor::Dyadic
 
-      def initialize string, work_dir, & oes_p
+    def initialize string, functions_dir, & oes_p
 
-        @a = []
-        @on_event_selectively = oes_p
-        @scn = Home_.lib_.string_scanner.new string
-        @work_dir = work_dir
-      end
+      @_a = []
+      @functions_dir = functions_dir
+      @_scn = Home_.lib_.string_scanner.new string
 
-      def execute
-        @ok = true
-        @result = nil
-        until @scn.eos?
-          normal = @scn.scan NORMAL_RX__
-          open = @scn.skip OPEN_RX__
-          if normal
-            process_normal_mutable_string normal or break
-          end
-          if open
-            parse_replacement_expression or break
-          elsif ! normal
-            self._SANITY
-          end
+      @_oes_p = oes_p
+    end
+
+    def execute
+      _ok = ___parse
+      _ok && Self_::Replace_Function__.new( @_a )
+    end
+
+    def ___parse
+
+      ok = true
+      scn = @_scn
+
+      until scn.eos?
+
+        d = scn.pos
+        normal = scn.scan NORMAL_RX__
+        open = scn.skip OPEN_RX__
+        d == scn.pos and self._SANITY
+
+        if normal
+          ok = ___process_normal_mutable_string normal
+          ok or break
         end
-        @ok and flush
-        @result
+
+        if open
+          ok = __parse_replacement_expression
+          ok or break
+        end
       end
+      ok
+    end
 
       NORMAL_RX__ = /(?:(?!\{\{).)+/m
 
       OPEN_RX__ = /{{/
 
-      def process_normal_mutable_string string
-        ok = true
-        string.gsub! ETC_RX__ do
-          s = $~[ 1 ]
-          s and p = UNESCAPE_OK_MAP__[ s.getbyte 0 ]
-          if p
-            p[ s ]
-          else
-            @on_event_selectively.call :error, :invalid_escape_sequence, s  # #open :+[#br-066]
-            ok = false
-            break
-          end
+    def ___process_normal_mutable_string string
+
+      ok = true
+
+      string.gsub! ETC_RX__ do
+
+        s = $~[ 1 ]
+        if s
+          p = UNESCAPE_OK_MAP__[ s.getbyte 0 ]
         end
-        if ok
-          @a.push Normal_String__.new string
-          ACHIEVED_
+
+        if p
+          p[ s ]
         else
-          @ok = ok
+          ok = ___when_invalid_escape_sequence s
+          break
         end
       end
+
+      if ok
+        _add_normal_string string
+      else
+        ok
+      end
+    end
 
       ETC_RX__ = /\\(.)?/
 
@@ -61,99 +78,121 @@ module Skylab::SearchAndReplace
         'n'.getbyte( 0 ) => -> _ { "\n" },
         't'.getbyte( 0 ) => -> _ { "\t" } }
 
-      def add_normal_string s
-        @a.push Normal_String__.new s ; nil
-      end
+    def ___when_invalid_escape_sequence s
 
-      def parse_replacement_expression
-        @scn.skip WHITE_RX_
-        if @scn.skip DOLLA_RX__
-          parse_substitution_or_etc
-        elsif @scn.skip LITERAL_OPEN_EXPRESSION_RX__
-          parse_literal_open_expression
-        else
-          expected :capture_reference, OPEN_BRACE_EXPRESSON__
-        end
+      @_oes_p.call :error, :invalid_escape_sequence, s  # #open #[#br-066]
+      UNABLE_
+    end
+
+    def __parse_replacement_expression
+
+      @_scn.skip WHITE_RX_
+
+      if @_scn.skip DOLLA_RX__
+        __parse_magic
+
+      elsif @_scn.skip LITERAL_OPEN_EXPRESSION_RX__
+        ___parse_literal_open_expression
+
+      else
+        _expected :capture_reference, OPEN_BRACE_EXPRESSON__
       end
+    end
 
       DOLLA_RX__ = /\$/
 
       LITERAL_OPEN_EXPRESSION_RX__ = /"\{\{"/
 
-      def parse_literal_open_expression
-        @scn.skip WHITE_RX_
-        if @scn.skip CLOSE_RX_
-          @a.push Normal_String__.new OPEN_BRACE_EXPRESSON__
-          ACHIEVED_
+    def ___parse_literal_open_expression
+
+      @_scn.skip WHITE_RX_
+
+      if @_scn.skip CLOSE_RX_
+        _add_normal_string OPEN_BRACE_EXPRESSON__
+      else
+        _expected CLOSE_BRACE_EXPRESSION__
+      end
+    end
+
+    def _add_normal_string s
+      @_a.push Normal_String___.new s
+      KEEP_PARSING_
+    end
+
+    def __parse_magic
+
+      d = @_scn.scan DIGIT_RX__
+      if d
+        ___on_digit d
+      else
+        _expected :digit
+      end
+    end
+
+    def ___on_digit d
+
+      m_a = []
+      ok = true
+
+      while @_scn.skip DOT_RX__
+        name_s = @_scn.scan METHOD_NAME_RX__
+        if name_s
+          m_a.push name_s
         else
-          expected CLOSE_BRACE_EXPRESSION__
+          ok = _expected :method_name
+          break
         end
       end
 
-      def parse_substitution_or_etc  # meh
-        d = @scn.scan DIGIT_RX__
-        if d
-          m_a = []
-          ok = true
-          while @scn.skip DOT_RX__
-            name_s = @scn.scan METHOD_NAME_RX__
-            if name_s
-              m_a.push name_s
-            else
-              ok = expect :method_name
-              break
-            end
-          end
-          if ok
-            @scn.skip WHITE_RX_
-            if ! @scn.skip CLOSE_RX_
-              ok = expected '.', CLOSE_BRACE_EXPRESSION__
-            end
-            ok and accept_thing d, m_a  # sets @ok
-          end
-          ok
-        else
-          expected :digit
-        end
+      if ok
+        ___parse_end_of_magic m_a, d
+      else
+        ok
       end
+    end
+
+    def ___parse_end_of_magic m_a, d
+
+      @_scn.skip WHITE_RX_
+
+      if @_scn.skip CLOSE_RX_
+        ___on_end_of_magic m_a, d
+      else
+        _expected '.', CLOSE_BRACE_EXPRESSION__
+      end
+    end
 
       DOT_RX__ = /\./
 
       METHOD_NAME_RX__ = /[a-z_]+/
 
-      def accept_thing d, s_a
+    def ___on_end_of_magic s_a, d
 
-        Self_::Build_replace_expression__.with(
+      repl_expr = Self_::Build_replace_expression__.with(
 
-          :capture_identifier, d,
-          :method_call_chain, s_a,
-          :work_dir, @work_dir,
-          :when_replace_expression, -> x do
-            @a.push x
-            ACHIEVED_
-          end
+        :capture_identifier, d,
+        :method_call_chain, s_a,
+        :functions_dir, @functions_dir,
+        & @_oes_p )
 
-        ) do | * i_a, & ev_p |
-          @result = @on_event_selectively[ * i_a, & ev_p ]
-          @ok = UNABLE_
-        end
+      if repl_expr
+        @_a.push repl_expr ; ACHIEVED_
+      else
+        repl_expr
       end
+    end
 
-      def expected * x_a
-        @result = @on_event_selectively.call :replace_function_parse_error do
-          Self_::Parse_error__[ * x_a, @scn ]
-        end
-        @ok = UNABLE_
-      end
+    def _expected * x_a
 
-      def flush
-        @result = Self_::Replace_Function__.new @a, @on_event_selectively
-        nil
+      @_oes_p.call :replace_function_parse_error do
+        Self_::Parse_error__[ * x_a, @_scn ]
       end
+      UNABLE_
+    end
 
       DIGIT_RX__ = /\d+/
 
-      class Normal_String__
+      class Normal_String___
 
         def initialize s
           @string = s
@@ -184,12 +223,14 @@ module Skylab::SearchAndReplace
 
       CLOSE_RX_ = /}}/
 
+    KEEP_PARSING_ = true
+
       OPEN_BRACE_EXPRESSON__ = '{{'.freeze
 
       Self_ = self
 
       WHITE_RX_ = /[[:space:]]+/
 
-    end
-  # -
+  end
 end
+# #todo - #pending-rename: to "functions dir" blah

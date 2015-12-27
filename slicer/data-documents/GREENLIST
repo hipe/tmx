@@ -1,2 +1,17 @@
-myterm slicer permute flex2treetop yacc2treetop bnf2treetop css_convert code_molester task_examples task treemap code_metrics git search_and_replace beauty_salon cull snag test_support tmx
-autonomous_component_system tan_man git_viz plugin fields sub_tree basic brazen zerk callback parse system human
+# a list of lists of the sidesystems.
+#
+#   • the two lists constitute broadly the app-likes and list-likes
+#     variously BUT:
+#
+#   • lop off a trailing contiguous segment of the longer list and put it
+#     somewhere in the shorter list until the time lengths are the
+#     closest they can be. (currently: [te] and [ta])
+#
+#   • in app-likes the "hotter" are towards the front (so fail fast)
+#
+#   • the lib-like list has three sections:
+#     "hot", "chokey (alphab.)", and "the rest (alphab.)"
+
+search_and_replace myterm snag code_metrics cull git_viz tan_man sub_tree permute treemap task_examples task slicer css_convert flex2treetop yacc2treetop bnf2treetop tmx
+
+zerk autonomous_component_system beauty_salon git human brazen basic callback code_molester fields parse plugin system test_support

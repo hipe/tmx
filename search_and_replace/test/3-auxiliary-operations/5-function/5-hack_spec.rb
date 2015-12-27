@@ -2,21 +2,24 @@ require_relative '../../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] features - function - hack", wip: true do
+  describe "[sa] auxiliaries - function - hack" do
+
+    # #pending-rename: this is a unit test, and tributary of the others..
+    #                  ..perhaps this belongs in [sy] instead? nah..
 
     TS_[ self ]
 
       it "it tries to infer the module tree from a file - FALLIBLE" do
 
-        _path = my_fixture_trees_._wat_FUNCTION_FILE_PATH
+        _path = ::File.join common_functions_dir_, 'stfu-omg.rb'
 
-        tree = __subject :path, _path
+        _tree = __subject :path, _path
 
         s_a = []
 
-        _SEP = Home_::CONST_SEP_
+        _SEP = '::'  # CONST_SEP_
 
-        tree.children_depth_first_via_args_hook nil do |node, x, p|
+        _tree.children_depth_first_via_args_hook nil do |node, x, p|
           a = []
           x and a.push x
           a.concat node.value_x

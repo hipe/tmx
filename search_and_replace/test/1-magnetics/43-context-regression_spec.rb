@@ -41,7 +41,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "(the replacement looks good)" do
 
-        expect_output_ edit_session_, unindent_( <<-HERE )
+        expect_edit_session_output_ unindent_( <<-HERE )
           JE zoo
           JIM
         HERE

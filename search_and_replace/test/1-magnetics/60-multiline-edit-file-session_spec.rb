@@ -12,11 +12,11 @@ module Skylab::SearchAndReplace::TestSupport
 
       _st = build_stream_for_single_path_to_file_with_three_lines_
 
-      _es_st = magnetics_::File_Session_Stream_via_Parameters.with(
-        :upstream_path_stream, _st,
-        :ruby_regexp, /e[\n!]/m,
-        :for_interactive_search_and_replace,
-      )
+      o = magnetics_::File_Session_Stream_via_Parameters.new( & no_events_ )
+      o.upstream_path_stream = _st
+      o.ruby_regexp = /e[\n!]/m
+      o.for = :for_interactive_search_and_replace
+      _es_st = o.execute
 
       _a = _es_st.to_a
 
@@ -44,14 +44,14 @@ module Skylab::SearchAndReplace::TestSupport
           fazzoozle my noozle - when i say "wazoozle" i mean WaZOOzle!
       HERE
 
-      expect_output_ _edit_session, _exp
+      expect_edit_session_output_ _exp
     end
 
     shared_subject :_match_controller_array do
-      match_controller_array_for_ _edit_session
+      match_controller_array_for_ edit_session_
     end
 
-    def _edit_session
+    def edit_session_
       _edit_session_array.fetch 0
     end
   end

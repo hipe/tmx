@@ -20,16 +20,34 @@ module Skylab::SearchAndReplace
 
       if st.no_unparsed_exists
 
-        Callback_::Bound_Call[ nil, dup, :___to_match_stream, & pp ]
+        _otr = dup._init_as_hot( & pp )
+
+        Callback_::Bound_Call[ nil, _otr, :___to_match_stream ]
       end
     end
 
-    def ___to_match_stream & pp
+    def to_mutable_file_session_stream params_x, & pp  # NOTE highlight eventually
 
+      dup._init_as_hot( & pp ).__to_mutable_file_session_stream params_x
+    end
+
+    # == all hot below
+
+    def _init_as_hot & pp
       @_pp = pp
-      @_oes_p = pp[ nil ]
+      @_oes_p = @_pp[ self ]
+      self
+    end
 
-      ok = __resolve_file_path_stream
+    def __to_mutable_file_session_stream repl_params_x
+
+      ok = _resolve_file_path_stream
+      ok && __build_mutable_file_session_stream( repl_params_x )
+    end
+
+    def ___to_match_stream
+
+      ok = _resolve_file_path_stream
       ok &&= __resolve_file_session_stream
       ok && ___via_file_session_stream
     end
@@ -44,21 +62,38 @@ module Skylab::SearchAndReplace
 
     def __resolve_file_session_stream
 
-      o = @_files_by_grep
-
-      _ = Home_::Magnetics_::File_Session_Stream_via_Parameters.with(
-        :do_highlight, nil, # NOTE eventually..
-        :upstream_path_stream, @_file_path_stream,
-        :ruby_regexp, o.ruby_regexp,
-        :grep_extended_regexp_string, o.grep_extended_regexp_string,
-        :read_only,
-        & @_oes_p
-      )
+      _ = __build_read_only_file_session_stream
 
       _write_trueish :@_file_session_stream, _
     end
 
-    def __resolve_file_path_stream
+    def __build_read_only_file_session_stream
+
+      o = _begin_common_file_session_stream
+      o.for = :read_only
+      o.execute
+    end
+
+    def __build_mutable_file_session_stream repl_params_x
+
+      o = _begin_common_file_session_stream
+      o.for = :for_interactive_search_and_replace
+      o.replacement_parameters = repl_params_x
+      o.execute
+    end
+
+    def _begin_common_file_session_stream
+
+      dep = @_files_by_grep
+
+      o = Home_::Magnetics_::File_Session_Stream_via_Parameters.new( & @_oes_p )
+      o.ruby_regexp = dep.ruby_regexp
+      o.upstream_path_stream = @_file_path_stream
+      o.grep_extended_regexp_string = dep.grep_extended_regexp_string
+      o
+    end
+
+    def _resolve_file_path_stream
 
       _ = @_files_by_grep.to_file_path_stream :for, :paths, & @_pp
       _write_trueish :@_file_path_stream, _

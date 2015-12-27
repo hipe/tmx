@@ -194,6 +194,18 @@ module Skylab::TestSupport
 
         io = @_IO
 
+        skip_rx = /\A[ \t]*(?:#|$)/
+        next_content_line_content = -> do
+          begin
+            line = io.gets
+            if skip_rx =~ line
+              redo
+            end
+            line.chomp!
+          end while nil
+          line
+        end
+
         pt = remove_instance_variable :@__parse_tree
 
         line = nil
@@ -201,8 +213,9 @@ module Skylab::TestSupport
         thing, opt, do_show = pt
 
         thing.value_x.times do
-          ( line = io.gets ).chomp!
+          line = next_content_line_content[]
         end
+
         io.close
 
         s_a = line.split %r([[:space:]]+)

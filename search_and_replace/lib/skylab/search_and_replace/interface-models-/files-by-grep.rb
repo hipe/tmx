@@ -37,7 +37,7 @@ module Skylab::SearchAndReplace
     def to_file_path_stream * x_a, & pp
 
       call = dup._init_as_hot( & pp )
-      Home_.lib_.fields::Parameters[ for: nil ].write_ivars call, x_a
+      Parameters_[ for: nil ].write_ivars call, x_a
       call._to_path_stream
     end
 

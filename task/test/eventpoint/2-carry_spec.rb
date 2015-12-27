@@ -4,7 +4,7 @@ module Skylab::Task::TestSupport
 
   module Eventpoint_Namespace  # <-
 
-  TS_.describe "[ts] quickie possible carry" do
+  TS_.describe "[ta] quickie possible carry" do
 
     TS_[ self ]
     use :eventpoint

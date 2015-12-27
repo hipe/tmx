@@ -4,7 +4,7 @@ module Skylab::SearchAndReplace
 
     class << self
       def [] up, & p
-        Sessioner___.new up, & p
+        Sessioner___.new( up, & p ).execute
       end
     end  # >>
 
@@ -12,17 +12,30 @@ module Skylab::SearchAndReplace
 
       def initialize up, & oes_p
 
-        x = up.max_file_size_for_multiline_mode
+        @_oes_p = oes_p
+        @_values = up
+      end
+
+      def execute
+
+        __init_values_via_dependency
+        _ok = __resolve_replacement_function
+        _ok && self
+      end
+
+      def __init_values_via_dependency
+
+        x = @_values.max_file_size_for_multiline_mode
         if ! x
           x = DEFAULT_MAX_FILE_SIZE_FOR_MULTIINE_MODE__
         end
         @max_file_size_for_multiline_mode = x
 
-        rx = up.ruby_regexp
+        rx = @_values.ruby_regexp
         @rx_opts = Home_.lib_.basic::Regexp.options_via_regexp rx
         @ruby_regexp = rx
 
-        @_oes_p = oes_p
+        NIL_
       end
 
           DEFAULT_MAX_FILE_SIZE_FOR_MULTIINE_MODE__ = 463296
@@ -33,6 +46,33 @@ module Skylab::SearchAndReplace
           # what the "right" cutoff point is totally system dependent and not
           # really of interest to us here, which is why we take this field
           # a parameter and provide this just as a last-line catchall.
+
+      def __resolve_replacement_function
+
+        px = @_values.replacement_parameters
+        if px
+          s = px.replacement_expression
+          dir = px.functions_directory
+        end
+
+        if s
+          x = Home_::Magnetics_::Replace_Function_via_String_and_Work_Dir.call(
+            s,
+            dir,
+            & @_oes_p )
+
+          if x
+            @_replacement_function = x
+            ACHIEVED_
+          else
+            x
+          end
+        else
+          # (then you'll have to provide your own string for the replacement)
+          @_replacement_function = nil
+          ACHIEVED_
+        end
+      end
 
       def produce_file_session_via_ordinal_and_path d, path
 
@@ -59,6 +99,7 @@ module Skylab::SearchAndReplace
 
         es = Here___::String_Edit_Session___.new(
           big_string,
+          @_replacement_function,
           @ruby_regexp,
         )
         es.set_path_and_ordinal path, d

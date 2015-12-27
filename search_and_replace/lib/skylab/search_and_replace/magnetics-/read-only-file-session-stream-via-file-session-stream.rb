@@ -14,7 +14,6 @@ module Skylab::SearchAndReplace
 
         @__prototype = Session___.new(
           up.ruby_regexp,
-          up.do_highlight,
           & oes_p )
       end
 
@@ -25,9 +24,8 @@ module Skylab::SearchAndReplace
 
     class Session___
 
-      def initialize rx, yes, & p
+      def initialize rx, & p
 
-        @do_highlight = yes
         @ruby_regexp = rx
 
         @_oes_p = p
@@ -57,7 +55,7 @@ module Skylab::SearchAndReplace
       # -
 
         def to_read_only_match_stream_when_multi_line
-          match = Read_Only_Match___.new @path, @do_highlight
+          match = Read_Only_Match___.new @path
           whole_file = ::File.read @path
           line_number = 1
           last_begin = 0
@@ -95,7 +93,7 @@ module Skylab::SearchAndReplace
             end
 
             beg_pos = next_begin
-            match.dup_with_args line_number, before_match, md, after_match
+            match.dup_via line_number, before_match, md, after_match
           end
           p = -> do
             md = @ruby_regexp.match whole_file, beg_pos
@@ -122,7 +120,7 @@ module Skylab::SearchAndReplace
               line_number += 1
               md = rx.match line
               if md
-                x = match.dup_with_args md, line_number, line
+                x = match.dup_via md, line_number, line
                 break
               end
             end
@@ -132,93 +130,109 @@ module Skylab::SearchAndReplace
 
         class Read_Only_Match___
 
-          def initialize path, yes
-            @do_highlight = yes
+          def initialize path
             @path = path
             freeze
           end
 
-          def dup_with * x_a
-            dup.init_copy_via_iambic x_a
-          end
-
-          def dup_with_args * a
+          def dup_via * a
             dup.___init_copy a
           end
 
-           def ___init_copy a
-             @lineno, @before_match, @md, @after_match = a
-             freeze
-           end
-
-           def init_copy_via_iambic x_a
-             x_a.each_slice 2 do |i, x|  # or whatever
-               send :"#{ i }=", x
-             end
-             freeze
-           end
-
-         public
-
-          def members
-            [ :md, :lineno, :lines, :path ]
-          end
-
-          attr_reader :lineno, :md, :path
-
-          attr_writer :do_highlight
-
-          def lines
-            to_line_stream.to_a
+          def ___init_copy a
+            @lineno, @before_match, @md, @after_match = a
+            freeze
           end
 
           def to_line_stream
-            p = stream = nil
-            s = s_ = nil
-            finish = -> do
-              p = EMPTY_P_ ; nil
-            end
-            main = -> do
-              if s_
-                x = s
-                s = s_
-                s_ = stream.gets
-                x
-              else
-                finish[]
-                "#{ s }#{ @after_match }"
-              end
-            end
-            p = -> do
-              stream = Home_.lib_.basic::String.line_stream @md[ 0 ]
-              if @do_highlight
-                stream = stream.map_by do |string|
-                  did = string.chomp!
-                  "\e[1;32m#{ string }\e[0m#{ NEWLINE_ if did }"
-                end
-              end
-              s = stream.gets
-              if s
-                s_ = stream.gets
-                if s_
-                  p = main
-                  x = "#{ @before_match }#{ s }"
-                  s = s_
-                  s_ = stream.gets
-                  x
-                else
-                  finish[]
-                  "#{ @before_match }#{ s }#{ @after_match }"
-                end
-              else
-                finish[]
-              end
-            end
+            to_line_stream_under THE_PASS_THRU_EXPAG___
+          end
+
+          def to_line_stream_under expag
+            otr = dup
+            otr.extend Line_Stream_via_Match___
+            otr.expag = expag
+            otr.execute
+          end
+
+          attr_reader(
+            :lineno,
+            :md,
+            :path,
+          )
+        end
+
+        module THE_PASS_THRU_EXPAG___ ; class << self
+          def map_match_line_stream st
+            st
+          end
+        end ; end
+
+        module Line_Stream_via_Match___  # #[#sl-003]
+
+          # effect these three aspects while streaming the lines of a match:
+          #
+          #   • the match may span multiple lines
+          #
+          #   • express any `@before_match` and `@after_match` before
+          #     the first and after last lines respectively (the same
+          #     line when one line).
+          #
+          #   • map thru the expag for styling before the above behavior.
+
+          # #open [#009] this probably duplicates efforts of the edit session
+          # (but then why is its logic unrecognizable? maybe it's fine..)
+
+          attr_writer(
+            :expag,
+          )
+
+          def execute
+
+            _st = Home_.lib_.basic::String.line_stream @md[ 0 ]
+            @_st = @expag.map_match_line_stream _st
+            @_p = method :___gets_first_line
+
             Callback_.stream do
-              p[]
+              @_p.call
             end
           end
-        end  # read only match
+
+          def ___gets_first_line
+            first_line = @_st.gets
+            if first_line
+              second_line = @_st.gets
+              if second_line
+                @_line_on_deck = second_line
+                @_p = method :___gets_subsequent_line
+                "#{ @before_match }#{ first_line }"
+              else
+                _close
+                "#{ @before_match }#{ first_line }#{ @after_match }"
+              end
+            else
+              _close
+            end
+          end
+
+          def ___gets_subsequent_line
+
+            line_after = @_st.gets
+            if line_after
+              s = @_line_on_deck
+              @_line_on_deck = line_after
+              s
+            else
+              _close
+              "#{ @_line_on_deck }#{ @after_match }"
+            end
+          end
+
+          def _close
+            @_p = EMPTY_P_
+            NOTHING_
+          end
+        end
       # -
     end  # session
   end  # magnetic

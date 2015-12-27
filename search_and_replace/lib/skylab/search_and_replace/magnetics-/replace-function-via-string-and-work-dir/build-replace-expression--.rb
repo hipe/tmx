@@ -7,29 +7,74 @@ module Skylab::SearchAndReplace
         Callback_::Actor.call( self, :properties,
 
           :capture_identifier,
+          :functions_dir,
           :method_call_chain,
-          :when_replace_expression,
-          :work_dir,
         )
 
         def execute
+
           @method_call_chain = @method_call_chain.map( & :intern )
+
           @custom_i_a = @method_call_chain - BUILTIN_FUNCTION_NAMES__
-          @fulfiller = if @custom_i_a.length.zero?
-            BUILTIN_FUNCTIONS__
+
+          _ok = ___resolve_fulfiller
+          _ok && __via_fulfiller
+        end
+
+        def ___resolve_fulfiller
+
+          if @custom_i_a.length.zero?
+
+            fu = BUILTIN_FUNCTIONS__
+
+          elsif @functions_dir
+
+            fu = Build_fulfiller___.call(
+              @custom_i_a,
+              @functions_dir,
+              & @on_event_selectively )
+
           else
-            Produce_fulfiller__[ @custom_i_a, @work_dir, @on_event_selectively ]
+            fu = ___when_no_functions_directory
           end
-          @fulfiller and via_fulfiller
+
+          if fu
+            @fulfiller = fu ; ACHIEVED_
+          else
+            fu
+          end
         end
 
-        def via_fulfiller
-          @when_replace_expression[
-            Replace_Expression__.new @method_call_chain,
-              @capture_identifier, @fulfiller ]
+        def ___when_no_functions_directory
+
+          sym_a = @custom_i_a
+
+          @on_event_selectively.call(
+
+            :error, :expression, :functions_directory_required
+
+          ) do | y |
+
+            _s_a = sym_a.map( & method( :code ) )
+
+            y << "a `functions_directory` #{
+              }must be indicated to help define #{
+               }#{ _s_a * ' and ' }"
+          end
+
+          UNABLE_
         end
 
-        class Replace_Expression__
+        def __via_fulfiller
+
+          Replace_Expression___.new(
+            @method_call_chain,
+            @capture_identifier,
+            @fulfiller,
+          )
+        end
+
+        class Replace_Expression___
 
           # proof of concept class. currently not robust, secure, scalable
 
@@ -70,24 +115,21 @@ module Skylab::SearchAndReplace
 
         # ~ custom functions
 
-        class Produce_fulfiller__
-
-          class << self
-            def [] * a
-              new( a ).execute
-            end
-          end
+        class Build_fulfiller___ < Callback_::Actor::Dyadic
 
           Callback_::Event.selective_builder_sender_receiver self
 
-          def initialize a
-            @custom_i_a, @work_dir, @oes = a
+          def initialize sym_a, path, & oes_p
+            @custom_i_a = sym_a
+            @functions_directory = path
+            @_oes_p = oes_p
           end
 
           def execute
+
             set = ::Hash[ @custom_i_a.map { |i| [ i, true ] } ]
 
-            @functions_pn = ::Pathname.new "#{ @work_dir }/functions"
+            @functions_pn = ::Pathname.new @functions_directory
 
             pn_a = @functions_pn.children false  # meh on ENOENT
 
@@ -109,7 +151,8 @@ module Skylab::SearchAndReplace
           end
 
           def when_missing_files
-            @oes.call :error do
+
+            @_oes_p.call :error, :missing_function_definitions do
               build_missing_function_definitions_event
             end
             UNABLE_
@@ -169,7 +212,7 @@ module Skylab::SearchAndReplace
 
             tree = Home_.lib_.system.filesystem.hack_guess_module_tree(
               @path,
-              & @oes )
+              & @_oes_p )
 
             if tree
               @tree = tree

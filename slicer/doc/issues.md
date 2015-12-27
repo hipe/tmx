@@ -138,7 +138,7 @@
              that is treated as an actor; by duping the object and
              modifying the dup (which in turn can be duped and modified
              again and so on.)
-             :[#.B] when we add a module to the singleton ancestor chain too
+             (see also [#003] which spawned off of this..)
              ( #was: 2011-11-22 @closed hacking dependency to let it get uglier )
 [#022] 2011-11-01 @closed ascii tree viewing utility like we've written like 5 times before
 [#021] 2011-10-30 @closed build more dry run into config make make install
@@ -157,7 +157,23 @@
 [#006] 2011-08-28 @closed aliases have namespaces too
 [#005] 2011-08-27 @closed death to old filemetrics
 [#004] 2011-08-24 @closed the birth of dependency graph, Open2 wrapper for face
-[#003] 2011-08-23 @closed filemetrics ignores blank lines, comments
+
+[#003]       spawned off of [#023], if you have a lower-level object
+             (a "performer") that needs to read more than one or two
+             parameters from the higher-level object (the "client"),
+             this hack can save lines of code while sacrificing
+             idiomacy ("clarity") - make a plain old dup of the
+             higher-level object, and send `extend` to that dup with a
+             module (the would-be perfomer class). now use the dup
+             as you would any ordinary performer.
+
+             this couples the performer entirely to that subset of those
+             ivars in the client (in both constituency and name) so
+             always keep such a hack in the same file, and use it only
+             for small performers.
+
+              ( #was: 2011-08-23 @closed filemetrics ignores blank lines, comments )
+
 [#002]        "now.dot" (salvaged from [hl])
               ( #was: 2011-08-20 @closed F-ace craps near namespaces )
 [#001]        universe dependency visualizations

@@ -2,68 +2,84 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] S & R - features - functions", wip: true do
+  describe "[sa] auxiliaries - function (fails)" do
 
     TS_[ self ]
+    use :memoizer_methods
+    use :expect_event
+    use :operations
 
-    it "when you use a strange function name (but have a function folder)" do
+    memoize( :_ruby_regexp ) { /wazoo/i }
 
-      _cd _first_workspace
+    _replacement_expression = '{{ $0.downcase.well_well_well.nope }}'
 
-      call_API :search, /wazoo/i,
-        :replace, '{{ $0.downcase.well_well_well.nope }}',
-        :dirs, TS_._COMMON_DIR,
-        :files, '*-line*.txt',
-        :preview,
-        :matches,
-        :grep,
-        :replace
+    _filename_pattern = '*-line*.txt'
 
-      _em = expect_not_OK_event_ :missing_function_definitions
+    context "you have a strange function and no function directory" do
 
-      black_and_white( _em.cached_event_value ).should match(
-        %r(\Areplace error: 'well_well_well' and 'nope' are missing #{
-         }the expected files #{
-          }«.*search-and-replace/functions/\{well-well-well\.rb, nope\.rb\}»\z)
+      shared_subject :state_ do
+        _call_with_directory nil
+        flush_event_log_and_result_to_state @result
+      end
+
+      it "fails" do
+        fails_
+      end
+
+      it "events" do
+
+        _be_this = be_emission_ending_with :functions_directory_required do |y|
+
+          _a = [ "a `functions_directory` must be indicated #{
+           }to help define #{
+             }(code :well_well_well) and (code :nope)" ]
+
+          y.should eql _a
+        end
+
+        last_emission.should _be_this
+      end
+    end
+
+    context "if you have an existent directory but no file" do
+
+      shared_subject :state_ do
+
+        _dir = TestSupport_::Fixtures.dir :empty_esque_directory
+        _call_with_directory _dir
+        flush_event_log_and_result_to_state @result
+      end
+
+      it "fails" do
+        fails_
+      end
+
+      it "events" do
+        msg = nil
+
+        _be_this = be_emission_ending_with :missing_function_definitions do |ev|
+          msg = black_and_white ev
+        end
+
+        last_emission.should _be_this
+
+        msg.should match(
+          %r('well_well_well' and 'nope' are missing the expected files «.+#{
+              }well-well-well\.rb, nope\.rb\}»\z) )
+      end
+    end
+
+    define_method :_call_with_directory do |dir|
+
+      call_(
+        :ruby_regexp, _ruby_regexp,
+        :path, common_haystack_directory_,
+        :filename_pattern, _filename_pattern,
+        :search,
+        :replacement_expression, _replacement_expression,
+        :functions_directory, dir,
+        :replace,
       )
-
-      expect_failed
-    end
-
-    it "**non-interactive** search and replace thru API call" do
-
-      start_tmpdir_
-      to_tmpdir_add_wazoozle_file_
-
-      _cd _first_workspace
-
-      call_API :search, /\bHAHA\b/,
-        :replace, 'ORLY-->{{ $0.stfu_omg.downcase }}<--YARLY',
-        :dirs, @tmpdir.to_path,
-        :files, '*-wazoozle.txt',
-        :preview,
-        :matches,
-        :grep,
-        :replace
-
-      _match = @result.gets
-      @result.gets.should be_nil
-
-      expect_neutral_event :grep_command_head
-
-      expect_OK_event_ :changed_file
-
-      _s = ::File.read @tmpdir.join( 'ok-whatever-wazoozle.txt' ).to_path
-      _s.should eql "ok oh my geez --> ORLY-->holy foxx: ahah<--YARLY <--\n"
-
-    end
-
-    def _cd path
-      Home_.lib_.file_utils.cd path
-    end
-
-    def _first_workspace
-      my_fixture_trees_._wat_WORKSPACE_PATH
     end
   end
 end

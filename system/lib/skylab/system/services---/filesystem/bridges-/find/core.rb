@@ -267,7 +267,7 @@ module Skylab::System
         def __resolve_valid_command_args  # amazing hax #note-130
 
           otr = dup
-          otr.extend Command_Building_Methods__  # pattern :+[#sl-023.B]
+          otr.extend Command_Building_Methods__  # pattern #[#sl-003]
           @args = otr.__args_via_flush
           if @args && @on_event_selectively
             @on_event_selectively.call :info, :event, :find_command_args do

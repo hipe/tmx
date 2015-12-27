@@ -38,7 +38,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         it "(output looks right)" do
 
-          expect_output_ edit_session_, unindent_( <<-HERE )
+          expect_edit_session_output_ unindent_( <<-HERE )
             zero_then
             one
             AND
@@ -128,7 +128,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "(output looks right)" do
 
-        expect_output_ edit_session_, unindent_( <<-HERE )
+        expect_edit_session_output_ unindent_( <<-HERE )
           zip nourk 1
           nourk 2
           nourk 3 zip
@@ -188,7 +188,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "(content looks right)" do
 
-        expect_output_ edit_session_, unindent_( <<-HERE )
+        expect_edit_session_output_ unindent_( <<-HERE )
           zo JE zoo
           JIM zam JOM
           ziff JUP zaff

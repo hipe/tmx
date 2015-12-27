@@ -206,15 +206,15 @@ module Skylab::Callback::TestSupport
         Common_State___.new x, _a
       end
 
-      Common_State___ = ::Struct.new( :result, :emission_array )
+      Common_State___ = ::Struct.new :result, :emission_array
 
       # -- log-based event testing
 
       def event_log
-        @event_log ||= ___build_expev_log  # ivar name is #public-API
+        @event_log ||= build_event_log  # ivar name is #public-API
       end
 
-      def ___build_expev_log
+      def build_event_log
 
         log = Event_Log___.new
 

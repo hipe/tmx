@@ -1,3 +1,34 @@
+[#014]    #track #experiment ONLY TO SUPPORT TESTS :/
+
+             for the cases of wanting to test the same file against the
+             same search-and-replace parameters but with different
+             match replacements variously engaged or not engaged; we
+             tried to cheat and use the same edit session in different
+             tests. but making the tests order-sensitive like this
+             violates the fundamental rules of unit testing against
+             the same, and it *did break* (with one test lib and not the
+             other no less).
+
+             on the other extreme end, to call the API several times on
+             the same filetree with the same parameters is so nasty (system
+             calls to find and grep and all) that the more we considered
+             it the less let ourselves even consider it.
+
+             another alternative is to write a recursive `clear` method,
+             but this effectively re-exposes us to the the same risky
+             conditions that got us into this mess - that of testing
+             different scenarios on the selfsame object graph.
+
+             so what we were left with was to deep-dup some reasonable
+             part of the object graph (the edit session). this is seen
+             as the most "elegant" as it is by some order of magnitude
+             cheaper than calling the API again, and does not incur the
+             above mentioned risks that a recursive `clear` would.
+
+             the only problem with this is that it violates another
+             testing rubric - we now have code in our asset tree that is
+             only in service of our tests in this regard.
+
 [#013]       the context lines algorithm ..
 
 [#012]       a "tagged sexp node" node is (at writing) effectively a string
@@ -15,7 +46,7 @@
              sequence changes.)
 
 [#010]       edit sessions
-[#009] #open consider merging read-only & not read-only file session ?  (are they??)
+[#009]   #investigate consider merging read-only rendering with edit session rendering
 [#008]       #feature have the multiple forms save to one file
 [#007]       #feature explicit choice of single line v. multiline
 [#006]       #feature support for spaces in list items

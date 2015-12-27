@@ -2,43 +2,32 @@ module Skylab::SearchAndReplace
 
   class Magnetics_::File_Session_Stream_via_Parameters
 
-    class << self
+    def initialize & oes_p
+      @_oes_p = oes_p
+    end
 
-      def with * x_a, & p
-        p ||= On_event_selectively_
-        new.__init( x_a, & p ).execute
-      end
-    end  # >>
-
-    o = Home_.lib_.fields::Parameters[
-      do_highlight: :_downwards,
-      for_interactive_search_and_replace: :flag,
-      grep_extended_regexp_string: :_downwards,
-      max_file_size_for_multiline_mode: :_downwards,
-      read_only: :flag,
-      ruby_regexp: :_downwards,
+    o = Parameters_[
+      for: nil,  # { read_only | for_interactive_search_and_replace }
+      grep_extended_regexp_string: :_read,
+      max_file_size_for_multiline_mode: :_read,
+      replacement_parameters: :_read,
+      ruby_regexp: :_read,
       upstream_path_stream: nil,
     ]
 
-    attr_reader( * o.symbols( :_downwards ) )
+    attr_writer( * o.symbols )
 
-    def __init x_a, & p
-      PARAMS___.write_ivars self, x_a
-      @_oes_p = p
-      self
-    end
-
-    PARAMS___ = o
+    attr_reader( * o.symbols( :_read ) )
 
     def execute
 
-      _ = if @for_interactive_search_and_replace
-        Home_::Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
-      elsif @read_only
-        Home_::Magnetics_::Read_Only_File_Session_Stream_via_File_Session_Stream
-      end
+      _ok = __resolve_producer
+      _ok && ___via_producer
+    end
 
-      producer = _[ self, & @_oes_p ]
+    def ___via_producer
+
+      producer = @_producer
 
       path_count = 0
       @upstream_path_stream.map_reduce_by do |path|
@@ -46,6 +35,29 @@ module Skylab::SearchAndReplace
         producer.produce_file_session_via_ordinal_and_path path_count, path
       end
     end
+
+    def __resolve_producer
+
+      _producer_producer = FOR___.fetch( @for )[]
+
+      x = _producer_producer[ self, & @_oes_p ]
+
+      if x
+        @_producer = x ; ACHIEVED_
+      else
+        x
+      end
+    end
+
+    FOR___ = {
+      for_interactive_search_and_replace: -> do
+        Home_::Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
+      end,
+
+      read_only: -> do
+        Home_::Magnetics_::Read_Only_File_Session_Stream_via_File_Session_Stream
+      end,
+    }
 
     Here__ = self
   end

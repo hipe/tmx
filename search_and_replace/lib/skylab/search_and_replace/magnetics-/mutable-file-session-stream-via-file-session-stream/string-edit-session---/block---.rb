@@ -20,8 +20,29 @@ module Skylab::SearchAndReplace
             __parse scanners
             NIL_
           end
+        end
+
+        # -- only for tests [#014] (see)
+
+        def initialize_dup _otr  # assume closed
+          if @_has_matches
+            @_match_controllers = @_match_controllers.map do | mc |
+              mc.dup_for_ self
+            end
+          end ; nil
+        end
+
+        def init_dup_recursive_ prev  # assume closed
+
+          @previous_block = prev
+          if @_next_block
+            @_next_block.next_block
+            @_next_block = @_next_block.dup.init_dup_recursive_ self
+          end
           self
         end
+
+        # --
 
         def _close
           p = @_open
@@ -171,8 +192,8 @@ module Skylab::SearchAndReplace
               # if the next found newline after your last match terminates
               # the big string, include everything as part of your block.
 
+              _become_block_with_matches
               _clean
-              @_has_matches = true
               @_next_block = nil
               @_end = d + 1
             else
@@ -185,7 +206,8 @@ module Skylab::SearchAndReplace
             end
           else
             # there is no newline anywhere after your last match..
-            @_has_matches = true
+
+            _become_block_with_matches
             @_next_block = nil
             @_end = @_line_scn.string_length
             _clean
@@ -203,11 +225,18 @@ module Skylab::SearchAndReplace
 
         def _close_matches_that_is_followed_by_static my_final_newline_d
 
-          scanners = @_scanners
+          _scanners = @_scanners
+          _become_block_with_matches
           _clean
-          @_has_matches = true
-          @_next_block = Self__.via_scanners self, scanners
+          @_next_block = Self__.via_scanners self, _scanners
           @_end = my_final_newline_d + 1
+          NIL_
+        end
+
+        def _become_block_with_matches
+
+          @_has_matches = true
+          @_replacement_function = @_scanners.replacement_function
           NIL_
         end
 
@@ -382,10 +411,7 @@ module Skylab::SearchAndReplace
         end
 
         def next_match_controller
-          if @_open
-            _close
-          end
-          if @_has_matches
+          if has_matches
             @_match_controllers.fetch 0
           elsif @_next_block
             @_next_block.next_match_controller
@@ -399,6 +425,14 @@ module Skylab::SearchAndReplace
             _close
           end
           @_next_block
+        end
+
+        def replacement_function_  # only to be called..
+
+          # ..by our own child match controllers so
+          # assume we are closed and have matches. (MAYBE?)
+
+          @_replacement_function
         end
 
         def has_matches

@@ -35,27 +35,6 @@ module Skylab::BeautySalon::TestSupport
       TestSupport_.debug_IO
     end
 
-    def existent_tmpdir_path
-      memoized_tmpdir_.to_path
-    end
-
-    define_method :memoized_tmpdir_, -> do
-
-      o = nil
-      -> do
-        if o
-          o.for self
-        else
-          o = TestSupport_.tmpdir.memoizer_for self, 'bertie-serern'
-          o.instance
-        end
-      end
-    end.call
-
-    def tmpdir_path_for_memoized_tmpdir
-      Home_.lib_.system.filesystem.tmpdir_path
-    end
-
     def subject_CLI
       Home_::CLI
     end

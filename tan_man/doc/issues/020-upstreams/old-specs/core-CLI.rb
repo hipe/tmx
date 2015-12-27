@@ -8,7 +8,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph::Remote::Core
 
   extend TestSupport_::Quickie
 
-  describe "[ts] CLI action graph remote", wip: true do
+  describe "[ta] CLI action graph remote", wip: true do
 
     extend TS_
 

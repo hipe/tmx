@@ -4,13 +4,13 @@ module Skylab::SearchAndReplace
 
     class String_Edit_Session___  # see [#010]
 
-      def initialize s, rx
+      def initialize s, repl_f, rx
 
         _match_scanner = Here_::Match_Scanner___.new s, rx
 
         _line_scanner = Here_::Line_Scanner_.new s
 
-        _scanners = Scanners___.new _match_scanner, _line_scanner
+        _scanners = Scanners___.new _match_scanner, _line_scanner, repl_f
 
         @first_block = Here_::Block___.via_scanners _scanners
 
@@ -18,14 +18,44 @@ module Skylab::SearchAndReplace
         @string = s
       end
 
-      Scanners___ = ::Struct.new :match_scanner, :line_scanner
+      Scanners___ = ::Struct.new(
+        :match_scanner,
+        :line_scanner,
+        :replacement_function,
+      )
 
       def set_path_and_ordinal path, d
         @ordinal = d
         @path = path ; nil
       end
 
+      def initialize_dup otr  # [#014] only for tests :/
+        @first_block.next_block
+        @first_block = @first_block.dup.init_dup_recursive_ nil
+      end
+
       # --
+
+      def write_output_lines_into y, & oes_p  # convenience for the lazy..
+
+        bytes = 0  # maybe ..
+        st = to_line_stream
+        begin
+          s = st.gets
+          s or break
+          y << s
+          bytes += s.length
+          redo
+        end while nil
+
+        if block_given?
+          oes_p.call :data, :number_of_bytes_written do
+            bytes
+          end
+        end
+
+        y
+      end
 
       def to_line_stream
         ___to_block_stream.expand_by do | block |

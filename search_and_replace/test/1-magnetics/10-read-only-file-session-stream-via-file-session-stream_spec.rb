@@ -22,11 +22,11 @@ module Skylab::SearchAndReplace::TestSupport
 
         _st = build_stream_for_single_path_to_file_with_three_lines_
 
-        file_session_stream = _subject.with(
-          :upstream_path_stream, _st,
-          :ruby_regexp, /\bwazoozle\b/i,
-          :read_only,
-        )
+        o = _subject.new( & no_events_ )
+        o.for = :read_only
+        o.ruby_regexp = /\bwazoozle\b/i
+        o.upstream_path_stream = _st
+        file_session_stream = o.execute
 
         one_file = file_session_stream.gets
         another_file = file_session_stream.gets
@@ -90,9 +90,11 @@ module Skylab::SearchAndReplace::TestSupport
 
           o = super_
 
-          to_lines = -> o_ do
-            _ = o_.dup_with :do_highlight, true
-            _.to_line_stream.to_a
+          to_lines = -> div do
+
+            _expag = Home_::CLI.highlighting_expression_agent_instance
+            _st = div.to_line_stream_under _expag
+            _st.to_a
           end
 
           [ to_lines[ o.second_match ],

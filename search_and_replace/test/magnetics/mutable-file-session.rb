@@ -8,7 +8,9 @@ module Skylab::SearchAndReplace::TestSupport
 
     # -
 
-      def expect_output_ es, string
+      def expect_edit_session_output_ string
+
+        es = edit_session_
 
         exp_st = Home_.lib_.basic::String.line_stream string
         act_st = es.to_line_stream
@@ -94,7 +96,7 @@ module Skylab::SearchAndReplace::TestSupport
       Common_State___ = ::Struct.new :match_controller_array, :edit_session
 
       def build_edit_session_via_ s, rx
-        _string_edit_session.new s, rx
+        _string_edit_session.new s, nil, rx
       end
 
       def __these

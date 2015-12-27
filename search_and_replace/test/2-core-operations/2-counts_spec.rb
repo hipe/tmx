@@ -13,11 +13,9 @@ module Skylab::SearchAndReplace::TestSupport
 
       call_by_ do
 
-        _path = TS_._COMMON_DIR
-
         call_(
           :ruby_regexp, /[ ]/,
-          :path, _path,
+          :path, common_haystack_directory_,
           :filename_patterns, EMPTY_A_,
           :search,
           :counts,
