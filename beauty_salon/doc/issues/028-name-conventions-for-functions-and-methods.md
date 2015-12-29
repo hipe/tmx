@@ -17,12 +17,16 @@ its "API scope". here is a summary of the N tiers of scope:
 
     ___one_off_scope_where_caller_is_immediately_above
 
+    # ..
+
+    this_method_has_a__generated_portion__  # see #A
+
 
 
 ## introducion through a quick example
 
 although we haven't explained what they all mean yet, a good example of
-that employs several of the above name conventions is a file in [#sa] that
+that employs several of the above name conventions is a file in [sa] that
 is taggged with [#]  (the subject doc node).
 
 the "trained eye" can see immediately that it has it has (at writing)
@@ -778,6 +782,13 @@ to change). they are:
     the first being a method that isn't ever called at all. (such
     methods should be removed so we don't have a special convention for
     them.) as such, this method is the cheapest to refactor.
+
+  • `a_method_with__some_part__nested_in_double_underscores`  # :#A
+
+    (this convention is described elsewhere -
+     that definition should be moved here #todo (sorry).
+     synopsis: the `some_part` is determined procedurally.)
+
 
 
 

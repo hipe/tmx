@@ -16,14 +16,17 @@ module Skylab::Callback
       ::OptionParser
     end
 
-    Strange = -> do
-      p = -> x do
-        _LENGTH_OF_A_LONG_LINE = 120
-        p = Basic[]::String.via_mixed.curry[ _LENGTH_OF_A_LONG_LINE ]
-        p[ x ]
-      end
-      -> x { p[ x ] }
-    end.call
+    strange = Lazy.call do
+
+      _LENGTH_OF_A_LONG_LINE = 120
+      o = Basic[]::String.via_mixed.dup
+      o.max_width = _LENGTH_OF_A_LONG_LINE
+      o.to_proc
+    end
+
+    Strange = -> x do
+      strange[][ x ]
+    end
 
     String_IO = Lazy.call do
       require 'stringio'

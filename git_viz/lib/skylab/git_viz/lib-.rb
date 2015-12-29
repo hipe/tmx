@@ -80,8 +80,15 @@ module Skylab::GitViz
       System[].IO.some_stderr_IO
     end
 
+    strange = Callback_::Lazy.call do
+
+      o = Basic[]::String.via_mixed.instance.dup
+      o.max_width = 120
+      o.to_proc
+    end
+
     Strange = -> x do
-      Basic[]::String.via_mixed 120, x
+      strange[][ x ]
     end
 
     System = -> do

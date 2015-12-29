@@ -24,10 +24,6 @@ module Skylab::SubTree
 
     Brazen = sidesys[ :Brazen ]
 
-    Strange_proc = -> do
-      Basic[]::String.via_mixed.to_proc
-    end
-
     Human = sidesys[ :Human ]
 
     _System_lib = sidesys[ :System ]

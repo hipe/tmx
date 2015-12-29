@@ -589,6 +589,11 @@ module Skylab::Zerk  # intro in [#001] README
     Fields = sidesys[ :Fields ]
     Open_3 = stdlib[ :Open3 ]
 
+    String_scanner = Lazy_.call do
+      require 'strscan'
+      ::StringScanner
+    end
+
     system_lib = sidesys[ :System ]
     System = -> do
       system_lib[].services
@@ -600,12 +605,13 @@ module Skylab::Zerk  # intro in [#001] README
   ACHIEVED_ = true
   BLANK_RX_ = /\A[[:space:]]*\z/
   EMPTY_A_ = [].freeze
+  EMPTY_S_ = ''
   FINISHED_ = nil
   Home_ = self
   KEEP_PARSING_ = true
   NIL_ = nil
+  NOTHING_ = nil
   NONE_S = '(none)'.freeze
-  NOTHING_TO_DO_ = nil
   SUCCESS_EXITSTATUS = 0
   SPACE_ = ' '
   UNABLE_ = false

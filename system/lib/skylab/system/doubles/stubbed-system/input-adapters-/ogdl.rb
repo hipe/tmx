@@ -4,7 +4,7 @@ module Skylab::System
     # -
       Input_Adapters_ = ::Module.new
 
-      class Input_Adapters_::OGDL
+      class Input_Adapters_::OGDL  # :[#029].
 
         class << self
 

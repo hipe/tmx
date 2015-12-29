@@ -197,6 +197,10 @@ module Skylab::Zerk::TestSupport
 
   # -- exp
 
+  Expect_Event = -> tcc do
+    Callback_.test_support::Expect_Event[ tcc ]
+  end
+
   Future_expect_nothing_ = Lazy_.call do
     -> * i_a do
       fail "unexpected: #{ i_a.inspect }"
@@ -246,6 +250,7 @@ module Skylab::Zerk::TestSupport
   MONADIC_EMPTINESS_ = -> _ { NIL_ }
   NEWLINE_ = "\n"
   NIL_ = nil
+  SPACE_ = Home_::SPACE_
   TS_ = self
   UNABLE_ = false
 end

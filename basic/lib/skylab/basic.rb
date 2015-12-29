@@ -189,7 +189,9 @@ module Skylab::Basic  # introduction at [#020]
     end
   end
 
-  Assume_ACS_ = Callback_::Lazy.call do
+  Lazy_ = Callback_::Lazy
+
+  Assume_ACS_ = Lazy_.call do
     ACS_ = ::Skylab::Autonomous_Component_System
     NIL_
   end

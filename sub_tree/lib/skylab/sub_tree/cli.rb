@@ -85,7 +85,9 @@ module Skylab::SubTree
         _strong s
       end
 
-      define_method :ick, lib.strange_proc.curry[ 60 ]
+      o = lib.basic::String.via_mixed.dup
+      o.max_width = 60
+      define_method :ick, o.to_proc
       alias_method :val, :ick
 
       def par_via_sym sym

@@ -346,7 +346,7 @@ module Skylab::Callback::TestSupport
 
       def only_emission
 
-        a = state_.emission_array
+        a = emission_array
         em = a.fetch 0
         if 1 == a.length
           em
@@ -356,7 +356,11 @@ module Skylab::Callback::TestSupport
       end
 
       def last_emission
-        state_.emission_array.last
+        emission_array.last
+      end
+
+      def emission_array
+        state_.emission_array
       end
 
       def be_emission_ending_with * x_a, & x_p

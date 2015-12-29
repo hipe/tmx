@@ -1,3 +1,9 @@
+[#009] #in-progress this rewrite
+[#008] #open eventually de-dup this with [#sy-029] OGDL
+[#007]       "threads" (tracking tags for experimentals towards public API)
+             #thread-three - nils vs. false
+             #thread-two - `gets` resulting in `nil` == interrupt
+             #thread-one - the UI tree is internally wired
 [#006]       expect screens ..
 [#005]       [the view maker maker]
 [#004]       [the compound adapter]

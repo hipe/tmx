@@ -96,7 +96,9 @@ module Skylab::Callback
         maybe_send_event :payload, :expression, :event_event do | y |
 
           a = []
-          p = Home_.lib_.basic::String.via_mixed.to_proc.curry[ 40 ]
+          o = Home_.lib_.basic::String.via_mixed.dup
+          o.max_width = 40
+          p = o.to_proc ; o = nil
 
           ev.instance_variables.each do | ivar |
 
