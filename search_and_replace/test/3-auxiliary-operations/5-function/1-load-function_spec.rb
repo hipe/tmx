@@ -2,16 +2,13 @@ require_relative '../../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] auxiliaries - function - hack" do
-
-    # #pending-rename: this is a unit test, and tributary of the others..
-    #                  ..perhaps this belongs in [sy] instead? nah..
+  describe "[sa] auxiliaries - function - (1) load" do
 
     TS_[ self ]
 
       it "it tries to infer the module tree from a file - FALLIBLE" do
 
-        _path = ::File.join common_functions_dir_, 'stfu-omg.rb'
+        _path = ::File.join common_functions_dir_, 'wahoo-awooga.rb'
 
         _tree = __subject :path, _path
 
@@ -35,7 +32,7 @@ module Skylab::SearchAndReplace::TestSupport
         o.gets.should eql "Jazzmatazz"
         o.gets.should eql "Jazzmatazz::Bizzo"
         o.gets.should eql "Jazzmatazz::Bizzo::Boffo"
-        o.gets.should eql "Jazzmatazz::Bizzo::Boffo::Stfu_OMG"
+        o.gets.should eql "Jazzmatazz::Bizzo::Boffo::WAHOO_Awooga"
         o.gets.should eql "Jazzmatazz::Other_Module"
 
         s_a.length.should eql 5

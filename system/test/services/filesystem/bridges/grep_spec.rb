@@ -6,7 +6,7 @@ module Skylab::System::TestSupport
 
     TS_[ self ]
 
-    it "minimal case - " do
+    it "minimal case - string looks like command" do
       _parent_subject.grep( :ruby_regexp, /foo/ ).string.should eql "grep -E foo"
     end
 
@@ -26,17 +26,17 @@ module Skylab::System::TestSupport
 
         a.push ev_p[]
         a.push i_a
-        :_nerp_
+        :_never_see
       end
 
-      _x.should eql :_nerp_
+      _x.should eql false  # unreliable
 
       a.last.should eql [ :error, :regexp_option_not_supported ]
 
       a.first.express_into_under y=[],
         Home_.lib_.brazen::API.expression_agent_instance
 
-      y.should eql [ "non convertible regexp options - '[:MULTILINE, :EXTENDED]'" ]
+      y.should eql [ "non convertible regexp options - 'MULTILINE', 'EXTENDED'" ]
     end
 
     it "a fully monty" do

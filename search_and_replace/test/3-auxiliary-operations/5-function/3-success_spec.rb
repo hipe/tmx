@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] auxiliaries - function - succeed" do
+  describe "[sa] auxiliaries - function - (3) success" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -22,7 +22,7 @@ module Skylab::SearchAndReplace::TestSupport
           :path, _dir,
           :filename_pattern, '*-wazizzle.txt',
           :search,
-          :replacement_expression, 'ORLY-->{{ $0.stfu_omg.downcase }}<--YARLY',
+          :replacement_expression, 'ORLY-->{{ $0.wahoo_awooga.downcase }}<--YARLY',
           :functions_directory, _func_dir,
           :replace,
         )

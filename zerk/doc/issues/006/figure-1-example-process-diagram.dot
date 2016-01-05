@@ -1,7 +1,7 @@
 digraph G {
 
   label="figure 1. with each \"(would) block\", the test library
-records something and send the next canned string."
+records something and sends the next canned string."
 
   rankdir="TB"
 

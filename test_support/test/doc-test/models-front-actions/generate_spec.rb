@@ -46,8 +46,6 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       shared_subject :_state do
 
-        debug!
-
         _path = ::File.join(
           DocTest_.dir_pathname.to_path,
           Callback_::Autoloader.default_core_file )
@@ -67,8 +65,6 @@ module Skylab::TestSupport::TestSupport::DocTest
       end
 
       it "neutral event talkin bout current output path (none)" do
-
-        debug!
 
         @event_log = Callback_::Stream.via_nonsparse_array _state.emission_array
 

@@ -39,12 +39,12 @@ module Skylab::Zerk::TestSupport
 
     def __delete__component asc
 
-      # per [#003]detail-one we are not passed an
+      # per #thread-one we are not passed an
       # emission handler proc as an argument for now.
 
       pd = "pretending to delete '#{ asc.name.as_slug }'"
 
-      @_oes_p.call :info, :expression do |y|  # use [#002]#detail-one
+      @_oes_p.call :info, :expression do |y|  # use #thread-one
         y << "#{ pd } two"
       end
 

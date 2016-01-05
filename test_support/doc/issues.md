@@ -1,3 +1,5 @@
+[#047] #open subscribers to quickie ever supporting a negate operator
+             ("should not")
 [#046] #open when doc-test rewrite, see subscribers
 [#045]       permute (as a doctest action)
 [#044]       lexical scope vs inheritence (as it pertains to us)..

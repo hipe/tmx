@@ -2,11 +2,20 @@ module Skylab::Basic
 
   module Hash
 
-    class Actors__::Determine_hotstrings < Callback_::Actor::Monadic
+    class Hotstrings  # :[#055]
 
-      # notes at spec
+      # notes at spec.
 
-      def initialize s_a
+      class << self
+        def _call x=nil, y
+          new( x, y ).execute
+        end
+        alias_method :[], :_call
+        private :new
+      end  # >>
+
+      def initialize blk, s_a
+        @_black = blk || MONADIC_EMPTINESS_
         @is_occupied = {}
         @s_a = s_a
         @was_occupied = {}
@@ -24,15 +33,25 @@ module Skylab::Basic
       end
 
       def via_index_and_string_create_hotstring
+
         @ordinal = 1
         last_ordinal = @string.length
+
         while @ordinal <= last_ordinal
+
           @candidate_s = @string[ 0, @ordinal ]
+
+          if @_black[ @candidate_s ]
+            @ordinal += 1
+            next
+          end
+
           if @was_occupied[ @candidate_s ]
             @ordinal += 1
             @is_occupied[ @candidate_s ] and adjust_other
             next
           end
+
           start_hotstring
           break
         end

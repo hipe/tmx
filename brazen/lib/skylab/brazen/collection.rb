@@ -276,6 +276,7 @@ module Skylab::Brazen
             a,
             @qualified_knownness.value_x,
             @qualified_knownness.name,
+            & @name_map
           )
         end
       end

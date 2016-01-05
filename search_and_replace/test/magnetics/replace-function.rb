@@ -10,7 +10,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       _oes_p = event_log.handle_event_selectively
 
-      _ = magnetics_::Replace_Function_via_String_and_Work_Dir
+      _ = magnetics_::Replace_Function_via_String_and_Functions_Dir
 
       @replace_function = _[
 

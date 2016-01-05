@@ -47,6 +47,15 @@ module Skylab::SearchAndReplace::TestSupport
 
     # -- setup
 
+    memoize :this_directory_that_exists_ do
+
+      _loc = caller_locations( 3 ).fetch 0
+      _ = ::File.dirname _loc.path
+      _ = ::File.expand_path _  # keep relative dirs out of tests
+      '4-interactive-CLI-integration' == ::File.basename( _ ) or fail
+      _
+    end
+
     dangerous_memoize :the_wazizzle_worktree_ do
 
       my_fixture_tree_ '3-the-wazizzle-worktree'
@@ -64,13 +73,7 @@ module Skylab::SearchAndReplace::TestSupport
     end
 
     dangerous_memoize :common_functions_dir_ do
-
-      my_fixture_tree_(
-        "2-has-hidden-workspace-with-stfu-omg-function/#{
-          }.search-and-replace/functions" )
-
-      # #pending-rename: the above path no longer needs
-      # to be so deep, nor in a hidden dotfile directory
+      my_fixture_tree_ '2-my-functions'
     end
 
     def my_fixture_tree_ entry_s
@@ -132,7 +135,34 @@ module Skylab::SearchAndReplace::TestSupport
       ::File.join TS_._MY_BIN_PATH, 'tmx-beauty-salon search-and-r'
     end
 
-  # -
+  # -- test support lib nodes
+
+  module Interactive_CLI
+
+    def self.[] tcc ; tcc.include self end
+
+    # ~ setup
+
+    def subject_CLI
+      Home_::CLI
+    end
+
+    def stdout_is_expected_to_be_written_to
+      true
+    end
+
+    # ~ assertion
+
+    def is_on_frame_number_with_buttons_ d
+      stack.should be_at_frame_number d
+      buttonesques
+    end
+
+    _RX = "/h.n#{}k.nl..p.r/i"
+    define_method :hinkenloooper_regexp_string_ do
+      _RX
+    end
+  end
 
   Memoizer_Methods = -> tcc do
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
@@ -140,6 +170,10 @@ module Skylab::SearchAndReplace::TestSupport
 
   Expect_Event = -> tcc do
     Callback_.test_support::Expect_Event[ tcc ]
+  end
+
+  Expect_Screens = -> tcc do
+    Home_.lib_.zerk.test_support.lib( :expect_screens )[ tcc ]
   end
 
   Callback_::Autoloader[ self, ::File.dirname( __FILE__ ) ]

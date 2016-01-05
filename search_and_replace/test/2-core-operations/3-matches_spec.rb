@@ -85,7 +85,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         _read_only_match = _matches.fetch 2
 
-        _expag = Home_::CLI.highlighting_expression_agent_instance
+        _expag = Home_::CLI.highlighting_expression_agent_instance__
         _st = _read_only_match.to_line_stream_under _expag
 
         lines = _st.to_a

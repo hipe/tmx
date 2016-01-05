@@ -107,11 +107,15 @@ module Skylab::System
         end
 
         def no_support_for i_a
+
           @on_event_selectively.call :error, :regexp_option_not_supported do
-            Callback_::Event.
-              inline_not_OK_with :non_convertible_regexp_options,
-                :option_symbols, i_a, :regexp, @ruby_regexp
+            Callback_::Event.inline_not_OK_with(
+              :non_convertible_regexp_options,
+              :option_symbols, i_a,
+              :regexp, @ruby_regexp,
+            )
           end
+          UNABLE_
         end
 
         def via_grep_regexp_mixed_result

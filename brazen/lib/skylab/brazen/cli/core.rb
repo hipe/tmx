@@ -233,10 +233,12 @@ module Skylab::Brazen
           @resources.sout.puts x
           SUCCESS_EXITSTATUS
         else
-
-          CLI_::When_Result_::Looks_like_stream.new(
-            x, @adapter, @adapter.expression_agent, @resources
-          ).execute
+          o = Home_::CLI_Support::Express_Mixed.new
+          o.expression_agent = @adapter.expression_agent
+          o.mixed_non_primitive_value = x
+          o.serr = @resources.serr
+          o.sout = @resources.sout
+          o.execute
         end
       end
 
@@ -293,7 +295,7 @@ module Skylab::Brazen
 
       ## ~~ name & related
 
-      def _write_invocation_string_parts_into y
+      def write_invocation_string_parts_into y  # [bs]
         y.concat @resources.invocation_string_array  # result
       end
 
@@ -354,7 +356,7 @@ module Skylab::Brazen
         :maybe_use_exit_status,
         :outbound_line_yielder_for__payload__,  # [gi]
         :_receive_invitation,
-        :_write_invocation_string_parts_into,
+        :write_invocation_string_parts_into,
       )
     end  # top invocation
 
@@ -982,8 +984,8 @@ module Skylab::Brazen
 
       # ~ delegate to parent:
 
-      def _write_invocation_string_parts_into y
-        @parent._write_invocation_string_parts_into y
+      def write_invocation_string_parts_into y
+        @parent.write_invocation_string_parts_into y
         y << name.as_slug
       end
 
@@ -1052,7 +1054,7 @@ module Skylab::Brazen
         :is_visible,
         :name_value_for_order,
         :_receive_invitation,  # [gi]
-        :_write_invocation_string_parts_into,
+        :write_invocation_string_parts_into,
         # invocation & lower
         :application_kernel,
         :bound_,
@@ -1388,7 +1390,7 @@ module Skylab::Brazen
       end
 
       def subprogram_name_string_
-        _write_invocation_string_parts_into( [] ) * SPACE_
+        write_invocation_string_parts_into( [] ) * SPACE_
       end
 
       # -- invocation - o.p

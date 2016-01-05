@@ -5,20 +5,35 @@ module Skylab::Zerk::TestSupport
   describe "[ze] 3 - x spec" do
 
     TS_[ self ]
+    use :memoizer_methods
     use :expect_screens
 
-    subject_ACS_class_ do
+    shared_subject :subject_CLI do
 
-      TS_.lib_ :examples_example_01_zombies
+      _ACS_class = TS_.lib_ :examples_example_01_zombies
+
+      _CLI_class = Home_::Interactive_CLI.new do | rsx, & ev_p |
+        _ACS_class.new rsx, & ev_p
+      end
+
+      TS_::Three_SFFF_CLI = _CLI_class
+
+      _CLI_class
+    end
+
+    def stdout_is_expected_to_be_written_to
+      false
     end
 
     context "first screen" do
 
-      input_  # nothing
+      given do
+        input  # nothing
+      end
 
       it "shows the buttons at the bottom" do
 
-        last_line_.should look_like_a_line_of_buttons_
+        last_line.should look_like_a_line_of_buttons_
       end
 
       it "the button \"hotstrings\" are the shortest they need to be to etc." do
@@ -31,86 +46,96 @@ module Skylab::Zerk::TestSupport
 
     context "sending an interrupt from first frame" do
 
-      input_ false
+      given do
+        input false
+      end
 
       it "exits successfully" do
         exitstatus_.should be_successful_exitstatus_
       end
 
       it "says goodbye" do
-        last_line_.should eql "goodbye."
+        last_line.should eql "goodbye."
       end
     end
 
     context "an unterpretable \"button\" from first frame" do
 
-      input_ 'montauk'
+      given do
+        input 'montauk'
+      end
 
       it "expresses that it wasn't recognized" do
 
-        first_line_.should match_line_for_unrecognized_argument_ 'montauk'
+        first_line.should match_line_for_unrecognized_argument_ 'montauk'
       end
 
-      it "asks \"did you mean?" do
+      it "asks \"did you mean?\"" do
 
-        unstyle_styled_( second_line_ ).should eql(
+        unstyle_styled_( second_line ).should eql(
           "did you mean 'fozzer', 'fizzie-nizzie' or 'biz-nappe'?" )
       end
 
       it "displays the first screen again" do
 
-        buttons_.should have_button_for_ 'fozzer'
+        buttonesques.should have_button_for 'fozzer'
       end
 
       it "ends at first frame" do
 
-        stack_.should be_at_frame_number_ 1
+        stack.should be_at_frame_number 1
       end
     end
 
     context "an ambiguous \"button\" from first frame" do
 
-      input_ 'f'
+      given do
+        input 'f'
+      end
 
       it "expresses" do
 
-        first_line_.should eql(
+        first_line.should eql(
           'ambiguous argument "f" - did you mean "fozzer" or "fizzie-nizzie"?' )
       end
 
       it "waits at first frame" do
 
-        stack_.should be_at_frame_number_ 1
+        stack.should be_at_frame_number 1
       end
     end
 
     context "a good button for a simple field" do
 
-      input_ 'fo'
+      given do
+        input 'fo'
+      end
 
       it "blocks waiting for input (does not end the line)" do
 
-        last_line_unchomped_.should _be_this_prompt
+        last_line_not_chomped_.should _be_this_prompt
       end
 
       it "waits at second frame" do
 
-        stack_.should be_at_frame_number_ 2
+        stack.should be_at_frame_number 2
       end
     end
 
     context "good button, then invalid value" do
 
-      input_ 'fo', '/x'
+      given do
+        input 'fo', '/x'
+      end
 
       it "complains of invalid" do
 
-        first_line_.should eql 'paths can\'t be absolute - "/x"'
+        first_line.should eql 'paths can\'t be absolute - "/x"'
       end
 
       it "goes back to the same prompt immediately after" do
 
-        last_line_.should _be_this_prompt
+        last_line.should _be_this_prompt
       end
     end
 
@@ -120,25 +145,29 @@ module Skylab::Zerk::TestSupport
 
     context "good button then invalid value then cancel" do
 
-      input_ 'fo', '/x', false
+      given do
+        input 'fo', '/x', false
+      end
 
       it "leaves you at the first frame" do
 
-        stack_.should be_at_frame_number_ 1
+        stack.should be_at_frame_number 1
       end
     end
 
     context "good button, then valid value" do
 
-      input_ 'fo', 'xhi'
+      given do
+        input 'fo', 'xhi'
+      end
 
       it "first line confirms that it wrote" do
-        first_line_.should eql 'set fozzer to "xhi"'
+        first_line.should eql 'set fozzer to "xhi"'
       end
 
       it "redisplays *all* buttons for first screen" do
 
-        buttons_.should be_in_any_order_the_buttons_(
+        buttonesques.should be_in_any_order_the_buttons_(
           'fozzer', 'fizzie-nizzie', 'biz-nappe' )
       end
     end

@@ -4,10 +4,6 @@ module Skylab::Basic
 
     class << self
 
-      def determine_hotstrings s_a
-        Hash_::Actors__::Determine_hotstrings[ s_a ]
-      end
-
       def pairs_at * i_a, & p
         METHODS__.pairs_at_via_names i_a, & p
       end

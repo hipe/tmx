@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace
 
-  class Magnetics_::Replace_Function_via_String_and_Work_Dir < Callback_::Actor::Dyadic
+  class Magnetics_::Replace_Function_via_String_and_Functions_Dir < Callback_::Actor::Dyadic
 
     def initialize string, functions_dir, & oes_p
 
@@ -233,4 +233,3 @@ module Skylab::SearchAndReplace
 
   end
 end
-# #todo - #pending-rename: to "functions dir" blah

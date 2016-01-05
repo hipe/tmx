@@ -12,12 +12,39 @@ module Skylab::SearchAndReplace
     end
   end  # >>
 
-  module CLI
-    class << self
-      def highlighting_expression_agent_instance
-        Home_::Modalities::CLI.highlighting_expression_agent_instance
-      end
-    end  # >>
+  Callback_ = ::Skylab::Callback
+
+  Lazy_ = Callback_::Lazy
+
+  CUSTOM_TREE___ = -> do
+    [
+      :children, {
+
+        search: -> do
+          [
+            :children, {
+              files_by_find: -> do
+                [
+                  :hotstring_delineation, %w( files-by- f ind ),
+                ]
+              end,
+              files_by_grep: -> do
+                [
+                  :hotstring_delineation, %w( files-by- g rep ),
+                ]
+              end,
+              matches: -> do
+                [
+                  :custom_view_controller, -> * a do
+                    Home_::CLI::Interactive_View_Controllers_::Matches.new( * a )
+                  end,
+                ]
+              end
+            }
+          ]
+        end
+      }
+    ]
   end
 
   rx = /(?:\r?\n|\r)\z/
@@ -37,10 +64,10 @@ module Skylab::SearchAndReplace
 
       def call * x_a, & oes_p
 
-        root = Root_Autonomous_Component_System___.new( & oes_p )
-        root.__init_with_defaults
+        root = Root_Autonomous_Component_System__.new( & oes_p )
+        root._init_with_defaults
 
-        Home_.lib_.zerk.call x_a, root
+        Home_.lib_.zerk::API.call x_a, root
       end
     end  # >>
   end
@@ -49,7 +76,7 @@ module Skylab::SearchAndReplace
     Home_.lib_.fields::Parameters[ h ]
   end
 
-  class Root_Autonomous_Component_System___
+  class Root_Autonomous_Component_System__
 
     Xxx = -> y do
 
@@ -91,7 +118,7 @@ module Skylab::SearchAndReplace
       @_oes_p = oes_p
     end
 
-    def __init_with_defaults
+    def _init_with_defaults
 
       @filename_patterns = [ '*.rb' ]
       @paths = [ '.' ]
@@ -104,12 +131,60 @@ module Skylab::SearchAndReplace
 
     def __ruby_regexp__component_association
 
+      if @ruby_regexp  # #item-value-description (#survey)
+        yield :description, -> qkn do
+          # ([ze] uses [#ba-019] ("ick") which doesn't express regexps)
+          qkn.value_x.inspect
+        end
+      end
+
       -> st, & pp do
         if st.unparsed_exists
-          ___interpret_ruby_regexp st.gets_one, & pp
+          x = st.gets_one
+          if x.respond_to? :casefold?
+            Callback_::Known_Known[ x ]
+          else
+            ___interpret_ruby_regexp x, & pp
+          end
         end
       end
     end
+
+    def ___interpret_ruby_regexp s, & pp
+
+      # in order to interpret regexp *options* (namely "extended",
+      # "ignore case", "multiline", "o...(#open [#015])"):
+      #
+      #   1) if the string starts with a slash and ends with a slash and
+      #      zero or more letters, it is assumed that the slases delimit
+      #      the regexp and the letters are options..
+      #
+      #   2) otherwise (and the string does not match the above pattern),
+      #      the whole string is used as the regexp body.
+
+      _lib = Home_.lib_.basic::Regexp
+
+      use_oes_p = nil
+
+      _oes_p = -> * i_a, & ev_p do
+        use_oes_p ||= pp[ self ]
+        use_oes_p[ * i_a, & ev_p ]
+      end
+
+      if LENIENT_RX_RX___ !~ s
+        s = "/#{ s }/"  # effectively normalize input, so we can use marshal load
+      end
+
+      rx = _lib.marshal_load s, & _oes_p
+
+      if rx
+        Callback_::Known_Known[ rx ]
+      else
+        rx
+      end
+    end
+
+    LENIENT_RX_RX___ = %r(\A/.*/[a-z]*\z)
 
     def __egrep_pattern__component_association
 
@@ -128,18 +203,6 @@ module Skylab::SearchAndReplace
       end
     end
 
-    def ___interpret_ruby_regexp s, & pp
-
-      Callback_::Known_Known[ ::Regexp.new s ]
-
-    rescue ::RegexpError => e
-
-      pp[ nil ].call :error, :expression, :regexp_error do | y |
-        y << "deesh: #{ e.message }"
-      end
-
-      UNABLE_
-    end
 
     def __paths__component_association
 
@@ -147,6 +210,8 @@ module Skylab::SearchAndReplace
     end
 
     def __path__component_association
+
+      yield :intent, :API  # don't show this for UI, just use `paths`
 
       yield :is_singular_of, :paths
 
@@ -164,6 +229,8 @@ module Skylab::SearchAndReplace
     end
 
     def __filename_pattern__component_association
+
+      yield :intent, :API  # same as up above
 
       yield :is_singular_of, :filename_patterns
 
@@ -197,7 +264,7 @@ module Skylab::SearchAndReplace
       end
 
       if a
-        Home_::Interface_Models_::Search.new( a, & @_oes_p )
+        Home_::Interface_Models_::Search.new a, & @_oes_p
       else
         -> _st, & pp do
           Cannot_search_until___[ pp ]
@@ -227,18 +294,9 @@ module Skylab::SearchAndReplace
     end
   end
 
-  if false  # #todo
+  if false  # #todo-next
 
-        # something somewhere doesn't like a relative path for the below.
-        # ideally, relative paths would "just work" for the rest of the
-        # system just like abspaths do, so this is a workaround for now
-
-        @work_dir = ::File.join ::Dir.pwd, '.search-and-replace'
-
-      def display_description
         @y << "(display, edit, and execute the details of your search)"
-        nil
-      end
 
       def xx
           "(defaults to the same pattern as below)"
@@ -304,14 +362,6 @@ module Skylab::SearchAndReplace
 
       # -- #list_parsing
 
-      def display_description
-        @y << nil
-        @y << THING_ABOUT_SPACES__
-        @y << THATS_COMING__[ @name.as_human ]
-        @y << nil
-        nil
-      end
-
       def prompt_when_value
         @serr.write "new #{ noun } (nothing to cancel, space(s) to remove): "
         @serr.flush
@@ -320,7 +370,7 @@ module Skylab::SearchAndReplace
 
       def know_via_nonblank_mutable_string s
         s.strip!
-        a = s.split SOME_SPACE_RX_
+        a = s.split SPACE_SPAN_RX_
         if a.length.zero?
           @a = nil
           UNABLE_
@@ -332,7 +382,7 @@ module Skylab::SearchAndReplace
 
       def against_nonempty_polymorphic_stream stream
         s = stream.gets_one
-        if SOME_SPACE_RX_ =~ s
+        if SPACE_SPAN_RX_ =~ s
           maybe_send_event :error do
             build_not_OK_event_with :only_single_item_for_now, :s, s
           end
@@ -343,26 +393,10 @@ module Skylab::SearchAndReplace
         end
       end
 
-      SOME_SPACE_RX_ = /[[:space:]]+/
-
-    THING_ABOUT_SPACES__ =
-      "for now, multiple values can be separated with one or more spaces."
-
-    THATS_COMING__ = -> s do
-      "and for now, there is no support for spaces in #{ s } list but that's coming.."  # #open [#006]
-    end
-
-    LIST_HACK_SEPARATOR_RX__ = /[ \t]+/
-
-    EMPTY_RX_ = /\A[[:space:]]*\z/
-    FINISHED_ = nil
-    NONE_S_ = Zerk_::NONE_S
     S_and_R_ = self
   end
 
-  Callback_ = ::Skylab::Callback
-
-  Require_ACS_ = Callback_::Lazy.call do
+  Require_ACS_ = Lazy_.call do
     ACS_ = Lib_::ACS[]
     NIL_
   end
@@ -408,6 +442,7 @@ module Skylab::SearchAndReplace
   NOTHING_ = nil
   NIL_ = nil
   SPACE_ = ' '
+  SPACE_SPAN_RX_ = /[[:space:]]+/
   UNABLE_ = false
 end
 

@@ -19,13 +19,13 @@ applications as produced by "zerk". the problem is exactly like the problem
 of testing interactivity in a web browser (although much simpler) and
 our effort at a solution is inspired by the efforts in that space.
 
-our previous solution fore this was "expect interactive" which had
-significat, (show-stopping) emergent shortcomings as a byproduct of its
+our previous solution before this was "expect interactive" which had
+significant (show-stopping) emergent shortcomings as a byproduct of its
 intrinsic design traits:
 
-  • it runs the system under test in a separate process, making
-    interactive debugging there impossible and stack traces difficult to
-    see on the system under test.
+  • it runs the system under test in a separate process; making
+    (of the system under test) stack traces difficult to see and
+    interactive debugging all but impossible.
 
   • the use of `select`, while necessary under such an architecture; was
     both clunky and expensive.

@@ -139,7 +139,7 @@
 [#036]    #watching to go from a literal to a resolved const its kind of awful
              to lose and re-parse the demarcation that is already present
              in it but meh is it worth it to hack the algorithm for this?
-[#035]       thoughts on the canonic component events ..
+[#035]       "expressive events" (and the canonic component events) ..
              ( #was: #tracking-tag events that should not be UI-level events )
 [#034]       #parent-node: [#026] the deleting narrative ..
 [#033]       #parent-node: [#026]  [the update narrative]

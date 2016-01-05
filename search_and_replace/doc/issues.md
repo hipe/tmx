@@ -1,3 +1,6 @@
+[#015] #open this new regexp 'o' option - what should we do with it?
+
+
 [#014]    #track #experiment ONLY TO SUPPORT TESTS :/
 
              for the cases of wanting to test the same file against the
@@ -49,7 +52,7 @@
 [#009]   #investigate consider merging read-only rendering with edit session rendering
 [#008]       #feature have the multiple forms save to one file
 [#007]       #feature explicit choice of single line v. multiline
-[#006]       #feature support for spaces in list items
+[#006] #done #feature support for spaces in list items
 [#005]       #feature make this one button with three labels instead of three buttons
 [#004]       #feature should check mtime before write, abort for that file if stale
 [#003]       [ track a historic node ]

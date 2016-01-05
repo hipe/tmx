@@ -1,9 +1,41 @@
 module Skylab::SearchAndReplace
 
-  module Modalities::CLI
+  module CLI
+
+    module Interactive_View_Controllers_  # only necessary until #todo-next
+      Autoloader_[ self ]
+    end
 
     class << self
-      def highlighting_expression_agent_instance
+
+      def new sin, sout, serr, pn_s_a
+
+        # _ = rsx.bridge_for( :filesystem ).pwd
+
+        cli = Home_.lib_.zerk::InteractiveCLI.new(
+
+          sin, sout, serr, pn_s_a
+
+        ) do | rsx, & top_oes_p |  # todo - don't need resources
+
+          acs = Root_Autonomous_Component_System__.new( & top_oes_p )
+          acs._init_with_defaults
+          acs
+        end
+
+        cli.design = -> vmm do
+
+          vmm.compound_frame = vmm.common_compound_frame
+          vmm.custom_tree = CUSTOM_TREE___
+          vmm.location = vmm.common_location
+          vmm.primitive_frame = vmm.common_primitive_frame
+          vmm
+        end
+
+        cli
+      end
+
+      def highlighting_expression_agent_instance__
         @___hl_expag ||= Highlighting_Expag___.new
       end
     end  # >>
@@ -29,7 +61,7 @@ module Skylab::SearchAndReplace
       end
     end
 
-    if false  # #todo - near the end
+    if false  # #todo-next
 
       Actions = ::Module.new
 

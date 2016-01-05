@@ -1,38 +1,76 @@
 module Skylab::Zerk
 
-  class Compound_Adapter___
+  class Node_Adapters_::Compound  # (built in 1 place by event loop)
 
-    def initialize acs, rsx
+    def initialize acs, ccv, rsx
 
       @ACS = acs
-      @_line_yielder = rsx.line_yielder
-      @_view_controller = rsx.view_controller
+      @compound_custom_view = ccv
+      @_indexed = nil
+      @line_yielder = rsx.line_yielder
+      @UI_event_handler = rsx.UI_event_handler
+      @view_controller = rsx.view_controller
     end
 
-    # -- expression
+    # -- ..
 
-    def to_button_name_stream
+    def begin_UI_frame
+      __index_for_UI_frame
+      NIL_
+    end
 
-      nf_a = []
-      qkn_a = []
-      st = ACS_::For_Interface::To_stream[ @ACS ]
+    def end_UI_frame
+      # remove_instance_variable :@_UI_frame_nodes  # used again ..
+      NIL_
+    end
+
+    def __index_for_UI_frame
+
+      load_tickets = []
+      st = UI_node_stream_for___[ @ACS ]
 
       # (during #description, use the above somehow ..)
+
+      butz = Home_::Expression_Adapters_::Buttonesque::Frame.begin
+
+      h = if @compound_custom_view
+        @compound_custom_view.custom_tree_for
+      else
+        MONADIC_EMPTINESS_
+      end
 
       begin
         qkn = st.gets
         qkn or break
-        nf_a.push qkn.name
-        qkn_a.push qkn
+
+        _cust_x = h[ qkn.name.as_variegated_symbol ]
+        lt = Home_::Load_Ticket_[ _cust_x, qkn, ]
+
+        butz.add lt
+
+        load_tickets.push lt
+
         redo
       end while nil
 
-      @last_buttonesques_ = qkn_a
-
-      Callback_::Stream.via_nonsparse_array nf_a
+      @_button_frame = butz.finish
+      @_UI_frame_nodes = load_tickets
+      NIL_
     end
 
-    attr_reader :last_buttonesques_
+    def to_UI_frame_item_stream
+      Callback_::Stream.via_nonsparse_array @_UI_frame_nodes
+    end
+
+    def to_stream_for_resolving_buttonesque_selection
+      Callback_::Stream.via_nonsparse_array @_button_frame
+    end
+
+    # -- expression
+
+    def button_frame
+      @_button_frame
+    end
 
     # -- user input
 
@@ -40,7 +78,7 @@ module Skylab::Zerk
 
       s.strip!  # here we strip not chomp because node names are more normal
       if s.length.zero?
-        @_line_yielder << "(nothing entered.)"
+        @line_yielder << "(nothing entered.)"
       else
         ___process_nonblank_string s
       end
@@ -49,19 +87,23 @@ module Skylab::Zerk
 
     def ___process_nonblank_string s
 
-      x = Interpret_buttonesque_[ s, self ]
+      x = Home_::Interpretation_Adapters_::Buttonesque[ s, self ]
       if x
-        @_view_controller.push_stack_frame_for x
+        @view_controller.push_stack_frame_for x
       end
       NIL_
     end
+
+    attr_reader(
+      :UI_event_handler,  # for buttonesque
+    )
 
     # -- events
 
     def handler_for sym, *_
       if :interrupt == sym
         -> do
-          @_view_controller.pop_me_off_of_the_stack self
+          @view_controller.pop_me_off_of_the_stack self
           NIL_
         end
       end
@@ -69,7 +111,7 @@ module Skylab::Zerk
 
     def receive_uncategorized_emission i_a, & ev_p
 
-      @_view_controller.receive_uncategorized_emission i_a, & ev_p
+      @view_controller.receive_uncategorized_emission i_a, & ev_p
       UNRELIABLE_
     end
 
@@ -81,8 +123,11 @@ module Skylab::Zerk
 
     # -- instrinsic shape reflection
 
-    def is_branchesque_
-      true
+    def shape_symbol
+      :branchesque
     end
+
+    MONADIC_EMPTINESS_ = -> _ { NIL }
+    UI_node_stream_for___ = Interface_stream_for_.curry[ :UI ]
   end
 end

@@ -160,7 +160,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
           ca_class._begin_definition._finish_definition_via cm, sym
 
         else
-          self._DESIGN_ME_cover_me__totally_empty_component_assoc
+          NIL_  # conditionally turn a whole assoc. off [sa]
         end
       end
 

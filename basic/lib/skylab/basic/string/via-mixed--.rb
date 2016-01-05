@@ -122,7 +122,7 @@ module Skylab::Basic
         # also we can't just make a method reflection. it has to be
         # a real proc (so others can use it as their own definition.)
 
-        @__did_make_proc = ___build_proc
+        @_as_proc ||= ___build_proc
       end
 
       def ___build_proc

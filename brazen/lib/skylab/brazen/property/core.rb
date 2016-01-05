@@ -6,8 +6,8 @@ module Skylab::Brazen
 
     class << self
 
-      def build_ambiguous_property_event *a
-        Property_::Events::Ambiguous.new_via_arglist a
+      def build_ambiguous_property_event *a, & slug
+        Property_::Events::Ambiguous.new_via_arglist a, & slug
       end
 
       def build_extra_values_event *a

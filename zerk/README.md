@@ -18,18 +18,6 @@ means to make non-interactive API's as well.
 
 
 
-
-## wishlist
-
-• when we figure out what we are doing, boy wouldn't it be great if this
-  were automatic like [br] CLI, and then you could flip-flop etc.
-
-• it does not yet use ncurses, but if we were to approach that we would
-  want it to do so unobtrusively, or spin off a separate enhancement library.
-
-
-
-
 ## the fundamentals
 
 zerk wants you to model your application as a tree of nodes.
@@ -93,3 +81,45 @@ node is the entrypoint application, for now written entirely by you.)
 in this way the user interface can be transformed by the current node:
 the node can change what this "current node" is to one of its children,
 or its parent (and sometimes even its parent's parent and so on #maybe).
+
+
+
+
+### different potential "modalities"
+
+currently zerk's main "modality" is what we call "interactive CLI" -
+that is, it runs in the terminal interactively. but also:
+
+  • one more mode that is supported is what we call `API`. the
+    extent to which this will work "out of the box" depends on
+    how much mode-specific logic is in your app..
+
+  • (other would-be modalities are discussed under "wishlist" below)
+
+
+
+
+## anti-wishlist
+
+  • ncurses: we don't want it: somewhere in our universe we once used
+    (and relied upon) `ncurses` for doing non-trivial stuff with terminals.
+    then at some point it became difficult (broken for us) to build on OSX.
+    whether or not this still remains the case, we have achieved the
+    target level of usability here without it, so for now we believe it
+    is best to avoid it altogether. (and if we do ever bring it back it
+    should be spun off as its own library.)
+
+
+
+
+## wishlist
+
+  • in effort to simplify, we removed the automatic session
+    serialization (storage to disk) we used to do. we *might* bring
+    it back if ever it hurts too much not to have it.
+
+  • one day it would be nice to have partial non-interactive CLI
+    support: you could enter many values in the familiar POSIX utility
+    conventions, and it would "drop you in" to a screen with those
+    values populated, and/or run the "job". but this will require some
+    design.

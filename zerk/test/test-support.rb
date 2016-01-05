@@ -173,7 +173,7 @@ module Skylab::Zerk::TestSupport
     end
 
     def call_via_argument_array_ args
-      Home_.call args, self
+      Home_::API.call args, self
     end
 
     def unmarshal_from_ st
@@ -242,13 +242,17 @@ module Skylab::Zerk::TestSupport
     end
   end
 
+  Memoizer_Methods = -> tcc do
+    TestSupport_::Memoization_and_subject_sharing[ tcc ]
+  end
+
   Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   ACHIEVED_ = true
   EMPTY_A_ = []
   EMPTY_S_ = "".freeze
   MONADIC_EMPTINESS_ = -> _ { NIL_ }
-  NEWLINE_ = "\n"
+  NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
   SPACE_ = Home_::SPACE_
   TS_ = self

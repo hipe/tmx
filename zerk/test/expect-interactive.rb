@@ -1,6 +1,6 @@
 module Skylab::Zerk::TestSupport
 
-  module Expect_Interactive
+  module Expect_Interactive  # #todo-next sunset this
 
     PUBLIC = true
 
@@ -298,7 +298,7 @@ module Skylab::Zerk::TestSupport
       # <-
 
     ACHIEVED_ = true
-    BLANK_RX_ = Home_::BLANK_RX_
+    BLANK_RX_ = /\A[[:space:]]*\z/
     EMPTY_S_ = ''
     LINE_DELIM_RX__ = /(?<=\n)/
     READ_BYTES___ = 8000  # like 100-ish lines - enough for now

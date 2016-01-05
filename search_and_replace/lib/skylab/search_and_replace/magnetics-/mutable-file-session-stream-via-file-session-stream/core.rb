@@ -56,7 +56,7 @@ module Skylab::SearchAndReplace
         end
 
         if s
-          x = Home_::Magnetics_::Replace_Function_via_String_and_Work_Dir.call(
+          x = Home_::Magnetics_::Replace_Function_via_String_and_Functions_Dir.call(
             s,
             dir,
             & @_oes_p )

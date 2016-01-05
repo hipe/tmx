@@ -2,7 +2,6 @@
 class ::String  # :1:[#sl-131] [#022] "to extlib or not to extlib.."
 
   def unindent
-
     ::Skylab::TestSupport.lib_.basic::String.mutate_by_unindenting self
     self
   end

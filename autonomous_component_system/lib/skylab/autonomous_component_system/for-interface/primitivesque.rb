@@ -45,6 +45,10 @@ module Skylab::Autonomous_Component_System
           Operation___.__new symmo, @_qkn, @ACS
         end
       end
+
+      def wrapped_qualified_knownness
+        @_qkn
+      end
     end
 
     class Operation___ < ACS_::Operation

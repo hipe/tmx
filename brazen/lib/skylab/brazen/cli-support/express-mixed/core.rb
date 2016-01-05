@@ -1,50 +1,57 @@
 module Skylab::Brazen
 
-  class CLI  # magic results are [#021]
+  module CLI_Support
 
-    class When_Result_::Looks_like_stream  # :[#068] for the list shape.
+    class Express_Mixed  # :[#068] for the list shape.
 
-      def initialize x, ada, expag, resources
-        @adapter = ada
-        @expag = expag
-        @resources = resources
-        @upstream = x
-        io = resources.sout
-        @y = ::Enumerator::Yielder.new do | s |
+      # magic results are [#021]
+
+      def sout= io  # convenience macro to create the line yielder
+
+        @line_yielder = ::Enumerator::Yielder.new do | s |
           io.puts s
         end
+
+        io
       end
+
+      attr_writer(
+        :expression_agent,
+        :line_yielder,  # if you do this, don't bother with `sout`
+        :mixed_non_primitive_value,
+        :serr,
+      )
 
       def execute
 
-        if @upstream.respond_to? :gets
+        if @mixed_non_primitive_value.respond_to? :gets
           @_is_single_item = false
-          __via_stream
+          ___via_stream
 
         else
           @_is_single_item = true
-          @_item = @upstream
-          @upstream = Callback_::Scn.the_empty_stream
+          @_item = @mixed_non_primitive_value
+          @mixed_non_primitive_value = Callback_::Scn.the_empty_stream
           _when_at_least_one_item
         end
       end
 
-      def __via_stream
+      def ___via_stream
 
-        @_item = @upstream.gets
+        @_item = @mixed_non_primitive_value.gets
 
         if @_item
           _when_at_least_one_item
 
         else
-          @resources.serr.puts "empty."
+          @serr.puts "empty."
           ACHIEVED_
         end
       end
 
       def _when_at_least_one_item
 
-        __resolve_name
+        ___resolve_name
 
         express_current_item =
           __niladic_proc_to_express_future_item_using_current_item_as_prototype
@@ -58,7 +65,7 @@ module Skylab::Brazen
             break
           end
 
-          x = @upstream.gets
+          x = @mixed_non_primitive_value.gets
           x or break
 
           @_item = x
@@ -77,7 +84,7 @@ module Skylab::Brazen
         end
       end
 
-      def __resolve_name
+      def ___resolve_name
 
         @_name = if @_item.respond_to? :name  # #open [#107] will change this name
           @_item.name
@@ -121,7 +128,7 @@ module Skylab::Brazen
 
       def ___niladic_proc_to_express_item_in_the_catch_all_default_manner
         -> do
-          @y << @_item
+          @line_yielder << @_item
           NIL_
         end
       end
@@ -135,10 +142,10 @@ module Skylab::Brazen
 
       def __niladic_proc_to_express_current_item_by_building_a_listing_expresser
 
-        p = When_Result_::Looks_like_stream__::Build_listing_expresser[ @expag, @_item ]
+        p = Here_::Build_listing_expresser___[ @expression_agent, @_item ]
 
         -> do
-          @_keep_looping = p[ @_item, @y ]
+          @_keep_looping = p[ @_item, @line_yielder ]
           NIL_
         end
       end
@@ -147,7 +154,7 @@ module Skylab::Brazen
 
         if x.respond_to? :express_of_via_into_under
 
-          pe = x.express_of_via_into_under @y, @expag
+          pe = x.express_of_via_into_under @line_yielder, @expression_agent
         end
 
         if pe
@@ -160,7 +167,7 @@ module Skylab::Brazen
           end
         else
           -> do
-            y = @_item.express_into_under @y, @expag
+            y = @_item.express_into_under @line_yielder, @expression_agent
             if ! y
               @_keep_looping = y
             end
@@ -173,7 +180,7 @@ module Skylab::Brazen
 
         d = @_count
         nm = @_name
-        serr = @resources.serr
+        serr = @serr
 
         if nm.respond_to? :verb_as_noun_lexeme
           lexeme = nm.verb_as_noun_lexeme
@@ -192,12 +199,12 @@ module Skylab::Brazen
         elsif 1 == d
           nm.as_human
         else
-          @expag.calculate do
+          @expression_agent.calculate do
             plural_noun nm.as_human
           end
         end
 
-        @expag.calculate do
+        @expression_agent.calculate do
           if 1 == d
             serr.puts "(one #{ surface } total)"
           else
@@ -212,7 +219,7 @@ module Skylab::Brazen
         end
       end
 
-      Self_ = self
+      Here_ = self
     end
   end
 end

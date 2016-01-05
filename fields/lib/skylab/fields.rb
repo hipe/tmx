@@ -155,7 +155,6 @@ module Skylab::Fields
     prp.default_proc
   end
 
-  can_be_more_than_one = nil
   includes_zero = nil
 
   Is_effectively_optional = -> prp do
@@ -183,9 +182,9 @@ module Skylab::Fields
 
   Takes_many_arguments = -> prp do
     if Takes_argument[ prp ]
-      if can_be_more_than_one[ prp.argument_arity ]
+      if Can_be_more_than_one[ prp.argument_arity ]
         true
-      elsif can_be_more_than_one[ prp.parameter_arity ]
+      elsif Can_be_more_than_one[ prp.parameter_arity ]
         true  # hi.
       end
     end
@@ -218,7 +217,7 @@ module Skylab::Fields
     one_or_more: true,
   }
 
-  can_be_more_than_one = {
+  Can_be_more_than_one = {
     zero_or_more: true,
     one_or_more: true,
   }

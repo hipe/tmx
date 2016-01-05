@@ -92,7 +92,7 @@ module Skylab::SearchAndReplace::TestSupport
 
           to_lines = -> div do
 
-            _expag = Home_::CLI.highlighting_expression_agent_instance
+            _expag = Home_::CLI.highlighting_expression_agent_instance__
             _st = div.to_line_stream_under _expag
             _st.to_a
           end

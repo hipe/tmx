@@ -1,86 +1,70 @@
 module Skylab::Zerk
 
-  module View_Maker_Maker___
+  class InteractiveCLI::View_Maker_Maker___
 
-    def self.new
-      View_Maker__
+    class << self
+      private :new
+    end  # >>
+
+    def initialize
+      @_compound_frame_view_controller = nil
+      @_location_view_controller = nil
+      @_primitive_frame_view_controller = nil
     end
 
-    class View_Maker__
+    define_singleton_method :instance, ( Lazy_.call do
+      new.freeze
+    end )
 
-      class << self
-        alias_method :make_view_maker, :new
-        private :new
-      end  # >>
+    def compound_frame= x
+      _receive :"@_compound_frame_view_controller", x
+    end
 
-      def initialize stack, rsx
+    def common_compound_frame
+      View_Controllers_::Compound_Frame.common_instance
+    end
 
-        b9r = rsx.boundarizer
-        @_boundarizer = b9r
-        @_boundarizing_line_yielder = b9r.line_yielder
-        @_stack = stack
-      end
+    def location= x
+      _receive :"@_location_view_controller", x
+    end
 
-      def express
+    def common_location
+      View_Controllers_::Location.common_instance
+    end
 
-        ada = @_stack.last
+    def primitive_frame= x
+      _receive :"@_primitive_frame_view_controller", x
+    end
 
-        button_nf_st = if ada.is_branchesque_
-          ada.to_button_name_stream
-        else
-          ada.any_button_name_stream
-        end
+    def common_primitive_frame
+      View_Controllers_::Primitive_Frame.common_instance
+    end
 
-        if button_nf_st
+    def _receive ivar, x
 
-          # (note we do not clear the boundarizer here - we want a blank)
-          __location_area
-          __body
-          __buttons button_nf_st
+      # to this point at least we store this input as though a distinction
+      # might be made between the user having not set a value and the user
+      # having set a false-ish value. to be able to hold this distinction
+      # in a single variable, we wrap it as a [#ca-004] "known known".
+      # (if a value is known to be `nil` or known to be `false` it is still
+      # a known known.) :#thread-three
 
-        else
-          ada.express_prompt  # might pass self later..
-        end
-        NIL_
-      end
+      instance_variable_set ivar, Callback_::Known_Known[ x ]
+      x
+    end
 
-      def __location_area
+    attr_accessor(
+      :custom_tree,
+    )
 
-        @_boundarizing_line_yielder << "<<location>>"
-        @_boundarizer.touch_boundary
-        NIL_
-      end
-
-      def __body
-
-        @_boundarizing_line_yielder << "<<body>>"
-        @_boundarizer.touch_boundary
-        NIL_
-      end
-
-      def __buttons nf_st
-
-        _ = nf_st.map_by do | nf |
-          nf.as_slug
-        end.to_a
-
-        _hs_a = Home_.lib_.basic::Hash.determine_hotstrings _
-
-        @_boundarizing_line_yielder << ( _hs_a.map do | hs |
-
-          if hs
-            "[#{ hs.hotstring }]#{ hs.rest }"
-
-            # if one string is a head-anchored substring of the other it is
-            # always ambiguous, not displayed except we produce nil as a clue
-
-          end
-        end.join SPACE_ )
-
-        @_boundarizer.touch_boundary
-
-        NIL_
-      end
+    def make_view_maker stack, rsx
+      View_Controllers_::Frame.new(
+        stack,
+        rsx,
+        @_compound_frame_view_controller,
+        @_location_view_controller,
+        @_primitive_frame_view_controller,
+      )
     end
   end
 end

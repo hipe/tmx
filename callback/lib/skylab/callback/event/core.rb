@@ -332,7 +332,7 @@ module Skylab::Callback
               _CLS_[ y, self, o ] ; nil
             end
           end
-        end
+        end  # >>
 
         Home_::Actor[ self, :properties,
           :y,
@@ -422,9 +422,15 @@ module Skylab::Callback
         end
 
         def ickify_item_x
+
           x = @item_x
+          a = ::Array.try_convert x
           s = @expression_agent.calculate do
-            ick x
+            if a
+              a.map( & method( :ick ) ).join( ', ' )
+            else
+              ick x
+            end
           end
           @item_x = s ; nil
         end

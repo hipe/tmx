@@ -130,6 +130,11 @@ module Skylab::SearchAndReplace
 
         class Read_Only_Match___
 
+          # one way to make this expressable under a textual context would be
+          # to implement `express_into_under` here. but because this node is
+          # the frontier for [#ze-010] custom view (controllers) we use that
+          # means instead.
+
           def initialize path
             @path = path
             freeze

@@ -25,14 +25,20 @@ module Skylab::Brazen
 
     class << Events::Ambiguous
 
-      def new_via_arglist a
-        __new_via( * a )
+      def new_via_arglist a, & slug
+        __new_via( * a, & slug )
       end
 
-      def __new_via ent_a, x, lemma_x=nil
+      def __new_via ent_a, x, lemma_x=nil, & slug
+
+        if ! slug
+          slug = -> ent do
+            ent.name.as_slug
+          end
+        end
 
         _name_s_a = ent_a.map do | ent |
-          ent.name.as_slug
+          slug[ ent ]
         end
 
         _name = if lemma_x

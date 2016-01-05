@@ -1,6 +1,6 @@
 module Skylab::Zerk
 
-  class Event_Loop___  # :[#002].
+  class InteractiveCLI::Event_Loop___  # :[#002].
 
     def initialize vmm, rsx, & build_top
 
@@ -24,7 +24,14 @@ module Skylab::Zerk
 
       begin
 
+        @_do_redo = false
+
         view_maker.express
+
+        if @_do_redo
+          redo
+        end
+
         s = nil
 
         begin
@@ -35,7 +42,7 @@ module Skylab::Zerk
         if s
           __process_mutable_string_input s
         else
-          # (per #detail-two, we classify as "interrupt" all such cases)
+          # classify as "interrupt" all such cases :#thread-two
           __process_interrupt
         end
       end while @_running
@@ -49,56 +56,88 @@ module Skylab::Zerk
 
       Require_ACS_[]
 
-      _top_oes_p = -> * i_a, & ev_p do  # :[#]#detail-one
+      top_oes_p = -> * i_a, & ev_p do  # this is this. :#thread-one
 
         receive_uncategorized_emission i_a, & ev_p
         UNRELIABLE_
       end
 
-      rsx = Frame_Resources___.new(
-        @_resources.line_yielder,
-        @_resources.serr,
-        self,
-      )
+      @line_yielder = @_resources.line_yielder
+      @serr = @_resources.serr
+      @sout = @_resources.sout
+      @UI_event_handler = top_oes_p
 
-      @_frame_resources = rsx
+      _top_ACS = @_build_top.call self, & top_oes_p
 
-      _top = @_build_top.call rsx, & _top_oes_p
-
-      @_stack = [ Home_::Compound_Adapter___.new( _top, rsx ) ]
-
-      NIL_
-    end
-
-    def push_stack_frame_for qkn
-
-      if qkn.is_effectively_known  # #detail-three: intentionally we munge
-        # the cases of the (for e.g) ivar being set to `nil` and the ivar
-        # not being set so that clients can internally set it to nil and
-        # check if it's set more idiomatically.
-
-        self._FUN_TIMES
-      else
-        _ = qkn.association.model_classifications.category_symbol
-        send :"__push_stack_frame_for_new__#{ _ }__", qkn
+      x = @_view_maker_maker.custom_tree
+      if x
+        _ccv = Home_::Load_Ticket_::Compound_Custom_View.new x
       end
-      NIL_
-    end
 
-    def __push_stack_frame_for_new__primitivesque__ qkn
-
-      _new = Home_::Primitivesque_Adapter___.new( qkn, @_frame_resources )
-
-      @_stack.push _new
+      @_stack = [ _build_compound_adapter( _top_ACS, _ccv ) ]
 
       NIL_
     end
 
-    Frame_Resources___ = ::Struct.new(
+    # -- parameters for lower-level modules (used to be "frame resources")
+
+    def view_controller
+      self
+    end
+
+    attr_reader(
       :line_yielder,
       :serr,
-      :view_controller,
+      :sout,
+      :UI_event_handler,
     )
+
+    # --
+
+    def push_stack_frame_for lt
+
+      send :"__push_stack_frame_for_new__#{ lt.category_symbol }__", lt
+      NIL_
+    end
+
+    def __push_stack_frame_for_new__primitivesque__ lt
+
+      _new = Home_::Node_Adapters_::Primitivesque.new lt, self
+      @_stack.push _new
+      NIL_
+    end
+
+    def __push_stack_frame_for_new__entitesque__ lt
+
+      _new = Home_::Node_Adapters_::Entitesque.new lt, self
+      @_stack.push _new
+      NIL_
+    end
+
+    def __push_stack_frame_for_new__compound__ lt
+
+      if lt.is_known_known
+        self._K
+      end
+
+      # (we may have to do better event wiring than the below eventually..)
+
+      acs = lt.association.component_model.interpret_compound_component(
+        IDENTITY_ )
+
+      if acs
+        _ccv = lt.compound_custom_view
+        _ = _build_compound_adapter acs, _ccv
+        @_stack.push _
+      end
+
+      NIL_
+    end
+
+    def _build_compound_adapter acs, ccv
+
+      Home_::Node_Adapters_::Compound.new acs, ccv, self
+    end
 
     # -- event handling
 
@@ -128,6 +167,10 @@ module Skylab::Zerk
     end
 
     # -- API as view controller
+
+    def redo
+      @_do_redo = true ; nil
+    end
 
     def pop_me_off_of_the_stack guy
 
@@ -160,5 +203,7 @@ module Skylab::Zerk
       @_running = false
       NIL_
     end
+
+    IDENTITY_ = -> x { x }
   end
 end

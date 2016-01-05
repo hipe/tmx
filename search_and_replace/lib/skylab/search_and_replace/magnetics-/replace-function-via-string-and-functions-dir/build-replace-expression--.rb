@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace
 
-    class Magnetics_::Replace_Function_via_String_and_Work_Dir
+    class Magnetics_::Replace_Function_via_String_and_Functions_Dir
 
       class Build_replace_expression__
 

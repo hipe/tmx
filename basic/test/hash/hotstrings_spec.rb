@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Basic::TestSupport::Hash
 
-  describe "[ba] hash - deterine hotstrings" do
+  describe "[ba] hash - hotstrings" do
 
     # we think we've seen some sort of builtin for this somewhere before
     # but A) we couldn't find it and B) the edge cases are such that it's
@@ -38,7 +38,7 @@ module Skylab::Basic::TestSupport::Hash
     end
 
     def subject a
-      Subject_[].determine_hotstrings a
+      Subject_[]::Hotstrings[ a ]
     end
   end
 end

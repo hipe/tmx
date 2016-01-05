@@ -10,7 +10,7 @@ module Skylab::Basic
       end
 
       def marshal_load s, & oes_p
-        Marshal_load__[ s, & oes_p ]
+        Marshal_load___[ s, & oes_p ]
       end
 
       def options_via_regexp rx
@@ -54,68 +54,75 @@ module Skylab::Basic
       end
     end  # >>
 
-    class Marshal_load__
+    class Marshal_load___ < Callback_::Actor::Monadic
 
-      Callback_::Actor.call self, :properties,
-
-        :string
+      def initialize s, & oes_p
+        @on_event_selectively = oes_p
+        @string = s
+      end
 
       def execute
-        @modifiers_d = 0
-        @md = RX_RX__.match @string
+        @_rx_options_d = 0
+        @md = RX_RX___.match @string
         if @md
-          via_md
+          __via_md
         else
-          when_no_md
+          ___when_no_md
         end
       end
 
-      RX_RX__ = %r(\A/(?<source>.*)/(?<modifiers>[imx]+)?\z)m
+      RX_RX___ = %r(\A/(?<source>.*)/(?<rx_options>[imx]+)?\z)m
 
-      def when_no_md
+      def __when_no_md
 
         @on_event_selectively.call :error, :not_parsable_as_regex do
 
           Callback_::Event.inline_not_OK_with :not_parsable_as_regex,
             :string, @string
         end
+        UNABLE_
       end
 
-      def via_md
-        @source, @modifiers = @md.captures
-        @modifiers and parse_modifiers
-        via_ivars
+      def __via_md
+
+        @source, @_rx_options = @md.captures
+
+        if @_rx_options
+          ___parse_rx_options
+        end
+
+        __via_ivars
       end
 
-      def parse_modifiers  # CANNOT FAIL - look at your regex
-        @modifiers.length.times do |d|
-          @modifiers_d |= MODIFIERS__.fetch @modifiers.getbyte d
-        end ; nil
+      def ___parse_rx_options  # CANNOT FAIL - look at your regex
+
+        @_rx_options.length.times do |d|
+          @_rx_options_d |= RX_OPTIONS___.fetch @_rx_options.getbyte d
+        end
+        NIL_
       end
 
-      MODIFIERS__ = {
+      RX_OPTIONS___ = {
         'i'.getbyte( 0 ) => ::Regexp::IGNORECASE,
         'm'.getbyte( 0 ) => ::Regexp::MULTILINE,
         'x'.getbyte( 0 ) => ::Regexp::EXTENDED
       }
 
-      def via_ivars
-        ::Regexp.new @source, @modifiers_d
+      def __via_ivars
+        ::Regexp.new @source, @_rx_options_d
       rescue ::RegexpError => @e
-        when_rx_e
+        ___when_rx_e
       end
 
-      def when_rx_e
+      def ___when_rx_e
 
         ev = Callback_::Event.wrap.exception @e
 
         @on_event_selectively.call :error, ev.terminal_channel_i do
           ev
         end
-      end
 
-      def value_is_known
-        ! @rx.nil?
+        UNABLE_
       end
     end
 

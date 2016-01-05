@@ -2,35 +2,30 @@ module Skylab::Zerk::TestSupport
 
   module Expect_Screens  # objective & scope at [#006]
 
-    PUBLIC = false  # a reminder that this is there
+    PUBLIC = true  # [sa]
 
     def self.[] tcc
-      tcc.extend Module_Methods___
+
+      tcc.send :define_singleton_method, :given, Given___
       tcc.include self
     end
 
-    module Module_Methods___
-
-      def subject_ACS_class_ & p
-
-        define_method :_expscr_subject_ACS_class, ( Lazy_.call do
-          p[]
-        end )
-      end
-
-      def input_ * x_a
-
+      Given___ = -> & p do
         Danger_Memo__.call self, :_expscr_session_state do
 
-          ___expscr_build_state x_a
+          @_expscr_args = Args___.new
+          instance_exec( & p )
+          _args = remove_instance_variable :@_expscr_args
+          _x_a, = _args.to_a
+          __expscr_build_state _x_a
         end
       end
-    end
 
     Danger_Memo__ = TestSupport_::Define_dangerous_memoizer
 
-    # -
+    Args___ = ::Struct.new :_CLI_x_a
 
+    # -
       # -- specific whines
 
       def match_line_for_unrecognized_argument_ s
@@ -44,11 +39,11 @@ module Skylab::Zerk::TestSupport
       end
 
       def hotstring_for_ slug
-        buttons_.hotstring_for slug
+        buttonesques.hotstring_for slug
       end
 
-      def buttons_
-        _expscr_session_state.screens.last.__buttons
+      def buttonesques
+        _expscr_session_state.screens.last.buttonesques
       end
 
       def be_in_any_order_the_buttons_ * s_a
@@ -59,7 +54,13 @@ module Skylab::Zerk::TestSupport
         o
       end
 
-      def have_button_for_ slug
+      def not_have_button_for slug  # ..
+        o = have_button_for slug
+        o.negate!
+        o
+      end
+
+      def have_button_for slug
 
         o = Button_Set_Matcher__.new self
         o.slug_set = [ slug ]
@@ -68,44 +69,64 @@ module Skylab::Zerk::TestSupport
 
       # -- screen lines
 
-      def first_line_
-        _last_screen_line_strings.fetch 0
+      def first_line
+        lines.fetch 0
       end
 
-      def second_line_
-        _last_screen_line_strings.fetch 1
+      def second_line
+        lines.fetch 1
       end
 
-      def last_line_
-        _last_screen_line_strings.fetch( -1 )
+      def last_line_not_chomped_  # (in case there is ever a difference)
+        lines.fetch( -1 )
       end
 
-      def _last_screen_line_strings
-
-        _expscr_session_state.screens.last.line_strings
+      def last_line
+        lines.fetch( -1 )
       end
 
-      def last_line_unchomped_
+      def lines
+        screen.__all_lines
+      end
 
-        # all lines are chomped because no lines are terminated (for now)
+      def first_screen
+        screens.first
+      end
 
-        _expscr_session_state.screens.last.line_strings.last
+      def second_screen
+        screens.fetch 1
+      end
+
+      def screen
+        screens.last
+      end
+
+      def screens
+        _expscr_session_state.screens
+      end
+
+      def _expscr_last_screen_stream_lines_stream
+        Callback_::Stream.via_nonsparse_array _expscr_last_screen_stream_lines 
+      end
+
+      def _expscr_last_screen_stream_lines
+        _expscr_session_state.screens.fetch( -1 ).stream_lines
       end
 
       def unstyle_styled_ s
         Home_.lib_.brazen::CLI_Support::Styling::Unstyle_styled[ s ]
       end
 
-      # -- internals
+      # -- testing which frame you are on
 
-      def stack_
+      def stack
 
         # see #here
 
         _expscr_session_state.event_loop_state.frame_stack_length
       end
 
-      def be_at_frame_number_ d
+      def be_at_frame_number d
 
         # :#here build these two out to be like buttons w/ custom matchers
         # as soon as you validate more than this one aspect of the event loop
@@ -125,21 +146,25 @@ module Skylab::Zerk::TestSupport
 
       # -- support - build state
 
-      def ___expscr_build_state x_a
+      def input( * x_a )
+        @_expscr_args._CLI_x_a = x_a ; nil
+      end
 
-        _cls = _expscr_subject_ACS_class
-
-        _CLI_class = Home_::CLI.new do | rsx, & ev_p |
-          _cls.new rsx, & ev_p
-        end
+      def __expscr_build_state x_a
 
         fake = Custom_Fake___.new x_a, do_debug, debug_IO
 
-        _CLI = _CLI_class.new fake.sin, SOUT_CANARY___, fake.serr, PN_S_A___
+        if stdout_is_expected_to_be_written_to
+          fake.init_sout_like_serr
+        else
+          fake.sout = SOUT_CANARY___
+        end
+
+        _CLI = __expscr_build_CLI fake
 
         event_loop = nil
-
         x = nil
+
         _got_to_end = catch :__expscr_freeze_where_you_are__ do
 
           x = _CLI.invoke EMPTY_A_ do | el |  # #NASTY
@@ -152,18 +177,25 @@ module Skylab::Zerk::TestSupport
         if _got_to_end
           fake.accept_end_result x
         else
-          _x = ___grind_the_event_loop event_loop
+          _x = ___expscr_grind_the_event_loop event_loop
           fake.accept_that_we_froze_in_the_middle _x
         end
 
         fake.flush_to_state
       end
 
-      def ___grind_the_event_loop event_loop
+      def ___expscr_grind_the_event_loop event_loop
 
         _d = event_loop.instance_variable_get( :@_stack ).length
 
         Event_Loop_State___.new _d
+      end
+
+      def __expscr_build_CLI fake
+
+        _CLI_class = subject_CLI
+
+        _CLI_class.new fake.sin, fake.sout, fake.serr, PN_S_A___
       end
 
       Event_Loop_State___ = ::Struct.new :frame_stack_length
@@ -191,81 +223,183 @@ module Skylab::Zerk::TestSupport
 
       def initialize
 
-        @_accept = method :__accept
-        @line_strings = []
-        @_pending = nil
+        @_accept = -> m, x do
+          send m, x
+        end
+        @_serr_buff = nil
+        @_stream_lines = []
       end
 
-      def accept sym, s
+    # -- readers (some that cache (lazily))
+
+      def count_lines_on sym
+        _to_stream_line_stream_on( sym ).flush_to_count
+      end
+
+      def serr_lines
+        @___serr_lines ||= to_content_line_stream_on( :serr ).to_a
+      end
+
+      def __all_lines
+        @___all_lines ||= _to_stream_line_stream( & :content_string ).to_a
+      end
+
+      def to_content_line_stream_on sym
+        _to_stream_line_stream_on( sym ).map_by( & :content_string )
+      end
+
+      def _to_stream_line_stream_on sym
+        _to_stream_line_stream.reduce_by do |o|
+          sym == o.stream_symbol
+        end
+      end
+
+      def _to_stream_line_stream & p
+        Callback_::Stream.via_nonsparse_array( @_stream_lines, & p )
+      end
+
+      # ~
+
+      def buttonesques
+        @___buttons ||= ___build_buttons
+      end
+
+      def ___build_buttons
+        o = @_stream_lines.last
+        if :serr != o.stream_symbol
+          self._LAST_LINE_SHOULD_ALWAYS_BE_ON_SERR
+        end
+        Hotstring_Index___.new( o.content_string )  # ..
+      end
+
+    # -- writers (while open only)
+
+      def __accept sym, s
         @_accept[ sym, s ]
       end
 
-      def __accept sym, s
+      # ~ internal for writing
+      private
 
-        if :line_string == sym
+      def sout_line_string s
+        s or self._WEIRD
 
-          s ||= EMPTY_S_  # some clients pass `nil` to get a newline
-
-          if @_pending
-            @_pending.concat s
-            s = @_pending
-            @_pending = nil
-          end
-
-          if ! s.frozen?
-            s.freeze
-          end
-
-          @line_strings.push s
-        else
-
-          send :"__accept__#{ sym }__", s
+        if ! s.frozen?
+          s.freeze
         end
+
+        __accept_sout_line_string s
         NIL_
       end
 
-      def __accept__write__ s
-        if @_pending
-          @_pending.concat s
+      def serr_line_string s
+
+        s ||= EMPTY_S_  # some clients pass `nil` to get a newline
+
+        if @_serr_buff
+          @_serr_buff.concat s
+          _flush_serr_buff
         else
-          @_pending = s.dup
+          _accept_serr_line_string s
         end
+
         NIL_
       end
 
-      def close
+      def serr_write s
 
-        s = @_pending
-        if s
-          @_pending = nil
-          @line_strings.push s
+        if @_serr_buff
+          @_serr_buff.concat s
+        else
+          @_serr_buff = s.dup
+        end
+        _flush_serr_buff
+        NIL_
+      end
+
+      # ~ exposures for writing
+      public
+
+      def _close_screen
+
+        if @_serr_buff
+          __close_serr_buff
         end
 
         @_accept = Closed__
-        @line_strings.freeze
+        @_stream_lines.freeze
         NIL_
       end
 
-      # --
-
-      def __buttons
-        @___buttons ||= Hotstring_Index___.new( @line_strings.last )  # ..
+      def __close_serr_buff  # assume
+        _flush_serr_buff
+        s = @_serr_buff
+        if s
+          @_serr_buff = nil
+          _accept_serr_line_string s  # LOSSY
+        end
+        NIL_
       end
 
-      attr_reader(
-        :line_strings,
-      )
+      def _flush_serr_buff  # assume
+        d = @_serr_buff.index NEWLINE_
+        if d
+          __do_flush_serr_buff d
+        end
+        NIL_
+      end
+
+      def __do_flush_serr_buff d  # (this again)
+
+        s = @_serr_buff
+        len = s.length
+        pos = 0
+        begin
+          _accept_serr_line_string s[ pos, d - pos ]  # effectively chomp
+          pos = d + 1
+          if len == pos
+            done = true
+            break
+          end
+          d = s.index NEWLINE_
+          if d
+            self._COVER_ME
+          else
+            break
+          end
+        end while nil
+
+        if done
+          @_serr_buff = nil
+        end
+      end
+
+      def __accept_sout_line_string s
+        @_stream_lines.push Stream_Line__[ s, :sout ] ; nil
+      end
+
+      def _accept_serr_line_string s
+        @_stream_lines.push Stream_Line__[ s, :serr ] ; nil
+      end
     end
+
+    Stream_Line__ = ::Struct.new :content_string, :stream_symbol
+      # #[#ts-007] (2 of 2 in universe)
 
     class Button_Set_Matcher__
 
       def initialize tc
         @_is_extent = false
+        @_polarity = true
         @_tc = tc
       end
 
       def slug_set_is_extent
         @_is_extent = true
+      end
+
+      def negate!
+        @_polarity = false ; nil
       end
 
       attr_writer(
@@ -284,12 +418,16 @@ module Skylab::Zerk::TestSupport
 
         @_failures = nil
 
-        if missing.length.nonzero?
-          ___add_failure_of_missing_buttons missing
+        if missing.length.zero?
+          if ! @_polarity
+            ___when_had_blacklisted_button missing
+          end
+        elsif @_polarity
+          ___when_missing_buttons missing
         end
 
         if extra && extra.length.nonzero?
-          __add_failure_of_extra_buttons extra
+          __when_extra_buttons extra
         end
 
         if @_failures
@@ -299,12 +437,16 @@ module Skylab::Zerk::TestSupport
         end
       end
 
-      def ___add_failure_of_missing_buttons missing
-        _add_failure "missing required button(s) (#{ missing * ', ' })"
+      def ___when_had_blacklisted_button x
+        _add_failure "found blacklisted button(s) (#{ x * ', '})"
       end
 
-      def __add_failure_of_extra_buttons extra
-        _add_failure "unexpected button(s) (#{ extra * ', ' })"
+      def __when_missing_buttons x
+        _add_failure "missing required button(s) (#{ x * ', ' })"
+      end
+
+      def __when_extra_buttons x
+        _add_failure "unexpected button(s) (#{ x * ', ' })"
       end
 
       def _add_failure s
@@ -320,7 +462,7 @@ module Skylab::Zerk::TestSupport
 
     class Hotstring_Index___
 
-      def initialize line_string
+      def initialize serr_line_string
 
         bx = Callback_::Box.new
 
@@ -329,24 +471,21 @@ module Skylab::Zerk::TestSupport
 
         parse_button = -> do
 
-          md = rx.match line_string, pos
+          md = rx.match serr_line_string, pos
 
-          a = [ * md.offset( :hotstring ), * md.offset( :rest ) ]
+          md or fail
 
-          a.map! do | d |
-            d - pos
-          end
+          butt = Button___.new md, serr_line_string
 
-          pos += md[ 0 ].length
-
-          butt = Button___.new( a, md[ 0 ] )
+          pos = md.offset( 0 ).last  # advance the pointer to the first
+            # cel after the end of the button (or off the end of the string)
 
           bx.add butt.slug, butt
 
           NIL_
         end
 
-        last = line_string.length
+        last = serr_line_string.length
         if last != pos
 
           parse_button[]
@@ -355,7 +494,7 @@ module Skylab::Zerk::TestSupport
             if last == pos
               break
             end
-            md = sp.match line_string, pos
+            md = sp.match serr_line_string, pos
             md or self._PARSE_FAILURE
             pos += md[ 0 ].length
 
@@ -388,22 +527,47 @@ module Skylab::Zerk::TestSupport
 
     class Button___
 
-      def initialize a, s
-        @_hotstring_range = ::Range.new( * a[ 0, 2 ], true )
-        @_rest_range = ::Range.new( * a[ 2, 2], true )
-        @_string = s
-      end
+      def initialize md, s
 
-      def slug
-        @___slug ||= "#{ hotstring }#{ @_string[ @_rest_range ] }"
+        translate = -> sym do
+          a = md.offset sym
+          if a.first
+            ::Range.new( * a, true )
+          end
+        end
+
+        head_r = translate[ :head ]
+        hot_r = translate[ :hotstring ]
+        tail_r = translate[ :tail ]
+
+        @_build_hs = -> do
+          s[ hot_r ]
+        end
+
+        @_build_slug = -> do
+         [ head_r, hot_r, tail_r ].reduce "" do | m, x |
+            if x
+              m.concat s[ x ]
+            end
+            m
+          end
+        end
       end
 
       def hotstring
-        @___hotstring ||= @_string[ @_hotstring_range ]
+        @___hs ||= _ :@_build_hs
+      end
+
+      def slug
+        @___slug ||= _ :@_build_slug
+      end
+
+      def _ ivar
+        remove_instance_variable( ivar ).call
       end
     end
 
-    EGADS_RX___ = /\G\[(?<hotstring>[a-z-]+)\](?<rest>[a-z-]*)/
+    EGADS_RX___ = /\G(?<head>[a-z-]+)?\[(?<hotstring>[a-z-]+)\](?<tail>[a-z-]+)?/
 
     BUTTON_SEPARATOR_RX___ = /\G[ ]/
 
@@ -428,7 +592,21 @@ module Skylab::Zerk::TestSupport
 
       end
 
-      # -- fake serr
+      attr_accessor :sout
+
+      # -- fake sout & serr
+
+      def init_sout_like_serr
+
+        io = Fake_Writable_IO__.new
+        io.on_puts = -> s do
+          @_receive[ :sout_line_string, s ]
+          NIL_
+        end
+        # etc ..
+        @sout = io
+        NIL_
+      end
 
       def ___build_fake_serr
 
@@ -442,12 +620,12 @@ module Skylab::Zerk::TestSupport
         io = Fake_Writable_IO__.new
 
         io.on_puts = -> s do
-          @_receive[ :line_string, s ]
+          @_receive[ :serr_line_string, s ]
           NIL_
         end
 
         io.on_write = -> s do
-          @_receive[ :write, s ]
+          @_receive[ :serr_write, s ]
           s.length
         end
 
@@ -481,7 +659,7 @@ module Skylab::Zerk::TestSupport
         end
 
         fake_interrupt = -> x do
-          x  # should be fine as-is per [#002]#detail-two
+          x  # should be fine as-is per #thread-two
         end
 
         if @_do_debug
@@ -541,7 +719,7 @@ module Skylab::Zerk::TestSupport
 
           @_begin_new_screen = -> do
             # each subsequent time it is called
-            @_screens.last.close
+            @_screens.last._close_screen
             _add_new_screen
             NIL_
           end
@@ -558,7 +736,7 @@ module Skylab::Zerk::TestSupport
 
         p = -> sym, s do
 
-          screen.accept sym, s
+          screen.__accept sym, s
           NIL_
         end
 
@@ -566,7 +744,7 @@ module Skylab::Zerk::TestSupport
           dbg = @_debug_IO
           p0 = p
           p = -> sym, s do
-            if :line_string != sym
+            if :serr_line_string != sym
               _ = " #{ sym }"
             end
             dbg.puts "(RECV#{ _ }: #{ s.inspect })"
@@ -603,6 +781,9 @@ module Skylab::Zerk::TestSupport
         remove_instance_variable( :@serr ).close_fake_IO
         remove_instance_variable( :@sin ).close_fake_IO
 
+        io = remove_instance_variable :@sout
+        io.close_fake_IO
+
         # assume always at least one screen
 
         if remove_instance_variable( :@_did_get_to_end )
@@ -612,7 +793,7 @@ module Skylab::Zerk::TestSupport
 
         else
 
-          @_screens.last.close
+          @_screens.last._close_screen
           end_result_wv = Callback_::KNOWN_UNKNOWN
           els = remove_instance_variable :@_event_loop_state
         end

@@ -15,21 +15,58 @@ below we will justify why we didn't use a tool like vi's `s///gc` or
 
 ## scope of the task
 
-at the time of this writing and exact match search for the the string
-`::Lib_` found hits on exactly 555 lines in the codebase.
+at the time of *first* writing of this paragraph, the string `::Lib_`
+matched 555 lines in the codebase. this code-feature was one that we
+were altering universe-wide in a way that was non-trivial but regular.
 
 
 
 
-## comparative analysis
+## justification for yet another wheel
 
 this is certainly a well-trodden space of solutions (some decades old)
 falling under the umbrella of "refactoring tools" that are out there.
 
-we assume that there certainly exit "better" ways to do this with
-whatver the "state of the art" IDE's and editors exist today. but the
-"best" way to do this with our current editor (`vi`) was really
-annoying:
+we built this with the acknowledgement that there are many solutions
+already "out there" in the world of IDE's that are functionally
+equivalent (or perhaps even superior) to what we accomplish here.
+
+notwithstanding, we built this anyway because:
+
+  1) we wanted to make something that did *exactly* what we wanted
+     and nothing more.
+
+  2) we wanted a general (and small) utility that wasn't coupled tightly
+     to any one IDE or editor - we want any developer to be comfortable
+     using this regardless of her editor or IDE of choice. (yes,
+     integration would be neat.)
+
+  3) we wanted a UI that was optimized for our exact sort of use cases
+     (namely that of "large"-ish projects of thousands of files - we
+     want it to scale to both projects of this size and we want it to
+     scale reasonably to the human who is refactoring projects of this
+     size.)
+
+  4) we wanted the "right" balance between power and usability:
+     we wanted to combine the expressive power of the pre-existing and
+     well-known tools like `find` and `grep` with the even more
+     expressive power of PCRE or (ahem) ONIGURUMA, and balance that
+     with an interface that is intuitive enough that you don't have
+     to go to a manpage for typical usage.
+
+  5) baked in from the start, we wanted our utility to be API-friendly
+     so that it can be called from a runtime just as cleanly as by
+     a human.
+
+  6) we wanted to drive forward our top secret project that relates
+     to semi-generated UI's.
+
+
+
+## comparison to how we used to do it
+
+before we wrote this, our means of dealing with search-and-replace in
+files was cumbersome:
 
 1) with the "ack" utility we *can* use lookbehind assertions to match
    all occurrences of `Lib_` followed by "::" (but not actually match
@@ -100,6 +137,7 @@ annoying:
 
 ## why go around obstacles when you can plow through them?
 
+(EDIT: the below is mostly redundant with points in an earlier section.)
 
 our ridiculous solution to all of this is to write our own custom
 solution. we expect that we will find a "better" solution than ours one

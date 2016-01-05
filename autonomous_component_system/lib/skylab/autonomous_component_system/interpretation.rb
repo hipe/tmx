@@ -4,7 +4,7 @@ module Skylab::Autonomous_Component_System
 
     module Interpretation
 
-      Accept_component_change = -> new_component, floating_qkn, acs do  # [mt] ONLY
+      Accept_component_change = -> new_x, floating_qkn, acs do  # [mt] ONLY
 
         # guarantee storage of new component. result in proc that produces
         # event describing the change.
@@ -22,47 +22,41 @@ module Skylab::Autonomous_Component_System
         # ACS, and in general). if one or more of A, B is not true, probably
         # the client should make some kind of component change writer..)
 
-        ACS_::Interpretation_::Write_value[ new_component, asc, acs ]  # guaranteed
+        ACS_::Interpretation_::Write_value[ new_x, asc, acs ]  # guaranteed
 
         # (see #resulting-in-proc)
 
-        looks_primitive = nil
-        as_new_component = nil
-        _LL = nil
+        as_component_via_component = -> x do
 
-        these = -> do
+          # for a value to be compatible with [#br-035] expressive events
+          # it must respond to one particular method. it is certainly not
+          # within the domain of concern of the primitive component value
+          # to respond to this method so we put it in a wrapper that does
 
-          looks_primitive = asc.model_classifications.looks_primitivesque
-
-          if looks_primitive
-
-            _new_qkn = Callback_::Qualified_Knownness.
-              via_value_and_association( new_component, asc )
-
-            as_new_component = Primitivesque_As_Component__.new _new_qkn
-
+          as_component_via_component = if asc.model_classifications.looks_primitivesque
+            Primitivesque_As_Component___.method :new
           else
-            as_new_component = new_component
+            IDENTITY_
           end
 
-          _LL = Home_.lib_.basic::List::Linked[ nil, asc.name ]
+          as_component_via_component[ x ]
+        end
+
+        build_linked_list_of_context = -> do
+          Home_.lib_.basic::List::Linked[ nil, asc.name ]
         end
 
         if orig_qkn.is_effectively_known  # #inout-A, [#]inout-B
 
           -> do
 
-            these[]
-
-            _as_previous_component = if looks_primitive
-              ACS_::Primitivesque::As_Component.new orig_qkn
-            else
-              orig_qkn.value_x
-            end
+            _as_new_comp = as_component_via_component[ new_x ]
+            _as_prev_comp = as_component_via_component[ orig_qkn.value_x ]
+            _LL = build_linked_list_of_context[]
 
             ACS_.event( :Component_Changed ).new_with(
-              :current_component, as_new_component,
-              :previous_component, _as_previous_component,
+              :current_component, _as_new_comp,
+              :previous_component, _as_prev_comp,
               :context_as_linked_list_of_names, _LL,
               :suggested_event_channel, [ :info, :component_changed ],
             )
@@ -71,10 +65,11 @@ module Skylab::Autonomous_Component_System
 
           -> do
 
-            these[]
+            _as_new_comp = as_component_via_component[ new_x ]
+            _LL = build_linked_list_of_context[]
 
             ACS_.event( :Component_Added ).new_with(
-              :component, as_new_component,
+              :component, _as_new_comp,
               :context_as_linked_list_of_names, _LL,
               :suggested_event_channel, [ :info, :component_added ],
               :verb_lemma_symbol, :set,
@@ -84,16 +79,16 @@ module Skylab::Autonomous_Component_System
         end
       end
 
-      class Primitivesque_As_Component__
+      class Primitivesque_As_Component___
 
-        def initialize qkn
-          @_qkn = qkn
+        def initialize x
+          @_x = x
         end
 
         def description_under expag
-          qkn = @_qkn
+          x = @_x
           expag.calculate do
-            val qkn.value_x
+            val x
           end
         end
       end

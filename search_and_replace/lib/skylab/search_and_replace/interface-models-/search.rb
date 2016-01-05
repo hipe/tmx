@@ -15,7 +15,7 @@ module Skylab::SearchAndReplace
     def initialize comp_a, & _IGNORING_oes_P
 
       # which interface nodes are active is determined from above.
-      # #todo is it as open issue that this might go stale & out of sync w/
+      # #todo-next is it as open issue that this might go stale & out of sync w/
       # UI, but we can't cover that until much later..
 
       @_component_a = comp_a

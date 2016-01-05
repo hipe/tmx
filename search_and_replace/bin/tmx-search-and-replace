@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby -w
+
+require 'skylab/search_and_replace'
+
+Skylab::SearchAndReplace::CLI.new(
+  $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+).invoke ARGV

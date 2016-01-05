@@ -1,14 +1,15 @@
 module Skylab::Brazen
 
-  class CLI
+  module CLI_Support
 
-    module When_Result_::Looks_like_stream__
+    class Express_Mixed
 
-      class Build_listing_expresser
+      class Build_listing_expresser___ < Callback_::Actor::Dyadic
 
-        Callback_::Actor.call self, :properties,
-
-          :expag, :first_item
+        def initialize x, y
+          @expag = x
+          @first_item = y
+        end
 
         def execute
 

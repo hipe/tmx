@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] search and replace - (interactive) CLI", wip: true do
+  describe "[sa] modality integrations - 2. CLI (main)", wip: true do
 
     TS_[ self ]
     # use :expect_interactive  # [ze]
@@ -38,7 +38,8 @@ module Skylab::SearchAndReplace::TestSupport
 
         _enter_field_selector 'search'
 
-        @interactive_session.puts '\bhinkenlooper\b'  # hackishly we assert that the file is written
+        self._OFF
+        @interactive_session.puts '\bhi nkenlooper\b'  # hackishly we assert that the file is written
 
         _in_lines do | lines |
 

@@ -1,3 +1,4 @@
+[#010]       [ custom view controllers ]
 [#009] #in-progress this rewrite
 [#008] #open eventually de-dup this with [#sy-029] OGDL
 [#007]       "threads" (tracking tags for experimentals towards public API)
@@ -9,4 +10,4 @@
 [#004]       [the compound adapter]
 [#003]       [the primitivesque adapter]
 [#002]       [the event loop]
-[#001]       the readme
+[#001] #open the readme (needs freshening up)

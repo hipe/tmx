@@ -5,7 +5,7 @@ module Jazzmatazz  # eew / meh / give up on ruby
 
   class Bizzo::Boffo
 
-    Stfu_OMG = -> string do
+    WAHOO_Awooga = -> string do
       "HOLY FOXX: #{ string.reverse }"
     end
   end

@@ -9,7 +9,7 @@ module Skylab::Brazen
   #
   # (but while we are at it we stowaway "small" event prototypes here too)
 
-  Autoloader_[ Events_ = ::Module.new ]
+  Autoloader_[ Events_ = ::Module.new ]  # [#035] expressive/canonic events
 
   module Event_Support_  # publicize if needed. stowaway.
 
