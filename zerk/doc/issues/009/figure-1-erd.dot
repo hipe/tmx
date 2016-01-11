@@ -1,0 +1,25 @@
+digraph g {
+
+  label="figure 1 - how certain zerk components are associated.
+legend: associations with no label are \"is built with\"."
+
+  el [label="event loop"]
+  el->ic
+  ic [label="interactive CLI:\n• sin, sout, serr\n• line boundarizer"]
+  el->vmm
+  vmm [label="view maker maker"]
+
+  vmm->fvc [label="makes"]
+
+  fvc [label="frame view controller"]
+
+  fvc->stack
+  el->stack [label="has"]
+  fvc->ic
+
+  # (was subgraph)
+
+    entitesque [label="entitesque\n• load ticket"]
+    entitesque->el
+    entitesque->fvc
+}

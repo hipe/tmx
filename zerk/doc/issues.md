@@ -1,5 +1,5 @@
-[#010]       [ custom view controllers ]
-[#009] #in-progress this rewrite
+[#010]       custom view controllers
+[#009] #in-progress this rewrite (and new architecture..)
 [#008] #open eventually de-dup this with [#sy-029] OGDL
 [#007]       "threads" (tracking tags for experimentals towards public API)
              #thread-three - nils vs. false

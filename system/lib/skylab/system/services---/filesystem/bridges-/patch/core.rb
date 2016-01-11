@@ -260,7 +260,7 @@ module Skylab::System
           cmd = [ 'patch' ]
 
           if :against_directory == @target_method
-            cmd.push "--directory=#{ esc @target_directory }"
+            cmd.push "--directory=#{ _esc @target_directory }"
             cmd.push '-p1'
           end
 
@@ -269,17 +269,17 @@ module Skylab::System
           end
 
           if :via_patch_file == @patch_method
-            cmd.push "--input=#{ esc @patch_file }"
+            cmd.push "--input=#{ _esc @patch_file }"
           end
 
           if :against_file == @target_method
-            cmd.push esc @target_file
+            cmd.push _esc @target_file
           end
 
           cmd
         end
 
-        def esc s
+        def _esc s
           Home_.lib_.shellwords.shellescape s
         end
 

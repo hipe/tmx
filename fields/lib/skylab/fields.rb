@@ -21,97 +21,290 @@ module Skylab::Fields
     class << self
       alias_method :[], :new
       private :new
-    end
+    end  # >>
 
     def initialize h
-      @_h = h
+      @_is_parsed = nil
+      @_indexes = nil
+      @_unparsed_h = h
+    end
+
+    def init o, x_a
+      @_is_parsed || _parse
+      Parse___.new( o, x_a, self ).execute
     end
 
     def symbols * sym
-
       if sym.length.zero?
-        @_h.keys
+        if @_is_parsed
+          @_h.keys
+        else
+          @_unparsed_h.keys
+        end
       else
-        @_indexed ||= _index
-        @_symbols_under_ad_hod_classification[ * sym ]
+        ___fetch_particular( * sym )
       end
     end
 
-    def write_ivars me, x_a
+    def ___fetch_particular sym
+      @_is_parsed || _parse
+      @_custom_indexes.fetch sym
+    end
 
-      @_indexed ||= _index
+    def [] k
+      @_h.fetch k
+    end
 
-      flag = @_is_flag
-      ivar = @_ivar_for
-      seen = {}
-      st = Callback_::Polymorphic_Stream.via_array x_a
+    def _parse
 
-      begin
-        k = st.gets_one
-        seen[ k ] = true
-        me.instance_variable_set ivar[k], ( flag[k] ? true : st.gets_one )
-      end until st.no_unparsed_exists
+      @_is_parsed = true
 
-      @_a.each do | k_ |
-        seen[ k_ ] and next
-        me.instance_variable_set ivar[ k_ ], nil
+      op_h = PARAM_INTERP___
+      h = {}
+
+      _h = remove_instance_variable :@_unparsed_h
+      _h.each_pair do | k, x |
+        o = Param___.new k, self
+        h[ k ] = o
+        if x
+          if ::Array.try_convert x
+            st = Callback_::Polymorphic_Stream.via_array x
+            o._st = st
+            begin
+              _p = op_h[ st.gets_one ]
+              o.instance_exec( & _p )
+            end until st.no_unparsed_exists
+          else
+            _p = op_h[ x ]
+            o.instance_exec( & _p )
+          end
+        end
+        o.close
       end
 
+      @_h = h
+      @build_param_getser = __build_param_getser_builder
       NIL_
     end
 
-    def _index
+    def __index_under_custom par, sym
+      ( ( @_custom_indexes ||= {} )[ sym ] ||= [] ).push par.name_symbol ; nil
+    end
 
-      flag_h = {}
-      ivar_h = {}
+    def __index_under par, sym
+      _idx = ( @_indexes ||= Indexes___.new )
+      ( _idx[ sym ] ||= {} )[ par.name_symbol ] = true
+      NIL_
+    end
 
-      op_h = {}
-      op_h[ :flag ] = -> k do
-        flag_h[ k ] = true
-      end
+    Indexes___ = ::Struct.new :optionals
 
-      custom = -> kk, kk_ do
+    def __build_param_getser_builder
 
-        cust_h = ::Hash.new { |h, k| h[k] = [] }
-        @_symbols_under_ad_hod_classification = cust_h.method :fetch
-        custom = -> k, k_ do
-          cust_h[ k_ ].push k ; nil
+      h = @_h
+
+      orig = -> parse do
+        st = parse.st
+        -> do
+          h.fetch st.gets_one
         end
-        custom[ kk, kk_ ]
       end
 
-      names = []
+      if @_indexes
+        opts = @_indexes.optionals
+      end
 
-      @_h.each_pair do |k, x|
-        a = [ * x ]
-        names.push k
-        ivar_h[ k ] = nil
-        flag_h[ k ] = nil
-        a.each do | k_ |
-          p = op_h[ k_ ]
-          if p
-            p[ k ]
-          else
-            custom[ k, k_ ]
+      if opts
+        -> parse do
+          gets_one = orig[ parse ]
+          pool = opts.dup
+          parse.normalize = Nilify___[ pool ]
+          -> do
+            par = gets_one[]
+            pool.delete par.name_symbol
+            par
           end
         end
+      else
+        orig
       end
-
-      @_a = names
-
-      @_is_flag = flag_h.method :fetch
-
-      @_ivar_for = -> k do
-        ivar = ivar_h.fetch k
-        if ! ivar
-          ivar = :"@#{ k }"
-          ivar_h[ k ] = ivar
-        end
-        ivar
-      end
-
-      ACHIEVED_
     end
+
+    attr_reader(
+      :build_param_getser,
+    )
+  end
+
+  Nilify___ = -> pool do
+    -> do
+      pool.keys.each do |k|
+        ivar = @pars[ k ].as_ivar
+        if ! @o.instance_variable_defined? ivar
+          @o.instance_variable_set ivar, nil
+        end
+      end
+      NIL_
+    end
+  end
+
+  # ~ parse
+
+  class Parse___
+
+    def initialize o, x_a, pars
+      @normalize = nil
+      @o = o
+      @pars = pars
+      @st = Callback_::Polymorphic_Stream.via_array x_a
+    end
+
+    def execute
+      st = @st
+      gets_one_param = @pars.build_param_getser[ self ]
+      until st.no_unparsed_exists
+        _par = gets_one_param[]
+        Assignment___.new( @o, @st, _par, @pars ).execute
+      end
+      if @normalize
+        instance_exec( & @normalize )
+      end
+      NIL_
+    end
+
+    attr_accessor(
+      :normalize,
+    )
+
+    attr_reader(
+      :st,
+    )
+  end
+
+  # ~ the meta-parameters
+
+  Value_Proxy__ = ::Struct.new :gets_one
+  fake_yes = Value_Proxy__.new true
+
+  flag = -> do
+    @x = true ; NIL_
+  end
+
+  flag_of = -> k do
+    -> do
+      @pars[ k ][ @o, fake_yes, @pars ]
+      NIL_
+    end
+  end
+
+  kn_kn = -> do
+    _x = @st.gets_one
+    @x = Callback_::Known_Known[ _x ]
+    NIL_
+  end
+
+  singular_of = -> k do
+    -> do
+      _st = Value_Proxy__.new [ @st.gets_one ]
+      @pars[ k ][ @o, _st, @pars ]
+      NIL_
+    end
+  end
+
+  PARAM_INTERP___ = {
+    flag: -> do
+      @stack[ 1 ] = flag
+    end,
+    flag_of: -> do
+      @stack[ 0 ] = flag_of[ @_st.gets_one ]
+    end,
+    known_known: -> do
+      @stack[ 0 ] = kn_kn
+    end,
+    optional: -> do
+      @_index.__index_under self, :optionals ; nil
+    end,
+    singular_of: -> do
+      @stack[ 0 ] = singular_of[ @_st.gets_one ]
+    end
+  }.tap do |h|
+    h.default_proc = -> _, k { -> { @_index.__index_under_custom self, k } }
+  end
+
+  # ~
+
+  class Assignment___
+
+    # the way the "stack" works is that when you get to the bottom of it,
+    # IFF @x is set you assign that into the ivar of the client instance
+
+    def initialize o, st, par, pars
+      @o = o
+      @par = par
+      @pars = pars
+      @st = st
+    end
+
+    def execute
+      stack = @par.stack
+      d = stack.length
+      if d.zero?
+        @x = @st.gets_one
+      else
+        begin
+          d -= 1
+          _p = stack.fetch d
+          instance_exec( & _p )
+          if d.zero?
+            break
+          end
+          redo
+        end while nil
+      end
+
+      if instance_variable_defined? :@x
+        @o.instance_variable_set @par.as_ivar, @x
+      end
+      NIL_
+    end
+  end
+
+  class Param___
+
+    def initialize k, indxr
+
+      @_index = indxr
+      @stack = []
+      @_st = nil
+      @name_symbol = k
+    end
+
+    def [] o, st, pars
+      Assignment___.new( o, st, self, pars ).execute
+      NIL_
+    end
+
+    attr_writer(
+      :_st,
+    )
+
+    def __become_singular_of sym
+      $stderr.puts "SOMETHING"
+    end
+
+    def close
+      @stack.compact!
+      remove_instance_variable :@_index
+      remove_instance_variable :@_st ; nil
+    end
+
+    def as_ivar
+      @___as_ivar ||= :"@#{ @name_symbol }"
+    end
+
+    attr_reader(
+      :name_symbol,
+      :stack,
+    )
   end
 
   # -- the external functions experiment ..

@@ -14,7 +14,7 @@ module Skylab::SearchAndReplace
           @match_index = d
           @replacement_is_engaged = false
           @matchdata = md
-          @offsets = md.offset( 0 ).freeze
+          @match_pos, @match_end = md.offset 0
         end
 
         # -- [#014] only for tests
@@ -71,7 +71,7 @@ module Skylab::SearchAndReplace
 
           remove_instance_variable :@_replacement
           @replacement_is_engaged = false
-          NIL_
+          ACHIEVED_
         end
 
         def replacement_value  # assume is engaged
@@ -80,22 +80,19 @@ module Skylab::SearchAndReplace
 
         # -- navigation & intrinsics
 
+        def previous_match_controller
+          @_block.previous_match_controller_before__ @match_index
+        end
+
         def next_match_controller
           @_block.next_match_controller_after__ @match_index
         end
 
-        def pos
-          @offsets.fetch 0
-        end
-
-        def end
-          @offsets.fetch 1
-        end
-
         attr_reader(
           :match_index,
+          :match_pos,
+          :match_end,
           :matchdata,
-          :offsets,
           :replacement_is_engaged,
         )
       end

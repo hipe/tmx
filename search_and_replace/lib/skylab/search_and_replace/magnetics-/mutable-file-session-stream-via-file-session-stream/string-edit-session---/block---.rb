@@ -82,7 +82,8 @@ module Skylab::SearchAndReplace
           # assume line scanner is still pointing to your beginning.
 
           # the current matchdata is yours. as well take each next matchdata
-          # that is on the same line or the next line
+          # that is on the same line or the next line (implementing
+          # [#010]/figure-1)
 
           md = @_md_scn.current_matchdata
 
@@ -151,7 +152,7 @@ module Skylab::SearchAndReplace
           # so you become static and ..
 
           @_newlines = d_a
-          @_end = d_a.last + 1  # revisit when investigat #open [#011]
+          _end_at d_a.last + 1  # revisit when investigate #open [#011]
           @_line_scn.pos = d_a.last + 1
 
           _scanners = @_scanners
@@ -168,7 +169,7 @@ module Skylab::SearchAndReplace
           @_next_block = nil
 
           end_ = @_line_scn.string_length
-          @_end = end_
+          _end_at end_
 
           d_a = @_line_scn.advance_to_greatest_index_of_newline_less_than end_
           _clean
@@ -195,7 +196,7 @@ module Skylab::SearchAndReplace
               _become_block_with_matches
               _clean
               @_next_block = nil
-              @_end = d + 1
+              _end_at d + 1
             else
 
               # the next found newline did *not* end the big string.
@@ -209,7 +210,7 @@ module Skylab::SearchAndReplace
 
             _become_block_with_matches
             @_next_block = nil
-            @_end = @_line_scn.string_length
+            _end_at @_line_scn.string_length
             _clean
           end
           NIL_
@@ -229,8 +230,12 @@ module Skylab::SearchAndReplace
           _become_block_with_matches
           _clean
           @_next_block = Self__.via_scanners self, _scanners
-          @_end = my_final_newline_d + 1
+          _end_at my_final_newline_d + 1
           NIL_
+        end
+
+        def _end_at d
+          @_end = d ; nil
         end
 
         def _become_block_with_matches
@@ -255,41 +260,71 @@ module Skylab::SearchAndReplace
         def to_output_line_stream__
 
           if has_matches
-            ___to_line_stream_when_matches
+            __to_line_stream_when_matches
           else
             __to_line_stream_when_static
           end
         end
 
         def write_the_previous_N_line_sexp_arrays_in_front_of a, n
-          if has_matches
-            self._A
-            __wpnl_rotbuf
 
-          else  # OCD optimizations for static blocks:
-            my_d = @_newlines.length
-            deficit = n - my_d
-            if 0 < deficit
-              # then we have a deficit
-              _static_wpnl a, my_d
-              __static_wpnl_seek a, deficit
-            else
-              _static_wpnl a, n
+          if has_matches
+            ___extend_backwards_when_has_matches a, n
+          else
+            __extend_backwards_when_static a, n
+          end
+          NIL_
+        end
+
+        def ___extend_backwards_when_has_matches a, n
+
+          # slice on to the BEGINNING of `a` up to N of our tail-anchored
+          # lines. because replacements can add or remove newlines, we can't
+          # know what our trailing N lines are without starting from our
+          # beginning. if we still have a deficit when we're done, try
+          # recursing backwards.
+
+          rb = Home_.lib_.basic::Rotating_Buffer[ n ]
+
+          st = to_inner_line_sexp_array_stream
+          begin
+            x = st.gets
+            x or break
+            rb << x
+            redo
+          end while nil
+
+          my_a = rb.to_a
+          deficit = n - my_a.length
+          a[ 0, 0 ] = my_a
+          if deficit.nonzero?
+            bl = @previous_block
+            if bl
+              self._PROBABLY_OK
+              bl.write_the_previous_N_line_sexp_arrays_in_front_of a, deficit
             end
           end
+          NIL_
         end
 
-        def __static_wpnl_seek a, n
-          self._IS_A_SKETCH
-          bl = @previous_block
-          if bl
-            bl.write_the_previous_N_line_sexp_arrays_in_front_of a, n
-          else
-            a
+        def __extend_backwards_when_static a, n
+
+          # OCD optimizations for static blocks. we can use the newline index.
+
+          ___add_own_lines_to_backwards_extension_when_static a, n
+
+          my_d = @_newlines.length
+          deficit = n - my_d
+          if 0 < deficit  # then we have one
+            bl = @previous_block
+            if bl
+              bl.write_the_previous_N_line_sexp_arrays_in_front_of a, deficit
+            end
           end
+          NIL_
         end
 
-        def _static_wpnl a, n
+        def ___add_own_lines_to_backwards_extension_when_static a, n
 
           # get the last N lines using your newline index
 
@@ -299,6 +334,8 @@ module Skylab::SearchAndReplace
           last = len - 1
           surplus = len - n
           if 0 < surplus
+            # the number of lines requested is LESS THAN the number of
+            # lines in the block so we have some backwards work to do
 
             d = surplus - 1
             _st = Callback_.stream do
@@ -313,7 +350,8 @@ module Skylab::SearchAndReplace
             o.newline_stream = _st
             o.pos = _pos
           else
-            self._B
+            # ASSUME the number of lines requested EQUALS
+            # the number of lines in the block.
             o.pos = @_pos
             o.newlines = d_a
           end
@@ -322,7 +360,7 @@ module Skylab::SearchAndReplace
           _st = o.execute
           _xa_a = _st.to_a
           a[ 0, 0 ] = _xa_a
-          a
+          NIL_
         end
 
         def write_the_next_N_line_sexp_arrays_into a, n
@@ -352,7 +390,11 @@ module Skylab::SearchAndReplace
           if done
             a
           else
-            self._K
+            nb = @_next_block
+            if nb
+              _deficit = n - d
+              nb.write_the_next_N_line_sexp_arrays_into a, _deficit
+            end
           end
         end
 
@@ -364,7 +406,7 @@ module Skylab::SearchAndReplace
           end
         end
 
-        def ___to_line_stream_when_matches
+        def __to_line_stream_when_matches
 
           _ = _to_line_sexp_array_stream_when_matches
           _ = o::Line_stream_via_line_sexp_array_stream[ _ ]
@@ -374,7 +416,7 @@ module Skylab::SearchAndReplace
         def _to_line_sexp_array_stream_when_matches
 
           o = _stream_magnetics
-          _ = o::Sexp_stream_via_matches_block[ self, @_big_string ]
+          _ = o::Sexp_stream_via_matches_block[ @_match_controllers, self, @_big_string ]
           _ = o::Line_sexp_array_stream_via_sexp_stream[ _ ]
           _
         end
@@ -395,6 +437,18 @@ module Skylab::SearchAndReplace
 
         alias_method :o, :_stream_magnetics  # eek
 
+        def previous_match_controller_before__ d
+
+          if d.zero?
+            pb = @previous_block
+            if pb
+              pb.lastmost_match_controller_during_or_before
+            end
+          else
+            @_match_controllers.fetch( d - 1 )
+          end
+        end
+
         def next_match_controller_after__ d
 
           d_ = d + 1
@@ -407,6 +461,16 @@ module Skylab::SearchAndReplace
             end
           else
             @_match_controllers.fetch d_
+          end
+        end
+
+        def lastmost_match_controller_during_or_before
+          if has_matches
+            @_match_controllers.last
+          elsif @previous_block
+            @previous_block.lastmost_match_controller_during_or_before
+          else
+            NOTHING_
           end
         end
 

@@ -5,8 +5,10 @@ module Skylab::System
     class Bridges_::Find
 
       Expression_Adapters::Event = Callback_::Event.prototype_with(
-
-         :find_command_args, :find_command_args, nil, :ok, nil ) do | y, o |
+         :find_command_args,
+         :find_command_args, nil,
+         :ok, nil,
+      ) do | y, o |
 
         sw = Home_.lib_.shellwords
 

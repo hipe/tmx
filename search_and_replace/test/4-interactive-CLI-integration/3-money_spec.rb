@@ -7,6 +7,16 @@ module Skylab::SearchAndReplace::TestSupport
     TS_[ self ]
     # use :expect_interactive  # [ze]
 
+    context "empty match on empty file"
+
+    context "cherry; next file"
+
+    context "cherry at last file"
+
+    context "all in file; next file"
+
+    context "all remaining"
+
     context "counts" do
 
       _COMMON_FIELD_PROMPT_ENDING = ' (nothing to cancel): '

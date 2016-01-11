@@ -27,18 +27,6 @@ module Skylab::SearchAndReplace
 
       @streamer.to_mutable_file_session_stream self, & @_pp
     end
-
-        def curry_file_writer tmpdir_path, oes_p=nil
-
-          -> edit_session, oes_p_=oes_p do
-
-            S_and_R_::Magnetics_::Write_any_changed_file.with(
-              :edit_session, edit_session,
-              :work_dir_path, tmpdir_path,
-              :is_dry_run, false,
-              & oes_p_ )
-          end
-        end
   end
 end
 # #history: this used to hold almost half the content of all interface nodes

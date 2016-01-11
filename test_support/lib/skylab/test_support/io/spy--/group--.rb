@@ -195,9 +195,13 @@ module Skylab::TestSupport
     end
 
     def do_debug_proc= p
+
       @debug ||= Debug__.new
       @debug.condition_p = p
-      @debug.emit_line_p or debug! some_debug_IO
+
+      if ! @debug.emit_line_p
+        _engage_debugging some_debug_IO
+      end
       p
     end
 
@@ -205,7 +209,7 @@ module Skylab::TestSupport
       @debug_IO || Home_.lib_.stderr
     end
 
-    def debug! stderr  # each time a line is parsed out of any stream we will
+    def _engage_debugging stderr  # each time a line is parsed out of any stream we will
       # `puts` to your `stderr` a line in a format of our choosing showing
       # both the stream name and the string content after any filters have
       # been applied

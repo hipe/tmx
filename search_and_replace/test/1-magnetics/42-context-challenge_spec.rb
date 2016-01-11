@@ -63,7 +63,6 @@ module Skylab::SearchAndReplace::TestSupport
           distill_( _1 ).should eql(
             [ :orig_str, :replacement_begin, :repl_str,
               :replacement_end, :newline_sequence ] )
-
         end
 
         it "the two after (uses the replacement delineation)" do
@@ -73,8 +72,8 @@ module Skylab::SearchAndReplace::TestSupport
           _2 = st.gets
           st.gets and fail
 
-          assemble_( _1 ).should eql "AND\n"
-          assemble_( _2 ).should eql "four\n"
+          assemble_( _1 ).should eql "three\n"
+          assemble_( _2 ).should eql "AND\n"
         end
 
         it "the two before (note the previous replace seq. spans 2 lines)" do
@@ -149,7 +148,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "there are no two after" do
 
-        for_ lines_after_
+        nothing_for_ lines_after_
       end
 
       it "the two before (ditto)" do

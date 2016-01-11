@@ -35,7 +35,7 @@ module Skylab::Zerk
         x = ada.button_frame
         if x
           self._K
-          @main_view_controller.express_buttons x
+          @main_view_controller.express_buttonesques x
         else
           ___express_longwinded_prompt y, ada
         end

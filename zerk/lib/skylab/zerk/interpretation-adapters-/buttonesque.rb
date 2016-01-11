@@ -24,6 +24,8 @@ module Skylab::Zerk
       bsque.hotstring_to_resolve_selection
     end
 
+    o.be_case_sensitive = true  # we care about the difference
+
     # -- resultage
 
     o.success_map = -> bsque do

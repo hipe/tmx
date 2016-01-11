@@ -7,10 +7,11 @@ module Skylab::SearchAndReplace
       # (this is the frontier for [#ze-010] custom view controllers. an
       #  alternative is discussed near this same tag elsewhere in sidesys.)
 
-      def initialize st, frame_vc, event_loop
+      def initialize st, main_vc, ent_ada
 
+        event_loop = ent_ada.event_loop
         expag = Home_::CLI.highlighting_expression_agent_instance__
-        serr = frame_vc.serr
+        serr = main_vc.serr
         _sout = event_loop.sout
 
         @_p = -> do
@@ -30,12 +31,19 @@ module Skylab::SearchAndReplace
             redo
           end while nil
 
+          event_loop.pop_me_off_of_the_stack ent_ada
+          event_loop.redo
+
           NIL_
         end
       end
 
       def call
         @_p.call
+      end
+
+      def end_UI_frame
+        NIL_
       end
     end
   end

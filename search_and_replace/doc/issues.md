@@ -1,3 +1,9 @@
+[#018]    #usability-enhancement - location #before:[#017]
+
+[#017]    #usability-enhancement - line numbers #before:[#016]
+
+[#016]    #usability-enhancement - munge "next" over "next file?"
+
 [#015] #open this new regexp 'o' option - what should we do with it?
 
 
@@ -53,7 +59,7 @@
 [#008]       #feature have the multiple forms save to one file
 [#007]       #feature explicit choice of single line v. multiline
 [#006] #done #feature support for spaces in list items
-[#005]       #feature make this one button with three labels instead of three buttons
+[#005] #done #feature make this one button with three labels instead of three buttons
 [#004]       #feature should check mtime before write, abort for that file if stale
 [#003]       [ track a historic node ]
 [#002]       -wip-them-all (in [ts]) *uses* this guy..

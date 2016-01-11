@@ -3,7 +3,6 @@ module Skylab::Zerk
   class InteractiveCLI::Event_Loop___  # :[#002].
 
     def initialize vmm, rsx, & build_top
-
       @_build_top = build_top
       @_resources = rsx
       @_view_maker_maker = vmm
@@ -17,6 +16,8 @@ module Skylab::Zerk
 
       view_maker = @_view_maker_maker.make_view_maker(
         @_stack, rsx )
+
+      @__main_view_controller = view_maker
 
       @_running = true
       @_serr = rsx.serr
@@ -81,7 +82,7 @@ module Skylab::Zerk
 
     # -- parameters for lower-level modules (used to be "frame resources")
 
-    def view_controller
+    def event_loop
       self
     end
 
@@ -109,7 +110,9 @@ module Skylab::Zerk
 
     def __push_stack_frame_for_new__entitesque__ lt
 
-      _new = Home_::Node_Adapters_::Entitesque.new lt, self
+      _new = Home_::Node_Adapters_::Entitesque.new(
+        lt, @__main_view_controller, self )
+
       @_stack.push _new
       NIL_
     end

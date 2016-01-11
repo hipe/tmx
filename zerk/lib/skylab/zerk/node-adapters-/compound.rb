@@ -3,13 +3,13 @@ module Skylab::Zerk
   class Node_Adapters_::Compound  # (built in 1 place by event loop)
 
     def initialize acs, ccv, rsx
-
+      # (currently `rsx` is actually the event loop)
       @ACS = acs
       @compound_custom_view = ccv
       @_indexed = nil
       @line_yielder = rsx.line_yielder
       @UI_event_handler = rsx.UI_event_handler
-      @view_controller = rsx.view_controller
+      @event_loop = rsx.event_loop
     end
 
     # -- ..
@@ -80,16 +80,10 @@ module Skylab::Zerk
       if s.length.zero?
         @line_yielder << "(nothing entered.)"
       else
-        ___process_nonblank_string s
-      end
-      NIL_
-    end
-
-    def ___process_nonblank_string s
-
-      x = Home_::Interpretation_Adapters_::Buttonesque[ s, self ]
-      if x
-        @view_controller.push_stack_frame_for x
+        x = Home_::Interpretation_Adapters_::Buttonesque[ s, self ]
+        if x
+          @event_loop.push_stack_frame_for x
+        end
       end
       NIL_
     end
@@ -103,7 +97,7 @@ module Skylab::Zerk
     def handler_for sym, *_
       if :interrupt == sym
         -> do
-          @view_controller.pop_me_off_of_the_stack self
+          @event_loop.pop_me_off_of_the_stack self
           NIL_
         end
       end
@@ -111,7 +105,7 @@ module Skylab::Zerk
 
     def receive_uncategorized_emission i_a, & ev_p
 
-      @view_controller.receive_uncategorized_emission i_a, & ev_p
+      @event_loop.receive_uncategorized_emission i_a, & ev_p
       UNRELIABLE_
     end
 

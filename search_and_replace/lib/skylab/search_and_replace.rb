@@ -39,7 +39,19 @@ module Skylab::SearchAndReplace
                     Home_::CLI::Interactive_View_Controllers_::Matches.new( * a )
                   end,
                 ]
-              end
+              end,
+              replacement_expression: -> do
+                [
+                  :hotstring_delineation, %w( replacement- e xpression ),
+                ]
+              end,
+              replace: -> do
+                [
+                  :custom_view_controller, -> * a do
+                    Home_::CLI::Interactive_View_Controllers_::Edit_File.new( * a )
+                  end,
+                ]
+              end,
             }
           ]
         end
@@ -122,6 +134,8 @@ module Skylab::SearchAndReplace
 
       @filename_patterns = [ '*.rb' ]
       @paths = [ '.' ]
+      @ruby_regexp = nil
+
       NIL_
     end
 
@@ -294,7 +308,7 @@ module Skylab::SearchAndReplace
     end
   end
 
-  if false  # #todo-next
+  if false  # #todo-during-descriptions
 
         @y << "(display, edit, and execute the details of your search)"
 
@@ -426,6 +440,11 @@ module Skylab::SearchAndReplace
 
     System = -> do
       system_lib[].services
+    end
+
+    Tmpdir = Lazy_.call do
+      require 'tmpdir'
+      ::Dir.tmpdir
     end
 
     Zerk = sidesys[ :Zerk ]

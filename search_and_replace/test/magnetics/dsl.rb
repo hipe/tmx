@@ -76,18 +76,18 @@ module Skylab::SearchAndReplace::TestSupport
 
       def for_ st
 
-        if block_given?
-          @_mag_dsl_st = st
-          yield
-          remove_instance_variable :@_mag_dsl_st
-          s = st.gets
-
-        elsif st
-          s = st.gets
-        end
-
+        @_mag_dsl_st = st
+        yield
+        remove_instance_variable :@_mag_dsl_st
+        s = st.gets
         if s
           fail __for_say_unexp s
+        end
+      end
+
+      def nothing_for_ st
+        if st
+          fail __for_say_stream
         end
       end
 
@@ -107,6 +107,7 @@ module Skylab::SearchAndReplace::TestSupport
         end
       end
 
+      def __for_say_stream ; "unexpected stream (expected no lines ergo false-ish)" ; end
       def __for_say_unexp s ; "unexpected line: #{ s.inspect }" ; end
       def __for_say_no_newline s ; "did not have a newline: #{ s.inspect }" ; end
       def __for_say_miss s ; "missing expected line: #{ s.inspect }" ; end

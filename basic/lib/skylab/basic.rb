@@ -41,63 +41,85 @@ module Skylab::Basic  # introduction at [#020]
     Minimal_Property.via_variegated_symbol :argument
   end
 
-  module Fuzzy  # :[#015].
+  class Fuzzy  # :[#015].
 
     class << self
 
       def reduce_array_against_string a, s, * p_a, & p
-
         p and p_a.push p
-
-        _reduce_to_array_stream_against_regex(
-          Callback_::Stream.via_nonsparse_array( a.select{ |x| x }.to_a ),
-          case_insensitive_regex_via_string( s ),
-          s,
-          p_a )
+        o = new
+        o.sparse_array = a
+        o.string = s
+        o.procs = p_a
+        o.execute
       end
 
       def reduce_to_array_stream_against_string st, s, * p_a, & p
-
         p and p_a.push p
+        o = new
+        o.stream = st
+        o.string = s
+        o.procs = p_a
+        o.execute
+      end
+    end  # >>
 
-        _reduce_to_array_stream_against_regex(
-          st, case_insensitive_regex_via_string( s ), s, p_a )
+    def initialize
+      @be_case_sensitive = false
+      @candidate_map = nil
+      @result_map = nil
+    end
+
+    def procs= p_a
+      @candidate_map, @result_map = p_a
+    end
+
+    def sparse_array= a
+
+      _nonsparse_array = a.select( & IDENTITY_ ).to_a
+      @stream = Callback_::Stream.via_nonsparse_array _nonsparse_array
+      a
+    end
+
+    attr_writer(
+      :be_case_sensitive,
+      :candidate_map,
+      :result_map,
+      :stream,
+      :string,
+    )
+
+    def execute
+
+      a = []
+      candidate_map = @candidate_map || IDENTITY_
+      result_map = @result_map || IDENTITY_
+      s = @string
+      st = @stream
+
+      rx = if @be_case_sensitive
+        /\A#{ ::Regexp.escape @string }/
+      else
+        /\A#{ ::Regexp.escape @string }/i
       end
 
-      def case_insensitive_regex_via_string s
-
-        /\A#{ ::Regexp.escape s }/i
-      end
-
-      def case_sensitive_regex_via_string s
-
-        /\A#{ ::Regexp.escape s }/
-      end
-
-      def _reduce_to_array_stream_against_regex st, rx, s, p_a
-
-        a = []
-        candidate_mapper, result_mapper = p_a
-        candidate_mapper ||= IDENTITY_
-        result_mapper ||= IDENTITY_
-
+      # ->
         begin
           x = st.gets
           x or break
-          s_ = candidate_mapper[ x ]
+          s_ = candidate_map[ x ]
           if rx =~ s_
             if s == s_
-              a.clear.push result_mapper[ x ]
+              a.clear.push result_map[ x ]
               break
             end
-            a.push result_mapper[ x ]
+            a.push result_map[ x ]
           end
           redo
         end while nil
-
-        a
-      end
-    end  # >>
+        # <-
+      a
+    end
   end
 
   class Minimal_Property

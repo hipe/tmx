@@ -15,7 +15,7 @@ module Skylab::SearchAndReplace
     def initialize comp_a, & _IGNORING_oes_P
 
       # which interface nodes are active is determined from above.
-      # #todo-next is it as open issue that this might go stale & out of sync w/
+      # #todo-at-end is it as open issue that this might go stale & out of sync w/
       # UI, but we can't cover that until much later..
 
       @_component_a = comp_a
@@ -73,14 +73,7 @@ module Skylab::SearchAndReplace
     def __replace__component_association
 
       if @replacement_expression
-
-        -> st, & pp do
-          if st.no_unparsed_exists
-            __build_replacement_bound_call_wrapped_value( & pp )
-          else
-            self._RIDE_THIS_50_50_its_OK
-          end
-        end
+        @replace ||= Replace_Model_Proxy___.new self  # ivar because we gotta..
       end
     end
 
@@ -93,12 +86,11 @@ module Skylab::SearchAndReplace
       end
     end
 
-    def __build_replacement_bound_call_wrapped_value & pp
+    def __build_replacement_bound_call & pp
 
-      # because we don't need (or want) a dedicated class for this buttonish
-      # (although the sibling buttons have one), we need to wrap our call to
-      # the actual operation twice: once to be a bound call (because buttons)
-      # and once to be a known known (because ACS).
+      # OK we're still figuring this out - because we form the counterpart
+      # association's component model to look "entitesque", we want to
+      # result in a bound call here? ..
 
       dependency = @_component_a.fetch( -1 )
         # yikes - randomly access a volatile UI structure to get a dependency
@@ -114,7 +106,25 @@ module Skylab::SearchAndReplace
 
       _bc = Callback_::Bound_Call[ nil, o, :to_file_session_stream ]
 
-      Callback_::Known_Known[ _bc ]
+      _bc
+    end
+
+    class Replace_Model_Proxy___
+
+      # the only reason that (for now) we have to make this bump is
+      # because we want it to look entitesque and not primitivesque
+
+      def initialize _
+        @_guy = _
+      end
+
+      def interpret_component st, & pp
+        if st.no_unparsed_exists
+          @_guy.__build_replacement_bound_call( & pp )
+        else
+          self._RIDE_THIS_50_50_its_OK
+        end
+      end
     end
 
     Require_ACS_[]

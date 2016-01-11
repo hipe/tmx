@@ -20,7 +20,43 @@ module Skylab::SearchAndReplace
 
       if st.no_unparsed_exists
 
-        Callback_::Bound_Call[ nil, dup, :___to_count_stream, & pp ]
+        Callback_::Bound_Call[ nil, dup, :___to_stream_with_summary, & pp ]
+      end
+    end
+
+    def ___to_stream_with_summary & pp
+
+      st = ___to_count_stream( & pp )
+      if st
+
+        tot_paths = 0 ; tot_matches = 0
+
+        summarize = -> do
+          summarize = EMPTY_P_
+          _oes_p = pp[ self ]
+          _oes_p.call :info, :expression, :summary do | y |
+
+            _ = plural_noun tot_matches, 'match'
+            __ = plural_noun tot_paths, 'path'
+
+            y << "(#{ tot_matches } #{ _ } in #{ tot_paths } #{ __ })"
+          end
+          NIL_
+        end
+
+        Callback_.stream do
+          o = st.gets
+          if o
+            tot_matches += o.count
+            tot_paths += 1
+            o
+          else
+            summarize[]
+          end
+          o
+        end
+      else
+        st
       end
     end
 

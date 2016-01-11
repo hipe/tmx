@@ -11,8 +11,8 @@ module Skylab::System
     Autonomous_component_system = sidesys[ :Autonomous_Component_System ]
 
     Basic = sidesys[ :Basic ]
-
     Brazen = sidesys[ :Brazen ]  # used in tests too
+    Fields = sidesys[ :Fields ]
 
     File_utils = stdlib[ :FileUtils ]
 
@@ -21,7 +21,6 @@ module Skylab::System
     Open3 = stdlib[ :Open3 ]
 
     Parse_lib = sidesys[ :Parse ]
-
     Plugin = sidesys[ :Plugin ]
 
     Properties_stack_frame = -> *a do

@@ -121,18 +121,24 @@ module Skylab::SearchAndReplace::TestSupport
         end
       end
 
-      it "the replacement expression can be disengaged again" do
+      context "the replacement expression can be disengaged again" do
 
-        _es_proto = edit_session_
+        shared_subject :_tuple do
 
-        _my_es = _es_proto.dup
+          _es_proto = edit_session_
+          _my_es = _es_proto.dup
+          mc = _my_es.first_match_controller
+          _x = mc.disengage_replacement
+          [ _x, mc ]
+        end
 
-        mc = _my_es.first_match_controller
+        it "the match controller knows it is not engaged after this" do
+          _tuple.fetch( 1 ).replacement_is_engaged.should eql false
+        end
 
-        _ = mc.disengage_replacement
-        _.should be_nil
-
-        mc.replacement_is_engaged.should eql false
+        it "the successful result of the call is TRUE (parallels `engage[..]`)" do
+          _tuple.fetch( 0 ).should eql true
+        end
       end
     end
   end

@@ -7,7 +7,7 @@ module Skylab::SearchAndReplace
       @chunk_size = 50  # ..
       @grep_extended_regexp_string = nil
       @ruby_regexp = nil
-      @shellwords = Home_.lib_.shellwords
+      @_shellwords = Home_.lib_.shellwords
 
       @_pp = pp
     end
@@ -22,90 +22,65 @@ module Skylab::SearchAndReplace
 
     def execute
 
-      @_oes_p = @_pp[ nil ]
-
-      cmd = Home_.lib_.system.filesystem.grep(
-        :grep_extended_regexp_string, @grep_extended_regexp_string,
-        :ruby_regexp, @ruby_regexp,
-        & @_oes_p )
-
-      if cmd
-        @_command = cmd
-        ___via_command
-      else
-        cmd
-      end
+      _ok = __resolve_grep_command
+      _ok && ___via_grep_command
     end
 
-    def ___via_command
+    # --
 
-      send :"__init_command_head_for__#{ @for }__"
+    def ___via_grep_command
+
+      gr = remove_instance_variable :@_grep_command
+
+      cmd = gr.to_command
+      _command_string = cmd.command_string
 
       @_oes_p.call :info, :grep_command_head do
 
         _ = Callback_::Event.inline_neutral_with(
           :grep_command_head,
-          :command_head, @_head_s,
+          :command_head, _command_string,
         )
         _
       end
 
-      send :"__via_command_head_when__#{ @for }__"
+      @_grep_runner = gr
+      @_grep_command_without_paths = cmd
+
+      send :"__when__#{ @for }__"
     end
 
-    def __init_command_head_for__counts__
-      @_head_s = "#{ @_command.string } --count ".freeze
-    end
+    def __when__counts__
 
-    def __init_command_head_for__paths__
-      @_head_s = "#{ @_command.string } --files-with-matches ".freeze
-    end
+      _st = _to_grep_result_path_stream
+      _st.map_reduce_by do |path|
 
-    def __via_command_head_when__counts__
-
-      __via_command_head_when_paths.map_reduce_by do |path|
         md = COUNT_LINE_RX___.match path
-        # -
-          if md
-            d = md[ 2 ].to_i
-            if d.nonzero?
+        if md
+          d = md[ 2 ].to_i
+          if d.nonzero?
             Count_Item___.new md[ 1 ], md[ 2 ].to_i
-            end
-          else
-            @on_event_selectively.call :error_string do
-              "failed to match: #{ path }"
-            end
-            nil
           end
+        else
+          # (not covered)
+          @_oes_p.call :error, :expression, :counts_by_grep do |y|
+            y << "failed to match line from grep: #{ path.inspect }"
+          end
+          NIL_
+        end
         # -
       end
     end
 
     COUNT_LINE_RX___ = /\A(.+):(\d+)\z/
-
     Count_Item___ = ::Struct.new :path, :count
 
-    def __via_command_head_when__paths__
-      # -
-        st = nil
-        p = -> do
-          st = produce_next_stream
-          p = -> do
-            while st
-              x = st.gets
-              x and break
-              st = produce_next_stream
-            end
-            x
-          end
-          p[]
-        end
+    def _to_grep_result_path_stream
 
-      # -
-
+      st = nil
       _Stream = Callback_::Stream
 
-      _releaser = _Stream::Resource_Releaser.new do
+      _resource_releaser = _Stream::Resource_Releaser.new do
         if st
           st.upstream.release_resource
         else
@@ -113,35 +88,111 @@ module Skylab::SearchAndReplace
         end
       end
 
-      _Stream.new _releaser do
+      main_p = -> do
+        while st
+          x = st.gets
+          x and break
+          st = _next_stream
+        end
+        x
+      end
+
+      p = -> do
+        st = _next_stream
+        p = main_p
+        p[]
+      end
+
+      _Stream.new _resource_releaser do
         p[]
       end
     end
 
-    alias_method :__via_command_head_when_paths, :__via_command_head_when__paths__
-    # -
-      def produce_next_stream
-        a = take_nonzero_length_escaped_paths_chunk
-        if a
-          _command_s = "#{ @_head_s }#{ a * SPACE_ }"
-          @_command.produce_stream_via_command_string _command_s
-        end
-      end
+    alias_method(  # we both call it internally and expose it
+      :__when__paths__,
+      :_to_grep_result_path_stream,
+    )
 
-      def take_nonzero_length_escaped_paths_chunk
-        path = @upstream_path_stream.gets
-        if path
-          y = [ @shellwords.escape( path ) ]
-          d = 1 ; max = @chunk_size
-          while d < max
-            d += 1
-            path = @upstream_path_stream.gets
-            path or break
-            y.push @shellwords.escape path
-          end
-          y
-        end
+    def _next_stream
+
+      open_cmd = @_grep_command_without_paths.open
+
+      _did = ___write_more_than_one_path_into open_cmd
+
+      if _did
+
+        _cmd = open_cmd.close
+        _ = @_grep_runner.line_content_stream_via_command _cmd
+        _
       end
-    # -
+    end
+
+    def ___write_more_than_one_path_into cmd
+
+      path = @upstream_path_stream.gets
+      if path
+
+        d = 1 ; max = @chunk_size
+        begin
+          cmd.push_item path
+
+          if d >= max
+            break
+          end
+
+          path = @upstream_path_stream.gets
+          path or break
+          d += 1
+
+          redo
+        end while nil
+
+        ACHIEVED_
+      end
+    end
+
+    # --
+
+    def __resolve_grep_command
+
+      a = []
+
+      send :"__write_grep_options_for__#{ @for }__", a
+
+      @_oes_p = @_pp[ nil ]
+
+      gr = Home_.lib_.system.filesystem.grep(
+        :grep_extended_regexp_string, @grep_extended_regexp_string,
+        :ruby_regexp, @ruby_regexp,
+        :freeform_options, a,
+        & @_oes_p )
+
+      if gr
+        @_grep_command = gr
+        ACHIEVED_
+      else
+        gr
+      end
+    end
+
+    def __write_grep_options_for__counts__ a
+
+      # the '-H' option is crucial to avoid a SPURIOUS "bug" that happens
+      # otherwise: one out of (say) 50 times, if you have only filename, the
+      # file header won't be displayed and our parse will break.
+
+      a.push COUNT_OPTION___, H_OPTION___ ; nil
+    end
+
+    COUNT_OPTION___ = '--count'.freeze
+
+    H_OPTION___ = '-H'.freeze
+
+    def __write_grep_options_for__paths__ a
+
+      a.push FILES_WITH_MATCHES_OPTION___ ; nil
+    end
+
+    FILES_WITH_MATCHES_OPTION___ = '--files-with-matches'.freeze
   end
 end

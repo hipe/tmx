@@ -2,91 +2,59 @@ module Skylab::System
 
   class Services___::Filesystem
 
-    class Bridges_::Grep  # see [#173]. this particular node models the command itself
+    class Bridges_::Grep  # [#017] (presently no content in document)
 
-      # ->
+      PARAMS___ = Home_.lib_.fields::Parameters[
+        do_ignore_case: [ :known_known, :optional ],
+        freeform_options: :optional,
+        grep_extended_regexp_string: :optional,
+        ignore_case: [ :flag_of, :do_ignore_case ],
+        path: [ :singular_of, :paths ],
+        paths: :optional,
+        ruby_regexp: :optional,
+      ]
 
-        class << self
+      class << self
 
-          def for_mutable_args_ x_a, & oes_p
-
-            new do
-
-              if oes_p
-                accept_selective_listener_proc oes_p
-              end
-
-              process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
-
-            end.mixed_result
-          end
-        end  # >>
-
-        Callback_::Actor.methodic( self, :simple, :properties,
-
-          :polymorphic_writer_method_to_be_provided, :property, :ignore_case,
-
-          :polymorphic_writer_method_to_be_provided, :property, :do_ignore_case,
-
-          :polymorphic_writer_method_to_be_provided, :property, :path,
-
-          :polymorphic_writer_method_to_be_provided, :property, :paths,
-
-          :properties,
-            :grep_extended_regexp_string,
-            :ruby_regexp,
-            :when_curry,
-        )
-
-        def initialize
-          @grep_extended_regexp_string = nil
-          @ignore_case_is_known = false
-          @unescaped_path_s_a = nil
-          super
-          @on_event_selectively ||= EVENTLESS_LISTENER__
-          @when_curry ||= IDENTITY_
+        def for_mutable_args_ x_a, & oes_p
+          o = new( & oes_p )
+          o.__init_via_iambic x_a
+          o.execute
         end
 
-        def accept_selective_listener_proc x
-          @on_event_selectively = x
-          NIL_
+        private :new
+      end  # >>
+
+      def initialize & p
+
+        @system_conduit = Home_.lib_.open3  # etc
+
+        @_any_oes_p = p
+      end
+
+      def __init_via_iambic x_a
+        PARAMS___.init self, x_a
+        NIL_
+      end
+
+      # -- normalization of state
+
+      def execute
+        _ok = ___resolve_regexp
+        _ok && freeze
+      end
+
+      def ___resolve_regexp
+
+        if @grep_extended_regexp_string
+          __resolve_regexp_via_egrep_string
+        else
+          ___resolve_regexp_via_ruby_regexp
         end
+      end
 
-      private
+      def ___resolve_regexp_via_ruby_regexp
 
-        def ignore_case=
-          @do_ignore_case = nil
-          @ignore_case_is_known = true
-          @do_ignore_case = true
-          KEEP_PARSING_
-        end
-
-        def do_ignore_case=
-          @ignore_case_is_known = true
-          @do_ignore_case = gets_one_polymorphic_value
-          KEEP_PARSING_
-        end
-
-        def path=
-          ( @unescaped_path_s_a ||= [] ).clear.push gets_one_polymorphic_value
-          KEEP_PARSING_
-        end
-
-        def paths=
-          @unescaped_path_s_a = gets_one_polymorphic_value
-          KEEP_PARSING_
-        end
-
-      public def mixed_result
-
-          if @grep_extended_regexp_string
-            via_grep_regexp_mixed_result
-          else
-            via_ruby_regexp_mixed_result
-          end
-        end
-
-        def via_ruby_regexp_mixed_result
           opts = Home_.lib_.basic::Regexp.options_via_regexp @ruby_regexp
           xtra_i_a = nil
           if opts.is_multiline
@@ -95,129 +63,166 @@ module Skylab::System
           if opts.is_extended
             ( xtra_i_a ||= [] ).push :EXTENDED
           end
-          if xtra_i_a
-            no_support_for xtra_i_a.freeze
-          else
-            if ! @ignore_case_is_known
-              @do_ignore_case = opts.is_ignorecase
-            end
-            @grep_regexp_guess = @ruby_regexp.source
-            get_busy
+
+        if xtra_i_a
+          ___when_no_support_for_ruby_regexp_options xtra_i_a.freeze
+        else
+
+          if ! @do_ignore_case
+            @do_ignore_case = Callback_::Known_Known[ opts.is_ignorecase ]
           end
+
+          @_use_as_grep_extended_regexp = @ruby_regexp.source
+          ACHIEVED_
         end
+      end
 
-        def no_support_for i_a
+      def ___when_no_support_for_ruby_regexp_options i_a
 
-          @on_event_selectively.call :error, :regexp_option_not_supported do
+        p = @_any_oes_p
+        if p
+          p.call :error, :regexp_option_not_supported do
+
             Callback_::Event.inline_not_OK_with(
               :non_convertible_regexp_options,
               :option_symbols, i_a,
               :regexp, @ruby_regexp,
             )
           end
-          UNABLE_
+        end
+        UNABLE_
+      end
+
+      def __resolve_regexp_via_egrep_string
+
+        if ! @do_ignore_case
+          @do_ignore_case = Callback_::Known_Known[ false ]  # ..
         end
 
-        def via_grep_regexp_mixed_result
-          if ! @ignore_case_is_known
-            @do_ignore_case = false
+        s = @grep_extended_regexp_string
+
+        if s
+          @_use_as_grep_extended_regexp = s
+          ACHIEVED_
+        else
+          s
+        end
+      end
+
+      # -- command building & execution
+
+      def to_output_line_content_stream
+
+        cmd = to_command
+        if cmd
+          line_content_stream_via_command cmd
+        else
+          cmd
+        end
+      end
+
+      def to_command_string
+        _of_command :command_string
+      end
+
+      def to_command_tokens
+        _of_command :command_tokens
+      end
+
+      def _of_command m
+        cmd = to_command
+        if cmd
+          cmd.send m
+        else
+          cmd
+        end
+      end
+
+      def to_command
+
+        cmd = Home_::Sessions_::Janus_Command.begin
+
+        cmd.push GREP___, E_OPTION___
+
+        if @do_ignore_case.value_x
+          cmd.push IGNORE_CASE_OPTION__
+        end
+
+        a = @freeform_options
+        if a
+          cmd.concat a
+        end
+
+        cmd.push @_use_as_grep_extended_regexp
+
+        a_ = @paths
+        if a_
+          cmd.concat a_
+        end
+
+        cmd.close
+      end
+
+      E_OPTION___ = '-E'.freeze
+      GREP___ = 'grep'.freeze
+      IGNORE_CASE_OPTION__ = '--ignore-case'.freeze
+
+      def line_content_stream_via_command cmd
+
+        _tokens = cmd.command_tokens ; cmd = nil
+
+        _Stream = Callback_::Stream
+        thread = nil
+
+        _resource_releaser = _Stream::Resource_Releaser.new do
+          if thread && thread.alive?
+            thread.exit
           end
-          @grep_regexp_guess = @grep_extended_regexp_string
-          get_busy
+          ACHIEVED_
         end
 
-        def get_busy
+        p = -> do
 
-          shellwords = Home_.lib_.shellwords
+          _, o, e, thread = @system_conduit.popen3( * _tokens )
 
-          y = [ 'grep', '-E' ]
-          if @do_ignore_case
-            y.push '--ignore-case'
-          end
-          y.push shellwords.escape @grep_regexp_guess
-
-          if @unescaped_path_s_a
-            @unescaped_path_s_a.each do |path|
-              y.push shellwords.escape path
-            end
-          end
-
-          @command_string = y * SPACE_
-
-          @when_curry[ self ]
-        end
-
-      public
-
-        def to_stream
-          @command_string and via_command_string_produce_stream
-        end
-
-        def string
-          @command_string
-        end
-
-      private
-
-        def via_command_string_produce_stream
-          produce_stream_via_command_string @command_string
-        end
-
-      public
-
-        def produce_stream_via_command_string command_string
-
-          thread = nil
-
-          p = -> do
-            _, o, e, thread = Home_.lib_.open3.popen3 command_string
-            err_s = e.gets
-            if err_s && err_s.length.nonzero?
-              o.close
-              p = -> { UNABLE_ }
-              when_system_error err_s
+          main_p = -> do
+            s = o.gets
+            if s
+              s.chop!
+              s
             else
-              p = -> do
-                s = o.gets
-                if s
-                  s.chop!
-                  s
-                else
-                  p = -> { s }
-                  s
-                end
-              end
-              p[]
+              p = -> { s }
+              s
             end
           end
 
-          o = Callback_::Stream
-          o.new(
-            o::Resource_Releaser.new do
-              if thread && thread.alive?
-                thread.exit
-              end
-              ACHIEVED_
-            end
-          ) do
+          err_s = e.gets
+          if err_s && err_s.length.nonzero?
+            o.close
+            p = -> { UNABLE_ }
+            ___when_system_error err_s
+          else
+            p = main_p
             p[]
           end
         end
 
-        def when_system_error err_s
-          @on_event_selectively.call :error, :system_call_error do
+        _Stream.new _resource_releaser do
+          p[]
+        end
+      end
+
+      def ___when_system_error err_s
+
+        p = @_any_oes_p
+        if p
+          p.call :error, :system_call_error do
             Callback_::Event.inline_not_OK_with :system_call_error,
               :message, err_s, :error_category, :system_call_error
           end
-          UNABLE_
         end
-
-        EVENTLESS_LISTENER__ = -> i, * do
-          if :info != i
-            UNABLE_
-          end
-        end
-        # <-
+        UNABLE_
+      end
     end
   end
 end

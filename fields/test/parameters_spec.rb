@@ -7,7 +7,7 @@ module Skylab::Fields::TestSupport
     TS_[ self ]
     use :memoizer_methods
 
-    context "(context)" do
+    context "five fields of [ `foo` | `flag` ][..]" do
 
       shared_subject :_params do
 
@@ -16,15 +16,21 @@ module Skylab::Fields::TestSupport
           two: [ :foo, :flag ],
           three: :flag,
           four: :foo,
-          five: :zazzle,
+          five: [ :zazzle, :optional ],
         ]
       end
 
-      it 'custom daddies' do
+      it "you can request those of a custom symbol" do
 
         o = _params
         o.symbols( :foo ).should eql %i( two four )
         o.symbols( :zazzle ).should eql %i( five )
+      end
+
+      it "you can request those fields of no symbol" do
+
+        _ = _params.symbols
+        _.should eql [ :one, :two, :three, :four, :five ]  # eek depends on hash order
       end
 
       context "set ivar" do
@@ -34,7 +40,7 @@ module Skylab::Fields::TestSupport
           _x_a = [ :one, :ONE, :two, :three, :four, :FOUR ]
 
           o = ::Object.new
-          _params.write_ivars o, _x_a
+          _params.init o, _x_a
           a = []
           o.instance_exec do
             a.push @one, @two, @three, @four
@@ -57,7 +63,7 @@ module Skylab::Fields::TestSupport
           _state[ 1, 2 ].should eql [ true, true ]
         end
 
-        it "ivars are nillified" do
+        it "ivars are nillified IFF `optional` meta-flag" do
           _state.fetch( 4 ).should be_nil
         end
       end
@@ -68,3 +74,4 @@ module Skylab::Fields::TestSupport
     end
   end
 end
+# #pending-rename

@@ -185,26 +185,38 @@ module Skylab::Basic
     end
 
     class A_Buffer_Of_One__  # #experimental
+
       def initialize
+
         @to_a_p = -> do ::Array.new 0 end
-        @vbl_p = -> do 0 end
+
+        @virtual_buffer_length = 0
+
         @set_p = -> x do
-          @vbl_p = -> do 1 end
+
+          @virtual_buffer_length = 1
+
           @to_a_p = -> do [ x ] end
+
           @set_p = -> x_ do
             x = x_ ; nil
           end ; nil
         end
       end
+
       def << x
         @set_p[ x ] ; self
       end
-      def virtual_buffer_length
-        @vbl_p[]
-      end
+
       def to_a
         @to_a_p[]
       end
+
+      attr_reader(
+        :virtual_buffer_length,
+      )
+
+      alias_method :length, :virtual_buffer_length
     end
   end
 end

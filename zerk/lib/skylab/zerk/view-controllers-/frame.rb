@@ -9,22 +9,22 @@ module Skylab::Zerk
 
       b9r = resources.boundarizer
       @_boundarizer = b9r
-      @_boundarizing_line_yielder = b9r.line_yielder
+      @line_yielder = b9r.line_yielder
       @expression_agent = EXPAG___  # etc
       @serr = resources.serr
       @stack = stack
 
       h = {}
       h[ :branchesque ] = -> do
-        _ = @compound_frame.call @_boundarizing_line_yielder
+        _ = @compound_frame.call @line_yielder
         _
       end
       h[ :entitesque ] = -> do
-        _ = stack.last.call self
+        _ = stack.last.call  # has self as member
         _
       end
       h[ :primitivesque ] = -> do
-        _ = @primitive_frame.call @_boundarizing_line_yielder
+        _ = @primitive_frame.call @line_yielder
         _
       end
       @_op_h = h
@@ -67,9 +67,9 @@ module Skylab::Zerk
 
     # -- for lower-level modules
 
-    def express_buttons button_frame
+    def express_buttonesques button_frame
 
-      @_boundarizing_line_yielder << ( button_frame.to_a.reduce [] do | m, sct |
+      @line_yielder << ( button_frame.to_a.reduce [] do | m, sct |
 
         m << "#{ sct.head }[#{ sct.hotstring_for_expression }]#{ sct.tail }"
 
@@ -80,7 +80,7 @@ module Skylab::Zerk
 
     def express_location_area
 
-      @location.call @_boundarizing_line_yielder
+      @location.call @line_yielder
       NIL_
     end
 
@@ -95,6 +95,7 @@ module Skylab::Zerk
 
     attr_reader(
       :expression_agent,
+      :line_yielder,  # [sa]
       :serr,
       :stack,
     )
@@ -109,12 +110,18 @@ module Skylab::Zerk
         rx.match( s )[ 0 ]
       end
 
-      def plural_noun s
-        Home_.lib_.human::NLP::EN::POS.plural_noun s
+      def plural_noun count_d=nil, s
+        Home_.lib_.human::NLP::EN::POS.plural_noun count_d, s
       end
+
+      def s d
+        if 1 != d
+          S___
+        end
+      end
+      S___ = 's'
     end
 
     EXPAG___ = Expag___.new
-
   end
 end

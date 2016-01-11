@@ -1,0 +1,17 @@
+digraph g {
+
+  label="the state machine of the entity adapter."
+
+  initial->closed [label="(when fails)"]
+
+  streamful_with_default_view [label="streamful with\ndefault view\n(momentary)"]
+  initial->streamful_with_default_view
+  streamful_with_default_view->closed
+
+  streamful_with_custom_view [label="streamful with\ncustom view\n(possibly long-running)"]
+  initial->streamful_with_custom_view
+  streamful_with_custom_view->streamful_with_custom_view [label="(conceptually)"]
+
+  streamful_with_custom_view->closed [label="(at will)"]
+
+}

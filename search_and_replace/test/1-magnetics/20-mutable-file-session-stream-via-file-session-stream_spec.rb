@@ -67,11 +67,20 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       it "first match controller has the right offsets" do
-        match_controllers_.fetch( 0 ).offsets.should eql [ 2, 4 ]
+
+        _at_idx_expect 0, 2, 4
       end
 
       it "second match controller has the right offsets" do
-        match_controllers_.fetch( 1 ).offsets.should eql [ 6, 8 ]
+
+        _at_idx_expect 1, 6, 8
+      end
+
+      def _at_idx_expect d, beg, end_
+
+        mc = match_controllers_.fetch d
+        mc.match_pos.should eql beg
+        mc.match_end.should eql end_
       end
     end
 

@@ -11,7 +11,7 @@ module Skylab::Zerk
     # "qualified knownness" so there remains an amount of delegation that
     # is perhaps conspicuous.
 
-    class Compound_Custom_View
+    class Primitive_Custom_View__
 
       def initialize p
 
@@ -29,14 +29,6 @@ module Skylab::Zerk
 
       # -- DSL
 
-      def children x
-        @custom_tree_for = x ; nil
-      end
-
-      def custom_view_controller x
-        @_custom_view_controller_proc = x ; nil
-      end
-
       def hotstring_delineation s, s_, s__
         @_custom_hotstring_pieces = [ s, s_, s__ ]
         NIL_
@@ -51,6 +43,21 @@ module Skylab::Zerk
           Home_::Expression_Adapters_::Buttonesque.new( * a, lt )
         end
       end
+    end
+
+    class Compound_Custom_View < Primitive_Custom_View__
+
+      # -- DSL
+
+      def children x
+        @custom_tree_for = x ; nil
+      end
+
+      def custom_view_controller x
+        @_custom_view_controller_proc = x ; nil
+      end
+
+      # --
 
       attr_reader(
         :custom_tree_for,
@@ -116,8 +123,11 @@ module Skylab::Zerk
       end
 
       def prepare_
-        if @_customization_x
-          self._K
+
+        x = remove_instance_variable :@_customization_x
+        if x
+          pcv = Primitive_Custom_View__.new x
+          @_custom_hotstring_structure = pcv.custom_hotstring_structure_for self
         else
           @_custom_hotstring_structure = nil
         end

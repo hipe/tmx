@@ -9,9 +9,9 @@ module Skylab::Zerk
 
       @_line_yielder = rsx.line_yielder
       @_qkn = qkn
-      @UI_event_handler = rsx.UI_event_handler
-      @view_controller = rsx.view_controller
 
+      @event_loop = rsx.event_loop
+      @UI_event_handler = rsx.UI_event_handler
       @_prompt_once = false  # nasty
     end
 
@@ -102,7 +102,7 @@ module Skylab::Zerk
       a = [ sym ]
       a.push @_qkn.name.as_variegated_symbol
 
-      _ACS = @view_controller.stack_penultimate.ACS  # #NASTY
+      _ACS = @event_loop.stack_penultimate.ACS  # #NASTY
 
       ok = ACS_.edit a, _ACS  # we could pass some arbitrary (oes_p_p)
       # handler here, but instead we (for now) defer eventing to the
@@ -113,7 +113,7 @@ module Skylab::Zerk
       # we'll jump up a level..
 
       if ok
-        @view_controller.pop_me_off_of_the_stack self
+        @event_loop.pop_me_off_of_the_stack self
       end
       NIL_
     end
@@ -150,7 +150,7 @@ module Skylab::Zerk
 
       # but wait: we do care..
 
-      _ACS = @view_controller.stack_penultimate.ACS  # #NASTY
+      _ACS = @event_loop.stack_penultimate.ACS  # #NASTY
 
       p = ACS_::Interpretation::Accept_component_change[
         wv.value_x,
@@ -162,7 +162,7 @@ module Skylab::Zerk
         p[]
       end
 
-      @view_controller.pop_me_off_of_the_stack self
+      @event_loop.pop_me_off_of_the_stack self
 
       NIL_
     end
@@ -172,7 +172,7 @@ module Skylab::Zerk
     def handler_for sym, *_
       if :interrupt == sym
         -> do
-          @view_controller.pop_me_off_of_the_stack self
+          @event_loop.pop_me_off_of_the_stack self
           NIL_
         end
       end
@@ -192,7 +192,7 @@ module Skylab::Zerk
 
     def receive_uncategorized_emission i_a, & ev_p
 
-      @view_controller.receive_uncategorized_emission i_a, & ev_p
+      @event_loop.receive_uncategorized_emission i_a, & ev_p
       UNRELIABLE_
     end
 

@@ -15,9 +15,25 @@ below we will justify why we didn't use a tool like vi's `s///gc` or
 
 ## scope of the task
 
-at the time of *first* writing of this paragraph, the string `::Lib_`
-matched 555 lines in the codebase. this code-feature was one that we
-were altering universe-wide in a way that was non-trivial but regular.
+  • at the time of *first* writing of this paragraph, the string `::Lib_`
+    matched 555 lines in the codebase.
+
+  • (after the [#ze-009] rewrite) we would use this on a code-feature
+    that appeared about 97 times in 76 files at this writing.
+
+some of these refactorings (or others like them, on a similar scale)
+involved transformations that were "non-trivial" but regular; which is
+to say they are not always a simple matter of search-and-replace.
+
+for example: replace a proc call (`Foo_bar[a, b]`) with a method call
+(`foo_bar a, b`). sometimes the transformation replaced code that spanned
+multiple lines.
+
+ironically or not, to do the above example transformations by hand would
+have very likely taken less time than the time we spent on this utility.
+but whether or not the work here ultimately serves as a multiplier effect,
+we would have found the above too mind-numbing ever to consider doing it
+by hand.
 
 
 
@@ -150,27 +166,9 @@ interactivity.
 
 
 
-### :#note-185
-
-as offered in #note-105, each line must know where the previous line ends
-to know where it begins. while looking backwards for context lines even
-when we show zero lines here, we still need to find the segment with a
-delimiter.
-
-
-
-
-### :#note-350
-
-don't use this method for general use, it is not future-proofy. it is
-just convenient for testing, which is probably some kind of smell.
-
-
-
-
 ## (notes from a child node)
 
-### #note-321
+### #note-321  (disassociated, might use again)
 
 we describe the behavior behind three similar buttons and justify their
 individual constituency:
@@ -208,12 +206,13 @@ individual constituency:
     file and there are remaining matches (or not?) and we wish to write
     the file nd be done with it.
 
-this whole note reveals a smell and opened up #open [#005].
+this whole note reveals a smell and opened up #open [#005],
+which is that these there buttons could be one.
 
 
 
 
-### #note-372
+### #note-372 (disassociated, might use again)
 
 in interactive mode when you are "within" this node it can behave as
 though it has persistent state (that is, be "sticky"): the file being
@@ -228,11 +227,4 @@ the appearance of being a fresh "session", starting again from the first
 file. (this is an arbitrary design decision and hypothetically could
 change.)
 
-as such experimentally the way we accomplish this for now is for this
-node to maintain its own run loop similar to (but maybe or maybe not the
-same as) the run loop at the very top of the application.
-
-"quit" is always easy because we just result in false-ish and it bubbles
-all the up out of the request stack. with "up", however, it is tricker:
-we release resources, break out of our own loop, and neded to change
-the focus of the main loop.
+(EDIT: Ok how do you do it now?)

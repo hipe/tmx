@@ -23,7 +23,7 @@ module Skylab::Zerk
       -> y do
         y << "«compound placeholder»"
         _ = stack.last.button_frame
-        mvc.express_buttons _
+        mvc.express_buttonesques _
         y
       end
     end
@@ -60,7 +60,7 @@ module Skylab::Zerk
 
         # (hypothetically there could be no buttons, and hypoth'ly s'OK)
 
-        @main_view_controller.express_buttons _button_frame
+        @main_view_controller.express_buttonesques _button_frame
         y
       end
 

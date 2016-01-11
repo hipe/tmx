@@ -7,11 +7,16 @@ module Skylab::System::TestSupport
     TS_[ self ]
 
     it "minimal case - string looks like command" do
-      _parent_subject.grep( :ruby_regexp, /foo/ ).string.should eql "grep -E foo"
+
+      _g = _parent_subject.grep :ruby_regexp, /foo/
+      _s = _g.to_command_string
+      _s.should eql "grep -E foo"
     end
 
     it "unsupported options, no listener" do
-      _parent_subject.grep( :ruby_regexp, /foo/imx ).should eql false
+
+      _g = _parent_subject.grep :ruby_regexp, /foo/imx
+      _g.should eql false
     end
 
     it "unsupported options, listener" do
@@ -41,12 +46,14 @@ module Skylab::System::TestSupport
 
     it "a fully monty" do
 
-      cmd = _parent_subject.grep :ruby_regexp, /\bZO[AEIOU]NK\b/i,
-        :path, _here_path
+      _grep = _parent_subject.grep(
+        :ruby_regexp, /\bZO[AEIOU]NK\b/i,
+        :path, _here_path,
+      )
 
-      cmd_string = cmd.string
+      _toks = _grep.to_command_tokens
 
-      _, o, e, t = Home_.lib_.open3.popen3 cmd_string
+      _, o, e, t = Home_.lib_.open3.popen3( * _toks )
 
       e.gets.should be_nil
       line = o.gets
@@ -55,26 +62,23 @@ module Skylab::System::TestSupport
       line.should be_include "-->ZOINK<--"
 
       t.value.exitstatus.should be_zero
-
     end
 
-    it "scan" do
+    it "hits the system if you want it to" do
       a = []
 
-      scan = _parent_subject.grep(
+      _cmd = _parent_subject.grep(
 
         :ruby_regexp, /foo[b]ie/i,
 
         :path, _here_path,
 
-        :when_curry, -> cmd do
-          cmd.to_stream
-        end,
-
       ) do | * i_a, & ev_p |
         a.push i_a
-        a.push ev_p.[]
+        a.push ev_p[]
       end
+
+      scan = _cmd.to_output_line_content_stream
 
       a.length.should be_zero
       scan.gets.should be_include 'foobie'

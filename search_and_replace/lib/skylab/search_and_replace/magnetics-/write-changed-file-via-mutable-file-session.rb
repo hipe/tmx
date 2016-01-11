@@ -1,89 +1,139 @@
-self._NOT_USED
-
 module Skylab::SearchAndReplace
 
-    class Magnetics_::Write_any_changed_file
+    class Magnetics_::Write_changed_file_via_mutable_file_session
 
+      # resolve a locked, writable filehandle to a tmpfile.
+      # line by line, write the new file state to the tmpfile.
+      # then IFF there were nonzero bytes written, use the filesystem
+      # to copy the tmpfile over to the "real" file location.
+      # implement dry run (expressed in the positive: `write_is_enabled`).
+      #
+      # we use the intermediate tmpfile (for now) for a number of
+      # "instinctual" reasons, the main one being that we don't want
+      # to corrupt the "real" file in cases of exceptions thrown while
+      # producing the new lines.
+      #
+      # this will definitely be touched by #open [#004] locking/mtime etc.
 
-      Callback_::Actor.call( self, :properties,
-        :edit_session,
-        :work_dir_path,
-        :is_dry_run,
-      )
-
-      Callback_::Event.selective_builder_sender_receiver self
-
-      def execute
-        _ok = write_temp_file
-        _ok && via_tmpfile_pn
+      def initialize & oes_p
+        @on_event_selectively = oes_p
       end
 
-      def write_temp_file
-        @stream = @edit_session.to_line_stream
-        line = @stream.gets
-        if line
-          via_stream_write_lines line
+      attr_writer(
+        :line_stream,
+        :path,
+        :write_is_enabled,
+      )
+
+      def execute
+        _ok = __resolve_tmpfile_IO
+        _ok && ___via_tmpfile_IO
+      end
+
+      def ___via_tmpfile_IO
+
+        tmp_path = @_tmpfile_IO.path
+        real_path = @path
+
+        is_dry = ! @write_is_enabled
+
+        _cls = Home_.lib_.system.filesystem.file_utils_controller
+
+        _fuc = _cls.new_via( & method( :___express_unexpected_mv_msg ) )
+
+        @_tmpfile_IO.flush
+        d = _fuc.mv tmp_path, real_path, noop: is_dry, verbose: false
+        @_tmpfile_IO.close
+
+        if is_dry || d.zero?
+
+          _ev = Home_.lib_.system.filesystem_lib.event( :Wrote ).new_with(
+            :bytes, @_bytes,
+            :path, real_path,
+            :is_dry, is_dry,
+          )
+
+          _ev
         else
-          @on_event_selectively.call :error do
-            build_not_OK_event_with :file_was_empty, :path, @edit_session.path
-          end
           UNABLE_
         end
       end
 
-      def via_stream_write_lines line
-        tmpfile_pn = build_tmpfile_pathname
-        @tmpfile = tmpfile_pn.to_path
-        io = tmpfile_pn.open ::File::CREAT | ::File::WRONLY
-        bytes = 0
-        begin
-          bytes += io.write line
-          line = @stream.gets
-        end while line
-        io.close
-        @stream = nil
-        @wrote_bytes = bytes
-        PROCEDE_
-      end
-
-      def build_tmpfile_pathname
-        ::Pathname.new "#{ @work_dir_path }/tmpfile.txt"
-      end
-
-      def via_tmpfile_pn
-        # we could compare the byte count first with stat, but why?
-        is_same = Home_.lib_.file_utils.cmp @edit_session.path, @tmpfile
-        if is_same
-          when_no_change
-        else
-          flush
+      def ___express_unexpected_mv_msg msg
+        self._COVER_ME
+        @on_event_selectively.call(
+          :error,
+          :expression,
+          :moving_tmpfile_to_real_file,
+        ) do | y |
+          y << msg
         end
+        NIL_
       end
 
-      def when_no_change
-        @on_event_selectively.call :info do
-          build_neutral_event_with :no_change, :path, @edit_session.path
-        end
-        UNABLE_  # don't stop the whole process.. or do?
-      end
+      def __resolve_tmpfile_IO
 
-      def flush
-
-        _cls = Home_.lib_.system.filesystem.file_utils_controller
-
-        _fuc = _cls.new_via -> msg do
-          @on_event_selectively.call :info do
-            Changed_[ @edit_session.path, @is_dry_run ]
+        st = @line_stream
+        line = st.gets
+        if line
+          ok = __write_nonzero_lines line, st
+          if ok
+            if @_bytes.zero?
+              _when_no_lines
+            else
+              ACHIEVED_
+            end
+          else
+            ok
           end
+        else
+          _when_no_lines
         end
-
-        _fuc.mv @tmpfile, @edit_session.path, noop: @is_dry_run  # result is nil
-
-        ACHIEVED_
       end
 
-      Changed_ = Callback_::Event.prototype_with :changed_file,
-        :path, nil, :is_dry_run, nil, :ok, true
+      def _when_no_lines
 
+        _path = @path
+
+        sym = :will_not_write_empty_file
+
+        @on_event_selectively.call :error, sym do
+          Callback_::Event.inline_not_OK_with sym, :path, _path
+        end
+        UNABLE_
+      end
+
+      def __write_nonzero_lines line, st
+
+        _path = Tmpfile_path___[]
+        io = ::File.open _path, PERM___
+        d = io.flock LOCK___
+        if d && d.zero?
+
+          io.truncate 0
+          bytes = 0
+
+          begin
+            _d = io.write line
+            bytes += _d
+            line = st.gets
+          end while line
+
+          @_bytes = bytes
+          @_tmpfile_IO = io
+          ACHIEVED_
+        else
+          self._COVER_ME_could_not_lock
+        end
+      end
+
+      Tmpfile_path___ = Lazy_.call do
+        ::File.join Home_.lib_.tmpdir, 'tmpfile.txt'
+      end
+
+      LOCK___ = ::File::LOCK_EX | ::File::LOCK_NB
+      PERM___ = ::File::CREAT | ::File::WRONLY
     end
+  # -
 end
+# #pending-rename

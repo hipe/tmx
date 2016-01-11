@@ -190,6 +190,7 @@ module Skylab::Brazen
 
       def initialize & oes_p
 
+        @be_case_sensitive = false
         @found_map = nil
         @levenshtein_number = nil
         @name_map = nil
@@ -219,6 +220,8 @@ module Skylab::Brazen
         :qualified_knownness,  # (required) wrap your target value in
         # this [#ca-004] which associates a name function with the value.
 
+        :be_case_sensitive,  # case sensitivity is OFF by default
+
         :stream_builder,  # (required) build the candidate stream. we need
         # a builder and not the stream itself because in case one match
         # is not resolved, we need the whole stream anew to report on it.
@@ -245,12 +248,13 @@ module Skylab::Brazen
           x = @target_map[ x ]
         end
 
-        a = Home_.lib_.basic::Fuzzy.reduce_to_array_stream_against_string(
-          @stream_builder.call,
-          x,
-          @name_map,
-          @found_map,
-        )
+        o = Home_.lib_.basic::Fuzzy.new
+        o.string = x
+        o.stream = @stream_builder.call
+        o.candidate_map = @name_map
+        o.result_map = @found_map
+        o.be_case_sensitive = @be_case_sensitive
+        a = o.execute
 
         case 1 <=> a.length
         when 0

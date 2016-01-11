@@ -56,7 +56,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "after looks good" do
 
-        for_ lines_after_
+        nothing_for_ lines_after_
       end
 
       it "before looks good" do

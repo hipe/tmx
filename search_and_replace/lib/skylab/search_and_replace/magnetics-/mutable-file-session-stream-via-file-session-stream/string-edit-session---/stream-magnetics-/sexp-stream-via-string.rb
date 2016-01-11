@@ -21,6 +21,10 @@ module Skylab::SearchAndReplace
           end
         end  # >>
 
+        def initialize
+          # (hi.)
+        end
+
         attr_writer(
           :end,
           :pos,

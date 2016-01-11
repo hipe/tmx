@@ -3,12 +3,24 @@ digraph G {
   label="figure 1 - schema and example document structure
 
 • blocks - each block represents a run of one or more adjacent
-lines from the input. (lines are virtual - internally we only
-store indexes.) lines are never broken by matches:
+\"lines\" from the input.
 
-rather, each block is partioned such that it is either a run
-of one or more lines that do not overlap with any matches -OR-
-a run of one or more lines each of which overlaps with matches.
+a line is EITHER: a run of zero or more characters that do not
+express a newline sequence terminated by a newline sequence OR
+(IFF the line is the last line of the file) ONE or more characters
+that do not express the newline sequence. that is, every line
+necessarily ends in a newline sequence except any final line of
+the file: for (and only for) a final line, the newline sequence
+is not a given. (more at [#sn-020].) (not fully implemented #open [#011]).
+
+as a parenthetical but essential lowlevel detail, lines are virtual:
+internally we only store indexes into the \"one big string\".
+
+as a corollary of above, a \"line\" is never delineated by a match
+per se (unless it happens to be that way). rather, each block is
+partioned such that it is either a run of one or more lines that
+do not overlap with any matches -OR- a run of one or more lines
+each of which overlaps with matches.
 
 a match can span multiple lines -AND- a line can
 overlap with (or contain fully) multiple matches;

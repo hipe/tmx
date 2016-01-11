@@ -4,23 +4,40 @@ module Skylab::SearchAndReplace
 
     class String_Edit_Session___
 
-      class Stream_Magnetics_::Sexp_stream_via_matches_block < Callback_::Actor::Dyadic
+      class Stream_Magnetics_::Sexp_stream_via_matches_block
 
         # given a [#010] block that has one or more matches, produce a
         # stream of [#012] sexp nodes representing the content with
         # replacements applied.
 
-        def initialize x, s
-          @_block = x
+        class << self
+          def [] a, b, c
+            new( a, b, c ).execute
+          end
+          private :new
+        end  # >>
+
+        def initialize mcs, bl, s
+          @_block = bl
+          @_mcs = mcs
           @_the_big_string = s
         end
 
         def execute
 
           @_current_pos, @_block_end = @_block.offsets
-          @_match_controller_stream = __build_match_controller_stream
+
+          _ = remove_instance_variable :@_mcs
+          @_match_controller_stream = Callback_::Stream.via_nonsparse_array _
+
+          # note we do *not* want to use the `next_match_controller` method
+          # of each current match controller because that hops over to any
+          # next block with more match controllers. we wnat to stay within
+          # the block.
+
           @_mc = @_match_controller_stream.gets  # assume one
           _on_unclassified_match
+
           Callback_.stream do
             @_p[]
           end
@@ -44,7 +61,7 @@ module Skylab::SearchAndReplace
 
         def _on_unclassified_match
 
-          d = @_mc.pos
+          d = @_mc.match_pos
           if @_current_pos == d  # then render this match now
             _on_match
           else  # else the block starts with some static
@@ -108,7 +125,8 @@ module Skylab::SearchAndReplace
 
         def ___on_disengaged_match_body
 
-          _on_static_then( * @_mc.offsets ) do
+          o = @_mc
+          _on_static_then o.match_pos, o.match_end do
 
             @_p = -> do
 
@@ -123,7 +141,7 @@ module Skylab::SearchAndReplace
 
           # when you have reached the end of either sort of match
 
-          @_current_pos = @_mc.end
+          @_current_pos = @_mc.match_end
 
           if @_block_end == @_current_pos  # end of match is also end of block
             @_p = EMPTY_P_
@@ -157,14 +175,6 @@ module Skylab::SearchAndReplace
           o.end = end_
           o.sexp_symbol_for_context_strings = :orig_str
           o.execute
-        end
-
-        def __build_match_controller_stream
-          curr = @_block
-          Callback_.stream do
-            curr = curr.next_match_controller
-            curr
-          end
         end
       end
     end
