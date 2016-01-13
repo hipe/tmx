@@ -6,35 +6,39 @@ module Skylab::SearchAndReplace
 
       def new sin, sout, serr, pn_s_a
 
-        # _ = rsx.bridge_for( :filesystem ).pwd
-
-        cli = Home_.lib_.zerk::InteractiveCLI.new(
-
-          sin, sout, serr, pn_s_a
-
-        ) do | rsx, & top_oes_p |  # todo - don't need resources
-
-          acs = Root_Autonomous_Component_System__.new( & top_oes_p )
-          acs._init_with_defaults
-          acs
-        end
-
-        cli.design = -> vmm do
-
-          vmm.compound_frame = vmm.common_compound_frame
-          vmm.custom_tree = CUSTOM_TREE___
-          vmm.location = vmm.common_location
-          vmm.primitive_frame = vmm.common_primitive_frame
-          vmm
-        end
-
-        cli
+        _pr = Prototype___[]
+        inst = _pr.dup
+        inst.universal_CLI_resources sin, sout, serr, pn_s_a
+        inst.finish
       end
 
       def highlighting_expression_agent_instance__
         @___hl_expag ||= Highlighting_Expag___.new
       end
     end  # >>
+
+    Prototype___ = Lazy_.call do
+
+      # _ = rsx.bridge_for( :filesystem ).pwd
+
+      cli = Home_.lib_.zerk::HybridCLI.begin
+
+      cli.root_ACS = -> & top_oes_p do
+        acs = Root_Autonomous_Component_System_.new( & top_oes_p )
+        acs._init_with_defaults
+        acs
+      end
+
+      cli.interactive_design = -> vmm do
+        vmm.compound_frame = vmm.common_compound_frame
+        vmm.custom_tree = CUSTOM_TREE_
+        vmm.location = vmm.common_location
+        vmm.primitive_frame = vmm.common_primitive_frame
+        vmm
+      end
+
+      cli
+    end
 
     class Highlighting_Expag___
 

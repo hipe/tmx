@@ -12,13 +12,13 @@ module Skylab::Zerk::TestSupport
 
       _ACS_class = TS_.lib_ :examples_example_01_zombies
 
-      _CLI_class = Home_::Interactive_CLI.new do | rsx, & ev_p |
-        _ACS_class.new rsx, & ev_p
+      cli = Home_::Interactive_CLI.begin
+
+      cli.root_ACS = -> & top_oes_p do
+        _ACS_class.new( & top_oes_p )
       end
 
-      TS_::Three_SFFF_CLI = _CLI_class
-
-      _CLI_class
+      cli.to_classesque
     end
 
     def stdout_is_expected_to_be_written_to

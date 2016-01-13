@@ -15,45 +15,52 @@ module Skylab::Zerk
     #     or be in a different library.
 
     class << self
-
-      alias_method :_orig_new, :new
-
-      def new * args, & mixed_p
-
-        if args.length.zero?
-          ___make_class( & mixed_p )
-        else
-          cli = _orig_new( * args )
-          cli._top_builder_proc = mixed_p
-          cli
-        end
+      def begin
+        new.__init_as_beginning
       end
-
-      def ___make_class( & p )
-        cls = ::Class.new self
-        class << cls
-          alias_method :new, :_orig_new
-        end
-        cls.send :define_method, :_top_builder_proc do
-          p
-        end
-        cls
-      end
+      private :new
     end  # >>
 
-    def initialize sin, sout, serr, pn_s_a
+    def initialize_copy _
+      # (hi.) (`dup` called below)
+      NIL_
+    end
 
-      @program_name_string_array = pn_s_a
-      @serr = serr
-      @sin = sin
-      @sout = sout
-
+    def __init_as_beginning
       @design = nil
+      @on_event_loop = nil  # ..
+      self
+    end
+
+    def root_ACS= p
+      @_root_ACS_proc = p
     end
 
     attr_writer(
       :design,
+      :on_event_loop,
     )
+
+    def to_classesque  # tracking #[#011]
+      Home_::CLI_Support_::Prototype_as_Classesque.new self
+    end
+
+    def universal_CLI_resources sin, sout, serr, pn_s_a
+      @sin = sin
+      @sout = sout
+      @serr = serr
+      @program_name_string_array = pn_s_a
+      NIL_
+    end
+
+    def __accept_resources sin, sout, serr, pn_s_a
+      @sin
+    end
+
+    def finish
+      # (nothing to do.)
+      self
+    end
 
     attr_reader(
       :argv,
@@ -64,24 +71,39 @@ module Skylab::Zerk
       :sout,
     )
 
-    attr_accessor :_top_builder_proc
-
     def invoke argv
 
       if argv.length.zero?
-
-        bc = ___bound_call_for_event_loop
-        x = bc.receiver
-        yield x if block_given?  # :/
-        x.send bc.method_name, * bc.args, & bc.block
-
-      elsif %r(\A-(?:h|-h(?:e(?:l(?:p)?)?)?)\z)i =~ argv.first
-
-        @serr.puts "usage: '#{ @program_name_string_array * SPACE_ }'"
-        SUCCESS_EXITSTATUS
+        invoke_when_zero_length_argv
       else
-        self._DESIGN_ME
+        ___invoke_when_nonzero_length_argv argv
       end
+    end
+
+    def ___invoke_when_nonzero_length_argv argv
+
+      _help_was_invoked = %r(\A-(?:h|-h(?:e(?:l(?:p)?)?)?)\z)i =~ argv.first
+
+      if _help_was_invoked
+        es = SUCCESS_EXITSTATUS
+      else
+        @serr.puts "unexpected argument: #{ argv.first.inspect }"
+        es = GENERIC_ERROR_EXITSTATUS
+      end
+      @serr.puts "usage: '#{ @program_name_string_array * SPACE_ }'"
+      es
+    end
+
+    def invoke_when_zero_length_argv
+
+      bc = ___bound_call_for_event_loop
+      evlo = bc.receiver
+
+      if @on_event_loop
+        @on_event_loop[ evlo ]  # testing only :/
+      end
+
+      evlo.send bc.method_name, * bc.args, & bc.block
     end
 
     def ___bound_call_for_event_loop
@@ -97,7 +119,7 @@ module Skylab::Zerk
         vmm = @design[ vmm ]
       end
 
-      _el = Here_::Event_Loop___.new vmm, self, & _top_builder_proc
+      _el = Here_::Event_Loop___.new vmm, self, & @_root_ACS_proc
 
       Callback_::Bound_Call.via_receiver_and_method_name _el, :run
     end

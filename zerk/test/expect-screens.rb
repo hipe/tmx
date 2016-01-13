@@ -160,17 +160,18 @@ module Skylab::Zerk::TestSupport
           fake.sout = SOUT_CANARY___
         end
 
-        _CLI = __expscr_build_CLI fake
+        cli = __expscr_build_CLI fake
 
         event_loop = nil
         x = nil
 
+        cli.on_event_loop = -> el do
+          event_loop = el
+        end
+
         _got_to_end = catch :__expscr_freeze_where_you_are__ do
 
-          x = _CLI.invoke EMPTY_A_ do | el |  # #NASTY
-            event_loop = el
-          end
-
+          x = cli.invoke EMPTY_A_
           ACHIEVED_
         end
 

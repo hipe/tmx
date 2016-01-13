@@ -2,6 +2,8 @@
 
 require 'skylab/search_and_replace'
 
-Skylab::SearchAndReplace::CLI.new(
+_es = Skylab::SearchAndReplace::CLI.new(
   $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
 ).invoke ARGV
+
+$stderr.puts "( s&r exitstatus: #{ _es.inspect } )"

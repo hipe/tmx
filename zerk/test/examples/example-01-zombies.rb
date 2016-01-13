@@ -12,7 +12,7 @@ module Skylab::Zerk::TestSupport
     # all other operations besides `set` need the ACS to define the operation
     # explicitly, as we have done here with `delete`.
 
-    def initialize _rsx, & oes_p
+    def initialize & oes_p
 
       # (we only emit events, we don't need e.g to write directly to stdout
       # which is why we disreagard the first argument above.)

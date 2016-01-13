@@ -1,5 +1,3 @@
-require 'skylab/callback'
-
 module Skylab::Zerk  # intro in [#001] README
 
   module API

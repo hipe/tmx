@@ -7,6 +7,10 @@ module Skylab::Brazen
       def standard_action_property_box_
         Standard_action_property_box___[]
       end
+
+      def standard_branch_property_box
+        Standard_branch_property_box___[]
+      end
     end  # >>
 
     option_argument_moniker_via_variegated_string = nil
@@ -56,6 +60,28 @@ module Skylab::Brazen
     option_argument_moniker_via_variegated_string = -> s do
 
       s.split( UNDERSCORE_ ).last.upcase
+    end
+
+    Standard_branch_property_box___ = Lazy_.call do
+
+      _Property = Modality_Specific_Property
+
+      bx = Box_.new
+
+      bx.add :action, _Property.new( :action, :is_required, true )
+
+      bx.add :help, _Property.new( :help,
+
+        :description_proc, -> y do
+          y << 'this screen (or help for action)'
+        end,
+
+        :option_argument_moniker, 'cmd',
+        :parameter_arity, :zero_or_one,
+        :argument_arity, :zero_or_one,  # LOOK Spot-1
+      )
+
+      bx.freeze
     end
 
     Standard_action_property_box___ = Callback_::Lazy.call do

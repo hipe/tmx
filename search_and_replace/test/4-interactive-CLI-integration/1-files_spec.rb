@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] modality integrations - 1. fbf, fbg, counts" do
+  describe "[sa] interactive CLI integration - 1. fbf, fbg, counts" do
 
     TS_[ self ]
     use :expect_screens

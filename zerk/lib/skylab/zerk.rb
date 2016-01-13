@@ -42,6 +42,22 @@ module Skylab::Zerk  # intro in [#001] README
     end
   end  # >>
 
+  module CLI_Support_
+
+    class Prototype_as_Classesque
+
+      def initialize x
+        @_prototype = x
+      end
+
+      def new sin, sout, serr, pn_s_a
+        otr = @_prototype.dup
+        otr.universal_CLI_resources sin, sout, serr, pn_s_a
+        otr.finish
+      end
+    end
+  end
+
   Callback_ = ::Skylab::Callback
 
   Interface_stream_for_ = -> target_sym, acs do
@@ -166,6 +182,7 @@ module Skylab::Zerk  # intro in [#001] README
   EMPTY_A_ = [].freeze
   EMPTY_S_ = ''
   FINISHED_ = nil
+  GENERIC_ERROR_EXITSTATUS = 5
   Home_ = self
   KEEP_PARSING_ = true
   NEWLINE_ = "\n"

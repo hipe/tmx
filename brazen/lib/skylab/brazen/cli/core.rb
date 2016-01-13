@@ -368,7 +368,7 @@ module Skylab::Brazen
       # -- branch - initialization
 
       def init_properties  # [*]
-        @front_properties = Standard_branch_property_box___[]
+        @front_properties = Home_::CLI_Support.standard_branch_property_box
         NIL_
       end
 
@@ -2065,30 +2065,6 @@ module Skylab::Brazen
         end
       end
       h
-    end
-
-    # -- performers that model formal properties
-
-    Standard_branch_property_box___ = Lazy_.call do
-
-      _Property = Home_::CLI_Support::Modality_Specific_Property
-
-      bx = Box_.new
-
-      bx.add :action, _Property.new( :action, :is_required, true )
-
-      bx.add :help, _Property.new( :help,
-
-        :description_proc, -> y do
-          y << 'this screen (or help for action)'
-        end,
-
-        :option_argument_moniker, 'cmd',
-        :parameter_arity, :zero_or_one,
-        :argument_arity, :zero_or_one,  # LOOK Spot-1
-      )
-
-      bx.freeze
     end
 
     # -- lower-level performers

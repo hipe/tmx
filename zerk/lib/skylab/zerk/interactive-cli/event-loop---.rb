@@ -68,7 +68,7 @@ module Skylab::Zerk
       @sout = @_resources.sout
       @UI_event_handler = top_oes_p
 
-      _top_ACS = @_build_top.call self, & top_oes_p
+      _top_ACS = @_build_top.call( & top_oes_p )
 
       x = @_view_maker_maker.custom_tree
       if x

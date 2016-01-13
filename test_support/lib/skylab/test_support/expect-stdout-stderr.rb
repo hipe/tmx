@@ -240,11 +240,15 @@ module Skylab::TestSupport
       end
 
       def expect_result_for_failure
-        @exitstatus.should eql result_for_failure_for_expect_stdout_stderr  # :+#hook-out
+        exitstatus.should eql result_for_failure_for_expect_stdout_stderr  # :+#hook-out
       end
 
       def expect_result_for_success
-        @exitstatus.should be_zero
+        exitstatus.should be_zero
+      end
+
+      def exitstatus
+        @exitstatus
       end
 
       # ~ support & other expectations
@@ -685,7 +689,7 @@ module Skylab::TestSupport
         if md
           @_matchdata = md
         else
-          _add_failure do
+          _add_failure_by do
             "string did not match #{ @_expectation.pattern_x } - #{
               }#{ @_against_string.inspect }"
           end

@@ -201,6 +201,10 @@ module Skylab::Zerk::TestSupport
     Callback_.test_support::Expect_Event[ tcc ]
   end
 
+  Expect_Stdout_Stderr = -> tcc do
+    tcc.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
+  end
+
   Future_expect_nothing_ = Lazy_.call do
     -> * i_a do
       fail "unexpected: #{ i_a.inspect }"
