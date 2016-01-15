@@ -54,7 +54,7 @@ module Skylab::Autonomous_Component_System
       m
     end
 
-    class Value_Popper  # 2x here Xx [ze] [#006]#VP
+    class Value_Popper  # 2x here 3-N [ze] [#006]#VP
 
       class << self
         alias_method :[], :new

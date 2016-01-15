@@ -2,42 +2,55 @@ require_relative '../test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] niCLI - options intro", wip: true do  # (was in [ac])
+  describe "[ze] niCLI - options intro" do  # (was in [ac])
 
     TS_[ self ]
-    use :memoizer_methods
-    # use :future_expect
-    # use :modalities_reactive_tree_CLI_integration
+    use :non_interactive_CLI
 
-    it "1.4)   operation has description" do
+    it "1.4)   operation has description", wip: true do  # #waypoint-H
+
       _top_help_screen.should match %r(^ +wazoozie-foozie +have 'fun'\n)
     end
 
-    context "for one particular operation" do
+    # == FROM HERE  # #waypoint-3
 
-      it "2.0)   operation short one argument" do
+    context "2.0)   missing a required argument", wip: true do
 
-        invoke 'waz'
-        expect :styled, :e, "expecting <flim-flam>"
-        expect_result_for_failure
+      given do
+        argv 'waz'
       end
 
-      it "2.3)   with one arg" do
+      it "fails" do
+        fails
+      end
 
-        invoke 'waz', 'ziz'
-        expect :styled, :e, "hello 'ziz'"
-        expect_no_more_lines
-        @exitstatus.should eql 12332
+      it "whines" do
+        first_line.should be_line( :styled, :e, "expecting <flim-flam>" )
       end
     end
 
-    context "(help screen)" do
+    context "2.3)   with one arg", wip: true do
 
-      shared_subject :root_ACS_state do
+      given do
+        argv 'waz', 'ziz'
+      end
 
-        invoke 'waz', '-h'
+      it "x." do
+        @exitstatus.should eql 12332
+      end
 
-        flush_invocation_to_help_screen_oriented_state
+      it "x" do
+        expect :styled, :e, "hello 'ziz'"
+      end
+    end
+
+    # == END
+    # == BEGIN #waypoint-H
+
+    context "(help screen)", wip: true do
+
+      given do
+        argv 'waz', '-h'
       end
 
       it "2.4.A) operation help screen starts with usage" do
@@ -61,15 +74,17 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    it "+1  1.4.B) has description in first help screen" do
-      _top_help_screen.should match %r(^ +fantazzle-dazzle +'yay'$)
+    context "+1  1.4.B) has description in first help screen", wip: true do
+
+      it "x." do
+        _top_help_screen.should match %r(^ +fantazzle-dazzle +'yay'$)
+      end
     end
 
-    context "+1  3.4)   request help on its action" do
+    context "+1  3.4)   request help on its action", wip: true do
 
-      shared_subject :root_ACS_state do
-        invoke 'fantaz', 'open', '-h'
-        flush_invocation_to_help_screen_oriented_state
+      given do
+        argv 'fantaz', 'open', '-h'
       end
 
       it "succeeds" do
@@ -101,17 +116,29 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    it "3.3)   money" do
+    ## == END
+    ## == FROM HERE #waypoint-3
 
-      invoke 'fantaz', 'open', '-v', 'zang'
-      expect :e, '[:file, "zang", :V]'
-      expect_no_more_lines
-      @exitstatus.should eql :_neat_
+    context "3.3)   money", wip: true do
+
+      given do
+        argv  'fantaz', 'open', '-v', 'zang'
+      end
+
+      it "x." do
+        @exitstatus.should eql :_neat_
+      end
+
+      it "works" do
+        expect :e, '[:file, "zang", :V]'
+      end
     end
 
+    if false
     dangerous_memoize :_top_help_screen do
       invoke '-h'
       flush_to_unstyled_string_contiguous_lines_on_stream :e
+    end
     end
 
     def subject_root_ACS_class
@@ -119,3 +146,4 @@ module Skylab::Zerk::TestSupport
     end
   end
 end
+# #pending-rename: (..)

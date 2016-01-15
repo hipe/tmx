@@ -6,6 +6,10 @@
 in *one* test context that you use in *another*. it is VERY dangerous if
 you don't know what you're doing!
 
+(by "context" we mean the actual instance that the test unit library
+uses that it creates one-for-one for each `it` you have. it is the
+`self` in the tests you write.)
+
 the advantage is that you can use your same familar stack of API test
 setup methods here for this "shared state" that would for any other
 test. you can then run many small tests against the produced structure

@@ -81,7 +81,15 @@ module Skylab::Zerk::TestSupport
     Here_ = self
   end
 
-  # -- exp
+  # -- support for fixtures
+
+  Primitivesque_model_for_trueish_value_ = -> arg_st do
+    x = arg_st.gets_one
+    x or self._SANITY
+    Callback_::Known_Known[ x ]
+  end
+
+  # -- test lib nodes
 
   Expect_Event = -> tcc do
     Callback_.test_support::Expect_Event[ tcc ]
@@ -135,6 +143,8 @@ module Skylab::Zerk::TestSupport
   Memoizer_Methods = -> tcc do
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
+
+  # --
 
   Autoloader__[ self, ::File.dirname( __FILE__ ) ]
 

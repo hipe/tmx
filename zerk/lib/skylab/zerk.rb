@@ -33,6 +33,10 @@ module Skylab::Zerk  # intro in [#001] README
     end
   end
 
+  Begin_fuzzy_retrieve_ = -> & any_oes_p do
+    Home_.lib_.brazen::Collection::Common_fuzzy_retrieve.new( & any_oes_p )
+  end
+
   Callback_ = ::Skylab::Callback
 
   Is_listy_ = -> sym do  # assume Fields_
@@ -70,6 +74,11 @@ module Skylab::Zerk  # intro in [#001] README
     Human = sidesys[ :Human ]
     Open_3 = stdlib[ :Open3 ]
 
+    Stdlib_option_parser = Lazy_.call do
+      require 'optparse'
+      ::OptionParser
+    end
+
     String_scanner = Lazy_.call do
       require 'strscan'
       ::StringScanner
@@ -93,6 +102,7 @@ module Skylab::Zerk  # intro in [#001] README
   FINISHED_ = nil
   GENERIC_ERROR_EXITSTATUS = 5
   Home_ = self
+  IDENTITY_ = -> x { x }
   KEEP_PARSING_ = true
   MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
   NEWLINE_ = "\n"

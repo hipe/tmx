@@ -5,25 +5,29 @@ module Skylab::Zerk::TestSupport
     class Class_11_Minimal_Postfix
 
       class << self
+        alias_method :new_cold_root_ACS_for_niCLI_test, :new
         alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
         private :new
       end  # >>
 
       def __left_number__component_association
+
         Here_::Class_71_Number
       end
 
       def __right_number__component_association
+
         Here_::Class_71_Number
       end
 
       def __add__component_operation
 
+        # yield :requires, :left_number, :right_number
+
         -> do
 
-          # NOTE there is no validatino of the numbers' existence..
-          _x = @left_number + @right_number
-          Callback_::Known_Known[ _x ]
+          # NOTE there is no validation of the numbers' existence..
+          @left_number + @right_number
         end
       end
 

@@ -1,8 +1,8 @@
-module Skylab::Autonomous_Component_System
+module Skylab::Zerk
 
   module TestSupport_Visual
 
-    class Autonomous_Component_System::Modalities::Reactive_Tree < Client_
+    class Zerk::Modalities::Reactive_Tree < Client_
 
       def when_no_args
         self

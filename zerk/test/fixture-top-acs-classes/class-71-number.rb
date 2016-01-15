@@ -24,7 +24,7 @@ module Skylab::Zerk::TestSupport
         Callback_::Known_Known[ x ]
       else
         pp[ nil ].call :error, :expression, :invalid_number do |y|
-          y << "nope: #{ ick x }"
+          y << "didn't look like a simple number (had: #{ ick x })"
         end
         false
       end

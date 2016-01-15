@@ -1,40 +1,11 @@
-self._HUH?  # #open [#013] unused fixture (as-yet)
-
 module Skylab::Zerk::TestSupport
 
-  module Modalities::Reactive_Tree::CLI_Integration
+  class Fixture_Top_ACS_Classes::Class_41_File_Writer
 
     class << self
-
-      def [] tcc
-        Home_.lib_.brazen.test_support.lib( :CLI_support_expectations )[ tcc ]
-        tcc.include self ; nil
-      end
-
-      def kernel_
-        @___kernel ||= Load_kernel___[]
-      end
+      alias_method :new_cold_root_ACS_for_niCLI_test, :new
+      private :new
     end  # >>
-
-    Load_kernel___ = -> do
-
-      ds = Local_subject__[]::Dynamic_Source_for_Unbounds.new
-
-      ds.add :Appie, Appie.new
-
-      Home_.lib_.brazen::Kernel.new Here_ do | ke |
-        ke.reactive_tree_seed = ds
-      end
-    end
-
-    class Appie
-
-      def build_unordered_index_stream & cli_oes_p
-
-        @_oes_p = cli_oes_p
-
-        Local_subject__[]::Children_as_unbound_stream[ self, & cli_oes_p ]
-      end
 
       def __wazoozie_foozie__component_operation
 
@@ -68,15 +39,13 @@ module Skylab::Zerk::TestSupport
         Faz_Daz
       end
 
-      def receive_component_event asc, i_a, & ev_p
-
-        @_oes_p.call( * i_a, & ev_p )
-      end
-    end
-
     class Faz_Daz
 
-      Um_ACS_TS::Be_component[ self ]
+      class << self
+        def interpret_compound_component _asc, _ACS, & pp
+          self._K
+        end
+      end  # >>
 
       def describe_into_under y, expag
         expag.calculate do
@@ -112,28 +81,5 @@ module Skylab::Zerk::TestSupport
         end
       end
     end
-
-    # ~ as module
-
-      def subject_CLI
-        Home_.lib_.brazen::CLI
-      end
-
-      def get_invocation_strings_for_expect_stdout_stderr
-        [ 'fam' ]
-      end
-
-      def CLI_options_for_expect_stdout_stderr
-
-        [ :back_kernel, Here_.kernel_ ]
-      end
-
-    # ~
-
-    Local_subject__ = -> do
-      Home_::Modalities::Reactive_Tree
-    end
-
-    Here_ = self
   end
 end

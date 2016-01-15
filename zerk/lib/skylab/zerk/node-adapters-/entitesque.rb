@@ -150,7 +150,5 @@ module Skylab::Zerk
     def shape_symbol
       :entitesque
     end
-
-    UNDERSCORE_ = '_'
   end
 end

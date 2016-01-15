@@ -94,7 +94,7 @@ changing during runtime).
 
 (we do *not*, however, cache the formal structures that are produced by
 these methods -- to do so would be in direct conflict with one of the
-primary design objectives of the [ac], near [#002]#dt3 dynamicism.)
+primary design objectives of the [ac], near [#002]#DT3 dynamicism.)
 
 
 
@@ -168,9 +168,9 @@ that was somewhat "atomic."
 
 while that "felt good" in theory, in implementation it was seen to be built
 on false premises that stem from a violation of what we now call our
-"design tenets", specifically #dt2 and #dt3:
+"design tenets", specifically #DT2 and #DT3:
 
-  • per #dt2 we must use the same underlying logic assets for unserialization
+  • per #DT2 we must use the same underlying logic assets for unserialization
     that we use for normalization (thru API/UI interface). in implementation
     of this principle, for all non-primitive components we use the component
     model's "construction method" (near #Tenet6) and we use the same construction
@@ -181,7 +181,7 @@ on false premises that stem from a violation of what we now call our
     method and are resulted from it. (otherwise the construction method
     can result in false-ish.))
 
-  • per #dt3, components express their associations thru reflection on the
+  • per #DT3, components express their associations thru reflection on the
     *component*, not the component model (for orthogonal & dynamic models).
     we cannot use the model to reflect on the component, we can only use
     the component itself.

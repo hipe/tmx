@@ -1,0 +1,116 @@
+digraph g {
+
+label="
+figure 1. schematic (possibly not exactly literal) flowchart
+for how non-internactive CLI argument streams are parsed.
+handling of requests for help is not shown.
+handling unavailability is not accounted for (yet)."
+
+/* states */
+
+state_start [shape=rectangle label="start: you have an
+argument stream and
+the empty stack     "]
+
+state_no_args [shape=rectangle label="no arguments in straight
+niCLI is syntax error (express
+what is expected). in in hybrid
+niCLI/iCLI then drop in.."]
+
+state_early_opt [shape=rectangle label="when zero leading non-dash-
+leading tokens, in straight niCLI
+is syntax error (express what is
+expected.) in hybrid then drop.."]
+
+state_parse_one [shape=rectangle label="with this non-dash-
+leading token, try to
+resolve (POSSIBLY
+FUZZILY) it into a
+node from the
+current frame."]
+
+state_levenschtein [shape=rectangle label="(do levenschtein
+for next box..)"]
+
+state_push [shape=rectangle label="accept this token and
+push a new frame on
+the stack"]
+
+state_op [shape=rectangle label="we attempt to build an
+option parser by whatever is the
+current way [#015] and parse the
+full remainder of the argument
+stream against it."]
+
+state_never_reached_operation [shape=rectangle label="the problem here
+is that we never reached an
+operation name. maybe express
+the available nodes from here
+(compound or operation)"]
+
+state_please_no_more_args [shape=rectangle label="no matter what they are;
+(and they must be non-dash-
+leading, right?) after all we
+have done, if there are any
+remaining args, at this point
+it's unrecognizeable."]
+
+state_failed [shape=rectangle label="invocation failed.
+possibly express an invite.
+result in a nonzero exitstatus." ]
+
+state_normalize [shape=rectangle label="somehow we've got to
+to sanitize on behalf of the
+operation that no required
+args are missing"]
+
+state_succeeded [shape=rectangle label="now you have
+a bound call
+which is great"]
+
+/* questions & transitions */
+
+state_start -> q1
+q1 [shape=diamond label="more\nargs? (a)"]
+q1->state_no_args [label="no (t1)"]
+state_no_args->state_failed
+q1->q2 [label="yes"]
+q2 [shape=diamond label="dash?"]
+q2->state_early_opt [label="yes (t2)"]
+state_early_opt->state_failed
+q2->state_parse_one [label="no"]
+state_parse_one->q3
+q3 [shape=diamond label="found?"]
+q3->state_levenschtein [label="no (t3)"]
+state_levenschtein -> state_never_reached_operation
+q3->q4 [label="yes"]
+q4 [shape=diamond label="compound?"]
+q4->state_push [label="yes"]
+q4->q7 [label="no"]
+state_push -> q5
+q5 [shape=diamond label="more\nargs? (b)"]
+q5->state_never_reached_operation [label="no (t6)"]
+state_never_reached_operation -> state_failed
+q5->q6 [label="yes"]
+q6 [shape=diamond label="dash?"]
+q6->state_never_reached_operation [label="yes (t7)"]
+q6->state_parse_one [label="no (t5)"]
+q7 [shape=diamond label="operation?"]
+q7->q8 [label="yes"]
+q7->state_levenschtein [label="no (t4)"]
+q8 [shape=diamond label="more\nargs? (c)"]
+q8->state_op [label="yes"]
+q8->state_normalize [label="no"]
+state_op->q9
+q9 [shape=diamond label="parsed\nok?"]
+q9->state_failed [label="no (t8)"]
+q9->q10 [label="yes"]
+q10 [shape=diamond label="more\nargs? (d)"]
+q10->state_please_no_more_args [label="yes (t9)"]
+state_please_no_more_args->state_failed
+q10->state_normalize [label="no"]
+state_normalize->q11
+q11 [shape=diamond label="OK?"]
+q11->state_failed [label="no (t10)"]
+q11->state_succeeded [label="yes (t11)"]
+}

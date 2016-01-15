@@ -1,6 +1,6 @@
 # model support notes :[#008]
 
-## :note-A
+## :Scope-stack-trick
 
 at writing there is a module called `Model_`. the purpose of this node
 is to provide opt-in support for nodes in our reactive tree. this

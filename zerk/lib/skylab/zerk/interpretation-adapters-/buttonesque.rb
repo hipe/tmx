@@ -4,7 +4,7 @@ module Skylab::Zerk
 
     oes_p = ada.UI_event_handler
 
-    o = Home_.lib_.brazen::Collection::Common_fuzzy_retrieve.new
+    o = Begin_fuzzy_retrieve_[]
 
     # -- setup
 

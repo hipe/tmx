@@ -131,10 +131,7 @@ module Skylab::Brazen
             p = -> tuple_ do
 
               if @_pluralize
-                s = Home_.lib_.human::NLP::EN::POS.plural_noun @_header_s
-                if s
-                  @_header_s = s
-                end
+                _change_header_to_plural
               end
 
               _express_lone_header_line
@@ -162,7 +159,7 @@ module Skylab::Brazen
         elsif cached_tuple
 
           if @_singularize
-            self._YAY_SINGULARIZE
+            _change_header_to_singular
           end
 
           _express_lone_header_line
@@ -179,14 +176,15 @@ module Skylab::Brazen
         # (that is, we don't needelssly cache all lines before outputting)
 
         had_none = true
-        only_one_x = nil
+        plain_one = nil
+        tight_one = nil
 
         p = -> line do
           had_none = false
           if @_tight_IFF_one_line
-            only_one_x = Callback_::Known_Known[ line ]
+            tight_one = Callback_::Known_Known[ line ]
             p = -> line_ do
-              only_one_x = nil
+              tight_one = nil
               _express_lone_header_line
               p = -> line__ do
                 @_line_yielder << line__
@@ -201,10 +199,18 @@ module Skylab::Brazen
               @_line_yielder << "#{ margin }#{ line_ }"
             end
           else
-            _express_lone_header_line
-            @_line_yielder << line
+            plain_one = line
             p = -> line_ do
-              @_line_yielder << line_
+              p = -> line__ do
+                @_line_yielder << line__
+              end
+              if @_pluralize
+                self._YAY_plain_pluralize
+              end
+              _express_lone_header_line
+              p[ plain_one ]
+              plain_one = nil
+              p[ line_ ]
             end
           end
         end
@@ -217,11 +223,33 @@ module Skylab::Brazen
 
         if had_none
           self._DECIDE_ME
-        elsif only_one_x
-          _express_tight_first_line only_one_x.value_x
+        elsif tight_one
+          _express_tight_first_line tight_one.value_x
           ACHIEVED_
+        elsif plain_one
+          if @_singularize
+            _change_header_to_singular
+          end
+          _express_lone_header_line
+          @_line_yielder << plain_one
         else
           ACHIEVED_
+        end
+      end
+
+      def _change_header_to_singular
+
+        s = Home_.lib_.human::NLP::EN::POS.singular_noun @_header_s
+        if s
+          @_header_s = s ; nil
+        end
+      end
+
+      def _change_header_to_plural
+
+        s = Home_.lib_.human::NLP::EN::POS.plural_noun @_header_s
+        if s
+          @_header_s = s ; nil
         end
       end
 

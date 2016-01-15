@@ -206,7 +206,5 @@ module Skylab::Zerk
       @_running = false
       NIL_
     end
-
-    IDENTITY_ = -> x { x }
   end
 end

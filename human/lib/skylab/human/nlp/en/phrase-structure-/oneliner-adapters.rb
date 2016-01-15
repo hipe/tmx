@@ -30,6 +30,13 @@ module Skylab::Human
           end
         end
 
+        Noun::Singular = -> plural_s do
+
+          # a placeholder for something smarter
+
+          plural_s.sub %r( [sS]\z )x, EMPTY_S_
+        end
+
         module Verb
 
           class << self

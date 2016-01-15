@@ -59,7 +59,7 @@ module Skylab::Zerk::TestSupport
 
       it "emits" do
         only_emission.should( be_emission_ending_with( :invalid_number ) do |y|
-          y.should eql [ "nope: '--10'" ]
+          y.first.should match %r(\Adidn't .+\(had: '--10'\))
         end )
       end
 
@@ -84,7 +84,7 @@ module Skylab::Zerk::TestSupport
 
       it "emits error" do
         last_emission.should( be_emission_ending_with( :invalid_number ) do |y|
-          y.should eql [ "nope: '--11'" ]
+          y.first.should match %r(\Adidn't .+\(had: '--11'\))
         end )
       end
 
@@ -121,9 +121,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "result" do
-        kn = root_ACS_result
-        kn.is_known_known or fail
-        kn.value_x.should eql 3
+        root_ACS_result.should eql 3
       end
     end
 

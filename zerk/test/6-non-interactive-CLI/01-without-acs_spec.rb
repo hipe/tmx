@@ -25,23 +25,20 @@ module Skylab::Zerk::TestSupport
           argv
         end
 
+        it "exitstatus" do
+          fails
+        end
+
         it "expecting" do
-          _ = expectation :styled, :e, 'expecting <action>'
-          first_line.should match_ _
+          first_line.should be_expecting_line_unadorned__
         end
 
         it "usage" do
-          _ = expectation :styled, :e, "usage: 'xyzi <action> [..]'"
-          second_line.should match_ _
+          second_line.should be_stack_sensitive_usage_line
         end
 
         it "invite" do
-          _ = expectation :styled, :e, "use 'xyzi -h' to see available arguments"
-          third_and_final_line.should match_ _
-        end
-
-        it "exitstatus" do
-          expect_result_for_failure
+          last_line.should be_invite_with_argument_focus
         end
       end
     end

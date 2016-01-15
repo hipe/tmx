@@ -39,14 +39,15 @@ module Skylab::TestSupport
 
         remove_instance_variable :@invocation
 
-        _gr = remove_instance_variable :@IO_spy_group_for_expect_stdout_stderr
-
-        _lines = _gr.release_lines
-
         Frozen_State___.new(
           remove_instance_variable( :@exitstatus ),
-          _lines.freeze,
+          release_lines_for_expect_stdout_stderr,
         ).freeze
+      end
+
+      def release_lines_for_expect_stdout_stderr
+        _gr = remove_instance_variable :@IO_spy_group_for_expect_stdout_stderr
+        _gr.release_lines
       end
 
       def flush_baked_emission_array  # :+#hook-near #universal
@@ -168,6 +169,11 @@ module Skylab::TestSupport
       end
 
       # -- the newschool way (experimental)
+
+      def be_line * x_a, & x_p
+
+        match_ Expectation.via_args( x_a, & x_p )
+      end
 
       def match_ expectation  # (we don't love the name)
 

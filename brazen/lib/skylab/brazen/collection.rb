@@ -288,6 +288,8 @@ module Skylab::Brazen
             & @name_map
           )
         end
+
+        UNABLE_
       end
 
       def __not_found
@@ -320,6 +322,8 @@ module Skylab::Brazen
             did_you_mean_s_a,
             kn.name.as_human )
         end
+
+        UNABLE_
       end
     end
   end

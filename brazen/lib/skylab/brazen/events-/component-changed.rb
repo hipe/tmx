@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  module Event_Support_  # :+"that trick"
+  module Event_Support_  # [#cm-008]#Scope-stack-trick
 
     expression = nil
 

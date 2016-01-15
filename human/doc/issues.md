@@ -1,3 +1,6 @@
+[#048]       API point - assumes that the root frame might have a name
+             ( in opposition to [#ac-031] which says it never does )
+
 [#047]       [ evented stream thing (first and subsequent) ]
 [#046]       phrase assembler
 [#045] #open (in [sa] reverse-lookup for pluralized words..)

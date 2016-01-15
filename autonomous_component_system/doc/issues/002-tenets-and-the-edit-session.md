@@ -17,15 +17,21 @@ violoation of which should occur only with good reason.
     without depending on any client (i.e would be "parent") component
     to the furthest extent possible.
 
-• :dt2: DRY-ness/intent-agnosticism: the structure, constituency and
+    ([#ze-027] "formal parameter sharing" explores the converse of this.)
+
+• :DT2: DRY-ness/intent-agnosticism: the structure, constituency and
     any behavior written into a component at this level must be done so
     in a way that is not particular to any one [#019] "intent". so the (for
     example) expression or interpretation logic should be represented in
     a way that can apply to as many different intents as is reasonable.
 
-• :dt3: dynamicism: the constituent list of a compound node's components
-    (in both actual *and* formal sense) must never be assumed to be
-    static. likewise meta-components of component associations.
+    the gravity towards DRY-ness also manifests prominently in the
+    implicit facility of "model sharing", something the [ac] encourages
+    without really even being aware of it.
+
+• :DT3: dynamicism: the constituent list of a compound node's
+    components (in both actual *and* formal sense) must never be assumed to
+    be static. likewise meta-components of component associations.
 
 • :DT4: conservatism: it is better to determine earlier that you won't
     need a structure, rather than to build it and not use it.

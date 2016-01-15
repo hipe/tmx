@@ -175,7 +175,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       # assume that the ACS assumes that these structures are produced
       # lazily, on-the-fly, and are not memoized to be used beyond the
-      # "moment": they are #dt3 dynamic and should not be #DT4 cached.
+      # "moment": they are #DT3 dynamic and should not be #DT4 cached.
 
       class << self
 

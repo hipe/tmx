@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  module Event_Support_  # :+"that trick"
+  module Event_Support_  # [#cm-008]#Scope-stack-trick
 
     Events_::Component_Not_Found = Callback_::Event.prototype_with(
 

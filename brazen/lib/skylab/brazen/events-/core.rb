@@ -5,7 +5,7 @@ module Skylab::Brazen
   #   1) to define the eponymous module (because it must)
   #
   #   2) to define a support module that many client event modules
-  #      will pull in using 'the trick'
+  #      will pull in using the [#cm-008]#Scope-stack-trick
   #
   # (but while we are at it we stowaway "small" event prototypes here too)
 

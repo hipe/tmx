@@ -1,5 +1,10 @@
-[#024] #open redundancy in 2 contextualizers
-[#023]     #after #milestone-9 this is conceptually redundant with many #[#hu-043]
+[#027]       formal parameter sharing ..
+[#026]       API-choice for niCLI - emitting one or more `error` during
+             during operation means your result will be disreagarded.
+
+[#025]       the result shape of operations ..
+[#024]       stack frame..  (mostly lengthy code notes)
+[#023] #open de-generalize the invites
 [#022] #open availability is not implemented (under niCLI)
 [#021]     #track what to do about entitesque ..
 [#020]     #track argument monikers
@@ -9,7 +14,7 @@
 [#016]     #track operation-specific parameters (as they pertain to niCLI)
 [#015]       option parsing..
 [#014]       [ flowcharts for CLI syntax ]
-[#013] #during #milestone-7 unused fixture
+[#013] #hole
 [#012]       [ flowcharts for API syntax ]
 [#011]     #track whether/how to share across 3 CLI client classes
 [#010]       custom view controllers

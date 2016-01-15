@@ -26,6 +26,10 @@ module Skylab::Human
           _lib::Verb::Progressive[ lemma_s ]
         end
 
+        def singular_noun plural_s  # hacked for now..
+          _lib::Noun::Singular[ plural_s ]
+        end
+
         def third_person lemma_s
           _lib::Verb::Third[ lemma_s ]
         end

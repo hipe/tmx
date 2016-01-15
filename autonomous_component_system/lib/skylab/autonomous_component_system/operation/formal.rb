@@ -7,7 +7,7 @@ module Skylab::Autonomous_Component_System
       # the "formal" part of the operation is that which is defined by the
       # association-like DSL expression. this data is wrapped by this node
       # only in the interest of compartmentalization - it (as associations)
-      # is [#002]:dt3 ephemeral. more in [#009].
+      # is [#002]:DT3 ephemeral. more in [#009].
 
       class << self
 
@@ -27,6 +27,13 @@ module Skylab::Autonomous_Component_System
             if acs.respond_to? m
 
               -> ss do
+
+                if ! ss.last  # kind of nasty [#030]: it is convenient for
+                  # fuzzy lookup to be told what the actual name (symbol)
+                  # is that was resolved, otherwise `sym` is inaccessible.
+                  ss[ -1 ] = Callback_::Name.via_variegated_symbol sym
+                end
+
                 _fo = new.___init_via m, ss
                 _fo.execute
               end

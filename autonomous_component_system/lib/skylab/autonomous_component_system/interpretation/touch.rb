@@ -34,6 +34,13 @@ module Skylab::Autonomous_Component_System
         :reader_writer,
       )
 
+      def self.[] asc, rw
+        o = new
+        o.component_association = asc
+        o.reader_writer = rw
+        o.execute
+      end
+
       def [] asc, rw
         o = dup
         o.component_association = asc
