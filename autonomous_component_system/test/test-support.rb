@@ -45,15 +45,8 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       dangerous_memoize :state_ do
         instance_exec( & p )
-        _a = remove_instance_variable( :@event_log ).flush_to_array
-        _root = remove_instance_variable :@__root
-        State___.new(
-          remove_instance_variable( :@__result ),
-          _a,
-          _root,
-        )
+        __flush_to_state
       end
-      NIL_
     end
   end
 
@@ -79,7 +72,7 @@ module Skylab::Autonomous_Component_System::TestSupport
         self._WRITE_ME
       end
 
-      root = my_model_.new
+      root = my_model_.new_
 
       oes_p = event_log.handle_event_selectively
 
@@ -87,10 +80,18 @@ module Skylab::Autonomous_Component_System::TestSupport
         oes_p
       end
 
-      @__result = Home_.edit x_a, root, & _oes_p_p
-      @__root = root
+      @result_ = Home_.edit x_a, root, & _oes_p_p
+      @root_ = root
 
       NIL_
+    end
+
+    def __flush_to_state
+
+      _result = remove_instance_variable :@result_
+      _a = remove_instance_variable( :@event_log ).flush_to_array
+      _root = remove_instance_variable :@root_
+      State___[ _result, _a, _root ]
     end
 
     def result_
@@ -99,6 +100,10 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     def be_result_for_failure_
       eql false
+    end
+
+    def root_ACS_
+      state_.root
     end
   end
 

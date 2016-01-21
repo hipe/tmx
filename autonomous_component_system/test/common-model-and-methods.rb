@@ -14,29 +14,19 @@ module Skylab::Autonomous_Component_System::TestSupport
       ACS__[]
     end
 
-    Common_child_methods = -> cls do
-
-      Common_child_class_methods[ cls ]
-
-      cls.send :define_method, :initialize do | & x_p |
-        @oes_p_ = x_p
+    Be_compound = -> cls do
+      cls.class_exec do
+        def self.interpret_compound_component p
+          p[ new ]
+        end
       end
-      NIL_
     end
 
-    Common_child_class_methods = -> cls do
-      class << cls
-        define_method :interpret_component, INTERPRET_COMPONENT
-        private :new
-      end
-      NIL_
-    end
-
-    INTERPRET_COMPONENT = -> st, & x_p do
-      if st.unparsed_exists
-        self._SANITY
-      else
-        new( & x_p )
+    Be_component = -> cls do
+      cls.class_exec do
+        def self.interpret_component st, & pp
+          new st, & pp
+        end
       end
     end
 
@@ -44,7 +34,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       class << self
 
-        def interpret_compound_component p, & _  # experimental for [#003]:#interp-D
+        def interpret_compound_component p, & _  # #experimental [#003]#compounds
           if p
             _me = new
             p[ _me ]

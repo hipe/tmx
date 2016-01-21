@@ -185,16 +185,12 @@ module Skylab::Autonomous_Component_System
 
         def ___go_deep_on qkn
 
-          wv = ___resolve_branch_component_recursively qkn
-          if wv
-
-            _qkn_ = qkn.new_with_value wv.value_x
-
-            @_accept_qkn[ _qkn_ ]
-
+          qk = ___resolve_branch_component_recursively qkn
+          if qk
+            @_accept_qkn[ qk ]
             ACHIEVED_
           else
-            wv
+            qk
           end
         end
 
@@ -291,21 +287,13 @@ module Skylab::Autonomous_Component_System
 
           _pp = _crazytimes asc
 
-          wv = ACS_::Interpretation_::Build_value[ _arg_st, asc, @ACS, & _pp ]
+          qk = ACS_::Interpretation_::Build_value[ _arg_st, asc, @ACS, & _pp ]
 
-          if wv
-
-            # the name value pair that used to hold e.g "color":"red"..
-
-            _qkn_ = qkn.new_with_value( wv.value_x )
-
-            # .. now has for its value a Color object (for example)
-
-            @_accept_qkn[ _qkn_ ]
-
+          if qk
+            @_accept_qkn[ qk ]
             ACHIEVED_
           else
-            wv
+            qk
           end
         end
 

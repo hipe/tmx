@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::MyTerm::TestSupport
 
-  describe "[my] models - font - set" do
+  describe "[my] models - font - set", wip: true do
 
     extend TS_
     use :sandboxed_kernels

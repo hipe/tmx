@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Autonomous_Component_System::TestSupport
 
-  describe "[ac] ACS tenet 3 - edit existing" do
+  describe "[ac] tenets - 3 - edit existing" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -68,7 +68,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     shared_subject :_subject_class do
 
-      class ACS_3_Bicycle
+      class ACS_28_6_6_Bicycle
 
         def initialize make, year=nil
           @make = make
@@ -121,7 +121,7 @@ module Skylab::Autonomous_Component_System::TestSupport
           end
         end
 
-        def __set__component x, ca, & oes_p
+        def __set__component x, ca, & _x_p
           instance_variable_set ca.name.as_ivar, x
           true
         end

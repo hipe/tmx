@@ -26,7 +26,7 @@ module Skylab::Basic
           State_
         end
 
-        def __add__component x, _ca, & _
+        def __add__component x, _ca, & _x_p
           if x
             @_bx.add x.name_symbol, x
             x

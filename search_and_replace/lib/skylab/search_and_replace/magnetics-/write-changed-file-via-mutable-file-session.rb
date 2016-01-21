@@ -136,4 +136,4 @@ module Skylab::SearchAndReplace
     end
   # -
 end
-# #pending-rename
+# #when [#ta-005] #then-do-pending-rename: to somthing like "[..] via arguments" - this takes primitive args not a mutable session

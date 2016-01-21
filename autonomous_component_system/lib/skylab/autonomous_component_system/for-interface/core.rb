@@ -4,94 +4,6 @@ module Skylab::Autonomous_Component_System
 
     module For_Interface  # notes in [#003]
 
-      class Read_or_write < Callback_::Actor::Dyadic
-
-        # #open :[#003]:issue-1: this effects a "crude autovivification" -
-        # it builds a component for a missing member and stores it whether
-        # or not it is ultimately necessary. we would like for it to work
-        # like it does thru signals where it only sets the member when it
-        # changes (etc), but this will be tricky; and we don't need it yet
-        # in the "real world" anyway
-
-        def initialize asc, acs
-          @ACS = acs
-          @asc_ = asc
-        end
-
-        def execute
-
-          if @asc_.model_classifications.looks_primitivesque
-            self.__WRITE_ME_cover_me_via_primitive
-          else
-            ___when_entitesque
-          end
-        end
-
-        def ___when_entitesque
-
-          qkn = ACS_::Reflection_::Read[ @asc_, @ACS ]
-
-          if qkn.is_effectively_known
-
-            self._REVIEW_one
-            qkn.value_x
-          else
-            Build_and_attach[ @asc_, @ACS ]
-          end
-        end
-      end
-
-      class Touch < Callback_::Actor::Dyadic
-
-        def initialize qkn, acs
-          @ACS = acs
-          @qkn = qkn
-        end
-
-        def execute
-
-          @_asc = @qkn.association
-
-          if @_asc.model_classifications.looks_primitivesque
-            __when_primitivesque
-          else
-            __when_entitesque
-          end
-        end
-
-        def __when_primitivesque
-
-          if @_asc.has_operations  # contrast with #here ..
-            ___when_primitivesque_with_operations
-          else
-            NIL_  # as covered
-          end
-        end
-
-        def ___when_primitivesque_with_operations
-
-          ACS_::For_Interface::Primitivesque.new @qkn, @ACS
-        end
-
-        def __when_entitesque
-
-          if @qkn.is_effectively_known
-
-            self._REVIEW_two
-            @qkn.value_x
-
-          else
-            ACS_::Interpretation::Build_empty_hot[ @_asc, @ACS ]
-          end
-        end
-      end
-
-      Build_and_attach = -> asc, acs do
-        cmp = ACS_::Interpretation::Build_empty_hot[ asc, acs ]
-        ACS_::Interpretation_::Write_value[ cmp, asc, acs ]
-        cmp
-      end
-
       To_stream = -> acs do
 
         if acs.respond_to? :to_stream_for_component_interface
@@ -122,7 +34,7 @@ module Skylab::Autonomous_Component_System
 
         def execute
 
-          st = ACS_::Reflection_::To_entry_stream[ @ACS ]
+          st = Home_::Reflection_::To_entry_stream[ @ACS ]
 
           Callback_.stream do  # (hand-written map-reduce for clarity)
             begin
@@ -143,7 +55,7 @@ module Skylab::Autonomous_Component_System
         def __qkn_for_first_association first_entry
 
           asc_for = Component_Association.reader_for @ACS
-          @_qkn_for = ACS_::Reflection_::Reader[ @ACS ]
+          @_qkn_for = Home_::Reflection_::Reader[ @ACS ]
 
           p = -> entry do
 
@@ -163,32 +75,24 @@ module Skylab::Autonomous_Component_System
           p[ first_entry ]
         end
 
-        def ___via_interface_association asc
+        def ___via_interface_association asc  # compare to here-A
 
-          qkn = @_qkn_for[ asc ]
-          if qkn.is_effectively_known
+          qk = @_qkn_for[ asc ]
+          if qk.is_effectively_known
             if asc.model_classifications.looks_primitivesque
-
-              # in contrast with :#here, we are not placing importance on
-              # whether the thing has operations. why this is is not clear
-              # .. TODO - try to take it off off the other one
-
-              # WAS: if asc.has_operations. now covered not to by [ze]
-
-              _ = ACS_::For_Interface::Primitivesque.new qkn, @ACS
-
-              qkn.new_with_value _
+              self._NOT_UNTIL_during_milestone_2
+              Home_::For_Interface::Primitivesque.new qk, @ACS
             else
-              qkn
+              qk
             end
           else
-            qkn
+            qk
           end
         end
 
         def __qkn_for_first_operation first_entry
 
-          operation_for = ACS_::Operation.reader_for @ACS
+          operation_for = Home_::Operation.reader_for @ACS
 
           p = -> entry do
             operation_for[ entry.name_symbol ]
@@ -198,6 +102,96 @@ module Skylab::Autonomous_Component_System
 
           p[ first_entry ]
         end
+      end
+
+      class Touch < Callback_::Actor::Dyadic  # result is a qk-ish
+
+        # 1) by default when we create a new component value for these ones,
+        #    we "attach" that value to the ACS (for example, by writing to
+        #    the ivar) but this attaching can be disabled thru an option.
+        #    when this attaching of the new component is disabled, we refer
+        #    to the resulting component as "floating".
+        #
+        # 2) because this is "for interface", for primitives you
+        #    get a wrapper IFF [..]
+        #    NOTE that for now, we never "attach" a primitive (because
+        #    we never create one)
+        #
+        # (all knowns/unknowns are "effectively":)
+        #
+        # if known   comp then qk of existing comp
+        # if known   ent  then qk of existing ent
+        # if known   prim then (2)
+        # if unknown comp then qk of created comp (1)
+        # if unknown ent  then qk of created ent (1)
+        # if unknown prim then (2)
+
+        class << self
+          public :new
+        end  # >>
+
+        def initialize asc, acs
+          @do_attach = true
+          _init_via asc, acs
+        end
+
+        attr_writer(
+          :do_attach,
+        )
+
+        def [] asc, acs
+          dup._init_via( asc, acs ).execute
+        end
+
+        def _init_via asc, acs
+          @ACS = acs
+          @asc = asc
+          self
+        end
+
+        def execute  # compare to here-A
+
+          @_qk = Home_::Reflection_::Read[ @asc, @ACS ]
+          @_is_known = @_qk.is_effectively_known
+
+          if @asc.model_classifications.looks_primitivesque
+            __when_primitivesque
+          elsif @_is_known
+            self._COVER_ME_probably_fine
+            @_qk
+          else
+            ___when_unknown_nonprimitivesque
+          end
+        end
+
+        def ___when_unknown_nonprimitivesque
+
+          # (an only slightly modified version of `Build_and_attach` below.)
+
+          qk = Home_::Interpretation::Build_empty_hot[ @asc, @ACS ]
+          if @do_attach
+            Home_::Interpretation_::Write_value[ qk.value_x, @asc, @ACS ]
+          end
+          qk
+        end
+
+        def __when_primitivesque
+
+          bx = @asc.transitive_capabilities_box
+          _has_transitive_capabilities = bx && bx.length.nonzero?
+
+          if _has_transitive_capabilities
+            ACS_::For_Interface::Primitivesque.new @_qk, @ACS
+          else
+            NOTHING_  # as covered
+          end
+        end
+      end
+
+      Build_and_attach = -> asc, acs do  # result is qk
+        qk = Home_::Interpretation::Build_empty_hot[ asc, acs ]
+        Home_::Interpretation_::Write_value[ qk.value_x, asc, acs ]
+        qk
       end
 
       Is_interface_intent___ = {

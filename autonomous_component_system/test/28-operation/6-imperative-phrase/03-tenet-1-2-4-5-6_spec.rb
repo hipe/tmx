@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Autonomous_Component_System::TestSupport
 
-  describe "[ac] ACS tenets 1, 2, 4, 5 and 6" do
+  describe "[ac] tenets - 1, 2, 4, 5 and 6" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -62,7 +62,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     memoize :_subject_class do
 
-      class ACS_1_one
+      class ACS_28_6_3_One
 
         class << self
 
@@ -102,12 +102,12 @@ module Skylab::Autonomous_Component_System::TestSupport
 
           yield :can, :set
 
-          ACS_1_Age
+          ACS_28_6_3_Age
         end
 
         attr_reader :age, :mi_nombre
 
-        def __set__component x, ca, & oes_p
+        def __set__component x, ca, & _x_p
 
           instance_variable_set ca.name.as_ivar, x
           true
@@ -118,7 +118,7 @@ module Skylab::Autonomous_Component_System::TestSupport
         end
       end
 
-      class ACS_1_Age
+      class ACS_28_6_3_Age
 
         def self.interpret_component st, & oes_p
           d = st.gets_one
@@ -136,7 +136,7 @@ module Skylab::Autonomous_Component_System::TestSupport
         attr_reader :as_digit
       end
 
-      ACS_1_one
+      ACS_28_6_3_One
     end
   end
 end

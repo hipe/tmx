@@ -76,7 +76,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     class Faz_Daz
 
-      Local_Lib__::Common_child_methods[ self ]
+      Local_Lib__::Be_component[ self ]
 
       def describe_into_under y, expag
         expag.calculate do

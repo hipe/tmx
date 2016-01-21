@@ -84,7 +84,7 @@ module Skylab::Autonomous_Component_System
                 store[ x ] ; redo  # false is always stored as-is
               end
 
-              redo  # nil is never stored per #inout-A
+              redo  # nil is never stored per #nil-note
             end
 
             # if it's a true-ish compound component, always recurse

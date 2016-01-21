@@ -1,3 +1,5 @@
+[#019] #open the rewrite (has subscribers)
+
 [#018]    #usability-enhancement - location #before:[#017]
 
 [#017]    #usability-enhancement - line numbers #before:[#016]

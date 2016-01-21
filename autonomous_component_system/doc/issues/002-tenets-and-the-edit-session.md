@@ -68,10 +68,11 @@ violoation of which should occur only with good reason.
       deliver such a component to the subject component thru the
       execution of an "operation" during an edit session.
 
-    * for use in component associations you can create your own
-      set of meta-components that exists the existing set, by
-      subclassing the base component association class
-      (as demonstrated in [#003]#X1)
+    * for advanced usage, you can extend the DSL that can be used by
+      your component assocations: you can add to the set of supported
+      "meta-components" your own custom ("business-specific") ones
+      by subclassing the base component association class.
+      this advanced technique is demonstrated in [#003]#X1.
 
 
 
@@ -92,7 +93,7 @@ violoation of which should occur only with good reason.
     • `result_for_component_mutation_session_when_changed`
     • `result_for_component_mutation_session_when_no_change`
 
-  IFF you want edit sessions (and for now only!))
+  IFF you want edit sessions (and for now only! (#open [#013])))
 
 
 
@@ -121,9 +122,8 @@ violoation of which should occur only with good reason.
 
 
 
-• there is as yet no facility for what we used to call business-specific
-  meta-properties. we want this, and will provision for it when its
-  absence becomes at all painful. (again this is #[#008].)
+• there is as yet no facility for extending the [#008] hard-coded
+  modifiers described below.
 
 
 
@@ -137,6 +137,8 @@ in summary:
 • new components are constructed by sending `edit_entity` to the class :Tenet2
 
 • existing components are mutated by sending `edit_entity` to the component :Tenet3
+
+• component associations are defined through instance methods :Tenet4
 
 • for "inward" purposes, associations are defined thru *instance* methods :Tenet5
 
@@ -351,7 +353,7 @@ the ACS will use this means (instead of the means described above) to
 attempt to produce the component.
 
 (we are in the midst of developing an experimental new form for the
-above that is only for "compound models" tracked with [#003]:#interp-D)
+above that is only for "compound models" tracked with [#003]#compounds)
 
 we say "interpret" because this method is expected to interpret one
 or more tokens off the argument stream to turn it into a (trueish)
@@ -539,12 +541,12 @@ weird thing with interpolating the `not` because we typically want
 to emit different events based on whether the positive or negative
 case failed. ("assumptions" are introduced below.)
 
-there can only be one `if` expression per operation expression.
+there can only be one `if` expression per imperative phrase.
 this is a design choice, because it would be ambiguous what the
 boolean semantics are for multiple `if` statements (AND or OR?).
 
 however note that there *can* be multiple `if` expressions in an edit
-expression (max one per operation expression).
+expression (max one per imperative phrase).
 
 
 
@@ -572,59 +574,14 @@ although this is a *very* exploratory pair of features, here's a thing:
 
 ### 8) the operation verb
 
-currently there are two ways to define "operations" - one is in the
-component association and the other is by a model class. we cover the
-first way here.
-
-the ACS assigns no special meaning to the various one or more verbs to be
-supported in edit sessions.
-
-the set of supported verbs is determined entirely by the subject component
-within the component associations it defines. each verb to be supported by
-the subject component corresponds to one method that must be implemented by
-that subject component.
-
-note that with an edit session being defined as one or more operation
-expressions, and an operation expression containing exactly one verb,
-then for an ACS component model to be buildable or editable it must
-define at least one such verb (and implementation method).
-
-grammatically the only requirement by the ACS for these verbs is that:
-
-  A) the operation verb cannot be one of the modifiers
-     (keywords) described in tenet (7) (an ever expanding list..)
-
-  B) the operation verb must occupy exactly one token (not more) (but of
-     course you could use single underscores to model verbs of more than
-     one word)
-
-
-a verb `foo_bar` requires an implementation method of
-`__foo_bar__component( x, ca, & oes_p )` where `x` is the object
-component and `ca` is the component association structure. (the
-semantics of the double underscore convention are explained in (4)
-above.)
-
-the true-ish- or false-ish-ness of the result indicates to the ACS
-whether or not the "delivery" of the operation succeeded. an operation
-that fails delivery will lead to more or less immediate exit from the
-edit session, regardless of any remaining operations in the "queue" for
-that edit session.
-
-in cases of success, the implementor may chose to result in the same `x`
-(component) that was passed to it so that this component "bubbles out" and
-can be used as the final result of the edit session (which can be useful
-for edit sessions that build or remove items where the caller may want to
-do something with this item). but not this technique cannot be used for
-models where the component can be valid-ly false-ish. (rather, look into
-using the "value wrapper" if you really need to.)
+(this section has been moved to a dedicated document: [#009])
 
 
 
 
 # component association notes
 
-## :how-we-cache-component-associations
+## :how-we-cache-component-associations (when we cache them)
 
 • for every item that is ever requested we will only ever attempt to
   retrieve from the real source once, regardless of whether it

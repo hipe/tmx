@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] 3 - x spec" do
+  describe "[ze] 3 - x spec", wip: true do
 
     TS_[ self ]
     use :memoizer_methods

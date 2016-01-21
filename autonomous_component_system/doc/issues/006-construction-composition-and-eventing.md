@@ -168,16 +168,6 @@ component passing itself in as the only argument to that proc.
 
 
 
-#### :#note-1:
-
-handlers blah - we hare at the
-intersection between the "cold" and "hot" models. this whole
-"edit session" thing was developed before the "hot" model existed.
-the uptake is, we've got to have an interface for one model
-so we must chose hot because while it can act as a superset of
-cold, the reverse is not true.
-
-
 
 ### :choice
 

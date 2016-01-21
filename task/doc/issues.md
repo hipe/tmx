@@ -1,3 +1,4 @@
+[#005]       [magnetics viz]  (in branch at writing) (has subscribers)
 [#004]       [eventpoint]
 [#003]       [new task]
 [#002]       [legacy task]

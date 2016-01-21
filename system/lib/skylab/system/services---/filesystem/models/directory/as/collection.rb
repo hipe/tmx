@@ -62,11 +62,11 @@ module Skylab::System
 
     # ~~ create (by way of ACS)
 
-    def __add__component o, _ca, & x_p
+    def __add__component o, _ca, & pp
 
-      ok = __resolve_entry_name o, & x_p
-      ok &&= __resolve_destination_directory( & x_p )
-      ok && __finish_add( o, & x_p )
+      ok = __resolve_entry_name o, & pp
+      ok &&= __resolve_destination_directory( & pp )
+      ok && __finish_add( o, & pp )
     end
 
     def __resolve_entry_name o, & oes_p_p

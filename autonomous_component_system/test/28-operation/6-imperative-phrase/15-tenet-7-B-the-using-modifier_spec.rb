@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Autonomous_Component_System::TestSupport
 
-  describe "[ac] ACS tenet 7 B - the `using` modifer" do
+  describe "[ac] tenets - 7 B - the `using` modifer" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -27,7 +27,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     shared_subject :_subject_class do
 
-      class ACS_7B1
+      class ACS_28_6_15_One
 
         def edit_entity * x_a, & x_p
           ACS_[].edit x_a, self, & x_p
@@ -42,7 +42,7 @@ module Skylab::Autonomous_Component_System::TestSupport
           end
         end
 
-        def __effect__component * many, ca, & _
+        def __effect__component * many, ca, & _x_p
 
           instance_variable_set ca.name.as_ivar, many
           :yep

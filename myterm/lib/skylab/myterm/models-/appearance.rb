@@ -189,7 +189,7 @@ module Skylab::MyTerm
 
       h = {
         common: -> qkn do
-          ACS_[]::For_Interface::Touch[ qkn, self ]
+          ACS_[]::For_Interface::Touch[ qkn, self ].value_x
         end,
         visiting: -> qkn do
           qkn.association._real_ACS.read_for_interface__ qkn
@@ -398,7 +398,7 @@ module Skylab::MyTerm
       _new_component = x_p[]
 
       _ev_p = ACS_[]::Interpretation::Accept_component_change[
-        _new_component, qkn, self ]
+        _new_component, qkn.association, self ]
 
       o = Linked_list_[]
       _end = o[ nil, _ev_p ]
@@ -521,7 +521,7 @@ module Skylab::MyTerm
 
       _asc = component_association_reader[ :adapters ]
 
-      ACS_[]::Interpretation::Build_empty_hot.call _asc, self
+      ACS_[]::Interpretation::Build_empty_hot[ _asc, self ].value_x
 
     end
 

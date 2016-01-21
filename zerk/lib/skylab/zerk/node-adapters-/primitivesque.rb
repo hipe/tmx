@@ -34,19 +34,19 @@ module Skylab::Zerk
         @_UI_frame_nodes = nil
         NIL_
 
-      elsif @_qkn.association.has_operations
-
-        _bx = @_qkn.association.operations_box_read_only
-
-        @_UI_frame_nodes = _bx.a_.map do | sym |
-          Callback_::Name.via_variegated_symbol sym
-        end
-
-        Callback_::Stream.via_nonsparse_array @_UI_frame_nodes
       else
+        bx = @_qkn.transitive_capabilities_box
+        if bx
+          @_UI_frame_nodes = bx.a_.map do |sym|
+            Callback_::Name.via_variegated_symbol sym
+          end
 
-        @_UI_frame_nodes = nil
-        NIL_
+          Callback_::Stream.via_nonsparse_array @_UI_frame_nodes
+        else
+
+          @_UI_frame_nodes = nil
+          NIL_
+        end
       end
     end
 
@@ -154,7 +154,7 @@ module Skylab::Zerk
 
       p = ACS_::Interpretation::Accept_component_change[
         wv.value_x,
-        @_qkn,
+        @_qkn.association,
         _ACS,
       ]
 

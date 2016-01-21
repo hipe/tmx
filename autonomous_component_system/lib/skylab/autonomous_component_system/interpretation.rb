@@ -4,20 +4,16 @@ module Skylab::Autonomous_Component_System
 
     module Interpretation
 
-      Accept_component_change = -> new_x, floating_qkn, acs do  # [mt] ONLY
+      Accept_component_change = -> new_x, asc, acs, & _LL_p do
 
         # guarantee storage of new component. result in proc that produces
         # event describing the change.
-
-        asc = floating_qkn.association ; floating_qkn = nil
-
-        # (disregard any "floating" value. we need to know if it was *stored*.)
 
         # make a note of any exisiting value before we replace it
 
         orig_qkn = ACS_::Reflection_::Read[ asc, acs ]
 
-        # (we assume A) that we are [#003]:assumption-A not long-running, and that
+        # (we assume A) that we are [#003]:not-long-running, and that
         # B) in the typical request, at most one component will change (per
         # ACS, and in general). if one or more of A, B is not true, probably
         # the client should make some kind of component change writer..)
@@ -43,10 +39,14 @@ module Skylab::Autonomous_Component_System
         end
 
         build_linked_list_of_context = -> do
-          Home_.lib_.basic::List::Linked[ nil, asc.name ]
+          if _LL_p
+            _LL_p[]
+          else
+            Home_.lib_.basic::List::Linked[ nil, asc.name ]
+          end
         end
 
-        if orig_qkn.is_effectively_known  # #inout-A, [#]inout-B
+        if orig_qkn.is_effectively_known  # #nil-note, [#]false-note
 
           -> do
 
@@ -93,7 +93,7 @@ module Skylab::Autonomous_Component_System
         end
       end
 
-      Build_empty_hot = -> asc, acs do
+      Build_empty_hot = -> asc, acs do  # result is qk
 
         # assume model is "entitesque" (not primitive-esque).
         # create a new empty component that is bound to the ACS.
@@ -113,7 +113,7 @@ module Skylab::Autonomous_Component_System
           Callback_::Polymorphic_Stream.the_empty_polymorphic_stream
         end
 
-        o.execute.value_x  # ..
+        o.execute
       end
 
       find_handler_method = nil
@@ -196,7 +196,7 @@ module Skylab::Autonomous_Component_System
 
       Looks_primitive = -> x do  # `nil` is NOT primitive by this definition!
         case x
-        when ::TrueClass, ::Fixnum, ::Float, ::Symbol, ::String  # [#003]inout-C
+        when ::TrueClass, ::Fixnum, ::Float, ::Symbol, ::String  # [#003]#trueish-note
           true
         else
           false

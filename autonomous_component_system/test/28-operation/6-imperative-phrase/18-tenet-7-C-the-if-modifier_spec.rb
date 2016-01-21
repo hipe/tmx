@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Autonomous_Component_System::TestSupport
 
-  describe "[ac] ACS tenet 7 C - the `if` modifer" do
+  describe "[ac] tenets -  7 C - the `if` modifer" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -55,7 +55,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     shared_subject :__subject_class do
 
-      class ACS_7C
+      class ACS_28_6_18
 
         def initialize
           @_a = []
@@ -87,7 +87,7 @@ module Skylab::Autonomous_Component_System::TestSupport
           end
         end
 
-        def __add__component x, ca, & _
+        def __add__component x, ca, & _x_p
           @_a.push x
           x
         end

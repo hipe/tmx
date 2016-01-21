@@ -2,6 +2,8 @@ module Skylab::Autonomous_Component_System
   # ->
     module Modalities::Reactive_Tree  # notes in [#003]
 
+      self._REACITVE_TREE_IS_OFF_till_phase_1
+
       class Dynamic_Source_for_Unbounds  # [mt]
 
         def initialize
@@ -112,7 +114,7 @@ module Skylab::Autonomous_Component_System
               x = h.fetch( qkn.association.category ).call
               x and break
 
-              # - [#]inout-E: components here must be controller-like
+              # - #trueish-note: components here must be controller-like
               # so they must be true-ish so we *can* map-reduce here
               redo
             end while nil
@@ -156,9 +158,7 @@ module Skylab::Autonomous_Component_System
 
             -> qkn do
 
-              # :+#suspect - do we want touch or Read_or_write ?
-
-              ACS_::For_Interface::Touch[ qkn, @ACS ]
+              ACS_::For_Interface::Touch[ qkn, @ACS ].value_x
             end
           end
         end
@@ -171,7 +171,7 @@ module Skylab::Autonomous_Component_System
 
       READER_METHOD__ = :component_value_reader_for_reactive_tree
 
-      class Hybrid__  # see "what is a hybrid?" (#note-RT-A)
+      class Hybrid__  # see "what is a hybrid?" [#]hybrid
 
         def accept_parent_node _
 
@@ -282,7 +282,7 @@ module Skylab::Autonomous_Component_System
           o.arg_st = st
           o.operation = @_op
 
-          o.process_named_arguments or self._SANITY   # all errors must raise
+          o.process_named_arguments_ or self._SANITY   # all errors must raise
 
           Callback_::Bound_Call[
             o.args,

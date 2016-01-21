@@ -43,14 +43,14 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
           _st = Home_::Interpretation::Value_Popper[ x ]
 
-          wv = Home_::Interpretation_::Build_value.call(
+          qk = Home_::Interpretation_::Build_value.call(
             _st,
             @singular_comp_assoc,
             :_man_ray_,
             & x_p )
 
-          if wv
-            ok_value_a.push wv.value_x
+          if qk
+            ok_value_a.push qk.value_x
           else
             ok = false
             break

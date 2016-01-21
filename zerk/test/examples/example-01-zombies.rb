@@ -37,7 +37,7 @@ module Skylab::Zerk::TestSupport
       File_Name_Model_
     end
 
-    def __delete__component asc
+    def __delete__component asc, & _x_p
 
       # per #thread-one we are not passed an
       # emission handler proc as an argument for now.

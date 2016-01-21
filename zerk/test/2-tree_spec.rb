@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] 2 - tree spec" do
+  describe "[ze] 2 - tree spec", wip: true do
 
     TS_[ self ]
     use :API

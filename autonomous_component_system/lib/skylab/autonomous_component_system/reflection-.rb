@@ -56,7 +56,7 @@ module Skylab::Autonomous_Component_System
 
         # for now, we don't cache the reflection on the below 2 methods which
         # leaves the door open for some extreme hacking of singleton classes.
-        # see [#]refl-A for more.
+        # more at [#]why-we-do-not-cache-reflection.
 
         if acs.respond_to? :to_component_symbol_stream
 
@@ -94,7 +94,7 @@ module Skylab::Autonomous_Component_System
 
           # if one, the other, or both had method definitions; then the
           # aggregate order will be in "categories" (in our hard-coded)
-          # order instead of by method definition order. (more at [#]refl-B.)
+          # order instead of by method definition order. (more at [#]when-both)
 
           if ! assocs_defined
             as_st = mi[].to_any_nonzero_length_association_entry_stream
@@ -135,7 +135,7 @@ module Skylab::Autonomous_Component_System
 
         def initialize meth_a
 
-          # the below cacheing rationale is explained at [#]refl-C
+          # the below cacheing rationale is explained at [#]method-index
 
           @_entry_stream = -> do
 

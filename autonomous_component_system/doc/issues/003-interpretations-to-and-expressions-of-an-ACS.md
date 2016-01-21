@@ -8,7 +8,7 @@ here we specify how both [#002] "compound" and "terminal" components of
 an ACS typically handle input & output from and to various "modalities."
 to be cheeky, we refer to input as "interpretation" and output as
 "expression". there is also the closely related idea of "intent"
-explored below at #interp-B
+explored below at #intent
 
 
 
@@ -47,7 +47,7 @@ just so we agree on terms in this document,
 
 
 
-## :assumption-A
+## :not-long-running
 
 .. is the assumption that we are not yet long-running. we use this tag
 to track areas that could be improved if we become long-running.
@@ -75,7 +75,7 @@ to a mutation session which interprets the input.)
 
 ## the modality API of "reactive tree"
 
-### what is a hybrid? :#note-RT-A
+### what is a hybrid? :hybrid
 
 the "unbound"/"bound" dichotomy is one that tries to leverage the
 "classical model" in which taxonomic, model and action nodes are
@@ -88,14 +88,7 @@ bound node. we refer to such objects as "hybrids" here.
 
 
 
-### :#note-RT-B
-
-we don't want it
-
-
-
-
-### :refl-A
+### :why-we-do-not-cache-reflection
 
 that component association structures are built anew on-the-fly whenever
 they are requested is an experiment. let's track where this potentially
@@ -107,7 +100,7 @@ to waste it is because of #DT4 conservatism.)
 
 
 
-### :refl-B
+### :when-both
 
 we want the node to be able to define its own (perhaps nil-ish) list of
 each of the things. if one or more of the things is not defined in this
@@ -121,13 +114,14 @@ order.
 
 
 
-### :refl-C
+### :method-index
 
 when the method index is in its beginning state, use the below hand-written
 map-reduce to produce each next "entry"; all the while memo'ing each entry
 produced for the one stream. if such a stream ever reaches its end, this
 moves the index out of this beginning state: for subsequent requests we used
 the cached array of entries.
+
 the rationale behind this is that we don't want to index every node if we
 don't have to (for example if we are seeking only one thing as opposed to
 all things). (although the way we may do this now may not need this
@@ -142,7 +136,7 @@ near the the end but never reach the end.
 
 
 
-### "intention method", "intent" - :#interp-B
+### "intention method", "intent" - :#intent
 
 the elegant wonder of the ACS near "interpret component" is the idea
 that we could use the same method (validation) whether we are
@@ -248,12 +242,12 @@ experimentally we attempt this trick (next section):
 
 the experimentation of this is the subject of this commit, and will not
 be commented on until it has incubated a bit. it is tracked with
- #interp-D.
+ :#compounds.
 
 
 
 
-### the "super-signature" of construction methods :interp-C
+### the "super-signature" of construction methods :the-super-singature
 
 in an ideal utopia of "true autonomy" the component model needs nothing
 more than the argument stream and a handler to construct itself from
@@ -282,7 +276,7 @@ methods:
           typically for use in the interface "intent"
 
       * for compound models, this is under exploration and is
-        being tracked with #interp-D.
+        being tracked with #compounds.
 
   • if this construction method takes more than one argument, the *last*
     argument will be the ACS that is building this as a component
@@ -304,7 +298,7 @@ not define defaults for any parameters.
 
 ### :on-JSON-expression
 
-(this section is to precede the INOUT notes next)
+(this section is to precede the following "note"-style sections.)
 
 originally we held the perspective of "the more the merrier" when it
 came to data dumps in JSON - we wanted the extra structural validation
@@ -321,7 +315,7 @@ furthermore this makes tests fragile as we add components.
 
 
 
-### :#inout-A
+### :#nil-note
 
 the "common" way we deal with `nil` for both expression and interpretation
 is that we treat it as equivalent to the value not being set. this is so
@@ -343,7 +337,7 @@ being set to `nil` over serialization.
 
 
 
-### :inout-B
+### :false-note
 
 when it comes to `false`, however, (in contrast to handling `nil`
 above), we always simply treat it as-is.
@@ -351,30 +345,30 @@ above), we always simply treat it as-is.
 
 
 
-### :inout-C
+### (truprim-note)
 
 truish-primitives..
 
 
 
 
-### :INOUT-D
+### (heavy-note)
 
 a "heavy atomic" is a component that has a dedicated class to manage it,
 but when it comes to serialization, it only needs one primitive value to
 be stored. when it gets unserialized it is crucial that this be
 translated back to such a dedicated object, and not the primitive as-is.
 
-the compoent itself has the autonomy to decide whether it is a heavy
+the component itself has the autonomy to decide whether it is a heavy
 atomic or a compound component (somehow), and can change this thru its
 lifetime.
 
 
 
 
-### :inout-E
+### :#trueish-note
 
-..would be used to mark places where the component must be true-ish, for
+we're using this to mark places where the component must be true-ish, for
 example because it is expected to be controller-like ..
 
 
@@ -390,10 +384,4 @@ example because it is expected to be controller-like ..
 ### :#infer-desc
 
 track the multiple places where we do this similar thing
-
-
-
-### :issue-1
-
-the way we autovivify here should be the way we do there (see).
 _

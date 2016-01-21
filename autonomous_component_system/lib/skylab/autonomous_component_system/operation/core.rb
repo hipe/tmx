@@ -1,162 +1,38 @@
 module Skylab::Autonomous_Component_System
-  # ->
-    class Operation  # experimental dsl for "rich" operations. notes in [#003]
+
+  module Operation
+
+    class Parsing_Session_
 
       class << self
 
-        def via_symbol_and_ACS sym, acs
-
-          new( acs ).init_for_sym_ sym
+        def call_via_parsing_session o
+          via_parsing_session( o ).execute
         end
 
-        def reader_for acs
-
-          proto = new acs
-          -> sym do
-            proto.dup.init_for_sym_ sym
-          end
+        def via_parsing_session o
+          new.___init_via_parsing_session o
         end
 
         private :new
       end  # >>
 
-      def initialize acs
-        @_ACS = acs
-        @_done = false
-        @prototype_parameter = nil
-      end
-
-      def init_for_sym_ sym
-
-        @name_symbol = sym
-
-        _args = method_and_args_for_ sym
-
-        _p = @_ACS.send( * _args ) do | * x_a |
-
-          st = Callback_::Polymorphic_Stream.via_array x_a
-          begin
-            send :"__accept__#{ st.gets_one }__meta_component", st
-            st.no_unparsed_exists and break
-            redo
-          end while nil
-          NIL_
-        end
-
-        @callable = _p
-
+      def ___init_via_parsing_session o
+        @ACS = o.ACS
+        @argument_stream = o.argument_stream
+        @pp_ = o.pp_
         self
       end
 
-      def method_and_args_for_ sym
-        :"__#{ sym }__component_operation"
-      end
-
-      def __accept__end__meta_component _
-
-        # this no-op is only so that we can have lines with trailing commas
-        # in yield which has syntactically different rules than a method call
-
-        NIL_
-      end
-
-      # ~ description & name
-
-      def __accept__description__meta_component st
-
-        @description_proc = st.gets_last_one
-        NIL_
-      end
-
-      def name
-        @___nf ||= Callback_::Name.via_variegated_symbol @name_symbol
-      end
+      # -- for sub-clients
 
       attr_reader(
-        :description_proc,
-        :name_symbol,
+        :ACS,
+        :argument_stream,
+        :pp_,
       )
-
-      # ~ parameters
-
-      def __accept__parameters__meta_component st
-
-        @prototype_parameter ||= ACS_::Parameter.new_prototype
-        @prototype_parameter.mutate_against_polymorphic_stream_passively st
-
-        NIL_
-      end
-
-      def __accept__parameter__meta_component st
-
-        @_mutable_parameter_box ||= Callback_::Box.new
-
-        ACS_::Parameter.interpret_into_via_passively_ @_mutable_parameter_box, st
-
-        NIL_
-      end
-
-      def formal_properties_in_callable_signature_order
-        @___ordered ||= __order
-        @__ordered_mutable_parameter_box
-      end
-
-      def __order
-
-        bx = formal_properties
-        bx_ = Callback_::Box.via_integral_parts bx.a_.dup, bx.h_  # careful!
-
-        _h = ::Hash[ @callable.parameters.each_with_index.map do | (_, k), d |
-          [ k,d ]
-        end ]
-
-        bx_.a_.sort_by!( & _h.method( :fetch ) )
-
-        @__ordered_mutable_parameter_box = bx_
-        ACHIEVED_
-      end
-
-      def formal_properties
-
-        @_done || _finish
-        @_mutable_parameter_box
-      end
-
-      attr_reader(
-        :prototype_parameter,
-      )
-
-      # ~
-
-      def callable
-        @_done || _finish
-        @callable
-      end
-
-      # ~ support
-
-      def _finish
-
-        @_done = true
-
-        @_mutable_parameter_box ||= Callback_::Box.new
-
-        ACS_::Parameter.collection_into_via_mutable_platform_parameters(
-          @_mutable_parameter_box,
-          @callable.parameters,
-        )
-        NIL_
-      end
-
-      # ~ intrinsic reflection
-
-      def association  # (look like qkn for now)
-        self
-      end
-
-      def category
-        :operation
-      end
     end
-  # -
+
+    Here_ = self
+  end
 end

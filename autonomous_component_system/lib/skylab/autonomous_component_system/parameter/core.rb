@@ -8,33 +8,7 @@ module Skylab::Autonomous_Component_System
           new do end
         end
 
-        def collection_into_via_mutable_platform_parameters bx, a
-
-          # every param except any trailing block has an isomorph
-
-          if a.length.nonzero? && :block == a.last.first  # might not be used
-            a.pop
-          end
-
-          h = bx.h_
-
-          a.each do | cat, sym |
-            existing = h[ sym ]
-            if existing
-              existing.send :"_when__#{ cat }__"
-            else
-              new do
-                bx.add sym, self
-                @name_symbol = sym
-                send :"_when__#{ cat }__"
-              end
-            end
-          end
-
-          NIL_
-        end
-
-        def interpret_into_via_passively_ bx, st
+        def interpret_into_via_passively__ bx, st
 
           par = new do
             __init_via_argument_stream_passively st
@@ -45,13 +19,12 @@ module Skylab::Autonomous_Component_System
           NIL_
         end
 
+        alias_method :new_by__, :new
         private :new
       end  # >>
 
       def initialize & p
-
         @argument_arity = :one
-
         instance_exec( & p )
       end
 
@@ -130,6 +103,12 @@ module Skylab::Autonomous_Component_System
         KEEP_PARSING_
       end
 
+      def __interpret__default_proc__ st
+
+        @default_proc = st.gets_one
+        KEEP_PARSING_
+      end
+
       attr_reader(
         :default_proc,
       )
@@ -139,25 +118,12 @@ module Skylab::Autonomous_Component_System
         KEEP_PARSING_
       end
 
-      def _when__opt__
-        @parameter_arity = :zero_or_one
-        NIL_
-      end
-
-      def _when__req__
-        @parameter_arity = :one
-        NIL_
-      end
-
-      def _when__rest__
-        @parameter_arity = :zero_or_more
-        NIL_
-      end
-
       attr_reader(
         :parameter_arity,
         :argument_arity,
       )
+
+      Here_ = self
     end
   # -
 end

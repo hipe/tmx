@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] core operations - (1) files" do
+  describe "[sa] core operations - (1) files", wip: true do
 
     TS_[ self ]
     use :memoizer_methods

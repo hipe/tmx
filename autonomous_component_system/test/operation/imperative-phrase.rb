@@ -1,6 +1,6 @@
 module Skylab::Autonomous_Component_System::TestSupport
 
-  module Operation
+  module Operation::Imperative_Phrase
 
     class << self
 
@@ -46,13 +46,17 @@ module Skylab::Autonomous_Component_System::TestSupport
 
         def __set_color_of_upper__component_operation
 
-          # (not the below are in an intentionally weird order to
-          #  assert that the order doesn't see expression (yet))
+          yield :parameter, :blink, :default, :no_blink
 
-          -> green, red, blink=:no_blink, alpha=:yes_alpha, blue do
+          yield :parameter, :alpha, :default_proc, -> { ___yes_alpha }
 
+          -> red, green, blue, alpha, blink do
             [ red, green, blue, alpha, blink ]  # abuse - must be truish
           end
+        end
+
+        def ___yes_alpha
+          :yes_alpha
         end
 
         def result_for_component_mutation_session_when_changed o
@@ -72,12 +76,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       class Lace
 
-        Local_Lib__::Common_child_class_methods[ self ]
-
-        def initialize & x_p
-          # (hi.)
-          @oes_p_ = x_p
-        end
+        Local_Lib__::Be_compound[ self ]
 
         def __color__component_association
           Color
@@ -88,7 +87,16 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       class Color
 
-        Local_Lib__::Common_child_methods[ self ]
+        Local_Lib__::Be_component[ self ]
+
+        def initialize _st
+          # ..
+        end
+
+        def description_under exp
+          s = @string
+          exp.calculate { val s }
+        end
 
         def __set__component_operation
 

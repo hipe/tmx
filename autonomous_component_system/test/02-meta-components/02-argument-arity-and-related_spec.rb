@@ -34,7 +34,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       end
 
       it "writes to plural ivar" do
-        state_.root._the_ivar.should eql %w( ok yerp )
+        root_ACS_._the_ivar.should eql %w( ok yerp )
       end
     end
 
@@ -49,13 +49,17 @@ module Skylab::Autonomous_Component_System::TestSupport
       end
 
       it "writes to plural ivar" do
-        state_.root._the_ivar.should eql %w( yay )
+        root_ACS_._the_ivar.should eql %w( yay )
       end
     end
 
     shared_subject :my_model_ do
 
       class MC_2_Xx
+
+        class << self
+          alias_method :new_, :new
+        end
 
         def __paths__component_association
 
@@ -82,7 +86,7 @@ module Skylab::Autonomous_Component_System::TestSupport
           end
         end
 
-        def __set__component x, asc, & _ignored
+        def __set__component x, asc, & _x_p
 
           instance_variable_set asc.name.as_ivar, x
           :_yerf_

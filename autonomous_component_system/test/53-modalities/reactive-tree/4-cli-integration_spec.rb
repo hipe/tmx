@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Autonomous_Component_System::TestSupport
 
-  describe "[ac] modalities - reactive tree - CLI integ. - 1." do
+  describe "[ac] modalities - reactive tree - CLI integ. - 1.", wip: true do
 
     TS_[ self ]
     use :memoizer_methods

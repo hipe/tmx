@@ -25,8 +25,8 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       def interpret arg_st, acs, & oes_p_p  # :+Tenet6, [#003]:hb-again
 
         o = _Mutation_Session.new( & oes_p_p )
-        o.arg_st = arg_st
         o.ACS = acs
+        o.argument_stream = arg_st
         o.macro_operation_method_name = :interpret
         o.execute
       end
@@ -224,7 +224,6 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       def initialize
         @_name_mutation = nil
-        @_operations = nil
       end
 
       def _finish_definition_via cm, sym
@@ -370,7 +369,9 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         me = self
         @instance_description_proc = -> y do
 
-          _st = me.operations_box_read_only.to_name_stream
+          bx = me.transitive_capabilities_box
+
+          _st = bx.to_name_stream
 
           _s_a = _st.reduce_into_by [] do | m, sym |
 
@@ -403,52 +404,18 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       attr_accessor :name
 
-      # ~ operations
+      # ~ transitive operation capabilities
 
       def accept__can__meta_component * i_a  # :Tenet8.
 
-        bx = Callback_::Box.new
-        i_a.each do | sym |
+        bx = ( @transitive_capabilities_box ||= Callback_::Box.new )
+        i_a.each do |sym|
           bx.add sym, :declared
         end
-        @_operations = bx ; nil
+        NIL_
       end
 
-      def operations_box_read_only
-        @_operations
-      end
-
-      def any_delivery_mode_for sym
-
-        if @_operations
-          if @_operations[ sym ]
-            mode = :association
-          end
-        end
-        if mode
-          mode
-        elsif __model_has_operation sym
-          :model
-        end
-      end
-
-      def operation_symbols
-
-        bx = @_operations
-        if bx
-          bx.get_names
-        else
-          EMPTY_A_
-        end
-      end
-
-      def to_operation_symbol_stream  # assume operations
-        @_operations.to_name_stream
-      end
-
-      def has_operations
-        ! @_operations.nil?
-      end
+      attr_reader :transitive_capabilities_box
 
       # ~ default
 
@@ -460,17 +427,13 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       # ~ intent
 
-      def accept__intent__meta_component sym  # see [#003]:#interp-B
+      def accept__intent__meta_component sym  # see [#003]#intent
         @intent = sym ; nil
       end
 
       attr_reader :intent
 
       # ~ model
-
-      def model_has_association__ sym
-        @component_model.method_defined? :"__#{ sym }__component_association"
-      end
 
       def __model_has_operation sym
         @component_model.method_defined? :"__#{ sym }__component_operation"
@@ -614,7 +577,9 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
     Home_ = self
     KEEP_PARSING_ = true
     Autoloader_[ Modalities = ::Module.new ]
+    MONADIC_EMPTINESS_ = -> _ { NIL_ }
     NIL_ = nil
+    NOTHING_ = nil
     SPACE_ = ' '.freeze
     UNABLE_ = false
   # -

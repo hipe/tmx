@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] auxiliaries - function - (2) failures" do
+  describe "[sa] auxiliaries - function - (2) failures", wip: true do
 
     TS_[ self ]
     use :memoizer_methods

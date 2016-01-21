@@ -252,7 +252,7 @@ module Skylab::Snag
       ACS_[]::Model::Via_normalization[ _n11n ]
     end
 
-    def __set__component x, ca, & _
+    def __set__component x, ca, & _x_p
 
       instance_variable_set ca.name.as_ivar, x
       ACHIEVED_

@@ -38,11 +38,14 @@ module Skylab::Autonomous_Component_System
 
       def to_stream_for_component_interface
 
-        _st = @_qkn.association.to_operation_symbol_stream
-
-        _st.map_by do | symmo |
-
-          Operation___.__new symmo, @_qkn, @ACS
+        bx = @_qkn.association.transitive_capabilities_box
+        if bx
+          _st = bx.to_name_stream
+          _st.map_by do | symmo |
+            Operation___.__new symmo, @_qkn, @ACS
+          end
+        else
+          Callback_::Stream.the_empty_stream
         end
       end
 

@@ -63,7 +63,7 @@ module Skylab::Zerk  # intro in [#001] README
         _cmp = if qkn.is_effectively_known
           qkn.value_x  # [sa]
         else
-          ACS_::For_Interface::Build_and_attach[ qkn.association, _ACS ]
+          ACS_::For_Interface::Build_and_attach[ qkn.association, _ACS ].value_x
           # #needs-upwards
         end
 
@@ -213,7 +213,7 @@ module Skylab::Zerk  # intro in [#001] README
 
         p = ACS_::Interpretation::Accept_component_change[
           wv.value_x,
-          node,
+          node.association,
           @ACS,
         ]
 

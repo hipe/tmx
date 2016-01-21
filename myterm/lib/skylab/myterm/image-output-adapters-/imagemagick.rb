@@ -144,7 +144,7 @@ module Skylab::MyTerm
     def __accept_primitive wv, qkn
 
       _ev_proc = ACS_[]::Interpretation::Accept_component_change[
-        wv.value_x, qkn, self ]
+        wv.value_x, qkn.association, self ]
 
       _LL = Linked_list_[].via qkn.name, _ev_proc  # #no-verb
 
@@ -189,7 +189,7 @@ module Skylab::MyTerm
       _new_component = new_component_p[]
 
       _ev_p = ACS_[]::Interpretation::Accept_component_change[
-        _new_component, qkn, self ]
+        _new_component, qkn.association, self ]
 
       o = Linked_list_[]
       _end = o[ nil, _ev_p ]
@@ -235,11 +235,15 @@ module Skylab::MyTerm
       # component. we build it as we would one of our own. (it *is* one of
       # our own.) the difference is in how we handle the events.
 
-      touch = ACS_[]::For_Interface::Touch
+      touch = ACS_[]::For_Interface::Touch.new nil, nil  # eew
+      touch.do_attach = false
 
       -> qkn_x do
-
-        touch[ qkn_x, self ]
+        if qkn_x.is_known_known
+          self._K
+        else
+          touch[ qkn_x.association, self ].value_xq
+        end
       end
     end
 

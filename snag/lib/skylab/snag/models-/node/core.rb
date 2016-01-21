@@ -219,7 +219,7 @@ module Skylab::Snag
 
     ## ~~ implementation of operations
 
-    def __set__component x, ca, & oes_p_p
+    def __set__component x, ca, & _x_p
 
       instance_variable_set ca.name.as_ivar, x
       x || self._COVER_ME  # as soon as you have valid false-ishes, things change

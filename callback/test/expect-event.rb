@@ -344,6 +344,10 @@ module Skylab::Callback::TestSupport
 
       # -- the newschool ways (matcher-based) (frontiered by [ze] for now..)
 
+      def emissions_count
+        emission_array.length
+      end
+
       def only_emission
 
         a = emission_array
@@ -353,6 +357,10 @@ module Skylab::Callback::TestSupport
         else
           a.length.should eql 1
         end
+      end
+
+      def first_emission
+        emission_array.first
       end
 
       def last_emission

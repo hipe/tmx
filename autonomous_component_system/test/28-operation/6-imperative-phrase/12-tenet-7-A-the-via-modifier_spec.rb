@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Autonomous_Component_System::TestSupport
 
-  describe "[ac] ACS tenet 7 A - the `via` modifier" do
+  describe "[ac] tenets - 7 A - the `via` modifier" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -28,7 +28,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     shared_subject :_subject_class do
 
-      class ACS_7_Via_1
+      class ACS_28_6_12_Via
 
         class << self
 
@@ -47,7 +47,7 @@ module Skylab::Autonomous_Component_System::TestSupport
           true
         end
 
-        def __set__component x, ca, & oes_p
+        def __set__component x, ca, & _x_p
 
           instance_variable_set ca.name.as_ivar, x
           true
@@ -57,10 +57,10 @@ module Skylab::Autonomous_Component_System::TestSupport
 
         def __thingo__component_association
           yield :can, :set
-          ACS_7_Thinger
+          ACS_28_6_12_Thinger
         end
 
-        class ACS_7_Thinger
+        class ACS_28_6_12_Thinger
 
           class << self
             def new_via__regulo_expo__ rx
@@ -84,7 +84,7 @@ module Skylab::Autonomous_Component_System::TestSupport
         end
       end
 
-      ACS_7_Via_1
+      ACS_28_6_12_Via
     end
   end
 end

@@ -2,8 +2,9 @@ module Skylab::Autonomous_Component_System
   # ->
     module Interpretation_
 
-      class Build_value  # [#006]:the-universal-component-builder explains everything
+      class Build_value  # result is a qk
 
+        # [#006]:the-universal-component-builder explains everything
         # corroboration by: [ze]
 
         class << self
@@ -60,8 +61,16 @@ module Skylab::Autonomous_Component_System
           if @_explicit_method_name
             __via_construction_method
           else
+            ___via_proc_like_call
+          end
+        end
 
-            @_receiver[ @mixed_argument, & @_oes_p_p ]
+        def ___via_proc_like_call
+          kn = @_receiver[ @mixed_argument, & @_oes_p_p ]
+          if kn
+            kn.to_qualified_known_around @association
+          else
+            kn
           end
         end
 
@@ -101,7 +110,7 @@ module Skylab::Autonomous_Component_System
 
           d = @_receiver.method( m ).arity
           if 1 < d
-            # see construction args [#006]:interp-C
+            # see construction args [#006]:the-super-signature
             xtra = []
             if 2 < d
               xtra.push @association
@@ -111,7 +120,7 @@ module Skylab::Autonomous_Component_System
 
           cmp = @_receiver.send m, @mixed_argument, * xtra, & @_oes_p_p
           if cmp
-            Value_Wrapper[ cmp ]
+            Callback_::Qualified_Knownness[ cmp, @association ]
           else
             cmp
           end

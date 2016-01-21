@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::MyTerm::TestSupport
 
-  describe "[my] models - label" do
+  describe "[my] models - label", wip: true do
 
     extend TS_
     use :sandboxed_kernels

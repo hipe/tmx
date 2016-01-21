@@ -178,7 +178,7 @@ module Skylab::MyTerm
 
       _ca = lt.component_association
 
-      x = ACS_[]::Interpretation::Build_empty_hot[ _ca, self ]
+      x = ACS_[]::Interpretation::Build_empty_hot[ _ca, self ].value_x
 
       _const = lt.adapter_name.as_const
 

@@ -91,7 +91,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       class Lace
 
-        Local_Lib__::Common_child_class_methods[ self ]
+        Local_Lib__::Be_component[ self ]
 
         def initialize & oes_p_p
 

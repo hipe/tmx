@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Autonomous_Component_System::TestSupport
 
-  describe "[ac] tenet 7 D - the `assuming` modifer" do
+  describe "[ac] tenets - 7 D - the `assuming` modifer" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -50,7 +50,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     shared_subject :__subject_class do
 
-      class ACS_7D
+      class ACS_28_6_21
 
         def initialize
           @is_fun = @is_good_times = nil
@@ -98,7 +98,7 @@ module Skylab::Autonomous_Component_System::TestSupport
           end
         end
 
-        def __rattle__component _, ca, & __
+        def __rattle__component _, ca, & _x_p
           @_last_rattled = ca.name.as_variegated_symbol
           :yep
         end
