@@ -7,32 +7,27 @@ module Skylab::Autonomous_Component_System::TestSupport
     TS_[ self ]
     use :memoizer_methods
     use :expect_event
-    use :operation_imperative_phrase
-
-    def my_model_
-      shoe_model_
-    end
+    use :expect_root_ACS
 
     context "2 deep" do
 
       call_by_ do
-
         _ = event_log.handle_event_selectively
-        shoe = shoe_model_.new_
-        @result_ = shoe.edit :set, :lace, :color, "red", & _
-        @root_ = shoe ; nil
+        shoe = _shoe_model.new_
+        @result = shoe.edit :set, :lace, :color, "red", & _
+        @root_ACS = shoe ; nil
       end
 
       it "the result was whatever we said it was" do
-        result_.should eql :_yergen_
+        root_ACS_result.should eql :_yergen_
       end
 
       it "the 'entitesque' component was attached to the compound component" do
-        root_ACS_.lace or fail
+        root_ACS.lace or fail
       end
 
       it "the primitive property was written to the entity" do
-        root_ACS_.lace.color.string.should eql "red"
+        root_ACS.lace.color.string.should eql "red"
       end
 
       it "we see the event that was emitted from inside the operation" do
@@ -56,17 +51,17 @@ module Skylab::Autonomous_Component_System::TestSupport
       end
 
       it "result" do
-        result_.should eql :_yergen_
+        root_ACS_result.should eql :_yergen_
       end
 
       it "sets BOTH values" do
-        shoe = root_ACS_
+        shoe = root_ACS
         shoe.size.should eql 11
         shoe.special.should eql 'w'
       end
 
       it "no events" do
-        emissions_count.should be_zero
+        emission_count.should be_zero
       end
     end
 
@@ -96,11 +91,17 @@ module Skylab::Autonomous_Component_System::TestSupport
     end
 
     def _new_shoe
-      shoe_model_.new_
+      _shoe_model.new_
     end
 
     def expression_agent_for_expect_event
       Home_.lib_.brazen::API.expression_agent_instance
     end
+
+    def subject_root_ACS_class
+      Fixture_top_ACS_class[ :Class_42_Shoe ]
+    end
+
+    alias_method :_shoe_model, :subject_root_ACS_class
   end
 end

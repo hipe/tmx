@@ -72,11 +72,9 @@ module Skylab::Autonomous_Component_System::TestSupport
       end
     end
 
-    Local_Lib__ = TS_.lib :common_model_and_methods
-
     class Faz_Daz
 
-      Local_Lib__::Be_component[ self ]
+      Um_ACS_TS::Be_component[ self ]
 
       def describe_into_under y, expag
         expag.calculate do

@@ -5,7 +5,6 @@ module Skylab::Autonomous_Component_System::TestSupport
   describe "[ac] modalities - JSON - express" do
 
     TS_[ self ]
-    use :common_model_and_methods
 
     it "non-sparse one-level structure" do
 
@@ -54,9 +53,13 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     def _begin_to_json sn
 
-      o = subject_::Modalities::JSON::Express.new
+      o = Home_::Modalities::JSON::Express.new
       o.upstream_ACS = sn
       o
+    end
+
+    def subject_root_ACS_class
+      Fixture_top_ACS_class[ :Class_01_Names ]
     end
   end
 end

@@ -11,16 +11,23 @@ module Skylab::Autonomous_Component_System
         end
 
         def via_parsing_session o
-          new.___init_via_parsing_session o
+          new.init_via_parsing_session_ o
         end
 
         private :new
       end  # >>
 
-      def ___init_via_parsing_session o
+      def init_via_parsing_session_ o, & pp
+
         @ACS = o.ACS
         @argument_stream = o.argument_stream
-        @pp_ = o.pp_
+
+        @pp_ = if pp
+         pp
+        else
+          o.pp_
+        end
+
         self
       end
 

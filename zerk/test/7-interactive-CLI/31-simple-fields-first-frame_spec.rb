@@ -1,8 +1,8 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] 3 - x spec", wip: true do
+  describe "[ze] iCLI - simple fields first frame", wip: true do
 
     TS_[ self ]
     use :memoizer_methods
@@ -172,8 +172,12 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    def state_  # muscle memory (for manually debugging only..)
+    def root_ACS_state  # muscle memory (for manually debugging only..)
       _expscr_session_state
+    end
+
+    def subject_root_ACS_class
+      My_fixture_top_ACS_class[ :Class_31_3_Prims_and_a_Transitive_Operation ]
     end
   end
 end

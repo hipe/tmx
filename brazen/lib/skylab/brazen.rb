@@ -72,12 +72,10 @@ module Skylab::Brazen
       Home_::Nodesque::Identifier
     end
 
-    def test_support  # :+[#ts-035]
-
+    def test_support  # #[#ts-035]
       if ! Home_.const_defined? :TestSupport, false
         require_relative '../../test/test-support'
       end
-
       Home_::TestSupport
     end
   end  # >>

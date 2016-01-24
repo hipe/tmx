@@ -7,6 +7,7 @@ module Skylab::Autonomous_Component_System::TestSupport
     TS_[ self ]
     use :memoizer_methods
     use :expect_event
+    use :expect_root_ACS
 
     context "invalid under the plural" do
 
@@ -15,7 +16,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       end
 
       it "fails" do
-        result_.should be_result_for_failure_
+        root_ACS_result.should be_common_result_for_failure
       end
 
       it "the plural validates with the singular" do
@@ -30,11 +31,11 @@ module Skylab::Autonomous_Component_System::TestSupport
       end
 
       it "succeeds" do
-        result_.should eql :_yerf_
+        root_ACS_result.should eql :_yerf_
       end
 
       it "writes to plural ivar" do
-        root_ACS_._the_ivar.should eql %w( ok yerp )
+        root_ACS._the_ivar.should eql %w( ok yerp )
       end
     end
 
@@ -45,15 +46,15 @@ module Skylab::Autonomous_Component_System::TestSupport
       end
 
       it "succeeds" do
-        result_.should eql :_yerf_
+        root_ACS_result.should eql :_yerf_
       end
 
       it "writes to plural ivar" do
-        root_ACS_._the_ivar.should eql %w( yay )
+        root_ACS._the_ivar.should eql %w( yay )
       end
     end
 
-    shared_subject :my_model_ do
+    shared_subject :subject_root_ACS_class do
 
       class MC_2_Xx
 

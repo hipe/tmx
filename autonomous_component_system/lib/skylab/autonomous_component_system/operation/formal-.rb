@@ -30,8 +30,8 @@ module Skylab::Autonomous_Component_System
 
       # --
 
-      def deliverable_via_selecting_session o
-        @_reifier.deliverable_via_selecting_session o
+      def deliverable_via_selecting_session o, & pp
+        @_reifier.deliverable_via_selecting_session o, & pp
       end
 
       # --
@@ -51,10 +51,11 @@ module Skylab::Autonomous_Component_System
           NIL_
         end
 
-        # -
+        if x.respond_to? :call
           ___accept_proc_as_implementation x
-
-        # -
+        else
+          self._WAHOO  # #during #milestone:1
+        end
 
         self
       end

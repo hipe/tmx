@@ -147,11 +147,11 @@ class Skylab::Task
 
   class << self
 
-    def test_support
-      @___test_support ||= begin
+    def test_support  # #[#ts-035]
+      if ! Home_.const_defined? :TestSupport
         require_relative '../../test/test-support'
-        Home_::TestSupport
       end
+      Home_::TestSupport
     end
 
     def lib_

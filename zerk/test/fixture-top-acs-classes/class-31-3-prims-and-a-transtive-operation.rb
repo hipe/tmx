@@ -1,6 +1,6 @@
 module Skylab::Zerk::TestSupport
 
-  class Examples::Example_01_Zombies
+  class Fixture_Top_ACS_Classes::Class_31_3_Prims_and_a_Transitive_Operation
 
     # (this is named "zombies" because we had just seen mockingjay p.2..)
 

@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Autonomous_Component_System::TestSupport
+module Skylab::Zerk::TestSupport
 
-  describe "[ac] for interface - (1) intent: with an intent of..", wip: true do
+  describe "[ze] API - intent intro", wip: true do  # was for 'for interface' of [aca]
 
     TS_[ self ]
     use :memoizer_methods
@@ -71,27 +71,8 @@ module Skylab::Autonomous_Component_System::TestSupport
       _st.to_a
     end
 
-    dangerous_memoize :_my_model do
-
-      class MC_1_Multi_Intent_Root
-
-        def __resourcez__component_association
-          yield :intent, :API
-          :_ok_
-        end
-
-        def __floofie__component_association
-          yield :intent, :UI
-          :_ok_
-        end
-
-        def __both__component_association
-          yield :intent, :interface
-          :_ok_
-        end
-
-        self
-      end
+    def subject_root_ACS_class
+      My_fixture_top_ACS_class[ :Class_23_Multi_Intent_Root ]
     end
   end
 end

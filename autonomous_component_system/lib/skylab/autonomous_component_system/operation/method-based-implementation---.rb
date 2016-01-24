@@ -45,19 +45,19 @@ module Skylab::Autonomous_Component_System
         self
       end
 
-      def deliverable_via_selecting_session o
-        Build_deliverable___.new( @_single_argument_qk, o ).execute
+      def deliverable_via_selecting_session o, & pp
+        Build_deliverable___.new( @_single_argument_qk, o, & pp ).execute
       end
 
       class Build_deliverable___
 
-        def initialize qk, o
+        def initialize qk, o, & pp
 
           # what argument(s) we pass will change for #open [#012]:
 
           @modz_ = o.modz_
           @selection_stack = o.selection_stack
-          @pp_ = o.pp_
+          @pp_ = pp
           @_qk = qk
         end
 
@@ -70,7 +70,7 @@ module Skylab::Autonomous_Component_System
           _receiver = a.fetch( -2 ).value_x
 
           _method_name = Self_.__method_for_symbol(
-            a.fetch( -1 ).as_variegated_symbol )
+            a.fetch( -1 ).name.as_variegated_symbol )
 
           # ~
 

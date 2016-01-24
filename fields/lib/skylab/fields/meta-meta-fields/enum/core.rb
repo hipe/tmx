@@ -76,6 +76,7 @@ module Skylab::Fields
         end  # >>
 
         attr_writer(
+          :adjective,
           :invalid_value,
           :valid_collection,
           :property_name,
@@ -84,6 +85,7 @@ module Skylab::Fields
         )
 
         def initialize
+          @adjective = nil
           @event_name_symbol = nil
           @valid_value_mapper_from = nil
         end
@@ -98,6 +100,7 @@ module Skylab::Fields
             :property_name, @property_name,
             :enum_value_polymorphic_streamable, @valid_collection,
             :valid_value_mapper_from, @valid_value_mapper_from,
+            :adjective, @adjective,
             :error_category, :argument_error,
 
 
@@ -125,7 +128,9 @@ module Skylab::Fields
               '{}'
             end
 
-            y << "invalid #{ o.property_name.as_human } #{ ick o.x }, #{
+            _adj = o.adjective || "invalid"  # ..
+
+            y << "#{ _adj } #{ o.property_name.as_human } #{ ick o.x }, #{
               }expecting #{ _expecting }"
           end
         end

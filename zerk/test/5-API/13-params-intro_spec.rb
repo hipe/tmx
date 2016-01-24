@@ -1,12 +1,12 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-module Skylab::Autonomous_Component_System::TestSupport
+module Skylab::Zerk::TestSupport
 
-  describe "[ac] modalities - reactive tree - 1. reaching an action", wip: true do
+  describe "[ze] API - params intro", wip:true do  # used to test r.t
 
     TS_[ self ]
-    use :future_expect
-    use :modalities_reactive_tree
+    # use :future_expect
+    # use :modalities_reactive_tree
 
     it "shoe model loads" do
 
@@ -33,17 +33,21 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     it "call the branch" do
 
+      self._BREAKUP
+
       future_expect :error, :action_name_ends_on_branch_node
 
-      call_ :shoe
+      call_root_ACS :shoe
       expect_failed_
     end
 
     it "call the sub-branch under the branch" do
 
+      self._BREAKUP
+
       future_expect :error, :action_name_ends_on_branch_node
 
-      call_ :shoe, :lace
+      call_root_ACS :shoe, :lace
       expect_failed_
     end
 
@@ -53,9 +57,13 @@ module Skylab::Autonomous_Component_System::TestSupport
         a.should eql [ "retrieving ** color **" ]
       end
 
-      call_ :shoe, :lace, :get_color
+      call_root_ACS :shoe, :lace, :get_color
       future_is_now
       @result.should eql "white"
+    end
+
+    def subject_root_ACS_class
+      My_fixture_top_ACS_class[ :Class_21_Another_Shoe ]
     end
   end
 end

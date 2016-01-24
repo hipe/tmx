@@ -117,7 +117,6 @@ module Skylab::Autonomous_Component_System
           end
         end
 
-
         def ___after_deliver x
 
           # if there were "hops" we may need to attach the "floating" component
@@ -150,6 +149,30 @@ module Skylab::Autonomous_Component_System
           end
           NIL_
         end
+
+        # -- experimental -
+        #    expose these four datapoints so this actually looks like a bound
+        #    call (for [ze]) BUT look at everything you lose (before hooks
+        #    and after hooks..)
+
+        def receiver
+          @_receiver
+        end
+
+        def method_name
+          @_method_name
+        end
+
+        def args
+          @_args
+        end
+
+        def block
+          # NOT SURE ..
+          @pp_
+        end
+
+        # --
 
         def _event_handler
           @___oes_p ||= @pp_[ @_receiver ]

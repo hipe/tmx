@@ -38,8 +38,11 @@ module Skylab::Callback
       Home_::Stream.new( & p )
     end
 
-    def test_support
-      Home_::Test
+    def test_support  # #[#ts-035]
+      if ! Home_.const_defined? :TestSupport
+        require_relative '../../test/test-support'
+      end
+      Home_::TestSupport
     end
   end  # >>
 

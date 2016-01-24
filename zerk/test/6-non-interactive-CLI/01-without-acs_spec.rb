@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] non-interactive CLI - 01. no ACS" do
+  describe "[ze] non-interactive CLI - without ACS" do
 
     TS_[ self ]
     use :memoizer_methods

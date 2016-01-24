@@ -7,7 +7,7 @@ module Skylab::Autonomous_Component_System
       read_via_ivar = nil
       read_via_method = nil
 
-      Reader = -> acs do
+      Reader = -> acs do  # and [ze]
 
         if acs.respond_to? READ_METHOD__
           -> asc do

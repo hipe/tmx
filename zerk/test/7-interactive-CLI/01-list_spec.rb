@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] interp. - list (like OGDL)" do
+  describe "[ze] iCLI - list interpretation (like OGDL)" do
 
     TS_[ self ]
     use :expect_event

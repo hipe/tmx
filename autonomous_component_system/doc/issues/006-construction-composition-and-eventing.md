@@ -80,6 +80,10 @@ a block passed to the entrypoint method, that will serve as *the*
 handler for the entire (roundtrip, full-stack) execution of the
 operation.
 
+
+
+### :#Hot-eventmodel:
+
 in the "hot" eventmodel, a component holds its "binding" (its
 "listeners" proc) *as* member data. this handler (proc) is an intrinsic,
 unchanging member of the entity that is present for its lifetime.

@@ -43,14 +43,14 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     def call_by_ & p
 
-      dangerous_memoize :state_ do
+      dangerous_memoize :root_ACS_state do
         instance_exec( & p )
-        __flush_to_state
+        _o = remove_instance_variable :@root_ACS
+        _x = remove_instance_variable :@result
+        root_ACS_state_via _x, _o
       end
     end
   end
-
-  State___ = ::Struct.new :result, :emission_array, :root
 
   module Instance_Methods___
 
@@ -66,13 +66,23 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     # --
 
+    TestSupport_::Memoization_and_subject_sharing[ self ]
+
+    memoize :_EMPTY_JSON_LINES do
+      [ "{}\n" ]
+    end
+
+    def state_  # nasty: for expect_event & expect_root_ACS when together
+      root_ACS_state
+    end
+
     def call_ * x_a
 
       if block_given?
         self._WRITE_ME
       end
 
-      root = my_model_.new_
+      root = subject_root_ACS_class.new_
 
       oes_p = event_log.handle_event_selectively
 
@@ -80,35 +90,67 @@ module Skylab::Autonomous_Component_System::TestSupport
         oes_p
       end
 
-      @result_ = Home_.edit x_a, root, & _oes_p_p
-      @root_ = root
+      @result = Home_.edit x_a, root, & _oes_p_p
+      @root_ACS = root
 
       NIL_
     end
 
-    def __flush_to_state
-
-      _result = remove_instance_variable :@result_
-      _a = remove_instance_variable( :@event_log ).flush_to_array
-      _root = remove_instance_variable :@root_
-      State___[ _result, _a, _root ]
-    end
-
-    def result_
-      state_.result
-    end
-
-    def be_result_for_failure_
-      eql false
-    end
-
-    def root_ACS_
-      state_.root
+    def const_ sym
+      subject_root_ACS_class.const_get( sym, false )
     end
   end
 
+  Callback_ = ::Skylab::Callback
+  Autoloader__ = Callback_::Autoloader
+
+  # -- fixtures & mocks
+
+  Fixture_top_ACS_class = -> const do
+    Fixture_Top_ACS_Classes.const_get const, false
+  end
+
+  module Fixture_Top_ACS_Classes
+
+    class Class_01_Empty
+
+      def initialize & oes_p
+        @_IGNORED_EVENT_HANDLER = true
+      end
+
+      def hello
+        :_emtpy_guy_
+      end
+    end
+
+    Autoloader__[ self ]
+    Here_ = self
+  end
+
+  Be_compound = -> cls do
+    cls.class_exec do
+      def self.interpret_compound_component p
+        p[ new ]
+      end
+    end
+  end
+
+  Be_component = -> cls do
+    cls.class_exec do
+      def self.interpret_component st, & pp
+        new st, & pp
+      end
+    end
+  end
+
+  # --
+
   No_events_ = -> * i_a, & ev_p do
     fail "unexpected: #{ i_a.inspect }"
+  end
+
+  No_events_pp_ = -> _ do
+    fail "no."
   end
 
   module TestLib_
@@ -126,8 +168,7 @@ module Skylab::Autonomous_Component_System::TestSupport
     end
   end
 
-  Callback_ = ::Skylab::Callback
-  Callback_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader__[ self, ::File.dirname( __FILE__ ) ]
 
   ACHIEVED_ = true
   Home_ = ::Skylab::Autonomous_Component_System

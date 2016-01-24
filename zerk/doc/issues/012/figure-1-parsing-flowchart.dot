@@ -1,0 +1,113 @@
+digraph g {
+
+  edge [colorscheme=paired10]
+
+  subgraph cluster_legend {
+
+    label="legend (in which test file is the edge tested?)"
+    node[ colorscheme=paired10 shape=rectangle]
+    edge[ color=white ]
+    xx04[ label="green  - test XX" fontcolor=4 ]
+    xx02[ label="blue   - test 07" fontcolor=2 ]
+    xx10[ label="purple - test 04" fontcolor=10 ]
+    # xx10->xx02->xx04
+  }
+
+  label="\nfigure 1. logical flowchart for
+how we parse API invocations"
+
+
+
+  start [shape=rectangle label="all API invocations start
+with a \"root\" compound node
+in the first frame of
+\"the invocation stack\""]
+
+  start->common
+
+  common [shape=diamond label="are there more\narguments?"]
+  common->no_more_args [label="no" color=10]
+
+  common->yes_more_args1 [label="yes"]
+
+  yes_more_args1 [shape=rectangle label="in the compound node of
+the top (i.e current) frame,
+lookup an association that
+corresponds to the head token
+of the argument stream."]
+
+  yes_more_args1->yes_more_args2
+
+  yes_more_args2 [shape=diamond label="found?"]
+
+  yes_more_args2->parse_failed [label=no color=10]
+  yes_more_args2->accept_token [label=yes]
+
+  accept_token [shape=rectangle label="accept the token.\nnow you have an
+association-esque."]
+
+  accept_token->thingo
+
+  thingo [label="what shape is\nthe association?" shape=diamond]
+
+  thingo->operation [label="operation"]
+  thingo->compound [label="compound"]
+  thingo->e_or_p_1 [label="entitesque or primitesque"]
+
+  operation [shape=rectangle label=
+"operation-implementation-specific
+adapter prepares (parses) the
+parameters off the argument stream.
+(note this does not yet execute the
+operation. also this is *not* the
+same as \"entitesque\" parsing.)" ]
+
+  operation->op2
+  op2 [shape=diamond label="parameters\nsatisfied?"]
+
+  op2->parse_failed [label=no]
+  op2->op3 [label=yes]
+
+  op3 [shape=diamond label="arguments\nremaining?"]
+  op3->parse_failed [label=yes color=2]
+  op3->op4 [label=no color=2]
+
+  op4 [shape=rectangle label="execute the prepared
+operation. result is
+freeform - totally up
+to the operation what
+the shape is          "]
+
+  op4->no_more_args
+
+  compound [label="when compound,
+add one frame to\nthe invocation stack." shape=rectange]
+
+  e_or_p_1 [shape=diamond label="are there more\narguments?"]
+
+  e_or_p_1->e_or_p_2 [label=yes]
+  e_or_p_1->no_more_args [label=no color=10]
+
+  e_or_p_2 [label="whether primitesque
+or entitesque, the
+component model gets
+parsing autnonomy." shape=rectangle]
+
+  e_or_p_2->after_p
+
+  after_p [label="built\nentity?" shape=diamond]
+  after_p->p_succeeded [label=yes color=10]
+  after_p->parse_failed [label=no color=10]
+
+  parse_failed [shape=rectangle label="stop parse as-is,\nresulting with the
+falseish value"]
+
+  p_succeeded [shape=rectangle label="store the value\nin the compound
+entity of the\ncurrent frame"]
+  p_succeeded->common
+  compound->common
+
+  no_more_args [shape=rectangle label="[results at\nfigure 2]"]
+
+
+}

@@ -1,34 +1,6 @@
 module Skylab::Autonomous_Component_System::TestSupport
 
-  module Common_Model_And_Methods
-
-    def self.[] tcc
-      tcc.include self
-    end
-
-    def const_ sym
-      Here_.const_get sym, false
-    end
-
-    def subject_
-      ACS__[]
-    end
-
-    Be_compound = -> cls do
-      cls.class_exec do
-        def self.interpret_compound_component p
-          p[ new ]
-        end
-      end
-    end
-
-    Be_component = -> cls do
-      cls.class_exec do
-        def self.interpret_component st, & pp
-          new st, & pp
-        end
-      end
-    end
+  class Fixture_Top_ACS_Classes::Class_01_Names
 
     class Simple_Name
 
@@ -72,7 +44,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
           s = st.gets_one
           if rx =~ s
-            Home_::Value_Wrapper[ s ]
+            Callback_::Known_Known[ s ]
           else
 
             _oes_p = oes_p_p[ nil ]
@@ -90,7 +62,7 @@ module Skylab::Autonomous_Component_System::TestSupport
         -> st, & p do
 
           _s = st.gets_one
-          ACS__[]::Value_Wrapper[ _s ]
+          Callback_::Known_Known[ _s ]
         end
       end
     end
@@ -115,7 +87,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
         -> st, & _ do
 
-          ACS__[]::Value_Wrapper[ st.gets_one ]
+          Callback_::Known_Known[ st.gets_one ]
         end
       end
 
@@ -123,11 +95,5 @@ module Skylab::Autonomous_Component_System::TestSupport
         Simple_Name
       end
     end
-
-    ACS__ = -> do
-      Home_
-    end
-
-    Here_ = self
   end
 end

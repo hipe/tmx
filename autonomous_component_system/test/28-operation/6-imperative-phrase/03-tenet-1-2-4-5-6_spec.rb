@@ -84,7 +84,7 @@ module Skylab::Autonomous_Component_System::TestSupport
             s = st.current_token
             if /\A[A-Z ]+\z/ =~ s
               st.advance_one
-              ACS_[]::Value_Wrapper[ s ]
+              Callback_::Known_Known[ s ]
             else
 
               _oes_p = oes_p_p[ nil ]

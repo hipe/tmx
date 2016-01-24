@@ -342,9 +342,15 @@ module Skylab::Callback::TestSupport
         em.channel_symbol_array.inspect
       end
 
+      # -- out-of-scope but convenient
+
+      def be_common_result_for_failure
+        eql false
+      end
+
       # -- the newschool ways (matcher-based) (frontiered by [ze] for now..)
 
-      def emissions_count
+      def emission_count
         emission_array.length
       end
 

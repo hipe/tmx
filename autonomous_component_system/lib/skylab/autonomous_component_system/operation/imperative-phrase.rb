@@ -33,7 +33,7 @@ module Skylab::Autonomous_Component_System
       end
 
       def ___produce_deliverable
-        @_formalesque.deliverable_via_selecting_session self
+        @_formalesque.deliverable_via_selecting_session self, & @pp_
       end
 
       def __parse_zero_or_more_modifiers  # we peek before loading the node

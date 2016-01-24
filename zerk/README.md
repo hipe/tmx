@@ -18,6 +18,13 @@ means to make non-interactive API's as well.
 
 
 
+
+## introduction to the new edition
+
+(TODO - #during [#009] write this)
+
+
+
 ## the fundamentals
 
 zerk wants you to model your application as a tree of nodes.

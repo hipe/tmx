@@ -1,13 +1,13 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-module Skylab::Autonomous_Component_System::TestSupport
+module Skylab::Zerk::TestSupport
 
-  describe "[ac] modalities - reactive tree - CLI integ. - 1.", wip: true do
+  describe "[ze] niCLI - options intro", wip: true do  # (was in [ac])
 
     TS_[ self ]
     use :memoizer_methods
-    use :future_expect
-    use :modalities_reactive_tree_CLI_integration
+    # use :future_expect
+    # use :modalities_reactive_tree_CLI_integration
 
     it "1.4)   operation has description" do
       _top_help_screen.should match %r(^ +wazoozie-foozie +have 'fun'\n)
@@ -33,7 +33,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     context "(help screen)" do
 
-      shared_subject :state_ do
+      shared_subject :root_ACS_state do
 
         invoke 'waz', '-h'
 
@@ -42,21 +42,21 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       it "2.4.A) operation help screen starts with usage" do
 
-        d = state_.lookup_index 'usage'
+        d = root_ACS_state.lookup_index 'usage'
         d.should be_zero
-        _ = state_.tree.children.fetch( d ).x.unstyled
+        _ = root_ACS_state.tree.children.fetch( d ).x.unstyled
         _.should match %r(\Ausage: fam wazoozie-foozie <flim-flam>$)
       end
 
       it "2.4.B) operation help screen has description of operation" do
 
-        _node = state_.lookup 'description'
+        _node = root_ACS_state.lookup 'description'
         _node.x.unstyled.should match %r(^description: have 'fun'$)
       end
 
       it "2.4.C) operation help screen has description of parameter!" do
 
-        _ = state_.lookup( 'argument' ).to_string :unstyled
+        _ = root_ACS_state.lookup( 'argument' ).to_string :unstyled
         _.should match %r(^argument\n +<flim-flam> +'yes'$)
       end
     end
@@ -67,18 +67,18 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     context "+1  3.4)   request help on its action" do
 
-      shared_subject :state_ do
+      shared_subject :root_ACS_state do
         invoke 'fantaz', 'open', '-h'
         flush_invocation_to_help_screen_oriented_state
       end
 
       it "succeeds" do
-        state_.exitstatus.should match_successful_exitstatus
+        root_ACS_state.exitstatus.should match_successful_exitstatus
       end
 
       it "usage" do
 
-        a = state_.lookup( 'usage' ).to_lines :unstyled
+        a = root_ACS_state.lookup( 'usage' ).to_lines :unstyled
 
         _1 = "usage: fam fantazzle-dazzle open [-v] [-d] <file>"
         _2 = "       fam fantazzle-dazzle open -h"
@@ -90,13 +90,13 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       it "options" do
 
-        state_.lookup( 'options' ).children.fetch( 0 ).
+        root_ACS_state.lookup( 'options' ).children.fetch( 0 ).
           x.string.should match %r(\A  +-v, --verbose  +tha V$)
       end
 
       it "argument" do
 
-        state_.lookup( 'argument' ).children.fetch( 0 ).
+        root_ACS_state.lookup( 'argument' ).children.fetch( 0 ).
           x.string.should match %r(\A  +<file>)
       end
     end
@@ -112,6 +112,10 @@ module Skylab::Autonomous_Component_System::TestSupport
     dangerous_memoize :_top_help_screen do
       invoke '-h'
       flush_to_unstyled_string_contiguous_lines_on_stream :e
+    end
+
+    def subject_root_ACS_class
+      My_fixture_top_ACS_class[ :Class_41_File_Writer ]
     end
   end
 end

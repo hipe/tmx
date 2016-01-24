@@ -9,10 +9,10 @@ module Skylab::Autonomous_Component_System
         @_p = p
       end
 
-      def deliverable_via_selecting_session o
+      def deliverable_via_selecting_session o, & pp
 
         @_formal_params_index ||= Formal_Params_Index___.new self
-        Build_deliverable___.new( o, self ).execute
+        Build_deliverable___.new( o, self, & pp ).execute
       end
 
       # -- sub-clients
@@ -25,11 +25,11 @@ module Skylab::Autonomous_Component_System
 
       class Build_deliverable___
 
-        def initialize o, impl
+        def initialize o, impl, & pp
           @argument_stream = o.argument_stream
           @_foz = impl._formal_params_index
           @_p = impl._p
-          @pp_ = o.pp_
+          @pp_ = pp
           @selection_stack = o.selection_stack
         end
 

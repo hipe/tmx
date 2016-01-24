@@ -1,19 +1,10 @@
 module Skylab::Autonomous_Component_System::TestSupport
 
-  module Operation::Imperative_Phrase
+  module Fixture_Top_ACS_Classes
 
-    class << self
+    class Class_42_Shoe
 
-      def [] tcc
-        tcc.include self
-      end
-    end  # >>
-
-    TS_::TestLib_::Memoizer_methods[ self ]
-
-    memoize :shoe_model_ do
-
-      class Shoe
+      # -
 
         class << self
           alias_method :new_, :new
@@ -26,7 +17,7 @@ module Skylab::Autonomous_Component_System::TestSupport
             x_p
           end
 
-          ACS__[].edit x_a, self, & _oes_p_p
+          Home_.edit x_a, self, & _oes_p_p
         end
 
         def __lace__component_association
@@ -70,13 +61,12 @@ module Skylab::Autonomous_Component_System::TestSupport
         end
 
         attr_reader( :lace, :size, :special )
-      end
 
-      Local_Lib__ = TS_.lib :common_model_and_methods
+        # -
 
       class Lace
 
-        Local_Lib__::Be_compound[ self ]
+        Be_compound[ self ]
 
         def __color__component_association
           Color
@@ -87,7 +77,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       class Color
 
-        Local_Lib__::Be_component[ self ]
+        Be_component[ self ]
 
         def initialize _st
           # ..
@@ -119,12 +109,6 @@ module Skylab::Autonomous_Component_System::TestSupport
 
         attr_reader :string
       end
-
-      Shoe
-    end
-
-    ACS__  = -> do
-      Home_
     end
   end
 end

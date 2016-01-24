@@ -61,7 +61,7 @@ module Skylab::Autonomous_Component_System
 
             asc = asc_for[ entry.name_symbol ]
             if asc
-              int = asc.intent
+              int = asc.intent  # #during [#018]
               if ! int || Is_interface_intent___[ int ]
                 ___via_interface_association asc
               end

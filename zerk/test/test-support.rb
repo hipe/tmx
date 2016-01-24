@@ -28,6 +28,7 @@ module Skylab::Zerk::TestSupport
 
   Home_ = ::Skylab::Zerk
   Callback_ = Home_::Callback_
+  Autoloader__ = Callback_::Autoloader
   Lazy_ = Callback_::Lazy
 
   # -
@@ -49,151 +50,36 @@ module Skylab::Zerk::TestSupport
     end
   # -
 
-  # -- the test library node called "API"
+  # -- fixtures & mocks
 
-  API = -> tcc do
-
-    TestSupport_::Memoization_and_subject_sharing[ tcc ]
-    Callback_.test_support::Expect_event[ tcc ]
-    tcc.include API_Instance_Methods___ ; nil
+  My_fixture_top_ACS_class = -> const do
+    Fixture_Top_ACS_Classes.const_get const, false
   end
 
-  module API_Instance_Methods___
+  need_ACS = true
 
-    def call_plus_ * args
+  Remote_fixture_top_ACS_class = -> const do
+    need_ACS && Require_ACS_for_testing_[]
+    ACS_.test_support::Fixture_top_ACS_class[ const ]
+  end
 
-      guy = build_top_
-      @result = guy.call_via_argument_array_ args
-      @_top = guy.freeze
+  Require_ACS_for_testing_ = -> do
+
+    # NOTE this *must* be different than the one in the asset tree -
+    # a) this sets a different constant and b) don't mess with the
+    # constant namespace of the asset tree.
+
+    if need_ACS
+      need_ACS = false
+      ACS_ = Home_.lib_.ACS
       NIL_
     end
-
-    def call_ * args
-
-      _guy = build_top_
-      @result = _guy.call_via_argument_array_ args
-
-      NIL_
-    end
-
-    def build_top_
-
-      _cls = top_ACS_class_
-
-      _oes_p = ___handle_event_selectively
-
-      _cls.new( & _oes_p )
-    end
-
-    def ___handle_event_selectively
-
-      _manually = oes_p_
-      _manually || event_log.handle_event_selectively
-    end
-
-    attr_reader :oes_p_
-
-    def expect_result_for_failure_
-      state_.result.should match_result_for_failure_
-    end
-
-    def match_result_for_failure_
-      eql Home_::UNABLE_
-    end
-
-    def expect_result_for_success_
-      state_.result.should eql ACHIEVED_
-    end
-
-    define_method :expression_agent_for_expect_event, ( Lazy_.call do
-      Home_.lib_.brazen::API.expression_agent_instance
-    end )
-
-    # --
-
-    def flush_state_plus_
-
-      o = flush_state_
-      State_After_Invocation_Plus___[
-        remove_instance_variable( :@_top ),
-        o.result,
-        o.emission_array,
-      ]
-    end
-
-    State_After_Invocation_Plus___ = ::Struct.new(
-      :top,
-      :result,
-      :emission_array,
-    )
-
-    def flush_state_
-
-      flush_event_log_and_result_to_state remove_instance_variable :@result
-    end
   end
 
-  # mocks
-
-  fn_rx = %r(\A[^/])
-
-  fnm = nil
-  File_Name_Model_ = -> arg_st, & oes_p_p do
-
-    if arg_st.no_unparsed_exists
-      # experimental to use #[#ac-002]Detail-one
-      Callback_::KNOWN_UNKNOWN
-    else
-      fnm[ arg_st, & oes_p_p ]
-    end
+  module Fixture_Top_ACS_Classes
+    Autoloader__[ self ]
+    Here_ = self
   end
-
-  fnm = -> arg_st, & oes_p_p do
-
-    x = arg_st.gets_one
-    if x.length.zero?
-      self._K
-    elsif fn_rx =~ x
-      Callback_::Known_Known[ x ]
-    else
-      _oes_p = oes_p_p[ nil ]
-      _oes_p.call :error, :expression, :invalid_value do | y |
-        y << "paths can't be absolute - #{ ick x }"
-      end
-      UNABLE_
-    end
-  end
-
-  # -- busi speci
-
-  module Unmarshal_and_Call_and_Marshal_
-
-    def initialize & oes_p
-      @oes_p_ = oes_p
-    end
-
-    def call_via_argument_array_ args
-      Home_::API.call args, self
-    end
-
-    def unmarshal_from_ st
-      Home_.unmarshal st, self
-    end
-
-    def persist_into_ * x_a
-      Home_.persist x_a, self
-    end
-
-    def event_handler_for _
-      @oes_p_
-    end
-
-    def component_event_model
-      :hot
-    end
-  end
-
-  EMPTY_JSON_LINES_ = [ "{}\n" ]
 
   # -- exp
 
@@ -211,7 +97,7 @@ module Skylab::Zerk::TestSupport
     end
   end
 
-  class Future_Expect_ < ::Proc
+  class Future_Expect_ < ::Proc  # #todo probably away this
 
     class << self
 
@@ -250,7 +136,7 @@ module Skylab::Zerk::TestSupport
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
 
-  Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader__[ self, ::File.dirname( __FILE__ ) ]
 
   ACHIEVED_ = true
   EMPTY_A_ = []

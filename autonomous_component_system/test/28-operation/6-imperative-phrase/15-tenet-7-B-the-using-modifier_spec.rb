@@ -38,7 +38,7 @@ module Skylab::Autonomous_Component_System::TestSupport
           yield :can, :effect
 
           -> st do
-            ACS_[]::Value_Wrapper[ st.gets_one ]
+            Callback_::Known_Known[ st.gets_one ]
           end
         end
 

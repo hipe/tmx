@@ -8,7 +8,6 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :future_expect
 
     context "(one model)" do
 

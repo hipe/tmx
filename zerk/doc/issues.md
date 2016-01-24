@@ -1,3 +1,5 @@
+[#013] #open when intent
+[#012]       [ flowcharts for API syntax ]
 [#011]     #track whether/how to share across 3 CLI client classes
 [#010]       custom view controllers
 [#009] #in-progress this rewrite (and new architecture..)

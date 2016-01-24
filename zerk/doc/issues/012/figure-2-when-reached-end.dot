@@ -1,0 +1,36 @@
+digraph g {
+
+  edge [colorscheme=paired10]
+
+  label="\nfigure 2. how we process API invocatons (note there is a
+lot of nodes that only contain thoughts)"
+
+  here [label="when reached end of\nargument stream" shape=rectangle]
+
+  here->end_oper
+
+  end_oper [label="did we end on\nan operation?" shape=diamond]
+  end_oper->oper_yes [label="yes"]
+  oper_yes [label="OK: result in an\nattempt to engage\nthe operation" shape=rectangle]
+  end_oper->oper_no [label="no"]
+
+  oper_no [label="did we\never mutate\nanything?" shape=diamond]
+  oper_no->muta_yes [label="yes"]
+  oper_no->muta_no [label="no" color=10]
+
+  muta_no [label="OK: whether compound,\nentitesque or primitivesque,
+result in a qualified knownness
+about the component value" shape=rectangle]
+
+
+  muta_yes [label="did we mutate the
+last traversed
+component?" shape=diamond]
+
+  muta_yes->muta_no [label="yes" color=10]
+  muta_yes->x1_no [label="no" color=2]
+
+  x1_no [label="for now, ok. (but we
+don't like using this for\nreading primitivesques)" shape=rectangle]
+
+}

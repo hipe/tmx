@@ -4,36 +4,11 @@ module Skylab::Zerk  # intro in [#001] README
 
   class << self
 
-    def persist args, acs, & p
-
-      _oes_p_p = handler_builder_for_ acs, & p
-
-      Persist___[ args, acs, & _oes_p_p ]
-    end
-
-    def test_support
+    def test_support  # #[#ts-035]
       if ! Home_.const_defined? :TestSupport
-        load ::File.expand_path( '../../../test/test-support.rb', __FILE__ )
+        require_relative '../../test/test-support'
       end
-      Home_.const_get :TestSupport, false
-    end
-
-    def unmarshal st, acs, & p
-
-      _oes_p = handler_builder_for_ acs, & p
-
-      Unmarshal___[ st, acs, & _oes_p ]
-    end
-
-    def handler_builder_for_ acs
-
-      Require_ACS_[]
-
-      if block_given?
-        self._DESIGN_ME
-      end
-
-      acs.method :event_handler_for
+      Home_::TestSupport
     end
 
     def lib_
@@ -60,7 +35,7 @@ module Skylab::Zerk  # intro in [#001] README
 
   Callback_ = ::Skylab::Callback
 
-  Interface_stream_for_ = -> target_sym, acs do
+  Interface_stream_for_ = -> target_sym, acs do  # away at #open [#013]
 
     _ = ACS_::For_Interface::To_stream[ acs ]
 
@@ -72,58 +47,6 @@ module Skylab::Zerk  # intro in [#001] README
         true
       end
     end
-  end
-
-  Unmarshal___ = -> st, acs, & oes_p_p do
-
-    if st.respond_to? :read
-      json = st.read
-    else
-      json = ""
-      while line = st.gets
-        json.concat line
-      end
-    end
-
-    _oes_p = oes_p_p[ acs ]
-
-    o = ACS_::Modalities::JSON::Interpret.new( & _oes_p )
-    o.ACS = acs
-    o.JSON = json
-
-    o.context_linked_list = begin
-
-      _context_value = -> do
-        'in input JSON'
-      end
-
-      Home_.lib_.basic::List::Linked[ nil, _context_value ]
-    end
-
-    o.execute
-  end
-
-  Persist___ = -> args, acs, & oes_p_p do
-
-    y = args.shift
-
-    _oes_p = oes_p_p[ acs ]
-
-    o = ACS_::Modalities::JSON::Express.new( & _oes_p )
-
-    o.downstream_IO_proc = -> do
-      y
-    end
-
-    o.upstream_ACS = acs
-
-    if args.length.nonzero?
-      args.each_slice 2 do | k, x |
-        o.send :"#{ k }=", x
-      end
-    end
-
-    o.execute
   end
 
   Is_listy_ = -> sym do  # assume Fields_

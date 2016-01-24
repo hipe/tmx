@@ -1,3 +1,5 @@
+[#018]       intent
+
 [#017]       #when: [#010] finally look at keyword args
 
 [#016] #open in-situ issue with floating..
@@ -6,11 +8,11 @@
 
 [#014]       imperative phrase..
 
-[#013]   #when:step-1
+[#013]   #during:phase-1
              for classic transitive collection-oriented operations, make
              these callbacks be hook-ins not hook-outs.
 
-[#012]   #when:step-1
+[#012]   #during:phase-1
              change clients of these operations to take qk's not 2 args THEN:
          #maybe (the idea of:) get rid of operations implemented as ..
 
@@ -19,7 +21,7 @@
 
 [#010] #open this big campaign
 
-[#009]   #when:step-1 support for class-implemented operations
+[#009]   #during:phase-1 support for class-implemented operations
              AND: intro to operations..
 
 [#008]   #maybe extension API for the *modifiers* for use in mutation sessions

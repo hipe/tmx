@@ -76,7 +76,7 @@ module Skylab::Autonomous_Component_System::TestSupport
           yield :can, :rattle
 
           -> st do
-            ACS_[]::Value_Wrapper[ nil ]
+            Callback_::Known_Known[ nil ]
           end
         end
 

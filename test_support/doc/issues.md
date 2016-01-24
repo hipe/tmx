@@ -12,7 +12,14 @@
 [#038]       expect line
 [#037]       #tracking tag warnings wishlist (#parent-node: [#014])
 [#036] #ongoing   indentation in quickie
-[#035]       track the ways in which sidesystems expose test insturments
+
+[#035]       #track `def test_support` (for `\.test_support`) occurrences,
+             which *must* all follow this:
+             we must use `require_relative` (and not `require` or `load`)
+             here, otherwise if our native tests are run after this method
+             is called, ruby will load the file redundantly which under
+             some autoloaderifications will bork apparently flickeresquely
+
 [#034] #open #parent-node: [015] "re-architect.."
 [#033]       #historical #done fix test globbing .. [#xx-009]
              ( #was: #done if you un-orphanize core.rb it presents an issue with autoloader) )

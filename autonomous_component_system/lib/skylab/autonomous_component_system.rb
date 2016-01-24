@@ -79,6 +79,28 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         ACS_::Mutation
       end
 
+      def marshal_to_JSON * io_and_options, acs, & pp
+        Home_::Modalities::JSON::Marshal[ io_and_options, acs, & pp ]
+      end
+
+      def unmarshal_from_JSON io, acs, & x_p
+        Home_::Modalities::JSON::Unmarshal[ io, acs, & x_p ]
+      end
+
+      def handler_builder_for acs  # for #Hot-eventmodel
+
+        block_given? and raise ::ArgumentError
+
+        acs.method :event_handler_for
+      end
+
+      def test_support  # #[#ts-035]
+        if ! Home_.const_defined? :TestSupport
+          require_relative '../../test/test-support'
+        end
+        Home_::TestSupport
+      end
+
       def lib_
         @___lib ||=
           Callback_.produce_library_shell_via_library_and_app_modules(
@@ -302,8 +324,8 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       h = {}
 
-      LOOKS_LIKE_COMPOUND___ = Looks_Like__.new
-      sing = LOOKS_LIKE_COMPOUND___
+      LOOKS_LIKE_COMPOUND = Looks_Like__.new
+      sing = LOOKS_LIKE_COMPOUND
       class << sing
 
         def construction_method_name
@@ -534,7 +556,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         -> asc do
           ivar = asc.name.as_ivar
           if acs.instance_variable_defined? ivar
-            Value_Wrapper[ acs.instance_variable_get( ivar ) ]
+            Callback_::Known_Known[ acs.instance_variable_get( ivar ) ]
           end
         end
       end
@@ -545,10 +567,6 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
     Require_field_library_ = Callback_::Lazy.call do
       Field_ = Home_.lib_.fields  # idiomatic name
       NIL_
-    end
-
-    Value_Wrapper = -> x do
-      Callback_::Known_Known[ x ]
     end
 
     Autoloader_ = Callback_::Autoloader
