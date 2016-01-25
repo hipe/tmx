@@ -85,14 +85,8 @@ module Skylab::Zerk
 
       def primitivesque
 
-        asc = remove_instance_variable :@_non_compound
-
-        @argument_stream.advance_one  # accept it
-
-        if @argument_stream.no_unparsed_exists
-
-          _finish_parse_by_resulting_in_a_qk_for asc
-        else
+        asc = _next_autonomously_parsable_association
+        if asc
           ___autonomously_parse_via_primitivesque asc
         end
         NIL_
@@ -100,16 +94,32 @@ module Skylab::Zerk
 
       def entitesque
 
-        asc = remove_instance_variable :@_non_compound
-
-        @argument_stream.advance_one  # accept it
-
-        if @argument_stream.no_unparsed_exists
-          _finish_parse_by_resulting_in_a_qk_for asc
-        else
+        asc = _next_autonomously_parsable_association
+        if asc
           ___autonomously_parse_via_entitesque asc
         end
         NIL_
+      end
+
+      def _next_autonomously_parsable_association
+
+        asc = remove_instance_variable :@_non_compound
+
+        if asc.association_is_available
+
+          @argument_stream.advance_one  # only now can we accept the token
+
+          if @argument_stream.no_unparsed_exists
+            _finish_parse_by_resulting_in_a_qk_for asc
+            NIL_
+          else
+            asc
+          end
+        else
+          @_parse_result = UNABLE_
+          __when_association_is_not_available asc
+          NIL_
+        end
       end
 
       def ___autonomously_parse_via_primitivesque asc
@@ -235,6 +245,14 @@ module Skylab::Zerk
 
         _handler.call :error, :no_such_association do
           Here_::When_no_such_association___[ self ]
+        end
+        UNABLE_
+      end
+
+      def __when_association_is_not_available asc
+
+        _handler.call :error, :association_is_not_available do
+          Here_::When_association_is_not_available___[ @selection_stack, asc ]
         end
         UNABLE_
       end

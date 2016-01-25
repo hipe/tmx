@@ -245,6 +245,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       # -- Initializers
 
       def initialize
+        @association_is_available = true
         @_name_mutation = nil
       end
 
@@ -381,6 +382,15 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       end
 
       # -- "meta-components" (similar to #[#fi-010] universal meta-properties)
+
+      # ~ availability (mode client must implement)
+
+      def accept__is_available__meta_component yes
+        @association_is_available = yes
+        NIL_
+      end
+
+      attr_reader :association_is_available
 
       # ~ description
 

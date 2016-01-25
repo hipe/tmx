@@ -1,18 +1,20 @@
 module Skylab::Zerk::TestSupport
 
-  class Fixture_Top_ACS_Classes::Class_22_Uggs
+  module Fixture_Top_ACS_Classes
 
-    # NOTE read the note in the first spec that uses this node.
+    class Class_22_Uggs
+      # <-
 
     def initialize
-      @_is = false
+      @_flicker_yes = false
+      @_ucolor_yes = true
     end
 
     # -- just for availability
 
     def __flickerer__component_operation
 
-      yield :is_available, @_is
+      yield :is_available, @_flicker_yes
 
       -> do
         :_yep_
@@ -20,8 +22,21 @@ module Skylab::Zerk::TestSupport
     end
 
     def make_flickerer_available_!
-      @_is = true
+      @_flicker_yes = true
     end
+
+    def __upper_color__component_association
+
+      yield :is_available, @_ucolor_yes
+
+      Here_::Class_72_Color
+    end
+
+    def make_ucolor_unavailable_!
+      @_ucolor_yes = false
+    end
+
+    attr_reader :upper_color
 
     # --
 
@@ -58,6 +73,8 @@ module Skylab::Zerk::TestSupport
 
     def get_shoestring_length_
       @shoestring_length
+    end
+  # ->
     end
   end
 end
