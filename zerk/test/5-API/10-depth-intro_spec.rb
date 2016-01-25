@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] API - depth intro", wip: true do
+  describe "[ze] API - depth intro" do
 
     TS_[ self ]
     use :API
@@ -19,11 +19,10 @@ module Skylab::Zerk::TestSupport
 
       it "message tail enumerates the available items (with glyphs)" do
 
-        only_emission.should ( be_emission :error, :uninterpretable_token do | ev |
+        only_emission.should ( be_emission_ending_with :no_such_association do |ev|
 
           _ = black_and_white ev
-
-          _.should match %r(, expecting \{ subject \| verb_phrase \}\z)
+          _.should look_like_did_you_mean_for_ %w( subject verb_phrase )
         end )
       end
     end
@@ -38,12 +37,13 @@ module Skylab::Zerk::TestSupport
         )
       end
 
-      it "wins" do
-        self._CHANGED
-        expect_result_for_success_
+      it "result is the last componet that was set - a primitivesque" do
+        qk = root_ACS_result
+        qk.value_x.should eql 'like'
+        qk.association.name_symbol.should eql :verb
       end
 
-      it "evo" do
+      it "(emits each time a leaf component was set)" do
 
         be_this_emission = be_emission :info, :set_leaf_component
         st = Callback_::Stream.via_nonsparse_array root_ACS_state.emission_array
@@ -57,16 +57,6 @@ module Skylab::Zerk::TestSupport
     end
 
     def subject_root_ACS_class
-      _require_model
-      Two_Sentence
-    end
-
-    def _build_verb_phrase
-      _require_model
-      Two_Verb_Phrase.new
-    end
-
-    def _require_model
       Remote_fixture_top_ACS_class[ :Class_41_Sentence ]
     end
   end

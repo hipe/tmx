@@ -99,7 +99,7 @@ module Skylab::Zerk::TestSupport
 
       _against input_s
       if @result
-        expect_no_events
+        expect_no_emissions
         @result.should eql output_a
       else
         ___when_had_no_result

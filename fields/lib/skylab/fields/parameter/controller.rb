@@ -103,7 +103,6 @@ module Skylab::Fields
       end
 
       CONST_SEP_ = '::'
-      SPACE_ = ' '
       UNDERSCORE_ = '_'
     end
   end

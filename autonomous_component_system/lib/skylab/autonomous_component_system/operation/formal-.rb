@@ -24,6 +24,7 @@ module Skylab::Autonomous_Component_System
 
       def ___init_via m, a
         @_method_name = m
+        @operation_is_available = true
         @selection_stack = a
         self
       end
@@ -37,8 +38,6 @@ module Skylab::Autonomous_Component_System
       # --
 
       def execute
-
-        _ACS = @selection_stack.fetch( -2 ).value_x
 
         x = _ACS.send @_method_name do | * x_a |
 
@@ -60,12 +59,23 @@ module Skylab::Autonomous_Component_System
         self
       end
 
+      def _ACS
+        @selection_stack.fetch( -2 ).value_x
+      end
+
       def ___accept_proc_as_implementation x
         @_reifier = Here_::Proc_based_Implementation___.new x, self
         NIL_
       end
 
       # --
+
+      def __accept__is_available__meta_component st
+        @operation_is_available = st.gets_one
+        NIL_
+      end
+
+      attr_reader :operation_is_available
 
       def __accept__parameter__meta_component st
 
@@ -75,6 +85,10 @@ module Skylab::Autonomous_Component_System
       end
 
       attr_reader :box
+
+      def name
+        @selection_stack.fetch( -1 )
+      end
     end
   end
 end

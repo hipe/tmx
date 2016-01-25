@@ -2,69 +2,84 @@ require_relative '../test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] API - depth and params integration", wip: true do  # used to test r.t
+  describe "[ze] API - primitive get and set" do
+
+    # NOTE the implementation of and syntax for this used to have more
+    # moving parts before we made the simplification illustrated in [#012].
+    #
+    # (we used have what amounted to a somewhat redundant implementation
+    # of something resembling "transitive operations" but only for
+    # interfaces. now, interface-specifics are not allowed in ACS's,
+    # and getters/setters arrive out of the box in a zerk API.)
+    #
+    # as such, this is now more redundant than it used to be with previous
+    # test and so it is now subject to re-appropriation.
 
     TS_[ self ]
-    use :memoizer_methods
-    # use :future_expect
-    # use :modalities_reactive_tree
+    use :API
 
     context "several component association with proc-like models.." do
 
-      it "one with no assoc-operations is not exposed to the UI" do
+      context "get when not set" do
 
-        _init_fresh_setup
-
-        @_shoe._did_run_.should be_nil
-
-        future_expect_only :error, :no_such_action
-
-        call_root_ACS :ugg, :looks_like_proc_but_no_operations
-
-        @_shoe._did_run_.should eql true
-
-        @result.should eql false
-      end
-
-      it "omg the hypothetic `get` would work" do
-
-        _init_fresh_setup
-
-        call_root_ACS :ugg, :shoestring_length, :abrufen
-
-        @result.should eql :_was_not_known_
-
-        @_shoe.instance_variable_set :@shoestring_length, :zizzy
-
-        call_root_ACS :ugg, :shoestring_length, :abrufen
-
-        @result.should eql [ :_was_known_huddaugh_, :zizzy ]
-      end
-
-      it "and check out this `set` that takes an invalid" do
-
-        _init_fresh_setup
-
-        future_expect_only :error, :expression, :nope do | s_a |
-          [ "doesn't look like integer: \"98 degrees\"" ]
+        call_by do
+          call :shoestring_length
         end
 
-        @_shoe._recv_etc( & fut_p )
-
-        call_root_ACS :ugg, :shoestring_length, :stellen, :length, '98 degrees'
-
-        @result.should eql false
+        it "qk etc" do
+          qk = root_ACS_result
+          qk.is_known_known and fail
+          qk.association.name_symbol.should eql :shoestring_length
+        end
       end
 
-      it "and yes, yay, take valid" do
+      context "get when set" do
 
-        _init_fresh_setup
+        call_by do
+          @root_ACS = build_root_ACS
+          @root_ACS.set_shoestring_length_ 123
+          call :shoestring_length
+        end
 
-        call_root_ACS :ugg, :shoestring_length, :stellen, :length, '98'
+        it "ok" do
+          root_ACS_result.value_x.should eql 123
+        end
+      end
 
-        @_shoe.instance_variable_get( :@shoestring_length ).should eql 98
+      context "set when invalid" do
 
-        @result.should eql :_you_did_it_
+        call_by do
+          call :shoestring_length, '98 degrees'
+        end
+
+        it "fails" do
+          fails
+        end
+
+        it "emits" do
+
+          _be_this = be_emission :error, :expression, :nope do | s_a |
+            [ "doesn't look like integer: \"98 degrees\"" ]
+          end
+
+          only_emission.should _be_this
+        end
+      end
+
+      context "set when valid" do
+
+        call_by do
+          call :shoestring_length, '98'
+        end
+
+        it "appears to work" do
+          _qk = root_ACS_result
+          _qk.value_x.should eql 98
+        end
+
+        it "worked" do
+          root_ACS.get_shoestring_length_.should eql 98
+        end
       end
     end
 

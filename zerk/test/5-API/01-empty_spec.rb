@@ -23,7 +23,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "(emits nothing)" do
-        no_events
+        expect_no_emissions
       end
     end
 

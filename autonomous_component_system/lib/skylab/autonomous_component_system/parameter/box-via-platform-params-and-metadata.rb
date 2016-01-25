@@ -37,18 +37,18 @@ module Skylab::Autonomous_Component_System
 
           _add_me = if existing
             existing.dup.instance_exec do
-              @parameter_arity ||= :one
               if edit
                 instance_exec( & edit )
               end
+              @parameter_arity ||= :one
               self
             end
           else
             Here_.new_by__ do
-              @parameter_arity = :one
               if edit
                 instance_exec( & edit )
               end
+              @parameter_arity ||= :one
               @name_symbol = sym
             end
           end
@@ -62,7 +62,8 @@ module Skylab::Autonomous_Component_System
       PARAM_ARITY___ = {
         req: NOTHING_,
         rest: -> do
-          self._SPECIAL
+          @argument_arity = :zero_or_more
+          @parameter_arity = :zero_or_more
         end,
       }
 

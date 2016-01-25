@@ -81,6 +81,7 @@ module Skylab::Autonomous_Component_System
 
       def __finish  # #[#117]
 
+        method_call_arguments = []
         miss_a = nil
 
         act_h = @_out_box.h_
@@ -91,8 +92,6 @@ module Skylab::Autonomous_Component_System
           par or break
           k = par.name_symbol
 
-          # Field_::Takes_many_arguments[ par ]  not our concern for now..
-
           x = act_h.fetch k
           if x.nil? && Field_::Has_default[ par ]
             x = par.default_proc.call
@@ -101,6 +100,15 @@ module Skylab::Autonomous_Component_System
 
           if Field_::Is_required[ par ] && x.nil?
             ( miss_a ||= [] ).push par
+            redo
+          end
+
+          if Field_::Takes_many_arguments[ par ]
+            if x
+              method_call_arguments.concat x
+            end
+          else
+            method_call_arguments.push x
           end
 
           redo
@@ -110,8 +118,7 @@ module Skylab::Autonomous_Component_System
           raise ::ArgumentError, ___say_missing( miss_a )
             # [#004]#exe explains why we raise here
         else
-          _ = @_out_box.enum_for( :each_value ).to_a
-          _
+          method_call_arguments
         end
       end
 

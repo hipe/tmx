@@ -61,7 +61,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       end
 
       it "no events" do
-        emission_count.should be_zero
+        expect_no_emissions
       end
     end
 

@@ -2,12 +2,19 @@ module Skylab::Zerk::TestSupport
 
   class Fixture_Top_ACS_Classes::Class_21_Another_Shoe
 
-    # (similar to another model elsewhere)
+    Require_ACS_for_testing_[]
 
-    # -- Components
+    O__ = ACS_.test_support
+
+    def __shoe__component_association
+      Shoe
+    end
+
+  class Shoe
+
+    O__::Be_compound[ self ]
 
     def __lace__component_association
-
       Lace
     end
 
@@ -18,34 +25,36 @@ module Skylab::Zerk::TestSupport
     def __globbie_guy__component_operation
 
       -> * file do
-        file
+        file.map( & :upcase )
       end
     end
 
     def __globbie_complex__component_operation
 
-      -> action, is_dry=false, verbose=false, *file do
+      yield :parameter, :is_dry, :default, false
 
-        [ action, is_dry, verbose, file ]
+      yield :parameter, :verbose, :default, false
+
+      -> action, is_dry, verbose, *file do
+
+        [ :_fun_, action, is_dry, verbose, file ]
       end
     end
   end
 
   class Lace
 
-    Be_component[ self ]
+    O__::Be_compound[ self ]
 
-    def initialize & oes_p_p
-
+    def initialize
       @color = 'white'
-      @_oes_p = oes_p_p[ self ]
     end
 
     def __get_color__component_operation
 
-      -> & use_p do  # [#006]#Event-models
+      -> & pp do  # [#006]#Event-models
 
-        use_p.call :info, :expression, :working do | y |
+        pp[ self ].call :info, :expression, :working do | y |
           y << "retrieving #{ highlight 'color' }"
         end
 
@@ -55,9 +64,9 @@ module Skylab::Zerk::TestSupport
 
     def __set_length__component_operation
 
-      -> length, & call_p do
+      -> length, & pp do
 
-        use_p = call_p  # currently, parents have no signal processing methods
+        use_p = pp[ self ]
 
         x = length
 
@@ -87,6 +96,14 @@ module Skylab::Zerk::TestSupport
           ok
         end
       end
+    end
+    def hello
+      :_hi_im_lace_
+    end
+  end
+
+    def self.hello
+      :_omg_shoes_
     end
   end
 end

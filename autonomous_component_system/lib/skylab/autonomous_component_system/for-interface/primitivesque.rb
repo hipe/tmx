@@ -53,27 +53,5 @@ module Skylab::Autonomous_Component_System
         @_qkn
       end
     end
-
-    class Operation___ < ACS_::Operation
-
-      class << self
-        alias_method :__new, :new
-        public :__new
-      end
-
-      def initialize sym, qkn, acs
-
-        super acs
-
-        @_qkn = qkn
-
-        init_for_sym_ sym
-      end
-
-      def method_and_args_for_ sym
-
-        [ :"__#{ sym }__primitivesque_component_operation_for", @_qkn ]
-      end
-    end
   end
 end

@@ -29,10 +29,21 @@ module Skylab::Zerk::TestSupport
         root_ACS_result.should eql Home_::UNABLE_
       end
 
+      # -- assertion for emission language
+
+      def look_like_did_you_mean_for_ s_a
+
+        _rxs = s_a.map do |s|
+          "'#{ s }'"
+        end.join ' \| '
+
+        match %r(, expecting \{ #{ _rxs } \}\z)
+      end
+
       # -- assertion for emissions
 
-      def no_events
-        emission_count.should be_zero
+      def no_such_association_
+        :no_such_association
       end
 
       def set_leaf_component_

@@ -91,16 +91,48 @@ module Skylab::Zerk
 
         if @argument_stream.no_unparsed_exists
 
-          __finish_parse_by_resulting_in_a_qk_for asc
+          _finish_parse_by_resulting_in_a_qk_for asc
         else
           ___autonomously_parse_via_primitivesque asc
         end
         NIL_
       end
 
+      def entitesque
+
+        asc = remove_instance_variable :@_non_compound
+
+        @argument_stream.advance_one  # accept it
+
+        if @argument_stream.no_unparsed_exists
+          _finish_parse_by_resulting_in_a_qk_for asc
+        else
+          ___autonomously_parse_via_entitesque asc
+        end
+        NIL_
+      end
+
       def ___autonomously_parse_via_primitivesque asc
 
-        kn = asc.component_model[ @argument_stream, & @_pp ]
+        _kn = asc.component_model[ @argument_stream, & @_pp ]
+        _after_autonomous_parse _kn, asc
+        NIL_
+      end
+
+      def ___autonomously_parse_via_entitesque asc
+
+        self._COVER_ME_worked_once_then_we_changed_the_fixture
+
+        qk = @selection_stack.last.read asc
+        if qk.is_known_known
+          self._DECIDE_BEHAVIOR_HERE_do_we_steamroll_the_old_entity_entirely?
+        end
+        _kn = asc.component_model.interpret_component @argument_stream, & @_pp
+        _after_autonomous_parse _kn, asc
+        NIL_
+      end
+
+      def _after_autonomous_parse kn, asc
         if kn
           ___accept_new_component_value kn, asc
 
@@ -163,15 +195,15 @@ module Skylab::Zerk
 
         _nf = Callback_::Name.via_variegated_symbol _op_name_symbol
 
-        _receiver = @selection_stack.last.value_x
+        otr = @selection_stack.dup  # ours always has compound on top
+        otr.push _nf
+        fo = @_Formal.via_method_name_and_selection_stack m, otr
 
-        _frame = Callback_::Qualified_Knownness[ _receiver, _op_name_symbol ]
-
-        @selection_stack.push _frame  # strange frame - note name and value
-
-        _fo = @_Formal.via_method_name_and_selection_stack m, @selection_stack
-
-        de = _fo.deliverable_via_selecting_session self, & @_pp
+        if fo.operation_is_available
+          de = fo.deliverable_via_selecting_session self, & @_pp
+        else
+          de = __when_operation_not_available fo
+        end
 
         if de
           if @argument_stream.no_unparsed_exists
@@ -180,11 +212,11 @@ module Skylab::Zerk
             __when_extra
           end
         else
-          self._COVER_ME_args_didnt_parse
+          de
         end
       end
 
-      def __finish_parse_by_resulting_in_a_qk_for asc
+      def _finish_parse_by_resulting_in_a_qk_for asc
 
         _qk = @selection_stack.last.read asc
         _finish_parse_by_resulting_in _qk
@@ -207,6 +239,14 @@ module Skylab::Zerk
         UNABLE_
       end
 
+      def __when_operation_not_available fo
+
+        _handler.call :error, :operation_is_not_available do
+          Here_::When_operation_is_not_available___[ fo ]
+        end
+        UNABLE_
+      end
+
       def __when_extra
 
         x = @argument_stream.current_token
@@ -220,6 +260,7 @@ module Skylab::Zerk
       end
 
       def _handler
+
         @_pp[ @selection_stack.last.value_x ]
       end
 

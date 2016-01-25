@@ -350,6 +350,10 @@ module Skylab::Callback::TestSupport
 
       # -- the newschool ways (matcher-based) (frontiered by [ze] for now..)
 
+      def expect_no_emissions
+        emission_count.should be_zero
+      end
+
       def emission_count
         emission_array.length
       end

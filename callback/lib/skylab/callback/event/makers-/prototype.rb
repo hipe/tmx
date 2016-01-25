@@ -190,6 +190,13 @@ module Skylab::Callback
             end
           end
 
+          def inline_with__EXPERIMENTAL__ * x_a
+            construct do
+              __hack_a_different_term_chan_sym x_a
+              freeze
+            end
+          end
+
           def new_via_each_pairable bx
             construct do
               __init_via_each_pairable bx
@@ -244,9 +251,23 @@ module Skylab::Callback
           #  has a formal property, set the ivar; else call a custom
           #  iambic parsing method. also nil-out any not-set values.)
 
+          _write_members Home_::Polymorphic_Stream.via_array x_a
+        end
+
+        def __hack_a_different_term_chan_sym x_a
+
+          st = Home_::Polymorphic_Stream.via_array x_a
+          _CUSTOM_TERM_CHAN_SYM = st.gets_one
+          _write_members st
+          define_singleton_method :terminal_channel_i do
+            _CUSTOM_TERM_CHAN_SYM
+          end
+        end
+
+        def _write_members st  # caller should freeeze
+
           bx = formal_properties
           ok = true
-          st = Home_::Polymorphic_Stream.via_array x_a
 
           at_end = EMPTY_P_
           did = false

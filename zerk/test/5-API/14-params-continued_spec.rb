@@ -1,64 +1,87 @@
 require_relative '../test-support'
 
-module Skylab::Autonomous_Component_System::TestSupport
+module Skylab::Zerk::TestSupport
 
-  describe "[ze] API - params continued", wip: true do
+  describe "[ze] API - params continued" do
 
     TS_[ self ]
-    use :future_expect
-    # use :modalities_reactive_tree
+    use :API
 
-    it "call a thing with one required arg (invalid)" do
+    context "call a thing with one required arg (invalid)" do
 
-      self._BREAKUP
-
-      future_expect_only :info, :expression, :too_low
-
-      call_root_ACS :shoe, :lace, :set_length, :length, '-4'
-
-      expect_failed_
-    end
-
-    it "same (valid)" do
-
-      call_root_ACS :shoe, :lace, :set_length, :length, '1'
-
-      @result.should eql :_yay_
-    end
-
-    it "globbie guy - normal" do
-
-      call_root_ACS :shoe, :globbie_guy, :file, [ :one, :two ]
-
-      @result.should eql [ :one, :two ]
-    end
-
-    it "complex globby - experimental crazy - defaults work" do
-
-      call_root_ACS :shoe, :globbie_complex, :action, :A
-
-      @result.should eql [ :A, false, false, [] ]
-    end
-
-    it "complex globby - works sort of.." do
-
-      call_root_ACS :shoe, :globbie_complex,
-        :action, :A, :is_dry, true, :verbose, :false, :file, [ :a, :b ]
-
-      @result.should eql [ :A, true, :false, [ :a, :b ] ]
-    end
-
-    it "options are not truly optional" do
-
-      begin
-
-        call_root_ACS :shoe, :globbie_complex,
-          :action, :A, :file, [ :a, :b ]
-      rescue ::ArgumentError => e
+      call_by do
+        call :shoe, :lace, :set_length, '-4'
       end
 
-      e.message.should match %r( because of our leaky isomorphism )
+      it "fails" do
+        fails
+      end
 
+      it "emits" do
+        _be_this = be_emission :info, :expression, :too_low
+        only_emission.should _be_this
+      end
+    end
+
+    context "same (valid)" do
+
+      call_by do
+        call :shoe, :lace, :set_length, '1'
+      end
+
+      it "ok" do
+        root_ACS_result.should eql :_yay_
+      end
+    end
+
+    context "globbie guy - normal" do
+
+      call_by do
+        call :shoe, :globbie_guy, [ :one, :two ]
+      end
+
+      it "the argument uses the glob parameter as it's supposed to" do
+        root_ACS_result.should eql [ :ONE, :TWO ]
+      end
+    end
+
+    context "complex globby - defaults work" do
+
+      call_by do
+        call :shoe, :globbie_complex, :action, :A
+      end
+
+      it "ok" do
+        _x = root_ACS_result
+        _x.should eql [ :_fun_, :A, false, false, [] ]
+      end
+    end
+
+    context "complex globby - glob works" do
+
+      call_by do
+        call :shoe, :globbie_complex,
+        :action, :A, :is_dry, true, :verbose, :false, :file, [ :a, :b ]
+      end
+
+      it "ok" do
+
+        _x = root_ACS_result
+        _x.should eql [ :_fun_, :A, true, :false, [ :a, :b ] ]
+      end
+    end
+
+    context "optional are truly optional (unlike if you tried to use proc defaults)" do
+
+      call_by do
+        call :shoe, :globbie_complex,
+          :action, :A, :file, [ :a, :b ]
+      end
+
+      it "ok" do
+        _x = root_ACS_result
+        _x.should eql [ :_fun_, :A, false, false, [ :a, :b ] ]
+      end
     end
 
     def subject_root_ACS_class

@@ -440,5 +440,6 @@ module Skylab::Fields
   EMPTY_S_ = ""
   Home_ = self
   NIL_ = nil
+  SPACE_ = ' '
   UNABLE_ = false
 end

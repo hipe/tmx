@@ -114,6 +114,7 @@ module Skylab::Autonomous_Component_System
       )
 
       def __interpret__is_flag__ _
+        @parameter_arity = :zero_or_one
         @argument_arity = :zero
         KEEP_PARSING_
       end

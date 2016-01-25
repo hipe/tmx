@@ -50,7 +50,7 @@ module Skylab::Fields
 
         def ___build_event qkn, bx
 
-          _ = Build_extra_value_event[
+          _ = Here_::Build_extra_value_event[
             qkn.value_x,
             bx.get_names,
             qkn.association.name_function,
@@ -58,89 +58,7 @@ module Skylab::Fields
           _
         end
       end ; end
-
-      class Build_extra_value_event
-
-        class << self
-
-          def _call x, x_a, nf
-            o = new
-            o.invalid_value = x
-            o.valid_collection = x_a
-            o.property_name = nf
-            o.execute
-          end
-
-          alias_method :[], :_call
-          alias_method :call, :_call
-        end  # >>
-
-        attr_writer(
-          :adjective,
-          :invalid_value,
-          :valid_collection,
-          :property_name,
-          :event_name_symbol,
-          :valid_value_mapper_from,
-        )
-
-        def initialize
-          @adjective = nil
-          @event_name_symbol = nil
-          @valid_value_mapper_from = nil
-        end
-
-        def execute
-
-          Callback_::Event.inline_not_OK_with(
-
-            ( @event_name_symbol || :invalid_property_value ),
-
-            :x, @invalid_value,
-            :property_name, @property_name,
-            :enum_value_polymorphic_streamable, @valid_collection,
-            :valid_value_mapper_from, @valid_value_mapper_from,
-            :adjective, @adjective,
-            :error_category, :argument_error,
-
-
-          ) do | y, o |
-
-            x = o.enum_value_polymorphic_streamable
-
-            x_a = ::Array.try_convert x
-            if ! x_a
-              x_a = x.flush_remaining_to_array
-            end
-
-            val = ( o.valid_value_mapper_from || Valid_value_mapper___ )[ self ]
-
-            x_a = x_a.map do | x_ |
-              val[ x_ ]
-            end
-
-            _expecting = case 1 <=> x_a.length
-            when -1
-              "{ #{ x_a * ' | ' } }"
-            when 0
-              x_a.fetch 0
-            when 1
-              '{}'
-            end
-
-            _adj = o.adjective || "invalid"  # ..
-
-            y << "#{ _adj } #{ o.property_name.as_human } #{ ick o.x }, #{
-              }expecting #{ _expecting }"
-          end
-        end
-
-        Valid_value_mapper___ = -> expag do
-          -> sym do
-            sym.id2name
-          end
-        end
-      end
-    # -
+    # <-
+    Here_ = self
   end
 end

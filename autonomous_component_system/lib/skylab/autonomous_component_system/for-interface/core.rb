@@ -13,7 +13,8 @@ module Skylab::Autonomous_Component_System
         end
       end
 
-      class Infer_stream < Callback_::Actor::Monadic
+      class Infer_stream < Callback_::Actor::Monadic  # DURING [#018]..
+        # .. take this whole node away and rewrite clients to use mappers
 
         # hand-write a map-reduce stream whereby for all entries of category
         # `operation` and for those entries of category `association` whose
@@ -92,10 +93,19 @@ module Skylab::Autonomous_Component_System
 
         def __qkn_for_first_operation first_entry
 
-          operation_for = Home_::Operation.reader_for @ACS
+          lib = Home_::Operation::Formal_  # #violation
+
+          fake_selection_stack_base = [ Callback_::Known_Known[ @ACS ] ]
 
           p = -> entry do
-            operation_for[ entry.name_symbol ]
+
+            _m = lib.method_name_for_symbol entry.name_symbol
+
+            a = fake_selection_stack_base.dup
+
+            a.push Callback_::Name.via_variegated_symbol entry.name_symbol
+
+            lib.via_method_name_and_selection_stack _m, a
           end
 
           @_qkn_for_category[ :operation ] = p

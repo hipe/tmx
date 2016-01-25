@@ -83,7 +83,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       end
 
       it "emits nothing" do
-        emission_count.should be_zero
+        expect_no_emissions
       end
 
       it "unmarshalled OK" do
