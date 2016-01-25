@@ -1,5 +1,4 @@
-[#018]       intent (1x)
-
+[#018]       [ load ticket ]  (as a concept)
 [#017]       #when: [#010] finally look at keyword args
 
 [#016] #open in-situ issue with floating..

@@ -12,6 +12,15 @@ module Skylab::Zerk
         @qualified_knownness = qk
       end
 
+      def to_node_stream_
+        st = ACS_::Reflection::To_node_stream[ @qualified_knownness.value_x ]
+        x = __mask__
+        if x
+          self._ETC
+        end
+        st
+      end
+
       def __mask__
         NOTHING_  # #during [#013]
       end

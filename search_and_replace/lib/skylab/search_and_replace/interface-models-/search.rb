@@ -30,6 +30,8 @@ module Skylab::SearchAndReplace
       p[ self ]
     end
 
+    self._LOOK_the_below_methods_upstream_API_has_changed  # near phase 1 milestone 1
+
     def to_stream_for_component_interface
 
       # for the components dynamically injected to us from above,

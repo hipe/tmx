@@ -123,6 +123,15 @@ module Skylab::Autonomous_Component_System::TestSupport
       end
     end
 
+    Class_72_Trueish = -> st do
+      x = st.gets_one
+      if x
+        Callback_::Known_Known[ x ]
+      else
+        self._NOT_NEEDED_YET
+      end
+    end
+
     Autoloader__[ self ]
     Here_ = self
   end

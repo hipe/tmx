@@ -39,7 +39,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       dangerous_memoize :_the_memoized_array do
 
         _hi = ___the_ACS_class.new
-        _st = ACS_X_1::ACS_::For_Interface::Infer_stream[ _hi ]
+        _st = Home_::Reflection::To_node_stream_via_inference[ _hi ]
         _st.to_a
       end
 

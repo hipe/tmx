@@ -36,18 +36,7 @@ module Skylab::Autonomous_Component_System
         end
       end
 
-      def to_stream_for_component_interface
-
-        bx = @_qkn.association.transitive_capabilities_box
-        if bx
-          _st = bx.to_name_stream
-          _st.map_by do | symmo |
-            Operation___.__new symmo, @_qkn, @ACS
-          end
-        else
-          Callback_::Stream.the_empty_stream
-        end
-      end
+      # (used to have ..)
 
       def wrapped_qualified_knownness
         @_qkn

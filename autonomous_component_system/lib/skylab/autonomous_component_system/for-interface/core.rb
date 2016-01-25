@@ -4,116 +4,6 @@ module Skylab::Autonomous_Component_System
 
     module For_Interface  # notes in [#003]
 
-      To_stream = -> acs do
-
-        if acs.respond_to? :to_stream_for_component_interface
-          acs.to_stream_for_component_interface
-        else
-          Infer_stream[ acs ]
-        end
-      end
-
-      class Infer_stream < Callback_::Actor::Monadic  # DURING [#018]..
-        # .. take this whole node away and rewrite clients to use mappers
-
-        # hand-write a map-reduce stream whereby for all entries of category
-        # `operation` and for those entries of category `association` whose
-        # component association states or implies an intent of `interface`,
-        # produce a qualified knownness-like structure.
-
-        # build the bound reader (one per category) lazily, only when the
-        # ACS is found to define one or more entries of that category.
-
-        def initialize acs
-          @ACS = acs
-
-          @_qkn_for_category = {
-            association: method( :__qkn_for_first_association ),
-            operation: method( :__qkn_for_first_operation ),
-          }
-        end
-
-        def execute
-
-          st = Home_::Reflection_::To_entry_stream[ @ACS ]
-
-          Callback_.stream do  # (hand-written map-reduce for clarity)
-            begin
-
-              entry = st.gets
-              entry or break
-
-              qkn_ish = @_qkn_for_category.fetch( entry.category ).call entry
-              qkn_ish or redo
-              break
-
-            end while nil
-
-            qkn_ish
-          end
-        end
-
-        def __qkn_for_first_association first_entry
-
-          asc_for = Component_Association.reader_for @ACS
-          @_qkn_for = Home_::Reflection_::Reader[ @ACS ]
-
-          p = -> entry do
-
-            asc = asc_for[ entry.name_symbol ]
-            if asc
-              int = asc.intent  # #during [#018]
-              if ! int || Is_interface_intent___[ int ]
-                ___via_interface_association asc
-              end
-            else
-              NIL_  # conditionally turn a whole assoc. off [sa]
-            end
-          end
-
-          @_qkn_for_category[ :association ] = p
-
-          p[ first_entry ]
-        end
-
-        def ___via_interface_association asc  # compare to here-A
-
-          qk = @_qkn_for[ asc ]
-          if qk.is_effectively_known
-            if asc.model_classifications.looks_primitivesque
-              self._NOT_UNTIL_during_milestone_2
-              Home_::For_Interface::Primitivesque.new qk, @ACS
-            else
-              qk
-            end
-          else
-            qk
-          end
-        end
-
-        def __qkn_for_first_operation first_entry
-
-          lib = Home_::Operation::Formal_  # #violation
-
-          fake_selection_stack_base = [ Callback_::Known_Known[ @ACS ] ]
-
-          p = -> entry do
-
-            _m = lib.method_name_for_symbol entry.name_symbol
-
-            a = fake_selection_stack_base.dup
-
-            a.push Callback_::Name.via_variegated_symbol entry.name_symbol
-
-            lib.via_method_name_and_selection_stack _m, a
-          end
-
-          @_qkn_for_category[ :operation ] = p
-
-          p[ first_entry ]
-        end
-      end
-
       class Touch < Callback_::Actor::Dyadic  # result is a qk-ish
 
         # 1) by default when we create a new component value for these ones,
@@ -203,13 +93,6 @@ module Skylab::Autonomous_Component_System
         Home_::Interpretation_::Write_value[ qk.value_x, asc, acs ]
         qk
       end
-
-      Is_interface_intent___ = {
-        # (etc..)
-        interface: true,
-        API: true,
-        UI: true,
-      }.method :[]
 
     end
   # -

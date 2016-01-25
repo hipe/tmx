@@ -31,7 +31,13 @@ module Skylab::Autonomous_Component_System::TestSupport
       _cls = subject_root_ACS_class
 
       if ! oes_p
-        oes_p = event_log.handle_event_selectively
+        el = event_log
+        if el
+          oes_p = el.handle_event_selectively
+        else
+          @event_log ||= nil
+          oes_p = No_events_
+        end
       end
 
       _cls.new( & oes_p )

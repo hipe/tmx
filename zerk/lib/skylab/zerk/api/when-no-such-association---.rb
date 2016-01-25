@@ -3,13 +3,12 @@ module Skylab::Zerk
   module API
 
     # -
-      _API_node_stream_for = nil
 
       When_no_such_association___ = -> up do
 
         Require_field_library_[]
 
-        _st = _API_node_stream_for[ up.selection_stack.last ]
+        _st = up.selection_stack.last.to_node_stream_
 
         _st_ = _st.map_by do |qk|
           qk.name.as_variegated_symbol
@@ -38,18 +37,6 @@ module Skylab::Zerk
         end
 
         o.execute
-      end
-
-      _API_node_stream_for = -> frame do
-
-        st = ACS_::For_Interface::To_stream[ frame.value_x ]
-
-        x = frame.__mask__  # #during #open [#013]
-        if x
-          self._K
-        end
-
-        st
       end
     # ->
   end

@@ -526,52 +526,6 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       end
     end
 
-    module Reflection
-
-      to_component_association_stream = nil
-      To_qualified_knownness_stream = -> acs do
-
-        qkn_for = ACS_::Reflection_::Reader[ acs ]
-
-        to_component_association_stream[ acs ].map_by do | asc |
-
-          qkn_for[ asc ]
-        end
-      end
-
-      to_component_association_stream = -> acs do
-
-        asc_for = Component_Association.reader_for acs
-
-        ACS_::Reflection_::To_entry_stream[ acs ].map_reduce_by do | entry |
-
-          if entry.is_association
-
-            asc_for[ entry.name_symbol ]
-          end
-        end
-      end
-
-      Ivar_based_value_writer = -> acs do
-
-        -> qkn do
-          ACS_::Interpretation_::Write_via_ivar[ qkn, acs ]
-        end
-      end
-
-      Ivar_based_value_reader = -> acs do
-
-        # (similar but necessarily different from the other)
-
-        -> asc do
-          ivar = asc.name.as_ivar
-          if acs.instance_variable_defined? ivar
-            Callback_::Known_Known[ acs.instance_variable_get( ivar ) ]
-          end
-        end
-      end
-    end
-
     Callback_ = ::Skylab::Callback
 
     Require_field_library_ = Callback_::Lazy.call do

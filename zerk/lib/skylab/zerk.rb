@@ -35,20 +35,6 @@ module Skylab::Zerk  # intro in [#001] README
 
   Callback_ = ::Skylab::Callback
 
-  Interface_stream_for_ = -> target_sym, acs do  # away at #open [#013]
-
-    _ = ACS_::For_Interface::To_stream[ acs ]
-
-    _.reduce_by do | qkn |
-      sym = qkn.association.intent
-      if sym
-        target_sym == sym
-      else
-        true
-      end
-    end
-  end
-
   Is_listy_ = -> sym do  # assume Fields_
     if sym
       Fields_::Can_be_more_than_zero[ sym ]
