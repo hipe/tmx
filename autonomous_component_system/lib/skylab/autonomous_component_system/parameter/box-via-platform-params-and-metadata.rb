@@ -44,7 +44,7 @@ module Skylab::Autonomous_Component_System
               self
             end
           else
-            Here_.new_by__ do
+            Here_.new_by_ do
               if edit
                 instance_exec( & edit )
               end

@@ -9,7 +9,7 @@ module Skylab::Autonomous_Component_System
         # basically a re-imagining of [#ca-059] "bound call" but with
         # implementation for our two modifiers-derived conditionals.
 
-        def initialize ss, modz=nil, args, rcvr, mn, & pp
+        def initialize modz, ss, bc
 
           if modz
             has_conditions = modz.has_conditions
@@ -19,11 +19,8 @@ module Skylab::Autonomous_Component_System
             end
           end
 
-          @_args = args
+          @_bound_call = bc
           @_has_conditions = has_conditions
-          @_method_name = mn
-          @pp_ = pp
-          @_receiver = rcvr
           @selection_stack = ss
         end
 
@@ -78,7 +75,9 @@ module Skylab::Autonomous_Component_System
 
           # #during:[#012] change the below too
 
-          _yes = @_receiver.send _m, * @_args, & _event_handler
+          bc = @_bound_call
+
+          _yes = bc.receiver.send _m, * bc.args, & _event_handler
 
           _yes
         end
@@ -95,7 +94,8 @@ module Skylab::Autonomous_Component_System
               :"expect_component__#{ assu.symbol }__"
             end
 
-            last_value = @_receiver.send _m, * @_args, & _event_handler
+            bc = @_bound_call
+            last_value = bc.receiver.send _m, * bc.args, & _event_handler
 
             last_value or break
           end
@@ -108,7 +108,9 @@ module Skylab::Autonomous_Component_System
         end
 
         def _deliver
-          x = @_receiver.send @_method_name, * @_args, & @pp_
+
+          bc = @_bound_call
+          x = bc.receiver.send bc.method_name, * bc.args, & bc.block
           x &&= ___after_deliver x
           if x
             Successful_Delivery_Result___.new x
@@ -155,27 +157,14 @@ module Skylab::Autonomous_Component_System
         #    call (for [ze]) BUT look at everything you lose (before hooks
         #    and after hooks..)
 
-        def receiver
-          @_receiver
-        end
-
-        def method_name
-          @_method_name
-        end
-
-        def args
-          @_args
-        end
-
-        def block
-          # NOT SURE ..
-          @pp_
+        def bound_call
+          @_bound_call
         end
 
         # --
 
         def _event_handler
-          @___oes_p ||= @pp_[ @_receiver ]
+          @___oes_p ||= @_bound_call.block[ @_bound_call.receiver ]
         end
       end
 

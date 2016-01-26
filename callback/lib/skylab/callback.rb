@@ -558,6 +558,10 @@ module Skylab::Callback
     def _say_not_found k
       "key not found: #{ k.inspect }"
     end
+
+    def box
+      self
+    end
   end
 
   class Polymorphic_Stream  # :[#046]
@@ -949,12 +953,7 @@ module Skylab::Callback
       @receiver = receiver
     end
 
-    def members
-      [ :args, :block, :method_name, :receiver ]
-    end
-
     attr_reader :args, :block, :method_name, :receiver
-
   end
 
   DOT_ = '.'

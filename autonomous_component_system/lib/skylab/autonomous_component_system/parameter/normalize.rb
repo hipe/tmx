@@ -2,22 +2,19 @@ module Skylab::Autonomous_Component_System
 
   class Parameter
 
-    class Normalize < Callback_::Actor::Dyadic  # 1x
+    class Normalize
 
-      # currently result in array of values in formal order or raise.
+      # if for flat platform parameters, produce an argument array.
+      # otherwise (and for random access), do that.
+      # for both, do defaults and check missing requireds.
 
       Require_field_library_[]
 
-      class << self
-        public :new
-      end  # >>
-
-      def initialize arg_st, sel_stack, foz
+      def initialize arg_st, sel_stack, fo_bx
 
         @argument_stream = arg_st
         @_current_formal = nil
-        @_formal_box = foz.box
-        @formals = foz
+        @_formal_box = fo_bx
         @selection_stack = sel_stack
       end
 
@@ -26,24 +23,65 @@ module Skylab::Autonomous_Component_System
         sym
       end
 
-      def execute
+      def to_flat_platform_arguments
 
-        ___init_empty_output_box_in_formal_order
-        __parse
-        __finish
+        bx = __build_box_for_flat_platform_arguments
+
+        @_intake = -> x do
+          bx.replace @_current_formal.name_symbol, x
+          NIL_
+        end
+        _intake
+
+        args = []
+        @_accept = -> x, par do
+          if Field_::Takes_many_arguments[ par ]
+            if x
+              args.concat x
+            end
+          else
+            args.push x
+          end
+        end
+        _normalize_against bx
+        args
       end
 
-      def ___init_empty_output_box_in_formal_order
+      def write_into o
+
+        bx = Callback_::Box.new
+
+        @_intake = -> x do
+
+          _k = @_current_formal.name_symbol
+          bx.add _k, x
+          NIL_
+        end
+        _intake
+
+        @_accept = -> x, par do
+
+          o.send :"#{ par.name_symbol }=", x
+          NIL_
+        end
+
+        _normalize_against bx
+
+        NIL_
+      end
+
+      def __build_box_for_flat_platform_arguments
+
+        # must be a fully nil'd out box in formal order
 
         h = {}
         @_formal_box.a_.each do |k|
           h[ k ] = nil
         end
-        @_out_box = Callback_::Box.via_integral_parts @_formal_box.a_.dup, h
-        NIL_
+        Callback_::Box.via_integral_parts @_formal_box.a_.dup, h
       end
 
-      def __parse
+      def _intake
 
         st = @argument_stream
 
@@ -75,16 +113,15 @@ module Skylab::Autonomous_Component_System
       def _assume_and_accept_value
 
         _x = @argument_stream.gets_one
-        @_out_box.replace @_current_formal.name_symbol, _x
+        @_intake[ _x ]
         NIL_
       end
 
-      def __finish  # #[#117]
+      def _normalize_against out_bx  # #[#117]
 
-        method_call_arguments = []
         miss_a = nil
 
-        act_h = @_out_box.h_
+        act_h = out_bx.h_
         st = @_formal_box.to_value_stream
 
         begin
@@ -92,10 +129,15 @@ module Skylab::Autonomous_Component_System
           par or break
           k = par.name_symbol
 
-          x = act_h.fetch k
+          had = true
+          x = act_h.fetch k do
+            had = false ; nil
+          end
+
+          did = false
           if x.nil? && Field_::Has_default[ par ]
             x = par.default_proc.call
-            act_h[ k ] = x
+            did = true
           end
 
           if Field_::Is_required[ par ] && x.nil?
@@ -103,12 +145,9 @@ module Skylab::Autonomous_Component_System
             redo
           end
 
-          if Field_::Takes_many_arguments[ par ]
-            if x
-              method_call_arguments.concat x
-            end
-          else
-            method_call_arguments.push x
+          if had || did
+            # (for random access, don't write nils if they were not passed)
+            @_accept[ x, par ]
           end
 
           redo
@@ -117,8 +156,6 @@ module Skylab::Autonomous_Component_System
         if miss_a
           raise ::ArgumentError, ___say_missing( miss_a )
             # [#004]#exe explains why we raise here
-        else
-          method_call_arguments
         end
       end
 

@@ -34,6 +34,11 @@ module Skylab::Fields
       Parse___.new( o, x_a, self ).execute
     end
 
+    def optionals_hash
+      @_is_parsed || _parse
+      @_indexes.optionals
+    end
+
     def symbols * sym
       if sym.length.zero?
         if @_is_parsed

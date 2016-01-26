@@ -31,8 +31,12 @@ module Skylab::Autonomous_Component_System
 
       # --
 
-      def deliverable_via_selecting_session o, & pp
-        @_reifier.deliverable_via_selecting_session o, & pp
+      def deliverable_via_selection_stack_and_argument_stream ss, arg_st, & pp
+        deliverable_ Request_for_Deliverable_[ ss, nil, arg_st, pp ]
+      end
+
+      def deliverable_ dreq
+        @_reifier.produce_deliverable_ dreq
       end
 
       # --
@@ -51,9 +55,11 @@ module Skylab::Autonomous_Component_System
         end
 
         if x.respond_to? :call
-          ___accept_proc_as_implementation x
+          @_reifier = Here_::Proc_based_Implementation___.new x, self
         else
-          self._WAHOO  # #during #milestone:1
+
+          _pfoz = x::PARAMETERS  # NOTE - `respond_to?` :parameters whenever
+          @_reifier = Here_::NonProc_based_Implementation___.new _pfoz, x, self
         end
 
         self
@@ -64,7 +70,6 @@ module Skylab::Autonomous_Component_System
       end
 
       def ___accept_proc_as_implementation x
-        @_reifier = Here_::Proc_based_Implementation___.new x, self
         NIL_
       end
 

@@ -46,6 +46,10 @@ module Skylab::Zerk::TestSupport
         :no_such_association
       end
 
+      def past_end_of_phrase_
+        :arguments_continued_past_end_of_phrase
+      end
+
       def set_leaf_component_
         :set_leaf_component
       end

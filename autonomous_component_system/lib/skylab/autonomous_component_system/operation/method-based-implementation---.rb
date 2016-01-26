@@ -30,7 +30,7 @@ module Skylab::Autonomous_Component_System
       class << self
 
         def begin__ qk
-          new.__initial_init_via( qk )
+          new.__initial_init_via qk
         end
 
         def __method_for_symbol sym
@@ -45,59 +45,30 @@ module Skylab::Autonomous_Component_System
         self
       end
 
-      def deliverable_via_selecting_session o, & pp
-        Build_deliverable___.new( @_single_argument_qk, o, & pp ).execute
-      end
+      def deliverable_ dreq  # look like formal not an implemenation
 
-      class Build_deliverable___
+        ss, modz, _, pp = dreq.to_a
 
-        def initialize qk, o, & pp
+        qk = @_single_argument_qk
 
-          # what argument(s) we pass will change for #open [#012]:
-
-          @modz_ = o.modz_
-          @selection_stack = o.selection_stack
-          @pp_ = pp
-          @_qk = qk
+        if modz
+          using_ = modz.using
         end
 
-        def execute
-
-          _args = ___build_args
-
-          a = @selection_stack
-
-          _receiver = a.fetch( -2 ).value_x
-
-          _method_name = Self_.__method_for_symbol(
-            a.fetch( -1 ).name.as_variegated_symbol )
-
-          # ~
-
-          Here_::Delivery_::Deliverable.new(
-            @selection_stack,
-            @modz_,
-            _args,
-            _receiver,
-            _method_name,
-            & @pp_ )
+        args = []
+        if using_
+          args.concat using_
         end
+        args.push qk.value_x, qk.association
 
-        def ___build_args
+        _receiver = ss.fetch( -2 ).value_x
 
-          a = []
+        _method_name = Self_.__method_for_symbol(
+          ss.fetch( -1 ).name.as_variegated_symbol )
 
-          if @modz_
-            using_ = @modz_.using
-            if using_
-              a.concat using_
-            end
-          end
+        _bc = Callback_::Bound_Call[ args, _receiver, _method_name, & pp ]
 
-          a.push @_qk.value_x, @_qk.association
-
-          a
-        end
+        Here_::Delivery_::Deliverable.new modz, ss, _bc
       end
 
       Self_ = self

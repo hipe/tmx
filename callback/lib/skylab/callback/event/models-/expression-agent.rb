@@ -79,3 +79,4 @@ module Skylab::Callback
 
     # <-
 end
+# #pending-rename - this is not a model (but meh)

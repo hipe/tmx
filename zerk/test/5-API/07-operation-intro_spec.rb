@@ -105,9 +105,7 @@ module Skylab::Zerk::TestSupport
 
       it "emits dedicated event" do
 
-        _be_this = be_emission_ending_with(
-          :arguments_continued_passed_end_of_phrase
-        ) do |y|
+        _be_this = be_emission_ending_with past_end_of_phrase_ do |y|
           y.should eql ["arguments continued passed end of phrase - #{
             }unexpected argument: 'right_number'" ]
         end

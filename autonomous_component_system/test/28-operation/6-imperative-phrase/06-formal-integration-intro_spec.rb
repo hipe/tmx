@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Autonomous_Component_System::TestSupport
 
-  describe "[ac] operation" do
+  describe "[ac] operation - formal integration" do
 
     TS_[ self ]
     use :memoizer_methods

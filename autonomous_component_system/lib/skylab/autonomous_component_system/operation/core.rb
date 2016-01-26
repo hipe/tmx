@@ -40,6 +40,8 @@ module Skylab::Autonomous_Component_System
       )
     end
 
+    Request_for_Deliverable_ = -> * a { a }
+
     Here_ = self
   end
 end

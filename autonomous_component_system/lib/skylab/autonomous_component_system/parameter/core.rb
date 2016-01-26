@@ -19,7 +19,7 @@ module Skylab::Autonomous_Component_System
           NIL_
         end
 
-        alias_method :new_by__, :new
+        alias_method :new_by_, :new
         private :new
       end  # >>
 

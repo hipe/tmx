@@ -205,19 +205,23 @@ module Skylab::Zerk
 
         _nf = Callback_::Name.via_variegated_symbol _op_name_symbol
 
-        otr = @selection_stack.dup  # ours always has compound on top
-        otr.push _nf
-        fo = @_Formal.via_method_name_and_selection_stack m, otr
+        ss = @selection_stack.dup  # ours always has compound on top
+        ss.push _nf
+        fo = @_Formal.via_method_name_and_selection_stack m, ss
 
-        if fo.operation_is_available
-          de = fo.deliverable_via_selecting_session self, & @_pp
+        de = if fo.operation_is_available
+
+          fo.deliverable_via_selection_stack_and_argument_stream(
+            ss, @argument_stream, & @_pp )
+
         else
-          de = __when_operation_not_available fo
+          __when_operation_not_available fo
         end
 
         if de
           if @argument_stream.no_unparsed_exists
-            de
+
+            de.bound_call  # disregard sel. stack at this point
           else
             __when_extra
           end
@@ -269,7 +273,7 @@ module Skylab::Zerk
 
         x = @argument_stream.current_token
         _handler.call(
-          :error, :expression, :arguments_continued_passed_end_of_phrase
+          :error, :expression, :arguments_continued_past_end_of_phrase
         ) do |y|
           y << "arguments continued passed end of phrase - #{
             }unexpected argument: #{ ick x }"

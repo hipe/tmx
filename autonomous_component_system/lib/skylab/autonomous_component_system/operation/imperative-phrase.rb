@@ -33,7 +33,12 @@ module Skylab::Autonomous_Component_System
       end
 
       def ___produce_deliverable
-        @_formalesque.deliverable_via_selecting_session self, & @pp_
+
+        @_deliverabler.deliverable_ Request_for_Deliverable_[
+          @selection_stack,
+          @modz_,
+          @argument_stream,
+          @pp_ ]
       end
 
       def __parse_zero_or_more_modifiers  # we peek before loading the node
@@ -224,7 +229,7 @@ module Skylab::Autonomous_Component_System
       def ___resolve_formalesque_for_transitive
 
         _qk = remove_instance_variable :@_deliveree_qk
-        @_formalesque = Here_::Method_based_Implementation___.begin__ _qk
+        @_deliverabler = Here_::Method_based_Implementation___.begin__ _qk
         ACHIEVED_
       end
 
@@ -234,7 +239,7 @@ module Skylab::Autonomous_Component_System
         # arguments to the would-be formal operation ..
 
         _m = remove_instance_variable :@_method_name
-        @_formalesque = Here_::Formal_.via_method_name_and_selection_stack(
+        @_deliverabler = Here_::Formal_.via_method_name_and_selection_stack(
           _m, @selection_stack )
 
         ACHIEVED_
