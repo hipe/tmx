@@ -20,6 +20,7 @@ module Skylab::Autonomous_Component_System
         attr_writer(
           :ACS,
           :context_linked_list,
+          :customization_structure_x,
           :on_empty_JSON_object,
           :JSON,
         )
@@ -34,6 +35,7 @@ module Skylab::Autonomous_Component_System
           rec = Recurse_.new(
             _x,
             remove_instance_variable( :@context_linked_list ),
+            remove_instance_variable( :@customization_structure_x ),
             @ACS,
             @on_empty_JSON_object,
             & @_oes_p )
@@ -44,10 +46,11 @@ module Skylab::Autonomous_Component_System
 
       class Interpret::Recurse_
 
-        def initialize x, context_x, acs, on_empty, & p
+        def initialize x, context_x, cust_x, acs, on_empty, & p
 
           @ACS = acs
           @context_linked_list = context_x
+          @customization_structure_x = cust_x
           @_oes_p = p
           @on_empty_JSON_object = on_empty
           @_x = x
@@ -140,7 +143,8 @@ module Skylab::Autonomous_Component_System
 
         def ___build_boxish
 
-          _st = ACS_::For_Serialization::To_stream[ @ACS ]
+          _st = ACS_::For_Serialization::To_stream[
+            @customization_structure_x, @ACS ]
 
           _st.flush_to_immutable_with_random_access_keyed_to_method(
             :name_symbol )
@@ -229,6 +233,11 @@ module Skylab::Autonomous_Component_System
 
         def ___recurse_into cmp, qkn
 
+          if @customization_structure_x
+            self._DING_DONG
+            cust_x = NIL_
+          end
+
           _desc_p = -> do
 
             _nf = qkn.association.name
@@ -240,7 +249,13 @@ module Skylab::Autonomous_Component_System
 
           _x = qkn.value_x
 
-          o = self.class.new( _x, _ctx_, cmp, @on_empty_JSON_object, & @_LAST_component_oes_p )
+          o = self.class.new(
+            _x,
+            _ctx_,
+            cust_x,
+            cmp,
+            @on_empty_JSON_object,
+            & @_LAST_component_oes_p )
 
           _xx_ = o._execute
 

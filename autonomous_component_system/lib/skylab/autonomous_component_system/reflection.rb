@@ -40,22 +40,43 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
     class To_node_stream_via_inference  < Callback_::Actor::Monadic
 
+      class << self
+        public :new
+      end  # >>
+
       def initialize acs
         @ACS = acs
-        @_node_op_h = {
-          association: method( :__node_for_first_association ),
-          operation: method( :__node_for_first_operation ),
-        }
       end
+
+      attr_writer(
+        :on_association,
+        :on_operation,
+      )
 
       def execute
 
+        @on_association ||= method :__node_for_first_association
+        @on_operation ||= method :__node_for_first_operation
+
         # hand-write a map-reduce for clarity
 
-        Home_::Reflection_::To_entry_stream[ @ACS ].map_by do |en|
-          @_node_op_h.fetch( en.category ).call en
+        st = Home_::Reflection_::To_entry_stream[ @ACS ]
+        Callback_.stream do
+          begin
+            en = st.gets
+            en or break
+            x = instance_variable_get( IVARS___.fetch( en.category ) ).call en
+            x and break
+            redo
+          end while nil
+          x
         end
       end
+
+      IVARS___ = {
+        association: :@on_association,
+        operation: :@on_operation,
+      }
 
       def __node_for_first_association first_en
 
@@ -65,7 +86,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         p = -> en do
           node.new en
         end
-        @_node_op_h[ :association ] = p
+        @on_association = p
         p[ first_en ]
       end
 
@@ -75,7 +96,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         p = -> en do
           node.new en
         end
-        @_node_op_h[ :operation ] = p
+        @on_operation = p
         p[ first_en ]
       end
     end
@@ -117,6 +138,15 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         self
       end
 
+      def qualified_knownness
+        if @_qkn_for
+          _asc = association
+          @__qkn = @_qkn_for[ _asc ]
+          @_qkn_for = nil
+        end
+        @__qkn
+      end
+
       def name
         if ! @_asc_for && @_association
           @_association.name
@@ -131,6 +161,10 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
           @_asc_for = nil
         end
         @_association
+      end
+
+      def name_symbol
+        @_entry.name_symbol
       end
 
       def category
@@ -184,6 +218,10 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       def name
         @___nf ||= Callback_::Name.via_variegated_symbol( @_entry.name_symbol )
+      end
+
+      def name_symbol
+        @_entry.name_symbol
       end
 
       def category

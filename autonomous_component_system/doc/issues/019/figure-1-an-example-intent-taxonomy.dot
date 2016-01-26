@@ -1,0 +1,32 @@
+digraph g {
+
+  label="
+figure 1. an example taxonomy of intents.
+(this is not prescriptive. it's just a       
+demonstration of the concept.)          "
+
+  intent
+
+  serialization [label="(un)serialization"]
+  serialization->intent [label="is a"]
+  interface->intent [label="is a"]
+
+  UI->interface
+  API->interface
+
+  GUI->UI
+
+  WEB->GUI
+
+  desktop->GUI
+
+  device->GUI
+  iPhone->device
+  iPad->device
+  android->device
+
+  CLI->UI
+  niCLI->CLI
+  iCLI->CLI
+
+}

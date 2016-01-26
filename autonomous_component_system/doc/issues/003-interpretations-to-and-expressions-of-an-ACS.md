@@ -163,41 +163,8 @@ that represents the mutable data (the "model" in the classical sense)
 to differ from what is effectively the interface structure used to
 express the UI or API. ([mt]'s adapters are an example.)
 
-these different classifications of concern referred to above we call
-"intents" - we consider [un]serialization one "intent", and API/UI
-another. (munging API and UI into one intent is itself a broad leap
-the ramifications which we won't explore here, but is the theory behind
-[br] in general.) at present, we have come up with no "intents" other than
-"serialization" and "interface".
+(this thread is continued at [#019])
 
-so, there are at least two issues that express themselves within our
-broad approach. they are not showstoppers, but for now they present the
-need for necessary handling. each of these issues express themselves
-through some "special handling accomodation". they are:
-
-
-
-#### special handing accomodation 1: expression of `intent`
-
-although we like our models to be relevant across intents, we have found
-it inhibits our expressive power to have this to be a given always.
-experimentally, you can now specify an `intent` in your componenent
-*association*. the syntax is something like:
-
-    intent { serialization | interface }
-
-A) to use this "meta-component" is in violation of #Tenet2 the tenet of
-DRY-ness across all intents; so it should be used sparingly let the
-whole ACS experiment will be proven a failure! when not expressed
-explicitly, the compnent association being defined is assumed to be
-relevant for all intents (as it should be).
-
-B) it is arguably a violation of #Tenet1 "component autonomy" to have the
-parent component deciding how it wants to the child (with regards to its
-intent); but by designing the formal expression this way rather than
-leaving it up to the child to express (somehow) allows for code that
-"feels" still #dt3 dynamic while trying to be #DT4 conservative under
-whatever the active intent is.
 
 
 
@@ -235,14 +202,6 @@ use the same sort of construction method for unserialization that could
 be used for the other intent (and the call to the construction method
 must result in a valid component if it results in one at all),
 experimentally we attempt this trick (next section):
-
-
-
-#### special handling accomodation 2: the compound construction method
-
-the experimentation of this is the subject of this commit, and will not
-be commented on until it has incubated a bit. it is tracked with
- :#compounds.
 
 
 

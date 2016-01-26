@@ -54,6 +54,7 @@ module Skylab::Autonomous_Component_System::TestSupport
     def _begin_to_json sn
 
       o = Home_::Modalities::JSON::Express.new
+      o.customization_structure_x = nil
       o.upstream_ACS = sn
       o
     end

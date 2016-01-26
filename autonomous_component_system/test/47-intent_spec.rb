@@ -2,9 +2,9 @@ require_relative 'test-support'
 
 module Skylab::Autonomous_Component_System::TestSupport
 
-  describe "[ac] for serialization" do
+  describe "[ac] intent" do
 
-    # (intent)
+    # (the subsequent test tests `include_if` so we don't)
 
     TS_[ self ]
     use :memoizer_methods
@@ -14,35 +14,41 @@ module Skylab::Autonomous_Component_System::TestSupport
       build_root_ACS
     end
 
-    context "whitelist-based (include if red)" do
+    context "exclude by name" do
 
       def _cust_x
 
         -> o do
-          rx = /\Ared_/
-          o.include_if = -> no do
-            rx =~ no.name_symbol
-          end
+          o.exclude :blue_flingle
           o
         end
       end
 
       it "ok." do
-        _x = _something
-        _x.should eql %i( red_floof red_flingle )
+        a = _something
+        a.length > 1 or fail
+        a.first.respond_to?( :id2name ) or fail
+        a.include? :red_floof or fail
+        a.include? :blue_flingle and fail
       end
     end
 
     def _something
 
       _acs = _ACS
+
+      _node_st = Home_::Reflection::To_node_stream_via_inference[ _acs ]
+
+      o = Home_::Intent::Streamer.new _node_st
       _x = _cust_x
-      st = Home_::For_Serialization::To_stream[ _x, _acs ]
+      o = _x[ o ]
+      st = o.to_node_stream
+
       a = []
       begin
-        x = st.gets
-        x or break
-        a.push x.name_symbol
+        no = st.gets
+        no or break
+        a.push no.name_symbol
         redo
       end while nil
       a

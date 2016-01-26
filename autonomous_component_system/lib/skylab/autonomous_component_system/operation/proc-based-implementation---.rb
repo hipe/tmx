@@ -38,7 +38,7 @@ module Skylab::Autonomous_Component_System
           bx = @_foz.box
           a = @selection_stack
 
-          o = Home_::Parameter::Box_via_Argument_Stream.new(
+          o = Home_::Parameter::Normalize.new(
             @argument_stream, a, @_foz )
 
           if 1 == bx.length

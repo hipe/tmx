@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   module Modalities::JSON
 
-    Unmarshal = -> acs, st, & pp do  # 1x
+    Unmarshal = -> acs, cust_x, st, & pp do  # 1x
 
       if ! pp
         self._COVER_ME_easy
@@ -21,6 +21,7 @@ module Skylab::Autonomous_Component_System
 
       o = Here_::Interpret.new( & _oes_p )
       o.ACS = acs
+      o.customization_structure_x = cust_x
       o.JSON = json
 
       o.context_linked_list = begin

@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   class Parameter
 
-    class Box_via_Argument_Stream < Callback_::Actor::Dyadic  # 1x
+    class Normalize < Callback_::Actor::Dyadic  # 1x
 
       # currently result in array of values in formal order or raise.
 

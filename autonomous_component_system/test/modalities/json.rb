@@ -6,7 +6,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       tcc.include self
     end
 
-    def unmarshal_from_JSON acs, io
+    def unmarshal_from_JSON acs, cust=nil, io
 
       block_given? and raise ::ArgumentError
 
@@ -15,7 +15,7 @@ module Skylab::Autonomous_Component_System::TestSupport
         _oes_p
       end
 
-      _x = Home_.unmarshal_from_JSON acs, io, & _pp
+      _x = Home_.unmarshal_from_JSON acs, cust, io, & _pp
 
       _x
     end

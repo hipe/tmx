@@ -1,4 +1,3 @@
-[#013] #open when intent  (1x)
 [#012]       [ flowcharts for API syntax ]
 [#011]     #track whether/how to share across 3 CLI client classes
 [#010]       custom view controllers

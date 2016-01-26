@@ -17,9 +17,11 @@ violoation of which should occur only with good reason.
     without depending on any client (i.e would be "parent") component
     to the furthest extent possible.
 
-• :dt2: DRY-ness: a component must express its normalization logic in a
-    way that can be applied trivially to both serialization and UI intents
-    (and future intents as we discover them).
+• :dt2: DRY-ness/intent-agnosticism: the structure, constituency and
+    any behavior written into a component at this level must be done so
+    in a way that is not particular to any one [#019] "intent". so the (for
+    example) expression or interpretation logic should be represented in
+    a way that can apply to as many different intents as is reasonable.
 
 • :dt3: dynamicism: the constituent list of a compound node's components
     (in both actual *and* formal sense) must never be assumed to be
@@ -421,7 +423,7 @@ this naming convention with the nested double underscores is
 the "generated form" desribed in (4).
 
 a `via` modifier is an assertion of shape with an expression of intent.
-(but we don't mean "intent" in the [#003] sense, just the non-technial
+(but we don't mean "intent" in the [#003] sense, just the non-technical
 sense.)
 
 the `via` modifier allows us to implement a variety of ways that the input

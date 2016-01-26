@@ -83,8 +83,8 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         Home_::Modalities::JSON::Marshal[ io_and_options, acs, & pp ]
       end
 
-      def unmarshal_from_JSON io, acs, & x_p
-        Home_::Modalities::JSON::Unmarshal[ io, acs, & x_p ]
+      def unmarshal_from_JSON acs, cust, io, & x_p
+        Home_::Modalities::JSON::Unmarshal[ acs, cust, io, & x_p ]
       end
 
       def handler_builder_for acs  # for #Hot-eventmodel
@@ -456,14 +456,6 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       end
 
       attr_reader :default_proc
-
-      # ~ intent
-
-      def accept__intent__meta_component sym  # see [#003]#intent
-        @intent = sym ; nil
-      end
-
-      attr_reader :intent
 
       # ~ model
 

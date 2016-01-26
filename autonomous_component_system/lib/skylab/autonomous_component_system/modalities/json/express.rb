@@ -8,11 +8,13 @@ module Skylab::Autonomous_Component_System
 
         def initialize & p
           @be_pretty = true
+          @customization_structure_x = nil
           @on_event_selectively = p
         end
 
         attr_writer(
           :be_pretty,
+          :customization_structure_x,
           :downstream_IO_proc,
           :upstream_ACS,
         )
@@ -37,7 +39,7 @@ module Skylab::Autonomous_Component_System
 
         def build_string
 
-          h = _recurse @upstream_ACS
+          h = _recurse @customization_structure_x, @upstream_ACS
 
           if h
 
@@ -52,7 +54,7 @@ module Skylab::Autonomous_Component_System
 
         THE_EMPTY_TIMES___ = '{}'
 
-        def _recurse acs  # see [#003]:on-JSON-expression
+        def _recurse cust_x, acs  # see [#003]:on-JSON-expression
 
           result = nil
 
@@ -67,7 +69,7 @@ module Skylab::Autonomous_Component_System
             store[ xx ]
           end
 
-          st = ACS_::For_Serialization::To_stream[ acs ]
+          st = ACS_::For_Serialization::To_stream[ cust_x, acs ]
 
           begin
             o = st.gets
@@ -92,7 +94,11 @@ module Skylab::Autonomous_Component_System
             _is = o.association.model_classifications.looks_compound
             if _is
 
-              x_ = _recurse x
+              _cust_x_ = if cust_x
+                self._K
+              end
+
+              x_ = _recurse _cust_x_, x
               if x_
                 store[ x_ ]
               end

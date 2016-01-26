@@ -1,20 +1,28 @@
-module Skylab::Zerk::TestSupport
+module Skylab::Autonomous_Component_System::TestSupport
 
-  class Fixture_Top_ACS_Classes::Class_23_Multi_Intent_Root
+  module Fixture_Top_ACS_Classes
 
-    def __resourcez__component_association
-      yield :intent, :API
-      :_ok_
-    end
+    class Class_24_Multi_Intent
 
-    def __floofie__component_association
-      yield :intent, :UI
-      :_ok_
-    end
+      def __red_floof__component_association
+        :xx
+      end
 
-    def __both__component_association
-      yield :intent, :interface
-      :_ok_
+      def __oppie__component_operation
+        No_events_
+      end
+
+      def __blue_flingle__component_association
+        :xx2
+      end
+
+      def __red_flingle__component_association
+        :xx3
+      end
+
+      def __blue_floof__component_association
+        :xx4
+      end
     end
   end
 end

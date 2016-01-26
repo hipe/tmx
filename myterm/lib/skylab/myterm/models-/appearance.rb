@@ -243,16 +243,6 @@ module Skylab::MyTerm
       end
     end
 
-    # ~ [un]serialization hook-ins
-
-    def to_stream_for_component_serialization
-
-      # (this is what is default, here for clarity - when serializing/
-      #  unserializing, use our methods (index) to define our assocs)
-
-      ACS_[]::For_Serialization::Infer_stream[ self ]
-    end
-
     # -- Components
 
     # ~ "adapter" (to put this before next looks better in JSON payloads)
