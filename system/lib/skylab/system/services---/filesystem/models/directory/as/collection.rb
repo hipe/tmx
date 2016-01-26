@@ -62,8 +62,9 @@ module Skylab::System
 
     # ~~ create (by way of ACS)
 
-    def __add__component o, _ca, & pp
+    def __add__component qk, & pp
 
+      o = qk.value_x
       ok = __resolve_entry_name o, & pp
       ok &&= __resolve_destination_directory( & pp )
       ok && __finish_add( o, & pp )
@@ -126,11 +127,12 @@ module Skylab::System
 
     # ~~ delete (by way of ACS)
 
-    def __remove__component o, _ca, & oes_p_p
+    def __remove__component qk, & oes_p_p
 
       # per ACS, assume that last we checked, item is present in collection
       # this is only exploraory - we emit an event on success
 
+      o = qk.value_x
       succ = Home_.lib_.basic::String.succ.with(
 
         :beginning_width, 2,
@@ -164,7 +166,7 @@ module Skylab::System
 
         _oes_p = oes_p_p[ nil ]
 
-        ACS_[].send_component_removed o, o.class, self, & _oes_p
+        ACS_[].send_component_removed qk, self, & _oes_p
         o
       else
         ok
@@ -173,23 +175,23 @@ module Skylab::System
 
     # ~~~ ACS hook-outs *for* edit session (remove if exists, create if not exist)
 
-    def expect_component_not__exists__ x, _ca, & oes_p
+    def expect_component_not__exists__ qk, & oes_p
 
-      _found = first_equivalent_item x
+      _found = first_equivalent_item qk.value_x
       if _found
-        ACS_[].send_component_already_added x, self, & oes_p
+        ACS_[].send_component_already_added qk, self, & oes_p
       else
         true
       end
     end
 
-    def expect_component__exists__ x, ca, & oes_p
+    def expect_component__exists__ qk, & oes_p
 
-      _found = first_equivalent_item x
+      _found = first_equivalent_item qk.value_x
       if _found
         true
       else
-        ACS_[].send_component_not_found x, ca, self, & oes_p
+        ACS_[].send_component_not_found qk, self, & oes_p
       end
     end
 
@@ -297,13 +299,6 @@ module Skylab::System
     end
 
     # -- Components (none formal: here, the components are filesystem entries!)
-
-    # -- ACS hook-outs (e.g primitive operations)
-
-    def result_for_component_mutation_session_when_changed o, & _
-
-      o.last_delivery_result
-    end
 
     # -- ACS signal handling (none)
 

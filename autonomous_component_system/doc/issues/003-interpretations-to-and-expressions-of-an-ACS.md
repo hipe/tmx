@@ -32,10 +32,7 @@ just so we agree on terms in this document,
       * with every child node having a name that is
         unique in the context of its parent
 
-      * and that name (let's just say for now) is a name that
-        isomorphs cleanly with the spec at [#013]:API.A,
-
-      * ergo the root node has no name.
+      * the root node has no name
 
       * furthermore we'll conceive of the children of these
         nodes as being ordered.

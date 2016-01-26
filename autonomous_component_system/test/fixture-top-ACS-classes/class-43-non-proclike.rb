@@ -17,10 +17,6 @@ module Skylab::Autonomous_Component_System::TestSupport
 
         Here_::Class_72_Big_Loada
       end
-
-      def result_for_component_mutation_session_when_changed o
-        o.last_delivery_result
-      end
     end
   end
 end

@@ -121,8 +121,9 @@ module Skylab::Human
         EF_::Models_::Argument_Adapter::Verbish
       end
 
-      def __add__component o, _ca, & _
+      def __add__component qk, & _
 
+        o = qk.value_x
         @__slots.add o.slot_symbol, o
         o
       end

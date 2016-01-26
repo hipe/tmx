@@ -36,8 +36,8 @@ each "imperative phrase" contains exactly one "operation verb".
 
 grammatically the only requirement by the ACS for these verbs is that:
 
-  A) the operation verb cannot be one of the modifiers
-     (keywords) described in [#002]#Tenet7 (an ever expanding list..)
+  A) the operation verb cannot be one of the four or so modifiers
+     (keywords) described in [#002]#Tenet7.
 
   B) the operation verb must occupy exactly one token. (but of course
      you could use underscores to express multiple words in one symbol,
@@ -61,7 +61,7 @@ because this is in flux, here are some semi-disparate points:
   • "transitive" operations were the first kind implemented - more below.
 
   • a "formal" operation is one that can have arbitrary metadata
-    associated with it and [will eventually #when [#009]] supports
+    associated with it and supports
     a variety of implementation options (procs, classes..)
 
 
@@ -90,18 +90,25 @@ because this is in flux, here are some semi-disparate points:
 
 ## defining a transitive operation
 
-imagine that we have a verb token `foo_bar` that (by whatever means) has
-been decided to be treated as a transitive operation as opposed to a
-formal one.
+imagine that we have a verb token `frobulate_loslessly` that (by
+whatever means) has been decided to be treated as a transitive
+operation as opposed to a formal one.
 
-this operation will require that a method something like:
+this operation will require a method defined something like:
 
-    def __foo_bar__component x, ca, & pp
+    def __frobulate_losslessly__component qk, & pp
       # ..
     end
 
-the above signature will change when #open [#012] so we don't document
-it for now..
+where `qk` is a "qualified knownness" and `pp` is an event handler
+builder.
+
+it seems that the result should be boolean-ish indicating the success
+or failure of the operation, where a failure will halt any subsequent
+deliveries in this mutation session.
+
+(the way we implement transitive operations might change, #maybe [#012])
+
 
 the meaning of the double underscores is explained in [#002]#Tenet4.
 

@@ -46,16 +46,13 @@ module Skylab::Snag
 
         # ~ for [#ac-002] the ACS (compliments same in parent class)
 
-        def __add__component bx, node, ca, & oes_p_p
+        def __add__component bx, qk, & oes_p_p
+
+          node = qk.value_x
 
           _oes_p = oes_p_p[ node ]  # transition from hot to cold
 
           persist_entity bx, node, & _oes_p
-        end
-
-        def result_for_component_mutation_session_when_changed log, &__
-
-          log.last_delivery_result || self._COVER_ME
         end
 
         # c r u d

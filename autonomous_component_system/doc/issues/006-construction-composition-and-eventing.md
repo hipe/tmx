@@ -8,7 +8,7 @@ construction like UI (edit sessions, reactive trees) or otherwise.
 
 the primary purpose this node serves is to effect the call to the
 component model's construction method (`interpret_component` or
-related (:Tenet5)) or `[]` (:Tenet6). while there are other code locations
+related (:Tenet6)) or `[]` (:Tenet5). while there are other code locations
 that "know" about these tenets, we want the subject node to be the
 only one that *ever* calls these construction methods.
 

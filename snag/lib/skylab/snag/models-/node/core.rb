@@ -175,35 +175,37 @@ module Skylab::Snag
       _route_test :absent, * x_a, & x_p
     end
 
-    def expect_component__present__ * x_a, & x_p
-      _route_test :present, * x_a, & x_p
+    def expect_component__present__ qk, & x_p
+      _route_test :present, qk, & x_p
     end
 
-    def expect_component__absent__ * x_a, & x_p
-      _route_test :absent, * x_a, & x_p
+    def expect_component__absent__ qk, & x_p
+      _route_test :absent, qk, & x_p
     end
 
-    def _route_test adj, o, ca, & x_p
+    def _route_test adj, qk, & x_p
 
-      send :"__expect__#{ ca.name.as_variegated_symbol }__is__#{ adj }__",
-        o, ca, & x_p
+      send :"__expect__#{ qk.name.as_variegated_symbol }__is__#{ adj }__",
+        qk, & x_p
     end
 
-    def __expect__tag__is__present__ tag, ca, & oes_p
+    def __expect__tag__is__present__ qk, & oes_p
 
+      tag = qk.value_x
       existing = first_equivalent_item tag
       if existing
         ACHIEVED_
       else
-        ACS_[].send_component_not_found tag, ca, self, & oes_p
+        ACS_[].send_component_not_found qk, self, & oes_p
       end
     end
 
-    def __expect__tag__is__absent__ tag, ca, & oes_p
+    def __expect__tag__is__absent__ qk, & oes_p
 
+      tag = qk.value_x
       existing = first_equivalent_item tag
       if existing
-        ACS_[].send_component_already_added tag, ca, self, & oes_p
+        ACS_[].send_component_already_added qk, self, & oes_p
       else
         ACHIEVED_
       end
@@ -219,30 +221,31 @@ module Skylab::Snag
 
     ## ~~ implementation of operations
 
-    def __set__component x, ca, & _x_p
+    def __set__component qk, & _x_p
 
-      instance_variable_set ca.name.as_ivar, x
+      x = qk.value_x
+      instance_variable_set qk.name.as_ivar, x
       x || self._COVER_ME  # as soon as you have valid false-ishes, things change
     end
 
-    def __prepend__component x, ca, & oes_p_p
+    def __prepend__component qk, & oes_p_p
 
-      _mutable_body_for_mutation_session.prepend_component_ x, ca, & oes_p_p
+      _mutable_body_for_mutation_session.prepend_component_ qk, & oes_p_p
     end
 
-    def __append__component x, ca, & oes_p_p
+    def __append__component qk, & oes_p_p
 
-      _mutable_body_for_mutation_session.append_component_ x, ca, & oes_p_p
+      _mutable_body_for_mutation_session.append_component_ qk, & oes_p_p
     end
 
-    def __remove__component x, ca, & oes_p_p
+    def __remove__component qk, & oes_p_p
 
-      o = _mutable_body_for_mutation_session.remove_component_ x, ca, & oes_p_p
+      o = _mutable_body_for_mutation_session.remove_component_ qk, & oes_p_p
       if o
 
         _oes_p = oes_p_p[ self ]
 
-        ACS_[].send_component_removed o, ca, self, & _oes_p
+        ACS_[].send_component_removed qk, self, & _oes_p
       end
       o
     end
@@ -264,11 +267,6 @@ module Skylab::Snag
 
       @_did_change = true
       o.last_delivery_result
-    end
-
-    def result_for_component_mutation_session_when_no_change &_
-
-      NIL_  # a no-op is not a success (covered)
     end
 
     # -- expression & reflection

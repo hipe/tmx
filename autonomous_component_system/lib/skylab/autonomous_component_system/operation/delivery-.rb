@@ -73,8 +73,6 @@ module Skylab::Autonomous_Component_System
             :"component_is__#{ @_if.symbol }__"
           end
 
-          # #during:[#012] change the below too
-
           bc = @_bound_call
 
           _yes = bc.receiver.send _m, * bc.args, & _event_handler

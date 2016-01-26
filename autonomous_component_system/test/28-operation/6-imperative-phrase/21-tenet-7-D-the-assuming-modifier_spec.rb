@@ -80,7 +80,7 @@ module Skylab::Autonomous_Component_System::TestSupport
           end
         end
 
-        def expect_component__fun__ _, _, & oes_p
+        def expect_component__fun__ _, & oes_p
           if @is_fun
             true
           else
@@ -89,7 +89,7 @@ module Skylab::Autonomous_Component_System::TestSupport
           end
         end
 
-        def expect_component__good_times__ _, _, & oes_p
+        def expect_component__good_times__ _, & oes_p
           if @is_good_times
             true
           else
@@ -98,13 +98,9 @@ module Skylab::Autonomous_Component_System::TestSupport
           end
         end
 
-        def __rattle__component _, ca, & _x_p
-          @_last_rattled = ca.name.as_variegated_symbol
+        def __rattle__component qk, & _x_p
+          @_last_rattled = qk.name.as_variegated_symbol
           :yep
-        end
-
-        def result_for_component_mutation_session_when_changed o, &__
-          o.last_delivery_result
         end
 
         def jimmy_is_rattled

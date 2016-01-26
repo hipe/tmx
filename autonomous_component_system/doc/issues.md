@@ -8,21 +8,16 @@
 
 [#014]       imperative phrase..
 
-[#013]   #during:phase-1
-             for classic transitive collection-oriented operations, make
-             these callbacks be hook-ins not hook-outs.
+[#013] #hole (#was: for transitive result value, hook-in not hook-out)
 
-[#012]   #during:phase-1
-             change clients of these operations to take qk's not 2 args THEN:
-         #maybe (the idea of:) get rid of operations implemented as ..
+[#012]   #maybe implement transitive operations with formals instead of
+             method-based implementation..
 
 [#011]   #when:[#sa-019] sub `ACS_` for `Home_` (this idiom didn't age well)
-             AND: normalize the test names near tenets
 
-[#010] #open this big campaign
+[#010] #open this big campaign (the 9 milestones)
 
-[#009]   #during:phase-1 support for class-implemented operations
-             AND: intro to operations..
+[#009]       intro to operations..
 
 [#008]   #maybe extension API for the *modifiers* for use in mutation sessions
              (we're not sure we want this yet. this just tracks the idea.)

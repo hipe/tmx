@@ -16,7 +16,7 @@ module Skylab::Autonomous_Component_System::TestSupport
             # this is only experimental - remember that it is mechanically
             # impossible to result in false-ish validly from here, so we
             # will probably either make a major, earth-shattering change to
-            # this #Tenet6 inteface, or make `null` invalid in JSON payloads,
+            # this #Tenet6 interface, or make `null` invalid in JSON payloads,
             # -OR- simply skip over nulls higher up (violating #dt1 autonomy)
 
             new

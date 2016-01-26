@@ -42,17 +42,14 @@ module Skylab::Autonomous_Component_System::TestSupport
           end
         end
 
-        def __effect__component * many, ca, & _x_p
+        def __effect__component * many, qk, & _x_p
 
-          instance_variable_set ca.name.as_ivar, many
+          many.push qk.value_x
+          instance_variable_set qk.name.as_ivar, many
           :yep
         end
 
         attr_reader :list_of_things
-
-        def result_for_component_mutation_session_when_changed _, &__
-          _.last_delivery_result
-        end
 
         ACS_ = -> do
           Home_

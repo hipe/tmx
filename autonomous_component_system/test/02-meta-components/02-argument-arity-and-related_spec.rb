@@ -87,14 +87,10 @@ module Skylab::Autonomous_Component_System::TestSupport
           end
         end
 
-        def __set__component x, asc, & _x_p
+        def __set__component qk, & _x_p
 
-          instance_variable_set asc.name.as_ivar, x
+          instance_variable_set qk.name.as_ivar, qk.value_x
           :_yerf_
-        end
-
-        def result_for_component_mutation_session_when_changed o
-          o.last_delivery_result
         end
 
         def _the_ivar

@@ -79,24 +79,35 @@ violoation of which should occur only with good reason.
 
 
 
-## how it is better (or worse) than [#001] entities?
+## how it is better (or worse) than [#br-001] entities?
 
 • no subclassing or mixin modules or load-time DSL's -
 
-  the ACS has a much simpler minimum API than its predecessor.
+  the ACS has a much simpler *minimum* API than its predecessor.
   participating classes need only implement particular methods with
   names matching patterns to express their associations and operations.
-  and the must implement themselves only the methods they need to reach
-  ACS subsystems (typically one line each).
 
-  the instance method namespace is respected because only "generated
-  names" are used by the ACS (with the exception of:
+  most of the methods you will write to be picked-up by the [ac] will
+  be of the "generated" variety (explained [#]:gen below); so there is
+  a far lower-than average likelihood of of one of these methods having
+  a name conflict with another method in the same class but outside of
+  this concern.
 
+  (nonetheless your participating classes should probably be "dedicated".)
+
+  there are no mandatory *instance* methods that you must define.
+
+  there are some *optional* methods you *can* define to hook-in to the
+  library to achieve "special" behavior; but those methods are in a
+  short enough list that we can cover all of them here.
+
+    • `to_component_node_stream`
+    • `to_component_symbol_stream`  # ..
+    • `to_component_operation_symbol_stream`  # ..
     • `result_for_component_mutation_session_when_changed`
     • `result_for_component_mutation_session_when_no_change`
 
-  IFF you want edit sessions (and for now only! (#open [#013])))
-
+  (see tombstones at end of this file for historical names too.)
 
 
 • dynamicism is heavily assumed -
@@ -109,9 +120,9 @@ violoation of which should occur only with good reason.
   here, the "component association" is built anew on the fly as it is
   needed, by sending a message to *the entity* and not its class.
 
-  the cost of this is potentially significant when we get to dealing with
-  more than one entity of one class in one runtime, which we haven't
-  yet (but hope to..)
+  because the cost of this dynamicism could be heavy,
+  there is #how-we-cache-component-associations.
+
 
 
 
@@ -124,33 +135,36 @@ violoation of which should occur only with good reason.
 
 
 
-• there is as yet no facility for extending the [#008] hard-coded
-  modifiers described below.
+• one minor point is that the Tenet7 "modifiers" part of
+  "transitive operation" syntax are in a hard-coded set of about 4 keywords.
+  there is as yet no plan to make this soft-coded. however this doesn't
+  really have an equivalent in [br] so it's not relelvant anyway.
 
 
 
 
-## the N tenets of the autonomous component system ("ACS") (experimental)
+## the 8 introductory tenets of the autonomous component system ("ACS")
 
-in summary:
+(2, 3, 7 & 8 relate only to the "classic" transitive operations.
+1, 4, 5 & 6 are still essential.)
 
-• in application code, ACS components are *not* constructed using `new` :Tenet1
+the tenets are:
 
-• new components are constructed by sending `edit_entity` to the class :Tenet2
+• the library itself will *never* use `new` to construct a component. :Tenet1
 
-• existing components are mutated by sending `edit_entity` to the component :Tenet3
+• humans might construct new components thru `edit_entity` class method :Tenet2
+
+• humans might mutate existing components thru its `edit_entity` method :Tenet3
 
 • component associations are defined through instance methods :Tenet4
 
-• for "inward" purposes, associations are defined thru *instance* methods :Tenet5
+• the simplest component models are defiend by proc-likes :Tenet5
 
-• simple or one-off models typically produce components thru `[]` :Tenet6
+• more complex component models (2 kinds) are defined with classes :Tenet6
 
-• `interpret_component` (and similar) is above for dedicated models :Tenet7
+• modifiers (experimental): `via`, `using`, `if` and `assuming` :Tenet7
 
-• modifiers (experimental): `via`, `using`, `if` and `assuming` :Tenet8
-
-• the operation verbs of mutation sessions are defined in the assoc.. :Tenet9
+• the operation verbs of mutation sessions are defined in the assoc.. :Tenet8
 
 
 we may tag some (or all!?) of the various occurrences of these tenets in
@@ -189,12 +203,16 @@ send `new` to a participating class except in the ways proscribed below
 in (2) and (7A) below.
 
 because we are purists, we almost always set `new` to private on
-participating classess for this reason, to enforce this design custom.
+participating classes for this reason, to enforce this design custom.
 
 
 
 
 ### 2) humans build new components by sending `edit_entity` to the class
+
+(EDIT: nowadays, intent-specific adaptations often auto-vivify
+components as needed, so this technique described in this sections is
+not broadly applicable.)
 
 the human may construct a component by sending an `edit_entity`
 call to the component class IFF (perhaps tautologically) the particular
@@ -247,9 +265,10 @@ that go into an ACS "edit session".
 ### 4) component assocations are defined thru instance methods.
 
 a "component association" is the association of one model to another
-thru a name and usually some "meta-components" about the association.
+thru a name, usually a reference to a "model" of some sort, and maybe
+some "meta-components" about the association.
 
-by "model" we may mean only in an abstract sense, like for example the
+by "model" we may mean only in a loose sense, like for example the
 creation of an ad-hoc normalizing function just for the sake of this
 component association.
 
@@ -299,7 +318,7 @@ before we can build it.
 
 
 
-#### the "generated form" method naming convention
+#### the "generated form" method naming convention :gen
 
 the method name of `__foo_bar__component_association` has a *pair* of
 *double* underscores nesting the *variable part*  of the method name.
@@ -308,7 +327,7 @@ appear ugly at first, it exists with good reason and is central to the
 ACS:
 
 all methods for which part of the name will be generated must use
-this "generated form". using this name distinct name convention for
+this "generated form". using this distinct name convention for
 such cases has at least two benefits:
 
 • for the developer searching for code locations from which a method
@@ -371,10 +390,12 @@ IFF the interpretation is a success it must produce the sub-component
 itself, which to use this form cannot ever be validly false-ish (unlike
 in (5)), which is not usually not a problem because typically the model
 exposing this means already has a dedicated class (which is what received
-the subject call), and all classes produce objects, and all objects are
-trueish; hence we can overload these two concerns (whether thex
-interpretation succeeded and if so, what the payload value is) into this
-one value; for those models that have dedicated classes.
+the subject call):
+
+to the extent that user-defined classes produce objects, and all
+such objects are trueish; we can overload these two concerns (whether
+the interpretation succeeded and if so, what the payload value is) into
+this one value; for those models that have dedicated classes.
 
 for a model that is mainly a compound model (i.e one that models a
 component that consists mainly of other components), the library's
@@ -462,6 +483,8 @@ normally the singature of this call is (currently) `(x, ca, & oes_p)`
 where `x` is the component and `ca` is  the component association
 structure.
 
+THE ABOVE CHANGES NOW
+
 for each `using` expression in the edit expression, one corresponding
 argument will be included in the above call in addition to the above
 described arguments. these additional arguments are added in front,
@@ -474,28 +497,35 @@ but here's this too:
 
     edit_entity :set, :severity, :SEVERE
 
-    # probably calls `subject.__set__component svrty, ca, & oes_p`
-    # where `svrty` is whatever object, `ca` is a component assoc, etc.
+    # probably calls `subject.__set__component qk, & oes_p`
+    # where `qk` is a qualified knownness wrapping the value and the
+    # association (of :SEVERE and "severity").
 
     edit_entity(
       :using, :one,
       :using, :two,
       :set, :severity, :SEVERE
-    )  # calls `subject.__set__component :one, :two, svrty, ca, & oes_p`
+    )  # calls `subject.__set__component :one, :two, qk, & oes_p`
 
 
 
 
 #### C) the (experimental) `if` expression
 
+(EDIT: this is very detailed and should be moved to its own document,
+accompanied by the next section about `assuming`.)
+
 an `if` expression acts as a filter, determining whether or not the
 we actually "deliver" the sub-component to the operation method.
 
-this same behavior could be accomplished "by hand" by implementing
-another operation method that does the conditional check (whatever
-it is) in code, however we ship in here as this sort of "logic macro"
-becauase of the sheer convenience it has for us when manipulating
-collections.
+this same behavior could of course be accomplished "by hand" by
+implementing another operation method that performs the conditional
+check (whatever it is) in code.
+
+however we have nonetheless bundled this "logic macro" into the
+syntax experimentally because of the readability and expressive
+conciseness it provides when implementing common operations on
+collections (near dup-checking and the like).
 
 allowing for the use of an `if` expression requires that the
 subject component (class) implement a corresponding `test` method for

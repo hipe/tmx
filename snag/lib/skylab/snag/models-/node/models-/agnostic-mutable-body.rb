@@ -8,12 +8,14 @@ module Skylab::Snag
         @_o_a = []
       end
 
-      def prepend_component_ o, _ca, & _oes_p
+      def prepend_component_ qk, & _oes_p
+        o = qk.value_x
         @_o_a.unshift o
         o
       end
 
-      def append_component_ o, _ca, & _oes_p
+      def append_component_ qk, & _oes_p
+        o = qk.value_x
         @_o_a.push o
         o
       end

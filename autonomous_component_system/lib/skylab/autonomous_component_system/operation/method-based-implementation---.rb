@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   module Operation
 
-    class Method_based_Implementation___  # #open :[#012]
+    class Method_based_Implementation___
 
       # implement what we now call "transitive operations" (in [#009]):
       #
@@ -12,15 +12,20 @@ module Skylab::Autonomous_Component_System
       # these operations always involve one receiver (what we now call
       # "the ACS"), one operation name, and probably one argument component
       # (the "deliveree"). (other arguments may be involved pursuant to
-      # [#002]#Tenet8 modifiers.)
+      # [#002]#Tenet7 modifiers.)
       #
-      # component associations express the set of operations for which those
-      # components are valid to be the "deliveree" with the `can` expression.
+      # for any given component there are zero or more operations for which
+      # it is valid to pass that component as the "deliveree" to that
+      # operation. for example components of association `frizbozz`
+      # might be valid deliverees for `add_frizbozz` operations.
       #
-      # this earliest still-standing incarnation of operation does not
-      # support the expression of metadata for the operation as does the
-      # newer "formal operation". as such, operations like these are not fit
-      # for isomorphing to interfaces.
+      # we express this relationship from the component to the operation
+      # with the `can` expression in the component association.
+      #
+      # unlike the more recently implemented "formal operations", these
+      # operations themselves cannot have metadata associated with them.
+      # as such, transitive operations are not fit for ismorphing to
+      # user interfaces.
       #
       # #open [#012] is the idea of using formal operations to implement
       # these "transitive" operations too, allowing them to be as expressive
@@ -59,7 +64,7 @@ module Skylab::Autonomous_Component_System
         if using_
           args.concat using_
         end
-        args.push qk.value_x, qk.association
+        args.push qk
 
         _receiver = ss.fetch( -2 ).value_x
 

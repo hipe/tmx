@@ -111,19 +111,22 @@ module Skylab::Autonomous_Component_System
 
         elsif @_at_least_one_delivery_changed_something
 
-          _changelog = Change_Log___.new @_last_changeful_delivery_result
+          if @ACS.respond_to? DID_CHANGE__
 
-          @ACS.result_for_component_mutation_session_when_changed(
-            _changelog,
-            & @pp_ )
+            _changelog = Change_Log___.new @_last_changeful_delivery_result
+            @ACS.send DID_CHANGE__, _changelog, & @pp_
+          else
+            @_last_changeful_delivery_result
+          end
+        elsif @ACS.respond_to? NO_CHANGE__
+          @ACS.send NO_CHANGE__, & @pp_
         else
-
-          @ACS.result_for_component_mutation_session_when_no_change(
-            & @pp_ )
+          NIL_  # a no-op is not a success, by default (per this line (covered))
         end
-
-        # about [#006] handlers, noone uses these yet anyway..
       end
+
+      DID_CHANGE__ = :result_for_component_mutation_session_when_changed
+      NO_CHANGE__ = :result_for_component_mutation_session_when_no_change
 
       def _prepare_unit_of_work_queue
 

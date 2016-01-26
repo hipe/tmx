@@ -50,10 +50,5 @@ module Skylab::Zerk::TestSupport
 
       :_yep_
     end
-
-    def result_for_component_mutation_session_when_changed ch, & _
-
-      ch.last_delivery_result
-    end
   end
 end

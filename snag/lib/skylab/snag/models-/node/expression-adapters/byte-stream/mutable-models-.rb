@@ -20,8 +20,9 @@ module Skylab::Snag
           @row_a = row_a
         end
 
-        def prepend_component_ obj, _ca, & _
+        def prepend_component_ qk, & _
 
+          obj = qk.value_x
           a = _mutable_row_at_index( @r.begin ).o_a_
           if a.length.nonzero?
             o = a.first
@@ -37,8 +38,9 @@ module Skylab::Snag
           ACHIEVED_
         end
 
-        def append_component_ obj, _ca, & _
+        def append_component_ qk, & _
 
+          obj = qk.value_x
           a = _mutable_row_at_index( @r.end - 1 ).o_a_
           if a.length.nonzero?
             o = a.last
@@ -59,8 +61,9 @@ module Skylab::Snag
           Home_::Models::Hashtag::String_Piece.new_via_string SPACE_
         end
 
-        def remove_component_ obj, _ca
+        def remove_component_ qk
 
+          obj = qk.value_x
           did = false
           x = nil
 

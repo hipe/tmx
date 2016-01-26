@@ -78,16 +78,17 @@ module Skylab::Autonomous_Component_System::TestSupport
           end
         end
 
-        def component_is__color_starts_with_g__ x, ca, & _
+        def component_is__color_starts_with_g__ qk, & _
 
-          if 'g' == x[ 0 ]
+          if 'g' == qk.value_x[ 0 ]
             true
           else
             false
           end
         end
 
-        def __add__component x, ca, & _x_p
+        def __add__component qk, & _x_p
+          x = qk.value_x
           @_a.push x
           x
         end

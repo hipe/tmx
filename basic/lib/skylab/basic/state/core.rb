@@ -26,17 +26,14 @@ module Skylab::Basic
           State_
         end
 
-        def __add__component x, _ca, & _x_p
+        def __add__component qk, & _x_p
+          x = qk.value_x
           if x
             @_bx.add x.name_symbol, x
             x
           else
             x
           end
-        end
-
-        def result_for_component_mutation_session_when_changed change_log, & _
-          change_log.last_delivery_result
         end
 
         def build_state_machine

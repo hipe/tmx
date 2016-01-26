@@ -31,13 +31,13 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         o.execute
       end
 
-      def send_component_already_added cmp, asc, acs, & oes_p
+      def send_component_already_added qk, acs, & oes_p
 
         oes_p.call :error, :component_already_added do
 
           event( :Component_Already_Added ).new_with(
-            :component, cmp,
-            :component_association, asc,
+            :component, qk.value_x,
+            :component_association, qk.association,
             :ACS, acs,
             :ok, nil,  # overwrite so error becomes info
           )
@@ -45,26 +45,26 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         UNABLE_  # important
       end
 
-      def send_component_not_found cmp, asc, acs, & oes_p
+      def send_component_not_found qkn, acs, & oes_p
 
         oes_p.call :error, :component_not_found do
 
           Home_.event( :Component_Not_Found ).new_with(
-            :component, cmp,
-            :component_association, asc,
+            :component, qkn.value_x,
+            :component_association, qkn.association,
             :ACS, acs,
           )
         end
         UNABLE_  # important
       end
 
-      def send_component_removed cmp, asc, acs, & oes_p
+      def send_component_removed qk, acs, & oes_p
 
         oes_p.call :info, :component_removed do
 
           event( :Component_Removed ).new_with(
-            :component, cmp,
-            :component_association, asc,
+            :component, qk.value_x,
+            :component_association, qk.association,
             :ACS, acs,
           )
         end
@@ -159,7 +159,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
           p[ x ]
         end
 
-        cm = acs.send m do | * x_a |  # :Tenet4.
+        cm = acs.send m do | * x_a |  # :Tenet4. - assocs are defined as i.m's
           p[ x_a ]
         end
 
