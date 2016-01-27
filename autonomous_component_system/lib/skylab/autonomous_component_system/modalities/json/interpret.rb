@@ -6,14 +6,15 @@ module Skylab::Autonomous_Component_System
 
         def initialize & p
 
+          @_caller_oes_p = p
           @context_linked_list = nil
-          @_oes_p = p
           @on_empty_JSON_object = nil
         end
 
         def prepend_more_specific_context_by & desc_p
 
-          @context_linked_list = Home_.lib_.basic::List::Linked[ @context_linked_list, desc_p ]
+          _ = Home_.lib_.basic::List::Linked[ @context_linked_list, desc_p ]
+          @context_linked_list = _
           NIL_
         end
 
@@ -32,27 +33,27 @@ module Skylab::Autonomous_Component_System
             symbolize_names: true,
           )
 
-          rec = Recurse_.new(
+          _rec = Stack_Frame__.new(
             _x,
             remove_instance_variable( :@context_linked_list ),
             remove_instance_variable( :@customization_structure_x ),
             @ACS,
             @on_empty_JSON_object,
-            & @_oes_p )
+            & @_caller_oes_p )
 
-          rec._execute
+          _rec._execute
         end
       end
 
-      class Interpret::Recurse_
+      class Interpret::Stack_Frame__
 
-        def initialize x, context_x, cust_x, acs, on_empty, & p
+        def initialize x, context_x, cust_x, acs, on_empty, & top_oes_p
 
           @ACS = acs
           @context_linked_list = context_x
           @customization_structure_x = cust_x
-          @_oes_p = p
           @on_empty_JSON_object = on_empty
+          @_original_caller_oes_p = top_oes_p
           @_x = x
         end
 
@@ -70,13 +71,13 @@ module Skylab::Autonomous_Component_System
 
           @_did_any_assignments = false
 
-          p = ACS_::Interpretation_::Writer[ @ACS ]
+          accept_qkn = ACS_::Interpretation_::Writer[ @ACS ]
 
           @_accept_qkn = -> qkn do
 
             @_did_any_assignments = true
-            @_accept_qkn = p
-            p[ qkn ]
+            @_accept_qkn = accept_qkn
+            accept_qkn[ qkn ]
           end
 
           NIL_
@@ -180,7 +181,7 @@ module Skylab::Autonomous_Component_System
           a = remove_instance_variable :@_unorderd_deeps
           _sort a
           ok = true
-          a.each do | qkn |
+          a.each do |qkn|
             ok = ___go_deep_on qkn
             ok or break
           end
@@ -200,7 +201,7 @@ module Skylab::Autonomous_Component_System
 
         def ___resolve_branch_component_recursively qkn
 
-          # (evntually, fall back on using the normal constructors)
+          # (eventually, fall back on using the normal constructors)
 
           _on_component = if qkn.is_effectively_known
 
@@ -221,7 +222,7 @@ module Skylab::Autonomous_Component_System
 
           asc = qkn.association
 
-          _oes_p_p = _crazytimes asc
+          _oes_p_p = _reinit_handlers_for asc
 
           o = ACS_::Interpretation_::Build_value.begin(
             _on_component, asc, @ACS, & _oes_p_p )
@@ -249,13 +250,13 @@ module Skylab::Autonomous_Component_System
 
           _x = qkn.value_x
 
-          o = self.class.new(
+          o = Interpret::Stack_Frame__.new(
             _x,
             _ctx_,
             cust_x,
             cmp,
             @on_empty_JSON_object,
-            & @_LAST_component_oes_p )
+            & @_original_caller_oes_p )
 
           _xx_ = o._execute
 
@@ -300,9 +301,10 @@ module Skylab::Autonomous_Component_System
 
           asc = qkn.association
 
-          _pp = _crazytimes asc
+          _reinit_handlers_for asc
 
-          qk = ACS_::Interpretation_::Build_value[ _arg_st, asc, @ACS, & _pp ]
+          qk = ACS_::Interpretation_::Build_value.call(
+            _arg_st, asc, @ACS, & @_CURRENT_component_handler_builder )
 
           if qk
             @_accept_qkn[ qk ]
@@ -312,7 +314,7 @@ module Skylab::Autonomous_Component_System
           end
         end
 
-        def _crazytimes asc
+        def _reinit_handlers_for asc
 
           # read [#006]:#Event-models. this is the first codepoint where we
           # must know which event-model is being used, because it determines
@@ -321,38 +323,74 @@ module Skylab::Autonomous_Component_System
           # produces the raw "modality" handler that was passed to us? the
           # ACS (not the component) decides whether/how to bind the component.
 
-          _sym = @ACS.component_event_model  # gets read N times ..
-          if :cold == _sym
+          @_eventmodel_symbol ||= ___determine_eventmodel_symbol
 
-            # if we the ACS are under the cold model, then the component we
-            # are building must receive the exact same plain old handler
-            # that was passed to the subject performer.
+          send WHEN_EVENTMODEL_IS___.fetch( @_eventmodel_symbol ), asc
 
-            @_LAST_component_oes_p = @_oes_p  # we can set itnow
+          NIL_
+        end
 
-            -> _ do
-              @_oes_p
-            end
+        WHEN_EVENTMODEL_IS___ = {
+          cold: :__reinit_handlers_when_cold_for,
+          hot: :__reinit_handlers_when_hot_for,  # gone in this commit
+        }
+
+        def ___determine_eventmodel_symbol
+
+          # this used to be a hook-out, now it's a hook-in
+
+          if @ACS.respond_to? :component_event_model
+            @ACS.component_event_model
           else
+            :cold
+          end
+        end
 
-            # otherwise (and we assume the "hot" model), we hack it so we
-            # get a handle on the very .. handler that the built component
-            # builds (whenever (if ever) it builds it) so that in the case
-            # of compound nodes, if we encounter an error "down deep" we
-            # can report it with all of the context..
+        def __reinit_handlers_when_cold_for asc
 
-            chb = ACS_::Interpretation::CHB[ asc, @ACS ]
+          # if cold, whenever an emission is emitted during unserialization,
+          # emit an emission with the exact same signature but contextualized
 
-            @_LAST_component_oes_p = nil  # sanity - it is not set yet
+          me = self
+          orig_oes_p = @_original_caller_oes_p
 
-            -> component_x do
+          oes_p = -> * i_a, & ev_p do
+            orig_oes_p.call( * i_a ) do |y=nil|
 
-              oes_p = chb[ component_x ]
-              # $stderr.puts "WAHOO we received a handler from #{ asc.name.as_human }"
-              @_LAST_component_oes_p = oes_p
-              oes_p
+              if :expression == i_a.fetch( 1 )
+                me.__express_contextualized_expression y, asc, self, & ev_p
+              else
+                self._HAVE_FUN_theres_already_one_such_thing_at_020_
+              end
+            end
+            UNRELIABLE_
+          end
+
+          @_CURRENT_component_handler_builder = -> _ do
+            oes_p
+          end
+
+          @_CURRENT_component_oes_p = oes_p
+
+          NIL_
+        end
+
+        def __express_contextualized_expression y, asc, expag, & y_p
+
+          o = Home_::Modalities::Human::Contextualized_Expression.new
+
+          o.say_association = -> asc_ do
+            expag.calculate do
+              code asc_.name.as_variegated_symbol
             end
           end
+
+          o.context_linked_list = @context_linked_list
+          o.expression_agent = expag
+          o.expression_proc = y_p
+          o.subject_association = asc
+          o.upstream_line_yielder = y
+          o.execute  # result is y
         end
 
         def _sort qkn_a
@@ -406,10 +444,12 @@ module Skylab::Autonomous_Component_System
           @context_linked_list
         end
 
-        def on_event_selectively
-          @_oes_p
+        def caller_emission_handler_  # assume it's about to be used
+          @_original_caller_oes_p
         end
       end
+
+      UNRELIABLE_ = :_unreliable_
     end
   # -
 end

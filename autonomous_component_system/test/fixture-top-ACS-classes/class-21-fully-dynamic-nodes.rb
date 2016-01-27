@@ -4,6 +4,11 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     class Class_21_Fully_Dynamic_Nodes
 
+      class << self
+        alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
+        private :new
+      end  # >>
+
       def initialize
         @_injector = Injector.new
       end
@@ -19,7 +24,7 @@ module Skylab::Autonomous_Component_System::TestSupport
         end
 
         def __assokie__component_association
-          Here_::Class_72_Trueish
+          Here_::Class_91_Trueish
         end
 
         def __opie__component_operation

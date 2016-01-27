@@ -8,7 +8,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     it "non-sparse one-level structure" do
 
-      sn = const_( :Simple_Name ).new_empty_for_test_
+      sn = const_( :Simple_Name ).new_cold_root_ACS_for_expect_root_ACS
       sn.first_name = "\"spike\""
       sn.last_name = "jonez"
 
@@ -19,7 +19,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     it "with sparse structres it does NOT render nil" do
 
-      sn = const_( :Simple_Name ).new_empty_for_test_
+      sn = const_( :Simple_Name ).new_cold_root_ACS_for_expect_root_ACS
       sn.last_name = "gustav"
 
       _s = _to_json_not_pretty sn
@@ -28,11 +28,11 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     it "two levels ..?" do
 
-      sn = const_( :Simple_Name ).new_empty_for_test_
+      sn = const_( :Simple_Name ).new_cold_root_ACS_for_expect_root_ACS
       sn.first_name = "FN"
       sn.last_name = "LN"
 
-      cn = const_( :Credits_Name ).new_empty_for_test_
+      cn = const_( :Credits_Name ).new_cold_root_ACS_for_expect_root_ACS
       cn.simple_name = sn
       cn.nickname = "NN"
 

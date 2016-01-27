@@ -175,23 +175,32 @@ module Skylab::Autonomous_Component_System
         end  # >>
 
         def initialize x
-          @current_token = x
-          @unparsed_exists = true
+          @_done = false
+          @_kn = Callback_::Known_Known[ x ]
         end
 
         def gets_one
-          @unparsed_exists = true
-          remove_instance_variable :@current_token
+          x = current_token
+          advance_one
+          x
+        end
+
+        def current_token
+          @_kn.value_x
+        end
+
+        def advance_one
+          remove_instance_variable :@_kn
+          @_done = true ; nil
+        end
+
+        def unparsed_exists
+          ! @_done
         end
 
         def no_unparsed_exists
-          ! @unparsed_exists
+          @_done
         end
-
-        attr_reader(
-          :current_token,
-          :unparsed_exists
-        )
       end
 
       Looks_primitive = -> x do  # `nil` is NOT primitive by this definition!

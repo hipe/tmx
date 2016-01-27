@@ -82,7 +82,9 @@ module Skylab::Autonomous_Component_System::TestSupport
         self._WRITE_ME
       end
 
-      root = subject_root_ACS_class.new_
+      _cls = subject_root_ACS_class
+
+      root = _cls.new_cold_root_ACS_for_expect_root_ACS
 
       oes_p = event_log.handle_event_selectively
 
@@ -99,6 +101,16 @@ module Skylab::Autonomous_Component_System::TestSupport
     def const_ sym
       subject_root_ACS_class.const_get( sym, false )
     end
+
+    # --
+
+    def clean_expag_
+      Home_.lib_.brazen::API.expression_agent_instance
+    end
+
+    def codifying_expag_
+      Callback_::Event.codifying_expression_agent_instance
+    end
   end
 
   Callback_ = ::Skylab::Callback
@@ -114,6 +126,11 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     class Class_01_Empty
 
+      class << self
+        alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
+        private :new
+      end  # >>
+
       def initialize & oes_p
         @_IGNORED_EVENT_HANDLER = true
       end
@@ -123,12 +140,29 @@ module Skylab::Autonomous_Component_System::TestSupport
       end
     end
 
-    Class_72_Trueish = -> st do
+    Class_91_Trueish = -> st do
       x = st.gets_one
       if x
         Callback_::Known_Known[ x ]
       else
         self._NOT_NEEDED_YET
+      end
+    end
+
+    rx_92 = nil
+    Class_92_Normal_Primitive_Lemma = -> st, & pp do
+      rx_92 ||= /\A[a-z]+\z/
+      s = st.current_token
+      if rx_92 =~ s
+        st.advance_one
+        Callback_::Known_Known[ s ]
+      else
+        _oes_p = pp[ nil ]
+        _oes_p.call :error, :expression, :nope do |y|
+          y << "(must be a lowercase word (had: #{ ick s }).)"
+          y << "so i guess that's that."
+        end
+        UNABLE_
       end
     end
 

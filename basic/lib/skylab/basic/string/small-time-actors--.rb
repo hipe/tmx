@@ -96,19 +96,27 @@ module Skylab::Basic
         end
       end
 
-      class Unparenthesize_message_string
+      module Unparenthesize_message_string
 
-        Callback_::Actor.call self, :properties,
-          :s
+        p = -> s do
+          md = UNPARENTHESIZE_RX___.match s
+          if md
+            [ md[ :open ], md[ :body ], md[ :close ] ]
+          else
+            [ nil, s, nil ]
+          end
+        end
 
-        def execute
-          md = UNPARENTHESIZE_RX__.match @s
-          md ? [ md[ :open ], md[ :body ], md[ :close ] ] : [ nil, @s, nil ]
+        define_singleton_method :to_proc do p end
+        define_singleton_method :_call, p
+        class << self
+          alias_method :[], :_call
+          alias_method :call, :_call
         end
 
         _P = '.?!:'
         _P_ = "[#{ _P }]*"
-        UNPARENTHESIZE_RX__ = /\A(?:
+        UNPARENTHESIZE_RX___ = /\A(?:
           (?<open> \( )  (?<body> .*[^#{ _P }] )?  (?<close> #{ _P_ }\) ) |
           (?<open> \[ )  (?<body> .*[^#{ _P }] )?  (?<close> #{ _P_ }\] ) |
           (?<open>  < )  (?<body> .*[^#{ _P }] )?  (?<close> #{ _P_ }>  ) |
@@ -118,3 +126,4 @@ module Skylab::Basic
     end
   end
 end
+# #tombstone: "unparenthesize" once had its own file

@@ -25,7 +25,7 @@ module Skylab::Autonomous_Component_System
 
       def Empty.[] sess
 
-        sess.on_event_selectively.call :error, :empty_object do
+        sess.caller_emission_handler_.call :error, :empty_object do
 
           new_with :context_linked_list, sess.context_linked_list
         end

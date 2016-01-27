@@ -2,6 +2,8 @@ module Skylab::Zerk::TestSupport
 
   module API
 
+    PUBLIC = true  # [mt]
+
     Require_ACS_for_testing_[]
 
     def self.[] tcc
@@ -58,19 +60,30 @@ module Skylab::Zerk::TestSupport
 
       def call * x_a
 
-        block_given? and raise ::ArgumentError
-
-        @root_ACS ||= build_root_ACS
-
-        oes_p = event_log.handle_event_selectively
-        _pp = -> _ do
-          oes_p
+        if block_given?
+          raise ::ArgumentError, ___say_why_no_blocks
         end
 
-        _x = Home_::API.call x_a, @root_ACS, & _pp
+        @root_ACS ||= build_root_ACS  # build COLD root ACS
+
+        el = event_log
+        if el
+          use_oes_p = el.handle_event_selectively
+          use_pp = -> _ do
+            use_oes_p
+          end
+        else
+          use_pp = No_events_because_etc_pp_
+        end
+
+        _x = Home_::API.call x_a, @root_ACS, & use_pp
         _o = remove_instance_variable :@root_ACS
 
         root_ACS_state_via _x, _o
+      end
+
+      def ___say_why_no_blocks
+        "isn't the event log's handler what you want?"
       end
 
       # -- hook-outs/ins
@@ -84,5 +97,15 @@ module Skylab::Zerk::TestSupport
       end )
 
     # -
+
+    say_etc = nil
+
+    No_events_because_etc_pp_ = -> * do  # cp from [ac]
+      fail say_etc[]
+    end
+
+    say_etc = -> do
+      "no events were expected because `event_log` was false-ish"
+    end
   end
 end

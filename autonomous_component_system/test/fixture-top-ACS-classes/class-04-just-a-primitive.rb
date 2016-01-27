@@ -4,14 +4,13 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     class Class_04_Just_a_Primitive
 
+      class << self
+        alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
+        private :new
+      end  # >>
+
       def __file_name__component_association
         Here_::Class_71_File_Name
-      end
-
-      # -- necessary for unmarshal
-
-      def component_event_model
-        :hot
       end
 
       # -- just for the tests

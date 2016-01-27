@@ -4,6 +4,11 @@ module Skylab::Zerk::TestSupport
 
     class Class_11_Minimal_Postfix
 
+      class << self
+        alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
+        private :new
+      end  # >>
+
       def __left_number__component_association
         Here_::Class_71_Number
       end

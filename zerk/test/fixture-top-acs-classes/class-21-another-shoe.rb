@@ -6,6 +6,11 @@ module Skylab::Zerk::TestSupport
 
     O__ = ACS_.test_support
 
+    class << self
+      alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
+      private :new
+    end  # >>
+
     def __shoe__component_association
       Shoe
     end

@@ -59,8 +59,9 @@ module Skylab::Autonomous_Component_System::TestSupport
       class MC_2_Xx
 
         class << self
-          alias_method :new_, :new
-        end
+          alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
+          private :new
+        end  # >>
 
         def __paths__component_association
 

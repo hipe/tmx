@@ -9,7 +9,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    # NOTE `event_log` is defined as nil towards end - so no `expect_event`
+    # NOTE - see #expect-no-events below
     use :expect_root_ACS
 
     context "fully dynamic association" do
@@ -67,7 +67,7 @@ module Skylab::Autonomous_Component_System::TestSupport
         end
       end
 
-      def event_log
+      def event_log  # #expect-no-events
         NIL_
       end
 

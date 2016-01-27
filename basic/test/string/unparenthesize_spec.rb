@@ -37,7 +37,7 @@ module Skylab::Basic::TestSupport
     end
 
     def subject s
-      md = subject_module_.unparenthesize_message_string::UNPARENTHESIZE_RX__.match s
+      md = subject_module_.unparenthesize_message_string::UNPARENTHESIZE_RX___.match s
       if md
         [ md[ :open ], md[ :body ], md[ :close ] ]  # not 'captures'
       end

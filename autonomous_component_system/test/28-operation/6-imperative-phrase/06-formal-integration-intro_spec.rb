@@ -13,7 +13,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       call_by_ do
         _ = event_log.handle_event_selectively
-        shoe = _shoe_model.new_
+        shoe = _shoe_model.new_cold_root_ACS_for_expect_root_ACS
         @result = shoe.edit :set, :lace, :color, "red", & _
         @root_ACS = shoe ; nil
       end
@@ -91,11 +91,11 @@ module Skylab::Autonomous_Component_System::TestSupport
     end
 
     def _new_shoe
-      _shoe_model.new_
+      _shoe_model.new_cold_root_ACS_for_expect_root_ACS
     end
 
     def expression_agent_for_expect_event
-      Home_.lib_.brazen::API.expression_agent_instance
+      clean_expag_
     end
 
     def subject_root_ACS_class

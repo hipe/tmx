@@ -61,6 +61,11 @@ in a relationship.)
 
 ## :#Event-models
 
+at writing we have (thank goodness) simplified things so we only
+have the "cold" eventmodel, and will perhaps succeed in re-writing
+the "hot" eventmodel out of existence. we'll wait to see how that
+goes .. (#during: [#010]) (EDIT:
+
 this is in flux (but may become stable). at writing this dichotomy
 is fresh, and is going thru its experimental "incubation" period.
 
@@ -98,6 +103,8 @@ method defined *on* the custodian.
 the benefit of the hot model is that the custodian can act as a sort
 of "mapper" (like a filter) of the events its components emit, allowing
 for some clever tricks with contextualizing events.
+
+(EDIT: the above is now seen as 'misleading')
 
 the cost of the hot model is that participating components are bound to
 this one listener for the lifetime of the component, not the lifetime of

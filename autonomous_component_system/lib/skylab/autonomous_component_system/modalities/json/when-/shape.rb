@@ -26,7 +26,7 @@ module Skylab::Autonomous_Component_System
 
         # (overrides a an event prototype method for building an event)
 
-        sess.on_event_selectively.call :error, :strange_shape do
+        sess.caller_emission_handler_.call :error, :strange_shape do
 
           new_with(
             :x, x,

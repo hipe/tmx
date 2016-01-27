@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Autonomous_Component_System::TestSupport
 
-  describe "[ac] modalities - JSON - interpret" do
+  describe "[ac] modalities - JSON - interpretation intro" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -46,8 +46,10 @@ module Skylab::Autonomous_Component_System::TestSupport
 
         it "emits" do
 
-          _be_this = be_emission :error, :expression, :no do |s_a|
-            s_a.should eql [ "no: monsieur" ]
+          _be_this = be_emission :error, :expression, :no do |y|
+
+            y.first.should be_include "can't be lowercase"
+              # (the above sort of expr gets MUCH more attention in #23)
           end
 
           only_emission.should _be_this
@@ -178,10 +180,7 @@ module Skylab::Autonomous_Component_System::TestSupport
     def _do_from oes_p, json
 
       cls = const_ _which
-      if ! cls.respond_to? :new_empty_for_test_
-        raise ::NoMethodError, ___say( cls )
-      end
-      new_empty = cls.new_empty_for_test_
+      new_empty = cls.new_cold_root_ACS_for_expect_root_ACS
 
       o = Home_::Modalities::JSON::Interpret.new( & oes_p )
 
@@ -197,13 +196,12 @@ module Skylab::Autonomous_Component_System::TestSupport
       _ok && new_empty
     end
 
-    def ___say cls
-      # honestly platform
-      "undefined method `new_empty_for_test_` for #{ cls.name }"
-    end
-
     def _fails
       root_ACS_result.should be_common_result_for_failure
+    end
+
+    def expression_agent_for_expect_event
+      clean_expag_
     end
 
     def subject_root_ACS_class

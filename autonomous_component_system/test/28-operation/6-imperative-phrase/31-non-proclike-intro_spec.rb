@@ -43,7 +43,7 @@ module Skylab::Autonomous_Component_System::TestSupport
     end
 
     def expression_agent_for_expect_event
-      Callback_::Event.codifying_expression_agent_instance
+      codifying_expag_
     end
 
     def subject_root_ACS_class

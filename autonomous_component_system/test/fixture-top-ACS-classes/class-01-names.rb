@@ -6,6 +6,8 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       class << self
 
+        alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
+
         def interpret_compound_component p, & _  # #experimental [#003]#compounds
           if p
             _me = new
@@ -23,9 +25,8 @@ module Skylab::Autonomous_Component_System::TestSupport
           end
         end
 
-        alias_method :new_empty_for_test_, :new
         private :new
-      end
+      end  # >>
 
       attr_accessor(
         :first_name,
@@ -50,7 +51,7 @@ module Skylab::Autonomous_Component_System::TestSupport
             _oes_p = oes_p_p[ nil ]
 
             _oes_p.call :error, :expression, :no do | y |
-              y << "no: #{ s }"
+              y << "can't be lowercase (had #{ ick s })"
             end
             false
           end
@@ -70,7 +71,7 @@ module Skylab::Autonomous_Component_System::TestSupport
     class Credits_Name
 
       class << self
-        alias_method :new_empty_for_test_, :new
+        alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
         private :new
       end  # >>
 

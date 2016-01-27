@@ -22,7 +22,9 @@
 [#110]       ..
 [#109]       when missing arguments fancy ..
 [#108]       testing conventions near CLI ..
-[#107] #open `name` should not be the name used here
+[#107]       `name` should not be the name used here
+             #after:[#sa-119]
+             (piggyback: `terminal_channel_i` too)
 [#106]       fun with help screen parsing ..
 [#105]       the isomorphic method argument narrative ..
 [#104]       the isomorphic methods client narrative ..

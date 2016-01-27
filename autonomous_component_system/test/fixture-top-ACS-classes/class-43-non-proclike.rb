@@ -5,13 +5,9 @@ module Skylab::Autonomous_Component_System::TestSupport
     class Class_43_Non_ProcLike
 
       class << self
-        alias_method :new_, :new
-        # private :new  [ze]
+        alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
+        private :new
       end  # >>
-
-      def initialize
-        # (at writing an oes_p is passed by [ze] only. we don't need it (cold model)
-      end
 
       def __zoof__component_operation
 

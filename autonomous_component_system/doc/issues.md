@@ -1,3 +1,5 @@
+[#021]       [ contextualization of expression emissions ]  #[#ca-066]
+[#020]       [ contextualization of event structures ]  #[#ca-066]
 [#019]       [ intent ]
 [#018]       [ load ticket ]  (as a concept)
 [#017]       #when: [#010] finally look at keyword args
@@ -15,7 +17,7 @@
 
 [#011]   #when:[#sa-019] sub `ACS_` for `Home_` (this idiom didn't age well)
 
-[#010] #open this big campaign (the 9 milestones)
+[#010] #open this big campaign (the 9 milestones) (has subscribers here)
 
 [#009]       intro to operations..
 

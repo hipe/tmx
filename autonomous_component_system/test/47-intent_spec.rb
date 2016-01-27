@@ -8,6 +8,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
+    # NOTE - see #expect-no-events below
     use :expect_root_ACS
 
     shared_subject :_ACS do
@@ -54,7 +55,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       a
     end
 
-    def event_log
+    def event_log  # #expect-no-events
       NIL_
     end
 

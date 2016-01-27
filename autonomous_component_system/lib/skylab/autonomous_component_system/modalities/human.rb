@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
   # ->
     module Modalities::Human
 
-      # mostly contextualize expressions of events
+      # mostly contextualize expressions of events :[#020].
 
       # -- Event via X
 
@@ -59,7 +59,7 @@ module Skylab::Autonomous_Component_System
         _ev
       end
 
-      Event_via_expression = -> desc_sym, event_category, & x_p do
+      Event_via_expression = -> desc_sym, event_category, & x_p do  # #[#021]
 
         _ok = :error == event_category ? false : nil
 
@@ -244,3 +244,4 @@ module Skylab::Autonomous_Component_System
     end
   # -
 end
+# #pending-rename: branch down
