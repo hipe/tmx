@@ -71,7 +71,7 @@ module Skylab::Autonomous_Component_System
             break
           end
 
-          _asc_reader = Component_Association.reader_for acs
+          _asc_reader = Home_::Component_association_reader[ acs ]
 
           asc = _asc_reader.call st.current_token do
             NO_SUCH_ASSOCIATION___

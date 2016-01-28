@@ -14,7 +14,7 @@ module Skylab::Zerk::TestSupport
     context "empty call from beginning - result is qk of top ACS" do
 
       call_by do
-        call
+        call  # #test-01
       end
 
       it "no events" do
@@ -32,7 +32,7 @@ module Skylab::Zerk::TestSupport
     context "first guy not found" do
 
       call_by do
-        call :wazoo
+        call :wazoo  # #test-02
       end
 
       it "fails" do
@@ -58,7 +58,7 @@ module Skylab::Zerk::TestSupport
         o = build_root_ACS
         o.set_file_nerm :_xXx_
         @root_ACS = o
-        call :file_name
+        call :file_name  # #test-07
       end
 
       it "emits nothing" do
@@ -76,7 +76,7 @@ module Skylab::Zerk::TestSupport
     context "primitivesque then \"bad\" value - component must emit" do
 
       call_by do
-        call :file_name, '/'
+        call :file_name, '/'  # #test-10
       end
 
       it "fails" do
@@ -96,7 +96,7 @@ module Skylab::Zerk::TestSupport
     context "primitivesque then \"good\" value (but nothing else..)" do
 
       call_by do
-        call :file_name, 'hi'
+        call :file_name, 'hi'  # #test-11
       end
 
       it "value is written" do

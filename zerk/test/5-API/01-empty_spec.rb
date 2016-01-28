@@ -14,7 +14,7 @@ module Skylab::Zerk::TestSupport
     context "call it with nothing" do
 
       call_by do
-        call
+        call  # #test-01
       end
 
       it "results in a qualified knownness of the root ACS" do
@@ -30,7 +30,7 @@ module Skylab::Zerk::TestSupport
     context "call it with something" do
 
       call_by do
-        call :something
+        call :something  # #test-02
       end
 
       it "fails" do

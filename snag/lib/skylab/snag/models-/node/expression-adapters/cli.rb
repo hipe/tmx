@@ -12,7 +12,7 @@ module Skylab::Snag
 
           sess.register_properties do | o |
 
-            comp_assoc_for = ACS_[]::Component_Association.reader_for first
+            comp_assoc_for = ACS_[]::Component_association_reader[ first ]
 
             first.formal_properties.each do | prp |
 

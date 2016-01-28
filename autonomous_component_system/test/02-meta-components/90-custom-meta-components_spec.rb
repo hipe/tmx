@@ -77,7 +77,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
               Require_it___[]
 
-              My_Comp_Assoc.method_based_reader_for self
+              My_Comp_Assoc.method_based_component_association_reader_for self
             end
           end
 

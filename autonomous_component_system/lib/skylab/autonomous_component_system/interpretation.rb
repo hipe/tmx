@@ -11,7 +11,7 @@ module Skylab::Autonomous_Component_System
 
         # make a note of any exisiting value before we replace it
 
-        orig_qkn = ACS_::Reflection_::Read[ asc, acs ]
+        orig_qkn = ACS_::Reflection_::Read_component_qualified_knownness[ asc, acs ]
 
         # (we assume A) that we are [#003]:not-long-running, and that
         # B) in the typical request, at most one component will change (per

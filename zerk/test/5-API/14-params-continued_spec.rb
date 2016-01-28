@@ -10,7 +10,7 @@ module Skylab::Zerk::TestSupport
     context "call a thing with one required arg (invalid)" do
 
       call_by do
-        call :shoe, :lace, :set_length, '-4'
+        call :shoe, :lace, :set_length, '-4'  # [#test-05 &] #test-50-05
       end
 
       it "fails" do
@@ -26,7 +26,7 @@ module Skylab::Zerk::TestSupport
     context "same (valid)" do
 
       call_by do
-        call :shoe, :lace, :set_length, '1'
+        call :shoe, :lace, :set_length, '1'  # [#test-05 &] #test-50-05
       end
 
       it "ok" do
@@ -45,6 +45,25 @@ module Skylab::Zerk::TestSupport
       end
     end
 
+    context "complex globby - missing required" do
+
+      shared_subject :_msg do
+        begin
+          call :shoe, :globbie_complex, :is_dry, true, :file, EMPTY_A_
+        rescue ::ArgumentError => e
+        end
+        e.message
+      end
+
+      it "lists the missing argument(s)" do
+        _msg.should be_include 'missing required argument(s) (`action`)'
+      end
+
+      it "expresses the fully qualified name of the operation" do
+        _msg.should match %r(\bfor `shoe` `globbie_complex`\z)
+      end
+    end
+
     context "complex globby - defaults work" do
 
       call_by do
@@ -53,7 +72,7 @@ module Skylab::Zerk::TestSupport
 
       it "ok" do
         _x = root_ACS_result
-        _x.should eql [ :_fun_, :A, false, false, [] ]
+        _x.should eql [ :_fun_, :A, false, false, EMPTY_A_ ]
       end
     end
 

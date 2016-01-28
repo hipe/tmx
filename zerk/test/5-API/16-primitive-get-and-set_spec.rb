@@ -7,13 +7,14 @@ module Skylab::Zerk::TestSupport
     # NOTE the implementation of and syntax for this used to have more
     # moving parts before we made the simplification illustrated in [#012].
     #
-    # (we used have what amounted to a somewhat redundant implementation
+    # we used have what amounted to a somewhat redundant implementation
     # of something resembling "transitive operations" but only for
     # interfaces. now, interface-specifics are not allowed in ACS's,
-    # and getters/setters arrive out of the box in a zerk API.)
+    # and getters/setters are automatically part of a zerk-generated
+    # API syntax.
     #
     # as such, this is now more redundant than it used to be with previous
-    # test and so it is now subject to re-appropriation.
+    # test and so it is now subject to re-appropriation as may be desired.
 
     TS_[ self ]
     use :API
@@ -23,7 +24,7 @@ module Skylab::Zerk::TestSupport
       context "get when not set" do
 
         call_by do
-          call :shoestring_length
+          call :shoestring_length  # #test-06
         end
 
         it "qk etc" do
@@ -49,7 +50,7 @@ module Skylab::Zerk::TestSupport
       context "set when invalid" do
 
         call_by do
-          call :shoestring_length, '98 degrees'
+          call :shoestring_length, '98 degrees'  # #test-10
         end
 
         it "fails" do
@@ -69,7 +70,7 @@ module Skylab::Zerk::TestSupport
       context "set when valid" do
 
         call_by do
-          call :shoestring_length, '98'
+          call :shoestring_length, '98'  # #test-11
         end
 
         it "appears to work" do

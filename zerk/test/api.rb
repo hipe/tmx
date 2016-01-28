@@ -64,26 +64,41 @@ module Skylab::Zerk::TestSupport
           raise ::ArgumentError, ___say_why_no_blocks
         end
 
-        @root_ACS ||= build_root_ACS  # build COLD root ACS
+        _pp = __some_handler_builder_for_zerk_expect_API
 
-        el = event_log
-        if el
-          use_oes_p = el.handle_event_selectively
-          use_pp = -> _ do
-            use_oes_p
-          end
-        else
-          use_pp = No_events_because_etc_pp_
+        init_result_for_zerk_expect_API x_a, & _pp
+
+        _x = remove_instance_variable :@result
+
+        if instance_variable_defined? :@root_ACS
+          _o = remove_instance_variable :@root_ACS
         end
-
-        _x = Home_::API.call x_a, @root_ACS, & use_pp
-        _o = remove_instance_variable :@root_ACS
 
         root_ACS_state_via _x, _o
       end
 
       def ___say_why_no_blocks
         "isn't the event log's handler what you want?"
+      end
+
+      def __some_handler_builder_for_zerk_expect_API  # publicize whenever
+
+        el = event_log
+        if el
+          use_oes_p = el.handle_event_selectively
+          -> _ do
+            use_oes_p
+          end
+        else
+          No_events_because_etc_pp_
+        end
+      end
+
+      def init_result_for_zerk_expect_API x_a, & pp
+
+        @root_ACS ||= build_root_ACS  # build COLD root ACS
+        @result = Home_::API.call x_a, @root_ACS, & pp
+        NIL_
       end
 
       # -- hook-outs/ins
@@ -100,7 +115,7 @@ module Skylab::Zerk::TestSupport
 
     say_etc = nil
 
-    No_events_because_etc_pp_ = -> * do  # cp from [ac]
+    No_events_because_etc_pp_ = -> _ do  # cp from [ac]
       fail say_etc[]
     end
 

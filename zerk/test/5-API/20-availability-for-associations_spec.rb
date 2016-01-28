@@ -10,7 +10,7 @@ module Skylab::Zerk::TestSupport
     context "read when available" do
 
       call_by do
-        call :upper_color
+        call :upper_color  # #test-07
       end
 
       it "ok" do
@@ -23,7 +23,7 @@ module Skylab::Zerk::TestSupport
     context "write when available" do
 
       call_by do
-        call :upper_color, :red
+        call :upper_color, :red  # #test-11
       end
 
       it "ok" do
@@ -37,7 +37,7 @@ module Skylab::Zerk::TestSupport
       call_by do
         @root_ACS = build_root_ACS
         @root_ACS.make_ucolor_unavailable_!
-        call :upper_color
+        call :upper_color  # #test-07+avail
       end
 
       it "fails" do
@@ -54,7 +54,7 @@ module Skylab::Zerk::TestSupport
       call_by do
         @root_ACS = build_root_ACS
         @root_ACS.make_ucolor_unavailable_!
-        call :upper_color, :red
+        call :upper_color, :red  # #test-11+avail
       end
 
       it "fails" do

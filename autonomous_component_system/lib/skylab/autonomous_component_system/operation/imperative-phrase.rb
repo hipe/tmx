@@ -156,7 +156,7 @@ module Skylab::Autonomous_Component_System
         # node (primitivesque or entitesque) we need to build in order to
         # find the recipient for the verb..
 
-        _reader = Component_Association.reader_for @selection_stack.last.value_x
+        _reader = Component_association_reader[ @selection_stack.last.value_x ]
         _asc = _reader.call @argument_stream.current_token
         @argument_stream.advance_one
 

@@ -4,11 +4,11 @@ module Skylab::Zerk
 
     # -
 
-      When_no_such_association___ = -> up do
+      When_no_such_association___ = -> ss, arg_st do
 
         Require_field_library_[]
 
-        _st = up.selection_stack.last.to_node_stream_
+        _st = ss.last.to_node_stream_
 
         _st_ = _st.map_by do |qk|
           qk.name.as_variegated_symbol
@@ -18,7 +18,7 @@ module Skylab::Zerk
 
         o = Fields_::MetaMetaFields::Enum::Build_extra_value_event.new
 
-        o.invalid_value = up.argument_stream.current_token
+        o.invalid_value = arg_st.current_token
 
         o.valid_collection = _st__
 

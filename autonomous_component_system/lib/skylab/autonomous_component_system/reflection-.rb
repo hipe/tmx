@@ -7,7 +7,7 @@ module Skylab::Autonomous_Component_System
       read_via_ivar = nil
       read_via_method = nil
 
-      Reader = -> acs do  # and [ze]
+      Component_qualified_knownness_reader = -> acs do  # and [ze]
 
         if acs.respond_to? READ_METHOD__
           -> asc do
@@ -20,7 +20,7 @@ module Skylab::Autonomous_Component_System
         end
       end
 
-      Read = -> asc, acs do  # redunds with above
+      Read_component_qualified_knownness = -> asc, acs do  # redunds with above
 
         if acs.respond_to? READ_METHOD__
           read_via_method[ asc, acs ]
@@ -40,6 +40,10 @@ module Skylab::Autonomous_Component_System
           Callback_::Qualified_Knownness.via_association asc
         end
       end
+
+      READ_METHOD__ =
+        :_NOT_CURRENTLY_USED_qualified_knownness_of_component_via_association
+          #  WAS `component_wrapped_value` - stay or go during [#010]
 
       read_via_ivar = -> asc, acs do
 
@@ -259,8 +263,6 @@ module Skylab::Autonomous_Component_System
           :name_symbol,
         )
       end
-
-      READ_METHOD__ = :component_wrapped_value
     end
   # -
 end

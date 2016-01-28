@@ -2,11 +2,10 @@ require_relative '../test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] API - params intro" do  # used to test r.t
+  describe "[ze] API - params intro (DOESN'T EVEN GET TO PARAMS)" do
 
     TS_[ self ]
     use :API
-    # use :modalities_reactive_tree
 
     it "shoe model loads" do
       subject_root_ACS_class.hello.should eql :_omg_shoes_
@@ -15,7 +14,7 @@ module Skylab::Zerk::TestSupport
     context "call a strange operation - enumerates avail. ops" do
 
       call_by do
-        call :shoe, :wazoozle
+        call :shoe, :wazoozle  # [#test-02 &] #test-50-02
       end
 
       it "fails" do
@@ -34,17 +33,16 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "an invoke that ends on the branch node.." do
+    context "an invoke that ends on the branch node that wasn't set.." do
 
       call_by do
-        call :shoe, :lace
+        call :shoe, :lace  # [#test-08 &] #test-50-08
       end
 
-      it "results in a qk about the entitesque (UNKNOWN)" do
+      it "results in a qk talkin bout known unknown" do
         qk = root_ACS_result
-        qk.is_known_known or fail
+        qk.is_known_known and fail
         qk.association.name_symbol.should eql :lace
-        qk.value_x.hello.should eql :_hi_im_lace_
       end
 
       it 'emits nothing' do
@@ -52,10 +50,10 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "call an action under the sub-branch" do
+    context "call an operation under the sub-branch" do
 
       call_by do
-        call :shoe, :lace, :get_color
+        call :shoe, :lace, :get_color  # [#test-05 &] #test-50-05
       end
 
       it "results in whatever business result" do

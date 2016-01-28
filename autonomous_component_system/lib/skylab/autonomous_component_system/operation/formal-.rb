@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   module Operation
 
-    class Formal_
+    class Formal_  # used by [ze] too
 
       # the "formal" part of the operation is that which is defined by the
       # association-like DSL expression. this data is wrapped by this node
@@ -31,8 +31,12 @@ module Skylab::Autonomous_Component_System
 
       # --
 
-      def deliverable_via_selection_stack_and_argument_stream ss, arg_st, & pp
-        deliverable_ Request_for_Deliverable_[ ss, nil, arg_st, pp ]
+      def deliverable_via_argument_stream arg_st, & pp
+        deliverable_ Request_for_Deliverable_[
+          @selection_stack,
+          nil,  # no modifiers for such a call
+          arg_st,
+          pp ]
       end
 
       def deliverable_ dreq
@@ -94,6 +98,8 @@ module Skylab::Autonomous_Component_System
       def name
         @selection_stack.fetch( -1 )
       end
+
+      attr_reader :selection_stack  # [ze]
     end
   end
 end

@@ -137,7 +137,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       o_._set_object 'chocolate'
 
-      o._set_verb_phrase o_
+      o.set_verb_phrase_for_expect_root_ACS o_
 
       o
     end

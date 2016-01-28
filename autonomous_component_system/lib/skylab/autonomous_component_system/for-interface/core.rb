@@ -51,7 +51,7 @@ module Skylab::Autonomous_Component_System
 
         def execute  # compare to here-A
 
-          @_qk = Home_::Reflection_::Read[ @asc, @ACS ]
+          @_qk = Home_::Reflection_::Read_component_qualified_knownness[ @asc, @ACS ]
           @_is_known = @_qk.is_effectively_known
 
           if @asc.model_classifications.looks_primitivesque

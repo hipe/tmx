@@ -10,7 +10,7 @@ module Skylab::Zerk::TestSupport
     context "only write an item - result is the qk (REDUNDANT w/ prev file)" do
 
       call_by do
-        call :left_number, 10
+        call :left_number, 10  # #test-11
       end
 
       it "result is qk" do
@@ -33,7 +33,7 @@ module Skylab::Zerk::TestSupport
     context "write one item then read another - OK (but eew)" do
 
       call_by do
-        call :left_number, 10, :right_number
+        call :left_number, 10, :right_number  # #test-12
       end
 
       it "emits same" do
@@ -50,7 +50,7 @@ module Skylab::Zerk::TestSupport
     context "write two items but first fails - second is not written" do
 
       call_by do
-        call :left_number, '--10', :right_number, 11
+        call :left_number, '--10', :right_number, 11  # #test-10
       end
 
       it "fails" do
@@ -71,7 +71,7 @@ module Skylab::Zerk::TestSupport
     context "write two items but second fails - first stays (NOT ATOMIC)" do
 
       call_by do
-        call :left_number, 10, :right_number, '--11'
+        call :left_number, 10, :right_number, '--11'  # #test-13
       end
 
       it "fails" do
@@ -96,7 +96,7 @@ module Skylab::Zerk::TestSupport
     context "write two items then add THEN read a primitivesque - NO" do
 
       call_by do
-        call :left_number, 1, :right_number, 2, :add, :right_number
+        call :left_number, 1, :right_number, 2, :add, :right_number  # #test-04
       end
 
       it "fails" do
@@ -117,7 +117,7 @@ module Skylab::Zerk::TestSupport
     context "write two items then add" do
 
       call_by do
-        call :left_number, '-2', :right_number, 5, :add
+        call :left_number, '-2', :right_number, 5, :add  # #test-15
       end
 
       it "result" do

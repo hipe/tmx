@@ -49,7 +49,6 @@ _
 
 ## rationale for rules of usage
 
-
   • keeping these in the same order across files allows them to
     become landmarks for each other.
 

@@ -204,6 +204,17 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
     COMPOUND_CONSTRUCTOR_METHOD_ = :interpret_compound_component
 
+    Component_association_reader = -> acs do
+
+      if acs.respond_to? CA_READER_METHOD__
+        acs.send CA_READER_METHOD__
+      else
+        Component_Association.method_based_component_association_reader_for acs
+      end
+    end
+
+    CA_READER_METHOD__ = :component_association_reader
+
     class Component_Association
 
       # assume that the ACS assumes that these structures are produced
@@ -218,16 +229,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
           Caching_method_based_reader_for___[ self, acs ]
         end
 
-        def reader_for acs
-
-          if acs.respond_to? METHOD__
-            acs.send METHOD__
-          else
-            method_based_reader_for acs
-          end
-        end
-
-        def method_based_reader_for acs
+        def method_based_component_association_reader_for acs
           Method_based_reader_for__[ self, acs ]
         end
 
@@ -239,8 +241,6 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         alias_method :_begin_definition, :new
         private :new
       end  # >>
-
-      METHOD__ = :component_association_reader
 
       # -- Initializers
 

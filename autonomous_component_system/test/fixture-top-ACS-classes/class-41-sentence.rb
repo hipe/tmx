@@ -23,7 +23,7 @@ module Skylab::Autonomous_Component_System::TestSupport
           @subject = x ; nil
         end
 
-        def _set_verb_phrase o
+        def set_verb_phrase_for_expect_root_ACS o
           @verb_phrase = o ; nil
         end
       # -

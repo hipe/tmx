@@ -10,7 +10,7 @@ module Skylab::Zerk::TestSupport
     context "call top node with something strange:" do
 
       call_by do
-        call :something
+        call :something  # #test-02
       end
 
       it "fails" do
@@ -27,13 +27,54 @@ module Skylab::Zerk::TestSupport
       end
     end
 
+    context "(from root) land on a compound when it is NOT set" do
+
+      call_by do
+        call :verb_phrase  # #test-08
+      end
+
+      it "results in a qk talking bout unknown" do
+
+        qk = root_ACS_result
+        qk.is_known_known and fail
+        qk.name_symbol.should eql :verb_phrase
+      end
+
+      def event_log
+        NIL_
+      end
+    end
+
+    context "(from root) land on a compound when it IS set" do
+
+      call_by do
+
+        @root_ACS = build_root_ACS
+        @root_ACS.set_verb_phrase_for_expect_root_ACS :_xXx_
+
+        call :verb_phrase  # #test-09
+      end
+
+      it "results in a qk talking bout unknown" do
+
+        qk = root_ACS_result
+        qk.is_known_known or fail
+        qk.name_symbol.should eql :verb_phrase
+        qk.value_x.should eql :_xXx_
+      end
+
+      def event_log
+        NIL_
+      end
+    end
+
     context "deep time" do
 
       call_by do
         call( :subject, 'you',
           :verb_phrase,
             :object, 'cocoa',
-            :verb, 'like',
+            :verb, 'like',  # [#test-11-ish &] #test-50-11-ish
         )
       end
 

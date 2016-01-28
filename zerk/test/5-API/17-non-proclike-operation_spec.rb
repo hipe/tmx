@@ -10,7 +10,7 @@ module Skylab::Zerk::TestSupport
     it "missing required args - raises arg. error (cp)" do
 
       begin
-        call :zoof
+        call :zoof  # #test-03
       rescue ::ArgumentError => e
       end
       e.message.should eql "missing required argument(s) #{
@@ -20,7 +20,7 @@ module Skylab::Zerk::TestSupport
     context "extra args" do
 
       call_by do
-        call :zoof, :foo, :_hi_, :quux, :_hey_, :extra
+        call :zoof, :foo, :_hi_, :quux, :_hey_, :extra  # #test-03
       end
 
       it "fails" do
@@ -35,7 +35,7 @@ module Skylab::Zerk::TestSupport
     context "supply the required args" do
 
       call_by do
-        call :zoof, :foo, :_hi_, :quux, :_hey_
+        call :zoof, :foo, :_hi_, :quux, :_hey_  # #test-05
       end
 
       it "emits business (cp)" do

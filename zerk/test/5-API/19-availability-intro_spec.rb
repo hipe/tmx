@@ -10,7 +10,7 @@ module Skylab::Zerk::TestSupport
     context "not available" do
 
       call_by do
-        call :flickerer
+        call :flickerer  # #test-05+avail
       end
 
       it "fails" do
@@ -35,7 +35,7 @@ module Skylab::Zerk::TestSupport
         @root_ACS = build_root_ACS
         @root_ACS.make_flickerer_available_!
 
-        call :flickerer
+        call :flickerer  # #test-05+avail
       end
 
       it "yay" do

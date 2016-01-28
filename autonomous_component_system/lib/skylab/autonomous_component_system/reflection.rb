@@ -7,7 +7,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
     to_component_association_stream = nil
     To_qualified_knownness_stream = -> acs do
 
-      qkn_for = ACS_::Reflection_::Reader[ acs ]
+      qkn_for = ACS_::Reflection_::Component_qualified_knownness_reader[ acs ]
 
       to_component_association_stream[ acs ].map_by do | asc |
 
@@ -17,7 +17,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
     to_component_association_stream = -> acs do
 
-      asc_for = Component_Association.reader_for acs
+      asc_for = Home_::Component_association_reader[ acs ]
 
       ACS_::Reflection_::To_entry_stream[ acs ].map_reduce_by do | entry |
 
@@ -125,8 +125,8 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       def initialize acs
 
-        @_asc_for = Component_Association.reader_for acs
-        @_qkn_for = Home_::Reflection_::Reader[ acs ]
+        @_asc_for = Home_::Component_association_reader[ acs ]
+        @_qkn_for = Home_::Reflection_::Component_qualified_knownness_reader[ acs ]
       end
 
       def new en
