@@ -6,9 +6,9 @@ module Skylab::MyTerm
 
     class << self
 
-      def interpret_compound_component p, asc, acs, & x_p
+      def interpret_compound_component p, asc, acs, & pp
 
-        p[ new asc, acs, & x_p ]
+        p[ new asc, acs, & pp ]
       end
 
       private :new
@@ -34,6 +34,13 @@ module Skylab::MyTerm
     end
 
     # -- Expressive event & modality hook-ins/hook-outs
+
+    def description_under expag  # for expressive events
+      nf = adapter_name
+      expag.calculate do
+        nm nf
+      end
+    end
 
     def express_into_under y, expag  # for modality clients
 

@@ -19,7 +19,7 @@ module Skylab::MyTerm
         _x = _ze::API.call x_a, _ACS, & pp
 
         _x
-      end
+      end  # :cp1
     end  # >>
   end
 
@@ -74,6 +74,10 @@ module Skylab::MyTerm
     def silo k
       @_p[ k ]
     end
+
+    def kernel_  # so we ourselves can get passed as proxy for component
+      self
+    end
   end
 
   # -- context experiments..
@@ -103,19 +107,17 @@ module Skylab::MyTerm
       :build_require_stdlib_proc )
 
     Autonomous_component_system = sidesys[ :Autonomous_Component_System ]
-
     Basic = sidesys[ :Basic ]
+    Brazen = sidesys[ :Brazen ]
 
     Open3 = stdlib[ :Open3 ]
 
     Shellwords = stdlib[ :Shellwords ]
 
     system_lib = sidesys[ :System ]
-
     System = -> do
       system_lib[].services
     end
-
     Zerk = sidesys[ :Zerk ]
   end
 

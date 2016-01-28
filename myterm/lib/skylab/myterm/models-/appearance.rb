@@ -23,6 +23,7 @@ module Skylab::MyTerm
     # -- let children violate [#ac-002]#DT1 autonomy:
 
     attr_reader(
+      :adapter,
       :kernel_,
     )
   end

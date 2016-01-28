@@ -4,7 +4,7 @@ module Skylab::MyTerm
 
     class Index___
 
-      def initialize paths
+      def initialize paths, single_mod
 
         # (see last line of file)
 
@@ -43,7 +43,7 @@ module Skylab::MyTerm
             have_seen = false
 
             load_ticket = Home_::Models_::Adapter::Load_Ticket.new_via__(
-              stem, path, category )
+              stem, path, category, single_mod )
 
             cache_a.push load_ticket
             cache_h[ stem ] = load_ticket

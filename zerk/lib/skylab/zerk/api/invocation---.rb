@@ -85,8 +85,8 @@ module Skylab::Zerk
 
       PARSE_AFTER_VIA_SHAPE___ = {
         compound: :__parse_after_compound_association,
-        entitesque: :_EASYESQUE,  # #open [
-        primitivesque: :__parse_after_primitiveque_association,
+        entitesque: :_parse_after_non_compound_association,
+        primitivesque: :_parse_after_non_compound_association,
       }
 
       def ___when_association_is_not_available asc
@@ -111,30 +111,26 @@ module Skylab::Zerk
         KEEP_PARSING__
       end
 
-      def __parse_after_primitiveque_association asc  # (p)
+      def _parse_after_non_compound_association asc  # (p)
 
-        _kn = asc.component_model[ @argument_stream, & @_pp ]
-        _receive_entitesque_or_primitivesque_known _kn, asc
-      end
+        qk = ACS_::Interpretation_::Build_value[
+          @argument_stream,
+          asc,
+          @selection_stack.last.value_x,
+          & @_pp ]
 
-      def _receive_entitesque_or_primitivesque_known kn, asc
-        if kn
-          ___accept_new_component_value kn, asc
+        if qk
+
+          p = @selection_stack.last.accept_new_component_value__ qk
+
+          _handler.call :info, :set_leaf_component do
+            p[]
+          end
+
           KEEP_PARSING__
         else
-          Result__[ kn ]
+          Result__[ qk ]
         end
-      end
-
-      def ___accept_new_component_value kn, asc
-
-        p = @selection_stack.last.accept_new_component_value__ kn, asc
-
-        _handler.call :info, :set_leaf_component do
-          p[]
-        end
-
-        NIL_
       end
 
       # -- parsing operations (not components)

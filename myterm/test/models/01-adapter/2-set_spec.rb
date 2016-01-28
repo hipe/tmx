@@ -2,125 +2,63 @@ require_relative '../../test-support'
 
 module Skylab::MyTerm::TestSupport
 
-  describe "[my] models - adapter - set", wip: true do
+  describe "[my] models - adapter - set" do
 
-    def self.dangerous_memoize_ _  # NOTE
-    end
     TS_[ self ]
-    # use :sandboxed_kernels
     use :my_API
 
-    it "set with a bad name - expresses good name(s)" do
+    context "set with a bad name - expresses good name(s)" do
 
-      @subject_kernel_ = read_only_kernel_with_no_data_
-
-      future_expect_only :error, :extra_properties do | ev |
-
-        _s = future_black_and_white ev
-
-        _s.should match %r(\Acouldn't set adapter because #{
-          }unrecognized adapter 'wazoozle'//#{
-            }did you mean .*'imagemagick'.*\?\z)
+      call_by do
+        call :adapter, 'whonani'
       end
 
-      call_ :adapter, :set, :adapter, "wazoozle"
+      it "fails" do
+        fails
+      end
 
-      expect_failed_
+      it "emits (levenschtein)" do
+
+        _be_this = be_emission :error, :extra_properties do |ev|
+
+          s_a = black_and_white_lines ev
+          s_a.first.should eql "unrecognized adapter name 'whonani'"
+          s_a.last.should match %r(\Adid you mean .*'imagemagick'\?\z)
+        end
+
+        only_emission.should _be_this
+      end
     end
 
     context "successful initial set" do
 
-      it "appears to work (results in context)" do
-
-        _expect_result_after_write
+      call_by do
+        call_plus_ACS :adapter, "imagemag"
       end
 
-      it "(matches fuzzily!) emits natural sounding event" do
+      it "result is the qk of the newly created adapter" do
 
-        past_expect_eventually :info, :component_added do | ev |
+        qk = root_ACS_result
+        qk.association.name_symbol.should eql :adapter
+        ada = qk.value_x
+        ada.adapter_name_const.should eql COMMON_ADAPTER_CONST_
+      end
 
-          _s = past_black_and_white ev
+      it "emits" do
+
+        _be_this = be_emission :info, :set_leaf_component do |ev|
+          _s = black_and_white ev
           _s.should eql "set adapter to 'imagemagick'"
         end
+
+        only_emission.should _be_this
       end
 
-      it "emits 'wrote' event" do
+      it "the ACS reflects this change" do
 
-        _expect_same_wrote_event
-      end
-
-      it "creates JSON file that looks right" do
-
-        _expect_same_JSON_file
-      end
-
-      def past_emissions
-        _state.emissions
-      end
-
-      dangerous_memoize_ :_state do
-
-        @subject_kernel_ = new_mutable_kernel_with_no_data_
-
-        state = begin_state_
-
-        call_ :adapter, :set, :adapter, "imagemag", & state.proc
-
-        state.finish
-      end
-
-      def _written_JSON_string
-
-        _em = _state.emissions.only_on :info, :wrote
-
-        _ev = _em.event_proc[]
-
-        ::File.read _ev.path
-      end
-    end
-
-    context "successful subsequent set" do
-
-      it "works (results in context)" do
-
-        _expect_result_after_write
-      end
-
-      it "natural" do
-
-        past_expect_eventually :info, :component_changed do | ev |
-          _s = future_black_and_white ev
-          _s.should eql(
-            "changed adapter from 'imagemagick' to 'imagemagick'" )
-        end
-      end
-
-      it "emits 'wrote' event" do
-        _expect_same_wrote_event
-      end
-
-      def past_emissions
-        _state.emissions
-      end
-
-      it "updates JSON file that looks right" do
-        _expect_same_JSON_file
-      end
-
-      def _written_JSON_string
-
-        _state.kernel._string_IO_for_testing_.string
-      end
-
-      dangerous_memoize_ :_state do
-
-        @subject_kernel_ = new_mutable_kernel_with_appearance_ appearance_JSON_one_.dup
-
-        state = begin_state_
-
-        call_ :adapter, :set, :adapter, 'imagemag', & state.proc
-
-        state.finish
+        _appearance = root_ACS
+        _ada = _appearance.instance_variable_get( :@adapter )
+        _ada.adapter_name_const or fail
       end
     end
 
@@ -130,10 +68,10 @@ module Skylab::MyTerm::TestSupport
         call :adapter, :imagemagick, :adapters, :list
       end
 
-      it "yes" do
-        # todo: CHOP appearance_JSON_one_
+      it "the selected adapter knows it's selected" do
+
+        st = root_ACS_result
         selected = []
-        st = @result
         begin
           ada = st.gets
           ada or break
@@ -142,37 +80,11 @@ module Skylab::MyTerm::TestSupport
           end
           redo
         end while nil
-        self._K
-        ada.adapter_name.as_slug.should eql 'imagemagick'
+
+        _bruh = selected.fetch 0
+        1 == selected.length or fail
+        _bruh.adapter_name_const.should eql COMMON_ADAPTER_CONST_
       end
     end
-
-
-    def _expect_same_wrote_event
-
-      past_expect_eventually :info, :wrote do | ev |
-
-        ev.preterite_verb.should eql 'wrote'
-        ev.path.should match %r(\[mt\]/[-a-zA-Z0-9]+\.json\z)
-        ( 31..109 ).should be_include ev.bytes  # :P
-      end
-    end
-
-    def _expect_result_after_write
-
-      _x = _state.result
-
-      # (one time it is a file, one time it is a StringIO ..)
-
-      _x.path or fail
-    end
-
-    def _expect_same_JSON_file
-
-      _act = _written_JSON_string
-      _act.should eql appearance_JSON_one_
-    end
-
-    attr_reader :subject_kernel_  # LOOK you must set this at every test
   end
 end

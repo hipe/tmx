@@ -9,14 +9,47 @@ module Skylab::MyTerm
         private :new
       end  # >>
 
-      def initialize stem, path, category
+      def initialize stem, path, category, single_mod
 
+        @_box_mod = single_mod
         @dir = nil
         @file = nil
+        @is_selected__ = false
         @stem = stem
 
         _recv_path path, category
       end
+
+      # -- reading
+
+      def module  # (doesn't cache the require'ing)
+
+        if @file
+          _load_path = @file[ 0 ... - Autoloader_::EXTNAME.length ]
+        else
+          self._COVER_ME
+        end
+
+        require _load_path  # ..
+
+        _const = adapter_name.as_const
+
+        @_box_mod.const_get _const, false
+      end
+
+      def adapter_name_const
+        adapter_name.as_const
+      end
+
+      def adapter_name
+        @___nf ||= Callback_::Name.via_slug @stem
+      end
+
+      def is_selected
+        @is_selected__
+      end
+
+      # -- writing
 
       def _recv_path path, category
 
@@ -52,6 +85,16 @@ module Skylab::MyTerm
       def path
         instance_variable_get @_path_ivar
       end
+
+      attr_reader(
+        :stem,
+      )
+
+      # -- egads
+
+      attr_writer(
+        :is_selected__,
+      )
     end
   end
 end

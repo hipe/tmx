@@ -60,13 +60,18 @@ module Skylab::Zerk::TestSupport
 
       def call * x_a
 
-        if block_given?
-          raise ::ArgumentError, ___say_why_no_blocks
-        end
+        _zerk_expect_API_call :init_result_for_zerk_expect_API, x_a
+      end
+
+      def call_plus_ACS * x_a
+        _zerk_expect_API_call :init_result_and_root_ACS_for_zerk_expect_API, x_a
+      end
+
+      def _zerk_expect_API_call m, x_a
 
         _pp = __some_handler_builder_for_zerk_expect_API
 
-        init_result_for_zerk_expect_API x_a, & _pp
+        send m, x_a, & _pp
 
         _x = remove_instance_variable :@result
 
@@ -75,10 +80,6 @@ module Skylab::Zerk::TestSupport
         end
 
         root_ACS_state_via _x, _o
-      end
-
-      def ___say_why_no_blocks
-        "isn't the event log's handler what you want?"
       end
 
       def __some_handler_builder_for_zerk_expect_API  # publicize whenever

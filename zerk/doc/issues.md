@@ -1,4 +1,3 @@
-[#013] #open entities are not covered in our coverage of syntax at all
 [#012]       [ flowcharts for API syntax ]
 [#011]     #track whether/how to share across 3 CLI client classes
 [#010]       custom view controllers

@@ -16,17 +16,16 @@ module Skylab::Zerk
 
       # -- write
 
-      def accept_new_component_value__ kn, asc
+      def accept_new_component_value__ qk
 
         _p = ACS_::Interpretation::Accept_component_change[
-          kn.value_x,
-          asc,
+          qk.value_x,
+          qk.association,
           @qualified_knownness.value_x,
         ]
 
         @_has_last_written = true
-        @_last_written_kn = kn
-        @_last_written_asc = asc
+        @_last_written_qkn = qk
 
         _p
       end
@@ -47,9 +46,7 @@ module Skylab::Zerk
         # (implement the relevant half of the graph of [#012]/figure-2)
 
         if @_has_last_written
-          Callback_::Qualified_Knownness.via_value_and_association(
-            @_last_written_kn.value_x,  # ..
-            @_last_written_asc )
+          @_last_written_qkn
         else
           @qualified_knownness
         end
