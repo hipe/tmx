@@ -34,7 +34,7 @@ we are familiar with the parent-child relationship in tree-like
 data structures. ACS structures are frequently just that: trees.
 however, we refrain from using the terms "parent" and "child"
 (or even *thinking* of the components in this regard) when
-working with ACS's because of its primary design tenet: :dt1
+working with ACS's because of its primary design tenet: :DT1
 autonomy.
 
 the whole theory behind The ACS is that if we strive to make

@@ -14,7 +14,7 @@ it.
 this is a *complete* overhaul of a little script from 4 years ago. its
 objective then was merely to change the background image of terminals.
 its objective now is that plus a whole lot of fun experimentation with
-our new "autonomous component system" from [br].
+our "autonomous component system".
 
 
 
@@ -41,9 +41,9 @@ background. if it were only that simple, this utility would take up less
 than a screen of code to implement. but it is never that simple:
 
 it is our goal to make this process arbitrarily configurable in a way that
-can scale out "horizontally" (so to  speak): we want the user to be able
+can scale out "horizontally" (so to speak): we want the user to be able
 to configure arbitrary details to this process (like font, color, size,
-etc), and in a way that is as intuitive and usable (for a CLI).
+etc), and in a way that is intuitive and usable (for a CLI).
 
 furthermore, we as developers of this utility want to be able to add,
 remove and modify "configurabilities" like these in a way that gives us
@@ -65,6 +65,6 @@ compartmentalization and configurability we want.
   • originally inspired by (and adapted heavily from)
      [kpumuk.info] http://kpumuk.info/mac-os-x/how-to-show-ssh-host-name-on-the-iterms-background/
 
-  • our sole referene for applescript: [iterm2.com] (https://iterm2.com/applescript.html)
+  • our sole reference for applescript: [iterm2.com] (https://iterm2.com/applescript.html)
 
   • our sole reference for imagemagick: [imagemagick.org] (http://www.imagemagick.org/Usage/text/)

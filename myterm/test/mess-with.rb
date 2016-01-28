@@ -1,24 +1,16 @@
 module Skylab::MyTerm::TestSupport
 
-  class Mess_With
+  class Mess_With < Callback_::Actor::Monadic
 
     # (mocking/stubbing hax)
 
-    class << self
-      def _call x, & edit
-        new( x )._edit_by( & edit )
-      end
-      alias_method :[], :_call
-      alias_method :call, :_call
-      private :new
-    end  # >>
-
-    def initialize x
+    def initialize x, & edit
       @_x = x
+      @_edit_p = edit
     end
 
-    def _edit_by & edit
-      edit[ self ]
+    def execute
+      @_edit_p[ self ]
       NIL_
     end
 
@@ -41,21 +33,14 @@ module Skylab::MyTerm::TestSupport
       NIL_
     end
 
-    class Make_dynamic_stub_proxy
+    class Make_dynamic_stub_proxy < Callback_::Actor::Monadic
 
-      class << self
-        def _call real_object, & edit
-          o = new real_object
-          edit[ o ]
-          o.finish
-        end
-        alias_method :[], :_call
-        alias_method :call, :_call
-      end  # >>
-
-      def initialize real_object
-
+      def initialize real_object, & edit
         @_real_object = real_object
+        @_edit_p = edit
+      end
+
+      def execute
 
         cls = ::Class.new ::BasicObject
 
@@ -68,6 +53,10 @@ module Skylab::MyTerm::TestSupport
         @_cls = cls
 
         @_stubbed_proxy = cls.new
+
+        @_edit[ self ]
+
+        finish
       end
 
       def if_then m, * args, & p

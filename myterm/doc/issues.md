@@ -1,3 +1,6 @@
+[#011] #open this rewrite
+[#010] #open all silo daemons
+[#009] #open remove blocks tagged with `#eventually`
 [#008] #wish info
 [#007] #wish clear
 [#006] #wish defaults

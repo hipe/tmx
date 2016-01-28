@@ -5,19 +5,24 @@ module Skylab::MyTerm::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
-  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
-
   extend TestSupport_::Quickie
 
-  module ModuleMethods
+  class << self
+    def [] tcc
+      tcc.send :define_singleton_method, :use, Use_method___
+      tcc.include Instance_Methods___
+    end
+  end  # >>
 
-    def use sym
+  # -
 
+    Use_method___ = -> sym do
       TS_.__lib( sym )[ self ]
     end
-  end
 
-  module InstanceMethods
+  # -
+
+  module Instance_Methods___
 
     def debug!
       @do_debug = true
@@ -27,33 +32,6 @@ module Skylab::MyTerm::TestSupport
 
     def debug_IO
       TestSupport_.debug_IO
-    end
-
-    def call_ * x_a, & custom_p
-
-      _oes_p = if custom_p
-        custom_p
-      else
-        fut_p  # assumes future expect for now
-      end
-
-      bc = subject_kernel_.bound_call_via_mutable_iambic x_a, & _oes_p
-
-      if bc
-
-        @result = bc.receiver.send bc.method_name, * bc.args, & bc.block
-
-        future_is_now  # assert no unexpected events
-      else
-        @result = bc
-      end
-
-      NIL_
-    end
-
-    def subject_kernel_
-      # use this real kernel for read-only type operations.
-      Home_.application_kernel_
     end
   end
 
@@ -67,8 +45,8 @@ module Skylab::MyTerm::TestSupport
         s = sym.id2name
         const = "#{ s[ 0 ].upcase }#{ s[ 1..-1 ] }".intern
 
-        x = if TestLib_.const_defined? const, false
-          TestLib_.const_get const, false
+        x = if TS_.const_defined? const, false
+          TS_.const_get const, false
         else
           TestSupport_.fancy_lookup sym, TS_
         end
@@ -78,21 +56,32 @@ module Skylab::MyTerm::TestSupport
     end
   end  # >>
 
-  module TestLib_
+  # --
 
-    Danger_memo = -> tcc do
+  module My_API
 
-      tcc.send :define_singleton_method,
-        :dangerous_memoize_,
-        TestSupport_::DANGEROUS_MEMOIZE
+    def self.[] tcc
+      @_ ||= Home_.lib_.zerk.test_support.lib :API
+      @_[ tcc ]
+      tcc.include self
     end
 
-    Future_expect = -> tcc do  # test context class
-      Callback_.test_support::Future_Expect[ tcc ]
+    def init_result_for_zerk_expect_API x_a, & pp
+
+      @result = Home_::API.call( * x_a, & pp )
+      NIL_
     end
   end
 
+  # --
+
   Callback_ = ::Skylab::Callback
+
+  Autoloader__ = Callback_::Autoloader
+  Autoloader__[ self, ::File.dirname( __FILE__ ) ]
+
   Home_ = ::Skylab::MyTerm
   NIL_ = nil
+  NONE_ = nil
+  TS_ = self
 end

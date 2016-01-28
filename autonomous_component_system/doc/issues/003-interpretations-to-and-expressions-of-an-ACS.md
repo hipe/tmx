@@ -183,7 +183,7 @@ on false premises that stem from a violation of what we now call our
     model's "construction method" (near #Tenet6) and we use the same construction
     method regardless of intent (unserialization or UI)..
 
-  • (..and towards autonomy #dt1 it must be that all such constructed
+  • (..and towards autonomy #DT1 it must be that all such constructed
     components are valid by the time they leave this construction
     method and are resulted from it. (otherwise the construction method
     can result in false-ish.))
@@ -238,7 +238,7 @@ methods:
     argument will be the ACS that is building this as a component
     (the "parent"). this is a violation of the design tenet of autonomy
     so keep this in mind when you design this sort of dependency into your
-    system. #dt1
+    system. #DT1
 
   • if the constructor takes more than 2 arguments, the *second to last*
     argument will be the association structure. (but keep in mind that per

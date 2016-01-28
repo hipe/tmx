@@ -2,46 +2,58 @@ require_relative '../../test-support'
 
 module Skylab::MyTerm::TestSupport
 
-  describe "[my] models - adapter - list", wip: true do
+  describe "[my] models - adapter - list" do
 
-    extend TS_
-    use :sandboxed_kernels
+    TS_[ self ]
+    use :my_API
 
-    it "the list produces one particular adapter" do
+    context "ask what the adapter is when no adapter is activated" do
 
-      _real_list_summary.found or fail
+      call_by do
+        call :adapter
+      end
+
+      it "result is effectively unknown (but qualified)" do
+
+        qk = root_ACS_result
+        qk.is_known_known or fail
+        qk.name.as_variegated_symbol.should eql :adapter
+        qk.value_x.should be_nil
+      end
+
+      def event_log
+        NONE_
+      end
     end
 
-    it "for now, there is only one adapter" do
+    context "list the adapters" do
 
-      _real_list_summary.count.should eql 1
+      call_by do
+        call :adapters, :list
+      end
+
+      shared_subject :_custom_state do
+
+        _st = root_ACS_result
+        __call_this_one_time_only _st
+      end
+
+      it "works" do
+        _custom_state.found or fail
+      end
+
+      it "lists one adapter" do
+        _custom_state.count.should eql 1
+      end
+
+      def event_log
+        NIL_
+      end
     end
 
-    it "the selected adapter is indicated" do
-
-      @subject_kernel_ = new_mutable_kernel_with_appearance_ appearance_JSON_one_
-
-      call_ :adapter, :list
-
-      st = @result
-      begin
-        ada = st.gets
-        ada or break
-        ada.is_selected and break
-        redo
-      end while nil
-
-      ada.adapter_name.as_slug.should eql 'imagemagick'
-    end
-
-    dangerous_memoize_ :_real_list_summary do
-
-      @subject_kernel_ = new_mutable_kernel_with_nothing_persisted_
-
-      call_ :adapter, :list
+    define_method :__call_this_one_time_only do |st| # (avoid warnings re: consts)
 
       count = 0
-      st = @result
       target = 'imagemagick.rb'
 
       begin
@@ -61,11 +73,8 @@ module Skylab::MyTerm::TestSupport
         end
       end
 
-      ADA_List_State = ::Struct.new :found, :count, :target
-      ADA_List_State.new found, count, target
+      ADA_List_State = ::Struct.new :found, :count
+      ADA_List_State.new found, count
     end
-
-    attr_reader :subject_kernel_
-
   end
 end

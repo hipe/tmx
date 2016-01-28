@@ -4,8 +4,11 @@ module Skylab::MyTerm::TestSupport
 
   describe "[my] models - font - set", wip: true do
 
-    extend TS_
-    use :sandboxed_kernels
+    def self.dangerous_memoize_ _  # NOTE
+    end
+
+    TS_[ self ]
+    # use :sandboxed_kernels
 
     context "bad name (FRAGILE)" do
 

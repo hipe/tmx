@@ -13,7 +13,7 @@ after it was effected, rather than informing it.
 also the tenets are not hard-and-fast rules, but rather guidelines the
 violoation of which should occur only with good reason.
 
-• :dt1: autonomy: a component must be able to effect its own behavior
+• :DT1: autonomy: a component must be able to effect its own behavior
     without depending on any client (i.e would be "parent") component
     to the furthest extent possible.
 
@@ -37,7 +37,7 @@ violoation of which should occur only with good reason.
 
 • model classes are implemeted as many small, "autonomous" components
   rather than needing to cram many different property-level concerns
-  into one node. (:#+dt1)
+  into one node. :+#DT1
 
 • (new in this version) we attempt a consistent inteface whether the
   mutatee is more like a "collection" or more like an "entity" (because

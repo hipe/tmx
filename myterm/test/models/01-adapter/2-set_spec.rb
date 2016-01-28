@@ -4,8 +4,11 @@ module Skylab::MyTerm::TestSupport
 
   describe "[my] models - adapter - set", wip: true do
 
-    extend TS_
-    use :sandboxed_kernels
+    def self.dangerous_memoize_ _  # NOTE
+    end
+    TS_[ self ]
+    # use :sandboxed_kernels
+    use :my_API
 
     it "set with a bad name - expresses good name(s)" do
 
@@ -120,6 +123,30 @@ module Skylab::MyTerm::TestSupport
         state.finish
       end
     end
+
+    context "set adapter and then list adapters" do
+
+      call_by do
+        call :adapter, :imagemagick, :adapters, :list
+      end
+
+      it "yes" do
+        # todo: CHOP appearance_JSON_one_
+        selected = []
+        st = @result
+        begin
+          ada = st.gets
+          ada or break
+          if ada.is_selected
+            selected.push ada
+          end
+          redo
+        end while nil
+        self._K
+        ada.adapter_name.as_slug.should eql 'imagemagick'
+      end
+    end
+
 
     def _expect_same_wrote_event
 

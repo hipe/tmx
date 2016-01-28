@@ -4,8 +4,8 @@ module Skylab::MyTerm::TestSupport
 
   describe "[my] models - font - list", wip: true do
 
-    extend TS_
-    use :sandboxed_kernels
+    TS_[ self ]
+    # use :sandboxed_kernels
 
     context "(some context)" do
 

@@ -1,3 +1,4 @@
+self._REMOVE_about_half_of_this_when_you_get_here
 module Skylab::MyTerm
 
   class Models_::Font

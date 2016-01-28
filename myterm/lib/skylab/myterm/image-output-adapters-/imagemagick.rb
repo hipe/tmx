@@ -176,9 +176,6 @@ module Skylab::MyTerm
 
     # -- ACS signal handling
 
-    def component_event_model
-      :hot
-    end
 
     def receive_component__change__ qkn, & new_component_p
 

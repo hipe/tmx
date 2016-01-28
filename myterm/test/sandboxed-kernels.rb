@@ -2,29 +2,6 @@ module Skylab::MyTerm::TestSupport
 
   module Sandboxed_Kernels
 
-    class << self
-
-      def [] tcc
-
-        tcc.send :define_singleton_method,
-         :dangerous_memoize_,
-           TestSupport_::DANGEROUS_MEMOIZE
-
-        TestLib_::Future_expect[ tcc ]
-
-        tcc.include self
-
-        nil
-      end
-
-      define_method :_danger_memo, TestSupport_::DANGEROUS_MEMOIZE
-
-      def _memoize sym, & p
-
-        define_method sym, Callback_::Memoize[ & p ]
-      end
-    end  # >>
-
     # ~ assertion methods (might move) & references
 
     _memoize :appearance_JSON_one_ do

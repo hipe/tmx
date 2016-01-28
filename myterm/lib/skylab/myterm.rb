@@ -1,4 +1,4 @@
-require 'skylab/brazen'
+require 'skylab/callback'
 
 module Skylab::MyTerm
 
@@ -6,30 +6,35 @@ module Skylab::MyTerm
     y << "for OS X and iTerm 2: identify terminals thru label as background image"
   end
 
-  Brazen_ = ::Skylab::Brazen
-  Callback_ = ::Skylab::Callback
-  Autoloader_ = Callback_::Autoloader
+  module API
+    class << self
+      def call * x_a, & pp
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
+        # (for now, every API call starts with a new empty root ACS)
+        # (but remember there is a kernel that is "long-running")
 
-  stowaway :CLI do
+        _ACS = Home_.__build_root_ACS
+        _ze = Home_.lib_.zerk
 
-    class CLI < Brazen_::CLI
+        _x = _ze::API.call x_a, _ACS, & pp
 
-      def back_kernel
-        Home_.application_kernel_
+        _x
       end
-
-      self
-    end
+    end  # >>
   end
 
   class << self
 
-    define_method :application_kernel_, ( Callback_.memoize do
+    def __build_root_ACS  # (break down as needed)
 
-      Build_default_application_kernel___[]
-    end )
+      _cls = Home_::Models_::Appearance
+      _k = ___custom_kernel
+      _cls.new _k
+    end
+
+    def ___custom_kernel
+      @___custom_kernel ||= Custom_Kernel___.new( Home_, :Models_ )
+    end
 
     def lib_
 
@@ -38,20 +43,36 @@ module Skylab::MyTerm
     end
   end  # >>
 
-  Build_default_application_kernel___ = -> do
+  class Custom_Kernel___
 
-    bx = ACS_[]::Modalities::Reactive_Tree::Dynamic_Source_for_Unbounds.new
-    bx.fallback_module = Models_
+    # this is a modified version of a relic from the [br] way.
+    # ..maybe go away, maybe abstract upwards to [ze] or somewhere..
 
-    Brazen_::Kernel.new Home_ do | kr |
+    def initialize home_mod, models_const
 
-      _sd = Models_::Appearance::Silo_Daemon.new kr
+      cache = {}
 
-      bx.add :Appearance, _sd
+      @_p = -> k do
 
-      kr.reactive_tree_seed = bx
+        cache.fetch k do
 
-      NIL_
+          _Models = home_mod.const_get models_const, false
+
+          silo_mod = _Models.const_get k, false
+
+          _silo_daemon_class = silo_mod.const_get :Silo_Daemon, false
+
+          silo_daemon = _silo_daemon_class.new self, silo_mod
+
+          cache[ k ] = silo_daemon
+
+          silo_daemon
+        end
+      end
+    end
+
+    def silo k
+      @_p[ k ]
     end
   end
 
@@ -62,14 +83,16 @@ module Skylab::MyTerm
     _LL ||= Home_.lib_.basic::List::Linked
   end
 
-  # -- Simple stowaways, functions
+  Callback_ = ::Skylab::Callback
+
+  Autoloader_ = Callback_::Autoloader
+
+  # -- Simple functionesques
 
   _ACS = nil
   ACS_ = -> do
     _ACS ||= Home_.lib_.autonomous_component_system
   end
-
-  Autoloader_[ Image_Output_Adapters_ = ::Module.new ]
 
   # -- Standard support
 
@@ -92,10 +115,15 @@ module Skylab::MyTerm
     System = -> do
       system_lib[].services
     end
+
+    Zerk = sidesys[ :Zerk ]
   end
+
+  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
   Home_ = self
+  Autoloader_[ Image_Output_Adapters_ = ::Module.new ]
   Autoloader_[ Models_ = ::Module.new ]
   NIL_ = nil
   UNABLE_ = false
