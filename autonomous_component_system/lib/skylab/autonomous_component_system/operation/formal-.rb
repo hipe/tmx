@@ -79,6 +79,13 @@ module Skylab::Autonomous_Component_System
 
       # --
 
+      def __accept__description__meta_component st  # #during #milestone:4
+        @description_proc = st.gets_one
+        NIL_
+      end
+
+      attr_reader :description_proc
+
       def __accept__is_available__meta_component st
         @operation_is_available = st.gets_one
         NIL_

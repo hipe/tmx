@@ -28,7 +28,7 @@ module Skylab::Autonomous_Component_System
 
         def execute
 
-          _rw = Home_::Reader_Writer.for_componentesque(
+          _rw = Home_::ReaderWriter.for_componentesque(
             remove_instance_variable( :@ACS ) )
 
           _x = Home_.lib_.JSON.parse(
@@ -253,7 +253,7 @@ module Skylab::Autonomous_Component_System
 
           _json_as_h = qk.value_x
 
-          _rw = Home_::Reader_Writer.for_componentesque cmp
+          _rw = Home_::ReaderWriter.for_componentesque cmp
 
           o = Interpret::Stack_Frame__.new(
             _json_as_h,

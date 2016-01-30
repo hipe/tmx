@@ -11,10 +11,10 @@ module Skylab::Autonomous_Component_System
         new_x = new_qkn.value_x
 
         # make a note of any exisiting value before we replace it
-        orig_kn = reader_writer.read_value_ asc
+        orig_kn = reader_writer.read_value asc
 
         # replace it
-        reader_writer.write_value_ new_qkn
+        reader_writer.write_value new_qkn
 
         # (see #resulting-in-proc)
 

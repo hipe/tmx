@@ -8,7 +8,7 @@ module Skylab::Autonomous_Component_System
       # intent-specific customizations
 
       def via_customization_and_ACS cust_x, acs
-        _rw = Home_::Reader_Writer.for_componentesque acs
+        _rw = Home_::ReaderWriter.for_componentesque acs
         via_customization_and_rw_ cust_x, _rw
       end
 

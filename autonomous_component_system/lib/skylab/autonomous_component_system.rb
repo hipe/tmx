@@ -107,14 +107,10 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
             Lib_, self )
       end
     end  # >>
+    # <-
+  class Component_Association
 
-    Component_Association = ::Class.new   # #[#bs-039] case study
-
-    method_name_for = -> sym do
-      :"__#{ sym }__component_association"
-    end
-
-    Component_Association::Reader_of_CAs_by_method_in___ = -> ca_class, acs do
+    Reader_of_CAs_by_method_in___ = -> ca_class, acs do
 
       read_association = -> m, sym do
 
@@ -140,7 +136,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
           else
             sym_ = ca.is_plural_of
             if sym_
-              _m_ = method_name_for[ sym_ ]
+              _m_ = Method_name_via_name_symbol[ sym_ ]
               _sing_ca = read_association[ _m_, sym_ ]
               Home_::Singularize___[ _sing_ca, sym, ca, acs ]
             else
@@ -159,13 +155,19 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       -> token_x do
 
         if token_x.respond_to? :id2name
-          m = method_name_for[ token_x ]
+          m = Method_name_via_name_symbol[ token_x ]
           if acs.respond_to? m
             read_association[ m, token_x ]
           end
         end
       end
     end
+
+    Method_name_via_name_symbol = -> sym do
+      :"__#{ sym }__component_association"
+    end
+  end
+  # ->
 
     COMPOUND_CONSTRUCTOR_METHOD_ = :interpret_compound_component
 

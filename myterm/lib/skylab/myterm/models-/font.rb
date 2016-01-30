@@ -1,54 +1,73 @@
-self._REMOVE_about_half_of_this_when_you_get_here
 module Skylab::MyTerm
 
   class Models_::Font
+
+    # a compound component with state and operations.
 
     # -- Construction methods
 
     class << self
 
-      def interpret_component st, acs, & x_p
-
-        if st.no_unparsed_exists
-          new nil, acs, & x_p
-        else
-          new( st.gets_one, acs, & x_p ).__normalize
-        end
+      def interpret_compound_component p, _asc, acs
+        p[ new.__init_as_entity acs ]
       end
 
-      def __new_flyweight
-        allocate
+      def __new_flyweight k
+        new.__init_as_flyweight k
       end
 
-      alias_method :new_entity, :new
       private :new
     end  # >>
 
     # -- Initializers
 
-    def initialize x, ke_source, & oes_p_p
+    def __init_as_entity ke_source
 
       @_do_express_skipped = true  # eew - avoid repetition here
 
       @kernel_ = ke_source.kernel_
 
-      @_oes_p_p = oes_p_p
+      @path = nil
 
-      @path = x  # any
-
-      @_oes_p = oes_p_p[ self ]
+      self
     end
 
-    # ~ (experimental flyweightism)
+    # -- experimental flyweightism (not clean)
+
+    def __init_as_flyweight ke
+      @kernel_ = ke
+      self
+    end
 
     def __reinit path
       @path = path ; self
     end
 
+    def initialize_dup _
+      remove_instance_variable :@kernel_
+      freeze
+    end
+
     # -- Expressive event & modality hook-ins/hook-outs
 
+    def describe_into_under y, _  # for #during #milestone-5 (or not..)
+
+      y << "set font, list available fonts"
+    end
+
     def express_into_under y, expag
-      self._RESPOND_TO_ONLY
+      me = self
+      expag.calculate do  # (hi.)
+        y << me.path
+      end
+    end
+
+    def description_under expag  # for expressive events..
+
+      s = ::File.basename @path
+      expag.calculate do
+        val s
+      end
     end
 
     def express_of_via_into_under y, _expag
@@ -57,104 +76,26 @@ module Skylab::MyTerm
       end
     end
 
-    def describe_into_under y, _
-      y << "set font, list available fonts"
-    end
+    # -- Components
 
-    def description_under expag
+    def __path__component_association
 
-      s = ::File.basename @path
-      expag.calculate do
-        val s
+      -> st, & pp do
+
+        path = st.current_token
+
+        _o = _build_new_collection_controller( & pp )
+
+        x = _o.lookup_font_path__ :set, path
+
+        if x
+          st.advance_one
+          Callback_::Known_Known[ x ]
+        else
+          x
+        end
       end
     end
-
-    # -- ACS hook-ins
-
-    def to_primitive_for_component_serialization
-      @path
-    end
-
-    # -- Operations
-
-    # ~ the "set" operation
-
-    def __set__component_operation
-
-      yield :description, -> y do
-        y << 'change what font is currently set'
-      end
-
-      method :__set
-    end
-
-    def __set path
-
-      path_ = _lookup :set, path
-
-      if path_
-
-        _new_self = self.class.new_entity path_, self, & @_oes_p_p
-
-        @_oes_p.call :change do
-          _new_self
-        end  # result is result
-      else
-        path_
-      end
-    end
-
-    def __normalize  # assume path is set
-
-      path = _lookup :normalize, @path
-      if path
-        @path = path
-        self
-      else
-        ok
-      end
-    end
-
-    Emit_by_adding_verb_ = -> oes_p, ev_p, action_sym, i_a do
-
-      o = Linked_list_[]
-
-      _end = o[ nil, ev_p ]
-      _LL = o[ _end, action_sym ]
-
-      oes_p.call i_a.fetch( 0 ), :contextualized, * i_a[ 1 .. -1 ] do
-        _LL
-      end
-    end
-
-    def _lookup action_sym, path
-
-      _oes_p = -> * i_a, & ev_p do
-
-        Emit_by_adding_verb_[ @_oes_p, ev_p, action_sym, i_a ]
-      end
-
-      o = Brazen_::Collection::Common_fuzzy_retrieve.new( & _oes_p )
-
-      o.set_qualified_knownness_value_and_symbol path, :font_path
-
-      o.stream_builder = -> do
-        _to_path_stream
-      end
-
-      p = -> path_ do
-        ::File.basename( path_ ).downcase
-      end
-
-      o.name_map = p
-      o.target_map = p
-
-      o.levenshtein_number = 3
-
-      o.execute
-    end
-
-    # ~ the "list" operation
 
     def __list__component_operation
 
@@ -162,116 +103,32 @@ module Skylab::MyTerm
         y << 'hackishly list the known fonts'
       end
 
-      -> do
-        fly = self.class.__new_flyweight
-        _to_path_stream.map_by do | path |
+      -> & pp do
+
+        _o = _build_new_collection_controller( & pp )
+
+        _st = _o.to_expressing_path_stream_
+
+        fly = self.class.__new_flyweight @kernel_
+
+        _st.map_by do |path|
+
           fly.__reinit path
         end
       end
     end
 
-    def _to_path_stream
-
-      @_sys = @kernel_.silo :Installation
-
-      real_yes = __build_pass_filter
-
-      none = true
-      yes = -> x do
-        yep = real_yes[ x ]
-        if yep
-          none = false
-          yes = real_yes
-        end
-        yep
-      end
-
-      fonts_dir = @_sys.fonts_dir
-
-      _glob_path = "#{ fonts_dir }/*"
-
-      _paths = @_sys.filesystem.glob _glob_path
-
-      remove_instance_variable :@_sys
-
-      _st = Callback_::Stream.via_nonsparse_array _paths
-
-      skipped = nil
-      none = false
-
-      st = _st.reduce_by do | path |
-
-        if yes[ path ]
-          path
-        else
-          skipped ||= ::Hash.new 0
-          skipped[ ::File.extname( path ) ] += 1
-          NIL_
-        end
-      end
-
-      p = -> do
-        x = st.gets
-        if x
-          x
-        else
-          if none
-            @_oes_p.call :info, :expression, :not_found do | y |
-              y << "(no fonts found - #{ pth fonts_dir })"
-            end
-          end
-          if skipped && @_do_express_skipped
-            @_do_express_skipped = false
-            @_oes_p.call :info, :expression, :skipped do | y |
-              y << "(skipped: #{ skipped.inspect })"
-            end
-          end
-          p = ->{};  # EMPTY_P_
-          NIL_
-        end
-      end
-
-      Callback_::Stream.new do
-        p[]
-      end
+    def _build_new_collection_controller & pp
+      Here_::Collection_Controller___.new @kernel_, & pp
     end
 
-    def __build_pass_filter
-
-      _a = @_sys.get_font_file_extensions
-
-      h = ::Hash[ _a.map { |s| [ ".#{ s }", true ] } ]
-
-      -> path do
-        h[ ::File.extname( path ) ]
-      end
-    end
-
-    # ~ the "get" operation
-
-    def __get__component_operation
-
-      yield :description, -> y do
-        y << "result in any 'font' object that is currently selected"
-      end
-
-      -> do
-        if @path
-          self
-        else
-          NIL_  # currently ..
-        end
-      end
-    end
-
-    # -- Project hook-outs
-
-    protected = [
-      :kernel_,
+    attr_reader(
       :path,
-    ]
+    )
 
-    attr_reader( * protected )
-    protected( * protected )
+    Here_ = self
   end
 end
+# #pending-rename: b.d
+# #tombstone: contextualization
+# #tombstone: contextualization (again)

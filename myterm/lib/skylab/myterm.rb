@@ -93,9 +93,15 @@ module Skylab::MyTerm
 
   # -- Simple functionesques
 
-  _ACS = nil
-  ACS_ = -> do
-    _ACS ||= Home_.lib_.autonomous_component_system
+  Lazy_ = Callback_::Lazy
+
+  Common_fuzzy_retrieve_ = -> do
+    Home_.lib_.brazen::Collection::Common_fuzzy_retrieve
+  end
+
+  Require_ACS_ = Lazy_.call do
+    ACS_ = Home_.lib_.autonomous_component_system
+    NIL_
   end
 
   # -- Standard support

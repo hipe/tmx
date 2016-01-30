@@ -130,7 +130,7 @@ module Skylab::Autonomous_Component_System
 
       def _prepare_unit_of_work_queue
 
-        _rw = Home_::Reader_Writer.for_componentesque @ACS
+        _rw = Home_::ReaderWriter.for_componentesque @ACS
         # (#[#023] - a read/writer is one-to-one with an ACS, so etc..)
 
         a = []

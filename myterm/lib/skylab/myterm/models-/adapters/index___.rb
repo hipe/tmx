@@ -64,4 +64,5 @@ module Skylab::MyTerm
     end
   end
 end
+# #pending-rename: oops
 # #tombstone: this is a non-streaming simplification of the predecessor

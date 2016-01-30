@@ -4,14 +4,6 @@ module Skylab::MyTerm::TestSupport
 
     # ~ assertion methods (might move) & references
 
-    _memoize :appearance_JSON_one_ do
-      <<-HERE.unindent.freeze
-        {
-          "adapter": "imagemagick"
-        }
-      HERE
-    end
-
     def expect_failed_  # might move
       @result.should eql result_value_for_failed_
     end

@@ -63,7 +63,7 @@ module Skylab::Autonomous_Component_System
 
         qk = Build_empty_hot___[ @_asc, @reader_writer.ACS_ ]
         if @do_attach
-          @reader_writer.write_value_ qk
+          @reader_writer.write_value qk
         end
         qk
       end

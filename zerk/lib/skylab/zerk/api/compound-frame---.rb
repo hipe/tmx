@@ -81,7 +81,7 @@ module Skylab::Zerk
 
         # (this one spot is the crux of the whole redesign near r/w)
 
-        @___rw ||= ACS_::Reader_Writer.for_componentesque self.ACS
+        @___rw ||= ACS_::ReaderWriter.for_componentesque self.ACS
       end
 
       def ACS

@@ -21,19 +21,18 @@ module Skylab::MyTerm
       def execute
 
         _ok = __resolve_load_ticket_via_argument_stream
-        _ok &&= __resolve_adapter_via_load_ticket
+        _ok &&= __adapter_via_load_ticket
       end
 
-      def __resolve_adapter_via_load_ticket
+      def __adapter_via_load_ticket
 
         lt = remove_instance_variable :@_load_ticket
 
         _mod = lt.module
 
-        _o = _mod.interpret_compound_component(
-          IDENTITY_, lt.adapter_name, @kernel_, & @_pp )
+        lt.adapter_name
 
-        _o
+        Adapter___.new _mod, lt.adapter_name, @kernel_, & @_pp
       end
 
       def __resolve_load_ticket_via_argument_stream
@@ -45,7 +44,7 @@ module Skylab::MyTerm
 
         @_oes_p = @_pp[ nil ]
 
-        o = Home_.lib_.brazen::Collection::Common_fuzzy_retrieve.new( & @_oes_p )
+        o = Common_fuzzy_retrieve_[].new( & @_oes_p )
 
         o.name_map = -> lt do
           lt.stem
@@ -66,6 +65,106 @@ module Skylab::MyTerm
           lt
         end
       end
+    end
+
+    class Adapter___
+
+      # #experiment - adapters shouldn't "know" they are adapters
+
+      # KEEP:
+      # _mod.interpret_compound_component IDENTITY_, nf, @kernel_, & @_pp
+
+      def initialize mod, nf, k, & pp
+
+        @is_selected = false
+        @kernel_ = k
+        @_nf = nf
+
+        @_impl = mod.new self, & pp
+        @_rw = ACS_::ReaderWriter.for_componentesque @_impl
+      end
+
+      # --
+
+      def mutate_by_becoming_selected_
+        @is_selected = true ; nil
+      end
+
+      def mutate_by_becoming_not_selected__
+        @is_selected = false ; nil
+      end
+
+      # -- Expressive event hook-ines/hook-outs
+
+      def express_into_under y, expag  # for modality clients
+
+        # (not #until #milestone-5)
+
+        nf = @_nf
+        yes = @is_selected
+
+        expag.calculate do
+
+          _glyph = yes ? GLYPH_FOR_IS_SELECTED___ : GLYPH_FOR_IS_NOT_SELECTED___
+
+          y << "#{ _glyph }#{ nm nf }"
+        end
+      end
+
+      GLYPH_FOR_IS_SELECTED___ = '• '
+      GLYPH_FOR_IS_NOT_SELECTED___ = '  '
+
+      def description_under expag  # for expressive events
+        nf = @_nf
+        expag.calculate do
+          nm nf
+        end
+      end
+
+      # -- our own personal adapter implementation API (parallels axiomatic ops)
+
+      def association_if_associated__ token_x
+
+        # in order to blahblah, it is we not they that do the checking here
+        # note that this method amounts to a variation of phrasing -
+        # fortunately our dependee method does exactly what we want already.
+
+        @_rw.read_association token_x
+      end
+
+      def read_value__ asc
+
+        # what we are *supposed* to implement is "give me the kn for this
+        # IFF it is an associated association". since that's more API than
+        # we think we need, we instead answer an easier question ("do we
+        # know the value?") and posit that the net effect will be the same..
+
+        kn = @_rw.read_value asc
+        if kn.is_known_known
+          kn
+        end
+      end
+
+      def write_value_if_associated__ qk
+
+        # the thing we dodged in the above method..
+
+        _yes = @_rw.has_an_association_definition_for qk.association.name_symbol
+        if _yes
+          @_rw.write_value qk
+          ACHIEVED_
+        end
+      end
+
+      # --
+
+      def adapter_name_const
+        @_nf.as_const
+      end
+
+      attr_reader(
+        :kernel_,
+      )
     end
 
     IDENTITY_ = -> x { x }

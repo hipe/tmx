@@ -293,7 +293,7 @@ module Skylab::Autonomous_Component_System
         end
 
         def reader_writer
-          @___rw ||= Home_::Reader_Writer.for_componentesque @ACS
+          @___rw ||= Home_::ReaderWriter.for_componentesque @ACS
         end
 
         def name
