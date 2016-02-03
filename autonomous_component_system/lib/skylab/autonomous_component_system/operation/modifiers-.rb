@@ -10,15 +10,15 @@ module Skylab::Autonomous_Component_System
 
         class << self
 
-          def call_via_parsing_session o
-            new.___init_via( o ).execute
+          def call_via_argument_stream__ as
+            new.___init_via( as ).execute
           end
 
           private :new
         end  # >>
 
-        def ___init_via o
-          @argument_stream = o.argument_stream
+        def ___init_via as
+          @argument_stream = as
           self
         end
 

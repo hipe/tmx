@@ -2,34 +2,42 @@ module Skylab::Autonomous_Component_System
 
   module For_Serialization  # notes in [#003]
 
-    # -
+    module Stream ; class << self
+
       # today this stands as a the #frontier and demonstration of realizing
       # intent-specific customizations
 
-      when_cust = nil
-      To_stream = -> cust_x, acs do
+      def via_customization_and_ACS cust_x, acs
+        _rw = Home_::Reader_Writer.for_componentesque acs
+        via_customization_and_rw_ cust_x, _rw
+      end
 
-        o = Home_::Reflection::To_node_stream_via_inference.new acs
+      def via_customization_and_rw_ customization_x, rw
+
+        o = rw.to_node_streamer
 
         o.on_operation = MONADIC_EMPTINESS_  # operation nodes don't get serialized
 
-        st = o.execute
-
-        if cust_x
-          when_cust[ cust_x, st ]
+        if customization_x
+          ___when_customizations customization_x, o
         else
-          st.map_by do |no|
-            no.qualified_knownness
+
+          _st = o.execute
+
+          _st.map_by do |no|
+            no.to_qualified_knownness_
           end
         end
       end
 
-      when_cust = -> cust_x, st do
+      def ___when_customizations cust_x, str
 
-        _sm = cust_x[ Home_::Intent::Streamer.new( st ) ]
+        _str_ = Home_::Intent::Streamer.via_streamer__ str
 
-        _sm.to_qualified_knownness_stream
+        _str3_ = cust_x[ _str_ ]
+
+        _str3_.to_qualified_knownness_stream
       end
-    # -
+    end ; end
   end
 end

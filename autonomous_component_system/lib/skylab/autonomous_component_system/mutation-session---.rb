@@ -1,6 +1,6 @@
 module Skylab::Autonomous_Component_System
   # ->
-    class Mutation  # notes in [#002]
+    class Mutation_Session___  # notes in [#002]
 
       def initialize & oes_p_p
         if oes_p_p
@@ -130,10 +130,16 @@ module Skylab::Autonomous_Component_System
 
       def _prepare_unit_of_work_queue
 
+        _rw = Home_::Reader_Writer.for_componentesque @ACS
+        # (#[#023] - a read/writer is one-to-one with an ACS, so etc..)
+
         a = []
         ok = ACHIEVED_
 
-        p = Home_::Operation::Imperative_Phrase.call_via_parsing_session self
+        p = Home_::Operation::Imperative_Phrase.call_via_these__(
+          @argument_stream,
+          _rw,
+          & @pp_ )
 
         begin
           ph = p[]

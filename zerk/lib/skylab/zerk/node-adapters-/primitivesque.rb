@@ -152,6 +152,7 @@ module Skylab::Zerk
 
       _ACS = @event_loop.stack_penultimate.ACS  # #NASTY
 
+      self._REDO
       p = ACS_::Interpretation::Accept_component_change[
         wv.value_x,
         @_qkn.association,

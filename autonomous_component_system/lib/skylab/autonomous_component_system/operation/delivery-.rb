@@ -129,15 +129,16 @@ module Skylab::Autonomous_Component_System
 
         def ___attach_floating_component
 
-          qk_a = @selection_stack
+          ss = @selection_stack
 
-          asc = qk_a.fetch( -3 ).value_x
-          qk = qk_a.fetch( -2 )
+          _deliveree_frame = ss.fetch( -2 )
+          _recipient_frame = ss.fetch( -3 )
+          _reader_writer = _recipient_frame.reader_writer
 
           _ev_p = Home_::Interpretation::Accept_component_change.call(
-            qk.value_x, qk.association, asc
+            _deliveree_frame, _reader_writer
           ) do
-            _nf_a = qk_a[ 1 .. -2 ].map( & :name )
+            _nf_a = ss[ 1 .. -2 ].map( & :name )
             _LL = Home_.lib_.basic::List.linked_list_via_array _nf_a
             _LL
           end

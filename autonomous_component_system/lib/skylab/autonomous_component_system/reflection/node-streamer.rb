@@ -2,50 +2,54 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
   module Reflection
 
-    # -- (a simplified, hard-coded form of next major node for components only)
+    class Node_Streamer
 
-    to_component_association_stream = nil
-    To_qualified_knownness_stream = -> acs do
+      # a "streamer" is a performer for producing a stream (re-entrantly).
+      # "node" (in our usage here):
+      #
+      #   • munges generally operations and components (and whatever else
+      #     similar we might come up with).
+      #
+      #   • facilitates the delivery of both operation- and component- related
+      #     values in a semi-uniform way.
+      #
+      #   • is an implementation of a #[#018] "load ticket" - resolves the
+      #     various implementation components of the association-or-formal
+      #     lazily, as-needed.
+      #
+      #   • must be suitable for *all* reflection concerns (including indexing)
+      #     so it won't reduce based on meta-components like availability or
+      #     conceptual componets like "intent". (this is made to serve as the
+      #     upstream for clients that *do* reduce in this manner.)
+      #
+      #   • has a name that is or isn't mutated by its definition
+      #     based on whether the definition has been loaded yet.
 
-      qkn_for = ACS_::Reflection_::Component_qualified_knownness_reader[ acs ]
-
-      to_component_association_stream[ acs ].map_by do | asc |
-
-        qkn_for[ asc ]
-      end
-    end
-
-    to_component_association_stream = -> acs do
-
-      asc_for = Home_::Component_association_reader[ acs ]
-
-      ACS_::Reflection_::To_entry_stream[ acs ].map_reduce_by do | entry |
-
-        if entry.is_association
-
-          asc_for[ entry.name_symbol ]
-        end
-      end
-    end
-
-    # --
-
-    To_node_stream = -> acs do
-      if acs.respond_to? :to_component_node_stream
-        acs.to_component_node_stream
-      else
-        To_node_stream_via_inference[ acs ]
-      end
-    end
-
-    class To_node_stream_via_inference  < Callback_::Actor::Monadic
 
       class << self
-        public :new
+
+        def via_ACS acs
+
+          # for clients (ACS or otherwise) who don't know or care about
+          # holding a reader-writer themselves..
+
+          _rw = Home_::ReaderWriter.for_componentesque acs
+          ___via_reader _rw
+        end
+
+        def ___via_reader rdr
+          rdr.to_node_streamer
+        end
+
+        def via_reader__ x
+          new x
+        end
+
+        private :new
       end  # >>
 
-      def initialize acs
-        @ACS = acs
+      def initialize rdr
+        @_reader = rdr
       end
 
       attr_writer(
@@ -60,7 +64,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
         # hand-write a map-reduce for clarity
 
-        st = Home_::Reflection_::To_entry_stream[ @ACS ]
+        st = @_reader.to_entry_stream__
         Callback_.stream do
           begin
             en = st.gets
@@ -73,6 +77,9 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         end
       end
 
+      # look like a proc (sort of) for clients that assume proc-like streamer
+      alias_method :call, :execute
+
       IVARS___ = {
         association: :@on_association,
         operation: :@on_operation,
@@ -82,7 +89,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
         # the below is initted lazily once per stream
 
-        node = Node_for_Assoc___.new @ACS
+        node = Node_for_Assoc___.new @_reader
         p = -> en do
           node.new en
         end
@@ -92,7 +99,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       def __node_for_first_operation first_en
 
-        node = Node_for_Operation___.new @ACS
+        node = Node_for_Operation___.new @_reader
         p = -> en do
           node.new en
         end
@@ -101,71 +108,70 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       end
     end
 
-    # "node" (in our usage here):
-    #
-    #   • munges generally operations and components (and whatever else
-    #     similar we might come up with).
-    #
-    #   • facilitates the delivery of both operation- and component- related
-    #     values in a semi-uniform way.
-    #
-    #   • is an implementation of a #[#018] "load ticket" - resolves the
-    #     various implementation components of the association-or-formal
-    #     lazily, as-needed.
-    #
-    #   • must be suitable for *all* reflection concerns (including indexing)
-    #     so it won't reduce based on meta-components like availability or
-    #     conceptual componets like "intent". (this is made to serve as the
-    #     upstream for clients that *do* reduce in this manner.)
-    #
-    #   • has a name that is or isn't mutated by its definition
-    #     based on whether the definition has been loaded yet.
-
     class Node_for_Assoc___
 
-      def initialize acs
-
-        @_asc_for = Home_::Component_association_reader[ acs ]
-        @_qkn_for = Home_::Reflection_::Component_qualified_knownness_reader[ acs ]
+      def initialize rdr
+        @__reader = rdr
       end
 
       def new en
-        dup.___init en
+        dup.__init en
       end
 
-      def ___init en
-        @_entry = en
+      def __init en
+
+        # everything is memoized; lazily. i.e: load/build/request as little
+        # as necessary (and perhaps less) to satisfy what is being requested
+
+        reader = remove_instance_variable :@__reader
+        name_sym = en.name_symbol ; en = nil
+
+        @_qk = -> do
+          _asc = @_asc[]
+          qk = reader.qualified_knownness_of_association _asc
+          @_qk = -> { qk }
+          qk
+        end
+
+        @_asc = -> do
+          asc = reader.read_association name_sym
+          # (whether or not we have produced a name by the below means,
+          # overwrite it with this ("more correct") name)
+          nf = asc.name
+          @_name = -> { nf }
+          @_asc = -> { asc }
+          asc
+        end
+
+        @_name = -> do
+          # there is a potential gotcha here - if the compasc would customize
+          # the name ([sg]) it won't be represented here unless the caller has
+          # requested the compasc any time before this request of the name.
+          nf = Callback_::Name.via_variegated_symbol name_sym
+          @_name = -> { nf }
+          nf
+        end
+
+        @name_symbol = name_sym
+
         self
       end
 
-      def qualified_knownness
-        if @_qkn_for
-          _asc = association
-          @__qkn = @_qkn_for[ _asc ]
-          @_qkn_for = nil
-        end
-        @__qkn
-      end
-
-      def name
-        if ! @_asc_for && @_association
-          @_association.name
-        else
-          @___nf ||= Callback_::Name.via_variegated_symbol( @_entry.name_symbol )
-        end
+      def to_qualified_knownness_
+        @_qk[]
       end
 
       def association
-        if @_asc_for
-          @_association = @_asc_for[ @_entry.name_symbol ]
-          @_asc_for = nil
-        end
-        @_association
+        @_asc[]
       end
 
-      def name_symbol
-        @_entry.name_symbol
+      def name
+        @_name[]
       end
+
+      attr_reader(
+        :name_symbol,
+      )
 
       def category
         :association
@@ -176,9 +182,9 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       # NOTE will have short selection stack
 
-      def initialize acs
+      def initialize reader
 
-        @_fake_selection_stack_base = [ Callback_::Known_Known[ acs ] ]
+        @_selection_stack_base = [ reader ]
         @_init_formal = true
         @_lib = Home_::Operation::Formal_  # #violation
       end
@@ -203,7 +209,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
         @_init_formal = false
 
-        a = remove_instance_variable( :@_fake_selection_stack_base ).dup
+        a = remove_instance_variable( :@_selection_stack_base ).dup
         lib = remove_instance_variable :@_lib
 
         _nf = name
@@ -228,28 +234,6 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         :operation
       end
     end
-
-    # --
-
-    Ivar_based_value_writer = -> acs do
-
-      # (technically for interpretation not reflection)
-
-      -> qkn do
-        ACS_::Interpretation_::Write_via_ivar[ qkn, acs ]
-      end
-    end
-
-    Ivar_based_value_reader = -> acs do
-
-      # (similar but necessarily different from the other)
-
-      -> asc do
-        ivar = asc.name.as_ivar
-        if acs.instance_variable_defined? ivar
-          Callback_::Known_Known[ acs.instance_variable_get( ivar ) ]
-        end
-      end
-    end
   end
 end
+# #tombstone - older streamers

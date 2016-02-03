@@ -8,16 +8,15 @@ module Skylab::Zerk
 
       def initialize args, acs, & pp
 
-        @_push_qualified_knownness_of_compound = -> qk do
-          @selection_stack.push Here_::Compound_Frame___.new qk ; nil
+        @_push_compound_qk = -> qk do
+          @_stack.push Here_::Compound_Frame___.new qk ; nil
         end
 
         _qk = Callback_::Qualified_Knownness[ acs, ROOT_ASSOCIATION___ ]
-        @selection_stack = []
-        @_push_qualified_knownness_of_compound[ _qk ]
+        @_stack = []
+        @_push_compound_qk[ _qk ]
 
-        @ACS = acs
-        @argument_stream = Callback_::Polymorphic_Stream.via_array args
+        @_stream = Callback_::Polymorphic_Stream.via_array args
         @_pp = pp
       end
 
@@ -27,7 +26,7 @@ module Skylab::Zerk
 
         begin
 
-          if @argument_stream.no_unparsed_exists  # (a)
+          if @_stream.no_unparsed_exists  # (a)
             x = __finish_as_value_inquiry_to_aforementioned_component
             break
           end
@@ -51,7 +50,7 @@ module Skylab::Zerk
 
         _handler.call :error, :no_such_association do
 
-          Here_::When_no_such_association___[ @selection_stack, @argument_stream ]
+          Here_::When_no_such_association___[ @_stack, @_stream ]
         end
         Stop_parsing_because_unable__[]
       end
@@ -60,15 +59,15 @@ module Skylab::Zerk
 
       def __maybe_parse_component_association  # result parse-tuple or nil
 
-        asc = @selection_stack.last.component_association_via_token(
-          @argument_stream.current_token )
+        asc = @_stack.last.component_association_via_token__(
+          @_stream.current_token )
 
         if asc
           if asc.association_is_available  # (k)
-            @argument_stream.advance_one
-            if @argument_stream.no_unparsed_exists  # (m)
+            @_stream.advance_one
+            if @_stream.no_unparsed_exists  # (m)
 
-              _qk = @selection_stack.last.qualified_knownness_for_assoc__ asc
+              _qk = @_stack.last.qualified_knownness_of_association__ asc
               _bc = _bound_call_for _qk
               Result__[ _bc ]
             else
@@ -92,36 +91,40 @@ module Skylab::Zerk
       def ___when_association_is_not_available asc
 
         _handler.call :error, :association_is_not_available do
-          Here_::When_association_is_not_available___[ @selection_stack, asc ]
+          Here_::When_association_is_not_available___[ @_stack, asc ]
         end
         Stop_parsing_because_unable__[]
       end
 
       def __parse_after_compound_association asc  # (q)
 
-        _qk = ACS_::For_Interface::Touch[ asc, @selection_stack.last.value_x ]
-        _qk or self._SANITY
-        @_push_qualified_knownness_of_compound[ _qk ]
+        o = ACS_::Interpretation::Touch.new
+        o.component_association = asc
+        o.reader_writer = @_stack.last.reader_writer
+
+        qk = o.execute
+        qk or self._SANITY
+        @_push_compound_qk[ qk ]
 
         # NOTE - in a slight break with the graph [#012]/figure-1, we are
         # about to loop back to one step farther back than the graph says to.
-        # the effect will be the same, but we are about to make a check for
-        # end of stream redundantly. we don't know a clean way around it.
+        # the effect will be the same, but we end up making a redundant check
+        # for end of stream. we don't know a clean way around it.
 
         KEEP_PARSING__
       end
 
       def _parse_after_non_compound_association asc  # (p)
 
-        qk = ACS_::Interpretation_::Build_value[
-          @argument_stream,
+        qk = ACS_::Interpretation::Build_value[
+          @_stream,
           asc,
-          @selection_stack.last.value_x,
+          @_stack.last.ACS,
           & @_pp ]
 
         if qk
 
-          p = @selection_stack.last.accept_new_component_value__ qk
+          p = @_stack.last.accept_component_change__ qk
 
           _handler.call :info, :set_leaf_component do
             p[]
@@ -139,9 +142,9 @@ module Skylab::Zerk
 
         Require_formal_operation___[]
 
-        m = Formal_Op_.method_name_for_symbol @argument_stream.current_token
+        m = Formal_Op_.method_name_for_symbol @_stream.current_token
 
-        if @selection_stack.last.value_x.respond_to? m
+        if @_stack.last.ACS.respond_to? m
           ___parse_formal_operation m
         else
           NOTHING_
@@ -155,15 +158,15 @@ module Skylab::Zerk
 
       def ___parse_formal_operation m
 
-        # we have our own weird selection stack and for now we don't want
-        # to "pollute" it with the final name function that formal options
-        # require at the top of their selection stacks..
+        # we maintain our own internal selection stack and for now we don't
+        # want to "pollute" it with the final name-function-as-frame that
+        # formal options require at the top of their selection stacks..
 
-        _sym = @argument_stream.current_token
+        _sym = @_stream.current_token
 
         _nf = Callback_::Name.via_variegated_symbol _sym
 
-        ss = @selection_stack.dup  # ours always has compound on top
+        ss = @_stack.dup  # ours always has compound on top
 
         ss.push _nf
 
@@ -183,13 +186,13 @@ module Skylab::Zerk
 
       def ___parse_available_formal_operation fo  # (e)
 
-        @argument_stream.advance_one
+        @_stream.advance_one
 
-        de = fo.deliverable_via_argument_stream @argument_stream, & @_pp
+        de = fo.deliverable_via_argument_stream @_stream, & @_pp
 
         if de  # (g)
 
-          if @argument_stream.no_unparsed_exists  # (j)
+          if @_stream.no_unparsed_exists  # (j)
 
             # (we discard the sel.stack of the deliv. use only the b.c)
 
@@ -206,7 +209,7 @@ module Skylab::Zerk
 
       def ___stop_parsing_when_extra
 
-        x = @argument_stream.current_token
+        x = @_stream.current_token
         _handler.call(
           :error, :expression, :arguments_continued_past_end_of_phrase
         ) do |y|
@@ -220,7 +223,7 @@ module Skylab::Zerk
 
       def __finish_as_value_inquiry_to_aforementioned_component
 
-        _qk = @selection_stack.last.qualified_knownness_as_invocation_result__
+        _qk = @_stack.last.qualified_knownness_as_invocation_result__
         _bound_call_for _qk
       end
 
@@ -231,7 +234,7 @@ module Skylab::Zerk
       # -- support
 
       def _handler
-        @_pp[ @selection_stack.last.value_x ]
+        @_pp[ @_stack.last.ACS ]
       end
 
       # --

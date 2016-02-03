@@ -4,8 +4,13 @@ module Skylab::Autonomous_Component_System
 
     class Streamer
 
-      def initialize st
-        @node_stream = st
+      class << self
+        alias_method :via_streamer__, :new
+        private :new
+      end  # >>
+
+      def initialize str
+        @node_streamer = str
       end
 
       def exclude name_sym
@@ -35,7 +40,8 @@ module Skylab::Autonomous_Component_System
 
         h = ::Hash[ @_black_name_symbols.map { |i| [ i, true ] } ]
 
-        st = @node_stream
+        st = @node_streamer.call
+
         p = -> do
           begin
             no = st.gets
@@ -61,11 +67,13 @@ module Skylab::Autonomous_Component_System
 
         p = @_include_if
 
-        @node_stream.map_reduce_by do |no|
+        _st = @node_streamer.call
+
+        _st.map_reduce_by do |no|
 
           _yes = p[ no ]
           if _yes
-            no.qualified_knownness
+            no.to_qualified_knownness_
           end
         end
       end

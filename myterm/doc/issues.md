@@ -1,3 +1,8 @@
+[#012] #open specs are currently not faked so they're built assuming
+             particular fonts are found.. (but given the scope of this
+             utility, *maybe* it will be ok..)
+
+
 [#011] #open this rewrite
 [#010] #open all silo daemons
 [#009] #open remove blocks tagged with `#eventually`

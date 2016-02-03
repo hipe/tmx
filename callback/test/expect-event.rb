@@ -373,6 +373,10 @@ module Skylab::Callback::TestSupport
         emission_array.first
       end
 
+      def second_emission
+        emission_array.fetch 1
+      end
+
       def last_emission
         emission_array.last
       end

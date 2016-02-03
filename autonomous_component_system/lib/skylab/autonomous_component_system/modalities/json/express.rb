@@ -69,7 +69,8 @@ module Skylab::Autonomous_Component_System
             store[ xx ]
           end
 
-          st = ACS_::For_Serialization::To_stream[ cust_x, acs ]
+          st = Home_::For_Serialization::Stream.via_customization_and_ACS(
+            cust_x, acs )
 
           begin
             o = st.gets
@@ -109,14 +110,14 @@ module Skylab::Autonomous_Component_System
 
             # at this point we know it's true-ish and not a compound node:
 
-            if ACS_::Interpretation::Looks_primitive[ x ]
+            if Looks_primitive__[ x ]
 
               # if it's a primitive, store as-is
               store[ x ] ; redo
 
             else
               x_ = x.to_primitive_for_component_serialization
-              if ! ACS_::Interpretation::Looks_primitive[ x_ ]
+              if ! Looks_primitive__[ x_ ]
                 self._COVER_ME_wrong_shape
               end
               store[ x_ ] ; redo
@@ -222,6 +223,15 @@ module Skylab::Autonomous_Component_System
         attr_reader(
           :downstream_IO,  # experimental..
         )
+      end
+
+      Looks_primitive__ = -> x do  # `nil` is NOT primitive by this definition!
+        case x
+        when ::TrueClass, ::Fixnum, ::Float, ::Symbol, ::String  # [#003]#trueish-note
+          true
+        else
+          false
+        end
       end
 
       NEWLINE_ = "\n"

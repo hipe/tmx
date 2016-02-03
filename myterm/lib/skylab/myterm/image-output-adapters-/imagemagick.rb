@@ -66,19 +66,19 @@ module Skylab::MyTerm
     # -- ACS hook-ins
 
     def component_association_reader
-      @___car ||= Component_Association___[].caching_method_based_reader_for self
+      Component_Association___[].caching_method_based_reader_for self
     end
 
     # (the next 2 are what is default, but #note-about-explicit-readers-writers)
 
-    def accept_component_qualified_knownness qkn
-      @___value_writer ||= ACS_[]::Reflection::Ivar_based_value_writer[ self ]
-      @___value_writer[ qkn ]
+    def component_value_reader
+      self._CHECK
+      ACS_[]::By_Ivars::Value_reader_in[ self ]
     end
 
-    def component_wrapped_value asc
-      @___value_reader ||= ACS_[]::Reflection::Ivar_based_value_reader[ self ]
-      @___value_reader[ asc ]
+    def component_value_writer
+      self._CHECK
+      ACS_[]::By_Ivars::Value_writer_in[ self ]
     end
 
     # -- Components
@@ -150,6 +150,7 @@ module Skylab::MyTerm
 
     def __accept_primitive wv, qkn
 
+      self._REDO
       _ev_proc = ACS_[]::Interpretation::Accept_component_change[
         wv.value_x, qkn.association, self ]
 
@@ -192,6 +193,7 @@ module Skylab::MyTerm
 
       _new_component = new_component_p[]
 
+      self._REDO
       _ev_p = ACS_[]::Interpretation::Accept_component_change[
         _new_component, qkn.association, self ]
 
@@ -239,7 +241,7 @@ module Skylab::MyTerm
       # component. we build it as we would one of our own. (it *is* one of
       # our own.) the difference is in how we handle the events.
 
-      touch = ACS_[]::For_Interface::Touch.new nil, nil  # eew
+      touch = ACS_[]::Touch.new
       touch.do_attach = false
 
       -> qkn_x do

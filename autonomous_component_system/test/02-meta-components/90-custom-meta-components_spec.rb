@@ -4,7 +4,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
   describe "[ac] (e)Xtensibility - meta components" do
 
-    # (what is accomplished here is referenced elsewhere as :[#003]#X1)
+    # (what is accomplished here is referenced elsewhere as :[#013])
 
     TS_[ self ]
     use :memoizer_methods
@@ -39,7 +39,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       dangerous_memoize :_the_memoized_array do
 
         _hi = ___the_ACS_class.new
-        _st = Home_::Reflection::To_node_stream_via_inference[ _hi ]
+        _st = Home_::Reflection::Node_Streamer.via_ACS( _hi ).call
         _st.to_a
       end
 
@@ -77,7 +77,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
               Require_it___[]
 
-              My_Comp_Assoc.method_based_component_association_reader_for self
+              My_Comp_Assoc.reader_of_component_associations_by_method_in self
             end
           end
 

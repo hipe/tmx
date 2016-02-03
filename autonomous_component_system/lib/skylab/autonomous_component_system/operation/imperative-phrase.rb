@@ -2,9 +2,24 @@ module Skylab::Autonomous_Component_System
 
   module Operation
 
-    class Imperative_Phrase < Parsing_Session_
+    class Imperative_Phrase
 
       # required reading: algorithm in :[#014]
+
+      class << self
+
+        def call_via_these__ as, rw, & pp
+          new( as, rw, & pp ).execute
+        end
+
+        private :new
+      end  # >>
+
+      def initialize as, rw, & pp
+        @argument_stream = as
+        @pp_ = pp
+        @_stack_base = [ rw ]
+      end
 
       def execute
 
@@ -24,6 +39,8 @@ module Skylab::Autonomous_Component_System
         #
         # e.g "via integer if not_set set dotily identifier 10"
 
+        @_stack = @_stack_base.dup
+
         __parse_zero_or_more_modifiers
         __parse_verb
         __parse_zero_or_more_operands
@@ -35,7 +52,7 @@ module Skylab::Autonomous_Component_System
       def ___produce_deliverable
 
         @_deliverabler.deliverable_ Request_for_Deliverable_[
-          @selection_stack,
+          @_stack,
           @modz_,
           @argument_stream,
           @pp_ ]
@@ -44,7 +61,7 @@ module Skylab::Autonomous_Component_System
       def __parse_zero_or_more_modifiers  # we peek before loading the node
 
         if MODIFIER_KEYWORDS___[ @argument_stream.current_token ]
-          o = Here_::Modifiers_::Parse.call_via_parsing_session self
+          o = Here_::Modifiers_::Parse.call_via_argument_stream__ @argument_stream
         end
 
         @modz_ = o
@@ -70,12 +87,17 @@ module Skylab::Autonomous_Component_System
         # at any point if one of the component associations you traverse
         # has the transitive capability (to be the deliveree), go that route.
 
-        o = Here_::Node_Parse.via_parsing_session self
+        o = Here_::Node_Parse.begin_via_these__(
+          @_stack,
+          @argument_stream,
+        )
 
         sym = @_imperative_verb_symbol
 
         asc_with_transitive_capability = nil
         transitive_found = false
+
+        o.build_frame_by( & Build_frame_by_qk__ )
 
         o.stop_if = -> asc do
           bx = asc.transitive_capabilities_box
@@ -87,7 +109,7 @@ module Skylab::Autonomous_Component_System
           end
         end
 
-        @selection_stack = o.execute
+        o.execute
 
         @_transitive_found = transitive_found
         if transitive_found
@@ -141,7 +163,7 @@ module Skylab::Autonomous_Component_System
         m = Here_::Formal_.method_name_for_symbol @_imperative_verb_symbol
         @_method_name = m
 
-        if @selection_stack.last.value_x.respond_to? m
+        if @_stack.last.ACS.respond_to? m
           _push_operation_name_on_to_selection_stack
           ACHIEVED_
         else
@@ -156,8 +178,10 @@ module Skylab::Autonomous_Component_System
         # node (primitivesque or entitesque) we need to build in order to
         # find the recipient for the verb..
 
-        _reader = Component_association_reader[ @selection_stack.last.value_x ]
-        _asc = _reader.call @argument_stream.current_token
+        _rw = @_stack.last.reader_writer
+        _asc = _rw.read_association @argument_stream.current_token
+        _asc or self._COVER_ME
+
         @argument_stream.advance_one
 
         qk = _build_this_under_top_of_selection_stack _asc
@@ -166,10 +190,9 @@ module Skylab::Autonomous_Component_System
           # because this is the recipient (not the deliveree) of the
           # operation, it goes on the stack
 
-          @selection_stack.push qk
+          @_stack.push Build_frame_by_qk__[ qk ]
 
           # the verb we parsed earlier is intended to be sent to above.
-
           _push_operation_name_on_to_selection_stack
 
           ACHIEVED_
@@ -193,9 +216,7 @@ module Skylab::Autonomous_Component_System
         if via
           ___build_via_via via, asc
         else
-          _ACS = @selection_stack.last.value_x
-          ACS_::Interpretation_::Build_value.call(
-            @argument_stream, asc, _ACS, & @pp_ )
+          __build_normally asc
         end
       end
 
@@ -209,9 +230,17 @@ module Skylab::Autonomous_Component_System
         end
       end
 
+      def __build_normally asc
+
+        _ACS = @_stack.last.ACS
+
+        ACS_::Interpretation::Build_value.call(
+          @argument_stream, asc, _ACS, & @pp_ )
+      end
+
       def _push_operation_name_on_to_selection_stack
         _sym = remove_instance_variable :@_imperative_verb_symbol
-        @selection_stack.push Callback_::Name.via_variegated_symbol _sym
+        @_stack.push Callback_::Name.via_variegated_symbol _sym
         NIL_
       end
 
@@ -239,8 +268,9 @@ module Skylab::Autonomous_Component_System
         # arguments to the would-be formal operation ..
 
         _m = remove_instance_variable :@_method_name
+
         @_deliverabler = Here_::Formal_.via_method_name_and_selection_stack(
-          _m, @selection_stack )
+          _m, @_stack )
 
         ACHIEVED_
       end
@@ -249,8 +279,44 @@ module Skylab::Autonomous_Component_System
 
       attr_reader(
         :modz_,
-        :selection_stack,
       )
+
+      Build_frame_by_qk__ = -> qk do
+        My_Frame___.new qk
+      end
+
+      class My_Frame___
+
+        def initialize qk
+          @association = qk.association
+          @ACS = qk.value_x
+        end
+
+        def reader_writer
+          @___rw ||= Home_::Reader_Writer.for_componentesque @ACS
+        end
+
+        def name
+          @association.name
+        end
+
+        # -- (rather than implement `to_qualified_knownness` but ..)
+
+        def value_x
+          @ACS
+        end
+
+        def is_known_known
+          true
+        end
+
+        # --
+
+        attr_reader(
+          :ACS,
+          :association,
+        )
+      end
     end
   end
 end

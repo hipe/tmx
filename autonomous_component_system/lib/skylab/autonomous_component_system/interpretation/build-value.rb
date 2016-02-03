@@ -1,11 +1,10 @@
 module Skylab::Autonomous_Component_System
-  # ->
-    module Interpretation_
 
-      class Build_value  # result is a qk
+  module Interpretation
 
+    class Build_value  # result is a qk
+      # -
         # [#006]:the-universal-component-builder explains everything
-        # corroboration by: [ze]
 
         class << self
           def _call ma, asc, acs, & oes_p_p
@@ -18,26 +17,22 @@ module Skylab::Autonomous_Component_System
           private :new
         end  # >>
 
-        def initialize ma, asc, acs, & p
+        def initialize ma, asc, acs, & pp
 
-          if p && 1 != p.arity
+          if pp && 1 != pp.arity
             self._WORLDWIDE_PROTEST
           end
 
           @ACS = acs
           @association = asc
-          @emission_handler_builder = p
           @construction_method = nil
+          @emission_handler_builder = pp
           @mixed_argument = ma
         end
 
         attr_writer(
           :construction_method,
           :mixed_argument,
-        )
-
-        attr_reader(
-          :emission_handler_builder,
         )
 
         def looks_like_compound_component__
@@ -51,11 +46,10 @@ module Skylab::Autonomous_Component_System
 
           @_did_prepare_call ||= _prepare_call
 
-          if @emission_handler_builder
-
-            @_oes_p_p = @emission_handler_builder
+          @_oes_p_p = if @emission_handler_builder
+            @emission_handler_builder
           else
-            @_oes_p_p = ACS_::Interpretation::CHB[ @association, @ACS ]
+            Build_emission_handler_builder_[ @association, @ACS ]
           end
 
           if @_explicit_method_name
@@ -137,48 +131,7 @@ module Skylab::Autonomous_Component_System
           # platform reporting of class name is not as helpful as it could be
           "undefined method `#{ m }` for #{ _ }"
         end
-      end
-
-      Writer = -> acs do
-
-        if acs.respond_to? WRITE_METHOD__
-          acs.method WRITE_METHOD__
-        else
-          ACS_::Reflection::Ivar_based_value_writer[ acs ]
-        end
-      end
-
-      write = nil
-      Write_value = -> x, asc, acs do
-
-        if asc.is_singular_of
-          x = [ x ]  # (not sure if this is the place for this..)
-        end
-
-        _ = Callback_::Qualified_Knownness.via_value_and_association x, asc
-        write[ _, acs ]
-      end
-
-      write = -> qkn, acs do
-
-        if acs.respond_to? WRITE_METHOD__
-          acs.send WRITE_METHOD__, qkn
-        else
-          Write_via_ivar[ qkn, acs ]
-        end
-      end
-
-      Write_via_ivar = -> qkn, acs do
-
-        if qkn.is_known_known
-          acs.instance_variable_set qkn.name.as_ivar, qkn.value_x
-        else
-          self._DESIGN_ME_cover_me  # e.g etc
-        end
-        NIL_
-      end
-
-      WRITE_METHOD__ = :accept_component_qualified_knownness
+      # -
     end
-  # -
+  end
 end

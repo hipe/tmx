@@ -185,8 +185,8 @@ module Skylab::Autonomous_Component_System::TestSupport
       o = Home_::Modalities::JSON::Interpret.new( & oes_p )
 
       o.customization_structure_x = nil
-      o.JSON = json
       o.ACS = new_empty
+      o.JSON = json
 
       o.prepend_more_specific_context_by do
         "in #{ code 'someplace' }"

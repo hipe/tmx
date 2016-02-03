@@ -38,9 +38,10 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       _acs = _ACS
 
-      _node_st = Home_::Reflection::To_node_stream_via_inference[ _acs ]
+      _node_sr = Home_::Reflection::Node_Streamer.via_ACS _acs
 
-      o = Home_::Intent::Streamer.new _node_st
+      o = Home_::Intent::Streamer.via_streamer__ _node_sr
+
       _x = _cust_x
       o = _x[ o ]
       st = o.to_node_stream

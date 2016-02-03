@@ -70,7 +70,7 @@ module Skylab::Autonomous_Component_System
       end
 
       def _ACS
-        @selection_stack.fetch( -2 ).value_x
+        @selection_stack.fetch( -2 ).ACS
       end
 
       def ___accept_proc_as_implementation x

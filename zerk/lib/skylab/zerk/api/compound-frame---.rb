@@ -4,8 +4,7 @@ module Skylab::Zerk
 
     class Compound_Frame___
 
-      # enhance what the sub-client performer normally uses as a stack frame:
-      # a qualified knownness.
+      # our custom frame for our custom stack.
 
       def initialize qk
 
@@ -16,13 +15,14 @@ module Skylab::Zerk
 
       # -- write
 
-      def accept_new_component_value__ qk
+      def accept_component_change__ qk
 
-        _p = ACS_::Interpretation::Accept_component_change[
-          qk.value_x,
-          qk.association,
-          @qualified_knownness.value_x,
-        ]
+        _rw = reader_writer
+
+        _p = ACS_::Interpretation::Accept_component_change.call(
+          qk,
+          _rw,
+        )
 
         @_has_last_written = true
         @_last_written_qkn = qk
@@ -33,12 +33,17 @@ module Skylab::Zerk
       # -- read
 
       def to_node_stream_
-        st = ACS_::Reflection::To_node_stream[ @qualified_knownness.value_x ]
+
+        _rw = reader_writer
+
+        sr = _rw.to_node_streamer
+
         x = __mask__
         if x
           self._ETC
         end
-        st
+        _st = sr.call
+        _st
       end
 
       def qualified_knownness_as_invocation_result__
@@ -52,45 +57,40 @@ module Skylab::Zerk
         end
       end
 
-      def qualified_knownness_for_assoc__ asc
+      def qualified_knownness_of_association__ asc
 
         # NOTE custodianship of this assoc to our compound component is not validated
 
-        @___qkn_p ||= ___build_qkn_p
-        @___qkn_p[ asc ]
+        _rw = reader_writer
+        _rw.qualified_knownness_of_association asc
       end
 
-      def component_association_via_token x
-        @___asc_p ||= ___build_asc_p
-        @___asc_p.call x do
-          NIL_
-        end
-      end
+      def component_association_via_token__ x
 
-      def ___build_qkn_p
-
-        ACS_::Reflection_::Component_qualified_knownness_reader.call(  # #violation
-          @qualified_knownness.value_x,
-        )
-      end
-
-      def ___build_asc_p
-        ACS_::Component_association_reader[ @qualified_knownness.value_x ]
+        _rw = reader_writer
+        _rw.read_association x
       end
 
       def __mask__
         NOTHING_  # #during [#013]
       end
 
-      # -- for sub-clients
+      # --
 
-      # ~ look like a kn
+      def reader_writer
 
-      def value_x
+        # (this one spot is the crux of the whole redesign near r/w)
+
+        @___rw ||= ACS_::Reader_Writer.for_componentesque self.ACS
+      end
+
+      def ACS
         @qualified_knownness.value_x
       end
 
-      def name  # [ac] for contextualized normalization failure expression
+      # -- for sub-clients
+
+      def name  # for our "when"'s - contextualized normalization failure expression
         @qualified_knownness.name
       end
     end

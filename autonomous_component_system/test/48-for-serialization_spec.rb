@@ -38,7 +38,9 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       _acs = _ACS
       _x = _cust_x
-      st = Home_::For_Serialization::To_stream[ _x, _acs ]
+
+      st = Home_::For_Serialization::Stream.via_customization_and_ACS _x, _acs
+
       a = []
       begin
         x = st.gets

@@ -20,6 +20,10 @@ explored below at #intent
 there is a particular way that we "interpret from" this modality, and a
 particular way we "express to" it as well.
 
+the ways in which [#019] "intent" is distinct from "modality" might not
+be valuable, and is certain not defined concretely.
+
+
 
 
 
@@ -44,10 +48,12 @@ just so we agree on terms in this document,
 
 
 
-## :not-long-running
 
-.. is the assumption that we are not yet long-running. we use this tag
-to track areas that could be improved if we become long-running.
+## the N "axiomatic operations" of an ACS (i.e "compoundesque" node)
+
+(this is placed here for narrative continuity with the above and below;
+that is, it is more specific than the above but more general than the
+below, and relates to both sections. the concept is assembled at [#022].)
 
 
 
@@ -70,48 +76,30 @@ to a mutation session which interprets the input.)
 
 
 
-## the modality API of "reactive tree"
 
-### what is a hybrid? :hybrid
+## "method index"
 
-the "unbound"/"bound" dichotomy is one that tries to leverage the
-"classical model" in which taxonomic, model and action nodes are
-represented variously by modules, classes and (again) classes
-respectively. this adaptation of an ACS into a reactive tree is
-decidedly not the classical model. as such, we attempt to reduce noise
-in our implementation by using the same object to act as an unbound and
-bound node. we refer to such objects as "hybrids" here.
+### :"why we cache the method index"
 
+the default assumption is (reasonably) that the compound is not going to
+create new instance methods on-they-fly on its singleton class in order
+to express new component associations or formal operations (because
+although this has been designed from the ground up to support dynamic
+such formals, this is not the way to do it).
 
+as such, we *do* cache the "constituency" of those "nodes" defined by
+instance methods (because per the previous paragraph, these instance
+methods should be coming from "static" classes which should not be
+changing during runtime).
 
-
-### :why-we-do-not-cache-reflection
-
-that component association structures are built anew on-the-fly whenever
-they are requested is an experiment. let's track where this potentially
-feels wasteful in case we change our minds.
-
-(that we create it anew is because of #dt3 dynamicism. that we want not
-to waste it is because of #DT4 conservatism.)
+(we do *not*, however, cache the formal structures that are produced by
+these methods -- to do so would be in direct conflict with one of the
+primary design objectives of the [ac], near [#002]#dt3 dynamicism.)
 
 
 
 
-### :when-both
-
-we want the node to be able to define its own (perhaps nil-ish) list of
-each of the things. if one or more of the things is not defined in this
-manner, we use the simple method index.
-
-however, if one or both of these "name symbols" methods is defined,
-then we effectively group the entries by category in this hard-coded
-order.
-
-
-
-
-
-### :method-index
+### :"the moment at which we cache the entries"
 
 when the method index is in its beginning state, use the below hand-written
 map-reduce to produce each next "entry"; all the while memo'ing each entry
@@ -119,10 +107,13 @@ produced for the one stream. if such a stream ever reaches its end, this
 moves the index out of this beginning state: for subsequent requests we used
 the cached array of entries.
 
-the rationale behind this is that we don't want to index every node if we
-don't have to (for example if we are seeking only one thing as opposed to
-all things). (although the way we may do this now may not need this
-stream anyway.)
+the reason we don't traverse and then cache every entry outright is that we
+don't want to have to traverse every item if we don't have to (for example
+if we are seeking only one item as opposed to expressing all items).
+
+however, if ever we do reach the end, then if we don't cache all this
+work it's a lost opportunity to save ourselves the effort the next time
+we might need it.
 
 the benefit of this is revealed by #coverage-1, which shows the cache
 being used.
@@ -132,6 +123,8 @@ near the the end but never reach the end.
 
 
 
+
+## the "intent" node
 
 ### "intention method", "intent" - :#intent
 

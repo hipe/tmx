@@ -108,8 +108,11 @@ module Skylab::Brazen
 
         x = @_item
 
-        if x.respond_to? :express_into_under
-          __niladic_proc_to_express_current_item_in_the_common_way x
+        if x.respond_to? :express_of_via_into_under
+          __niladic_proc_to_express_current_item_with_preparation x
+
+        elsif x.respond_to? :express_into_under
+          _niladic_proc_to_express_current_item_in_the_common_way
 
         elsif x.respond_to? :execute
           __niladic_proc_to_express_current_item_by_the_execute_method
@@ -150,12 +153,9 @@ module Skylab::Brazen
         end
       end
 
-      def __niladic_proc_to_express_current_item_in_the_common_way x
+      def __niladic_proc_to_express_current_item_with_preparation x
 
-        if x.respond_to? :express_of_via_into_under
-
-          pe = x.express_of_via_into_under @line_yielder, @expression_agent
-        end
+        pe = x.express_of_via_into_under @line_yielder, @expression_agent
 
         if pe
           -> do
@@ -166,6 +166,12 @@ module Skylab::Brazen
             NIL_
           end
         else
+          _niladic_proc_to_express_current_item_in_the_common_way
+        end
+      end
+
+      def _niladic_proc_to_express_current_item_in_the_common_way
+        # -
           -> do
             y = @_item.express_into_under @line_yielder, @expression_agent
             if ! y
@@ -173,7 +179,7 @@ module Skylab::Brazen
             end
             NIL_
           end
-        end
+        # -
       end
 
       def __finish_when_was_stream

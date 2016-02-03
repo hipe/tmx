@@ -341,10 +341,6 @@ module Skylab::Git
         NIL_
       end
 
-      def express_into_under y, expag
-        self._NOT_USED  # but it is necessary that we define the method
-      end
-
       def express_of_via_into_under y, expag
         -> me do
           expag.calculate do

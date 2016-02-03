@@ -1,10 +1,8 @@
 module Skylab::Autonomous_Component_System
 
-  # ->
+  module Interpretation
 
-    module For_Interface  # notes in [#003]
-
-      class Touch < Callback_::Actor::Dyadic  # result is a qk-ish
+    class Touch  # result is a qk-ish
 
         # 1) by default when we create a new component value for these ones,
         #    we "attach" that value to the ACS (for example, by writing to
@@ -12,10 +10,7 @@ module Skylab::Autonomous_Component_System
         #    when this attaching of the new component is disabled, we refer
         #    to the resulting component as "floating".
         #
-        # 2) because this is "for interface", for primitives you
-        #    get a wrapper IFF [..]
-        #    NOTE that for now, we never "attach" a primitive (because
-        #    we never create one)
+        # 2) (see the reference to [#010] below)
         #
         # (all knowns/unknowns are "effectively":)
         #
@@ -26,74 +21,107 @@ module Skylab::Autonomous_Component_System
         # if unknown ent  then qk of created ent (1)
         # if unknown prim then (2)
 
-        class << self
-          public :new
-        end  # >>
-
-        def initialize asc, acs
+      def initialize
           @do_attach = true
-          _init_via asc, acs
-        end
+      end
 
-        attr_writer(
-          :do_attach,
-        )
+      def component_association= x
+        @_asc = x
+      end
 
-        def [] asc, acs
-          dup._init_via( asc, acs ).execute
-        end
+      attr_writer(
+        :do_attach,
+        :reader_writer,
+      )
 
-        def _init_via asc, acs
-          @ACS = acs
-          @asc = asc
-          self
-        end
+      def [] asc, rw
+        o = dup
+        o.component_association = asc
+        o.reader_writer = rw
+        o.execute
+      end
 
-        def execute  # compare to here-A
+      def execute
 
-          @_qk = Home_::Reflection_::Read_component_qualified_knownness[ @asc, @ACS ]
-          @_is_known = @_qk.is_effectively_known
+        @_qk = @reader_writer.qualified_knownness_of_association @_asc
 
-          if @asc.model_classifications.looks_primitivesque
-            __when_primitivesque
-          elsif @_is_known
-            self._COVER_ME_probably_fine
-            @_qk
-          else
-            ___when_unknown_nonprimitivesque
-          end
-        end
+        @_is_known = @_qk.is_effectively_known
 
-        def ___when_unknown_nonprimitivesque
-
-          # (an only slightly modified version of `Build_and_attach` below.)
-
-          qk = Home_::Interpretation::Build_empty_hot[ @asc, @ACS ]
-          if @do_attach
-            Home_::Interpretation_::Write_value[ qk.value_x, @asc, @ACS ]
-          end
-          qk
-        end
-
-        def __when_primitivesque
-
-          bx = @asc.transitive_capabilities_box
-          _has_transitive_capabilities = bx && bx.length.nonzero?
-
-          if _has_transitive_capabilities
-            ACS_::For_Interface::Primitivesque.new @_qk, @ACS
-          else
-            NOTHING_  # as covered
-          end
+        if @_asc.model_classifications.looks_primitivesque
+          __when_primitivesque
+        elsif @_is_known
+          self._COVER_ME_probably_fine
+          @_qk
+        else
+          ___when_unknown_nonprimitivesque
         end
       end
 
-      Build_and_attach = -> asc, acs do  # result is qk
-        qk = Home_::Interpretation::Build_empty_hot[ asc, acs ]
-        Home_::Interpretation_::Write_value[ qk.value_x, asc, acs ]
+      def ___when_unknown_nonprimitivesque
+
+        # (an only slightly modified version of "build and attach" below.)
+
+        qk = Build_empty_hot___[ @_asc, @reader_writer.ACS_ ]
+        if @do_attach
+          @reader_writer.write_value_ qk
+        end
         qk
       end
 
+      def __when_primitivesque
+
+        bx = @_asc.transitive_capabilities_box
+        _has_transitive_capabilities = bx && bx.length.nonzero?
+
+        if _has_transitive_capabilities
+          Primitivesque_Wrapper___.new @_qk, @ACS
+        else
+          NOTHING_  # as covered
+        end
+      end
+
+      Build_empty_hot___ = -> asc, acs do  # result is qk
+
+        _oes_p_p = Build_emission_handler_builder_[ asc, acs ]
+
+        o = ACS_::Interpretation::Build_value.begin nil, asc, acs, & _oes_p_p
+
+        o.mixed_argument = if o.looks_like_compound_component__
+          IDENTITY_
+        else
+          Callback_::Polymorphic_Stream.the_empty_polymorphic_stream
+        end
+
+        o.execute
+      end
+
+      class Primitivesque_Wrapper___
+
+        # #open [#010] this is so [etc])
+
+        def initialize qkn, acs
+
+          @ACS = acs
+          @_qkn = qkn
+        end
+
+        def describe_into_under y, expag
+
+          p = @_qkn.association.instance_description_proc
+
+          if p
+            expag.calculate y, & p
+          else
+            y
+          end
+        end
+
+        # (used to have ..)
+
+        def wrapped_qualified_knownness
+          @_qkn
+        end
+      end
     end
-  # -
+  end
 end

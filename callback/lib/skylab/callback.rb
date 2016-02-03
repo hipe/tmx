@@ -736,6 +736,10 @@ module Skylab::Callback
       Qualified_Knownness.via_association asc
     end
 
+    def to_known_known
+      NIL_  # UNKNOWN_
+    end
+
     def new_with_value x
       Known_Known[ x ]
     end
@@ -768,6 +772,10 @@ module Skylab::Callback
 
     def to_qualified_known_around asc
       Qualified_Knownness.via_value_and_association @value_x, asc
+    end
+
+    def to_known_known
+      self
     end
 
     def new_with_value x

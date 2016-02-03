@@ -76,7 +76,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       end
 
       def _Mutation_Session
-        ACS_::Mutation
+        ACS_::Mutation_Session___
       end
 
       def marshal_to_JSON * io_and_options, acs, & pp
@@ -108,50 +108,20 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       end
     end  # >>
 
-    Component_Association = ::Class.new
-
-    # how this unit is structured is the subject of the [#bs-039] case study
-
-    Component_Association::Caching_method_based_reader_for___ = -> cls, acs do
-
-      # see [#]how-we-cache-component-associations
-
-      read = Component_Association::Method_based_reader_for__[ cls, acs ]
-
-      h = {}
-
-      -> sym, & else_p do
-
-        x = h.fetch sym do
-
-          x_ = read.call sym do
-            NIL_
-          end
-          # when nil, we munge the detail of how `x_` became that way here.
-          h[ sym ] = x_
-          x_
-        end
-
-        if x
-          x
-        elsif else_p
-          else_p[]
-        end
-      end
-    end
+    Component_Association = ::Class.new   # #[#bs-039] case study
 
     method_name_for = -> sym do
       :"__#{ sym }__component_association"
     end
 
-    Component_Association::Method_based_reader_for__ = -> ca_class, acs do
+    Component_Association::Reader_of_CAs_by_method_in___ = -> ca_class, acs do
 
-      send = -> m, sym do
+      read_association = -> m, sym do
 
         ca = nil
 
         p = -> x do
-          ca = ca_class._begin_definition
+          ca = ca_class._begin_via_method_name m
           p = -> x_a do
             ca.send :"accept__#{ x_a.first }__meta_component", * x_a[ 1..-1 ]
             NIL_
@@ -166,12 +136,12 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         if ca
 
           if cm
-            ca._finish_definition_via cm, sym
+            ca._finish_via cm, sym
           else
             sym_ = ca.is_plural_of
             if sym_
               _m_ = method_name_for[ sym_ ]
-              _sing_ca = send[ _m_, sym_ ]
+              _sing_ca = read_association[ _m_, sym_ ]
               Home_::Singularize___[ _sing_ca, sym, ca, acs ]
             else
               self._COVER_ME
@@ -179,41 +149,25 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
           end
 
         elsif cm
-          ca_class._begin_definition._finish_definition_via cm, sym
+          ca_class._begin_via_method_name( m )._finish_via cm, sym
 
         else
-          NIL_  # conditionally turn a whole assoc. off [sa]
+          self._NO_deprecated_use_availability_instead  # #waiting [#025]
         end
       end
 
-      -> sym, & else_p do
+      -> token_x do
 
-        m = method_name_for[ sym ]
-
-        if else_p
+        if token_x.respond_to? :id2name
+          m = method_name_for[ token_x ]
           if acs.respond_to? m
-            send[ m, sym ]
-          else
-            else_p[]
+            read_association[ m, token_x ]
           end
-        else
-          send[ m, sym ]
         end
       end
     end
 
     COMPOUND_CONSTRUCTOR_METHOD_ = :interpret_compound_component
-
-    Component_association_reader = -> acs do
-
-      if acs.respond_to? CA_READER_METHOD__
-        acs.send CA_READER_METHOD__
-      else
-        Component_Association.method_based_component_association_reader_for acs
-      end
-    end
-
-    CA_READER_METHOD__ = :component_association_reader
 
     class Component_Association
 
@@ -221,35 +175,25 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       # lazily, on-the-fly, and are not memoized to be used beyond the
       # "moment": they are #dt3 dynamic and should not be #DT4 cached.
 
-      # -- Construction methods
-
       class << self
 
-        def caching_method_based_reader_for acs
-          Caching_method_based_reader_for___[ self, acs ]
+        def reader_of_component_associations_by_method_in acs
+          Reader_of_CAs_by_method_in___[ self, acs ]
         end
 
-        def method_based_component_association_reader_for acs
-          Method_based_reader_for__[ self, acs ]
-        end
-
-        def via_name_and_model nf, mdl
-
-          _begin_definition._init_via nf, mdl
-        end
-
-        alias_method :_begin_definition, :new
+        alias_method :_begin_via_method_name, :new
         private :new
       end  # >>
 
       # -- Initializers
 
-      def initialize
+      def initialize m
         @association_is_available = true
+        @association_method_name = m
         @_name_mutation = nil
       end
 
-      def _finish_definition_via cm, sym
+      def _finish_via cm, sym
 
         nf = Callback_::Name.via_variegated_symbol sym
 
@@ -272,20 +216,6 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         @___cx ||= Classify_model___[ @component_model ]
       end
 
-      Classify_model___ = -> mdl do
-
-        m = CONSTRUCTOR_METHODS__.detect { | m_ | mdl.respond_to? m_ }
-
-        if m
-          NON_PRIMITIVES___.fetch m
-
-        elsif mdl.respond_to? :[]
-          LOOKS_LIKE_PROC___
-        else
-          self._COVER_ME_model_has_unrecognized_shape
-        end
-      end
-
       def say_no_method__
 
         # assume model does not look like proc - for use in raising e.g a
@@ -299,80 +229,6 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         _or = Callback_::Oxford_or[ _s_a ]
 
         "must respond to #{ _or } - #{ @component_model.name }"
-      end
-
-      ENTITESQUE_CONSTRUCTOR_METHOD__ = :interpret_component
-
-      CONSTRUCTOR_METHODS__ = [
-        ENTITESQUE_CONSTRUCTOR_METHOD__,
-        COMPOUND_CONSTRUCTOR_METHOD_,
-      ]
-
-      class Looks_Like__ < ::Module
-
-        def looks_compound
-          false
-        end
-
-        def looks_entitesque
-          false
-        end
-
-        def looks_primitivesque
-          false
-        end
-      end
-
-      h = {}
-
-      LOOKS_LIKE_COMPOUND = Looks_Like__.new
-      sing = LOOKS_LIKE_COMPOUND
-      class << sing
-
-        def construction_method_name
-          COMPOUND_CONSTRUCTOR_METHOD_
-        end
-
-        def category_symbol
-          :compound
-        end
-
-        def looks_compound
-          true
-        end
-      end
-      h[ sing.construction_method_name ] = sing
-
-      LOOKS_LIKE_ENTITY___ = Looks_Like__.new
-      sing = LOOKS_LIKE_ENTITY___
-      class << sing
-
-        def construction_method_name
-          ENTITESQUE_CONSTRUCTOR_METHOD__
-        end
-
-        def category_symbol
-          :entitesque
-        end
-
-        def looks_entitesque
-          true
-        end
-      end
-      h[ sing.construction_method_name ] = sing
-      NON_PRIMITIVES___ = h
-      h = nil
-
-      LOOKS_LIKE_PROC___ = Looks_Like__.new
-      class << LOOKS_LIKE_PROC___
-
-        def category_symbol
-          :primitivesque
-        end
-
-        def looks_primitivesque
-          true
-        end
       end
 
       # -- Expressive event hook-outs
@@ -434,7 +290,10 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         @name.as_variegated_symbol
       end
 
-      attr_accessor :name
+      attr_accessor(
+        :name,
+        :association_method_name,  # where available. (1x [my], 0x here)
+      )
 
       # ~ transitive operation capabilities
 
@@ -516,16 +375,144 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       def sub_category
         :common
       end
+
+      # --
+
+      Classify_model___ = -> mdl do
+
+        m = CONSTRUCTOR_METHODS__.detect { | m_ | mdl.respond_to? m_ }
+
+        if m
+          NON_PRIMITIVES___.fetch m
+
+        elsif mdl.respond_to? :[]
+          LOOKS_LIKE_PROC___
+        else
+          self._COVER_ME_model_has_unrecognized_shape
+        end
+      end
+
+      ENTITESQUE_CONSTRUCTOR_METHOD__ = :interpret_component
+
+      CONSTRUCTOR_METHODS__ = [
+        ENTITESQUE_CONSTRUCTOR_METHOD__,
+        COMPOUND_CONSTRUCTOR_METHOD_,
+      ]
+
+      class Looks_Like__ < ::Module
+
+        def looks_compound
+          false
+        end
+
+        def looks_entitesque
+          false
+        end
+
+        def looks_primitivesque
+          false
+        end
+      end
+
+      h = {}
+
+      LOOKS_LIKE_COMPOUND = Looks_Like__.new
+      sing = LOOKS_LIKE_COMPOUND
+      class << sing
+
+        def construction_method_name
+          COMPOUND_CONSTRUCTOR_METHOD_
+        end
+
+        def category_symbol
+          :compound
+        end
+
+        def looks_compound
+          true
+        end
+      end
+      h[ sing.construction_method_name ] = sing
+
+      LOOKS_LIKE_ENTITY___ = Looks_Like__.new
+      sing = LOOKS_LIKE_ENTITY___
+      class << sing
+
+        def construction_method_name
+          ENTITESQUE_CONSTRUCTOR_METHOD__
+        end
+
+        def category_symbol
+          :entitesque
+        end
+
+        def looks_entitesque
+          true
+        end
+      end
+      h[ sing.construction_method_name ] = sing
+      NON_PRIMITIVES___ = h
+      h = nil
+
+      LOOKS_LIKE_PROC___ = Looks_Like__.new
+      class << LOOKS_LIKE_PROC___
+
+        def category_symbol
+          :primitivesque
+        end
+
+        def looks_primitivesque
+          true
+        end
+      end
+    end
+
+    module By_Ivars
+
+      Value_writer_in = -> acs do
+
+        -> qk do
+          if qk.is_known_known
+            acs.instance_variable_set qk.name.as_ivar, qk.value_x
+          else
+            self._NEVER_BEEN_NEEDED
+          end
+          NIL_
+        end
+      end
+
+      Value_reader_in = -> acs do
+
+        -> asc do
+          ivar = asc.name.as_ivar
+          if acs.instance_variable_defined? ivar
+            Callback_::Known_Known[ acs.instance_variable_get ivar ]
+          else
+            Callback_::KNOWN_UNKNOWN
+          end
+        end
+      end
     end
 
     Callback_ = ::Skylab::Callback
+    Autoloader_ = Callback_::Autoloader
 
-    Require_field_library_ = Callback_::Lazy.call do
+    module Operation
+      Autoloader_[ self ]
+      Here_ = self
+      Request_for_Deliverable_ = -> * a { a }
+    end
+
+    module Reflection
+      Autoloader_[ self ]
+    end
+
+    Lazy_ = Callback_::Lazy
+
+    Require_field_library_ = Lazy_.call do
       Field_ = Home_.lib_.fields  # idiomatic name
       NIL_
     end
-
-    Autoloader_ = Callback_::Autoloader
 
     module Lib_
 
@@ -558,3 +545,5 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
     UNABLE_ = false
   # -
 end
+# #tombstone: `caching_method_based_reader_for`
+# #tombstone (maybe) - how parts of this file is/were structured is/was [#bs-039]

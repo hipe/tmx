@@ -1,4 +1,4 @@
-module Skylab::Autonomous_Component_System  # notes in [#002]
+module Skylab::Autonomous_Component_System
 
   class Singularize___
 
@@ -43,10 +43,10 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
           _st = Home_::Interpretation::Value_Popper[ x ]
 
-          qk = Home_::Interpretation_::Build_value.call(
+          qk = Home_::Interpretation::Build_value.call(
             _st,
             @singular_comp_assoc,
-            :_man_ray_,
+            @ACS,
             & x_p )
 
           if qk

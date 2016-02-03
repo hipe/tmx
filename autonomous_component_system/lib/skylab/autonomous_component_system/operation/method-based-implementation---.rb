@@ -66,7 +66,7 @@ module Skylab::Autonomous_Component_System
         end
         args.push qk
 
-        _receiver = ss.fetch( -2 ).value_x
+        _receiver = ss.fetch( -2 ).ACS
 
         _method_name = Self_.__method_for_symbol(
           ss.fetch( -1 ).name.as_variegated_symbol )

@@ -1,16 +1,23 @@
+[#025]       #after: [#010]
+[#023]       tracks places where the assumption is made that we are not
+             long-running. if/when "long-running"-ness occurs for an
+             application, these are areas that make calculations redudantly.
+
+[#022]       [ reader-writer ] AND theory..
 [#021]       [ contextualization of expression emissions ]  #[#ca-066]
 [#020]       [ contextualization of event structures ]  #[#ca-066]
 [#019]       [ intent ]
 [#018]       [ load ticket ]  (as a concept)
 [#017]       #when: [#010] finally look at keyword args
 
-[#016] #open in-situ issue with floating..
+[#016] #open will this treatment of "floating" steam-roll existing values?
 
 [#015]       node parse..
 
 [#014]       imperative phrase..
 
-[#013] #hole (#was: for transitive result value, hook-in not hook-out)
+[#013]       #track where we implement custom meta-components
+             (#was: for transitive result value, hook-in not hook-out)
 
 [#012]   #maybe implement transitive operations with formals instead of
              method-based implementation..
@@ -21,7 +28,7 @@
 
 [#009]       intro to operations..
 
-[#008]   #maybe extension API for the *modifiers* for use in mutation sessions
+[#008]   #possible-feature extension API for the *modifiers* for use in mutation sessions
              (we're not sure we want this yet. this just tracks the idea.)
 [#007]       our take on [#br-002]#GEC (see)
 [#006]       construction, composition and eventing ..

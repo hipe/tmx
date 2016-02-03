@@ -74,7 +74,8 @@ violoation of which should occur only with good reason.
       your component assocations: you can add to the set of supported
       "meta-components" your own custom ("business-specific") ones
       by subclassing the base component association class.
-      this advanced technique is demonstrated in [#003]#X1.
+      a test example of this here (and real examples elsewhere) is
+      tracked with [#013].
 
 
 
@@ -101,9 +102,7 @@ violoation of which should occur only with good reason.
   library to achieve "special" behavior; but those methods are in a
   short enough list that we can cover all of them here.
 
-    • `to_component_node_stream`
-    • `to_component_symbol_stream`  # ..
-    • `to_component_operation_symbol_stream`  # ..
+    • [ the ~ 4 "axiomatic operations" that can be hooked-in to at [#022] ]
     • `result_for_component_mutation_session_when_changed`
     • `result_for_component_mutation_session_when_no_change`
 
@@ -120,8 +119,9 @@ violoation of which should occur only with good reason.
   here, the "component association" is built anew on the fly as it is
   needed, by sending a message to *the entity* and not its class.
 
-  because the cost of this dynamicism could be heavy,
-  there is #how-we-cache-component-associations.
+  we used to provide a caching mechanism for component associations,
+  but it turns out that in practice we always seem to want our assocs
+  to be dynamic anyway (but there's a tombstone for this if interested.)
 
 
 
@@ -607,23 +607,3 @@ although this is a *very* exploratory pair of features, here's a thing:
 ### 8) the operation verb
 
 (this section has been moved to a dedicated document: [#009])
-
-
-
-
-# component association notes
-
-## :how-we-cache-component-associations (when we cache them)
-
-• for every item that is ever requested we will only ever attempt to
-  retrieve from the real source once, regardless of whether it
-  was found that time or not.
-
-• for some goof-proofing we conflate not knowing the item with knowing
-  it and resulting in false-ish (for now!), because presumably the ACS
-  that results in false-ish for a "known" item wants us to "think" it
-  doesn't "have" the item in any way. (this related to some nearby non-
-  covered codepoints.)
-
-• any "else" block the client passes must be evaluated anew for each call
-  and must not impact any real (inner) retrieval that is performed.

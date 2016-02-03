@@ -17,7 +17,7 @@ module Skylab::Zerk
         o.property_name = Callback_::Name.via_human 'association'
 
         a = ss[ 1..-1 ].map do |fr|
-          fr.qualified_knownness.name.as_slug
+          fr.name.as_slug
         end
 
         a.push asc.name.as_slug

@@ -12,13 +12,15 @@ module Skylab::Snag
 
           sess.register_properties do | o |
 
-            comp_assoc_for = ACS_[]::Component_association_reader[ first ]
+            _rw = ACS_[]::Reader_Writer.for_componentesque first
 
-            first.formal_properties.each do | prp |
+            comp_assoc_for = _rw.association_reader
 
-              _p = comp_assoc_for[ prp.name_symbol ].
-                component_model::Expression_Adapters::CLI.
-                  express_of_via_under expag
+            first.formal_properties.each do |prp|
+
+              _asc = comp_assoc_for[ prp.name_symbol ]
+              _CLI = _asc.component_model::Expression_Adapters::CLI
+              _p = _CLI.express_of_via_under expag
 
               o.register_property prp, & _p
             end

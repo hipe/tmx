@@ -28,6 +28,9 @@ module Skylab::Autonomous_Component_System
 
         def execute
 
+          _rw = Home_::Reader_Writer.for_componentesque(
+            remove_instance_variable( :@ACS ) )
+
           _x = Home_.lib_.JSON.parse(
             remove_instance_variable( :@JSON ),
             symbolize_names: true,
@@ -37,7 +40,7 @@ module Skylab::Autonomous_Component_System
             _x,
             remove_instance_variable( :@context_linked_list ),
             remove_instance_variable( :@customization_structure_x ),
-            @ACS,
+            _rw,
             @on_empty_JSON_object,
             & @_caller_oes_p )
 
@@ -47,13 +50,13 @@ module Skylab::Autonomous_Component_System
 
       class Interpret::Stack_Frame__
 
-        def initialize x, context_x, cust_x, acs, on_empty, & top_oes_p
+        def initialize x, context_x, cust_x, rw, on_empty, & top_oes_p
 
-          @ACS = acs
           @context_linked_list = context_x
           @customization_structure_x = cust_x
           @on_empty_JSON_object = on_empty
           @_original_caller_oes_p = top_oes_p
+          @_rw = rw
           @_x = x
         end
 
@@ -71,13 +74,13 @@ module Skylab::Autonomous_Component_System
 
           @_did_any_assignments = false
 
-          accept_qkn = ACS_::Interpretation_::Writer[ @ACS ]
+          write_value = @_rw.value_writer_
 
-          @_accept_qkn = -> qkn do
+          @_write_value = -> qk do
 
             @_did_any_assignments = true
-            @_accept_qkn = accept_qkn
-            accept_qkn[ qkn ]
+            @_write_value = write_value
+            write_value[ qk ]
           end
 
           NIL_
@@ -110,7 +113,7 @@ module Skylab::Autonomous_Component_System
             x = pair.value_x
 
             had = true
-            qkn = bxish.fetch sym do
+            qk = bxish.fetch sym do
               had = false
             end
 
@@ -119,7 +122,7 @@ module Skylab::Autonomous_Component_System
               break
             end
 
-            _is = qkn.association.model_classifications.looks_compound
+            _is = qk.association.model_classifications.looks_compound
 
             _category = if _is
               ( deeps ||= [] )
@@ -127,7 +130,7 @@ module Skylab::Autonomous_Component_System
               ( shallows ||= [] )
             end
 
-            _category.push qkn.new_with_value x
+            _category.push qk.new_with_value x
 
             redo
           end while nil
@@ -144,8 +147,8 @@ module Skylab::Autonomous_Component_System
 
         def ___build_boxish
 
-          _st = ACS_::For_Serialization::To_stream[
-            @customization_structure_x, @ACS ]
+          _st = ACS_::For_Serialization::Stream.via_customization_and_rw_(
+            @customization_structure_x, @_rw )
 
           _st.flush_to_immutable_with_random_access_keyed_to_method(
             :name_symbol )
@@ -181,36 +184,36 @@ module Skylab::Autonomous_Component_System
           a = remove_instance_variable :@_unorderd_deeps
           _sort a
           ok = true
-          a.each do |qkn|
-            ok = ___go_deep_on qkn
+          a.each do |qk|
+            ok = ___go_deep_on qk
             ok or break
           end
           ok
         end
 
-        def ___go_deep_on qkn
+        def ___go_deep_on qk
 
-          qk = ___resolve_branch_component_recursively qkn
+          qk = ___resolve_branch_component_recursively qk
           if qk
-            @_accept_qkn[ qk ]
+            @_write_value[ qk ]
             ACHIEVED_
           else
             qk
           end
         end
 
-        def ___resolve_branch_component_recursively qkn
+        def ___resolve_branch_component_recursively qk
 
           # (eventually, fall back on using the normal constructors)
 
-          _on_component = if qkn.is_effectively_known
+          _on_component = if qk.is_effectively_known
 
             -> acs do
 
               # the model itself does the actual contsruction, and once we
               # get this "empty" component, we can populate it by recursing
 
-              ___recurse_into acs, qkn
+              ___recurse_into acs, qk
             end
           else
 
@@ -220,19 +223,19 @@ module Skylab::Autonomous_Component_System
             NIL_
           end
 
-          asc = qkn.association
+          asc = qk.association
 
           _oes_p_p = _reinit_handlers_for asc
 
-          o = ACS_::Interpretation_::Build_value.begin(
-            _on_component, asc, @ACS, & _oes_p_p )
+          o = ACS_::Interpretation::Build_value.begin(
+            _on_component, asc, _ACS, & _oes_p_p )
 
           o.construction_method = :interpret_compound_component
 
           o.execute
         end
 
-        def ___recurse_into cmp, qkn
+        def ___recurse_into cmp, qk
 
           if @customization_structure_x
             self._DING_DONG
@@ -241,20 +244,22 @@ module Skylab::Autonomous_Component_System
 
           _desc_p = -> do
 
-            _nf = qkn.association.name
+            _nf = qk.association.name
 
             "in #{ ick _nf.as_lowercase_with_underscores_symbol.id2name }"
           end
 
           _ctx_ = ::Skylab::Basic::List::Linked[ @context_linked_list, _desc_p ]
 
-          _x = qkn.value_x
+          _json_as_h = qk.value_x
+
+          _rw = Home_::Reader_Writer.for_componentesque cmp
 
           o = Interpret::Stack_Frame__.new(
-            _x,
+            _json_as_h,
             _ctx_,
             cust_x,
-            cmp,
+            _rw,
             @on_empty_JSON_object,
             & @_original_caller_oes_p )
 
@@ -279,35 +284,35 @@ module Skylab::Autonomous_Component_System
           a = remove_instance_variable :@_unorderd_shallows
           _sort a
           ok = true
-          a.each do | qkn |
-            ok = ___go_shallow qkn
+          a.each do |qk|
+            ok = ___go_shallow qk
             ok or break
           end
           ok
         end
 
-        def ___go_shallow qkn
+        def ___go_shallow qk
 
           # accept each of these in a batch manner. we don't bother with
           # UOW any more: we are in the middle of a depth-first building
           # of a compound component.
 
-          _arg_st = ACS_::Interpretation::Value_Popper[ qkn.value_x ]
+          _arg_st = ACS_::Interpretation::Value_Popper[ qk.value_x ]
 
           # using the "value popper" (a shortlived proxy that looks like
           # a stream but only wraps one value) is our way of leveraging
           # the same validation & normalization used in "edit sessions"
           # for unserialization.. (interface experimental)
 
-          asc = qkn.association
+          asc = qk.association
 
           _reinit_handlers_for asc
 
-          qk = ACS_::Interpretation_::Build_value.call(
-            _arg_st, asc, @ACS, & @_CURRENT_component_handler_builder )
+          qk = ACS_::Interpretation::Build_value.call(
+            _arg_st, asc, _ACS, & @_CURRENT_component_handler_builder )
 
           if qk
-            @_accept_qkn[ qk ]
+            @_write_value[ qk ]
             ACHIEVED_
           else
             qk
@@ -339,8 +344,8 @@ module Skylab::Autonomous_Component_System
 
           # this used to be a hook-out, now it's a hook-in
 
-          if @ACS.respond_to? :component_event_model
-            @ACS.component_event_model
+          if _ACS.respond_to? :component_event_model
+            _ACS.component_event_model
           else
             :cold
           end
@@ -404,9 +409,9 @@ module Skylab::Autonomous_Component_System
 
           bx = @_boxish
 
-          qkn_a.sort_by do | qkn |
+          qkn_a.sort_by do |qk|
 
-            bx.index qkn.name_symbol
+            bx.index qk.name_symbol
           end
           NIL_
         end
@@ -414,10 +419,14 @@ module Skylab::Autonomous_Component_System
         def __flush
 
           if @_did_any_assignments
-            @ACS
+            _ACS
           else
             ___when_empty
           end
+        end
+
+        def _ACS
+          @_rw.ACS_
         end
 
         def ___when_empty

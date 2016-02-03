@@ -16,7 +16,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       shared_subject :_tuple do
         _o = build_root_ACS
-        st = Home_::Reflection::To_node_stream[ _o ]
+        st = Home_::Reflection::Node_Streamer.via_ACS( _o ).call
         _x = st.gets
         _xx = st.gets
         _xxx = st.gets and fail
@@ -58,7 +58,7 @@ module Skylab::Autonomous_Component_System::TestSupport
           _fo = _node.formal
           a = _fo.instance_variable_get :@selection_stack  # bad test
           a.last.name.as_variegated_symbol.should eql :opie
-          _hi = a.first.value_x.hello
+          _hi = a.first.ACS.hello
           _hi.should eql :_i_am_from_injector_
         end
 
