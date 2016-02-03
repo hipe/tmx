@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   module Operation
 
-    class Formal_  # used by [ze] too
+    class Formal_  # 1x [mt] 1x here
 
       # the "formal" part of the operation is that which is defined by the
       # association-like DSL expression. this data is wrapped by this node
@@ -11,21 +11,36 @@ module Skylab::Autonomous_Component_System
 
       class << self
 
-        def method_name_for_symbol sym
-          :"__#{ sym }__component_operation"
-        end
+        def reader_of_formal_operations_by_method_in acs
 
-        def via_method_name_and_selection_stack m, a
-          new.___init_via( m, a ).execute
+          # we've decided that a "formal operation" includes the "selection
+          # stack" involved in reaching it. so the reader (when successful)
+          # cannot itself produce a full formal operation simply from a
+          # symbolic name and an ACS. rather, the successful "read" results
+          # in a proc which in turn will produce the formal operation when
+          # passed a selection stack. whew!
+
+          -> sym do
+
+            m = :"__#{ sym }__component_operation"
+
+            if acs.respond_to? m
+
+              -> ss do
+                _fo = new.___init_via m, ss
+                _fo.execute
+              end
+            end
+          end
         end
 
         private :new
       end  # >>
 
-      def ___init_via m, a
+      def ___init_via m, ss
         @_method_name = m
         @operation_is_available = true
-        @selection_stack = a
+        @selection_stack = ss
         self
       end
 
@@ -91,7 +106,15 @@ module Skylab::Autonomous_Component_System
         NIL_
       end
 
-      attr_reader :operation_is_available
+      def __accept__unavailability_reason_tuple_proc__meta_component st
+        # (it's a proc that produces a tuple of N symbols and one proc!)
+        @unavailability_reason_tuple_proc = st.gets_one ; nil
+      end
+
+      attr_reader(
+        :operation_is_available,
+        :unavailability_reason_tuple_proc,
+      )
 
       def __accept__parameter__meta_component st
 
@@ -110,3 +133,4 @@ module Skylab::Autonomous_Component_System
     end
   end
 end
+# #pending-rename: promote to public [mt]

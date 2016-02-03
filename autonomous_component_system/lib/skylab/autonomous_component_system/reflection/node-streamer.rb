@@ -25,7 +25,6 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       #   • has a name that is or isn't mutated by its definition
       #     based on whether the definition has been loaded yet.
 
-
       class << self
 
         def via_ACS acs
@@ -106,7 +105,8 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         @on_operation = p
         p[ first_en ]
       end
-    end
+
+      # <-
 
     class Node_for_Assoc___
 
@@ -157,7 +157,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         self
       end
 
-      def to_qualified_knownness_
+      def to_qualified_knownness
         @_qk[]
       end
 
@@ -186,7 +186,6 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
         @_selection_stack_base = [ reader ]
         @_init_formal = true
-        @_lib = Home_::Operation::Formal_  # #violation
       end
 
       def new en
@@ -210,14 +209,11 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         @_init_formal = false
 
         a = remove_instance_variable( :@_selection_stack_base ).dup
-        lib = remove_instance_variable :@_lib
 
+        fo = a.last.read_formal_operation @_entry.name_symbol
         _nf = name
         a.push _nf
-
-        _m = lib.method_name_for_symbol @_entry.name_symbol
-
-        @_formal = lib.via_method_name_and_selection_stack _m, a
+        @_formal = fo[ a ]
 
         NIL_
       end
@@ -233,6 +229,8 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       def category
         :operation
       end
+    end
+  # ->
     end
   end
 end

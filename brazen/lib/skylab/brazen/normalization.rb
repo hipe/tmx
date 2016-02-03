@@ -73,7 +73,7 @@ module Skylab::Brazen
       end
     end
 
-    class Build_Knownness_Normalizer__  # #[#117].
+    class Build_Knownness_Normalizer__  # #[#087].
 
       attr_writer(
         :apply_default,

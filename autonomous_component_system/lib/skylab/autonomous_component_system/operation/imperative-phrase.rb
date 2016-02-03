@@ -160,13 +160,16 @@ module Skylab::Autonomous_Component_System
 
         # if this compound node itself defines the formal operation..
 
-        m = Here_::Formal_.method_name_for_symbol @_imperative_verb_symbol
-        @_method_name = m
+        _rw = @_stack.last.reader_writer
 
-        if @_stack.last.ACS.respond_to? m
+        fo_p = _rw.read_formal_operation @_imperative_verb_symbol
+
+        if fo_p
+          @_fo_p = fo_p
           _push_operation_name_on_to_selection_stack
           ACHIEVED_
         else
+          @_fo_p = nil  # eew
           ___finish_selection_stack_for_formal_with_one_more_descent
         end
       end
@@ -267,10 +270,21 @@ module Skylab::Autonomous_Component_System
         # any remainder of the arg stream that we can parse represents
         # arguments to the would-be formal operation ..
 
-        _m = remove_instance_variable :@_method_name
+        fo_p = remove_instance_variable :@_fo_p
 
-        @_deliverabler = Here_::Formal_.via_method_name_and_selection_stack(
-          _m, @_stack )
+        if fo_p
+
+          fo = fo_p[ @_stack ]
+
+        else
+
+          # as covered, this is a hail mary ..
+          _sym = @_stack.last.as_variegated_symbol
+          _eek = @_stack.fetch( -2 ).reader_writer.read_formal_operation _sym
+          fo = _eek[ @_stack ]
+        end
+
+        @_deliverabler = fo
 
         ACHIEVED_
       end

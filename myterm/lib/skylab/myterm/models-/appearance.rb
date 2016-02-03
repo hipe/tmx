@@ -42,6 +42,26 @@ module Skylab::MyTerm
       end
     end
 
+    def component_operation_reader
+
+      mine = ACS_::Operation::Formal_.reader_of_formal_operations_by_method_in self
+
+      -> sym do
+
+        if @adapter
+          fo_p = @adapter.read_formal_operation__ sym
+        end
+        if fo_p
+          -> ss do
+            _ss_ = Crazy_swap___[ ss, @adapter.implementation__ ]
+            fo_p[ _ss_ ]
+          end
+        else
+          mine[ sym ]
+        end
+      end
+    end
+
     def to_component_node_streamer
       self._K  # probably in #during #milestone-5
     end
@@ -73,6 +93,30 @@ module Skylab::MyTerm
         if ! did
           mine[ qk ]
         end
+      end
+    end
+
+    Crazy_swap___ = -> ss, impl do
+
+      _receiver_frame = ss.fetch( -2 )
+
+      _qk = _receiver_frame.qualified_knownness
+      _qk_ = _qk.new_with_value impl
+      _receiver_frame_ = Simplified_Frame_for_Experiment___.new _qk_
+
+      ss_ = ss.dup
+      ss_[ -2 ] = _receiver_frame_
+      ss_
+    end
+
+    class Simplified_Frame_for_Experiment___
+
+      def initialize qk
+        @_qk = qk
+      end
+
+      def ACS
+        @_qk.value_x
       end
     end
 

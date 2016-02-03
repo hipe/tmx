@@ -32,7 +32,7 @@ module Skylab::MyTerm
 
         lt.adapter_name
 
-        Adapter___.new _mod, lt.adapter_name, @kernel_, & @_pp
+        Adapter___.new _mod, lt.adapter_name, @kernel_
       end
 
       def __resolve_load_ticket_via_argument_stream
@@ -74,13 +74,13 @@ module Skylab::MyTerm
       # KEEP:
       # _mod.interpret_compound_component IDENTITY_, nf, @kernel_, & @_pp
 
-      def initialize mod, nf, k, & pp
+      def initialize mod, nf, k
 
         @is_selected = false
         @kernel_ = k
         @_nf = nf
 
-        @_impl = mod.new self, & pp
+        @_impl = mod.new self
         @_rw = ACS_::ReaderWriter.for_componentesque @_impl
       end
 
@@ -132,6 +132,10 @@ module Skylab::MyTerm
         @_rw.read_association token_x
       end
 
+      def read_formal_operation__ sym
+        @_rw.read_formal_operation sym
+      end
+
       def read_value__ asc
 
         # what we are *supposed* to implement is "give me the kn for this
@@ -160,6 +164,14 @@ module Skylab::MyTerm
 
       def adapter_name_const
         @_nf.as_const
+      end
+
+      def implementation__
+        @_impl
+      end
+
+      def reader_writer__
+        @_rw
       end
 
       attr_reader(

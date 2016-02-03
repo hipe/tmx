@@ -75,7 +75,7 @@ module Skylab::Zerk
               send PARSE_AFTER_VIA_SHAPE___.fetch( _ ), asc
             end
           else
-            ___when_association_is_not_available asc
+            __when_association_is_not_available asc
           end
         else
           NOTHING_  # let the next guy try
@@ -87,14 +87,6 @@ module Skylab::Zerk
         entitesque: :_parse_after_non_compound_association,
         primitivesque: :_parse_after_non_compound_association,
       }
-
-      def ___when_association_is_not_available asc
-
-        _handler.call :error, :association_is_not_available do
-          Here_::When_association_is_not_available___[ @_stack, asc ]
-        end
-        Stop_parsing_because_unable__[]
-      end
 
       def __parse_after_compound_association asc  # (q)
 
@@ -140,23 +132,18 @@ module Skylab::Zerk
 
       def __maybe_parse_formal_operation
 
-        Require_formal_operation___[]
+        _rw = @_stack.last.reader_writer
 
-        m = Formal_Op_.method_name_for_symbol @_stream.current_token
+        fo = _rw.read_formal_operation @_stream.current_token
 
-        if @_stack.last.ACS.respond_to? m
-          ___parse_formal_operation m
+        if fo
+          ___when_formal_operation fo
         else
           NOTHING_
         end
       end
 
-      Require_formal_operation___ = Lazy_.call do
-        Formal_Op_ = ACS_::Operation::Formal_  # #violation
-        NIL_
-      end
-
-      def ___parse_formal_operation m
+      def ___when_formal_operation fo_p
 
         # we maintain our own internal selection stack and for now we don't
         # want to "pollute" it with the final name-function-as-frame that
@@ -170,21 +157,41 @@ module Skylab::Zerk
 
         ss.push _nf
 
-        fo = Formal_Op_.via_method_name_and_selection_stack m, ss
+        fo = fo_p[ ss ]
 
         if fo.operation_is_available
 
-          ___parse_available_formal_operation fo
+          __parse_available_formal_operation fo
         else
-
-          _handler.call :error, :operation_is_not_available do
-            Here_::When_operation_is_not_available___[ fo ]
-          end
-          Stop_parsing_because_unable__[]
+          ___when_operation_not_available fo
         end
       end
 
-      def ___parse_available_formal_operation fo  # (e)
+      def ___when_operation_not_available fo
+
+        p = fo.unavailability_reason_tuple_proc
+        if p
+          ( * sym_a, ev_p ) = p.call
+          _handler.call( * sym_a, & ev_p )
+        else
+          _handler.call :error, :operation_is_not_available do
+            Here_::When_operation_is_not_available___[ fo ]
+          end
+        end
+
+        Stop_parsing_because_unable__[]
+      end
+
+      def __when_association_is_not_available asc
+
+        _handler.call :error, :association_is_not_available do
+          Here_::When_association_is_not_available___[ @_stack, asc ]
+        end
+
+        Stop_parsing_because_unable__[]
+      end
+
+      def __parse_available_formal_operation fo  # (e)
 
         @_stream.advance_one
 

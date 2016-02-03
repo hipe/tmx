@@ -25,7 +25,7 @@ module Skylab::Autonomous_Component_System
           _st = o.execute
 
           _st.map_by do |no|
-            no.to_qualified_knownness_
+            no.to_qualified_knownness
           end
         end
       end

@@ -93,6 +93,10 @@ module Skylab::Zerk
       def name  # for our "when"'s - contextualized normalization failure expression
         @qualified_knownness.name
       end
+
+      # -- crazy experiment for [my]
+
+      attr_reader :qualified_knownness
     end
   end
 end

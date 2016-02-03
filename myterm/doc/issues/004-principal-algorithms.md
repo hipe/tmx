@@ -36,7 +36,10 @@ the work.
 
 
 
-### :subnote-1
+### :"we used to abstain from calling this normalize"
+
+(EDIT: the below is in the present tense, should be in past now.)
+(do NOT erase this whole hog! the theory it brings up is important.)
 
 we don't call this step `normalize` (despite the strong gravity from
 the [#br-087] normal normalizer) because (quite interestingly) under the

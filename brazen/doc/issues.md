@@ -9,7 +9,8 @@
 [#119]       track expression of ACS associations into brazen unbound tree
              ( #was: get [fm] out of test (see) )
 [#118]       do we want the ability to have a model-less-action? for now, no
-[#117]       track abstraction candidates near reactive model, normalization
+[#117] #hole (#merged-with: [#087])
+             (#was: track abstraction candidates near reactive model, normalization)
              (#was: we might want top invocation to be able to emit events with
              the same interface as action adapters, which would change
              the inheritence graph considerably )
@@ -48,7 +49,7 @@
 [#089] #open integrate the *four* redundancies at [#002]#GEC
              ( became the ACS )
 [#088]       the meta-meta-properties justification ..
-[#087]       #track similar normalization logics (this might be a redundant tracker)
+[#087]       #track similar normalization logics
 [#086]       #track cases where failure is "fuzzy" (i.e non-atomic),
                ignored for the greater good, for usability
 [#085] #hole (#was: (#moved-to: [#ba-052]))

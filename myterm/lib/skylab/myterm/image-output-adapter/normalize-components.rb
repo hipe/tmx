@@ -2,76 +2,122 @@ module Skylab::MyTerm
 
   module Image_Output_Adapter
 
-    class Normalize_Components
+    class Normalize_Components < Callback_::Actor::Dyadic
 
-      self._NOTE  # this was just cut-and-paste here. half is reference
+      # the logical essence of this is just a plain old #[#br-087]-style
+      # missing-required's-check. it's noisy because it needs a lot of
+      # custom fittings inbound & out.
 
-      # see [#004]:principal-algorithm-1 - when images are made
+      # always result in the same shape of custom result struct (bottom).
+      #   • towards [#004]:principal-algorithm-1 - when images are made
+      #   • fun: [#004]:"we used to abstain from calling this normalize"
 
-      def ___maybe_build_and_send_image
-
-        _yes = __check_if_all_requireds_are_set
-        if _yes
-          __via_snapshot_build_and_send_image
-        else
-          ACHIEVED_  # missing requireds is not a failure
-        end
+      def initialize rw, mcmp_sym
+        @metacomponent_symbol = mcmp_sym
+        @_rw = rw
       end
 
-      def __check_if_all_requireds_are_set
+      def execute
 
-        # all about this name and implementation at [#004]:subnote-1
+        # for each component assocation (i.e each node that is not a formal
+        # operation), if it's required and "missing" then make a memo of it
+        # and go into "error reporting mode" (below). otherwise add a qk
+        # of the node to a box. "error reporting mode" simply means etc.
 
-        missing = nil
-        snapshot = Callback_::Box.new  # stowaway logic while making the trip
+        st = ___build_node_stream
 
-        st = ACS_::Reflection::Qualified_knownness_stream_via_ACS[ self ]
+        @_see = method :__normal_see
+        @_finish = method :__normal_finish
+        @_snapshot = Callback_::Box.new
 
         begin
-
-          qkn = st.gets
-          qkn or break
-
-          snapshot.add qkn.name.as_variegated_symbol, qkn
-
-          if ! qkn.association.is_required_to_make_image_
-            redo
-          end
-
-          if ! qkn.is_effectively_known
-            ( missing ||= [] ).push qkn.association
-          end
-
+          no = st.gets
+          no or break
+          _qk = no.to_qualified_knownness
+          @_see[ _qk ]
           redo
         end while nil
 
-        if missing
-          ___emit_information_about_remaining_required_fields missing
-          UNABLE_
-        else
-          @snapshot_ = snapshot
-          ACHIEVED_
-        end
+        @_finish.call
       end
 
-      def ___emit_information_about_remaining_required_fields missing
+      def ___build_node_stream
 
-        @oes_p_.call :info, :expression, :remaining_required_fields do | y |
+        o = @_rw.to_node_streamer
+        o.on_operation = MONADIC_EMPTINESS_
+        o.execute
+      end
 
-          _s_a = missing.map do | asc |
-            val asc.name.as_human  # ..
-          end
+      def __normal_see qk
 
-          y << "(still needed before we can produce an image: #{ and_ _s_a })"
+        if _invalid qk
+          @_nerp = []
+          _add_invalid qk
+          @_see = method :___abnormal_see
+          @_finish = method :__abnormal_finish
+        else
+          @_snapshot.add :k, :qkn
         end
-
         NIL_
       end
 
-      def __via_snapshot_build_and_send_image
+      def ___abnormal_see qk
+        if _invalid qk
+          _add_invalid qk
+        end
+        NIL_
+      end
+
+      def _invalid qk
+        _asc = qk.association
+        _is_required = _asc.send @metacomponent_symbol
+        if _is_required
+          ! qk.is_effectively_known
+        end
+      end
+
+      def _add_invalid qk
+        @_nerp.push qk.association ; nil
+      end
+
+      def __normal_finish
+        _sn = remove_instance_variable :@_snapshot
+        Result__.new NO_ERRORS_, IS_AVAILABLE___, _sn
+      end
+
+      def __abnormal_finish
+
+        _em_proc = -> do
+
+          missing = @_nerp
+
+          _p = -> y do
+
+            _s_a = missing.map do |asc|
+              val asc.name.as_human  # ..
+            end
+
+            y << "(still needed before we can produce an image: #{ and_ _s_a })"
+          end
+
+          [ :info, :expression, :remaining_required_fields, _p ]
+        end
+
+        Result__.new _em_proc, NOT_AVAILABLE___
+      end
+
+      def __TAKE_ME_via_snapshot_build_and_send_image
 
         Here_::Build_and_send_image_[ @snapshot_, @kernel_, & @oes_p_ ]
       end
+
+      Result__ = ::Struct.new :reason_proc, :is_available, :shh__
+
+      IS_AVAILABLE___ = true
+      MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
+      NO_ERRORS_ = nil
+      NOTHING_ = nil
+      NOT_AVAILABLE___ = false
     end
   end
 end

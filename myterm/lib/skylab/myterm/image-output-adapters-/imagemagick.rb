@@ -2,7 +2,26 @@ module Skylab::MyTerm
 
   class Image_Output_Adapters_::Imagemagick  # (notes in [#003], [#004])
 
-    def initialize svc, & pp
+    def initialize svc
+      @_svc = svc
+    end
+
+    # -- Operations
+
+    def __imagemagick_command__component_operation
+
+      _rw = @_svc.reader_writer__
+
+      o = Home_::Image_Output_Adapter::Normalize_Components.call(
+        _rw, :is_required_to_make_image_ )
+
+      yield :is_available, o.is_available
+
+      yield :unavailability_reason_tuple_proc, o.reason_proc
+
+      -> do
+        self._K
+      end
     end
 
     # -- Components

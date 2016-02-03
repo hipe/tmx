@@ -73,7 +73,7 @@ module Skylab::Autonomous_Component_System
 
           _yes = p[ no ]
           if _yes
-            no.to_qualified_knownness_
+            no.to_qualified_knownness
           end
         end
       end

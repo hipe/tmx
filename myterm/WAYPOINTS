@@ -1,3 +1,2 @@
-waypoint 5 - compound injection
-           - integrated unavailability per operation
-           - injected operation
+waypoint 6 - integrated unavailability (& injected operation)
+waypoint 7 - "label" component & generate i.m command

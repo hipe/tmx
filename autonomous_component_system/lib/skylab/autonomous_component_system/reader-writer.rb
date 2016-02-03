@@ -30,6 +30,7 @@ module Skylab::Autonomous_Component_System
       _detect_association_definition_: :__build_detect_etc,
       _method_index_: :__build_method_index,
       _read_association_: :__build_read_association,
+      _read_formal_operation_: :__build_read_formal_operation,
       _read_value_: :__build_value_reader,
       _to_node_streamer_: :__build_to_node_streamer,
       _write_value_: :__build_value_writer,
@@ -37,6 +38,7 @@ module Skylab::Autonomous_Component_System
 
     CUSTOM_METHOD__ = {
       _read_association_: :component_association_reader,
+      _read_formal_operation_: :component_operation_reader,
       _read_value_: :component_value_reader,
       _to_node_streamer_: :to_component_node_streamer,
       _write_value_: :component_value_writer,
@@ -70,9 +72,24 @@ module Skylab::Autonomous_Component_System
     def __build_read_association
       m = CUSTOM_METHOD__.fetch :_read_association_
       if @ACS_.respond_to? m
-        @ACS_.send m  # NOTE - the result is a "reader", i.e a proc-like
+        @ACS_.send m
       else
         Component_Association.reader_of_component_associations_by_method_in @ACS_
+      end
+    end
+
+    # -
+
+    def read_formal_operation k
+      @_cached[ :_read_formal_operation_ ].call k
+    end
+
+    def __build_read_formal_operation
+      m = CUSTOM_METHOD__.fetch :_read_formal_operation_
+      if @ACS_.respond_to? m
+        @ACS_.send m
+      else
+        Home_::Operation::Formal_.reader_of_formal_operations_by_method_in @ACS_
       end
     end
 
