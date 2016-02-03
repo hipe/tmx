@@ -18,6 +18,7 @@ state_compound_yes->state_more_arguments
 state_inquiry->state_succeeded
 state_more_arguments->ask_assoc
 state_operation->ask_arg_parse_succeeded
+state_stack->state_more_arguments
 state_start->ama1
 state_unrecognized->state_failed
 state_whether_compound->state_inquiry
@@ -33,13 +34,15 @@ ask_component_parse_succeed->state_failed [label="no (r)"]
 ask_component_parse_succeed->state_write [label="yes (s)"]
 ask_compound->state_component_parse [label="no (p)"]
 ask_compound->state_compound_yes [label="yes (q)"]
+ask_stack->state_stack [label="yes (d3)"]
+ask_stack->state_unrecognized [label="no (d2)"]
 ama1->state_more_arguments [label="yes (b)"]
 ama1->state_inquiry [label="no (a)"]
 ama2->state_succeeded [label="no (j)"]
 ama2->state_extra_args_post_op [label="yes (h)"]
 ama3->state_whether_compound[label="no (m)"]
 ama3->ask_compound [label="yes (n)"]
-ask_operation->state_unrecognized [label="no (d)"]
+ask_operation->ask_stack [label="no (d)"]
 ask_operation->state_operation [label="yes (e)"]
 
 /* asks */
@@ -48,6 +51,7 @@ ask_arg_parse_succeeded [shape=diamond label="succeeded? (1st)"]
 ask_assoc [shape=diamond label="association?"]
 ask_component_parse_succeed [shape=diamond label="succeeded? (2nd)"]
 ask_compound [shape=diamond label="is aforementioned\nassoc. compound?"]
+ask_stack [shape=diamond label="more on\nstack?"]
 ama1 [shape=diamond label="are there more\narguments? (1st)"]
 ama2 [shape=diamond label="are there more\narguments? (2nd)"]
 ama3 [shape=diamond label="are there more\narguments? (3rd)"]
@@ -94,6 +98,9 @@ operation \"autonomously\"
 attempts to \"prepare\" itself
 by parsing all the arguments it
 can off the argument stream."]
+
+state_stack [shape=rectangle label="pop one frame
+off the stack"]
 
 state_unrecognized [shape=rectangle label="the token is
 unrecognizable"]

@@ -26,7 +26,16 @@ module Skylab::Autonomous_Component_System::TestSupport
         def set_verb_phrase_for_expect_root_ACS o
           @verb_phrase = o ; nil
         end
+
       # -
+
+      def SUBJ
+        @subject
+      end
+
+      def VP
+        @verb_phrase
+      end
 
       class Verb_Phrase
 
@@ -47,6 +56,14 @@ module Skylab::Autonomous_Component_System::TestSupport
         def _set_object x
           @object = x ; nil
         end
+
+        def V
+          @verb
+        end
+
+        attr_reader :object
+        alias_method :O, :object
+        undef_method :object
       end
     end
   end

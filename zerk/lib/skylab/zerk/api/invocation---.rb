@@ -13,6 +13,8 @@ module Skylab::Zerk
         end
 
         _qk = Callback_::Qualified_Knownness[ acs, ROOT_ASSOCIATION___ ]
+
+        @_memory = []
         @_stack = []
         @_push_compound_qk[ _qk ]
 
@@ -35,7 +37,9 @@ module Skylab::Zerk
 
           parse ||= __maybe_parse_formal_operation  # (c)
 
-          parse ||= ___stop_parsing_because_no_such_association  # (d)
+          parse ||= __maybe_pop_the_stack  # (d), (d2)
+
+          parse ||= __stop_parsing_because_no_such_association  # (d3)
 
           if parse.keep_parsing
             redo
@@ -46,15 +50,6 @@ module Skylab::Zerk
         x
       end
 
-      def ___stop_parsing_because_no_such_association
-
-        _handler.call :error, :no_such_association do
-
-          Here_::When_no_such_association___[ @_stack, @_stream ]
-        end
-        Stop_parsing_because_unable__[]
-      end
-
       # -- parsing components (not operations)
 
       def __maybe_parse_component_association  # result parse-tuple or nil
@@ -63,6 +58,7 @@ module Skylab::Zerk
           @_stream.current_token )
 
         if asc
+          @_memory.clear
           if asc.association_is_available  # (k)
             @_stream.advance_one
             if @_stream.no_unparsed_exists  # (m)
@@ -149,6 +145,8 @@ module Skylab::Zerk
         # want to "pollute" it with the final name-function-as-frame that
         # formal options require at the top of their selection stacks..
 
+        @_memory.clear
+
         _sym = @_stream.current_token
 
         _nf = Callback_::Name.via_variegated_symbol _sym
@@ -212,6 +210,29 @@ module Skylab::Zerk
         else  # (f)
           Result__[ de ]
         end
+      end
+
+      def __maybe_pop_the_stack
+
+        if 1 < @_stack.length
+          _bye_bye = @_stack.pop
+          @_memory.push _bye_bye
+          KEEP_PARSING__
+        end
+      end
+
+      def __stop_parsing_because_no_such_association
+
+        while @_memory.length.nonzero?
+          @_stack.push @_memory.pop
+        end
+
+        _handler.call :error, :no_such_association do
+
+          Here_::When_no_such_association___[ @_stack, @_stream ]
+        end
+
+        Stop_parsing_because_unable__[]
       end
 
       def ___stop_parsing_when_extra
